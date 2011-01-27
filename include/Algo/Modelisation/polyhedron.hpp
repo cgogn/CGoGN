@@ -1017,7 +1017,7 @@ void Polyhedron<PFP>::embedTwistedStrip( float radius_min,  float radius_max, fl
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn)
+void Polyhedron<PFP>::embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -1033,14 +1033,14 @@ void Polyhedron<PFP>::embedHelicoid( float radius_min,  float radius_max, float 
 		{
 // 			float r = radius_max + radius_min*cos(beta*float(j));
 			float r,x,y;
-			if(i==1) {
-				r = radius_max;
-			}
-			else {
-				r= radius_min;
-			}
-			x = r*sin(alpha*float(j));
-			y = r*cos(alpha*float(j));
+// 			if(i==1) {
+// 				r = radius_max;
+// 			}
+// 			else {
+				r= radius_min+(radius_max-radius_min)*float(i)/float(m_ny);
+// 			}
+			x = orient*r*sin(alpha*float(j));
+			y = orient*r*cos(alpha*float(j));
 
 			VEC3 pos(x, y, j*hS);
 			Dart d = m_tableVertDarts[i*(m_nx+1)+j];

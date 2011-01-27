@@ -27,6 +27,120 @@ void generateAbsolutSpiralOfDeath(typename PFP::MAP& map,typename PFP::TVEC3& po
 	map.initOrbitEmbedding(FACE_ORBIT);
 }
 
+template <typename PFP>
+void generateToboggan(typename PFP::MAP& map,typename PFP::TVEC3& position, DartMarker& closeMark, unsigned int side, float rMin, float rMax,float nbTurns)
+{
+	//the stairs
+	Algo::Modelisation::Polyhedron<PFP> prim(map,position);
+	prim.grid_topo(side,3);
+	//the slide
+	Algo::Modelisation::Polyhedron<PFP> prim2(map,position);
+	prim2.grid_topo(side/4,3);
+
+	float height=150;
+
+	prim2.embedHelicoid(rMin*4,rMax,-1*height,0.5f,-1);
+
+// 	typename PFP::VEC3 transl(0,2*rMax,height);
+	typename PFP::VEC3 transl(-rMax/2,0,height);
+	CellMarker m(map, VERTEX_CELL) ;
+	for(Dart d=map.begin();d!=map.end();map.next(d)) {
+		if(!m.isMarked(d)) {
+			m.mark(d);
+			position[d] += transl;
+			position[d][0] *= 2.0f;
+		}
+	}
+
+	prim.embedHelicoid(rMin,rMax,height,nbTurns-0.5f);
+
+	Dart dStairsDown = map.phi_1(prim.getDart());
+	Dart dStairsUp = dStairsDown;
+	do {
+		closeMark.markOrbit(FACE_ORBIT,dStairsUp);
+		closeMark.markOrbit(FACE_ORBIT,map.phi2(map.phi1(map.phi1(map.phi2(map.phi_1(dStairsUp))))));
+		dStairsUp= map.phi2(map.phi1(map.phi1(dStairsUp)));
+	} while(map.phi2(dStairsUp)!=dStairsUp);
+
+	Dart dSlideUp = map.phi_1(prim2.getDart());
+	Dart dSlideDown = dSlideUp;
+	do {
+		closeMark.markOrbit(FACE_ORBIT,dSlideDown);
+		closeMark.markOrbit(FACE_ORBIT,map.phi2(map.phi1(map.phi1(map.phi2(map.phi_1(dSlideDown))))));
+		dSlideDown= map.phi2(map.phi1(map.phi1(dSlideDown)));
+	} while(map.phi2(dSlideDown)!=dSlideDown);
+
+
+	Algo::Modelisation::Polyhedron<PFP> primPathUp(map,position);
+	primPathUp.grid_topo(1,3);
+	Dart dPathUp = map.phi_1(primPathUp.getDart());
+
+	Algo::Modelisation::Polyhedron<PFP> primPathDown(map,position);
+	primPathDown.grid_topo(1,3);
+	Dart dPathDown = map.phi_1(primPathDown.getDart());
+
+	closeMark.markOrbit(FACE_ORBIT,dPathUp);
+	closeMark.markOrbit(FACE_ORBIT,dPathDown);
+
+	map.sewFaces(dStairsUp,dPathUp);
+	map.sewFaces(dSlideUp,map.phi1(map.phi1(dPathUp)));
+	map.sewFaces(dSlideDown,dPathDown);
+	map.sewFaces(dStairsDown,map.phi1(map.phi1(dPathDown)));
+
+	dPathUp = map.phi_1(map.alpha1(dPathUp));
+	dPathDown = map.phi_1(map.alpha1(dPathDown));
+
+	dSlideUp = map.phi_1(map.alpha1(dSlideUp));
+	dSlideDown =map.alpha_1(map.phi1(dSlideDown));
+	dStairsUp = map.alpha_1(map.phi1(dStairsUp));
+	dStairsDown = map.phi_1(map.alpha1(dStairsDown));
+
+// 	Dart dPathUp = map.newOrientedFace(4);
+// 	Dart dPathDown = map.newOrientedFace(4);
+
+	map.sewFaces(dStairsUp,dPathUp);
+	map.sewFaces(dSlideUp,map.phi1(map.phi1(dPathUp)));
+	map.sewFaces(dSlideDown,dPathDown);
+	map.sewFaces(dStairsDown,map.phi1(map.phi1(dPathDown)));
+
+	dPathUp = map.phi_1(map.alpha1(dPathUp));
+	dPathDown = map.phi_1(map.alpha1(dPathDown));
+	dSlideUp = map.phi_1(map.alpha1(dSlideUp));
+	dStairsUp = map.alpha_1(map.phi1(dStairsUp));
+	dSlideDown =map.alpha_1(map.phi1(dSlideDown));
+	dStairsDown = map.phi_1(map.alpha1(dStairsDown));
+
+	closeMark.markOrbit(FACE_ORBIT,dPathUp);
+	closeMark.markOrbit(FACE_ORBIT,dPathDown);
+
+	map.sewFaces(dStairsUp,dPathUp);
+	map.sewFaces(dSlideUp,map.phi1(map.phi1(dPathUp)));
+	map.sewFaces(dSlideDown,dPathDown);
+	map.sewFaces(dStairsDown,map.phi1(map.phi1(dPathDown)));
+
+// 	map.sewFaces(dStairsDown,dPathDown);
+// 	map.sewFaces(dSlideDown,map.phi1(map.phi1(dPathDown)));
+
+// 	map.sewFaces(dStairs,dSlide);
+
+	map.closeMap(closeMark) ;
+	CellMarker traite(map,FACE_CELL);
+	for(Dart d = map.begin(); d!=map.end() ; map.next(d)) {
+		if(!traite.isMarked(d)) {
+			traite.mark(d);
+			map.splitFace(d,map.phi1(map.phi1(d)));
+		}
+	}
+
+	for(Dart d = map.begin(); d!=map.end() ; map.next(d)) {
+		if(closeMark.isMarked(d)) {
+			closeMark.markOrbit(FACE_ORBIT,d);
+		}
+	}
+
+	map.initOrbitEmbedding(FACE_ORBIT);
+}
+
 template <typename PFP, typename EMBV>
 void generateSmallCity(typename PFP::MAP& map, EMBV& position, DartMarker& closeMark, float sideSize)
 {

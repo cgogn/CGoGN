@@ -53,6 +53,8 @@ class Simulator
 	
 		std::vector<PFP::VEC3 > socialAgents;
 
+		void setPreferredNextCellVelocities();
+
 // 		std::vector<Dart> path;
 	
 		/** Added function */
