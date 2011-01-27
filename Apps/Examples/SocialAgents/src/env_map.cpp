@@ -339,8 +339,8 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 void EnvMap::updateMap()
 {
 // 	simplifyFaces();
-//  	subdivideFaces() ;
-//  	map.setCurrentLevel(map.getMaxLevel()) ;
+	subdivideFaces() ;
+	map.setCurrentLevel(map.getMaxLevel()) ;
 }
 
 void EnvMap::subdivideFaces()
