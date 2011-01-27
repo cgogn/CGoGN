@@ -148,7 +148,7 @@ void generateSmallCity(typename PFP::MAP& map, EMBV& position, DartMarker& close
 // 	sideSize *= 0.2f;
 	unsigned int nbBuilding=1000;
 	float height = sideSize/2.0f;
-	unsigned int side = 25;
+	unsigned int side = 3;
 	generateGrid<PFP,EMBV>(map,position,side,side,sideSize,closeMark);
 
 	Dart dEnd = map.end();
