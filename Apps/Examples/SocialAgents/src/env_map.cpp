@@ -99,7 +99,6 @@ bool EnvMap::simplifyVertex(Dart& d)
 				if (d1==dd)			// last edge is pending edge inside of face
 					finished=true;
 				map.deleteFace(dd);
-// 				map.deleteOrientedFace(dd);
 				dd = d1;
 			} while (!finished);
 
@@ -223,7 +222,7 @@ void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 	do {
 		if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
 			for(PFP::AGENTS::iterator it=agents.begin(); it!= agents.end(); ++it) {
-// 				if(leftOf((*it)->part->m_position,position[map.phi2(dd)],position[map.phi1(map.phi2(dd))])<0.0f) {
+// 				if(leftOf((*it)->part->m_position,position[dd],position[map.phi1(dd)])<0.0f) {
 					(*it)->insertObstacleNeighbor(dd);
 // 				}
 			}
@@ -340,8 +339,8 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 void EnvMap::updateMap()
 {
 // 	simplifyFaces();
- 	subdivideFaces() ;
- 	map.setCurrentLevel(map.getMaxLevel()) ;
+//  	subdivideFaces() ;
+//  	map.setCurrentLevel(map.getMaxLevel()) ;
 }
 
 void EnvMap::subdivideFaces()
@@ -637,7 +636,6 @@ void EnvMap::resetAgentInFace(Agent * agent)
 	agent->part->state = FACE_ORBIT;
 	agent->part->move(agent->position_) ;
 // 	agent->part->d = d;
-	agent->newCells=true;
 }
 
 void EnvMap::addObstacle(std::vector<VEC3> points)

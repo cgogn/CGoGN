@@ -165,20 +165,29 @@ void MyGlutWin::myRedraw()
 
 	glColor3f(1.0f,0.0f,0.0f);
 
-	std::vector<PFP::VEC3> v = sim->getAgentsPosition();
-// 	glLineWidth(10.0f);
-// 	glPointSize(10.0f);
 // 	glBegin(GL_POINTS);
-// // 	for(std::vector<PFP::VEC3>::iterator it = v.begin() ; it != v.end(); ++it) {
-// 	for(unsigned int i = 0.0f; i< v.size() ; ++i) {
-// 		glColor3f(i%int(2.0f/3.0f*v.size())/(v.size()/3.0f),i%int(1.0f/3.0f*v.size())/(v.size()/3.0f),i/(v.size()/3.0f));
-// 		glVertex3fv(&(v[i])[0]);
+// 		glVertex3fv(&posToReach[0]);
+// 		for(Dart d = sim->envMap.map.begin() ; d != sim->envMap.map.end() ; sim->envMap.map.next(d))
+// 			glVertex3fv(&sim->envMap.getPosition(d)[0]);
+// 	glEnd();
+
+// 	glBegin(GL_LINES);
+// 	for(std::vector<Dart>::iterator it = sim->path.begin() ; it != sim->path.end() ; ++ it) {
+// 		VEC3 c = Algo::Geometry::faceCentroid<PFP>(sim->envMap.map,*it,sim->envMap.position);
+// 		glVertex3fv(&c[0]);
 // 	}
 // 	glEnd();
 
-// 	glPointSize(10.0f);
-// 	glBegin(GL_POINTS);
-	for(unsigned int i = 0.0f; i< v.size() ; ++i) {
+//	glBegin(GL_POINTS);
+//	for(unsigned int i = 0; i<4;++i) {
+//		for(std::vector<VEC3>::iterator it=(*sim->pathToFollow[0]).begin() ; it!=(*sim->pathToFollow[0]).end() ; ++it) {
+//			glVertex3fv(&(*it)[0]);
+//		}
+//	}
+//	glEnd();
+
+	unsigned int i=0;
+	for(std::vector<Agent * >::iterator it = sim->agents_.begin() ; it != sim->agents_.end() ; ++ it, ++i) {
 // 		glColor3f(i%int(2.0f/3.0f*v.size())/(v.size()/3.0f),i%int(1.0f/3.0f*v.size())/(v.size()/3.0f),i/(v.size()/3.0f));
 //		glCircle3i(v[i][0],v[i][1],1.5f);
 		glPushMatrix();
@@ -205,34 +214,10 @@ void MyGlutWin::myRedraw()
 // 			glVertex3f(posR[0],posR[1],posR[2]);
 			glCircle3i(0,0,sim->agents_[i]->radius_);
   		glPopMatrix();
-	}
 // 	glEnd();
 
 	glColor3f(1.0f,1.0f,1.0f);
 
-// 	glBegin(GL_POINTS);
-// 		glVertex3fv(&posToReach[0]);
-// 		for(Dart d = sim->envMap.map.begin() ; d != sim->envMap.map.end() ; sim->envMap.map.next(d))
-// 			glVertex3fv(&sim->envMap.getPosition(d)[0]);
-// 	glEnd();
-
-// 	glBegin(GL_LINES);
-// 	for(std::vector<Dart>::iterator it = sim->path.begin() ; it != sim->path.end() ; ++ it) {
-// 		VEC3 c = Algo::Geometry::faceCentroid<PFP>(sim->envMap.map,*it,sim->envMap.position);
-// 		glVertex3fv(&c[0]);
-// 	}
-// 	glEnd();
-
-//	glBegin(GL_POINTS);
-//	for(unsigned int i = 0; i<4;++i) {
-//		for(std::vector<VEC3>::iterator it=(*sim->pathToFollow[0]).begin() ; it!=(*sim->pathToFollow[0]).end() ; ++it) {
-//			glVertex3fv(&(*it)[0]);
-//		}
-//	}
-//	glEnd();
-
-	unsigned int i=0;
-	for(std::vector<Agent * >::iterator it = sim->agents_.begin() ; it != sim->agents_.end() ; ++ it, ++i) {
 // 		//draw all containing faces
 // 		glColor3f(1,1,0);
 // 		for(std::vector<Dart>::iterator incF = (*it)->includingFaces.begin(); incF != (*it)->includingFaces.end(); ++incF) {
@@ -256,7 +241,7 @@ void MyGlutWin::myRedraw()
 	// 		//and prediction triangle
  			glColor3f(((*it)->part->state)/3.0f,((*it)->part->state%2),0);
  			glLineWidth(5.0f);
- 			renderPredictionTriangle(sim->envMap,(*it)->part->d,(*it)->part->m_position);
+ 			renderPredictionTriangle(sim->envMap,(*it)->part->d,/*(*it)->part->m_position*/posR);
  			glLineWidth(1.0f);
 
 			//draw next goal
@@ -403,8 +388,9 @@ void MyGlutWin::animate(void)
 // 	std::cout << "pos to reach : " << posToReach << std::endl;
 // 	std::cout << sim->getGlobalTime() << " " << std::endl;
 	updateVisualization(sim);
- 	sim->setPreferredVelocities(posToReach);
+//  	sim->setPreferredVelocities(posToReach);
 //	sim->setPreferredPathVelocities();
+ 	sim->setPreferredNextCellVelocities();
 	sim->doStep();
 // 	sim->envMap.simplify();
 	glutPostRedisplay();

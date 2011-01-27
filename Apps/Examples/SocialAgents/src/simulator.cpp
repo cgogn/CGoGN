@@ -14,17 +14,18 @@ Simulator::Simulator() : agents_(), defaultAgent_(0), globalTime_(0.0f), timeSte
 // 	CGoGN::CityGenerator::generateGrid<PFP,PFP::TVEC3>(envMap.map,envMap.position,100,100,50.0f,envMap.closeMark);
 
 	envMap.sideSize = 70.0f;
- 	CGoGN::CityGenerator::generateSmallCity<PFP,PFP::TVEC3>(envMap.map,envMap.position,envMap.closeMark,envMap.sideSize);
+//  	CGoGN::CityGenerator::generateSmallCity<PFP,PFP::TVEC3>(envMap.map,envMap.position,envMap.closeMark,envMap.sideSize);
 
-//	CGoGN::CityGenerator::generateAbsolutSpiralOfDeath<PFP>(envMap.map,envMap.position,envMap.closeMark,2000,0.25,110,100);
+// 	CGoGN::CityGenerator::generateAbsolutSpiralOfDeath<PFP>(envMap.map,envMap.position,envMap.closeMark,2000,0.25,110,100);
+	CGoGN::CityGenerator::generateToboggan<PFP>(envMap.map,envMap.position,envMap.closeMark,100,0.25,200,10);
 
 
 //	std::cout << "simplify" << std::endl;
 // 	envMap.simplify();
- 	envMap.map.init();
+//  	envMap.map.init();
 	std::cout << "setup scenario" << std::endl;
-//	setupHelicoidScenario(1,50);
-	setupScenario();
+// 	setupScenario();
+	setupHelicoidScenario(1,50);
 
 // 	Dart dStop=envMap.map.begin();
 // 	for(unsigned int i=0;i<5000;++i) envMap.map.next(dStop);
@@ -190,6 +191,45 @@ void Simulator::setPreferredVelocities(PFP::VEC3 posToReach)
   }
 }
 
+void Simulator::setPreferredNextCellVelocities()
+{
+    for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
+		Dart dNext = agents_[i]->part->d;
+		while(envMap.closeMark.isMarked(envMap.map.phi2(dNext)) && envMap.map.phi1(dNext) != agents_[i]->part->d)
+			dNext = envMap.map.phi1(dNext);
+
+		VEC3 goalVector;
+		if(envMap.closeMark.isMarked(envMap.map.phi2(dNext))) {
+			goalVector = VEC3(0,0,0);
+		}
+		else {
+// 			goalVector = Algo::Geometry::faceCentroid<PFP>(envMap.map,envMap.map.phi2(dNext),envMap.position);
+			goalVector = (envMap.position[dNext]+envMap.position[envMap.map.phi2(dNext)])*0.5f;
+			goalVector -= agents_[i]->position_;
+			goalVector = normalize(goalVector);
+		}
+
+// 		goalVector *= 0.5f;
+// 		goalVector += agents_[i]->prefVelocity_;
+// 		goalVector *= 0.5f;
+
+// 		if (absSq(goalVector) > 1.0f) {
+// 			goalVector = normalize(goalVector);
+// 		}
+
+		this->setAgentPrefVelocity(i, goalVector);
+
+		/*
+		* Perturb a little to avoid deadlocks due to perfect symmetry.
+		*/
+		float angle = std::rand() * 2.0f * M_PI / RAND_MAX;
+		float dist = std::rand() * 0.0001f / RAND_MAX;
+		
+		this->setAgentPrefVelocity(i, this->getAgentPrefVelocity(i) +
+								 VEC3(dist*std::cos(angle), dist*std::sin(angle),0.0f));
+	}
+}
+
 void Simulator::setPreferredPathVelocities()
 {
     for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
@@ -307,7 +347,7 @@ void Simulator::setupHelicoidScenario(float rMax,float rMin)
 	DartMarkerStore filled(envMap.map);
 
 	bool found=false;
-	int nbPack=3000;
+	int nbPack=2000;
 
   for (int i = 0; i < nbPack && d != envMap.map.end(); ++i) {
 	found = false;

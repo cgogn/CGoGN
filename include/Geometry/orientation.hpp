@@ -35,7 +35,8 @@ Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb)
 {
 
 	typedef typename VEC3::DATA_TYPE T ;
-	const T min = std::numeric_limits<T>::min()*T(100);
+//	const T min = std::numeric_limits<T>::min()*T(100);
+	const T min = 0.00001;
 
 	T wsof = (Pa[0]-P[0])*(P[1]-Pb[1])-(P[0]-Pb[0])*(Pa[1]-P[1]);
 

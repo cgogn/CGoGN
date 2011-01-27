@@ -10,6 +10,9 @@ namespace CityGenerator
 template <typename PFP>
 void generateAbsolutSpiralOfDeath(typename PFP::MAP& map,typename PFP::TVEC3& position, DartMarker& closeMark, unsigned int side, float rMin, float rMax,float nbTurns);
 
+template <typename PFP>
+void generateToboggan(typename PFP::MAP& map,typename PFP::TVEC3& position, DartMarker& closeMark, unsigned int side, float rMin, float rMax,float nbTurns);
+
 template <typename PFP, typename EMBV>
 void generateSmallCity(typename PFP::MAP& map, EMBV& position, DartMarker& closeMark, float sideSize);
 

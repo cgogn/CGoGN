@@ -65,7 +65,6 @@ class Simulator;
 // 		std::vector<Dart> includingFaces;
 		CGoGN::Algo::MovingObjects::ParticleCell2D<PFP> * part;
 		float rangeSq;
-		bool newCells;
 		bool treated;
   };
 

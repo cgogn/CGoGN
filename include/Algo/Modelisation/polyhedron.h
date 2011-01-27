@@ -295,7 +295,7 @@ public:
 	* @param maxHeight height to reach
 	* @param turns number of turn
 	*/
-	void embedHelicoid( float radius_min, sa race, float radius_max, float maxHeight, float nbTurn);
+	void embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient=1);
 
 	/**
 	* transform the Polyhedron with transformation matrice
