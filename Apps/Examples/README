@@ -1,0 +1,36 @@
+
+Compil
+======
+A compiler avec make
+attention dépendance  avec les templates de Core et Algo non gérées
+
+Utilisation:
+============
+
+MC_Example: 
+----------
+ MC_Example file.png : marching cube sur l'objet stocké
+ MC_Example : marching cube sur image définie implicitement
+
+FilterExample:
+--------------
+Filtrage sur maillage (import de fichier off, obj, ply, trian et trianbgz en parametre)
+clavier:
+	a average
+	t taubin
+	b bilateral
+	n average normal
+	m mmse
+
+SimplifExample:
+---------------
+Simplfication du maillage en paramètre (idem prec)
+a: une passe topo
+u: ~ la moitié des faces
+
+
+convert2tbgz:
+-------------
+convert2tbgz fich_in fich_out
+Convertit un maillage (off, ply, obj, trian, trianbgz) en un 
+autre format

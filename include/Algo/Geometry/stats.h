@@ -1,0 +1,108 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
+#ifndef STATS_H
+#define STATS_H
+
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace Geometry
+{
+
+template <typename PFP>
+void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
+{
+	int nbFaces = 0;
+	int nbVertex = 0;
+
+	DartMarker mFace(map);
+	CellMarker mVertex(map, VERTEX_ORBIT);
+
+	float ratioMinMax = 0;
+	int nbEdgePerVertex = 0;
+	float lengthSeg = 0;
+	int nbEdge = 0;
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (!mFace.isMarked(d))
+		{
+			nbFaces++;
+			bool init = true;
+			float min = 0;
+			float max = 0;
+			Dart e = d;
+			do
+			{
+				mFace.mark(e);
+				typename PFP::VEC3 segment = position[e] - position[map.phi1(e)] ;
+
+				float len = segment.norm() ;
+
+				lengthSeg += len;
+				nbEdge++;
+
+				if (init || len < min)
+					min = len;
+				if (init || len > max)
+					max = len;
+
+				init = false;
+				e = map.phi1(e);
+			}
+			while (e != d);
+
+			ratioMinMax += (min / max);
+		}
+
+		if (!mVertex.isMarked(d))
+		{
+			mVertex.mark(d) ;
+			nbVertex++ ;
+			Dart e = d;
+			do
+			{
+				nbEdgePerVertex++ ;
+				e = map.alpha1(e) ;
+			}
+			while (e != d) ;
+		}
+	}
+
+	std::cout << "number of faces                : " << nbFaces << std::endl;
+	std::cout << "number of vertices             : " << nbVertex << std::endl;
+	std::cout << "mean ratio min max             : " << (ratioMinMax / (float) nbFaces) << std::endl;
+	std::cout << "mean number of edge per vertex : " << ((float) nbEdgePerVertex / (float) nbVertex) << std::endl;
+	std::cout << "mean edge length               : " << lengthSeg / (float) nbEdge<< std::endl;
+}
+
+} // namespace Geometry
+} // namespace Algo
+} // namespace CGoGN
+
+#endif /*STATS_H*/
