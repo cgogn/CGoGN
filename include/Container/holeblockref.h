@@ -1,33 +1,59 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
 #ifndef __HOLE_BLOCK_REF__
 #define __HOLE_BLOCK_REF__
 
 #include <fstream>
 #include <iostream>
 
-#include "sizeblock.h"
+#include "Container/sizeblock.h"
 
 namespace CGoGN
 {
-//WARNING WE USED SHORT INT BLOCK_SIZE MUST BE < 65536
+
+//WARNING WE USE SHORT INT BLOCK_SIZE MUST BE < 65536
+
 class HoleBlockRef
 {
 protected:
 	/**
 	* Table of free index
 	*/
-	uint* m_tableFree;
-	uint m_nbfree;
+	unsigned int* m_tableFree;
+	unsigned int m_nbfree;
 
 	/**
 	* Reference counter (if 0 it is a hole)
 	*/
-	uint* m_refCount;
-	uint m_nbref;
+	unsigned int* m_refCount;
+	unsigned int m_nbref;
 
 	/**
 	* nb element in block
 	*/
-	uint m_nb;
+	unsigned int m_nb;
 
 public:
 	/**
@@ -50,16 +76,16 @@ public:
 	* @param nbEltsMax (IN/OUT) max number of element stored
 	* @return index on new element
 	*/
-	uint newRefElt(uint& nbEltsMax);
+	unsigned int newRefElt(unsigned int& nbEltsMax);
 
 	/**
 	* remove an element
 	*/
-	inline void removeElt(uint idx)
+	inline void removeElt(unsigned int idx)
 	{
 		m_nb--;
-		m_tableFree[m_nbfree++]=idx;
-		m_refCount[idx]=0;
+		m_tableFree[m_nbfree++] = idx;
+		m_refCount[idx] = 0;
 	}
 
 	/**
@@ -109,12 +135,12 @@ public:
 	* @param bf ptr on the block of other line
 	* @param j index of the other line in bf
 	*/
-	void overwrite(int i, HoleBlockRef *bf, int j);
+	void overwrite(unsigned int i, HoleBlockRef *bf, unsigned int j);
 
 	/**
 	* increment ref counter of element i
 	*/
-	inline void ref(uint i)
+	inline void ref(unsigned int i)
 	{
 		m_refCount[i]++;
 	}
@@ -123,7 +149,7 @@ public:
 	* decrement ref counter of element i
 	* @return true if ref=0 and element has been destroyed
 	*/
-	inline bool unref(uint i)
+	inline bool unref(unsigned int i)
 	{
 		m_refCount[i]--;
 		if (m_refCount[i] == 1)
@@ -137,22 +163,21 @@ public:
 	/**
 	* set ref counter of element i with j
 	*/
-	inline void setNbRefs(uint i, uint nb) { m_refCount[i] = nb; }
+	inline void setNbRefs(unsigned int i, unsigned int nb) { m_refCount[i] = nb; }
 
 	/**
 	* number of references of element i
 	* @return the number of references (0 = no elements)
 	*/
-	inline uint nbRefs(uint i) { return m_refCount[i]; }
+	inline unsigned int nbRefs(unsigned int i) { return m_refCount[i]; }
 
-	bool updateHoles(uint nb);
+	bool updateHoles(unsigned int nb);
 
 	void saveBin(CGoGNostream& fs);
 
 	bool loadBin(CGoGNistream& fs);
 };
 
-}
+} // namespace CGoGN
 
 #endif
-

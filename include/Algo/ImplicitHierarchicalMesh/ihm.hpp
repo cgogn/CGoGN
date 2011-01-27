@@ -84,11 +84,7 @@ inline Dart ImplicitHierarchicalMap::phi1(Dart d)
 		else
 		{
 			while(m_edgeId[it] != edgeId)
-			{
-				if(Map2::phi2(it) == it)
-					std::cout << "fix point in the middle" << std::endl ;
 				it = Map2::alpha_1(it) ;
-			}
 		}
 	} while(!finished) ;
 	return it ;
@@ -100,7 +96,6 @@ inline Dart ImplicitHierarchicalMap::phi_1(Dart d)
 	bool finished = false ;
 	Dart it = Map2::phi_1(d) ;
 	unsigned int edgeId = m_edgeId[it] ;
-
 	do
 	{
 		if(m_dartLevel[it] <= m_curLevel)
@@ -112,21 +107,6 @@ inline Dart ImplicitHierarchicalMap::phi_1(Dart d)
 				it = Map2::phi_1(Map2::phi2(it)) ;
 		}
 	} while(!finished) ;
-
-//	do
-//	{
-//		if(m_dartLevel[it] <= m_curLevel)
-//			finished = true ;
-//		else
-//		{
-//			do
-//			{
-//				it = Map2::alpha1(it) ;
-//			} while(m_edgeId[it] != edgeId) ;
-//			it = Map2::phi2(it) ;
-//		}
-//	} while(!finished) ;
-
 	return it ;
 }
 
@@ -328,8 +308,6 @@ inline unsigned int ImplicitHierarchicalMap::edgeLevel(Dart d)
 	unsigned int ldd = m_dartLevel[phi1(d)] ;
 	return ld < ldd ? ldd : ld ;				// insertion levels of its two darts
 }
-
-
 
 template <typename T>
 T& AttributeHandler_IHM<T>::operator[](Dart d)

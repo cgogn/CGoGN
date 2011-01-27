@@ -39,7 +39,6 @@
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/map_glRender.h"
 #include "Algo/Render/vbo_MapRender.h"
-#include "Topology/generic/ecell.h"
 #include "Algo/Render/topo_vboRender.h"
 
 using namespace CGoGN ;

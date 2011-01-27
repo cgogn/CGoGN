@@ -2,13 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 
 project(SocialAgents)
 
-SET(CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_BUILD_TYPE Release)
 
 link_directories(
 	${CGoGN_ROOT_DIR}/lib/Debug/
 	${CGoGN_ROOT_DIR}/lib/Release/)
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp -O3")
 
 # define includes path
 include_directories(
@@ -21,8 +19,6 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
 	${CGoGN_ROOT_DIR}/ThirdParty/Zinri
 )
-
-
 
 #define exec to compile
 add_executable(socialAgents ./src/viewer.cpp ./src/env_map.cpp ./src/agent.cpp ./src/simulator.cpp  )

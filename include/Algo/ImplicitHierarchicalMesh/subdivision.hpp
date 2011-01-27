@@ -128,7 +128,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		while(dd != ne)								// turn around the face and insert new edges
 		{											// linked to the central vertex
 			Dart next = map.phi1(map.phi1(dd)) ;
-			map.splitFace(dd, map.phi1(ne)) ;
+			map.splitFace(map.phi1(ne), dd) ;
 			Dart nne = map.alpha1(dd) ;
 			id = map.getNewEdgeId() ;
 			map.setEdgeId(nne, id) ;

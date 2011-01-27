@@ -482,7 +482,7 @@ bool Map2::check()
 {
 	std::cout << "Check: topology begin" << std::endl;
 	DartMarker m(*this);
-	for(Dart d = begin(); d != end(); next(d))
+	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		Dart d2 = phi2(d);
 		if (phi2(d2) != d)	// phi2 involution ?
@@ -494,7 +494,7 @@ bool Map2::check()
 		Dart d1 = phi1(d);
 		if (phi_1(d1) != d)	// phi1 a une image correcte ?
 		{
-			std::cout << "Check: unconsistent phi_1 link" << std::endl;
+			std::cout << "Check: inconsistent phi_1 link" << std::endl;
 			return false;
 		}
 
@@ -510,9 +510,9 @@ bool Map2::check()
 		if (phi1(d1) == d)
 			std::cout << "Check: (warning) face with only two edges" << std::endl;
 		if (phi2(d1) == d)
-			std::cout << "Check: (warning) dandling edge" << std::endl;
+			std::cout << "Check: (warning) dangling edge" << std::endl;
 	}
-	for(Dart d = begin(); d != end(); next(d))
+	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		if (!m.isMarked(d))	// phi1 a au moins un antécédent ?
 		{

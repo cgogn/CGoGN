@@ -223,13 +223,13 @@ void MyGlutWin::myRedraw()
 // 	}
 // 	glEnd();
 
-	glBegin(GL_POINTS);
-	for(unsigned int i = 0; i<4;++i) {
-		for(std::vector<VEC3>::iterator it=(*sim->pathToFollow[0]).begin() ; it!=(*sim->pathToFollow[0]).end() ; ++it) {
-			glVertex3fv(&(*it)[0]);
-		}
-	}
-	glEnd();
+//	glBegin(GL_POINTS);
+//	for(unsigned int i = 0; i<4;++i) {
+//		for(std::vector<VEC3>::iterator it=(*sim->pathToFollow[0]).begin() ; it!=(*sim->pathToFollow[0]).end() ; ++it) {
+//			glVertex3fv(&(*it)[0]);
+//		}
+//	}
+//	glEnd();
 
 	unsigned int i=0;
 	for(std::vector<Agent * >::iterator it = sim->agents_.begin() ; it != sim->agents_.end() ; ++ it, ++i) {
@@ -244,7 +244,7 @@ void MyGlutWin::myRedraw()
 			//draw containing center face
 	 		glColor3f(0,0,1);
 	 		glLineWidth(4.0f);
-	 		renderFace(sim->envMap,(*it)->nearestDart);
+	 		renderFace(sim->envMap,(*it)->part->d);
 	 		glLineWidth(1.0f);
 
 	// 		//draw displacement
@@ -254,18 +254,18 @@ void MyGlutWin::myRedraw()
 	// 		glEnd();
 
 	// 		//and prediction triangle
-// 			glColor3f(((*it)->part->state)/3.0f,((*it)->part->state%2),0);
-// 			glLineWidth(5.0f);
-// 			renderPredictionTriangle(sim->envMap,(*it)->nearestDart,(*it)->part->m_position);
-// 			glLineWidth(1.0f);
+ 			glColor3f(((*it)->part->state)/3.0f,((*it)->part->state%2),0);
+ 			glLineWidth(5.0f);
+ 			renderPredictionTriangle(sim->envMap,(*it)->part->d,(*it)->part->m_position);
+ 			glLineWidth(1.0f);
 
 			//draw next goal
-			glBegin(GL_LINES);
-				glVertex3f((*it)->part->m_position[0],(*it)->part->m_position[1],(*it)->part->m_position[2]);
-				glVertex3f((*sim->pathToFollow[sim->pathPointer[i].first])[sim->pathPointer[i].second][0],
-							(*sim->pathToFollow[sim->pathPointer[i].first])[sim->pathPointer[i].second][1],
-							(*sim->pathToFollow[sim->pathPointer[i].first])[sim->pathPointer[i].second][2]);
-			glEnd();
+//			glBegin(GL_LINES);
+//				glVertex3f((*it)->part->m_position[0],(*it)->part->m_position[1],(*it)->part->m_position[2]);
+//				glVertex3f((*sim->pathToFollow[sim->pathPointer[i].first])[sim->pathPointer[i].second][0],
+//							(*sim->pathToFollow[sim->pathPointer[i].first])[sim->pathPointer[i].second][1],
+//							(*sim->pathToFollow[sim->pathPointer[i].first])[sim->pathPointer[i].second][2]);
+//			glEnd();
 		}
 
 // 		glCircle3i((*it)->position_[0],(*it)->position_[1],(*it)->neighborDist_);
@@ -403,8 +403,8 @@ void MyGlutWin::animate(void)
 // 	std::cout << "pos to reach : " << posToReach << std::endl;
 // 	std::cout << sim->getGlobalTime() << " " << std::endl;
 	updateVisualization(sim);
-// 	sim->setPreferredVelocities(posToReach);
-	sim->setPreferredPathVelocities();
+ 	sim->setPreferredVelocities(posToReach);
+//	sim->setPreferredPathVelocities();
 	sim->doStep();
 // 	sim->envMap.simplify();
 	glutPostRedisplay();
@@ -626,6 +626,10 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		break;
 		case '9': {
 			render_anim=!render_anim;
+		}
+		break;
+		case 'c': {
+			sim->envMap.map.check();
 		}
 		break;
 	}

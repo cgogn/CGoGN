@@ -531,7 +531,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			unsigned int nbVertices = myMap.getNbOrbits(VERTEX_ORBIT) ;
 
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Decimation::decimate<PFP>(myMap, Algo::Decimation::S_EdgeLength, Algo::Decimation::A_QEM, position, nbVertices * 0.95) ;
+			Algo::Decimation::decimate<PFP>(myMap, Algo::Decimation::S_QEM, Algo::Decimation::A_QEM, position, nbVertices * 0.75) ;
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "decimation: "<< seconds << "sec" << std::endl;

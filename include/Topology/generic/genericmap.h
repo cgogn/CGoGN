@@ -127,7 +127,7 @@ protected:
 	/**
 	 * Add a dart to the map
 	 */
-	Dart newDart();
+	virtual Dart newDart();
 
 	/**
 	 * Erase a dart of the map
@@ -153,6 +153,12 @@ public:
 	 * tell if an orbit is embedded or not
 	 */
 	bool isOrbitEmbedded(unsigned int orbit) const;
+
+	/**
+	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
+	 * (may be NULL if the orbit is not embedded)
+	 */
+	AttribMultiVect<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit) const;
 
 	/**
 	 * return the number of embedded orbits (including DART_ORBIT)

@@ -140,7 +140,7 @@ inline void Map1::deleteFace(Dart d)
 inline void Map1::cutEdge(Dart d)
 {
 	Dart e = newDart() ;	// Create a new dart
-	phi1sew(d,e) ;			// Insert dart e between d and phi1(d)
+	phi1sew(d, e) ;			// Insert dart e between d and phi1(d)
 }
 
 inline void Map1::collapseEdge(Dart d)
@@ -152,8 +152,8 @@ inline void Map1::collapseEdge(Dart d)
 inline void Map1::splitFace(Dart d, Dart e)
 {
 	assert(d != e && sameOrientedFace(d, e)) ;
-	Map1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart after d)
-	Map1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart after e)
+	Map1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
+	Map1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
 	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
 }
 

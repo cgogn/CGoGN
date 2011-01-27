@@ -1,9 +1,27 @@
-/*
- * holeblockref.cpp
- *
- *  Created on: Jun 10, 2010
- *      Author: thery
- */
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
 #include "Container/holeblockref.h"
 
 #include <map>
@@ -25,19 +43,19 @@ namespace CGoGN
 HoleBlockRef::HoleBlockRef():
 m_nbfree(0),m_nbref(0),m_nb(0)
 {
-	m_tableFree = new uint[_BLOCKSIZE_];
-	m_refCount = new uint[_BLOCKSIZE_];
+	m_tableFree = new unsigned int[_BLOCKSIZE_];
+	m_refCount = new unsigned int[_BLOCKSIZE_];
 }
 
 HoleBlockRef::~HoleBlockRef()
 {
-		delete[] m_tableFree;
-		delete[] m_refCount;
+	delete[] m_tableFree;
+	delete[] m_refCount;
 }
 
 void HoleBlockRef::swap(HoleBlockRef& hb)
 {
-	uint temp = m_nbfree;
+	unsigned int temp = m_nbfree;
 	m_nbfree = hb.m_nbfree;
 	hb.m_nbfree = temp;
 
@@ -49,21 +67,21 @@ void HoleBlockRef::swap(HoleBlockRef& hb)
 	m_nb = hb.m_nb;
 	hb.m_nb = temp;
 
-	uint* ptr = m_tableFree;
+	unsigned int* ptr = m_tableFree;
 	m_tableFree = hb.m_tableFree;
 	hb.m_tableFree = ptr;
 
-	uint* ptr2 = m_refCount;
+	unsigned int* ptr2 = m_refCount;
 	m_refCount = hb.m_refCount;
 	hb.m_refCount = ptr2;
 }
 
-uint HoleBlockRef::newRefElt(uint& nbEltsMax)
+unsigned int HoleBlockRef::newRefElt(unsigned int& nbEltsMax)
 {
 	// no hole then add a line at the end of block
 	if (m_nbfree == 0)
 	{
- 		uint nbElts = m_nbref;
+		unsigned int nbElts = m_nbref;
 
  		m_refCount[m_nbref++] = 1;
 
@@ -72,7 +90,7 @@ uint HoleBlockRef::newRefElt(uint& nbEltsMax)
 		return nbElts;
 	}
 
-	uint index = m_tableFree[--m_nbfree];
+	unsigned int index = m_tableFree[--m_nbfree];
 
 	m_refCount[index] = 1;
 
@@ -84,7 +102,6 @@ bool  HoleBlockRef::compressFree()
 {
 	if (m_nb)
 	{
-
 		m_nbfree = 0;
 		m_nbref = m_nb;
 		return false;
@@ -92,7 +109,7 @@ bool  HoleBlockRef::compressFree()
 	return true;
 }
 
-void HoleBlockRef::overwrite(int i, HoleBlockRef *bf, int j)
+void HoleBlockRef::overwrite(unsigned int i, HoleBlockRef *bf, unsigned int j)
 {
 	m_refCount[i] = bf->m_refCount[j];
 	bf->m_refCount[j] = 0;
@@ -144,7 +161,7 @@ void HoleBlockRef::saveBin(CGoGNostream& fs)
 
 bool HoleBlockRef::loadBin(CGoGNistream& fs)
 {
-	uint numbers[3];
+	unsigned int numbers[3];
 
 	fs.read(reinterpret_cast<char*>(numbers), 3*sizeof(uint));
 	m_nb = numbers[0];
@@ -157,5 +174,4 @@ bool HoleBlockRef::loadBin(CGoGNistream& fs)
 	return true;
 }
 
-}
-
+} // namespace CGoGN

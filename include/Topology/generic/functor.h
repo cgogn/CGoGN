@@ -120,39 +120,6 @@ public:
 	}
 };
 
-class FunctorGetLazyEmb: public FunctorType
-{
-protected:
-	AttribMultiVect<unsigned int>& m_emb;
-	unsigned int m_val;
-	std::vector<Dart> m_darts;
-
-public:
-	FunctorGetLazyEmb(AttribMultiVect<unsigned int>& emb): m_emb(emb), m_val(EMBNULL)
-	{
-		m_darts.reserve(8) ;
-	}
-
-	bool operator()(Dart d)
-	{
-		if (m_emb[d.index] != EMBNULL)
-		{
-			m_val = m_emb[d.index];
-			return true;
-		}
-		m_darts.push_back(d);
-		return false;
-	}
-
-	unsigned int getVal()
-	{
-		for(std::vector<Dart>::iterator it = m_darts.begin(); it != m_darts.end(); ++it)
-			m_emb[it->index] = m_val;
-
-		return m_val;
-	}
-};
-
 // Search Functor: look for a given dart when applied
 /********************************************************/
 

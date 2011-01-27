@@ -227,7 +227,7 @@ void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 					(*it)->insertObstacleNeighbor(dd);
 // 				}
 			}
-			return;
+//			return;
 		}
 		dd = map.phi1(dd);
 	} while (dd!=d);
@@ -340,7 +340,7 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 void EnvMap::updateMap()
 {
 // 	simplifyFaces();
- 	subdivideFaces();
+ 	subdivideFaces() ;
  	map.setCurrentLevel(map.getMaxLevel()) ;
 }
 
@@ -352,18 +352,38 @@ void EnvMap::subdivideFaces()
 		if(!m.isMarked(d))
 		{
 			m.mark(d) ;
-			if(!closeMark.isMarked(d) && agentvect[d].size() > 10)
+			if(!closeMark.isMarked(d) && agentvect[d].size() > 8)
 			{
 				if(!map.faceIsSubdivided(d))
 				{
 					std::vector<Agent*> agents ;
 					agents.swap(agentvect[d]) ;
+
+					unsigned int cur = map.getCurrentLevel() ;
+					unsigned int fLevel = map.faceLevel(d) ;
+					map.setCurrentLevel(fLevel) ;
+					std::vector<Dart> marked ;
+					Dart fit = d ;
+					do
+					{
+						if(closeMark.isMarked(map.phi2(fit)))
+							marked.push_back(fit) ;
+						fit = map.phi1(fit) ;
+					} while(fit != d) ;
+
 					Algo::IHM::subdivideFace<PFP>(map, d, position) ;
+
+					map.setCurrentLevel(fLevel + 1) ;
+					for(std::vector<Dart>::iterator it = marked.begin(); it != marked.end(); ++it)
+						closeMark.mark(map.phi2(*it)) ;
+
 					for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
 					{
-						this->resetAgentInFace(*it) ;
+						resetAgentInFace(*it) ;
 						agentvect[(*it)->part->d].push_back(*it) ;
 					}
+
+					map.setCurrentLevel(cur) ;
 				}
 			}
 		}

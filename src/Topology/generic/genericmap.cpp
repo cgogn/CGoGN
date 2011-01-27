@@ -151,7 +151,7 @@ void GenericMap::update_m_emb_afterLoad()
 	std::vector<std::string> listeNames;
 	cont.getAttributesStrings(listeNames);
 
-	// chreck if there are EMB_X attributes
+	// check if there are EMB_X attributes
 	for (unsigned int i = 0;  i < listeNames.size(); ++i)
 	{
 		std::string sub = listeNames[i].substr(0,listeNames[i].size()-1);

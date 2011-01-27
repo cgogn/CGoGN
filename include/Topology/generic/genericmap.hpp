@@ -42,13 +42,21 @@ inline Dart GenericMap::newDart()
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		if (m_embeddings[i])
 			(*m_embeddings[i])[d.index] = EMBNULL ;
-
 	return d ;
 }
 
 inline void GenericMap::deleteDart(Dart d)
 {
 	m_attribs[DART_ORBIT].removeLine(d.index) ;
+	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		if (m_embeddings[orbit])
+		{
+			unsigned int emb = (*m_embeddings[orbit])[d.index] ;
+			if(emb != EMBNULL)
+				m_attribs[orbit].unrefLine(emb) ;
+		}
+	}
 }
 
 inline bool GenericMap::isDartValid(Dart d)
@@ -68,6 +76,11 @@ inline unsigned int GenericMap::getNbDarts()
 inline bool GenericMap::isOrbitEmbedded(unsigned int orbit) const
 {
 	return (orbit == DART_ORBIT) || (m_embeddings[orbit] != NULL) ;
+}
+
+inline AttribMultiVect<unsigned int>* GenericMap::getEmbeddingAttributeVector(unsigned int orbit) const
+{
+	return m_embeddings[orbit] ;
 }
 
 inline unsigned int GenericMap::nbEmbeddings() const
@@ -90,7 +103,51 @@ inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
 	if(emb != EMBNULL)
 		return emb ;
 
-	FunctorGetLazyEmb fle(*m_embeddings[orbit]);
+	class FunctorGetLazyEmb: public FunctorType
+	{
+	protected:
+		GenericMap& m_map;
+		unsigned int m_orbit;
+		AttribMultiVect<unsigned int>* m_emb;
+		unsigned int m_val;
+		std::vector<Dart> m_darts;
+
+	public:
+		FunctorGetLazyEmb(GenericMap& map, unsigned int orbit):
+			m_map(map), m_orbit(orbit), m_val(EMBNULL)
+		{
+			m_emb = m_map.getEmbeddingAttributeVector(orbit) ;
+			m_darts.reserve(8) ;
+		}
+
+		bool operator()(Dart d)
+		{
+			if ((*m_emb)[d.index] != EMBNULL)
+			{
+				m_val = (*m_emb)[d.index];
+				return true;
+			}
+			m_darts.push_back(d);
+			return false;
+		}
+
+		unsigned int getVal()
+		{
+			if(m_val != EMBNULL)
+			{
+				AttribContainer& cont = m_map.getAttributeContainer(m_orbit) ;
+				for(std::vector<Dart>::iterator it = m_darts.begin(); it != m_darts.end(); ++it)
+				{
+					(*m_emb)[it->index] = m_val;
+					cont.refLine(m_val) ;
+				}
+			}
+
+			return m_val;
+		}
+	};
+
+	FunctorGetLazyEmb fle(*this, orbit);
 	foreach_dart_of_orbit(orbit, d, fle);
 
 	return fle.getVal();

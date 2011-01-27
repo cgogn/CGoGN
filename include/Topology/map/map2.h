@@ -235,6 +235,7 @@ public:
 	*/
 	void reverseOrientation();
 
+	// TODO a mettre en algo
 	/**
 	 * compute the topological dual of the current map
 	 */
@@ -287,11 +288,10 @@ public:
 	 */
 	bool isTriangular() ;
 
+	// TODO a mettre en algo
 	/**
 	 * Check if map is complete
-	 */
-	/* TODO devrait disparaitre :
-	 * Le test doit être fait à l'import.
+	 * Should be executed after import
 	 */
 	virtual bool check();
 	//@}
