@@ -66,10 +66,10 @@ template <typename PFP>
 bool importOFFWithELERegions(typename PFP::MAP& the_map, const std::string& filenameOFF, const std::string& filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f);
+bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 template <typename PFP>
-bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f);
+bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 template <typename PFP>
 bool importInESS(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames);

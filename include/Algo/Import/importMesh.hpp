@@ -439,13 +439,11 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 }
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind)
 {
-	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
+	MeshTablesVolume<PFP> mtv(map);
 
-	MeshTablesVolume<PFP> mtv(vertexContainer, positions);
-
-	if(!mtv.importMesh(filename, kind))
+	if(!mtv.importMesh(filename, attrNames, kind))
 		return false;
 
 	return importMesh<PFP>(map, mtv);
