@@ -82,12 +82,15 @@ inline X  lerp( X u, X v, double a )
 
 
 
-struct PFP {
-	// definition de la carte
+struct PFP
+{
+	// definition of the map
 	typedef Map2 MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -96,13 +99,7 @@ struct PFP {
 
 	typedef AttributeHandler<VEC3> TVEC3;
 	typedef AttributeHandler<REAL> TREAL;
-	typedef AttributeHandler<MATRIX33> TFRAME;
-	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
-
-
-INIT_STATICS_MAP();
-
 
 
 //class MyPosFunctor : public FunctorAttribute<Geom::Vec3f>
@@ -338,16 +335,16 @@ int main(int argc, char **argv)
 
 		AttributeHandler< NoMathIOAttribute<Pipos> > tablestring = myMap.addAttribute< NoMathIOAttribute<Pipos> >(VERTEX_ORBIT, "strings");
 
-		PFP::TVEC3 tablePosition = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
 
 		PFP::TVEC3 tableNormal = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "normals");
 
-        bool success = Algo::Import::importMesh<PFP>(myMap, "liver.trian", tablePosition, Algo::Import::ImportSurfacique::UNKNOWNSURFACE);
-        if (!success)
+		std::vector<std::string> attrNames ;
+        if (!Algo::Import::importMesh<PFP>(myMap, "liver.trian", attrNames))
         {
         	std::cerr << "Import fail" << std::endl;
         	exit(1);
         }
+		PFP::TVEC3 tablePosition = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]);
 
         std::cout << "Nombre de sommets: "<< myMap.getNbCells(VERTEX_ORBIT)<<std::endl;
 		SelectorTrue allDarts;
