@@ -26,9 +26,12 @@
 #include "Topology/generic/dartmarker.h"
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
+#include "Container/registered.h"
 
 namespace CGoGN
 {
+
+std::map< std::string, RegisteredBaseAttribute* > GenericMap::m_attributes_registry_map = std::map< std::string, RegisteredBaseAttribute* >();
 
 GenericMap::GenericMap()
 {

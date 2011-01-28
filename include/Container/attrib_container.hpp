@@ -191,23 +191,6 @@ unsigned int AttribContainer::getAddresses(unsigned int attr, std::vector<T*>& v
 //  Enregistrement attributs
 //////////////////////////////
 
-//template <typename R>
-//bool AttribContainer::registerAttribute(const std::string &nameType)
-//{
-//	RegisteredBasedAttribute* ra = new RegisteredAttribute<R>;
-//	if (ra == NULL)
-//	{
-//		std::cerr << "Erreur enregistrement attribut"<<std::endl;
-//		return false;
-//	}
-//
-//	ra->setTypeName(nameType);
-//
-//	m_attributes_registry_map->insert(std::pair<std::string, RegisteredBasedAttribute*>(nameType,ra));
-//	return true;
-//}
-
-
 //// INLINED FUNCTIONS
 inline bool AttribContainer::used(unsigned int eltIdx) const
 {

@@ -23,12 +23,12 @@ public:
 	/**
 	 * affecte un nom de type a l'attribut
 	 */
-	void setTypeName(const std::string& nameType) { m_name  = nameType;}
+	void setTypeName(const std::string& nameType) { m_name  = nameType; }
 
 	/**
 	 * recupere le nom de type affecté à l'attribut
 	 */
-	const std::string& getTypeName() { return m_name;}
+	const std::string& getTypeName() { return m_name; }
 
 	/**
 	 * Ajout de l'attribut au container (A INMPLEMENTER)
@@ -61,4 +61,3 @@ public:
 }
 
 #endif /* REGISTRED_H_ */
-

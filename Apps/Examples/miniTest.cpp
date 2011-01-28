@@ -65,8 +65,6 @@ struct PFP
 	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
 
-INIT_STATICS_MAP() ;
-
 typedef PFP::MAP MAP;
 
 MAP myMap ;
