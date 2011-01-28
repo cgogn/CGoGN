@@ -44,12 +44,15 @@
 
 using namespace CGoGN ;
 
-struct PFP {
-	// definition de la carte
+struct PFP
+{
+	// definition of the map
 	typedef Map2 MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -58,12 +61,7 @@ struct PFP {
 
 	typedef AttributeHandler<VEC3> TVEC3;
 	typedef AttributeHandler<REAL> TREAL;
-	typedef AttributeHandler<MATRIX33> TFRAME;
-	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
-
-
-INIT_STATICS_MAP() ;
 
 
 typedef PFP::MAP MAP ;

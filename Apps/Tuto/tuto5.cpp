@@ -70,10 +70,6 @@ struct PFP {
 	typedef AttributeHandler<VEC3> TVEC3;
 };
 
-// qq initialisation cachees (car penible syntaxiquement)
-INIT_STATICS_MAP();
-
-
 PFP::MAP myMap;
 SelectorTrue allDarts;
 PFP::TVEC3 position ;
@@ -417,10 +413,9 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 int main(int argc, char **argv)
 {
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-
-
-	Algo::Import::importInESS<PFP>(myMap,position,argv[1]);
+	std::vector<std::string> attrNames ;
+	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
+	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
      //plongement
 //	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);

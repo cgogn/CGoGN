@@ -339,8 +339,24 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 void EnvMap::updateMap()
 {
 // 	simplifyFaces();
-//  	subdivideFaces() ;
-//  	map.setCurrentLevel(map.getMaxLevel()) ;
+
+	CellMarker m(map, FACE_CELL) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d))
+		{
+			m.mark(d) ;
+			std::vector<Agent*>& agents = agentvect[d] ;
+			for(std::vector<Agent*>::iterator it = agents.begin(); it != agents.end(); ++it)
+			{
+				if(!map.sameFace(d, (*it)->part->d))
+					std::cout << "aaaaaaaaaaaaaaaaaaa" << std::endl ;
+			}
+		}
+	}
+
+	subdivideFaces() ;
+	map.setCurrentLevel(map.getMaxLevel()) ;
 }
 
 void EnvMap::subdivideFaces()

@@ -44,10 +44,13 @@ using namespace CGoGN;
 // definition des parametres de la carte
 struct PFP
 {
+	// definition of the map
 	typedef EmbeddedMap2<GMap2> MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -56,11 +59,7 @@ struct PFP
 
 	typedef AttributeHandler<VEC3> TVEC3;
 	typedef AttributeHandler<REAL> TREAL;
-	typedef AttributeHandler<MATRIX33> TFRAME;
-	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
-
-INIT_STATICS_MAP() ;
 
 PFP::MAP myMap;
 
@@ -392,14 +391,13 @@ int main(int argc, char **argv)
 
 	char* filename = argv[1] ;
 
-	mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-
 	PFP::VEC3 gMax;
 	PFP::VEC3 gMin;
 
 	if(argc < 2)
 	{
+		mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 		Dart d = myMap.newFace(4);
 		Dart e = myMap.newFace(3);
 
@@ -423,13 +421,16 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		bool success = Algo::Import::importMesh<PFP>(myMap, filename, mgw.position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE) ;
-		if (!success)
+		std::vector<std::string> attrNames ;
+		if(!Algo::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			std::cerr <<"Import fail"<< std::endl;
 			exit(1);
 		}
+		mgw.position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 	}
+
+	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
 
 	// pour le rendu
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, mgw.position) ;

@@ -36,8 +36,10 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 {
 	if ((filename.rfind(".tet")!=std::string::npos) || (filename.rfind(".TET")!=std::string::npos))
 		return ImportVolumique::TET;
+
 	if ((filename.rfind(".trianbgz")!=std::string::npos) || (filename.rfind(".TRIANBGZ")!=std::string::npos))
 		return ImportVolumique::TRIANBGZ;
+
 	if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
 		return ImportVolumique::PLY;
 
@@ -45,7 +47,7 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 }
 
 template <typename PFP>
-bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, ImportVolumique::ImportType kind,float scaleFactor=1.0f)
+bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor=1.0f)
 {
 	if (kind == ImportVolumique::UNKNOWNVOLUME)
 		kind = getFileType(filename);
@@ -53,13 +55,13 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, ImportVolumi
 	switch (kind)
 	{
 	case ImportVolumique::PLY:
-		return importPly(filename);
+		return importPly(filename, attrNames);
 		break;
 	case ImportVolumique::TET:
-		return importTet(filename,scaleFactor);
+		return importTet(filename, attrNames, scaleFactor);
 		break;
 	case ImportVolumique::TRIANBGZ:
-		return importTrianBinGz(filename);
+		return importTrianBinGz(filename, attrNames);
 		break;
 	default:
 		std::cerr << "Not yet supported" << std::endl;
@@ -69,8 +71,12 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, ImportVolumi
 }
 
 template <typename PFP>
-bool MeshTablesVolume<PFP>::importTet(const std::string& filename,float scaleFactor=1.0f)
+bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f)
 {
+	AttribContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	attrNames.push_back(positions.name()) ;
+
 	// open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
@@ -78,7 +84,6 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename,float scaleFac
 		std::cerr << "Unable to open file " << filename<< std::endl;
 		return false;
 	}
-
 
     std::string ligne;
     int nbv,nbt;
@@ -116,8 +121,8 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename,float scaleFac
 
 		//std::cout << "VEC3 = " << pos << std::endl;
 
-		unsigned int id = m_container.insertLine();
-		m_positions[id] = pos;
+		unsigned int id = container.insertLine();
+		positions[id] = pos;
 
 		verticesID.push_back(id);
 	}
@@ -133,7 +138,7 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename,float scaleFac
 	m_nbFaces=nbt*4;
 	m_emb.reserve(nbt*12);
 
-	for (unsigned i=0; i<m_nbVolumes ;++i)
+	for (unsigned int i = 0; i < m_nbVolumes ; ++i)
 	{
     	do
     	{
@@ -183,7 +188,7 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename,float scaleFac
 }
 
 template <typename PFP>
-bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename)
+bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames)
 {
 //	// open file
 //	igzstream fs(filename.c_str(), std::ios::in|std::ios::binary);
@@ -246,7 +251,7 @@ bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename)
 }
 
 template<typename PFP>
-bool MeshTablesVolume<PFP>::importPly(const std::string& filename)
+bool MeshTablesVolume<PFP>::importPly(const std::string& filename, std::vector<std::string>& attrNames)
 {
 //	PlyImportData pid;
 //
@@ -286,7 +291,6 @@ bool MeshTablesVolume<PFP>::importPly(const std::string& filename)
 //			m_emb.push_back(vertices[ indices[j] ]);
 //		}
 //	}
-
 	return true;
 }
 

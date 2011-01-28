@@ -45,22 +45,22 @@ using namespace CGoGN ;
  */
 struct PFP
 {
-	// definition of the type of the map
+	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 
 	// definition of the type of real value
 	typedef float REAL;
-	// definition of the type of 3D vector
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
+	typedef Geom::Vector<6,REAL> VEC6;
+	typedef Geom::Matrix<3,3,REAL> MATRIX33;
+	typedef Geom::Matrix<4,4,REAL> MATRIX44;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36;
 
-	// definition of the type of 3D vector attribute handler
 	typedef AttributeHandler<VEC3> TVEC3;
+	typedef AttributeHandler<REAL> TREAL;
 };
-
-
-// some hidden initializations
-INIT_STATICS_MAP();
-
 
 /**
  * A class for a little interface and rendering
@@ -162,7 +162,6 @@ int main(int argc, char **argv)
 	// creation of a new attribute on vertices of type 3D vector
 	// a handler to this attribute is returned
 	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-
 
 	// creation face 1 (convexe)
 	Dart d1 = myMap.newFace(5);

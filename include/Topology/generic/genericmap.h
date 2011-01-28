@@ -51,12 +51,6 @@
 #include "Topology/generic/functor.h"
 
 
-// Small macro to init static members
-// to be called in main just after the PFP declaration
-#define INIT_STATICS_MAP() \
-	std::map< std::string, RegisteredBaseAttribute* > GenericMap::m_attributes_registry_map = std::map< std::string, RegisteredBaseAttribute* >();
-
-
 namespace CGoGN
 {
 

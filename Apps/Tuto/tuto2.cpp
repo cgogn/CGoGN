@@ -56,9 +56,6 @@ struct PFP {
 	typedef AttributeHandler<VEC3> TVEC3;
 };
 
-// qq initialisation cachees (car penible syntaxiquement)
-INIT_STATICS_MAP();
-
 
 PFP::MAP myMap;
 

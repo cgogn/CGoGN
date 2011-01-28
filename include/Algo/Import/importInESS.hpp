@@ -55,16 +55,19 @@ typename PFP::VEC3 stringToEmb(std::string s)
 }
 
 template <typename PFP>
-bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filename)
+bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
 
+	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	attrNames.push_back(position.name()) ;
 
 	// open file
-	std::ifstream fp(filename, std::ios::in);
+	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename<< std::endl;
+		std::cerr << "Unable to open file " << filename << std::endl;
 		return false;
 	}
 
@@ -80,20 +83,18 @@ bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, ch
 
 	// First column
 	//Bounding box : first coord & second coord
-	bg = line.substr(0,posData);
+	bg = line.substr(0, posData);
 	posCoord = bg.find(") (");
-	stringToEmb<PFP>(bg.substr(0,posCoord));
+	stringToEmb<PFP>(bg.substr(0, posCoord));
 	stringToEmb<PFP>(bg.substr(posCoord+3));
-
 
 	while ( std::getline( fp, line ) )
 	{
-
 		posData = line.find("\t");
 
 		// First column
 		//Bounding box : first coord & second coord
-		bg = line.substr(0,posData);
+		bg = line.substr(0, posData);
 		posCoord = bg.find(") (");
 		stringToEmb<PFP>(bg.substr(0,posCoord));
 		stringToEmb<PFP>(bg.substr(posCoord+3));
@@ -101,20 +102,18 @@ bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, ch
 		//Second column
 		bg = line.substr(posData+1);
 		posCoord = bg.find(") (");
-		stringToEmb<PFP>(bg.substr(0,posCoord));
+		stringToEmb<PFP>(bg.substr(0, posCoord));
 		stringToEmb<PFP>(bg.substr(posCoord+3));
 
 	   ++count;
 	}
 
-
-
 	fp.close();
 	return true;
 }
 
+} // namespace Import
 
+} // namespace Algo
 
-}
-} // end namespaces
-}
+} // namespace CGoGN

@@ -50,12 +50,12 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType {UNKNOWNSURFACE,TRIAN,TRIANBGZ,PLY,PLYPTM,OFF,OBJ,CTM,VRML};
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, OFF, OBJ, CTM, VRML };
 	}
 
 	namespace ImportVolumique
 	{
-		enum ImportType {UNKNOWNVOLUME,TET,TRIANBGZ,PLY};
+		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY };
 	}
 
 
@@ -63,11 +63,14 @@ template <typename PFP>
 class MeshTablesSurface
 {
 protected:
+	typename PFP::MAP& m_map;
+
 	unsigned m_nbVertices;
 
 	unsigned m_nbFaces;
 
 	unsigned int m_lab;
+
 	/**
 	* number of edges per face
 	*/
@@ -78,64 +81,48 @@ protected:
 	*/
 	std::vector<unsigned int> m_emb;
 
-	/**
-	 * we need direct access to container itself to insert new lines while reading points
-	 */
-	AttribContainer& m_container;
-
-	/**
-	 * table of positions
-	 */
-	typename PFP::TVEC3& m_positions;
-
 	static ImportSurfacique::ImportType getFileType(const std::string& filename);
 
-	void extractMeshRec(const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
+	void extractMeshRec(AttribContainer& container, AttributeHandler<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
 
 public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename VEC3::DATA_TYPE DATA_TYPE ;
 
-	inline unsigned getNbFaces() const { return m_nbFaces;}
+	inline unsigned getNbFaces() const { return m_nbFaces; }
 
-	inline unsigned getNbVertices() const { return m_nbVertices;}
+	inline unsigned getNbVertices() const { return m_nbVertices; }
 
-	inline short getNbEdgesFace(int i) const  { return m_nbEdges[i];}
+	inline short getNbEdgesFace(int i) const  { return m_nbEdges[i]; }
 
-	inline unsigned int getEmbIdx(int i) { return  m_emb[i];}
+	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importTrian(const std::string& filename);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind);
 
-	bool importTrianBinGz(const std::string& filename);
+	bool importTrian(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importOff(const std::string& filename);
+	bool importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importObj(const std::string& filename);
+	bool importOff(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importPly(const std::string& filename);
+	bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importMesh(const std::string& filename, ImportSurfacique::ImportType kind);
+	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importPlyPTM(const std::string& filename, typename PFP::TFRAME& Frame, typename PFP::TRGBFUNCS& RGBfunctions);
+	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importCTM(const std::string& filename);
+	bool importCTM(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importASSIMP(const std::string& filename);
+	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 
 	/**
 	 * @param container container of vertex orbite
 	 * @param idPositions id of position attribute in the container
 	 * @param idLabels id of label attribute in the container
 	 */
-	MeshTablesSurface(AttribContainer& container, typename PFP::TVEC3& positions):
-		m_container(container), m_positions(positions)
+	MeshTablesSurface(typename PFP::MAP& map):
+		m_map(map)
 	{
-	}
-
-	MeshTablesSurface(AttribContainer& container, typename PFP::TVEC3& positions, const std::string& filename):
-		m_container(container), m_positions(positions)
-	{
-		importMesh(filename);
 	}
 };
 
@@ -143,10 +130,9 @@ public:
 template <typename PFP>
 class MeshTablesVolume
 {
-public:
-
-
 protected:
+	typename PFP::MAP& m_map;
+
 	unsigned m_nbVertices;
 
 	unsigned m_nbFaces;
@@ -163,16 +149,6 @@ protected:
 	*/
 	std::vector<unsigned int> m_emb;
 
-	/**
-	 * we need direct access to container itself to insert new lines while reading points
-	 */
-	AttribContainer& m_container;
-
-	/**
-	 * table of positions
-	 */
-	typename PFP::TVEC3& m_positions;
-
 	static ImportVolumique::ImportType getFileType(const std::string& filename);
 
 public:
@@ -183,7 +159,7 @@ public:
 	typedef Geom::Matrix<3,3,DATA_TYPE> MAT33;
 	typedef Geom::Matrix<3,6,DATA_TYPE> MAT36;
 
-	inline short getNbEdgesFace(int i) const  { return m_nbEdges[i];}
+	inline short getNbEdgesFace(int i) const  { return m_nbEdges[i]; }
 
 	inline unsigned getNbVolumes() const { return m_nbVolumes; }
 
@@ -197,23 +173,17 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importTet(const std::string& filename,float scaleFactor);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor);
 
-	bool importPly(const std::string& filename);
+	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
 
-	bool importTrianBinGz(const std::string& filename);
+	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importMesh(const std::string& filename, ImportVolumique::ImportType kind, float scaleFactor);
+	bool importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames);
 
-	MeshTablesVolume(AttribContainer& container, typename PFP::TVEC3& pos ):
-		m_container(container), m_positions(pos)
+	MeshTablesVolume(typename PFP::MAP& map):
+		m_map(map)
 	{
-	}
-
-	MeshTablesVolume(AttribContainer& container, typename PFP::TVEC3& pos, const std::string& filename):
-		m_container(container), m_positions(pos)
-	{
-		importMesh(filename);
 	}
 };
 

@@ -58,10 +58,6 @@ struct PFP
 };
 
 
-// some hidden initializations
-INIT_STATICS_MAP();
-
-
 /**
  * A class for a little interface and rendering
  */

@@ -246,20 +246,17 @@ public:
 	* @param strings (OUT) tableau des noms d'attributs
 	* @return le nombre d'attributs
 	*/	
-	unsigned int getAttributesStrings(std::vector< std::string>& strings);
+	unsigned int getAttributesStrings(std::vector<std::string>& strings);
 
 	/**
 	 * get the name of an attribute, given its index in the container
 	 */
 	const std::string& getAttributeName(unsigned int attrIndex);
 
-	unsigned int getNbAttributes()
-	{
-		for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
-			std::cout << "table ptr:" << m_tableAttribs[i] << std::endl;
-
-		return m_tableAttribs.size();
-	}
+	/**
+	 * return the number of attributes of the container
+	 */
+	unsigned int getNbAttributes();
 
 	/**
 	* insert une ligne vide dans tous les tableaux (compteur de referencements = 0)
@@ -532,45 +529,6 @@ public:
 	 */
 	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
 };
-
-
-
-//unsigned int AttribContainer::insertRefLine()
-//{
-//	// if no more rooms
-//	if (m_tableBlocksWithFree.empty())
-//	{
-//		HoleBlockRef* ptr = new HoleBlockRef;	// new block
-//		m_tableBlocksWithFree.push_back(m_holesBlocks.size());	// add its future position to block_free
-//		m_holesBlocks.push_back(ptr);							// and add it to block table
-//
-//		for(unsigned int i=0; i< m_tableAttribs.size(); ++i)
-//		{
-//			if (m_tableAttribs[i]!= NULL)
-//				m_tableAttribs[i]->addBlock();						//ajoute un bloc a chaque attribut
-//		}
-//	}
-//
-//	// get the first free block index (last in vector)
-//	unsigned int bf = m_tableBlocksWithFree.back();
-//	// get the block
-//	HoleBlockRef* block = m_holesBlocks[bf];
-//
-//	// add new elt in block and compute index
-//
-//	unsigned int ne;
-//	ne =  block->newRefElt(m_maxSize);
-//	unsigned int idx = _BLOCKSIZE_*bf + ne;
-//
-//
-//	// if no more room in block remove it from free_blocks
-//	if (block->full())
-//		m_tableBlocksWithFree.pop_back();
-//
-//	m_size++;
-//
-//	return idx;
-//}
 
 } // namespace CGoGN
 

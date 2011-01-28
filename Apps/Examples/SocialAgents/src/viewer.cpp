@@ -388,9 +388,9 @@ void MyGlutWin::animate(void)
 // 	std::cout << "pos to reach : " << posToReach << std::endl;
 // 	std::cout << sim->getGlobalTime() << " " << std::endl;
 	updateVisualization(sim);
-//  	sim->setPreferredVelocities(posToReach);
+	sim->setPreferredVelocities(posToReach);
 //	sim->setPreferredPathVelocities();
- 	sim->setPreferredNextCellVelocities();
+// 	sim->setPreferredNextCellVelocities();
 	sim->doStep();
 // 	sim->envMap.simplify();
 	glutPostRedisplay();

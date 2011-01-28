@@ -26,11 +26,8 @@
 #include <time.h>
 #include <algorithm>
 
-
-
 #include "Utils/GLSLShader.h"
 #include "Utils/glutwin.h"
-
 
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
@@ -47,20 +44,22 @@
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
 
+
 /// pour simplifier l'ecriture du code
 using namespace CGoGN;
-
 
 
 /// definition de la structure qui decrit le type de carte utilise
 
 struct PFP
 {
-	// definition de la carte
+	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -69,12 +68,7 @@ struct PFP
 
 	typedef AttributeHandler<VEC3> TVEC3;
 	typedef AttributeHandler<REAL> TREAL;
-	typedef AttributeHandler<MATRIX33> TFRAME;
-	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
-
-// some hidden initializations
-INIT_STATICS_MAP();
 
 
 /// definition de la carte en  global, plus facile 
@@ -86,16 +80,11 @@ AttributeHandler<PFP::VEC3> position;
 // handler d'attribut de normale par sommet
 AttributeHandler<PFP::VEC3> normal;
 
-
 /// fonction qui renvoit vrai (appliquée à un brin)
 SelectorTrue allDarts;
 
-
-
-/// encore 2 typedef pour simplifier l'ecriture du code
-
+/// encore 1 typedef pour simplifier l'ecriture du code
 typedef PFP::VEC3 Point3D;
-
 
 /// pile des brins selectionnes (6 max)
 std::vector<Dart> selected_darts;
@@ -233,11 +222,6 @@ void coupe_carre(Dart dd)
 
 
 
-
-
-
-
-
 class myGlutWin: public Utils::SimpleGlutWin
 {
 public:
@@ -252,7 +236,6 @@ public:
 	 */
 	float gWidthObj;
 
-
 	Algo::Render::VBO::MapRender_VBO<PFP>* m_render;
 
 	Algo::Render::VBO::topo_VBORenderMapD* m_render_topo;
@@ -266,7 +249,6 @@ public:
 	 * keyboard CB
 	 */
 	void myKeyboard(unsigned char keycode, int x, int y);
-
 
 	/**
 	 * GL initialization
@@ -298,8 +280,6 @@ public:
 	myGlutWin(	int* argc, char **argv, int winX, int winY) :
 		SimpleGlutWin(argc,argv,winX,winY),
 		m_render(NULL),m_render_topo(NULL),aff_help(true) {}
-
-
 };
 
 
@@ -312,7 +292,7 @@ std::vector<Dart> d_edges;
 std::vector<Dart> d_vertices;
 
 
-// fonction qui calcule la distance a utilisé pour la selection
+// fonction qui calcule la distance a utiliser pour la selection
 float computeSelectRadius(int x, int y, int pixelRadius)
 {
 	GLint viewport[4];
@@ -348,7 +328,6 @@ float computeSelectRadius(int x, int y, int pixelRadius)
 	q -= p;
 	return float(q.norm());
 }
-
 
 
 void myGlutWin::drawSelected()
@@ -408,9 +387,6 @@ void myGlutWin::drawSelected()
 		glVertex3fv(P.data());
 	}
 	glEnd();
-
-
-
 	
 	glLineWidth(7.0f);
 	for(unsigned int i=0; i < selected_darts.size(); ++i)
@@ -443,24 +419,17 @@ void myGlutWin::drawSelected()
 	}
 }
 
-
-
 void myGlutWin::myInitGL()
 {
-
 	glClearColor(0.2,0.2,0.2,0.);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
-
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition);
 	glEnable(GL_LIGHT0);
-
-
-
 }
 
 void myGlutWin::updateRender()
@@ -482,7 +451,6 @@ void myGlutWin::updateRender()
 	m_render_topo->updateData<PFP>(myMap,position,0.9f,0.9f);
 }
 
-
 void myGlutWin::myRedraw(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -492,7 +460,6 @@ void myGlutWin::myRedraw(void)
 	float sc = 50./gWidthObj;
 	glScalef(sc,sc,sc);
 	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
 
 	/// Affichage de la topologie si demande
 	glDisable(GL_LIGHTING);
@@ -521,7 +488,6 @@ void myGlutWin::myRedraw(void)
 	//glColor3f(0.9f,0.3f,0.3f);
 	glColor3f(0.0f,0.9f,0.3f);
 
-
 	/// decalage pour surlignage non clignotant
 	glEnable( GL_POLYGON_OFFSET_FILL );
 	glPolygonOffset( 1.0f, 1.0f );
@@ -542,7 +508,6 @@ void myGlutWin::myRedraw(void)
 
 	glDisable( GL_POLYGON_OFFSET_FILL );
 
-
 	glPopMatrix();
 
 	if (aff_help)
@@ -550,9 +515,7 @@ void myGlutWin::myRedraw(void)
 		glColor3f(1.0f,1.0f,1.0f);
 		printString2D(10,20,"Keys:\nt: affichage topologie\nf: selection face (position souris)\na: selection aretes\ns: selection sommet\nd: selection brin\n0: vide la pile des brins selectionnes\nD: info brin");
 	}
-
 }
-
 
 void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 {
@@ -680,8 +643,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		glScalef(sc,sc,sc);
 		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
 		
-		
-
 		/// calcul du rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
@@ -698,8 +659,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		std::cout << "Distance obj = "<<dist << std::endl;
 
 		Algo::Selection::edgesRaySelection<PFP>(myMap, position, allDarts, rayA, AB, d_edges,dist);
-
-
 
 		glPopMatrix();
 
@@ -727,7 +686,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		float sc = 50./gWidthObj;
 		glScalef(sc,sc,sc);
 		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
 
 		/// Rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
@@ -760,11 +718,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		break;
 	}
-	
-
-
-		glutPostRedisplay();
-		break;
 
 	case 'h':
 		aff_help =!aff_help;
@@ -815,26 +768,24 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 	}
 }
 
-
-
 int main(int argc, char **argv)
 {
 	/// init glut interface and
 	myGlutWin mgw(&argc,argv,800,800);
 	mgw.init();
 
-	// cree un handler d'attribut pour la position des points
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-	// cree un handler pour les normales aux sommets
-	normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
-
-	if (argc==2)
+	if (argc == 2)
 	{
-		bool success = Algo::Import::importMesh<PFP>(myMap, argv[1], position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE) ;
+		std::vector<std::string> attrNames ;
+		Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames) ;
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 		mgw.updateRender();
 	}
 	else
 	{
+		position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 		createMap();
 		mgw.updateRender();	// ne pas oublier de mettre à jour openGL après chaque modif dans la carte
 	}
@@ -845,7 +796,6 @@ int main(int argc, char **argv)
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
     mgw.gWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
     mgw.gPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-
 
 	mgw.mainLoop();
 

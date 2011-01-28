@@ -428,40 +428,22 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 }
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportSurfacique::ImportType kind)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
 {
-	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
+	MeshTablesSurface<PFP> mts(map);
 
-	MeshTablesSurface<PFP> mts(vertexContainer, positions);
-
-	if(!mts.importMesh(filename, kind))
+	if(!mts.importMesh(filename, attrNames, kind))
 		return false;
 
 	return importMesh<PFP>(map, mts);
 }
 
 template <typename PFP>
-bool importPLYPTM(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportSurfacique::ImportType kind,
-			typename PFP::TFRAME& Frame, typename PFP::TRGBFUNCS& RGBfunctions)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind)
 {
-	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
+	MeshTablesVolume<PFP> mtv(map);
 
-	MeshTablesSurface<PFP> mts(vertexContainer, positions);
-
-	if(!mts.importPlyPTM(filename, Frame, RGBfunctions))
-		return false;
-
-	return importMesh<PFP>(map, mts);
-}
-
-template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind)
-{
-	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
-
-	MeshTablesVolume<PFP> mtv(vertexContainer, positions);
-
-	if(!mtv.importMesh(filename, kind))
+	if(!mtv.importMesh(filename, attrNames, kind))
 		return false;
 
 	return importMesh<PFP>(map, mtv);

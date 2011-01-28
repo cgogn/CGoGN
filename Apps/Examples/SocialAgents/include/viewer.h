@@ -42,10 +42,7 @@
 // #include "Algo/Render/topo_vboRender.h"
 #include "Algo/Render/topo_render.h"
 
-
 using namespace CGoGN ;
-
-INIT_STATICS_MAP() ;
 
 typedef PFP::MAP MAP;
 

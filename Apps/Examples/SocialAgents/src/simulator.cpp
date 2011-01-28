@@ -14,18 +14,17 @@ Simulator::Simulator() : agents_(), defaultAgent_(0), globalTime_(0.0f), timeSte
 // 	CGoGN::CityGenerator::generateGrid<PFP,PFP::TVEC3>(envMap.map,envMap.position,100,100,50.0f,envMap.closeMark);
 
 	envMap.sideSize = 70.0f;
-//  	CGoGN::CityGenerator::generateSmallCity<PFP,PFP::TVEC3>(envMap.map,envMap.position,envMap.closeMark,envMap.sideSize);
+	CGoGN::CityGenerator::generateSmallCity<PFP,PFP::TVEC3>(envMap.map,envMap.position,envMap.closeMark,envMap.sideSize);
 
 // 	CGoGN::CityGenerator::generateAbsolutSpiralOfDeath<PFP>(envMap.map,envMap.position,envMap.closeMark,2000,0.25,110,100);
-	CGoGN::CityGenerator::generateToboggan<PFP>(envMap.map,envMap.position,envMap.closeMark,100,0.25,200,10);
-
+//	CGoGN::CityGenerator::generateToboggan<PFP>(envMap.map,envMap.position,envMap.closeMark,100,0.25,200,10);
 
 //	std::cout << "simplify" << std::endl;
 // 	envMap.simplify();
-//  	envMap.map.init();
+	envMap.map.init();
 	std::cout << "setup scenario" << std::endl;
-// 	setupScenario();
-	setupHelicoidScenario(1,50);
+ 	setupScenario();
+//	setupHelicoidScenario(1,50);
 
 // 	Dart dStop=envMap.map.begin();
 // 	for(unsigned int i=0;i<5000;++i) envMap.map.next(dStop);

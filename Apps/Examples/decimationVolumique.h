@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #ifndef __DECIMATIONVOLUMIQUE__
 #define __DECIMATIONVOLUMIQUE__
 
@@ -45,29 +46,24 @@
 
 using namespace CGoGN ;
 
-struct PFP {
-	// definition de la carte
+struct PFP
+{
+	// definition of the map
 	typedef Map3 MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
-	// definition du type de vecteur (point) utilise
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
-	// definition du type de matrice 3x3 utilise
+	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	// definition du type de matrice 4x4 utilise
 	typedef Geom::Matrix<4,4,REAL> MATRIX44;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36;
 
-	// definition du type du AttributeHandler de vecteur 3D
 	typedef AttributeHandler<VEC3> TVEC3;
-
-	// definition du type du AttributeHandler de reels
 	typedef AttributeHandler<REAL> TREAL;
 };
-
-// qq initialisation cachees (car penible syntaxiquement)
-INIT_STATICS_MAP();
-
 
 PFP::MAP myMap;
 SelectorTrue allDarts;
