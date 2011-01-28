@@ -45,6 +45,7 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 {
 	if ((filename.rfind(".trianbgz")!=std::string::npos) || (filename.rfind(".TRIANBGZ")!=std::string::npos))
 		return ImportSurfacique::TRIANBGZ;
+
 	if ((filename.rfind(".trian")!=std::string::npos) || (filename.rfind(".TRIAN")!=std::string::npos))
 		return ImportSurfacique::TRIAN;
 
@@ -53,10 +54,13 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 
 	if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
 		return ImportSurfacique::PLY;
+
 	if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
 		return ImportSurfacique::OFF;
+
 	if ((filename.rfind(".obj")!=std::string::npos) || (filename.rfind(".OBJ")!=std::string::npos))
 		return ImportSurfacique::OBJ;
+
 	if ((filename.rfind(".ctm")!=std::string::npos) || (filename.rfind(".OBJ")!=std::string::npos))
 		return ImportSurfacique::CTM;
 
@@ -92,6 +96,10 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 	case ImportSurfacique::PLY:
 		std::cout << "TYPE: PLY" << std::endl;
 		return importPly(filename, attrNames);
+		break;
+	case ImportSurfacique::PLYPTM:
+		std::cout << "TYPE: PLYPTM" << std::endl;
+		return importPlyPTM(filename, attrNames);
 		break;
 	case ImportSurfacique::OBJ:
 		std::cout << "TYPE: OBJ" << std::endl;

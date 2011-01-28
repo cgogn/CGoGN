@@ -33,7 +33,7 @@ namespace Import
 {
 
 template <typename PFP>
-typename PFP::VEC3 stringToEmb(std::string s)
+typename PFP::VEC3 stringToEmb(std::string& s)
 {
 	if(s[0] == '(')
 		s.erase(0,2);
@@ -55,10 +55,13 @@ typename PFP::VEC3 stringToEmb(std::string s)
 }
 
 template <typename PFP>
-bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filename)
+bool importInESS(typename PFP::MAP& map, char* filename, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
 
+	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	attrNames.push_back(position.name()) ;
 
 	// open file
 	std::ifstream fp(filename, std::ios::in);
@@ -85,10 +88,8 @@ bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, ch
 	stringToEmb<PFP>(bg.substr(0,posCoord));
 	stringToEmb<PFP>(bg.substr(posCoord+3));
 
-
 	while ( std::getline( fp, line ) )
 	{
-
 		posData = line.find("\t");
 
 		// First column
@@ -107,14 +108,12 @@ bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, ch
 	   ++count;
 	}
 
-
-
 	fp.close();
 	return true;
 }
 
+} // namespace Import
 
+} // namespace Algo
 
-}
-} // end namespaces
-}
+} // namespace CGoGN

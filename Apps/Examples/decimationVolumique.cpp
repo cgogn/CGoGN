@@ -348,12 +348,10 @@ void maillageTest()
 
 int main(int argc, char **argv)
 {
-	//Initilisation du plongement geometrique
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-
 	/*
 	 * Chargement de maillages
 	 */
+	std::vector<std::string> attrNames ;
 	if(argc < 2)
 	{
 			std::cerr << "usage : " << argv[0] << " -off" << std::endl;
@@ -371,7 +369,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		Algo::Import::importOFFWithELERegions<PFP>(myMap,position,argv[2],argv[3]);
+		Algo::Import::importOFFWithELERegions<PFP>(myMap,argv[2],argv[3],attrNames);
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 	}
 	else if(std::string(argv[1]) == "-tet")
 	{
@@ -380,7 +379,8 @@ int main(int argc, char **argv)
 				return 1;
 			}
 
-			Algo::Import::importTet<PFP>(myMap,position,argv[2]);
+			Algo::Import::importTet<PFP>(myMap,argv[2],attrNames);
+			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 	}
 	else if(std::string(argv[1]) == "-ts")
 	{
@@ -389,7 +389,8 @@ int main(int argc, char **argv)
 				return 1;
 			}
 
-			Algo::Import::importTs<PFP>(myMap,position,argv[2]);
+			Algo::Import::importTs<PFP>(myMap,argv[2],attrNames);
+			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
 			//scalar = myMap.getAttribute<PFP::REAL>(VERTEX_ORBIT, "scalar");
 	}

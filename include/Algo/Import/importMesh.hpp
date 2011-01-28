@@ -430,25 +430,9 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
 {
-//	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
-
 	MeshTablesSurface<PFP> mts(map);
 
 	if(!mts.importMesh(filename, attrNames, kind))
-		return false;
-
-	return importMesh<PFP>(map, mts);
-}
-
-template <typename PFP>
-bool importPLYPTM(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportSurfacique::ImportType kind,
-			typename PFP::TFRAME& Frame, typename PFP::TRGBFUNCS& RGBfunctions)
-{
-	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
-
-	MeshTablesSurface<PFP> mts(vertexContainer, positions);
-
-	if(!mts.importPlyPTM(filename, Frame, RGBfunctions))
 		return false;
 
 	return importMesh<PFP>(map, mts);

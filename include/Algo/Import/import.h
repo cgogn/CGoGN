@@ -49,10 +49,6 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
 
-template <typename PFP>
-bool importPLYPTM(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportSurfacique::ImportType kind,
-		typename PFP::TFRAME& frame, typename PFP::TRGBFUNCTIONS& funcs);
-
 /**
  * import a volumic mesh
  */
@@ -63,27 +59,26 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PF
 //bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
 //
 
-
 /*
  * TODO a transformer en utilisant un MeshTableVolume.
  */
 template <typename PFP>
-bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filenameOFF,char * filenameELE);
+bool importOFFWithELERegions(typename PFP::MAP& the_map, char* filenameOFF,char * filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filename, float scaleFactor=1.0f);
+bool importTet(typename PFP::MAP& the_map, char* filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f);
 
 template <typename PFP>
-bool importTs(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filename, float scaleFactor=1.0f);
+bool importTs(typename PFP::MAP& the_map, char* filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f);
 
 template <typename PFP>
-bool importInESS(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filename);
+bool importInESS(typename PFP::MAP& the_map, char* filename, std::vector<std::string>& attrNames);
 
-}
+} // namespace Import
 
-}
+} // namespace Algo
 
-}
+} // namespace CGoGN
 
 #include "Algo/Import/importMesh.hpp"
 //#include "Algo/Import/importObjTex.hpp"

@@ -27,19 +27,25 @@
 
 namespace CGoGN
 {
+
 namespace Algo
 {
-namespace Import 
+
+namespace Import
 {
 
 template<typename PFP>
-bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_position, char* filenameOFF, char * filenameELE)
+bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * filenameELE, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
 
+	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	attrNames.push_back(position.name()) ;
+
 	unsigned int m_nbVertices=0, m_nbFaces=0, m_nbEdges=0, m_nbVolumes=0;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(the_map, VERTEX_ORBIT, "incidents");
+	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
 
 	// open files
 	std::ifstream foff(filenameOFF, std::ios::in);
@@ -66,7 +72,6 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 		std::cerr << line << std::endl;
 		return false;
 	}
-
 
 	//Reading number of vertex/faces/edges in OFF file
 	int nbe;
@@ -98,13 +103,11 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 
 	std::cout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << std::endl;
 
-	AttribContainer& m_container = the_map.getAttributeContainer(VERTEX_ORBIT);
-
 	//Reading vertices
 	std::vector<unsigned int> verticesID;
 	verticesID.reserve(m_nbVertices);
 
-	for(unsigned int i=0 ; i < m_nbVertices ; ++i)
+	for(unsigned int i = 0 ; i < m_nbVertices ; ++i)
 	{
 		do
 		{
@@ -120,8 +123,8 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 		//we can read colors informations if exists
 		VEC3 pos(x,y,z);
 
-		unsigned int id = m_container.insertLine();
-		m_position[id] = pos;
+		unsigned int id = container.insertLine();
+		position[id] = pos;
 
 //		std::cout << "emb : " << pos << " / id = " << id << std::endl;
 		verticesID.push_back(id);
@@ -142,8 +145,8 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 		oss >> nbe;
 //		std::cout << "tetra number : " << nbe << std::endl;
 
-		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(the_map);
-		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(the_map,4);
+		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(map);
+		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map,4);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
@@ -160,33 +163,33 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 		{
 //			std::cout << "\t embedding number : " << pt[j];
 
-			FunctorSetEmb<typename PFP::MAP> femb(the_map,VERTEX_ORBIT,verticesID[pt[j]]);
+			FunctorSetEmb<typename PFP::MAP> femb(map,VERTEX_ORBIT,verticesID[pt[j]]);
 
 			Dart dd = d;
 			do {
 				femb(dd);
 				//vecDartPtrEmb[pt[j]].push_back(dd);
 				vecDartsPerVertex[pt[j]].push_back(dd);
-				dd = the_map.phi1(the_map.phi2(dd));
+				dd = map.phi1(map.phi2(dd));
 			} while(dd!=d);
 
-			d = the_map.phi1(d);
+			d = map.phi1(d);
 
 //			std::cout << " done" << std::endl;
 		}
 
 		//Embed the last vertex
 //		std::cout << "\t embedding number : " << pt[3] << std::endl;
-		d = the_map.phi_1(the_map.phi2(d));
+		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> femb(the_map,VERTEX_ORBIT,verticesID[pt[3]]);
+		FunctorSetEmb<typename PFP::MAP> femb(map,VERTEX_ORBIT,verticesID[pt[3]]);
 		Dart dd = d;
 		do {
 			femb(dd);
 //			std::cout << "embed" << std::endl;
 			//vecDartPtrEmb[pt[3]].push_back(dd);
 			vecDartsPerVertex[pt[3]].push_back(dd);
-			dd = the_map.phi1(the_map.phi2(dd));
+			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 
 //		std::cout << "end tetra" << std::endl;
@@ -198,21 +201,21 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 	fele.close();
 
 	//Association des phi3
-	for (Dart d = the_map.begin(); d != the_map.end(); the_map.next(d))
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		std::vector<Dart>& vec = vecDartsPerVertex[d];
 
 		for(typename std::vector<Dart>::iterator it = vec.begin(); it!=vec.end(); ++it)
 		{
-			if(the_map.phi3(*it)==*it)
+			if(map.phi3(*it)==*it)
 			{
 				bool sewn=false;
 				for(typename std::vector<Dart>::iterator itnext=it+1; itnext!=vec.end() && !sewn; ++itnext)
 				{
-					if(the_map.getDartEmbedding(VERTEX_ORBIT,the_map.phi1(*it))==the_map.getDartEmbedding(VERTEX_ORBIT,the_map.phi_1(*itnext))
-					&& the_map.getDartEmbedding(VERTEX_ORBIT,the_map.phi_1(*it))==the_map.getDartEmbedding(VERTEX_ORBIT,the_map.phi1(*itnext)))
+					if(map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*itnext))
+					&& map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*itnext)))
 					{
-						the_map.sewVolumes(*it,the_map.phi_1(*itnext));
+						map.sewVolumes(*it,map.phi_1(*itnext));
 						sewn = true;
 					}
 				}
@@ -225,7 +228,8 @@ bool importOFFWithELERegions(typename PFP::MAP& the_map, typename PFP::TVEC3& m_
 	return true;
 }
 
+} // namespace Import
 
-}
-} // end namespaces
-}
+} // namespace Algo
+
+} // namespace CGoGN

@@ -50,12 +50,12 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType {UNKNOWNSURFACE,TRIAN,TRIANBGZ,PLY,PLYPTM,OFF,OBJ,CTM,VRML};
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, OFF, OBJ, CTM, VRML };
 	}
 
 	namespace ImportVolumique
 	{
-		enum ImportType {UNKNOWNVOLUME,TET,TRIANBGZ,PLY};
+		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY };
 	}
 
 
