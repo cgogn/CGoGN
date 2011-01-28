@@ -67,6 +67,9 @@ public:
 	template <typename T>
 	AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
+	template <typename T>
+	AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+
 	/***************************************************
 	 *                 MAP TRAVERSAL                   *
 	 ***************************************************/

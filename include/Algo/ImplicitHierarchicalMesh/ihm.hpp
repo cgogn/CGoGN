@@ -57,6 +57,13 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap::addAttribute(unsigned int orbit
 	return AttributeHandler_IHM<T>(this, h.id()) ;
 }
 
+template <typename T>
+AttributeHandler_IHM<T> ImplicitHierarchicalMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
+{
+	AttributeHandler<T> h = Map2::getAttribute<T>(orbit, nameAttr) ;
+	return AttributeHandler_IHM<T>(this, h.id()) ;
+}
+
 /***************************************************
  *                 MAP TRAVERSAL                   *
  ***************************************************/

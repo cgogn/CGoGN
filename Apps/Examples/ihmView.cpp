@@ -45,11 +45,12 @@ using namespace CGoGN ;
 
 struct PFP
 {
-	// definition de la carte
+	// definition of the map
 	typedef Algo::IHM::ImplicitHierarchicalMap MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
+
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -58,11 +59,8 @@ struct PFP
 
 	typedef Algo::IHM::AttributeHandler_IHM<VEC3> TVEC3;
 	typedef Algo::IHM::AttributeHandler_IHM<REAL> TREAL;
-	typedef Algo::IHM::AttributeHandler_IHM<MATRIX33> TFRAME;
-	typedef Algo::IHM::AttributeHandler_IHM<MATRIX36> TRGBFUNCS;
 };
 
-INIT_STATICS_MAP() ;
 
 PFP::MAP myMap ;
 SelectorTrue allDarts ;
@@ -573,23 +571,21 @@ int main(int argc, char** argv)
 {
 	MyGlutWin* mgw = new MyGlutWin(&argc, argv, 1200, 800) ;
 
-	mgw->position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-	mgw->normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-	std::cout << "position -> " << mgw->position.isValid() << std::endl ;
-	std::cout << "normal -> " << mgw->normal.isValid() << std::endl ;
-
 	char* filename = argv[1] ;
 
 	GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
-	bool success = Algo::Import::importMesh<PFP>(myMap, filename, mgw->position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE) ;
-	if(!success)
+	std::vector<std::string> attrNames ;
+	if(!Algo::Import::importMesh<PFP>(myMap, filename, attrNames))
 	{
 		std::cerr << "could not import "<< filename << std::endl ;
 		return 1 ;
 	}
+	mgw->position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 	GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 	GLfloat seconds = (t2 - t1) / 1000.0f ;
 	std::cout << "import: " << seconds << " sec" << std::endl ;
+
+	mgw->normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
 
 	myMap.init() ;
 
