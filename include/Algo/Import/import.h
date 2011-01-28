@@ -47,7 +47,7 @@ namespace Import
 * @return a boolean indicating if import was successfull
 */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
 
 template <typename PFP>
 bool importPLYPTM(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportSurfacique::ImportType kind,
@@ -57,7 +57,7 @@ bool importPLYPTM(typename PFP::MAP& map, const std::string& filename, typename 
  * import a volumic mesh
  */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind= ImportVolumique::UNKNOWNVOLUME);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME);
 
 //template <typename PFP>
 //bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);

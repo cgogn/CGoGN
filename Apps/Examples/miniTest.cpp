@@ -627,8 +627,6 @@ int main(int argc, char** argv)
 {
 	MyGlutWin* mgw = new MyGlutWin(&argc, argv, 1200, 800) ;
 
-	mgw->position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-
 	if(argc < 2)
 	{
 		Dart d1 = myMap.newFace(3) ;
@@ -641,12 +639,13 @@ int main(int argc, char** argv)
 		char* filename = argv[1] ;
 
 		GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
-		bool success = Algo::Import::importMesh<PFP>(myMap, filename, mgw->position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE) ;
-		if(!success)
+		std::vector<std::string> attrNames ;
+		if(!Algo::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
 			std::cerr << "could not import "<< filename << std::endl ;
 			return 1 ;
 		}
+		mgw->position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 		GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 		GLfloat seconds = (t2 - t1) / 1000.0f ;
 		std::cout << "import: " << seconds << " sec" << std::endl ;

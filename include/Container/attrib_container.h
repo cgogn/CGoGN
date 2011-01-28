@@ -246,7 +246,7 @@ public:
 	* @param strings (OUT) tableau des noms d'attributs
 	* @return le nombre d'attributs
 	*/	
-	unsigned int getAttributesStrings(std::vector< std::string>& strings);
+	unsigned int getAttributesStrings(std::vector<std::string>& strings);
 
 	/**
 	 * get the name of an attribute, given its index in the container
