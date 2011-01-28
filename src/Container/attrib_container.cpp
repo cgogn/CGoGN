@@ -397,7 +397,7 @@ bool AttribContainer::loadXml(xmlNodePtr node)
 
 void AttribContainer::saveBin(CGoGNostream& fs, unsigned int id)
 {
-// en ascii id et taille les tailles
+	// en ascii id et taille les tailles
 
 	std::vector<unsigned int> bufferui;
 	bufferui.reserve(6);
@@ -410,28 +410,23 @@ void AttribContainer::saveBin(CGoGNostream& fs, unsigned int id)
 	bufferui.push_back(m_size);
 	bufferui.push_back(m_maxSize);
 
-
-
 	std::cout << "Save Container: id:" <<id <<"  nbAtt:"<<m_nbAttributes << "  size:"<<m_size<<std::endl;
 
 	fs.write(reinterpret_cast<const char*>(&bufferui[0]) ,bufferui.size()*sizeof(unsigned int));
 
-
-	unsigned int i=0;
+	unsigned int i = 0;
 	for(std::vector<AttribMultiVectGen*>::iterator it=m_tableAttribs.begin(); it!=m_tableAttribs.end(); ++it)
 	{
 		if (*it !=NULL)
-		{
-			(*it)->saveBin(fs,i++);
-		}
+			(*it)->saveBin(fs, i++);
 	}
 
 	//en binaire les blocks de ref
-		for (std::vector<  HoleBlockRef* >::iterator it = m_holesBlocks.begin(); it != m_holesBlocks.end(); ++it)
-			(*it)->saveBin(fs);
+	for (std::vector<HoleBlockRef*>::iterator it = m_holesBlocks.begin(); it != m_holesBlocks.end(); ++it)
+		(*it)->saveBin(fs);
 
 	// les indices des blocks libres
-		fs.write(reinterpret_cast<const char*>( &m_tableBlocksWithFree[0]),m_tableBlocksWithFree.size()*sizeof(uint));
+	fs.write(reinterpret_cast<const char*>(&m_tableBlocksWithFree[0]), m_tableBlocksWithFree.size() * sizeof(uint));
 }
 
 unsigned int AttribContainer::loadBinId(CGoGNistream& fs)
@@ -454,7 +449,7 @@ bool AttribContainer::loadBin(CGoGNistream& fs)
 
 	fs.read(reinterpret_cast<char*>(&(bufferui[0])), 6*sizeof(unsigned int));
 
-	unsigned int bs,szHB,szBWF,nbAtt;
+	unsigned int bs, szHB, szBWF, nbAtt;
 	bs = bufferui[0];
 	szHB = bufferui[1];
 	szBWF = bufferui[2];
@@ -484,18 +479,17 @@ bool AttribContainer::loadBin(CGoGNistream& fs)
 		{
 			RegisteredBaseAttribute* ra = itAtt->second;
 			unsigned int idAtt = ra->addAttribute(*this, nameAtt);
-			std::cout << "loading attribute "<<nameAtt<<" : "<< typeAtt <<std::endl;
+			std::cout << "loading attribute " << nameAtt << " : " << typeAtt << std::endl;
 			m_tableAttribs[idAtt]->loadBin(fs);
 			// no need the set the nb of block (done by binary read of attribmv)
 			m_nbAttributes++;
 		}
-
 	}
 
 	m_holesBlocks.resize(szHB);
 
 	// blocks
-	for (unsigned int i=0; i<szHB; ++i)
+	for (unsigned int i = 0; i < szHB; ++i)
 	{
 		m_holesBlocks[i] = new HoleBlockRef;
 		m_holesBlocks[i]->loadBin(fs);

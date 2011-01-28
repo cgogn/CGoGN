@@ -1,12 +1,29 @@
-/*
- * registred.h
- *
- *  Created on: Jun 10, 2010
- *      Author: thery
- */
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
 
-#ifndef _ATTRIBUTE_REGISTERED_H_
-#define _ATTRIBUTE_REGISTERED_H_
+#ifndef _REGISTERED_ATTRIBUTE_H_
+#define _REGISTERED_ATTRIBUTE_H_
 
 namespace CGoGN
 {
@@ -31,12 +48,7 @@ public:
 	const std::string& getTypeName() { return m_name; }
 
 	/**
-	 * Ajout de l'attribut au container (A INMPLEMENTER)
-	 */
-//	virtual unsigned int addAttribute(AttribContainer& container, const std::string& attribName, unsigned int id)=0;
-
-	/**
-	 * Ajout de l'attribut au container (A INMPLEMENTER)
+	 * Ajout de l'attribut au container (A IMPLEMENTER)
 	 */
 	virtual unsigned int addAttribute(AttribContainer& container, const std::string& attribName)=0;
 };
@@ -58,6 +70,6 @@ public:
 	}
 };
 
-}
+} // namespace CGoGN
 
-#endif /* REGISTRED_H_ */
+#endif // _REGISTERED_ATTRIBUTE_H_

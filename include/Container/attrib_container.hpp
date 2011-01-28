@@ -92,12 +92,17 @@ unsigned int AttribContainer::addAttribute(const std::string& attribName, const 
 	return idxAttrib;
 }
 
+inline unsigned int AttribContainer::getNbAttributes()
+{
+	return m_tableAttribs.size();
+}
+
 ///////////////////////////
 // ACCES AUX DONNEES
 ///////////////////////////
 
 template <typename T>
-T&  AttribContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
+T& AttribContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
 {
 	assert(eltIdx < m_maxSize && "Attribut non existant (indice trop grand)");
 	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_)&&"Attribut non existant");
@@ -110,7 +115,7 @@ T&  AttribContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
 }
 
 template <typename T>
-const T&  AttribContainer::getData(unsigned int codeAttrib, unsigned int eltIdx) const
+const T& AttribContainer::getData(unsigned int codeAttrib, unsigned int eltIdx) const
 {
  	assert(eltIdx < m_maxSize && "Attribut non existant (indice trop grand)");
 	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_)&&"Attribut non existant");
@@ -123,7 +128,7 @@ const T&  AttribContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
 }
 
 template <typename T>
-void  AttribContainer::setData(unsigned int codeAttrib, unsigned int eltIdx,  const T& data)
+void AttribContainer::setData(unsigned int codeAttrib, unsigned int eltIdx,  const T& data)
 {
 	
  	assert(eltIdx < m_maxSize && "Attribut non existant (indice trop grand)");
@@ -155,7 +160,7 @@ AttribMultiVect<T>& AttribContainer::getDataVector(unsigned int codeAttrib)
 	return *atm;
 }
 
- template<typename T>
+template<typename T>
 bool AttribContainer::getAttributesVector(const std::string& attribName, AttribMultiVect<T>** ptr)
 {
 	MapNameId::iterator it = m_attribNameMap.find(attribName);
@@ -264,4 +269,3 @@ inline void AttribContainer::toggleNoProcess(unsigned int id)
 }
 
 } // namespace CGoGN
-

@@ -35,7 +35,7 @@ namespace Import
 {
 
 template<typename PFP>
-bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * filenameELE, std::vector<std::string>& attrNames)
+bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filenameOFF, const std::string& filenameELE, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -48,14 +48,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
 
 	// open files
-	std::ifstream foff(filenameOFF, std::ios::in);
+	std::ifstream foff(filenameOFF.c_str(), std::ios::in);
 	if (!foff.good())
 	{
 		std::cerr << "Unable to open OFF file " << std::endl;
 		return false;
 	}
 
-	std::ifstream fele(filenameELE, std::ios::in);
+	std::ifstream fele(filenameELE.c_str(), std::ios::in);
 	if (!fele.good())
 	{
 		std::cerr << "Unable to open ELE file " << std::endl;
@@ -65,7 +65,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 	std::string line;
 
 	//OFF reading
-	std::getline(foff,line);
+	std::getline(foff, line);
 	if(line.rfind("OFF") == std::string::npos)
 	{
 		std::cerr << "Problem reading off file: not an off file"<<std::endl;
@@ -74,7 +74,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 	}
 
 	//Reading number of vertex/faces/edges in OFF file
-	int nbe;
+	unsigned int nbe;
 	{
 		do
 		{
@@ -89,7 +89,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 	}
 
 	//Reading number of tetrahedra in ELE file
-	int nbv;
+	unsigned int nbv;
 	{
 		do
 		{
@@ -134,7 +134,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 	vecDartPtrEmb.reserve(m_nbVertices);
 
 	//Read and embed tetrahedra TODO
-	for(unsigned i=0; i < m_nbVolumes ; ++i)
+	for(unsigned i = 0; i < m_nbVolumes ; ++i)
 	{
 		do
 		{
@@ -146,7 +146,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 //		std::cout << "tetra number : " << nbe << std::endl;
 
 		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(map);
-		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map,4);
+		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map, 4);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
@@ -159,11 +159,11 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 //		std::cout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << std::endl;
 
 		// Embed three vertices
-		for(unsigned int j=0 ; j<3 ; ++j)
+		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
 //			std::cout << "\t embedding number : " << pt[j];
 
-			FunctorSetEmb<typename PFP::MAP> femb(map,VERTEX_ORBIT,verticesID[pt[j]]);
+			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[j]]);
 
 			Dart dd = d;
 			do {
@@ -182,7 +182,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 //		std::cout << "\t embedding number : " << pt[3] << std::endl;
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> femb(map,VERTEX_ORBIT,verticesID[pt[3]]);
+		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[3]]);
 		Dart dd = d;
 		do {
 			femb(dd);
@@ -205,12 +205,12 @@ bool importOFFWithELERegions(typename PFP::MAP& map, char* filenameOFF, char * f
 	{
 		std::vector<Dart>& vec = vecDartsPerVertex[d];
 
-		for(typename std::vector<Dart>::iterator it = vec.begin(); it!=vec.end(); ++it)
+		for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 		{
 			if(map.phi3(*it)==*it)
 			{
 				bool sewn=false;
-				for(typename std::vector<Dart>::iterator itnext=it+1; itnext!=vec.end() && !sewn; ++itnext)
+				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
 				{
 					if(map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*itnext))
 					&& map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*itnext)))

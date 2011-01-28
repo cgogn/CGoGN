@@ -38,7 +38,7 @@ namespace Import
  *
  */
 template <typename PFP>
-bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& attrNames, float scaleFactor)
+bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -53,7 +53,7 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
 
 	// open file
-	std::ifstream fp(filename, std::ios::in);
+	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
 		std::cerr << "Unable to open file " << filename<< std::endl;
@@ -63,7 +63,7 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 	//Difference entre un .tet et un point .ts se situe a la lecture
 	//du nb de sommets et tetrahedres
 	std::string ligne;
-	int nbv,nbt;
+	unsigned int nbv, nbt;
 	// lecture des nombres de sommets/tetra
 	std::getline (fp, ligne);
 	std::stringstream oss(ligne);
@@ -77,13 +77,13 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 	//lecture sommets
 	std::vector<unsigned int> verticesID;
 	verticesID.reserve(nbv);
-	for(int i=0; i<nbv;++i)
+	for(unsigned int i = 0; i < nbv;++i)
 	{
 
 		do
 		{
 			std::getline (fp, ligne);
-		} while (ligne.size()==0);
+		} while (ligne.size() == 0);
 
 		std::stringstream oss(ligne);
 
@@ -114,7 +114,7 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 	// lecture tetra
 	// normalement m_nbVolumes*12 (car on ne charge que des tetra)
 
-	m_nbFaces=nbt*4;
+	m_nbFaces = nbt*4;
 
 	std::cout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << std::endl;
 
@@ -144,19 +144,20 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 //		std::cout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << std::endl;
 
 		// Embed three vertices
-		for(unsigned int j=0 ; j<3 ; ++j)
+		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
 //			std::cout << "\t embedding number : " << pt[j];
 
-			FunctorSetEmb<typename PFP::MAP> femb(map,VERTEX_ORBIT,verticesID[pt[j]]);
+			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[j]]);
 
 			Dart dd = d;
-			do {
+			do
+			{
 				femb(dd);
 				//vecDartPtrEmb[pt[j]].push_back(dd);
 				vecDartsPerVertex[pt[j]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
-			} while(dd!=d);
+			} while(dd != d);
 
 			d = map.phi1(d);
 
@@ -167,9 +168,10 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 //		std::cout << "\t embedding number : " << pt[3] << std::endl;
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> femb(map,VERTEX_ORBIT,verticesID[pt[3]]);
+		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[3]]);
 		Dart dd = d;
-		do {
+		do
+		{
 			femb(dd);
 //			std::cout << "embed" << std::endl;
 			//vecDartPtrEmb[pt[3]].push_back(dd);
@@ -187,17 +189,17 @@ bool importTs(typename PFP::MAP& map, char* filename, std::vector<std::string>& 
 	{
 		std::vector<Dart>& vec = vecDartsPerVertex[d];
 
-		for(typename std::vector<Dart>::iterator it = vec.begin(); it!=vec.end(); ++it)
+		for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 		{
 			if(map.phi3(*it)==*it)
 			{
 				bool sewn=false;
-				for(typename std::vector<Dart>::iterator itnext=it+1; itnext!=vec.end() && !sewn; ++itnext)
+				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
 				{
 					if(map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*itnext))
 					&& map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*itnext)))
 					{
-						map.sewVolumes(*it,map.phi_1(*itnext));
+						map.sewVolumes(*it, map.phi_1(*itnext));
 						sewn = true;
 					}
 				}

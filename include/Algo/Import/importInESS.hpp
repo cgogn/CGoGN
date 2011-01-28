@@ -33,7 +33,7 @@ namespace Import
 {
 
 template <typename PFP>
-typename PFP::VEC3 stringToEmb(std::string& s)
+typename PFP::VEC3 stringToEmb(std::string s)
 {
 	if(s[0] == '(')
 		s.erase(0,2);
@@ -55,7 +55,7 @@ typename PFP::VEC3 stringToEmb(std::string& s)
 }
 
 template <typename PFP>
-bool importInESS(typename PFP::MAP& map, char* filename, std::vector<std::string>& attrNames)
+bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -64,10 +64,10 @@ bool importInESS(typename PFP::MAP& map, char* filename, std::vector<std::string
 	attrNames.push_back(position.name()) ;
 
 	// open file
-	std::ifstream fp(filename, std::ios::in);
+	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename<< std::endl;
+		std::cerr << "Unable to open file " << filename << std::endl;
 		return false;
 	}
 
@@ -83,9 +83,9 @@ bool importInESS(typename PFP::MAP& map, char* filename, std::vector<std::string
 
 	// First column
 	//Bounding box : first coord & second coord
-	bg = line.substr(0,posData);
+	bg = line.substr(0, posData);
 	posCoord = bg.find(") (");
-	stringToEmb<PFP>(bg.substr(0,posCoord));
+	stringToEmb<PFP>(bg.substr(0, posCoord));
 	stringToEmb<PFP>(bg.substr(posCoord+3));
 
 	while ( std::getline( fp, line ) )
@@ -94,7 +94,7 @@ bool importInESS(typename PFP::MAP& map, char* filename, std::vector<std::string
 
 		// First column
 		//Bounding box : first coord & second coord
-		bg = line.substr(0,posData);
+		bg = line.substr(0, posData);
 		posCoord = bg.find(") (");
 		stringToEmb<PFP>(bg.substr(0,posCoord));
 		stringToEmb<PFP>(bg.substr(posCoord+3));
@@ -102,7 +102,7 @@ bool importInESS(typename PFP::MAP& map, char* filename, std::vector<std::string
 		//Second column
 		bg = line.substr(posData+1);
 		posCoord = bg.find(") (");
-		stringToEmb<PFP>(bg.substr(0,posCoord));
+		stringToEmb<PFP>(bg.substr(0, posCoord));
 		stringToEmb<PFP>(bg.substr(posCoord+3));
 
 	   ++count;

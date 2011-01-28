@@ -44,11 +44,13 @@ using namespace CGoGN ;
  */
 struct PFP
 {
-	// definition of the type of the map
+	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 
 	// definition of the type of real value
 	typedef float REAL;
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -57,13 +59,7 @@ struct PFP
 
 	typedef AttributeHandler<VEC3> TVEC3;
 	typedef AttributeHandler<REAL> TREAL;
-	typedef AttributeHandler<MATRIX33> TFRAME;
-	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
-
-
-// some hidden initializations
-INIT_STATICS_MAP();
 
 
 int main(int argc, char **argv)
@@ -83,11 +79,11 @@ int main(int argc, char **argv)
 	// declaration of the map
 	PFP::MAP myMap;
 
-	// creation of a new attribute on vertices of type 3D vector
-	// a handler to this attribute is returned
-	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	std::vector<std::string> attrNames ;
+	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
-	Algo::Import::importMesh<PFP>(myMap, argv[1], position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE);
+	// get a handler to the 3D vector attribute created by the import
+	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]);
 
 	for(unsigned int i = 0; i < nbSteps; ++i)
 		Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);

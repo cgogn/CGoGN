@@ -45,25 +45,22 @@ using namespace CGoGN ;
  */
 struct PFP
 {
-	// definition of the type of the map
+	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 
 	// definition of the type of real value
 	typedef float REAL;
-	// definition of the type of 3D vector
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
+	typedef Geom::Vector<6,REAL> VEC6;
+	typedef Geom::Matrix<3,3,REAL> MATRIX33;
+	typedef Geom::Matrix<4,4,REAL> MATRIX44;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36;
 
-	// definition of the type of 3D vector attribute handler
 	typedef AttributeHandler<VEC3> TVEC3;
-
-	typedef TVEC3 TFRAME;
-	typedef TVEC3 TRGBFUNCS;
+	typedef AttributeHandler<REAL> TREAL;
 };
-
-
-// some hidden initializations
-INIT_STATICS_MAP();
-
 
 /**
  * A class for a little interface and rendering
@@ -130,8 +127,6 @@ void fonction_exemple(typename PFP::MAP& map, const AttributeHandler<typename PF
 
 
 
-
-
 int main(int argc, char **argv)
 {
 	// declaration of the map
@@ -141,34 +136,36 @@ int main(int argc, char **argv)
 	SelectorTrue allDarts;
 
 
-	// cree un handler d'attribut pour la position des points
-	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	std::vector<std::string> attrNames ;
+	if(!Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames))
+	{
+		std::cerr << "could not import " << argv[1] << std::endl ;
+		return 1 ;
+	}
+	// cree un handler d'attribut pour la position des points (créé lors de l'import)
+	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 	// cree un handler pour les normales aux sommets
 	AttributeHandler<PFP::VEC3> normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 
 
-	bool success = Algo::Import::importMesh<PFP>(myMap, argv[1], position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE) ;
-
-
 //	// parcours de tous les brins de la carte:
-//	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
-//		fonction_exemple<PFP>(myMap,position,d);
+//	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+//		fonction_exemple<PFP>(myMap, position, d);
 
 	// parcours de toutes les faces de la carte:
 	DartMarker mf(myMap);
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
 		if (! mf.isMarked(d)) // si d non marque:
 		{
-			fonction_exemple<PFP>(myMap,position,d);
+			fonction_exemple<PFP>(myMap, position, d);
 			// marque tous les brins de la face de d
-			mf.markOrbit(FACE_ORBIT,d);
+			mf.markOrbit(FACE_ORBIT, d);
 		}
 	}
 
 	// pas obligatoire (fait dans le destructeur)
 	mf.unmarkAll();
-
 
 
     // instanciation of the interface

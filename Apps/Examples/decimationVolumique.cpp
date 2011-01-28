@@ -379,7 +379,7 @@ int main(int argc, char **argv)
 				return 1;
 			}
 
-			Algo::Import::importTet<PFP>(myMap,argv[2],attrNames);
+			Algo::Import::importTet<PFP>(myMap, argv[2], attrNames);
 			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 	}
 	else if(std::string(argv[1]) == "-ts")
