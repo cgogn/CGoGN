@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include <iostream>
 #include "Utils/os_spec.h"
 
@@ -52,16 +53,17 @@
 
 #include "Algo/Export/export.h"
 
-
 using namespace CGoGN;
 
 struct PFP
 {
-	// definition de la carte
+	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 
-	// definition du type de reel utilise
+	// definition of the type of real value
 	typedef float REAL;
+
+	// other types definitions
 	typedef Geom::Vector<3,REAL> VEC3;
 	typedef Geom::Vector<6,REAL> VEC6;
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
@@ -70,12 +72,7 @@ struct PFP
 
 	typedef AttributeHandler<VEC3> TVEC3;
 	typedef AttributeHandler<REAL> TREAL;
-	typedef AttributeHandler<MATRIX33> TFRAME;
-	typedef AttributeHandler<MATRIX36> TRGBFUNCS;
 };
-
-
-INIT_STATICS_MAP();
 
 
 PFP::MAP myMap;
@@ -345,11 +342,11 @@ int main(int argc, char **argv)
 
 //    GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 
-	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
-
 	if (argc == 1)
 	{
-std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
+		position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
+
+		std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 //		typedef uint8 DATATYPE;
 //		Algo::MC::Image<DATATYPE> myImg;
 //		myImg.loadPNG3D("liver.png");
@@ -391,8 +388,6 @@ std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 //
 //		//realisation du maillage
 //		mc.simpleMeshing();
-//
-
 
 		std::vector<Geom::Vec3f> objV;
 		objV.push_back(Geom::Vec3f(-1,-1,37));
@@ -423,8 +418,6 @@ std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 		pathV.push_back(Geom::Vec3f(5,0 ,-10));		pathRadius.push_back(1.);
 	//	Algo::Modelisation::extrusion<PFP>(myMap, objV, Geom::Vec3f(0.0,0.0,37.0), Geom::Vec3f(0.0,0.0,1.0),false, pathV, false);
 		Algo::Modelisation::extrusion_scale_prim<PFP>(myMap, position, objV, Geom::Vec3f(0.0,0.0,37.0), Geom::Vec3f(0.0,0.0,1.0),false, pathV, false, pathRadius);
-
-
 	}
 
 //	{
@@ -475,13 +468,14 @@ std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 		SelectorTrue allDarts;
 //		GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 
-        DartMarker mi(myMap);
-        bool success = Algo::Import::importMesh<PFP>(myMap, std::string(argv[1]), position, Algo::Import::ImportSurfacique::UNKNOWNSURFACE);
-    	if(!success)
+		std::vector<std::string> attrNames ;
+    	if(!Algo::Import::importMesh<PFP>(myMap, std::string(argv[1]), attrNames))
     	{
-    		std::cerr << "could not import "<< std::string(argv[1]) << std::endl ;
+    		std::cerr << "could not import " << std::string(argv[1]) << std::endl ;
     		exit(1);
     	}
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+
 		GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 
 //		Algo::Export::exportCTM<PFP>(myMap, position, std::string("pipo.ctm"));
@@ -525,16 +519,6 @@ std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 //		GLfloat seconds = (t2 - t1) / 1000.0f;
 //		std::cout << "import: "<< seconds << "sec" << std::endl;
 
-		if (!success)
-		{
-				std::cerr << "not possible to import "<<argv[1] << std::endl;
-				return 1;
-		}
-//	      else
-//		for (unsigned int it = position.begin(); it != position.end(); position.next(it))
-//		{
-//			std::cout << position[it] << "  /  "<< normal.at(it)<< std::endl;
-//		}
 	}
 
 		float area = Algo::Geometry::totalArea<PFP>(myMap, position) ;
