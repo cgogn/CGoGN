@@ -59,7 +59,7 @@ struct PFP
 
 
 // some hidden initializations
-INIT_STATICS_MAP(); // juste pour foutre le bordel !!
+INIT_STATICS_MAP();
 
 
 /**
