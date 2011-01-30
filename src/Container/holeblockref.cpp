@@ -146,30 +146,30 @@ void HoleBlockRef::saveBin(CGoGNostream& fs)
 //	std::cout << "save bf "<< m_nb<< " / "<< m_nbref<< " / "<< m_nbfree << std::endl;
 
 	// on sauve les trois nombres;
-	uint numbers[3];
+	unsigned int numbers[3];
 	numbers[0] = m_nb;
 	numbers[1] = m_nbref;
 	numbers[2] = m_nbfree;
-	fs.write(reinterpret_cast<const char*>(numbers), 3*sizeof(uint) );
+	fs.write(reinterpret_cast<const char*>(numbers), 3*sizeof(unsigned int) );
 
 	// sauve les ref count
-	fs.write(reinterpret_cast<const char*>(m_refCount), _BLOCKSIZE_*sizeof(uint));
+	fs.write(reinterpret_cast<const char*>(m_refCount), _BLOCKSIZE_*sizeof(unsigned int));
 
 	// sauve les free lines
-	fs.write(reinterpret_cast<const char*>(m_tableFree), m_nbfree*sizeof(uint));
+	fs.write(reinterpret_cast<const char*>(m_tableFree), m_nbfree*sizeof(unsigned int));
 }
 
 bool HoleBlockRef::loadBin(CGoGNistream& fs)
 {
 	unsigned int numbers[3];
 
-	fs.read(reinterpret_cast<char*>(numbers), 3*sizeof(uint));
+	fs.read(reinterpret_cast<char*>(numbers), 3*sizeof(unsigned int));
 	m_nb = numbers[0];
 	m_nbref = numbers[1];
 	m_nbfree = numbers[2];
 
-	fs.read(reinterpret_cast<char*>(m_refCount), _BLOCKSIZE_*sizeof(uint));
-	fs.read(reinterpret_cast<char*>(m_tableFree), m_nbfree*sizeof(uint));
+	fs.read(reinterpret_cast<char*>(m_refCount), _BLOCKSIZE_*sizeof(unsigned int));
+	fs.read(reinterpret_cast<char*>(m_tableFree), m_nbfree*sizeof(unsigned int));
 
 	return true;
 }

@@ -106,7 +106,7 @@ void AttribContainer::merge(AttribContainer& cont)
 	newId.resize(m_tableAttribs.size() + cont.m_tableAttribs.size());
 
 
-	uint nbb = m_holesBlocks.size();
+	unsigned int nbb = m_holesBlocks.size();
 
 	// parcours des attributs de cont pour les ajouter dans this et stocker la correspondance
 	for (MapNameId::iterator it = cont.m_attribNameMap.begin(); it != cont.m_attribNameMap.end(); ++it)
@@ -426,7 +426,7 @@ void AttribContainer::saveBin(CGoGNostream& fs, unsigned int id)
 		(*it)->saveBin(fs);
 
 	// les indices des blocks libres
-	fs.write(reinterpret_cast<const char*>(&m_tableBlocksWithFree[0]), m_tableBlocksWithFree.size() * sizeof(uint));
+	fs.write(reinterpret_cast<const char*>(&m_tableBlocksWithFree[0]), m_tableBlocksWithFree.size() * sizeof(unsigned int));
 }
 
 unsigned int AttribContainer::loadBinId(CGoGNistream& fs)
@@ -497,7 +497,7 @@ bool AttribContainer::loadBin(CGoGNistream& fs)
 
 	// les indices des blocks libres
 	m_tableBlocksWithFree.resize(szBWF);
-	fs.read(reinterpret_cast<char*>(&(m_tableBlocksWithFree[0])), szBWF*sizeof(uint));
+	fs.read(reinterpret_cast<char*>(&(m_tableBlocksWithFree[0])), szBWF*sizeof(unsigned int));
 
 	return true;
 }
