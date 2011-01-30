@@ -64,7 +64,8 @@ typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const typename PFP
 		do
 		{
 			VEC3 n = triangleNormal<PFP>(map, it, position) ;
-			if(!std::isnan(n[0]))
+			//if(!std::isnan(n[0]))
+			if (n[0] == n[0])
 				N += n ;
 			it = map.phi1(it) ;
 		} while (it != d) ;
