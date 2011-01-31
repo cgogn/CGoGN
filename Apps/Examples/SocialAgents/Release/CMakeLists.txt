@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 2.6)
 
 project(SocialAgents)
 
-SET(CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_BUILD_TYPE Release)
 
 link_directories(
-	${CGoGN_ROOT_DIR}/lib/Debug/
-	${CGoGN_ROOT_DIR}/lib/Release/)
+	${CGoGN_ROOT_DIR}/lib/Release/
+)
 
 # define includes path
 include_directories(
@@ -21,8 +21,5 @@ include_directories(
 )
 
 #define exec to compile
-add_executable(socialAgents ./src/viewer.cpp ./src/env_map.cpp ./src/agent.cpp ./src/simulator.cpp  )
+add_executable(socialAgents ../src/viewer.cpp ../src/env_map.cpp ../src/agent.cpp ../src/simulator.cpp  )
 target_link_libraries( socialAgents container topology utils algo ${COMMON_LIBS} )
-
-add_executable(socialAgentsD ./src/viewer.cpp ./src/env_map.cpp ./src/agent.cpp ./src/simulator.cpp  )
-target_link_libraries( socialAgentsD containerD topologyD utilsD algoD ${COMMON_LIBS} )

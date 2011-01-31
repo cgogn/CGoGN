@@ -191,18 +191,18 @@ void MyGlutWin::myRedraw()
 // 		glColor3f(i%int(2.0f/3.0f*v.size())/(v.size()/3.0f),i%int(1.0f/3.0f*v.size())/(v.size()/3.0f),i/(v.size()/3.0f));
 //		glCircle3i(v[i][0],v[i][1],1.5f);
 		glPushMatrix();
-			Geom::Plane3D<PFP::REAL> pl = Algo::Geometry::trianglePlane<PFP>(sim->envMap.map,sim->agents_[i]->nearestDart,sim->envMap.position);
+//			Geom::Plane3D<PFP::REAL> pl = Algo::Geometry::trianglePlane<PFP>(sim->envMap.map,sim->agents_[i]->nearestDart,sim->envMap.position);
 			VEC3 pBase(sim->agents_[i]->position_);
-			VEC3 posR;
-			pl.normal() = -1.0f*pl.normal();
+			VEC3 posR = pBase;
+//			pl.normal() = -1.0f*pl.normal();
 
 // 			VEC3 v(sim->envMap.position[sim->agents_[i]->nearestDart]-pBase);
 // 			float scal = v*pl.normal();
 // 			posR = pBase + scal*pl.normal();
 
-			VEC3 dir(0.0f,0.0f,-1.0f);
-			pBase[2]=100000.0f;
-			Geom::intersectPlaneRay<VEC3,Geom::Plane3D<PFP::REAL> >(pl,pBase,dir,posR);
+//			VEC3 dir(0.0f,0.0f,-1.0f);
+//			pBase[2]=100000.0f;
+//			Geom::intersectPlaneRay<VEC3,Geom::Plane3D<PFP::REAL> >(pl,pBase,dir,posR);
 
 // 			VEC3 posR(sim->agents_[i]->position_[0],sim->agents_[i]->position_[1],0);
 			glTranslatef(posR[0],posR[1],posR[2]);

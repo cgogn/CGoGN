@@ -158,7 +158,7 @@ inline void ImplicitHierarchicalMap::next(Dart& d)
 	do
 	{
 		Map2::next(d) ;
-	} while(m_dartLevel[d] > m_curLevel && d != Map2::end()) ;
+	} while(d != Map2::end() && m_dartLevel[d] > m_curLevel) ;
 }
 
 inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType& f)
@@ -246,6 +246,20 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_volume(Dart d, FunctorType&
 inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f)
 {
 	return foreach_dart_of_oriented_volume(d, f) ;
+}
+
+/***************************************************
+ *               MAP MANIPULATION                  *
+ ***************************************************/
+
+inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
+{
+	EmbeddedMap2<Map2>::splitFace(d, e) ;
+	unsigned int cur = m_curLevel ;
+	m_curLevel = m_maxLevel ;
+	this->embedOrbit(FACE_ORBIT, d, this->getDartEmbedding(FACE_ORBIT, d)) ;
+	this->embedOrbit(FACE_ORBIT, e, this->getDartEmbedding(FACE_ORBIT, e)) ;
+	m_curLevel = cur ;
 }
 
 /***************************************************

@@ -350,7 +350,14 @@ void EnvMap::updateMap()
 			for(std::vector<Agent*>::iterator it = agents.begin(); it != agents.end(); ++it)
 			{
 				if(!map.sameFace(d, (*it)->part->d))
+				{
 					std::cout << "aaaaaaaaaaaaaaaaaaa" << std::endl ;
+					std::cout << (*it)->part->state << std::endl ;
+					if(map.sameFace(map.phi2(d), (*it)->part->d))
+					{
+						std::cout << "saucisse" << std::endl ;
+					}
+				}
 			}
 		}
 	}
@@ -367,15 +374,28 @@ void EnvMap::subdivideFaces()
 		if(!m.isMarked(d))
 		{
 			m.mark(d) ;
-			if(!closeMark.isMarked(d) && agentvect[d].size() > 8)
+			if(!closeMark.isMarked(d) && agentvect[d].size() > 5)
 			{
 				if(!map.faceIsSubdivided(d))
 				{
+					d = map.faceOldestDart(d) ;
+
 					std::vector<Agent*> agents ;
 					agents.swap(agentvect[d]) ;
 
 					unsigned int cur = map.getCurrentLevel() ;
 					unsigned int fLevel = map.faceLevel(d) ;
+
+//					std::cout << "cur -> " << cur << " / fLevel -> " << fLevel << " :" ;
+//					Dart fit = d ;
+//					do
+//					{
+//						unsigned int e = map.getDartEmbedding(FACE_ORBIT, fit) ;
+//						if(e == EMBNULL) std::cout << " -" ; else std::cout << " " << e ;
+//						fit = map.phi1(fit) ;
+//					} while(fit != d) ;
+//					std::cout << std::endl ;
+
 					map.setCurrentLevel(fLevel) ;
 					std::vector<Dart> marked ;
 					Dart fit = d ;
@@ -389,16 +409,35 @@ void EnvMap::subdivideFaces()
 					Algo::IHM::subdivideFace<PFP>(map, d, position) ;
 
 					map.setCurrentLevel(fLevel + 1) ;
+
+//					Dart cv = map.phi2(map.phi1(d)) ;
+//					Dart vit = cv ;
+//					unsigned int i = 1 ;
+//					do
+//					{
+//						std::cout << "  face " << i << " -> " ;
+//						Dart f = vit ;
+//						do
+//						{
+//							unsigned int e = map.getDartEmbedding(FACE_ORBIT, f) ;
+//							if(e == EMBNULL) std::cout << " -" ; else std::cout << " " << e ;
+//							f = map.phi1(f) ;
+//						} while(f != vit) ;
+//						std::cout << std::endl ;
+//						vit = map.alpha1(vit) ;
+//						++i ;
+//					} while(vit != cv) ;
+
 					for(std::vector<Dart>::iterator it = marked.begin(); it != marked.end(); ++it)
 						closeMark.mark(map.phi2(*it)) ;
+
+					map.setCurrentLevel(cur) ;
 
 					for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
 					{
 						resetAgentInFace(*it) ;
 						agentvect[(*it)->part->d].push_back(*it) ;
 					}
-
-					map.setCurrentLevel(cur) ;
 				}
 			}
 		}
