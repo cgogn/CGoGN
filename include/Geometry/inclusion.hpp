@@ -159,13 +159,13 @@ bool isEdgeInOrIntersectingTetrahedron(VEC3 points[4], VEC3& point1, VEC3& point
 }
 
 template <typename VEC3>
-bool arePointsEquals(const VEC3& point1,const VEC3& point2)
+bool arePointsEquals(const VEC3& point1, const VEC3& point2)
 {
-	typedef typename VEC3::DATA_TYPE T ;
-
 	VEC3 v(point1 - point2);
 
-	return v.norm2() <= T(3)*std::numeric_limits<T>::min();
+#define PRECISION 1e-20
+	return v.norm2() <= PRECISION ;
+#undef PRECISION
 }
 
 }

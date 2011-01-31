@@ -236,7 +236,7 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
     float b = (n * Dir) ;
 
     if(fabs(b) < precision)			//ray parallel to triangle
-			return NO_INTERSECTION ;
+		return NO_INTERSECTION ;
 
 	//compute intersection
 	T r = a / b ;

@@ -40,9 +40,7 @@ class ParticleCell2D : public ParticleBase
 
 	DartMarker& obstacle;
 
-	bool chgCell;
-
-	ParticleCell2D() : chgCell(true) {};
+	ParticleCell2D() {}
 
 	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, TAB_POS tabPos, DartMarker& obst) : ParticleBase(pos), m(map), d(belonging_cell), m_positions(tabPos), obstacle(obst)
 	{
@@ -73,18 +71,16 @@ class ParticleCell2D : public ParticleBase
 
 	void move(const VEC3& newCurrent)
 	{
-// 		std::cout << "move to : " << newCurrent << std::endl;
-		prevPos = m_position;
+		if(!Geom::arePointsEquals(newCurrent, m_position)) {
+	// 		std::cout << "move to : " << newCurrent << std::endl;
+			prevPos = m_position;
 
-		chgCell=false;
-
-		switch(state) {
-		case VERTEX_ORBIT : vertexState(newCurrent); break;
-		case EDGE_ORBIT : 	edgeState(newCurrent);   break;
-		case FACE_ORBIT : 	faceState(newCurrent);   break;
+			switch(state) {
+			case VERTEX_ORBIT : vertexState(newCurrent); break;
+			case EDGE_ORBIT : 	edgeState(newCurrent);   break;
+			case FACE_ORBIT : 	faceState(newCurrent);   break;
+			}
 		}
-
-		this->display();
 	}
 
 

@@ -96,25 +96,25 @@ void Simulator::doStep()
 
 	}
 
-	for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
+	for (unsigned int i = 0; i < agents_.size(); ++i) {
 		envMap.linkAgentWithCells(agents_[i]);
 	}
 
 // #pragma omp parallel for
-	for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
+	for (unsigned int i = 0; i < agents_.size(); ++i) {
 		agents_[i]->computeNewVelocity();
 	}
 
 
 // #pragma omp parallel for
-	for (int i = 0; i < static_cast<int>(agents_.size()); ++i) {
+	for (unsigned int i = 0; i < agents_.size(); ++i) {
 		envMap.popAgentInCell(agents_[i],agents_[i]->part->d);
 		agents_[i]->update();
 		envMap.pushAgentInCell(agents_[i],agents_[i]->part->d);
 		agents_[i]->treated=false;
 	}
 
-	envMap.updateMap();
+//	envMap.updateMap();
 
 	globalTime_ += timeStep_;
 }
