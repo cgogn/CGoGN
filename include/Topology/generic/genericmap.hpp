@@ -223,6 +223,7 @@ inline void GenericMap::initCell(unsigned int orbit, unsigned int i)
 template <typename T>
 inline AttribMultiVect<T>& GenericMap::getAttributeVector(unsigned int idAttr)
 {
+	assert(idAttr != AttribContainer::UNKNOWN) ;
 	return m_attribs[AttribContainer::orbitAttr(idAttr)].getDataVector<T>(AttribContainer::indexAttr(idAttr)) ;
 }
 
@@ -234,12 +235,13 @@ inline AttribMultiVect<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
 
 inline AttribMultiVectGen& GenericMap::getMultiVec(unsigned int idAttr)
 {
+	assert(idAttr != AttribContainer::UNKNOWN) ;
 	return m_attribs[AttribContainer::orbitAttr(idAttr)].getVirtualDataVector(AttribContainer::indexAttr(idAttr)) ;
 }
 
 inline AttribContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 {
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
+//	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	return m_attribs[orbit] ;
 }
 

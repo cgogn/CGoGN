@@ -35,7 +35,7 @@ namespace CGoGN
 
 /**
  * Class that create an access-table to an existing attribute
- * Permetting operation are:
+ * Main available operations are:
  * - [ index ]
  * - [ dart ]
  * - begin / end / next to manage indexing
@@ -109,7 +109,7 @@ public:
 	 * check if the attribute handler is linked to a valid attribute
 	 * -> MUST BE USED AFTER A CALL TO :
 	 * getAttribute(unsigned int orbit, const std::string& nameAttr)
-	 * addAttribute( unsigned int orbit, const std::string& nameAttr)
+	 * addAttribute(unsigned int orbit, const std::string& nameAttr)
 	 */
 	bool isValid() const ;
 
