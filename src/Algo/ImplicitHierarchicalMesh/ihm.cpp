@@ -131,24 +131,38 @@ Dart ImplicitHierarchicalMap::faceOldestDart(Dart d)
 bool ImplicitHierarchicalMap::edgeIsSubdivided(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
-
 //	Dart d2 = phi2(d) ;
-//	++m_curLevel ;
-//	Dart d2_l = phi2(d) ;
-//	--m_curLevel ;
-//	if(d2 != d2_l)
-//		return true ;
-//	else
-//		return false ;
-
 	Dart d1 = phi1(d) ;
 	++m_curLevel ;
+//	Dart d2_l = phi2(d) ;
 	Dart d1_l = phi1(d) ;
 	--m_curLevel ;
 	if(d1 != d1_l)
 		return true ;
 	else
 		return false ;
+}
+
+bool ImplicitHierarchicalMap::edgeCanBeCoarsened(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+	bool subd = false ;
+	bool subdOnce = true ;
+	bool degree2 = false ;
+	if(edgeIsSubdivided(d))
+	{
+		subd = true ;
+		Dart d2 = phi2(d) ;
+		++m_curLevel ;
+		if(vertexDegree(phi1(d)) == 2)
+		{
+			degree2 = true ;
+			if(edgeIsSubdivided(d) || edgeIsSubdivided(d2))
+				subdOnce = false ;
+		}
+		--m_curLevel ;
+	}
+	return subd && degree2 && subdOnce ;
 }
 
 bool ImplicitHierarchicalMap::faceIsSubdivided(Dart d)
