@@ -295,7 +295,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 			{
 				if (!markV.isMarked(e))
 				{
-					vertices.push_back(lab);
+					vertices.push_back(map.getEmbedding(e, VERTEX_ORBIT));
 					tableVertLab[e] = lab++;
 
 					markV.mark(e);
@@ -416,7 +416,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 			{
 				if (!markV.isMarked(e))
 				{
-					vertices.push_back(lab);
+					vertices.push_back(map.getEmbedding(e, VERTEX_ORBIT));
 					tableVertLab[e] = lab++;
 
 					markV.mark(e);

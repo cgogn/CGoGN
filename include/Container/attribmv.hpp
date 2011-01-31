@@ -211,7 +211,7 @@ void AttribMultiVect<T>::addBlocksBefore(unsigned int nbb)
 	std::vector< T* > tempo;
 	tempo.reserve(1024);
 
-	for (uint i= 0; i <nbb; ++i)
+	for (unsigned int i= 0; i <nbb; ++i)
 	{
 		T* ptr = new T[_BLOCKSIZE_];
 		tempo.push_back( ptr );
@@ -277,7 +277,7 @@ void AttribMultiVect<T>::saveBin(CGoGNostream& fs, unsigned int id)
 	fs.write(reinterpret_cast<const char*>(nbs),2*sizeof(unsigned int));
 
 	// store data blocks
-	for(uint i=0; i<nbs[0]; ++i)
+	for(unsigned int i=0; i<nbs[0]; ++i)
 	{
 		fs.write(reinterpret_cast<const char*>(m_tableData[i]),_BLOCKSIZE_*sizeof(T));
 	}
@@ -311,7 +311,7 @@ bool AttribMultiVect<T>::loadBin(CGoGNistream& fs)
 
 	// load data blocks
 	m_tableData.resize(nb);
-	for(uint i=0; i<nb; ++i)
+	for(unsigned int i=0; i<nb; ++i)
 	{
 		T* ptr = new T[_BLOCKSIZE_];
 		fs.read(reinterpret_cast<char*>(ptr),_BLOCKSIZE_*sizeof(T));

@@ -87,7 +87,7 @@ protected:
 	 */
 	AttribContainer m_attribs[NB_ORBITS] ;
 
-	static std::map< std::string, RegisteredBaseAttribute* > m_attributes_registry_map ;
+	static std::map< std::string, RegisteredBaseAttribute* >* m_attributes_registry_map ;
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings

@@ -30,11 +30,12 @@
 
 namespace CGoGN
 {
-
-std::map< std::string, RegisteredBaseAttribute* > GenericMap::m_attributes_registry_map = std::map< std::string, RegisteredBaseAttribute* >();
+std::map< std::string, RegisteredBaseAttribute* >* GenericMap::m_attributes_registry_map = NULL;
 
 GenericMap::GenericMap()
 {
+
+	m_attributes_registry_map = new std::map< std::string, RegisteredBaseAttribute* >;
 	// register all known types
 	registerAttribute<Dart>("Dart");
 	registerAttribute<Mark>("Mark");
@@ -65,7 +66,7 @@ GenericMap::GenericMap()
 
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
-		m_attribs[i].setRegistry(&m_attributes_registry_map) ;
+		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
 		m_markerTables[i] = NULL ;
 	}
@@ -80,6 +81,8 @@ GenericMap::~GenericMap()
 			m_attribs[i].clear(true) ;
 		}
 	}
+	if (m_attributes_registry_map)
+		delete m_attributes_registry_map;
 }
 
 /****************************************
@@ -136,7 +139,7 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 
 	ra->setTypeName(nameType);
 
-	m_attributes_registry_map.insert(std::pair<std::string, RegisteredBaseAttribute*>(nameType,ra));
+	m_attributes_registry_map->insert(std::pair<std::string, RegisteredBaseAttribute*>(nameType,ra));
 	return true;
 }
 
