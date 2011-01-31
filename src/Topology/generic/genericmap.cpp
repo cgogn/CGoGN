@@ -35,7 +35,8 @@ std::map< std::string, RegisteredBaseAttribute* >* GenericMap::m_attributes_regi
 GenericMap::GenericMap()
 {
 
-	m_attributes_registry_map = new std::map< std::string, RegisteredBaseAttribute* >;
+	if (m_attributes_registry_map ==NULL)
+		m_attributes_registry_map = new std::map< std::string, RegisteredBaseAttribute* >;
 	// register all known types
 	registerAttribute<Dart>("Dart");
 	registerAttribute<Mark>("Mark");
