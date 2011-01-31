@@ -114,7 +114,7 @@ void Simulator::doStep()
 		agents_[i]->treated=false;
 	}
 
-//	envMap.updateMap();
+	envMap.updateMap();
 
 	globalTime_ += timeStep_;
 }
