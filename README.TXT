@@ -4,6 +4,7 @@ cmake libXi-dev libXmu-dev freeglut3-dev libdevil-dev libglew-dev libgmp3-dev li
 
 
 Pour compiler CGoGN:
+- aller dans ThirdParty et taper "cmake .", puis make
 - aller dans build et taper "cmake .", puis make
 - la compilation des sous-parties se fait en allant dans les sous-repertoires de build
 
