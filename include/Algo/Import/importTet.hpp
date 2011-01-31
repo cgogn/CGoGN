@@ -37,11 +37,12 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
 	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
 	attrNames.push_back(position.name()) ;
 
-	unsigned int m_nbVertices=0, m_nbFaces=0, m_nbEdges=0, m_nbVolumes=0;
+	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+
+	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
 
 	// open file
@@ -75,7 +76,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		do
 		{
 			std::getline (fp, ligne);
-		} while (ligne.size()==0);
+		} while (ligne.size() == 0);
 
 		std::stringstream oss(ligne);
 
@@ -102,7 +103,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 	// lecture tetra
 	// normalement m_nbVolumes*12 (car on ne charge que des tetra)
 
-	m_nbFaces=nbt*4;
+	m_nbFaces = nbt*4;
 
 	std::cout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << std::endl;
 
@@ -146,7 +147,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 				//vecDartPtrEmb[pt[j]].push_back(dd);
 				vecDartsPerVertex[pt[j]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
-			} while(dd!=d);
+			} while(dd != d);
 
 			d = map.phi1(d);
 
