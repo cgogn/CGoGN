@@ -5,13 +5,13 @@
 #include <GL/glut.h>
 
 
-static void renderPoint(EnvMap& m, Dart& d)
-{
-	PFP::VEC3 p = m.position[d];
-	glBegin(GL_POINTS);
-		glVertex3f(p[0],p[1],p[2]);
-	glEnd();
-}
+//static void renderPoint(EnvMap& m, Dart& d)
+//{
+//	PFP::VEC3 p = m.position[d];
+//	glBegin(GL_POINTS);
+//		glVertex3f(p[0],p[1],p[2]);
+//	glEnd();
+//}
 
 static void renderDart(EnvMap& m, Dart d)
 {
@@ -33,24 +33,24 @@ static void renderFace(EnvMap& m, Dart& d)
 	}while(dd!=d);
 }
 
-static void renderCellOfDim(EnvMap& m,Dart d, unsigned int dim)
-{
-	switch(dim) {
-		case 0 : renderPoint(m,d); break;
-		case 1 : renderDart(m,d);  break;
-		case 2 : renderFace(m,d);  break;
-	}
-}
-
-static void renderAllPoints(EnvMap& m)
-{
-	glBegin(GL_POINTS);
-	for(Dart d=m.map.begin();d!=m.map.end();m.map.next(d)) {
-		PFP::VEC3 p = m.position[d];
-		glVertex3f(p[0],p[1],p[2]);
-	}
-	glEnd();
-}
+//static void renderCellOfDim(EnvMap& m,Dart d, unsigned int dim)
+//{
+//	switch(dim) {
+//		case 0 : renderPoint(m,d); break;
+//		case 1 : renderDart(m,d);  break;
+//		case 2 : renderFace(m,d);  break;
+//	}
+//}
+//
+//static void renderAllPoints(EnvMap& m)
+//{
+//	glBegin(GL_POINTS);
+//	for(Dart d=m.map.begin();d!=m.map.end();m.map.next(d)) {
+//		PFP::VEC3 p = m.position[d];
+//		glVertex3f(p[0],p[1],p[2]);
+//	}
+//	glEnd();
+//}
 
 static void renderPredictionTriangle(EnvMap& m, Dart d, PFP::VEC3 p)
 {

@@ -191,7 +191,7 @@ void MyGlutWin::myRedraw()
 // 		glColor3f(i%int(2.0f/3.0f*v.size())/(v.size()/3.0f),i%int(1.0f/3.0f*v.size())/(v.size()/3.0f),i/(v.size()/3.0f));
 //		glCircle3i(v[i][0],v[i][1],1.5f);
 		glPushMatrix();
-//			Geom::Plane3D<PFP::REAL> pl = Algo::Geometry::trianglePlane<PFP>(sim->envMap.map,sim->agents_[i]->nearestDart,sim->envMap.position);
+//			Geom::Plane3D<PFP::REAL> pl = Algo::Geometry::trianglePlane<PFP>(sim->envMap.map,sim->agents_[i]->part->d,sim->envMap.position);
 			VEC3 pBase(sim->agents_[i]->position_);
 			VEC3 posR = pBase;
 //			pl.normal() = -1.0f*pl.normal();
@@ -340,7 +340,7 @@ void MyGlutWin::myRedraw()
 	}
 	else if(visu==3) {
 // 		renderDart(sim->envMap,sim->envMap.getDart(33701));
-// 		renderDart(sim->envMap,sim->envMap.getDart(452));
+// 		renderDart(sim->envMap,sim->envMap.getDart(2));
 // 		renderCellOfDim(sim->envMap,sim->envMap.getDart(1257),2);
 // 		glBegin(GL_POINTS);
 // 		glVertex3f(-494.518,-672,0);
@@ -474,7 +474,7 @@ bool MyGlutWin::exportScenePov(PFP::MAP& map, PFP::TVEC3& position, const std::s
 	std::vector<PFP::VEC3> v = sim->getAgentsPosition();
 	for(unsigned int i = 0; i< sim->agents_.size() ; ++i) {
 		out << "cylinder {" << std::endl;
-			Geom::Plane3D<PFP::REAL> pl = Algo::Geometry::trianglePlane<PFP>(sim->envMap.map,sim->agents_[i]->nearestDart,sim->envMap.position);
+			Geom::Plane3D<PFP::REAL> pl = Algo::Geometry::trianglePlane<PFP>(sim->envMap.map,sim->agents_[i]->part->d,sim->envMap.position);
 			VEC3 pBase(sim->agents_[i]->position_);
 			VEC3 posR;
 			pl.normal() = -1.0f*pl.normal();

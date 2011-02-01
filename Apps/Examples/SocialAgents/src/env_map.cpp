@@ -380,7 +380,6 @@ void EnvMap::subdivideFaces()
 						closeMark.mark(map.phi2(*it)) ;
 
 					map.setCurrentLevel(map.getMaxLevel()) ;
-
 					for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
 					{
 						resetAgentInFace(*it) ;
@@ -661,7 +660,7 @@ VEC3 EnvMap::faceCenter(Dart d)
 void EnvMap::resetAgentInFace(Agent * agent)
 {
 // 	agent->part->state = VERTEX_ORBIT;
-// 	agent->part->m_position = position[d];
+// 	agent->part->m_position = position[agent->part->d];
 
 // 	agent->part->m_position = agent->part->pointInFace(agent->part->d);
 	agent->part->m_position = Algo::Geometry::faceCentroid<PFP>(map,agent->part->d,position);

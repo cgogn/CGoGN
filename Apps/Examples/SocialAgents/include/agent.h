@@ -61,7 +61,7 @@ class Simulator;
 
 		size_t agentNo_;
 		size_t goalNo_;
-		Dart nearestDart;
+//		Dart nearestDart;
 // 		std::vector<Dart> includingFaces;
 		CGoGN::Algo::MovingObjects::ParticleCell2D<PFP> * part;
 		float rangeSq;

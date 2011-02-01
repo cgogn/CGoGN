@@ -200,6 +200,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 									edgeState(current);
 									return;
 				case Geom::RIGHT :
+									std::cout << std::setprecision(10);
 									std::cout << "smthg went bad " << m_position << " " << current << std::endl;
 									std::cout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << std::endl;
 									m_position = intersectLineEdge(current,m_position,d);

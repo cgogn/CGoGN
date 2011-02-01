@@ -24,6 +24,8 @@ std::vector<Dart> pathFindAStar(typename PFP::MAP& map,const typename PFP::TVEC3
 	std::vector<std::pair<float,Dart> > vToDev;
 
 	Dart toDev = stopPos;
+	vToDev.push_back(std::make_pair(0, toDev));
+	tablePred[toDev] = toDev;
 	do {
 		//dev cell
 		//get all vertex-adjacent cells 
@@ -33,12 +35,12 @@ std::vector<Dart> pathFindAStar(typename PFP::MAP& map,const typename PFP::TVEC3
 			do {
 				ddd = map.alpha1(ddd);
 				if(ddd!=dd) {
-					if(!map.foreach_dart_of_face(ddd,bad)) {
+					if(!map.foreach_dart_of_face(ddd,bad) && tablePred[ddd]==EMBNULL) {
 						//evaluate their cost and push them in the vector to dev
 						if(tablePred[ddd]==EMBNULL)
 							tablePred[ddd]=toDev;
 						std::vector<std::pair<float,Dart> >::iterator it=vToDev.begin();
-						float costDDD=pathCostSqr<PFP>(map,position,startPos,ddd);
+						float costDDD=pathCostSqr<PFP>(map,position,startPos,ddd)+(vToDev.begin())->first;
 						while(it!=vToDev.end() && (*it).first<costDDD)
 							++it;
 						vToDev.insert(it, std::make_pair(costDDD, ddd));
@@ -58,6 +60,7 @@ std::vector<Dart> pathFindAStar(typename PFP::MAP& map,const typename PFP::TVEC3
 	//if path found : from start to stop -> push all predecessors
 	if(map.sameOrientedFace(startPos,toDev))
 	{
+		std::cout << "found" << std::endl;
 		Dart toPush=startPos;
 		std::cout << tablePred[startPos] << std::endl;
 		do {
