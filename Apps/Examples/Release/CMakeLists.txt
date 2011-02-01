@@ -141,3 +141,15 @@ target_link_libraries( triangulation
 add_executable( ter_meshes ../ter_meshes.cpp)
 target_link_libraries( ter_meshes
 	container topology utils algo ${COMMON_LIBS} )
+	
+	add_executable( polyhedronsView ../polyhedronsView.cpp)
+target_link_libraries( polyhedronsView
+        container topology utils algo ${COMMON_LIBS} )
+
+add_executable( extrusionView ../extrusionView.cpp)
+target_link_libraries( extrusionView
+        container topology utils algo ${COMMON_LIBS} )
+        
+add_executable( scene ../scene.cpp)
+target_link_libraries( scene
+        container topology utils algo ${COMMON_LIBS} )

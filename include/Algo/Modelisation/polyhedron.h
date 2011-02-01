@@ -157,17 +157,28 @@ public:
 	Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2);
 
 	/**
-	 *
+	 * create simple simple polyhedron (not handled by Polyhedron object)
 	 */
 	static Dart createOrientedPolyhedron(typename PFP::MAP& the_map, int nbFaces);
 
-
+	/**
+	 * create simple simple tetrahedron (not handled by Polyhedron object)
+	 */
 	static Dart createOrientedTetra(typename PFP::MAP& the_map);
 
+	/**
+	 * create simple simple pyramid (not handled by Polyhedron object)
+	 */
 	static Dart createOrientedPyra(typename PFP::MAP& the_map);
 
+	/**
+	 * create simple simple hexaedron (not handled by Polyhedron object)
+	 */
 	static Dart createOrientedHexa(typename PFP::MAP& the_map);
 
+	/**
+	 * create simple simple prism (not handled by Polyhedron object)
+	 */
 	static Dart createOrientedPrism(typename PFP::MAP& the_map);
 
 	/*
@@ -226,13 +237,13 @@ public:
 
 	/**
 	* Create a subdivided (surface) cylinder
-	* @param n nb of quads around small circunference
 	* @param m nb of quads around big circunference
+	* @param n nb of quads around small circunference
 	* @param top_closed close the top with triangles fan
 	* @param bottom_closed close the bottom with triangles fan
 	* @return the dart
 	*/
-	Dart tore_topo(int n, int m);
+	Dart tore_topo(int m, int n);
 
 	/**
 	* embed the topo grid Polyhedron

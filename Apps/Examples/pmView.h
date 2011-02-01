@@ -26,6 +26,7 @@
 
 #include "Utils/glutwin_atb.h"
 
+#include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
 
@@ -40,23 +41,11 @@
 
 using namespace CGoGN ;
 
-struct PFP
+struct PFP: public PFP_STANDARD
 {
 	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 
-	// definition of the type of real value
-	typedef float REAL;
-
-	// other types definitions
-	typedef Geom::Vector<3,REAL> VEC3;
-	typedef Geom::Vector<6,REAL> VEC6;
-	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	typedef Geom::Matrix<4,4,REAL> MATRIX44;
-	typedef Geom::Matrix<3,6,REAL> MATRIX36;
-
-	typedef AttributeHandler<VEC3> TVEC3;
-	typedef AttributeHandler<REAL> TREAL;
 };
 
 typedef PFP::MAP MAP;
@@ -94,7 +83,7 @@ public:
 	PFP::TVEC3 normal ;
 	AttributeHandler<Geom::Vec4f> color ;
 
-	Algo::Render::VBO::MapRender_VBO<PFP>* vbo_render ;
+	Algo::Render::VBO::MapRender_VBO* vbo_render ;
 	bool usePrecomputedTableIndices ;
 	std::vector<GLuint> triangleTableIndices[101] ;
 	std::vector<GLuint> lineTableIndices[101] ;

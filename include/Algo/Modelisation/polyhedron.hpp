@@ -549,7 +549,7 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 	
 	// we now have the 4 sides, just need to create store and sew top & bottom
 	// the top
-	Polyhedron<PFP> primTop(m_map);
+	Polyhedron<PFP> primTop(m_map, m_positions);
 	primTop.grid_topo(x,y);
 	std::vector<Dart>& tableTop = primTop.getVertexDarts();
 
@@ -582,7 +582,7 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 	}
 
 	// the bottom
-	Polyhedron<PFP> primBottom(m_map);
+	Polyhedron<PFP> primBottom(m_map,m_positions);
 	primBottom.grid_topo(x,y);
 	std::vector<Dart>& tableBottom = primBottom.getVertexDarts();
 
@@ -637,7 +637,7 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::tore_topo(int n, int m)
+Dart Polyhedron<PFP>::tore_topo(int m, int n)
 {
 	if (m_kind != NONE) return m_dart;
 

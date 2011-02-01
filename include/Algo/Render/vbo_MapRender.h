@@ -25,12 +25,15 @@
 #ifndef _VBO_MAP_RENDER_
 #define _VBO_MAP_RENDER_
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <vector>
 #include <list>
 
+#include "Topology/generic/dart.h"
 #include "Topology/generic/functor.h"
+#include "Topology/generic/attributeHandler.h"
 #include "Container/convert.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -73,22 +76,11 @@ enum bufferIndex {
 
 const unsigned int NB_BUFFERS = 7 ;
 
-template <typename PFP>
+
 class MapRender_VBO
 {
-	typedef typename PFP::MAP MAP ;
 
 protected:
-	/**
-	 * the map to draw
-	 */
-	MAP& m_map ;
-
-	/**
-	 * darts selector
-	 */
-	const FunctorSelect& m_good ;
-
 	/**
 	 * vbo buffers
 	 */
@@ -120,7 +112,7 @@ public:
 	 * @param map the map to draw
 	 * @param good functor that return true for darts of part to draw
 	 */
-	MapRender_VBO(MAP& map, const FunctorSelect& good) ;
+	MapRender_VBO() ;
 
 	/**
 	 * Destructor
@@ -157,40 +149,48 @@ protected:
 	 * @param d a dart of the triangle
 	 * @param tableIndices the indices table
 	 */
-	void addTri(Dart d, std::vector<GLuint>& tableIndices) ;
+	template <typename PFP>
+	void addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices) ;
 
 public:
 	/**
 	 * creation of indices table of triangles (optimized order)
 	 * @param tableIndices the table where indices are stored
 	 */
-	void initTriangles(std::vector<GLuint>& tableIndices) ;
-	void initTrianglesOptimized(std::vector<GLuint>& tableIndices) ;
+	template <typename PFP>
+	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	template <typename PFP>
+	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
 
 	/**
 	 * creation of indices table of lines (optimized order)
 	 * @param tableIndices the table where indices are stored
 	 */
-	void initLines(std::vector<GLuint>& tableIndices) ;
-	void initLinesOptimized(std::vector<GLuint>& tableIndices) ;
+	template <typename PFP>
+	void initLines(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	template <typename PFP>
+	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
 
 	/**
 	 * creation of indices table of points
 	 * @param tableIndices the table where indices are stored
 	 */
-	void initPoints(std::vector<GLuint>& tableIndices) ;
+	template <typename PFP>
+	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
 
 	/**
 	 * creation of VBO for flat faces rendering
 	 */
-	void initFlatTriangles();
+	template <typename PFP>
+	void initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good);
 
 	/**
 	 * initialization of the VBO indices primitives
 	 * computed by a traversal of the map
 	 * @param prim primitive to draw: VBO_TRIANGLES, VBO_LINES
 	 */
-	void initPrimitives(int prim, bool optimized = true) ;
+	template <typename PFP>
+	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true) ;
 
 	/**
 	 * initialization of the VBO indices primitives
