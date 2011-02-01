@@ -78,6 +78,39 @@ void EmbeddedMap2<MAP2>::splitVertex(Dart d, Dart e)
 }
 
 template <typename MAP2>
+bool EmbeddedMap2<MAP2>::deleteVertex(Dart d)
+{
+	if(MAP2::isOrbitEmbedded(VERTEX_ORBIT))
+	{
+		Dart vit = d ;
+		do
+		{
+			unsigned int vEmb = MAP2::getDartEmbedding(VERTEX_ORBIT, MAP2::phi2(vit)) ;
+			if(vEmb != EMBNULL)
+				MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::phi1(vit), vEmb) ;
+			vit = MAP2::alpha1(vit) ;
+		} while(vit != d) ;
+	}
+
+	Dart f = MAP2::phi1(d) ;
+	unsigned int fEmb = EMBNULL ;
+	if (MAP2::isOrbitEmbedded(FACE_ORBIT))
+	{
+		fEmb = MAP2::getEmbedding(d, FACE_ORBIT) ;
+	}
+
+	if(MAP2::deleteVertex(d))
+	{
+		if (MAP2::isOrbitEmbedded(FACE_ORBIT))
+		{
+			MAP2::embedOrbit(FACE_ORBIT, f, fEmb) ;
+		}
+		return true ;
+	}
+	return false ;
+}
+
+template <typename MAP2>
 void EmbeddedMap2<MAP2>::cutEdge(Dart d)
 {
 	unsigned int eEmb = EMBNULL ;

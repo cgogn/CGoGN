@@ -51,6 +51,13 @@ public:
 	virtual void splitVertex(Dart d, Dart e) ;
 
 	/**
+	 * Nothing has to be done for the vertices
+	 * Nothing has to be done for the edges
+	 * The attributes attached to the face of d are kept on the resulting face
+	 */
+	virtual bool deleteVertex(Dart d) ;
+
+	/**
 	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 * Nothing has to be done for the faces

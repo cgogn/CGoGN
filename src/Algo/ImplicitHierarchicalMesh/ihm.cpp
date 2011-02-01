@@ -107,7 +107,7 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 		++nbSubd ;								// is treated here
 		it = phi1(it) ;
 	} while(m_edgeId[it] == eId) ;
-	//fLevel -= (unsigned int)(log2(nbSubd)) ;	PB WINDOWS log2 n'existe pas sous Visual 2010 !!
+//	fLevel -= (unsigned int)(log2(nbSubd)) ;	// PB WINDOWS log2 n'existe pas sous Visual 2010 !!
 	fLevel -= (unsigned int)(log((double)nbSubd)/log(2.0)) ;
 	m_curLevel = cur ;
 

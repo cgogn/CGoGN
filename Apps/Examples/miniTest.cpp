@@ -552,6 +552,22 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			break ;
 		}
 
+
+		case 'v':
+		{
+			srand(time(NULL)) ;
+			unsigned int nbDarts = myMap.getNbDarts() ;
+			unsigned int r = rand() % nbDarts ;
+			Dart d(r) ;
+			if(myMap.isDartValid(d))
+			{
+				myMap.deleteVertex(d) ;
+				updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+				updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+				topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+			}
+		}
+
 		case 'x':
 		{
 			Algo::Export::exportOFF<PFP>(myMap, position, "export.off") ;

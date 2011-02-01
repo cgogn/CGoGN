@@ -153,6 +153,17 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
+
+	unsigned int cur = map.getCurrentLevel() ;
+
+	Dart fit = d ;
+	do
+	{
+		map.setCurrentLevel(cur + 1) ;
+		map.removeVertex(map.phi1(map.phi1(fit))) ;
+		map.setCurrentLevel(cur) ;
+		fit = map.phi1(fit) ;
+	} while(fit != d) ;
 }
 
 } //namespace IHM
