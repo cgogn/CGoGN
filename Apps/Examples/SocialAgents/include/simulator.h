@@ -73,6 +73,7 @@ class Simulator
 
 		//scenarii
 		void setupScenario();
+		void setupTobogganScenario(float rMax,float rMin);
 		void setupHelicoidScenario(float rMax,float rMin);
 };
 

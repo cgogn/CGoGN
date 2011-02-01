@@ -72,7 +72,6 @@ class ParticleCell2D : public ParticleBase
 	void move(const VEC3& newCurrent)
 	{
 		if(!Geom::arePointsEquals(newCurrent, m_position)) {
-	// 		std::cout << "move to : " << newCurrent << std::endl;
 			prevPos = m_position;
 
 			switch(state) {
@@ -80,6 +79,8 @@ class ParticleCell2D : public ParticleBase
 			case EDGE_ORBIT : 	edgeState(newCurrent);   break;
 			case FACE_ORBIT : 	faceState(newCurrent);   break;
 			}
+
+			display();
 		}
 	}
 

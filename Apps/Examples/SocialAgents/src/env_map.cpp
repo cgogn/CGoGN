@@ -218,6 +218,7 @@ Dart EnvMap::getBelongingCell(const PFP::VEC3& pos)
 
 void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 {
+	map.setCurrentLevel(map.getMinLevel()) ;
 	Dart dd =d;
 	do {
 		if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
@@ -230,6 +231,8 @@ void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 		}
 		dd = map.phi1(dd);
 	} while (dd!=d);
+
+	map.setCurrentLevel(map.getMaxLevel()) ;
 }
 
 void EnvMap::getAllFacesOfAgents(Dart d)
@@ -431,13 +434,15 @@ void EnvMap::subdivideFaces()
 					for(std::vector<Dart>::iterator it = marked.begin(); it != marked.end(); ++it)
 						closeMark.mark(map.phi2(*it)) ;
 
-					map.setCurrentLevel(cur) ;
+
 
 					for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
 					{
 						resetAgentInFace(*it) ;
 						agentvect[(*it)->part->d].push_back(*it) ;
 					}
+
+					map.setCurrentLevel(cur) ;
 				}
 			}
 		}
@@ -684,7 +689,7 @@ VEC3 EnvMap::faceCenter(Dart d)
 void EnvMap::resetAgentInFace(Agent * agent)
 {
 // 	agent->part->state = VERTEX_ORBIT;
-// 	agent->part->m_position = position[d];
+// 	agent->part->m_position = position[agent->part->d];
 
 // 	agent->part->m_position = agent->part->pointInFace(agent->part->d);
 	agent->part->m_position = Algo::Geometry::faceCentroid<PFP>(map,agent->part->d,position);

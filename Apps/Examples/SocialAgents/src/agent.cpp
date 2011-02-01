@@ -8,22 +8,21 @@ Agent::Agent(Simulator* sim, size_t agentNo) : agentNeighbors_(), maxNeighbors_(
 
 Agent::Agent(Simulator* sim, const VEC_A& position, size_t agentNo) : agentNeighbors_(), maxNeighbors_(sim->defaultAgent_->maxNeighbors_), maxSpeed_(sim->defaultAgent_->maxSpeed_), neighborDist_(sim->defaultAgent_->neighborDist_), newVelocity_(sim->defaultAgent_->velocity_), obstacleNeighbors_(), orcaLines_(), position_(position), prefVelocity_(), radius_(sim->defaultAgent_->radius_), sim_(sim), timeHorizon_(sim->defaultAgent_->timeHorizon_), timeHorizonObst_(sim->defaultAgent_->timeHorizonObst_), velocity_(sim->defaultAgent_->velocity_), agentNo_(agentNo), goalNo_(agentNo), treated(false)
 {
-	nearestDart = sim->envMap.getBelongingCell(VEC3(position[0],position[1],0));
-	part = new Algo::MovingObjects::ParticleCell2D<PFP>(sim->envMap.map,nearestDart,position,sim->envMap.position,sim->envMap.closeMark);
+	Dart d =  sim->envMap.getBelongingCell(VEC3(position[0],position[1],0));
+	part = new Algo::MovingObjects::ParticleCell2D<PFP>(sim->envMap.map,d,position,sim->envMap.position,sim->envMap.closeMark);
 	rangeSq = sqr(timeHorizonObst_ * maxSpeed_ + radius_);
 }
 
 Agent::Agent(Simulator* sim, const VEC_A& position, size_t agentNo, Dart d) : agentNeighbors_(), maxNeighbors_(sim->defaultAgent_->maxNeighbors_), maxSpeed_(sim->defaultAgent_->maxSpeed_), neighborDist_(sim->defaultAgent_->neighborDist_), newVelocity_(sim->defaultAgent_->velocity_), obstacleNeighbors_(), orcaLines_(), position_(position), prefVelocity_(), radius_(sim->defaultAgent_->radius_), sim_(sim), timeHorizon_(sim->defaultAgent_->timeHorizon_), timeHorizonObst_(sim->defaultAgent_->timeHorizonObst_), velocity_(sim->defaultAgent_->velocity_), agentNo_(agentNo), goalNo_(agentNo), treated(false)
 {
-	nearestDart = d;
-	part = new Algo::MovingObjects::ParticleCell2D<PFP>(sim->envMap.map,nearestDart,position,sim->envMap.position,sim->envMap.closeMark);
+	part = new Algo::MovingObjects::ParticleCell2D<PFP>(sim->envMap.map,d,position,sim->envMap.position,sim->envMap.closeMark);
 	rangeSq = sqr(timeHorizonObst_ * maxSpeed_ + radius_);
 }
 
 Agent::Agent(Simulator* sim, const VEC_A& position, float neighborDist, size_t maxNeighbors, float timeHorizon, float timeHorizonObst, float radius, const VEC_A& velocity, float maxSpeed, size_t agentNo) : agentNeighbors_(), maxNeighbors_(maxNeighbors), maxSpeed_(maxSpeed), neighborDist_(neighborDist), newVelocity_(velocity), obstacleNeighbors_(), orcaLines_(), position_(position), prefVelocity_(), radius_(radius), sim_(sim), timeHorizon_(timeHorizon), timeHorizonObst_(timeHorizonObst), velocity_(velocity), agentNo_(agentNo), goalNo_(agentNo), treated(false)
 {
-	nearestDart = sim->envMap.getBelongingCell(VEC3(position[0],position[1],0));
-	part = new Algo::MovingObjects::ParticleCell2D<PFP>(sim->envMap.map,nearestDart,position,sim->envMap.position,sim->envMap.closeMark);
+	Dart d = sim->envMap.getBelongingCell(VEC3(position[0],position[1],0));
+	part = new Algo::MovingObjects::ParticleCell2D<PFP>(sim->envMap.map,d,position,sim->envMap.position,sim->envMap.closeMark);
 	rangeSq = sqr(timeHorizonObst_ * maxSpeed_ + radius_);
 }
 
@@ -355,7 +354,6 @@ void Agent::update()
 	position_ += velocity_ * sim_->timeStep_;
 
 	part->move(VEC3(position_[0],position_[1],0));
-	nearestDart = part->getCell();
 }
 
 bool linearProgram1(const std::vector<Line>& lines, size_t lineNo, float radius, const Agent::Agent::VEC_A& optVelocity, bool directionOpt, Agent::VEC_A& result)
