@@ -338,7 +338,7 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 
 void EnvMap::updateMap()
 {
- 	simplifyFaces() ;
+// 	simplifyFaces() ;
 	subdivideFaces() ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 }
@@ -432,14 +432,18 @@ void EnvMap::simplifyFaces()
 			{
 				Dart old = map.faceOldestDart(d) ;
 				map.setCurrentLevel(cur - 1) ;
-				Dart fit = old ;
-				do
+				if(map.faceIsSubdividedOnce(old))
 				{
-					map.setCurrentLevel(cur) ;
-
-					map.setCurrentLevel(cur - 1) ;
-					fit = phi1(fit) ;
-				} while(fit != d) ;
+					unsigned int nbAgents = 0 ;
+					Dart fit = old ;
+					do
+					{
+						map.setCurrentLevel(cur) ;
+						nbAgents += agentvect[fit].size() ;
+						map.setCurrentLevel(cur - 1) ;
+						fit = map.phi1(fit) ;
+					} while(fit != old) ;
+				}
 				map.setCurrentLevel(cur) ;
 			}
 		}
