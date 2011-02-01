@@ -114,6 +114,22 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 	return fLevel ;
 }
 
+Dart ImplicitHierarchicalMap::faceOrigin(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+	unsigned int cur = m_curLevel ;
+	Dart p = d ;
+	unsigned int pLevel = m_dartLevel[p] ;
+	while(pLevel > 0)
+	{
+		p = faceOldestDart(p) ;
+		pLevel = m_dartLevel[p] ;
+		m_curLevel = pLevel ;
+	}
+	m_curLevel = cur ;
+	return p ;
+}
+
 Dart ImplicitHierarchicalMap::faceOldestDart(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
