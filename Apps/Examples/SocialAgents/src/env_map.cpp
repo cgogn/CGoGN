@@ -218,18 +218,21 @@ Dart EnvMap::getBelongingCell(const PFP::VEC3& pos)
 
 void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 {
-	Dart dd =d;
-	do {
-		if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
-			for(PFP::AGENTS::iterator it=agents.begin(); it!= agents.end(); ++it) {
-// 				if(leftOf((*it)->part->m_position,position[dd],position[map.phi1(dd)])<0.0f) {
-					(*it)->insertObstacleNeighbor(dd);
-// 				}
+	if(map.getDartLevel(map.faceOldestDart(d))==0) {
+
+		Dart dd =d;
+		do {
+			if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
+				for(PFP::AGENTS::iterator it=agents.begin(); it!= agents.end(); ++it) {
+	// 				if(leftOf((*it)->part->m_position,position[dd],position[map.phi1(dd)])<0.0f) {
+						(*it)->insertObstacleNeighbor(dd);
+	// 				}
+				}
+	//			return;
 			}
-//			return;
-		}
-		dd = map.phi1(dd);
-	} while (dd!=d);
+			dd = map.phi1(dd);
+		} while (dd!=d);
+	}
 }
 
 void EnvMap::getAllFacesOfAgents(Dart d)

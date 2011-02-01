@@ -75,10 +75,9 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 	}
 	else {
 		//orientation step
+		if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1])
+			d=m.alpha1(d);
 		if(getOrientationEdge(current,m.alpha1(d))!=Geom::RIGHT) {
-
-			if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1])
-				d=m.alpha1(d);
 			Dart dd_vert = d;
 			do {
 				d = m.alpha1(d);
@@ -100,21 +99,24 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 			}
 		}
 		else {
-			if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1])
-				d=m.alpha1(d);
+			std::cout << "ploc" << std::endl;
 			Dart dd_vert = m.alpha1(d);
 			while(getOrientationEdge(current,d)==Geom::RIGHT && dd_vert!=d) {
+				std::cout << "tourne" << std::endl;
 				d = m.alpha_1(d);
 
-				if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1])
+				if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1]) {
 					d=m.alpha_1(d);
+				}
 			}
 		}
 
 		//displacement step
 // 		if(!obstacle.isMarked(d)) {
-			if(getOrientationEdge(current,d)==Geom::ALIGNED) 
+			if(getOrientationEdge(current,d)==Geom::ALIGNED && Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current)) {
+				std::cout << m.vertexDegree(d) << std::endl;
 				edgeState(current);
+			}
 			else {
 				d = m.phi1(d);
 				faceState(current);
@@ -200,7 +202,6 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 									edgeState(current);
 									return;
 				case Geom::RIGHT :
-									std::cout << std::setprecision(10);
 									std::cout << "smthg went bad " << m_position << " " << current << std::endl;
 									std::cout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << std::endl;
 									m_position = intersectLineEdge(current,m_position,d);
