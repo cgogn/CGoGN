@@ -144,6 +144,8 @@ template <typename PFP>
 void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
+
 }
 
 template <typename PFP>

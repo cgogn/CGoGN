@@ -87,7 +87,7 @@ void MyGlutWin::initGUI()
 
 bool MyGlutWin::reachedGoal(Simulator* sim)
 {
-	if((int(sim->globalTime_)%1000)==0)
+	if((int(sim->globalTime_)%500)==0)
 		std::random_shuffle( sim->goals.begin(), sim->goals.end() );
 //   /* Check if all agents have reached their goals. */
 //   for (size_t i = 0; i < sim->getNumAgents(); ++i) {
@@ -381,7 +381,7 @@ void updateVisualization(Simulator* sim)
 void MyGlutWin::animate(void)
 {
 // 	if(int(sim->globalTime_)%2)
-// 	CGoGN::CityGenerator::animateCity<PFP,PFP::TVEC3,PFP::TAB_AGENTVECT>(sim->envMap.map,sim->envMap.position,sim->envMap.agentvect,sim->envMap.closeMark,sim->envMap.newBuildings);
+// 		CGoGN::CityGenerator::animateCity<PFP,PFP::TVEC3,PFP::TAB_AGENTVECT>(sim->envMap.map,sim->envMap.position,sim->envMap.agentvect,sim->envMap.closeMark,sim->envMap.newBuildings);
 // 	sim->envMap.map.check();
 // 	posToReach[0] += sin(rand());
 // 	posToReach[1] += cos(rand());

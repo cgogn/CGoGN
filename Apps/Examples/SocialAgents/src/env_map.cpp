@@ -218,7 +218,6 @@ Dart EnvMap::getBelongingCell(const PFP::VEC3& pos)
 
 void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 {
-	map.setCurrentLevel(map.getMinLevel()) ;
 	Dart dd =d;
 	do {
 		if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
@@ -231,8 +230,6 @@ void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
 		}
 		dd = map.phi1(dd);
 	} while (dd!=d);
-
-	map.setCurrentLevel(map.getMaxLevel()) ;
 }
 
 void EnvMap::getAllFacesOfAgents(Dart d)
@@ -342,29 +339,6 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 void EnvMap::updateMap()
 {
 // 	simplifyFaces();
-
-	CellMarker m(map, FACE_CELL) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(!m.isMarked(d))
-		{
-			m.mark(d) ;
-			std::vector<Agent*>& agents = agentvect[d] ;
-			for(std::vector<Agent*>::iterator it = agents.begin(); it != agents.end(); ++it)
-			{
-				if(!map.sameFace(d, (*it)->part->d))
-				{
-					std::cout << "aaaaaaaaaaaaaaaaaaa" << std::endl ;
-					std::cout << (*it)->part->state << std::endl ;
-					if(map.sameFace(map.phi2(d), (*it)->part->d))
-					{
-						std::cout << "saucisse" << std::endl ;
-					}
-				}
-			}
-		}
-	}
-
 	subdivideFaces() ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 }
@@ -377,7 +351,7 @@ void EnvMap::subdivideFaces()
 		if(!m.isMarked(d))
 		{
 			m.mark(d) ;
-			if(!closeMark.isMarked(d) && agentvect[d].size() > 5)
+			if(!closeMark.isMarked(d) && agentvect[d].size() > 3)
 			{
 				if(!map.faceIsSubdivided(d))
 				{
@@ -388,16 +362,6 @@ void EnvMap::subdivideFaces()
 
 					unsigned int cur = map.getCurrentLevel() ;
 					unsigned int fLevel = map.faceLevel(d) ;
-
-//					std::cout << "cur -> " << cur << " / fLevel -> " << fLevel << " :" ;
-//					Dart fit = d ;
-//					do
-//					{
-//						unsigned int e = map.getDartEmbedding(FACE_ORBIT, fit) ;
-//						if(e == EMBNULL) std::cout << " -" ; else std::cout << " " << e ;
-//						fit = map.phi1(fit) ;
-//					} while(fit != d) ;
-//					std::cout << std::endl ;
 
 					map.setCurrentLevel(fLevel) ;
 					std::vector<Dart> marked ;
@@ -412,30 +376,10 @@ void EnvMap::subdivideFaces()
 					Algo::IHM::subdivideFace<PFP>(map, d, position) ;
 
 					map.setCurrentLevel(fLevel + 1) ;
-
-//					Dart cv = map.phi2(map.phi1(d)) ;
-//					Dart vit = cv ;
-//					unsigned int i = 1 ;
-//					do
-//					{
-//						std::cout << "  face " << i << " -> " ;
-//						Dart f = vit ;
-//						do
-//						{
-//							unsigned int e = map.getDartEmbedding(FACE_ORBIT, f) ;
-//							if(e == EMBNULL) std::cout << " -" ; else std::cout << " " << e ;
-//							f = map.phi1(f) ;
-//						} while(f != vit) ;
-//						std::cout << std::endl ;
-//						vit = map.alpha1(vit) ;
-//						++i ;
-//					} while(vit != cv) ;
-
 					for(std::vector<Dart>::iterator it = marked.begin(); it != marked.end(); ++it)
 						closeMark.mark(map.phi2(*it)) ;
 
-
-
+					map.setCurrentLevel(map.getMaxLevel()) ;
 					for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
 					{
 						resetAgentInFace(*it) ;
