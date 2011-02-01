@@ -341,7 +341,7 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 
 void EnvMap::updateMap()
 {
-// 	simplifyFaces() ;
+ 	simplifyFaces() ;
 	subdivideFaces() ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 }
@@ -354,7 +354,7 @@ void EnvMap::subdivideFaces()
 		if(!m.isMarked(d))
 		{
 			m.mark(d) ;
-			if(!closeMark.isMarked(d) && agentvect[d].size() > 3)
+			if(!closeMark.isMarked(d) && agentvect[d].size() > 6)
 			{
 				if(!map.faceIsSubdivided(d))
 				{
@@ -434,18 +434,36 @@ void EnvMap::simplifyFaces()
 			if(!closeMark.isMarked(d) && fLevel > 0)
 			{
 				Dart old = map.faceOldestDart(d) ;
-				map.setCurrentLevel(cur - 1) ;
+				map.setCurrentLevel(fLevel - 1) ;
 				if(map.faceIsSubdividedOnce(old))
 				{
 					unsigned int nbAgents = 0 ;
 					Dart fit = old ;
 					do
 					{
-						map.setCurrentLevel(cur) ;
 						nbAgents += agentvect[fit].size() ;
-						map.setCurrentLevel(cur - 1) ;
 						fit = map.phi1(fit) ;
 					} while(fit != old) ;
+
+					if(nbAgents < 6)
+					{
+						std::vector<Agent*> agents ;
+						fit = old ;
+						do
+						{
+							agents.insert(agents.end(), agentvect[fit].begin(), agentvect[fit].end()) ;
+							fit = map.phi1(fit) ;
+						} while(fit != old) ;
+
+						Algo::IHM::coarsenFace<PFP>(map, old, position) ;
+
+						agentvect[old].clear() ;
+						for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
+						{
+							resetAgentInFace(*it) ;
+							agentvect[(*it)->part->d].push_back(*it) ;
+						}
+					}
 				}
 				map.setCurrentLevel(cur) ;
 			}
