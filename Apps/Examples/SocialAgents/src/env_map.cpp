@@ -338,7 +338,7 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 
 void EnvMap::updateMap()
 {
-// 	simplifyFaces();
+ 	simplifyFaces() ;
 	subdivideFaces() ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 }
@@ -416,55 +416,82 @@ void EnvMap::subdivideFaces()
 
 void EnvMap::simplifyFaces()
 {
-// 	map.check();
-// 	for(Dart d = map.begin(); d!= map.end() ; map.next(d)) {
-	for(unsigned int i=0;i<2;++i) {
-// 	std::cout << "subdividedDarts size " << subdividedDarts.size() << std::endl;
-// 	for(std::vector<Dart>::iterator it = subdividedDarts.begin(); it != subdividedDarts.end() ; ++it) {
-// 	      Dart d=*it;
-// 	      if(map.phi1(d)!=map.phi_1(d))
-// 	      do {
-// 		Dart dNext = dSimplify;
-// 		map.next(dNext);
+	assert(map.getCurrentLevel() == map.getMaxLevel()) ;
+	unsigned int cur = map.getCurrentLevel() ;
 
-		if(!closeMark.isMarked(dSimplify) && !closeMark.isMarked(map.phi2(dSimplify)) && agentvect[dSimplify].size()==0) {
-// 			if(noAgentSurroundingVertex(dSimplify) && simplifyVertex(dSimplify)) {
-// 				std::cout << "erase some darts 1" << std::endl;
-// // 				subdividedDarts.erase(it);
-// 				map.next(dSimplify);
-// 				return;
-// 			}
-// 			else 	{
-					if(agentvect[map.phi2(dSimplify)].size()==0) {
-						if(simplifyEdge(dSimplify)) {
-							std::cout << "erase some darts 2" << std::endl;
-// 							subdividedDarts.erase(it);
-// 							dSimplify = dNext;
-							map.next(dSimplify);
-							return;
-						}
-						else if(simplifiable(dSimplify)) {
-							std::cout << "erase some darts 3" << std::endl;
-							map.mergeFaces(dSimplify);
-// 							subdividedDarts.erase(it);
-// 							dSimplify = dNext;
-							map.next(dSimplify);
-							return;
-						}
-					}
-// 			}
-		}
-// 		 d=map.phi1(d);
-// 	      }while(d!=*it);
-		map.next(dSimplify);
-// 		dSimplify = dNext;
+	if(cur == 0)
+		return ;
 
-		if(dSimplify==map.end()) {
-			dSimplify = map.begin();
+	CellMarker m(map, FACE_CELL) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d))
+		{
+			m.mark(d) ;
+			unsigned int fLevel = map.faceLevel(d) ;
+			if(!closeMark.isMarked(d) && fLevel > 0)
+			{
+				Dart old = map.faceOldestDart(d) ;
+				map.setCurrentLevel(cur - 1) ;
+				Dart fit = old ;
+				do
+				{
+					map.setCurrentLevel(cur) ;
+
+					map.setCurrentLevel(cur - 1) ;
+					fit = phi1(fit) ;
+				} while(fit != d) ;
+				map.setCurrentLevel(cur) ;
+			}
 		}
 	}
 
-// 	std::cout << "say what ?" << std::endl;
+//// 	for(Dart d = map.begin(); d!= map.end() ; map.next(d)) {
+//	for(unsigned int i=0;i<2;++i) {
+//// 	std::cout << "subdividedDarts size " << subdividedDarts.size() << std::endl;
+//// 	for(std::vector<Dart>::iterator it = subdividedDarts.begin(); it != subdividedDarts.end() ; ++it) {
+//// 	      Dart d=*it;
+//// 	      if(map.phi1(d)!=map.phi_1(d))
+//// 	      do {
+//// 		Dart dNext = dSimplify;
+//// 		map.next(dNext);
+//
+//		if(!closeMark.isMarked(dSimplify) && !closeMark.isMarked(map.phi2(dSimplify)) && agentvect[dSimplify].size()==0) {
+//// 			if(noAgentSurroundingVertex(dSimplify) && simplifyVertex(dSimplify)) {
+//// 				std::cout << "erase some darts 1" << std::endl;
+//// // 				subdividedDarts.erase(it);
+//// 				map.next(dSimplify);
+//// 				return;
+//// 			}
+//// 			else 	{
+//					if(agentvect[map.phi2(dSimplify)].size()==0) {
+//						if(simplifyEdge(dSimplify)) {
+//							std::cout << "erase some darts 2" << std::endl;
+//// 							subdividedDarts.erase(it);
+//// 							dSimplify = dNext;
+//							map.next(dSimplify);
+//							return;
+//						}
+//						else if(simplifiable(dSimplify)) {
+//							std::cout << "erase some darts 3" << std::endl;
+//							map.mergeFaces(dSimplify);
+//// 							subdividedDarts.erase(it);
+//// 							dSimplify = dNext;
+//							map.next(dSimplify);
+//							return;
+//						}
+//					}
+//// 			}
+//		}
+//// 		 d=map.phi1(d);
+//// 	      }while(d!=*it);
+//		map.next(dSimplify);
+//// 		dSimplify = dNext;
+//
+//		if(dSimplify==map.end()) {
+//			dSimplify = map.begin();
+//		}
+//	}
 }
 
 bool EnvMap::checkForSubdivision(Dart d)
