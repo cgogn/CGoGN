@@ -112,7 +112,6 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 		//displacement step
 // 		if(!obstacle.isMarked(d)) {
 			if(getOrientationEdge(current,d)==Geom::ALIGNED && Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current)) {
-				std::cout << m.vertexDegree(d) << std::endl;
 				edgeState(current);
 			}
 			else {

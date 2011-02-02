@@ -287,7 +287,7 @@ void Simulator::setupScenario()
 	while(!found && d != envMap.map.end()) {
 		VEC3 n = Algo::Geometry::triangleNormal<PFP>(envMap.map,d,envMap.position);
 		if(!envMap.closeMark.isMarked(d) && !filled.isMarked(d) && envMap.position[d][2]==0.0f && n[2]==1.0f) {
-			pos = envMap.faceCenter(d);
+			pos = Algo::Geometry::faceCentroid<PFP>(envMap.map,d,envMap.position);
 			dCell=d;
 			found = true;
 			filled.markOrbit(FACE_ORBIT,d);
@@ -353,7 +353,7 @@ void Simulator::setupHelicoidScenario(float rMax,float rMin)
 	Dart dCell;
 	while(!found && d != envMap.map.end()) {
 		if(!envMap.closeMark.isMarked(d) && !filled.isMarked(d)) {
-			pos = envMap.faceCenter(d);
+			pos = Algo::Geometry::faceCentroid<PFP>(envMap.map,d,envMap.position);
 			if(i==nbPack/2)
 				std::cout << "pos " << pos << std::endl;
 			pos[2]=0.0f;
