@@ -303,10 +303,10 @@ void EnvMap::getAllFacesOfAgents(Dart d)
 
 void EnvMap::pushFaceToSubdivide(Dart d)
 {
-	for(std::list<Dart>::iterator it = filledFaces.begin(); it != filledFaces.end() ; ++it) {
-		if(map.sameFace(d,*it))
-			return;
-	}
+//	for(std::list<Dart>::iterator it = filledFaces.begin(); it != filledFaces.end() ; ++it) {
+//		if(map.sameFace(d,*it))
+//			return;
+//	}
 	filledFaces.push_back(d);
 }
 
@@ -408,6 +408,8 @@ void EnvMap::subdivideFaces()
 					}
 				}
 			}
+//			else if(agentvect[d].size()==0)
+//				itF = filledFaces.erase(itF);
 	}
 
 //	for(unsigned int i=0;i<8;++i) {
