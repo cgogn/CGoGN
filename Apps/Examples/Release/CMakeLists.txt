@@ -34,14 +34,6 @@ add_executable( Viewer ../Viewer.cpp)
 target_link_libraries( Viewer
 	container topology utils algo  ${COMMON_LIBS} )
 
-add_executable( FilterExamples ../FilterExamples.cpp)
-target_link_libraries( FilterExamples
-	container topology utils algo numerical lapack blas f2c ${COMMON_LIBS} )
-
-add_executable( linearTest ../linearTest.cpp)
-target_link_libraries( linearTest
-	container topology utils algo numerical lapack blas f2c ${COMMON_LIBS} )
-
 add_executable( simpleGMap2 ../simpleGMap2.cpp)
 target_link_libraries( simpleGMap2
 	container topology utils algo ${COMMON_LIBS} Zinri)

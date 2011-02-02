@@ -33,14 +33,6 @@ add_executable( ViewerD ../Viewer.cpp)
 target_link_libraries( ViewerD
 	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
 
-add_executable( FilterExamplesD ../FilterExamples.cpp)
-target_link_libraries( FilterExamplesD
-	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
-
-add_executable( linearTestD ../linearTest.cpp)
-target_link_libraries( linearTestD
-	containerD topologyD utilsD algoD numerical lapack blas f2c  ${COMMON_LIBS} )
-
 add_executable( simpleGMap2D ../simpleGMap2.cpp)
 target_link_libraries( simpleGMap2D
 	containerD topologyD utilsD algoD ${COMMON_LIBS} Zinri)
