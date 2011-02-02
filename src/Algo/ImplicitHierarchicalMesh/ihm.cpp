@@ -107,11 +107,27 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 		++nbSubd ;								// is treated here
 		it = phi1(it) ;
 	} while(m_edgeId[it] == eId) ;
-	//fLevel -= (unsigned int)(log2(nbSubd)) ;	PB WINDOWS log2 n'existe pas sous Visual 2010 !!
+//	fLevel -= (unsigned int)(log2(nbSubd)) ;	// PB WINDOWS log2 n'existe pas sous Visual 2010 !!
 	fLevel -= (unsigned int)(log((double)nbSubd)/log(2.0)) ;
 	m_curLevel = cur ;
 
 	return fLevel ;
+}
+
+Dart ImplicitHierarchicalMap::faceOrigin(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+	unsigned int cur = m_curLevel ;
+	Dart p = d ;
+	unsigned int pLevel = m_dartLevel[p] ;
+	while(pLevel > 0)
+	{
+		p = faceOldestDart(p) ;
+		pLevel = m_dartLevel[p] ;
+		m_curLevel = pLevel ;
+	}
+	m_curLevel = cur ;
+	return p ;
 }
 
 Dart ImplicitHierarchicalMap::faceOldestDart(Dart d)
@@ -184,8 +200,8 @@ bool ImplicitHierarchicalMap::faceIsSubdividedOnce(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	unsigned int fLevel = faceLevel(d) ;
-	if(fLevel < m_curLevel)
-		return false ;
+	if(fLevel < m_curLevel)		// a face whose level in the current level map is lower than
+		return false ;			// the current level can not be subdivided to higher levels
 
 	unsigned int degree = 0 ;
 	bool subd = false ;

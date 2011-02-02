@@ -146,6 +146,15 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
 
+	unsigned int cur = map.getCurrentLevel() ;
+	Dart d2 = map.phi2(d) ;
+	map.setCurrentLevel(cur + 1) ;
+	map.unsewFaces(d) ;
+	map.unsewFaces(d2) ;
+	map.collapseEdge(map.phi1(d)) ;
+	map.collapseEdge(map.phi1(d2)) ;
+	map.sewFaces(d, d2) ;
+	map.setCurrentLevel(cur) ;
 }
 
 template <typename PFP>
@@ -153,6 +162,18 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
+
+	unsigned int cur = map.getCurrentLevel() ;
+	map.setCurrentLevel(cur + 1) ;
+	map.deleteVertex(map.phi1(map.phi1(d))) ;
+	map.setCurrentLevel(cur) ;
+	Dart fit = d ;
+	do
+	{
+		if(map.edgeCanBeCoarsened(fit))
+			coarsenEdge<PFP>(map, fit, position) ;
+		fit = map.phi1(fit) ;
+	} while(fit != d) ;
 }
 
 } //namespace IHM

@@ -22,88 +22,30 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
 
-#include "Utils/glutwin_atb.h"
+#ifndef __PARAMETERS_
+#define __PARAMETERS_
 
-#include "xmap/exmap.h"
-#include "point3d.h"
-#include "export/export.h"
+#include "Geometry/vector_gen.h"
+#include "Geometry/matrix.h"
+#include "attributeHandler.h"
 
-#include "Algo/Render/helpRender.h"
-#include "Algo/Render/map_glRender.h"
-
-using namespace CGoGN ;
-
-class XMAP_V0 : public DP::DefaultDartParameters
+namespace CGoGN
 {
-public:
-	static const unsigned nbInvolutions = 2 ;
-	static const unsigned nbPermutations = 2 ;
-} ;
 
-struct PFP
+struct PFP_STANDARD
 {
-	typedef DartObj<XMAP_V0> DART ;
-	typedef e0xmap<DART> MAP ;
-	typedef Emb::Point3D EMB ;
+	typedef float REAL;
+	typedef Geom::Vector<3,REAL> VEC3;
+	typedef Geom::Vector<4,REAL> VEC4;
+	typedef Geom::Vector<6,REAL> VEC6;
+	typedef Geom::Matrix<3,3,REAL> MATRIX33;
+	typedef Geom::Matrix<4,4,REAL> MATRIX44;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36;
+	typedef AttributeHandler<VEC3> TVEC3;
+	typedef AttributeHandler<REAL> TREAL;
 };
 
-PFP::MAP myMap ;
-PFP::EMB P ;
+}
 
-class MyGlutWin : public Utils::GlutWin_ATB
-{
-public:
-	gmtl::Vec4f colDif ;
-	gmtl::Vec4f colSpec ;
-	gmtl::Vec4f colClear ;
-	gmtl::Vec4f colNormal ;
-	float shininess ;
-	gmtl::Vec3f gPosObj ;
-	float gWidthObj ;
-	float normalBaseSize ;
-	float normalScaleFactor ;
-	std::vector<gmtl::Vec3f> vNormals ;
-	bool vNormals_dirty ;
-
-	enum { FLAT, GOURAUD, PHONG, LINE, NORMAL } ;
-	bool renderObject ;
-	bool renderNormals ;
-	bool renderLines ;
-	bool renderHelp ;
-	int renderStyle ;
-	bool selecting ;
-	bool deselecting ;
-	Marker selectionMarker ;
-	std::vector<PFP::MAP::Dart> selected_vertices ;
-	bool dragging ;
-	GLuint dl_obj ;
-	GLuint dl_line ;
-	GLuint dl_norm ;
-
-	TwBar* viewer_bar ;
-
-	MyGlutWin(int* argc, char **argv, int winX, int winY) ;
-
-	void initGUI() ;
-
-	void myRedraw() ;
-	void myKeyboard(unsigned char keycode, int x, int y) ;
-
-	void initDL() ;
-	void initDLNormals() ;
-	void initDLLines() ;
-	void render(int renderMode) ;
-
-	void selectVertices(PFP::MAP::Dart d, float dist) ;
-	void selectVertex(PFP::MAP::Dart d) ;
-	void deselectVertex(PFP::MAP::Dart d) ;
-	void deselectAllVertices() ;
-
-	void saveOriginalPositions() ;
-	void restoreOriginalPositions() ;
-	void updateVerticesDistance2() ;
-	void updateVerticesColor(float min, float max) ;
-	void computeDistanceToOriginal() ;
-} ;
+#endif

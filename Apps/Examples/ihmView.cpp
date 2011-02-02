@@ -26,6 +26,7 @@
 
 #include "Utils/glutwin_atb.h"
 
+#include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
 #include "Algo/ImplicitHierarchicalMesh/ihm.h"
@@ -43,19 +44,10 @@
 
 using namespace CGoGN ;
 
-struct PFP
+struct PFP: public PFP_STANDARD
 {
 	// definition of the map
 	typedef Algo::IHM::ImplicitHierarchicalMap MAP;
-
-	// definition of the type of real value
-	typedef float REAL;
-
-	typedef Geom::Vector<3,REAL> VEC3;
-	typedef Geom::Vector<6,REAL> VEC6;
-	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	typedef Geom::Matrix<4,4,REAL> MATRIX44;
-	typedef Geom::Matrix<3,6,REAL> MATRIX36;
 
 	typedef Algo::IHM::AttributeHandler_IHM<VEC3> TVEC3;
 	typedef Algo::IHM::AttributeHandler_IHM<REAL> TREAL;
@@ -98,7 +90,7 @@ public:
 	PFP::TVEC3 position ;
 	PFP::TVEC3 normal ;
 
-	Algo::Render::VBO::MapRender_VBO<PFP>* vbo_render ;
+	Algo::Render::VBO::MapRender_VBO* vbo_render ;
 
 	Algo::Render::VBO::topo_VBORenderMapD* topo_render ;
 
@@ -299,7 +291,7 @@ MyGlutWin::MyGlutWin(int* argc, char **argv, int winX, int winY) :
 
 void MyGlutWin::init()
 {
-	vbo_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts) ;
+	vbo_render = new Algo::Render::VBO::MapRender_VBO() ;
 	updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 	updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 
@@ -513,17 +505,17 @@ void MyGlutWin::updateVBOprimitives(int upType)
 {
 	if(upType & Algo::Render::VBO::TRIANGLES)
 	{
-		vbo_render->initPrimitives(Algo::Render::VBO::TRIANGLES) ;
+		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES) ;
 	}
 
 	if(upType & Algo::Render::VBO::LINES)
 	{
-		vbo_render->initPrimitives(Algo::Render::VBO::LINES) ;
+		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES) ;
 	}
 
 	if(upType & Algo::Render::VBO::POINTS)
 	{
-		vbo_render->initPrimitives(Algo::Render::VBO::POINTS) ;
+		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::POINTS) ;
 	}
 }
 

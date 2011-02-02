@@ -125,7 +125,7 @@ public:
 	/**
 	* destructor
 	*/
-	virtual ~SimpleGlutWin() {};
+	virtual ~SimpleGlutWin() {}
 
 	/**
 	 * set the focale distance (for a screen width of 2), default value is 1

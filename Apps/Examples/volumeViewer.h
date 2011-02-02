@@ -38,25 +38,14 @@
 
 using namespace CGoGN;
 
-struct PFP {
+struct PFP: public PFP_STANDARD
+{
 	// definition de la carte
 	typedef Map3 MAP;
 
-	// definition du type de reel utilise
-	typedef float REAL;
-	// definition du type de vecteur (point) utilise
-	typedef Geom::Vector<3,REAL> VEC3;
-	// definition du type de matrice 3x3 utilise
-	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	// definition du type de matrice 4x4 utilise
-	typedef Geom::Matrix<4,4,REAL> MATRIX44;
-
-	// definition du type du AttributeHandler de vecteur 3D
-	typedef AttributeHandler<VEC3> TVEC3;
 };
 
-// qq initialisation cachees (car penible syntaxiquement)
-INIT_STATICS_MAP();
+
 
 PFP::MAP myMap;
 SelectorTrue allDarts;

@@ -29,10 +29,6 @@ add_executable( miniTestD ../miniTest.cpp)
 target_link_libraries( miniTestD
 	containerD topologyD utilsD algoD  numerical lapack blas f2c ${COMMON_LIBS} )
 
-add_executable( firstD ../first.cpp)
-target_link_libraries( firstD
-	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
-
 add_executable( ViewerD ../Viewer.cpp)
 target_link_libraries( ViewerD
 	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
@@ -40,10 +36,6 @@ target_link_libraries( ViewerD
 add_executable( FilterExamplesD ../FilterExamples.cpp)
 target_link_libraries( FilterExamplesD
 	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
-
-add_executable( pmViewD ../pmView.cpp)
-target_link_libraries( pmViewD
-	containerD topologyD utilsD algoD numerical lapack blas f2c ${COMMON_LIBS} )
 
 add_executable( linearTestD ../linearTest.cpp)
 target_link_libraries( linearTestD
@@ -73,3 +65,14 @@ add_executable( ter_meshesD ../ter_meshes.cpp)
 target_link_libraries( ter_meshesD
         containerD topologyD utilsD algoD ${COMMON_LIBS} )
 
+add_executable( polyhedronsViewD ../polyhedronsView.cpp)
+target_link_libraries( polyhedronsViewD
+        containerD topologyD utilsD algoD ${COMMON_LIBS} )
+
+add_executable( extrusionViewD ../extrusionView.cpp)
+target_link_libraries( extrusionViewD
+        containerD topologyD utilsD algoD ${COMMON_LIBS} )
+        
+add_executable( sceneD ../scene.cpp)
+target_link_libraries( sceneD
+        containerD topologyD utilsD algoD ${COMMON_LIBS} )

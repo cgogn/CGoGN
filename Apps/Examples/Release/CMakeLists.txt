@@ -30,10 +30,6 @@ add_executable( miniTest ../miniTest.cpp)
 target_link_libraries( miniTest
 	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
 
-add_executable( first ../first.cpp)
-target_link_libraries( first
-	container topology utils algo  ${COMMON_LIBS} )
-
 add_executable( Viewer ../Viewer.cpp)
 target_link_libraries( Viewer
 	container topology utils algo  ${COMMON_LIBS} )
@@ -42,58 +38,6 @@ add_executable( FilterExamples ../FilterExamples.cpp)
 target_link_libraries( FilterExamples
 	container topology utils algo numerical lapack blas f2c ${COMMON_LIBS} )
 
-#add_executable( SimpleEMap3 ../simpleEMap3.cpp)
-#target_link_libraries( SimpleEMap3
-#	container topology utils algo ${COMMON_LIBS} )
- 
-#add_executable( movingObjects ../movingObjects_Unconstrained-Unoptimized.cpp)
-# target_link_libraries( movingObjects
-# 	container topology utils algo ${COMMON_LIBS} )
-
-# add_executable( MeshVBO ../MeshVBO.cpp)
-# target_link_libraries( MeshVBO
-# 	topology utils algo ${COMMON_LIBS} )
-
-# add_executable( MeshViewer ../MeshViewer.cpp)
-# target_link_libraries( MeshViewer
-# 	topology utils algo gzstream ${COMMON_LIBS} )
-
-# add_executable( primView ../primView.cpp)
-# target_link_libraries( primView
-# 	topology utils algo ${COMMON_LIBS} )
-
-# add_executable( test_geo3d ../test_geo3d.cpp)
-# target_link_libraries( test_geo3d
-# 	topology utils algo ${COMMON_LIBS} gmp)
-
-# add_executable( vox2mesh ../vox2mesh.cpp)
-# target_link_libraries( vox2mesh
-# 	topology utils algo ${COMMON_LIBS} Zinri )
-
-# add_executable( topoSelect ../topoSelect.cpp)
-# target_link_libraries( topoSelect
-# 	topology utils algo ${COMMON_LIBS} )
-
-# add_executable( MC_Examples ../MC_Examples.cpp)
-# target_link_libraries( MC_Examples
-# 	topology utils algo ${COMMON_LIBS} Zinri )
-
-# add_executable( volumeExample ../volumeExample.cpp)
-# target_link_libraries( volumeExample
-# 	topology utils algo ${COMMON_LIBS} )
-
-add_executable( pmView ../pmView.cpp)
-target_link_libraries( pmView
-	container topology utils algo numerical lapack blas f2c ${COMMON_LIBS} )
-
-# add_executable( modeler ../modeler.cpp)
-# target_link_libraries( modeler
-# 	topology utils algo ${COMMON_LIBS} )
-
-#add_executable( volumeViewer ../volumeViewer.cpp)
-#target_link_libraries( volumeViewer
-#	topology utils algo ${COMMON_LIBS} )
-
 add_executable( linearTest ../linearTest.cpp)
 target_link_libraries( linearTest
 	container topology utils algo numerical lapack blas f2c ${COMMON_LIBS} )
@@ -101,22 +45,6 @@ target_link_libraries( linearTest
 add_executable( simpleGMap2 ../simpleGMap2.cpp)
 target_link_libraries( simpleGMap2
 	container topology utils algo ${COMMON_LIBS} Zinri)
-
-# add_executable( simpleXMap ../simpleXMap.cpp)
-# target_link_libraries( simpleXMap
-# 	topology utils algo ${COMMON_LIBS} Zinri)
-
-# add_executable( objTexViewer ../objTexViewer.cpp)
-# target_link_libraries( objTexViewer
-# 	topology utils algo gzstream ${COMMON_LIBS} )
-
-# add_executable( Viz3Map ../Viz3Map.cpp)
-# target_link_libraries( Viz3Map
-#     topology utils algo ${COMMON_LIBS} Zinri)
-
-# add_executable( volumeTopoDraw ../volumeTopoDraw.cpp)
-# target_link_libraries( volumeTopoDraw
-# 	topology utils algo ${COMMON_LIBS})
 
 # add_executable( hm_convexhull ../hm_convexhull.cpp)
 # target_link_libraries( hm_convexhull
@@ -141,3 +69,15 @@ target_link_libraries( triangulation
 add_executable( ter_meshes ../ter_meshes.cpp)
 target_link_libraries( ter_meshes
 	container topology utils algo ${COMMON_LIBS} )
+	
+add_executable( polyhedronsView ../polyhedronsView.cpp)
+target_link_libraries( polyhedronsView
+        container topology utils algo ${COMMON_LIBS} )
+
+add_executable( extrusionView ../extrusionView.cpp)
+target_link_libraries( extrusionView
+        container topology utils algo ${COMMON_LIBS} )
+        
+add_executable( scene ../scene.cpp)
+target_link_libraries( scene
+        container topology utils algo ${COMMON_LIBS} )

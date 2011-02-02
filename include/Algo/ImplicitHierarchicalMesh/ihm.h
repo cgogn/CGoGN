@@ -164,6 +164,12 @@ public:
 	unsigned int faceLevel(Dart d) ;
 
 	/**
+	 * Given the face of d in the current level map,
+	 * return a level 0 dart of its origin face
+	 */
+	Dart faceOrigin(Dart d) ;
+
+	/**
 	 * Return the oldest dart of the face of d in the current level map
 	 */
 	Dart faceOldestDart(Dart d) ;

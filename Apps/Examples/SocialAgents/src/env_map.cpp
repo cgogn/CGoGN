@@ -300,7 +300,7 @@ void EnvMap::addNeighborAgents(PFP::AGENTS agentsFrom,PFP::AGENTS agentsTo)
 
 void EnvMap::updateMap()
 {
-// 	simplifyFaces();
+ 	simplifyFaces() ;
 	subdivideFaces() ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 }
@@ -309,8 +309,15 @@ void EnvMap::subdivideFaces()
 {
 	for(std::list<Dart>::iterator itF = filledFaces.begin(); itF != filledFaces.end(); ++itF)
 	{
+<<<<<<< HEAD:Apps/Examples/SocialAgents/src/env_map.cpp
 		Dart d = *itF;
 			if(agentvect[d].size() > maxNbAgentInFace)
+=======
+		if(!m.isMarked(d))
+		{
+			m.mark(d) ;
+			if(!closeMark.isMarked(d) && agentvect[d].size() > 6)
+>>>>>>> 1b96b9f39ac05db519a7ce78eac22bee10f6277d:Apps/Examples/SocialAgents/src/env_map.cpp
 			{
 				if(!map.faceIsSubdivided(d))
 				{
@@ -349,6 +356,295 @@ void EnvMap::subdivideFaces()
 			else
 				itF = filledFaces.erase(itF);
 	}
+<<<<<<< HEAD:Apps/Examples/SocialAgents/src/env_map.cpp
+=======
+
+//	for(unsigned int i=0;i<8;++i) {
+//		if(/*!fm.isMarked(d) && */!closeMark.isMarked(dSubdivide) && !closeMark.isMarked(map.phi2(dSubdivide))) {
+//			VEC3 n = Algo::Geometry::triangleNormal<PFP>(map,dSubdivide,position);
+//			if(n[2]==1.0f) {
+//				if(checkForSubdivision(dSubdivide)) {
+//					map.next(dSubdivide);
+//					if(dSubdivide==map.end()) {
+//						dSubdivide = map.begin();
+//					}
+//					return;
+//				}
+//			}
+//		}
+//		map.next(dSubdivide);
+//
+//		if(dSubdivide==map.end()) {
+//			dSubdivide = map.begin();
+//		}
+//	}
+}
+
+void EnvMap::simplifyFaces()
+{
+	assert(map.getCurrentLevel() == map.getMaxLevel()) ;
+	unsigned int cur = map.getCurrentLevel() ;
+
+	if(cur == 0)
+		return ;
+
+	CellMarker m(map, FACE_CELL) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d))
+		{
+			m.mark(d) ;
+			unsigned int fLevel = map.faceLevel(d) ;
+			if(!closeMark.isMarked(d) && fLevel > 0)
+			{
+				Dart old = map.faceOldestDart(d) ;
+				map.setCurrentLevel(fLevel - 1) ;
+				if(map.faceIsSubdividedOnce(old))
+				{
+					unsigned int nbAgents = 0 ;
+					Dart fit = old ;
+					do
+					{
+						nbAgents += agentvect[fit].size() ;
+						fit = map.phi1(fit) ;
+					} while(fit != old) ;
+
+					if(nbAgents < 6)
+					{
+						std::vector<Agent*> agents ;
+						fit = old ;
+						do
+						{
+							agents.insert(agents.end(), agentvect[fit].begin(), agentvect[fit].end()) ;
+							fit = map.phi1(fit) ;
+						} while(fit != old) ;
+
+						Algo::IHM::coarsenFace<PFP>(map, old, position) ;
+
+						agentvect[old].clear() ;
+						for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
+						{
+							resetAgentInFace(*it) ;
+							agentvect[(*it)->part->d].push_back(*it) ;
+						}
+					}
+				}
+				map.setCurrentLevel(cur) ;
+			}
+		}
+	}
+
+//// 	for(Dart d = map.begin(); d!= map.end() ; map.next(d)) {
+//	for(unsigned int i=0;i<2;++i) {
+//// 	std::cout << "subdividedDarts size " << subdividedDarts.size() << std::endl;
+//// 	for(std::vector<Dart>::iterator it = subdividedDarts.begin(); it != subdividedDarts.end() ; ++it) {
+//// 	      Dart d=*it;
+//// 	      if(map.phi1(d)!=map.phi_1(d))
+//// 	      do {
+//// 		Dart dNext = dSimplify;
+//// 		map.next(dNext);
+//
+//		if(!closeMark.isMarked(dSimplify) && !closeMark.isMarked(map.phi2(dSimplify)) && agentvect[dSimplify].size()==0) {
+//// 			if(noAgentSurroundingVertex(dSimplify) && simplifyVertex(dSimplify)) {
+//// 				std::cout << "erase some darts 1" << std::endl;
+//// // 				subdividedDarts.erase(it);
+//// 				map.next(dSimplify);
+//// 				return;
+//// 			}
+//// 			else 	{
+//					if(agentvect[map.phi2(dSimplify)].size()==0) {
+//						if(simplifyEdge(dSimplify)) {
+//							std::cout << "erase some darts 2" << std::endl;
+//// 							subdividedDarts.erase(it);
+//// 							dSimplify = dNext;
+//							map.next(dSimplify);
+//							return;
+//						}
+//						else if(simplifiable(dSimplify)) {
+//							std::cout << "erase some darts 3" << std::endl;
+//							map.mergeFaces(dSimplify);
+//// 							subdividedDarts.erase(it);
+//// 							dSimplify = dNext;
+//							map.next(dSimplify);
+//							return;
+//						}
+//					}
+//// 			}
+//		}
+//// 		 d=map.phi1(d);
+//// 	      }while(d!=*it);
+//		map.next(dSimplify);
+//// 		dSimplify = dNext;
+//
+//		if(dSimplify==map.end()) {
+//			dSimplify = map.begin();
+//		}
+//	}
+}
+
+bool EnvMap::checkForSubdivision(Dart d)
+{
+	if(agentvect[d].size() > 10) {
+// 		if(map.phi<1111>(d)==d) {
+// 			if(!closeMark.isMarked(d) && subdivideSquare(d)) {
+// // 				map.check();
+// // 				std::cout << "subdivided square" << std::endl;
+// 				for(PFP::AGENTS::iterator it  = agentvect[d].begin() ;it != agentvect[d].end() ; ++it ) {
+// 					resetAgentInFace(*it,d);
+// 					Dart dd = map.phi2(map.phi1(d));
+// 					Dart ddd=dd;
+// 					do {
+// // 						std::cout << "push 4 times" << std::endl;
+// 						pushAgentInCell(*it,ddd,(*it)->includingFaces);
+// 						ddd = map.alpha1(ddd);
+// 					} while(dd!=map.alpha1(ddd));
+// 				}
+// // 				std::cout << "ok" << std::endl;
+// 				return true;
+// 			}
+// 		}
+// 		else
+// 		{
+			Dart dd=d;
+			bool found=false;
+			do {
+				if(Geom::testOrientation2D<PFP::VEC3>(position[map.phi_1(dd)],position[dd],position[map.phi1(dd)])==Geom::ALIGNED && (position[map.phi1(dd)][0]!= position[dd][0] || position[map.phi1(dd)][1]!= position[dd][1]))
+					found = true;
+				else
+					dd = map.phi1(dd);
+			} while(!found && dd!=d);
+
+			if(found && subdivideFace(dd)) {
+	// 			map.check();
+	// 		if(found && !map.faceIsSubdivided(d)) {
+	// 			Algo::IHM::subdivideFace<PFP>(map,d,position);
+	// 			std::cout << "replace agents : " << agentvect[dd].size() << std::endl;
+				for(PFP::AGENTS::iterator it  = agentvect[dd].begin() ;it != agentvect[dd].end() ; ++it ) {
+	// 				std::cout << "agent " << (*it)->agentNo_ << std::endl;
+					resetAgentInFace(*it);
+					pushAgentInCell(*it,map.alpha1(dd));
+				}
+
+				return true;
+			}
+// 		}
+	}
+
+	return false;
+}
+
+bool EnvMap::subdivideSquare(Dart d)
+{
+	std::cout << "subdivide square" << std::endl;
+	VEC3 c;
+	Dart dd=d;
+	do {
+		VEC3 mid(position[dd]+position[map.phi1(dd)]);
+		mid *= 0.5f;
+		map.cutEdge(dd);
+		if(closeMark.isMarked(map.phi2(dd)))
+			closeMark.mark(map.phi2(map.phi1(dd)));
+		position[map.phi1(dd)] = mid;
+		c +=mid;
+		dd = map.phi1(map.phi1(dd));
+	} while(dd!=d);
+	c *= 0.25f;
+
+	position[Algo::Modelisation::quadranguleFace<PFP>(map,dd)] = c;
+
+	return true;
+}
+
+bool EnvMap::subdivideFace(Dart d)
+{
+	int coordChg = 0;
+	int phiCount=0;
+
+// 	std::cout << "start " << std::endl;
+	VEC3 posD = position[d];
+
+	if(posD[1]!=position[map.phi1(d)][1])
+		coordChg = 1;
+	
+	if(fabs(position[map.phi1(d)][coordChg]-posD[coordChg])<sideSize)
+		return false;
+
+	Dart dd=d;
+	do {
+		dd=map.phi1(dd);
+		phiCount++;
+// 		std::cout << " -pos dd " << position[dd] << std::endl;
+	} while(position[map.phi1(dd)][coordChg]!=position[dd][coordChg]);
+
+	coordChg = (coordChg+1)%2;
+	while(position[map.phi1(dd)][coordChg]!=position[dd][coordChg]) { 
+		dd=map.phi1(dd);
+// 		std::cout << " +pos dd " << position[dd] << std::endl;
+	} 
+
+	coordChg = (coordChg+1)%2;
+	do {
+		dd=map.phi1(dd);
+// 		std::cout << " *pos dd " << position[dd] << std::endl;
+	} while(dd!=d && posD[coordChg]!=position[dd][coordChg]);
+
+// 	std::cout << "phiCount " << phiCount << std::endl;
+
+	coordChg = (coordChg+1)%2;
+
+	if(d!=dd && Geom::testOrientation2D<PFP::VEC3>(position[map.phi_1(dd)],position[dd],position[map.phi1(dd)])==Geom::ALIGNED) {
+// 	  std::cout << " pos d " << position[d] << " dd " << position[dd] << std::endl;
+//   	 std::cout << "  d " << d << " dd " << dd << std::endl;
+// 	  std::cout << " coord " << coordChg << std::endl;
+	  map.splitFace(d,dd);
+	  
+	  int nbCut = (position[d][coordChg]-position[dd][coordChg])/sideSize;
+	  if(nbCut>0)
+		  nbCut--;
+	  else
+		  nbCut++;
+
+	  while(abs(nbCut)>0) {
+		  map.cutEdge(map.phi_1(d));
+		  position[map.phi_1(d)] = position[d];
+		  position[map.phi_1(d)][coordChg] -= nbCut*this->sideSize;
+
+// 		 std::cout << " cutEdge : " << position[map.phi_1(d)] << std::endl;
+
+		  if(nbCut>0)
+			  nbCut--;
+		  else
+			  nbCut++;
+	  }
+
+	  return true;
+	}
+	
+	return false;
+}
+
+VEC3 EnvMap::faceCenter(Dart d)
+{
+	VEC3 center(0,0,0);
+	unsigned int count = 0 ;
+	Dart it = d ;
+	do
+	{
+		center += position[it];
+		++count ;
+// 		while(map.phi1(it)!=d && Geom::testOrientation2D<PFP::VEC3>(position[map.phi1(d)],position[d],position[map.phi1(map.phi1(d))])==Geom::ALIGNED)
+// 			it=map.phi1(it);
+
+		it = map.phi1(it) ;
+	} while(it != d) ;
+
+// 	if(count<4) {
+// 		std::cout << "??????" << count << std::endl;
+// 	}
+
+	center /= double(count);
+	return center ;
+>>>>>>> 1b96b9f39ac05db519a7ce78eac22bee10f6277d:Apps/Examples/SocialAgents/src/env_map.cpp
 }
 
 void EnvMap::resetAgentInFace(Agent * agent)

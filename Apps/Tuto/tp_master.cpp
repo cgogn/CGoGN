@@ -29,6 +29,7 @@
 #include "Utils/GLSLShader.h"
 #include "Utils/glutwin.h"
 
+#include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
 
@@ -51,23 +52,10 @@ using namespace CGoGN;
 
 /// definition de la structure qui decrit le type de carte utilise
 
-struct PFP
+struct PFP: public PFP_STANDARD
 {
 	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
-
-	// definition of the type of real value
-	typedef float REAL;
-
-	// other types definitions
-	typedef Geom::Vector<3,REAL> VEC3;
-	typedef Geom::Vector<6,REAL> VEC6;
-	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	typedef Geom::Matrix<4,4,REAL> MATRIX44;
-	typedef Geom::Matrix<3,6,REAL> MATRIX36;
-
-	typedef AttributeHandler<VEC3> TVEC3;
-	typedef AttributeHandler<REAL> TREAL;
 };
 
 
@@ -81,7 +69,7 @@ AttributeHandler<PFP::VEC3> position;
 AttributeHandler<PFP::VEC3> normal;
 
 /// fonction qui renvoit vrai (appliquée à un brin)
-SelectorTrue allDarts;
+//SelectorTrue allDarts;
 
 /// encore 1 typedef pour simplifier l'ecriture du code
 typedef PFP::VEC3 Point3D;
@@ -236,7 +224,7 @@ public:
 	 */
 	float gWidthObj;
 
-	Algo::Render::VBO::MapRender_VBO<PFP>* m_render;
+	Algo::Render::VBO::MapRender_VBO* m_render;
 
 	Algo::Render::VBO::topo_VBORenderMapD* m_render_topo;
 
@@ -435,10 +423,10 @@ void myGlutWin::myInitGL()
 void myGlutWin::updateRender()
 {
 	if (m_render == NULL)
-		m_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts) ;
+		m_render = new Algo::Render::VBO::MapRender_VBO() ;
 
-	m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-//	m_render->initPrimitives(Algo::Render::VBO::LINES);
+	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::VBO::TRIANGLES);
+//	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::VBO::LINES);
 	m_render->updateData(Algo::Render::VBO::POSITIONS, position);
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
@@ -551,7 +539,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		d_edges.clear();
 		d_vertices.clear();
 		std::vector<Dart> darts;
-		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, allDarts);
+		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, SelectorTrue());
 
 		glPopMatrix();
 
@@ -581,7 +569,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		d_edges.clear();
 		d_vertices.clear();
 		std::vector<Dart> darts;
-		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, allDarts);
+		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, SelectorTrue());
 
 		glPopMatrix();
 
@@ -620,7 +608,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		d_edges.clear();
 		d_vertices.clear();
 	
-		Algo::Selection:: facesRaySelection<PFP>(myMap, position, allDarts, rayA, AB, d_faces);
+		Algo::Selection:: facesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_faces);
 
 		glPopMatrix();
 
@@ -658,7 +646,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		float dist = computeSelectRadius(x,y,4);
 		std::cout << "Distance obj = "<<dist << std::endl;
 
-		Algo::Selection::edgesRaySelection<PFP>(myMap, position, allDarts, rayA, AB, d_edges,dist);
+		Algo::Selection::edgesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_edges,dist);
 
 		glPopMatrix();
 
@@ -701,7 +689,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 //		float dist = gWidthObj/(100.0f*getScale());
 		float dist = computeSelectRadius(x,y,6);
 
-		Algo::Selection::verticesRaySelection<PFP>(myMap, position,rayA, AB, d_vertices,dist,allDarts);
+		Algo::Selection::verticesRaySelection<PFP>(myMap, position,rayA, AB, d_vertices,dist,SelectorTrue());
 		std::cout << "Distance obj = "<<dist << std::endl;
 		
 		glPopMatrix();

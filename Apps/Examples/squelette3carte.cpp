@@ -231,8 +231,8 @@ void MyGlutWin::initRender()
     // maj des donnees de position
     m_render->updateData(Algo::Render::VBO::POSITIONS, position );
     // creation des primitives de rendu a partir de la carte
-    m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-    m_render->initPrimitives(Algo::Render::VBO::LINES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
 
     // creation des primitives de rendu de la topologie a partir de la carte
 	m_render_topo->updateData<PFP>(myMap,allDarts,position,coefTopoExplod[0],coefTopoExplod[1],coefTopoExplod[2]);
@@ -315,7 +315,7 @@ int main(int argc, char **argv)
 
 
     // allocation des objets necessaires pour le rendu
-    mgw->m_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts);
+    mgw->m_render = new Algo::Render::VBO::MapRender_VBO();
     //mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMap<PFP::MAP>();
     mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
 

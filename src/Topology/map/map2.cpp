@@ -56,6 +56,23 @@ void Map2::splitVertex(Dart d, Dart e)
 	phi2sew(phi1(dd), phi1(ee));// Sew the two faces along the new edge
 }
 
+bool Map2::deleteVertex(Dart d)
+{
+	if(isBoundaryVertex(d))
+		return false ;
+
+	Dart vit = d ;
+	do
+	{
+		Dart f = phi_1(phi2(vit)) ;
+		phi1sew(vit, f) ;
+		vit = alpha1(vit) ;
+	} while(vit != d) ;
+	Map1::deleteFace(d) ;
+
+	return true ;
+}
+
 void Map2::cutEdge(Dart d)
 {
 	Map1::cutEdge(d);		// Cut the edge of d
