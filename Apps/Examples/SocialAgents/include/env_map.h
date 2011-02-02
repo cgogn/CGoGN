@@ -4,6 +4,7 @@
 #include <iostream>
 // #include "Definitions.h"
 
+#include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
 
@@ -23,28 +24,19 @@ using namespace CGoGN;
 
 class Agent;
 
-struct PFP {
+struct PFP: public PFP_STANDARD
+{
 	// definition de la carte
 // 	typedef EmbeddedMap2<Map2> MAP;
  	typedef Algo::IHM::ImplicitHierarchicalMap MAP;
-	// definition du type de reel utilise
-	typedef float REAL;
-	// definition du type de vecteur (point) utilise
-	typedef Geom::Vec3f VEC3;
 	// definition des listes d'agent
 // 	typedef std::vector<Agent *> AGENTS;
 	typedef std::vector<Agent * > AGENTS;
 	typedef NoMathIONameAttribute<AGENTS > AGENTVECT;
 
-	typedef AttributeHandler<VEC3> TVEC3;
 
 	typedef AttributeHandler<AGENTVECT> TAB_AGENTVECT;
 
-	// definition des cellules abstraites
-// 	typedef MAP::EVertex EVERTEX;
-// 	typedef MAP::EEdge EEDGE;
-// 	typedef MAP::EFace EFACE;
-//	typedef MAP::EVolume EVOLUME;
 };
 
 typedef PFP::VEC3 VEC3 ;

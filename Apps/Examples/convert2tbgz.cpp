@@ -40,7 +40,7 @@
 gmtl::Vec3f gMax;
 gmtl::Vec3f gMin;
 
-struct PFP
+struct PFP: public PFP_STANDARD
 {
 	typedef DartObj<DP::DefaultDartParameters> DART;
 	typedef e0mapd2<DART> MAP;

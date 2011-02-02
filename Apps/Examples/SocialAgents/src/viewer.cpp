@@ -63,15 +63,15 @@ void MyGlutWin::init()
 
 // 	topo_render = new Algo::Render::VBO::topo_VBORenderMapD() ;
 
-// 	m_render = new Algo::Render::VBO::MapRender_VBO<PFP>(sim->envMap.map, allDarts) ;
-// 	m_render->initPrimitives(Algo::Render::VBO::TRIANGLES) ;
+// 	m_render = new Algo::Render::VBO::MapRender_VBO(sim->envMap.map, allDarts) ;
+// 	m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::TRIANGLES) ;
 // 	m_render->updateData(Algo::Render::VBO::POSITIONS, sim->envMap.position) ;
 
 // 	Algo::Geometry::computeNormalFaces<PFP>(sim->envMap.map, sim->envMap.position, sim->envMap.normal) ;
 // 	m_render->updateData(Algo::Render::VBO::NORMALS, sim->envMap.normal) ;;
 
-// 	m_render->initPrimitives(Algo::Render::VBO::TRIANGLES) ;
-// 	m_render->initPrimitives(Algo::Render::VBO::LINES) ;
+// 	m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::TRIANGLES) ;
+// 	m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::LINES) ;
 }
 
 void MyGlutWin::initGUI()

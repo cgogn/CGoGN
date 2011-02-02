@@ -236,8 +236,8 @@ void myGlutWin::initDL(void)
 
 	vbor = new VBORenderType(myMap,allDarts, my_vbo_cb);
  	vbor->initData(0,invertedNormals);
- 	vbor->initPrimitives(Algo::Render::VBO::VBO_TRIANGLES);
-	vbor->initPrimitives(Algo::Render::VBO::VBO_LINES);
+ 	vbor->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::VBO_TRIANGLES);
+	vbor->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::VBO_LINES);
 
 
 //	vbor->initEmb_Flat_Exploded(myMap.getNbDarts() , true, invertedNormals,0.8f);

@@ -21,6 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#include "Topology/generic/dartmarker.h"
+#include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
 {
@@ -34,31 +36,10 @@ namespace Render
 namespace VBO
 {
 
-template<typename PFP>
-MapRender_VBO<PFP>::MapRender_VBO(MAP& map, const FunctorSelect& good) :
-	m_map(map),
-	m_good(good),
-	m_nbIndicesTri(0),
-	m_nbIndicesLines(0)
-{
-	glGenBuffersARB(NB_BUFFERS, m_VBOBuffers) ;
-	for(unsigned int i = 0; i < NB_BUFFERS; ++i)
-	{
-		m_allocatedBuffers[i] = false ;
-		m_usedBuffers[i] = false ;
-	}
-}
 
-template<typename PFP>
-MapRender_VBO<PFP>::~MapRender_VBO()
-{
-	glDeleteBuffersARB(NB_BUFFERS, m_VBOBuffers);
-	delete[] m_VBOBuffers ;
-}
 
-template <typename PFP>
 template <typename ATTR_HANDLER>
-void MapRender_VBO<PFP>::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	// choisit le bon buffer en fonction du paramètre upType
 	unsigned int indexVBO = -1 ;
@@ -70,7 +51,7 @@ void MapRender_VBO<PFP>::updateData(int upType, const ATTR_HANDLER& attrib, Conv
 		indexVBO = COLORS_BUFFER ;
 	else
 	{
-		std::cout << "MapRender_VBO<PFP>::updateData : should not get here.. Bad type to update.." << std::endl ;
+		std::cout << "MapRender_VBO::updateData : should not get here.. Bad type to update.." << std::endl ;
 		return ;
 	}
 
@@ -83,35 +64,10 @@ void MapRender_VBO<PFP>::updateData(int upType, const ATTR_HANDLER& attrib, Conv
 		fillBufferDirect(indexVBO, attrib) ;
 }
 
-template <typename PFP>
-inline void MapRender_VBO<PFP>::enableBuffers(int buffersMask)
-{
-	if((buffersMask & POSITIONS) && m_allocatedBuffers[POSITIONS_BUFFER])
-		m_usedBuffers[POSITIONS_BUFFER] = true ;
 
-	if((buffersMask & NORMALS) && m_allocatedBuffers[NORMALS_BUFFER])
-		m_usedBuffers[NORMALS_BUFFER] = true ;
 
-	if((buffersMask & COLORS) && m_allocatedBuffers[COLORS_BUFFER])
-		m_usedBuffers[COLORS_BUFFER] = true ;
-}
-
-template <typename PFP>
-inline void MapRender_VBO<PFP>::disableBuffers(int buffersMask)
-{
-	if((buffersMask & POSITIONS))
-		m_usedBuffers[POSITIONS_BUFFER] = false ;
-
-	if((buffersMask & NORMALS))
-		m_usedBuffers[NORMALS_BUFFER] = false ;
-
-	if((buffersMask & COLORS))
-		m_usedBuffers[COLORS_BUFFER] = false ;
-}
-
-template <typename PFP>
 template <typename ATTR_HANDLER>
-void MapRender_VBO<PFP>::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
+void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
 {
 	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -132,9 +88,9 @@ void MapRender_VBO<PFP>::fillBufferDirect(unsigned int indexVBO, const ATTR_HAND
 	}
 }
 
-template <typename PFP>
+
 template <typename ATTR_HANDLER>
-void MapRender_VBO<PFP>::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -167,57 +123,57 @@ void MapRender_VBO<PFP>::fillBufferConvert(unsigned int indexVBO, const ATTR_HAN
 }
 
 template<typename PFP>
-inline void MapRender_VBO<PFP>::addTri(Dart d, std::vector<GLuint>& tableIndices)
+inline void MapRender_VBO::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
 {
 	Dart a = d;
-	Dart b = m_map.phi1(a);
-	Dart c = m_map.phi1(b);
+	Dart b = map.phi1(a);
+	Dart c = map.phi1(b);
 	
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
 	do
 	{
-		tableIndices.push_back(m_map.getEmbedding(d, VERTEX_ORBIT));
-		tableIndices.push_back(m_map.getEmbedding(b, VERTEX_ORBIT));
-		tableIndices.push_back(m_map.getEmbedding(c, VERTEX_ORBIT));
+		tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
+		tableIndices.push_back(map.getEmbedding(b, VERTEX_ORBIT));
+		tableIndices.push_back(map.getEmbedding(c, VERTEX_ORBIT));
 		b = c;
-		c = m_map.phi1(b);
+		c = map.phi1(b);
 	} while (c != d);
 }
 
 template<typename PFP>
-void MapRender_VBO<PFP>::initTriangles(std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
 {
-	DartMarker m(m_map);
-	tableIndices.reserve(4*m_map.getNbDarts()/3);
+	DartMarker m(map);
+	tableIndices.reserve(4*map.getNbDarts()/3);
 
-	for(Dart dd = m_map.begin(); dd != m_map.end(); m_map.next(dd))
+	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
-		if(!m.isMarked(dd) && m_good(dd))
+		if(!m.isMarked(dd) && good(dd))
 		{
-			addTri(dd, tableIndices);
+			addTri<PFP>(map, dd, tableIndices);
 			m.markOrbit(FACE_ORBIT, dd);
 		}
 	}
 }
 
 template<typename PFP>
-void MapRender_VBO<PFP>::initTrianglesOptimized(std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
 {
 #define LIST_SIZE 20
-	DartMarker m(m_map);
+	DartMarker m(map);
 	// reserve memory for triangles ( nb indices == nb darts )
 	// and a little bit more
 	// if lots of polygonal faces, realloc is done by vector 
-	tableIndices.reserve(4*m_map.getNbDarts()/3);
+	tableIndices.reserve(4*map.getNbDarts()/3);
 
-	for (Dart dd = m_map.begin(); dd != m_map.end(); m_map.next(dd))
+	for (Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
 		if (!m.isMarked(dd))
 		{
 			std::list<Dart> bound;
 
-			if(m_good(dd))
-				addTri(dd,tableIndices);
+			if(good(dd))
+				addTri<PFP>(map,dd,tableIndices);
 			m.markOrbit(FACE_ORBIT, dd);
 			bound.push_back(dd);
 			int nb = 1;
@@ -232,10 +188,10 @@ void MapRender_VBO<PFP>::initTrianglesOptimized(std::vector<GLuint>& tableIndice
 					{
 						if (!m.isMarked(f))
 						{
-							if(m_good(f))
-								addTri(f, tableIndices);
+							if(good(f))
+								addTri<PFP>(map, f, tableIndices);
 							m.markOrbit(FACE_ORBIT, f);
-							bound.push_back(m_map.phi1(f));
+							bound.push_back(map.phi1(f));
 							++nb;
 							if (nb > LIST_SIZE)
 							{
@@ -243,9 +199,9 @@ void MapRender_VBO<PFP>::initTrianglesOptimized(std::vector<GLuint>& tableIndice
 								--nb;
 							}
 						}
-						f = m_map.phi1(m_map.phi2(f));
+						f = map.phi1(map.phi2(f));
 					} while (f != ee);
-					ee = m_map.phi1(ee);
+					ee = map.phi1(ee);
 				} while (ee != e);
 
 				bound.pop_back();
@@ -257,31 +213,31 @@ void MapRender_VBO<PFP>::initTrianglesOptimized(std::vector<GLuint>& tableIndice
 }
 
 template<typename PFP>
-void MapRender_VBO<PFP>::initLines(std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
 {
-	DartMarker m(m_map);
-	tableIndices.reserve(m_map.getNbDarts());
+	DartMarker m(map);
+	tableIndices.reserve(map.getNbDarts());
 
-	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m.isMarked(d) && m_good(d))
+		if(!m.isMarked(d) && good(d))
 		{
-			tableIndices.push_back(m_map.getEmbedding(d, VERTEX_ORBIT));
-			tableIndices.push_back(m_map.getEmbedding(m_map.phi2(d), VERTEX_ORBIT));
+			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
+			tableIndices.push_back(map.getEmbedding(map.phi2(d), VERTEX_ORBIT));
 			m.markOrbit(EDGE_ORBIT, d);
 		}
 	}
 }
 
 template<typename PFP>
-void MapRender_VBO<PFP>::initLinesOptimized(std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
 {
 #define LIST_SIZE 20
-	DartMarker m(m_map);
+	DartMarker m(map);
 	// reserve memory for edges indices ( nb indices == nb darts)
-	tableIndices.reserve(m_map.getNbDarts());
+	tableIndices.reserve(map.getNbDarts());
 
-	for (Dart dd = m_map.begin(); dd != m_map.end(); m_map.next(dd))
+	for (Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
 		if (!m.isMarked(dd))
 		{
@@ -294,13 +250,13 @@ void MapRender_VBO<PFP>::initLinesOptimized(std::vector<GLuint>& tableIndices)
 				Dart ee = e;
 				do
 				{
-					Dart f = m_map.phi2(ee);
+					Dart f = map.phi2(ee);
 					if (!m.isMarked(ee))
 					{
-						if(m_good(ee))
-							tableIndices.push_back(m_map.getEmbedding(ee, VERTEX_ORBIT));
-						if(m_good(f))
-							tableIndices.push_back(m_map.getEmbedding(m_map.phi1(ee), VERTEX_ORBIT));
+						if(good(ee))
+							tableIndices.push_back(map.getEmbedding(ee, VERTEX_ORBIT));
+						if(good(f))
+							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX_ORBIT));
 						m.markOrbit(EDGE_ORBIT, f);
 
 						bound.push_back(f);
@@ -311,7 +267,7 @@ void MapRender_VBO<PFP>::initLinesOptimized(std::vector<GLuint>& tableIndices)
 							--nb;
 						}
 					}
-					ee = m_map.phi1(f);
+					ee = map.phi1(f);
 				} while (ee != e);
 				bound.pop_back();
 				--nb;
@@ -322,23 +278,23 @@ void MapRender_VBO<PFP>::initLinesOptimized(std::vector<GLuint>& tableIndices)
 }
 
 template<typename PFP>
-void MapRender_VBO<PFP>::initPoints(std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
 {
-	CellMarker m(m_map, VERTEX_ORBIT) ;
-	tableIndices.reserve(m_map.getNbDarts()/5);
+	CellMarker m(map, VERTEX_ORBIT) ;
+	tableIndices.reserve(map.getNbDarts()/5);
 
-	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m.isMarked(d) && m_good(d))
+		if(!m.isMarked(d) && good(d))
 		{
-			tableIndices.push_back(m_map.getEmbedding(d, VERTEX_ORBIT));
+			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
 			m.mark(d) ;
 		}
 	}
 }
 
 template<typename PFP>
-void MapRender_VBO<PFP>::initPrimitives(int prim, bool optimized)
+void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized)
 {
 	std::vector<GLuint> tableIndices;
 
@@ -347,27 +303,27 @@ void MapRender_VBO<PFP>::initPrimitives(int prim, bool optimized)
 	switch(prim)
 	{
 		case FLAT_TRIANGLES:
-			initFlatTriangles();
+			initFlatTriangles<PFP>(map,good);
 			break;
 
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized(tableIndices);
+				initTrianglesOptimized<PFP>(map,good,tableIndices);
 			else
-				initTriangles(tableIndices) ;
+				initTriangles<PFP>(map,good,tableIndices) ;
 			m_nbIndicesTri = tableIndices.size();
 			vbo_ind = m_VBOBuffers[TRIANGLE_INDICES];
 			break;
 		case LINES:
 			if(optimized)
-				initLinesOptimized(tableIndices);
+				initLinesOptimized<PFP>(map,good,tableIndices);
 			else
-				initLines(tableIndices) ;
+				initLines<PFP>(map,good,tableIndices) ;
 			m_nbIndicesLines = tableIndices.size();
 			vbo_ind = m_VBOBuffers[LINE_INDICES];
 			break;
 		case POINTS:
-			initPoints(tableIndices);
+			initPoints<PFP>(map,good,tableIndices);
 			m_nbIndicesPoints = tableIndices.size();
 			vbo_ind = m_VBOBuffers[POINT_INDICES];
 			break;
@@ -382,235 +338,14 @@ void MapRender_VBO<PFP>::initPrimitives(int prim, bool optimized)
 	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
-template<typename PFP>
-void MapRender_VBO<PFP>::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
-{
-	// indice du VBO a utiliser
-	int vbo_ind = 0;
-	switch(prim)
-	{
-		case TRIANGLES:
-			m_nbIndicesTri = tableIndices.size();
-			vbo_ind = m_VBOBuffers[TRIANGLE_INDICES];
-			break;
-		case LINES:
-			m_nbIndicesLines = tableIndices.size();
-			vbo_ind = m_VBOBuffers[LINE_INDICES];
-			break;
-		case POINTS:
-			m_nbIndicesPoints = tableIndices.size();
-			vbo_ind = m_VBOBuffers[POINT_INDICES];
-			break;
-		case FLAT_TRIANGLES:
-			initFlatTriangles();
-			break;
-		default:
-			std::cerr << "problem initializing VBO indices" << std::endl;
-			break;
-	}
-	int size = tableIndices.size();
 
-	// setup du buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
-}
+
 
 template<typename PFP>
-void MapRender_VBO<PFP>::drawTriangles(bool bindColors)
-{
-	// buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[TRIANGLE_INDICES]);
-	glEnableClientState(GL_INDEX_ARRAY);
-
-	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
-	{
-		if(m_usedBuffers[i])
-		{
-			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
-			switch(i)
-			{
-				case POSITIONS_BUFFER :
-					glVertexPointer(3, GL_FLOAT, 0, 0);
-					glEnableClientState(GL_VERTEX_ARRAY);
-					break ;
-				case NORMALS_BUFFER :
-					glNormalPointer(GL_FLOAT, 0, 0);
-					glEnableClientState(GL_NORMAL_ARRAY);
-					break ;
-				case COLORS_BUFFER :
-					if (bindColors) {
-						glColorPointer(4, GL_FLOAT, 0, 0);
-						glEnableClientState(GL_COLOR_ARRAY);
-					}
-					break ;
-			}
-		}
-	}
-
-	glDrawElements(GL_TRIANGLES, m_nbIndicesTri, GL_UNSIGNED_INT, 0);
-	glDisableClientState(GL_INDEX_ARRAY);
-
-	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
-	{
-		if(m_usedBuffers[i])
-		{
-			switch(i)
-			{
-				case POSITIONS_BUFFER :
-					glDisableClientState(GL_VERTEX_ARRAY);
-					break ;
-				case NORMALS_BUFFER :
-					glDisableClientState(GL_NORMAL_ARRAY);
-					break ;
-				case COLORS_BUFFER :
-					if (bindColors) {
-						glDisableClientState(GL_COLOR_ARRAY);
-					}
-					break ;
-			}
-		}
-	}
-}
-
-template<typename PFP>
-void MapRender_VBO<PFP>::drawLines(bool bindColors)
-{
-	// buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[LINE_INDICES]);
-	glEnableClientState(GL_INDEX_ARRAY);
-
-	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
-	{
-		if(m_usedBuffers[i])
-		{
-			switch(i)
-			{
-				case POSITIONS_BUFFER :
-					glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
-					glVertexPointer(3, GL_FLOAT, 0, 0);
-					glEnableClientState(GL_VERTEX_ARRAY);
-					break ;
-				case NORMALS_BUFFER :
-					break ;
-				case COLORS_BUFFER :
-					if (bindColors) {
-						glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
-						glColorPointer(4, GL_FLOAT, 0, 0);
-						glEnableClientState(GL_COLOR_ARRAY);
-					}
-					break ;
-			}
-		}
-	}
-
-	glDrawElements(GL_LINES, m_nbIndicesLines, GL_UNSIGNED_INT, 0);
-	glDisableClientState(GL_INDEX_ARRAY);
-
-	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
-	{
-		if(m_usedBuffers[i])
-		{
-			switch(i)
-			{
-				case POSITIONS_BUFFER :
-					glDisableClientState(GL_VERTEX_ARRAY);
-					break ;
-				case NORMALS_BUFFER :
-					break ;
-				case COLORS_BUFFER :
-					if (bindColors) {
-						glDisableClientState(GL_COLOR_ARRAY) ;
-					}
-					break ;
-			}
-		}
-	}
-}
-
-template<typename PFP>
-void MapRender_VBO<PFP>::drawPoints(bool bindColors)
-{
-	// buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[POINT_INDICES]);
-	glEnableClientState(GL_INDEX_ARRAY);
-
-	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
-	{
-		if(m_usedBuffers[i])
-		{
-			switch(i)
-			{
-				case POSITIONS_BUFFER :
-					glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
-					glVertexPointer(3, GL_FLOAT, 0, 0);
-					glEnableClientState(GL_VERTEX_ARRAY);
-					break ;
-				case NORMALS_BUFFER :
-					break ;
-				case COLORS_BUFFER :
-					if (bindColors) {
-						glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
-						glColorPointer(4, GL_FLOAT, 0, 0);
-						glEnableClientState(GL_COLOR_ARRAY);
-					}
-					break ;
-			}
-		}
-	}
-
-	glDrawElements(GL_POINTS, m_nbIndicesPoints, GL_UNSIGNED_INT, 0) ;
-	glDisableClientState(GL_INDEX_ARRAY);
-
-	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
-	{
-		if(m_usedBuffers[i])
-		{
-			switch(i)
-			{
-				case POSITIONS_BUFFER :
-					glDisableClientState(GL_VERTEX_ARRAY);
-					break ;
-				case NORMALS_BUFFER :
-					break ;
-				case COLORS_BUFFER :
-					if (bindColors) {
-						glDisableClientState(GL_COLOR_ARRAY);
-					}
-					break ;
-				default:
-					break;
-			}
-		}
-	}
-}
-
-template<typename PFP>
-inline void MapRender_VBO<PFP>::draw(int prim, bool bindColors)
-{ 
-	switch(prim)
-	{	
-		case TRIANGLES:
-			drawTriangles(bindColors);
-			break;
-		case LINES:
-			drawLines(bindColors);
-			break;
-		case POINTS:
-			drawPoints(bindColors);
-			break;
-		case FLAT_TRIANGLES:
-			drawFlat();
-			break;
-		default:
-			break;
-	}
-}
-
-template<typename PFP>
-void MapRender_VBO<PFP>::initFlatTriangles()
+void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good)
 {
 	std::vector<Geom::Vec3f> tableFlat;
-	tableFlat.reserve(3*m_map.getNbDarts()); // 3 in case of polygonal faces (less chance of realloc, but bigger allocation)
+	tableFlat.reserve(3*map.getNbDarts()); // 3 in case of polygonal faces (less chance of realloc, but bigger allocation)
 
 	// map VBO of points for vertices positions
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[POSITIONS_BUFFER]);
@@ -618,18 +353,18 @@ void MapRender_VBO<PFP>::initFlatTriangles()
 
 	m_nbFlatElts=0;
 	// traversal of map for creating buffers
-	DartMarker m(m_map);
-	for(Dart dd = m_map.begin(); dd != m_map.end(); m_map.next(dd))
+	DartMarker m(map);
+	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
-		if(!m.isMarked(dd) && m_good(dd))
+		if(!m.isMarked(dd) && good(dd))
 		{
 			Dart a = dd;
-			Dart b = m_map.phi1(a);
-			Dart c = m_map.phi1(b);
+			Dart b = map.phi1(a);
+			Dart c = map.phi1(b);
 
-			Geom::Vec3f& P = tablePos[m_map.getEmbedding(a, VERTEX_ORBIT)];
-			Geom::Vec3f& Q = tablePos[m_map.getEmbedding(b, VERTEX_ORBIT)];
-			Geom::Vec3f& R = tablePos[m_map.getEmbedding(c, VERTEX_ORBIT)];
+			Geom::Vec3f& P = tablePos[map.getEmbedding(a, VERTEX_ORBIT)];
+			Geom::Vec3f& Q = tablePos[map.getEmbedding(b, VERTEX_ORBIT)];
+			Geom::Vec3f& R = tablePos[map.getEmbedding(c, VERTEX_ORBIT)];
 
 			Geom::Vec3f U = Q-P;
 			Geom::Vec3f V = R-P;
@@ -639,14 +374,14 @@ void MapRender_VBO<PFP>::initFlatTriangles()
 			// loop to cut a polygon in triangle on the fly (works only with convex faces)
 			do
 			{
-				tableFlat.push_back(tablePos[m_map.getEmbedding(a, VERTEX_ORBIT)]);
+				tableFlat.push_back(tablePos[map.getEmbedding(a, VERTEX_ORBIT)]);
 				tableFlat.push_back(N);
-				tableFlat.push_back(tablePos[m_map.getEmbedding(b, VERTEX_ORBIT)]);
+				tableFlat.push_back(tablePos[map.getEmbedding(b, VERTEX_ORBIT)]);
 				tableFlat.push_back(N);
-				tableFlat.push_back(tablePos[m_map.getEmbedding(c, VERTEX_ORBIT)]);
+				tableFlat.push_back(tablePos[map.getEmbedding(c, VERTEX_ORBIT)]);
 				tableFlat.push_back(N);
 				b = c;
-				c = m_map.phi1(b);
+				c = map.phi1(b);
 			} while (c != dd);
 			m.markOrbit(FACE_ORBIT, dd);
 		}
@@ -662,20 +397,7 @@ void MapRender_VBO<PFP>::initFlatTriangles()
 }
 
 
-template<typename PFP>
-void MapRender_VBO<PFP>::drawFlat()
-{
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[FLAT_BUFFER]);
- 	glVertexPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
-	glNormalPointer(GL_FLOAT, 6*sizeof(GL_FLOAT),   (GLvoid*)(3*sizeof(GL_FLOAT)));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
 
-	glDrawArrays(GL_TRIANGLES, 0, m_nbFlatElts);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-}
 
 
 } // namespace VBO

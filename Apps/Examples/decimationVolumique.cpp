@@ -148,12 +148,12 @@ void MyGlutWin::myRedraw(void)
 	if(render_obj)
 	{
 		m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-		//m_render->initPrimitives(Algo::Render::VBO::POINTS);
+		//m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::POINTS);
 
 		if(renderObjStyle == O_ALL)
 		{
-			m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-		    m_render->initPrimitives(Algo::Render::VBO::LINES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
+		    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
 
 			glEnable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( 1.0f, 1.0f );
@@ -171,7 +171,7 @@ void MyGlutWin::myRedraw(void)
 		}
 		else if(renderObjStyle == O_FACES)
 		{
-			m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
 
 			glEnable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( 1.0f, 1.0f );
@@ -182,7 +182,7 @@ void MyGlutWin::myRedraw(void)
 		}
 		else if(renderObjStyle == O_LINE)
 		{
-			m_render->initPrimitives(Algo::Render::VBO::LINES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
 
 			// on trace les ligne devant
 			glDisable( GL_POLYGON_OFFSET_FILL );
@@ -277,8 +277,8 @@ void MyGlutWin::initRender()
 	std::cout << "updateData: "<< seconds << "sec" << std::endl;
     // creation des primitives de rendu a partir de la carte
 	t1 = glutGet(GLUT_ELAPSED_TIME);
-    m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-    m_render->initPrimitives(Algo::Render::VBO::LINES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
     t2 = glutGet(GLUT_ELAPSED_TIME);
     seconds = (t2 - t1) / 1000.0f;
     std::cout << "initPrimitives: "<< seconds << "sec" << std::endl;
@@ -414,7 +414,7 @@ int main(int argc, char **argv)
 
 
     // allocation des objets necessaires pour le rendu
-    mgw->m_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts);
+    mgw->m_render = new Algo::Render::VBO::MapRender_VBO();
     //mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMap<PFP::MAP>();
     mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
 

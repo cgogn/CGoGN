@@ -26,6 +26,7 @@
 
 #include "Utils/glutwin.h"
 
+#include "Topology/generic/parameters.h"
 #include "Topology/map/map3.h"
 #include "Topology/generic/embeddedMap3.h"
 
@@ -51,23 +52,12 @@
 
 using namespace CGoGN ;
 
-struct PFP {
+struct PFP: public PFP_STANDARD
+{
 	// definition de la carte
 	typedef EmbeddedMap3<Map3> MAP;
 	//typedef Map3 MAP;
 
-
-	// definition du type de reel utilise
-	typedef float REAL;
-	// definition du type de vecteur (point) utilise
-	typedef Geom::Vector<3,REAL> VEC3;
-	// definition du type de matrice 3x3 utilise
-	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	// definition du type de matrice 4x4 utilise
-	typedef Geom::Matrix<4,4,REAL> MATRIX44;
-
-	// definition du type du AttributeHandler de vecteur 3D
-	typedef AttributeHandler<VEC3> TVEC3;
 };
 
 PFP::MAP myMap;
@@ -92,8 +82,10 @@ public:
      bool render_volume;
      bool render_topo;
 
-    Algo::Render::VBO::MapRender_VBO<PFP>* m_render;
+    Algo::Render::VBO::MapRender_VBO* m_render;
     Algo::Render::VBO::topo3_VBORenderMapD* m_render_topo;
+
+    void updateVBO();
 
  	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY)
     {
@@ -169,6 +161,16 @@ void myGlutWin::myRedraw(void)
 
 
 }
+
+void myGlutWin::updateVBO()
+{
+	m_render->updateData(Algo::Render::VBO::POSITIONS, position );
+	m_render->initPrimitives<PFP>(myMap,allDarts,Algo::Render::VBO::LINES);
+	m_render->initPrimitives<PFP>(myMap,allDarts,Algo::Render::VBO::POINTS);
+	m_render->initPrimitives<PFP>(myMap,allDarts,Algo::Render::VBO::TRIANGLES);
+	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
+}
+
 
 /// Gestion des touches clavier
 void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
@@ -256,11 +258,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
         			std::cout << "boundary : " << myMap.isBoundaryVolume(d) << std::endl;
 
-        			m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-        			m_render->initPrimitives(Algo::Render::VBO::POINTS);
-        			m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-        			m_render->initPrimitives(Algo::Render::VBO::LINES);
-        			m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+        			updateVBO();
         			glutPostRedisplay();
         			break;
         		}
@@ -283,11 +281,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 						myMap.collapseEdge(d);
 
-						m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-						m_render->initPrimitives(Algo::Render::VBO::POINTS);
-						m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-					    m_render->initPrimitives(Algo::Render::VBO::LINES);
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+						updateVBO();
 						glutPostRedisplay();
 						break;
         		}
@@ -310,12 +304,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 //       				myMap.collapseEdge(d1);
 //        				myMap.collapseEdge(d11,false,false);
 
-
-						m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-						m_render->initPrimitives(Algo::Render::VBO::LINES);
-						m_render->initPrimitives(Algo::Render::VBO::POINTS);
-						m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-						m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
+						updateVBO();
 						glutPostRedisplay();
 						break;
         		}
@@ -333,12 +322,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 						Algo::Modelisation::hexaCutVolume<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap,d , position);
 
-
-        				m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-        				m_render->initPrimitives(Algo::Render::VBO::LINES);
-        				m_render->initPrimitives(Algo::Render::VBO::POINTS);
-        				m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+						updateVBO();
         				glutPostRedisplay();
         				break;
         		}
@@ -364,41 +348,24 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
                 }
                 case '1': {
                 		Algo::Modelisation::Tetrahedron::swap2To2<PFP>(myMap, dglobal, position);
-                		m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-						m_render->initPrimitives(Algo::Render::VBO::POINTS);
-						m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-						m_render->initPrimitives(Algo::Render::VBO::LINES);
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+                		updateVBO();
 						glutPostRedisplay();
                         break;
                 }
                 case '2' : {
 						Algo::Modelisation::Tetrahedron::swap4To4<PFP>(myMap, dglobal, position);
-						m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-						m_render->initPrimitives(Algo::Render::VBO::POINTS);
-						m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-						m_render->initPrimitives(Algo::Render::VBO::LINES);
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
-						glutPostRedisplay();
+						updateVBO();						glutPostRedisplay();
 						break;
                 }
                 case '3' : {
 						Algo::Modelisation::Tetrahedron::swap2To3<PFP>(myMap, dglobal, position);
-						m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-						m_render->initPrimitives(Algo::Render::VBO::POINTS);
-						m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-						m_render->initPrimitives(Algo::Render::VBO::LINES);
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+						updateVBO();
 						glutPostRedisplay();
                 		break;
                 }
                 case '4' : {
                 		Algo::Modelisation::Tetrahedron::swap3To2<PFP>(myMap, dglobal, position);
-                		m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-                		m_render->initPrimitives(Algo::Render::VBO::POINTS);
-                		m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-                		m_render->initPrimitives(Algo::Render::VBO::LINES);
-                		m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+                		updateVBO();
                 		glutPostRedisplay();
                 		break;
                 }
@@ -473,21 +440,11 @@ int main(int argc, char **argv)
 
 
     // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts);
-    //mgw.m_render_topo = new Algo::Render::VBO::topo3_VBORenderMap<PFP::MAP>();
+    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
     mgw.m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
 
 
-
-    // maj des donnees de position
-    mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
-    // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-    mgw.m_render->initPrimitives(Algo::Render::VBO::LINES);
-    mgw.m_render->initPrimitives(Algo::Render::VBO::POINTS);
-
-    // creation des primitives de rendu de la topologie a partir de la carte
-    mgw.m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
+    mgw.updateVBO();
 
 
 

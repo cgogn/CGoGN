@@ -380,9 +380,9 @@ void MyGlutWin::init()
 
 	origResVertexMarker->markAll() ;
 
-	vbo_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, *activeDartsSelector) ;
-	updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES) ;
-	updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+	vbo_render = new Algo::Render::VBO::MapRender_VBO() ;
+	updateVBOprimitives( Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES) ;
+	updateVBOdata( Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 	usePrecomputedTableIndices = false ;
 }
 
@@ -717,10 +717,10 @@ void MyGlutWin::computeVBOprimitives()
 	{
 		unsigned int l = (float(i)/100.0f)*(m_pmesh->nbSplits()) ;
 		m_pmesh->gotoLevel(l) ;
-		vbo_render->initTriangles(triangleTableIndices[i]) ;
-		vbo_render->initLines(lineTableIndices[i]) ;
-//		vbo_render->optimizedTriangles(triangleTableIndices[i]) ;
-//		vbo_render->optimizedLines(lineTableIndices[i]) ;
+		vbo_render->initTriangles<PFP>(myMap, *activeDartsSelector, triangleTableIndices[i]) ;
+		vbo_render->initLines<PFP>(myMap, *activeDartsSelector, lineTableIndices[i]) ;
+//		vbo_render->optimizedTriangles<PFP>(myMap, *activeDartsSelector, triangleTableIndices[i]) ;
+//		vbo_render->optimizedLines<PFP>(myMap, *activeDartsSelector, lineTableIndices[i]) ;
 	}
     GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
     GLfloat seconds = (t2 - t1) / 1000.0f ;
@@ -741,17 +741,17 @@ void MyGlutWin::updateVBOprimitives(int upType)
 	if(upType & Algo::Render::VBO::TRIANGLES)
 	{
 		if(usePrecomputedTableIndices)
-			vbo_render->initPrimitives(Algo::Render::VBO::TRIANGLES, triangleTableIndices[currentLevel]) ;
+			vbo_render->initPrimitives( Algo::Render::VBO::TRIANGLES, triangleTableIndices[currentLevel]) ;
 		else
-			vbo_render->initPrimitives(Algo::Render::VBO::TRIANGLES) ;
+			vbo_render->initPrimitives<PFP>(myMap, *activeDartsSelector, Algo::Render::VBO::TRIANGLES) ;
 	}
 
 	if(upType & Algo::Render::VBO::LINES)
 	{
 		if(usePrecomputedTableIndices)
-			vbo_render->initPrimitives(Algo::Render::VBO::LINES, lineTableIndices[currentLevel]) ;
+			vbo_render->initPrimitives( Algo::Render::VBO::LINES, lineTableIndices[currentLevel]) ;
 		else
-			vbo_render->initPrimitives(Algo::Render::VBO::LINES) ;
+			vbo_render->initPrimitives<PFP>(myMap, *activeDartsSelector, Algo::Render::VBO::LINES) ;
 	}
 }
 
