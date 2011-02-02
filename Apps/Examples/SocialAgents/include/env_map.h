@@ -78,6 +78,7 @@ class EnvMap
 // 		std::vector<Dart> subdividedDarts;
 		Dart dSimplify;
 		Dart dSubdivide;
+		std::list<Dart> filledFaces;
 
 		EnvMap();
 
@@ -104,7 +105,7 @@ class EnvMap
 		void findAgentContactInFace(Dart d, PFP::VEC3 pos, float radius, std::vector<Dart>& l_contact_Dart,DartMarker& m);
 
 // 		void insertObstacleOfFace(Agent * agent, const Dart d);
-		void insertObstacleOfFace(PFP::AGENTS agents,const Dart d);
+		void insertObstacleOfFace(PFP::AGENTS agents,Dart d);
 		
 // 		void getAllFacesOfAgent(Agent * agent, Dart d, PFP::VEC3 pos, float radius);
 		void getAllFacesOfAgents(Dart d);
@@ -126,6 +127,10 @@ class EnvMap
 		void subdivideFaces();
 
 		void simplifyFaces();
+
+		void pushFaceToSubdivide(Dart d);
+
+		std::list<Dart>::iterator popFaceToSubdivide(Dart d);
 
 		void pushAgentInCell(Agent * agent, Dart d);
 

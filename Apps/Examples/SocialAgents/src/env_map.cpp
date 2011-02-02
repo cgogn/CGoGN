@@ -216,23 +216,20 @@ Dart EnvMap::getBelongingCell(const PFP::VEC3& pos)
 	return map.begin();
 }
 
-void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,const Dart d)
+void EnvMap::insertObstacleOfFace(PFP::AGENTS agents,Dart d)
 {
-	if(map.getDartLevel(map.faceOldestDart(d))==0) {
-
-		Dart dd =d;
-		do {
-			if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
-				for(PFP::AGENTS::iterator it=agents.begin(); it!= agents.end(); ++it) {
-	// 				if(leftOf((*it)->part->m_position,position[dd],position[map.phi1(dd)])<0.0f) {
-						(*it)->insertObstacleNeighbor(dd);
-	// 				}
-				}
-	//			return;
+	Dart dd =d;
+	do {
+		if(closeMark.isMarked(dd) /*&& (position[map.phi2(dd)][2]==0.0 || position[map.phi1(map.phi2(dd))][2] ==0.0f)*/) {
+			for(PFP::AGENTS::iterator it=agents.begin(); it!= agents.end(); ++it) {
+// 				if(leftOf((*it)->part->m_position,position[dd],position[map.phi1(dd)])<0.0f) {
+					(*it)->insertObstacleNeighbor(dd);
+// 				}
 			}
-			dd = map.phi1(dd);
-		} while (dd!=d);
-	}
+//			return;
+		}
+		dd = map.phi1(dd);
+	} while (dd!=d);
 }
 
 void EnvMap::getAllFacesOfAgents(Dart d)
@@ -304,9 +301,31 @@ void EnvMap::getAllFacesOfAgents(Dart d)
 // 	}while(dd!=d);
 }
 
+void EnvMap::pushFaceToSubdivide(Dart d)
+{
+	for(std::list<Dart>::iterator it = filledFaces.begin(); it != filledFaces.end() ; ++it) {
+		if(map.sameFace(d,*it))
+			return;
+	}
+	filledFaces.push_back(d);
+}
+
+std::list<Dart>::iterator EnvMap::popFaceToSubdivide(Dart d)
+{
+	for(std::list<Dart>::iterator it = filledFaces.begin(); it != filledFaces.end() ; ++it)
+		if(map.sameFace(d,*it)) {
+			return filledFaces.erase(it);
+		}
+
+	std::cout << "ERROR : cannot pop face to subdivide " << std::endl;
+}
+
 void EnvMap::pushAgentInCell(Agent * agent, Dart d)
 {
 	agentvect[d].push_back(agent);
+	if(agentvect[d].size()==1) {
+		pushFaceToSubdivide(d);
+	}
 }
 
 void EnvMap::popAgentInCell(Agent * agent, Dart d)
@@ -314,6 +333,8 @@ void EnvMap::popAgentInCell(Agent * agent, Dart d)
 	for(PFP::AGENTVECT::iterator it = agentvect[d].begin(); it != agentvect[d].end() ; ++it)
 		if(*it==agent) {
 			agentvect[d].erase(it);
+			if(agentvect[d].size()==0)
+				popFaceToSubdivide(d);
 			return;
 		}
 
@@ -348,12 +369,9 @@ void EnvMap::updateMap()
 
 void EnvMap::subdivideFaces()
 {
-	CellMarker m(map, FACE_CELL) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	for(std::list<Dart>::iterator itF = filledFaces.begin(); itF != filledFaces.end(); ++itF)
 	{
-		if(!m.isMarked(d))
-		{
-			m.mark(d) ;
+		Dart d = *itF;
 			if(!closeMark.isMarked(d) && agentvect[d].size() > 3)
 			{
 				if(!map.faceIsSubdivided(d))
@@ -362,8 +380,8 @@ void EnvMap::subdivideFaces()
 
 					std::vector<Agent*> agents ;
 					agents.swap(agentvect[d]) ;
+					itF = filledFaces.erase(itF);
 
-					unsigned int cur = map.getCurrentLevel() ;
 					unsigned int fLevel = map.faceLevel(d) ;
 
 					map.setCurrentLevel(fLevel) ;
@@ -386,13 +404,10 @@ void EnvMap::subdivideFaces()
 					for(PFP::AGENTS::iterator it = agents.begin(); it != agents.end(); ++it)
 					{
 						resetAgentInFace(*it) ;
-						agentvect[(*it)->part->d].push_back(*it) ;
+						pushAgentInCell(*it,(*it)->part->d);
 					}
-
-					map.setCurrentLevel(cur) ;
 				}
 			}
-		}
 	}
 
 //	for(unsigned int i=0;i<8;++i) {

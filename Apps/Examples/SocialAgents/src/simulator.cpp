@@ -105,7 +105,6 @@ void Simulator::doStep()
 		agents_[i]->computeNewVelocity();
 	}
 
-
 // #pragma omp parallel for
 	for (unsigned int i = 0; i < agents_.size(); ++i) {
 		envMap.popAgentInCell(agents_[i],agents_[i]->part->d);

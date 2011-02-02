@@ -99,10 +99,8 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 			}
 		}
 		else {
-			std::cout << "ploc" << std::endl;
 			Dart dd_vert = m.alpha1(d);
 			while(getOrientationEdge(current,d)==Geom::RIGHT && dd_vert!=d) {
-				std::cout << "tourne" << std::endl;
 				d = m.alpha_1(d);
 
 				if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1]) {
