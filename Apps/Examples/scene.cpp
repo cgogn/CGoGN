@@ -34,9 +34,11 @@
 #include "Geometry/matrix.h"
 #include "Geometry/transfo.h"
 #include "Algo/Geometry/boundingbox.h"
+#include "Algo/Geometry/normal.h"
 
 #include "Algo/Render/vbo_MapRender.h"
 #include "Algo/Modelisation/polyhedron.h"
+#include "Topology/generic/cellmarker.h"
 
 #include "Utils/scene_graph.h"
 
@@ -53,7 +55,7 @@ struct PFP: public PFP_STANDARD
 
 PFP::MAP myMap;
 
-Utils::SceneGraph::Material_Node* root;
+
 
 class myGlutWin: public Utils::SimpleGlutWin
 {
@@ -91,6 +93,9 @@ public:
 	// position handler
 	PFP::TVEC3 position ;
 
+	PFP::TVEC3 normal ;
+
+	Utils::SceneGraph::Group_Node* root;
 
 	/**
 	 * render object
@@ -104,13 +109,19 @@ public:
 				m_render(NULL)
 				 {	}
 
-	~myGlutWin();
+	void exitCallback();
+
+	~myGlutWin() {}
+
 };
 
-myGlutWin::~myGlutWin()
+void myGlutWin::exitCallback()
 {
-	if (m_render)
-		delete m_render;
+	std::cout << "DESTRUCTOR"<< std::endl;
+	eraseGraph(root);
+//	if (m_render)
+//		delete m_render;
+
 }
 
 void myGlutWin::init()
@@ -140,8 +151,13 @@ void myGlutWin::updateRender()
 	m_render->updateData(Algo::Render::VBO::POSITIONS, position);
 	// update flat faces primtives (warning need position buffer)
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::FLAT_TRIANGLES);
+	// update smooth faces primtives
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
 	// update lines primitives
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+
+	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+	m_render->updateData(Algo::Render::VBO::NORMALS, normal);
 
 }
 
@@ -174,7 +190,7 @@ void myGlutWin::myRedraw(void)
 //
 //	glDisable( GL_POLYGON_OFFSET_FILL );
 
-	Utils::SceneGraph::render(root);
+	Utils::SceneGraph::renderGraph(root);
 
 	glPopMatrix();
 }
@@ -183,8 +199,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 {
 	switch(keycode)
 	{
-	case 27:
-		exit(0);
 	default:
 		break;
 	}
@@ -198,61 +212,91 @@ int main(int argc, char **argv)
 	mgw.init();
 
 	mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
 
 
+//	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, mgw.position);
+//	prim1.cylinder_topo(16,16, true, true); // topo of sphere is a closed cylinder
+//	prim1.embedCylinder(40.0f,40.0f,30.0f);
+//
+//	CellMarker mark1(myMap,VERTEX_CELL);
+//	prim1.mark(mark1);
+//
 	// create a sphere
 	Algo::Modelisation::Polyhedron<PFP> prim2(myMap, mgw.position);
 	prim2.cylinder_topo(16,16, true, true); // topo of sphere is a closed cylinder
 	prim2.embedSphere(40.0f);
+//
+//	CellMarker mark2(myMap,VERTEX_CELL);
+//	prim2.mark(mark2);
+//
+//	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+//
+//	Algo::Render::VBO::MapRender_VBO render1 = new Algo::Render::VBO::MapRender_VBO() ;
+//
+//	render1->updateData(Algo::Render::VBO::POSITIONS, position);
+//	render1->updateData(Algo::Render::VBO::NORMALS, normal);
+//		// update flat faces primtives (warning need position buffer)
+//	render1->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::FLAT_TRIANGLES);
+//		// update smooth faces primtives
+//	render1->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
+//		// update lines primitives
+//	render1->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+//
+//
+
+
+
 
 	// update renderer
 	mgw.updateRender();
 
-	root = new Utils::SceneGraph::Material_Node();
-	root->setDiffuse(Geom::Vec4f(0.3f, 1.0f, 0.0f, 1.0f));
-	root->setColor(Geom::Vec4f(0.0f, 0.0f, 0.0f, 1.0f));
+	mgw.root = new Utils::SceneGraph::Group_Node();
 
-	Utils::SceneGraph::VBO_Node* vbon = new Utils::SceneGraph::VBO_Node();
-	vbon->setVBO(mgw.m_render);
+	Utils::SceneGraph::Material_Node* mater = new Utils::SceneGraph::Material_Node();
+	mater->setDiffuse(Geom::Vec4f(0.3f, 1.0f, 0.0f, 1.0f));
+	mater->setColor(Geom::Vec4f(0.0f, 0.0f, 0.0f, 1.0f));
+
+	mgw.root->setMaterial(mater);
+
+	Utils::SceneGraph::VBO_Node* vbon = new Utils::SceneGraph::VBO_Node(mgw.m_render);
 	vbon->setPrimitives(Algo::Render::VBO::FLAT_TRIANGLES);
 
-	root->addChild(vbon);
+	mgw.root->addChild(vbon);
 
-	Utils::SceneGraph::Transfo_Node* transfo = new Utils::SceneGraph::Transfo_Node();
+	Utils::SceneGraph::Group_Node* group1 = new Utils::SceneGraph::Group_Node();
 	Geom::Matrix44f mat;
 	mat.identity();
 	Geom::translate(80.0f, 0.0f, 0.0f,mat);
-	transfo->setMatrix(mat);
+	group1->setMatrixTransfo(mat);
 
-	root->addChild(transfo);
+	mgw.root->addChild(group1);
 
-	vbon = new Utils::SceneGraph::VBO_Node();
-	vbon->setVBO(mgw.m_render);
+	vbon = new Utils::SceneGraph::VBO_Node(mgw.m_render);
+	vbon->setPrimitives(Algo::Render::VBO::TRIANGLES);
+	vbon->setPrimitives(Algo::Render::VBO::LINES);
+
+	group1->addChild(vbon);
+
+
+	Utils::SceneGraph::Group_Node* group2 = new Utils::SceneGraph::Group_Node();
+	mat.identity();
+	Geom::translate(100.0f, 50.0f, 20.0f,mat);
+	group2->setMatrixTransfo(mat);
+
+	mgw.root->addChild(group2);
+
+
+	mater = new Utils::SceneGraph::Material_Node();
+	mater->setDiffuse(Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+	mater->setColor(Geom::Vec4f(1.0f, 1.0f, 0.0f, 1.0f));
+	group2->setMaterial(mater);
+
+	vbon = new Utils::SceneGraph::VBO_Node(mgw.m_render);
 	vbon->setPrimitives(Algo::Render::VBO::FLAT_TRIANGLES);
 	vbon->setPrimitives(Algo::Render::VBO::LINES);
 
-	transfo->addChild(vbon);
-
-
-	transfo = new Utils::SceneGraph::Transfo_Node();
-	mat.identity();
-	Geom::translate(100.0f, 50.0f, 20.0f,mat);
-	transfo->setMatrix(mat);
-
-	root->addChild(transfo);
-
-	Utils::SceneGraph::Material_Node* material = new Utils::SceneGraph::Material_Node();
-	material->setDiffuse(Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
-
-	transfo->addChild(material);
-
-	vbon = new Utils::SceneGraph::VBO_Node();
-	vbon->setVBO(mgw.m_render);
-	vbon->setPrimitives(Algo::Render::VBO::FLAT_TRIANGLES);
-
-	material->addChild(vbon);
-
-	delete root;
+	group2->addChild(vbon);
 
 
 	// compute BB and store it for object positionning in screen
@@ -261,8 +305,6 @@ int main(int argc, char **argv)
 	mgw.gPosObj = Geom::Vec3f(100.0f,0.0f,0.0f);
 
 	mgw.mainLoop();
-
-
 
 	return 0;
 }

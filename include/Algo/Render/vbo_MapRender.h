@@ -109,10 +109,13 @@ protected:
 public:
 	/**
 	 * Constructor
-	 * @param map the map to draw
-	 * @param good functor that return true for darts of part to draw
 	 */
 	MapRender_VBO() ;
+
+	/**
+	 * Constructor that share vertices attributes vbo (position/normals/colors...)
+	 */
+	MapRender_VBO(const MapRender_VBO& mrvbo);
 
 	/**
 	 * Destructor

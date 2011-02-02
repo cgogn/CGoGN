@@ -28,6 +28,8 @@
 #include <vector>
 #include "Algo/Modelisation/subdivision.h"
 #include "Geometry/transfo.h"
+#include "Topology/generic/cellmarker.h"
+
 #include "Utils/os_spec.h"
 
 
@@ -316,9 +318,9 @@ public:
 
 	/**
 	* mark all darts of the Polyhedron
-	* @param m the marker to use
+	* @param m the CellMarker(VERTEX) to use
 	*/
-	void mark(Marker m);
+	void mark(CellMarker m);
 
 	/**
 	* mark all embedded vertices of the Polyhedron
