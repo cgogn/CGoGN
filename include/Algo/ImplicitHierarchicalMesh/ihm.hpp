@@ -255,11 +255,14 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f)
 inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
 {
 	EmbeddedMap2<Map2>::splitFace(d, e) ;
-	unsigned int cur = m_curLevel ;
-	m_curLevel = m_maxLevel ;
-	this->embedOrbit(FACE_ORBIT, d, this->getDartEmbedding(FACE_ORBIT, d)) ;
-	this->embedOrbit(FACE_ORBIT, e, this->getDartEmbedding(FACE_ORBIT, e)) ;
-	m_curLevel = cur ;
+	if(isOrbitEmbedded(FACE_ORBIT))
+	{
+		unsigned int cur = m_curLevel ;
+		m_curLevel = m_maxLevel ;
+		this->embedOrbit(FACE_ORBIT, d, this->getDartEmbedding(FACE_ORBIT, d)) ;
+		this->embedOrbit(FACE_ORBIT, e, this->getDartEmbedding(FACE_ORBIT, e)) ;
+		m_curLevel = cur ;
+	}
 }
 
 /***************************************************
