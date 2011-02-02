@@ -26,6 +26,7 @@
 
 #include "Utils/glutwin.h"
 
+#include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/cellmarker.h"
 
@@ -39,21 +40,10 @@
 
 using namespace CGoGN ;
 
-struct PFP {
+struct PFP: public PFP_STANDARD
+{
 	// definition de la carte
 	typedef Map2 MAP;
-
-	// definition du type de reel utilise
-	typedef float REAL;
-	// definition du type de vecteur (point) utilise
-	typedef Geom::Vector<3,REAL> VEC3;
-	// definition du type de matrice 3x3 utilise
-	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	// definition du type de matrice 4x4 utilise
-	typedef Geom::Matrix<4,4,REAL> MATRIX44;
-
-	// definition du type du AttributeHandler de vecteur 3D
-	typedef AttributeHandler<VEC3> TVEC3;
 };
 
 PFP::MAP myMap;
@@ -75,7 +65,7 @@ public:
      float gWidthObj;
      Geom::Vec3f gPosObj;
 
-     Algo::Render::VBO::MapRender_VBO<PFP>* m_render;
+     Algo::Render::VBO::MapRender_VBO* m_render;
 
  	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY) {}
 };
@@ -173,13 +163,13 @@ int main(int argc, char **argv)
     mgw.gPosObj =  (bb.min() +  bb.max()) /2.0f;
 
     // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts);
+    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
 
     // maj des donnees de position
     mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
     // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives(Algo::Render::VBO::TRIANGLES);
-    mgw.m_render->initPrimitives(Algo::Render::VBO::LINES);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::TRIANGLES);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::LINES);
 
     mgw.mainLoop();
 

@@ -72,8 +72,8 @@ public:
 	void myKeyboard(unsigned char keycode, int x, int y);
 	void myMouse(int button, int state, int x, int y);
 
-	Algo::Render::VBO::MapRender_VBO<PFP>* m_render;
-	Algo::Render::VBO::MapRender_VBO<PFP>* m_render_line ;
+	Algo::Render::VBO::MapRender_VBO* m_render;
+	Algo::Render::VBO::MapRender_VBO* m_render_line ;
 // 	Algo::Render::VBO::topo_MD2_VBORender<PFP>* topo_render ;
 // 	Algo::Render::VBO::topo_VBORenderMapD* topo_render ;
 

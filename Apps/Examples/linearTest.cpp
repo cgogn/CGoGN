@@ -326,9 +326,9 @@ void MyGlutWin::init()
 	K2 = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "K2") ;
 	color = myMap.addAttribute<Geom::Vec4f>(VERTEX_ORBIT, "color") ;
 
-	vbo_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts) ;
-	vbo_render->initPrimitives(Algo::Render::VBO::TRIANGLES) ;
-	vbo_render->initPrimitives(Algo::Render::VBO::LINES) ;
+	vbo_render = new Algo::Render::VBO::MapRender_VBO( ) ;
+	vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES) ;
+	vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES) ;
 	updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 
 	Algo::Geometry::computeLaplacianVertices<PFP>(myMap, Algo::Geometry::TOPOLOGICAL, position, diffCoord) ;

@@ -73,3 +73,14 @@ add_executable( ter_meshesD ../ter_meshes.cpp)
 target_link_libraries( ter_meshesD
         containerD topologyD utilsD algoD ${COMMON_LIBS} )
 
+add_executable( polyhedronsViewD ../polyhedronsView.cpp)
+target_link_libraries( polyhedronsViewD
+        containerD topologyD utilsD algoD ${COMMON_LIBS} )
+
+add_executable( extrusionViewD ../extrusionView.cpp)
+target_link_libraries( extrusionViewD
+        containerD topologyD utilsD algoD ${COMMON_LIBS} )
+        
+add_executable( sceneD ../scene.cpp)
+target_link_libraries( sceneD
+        containerD topologyD utilsD algoD ${COMMON_LIBS} )

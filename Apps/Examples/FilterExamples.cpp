@@ -237,9 +237,9 @@ void MyGlutWin::init()
 
 	myMap.copyAttribute(originalPosition, position) ;
 
-	vbo_render = new Algo::Render::VBO::MapRender_VBO<PFP>(myMap, allDarts) ;
-	vbo_render->initPrimitives(Algo::Render::VBO::TRIANGLES) ;
-	vbo_render->initPrimitives(Algo::Render::VBO::LINES) ;
+	vbo_render = new Algo::Render::VBO::MapRender_VBO() ;
+	vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES) ;
+	vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES) ;
 	updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 }
 
