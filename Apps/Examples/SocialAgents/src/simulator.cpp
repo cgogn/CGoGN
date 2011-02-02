@@ -20,7 +20,7 @@ Simulator::Simulator() : agents_(), defaultAgent_(0), globalTime_(0.0f), timeSte
 //	CGoGN::CityGenerator::generateToboggan<PFP>(envMap.map,envMap.position,envMap.closeMark,100,0.25,200,10);
 
 //	std::cout << "simplify" << std::endl;
- 	envMap.simplify();
+// 	envMap.simplify();
 	envMap.map.init();
 	std::cout << "setup scenario" << std::endl;
  	setupScenario();

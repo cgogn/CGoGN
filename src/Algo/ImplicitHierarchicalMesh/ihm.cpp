@@ -200,8 +200,8 @@ bool ImplicitHierarchicalMap::faceIsSubdividedOnce(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	unsigned int fLevel = faceLevel(d) ;
-	if(fLevel < m_curLevel)
-		return false ;
+	if(fLevel < m_curLevel)		// a face whose level in the current level map is lower than
+		return false ;			// the current level can not be subdivided to higher levels
 
 	unsigned int degree = 0 ;
 	bool subd = false ;
