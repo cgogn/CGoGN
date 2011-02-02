@@ -540,7 +540,6 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			break ;
 		}
 
-
 		case 'v':
 		{
 			srand(time(NULL)) ;
@@ -554,6 +553,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 				updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 				topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 			}
+			glutPostRedisplay() ;
+			break ;
 		}
 
 		case 'x':
