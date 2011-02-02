@@ -100,6 +100,13 @@ public:
 	 */
 	virtual void splitVertex(Dart d, Dart e);
 
+	//! Delete the vertex of d (works only for internal vertices)
+	/*! All the faces around the vertex are merged into one face
+	 *  @param d a dart of the vertex to delete
+	 * @return true if the deletion has been executed, false otherwise
+	 */
+	virtual bool deleteVertex(Dart d) ;
+
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */

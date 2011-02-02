@@ -26,7 +26,7 @@
 
 #include "Utils/glutwin_atb.h"
 
-#include "Topology/map/map2.h"
+#include "Topology/gmap/gmap2.h"
 #include "Topology/generic/embeddedMap2.h"
 
 #include "Geometry/matrix.h"
@@ -49,7 +49,7 @@ using namespace CGoGN ;
 struct PFP
 {
 	// definition of the map
-	typedef EmbeddedMap2<Map2> MAP;
+	typedef EmbeddedMap2<GMap2> MAP;
 
 	// definition of the type of real value
 	typedef float REAL;
@@ -552,7 +552,6 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			break ;
 		}
 
-
 		case 'v':
 		{
 			srand(time(NULL)) ;
@@ -566,6 +565,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 				updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 				topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 			}
+			glutPostRedisplay() ;
+			break ;
 		}
 
 		case 'x':

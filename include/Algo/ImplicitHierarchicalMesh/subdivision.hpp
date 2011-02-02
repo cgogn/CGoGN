@@ -160,7 +160,7 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	do
 	{
 		map.setCurrentLevel(cur + 1) ;
-		map.removeVertex(map.phi1(map.phi1(fit))) ;
+		map.deleteVertex(map.phi1(map.phi1(fit))) ;
 		map.setCurrentLevel(cur) ;
 		fit = map.phi1(fit) ;
 	} while(fit != d) ;
