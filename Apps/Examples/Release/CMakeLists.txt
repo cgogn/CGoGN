@@ -50,10 +50,6 @@ add_executable( decimationVolumique ../decimationVolumique.cpp)
 target_link_libraries( decimationVolumique
 	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
 	
-add_executable( ihmView ../ihmView.cpp)
-target_link_libraries( ihmView
-	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
-
 add_executable( triangulation ../triangulation.cpp)
 target_link_libraries( triangulation
 	container topology utils algo ${COMMON_LIBS} )

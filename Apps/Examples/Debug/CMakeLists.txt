@@ -41,10 +41,6 @@ target_link_libraries( simpleGMap2D
 #target_link_libraries( SimpleEMap3D
 #	containerD topologyD utilsD algoD ${COMMON_LIBS} )
 
-add_executable( ihmViewD ../ihmView.cpp)
-target_link_libraries( ihmViewD
-	containerD topologyD utilsD algoD ${COMMON_LIBS} Zinri)
-
 add_executable( triangulationD ../triangulation.cpp)
 target_link_libraries( triangulationD
         containerD topologyD utilsD algoD ${COMMON_LIBS} )
