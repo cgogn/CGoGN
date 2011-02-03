@@ -124,6 +124,20 @@ void Group_Node::setMatrixTransfo(const Geom::Matrix44f& mat)
 	*m_matrix_transfo = mat.transposed();
 }
 
+
+Geom::Matrix44f Group_Node::getMatrixTransfo() const
+{
+	if (m_matrix_transfo == NULL)
+	{
+		Geom::Matrix44f m;
+		m.identity();
+		return m;
+	}
+
+	return m_matrix_transfo->transposed();
+
+}
+
 void Group_Node::setMaterial(Material_Node* mat)
 {
 	mat->ref();
@@ -151,7 +165,7 @@ VBO_Node::VBO_Node()
 
 
 VBO_Node::VBO_Node(Algo::Render::VBO::MapRender_VBO* vbo)
-: m_vbo(vbo)
+: m_vbo(vbo), m_primitives(0)
 {}
 
 
@@ -182,21 +196,32 @@ void VBO_Node::render()
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0f, 1.0f);
 			glEnable(GL_LIGHTING);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) ;
+			glShadeModel(GL_SMOOTH);
 			m_vbo->draw(Algo::Render::VBO::TRIANGLES);
 		}
 
 		if (m_primitives & Algo::Render::VBO::LINES)
 		{
+			GLint prg;
+			glGetIntegerv(GL_CURRENT_PROGRAM,&prg);
+			glUseProgram(0);
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			glDisable(GL_LIGHTING);
 			m_vbo->draw(Algo::Render::VBO::LINES);
+			glUseProgram(prg);
 		}
 
 		if (m_primitives & Algo::Render::VBO::POINTS)
 		{
+			GLint prg;
+			glGetIntegerv(GL_CURRENT_PROGRAM,&prg);
+			glUseProgram(0);
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			glDisable(GL_LIGHTING);
+			glPointSize(3.0f);
 			m_vbo->draw(Algo::Render::VBO::POINTS);
+			glUseProgram(prg);
 		}
 		if (m_primitives & Algo::Render::VBO::FLAT_TRIANGLES)
 		{
@@ -218,7 +243,8 @@ Material_Node::Material_Node()
  m_has_specular(false),
  m_has_ambient(false),
  m_has_shininess(false),
- m_has_color(false)
+ m_has_color(false),
+m_shader(NULL)
 {}
 
 void Material_Node::setDiffuse(const Geom::Vec4f& v)
@@ -255,6 +281,16 @@ void Material_Node::setColor(const Geom::Vec4f& v)
 	m_has_color=true;
 }
 
+void Material_Node::setShader(Utils::GLSLShader *shader)
+{
+	m_shader = shader;
+}
+
+void Material_Node::setNoShader()
+{
+	m_disable_shader=true;
+}
+
 
 void Material_Node::render()
 {
@@ -268,6 +304,12 @@ void Material_Node::render()
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,&m_shininess);
 	if (m_has_color)
 		glColor3fv(m_color.data());
+
+	if (m_shader!=NULL)
+		m_shader->bind();
+	else
+		if (m_disable_shader)
+			glUseProgramObjectARB(0);
 }
 
 

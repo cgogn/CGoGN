@@ -27,6 +27,7 @@
 
 #include "Topology/generic/marker.h"
 #include "Topology/generic/genericmap.h"
+#include "Topology/generic/functor.h"
 
 #define VERTEX_CELL	VERTEX_ORBIT
 #define EDGE_CELL	EDGE_ORBIT
@@ -230,6 +231,26 @@ protected:
 	CellMarkerNoUnmark(const CellMarkerNoUnmark& cm) : CellMarker(cm)
 	{}
 };
+
+
+/**
+ * selector that say if a dart has it cell marked
+ */
+class SelectorCellMarked: public FunctorSelect
+{
+protected:
+	CellMarker& m_cmarker;
+public:
+	SelectorCellMarked(CellMarker& cm): m_cmarker(cm) {}
+	bool operator()(Dart d) const
+	{
+		if (m_cmarker.isMarked(d))
+			return true;
+		return false;
+	}
+};
+
+
 
 } // namespace CGoGN
 

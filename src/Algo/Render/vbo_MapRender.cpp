@@ -54,14 +54,22 @@ MapRender_VBO::~MapRender_VBO()
 	delete[] m_VBOBuffers ;
 }
 
+
 MapRender_VBO::MapRender_VBO(const MapRender_VBO& mrvbo):
 	m_nbIndicesTri(0),
 	m_nbIndicesLines(0)
 {
-	glGenBuffersARB(3, m_VBOBuffers) ; // gen only for indices
-	// get back others from mrvbo
-	for(unsigned int i = POSITIONS; i < NB_BUFFERS; ++i)
+	glGenBuffersARB(4, m_VBOBuffers) ; // gen only for indices
+	for(unsigned int i = 0; i < POSITIONS_BUFFER; ++i)
 	{
+		m_allocatedBuffers[i] = false ;
+		m_usedBuffers[i] = false ;
+	}
+
+	// get back others from mrvbo
+	for(unsigned int i = POSITIONS_BUFFER; i < NB_BUFFERS; ++i)
+	{
+		m_VBOBuffers[i] = mrvbo.m_VBOBuffers[i];
 		m_allocatedBuffers[i] = mrvbo.m_allocatedBuffers[i] ;
 		m_usedBuffers[i] = mrvbo.m_usedBuffers[i] ;
 	}

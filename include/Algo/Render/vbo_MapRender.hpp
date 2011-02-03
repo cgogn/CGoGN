@@ -239,7 +239,7 @@ void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSele
 
 	for (Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
-		if (!m.isMarked(dd))
+		if (!m.isMarked(dd) && good(dd))
 		{
 			std::list<Dart> bound;
 			bound.push_back(dd);

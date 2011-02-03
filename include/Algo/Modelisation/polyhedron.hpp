@@ -971,7 +971,7 @@ void Polyhedron<PFP>::transform(const Geom::Matrix44f& matrice)
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::mark(CellMarker m)
+void Polyhedron<PFP>::mark(CellMarker& m)
 {
 	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
 	{
