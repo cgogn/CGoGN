@@ -411,6 +411,74 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 }
 
 template <typename PFP, typename EMBV, typename EMB>
+void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+{
+	AutoAttributeHandler< Dart > tablePred(map,EDGE_ORBIT);
+	CellMarker m0(map, EDGE_CELL);
+
+	std::vector<Dart> dOrig;
+	std::vector<EMB> cOrig;
+
+	//first pass cut edge
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(selected(d))
+		{
+			if(!m0.isMarked(d)) {
+				dOrig.push_back(d);
+
+				Dart dd = d;
+				do {
+					if(!m0.isMarked(dd)) {
+						EMB e1 = attributs[dd];
+						EMB e2 = attributs[map.phi1(dd)];
+						map.cutEdge(dd);
+						attributs[map.phi1(dd)] = e1*2.0f/3.0f+e2/3.0f;
+						map.cutEdge(map.phi1(dd));
+						attributs[map.phi1(map.phi1(dd))] = e2*2.0f/3.0f+e1/3.0f;
+						m0.mark(dd);
+						m0.mark(map.phi1(dd));
+						m0.mark(map.template phi<11>(dd));
+					}
+					dd = map.template phi<111>(dd);
+				} while(dd!=d);
+
+			}
+		}
+	}
+
+	std::cout << "nb orig : " << dOrig.size() << std::endl;
+
+	DartMarkerNoUnmark mCorner(map);
+//	//second pass create corner face
+	for (std::vector<Dart>::iterator it = dOrig.begin(); it != dOrig.end(); ++it)
+	{
+		EMB c = Algo::Geometry::faceCentroid<PFP>(map,*it,attributs);
+		Dart dd = *it;
+		do
+		{
+			map.splitFace(map.phi1(dd),map.phi_1(dd));
+			map.cutEdge(map.phi1(dd));
+			mCorner.mark(map.phi2(map.phi1(dd)));
+			attributs[map.template phi<11>(dd)] = c*2.0/3.0f + attributs[dd]/3.0f;
+			dd = map.phi1(map.phi1(map.phi1(map.phi2(map.phi1(dd)))));
+		} while(!mCorner.isMarked(dd));
+	}
+
+	//third pass create center face
+	for (std::vector<Dart>::iterator it = dOrig.begin(); it != dOrig.end(); ++it)
+	{
+		Dart dd = map.phi2(map.phi1(*it));
+		do {
+			mCorner.unmark(dd);
+			Dart dNext = map.phi1(map.phi1(map.phi1(dd)));
+			map.splitFace(dd,dNext);
+			dd = dNext;
+		} while(mCorner.isMarked(dd));
+	}
+}
+
+template <typename PFP, typename EMBV, typename EMB>
 void computeDual(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
 //	std::vector<EMB> lstEmbs;

@@ -327,9 +327,9 @@ void EmbeddedMap2<MAP2>::unsewFaces(Dart d)
 		if(e != d)
 		{
 			MAP2::embedNewCell(VERTEX_ORBIT, e) ;
-			MAP2::copyCell(VERTEX_ORBIT, e, MAP2::phi1(d)) ;
+			MAP2::copyCell(VERTEX_ORBIT, e, d) ;
 			MAP2::embedNewCell(VERTEX_ORBIT, MAP2::phi1(e)) ;
-			MAP2::copyCell(VERTEX_ORBIT, MAP2::phi1(e), d) ;
+			MAP2::copyCell(VERTEX_ORBIT, MAP2::phi1(e), MAP2::phi1(d)) ;
 		}
 	}
 
