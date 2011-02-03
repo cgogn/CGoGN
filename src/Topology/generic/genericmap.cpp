@@ -100,7 +100,10 @@ void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 		return;
 	// if different then unref the old emb
 	if (old != EMBNULL)
-		m_attribs[orbit].unrefLine(old);
+	{
+		if(m_attribs[orbit].unrefLine(old))
+			m_markerTables[orbit]->operator[](old).clear();
+	}
 	// ref the new emb
 	if (emb != EMBNULL)
 		m_attribs[orbit].refLine(emb);

@@ -222,9 +222,14 @@ inline void AttribContainer::refLine(unsigned int eltIdx)
 	m_holesBlocks[eltIdx / _BLOCKSIZE_]->ref(eltIdx % _BLOCKSIZE_);
 }
 
-inline void AttribContainer::unrefLine(unsigned int eltIdx)
+inline bool AttribContainer::unrefLine(unsigned int eltIdx)
 {
-	if (m_holesBlocks[eltIdx / _BLOCKSIZE_]->unref(eltIdx % _BLOCKSIZE_)) m_size--;
+	if (m_holesBlocks[eltIdx / _BLOCKSIZE_]->unref(eltIdx % _BLOCKSIZE_))
+	{
+		m_size--;
+		return true;
+	}
+	return false;
 }
 
 inline void AttribContainer::setRefLine(unsigned int eltIdx, unsigned int nb)
