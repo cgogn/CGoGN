@@ -9,8 +9,6 @@ ELSE(WIN32)
 	add_subdirectory(Examples/Release)
 	add_subdirectory(Examples/Debug)
 	add_subdirectory(Examples/Tests)
-	add_subdirectory(Examples/SocialAgents/Release)
-	add_subdirectory(Examples/SocialAgents/Debug)
 	add_subdirectory(Tuto)
 ENDIF(WIN32)
 
