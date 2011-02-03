@@ -290,7 +290,7 @@ public:
 	* Decremente le compteur de reference de la ligne
 	* @param eltIdx iterator sur cette ligne
 	*/
-	void unrefLine(unsigned int eltIdx);
+	bool unrefLine(unsigned int eltIdx);
 
 	void setRefLine(unsigned int eltIdx, unsigned int nb);
 
