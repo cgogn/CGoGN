@@ -26,7 +26,7 @@
 #define __CELL_MARKER__
 
 #include "Topology/generic/marker.h"
-#include "Topology/generic/genericmap.h"
+#include "Topology/generic/attribmap.h"
 
 #define VERTEX_CELL	VERTEX_ORBIT
 #define EDGE_CELL	EDGE_ORBIT
@@ -45,7 +45,7 @@ class CellMarker
 {
 protected:
 	Marker m_marker;
-	GenericMap& m_map;
+	AttribMap& m_map;
 
 public:
 	/**
@@ -54,8 +54,10 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarker(GenericMap& map, unsigned int cell): m_map(map)
+	CellMarker(AttribMap& map, unsigned int cell): m_map(map)
 	{
+		if(!map.isOrbitEmbedded(cell))
+			map.addEmbedding(cell) ;
 		m_marker = map.getNewMarker(cell);
 	}
 
@@ -168,7 +170,7 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarkerStore(GenericMap& map, unsigned int cell): CellMarker(map, cell)
+	CellMarkerStore(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
 protected:
@@ -217,7 +219,7 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarkerNoUnmark(GenericMap& map, unsigned int cell): CellMarker(map, cell)
+	CellMarkerNoUnmark(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
 	~CellMarkerNoUnmark()
