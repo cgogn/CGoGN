@@ -89,12 +89,12 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 			if(dd_vert==d) {
 				//orbit with 2 edges : point on one edge
 				if(m.alpha1(m.alpha1(d))==d) {
-				 if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current)) {
-					d = m.alpha1(d);
-				 }
+					if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current)) {
+						d = m.alpha1(d);
+					}
 				}
 				else {
-    					state = VERTEX_ORBIT;
+					state = VERTEX_ORBIT;
 					return;
 				}
 			}
@@ -103,7 +103,6 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 			Dart dd_vert = m.alpha1(d);
 			while(getOrientationEdge(current,d)==Geom::RIGHT && dd_vert!=d) {
 				d = m.alpha_1(d);
-
 				if(m_positions[d][0]==m_positions[m.phi1(d)][0] && m_positions[d][1]==m_positions[m.phi1(d)][1]) {
 					d=m.alpha_1(d);
 				}
