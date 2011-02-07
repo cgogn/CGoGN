@@ -91,7 +91,6 @@ class ParticleCell2D : public ParticleBase
 };
 
 #include "particle_cell_2D.hpp"
-//namespace
 
 }
 
