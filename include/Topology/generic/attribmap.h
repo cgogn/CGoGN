@@ -33,6 +33,10 @@ namespace CGoGN
 
 class AttribMap : public GenericMap
 {
+	friend class CellMarker ;
+	friend class CellMarkerStore ;
+	friend class CellMarkerNoUnmark ;
+
 	template<typename T> friend class AutoAttributeHandler ;
 
 public:
