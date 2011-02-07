@@ -69,6 +69,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 	#endif
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 
+	changeCell = true;
 	if(Algo::Geometry::isPointOnVertex<PFP>(m,d,m_positions,current)) {
 		state = VERTEX_ORBIT;
 		return;
@@ -135,6 +136,7 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& current, Geom::Orientation2D sid
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 // 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
+	changeCell = true;
 	if(sideOfEdge==Geom::ALIGNED)
 		sideOfEdge = getOrientationEdge(current,d);
 
