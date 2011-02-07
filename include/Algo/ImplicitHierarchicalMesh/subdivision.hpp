@@ -164,8 +164,10 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
 
 	unsigned int cur = map.getCurrentLevel() ;
+	map.setCurrentLevel(cur + 1) ;
+	Dart cv = map.phi1(map.phi1(d)) ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
-	map.deleteVertex(map.phi1(map.phi1(d))) ;
+	map.deleteVertex(cv) ;
 	map.setCurrentLevel(cur) ;
 	Dart fit = d ;
 	do
