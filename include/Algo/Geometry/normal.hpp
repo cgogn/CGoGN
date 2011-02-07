@@ -95,9 +95,9 @@ typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename P
 }
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select)
+void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select, unsigned int thread)
 {
-	CellMarker marker(map, FACE_CELL);
+	CellMarker marker(map, FACE_CELL,thread);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))
@@ -109,9 +109,9 @@ void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 }
 
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select)
+void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select, unsigned int thread)
 {
-	CellMarker marker(map, VERTEX_CELL);
+	CellMarker marker(map, VERTEX_CELL,thread);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))

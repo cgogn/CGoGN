@@ -226,7 +226,7 @@ inline void GMap1::mergeFaces(Dart d, Dart e)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap1::foreach_dart_of_vertex(Dart d, FunctorType& f)
+inline bool GMap1::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d)) return true;
 	Dart d1 = beta1(d);
@@ -234,7 +234,7 @@ inline bool GMap1::foreach_dart_of_vertex(Dart d, FunctorType& f)
 	return false;
 }
 
-inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f)
+inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d)) return true;
 	Dart d1 = beta0(d);
@@ -242,9 +242,9 @@ inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f)
 	return false;
 }
 
-inline bool GMap1::foreach_dart_of_volume(Dart d, FunctorType& f)
+inline bool GMap1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_face(d, f) ;
+	return foreach_dart_of_face(d, f, thread) ;
 }
 
 } // namespace CGoGN

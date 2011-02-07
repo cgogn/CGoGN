@@ -22,10 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_GEOMETRY_NORMAL_H__
-#define __ALGO_GEOMETRY_NORMAL_H__
 
-#include "Geometry/basic.h"
+#include "Topology/generic/functor.h"
+
+#ifndef __PARALLEL_FOREACH__
+#define __PARALLEL_FOREACH__
 
 namespace CGoGN
 {
@@ -33,38 +34,45 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Geometry
+namespace Parallel
 {
 
-template <typename PFP>
-typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
-
-template <typename PFP>
-typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
-
-template <typename PFP>
-typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
-
-template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread=0) ;
 
 /**
- * compute normals of  vertices
- * @param map the map on which we work
- * @param position the position of vertices attribute handler
- * @param normal the normal handler in which the result will be stored
- * @param the selector
- * @ param th the thread number
+ * Traverse orbits of a map in parallel. Use topological marker
+ * Functor application must be independant
+ * @param map the map
+ * @param orbit the orbit (VERTEX_ORBIT/EDGE_ORBIT/FACE_ORBIT/..
+ * @param func the functor to apply
+ * @param nbth number of thread to use ((use twice as threads of processor)
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param good a selector
  */
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread=0) ;
+void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
 
-} // namespace Geometry
 
-} // namespace Algo
+/**
+ * Traverse cells of a map in parallel. Use embedding marker
+ * Functor application must be independant
+ * @param map the map
+ * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param func the functor to apply
+ * @param nbth number of thread to use (use twice as threads of processor)
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param good a selector
+ */
+template <typename PFP>
+void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
 
-} // namespace CGoGN
 
-#include "Algo/Geometry/normal.hpp"
+}
+}	// end namespace
+}
+
+
+#include "Algo/Parallel/parallel_foreach.hpp"
+
 
 #endif
+

@@ -312,41 +312,41 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_vertex(Dart d, FunctorType& f);
+	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a edge
 	/*! @param d a dart of the edge
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_edge(Dart d, FunctorType& f);
+	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f);
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread=0);
 
-	bool foreach_dart_of_volume(Dart d, FunctorType& f);
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a connected component
 	/*! @param d a dart of the connected component
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_cc(Dart d, FunctorType& f);
+	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//!
 	/*! TODO Ajout a valider
 	 * restreint aux complexes simpliciaux
 	 * Apply a functor on the all darts in the set of the star from orbit
 	 */
-	bool foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f);
+	bool foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 
 	//!
 	/*! TODO Ajout a valider
 	 * restreint aux complexes simpliciaux
 	 * Apply a functor on the all darts in the set of the link from orbit
 	 */
-	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f);
+	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 
 	//@}
 };

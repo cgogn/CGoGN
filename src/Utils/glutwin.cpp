@@ -105,9 +105,26 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 	glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition);
 	glEnable(GL_LIGHT0);
 
+	//Store context infos
+	m_dpy = glXGetCurrentDisplay();
+	m_drawable = glXGetCurrentDrawable();
+	m_context = glXGetCurrentContext();
+
 	// Call other initialization (possibly overloaded in instances)
 	instance->init();
 }
+
+void SimpleGlutWin::releaseContext()
+{
+	glXMakeCurrent(m_dpy,None,NULL);
+}
+
+void SimpleGlutWin::useContext()
+{
+	glXMakeCurrent(m_dpy, m_drawable, m_context);
+}
+
+
 
 void SimpleGlutWin::recalcModelView(void)
 {

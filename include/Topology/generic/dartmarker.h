@@ -80,15 +80,20 @@ class DartMarker
 protected:
 	Marker m_marker;
 	GenericMap& m_map;
-
+	unsigned int m_thread;
 public:
 	/**
 	 * constructor
 	 * @param map the map on which we work
 	 */
-	DartMarker(GenericMap& map): m_map(map)
+	DartMarker(GenericMap& map): m_map(map), m_thread(0)
 	{
-		m_marker = map.getNewMarker(DART_ORBIT);
+		m_marker = map.getNewMarker(DART_ORBIT,0);
+	}
+
+	DartMarker(GenericMap& map, unsigned int thread): m_map(map), m_thread(thread)
+	{
+		m_marker = map.getNewMarker(DART_ORBIT,thread);
 	}
 
 	virtual ~DartMarker()
@@ -102,13 +107,14 @@ protected:
 	DartMarker(const DartMarker& dm) : m_map(dm.m_map)
 	{}
 
+
 public:
 	/**
 	 * mark the cell of dart
 	 */
 	virtual void mark(Dart d)
 	{
-		m_map.getMarkerVector(DART_ORBIT)->operator[](d.index).setMark(m_marker);
+		m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](d.index).setMark(m_marker);
 	}
 
 	/**
@@ -116,7 +122,7 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
-		m_map.getMarkerVector(DART_ORBIT)->operator[](d.index).unsetMark(m_marker);
+		m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](d.index).unsetMark(m_marker);
 	}
 
 	/**
@@ -124,7 +130,7 @@ public:
 	 */
 	virtual bool isMarked(Dart d)
 	{
-		return m_map.getMarkerVector(DART_ORBIT)->operator[](d.index).testMark(m_marker);
+		return m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](d.index).testMark(m_marker);
 	}
 
 	/**
@@ -132,7 +138,7 @@ public:
 	 */
 	virtual void mark(unsigned int em)
 	{
-		m_map.getMarkerVector(DART_ORBIT)->operator[](em).setMark(m_marker);
+		m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](em).setMark(m_marker);
 	}
 
 	/**
@@ -140,7 +146,7 @@ public:
 	 */
 	virtual void unmark(unsigned int em)
 	{
-		m_map.getMarkerVector(DART_ORBIT)->operator[](em).unsetMark(m_marker);
+		m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](em).unsetMark(m_marker);
 	}
 
 	/**
@@ -148,33 +154,33 @@ public:
 	 */
 	virtual bool isMarked(unsigned int em)
 	{
-		return m_map.getMarkerVector(DART_ORBIT)->operator[](em).testMark(m_marker);
+		return m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](em).testMark(m_marker);
 	}
 
 	virtual void markAll()
 	{
 		AttribContainer& cont = m_map.getAttributeContainer(DART_ORBIT) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(DART_ORBIT)->operator[](i).setMark(m_marker);
+			m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](i).setMark(m_marker);
 	}
 
 	virtual void unmarkAll()
 	{
 		AttribContainer& cont = m_map.getAttributeContainer(DART_ORBIT) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(DART_ORBIT)->operator[](i).unsetMark(m_marker);
+			m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](i).unsetMark(m_marker);
 	}
 
 	virtual void markOrbit(unsigned int orbit, Dart d)
 	{
-		FunctorMark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT)) ;
-		m_map.foreach_dart_of_orbit(orbit, d, fm) ;
+		FunctorMark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT,m_thread)) ;
+		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 
 	virtual void unmarkOrbit(unsigned int orbit, Dart d)
 	{
-		FunctorUnmark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT)) ;
-		m_map.foreach_dart_of_orbit(orbit, d, fm) ;
+		FunctorUnmark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT, m_thread)) ;
+		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 };
 
@@ -196,10 +202,14 @@ public:
 	DartMarkerStore(GenericMap& map): DartMarker(map)
 	{}
 
+	DartMarkerStore(GenericMap& map, unsigned int th): DartMarker(map,th)
+	{}
+
 protected:
 	// protected copy constructor to forbid its usage
 	DartMarkerStore(const DartMarkerStore& dm) : DartMarker(dm)
 	{}
+
 
 public:
 	/**
@@ -223,7 +233,7 @@ public:
 	void unmarkAll()
 	{
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
-			m_map.getMarkerVector(DART_ORBIT)->operator[](*it).unsetMark(m_marker);
+			m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](*it).unsetMark(m_marker);
 	}
 };
 
@@ -240,6 +250,9 @@ public:
 	 * @param map the map on which we work
 	 */
 	DartMarkerNoUnmark(GenericMap& map): DartMarker(map)
+	{}
+
+	DartMarkerNoUnmark(GenericMap& map, unsigned int th): DartMarker(map,th)
 	{}
 
 	~DartMarkerNoUnmark()

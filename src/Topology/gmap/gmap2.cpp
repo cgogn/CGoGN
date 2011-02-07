@@ -453,7 +453,7 @@ bool GMap2::check()
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
 	do
@@ -465,12 +465,12 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f)
  	return false;
 }
 
-bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_vertex(d, f) || foreach_dart_of_oriented_vertex(beta1(d), f) ;
+	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
 }
 
-bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d))
 		return true ;
@@ -490,11 +490,11 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f)
 	return false ;
 }
 
-bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	bool found = false;
 	// lock a marker
-	DartMarkerStore markCC(*this);
+	DartMarkerStore markCC(*this,thread);
 
 	// init algo with parameter dart
 	std::list<Dart> darts_list;

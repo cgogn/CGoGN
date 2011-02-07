@@ -31,6 +31,7 @@
 #define __X_GL_H
 #define GLAPIENTRY
 #include <GL/glut.h>
+#include <GL/glx.h>
 
 #include "Utils/trackball.h"
 #include <IL/ilu.h>
@@ -107,6 +108,12 @@ protected:
 	virtual void myMouseMotion(int x, int y) {}
 
 	virtual void myMouseClick(int button, int state, int x, int y) {}
+
+
+	Display* m_dpy;
+	GLXDrawable m_drawable;
+	GLXContext m_context;
+
 
 public:
 	//! Others initialization: should be overloaded in derived classes
@@ -186,6 +193,16 @@ public:
 	* say to interface that it does no more use mouse to move around the scene
 	*/
 	void setNoMouse(bool b) { m_noMouse = b; }
+
+	/**
+	 * release OpenGL context
+	 */
+	void releaseContext();
+
+	/**
+	 * use initial OpenGL context
+	 */
+	void useContext();
 };
 
 } // namespace Utils
