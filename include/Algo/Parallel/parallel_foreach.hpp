@@ -23,7 +23,7 @@
 *******************************************************************************/
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
-
+#include <vector>
 
 namespace CGoGN
 {
@@ -157,8 +157,8 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorType& fun
 template <typename PFP>
 void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func,  unsigned int nbth, unsigned int szbuff, const FunctorSelect& good)
 {
-	std::vector<Dart> vd[nbth];
-	boost::thread* threads[nbth];
+	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
+	boost::thread** threads = new boost::thread*[nbth];
 
 	CellMarker cm(map,cell);
 	Dart d=map.begin();
@@ -188,7 +188,8 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func, 
 		threads[i] = new boost::thread(ThreadFunctor(func, vd[i],sync1,sync2, finished));
 
 	// and continue to traverse the map
-	std::vector<Dart> tempo[nbth];
+	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
+
 	for (unsigned int i=0; i<nbth; ++i)
 		tempo[i].reserve(szbuff);
 
@@ -225,6 +226,9 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func, 
 		threads[i]->join();
 		delete threads[i];
 	}
+	delete[] threads;
+	delete[] vd;
+	delete[] tempo;
 }
 
 

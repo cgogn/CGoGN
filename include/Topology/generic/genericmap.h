@@ -37,7 +37,7 @@
 #define EMBNULL 0xffffffff
 
 #define NB_ORBITS 5
-#define NBTHREAD 8
+#define NBTHREAD 16
 
 #define VERTEX_ORBIT	(unsigned int)(0)
 #define EDGE_ORBIT		(unsigned int)(1)

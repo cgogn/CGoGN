@@ -376,7 +376,6 @@ if(BUILD_COMPLEX16)
   set(ALLOBJ  ${ZLASRC} ${ALLAUX} ${DZLAUX})
 endif()
 
-set(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
 add_library(lapack ${ALLOBJ} ${ALLXOBJ})
 target_link_libraries(lapack blas)
 

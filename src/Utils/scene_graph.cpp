@@ -155,7 +155,7 @@ VBO_Node::VBO_Node(Algo::Render::VBO::MapRender_VBO* vbo)
 {}
 
 
-void VBO_Node::VBO_Node::setVBO(Algo::Render::VBO::MapRender_VBO* vbo)
+void VBO_Node::setVBO(Algo::Render::VBO::MapRender_VBO* vbo)
 {
 	m_vbo = vbo;
 }

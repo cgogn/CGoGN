@@ -41,7 +41,6 @@
 
 #include "Algo/Parallel/parallel_foreach.h"
 
-#include <GL/glx.h>
 
 using namespace CGoGN ;
 

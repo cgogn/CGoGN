@@ -100,6 +100,7 @@ Dart d_maison;
 
 Dart Carre()
 {
+	return Dart::nil();
 }
 
 
@@ -107,7 +108,7 @@ Dart Carre()
 
 Dart Triangle()
 {
-
+	return Dart::nil();
 }
 
 
@@ -141,7 +142,7 @@ void ColleMilieu(Dart d, Dart e)
 
 Dart Maison()
 {
-
+	return Dart::nil();
 }
 
 

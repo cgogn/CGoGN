@@ -54,7 +54,8 @@ inline void GenericMap::deleteDart(Dart d)
 			if(emb != EMBNULL)
 				m_attribs[orbit].unrefLine(emb) ;
 		}
-		m_markerTables[DART_ORBIT]->operator[](d.index).clear() ;
+		for (unsigned int t=0; t<m_nbThreads; ++t)
+			m_markerTables[DART_ORBIT][t]->operator[](d.index).clear() ;
 	}
 }
 

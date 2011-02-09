@@ -31,8 +31,9 @@
 #define __X_GL_H
 #define GLAPIENTRY
 #include <GL/glut.h>
-#include <GL/glx.h>
-
+#ifndef WIN32
+	#include <GL/glx.h>
+#endif
 #include "Utils/trackball.h"
 #include <IL/ilu.h>
 #include <IL/ilut.h>
@@ -109,11 +110,14 @@ protected:
 
 	virtual void myMouseClick(int button, int state, int x, int y) {}
 
-
+#ifdef WIN32
+	HDC m_drawable;
+	HGLRC m_context;
+#else
 	Display* m_dpy;
 	GLXDrawable m_drawable;
 	GLXContext m_context;
-
+#endif
 
 public:
 	//! Others initialization: should be overloaded in derived classes

@@ -106,22 +106,35 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 	glEnable(GL_LIGHT0);
 
 	//Store context infos
+#ifdef WIN32
+	m_drawable = wglGetCurrentDC();
+	m_context = wglGetCurrentContext();
+#else
 	m_dpy = glXGetCurrentDisplay();
 	m_drawable = glXGetCurrentDrawable();
 	m_context = glXGetCurrentContext();
-
+#endif
 	// Call other initialization (possibly overloaded in instances)
 	instance->init();
 }
 
 void SimpleGlutWin::releaseContext()
 {
-	glXMakeCurrent(m_dpy,None,NULL);
+#ifdef WIN32
+	wglMakeCurrent(NULL,NULL);
+#else
+	glxMakeCurrent(m_dpy,None,NULL);
+#endif
 }
 
 void SimpleGlutWin::useContext()
 {
-	glXMakeCurrent(m_dpy, m_drawable, m_context);
+#ifdef WIN32
+	wglMakeCurrent(m_drawable, m_context);
+#else
+	glxMakeCurrent(m_dpy, m_drawable, m_context);
+#endif
+
 }
 
 
