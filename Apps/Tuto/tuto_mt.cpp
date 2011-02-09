@@ -665,6 +665,10 @@ public:
 		typename PFP::VEC3 n2 = Algo::Geometry::vertexNormal<PFP>(this->m_map, this->m_map.phi1(d), m_positions);
 		typename PFP::VEC3 n3 = Algo::Geometry::vertexNormal<PFP>(this->m_map, this->m_map.phi_1(d), m_positions);
 		typename PFP::VEC3 n = n1+n2+n3;
+		n1 = Algo::Geometry::vertexNormal<PFP>(this->m_map, d, m_positions);
+		n2 = Algo::Geometry::vertexNormal<PFP>(this->m_map, this->m_map.phi1(d), m_positions);
+		n3 = Algo::Geometry::vertexNormal<PFP>(this->m_map, this->m_map.phi_1(d), m_positions);
+		n += n1+n2+n3;
 		n.normalize();
 		m_normals[d] =  n;
 //		m_normals[d] = Algo::Geometry::vertexNormal<PFP>(this->m_map, d, m_positions);
@@ -717,32 +721,26 @@ int main(int argc, char **argv)
 	std::cout << " linear "<< seconds << "sec" << std::endl;
 
 
-	t1 = glutGet(GLUT_ELAPSED_TIME);
-	Algo::Geometry::computeNormalVertices<PFP>(myMap,position,normal,SelectorTrue());
-	t2 = glutGet(GLUT_ELAPSED_TIME);
-	seconds = (t2 - t1) / 1000.0f;
-	std::cout << " compute direct "<< seconds << "sec" << std::endl;
+//	t1 = glutGet(GLUT_ELAPSED_TIME);
+//	Algo::Geometry::computeNormalVertices<PFP>(myMap,position,normal,SelectorTrue());
+//	t2 = glutGet(GLUT_ELAPSED_TIME);
+//	seconds = (t2 - t1) / 1000.0f;
+//	std::cout << " compute direct "<< seconds << "sec" << std::endl;
 
 
 	TestFunctor<PFP> tf2(myMap,position,normal2);
 
 	t1 = glutGet(GLUT_ELAPSED_TIME);
 
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4);
+	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4,1024);
 
 	t2 = glutGet(GLUT_ELAPSED_TIME);
 	seconds = (t2 - t1) / 1000.0f;
-	std::cout << " parallel 4 "<< seconds << "sec" << std::endl;
+	std::cout << " parallel 4, 1024 "<< seconds << "sec" << std::endl;
 
 
 	t1 = glutGet(GLUT_ELAPSED_TIME);
 
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4,8192);
 	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,4,8192);
 
 	t2 = glutGet(GLUT_ELAPSED_TIME);
@@ -753,9 +751,6 @@ int main(int argc, char **argv)
 	t1 = glutGet(GLUT_ELAPSED_TIME);
 
 	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,8,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,8,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,8,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,8,8192);
 
 	t2 = glutGet(GLUT_ELAPSED_TIME);
 	seconds = (t2 - t1) / 1000.0f;
@@ -765,21 +760,6 @@ int main(int argc, char **argv)
 	t1 = glutGet(GLUT_ELAPSED_TIME);
 
 	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,16,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,16,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,16,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,16,8192);
-
-	t2 = glutGet(GLUT_ELAPSED_TIME);
-	seconds = (t2 - t1) / 1000.0f;
-	std::cout << " parallel 16/8192  "<< seconds << "sec" << std::endl;
-
-
-	t1 = glutGet(GLUT_ELAPSED_TIME);
-
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,32,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,32,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,32,8192);
-	Algo::Parallel::foreach_cell<PFP>(myMap,VERTEX_ORBIT, tf2,32,8192);
 
 	t2 = glutGet(GLUT_ELAPSED_TIME);
 	seconds = (t2 - t1) / 1000.0f;
