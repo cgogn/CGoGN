@@ -109,6 +109,26 @@ void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 }
 
 template <typename PFP>
+class computeNormalVerticesFunctor: public FunctorMap<typename PFP::MAP>
+{
+protected:
+	typename PFP::MAP& m_map;
+	const typename PFP::TVEC3& m_position;
+	typename PFP::TVEC3& m_normal;
+public:
+	computeNormalVerticesFunctor(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal):
+		m_map(map), m_position(position), m_normal(normal) {}
+
+	bool operator()(Dart d)
+	{
+		m_normal[d] = vertexNormal<PFP>(m_map, d, m_position) ;
+		return false;
+	}
+};
+
+
+
+template <typename PFP>
 void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select, unsigned int thread)
 {
 	CellMarker marker(map, VERTEX_CELL,thread);

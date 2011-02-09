@@ -44,7 +44,7 @@ namespace Parallel
  * @param map the map
  * @param orbit the orbit (VERTEX_ORBIT/EDGE_ORBIT/FACE_ORBIT/..
  * @param func the functor to apply
- * @param nbth number of thread to use ((use twice as threads of processor)
+ * @param nbth number of thread to use
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
  * @param good a selector
  */
@@ -64,6 +64,20 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorType& fun
  */
 template <typename PFP>
 void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
+
+
+/**
+ * Traverse darts of a map in parallel
+ * Functor application must be independant
+ * @param map the map
+ * @param func the functor to apply
+ * @param nbth number of thread to use
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param good a selector
+ */
+template <typename PFP>
+void foreach_dart(typename PFP::MAP& map, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
+
 
 
 }

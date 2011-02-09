@@ -69,7 +69,8 @@ GenericMap::GenericMap()
 	{
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
-		m_markerTables[i][0] = NULL ;
+		for (unsigned int j = 0; j < NBTHREAD; ++j)
+			m_markerTables[i][j] = NULL ;
 	}
 }
 

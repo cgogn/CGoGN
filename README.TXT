@@ -1,6 +1,6 @@
 Dépendences Linux:
 installer les paquets suivants:
-cmake libXi-dev libXmu-dev freeglut3-dev libdevil-dev libglew-dev libgmp3-dev libxml2-dev libboost-dev
+cmake libXi-dev libXmu-dev freeglut3-dev libdevil-dev libglew-dev libgmp3-dev libxml2-dev libboost-dev lizip-dev
 
 
 Pour compiler CGoGN:

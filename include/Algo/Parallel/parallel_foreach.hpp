@@ -228,6 +228,78 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func, 
 }
 
 
+
+template <typename PFP>
+void foreach_dart(typename PFP::MAP& map, FunctorType& func,  unsigned int nbth, unsigned int szbuff, const FunctorSelect& good)
+{
+	std::vector<Dart> vd[nbth];
+	boost::thread* threads[nbth];
+
+	Dart d=map.begin();
+
+	// nbth new functions, new thread (with good darts !)
+	for (unsigned int i=0; i<nbth; ++i)
+		vd[i].reserve(szbuff);
+
+	// fill each vd buffers with 4096 darts
+	unsigned int nb =0;
+	while (( d != map.end()) && (nb < nbth*szbuff) )
+	{
+		if (good(d))
+		{
+			vd[nb%nbth].push_back(d);
+			nb++;
+		}
+		map.next(d);
+	}
+
+	boost::barrier sync1(nbth+1);
+	boost::barrier sync2(nbth+1);
+	bool finished=false;
+	// lauch threads
+	for (unsigned int i=0; i<nbth; ++i)
+		threads[i] = new boost::thread(ThreadFunctor(func, vd[i],sync1,sync2, finished));
+
+	// and continue to traverse the map
+	std::vector<Dart> tempo[nbth];
+	for (unsigned int i=0; i<nbth; ++i)
+		tempo[i].reserve(szbuff);
+
+	while ( d != map.end())
+	{
+		for (unsigned int i=0; i<nbth; ++i)
+			tempo[i].clear();
+
+		unsigned int nb =0;
+		while (( d != map.end()) && (nb < nbth*szbuff) )
+		{
+			if (good(d))
+			{
+				tempo[nb%nbth].push_back(d);
+				nb++;
+			}
+			map.next(d);
+		}
+
+		sync1.wait();
+		for (unsigned int i=0; i<nbth; ++i)
+			vd[i].swap(tempo[i]);
+		sync2.wait();
+	}
+
+	sync1.wait();
+	finished = true;
+	sync2.wait();
+
+	//wait for all theads to be finished
+	for (unsigned int i=0; i< nbth; ++i)
+	{
+		threads[i]->join();
+		delete threads[i];
+	}
+}
+
+
 }
 }	// end namespace
 }
