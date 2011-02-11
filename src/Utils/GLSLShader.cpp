@@ -426,43 +426,43 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 
 
 	/*** creates the list of uniform variables and samplers ***/
-	GLint		active_uniform_count;
-	GLcharARB	name_char[256];
-	int			length;
-	int			size;
-	int			type;
-
-	glGetObjectParameterivARB( program_object, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &active_uniform_count );
-
-	for( GLuint i=0; i<(GLuint)active_uniform_count; i++ )
-	{
-		glGetActiveUniformARB( program_object, i, 256, &length, &size, (GLenum*)&type, name_char );
-		std::string		name = name_char;
-
-		if( name.find( std::string("gl_"), 0 ) != std::string::npos )
-			continue;
-		else if( type<GL_SAMPLER_1D_ARB || type>GL_SAMPLER_2D_RECT_SHADOW_ARB )
-		{
-			unif_list[name].location = glGetUniformLocationARB( program_object, name_char );
-			unif_list[name].size = size;
-			unif_list[name].type = type;
-		}
-		else
-		{
-			sampler_list[name].location = glGetUniformLocationARB( program_object, name_char );
-		}
-	}
+//	GLint		active_uniform_count;
+//	GLcharARB	name_char[256];
+//	int			length;
+//	int			size;
+//	int			type;
+//
+//	glGetObjectParameterivARB( program_object, GL_OBJECT_ACTIVE_UNIFORMS_ARB, &active_uniform_count );
+//
+//	for( GLuint i=0; i<(GLuint)active_uniform_count; i++ )
+//	{
+//		glGetActiveUniformARB( program_object, i, 256, &length, &size, (GLenum*)&type, name_char );
+//		std::string		name = name_char;
+//
+//		if( name.find( std::string("gl_"), 0 ) != std::string::npos )
+//			continue;
+//		else if( type<GL_SAMPLER_1D_ARB || type>GL_SAMPLER_2D_RECT_SHADOW_ARB )
+//		{
+//			unif_list[name].location = glGetUniformLocationARB( program_object, name_char );
+//			unif_list[name].size = size;
+//			unif_list[name].type = type;
+//		}
+//		else
+//		{
+//			sampler_list[name].location = glGetUniformLocationARB( program_object, name_char );
+//		}
+//	}
 
 
 	/*** creates the list of vertex attributes */
-	GLint	activeAttribCount;
-	glGetObjectParameterivARB( program_object, GL_OBJECT_ACTIVE_ATTRIBUTES_ARB, &activeAttribCount );
-
-	for( GLuint i=0; i<(GLuint)activeAttribCount; i++ )
-	{
-		glGetActiveAttribARB( program_object, i, 256, &length, &size, (GLenum*)&type, name_char );
-		attrib_list[ name_char ] = i;
-	}
+//	GLint	activeAttribCount;
+//	glGetObjectParameterivARB( program_object, GL_OBJECT_ACTIVE_ATTRIBUTES_ARB, &activeAttribCount );
+//
+//	for( GLuint i=0; i<(GLuint)activeAttribCount; i++ )
+//	{
+//		glGetActiveAttribARB( program_object, i, 256, &length, &size, (GLenum*)&type, name_char );
+//		attrib_list[ name_char ] = i;
+//	}
 
 
 	/*** termination ***/
@@ -496,92 +496,92 @@ bool GLSLShader::isBinded()
 	return ( program_object && program_object == glGetHandleARB(GL_PROGRAM_OBJECT_ARB) );
 }
 
+//
+//bool GLSLShader::setSampler( char* sampler_name, int tex_unit )
+//{
+//	GLuint		pgObjBackup;
+//	std::string	name = sampler_name;
+//
+//
+//	if( sampler_list.find( name ) != sampler_list.end() )
+//	{
+//		pgObjBackup = glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
+//		glUseProgramObjectARB( program_object );
+//
+//		sampler_list[name].tex_unit = tex_unit - GL_TEXTURE0_ARB;
+//		glUniform1iARB( sampler_list[name].location, sampler_list[name].tex_unit );
+//
+//		glUseProgramObjectARB( pgObjBackup );
+//
+//		return true;
+//	}
+//
+//
+//	return false;
+//}
+//
+//
+//bool GLSLShader::setUniform( char* unif_name, void* value )
+//{
+//	GLuint		pgObjBackup;
+//	std::string	name = unif_name;
+//
+//
+//	if( unif_list.find( name ) != unif_list.end() )
+//	{
+//		Uniform	u = unif_list[name];
+//
+//		pgObjBackup = glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
+//		glUseProgramObjectARB( program_object );
+//
+//		switch( u.type )
+//		{
+//			case GL_FLOAT:
+//				glUniform1fvARB( u.location, u.size, (GLfloat*) value ); break;
+//			case GL_FLOAT_VEC2_ARB:
+//				glUniform2fvARB( u.location, u.size, (GLfloat*) value ); break;
+//			case GL_FLOAT_VEC3_ARB:
+//				glUniform3fvARB( u.location, u.size, (GLfloat*) value ); break;
+//			case GL_FLOAT_VEC4_ARB:
+//				glUniform4fvARB( u.location, u.size, (GLfloat*) value ); break;
+//			case GL_INT:
+//				glUniform1ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_INT_VEC2_ARB:
+//				glUniform2ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_INT_VEC3_ARB:
+//				glUniform3ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_INT_VEC4_ARB:
+//				glUniform4ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_BOOL_ARB:
+//				glUniform1ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_BOOL_VEC2_ARB:
+//				glUniform2ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_BOOL_VEC3_ARB:
+//				glUniform3ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_BOOL_VEC4_ARB:
+//				glUniform4ivARB( u.location, u.size, (GLint*) value ); break;
+//			case GL_FLOAT_MAT2_ARB:
+//				glUniformMatrix2fvARB( u.location, u.size, GL_FALSE, (GLfloat*) value ); break;
+//			case GL_FLOAT_MAT3_ARB:
+//				glUniformMatrix3fvARB( u.location, u.size, GL_FALSE, (GLfloat*) value ); break;
+//			case GL_FLOAT_MAT4_ARB:
+//				glUniformMatrix4fvARB( u.location, u.size, GL_FALSE, (GLfloat*) value ); break;
+//		}
+//
+//		glUseProgramObjectARB( pgObjBackup );
+//
+//		return true;
+//	}
+//
+//
+//	return false;
+//}
 
-bool GLSLShader::setSampler( char* sampler_name, int tex_unit )
-{
-	GLuint		pgObjBackup;
-	std::string	name = sampler_name;
 
-
-	if( sampler_list.find( name ) != sampler_list.end() )
-	{
-		pgObjBackup = glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
-		glUseProgramObjectARB( program_object );
-
-		sampler_list[name].tex_unit = tex_unit - GL_TEXTURE0_ARB;
-		glUniform1iARB( sampler_list[name].location, sampler_list[name].tex_unit );
-
-		glUseProgramObjectARB( pgObjBackup );
-
-		return true;
-	}
-
-
-	return false;
-}
-
-
-bool GLSLShader::setUniform( char* unif_name, void* value )
-{
-	GLuint		pgObjBackup;
-	std::string	name = unif_name;
-
-
-	if( unif_list.find( name ) != unif_list.end() )
-	{
-		Uniform	u = unif_list[name];
-
-		pgObjBackup = glGetHandleARB( GL_PROGRAM_OBJECT_ARB );
-		glUseProgramObjectARB( program_object );
-
-		switch( u.type )
-		{
-			case GL_FLOAT:
-				glUniform1fvARB( u.location, u.size, (GLfloat*) value ); break;
-			case GL_FLOAT_VEC2_ARB:
-				glUniform2fvARB( u.location, u.size, (GLfloat*) value ); break;
-			case GL_FLOAT_VEC3_ARB:
-				glUniform3fvARB( u.location, u.size, (GLfloat*) value ); break;
-			case GL_FLOAT_VEC4_ARB:
-				glUniform4fvARB( u.location, u.size, (GLfloat*) value ); break;
-			case GL_INT:
-				glUniform1ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_INT_VEC2_ARB:
-				glUniform2ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_INT_VEC3_ARB:
-				glUniform3ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_INT_VEC4_ARB:
-				glUniform4ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_BOOL_ARB:
-				glUniform1ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_BOOL_VEC2_ARB:
-				glUniform2ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_BOOL_VEC3_ARB:
-				glUniform3ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_BOOL_VEC4_ARB:
-				glUniform4ivARB( u.location, u.size, (GLint*) value ); break;
-			case GL_FLOAT_MAT2_ARB:
-				glUniformMatrix2fvARB( u.location, u.size, GL_FALSE, (GLfloat*) value ); break;
-			case GL_FLOAT_MAT3_ARB:
-				glUniformMatrix3fvARB( u.location, u.size, GL_FALSE, (GLfloat*) value ); break;
-			case GL_FLOAT_MAT4_ARB:
-				glUniformMatrix4fvARB( u.location, u.size, GL_FALSE, (GLfloat*) value ); break;
-		}
-
-		glUseProgramObjectARB( pgObjBackup );
-
-		return true;
-	}
-
-
-	return false;
-}
-
-
-GLuint GLSLShader::getAttribIndex( char* attribName )
-{
-	return attrib_list[ attribName ];
-}
+//GLuint GLSLShader::getAttribIndex( char* attribName )
+//{
+//	return attrib_list[ attribName ];
+//}
 
 
 GLSLShader::~GLSLShader()
@@ -609,74 +609,6 @@ GLSLShader::~GLSLShader()
 		glDeleteObjectARB( program_object );
 	}
 }
-
-/*
-std::string GLSLShader::findFile(const std::string filename)
-{
-	std::ifstream file;
-	file.open(filename.c_str(),std::ios::in | std::ios::binary);
-	if (file.good())
-	{
-		file.close();
-		return filename;
-	}
-
-
-// SHADERPATH contient le chemin du r�pertoire ou se trouve les shaders
-#ifndef SHADERPATH
-  #define SHADERPATH "."
-#endif
-
-#ifdef WIN32
-	//char l_strSingleVal[200];
-	//GetEnvironmentVariable("SHADERS_PATH", l_strSingleVal,200);
-	//std::string var(l_strSingleVal);
-	std::string var("c:/Shaders");
-#else
-	char * cshp = getenv(SHADERPATH);
-	std::string var;
-	if (cshp != NULL)
-		var = std::string(cshp);
-
-#endif
-	
-	unsigned int dp;
-	do
-	{
-		dp = var.find(":");
-		if ( dp != std::string::npos)
-		{
-			std::string st = var.substr(0,dp);
-			var = var.substr(dp+1,var.length()-dp);
-			if (st[st.length()-1]!='/')
-				st.append(std::string("/"));
-			st.append(filename);
-			file.open(st.c_str(),std::ios::in | std::ios::binary);
-			if (file.good())
-			{
-				file.close();
-				return st;
-			}
-			file.close();
-		} 
-	} while (dp != std::string::npos);
-
-
-	if (var[var.length()-1]!='/')
-			var.append(std::string("/"));
-	var.append(filename);
-
-	file.open(var.c_str(),std::ios::in | std::ios::binary);
-	if (file.good())
-	{
-		file.close();
-		return var;
-	}
-	file.close();
-
-	return filename;
-}
-*/
 
 
 std::string GLSLShader::findFile(const std::string filename)
@@ -770,22 +702,14 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const
 	return true;
 }
 
-// bool GLSLShader::sourceVertexShader( char *vertex_shader_source )
-// {
-// 	if (!vertex_shader_source)
-// 		return false;
-// 
-// 	return loadVertexShaderSourceString( vertex_shader_source );
-// }
-// 
-// 
-// bool GLSLShader::sourcePixelShader( char *pixel_shader_source  )
-// {
-// 	if( !pixel_shader_source )
-// 		return false;
-// 	
-// 	return loadPixelShaderSourceString( pixel_shader_source );
-// }
+
+void GLSLShader::bindAttrib(unsigned int att, const char* name)
+{
+	glBindAttribLocation(program_object,att,name);
+}
+
+
+
 
 } // namespace Utils
 } // namespace CGoGN

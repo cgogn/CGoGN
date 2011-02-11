@@ -78,9 +78,9 @@ protected:
 	GLhandleARB						geom_shader_object;
 	GLhandleARB						program_object;
 
-	std::map<std::string,Sampler>	sampler_list;
-	std::map<std::string,Uniform>	unif_list;
-	std::map<std::string,GLuint>	attrib_list;
+//	std::map<std::string,Sampler>	sampler_list;
+//	std::map<std::string,Uniform>	unif_list;
+//	std::map<std::string,GLuint>	attrib_list;
 
 
 	/****************\
@@ -139,12 +139,59 @@ public:
 	
 	static bool init();
 
+	/**
+	 * bind vertex attribute with its name in shaders
+	 */
+	void bindAttrib(unsigned int att, const char* name);
 
 	/************\
 	| DESTRUCTOR |
 	\************/
 public:
 	virtual ~GLSLShader();
+
+
+	template<unsigned int NB>
+	void setuniformf( const char* name , float* val)
+	{
+		GLuint uni = glGetUniformLocationARB(program_object,name);
+		switch(NB)
+		{
+		case 1:
+			glUniform1fvARB( uni, 1, val) ;
+			break;
+		case 2:
+			glUniform2fvARB( uni, 2, val) ;
+			break;
+		case 3:
+			glUniform3fvARB( uni, 3, val) ;
+			break;
+		case 4:
+			glUniform4fvARB( uni, 4, val) ;
+			break;
+		}
+	}
+
+	template<unsigned int NB>
+	void setuniformi( const char* name , int* val)
+	{
+		GLuint uni = glGetUniformLocationARB(program_object,name);
+		switch(NB)
+		{
+		case 1:
+			glUniform1ivARB( uni, 1, val) ;
+			break;
+		case 2:
+			glUniform2ivARB( uni, 2, val) ;
+			break;
+		case 3:
+			glUniform3ivARB( uni, 3, val) ;
+			break;
+		case 4:
+			glUniform4ivARB( uni, 4, val) ;
+			break;
+		}
+	}
 };
 
 
@@ -157,8 +204,10 @@ inline bool GLSLShader::isCreated()
 }
 
 
-} //namespace Utils
 
+
+
+} //namespace Utils
 } //namespace CGoGN
 
 

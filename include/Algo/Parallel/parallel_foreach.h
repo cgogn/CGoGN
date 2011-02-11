@@ -37,6 +37,51 @@ namespace Algo
 namespace Parallel
 {
 
+// TODO a deplacer dans functor.h
+/**
+ * Functor class for parallel::foreach_xxx
+ */
+template<typename MAP>
+class FunctorMapThreaded: public FunctorMap<MAP>
+{
+protected:
+	// current thread id
+	unsigned int m_threadId;
+public:
+	/**
+	 * constructor
+	 * @param map traversed map
+	 * @param th current thread id
+	 */
+	FunctorMapThreaded(MAP& m, unsigned int th=0): FunctorMap<MAP>(m), m_threadId(th) {}
+
+	/**
+	 * Method that duplicate the fonctor for each thread, typically:
+	 *    FunctorXXXX<MAP>* copy = new FunctorXXXX<MAP>(this->m_map,pos,norm,id);
+	 *    return reinterpret_cast<FunctorMapThreaded<MAP>*>(copy);
+	 *  @param id thread id assigned to functor
+	 */
+	virtual FunctorMapThreaded<MAP>* duplicate(unsigned int id)=0;
+
+};
+
+/**
+ * Functor class for parallel::foreach_xxx_res
+ */
+template<typename MAP,typename T>
+class FunctorMapThreadedResult: public FunctorMapThreaded<MAP>
+{
+public:
+	FunctorMapThreadedResult(MAP& m, unsigned int th=0): FunctorMapThreaded<MAP>(m,th) {}
+
+	/**
+	 * get back result (used by foreach_xxx_res for filling vector of results
+	 */
+	virtual T getResult() = 0;
+};
+
+
+
 
 /**
  * Traverse orbits of a map in parallel. Use topological marker
@@ -46,10 +91,11 @@ namespace Parallel
  * @param func the functor to apply
  * @param nbth number of thread to use
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
  * @param good a selector
  */
 template <typename PFP>
-void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
+void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good= SelectorTrue());
 
 
 /**
@@ -58,12 +104,13 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorType& fun
  * @param map the map
  * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
  * @param func the functor to apply
- * @param nbth number of thread to use (use twice as threads of processor)
+ * @param nbth number of threads
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
  * @param good a selector
  */
 template <typename PFP>
-void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
+void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good= SelectorTrue());
 
 
 /**
@@ -73,10 +120,111 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorType& func, 
  * @param func the functor to apply
  * @param nbth number of thread to use
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
  * @param good a selector
  */
 template <typename PFP>
-void foreach_dart(typename PFP::MAP& map, FunctorType& func,  unsigned int nbth, unsigned int szbuff=8192, const FunctorSelect& good= SelectorTrue());
+void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+
+
+
+/**
+ * Traverse orbits of a map in parallel. Use topo marker
+ * Use this version if you want to store a result for traversal (sum, average, max, etc..)
+ * @param map the map
+ * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param func the functor to apply
+ * @param nbth number of threads
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param results output of the FunctorMapThreadedResult of each thread
+ * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
+ * @param good a selector
+ */
+template <typename PFP, typename T>
+void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+
+/**
+ * Traverse cells of a map in parallel. Use embedding marker
+ * Use this version if you want to store a result for traversal (sum, average, max, etc..)
+ * @param map the map
+ * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param func the functor to apply
+ * @param nbth number of threads
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param results output of the FunctorMapThreadedResult of each thread
+ * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
+ * @param good a selector
+ */
+template <typename PFP, typename T>
+void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+
+/**
+ * Traverse cells of a map in parallel. Use embedding marker
+ * Use this version if you want to store a result for traversal (sum, average, max, etc..)
+ * @param map the map
+ * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param func the functor to apply
+ * @param nbth number of threads
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param results output of the FunctorMapThreadedResult of each thread
+ * @param needMarkers set to yes if you want that each thread use different markers (markers are allocated if necessary)
+ * @param good a selector
+ */
+template <typename PFP, typename T>
+void foreach_dart_res(typename PFP::MAP& map, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+
+
+
+
+/**
+ * easy sum of returned result of foreach_xxx_res
+ */
+template <typename T>
+T sumResult(const std::vector<T>& res);
+
+/**
+ *  easy sum of returned result of foreach_xxx_res
+ */
+template <typename T1, typename T2>
+std::pair<T1,T2> sumPairResult(const std::vector< std::pair<T1,T2> >& res);
+
+/**
+ *  easy max of returned result of foreach_xxx_res
+ */
+template <typename T>
+T maxResult(const std::vector<T>& res);
+
+/**
+ *  easy min of returned result of foreach_xxx_res
+ */
+template <typename T>
+T minResult(const std::vector<T>& res);
+
+
+/**
+ * Class to encapsulate algorithm in a boost thread
+ * Usage:
+ * - Define a class MyCGoGNThread that inherit from CGoGNThread
+ * - call with boost::thread cgt1(MyCGoGNThread(map,1, ...);
+ * - wait to finish: cgt1.join();
+ */
+template<typename MAP>
+class CGoGNThread
+{
+protected:
+	MAP& m_map;
+	unsigned int m_threadId;
+
+public:
+	CGoGNThread(MAP& map, unsigned int th):
+		m_map(map), m_threadId(th) {}
+
+	/**
+	 * to implement with algo to execute (use m_threadId
+	 */
+	virtual void operator()() =0;
+};
+
 
 
 

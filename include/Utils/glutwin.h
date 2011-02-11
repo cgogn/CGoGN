@@ -30,7 +30,7 @@
 
 #define __X_GL_H
 #define GLAPIENTRY
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #ifndef WIN32
 	#include <GL/glx.h>
 #endif
@@ -131,7 +131,7 @@ public:
 	/**
 	* constructor
 	*/
-	SimpleGlutWin(int* argc, char **argv, int winX, int winY);
+	SimpleGlutWin(int* argc, char **argv, int winX, int winY, bool gl3=false);
 
 	/**
 	* destructor
