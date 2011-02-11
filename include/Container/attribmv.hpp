@@ -173,13 +173,13 @@ void AttribMultiVect<T>::addBlock()
 template <typename T>
 void AttribMultiVect<T>::initElt(unsigned int id)
 {
-	m_tableData[id/_BLOCKSIZE_][id%_BLOCKSIZE_] =  T(0);
+	m_tableData[id/_BLOCKSIZE_][id%_BLOCKSIZE_] = T(0);
 }
 
 template <typename T>
 void AttribMultiVect<T>::copyElt(unsigned int dst, unsigned int src)
 {
-	m_tableData[dst/_BLOCKSIZE_][dst%_BLOCKSIZE_] =  m_tableData[src/_BLOCKSIZE_][src%_BLOCKSIZE_];
+	m_tableData[dst/_BLOCKSIZE_][dst%_BLOCKSIZE_] = m_tableData[src/_BLOCKSIZE_][src%_BLOCKSIZE_];
 }
 
 template <typename T>
@@ -192,7 +192,6 @@ void AttribMultiVect<T>::setNbBlocks(unsigned int nbb)
 //			T* ptr = new T[_BLOCKSIZE_];
 //			m_tableData.push_back( ptr );
 			addBlock();
-
 		}
 	}
 	else

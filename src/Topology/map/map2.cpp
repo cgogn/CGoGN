@@ -88,14 +88,24 @@ void Map2::cutEdge(Dart d)
 	}
 }
 
-void Map2::collapseEdge(Dart d, bool delDegenerateFaces)
+Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
-	Dart f;							// A dart in the face to check
-	Dart e = phi2(d);				// Test if an opposite edge exists
-	if (e != d)
+	Dart resV ;
+
+	Dart e = phi2(d);
+	if (e != d)			// Test if an opposite edge exists
 	{
-		f = phi1(e);				// A dart in the face of e
-		phi2unsew(d);				// Unlink the opposite edges
+		phi2unsew(d);	// Unlink the opposite edges
+		Dart f = phi1(e) ;
+		Dart g = phi_1(e) ;
+
+		if(!isFaceTriangle(e))
+			resV = f ;
+		else if(phi2(g) != g)
+			resV = phi2(g) ;
+		else if(phi2(f) != f)
+			resV = phi1(phi2(f)) ;
+
 		if (f != e && delDegenerateFaces)
 		{
 			Map1::collapseEdge(e);		// Collapse edge e
@@ -104,7 +114,20 @@ void Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 		else
 			Map1::collapseEdge(e);	// Just collapse edge e
 	}
-	f = phi1(d);					// A dart in the face of d
+
+	Dart f = phi1(d) ;
+	Dart g = phi_1(d) ;
+
+	if(resV == Dart::nil())
+	{
+		if(!isFaceTriangle(d))
+			resV = f ;
+		else if(phi2(g) != g)
+			resV = phi2(g) ;
+		else if(phi2(f) != f)
+			resV = phi1(phi2(f)) ;
+	}
+
 	if (f != d && delDegenerateFaces)
 	{
 		Map1::collapseEdge(d);		// Collapse edge d
@@ -112,6 +135,8 @@ void Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	}
 	else
 		Map1::collapseEdge(d);	// Just collapse edge d
+
+	return resV ;
 }
 
 bool Map2::flipEdge(Dart d)
