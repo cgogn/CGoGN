@@ -99,11 +99,11 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 		Dart f = phi1(e) ;
 		Dart g = phi_1(e) ;
 
-		if(!isFaceTriangle(e))
+		if(f != d && !isFaceTriangle(e))
 			resV = f ;
 		else if(phi2(g) != g)
 			resV = phi2(g) ;
-		else if(phi2(f) != f)
+		else if(f != d && phi2(f) != f)
 			resV = phi1(phi2(f)) ;
 
 		if (f != e && delDegenerateFaces)
