@@ -243,7 +243,6 @@ inline AttribMultiVectGen& GenericMap::getMultiVec(unsigned int idAttr)
 
 inline AttribContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 {
-//	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	return m_attribs[orbit] ;
 }
 
@@ -253,7 +252,8 @@ inline AttribContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 
 inline Marker GenericMap::getNewMarker(unsigned int cell, unsigned int thread)
 {
-	assert(isOrbitEmbedded(cell) || !"Try to get a marker on non embedded cell! ") ;
+
+//	assert(isOrbitEmbedded(cell) || !"Try to get a marker on non embedded cell! ") ;
 	return m_orbMarker[cell][thread].getNewMarker(cell) ;
 }
 

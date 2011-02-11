@@ -26,7 +26,7 @@
 #define __CELL_MARKER__
 
 #include "Topology/generic/marker.h"
-#include "Topology/generic/genericmap.h"
+#include "Topology/generic/attribmap.h"
 
 #define VERTEX_CELL	VERTEX_ORBIT
 #define EDGE_CELL	EDGE_ORBIT
@@ -45,8 +45,9 @@ class CellMarker
 {
 protected:
 	Marker m_marker;
-	GenericMap& m_map;
+	AttribMap& m_map;
 	unsigned int m_thread;
+
 public:
 	/**
 	 * constructor
@@ -54,12 +55,15 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarker(GenericMap& map, unsigned int cell): m_map(map), m_thread(0)
+
+	CellMarker(AttribMap& map, unsigned int cell): m_map(map), m_thread(0)
 	{
+		if(!map.isOrbitEmbedded(cell))
+			map.addEmbedding(cell) ;
 		m_marker = map.getNewMarker(cell);
 	}
 
-	CellMarker(GenericMap& map, unsigned int cell, unsigned int thread): m_map(map), m_thread(thread)
+	CellMarker(AttribMap& map, unsigned int cell, unsigned int thread): m_map(map), m_thread(thread)
 	{
 		m_marker = map.getNewMarker(cell,thread);
 	}
@@ -173,10 +177,10 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarkerStore(GenericMap& map, unsigned int cell): CellMarker(map, cell)
+	CellMarkerStore(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
-	CellMarkerStore(GenericMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
+	CellMarkerStore(AttribMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
 	{}
 
 protected:
@@ -226,11 +230,11 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarkerNoUnmark(GenericMap& map, unsigned int cell): CellMarker(map, cell)
+	CellMarkerNoUnmark(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
 
-	CellMarkerNoUnmark(GenericMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
+	CellMarkerNoUnmark(AttribMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
 	{}
 
 	~CellMarkerNoUnmark()

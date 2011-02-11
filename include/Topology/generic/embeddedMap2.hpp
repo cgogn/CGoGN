@@ -186,7 +186,7 @@ bool EmbeddedMap2<MAP2>::edgeCanCollapse(Dart d)
 template <typename MAP2>
 void EmbeddedMap2<MAP2>::collapseEdge(Dart d, bool delDegenerateFaces)
 {
-	Dart dPrev = MAP2::phi_1(d) ;
+	Dart dPrev2 = MAP2::phi2(MAP2::phi_1(d)) ;
 
 	unsigned int vEmb = EMBNULL ;
 	if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
@@ -198,9 +198,7 @@ void EmbeddedMap2<MAP2>::collapseEdge(Dart d, bool delDegenerateFaces)
 
 	if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 	{
-		Dart dPrev2 = MAP2::phi2(dPrev) ;
-		if(dPrev2 != dPrev)
-			MAP2::embedOrbit(VERTEX_ORBIT, dPrev2, vEmb) ;
+		MAP2::embedOrbit(VERTEX_ORBIT, dPrev2, vEmb) ;
 	}
 }
 
