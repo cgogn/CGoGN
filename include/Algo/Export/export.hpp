@@ -353,9 +353,9 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		out << Frame[vi](0,0) << " " << Frame[vi](0,1) << " " << Frame[vi](0,2) << " " ;
 		out << Frame[vi](1,0) << " " << Frame[vi](1,1) << " " << Frame[vi](1,2) << " " ;
 		out << Frame[vi](2,0) << " " << Frame[vi](2,1) << " " << Frame[vi](2,2) << " " ;
-		out << RGBfuncs[vi](0,0) << " " << RGBfuncs[vi](0,1) << " " << RGBfuncs[vi](0,2) << RGBfuncs[vi](0,3) << " " << RGBfuncs[vi](0,4) << " " << RGBfuncs[vi](0,5) <<" ";
-		out << RGBfuncs[vi](1,0) << " " << RGBfuncs[vi](1,1) << " " << RGBfuncs[vi](1,2) << RGBfuncs[vi](1,3) << " " << RGBfuncs[vi](1,4) << " " << RGBfuncs[vi](1,5) <<" ";
-		out << RGBfuncs[vi](2,0) << " " << RGBfuncs[vi](2,1) << " " << RGBfuncs[vi](2,2) << RGBfuncs[vi](2,3) << " " << RGBfuncs[vi](2,4) << " " << RGBfuncs[vi](2,5) << std::endl ;
+		out << RGBfuncs[vi](0,0) << " " << RGBfuncs[vi](0,1) << " " << RGBfuncs[vi](0,2) << " " << RGBfuncs[vi](0,3) << " " << RGBfuncs[vi](0,4) << " " << RGBfuncs[vi](0,5) <<" ";
+		out << RGBfuncs[vi](1,0) << " " << RGBfuncs[vi](1,1) << " " << RGBfuncs[vi](1,2) << " " << RGBfuncs[vi](1,3) << " " << RGBfuncs[vi](1,4) << " " << RGBfuncs[vi](1,5) <<" ";
+		out << RGBfuncs[vi](2,0) << " " << RGBfuncs[vi](2,1) << " " << RGBfuncs[vi](2,2) << " " << RGBfuncs[vi](2,3) << " " << RGBfuncs[vi](2,4) << " " << RGBfuncs[vi](2,5) << std::endl ;
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();;
@@ -474,9 +474,9 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		out << Tan[vi][0] << " " << Tan[vi][1] << " " << Tan[vi][2]<<" ";
 		out << Btan[vi][0] << " " << Btan[vi][1] << " " << Btan[vi][2]<<" ";
 		out << Norm[vi][0] << " " << Norm[vi][1] << " " << Norm[vi][2]<<" ";
-		out << L1[vi][0] << " " << L1[vi][1] << " " << L1[vi][2]<< L1[vi][3] << " " << L1[vi][4] << " " << L1[vi][5] <<" ";
-		out << L2[vi][0] << " " << L2[vi][1] << " " << L2[vi][2]<< L2[vi][3] << " " << L2[vi][4] << " " << L2[vi][5] <<" ";
-		out << L3[vi][0] << " " << L3[vi][1] << " " << L3[vi][2]<< L3[vi][3] << " " << L3[vi][4] << " " << L3[vi][5] << std::endl ;
+		out << L1[vi][0] << " " << L1[vi][1] << " " << L1[vi][2]<< " " << L1[vi][3] << " " << L1[vi][4] << " " << L1[vi][5] <<" ";
+		out << L2[vi][0] << " " << L2[vi][1] << " " << L2[vi][2]<< " " << L2[vi][3] << " " << L2[vi][4] << " " << L2[vi][5] <<" ";
+		out << L3[vi][0] << " " << L3[vi][1] << " " << L3[vi][2]<< " " << L3[vi][3] << " " << L3[vi][4] << " " << L3[vi][5] << std::endl ;
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();;
@@ -492,6 +492,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	out.close() ;
 	return true ;
 }
+
 
 } // namespace Export
 
