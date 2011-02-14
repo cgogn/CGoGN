@@ -333,6 +333,10 @@ inline unsigned int ImplicitHierarchicalMap::edgeLevel(Dart d)
 	return ld < ldd ? ldd : ld ;				// insertion levels of its two darts
 }
 
+/***************************************************
+ *               ATTRIBUTE HANDLER                 *
+ ***************************************************/
+
 template <typename T>
 T& AttributeHandler_IHM<T>::operator[](Dart d)
 {

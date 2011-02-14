@@ -76,7 +76,7 @@ public:
 	 * See 'collapseDegeneratedFace' to see what can happen to edges attributes
 	 * Nothing has to be done for the faces (some degenerate ones can be deleted)
 	 */
-	virtual void collapseEdge(Dart d, bool delDegenerateFaces = true) ;
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true) ;
 
 	/**
 	 * No cell is created or deleted

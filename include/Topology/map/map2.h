@@ -132,14 +132,15 @@ public:
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
-	 *  faces are build (faces with less than 3 edges). If it occurs the faces
+	 *  faces are built (faces with less than 3 edges). If it occurs the faces
 	 *  are deleted and the adjacencies are updated (see collapseDegeneratedFace).
 	 *  \warning This may produce two distinct vertices if the edge
 	 *  was the only link between two border faces
 	 *  @param d a dart in the deleted edge
 	 *  @param delDegenerateFaces a boolean (default to true)
+	 *  @return a dart of the resulting vertex
 	 */
-	virtual void collapseEdge(Dart d, bool delDegenerateFaces = true);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
 	 * Flip the edge of d. (rotation in phi1 order)
