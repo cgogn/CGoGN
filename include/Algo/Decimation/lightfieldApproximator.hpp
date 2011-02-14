@@ -68,7 +68,6 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 
 		REAL t = std::max (std::min (segment * segmentNew , REAL(1)) , REAL(0) ) ; // Orthogonal projection on segment v1-v2 of new vertex
 
-
 		VEC3 n1, n2 ;
 		this->m_attrV[d].getSubVectorH(2, 0, n1) ;
 		this->m_attrV[dd].getSubVectorH(2, 0, n2) ;
@@ -76,7 +75,7 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 		VEC3 newN = slerp(n1,n2,t) ; // spherical interpolation
 		newN.normalize() ;
 
-		VEC3 newI = n1 ^ n2 ; // i is perpendicular to newNormal
+		VEC3 newI = n2 ^ n1 ; // i is perpendicular to newNormal
 		newI.normalize() ;
 
 		VEC3 newJ = newN ^ newI ;

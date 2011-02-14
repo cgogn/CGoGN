@@ -123,7 +123,7 @@ bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(RGBFUNCTIONS& cf) cons
 
 		coefs = Ainv * b[col];
 
-		assert (cf.setSubVectorH(col,0,coefs) || "QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed") ;
+		assert (cf.setSubVectorH(col,0,coefs) || !"QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed") ;
 	}
 
 	return true;
