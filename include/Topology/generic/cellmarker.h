@@ -233,6 +233,26 @@ protected:
 	{}
 };
 
+
+/**
+ * selector that say if a dart has it cell marked
+ */
+class SelectorCellMarked: public FunctorSelect
+{
+protected:
+	CellMarker& m_cmarker;
+public:
+	SelectorCellMarked(CellMarker& cm): m_cmarker(cm) {}
+	bool operator()(Dart d) const
+	{
+		if (m_cmarker.isMarked(d))
+			return true;
+		return false;
+	}
+};
+
+
+
 } // namespace CGoGN
 
 #endif
