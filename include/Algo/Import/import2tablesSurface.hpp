@@ -512,9 +512,9 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 {
 	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
 	attrNames.push_back(positions.name()) ;
-	AttributeHandler<typename PFP::MATRIX33> Frame = m_map.template addAttribute<typename PFP::MATRIX33>(VERTEX_ORBIT, "Frame") ;
+	AttributeHandler<typename PFP::MATRIX33> Frame = m_map.template addAttribute<typename PFP::MATRIX33>(VERTEX_ORBIT, "frame") ;
 	attrNames.push_back(Frame.name()) ;
-	AttributeHandler<typename PFP::MATRIX36> RGBfunctions = m_map.template addAttribute<typename PFP::MATRIX36>(VERTEX_ORBIT, "RGBfunctions") ;
+	AttributeHandler<typename PFP::MATRIX36> RGBfunctions = m_map.template addAttribute<typename PFP::MATRIX36>(VERTEX_ORBIT, "colorPTM") ;
 	attrNames.push_back(RGBfunctions.name()) ;
 
 	AttribContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;

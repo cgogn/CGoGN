@@ -49,10 +49,16 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, REAL alph
 	MATRIX66 R1,R2_A,R2_b,R2_c;
 	// Matrice de rotation 1
 	buildRotateMatrix(R1,gamma);
+//	std::cout <<"R1 : " <<  R1 << std::endl ;
+//	std::cout <<"alpha : " << alpha << std::endl ;
 	// Matrice de rotation 2 + intégrale
 	buildIntegralMatrix_A(R2_A,alpha);
 	buildIntegralMatrix_b(R2_b,alpha);
 	buildIntegralMatrix_b(R2_c,alpha);
+
+//	std::cout << "A : " << R2_A << std::endl ;
+//	std::cout << "b : " << R2_b << std::endl ;
+//	std::cout << "c : " << R2_c << std::endl ;
 
 
 	// Quadrique (A,b,c) tel que L*A*Lt - 2*b*Lt + c = ERROR
@@ -60,11 +66,7 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, REAL alph
 		// Rotation 1
 
 		Geom::Vector<6,REAL> function;
-		/*if (!cf.getSubMatrix(col,1,function)) // extract the vector of function col
-			std::cerr << "getSubMatrix failed" << std::endl;
-		*/
-		for (unsigned i = 0 ; i < 6 ; ++i)
-			function[i] = cf(col,i) ;
+		assert(cf.getSubVectorH(col,0,function) || !"QuadricRGBfunctions::constructor") ;
 
 		VEC6 coefs = R1 * function ; // Multiply coefs
 
@@ -90,10 +92,7 @@ REAL QuadricRGBfunctions<REAL>::operator() (const RGBFUNCTIONS& cf) const {
 	for (unsigned col = RED; col < BLUE+1; ++col) {
 		Geom::Vector<6,REAL> function ;
 
-		if (!cf.getSubVectorH(col,1,function))
-			std::cerr << "operator() --> getSubMatrix failed" << std::endl;
-//		for (unsigned i = 0 ; i < 6 ; ++i)
-//			function[i] = cf(col,i) ;
+		assert (cf.getSubVectorH(col,0,function) || !"QuadricRGBfunctions::operator()") ;
 
 		VEC6 Al = A[col] * function;
 
@@ -124,11 +123,7 @@ bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(RGBFUNCTIONS& cf) cons
 
 		coefs = Ainv * b[col];
 
-		if (! cf.setSubVectorH(col,1,coefs)) {
-			std::cerr << "QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed" << std::endl ;
-			exit(col + 1) ;
-		}
-
+		assert (cf.setSubVectorH(col,0,coefs) || "QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed") ;
 	}
 
 	return true;

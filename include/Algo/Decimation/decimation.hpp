@@ -64,7 +64,7 @@ void decimate(
 		{
 			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
 			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
-			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "RGBfunctions") ;
+			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "colorPTM") ;
 			approximators.push_back(new Approximator_Frame<PFP>(map, frame)) ;
 			approximators.push_back(new Approximator_RGBfunctions<PFP>(map, RGBfunctions)) ;
 			break ;
@@ -105,10 +105,13 @@ void decimate(
 	unsigned int nbVertices = map.getNbOrbits(VERTEX_ORBIT) ;
 	bool finished = false ;
 	Dart d ;
+
 	while(!finished)
 	{
-		if(!selector->nextEdge(d))
+		if(!selector->nextEdge(d)) {
+			std::cout << "out" << std::endl ;
 			break ;
+		}
 
 		--nbVertices ;
 
@@ -130,8 +133,10 @@ void decimate(
 
 		selector->updateAfterCollapse(d2, dd2) ;// update selector
 
-		if(nbVertices <= nbWantedVertices)
+		if(nbVertices <= nbWantedVertices) {
 			finished = true ;
+			std::cout << "done" << std::endl ;
+		}
 	}
 
 	delete selector ;

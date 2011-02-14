@@ -64,14 +64,14 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 		segment -= this->m_position[d] ;
 
 		VEC3 segmentNew = m_approxPosition[d] ;
-		segment -= this->m_position[d] ;
+		segmentNew -= this->m_position[d] ;
 
 		REAL t = std::max (std::min (segment * segmentNew , REAL(1)) , REAL(0) ) ; // Orthogonal projection on segment v1-v2 of new vertex
 
 
 		VEC3 n1, n2 ;
-		this->m_attrV[d].getSubVectorH(3, 1, n1) ;
-		this->m_attrV[dd].getSubVectorH(3, 1, n2) ;
+		this->m_attrV[d].getSubVectorH(2, 0, n1) ;
+		this->m_attrV[dd].getSubVectorH(2, 0, n2) ;
 
 		VEC3 newN = slerp(n1,n2,t) ; // spherical interpolation
 		newN.normalize() ;
@@ -82,9 +82,9 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 		VEC3 newJ = newN ^ newI ;
 		newJ.normalize() ;
 
-		this->m_approx[d].setSubVectorH(1,1,newI) ;
-		this->m_approx[d].setSubVectorH(2,1,newJ) ;
-		this->m_approx[d].setSubVectorH(3,1,newN) ;
+		assert(this->m_approx[d].setSubVectorH(0,0,newI) || !"Approximator_Frame::approximate") ;
+		assert(this->m_approx[d].setSubVectorH(1,0,newJ) || !"Approximator_Frame::approximate") ;
+		assert(this->m_approx[d].setSubVectorH(2,0,newN) || !"Approximator_Frame::approximate") ;
 	}
 }
 
@@ -97,9 +97,12 @@ bool Approximator_RGBfunctions<PFP>::init()
 {
 	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX_ORBIT, "frame") ;
 	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE_ORBIT, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "QuadricRGBfunctions") ;
+	m_quadricRGBfunctions = new AutoAttributeHandler<QuadricRGBfunctions<REAL> >(this->m_map, EDGE_ORBIT) ;
 
-	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions.isValid())
+	for (Dart d = this->m_map.begin() ; d != this->m_map.end() ; this->m_map.next(d))
+		(*m_quadricRGBfunctions)[d].zero() ;
+
+	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions->isValid())
 	{
 		std::cerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << std::endl ;
 		return false ;
@@ -115,17 +118,17 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 
 	VEC3 i,n ;
 	VEC3 n1,n2,i1,i2,j1,j2 ;
-	m_approxFrame[d].getSubVectorH(1,1,i) ;
-	m_approxFrame[d].getSubVectorH(3,1,n) ;
+	m_approxFrame[d].getSubVectorH(0,0,i) ;
+	m_approxFrame[d].getSubVectorH(2,0,n) ;
 
-	m_frame[d].getSubVectorH(1,1,i1) ;
-	m_frame[dd].getSubVectorH(1,1,i2) ;
+	m_frame[d].getSubVectorH(0,0,i1) ;
+	m_frame[dd].getSubVectorH(0,0,i2) ;
 
-	m_frame[d].getSubVectorH(2,1,j1) ;
-	m_frame[dd].getSubVectorH(2,1,j2) ;
+	m_frame[d].getSubVectorH(1,0,j1) ;
+	m_frame[dd].getSubVectorH(1,0,j2) ;
 
-	m_frame[d].getSubVectorH(3,1,n1) ;
-	m_frame[dd].getSubVectorH(3,1,n2) ;
+	m_frame[d].getSubVectorH(2,0,n1) ;
+	m_frame[dd].getSubVectorH(2,0,n2) ;
 
 	VEC3 j1pr = n1 ^ i ;
 	VEC3 j2pr = n2 ^ i ;
@@ -135,11 +138,17 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	REAL gamma1 = ((j1 * i) > 0 ? 1 : -1) * acos( i1 * i ) ;
 	REAL gamma2 = ((j2 * i) > 0 ? 1 : -1) * acos( i2 * i ) ;
 
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d],alpha1,gamma1) ;
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd],alpha2,gamma2) ;
+	alpha1 = std::min(REAL(1),std::max(REAL(-1),alpha1)) ;
+	alpha2 = std::min(REAL(1),std::max(REAL(-1),alpha2)) ;
+
+	gamma1 = std::min(REAL(1),std::max(REAL(-1),gamma1)) ;
+	gamma2 = std::min(REAL(1),std::max(REAL(-1),gamma2)) ;
+
+	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d],alpha1,gamma1) ;
+	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd],alpha2,gamma2) ;
 
 	// New RGBf
-	if (! m_quadricRGBfunctions[d].findOptimizedRGBfunctions(this->m_approx[d]))
+	if (! (*m_quadricRGBfunctions)[d].findOptimizedRGBfunctions(this->m_approx[d]))
 		this->m_approx[d] = this->m_attrV[d];
 }
 

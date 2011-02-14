@@ -504,7 +504,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 			m_frameApproximator = reinterpret_cast<Approximator<PFP, FRAME>* >(*it) ; // 2) frame (needs position)
 			++ok ;
 		}
-		else if(ok == 2 && (*it)->getApproximatedAttributeName() == "RGBfunctions")
+		else if(ok == 2 && (*it)->getApproximatedAttributeName() == "colorPTM")
 		{
 			m_RGBfunctionsApproximator = reinterpret_cast<Approximator<PFP, RGBFUNCTIONS>* >(*it) ; // 3) functions (needs frame)
 			++ok ;
@@ -697,11 +697,11 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MATRIX33 newFrame = this->m_frameApproximator->getApprox(d) ; // get newF
 
 	VEC3 n1,n2 ;
-	if (! m_frame[d].getSubVectorH(3,1,n1))	{ // get the normals
+	if (! m_frame[d].getSubVectorH(2,0,n1))	{ // get the normals
 		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 1 failed " << std::endl;
 		exit(2) ;
 	}
-	if (!m_frame[dd].getSubVectorH(3,1,n2))	{ // of the two vertices
+	if (!m_frame[dd].getSubVectorH(2,0,n2))	{ // of the two vertices
 		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 2 failed " << std::endl;
 		exit(3) ;
 	}
