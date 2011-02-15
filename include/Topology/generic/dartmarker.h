@@ -99,7 +99,7 @@ public:
 	virtual ~DartMarker()
 	{
 		unmarkAll();
-		m_map.releaseMarker(m_marker);
+		m_map.releaseMarker(m_marker,m_thread);
 	}
 
 protected:
@@ -257,7 +257,7 @@ public:
 
 	~DartMarkerNoUnmark()
 	{
-		m_map.releaseMarker(m_marker);
+		m_map.releaseMarker(m_marker,m_thread);
 	}
 
 protected:

@@ -33,30 +33,28 @@ namespace Algo
 namespace Render
 {
 
-namespace VBO
+namespace GL3
 {
 
 
 
 template <typename ATTR_HANDLER>
-void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+void MapRender::updateData(unsigned int vertex_attrib, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	// choisit le bon buffer en fonction du paramètre upType
-	unsigned int indexVBO = -1 ;
-	if (upType == POSITIONS)
-		indexVBO = POSITIONS_BUFFER ;
-	else if (upType == NORMALS)
-		indexVBO = NORMALS_BUFFER ;
-	else if (upType == COLORS)
-		indexVBO = COLORS_BUFFER ;
-	else
+
+	unsigned int indexVBO = vertex_attrib+FIRST_ATTRIBUTE_BUFFER;
+
+	if (! m_allocatedAttributes[vertex_attrib] )
 	{
-		std::cout << "MapRender_VBO::updateData : should not get here.. Bad type to update.." << std::endl ;
-		return ;
+		glGenBuffersARB(1, &(m_VBOBuffers[indexVBO])) ;
+		m_allocatedAttributes[vertex_attrib] = true ;
 	}
 
-	m_allocatedBuffers[indexVBO] = true ;
-	m_usedBuffers[indexVBO] = true ;
+
+	m_usedAttributes[vertex_attrib] = true ;
+	m_AttributesDataSize[vertex_attrib]= sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
+
 
 	if (conv)
 		fillBufferConvert(indexVBO, attrib, conv) ;
@@ -67,7 +65,7 @@ void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAt
 
 
 template <typename ATTR_HANDLER>
-void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
+void MapRender::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
 {
 	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -79,7 +77,6 @@ void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& 
 	glBufferDataARB(GL_ARRAY_BUFFER, nbb * byteTableSize, 0, GL_STREAM_DRAW);
 
 	unsigned int offset = 0;
-//	unsigned int offsetInc = byteTableSize;
 
 	for (unsigned int i = 0; i < nbb; ++i)
 	{
@@ -90,7 +87,7 @@ void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& 
 
 
 template <typename ATTR_HANDLER>
-void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+void MapRender::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -106,7 +103,6 @@ void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER&
 	glBufferDataARB(GL_ARRAY_BUFFER, nbb * conv->sizeBuffer(), 0, GL_STREAM_DRAW);
 
 	unsigned int offset = 0;
-//	unsigned int offsetInc = byteTableSize;
 
 	for (unsigned int i = 0; i < nbb; ++i)
 	{
@@ -123,12 +119,12 @@ void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER&
 }
 
 template<typename PFP>
-inline void MapRender_VBO::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
+inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
 {
 	Dart a = d;
 	Dart b = map.phi1(a);
 	Dart c = map.phi1(b);
-	
+
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
 	do
 	{
@@ -140,8 +136,9 @@ inline void MapRender_VBO::addTri(typename PFP::MAP& map, Dart d, std::vector<GL
 	} while (c != d);
 }
 
+
 template<typename PFP>
-void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	DartMarker m(map,thread);
 	tableIndices.reserve(4*map.getNbDarts()/3);
@@ -157,13 +154,13 @@ void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& g
 }
 
 template<typename PFP>
-void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
 	DartMarker m(map,thread);
 	// reserve memory for triangles ( nb indices == nb darts )
 	// and a little bit more
-	// if lots of polygonal faces, realloc is done by vector 
+	// if lots of polygonal faces, realloc is done by vector
 	tableIndices.reserve(4*map.getNbDarts()/3);
 
 	for (Dart dd = map.begin(); dd != map.end(); map.next(dd))
@@ -213,7 +210,7 @@ void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const Functor
 }
 
 template<typename PFP>
-void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	DartMarker m(map,thread);
 	tableIndices.reserve(map.getNbDarts());
@@ -230,7 +227,7 @@ void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good,
 }
 
 template<typename PFP>
-void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
 
@@ -280,7 +277,7 @@ void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSele
 }
 
 template<typename PFP>
-void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 	CellMarker m(map, VERTEX_ORBIT,thread) ;
 	tableIndices.reserve(map.getNbDarts()/5);
@@ -296,18 +293,18 @@ void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good
 }
 
 template<typename PFP>
-void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
+void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
 {
 	std::vector<GLuint> tableIndices;
 
 	// indice du VBO a utiliser
 	int vbo_ind = 0;
+
+
 	switch(prim)
 	{
 		case FLAT_TRIANGLES:
-			initFlatTriangles<PFP>(map,good,thread);
 			break;
-
 		case TRIANGLES:
 			if(optimized)
 				initTrianglesOptimized<PFP>(map,good,tableIndices,thread);
@@ -323,14 +320,6 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 				initLines<PFP>(map,good,tableIndices,thread) ;
 			m_nbIndicesLines = tableIndices.size();
 			vbo_ind = m_VBOBuffers[LINE_INDICES];
-
-			for (unsigned int i=0; i< tableIndices.size(); ++i)
-			{
-				std::cout << tableIndices[i]<< "/";
-				if (i%2 == 1) std::cout << std::endl;
-			}
-			 std::cout << std::endl;
-
 			break;
 		case POINTS:
 			initPoints<PFP>(map,good,tableIndices,thread);
@@ -341,7 +330,7 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 			std::cerr << "problem initializing VBO indices" << std::endl;
 			break;
 	}
-	int size = tableIndices.size();
+	unsigned int size = tableIndices.size();
 
 	// setup du buffer d'indices
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
@@ -352,13 +341,13 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 
 
 template<typename PFP>
-void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good, unsigned int thread)
+void MapRender::initFlatTriangles( typename PFP::MAP& map, unsigned int vertex_attrib_position, const FunctorSelect& good, unsigned int thread)
 {
 	std::vector<Geom::Vec3f> tableFlat;
 	tableFlat.reserve(3*map.getNbDarts()); // 3 in case of polygonal faces (less chance of realloc, but bigger allocation)
 
 	// map VBO of points for vertices positions
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[POSITIONS_BUFFER]);
+	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[vertex_attrib_position+FIRST_ATTRIBUTE_BUFFER]);
 	Geom::Vec3f* tablePos = reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER,GL_READ_ONLY));
 
 	m_nbFlatElts=0;

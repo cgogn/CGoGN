@@ -148,7 +148,7 @@ public:
 		unsigned int cell = m_marker.getCell() ;
 		AttribContainer& cont = m_map.getAttributeContainer(cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(cell)->operator[](i).setMark(m_marker);
+			m_map.getMarkerVector(cell,m_thread)->operator[](i).setMark(m_marker);
 	}
 
 	virtual void unmarkAll()

@@ -16,6 +16,7 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
 	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
+	${CGoGN_ROOT_DIR}/ThirdParty/glm
 	${CGoGN_ROOT_DIR}/include
 )
 
@@ -56,3 +57,9 @@ add_executable( tuto_mt tuto_mt.cpp)
 target_link_libraries( tuto_mt
 	containerD topologyD utilsD algoD  ${COMMON_LIBS} boost_thread)
 #	container topology utils algo ${COMMON_LIBS} boost_thread)
+
+add_executable( tuto_ogl3 tuto_ogl3.cpp)
+target_link_libraries( tuto_ogl3
+	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
+#	container topology utils algo  ${COMMON_LIBS} )
+
