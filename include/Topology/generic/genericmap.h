@@ -75,10 +75,6 @@ class GenericMap : public MapBrowser
 	friend class DartMarkerStore ;
 	friend class DartMarkerNoUnmark ;
 
-	friend class CellMarker ;
-	friend class CellMarkerStore ;
-	friend class CellMarkerNoUnmark ;
-
 	template<typename T> friend class AutoAttributeHandler ;
 
 protected:

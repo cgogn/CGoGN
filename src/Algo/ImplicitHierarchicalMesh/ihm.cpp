@@ -84,6 +84,46 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 	if(m_curLevel == 0)
 		return 0 ;
 
+//	unsigned int cur = m_curLevel ;
+//	Dart it = d ;
+//	Dart end = d ;
+//	bool resetEnd = true ;
+//	bool firstEdge = true ;
+//	do
+//	{
+//		if(!resetEnd)
+//			firstEdge = false ;
+//
+//		unsigned int eId = m_edgeId[it] ;
+//		Dart next = it ;
+//		do
+//		{
+//			unsigned int l = edgeLevel(next) ;
+//			if(l < m_curLevel)
+//				m_curLevel = l ;
+//			else // l == curLevel
+//			{
+//				if(!firstEdge)
+//				{
+//					--m_curLevel ;
+//					next = it ;
+//				}
+//			}
+//			next = phi1(next) ;
+//		} while(m_edgeId[next] == eId) ;
+//		it = next ;
+//
+//		if(resetEnd)
+//		{
+//			end = it ;
+//			resetEnd = false ;
+//		}
+//
+//	} while(!firstEdge && it != end) ;
+//
+//	unsigned int fLevel = m_curLevel ;
+//	m_curLevel = cur ;
+
 	Dart it = d ;
 	Dart old = it ;
 	unsigned int fLevel = edgeLevel(it) ;
@@ -210,11 +250,11 @@ bool ImplicitHierarchicalMap::faceIsSubdividedOnce(Dart d)
 	do
 	{
 		++m_curLevel ;
-		if(m_dartLevel[phi1(d)] == m_curLevel && m_edgeId[phi1(d)] != m_edgeId[d])
+		if(m_dartLevel[phi1(fit)] == m_curLevel && m_edgeId[phi1(fit)] != m_edgeId[fit])
 		{
 			subd = true ;
 			++m_curLevel ;
-			if(m_dartLevel[phi1(d)] == m_curLevel && m_edgeId[phi1(d)] != m_edgeId[d])
+			if(m_dartLevel[phi1(fit)] == m_curLevel && m_edgeId[phi1(fit)] != m_edgeId[fit])
 				subdOnce = false ;
 			--m_curLevel ;
 		}

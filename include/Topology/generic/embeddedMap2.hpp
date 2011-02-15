@@ -308,8 +308,11 @@ void EmbeddedMap2<MAP2>::unsewFaces(Dart d)
 	unsigned int vEmb2 = EMBNULL ;
 	if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 	{
-		vEmb1 = MAP2::getEmbedding(d, VERTEX_ORBIT) ;
-		vEmb2 = MAP2::getEmbedding(MAP2::phi1(d), VERTEX_ORBIT) ;
+		if(MAP2::isBoundaryVertex(d))
+			vEmb1 = MAP2::getEmbedding(d, VERTEX_ORBIT) ;
+		Dart dd = MAP2::phi1(d) ;
+		if(MAP2::isBoundaryVertex(dd))
+			vEmb2 = MAP2::getEmbedding(dd, VERTEX_ORBIT) ;
 	}
 	unsigned int eEmb = EMBNULL ;
 	if (MAP2::isOrbitEmbedded(EDGE_ORBIT))
@@ -322,17 +325,26 @@ void EmbeddedMap2<MAP2>::unsewFaces(Dart d)
 
 	if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 	{
-		MAP2::setDartEmbedding(VERTEX_ORBIT, d, vEmb1) ;
-		MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::phi1(d), vEmb2) ;
-		if(e != d)
+		if(vEmb1 != EMBNULL)
 		{
-			MAP2::embedNewCell(VERTEX_ORBIT, e) ;
-			MAP2::copyCell(VERTEX_ORBIT, e, d) ;
-			MAP2::embedNewCell(VERTEX_ORBIT, MAP2::phi1(e)) ;
-			MAP2::copyCell(VERTEX_ORBIT, MAP2::phi1(e), MAP2::phi1(d)) ;
+			MAP2::setDartEmbedding(VERTEX_ORBIT, d, vEmb1) ;
+			if(e != d)
+			{
+				MAP2::embedNewCell(VERTEX_ORBIT, MAP2::phi1(e)) ;
+				MAP2::copyCell(VERTEX_ORBIT, MAP2::phi1(e), d) ;
+			}
+		}
+
+		if(vEmb2 != EMBNULL)
+		{
+			MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::phi1(d), vEmb2) ;
+			if(e != d)
+			{
+				MAP2::embedNewCell(VERTEX_ORBIT, e) ;
+				MAP2::copyCell(VERTEX_ORBIT, e, MAP2::phi1(d)) ;
+			}
 		}
 	}
-
 	if (MAP2::isOrbitEmbedded(EDGE_ORBIT))
 	{
 		MAP2::setDartEmbedding(EDGE_ORBIT, d, eEmb) ;

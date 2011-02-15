@@ -56,7 +56,7 @@ public:
 	//! Constructor
 	Mark() : m_bits(0) {};
 
-	Mark(unsigned a) : m_bits(a) {};
+	Mark(unsigned int a) : m_bits(a) {};
 
 	//! Copy constructor
 	Mark(const Mark& m) : m_bits(m.m_bits) {};
@@ -71,11 +71,16 @@ public:
 		return n;
 	}
 
+	inline void clear()
+	{
+		m_bits = 0;
+	}
+
 	//! Test if all marks are set to NO (0)
 	inline bool isClear()
 	{
 		return (m_bits == 0);
-	};
+	}
 
 	//! Set given marks to YES
 	/*! @param m the marks to set

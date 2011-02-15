@@ -40,6 +40,8 @@ class ParticleCell2D : public ParticleBase
 
 	DartMarker& obstacle;
 
+	bool changeCell ;
+
 	ParticleCell2D() {}
 
 	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, TAB_POS tabPos, DartMarker& obst) : ParticleBase(pos), m(map), d(belonging_cell), m_positions(tabPos), obstacle(obst)
@@ -71,6 +73,7 @@ class ParticleCell2D : public ParticleBase
 
 	void move(const VEC3& newCurrent)
 	{
+		changeCell = false ;
 		if(!Geom::arePointsEquals(newCurrent, m_position)) {
 			prevPos = m_position;
 
@@ -88,7 +91,6 @@ class ParticleCell2D : public ParticleBase
 };
 
 #include "particle_cell_2D.hpp"
-//namespace
 
 }
 
