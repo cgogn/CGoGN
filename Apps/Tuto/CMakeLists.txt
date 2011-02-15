@@ -5,8 +5,8 @@ project(Tutos)
 #SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} gzstream AntTweakBar openctm)
 
 
-SET (CMAKE_BUILD_TYPE Debug)
-#SET(CMAKE_BUILD_TYPE Release)
+#SET (CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_BUILD_TYPE Release)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
@@ -55,11 +55,9 @@ target_link_libraries( tp_master
 
 add_executable( tuto_mt tuto_mt.cpp)
 target_link_libraries( tuto_mt
-	containerD topologyD utilsD algoD  ${COMMON_LIBS} boost_thread)
-#	container topology utils algo ${COMMON_LIBS} boost_thread)
+	container topology utils algo ${COMMON_LIBS} boost_thread)
 
 add_executable( tuto_ogl3 tuto_ogl3.cpp)
 target_link_libraries( tuto_ogl3
-	containerD topologyD utilsD algoD  ${COMMON_LIBS} )
-#	container topology utils algo  ${COMMON_LIBS} )
+	container topology utils algo  ${COMMON_LIBS} )
 
