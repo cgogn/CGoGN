@@ -54,7 +54,8 @@ inline void GenericMap::deleteDart(Dart d)
 			if(emb != EMBNULL)
 				m_attribs[orbit].unrefLine(emb) ;
 		}
-		m_markerTables[DART_ORBIT]->operator[](d.index).clear() ;
+		for (unsigned int t=0; t<m_nbThreads; ++t)
+			m_markerTables[DART_ORBIT][t]->operator[](d.index).clear() ;
 	}
 }
 
@@ -228,10 +229,10 @@ inline AttribMultiVect<T>& GenericMap::getAttributeVector(unsigned int idAttr)
 	return m_attribs[AttribContainer::orbitAttr(idAttr)].getDataVector<T>(AttribContainer::indexAttr(idAttr)) ;
 }
 
-inline AttribMultiVect<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
+inline AttribMultiVect<Mark>* GenericMap::getMarkerVector(unsigned int orbit, unsigned int thread)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	return m_markerTables[orbit] ;
+	return m_markerTables[orbit][thread] ;
 }
 
 inline AttribMultiVectGen& GenericMap::getMultiVec(unsigned int idAttr)
@@ -249,17 +250,18 @@ inline AttribContainer& GenericMap::getAttributeContainer(unsigned int orbit)
  *          MARKERS MANAGEMENT          *
  ****************************************/
 
-inline Marker GenericMap::getNewMarker(unsigned int cell)
+inline Marker GenericMap::getNewMarker(unsigned int cell, unsigned int thread)
 {
+
 //	assert(isOrbitEmbedded(cell) || !"Try to get a marker on non embedded cell! ") ;
-	return m_orbMarker[cell].getNewMarker(cell) ;
+	return m_orbMarker[cell][thread].getNewMarker(cell) ;
 }
 
-inline void GenericMap::releaseMarker(Marker m)
+inline void GenericMap::releaseMarker(Marker m, unsigned int thread)
 {
 	unsigned int cell = m.getCell();
 	assert(isOrbitEmbedded(cell) || !"Try to release a marker on non embedded cell! ") ;
-	m_orbMarker[cell].releaseMarker(m) ;
+	m_orbMarker[cell][thread].releaseMarker(m) ;
 }
 
 /****************************************

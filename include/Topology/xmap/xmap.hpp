@@ -26,9 +26,9 @@ namespace CGoGN
 {
 
 template <typename DART>
-bool tXMap<DART>::foreach_dart_of_cc(Dart d, FunctorType& f)
+bool tXMap<DART>::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore m(*this);
+	DartMarkerStore m(*this,thread);
 	bool found = false;
 	std::list<Dart> darts_list;
 	darts_list.push_back(d);
@@ -69,30 +69,30 @@ bool tXMap<DART>::foreach_dart_of_cc(Dart d, FunctorType& f)
 }
 
 template <typename DART>
-bool tXMap<DART>::foreach_dart_of_face(Dart d, FunctorType& f)
+bool tXMap<DART>::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	if (foreach_dart_of_oriented_face(d,f)) return true;
+	if (foreach_dart_of_oriented_face(d,f,thread)) return true;
 
 	Dart d3 = phi3(d);
-	if (d3 != d) return foreach_dart_of_oriented_face(d3,f);
+	if (d3 != d) return foreach_dart_of_oriented_face(d3,f,thread);
 	return false;
 }
 
 template <typename DART>
-bool tXMap<DART>::foreach_dart_of_edge(Dart d, FunctorType& f)
+bool tXMap<DART>::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
 	do {
-		if (tMap2<DART>::foreach_dart_of_edge(dNext,f)) return true;
+		if (tMap2<DART>::foreach_dart_of_edge(dNext,f,thread)) return true;
 		dNext = alpha(2,dNext);
 	} while (dNext != d);
 	return false;
 }
 
 template <typename DART>
-bool tXMap<DART>::foreach_dart_of_vertex(Dart d, FunctorType& f)
+bool tXMap<DART>::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore m(*this) ;
+	DartMarkerStore m(*this,thread) ;
 	bool found = false ;
 
 	std::list<Dart> darts_list ;

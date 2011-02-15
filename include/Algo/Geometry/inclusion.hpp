@@ -39,12 +39,12 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isConvex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, bool CCW)
+bool isConvex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, bool CCW, unsigned int thread)
 {
 	//get all the dart of the volume
 	std::vector<Dart> vStore;
 	FunctorStore fs(vStore);
-	map.foreach_dart_of_volume(d, fs);
+	map.foreach_dart_of_volume(d, fs,thread);
 
 	bool convex = true;
 

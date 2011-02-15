@@ -178,29 +178,29 @@ inline bool Map1::sameFace(Dart d, Dart e)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool Map1::foreach_dart_of_vertex(Dart d, FunctorType& f)
+inline bool Map1::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	return f(d) ;
 }
 
-inline bool Map1::foreach_dart_of_edge(Dart d, FunctorType& f)
+inline bool Map1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	return f(d) ;
 }
 
-inline bool Map1::foreach_dart_of_face(Dart d, FunctorType& f)
+inline bool Map1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d, f) ;
+	return foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
-inline bool Map1::foreach_dart_of_volume(Dart d, FunctorType& f)
+inline bool Map1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d, f) ;
+	return foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
-inline bool Map1::foreach_dart_of_cc(Dart d, FunctorType& f)
+inline bool Map1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d, f) ;
+	return foreach_dart_of_oriented_face(d, f, thread) ;
 }
 
 } // namespace CGoGN

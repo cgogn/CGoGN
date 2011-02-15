@@ -100,6 +100,7 @@ Dart d_maison;
 
 Dart Carre()
 {
+	return Dart::nil();
 }
 
 
@@ -107,7 +108,7 @@ Dart Carre()
 
 Dart Triangle()
 {
-
+	return Dart::nil();
 }
 
 
@@ -141,7 +142,7 @@ void ColleMilieu(Dart d, Dart e)
 
 Dart Maison()
 {
-
+	return Dart::nil();
 }
 
 
@@ -634,7 +635,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		/// calcul du rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
-		float AB2 = AB.norm2();
 
 		d_faces.clear();
 		d_edges.clear();
@@ -678,7 +678,6 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		/// Rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
-		float AB2 = AB.norm2();
 
 		d_faces.clear();
 		d_edges.clear();

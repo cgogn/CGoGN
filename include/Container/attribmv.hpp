@@ -63,6 +63,7 @@ AttribMultiVectGen* AttribMultiVect<T>::new_obj()
 	return new AttribMultiVect<T>;
 }
 
+
 template <typename T>
 bool AttribMultiVect<T>::copy(const AttribMultiVectGen* atmvg)
 {

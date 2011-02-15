@@ -33,8 +33,8 @@ namespace CGoGN
 std::map< std::string, RegisteredBaseAttribute* >* GenericMap::m_attributes_registry_map = NULL;
 
 GenericMap::GenericMap()
+:m_nbThreads(1)
 {
-
 	if (m_attributes_registry_map ==NULL)
 		m_attributes_registry_map = new std::map< std::string, RegisteredBaseAttribute* >;
 	// register all known types
@@ -69,7 +69,8 @@ GenericMap::GenericMap()
 	{
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
-		m_markerTables[i] = NULL ;
+		for (unsigned int j = 0; j < NBTHREAD; ++j)
+			m_markerTables[i][j] = NULL ;
 	}
 }
 
@@ -102,7 +103,8 @@ void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 	if (old != EMBNULL)
 	{
 		if(m_attribs[orbit].unrefLine(old))
-			m_markerTables[orbit]->operator[](old).clear();
+			for (unsigned int t=0; t<m_nbThreads; ++t)
+				m_markerTables[orbit][t]->operator[](old).clear();
 	}
 	// ref the new emb
 	if (emb != EMBNULL)
@@ -199,8 +201,8 @@ bool GenericMap::saveMapXml(const std::string& filename, bool compress)
 	{
 		int rc = xmlTextWriterStartElement(writer, BAD_CAST "MarkerSet");
 		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "orbit", "%u", i);
-		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_orbMarker[i].getMarkVal());
-//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "bin", BAD_CAST m_orbMarker[i].getMarkerAsBinaryString().c_str());
+		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_orbMarker[i][0].getMarkVal());
+//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "bin", BAD_CAST m_orbMarker[i][0].getMarkerAsBinaryString().c_str());
 //		m_orbMarker[i] ;
 		rc = xmlTextWriterEndElement(writer);
 	}
@@ -317,7 +319,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 				unsigned int orb = atoi((char*)prop);
 				prop = xmlGetProp(mark_node, BAD_CAST "val");
 				unsigned int val = atoi((char*)prop);
-				m_orbMarker[orb].setMarkVal(val);
+				m_orbMarker[orb][0].setMarkVal(val);
 			}
 			read1 =true;
 		}
@@ -385,7 +387,7 @@ bool GenericMap::saveMapBin(const std::string& filename)
 	buffer.reserve(NB_ORBITS+1);
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
 	{
-		buffer.push_back(m_orbMarker[i].getMarkVal());
+		buffer.push_back(m_orbMarker[i][0].getMarkVal());
 	}
 //	buffer.push_back(m_BoundaryMarkerVal.getMarkVal());
 
@@ -452,7 +454,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	fs.read(reinterpret_cast<char*>(&(buffer[0])), (NB_ORBITS+1)*sizeof(unsigned int));
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
 	{
-		m_orbMarker[i].setMarkVal(buffer[i]);
+		m_orbMarker[i][0].setMarkVal(buffer[i]);
 	}
 //	m_BoundaryMarkerVal.setMarkVal(buffer[NB_ORBITS]);
 
@@ -477,24 +479,24 @@ bool GenericMap::foreach_dart(FunctorType& f, const FunctorSelect& good)
 	return false;
 }
 
-bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f)
+bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread)
 {
 	switch(orbit)
 	{
 		case  DART_ORBIT: return f(d);
-		case  VERTEX_ORBIT: return foreach_dart_of_vertex(d, f);
-		case  EDGE_ORBIT: return foreach_dart_of_edge(d, f);
-		case  FACE_ORBIT: return foreach_dart_of_face(d, f);
-		case  VOLUME_ORBIT: return foreach_dart_of_volume(d, f);
-//		case -1: return foreach_dart_of_cc(d,f);
+		case  VERTEX_ORBIT: return foreach_dart_of_vertex(d, f,thread);
+		case  EDGE_ORBIT: return foreach_dart_of_edge(d, f,thread);
+		case  FACE_ORBIT: return foreach_dart_of_face(d, f,thread);
+		case  VOLUME_ORBIT: return foreach_dart_of_volume(d, f, thread);
+//		case -1: return foreach_dart_of_cc(d,f,thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}
 	return false;
 }
 
-bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good)
+bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
 {
-	DartMarker marker(*this);	// Lock a marker
+	DartMarker marker(*this,thread);	// Lock a marker
 	bool found = false;			// Store the result
 
 	// Scan all darts of the map
@@ -520,5 +522,58 @@ unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& go
 	foreach_orbit(orbit, fcount, good);
 	return fcount.getNb();
 }
+
+
+void GenericMap::addThreadMarker(unsigned int nb)
+{
+	unsigned int th;
+
+	for (unsigned int j=0; j< nb; ++j)
+	{
+		th= m_nbThreads;
+		m_nbThreads++;
+
+		for (unsigned int i=0; i< NB_ORBITS; ++i)
+		{
+			if (isOrbitEmbedded(i))
+			{
+				AttribContainer& cellCont = m_attribs[i] ;
+				std::stringstream ss;
+				ss << "Mark_"<< th;
+				unsigned int mark_index = cellCont.addAttribute<Mark>(ss.str()) ;
+				AttribMultiVect<Mark>& amvMark = cellCont.getDataVector<Mark>(mark_index) ;
+				m_markerTables[i][th] = &amvMark ;
+			}
+		}
+	}
+}
+
+unsigned int GenericMap::getNbThreadMarkers()
+{
+	return m_nbThreads;
+}
+
+void GenericMap::removeThreadMarker(unsigned int nb)
+{
+	unsigned int th=0;
+	while ((m_nbThreads>1)&&(nb>0))
+	{
+		th= --m_nbThreads;
+		nb--;
+		for (unsigned int i=0; i< NB_ORBITS; ++i)
+		{
+			if (isOrbitEmbedded(i))
+			{
+				AttribContainer& cellCont = m_attribs[i] ;
+				std::stringstream ss;
+				ss << "Mark_"<< th;
+				cellCont.removeAttribute(ss.str());
+				m_markerTables[i][th] = NULL ;
+			}
+		}
+	}
+}
+
+
 
 } // namespace CGoGN

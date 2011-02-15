@@ -47,6 +47,7 @@ class CellMarker
 protected:
 	Marker m_marker;
 	AttribMap& m_map;
+	unsigned int m_thread;
 
 public:
 	/**
@@ -55,17 +56,23 @@ public:
 	 * @param cell the type of cell we want to mark VERTEX_CELL, EDGE_CELL,...
 	 * \pre the cell is embedded in the map
 	 */
-	CellMarker(AttribMap& map, unsigned int cell): m_map(map)
+
+	CellMarker(AttribMap& map, unsigned int cell): m_map(map), m_thread(0)
 	{
 		if(!map.isOrbitEmbedded(cell))
 			map.addEmbedding(cell) ;
 		m_marker = map.getNewMarker(cell);
 	}
 
+	CellMarker(AttribMap& map, unsigned int cell, unsigned int thread): m_map(map), m_thread(thread)
+	{
+		m_marker = map.getNewMarker(cell,thread);
+	}
+
 	virtual ~CellMarker()
 	{
 		unmarkAll();
-		m_map.releaseMarker(m_marker);
+		m_map.releaseMarker(m_marker,m_thread);
 	}
 
 protected:
@@ -84,7 +91,7 @@ public:
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(cell, d);
 
-		m_map.getMarkerVector(cell)->operator[](a).setMark(m_marker);
+		m_map.getMarkerVector(cell,m_thread)->operator[](a).setMark(m_marker);
 	}
 
 	/**
@@ -97,7 +104,7 @@ public:
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(cell, d);
 
-		m_map.getMarkerVector(cell)->operator[](a).unsetMark(m_marker);
+		m_map.getMarkerVector(cell,m_thread)->operator[](a).unsetMark(m_marker);
 	}
 
 	/**
@@ -110,7 +117,7 @@ public:
 		if (a == EMBNULL)
 			return false;
 
-		return m_map.getMarkerVector(cell)->operator[](a).testMark(m_marker);
+		return m_map.getMarkerVector(cell,m_thread)->operator[](a).testMark(m_marker);
 	}
 
 	/**
@@ -118,7 +125,7 @@ public:
 	 */
 	virtual void mark(unsigned int em)
 	{
-		m_map.getMarkerVector(m_marker.getCell())->operator[](em).setMark(m_marker);
+		m_map.getMarkerVector(m_marker.getCell(),m_thread)->operator[](em).setMark(m_marker);
 	}
 
 	/**
@@ -126,7 +133,7 @@ public:
 	 */
 	virtual void unmark(unsigned int em)
 	{
-		m_map.getMarkerVector(m_marker.getCell())->operator[](em).unsetMark(m_marker);
+		m_map.getMarkerVector(m_marker.getCell(),m_thread)->operator[](em).unsetMark(m_marker);
 	}
 
 	/**
@@ -134,7 +141,7 @@ public:
 	 */
 	virtual bool isMarked(unsigned int em)
 	{
-		return m_map.getMarkerVector(m_marker.getCell())->operator[](em).testMark(m_marker);
+		return m_map.getMarkerVector(m_marker.getCell(),m_thread)->operator[](em).testMark(m_marker);
 	}
 
 	virtual void markAll()
@@ -142,7 +149,7 @@ public:
 		unsigned int cell = m_marker.getCell() ;
 		AttribContainer& cont = m_map.getAttributeContainer(cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(cell)->operator[](i).setMark(m_marker);
+			m_map.getMarkerVector(cell,m_thread)->operator[](i).setMark(m_marker);
 	}
 
 	virtual void unmarkAll()
@@ -150,7 +157,7 @@ public:
 		unsigned int cell = m_marker.getCell() ;
 		AttribContainer& cont = m_map.getAttributeContainer(cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(cell)->operator[](i).unsetMark(m_marker);
+			m_map.getMarkerVector(cell,m_thread)->operator[](i).unsetMark(m_marker);
 	}
 };
 
@@ -174,10 +181,14 @@ public:
 	CellMarkerStore(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
+	CellMarkerStore(AttribMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
+	{}
+
 protected:
 	// protected copy constructor to forbid its usage
 	CellMarkerStore(const CellMarkerStore& cm) : CellMarker(cm)
 	{}
+
 
 public:
 	/**
@@ -202,7 +213,7 @@ public:
 	{
 		unsigned int cell = m_marker.getCell() ;
 		for (std::vector<unsigned int>::iterator it = m_markedCells.begin(); it != m_markedCells.end(); ++it)
-			m_map.getMarkerVector(cell)->operator[](*it).unsetMark(m_marker);
+			m_map.getMarkerVector(cell,m_thread)->operator[](*it).unsetMark(m_marker);
 	}
 };
 
@@ -223,9 +234,13 @@ public:
 	CellMarkerNoUnmark(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
+
+	CellMarkerNoUnmark(AttribMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
+	{}
+
 	~CellMarkerNoUnmark()
 	{
-		m_map.releaseMarker(m_marker);
+		m_map.releaseMarker(m_marker,m_thread);
 	}
 
 protected:

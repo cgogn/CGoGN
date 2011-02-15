@@ -545,7 +545,7 @@ bool Map2::check()
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f)
+bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
 	do
@@ -557,7 +557,7 @@ bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f)
  	return false;
 }
 
-bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct)
+bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
 {
 	if (fonct(d))
 		return true;
@@ -569,9 +569,9 @@ bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct)
 		return false;
 }
 
-bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f)
+bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
+	DartMarkerStore mark(*this,thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
@@ -605,7 +605,7 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f)
 	return found;
 }
 
-bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f)
+bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
 {
 	if(orbit == VERTEX_ORBIT)
 	{
@@ -613,7 +613,7 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f)
 		Dart dNext = d;
 		do
 		{
-			if(Map1::foreach_dart_of_face(dNext,f))
+			if(Map1::foreach_dart_of_face(dNext,f,thread))
 				return true;
 
 			dNext = alpha1(dNext);
@@ -623,11 +623,11 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f)
 	}
 	else if(orbit == FACE_ORBIT)
 	{
-		if(Map1::foreach_dart_of_face(d,f))
+		if(Map1::foreach_dart_of_face(d,f,thread))
 			return true;
 
 		if(phi2(d) != d)
-			return Map1::foreach_dart_of_face(phi2(d),f);
+			return Map1::foreach_dart_of_face(phi2(d),f,thread);
 		else
 			return false;
 	}
@@ -635,14 +635,14 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f)
 	return false;
 }
 
-bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f)
+bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
 {
 	if(orbit == VERTEX_ORBIT)
 	{
 		Dart dNext = d;
 		do
 		{
-			if(Map2::foreach_dart_of_edge(phi1(dNext),f))
+			if(Map2::foreach_dart_of_edge(phi1(dNext),f,thread))
 				return true;
 
 			dNext = alpha1(dNext);
@@ -652,10 +652,10 @@ bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f)
 	}
 	else if(orbit == FACE_ORBIT)
 	{
-		if(Map2::foreach_dart_of_vertex(phi_1(d),f))
+		if(Map2::foreach_dart_of_vertex(phi_1(d),f,thread))
 			return true;
 
-		if(Map2::foreach_dart_of_vertex(phi_1(phi2(d)),f))
+		if(Map2::foreach_dart_of_vertex(phi_1(phi2(d)),f,thread))
 			return true;
 
 		return false;

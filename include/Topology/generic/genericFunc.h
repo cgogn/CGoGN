@@ -47,7 +47,7 @@ namespace CGoGN
 * @param m index of the marker
 */
 template <typename MF, typename MM>
-void markOrbitGen(int dim, typename MM::Dart d, Marker m, MM *ptr);
+void markOrbitGen(int dim, typename MM::Dart d, Marker m, MM *ptr, unsigned int th=0);
 
 /**
 * unmark darts of a cell with marker m
@@ -58,7 +58,7 @@ void markOrbitGen(int dim, typename MM::Dart d, Marker m, MM *ptr);
 * @param m index of the marker
 */
 template <typename MF, typename MM>
-void unmarkOrbitGen(int dim, typename MM::Dart d, Marker m, MM* ptr);
+void unmarkOrbitGen(int dim, typename MM::Dart d, Marker m, MM* ptr, unsigned int th=0);
 
 /**
 * execute functor for each cell
@@ -67,10 +67,10 @@ void unmarkOrbitGen(int dim, typename MM::Dart d, Marker m, MM* ptr);
 * @param f the functor
 */
 template <typename MF, typename MM>
-void foreach_orbitGen(int dim, FunctorType<typename MM>& fonct, MM* ptr);
+void foreach_orbitGen(int dim, FunctorType<typename MM>& fonct, MM* ptr, unsigned int th=0);
 
 template <typename MF, typename MM>
-void foreach_orbitGen_sel(int dim, FunctorType<typename MM>& fonct, MM* ptr, FunctorType<typename MM>& good);
+void foreach_orbitGen_sel(int dim, FunctorType<typename MM>& fonct, MM* ptr, FunctorType<typename MM>& good, unsigned int th=0);
 
 /**
 * Associate an embedding to all darts of a vertex
@@ -82,7 +82,7 @@ void foreach_orbitGen_sel(int dim, FunctorType<typename MM>& fonct, MM* ptr, Fun
 * ptr an ptr on the Map
 */
 template <typename MF, typename MM>
-void embedOrbitGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr);
+void embedOrbitGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr, unsigned int th=0);
 
 } //namespace CGoGN
 

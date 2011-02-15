@@ -163,31 +163,31 @@ public:
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 	template <typename PFP>
-	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
 	/**
 	 * creation of indices table of lines (optimized order)
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initLines(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initLines(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 	template <typename PFP>
-	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
 	/**
 	 * creation of indices table of points
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
 	/**
 	 * creation of VBO for flat faces rendering
 	 */
 	template <typename PFP>
-	void initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good);
+	void initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good, unsigned int thread=0);
 
 	/**
 	 * initialization of the VBO indices primitives
@@ -195,7 +195,7 @@ public:
 	 * @param prim primitive to draw: VBO_TRIANGLES, VBO_LINES
 	 */
 	template <typename PFP>
-	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true) ;
+	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true, unsigned int thread=0) ;
 
 	/**
 	 * initialization of the VBO indices primitives

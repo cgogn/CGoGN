@@ -111,7 +111,7 @@ bool GMap1::isFaceTriangle(Dart d)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f)
+bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d ;
 	do
@@ -123,12 +123,12 @@ bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f)
 	return false ;
 }
 
-bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f)
+bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d, f) || foreach_dart_of_oriented_face(beta0(d), f) ;
+	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(beta0(d), f, thread) ;
 }
 
-bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f)
+bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	// first go first through beta0
 	Dart d1 = d;

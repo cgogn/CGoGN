@@ -141,9 +141,9 @@ inline void MapRender_VBO::addTri(typename PFP::MAP& map, Dart d, std::vector<GL
 }
 
 template<typename PFP>
-void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map);
+	DartMarker m(map,thread);
 	tableIndices.reserve(4*map.getNbDarts()/3);
 
 	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
@@ -157,10 +157,10 @@ void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& g
 }
 
 template<typename PFP>
-void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
-	DartMarker m(map);
+	DartMarker m(map,thread);
 	// reserve memory for triangles ( nb indices == nb darts )
 	// and a little bit more
 	// if lots of polygonal faces, realloc is done by vector 
@@ -213,9 +213,9 @@ void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const Functor
 }
 
 template<typename PFP>
-void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map);
+	DartMarker m(map,thread);
 	tableIndices.reserve(map.getNbDarts());
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -230,10 +230,12 @@ void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good,
 }
 
 template<typename PFP>
-void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
-	DartMarker m(map);
+
+	DartMarker m(map,thread);
+
 	// reserve memory for edges indices ( nb indices == nb darts)
 	tableIndices.reserve(map.getNbDarts());
 
@@ -278,9 +280,9 @@ void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSele
 }
 
 template<typename PFP>
-void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices)
+void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	CellMarker m(map, VERTEX_ORBIT) ;
+	CellMarker m(map, VERTEX_ORBIT,thread) ;
 	tableIndices.reserve(map.getNbDarts()/5);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -294,7 +296,7 @@ void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good
 }
 
 template<typename PFP>
-void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized)
+void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
 {
 	std::vector<GLuint> tableIndices;
 
@@ -303,27 +305,35 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 	switch(prim)
 	{
 		case FLAT_TRIANGLES:
-			initFlatTriangles<PFP>(map,good);
+			initFlatTriangles<PFP>(map,good,thread);
 			break;
 
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized<PFP>(map,good,tableIndices);
+				initTrianglesOptimized<PFP>(map,good,tableIndices,thread);
 			else
-				initTriangles<PFP>(map,good,tableIndices) ;
+				initTriangles<PFP>(map,good,tableIndices,thread) ;
 			m_nbIndicesTri = tableIndices.size();
 			vbo_ind = m_VBOBuffers[TRIANGLE_INDICES];
 			break;
 		case LINES:
 			if(optimized)
-				initLinesOptimized<PFP>(map,good,tableIndices);
+				initLinesOptimized<PFP>(map,good,tableIndices,thread);
 			else
-				initLines<PFP>(map,good,tableIndices) ;
+				initLines<PFP>(map,good,tableIndices,thread) ;
 			m_nbIndicesLines = tableIndices.size();
 			vbo_ind = m_VBOBuffers[LINE_INDICES];
+
+			for (unsigned int i=0; i< tableIndices.size(); ++i)
+			{
+				std::cout << tableIndices[i]<< "/";
+				if (i%2 == 1) std::cout << std::endl;
+			}
+			 std::cout << std::endl;
+
 			break;
 		case POINTS:
-			initPoints<PFP>(map,good,tableIndices);
+			initPoints<PFP>(map,good,tableIndices,thread);
 			m_nbIndicesPoints = tableIndices.size();
 			vbo_ind = m_VBOBuffers[POINT_INDICES];
 			break;
@@ -342,7 +352,7 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 
 
 template<typename PFP>
-void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good)
+void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good, unsigned int thread)
 {
 	std::vector<Geom::Vec3f> tableFlat;
 	tableFlat.reserve(3*map.getNbDarts()); // 3 in case of polygonal faces (less chance of realloc, but bigger allocation)
@@ -353,7 +363,7 @@ void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelec
 
 	m_nbFlatElts=0;
 	// traversal of map for creating buffers
-	DartMarker m(map);
+	DartMarker m(map,thread);
 	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
 		if(!m.isMarked(dd) && good(dd))

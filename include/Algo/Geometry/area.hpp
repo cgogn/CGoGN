@@ -68,10 +68,10 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename
 }
 
 template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select)
+typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select, unsigned int th)
 {
 	float area = 0.0f ;
-	DartMarker mark(map) ;
+	DartMarker mark(map,th) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mark.isMarked(d))
