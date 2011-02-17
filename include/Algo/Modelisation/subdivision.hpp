@@ -437,32 +437,24 @@ void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
 template <typename PFP>
 void computeDual(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
 {
-//	typedef typename PFP::MAP MAP ;
-//	typedef typename PFP::VEC3 VEC3 ;
-//	typedef typename PFP::REAL REAL ;
-//
-//	AutoAttributeHandler<VEC3> faceCentroid(map, FACE_ORBIT, "faceCentroid") ;
-//	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, selected) ;
-//
-//	for(Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if(m.isMarked(d))
-//		{
-//			unsigned int em = map.newCell(VERTEX_ORBIT) ;
-//			Dart dd = d ;
-//			do
-//			{
-//				map.setDartEmbedding(map.phi2(dd), VERTEX_ORBIT, em) ;
-//				m.unmark(dd) ;
-//				dd = map.phi1(dd) ;
-//			}
-//			while (dd != d) ;
-//			attributs[map.phi2(d)] = *itEmb ;
-//			++itEmb ;
-//		}
-//	}
-//
-//	map.computeDual() ;
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
+	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART_ORBIT, "phi_1") ;
+	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi1") ;
+
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		Dart dd = map.alpha1(d) ;
+		new_phi1[d] = dd ;
+		phi_1[dd] = d ;
+	}
+
+	map.template swapAttributes<Dart>(phi1, new_phi1) ;
+
+	map.template removeAttribute<Dart>(new_phi1) ;
 }
 
 template <typename PFP>

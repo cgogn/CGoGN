@@ -56,8 +56,8 @@ template <typename T>
 inline bool AttribMap::swapAttributes(AttributeHandler<T>& attr1, AttributeHandler<T>& attr2)
 {
 	assert((attr1.isValid() && attr2.isValid()) || !"Invalid attribute handler") ;
+	assert(AttributeContainer::orbitAttr(attr1.id()) == AttributeContainer::orbitAttr(attr2.id()) || !"Cannot swap attributes of different orbits") ;
 	unsigned int orbit = AttributeContainer::orbitAttr(attr1.id()) ;
-	assert(orbit == AttributeContainer::orbitAttr(attr2.id()) || !"Cannot swap attributes of different orbits") ;
 	unsigned int index1 = AttributeContainer::indexAttr(attr1.id()) ;
 	unsigned int index2 = AttributeContainer::indexAttr(attr2.id()) ;
 	if(index1 != index2)

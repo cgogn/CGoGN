@@ -393,27 +393,6 @@ void Map2::reverseOrientation()
 	}
 }
 
-//void Map2::computeDual()
-//{
-//	AttributeContainer& cont = m_attribs[DART_ORBIT] ;
-//
-//	unsigned int phi1_idx = cont.getAttribute("phi1") ;
-//	unsigned int new_phi1_idx = cont.addAttribute<Dart>("new_phi1") ;
-//
-//	AttributeMultiVector<Dart>& new_phi1 = cont.getDataVector<Dart>(new_phi1_idx) ;
-//
-//	for (Dart d = begin() ; d != end() ; next(d))
-//	{
-//		Dart dd = alpha1(d) ;
-//		new_phi1[d.index] = dd ;
-//		(*m_phi_1)[dd.index] = d ;
-//	}
-//
-//	cont.swapAttributes(phi1_idx, new_phi1_idx) ;
-//
-//	cont.removeAttribute(new_phi1_idx) ;
-//}
-
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
