@@ -77,11 +77,6 @@ inline bool GenericMap::isOrbitEmbedded(unsigned int orbit) const
 	return (orbit == DART_ORBIT) || (m_embeddings[orbit] != NULL) ;
 }
 
-inline AttribMultiVect<unsigned int>* GenericMap::getEmbeddingAttributeVector(unsigned int orbit) const
-{
-	return m_embeddings[orbit] ;
-}
-
 inline unsigned int GenericMap::nbEmbeddings() const
 {
 	unsigned int nb = 0;
@@ -107,7 +102,7 @@ inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
 	protected:
 		GenericMap& m_map;
 		unsigned int m_orbit;
-		AttribMultiVect<unsigned int>* m_emb;
+		AttributeMultiVector<unsigned int>* m_emb;
 		unsigned int m_val;
 		std::vector<Dart> m_darts;
 
@@ -134,7 +129,7 @@ inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
 		{
 			if(m_val != EMBNULL)
 			{
-				AttribContainer& cont = m_map.getAttributeContainer(m_orbit) ;
+				AttributeContainer& cont = m_map.getAttributeContainer(m_orbit) ;
 				for(std::vector<Dart>::iterator it = m_darts.begin(); it != m_darts.end(); ++it)
 				{
 					(*m_emb)[it->index] = m_val;
@@ -221,28 +216,32 @@ inline void GenericMap::initCell(unsigned int orbit, unsigned int i)
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
-template <typename T>
-inline AttribMultiVect<T>& GenericMap::getAttributeVector(unsigned int idAttr)
+inline AttributeContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 {
-	assert(idAttr != AttribContainer::UNKNOWN) ;
-	return m_attribs[AttribContainer::orbitAttr(idAttr)].getDataVector<T>(AttribContainer::indexAttr(idAttr)) ;
+	return m_attribs[orbit] ;
 }
 
-inline AttribMultiVect<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
+template <typename T>
+inline AttributeMultiVector<T>& GenericMap::getAttributeVector(unsigned int idAttr)
 {
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
+	assert(idAttr != AttributeContainer::UNKNOWN) ;
+	return m_attribs[AttributeContainer::orbitAttr(idAttr)].getDataVector<T>(AttributeContainer::indexAttr(idAttr)) ;
+}
+
+inline AttributeMultiVectorGen& GenericMap::getAttributeVectorGen(unsigned int idAttr)
+{
+	assert(idAttr != AttributeContainer::UNKNOWN) ;
+	return m_attribs[AttributeContainer::orbitAttr(idAttr)].getVirtualDataVector(AttributeContainer::indexAttr(idAttr)) ;
+}
+
+inline AttributeMultiVector<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
+{
 	return m_markerTables[orbit] ;
 }
 
-inline AttribMultiVectGen& GenericMap::getMultiVec(unsigned int idAttr)
+inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVector(unsigned int orbit)
 {
-	assert(idAttr != AttribContainer::UNKNOWN) ;
-	return m_attribs[AttribContainer::orbitAttr(idAttr)].getVirtualDataVector(AttribContainer::indexAttr(idAttr)) ;
-}
-
-inline AttribContainer& GenericMap::getAttributeContainer(unsigned int orbit)
-{
-	return m_attribs[orbit] ;
+	return m_embeddings[orbit] ;
 }
 
 /****************************************

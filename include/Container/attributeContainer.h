@@ -22,12 +22,12 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ATTRIB_CONTAINER__
-#define __ATTRIB_CONTAINER__
+#ifndef __ATTRIBUTE_CONTAINER__
+#define __ATTRIBUTE_CONTAINER__
 
 #include "Container/sizeblock.h"
 #include "Container/holeblockref.h"
-#include "Container/attribmv.h"
+#include "Container/attributeMultiVector.h"
 
 #include <vector>
 #include <map>
@@ -48,16 +48,11 @@ class RegisteredBaseAttribute;
 * trous (et les indices) sont les mêmes pour tous les attributs
 * On peut ajouter et enlever des attributs a la volée
 */
-class AttribContainer
+class AttributeContainer
 {
 protected:
 
 	typedef std::map<std::string, unsigned int> MapNameId;
-
-	/**
-	 * counter for attributes without name
-	 */
-	unsigned int m_nbunknown;
 
 	/**
 	* vecteur des blocs qui gerent les cases libres
@@ -74,7 +69,7 @@ protected:
 	/**
 	* vecteur de pointeur sur les gestionnaires d'attributs
 	*/
-	std::vector<AttribMultiVectGen*> m_tableAttribs;
+	std::vector<AttributeMultiVectorGen*> m_tableAttribs;
 
 	/**
 	* map de correspondance string / indice pour les attributs
@@ -87,6 +82,11 @@ protected:
 	* nombre d'attributs
 	*/ 
 	unsigned int m_nbAttributes;
+
+	/**
+	 * counter for attributes without name
+	 */
+	unsigned int m_nbUnknown;
 
 	/**
 	* size (number of elts) of the container
@@ -142,12 +142,12 @@ public:
 	/**
 	* constructor
 	*/
-	AttribContainer();
+	AttributeContainer();
 
 	/**
 	* destructor
 	*/
-	~AttribContainer();
+	~AttributeContainer();
 
 	/**
 	* is the line used in the container
@@ -162,12 +162,12 @@ public:
 	/**
 	 * swapping
 	 */
-	void swap(AttribContainer&);
+	void swap(AttributeContainer&);
 
 	/**
 	 * merge
 	 */
-	void merge(AttribContainer& cont);
+	void merge(AttributeContainer& cont);
 
 	/**
 	 * extract orbit from code (orbit & id)
@@ -331,9 +331,9 @@ public:
 	* @param codeAttrib code de l'attribut
 	*/
 	template<typename T>
-	AttribMultiVect<T>& getDataVector(unsigned int codeAttrib);
+	AttributeMultiVector<T>& getDataVector(unsigned int codeAttrib);
 
-	AttribMultiVectGen& getVirtualDataVector(unsigned int codeAttrib);
+	AttributeMultiVectorGen& getVirtualDataVector(unsigned int codeAttrib);
 
 	/**
 	* Renvoit un pseudo vecteur d'attribut (operateur []) 
@@ -341,7 +341,7 @@ public:
 	* @param name nom de l'attribut
 	*/
 // 	template<typename T>
-// 	AttribMultiVect<T>& getAttributesVector(const std::string& name);
+// 	AttributeMultiVector<T>& getAttributesVector(const std::string& name);
 
 	/**
 	* Renvoit un pseudo vecteur d'attribut (operateur []) 
@@ -351,7 +351,7 @@ public:
 	* @return vrai si OK faux si pb
 	*/
 	template<typename T>
-	bool getAttributesVector(const std::string& name, AttribMultiVect<T>** ptr);
+	bool getAttributesVector(const std::string& name, AttributeMultiVector<T>** ptr);
 
 	/**
 	* insert un attribut dans le container la ligne est crée
@@ -532,6 +532,6 @@ public:
 
 } // namespace CGoGN
 
-#include "attrib_container.hpp"
+#include "attributeContainer.hpp"
 
 #endif

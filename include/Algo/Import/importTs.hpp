@@ -48,7 +48,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	AttributeHandler<REAL> scalaire = map.template addAttribute<REAL>(VERTEX_ORBIT, "scalar");
 	attrNames.push_back(scalaire.name()) ;
 
-	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");

@@ -12,14 +12,14 @@
 #include <libxml/xmlwriter.h>
 #include <iostream>
 
-#include "Container/attrib_container.h"
+#include "Container/attributeContainer.h"
 
 namespace CGoGN
 {
 
-AttribContainer::AttribContainer():
-m_nbunknown(0),
+AttributeContainer::AttributeContainer():
 m_nbAttributes(0),
+m_nbUnknown(0),
 m_size(0),
 m_maxSize(0),
 m_lineCost(0),
@@ -28,11 +28,11 @@ m_attributes_registry_map(NULL)
 	m_holesBlocks.reserve(512);
 }
 
-AttribContainer::~AttribContainer()
+AttributeContainer::~AttributeContainer()
 {
 }
 
-void AttribContainer::swap(AttribContainer& cont)
+void AttributeContainer::swap(AttributeContainer& cont)
 {
 	m_holesBlocks.swap(cont.m_holesBlocks);
 	m_tableBlocksWithFree.swap(cont.m_tableBlocksWithFree);
@@ -42,6 +42,10 @@ void AttribContainer::swap(AttribContainer& cont)
 	unsigned int temp = m_nbAttributes;
 	m_nbAttributes = cont.m_nbAttributes;
 	cont.m_nbAttributes = temp;
+
+	temp = m_nbUnknown ;
+	m_nbUnknown = cont.m_nbUnknown ;
+	cont.m_nbUnknown = temp ;
 
 	temp = m_size;
 	m_size = cont.m_size;
@@ -56,7 +60,7 @@ void AttribContainer::swap(AttribContainer& cont)
 	cont.m_lineCost = temp;
 }
 
-bool AttribContainer::removeAttribute(const std::string& attribName)
+bool AttributeContainer::removeAttribute(const std::string& attribName)
 {
 	MapNameId::iterator it = m_attribNameMap.find(attribName);
 	if (it == m_attribNameMap.end())
@@ -77,7 +81,7 @@ bool AttribContainer::removeAttribute(const std::string& attribName)
 	return true;
 }
 
-bool AttribContainer::removeAttribute(unsigned int index)
+bool AttributeContainer::removeAttribute(unsigned int index)
 {
 	MapNameId::iterator it = m_attribNameMap.begin();
 	while ((it != m_attribNameMap.end()) && (it->second != index))
@@ -98,7 +102,7 @@ bool AttribContainer::removeAttribute(unsigned int index)
 	return true;
 }
 
-void AttribContainer::merge(AttribContainer& cont)
+void AttributeContainer::merge(AttributeContainer& cont)
 {
 	/*
 	// tableau de correspondance pour reperer les tables de cont et les mettre ou il faut dans this
@@ -119,7 +123,7 @@ void AttribContainer::merge(AttribContainer& cont)
 			m_nbAttributes++;
 
 			newId[idxAttrib] = it->second;
-			AttribMultiVectGen* ptr = cont.m_tableAttribs[it->second];
+			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[it->second];
 			ptr->addBlocksBefore(nbb);
 			m_tableAttribs.push_back( ptr );
 		}
@@ -164,7 +168,7 @@ void AttribContainer::merge(AttribContainer& cont)
 	*/
 }
 
-void AttribContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
+void AttributeContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
 {
 	if (m_nbAttributes == 0)
 		return;
@@ -228,7 +232,7 @@ void AttribContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
 
 }
 
-bool AttribContainer::loadXmlBWF(xmlNodePtr node)
+bool AttributeContainer::loadXmlBWF(xmlNodePtr node)
 {
 	xmlChar* prop = xmlGetProp(node, BAD_CAST "nb");
 	unsigned int nb = atoi((char*)prop);
@@ -248,7 +252,7 @@ bool AttribContainer::loadXmlBWF(xmlNodePtr node)
 	return true;
 }
 
-bool AttribContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
+bool AttributeContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
 {
 	xmlChar* prop = xmlGetProp(node, BAD_CAST "nb");
 //	unsigned int nb = atoi((char*)prop);
@@ -299,7 +303,7 @@ bool AttribContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
 	return true;
 }
 
-bool AttribContainer::loadXmlDL(xmlNodePtr node)
+bool AttributeContainer::loadXmlDL(xmlNodePtr node)
 {
 	// charge et cree les  attributs
 	for (xmlNode* x_node = node->children; x_node!=NULL; x_node = x_node->next)
@@ -333,14 +337,14 @@ bool AttribContainer::loadXmlDL(xmlNodePtr node)
 }
 
 
-unsigned int AttribContainer::getIdXmlNode(xmlNodePtr node)
+unsigned int AttributeContainer::getIdXmlNode(xmlNodePtr node)
 {
 	xmlChar *prop = xmlGetProp(node, BAD_CAST "id");
 	unsigned int id = atoi((char*)prop);
 	return id;
 }
 
-bool AttribContainer::loadXml(xmlNodePtr node)
+bool AttributeContainer::loadXml(xmlNodePtr node)
 {
 	xmlChar *prop = xmlGetProp(node, BAD_CAST "BlockSize");
 	unsigned int bs = atoi((char*)prop);
@@ -395,7 +399,7 @@ bool AttribContainer::loadXml(xmlNodePtr node)
 	return true;
 }
 
-void AttribContainer::saveBin(CGoGNostream& fs, unsigned int id)
+void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id)
 {
 	// en ascii id et taille les tailles
 
@@ -415,7 +419,7 @@ void AttribContainer::saveBin(CGoGNostream& fs, unsigned int id)
 	fs.write(reinterpret_cast<const char*>(&bufferui[0]) ,bufferui.size()*sizeof(unsigned int));
 
 	unsigned int i = 0;
-	for(std::vector<AttribMultiVectGen*>::iterator it=m_tableAttribs.begin(); it!=m_tableAttribs.end(); ++it)
+	for(std::vector<AttributeMultiVectorGen*>::iterator it=m_tableAttribs.begin(); it!=m_tableAttribs.end(); ++it)
 	{
 		if (*it !=NULL)
 			(*it)->saveBin(fs, i++);
@@ -429,14 +433,14 @@ void AttribContainer::saveBin(CGoGNostream& fs, unsigned int id)
 	fs.write(reinterpret_cast<const char*>(&m_tableBlocksWithFree[0]), m_tableBlocksWithFree.size() * sizeof(unsigned int));
 }
 
-unsigned int AttribContainer::loadBinId(CGoGNistream& fs)
+unsigned int AttributeContainer::loadBinId(CGoGNistream& fs)
 {
 	unsigned int id;
 	fs.read(reinterpret_cast<char*>(&id), sizeof(unsigned int));
 	return id;
 }
 
-bool AttribContainer::loadBin(CGoGNistream& fs)
+bool AttributeContainer::loadBin(CGoGNistream& fs)
 {
 	if (m_attributes_registry_map ==NULL)
 	{
@@ -467,13 +471,13 @@ bool AttribContainer::loadBin(CGoGNistream& fs)
 	{
 		std::string nameAtt;
 		std::string typeAtt;
-		/*unsigned int id = */AttribMultiVectGen::loadBinInfos(fs,nameAtt, typeAtt);
+		/*unsigned int id = */AttributeMultiVectorGen::loadBinInfos(fs,nameAtt, typeAtt);
 
 		std::map<std::string, RegisteredBaseAttribute*>::iterator itAtt = m_attributes_registry_map->find(typeAtt);
 		if (itAtt == m_attributes_registry_map->end())
 		{
 			std::cout << "Skipping non registred attribute of type name"<< typeAtt <<std::endl;
-			AttribMultiVectGen::skipLoadBin(fs);
+			AttributeMultiVectorGen::skipLoadBin(fs);
 		}
 		else
 		{
@@ -506,7 +510,7 @@ bool AttribContainer::loadBin(CGoGNistream& fs)
 // GESTION DES ATTRIBUTS
 ///////////////////////////
 
-unsigned int AttribContainer::getAttribute(const std::string& attribName)
+unsigned int AttributeContainer::getAttribute(const std::string& attribName)
 {
 	MapNameId::iterator it = m_attribNameMap.find(attribName);
 	if (it == m_attribNameMap.end())
@@ -516,7 +520,7 @@ unsigned int AttribContainer::getAttribute(const std::string& attribName)
 	return it->second;
 }
 
-bool AttribContainer::isValidAttribute(unsigned int attr)
+bool AttributeContainer::isValidAttribute(unsigned int attr)
 {
 	if (attr == UNKNOWN)
 		return false;
@@ -530,7 +534,7 @@ bool AttribContainer::isValidAttribute(unsigned int attr)
 	return false;
 }
 
-unsigned int AttribContainer::getAttributesStrings(std::vector<std::string>& strings)
+unsigned int AttributeContainer::getAttributesStrings(std::vector<std::string>& strings)
 {
 	strings.clear();
 
@@ -544,7 +548,7 @@ unsigned int AttribContainer::getAttributesStrings(std::vector<std::string>& str
 	return m_attribNameMap.size();
 }
 
-const std::string& AttribContainer::getAttributeName(unsigned int attrIndex)
+const std::string& AttributeContainer::getAttributeName(unsigned int attrIndex)
 {
 	for (MapNameId::iterator it = m_attribNameMap.begin(); it!= m_attribNameMap.end(); ++it)
 	{
@@ -556,7 +560,7 @@ const std::string& AttribContainer::getAttributeName(unsigned int attrIndex)
 	return  m_attribNameMap.begin()->first;		// just for compiling
 }
 
-unsigned int AttribContainer::nbAttributes()
+unsigned int AttributeContainer::nbAttributes()
 {
 	return m_attribNameMap.size();
 }
@@ -565,7 +569,7 @@ unsigned int AttribContainer::nbAttributes()
 //   GESTION DES LIGNES
 ///////////////////////////
 
-unsigned int AttribContainer::insertLine()
+unsigned int AttributeContainer::insertLine()
 {
 	// if no more rooms
 	if (m_tableBlocksWithFree.empty())
@@ -606,7 +610,7 @@ unsigned int AttribContainer::insertLine()
 	return idx;
 }
 
-void AttribContainer::initLine(unsigned int idx)
+void AttributeContainer::initLine(unsigned int idx)
 {
 	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
 	{
@@ -615,7 +619,7 @@ void AttribContainer::initLine(unsigned int idx)
 	}
 }
 
-void AttribContainer::removeLine(unsigned int eltIdx)
+void AttributeContainer::removeLine(unsigned int eltIdx)
 {
 	unsigned int bi = eltIdx / _BLOCKSIZE_;
 	unsigned int j = eltIdx % _BLOCKSIZE_;
@@ -640,7 +644,7 @@ void AttribContainer::removeLine(unsigned int eltIdx)
 	}
 }
 
-void AttribContainer::copyLine(unsigned int dstIdx, unsigned int srcIdx)
+void AttributeContainer::copyLine(unsigned int dstIdx, unsigned int srcIdx)
 {
 	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
 	{
@@ -653,7 +657,7 @@ void AttribContainer::copyLine(unsigned int dstIdx, unsigned int srcIdx)
 // GESTION DES ITERATEURS
 ///////////////////////////
 
-//void AttribContainer::next(iterator& it)
+//void AttributeContainer::next(iterator& it)
 //{
 //	do
 //	{
@@ -661,7 +665,7 @@ void AttribContainer::copyLine(unsigned int dstIdx, unsigned int srcIdx)
 //	} while ((it<m_maxSize) && (!used(it)));
 //}
 
-//AttribContainer::iterator AttribContainer::AttribContainer::end()
+//AttributeContainer::iterator AttributeContainer::AttributeContainer::end()
 //{
 //	return m_maxSize;
 //
@@ -675,22 +679,22 @@ void AttribContainer::copyLine(unsigned int dstIdx, unsigned int srcIdx)
 // GESTION DES TAILLES
 ///////////////////////////
 
-unsigned int AttribContainer::size()
+unsigned int AttributeContainer::size()
 {
 	return m_size;
 }
 
-unsigned int AttribContainer::capacity()
+unsigned int AttributeContainer::capacity()
 {
 	return m_holesBlocks.size()*_BLOCKSIZE_;
 }
 
-unsigned int AttribContainer::memoryTotalSize()
+unsigned int AttributeContainer::memoryTotalSize()
 {
 	return _BLOCKSIZE_*(m_holesBlocks.size()*m_lineCost + 8);
 }
 
-unsigned int AttribContainer::nbRefs(unsigned int it)
+unsigned int AttributeContainer::nbRefs(unsigned int it)
 {
 	unsigned int bi = it / _BLOCKSIZE_;
 	unsigned int j = it % _BLOCKSIZE_;
@@ -703,7 +707,7 @@ unsigned int AttribContainer::nbRefs(unsigned int it)
 //   COMPACTAGE
 ///////////////////////////
 
-void AttribContainer::compact(std::vector<unsigned int>& mapOldNew)
+void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 {
 	unsigned int nbe = _BLOCKSIZE_*m_holesBlocks.size();
 
@@ -811,7 +815,7 @@ void AttribContainer::compact(std::vector<unsigned int>& mapOldNew)
 //   NETTOYAGE
 ///////////////////////////
 
-void AttribContainer::clear(bool clearAttrib)
+void AttributeContainer::clear(bool clearAttrib)
 {
 	m_size = 0;
  	m_maxSize = 0;
@@ -828,7 +832,7 @@ void AttribContainer::clear(bool clearAttrib)
 	m_tableBlocksWithFree.swap(bwf);
 
 	// detruit les données
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if ((*it) != NULL)
 			(*it)->free();
@@ -843,8 +847,8 @@ void AttribContainer::clear(bool clearAttrib)
 		m_attribNameMap.clear();
 
 		// detruit tous les attributs
-		std::vector< AttribMultiVectGen* > amg;
-		for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
+		std::vector< AttributeMultiVectorGen* > amg;
+		for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
 		{
 			if ((*it) != NULL)
 				delete (*it);
@@ -857,54 +861,54 @@ void AttribContainer::clear(bool clearAttrib)
 // OLD INLINE FUNCTIONS
 ///////////////////////////
 
-void AttribContainer::affect(unsigned int i, unsigned int j)
+void AttributeContainer::affect(unsigned int i, unsigned int j)
 {
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if (*it != NULL)
 			(*it)->affect(i, j);
 	}
 }
 
-void AttribContainer::add(unsigned int i, unsigned int j)
+void AttributeContainer::add(unsigned int i, unsigned int j)
 {
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if ((*it) != NULL)
 			(*it)->add(i, j);
 	}
 }
 
-void AttribContainer::sub(unsigned int i, unsigned int j)
+void AttributeContainer::sub(unsigned int i, unsigned int j)
 {
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if ((*it) != NULL)
 			(*it)->sub(i, j);
 	}
 }
 
-void AttribContainer::mult(unsigned int i, double alpha)
+void AttributeContainer::mult(unsigned int i, double alpha)
 {
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if ((*it) != NULL)
 			(*it)->mult(i, alpha);
 	}
 }
 
-void AttribContainer::div(unsigned int i, double alpha)
+void AttributeContainer::div(unsigned int i, double alpha)
 {
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if ((*it) != NULL)
 			(*it)->div(i, alpha);
 	}
 }
 
-void AttribContainer::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
+void AttributeContainer::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
 {
-	for (std::vector< AttribMultiVectGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	for (std::vector< AttributeMultiVectorGen* >::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
 		if ((*it) != NULL)
 			(*it)->lerp(res, i, j, alpha);

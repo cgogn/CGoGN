@@ -46,9 +46,9 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap::addAttribute(unsigned int orbit
 
 	if(addNextLevelCell)
 	{
-		AttribContainer& cellCont = m_attribs[orbit] ;
+		AttributeContainer& cellCont = m_attribs[orbit] ;
 		unsigned int index = cellCont.addAttribute<unsigned int>("nextLevelCell") ;
-		AttribMultiVect<unsigned int>& amv = cellCont.getDataVector<unsigned int>(index) ;
+		AttributeMultiVector<unsigned int>& amv = cellCont.getDataVector<unsigned int>(index) ;
 		m_nextLevelCell[orbit] = &amv ;
 		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
 			amv[i] = EMBNULL ;
@@ -344,7 +344,7 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = AttribContainer::orbitAttr(this->m_id) ;
+	unsigned int orbit = AttributeContainer::orbitAttr(this->m_id) ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 
@@ -355,7 +355,7 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 		return this->m_attrib->operator[](index);
 	}
 
-	AttribContainer& cont = m->getAttributeContainer(orbit) ;
+	AttributeContainer& cont = m->getAttributeContainer(orbit) ;
 	unsigned int step = 0 ;
 	while(step < nbSteps)
 	{
@@ -381,7 +381,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = AttribContainer::orbitAttr(this->m_id) ;
+	unsigned int orbit = AttributeContainer::orbitAttr(this->m_id) ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 

@@ -2,32 +2,32 @@
 namespace CGoGN
 {
 
-inline AttribMultiVectGen::AttribMultiVectGen(const std::string& strName, const std::string& strType):
+inline AttributeMultiVectorGen::AttributeMultiVectorGen(const std::string& strName, const std::string& strType):
 		m_attName(strName), m_typeName(strType), m_toProcess(true)
 {}
 
-inline AttribMultiVectGen::AttribMultiVectGen(): m_toProcess(true)
+inline AttributeMultiVectorGen::AttributeMultiVectorGen(): m_toProcess(true)
 {}
 
-inline AttribMultiVectGen::~AttribMultiVectGen()
+inline AttributeMultiVectorGen::~AttributeMultiVectorGen()
 {}
 
-inline void AttribMultiVectGen::toggleProcess()
+inline void AttributeMultiVectorGen::toggleProcess()
 {
 	m_toProcess = true;
 }
 
-inline void AttribMultiVectGen::toggleNoProcess()
+inline void AttributeMultiVectorGen::toggleNoProcess()
 {
 	m_toProcess = false;
 }
 
-inline bool AttribMultiVectGen::toProcess()
+inline bool AttributeMultiVectorGen::toProcess()
 {
 	return m_toProcess;
 }
 
-inline unsigned int AttribMultiVectGen::BlockSize()
+inline unsigned int AttributeMultiVectorGen::BlockSize()
 {
 	return _BLOCKSIZE_;
 }
@@ -38,35 +38,35 @@ inline unsigned int AttribMultiVectGen::BlockSize()
 
 
 template <typename T>
-AttribMultiVect<T>::AttribMultiVect(const std::string& strName, const std::string& strType):
-AttribMultiVectGen(strName,strType)
+AttributeMultiVector<T>::AttributeMultiVector(const std::string& strName, const std::string& strType):
+AttributeMultiVectorGen(strName,strType)
 {
 	m_tableData.reserve(1024);
 }
 
 template <typename T>
-AttribMultiVect<T>::AttribMultiVect()
+AttributeMultiVector<T>::AttributeMultiVector()
 {
 	m_tableData.reserve(1024);
 }
 
 template <typename T>
-AttribMultiVect<T>::~AttribMultiVect()
+AttributeMultiVector<T>::~AttributeMultiVector()
 {
 	for (typename std::vector< T* >::iterator it = m_tableData.begin(); it != m_tableData.end(); ++it)
 		delete[] (*it);
 }
 
 template <typename T>
-AttribMultiVectGen* AttribMultiVect<T>::new_obj()
+AttributeMultiVectorGen* AttributeMultiVector<T>::new_obj()
 {
-	return new AttribMultiVect<T>;
+	return new AttributeMultiVector<T>;
 }
 
 template <typename T>
-bool AttribMultiVect<T>::copy(const AttribMultiVectGen* atmvg)
+bool AttributeMultiVector<T>::copy(const AttributeMultiVectorGen* atmvg)
 {
-	const AttribMultiVect<T>* atmv = dynamic_cast<const AttribMultiVect<T>*>(atmvg);
+	const AttributeMultiVector<T>* atmv = dynamic_cast<const AttributeMultiVector<T>*>(atmvg);
 
 	if (atmv == NULL)
 	{
@@ -82,9 +82,9 @@ bool AttribMultiVect<T>::copy(const AttribMultiVectGen* atmvg)
 }
 
 template <typename T>
-bool AttribMultiVect<T>::swap(AttribMultiVectGen* atmvg)
+bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen* atmvg)
 {
-	AttribMultiVect<T>* atmv = dynamic_cast<AttribMultiVect<T>*>(atmvg);
+	AttributeMultiVector<T>* atmv = dynamic_cast<AttributeMultiVector<T>*>(atmvg);
 
 	if (atmv == NULL)
 	{
@@ -97,9 +97,9 @@ bool AttribMultiVect<T>::swap(AttribMultiVectGen* atmvg)
 }
 
 template <typename T>
-bool AttribMultiVect<T>::swap(AttribMultiVectGen& att)
+bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen& att)
 {
-	AttribMultiVect<T>* attrib = dynamic_cast< AttribMultiVect<T>* >(&att);
+	AttributeMultiVector<T>* attrib = dynamic_cast< AttributeMultiVector<T>* >(&att);
 	if (attrib==NULL)
 	{
 		std::cerr << "Erreur, swap de container de types differents"<<std::endl;
@@ -118,9 +118,9 @@ bool AttribMultiVect<T>::swap(AttribMultiVectGen& att)
 }
 
 template <typename T>
-bool AttribMultiVect<T>::merge(const AttribMultiVectGen& att)
+bool AttributeMultiVector<T>::merge(const AttributeMultiVectorGen& att)
 {
-	const AttribMultiVect<T>* attrib = dynamic_cast< const AttribMultiVect<T>* >(&att);
+	const AttributeMultiVector<T>* attrib = dynamic_cast< const AttributeMultiVector<T>* >(&att);
 	if (attrib==NULL)
 	{
 		std::cerr << "Erreur, merge de container de types differents"<<std::endl;
@@ -139,13 +139,13 @@ bool AttribMultiVect<T>::merge(const AttribMultiVectGen& att)
 }
 
 template <typename T>
-T& AttribMultiVect<T>::operator[](unsigned int i) { return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];}
+T& AttributeMultiVector<T>::operator[](unsigned int i) { return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];}
 
 template <typename T>
-const T& AttribMultiVect<T>::operator[](unsigned int i) const { return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];}
+const T& AttributeMultiVector<T>::operator[](unsigned int i) const { return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];}
 
 template <typename T>
-std::string AttribMultiVect<T>::output(unsigned int i)
+std::string AttributeMultiVector<T>::output(unsigned int i)
 {
 	std::stringstream ss;
 	ss << m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];
@@ -153,14 +153,14 @@ std::string AttribMultiVect<T>::output(unsigned int i)
 }
 
 template <typename T>
-void AttribMultiVect<T>::input(unsigned int i,const std::string& st)
+void AttributeMultiVector<T>::input(unsigned int i,const std::string& st)
 {
 	std::stringstream ss(st);
 	ss >> m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];
 }
 
 template <typename T>
-void AttribMultiVect<T>::addBlock()
+void AttributeMultiVector<T>::addBlock()
 {
 	T* ptr = new T[_BLOCKSIZE_];
 	m_tableData.push_back( ptr );
@@ -171,19 +171,19 @@ void AttribMultiVect<T>::addBlock()
 }
 
 template <typename T>
-void AttribMultiVect<T>::initElt(unsigned int id)
+void AttributeMultiVector<T>::initElt(unsigned int id)
 {
 	m_tableData[id/_BLOCKSIZE_][id%_BLOCKSIZE_] = T(0);
 }
 
 template <typename T>
-void AttribMultiVect<T>::copyElt(unsigned int dst, unsigned int src)
+void AttributeMultiVector<T>::copyElt(unsigned int dst, unsigned int src)
 {
 	m_tableData[dst/_BLOCKSIZE_][dst%_BLOCKSIZE_] = m_tableData[src/_BLOCKSIZE_][src%_BLOCKSIZE_];
 }
 
 template <typename T>
-void AttribMultiVect<T>::setNbBlocks(unsigned int nbb)
+void AttributeMultiVector<T>::setNbBlocks(unsigned int nbb)
 {
 	if (nbb >=m_tableData.size())
 	{
@@ -205,7 +205,7 @@ void AttribMultiVect<T>::setNbBlocks(unsigned int nbb)
 }
 
 template <typename T>
-void AttribMultiVect<T>::addBlocksBefore(unsigned int nbb)
+void AttributeMultiVector<T>::addBlocksBefore(unsigned int nbb)
 {
 	std::vector< T* > tempo;
 	tempo.reserve(1024);
@@ -224,13 +224,13 @@ void AttribMultiVect<T>::addBlocksBefore(unsigned int nbb)
 }
 
 template <typename T>
-void AttribMultiVect<T>::overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id)
+void AttributeMultiVector<T>::overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id)
 {
 	m_tableData[dst_b][dst_id] = m_tableData[src_b][src_id];
 }
 
 template <typename T>
-void AttribMultiVect<T>::free()
+void AttributeMultiVector<T>::free()
 {
 	for (typename std::vector< T* >::iterator it = m_tableData.begin(); it != m_tableData.end(); ++it)
 		delete[] (*it);
@@ -238,7 +238,7 @@ void AttribMultiVect<T>::free()
 }
 
 template <typename T>
-unsigned int AttribMultiVect<T>::getStartAddresses(std::vector<void*>& addr, unsigned int& byteTableSize)
+unsigned int AttributeMultiVector<T>::getStartAddresses(std::vector<void*>& addr, unsigned int& byteTableSize)
 {
 	byteTableSize = _BLOCKSIZE_ * sizeof(T);
 
@@ -253,7 +253,7 @@ unsigned int AttribMultiVect<T>::getStartAddresses(std::vector<void*>& addr, uns
 }
 
 template <typename T>
-void AttribMultiVect<T>::saveBin(CGoGNostream& fs, unsigned int id)
+void AttributeMultiVector<T>::saveBin(CGoGNostream& fs, unsigned int id)
 {
 	unsigned int nbs[3];
 	nbs[0] = id;
@@ -282,7 +282,7 @@ void AttribMultiVect<T>::saveBin(CGoGNostream& fs, unsigned int id)
 	}
 }
 
-inline unsigned int AttribMultiVectGen::loadBinInfos(CGoGNistream& fs, std::string& name, std::string& type)
+inline unsigned int AttributeMultiVectorGen::loadBinInfos(CGoGNistream& fs, std::string& name, std::string& type)
 {
 	unsigned int nbs[3];
 	fs.read(reinterpret_cast<char*>(nbs), 3*sizeof(unsigned int));
@@ -301,7 +301,7 @@ inline unsigned int AttribMultiVectGen::loadBinInfos(CGoGNistream& fs, std::stri
 }
 
 template <typename T>
-bool AttribMultiVect<T>::loadBin(CGoGNistream& fs)
+bool AttributeMultiVector<T>::loadBin(CGoGNistream& fs)
 {
 	unsigned int nbs[2];
 	fs.read(reinterpret_cast<char*>(nbs), 2*sizeof(unsigned int));
@@ -320,7 +320,7 @@ bool AttribMultiVect<T>::loadBin(CGoGNistream& fs)
 	return true;
 }
 
-inline bool AttribMultiVectGen::skipLoadBin(CGoGNistream& fs)
+inline bool AttributeMultiVectorGen::skipLoadBin(CGoGNistream& fs)
 {
 	unsigned int nbs[2];
 	fs.read(reinterpret_cast<char*>(nbs), 2*sizeof(unsigned int));
@@ -348,42 +348,42 @@ inline bool AttribMultiVectGen::skipLoadBin(CGoGNistream& fs)
 }
 
 template <typename T>
-void AttribMultiVect<T>::affect(unsigned int i, unsigned int j)
+void AttributeMultiVector<T>::affect(unsigned int i, unsigned int j)
 {
 	if (m_toProcess)
 		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] = m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
 }
 
 template <typename T>
-void AttribMultiVect<T>::add(unsigned int i, unsigned int j)
+void AttributeMultiVector<T>::add(unsigned int i, unsigned int j)
 {
 	if (m_toProcess)
 		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] += m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
 }
 
 template <typename T>
-void AttribMultiVect<T>::sub(unsigned int i, unsigned int j)
+void AttributeMultiVector<T>::sub(unsigned int i, unsigned int j)
 {
 	if (m_toProcess)
 		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] -= m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
 }
 
 template <typename T>
-void AttribMultiVect<T>::mult(unsigned int i, double alpha)
+void AttributeMultiVector<T>::mult(unsigned int i, double alpha)
 {
 	if (m_toProcess)
 		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] *= alpha;
 }
 
 template <typename T>
-void AttribMultiVect<T>::div(unsigned int i, double alpha)
+void AttributeMultiVector<T>::div(unsigned int i, double alpha)
 {
 	if (m_toProcess)
 		m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] /= alpha;
 }
 
 template <typename T>
-void AttribMultiVect<T>::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
+void AttributeMultiVector<T>::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
 {
 	if (m_toProcess)
 	{

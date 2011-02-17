@@ -50,7 +50,7 @@ class ECellDart
 	static GenericMap* s_map;
 
 	///container ptr acces (static, all ECellDart)
-	static AttribContainer* s_cont;
+	static AttributeContainer* s_cont;
 
 	///id of cell
 	unsigned int m_id;
@@ -83,7 +83,7 @@ class ECellDart
 	/**
 	 * assign container
 	 */
-	static void setContainer(AttribContainer& cont);
+	static void setContainer(AttributeContainer& cont);
 
 	/**
 	 * assign map

@@ -56,7 +56,7 @@ void ImplicitHierarchicalMap::init()
 	{
 		if(m_nextLevelCell[orbit] != NULL)
 		{
-			AttribContainer& cellCont = m_attribs[orbit] ;
+			AttributeContainer& cellCont = m_attribs[orbit] ;
 			for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
 				m_nextLevelCell[orbit]->operator[](i) = EMBNULL ;
 		}

@@ -53,7 +53,7 @@ protected:
 	unsigned int m_id;
 
 	// access to the data
-	AttribMultiVect<T>* m_attrib;
+	AttributeMultiVector<T>* m_attrib;
 
 protected:
 	/**
@@ -66,7 +66,7 @@ protected:
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler() : m_map(NULL), m_id(AttribContainer::UNKNOWN), m_attrib(NULL) {}
+	AttributeHandler() : m_map(NULL), m_id(AttributeContainer::UNKNOWN), m_attrib(NULL) {}
 
 	/**
 	 * Copy constructor
@@ -93,7 +93,7 @@ public:
 	/**
 	 * get attribute data vector
 	 */
-	AttribMultiVect<T>* getDataVector() const ;
+	AttributeMultiVector<T>* getDataVector() const ;
 
 	/**
 	 * get attribute id

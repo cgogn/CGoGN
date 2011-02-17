@@ -36,7 +36,7 @@ namespace CGoGN
 class GMap2 : public GMap1
 {
 protected:
-	AttribMultiVect<Dart>* m_beta2 ;
+	AttributeMultiVector<Dart>* m_beta2 ;
 
 public:
 	GMap2();

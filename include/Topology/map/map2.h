@@ -48,7 +48,7 @@ namespace CGoGN
 class Map2 : public Map1
 {
 protected:
-	AttribMultiVect<Dart>* m_phi2 ;
+	AttributeMultiVector<Dart>* m_phi2 ;
 
 public:
 	typedef Map1 ParentMap;
@@ -242,12 +242,6 @@ public:
 	* no dart created, each dart keeps its embedding, only changing phi1 and phi2
 	*/
 	void reverseOrientation();
-
-	// TODO a mettre en algo
-	/**
-	 * compute the topological dual of the current map
-	 */
-	void computeDual();
 	//@}
 
 	/*! @name Topological Queries

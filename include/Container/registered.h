@@ -50,7 +50,7 @@ public:
 	/**
 	 * Ajout de l'attribut au container (A IMPLEMENTER)
 	 */
-	virtual unsigned int addAttribute(AttribContainer& container, const std::string& attribName)=0;
+	virtual unsigned int addAttribute(AttributeContainer& container, const std::string& attribName)=0;
 };
 
 /**
@@ -64,7 +64,7 @@ class RegisteredAttribute : public RegisteredBaseAttribute
 {
 public:
 
-	unsigned int addAttribute(AttribContainer& container, const std::string& attribName)
+	unsigned int addAttribute(AttributeContainer& container, const std::string& attribName)
 	{
 		return container.addAttribute<T>(attribName);
 	}

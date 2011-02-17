@@ -52,11 +52,11 @@ public:
 		this->m_map = &m ;
 		if(!m.isOrbitEmbedded(orbit))
 			m.addEmbedding(orbit) ;
-		AttribContainer& cellCont = this->m_map->m_attribs[orbit] ;
+		AttributeContainer& cellCont = this->m_map->m_attribs[orbit] ;
 		unsigned int index = cellCont.addAttribute<T>(nameAttr) ;
-		AttribMultiVect<T>& atm = cellCont.getDataVector<T>(index);
+		AttributeMultiVector<T>& atm = cellCont.getDataVector<T>(index);
 		this->m_attrib = &atm;
-		this->m_id = AttribContainer::attrId(orbit, index) ;
+		this->m_id = AttributeContainer::attrId(orbit, index) ;
 	}
 
 	~AutoAttributeHandler()

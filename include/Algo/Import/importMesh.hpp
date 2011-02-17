@@ -457,7 +457,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 //
 //
 //	// Attributes container for vertex orbit
-//	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
+//	AttributeContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
 //
 //	AttributeHandler<VEC3> positions(idPositions,map);
 //

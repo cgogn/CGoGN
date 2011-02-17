@@ -69,7 +69,7 @@ void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAt
 template <typename ATTR_HANDLER>
 void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
 {
-	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
+	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
 	std::vector<void*> addr;
 	unsigned int byteTableSize;
@@ -92,7 +92,7 @@ void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& 
 template <typename ATTR_HANDLER>
 void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
-	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
+	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
 	std::vector<void*> addr;
 	unsigned int byteTableSize;

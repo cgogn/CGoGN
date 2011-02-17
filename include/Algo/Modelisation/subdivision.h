@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _SUBDIVISION_H_
-#define _SUBDIVISION_H_
+#ifndef __SUBDIVISION_H__
+#define __SUBDIVISION_H__
 
 #include <math.h>
 #include <vector>
@@ -51,6 +51,9 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d);
 template <typename PFP, typename EMBV, typename EMB>
 void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
 
+template <typename PFP>
+void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+
 /**
 * Quadrangule a face with central vertex
 * warning: edges are considered here as already cut !!
@@ -67,11 +70,17 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d);
 template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
 
+template <typename PFP>
+void quadranguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+
 /**
  * Catmull-Clark subdivision scheme
  */
 template <typename PFP, typename EMBV, typename EMB>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+
+template <typename PFP>
+void CatmullClarkSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
 
 /**
  * Loop subdivision scheme
@@ -79,17 +88,22 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 template <typename PFP, typename EMBV, typename EMB>
 void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
 
+template <typename PFP>
+void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+
 /**
  * Dual mesh computation
  */
-template <typename PFP, typename EMBV, typename EMB>
-void computeDual(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
 
 /**
  * Sqrt(3) subdivision scheme
  */
-template <typename PFP, typename EMBV, typename EMB>
-void Sqrt3Subdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+template <typename PFP>
+void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+
+
 
 /*
  * TODO quadrangule volume
@@ -111,7 +125,6 @@ void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs);
 template <typename PFP, typename EMBV, typename EMB>
 void quadranguleVolumes(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue());
 
-//double betaF(unsigned int n) ;
 
 // TODO a mettre ailleurs ?
 //

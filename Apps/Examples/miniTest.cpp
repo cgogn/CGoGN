@@ -433,7 +433,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		case 'l':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "loop: "<< seconds << "sec" << std::endl;
@@ -454,7 +454,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		case 'c':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::CatmullClarkSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
+			Algo::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "catmull-clark: "<< seconds << "sec" << std::endl;
@@ -475,7 +475,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		case 't':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::trianguleFaces<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position) ;
+			Algo::Modelisation::trianguleFaces<PFP>(myMap, position) ;
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "triangulation: "<< seconds << "sec" << std::endl;
@@ -495,7 +495,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		case 'q':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::quadranguleFaces<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position) ;
+			Algo::Modelisation::quadranguleFaces<PFP>(myMap, position) ;
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "quadrangulation: "<< seconds << "sec" << std::endl;
@@ -530,6 +530,64 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			seconds = (t2 - t1) / 1000.0f;
 			std::cout << "display update: "<< seconds << "sec" << std::endl;
 
+			glutPostRedisplay() ;
+			break ;
+		}
+
+		case '3':
+		{
+			CellMarker markVisit(myMap, VERTEX_CELL) ;
+
+			CellMarker markNoDelete(myMap, VERTEX_CELL) ;
+
+			std::vector<Dart> visited ;
+			visited.reserve(myMap.getNbCells(VERTEX_CELL)) ;
+
+			visited.push_back(myMap.begin()) ;
+			markVisit.mark(myMap.begin()) ;
+
+			for(std::vector<Dart>::iterator vertex = visited.begin(); vertex != visited.end(); ++vertex)
+			{
+				bool deleteV = true ;
+				if(markNoDelete.isMarked(*vertex))
+					deleteV = false ;
+
+				Dart vit = *vertex ;
+				do	// add all vertex neighbors to the table
+				{
+					Dart nv = myMap.phi1(vit) ;
+					if(!markVisit.isMarked(nv))
+					{
+						visited.push_back(nv) ;
+						markVisit.mark(nv) ;
+					}
+					if(deleteV)
+						markNoDelete.mark(nv) ;
+					vit = myMap.alpha1(vit) ;
+				} while(vit != *vertex) ;
+
+				if(deleteV)
+					myMap.deleteVertex(*vertex) ;
+			}
+
+//			for(Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+//			{
+//				if(!markVisit.isMarked(d))
+//				{
+//					Dart dd = myMap.phi1(d) ;
+//					myMap.deleteVertex(d) ;
+//					Dart fit = dd ;
+//					do
+//					{
+//						markVisit.mark(fit) ;
+//						fit = myMap.phi1(fit) ;
+//					} while(fit != dd) ;
+//				}
+//			}
+
+			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 			glutPostRedisplay() ;
 			break ;
 		}

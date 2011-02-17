@@ -40,7 +40,7 @@ class AttribMap : public GenericMap
 	template<typename T> friend class AutoAttributeHandler ;
 
 public:
-	static const unsigned int UNKNOWN_ATTRIB = AttribContainer::UNKNOWN ;
+	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
 	AttribMap();
 
@@ -110,7 +110,7 @@ protected:
 	 * Add a toological relation in the map
 	 * @param name name of relation
 	 */
-	AttribMultiVect<Dart>* addRelation(const std::string& name);
+	AttributeMultiVector<Dart>* addRelation(const std::string& name);
 
 public:
 	/****************************************

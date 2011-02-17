@@ -30,9 +30,9 @@ inline AttributeHandler<T> AttribMap::addAttribute(unsigned int orbit, const std
 {
 	if(!isOrbitEmbedded(orbit))
 		addEmbedding(orbit) ;
-	AttribContainer& cellCont = m_attribs[orbit] ;
+	AttributeContainer& cellCont = m_attribs[orbit] ;
 	unsigned int index = cellCont.addAttribute<T>(nameAttr) ;
-	unsigned int idAttr = AttribContainer::attrId(orbit, index) ; // assume here that we have less than 16M attributes and 255 orbits!!
+	unsigned int idAttr = AttributeContainer::attrId(orbit, index) ; // assume here that we have less than 16M attributes and 255 orbits!!
 	return AttributeHandler<T>(this, idAttr) ;
 }
 
@@ -41,7 +41,7 @@ inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
 {
 	assert(attr.isValid() || !"Invalid attribute handler") ;
 	unsigned int idAttr = attr.id() ;
-	return m_attribs[AttribContainer::orbitAttr(idAttr)].removeAttribute(AttribContainer::indexAttr(idAttr)) ;
+	return m_attribs[AttributeContainer::orbitAttr(idAttr)].removeAttribute(AttributeContainer::indexAttr(idAttr)) ;
 }
 
 template <typename T>
@@ -49,17 +49,17 @@ inline AttributeHandler<T> AttribMap::getAttribute(unsigned int orbit, const std
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	unsigned int index = m_attribs[orbit].getAttribute(nameAttr) ;
-	return AttributeHandler<T>(this, AttribContainer::attrId(orbit, index)) ;
+	return AttributeHandler<T>(this, AttributeContainer::attrId(orbit, index)) ;
 }
 
 template <typename T>
 inline bool AttribMap::swapAttributes(AttributeHandler<T>& attr1, AttributeHandler<T>& attr2)
 {
 	assert((attr1.isValid() && attr2.isValid()) || !"Invalid attribute handler") ;
-	unsigned int orbit = AttribContainer::orbitAttr(attr1.id()) ;
-	assert(orbit == AttribContainer::orbitAttr(attr2.id()) || !"Cannot swap attributes of different orbits") ;
-	unsigned int index1 = AttribContainer::indexAttr(attr1.id()) ;
-	unsigned int index2 = AttribContainer::indexAttr(attr2.id()) ;
+	unsigned int orbit = AttributeContainer::orbitAttr(attr1.id()) ;
+	assert(orbit == AttributeContainer::orbitAttr(attr2.id()) || !"Cannot swap attributes of different orbits") ;
+	unsigned int index1 = AttributeContainer::indexAttr(attr1.id()) ;
+	unsigned int index2 = AttributeContainer::indexAttr(attr2.id()) ;
 	if(index1 != index2)
 		return m_attribs[orbit].swapAttributes(index1, index2) ;
 	return false ;
@@ -69,10 +69,10 @@ template <typename T>
 inline bool AttribMap::copyAttribute(AttributeHandler<T>& dst, AttributeHandler<T>& src)
 {
 	assert((dst.isValid() && src.isValid()) || !"Invalid attribute handler") ;
-	unsigned int orbit = AttribContainer::orbitAttr(dst.id()) ;
-	assert(orbit == AttribContainer::orbitAttr(src.id()) || !"Cannot copy attributes of different orbits") ;
-	unsigned int index_dst = AttribContainer::indexAttr(dst.id()) ;
-	unsigned int index_src = AttribContainer::indexAttr(src.id()) ;
+	unsigned int orbit = AttributeContainer::orbitAttr(dst.id()) ;
+	assert(orbit == AttributeContainer::orbitAttr(src.id()) || !"Cannot copy attributes of different orbits") ;
+	unsigned int index_dst = AttributeContainer::indexAttr(dst.id()) ;
+	unsigned int index_src = AttributeContainer::indexAttr(src.id()) ;
 	if(index_dst != index_src)
 		return m_attribs[orbit].copyAttribute(index_dst, index_src) ;
 	return false ;
@@ -88,12 +88,12 @@ inline unsigned int AttribMap::getNbCells(unsigned int orbit)
  *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
  ****************************************/
 
-inline AttribMultiVect<Dart>* AttribMap::addRelation(const std::string& name)
+inline AttributeMultiVector<Dart>* AttribMap::addRelation(const std::string& name)
 {
-	AttribContainer& cont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& cont = m_attribs[DART_ORBIT] ;
 
 	unsigned int index = cont.addAttribute<Dart>(name) ;
-	AttribMultiVect<Dart>& amv = cont.getDataVector<Dart>(index) ;
+	AttributeMultiVector<Dart>& amv = cont.getDataVector<Dart>(index) ;
 
 	// set new relation to fix point for all the darts of the map
 	for(unsigned int i = cont.begin(); i < cont.end(); cont.next(i))

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ATTRIB_MV__
-#define __ATTRIB_MV__
+#ifndef __ATTRIBUTE_MULTI_VECTOR__
+#define __ATTRIBUTE_MULTI_VECTOR__
 
 #include <vector>
 #include <iostream>
@@ -33,12 +33,12 @@
 
 #include <typeinfo>
 
-#include "sizeblock.h"
+#include "Container/sizeblock.h"
 
 namespace CGoGN
 {
 
-class AttribMultiVectGen
+class AttributeMultiVectorGen
 {
 protected:
 	std::string m_attName;
@@ -49,11 +49,11 @@ protected:
 
 public:
 
-	AttribMultiVectGen(const std::string& strName, const std::string& strType);
+	AttributeMultiVectorGen(const std::string& strName, const std::string& strType);
 
-	AttribMultiVectGen();
+	AttributeMultiVectorGen();
 
- 	virtual ~AttribMultiVectGen();
+ 	virtual ~AttributeMultiVectorGen();
 
  	void toggleProcess();
 
@@ -66,11 +66,11 @@ public:
  	/**
  	 * construct a new object using this type
  	 */
- 	virtual AttribMultiVectGen* new_obj()=0;
+ 	virtual AttributeMultiVectorGen* new_obj()=0;
 
-	virtual bool copy(const AttribMultiVectGen* atmvg)=0;
+	virtual bool copy(const AttributeMultiVectorGen* atmvg)=0;
 
-	virtual bool swap(AttribMultiVectGen* atmvg)=0;
+	virtual bool swap(AttributeMultiVectorGen* atmvg)=0;
 
 	/**
 	* add a vector in table
@@ -115,9 +115,9 @@ public:
 
 	virtual void input(unsigned int i,const std::string& st)=0;
 
-	virtual bool swap(AttribMultiVectGen& att)=0;
+	virtual bool swap(AttributeMultiVectorGen& att)=0;
 
-	virtual bool merge(const AttribMultiVectGen& att)=0;
+	virtual bool merge(const AttributeMultiVectorGen& att)=0;
 
 	virtual void addBlocksBefore(unsigned int nbb)=0;
 
@@ -159,13 +159,10 @@ public:
 	 * @param name [out] name of attribute
 	 * @param type [out] type of attribute
 	 */
-
 };
 
-
-
 template <typename T>
-class AttribMultiVect:  public AttribMultiVectGen
+class AttributeMultiVector:  public AttributeMultiVectorGen
 {
 	/**
 	* table of blocks of data ptr: vectors!
@@ -175,21 +172,21 @@ class AttribMultiVect:  public AttribMultiVectGen
 
 public:
 
-	AttribMultiVect(const std::string& strName, const std::string& strType);
+	AttributeMultiVector(const std::string& strName, const std::string& strType);
 
-	AttribMultiVect();
+	AttributeMultiVector();
 
-	~AttribMultiVect();
+	~AttributeMultiVector();
 
-	bool copy(const AttribMultiVectGen* atmvg);
+	bool copy(const AttributeMultiVectorGen* atmvg);
 
-	bool swap(AttribMultiVectGen* atmvg);
+	bool swap(AttributeMultiVectorGen* atmvg);
 
-	AttribMultiVectGen* new_obj();
+	AttributeMultiVectorGen* new_obj();
 
-	bool swap(AttribMultiVectGen& att);
+	bool swap(AttributeMultiVectorGen& att);
 
-	bool merge(const AttribMultiVectGen& att);
+	bool merge(const AttributeMultiVectorGen& att);
 
 	/**
 	* get a reference on a elt
@@ -284,6 +281,6 @@ public:
 
 }
 
-#include "attribmv.hpp"
+#include "attributeMultiVector.hpp"
 
 #endif

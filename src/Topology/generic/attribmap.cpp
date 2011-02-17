@@ -29,9 +29,9 @@ namespace CGoGN
 
 AttribMap::AttribMap() : GenericMap()
 {
-	AttribContainer& dartCont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
 	unsigned int mark_index = dartCont.addAttribute<Mark>("Mark") ;
-	AttribMultiVect<Mark>& amv = dartCont.getDataVector<Mark>(mark_index) ;
+	AttributeMultiVector<Mark>& amv = dartCont.getDataVector<Mark>(mark_index) ;
 	m_markerTables[DART_ORBIT] = &amv ;
 }
 
@@ -44,18 +44,18 @@ void AttribMap::addEmbedding(unsigned int orbit)
 	std::ostringstream oss;
 	oss << "EMB_" << orbit;
 
-	AttribContainer& dartCont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
 	unsigned int index = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	AttribMultiVect<unsigned int>& amv = dartCont.getDataVector<unsigned int>(index) ;
+	AttributeMultiVector<unsigned int>& amv = dartCont.getDataVector<unsigned int>(index) ;
 	m_embeddings[orbit] = &amv ;
 
 	// set new embedding to EMBNULL for all the darts of the map
 	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
 		amv[i] = EMBNULL ;
 
-	AttribContainer& cellCont = m_attribs[orbit] ;
+	AttributeContainer& cellCont = m_attribs[orbit] ;
 	unsigned int mark_index = cellCont.addAttribute<Mark>("Mark") ;
-	AttribMultiVect<Mark>& amvMark = cellCont.getDataVector<Mark>(mark_index) ;
+	AttributeMultiVector<Mark>& amvMark = cellCont.getDataVector<Mark>(mark_index) ;
 	m_markerTables[orbit] = &amvMark ;
 }
 
@@ -65,7 +65,7 @@ void AttribMap::addEmbedding(unsigned int orbit)
 
 unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
 {
-	AttribContainer& cont = m_attribs[AttribContainer::orbitAttr(idx.id())] ;
+	AttributeContainer& cont = m_attribs[AttributeContainer::orbitAttr(idx.id())] ;
 	unsigned int cpt = 0 ;
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 	{
