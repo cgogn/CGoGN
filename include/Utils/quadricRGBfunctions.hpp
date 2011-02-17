@@ -45,7 +45,7 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const QuadricRGBfunctions& q) {
 }
 
 template <typename REAL>
-QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, REAL alpha, REAL gamma) {
+QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, REAL gamma, REAL alpha) {
 	MATRIX66 R1,R2_A,R2_b,R2_c;
 	// Matrice de rotation 1
 	buildRotateMatrix(R1,gamma);
@@ -66,7 +66,9 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, REAL alph
 		// Rotation 1
 
 		Geom::Vector<6,REAL> function;
-		assert(cf.getSubVectorH(col,0,function) || !"QuadricRGBfunctions::constructor") ;
+
+		if (!cf.getSubVectorH(col,0,function))
+			assert(!"QuadricRGBfunctions::constructor") ;
 
 		VEC6 coefs = R1 * function ; // Multiply coefs
 
@@ -92,7 +94,8 @@ REAL QuadricRGBfunctions<REAL>::operator() (const RGBFUNCTIONS& cf) const {
 	for (unsigned col = RED; col < BLUE+1; ++col) {
 		Geom::Vector<6,REAL> function ;
 
-		assert (cf.getSubVectorH(col,0,function) || !"QuadricRGBfunctions::operator()") ;
+		if (!cf.getSubVectorH(col,0,function))
+			assert (!"QuadricRGBfunctions::getSubVectorH") ;
 
 		VEC6 Al = A[col] * function;
 
@@ -123,7 +126,8 @@ bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(RGBFUNCTIONS& cf) cons
 
 		coefs = Ainv * b[col];
 
-		assert (cf.setSubVectorH(col,0,coefs) || !"QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed") ;
+		if (!cf.setSubVectorH(col,0,coefs))
+			assert (!"QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed") ;
 	}
 
 	return true;

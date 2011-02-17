@@ -66,7 +66,8 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 		VEC3 segmentNew = m_approxPosition[d] ;
 		segmentNew -= this->m_position[d] ;
 
-		REAL t = std::max (std::min (segment * segmentNew , REAL(1)) , REAL(0) ) ; // Orthogonal projection on segment v1-v2 of new vertex
+		REAL t = (segment * segmentNew) / (segment.norm()*segment.norm()) ;
+		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // Orthogonal projection on segment v1-v2 of new vertex
 
 		VEC3 n1, n2 ;
 		this->m_attrV[d].getSubVectorH(2, 0, n1) ;
@@ -81,10 +82,14 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 		VEC3 newJ = newN ^ newI ;
 		newJ.normalize() ;
 
-		assert(this->m_approx[d].setSubVectorH(0,0,newI) || !"Approximator_Frame::approximate") ;
-		assert(this->m_approx[d].setSubVectorH(1,0,newJ) || !"Approximator_Frame::approximate") ;
-		assert(this->m_approx[d].setSubVectorH(2,0,newN) || !"Approximator_Frame::approximate") ;
+		if (!this->m_approx[d].setSubVectorH(0,0,newI) ||
+			!this->m_approx[d].setSubVectorH(1,0,newJ) ||
+			!this->m_approx[d].setSubVectorH(2,0,newN) )
+			assert(!"Approximator_Frame::approximate") ;
 	}
+
+	//	AutoAttributeHandler<VEC3> normals = this->m_map.template getAttribute<VEC3>(VERTEX_ORBIT, "normals") ;
+	//	this->m_approx[d].getSubVectorH(2,0,normals[d]) ;
 }
 
 /************************************************************************************
@@ -130,21 +135,24 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	m_frame[dd].getSubVectorH(2,0,n2) ;
 
 	VEC3 j1pr = n1 ^ i ;
+	j1pr.normalize() ;
 	VEC3 j2pr = n2 ^ i ;
+	j2pr.normalize() ;
 
-	REAL alpha1 = ((n * j1pr) > 0 ? 1 : -1) * acos(n * n1) ;
-	REAL alpha2 = ((n * j2pr) > 0 ? 1 : -1) * acos(n * n2) ;
-	REAL gamma1 = ((j1 * i) > 0 ? 1 : -1) * acos( i1 * i ) ;
-	REAL gamma2 = ((j2 * i) > 0 ? 1 : -1) * acos( i2 * i ) ;
+	// Rotation dans sens trigo dans le plan tangent autour de n (i1->i)
+	REAL gamma1 = ((j1 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i1 * i ), -1.0f)) ; // angle positif ssi
+	REAL gamma2 = ((j2 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i2 * i ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
+	// Rotation dans le sens trigo autour de l'axe i (n1->n)
+	REAL alpha1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
+	REAL alpha2 = ((n * j2pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
 
-	alpha1 = std::min(REAL(1),std::max(REAL(-1),alpha1)) ;
-	alpha2 = std::min(REAL(1),std::max(REAL(-1),alpha2)) ;
+	assert (-3.15 < gamma1 && gamma1 <= 3.15) ;
+	assert (-3.15 < gamma2 && gamma2 <= 3.15) ;
+	assert (-3.15 < alpha1 && alpha1 <= 3.15) ;
+	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
-	gamma1 = std::min(REAL(1),std::max(REAL(-1),gamma1)) ;
-	gamma2 = std::min(REAL(1),std::max(REAL(-1),gamma2)) ;
-
-	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d],alpha1,gamma1) ;
-	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd],alpha2,gamma2) ;
+	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d],gamma1, alpha1) ;
+	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd],gamma2, alpha2) ;
 
 	// New RGBf
 	if (! (*m_quadricRGBfunctions)[d].findOptimizedRGBfunctions(this->m_approx[d]))

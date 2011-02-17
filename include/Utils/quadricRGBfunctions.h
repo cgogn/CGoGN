@@ -41,7 +41,7 @@ public:
 	QuadricRGBfunctions();
 	QuadricRGBfunctions(int i);
 	QuadricRGBfunctions(const QuadricRGBfunctions&);
-	QuadricRGBfunctions(const RGBFUNCTIONS&, REAL alpha = REAL(0), REAL gamma = REAL(0));
+	QuadricRGBfunctions(const RGBFUNCTIONS&, REAL gamma = REAL(0), REAL alpha = REAL(0));
 
 	virtual ~QuadricRGBfunctions();
 
