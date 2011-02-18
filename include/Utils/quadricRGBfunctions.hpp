@@ -408,6 +408,8 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, REAL gamma) const
 	REAL sinus = sin(gamma), sin2 = sinus*sinus;
 	REAL sincos = sinus*cosinus;
 
+	// Inverted matrix for left-hand side application
+
 	N(0,0) = cos2;
 	N(0,1) = sin2;
 	N(0,2) = -sincos;
@@ -448,7 +450,8 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, REAL gamma) const
 	N(5,2) = REAL(0);
 	N(5,3) = REAL(0);
 	N(5,4) = REAL(0);
-	N(5,5) = 1.0;
+	N(5,5) = REAL(1.0);
+
 }
 
 template <typename REAL>
