@@ -37,6 +37,7 @@ void AttributeContainer::swap(AttributeContainer& cont)
 	m_holesBlocks.swap(cont.m_holesBlocks);
 	m_tableBlocksWithFree.swap(cont.m_tableBlocksWithFree);
 	m_tableAttribs.swap(cont.m_tableAttribs);
+	m_freeIndices.swap(cont.m_freeIndices);
 	m_attribNameMap.swap(cont.m_attribNameMap);
 
 	unsigned int temp = m_nbAttributes;
@@ -73,6 +74,11 @@ bool AttributeContainer::removeAttribute(const std::string& attribName)
 	delete (m_tableAttribs[it->second]);
 	m_tableAttribs[it->second] = NULL;
 
+	if(it->second == m_tableAttribs.size() - 1)
+		m_tableAttribs.pop_back() ;
+	else
+		m_freeIndices.push_back(it->second);
+
 	// remove the attribute from the name map
 	m_attribNameMap.erase(it);
 
@@ -86,16 +92,20 @@ bool AttributeContainer::removeAttribute(unsigned int index)
 	MapNameId::iterator it = m_attribNameMap.begin();
 	while ((it != m_attribNameMap.end()) && (it->second != index))
 		++it;
-	if (it != m_attribNameMap.end())
-	{
-		// remove the attribute from the name map
-		m_attribNameMap.erase(it);
-	}
-	// else it was an attribute without name
 
 	// delete the attribute
 	delete (m_tableAttribs[index]);
 	m_tableAttribs[index] = NULL;
+
+	if(index == m_tableAttribs.size() - 1)
+		m_tableAttribs.pop_back() ;
+	else
+		m_freeIndices.push_back(index);
+
+	// remove the attribute from the name map
+	if (it != m_attribNameMap.end())
+		m_attribNameMap.erase(it);
+	// else it was an attribute without name
 
 	m_nbAttributes--;
 
@@ -179,7 +189,6 @@ void AttributeContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
 	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "BlockSize","%u",_BLOCKSIZE_);
 	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "size","%u",m_maxSize);
 
-
 	// recuperer le nombre d'attributs
 	unsigned int nbAtt = m_attribNameMap.size();
 	unsigned int sizeVectAtt = m_tableAttribs.size();
@@ -201,7 +210,6 @@ void AttributeContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
 	}
 	// fin du noeud
 	rc = xmlTextWriterEndElement(writer);
-
 
 	// parcourir le container et sauver les lignes
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "Data_Lines");
@@ -229,7 +237,6 @@ void AttributeContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
 
 	// fin du noeud Container
 	rc = xmlTextWriterEndElement(writer);
-
 }
 
 bool AttributeContainer::loadXmlBWF(xmlNodePtr node)
@@ -258,7 +265,6 @@ bool AttributeContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
 //	unsigned int nb = atoi((char*)prop);
 	prop = xmlGetProp(node, BAD_CAST "sv");
 //	unsigned int sv = atoi((char*)prop);
-
 
 	// Noooooooo!!!!
 //	m_tableAttribs.resize(sv);
@@ -316,7 +322,7 @@ bool AttributeContainer::loadXmlDL(xmlNodePtr node)
 		unsigned int nbr = atoi((char*)prop);
 		setRefLine(id,nbr);
 
-		if (nbr>0)
+		if (nbr > 0)
 		{
 			for (MapNameId::iterator it=m_attribNameMap.begin(); it!=m_attribNameMap.end(); ++it)
 			{
@@ -335,7 +341,6 @@ bool AttributeContainer::loadXmlDL(xmlNodePtr node)
 
 	return true;
 }
-
 
 unsigned int AttributeContainer::getIdXmlNode(xmlNodePtr node)
 {
@@ -360,7 +365,6 @@ bool AttributeContainer::loadXml(xmlNodePtr node)
 
 	prop = xmlGetProp(node, BAD_CAST "size");
 	m_maxSize = atoi((char*)prop);
-
 
 	char* ANnode = (char*)"Attributes_Names";
 	char* DLnode= (char*)"Data_Lines";
@@ -514,9 +518,7 @@ unsigned int AttributeContainer::getAttribute(const std::string& attribName)
 {
 	MapNameId::iterator it = m_attribNameMap.find(attribName);
 	if (it == m_attribNameMap.end())
-	{
 		return UNKNOWN;
-	}
 	return it->second;
 }
 
@@ -534,18 +536,15 @@ bool AttributeContainer::isValidAttribute(unsigned int attr)
 	return false;
 }
 
-unsigned int AttributeContainer::getAttributesStrings(std::vector<std::string>& strings)
+unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& names)
 {
-	strings.clear();
+	names.clear();
+	names.reserve(m_nbAttributes);
 
-	strings.resize(m_tableAttribs.size());
+	for (MapNameId::iterator it = m_attribNameMap.begin(); it != m_attribNameMap.end(); ++it)
+		names.push_back(it->first);
 
-	for (MapNameId::iterator it = m_attribNameMap.begin(); it!= m_attribNameMap.end(); ++it)
-	{
-		strings[it->second] = it->first;
-	}
-
-	return m_attribNameMap.size();
+	return m_nbAttributes;
 }
 
 const std::string& AttributeContainer::getAttributeName(unsigned int attrIndex)
@@ -558,11 +557,6 @@ const std::string& AttributeContainer::getAttributeName(unsigned int attrIndex)
 
 	std::cerr << "Fail finding attribute name" << std::endl;
 	return  m_attribNameMap.begin()->first;		// just for compiling
-}
-
-unsigned int AttributeContainer::nbAttributes()
-{
-	return m_attribNameMap.size();
 }
 
 ///////////////////////////

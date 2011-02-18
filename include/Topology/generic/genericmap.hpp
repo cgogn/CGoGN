@@ -244,6 +244,16 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVect
 	return m_embeddings[orbit] ;
 }
 
+inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
+{
+	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
+	assert((orbit1 != DART_ORBIT && orbit2 != DART_ORBIT) || !"Cannot swap the darts container") ;
+	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
+	AttributeMultiVector<unsigned int>* e1 = m_embeddings[orbit1] ;
+	m_embeddings[orbit1] = m_embeddings[orbit2] ;
+	m_embeddings[orbit2] = e1 ;
+}
+
 /****************************************
  *          MARKERS MANAGEMENT          *
  ****************************************/

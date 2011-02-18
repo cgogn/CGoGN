@@ -41,6 +41,8 @@ AttribMap::AttribMap() : GenericMap()
 
 void AttribMap::addEmbedding(unsigned int orbit)
 {
+	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
+
 	std::ostringstream oss;
 	oss << "EMB_" << orbit;
 

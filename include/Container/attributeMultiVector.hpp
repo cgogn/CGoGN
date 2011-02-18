@@ -1,9 +1,32 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
 
 namespace CGoGN
 {
 
 inline AttributeMultiVectorGen::AttributeMultiVectorGen(const std::string& strName, const std::string& strType):
-		m_attName(strName), m_typeName(strType), m_toProcess(true)
+	m_attName(strName), m_typeName(strType), m_toProcess(true)
 {}
 
 inline AttributeMultiVectorGen::AttributeMultiVectorGen(): m_toProcess(true)
@@ -70,7 +93,12 @@ bool AttributeMultiVector<T>::copy(const AttributeMultiVectorGen* atmvg)
 
 	if (atmv == NULL)
 	{
-		std::cerr<< "copy attribute of different type"<<std::endl;
+		std::cerr << "trying to copy attributes of different type" << std::endl;
+		return false;
+	}
+	if (atmv->m_typeName != m_typeName)
+	{
+		std::cerr << "trying to swap attributes with different type names" << std::endl;
 		return false;
 	}
 
@@ -88,7 +116,12 @@ bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen* atmvg)
 
 	if (atmv == NULL)
 	{
-		std::cerr<< "swap attribute of different type"<<std::endl;
+		std::cerr << "trying to swap attributes of different type" << std::endl;
+		return false;
+	}
+	if (atmv->m_typeName != m_typeName)
+	{
+		std::cerr << "trying to swap attributes with different type names" << std::endl;
 		return false;
 	}
 
@@ -96,26 +129,26 @@ bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen* atmvg)
 	return true;
 }
 
-template <typename T>
-bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen& att)
-{
-	AttributeMultiVector<T>* attrib = dynamic_cast< AttributeMultiVector<T>* >(&att);
-	if (attrib==NULL)
-	{
-		std::cerr << "Erreur, swap de container de types differents"<<std::endl;
-		return false;
-	}
-	if (attrib->m_typeName != m_typeName)
-	{
-		std::cerr << "Erreur, swap de container avec noms de type differents"<<std::endl;
-		return false;
-	}
-
-	m_tableData.swap(attrib->m_tableData);
-	m_typeName.swap(attrib->m_typeName);
-
-	return true;
-}
+//template <typename T>
+//bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen& att)
+//{
+//	AttributeMultiVector<T>* attrib = dynamic_cast<AttributeMultiVector<T>*>(&att);
+//	if (attrib==NULL)
+//	{
+//		std::cerr << "Erreur, swap de container de types differents"<<std::endl;
+//		return false;
+//	}
+//	if (attrib->m_typeName != m_typeName)
+//	{
+//		std::cerr << "Erreur, swap de container avec noms de type differents"<<std::endl;
+//		return false;
+//	}
+//
+//	m_tableData.swap(attrib->m_tableData);
+//	m_typeName.swap(attrib->m_typeName);
+//
+//	return true;
+//}
 
 template <typename T>
 bool AttributeMultiVector<T>::merge(const AttributeMultiVectorGen& att)
@@ -139,10 +172,16 @@ bool AttributeMultiVector<T>::merge(const AttributeMultiVectorGen& att)
 }
 
 template <typename T>
-T& AttributeMultiVector<T>::operator[](unsigned int i) { return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];}
+T& AttributeMultiVector<T>::operator[](unsigned int i)
+{
+	return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];
+}
 
 template <typename T>
-const T& AttributeMultiVector<T>::operator[](unsigned int i) const { return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];}
+const T& AttributeMultiVector<T>::operator[](unsigned int i) const
+{
+	return m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_];
+}
 
 template <typename T>
 std::string AttributeMultiVector<T>::output(unsigned int i)

@@ -95,7 +95,7 @@ void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
  * Dual mesh computation
  */
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = SelectorTrue()) ;
 
 /**
  * Sqrt(3) subdivision scheme

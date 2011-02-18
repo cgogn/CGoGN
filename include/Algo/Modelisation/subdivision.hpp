@@ -435,32 +435,33 @@ void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 {
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
 	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
 	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART_ORBIT, "phi_1") ;
 	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi1") ;
+	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi_1") ;
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		Dart dd = map.alpha1(d) ;
 		new_phi1[d] = dd ;
-		phi_1[dd] = d ;
+		new_phi_1[dd] = d ;
 	}
 
 	map.template swapAttributes<Dart>(phi1, new_phi1) ;
+	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
 
 	map.template removeAttribute<Dart>(new_phi1) ;
+	map.template removeAttribute<Dart>(new_phi_1) ;
+
+	map.swapEmbeddingContainers(VERTEX_ORBIT, FACE_ORBIT) ;
 }
 
 template <typename PFP>
 void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
 {
-	computeDual<PFP>(map, position, selected);
+//	computeDual<PFP>(map, selected);
 	trianguleFaces<PFP>(map, position, selected);
 }
 

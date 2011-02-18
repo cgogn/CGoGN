@@ -257,6 +257,11 @@ public:
 	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit);
 
 	/**
+	 *
+	 */
+	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2);
+
+	/**
 	 * static function for type registration
 	 */
 	template <typename R>

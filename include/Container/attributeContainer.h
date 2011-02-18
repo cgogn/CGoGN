@@ -71,6 +71,8 @@ protected:
 	*/
 	std::vector<AttributeMultiVectorGen*> m_tableAttribs;
 
+	std::vector<unsigned int> m_freeIndices;
+
 	/**
 	* map de correspondance string / indice pour les attributs
 	*/
@@ -246,7 +248,7 @@ public:
 	* @param strings (OUT) tableau des noms d'attributs
 	* @return le nombre d'attributs
 	*/	
-	unsigned int getAttributesStrings(std::vector<std::string>& strings);
+	unsigned int getAttributesNames(std::vector<std::string>& names);
 
 	/**
 	 * get the name of an attribute, given its index in the container
@@ -393,11 +395,6 @@ public:
 	* Cout memoire total approximatif
 	*/
 	unsigned int memoryTotalSize() ;
-
-	/**
-	* Nombre d'attributs
-	*/
-	unsigned int nbAttributes();
 
 	/**
 	* Nombre de reference d'une ligne

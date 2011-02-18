@@ -1,11 +1,28 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
 
-//#include <typeinfo>
-//#include <stdio.h>
-//#include <string.h>
-//#include <libxml/encoding.h>
-//#include <libxml/xmlwriter.h>
-
-#include<iostream>
+#include <iostream>
 #include <cassert>
 #include "Container/registered.h"
 #include "Utils/nameTypes.h"
@@ -27,16 +44,24 @@ unsigned int AttributeContainer::addAttribute(const std::string& attribName)
 	{
 		MapNameId::iterator it = m_attribNameMap.find(attribName);
 		if (it != m_attribNameMap.end())
-		{
 			return UNKNOWN;
-		}
 	}
 
 	// new attribut
-	AttributeMultiVector<T>* ptr = new AttributeMultiVector<T>(attribName, nametype);
-	unsigned int idxAttrib = m_tableAttribs.size();
-	// add it to table of attribut_manager
-	m_tableAttribs.push_back(ptr);
+	AttributeMultiVector<T>* amv = new AttributeMultiVector<T>(attribName, nametype);
+
+	unsigned int idxAttrib ;
+	if(!m_freeIndices.empty())
+	{
+		idxAttrib = m_freeIndices.back() ;
+		m_freeIndices.pop_back() ;
+		m_tableAttribs[idxAttrib] = amv ;
+	}
+	else
+	{
+		idxAttrib = m_tableAttribs.size();
+		m_tableAttribs.push_back(amv);
+	}
 
 	// add it in the map 
 	if (attribName == "") // if no name, generate a fake name
@@ -44,6 +69,7 @@ unsigned int AttributeContainer::addAttribute(const std::string& attribName)
 		std::stringstream ss;
 		ss << "unknown" << m_nbUnknown++;
 		m_attribNameMap.insert(std::pair<std::string, unsigned int>(ss.str(), idxAttrib));
+		amv->setName(ss.str());
 	}
 	else
 		m_attribNameMap.insert(std::pair<std::string, unsigned int>(attribName, idxAttrib));
@@ -53,7 +79,7 @@ unsigned int AttributeContainer::addAttribute(const std::string& attribName)
 	
 	// resize the new attribute container to have same size than others
 	int nbb = m_holesBlocks.size();
-	ptr->setNbBlocks(nbb);
+	amv->setNbBlocks(nbb);
 
 	m_nbAttributes++;
 
@@ -68,24 +94,30 @@ unsigned int AttributeContainer::addAttribute(const std::string& attribName, con
 	{
 		MapNameId::iterator it = m_attribNameMap.find(attribName);
 		if (it != m_attribNameMap.end())
-		{
 			return UNKNOWN;
-		}
 	}
 
 	// new attribut
-	AttributeMultiVector<T>* ptr = new AttributeMultiVector<T>(attribName, nametype);
+	AttributeMultiVector<T>* amv = new AttributeMultiVector<T>(attribName, nametype);
 	// add it to table of attribut_manager
-	m_tableAttribs[idxAttrib] = ptr;
+	m_tableAttribs[idxAttrib] = amv;
 	// add it in the map
-	m_attribNameMap.insert(std::pair<std::string, unsigned int>(attribName, idxAttrib));
+	if (attribName == "") // if no name, generate a fake name
+	{
+		std::stringstream ss;
+		ss << "unknown" << m_nbUnknown++;
+		m_attribNameMap.insert(std::pair<std::string, unsigned int>(ss.str(), idxAttrib));
+		amv->setName(ss.str());
+	}
+	else
+		m_attribNameMap.insert(std::pair<std::string, unsigned int>(attribName, idxAttrib));
 
 	// maj taille d'une ligne
 	m_lineCost += sizeof(T);
 
 	// resize the new attribute container to have same size than others
 	int nbb = m_holesBlocks.size();
-	ptr->setNbBlocks(nbb);
+	amv->setNbBlocks(nbb);
 
 	m_nbAttributes++;
 
@@ -94,7 +126,7 @@ unsigned int AttributeContainer::addAttribute(const std::string& attribName, con
 
 inline unsigned int AttributeContainer::getNbAttributes()
 {
-	return m_tableAttribs.size();
+	return m_nbAttributes;
 }
 
 ///////////////////////////
@@ -104,12 +136,12 @@ inline unsigned int AttributeContainer::getNbAttributes()
 template <typename T>
 T& AttributeContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
 {
-	assert(eltIdx < m_maxSize && "Attribut non existant (indice trop grand)");
-	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_)&&"Attribut non existant");
-	assert((m_tableAttribs[codeAttrib]!=NULL)&&"Attribut detruit");
+	assert(eltIdx < m_maxSize || !"Attribut non existant (indice trop grand)");
+	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_) || !"Attribut non existant");
+	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
 
 	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm!=NULL)&& "type attribut non concordant");
+	assert((atm != NULL) || !"type attribut non concordant");
 
 	return atm->operator[](eltIdx);
 }
@@ -117,12 +149,12 @@ T& AttributeContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
 template <typename T>
 const T& AttributeContainer::getData(unsigned int codeAttrib, unsigned int eltIdx) const
 {
- 	assert(eltIdx < m_maxSize && "Attribut non existant (indice trop grand)");
-	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_)&&"Attribut non existant");
-	assert((m_tableAttribs[codeAttrib]!=NULL)&&"Attribut detruit");
+	assert(eltIdx < m_maxSize || !"Attribut non existant (indice trop grand)");
+	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_) || !"Attribut non existant");
+	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
 
 	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm!=NULL)&& "type attribut non concordant");
+	assert((atm != NULL) || !"type attribut non concordant");
 
 	return atm->operator[](eltIdx);
 }
@@ -130,13 +162,12 @@ const T& AttributeContainer::getData(unsigned int codeAttrib, unsigned int eltId
 template <typename T>
 void AttributeContainer::setData(unsigned int codeAttrib, unsigned int eltIdx,  const T& data)
 {
-	
- 	assert(eltIdx < m_maxSize && "Attribut non existant (indice trop grand)");
-	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_)&&"Attribut non existant");
-	assert((m_tableAttribs[codeAttrib]!=NULL)&&"Attribut detruit");
+	assert(eltIdx < m_maxSize || !"Attribut non existant (indice trop grand)");
+	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_) || !"Attribut non existant");
+	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
 
 	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm!=NULL)&& "type attribut non concordant");
+	assert((atm != NULL) || !"type attribut non concordant");
 
 	atm->operator[](eltIdx) = data;
 }
@@ -152,11 +183,11 @@ void AttributeContainer::setData(unsigned int codeAttrib, unsigned int eltIdx,  
 template<typename T>
 AttributeMultiVector<T>& AttributeContainer::getDataVector(unsigned int codeAttrib)
 {
-	assert((codeAttrib < m_tableAttribs.size()) && "Attribut inexistant");
-	assert((m_tableAttribs[codeAttrib] != NULL) && "Attribut detruit");
+	assert((codeAttrib < m_tableAttribs.size()) || !"Attribut inexistant");
+	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
 
 	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm!=NULL)&& "type attribut non concordant");
+	assert((atm != NULL) || !"type attribut non concordant");
 	return *atm;
 }
 
@@ -169,11 +200,11 @@ bool AttributeContainer::getAttributesVector(const std::string& attribName, Attr
 	
 	int codeAttrib = it->second;
 
-	if (m_tableAttribs[codeAttrib]==NULL) 
+	if (m_tableAttribs[codeAttrib] == NULL)
 		return false;
 
 	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	if (atm==NULL) 
+	if (atm == NULL)
 		return false;
 
 	*ptr = atm;
@@ -188,7 +219,7 @@ template <typename T>
 unsigned int AttributeContainer::getAddresses(unsigned int attr, std::vector<T*>& vect_adr)
 {
 	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[attr]);
-	assert((atm!=NULL)&& "type attribut non concordant");
+	assert((atm != NULL) || !"type attribut non concordant");
 	return atm->getStartAddresses(vect_adr);
 }
 

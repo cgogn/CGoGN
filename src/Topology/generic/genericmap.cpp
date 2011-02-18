@@ -160,7 +160,7 @@ void GenericMap::update_m_emb_afterLoad()
 
 	// get the list of attributes
 	std::vector<std::string> listeNames;
-	cont.getAttributesStrings(listeNames);
+	cont.getAttributesNames(listeNames);
 
 	// check if there are EMB_X attributes
 	for (unsigned int i = 0;  i < listeNames.size(); ++i)

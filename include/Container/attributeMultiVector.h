@@ -99,9 +99,13 @@ public:
 	/**
 	* get name of the type of attribute
 	*/
-	const std::string& getTypeName() { return m_typeName;}
+	const std::string& getTypeName() { return m_typeName; }
 
-	const std::string& getName() { return m_attName;}
+	void setTypeName(const std::string& n) { m_typeName = n ; }
+
+	const std::string& getName() { return m_attName; }
+
+	void setName(const std::string& n) { m_attName = n ; }
 
 	virtual void saveBin(CGoGNostream& fs, unsigned int id)=0;
 
@@ -114,8 +118,6 @@ public:
 	virtual std::string output(unsigned int i)=0;
 
 	virtual void input(unsigned int i,const std::string& st)=0;
-
-	virtual bool swap(AttributeMultiVectorGen& att)=0;
 
 	virtual bool merge(const AttributeMultiVectorGen& att)=0;
 
@@ -162,13 +164,12 @@ public:
 };
 
 template <typename T>
-class AttributeMultiVector:  public AttributeMultiVectorGen
+class AttributeMultiVector: public AttributeMultiVectorGen
 {
 	/**
 	* table of blocks of data ptr: vectors!
 	*/
-	std::vector< T* > m_tableData;
-
+	std::vector<T*> m_tableData;
 
 public:
 
@@ -183,8 +184,6 @@ public:
 	bool swap(AttributeMultiVectorGen* atmvg);
 
 	AttributeMultiVectorGen* new_obj();
-
-	bool swap(AttributeMultiVectorGen& att);
 
 	bool merge(const AttributeMultiVectorGen& att);
 
@@ -256,13 +255,11 @@ public:
 	 */
 	void saveBin(CGoGNostream& fs, unsigned int id);
 
-
 	/**
 	 * lecture binaire
 	 * @param fs filestream
 	 */
 	bool loadBin(CGoGNistream& fs);
-
 
 	// Processing attributes
 
@@ -279,7 +276,7 @@ public:
 	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
 };
 
-}
+} // namespace CGoGN
 
 #include "attributeMultiVector.hpp"
 
