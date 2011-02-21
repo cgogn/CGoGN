@@ -52,37 +52,38 @@ struct PFP: public PFP_STANDARD
 };
 
 
-
-const unsigned int GL_ATTRIB_POSITION=0;
-const unsigned int GL_ATTRIB_NORMAL=1;
-
-
 /**
  * A class for a little interface and rendering
  */
 class MyGlutWin: public Utils::SimpleGlutWinGL3
 {
 public:
-     void myRedraw();
-     void initGLAttribs();
-     void renderColor();
-     void renderPhong();
 
-     PFP::REAL gWidthObj;
-     PFP::VEC3 gPosObj;
+	void myRedraw();
 
-     Algo::Render::GL3::MapRender* m_render;
+    void myKeyboard(unsigned char keycode, int x, int y);
 
-     Utils::GLSLShader* current_shader;
-     Utils::GLSLShader shaders[4];
+    void renderColor();
 
+    void renderPhong();
 
+    void initPhongMaterial();
 
- 	MyGlutWin(int* argc, char **argv, int winX, int winY) : SimpleGlutWinGL3(argc, argv, winX, winY)
+    PFP::REAL gWidthObj;
+    PFP::VEC3 gPosObj;
+
+    Algo::Render::GL3::MapRender* m_render;
+
+    Utils::GLSLShader* current_shader;
+    Utils::GLSLShader shaders[4];
+
+    int rt;
+
+ 	MyGlutWin(int* argc, char **argv, int winX, int winY) : SimpleGlutWinGL3(argc, argv, winX, winY),rt(0)
     {
  		shaders[0].loadShaders("color_gl3.vert","color_gl3.frag");
  		shaders[1].loadShaders("phong_gl3.vert","phong_gl3.frag");
- 		current_shader = &shaders[1];
+ 		current_shader = &shaders[0];
  		setCurrentShader(current_shader);
     }
  	~MyGlutWin()
@@ -91,30 +92,38 @@ public:
  	}
 };
 
-void MyGlutWin::initGLAttribs()
-{
-	shaders[0].bindAttrib(GL_ATTRIB_POSITION, "VertexPosition");
 
-	shaders[1].bindAttrib(GL_ATTRIB_POSITION, "VertexPosition");
-	shaders[1].bindAttrib(GL_ATTRIB_NORMAL, "VertexNormal");
+void MyGlutWin::initPhongMaterial()
+{
+	float diffuse[] = {0.0f,1.0f,0.0f,0.0f};
+	float specular[] = {0.3f,0.3f,1.0f,0.0f};
+	float ambient[] = {0.1f,0.03f,0.03f,0.0f};
+	float shininess = 100.0f;
+	float lightPos[] = {100.0,300.0,1000.0f};
+
+	shaders[1].bind();
+
+	shaders[1].setuniformf<4>("materialDiffuse",diffuse);
+	shaders[1].setuniformf<4>("materialSpecular",specular);
+	shaders[1].setuniformf<4>("materialAmbient",ambient);
+	shaders[1].setuniformf<1>("shininess",&shininess);
+
+	shaders[1].setuniformf<3>("LightPosition",lightPos);
+
 }
+
 
 void MyGlutWin::renderColor()
 {
-	current_shader = &shaders[0];
-
-//	setModelViewProjectionMatrix(current_shader);
-	setCurrentShader(current_shader);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_LIGHTING);
 
 	current_shader->bind();
 
-	float colorLine[] = {1.0f,1.0f,0.0f,0.0f};
-	float colorFace[] = {0.0f,1.0f,0.0f,0.0f};
 
 	// draw the lines
 	glLineWidth(2.0f);
+	float colorLine[] = {1.0f,1.0f,0.0f,0.0f};
 	current_shader->setuniformf<4>("Color",colorLine);
 	m_render->draw(Algo::Render::GL3::LINES);
 
@@ -122,6 +131,7 @@ void MyGlutWin::renderColor()
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1.0f, 1.0f);
 
+	float colorFace[] = {0.1f,0.1f,0.3f,0.0f};
 	current_shader->setuniformf<4>("Color",colorFace);
 	m_render->draw(Algo::Render::GL3::TRIANGLES);
 
@@ -131,27 +141,11 @@ void MyGlutWin::renderColor()
 
 void MyGlutWin::renderPhong()
 {
-	current_shader = &shaders[1];
-	setCurrentShader(current_shader);
-//	setModelViewProjectionMatrix(current_shader);
-
-	float diffuse[] = {0.0f,1.0f,0.0f,0.0f};
-	float specular[] = {0.3f,0.3f,1.0f,0.0f};
-	float ambient[] = {0.1f,0.03f,0.03f,0.0f};
-	float shininess = 100.0f;
-	float lightPos[] = {100.0,300.0,1000.0f};
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_LIGHTING);
 
 	current_shader->bind();
-
-	current_shader->setuniformf<4>("materialDiffuse",diffuse);
-	current_shader->setuniformf<4>("materialSpecular",specular);
-	current_shader->setuniformf<4>("materialAmbient",ambient);
-	current_shader->setuniformf<1>("shininess",&shininess);
-
-	current_shader->setuniformf<3>("LightPosition",lightPos);
 
 	m_render->draw(Algo::Render::GL3::TRIANGLES);
 }
@@ -162,10 +156,42 @@ void MyGlutWin::myRedraw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //	oglPushModelViewMatrix();
 
-	renderPhong();
+	switch(rt)
+	{
+	case 0:
+		renderColor();
+		break;
+	case 1:
+		renderPhong();
+		break;
+	}
 
 //	oglPopModelViewMatrix();
 }
+
+
+void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
+{
+
+	switch(keycode)
+	{
+	case 'c':
+		rt=0;
+		current_shader = &shaders[0];
+		setCurrentShader(current_shader);
+		std::cout << "Color"<< std::endl;
+		break;
+	case 'p':
+		rt=1;
+		current_shader = &shaders[1];
+		setCurrentShader(current_shader);
+		std::cout << "Phong"<< std::endl;
+		break;
+	}
+	glutPostRedisplay();
+
+}
+
 
 int main(int argc, char **argv)
 {
@@ -187,6 +213,8 @@ int main(int argc, char **argv)
 
 	mgw.init();
 
+	glClearColor(0.1,0.1,0.3,0.0);
+
     // computation of the bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
     mgw.gWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -197,16 +225,23 @@ int main(int argc, char **argv)
     // instanciation of the renderer (here using VBOs)
     mgw.m_render = new Algo::Render::GL3::MapRender();
 
+
+	// declare names attributes of shaders
+    mgw.m_render->useVertexAttributeName("VertexPosition",mgw.shaders[0]);
+    mgw.m_render->useVertexAttributeName("VertexPosition",mgw.shaders[1]);
+    unsigned int attNormalId = mgw.m_render->useVertexAttributeName("VertexNormal",mgw.shaders[1]);
+
+    // send data to gc
+    mgw.m_render->updateData("VertexPosition", position);	// with name
+    mgw.m_render->updateData(attNormalId, normal);			//with Id
+
     // update the renderer (primitives and geometry)
 	SelectorTrue allDarts;
     mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL3::TRIANGLES);
     mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL3::LINES);
     mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL3::POINTS);
 
-    mgw.m_render->updateData(GL_ATTRIB_POSITION, position);
-    mgw.m_render->updateData(GL_ATTRIB_NORMAL, normal);
-
-    mgw.initGLAttribs();
+    mgw.initPhongMaterial();
 
     mgw.mainLoop();
 

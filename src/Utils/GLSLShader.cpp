@@ -645,7 +645,7 @@ bool GLSLShader::checkShader(int shaderType)
 
 
 
-void GLSLShader::bindAttrib(unsigned int att, const char* name)
+void GLSLShader::bindAttrib(unsigned int att, const char* name) const
 {
 	glBindAttribLocation(m_program_object,att,name);
 }

@@ -112,6 +112,9 @@ protected:
 	// table of shaders
 	static Utils::GLSLShader* m_current_shaders;
 
+
+	static void recalcModelView();
+
 	// internal callbacks
 	static void redraw(void);
 
@@ -127,14 +130,9 @@ protected:
 
 	static void keyboard(unsigned char keycode, int x, int y);
 
-	static void recalcModelView();
-
 	static SimpleGlutWinGL3* instance;
 
 protected:
-	static GLfloat lightZeroPosition[4];
-
-	static GLfloat lightZeroColor[4];
 
 	virtual void myKeyboard(unsigned char, int, int) {}
 

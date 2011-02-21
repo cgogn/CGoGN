@@ -31,9 +31,16 @@
 #define __X_GL_H
 #define GLAPIENTRY
 #include <GL/freeglut.h>
+
 #ifndef WIN32
-	#include <GL/glx.h>
+	#ifdef MAC_OSX
+		#include <OpenGL/CGLCurrent.h>
+	#else
+		#include <GL/glx.h>
+	#endif
 #endif
+
+
 #include "Utils/trackball.h"
 #include <IL/ilu.h>
 #include <IL/ilut.h>
@@ -114,9 +121,14 @@ protected:
 	HDC m_drawable;
 	HGLRC m_context;
 #else
-	Display* m_dpy;
-	GLXDrawable m_drawable;
-	GLXContext m_context;
+	#ifdef MAC_OSX
+		CGLContextObj m_context;
+	#else
+		Display* m_dpy;
+		GLXDrawable m_drawable;
+		GLXContext m_context;
+	#endif
+
 #endif
 
 public:
@@ -131,7 +143,7 @@ public:
 	/**
 	* constructor
 	*/
-	SimpleGlutWin(int* argc, char **argv, int winX, int winY, bool gl3=false);
+	SimpleGlutWin(int* argc, char **argv, int winX, int winY);
 
 	/**
 	* destructor

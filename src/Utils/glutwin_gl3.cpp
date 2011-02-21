@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef MAC_OSX
+
 #include <stdlib.h>
 
 #include "Utils/glutwingl3.h"
@@ -77,15 +79,15 @@ glm::mat4 SimpleGlutWinGL3::m_modelView_matrix;
 std::stack<glm::mat4> SimpleGlutWinGL3::m_stack_mv;
 
 // light
-glm::vec4 SimpleGlutWinGL3::m_materialAmbient;
-glm::vec4 SimpleGlutWinGL3::m_materialDiffuse;
-glm::vec4 SimpleGlutWinGL3::m_materialSpecular;
-float SimpleGlutWinGL3::m_materialShininess;
-
-glm::vec4 SimpleGlutWinGL3::m_lightPosition;
-glm::vec4 SimpleGlutWinGL3::m_lightDiffuse;
-glm::vec4 SimpleGlutWinGL3::m_lightSpecular;
-glm::vec4 SimpleGlutWinGL3::m_lightAmbient;
+//glm::vec4 SimpleGlutWinGL3::m_materialAmbient;
+//glm::vec4 SimpleGlutWinGL3::m_materialDiffuse;
+//glm::vec4 SimpleGlutWinGL3::m_materialSpecular;
+//float SimpleGlutWinGL3::m_materialShininess;
+//
+//glm::vec4 SimpleGlutWinGL3::m_lightPosition;
+//glm::vec4 SimpleGlutWinGL3::m_lightDiffuse;
+//glm::vec4 SimpleGlutWinGL3::m_lightSpecular;
+//glm::vec4 SimpleGlutWinGL3::m_lightAmbient;
 
 
 SimpleGlutWinGL3::SimpleGlutWinGL3(int* argc, char **argv, int winX, int winY)
@@ -102,8 +104,8 @@ SimpleGlutWinGL3::SimpleGlutWinGL3(int* argc, char **argv, int winX, int winY)
 	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutCreateWindow(argv[0]);
-	glutInitContextVersion (3, 2);
-	glutInitContextFlags (GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
+//	glutInitContextVersion (3, 2);
+//	glutInitContextFlags (GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
 
 	glutReshapeWindow(winX,winY);
   	W=winX; H=winY;
@@ -121,7 +123,7 @@ SimpleGlutWinGL3::SimpleGlutWinGL3(int* argc, char **argv, int winX, int winY)
 	glGetIntegerv(GL_MINOR_VERSION, &MinorVersionContext);
 
 	std::cout << "OpenGL v"<<MajorVersionContext<<"."<<MinorVersionContext<<std::endl;
-
+	std::cout << glGetString(GL_VERSION)<<std::endl;
 
 	shaderOk = Utils::GLSLShader::init();
 
@@ -230,6 +232,9 @@ void SimpleGlutWinGL3::setParamObject(float width, float* pos)
 void SimpleGlutWinGL3::setCurrentShader(Utils::GLSLShader* sh)
 {
 	m_current_shaders = sh;
+	m_current_shaders->bind();
+	setModelViewProjectionMatrix(m_current_shaders);
+	glutPostRedisplay();
 }
 
 void SimpleGlutWinGL3::releaseContext()
@@ -498,4 +503,4 @@ GLfloat SimpleGlutWinGL3::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geo
 } // namespace Utils
 } // namespace CGoGN
 
-
+#endif

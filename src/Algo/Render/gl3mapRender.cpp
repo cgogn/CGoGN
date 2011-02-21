@@ -37,8 +37,11 @@ namespace GL3
 {
 
 MapRender::MapRender():
+	m_nbVertexAttrib(0),
 	m_nbIndicesTri(0),
-	m_nbIndicesLines(0)
+	m_nbIndicesLines(0),
+	m_nbIndicesPoints(0),
+	m_nbFlatElts(0)
 {
 	glGenBuffersARB(4, m_VBOBuffers) ;
 
@@ -56,7 +59,7 @@ MapRender::~MapRender()
 	glDeleteBuffersARB(4, m_VBOBuffers);
 	delete[] m_VBOBuffers ;
 
-	for(unsigned int i = 4; i < NB_BUFFERS; ++i)
+	for(unsigned int i = 4; i < 4+m_nbVertexAttrib; ++i)
 	{
 		if (m_allocatedAttributes[i])
 			glDeleteBuffersARB(4, &(m_VBOBuffers[i]));
@@ -65,8 +68,11 @@ MapRender::~MapRender()
 
 
 MapRender::MapRender(const MapRender& mrvbo):
+	m_nbVertexAttrib(mrvbo.m_nbVertexAttrib),
 	m_nbIndicesTri(0),
-	m_nbIndicesLines(0)
+	m_nbIndicesLines(0),
+	m_nbIndicesPoints(0),
+	m_nbFlatElts(0)
 {
 	glGenBuffersARB(3, m_VBOBuffers) ; // gen only for indices
 	// get back others from mrvbo
@@ -79,15 +85,6 @@ MapRender::MapRender(const MapRender& mrvbo):
 }
 
 
-void MapRender::enableVertexAttrib(unsigned int index)
-{
-	m_usedAttributes[index] = true ;
-}
-
-void MapRender::disableVertexAttrib(unsigned int index)
-{
-	m_usedAttributes[index] = false ;
-}
 
 
 void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
@@ -122,24 +119,21 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 
 void MapRender::drawTriangles(bool bindColors)
 {
-
-	for(unsigned int i = FIRST_ATTRIBUTE_BUFFER; i < NB_BUFFERS; ++i)
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
 	{
-		unsigned int j = i-FIRST_ATTRIBUTE_BUFFER;
 		if(m_usedAttributes[j])
 		{
-			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
+			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[j+FIRST_ATTRIBUTE_BUFFER]);
 			glEnableVertexAttribArray(j);
 			glVertexAttribPointer(j, m_AttributesDataSize[j], GL_FLOAT, false, 0, 0);
 		}
 	}
 
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[TRIANGLE_INDICES]);
-//	glEnableClientState(GL_INDEX_ARRAY);
-	glDrawElements(GL_TRIANGLES, m_nbIndicesTri, GL_UNSIGNED_INT, 0);
-//	glDisableClientState(GL_INDEX_ARRAY);
 
-	for(unsigned int j = 0; j < NB_BUFFERS-FIRST_ATTRIBUTE_BUFFER; ++j)
+	glDrawElements(GL_TRIANGLES, m_nbIndicesTri, GL_UNSIGNED_INT, 0);
+
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
 	{
 		if(m_usedAttributes[j])
 		{
@@ -150,12 +144,11 @@ void MapRender::drawTriangles(bool bindColors)
 
 void MapRender::drawLines(bool bindColors)
 {
-	for(unsigned int i = FIRST_ATTRIBUTE_BUFFER; i < NB_BUFFERS; ++i)
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
 	{
-		unsigned int j = i-FIRST_ATTRIBUTE_BUFFER;
 		if(m_usedAttributes[j])
 		{
-			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
+			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[j+FIRST_ATTRIBUTE_BUFFER]);
 			glEnableVertexAttribArray(j);
 			glVertexAttribPointer(j, m_AttributesDataSize[j], GL_FLOAT, false, 0, 0);
 
@@ -167,7 +160,7 @@ void MapRender::drawLines(bool bindColors)
 	glDrawElements(GL_LINES, m_nbIndicesLines, GL_UNSIGNED_INT, 0);
 //	glDisableClientState(GL_INDEX_ARRAY);
 
-	for(unsigned int j = 0; j < NB_BUFFERS-FIRST_ATTRIBUTE_BUFFER; ++j)
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
 	{
 		if(m_usedAttributes[j])
 		{
@@ -178,23 +171,21 @@ void MapRender::drawLines(bool bindColors)
 
 void MapRender::drawPoints(bool bindColors)
 {
-	for(unsigned int i = FIRST_ATTRIBUTE_BUFFER; i < NB_BUFFERS; ++i)
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
 	{
-		unsigned int j = i-FIRST_ATTRIBUTE_BUFFER;
 		if(m_usedAttributes[j])
 		{
-			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[i]);
+			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[j+FIRST_ATTRIBUTE_BUFFER]);
 			glEnableVertexAttribArray(j);
 			glVertexAttribPointer(j, m_AttributesDataSize[j], GL_FLOAT, false, 0, 0);
 		}
 	}
 
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[POINT_INDICES]);
-//	glEnableClientState(GL_INDEX_ARRAY);
-	glDrawElements(GL_POINTS, m_nbIndicesPoints, GL_UNSIGNED_INT, 0) ;
-//	glDisableClientState(GL_INDEX_ARRAY);
 
-	for(unsigned int j = 0; j < NB_BUFFERS-FIRST_ATTRIBUTE_BUFFER; ++j)
+	glDrawElements(GL_POINTS, m_nbIndicesPoints, GL_UNSIGNED_INT, 0) ;
+
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
 	{
 		if(m_usedAttributes[j])
 		{

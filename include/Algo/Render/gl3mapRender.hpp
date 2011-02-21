@@ -37,6 +37,60 @@ namespace GL3
 {
 
 
+// inline functions:
+inline void MapRender::enableVertexAttrib(unsigned int index)
+{
+	m_usedAttributes[index] = true ;
+}
+
+inline void MapRender::disableVertexAttrib(unsigned int index)
+{
+	m_usedAttributes[index] = false ;
+}
+
+
+/**
+ * enable a vertex attribute for rendering (updateDate automatically enable attrib)
+ */
+inline void MapRender::enableVertexAttrib(const std::string& name)
+{
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it != m_attributebyName.end())
+		enableVertexAttrib(it->second);
+	else
+		std::cerr <<"enableVertexAttrib: unknown attribute "<< name << std::endl;
+}
+
+
+
+inline void MapRender::disableVertexAttrib(const std::string& name)
+{
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it != m_attributebyName.end())
+		disableVertexAttrib(it->second);
+	else
+		std::cerr <<"disableVertexAttrib: unknown attribute "<< name << std::endl;
+}
+
+
+
+inline unsigned int MapRender::useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh)
+{
+	unsigned int vertex_attrib =0;
+
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it == m_attributebyName.end())
+	{
+		vertex_attrib = m_nbVertexAttrib++;
+		m_attributebyName.insert(std::pair<std::string,unsigned int>(name,vertex_attrib));
+	}
+	else
+		vertex_attrib = it->second;
+
+	sh.bindAttrib(vertex_attrib,name.c_str());
+
+	return vertex_attrib;
+}
 
 template <typename ATTR_HANDLER>
 void MapRender::updateData(unsigned int vertex_attrib, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
@@ -62,6 +116,30 @@ void MapRender::updateData(unsigned int vertex_attrib, const ATTR_HANDLER& attri
 		fillBufferDirect(indexVBO, attrib) ;
 }
 
+
+
+
+
+
+template <typename ATTR_HANDLER>
+void MapRender::updateData(const std::string& name, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+{
+	unsigned int vertex_attrib = 0;
+
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it == m_attributebyName.end())
+	{
+		vertex_attrib = m_nbVertexAttrib++;
+		m_attributebyName.insert(std::pair<std::string,unsigned int>(name,vertex_attrib));
+		std::cerr << "warning update data with unknown name, adding vertex attribute"<< std::endl;
+	}
+	else
+	{
+		vertex_attrib = it->second;
+	}
+
+	updateData<ATTR_HANDLER>(vertex_attrib,attrib,conv);
+}
 
 
 template <typename ATTR_HANDLER>

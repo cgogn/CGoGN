@@ -217,7 +217,7 @@ public:
 	/**
 	 * bind vertex attribute with its name in shaders
 	 */
-	void bindAttrib(unsigned int att, const char* name);
+	void bindAttrib(unsigned int att, const char* name) const;
 
 
 	bool validateProgram();

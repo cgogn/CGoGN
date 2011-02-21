@@ -41,9 +41,11 @@
 
 #include "Algo/Parallel/parallel_foreach.h"
 
-#include "averaging.h"
 
 using namespace CGoGN ;
+
+
+
 
 
 /**

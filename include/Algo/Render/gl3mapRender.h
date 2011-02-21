@@ -35,6 +35,8 @@
 #include "Container/convert.h"
 #include "Geometry/vector_gen.h"
 
+#include "Utils/GLSLShader.h"
+
 namespace CGoGN
 {
 
@@ -83,6 +85,14 @@ protected:
 
 	unsigned int m_AttributesDataSize[NB_BUFFERS];
 
+	std::map<std::string,GLuint> m_attributebyName;
+
+
+	/**
+	 * number of vertex attributes
+	 */
+	GLuint m_nbVertexAttrib ;
+
 	/**
 	 * number of indices of triangles
 	 */
@@ -119,14 +129,48 @@ public:
 	 */
 	~MapRender() ;
 
+
+
+public:
 	/**
 	 * update the data
-	 * @param uptype that have to be updated: POSITIONS, NORMALS, COLORS, TEXCOORDS, ???
-	 * @param attribId attribute where data is stored
+	 * @param vertex_attrib vertex attrib id
+	 * @param attrib attribute where data is stored
 	 * @param conv Callback of attribute conversion (NULL if direct copy, default value)
 	 */
 	template <typename ATTR_HANDLER>
 	void updateData(unsigned int vertex_attrib, const ATTR_HANDLER& attrib, ConvertAttrib* conv = NULL) ;
+
+	/**
+	 * update the data
+	 * @param va_name vertex attrib name (in shader)
+	 * @param attrib attribute where data is stored
+	 * @param conv Callback of attribute conversion (NULL if direct copy, default value)
+	 */
+	template <typename ATTR_HANDLER>
+	void updateData(const std::string& name, const ATTR_HANDLER& attrib, ConvertAttrib* conv = NULL) ;
+
+
+	/**
+	 * enable a vertex attribute for rendering (updateDate automatically enable attrib)
+	 */
+	void enableVertexAttrib(const std::string& name);
+
+	/**
+	 * disable a vertex attribute for rendering
+	 */
+	void disableVertexAttrib(const std::string& name);
+
+
+	/**
+	 * associate a name to a vertex attribute
+	 * @param name the name in shader
+	 * @param sh the shader
+	 * @return the id to use with update (if not using name)
+	 */
+	unsigned int useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh);
+
+protected:
 
 	/**
 	 * enable a vertex attribute for rendering (updateDate automatically enable attrib)
@@ -138,8 +182,6 @@ public:
 	 */
 	void disableVertexAttrib(unsigned int index);
 
-
-protected:
 	/**
 	* fill buffer directly from attribute
 	*/

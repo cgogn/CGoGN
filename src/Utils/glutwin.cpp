@@ -60,7 +60,7 @@ int SimpleGlutWin::W=0;
 int SimpleGlutWin::H=0;
 bool SimpleGlutWin::m_noMouse=false;
 
-SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY, bool gl3)
+SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 {
 	instance = this;
 	spinning = 0;
@@ -71,11 +71,6 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY, bool gl
 	trans_y=0.;
 	trans_z=-50.0f;
 
-	if (gl3)
-	{
-		glutInitContextVersion (3, 2);
-		glutInitContextFlags (GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
-	}
 
 	std::cout << "Initialisation Glut" << std::endl;
 	glutInit(argc, argv);
@@ -92,6 +87,7 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY, bool gl
 	glutKeyboardFunc(keyboard);
 
 	std::cout << "Initialisation OpenGL" << std::endl;
+	std::cout << glGetString(GL_VERSION)<<std::endl;
 	shaderOk = Utils::GLSLShader::init();
 
 	glViewport(0, 0, W, H);
@@ -116,9 +112,13 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY, bool gl
 	m_drawable = wglGetCurrentDC();
 	m_context = wglGetCurrentContext();
 #else
-	m_dpy = glXGetCurrentDisplay();
-	m_drawable = glXGetCurrentDrawable();
-	m_context = glXGetCurrentContext();
+	#ifdef MAC_OSX
+		m_context = CGLGetCurrentContext();
+	#else
+		m_dpy = glXGetCurrentDisplay();
+		m_drawable = glXGetCurrentDrawable();
+		m_context = glXGetCurrentContext();
+	#endif
 #endif
 	// Call other initialization (possibly overloaded in instances)
 	instance->init();
@@ -129,7 +129,11 @@ void SimpleGlutWin::releaseContext()
 #ifdef WIN32
 	wglMakeCurrent(NULL,NULL);
 #else
-	glXMakeCurrent(m_dpy,None,NULL);
+	#ifdef MAC_OSX
+		CGLSetCurrentContext(NULL);
+	#else
+		glXMakeCurrent(m_dpy,None,NULL);
+	#endif
 #endif
 }
 
@@ -138,7 +142,11 @@ void SimpleGlutWin::useContext()
 #ifdef WIN32
 	wglMakeCurrent(m_drawable, m_context);
 #else
-	glXMakeCurrent(m_dpy, m_drawable, m_context);
+	#ifdef MAC_OSX
+		CGLSetCurrentContext(m_context);
+	#else
+		glXMakeCurrent(m_dpy, m_drawable, m_context);
+	#endif
 #endif
 
 }
