@@ -65,10 +65,13 @@ template <typename PFP>
 void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const typename PFP::TVEC3& color, const FunctorSelect& good = SelectorTrue());
 
-
 template <typename PFP>
 void renderNormalVertices(typename PFP::MAP& the_map,
 		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, float scale, const FunctorSelect& good = SelectorTrue());
+
+template <typename PFP>
+void renderFrameVertices(typename PFP::MAP& the_map,
+		const typename PFP::TVEC3& position, const typename PFP::TMAT33& frames, float scale, const FunctorSelect& good = SelectorTrue());
 
 } // namespace Direct
 

@@ -92,8 +92,6 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 			assert(!"Approximator_Frame::approximate") ;
 	}
 
-	//	AutoAttributeHandler<VEC3> normals = this->m_map.template getAttribute<VEC3>(VERTEX_ORBIT, "normals") ;
-	//	this->m_approx[d].getSubVectorH(2,0,normals[d]) ;
 }
 
 /************************************************************************************
@@ -164,8 +162,8 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
 	// Create and sum quadrics
-	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d],gamma1, alpha1) ;
-	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd],gamma2, alpha2) ;
+	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
+	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
 
 	// Compute new function
 	if (! (*m_quadricRGBfunctions)[d].findOptimizedRGBfunctions(this->m_approx[d]))

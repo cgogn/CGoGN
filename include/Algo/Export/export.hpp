@@ -256,7 +256,7 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 }
 
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& Pos,	const typename PFP::TFRAME& Frame, const typename PFP::TRGBFUNCS& RGBfuncs, const FunctorSelect& good)
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& Pos,	const typename PFP::TMAT33& Frame, const typename PFP::TMAT36& RGBfuncs, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
