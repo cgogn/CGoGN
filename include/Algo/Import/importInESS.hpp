@@ -58,6 +58,7 @@ template <typename PFP>
 bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
+	unsigned int em;
 
 	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
 	attrNames.push_back(position.name()) ;
@@ -86,8 +87,39 @@ bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vecto
 	//Bounding box : first coord & second coord
 	bg = line.substr(0, posData);
 	posCoord = bg.find(") (");
-	stringToEmb<PFP>(bg.substr(0, posCoord));
-	stringToEmb<PFP>(bg.substr(posCoord+3));
+	VEC3 c1 = stringToEmb<PFP>(bg.substr(0, posCoord));
+	VEC3 c2 = stringToEmb<PFP>(bg.substr(posCoord+3));
+
+	std::vector<std::vector<VEC3> > coordonnees; //tableau 2D avec les x en fonction des y
+	coordonnees.reserve(50);
+
+//	Dart d = map.newFace(4);
+//
+//	em = container.insertLine();
+//	position[em] = c1;
+//	map.setDartEmbedding(VERTEX_ORBIT, d, em);
+//	d = map.phi1(d);
+//
+//	em = container.insertLine();
+//	position[em] = VEC3(c2[0],c1[1],c2[2]);
+//	map.setDartEmbedding(VERTEX_ORBIT, d, em);
+//	d = map.phi1(d);
+//
+//	em = container.insertLine();
+//	position[em] = c2;
+//	map.setDartEmbedding(VERTEX_ORBIT, d, em);
+//	d = map.phi1(d);
+//
+//	em = container.insertLine();
+//	position[em] = VEC3(c1[0],c2[1],c1[2]);
+//	map.setDartEmbedding(VERTEX_ORBIT, d, em);
+//	d = map.phi1(d);
+
+
+//	id = container.insertLine();
+//	position[id] = stringToEmb<PFP>(bg.substr(0, posCoord));
+//	id = container.insertLine();
+//	position[id] = stringToEmb<PFP>(bg.substr(posCoord+3));
 
 	while ( std::getline( fp, line ) )
 	{
@@ -97,14 +129,44 @@ bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vecto
 		//Bounding box : first coord & second coord
 		bg = line.substr(0, posData);
 		posCoord = bg.find(") (");
-		stringToEmb<PFP>(bg.substr(0,posCoord));
-		stringToEmb<PFP>(bg.substr(posCoord+3));
+
+		VEC3 c1 = stringToEmb<PFP>(bg.substr(0, posCoord));
+		VEC3 c2 = stringToEmb<PFP>(bg.substr(posCoord+3));
+
+		Dart d = map.newFace(4);
+
+		em = container.insertLine();
+		position[em] = c1;
+		map.setDartEmbedding(VERTEX_ORBIT, d, em);
+		d = map.phi1(d);
+
+		em = container.insertLine();
+		position[em] = VEC3(c2[0],c1[1],c2[2]);
+		map.setDartEmbedding(VERTEX_ORBIT, d, em);
+		d = map.phi1(d);
+
+		em = container.insertLine();
+		position[em] = c2;
+		map.setDartEmbedding(VERTEX_ORBIT, d, em);
+		d = map.phi1(d);
+
+		em = container.insertLine();
+		position[em] = VEC3(c1[0],c2[1],c1[2]);
+		map.setDartEmbedding(VERTEX_ORBIT, d, em);
+		d = map.phi1(d);
+
+//		id = container.insertLine();
+//		position[id] = stringToEmb<PFP>(bg.substr(0,posCoord));
+//		id = container.insertLine();
+//		position[id] = stringToEmb<PFP>(bg.substr(posCoord+3));
 
 		//Second column
-		bg = line.substr(posData+1);
-		posCoord = bg.find(") (");
-		stringToEmb<PFP>(bg.substr(0, posCoord));
-		stringToEmb<PFP>(bg.substr(posCoord+3));
+//		bg = line.substr(posData+1);
+//		posCoord = bg.find(") (");
+//		id = container.insertLine();
+//		position[id] = stringToEmb<PFP>(bg.substr(0, posCoord));
+//		id = container.insertLine();
+//		position[id] = stringToEmb<PFP>(bg.substr(posCoord+3));
 
 	   ++count;
 	}

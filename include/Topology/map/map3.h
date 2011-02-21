@@ -240,6 +240,10 @@ public:
 	 */
 	virtual bool isBoundaryVolume(Dart d);
 
+	/**
+	 *
+	 */
+	virtual bool isBoundaryVertex(Dart d);
 
 	//@}
 

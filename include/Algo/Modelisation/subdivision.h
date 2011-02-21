@@ -104,6 +104,8 @@ void quadranguleFacesVolume(typename PFP::MAP& map, EMBV& attributs, const Funct
 template <typename PFP, typename EMBV, typename EMB>
 void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs);
 
+template <typename PFP, typename EMBV, typename EMB>
+void dooSabinVolume(typename PFP::MAP& map, Dart d, EMBV& attributs);
 
 /*
  * Quadrangule a Volume

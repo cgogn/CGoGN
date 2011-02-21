@@ -607,6 +607,44 @@ bool Map3::isBoundaryVolume(Dart d)
 	return isBoundary;
 }
 
+bool Map3::isBoundaryVertex(Dart d)
+{
+	DartMarkerStore mv(*this);			// Lock a marker
+	bool found = false;					// Last functor return value
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	std::list<Dart>::iterator darts;
+
+	mv.mark(d);
+
+	for(darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts_list.push_back(d21);
+			mv.mark(d21);
+		}
+
+		if((d23!=d2) && !mv.isMarked(d23))
+		{
+			darts_list.push_back(d23);
+			mv.mark(d23);
+		}
+
+		found = phi3(dc) == dc;
+	}
+
+	return found;
+}
+
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/

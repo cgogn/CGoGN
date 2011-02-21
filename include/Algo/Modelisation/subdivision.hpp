@@ -579,6 +579,8 @@ void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
 		}
 	}
 
+	moe.unmarkAll();
+
 	//Fifth pass : traversal to phi3 sewing
 	std::vector<Dart>::iterator nvol;
 	for (nvol = quadfaces.begin(); nvol != quadfaces.end(); nvol = nvol + 2)
@@ -637,6 +639,83 @@ void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
 //
 //		attributs[*face] = emcp ;
 //	}
+}
+
+template <typename PFP, typename EMBV, typename EMB>
+void dooSabinVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
+{
+	DartMarker mf(map) ; //mark face
+	DartMarker me(map) ; //mark edge
+
+	DartMarkerStore mark(map);		// Lock a marker
+
+	//Store faces that are traversed and start with the face of d
+	std::vector<Dart> visitedFaces;
+	visitedFaces.reserve(100);
+	visitedFaces.push_back(d);
+	std::vector<Dart>::iterator face;
+
+	//Store a dart from a each face
+	std::vector<Dart> faces;
+	faces.reserve(100);
+
+	// First pass : for every face added to the list save a dart
+	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+
+			faces.push_back(*face);
+
+			Dart dNext = *face ;
+			do
+			{
+				mark.mark(dNext);					// Mark
+				Dart adj = map.phi2(dNext);				// Get adjacent face
+				if (adj != dNext && !mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+				dNext = map.phi1(dNext);
+			} while(dNext != *face);
+		}
+	}
+
+	// Second pass : for every edges insert a face
+	for(face = faces.begin() ; face != faces.end() ; ++face)
+	{
+		Dart e = *face;
+		do
+		{
+			if(!me.isMarked(e))
+			{
+				//insertion d'une face dans l'arete
+				Dart e2 = map.phi2(e);
+				map.unsewFaces(e);
+				Dart ne = map.newOrientedFace(4);
+
+				map.sewFaces(e,ne);
+				map.sewFaces(e2, map.phi1(map.phi1(ne)));
+
+				//marquage de l'orbite arete
+				me.markOrbit(EDGE_ORBIT,e);
+			}
+
+			e = map.phi1(e);
+		}while (e != *face);
+	}
+
+//	Dart f = map.phi1(d);
+//	map.cutEdge(d);
+//	Dart e = map.phi1(d);
+//	attributs[e] = attributs[d];
+//	attributs[e] += attributs[f];
+//	attributs[e] *= 0.5;
+//
+//	Dart dPrev = d;
+//	Dart ePrev = map.phi2(d);
+//	map.splitFace(dPrev,ePrev);
+//
+//	attributs[map.phi_1(d)] = attributs[map.phi1(ePrev)];
+
 }
 
 } // namespace Modelisation
