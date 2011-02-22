@@ -8,7 +8,9 @@ SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 
 find_package(OpenGL)
 find_package(GLUT)
-
+IF (APPLE)
+	SET(CMAKE_OSX_ARCHITECTURES x86_64)
+ENDIF(APPLE)
 #On Windows we use AntTweakBar/OpenCTM of dependencies, not compiled
 IF(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib)#release added by visual

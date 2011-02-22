@@ -38,8 +38,13 @@
 #include <GL/freeglut.h>
 
 #ifndef WIN32
-	#include <GL/glx.h>
+	#ifdef MAC_OSX
+		#include <OpenGL/CGLCurrent.h>
+	#else
+		#include <GL/glx.h>
+	#endif
 #endif
+
 
 #include "Utils/trackball.h"
 #include <IL/ilu.h>
@@ -142,13 +147,19 @@ protected:
 
 	virtual void myMouseClick(int button, int state, int x, int y) {}
 
+
 #ifdef WIN32
 	HDC m_drawable;
 	HGLRC m_context;
 #else
-	Display* m_dpy;
-	GLXDrawable m_drawable;
-	GLXContext m_context;
+	#ifdef MAC_OSX
+		CGLContextObj m_context;
+	#else
+		Display* m_dpy;
+		GLXDrawable m_drawable;
+		GLXContext m_context;
+	#endif
+
 #endif
 
 public:

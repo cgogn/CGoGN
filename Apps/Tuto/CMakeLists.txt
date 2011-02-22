@@ -55,7 +55,7 @@ target_link_libraries( tp_master
 
 add_executable( tuto_mt tuto_mt.cpp)
 target_link_libraries( tuto_mt
-	container topology utils algo ${COMMON_LIBS} boost_thread)
+	container topology utils algo ${COMMON_LIBS} boost_thread-mt)
 
 add_executable( tuto_ogl3 tuto_ogl3.cpp)
 target_link_libraries( tuto_ogl3

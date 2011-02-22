@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef MAC_OSX
+//#ifndef MAC_OSX
 
 #include <stdlib.h>
 
@@ -143,13 +143,18 @@ SimpleGlutWinGL3::SimpleGlutWinGL3(int* argc, char **argv, int winX, int winY)
 	glEnable(GL_LIGHTING);
 
 	//Store context infos
+
 #ifdef WIN32
 	m_drawable = wglGetCurrentDC();
 	m_context = wglGetCurrentContext();
 #else
-	m_dpy = glXGetCurrentDisplay();
-	m_drawable = glXGetCurrentDrawable();
-	m_context = glXGetCurrentContext();
+	#ifdef MAC_OSX
+		m_context = CGLGetCurrentContext();
+	#else
+		m_dpy = glXGetCurrentDisplay();
+		m_drawable = glXGetCurrentDrawable();
+		m_context = glXGetCurrentContext();
+	#endif
 #endif
 	// Call other initialization (possibly overloaded in instances)
 	instance->init();
@@ -237,12 +242,17 @@ void SimpleGlutWinGL3::setCurrentShader(Utils::GLSLShader* sh)
 	glutPostRedisplay();
 }
 
+
 void SimpleGlutWinGL3::releaseContext()
 {
 #ifdef WIN32
 	wglMakeCurrent(NULL,NULL);
 #else
-	glXMakeCurrent(m_dpy,None,NULL);
+	#ifdef MAC_OSX
+		CGLSetCurrentContext(NULL);
+	#else
+		glXMakeCurrent(m_dpy,None,NULL);
+	#endif
 #endif
 }
 
@@ -251,10 +261,16 @@ void SimpleGlutWinGL3::useContext()
 #ifdef WIN32
 	wglMakeCurrent(m_drawable, m_context);
 #else
-	glXMakeCurrent(m_dpy, m_drawable, m_context);
+	#ifdef MAC_OSX
+		CGLSetCurrentContext(m_context);
+	#else
+		glXMakeCurrent(m_dpy, m_drawable, m_context);
+	#endif
 #endif
 
 }
+
+
 
 
 
@@ -503,4 +519,4 @@ GLfloat SimpleGlutWinGL3::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geo
 } // namespace Utils
 } // namespace CGoGN
 
-#endif
+//#endif
