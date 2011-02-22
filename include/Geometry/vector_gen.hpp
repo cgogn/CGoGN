@@ -320,13 +320,13 @@ template <unsigned int DIM, typename T>
 inline Vector<DIM,T> slerp(const Vector<DIM,T> &v1, const Vector<DIM,T> &v2, const T &t) {
 	Vector<DIM,T> res ;
 
-	T omega = acos(v1 * v2) ;
+	T omega = acos(v1 * v2) ;	// assume v1,v2 normalized
 	T den = sin(omega) ;
 
 	if (-1e-8 < den && den < 1e-8)
 		return t < 0.5 ? v1 : v2 ;
 
-	T f1 = sin(( T(1)-t ) * omega ) / den ;
+	T f1 = sin(( T(1)-t ) * omega ) / den ;	// assume 0 <= t <= 1
 	T f2 = sin( t * omega ) / den ;
 
 	res += f1 * v1 ;

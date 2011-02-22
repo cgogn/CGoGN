@@ -69,7 +69,7 @@ void Approximator_Frame<PFP>::approximate(Dart d)
 		segmentNew -= this->m_position[d] ;
 
 		// Orthogonal projection of v0-v onto v0-v1 : get coefficient t
-		REAL t = (segment * segmentNew) / (segment.norm()*segment.norm()) ;
+		REAL t = (segment * segmentNew) / segment.norm() ;
 		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // clamp it to [0,1]
 
 		VEC3 n1, n2 ;

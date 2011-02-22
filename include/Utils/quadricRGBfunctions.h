@@ -41,9 +41,9 @@ public:
 	QuadricRGBfunctions();
 	QuadricRGBfunctions(int i);
 	QuadricRGBfunctions(const QuadricRGBfunctions&);
-	QuadricRGBfunctions(const RGBFUNCTIONS&, REAL gamma = REAL(0), REAL alpha = REAL(0));
+	QuadricRGBfunctions(const RGBFUNCTIONS&, const REAL gamma = REAL(0), const REAL alpha = REAL(0)) ;
 
-	virtual ~QuadricRGBfunctions();
+	virtual ~QuadricRGBfunctions() {} ;
 
 	REAL operator() (const RGBFUNCTIONS&) const;
 
@@ -51,8 +51,8 @@ public:
 
 	void operator += (const QuadricRGBfunctions&) ;
 	void operator -= (const QuadricRGBfunctions&) ;
-	void operator *= (REAL v) ;
-	void operator /= (REAL v) ;
+	void operator *= (const REAL v) ;
+	void operator /= (const REAL v) ;
 
 	void zero () ;
 
@@ -60,10 +60,10 @@ public:
 	friend std::istream& operator>> (std::istream &in, const QuadricRGBfunctions&) {return in;};
 
 private :
-	void buildIntegralMatrix_A(MATRIX66 &, REAL alpha) const;
-	void buildIntegralMatrix_b(MATRIX66 &, REAL alpha) const;
-	void buildIntegralMatrix_c(MATRIX66 &, REAL alpha) const;
-	void buildRotateMatrix(MATRIX66 &N, REAL gamma) const;
+	void buildIntegralMatrix_A(MATRIX66 &, const REAL alpha) const;
+	void buildIntegralMatrix_b(MATRIX66 &, const REAL alpha) const;
+	void buildIntegralMatrix_c(MATRIX66 &, const REAL alpha) const;
+	void buildRotateMatrix(MATRIX66 &N, const REAL gamma) const;
 
 };
 
