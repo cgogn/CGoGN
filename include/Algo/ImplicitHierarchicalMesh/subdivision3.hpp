@@ -31,7 +31,7 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace IHM3
+namespace IHM
 {
 
 //OK
@@ -91,7 +91,7 @@ Dart subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		++degree;
 		p += position[it] ;
 		if(!map.edgeIsSubdivided(it))							// first cut the edges (if they are not already)
-			Algo::IHM3::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
+			Algo::IHM::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
 		it = map.phi1(it) ;
 	} while(it != old) ;
 	p /= typename PFP::REAL(degree) ;
@@ -150,11 +150,8 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(vLevel) ;		// go to the level of the face to subdivide its edges
 
-	// compute volume centroid
-	typename PFP::VEC3 volCenter;// = Algo::Geometry::volumeCentroidGen<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, d, position);
 
-
-	std::cout << "vLevel=" << vLevel << std::endl;
+	std::cout << "vLevel to subdivide volume=" << vLevel << std::endl;
 
 	/*
 	 * ou niveau du volume courant i
@@ -162,7 +159,6 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker
-	DartMarkerStore mv(map);		// Lock a vertex marker
 
 	//Store faces that are traversed and start with the face of d
 	std::vector<Dart> visitedFaces;
@@ -173,11 +169,6 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	std::vector<Dart> oldEdges;
 	oldEdges.reserve(20);
 
-	//Store the darts from quadrangulated faces
-	std::vector<Dart> quadfaces;
-	quadfaces.reserve(100);
-
-
 	mf.markOrbit(FACE_ORBIT, old) ;
 	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
@@ -185,11 +176,9 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 
 		do	// add all face neighbours to the table
 		{
-			//if(!mv.isMarked(e))
-			//{
-				oldEdges.push_back(e);
-			//	mv.markOrbit(VERTEX_ORBIT, e);
-			//}
+
+			oldEdges.push_back(e);
+
 			Dart ee = map.phi2(e) ;
 			if(!mf.isMarked(ee)) // not already marked
 			{
@@ -200,12 +189,17 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 		} while(e != *face) ;
 	}
 
+	/*
+	 *
+	 */
+
+	// compute volume centroid
+	typename PFP::VEC3 volCenter = Algo::Geometry::volumeCentroidGen<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, d, position);
 
 
-	DartMarker me(map) ; //mark edge
-
-	unsigned int degree = 0 ;
-	DartMarker mvolcent(map); //mark vertices vol centroid computing
+	//Store the darts from quadrangulated faces
+	std::vector<Dart> quadfaces;
+	quadfaces.reserve(100);
 
 	//First step : subdivide edges and faces
 	//creates a i+1 edge level and i+1 face level
@@ -213,32 +207,68 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	{
 		Dart d = *face;
 
-
-			Dart it = d ;
-			do
-			{
-				if(!mvolcent.isMarked(it))
-				{
-					++degree;
-					volCenter += position[it] ;
-					mvolcent.markOrbit(VERTEX_ORBIT, it);
-				}
-				it = map.phi1(it) ;
-			} while(it != d) ;
-
-
-
 		std::cout << "subdiv de toutes les faces" << std::endl;
 		if(!map.faceIsSubdivided(d))
 		{
 
-			Dart cf = Algo::IHM3::subdivideFace<PFP>(map, *face, position);
-			std::cout << "face faite" << std::endl;
 
+			unsigned int fLevel = map.faceLevel(d) ;
+			Dart old = map.faceOldestDart(d) ;
 
-			unsigned int fLevel = map.getDartLevel(cf) ;
+			unsigned int cur = map.getCurrentLevel() ;
+			map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
-			map.setCurrentLevel(fLevel) ;
+			std::cout << "fLevel=" << fLevel << std::endl;
+
+			unsigned int degree = 0 ;
+			typename PFP::VEC3 p ;
+			Dart it = old ;
+			do
+			{
+				++degree;
+				p += position[it] ;
+				if(!map.edgeIsSubdivided(it))							// first cut the edges (if they are not already)
+					Algo::IHM::subdivideEdge<PFP>(map, it, position) ;	// and compute the degree of the face
+				it = map.phi1(it) ;
+			} while(it != old) ;
+			p /= typename PFP::REAL(degree) ;
+
+			map.setCurrentLevel(fLevel + 1) ;			// go to the next level to perform face subdivision
+
+			Dart dd = map.phi1(old) ;
+			map.splitFace(dd, map.phi1(map.phi1(dd))) ;
+			unsigned int idface = map.getFaceId(d);
+			map.setFaceId(map.phi1(map.phi1(dd)), idface, FACE_ORBIT) ;
+			map.setFaceId(map.phi2(map.phi1(map.phi1(dd))), idface, FACE_ORBIT) ;
+
+			Dart ne = map.phi2(map.phi_1(dd));
+			Dart ne2 = map.phi2(ne);
+
+			map.cutEdge(ne) ;
+			unsigned int id = map.getNewEdgeId() ;
+			map.setEdgeId(ne, id, EDGE_ORBIT) ;
+			id = map.getNewEdgeId() ;
+			map.setEdgeId(ne2, id, EDGE_ORBIT) ;
+
+			Dart res = map.phi2(ne);
+
+			dd = map.phi1(map.phi1(map.phi1(map.phi1(ne)))) ;
+			while(dd != ne)
+			{
+				Dart next = map.phi1(map.phi1(dd)) ;
+				map.splitFace(map.phi1(ne), dd) ;
+				Dart nne = map.phi2(map.phi_1(dd)) ;
+
+				id = map.getNewEdgeId() ;
+				map.setEdgeId(nne, id, EDGE_ORBIT) ;
+
+				map.setFaceId(nne, idface, FACE_ORBIT) ;
+				dd = next ;
+			}
+
+			position[res] = p ;
+
+			Dart cf = res;
 
 			Dart e = cf;
 			do
@@ -247,11 +277,44 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 				quadfaces.push_back(map.phi2(e));
 				e = map.phi2(map.phi_1(e));
 			}while (e != cf);
+
+
+			map.setCurrentLevel(cur) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+			//Dart cf = Algo::IHM::subdivideFace<PFP>(map, *face, position);
+
+			std::cout << "face faite" << std::endl;
+
+
+//			unsigned int fLevel = map.getDartLevel(cf) ;
+//
+//			map.setCurrentLevel(fLevel) ;
+//
+//			Dart e = cf;
+//			do
+//			{
+//				quadfaces.push_back(e);
+//				quadfaces.push_back(map.phi2(e));
+//				e = map.phi2(map.phi_1(e));
+//			}while (e != cf);
 		}
 	}
 
-	volCenter /= typename PFP::REAL(degree) ;
-
+	/*
+	 *
+	 */
 	map.setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
 
 	std::cout << "vLevel+1=" << vLevel + 1 << std::endl;
@@ -261,14 +324,6 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	//Third pass : deconnect the corners
 	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
 	{
-
-//					Dart e = *edge;
-//					do
-//					{
-//						map.unsewFaces(map.phi1(map.phi1(*edge)));
-//						map.unsewFaces(map.phi1(*edge));
-//						e = map.phi2(map.phi_1(e));
-//					}while (e != *edge);
 		map.unsewFaces(map.phi1(*edge));
 		moe.markOrbit(DART_ORBIT,map.phi1(*edge));
 	}
@@ -324,7 +379,6 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	}
 
 	moe.unmarkAll();
-
 
 	for (std::vector<Dart>::iterator nvol = quadfaces.begin(); nvol != quadfaces.end(); nvol = nvol + 2)
 	{

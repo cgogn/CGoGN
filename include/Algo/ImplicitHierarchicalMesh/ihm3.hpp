@@ -28,7 +28,7 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace IHM3
+namespace IHM
 {
 
 /***************************************************
