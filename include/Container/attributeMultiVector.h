@@ -41,19 +41,123 @@ namespace CGoGN
 class AttributeMultiVectorGen
 {
 protected:
-	std::string m_attName;
+	/**
+	 * Name of the attribute
+	 */
+	std::string m_attrName;
 
+	/**
+	 * Name of the type of the attribute
+	 */
 	std::string m_typeName;
 
+	/**
+	 * orbit of the attribute
+	 */
+	unsigned int m_orbit;
+
+	/**
+	 * index of the attribute in its container
+	 */
+	unsigned int m_index;
+
+	/**
+	 * Process or not the attribute in arithmetic operations
+	 */
 	bool m_toProcess;
 
 public:
-
 	AttributeMultiVectorGen(const std::string& strName, const std::string& strType);
 
 	AttributeMultiVectorGen();
 
  	virtual ~AttributeMultiVectorGen();
+
+ 	virtual AttributeMultiVectorGen* new_obj() = 0;
+
+	/**************************************
+	 *             ACCESSORS              *
+	 **************************************/
+
+	/**
+	* get / set orbit of the attribute
+	*/
+ 	unsigned int getOrbit() const ;
+
+ 	void setOrbit(unsigned int id) ;
+
+	/**
+	* get / set index of the attribute
+	*/
+ 	unsigned int getIndex() const ;
+
+ 	void setIndex(unsigned int id) ;
+
+	/**
+	* get / set name of the attribute
+	*/
+	const std::string& getName();
+
+	void setName(const std::string& n);
+
+	/**
+	* get / set name of the type of the attribute
+	*/
+	const std::string& getTypeName();
+
+	void setTypeName(const std::string& n);
+
+	/**
+	 * get block size
+	 */
+ 	unsigned int getBlockSize();
+
+	/**************************************
+	 *       MULTI VECTOR MANAGEMENT      *
+	 **************************************/
+
+	/**
+	* add a block of data in the multi vector
+	*/
+	virtual void addBlock() = 0;
+
+	/**
+	* set the number of blocks
+	*/
+	virtual void setNbBlocks(unsigned int nbb) = 0;
+
+	virtual void addBlocksBefore(unsigned int nbb) = 0;
+
+	virtual bool copy(const AttributeMultiVectorGen* atmvg) = 0;
+
+	virtual bool swap(AttributeMultiVectorGen* atmvg) = 0;
+
+	virtual bool merge(const AttributeMultiVectorGen& att) = 0;
+
+	/**
+	* free the used memory
+	*/
+	virtual void clear() = 0;
+
+	/**************************************
+	 *             DATA ACCESS            *
+	 **************************************/
+
+	virtual unsigned int getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize) = 0;
+
+	/**************************************
+	 *          LINES MANAGEMENT          *
+	 **************************************/
+
+	virtual void initElt(unsigned int id) = 0;
+
+	virtual void copyElt(unsigned int dst, unsigned int src) = 0;
+
+	virtual void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id) = 0;
+
+	/**************************************
+	 *       ARITHMETIC OPERATIONS        *
+	 **************************************/
 
  	void toggleProcess();
 
@@ -61,142 +165,150 @@ public:
 
  	bool toProcess();
 
- 	unsigned int BlockSize();
-
- 	/**
- 	 * construct a new object using this type
- 	 */
- 	virtual AttributeMultiVectorGen* new_obj()=0;
-
-	virtual bool copy(const AttributeMultiVectorGen* atmvg)=0;
-
-	virtual bool swap(AttributeMultiVectorGen* atmvg)=0;
-
-	/**
-	* add a vector in table
-	*/
-	virtual void addBlock()=0;
-
-	/**
-	* set the number of block
-	*/
-	virtual void setNbBlocks(unsigned int nbt)=0;
-
-	/**
-	* swap two element in the attribute container
-	*/
-	virtual void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id)=0;
-
-	/**
-	* Free the used memory
-	*/
-	virtual void free()=0;
-
-	virtual void initElt(unsigned int id)=0;
-
-	virtual void copyElt(unsigned int dst, unsigned int src)=0;
-
-	/**
-	* get name of the type of attribute
-	*/
-	const std::string& getTypeName() { return m_typeName; }
-
-	void setTypeName(const std::string& n) { m_typeName = n ; }
-
-	const std::string& getName() { return m_attName; }
-
-	void setName(const std::string& n) { m_attName = n ; }
-
-	virtual void saveBin(CGoGNostream& fs, unsigned int id)=0;
-
-	static unsigned int loadBinInfos(CGoGNistream& fs, std::string& name, std::string& type);
-
-	virtual bool loadBin(CGoGNistream& fs)=0;
-
-	static bool skipLoadBin(CGoGNistream& fs);
-
-	virtual std::string output(unsigned int i)=0;
-
-	virtual void input(unsigned int i,const std::string& st)=0;
-
-	virtual bool merge(const AttributeMultiVectorGen& att)=0;
-
-	virtual void addBlocksBefore(unsigned int nbb)=0;
-
-	virtual unsigned int getStartAddresses(std::vector<void*>& addr, unsigned int& byteTableSize)=0;
-
 	/**
 	 * copy attribute j on i
 	 */
-	virtual void affect(unsigned int i, unsigned int j)=0;
+	virtual void affect(unsigned int i, unsigned int j) = 0;
 
 	/**
 	 * add attribute j to i
 	 */
-	virtual void add(unsigned int i, unsigned int j)=0;
+	virtual void add(unsigned int i, unsigned int j) = 0;
 
 	/**
 	 * sub attribute j from i
 	 */
-	virtual void sub(unsigned int i, unsigned int j)=0;
+	virtual void sub(unsigned int i, unsigned int j) = 0;
 
 	/**
 	 * multiply attribute i by alpha
 	 */
-	virtual void mult(unsigned int i, double alpha)=0;
+	virtual void mult(unsigned int i, double alpha) = 0;
 
 	/**
 	 * divide attribute i by alpha
 	 */
-	virtual void div(unsigned int i, double alpha)=0;
+	virtual void div(unsigned int i, double alpha) = 0;
 
 	/**
-	 * interpole attribute i and j in res (with alpha coef)
+	 * interpolate attribute i and j in res (with alpha coefficient)
 	 */
-	virtual void lerp(unsigned res, unsigned int i, unsigned int j, double alpha)=0;
+	virtual void lerp(unsigned res, unsigned int i, unsigned int j, double alpha) = 0;
 
-	/**
-	 * load info of binary stream
-	 * @param fs filestream
-	 * @param name [out] name of attribute
-	 * @param type [out] type of attribute
-	 */
+	/**************************************
+	 *            SAVE & LOAD             *
+	 **************************************/
+
+	virtual std::string output(unsigned int i) = 0;
+
+	virtual void input(unsigned int i,const std::string& st) = 0;
+
+	virtual void saveBin(CGoGNostream& fs, unsigned int id) = 0;
+
+	static unsigned int loadBinInfos(CGoGNistream& fs, std::string& name, std::string& type);
+
+	virtual bool loadBin(CGoGNistream& fs) = 0;
+
+	static bool skipLoadBin(CGoGNistream& fs);
 };
 
+
+/***************************************************************************************************/
+/***************************************************************************************************/
+
+
 template <typename T>
-class AttributeMultiVector: public AttributeMultiVectorGen
+class AttributeMultiVector : public AttributeMultiVectorGen
 {
 	/**
-	* table of blocks of data ptr: vectors!
+	* table of blocks of data pointers: vectors!
 	*/
 	std::vector<T*> m_tableData;
 
 public:
-
 	AttributeMultiVector(const std::string& strName, const std::string& strType);
 
 	AttributeMultiVector();
 
 	~AttributeMultiVector();
 
+	AttributeMultiVectorGen* new_obj();
+
+	/**************************************
+	 *       MULTI VECTOR MANAGEMENT      *
+	 **************************************/
+
+	void addBlock();
+
+	void setNbBlocks(unsigned int nbb);
+
+	void addBlocksBefore(unsigned int nbb);
+
 	bool copy(const AttributeMultiVectorGen* atmvg);
 
 	bool swap(AttributeMultiVectorGen* atmvg);
 
-	AttributeMultiVectorGen* new_obj();
-
 	bool merge(const AttributeMultiVectorGen& att);
 
+	void clear();
+
+	/**************************************
+	 *             DATA ACCESS            *
+	 **************************************/
+
 	/**
-	* get a reference on a elt
-	* @param i index of element
-	*/
+	 * get a reference on a elt
+	 * @param i index of element
+	 */
 	T& operator[](unsigned int i);
+
 	/**
-	* get a const reference on a elt
-	* @param i index of element
+	 * get a const reference on a elt
+	 * @param i index of element
+	 */
+	const T& operator[](unsigned int i) const;
+
+	/**
+	 * Get the addresses of each block of data
+	 */
+	unsigned int getBlocksPointers(std::vector<void*>& addr, unsigned int& byteBlockSize);
+
+	/**************************************
+	 *          LINES MANAGEMENT          *
+	 **************************************/
+
+	void initElt(unsigned int id);
+
+	void copyElt(unsigned int dst, unsigned int src);
+
+	/**
+	* swap two elements in container (useful for compact function)
+	* @param src_b  block index of source element
+	* @param src_id index in block of source element
+	* @param dst_b  block index of destination element
+	* @param dst_id index in block of destination element
 	*/
-	const T& operator[](unsigned int i) const ;
+	void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id);
+
+	/**************************************
+	 *       ARITHMETIC OPERATIONS        *
+	 **************************************/
+
+	void affect(unsigned int i, unsigned int j);
+
+	void add(unsigned int i, unsigned int j);
+
+	void sub(unsigned int i, unsigned int j);
+
+	void mult(unsigned int i, double alpha);
+
+	void div(unsigned int i, double alpha);
+
+	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
+
+	/**************************************
+	 *            SAVE & LOAD             *
+	 **************************************/
 
 	/**
 	 *  export en string d'un element
@@ -212,43 +324,6 @@ public:
 	void input(unsigned int i,const std::string& st);
 
 	/**
-	* add a block of data in the attribute container
-	*/
-	void addBlock();
-
-	void initElt(unsigned int id);
-
-	void copyElt(unsigned int dst, unsigned int src);
-
-	/**
-	* set the number of block of the container
-	* Usefull when we add a new attribute in not empty container
-	* @param nbb the number of block to set
-	*/
-	void setNbBlocks(unsigned int nbb);
-
-	void addBlocksBefore(unsigned int nbb);
-
-	/**
-	* swap to elements in container (usefull for compact function)
-	* @param src_b  block index of source element
-	* @param src_id index in block of source element
-	* @param dst_b  block index of destination element
-	* @param dst_id index in block of destination element
-	*/
-	void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id);
-
-	/**
-	* Free the used memory
-	*/
-	void free();
-
-	/**
-	 * Get the addresses of each block of data
-	 */
-	unsigned int getStartAddresses(std::vector<void*>& addr, unsigned int& byteTableSize);
-
-	/**
 	 * Sauvegarde binaire
 	 * @param fs filestream
 	 * @param id id of mv
@@ -260,20 +335,6 @@ public:
 	 * @param fs filestream
 	 */
 	bool loadBin(CGoGNistream& fs);
-
-	// Processing attributes
-
-	void affect(unsigned int i, unsigned int j);
-
-	void add(unsigned int i, unsigned int j);
-
-	void sub(unsigned int i, unsigned int j);
-
-	void mult(unsigned int i, double alpha);
-
-	void div(unsigned int i, double alpha);
-
-	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
 };
 
 } // namespace CGoGN

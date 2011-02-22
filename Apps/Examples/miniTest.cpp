@@ -536,43 +536,26 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 'd':
 		{
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-
 			myMap.removeAttribute<PFP::VEC3>(normal) ;
 			myMap.removeAttribute<PFP::VEC3>(laplacian) ;
 
 			AttributeHandler<PFP::VEC3> newPosition = myMap.addAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
 			Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, newPosition) ;
 
-			std::vector<std::string> attrNames ;
-			for(unsigned int i = 0; i < NB_ORBITS; ++i)
-			{
-				AttributeContainer& cont = myMap.getAttributeContainer(i) ;
-				std::cout << "container " << i << " (" << cont.getNbAttributes() << ") :" << std::endl ;
-				cont.getAttributesNames(attrNames) ;
-				for(unsigned int j = 0; j < attrNames.size(); ++j)
-					std::cout << "  -> " << attrNames[j] << std::endl ;
-			}
-			std::cout << std::endl ;
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 
 			Algo::Modelisation::computeDual<PFP>(myMap) ;
-
-			for(unsigned int i = 0; i < NB_ORBITS; ++i)
-			{
-				AttributeContainer& cont = myMap.getAttributeContainer(i) ;
-				std::cout << "container " << i << " (" << cont.getNbAttributes() << ") :" << std::endl ;
-				cont.getAttributesNames(attrNames) ;
-				for(unsigned int j = 0; j < attrNames.size(); ++j)
-					std::cout << "  -> " << attrNames[j] << std::endl ;
-			}
-
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-			normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-			laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "dual computation: "<< seconds << "sec" << std::endl;
+
+			newPosition = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+			myMap.removeAttribute<PFP::VEC3>(newPosition) ;
+
+			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
+			normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME);
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
@@ -743,6 +726,7 @@ int main(int argc, char** argv)
 			std::cerr << "could not import " << filename << std::endl ;
 			return 1 ;
 		}
+
 		mgw->position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 		GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 		GLfloat seconds = (t2 - t1) / 1000.0f ;

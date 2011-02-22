@@ -36,8 +36,6 @@ namespace Render
 namespace VBO
 {
 
-
-
 template <typename ATTR_HANDLER>
 void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
@@ -64,8 +62,6 @@ void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAt
 		fillBufferDirect(indexVBO, attrib) ;
 }
 
-
-
 template <typename ATTR_HANDLER>
 void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
 {
@@ -73,7 +69,7 @@ void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& 
 
 	std::vector<void*> addr;
 	unsigned int byteTableSize;
-	unsigned int nbb = mv->getStartAddresses(addr, byteTableSize);
+	unsigned int nbb = mv->getBlocksPointers(addr, byteTableSize);
 
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[indexVBO]);
 	glBufferDataARB(GL_ARRAY_BUFFER, nbb * byteTableSize, 0, GL_STREAM_DRAW);
@@ -88,7 +84,6 @@ void MapRender_VBO::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& 
 	}
 }
 
-
 template <typename ATTR_HANDLER>
 void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
@@ -96,10 +91,10 @@ void MapRender_VBO::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER&
 
 	std::vector<void*> addr;
 	unsigned int byteTableSize;
-	unsigned int nbb = mv->getStartAddresses(addr, byteTableSize);
+	unsigned int nbb = mv->getBlocksPointers(addr, byteTableSize);
 
 	// alloue la memoire pour le buffer et initialise le conv
-	conv->reserve(mv->BlockSize());
+	conv->reserve(mv->getBlockSize());
 
 	// bind buffer to update
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[indexVBO]);
@@ -338,9 +333,6 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
-
-
-
 template<typename PFP>
 void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good)
 {
@@ -393,12 +385,7 @@ void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelec
 	//creating VBO for flat
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[FLAT_BUFFER]);
 	glBufferDataARB(GL_ARRAY_BUFFER, tableFlat.size() * sizeof(Geom::Vec3f), (char*)(&(tableFlat[0])), GL_STREAM_DRAW);
-
 }
-
-
-
-
 
 } // namespace VBO
 

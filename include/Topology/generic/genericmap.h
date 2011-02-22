@@ -232,17 +232,19 @@ public:
 
 	/**
 	 * get a multi vector of attribute (direct access with [i])
-	 * @param idAttr code (orbit+attribute)
+	 * @param orbit orbit of attribute
+	 * @param index index of attribute
 	 */
 	template <typename T>
-	AttributeMultiVector<T>& getAttributeVector(unsigned int idAttr);
+	AttributeMultiVector<T>& getAttributeVector(unsigned int orbit, unsigned int index);
 
 	/**
 	 * get a virtual multi vector of attribute
-	 * No access to data, usefull for access to address (VBO)
-	 * @param idAttr code (orbit+attribute)
+	 * No access to data, useful for access to address (VBO)
+	 * @param orbit orbit of attribute
+	 * @param index index of attribute
 	 */
-	AttributeMultiVectorGen& getAttributeVectorGen(unsigned int idAttr);
+	AttributeMultiVectorGen& getAttributeVectorGen(unsigned int orbit, unsigned int index);
 
 	/**
 	 * get a multi vector of marker attribute (direct access with [i])
@@ -257,7 +259,7 @@ public:
 	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit);
 
 	/**
-	 *
+	 * swap two attribute containers
 	 */
 	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2);
 

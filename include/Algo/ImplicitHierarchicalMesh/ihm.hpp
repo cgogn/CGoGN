@@ -54,14 +54,14 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap::addAttribute(unsigned int orbit
 			amv[i] = EMBNULL ;
 	}
 
-	return AttributeHandler_IHM<T>(this, h.id()) ;
+	return AttributeHandler_IHM<T>(this, h.getOrbit(), h.getIndex()) ;
 }
 
 template <typename T>
 AttributeHandler_IHM<T> ImplicitHierarchicalMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
 {
 	AttributeHandler<T> h = Map2::getAttribute<T>(orbit, nameAttr) ;
-	return AttributeHandler_IHM<T>(this, h.id()) ;
+	return AttributeHandler_IHM<T>(this, h.getOrbit(), h.getIndex()) ;
 }
 
 /***************************************************
@@ -344,7 +344,7 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = AttributeContainer::orbitAttr(this->m_id) ;
+	unsigned int orbit = this->m_orbit ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 
@@ -381,7 +381,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = AttributeContainer::orbitAttr(this->m_id) ;
+	unsigned int orbit = this->m_orbit ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 

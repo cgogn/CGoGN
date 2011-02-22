@@ -211,7 +211,7 @@ public:
 	AttributeHandler_IHM() : AttributeHandler<T>()
 	{}
 
-	AttributeHandler_IHM(GenericMap* m, unsigned int idAttr) : AttributeHandler<T>(m, idAttr)
+	AttributeHandler_IHM(GenericMap* m, unsigned int orbit, unsigned int index) : AttributeHandler<T>(m, orbit, index)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const

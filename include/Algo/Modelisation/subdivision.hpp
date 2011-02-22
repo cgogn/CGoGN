@@ -444,7 +444,7 @@ void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		Dart dd = map.alpha1(d) ;
+		Dart dd = map.alpha_1(d) ;
 		new_phi1[d] = dd ;
 		new_phi_1[dd] = d ;
 	}
@@ -468,7 +468,6 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFacesVolume(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-
 
 }
 

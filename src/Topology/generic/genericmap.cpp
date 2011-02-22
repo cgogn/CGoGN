@@ -68,6 +68,7 @@ GenericMap::GenericMap()
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
+		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
 		m_markerTables[i] = NULL ;
@@ -79,9 +80,7 @@ GenericMap::~GenericMap()
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if(isOrbitEmbedded(i))
-		{
 			m_attribs[i].clear(true) ;
-		}
 	}
 	if(m_attributes_registry_map)
 		delete m_attributes_registry_map;

@@ -30,213 +30,222 @@
 namespace CGoGN
 {
 
-///////////////////////////
-// GESTION DES ATTRIBUTS
-///////////////////////////
-
-template <typename T>
-unsigned int AttributeContainer::addAttribute(const std::string& attribName)
+inline unsigned int AttributeContainer::getOrbit()
 {
-	std::string nametype = nameOfType(T());
+	return m_orbit ;
+}
 
-	// first check if attribute already exist
-	if (attribName != "")
+inline void AttributeContainer::setOrbit(unsigned int orbit)
+{
+	m_orbit = orbit ;
+	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
 	{
-		MapNameId::iterator it = m_attribNameMap.find(attribName);
-		if (it != m_attribNameMap.end())
-			return UNKNOWN;
+		if (m_tableAttribs[i] != NULL)
+			m_tableAttribs[i]->setOrbit(orbit);
 	}
-
-	// new attribut
-	AttributeMultiVector<T>* amv = new AttributeMultiVector<T>(attribName, nametype);
-
-	unsigned int idxAttrib ;
-	if(!m_freeIndices.empty())
-	{
-		idxAttrib = m_freeIndices.back() ;
-		m_freeIndices.pop_back() ;
-		m_tableAttribs[idxAttrib] = amv ;
-	}
-	else
-	{
-		idxAttrib = m_tableAttribs.size();
-		m_tableAttribs.push_back(amv);
-	}
-
-	// add it in the map 
-	if (attribName == "") // if no name, generate a fake name
-	{
-		std::stringstream ss;
-		ss << "unknown" << m_nbUnknown++;
-		m_attribNameMap.insert(std::pair<std::string, unsigned int>(ss.str(), idxAttrib));
-		amv->setName(ss.str());
-	}
-	else
-		m_attribNameMap.insert(std::pair<std::string, unsigned int>(attribName, idxAttrib));
-
-	// maj taille d'une ligne
-	m_lineCost += sizeof(T);
-	
-	// resize the new attribute container to have same size than others
-	int nbb = m_holesBlocks.size();
-	amv->setNbBlocks(nbb);
-
-	m_nbAttributes++;
-
-	return idxAttrib;
-}
-
-template <typename T>
-unsigned int AttributeContainer::addAttribute(const std::string& attribName, const std::string& nametype, unsigned int idxAttrib)
-{
-	// first check if attribute already exist
-	if (attribName != "")
-	{
-		MapNameId::iterator it = m_attribNameMap.find(attribName);
-		if (it != m_attribNameMap.end())
-			return UNKNOWN;
-	}
-
-	// new attribut
-	AttributeMultiVector<T>* amv = new AttributeMultiVector<T>(attribName, nametype);
-	// add it to table of attribut_manager
-	m_tableAttribs[idxAttrib] = amv;
-	// add it in the map
-	if (attribName == "") // if no name, generate a fake name
-	{
-		std::stringstream ss;
-		ss << "unknown" << m_nbUnknown++;
-		m_attribNameMap.insert(std::pair<std::string, unsigned int>(ss.str(), idxAttrib));
-		amv->setName(ss.str());
-	}
-	else
-		m_attribNameMap.insert(std::pair<std::string, unsigned int>(attribName, idxAttrib));
-
-	// maj taille d'une ligne
-	m_lineCost += sizeof(T);
-
-	// resize the new attribute container to have same size than others
-	int nbb = m_holesBlocks.size();
-	amv->setNbBlocks(nbb);
-
-	m_nbAttributes++;
-
-	return idxAttrib;
-}
-
-inline unsigned int AttributeContainer::getNbAttributes()
-{
-	return m_nbAttributes;
-}
-
-///////////////////////////
-// ACCES AUX DONNEES
-///////////////////////////
-
-template <typename T>
-T& AttributeContainer::getData(unsigned int codeAttrib, unsigned int eltIdx)
-{
-	assert(eltIdx < m_maxSize || !"Attribut non existant (indice trop grand)");
-	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_) || !"Attribut non existant");
-	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
-
-	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm != NULL) || !"type attribut non concordant");
-
-	return atm->operator[](eltIdx);
-}
-
-template <typename T>
-const T& AttributeContainer::getData(unsigned int codeAttrib, unsigned int eltIdx) const
-{
-	assert(eltIdx < m_maxSize || !"Attribut non existant (indice trop grand)");
-	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_) || !"Attribut non existant");
-	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
-
-	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm != NULL) || !"type attribut non concordant");
-
-	return atm->operator[](eltIdx);
-}
-
-template <typename T>
-void AttributeContainer::setData(unsigned int codeAttrib, unsigned int eltIdx,  const T& data)
-{
-	assert(eltIdx < m_maxSize || !"Attribut non existant (indice trop grand)");
-	assert(m_holesBlocks[eltIdx/_BLOCKSIZE_]->used(eltIdx%_BLOCKSIZE_) || !"Attribut non existant");
-	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
-
-	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm != NULL) || !"type attribut non concordant");
-
-	atm->operator[](eltIdx) = data;
-}
-
-//template <typename T>
-//unsigned int AttributeContainer::insertLineWidthData(unsigned int codeAttrib,const T& data)
-//{
-//	unsigned int it =  insertLine();
-//	setData<T>(codeAttrib, it, data);
-//	return it;
-//}
-
-template<typename T>
-AttributeMultiVector<T>& AttributeContainer::getDataVector(unsigned int codeAttrib)
-{
-	assert((codeAttrib < m_tableAttribs.size()) || !"Attribut inexistant");
-	assert((m_tableAttribs[codeAttrib] != NULL) || !"Attribut detruit");
-
-	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	assert((atm != NULL) || !"type attribut non concordant");
-	return *atm;
-}
-
-template<typename T>
-bool AttributeContainer::getAttributesVector(const std::string& attribName, AttributeMultiVector<T>** ptr)
-{
-	MapNameId::iterator it = m_attribNameMap.find(attribName);
-	if (it == m_attribNameMap.end())
-		return false;
-	
-	int codeAttrib = it->second;
-
-	if (m_tableAttribs[codeAttrib] == NULL)
-		return false;
-
-	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[codeAttrib]);
-	if (atm == NULL)
-		return false;
-
-	*ptr = atm;
-	return true;
-}
-
-///////////////////////////
-//  ADRESSES MEMOIRES
-///////////////////////////
-
-template <typename T>
-unsigned int AttributeContainer::getAddresses(unsigned int attr, std::vector<T*>& vect_adr)
-{
-	AttributeMultiVector<T>* atm = dynamic_cast< AttributeMultiVector<T>* >(m_tableAttribs[attr]);
-	assert((atm != NULL) || !"type attribut non concordant");
-	return atm->getStartAddresses(vect_adr);
-}
-
-//////////////////////////////
-//  Enregistrement attributs
-//////////////////////////////
-
-//// INLINED FUNCTIONS
-inline bool AttributeContainer::used(unsigned int eltIdx) const
-{
-	return m_holesBlocks[ eltIdx / _BLOCKSIZE_ ]->used( eltIdx % _BLOCKSIZE_ );
 }
 
 inline void AttributeContainer::setRegistry(std::map< std::string, RegisteredBaseAttribute* >* re)
 {
 	m_attributes_registry_map = re;
 }
+
+/**************************************
+ *          BASIC FEATURES            *
+ **************************************/
+
+template <typename T>
+AttributeMultiVector<T>* AttributeContainer::addAttribute(const std::string& attribName)
+{
+	// first check if attribute already exist
+	unsigned int index ;
+	if (attribName != "")
+	{
+		index = getAttributeIndex(attribName) ;
+		if (index != UNKNOWN)
+			return NULL ;
+	}
+
+	// create the new attribute
+	std::string typeName = nameOfType(T()) ;
+	AttributeMultiVector<T>* amv = new AttributeMultiVector<T>(attribName, typeName) ;
+
+	if(!m_freeIndices.empty())
+	{
+		index = m_freeIndices.back() ;
+		m_freeIndices.pop_back() ;
+		m_tableAttribs[index] = amv ;
+	}
+	else
+	{
+		index = m_tableAttribs.size() ;
+		m_tableAttribs.push_back(amv) ;
+	}
+
+	amv->setOrbit(m_orbit) ;
+	amv->setIndex(index) ;
+
+	// generate a name for the attribute if no one was given
+	if (attribName == "")
+	{
+		std::stringstream ss ;
+		ss << "unknown" << m_nbUnknown++ ;
+		amv->setName(ss.str()) ;
+	}
+
+	// update the memory cost of a line
+	m_lineCost += sizeof(T) ;
+
+	// resize the new attribute so that it has the same size than others
+	amv->setNbBlocks(m_holesBlocks.size()) ;
+
+	m_nbAttributes++ ;
+
+	return amv ;
+}
+
+template <typename T>
+void AttributeContainer::addAttribute(const std::string& attribName, const std::string& nametype, unsigned int index)
+{
+	// first check if attribute already exist
+	if (attribName != "")
+	{
+		unsigned int i = getAttributeIndex(attribName) ;
+		if (i != UNKNOWN)
+			return ;
+	}
+
+	// create the new attribute
+	AttributeMultiVector<T>* amv = new AttributeMultiVector<T>(attribName, nametype);
+
+	m_tableAttribs[index] = amv;
+	amv->setOrbit(m_orbit) ;
+	amv->setIndex(index) ;
+
+	// generate a name for the attribute if no one was given
+	if (attribName == "")
+	{
+		std::stringstream ss;
+		ss << "unknown" << m_nbUnknown++;
+		amv->setName(ss.str());
+	}
+
+	// update the memory cost of a line
+	m_lineCost += sizeof(T) ;
+
+	// resize the new attribute so that it has the same size than others
+	amv->setNbBlocks(m_holesBlocks.size()) ;
+
+	m_nbAttributes++;
+}
+
+/**************************************
+ *      INFO ABOUT THE CONTAINER      *
+ **************************************/
+
+inline unsigned int AttributeContainer::getNbAttributes() const
+{
+	return m_nbAttributes;
+}
+
+inline unsigned int AttributeContainer::size() const
+{
+	return m_size;
+}
+
+inline unsigned int AttributeContainer::capacity() const
+{
+	return m_holesBlocks.size() * _BLOCKSIZE_;
+}
+
+inline unsigned int AttributeContainer::memoryTotalSize() const
+{
+	return _BLOCKSIZE_ * (m_holesBlocks.size() * m_lineCost + 8);
+}
+
+inline bool AttributeContainer::used(unsigned int index) const
+{
+	return m_holesBlocks[index / _BLOCKSIZE_]->used(index % _BLOCKSIZE_);
+}
+
+/**************************************
+ *         CONTAINER TRAVERSAL        *
+ **************************************/
+
+inline unsigned int AttributeContainer::begin() const
+{
+	unsigned int it = 0;
+	while ((it < m_maxSize) && (!used(it)))
+		++it;
+	return it;
+}
+
+inline unsigned int AttributeContainer::end() const
+{
+	return m_maxSize;
+}
+
+inline void AttributeContainer::next(unsigned int &it) const
+{
+	do
+	{
+		++it;
+	} while ((it < m_maxSize) && (!used(it)));
+}
+
+/**************************************
+ *          LINES MANAGEMENT          *
+ **************************************/
+
+inline void AttributeContainer::initLine(unsigned int index)
+{
+	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+			m_tableAttribs[i]->initElt(index);
+	}
+}
+
+inline void AttributeContainer::copyLine(unsigned int dstIndex, unsigned int srcIndex)
+{
+	for(unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if (m_tableAttribs[i] != NULL)
+			m_tableAttribs[i]->copyElt(dstIndex, srcIndex);
+	}
+}
+
+inline void AttributeContainer::refLine(unsigned int index)
+{
+	m_holesBlocks[index / _BLOCKSIZE_]->ref(index % _BLOCKSIZE_);
+}
+
+inline bool AttributeContainer::unrefLine(unsigned int index)
+{
+	if (m_holesBlocks[index / _BLOCKSIZE_]->unref(index % _BLOCKSIZE_))
+	{
+		--m_size;
+		return true;
+	}
+	return false;
+}
+
+inline unsigned int AttributeContainer::getNbRefs(unsigned int index)
+{
+	unsigned int bi = index / _BLOCKSIZE_;
+	unsigned int j = index % _BLOCKSIZE_;
+
+	return m_holesBlocks[bi]->nbRefs(j);
+}
+
+inline void AttributeContainer::setNbRefs(unsigned int index, unsigned int nb)
+{
+	m_holesBlocks[index / _BLOCKSIZE_]->setNbRefs(index % _BLOCKSIZE_, nb);
+}
+
+/**************************************
+ *       ATTRIBUTES MANAGEMENT        *
+ **************************************/
 
 inline bool AttributeContainer::copyAttribute(unsigned int index_dst, unsigned int index_src)
 {
@@ -248,60 +257,154 @@ inline bool AttributeContainer::swapAttributes(unsigned int index1, unsigned int
 	return m_tableAttribs[index1]->swap(m_tableAttribs[index2]);
 }
 
-inline void AttributeContainer::refLine(unsigned int eltIdx)
+/**************************************
+ *       ATTRIBUTES DATA ACCESS       *
+ **************************************/
+
+template <typename T>
+AttributeMultiVector<T>& AttributeContainer::getDataVector(unsigned int attrIndex)
 {
-	m_holesBlocks[eltIdx / _BLOCKSIZE_]->ref(eltIdx % _BLOCKSIZE_);
+	assert(attrIndex < m_tableAttribs.size() || !"getDataVector: attribute index out of bounds");
+	assert(m_tableAttribs[attrIndex] != NULL || !"getDataVector: attribute does not exist");
+
+	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
+	assert((atm != NULL) || !"getDataVector: wrong type");
+	return *atm;
 }
 
-inline bool AttributeContainer::unrefLine(unsigned int eltIdx)
+inline AttributeMultiVectorGen& AttributeContainer::getVirtualDataVector(unsigned int attrIndex)
 {
-	if (m_holesBlocks[eltIdx / _BLOCKSIZE_]->unref(eltIdx % _BLOCKSIZE_))
+	return *(m_tableAttribs[attrIndex]);
+}
+
+template <typename T>
+AttributeMultiVector<T>& AttributeContainer::getDataVector(const std::string& attribName)
+{
+	unsigned int index = getAttributeIndex(attribName) ;
+
+	assert(index != UNKNOWN) ;
+
+	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[index]);
+	assert((atm != NULL) || !"getDataVector: wrong type");
+	return *atm;
+}
+
+inline AttributeMultiVectorGen& AttributeContainer::getVirtualDataVector(const std::string& attribName)
+{
+	unsigned int index = getAttributeIndex(attribName) ;
+	assert(index != UNKNOWN) ;
+	return *(m_tableAttribs[index]);
+}
+
+template <typename T>
+inline T& AttributeContainer::getData(unsigned int attrIndex, unsigned int eltIndex)
+{
+	assert(eltIndex < m_maxSize || !"getData: element index out of bounds");
+	assert(m_holesBlocks[eltIndex / _BLOCKSIZE_]->used(eltIndex % _BLOCKSIZE_) || !"getData: element does not exist");
+	assert((m_tableAttribs[attrIndex] != NULL) || !"getData: attribute does not exist");
+
+	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
+	assert((atm != NULL) || !"getData: wrong type");
+
+	return atm->operator[](eltIndex);
+}
+
+template <typename T>
+inline const T& AttributeContainer::getData(unsigned int attrIndex, unsigned int eltIndex) const
+{
+	assert(eltIndex < m_maxSize || !"getData: element index out of bounds");
+	assert(m_holesBlocks[eltIndex / _BLOCKSIZE_]->used(eltIndex % _BLOCKSIZE_) || !"getData: element does not exist");
+	assert((m_tableAttribs[attrIndex] != NULL) || !"getData: attribute does not exist");
+
+	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
+	assert((atm != NULL) || !"getData: wrong type");
+
+	return atm->operator[](eltIndex);
+}
+
+template <typename T>
+inline void AttributeContainer::setData(unsigned int attrIndex, unsigned int eltIndex, const T& data)
+{
+	assert(eltIndex < m_maxSize || !"getData: element index out of bounds");
+	assert(m_holesBlocks[eltIndex / _BLOCKSIZE_]->used(eltIndex % _BLOCKSIZE_) || !"getData: element does not exist");
+	assert((m_tableAttribs[attrIndex] != NULL) || !"getData: attribute does not exist");
+
+	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
+	assert((atm != NULL) || !"getData: wrong type");
+
+	atm->operator[](eltIndex) = data;
+}
+
+/**************************************
+ *       ARITHMETIC OPERATIONS        *
+ **************************************/
+
+inline void AttributeContainer::toggleProcess(unsigned int index)
+{
+	assert(index < m_tableAttribs.size() || !"toggleProcess: attribute index out of bounds");
+	assert(m_tableAttribs[index] != NULL || !"toggleProcess: attribute does not exist");
+	m_tableAttribs[index]->toggleProcess();
+}
+
+inline void AttributeContainer::toggleNoProcess(unsigned int index)
+{
+	assert(index < m_tableAttribs.size() || !"toggleNoProcess: attribute index out of bounds");
+	assert(m_tableAttribs[index] != NULL || !"toggleNoProcess: attribute does not exist");
+	m_tableAttribs[index]->toggleNoProcess();
+}
+
+inline void AttributeContainer::affect(unsigned int i, unsigned int j)
+{
+	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
-		m_size--;
-		return true;
+		if (*it != NULL)
+			(*it)->affect(i, j);
 	}
-	return false;
 }
 
-inline void AttributeContainer::setRefLine(unsigned int eltIdx, unsigned int nb)
+inline void AttributeContainer::add(unsigned int i, unsigned int j)
 {
-	m_holesBlocks[ eltIdx / _BLOCKSIZE_]->setNbRefs(eltIdx % _BLOCKSIZE_,nb);
-}
-
-inline AttributeMultiVectorGen& AttributeContainer::getVirtualDataVector(unsigned int codeAttrib)
-{
-	return *(m_tableAttribs[indexAttr(codeAttrib)]);
-}
-
-inline unsigned int AttributeContainer::end() const
-{
-	return m_maxSize;
-}
-
-inline unsigned int AttributeContainer::begin() const
-{
-	unsigned int it = 0;
-	while ((it < m_maxSize) && (!used(it)))
-		++it;
-	return it;
-}
-
-inline void AttributeContainer::next(unsigned int &it) const
-{
-	do
+	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
 	{
-		++it;
-	} while ((it < m_maxSize) && (!used(it)));
+		if ((*it) != NULL)
+			(*it)->add(i, j);
+	}
 }
 
-inline void AttributeContainer::toggleProcess(unsigned int id)
+inline void AttributeContainer::sub(unsigned int i, unsigned int j)
 {
-	m_tableAttribs[indexAttr(id)]->toggleProcess();
+	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	{
+		if ((*it) != NULL)
+			(*it)->sub(i, j);
+	}
 }
 
-inline void AttributeContainer::toggleNoProcess(unsigned int id)
+inline void AttributeContainer::mult(unsigned int i, double alpha)
 {
-	m_tableAttribs[indexAttr(id)]->toggleNoProcess();
+	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	{
+		if ((*it) != NULL)
+			(*it)->mult(i, alpha);
+	}
+}
+
+inline void AttributeContainer::div(unsigned int i, double alpha)
+{
+	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	{
+		if ((*it) != NULL)
+			(*it)->div(i, alpha);
+	}
+}
+
+inline void AttributeContainer::lerp(unsigned res, unsigned int i, unsigned int j, double alpha)
+{
+	for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it!=  m_tableAttribs.end(); ++it)
+	{
+		if ((*it) != NULL)
+			(*it)->lerp(res, i, j, alpha);
+	}
 }
 
 } // namespace CGoGN

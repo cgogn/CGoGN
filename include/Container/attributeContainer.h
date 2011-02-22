@@ -41,47 +41,56 @@ namespace CGoGN
 class RegisteredBaseAttribute;
 
 /**
-* Container de stockage d'attributs par block de vecteur
-* Les trous sont gérés automatiquement par ligne
-* ie: on a tableau (multi-blocs) pour chaque attributs, mais
-* Tous les tableaux ont le même nombre d'attributs et les 
-* trous (et les indices) sont les mêmes pour tous les attributs
-* On peut ajouter et enlever des attributs a la volée
-*/
+ * Container for AttributeMultiVectors
+ * All the attributes always have the same size and
+ * the management of holes is shared by all attributes
+ */
 class AttributeContainer
 {
-protected:
-
-	typedef std::map<std::string, unsigned int> MapNameId;
+public:
+	/**
+	* constante d'attribut inconnu
+	*/
+	static const unsigned int UNKNOWN = 0xffffffff;
 
 	/**
-	* vecteur des blocs qui gerent les cases libres
+	* Taille du bloc
+	*/
+	static const unsigned int BlockSize = _BLOCKSIZE_;
+
+protected:
+	/**
+	* vector of pointers to AttributeMultiVectors
+	*/
+	std::vector<AttributeMultiVectorGen*> m_tableAttribs;
+
+	/**
+	 * vector of free indices in the vector of AttributeMultiVectors
+	 */
+	std::vector<unsigned int> m_freeIndices;
+
+	/**
+	* vector of pointers to HoleBlockRef -> structure that manages holes and refs
 	*/
 	std::vector<HoleBlockRef*> m_holesBlocks;
 
 	/**
-	* tables of indices of block with free elts
+	* vector of indices of blocks that have free space
 	*/
 	std::vector<unsigned int> m_tableBlocksWithFree;
 
+	/**
+	* vector of indices of blocks that are empty
+	*/
 	std::vector<unsigned int> m_tableBlocksEmpty;
 
 	/**
-	* vecteur de pointeur sur les gestionnaires d'attributs
-	*/
-	std::vector<AttributeMultiVectorGen*> m_tableAttribs;
-
-	std::vector<unsigned int> m_freeIndices;
+	 * orbit of the container
+	 */
+	unsigned int m_orbit;
 
 	/**
-	* map de correspondance string / indice pour les attributs
-	*/
-	MapNameId m_attribNameMap;
-
-//	std::vector<unsigned int> m_processAttribs;
-
-	/**
-	* nombre d'attributs
+	* number of attributes
 	*/ 
 	unsigned int m_nbAttributes;
 
@@ -101,132 +110,55 @@ protected:
 	unsigned int m_maxSize;
 
 	/**
-	* Cout memoire d'une ligne
+	* memory cost of each line
 	*/
 	unsigned int m_lineCost;
 
 	/**
-	 * load xmlpart of container
+	 * map pointer (shared for all container of the same map) for attribute registration
 	 */
-	bool loadXmlHB(xmlNodePtr node);
+	std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map;
+
+public:
+	AttributeContainer();
+
+	~AttributeContainer();
+
+	unsigned int getOrbit();
+	void setOrbit(unsigned int orbit);
+
+	void setRegistry(std::map<std::string, RegisteredBaseAttribute*>* re);
+
+	/**************************************
+	 *          BASIC FEATURES            *
+	 **************************************/
 
 	/**
-	 * load xmlpart of container
+	 * add a new attribute to the container
+	 * @param T (template) type of the new attribute
+	 * @param attribName name of the new attribute
+	 * @return pointer to the new AttributeMultiVector
 	 */
-	bool loadXmlBWF(xmlNodePtr node);
+	template <typename T>
+	AttributeMultiVector<T>* addAttribute(const std::string& attribName);
 
+protected:
 	/**
-	 * load xmlpart of container
+	 * add a new attribute with a given index (for load only)
+	 * @param T (template) type of the new attribute
+	 * @param attribName name of the new attribute
+	 * @param typeName name of the new attribute's type
+	 * @param index index of the new attribute
 	 */
-	bool loadXmlAN(xmlNodePtr node, unsigned int nbb);
-
-	/**
-	 * load xmlpart of container
-	 */
-	bool loadXmlDL(xmlNodePtr node);
-
-	/**
-	 * map ptr (shared for all container of the same map) for attribute registry
-	 */
-	std::map< std::string, RegisteredBaseAttribute* >* m_attributes_registry_map;
+	template <typename T>
+	void addAttribute(const std::string& attribName, const std::string& typeName, unsigned int index);
 
 public:
 	/**
-	* constante d'attribut inconnu
-	*/
-	static const unsigned int UNKNOWN = 0xffffffff;
-
-	/**
-	* Taille du bloc
-	*/
-	static const unsigned int BlockSize = _BLOCKSIZE_;
-
-	/**
-	* constructor
-	*/
-	AttributeContainer();
-
-	/**
-	* destructor
-	*/
-	~AttributeContainer();
-
-	/**
-	* is the line used in the container
-	*/
-	inline bool used(unsigned int eltIdx) const;
-
-	/**
-	 * set the registry map
-	 */
-	inline void setRegistry(std::map< std::string, RegisteredBaseAttribute* >* re);
-
-	/**
-	 * swapping
-	 */
-	void swap(AttributeContainer&);
-
-	/**
-	 * merge
-	 */
-	void merge(AttributeContainer& cont);
-
-	/**
-	 * extract orbit from code (orbit & id)
-	 */
-	inline static unsigned int orbitAttr(unsigned int idAttr)
-	{
-		return idAttr >> 24;
-	}
-
-	/**
-	 * extract index of attribute in container from code (orbit & id)
-	 */
-	inline static unsigned int indexAttr(unsigned int idAttr)
-	{
-		return idAttr & 0x00ffffff;
-	}
-
-	/**
-	 * create an attrib Id based on the orbit and the index
-	 */
-	inline static unsigned int attrId(unsigned int orbit, unsigned int index)
-	{
-		return (orbit << 24) | index ;
-	}
-
-	/**
-	* ajout d'un attribut
-	* @param T (template) type de l'attribut a ajouter
-	* @return the id of attribute
-	*/
-	template <typename T>
-	unsigned int addAttribute(const std::string& attribName);
-
-	/**
-	* ajout d'un attribut avec identificateur (pour le chargement)
-	* @param T (template) type de l'attribut a ajouter
-	* @param attribName nom de l'attribut
-	* @param id index de l'attribut
-	*/
-	template <typename T>
-	unsigned int addAttribute(const std::string& attribName, const std::string& nametype, unsigned int id);
-
-	bool copyAttribute(unsigned int index_dst, unsigned int index_src);
-
-	bool swapAttributes(unsigned int index1, unsigned int index2);
-
-	/**
-	* recuperation du code d'un attribut
-	* @param attribName nom de l'attribut
-	* @return l'indice de l'attribut 
-	*/
-	unsigned int getAttribute(const std::string& attribName);
-
-	/**
 	* Remove an attribute (destroys data)
 	* @param attribName name of the attribute to remove
-	*/	
+	* @return removed or not
+	*/
 	bool removeAttribute(const std::string& attribName);
 
 	/**
@@ -236,19 +168,65 @@ public:
 	*/
 	bool removeAttribute(unsigned int index);
 
+	/**************************************
+	 *      INFO ABOUT THE CONTAINER      *
+	 **************************************/
+
 	/**
-	* teste si un attribut est valide (encore dans la map de noms)
-	* @param attr attribut a tester
-	* @return vrai attribut encore utilise dans le container
-	*/	
-	bool isValidAttribute(unsigned int attr);
-	
+	 * Number of attributes of the container
+	 */
+	unsigned int getNbAttributes() const;
+
 	/**
-	* remplit un vecteur avec les noms des attributs du container.
-	* @param strings (OUT) tableau des noms d'attributs
-	* @return le nombre d'attributs
-	*/	
-	unsigned int getAttributesNames(std::vector<std::string>& names);
+	* Size of the container (number of lines)
+	*/
+	unsigned int size() const;
+
+	/**
+	* Capacity of the container (number of lines including holes)
+	*/
+	unsigned int capacity() const;
+
+	/**
+	* Total memory cost of container
+	*/
+	unsigned int memoryTotalSize() const;
+
+	/**
+	* is the line used in the container
+	*/
+	inline bool used(unsigned int index) const;
+
+	/**************************************
+	 *         CONTAINER TRAVERSAL        *
+	 **************************************/
+
+	/**
+	 * return the index of the first line of the container
+	 */
+	unsigned int begin() const;
+
+	/**
+	 * return the index of the last line of the container
+	 */
+	unsigned int end() const;
+
+	/**
+	 * get the index of the line after it in the container
+	 * MUST BE USED INSTEAD OF ++ !
+	 */
+	void next(unsigned int &it) const;
+
+	/**************************************
+	 *       INFO ABOUT ATTRIBUTES        *
+	 **************************************/
+
+	/**
+	* recuperation du code d'un attribut
+	* @param attribName nom de l'attribut
+	* @return l'indice de l'attribut
+	*/
+	unsigned int getAttributeIndex(const std::string& attribName);
 
 	/**
 	 * get the name of an attribute, given its index in the container
@@ -256,231 +234,177 @@ public:
 	const std::string& getAttributeName(unsigned int attrIndex);
 
 	/**
-	 * return the number of attributes of the container
+	 * fill a vector with pointers to the blocks of the given attribute
+	 * @param attrIndex index of the attribute
+	 * @param vect_addr (OUT) vector of pointers
+	 * @param byteBlockSize (OUT) size in bytes of each block
+	 * @return number of blocks
 	 */
-	unsigned int getNbAttributes();
+	template<typename T>
+	unsigned int getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize);
 
 	/**
-	* insert une ligne vide dans tous les tableaux (compteur de referencements = 0)
-	* @return retourne un iterator sur la ligne (indice uint)
+	 * fill a vector with attributes' names
+	 * @param vector of names
+	 * @return number of attribute
+	 */
+	unsigned int getAttributesNames(std::vector<std::string>& names);
+
+	/**************************************
+	 *        CONTAINER MANAGEMENT        *
+	 **************************************/
+
+	/**
+	 * swap two containers
+	 */
+	void swap(AttributeContainer& cont);
+
+	/**
+	 * clear the container
+	 * @param removeAttrib remove the attributes (not only their data)
+	 */
+	void clear(bool clearAttrib = false);
+
+	/**
+	 * container compacting
+	 * @param mapOldNew table that contains a map from old indices to new indices (holes -> 0xffffffff)
+	 */
+	void compact(std::vector<unsigned int>& mapOldNew);
+
+	/**************************************
+	 *          LINES MANAGEMENT          *
+	 **************************************/
+
+	/**
+	* insert a line in the container
+	* @return index of the line
 	*/
 	unsigned int insertLine();
 
 	/**
-	 *
-	 */
-	void initLine(unsigned int idx);
-
-	/**
-	* Supprime une ligne d'attribut
-	* @param eltIdx iterator sur cette ligne
+	* remove a line in the container
+	* @param index index of the line to remove
 	*/
-	void removeLine(unsigned int eltIdx);
+	void removeLine(unsigned int index);
 
 	/**
-	 *
+	 * initialize a line of the container (an element of each attribute)
 	 */
-	void copyLine(unsigned int dstIdx, unsigned int srcIdx);
+	void initLine(unsigned int index);
 
 	/**
-	* Incremente le compteur de reference de la ligne
-	* @param eltIdx iterator sur cette ligne
+	 * copy the content of line src in line dst
+	 */
+	void copyLine(unsigned int dstIndex, unsigned int srcIndex);
+
+	/**
+	* increment the ref counter of the given line
+	* @param index index of the line
 	*/
-	void refLine(unsigned int eltIdx);
+	void refLine(unsigned int index);
 
 	/**
-	* Decremente le compteur de reference de la ligne
-	* @param eltIdx iterator sur cette ligne
+	* decrement the ref counter of the given line
+	* @param index index of the line
+	* @return true if the line was removed
 	*/
 	bool unrefLine(unsigned int eltIdx);
 
-	void setRefLine(unsigned int eltIdx, unsigned int nb);
-
 	/**
-	* retourne une reference sur un attribut
-	* @param T type de l'attribut a recuperer
-	* @param codeAttrib code de l'attribut
-	* @param eltIdx indice de la ligne
-	* @return le pointeur sur l'attribut recherche
+	* get the number of refs of the given line
+	* @param index index of the line
+	* @return number of refs of the line
 	*/
-	template <typename T>
-	T& getData(unsigned int codeAttrib, unsigned int eltIdx);
+	unsigned int getNbRefs(unsigned int index);
 
 	/**
-	* retourne une reference constnate sur un attribut
-	* @param T type de l'attribut a recuperer
-	* @param codeAttrib code de l'attribut
-	* @param eltIdx indice de la ligne
-	* @return le pointeur sur l'attribut recherche
+	* set the number of refs of the given line
+	* @param index index of the line
+	* @param nb number of refs
 	*/
-	template <typename T>
-	const T& getData(unsigned int codeAttrib, unsigned int eltIdx) const;
+	void setNbRefs(unsigned int eltIdx, unsigned int nb);
+
+	/**************************************
+	 *       ATTRIBUTES MANAGEMENT        *
+	 **************************************/
 
 	/**
-	* affecte un attribut dans le container
-	* @param T type de l'attribut a affecter, compile souvent sans le mettre, mais danger: (cast implicites sur plusieurs niveaux de template ...)
-	* @param codeAttrib code de l'attribut
-	* @param eltIdx indice de la ligne
-	* @param data attribut a inserer
-	*/
-	template <typename T>
-	void setData(unsigned int codeAttrib, unsigned int eltIdx, const T& data);
-
-	/**
-	* Renvoit un pseudo vecteur d'attribut (operateur []) 
-	* Attention plantage assure si l'attribut n'existe pas
-	* A utiliser apres un getAttribute et test du resultat
-	* @param codeAttrib code de l'attribut
-	*/
-	template<typename T>
-	AttributeMultiVector<T>& getDataVector(unsigned int codeAttrib);
-
-	AttributeMultiVectorGen& getVirtualDataVector(unsigned int codeAttrib);
-
-	/**
-	* Renvoit un pseudo vecteur d'attribut (operateur []) 
-	* Attention plantage assure si l'attribut n'existe pas
-	* @param name nom de l'attribut
-	*/
-// 	template<typename T>
-// 	AttributeMultiVector<T>& getAttributesVector(const std::string& name);
-
-	/**
-	* Renvoit un pseudo vecteur d'attribut (operateur []) 
-	* Avantages: pas de plantage et pas besoin de mettre le parametre template si le type ptr est ok
-	* @param name nom de l'attribut
-	* @param ptr pointeur de pointeur du container
-	* @return vrai si OK faux si pb
-	*/
-	template<typename T>
-	bool getAttributesVector(const std::string& name, AttributeMultiVector<T>** ptr);
-
-	/**
-	* insert un attribut dans le container la ligne est crée
-	* @param T type de l'attribut a affecter (si le type de data est deductible pas besoin de le mettre)
-	* @param codeAttrib code de l'attribut
-	* @param data attribut a inserer
-	* @return l'indice de la ligne crée
-	*/
-//	template <typename T>
-//	unsigned int insertLineWidthData(unsigned int codeAttrib,const T& data);
-
-	/**
-	* iterateur begin
-	*/
-	unsigned int begin() const;
-
-	/**
-	*  iterateur end (attention: fait un petit calcul)
-	*/
-	unsigned int end() const;
-
-	/**
-	* applique next sur un iterateur. ATTENTION DOIT ETRE UTILISE A LA PLACE DE ++
-	* @param it iterateur a incrementer
-	*/	
-	void next(unsigned int &it) const;
-
-	/**
-	* Taille du container en nombre de lignes
-	*/
-	unsigned int size();
-
-	/**
-	* Taille du container en nombre de lignes en memoire (avec les trous)
-	*/
-	unsigned int capacity();
-
-	/**
-	* Cout memoire total approximatif
-	*/
-	unsigned int memoryTotalSize() ;
-
-	/**
-	* Nombre de reference d'une ligne
-	*/
-	unsigned int nbRefs(unsigned int it);
-
-	/**
-	* compactage du container:
-	* @param mapOldNew une table qui represente une map anciens_indices -> nouveaux_indices. Les trous ont la valeur 0xffffffff.
-	*/
-	void compact(std::vector<unsigned int>& mapOldNew);
-
-	/**
-	* clear the container
-	* @param clearAttrib detruit les attributs ?
-	*/
-	void clear(bool clearAttrib=false);
-
-	/**
-	* Recupere les pointeurs sur les premiers elements de chaque bloc d'un attribut
-	* @param attr attribut 
-	* @param vect_adr (OUT) vecteur de pointeurs
-	* @param vect_adr (OUT) vecteur de tailles (en nombre d'elts)
-	* @return nombres de pointeurs
-	*/
-	template<typename T>
-	unsigned int getAddresses(unsigned int attr, std::vector<T*>& vect_adr);
-
-	/**
-	* save Xml file
-	* @param writer a xmlTextWriterPtr obj
-	* @param id the id to save
-	*/
-	void saveXml(xmlTextWriterPtr writer, unsigned int id);
-
-	/**
-	* get id from xml node
-	* @param node the node of container node of xml tree
-	* @return the value of id of the node
-	*/
-	static unsigned int getIdXmlNode(xmlNodePtr node);
-
-	/**
-	* load from xml node
-	* @param node the node of container node of xml tree
-	*/
-	bool loadXml(xmlNodePtr node);
-
-	/**
-	* get id from file binary stream
-	* @param fs file stream
-	* @return the id of attribute container
-	*/
-	static unsigned int loadBinId(CGoGNistream& fs);
-
-	/**
-	* load from binary file
-	* @param fs a file stream
-	* @param id  ??
-	*/
-	bool loadBin(CGoGNistream& fs);
-
-	/**
-	* save binary file
-	* @param fs a file stream
-	* @param id the id to save
-	*/
-	void saveBin(CGoGNostream& fs, unsigned int id);
-
-	/**
-	 *  reserve and clear list of attribute to process
-	 *  @param nb max number of attributes to add to the list (just for optimization)
+	 * copy the data of attribute src in attribute dst (type has to be the same)
 	 */
-//	void clearProcessList(unsigned int nb) { m_processAttribs.reserve(nb); m_processAttribs.clear();}
+	bool copyAttribute(unsigned int dstIndex, unsigned int srcIndex);
+
+	/**
+	 * swap the data of attribute 1 with attribute 2 (type has to be the same)
+	 */
+	bool swapAttributes(unsigned int index1, unsigned int index2);
+
+	/**************************************
+	 *       ATTRIBUTES DATA ACCESS       *
+	 **************************************/
+
+	/**
+	* get an AttributeMultiVector
+	* @param attrIndex index of the attribute
+	*/
+	template<typename T>
+	AttributeMultiVector<T>& getDataVector(unsigned int attrIndex);
+
+	AttributeMultiVectorGen& getVirtualDataVector(unsigned int attrIndex);
+
+	/**
+	* get an AttributeMultiVector
+	* @param attribName name of the attribute
+	*/
+	template<typename T>
+	AttributeMultiVector<T>& getDataVector(const std::string& attribName);
+
+	AttributeMultiVectorGen& getVirtualDataVector(const std::string& attribName);
+
+	/**
+	* get a given element of a given attribute
+	* @param T type of the attribute
+	* @param attrIndex index of the attribute
+	* @param eltIndex index of the element
+	* @return a reference on the element
+	*/
+	template <typename T>
+	T& getData(unsigned int attrIndex, unsigned int eltIndex);
+
+	/**
+	* get a given const element of a given attribute
+	* @param T type of the attribute
+	* @param attrIndex index of the attribute
+	* @param eltIndex index of the element
+	* @return a const reference on the element
+	*/
+	template <typename T>
+	const T& getData(unsigned int attrIndex, unsigned int eltIndex) const;
+
+	/**
+	* set a given element of a given attribute
+	* @param T type of the attribute
+	* @param attrIndex index of the attribute
+	* @param eltIndex index of the element
+	* @param data data to insert
+	*/
+	template <typename T>
+	void setData(unsigned int attrIndex, unsigned int eltIndex, const T& data);
+
+	/**************************************
+	 *       ARITHMETIC OPERATIONS        *
+	 **************************************/
 
 	/**
 	 * Toggle an attribute to process
-	 * @param id the id (or code) of attribute to add
+	 * @param index index of attribute
 	 */
-	void toggleProcess(unsigned int id);
+	void toggleProcess(unsigned int index);
 
 	/**
 	 * Toggle an attribute to process
-	 * @param id the id (or code) of attribute to add
+	 * @param index index of attribute
 	 */
-	void toggleNoProcess(unsigned int id);
+	void toggleNoProcess(unsigned int index);
 
 	/**
 	 * copy process attributes of line j in line i
@@ -525,6 +449,73 @@ public:
 	 * @param alpha coefficient of interpolation
 	 */
 	void lerp(unsigned res, unsigned int i, unsigned int j, double alpha);
+
+	/**************************************
+	 *            SAVE & LOAD             *
+	 **************************************/
+
+protected:
+//	/**
+//	 * load xmlpart of container
+//	 */
+//	bool loadXmlHB(xmlNodePtr node);
+
+	/**
+	 * load xmlpart of container
+	 */
+	bool loadXmlBWF(xmlNodePtr node);
+
+	/**
+	 * load xmlpart of container
+	 */
+	bool loadXmlAN(xmlNodePtr node, unsigned int nbb);
+
+	/**
+	 * load xmlpart of container
+	 */
+	bool loadXmlDL(xmlNodePtr node);
+
+public:
+	/**
+	* save Xml file
+	* @param writer a xmlTextWriterPtr obj
+	* @param id the id to save
+	*/
+	void saveXml(xmlTextWriterPtr writer, unsigned int id);
+
+	/**
+	* get id from xml node
+	* @param node the node of container node of xml tree
+	* @return the value of id of the node
+	*/
+	static unsigned int getIdXmlNode(xmlNodePtr node);
+
+	/**
+	* load from xml node
+	* @param node the node of container node of xml tree
+	*/
+	bool loadXml(xmlNodePtr node);
+
+	/**
+	* save binary file
+	* @param fs a file stream
+	* @param id the id to save
+	*/
+	void saveBin(CGoGNostream& fs, unsigned int id);
+
+	/**
+	* get id from file binary stream
+	* @param fs file stream
+	* @return the id of attribute container
+	*/
+	static unsigned int loadBinId(CGoGNistream& fs);
+
+	/**
+	* load from binary file
+	* @param fs a file stream
+	* @param id  ??
+	*/
+	bool loadBin(CGoGNistream& fs);
 };
 
 } // namespace CGoGN

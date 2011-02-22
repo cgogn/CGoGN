@@ -222,16 +222,16 @@ inline AttributeContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 }
 
 template <typename T>
-inline AttributeMultiVector<T>& GenericMap::getAttributeVector(unsigned int idAttr)
+inline AttributeMultiVector<T>& GenericMap::getAttributeVector(unsigned int orbit, unsigned int index)
 {
-	assert(idAttr != AttributeContainer::UNKNOWN) ;
-	return m_attribs[AttributeContainer::orbitAttr(idAttr)].getDataVector<T>(AttributeContainer::indexAttr(idAttr)) ;
+	assert(index != AttributeContainer::UNKNOWN) ;
+	return m_attribs[orbit].getDataVector<T>(index) ;
 }
 
-inline AttributeMultiVectorGen& GenericMap::getAttributeVectorGen(unsigned int idAttr)
+inline AttributeMultiVectorGen& GenericMap::getAttributeVectorGen(unsigned int orbit, unsigned int index)
 {
-	assert(idAttr != AttributeContainer::UNKNOWN) ;
-	return m_attribs[AttributeContainer::orbitAttr(idAttr)].getVirtualDataVector(AttributeContainer::indexAttr(idAttr)) ;
+	assert(index != AttributeContainer::UNKNOWN) ;
+	return m_attribs[orbit].getVirtualDataVector(index) ;
 }
 
 inline AttributeMultiVector<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
@@ -248,10 +248,22 @@ inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned in
 {
 	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
 	assert((orbit1 != DART_ORBIT && orbit2 != DART_ORBIT) || !"Cannot swap the darts container") ;
+
 	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
-	AttributeMultiVector<unsigned int>* e1 = m_embeddings[orbit1] ;
+	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
+	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
+
+	AttributeMultiVector<unsigned int>* e = m_embeddings[orbit1] ;
 	m_embeddings[orbit1] = m_embeddings[orbit2] ;
-	m_embeddings[orbit2] = e1 ;
+	m_embeddings[orbit2] = e ;
+
+	AttributeMultiVector<Mark>* m = m_markerTables[orbit1] ;
+	m_markerTables[orbit1] = m_markerTables[orbit2] ;
+	m_markerTables[orbit2] = m ;
+
+	MarkerSet ms = m_orbMarker[orbit1] ;
+	m_orbMarker[orbit1] = m_orbMarker[orbit2] ;
+	m_orbMarker[orbit2] = ms ;
 }
 
 /****************************************

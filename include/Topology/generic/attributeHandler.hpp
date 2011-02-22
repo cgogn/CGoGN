@@ -26,21 +26,15 @@ namespace CGoGN
 {
 
 template <typename T>
-AttributeHandler<T>::AttributeHandler(GenericMap* m, unsigned int idAttr):
-	m_map(m), m_id(idAttr)
+AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv):
+	m_map(m)
 {
-	if(idAttr != AttributeContainer::UNKNOWN)
-	{
-		AttributeMultiVector<T>& atm = m_map->getAttributeVector<T>(m_id);
-		m_attrib = &atm;
-	}
-	else
-		m_attrib = NULL ;
+	m_attrib = amv ;
 }
 
 template <typename T>
 AttributeHandler<T>::AttributeHandler(const AttributeHandler<T>& ta):
-	m_map(ta.m_map), m_id(ta.m_id), m_attrib(ta.m_attrib)
+	m_map(ta.m_map), m_attrib(ta.m_attrib)
 {}
 
 template <typename T>
@@ -48,7 +42,6 @@ inline void AttributeHandler<T>::operator=(const AttributeHandler<T>& ta)
 {
 	m_map = ta.m_map ;
 	m_attrib = ta.m_attrib ;
-	m_id = ta.m_id ;
 }
 
 template <typename T>
@@ -68,31 +61,40 @@ AttributeMultiVector<T>* AttributeHandler<T>::getDataVector() const
 }
 
 template <typename T>
-unsigned int AttributeHandler<T>::id() const
+unsigned int AttributeHandler<T>::getOrbit() const
 {
-	return m_id ;
+	return m_attrib->getOrbit() ;
+}
+
+template <typename T>
+unsigned int AttributeHandler<T>::getIndex() const
+{
+	return m_attrib->getIndex() ;
 }
 
 template <typename T>
 const std::string& AttributeHandler<T>::name() const
 {
-	return m_map->getAttributeContainer(AttributeContainer::orbitAttr(m_id)).getAttributeName(AttributeContainer::indexAttr(m_id)) ;
+	return m_attrib->getName() ;
 }
 
 template <typename T>
 bool AttributeHandler<T>::isValid() const
 {
-	return (m_id != AttributeContainer::UNKNOWN) && (m_map != NULL) && (m_attrib != NULL) ;
+	return (m_attrib->getIndex() != AttributeContainer::UNKNOWN &&
+			m_map != NULL &&
+			m_attrib != NULL) ;
 }
 
 template <typename T>
 inline T& AttributeHandler<T>::operator[](Dart d)
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int a = m_map->getEmbedding(d, AttributeContainer::orbitAttr(m_id));
+	unsigned int orbit = m_attrib->getOrbit() ;
+	unsigned int a = m_map->getEmbedding(d, orbit) ;
 
 	if (a == EMBNULL)
-		a = m_map->embedNewCell(AttributeContainer::orbitAttr(m_id), d);
+		a = m_map->embedNewCell(orbit, d);
 
 	return m_attrib->operator[](a);
 }
@@ -101,8 +103,8 @@ template <typename T>
 inline const T& AttributeHandler<T>::operator[](Dart d) const
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int a = m_map->getEmbedding(d, AttributeContainer::orbitAttr(m_id));
-	return m_attrib->operator[](a);
+	unsigned int a = m_map->getEmbedding(d, m_attrib->getOrbit()) ;
+	return m_attrib->operator[](a) ;
 }
 
 template <typename T>
@@ -123,7 +125,7 @@ template <typename T>
 inline unsigned int AttributeHandler<T>::insert(const T& elt)
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int idx = m_map->getAttributeContainer(AttributeContainer::orbitAttr(m_id)).insertLine();
+	unsigned int idx = m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine();
 	m_attrib->operator[](idx) = elt;
 	return idx;
 }
@@ -132,7 +134,7 @@ template <typename T>
 inline unsigned int AttributeHandler<T>::newElt()
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int idx = m_map->getAttributeContainer(AttributeContainer::orbitAttr(m_id)).insertLine();
+	unsigned int idx = m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine();
 	return idx;
 }
 
@@ -140,21 +142,21 @@ template <typename T>
 inline unsigned int AttributeHandler<T>::begin() const
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	return m_map->getAttributeContainer(AttributeContainer::orbitAttr(m_id)).begin();
+	return m_map->getAttributeContainer(m_attrib->getOrbit()).begin();
 }
 
 template <typename T>
 inline unsigned int AttributeHandler<T>::end() const
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	return m_map->getAttributeContainer(AttributeContainer::orbitAttr(m_id)).end();
+	return m_map->getAttributeContainer(m_attrib->getOrbit()).end();
 }
 
 template <typename T>
 inline void AttributeHandler<T>::next(unsigned int& iter) const
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	m_map->getAttributeContainer(AttributeContainer::orbitAttr(m_id)).next(iter);
+	m_map->getAttributeContainer(m_attrib->getOrbit()).next(iter);
 }
 
 } //namespace CGoGN
