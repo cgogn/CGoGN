@@ -30,8 +30,7 @@ inline AttributeHandler<T> AttribMap::addAttribute(unsigned int orbit, const std
 {
 	if(!isOrbitEmbedded(orbit))
 		addEmbedding(orbit) ;
-	AttributeContainer& cellCont = m_attribs[orbit] ;
-	AttributeMultiVector<T>* amv = cellCont.addAttribute<T>(nameAttr) ;
+	AttributeMultiVector<T>* amv = m_attribs[orbit].addAttribute<T>(nameAttr) ;
 	return AttributeHandler<T>(this, amv) ;
 }
 
@@ -46,8 +45,8 @@ template <typename T>
 inline AttributeHandler<T> AttribMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	AttributeMultiVector<T>& amv = m_attribs[orbit].getDataVector<T>(nameAttr) ;
-	return AttributeHandler<T>(this, &amv) ;
+	AttributeMultiVector<T>* amv = m_attribs[orbit].getDataVector<T>(nameAttr) ;
+	return AttributeHandler<T>(this, amv) ;
 }
 
 template <typename T>

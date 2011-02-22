@@ -262,38 +262,38 @@ inline bool AttributeContainer::swapAttributes(unsigned int index1, unsigned int
  **************************************/
 
 template <typename T>
-AttributeMultiVector<T>& AttributeContainer::getDataVector(unsigned int attrIndex)
+AttributeMultiVector<T>* AttributeContainer::getDataVector(unsigned int attrIndex)
 {
 	assert(attrIndex < m_tableAttribs.size() || !"getDataVector: attribute index out of bounds");
 	assert(m_tableAttribs[attrIndex] != NULL || !"getDataVector: attribute does not exist");
 
 	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[attrIndex]);
 	assert((atm != NULL) || !"getDataVector: wrong type");
-	return *atm;
+	return atm;
 }
 
-inline AttributeMultiVectorGen& AttributeContainer::getVirtualDataVector(unsigned int attrIndex)
+inline AttributeMultiVectorGen* AttributeContainer::getVirtualDataVector(unsigned int attrIndex)
 {
-	return *(m_tableAttribs[attrIndex]);
+	return m_tableAttribs[attrIndex];
 }
 
 template <typename T>
-AttributeMultiVector<T>& AttributeContainer::getDataVector(const std::string& attribName)
+AttributeMultiVector<T>* AttributeContainer::getDataVector(const std::string& attribName)
 {
 	unsigned int index = getAttributeIndex(attribName) ;
-
-	assert(index != UNKNOWN) ;
+	if(index == UNKNOWN)
+		return NULL ;
 
 	AttributeMultiVector<T>* atm = dynamic_cast<AttributeMultiVector<T>*>(m_tableAttribs[index]);
 	assert((atm != NULL) || !"getDataVector: wrong type");
-	return *atm;
+	return atm;
 }
 
-inline AttributeMultiVectorGen& AttributeContainer::getVirtualDataVector(const std::string& attribName)
+inline AttributeMultiVectorGen* AttributeContainer::getVirtualDataVector(const std::string& attribName)
 {
 	unsigned int index = getAttributeIndex(attribName) ;
 	assert(index != UNKNOWN) ;
-	return *(m_tableAttribs[index]);
+	return m_tableAttribs[index];
 }
 
 template <typename T>

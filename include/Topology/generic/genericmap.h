@@ -231,22 +231,6 @@ public:
 	AttributeContainer& getAttributeContainer(unsigned int orbit);
 
 	/**
-	 * get a multi vector of attribute (direct access with [i])
-	 * @param orbit orbit of attribute
-	 * @param index index of attribute
-	 */
-	template <typename T>
-	AttributeMultiVector<T>& getAttributeVector(unsigned int orbit, unsigned int index);
-
-	/**
-	 * get a virtual multi vector of attribute
-	 * No access to data, useful for access to address (VBO)
-	 * @param orbit orbit of attribute
-	 * @param index index of attribute
-	 */
-	AttributeMultiVectorGen& getAttributeVectorGen(unsigned int orbit, unsigned int index);
-
-	/**
 	 * get a multi vector of marker attribute (direct access with [i])
 	 * @param orbit code
 	 */

@@ -169,9 +169,9 @@ void GenericMap::update_m_emb_afterLoad()
 		{
 			unsigned int orb = listeNames[i][4]-'0'; // easy atoi computation for one char;
 
-			AttributeMultiVector<unsigned int>& amv = cont.getDataVector<unsigned int>(i);
-			m_embeddings[orb] = &amv ;
-			std::cout << "Ajoute m_emb["<<orb<<"]:"<< i <<std::endl;
+			AttributeMultiVector<unsigned int>* amv = cont.getDataVector<unsigned int>(i);
+			m_embeddings[orb] = amv ;
+			std::cout << "Ajoute m_emb[" << orb << "] : " << i << std::endl;
 		}
 	}
 }

@@ -47,21 +47,20 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap::addAttribute(unsigned int orbit
 	if(addNextLevelCell)
 	{
 		AttributeContainer& cellCont = m_attribs[orbit] ;
-		unsigned int index = cellCont.addAttribute<unsigned int>("nextLevelCell") ;
-		AttributeMultiVector<unsigned int>& amv = cellCont.getDataVector<unsigned int>(index) ;
-		m_nextLevelCell[orbit] = &amv ;
+		AttributeMultiVector<unsigned int>* amv = cellCont.addAttribute<unsigned int>("nextLevelCell") ;
+		m_nextLevelCell[orbit] = amv ;
 		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
-			amv[i] = EMBNULL ;
+			amv->operator[](i) = EMBNULL ;
 	}
 
-	return AttributeHandler_IHM<T>(this, h.getOrbit(), h.getIndex()) ;
+	return AttributeHandler_IHM<T>(this, h.getDataVector()) ;
 }
 
 template <typename T>
 AttributeHandler_IHM<T> ImplicitHierarchicalMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
 {
 	AttributeHandler<T> h = Map2::getAttribute<T>(orbit, nameAttr) ;
-	return AttributeHandler_IHM<T>(this, h.getOrbit(), h.getIndex()) ;
+	return AttributeHandler_IHM<T>(this, h.getDataVector()) ;
 }
 
 /***************************************************

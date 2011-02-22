@@ -221,19 +221,6 @@ inline AttributeContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 	return m_attribs[orbit] ;
 }
 
-template <typename T>
-inline AttributeMultiVector<T>& GenericMap::getAttributeVector(unsigned int orbit, unsigned int index)
-{
-	assert(index != AttributeContainer::UNKNOWN) ;
-	return m_attribs[orbit].getDataVector<T>(index) ;
-}
-
-inline AttributeMultiVectorGen& GenericMap::getAttributeVectorGen(unsigned int orbit, unsigned int index)
-{
-	assert(index != AttributeContainer::UNKNOWN) ;
-	return m_attribs[orbit].getVirtualDataVector(index) ;
-}
-
 inline AttributeMultiVector<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
 {
 	return m_markerTables[orbit] ;

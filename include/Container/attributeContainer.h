@@ -347,18 +347,18 @@ public:
 	* @param attrIndex index of the attribute
 	*/
 	template<typename T>
-	AttributeMultiVector<T>& getDataVector(unsigned int attrIndex);
+	AttributeMultiVector<T>* getDataVector(unsigned int attrIndex);
 
-	AttributeMultiVectorGen& getVirtualDataVector(unsigned int attrIndex);
+	AttributeMultiVectorGen* getVirtualDataVector(unsigned int attrIndex);
 
 	/**
 	* get an AttributeMultiVector
 	* @param attribName name of the attribute
 	*/
 	template<typename T>
-	AttributeMultiVector<T>& getDataVector(const std::string& attribName);
+	AttributeMultiVector<T>* getDataVector(const std::string& attribName);
 
-	AttributeMultiVectorGen& getVirtualDataVector(const std::string& attribName);
+	AttributeMultiVectorGen* getVirtualDataVector(const std::string& attribName);
 
 	/**
 	* get a given element of a given attribute

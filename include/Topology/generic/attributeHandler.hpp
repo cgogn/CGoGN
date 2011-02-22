@@ -27,10 +27,8 @@ namespace CGoGN
 
 template <typename T>
 AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv):
-	m_map(m)
-{
-	m_attrib = amv ;
-}
+	m_map(m), m_attrib(amv)
+{}
 
 template <typename T>
 AttributeHandler<T>::AttributeHandler(const AttributeHandler<T>& ta):
@@ -81,9 +79,9 @@ const std::string& AttributeHandler<T>::name() const
 template <typename T>
 bool AttributeHandler<T>::isValid() const
 {
-	return (m_attrib->getIndex() != AttributeContainer::UNKNOWN &&
-			m_map != NULL &&
-			m_attrib != NULL) ;
+	return (m_map != NULL &&
+			m_attrib != NULL &&
+			m_attrib->getIndex() != AttributeContainer::UNKNOWN) ;
 }
 
 template <typename T>
