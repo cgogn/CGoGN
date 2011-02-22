@@ -104,14 +104,14 @@ bool Approximator_RGBfunctions<PFP>::init()
 	// get actual frames and hypothetical approximated frames
 	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX_ORBIT, "frame") ;
 	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE_ORBIT, "approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "quadricRGBfunctions") ;
 
 	// create quadric embedding for computing and set them to 0
-	m_quadricRGBfunctions = new AutoAttributeHandler<QuadricRGBfunctions<REAL> >(this->m_map, EDGE_ORBIT) ;
 	for (Dart d = this->m_map.begin() ; d != this->m_map.end() ; this->m_map.next(d))
-		(*m_quadricRGBfunctions)[d].zero() ;
+		m_quadricRGBfunctions[d].zero() ;
 
 	// Check on embeddings
-	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions->isValid())
+	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions.isValid())
 	{
 		std::cerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << std::endl ;
 		return false ;
@@ -162,12 +162,16 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
 	// Create and sum quadrics
-	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
-	(*m_quadricRGBfunctions)[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
+
+	std::cout << "plop" << std::endl ;
+	std::cout << m_quadricRGBfunctions[d] << std::endl ;
 
 	// Compute new function
-	if (! (*m_quadricRGBfunctions)[d].findOptimizedRGBfunctions(this->m_approx[d]))
+	if (! m_quadricRGBfunctions[d].findOptimizedRGBfunctions(this->m_approx[d])) {
 		this->m_approx[d] = this->m_attrV[d]; // if fail take first one
+	}
 
 //	std::cout << "Approx of : " <<std::endl ;
 //	std::cout << "Frame1 : " << m_frame[d] << std::endl ;

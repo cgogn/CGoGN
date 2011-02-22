@@ -30,7 +30,7 @@ public:
 	typedef Geom::Matrix<3,6,REAL> RGBFUNCTIONS;
 
 private:
-	MATRIX66 A[COLCHANNELS];
+	MATRIX66 A;
 	VEC6 b[COLCHANNELS];
 	REAL c[COLCHANNELS];
 
@@ -56,7 +56,15 @@ public:
 
 	void zero () ;
 
-	friend std::ostream& operator<< (std::ostream &out, const QuadricRGBfunctions&) {return out;};
+	friend std::ostream& operator<< (std::ostream &out, const QuadricRGBfunctions& q) {
+		out << "quadricRGBf : " << std::endl ;
+		out << "q.A" << "= " << q.A << std::endl ;
+		for (unsigned int i = 0 ; i < 3 ; ++i) {
+			out << "q.b["<<i<<"] = " << q.b[i] << std::endl ;
+			out << "q.c["<<i<<"] = " << q.c[i] << std::endl ;
+		}
+		return out ;
+	} ;
 	friend std::istream& operator>> (std::istream &in, const QuadricRGBfunctions&) {return in;};
 
 private :

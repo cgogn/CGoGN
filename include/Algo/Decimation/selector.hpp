@@ -711,10 +711,11 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MATRIX36 newRGBf = this->m_RGBfunctionsApproximator->getApprox(d) ; // get newRGBf
 
 	QuadricRGBfunctions<typename PFP::REAL> quadRGBf = quadricRGBfunctions[d]; // get quadricRGBf
-	// ?? test if quadRGBf is valid
 
 	// Compute error
 	REAL err = quad(newPos) + (2 * acos (n1 * n2)) + quadRGBf(newRGBf) ;
+//	std::cout << err << " -- " << quad(newPos) << " -- " << (2 * acos (n1 * n2)) << " -- " << quadRGBf(newRGBf) << std::endl ;
+	std::cout << quadRGBf << std::endl ;
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }

@@ -15,12 +15,12 @@ std::string QuadricRGBfunctions<REAL>::CGoGNnameOfType() {
 
 template <typename REAL>
 QuadricRGBfunctions<REAL>::QuadricRGBfunctions() {
+	for (unsigned i = 0; i < 6; ++i)
+		for (unsigned j = 0; j < 6; ++j)
+			A(i,j) = REAL(0) ;
+
 	for (unsigned col = RED; col < BLUE+1 ; ++col) {
-
 		for (unsigned i = 0; i < 6; ++i) {
-			for (unsigned j = 0; j < 6; ++j)
-				A[col](i,j) = REAL(0) ;
-
 			b[col][i] = REAL(0) ;
 		}
 
@@ -35,11 +35,13 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(int i) {
 
 template <typename REAL>
 QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const QuadricRGBfunctions& q) {
+	for (unsigned i = 0; i < 6; ++i)
+		for (unsigned j = 0; j < 6; ++j)
+			A(i,j) = q.A(i,j) ;
+
 	for (unsigned col = RED; col < BLUE+1 ; ++col) {
 
 		for (unsigned i = 0; i < 6; ++i) {
-			for (unsigned j = 0; j < 6; ++j)
-				A[col](i,j) = q.A[col](i,j) ;
 			b[col][i] = q.b[col][i] ;
 		}
 
@@ -58,6 +60,7 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 	buildIntegralMatrix_c(R2_c,alpha); // Parameterized integral matrix c
 
 	// Quadric (A,b,c) => L*A*Lt - 2*b*Lt + c = ERROR
+	A = R2_A ; // Matrix A : integral
 	for (unsigned col = RED; col < BLUE+1; ++col) {
 		Geom::Vector<6,REAL> function; // get function coefficients
 		if (!cf.getSubVectorH(col,0,function))
@@ -65,7 +68,6 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 
 		VEC6 coefs = R1 * function ; // Rotation 1
 
-		A[col] = R2_A ; // Matrix A : integral
 		b[col] = R2_b * function ;	// Vector b : integral + rotation on 1 vector
 		c[col] = function * (R2_c * function) ;	// Scalar c : integral + rotation on 2 vectors
 	}
@@ -81,7 +83,7 @@ REAL QuadricRGBfunctions<REAL>::operator() (const RGBFUNCTIONS& cf) const {
 			assert (!"QuadricRGBfunctions::getSubVectorH") ;
 
 		REAL res_local = REAL(0) ;
-		res_local += function * (A[col] * function) ; // l*A*lt
+		res_local += function * (A * function) ; // l*A*lt
 		res_local -= 2 * (function * b[col]) ; // -2*l*b
 		res_local += c[col] ; // c
 		// res = l*A*lT - 2*l*b + c
@@ -93,13 +95,13 @@ REAL QuadricRGBfunctions<REAL>::operator() (const RGBFUNCTIONS& cf) const {
 
 template <typename REAL>
 bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(RGBFUNCTIONS& cf) const {
+	MATRIX66 Ainv ;
+
+	REAL det = A.invert(Ainv) ; // Invert matrix
+	if(det > -1e-8 && det < 1e-8)
+		return false ; // invert failed
 
 	for (unsigned  col = RED; col < BLUE+1 ; ++col) {
-		MATRIX66 Ainv ;
-
-		REAL det = A[col].invert(Ainv) ; // Invert matrix
-		if(det > -1e-8 && det < 1e-8)
-			return false ; // invert failed
 
 		VEC6 coefs = Ainv * b[col]; // function = A^(-1) * b
 
@@ -528,11 +530,13 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, const REAL gamma)
 
 template <typename REAL>
 void QuadricRGBfunctions<REAL>::operator += (const QuadricRGBfunctions& q) {
+	for (unsigned i = 0; i < 6; ++i)
+		for (unsigned j = 0; j < 6; ++j)
+			A(i,j) += q.A(i,j);
+
 	for (unsigned col = RED; col < BLUE+1 ; ++col) {
 
 		for (unsigned i = 0; i < 6; ++i) {
-			for (unsigned j = 0; j < 6; ++j)
-				A[col](i,j) += q.A[col](i,j);
 			b[col][i] += q.b[col][i];
 		}
 		c[col] += q.c[col];
@@ -542,11 +546,13 @@ void QuadricRGBfunctions<REAL>::operator += (const QuadricRGBfunctions& q) {
 
 template <typename REAL>
 void QuadricRGBfunctions<REAL>::operator -= (const QuadricRGBfunctions& q) {
+	for (unsigned i = 0; i < 6; ++i)
+		for (unsigned j = 0; j < 6; ++j)
+			A(i,j) -= q.A(i,j);
+
 	for (unsigned col = RED; col < BLUE+1 ; ++col) {
 		for (unsigned i = 0; i < 6; ++i) {
 			b[col][i] -= q.b[col][i];
-			for (unsigned j = 0; j < 6; ++j)
-				A[col](i,j) -= q.A[col](i,j);
 		}
 
 		c[col] -= q.c[col];
@@ -555,11 +561,13 @@ void QuadricRGBfunctions<REAL>::operator -= (const QuadricRGBfunctions& q) {
 
 template <typename REAL>
 void QuadricRGBfunctions<REAL>::operator *= (const REAL v) {
+	for (unsigned i = 0; i < 6; ++i)
+		for (unsigned j = 0; j < 6; ++j)
+			A(i,j) *= v;
+
 	for (unsigned col = RED; col < BLUE+1 ; ++col) {
 		for (unsigned i = 0; i < 6; ++i) {
 			b[col][i] *= v;
-			for (unsigned j = 0; j < 6; ++j)
-				A[col](i,j) *= v;
 		}
 
 		c[col] *= v;
@@ -568,11 +576,13 @@ void QuadricRGBfunctions<REAL>::operator *= (const REAL v) {
 
 template <typename REAL>
 void QuadricRGBfunctions<REAL>::operator /= (const REAL v) {
+	for (unsigned i = 0; i < 6; ++i)
+		for (unsigned j = 0; j < 6; ++j)
+			A(i,j) /= v;
+
 	for (unsigned col = RED; col < BLUE+1 ; ++col) {
 		for (unsigned i = 0; i < 6; ++i) {
 			b[col][i] /= v;
-			for (unsigned j = 0; j < 6; ++j)
-				A[col](i,j) /= v;
 		}
 
 		c[col] /= v;
@@ -581,8 +591,8 @@ void QuadricRGBfunctions<REAL>::operator /= (const REAL v) {
 
 template <typename REAL>
 void QuadricRGBfunctions<REAL>::zero () {
+	A.zero();
 	for (unsigned int i = 0 ; i < COLCHANNELS ; ++i) {
-		A[i].zero();
 		b[i].zero();
 		c[i] = REAL(0) ;
 	}

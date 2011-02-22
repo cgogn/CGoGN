@@ -76,12 +76,12 @@ public:
 protected:
 	AttributeHandler<MATRIX33> m_frame ;
 	AttributeHandler<MATRIX33> m_approxFrame ;
-	AutoAttributeHandler<QuadricRGBfunctions<REAL> > *m_quadricRGBfunctions ;
+	AttributeHandler<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
 
 public:
 	Approximator_RGBfunctions(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
 		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE_ORBIT, pred)
-	{}
+	{ }
 	~Approximator_RGBfunctions()
 	{}
 	ApproximatorType getType() const { return A_LightfieldFull ; }
