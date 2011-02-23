@@ -714,8 +714,8 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// Compute error
 	REAL err = quad(newPos) + (2 * acos (n1 * n2)) + quadRGBf(newRGBf) ;
-//	std::cout << err << " -- " << quad(newPos) << " -- " << (2 * acos (n1 * n2)) << " -- " << quadRGBf(newRGBf) << std::endl ;
-	std::cout << quadRGBf << std::endl ;
+//	std::cout << err << " = " << quad(newPos) << " + " << (2 * acos (n1 * n2)) << " + " << quadRGBf(newRGBf) << std::endl ;
+//	std::cout << quadRGBf << std::endl ;
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }

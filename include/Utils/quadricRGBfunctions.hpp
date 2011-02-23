@@ -54,7 +54,7 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 	MATRIX66 R1,R2_A,R2_b,R2_c;
 
 	buildRotateMatrix(R1,gamma); // Rotation 1
-
+	R1.transpose() ;
 	buildIntegralMatrix_A(R2_A,alpha); // Parameterized integral matrix A
 	buildIntegralMatrix_b(R2_b,alpha); // Parameterized integral matrix b
 	buildIntegralMatrix_c(R2_c,alpha); // Parameterized integral matrix c
@@ -63,10 +63,13 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 	A = R2_A ; // Matrix A : integral
 	for (unsigned col = RED; col < BLUE+1; ++col) {
 		Geom::Vector<6,REAL> function; // get function coefficients
+
 		if (!cf.getSubVectorH(col,0,function))
 			assert(!"QuadricRGBfunctions::constructor") ;
-
-		VEC6 coefs = R1 * function ; // Rotation 1
+//		std::cout << "gamma = " << gamma << " -- function = " << function ;
+		function = R1 * function ; // Rotation 1
+//		std::cout << " -- function after R1 = " << function << std::endl ;
+//		std::cout << "R1 = " << R1 << std::endl ;
 
 		b[col] = R2_b * function ;	// Vector b : integral + rotation on 1 vector
 		c[col] = function * (R2_c * function) ;	// Scalar c : integral + rotation on 2 vectors
@@ -100,12 +103,12 @@ bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(RGBFUNCTIONS& cf) cons
 	REAL det = A.invert(Ainv) ; // Invert matrix
 	if(det > -1e-8 && det < 1e-8)
 		return false ; // invert failed
+	Ainv.transpose() ;
 
 	for (unsigned  col = RED; col < BLUE+1 ; ++col) {
+		VEC6 function = Ainv * b[col]; // function = A^(-1) * b
 
-		VEC6 coefs = Ainv * b[col]; // function = A^(-1) * b
-
-		if (!cf.setSubVectorH(col,0,coefs)) // save in argument cf
+		if (!cf.setSubVectorH(col,0,function)) // save in argument cf
 			assert (!"QuadricRGBfunctions::findOptimizedRGBfunctions(cf) setSubVector failed") ;
 	}
 
@@ -122,6 +125,8 @@ void QuadricRGBfunctions<REAL>::buildIntegralMatrix_A(MATRIX66 &M, const REAL al
 	const REAL pi = 3.141592 ;
 
 	const REAL cosinus = cos(alpha);
+	const REAL cos2 = cosinus*cosinus;
+	const REAL cos3 = cos2*cosinus;
 	const REAL sinus = sin(alpha);
 	const REAL sinAbs = sin(alphaAbs); // = - sin(alpha) si alpha < 0
 
@@ -141,13 +146,13 @@ void QuadricRGBfunctions<REAL>::buildIntegralMatrix_A(MATRIX66 &M, const REAL al
 	// Line 2
 	M(1,0) = M(0,1);
 
-	M(1,1) = (-4.0 * sinAbs*cosinus*cosinus*cosinus + 6.0 * (pi - cosinus*sinAbs - alphaAbs)) / 15.0 ;
+	M(1,1) = (-4.0 * sinAbs*cos3 + 6.0 * (pi - cosinus*sinAbs - alphaAbs)) / 15.0 ;
 
 	M(1,2) = REAL(0);
 
 	M(1,3) = REAL(0);
 
-	M(1,4) = (sinus*cosinus*cosinus*pi + 2*sinus*pi) / 8.0;
+	M(1,4) = (sinus*cos2*pi + 2*sinus*pi) / 8.0;
 
 	M(1,5) = 2.0*(pi-cosinus*sinAbs-alphaAbs)/3.0;
 
@@ -524,7 +529,7 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, const REAL gamma)
 	N(5,2) = REAL(0);
 	N(5,3) = REAL(0);
 	N(5,4) = REAL(0);
-	N(5,5) = REAL(1.0);
+	N(5,5) = REAL(1);
 
 }
 

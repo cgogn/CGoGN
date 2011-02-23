@@ -162,17 +162,16 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
 	// Create and sum quadrics
+//	std::cout << "angles1 : " << gamma1 << " " << alpha1 << std::endl ;
+//	std::cout << "angles2 : " << gamma2 << " " << alpha2 << std::endl ;
 	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
 	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
-
-	std::cout << "plop" << std::endl ;
-	std::cout << m_quadricRGBfunctions[d] << std::endl ;
 
 	// Compute new function
 	if (! m_quadricRGBfunctions[d].findOptimizedRGBfunctions(this->m_approx[d])) {
 		this->m_approx[d] = this->m_attrV[d]; // if fail take first one
 	}
-
+//	if (gamma2 < -1) {
 //	std::cout << "Approx of : " <<std::endl ;
 //	std::cout << "Frame1 : " << m_frame[d] << std::endl ;
 //	std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
@@ -181,6 +180,7 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 //	std::cout << "is " << std::endl ;
 //	std::cout << "Frame :" << m_approxFrame[d] << std::endl ;
 //	std::cout << "Function : " << this->m_approx[d] << std::endl << std::endl ;
+//	}
 }
 
 } //namespace Decimation
