@@ -196,6 +196,11 @@ public:
 	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
 
 
+	/**
+	 * Link the shader do it just after binding the attributes
+	 */
+	bool link();
+
 	inline bool		isCreated();
 
 	bool			isBinded();

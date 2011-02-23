@@ -61,3 +61,6 @@ add_executable( tuto_ogl3 tuto_ogl3.cpp)
 target_link_libraries( tuto_ogl3
 	container topology utils algo  ${COMMON_LIBS} )
 
+add_executable( tuto_ogl2 tuto_ogl2.cpp)
+target_link_libraries( tuto_ogl2
+	container topology utils algo  ${COMMON_LIBS} )
