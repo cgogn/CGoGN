@@ -37,6 +37,7 @@ namespace VBO
 {
 
 MapRender_VBO::MapRender_VBO():
+	m_nbVertexAttrib(0),
 	m_nbIndicesTri(0),
 	m_nbIndicesLines(0)
 {
@@ -46,6 +47,14 @@ MapRender_VBO::MapRender_VBO():
 		m_allocatedBuffers[i] = false ;
 		m_usedBuffers[i] = false ;
 	}
+
+	for(unsigned int i = 0; i < NB_ATTRIBUTES; ++i)
+	{
+		m_allocatedAttributes[i] = false ;
+		m_usedAttributes[i] = false ;
+		m_AttributesDataSize[i]=0;
+	}
+
 }
 
 MapRender_VBO::~MapRender_VBO()
@@ -56,6 +65,7 @@ MapRender_VBO::~MapRender_VBO()
 
 
 MapRender_VBO::MapRender_VBO(const MapRender_VBO& mrvbo):
+	m_nbVertexAttrib(mrvbo.m_nbVertexAttrib),
 	m_nbIndicesTri(0),
 	m_nbIndicesLines(0)
 {
@@ -73,6 +83,16 @@ MapRender_VBO::MapRender_VBO(const MapRender_VBO& mrvbo):
 		m_allocatedBuffers[i] = mrvbo.m_allocatedBuffers[i] ;
 		m_usedBuffers[i] = mrvbo.m_usedBuffers[i] ;
 	}
+
+	for(unsigned int i = 0; i < NB_ATTRIBUTES; ++i)
+	{
+		m_allocatedAttributes[i] = mrvbo.m_allocatedAttributes[i] ;
+		m_usedAttributes[i] = mrvbo.m_usedAttributes[i] ;
+		m_AttributesDataSize[i] = mrvbo.m_AttributesDataSize[i];
+	}
+
+
+
 }
 
 
@@ -163,6 +183,15 @@ void MapRender_VBO::drawTriangles(bool bindColors)
 		}
 	}
 
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
+		if(m_usedAttributes[j])
+		{
+			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[j+ FIRST_ATTRIBUTE_BUFFER]);
+			glEnableVertexAttribArray(j+FIRST_VERTEX_ATTRIB);
+			glVertexAttribPointer(j+FIRST_VERTEX_ATTRIB, m_AttributesDataSize[j], GL_FLOAT, false, 0, 0);
+		}
+
+
 	glDrawElements(GL_TRIANGLES, m_nbIndicesTri, GL_UNSIGNED_INT, 0);
 	glDisableClientState(GL_INDEX_ARRAY);
 
@@ -186,6 +215,12 @@ void MapRender_VBO::drawTriangles(bool bindColors)
 			}
 		}
 	}
+
+
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
+		if(m_usedAttributes[j])
+			glDisableVertexAttribArray(j+FIRST_VERTEX_ATTRIB);
+
 }
 
 void MapRender_VBO::drawLines(bool bindColors)
@@ -218,6 +253,14 @@ void MapRender_VBO::drawLines(bool bindColors)
 		}
 	}
 
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
+		if(m_usedAttributes[j])
+		{
+			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[j+ FIRST_ATTRIBUTE_BUFFER]);
+			glEnableVertexAttribArray(j+FIRST_VERTEX_ATTRIB);
+			glVertexAttribPointer(j+FIRST_VERTEX_ATTRIB, m_AttributesDataSize[j], GL_FLOAT, false, 0, 0);
+		}
+
 	glDrawElements(GL_LINES, m_nbIndicesLines, GL_UNSIGNED_INT, 0);
 	glDisableClientState(GL_INDEX_ARRAY);
 
@@ -240,6 +283,11 @@ void MapRender_VBO::drawLines(bool bindColors)
 			}
 		}
 	}
+
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
+		if(m_usedAttributes[j])
+			glDisableVertexAttribArray(j+FIRST_VERTEX_ATTRIB);
+
 }
 
 void MapRender_VBO::drawPoints(bool bindColors)
@@ -272,6 +320,14 @@ void MapRender_VBO::drawPoints(bool bindColors)
 		}
 	}
 
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
+		if(m_usedAttributes[j])
+		{
+			glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[j+ FIRST_ATTRIBUTE_BUFFER]);
+			glEnableVertexAttribArray(j+FIRST_VERTEX_ATTRIB);
+			glVertexAttribPointer(j+FIRST_VERTEX_ATTRIB, m_AttributesDataSize[j], GL_FLOAT, false, 0, 0);
+		}
+
 	glDrawElements(GL_POINTS, m_nbIndicesPoints, GL_UNSIGNED_INT, 0) ;
 	glDisableClientState(GL_INDEX_ARRAY);
 
@@ -296,6 +352,11 @@ void MapRender_VBO::drawPoints(bool bindColors)
 			}
 		}
 	}
+
+	for(unsigned int j = 0; j < m_nbVertexAttrib; ++j)
+		if(m_usedAttributes[j])
+			glDisableVertexAttribArray(j+FIRST_VERTEX_ATTRIB);
+
 }
 
 

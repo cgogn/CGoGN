@@ -37,6 +37,111 @@ namespace VBO
 {
 
 
+// inline functions:
+inline void MapRender_VBO::enableVertexAttrib(unsigned int index)
+{
+	m_usedAttributes[index] = true ;
+}
+
+inline void MapRender_VBO::disableVertexAttrib(unsigned int index)
+{
+	m_usedAttributes[index] = false ;
+}
+
+
+/**
+ * enable a vertex attribute for rendering (updateDate automatically enable attrib)
+ */
+inline void MapRender_VBO::enableVertexAttrib(const std::string& name)
+{
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it != m_attributebyName.end())
+		enableVertexAttrib(it->second);
+	else
+		std::cerr <<"enableVertexAttrib: unknown attribute "<< name << std::endl;
+}
+
+
+
+inline void MapRender_VBO::disableVertexAttrib(const std::string& name)
+{
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it != m_attributebyName.end())
+		disableVertexAttrib(it->second);
+	else
+		std::cerr <<"disableVertexAttrib: unknown attribute "<< name << std::endl;
+}
+
+
+
+inline unsigned int MapRender_VBO::useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh)
+{
+	unsigned int vertex_attrib =0;
+
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it == m_attributebyName.end())
+	{
+		vertex_attrib = m_nbVertexAttrib++;
+		m_attributebyName.insert(std::pair<std::string,unsigned int>(name,vertex_attrib));
+	}
+	else
+		vertex_attrib = it->second;
+
+	sh.bindAttrib(vertex_attrib+FIRST_VERTEX_ATTRIB,name.c_str());
+
+	return vertex_attrib;
+}
+
+
+template <typename ATTR_HANDLER>
+void MapRender_VBO::updateVAData(unsigned int vertex_attrib, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+{
+	// choisit le bon buffer en fonction du paramètre upType
+
+	unsigned int indexVBO = vertex_attrib + FIRST_ATTRIBUTE_BUFFER;
+
+	if (! m_allocatedAttributes[vertex_attrib] )
+	{
+		glGenBuffersARB(1, &(m_VBOBuffers[indexVBO])) ;
+		m_allocatedAttributes[vertex_attrib] = true ;
+	}
+
+
+	m_usedAttributes[vertex_attrib] = true ;
+	m_AttributesDataSize[vertex_attrib]= sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
+
+
+	if (conv)
+		fillBufferConvert(indexVBO, attrib, conv) ;
+	else
+		fillBufferDirect(indexVBO, attrib) ;
+}
+
+
+
+
+
+
+template <typename ATTR_HANDLER>
+void MapRender_VBO::updateVAData(const std::string& name, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
+{
+	unsigned int vertex_attrib = 0;
+
+	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
+	if (it == m_attributebyName.end())
+	{
+		vertex_attrib = m_nbVertexAttrib++;
+		m_attributebyName.insert(std::pair<std::string,unsigned int>(name,vertex_attrib));
+		std::cerr << "warning update data with unknown name, adding vertex attribute"<< std::endl;
+	}
+	else
+	{
+		vertex_attrib = it->second;
+	}
+
+	updateVAData<ATTR_HANDLER>(vertex_attrib,attrib,conv);
+}
+
 
 template <typename ATTR_HANDLER>
 void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
@@ -323,14 +428,6 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 				initLines<PFP>(map,good,tableIndices,thread) ;
 			m_nbIndicesLines = tableIndices.size();
 			vbo_ind = m_VBOBuffers[LINE_INDICES];
-
-			for (unsigned int i=0; i< tableIndices.size(); ++i)
-			{
-				std::cout << tableIndices[i]<< "/";
-				if (i%2 == 1) std::cout << std::endl;
-			}
-			 std::cout << std::endl;
-
 			break;
 		case POINTS:
 			initPoints<PFP>(map,good,tableIndices,thread);

@@ -428,6 +428,39 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 }
 
 
+bool GLSLShader::link()
+{
+	int		status;
+	char	*info_log;
+
+
+	/*** link program object ***/
+	glLinkProgramARB( m_program_object );
+
+	glGetObjectParameterivARB( m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
+	if( !status )
+	{
+		std::cerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << std::endl;
+		info_log = getInfoLog( m_program_object );
+		std::cerr << "  LINK " << info_log << std::endl;
+		delete [] info_log;
+
+		glDetachObjectARB( m_program_object, m_vertex_shader_object );
+		glDetachObjectARB( m_program_object, m_fragment_shader_object );
+		if (m_geom_shader_object)
+			glDetachObjectARB( m_program_object, m_geom_shader_object );
+		glDeleteObjectARB( m_program_object );
+		m_program_object = 0;
+
+		return false;
+	}
+
+	return true;
+}
+
+
+
+
 bool GLSLShader::bind()
 {
 	if( m_program_object )

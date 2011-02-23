@@ -125,6 +125,10 @@ SimpleGlutWinGL3::SimpleGlutWinGL3(int* argc, char **argv, int winX, int winY)
 	std::cout << "OpenGL v"<<MajorVersionContext<<"."<<MinorVersionContext<<std::endl;
 	std::cout << glGetString(GL_VERSION)<<std::endl;
 
+	int nbatt;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nbatt);
+	std::cout << "Attribute max: "<< nbatt << std::endl;
+
 	shaderOk = Utils::GLSLShader::init();
 
 

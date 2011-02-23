@@ -268,6 +268,14 @@ public:
 
 int main(int argc, char **argv)
 {
+
+	if (argc < 2)
+	{
+		std::cerr << argv[0] << "  mesh"<< std::endl;
+		exit(1);
+	}
+
+
 	// declaration of the map
 	PFP::MAP myMap;
 
@@ -279,8 +287,7 @@ int main(int argc, char **argv)
 	MyGlutWin mgw(&argc, argv, 800, 800);
 	glewInit();
 
-	// release context (leave it for thread 0);
-	mgw.releaseContext();
+
 
 	std::vector<std::string> attrNames ;
 	if(!Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames))
@@ -295,8 +302,6 @@ int main(int argc, char **argv)
 	// cree un handler d'attribut pour la position des points (créé lors de l'import)
 	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
-
-	std::cout << "Sommets:"<< position.end()<< std::endl;
 	// cree un handler pour les normales aux sommets
 	AttributeHandler<PFP::VEC3> normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 	AttributeHandler<PFP::VEC3> normal2 = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal2");
@@ -330,8 +335,6 @@ int main(int argc, char **argv)
 	// on calcule la somme des resultats
 	std::pair<double,unsigned int> le = Algo::Parallel::sumPairResult<double,unsigned int>(lengthp);
 	std::cout << "length :" <<le.first/le.second<< std::endl;
-
-
 
 
 	// on enleve les markers ajoutes
