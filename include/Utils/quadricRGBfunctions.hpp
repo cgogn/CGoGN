@@ -54,7 +54,7 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 	MATRIX66 R1,R2_A,R2_b,R2_c;
 
 	buildRotateMatrix(R1,gamma); // Rotation 1
-	R1.transpose() ;
+
 	buildIntegralMatrix_A(R2_A,alpha); // Parameterized integral matrix A
 	buildIntegralMatrix_b(R2_b,alpha); // Parameterized integral matrix b
 	buildIntegralMatrix_c(R2_c,alpha); // Parameterized integral matrix c
@@ -66,10 +66,8 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 
 		if (!cf.getSubVectorH(col,0,function))
 			assert(!"QuadricRGBfunctions::constructor") ;
-//		std::cout << "gamma = " << gamma << " -- function = " << function ;
+
 		function = R1 * function ; // Rotation 1
-//		std::cout << " -- function after R1 = " << function << std::endl ;
-//		std::cout << "R1 = " << R1 << std::endl ;
 
 		b[col] = R2_b * function ;	// Vector b : integral + rotation on 1 vector
 		c[col] = function * (R2_c * function) ;	// Scalar c : integral + rotation on 2 vectors
@@ -132,160 +130,51 @@ void QuadricRGBfunctions<REAL>::buildIntegralMatrix_A(MATRIX66 &M, const REAL al
 
 	// Line 1
 	M(0,0) = 2.0*(pi-alphaAbs)/5.0f;
-
 	M(0,1) = 2.0 * (pi - alphaAbs - cosinus*sinAbs) / 15.0 ;
-
 	M(0,2) = 0;
-
 	M(0,3) = 0;
-
 	M(0,4) = sinAbs*pi / 8.0;
-
 	M(0,5) = 2.0*(pi-alphaAbs)/3.0;
 
 	// Line 2
 	M(1,0) = M(0,1);
-
 	M(1,1) = (-4.0 * sinAbs*cos3 + 6.0 * (pi - cosinus*sinAbs - alphaAbs)) / 15.0 ;
-
 	M(1,2) = REAL(0);
-
 	M(1,3) = REAL(0);
-
 	M(1,4) = (sinus*cos2*pi + 2*sinus*pi) / 8.0;
-
 	M(1,5) = 2.0*(pi-cosinus*sinAbs-alphaAbs)/3.0;
 
 	// LINE 3
 	M(2,0) = REAL(0);
-
 	M(2,1) = REAL(0);
-
 	M(2,2) = 2.0*(pi - alphaAbs - cosinus*sinAbs)/15.0;
-
 	M(2,3) = pi*sinus/8.0f;
-
 	M(2,4) = REAL(0) ;
-
 	M(2,5) = REAL(0) ;
 
 	// Line 4
 	M(3,0) = REAL(0) ;
-
 	M(3,1) = REAL(0) ;
-
 	M(3,2) = M(2,3);
-
 	M(3,3) = 2.0*(pi-alphaAbs)/3.0 ;
-
 	M(3,4) = REAL(0) ;
-
 	M(3,5) = REAL(0) ;
 
 	// Line 5
 	M(4,0) = M(0,4) ;
-
 	M(4,1) = M(1,4) ;
-
 	M(4,2) = REAL(0) ;
-
 	M(4,3) = REAL(0) ;
-
 	M(4,4) = 2.0 * (pi - cosinus*sinAbs - alphaAbs ) / 3.0 ;
-
 	M(4,5) = pi*sinus / 2.0 ;
 
 	// Line 6
 	M(5,0) = M(0,5) ;
-
 	M(5,1) = M(1,5) ;
-
 	M(5,2) = REAL(0) ;
-
 	M(5,3) = REAL(0) ;
-
 	M(5,4) = M(4,5) ;
-
 	M(5,5) = 2.0*(pi-alphaAbs);
-
-/*	// Line 1
-	M(0,0) = 2.0*(pi-alphaAbs)/5.0f;
-
-	M(0,1) = 2.0 * (pi - alphaAbs - cosAbs*sinus) / 15.0 ;
-
-	M(0,2) = 0;
-
-	M(0,3) = 0;
-
-	M(0,4) = - sinus*pi / 8.0;
-
-	M(0,5) = 2.0*(pi-alphaAbs)/3.0;
-
-	// Line 2
-	M(1,0) = M(0,1);
-
-	M(1,1) = -4.0 * sinus*cosAbs*cosAbs*cosAbs / 15.0 + 2.0 * (pi - cosAbs*sinus - alphaAbs) / 5.0 ;
-
-	M(1,2) = 0;
-
-	M(1,3) = 0;
-
-	M(1,4) = -(sinus*cosinus*cosinus*pi + 2*sinus*pi) / 8.0;
-
-	M(1,5) = 2.0*(pi-cosAbs*sinus-alphaAbs)/3.0;
-
-	// LINE 3
-	M(2,0) = REAL(0);
-
-	M(2,1) = REAL(0);
-
-	M(2,2) = 2.0*(pi - alphaAbs - cosAbs*sinus)/15.0;
-
-	M(2,3) = -pi*sinus/8.0f;
-
-	M(2,4) = REAL(0) ;
-
-	M(2,5) = REAL(0) ;
-
-	// Line 4
-	M(3,0) = REAL(0) ;
-
-	M(3,1) = REAL(0) ;
-
-	M(3,2) = M(2,3);
-
-	M(3,3) = 2.0*(pi-alphaAbs)/3.0 ;
-
-	M(3,4) = REAL(0) ;
-
-	M(3,5) = REAL(0) ;
-
-	// Line 5
-	M(4,0) = - M(0,4) ;
-
-	M(4,1) = - (2*pi*sinus + sinus*cosinus*cosinus*pi ) / 8.0 ;
-
-	M(4,2) = REAL(0) ;
-
-	M(4,3) = REAL(0) ;
-
-	M(4,4) = 2.0 * (pi - cosAbs*sinus - alphaAbs ) / 3.0 ;
-
-	M(4,5) = - pi*sinus / 2.0 ;
-
-	// Line 6
-	M(5,0) = M(0,5) ;
-
-	M(5,1) = M(1,5) ;
-
-	M(5,2) = REAL(0) ;
-
-	M(5,3) = REAL(0) ;
-
-	M(5,4) = M(4,5) ;
-
-	M(5,5) = 2.0*(pi-alphaAbs);
-*/
 }
 
 
@@ -307,80 +196,50 @@ void QuadricRGBfunctions<REAL>::buildIntegralMatrix_b(MATRIX66 &M, const REAL al
 
 	// Line 1
 	M(0,0) = 2.0*(pi-alphaAbs)/5.0f;
-
 	M(0,1) = ( 6*cosinus*sinAbs - 8*sinAbs*cos3 - 2*alphaAbs + 2*pi ) / 15.0 ;
-
 	M(0,2) = 0;
-
 	M(0,3) = 0;
-
 	M(0,4) = (sinus*pi + 2*pi*cosinus*sinus) / 8.0 ;
-
 	M(0,5) = 2.0*(pi-alphaAbs)/3.0;
 
 	// Line 2
 	M(1,0) = 2 * (pi - cosinus*sinAbs - alphaAbs ) / 15.0 ;
-
 	M(1,1) = ( 6*cosinus*sinAbs - 2*alphaAbs + 2*pi - 16*sinAbs*cos5+4*cos2*pi  - 4*alphaAbs * cos2 ) / 15.0 ;
-
 	M(1,2) = 0;
-
 	M(1,3) = 0;
-
 	M(1,4) = (sinus*pi + 2* (pi*sinus*cos3+pi*cosinus*sinus)) / 8.0 ;
-
 	M(1,5) = 2.0*(pi-cosinus*sinAbs-alphaAbs) / 3.0;
 
 	// LINE 3
 	M(2,0) = REAL(0);
-
 	M(2,1) = REAL(0);
-
 	M(2,2) = 2 * (sinAbs - cosinus*alphaAbs + cosinus*pi - 2*cos2*sinAbs) / 15.0 ;
-
 	M(2,3) = pi*sinus / 8.0f;
-
 	M(2,4) = REAL(0) ;
-
 	M(2,5) = REAL(0) ;
 
 	// Line 4
 	M(3,0) = REAL(0) ;
-
 	M(3,1) = REAL(0) ;
-
 	M(3,2) = ( sinus*pi + 2*pi*cosinus*sinus ) / 8.0 ;
-
 	M(3,3) = 2.0*(pi-alphaAbs)/3.0 ;
-
 	M(3,4) = REAL(0) ;
-
 	M(3,5) = REAL(0) ;
 
 	// Line 5
 	M(4,0) = pi*sinus / 8.0 ;
-
 	M(4,1) = (sinus*pi + 4 * sinus * cos4 + 2*pi*cosinus*sinus) / 8.0 ;
-
 	M(4,2) = REAL(0) ;
-
 	M(4,3) = REAL(0) ;
-
 	M(4,4) = 2*(sinAbs - cosinus*alphaAbs + cosinus*pi - 2*cos2*sinAbs) / 3.0 ;
-
 	M(4,5) = pi*sinus / 2.0 ;
 
 	// Line 6
 	M(5,0) = M(0,5) ;
-
 	M(5,1) = 2*cosinus*sinAbs + 2*(pi-4*sinAbs*cos3-alphaAbs) / 3.0 ;
-
 	M(5,2) = REAL(0) ;
-
 	M(5,3) = REAL(0) ;
-
 	M(5,4) = sinus*pi / 2.0 + pi*cosinus*sinus ;
-
 	M(5,5) = 2.0*(pi-alphaAbs);
 }
 
@@ -403,80 +262,50 @@ void QuadricRGBfunctions<REAL>::buildIntegralMatrix_c(MATRIX66 &M, const REAL al
 
 	// Line 1
 	M(0,0) = 2.0*(pi-alphaAbs)/5.0f;
-
 	M(0,1) = 2.0 * (3*cosinus*sinAbs-4*sinAbs*cos3-alphaAbs+pi) / 15.0 ;
-
 	M(0,2) = 0;
-
 	M(0,3) = 0;
-
 	M(0,4) = (sinus*pi + 2*pi*cosinus*sinus) / 8.0;
-
 	M(0,5) = 2.0*(pi-alphaAbs)/3.0;
 
 	// Line 2
 	M(1,0) = M(0,1);
-
 	M(1,1) = (96*sinAbs*cos5 - 64*cos7*sinAbs+26*cosinus*sinAbs-68*sinAbs*cos3-6*alphaAbs+6*pi) / 15.0 ;
-
 	M(1,2) = 0;
-
 	M(1,3) = 0;
-
 	M(1,4) = (2*sinus*pi + pi * sinus*cos5 - pi*sinus*cos3 + 6*pi*cosinus*sinus + sinus*cos2*pi) / 8.0 ;
-
 	M(1,5) = 2*cosinus*sinAbs + (2*pi-8*sinAbs*cos3 - 2*alphaAbs) / 3.0 ;
 
 	// LINE 3
 	M(2,0) = REAL(0);
-
 	M(2,1) = REAL(0);
-
 	M(2,2) = 2.0*(3*cosinus*sinAbs - 4*sinAbs*cos3 - alphaAbs + pi)/15.0;
-
 	M(2,3) = pi*sinus/8.0f + cosinus*sinus*pi / 4.0f;
-
 	M(2,4) = REAL(0) ;
-
 	M(2,5) = REAL(0) ;
 
 	// Line 4
 	M(3,0) = REAL(0) ;
-
 	M(3,1) = REAL(0) ;
-
 	M(3,2) = M(2,3);
-
 	M(3,3) = 2.0*(pi-alphaAbs)/3.0 ;
-
 	M(3,4) = REAL(0) ;
-
 	M(3,5) = REAL(0) ;
 
 	// Line 5
 	M(4,0) = M(0,4) ;
-
 	M(4,1) = M(1,4) ;
-
 	M(4,2) = REAL(0) ;
-
 	M(4,3) = REAL(0) ;
-
 	M(4,4) = M(1,5) ;
-
 	M(4,5) = pi*sinus / 2.0 + pi*cosinus*sinus ;
 
 	// Line 6
 	M(5,0) = M(0,5) ;
-
 	M(5,1) = M(1,5) ;
-
 	M(5,2) = REAL(0) ;
-
 	M(5,3) = REAL(0) ;
-
 	M(5,4) = M(4,5) ;
-
 	M(5,5) = 2.0*(pi-alphaAbs);
 }
 
@@ -487,24 +316,22 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, const REAL gamma)
 	REAL sinus = sin(gamma), sin2 = sinus*sinus;
 	REAL sincos = sinus*cosinus;
 
-	// Transposed matrix for left-hand side application
-
 	N(0,0) = cos2;
 	N(0,1) = sin2;
-	N(0,2) = -sincos;
+	N(0,2) = 2*sincos;
 	N(0,3) = REAL(0);
 	N(0,4) = REAL(0);
 	N(0,5) = REAL(0);
 
 	N(1,0) = sin2;
 	N(1,1) = cos2;
-	N(1,2) = sincos;
+	N(1,2) = -2*sincos;
 	N(1,3) = REAL(0);
 	N(1,4) = REAL(0);
 	N(1,5) = REAL(0);
 
-	N(2,0) = 2*sincos;
-	N(2,1) = -2*sincos;
+	N(2,0) = -sincos;
+	N(2,1) = sincos;
 	N(2,2) = cos2-sin2;
 	N(2,3) = REAL(0);
 	N(2,4) = REAL(0);
@@ -514,13 +341,13 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, const REAL gamma)
 	N(3,1) = REAL(0);
 	N(3,2) = REAL(0);
 	N(3,3) = cosinus;
-	N(3,4) = -sinus;
 	N(3,5) = REAL(0);
+	N(3,4) = sinus;
 
 	N(4,0) = REAL(0);
 	N(4,1) = REAL(0);
 	N(4,2) = REAL(0);
-	N(4,3) = sinus;
+	N(4,3) = -sinus;
 	N(4,4) = cosinus;
 	N(4,5) = REAL(0);
 
