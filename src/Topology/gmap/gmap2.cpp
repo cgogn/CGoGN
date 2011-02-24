@@ -86,14 +86,24 @@ void GMap2::cutEdge(Dart d)
 	}
 }
 
-void GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
+Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
 {
-	Dart f;								// A dart in the face to check
-	Dart e = phi2(d);					// Test if an opposite edge exists
-	if (e != d)
+	Dart resV ;
+
+	Dart e = phi2(d);
+	if (e != d)			// Test if an opposite edge exists
 	{
-		f = phi1(e);					// A dart in the face of e
-		phi2unsew(d);					// Unlink the opposite edges
+		phi2unsew(d);	// Unlink the opposite edges
+		Dart f = phi1(e) ;
+		Dart g = phi_1(e) ;
+
+		if(f != d && !isFaceTriangle(e))
+			resV = f ;
+		else if(phi2(g) != g)
+			resV = phi2(g) ;
+		else if(f != d && phi2(f) != f)
+			resV = phi1(phi2(f)) ;
+
 		if (f != e && delDegenerateFaces)
 		{
 			GMap1::collapseEdge(e);		// Collapse edge e
@@ -102,7 +112,20 @@ void GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
 		else
 			GMap1::collapseEdge(e);	// Just collapse edge e
 	}
-	f = phi1(d);					// A dart in the face of d
+
+	Dart f = phi1(d) ;
+	Dart g = phi_1(d) ;
+
+	if(resV == Dart::nil())
+	{
+		if(!isFaceTriangle(d))
+			resV = f ;
+		else if(phi2(g) != g)
+			resV = phi2(g) ;
+		else if(phi2(f) != f)
+			resV = phi1(phi2(f)) ;
+	}
+
 	if (f != d && delDegenerateFaces)
 	{
 		GMap1::collapseEdge(d);		// Collapse edge d
@@ -110,6 +133,8 @@ void GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
 	}
 	else
 		GMap1::collapseEdge(d);	// Just collapse edge d
+
+	return resV ;
 }
 
 bool GMap2::flipEdge(Dart d)
@@ -453,7 +478,7 @@ bool GMap2::check()
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
 	do
@@ -465,12 +490,12 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f)
  	return false;
 }
 
-bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_vertex(d, f) || foreach_dart_of_oriented_vertex(beta1(d), f) ;
+	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
 }
 
-bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d))
 		return true ;
@@ -490,11 +515,11 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f)
 	return false ;
 }
 
-bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f)
+bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	bool found = false;
 	// lock a marker
-	DartMarkerStore markCC(*this);
+	DartMarkerStore markCC(*this,thread);
 
 	// init algo with parameter dart
 	std::list<Dart> darts_list;

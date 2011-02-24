@@ -36,7 +36,7 @@ namespace CGoGN
 class GMap2 : public GMap1
 {
 protected:
-	AttribMultiVect<Dart>* m_beta2 ;
+	AttributeMultiVector<Dart>* m_beta2 ;
 
 public:
 	GMap2();
@@ -120,8 +120,9 @@ public:
 	 *  was the only link between two border faces
 	 *  @param d a dart in the deleted edge
 	 *  @param delDegenerateFaces a boolean (default to true)
+	 *  @return a dart of the resulting vertex
 	 */
-	virtual void collapseEdge(Dart d, bool delDegenerateFaces);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces);
 
 	/**
 	 * Flip the edge of d. (rotation in phi1 order)
@@ -265,40 +266,40 @@ public:
 	* @param d a dart of the face
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct);
+	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of a face
 	* @param d a dart of the face
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct);
+	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of an edge
 	* @param d a dart of the oriented face
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_edge(Dart d, FunctorType& fonct);
+	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct);
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct);
+	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of a cc
 	* @param d a dart of the cc
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_cc(Dart d, FunctorType& fonct);
+	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0);
 	//@}
 };
 

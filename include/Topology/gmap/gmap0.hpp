@@ -77,12 +77,12 @@ inline void GMap0::beta0unsew(Dart d)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap0::foreach_dart_of_vertex(Dart d, FunctorType& f)
+inline bool GMap0::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	return f(d) ;
 }
 
-inline bool GMap0::foreach_dart_of_edge(Dart d, FunctorType& f)
+inline bool GMap0::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d)) return true;
 	Dart d1 = beta0(d);
@@ -90,24 +90,24 @@ inline bool GMap0::foreach_dart_of_edge(Dart d, FunctorType& f)
 	return false;
 }
 
-inline bool GMap0::foreach_dart_of_oriented_face(Dart d, FunctorType& f)
+inline bool GMap0::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	return f(d) ;
 }
 
-inline bool GMap0::foreach_dart_of_face(Dart d, FunctorType& f)
+inline bool GMap0::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_edge(d,f) ;
+	return foreach_dart_of_edge(d,f, thread) ;
 }
 
-inline bool GMap0::foreach_dart_of_volume(Dart d, FunctorType& f)
+inline bool GMap0::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_face(d,f) ;
+	return foreach_dart_of_oriented_face(d,f,thread) ;
 }
 
-inline bool GMap0::foreach_dart_of_cc(Dart d, FunctorType& f)
+inline bool GMap0::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_face(d,f) ;
+	return foreach_dart_of_face(d,f, thread) ;
 }
 
 } // namespace CGoGN

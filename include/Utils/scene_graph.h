@@ -28,6 +28,7 @@
 #include <string>
 #include "Geometry/matrix.h"
 #include "Algo/Render/vbo_MapRender.h"
+#include "Utils/GLSLShader.h"
 
 
 namespace CGoGN
@@ -106,7 +107,8 @@ protected:
 	bool m_has_ambient;
 	bool m_has_shininess;
 	bool m_has_color;
-
+	Utils::GLSLShader* m_shader;
+	bool m_disable_shader;
 public:
 	/**
 	 * Constructor
@@ -142,6 +144,16 @@ public:
 	 * @param v the color RGBA
 	 */
 	void setColor(const Geom::Vec4f& v);
+
+	/**
+	 * set the shader that will be used in children
+	 */
+	void setShader(Utils::GLSLShader* shader);
+
+	/**
+	 * Explicitly disable shaders when traverse this node
+	 */
+	void setNoShader();
 
 	/**
 	 * Rendering callback (used in traversal by renderGraph)
@@ -198,10 +210,16 @@ public:
 	void removeChild(Node* child);
 
 	/**
-	 * set trnaformation matrix (4x4)
+	 * set transformation matrix (4x4)
 	 * @param mat matrix (copy and stored here transposed for OGL)
 	 */
 	void setMatrixTransfo(const Geom::Matrix44f& mat);
+
+	/**
+	 * get the transformation matrix
+	 * @ return a copy of the matrix (I if none)
+	 */
+	Geom::Matrix44f getMatrixTransfo() const;
 
 	/**
 	 * set material

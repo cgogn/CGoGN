@@ -46,10 +46,18 @@ template <typename PFP>
 typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = SelectorTrue()) ;
+void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread=0) ;
 
+/**
+ * compute normals of  vertices
+ * @param map the map on which we work
+ * @param position the position of vertices attribute handler
+ * @param normal the normal handler in which the result will be stored
+ * @param the selector
+ * @ param th the thread number
+ */
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue()) ;
+void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread=0) ;
 
 } // namespace Geometry
 

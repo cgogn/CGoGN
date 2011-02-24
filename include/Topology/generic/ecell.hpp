@@ -51,7 +51,7 @@ ECellDart<DIM>::~ECellDart()
 }
 
 template <int DIM>
-void ECellDart<DIM>::setContainer(AttribContainer& cont)
+void ECellDart<DIM>::setContainer(AttributeContainer& cont)
 {
 	s_cont = &cont;
 }

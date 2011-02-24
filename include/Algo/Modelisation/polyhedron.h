@@ -320,7 +320,7 @@ public:
 	* mark all darts of the Polyhedron
 	* @param m the CellMarker(VERTEX) to use
 	*/
-	void mark(CellMarker m);
+	void mark(CellMarker& m);
 
 	/**
 	* mark all embedded vertices of the Polyhedron

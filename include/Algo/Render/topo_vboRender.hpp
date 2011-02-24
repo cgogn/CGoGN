@@ -78,7 +78,7 @@ void topo_VBORenderMapD::updateData(typename PFP::MAP& map, const typename PFP::
 	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
-	unsigned int posDBI=0;
+	unsigned int posDBI = 0;
 
 	DartMarker mf(map);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
@@ -176,11 +176,7 @@ void topo_VBORenderMapD::updateData(typename PFP::MAP& map, const typename PFP::
 
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[2]);
 	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
-
 }
-
-
-
 
 template<typename PFP>
 void topo_VBORenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)

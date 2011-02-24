@@ -63,7 +63,7 @@ bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vecto
 	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
 
 	// open file
 	std::ifstream fp(filename.c_str(), std::ios::in);

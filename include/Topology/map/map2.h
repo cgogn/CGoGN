@@ -48,7 +48,7 @@ namespace CGoGN
 class Map2 : public Map1
 {
 protected:
-	AttribMultiVect<Dart>* m_phi2 ;
+	AttributeMultiVector<Dart>* m_phi2 ;
 
 public:
 	typedef Map1 ParentMap;
@@ -132,14 +132,15 @@ public:
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
-	 *  faces are build (faces with less than 3 edges). If it occurs the faces
+	 *  faces are built (faces with less than 3 edges). If it occurs the faces
 	 *  are deleted and the adjacencies are updated (see collapseDegeneratedFace).
 	 *  \warning This may produce two distinct vertices if the edge
 	 *  was the only link between two border faces
 	 *  @param d a dart in the deleted edge
 	 *  @param delDegenerateFaces a boolean (default to true)
+	 *  @return a dart of the resulting vertex
 	 */
-	virtual void collapseEdge(Dart d, bool delDegenerateFaces = true);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
 	 * Flip the edge of d. (rotation in phi1 order)
@@ -241,12 +242,6 @@ public:
 	* no dart created, each dart keeps its embedding, only changing phi1 and phi2
 	*/
 	void reverseOrientation();
-
-	// TODO a mettre en algo
-	/**
-	 * compute the topological dual of the current map
-	 */
-	void computeDual();
 	//@}
 
 	/*! @name Topological Queries
@@ -312,41 +307,41 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_vertex(Dart d, FunctorType& f);
+	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a edge
 	/*! @param d a dart of the edge
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_edge(Dart d, FunctorType& f);
+	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f);
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread=0);
 
-	bool foreach_dart_of_volume(Dart d, FunctorType& f);
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on every dart of a connected component
 	/*! @param d a dart of the connected component
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_cc(Dart d, FunctorType& f);
+	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//!
 	/*! TODO Ajout a valider
 	 * restreint aux complexes simpliciaux
 	 * Apply a functor on the all darts in the set of the star from orbit
 	 */
-	bool foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f);
+	bool foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 
 	//!
 	/*! TODO Ajout a valider
 	 * restreint aux complexes simpliciaux
 	 * Apply a functor on the all darts in the set of the link from orbit
 	 */
-	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f);
+	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 
 	//@}
 };

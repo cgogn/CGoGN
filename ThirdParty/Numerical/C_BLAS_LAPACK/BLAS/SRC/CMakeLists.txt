@@ -135,7 +135,7 @@ if(BLAS_COMPLEX16)
 	${ALLBLAS} ${ZBLAS2} ${ZBLAS3})
 endif()
   
-set(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
+
 add_library(blas ${ALLOBJ})
 if(UNIX)
   target_link_libraries(blas m)

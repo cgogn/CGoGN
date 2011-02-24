@@ -49,102 +49,196 @@ namespace Utils
 
 ////////// CLASS DECLARATION //////////
 
-APIEXPORT class GLSLShader
+class GLSLShader
 {
-	/*********\
-	| TYPE(S) |
-	\*********/
-protected:
-	struct Sampler
-	{
-		int		location;
-		int		tex_unit;
-	};
 
-	struct Uniform
-	{
-		int		location;
-		int		size;
-		int		type;
-	};
-
-
-	/**************\
-	| ATTRIBUTE(S) |
-	\**************/
-protected:
-	GLhandleARB						vertex_shader_object;
-	GLhandleARB						fragment_shader_object;
-	GLhandleARB						geom_shader_object;
-	GLhandleARB						program_object;
-
-	std::map<std::string,Sampler>	sampler_list;
-	std::map<std::string,Uniform>	unif_list;
-	std::map<std::string,GLuint>	attrib_list;
-
-
-	/****************\
-	| CONSTRUCTOR(S) |
-	\****************/
 public:
+	/**
+	 * enum of supported shader type
+	 */
+	enum shaderType {VERTEX_SHADER = 1, FRAGMENT_SHADER = 2, GEOMETRY_SHADER = 3 };
+
+
+protected:
+	/**
+	 * handle of vertex shader
+	 */
+	GLhandleARB	m_vertex_shader_object;
+
+	/**
+	 * handle of fragment shader
+	 */
+	GLhandleARB	m_fragment_shader_object;
+
+	/**
+	 * handle of geometry shader
+	 */
+	GLhandleARB	m_geom_shader_object;
+
+	/**
+	 * handle of program
+	 */
+	GLhandleARB m_program_object;
+
+
+	/**
+	 * load vertex shader
+	 * @param vertex_shader_source src text shader
+	 */
+	bool loadVertexShaderSourceString( const char* vertex_shader_source );
+
+	/**
+	 * load fragment shader
+	 * @param fragment_shader_source src text shader
+	 */
+	bool loadFragmentShaderSourceString( const char* fragment_shader_source );
+
+	/**
+	 * load geometry shader
+	 * @param geom_shader_source src text shader
+	 */
+	bool loadGeometryShaderSourceString( const char* geom_shader_source );
+
+	/**
+	 * load vertex shader
+	 * @param filename file name
+	 */
+	bool loadVertexShader( const std::string& filename );
+
+	/**
+	 * load fragment shader
+	 * @param filename file name
+	 */
+	bool loadFragmentShader( const std::string& filename );
+
+	/**
+	 * load geometry shader
+	 * @param filename file name
+	 */
+	bool  loadGeometryShader( const std::string& filename );
+
+	/**
+	 * Load of source file in a char buffer
+	 * @param source_file file name
+	 */
+	char* loadSourceFile( const std::string& source_file );
+
+	/**
+	 * create the shader (attach and link shaders into program)
+	 */
+	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
+
+	/*
+	 * search file in different path
+	 */
+	std::string findFile(const std::string filename);
+
+	/**
+	 * get log after compiling
+	 * @param obj what log do you want ?
+	 * @return the log
+	 */
+	char* getInfoLog( GLhandleARB obj );
+
+
+public:
+	/**
+	 * constructor
+	 */
 	GLSLShader();
 
 
-	/***********\
-	| METHOD(S) |
-	\***********/
-protected:
-	char*			getInfoLog( GLhandleARB obj );
+	/**
+	 * destructor
+	 */
+	virtual ~GLSLShader();
 
 
-public:
-	static bool		areShadersSupported();
+	/**
+	 * test support of shader
+	 */
+	static bool	areShadersSupported();
 
-	static bool		areVBOSupported();
+	/**
+	 * test support of Vertex Buffer Object
+	 */
+	static bool	areVBOSupported();
 
-	static bool		areGeometryShadersSupported();
+	/**
+	 * test support of geometry shader
+	 */
+	static bool	areGeometryShadersSupported();
 
-	bool			loadVertexShaderSourceString( const char* vertex_shader_source );
-	bool			loadPixelShaderSourceString( const char* pixel_shader_source );
-	bool			loadGeometryShaderSourceString( const char* pixel_shader_source );
+	/**
+	 * test support of gl3
+	 */
+	static bool	isGL3Supported();
 
 
-	bool			loadVertexShader( const std::string& filename );
-	bool			loadPixelShader( const std::string& filename );
-	bool 			loadGeometryShader( const std::string& filename );
-
-
-	bool			create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
-
-	inline bool		isCreated();
-	bool			isBinded();
-
-	virtual bool	bind();
-	virtual void	unbind();
-
-	bool			setSampler( char* sampler_name, int tex_unit );
-	bool			setUniform( char* unif_name, void* value );
-	GLuint			getAttribIndex( char* attribName );
-
-	bool 			loadShaders(const std::string& vs, const std::string& ps);
-
-	bool 			loadShaders(const std::string& vs, const std::string& ps, const std::string& gs,GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
-	
-	char*			loadSourceFile( const std::string& source_file );
-	
-	std::string findFile(const std::string filename);
-	
-
-	GLuint program_handler() { return program_object;}
-	
 	static bool init();
 
 
-	/************\
-	| DESTRUCTOR |
-	\************/
+	/**
+	 * load shaders (compile and link)
+	 * @param vs vertex shader source file
+	 * @param fs fragment shader source file
+	 */
+	bool loadShaders(const std::string& vs, const std::string& fs);
+
+	/**
+	 * load shaders (compile and link)
+	 * @param vs vertex shader source file
+	 * @param fs fragment shader source file
+	 * @param fs fragment shader source file
+	 * @param inputGeometryPrimitive primitives used in geometry shader as input
+	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
+	 */
+	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
+
+
+	/**
+	 * Link the shader do it just after binding the attributes
+	 */
+	bool link();
+
+	inline bool		isCreated();
+
+	bool			isBinded();
+
+	virtual bool	bind();
+
+	virtual void	unbind();
+
+
+	GLuint 	getAttribIndex( char* attribName );
+
+	
+	/**
+	 * get handler of program for external use og gl functions
+	 */
+	GLuint program_handler() { return m_program_object;}
+	
+
+	/**
+	 * bind vertex attribute with its name in shaders
+	 */
+	void bindAttrib(unsigned int att, const char* name) const;
+
+
+	bool validateProgram();
+
+	bool checkProgram();
+
+	bool checkShader(int shaderType);
+
 public:
-	virtual ~GLSLShader();
+
+
+	template<unsigned int NB>
+	void setuniformf( const char* name , float* val);
+
+	template<unsigned int NB>
+	void setuniformi( const char* name , int* val);
 };
 
 
@@ -153,12 +247,65 @@ public:
 
 inline bool GLSLShader::isCreated()
 {
-	return ( program_object != 0 );
+	return ( m_program_object != 0 );
+}
+
+template<unsigned int NB>
+void GLSLShader::setuniformf( const char* name , float* val)
+{
+	GLint uni = glGetUniformLocationARB(m_program_object,name);
+	if (uni>=0)
+	{
+		switch(NB)
+		{
+		case 1:
+			glUniform1fvARB( uni, 1, val) ;
+			break;
+		case 2:
+			glUniform2fvARB( uni, 1, val) ;
+			break;
+		case 3:
+			glUniform3fvARB( uni, 1, val) ;
+			break;
+		case 4:
+			glUniform4fvARB( uni, 1, val) ;
+			break;
+		case 16:
+			glUniformMatrix4fv(uni, 1 , false, val);
+			break;
+		}
+	}
+}
+
+template<unsigned int NB>
+void GLSLShader::setuniformi( const char* name , int* val)
+{
+	GLint uni = glGetUniformLocationARB(m_program_object,name);
+	if (uni>=0)
+	{
+		switch(NB)
+		{
+		case 1:
+			glUniform1ivARB( uni, 1, val) ;
+			break;
+		case 2:
+			glUniform2ivARB( uni, 2, val) ;
+			break;
+		case 3:
+			glUniform3ivARB( uni, 3, val) ;
+			break;
+		case 4:
+			glUniform4ivARB( uni, 4, val) ;
+			break;
+		}
+	}
 }
 
 
-} //namespace Utils
 
+
+
+} //namespace Utils
 } //namespace CGoGN
 
 

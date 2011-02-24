@@ -79,6 +79,12 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 }
 
 template <typename PFP>
+void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+{
+	trianguleFaces<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected) ;
+}
+
+template <typename PFP>
 Dart quadranguleFace(typename PFP::MAP& map, Dart d)
 {
 	d = map.phi1(d) ;
@@ -140,8 +146,14 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 	}
 }
 
+template <typename PFP>
+void quadranguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+{
+	quadranguleFaces<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected) ;
+}
+
 template <typename PFP, typename EMBV, typename EMB>
-void CatmullClarkSubdivision(typename PFP::MAP& map,  EMBV& attributs, const FunctorSelect& selected)
+void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
@@ -259,6 +271,12 @@ void CatmullClarkSubdivision(typename PFP::MAP& map,  EMBV& attributs, const Fun
 
 		attributs[*vert] = emcp ;
 	}
+}
+
+template <typename PFP>
+void CatmullClarkSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+{
+	CatmullClarkSubdivision<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected) ;
 }
 
 inline double betaF(unsigned int n)
@@ -410,56 +428,46 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	}
 }
 
-template <typename PFP, typename EMBV, typename EMB>
-void computeDual(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+template <typename PFP>
+void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
 {
-//	std::vector<EMB> lstEmbs;
-//	lstEmbs.reserve(map.getNbDarts()/3);
-//
-//	DartMarker m(map);
-//	for (Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if (!m.isMarked(d))
-//		{
-//			EMB center = Algo::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);
-//			m.markOrbit(FACE_ORBIT, d);
-//			lstEmbs.push_back(center);
-//		}
-//	}
-//
-//	typename std::vector<EMB>::iterator itEmb = lstEmbs.begin();
-//	for (Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if (m.isMarked(d))
-//		{
-//			unsigned int em = map.newCell(VERTEX_ORBIT);
-//			Dart dd = d;
-//			do
-//			{
-//				map.setDartEmbedding(map.phi2(dd),VERTEX_ORBIT,em);
-//				m.unmark(dd);
-//				dd = map.phi1(dd);
-//			}
-//			while (dd != d);
-//			attributs[map.phi2(d)] = *itEmb;
-//			++itEmb;
-//		}
-//	}
-//
-//	map.computeDual();
+	LoopSubdivision<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected) ;
 }
 
-template <typename PFP, typename EMBV, typename EMB>
-void Sqrt3Subdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
+template <typename PFP>
+void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 {
-	computeDual<PFP,EMBV,EMB>(map, attributs, selected);
-	trianguleFaces<PFP,EMBV,EMB>(map, attributs, selected);
+	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
+	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART_ORBIT, "phi_1") ;
+	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi1") ;
+	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi_1") ;
+
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		Dart dd = map.alpha_1(d) ;
+		new_phi1[d] = dd ;
+		new_phi_1[dd] = d ;
+	}
+
+	map.template swapAttributes<Dart>(phi1, new_phi1) ;
+	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
+
+	map.template removeAttribute<Dart>(new_phi1) ;
+	map.template removeAttribute<Dart>(new_phi_1) ;
+
+	map.swapEmbeddingContainers(VERTEX_ORBIT, FACE_ORBIT) ;
+}
+
+template <typename PFP>
+void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+{
+//	computeDual<PFP>(map, selected);
+	trianguleFaces<PFP>(map, position, selected);
 }
 
 template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFacesVolume(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-
 
 }
 

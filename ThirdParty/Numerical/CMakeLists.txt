@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Numerical)
 
-set(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
 
 SUBDIRS(C_BLAS_LAPACK)
 

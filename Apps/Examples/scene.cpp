@@ -186,7 +186,7 @@ void myGlutWin::myRedraw(void)
 //	glEnable(GL_COLOR_MATERIAL);
 //	glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 //	glColor3f(0.0f,0.0f,0.9f);
-//	m_render->draw(Algo::Render::VBO::FLAT_TRIANGLES) ;
+//	m_render->draw(Algo::Render::VBO::TRIANGLES) ;
 //
 //	glDisable( GL_POLYGON_OFFSET_FILL );
 
@@ -214,53 +214,83 @@ int main(int argc, char **argv)
 	mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
 	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
 
+	glewInit();
+	if (! Utils::GLSLShader::areShadersSupported())
+	{
+		std::cerr << "Shaders not supported"<< std::endl;
+		exit(1);
+	}
 
-//	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, mgw.position);
-//	prim1.cylinder_topo(16,16, true, true); // topo of sphere is a closed cylinder
-//	prim1.embedCylinder(40.0f,40.0f,30.0f);
-//
-//	CellMarker mark1(myMap,VERTEX_CELL);
-//	prim1.mark(mark1);
-//
+	Utils::GLSLShader* phong = new Utils::GLSLShader() ;
+	phong->loadShaders("phong_vs.txt", "phong_ps.txt") ;
+
+
+	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, mgw.position);
+	prim1.cylinder_topo(16,15, true, true);
+	prim1.embedCylinder(30.0f,20.0f,50.0f);
+
+	CellMarker mark1(myMap,VERTEX_CELL);
+	prim1.mark(mark1);
+
 	// create a sphere
 	Algo::Modelisation::Polyhedron<PFP> prim2(myMap, mgw.position);
-	prim2.cylinder_topo(16,16, true, true); // topo of sphere is a closed cylinder
+	prim2.cylinder_topo(16,16, true, true);
 	prim2.embedSphere(40.0f);
-//
-//	CellMarker mark2(myMap,VERTEX_CELL);
-//	prim2.mark(mark2);
-//
-//	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-//
-//	Algo::Render::VBO::MapRender_VBO render1 = new Algo::Render::VBO::MapRender_VBO() ;
-//
-//	render1->updateData(Algo::Render::VBO::POSITIONS, position);
-//	render1->updateData(Algo::Render::VBO::NORMALS, normal);
-//		// update flat faces primtives (warning need position buffer)
-//	render1->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::FLAT_TRIANGLES);
-//		// update smooth faces primtives
-//	render1->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
-//		// update lines primitives
-//	render1->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
-//
-//
+
+	CellMarker mark2(myMap,VERTEX_CELL);
+	prim2.mark(mark2);
+
+	// create a sphere
+	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, mgw.position);
+	prim3.tore_topo(12,48);
+	prim3.embedTore(50.0f,10.0f);
+
+	CellMarker mark3(myMap,VERTEX_CELL);
+	prim3.mark(mark3);
 
 
 
+	Algo::Geometry::computeNormalVertices<PFP>(myMap, mgw.position, mgw.normal) ;
 
-	// update renderer
-	mgw.updateRender();
+	Algo::Render::VBO::MapRender_VBO* render1 = new Algo::Render::VBO::MapRender_VBO() ;
+	render1->updateData(Algo::Render::VBO::POSITIONS, mgw.position);
+	render1->updateData(Algo::Render::VBO::NORMALS, mgw.normal);
+
+	SelectorCellMarked cm1(mark1);
+	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::VBO::TRIANGLES);
+	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::VBO::FLAT_TRIANGLES);
+	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::VBO::LINES);
+
+
+	Algo::Render::VBO::MapRender_VBO* render2 = new Algo::Render::VBO::MapRender_VBO(*render1) ;
+
+	SelectorCellMarked cm2(mark2);
+	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::VBO::TRIANGLES);
+	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::VBO::FLAT_TRIANGLES);
+	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::VBO::POINTS);
+
+	Algo::Render::VBO::MapRender_VBO* render3 = new Algo::Render::VBO::MapRender_VBO(*render1) ;
+	SelectorCellMarked cm3(mark3);
+	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::VBO::FLAT_TRIANGLES);
+	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::VBO::TRIANGLES);
+	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::VBO::LINES);
+
 
 	mgw.root = new Utils::SceneGraph::Group_Node();
 
 	Utils::SceneGraph::Material_Node* mater = new Utils::SceneGraph::Material_Node();
 	mater->setDiffuse(Geom::Vec4f(0.3f, 1.0f, 0.0f, 1.0f));
+	mater->setAmbient(Geom::Vec4f(0.1f, 0.1f, 0.1f, 1.0f));
+	mater->setSpecular(Geom::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+	mater->setShininess(100.0f);
 	mater->setColor(Geom::Vec4f(0.0f, 0.0f, 0.0f, 1.0f));
+	mater->setShader(phong);
 
 	mgw.root->setMaterial(mater);
 
-	Utils::SceneGraph::VBO_Node* vbon = new Utils::SceneGraph::VBO_Node(mgw.m_render);
+	Utils::SceneGraph::VBO_Node* vbon = new Utils::SceneGraph::VBO_Node(render1);
 	vbon->setPrimitives(Algo::Render::VBO::FLAT_TRIANGLES);
+	vbon->setPrimitives(Algo::Render::VBO::LINES);
 
 	mgw.root->addChild(vbon);
 
@@ -272,11 +302,10 @@ int main(int argc, char **argv)
 
 	mgw.root->addChild(group1);
 
-	vbon = new Utils::SceneGraph::VBO_Node(mgw.m_render);
-	vbon->setPrimitives(Algo::Render::VBO::TRIANGLES);
-	vbon->setPrimitives(Algo::Render::VBO::LINES);
-
-	group1->addChild(vbon);
+	Utils::SceneGraph::VBO_Node* vbon2 = new Utils::SceneGraph::VBO_Node(render2);
+	vbon2->setPrimitives(Algo::Render::VBO::TRIANGLES);
+	vbon2->setPrimitives(Algo::Render::VBO::POINTS);
+	group1->addChild(vbon2);
 
 
 	Utils::SceneGraph::Group_Node* group2 = new Utils::SceneGraph::Group_Node();
@@ -289,18 +318,21 @@ int main(int argc, char **argv)
 
 	mater = new Utils::SceneGraph::Material_Node();
 	mater->setDiffuse(Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
+	mater->setAmbient(Geom::Vec4f(0.1f, 0.1f, 0.1f, 1.0f));
+	mater->setSpecular(Geom::Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+	mater->setShininess(100.0f);
 	mater->setColor(Geom::Vec4f(1.0f, 1.0f, 0.0f, 1.0f));
+	mater->setNoShader();
 	group2->setMaterial(mater);
 
-	vbon = new Utils::SceneGraph::VBO_Node(mgw.m_render);
-	vbon->setPrimitives(Algo::Render::VBO::FLAT_TRIANGLES);
+	vbon = new Utils::SceneGraph::VBO_Node(render3);
+	vbon->setPrimitives(Algo::Render::VBO::TRIANGLES);
 	vbon->setPrimitives(Algo::Render::VBO::LINES);
 
 	group2->addChild(vbon);
 
 
-	// compute BB and store it for object positionning in screen
-//	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap,mgw.position) ;
+// not possible here to compute a BB !!
 	mgw.gWidthObj = 200.0f;
 	mgw.gPosObj = Geom::Vec3f(100.0f,0.0f,0.0f);
 

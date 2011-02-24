@@ -29,10 +29,9 @@ namespace CGoGN
 
 AttribMap::AttribMap() : GenericMap()
 {
-	AttribContainer& dartCont = m_attribs[DART_ORBIT] ;
-	unsigned int mark_index = dartCont.addAttribute<Mark>("Mark") ;
-	AttribMultiVect<Mark>& amv = dartCont.getDataVector<Mark>(mark_index) ;
-	m_markerTables[DART_ORBIT] = &amv ;
+	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
+	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
+	m_markerTables[DART_ORBIT][0] = amv ;
 }
 
 /****************************************
@@ -41,22 +40,25 @@ AttribMap::AttribMap() : GenericMap()
 
 void AttribMap::addEmbedding(unsigned int orbit)
 {
+	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
+
 	std::ostringstream oss;
 	oss << "EMB_" << orbit;
 
-	AttribContainer& dartCont = m_attribs[DART_ORBIT] ;
-	unsigned int index = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	AttribMultiVect<unsigned int>& amv = dartCont.getDataVector<unsigned int>(index) ;
-	m_embeddings[orbit] = &amv ;
+	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
+	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
+	m_embeddings[orbit] = amv ;
 
 	// set new embedding to EMBNULL for all the darts of the map
 	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		amv[i] = EMBNULL ;
+		amv->operator[](i) = EMBNULL ;
 
-	AttribContainer& cellCont = m_attribs[orbit] ;
-	unsigned int mark_index = cellCont.addAttribute<Mark>("Mark") ;
-	AttribMultiVect<Mark>& amvMark = cellCont.getDataVector<Mark>(mark_index) ;
-	m_markerTables[orbit] = &amvMark ;
+	AttributeContainer& cellCont = m_attribs[orbit];
+	for (unsigned int t = 0; t < m_nbThreads; ++t)
+	{
+		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>("Mark") ;
+		m_markerTables[orbit][t] = amvMark ;
+	}
 }
 
 /****************************************
@@ -65,12 +67,10 @@ void AttribMap::addEmbedding(unsigned int orbit)
 
 unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
 {
-	AttribContainer& cont = m_attribs[AttribContainer::orbitAttr(idx.id())] ;
+	AttributeContainer& cont = m_attribs[idx.getOrbit()] ;
 	unsigned int cpt = 0 ;
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-	{
 		idx[i] = cpt++ ;
-	}
 	return cpt ;
 }
 
