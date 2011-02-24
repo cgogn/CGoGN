@@ -50,7 +50,7 @@ namespace CGoGN
 class Map3 : public Map2
 {
 protected:
-	AttribMultiVect<Dart>* m_phi3 ;
+	AttributeMultiVector<Dart>* m_phi3 ;
 
 public:
 	typedef Map2 ParentMap;

@@ -32,9 +32,9 @@ namespace CGoGN
 {
 
 /**
- * Class that create an acces-table to an attribute
+ * Class that creates an access-table to an attribute
  * that is added especially. The attribute is removed when
- * the object is destroyed
+ * the AutoAttributeHandler object is destroyed
  */
 template <typename T>
 class AutoAttributeHandler : public AttributeHandler<T>
@@ -52,11 +52,9 @@ public:
 		this->m_map = &m ;
 		if(!m.isOrbitEmbedded(orbit))
 			m.addEmbedding(orbit) ;
-		AttribContainer& cellCont = this->m_map->m_attribs[orbit] ;
-		unsigned int index = cellCont.addAttribute<T>(nameAttr) ;
-		AttribMultiVect<T>& atm = cellCont.getDataVector<T>(index);
-		this->m_attrib = &atm;
-		this->m_id = AttribContainer::attrId(orbit, index) ;
+		AttributeContainer& cellCont = this->m_map->m_attribs[orbit] ;
+		AttributeMultiVector<T>* amv = cellCont.addAttribute<T>(nameAttr) ;
+		this->m_attrib = amv ;
 	}
 
 	~AutoAttributeHandler()

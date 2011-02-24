@@ -40,9 +40,9 @@ class FunctorMarker : public FunctorMap<MAP>
 {
 protected:
 	Marker m_marker;
-	AttribMultiVect<Mark>* m_markerTable;
+	AttributeMultiVector<Mark>* m_markerTable;
 public:
-	FunctorMarker(MAP& map, Marker m, AttribMultiVect<Mark>* mTable) : FunctorMap<MAP>(map), m_marker(m), m_markerTable(mTable) {}
+	FunctorMarker(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable) : FunctorMap<MAP>(map), m_marker(m), m_markerTable(mTable) {}
 	Marker getMarker() { return m_marker; }
 };
 
@@ -50,7 +50,7 @@ template <typename MAP>
 class FunctorMark: public FunctorMarker<MAP>
 {
 public:
-	FunctorMark(MAP& map, Marker m, AttribMultiVect<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable) {}
+	FunctorMark(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable) {}
 	bool operator()(Dart d)
 	{
 		this->m_markerTable->operator[](d.index).setMark(this->m_marker);
@@ -62,7 +62,7 @@ template <typename MAP>
 class FunctorUnmark: public FunctorMarker<MAP>
 {
 public:
-	FunctorUnmark(MAP& map, Marker m, AttribMultiVect<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable) {}
+	FunctorUnmark(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable) {}
 	bool operator()(Dart d)
 	{
 		this->m_markerTable->operator[](d.index).unsetMark(this->m_marker);
@@ -159,14 +159,14 @@ public:
 
 	virtual void markAll()
 	{
-		AttribContainer& cont = m_map.getAttributeContainer(DART_ORBIT) ;
+		AttributeContainer& cont = m_map.getAttributeContainer(DART_ORBIT) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](i).setMark(m_marker);
 	}
 
 	virtual void unmarkAll()
 	{
-		AttribContainer& cont = m_map.getAttributeContainer(DART_ORBIT) ;
+		AttributeContainer& cont = m_map.getAttributeContainer(DART_ORBIT) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkerVector(DART_ORBIT,m_thread)->operator[](i).unsetMark(m_marker);
 	}
