@@ -380,33 +380,38 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 int main(int argc, char **argv)
 {
-	std::vector<std::string> attrNames ;
-	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+//	std::vector<std::string> attrNames ;
+//	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
+//	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
-     //plongement
-//	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
-//	dglobal = prim.hexaGrid_topo(3,3,3);
-//	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT,"position");
+
+
+	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
+	int nb=3;
+	if (argc>1)
+		nb = atoi(argv[1]);
+	dglobal = prim.hexaGrid_topo(nb,nb,nb);
+	prim.embedHexaGrid(1.0f,1.0f,1.0f);
 //	Geom::Matrix44f mat;
 //	mat.identity();
 //	Geom::scale(2.0f, 2.0f,2.0f,mat);
 //	prim.transform(mat);
 
 
-	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,6);
-	dglobal=d;
-
-	position[d] = PFP::VEC3(0);
-	position[myMap.phi1(d)] = PFP::VEC3(1,0,0);
-	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(1,0,1);
-	position[myMap.phi_1(d)] = PFP::VEC3(0,0,1);
-
-	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
-	position[d] = PFP::VEC3(1,1,0);
-	position[myMap.phi1(d)] = PFP::VEC3(0,1,0);
-	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(0,1,1);
-	position[myMap.phi_1(d)] = PFP::VEC3(1,1,1);
+//	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,6);
+//	dglobal=d;
+//
+//	position[d] = PFP::VEC3(0);
+//	position[myMap.phi1(d)] = PFP::VEC3(1,0,0);
+//	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(1,0,1);
+//	position[myMap.phi_1(d)] = PFP::VEC3(0,0,1);
+//
+//	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
+//	position[d] = PFP::VEC3(1,1,0);
+//	position[myMap.phi1(d)] = PFP::VEC3(0,1,0);
+//	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(0,1,1);
+//	position[myMap.phi_1(d)] = PFP::VEC3(1,1,1);
 
 //	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,4);
 //	dglobal=d;

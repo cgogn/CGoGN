@@ -78,13 +78,25 @@ protected:
 	 * vbo buffers
 	 */
 	GLuint m_VBOBuffers[NB_BUFFERS] ;
-//	bool m_allocatedBuffers[NB_BUFFERS] ;
-//	bool m_usedBuffers[NB_BUFFERS] ;
+
+	/**
+	 *
+	 */
 	bool m_allocatedAttributes[NB_BUFFERS] ;
+
+	/**
+	 *
+	 */
 	bool m_usedAttributes[NB_BUFFERS] ;
 
+	/**
+	 *
+	 */
 	unsigned int m_AttributesDataSize[NB_BUFFERS];
 
+	/**
+	 *
+	 */
 	std::map<std::string,GLuint> m_attributebyName;
 
 
