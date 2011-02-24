@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]);
 
 	for(unsigned int i = 0; i < nbSteps; ++i)
-		Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
+		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
 
 	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
 

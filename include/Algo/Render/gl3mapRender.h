@@ -58,7 +58,6 @@ enum drawingType {
 	ERR = 32
 } ;
 
-
 enum bufferIndex {
 	TRIANGLE_INDICES = 0,
 	LINE_INDICES = 1,
@@ -68,7 +67,6 @@ enum bufferIndex {
 } ;
 
 const unsigned int NB_BUFFERS = 16 ;
-
 
 class MapRender
 {
@@ -86,7 +84,6 @@ protected:
 	unsigned int m_AttributesDataSize[NB_BUFFERS];
 
 	std::map<std::string,GLuint> m_attributebyName;
-
 
 	/**
 	 * number of vertex attributes
@@ -129,8 +126,6 @@ public:
 	 */
 	~MapRender() ;
 
-
-
 public:
 	/**
 	 * update the data
@@ -150,7 +145,6 @@ public:
 	template <typename ATTR_HANDLER>
 	void updateData(const std::string& name, const ATTR_HANDLER& attrib, ConvertAttrib* conv = NULL) ;
 
-
 	/**
 	 * enable a vertex attribute for rendering (updateDate automatically enable attrib)
 	 */
@@ -161,7 +155,6 @@ public:
 	 */
 	void disableVertexAttrib(const std::string& name);
 
-
 	/**
 	 * associate a name to a vertex attribute
 	 * @param name the name in shader
@@ -171,7 +164,6 @@ public:
 	unsigned int useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh);
 
 protected:
-
 	/**
 	 * enable a vertex attribute for rendering (updateDate automatically enable attrib)
 	 */

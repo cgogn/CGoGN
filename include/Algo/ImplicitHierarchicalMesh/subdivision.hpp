@@ -149,11 +149,9 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	unsigned int cur = map.getCurrentLevel() ;
 	Dart d2 = map.phi2(d) ;
 	map.setCurrentLevel(cur + 1) ;
-	map.unsewFaces(d) ;
-	map.unsewFaces(d2) ;
-	map.collapseEdge(map.phi1(d)) ;
-	map.collapseEdge(map.phi1(d2)) ;
-	map.sewFaces(d, d2) ;
+	unsigned int dl = map.getDartLevel(d2) ;
+	map.setDartLevel(map.phi1(d2), dl) ;
+	map.collapseEdge(d2) ;
 	map.setCurrentLevel(cur) ;
 }
 

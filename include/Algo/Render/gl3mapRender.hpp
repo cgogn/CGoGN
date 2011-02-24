@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 
@@ -36,7 +37,6 @@ namespace Render
 namespace GL3
 {
 
-
 // inline functions:
 inline void MapRender::enableVertexAttrib(unsigned int index)
 {
@@ -47,7 +47,6 @@ inline void MapRender::disableVertexAttrib(unsigned int index)
 {
 	m_usedAttributes[index] = false ;
 }
-
 
 /**
  * enable a vertex attribute for rendering (updateDate automatically enable attrib)
@@ -61,8 +60,6 @@ inline void MapRender::enableVertexAttrib(const std::string& name)
 		std::cerr <<"enableVertexAttrib: unknown attribute "<< name << std::endl;
 }
 
-
-
 inline void MapRender::disableVertexAttrib(const std::string& name)
 {
 	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
@@ -72,22 +69,20 @@ inline void MapRender::disableVertexAttrib(const std::string& name)
 		std::cerr <<"disableVertexAttrib: unknown attribute "<< name << std::endl;
 }
 
-
-
 inline unsigned int MapRender::useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh)
 {
-	unsigned int vertex_attrib =0;
+	unsigned int vertex_attrib = 0;
 
 	std::map<std::string,unsigned int>::iterator it = m_attributebyName.find(name);
 	if (it == m_attributebyName.end())
 	{
 		vertex_attrib = m_nbVertexAttrib++;
-		m_attributebyName.insert(std::pair<std::string,unsigned int>(name,vertex_attrib));
+		m_attributebyName.insert(std::pair<std::string,unsigned int>(name, vertex_attrib));
 	}
 	else
 		vertex_attrib = it->second;
 
-	sh.bindAttrib(vertex_attrib,name.c_str());
+	sh.bindAttrib(vertex_attrib, name.c_str());
 
 	return vertex_attrib;
 }
@@ -96,8 +91,7 @@ template <typename ATTR_HANDLER>
 void MapRender::updateData(unsigned int vertex_attrib, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	// choisit le bon buffer en fonction du paramètre upType
-
-	unsigned int indexVBO = vertex_attrib+FIRST_ATTRIBUTE_BUFFER;
+	unsigned int indexVBO = vertex_attrib + FIRST_ATTRIBUTE_BUFFER;
 
 	if (! m_allocatedAttributes[vertex_attrib] )
 	{
@@ -105,21 +99,14 @@ void MapRender::updateData(unsigned int vertex_attrib, const ATTR_HANDLER& attri
 		m_allocatedAttributes[vertex_attrib] = true ;
 	}
 
-
 	m_usedAttributes[vertex_attrib] = true ;
-	m_AttributesDataSize[vertex_attrib]= sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
-
+	m_AttributesDataSize[vertex_attrib] = sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
 
 	if (conv)
 		fillBufferConvert(indexVBO, attrib, conv) ;
 	else
 		fillBufferDirect(indexVBO, attrib) ;
 }
-
-
-
-
-
 
 template <typename ATTR_HANDLER>
 void MapRender::updateData(const std::string& name, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
@@ -134,22 +121,19 @@ void MapRender::updateData(const std::string& name, const ATTR_HANDLER& attrib, 
 		std::cerr << "warning update data with unknown name, adding vertex attribute"<< std::endl;
 	}
 	else
-	{
 		vertex_attrib = it->second;
-	}
 
-	updateData<ATTR_HANDLER>(vertex_attrib,attrib,conv);
+	updateData<ATTR_HANDLER>(vertex_attrib, attrib, conv);
 }
-
 
 template <typename ATTR_HANDLER>
 void MapRender::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attrib)
 {
-	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
+	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
 	std::vector<void*> addr;
 	unsigned int byteTableSize;
-	unsigned int nbb = mv->getStartAddresses(addr, byteTableSize);
+	unsigned int nbb = mv->getBlocksPointers(addr, byteTableSize);
 
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[indexVBO]);
 	glBufferDataARB(GL_ARRAY_BUFFER, nbb * byteTableSize, 0, GL_STREAM_DRAW);
@@ -163,18 +147,17 @@ void MapRender::fillBufferDirect(unsigned int indexVBO, const ATTR_HANDLER& attr
 	}
 }
 
-
 template <typename ATTR_HANDLER>
 void MapRender::fillBufferConvert(unsigned int indexVBO, const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
-	AttribMultiVect<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
+	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
 	std::vector<void*> addr;
 	unsigned int byteTableSize;
-	unsigned int nbb = mv->getStartAddresses(addr, byteTableSize);
+	unsigned int nbb = mv->getBlocksPointers(addr, byteTableSize);
 
 	// alloue la memoire pour le buffer et initialise le conv
-	conv->reserve(mv->BlockSize());
+	conv->reserve(mv->getBlockSize());
 
 	// bind buffer to update
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[indexVBO]);

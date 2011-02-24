@@ -39,12 +39,10 @@ namespace CGoGN
 void Map3::deleteOrientedVolume(Dart d)
 {
 	DartMarkerStore mark(*this);		// Lock a marker
-	bool found = false;					// Last functor return value
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(16);
 	visitedFaces.push_back(d);			// Start with the face of d
-	std::vector<Dart>::iterator face;
 
 //	// For every face added to the list
 //	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
@@ -67,7 +65,7 @@ void Map3::deleteOrientedVolume(Dart d)
 
 	mark.markOrbit(FACE_ORBIT, d) ;
 
-	for(face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
 		Dart e = *face ;
 
@@ -87,7 +85,7 @@ void Map3::deleteOrientedVolume(Dart d)
 
 
 	// delete every visited face
-	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 		Map1::deleteOrientedFace(*face);
 }
 

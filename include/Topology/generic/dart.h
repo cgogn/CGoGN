@@ -54,19 +54,19 @@ struct Dart
 	 * equality operator
 	 * @param d the dart to compare with
 	 */
-	bool operator==(Dart d) { return d.index == index; }
+	bool operator==(Dart d) const { return d.index == index; }
 
 	/**
 	 * different operator
 	 * @param d the dart to compare with
 	 */
-	bool operator!=(Dart d) { return d.index != index; }
+	bool operator!=(Dart d) const { return d.index != index; }
 
 	/**
 	 * less operator, can be used for sorting
 	 * @param d the dart to compare with
 	 */
-	bool operator<(Dart d) { return d.index < index; }
+	bool operator<(Dart d) const { return index < d.index; }
 
 	friend std::ostream& operator<<( std::ostream &out, const Dart& fa ) { return out << fa.index; }
 	friend std::istream& operator>>( std::istream &in, Dart& fa ) { in >> fa.index; return in; }

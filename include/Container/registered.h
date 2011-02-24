@@ -40,7 +40,7 @@ public:
 	/**
 	 * affecte un nom de type a l'attribut
 	 */
-	void setTypeName(const std::string& nameType) { m_name  = nameType; }
+	void setTypeName(const std::string& nameType) { m_name = nameType; }
 
 	/**
 	 * recupere le nom de type affecté à l'attribut
@@ -50,7 +50,7 @@ public:
 	/**
 	 * Ajout de l'attribut au container (A IMPLEMENTER)
 	 */
-	virtual unsigned int addAttribute(AttribContainer& container, const std::string& attribName)=0;
+	virtual AttributeMultiVectorGen* addAttribute(AttributeContainer& container, const std::string& attribName) = 0;
 };
 
 /**
@@ -64,7 +64,7 @@ class RegisteredAttribute : public RegisteredBaseAttribute
 {
 public:
 
-	unsigned int addAttribute(AttribContainer& container, const std::string& attribName)
+	AttributeMultiVectorGen* addAttribute(AttributeContainer& container, const std::string& attribName)
 	{
 		return container.addAttribute<T>(attribName);
 	}
