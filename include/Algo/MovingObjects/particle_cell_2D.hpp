@@ -236,7 +236,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 		}
 
 		//in case of numerical incoherence
-		if(m.phi_1(d)==dd) {
+		if(m.phi_1(d)==dd && wsoe==Geom::RIGHT) {
 			d = m.phi_1(d);
 			do {
 				switch (getOrientationEdge(current,d)) {

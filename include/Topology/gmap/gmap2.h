@@ -36,7 +36,7 @@ namespace CGoGN
 class GMap2 : public GMap1
 {
 protected:
-	AttribMultiVect<Dart>* m_beta2 ;
+	AttributeMultiVector<Dart>* m_beta2 ;
 
 public:
 	GMap2();
@@ -120,8 +120,9 @@ public:
 	 *  was the only link between two border faces
 	 *  @param d a dart in the deleted edge
 	 *  @param delDegenerateFaces a boolean (default to true)
+	 *  @return a dart of the resulting vertex
 	 */
-	virtual void collapseEdge(Dart d, bool delDegenerateFaces);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces);
 
 	/**
 	 * Flip the edge of d. (rotation in phi1 order)

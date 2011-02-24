@@ -246,7 +246,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 	case 's':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::CatmullClarkSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
+			Algo::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "catmull-clark: "<< seconds << "sec" << std::endl;
@@ -259,11 +259,11 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 	case 'l':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
-			Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
-			Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
-			Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
-			Algo::Modelisation::LoopSubdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "loop: "<< seconds << "sec" << std::endl;
@@ -276,7 +276,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 	case 'd':
 		{
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::Sqrt3Subdivision<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap, position);
+			Algo::Modelisation::Sqrt3Subdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "dual: "<< seconds << "sec" << std::endl;

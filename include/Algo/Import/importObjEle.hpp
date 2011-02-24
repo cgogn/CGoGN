@@ -42,7 +42,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttribContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 

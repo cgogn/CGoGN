@@ -322,7 +322,7 @@ GLfloat GlutWin_ATB::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Ve
 
 void GlutWin_ATB::capturePNG(const char* filename)
 {
-	ILuint imgName ;
+/*	ILuint imgName ;
 	ilGenImages(1, &imgName) ;
 	ilBindImage(imgName) ;
 	ilutGLScreen() ;
@@ -330,7 +330,7 @@ void GlutWin_ATB::capturePNG(const char* filename)
 	// save image
 	ilEnable(IL_FILE_OVERWRITE) ;
 	ilSaveImage((ILstring)filename) ;
-	ilDeleteImages(1, &imgName) ;
+	ilDeleteImages(1, &imgName) ;*/
 }
 
 void GlutWin_ATB::printString2D(int x, int y, const std::string& str) 

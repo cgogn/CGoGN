@@ -139,7 +139,7 @@ public:
 	virtual void markAll()
 	{
 		unsigned int cell = m_marker.getCell() ;
-		AttribContainer& cont = m_map.getAttributeContainer(cell) ;
+		AttributeContainer& cont = m_map.getAttributeContainer(cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkerVector(cell)->operator[](i).setMark(m_marker);
 	}
@@ -147,7 +147,7 @@ public:
 	virtual void unmarkAll()
 	{
 		unsigned int cell = m_marker.getCell() ;
-		AttribContainer& cont = m_map.getAttributeContainer(cell) ;
+		AttributeContainer& cont = m_map.getAttributeContainer(cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkerVector(cell)->operator[](i).unsetMark(m_marker);
 	}

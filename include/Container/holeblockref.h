@@ -33,8 +33,6 @@
 namespace CGoGN
 {
 
-//WARNING WE USE SHORT INT BLOCK_SIZE MUST BE < 65536
-
 class HoleBlockRef
 {
 protected:

@@ -49,7 +49,6 @@ namespace VBO
 class topo_VBORender
 {
 protected:
-
 	/**
 	* vbo buffers
 	* 0: vertices darts
@@ -77,7 +76,6 @@ protected:
 	 * width of lines use to draw phi
 	 */
 	float m_topo_relation_width;
-
 
 	/**
 	 * attribut d'index dans le VBO
@@ -157,11 +155,9 @@ public:
 	 * @param b blue !
 	 */
 	void overdrawDart(Dart d, float width, float r, float g, float b);
-
-
 };
 
-class topo_VBORenderMapD:public topo_VBORender
+class topo_VBORenderMapD : public topo_VBORender
 {
 public:
 	/**
@@ -176,7 +172,7 @@ public:
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = SelectorTrue());
 };
 
-class topo_VBORenderGMap: public topo_VBORender
+class topo_VBORenderGMap : public topo_VBORender
 {
 public:
 	/**

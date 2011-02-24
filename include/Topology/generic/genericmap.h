@@ -45,7 +45,7 @@
 #define DART_ORBIT		(unsigned int)(4)
 
 
-#include "Container/attrib_container.h"
+#include "Container/attributeContainer.h"
 #include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
@@ -81,7 +81,7 @@ protected:
 	/**
 	 * Attributes Containers
 	 */
-	AttribContainer m_attribs[NB_ORBITS] ;
+	AttributeContainer m_attribs[NB_ORBITS] ;
 
 	static std::map< std::string, RegisteredBaseAttribute* >* m_attributes_registry_map ;
 
@@ -89,7 +89,7 @@ protected:
 	 * Direct access to the Dart attributes that store the orbits embeddings
 	 * (only initialized when necessary)
 	 */
-	AttribMultiVect<unsigned int>* m_embeddings[NB_ORBITS] ;
+	AttributeMultiVector<unsigned int>* m_embeddings[NB_ORBITS] ;
 
 	/**
 	 * Markers manager
@@ -99,10 +99,10 @@ protected:
 	/**
 	 * Direct access to the attributes that store Marks
 	 */
-	AttribMultiVect<Mark>* m_markerTables[NB_ORBITS];
+	AttributeMultiVector<Mark>* m_markerTables[NB_ORBITS];
 
 public:
-	static const unsigned int UNKNOWN_ATTRIB = AttribContainer::UNKNOWN ;
+	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
 	GenericMap();
 
@@ -143,12 +143,6 @@ public:
 	 * tell if an orbit is embedded or not
 	 */
 	bool isOrbitEmbedded(unsigned int orbit) const;
-
-	/**
-	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
-	 * (may be NULL if the orbit is not embedded)
-	 */
-	AttribMultiVect<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit) const;
 
 	/**
 	 * return the number of embedded orbits (including DART_ORBIT)
@@ -231,42 +225,39 @@ public:
 	 ****************************************/
 
 	/**
-	 * Traverse the map and embed all orbits of the given dimension with a new cell
-	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
-	 */
-	void initOrbitEmbedding(unsigned int orbit, bool realloc = false);
-
-	/**
-	 * get a pseudo vector of attribute (direct access with [i])
-	 * @param idAttr code (orbit+attribute)
-	 */
-	template <typename T>
-	AttribMultiVect<T>& getAttributeVector(unsigned int idAttr);
-
-	/**
-	 * get a pseudo vector of marker attribute (direct access with [i])
-	 * @param orbit code
-	 */
-	AttribMultiVect<Mark>* getMarkerVector(unsigned int orbit);
-
-	/**
-	 * get a virtual vector of attribute
-	 * No access to data, usefull for access to address (VBO)
-	 * @param idAttr code (orbit+attribute)
-	 */
-	AttribMultiVectGen& getMultiVec(unsigned int idAttr);
-
-	/**
 	 * get the attrib container of a given orbit
 	 * @param orbit the orbit !!! (bilbo the orbit !)
 	 */
-	AttribContainer& getAttributeContainer(unsigned int orbit);
+	AttributeContainer& getAttributeContainer(unsigned int orbit);
+
+	/**
+	 * get a multi vector of marker attribute (direct access with [i])
+	 * @param orbit code
+	 */
+	AttributeMultiVector<Mark>* getMarkerVector(unsigned int orbit);
+
+	/**
+	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
+	 * (may be NULL if the orbit is not embedded)
+	 */
+	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit);
+
+	/**
+	 * swap two attribute containers
+	 */
+	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2);
 
 	/**
 	 * static function for type registration
 	 */
 	template <typename R>
 	static bool registerAttribute(const std::string &nameType) ;
+
+	/**
+	 * Traverse the map and embed all orbits of the given dimension with a new cell
+	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
+	 */
+	void initOrbitEmbedding(unsigned int orbit, bool realloc = false);
 
 	/****************************************
 	 *          MARKERS MANAGEMENT          *

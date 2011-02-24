@@ -30,13 +30,14 @@
 
 namespace CGoGN
 {
-std::map< std::string, RegisteredBaseAttribute* >* GenericMap::m_attributes_registry_map = NULL;
+
+std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL ;
 
 GenericMap::GenericMap()
 {
+	if(m_attributes_registry_map == NULL)
+		m_attributes_registry_map = new std::map< std::string, RegisteredBaseAttribute* > ;
 
-	if (m_attributes_registry_map ==NULL)
-		m_attributes_registry_map = new std::map< std::string, RegisteredBaseAttribute* >;
 	// register all known types
 	registerAttribute<Dart>("Dart");
 	registerAttribute<Mark>("Mark");
@@ -65,8 +66,9 @@ GenericMap::GenericMap()
 	registerAttribute<Geom::Matrix33d>(Geom::Matrix33d::CGoGNnameOfType());
 	registerAttribute<Geom::Matrix44d>(Geom::Matrix44d::CGoGNnameOfType());
 
-	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
+		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
 		m_markerTables[i] = NULL ;
@@ -78,11 +80,9 @@ GenericMap::~GenericMap()
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if(isOrbitEmbedded(i))
-		{
 			m_attribs[i].clear(true) ;
-		}
 	}
-	if (m_attributes_registry_map)
+	if(m_attributes_registry_map)
 		delete m_attributes_registry_map;
 }
 
@@ -155,11 +155,11 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 void GenericMap::update_m_emb_afterLoad()
 {
 	// get container of dart orbit
-	AttribContainer& cont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& cont = m_attribs[DART_ORBIT] ;
 
 	// get the list of attributes
 	std::vector<std::string> listeNames;
-	cont.getAttributesStrings(listeNames);
+	cont.getAttributesNames(listeNames);
 
 	// check if there are EMB_X attributes
 	for (unsigned int i = 0;  i < listeNames.size(); ++i)
@@ -169,9 +169,9 @@ void GenericMap::update_m_emb_afterLoad()
 		{
 			unsigned int orb = listeNames[i][4]-'0'; // easy atoi computation for one char;
 
-			AttribMultiVect<unsigned int>& amv = cont.getDataVector<unsigned int>(i);
-			m_embeddings[orb] = &amv ;
-			std::cout << "Ajoute m_emb["<<orb<<"]:"<< i <<std::endl;
+			AttributeMultiVector<unsigned int>* amv = cont.getDataVector<unsigned int>(i);
+			m_embeddings[orb] = amv ;
+			std::cout << "Ajoute m_emb[" << orb << "] : " << i << std::endl;
 		}
 	}
 }
@@ -258,7 +258,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 		{
 			std::cout << "LOAD ATTRIBUT"<< std::endl;
 			// get the orbit id
-			unsigned int id = AttribContainer::getIdXmlNode(cur_node);
+			unsigned int id = AttributeContainer::getIdXmlNode(cur_node);
 			// and load container
 			unsigned int nba = m_attribs[id].getNbAttributes();
 
@@ -273,7 +273,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 	*   creation of the m_embeddings pointers table
 	************************************************/
 //	// get attribute names of dart orbit
-//	AttribContainer& contDart = m_attribs[DART_ORBIT] ;
+//	AttributeContainer& contDart = m_attribs[DART_ORBIT] ;
 //	std::vector< std::string > tableNames;
 //	contDart.getAttributesStrings(tableNames);
 //
@@ -286,7 +286,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 //		std::string is_an_emb = name.substr(0,4);
 //		if (is_an_emb == "EMB_")
 //		{
-//			AttribMultiVect<unsigned int>& amv = contDart.getDataVector<unsigned int>(i) ;
+//			AttributeMultiVector<unsigned int>& amv = contDart.getDataVector<unsigned int>(i) ;
 //
 //			std::string orbitname = name.substr(4, name.size()-4);
 //			std::istringstream iss(orbitname);
@@ -442,7 +442,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	// load attrib container
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
 	{
-		unsigned int id = AttribContainer::loadBinId(fs);
+		unsigned int id = AttributeContainer::loadBinId(fs);
 		m_attribs[id].loadBin(fs);
 	}
 

@@ -77,11 +77,6 @@ inline bool GenericMap::isOrbitEmbedded(unsigned int orbit) const
 	return (orbit == DART_ORBIT) || (m_embeddings[orbit] != NULL) ;
 }
 
-inline AttribMultiVect<unsigned int>* GenericMap::getEmbeddingAttributeVector(unsigned int orbit) const
-{
-	return m_embeddings[orbit] ;
-}
-
 inline unsigned int GenericMap::nbEmbeddings() const
 {
 	unsigned int nb = 0;
@@ -107,7 +102,7 @@ inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
 	protected:
 		GenericMap& m_map;
 		unsigned int m_orbit;
-		AttribMultiVect<unsigned int>* m_emb;
+		AttributeMultiVector<unsigned int>* m_emb;
 		unsigned int m_val;
 		std::vector<Dart> m_darts;
 
@@ -134,7 +129,7 @@ inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
 		{
 			if(m_val != EMBNULL)
 			{
-				AttribContainer& cont = m_map.getAttributeContainer(m_orbit) ;
+				AttributeContainer& cont = m_map.getAttributeContainer(m_orbit) ;
 				for(std::vector<Dart>::iterator it = m_darts.begin(); it != m_darts.end(); ++it)
 				{
 					(*m_emb)[it->index] = m_val;
@@ -221,28 +216,41 @@ inline void GenericMap::initCell(unsigned int orbit, unsigned int i)
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
-template <typename T>
-inline AttribMultiVect<T>& GenericMap::getAttributeVector(unsigned int idAttr)
+inline AttributeContainer& GenericMap::getAttributeContainer(unsigned int orbit)
 {
-	assert(idAttr != AttribContainer::UNKNOWN) ;
-	return m_attribs[AttribContainer::orbitAttr(idAttr)].getDataVector<T>(AttribContainer::indexAttr(idAttr)) ;
+	return m_attribs[orbit] ;
 }
 
-inline AttribMultiVect<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
+inline AttributeMultiVector<Mark>* GenericMap::getMarkerVector(unsigned int orbit)
 {
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	return m_markerTables[orbit] ;
 }
 
-inline AttribMultiVectGen& GenericMap::getMultiVec(unsigned int idAttr)
+inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVector(unsigned int orbit)
 {
-	assert(idAttr != AttribContainer::UNKNOWN) ;
-	return m_attribs[AttribContainer::orbitAttr(idAttr)].getVirtualDataVector(AttribContainer::indexAttr(idAttr)) ;
+	return m_embeddings[orbit] ;
 }
 
-inline AttribContainer& GenericMap::getAttributeContainer(unsigned int orbit)
+inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
 {
-	return m_attribs[orbit] ;
+	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
+	assert((orbit1 != DART_ORBIT && orbit2 != DART_ORBIT) || !"Cannot swap the darts container") ;
+
+	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
+	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
+	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
+
+	AttributeMultiVector<unsigned int>* e = m_embeddings[orbit1] ;
+	m_embeddings[orbit1] = m_embeddings[orbit2] ;
+	m_embeddings[orbit2] = e ;
+
+	AttributeMultiVector<Mark>* m = m_markerTables[orbit1] ;
+	m_markerTables[orbit1] = m_markerTables[orbit2] ;
+	m_markerTables[orbit2] = m ;
+
+	MarkerSet ms = m_orbMarker[orbit1] ;
+	m_orbMarker[orbit1] = m_orbMarker[orbit2] ;
+	m_orbMarker[orbit2] = ms ;
 }
 
 /****************************************
