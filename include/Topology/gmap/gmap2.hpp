@@ -185,9 +185,9 @@ inline void GMap2::phi2unsew(Dart d)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap2::foreach_dart_of_volume(Dart d, FunctorType& fonct)
+inline bool GMap2::foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread)
 {
-	return foreach_dart_of_cc(d, fonct) ;
+	return foreach_dart_of_cc(d, fonct, thread) ;
 }
 
 } // namespace CGoGN

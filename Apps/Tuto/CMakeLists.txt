@@ -4,6 +4,8 @@ project(Tutos)
 
 #SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} gzstream AntTweakBar openctm)
 
+
+#SET (CMAKE_BUILD_TYPE Debug)
 SET(CMAKE_BUILD_TYPE Release)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
@@ -14,6 +16,7 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
 	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
+	${CGoGN_ROOT_DIR}/ThirdParty/glm
 	${CGoGN_ROOT_DIR}/include
 )
 
@@ -48,4 +51,16 @@ target_link_libraries( tuto_subdivision
 
 add_executable( tp_master tp_master.cpp)
 target_link_libraries( tp_master
+	container topology utils algo  ${COMMON_LIBS} )
+
+add_executable( tuto_mt tuto_mt.cpp)
+target_link_libraries( tuto_mt
+	container topology utils algo ${COMMON_LIBS} boost_thread-mt)
+
+add_executable( tuto_ogl3 tuto_ogl3.cpp)
+target_link_libraries( tuto_ogl3
+	container topology utils algo  ${COMMON_LIBS} )
+
+add_executable( tuto_ogl2 tuto_ogl2.cpp)
+target_link_libraries( tuto_ogl2
 	container topology utils algo  ${COMMON_LIBS} )

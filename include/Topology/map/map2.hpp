@@ -173,14 +173,14 @@ inline bool Map2::sameVertex(Dart d, Dart e)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool Map2::foreach_dart_of_volume(Dart d, FunctorType& f)
+inline bool Map2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f);
+	return foreach_dart_of_oriented_volume(d, f, thread);
 }
 
-inline bool Map2::foreach_dart_of_cc(Dart d, FunctorType& f)
+inline bool Map2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f);
+	return foreach_dart_of_oriented_volume(d, f, thread);
 }
 
 } // namespace CGoGN

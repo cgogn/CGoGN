@@ -31,7 +31,7 @@ AttribMap::AttribMap() : GenericMap()
 {
 	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
 	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
-	m_markerTables[DART_ORBIT] = amv ;
+	m_markerTables[DART_ORBIT][0] = amv ;
 }
 
 /****************************************
@@ -53,9 +53,12 @@ void AttribMap::addEmbedding(unsigned int orbit)
 	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
 		amv->operator[](i) = EMBNULL ;
 
-	AttributeContainer& cellCont = m_attribs[orbit] ;
-	AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>("Mark") ;
-	m_markerTables[orbit] = amvMark ;
+	AttributeContainer& cellCont = m_attribs[orbit];
+	for (unsigned int t = 0; t < m_nbThreads; ++t)
+	{
+		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>("Mark") ;
+		m_markerTables[orbit][t] = amvMark ;
+	}
 }
 
 /****************************************

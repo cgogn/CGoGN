@@ -118,7 +118,7 @@ void myGlutWin::init()
 
 	glClearColor(0.1f,0.1f,0.1f,0.0f);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);
+//	glEnable(GL_NORMALIZE);
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
