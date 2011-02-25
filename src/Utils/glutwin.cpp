@@ -71,6 +71,7 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 	trans_y=0.;
 	trans_z=-50.0f;
 
+
 	std::cout << "Initialisation Glut" << std::endl;
 	glutInit(argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -86,6 +87,7 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 	glutKeyboardFunc(keyboard);
 
 	std::cout << "Initialisation OpenGL" << std::endl;
+	std::cout << glGetString(GL_VERSION)<<std::endl;
 	shaderOk = Utils::GLSLShader::init();
 
 	glViewport(0, 0, W, H);
@@ -105,9 +107,51 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 	glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition);
 	glEnable(GL_LIGHT0);
 
+	//Store context infos
+#ifdef WIN32
+	m_drawable = wglGetCurrentDC();
+	m_context = wglGetCurrentContext();
+#else
+	#ifdef MAC_OSX
+		m_context = CGLGetCurrentContext();
+	#else
+		m_dpy = glXGetCurrentDisplay();
+		m_drawable = glXGetCurrentDrawable();
+		m_context = glXGetCurrentContext();
+	#endif
+#endif
 	// Call other initialization (possibly overloaded in instances)
 	instance->init();
 }
+
+void SimpleGlutWin::releaseContext()
+{
+#ifdef WIN32
+	wglMakeCurrent(NULL,NULL);
+#else
+	#ifdef MAC_OSX
+		CGLSetCurrentContext(NULL);
+	#else
+		glXMakeCurrent(m_dpy,None,NULL);
+	#endif
+#endif
+}
+
+void SimpleGlutWin::useContext()
+{
+#ifdef WIN32
+	wglMakeCurrent(m_drawable, m_context);
+#else
+	#ifdef MAC_OSX
+		CGLSetCurrentContext(m_context);
+	#else
+		glXMakeCurrent(m_dpy, m_drawable, m_context);
+	#endif
+#endif
+
+}
+
+
 
 void SimpleGlutWin::recalcModelView(void)
 {

@@ -58,6 +58,7 @@ if(WIN32)
 endif()
 include_directories(${CLAPACK_SOURCE_DIR}/F2CLIBS/libf2c)
 include_directories(${CLAPACK_BINARY_DIR}/F2CLIBS/libf2c)
-set(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
+
 add_library(f2c ${OFILES} ${CMAKE_CURRENT_BINARY_DIR}/arith.h)
-set_property(TARGET f2c PROPERTY PREFIX lib)
+#set_property(TARGET f2c PROPERTY PREFIX lib)
+#pb sous windows avec le prefix lib

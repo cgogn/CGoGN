@@ -56,7 +56,7 @@ void ImplicitHierarchicalMap::init()
 	{
 		if(m_nextLevelCell[orbit] != NULL)
 		{
-			AttribContainer& cellCont = m_attribs[orbit] ;
+			AttributeContainer& cellCont = m_attribs[orbit] ;
 			for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
 				m_nextLevelCell[orbit]->operator[](i) = EMBNULL ;
 		}
@@ -81,6 +81,7 @@ void ImplicitHierarchicalMap::initEdgeId()
 unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+
 	if(m_curLevel == 0)
 		return 0 ;
 
@@ -126,14 +127,19 @@ unsigned int ImplicitHierarchicalMap::faceLevel(Dart d)
 
 	Dart it = d ;
 	Dart old = it ;
+	unsigned int l_old = m_dartLevel[old] ;
 	unsigned int fLevel = edgeLevel(it) ;
 	do
 	{
 		it = phi1(it) ;
-		if(m_dartLevel[it] < m_dartLevel[old])	// in a first time, the level of a face
-			old = it ;							// is the minimum of the levels
-		unsigned int l = edgeLevel(it) ;		// of its edges
-		fLevel = l < fLevel ? l : fLevel ;
+		unsigned int dl = m_dartLevel[it] ;
+		if(dl < l_old)							// compute the oldest dart of the face
+		{										// in the same time
+			old = it ;
+			l_old = dl ;
+		}										// in a first time, the level of a face
+		unsigned int l = edgeLevel(it) ;		// is the minimum of the levels
+		fLevel = l < fLevel ? l : fLevel ;		// of its edges
 	} while(it != d) ;
 
 	unsigned int cur = m_curLevel ;
@@ -180,11 +186,16 @@ Dart ImplicitHierarchicalMap::faceOldestDart(Dart d)
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	Dart it = d ;
 	Dart oldest = it ;
+	unsigned int l_old = m_dartLevel[oldest] ;
 	do
 	{
-		it = phi1(it) ;
-		if(m_dartLevel[it] < m_dartLevel[oldest])
+		unsigned int l = m_dartLevel[it] ;
+		if(l < l_old || (l == l_old && it < oldest))
+		{
 			oldest = it ;
+			l_old = l ;
+		}
+		it = phi1(it) ;
 	} while(it != d) ;
 	return oldest ;
 }

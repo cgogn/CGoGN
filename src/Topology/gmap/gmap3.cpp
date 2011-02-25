@@ -113,9 +113,9 @@ bool GMap3::mergeVolumes(Dart d)
 
 
 
-bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f)
+bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this);			// Lock a marker
+	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed
@@ -157,9 +157,9 @@ bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f)
 
 
 // TODO:optimize traversal of edges ?
-bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f)
+bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this);			// Lock a marker
+	DartMarkerStore mv(*this,thread);			// Lock a marker
 	bool found = false;					// Last functor return value
 	std::list<Dart> darts_list;		//Darts that are traversed
 	darts_list.push_back(d);			//Start with the dart d
@@ -199,20 +199,20 @@ bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f)
 
 }
 
-bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f)
+bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return GMap1::foreach_dart_of_face(d, f) || GMap1::foreach_dart_of_face(beta3(d), f) ;
+	return GMap1::foreach_dart_of_face(d, f, thread) || GMap1::foreach_dart_of_face(beta3(d), f, thread) ;
 }
 
-bool GMap3::foreach_dart_of_volume(Dart d, FunctorType& f)
+bool GMap3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	return GMap2::foreach_dart_of_cc(d, f);
+	return GMap2::foreach_dart_of_cc(d, f, thread);
 }
 
 
-bool GMap3::foreach_dart_of_cc(Dart d, FunctorType& f)
+bool GMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this);			// Lock a marker
+	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed

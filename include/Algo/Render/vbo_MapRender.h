@@ -35,6 +35,8 @@
 #include "Container/convert.h"
 #include "Geometry/vector_gen.h"
 
+#include "Utils/GLSLShader.h"
+
 namespace CGoGN
 {
 
@@ -71,13 +73,26 @@ enum bufferIndex {
 	FLAT_BUFFER = 3,
 	POSITIONS_BUFFER = 4,
 	NORMALS_BUFFER = 5,
-	COLORS_BUFFER = 6
-
-
+	COLORS_BUFFER = 6,
+	FIRST_ATTRIBUTE_BUFFER = 7
 } ;
 
-const unsigned int NB_BUFFERS = 7 ;
+const unsigned int NB_BUFFERS = 20 ;
 
+// Warning using attributes forbid using the following buildin attributes
+// gl_SecondaryColor
+// gl_FogCoord
+// gl_MultiTexCoord0
+// gl_MultiTexCoord1
+// gl_MultiTexCoord2
+// gl_MultiTexCoord3
+// gl_MultiTexCoord4
+// gl_MultiTexCoord5
+// gl_MultiTexCoord6
+// gl_MultiTexCoord7
+const unsigned int FIRST_VERTEX_ATTRIB = 4 ;
+
+const unsigned int NB_ATTRIBUTES = 12 ;
 
 class MapRender_VBO
 {
@@ -89,6 +104,15 @@ protected:
 	GLuint m_VBOBuffers[NB_BUFFERS] ;
 	bool m_allocatedBuffers[NB_BUFFERS] ;
 	bool m_usedBuffers[NB_BUFFERS] ;
+
+	bool m_allocatedAttributes[NB_ATTRIBUTES] ;
+	bool m_usedAttributes[NB_ATTRIBUTES] ;
+	unsigned int m_AttributesDataSize[NB_ATTRIBUTES];
+
+	unsigned int m_nbVertexAttrib;
+
+	std::map<std::string,GLuint> m_attributebyName;
+
 
 	/**
 	 * number of indices of triangles
@@ -136,7 +160,59 @@ public:
 	void enableBuffers(int buffersMask) ;
 	void disableBuffers(int buffersMask) ;
 
+
+	/**
+	 * update the data for vertex attributes
+	 * @param vertex_attrib vertex attrib id
+	 * @param attrib attribute where data is stored
+	 * @param conv Callback of attribute conversion (NULL if direct copy, default value)
+	 */
+	template <typename ATTR_HANDLER>
+	void updateVAData(unsigned int vertex_attrib, const ATTR_HANDLER& attrib, ConvertAttrib* conv = NULL) ;
+
+	/**
+	 * update the data for vertex attributes
+	 * @param va_name vertex attrib name (in shader)
+	 * @param attrib attribute where data is stored
+	 * @param conv Callback of attribute conversion (NULL if direct copy, default value)
+	 */
+	template <typename ATTR_HANDLER>
+	void updateVAData(const std::string& name, const ATTR_HANDLER& attrib, ConvertAttrib* conv = NULL) ;
+
+
+	/**
+	 * enable a vertex attribute for rendering (updateDate automatically enable attrib)
+	 */
+	void enableVertexAttrib(const std::string& name);
+
+	/**
+	 * disable a vertex attribute for rendering
+	 */
+	void disableVertexAttrib(const std::string& name);
+
+
+	/**
+	 * associate a name to a vertex attribute
+	 * @param name the name in shader
+	 * @param sh the shader
+	 * @return the id to use with update (if not using name)
+	 */
+	unsigned int useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh);
+
 protected:
+
+	unsigned int vbo_index_attribute( unsigned int att) { return att + FIRST_ATTRIBUTE_BUFFER - FIRST_VERTEX_ATTRIB;}
+
+	/**
+	 * enable a vertex attribute for rendering (updateDate automatically enable attrib)
+	 */
+	void enableVertexAttrib(unsigned int index);
+
+	/**
+	 * disable a vertex attribute for rendering
+	 */
+	void disableVertexAttrib(unsigned int index);
+
 	/**
 	* fill buffer directly from attribute
 	*/
@@ -163,31 +239,31 @@ public:
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 	template <typename PFP>
-	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
 	/**
 	 * creation of indices table of lines (optimized order)
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initLines(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initLines(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 	template <typename PFP>
-	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
 	/**
 	 * creation of indices table of points
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices) ;
+	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
 	/**
 	 * creation of VBO for flat faces rendering
 	 */
 	template <typename PFP>
-	void initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good);
+	void initFlatTriangles(typename PFP::MAP& map, const FunctorSelect& good, unsigned int thread=0);
 
 	/**
 	 * initialization of the VBO indices primitives
@@ -195,7 +271,7 @@ public:
 	 * @param prim primitive to draw: VBO_TRIANGLES, VBO_LINES
 	 */
 	template <typename PFP>
-	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true) ;
+	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true, unsigned int thread=0) ;
 
 	/**
 	 * initialization of the VBO indices primitives

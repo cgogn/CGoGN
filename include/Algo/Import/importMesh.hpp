@@ -40,7 +40,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
+	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
@@ -106,7 +106,6 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 			if (good_dart != Dart::nil())
 			{
-				Dart aze = map.phi2(good_dart) ;
 				if (good_dart == map.phi2(good_dart))
 				{
 					map.sewFaces(d, good_dart);
@@ -457,7 +456,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 //
 //
 //	// Attributes container for vertex orbit
-//	AttribContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
+//	AttributeContainer& vertexContainer = map.getAttributeContainer(VERTEX_ORBIT);
 //
 //	AttributeHandler<VEC3> positions(idPositions,map);
 //

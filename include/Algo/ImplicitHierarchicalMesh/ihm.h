@@ -51,7 +51,7 @@ private:
 	AttributeHandler<unsigned int> m_dartLevel ;
 	AttributeHandler<unsigned int> m_edgeId ;
 
-	AttribMultiVect<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
+	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
 public:
 	ImplicitHierarchicalMap() ;
@@ -211,10 +211,10 @@ public:
 	AttributeHandler_IHM() : AttributeHandler<T>()
 	{}
 
-	AttributeHandler_IHM(GenericMap* m, unsigned int idAttr) : AttributeHandler<T>(m, idAttr)
+	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
 	{}
 
-	AttribMultiVect<T>* getDataVector() const
+	AttributeMultiVector<T>* getDataVector() const
 	{
 		return AttributeHandler<T>::getDataVector() ;
 	}

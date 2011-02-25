@@ -40,8 +40,15 @@
  * A virtual trackball implementation
  * Written by Gavin Bell for Silicon Graphics, November 1988.
  */
+#ifndef __TRACK_BALL_
+#define __TRACK_BALL_
 
 #include "Utils/os_spec.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_projection.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 
 namespace CGoGN
 {
@@ -78,6 +85,9 @@ add_quats(float *q1, float *q2, float *dest);
 APIEXPORT void
 build_rotmatrix(float m[4][4], float q[4]);
 
+
+void build_rotmatrixgl3(glm::mat4& m, float q[4]);
+
 /*
  * This function computes a quaternion based on an axis (defined by
  * the given vector) and an angle about which to rotate.  The angle is
@@ -90,4 +100,5 @@ axis_to_quat(float a[3], float phi, float q[4]);
 
 } //namespace CGoGN
 
+#endif
 

@@ -43,30 +43,24 @@ namespace CGoGN
 template <typename T>
 class AttributeHandler
 {
-	friend class AttribMap ;
-
 protected:
 	// we need the map to use dart as index
 	GenericMap* m_map;
 
-	// id of the attribute
-	unsigned int m_id;
-
 	// access to the data
-	AttribMultiVect<T>* m_attrib;
-
-protected:
-	/**
-	 * Constructor
-	 * @param idAttr identifiant of attribute
-	 * @param m the map which belong attribute
-	 */
-	AttributeHandler(GenericMap* m, unsigned int idAttr) ;
+	AttributeMultiVector<T>* m_attrib;
 
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler() : m_map(NULL), m_id(AttribContainer::UNKNOWN), m_attrib(NULL) {}
+	/**
+	 * Constructor
+	 * @param m the map which belong attribute
+	 * @param amv a pointer to the AttributeMultiVector
+	 */
+	AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) ;
+
+	AttributeHandler() ;
 
 	/**
 	 * Copy constructor
@@ -93,12 +87,17 @@ public:
 	/**
 	 * get attribute data vector
 	 */
-	AttribMultiVect<T>* getDataVector() const ;
+	AttributeMultiVector<T>* getDataVector() const ;
 
 	/**
-	 * get attribute id
+	 * get attribute orbit
 	 */
-	unsigned int id() const ;
+	unsigned int getOrbit() const ;
+
+	/**
+	 * get attribute index
+	 */
+	unsigned int getIndex() const ;
 
 	/**
 	 * get attribute name
@@ -150,13 +149,13 @@ public:
 	unsigned int begin() const;
 
 	/**
-	 * begin of table
+	 * end of table
 	 * @return the iterator of the end of container
 	 */
 	unsigned int end() const;
 
 	/**
-	 * Next on iterator (equivalent too stl ++)
+	 * Next on iterator (equivalent to stl ++)
 	 * @param iter iterator to
 	 */
 	void next(unsigned int& iter) const;

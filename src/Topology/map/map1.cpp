@@ -111,7 +111,7 @@ bool Map1::isFaceTriangle(Dart d)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f)
+bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d ;
 	do

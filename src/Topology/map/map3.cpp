@@ -39,12 +39,10 @@ namespace CGoGN
 void Map3::deleteOrientedVolume(Dart d)
 {
 	DartMarkerStore mark(*this);		// Lock a marker
-	bool found = false;					// Last functor return value
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(16);
 	visitedFaces.push_back(d);			// Start with the face of d
-	std::vector<Dart>::iterator face;
 
 //	// For every face added to the list
 //	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
@@ -67,7 +65,7 @@ void Map3::deleteOrientedVolume(Dart d)
 
 	mark.markOrbit(FACE_ORBIT, d) ;
 
-	for(face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
 		Dart e = *face ;
 
@@ -87,7 +85,7 @@ void Map3::deleteOrientedVolume(Dart d)
 
 
 	// delete every visited face
-	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 		Map1::deleteOrientedFace(*face);
 }
 
@@ -611,9 +609,9 @@ bool Map3::isBoundaryVolume(Dart d)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f)
+bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this);			// Lock a marker
+	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed
@@ -649,19 +647,19 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f)
 	return found;
 }
 
-bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f)
+bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
 	do {
-		if (Map2::foreach_dart_of_edge(dNext,f)) return true;
+		if (Map2::foreach_dart_of_edge(dNext,f,thread)) return true;
 		dNext = alpha2(dNext);
 	} while (dNext != d);
 	return false;
 }
 
-bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f)
+bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this);			// Lock a marker
+	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed
@@ -695,18 +693,18 @@ bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f)
 	return found;
 }
 
-bool Map3::foreach_dart_of_face(Dart d, FunctorType& f)
+bool Map3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	if (foreach_dart_of_oriented_face(d,f)) return true;
+	if (foreach_dart_of_oriented_face(d,f,thread)) return true;
 
 	Dart d3 = phi3(d);
-	if (d3 != d) return foreach_dart_of_oriented_face(d3,f);
+	if (d3 != d) return foreach_dart_of_oriented_face(d3,f,thread);
 	return false;
 }
 
-bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f)
+bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this);			// Lock a marker
+	DartMarkerStore mv(*this,thread);			// Lock a marker
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed
