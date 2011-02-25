@@ -46,11 +46,11 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& 
 template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = SelectorTrue()) ;
 
-}
+} // namespace Geometry
 
-}
+} // namespace Algo
 
-}
+} // namespace CGoGN
 
 #include "Algo/Geometry/area.hpp"
 
