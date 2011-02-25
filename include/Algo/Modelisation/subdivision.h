@@ -92,6 +92,12 @@ template <typename PFP>
 void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
 
 /**
+ * Reverse the orientation of the map
+ */
+template <typename PFP>
+void reverseOrientation(typename PFP::MAP& map) ;
+
+/**
  * Dual mesh computation
  */
 template <typename PFP>

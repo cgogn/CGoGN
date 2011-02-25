@@ -235,13 +235,6 @@ public:
 	 *  @param marker
 	 */
 	void closeMap(DartMarker& marker);
-
-	// TODO a mettre en algo
-	/**
-	* Reverse orientation of map (reverse orientation of all faces)
-	* no dart created, each dart keeps its embedding, only changing phi1 and phi2
-	*/
-	void reverseOrientation();
 	//@}
 
 	/*! @name Topological Queries

@@ -31,6 +31,11 @@ AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* am
 {}
 
 template <typename T>
+AttributeHandler<T>::AttributeHandler():
+	m_map(NULL), m_attrib(NULL)
+{}
+
+template <typename T>
 AttributeHandler<T>::AttributeHandler(const AttributeHandler<T>& ta):
 	m_map(ta.m_map), m_attrib(ta.m_attrib)
 {}
@@ -79,9 +84,9 @@ const std::string& AttributeHandler<T>::name() const
 template <typename T>
 bool AttributeHandler<T>::isValid() const
 {
-	return (m_map != NULL &&
-			m_attrib != NULL &&
-			m_attrib->getIndex() != AttributeContainer::UNKNOWN) ;
+	return !(m_map == NULL ||
+			m_attrib == NULL ||
+			m_attrib->getIndex() == AttributeContainer::UNKNOWN) ;
 }
 
 template <typename T>

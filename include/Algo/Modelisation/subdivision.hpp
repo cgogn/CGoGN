@@ -435,6 +435,24 @@ void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
+void reverseOrientation(typename PFP::MAP& map)
+{
+	AttributeHandler<unsigned int> emb0(&map, map.getEmbeddingAttributeVector(VERTEX_ORBIT)) ;
+	if(emb0.isValid())
+	{
+		AttributeHandler<unsigned int> new_emb0 = map.template addAttribute<unsigned int>(DART_ORBIT, "new_EMB_0") ;
+		for(Dart d = map.begin(); d != map.end(); map.next(d))
+			new_emb0[d] = emb0[map.phi1(d)] ;
+		map.template swapAttributes<unsigned int>(emb0, new_emb0) ;
+		map.template removeAttribute<unsigned int>(new_emb0) ;
+	}
+
+	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
+	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART_ORBIT, "phi_1") ;
+	map.template swapAttributes<Dart>(phi1, phi_1) ;
+}
+
+template <typename PFP>
 void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 {
 	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
@@ -456,12 +474,14 @@ void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 	map.template removeAttribute<Dart>(new_phi_1) ;
 
 	map.swapEmbeddingContainers(VERTEX_ORBIT, FACE_ORBIT) ;
+
+	reverseOrientation<PFP>(map) ;
 }
 
 template <typename PFP>
 void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
 {
-//	computeDual<PFP>(map, selected);
+	computeDual<PFP>(map, selected);
 	trianguleFaces<PFP>(map, position, selected);
 }
 
