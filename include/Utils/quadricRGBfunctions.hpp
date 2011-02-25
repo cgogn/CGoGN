@@ -51,16 +51,15 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const QuadricRGBfunctions& q) {
 
 template <typename REAL>
 QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REAL gamma, const REAL alpha) {
-	MATRIX66 R1,R2_A,R2_b,R2_c;
+	MATRIX66 R1,R2_b,R2_c;
 
 	buildRotateMatrix(R1,gamma); // Rotation 1
 
-	buildIntegralMatrix_A(R2_A,alpha); // Parameterized integral matrix A
+	buildIntegralMatrix_A(A,alpha); // Parameterized integral matrix A
 	buildIntegralMatrix_b(R2_b,alpha); // Parameterized integral matrix b
 	buildIntegralMatrix_c(R2_c,alpha); // Parameterized integral matrix c
 
 	// Quadric (A,b,c) => L*A*Lt - 2*b*Lt + c = ERROR
-	A = R2_A ; // Matrix A : integral
 	for (unsigned col = RED; col < BLUE+1; ++col) {
 		Geom::Vector<6,REAL> function; // get function coefficients
 
