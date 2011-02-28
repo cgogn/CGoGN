@@ -33,8 +33,7 @@ namespace CGoGN
 
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL ;
 
-GenericMap::GenericMap()
-:m_nbThreads(1)
+GenericMap::GenericMap() : m_nbThreads(1)
 {
 	if(m_attributes_registry_map == NULL)
 		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*> ;
@@ -114,7 +113,6 @@ void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 	(*m_embeddings[orbit])[d.index] = emb ;
 }
 
-
 /****************************************
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
@@ -150,6 +148,58 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 	return true;
 }
 
+/****************************************
+ *          THREAD MANAGEMENT           *
+ ****************************************/
+
+void GenericMap::addThreadMarker(unsigned int nb)
+{
+	unsigned int th ;
+
+	for (unsigned int j = 0; j < nb; ++j)
+	{
+		th = m_nbThreads ;
+		m_nbThreads++ ;
+
+		for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		{
+			if (isOrbitEmbedded(i))
+			{
+				std::stringstream ss ;
+				ss << "Mark_"<< th ;
+				AttributeContainer& cellCont = m_attribs[i] ;
+				AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
+				m_markerTables[i][th] = amvMark ;
+			}
+		}
+	}
+}
+
+unsigned int GenericMap::getNbThreadMarkers()
+{
+	return m_nbThreads;
+}
+
+void GenericMap::removeThreadMarker(unsigned int nb)
+{
+	unsigned int th = 0;
+	while ((m_nbThreads > 1) && (nb > 0))
+	{
+		th = --m_nbThreads ;
+		--nb;
+		for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		{
+			if (isOrbitEmbedded(i))
+			{
+				std::stringstream ss ;
+				ss << "Mark_"<< th ;
+				AttributeContainer& cellCont = m_attribs[i] ;
+				cellCont.removeAttribute(ss.str()) ;
+				m_markerTables[i][th] = NULL ;
+			}
+		}
+	}
+}
 
 /****************************************
  *             SAVE & LOAD              *
@@ -464,7 +514,6 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	return true;
 }
 
-
 /****************************************
  *           DARTS TRAVERSALS           *
  ****************************************/
@@ -523,56 +572,5 @@ unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& go
 	foreach_orbit(orbit, fcount, good);
 	return fcount.getNb();
 }
-
-void GenericMap::addThreadMarker(unsigned int nb)
-{
-	unsigned int th ;
-
-	for (unsigned int j = 0; j < nb; ++j)
-	{
-		th = m_nbThreads ;
-		m_nbThreads++ ;
-
-		for (unsigned int i = 0; i < NB_ORBITS; ++i)
-		{
-			if (isOrbitEmbedded(i))
-			{
-				AttributeContainer& cellCont = m_attribs[i] ;
-				std::stringstream ss ;
-				ss << "Mark_"<< th ;
-				AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-				m_markerTables[i][th] = amvMark ;
-			}
-		}
-	}
-}
-
-unsigned int GenericMap::getNbThreadMarkers()
-{
-	return m_nbThreads;
-}
-
-void GenericMap::removeThreadMarker(unsigned int nb)
-{
-	unsigned int th = 0;
-	while ((m_nbThreads > 1) && (nb > 0))
-	{
-		th = --m_nbThreads ;
-		--nb;
-		for (unsigned int i = 0; i < NB_ORBITS; ++i)
-		{
-			if (isOrbitEmbedded(i))
-			{
-				AttributeContainer& cellCont = m_attribs[i] ;
-				std::stringstream ss ;
-				ss << "Mark_"<< th ;
-				cellCont.removeAttribute(ss.str()) ;
-				m_markerTables[i][th] = NULL ;
-			}
-		}
-	}
-}
-
-
 
 } // namespace CGoGN

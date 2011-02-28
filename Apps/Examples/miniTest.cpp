@@ -536,11 +536,10 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 'd':
 		{
-			myMap.removeAttribute<PFP::VEC3>(normal) ;
-			myMap.removeAttribute<PFP::VEC3>(laplacian) ;
-
-			AttributeHandler<PFP::VEC3> newPosition = myMap.addAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
-			Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, newPosition) ;
+			AttributeHandler<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+			if(!positionF.isValid())
+				positionF = myMap.addAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+			Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 
@@ -550,12 +549,14 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			GLfloat seconds = (t2 - t1) / 1000.0f;
 			std::cout << "dual computation: "<< seconds << "sec" << std::endl;
 
-			newPosition = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
-			myMap.removeAttribute<PFP::VEC3>(newPosition) ;
-
 			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-			normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-			laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+
+			normal = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			if(!normal.isValid())
+				normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+			if(!laplacian.isValid())
+				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME);
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;

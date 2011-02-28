@@ -242,9 +242,7 @@ inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned in
 	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
 	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
 
-	AttributeMultiVector<unsigned int>* e = m_embeddings[orbit1] ;
-	m_embeddings[orbit1] = m_embeddings[orbit2] ;
-	m_embeddings[orbit2] = e ;
+	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
 
 	for(unsigned int t = 0; t < m_nbThreads; ++t)
 	{

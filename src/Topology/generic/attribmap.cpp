@@ -56,7 +56,9 @@ void AttribMap::addEmbedding(unsigned int orbit)
 	AttributeContainer& cellCont = m_attribs[orbit];
 	for (unsigned int t = 0; t < m_nbThreads; ++t)
 	{
-		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>("Mark") ;
+		std::stringstream ss ;
+		ss << "Mark_"<< t ;
+		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
 		m_markerTables[orbit][t] = amvMark ;
 	}
 }

@@ -43,8 +43,6 @@ namespace CGoGN
 template <typename T>
 class AttributeHandler
 {
-	friend class AttribMap ;
-
 protected:
 	// we need the map to use dart as index
 	GenericMap* m_map;
@@ -52,19 +50,17 @@ protected:
 	// access to the data
 	AttributeMultiVector<T>* m_attrib;
 
-protected:
-	/**
-	 * Constructor
-	 * @param m the map which belong attribute
-	 * @param orbit orbit of attribute
-	 * @param orbit index of attribute
-	 */
-	AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) ;
-
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler() : m_map(NULL), m_attrib(NULL) {}
+	/**
+	 * Constructor
+	 * @param m the map which belong attribute
+	 * @param amv a pointer to the AttributeMultiVector
+	 */
+	AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) ;
+
+	AttributeHandler() ;
 
 	/**
 	 * Copy constructor

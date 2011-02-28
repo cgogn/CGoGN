@@ -125,8 +125,7 @@ const std::string& AttributeContainer::getAttributeName(unsigned int index)
 	assert(index < m_tableAttribs.size() || !"getAttributeName: attribute index out of bounds");
 	assert(m_tableAttribs[index] != NULL || !"getAttributeName: attribute does not exist");
 
-	if(m_tableAttribs[index] != NULL)
-		return m_tableAttribs[index]->getName() ;
+	return m_tableAttribs[index]->getName() ;
 }
 
 template <typename T>

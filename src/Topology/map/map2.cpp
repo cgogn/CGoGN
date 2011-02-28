@@ -353,46 +353,6 @@ void Map2::closeMap(DartMarker& marker)
 	}
 }
 
-void Map2::reverseOrientation()
-{
-	DartMarkerNoUnmark mf(*this);
-
-	// reverse all faces (only phi1 is modified)
-	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (!mf.isMarked(d))
-		{
-			reverseFace(d);
-			mf.markOrbit(FACE_ORBIT, d);
-		}
-	}
-
-	// store all new phi2
-	std::vector<Dart> vd;
-	vd.reserve(getNbDarts());
-	for (Dart d = begin(); d != end(); next(d))
-	{
-		Dart e = phi_1(phi2(phi1(d)));
-		vd.push_back(e);
-	}
-
-	// apply the phi2sew with stored phi2 on all darts
-	std::vector<Dart>::iterator id = vd.begin();
-	for (Dart d = begin(); d != end(); next(d),++id)
-	{
-		if (mf.isMarked(d))
-		{
-			mf.unmark(d);		// unmark the two darts
-			mf.unmark(*id);
-			if (phi2(d) != d)
-				phi2unsew(d);	// unsew the two darts if necessary
-			if (phi2(*id) != *id)
-				phi2unsew(*id);
-			phi2sew(d, *id); 	// sew the darts
-		}
-	}
-}
-
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
