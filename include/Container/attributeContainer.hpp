@@ -292,8 +292,10 @@ AttributeMultiVector<T>* AttributeContainer::getDataVector(const std::string& at
 inline AttributeMultiVectorGen* AttributeContainer::getVirtualDataVector(const std::string& attribName)
 {
 	unsigned int index = getAttributeIndex(attribName) ;
-	assert(index != UNKNOWN) ;
-	return m_tableAttribs[index];
+	if(index == UNKNOWN)
+		return NULL ;
+	else
+		return m_tableAttribs[index];
 }
 
 template <typename T>

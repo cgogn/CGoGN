@@ -44,7 +44,6 @@ inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
 template <typename T>
 inline AttributeHandler<T> AttribMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
 {
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	AttributeMultiVector<T>* amv = m_attribs[orbit].getDataVector<T>(nameAttr) ;
 	return AttributeHandler<T>(this, amv) ;
 }
@@ -77,7 +76,6 @@ inline bool AttribMap::copyAttribute(AttributeHandler<T>& dst, AttributeHandler<
 
 inline unsigned int AttribMap::getNbCells(unsigned int orbit)
 {
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	return this->m_attribs[orbit].size() ;
 }
 
@@ -88,7 +86,6 @@ inline unsigned int AttribMap::getNbCells(unsigned int orbit)
 inline AttributeMultiVector<Dart>* AttribMap::addRelation(const std::string& name)
 {
 	AttributeContainer& cont = m_attribs[DART_ORBIT] ;
-
 	AttributeMultiVector<Dart>* amv = cont.addAttribute<Dart>(name) ;
 
 	// set new relation to fix point for all the darts of the map
