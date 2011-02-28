@@ -890,6 +890,50 @@ void topo3_VBORenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect
 //}
 
 
+
+template<typename PFP>
+void topo3_VBORender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
+{
+
+	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+	float* colorBuffer =  reinterpret_cast<float*>(glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	unsigned int nb=0;
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (nb < m_nbDarts)
+		{
+			if (good(d))
+			{
+				unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
+
+				float r = float(lab%256) / 256.0f; lab = lab/256;
+				float g = float(lab%256) / 256.0f; lab = lab/256;
+				float b = float(lab%256) / 256.0f; lab = lab/256;
+
+				if (lab!=0)
+					std::cerr << "Error picking color, too many darts"<< std::endl;
+
+				*colorBuffer++ = r;
+				*colorBuffer++ = g;
+				*colorBuffer++ = b;
+				*colorBuffer++ = r;
+				*colorBuffer++ = g;
+				*colorBuffer++ = b;
+
+				nb++;
+			}
+		}
+		else
+		{
+			std::cerr << "Error buffer too small for color picking (change the good parameter ?)" << std::endl;
+			d = map.end();
+		}
+	}
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
+}
+
+
 }//end namespace VBO
 
 }//end namespace Algo

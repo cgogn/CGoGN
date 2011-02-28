@@ -177,7 +177,6 @@ int main(int argc, char **argv)
 //    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::POINTS);
 
 
-
     mgw.mainLoop();
 
     return 0;

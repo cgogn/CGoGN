@@ -182,6 +182,20 @@ public:
 		FunctorUnmark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT, m_thread)) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
+
+	template <typename MAP>
+	void markOrbitInParent(unsigned int orbit, Dart d)
+	{
+		FunctorMark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT,m_thread)) ;
+		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
+	}
+
+	template <typename MAP>
+	void unmarkOrbit(unsigned int orbit, Dart d)
+	{
+		FunctorUnmark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART_ORBIT, m_thread)) ;
+		foreach_dart_of_orbit_in_parent<MAP>(m_map, orbit, d, fm, m_thread);
+	}
 };
 
 /**
