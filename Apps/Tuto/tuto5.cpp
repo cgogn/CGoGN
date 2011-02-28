@@ -108,8 +108,25 @@ void myGlutWin::myRedraw(void)
 	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
 
 
+
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	glDisable(GL_LIGHTING);
+
+	glLineWidth(3.0);
+	glBegin(GL_LINES);
+	glColor3f(1.,0.,0.);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(1.0,0.0,0.0);
+
+	glColor3f(0.,1.,0.);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(0.0,1.0,0.0);
+
+	glColor3f(0.,0.,1.);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(0.0,0.0,1.0);
+
+	glEnd();
 
 	glColor3f(0.0f,1.0f,.0f);
 	m_render->draw(Algo::Render::VBO::POINTS);
@@ -187,6 +204,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
         	}
         		break;
+
         	case 'x':
         	{
         		// push/pop color is only needed for dart coloring conservation
@@ -203,22 +221,23 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
         		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
         		//pick
         		Dart d = m_render_topo->picking(x,H-y);
+
         		glPopMatrix();
 
         		m_render_topo->popColors();
 
-        		if (d != Dart::nil())
+         		if (d != Dart::nil())
         		{
+        			m_render_topo->setDartColor(d,1.0,0.0,0.0);
         			redraw();
         			std::stringstream ss;
         			ss << "Pick dart:" << d << std::endl<<"pos="<< position[d];
         			glColor3f(1.,1.,0.);
         			printString2D(x+12,y+22,ss.str());
         			glutSwapBuffers();
-//        			std::cout << "Pick dart:" << d << " position= "<< position[d] << std::endl;
-        			std::cout << "Pick dart:" << d << std::endl;
+        			std::cout << "Pick dart:" << d << " pos= "<< position[d] << std::endl;
         		}
-        		// in console:
+
 
         		break;
         	}
@@ -427,6 +446,8 @@ int main(int argc, char **argv)
 		nb = atoi(argv[1]);
 	dglobal = prim.hexaGrid_topo(nb,nb,nb);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
+
 //	Geom::Matrix44f mat;
 //	mat.identity();
 //	Geom::scale(2.0f, 2.0f,2.0f,mat);

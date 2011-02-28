@@ -118,6 +118,11 @@ protected:
 
 
 public:
+
+	Dart colToDart(float* color);
+
+	void dartToCol(Dart d, float& r, float& g, float& b);
+
 	/**
 	* Constructor
 	* @param map the map to draw

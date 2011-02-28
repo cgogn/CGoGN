@@ -905,21 +905,15 @@ void topo3_VBORender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelec
 		{
 			if (good(d))
 			{
-				unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
-
-				float r = float(lab%256) / 256.0f; lab = lab/256;
-				float g = float(lab%256) / 256.0f; lab = lab/256;
-				float b = float(lab%256) / 256.0f; lab = lab/256;
-
-				if (lab!=0)
-					std::cerr << "Error picking color, too many darts"<< std::endl;
-
-				*colorBuffer++ = r;
-				*colorBuffer++ = g;
-				*colorBuffer++ = b;
-				*colorBuffer++ = r;
-				*colorBuffer++ = g;
-				*colorBuffer++ = b;
+				float r,g,b;
+				dartToCol(d, r,g,b);
+				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
 
 				nb++;
 			}
