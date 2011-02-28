@@ -43,8 +43,6 @@
 
 #include "Algo/Render/topo3_vboRender.h"
 
-//#include "Algo/Render/topo_vboRender.h"
-
 #include "Topology/generic/cellmarker.h"
 
 //#include "testMaps.h"
@@ -189,6 +187,42 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
         	}
         		break;
+        	case 'x':
+        	{
+        		// push/pop color is only needed for dart coloring conservation
+        		// can bee long long huge meshes
+        		m_render_topo->pushColors();
+
+        		// setDartsIdColor can be done only once if dart coloring not used
+        		m_render_topo->setDartsIdColor<PFP>(myMap,allDarts);
+
+        		// transform as in drawing cb
+        		glPushMatrix();
+        		float sc = 50.0f/gWidthObj;
+        		glScalef(sc,sc,sc);
+        		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
+        		//pick
+        		Dart d = m_render_topo->picking(x,H-y);
+        		glPopMatrix();
+
+        		m_render_topo->popColors();
+
+        		if (d != Dart::nil())
+        		{
+        			redraw();
+        			std::stringstream ss;
+        			ss << "Pick dart:" << d << std::endl<<"pos="<< position[d];
+        			glColor3f(1.,1.,0.);
+        			printString2D(x+12,y+22,ss.str());
+        			glutSwapBuffers();
+//        			std::cout << "Pick dart:" << d << " position= "<< position[d] << std::endl;
+        			std::cout << "Pick dart:" << d << std::endl;
+        		}
+        		// in console:
+
+        		break;
+        	}
+
         	case 'Q':
         		m_render_topo->setAllDartsColor(1.0f,1.0f,1.0f);
         		glutPostRedisplay();

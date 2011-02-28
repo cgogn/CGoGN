@@ -355,6 +355,11 @@ void SimpleGlutWin::printString2D(int x, int y, const std::string& str)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	
+	// not very optimized but not very important here
+	unsigned char blank[180];
+	for (unsigned int i=0; i< 180; ++i)
+		blank[i]=(unsigned char)(0);
+
 	// AFFICHAGE EN 2D
 	int x1 = x;
 	for (unsigned i=0; i<str.length(); ++i) 
@@ -365,6 +370,9 @@ void SimpleGlutWin::printString2D(int x, int y, const std::string& str)
 			x1 = x;
 			y += 14;
 		}
+		glRasterPos2i(x1,y+2);
+		glDrawPixels(12,15,GL_LUMINANCE,GL_UNSIGNED_BYTE, blank);
+
 		glRasterPos2i(x1,y);
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
 		x1 += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12,c);

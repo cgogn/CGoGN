@@ -85,6 +85,9 @@ protected:
 	 */
 	float m_topo_relation_width;
 
+
+	float *m_color_save;
+
 	AttributeHandler<unsigned int> m_attIndex;
 
 	/**
@@ -207,10 +210,37 @@ public:
 	 * @param g green !
 	 * @param b blue !
 	 */
-
 	void overdrawDart(Dart d, float width, float r, float g, float b);
 
 
+	/**
+	 * save colors
+	 */
+	void pushColors();
+
+
+	/**
+	 * restore colors
+	 */
+	void popColors();
+
+	/*
+	 * store darts in color for picking
+	 * @param map the map (must be the same than during updating data)
+	 * @param good the selector (must be the same than during updating data)
+	 */
+	template<typename PFP>
+	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
+
+
+	/**
+	 * pick dart with color set bey setDartsIdColor
+	 * Do not forget to apply same transformation to scene before picking than before drawing !
+	 * @param x position of mouse (x)
+	 * @param y position of mouse (pass H-y, classic pb of origin)
+	 * @return the dart or NIL
+	 */
+	Dart picking(unsigned int x, unsigned int y);
 };
 
 //template<typename MAP>
