@@ -98,7 +98,7 @@ void topo3_VBORender::setAllDartsColor(float r, float g, float b)
 
 void topo3_VBORender::drawDarts()
 {
-	glColor3f(1.0f,1.0f,1.0f);
+//	glColor3f(1.0f,1.0f,1.0f);
 	glLineWidth(m_topo_dart_width);
 	glPointSize(2.0f*m_topo_dart_width);
 
@@ -214,6 +214,32 @@ void topo3_VBORender::popColors()
 }
 
 
+Dart topo3_VBORender::colToDart(float* color)
+{
+	unsigned int r = (unsigned int)(color[0]*255.0f);
+	unsigned int g = (unsigned int)(color[1]*255.0f);
+	unsigned int b = (unsigned int)(color[2]*255.0f);
+
+	unsigned int id = r + 255*g +255*255*b;
+
+	if (id==0)
+		return Dart::nil();
+	return  Dart(id-1);
+
+}
+
+void topo3_VBORender::dartToCol(Dart d, float& r, float& g, float& b)
+{
+	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
+
+	r = float(lab%255) / 255.0f; lab = lab/255;
+	g = float(lab%255) / 255.0f; lab = lab/255;
+	b = float(lab%255) / 255.0f; lab = lab/255;
+	if (lab!=0)
+		std::cerr << "Error picking color, too many darts"<< std::endl;
+}
+
+
 Dart topo3_VBORender::picking(unsigned int x, unsigned int y)
 {
 	//more easy picking for
@@ -241,17 +267,7 @@ Dart topo3_VBORender::picking(unsigned int x, unsigned int y)
 
 	glClearColor(cc[0], cc[1], cc[2], cc[3]);
 
-	// compute dart index:
-	unsigned int r = (unsigned int)(color[0]*255.0f);
-	unsigned int g = (unsigned int)(color[1]*255.0f);
-	unsigned int b = (unsigned int)(color[2]*255.0f);
-
-	unsigned int id = r + 256*g +256*256*b;
-
-	if (id == 0)
-		return Dart::nil();
-
-	return Dart(id-1); // -1 because we draw +1
+	return colToDart(color);
 }
 
 
