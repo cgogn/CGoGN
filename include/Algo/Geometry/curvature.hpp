@@ -97,10 +97,20 @@ void computeCurvatureVertex(
 	K1_v = invLocalFrame * K1_v ;
 	VEC3 K2_v = n ^ K1_v ;
 
-	k1[dart] = k1_v ;
-	k2[dart] = k2_v ;
-	K1[dart] = K1_v ;
-	K2[dart] = K2_v ;
+	if (k1_v < k2_v)
+	{
+		k1[dart] = -k1_v ;
+		k2[dart] = -k2_v ;
+		K1[dart] = K1_v ;
+		K2[dart] = K2_v ;
+	}
+	else
+	{
+		k1[dart] = -k2_v ;
+		k2[dart] = -k1_v ;
+		K1[dart] = K2_v ;
+		K2[dart] = K1_v ;
+	}
 }
 
 template <typename PFP>
