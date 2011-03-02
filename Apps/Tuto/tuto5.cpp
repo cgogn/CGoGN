@@ -44,7 +44,6 @@
 #include "Algo/Render/topo3_vboRender.h"
 
 #include "Topology/generic/cellmarker.h"
-#include "Utils/text3d.h"
 
 //#include "testMaps.h"
 
@@ -67,10 +66,6 @@ Dart dglobal;
 unsigned int idNorm;
 unsigned int idCol;
 
-
-
-
-
 class myGlutWin: public Utils::SimpleGlutWin
 {
 public:
@@ -88,11 +83,7 @@ public:
     Algo::Render::VBO::MapRender_VBO* m_render;
     Algo::Render::VBO::topo3_VBORenderMapD* m_render_topo;
 
-    Utils::Strings3D m_strings;
-
     void updateVBO();
-
-    void storeVerticesInfo();
 
  	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY)
     {
@@ -105,22 +96,6 @@ public:
 
  	void myKeyboard(unsigned char keycode, int x, int y);
 };
-
-void myGlutWin::storeVerticesInfo()
-{
-
-	CellMarker mv(myMap,VERTEX_CELL);
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
-	{
-		if (!mv.isMarked(d))
-		{
-			mv.mark(d);
-			std::stringstream ss;
-			ss << d << " : "<< position[d];
-			m_strings.addString(ss.str(),position[d]);
-		}
-	}
-}
 
 void myGlutWin::myRedraw(void)
 {
@@ -185,15 +160,6 @@ void myGlutWin::myRedraw(void)
 		m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
 
 	}
-
-//	m_strings.predraw(Geom::Vec3f(0.0,1.0,1.0));
-//	m_strings.draw(0,Geom::Vec3f(0.5,0.5,0.5));
-//	m_strings.draw(1,Geom::Vec3f(-0.5,0.5,0.5));
-//	m_strings.draw(2,Geom::Vec3f(-0.5,-0.5,0.5));
-//	m_strings.postdraw();
-
-
-	m_strings.drawAll(Geom::Vec3f(0.0,1.0,1.0));
 
     //affichage de l'aide
     if (aff_help) {
@@ -537,11 +503,10 @@ int main(int argc, char **argv)
     mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
     mgw.m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
 
+
     mgw.updateVBO();
 
-    mgw.m_strings.init();
-    mgw.storeVerticesInfo();
-    mgw.m_strings.sendToVBO();
+
 
     mgw.mainLoop();
 

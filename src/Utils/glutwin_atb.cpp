@@ -65,7 +65,7 @@ GlutWin_ATB::GlutWin_ATB(int* argc, char **argv, int winX, int winY)
 	scalefactor = 1.0f ;
 	trans_x = 0.0f ;
 	trans_y = 0.0f ;
-	trans_z = -200.0f ;
+	trans_z = -50.0f ;
 
 	std::cout << "Initialisation Glut" << std::endl ;
 	glutInit(argc, argv) ;
@@ -155,10 +155,13 @@ void GlutWin_ATB::recalcModelView()
 	glPopMatrix() ;
 	glPushMatrix() ;
 
-	glTranslatef(trans_x, trans_y, trans_z) ;
+	glTranslatef(trans_x, trans_y, trans_z+focal) ;
 
 	build_rotmatrix(m, curquat) ;
 	glMultMatrixf(&m[0][0]) ;
+
+	float sc = getScale() ;
+	glScalef(sc, sc, sc) ;
 
 	newModel = 0 ;
 }
@@ -182,15 +185,14 @@ void GlutWin_ATB::motion(int x, int y)
 	}
 	else if(scaling)
 	{
-		trans_z -= 0.1f*(x - beginx);
-		trans_z -= 0.1f*(y - beginy);
+		scalefactor = scalefactor * (1.0f + (((float) (beginy - y)) / H)) ;
 		newModel = 1 ;
 		glutPostRedisplay() ;
 	}
 	else if(translating)
 	{
-		trans_x += 0.05f * (x - beginx) ;
-		trans_y += 0.05f * (beginy - y) ;
+		trans_x += 0.01f * (x - beginx) ;
+		trans_y += 0.01f * (beginy - y) ;
 		newModel = 1 ;
 		glutPostRedisplay() ;
 	}
