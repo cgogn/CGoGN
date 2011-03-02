@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Utils
 {
 
+
+std::vector<std::string> GLSLShader::m_pathes;
+
 GLSLShader::GLSLShader()
 {
 	m_vertex_shader_object = 0;
@@ -527,6 +530,20 @@ std::string GLSLShader::findFile(const std::string filename)
 	}
 	file.close();
 
+	for (std::vector<std::string>::const_iterator ipath = m_pathes.begin(); ipath != m_pathes.end(); ++ipath)
+	{
+		std::string st(*ipath);
+		st.append(filename);
+
+		std::ifstream file2;
+		file2.open(st.c_str(),std::ios::in);
+		if (!file2.fail())
+		{
+			file2.close();
+			return st;
+		}
+	}
+
 // LA MACRO SHADERPATH contient le chemin du repertoire qui contient les fichiers textes
 	std::string st(SHADERPATH);
 	st.append(filename);
@@ -683,6 +700,11 @@ void GLSLShader::bindAttrib(unsigned int att, const char* name) const
 	glBindAttribLocation(m_program_object,att,name);
 }
 
+
+void GLSLShader::addPathFileSeach(const std::string& path)
+{
+	m_pathes.push_back(path);
+}
 
 
 
