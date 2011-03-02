@@ -37,6 +37,55 @@ namespace Decimation
 {
 
 template <typename PFP>
+class Approximator_FrameHalf : public Approximator<PFP, typename Geom::Matrix<3,3,typename PFP::REAL> >
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	typedef Geom::Matrix<3,3,REAL> MATRIX33 ;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
+
+public:
+	Approximator_FrameHalf(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
+		Approximator<PFP, MATRIX33>(m, frame, EDGE_ORBIT, pred)
+	{}
+	~Approximator_FrameHalf()
+	{}
+	ApproximatorType getType() const { return A_LightfieldHalf ; }
+	bool init() { return true ; } ;
+	void approximate(Dart d) ;
+} ;
+
+template <typename PFP>
+class Approximator_RGBfunctionsHalf : public Approximator<PFP, typename Geom::Matrix<3,6,typename PFP::REAL> >
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	typedef Geom::Matrix<3,3,REAL> MATRIX33 ;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
+
+protected:
+	AttributeHandler<MATRIX33> m_frame ;
+	AttributeHandler<MATRIX33> m_approxFrame ;
+	AttributeHandler<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
+
+public:
+	Approximator_RGBfunctionsHalf(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE_ORBIT, pred)
+	{ }
+	~Approximator_RGBfunctionsHalf	()
+	{}
+	ApproximatorType getType() const { return A_LightfieldHalf ; }
+	bool init() ;
+	void approximate(Dart d) ;
+} ;
+
+template <typename PFP>
 class Approximator_Frame : public Approximator<PFP, typename Geom::Matrix<3,3,typename PFP::REAL> >
 {
 public:

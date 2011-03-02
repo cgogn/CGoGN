@@ -76,22 +76,13 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 * export the map into a PLYPTM file
 * @param the_map map to be exported
 * @param filename filename of ply file
+* @param position the position container
+* @param frame[3] table of 3 vectors representing the local frame
+* @param colorPTM[6] function coefficients (6) for each color channel (3)
 * @return true
 */
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& Pos,
-		const typename PFP::TVEC3& Tan, const typename PFP::TVEC3& Btan, const typename PFP::TVEC3& Norm,
-		const AttributeHandler<typename PFP::VEC6>& L1, AttributeHandler<typename PFP::VEC6>& L2, const AttributeHandler<typename PFP::VEC6>& L3,
-		const FunctorSelect& good = SelectorTrue()) ;
-
-/**
-* export the map into a PLYPTM file
-* @param the_map map to be exported
-* @param filename filename of ply file
-* @return true
-*/
-template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& Pos,	const typename PFP::TMAT33& Frame, const typename PFP::TMAT36& RGBfuncs, const FunctorSelect& good = SelectorTrue()) ;
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good = SelectorTrue()) ;
 
 } // namespace Export
 

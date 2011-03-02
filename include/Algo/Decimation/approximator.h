@@ -44,6 +44,7 @@ enum ApproximatorType
 	A_CornerCutting,
 	A_TangentPredict1,
 	A_TangentPredict2,
+	A_LightfieldHalf,
 	A_LightfieldFull
 } ;
 

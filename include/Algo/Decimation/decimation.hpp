@@ -71,11 +71,11 @@ void decimate(
 		}
 		case A_LightfieldHalf :
 		{
-			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
+			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, position)) ;
 			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
 			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "colorPTM") ;
 			approximators.push_back(new Approximator_FrameHalf<PFP>(map, frame)) ;
-			approximators.push_back(new Approximator_RGBfunctions<PFP>(map, RGBfunctions)) ;
+			approximators.push_back(new Approximator_RGBfunctionsHalf<PFP>(map, RGBfunctions)) ;
 			break ;
 		}
 	}
@@ -91,11 +91,17 @@ void decimate(
 		case S_EdgeLength :
 			selector = new EdgeSelector_Length<PFP>(map, position, approximators) ;
 			break ;
+		case S_QEMml :
+			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators) ;
+			break ;
 		case S_QEM :
 			selector = new EdgeSelector_QEM<PFP>(map, position, approximators) ;
 			break ;
 		case S_Lightfield :
 			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators) ;
+			break ;
+		case S_LightfieldHalf :
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
 		case S_Curvature :
 			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators) ;

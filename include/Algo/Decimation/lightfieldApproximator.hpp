@@ -36,6 +36,96 @@ namespace Decimation
  ************************************************************************************/
 
 template <typename PFP>
+void Approximator_FrameHalf<PFP>::approximate(Dart d)
+{
+	this->m_approx[d] = this->m_attrV[d] ;
+}
+
+/************************************************************************************
+ *                      LIGHTFIELD QUADRIC METRIC : functions                       *
+ ************************************************************************************/
+
+template <typename PFP>
+bool Approximator_RGBfunctionsHalf<PFP>::init()
+{
+	// get actual frames and hypothetical approximated frames
+	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX_ORBIT, "frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE_ORBIT, "approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "quadricRGBfunctions") ;
+
+	MapBrowserLinkedAuto<typename PFP::MAP> mb(this->m_map) ;
+	this->m_map.foreach_orbit(EDGE_ORBIT, mb) ;
+
+	// create quadric embedding for computing and set them to 0
+	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))
+		m_quadricRGBfunctions[d].zero() ;
+
+	// Check on embeddings
+	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions.isValid())
+	{
+		std::cerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << std::endl ;
+		return false ;
+	}
+
+	return true ;
+}
+
+template <typename PFP>
+void Approximator_RGBfunctionsHalf<PFP>::approximate(Dart d)
+{
+	MAP& m = this->m_map ;
+	Dart dd = m.phi2(d) ;	// get the two vertices
+
+	// Approximation
+	this->m_approx[d] = this->m_attrV[d] ;
+
+	// Compute quadrics for error evaluation
+	// get hypothetical local frames
+	VEC3 i,n ;
+
+	m_approxFrame[d].getSubVectorH(0,0,i) ;
+	m_approxFrame[d].getSubVectorH(2,0,n) ;
+
+	// Get previous local frames
+	VEC3 n1,n2,i1,i2,j1,j2 ;
+
+	m_frame[d].getSubVectorH(0,0,i1) ;
+	m_frame[dd].getSubVectorH(0,0,i2) ;
+
+	m_frame[d].getSubVectorH(1,0,j1) ;
+	m_frame[dd].getSubVectorH(1,0,j2) ;
+
+	m_frame[d].getSubVectorH(2,0,n1) ;
+	m_frame[dd].getSubVectorH(2,0,n2) ;
+
+	// Compute j1' and j2'
+	VEC3 j1pr = n1 ^ i ;
+	j1pr.normalize() ;
+	VEC3 j2pr = n2 ^ i ;
+	j2pr.normalize() ;
+
+	// Rotation dans sens trigo dans le plan tangent autour de n (i1->i)
+//	REAL gamma1 = ((j1 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i1 * i ), -1.0f)) ; // angle positif ssi
+	REAL gamma2 = ((j2 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i2 * i ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
+	// Rotation dans le sens trigo autour de l'axe i (n1->n)
+//	REAL alpha1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
+	REAL alpha2 = ((n * j2pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
+
+//	assert (-0.01 < gamma1 && gamma1 < 0.01) ;
+//	assert (-0.01 < alpha1 && alpha1 < 0.01) ;
+	REAL gamma1 = REAL(0) ;
+	REAL alpha1 = REAL(0) ;
+
+	// Create and sum quadrics
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
+}
+
+/************************************************************************************
+ *                      LIGHTFIELD QUADRIC METRIC : frame                           *
+ ************************************************************************************/
+
+template <typename PFP>
 bool Approximator_Frame<PFP>::init()
 {
 	m_position = this->m_map.template getAttribute<VEC3>(VERTEX_ORBIT, "position") ;
@@ -106,8 +196,11 @@ bool Approximator_RGBfunctions<PFP>::init()
 	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE_ORBIT, "approx_frame") ;
 	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "quadricRGBfunctions") ;
 
+	MapBrowserLinkedAuto<typename PFP::MAP> mb(this->m_map) ;
+	this->m_map.foreach_orbit(EDGE_ORBIT, mb) ;
+
 	// create quadric embedding for computing and set them to 0
-	for (Dart d = this->m_map.begin() ; d != this->m_map.end() ; this->m_map.next(d))
+	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))
 		m_quadricRGBfunctions[d].zero() ;
 
 	// Check on embeddings

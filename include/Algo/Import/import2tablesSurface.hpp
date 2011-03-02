@@ -512,10 +512,24 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 {
 	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
 	attrNames.push_back(positions.name()) ;
-	AttributeHandler<typename PFP::MATRIX33> Frame = m_map.template addAttribute<typename PFP::MATRIX33>(VERTEX_ORBIT, "frame") ;
-	attrNames.push_back(Frame.name()) ;
-	AttributeHandler<typename PFP::MATRIX36> RGBfunctions = m_map.template addAttribute<typename PFP::MATRIX36>(VERTEX_ORBIT, "colorPTM") ;
-	attrNames.push_back(RGBfunctions.name()) ;
+
+	AttributeHandler<typename PFP::VEC3> frame[3] ;
+	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_T") ; // Tangent
+	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_B") ; // Bitangent
+	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_N") ; // Normal
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+		attrNames.push_back(frame[i].name()) ;
+
+	AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
+	colorPTM[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_a") ;
+	colorPTM[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_b") ;
+	colorPTM[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_c") ;
+	colorPTM[3] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_d") ;
+	colorPTM[4] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_e") ;
+	colorPTM[5] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_f") ;
+
+	for (unsigned int i = 0 ; i < 6 ; ++i)
+		attrNames.push_back(colorPTM[i].name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
 
@@ -585,11 +599,11 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 
 		for (unsigned int k = 0 ; k < 3 ; ++k)
 			for (unsigned int l = 0 ; l < 3 ; ++l)
-				Frame[id](k,l) = properties[3+(3*k+l)] ;
+				frame[k][id][l] = properties[3+(3*k+l)] ;
 
 		for (unsigned int k = 0 ; k < 3 ; ++k)
 			for (unsigned int l = 0 ; l < 6 ; ++l)
-				RGBfunctions[id](k,l) = properties[12+(6*k+l)];
+				colorPTM[l][id][k] = properties[12+(6*k+l)];
 	}
 
 	m_nbVertices = verticesID.size();

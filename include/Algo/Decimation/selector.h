@@ -46,9 +46,11 @@ enum SelectorType
 	S_Random,
 	S_EdgeLength,
 	S_QEM,
+	S_QEMml,
 	S_MinDetail,
 	S_Curvature,
-	S_Lightfield
+	S_Lightfield,
+	S_LightfieldHalf
 } ;
 
 
@@ -222,6 +224,120 @@ public:
 		this->m_map.removeAttribute(edgeInfo) ;
 	}
 	SelectorType getType() { return S_QEM ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
+
+template <typename PFP>
+class EdgeSelector_QEMml : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
+	} QEMedgeInfo ;
+	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo ;
+
+	AttributeHandler<EdgeInfo> edgeInfo ;
+	AttributeHandler<Quadric<REAL> > quadric ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, typename PFP::VEC3>* m_positionApproximator ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool neighbours = false) ;
+	Dart rewind(const Dart d) ;
+
+public:
+	EdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+		EdgeSelector<PFP>(m, pos, approx, select)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
+	}
+	~EdgeSelector_QEMml()
+	{
+		this->m_map.removeAttribute(quadric) ;
+		this->m_map.removeAttribute(edgeInfo) ;
+	}
+	SelectorType getType() { return S_QEM ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
+
+template <typename PFP>
+class HalfEdgeSelector_Lightfield : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	typedef Geom::Matrix<3,3,REAL> MATRIX33 ;
+	typedef MATRIX33 FRAME ;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
+	typedef MATRIX36 RGBFUNCTIONS ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "LightfieldHalfEdgeInfo" ; }
+	} LightfieldHalfEdgeInfo ;
+	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
+
+	AttributeHandler<FRAME > m_frame ;
+
+	AttributeHandler<HalfEdgeInfo> halfEdgeInfo ;
+	AttributeHandler<Quadric<REAL> > quadric ;
+	AttributeHandler<QuadricRGBfunctions<REAL> > quadricRGBfunctions ;
+
+	std::multimap<float,Dart> halfEdges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, VEC3>* m_positionApproximator ;
+	Approximator<PFP, FRAME >* m_frameApproximator ;
+	Approximator<PFP, RGBFUNCTIONS >* m_RGBfunctionsApproximator ;
+
+	void initHalfEdgeInfo(Dart d) ;
+	void updateHalfEdgeInfo(Dart d, bool recompute) ;
+	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool neighbors) ;
+	Dart rewind(const Dart d) ;
+
+public:
+	HalfEdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+		EdgeSelector<PFP>(m, pos, approx, select)
+	{
+		m_frame = m.template getAttribute<FRAME>(VERTEX_ORBIT, "frame") ;
+
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo>(DART_ORBIT, "halfEdgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
+		quadricRGBfunctions = m.template addAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "quadricRGBfunctions") ;
+	}
+	~HalfEdgeSelector_Lightfield()
+	{
+		this->m_map.removeAttribute(quadric) ;
+		this->m_map.removeAttribute(quadricRGBfunctions) ;
+		this->m_map.removeAttribute(halfEdgeInfo) ;
+	}
+	SelectorType getType() { return S_Lightfield ; }
 	bool init() ;
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
