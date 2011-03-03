@@ -255,7 +255,7 @@ protected:
 	/**
 	 * frame of vertices
 	 */
-	const typename PFP::TMAT33& m_frames;
+	const typename PFP::TVEC3 *m_frames;
 
 	/**
 	* Dart selector to restrict the rendering
@@ -269,7 +269,7 @@ public:
 
 	* @param good dart selector
 	*/
-	FunctorGLFrame (MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TMAT33& frames, float scale);
+	FunctorGLFrame (MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3 frames[3], float scale);
 
 	bool operator() (Dart d);
 };

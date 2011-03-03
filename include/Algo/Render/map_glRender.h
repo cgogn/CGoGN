@@ -71,7 +71,7 @@ void renderNormalVertices(typename PFP::MAP& the_map,
 
 template <typename PFP>
 void renderFrameVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TMAT33& frames, float scale, const FunctorSelect& good = SelectorTrue());
+		const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good = SelectorTrue());
 
 } // namespace Direct
 

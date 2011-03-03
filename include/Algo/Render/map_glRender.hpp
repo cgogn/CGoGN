@@ -183,7 +183,7 @@ void renderNormalVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3&
 }
 
 template <typename PFP>
-void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const typename PFP::TMAT33& frame, float scale, const FunctorSelect& good)
+void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good)
 {
 	FunctorGLFrame<PFP> fgl_frame(the_map, good, position, frame, scale) ;
 
