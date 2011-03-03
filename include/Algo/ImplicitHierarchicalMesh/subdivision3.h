@@ -35,14 +35,28 @@ namespace Algo
 namespace IHM
 {
 
+enum SubdivideType
+{
+	S_TRI,
+	S_QUAD
+} ;
+
 template <typename PFP>
 void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-Dart subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_QUAD);
 
 template <typename PFP>
-void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_QUAD);
+
+
+
+template <typename PFP>
+Dart subdivideFaceTri(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
+template <typename PFP>
+void subdivideVolumeTri(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 template <typename PFP>
 void catmullClarck(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);

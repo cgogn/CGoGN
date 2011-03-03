@@ -37,11 +37,8 @@ namespace Algo
 namespace IHM
 {
 
-template<typename T> class AttributeHandler_IHM ;
-
 class ImplicitHierarchicalMap3 : public EmbeddedMap3<Map3>
 {
-	template<typename T> friend class AttributeHandler_IHM ;
 
 public:
 	unsigned int m_curLevel ;
@@ -53,7 +50,7 @@ public:
 	AttributeHandler<unsigned int> m_edgeId ;
 	AttributeHandler<unsigned int> m_faceId ;
 
-	AttribMultiVect<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
+	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
 public:
 	ImplicitHierarchicalMap3() ;
@@ -61,13 +58,6 @@ public:
 	~ImplicitHierarchicalMap3() ;
 
 	void init() ;
-
-	/***************************************************
-	 *             ATTRIBUTES MANAGEMENT               *
-	 ***************************************************/
-
-	template <typename T>
-	AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
 	/***************************************************
 	 *                 MAP TRAVERSAL                   *
@@ -79,12 +69,12 @@ public:
 
 	Dart phi_1(Dart d) ;
 
+	Dart phi2(Dart d) ;
+
 private:
 	Dart phi2bis(Dart d) ;
 
 public:
-	Dart phi2(Dart d) ;
-
 	Dart phi3(Dart d);
 
 	Dart alpha0(Dart d);
@@ -141,13 +131,24 @@ public:
 	 */
 	unsigned int getNewEdgeId() ;
 
+	/**
+	 * Return the id of the edge of d
+	 */
 	unsigned int getEdgeId(Dart d) ;
 
+	/**
+	 * Set an edge id to all darts from an orbit of d
+	 */
+	//TODO changer l'ordre des parametres
 	void setEdgeId(Dart d, unsigned int i, unsigned int orbit);
 
 	/***************************************************
 	 *             FACE ID MANAGEMENT                  *
 	 ***************************************************/
+
+	/**
+	 * Give a new unique id to all the faces of the map
+	 */
 	void initFaceId() ;
 
 	/**
@@ -155,9 +156,18 @@ public:
 	 */
 	unsigned int getNewFaceId() ;
 
+	/**
+	 * Return the id of the face of d
+	 */
 	unsigned int getFaceId(Dart d) ;
 
+	/**
+	 * Set a face id to all darts from an orbit of d
+	 */
+	//TODO changer l'ordre des parametres
 	void setFaceId(Dart d, unsigned int i, unsigned int orbit);
+
+	void setFaceId(unsigned int orbit, Dart d);
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
@@ -174,22 +184,22 @@ public:
 	unsigned int edgeLevel(Dart d) ;
 
 	/**
-	 *
+	 * Return the level of the face of d in the current level map
 	 */
 	unsigned int faceLevel(Dart d);
 
 	/**
-	 *
+	 * Return the level of the volume of d in the current level map
 	 */
 	unsigned int volumeLevel(Dart d);
 
 	/**
-	 *
+	 * Return the oldest dart of the face of d in the current level map
 	 */
 	Dart faceOldestDart(Dart d);
 
 	/**
-	 *
+	 * Return the oldest dart of the volume of d in the current level map
 	 */
 	Dart volumeOldestDart(Dart d);
 
@@ -200,52 +210,18 @@ public:
 	bool edgeIsSubdivided(Dart d) ;
 
 	/**
-	 *
+	 * Return true if the face of d in the current level map
+	 * has already been subdivided to the next level
 	 */
 	bool faceIsSubdivided(Dart d) ;
 
 	/**
-	 *
+	 * Return true if the volume of d in the current level map
+	 * has already been subdivided to the next level
 	 */
 	bool volumeIsSubdivided(Dart d);
 } ;
 
-template <typename T>
-class AttributeHandler_IHM : public AttributeHandler<T>
-{
-public:
-	typedef T DATA_TYPE ;
-
-	AttributeHandler_IHM() : AttributeHandler<T>()
-	{}
-
-	AttributeHandler_IHM(GenericMap* m, unsigned int idAttr) : AttributeHandler<T>(m, idAttr)
-	{}
-
-	AttribMultiVect<T>* getDataVector() const
-	{
-		return AttributeHandler<T>::getDataVector() ;
-	}
-
-	bool isValid() const
-	{
-		return AttributeHandler<T>::isValid() ;
-	}
-
-	T& operator[](Dart d) ;
-
-	const T& operator[](Dart d) const ;
-
-	T& operator[](unsigned int a)
-	{
-		return AttributeHandler<T>::operator[](a) ;
-	}
-
-	const T& operator[](unsigned int a) const
-	{
-		return AttributeHandler<T>::operator[](a) ;
-	}
-} ;
 
 } //namespace IHM
 

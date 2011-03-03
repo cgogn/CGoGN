@@ -178,30 +178,30 @@ void Map3::cutEdge(Dart d)
 	}
 }
 
-void Map3::sewFace(Dart d, Dart e)
-{
-	Dart d2 = phi2(d);
-
-	unsewFaces(d);
-
-	sewFaces(d2,phi3(e));
-	sewFaces(d,e);
-}
-
-void Map3::unsewFace(Dart d)
-{
-	if(phi3(d) != d)
-	{
-		Dart e = phi2(phi3(d));
-
-		Dart d2 = phi2(d);
-		Dart e2 = phi2(e);
-
-		unsewFaces(d);
-		unsewFaces(e);
-		sewFaces(d2 , e);
-	}
-}
+//void Map3::sewFace(Dart d, Dart e)
+//{
+//	Dart d2 = phi2(d);
+//
+//	unsewFaces(d);
+//
+//	sewFaces(d2,phi3(e));
+//	sewFaces(d,e);
+//}
+//
+//void Map3::unsewFace(Dart d)
+//{
+//	if(phi3(d) != d)
+//	{
+//		Dart e = phi2(phi3(d));
+//
+//		Dart d2 = phi2(d);
+//		Dart e2 = phi2(e);
+//
+//		unsewFaces(d);
+//		unsewFaces(e);
+//		sewFaces(d2 , e);
+//	}
+//}
 
 //TODO
 //bool Map3::flipEdge(Dart d)
