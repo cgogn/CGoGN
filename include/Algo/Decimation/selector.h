@@ -258,8 +258,7 @@ private:
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
-	void recomputeQuadric(const Dart d, const bool neighbours = false) ;
-	Dart rewind(const Dart d) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
 	EdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
@@ -318,8 +317,7 @@ private:
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
 	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
-	void recomputeQuadric(const Dart d, const bool neighbors) ;
-	Dart rewind(const Dart d) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors) ;
 
 public:
 	HalfEdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :

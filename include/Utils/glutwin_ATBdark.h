@@ -75,6 +75,7 @@ protected:
 
 	// internal callbacks
 	static void redraw() ;
+	static void idleFunc() ;
 	static void recalcModelView() ;
 	static void motion(int x, int y) ;
 	static void mouse(int button, int state, int x, int y) ;
@@ -82,6 +83,7 @@ protected:
 	static void keyboard(unsigned char keycode, int x, int y) ;
 
 protected:
+	virtual void myIdleFunc()  {}
 	virtual void myKeyboard(unsigned char, int, int) {}
 	virtual void myMouse(int, int, int, int) {}
 	virtual void myMotion(int, int) {}

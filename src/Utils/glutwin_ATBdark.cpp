@@ -49,7 +49,7 @@ GlutWin_ATBdark::GlutWin_ATBdark(int* argc, char **argv, int winX, int winY)
 
 	glutDisplayFunc(redraw) ;
 	glutReshapeFunc(reshape) ;
-	glutIdleFunc(NULL) ;
+	glutIdleFunc(idleFunc) ;
 	glutMouseFunc(mouse) ;
 	glutPassiveMotionFunc(passive_mouse) ;
 	glutMotionFunc(motion) ;
@@ -104,6 +104,11 @@ void GlutWin_ATBdark::reshape(int w, int h)
 
 	// AntTweakBar
 	TwWindowSize(W, H) ;
+}
+
+void GlutWin_ATBdark::idleFunc()
+{
+	instance->myIdleFunc() ;
 }
 
 void GlutWin_ATBdark::recalcModelView()

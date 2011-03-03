@@ -26,6 +26,7 @@
 #define __LIGHTFIELD_APPROXIMATOR_H__
 
 #include "Algo/Decimation/approximator.h"
+#include "Topology/generic/mapBrowser.h"
 
 namespace CGoGN
 {

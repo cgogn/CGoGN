@@ -582,23 +582,6 @@ void EdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 		if(edgeE.valid)
 			edges.erase(edgeE.it) ;
 	}
-
-}
-
-/**
- *  rewind until border (if any)
- */
-// TODO : check & optimize
-template <typename PFP>
-Dart EdgeSelector_QEMml<PFP>::rewind(const Dart d) {
-	Dart dInit = d ;
-	do {
-		if (dInit == this->m_map.phi2(dInit)) // if border
-			break ; // stop
-		dInit = this->m_map.alpha_1(dInit) ;
-	} while (dInit != d) ;
-
-	return dInit ;
 }
 
 /**
@@ -608,29 +591,27 @@ Dart EdgeSelector_QEMml<PFP>::rewind(const Dart d) {
  * @param dart d
  */
 template <typename PFP>
-void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool neighbours) {
-	Dart dFront,dBack;
-	Dart dInit = rewind(d) ; // rewind until border (if any)
+void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors) {
+	Dart dFront,dBack ;
+	Dart dInit = d ;
 
 	// Init Front
-	dFront = dInit;
+	dFront = dInit ;
 
-	quadric[d].zero();
+	quadric[d].zero() ;
 
    	do {
    		// Make step
-   		dBack = dFront ;
-       	dFront = this->m_map.alpha1(dFront);
+   		dBack = this->m_map.phi2(dFront) ;
+       	dFront = this->m_map.alpha1(dFront) ;
 
-       	if (neighbours)
+       	if (dBack != dFront) { // if dFront is no border
+           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+       	}
+       	if (recomputeNeighbors)
        		recomputeQuadric(this->m_map.phi2(dFront), false) ;
 
-       	if (dFront == this->m_map.phi2(dFront))
-       		break ;
-
-       	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[this->m_map.phi2(dBack)]);
-
-    } while(dFront != dInit);
+    } while(dFront != dInit) ;
 }
 
 
@@ -850,30 +831,15 @@ void HalfEdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 }
 
 /**
- *  rewind until border (if any)
- */
-template <typename PFP>
-Dart HalfEdgeSelector_Lightfield<PFP>::rewind(const Dart d) {
-	Dart dInit = d ;
-	do {
-		if (dInit == this->m_map.phi2(dInit)) // if border
-			break ; // stop
-		dInit = this->m_map.alpha_1(dInit) ;
-	} while (dInit != d) ;
-
-	return dInit ;
-}
-
-/**
  * Update quadric of a vertex
  * Discards quadrics of d and assigns freshly calculated
  * quadrics depending on the actual planes surrounding d
  * @param dart d
  */
 template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool neighbors) {
+void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors) {
 	Dart dFront,dBack ;
-	Dart dInit = rewind(d) ; // rewind until border (if any)
+	Dart dInit = d ;
 
 	// Init Front
 	dFront = dInit ;
@@ -882,19 +848,18 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
 
    	do {
    		// Make step
-   		dBack = dFront ;
+   		dBack = this->m_map.phi2(dFront) ;
        	dFront = this->m_map.alpha1(dFront) ;
 
-       	if (neighbors)
+       	if (dBack != dFront) { // if dFront is no border
+           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+       	}
+       	if (recomputeNeighbors)
        		recomputeQuadric(this->m_map.phi2(dFront), false) ;
-
-       	if (dFront == this->m_map.phi2(dFront))
-       		break ;
-
-       	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[this->m_map.phi2(dBack)]) ;
 
     } while(dFront != dInit) ;
 }
+
 
 template <typename PFP>
 void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
