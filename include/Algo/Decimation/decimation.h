@@ -25,7 +25,8 @@
 #ifndef __DECIMATION_H__
 #define __DECIMATION_H__
 
-#include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/edgeSelector.h"
+#include "Algo/Decimation/halfEdgeSelector.h"
 #include "Algo/Decimation/geometryApproximator.h"
 #include "Algo/Decimation/lightfieldApproximator.h"
 

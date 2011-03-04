@@ -122,17 +122,17 @@ void decimate(
 		case S_QEM :
 			selector = new EdgeSelector_QEM<PFP>(map, position, approximators) ;
 			break ;
-		case S_Lightfield :
-			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators) ;
-			break ;
-		case S_LightfieldHalf :
-			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
-			break ;
 		case S_Curvature :
 			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators) ;
 			break ;
 		case S_MinDetail :
 			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
+			break ;
+		case S_hLightfield :
+			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
+			break ;
+		case S_hQEMml :
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
 	}
 
