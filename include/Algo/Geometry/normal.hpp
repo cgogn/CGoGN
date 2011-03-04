@@ -40,9 +40,9 @@ typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const typename
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	VEC3 p1 = position[d];
-	VEC3 p2 = position[map.phi1(d)];
-	VEC3 p3 = position[map.phi_1(d)];
+	const VEC3& p1 = position[d];
+	const VEC3& p2 = position[map.phi1(d)];
+	const VEC3& p3 = position[map.phi_1(d)];
 
 	VEC3 N = Geom::triangleNormal(p1, p2, p3) ;
 	N.normalize() ;
@@ -84,10 +84,13 @@ typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename P
 	do
 	{
 		VEC3 n = faceNormal<PFP>(map, it, position) ;
-		VEC3 v1 = vectorOutOfDart<PFP>(map, it, position) ;
-		VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(it), position) ;
-		n *= convexFaceArea<PFP>(map,it,position) / (v1.norm2() * v2.norm2()) ;
-		N += n ;
+		if(!n.hasNan())
+		{
+			VEC3 v1 = vectorOutOfDart<PFP>(map, it, position) ;
+			VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(it), position) ;
+			n *= convexFaceArea<PFP>(map, it, position) / (v1.norm2() * v2.norm2()) ;
+			N += n ;
+		}
 		it = map.phi1(map.phi2(it)) ;
 	} while (it != d) ;
 	N.normalize() ;

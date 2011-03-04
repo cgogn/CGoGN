@@ -45,6 +45,8 @@
 #include "Algo/Decimation/decimation.h"
 #include "Algo/Remeshing/pliant.h"
 
+#include "Algo/Selection/raySelector.h"
+
 using namespace CGoGN ;
 
 struct PFP: public PFP_STANDARD
@@ -95,6 +97,8 @@ public:
 	Algo::Render::VBO::MapRender_VBO* vbo_render ;
 	Algo::Render::VBO::topo_VBORenderMapD* topo_render ;
 	GLuint dl_norm, dl_lapl ;
+
+	Dart selectedDart ;
 
 	MyGlutWin(int* argc, char **argv, int winX, int winY) ;
 
@@ -306,6 +310,8 @@ MyGlutWin::MyGlutWin(int* argc, char **argv, int winX, int winY) :
 		shaders[0].loadShaders("phong_vs.txt", "phong_ps.txt") ;
 		shaders[1].loadShaders("flat_vs.txt", "flat_ps.txt", "flat_gs.txt") ;
 	}
+
+	selectedDart = Dart::nil() ;
 }
 
 void MyGlutWin::init()
@@ -349,9 +355,25 @@ void MyGlutWin::myRedraw()
 
 	glPushMatrix() ;
 
-	float sc = 50. / gWidthObj ;
+	float sc = 50.0f / gWidthObj ;
 	glScalef(sc, sc, sc) ;
 	glTranslatef(-gPosObj[0], -gPosObj[1], -gPosObj[2]) ;
+
+	if(!selectedDart.isNil())
+	{
+		glDisable(GL_LIGHTING) ;
+		glColor3f(1.0f,0.0f,0.0f) ;
+		glLineWidth(3.0f) ;
+		PFP::VEC3 c = Algo::Geometry::faceCentroid<PFP>(myMap, selectedDart, position) ;
+		PFP::VEC3 p1 = position[selectedDart] ;
+		PFP::VEC3 p2 = position[myMap.phi1(selectedDart)] ;
+		p1 += PFP::REAL(0.1) * (c - p1) ;
+		p2 += PFP::REAL(0.1) * (c - p2) ;
+		glBegin(GL_LINES) ;
+		glVertex3fv(p1.data()) ;
+		glVertex3fv(p2.data()) ;
+		glEnd() ;
+	}
 
 	if (renderTopo)
 	{
@@ -700,6 +722,37 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+
+			glutPostRedisplay() ;
+			break ;
+		}
+
+		case 'i':
+		{
+			glPushMatrix();
+
+			float sc = 50.0f / gWidthObj ;
+			glScalef(sc, sc, sc) ;
+			glTranslatef(-gPosObj[0], -gPosObj[1], -gPosObj[2]) ;
+
+			PFP::VEC3 rayA, rayB ;
+			getOrthoScreenRay(x, y, rayA, rayB) ;
+			PFP::VEC3 AB = rayB - rayA ;
+
+			std::vector<Dart> darts ;
+			Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts) ;
+
+			glPopMatrix();
+
+			if(!darts.empty())
+			{
+				selectedDart = darts[0] ;
+				std::cout << "selected dart -> " << selectedDart << std::endl ;
+				std::cout << "  phi1 -> " << myMap.phi1(selectedDart) << " / phi2 -> " << myMap.phi2(selectedDart) << std::endl ;
+				std::cout << "  emb0 -> " << myMap.getDartEmbedding(VERTEX_ORBIT, selectedDart) << std::endl ;
+			}
+			else
+				selectedDart = Dart::nil() ;
 
 			glutPostRedisplay() ;
 			break ;

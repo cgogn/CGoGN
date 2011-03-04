@@ -86,7 +86,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 		{
 			m3.markOrbit(EDGE_ORBIT, d) ;
 			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
-			if(length < edgeLengthInf)
+			if(length < edgeLengthInf && map.edgeCanCollapse(d))
 			{
 				bool collapse = true ;
 				Dart dd = map.phi2(d) ;
@@ -125,7 +125,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 			flip += x > 6 ? 1 : (x < 6 ? -1 : 0) ;
 			flip += y < 6 ? 1 : (y > 6 ? -1 : 0) ;
 			flip += z < 6 ? 1 : (z > 6 ? -1 : 0) ;
-			if(flip > 2)
+			if(flip > 1)
 			{
 				map.flipEdge(d) ;
 				m4.markOrbit(EDGE_ORBIT, map.phi1(d)) ;
@@ -140,8 +140,8 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	Algo::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
 
 	// tangential relaxation
-	AttributeHandler<VEC3> newPosition = map.template addAttribute<VEC3>(VERTEX_ORBIT, "newPosition") ;
-	Algo::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, newPosition) ;
+	AttributeHandler<VEC3> centroid = map.template addAttribute<VEC3>(VERTEX_ORBIT, "centroid") ;
+	Algo::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
 
 	CellMarker vm(map, VERTEX_CELL) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -149,12 +149,14 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 		if(!vm.isMarked(d))
 		{
 			vm.mark(d) ;
-			VEC3 l = position[d] - newPosition[d] ;
-			newPosition[d] = newPosition[d] + ((normal[d] * l) * normal[d]) ;
+			VEC3 l = position[d] - centroid[d] ;
+			REAL e = l * normal[d] ;
+			VEC3 displ = e * normal[d] ;
+			position[d] = centroid[d] + displ ;
 		}
 	}
-	map.template swapAttributes<VEC3>(position, newPosition) ;
-	map.template removeAttribute<VEC3>(newPosition) ;
+
+	map.template removeAttribute<VEC3>(centroid) ;
 }
 
 } // namespace Remeshing

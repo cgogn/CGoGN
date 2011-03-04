@@ -132,6 +132,8 @@ public:
 	// Equal
 	bool operator==(const Vector<DIM,T>& v) const ;
 
+	bool hasNan() const ;
+
 	/**********************************************/
 	/*             STREAM OPERATORS               */
 	/**********************************************/
