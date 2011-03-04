@@ -106,6 +106,69 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 }
 
 /************************************************************************************
+ *                            QUADRIC ERROR METRIC (for half-edge criteria)         *
+ ************************************************************************************/
+
+template <typename PFP>
+bool Approximator_QEMhalf<PFP>::init()
+{
+	m_quadric = this->m_map.template getAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
+
+	if(this->m_predictor)
+	{
+		return false ;
+	}
+	return true ;
+}
+
+template <typename PFP>
+void Approximator_QEMhalf<PFP>::approximate(Dart d)
+{
+	MAP& m = this->m_map ;
+
+	// get some darts
+	Dart dd = m.phi2(d) ;
+
+	Quadric<REAL> q1, q2 ;
+	if(!m_quadric.isValid()) // if the selector is not QEM, compute local error quadrics
+	{
+		// compute the error quadric associated to v1
+		Dart it = d ;
+		do
+		{
+			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
+			q1 += q ;
+			it = m.alpha1(it) ;
+		} while(it != d) ;
+
+		// compute the error quadric associated to v2
+		it = dd ;
+		do
+		{
+			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
+			q2 += q ;
+			it = m.alpha1(it) ;
+		} while(it != dd) ;
+	}
+	else // if the selector is QEM, use the error quadrics computed by the selector
+	{
+		q1 = m_quadric[d] ;
+		q2 = m_quadric[dd] ;
+	}
+
+	Quadric<REAL> quad ;
+	quad += q1 ;	// compute the sum of the
+	quad += q2 ;	// two vertices quadrics
+
+	VEC3 res ;
+	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
+	if(!opt)
+		this->m_approx[d] = this->m_attrV[d] ;
+	else
+		this->m_approx[d] = res ;
+}
+
+/************************************************************************************
  *							         MID EDGE                                       *
  ************************************************************************************/
 

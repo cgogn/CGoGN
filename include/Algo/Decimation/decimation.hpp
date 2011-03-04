@@ -45,6 +45,9 @@ void decimate(
 		case A_QEM :
 			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
 			break ;
+		case A_QEMhalf :
+			approximators.push_back(new Approximator_QEMhalf<PFP>(map, position)) ;
+			break ;
 		case A_MidEdge :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, position)) ;
 			break ;
@@ -62,7 +65,7 @@ void decimate(
 			break ;
 		case A_LightfieldFull :
 		{
-			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
+			approximators.push_back(new Approximator_QEMhalf<PFP>(map, position)) ;
 			/*
 						PFP::TVEC3 frame[3] ;
 						frame[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_T") ; // Tangent
@@ -94,28 +97,6 @@ void decimate(
 		case A_LightfieldHalf :
 		{
 			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, position)) ;
-			/*
-						PFP::TVEC3 frame[3] ;
-						frame[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_T") ; // Tangent
-						frame[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_B") ; // Bitangent
-						frame[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_N") ; // Normal
-						for (unsigned int i = 0 ; i < 3 ; ++i)
-							if (!frame[i].isValid()) {
-								std::cerr << "In function decimate : frame[" << i << "] is not valid" << std::endl ;
-							}
-
-						AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
-						colorPTM[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_a") ;
-						colorPTM[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_b") ;
-						colorPTM[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_c") ;
-						colorPTM[3] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_d") ;
-						colorPTM[4] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_e") ;
-						colorPTM[5] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_f") ;
-						for (unsigned int i = 0 ; i < 6 ; ++i)
-							if (!colorPTM[i].isValid()) {
-								std::cerr << "In function decimate : colorPTM[" << i << "] is not valid" << std::endl ;
-							}
-			*/
 			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
 			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "colorPTM") ;
 			approximators.push_back(new Approximator_FrameHalf<PFP>(map, frame)) ;

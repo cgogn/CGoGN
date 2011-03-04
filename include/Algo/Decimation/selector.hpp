@@ -404,9 +404,9 @@ void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
-				updateEdgeInfo(m.phi1(vit2), false) ; // OPTIM POSSIBLE : ne pas faire le 1er phi1(vit2) (car sera fait dans prochaine itération) ?
+				updateEdgeInfo(m.phi1(vit2), false) ;
 				vit2 = m.alpha_1(vit2) ;
-			} while(vit2 != stop) ;	// OPTIM POSSIBLE : ne pas faire vit2 == stop (car déjà fait dans initEdgeInfo(vit)) ?
+			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
@@ -473,7 +473,8 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	m_positionApproximator->approximate(d) ;
 
-	REAL err = quad(m_positionApproximator->getApprox(d)) ;
+	REAL err = std::max(REAL(0),REAL(quad(m_positionApproximator->getApprox(d)))) ;
+
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
@@ -609,7 +610,7 @@ void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomput
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
        	}
        	if (recomputeNeighbors)
-       		recomputeQuadric(this->m_map.phi2(dFront), false) ;
+       		recomputeQuadric(dBack, false) ;
 
     } while(dFront != dInit) ;
 }
@@ -638,7 +639,7 @@ void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			updateEdgeInfo(vit2, true) ;
 			updateEdgeInfo(m.phi1(vit2), false) ;
-			vit2 = m.alpha_1(vit2) ;	// OPTIM POSSIBLE : ne pas faire vit2 == stop car déjà fait dans init/updateEdgeInfo(vit)
+			vit2 = m.alpha_1(vit2) ;
 		} while(vit2 != stop) ;
 
 		vit = m.alpha1(vit) ;
@@ -728,6 +729,7 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 		if(ok == 0 && (*it)->getApproximatedAttributeName() == "position")
 		{
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // 1) position
+			assert(m_positionApproximator->getType() != A_QEM) ; // A_QEM is not compatible for half-edge crit
 			++ok ;
 		}
 		else if( ok == 1 && (*it)->getApproximatedAttributeName() == "frame")
@@ -855,7 +857,7 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
        	}
        	if (recomputeNeighbors)
-       		recomputeQuadric(this->m_map.phi2(dFront), false) ;
+       		recomputeQuadric(dBack, false) ;
 
     } while(dFront != dInit) ;
 }
@@ -872,7 +874,9 @@ void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	do
 	{
 		updateHalfEdgeInfo(vit, true) ;
+		updateHalfEdgeInfo(m.phi2(vit), true) ;
 		updateHalfEdgeInfo(m.phi1(vit), true) ;
+		updateHalfEdgeInfo(m.phi2(m.phi1(vit)), true) ;
 
 		Dart stop = m.phi2(vit) ;
 		Dart vit2 = m.alpha_1(m.phi1(vit)) ;

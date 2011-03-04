@@ -39,6 +39,7 @@ namespace Decimation
 enum ApproximatorType
 {
 	A_QEM,
+	A_QEMhalf,
 	A_MidEdge,
 	A_HalfCollapse,
 	A_CornerCutting,
