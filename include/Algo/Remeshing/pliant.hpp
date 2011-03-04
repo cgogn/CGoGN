@@ -34,34 +34,37 @@ namespace Remeshing
 {
 
 template <typename PFP>
-void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position)
+void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	DartMarker m(map) ;
-
+	// compute the mean edge length
+	DartMarker m1(map) ;
 	REAL meanEdgeLength = 0 ;
 	unsigned int nbEdges = 0 ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m.isMarked(d))
+		if(!m1.isMarked(d))
 		{
-			m.markOrbit(EDGE_ORBIT, d) ;
+			m1.markOrbit(EDGE_ORBIT, d) ;
 			meanEdgeLength += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			++nbEdges ;
 		}
 	}
 	meanEdgeLength /= REAL(nbEdges) ;
 
-	REAL edgeLengthInf = REAL(4) / REAL(5) * meanEdgeLength ;
+	// compute the min and max edge lengths
+	REAL edgeLengthInf = REAL(3) / REAL(4) * meanEdgeLength ;
 	REAL edgeLengthSup = REAL(4) / REAL(3) * meanEdgeLength ;
 
+	// split long edges
+	DartMarker m2(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(m.isMarked(d))
+		if(!m2.isMarked(d))
 		{
-			m.unmarkOrbit(EDGE_ORBIT, d) ;
+			m2.markOrbit(EDGE_ORBIT, d) ;
 			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			if(length > edgeLengthSup)
 			{
@@ -75,11 +78,13 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position)
 		}
 	}
 
+	// collapse short edges
+	DartMarker m3(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m.isMarked(d))
+		if(!m3.isMarked(d))
 		{
-			m.markOrbit(EDGE_ORBIT, d) ;
+			m3.markOrbit(EDGE_ORBIT, d) ;
 			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			if(length < edgeLengthInf)
 			{
@@ -102,6 +107,54 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position)
 			}
 		}
 	}
+
+	// equalize valences with edge flips
+	DartMarker m4(map) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m4.isMarked(d))
+		{
+			m4.markOrbit(EDGE_ORBIT, d) ;
+			Dart e = map.phi2(d) ;
+			unsigned int w = map.vertexDegree(d) ;
+			unsigned int x = map.vertexDegree(e) ;
+			unsigned int y = map.vertexDegree(map.phi1(map.phi1(d))) ;
+			unsigned int z = map.vertexDegree(map.phi1(map.phi1(e))) ;
+			int flip = 0 ;
+			flip += w > 6 ? 1 : (w < 6 ? -1 : 0) ;
+			flip += x > 6 ? 1 : (x < 6 ? -1 : 0) ;
+			flip += y < 6 ? 1 : (y > 6 ? -1 : 0) ;
+			flip += z < 6 ? 1 : (z > 6 ? -1 : 0) ;
+			if(flip > 2)
+			{
+				map.flipEdge(d) ;
+				m4.markOrbit(EDGE_ORBIT, map.phi1(d)) ;
+				m4.markOrbit(EDGE_ORBIT, map.phi_1(d)) ;
+				m4.markOrbit(EDGE_ORBIT, map.phi1(e)) ;
+				m4.markOrbit(EDGE_ORBIT, map.phi_1(e)) ;
+			}
+		}
+	}
+
+	// update vertices normals
+	Algo::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
+
+	// tangential relaxation
+	AttributeHandler<VEC3> newPosition = map.template addAttribute<VEC3>(VERTEX_ORBIT, "newPosition") ;
+	Algo::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, newPosition) ;
+
+	CellMarker vm(map, VERTEX_CELL) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!vm.isMarked(d))
+		{
+			vm.mark(d) ;
+			VEC3 l = position[d] - newPosition[d] ;
+			newPosition[d] = newPosition[d] + ((normal[d] * l) * normal[d]) ;
+		}
+	}
+	map.template swapAttributes<VEC3>(position, newPosition) ;
+	map.template removeAttribute<VEC3>(newPosition) ;
 }
 
 } // namespace Remeshing

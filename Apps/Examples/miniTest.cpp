@@ -583,30 +583,6 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			break ;
 		}
 
-		case 'r':
-		{
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
-
-			Algo::Remeshing::pliantRemeshing<PFP>(myMap, position) ;
-
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
-			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "pliant remeshing: "<< seconds << "sec" << std::endl ;
-
-			t1 = glutGet(GLUT_ELAPSED_TIME) ;
-
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
-			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-
-			t2 = glutGet(GLUT_ELAPSED_TIME) ;
-			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
-
-			glutPostRedisplay() ;
-			break ;
-		}
-
 		case 'd':
 		{
 			AttributeHandler<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
@@ -630,6 +606,31 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
 			if(!laplacian.isValid())
 				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+
+			glutPostRedisplay() ;
+			break ;
+		}
+
+		case 'r':
+		{
+
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			Algo::Remeshing::pliantRemeshing<PFP>(myMap, position, normal) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "pliant remeshing: "<< seconds << "sec" << std::endl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 

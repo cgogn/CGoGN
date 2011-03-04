@@ -32,7 +32,7 @@ namespace Remeshing
 {
 
 template <typename PFP>
-void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position) ;
+void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& normal) ;
 
 } // namespace Remeshing
 
@@ -41,3 +41,4 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position) ;
 } // namespace CGoGN
 
 #include "Algo/Remeshing/pliant.hpp"
+

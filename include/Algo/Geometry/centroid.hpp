@@ -121,7 +121,7 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
 	{
 		center += attributs[map.phi2(it)];
 		++count ;
-		it = map.phi1(map.phi2(it)) ;
+		it = map.alpha1(it) ;
 	} while(it != d) ;
 	center /= count ;
 	return center ;
