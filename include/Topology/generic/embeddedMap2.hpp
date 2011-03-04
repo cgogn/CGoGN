@@ -205,26 +205,6 @@ Dart EmbeddedMap2<MAP2>::collapseEdge(Dart d, bool delDegenerateFaces)
 template <typename MAP2>
 bool EmbeddedMap2<MAP2>::flipEdge(Dart d)
 {
-//	unsigned int dVEmb = EMBNULL ;
-//	unsigned int eVEmb = EMBNULL ;
-//
-//	Dart e = MAP2::phi2(d) ;
-//
-//	if(MAP2::isOrbitEmbedded(VERTEX_ORBIT))
-//	{
-//		dVEmb = MAP2::getDartEmbedding(VERTEX_ORBIT, d) ;
-//		if(dVEmb != EMBNULL)
-//			MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::alpha1(d), dVEmb) ;
-//		MAP2::setDartEmbedding(VERTEX_ORBIT, d, EMBNULL) ;
-//		
-//		eVEmb = MAP2::getDartEmbedding(VERTEX_ORBIT, e) ;
-//		if(eVEmb != EMBNULL)
-//			MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::alpha1(e), eVEmb) ;
-//		MAP2::setDartEmbedding(VERTEX_ORBIT, e, EMBNULL) ;
-//	}
-//
-//	return MAP2::flipEdge(d) ;
-
 	if(MAP2::flipEdge(d))
 	{
 		Dart e = MAP2::phi2(d) ;
