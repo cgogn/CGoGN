@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/Geometry/basic.h"
+#include "Algo/Geometry/feature.h"
 
 namespace CGoGN
 {
@@ -73,65 +74,102 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 				map.cutEdge(d) ;
 				position[map.phi1(d)] = p ;
 				map.splitFace(map.phi1(d), map.phi_1(d)) ;
-				map.splitFace(map.phi1(dd), map.phi_1(dd)) ;
+				if(dd != d)
+					map.splitFace(map.phi1(dd), map.phi_1(dd)) ;
 			}
 		}
 	}
 
-	// collapse short edges
+	// compute feature edges
+	DartMarker featureEdge(map) ;
+	Algo::Geometry::featureEdgeDetection<PFP>(map, position, featureEdge) ;
+
+	// compute feature vertices
+	CellMarker featureVertex(map, VERTEX_ORBIT) ;
+	CellMarker cornerVertex(map, VERTEX_ORBIT) ;
 	DartMarker m3(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(!m3.isMarked(d))
 		{
-			m3.markOrbit(EDGE_ORBIT, d) ;
-			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
-			if(length < edgeLengthInf && map.edgeCanCollapse(d))
+			m3.markOrbit(VERTEX_ORBIT, d) ;
+			unsigned int nbFeatureEdges = 0 ;
+			Dart vit = d ;
+			do
 			{
-				bool collapse = true ;
-				Dart dd = map.phi2(d) ;
-				VEC3 p = position[dd] ;
-				Dart vit = map.alpha1(d) ;
-				do
+				if(featureEdge.isMarked(vit))
+					++nbFeatureEdges ;
+				vit = map.alpha1(vit) ;
+			} while(vit != d) ;
+			if(nbFeatureEdges > 0)
+			{
+				if(nbFeatureEdges == 2)
+					featureVertex.mark(d) ;
+				else
+					cornerVertex.mark(d) ;
+			}
+		}
+	}
+
+	// collapse short
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(m3.isMarked(d))
+		{
+			m3.unmarkOrbit(EDGE_ORBIT, d) ;
+			Dart d1 = map.phi1(d) ;
+			if(!cornerVertex.isMarked(d) && !cornerVertex.isMarked(d1) &&
+				( (featureVertex.isMarked(d) && featureVertex.isMarked(d1)) || (!featureVertex.isMarked(d) && !featureVertex.isMarked(d1)) ))
+			{
+				REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
+				if(length < edgeLengthInf && map.edgeCanCollapse(d))
 				{
-					VEC3 vec = position[dd] - position[map.phi1(vit)] ;
-					if(vec.norm() > edgeLengthSup)
-						collapse = false ;
-					vit = map.alpha1(vit) ;
-				} while(vit != d && collapse) ;
-				if(collapse)
-				{
-					Dart v = map.collapseEdge(d) ;
-					position[v] = p ;
+					bool collapse = true ;
+					VEC3 p = position[d1] ;
+					Dart vit = map.alpha1(d) ;
+					do
+					{
+						VEC3 vec = position[d1] - position[map.phi1(vit)] ;
+						if(vec.norm() > edgeLengthSup)
+							collapse = false ;
+						vit = map.alpha1(vit) ;
+					} while(vit != d && collapse) ;
+					if(collapse)
+					{
+						Dart v = map.collapseEdge(d) ;
+						position[v] = p ;
+					}
 				}
 			}
 		}
 	}
 
 	// equalize valences with edge flips
-	DartMarker m4(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!m4.isMarked(d))
+		if(!m3.isMarked(d))
 		{
-			m4.markOrbit(EDGE_ORBIT, d) ;
+			m3.markOrbit(EDGE_ORBIT, d) ;
 			Dart e = map.phi2(d) ;
-			unsigned int w = map.vertexDegree(d) ;
-			unsigned int x = map.vertexDegree(e) ;
-			unsigned int y = map.vertexDegree(map.phi1(map.phi1(d))) ;
-			unsigned int z = map.vertexDegree(map.phi1(map.phi1(e))) ;
-			int flip = 0 ;
-			flip += w > 6 ? 1 : (w < 6 ? -1 : 0) ;
-			flip += x > 6 ? 1 : (x < 6 ? -1 : 0) ;
-			flip += y < 6 ? 1 : (y > 6 ? -1 : 0) ;
-			flip += z < 6 ? 1 : (z > 6 ? -1 : 0) ;
-			if(flip > 1)
+			if(!featureEdge.isMarked(d) && e != d)
 			{
-				map.flipEdge(d) ;
-				m4.markOrbit(EDGE_ORBIT, map.phi1(d)) ;
-				m4.markOrbit(EDGE_ORBIT, map.phi_1(d)) ;
-				m4.markOrbit(EDGE_ORBIT, map.phi1(e)) ;
-				m4.markOrbit(EDGE_ORBIT, map.phi_1(e)) ;
+				unsigned int w = map.vertexDegree(d) ;
+				unsigned int x = map.vertexDegree(e) ;
+				unsigned int y = map.vertexDegree(map.phi1(map.phi1(d))) ;
+				unsigned int z = map.vertexDegree(map.phi1(map.phi1(e))) ;
+				int flip = 0 ;
+				flip += w > 6 ? 1 : (w < 6 ? -1 : 0) ;
+				flip += x > 6 ? 1 : (x < 6 ? -1 : 0) ;
+				flip += y < 6 ? 1 : (y > 6 ? -1 : 0) ;
+				flip += z < 6 ? 1 : (z > 6 ? -1 : 0) ;
+				if(flip > 1)
+				{
+					map.flipEdge(d) ;
+					m3.markOrbit(EDGE_ORBIT, map.phi1(d)) ;
+					m3.markOrbit(EDGE_ORBIT, map.phi_1(d)) ;
+					m3.markOrbit(EDGE_ORBIT, map.phi1(e)) ;
+					m3.markOrbit(EDGE_ORBIT, map.phi_1(e)) ;
+				}
 			}
 		}
 	}
@@ -149,10 +187,13 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 		if(!vm.isMarked(d))
 		{
 			vm.mark(d) ;
-			VEC3 l = position[d] - centroid[d] ;
-			REAL e = l * normal[d] ;
-			VEC3 displ = e * normal[d] ;
-			position[d] = centroid[d] + displ ;
+			if(!cornerVertex.isMarked(d) && !featureVertex.isMarked(d) && !map.isBoundaryVertex(d))
+			{
+				VEC3 l = position[d] - centroid[d] ;
+				REAL e = l * normal[d] ;
+				VEC3 displ = e * normal[d] ;
+				position[d] = centroid[d] + displ ;
+			}
 		}
 	}
 

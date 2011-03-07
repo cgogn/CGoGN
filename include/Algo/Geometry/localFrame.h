@@ -44,8 +44,8 @@ namespace Geometry
 template <typename PFP>
 void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
-	Z = vertexNormal<PFP>(map,d,position) ;
-	X = vectorOutOfDart<PFP>(map,d,position) ;
+	Z = vertexNormal<PFP>(map, d, position) ;
+	X = vectorOutOfDart<PFP>(map, d, position) ;
 	Y = Z ^ X ;
 	Y.normalize() ;
 	X = Y ^ Z ;
@@ -56,7 +56,7 @@ template <typename PFP>
 typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
 	typename PFP::VEC3 X, Y, Z ;
-	vertexLocalFrame<PFP>(map,d,position,X,Y,Z) ;
+	vertexLocalFrame<PFP>(map, d, position, X, Y, Z) ;
 	typename PFP::MATRIX33 frame ;
 	frame(0,0) = X[0] ;	frame(0,1) = X[1] ;	frame(0,2) = X[2] ;
 	frame(1,0) = Y[0] ;	frame(1,1) = Y[1] ;	frame(1,2) = Y[2] ;
@@ -70,7 +70,7 @@ template <typename PFP>
 void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& normal, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
 	Z = normal ;
-	X = vectorOutOfDart<PFP>(map,d,position) ;
+	X = vectorOutOfDart<PFP>(map, d, position) ;
 	Y = Z ^ X ;
 	Y.normalize() ;
 	X = Y ^ Z ;
@@ -81,7 +81,7 @@ template <typename PFP>
 typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& normal)
 {
 	typename PFP::VEC3 X, Y, Z ;
-	vertexLocalFrame<PFP>(map,d,position,normal,X,Y,Z) ;
+	vertexLocalFrame<PFP>(map, d, position, normal, X, Y, Z) ;
 	typename PFP::MATRIX33 frame ;
 	frame(0,0) = X[0] ;	frame(0,1) = X[1] ;	frame(0,2) = X[2] ;
 	frame(1,0) = Y[0] ;	frame(1,1) = Y[1] ;	frame(1,2) = Y[2] ;

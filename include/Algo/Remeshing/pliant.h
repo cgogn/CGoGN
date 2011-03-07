@@ -22,6 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef __ALGO_GEOMETRY_REMESHING_H__
+#define __ALGO_GEOMETRY_REMESHING_H__
+
 namespace CGoGN
 {
 
@@ -42,3 +45,4 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 
 #include "Algo/Remeshing/pliant.hpp"
 
+#endif
