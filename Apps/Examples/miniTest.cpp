@@ -668,6 +668,31 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			break ;
 		}
 
+		case '0':
+		{
+
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			Algo::Modelisation::reverseOrientation<PFP>(myMap) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "pliant remeshing: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+
+			glutPostRedisplay() ;
+			break ;
+		}
+
 		case '9':
 		{
 			CellMarker markVisit(myMap, VERTEX_CELL) ;

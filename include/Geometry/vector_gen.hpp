@@ -280,7 +280,7 @@ template <unsigned int DIM, typename T>
 inline bool Vector<DIM,T>::hasNan() const
 {
 	for(unsigned int i = 0 ; i < DIM ; ++i)
-		if(isnan(m_data[i]))
+		if(m_data[i] != m_data[i])
 			return true ;
 	return false ;
 }
