@@ -347,11 +347,10 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 
-	if(index == EMBNULL && nbSteps == 0)
+	if(index == EMBNULL)
 	{
 		index = m->embedNewCell(orbit, d) ;
 		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
-		return this->m_attrib->operator[](index);
 	}
 
 	AttributeContainer& cont = m->getAttributeContainer(orbit) ;
