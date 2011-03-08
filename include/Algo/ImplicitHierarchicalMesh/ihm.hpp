@@ -343,15 +343,14 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = this->m_orbit ;
+	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 
-	if(index == EMBNULL && nbSteps == 0)
+	if(index == EMBNULL)
 	{
 		index = m->embedNewCell(orbit, d) ;
 		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
-		return this->m_attrib->operator[](index);
 	}
 
 	AttributeContainer& cont = m->getAttributeContainer(orbit) ;
@@ -380,7 +379,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
 	assert(m->vertexInsertionLevel(d) <= m->m_curLevel || !"Access to the embedding of a vertex inserted after current level") ;
 
-	unsigned int orbit = this->m_orbit ;
+	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
 	unsigned int index = m->getEmbedding(d, orbit) ;
 

@@ -22,36 +22,96 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_GEOMETRY_AREA_H__
-#define __ALGO_GEOMETRY_AREA_H__
+#ifndef __CGoGN_MEM_SHARED_
+#define __CGoGN_MEM_SHARED_
+
+
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdlib.h>
+#include <iostream>
+
 
 namespace CGoGN
 {
 
-namespace Algo
+namespace Utils
 {
-
-namespace Geometry
+/**
+* Shared Memory Segment management
+* Example:
+*  in master:
+*    SharedMem<MY_DATA> shm;
+*    shm.initMaster(4321);
+*    ...
+*     *(shm.lockForWrite()) = localData;
+*     shm.release();
+*    ...
+*  in slave
+*    SharedMem<MY_DATA> shm;
+*    shm.initSlace(4321);
+*    ...
+*	 MY_DATA localData = *(shm.dataRead());
+*    ...
+*/
+template<typename DATA>
+class SharedMemSeg
 {
+protected:
+	int m_mem_id;
+	int* m_ptr;
+	DATA* m_ptr1;
+	DATA* m_ptr2;
+public:
+	
+	/**
+	* Constructor
+	*/
+	SharedMemSeg();
 
-template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+	/**
+	* Destructor
+	*/
+	~SharedMemSeg();
+	
+	/**
+	* Initialization for master
+	* @param key key of shared mem zone
+	*/
+	bool initMaster(int key);
 
-template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+	/**
+	* Initialization for master
+	* @param key key of shared mem zone
+	*/
+	bool initSlave(int key);
 
-template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int th=0) ;
+	/**
+	* read data 
+	* @return a pointer on data (for copy or read)
+	*/
+	DATA* dataRead();
+	
+	/**
+	* lock data for writing. 
+	* @return a pointer on data (back buffer) to copy data in
+	*/	
+	DATA* lockForWrite();
 
-template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = SelectorTrue()) ;
+	/**
+	* release the data ( switch ptr from back to front)
+	*/
+	void release();
 
-} // namespace Geometry
+};
 
-} // namespace Algo
+}
+}
 
-} // namespace CGoGN
-
-#include "Algo/Geometry/area.hpp"
+#include "Utils/shared_mem.hpp"
 
 #endif
+
+
+

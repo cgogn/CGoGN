@@ -84,7 +84,7 @@ protected:
 	 */
 	AttributeContainer m_attribs[NB_ORBITS] ;
 
-	static std::map< std::string, RegisteredBaseAttribute* >* m_attributes_registry_map ;
+	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map ;
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
@@ -272,17 +272,16 @@ protected:
 	 * @param orbit the orbit of cell to use (xxx_ORBIT)
 	 * @return the marker to use
 	 */
-	Marker getNewMarker(unsigned int cell = DART_ORBIT, unsigned int thread=0);
+	Marker getNewMarker(unsigned int cell = DART_ORBIT, unsigned int thread = 0);
 
 	/**
 	 * release a marker of cell.
 	 * @param m the marker to release
 	 */
-	void releaseMarker(Marker m, unsigned int thread=0);
-
+	void releaseMarker(Marker m, unsigned int thread = 0);
 
 	/****************************************
-	 *         THREAD MANAGEMENT         *
+	 *          THREAD MANAGEMENT           *
 	 ****************************************/
 public:
 	/**
@@ -303,7 +302,6 @@ public:
 	 * @return remaining number of threads (including principal)
 	 */
 	void removeThreadMarker(unsigned int nb);
-
 
 	/****************************************
 	 *             SAVE & LOAD              *
@@ -384,13 +382,13 @@ public:
 	 *  @param d a dart of the orbit
 	 *  @param f a functor obj
 	 */
-	bool foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0);
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread=0) = 0;
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread=0) = 0;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread=0) = 0;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread=0) = 0;
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread=0) = 0;
+	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 
 	/**
 	* execute functor for each orbit
@@ -398,7 +396,7 @@ public:
 	* @param f the functor
 	* @param good the selector of darts
 	*/
-	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = SelectorTrue(),unsigned int thread=0);
+	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0);
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit

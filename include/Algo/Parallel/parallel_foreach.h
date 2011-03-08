@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #include "Topology/generic/functor.h"
 
 #ifndef __PARALLEL_FOREACH__
@@ -225,16 +224,12 @@ public:
 	virtual void operator()() =0;
 };
 
+} // namespace Parallel
 
+} // namespace Algo
 
-
-}
-}	// end namespace
-}
-
+} // namespace CGoGN
 
 #include "Algo/Parallel/parallel_foreach.hpp"
 
-
 #endif
-

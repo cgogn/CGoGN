@@ -22,36 +22,100 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_GEOMETRY_AREA_H__
-#define __ALGO_GEOMETRY_AREA_H__
 
 namespace CGoGN
 {
 
-namespace Algo
+namespace Utils
 {
 
-namespace Geometry
+
+template<typename DATA>
+SharedMemSeg<DATA>::SharedMemSeg():
+m_ptr(NULL) 
+{ }
+
+template<typename DATA>
+SharedMemSeg<DATA>::~SharedMemSeg()
+{ 
+	if (m_ptr !=NULL)
+	{
+		struct shmid_ds buf;
+		shmctl(m_mem_id,IPC_RMID, &buf);
+		shmdt(m_ptr);
+	}
+}
+
+template<typename DATA>
+bool SharedMemSeg<DATA>::initMaster(int key)
 {
+	m_mem_id = shmget(key, 2*sizeof(DATA)+2*sizeof(int), IPC_CREAT|0666);
+	if (m_mem_id < 0)
+	{
+		std::cerr << "Error shmget"<<std::endl;
+		return false;
+	}
 
-template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+	m_ptr = reinterpret_cast<int*>(shmat(m_mem_id, NULL, 0));
+	if (m_ptr ==  (int*)-1)
+	{
+		std::cerr << "Error shmat"<<std::endl;
+		return false;
+	}
 
-template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+	m_ptr1 = reinterpret_cast<DATA*>(m_ptr + 2);
+	m_ptr2 = m_ptr1+1;
+	*m_ptr = 0;
+}
 
-template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int th=0) ;
+template<typename DATA>
+bool SharedMemSeg<DATA>::initSlave(int key)
+{
+	m_mem_id = shmget(key, 2*sizeof(DATA)+2*sizeof(int), 0444);
+	if (m_mem_id < 0)
+	{
+		std::cerr <<"Shared Memory "<< key << " does not exist can not read"<< std::endl;
+		return false;
+	}
 
-template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = SelectorTrue()) ;
+	m_ptr = reinterpret_cast<int*>(shmat(m_mem_id, NULL, 0));
+	if (m_ptr ==  (int*)-1)
+	{
+		std::cerr <<"Problem getting shared memory ptr for "<< key << std::endl;
+		return false;
+	}
+		
+	m_ptr1 = reinterpret_cast<DATA*>(m_ptr + 2);
+	m_ptr2 = m_ptr1+1;
+	*(int*)m_ptr = 0;
+}
 
-} // namespace Geometry
+	
+template<typename DATA>
+DATA*  SharedMemSeg<DATA>::dataRead()
+{
+	if (*m_ptr == 0)
+		return m_ptr1;
+	return  m_ptr2;
+}
 
-} // namespace Algo
 
-} // namespace CGoGN
+template<typename DATA>
+DATA*  SharedMemSeg<DATA>::lockForWrite()
+{
+	if (*m_ptr == 0)
+		return m_ptr2;
+	return m_ptr1;
+}
 
-#include "Algo/Geometry/area.hpp"
+template<typename DATA>
+void  SharedMemSeg<DATA>::release()
+{
+	*m_ptr = 1 - *m_ptr;	//invert id		
+}
 
-#endif
+
+}
+}
+
+

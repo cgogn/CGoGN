@@ -43,7 +43,8 @@
 #include "Algo/Geometry/laplacian.h"
 #include "Algo/Modelisation/subdivision.h"
 #include "Algo/Decimation/decimation.h"
-#include "Algo/Filters2D/filters2D.h"
+#include "Algo/Remeshing/pliant.h"
+#include "Algo/Geometry/feature.h"
 
 using namespace CGoGN ;
 
@@ -349,7 +350,7 @@ void MyGlutWin::myRedraw()
 
 	glPushMatrix() ;
 
-	float sc = 50. / gWidthObj ;
+	float sc = 50.0f / gWidthObj ;
 	glScalef(sc, sc, sc) ;
 	glTranslatef(-gPosObj[0], -gPosObj[1], -gPosObj[2]) ;
 
@@ -432,61 +433,102 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 	{
 		case 'l':
 		{
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
-			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "loop: "<< seconds << "sec" << std::endl;
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			t1 = glutGet(GLUT_ELAPSED_TIME);
+			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "loop: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-			t2 = glutGet(GLUT_ELAPSED_TIME);
-			seconds = (t2 - t1) / 1000.0f;
-			std::cout << "display update: "<< seconds << "sec" << std::endl;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
 
 			glutPostRedisplay() ;
-
 			break ;
 		}
 
 		case 'c':
 		{
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position);
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
-			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "catmull-clark: "<< seconds << "sec" << std::endl;
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			t1 = glutGet(GLUT_ELAPSED_TIME);
+			Algo::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "catmull-clark: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-			t2 = glutGet(GLUT_ELAPSED_TIME);
-			seconds = (t2 - t1) / 1000.0f;
-			std::cout << "display update: "<< seconds << "sec" << std::endl;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
 
 			glutPostRedisplay() ;
+			break ;
+		}
 
+		case '3':
+		{
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			Algo::Modelisation::Sqrt3Subdivision<PFP>(myMap, position) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "sqrt3: "<< seconds << "sec" << std::endl ;
+
+			normal = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			if(!normal.isValid())
+				normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+			if(!laplacian.isValid())
+				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+
+			glutPostRedisplay() ;
 			break ;
 		}
 
 		case 't':
 		{
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::trianguleFaces<PFP>(myMap, position) ;
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
-			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "triangulation: "<< seconds << "sec" << std::endl;
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			t1 = glutGet(GLUT_ELAPSED_TIME);
+			Algo::Modelisation::trianguleFaces<PFP>(myMap, position) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "triangulation: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-			t2 = glutGet(GLUT_ELAPSED_TIME);
-			seconds = (t2 - t1) / 1000.0f;
-			std::cout << "display update: "<< seconds << "sec" << std::endl;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -494,19 +536,23 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 'q':
 		{
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Modelisation::quadranguleFaces<PFP>(myMap, position) ;
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
-			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "quadrangulation: "<< seconds << "sec" << std::endl;
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			t1 = glutGet(GLUT_ELAPSED_TIME);
+			Algo::Modelisation::quadranguleFaces<PFP>(myMap, position) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "quadrangulation: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-			t2 = glutGet(GLUT_ELAPSED_TIME);
-			seconds = (t2 - t1) / 1000.0f;
-			std::cout << "display update: "<< seconds << "sec" << std::endl;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -516,19 +562,23 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		{
 			unsigned int nbVertices = myMap.getNbOrbits(VERTEX_ORBIT) ;
 
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-			Algo::Decimation::decimate<PFP>(myMap, Algo::Decimation::S_QEM, Algo::Decimation::A_QEM, position, nbVertices * 0.75) ;
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
-			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "decimation: "<< seconds << "sec" << std::endl;
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			t1 = glutGet(GLUT_ELAPSED_TIME);
+			Algo::Decimation::decimate<PFP>(myMap, Algo::Decimation::S_QEM, Algo::Decimation::A_QEM, position, nbVertices * 0.75) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "decimation: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-			t2 = glutGet(GLUT_ELAPSED_TIME);
-			seconds = (t2 - t1) / 1000.0f;
-			std::cout << "display update: "<< seconds << "sec" << std::endl;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -536,40 +586,68 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 'd':
 		{
-			myMap.removeAttribute<PFP::VEC3>(normal) ;
-			myMap.removeAttribute<PFP::VEC3>(laplacian) ;
+			AttributeHandler<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+			if(!positionF.isValid())
+				positionF = myMap.addAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+			Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
-			AttributeHandler<PFP::VEC3> newPosition = myMap.addAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
-			Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, newPosition) ;
-
-			GLint t1 = glutGet(GLUT_ELAPSED_TIME);
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
 			Algo::Modelisation::computeDual<PFP>(myMap) ;
 
-			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
-			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "dual computation: "<< seconds << "sec" << std::endl;
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "dual computation: "<< seconds << "sec" << std::endl ;
 
-			newPosition = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
-			myMap.removeAttribute<PFP::VEC3>(newPosition) ;
+			position = positionF ;
 
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-			normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-			laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+			normal = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			if(!normal.isValid())
+				normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+			if(!laplacian.isValid())
+				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
 
-			t1 = glutGet(GLUT_ELAPSED_TIME);
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
-			t2 = glutGet(GLUT_ELAPSED_TIME);
-			seconds = (t2 - t1) / 1000.0f;
-			std::cout << "display update: "<< seconds << "sec" << std::endl;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
 
 			glutPostRedisplay() ;
 			break ;
 		}
 
-		case '3':
+		case 'r':
+		{
+
+			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			Algo::Remeshing::pliantRemeshing<PFP>(myMap, position, normal) ;
+
+			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			GLfloat seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "pliant remeshing: "<< seconds << "sec" << std::endl ;
+
+			t1 = glutGet(GLUT_ELAPSED_TIME) ;
+
+			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+
+			t2 = glutGet(GLUT_ELAPSED_TIME) ;
+			seconds = (t2 - t1) / 1000.0f ;
+			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+
+			glutPostRedisplay() ;
+			break ;
+		}
+
+		case '9':
 		{
 			CellMarker markVisit(myMap, VERTEX_CELL) ;
 
@@ -623,6 +701,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
 			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
+
 			glutPostRedisplay() ;
 			break ;
 		}

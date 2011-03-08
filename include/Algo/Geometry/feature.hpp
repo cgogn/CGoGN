@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_GEOMETRY_AREA_H__
-#define __ALGO_GEOMETRY_AREA_H__
+#include "Geometry/basic.h"
+#include "Algo/Geometry/normal.h"
 
 namespace CGoGN
 {
@@ -35,23 +35,32 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position, DartMarker& feature)
+{
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+	feature.unmarkAll() ;
 
-template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int th=0) ;
+	AttributeHandler<VEC3> fNormal = map.template addAttribute<VEC3>(FACE_ORBIT, "fNormal") ;
+	Algo::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
-template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = SelectorTrue()) ;
+	DartMarker m(map) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d))
+		{
+			m.markOrbit(EDGE_ORBIT, d) ;
+			if(Geom::angle(fNormal[d], fNormal[map.phi2(d)]) > M_PI / REAL(6))
+				feature.markOrbit(EDGE_ORBIT, d) ;
+		}
+	}
+
+	map.template removeAttribute<VEC3>(fNormal) ;
+}
 
 } // namespace Geometry
 
 } // namespace Algo
 
 } // namespace CGoGN
-
-#include "Algo/Geometry/area.hpp"
-
-#endif

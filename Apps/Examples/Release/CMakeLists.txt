@@ -17,7 +17,6 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
 	${CGoGN_ROOT_DIR}/ThirdParty/glm
-
 )
 
 # define libs path

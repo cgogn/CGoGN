@@ -270,9 +270,19 @@ inline Vector<DIM,T> Vector<DIM,T>::operator^(const Vector<DIM,T> v) const
 template <unsigned int DIM, typename T>
 inline bool Vector<DIM,T>::operator==(const Vector<DIM,T>& v) const
 {
-	for (unsigned int i = 0 ; i < DIM ; ++i)
-		if (v[i] != m_data[i]) return false ;
+	for(unsigned int i = 0 ; i < DIM ; ++i)
+		if(v[i] != m_data[i])
+			return false ;
 	return true ;
+}
+
+template <unsigned int DIM, typename T>
+inline bool Vector<DIM,T>::hasNan() const
+{
+	for(unsigned int i = 0 ; i < DIM ; ++i)
+		if(m_data[i] != m_data[i])
+			return true ;
+	return false ;
 }
 
 /**********************************************/

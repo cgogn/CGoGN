@@ -55,6 +55,16 @@ template <typename PFP>
 void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
 
 /**
+ * Triangule all the faces of the mesh
+ * positions for new vertices are given as face attribute
+ */
+template <typename PFP>
+void trianguleFaces(
+	typename PFP::MAP& map,
+	typename PFP::TVEC3& position, typename PFP::TVEC3& positionF,
+	const FunctorSelect& selected = SelectorTrue()) ;
+
+/**
 * Quadrangule a face with central vertex
 * warning: edges are considered here as already cut !!
 * A face with 2n edges give n quads
@@ -90,6 +100,12 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 template <typename PFP>
 void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+
+/**
+ * Reverse the orientation of the map
+ */
+template <typename PFP>
+void reverseOrientation(typename PFP::MAP& map) ;
 
 /**
  * Dual mesh computation

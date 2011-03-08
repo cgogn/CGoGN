@@ -40,7 +40,7 @@ namespace Geometry
  * vectorOutOfDart return a dart from the position of vertex attribute of d to the position of vertex attribute of phi1(d)
  */
 template <typename PFP>
-typename PFP::VEC3 vectorOutOfDart(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+inline typename PFP::VEC3 vectorOutOfDart(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
 	typename PFP::VEC3 vec = position[map.phi1(d)] ;
 	vec -= position[d] ;
@@ -48,11 +48,17 @@ typename PFP::VEC3 vectorOutOfDart(typename PFP::MAP& map, Dart d, const typenam
 }
 
 template <typename PFP>
-float angle(typename PFP::MAP& map, Dart d1, Dart d2, const typename PFP::TVEC3& position)
+inline typename PFP::REAL edgeLength(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typename PFP::VEC3 v1, v2 ;
-	vectorOutOfDart<PFP>(map, d1, position, v1) ;
-	vectorOutOfDart<PFP>(map, d2, position, v2) ;
+	typename PFP::VEC3 v = vectorOutOfDart<PFP>(map, d, position) ;
+	return v.norm() ;
+}
+
+template <typename PFP>
+inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const typename PFP::TVEC3& position)
+{
+	typename PFP::VEC3 v1 = vectorOutOfDart<PFP>(map, d1, position) ;
+	typename PFP::VEC3 v2 = vectorOutOfDart<PFP>(map, d2, position) ;
 	return Geom::angle(v1, v2) ;
 }
 

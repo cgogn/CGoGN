@@ -143,7 +143,7 @@ public:
 	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
-	 * Flip the edge of d. (rotation in phi1 order)
+	 * Flip the edge of d (rotation in phi1 order)
 	 * WARNING : Works only for non-border edges.
 	 * @param d a dart of the edge to flip
 	 * @return true if the flip has been executed, false otherwise
@@ -151,7 +151,7 @@ public:
 	virtual bool flipEdge(Dart d);
 
 	/**
-	 * Flip the edge of d. (rotation in phi_1 order)
+	 * Flip the edge of d (rotation in phi_1 order)
 	 * WARNING : Works only for non-border edges.
 	 * @param d a dart of the edge to flip
 	 * @return true if the flip has been executed, false otherwise
@@ -235,13 +235,6 @@ public:
 	 *  @param marker
 	 */
 	void closeMap(DartMarker& marker);
-
-	// TODO a mettre en algo
-	/**
-	* Reverse orientation of map (reverse orientation of all faces)
-	* no dart created, each dart keeps its embedding, only changing phi1 and phi2
-	*/
-	void reverseOrientation();
 	//@}
 
 	/*! @name Topological Queries
