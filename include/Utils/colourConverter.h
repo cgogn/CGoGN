@@ -47,29 +47,75 @@ class ColourConverter
 
 public: // types
 	typedef Geom::Vector<3,REAL> VEC3 ;
-	enum ColourEncoding { C_RGB, C_XYZ, C_Luv } ;
+	/**
+	 * Supported colour spaces
+	 */
+	enum ColourEncoding { C_RGB, C_XYZ, C_Luv, C_Lab } ;
 
 public: // methods
+	/**
+	 * Constructor
+	 * @param col a VEC3 colour
+	 * @param enc the colour space of provided colour
+	 */
 	ColourConverter(VEC3 col, enum ColourEncoding enc) ;
+	/**
+	 * Destructor
+	 */
 	~ColourConverter() {} ;
 
+	/**
+	 * getR
+	 * @return RGB value of provided colour
+	 */
 	VEC3 getRGB() ;
+	/**
+	 * getR
+	 * @return Luv value of provided colour
+	 */
 	VEC3 getLuv() ;
+	/**
+	 * getR
+	 * @return Lab value of provided colour
+	 */
+	VEC3 getLab() ;
+	/**
+	 * getR
+	 * @return XYZ value of provided colour
+	 */
 	VEC3 getXYZ() ;
 
 public: // members
+	/**
+	 * Colour space of original (unaltered) data
+	 */
 	enum ColourEncoding originalEnc ;
 
 private: // private members
 	VEC3 *RGB ;
 	VEC3 *Luv ;
+	VEC3 *Lab ;
 	VEC3 *XYZ ;
 
 	bool convert(enum ColourEncoding from, enum ColourEncoding to) ;
 	void convertRGBtoXYZ() ;
+	void convertXYZtoRGB() ;
+
 	void convertXYZtoLuv() ;
 	void convertLuvToXYZ() ;
-	void convertXYZtoRGB() ;
+
+	void convertXYZtoLab() ;
+	void convertLabToXYZ() ;
+
+private: // private constants
+
+	// D65 reference white
+	static const REAL Xn = 0.950456 ;
+	static const REAL Yn = 1.0 ;
+	static const REAL Zn = 1.088754 ;
+
+	static const REAL un = 0.197832 ;
+	static const REAL vn = 0.468340 ;
 
 
 } ;

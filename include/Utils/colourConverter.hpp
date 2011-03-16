@@ -29,6 +29,7 @@ template<typename REAL>
 ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 	RGB(NULL),
 	Luv(NULL),
+	Lab(NULL),
 	XYZ(NULL)
 {
 	originalEnc = enc ;
@@ -45,6 +46,10 @@ ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 		case (C_XYZ) :
 			XYZ = new VEC3(col) ;
 			break ;
+
+		case (C_Lab) :
+			Lab = new VEC3(col) ;
+			break ;
 	}
 }
 
@@ -60,6 +65,14 @@ template<typename REAL>
 Geom::Vector<3,REAL> ColourConverter<REAL>::getLuv() {
 	if (Luv == NULL)
 		convert(originalEnc,C_Luv) ;
+
+	return *Luv ;
+}
+
+template<typename REAL>
+Geom::Vector<3,REAL> ColourConverter<REAL>::getLab() {
+	if (Luv == NULL)
+		convert(originalEnc,C_Lab) ;
 
 	return *Luv ;
 }
@@ -160,8 +173,79 @@ void ColourConverter<REAL>::convertLuvToXYZ() {
 	XYZ = new VEC3(X,Y,Z) ;
 }
 
+/*
+template<typename REAL>
+REAL f(REAL x) {
+	if (x > 0.008856)
+		return pow(x,1.0/3.0) ;
+	else
+		return 7.787 * x + 16.0/116.0 ;
+}*/
+
+template<typename REAL>
+void ColourConverter<REAL>::convertXYZtoLab() {
+	REAL L,a,b ;
+
+	REAL &X = (*XYZ)[0] ;
+	REAL &Y = (*XYZ)[1] ;
+	REAL &Z = (*XYZ)[2] ;
+
+	struct Local {
+		static REAL f(REAL x) {
+			if (x > 0.008856)
+			return pow(x,1.0/3.0) ;
+			else
+				return 7.787 * x + 16.0/116.0 ;
+		}
+	} ;
+
+	if (Y > 0.008856)
+		L = 116.0f * pow(Y,1.0f/3.0) - 16 ;
+	else // near black
+		L = 903.3 * Y ;
+
+	a = 500.0 * (Local::f(X/Xn) - Local::f(Y/Yn)) ;
+	b = 200.0 * (Local::f(Y/Yn) - Local::f(Z/Zn)) ;
+
+	Lab = new VEC3(L,a,b) ;
+}
+
+template<typename REAL>
+void ColourConverter<REAL>::convertLabToXYZ() {
+	REAL X,Y,Z ;
+
+	REAL &L = (*Luv)[0] ;
+	REAL &a = (*Luv)[1] ;
+	REAL &b = (*Luv)[2] ;
+
+	struct Local {
+		static REAL f(REAL x) {
+			if (x > 0.206893)
+			return pow(x,3.0) ;
+			else
+				return x / 7.787 - 16.0/903.3 ;
+		}
+	} ;
+
+	if (L > 8.0)
+		Y = pow(((L+16.0) / 116.0),3) ;
+	else // near black
+		Y = L / 903.3 ;
+
+	REAL nom = (L+16.0) / 116.0 ;
+	X = Xn * Local::f( nom +  a/500.0) ;
+	Z = Zn * Local::f( nom -  b/200.0) ;
+
+	XYZ = new VEC3(X,Y,Z) ;
+}
+
 template<typename REAL>
 bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncoding to) {
+	if (to == from) {
+		std::cerr << "ColourConverter::convert(from,to) : conversion into same colour space" << std::endl ;
+		return false ;
+	}
+
 	switch(from) {
 		case(C_RGB) :
 			switch (to) {
@@ -174,6 +258,12 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertRGBtoXYZ() ;
 					if (Luv == NULL)
 						convertXYZtoLuv() ;
+					break ;
+				case(C_Lab) :
+					if (XYZ == NULL)
+						convertRGBtoXYZ() ;
+					if (Lab == NULL)
+						convertXYZtoLab() ;
 					break ;
 				default :
 					std::cerr << "Colour conversion not supported" << std::endl ;
@@ -196,6 +286,13 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertLuvToXYZ() ;
 					break ;
 				}
+				case(C_Lab) :
+					if (Lab == NULL) {
+						if (XYZ == NULL)
+							convertLuvToXYZ() ;
+						convertXYZtoLab() ;
+					}
+					break ;
 				default :
 					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
@@ -212,11 +309,44 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					if (Luv == NULL)
 						convertXYZtoLuv() ;
 					break ;
+				case(C_Lab) :
+					if (Lab == NULL)
+						convertXYZtoLab() ;
+					break ;
 				default :
 					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
 			}
 			break ;
+
+		case(C_Lab) :
+			switch (to) {
+				case(C_RGB) : {
+					if (RGB == NULL) {
+						if (XYZ == NULL)
+							convertLabToXYZ() ;
+						convertXYZtoRGB() ;
+					}
+					break ;
+				}
+				case(C_XYZ) : {
+					if (XYZ == NULL)
+						convertLabToXYZ() ;
+					break ;
+				}
+				case(C_Luv) :
+					if (Luv == NULL) {
+						if (XYZ == NULL)
+							convertLabToXYZ() ;
+						convertXYZtoLuv() ;
+					}
+					break ;
+				default :
+					std::cerr << "Colour conversion not supported" << std::endl ;
+					return false ;
+			}
+			break ;
+
 		default :
 			std::cerr << "Colour conversion not supported" << std::endl ;
 			return false ;
