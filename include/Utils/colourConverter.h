@@ -117,7 +117,6 @@ private: // private constants
 	static const REAL un = 0.197832 ;
 	static const REAL vn = 0.468340 ;
 
-
 } ;
 
 } // namespace Utils

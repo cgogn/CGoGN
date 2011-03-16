@@ -36,18 +36,30 @@ ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 
 	switch(originalEnc) {
 		case(C_RGB):
+			assert (-0.001 < col[0] && col[0] < 1.001) ;
+			assert (-0.001 < col[1] && col[1] < 1.001) ;
+			assert (-0.001 < col[2] && col[2] < 1.001) ;
 			RGB = new VEC3(col) ;
 			break ;
 
 		case (C_Luv) :
+			assert (-0.001 < col[0] && col[0] < 100.001) ;
+			assert (-83.001 < col[1] && col[1] < 175.001) ;
+			assert (-134.001 < col[2] && col[2] < 108.001) ;
 			Luv = new VEC3(col) ;
 			break ;
 
 		case (C_XYZ) :
+			assert (-0.001 < col[0] && col[0] < 1.001) ;
+			assert (-0.001 < col[1] && col[1] < 1.001) ;
+			assert (-0.001 < col[2] && col[2] < 1.001) ;
 			XYZ = new VEC3(col) ;
 			break ;
 
 		case (C_Lab) :
+			assert (-0.001 < col[0] && col[0] < 100.001) ;
+			assert (-86.001 < col[1] && col[1] < 98.001) ;
+			assert (-108.001 < col[2] && col[2] < 95.001) ;
 			Lab = new VEC3(col) ;
 			break ;
 	}
@@ -71,10 +83,10 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getLuv() {
 
 template<typename REAL>
 Geom::Vector<3,REAL> ColourConverter<REAL>::getLab() {
-	if (Luv == NULL)
+	if (Lab == NULL)
 		convert(originalEnc,C_Lab) ;
 
-	return *Luv ;
+	return *Lab ;
 }
 
 template<typename REAL>
@@ -136,16 +148,17 @@ void ColourConverter<REAL>::convertXYZtoLuv() {
 	REAL &Y = (*XYZ)[1] ;
 	REAL &Z = (*XYZ)[2] ;
 
-	if (Y > 0.008856)
-		L = 116.0f * pow(Y,1.0f/3.0) - 16 ;
+	REAL Ydiv = Y/Yn ;
+	if (Ydiv > 0.008856)
+		L = 116.0 * pow(Ydiv,1.0f/3.0) - 16.0 ;
 	else // near black
-		L = 903.3 * Y ;
+		L = 903.3 * Ydiv ;
 
 	REAL den = X + 15.0 * Y + 3 * Z ;
 	REAL u1 = (4.0 * X) / den ;
-	REAL v1 = (9.0 * X) / den ;
-	u = 13*L * (u1 - 0.197832) ;
-	v = 13*L * (v1 - 0.468340) ;
+	REAL v1 = (9.0 * Y) / den ;
+	u = 13*L * (u1 - un) ;
+	v = 13*L * (v1 - vn) ;
 
 	Luv = new VEC3(L,u,v) ;
 }
@@ -161,26 +174,17 @@ void ColourConverter<REAL>::convertLuvToXYZ() {
 	if (L > 8.0)
 		Y = pow(((L+16.0) / 116.0),3) ;
 	else // near black
-		Y = L / 903.3 ;
+		Y = Yn * L / 903.3 ;
 
 	REAL den = 13.0 * L ;
-	REAL u1 = u/den + 0.197832 ;
-	REAL v1 = v/den + 0.468340 ;
+	REAL u1 = u/den + un ;
+	REAL v1 = v/den + vn ;
 	den = 4.0*v1 ;
-	X = Y * 9.0*u1 / den ;
-	Z = Y * (12-3*u1-20*v1) / den ;
+	X = Y * 9.0 * u1 / den ;
+	Z = Y * (12 - 3*u1 - 20*v1) / den ;
 
 	XYZ = new VEC3(X,Y,Z) ;
 }
-
-/*
-template<typename REAL>
-REAL f(REAL x) {
-	if (x > 0.008856)
-		return pow(x,1.0/3.0) ;
-	else
-		return 7.787 * x + 16.0/116.0 ;
-}*/
 
 template<typename REAL>
 void ColourConverter<REAL>::convertXYZtoLab() {
@@ -214,9 +218,9 @@ template<typename REAL>
 void ColourConverter<REAL>::convertLabToXYZ() {
 	REAL X,Y,Z ;
 
-	REAL &L = (*Luv)[0] ;
-	REAL &a = (*Luv)[1] ;
-	REAL &b = (*Luv)[2] ;
+	REAL &L = (*Lab)[0] ;
+	REAL &a = (*Lab)[1] ;
+	REAL &b = (*Lab)[2] ;
 
 	struct Local {
 		static REAL f(REAL x) {
