@@ -33,6 +33,17 @@ namespace CGoGN {
 namespace Utils {
 
 /**
+ * Supported colour spaces
+ */
+enum ColourEncoding
+{
+	C_RGB = 0,
+	C_Luv = 1,
+	C_XYZ = 2,
+	C_Lab = 3
+} ;
+
+/**
  * Class for colour conversions between the enumerated colour spaces.
  * Usage :
  *  VEC3 colRGB ; 								// current colour in RGB for example
@@ -47,10 +58,6 @@ class ColourConverter
 
 public: // types
 	typedef Geom::Vector<3,REAL> VEC3 ;
-	/**
-	 * Supported colour spaces
-	 */
-	enum ColourEncoding { C_RGB, C_XYZ, C_Luv, C_Lab } ;
 
 public: // methods
 	/**

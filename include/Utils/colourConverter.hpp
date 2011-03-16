@@ -181,7 +181,7 @@ void ColourConverter<REAL>::convertLuvToXYZ() {
 	REAL v1 = v/den + vn ;
 	den = 4.0*v1 ;
 	X = Y * 9.0 * u1 / den ;
-	Z = Y * (12 - 3*u1 - 20*v1) / den ;
+	Z = Y * (12.0 - 3.0*u1 - 20.0*v1) / den ;
 
 	XYZ = new VEC3(X,Y,Z) ;
 }
