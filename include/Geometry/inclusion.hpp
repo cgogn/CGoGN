@@ -39,13 +39,13 @@ Inclusion isPointInTriangle(const VEC3& point,const VEC3& Ta,const VEC3& Tb,cons
 	VEC3 v1(Tb) ;
 	v1 -= Ta ;
 	VEC3 v2(point) ;
-	v1 -= Ta ;
+	v2 -= Ta ;
 
 	// Compute dot products
-	T dot00 = v0.norm2() ;
+	T dot00 = v0 * v0 ;
 	T dot01 = v0 * v1 ;
 	T dot02 = v0 * v2 ;
-	T dot11 = v1.norm2() ;
+	T dot11 = v1 * v1 ;
 	T dot12 = v1 * v2 ;
 
 	// Compute barycentric coordinates

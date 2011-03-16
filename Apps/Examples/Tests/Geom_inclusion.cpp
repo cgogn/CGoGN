@@ -39,6 +39,8 @@ int main()
 	VEC3 tc(0,5,0);
 	VEC3 pIn1(1,1,0);
 	VEC3 pIn2(2,0,0);
+	VEC3 pIn3 = (tb+tc)/2.0f;
+	VEC3 pIn4 = (tc+ta)/2.0f;
 	VEC3 pOut(6,0,0);
 
 	if(Geom::isPointInTriangle<VEC3>(pIn1,ta,tb,tc)!=Geom::FACE_INCLUSION)
@@ -47,6 +49,16 @@ int main()
 	}
 
 	if(Geom::isPointInTriangle<VEC3>(pIn2,ta,tb,tc)!=Geom::EDGE_INCLUSION)
+	{
+		std::cout << "ERROR : isPointInTriangle : edge inclusion" << std::endl;
+	}
+
+	if(Geom::isPointInTriangle<VEC3>(pIn3,ta,tb,tc)!=Geom::EDGE_INCLUSION)
+	{
+		std::cout << "ERROR : isPointInTriangle : edge inclusion" << std::endl;
+	}
+
+	if(Geom::isPointInTriangle<VEC3>(pIn4,ta,tb,tc)!=Geom::EDGE_INCLUSION)
 	{
 		std::cout << "ERROR : isPointInTriangle : edge inclusion" << std::endl;
 	}
