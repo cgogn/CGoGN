@@ -129,10 +129,10 @@ void decimate(
 			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
 			break ;
 		case S_hLightfield :
-			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
 		case S_hQEMml :
-			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
+			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
 			break ;
 	}
 
