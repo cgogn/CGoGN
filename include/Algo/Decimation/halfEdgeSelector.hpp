@@ -159,11 +159,11 @@ void HalfEdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool reco
 
    	do {
    		// Make step
-   		dBack = this->m_map.phi2(dFront) ;
+   		dBack = this->m_map.phi1(dFront) ;
        	dFront = this->m_map.alpha1(dFront) ;
 
        	if (dBack != dFront) { // if dFront is no border
-           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi1(dFront)],this->m_position[dBack]) ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -404,18 +404,19 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
 
    	do {
    		// Make step
-   		dBack = this->m_map.phi2(dFront) ;
+   		dBack = this->m_map.phi1(dFront) ;
        	dFront = this->m_map.alpha1(dFront) ;
 
        	if (dBack != dFront) { // if dFront is no border
-           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi1(dFront)],this->m_position[dBack]) ;
+           	if (isnan(this->m_position[d][0]))
+           		std::cout << "NaaaaN" << std::endl ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
 
     } while(dFront != dInit) ;
 }
-
 
 template <typename PFP>
 void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)

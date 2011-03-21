@@ -68,18 +68,19 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const QuadricRGBfunctions& q) {
 
 template <typename REAL>
 QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REAL gamma, const REAL alpha) {
-	MATRIX66 R1,R2_b,R2_c;
+	MATRIX66 R1,R2_b,R2_c ;
 
 	buildRotateMatrix(R1,gamma); // Rotation 1
+	R1.transpose() ;
 
 	buildIntegralMatrix_A(A,alpha); // Parameterized integral matrix A
 	buildIntegralMatrix_b(R2_b,alpha); // Parameterized integral matrix b
 	buildIntegralMatrix_c(R2_c,alpha); // Parameterized integral matrix c
 
 	// Quadric (A,b,c) => L*A*Lt - 2*b*Lt + c = ERROR
-	for (unsigned col = RED; col < BLUE+1; ++col) {
-		Geom::Vector<6,REAL> function; // get function coefficients
+	for (unsigned col = RED ; col < BLUE+1 ; ++col) {
 
+		Geom::Vector<6,REAL> function ; // get function coefficients
 		if (!cf.getSubVectorH(col,0,function))
 			assert(!"QuadricRGBfunctions::constructor") ;
 
@@ -373,7 +374,6 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, const REAL gamma)
 	N(5,3) = REAL(0);
 	N(5,4) = REAL(0);
 	N(5,5) = REAL(1);
-
 }
 
 template <typename REAL>

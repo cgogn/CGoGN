@@ -264,15 +264,15 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	if (! m_quadricRGBfunctions[d].findOptimizedRGBfunctions(this->m_approx[d])) {
 		this->m_approx[d] = this->m_attrV[d]; // if fail take first one
 	}
-//	if (gamma2 < -1) {
-//	std::cout << "Approx of : " <<std::endl ;
-//	std::cout << "Frame1 : " << m_frame[d] << std::endl ;
-//	std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
-//	std::cout << "Frame2 : " << m_frame[dd] << std::endl ;
-//	std::cout << "Function2 : "<< this->m_attrV[dd] << std::endl ;
-//	std::cout << "is " << std::endl ;
-//	std::cout << "Frame :" << m_approxFrame[d] << std::endl ;
-//	std::cout << "Function : " << this->m_approx[d] << std::endl << std::endl ;
+//	if (gamma2 < -3) {
+//		std::cout << "Approx of : " <<std::endl ;
+//		std::cout << "Frame1 : " << m_frame[d] << std::endl ;
+//		std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
+//		std::cout << "Frame2 : " << m_frame[dd] << std::endl ;
+//		std::cout << "Function2 : "<< this->m_attrV[dd] << std::endl ;
+//		std::cout << "is " << std::endl ;
+//		std::cout << "Frame :" << m_approxFrame[d] << std::endl ;
+//		std::cout << "Function : " << this->m_approx[d] << std::endl << std::endl ;
 //	}
 }
 

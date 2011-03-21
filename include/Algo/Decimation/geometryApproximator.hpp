@@ -110,7 +110,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
  ************************************************************************************/
 
 template <typename PFP>
-bool Approximator_QEMhalf<PFP>::init()
+bool Approximator_QEMhalfEdge<PFP>::init()
 {
 	m_quadric = this->m_map.template getAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
 
@@ -122,7 +122,7 @@ bool Approximator_QEMhalf<PFP>::init()
 }
 
 template <typename PFP>
-void Approximator_QEMhalf<PFP>::approximate(Dart d)
+void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
@@ -166,6 +166,12 @@ void Approximator_QEMhalf<PFP>::approximate(Dart d)
 		this->m_approx[d] = this->m_attrV[d] ;
 	else
 		this->m_approx[d] = res ;
+
+	if (isnan((res[0]))) {
+		std::cout << "res(" << opt << ") = " << this->m_approx[d] << std::endl ;
+		std::cout << q1 << std::endl ;
+		std::cout << q2 << std::endl ;
+	}
 }
 
 /************************************************************************************

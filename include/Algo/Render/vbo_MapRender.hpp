@@ -308,7 +308,7 @@ void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good,
 		if(!m.isMarked(d) && good(d))
 		{
 			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
-			tableIndices.push_back(map.getEmbedding(map.phi2(d), VERTEX_ORBIT));
+			tableIndices.push_back(map.getEmbedding(map.phi1(d), VERTEX_ORBIT));
 			m.markOrbit(EDGE_ORBIT, d);
 		}
 	}

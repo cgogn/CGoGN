@@ -45,8 +45,8 @@ void decimate(
 		case A_QEM :
 			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
 			break ;
-		case A_QEMhalf :
-			approximators.push_back(new Approximator_QEMhalf<PFP>(map, position)) ;
+		case A_QEMhalfEdge :
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, position)) ;
 			break ;
 		case A_MidEdge :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, position)) ;
@@ -65,7 +65,7 @@ void decimate(
 			break ;
 		case A_LightfieldFull :
 		{
-			approximators.push_back(new Approximator_QEMhalf<PFP>(map, position)) ;
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, position)) ;
 			/*
 						PFP::TVEC3 frame[3] ;
 						frame[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_T") ; // Tangent
@@ -148,8 +148,11 @@ void decimate(
 
 	while(!finished)
 	{
+		std::cout << "Countdown : " ;
+		std::cout << std::setprecision(8) << (nbVertices - nbWantedVertices) << "\r" << std::flush;
+
 		if(!selector->nextEdge(d)) {
-			std::cout << "out" << std::endl ;
+			std::cout << std::endl << "out" << std::endl ;
 			break ;
 		}
 
@@ -175,7 +178,7 @@ void decimate(
 
 		if(nbVertices <= nbWantedVertices) {
 			finished = true ;
-			std::cout << "done" << std::endl ;
+			std::cout << std::endl << "done" << std::endl ;
 		}
 	}
 

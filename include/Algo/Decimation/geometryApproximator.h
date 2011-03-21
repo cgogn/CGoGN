@@ -59,7 +59,7 @@ public:
 } ;
 
 template <typename PFP>
-class Approximator_QEMhalf : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_QEMhalfEdge : public Approximator<PFP, typename PFP::VEC3>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -70,12 +70,12 @@ protected:
 	AttributeHandler<Quadric<REAL> > m_quadric ;
 
 public:
-	Approximator_QEMhalf(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEMhalfEdge(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, EDGE_ORBIT, pred)
 	{}
-	~Approximator_QEMhalf()
+	~Approximator_QEMhalfEdge()
 	{}
-	ApproximatorType getType() const { return A_QEMhalf ; }
+	ApproximatorType getType() const { return A_QEMhalfEdge ; }
 	bool init() ;
 	void approximate(Dart d) ;
 } ;
