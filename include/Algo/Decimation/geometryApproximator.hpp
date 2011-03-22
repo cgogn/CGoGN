@@ -166,12 +166,6 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		this->m_approx[d] = this->m_attrV[d] ;
 	else
 		this->m_approx[d] = res ;
-
-	if (isnan((res[0]))) {
-		std::cout << "res(" << opt << ") = " << this->m_approx[d] << std::endl ;
-		std::cout << q1 << std::endl ;
-		std::cout << q2 << std::endl ;
-	}
 }
 
 /************************************************************************************

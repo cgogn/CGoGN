@@ -242,10 +242,9 @@ template <unsigned int DIM, typename T>
 inline double Vector<DIM,T>::normalize()
 {
 	double n = norm() ;
-	if(n==T(0.0))
-		n = T(0.0001) ;
-	for(unsigned int i = 0; i < DIM; ++i)
-		m_data[i] /= T(n) ;
+	if(n != T(0.0))
+		for(unsigned int i = 0; i < DIM; ++i)
+			m_data[i] /= T(n) ;
 	return n ;
 }
 

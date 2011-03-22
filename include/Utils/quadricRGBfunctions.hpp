@@ -358,8 +358,8 @@ void QuadricRGBfunctions<REAL>::buildRotateMatrix(MATRIX66 &N, const REAL gamma)
 	N(3,1) = REAL(0);
 	N(3,2) = REAL(0);
 	N(3,3) = cosinus;
-	N(3,5) = REAL(0);
 	N(3,4) = sinus;
+	N(3,5) = REAL(0);
 
 	N(4,0) = REAL(0);
 	N(4,1) = REAL(0);
