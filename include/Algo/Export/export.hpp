@@ -288,9 +288,8 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		if(good(d) && !markF.isMarked(d))
 		{
 			markF.markOrbit(FACE_ORBIT, d) ;
-			faces.push_back(0);
-			unsigned int& nbe = faces.back();
 			Dart e = d;
+			std::vector<unsigned int> face ;
 			do
 			{
 				if (!markV.isMarked(e))
@@ -300,11 +299,15 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 
 					markV.mark(e);
 				}
-				faces.push_back(tableVertLab[e]);
-				nbe++;
+				face.push_back(tableVertLab[e]);
 				e = map.phi1(e);
-			} while (e!=d);
-			nbf++;
+			} while (e!=d) ;
+
+			faces.push_back(face.size()) ;
+			for (unsigned int i = 0 ; i < face.size() ; ++i)
+				faces.push_back(face.at(i)) ;
+
+			++nbf;
 		}
 	}
 
@@ -358,7 +361,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << std::endl ;
 	}
 
-	std::vector<unsigned int>::iterator it = faces.begin();;
+	std::vector<unsigned int>::iterator it = faces.begin();
 	while (it != faces.end())
 	{
 		unsigned int nbe = *it++;

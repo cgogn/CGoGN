@@ -216,7 +216,7 @@ template <typename PFP>
 void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
-	Dart dd = m.phi2(d) ;	// get the two vertices
+	Dart dd = m.phi1(d) ;	// get the two vertices
 
 	// get hypothetical local frames
 	VEC3 i,n ;

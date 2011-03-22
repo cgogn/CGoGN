@@ -67,11 +67,11 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const QuadricRGBfunctions& q) {
 }
 
 template <typename REAL>
-QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REAL gamma, const REAL alpha) {
+QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const MATRIX36& cf, const REAL gamma, const REAL alpha) {
 	MATRIX66 R1,R2_b,R2_c ;
 
 	buildRotateMatrix(R1,gamma); // Rotation 1
-	R1.transpose() ;
+//	R1.transpose() ;
 
 	buildIntegralMatrix_A(A,alpha); // Parameterized integral matrix A
 	buildIntegralMatrix_b(R2_b,alpha); // Parameterized integral matrix b
@@ -92,7 +92,7 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const RGBFUNCTIONS& cf, const REA
 }
 
 template <typename REAL>
-REAL QuadricRGBfunctions<REAL>::operator() (const RGBFUNCTIONS& cf) const {
+REAL QuadricRGBfunctions<REAL>::operator() (const MATRIX36& cf) const {
 	REAL res = REAL(0);
 
 	for (unsigned col = RED; col < BLUE+1; ++col) {
@@ -112,7 +112,7 @@ REAL QuadricRGBfunctions<REAL>::operator() (const RGBFUNCTIONS& cf) const {
 }
 
 template <typename REAL>
-bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(RGBFUNCTIONS& cf) const {
+bool QuadricRGBfunctions<REAL>::findOptimizedRGBfunctions(MATRIX36& cf) const {
 	MATRIX66 Ainv ;
 
 	REAL det = A.invert(Ainv) ; // Invert matrix

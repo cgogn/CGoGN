@@ -43,8 +43,7 @@ public:
 
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
 	typedef Quadric<REAL> QUADRIC;
-	typedef MATRIX33 FRAME;
-	typedef Geom::Matrix<3,6,REAL> RGBFUNCTIONS;
+	typedef Geom::Matrix<3,6,REAL> MATRIX36;
 
 private:
 	MATRIX66 A;
@@ -58,13 +57,13 @@ public:
 	QuadricRGBfunctions();
 	QuadricRGBfunctions(int i);
 	QuadricRGBfunctions(const QuadricRGBfunctions&);
-	QuadricRGBfunctions(const RGBFUNCTIONS&, const REAL gamma = REAL(0), const REAL alpha = REAL(0)) ;
+	QuadricRGBfunctions(const MATRIX36&, const REAL gamma = REAL(0), const REAL alpha = REAL(0)) ;
 
 	virtual ~QuadricRGBfunctions() {} ;
 
-	REAL operator() (const RGBFUNCTIONS&) const;
+	REAL operator() (const MATRIX36&) const;
 
-	bool findOptimizedRGBfunctions(RGBFUNCTIONS& lff) const;
+	bool findOptimizedRGBfunctions(MATRIX36& lff) const;
 
 	void operator += (const QuadricRGBfunctions&) ;
 	void operator -= (const QuadricRGBfunctions&) ;

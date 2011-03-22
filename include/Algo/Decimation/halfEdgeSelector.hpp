@@ -125,6 +125,7 @@ void HalfEdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 		halfEdges.erase(edgeE.it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
+	assert(dd != d) ;
 	if(dd != d)
 	{
 		edgeE = halfEdgeInfo[dd] ;
@@ -162,9 +163,10 @@ void HalfEdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool reco
    		dBack = this->m_map.phi1(dFront) ;
        	dFront = this->m_map.alpha1(dFront) ;
 
-       	if (dBack != dFront) { // if dFront is no border
-           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi1(dFront)],this->m_position[dBack]) ;
+       	if (this->m_map.phi2(dFront) != dFront) { // if dFront is no border
+           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[dBack],this->m_position[this->m_map.phi1(dFront)]) ;
        	}
+
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
 
@@ -182,19 +184,30 @@ void HalfEdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	do
 	{
 		updateHalfEdgeInfo(vit, true) ;
-		updateHalfEdgeInfo(m.phi2(vit), true) ;
+		Dart d = m.phi2(vit) ;
+		if (d != vit) ;
+			updateHalfEdgeInfo(d, true) ;
+
 		updateHalfEdgeInfo(m.phi1(vit), true) ;
-		updateHalfEdgeInfo(m.phi2(m.phi1(vit)), true) ;
+		d = m.phi2(m.phi1(vit)) ;
+		if (d != m.phi1(vit)) ;
+			updateHalfEdgeInfo(d, true) ;
 
 		Dart stop = m.phi2(vit) ;
+		assert (stop != vit) ;
 		Dart vit2 = m.alpha_1(m.phi1(vit)) ;
 		do {
 			updateHalfEdgeInfo(vit2, true) ;
-			updateHalfEdgeInfo(m.phi2(vit2), true) ;
-			updateHalfEdgeInfo(m.phi1(vit2), false) ;
-			updateHalfEdgeInfo(m.phi2(m.phi1(vit2)), false) ;
-			vit2 = m.alpha_1(vit2) ;
+			d = m.phi2(vit2) ;
+			if (d != vit2) ;
+				updateHalfEdgeInfo(d, true) ;
 
+			updateHalfEdgeInfo(m.phi1(vit2), false) ;
+			d = m.phi2(m.phi1(vit2)) ;
+			if (d != m.phi1(vit2)) ;
+				updateHalfEdgeInfo(d, false) ;
+
+			vit2 = m.alpha_1(vit2) ;
 		} while (stop != vit2) ;
 		vit = m.alpha1(vit) ;
 	} while(vit != d2) ;
@@ -251,7 +264,7 @@ template <typename PFP>
 void HalfEdgeSelector_QEMml<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
 {
 	MAP& m = this->m_map ;
-	Dart dd = m.phi2(d) ;
+	Dart dd = m.phi1(d) ;
 
 	Quadric<REAL> quad ;
 	quad += quadric[d] ;	// compute the sum of the
@@ -288,12 +301,12 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 		}
 		else if( ok == 1 && (*it)->getApproximatedAttributeName() == "frame")
 		{
-			m_frameApproximator = reinterpret_cast<Approximator<PFP, FRAME>* >(*it) ; // 2) frame (needs position)
+			m_frameApproximator = reinterpret_cast<Approximator<PFP, MATRIX33>* >(*it) ; // 2) frame (needs position)
 			++ok ;
 		}
 		else if(ok == 2 && (*it)->getApproximatedAttributeName() == "colorPTM")
 		{
-			m_RGBfunctionsApproximator = reinterpret_cast<Approximator<PFP, RGBFUNCTIONS>* >(*it) ; // 3) functions (needs frame)
+			m_RGBfunctionsApproximator = reinterpret_cast<Approximator<PFP, MATRIX36>* >(*it) ; // 3) functions (needs frame)
 			++ok ;
 		}
 	}
@@ -409,8 +422,6 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
 
        	if (dBack != dFront) { // if dFront is no border
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi1(dFront)],this->m_position[dBack]) ;
-           	if (isnan(this->m_position[d][0]))
-           		std::cout << "NaaaaN" << std::endl ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -429,22 +440,34 @@ void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	do
 	{
 		updateHalfEdgeInfo(vit, true) ;
-		updateHalfEdgeInfo(m.phi2(vit), true) ;
+		Dart d = m.phi2(vit) ;
+		if (d != vit) ;
+			updateHalfEdgeInfo(d, true) ;
+
 		updateHalfEdgeInfo(m.phi1(vit), true) ;
-		updateHalfEdgeInfo(m.phi2(m.phi1(vit)), true) ;
+		d = m.phi2(m.phi1(vit)) ;
+		if (d != m.phi1(vit)) ;
+			updateHalfEdgeInfo(d, true) ;
 
 		Dart stop = m.phi2(vit) ;
+		assert (stop != vit) ;
 		Dart vit2 = m.alpha_1(m.phi1(vit)) ;
 		do {
 			updateHalfEdgeInfo(vit2, true) ;
-			updateHalfEdgeInfo(m.phi2(vit2), true) ;
-			updateHalfEdgeInfo(m.phi1(vit2), false) ;
-			updateHalfEdgeInfo(m.phi2(m.phi1(vit2)), false) ;
-			vit2 = m.alpha_1(vit2) ;
+			d = m.phi2(vit2) ;
+			if (d != vit2) ;
+				updateHalfEdgeInfo(d, true) ;
 
+			updateHalfEdgeInfo(m.phi1(vit2), false) ;
+			d = m.phi2(m.phi1(vit2)) ;
+			if (d != m.phi1(vit2)) ;
+				updateHalfEdgeInfo(d, false) ;
+
+			vit2 = m.alpha_1(vit2) ;
 		} while (stop != vit2) ;
 		vit = m.alpha1(vit) ;
 	} while(vit != d2) ;
+
 
 	cur = halfEdges.begin() ; // set the current edge to the first one
 }
@@ -498,7 +521,7 @@ template <typename PFP>
 void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
 {
 	MAP& m = this->m_map ;
-	Dart dd = m.phi2(d) ;
+	Dart dd = m.phi1(d) ;
 
 	// New position
 	Quadric<REAL> quad ;

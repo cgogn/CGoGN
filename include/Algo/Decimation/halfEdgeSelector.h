@@ -94,9 +94,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	typedef Geom::Matrix<3,3,REAL> MATRIX33 ;
-	typedef MATRIX33 FRAME ;
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
-	typedef MATRIX36 RGBFUNCTIONS ;
 
 private:
 	typedef	struct
@@ -107,7 +105,7 @@ private:
 	} LightfieldHalfEdgeInfo ;
 	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
 
-	AttributeHandler<FRAME > m_frame ;
+	AttributeHandler<MATRIX33 > m_frame ;
 
 	AttributeHandler<HalfEdgeInfo> halfEdgeInfo ;
 	AttributeHandler<Quadric<REAL> > quadric ;
@@ -117,8 +115,8 @@ private:
 	typename std::multimap<float,Dart>::iterator cur ;
 
 	Approximator<PFP, VEC3>* m_positionApproximator ;
-	Approximator<PFP, FRAME >* m_frameApproximator ;
-	Approximator<PFP, RGBFUNCTIONS >* m_RGBfunctionsApproximator ;
+	Approximator<PFP, MATRIX33 >* m_frameApproximator ;
+	Approximator<PFP, MATRIX36 >* m_RGBfunctionsApproximator ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
@@ -129,7 +127,7 @@ public:
 	HalfEdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		m_frame = m.template getAttribute<FRAME>(VERTEX_ORBIT, "frame") ;
+		m_frame = m.template getAttribute<MATRIX33>(VERTEX_ORBIT, "frame") ;
 
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo>(DART_ORBIT, "halfEdgeInfo") ;
 		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
