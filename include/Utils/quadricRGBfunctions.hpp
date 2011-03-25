@@ -424,6 +424,8 @@ void QuadricRGBfunctions<REAL>::operator *= (const REAL v) {
 
 template <typename REAL>
 void QuadricRGBfunctions<REAL>::operator /= (const REAL v) {
+	if (v==REAL(0))
+		return ;
 	for (unsigned i = 0; i < 6; ++i)
 		for (unsigned j = 0; j < 6; ++j)
 			A(i,j) /= v;

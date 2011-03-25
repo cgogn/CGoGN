@@ -42,7 +42,6 @@ public:
 	typedef Geom::Matrix<6,6,REAL> MATRIX66;
 
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
-	typedef Quadric<REAL> QUADRIC;
 	typedef Geom::Matrix<3,6,REAL> MATRIX36;
 
 private:

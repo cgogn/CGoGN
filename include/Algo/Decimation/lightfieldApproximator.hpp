@@ -254,26 +254,33 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	assert (-3.15 < alpha1 && alpha1 <= 3.15) ;
 	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
+	MATRIX36 &f1 = this->m_attrV[d] ;
+	MATRIX36 &f2 = this->m_attrV[dd] ;
+
 	// Create and sum quadrics
 //	std::cout << "angles1 : " << gamma1 << " " << alpha1 << std::endl ;
 //	std::cout << "angles2 : " << gamma2 << " " << alpha2 << std::endl ;
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
+	QuadricRGBfunctions<REAL> q(f1, gamma1/*, alpha1*/) ;
+	m_quadricRGBfunctions[d].zero() ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1/*, alpha1*/) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2/*, alpha2*/) ;
 
 	// Compute new function
 	if (! m_quadricRGBfunctions[d].findOptimizedRGBfunctions(this->m_approx[d])) {
 		this->m_approx[d] = this->m_attrV[d]; // if fail take first one
 	}
-//	if (gamma2 < -3) {
-//		std::cout << "Approx of : " <<std::endl ;
-//		std::cout << "Frame1 : " << m_frame[d] << std::endl ;
-//		std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
-//		std::cout << "Frame2 : " << m_frame[dd] << std::endl ;
-//		std::cout << "Function2 : "<< this->m_attrV[dd] << std::endl ;
-//		std::cout << "is " << std::endl ;
-//		std::cout << "Frame :" << m_approxFrame[d] << std::endl ;
-//		std::cout << "Function : " << this->m_approx[d] << std::endl << std::endl ;
-//	}
+	MATRIX36 &newF = this->m_approx[d] ;
+//	std::cout << "Approx of : " <<std::endl ;
+//	std::cout << "Frame1 : " << m_frame[d] << std::endl ;
+//	std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
+//	std::cout << "gamma1 : " << gamma1 << std::endl ;
+//	std::cout << "Frame2 : " << m_frame[dd] << std::endl ;
+//	std::cout << "Function2 : "<< this->m_attrV[dd] << std::endl ;
+//	std::cout << "gamma2 : " << gamma2 << std::endl ;
+//	std::cout << "is " << std::endl ;
+//	std::cout << "Frame :" << m_approxFrame[d] << std::endl ;
+//	std::cout << "Function : " << this->m_approx[d] << std::endl ;
+//	std::cout << std::endl ;
 }
 
 } //namespace Decimation
