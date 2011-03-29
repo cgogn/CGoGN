@@ -71,7 +71,6 @@ QuadricRGBfunctions<REAL>::QuadricRGBfunctions(const MATRIX36& cf, const REAL ga
 	MATRIX66 R1,R2_b,R2_c ;
 
 	buildRotateMatrix(R1,gamma); // Rotation 1
-//	R1.transpose() ;
 
 	buildIntegralMatrix_A(A,alpha); // Parameterized integral matrix A
 	buildIntegralMatrix_b(R2_b,alpha); // Parameterized integral matrix b

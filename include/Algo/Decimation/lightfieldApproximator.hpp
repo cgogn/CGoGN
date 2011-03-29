@@ -249,27 +249,24 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	REAL alpha1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
 	REAL alpha2 = ((n * j2pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
 
-	assert (-3.15 < gamma1 && gamma1 <= 3.15) ;
-	assert (-3.15 < gamma2 && gamma2 <= 3.15) ;
-	assert (-3.15 < alpha1 && alpha1 <= 3.15) ;
-	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
+//	assert (-3.15 < gamma1 && gamma1 <= 3.15) ;
+//	assert (-3.15 < gamma2 && gamma2 <= 3.15) ;
+//	assert (-3.15 < alpha1 && alpha1 <= 3.15) ;
+//	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
-	MATRIX36 &f1 = this->m_attrV[d] ;
-	MATRIX36 &f2 = this->m_attrV[dd] ;
+//	MATRIX36 &f1 = this->m_attrV[d] ;
+//	MATRIX36 &f2 = this->m_attrV[dd] ;
 
 	// Create and sum quadrics
-//	std::cout << "angles1 : " << gamma1 << " " << alpha1 << std::endl ;
-//	std::cout << "angles2 : " << gamma2 << " " << alpha2 << std::endl ;
-	QuadricRGBfunctions<REAL> q(f1, gamma1/*, alpha1*/) ;
 	m_quadricRGBfunctions[d].zero() ;
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1/*, alpha1*/) ;
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2/*, alpha2*/) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
 
 	// Compute new function
 	if (! m_quadricRGBfunctions[d].findOptimizedRGBfunctions(this->m_approx[d])) {
 		this->m_approx[d] = this->m_attrV[d]; // if fail take first one
 	}
-	MATRIX36 &newF = this->m_approx[d] ;
+//	MATRIX36 &newF = this->m_approx[d] ;
 //	std::cout << "Approx of : " <<std::endl ;
 //	std::cout << "Frame1 : " << m_frame[d] << std::endl ;
 //	std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
