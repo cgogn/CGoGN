@@ -150,7 +150,7 @@ void ColourConverter<REAL>::convertXYZtoLuv() {
 
 	REAL Ydiv = Y/Yn ;
 	if (Ydiv > 0.008856)
-		L = 116.0 * pow(Ydiv,1.0f/3.0) - 16.0 ;
+		L = 116.0 * pow(Ydiv,1.0/3.0) - 16.0 ;
 	else // near black
 		L = 903.3 * Ydiv ;
 
