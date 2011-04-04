@@ -27,6 +27,7 @@
 
 #include "Topology/generic/marker.h"
 #include "Topology/generic/attribmap.h"
+
 #include "Topology/generic/functor.h"
 
 #define VERTEX_CELL	VERTEX_ORBIT

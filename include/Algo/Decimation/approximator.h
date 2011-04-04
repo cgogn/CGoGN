@@ -39,11 +39,13 @@ namespace Decimation
 enum ApproximatorType
 {
 	A_QEM,
+	A_QEMhalfEdge,
 	A_MidEdge,
 	A_HalfCollapse,
 	A_CornerCutting,
 	A_TangentPredict1,
 	A_TangentPredict2,
+	A_LightfieldHalf,
 	A_LightfieldFull
 } ;
 

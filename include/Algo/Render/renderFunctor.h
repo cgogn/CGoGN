@@ -210,8 +210,8 @@ template<typename PFP>
 class FunctorGLNormal : public  CGoGN::FunctorMap<typename PFP::MAP>
 {
 	typedef typename PFP::MAP MAP;
-	
- 
+
+
 protected:
 	/**
 	 * positions of vertices
@@ -239,6 +239,43 @@ public:
 
 	bool operator() (Dart d);
 };
+
+template<typename PFP>
+class FunctorGLFrame : public  CGoGN::FunctorMap<typename PFP::MAP>
+{
+	typedef typename PFP::MAP MAP;
+
+
+protected:
+	/**
+	 * positions of vertices
+	 */
+	const typename PFP::TVEC3& m_positions;
+
+	/**
+	 * frame of vertices
+	 */
+	const typename PFP::TVEC3 *m_frames;
+
+	/**
+	* Dart selector to restrict the rendering
+	*/
+	const FunctorSelect& m_selector;
+
+	float m_scale;
+
+public:
+	/**
+
+	* @param good dart selector
+	*/
+	FunctorGLFrame (MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3 frames[3], float scale);
+
+	bool operator() (Dart d);
+};
+
+
+
 
 } // namespace Direct
 

@@ -473,45 +473,34 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	m_positionApproximator->approximate(d) ;
 
-	REAL err = quad(m_positionApproximator->getApprox(d)) ;
+	REAL err = std::max(REAL(0),REAL(quad(m_positionApproximator->getApprox(d)))) ;
+
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
 
 /************************************************************************************
- *                             EDGESELECTOR LIGHTFIELD                              *
+ *                            QUADRIC ERROR METRIC (Memoryless version)             *
  ************************************************************************************/
 
 template <typename PFP>
-bool EdgeSelector_Lightfield<PFP>::init()
+bool EdgeSelector_QEMml<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	// Verify availability of required approximators
-	char ok = 0 ;
+	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
-		it != this->m_approximators.end();
+		it != this->m_approximators.end() && !ok;
 		++it)
 	{
-		// constraint : 3 approximators in specific order
-		if(ok == 0 && (*it)->getApproximatedAttributeName() == "position")
+		if((*it)->getApproximatedAttributeName() == "position")
 		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // 1) position
-			++ok ;
-		}
-		else if( ok == 1 && (*it)->getApproximatedAttributeName() == "frame")
-		{
-			m_frameApproximator = reinterpret_cast<Approximator<PFP, FRAME>* >(*it) ; // 2) frame (needs position)
-			++ok ;
-		}
-		else if(ok == 2 && (*it)->getApproximatedAttributeName() == "RGBfunctions")
-		{
-			m_RGBfunctionsApproximator = reinterpret_cast<Approximator<PFP, RGBFUNCTIONS>* >(*it) ; // 3) functions (needs frame)
-			++ok ;
+			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ;
+			ok = true ;
 		}
 	}
 
-	if(ok != 3)
+	if(!ok)
 		return false ;
 
 	edges.clear() ;
@@ -521,24 +510,23 @@ bool EdgeSelector_Lightfield<PFP>::init()
 	{
 		if(!vMark.isMarked(d))
 		{
-			Quadric<REAL> q ;		// create one quadric
-			quadric[d] = q ;		// per vertex
+			Quadric<REAL> q ;	// create one quadric
+			quadric[d] = q ;	// per vertex
 			vMark.mark(d) ;
 		}
 	}
 
 	DartMarker mark(m) ;
-
-	for(Dart d = m.begin(); d != m.end(); m.next(d)) // init QEM quadrics
+	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!mark.isMarked(d))
 		{
-			Dart d1 = m.phi1(d) ;					// for each triangle,
-			Dart d_1 = m.phi_1(d) ;					// initialize the quadric of the triangle
+			Dart d1 = m.phi1(d) ;				// for each triangle,
+			Dart d_1 = m.phi_1(d) ;				// initialize the quadric of the triangle
 			Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
-			quadric[d] += q ;						// and add the contribution of
-			quadric[d1] += q ;						// this quadric to the ones
-			quadric[d_1] += q ;						// of the 3 incident vertices
+			quadric[d] += q ;					// and add the contribution of
+			quadric[d1] += q ;					// this quadric to the ones
+			quadric[d_1] += q ;					// of the 3 incident vertices
 			mark.markOrbit(FACE_ORBIT, d) ;
 		}
 	}
@@ -548,7 +536,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 	{
 		if(!eMark.isMarked(d))
 		{
-			initEdgeInfo(d) ;	// init the edges with their optimal info
+			initEdgeInfo(d) ;	// init the edges with their optimal position
 			eMark.mark(d) ;		// and insert them in the multimap according to their error
 		}
 	}
@@ -559,7 +547,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 }
 
 template <typename PFP>
-bool EdgeSelector_Lightfield<PFP>::nextEdge(Dart& d)
+bool EdgeSelector_QEMml<PFP>::nextEdge(Dart& d)
 {
 	if(cur == edges.end() || edges.empty())
 		return false ;
@@ -568,7 +556,7 @@ bool EdgeSelector_Lightfield<PFP>::nextEdge(Dart& d)
 }
 
 template <typename PFP>
-void EdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
+void EdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
@@ -595,38 +583,64 @@ void EdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 		if(edgeE.valid)
 			edges.erase(edgeE.it) ;
 	}
-
-	tmpQ.zero() ;			// compute quadric for the new
-	tmpQ += quadric[d] ;	// vertex as the sum of those
-	tmpQ += quadric[dd] ;	// of the contracted vertices
 }
 
+/**
+ * Update quadric of a vertex
+ * Discards quadrics of d and assigns freshly calculated
+ * quadrics depending on the actual planes surrounding d
+ * @param dart d
+ */
 template <typename PFP>
-void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors) {
+	Dart dFront,dBack ;
+	Dart dInit = d ;
+
+	// Init Front
+	dFront = dInit ;
+
+	quadric[d].zero() ;
+
+   	do {
+   		// Make step
+   		dBack = this->m_map.phi2(dFront) ;
+       	dFront = this->m_map.alpha1(dFront) ;
+
+       	if (dBack != dFront) { // if dFront is no border
+           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+       	}
+       	if (recomputeNeighbors)
+       		recomputeQuadric(dBack, false) ;
+
+    } while(dFront != dInit) ;
+}
+
+
+template <typename PFP>
+void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
 
-	quadric[d2] = tmpQ ;
+	// for local vertex and neighbors
+	recomputeQuadric(d2, true) ;
 
 	Dart vit = d2 ;
 	do
 	{
-		updateEdgeInfo(m.phi1(vit), false) ;			// must recompute some edge infos in the
-		if(vit == d2 || vit == dd2)						// neighborhood of the collapsed edge
-		{
-			initEdgeInfo(vit) ;							// various optimizations are applied here by
-														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
-			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
-			do											// - edges for which only the collapsibility must be re-tested
-			{
-				updateEdgeInfo(vit2, false) ;
-				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
-			} while(vit2 != stop) ;
-		}
-		else
+		updateEdgeInfo(m.phi1(vit), true) ;			// must recompute some edge infos in the
+		if(vit == d2 || vit == dd2)					// neighborhood of the collapsed edge
+			initEdgeInfo(vit) ;						// various optimizations are applied here by
+		else										// treating differently :
 			updateEdgeInfo(vit, true) ;
+
+		Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+		Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
+		do											// - edges for which only the collapsibility must be re-tested
+		{
+			updateEdgeInfo(vit2, true) ;
+			updateEdgeInfo(m.phi1(vit2), false) ;
+			vit2 = m.alpha_1(vit2) ;
+		} while(vit2 != stop) ;
 
 		vit = m.alpha1(vit) ;
 	} while(vit != d2) ;
@@ -635,7 +649,7 @@ void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
-void EdgeSelector_Lightfield<PFP>::initEdgeInfo(Dart d)
+void EdgeSelector_QEMml<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
 	EdgeInfo einfo ;
@@ -647,14 +661,14 @@ void EdgeSelector_Lightfield<PFP>::initEdgeInfo(Dart d)
 }
 
 template <typename PFP>
-void EdgeSelector_Lightfield<PFP>::updateEdgeInfo(Dart d, bool recompute)
+void EdgeSelector_QEMml<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
 	MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
 	if(recompute)
 	{
 		if(einfo.valid)
-			edges.erase(einfo.it) ;			// remove the edge from the multimap
+			edges.erase(einfo.it) ;		// remove the edge from the multimap
 		if(m.edgeCanCollapse(d))
 			computeEdgeInfo(d, einfo) ;
 		else
@@ -664,7 +678,7 @@ void EdgeSelector_Lightfield<PFP>::updateEdgeInfo(Dart d, bool recompute)
 	{
 		if(m.edgeCanCollapse(d))
 		{								 	// if the edge can be collapsed now
-			if(!einfo.valid)				 // but it was not before
+			if(!einfo.valid)				// but it was not before
 				computeEdgeInfo(d, einfo) ;
 		}
 		else
@@ -679,42 +693,18 @@ void EdgeSelector_Lightfield<PFP>::updateEdgeInfo(Dart d, bool recompute)
 }
 
 template <typename PFP>
-void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
+void EdgeSelector_QEMml<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	// New position
 	Quadric<REAL> quad ;
 	quad += quadric[d] ;	// compute the sum of the
 	quad += quadric[dd] ;	// two vertices quadrics
 
-	this->m_positionApproximator->approximate(d) ; 		// sets newPos
-	VEC3 newPos = this->m_positionApproximator->getApprox(d) ; // get newPos
+	m_positionApproximator->approximate(d) ;
 
-	// New Frame
-	this->m_frameApproximator->approximate(d) ; 		// sets newF
-	MATRIX33 newFrame = this->m_frameApproximator->getApprox(d) ; // get newF
-
-	VEC3 n1,n2 ;
-	if (! m_frame[d].getSubVectorH(3,1,n1))	{ // get the normals
-		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 1 failed " << std::endl;
-		exit(2) ;
-	}
-	if (!m_frame[dd].getSubVectorH(3,1,n2))	{ // of the two vertices
-		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 2 failed " << std::endl;
-		exit(3) ;
-	}
-
-	// New function
-	this->m_RGBfunctionsApproximator->approximate(d) ; 	// sets quadricRGBf and newRGBf
-	MATRIX36 newRGBf = this->m_RGBfunctionsApproximator->getApprox(d) ; // get newRGBf
-
-	QuadricRGBfunctions<typename PFP::REAL> quadRGBf = quadricRGBfunctions[d]; // get quadricRGBf
-	// ?? test if quadRGBf is valid
-
-	// Compute error
-	REAL err = quad(newPos) + (2 * acos (n1 * n2)) + quadRGBf(newRGBf) ;
+	REAL err = quad(m_positionApproximator->getApprox(d)) ;
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }

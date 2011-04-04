@@ -182,6 +182,18 @@ void renderNormalVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3&
 	glEnd();
 }
 
+template <typename PFP>
+void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good)
+{
+	FunctorGLFrame<PFP> fgl_frame(the_map, good, position, frame, scale) ;
+
+	glBegin(GL_LINES) ;
+	the_map.foreach_orbit(VERTEX_ORBIT, fgl_frame, good) ;
+	glEnd();
+}
+
+
+
 } // namespace Direct
 
 } // namespace Render

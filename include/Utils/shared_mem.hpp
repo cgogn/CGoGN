@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-
 namespace CGoGN
 {
 
@@ -66,6 +65,8 @@ bool SharedMemSeg<DATA>::initMaster(int key)
 	m_ptr1 = reinterpret_cast<DATA*>(m_ptr + 2);
 	m_ptr2 = m_ptr1+1;
 	*m_ptr = 0;
+
+	return true ;
 }
 
 template<typename DATA>
@@ -88,6 +89,8 @@ bool SharedMemSeg<DATA>::initSlave(int key)
 	m_ptr1 = reinterpret_cast<DATA*>(m_ptr + 2);
 	m_ptr2 = m_ptr1+1;
 	*(int*)m_ptr = 0;
+
+	return true ;
 }
 
 	

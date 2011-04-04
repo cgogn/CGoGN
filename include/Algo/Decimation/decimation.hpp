@@ -45,6 +45,9 @@ void decimate(
 		case A_QEM :
 			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
 			break ;
+		case A_QEMhalfEdge :
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, position)) ;
+			break ;
 		case A_MidEdge :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, position)) ;
 			break ;
@@ -62,11 +65,42 @@ void decimate(
 			break ;
 		case A_LightfieldFull :
 		{
-			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, position)) ;
+			/*
+						PFP::TVEC3 frame[3] ;
+						frame[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_T") ; // Tangent
+						frame[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_B") ; // Bitangent
+						frame[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_N") ; // Normal
+						for (unsigned int i = 0 ; i < 3 ; ++i)
+							if (!frame[i].isValid()) {
+								std::cerr << "In function decimate : frame[" << i << "] is not valid" << std::endl ;
+							}
+
+						AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
+						colorPTM[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_a") ;
+						colorPTM[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_b") ;
+						colorPTM[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_c") ;
+						colorPTM[3] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_d") ;
+						colorPTM[4] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_e") ;
+						colorPTM[5] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_f") ;
+						for (unsigned int i = 0 ; i < 6 ; ++i)
+							if (!colorPTM[i].isValid()) {
+								std::cerr << "In function decimate : colorPTM[" << i << "] is not valid" << std::endl ;
+							}
+			*/
 			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
-			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "RGBfunctions") ;
+			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "colorPTM") ;
 			approximators.push_back(new Approximator_Frame<PFP>(map, frame)) ;
 			approximators.push_back(new Approximator_RGBfunctions<PFP>(map, RGBfunctions)) ;
+			break ;
+		}
+		case A_LightfieldHalf :
+		{
+			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, position)) ;
+			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
+			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "colorPTM") ;
+			approximators.push_back(new Approximator_FrameHalf<PFP>(map, frame)) ;
+			approximators.push_back(new Approximator_RGBfunctionsHalf<PFP>(map, RGBfunctions)) ;
 			break ;
 		}
 	}
@@ -82,17 +116,23 @@ void decimate(
 		case S_EdgeLength :
 			selector = new EdgeSelector_Length<PFP>(map, position, approximators) ;
 			break ;
+		case S_QEMml :
+			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators) ;
+			break ;
 		case S_QEM :
 			selector = new EdgeSelector_QEM<PFP>(map, position, approximators) ;
-			break ;
-		case S_Lightfield :
-			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators) ;
 			break ;
 		case S_Curvature :
 			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators) ;
 			break ;
 		case S_MinDetail :
 			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
+			break ;
+		case S_hLightfield :
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
+			break ;
+		case S_hQEMml :
+			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
 			break ;
 	}
 
@@ -105,10 +145,16 @@ void decimate(
 	unsigned int nbVertices = map.getNbOrbits(VERTEX_ORBIT) ;
 	bool finished = false ;
 	Dart d ;
+
 	while(!finished)
 	{
-		if(!selector->nextEdge(d))
+		std::cout << "Countdown : " ;
+		std::cout << std::setprecision(8) << (nbVertices - nbWantedVertices) << "\r" << std::flush;
+
+		if(!selector->nextEdge(d)) {
+			std::cout << std::endl << "out" << std::endl ;
 			break ;
+		}
 
 		--nbVertices ;
 
@@ -130,8 +176,10 @@ void decimate(
 
 		selector->updateAfterCollapse(d2, dd2) ;// update selector
 
-		if(nbVertices <= nbWantedVertices)
+		if(nbVertices <= nbWantedVertices) {
 			finished = true ;
+			std::cout << std::endl << "done" << std::endl ;
+		}
 	}
 
 	delete selector ;

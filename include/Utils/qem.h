@@ -153,6 +153,9 @@ private:
 
 	bool optimize(VEC4& v) const
 	{
+		if (isnan(A(0,0)))
+			return false ;
+
 		MATRIX44 A2(A) ;
 		for(int i = 0; i < 3; ++i)
 			A2(3,i) = 0.0f ;

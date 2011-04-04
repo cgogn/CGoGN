@@ -361,8 +361,32 @@ bool FunctorGLNormal<PFP>::operator() (Dart d)
 	return false;
 }
 
+template<typename PFP>
+FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3 frames[3], float scale):
+	FunctorMap<MAP>(map),
+	m_positions(posi),
+	m_frames(frames),
+	m_selector(good),
+	m_scale(scale)
+{
+}
 
-
+template<typename PFP>
+bool FunctorGLFrame<PFP>::operator() (Dart d)
+{
+	if (m_selector(d))
+	{
+		typename PFP::VEC3 p = m_positions[d] ;
+		for (unsigned int i = 0 ; i < 3 ; ++i) {
+			glVertex3fv(p.data());
+			typename PFP::VEC3 q ;
+			q = p ;
+			q += m_scale * m_frames[i][d] ;
+			glVertex3fv(q.data());
+		}
+	}
+	return false;
+}
 
 template <typename PFP>
 FunctorGLFaceColor<PFP>::FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,

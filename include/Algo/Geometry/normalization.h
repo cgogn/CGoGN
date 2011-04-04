@@ -22,66 +22,54 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _MAP_GL_RENDER
-#define _MAP_GL_RENDER
+#ifndef __ALGO_GEOMETRY_NORMALIZATION_H__
+#define __ALGO_GEOMETRY_NORMALIZATION_H__
 
-#include <list>
-#include <GL/glew.h>
+#include "Geometry/vector_gen.h"
+#include "Topology/generic/mapBrowser.h"
 
-#include "Topology/generic/functor.h"
-
-/**
-* A set of functions that allow the creation of rendering
-* object using Vertex-Buffer-Object.
-* Function are made for dual-2-map and can be used on
-* any subset of a dual-N-map which is a 2-map
-*/
 namespace CGoGN
 {
 
 namespace Algo
 {
 
-namespace Render
+namespace Geometry
 {
 
-namespace Direct
-{
-
-enum RenderType { NO_LIGHT=1, LINE, FLAT, SMOOTH };
-enum RenderPrimitives { NONE=0, TRIANGLES=3, QUADS=4, POLYGONS=5, TRIFAN=6};
-
-/**
-* @param the_map the map to render
-* @param rt type of rendu (FLAT, SMOOTH, FIL)
-* @param explode face exploding coefficient
-* @param good selector
-*/
+// Normalize the average length of given attribute
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const FunctorSelect& good = SelectorTrue());
+typename PFP::REAL normalizeLength(typename PFP::MAP & the_map, typename PFP::TVEC3 & m_attr, const typename PFP::REAL scale = 1.0, const FunctorSelect & good = SelectorTrue()) {
+	typename PFP::REAL sum = 0 ;
+	int count = 0 ;
 
-template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const typename PFP::TVEC3& color, const FunctorSelect& good = SelectorTrue());
+	MapBrowserLinkedAuto<typename PFP::MAP> mb(the_map) ;
+	the_map.foreach_orbit(m_attr.getOrbit(), mb) ;
 
-template <typename PFP>
-void renderNormalVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, float scale, const FunctorSelect& good = SelectorTrue());
+	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
+	{
+		typename PFP::VEC3 length = m_attr[d] ;
+		length -= m_attr[the_map.phi2(d)] ;
+        sum += length.norm() ;
+        ++count ;
+	}
 
-template <typename PFP>
-void renderFrameVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good = SelectorTrue());
+    sum /= typename PFP::REAL(count) ;
 
-} // namespace Direct
+    typename PFP::REAL div = sum / scale ; // mutiply res by scale factor
 
-} // namespace Render
+	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
+	{
+        m_attr[d] /= div ;
+	}
+
+	return div ;
+}
+
+} // namespace Geometry
 
 } // namespace Algo
 
 } // namespace CGoGN
-
-#include "Algo/Render/renderFunctor.h"
-#include "Algo/Render/map_glRender.hpp"
 
 #endif
