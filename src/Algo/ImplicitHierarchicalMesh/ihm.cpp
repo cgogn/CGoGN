@@ -284,7 +284,7 @@ bool ImplicitHierarchicalMap::faceIsSubdividedOnce(Dart d)
 		++m_curLevel ;
 		Dart cf = phi2(phi1(d)) ;
 		++m_curLevel ;
-		if(m_dartLevel[phi1(d)] == m_curLevel && m_edgeId[phi1(d)] != m_edgeId[d])
+		if(m_dartLevel[phi1(cf)] == m_curLevel && m_edgeId[phi1(cf)] != m_edgeId[cf])
 			subdOnce = false ;
 		--m_curLevel ;
 		--m_curLevel ;

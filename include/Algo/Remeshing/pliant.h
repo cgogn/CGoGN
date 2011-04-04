@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_GEOMETRY_AREA_H__
-#define __ALGO_GEOMETRY_AREA_H__
+#ifndef __ALGO_GEOMETRY_REMESHING_H__
+#define __ALGO_GEOMETRY_REMESHING_H__
 
 namespace CGoGN
 {
@@ -31,27 +31,18 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Geometry
+namespace Remeshing
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& normal) ;
 
-template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
-
-template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int th=0) ;
-
-template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = SelectorTrue()) ;
-
-} // namespace Geometry
+} // namespace Remeshing
 
 } // namespace Algo
 
 } // namespace CGoGN
 
-#include "Algo/Geometry/area.hpp"
+#include "Algo/Remeshing/pliant.hpp"
 
 #endif

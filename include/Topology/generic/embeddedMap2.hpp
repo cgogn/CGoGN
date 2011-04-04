@@ -221,7 +221,6 @@ bool EmbeddedMap2<MAP2>::flipEdge(Dart d)
 				MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::phi_1(e), eVEmb) ;
 			MAP2::setDartEmbedding(VERTEX_ORBIT, e, EMBNULL) ;
 		}
-
 		if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 		{
 			unsigned int dFEmb = MAP2::getDartEmbedding(FACE_ORBIT, MAP2::phi_1(e)) ;
@@ -398,17 +397,31 @@ template <typename MAP2>
 bool EmbeddedMap2<MAP2>::mergeFaces(Dart d)
 {
 	Dart dNext = MAP2::phi1(d) ;
+	Dart e = MAP2::phi2(d) ;
+	Dart eNext = MAP2::phi1(e) ;
 
+	unsigned int vEmb1 = EMBNULL ;
+	unsigned int vEmb2 = EMBNULL ;
+	if(MAP2::isOrbitEmbedded(VERTEX_ORBIT))
+	{
+		vEmb1 = MAP2::getDartEmbedding(VERTEX_ORBIT, d) ;
+		vEmb2 = MAP2::getDartEmbedding(VERTEX_ORBIT, e) ;
+	}
 	unsigned int fEmb = EMBNULL ;
 	if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 	{
 		fEmb = MAP2::getEmbedding(d, FACE_ORBIT) ;
-		if(fEmb != EMBNULL)
-			MAP2::setDartEmbedding(FACE_ORBIT, dNext, fEmb) ;
 	}
 
 	if(MAP2::mergeFaces(d))
 	{
+		if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
+		{
+			if(vEmb1 != EMBNULL)
+				MAP2::setDartEmbedding(VERTEX_ORBIT, eNext, vEmb1) ;
+			if(vEmb2 != EMBNULL)
+				MAP2::setDartEmbedding(VERTEX_ORBIT, dNext, vEmb2) ;
+		}
 		if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 		{
 			MAP2::embedOrbit(FACE_ORBIT, dNext, fEmb) ;
@@ -467,6 +480,7 @@ bool EmbeddedMap2<MAP2>::check()
 	bool topo = MAP2::check() ;
 	if (!topo)
 		return false ;
+
 	std::cout << "Check: embedding begin" << std::endl ;
 	for(Dart d = MAP2::begin(); d != MAP2::end(); MAP2::next(d))
 	{

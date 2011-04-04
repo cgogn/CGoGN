@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_GEOMETRY_AREA_H__
-#define __ALGO_GEOMETRY_AREA_H__
+#ifndef __ALGO_GEOMETRY_FEATURE_H__
+#define __ALGO_GEOMETRY_FEATURE_H__
 
 namespace CGoGN
 {
@@ -35,16 +35,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
-
-template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
-
-template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int th=0) ;
-
-template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = SelectorTrue()) ;
+void featureEdgeDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, DartMarker& feature) ;
 
 } // namespace Geometry
 
@@ -52,6 +43,6 @@ void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& positio
 
 } // namespace CGoGN
 
-#include "Algo/Geometry/area.hpp"
+#include "Algo/Geometry/feature.hpp"
 
 #endif

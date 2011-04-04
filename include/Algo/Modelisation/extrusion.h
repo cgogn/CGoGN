@@ -194,9 +194,11 @@ template<typename PFP>
 Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
 	Dart d,	float dist);
 
-}//end namespace
-}//end namespace
-}//end namespace
+} // namespace Modelisation
+
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/Modelisation/extrusion.hpp"
 

@@ -73,7 +73,7 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const typename PFP::T
  * @param the point
  */
 template <typename PFP>
-bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3& point, bool CCW );
+bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3& point, bool CCW=true);
 
 /**
  * test if a point is inside a face

@@ -311,7 +311,14 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 	T coeff = vp1q1[0]*vq1q2[1]- vp1q1[1]*vq1q2[0];
 	Inter = VEC3((PA[0]*delta+vp1p2[0]*coeff)/delta,(PA[1]*delta+vp1p2[1]*coeff)/delta,(PA[2]*delta+vp1p2[2]*coeff)/delta);
 
-	//TODO : add error cases
+	//test if inter point is outside the edges
+	if( (Inter[0]<PA[0] && Inter[0]<PB[0]) || (Inter[0]>PA[0] && Inter[0]>PB[0])
+			|| (Inter[0]<QA[0] && Inter[0]<QB[0]) || (Inter[0]>QA[0] && Inter[0]>QB[0])
+			|| (Inter[1]<PA[1] && Inter[1]<PB[1]) || (Inter[1]>PA[1] && Inter[1]>PB[1])
+			|| (Inter[1]<QA[1] && Inter[1]<QB[1]) || (Inter[1]>QA[1] && Inter[1]>QB[1])
+	)
+		return NO_INTERSECTION;
+
 	return EDGE_INTERSECTION;
 }
 
