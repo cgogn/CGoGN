@@ -43,9 +43,8 @@
 
 #include "Algo/Render/topo3_vboRender.h"
 
-//#include "Algo/Render/topo_vboRender.h"
-
 #include "Topology/generic/cellmarker.h"
+#include "Utils/text3d.h"
 
 //#include "testMaps.h"
 
@@ -68,6 +67,10 @@ Dart dglobal;
 unsigned int idNorm;
 unsigned int idCol;
 
+
+
+
+
 class myGlutWin: public Utils::SimpleGlutWin
 {
 public:
@@ -85,7 +88,11 @@ public:
     Algo::Render::VBO::MapRender_VBO* m_render;
     Algo::Render::VBO::topo3_VBORenderMapD* m_render_topo;
 
+    Utils::Strings3D m_strings;
+
     void updateVBO();
+
+    void storeVerticesInfo();
 
  	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY)
     {
@@ -99,6 +106,22 @@ public:
  	void myKeyboard(unsigned char keycode, int x, int y);
 };
 
+void myGlutWin::storeVerticesInfo()
+{
+
+	CellMarker mv(myMap,VERTEX_CELL);
+	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	{
+		if (!mv.isMarked(d))
+		{
+			mv.mark(d);
+			std::stringstream ss;
+			ss << d << " : "<< position[d];
+			m_strings.addString(ss.str(),position[d]);
+		}
+	}
+}
+
 void myGlutWin::myRedraw(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -110,8 +133,25 @@ void myGlutWin::myRedraw(void)
 	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
 
 
+
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	glDisable(GL_LIGHTING);
+
+	glLineWidth(3.0);
+	glBegin(GL_LINES);
+	glColor3f(1.,0.,0.);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(1.0,0.0,0.0);
+
+	glColor3f(0.,1.,0.);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(0.0,1.0,0.0);
+
+	glColor3f(0.,0.,1.);
+	glVertex3f(0.0,0.0,0.0);
+	glVertex3f(0.0,0.0,1.0);
+
+	glEnd();
 
 	glColor3f(0.0f,1.0f,.0f);
 	m_render->draw(Algo::Render::VBO::POINTS);
@@ -145,6 +185,15 @@ void myGlutWin::myRedraw(void)
 		m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
 
 	}
+
+//	m_strings.predraw(Geom::Vec3f(0.0,1.0,1.0));
+//	m_strings.draw(0,Geom::Vec3f(0.5,0.5,0.5));
+//	m_strings.draw(1,Geom::Vec3f(-0.5,0.5,0.5));
+//	m_strings.draw(2,Geom::Vec3f(-0.5,-0.5,0.5));
+//	m_strings.postdraw();
+
+
+	m_strings.drawAll(Geom::Vec3f(0.0,1.0,1.0));
 
     //affichage de l'aide
     if (aff_help) {
@@ -189,6 +238,44 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
         	}
         		break;
+
+        	case 'x':
+        	{
+        		// push/pop color is only needed for dart coloring conservation
+        		// can bee long long huge meshes
+        		m_render_topo->pushColors();
+
+        		// setDartsIdColor can be done only once if dart coloring not used
+        		m_render_topo->setDartsIdColor<PFP>(myMap,allDarts);
+
+        		// transform as in drawing cb
+        		glPushMatrix();
+        		float sc = 50.0f/gWidthObj;
+        		glScalef(sc,sc,sc);
+        		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
+        		//pick
+        		Dart d = m_render_topo->picking(x,H-y);
+
+        		glPopMatrix();
+
+        		m_render_topo->popColors();
+
+         		if (d != Dart::nil())
+        		{
+        			m_render_topo->setDartColor(d,1.0,0.0,0.0);
+        			redraw();
+        			std::stringstream ss;
+        			ss << "Pick dart:" << d << std::endl<<"pos="<< position[d];
+        			glColor3f(1.,1.,0.);
+        			printString2D(x+12,y+22,ss.str());
+        			glutSwapBuffers();
+        			std::cout << "Pick dart:" << d << " pos= "<< position[d] << std::endl;
+        		}
+
+
+        		break;
+        	}
+
         	case 'Q':
         		m_render_topo->setAllDartsColor(1.0f,1.0f,1.0f);
         		glutPostRedisplay();
@@ -380,33 +467,40 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 int main(int argc, char **argv)
 {
-	std::vector<std::string> attrNames ;
-	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+//	std::vector<std::string> attrNames ;
+//	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
+//	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
-     //plongement
-//	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
-//	dglobal = prim.hexaGrid_topo(3,3,3);
-//	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT,"position");
+
+
+	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
+	int nb=3;
+	if (argc>1)
+		nb = atoi(argv[1]);
+	dglobal = prim.hexaGrid_topo(nb,nb,nb);
+	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
+
 //	Geom::Matrix44f mat;
 //	mat.identity();
 //	Geom::scale(2.0f, 2.0f,2.0f,mat);
 //	prim.transform(mat);
 
 
-	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,6);
-	dglobal=d;
-
-	position[d] = PFP::VEC3(0);
-	position[myMap.phi1(d)] = PFP::VEC3(1,0,0);
-	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(1,0,1);
-	position[myMap.phi_1(d)] = PFP::VEC3(0,0,1);
-
-	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
-	position[d] = PFP::VEC3(1,1,0);
-	position[myMap.phi1(d)] = PFP::VEC3(0,1,0);
-	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(0,1,1);
-	position[myMap.phi_1(d)] = PFP::VEC3(1,1,1);
+//	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,6);
+//	dglobal=d;
+//
+//	position[d] = PFP::VEC3(0);
+//	position[myMap.phi1(d)] = PFP::VEC3(1,0,0);
+//	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(1,0,1);
+//	position[myMap.phi_1(d)] = PFP::VEC3(0,0,1);
+//
+//	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
+//	position[d] = PFP::VEC3(1,1,0);
+//	position[myMap.phi1(d)] = PFP::VEC3(0,1,0);
+//	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(0,1,1);
+//	position[myMap.phi_1(d)] = PFP::VEC3(1,1,1);
 
 //	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,4);
 //	dglobal=d;
@@ -443,10 +537,11 @@ int main(int argc, char **argv)
     mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
     mgw.m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
 
-
     mgw.updateVBO();
 
-
+    mgw.m_strings.init();
+    mgw.storeVerticesInfo();
+    mgw.m_strings.sendToVBO();
 
     mgw.mainLoop();
 

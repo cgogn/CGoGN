@@ -65,7 +65,7 @@ GlutWin_ATB::GlutWin_ATB(int* argc, char **argv, int winX, int winY)
 	scalefactor = 1.0f ;
 	trans_x = 0.0f ;
 	trans_y = 0.0f ;
-	trans_z = -50.0f ;
+	trans_z = -200.0f ;
 
 	std::cout << "Initialisation Glut" << std::endl ;
 	glutInit(argc, argv) ;
@@ -155,13 +155,10 @@ void GlutWin_ATB::recalcModelView()
 	glPopMatrix() ;
 	glPushMatrix() ;
 
-	glTranslatef(trans_x, trans_y, trans_z+focal) ;
+	glTranslatef(trans_x, trans_y, trans_z) ;
 
 	build_rotmatrix(m, curquat) ;
 	glMultMatrixf(&m[0][0]) ;
-
-	float sc = getScale() ;
-	glScalef(sc, sc, sc) ;
 
 	newModel = 0 ;
 }
@@ -185,14 +182,15 @@ void GlutWin_ATB::motion(int x, int y)
 	}
 	else if(scaling)
 	{
-		scalefactor = scalefactor * (1.0f + (((float) (beginy - y)) / H)) ;
+		trans_z -= 0.1f*(x - beginx);
+		trans_z -= 0.1f*(y - beginy);
 		newModel = 1 ;
 		glutPostRedisplay() ;
 	}
 	else if(translating)
 	{
-		trans_x += 0.01f * (x - beginx) ;
-		trans_y += 0.01f * (beginy - y) ;
+		trans_x += 0.05f * (x - beginx) ;
+		trans_y += 0.05f * (beginy - y) ;
 		newModel = 1 ;
 		glutPostRedisplay() ;
 	}
@@ -346,6 +344,10 @@ void GlutWin_ATB::printString2D(int x, int y, const std::string& str)
 	glDisable(GL_DEPTH_TEST) ;
 	glDisable(GL_LIGHTING) ;
 
+	unsigned char blank[180];
+	for (unsigned int i=0; i< 180; ++i)
+		blank[i]=(unsigned char)(0);
+
 	// AFFICHAGE EN 2D
 	int x1 = x ;
 	for(unsigned int i = 0; i < str.length(); ++i)
@@ -356,6 +358,9 @@ void GlutWin_ATB::printString2D(int x, int y, const std::string& str)
 			x1 = x ;
 			y += 14 ;
 		}
+		glRasterPos2i(x1,y+2);
+		glDrawPixels(12,15,GL_LUMINANCE,GL_UNSIGNED_BYTE, blank);
+
 		glRasterPos2i(x1, y) ;
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c) ;
 		x1 += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, c) ;

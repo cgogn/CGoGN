@@ -39,6 +39,7 @@
 #include <map>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 
 namespace CGoGN
 {
@@ -128,10 +129,7 @@ protected:
 	 */
 	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
 
-	/*
-	 * search file in different path
-	 */
-	std::string findFile(const std::string filename);
+
 
 	/**
 	 * get log after compiling
@@ -140,6 +138,8 @@ protected:
 	 */
 	char* getInfoLog( GLhandleARB obj );
 
+
+	static std::vector<std::string> m_pathes;
 
 public:
 	/**
@@ -152,6 +152,11 @@ public:
 	 * destructor
 	 */
 	virtual ~GLSLShader();
+
+	/*
+	 * search file in different path
+	 */
+	static std::string findFile(const std::string filename);
 
 
 	/**
@@ -210,6 +215,9 @@ public:
 	virtual void	unbind();
 
 
+	/**
+	 *
+	 */
 	GLuint 	getAttribIndex( char* attribName );
 
 	
@@ -225,20 +233,49 @@ public:
 	void bindAttrib(unsigned int att, const char* name) const;
 
 
+	/**
+	 * check shader validity width official GLSL syntax
+	 */
 	bool validateProgram();
 
+	/**
+	 * check program link status
+	 */
 	bool checkProgram();
 
+	/**
+	 * check shader compile status
+	 */
 	bool checkShader(int shaderType);
 
 public:
 
-
+	/**
+	 * set uniform shader float variable
+	 * @warning practical but less efficient that storing id (get with glGetUniformLocation) and use glUniform*fvARB
+	 * @param NB template size of variable to set
+	 * @param name name in shader
+	 * @param pointer on data to copy
+	 */
 	template<unsigned int NB>
 	void setuniformf( const char* name , float* val);
 
+	/**
+	 * set uniform shader int variable
+	 * @warning practical but less efficient that storing id (get with glGetUniformLocation) and use glUniform*ivARB
+	 * @param NB template size of variable to set
+	 * @param name name in shader
+	 * @param pointer on data to copy
+	 */
 	template<unsigned int NB>
 	void setuniformi( const char* name , int* val);
+
+	/**
+	 * add search path for file
+	 * @param path to add
+	 */
+	void addPathFileSeach(const std::string& path);
+
 };
 
 
@@ -289,17 +326,18 @@ void GLSLShader::setuniformi( const char* name , int* val)
 			glUniform1ivARB( uni, 1, val) ;
 			break;
 		case 2:
-			glUniform2ivARB( uni, 2, val) ;
+			glUniform2ivARB( uni, 1, val) ;
 			break;
 		case 3:
-			glUniform3ivARB( uni, 3, val) ;
+			glUniform3ivARB( uni, 1, val) ;
 			break;
 		case 4:
-			glUniform4ivARB( uni, 4, val) ;
+			glUniform4ivARB( uni, 1, val) ;
 			break;
 		}
 	}
 }
+
 
 
 

@@ -65,3 +65,9 @@ target_link_libraries( extrusionViewD
 add_executable( sceneD ../scene.cpp)
 target_link_libraries( sceneD
         containerD topologyD utilsD algoD ${COMMON_LIBS} )
+        
+                
+#add_executable( VizVolumeD ../VizVolume.cpp)
+#target_link_libraries( VizVolumeD
+#        containerD topologyD utilsD algoD ${COMMON_LIBS} Zinri)
+        
