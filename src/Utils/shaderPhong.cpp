@@ -33,7 +33,7 @@ namespace CGoGN
 namespace Utils
 {
 
-std::string ShaderPhong3::vertexShaderText =
+std::string ShaderPhong::vertexShaderText =
 "ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
 "#ifdef WITH_COLOR\n"
 "ATTRIBUTE vec3 VertexColor;\n"
@@ -60,7 +60,7 @@ std::string ShaderPhong3::vertexShaderText =
 "}";
 
 
-std::string ShaderPhong3::fragmentShaderText =
+std::string ShaderPhong::fragmentShaderText =
 "PRECISON;\n"
 "VARYING_FRAG vec3 EyeVector, Normal, LightDir;\n"
 "#ifdef WITH_COLOR\n"
@@ -95,7 +95,7 @@ std::string ShaderPhong3::fragmentShaderText =
 
 
 
-ShaderPhong3::ShaderPhong3():
+ShaderPhong::ShaderPhong():
 		m_with_color(false),
 		m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 		m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
@@ -118,7 +118,7 @@ ShaderPhong3::ShaderPhong3():
 	sendParams();
 }
 
-void ShaderPhong3::getLocations()
+void ShaderPhong::getLocations()
 {
 	m_unif_ambiant   = glGetUniformLocation(this->program_handler(),"materialAmbient");
 	m_unif_diffuse   = glGetUniformLocation(this->program_handler(),"materialDiffuse");
@@ -127,7 +127,7 @@ void ShaderPhong3::getLocations()
 	m_unif_lightPos =  glGetUniformLocation(this->program_handler(),"lightPosition");
 }
 
-void ShaderPhong3::sendParams()
+void ShaderPhong::sendParams()
 {
 	glUniform4fv(m_unif_ambiant,  1, m_ambiant.data());
 	glUniform4fv(m_unif_diffuse,  1, m_diffuse.data());
@@ -136,35 +136,35 @@ void ShaderPhong3::sendParams()
 	glUniform3fv(m_unif_lightPos, 1, m_lightPos.data());
 }
 
-void ShaderPhong3::setAmbiant(const Geom::Vec4f& ambiant)
+void ShaderPhong::setAmbiant(const Geom::Vec4f& ambiant)
 {
 	this->bind();
 	glUniform4fv(m_unif_ambiant,1, ambiant.data());
 	m_ambiant = ambiant;
 }
 
-void ShaderPhong3::setDiffuse(const Geom::Vec4f& diffuse)
+void ShaderPhong::setDiffuse(const Geom::Vec4f& diffuse)
 {
 	this->bind();
 	glUniform4fv(m_unif_diffuse,1, diffuse.data());
 	m_diffuse = diffuse;
 }
 
-void ShaderPhong3::setSpecular(const Geom::Vec4f& specular)
+void ShaderPhong::setSpecular(const Geom::Vec4f& specular)
 {
 	this->bind();
 	glUniform4fv(m_unif_specular,1,specular.data());
 	m_specular = specular;
 }
 
-void ShaderPhong3::setShininess(float shininess)
+void ShaderPhong::setShininess(float shininess)
 {
 	this->bind();
 	glUniform1f (m_unif_shininess, shininess);
 	m_shininess = shininess;
 }
 
-void ShaderPhong3::setLightPosition( Geom::Vec3f lightPos)
+void ShaderPhong::setLightPosition( Geom::Vec3f lightPos)
 {
 	this->bind();
 	glUniform3fv(m_unif_lightPos,1,lightPos.data());
@@ -172,7 +172,7 @@ void ShaderPhong3::setLightPosition( Geom::Vec3f lightPos)
 }
 
 
-void ShaderPhong3::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos)
+void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos)
 {
 	m_ambiant = ambiant;
 	m_diffuse = diffuse;
@@ -185,7 +185,7 @@ void ShaderPhong3::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diff
 }
 
 
-void ShaderPhong3::setAttributeColor(VBO& vbo)
+void ShaderPhong::setAttributeColor(VBO& vbo)
 {
 	if (!m_with_color)
 	{
@@ -209,7 +209,7 @@ void ShaderPhong3::setAttributeColor(VBO& vbo)
 }
 
 
-void ShaderPhong3::unsetAttributeColor()
+void ShaderPhong::unsetAttributeColor()
 {
 	if (m_with_color)
 	{

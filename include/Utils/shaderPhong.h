@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_PHONG3_
-#define __CGOGN_SHADER_PHONG3_
+#ifndef __CGOGN_SHADER_PHONG_
+#define __CGOGN_SHADER_PHONG_
 
 #include "Utils/GLSLShader3.h"
 #include "Geometry/vector_gen.h"
@@ -35,7 +35,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderPhong3 : public GLSLShader3
+class ShaderPhong : public GLSLShader
 {
 protected:
 	// flag color per vertex or not
@@ -67,7 +67,7 @@ protected:
 	void sendParams();
 
 public:
-	ShaderPhong3();
+	ShaderPhong();
 
 	// inviduals parameter setting functions
 	void setAmbiant(const Geom::Vec4f& ambiant);
