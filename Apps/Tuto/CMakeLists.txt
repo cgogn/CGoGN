@@ -40,7 +40,6 @@ target_link_libraries( tuto1
 
 QT4_WRAP_UI( tuto2_ui tuto2.ui )
 QT4_WRAP_CPP(tuto2_moc tuto2.h)
-
 add_executable( tuto2 tuto2.cpp tuto2.h ${tuto2_ui}  ${tuto2_moc})
 target_link_libraries( tuto2
 	container topology utils algo  ${COMMON_LIBS} ${QT_LIBRARIES} )
@@ -69,9 +68,10 @@ add_executable( tuto_mt tuto_mt.cpp)
 target_link_libraries( tuto_mt
 	container topology utils algo ${COMMON_LIBS} boost_thread-mt)
 
-add_executable( tuto_ogl3 tuto_ogl3.cpp)
+QT4_WRAP_CPP(tuto_ogl3_moc tuto_ogl3.h)
+add_executable( tuto_ogl3 tuto_ogl3.cpp ${tuto_ogl3_moc})
 target_link_libraries( tuto_ogl3
-	container topology utils algo  ${COMMON_LIBS} )
+	container topology utils algo  ${COMMON_LIBS} ${QT_LIBRARIES} )
 
 add_executable( tuto_ogl2 tuto_ogl2.cpp)
 target_link_libraries( tuto_ogl2

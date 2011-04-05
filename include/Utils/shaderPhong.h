@@ -25,7 +25,7 @@
 #ifndef __CGOGN_SHADER_PHONG_
 #define __CGOGN_SHADER_PHONG_
 
-#include "Utils/GLSLShader3.h"
+#include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
 #include <string>
