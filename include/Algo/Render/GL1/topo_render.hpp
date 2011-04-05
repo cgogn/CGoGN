@@ -34,7 +34,7 @@ namespace Algo
 namespace Render
 {
 
-namespace Direct
+namespace GL1
 {
 	
 //template<typename PFP>

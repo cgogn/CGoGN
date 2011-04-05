@@ -9,6 +9,13 @@ set(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Debug)
 SET(CMAKE_BUILD_TYPE Debug)
 
 
+# FOR Qt4
+FIND_PACKAGE(Qt4 REQUIRED)
+SET(QT_USE_QTOPENGL TRUE)
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
 include_directories(
 	/usr/include/libxml2
 	${CGoGN_ROOT_DIR}/include
@@ -78,8 +85,20 @@ file(
 	${CGoGN_ROOT_DIR}/include/Utils/*.hpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.h
 )
+
+file(
+	GLOB_RECURSE
+	utils_qt_headers
+	${CGoGN_ROOT_DIR}/include/Utils/qt*.h
+)
+	
+QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
+
+SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
+
 add_library(
 	utilsD
-	${files_utils}
+	${files_utils_withQt}
 )
+
 

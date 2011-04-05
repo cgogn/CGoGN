@@ -142,12 +142,12 @@ void MyGlutWin::myRedraw(void)
 			glPolygonOffset( 1.0f, 1.0f );
 
 			glColor3f(0.0f,0.5f,0.0f);
-			m_render->draw(Algo::Render::VBO::TRIANGLES);
+			m_render->draw(Algo::Render::GL2::TRIANGLES);
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			// on trace les ligne devant
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			glColor3f(1.0f,1.0f,0.0f);
-			m_render->draw(Algo::Render::VBO::LINES);
+			m_render->draw(Algo::Render::GL2::LINES);
 		}
 		else if(renderObjStyle == O_FACES)
 		{
@@ -155,7 +155,7 @@ void MyGlutWin::myRedraw(void)
 			glPolygonOffset( 1.0f, 1.0f );
 
 			glColor3f(0.0f,0.5f,0.0f);
-			m_render->draw(Algo::Render::VBO::TRIANGLES);
+			m_render->draw(Algo::Render::GL2::TRIANGLES);
 			glDisable( GL_POLYGON_OFFSET_FILL );
 		}
 		else if(renderObjStyle == O_LINE)
@@ -163,7 +163,7 @@ void MyGlutWin::myRedraw(void)
 			// on trace les ligne devant
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			glColor3f(1.0f,1.0f,0.0f);
-			m_render->draw(Algo::Render::VBO::LINES);
+			m_render->draw(Algo::Render::GL2::LINES);
 		}
 		else if(renderObjStyle == O_EXPLOD)
 		{
@@ -229,10 +229,10 @@ void MyGlutWin::init()
 void MyGlutWin::initRender()
 {
     // maj des donnees de position
-    m_render->updateData(Algo::Render::VBO::POSITIONS, position );
+    m_render->updateData(Algo::Render::GL2::POSITIONS, position );
     // creation des primitives de rendu a partir de la carte
-    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
-    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
     // creation des primitives de rendu de la topologie a partir de la carte
 	m_render_topo->updateData<PFP>(myMap,allDarts,position,coefTopoExplod[0],coefTopoExplod[1],coefTopoExplod[2]);
@@ -315,9 +315,9 @@ int main(int argc, char **argv)
 
 
     // allocation des objets necessaires pour le rendu
-    mgw->m_render = new Algo::Render::VBO::MapRender_VBO();
-    //mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMap<PFP::MAP>();
-    mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
+    mgw->m_render = new Algo::Render::GL2::MapRender_VBO();
+    //mgw->m_render_topo = new Algo::Render::GL2::topo3_VBORenderMap<PFP::MAP>();
+    mgw->m_render_topo = new Algo::Render::GL2::topo3_VBORenderMapD();
 
     mgw->init();
     mgw->initRender();

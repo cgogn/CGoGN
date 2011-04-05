@@ -35,11 +35,11 @@ namespace Algo
 namespace Render
 {
 
-namespace VBO
+namespace GL2
 {
 
 template<typename PFP>
-void topo_VBORenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void topoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -179,7 +179,7 @@ void topo_VBORenderMapD::updateData(typename PFP::MAP& map, const typename PFP::
 }
 
 template<typename PFP>
-void topo_VBORenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void topoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -336,7 +336,7 @@ void topo_VBORenderGMap::updateData(typename PFP::MAP& map, const typename PFP::
 
 }
 
-}//end namespace VBO
+}//end namespace GL2
 
 }//end namespace Algo
 

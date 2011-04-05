@@ -32,7 +32,7 @@
 
 
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/vbo_MapRender.h"
+#include "Algo/Render/GL2/mapRender.h"
 
 #include "Algo/Modelisation/polyhedron.h"
 #include "Geometry/vector_gen.h"
@@ -64,7 +64,7 @@ public:
     PFP::REAL gWidthObj;
     PFP::VEC3 gPosObj;
 
-    Algo::Render::VBO::MapRender_VBO* m_render;
+    Algo::Render::GL2::MapRender_VBO* m_render;
 
     Utils::GLSLShader shaders[4];
 
@@ -111,7 +111,7 @@ void MyGlutWin::myRedraw()
 	shaders[0].bind();
 
 	// draw triangles
-	m_render->draw(Algo::Render::VBO::TRIANGLES) ;
+	m_render->draw(Algo::Render::GL2::TRIANGLES) ;
 
 	// unbind (in case of other rendering wihtout shader)
 	shaders[0].unbind();
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 
 
     // instanciation of the vbo renderer
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
+    mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
 
     // vertex attribute declaration (max 12)
     mgw.m_render->useVertexAttributeName("ColorPerVertex",mgw.shaders[0]);
@@ -167,14 +167,14 @@ int main(int argc, char **argv)
     mgw.m_render->updateVAData("ColorPerVertex", normal);
 
     // copy data from map attributes to vbo
-    mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
-    mgw.m_render->updateData(Algo::Render::VBO::NORMALS, normal);
+    mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
+    mgw.m_render->updateData(Algo::Render::GL2::NORMALS, normal);
 
     // update the renderer (primitives)
 	SelectorTrue allDarts;
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::TRIANGLES);
-//    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::LINES);
-//    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::POINTS);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
+//    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
+//    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::POINTS);
 
 
     mgw.mainLoop();

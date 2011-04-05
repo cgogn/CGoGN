@@ -69,7 +69,7 @@ public:
      PFP::REAL gWidthObj;
      PFP::VEC3 gPosObj;
 
-     Algo::Render::VBO::MapRender_VBO* m_render;
+     Algo::Render::GL2::MapRender_VBO* m_render;
 
  	MyGlutWin(int* argc, char **argv, int winX, int winY) : SimpleGlutWin(argc, argv, winX, winY), m_render(NULL) {}
  	~MyGlutWin()
@@ -95,13 +95,13 @@ void MyGlutWin::myRedraw()
 
 	// draw the lines
 	glColor3f(1.0f, 1.0f, 0.0f);
-	m_render->draw(Algo::Render::VBO::LINES);
+	m_render->draw(Algo::Render::GL2::LINES);
 
 	// draw the faces
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1.0f, 1.0f);
 	glColor3f(0.0f, 0.5f, 0.0f);
-	m_render->draw(Algo::Render::VBO::TRIANGLES);
+	m_render->draw(Algo::Render::GL2::TRIANGLES);
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	glPopMatrix();
@@ -173,13 +173,13 @@ public:
 //		m_mgw.useContext();
 //
 //		// instanciation of the renderer (here using VBOs)
-//		m_mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
+//		m_mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
 //
 //	    // update the renderer (geometry and primitives)
-//	    m_mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+//	    m_mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
 //
-//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::VBO::TRIANGLES,m_th);
-//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::VBO::LINES,m_th);
+//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::GL2::TRIANGLES,m_th);
+//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::GL2::LINES,m_th);
 //
 //	    m_mgw.releaseContext();
 //	    std::cout<< "Render OK "<< std::endl;

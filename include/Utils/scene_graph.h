@@ -27,7 +27,7 @@
 
 #include <string>
 #include "Geometry/matrix.h"
-#include "Algo/Render/vbo_MapRender.h"
+#include "Algo/Render/GL2/mapRender.h"
 #include "Utils/GLSLShader.h"
 
 
@@ -38,6 +38,8 @@ namespace Utils
 namespace SceneGraph
 {
 
+class Material_Node;
+
 /**
  * Simple Node class
  */
@@ -46,6 +48,7 @@ class Node
 protected:
 	std::string m_label;
 	unsigned int m_nbRefs;
+	static Material_Node* m_current_material;
 public:
 	/**
 	 * Constructor
@@ -151,6 +154,11 @@ public:
 	void setShader(Utils::GLSLShader* shader);
 
 	/**
+	 * get the shader
+	 */
+	Utils::GLSLShader* getShader() { return m_shader;}
+
+	/**
 	 * Explicitly disable shaders when traverse this node
 	 */
 	void setNoShader();
@@ -159,6 +167,8 @@ public:
 	 * Rendering callback (used in traversal by renderGraph)
 	 */
 	virtual void render();
+
+	void apply();
 };
 
 
@@ -245,7 +255,7 @@ public:
 class VBO_Node: public Node
 {
 protected:
-	Algo::Render::VBO::MapRender_VBO* m_vbo;
+	Algo::Render::GL2::MapRender* m_vbo;
 
 	unsigned int m_primitives;
 public:
@@ -257,13 +267,13 @@ public:
 	/**
 	 * Constructor
 	 */
-	VBO_Node(Algo::Render::VBO::MapRender_VBO* vbo);
+	VBO_Node(Algo::Render::GL2::MapRender* vbo);
 
 	/**
 	 * set the VBO render object ptr
-	 * @param ptr on MapRender_VBO object (not released by destructor
+	 * @param ptr on MapRender object (not released by destructor
 	 */
-	void setVBO(Algo::Render::VBO::MapRender_VBO* vbo);
+	void setVBO(Algo::Render::GL2::MapRender* vbo);
 
 	/**
 	 * set the primitives to render

@@ -147,47 +147,47 @@ void MyGlutWin::myRedraw(void)
 
 	if(render_obj)
 	{
-		m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-		//m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::POINTS);
+		m_render->updateData(Algo::Render::GL2::POSITIONS, position );
+		//m_render->initPrimitives<PFP>(myMap, good, Algo::Render::GL2::POINTS);
 
 		if(renderObjStyle == O_ALL)
 		{
-			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
-		    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+		    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
 			glEnable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( 1.0f, 1.0f );
 
 			glColor3f(0.0f,0.5f,0.0f);
 			//shaders[3].bind();
-			m_render->draw(Algo::Render::VBO::TRIANGLES);
+			m_render->draw(Algo::Render::GL2::TRIANGLES);
 			//shaders[3].unbind();
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			// on trace les ligne devant
 			glColor3f(1.0f,1.0f,0.0f);
 
-			m_render->draw(Algo::Render::VBO::LINES);
+			m_render->draw(Algo::Render::GL2::LINES);
 
 		}
 		else if(renderObjStyle == O_FACES)
 		{
-			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 
 			glEnable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( 1.0f, 1.0f );
 
 			glColor3f(0.0f,0.5f,0.0f);
-			m_render->draw(Algo::Render::VBO::TRIANGLES);
+			m_render->draw(Algo::Render::GL2::TRIANGLES);
 			glDisable( GL_POLYGON_OFFSET_FILL );
 		}
 		else if(renderObjStyle == O_LINE)
 		{
-			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
 			// on trace les ligne devant
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			glColor3f(1.0f,1.0f,0.0f);
-			m_render->draw(Algo::Render::VBO::LINES);
+			m_render->draw(Algo::Render::GL2::LINES);
 		}
 		else if(renderObjStyle == O_EXPLOD)
 		{
@@ -271,14 +271,14 @@ void MyGlutWin::initRender()
 {
     // maj des donnees de position
 	GLint t1 = glutGet(GLUT_ELAPSED_TIME);
-    m_render->updateData(Algo::Render::VBO::POSITIONS, position );
+    m_render->updateData(Algo::Render::GL2::POSITIONS, position );
 	GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 	GLfloat seconds = (t2 - t1) / 1000.0f;
 	std::cout << "updateData: "<< seconds << "sec" << std::endl;
     // creation des primitives de rendu a partir de la carte
 	t1 = glutGet(GLUT_ELAPSED_TIME);
-    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
-    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+    m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
     t2 = glutGet(GLUT_ELAPSED_TIME);
     seconds = (t2 - t1) / 1000.0f;
     std::cout << "initPrimitives: "<< seconds << "sec" << std::endl;
@@ -414,9 +414,9 @@ int main(int argc, char **argv)
 
 
     // allocation des objets necessaires pour le rendu
-    mgw->m_render = new Algo::Render::VBO::MapRender_VBO();
-    //mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMap<PFP::MAP>();
-    mgw->m_render_topo = new Algo::Render::VBO::topo3_VBORenderMapD();
+    mgw->m_render = new Algo::Render::GL2::MapRender_VBO();
+    //mgw->m_render_topo = new Algo::Render::GL2::topo3_VBORenderMap<PFP::MAP>();
+    mgw->m_render_topo = new Algo::Render::GL2::topo3_VBORenderMapD();
 
     mgw->init();
     mgw->initRender();

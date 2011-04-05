@@ -166,7 +166,7 @@ public:
         /**
          * render topology
          */
-        Algo::Render::VBO::topo_VBORenderGMap* m_render_topo;
+        Algo::Render::GL2::topo_VBORenderGMap* m_render_topo;
 
         /**
          * render mode enum
@@ -186,7 +186,7 @@ public:
 		dl_norm(-1)
     {
 		if (this->shaderOk) shaders[0].loadShaders("phong_vs.txt","phong_ps.txt");
-		m_render_topo = new Algo::Render::VBO::topo_VBORenderGMap();
+		m_render_topo = new Algo::Render::GL2::topo_VBORenderGMap();
 	}
 };
 

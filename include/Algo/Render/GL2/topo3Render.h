@@ -43,11 +43,11 @@ namespace Algo
 namespace Render
 {
 
-namespace VBO
+namespace GL2
 {
 
 
-class topo3_VBORender
+class topo3Render
 {
 protected:
 
@@ -129,12 +129,12 @@ public:
 	* @param good functor that return true for darts of part to draw
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/
-	topo3_VBORender();
+	topo3Render();
 
 	/**
 	* Destructor
 	*/
-	~topo3_VBORender();
+	~topo3Render();
 
 	/**
 	* update all drawing buffers
@@ -268,7 +268,7 @@ public:
 
 
 
-class topo3_VBORenderMapD: public topo3_VBORender
+class topo3RenderMapD: public topo3Render
 {
 public:
 	/**
@@ -285,7 +285,7 @@ public:
 };
 //
 //
-//class topo3_VBORenderGMap: public topo3_VBORender
+//class topo3RenderGMap: public topo3Render
 //{
 //public:
 //	/**
@@ -309,6 +309,6 @@ public:
 
 }//end namespace CGoGN
 
-#include "Algo/Render/topo3_vboRender.hpp"
+#include "Algo/Render/GL2/topo3Render.hpp"
 
 #endif

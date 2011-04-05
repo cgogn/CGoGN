@@ -225,9 +225,9 @@ public:
 	 */
 	float gWidthObj;
 
-	Algo::Render::VBO::MapRender_VBO* m_render;
+	Algo::Render::GL2::MapRender_VBO* m_render;
 
-	Algo::Render::VBO::topo_VBORenderMapD* m_render_topo;
+	Algo::Render::GL2::topo_VBORenderMapD* m_render_topo;
 
 	/**
 	 * redraw CB
@@ -424,18 +424,18 @@ void myGlutWin::myInitGL()
 void myGlutWin::updateRender()
 {
 	if (m_render == NULL)
-		m_render = new Algo::Render::VBO::MapRender_VBO() ;
+		m_render = new Algo::Render::GL2::MapRender_VBO() ;
 
-	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::VBO::TRIANGLES);
-//	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::VBO::LINES);
-	m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::GL2::TRIANGLES);
+//	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::GL2::LINES);
+	m_render->updateData(Algo::Render::GL2::POSITIONS, position);
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-	m_render->updateData(Algo::Render::VBO::NORMALS, normal);
+	m_render->updateData(Algo::Render::GL2::NORMALS, normal);
 
 
 	if (m_render_topo == NULL)
-		m_render_topo = new Algo::Render::VBO::topo_VBORenderMapD() ;
+		m_render_topo = new Algo::Render::GL2::topo_VBORenderMapD() ;
 
 	m_render_topo->updateData<PFP>(myMap,position,0.9f,0.9f);
 }
@@ -493,7 +493,7 @@ void myGlutWin::myRedraw(void)
 	//glColor3f(0.5f,0.1f,0.1f);
 	glColor3f(0.1f,0.5f,0.1f);
 
-	m_render->draw(Algo::Render::VBO::TRIANGLES) ;
+	m_render->draw(Algo::Render::GL2::TRIANGLES) ;
 
 	glDisable( GL_POLYGON_OFFSET_FILL );
 

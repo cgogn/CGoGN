@@ -36,7 +36,7 @@ namespace Algo
 namespace Render
 {
 
-namespace VBO
+namespace GL2
 {
 
 inline explodeVolume_VBORender::explodeVolume_VBORender()

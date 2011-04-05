@@ -27,6 +27,7 @@
 
 #include "Topology/map/map3.h"
 #include "Topology/generic/embeddedMap3.h"
+#include "Container/attributeContainer.h"
 
 namespace CGoGN
 {
@@ -53,7 +54,7 @@ public:
 	AttributeHandler<unsigned int> m_edgeId ;
 	AttributeHandler<unsigned int> m_faceId ;
 
-	AttribMultiVect<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
+	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
 public:
 	ImplicitHierarchicalMap3() ;
@@ -222,7 +223,7 @@ public:
 	AttributeHandler_IHM(GenericMap* m, unsigned int idAttr) : AttributeHandler<T>(m, idAttr)
 	{}
 
-	AttribMultiVect<T>* getDataVector() const
+	AttributeMultiVector<T>* getDataVector() const
 	{
 		return AttributeHandler<T>::getDataVector() ;
 	}

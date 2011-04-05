@@ -22,87 +22,34 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _EXPLODE_VOLUME_VBO_RENDER
-#define _EXPLODE_VOLUME_VBO_RENDER
+#ifndef __CGOGN_SHADER_SIMPLECOLOR_
+#define __CGOGN_SHADER_SIMPLECOLOR_
 
-#include <GL/gl.h>
-
-#include <vector>
-#include <list>
-
-#include "Topology/generic/dart.h"
-#include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/functor.h"
+#include "Utils/GLSLShader.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
-
-namespace Algo
+namespace Utils
 {
 
-namespace Render
-{
-
-namespace VBO
-{
-
-
-class explodeVolume_VBORender
+class ShaderSimpleColor : public GLSLShader
 {
 protected:
-
-
-	/**
-	* vbo buffers
-	* 0: vertices
-	* 1: normals
-	*/
-	GLuint m_VBOBuffers[2];
-
-	/**
-	*number of triangles to draw
-	*/
-	GLuint m_nbTris;
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string fragmentShaderText;
+    // uniform locations
+	GLuint m_unif_color;
 
 public:
-	/**
-	* Constructor
-	* @param map the map to draw
-	* @param good functor that return true for darts of part to draw
-	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
-	*/
-	explodeVolume_VBORender();
+	ShaderSimpleColor();
 
-	/**
-	* Destructor
-	*/
-	~explodeVolume_VBORender();
+	void setColor(const Geom::Vec4f& color);
 
-	/**
-	* update all drawing buffers
-	* @param map the map
-	* @param good selector
-	* @param positions  attribute of position vertices
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
-	*/
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float kf, float kv);
-
-	/**
-	 * draw all topo
-	 */
-	void drawFaces();
+	void setAttributePosition(VBO& vbo);
 };
 
-}//end namespace VBO
-
-}//end namespace Algo
-
-}//end namespace Render
-
-}//end namespace CGoGN
-
-#include "Algo/Render/explodeVolume_vboRender.hpp"
-
+}
+}
 #endif

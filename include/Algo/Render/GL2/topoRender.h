@@ -43,10 +43,10 @@ namespace Algo
 namespace Render
 {
 
-namespace VBO
+namespace GL2
 {
 
-class topo_VBORender
+class topoRender
 {
 protected:
 	/**
@@ -90,12 +90,12 @@ public:
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/	
 
-	topo_VBORender();
+	topoRender();
 
 	/**
 	* Destructor
 	*/
-	~topo_VBORender();
+	~topoRender();
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)
@@ -157,7 +157,7 @@ public:
 	void overdrawDart(Dart d, float width, float r, float g, float b);
 };
 
-class topo_VBORenderMapD : public topo_VBORender
+class topoRenderMapD : public topoRender
 {
 public:
 	/**
@@ -172,7 +172,7 @@ public:
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = SelectorTrue());
 };
 
-class topo_VBORenderGMap : public topo_VBORender
+class topoRenderGMap : public topoRender
 {
 public:
 	/**
@@ -196,6 +196,6 @@ public:
 } // namespace CGoGN
 
 
-#include "Algo/Render/topo_vboRender.hpp"
+#include "Algo/Render/GL2/topoRender.hpp"
 
 #endif

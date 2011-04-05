@@ -23,10 +23,11 @@ protected:
 	unsigned int m_size;
 	
 	/**
-	 * size of buffer in number of element
+	 * size of buffer in number of elements
 	 */
 	unsigned int m_nb;
 	
+
 	/**
 	 * buffer
 	 */
@@ -67,6 +68,13 @@ public:
 	 * get the size of buffer in bytes
 	 */
 	unsigned int sizeBuffer() { return m_size;}
+
+	/**
+	 * get the size of buffer in bytes
+	 */
+	unsigned int sizeElt() { return m_size/m_nb;}
+
+
 };
 
 

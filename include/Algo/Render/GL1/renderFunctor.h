@@ -37,7 +37,7 @@ namespace Algo
 namespace Render
 {
 
-namespace Direct
+namespace GL1
 {
 
 
@@ -277,7 +277,7 @@ public:
 
 
 
-} // namespace Direct
+} // namespace GL1
 
 } // namespace Render
 
@@ -285,6 +285,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Render/renderFunctor.hpp"
+#include "Algo/Render/GL1/renderFunctor.hpp"
 
 #endif

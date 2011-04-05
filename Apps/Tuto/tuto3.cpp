@@ -65,7 +65,7 @@ public:
      float gWidthObj;
      Geom::Vec3f gPosObj;
 
-     Algo::Render::VBO::MapRender_VBO* m_render;
+     Algo::Render::GL2::MapRender_VBO* m_render;
 
  	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY) {}
 };
@@ -87,14 +87,14 @@ void myGlutWin::myRedraw(void)
 	// on trace les ligne devant
 	glDisable( GL_POLYGON_OFFSET_FILL );
 	glColor3f(1.0f,1.0f,0.0f);
-	m_render->draw(Algo::Render::VBO::LINES);
+	m_render->draw(Algo::Render::GL2::LINES);
 
 	// et on decale les faces vers l'arriere
 	glEnable( GL_POLYGON_OFFSET_FILL );
 	glPolygonOffset( 1.0f, 1.0f );
 
 	glColor3f(0.0f,0.5f,0.0f);
-	m_render->draw(Algo::Render::VBO::TRIANGLES);
+	m_render->draw(Algo::Render::GL2::TRIANGLES);
 	glDisable( GL_POLYGON_OFFSET_FILL );
 
 	glPopMatrix();
@@ -163,13 +163,13 @@ int main(int argc, char **argv)
     mgw.gPosObj =  (bb.min() +  bb.max()) /2.0f;
 
     // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
+    mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
 
     // maj des donnees de position
-    mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+    mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
     // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::TRIANGLES);
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::LINES);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
 
     mgw.mainLoop();
 

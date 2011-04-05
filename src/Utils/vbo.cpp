@@ -22,67 +22,41 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _TOPO_GL_RENDER
-#define _TOPO_GL_RENDER
-
-#include <list>
-//#include <gmtl/VecOps.h>
-//#include <gmtl/Output.h>
-#include <GL/gl.h>
-
-// OpenGL direct mode rendering of darts of maps
+#include "Utils/vbo.h"
+#include "Utils/GLSLShader.h"
 
 namespace CGoGN
 {
-
-namespace Algo
+namespace Utils
 {
 
-namespace Render
+
+VBO::VBO()
 {
+	glGenBuffersARB(1,&m_id);
+	m_refs.reserve(4);
+}
 
-namespace Direct
+VBO::~VBO()
 {
+	glDeleteBuffersARB(1,&m_id);
+	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
+	{
+		(*it)->unbindVBO(this);
+	}
+}
 
-/**
-* Render darts of generalized map
-*/
-template <typename PFP>
-void renderTopoGM2(typename PFP::MAP& the_map, Marker m);
-
-/**
-* Render darts of dual map
-*
-* @param the_map map to render
-* @param drawPhi1 draw the phi1 relation ?
-* @param drawPhi2 draw the phi2 relation ?
-* @param ke exploding coefficient for edge (1.0 normal draw)
-* @param kf exploding coefficient for edge (1.0 normal draw)
-*/
-
-template <typename PFP>
-void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, float ke, float kf);
+void VBO::ref(GLSLShader* sh)
+{
+	//already referenced ?
+	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
+		if (*it == sh )
+			return;
+	// no then add
+	m_refs.push_back(sh);
+}
 
 
-/**
- * Render darts of dual map
- *
- * @param the_map map to render
- * @param drawPhi1 draw the phi1 relation ?
- * @param drawPhi2 draw the phi2 relation ?
- * @param drawPhi3 draw the phi3 relation ?
- * @param ke exploding coefficient for edge (1.0 normal draw)
- * @param kf exploding coefficient for edge (1.0 normal draw)
- * @param kv exploding coefficient for volumes (0.0 normal draw)
- */
-template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& the_map, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+}
+}
 
-}// end namespace
-}// end namespace
-}// end namespace
-}// end namespace
-
-#include "Algo/Render/topo_render.hpp"
-
-#endif

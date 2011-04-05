@@ -22,20 +22,16 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _MAP_GL_RENDER
-#define _MAP_GL_RENDER
+#ifndef _TOPO_GL_RENDER
+#define _TOPO_GL_RENDER
 
 #include <list>
-#include <GL/glew.h>
+//#include <gmtl/VecOps.h>
+//#include <gmtl/Output.h>
+#include <GL/gl.h>
 
-#include "Topology/generic/functor.h"
+// OpenGL direct mode rendering of darts of maps
 
-/**
-* A set of functions that allow the creation of rendering
-* object using Vertex-Buffer-Object.
-* Function are made for dual-2-map and can be used on
-* any subset of a dual-N-map which is a 2-map
-*/
 namespace CGoGN
 {
 
@@ -45,43 +41,48 @@ namespace Algo
 namespace Render
 {
 
-namespace Direct
+namespace GL1
 {
 
-enum RenderType { NO_LIGHT=1, LINE, FLAT, SMOOTH };
-enum RenderPrimitives { NONE=0, TRIANGLES=3, QUADS=4, POLYGONS=5, TRIFAN=6};
-
 /**
-* @param the_map the map to render
-* @param rt type of rendu (FLAT, SMOOTH, FIL)
-* @param explode face exploding coefficient
-* @param good selector
+* Render darts of generalized map
 */
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const FunctorSelect& good = SelectorTrue());
+void renderTopoGM2(typename PFP::MAP& the_map, Marker m);
+
+/**
+* Render darts of dual map
+*
+* @param the_map map to render
+* @param drawPhi1 draw the phi1 relation ?
+* @param drawPhi2 draw the phi2 relation ?
+* @param ke exploding coefficient for edge (1.0 normal draw)
+* @param kf exploding coefficient for edge (1.0 normal draw)
+*/
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const typename PFP::TVEC3& color, const FunctorSelect& good = SelectorTrue());
+void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, float ke, float kf);
 
+
+/**
+ * Render darts of dual map
+ *
+ * @param the_map map to render
+ * @param drawPhi1 draw the phi1 relation ?
+ * @param drawPhi2 draw the phi2 relation ?
+ * @param drawPhi3 draw the phi3 relation ?
+ * @param ke exploding coefficient for edge (1.0 normal draw)
+ * @param kf exploding coefficient for edge (1.0 normal draw)
+ * @param kv exploding coefficient for volumes (0.0 normal draw)
+ */
 template <typename PFP>
-void renderNormalVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, float scale, const FunctorSelect& good = SelectorTrue());
+void renderTopoMD3(typename PFP::MAP& the_map, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
 
-template <typename PFP>
-void renderFrameVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good = SelectorTrue());
+}// end namespace
+}// end namespace
+}// end namespace
+}// end namespace
 
-} // namespace Direct
-
-} // namespace Render
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#include "Algo/Render/renderFunctor.h"
-#include "Algo/Render/map_glRender.hpp"
+#include "Algo/Render/GL1/topo_render.hpp"
 
 #endif

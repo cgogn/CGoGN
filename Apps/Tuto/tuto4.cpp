@@ -66,8 +66,8 @@ public:
      bool render_obj;
      bool render_topo;
 
-     Algo::Render::VBO::MapRender_VBO* m_render;
-     Algo::Render::VBO::topo_VBORenderMapD* m_render_topo;
+     Algo::Render::GL2::MapRender_VBO* m_render;
+     Algo::Render::GL2::topo_VBORenderMapD* m_render_topo;
 
  	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY)
     {
@@ -121,14 +121,14 @@ void myGlutWin::myRedraw(void)
 		// on trace les ligne devant
 		glDisable( GL_POLYGON_OFFSET_FILL );
 		glColor3f(1.0f,1.0f,0.0f);
-		m_render->draw(Algo::Render::VBO::LINES);
+		m_render->draw(Algo::Render::GL2::LINES);
 
 		// et on decale les faces vers l'arriere
 		glEnable( GL_POLYGON_OFFSET_FILL );
 		glPolygonOffset( 1.0f, 1.0f );
 
 		glColor3f(0.0f,0.5f,0.0f);
-		m_render->draw(Algo::Render::VBO::TRIANGLES);
+		m_render->draw(Algo::Render::GL2::TRIANGLES);
 		glDisable( GL_POLYGON_OFFSET_FILL );
 	}
 
@@ -209,14 +209,14 @@ int main(int argc, char **argv)
 
 
     // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
-    mgw.m_render_topo = new Algo::Render::VBO::topo_VBORenderMapD();
+    mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
+    mgw.m_render_topo = new Algo::Render::GL2::topo_VBORenderMapD();
 
     // maj des donnees de position
-    mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+    mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
     // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::TRIANGLES);
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::LINES);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
+    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
 
     // creation des primitives de rendu de la topologie a partir de la carte
     mgw.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);

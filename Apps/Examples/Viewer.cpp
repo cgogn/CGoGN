@@ -137,7 +137,7 @@ public:
          */
         int renderStyle;
 
-        Algo::Render::VBO::MapRender_VBO* m_render;
+        Algo::Render::GL2::MapRender_VBO* m_render;
 
         /**
          * render mode enum
@@ -152,14 +152,14 @@ public:
         {
 			if (this->shaderOk) shaders[0].loadShaders("phong_vs.txt","phong_ps.txt");
 
-//			m_cb = new Algo::Render::VBO::VBO_CB_PositionNormal<PFP>(myMap);
-//			m_render = new Algo::Render::VBO::MapRender_VBO(myMap, allDarts, m_cb);
+//			m_cb = new Algo::Render::GL2::GL2_CB_PositionNormal<PFP>(myMap);
+//			m_render = new Algo::Render::GL2::MapRender_VBO(myMap, allDarts, m_cb);
 //
 //			m_render->initBuffers();
-//			m_render->updateData(Algo::Render::VBO::POSITIONS, position );
-//			m_render->updateData(Algo::Render::VBO::NORMALS, normal );
-//			m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::TRIANGLES);
-//			m_render->initPrimitives<PFP>(myMap, good, Algo::Render::VBO::LINES);
+//			m_render->updateData(Algo::Render::GL2::POSITIONS, position );
+//			m_render->updateData(Algo::Render::GL2::NORMALS, normal );
+//			m_render->initPrimitives<PFP>(myMap, good, Algo::Render::GL2::TRIANGLES);
+//			m_render->initPrimitives<PFP>(myMap, good, Algo::Render::GL2::LINES);
 
 		}
 };
@@ -186,12 +186,12 @@ void myGlutWin::myRedraw(void)
     	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
     	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-//        m_render->draw(Algo::Render::VBO::TRIANGLES);
+//        m_render->draw(Algo::Render::GL2::TRIANGLES);
        	Algo::Render::Direct::renderTriQuadPoly<PFP>(myMap, Algo::Render::Direct::FLAT, 0.9 , position, normal, normal);
 
         glDisable(GL_LIGHTING);
         glColor3f(0.0f,0.0f,0.0f);
-//        m_render->draw(Algo::Render::VBO::LINES);
+//        m_render->draw(Algo::Render::GL2::LINES);
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
       	Algo::Render::Direct::renderTriQuadPoly<PFP>(myMap, Algo::Render::Direct::LINE, 1.0, position, normal);
 //      	glPointSize(5.0f);
@@ -227,7 +227,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 				position[it] += normal[it] * 0.1;
 			}
 
-			m_render->updateData(Algo::Render::VBO::POSITIONS, position );
+			m_render->updateData(Algo::Render::GL2::POSITIONS, position );
 		}
 		break;
 
@@ -239,7 +239,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 				normal[it] *= -1.0f;
 			}
 
-			m_render->updateData(Algo::Render::VBO::NORMALS, normal );
+			m_render->updateData(Algo::Render::GL2::NORMALS, normal );
 		}
 		break;
 

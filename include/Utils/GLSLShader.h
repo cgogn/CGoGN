@@ -26,41 +26,56 @@
 *  Thanks to Frederic Larue for this class
 ***********************************************/
 
-#ifndef __KLIB__GLSHADER__12052005__
-#define __KLIB__GLSHADER__12052005__
+#ifndef __CGoGN_GLSL_SHADER__
+#define __CGoGN_GLSL_SHADER__
 
 #include "Utils/os_spec.h"
+#include "Utils/vbo.h"
 
+#include "glm/glm.hpp"
 #include <GL/glew.h>
 
-
-//#include <GL/glut.h>
-
-#include <map>
 #include <stdlib.h>
 #include <string>
 #include <vector>
 
 namespace CGoGN
 {
-
 namespace Utils
 {
 
 
-////////// CLASS DECLARATION //////////
-
 class GLSLShader
 {
 
+
 public:
+
+	struct VAStr
+	{
+		int va_id;
+		VBO* vbo_ptr;
+//		GLuint vbo_id;
+//		unsigned int size;
+	};
+
+
 	/**
 	 * enum of supported shader type
 	 */
 	enum shaderType {VERTEX_SHADER = 1, FRAGMENT_SHADER = 2, GEOMETRY_SHADER = 3 };
 
+	static unsigned int CURRENT_OGL_VERSION;
+
 
 protected:
+
+	static std::string DEFINES_GL2;
+
+	static std::string DEFINES_GL3;
+
+	static std::string* DEFINES_GL;
+
 	/**
 	 * handle of vertex shader
 	 */
@@ -81,6 +96,15 @@ protected:
 	 */
 	GLhandleARB m_program_object;
 
+
+	/**
+	 * a set of pair VA_id / VBO_id
+	 */
+//	std::vector<pair<int,unsigned int> > m_va_vbo_binding;
+	std::vector<VAStr> m_va_vbo_binding;
+
+
+	static std::vector<std::string> m_pathes;
 
 	/**
 	 * load vertex shader
@@ -130,16 +154,12 @@ protected:
 	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
 
 
-
 	/**
 	 * get log after compiling
 	 * @param obj what log do you want ?
 	 * @return the log
 	 */
 	char* getInfoLog( GLhandleARB obj );
-
-
-	static std::vector<std::string> m_pathes;
 
 public:
 	/**
@@ -153,11 +173,14 @@ public:
 	 */
 	virtual ~GLSLShader();
 
+
+	static void setCurrentOGLVersion(unsigned int version);
+
+
 	/*
 	 * search file in different path
 	 */
 	static std::string findFile(const std::string filename);
-
 
 	/**
 	 * test support of shader
@@ -192,9 +215,9 @@ public:
 
 	/**
 	 * load shaders (compile and link)
-	 * @param vs vertex shader source file
-	 * @param fs fragment shader source file
-	 * @param fs fragment shader source file
+	 * @param vs vertex shader source file name
+	 * @param fs fragment shader source file name
+	 * @param gs geometry shader source file name
 	 * @param inputGeometryPrimitive primitives used in geometry shader as input
 	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
 	 */
@@ -202,9 +225,31 @@ public:
 
 
 	/**
+	 * load shaders (compile and link)
+	 * @param vs vertex shader source char* prt
+	 * @param fs fragment shader source char* prt
+
+	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
+	 */
+	bool loadShadersFromMemory(const char* vs, const char* fs);
+
+	/**
+	 * load shaders (compile and link)
+	 * @param vs vertex shader source char* prt
+	 * @param fs fragment shader source char* prt
+	 * @param fs geometry shader source char* prt
+	 * @param inputGeometryPrimitive primitives used in geometry shader as input
+	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
+	 */
+	bool loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive);
+
+
+	/**
 	 * Link the shader do it just after binding the attributes
 	 */
 	bool link();
+
+
 
 	inline bool		isCreated();
 
@@ -218,7 +263,7 @@ public:
 	/**
 	 *
 	 */
-	GLuint 	getAttribIndex( char* attribName );
+//	GLuint 	getAttribIndex( char* attribName );
 
 	
 	/**
@@ -227,10 +272,6 @@ public:
 	GLuint program_handler() { return m_program_object;}
 	
 
-	/**
-	 * bind vertex attribute with its name in shaders
-	 */
-	void bindAttrib(unsigned int att, const char* name) const;
 
 
 	/**
@@ -258,7 +299,7 @@ public:
 	 * @param pointer on data to copy
 	 */
 	template<unsigned int NB>
-	void setuniformf( const char* name , float* val);
+	void setuniformf( const char* name, const float* val);
 
 	/**
 	 * set uniform shader int variable
@@ -268,7 +309,7 @@ public:
 	 * @param pointer on data to copy
 	 */
 	template<unsigned int NB>
-	void setuniformi( const char* name , int* val);
+	void setuniformi( const char* name, const int* val);
 
 	/**
 	 * add search path for file
@@ -276,6 +317,33 @@ public:
 	 */
 	void addPathFileSeach(const std::string& path);
 
+	/**
+	 * remove VBO index from binding
+	 */
+	void unbindVBO(VBO* ptr);
+
+	/**
+	 * remove VBO index from binding
+	 */
+	void unbindVA(const std::string& name);
+
+	/**
+	 * associate an attribute name of shader with a vbo
+	 */
+	void bindVA_VBO(const std::string& name, VBO& vbo);
+
+	/**
+	 * get binding VA VBO
+	 */
+	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding;}
+
+
+	void bindAttrib(unsigned int att, const char* name) const;
+
+	/**
+	 * update projection, modelview, ... matrices
+	 */
+	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview);
 };
 
 
@@ -288,7 +356,7 @@ inline bool GLSLShader::isCreated()
 }
 
 template<unsigned int NB>
-void GLSLShader::setuniformf( const char* name , float* val)
+void GLSLShader::setuniformf( const char* name, const float* val)
 {
 	GLint uni = glGetUniformLocationARB(m_program_object,name);
 	if (uni>=0)
@@ -315,7 +383,7 @@ void GLSLShader::setuniformf( const char* name , float* val)
 }
 
 template<unsigned int NB>
-void GLSLShader::setuniformi( const char* name , int* val)
+void GLSLShader::setuniformi( const char* name, const int* val)
 {
 	GLint uni = glGetUniformLocationARB(m_program_object,name);
 	if (uni>=0)
@@ -349,4 +417,4 @@ void GLSLShader::setuniformi( const char* name , int* val)
 
 
 
-#endif /*__KLIB__GLSHADER__12052005__*/
+#endif

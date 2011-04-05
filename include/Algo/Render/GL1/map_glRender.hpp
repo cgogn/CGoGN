@@ -27,7 +27,7 @@
 
 #include <list>
 
-#include "Algo/Render/renderFunctor.h"
+#include "Algo/Render/GL1/renderFunctor.h"
 
 namespace CGoGN
 {
@@ -38,7 +38,7 @@ namespace Algo
 namespace Render
 {
 
-namespace Direct
+namespace GL1
 {
 
 template <typename PFP>
@@ -194,7 +194,7 @@ void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& 
 
 
 
-} // namespace Direct
+} // namespace GL1
 
 } // namespace Render
 

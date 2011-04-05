@@ -24,18 +24,18 @@
 
 #include <iostream>
 
-#include "Utils/glutwin.h"
-
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
-
 #include "Geometry/vector_gen.h"
 
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/vbo_MapRender.h"
 
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/shaderSimpleColor.h"
+
+#include "tuto1.h"
 
 using namespace CGoGN ;
 
@@ -51,60 +51,69 @@ struct PFP: public PFP_STANDARD
 };
 
 
-/**
- * A class for a little interface and rendering
- */
-class MyGlutWin: public Utils::SimpleGlutWin
+
+void MyQT::cb_initGL()
 {
-public:
-     void myRedraw();
+	// choose to use GL version 2
+	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-     PFP::REAL gWidthObj;
-     PFP::VEC3 gPosObj;
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
 
-     Algo::Render::VBO::MapRender_VBO* m_render;
+	// create VBO for position
+	m_positionVBO = new Utils::VBO();
 
- 	MyGlutWin(int* argc, char **argv, int winX, int winY) : SimpleGlutWin(argc, argv, winX, winY) {}
- 	~MyGlutWin()
- 	{
- 		delete m_render ;
- 	}
-};
+	// using simple shader with color
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(*m_positionVBO);
+	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
 
-void MyGlutWin::myRedraw()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
-
-	// center the object
-	float sc = 50.0f / gWidthObj;
-	glScalef(sc, sc, sc);
-	glTranslatef(-gPosObj[0], -gPosObj[1], -gPosObj[2]);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDisable(GL_LIGHTING);
-
-	// draw the lines
-	glColor3f(1.0f, 1.0f, 0.0f);
-	m_render->draw(Algo::Render::VBO::LINES);
-
-	// draw the faces
-	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(1.0f, 1.0f);
-	glColor3f(0.0f, 0.5f, 0.0f);
-	m_render->draw(Algo::Render::VBO::TRIANGLES);
-	glDisable(GL_POLYGON_OFFSET_FILL);
-
-	glPopMatrix();
 }
+
+void MyQT::cb_updateMatrix()
+{
+	if (m_shader)
+	{
+		m_shader->updateMatrices(m_projection_matrix, m_modelView_matrix);
+	}
+}
+
+
+void MyQT::cb_redraw()
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_LIGHTING);
+	if (m_shader)
+	{
+		glLineWidth(2.0f);
+		m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+		m_render->draw(m_shader, Algo::Render::GL2::LINES);
+
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0f, 1.0f);
+
+		m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
+		m_render->draw(m_shader, Algo::Render::GL2::TRIANGLES);
+
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+}
+
+void MyQT::cb_keyPress(int code)
+{
+	if ((code >65) && (code< 123 ))
+		std::cout << " key char " << char(code) << "pressed"<< std::endl;
+
+	if ((code >'0') && (code<='9'))
+		std::cout << " key num " << code-'0' << "pressed"<< std::endl;
+
+}
+
 
 int main(int argc, char **argv)
 {
 	// declaration of the map
 	PFP::MAP myMap;
-
-	// this selector is going to select all the darts
-	SelectorTrue allDarts;
 
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);
@@ -132,23 +141,43 @@ int main(int argc, char **argv)
 	position[myMap.phi1(d3)] = PFP::VEC3(8, 0, 0);
 	position[myMap.phi_1(d3)] = PFP::VEC3(6, 3, 0);
 
-    // instanciation of the interface
-	MyGlutWin mgw(&argc, argv, 800, 800);
 
-    // computation of the bounding box
+	// interface:
+	QApplication app(argc, argv);
+	MyQT sqt;
+
+	// ajout entree dans le menu application
+	sqt.add_menu_entry("entree1", SLOT(menu_slot1()));
+
+	// message d'aide
+	sqt.setHelpMsg("First Tuto:\n"
+			"create 2 faces\n"
+			"and sew them \n"
+			"simple interface in Qt");
+
+    //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    mgw.gWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    mgw.gPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-    // instanciation of the renderer (here using VBOs)
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
+    // envoit info BB a l'interface
+	sqt.setParamObject(lWidthObj,lPosObj.data());
 
-    // update the renderer (primitives and geometry)
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::TRIANGLES);
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::VBO::LINES);
-    mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+	// show 1 pour GL context
+	sqt.show();
 
-    mgw.mainLoop();
+	// update du VBO position (context GL necessaire)
+	sqt.m_positionVBO->updateData(position);
 
-    return 0;
+	// update des primitives du renderer
+	SelectorTrue allDarts;
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+
+	// show final pour premier redraw
+	sqt.show();
+
+	// et on attend la fin.
+	return app.exec();
+
 }

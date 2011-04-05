@@ -36,7 +36,7 @@ namespace Algo
 namespace Render
 {
 
-namespace Direct
+namespace GL1
 {
 
 /**
@@ -679,7 +679,7 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 	}
 }
 
-} // namespace Direct
+} // namespace GL1
 
 } // namespace Render
 

@@ -100,7 +100,7 @@ public:
 	/**
 	 * render object
 	 */
-	Algo::Render::VBO::MapRender_VBO* m_render;
+	Algo::Render::GL2::MapRender_VBO* m_render;
 
 
 
@@ -145,19 +145,19 @@ void myGlutWin::updateRender()
 
 	// create the renderer (first call only)
 	if (m_render == NULL)
-		m_render = new Algo::Render::VBO::MapRender_VBO() ;
+		m_render = new Algo::Render::GL2::MapRender_VBO() ;
 
 	// update buffer op vertices positions
-	m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+	m_render->updateData(Algo::Render::GL2::POSITIONS, position);
 	// update flat faces primtives (warning need position buffer)
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::FLAT_TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::FLAT_TRIANGLES);
 	// update smooth faces primtives
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	// update lines primitives
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-	m_render->updateData(Algo::Render::VBO::NORMALS, normal);
+	m_render->updateData(Algo::Render::GL2::NORMALS, normal);
 
 }
 
@@ -175,7 +175,7 @@ void myGlutWin::myRedraw(void)
 //	// DRAW LINES OF OBJECTS
 //	glDisable(GL_LIGHTING);
 //	glColor3f(1.0f,1.0f,0.0f);
-//	m_render->draw(Algo::Render::VBO::LINES) ;
+//	m_render->draw(Algo::Render::GL2::LINES) ;
 //
 //	//shit for nice line rendering
 //	glEnable( GL_POLYGON_OFFSET_FILL );
@@ -186,7 +186,7 @@ void myGlutWin::myRedraw(void)
 //	glEnable(GL_COLOR_MATERIAL);
 //	glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 //	glColor3f(0.0f,0.0f,0.9f);
-//	m_render->draw(Algo::Render::VBO::TRIANGLES) ;
+//	m_render->draw(Algo::Render::GL2::TRIANGLES) ;
 //
 //	glDisable( GL_POLYGON_OFFSET_FILL );
 
@@ -252,28 +252,28 @@ int main(int argc, char **argv)
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, mgw.position, mgw.normal) ;
 
-	Algo::Render::VBO::MapRender_VBO* render1 = new Algo::Render::VBO::MapRender_VBO() ;
-	render1->updateData(Algo::Render::VBO::POSITIONS, mgw.position);
-	render1->updateData(Algo::Render::VBO::NORMALS, mgw.normal);
+	Algo::Render::GL2::MapRender_VBO* render1 = new Algo::Render::GL2::MapRender_VBO() ;
+	render1->updateData(Algo::Render::GL2::POSITIONS, mgw.position);
+	render1->updateData(Algo::Render::GL2::NORMALS, mgw.normal);
 
 	SelectorCellMarked cm1(mark1);
-	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::VBO::TRIANGLES);
-	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::VBO::FLAT_TRIANGLES);
-	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::VBO::LINES);
+	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::GL2::TRIANGLES);
+	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::GL2::FLAT_TRIANGLES);
+	render1->initPrimitives<PFP>(myMap, cm1, Algo::Render::GL2::LINES);
 
 
-	Algo::Render::VBO::MapRender_VBO* render2 = new Algo::Render::VBO::MapRender_VBO(*render1) ;
+	Algo::Render::GL2::MapRender_VBO* render2 = new Algo::Render::GL2::MapRender_VBO(*render1) ;
 
 	SelectorCellMarked cm2(mark2);
-	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::VBO::TRIANGLES);
-	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::VBO::FLAT_TRIANGLES);
-	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::VBO::POINTS);
+	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::GL2::TRIANGLES);
+	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::GL2::FLAT_TRIANGLES);
+	render2->initPrimitives<PFP>(myMap, cm2, Algo::Render::GL2::POINTS);
 
-	Algo::Render::VBO::MapRender_VBO* render3 = new Algo::Render::VBO::MapRender_VBO(*render1) ;
+	Algo::Render::GL2::MapRender_VBO* render3 = new Algo::Render::GL2::MapRender_VBO(*render1) ;
 	SelectorCellMarked cm3(mark3);
-	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::VBO::FLAT_TRIANGLES);
-	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::VBO::TRIANGLES);
-	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::VBO::LINES);
+	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::GL2::FLAT_TRIANGLES);
+	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::GL2::TRIANGLES);
+	render3->initPrimitives<PFP>(myMap, cm3, Algo::Render::GL2::LINES);
 
 
 	mgw.root = new Utils::SceneGraph::Group_Node();
@@ -288,9 +288,9 @@ int main(int argc, char **argv)
 
 	mgw.root->setMaterial(mater);
 
-	Utils::SceneGraph::VBO_Node* vbon = new Utils::SceneGraph::VBO_Node(render1);
-	vbon->setPrimitives(Algo::Render::VBO::FLAT_TRIANGLES);
-	vbon->setPrimitives(Algo::Render::VBO::LINES);
+	Utils::SceneGraph::GL2_Node* vbon = new Utils::SceneGraph::GL2_Node(render1);
+	vbon->setPrimitives(Algo::Render::GL2::FLAT_TRIANGLES);
+	vbon->setPrimitives(Algo::Render::GL2::LINES);
 
 	mgw.root->addChild(vbon);
 
@@ -302,9 +302,9 @@ int main(int argc, char **argv)
 
 	mgw.root->addChild(group1);
 
-	Utils::SceneGraph::VBO_Node* vbon2 = new Utils::SceneGraph::VBO_Node(render2);
-	vbon2->setPrimitives(Algo::Render::VBO::TRIANGLES);
-	vbon2->setPrimitives(Algo::Render::VBO::POINTS);
+	Utils::SceneGraph::GL2_Node* vbon2 = new Utils::SceneGraph::GL2_Node(render2);
+	vbon2->setPrimitives(Algo::Render::GL2::TRIANGLES);
+	vbon2->setPrimitives(Algo::Render::GL2::POINTS);
 	group1->addChild(vbon2);
 
 
@@ -325,9 +325,9 @@ int main(int argc, char **argv)
 	mater->setNoShader();
 	group2->setMaterial(mater);
 
-	vbon = new Utils::SceneGraph::VBO_Node(render3);
-	vbon->setPrimitives(Algo::Render::VBO::TRIANGLES);
-	vbon->setPrimitives(Algo::Render::VBO::LINES);
+	vbon = new Utils::SceneGraph::GL2_Node(render3);
+	vbon->setPrimitives(Algo::Render::GL2::TRIANGLES);
+	vbon->setPrimitives(Algo::Render::GL2::LINES);
 
 	group2->addChild(vbon);
 

@@ -132,13 +132,13 @@ public:
 	 /*
 	  * VBO Object rendering
 	  */
-	 Algo::Render::VBO::MapRender_VBO* m_render;
+	 Algo::Render::GL2::MapRender_VBO* m_render;
 
 	 /*
 	  * VBO Topo rendering
 	  */
-	 //Algo::Render::VBO::topo_MD3_VBORender<PFP>* m_render_topo;
-	 Algo::Render::VBO::topo3_VBORenderMapD* m_render_topo;
+	 //Algo::Render::GL2::topo_MD3_VBORender<PFP>* m_render_topo;
+	 Algo::Render::GL2::topo3_VBORenderMapD* m_render_topo;
 
 	 /*
 	  * ALGO VARIABLES

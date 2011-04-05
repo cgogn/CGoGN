@@ -28,22 +28,47 @@
 #include <fstream>
 #include <vector>
 
+#include "glm/gtx/inverse_transpose.hpp"
+
 
 namespace CGoGN
 {
 
 namespace Utils
 {
+unsigned int GLSLShader::CURRENT_OGL_VERSION=3;
 
+std::string GLSLShader::DEFINES_GL2=\
+"#version 110\n"
+"#define PRECISON \n"
+"#define ATTRIBUTE attribute\n"
+"#define VARYING_VERT varying\n"
+"#define VARYING_FRAG varying\n"
+"#define FRAG_OUT_DEF \n"
+"#define INVARIANT_POS \n";
+
+
+std::string GLSLShader::DEFINES_GL3=\
+"#version 330\n"
+"#define PRECISON precision highp float;\n"
+"#define ATTRIBUTE in\n"
+"#define VARYING_VERT smooth out\n"
+"#define VARYING_FRAG smooth in\n"
+"#define FRAG_OUT_DEF out vec4 gl_FragColor\n"
+"#define INVARIANT_POS \n";
+
+std::string* GLSLShader::DEFINES_GL =NULL;
 
 std::vector<std::string> GLSLShader::m_pathes;
 
-GLSLShader::GLSLShader()
+GLSLShader::GLSLShader():
+			m_vertex_shader_object(0),
+			m_fragment_shader_object(0),
+			m_geom_shader_object(0),
+			m_program_object(0)
 {
-	m_vertex_shader_object = 0;
-	m_fragment_shader_object = 0;
-	m_geom_shader_object = 0;
-	m_program_object = 0;
+	if (DEFINES_GL==NULL)
+		DEFINES_GL = &DEFINES_GL3;
 }
 
 
@@ -193,9 +218,14 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	int		status;
 	char	*info_log;
 
+	if (m_vertex_shader_object==0)
+	{
+		glDeleteShader(m_vertex_shader_object);
+		m_vertex_shader_object=0;
+	}
 
 	/*** create shader object ***/
-	m_vertex_shader_object = glCreateShaderObjectARB( GL_VERTEX_SHADER_ARB );
+	m_vertex_shader_object = glCreateShader( GL_VERTEX_SHADER );
 
 	if( !m_vertex_shader_object )
 	{
@@ -246,9 +276,14 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	int		status;
 	char	*info_log;
 
+	if (m_fragment_shader_object==0)
+	{
+		glDeleteShader(m_fragment_shader_object);
+		m_fragment_shader_object=0;
+	}
 
 	/*** create shader object ***/
-	m_fragment_shader_object = glCreateShaderObjectARB( GL_FRAGMENT_SHADER_ARB );
+	m_fragment_shader_object = glCreateShader( GL_FRAGMENT_SHADER );
 
 	if( !m_fragment_shader_object )
 	{
@@ -300,9 +335,12 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	int		status;
 	char	*info_log;
 
-
+	if (m_geom_shader_object==0)
+	{
+		glDeleteShader(m_geom_shader_object);
+		m_geom_shader_object=0;
+	}
 	/*** create shader object ***/
-	// glCreateShaderObjectARB( GL_FRAGMENT_SHADER_ARB );
 	m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER_EXT);
 
 
@@ -624,6 +662,39 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const
 
 
 
+bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
+{
+	if(!loadVertexShaderSourceString(vs)) return false;
+
+	if(!loadFragmentShaderSourceString(fs)) return false;
+
+	if(!create())
+	{
+		std::cout << "Unable to create the shaders !" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive)
+{
+	if(!loadVertexShaderSourceString(vs)) return false;
+
+	if(!loadFragmentShaderSourceString(fs)) return false;
+
+//	bool geomShaderLoaded = loadGeometryShaderSourceString(gs);
+	if(!loadGeometryShaderSourceString(gs)) return false;
+
+	if(!create(inputGeometryPrimitive,outputGeometryPrimitive))
+	{
+		std::cout << "Unable to create the shaders !" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+
 bool GLSLShader::validateProgram()
 {
 	if(!m_program_object)
@@ -706,7 +777,101 @@ void GLSLShader::addPathFileSeach(const std::string& path)
 	m_pathes.push_back(path);
 }
 
+void GLSLShader::unbindVBO(VBO* ptr)
+{
+	unsigned int nb = m_va_vbo_binding.size();
+	for (unsigned int i =0; i<nb; ++i)
+	{
+		if (m_va_vbo_binding[i].vbo_ptr == ptr)
+		{
+			if (i != (nb-1))
+				m_va_vbo_binding[i] = m_va_vbo_binding[nb-1];
+			m_va_vbo_binding.pop_back();
+			return;
+		}
+	}
+}
 
+void GLSLShader::bindVA_VBO(const std::string& name, VBO& vbo)
+{
+	vbo.ref(this);
+
+	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
+	//valid ?
+	if (idVA < 0)
+	{
+		std::cerr << "GLSLShader: Attribute "<<name<< " does not exist in shader"<< std::endl;
+		return;
+	}
+	// search if name already exist
+	for (std::vector<VAStr>::iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
+	{
+		if (it->va_id == idVA)
+		{
+			it->vbo_ptr = &vbo;
+			return;
+		}
+	}
+	// new one:
+	VAStr temp;
+	temp.va_id = idVA;
+	temp.vbo_ptr = &vbo;
+	m_va_vbo_binding.push_back(temp);
+}
+
+void GLSLShader::unbindVA(const std::string& name)
+{
+	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
+	//valid ?
+	if (idVA < 0)
+	{
+		std::cerr << "GLSLShader: Attribute "<<name<< " does not exist in shader, not unbinded"<< std::endl;
+		return;
+	}
+	// search if name already exist
+	unsigned int nb = m_va_vbo_binding.size();
+	for (unsigned int i =0; i<nb; ++i)
+	{
+		if (m_va_vbo_binding[i].va_id == idVA)
+		{
+			if (i != (nb-1))
+				m_va_vbo_binding[i] = m_va_vbo_binding[nb-1];
+			m_va_vbo_binding.pop_back();
+			return;
+		}
+	}
+	std::cerr << "GLSLShader: Attribute "<<name<< " not binded"<< std::endl;
+}
+
+void GLSLShader::setCurrentOGLVersion(unsigned int version)
+{
+	CURRENT_OGL_VERSION=version;
+	switch(version)
+	{
+	case 2:
+		DEFINES_GL = &DEFINES_GL2;
+		break;
+	case 3:
+		DEFINES_GL = &DEFINES_GL3;
+		break;
+	}
+}
+
+/**
+ * update projection, modelview, ... matrices
+ */
+void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview)
+{
+	this->bind();
+	glm::mat4 PMV = projection*modelview;
+	this->setuniformf<16>("ModelViewProjectionMatrix", &PMV[0][0]);
+
+	this->setuniformf<16>("ModelViewMatrix", &modelview[0][0]);
+
+	glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
+	this->setuniformf<16>("NormalMatrix", &normalMatrix[0][0]);
+
+}
 
 } // namespace Utils
 } // namespace CGoGN

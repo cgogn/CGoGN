@@ -93,8 +93,8 @@ public:
 	PFP::TVEC3 normal ;
 	PFP::TVEC3 laplacian ;
 
-	Algo::Render::VBO::MapRender_VBO* vbo_render ;
-	Algo::Render::VBO::topo_VBORenderMapD* topo_render ;
+	Algo::Render::GL2::MapRender_VBO* vbo_render ;
+	Algo::Render::GL2::topo_VBORenderMapD* topo_render ;
 	GLuint dl_norm, dl_lapl ;
 
 	MyGlutWin(int* argc, char **argv, int winX, int winY) ;
@@ -314,11 +314,11 @@ void MyGlutWin::init()
 	normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
 	laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
 
-	vbo_render = new Algo::Render::VBO::MapRender_VBO() ;
-	updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
-	updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
+	vbo_render = new Algo::Render::GL2::MapRender_VBO() ;
+	updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
+	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
-	topo_render = new Algo::Render::VBO::topo_VBORenderMapD() ;
+	topo_render = new Algo::Render::GL2::topo_VBORenderMapD() ;
 	topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 }
 
@@ -365,7 +365,7 @@ void MyGlutWin::myRedraw()
 		glDisable(GL_LIGHTING);
 		glLineWidth(1.0f) ;
 		glColor3f(0.0f,0.0f,0.0f);
-		vbo_render->draw(Algo::Render::VBO::LINES) ;
+		vbo_render->draw(Algo::Render::GL2::LINES) ;
 	}
 
 	if(renderPoints)
@@ -373,7 +373,7 @@ void MyGlutWin::myRedraw()
 		glPointSize(2.0f) ;
 		glDisable(GL_LIGHTING);
 		glColor3f(0.3f,0.3f,0.8f);
-		vbo_render->draw(Algo::Render::VBO::POINTS) ;
+		vbo_render->draw(Algo::Render::GL2::POINTS) ;
 	}
 
 	if(renderNormals)
@@ -408,7 +408,7 @@ void MyGlutWin::myRedraw()
 			glShadeModel(GL_FLAT) ;
 			shaders[1].bind() ;
 			glUniform1fARB(glGetUniformLocationARB(shaders[1].program_handler(),"explode"), faceShrinkage) ;
-			vbo_render->draw(Algo::Render::VBO::TRIANGLES) ;
+			vbo_render->draw(Algo::Render::GL2::TRIANGLES) ;
 			shaders[1].unbind() ;
 		}
 		else
@@ -416,7 +416,7 @@ void MyGlutWin::myRedraw()
 			glShadeModel(GL_SMOOTH) ;
 			if(renderStyle == PHONG)
 				shaders[0].bind() ;
-			vbo_render->draw(Algo::Render::VBO::TRIANGLES) ;
+			vbo_render->draw(Algo::Render::GL2::TRIANGLES) ;
 			if(renderStyle == PHONG)
 				shaders[0].unbind() ;
 		}
@@ -443,8 +443,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -467,8 +467,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -498,8 +498,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -522,8 +522,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -546,8 +546,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -572,8 +572,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -610,8 +610,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -635,8 +635,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -698,8 +698,8 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 //				}
 //			}
 
-			updateVBOprimitives(Algo::Render::VBO::TRIANGLES | Algo::Render::VBO::LINES | Algo::Render::VBO::POINTS) ;
-			updateVBOdata(Algo::Render::VBO::POSITIONS | Algo::Render::VBO::NORMALS) ;
+			updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
+			updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
 			topo_render->updateData<PFP>(myMap, position, 0.9f, 0.9f) ;
 
 			glutPostRedisplay() ;
@@ -722,32 +722,32 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 void MyGlutWin::updateVBOprimitives(int upType)
 {
-	if(upType & Algo::Render::VBO::TRIANGLES)
+	if(upType & Algo::Render::GL2::TRIANGLES)
 	{
-		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES) ;
+		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 	}
 
-	if(upType & Algo::Render::VBO::LINES)
+	if(upType & Algo::Render::GL2::LINES)
 	{
-		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES) ;
+		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	}
 
-	if(upType & Algo::Render::VBO::POINTS)
+	if(upType & Algo::Render::GL2::POINTS)
 	{
-		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::POINTS) ;
+		vbo_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	}
 }
 
 void MyGlutWin::updateVBOdata(int upType, bool recompute)
 {
-	if(upType & Algo::Render::VBO::POSITIONS)
-		vbo_render->updateData(Algo::Render::VBO::POSITIONS, position) ;
+	if(upType & Algo::Render::GL2::POSITIONS)
+		vbo_render->updateData(Algo::Render::GL2::POSITIONS, position) ;
 
-	if(upType & Algo::Render::VBO::NORMALS)
+	if(upType & Algo::Render::GL2::NORMALS)
 	{
 		if(recompute)
 			Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-		vbo_render->updateData(Algo::Render::VBO::NORMALS, normal) ;
+		vbo_render->updateData(Algo::Render::GL2::NORMALS, normal) ;
 		if(renderNormals)
 			initDL(MyGlutWin::NORMALS) ;
 	}

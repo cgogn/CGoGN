@@ -24,8 +24,6 @@
 
 #include <iostream>
 
-#include "Utils/glutwin.h"
-
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/mapBrowser.h"
@@ -34,8 +32,10 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/map_glRender.h"
-#include "Algo/Render/vbo_MapRender.h"
+
+#include "tuto2.h"
+
+
 
 
 using namespace CGoGN ;
@@ -51,52 +51,98 @@ PFP::MAP myMap;
 
 SelectorTrue allDarts;
 
-
 PFP::TVEC3 position ;
 PFP::TVEC3 normal ;
 AttributeHandler<Geom::Vec4f> color ;
 
-class myGlutWin: public Utils::SimpleGlutWin
+
+void MyQT::cb_initGL()
 {
-public:
+	// choose to use GL version 2
+	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-     void myRedraw();
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
 
-     float gWidthObj;
-     Geom::Vec3f gPosObj;
+	// create VBO for position
+	m_positionVBO = new Utils::VBO();
 
-     Algo::Render::VBO::MapRender_VBO* m_render;
+	// using simple shader with color
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(*m_positionVBO);
 
- 	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY) {}
-};
+	m_color = Geom::Vec4f(0.,1.,0.,0.);
+	m_shader->setColor(m_color);
 
-void myGlutWin::myRedraw(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
+	m_with_lines=true;
+	m_line_width=4.0;
 
-	// center the object
-	float sc = 50.0f / gWidthObj;
-	glScalef(sc, sc, sc);
-	glTranslatef(-gPosObj[0], -gPosObj[1], -gPosObj[2]);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDisable(GL_LIGHTING);
-
-	// draw the lines
-	glColor3f(1.0f, 1.0f, 0.0f);
-	m_render->draw(Algo::Render::VBO::LINES);
-
-	// draw the faces
-	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(1.0f, 1.0f);
-	glColor3f(0.0f, 0.5f, 0.0f);
-	m_render->draw(Algo::Render::VBO::TRIANGLES);
-	glDisable(GL_POLYGON_OFFSET_FILL);
-
-	glPopMatrix();
 }
 
+void MyQT::cb_updateMatrix()
+{
+	if (m_shader)
+	{
+		m_shader->updateMatrices(m_projection_matrix, m_modelView_matrix);
+	}
+}
+
+
+void MyQT::cb_redraw()
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_LIGHTING);
+	if (m_shader)
+	{
+		if (m_with_lines)
+		{
+			glLineWidth(m_line_width);
+			m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+			m_render->draw(m_shader, Algo::Render::GL2::LINES);
+		}
+
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0f, 1.0f);
+
+		m_shader->setColor(m_color);
+		m_render->draw(m_shader, Algo::Render::GL2::TRIANGLES);
+
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+}
+
+
+void MyQT::lines_slot(bool x)
+{
+	m_with_lines = x;
+	updateGL();
+}
+
+
+
+void MyQT::line_width_slot(int x)
+{
+
+	m_line_width=x;
+	updateGL();
+}
+
+
+
+void MyQT::color_slot()
+{
+	QColor col = QColorDialog::getColor ();
+	if (col.isValid())
+	{
+
+		m_color = Geom::Vec4f(float(col.red())/255.0f,float(col.green())/255.0f,float(col.blue())/255.0f,0.0f);
+		updateGL();
+	}
+	else
+	{
+		std::cout << "Cancel Color"<< std::endl;
+	}
+}
 
 // Algorithme qui parcours une carte et affiche l'attribut position de chaque brin
 //
@@ -196,27 +242,46 @@ int main(int argc, char **argv)
 //	TestDeParcoursAFF<PFP>(myMap,mbsel,position);
 
 
-    // un peu d'interface
-	myGlutWin mgw(&argc,argv,800,800);
+	// interface:
+	QApplication app(argc, argv);
+	MyQT sqt;
 
-    // calcul de la bounding box
+    Utils::QT::uiDockInterface dock;
+    sqt.setDock(&dock);
+
+	sqt.setCallBack( dock.checkLines, SIGNAL(toggled(bool)), SLOT(lines_slot(bool)) );
+	sqt.setCallBack( dock.color_button , SIGNAL(pressed()), SLOT(color_slot()) );
+	sqt.setCallBack( dock.dial_line_width , SIGNAL(valueChanged(int)), SLOT(line_width_slot(int)) );
+
+
+	// message d'aide
+	sqt.setHelpMsg("Second Tuto");
+
+	dock.number_of_darts->display(int(myMap.getNbDarts()));
+
+    //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    // pour l'affichage
-    mgw.gWidthObj = std::max<float>(std::max<float>(bb.size(0),bb.size(1)),bb.size(2));
-    mgw.gPosObj =  (bb.min() +  bb.max()) /2.0f;
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-    // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
+    // envoit info BB a l'interface
+	sqt.setParamObject(lWidthObj,lPosObj.data());
 
-    // maj des donnees de position
-    mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
-    // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::TRIANGLES);
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+	// show 1 pour GL context
+	sqt.show();
 
-    mgw.mainLoop();
+	// update du VBO position (context GL necessaire)
+	sqt.m_positionVBO->updateData(position);
 
-    delete mgw.m_render;
+	// update des primitives du renderer
+	SelectorTrue allDarts;
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
-    return 0;
+	// show final pour premier redraw
+	sqt.show();
+
+	// et on attend la fin.
+	return app.exec();
+
 }

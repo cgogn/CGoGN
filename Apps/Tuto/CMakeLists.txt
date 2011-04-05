@@ -10,8 +10,16 @@ SET(CMAKE_BUILD_TYPE Release)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
+# FOR Qt4
+FIND_PACKAGE(Qt4 REQUIRED)
+SET(QT_USE_QTOPENGL TRUE)
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
 # define includes path
 include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
 	/usr/include/libxml2/
 	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
 	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
@@ -25,13 +33,17 @@ link_directories(${CGoGN_ROOT_DIR}/lib/Release)
 
 #define exec to compile
 
-add_executable( tuto1 tuto1.cpp)
+QT4_WRAP_CPP(tuto1_moc tuto1.h)
+add_executable( tuto1 tuto1.cpp ${tuto1_moc})
 target_link_libraries( tuto1
-	container topology utils algo  ${COMMON_LIBS} )
+	container topology utils algo  ${COMMON_LIBS} ${QT_LIBRARIES})
 
-add_executable( tuto2 tuto2.cpp)
+QT4_WRAP_UI( tuto2_ui tuto2.ui )
+QT4_WRAP_CPP(tuto2_moc tuto2.h)
+
+add_executable( tuto2 tuto2.cpp tuto2.h ${tuto2_ui}  ${tuto2_moc})
 target_link_libraries( tuto2
-	container topology utils algo  ${COMMON_LIBS} )
+	container topology utils algo  ${COMMON_LIBS} ${QT_LIBRARIES} )
 
 add_executable( tuto3 tuto3.cpp)
 target_link_libraries( tuto3

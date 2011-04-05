@@ -30,7 +30,7 @@ namespace Utils
 namespace SceneGraph
 {
 
-
+Material_Node* Node::m_current_material = NULL;
 
 
 // NODE METHODS
@@ -160,16 +160,16 @@ void Group_Node::render()
 
 
 VBO_Node::VBO_Node()
-: Node("SceneGraph::VBO_Node"), m_vbo(NULL), m_primitives(0)
+: Node("SceneGraph::GL2_Node"), m_vbo(NULL), m_primitives(0)
 {}
 
 
-VBO_Node::VBO_Node(Algo::Render::VBO::MapRender_VBO* vbo)
+VBO_Node::VBO_Node(Algo::Render::GL2::MapRender* vbo)
 : m_vbo(vbo), m_primitives(0)
 {}
 
 
-void VBO_Node::setVBO(Algo::Render::VBO::MapRender_VBO* vbo)
+void VBO_Node::setVBO(Algo::Render::GL2::MapRender* vbo)
 {
 	m_vbo = vbo;
 }
@@ -191,28 +191,28 @@ void VBO_Node::render()
 {
 	if (m_vbo != NULL)
 	{
-		if (m_primitives & Algo::Render::VBO::TRIANGLES)
+		if (m_primitives & Algo::Render::GL2::TRIANGLES)
 		{
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0f, 1.0f);
 			glEnable(GL_LIGHTING);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) ;
 			glShadeModel(GL_SMOOTH);
-			m_vbo->draw(Algo::Render::VBO::TRIANGLES);
+			m_vbo->draw(m_current_material->getShader(), Algo::Render::GL2::TRIANGLES);
 		}
 
-		if (m_primitives & Algo::Render::VBO::LINES)
+		if (m_primitives & Algo::Render::GL2::LINES)
 		{
 			GLint prg;
 			glGetIntegerv(GL_CURRENT_PROGRAM,&prg);
 			glUseProgram(0);
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			glDisable(GL_LIGHTING);
-			m_vbo->draw(Algo::Render::VBO::LINES);
+			m_vbo->draw(m_current_material->getShader(), Algo::Render::GL2::LINES);
 			glUseProgram(prg);
 		}
 
-		if (m_primitives & Algo::Render::VBO::POINTS)
+		if (m_primitives & Algo::Render::GL2::POINTS)
 		{
 			GLint prg;
 			glGetIntegerv(GL_CURRENT_PROGRAM,&prg);
@@ -220,16 +220,16 @@ void VBO_Node::render()
 			glDisable(GL_POLYGON_OFFSET_FILL);
 			glDisable(GL_LIGHTING);
 			glPointSize(3.0f);
-			m_vbo->draw(Algo::Render::VBO::POINTS);
+			m_vbo->draw(m_current_material->getShader(), Algo::Render::GL2::POINTS);
 			glUseProgram(prg);
 		}
-		if (m_primitives & Algo::Render::VBO::FLAT_TRIANGLES)
-		{
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonOffset(1.0f, 1.0f);
-			glEnable(GL_LIGHTING);
-			m_vbo->draw(Algo::Render::VBO::FLAT_TRIANGLES);
-		}
+//		if (m_primitives & Algo::Render::GL2::FLAT_TRIANGLES)
+//		{
+//			glEnable(GL_POLYGON_OFFSET_FILL);
+//			glPolygonOffset(1.0f, 1.0f);
+//			glEnable(GL_LIGHTING);
+//			m_vbo->draw(Algo::Render::GL2::FLAT_TRIANGLES);
+//		}
 	}
 }
 
@@ -294,6 +294,30 @@ void Material_Node::setNoShader()
 
 void Material_Node::render()
 {
+	Node::m_current_material = this;
+//	if (m_has_diffuse)
+//		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,m_diffuse.data());
+//	if (m_has_specular)
+//		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,m_specular.data());
+//	if (m_has_ambient)
+//		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,m_ambient.data());
+//	if (m_has_shininess)
+//		glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,&m_shininess);
+//	if (m_has_color)
+//		glColor3fv(m_color.data());
+//
+//	if (m_shader!=NULL)
+//		m_shader->bind();
+//	else
+//		if (m_disable_shader)
+//			glUseProgramObjectARB(0);
+}
+
+
+void Material_Node::apply()
+{
+
+	// A MODIFIER: PASSER VARIABLES AU SHADER ?
 	if (m_has_diffuse)
 		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,m_diffuse.data());
 	if (m_has_specular)
@@ -305,13 +329,7 @@ void Material_Node::render()
 	if (m_has_color)
 		glColor3fv(m_color.data());
 
-	if (m_shader!=NULL)
-		m_shader->bind();
-	else
-		if (m_disable_shader)
-			glUseProgramObjectARB(0);
 }
-
 
 
 

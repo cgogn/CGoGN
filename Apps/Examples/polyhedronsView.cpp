@@ -93,7 +93,7 @@ public:
 	/**
 	 * render object
 	 */
-	Algo::Render::VBO::MapRender_VBO* m_render;
+	Algo::Render::GL2::MapRender_VBO* m_render;
 
 
 
@@ -132,14 +132,14 @@ void myGlutWin::updateRender()
 
 	// create the renderer (first call only)
 	if (m_render == NULL)
-		m_render = new Algo::Render::VBO::MapRender_VBO() ;
+		m_render = new Algo::Render::GL2::MapRender_VBO() ;
 
 	// update buffer op vertices positions
-	m_render->updateData(Algo::Render::VBO::POSITIONS, position);
+	m_render->updateData(Algo::Render::GL2::POSITIONS, position);
 	// update flat faces primtives (warning need position buffer)
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::FLAT_TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::FLAT_TRIANGLES);
 	// update lines primitives
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::VBO::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
 }
 
@@ -157,7 +157,7 @@ void myGlutWin::myRedraw(void)
 	// DRAW LINES OF OBJECTS
 	glDisable(GL_LIGHTING);
 	glColor3f(1.0f,1.0f,0.0f);
-	m_render->draw(Algo::Render::VBO::LINES) ;
+	m_render->draw(Algo::Render::GL2::LINES) ;
 
 	//shit for nice line rendering
 	glEnable( GL_POLYGON_OFFSET_FILL );
@@ -168,7 +168,7 @@ void myGlutWin::myRedraw(void)
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
 	glColor3f(0.0f,0.0f,0.9f);
-	m_render->draw(Algo::Render::VBO::FLAT_TRIANGLES) ;
+	m_render->draw(Algo::Render::GL2::FLAT_TRIANGLES) ;
 
 	glDisable( GL_POLYGON_OFFSET_FILL );
 

@@ -40,7 +40,7 @@ namespace Algo
 namespace Render
 {
 
-namespace VBO
+namespace GL2
 {
 
 //template<>
@@ -458,7 +458,7 @@ namespace VBO
 
 
 template<typename PFP>
-void topo3_VBORenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
+void topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -678,7 +678,7 @@ void topo3_VBORenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect
 //
 //
 //template<typename PFP>
-//void topo3_VBORenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
+//void topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
 //{
 //	typedef typename PFP::VEC3 VEC3;
 //	typedef typename PFP::REAL REAL;
@@ -892,7 +892,7 @@ void topo3_VBORenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect
 
 
 template<typename PFP>
-void topo3_VBORender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
+void topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
 
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
