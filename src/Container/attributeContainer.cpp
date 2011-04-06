@@ -51,56 +51,6 @@ AttributeContainer::~AttributeContainer()
 }
 
 /**************************************
- *          BASIC FEATURES            *
- **************************************/
-
-bool AttributeContainer::removeAttribute(const std::string& attribName)
-{
-	unsigned int index = getAttributeIndex(attribName) ;
-
-	if (index == UNKNOWN)
-	{
-		std::cerr << "removeAttribute by name: attribute not found" << std::endl ;
-		return false ;
-	}
-
-	// delete the attribute
-	delete m_tableAttribs[index] ;
-	m_tableAttribs[index] = NULL ;
-
-	if (index == m_tableAttribs.size() - 1)
-		m_tableAttribs.pop_back() ;
-	else
-		m_freeIndices.push_back(index) ;
-
-	--m_nbAttributes ;
-
-	return true ;
-}
-
-bool AttributeContainer::removeAttribute(unsigned int index)
-{
-	if(m_tableAttribs[index] == NULL)
-	{
-		std::cerr << "removeAttribute by index: attribute not found" << std::endl ;
-		return false ;
-	}
-
-	// delete the attribute
-	delete m_tableAttribs[index] ;
-	m_tableAttribs[index] = NULL ;
-
-	if(index == m_tableAttribs.size() - 1)
-		m_tableAttribs.pop_back() ;
-	else
-		m_freeIndices.push_back(index) ;
-
-	--m_nbAttributes ;
-
-	return true ;
-}
-
-/**************************************
  *       INFO ABOUT ATTRIBUTES        *
  **************************************/
 

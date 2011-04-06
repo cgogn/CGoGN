@@ -139,6 +139,57 @@ void AttributeContainer::addAttribute(const std::string& attribName, const std::
 	m_nbAttributes++;
 }
 
+template <typename T>
+bool AttributeContainer::removeAttribute(const std::string& attribName)
+{
+	unsigned int index = getAttributeIndex(attribName) ;
+
+	if (index == UNKNOWN)
+	{
+		std::cerr << "removeAttribute by name: attribute not found" << std::endl ;
+		return false ;
+	}
+
+	// delete the attribute
+	delete m_tableAttribs[index] ;
+	m_tableAttribs[index] = NULL ;
+
+	if (index == m_tableAttribs.size() - 1)
+		m_tableAttribs.pop_back() ;
+	else
+		m_freeIndices.push_back(index) ;
+
+	--m_nbAttributes ;
+	m_lineCost -= sizeof(T);
+
+	return true ;
+}
+
+template <typename T>
+bool AttributeContainer::removeAttribute(unsigned int index)
+{
+	if(m_tableAttribs[index] == NULL)
+	{
+		std::cerr << "removeAttribute by index: attribute not found" << std::endl ;
+		return false ;
+	}
+
+	// delete the attribute
+	delete m_tableAttribs[index] ;
+	m_tableAttribs[index] = NULL ;
+
+	if(index == m_tableAttribs.size() - 1)
+		m_tableAttribs.pop_back() ;
+	else
+		m_freeIndices.push_back(index) ;
+
+	--m_nbAttributes ;
+	m_lineCost -= sizeof(T);
+
+	return true ;
+}
+
+
 /**************************************
  *      INFO ABOUT THE CONTAINER      *
  **************************************/
@@ -160,7 +211,12 @@ inline unsigned int AttributeContainer::capacity() const
 
 inline unsigned int AttributeContainer::memoryTotalSize() const
 {
-	return _BLOCKSIZE_ * (m_holesBlocks.size() * m_lineCost + 8);
+	return capacity() * (m_lineCost + 8);
+}
+
+inline unsigned int AttributeContainer::memorySize() const
+{
+	return size() * (m_lineCost + 8);
 }
 
 inline bool AttributeContainer::used(unsigned int index) const

@@ -194,7 +194,7 @@ void GenericMap::removeThreadMarker(unsigned int nb)
 				std::stringstream ss ;
 				ss << "Mark_"<< th ;
 				AttributeContainer& cellCont = m_attribs[i] ;
-				cellCont.removeAttribute(ss.str()) ;
+				cellCont.removeAttribute<Mark>(ss.str()) ;
 				m_markerTables[i][th] = NULL ;
 			}
 		}

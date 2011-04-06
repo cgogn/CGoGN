@@ -75,6 +75,7 @@ class ParticleCell2D : public ParticleBase
 	{
 		changeCell = false ;
 		if(!Geom::arePointsEquals(newCurrent, m_position)) {
+//			std::cout << "-- " << m_position << "--" << newCurrent << std::endl;
 			prevPos = m_position;
 
 			switch(state) {

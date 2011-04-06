@@ -38,7 +38,7 @@ template <typename T>
 inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
 {
 	assert(attr.isValid() || !"Invalid attribute handler") ;
-	return m_attribs[attr.getOrbit()].removeAttribute(attr.getIndex()) ;
+	return m_attribs[attr.getOrbit()].removeAttribute<T>(attr.getIndex()) ;
 }
 
 template <typename T>
