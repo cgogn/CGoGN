@@ -27,13 +27,17 @@
 
 #include <iostream>
 
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/shaderSimpleColor.h"
 
 #include "Utils/qtSimple.h"
-
 #include "ui_tuto2.h"
 #include "Utils/qtui.h"
+
+#include "Geometry/vector_gen.h"
+
+// forward definitions (minimize includes)
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Utils { class VBO; } }
+namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 
 using namespace CGoGN ;
 
@@ -65,8 +69,6 @@ public:
 
 	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL) {}
 
-	// callbacks of simpleQT to overdefine:
-	void cb_updateMatrix();
 
 	void cb_redraw();
 

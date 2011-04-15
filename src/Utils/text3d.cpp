@@ -24,56 +24,115 @@
 
 #include "Utils/text3d.h"
 
+#include "Utils/vbo.h"
+
 namespace CGoGN
 {
 namespace Utils
 {
 
-Strings3D::Strings3D():
+std::string Strings3D::vertexShaderText =
+"ATTRIBUTE vec4 VertexPosition;\n"
+"uniform mat4 ModelViewMatrix;\n"
+"uniform mat4 ProjectionMatrix;\n"
+"uniform vec3 strPos;\n"
+"uniform float scale;\n"
+"VARYING_VERT vec2 tex_coord;\n"
+"INVARIANT_POS;\n"
+"void main ()\n"
+"{\n"
+"	vec4 pos = ModelViewMatrix * vec4(strPos,1.0) + vec4(VertexPosition[0]*scale,VertexPosition[1]*scale,0.0,0.0);\n"
+"	tex_coord = vec2(VertexPosition[2],VertexPosition[3]);\n"
+"	gl_Position = ProjectionMatrix * pos;\n"
+"}";
+
+std::string Strings3D::fragmentShaderText1 =
+"VARYING_FRAG vec2 tex_coord;\n"
+"uniform sampler2D FontTexture;\n"
+"uniform vec3 color;\n"
+"FRAG_OUT_DEF;\n"
+"void main (void)\n"
+"{\n"
+"	float lum = texture2D(FontTexture, tex_coord).s;\n";
+
+std::string Strings3D::fragmentShaderText2 =
+"	gl_FragColor = vec4(color,0.0)*lum;\n"
+"}";
+
+GLuint Strings3D::m_idTexture = 0xffffffff;
+ILuint Strings3D::m_imgName;
+
+Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc):
 	m_nbChars(0)
-{ }
-
-void Strings3D::init(float scale)
 {
-	glGenBuffersARB(1, &m_vbo1);
-	m_shader.loadShaders("text.vert", "text.frag");
-	m_shader.bind();
-	m_uniform_position = glGetUniformLocationARB(m_shader.program_handler(),"strPos");
-	m_uniform_color = glGetUniformLocationARB(m_shader.program_handler(),"color");
-	m_uniform_scale = glGetUniformLocationARB(m_shader.program_handler(),"scale");
-	glUniform1f(m_uniform_scale, scale);
-	m_shader.unbind();
+	if (m_idTexture == 0xffffffff)
+	{
+		std::string font_finename = Utils::GLSLShader::findFile("font_cgogn.png");
+		ilInit();
+		ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
+		ilEnable(IL_ORIGIN_SET);
 
-	// load texture
-	std::string font_finename = Utils::GLSLShader::findFile("font_cgogn.png");
-	ilInit();
-	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
-	ilEnable(IL_ORIGIN_SET);
+		ilGenImages(1,&m_imgName);
+		ilBindImage(m_imgName);
+		ilLoadImage(font_finename.c_str());
 
-	ilGenImages(1,&m_imgName);
-	ilBindImage(m_imgName);
-	ilLoadImage(font_finename.c_str());
+		glGenTextures( 1, &m_idTexture);
+		glBindTexture(GL_TEXTURE_2D, m_idTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(ilGetData()));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
 
-	glGenTextures( 1, &m_idTexture);
-	glBindTexture(GL_TEXTURE_2D, m_idTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(ilGetData()));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	m_uniform_texture = glGetUniformLocationARB(m_shader.program_handler(),"FontTexture");
+
+
+	std::string glxvert(*GLSLShader::DEFINES_GL);
+	glxvert.append(vertexShaderText);
+	std::string glxfrag(*GLSLShader::DEFINES_GL);
+
+	glxfrag.append(fragmentShaderText1);
+
+	std::string background;
+	if (!withBackground)
+		glxfrag.append("if (lum==0.0) discard;\n");
+	else if (bgc*bgc > 0.0)
+	{
+		std::stringstream ss;
+		ss << "	if (lum==0.0) gl_FragColor=vec4(";
+		ss << bgc[0]<<","<<bgc[1]<<","<<bgc[2]<<",0.0);\n		else\n";
+		background.append(ss.str());
+	}
+	glxfrag.append(background);
+	glxfrag.append(fragmentShaderText2);
+
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+
+	m_vbo1 = new Utils::VBO();
+	m_vbo1->setDataSize(4);
+	m_vbo1->ref(this);
+
+	bindVA_VBO("VertexPosition", m_vbo1);
+
+	bind();
+	m_uniform_position = glGetUniformLocation(program_handler(),"strPos");
+	m_uniform_color = glGetUniformLocation(program_handler(),"color");
+	m_uniform_scale = glGetUniformLocation(program_handler(),"scale");
+	m_uniform_texture = glGetUniformLocation(program_handler(),"FontTexture");
+	glUniform1f(m_uniform_scale, 1.0f);
+	unbind();
 }
-
 
 void Strings3D::setScale(float scale)
 {
-	m_shader.bind();
+	bind();
 	glUniform1f(m_uniform_scale, scale);
-	m_shader.unbind();
+	unbind();
 }
 
 Strings3D::~Strings3D()
 {
 	ilDeleteImages(1,&m_imgName);
-	glDeleteBuffers(1, &m_vbo1);
+
+	delete m_vbo1;
 }
 
 unsigned int Strings3D::addString(const std::string& str)
@@ -144,9 +203,9 @@ void Strings3D::sendToVBO()
 	// send coord / texcoord of strings
 
 	// alloc buffer
-	glBindBufferARB(GL_ARRAY_BUFFER, m_vbo1);
-	glBufferDataARB(GL_ARRAY_BUFFER, m_nbChars*16*sizeof(float), 0, GL_STREAM_DRAW);
-	float* buffer =  reinterpret_cast<float*>(glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	m_vbo1->bind();
+	glBufferData(GL_ARRAY_BUFFER, m_nbChars*16*sizeof(float), 0, GL_STREAM_DRAW);
+	float* buffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 
 	// fill buffer
 	unsigned int pos=0; // pos of first index in vbo for current string
@@ -158,17 +217,16 @@ void Strings3D::sendToVBO()
 		pos += nb;
 	}
 
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 
 
 void Strings3D::predraw(const Geom::Vec3f& color)
 {
-	m_shader.bind();
-	glUniform1iARB(m_uniform_texture,0);
-
-	glUniform3fvARB(m_uniform_color,1,color.data());
+	bind();
+	glUniform1i(m_uniform_texture,0);
+	glUniform3fv(m_uniform_color,1,color.data());
 
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, m_idTexture);
@@ -176,17 +234,13 @@ void Strings3D::predraw(const Geom::Vec3f& color)
 
 	glDisable(GL_LIGHTING);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_vbo1);
-	glVertexPointer(4, GL_FLOAT, 0, 0);
-	glEnableClientState(GL_VERTEX_ARRAY);
+	enableVertexAttribs();
 }
 
 void Strings3D::postdraw()
 {
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_LIGHTING);
-	m_shader.unbind();
+	disableVertexAttribs();
+	unbind();
 }
 
 
@@ -205,6 +259,7 @@ void Strings3D::drawAll(const Geom::Vec3f& color)
 		std::cerr << "Strings3D: for drawAll use exclusively addString with position"<< std::endl;
 		return;
 	}
+
 
 	unsigned int nb = m_strpos.size();
 	for (unsigned int idSt=0; idSt<nb; ++idSt)

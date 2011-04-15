@@ -22,77 +22,39 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
-#include "Utils/shaderSimpleColor.h"
+#ifndef __CGOGN_SHADER_CPV_
+#define __CGOGN_SHADER_CPV_
+
+#include "Utils/GLSLShader.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
 namespace Utils
 {
 
-std::string ShaderSimpleColor::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"}";
-
-
-std::string ShaderSimpleColor::fragmentShaderText =
-		"PRECISON;\n"
-		"uniform vec4 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=color;\n"
-		"}";
-
-
-ShaderSimpleColor::ShaderSimpleColor()
+class ShaderColorPerVertex : public GLSLShader
 {
-	// get choose GL defines (2 or 3)
-	// ans compile shaders
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+protected:
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string fragmentShaderText;
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+    VBO* m_vboPos;
+    VBO* m_vboCol;
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+    void restoreUniformsAttribs();
 
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
+public:
 
-	//Default values
-	Geom::Vec4f color(0.1f,0.9f,0.1f,0.0f);
-	setColor(color);
+    ShaderColorPerVertex();
 
-}
+	unsigned int setAttributePosition(VBO* vbo);
 
-void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
-{
-	m_color = color;
-	bind();
-	glUniform4fv(m_unif_color,1, color.data());
-}
+	unsigned int setAttributeColor(VBO* vbo);
 
-
-unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
-}
-
-void ShaderSimpleColor::restoreUniformsAttribs()
-{
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
-	bind();
-	glUniform4fv(m_unif_color,1, m_color.data());
-	bindVA_VBO("VertexPosition", m_vboPos);
-}
-
+};
 
 }
 }
-
+#endif

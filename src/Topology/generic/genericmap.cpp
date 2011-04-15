@@ -83,8 +83,11 @@ GenericMap::~GenericMap()
 		if(isOrbitEmbedded(i))
 			m_attribs[i].clear(true) ;
 	}
-	if(m_attributes_registry_map)
+	if (m_attributes_registry_map)
+	{
 		delete m_attributes_registry_map;
+		m_attributes_registry_map = NULL;
+	}
 }
 
 /****************************************

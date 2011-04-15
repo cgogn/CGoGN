@@ -21,78 +21,55 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#ifndef _TUTO4_H_
+#define _TUTO4_H_
 
-#include <GL/glew.h>
-#include "Utils/shaderSimpleColor.h"
+#include "Utils/qtSimple.h"
 
-namespace CGoGN
+#include "ui_tuto4.h"
+// inclure qtui.h juste après le ui_xxx.h
+#include "Utils/qtui.h"
+
+// forward definitions (minimize includes) syntax a little bit tricky !!
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; class TopoRenderMapD; }}}}
+namespace CGoGN { namespace Utils { class VBO; } }
+namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
+namespace CGoGN { namespace Utils { class ShaderFlat; } }
+
+using namespace CGoGN ;
+/**
+ * A class for a little interface and rendering
+ */
+
+class MyQT: public Utils::QT::SimpleQT
 {
-namespace Utils
-{
+	Q_OBJECT
+public:
+	// render
+	Algo::Render::GL2::MapRender* m_render;
+	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
 
-std::string ShaderSimpleColor::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"}";
+	// VBO
+	Utils::VBO* m_positionVBO;
 
+	// shader basic
+	Utils::ShaderSimpleColor* m_shader;
+	Utils::ShaderFlat* m_shader2;
 
-std::string ShaderSimpleColor::fragmentShaderText =
-		"PRECISON;\n"
-		"uniform vec4 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=color;\n"
-		"}";
+	bool render_obj;
+	bool render_topo;
 
+	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL), render_obj(true), render_topo(false) {}
 
-ShaderSimpleColor::ShaderSimpleColor()
-{
-	// get choose GL defines (2 or 3)
-	// ans compile shaders
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+	void cb_redraw();
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+	void cb_initGL();
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+	void cb_keyPress(int code);
 
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
+public slots:
+	void button_compile();
+	void slider_explode(int x);
+};
 
-	//Default values
-	Geom::Vec4f color(0.1f,0.9f,0.1f,0.0f);
-	setColor(color);
-
-}
-
-void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
-{
-	m_color = color;
-	bind();
-	glUniform4fv(m_unif_color,1, color.data());
-}
-
-
-unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
-}
-
-void ShaderSimpleColor::restoreUniformsAttribs()
-{
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
-	bind();
-	glUniform4fv(m_unif_color,1, m_color.data());
-	bindVA_VBO("VertexPosition", m_vboPos);
-}
-
-
-}
-}
-
+#endif

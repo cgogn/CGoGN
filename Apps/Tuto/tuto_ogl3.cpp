@@ -25,10 +25,7 @@
 #include <iostream>
 
 #include "tuto_ogl3.h"
-#include <QWidget>
-#include <QtGui>
 
-#include "Utils/shaderPhong.h"
 using namespace CGoGN ;
 
 
@@ -78,20 +75,15 @@ void MyQT::cb_initGL()
 
 	shader1 = new Utils::ShaderPhong();
 
-	shader1->setAttributePosition(*positionVBO);
-	shader1->setAttributeNormal(*normalVBO);
+	shader1->setAttributePosition(positionVBO);
+	shader1->setAttributeNormal(normalVBO);
+	registerRunning(shader1);
 
 	currentShader = shader1;
+
 }
 
-void MyQT::cb_updateMatrix()
-{
-	if (currentShader)
-	{
-		currentShader->bind();
-		currentShader->updateMatrices(m_projection_matrix, m_modelView_matrix);
-	}
-}
+
 
 
 void MyQT::cb_redraw()

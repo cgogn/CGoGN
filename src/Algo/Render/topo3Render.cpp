@@ -24,6 +24,8 @@
 
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Topology/generic/dart.h"
+#include "Utils/shaderSimpleColor.h"
+#include "Utils/shaderColorPerVertex.h"
 
 #include <string.h>
 
@@ -40,16 +42,51 @@ namespace GL2
 {
 
 
-topo3Render::topo3Render():
+Topo3Render::Topo3Render():
 m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
 {
-	glGenBuffersARB(5, m_VBOBuffers);
+	m_vbo0 = new Utils::VBO();
+	m_vbo1 = new Utils::VBO();
+	m_vbo2 = new Utils::VBO();
+	m_vbo3 = new Utils::VBO();
+	m_vbo4 = new Utils::VBO();
+
+	m_vbo0->setDataSize(3);
+	m_vbo1->setDataSize(3);
+	m_vbo2->setDataSize(3);
+	m_vbo3->setDataSize(3);
+	m_vbo4->setDataSize(3);
+
+	m_shader1 = new Utils::ShaderSimpleColor();
+	m_shader2 = new Utils::ShaderColorPerVertex();
+
+
+	// binding VBO - VA
+	m_vaId = m_shader1->setAttributePosition(m_vbo1);
+
+	m_shader2->setAttributePosition(m_vbo0);
+	m_shader2->setAttributeColor(m_vbo4);
+
+	// registering for auto matrices update
+	Utils::GLSLShader::registerRunning(m_shader1);
+	Utils::GLSLShader::registerRunning(m_shader2);
+
 }
 
 
-topo3Render::~topo3Render()
+Topo3Render::~Topo3Render()
 {
-	glDeleteBuffersARB(5, m_VBOBuffers);
+	Utils::GLSLShader::unregisterRunning(m_shader2);
+	Utils::GLSLShader::unregisterRunning(m_shader1);
+
+	delete m_shader2;
+	delete m_shader1;
+	delete m_vbo4;
+	delete m_vbo3;
+	delete m_vbo2;
+	delete m_vbo1;
+	delete m_vbo0;
+
 	if (m_attIndex.map() != NULL)
 		static_cast<AttribMap*>(m_attIndex.map())->removeAttribute(m_attIndex);
 
@@ -60,29 +97,29 @@ topo3Render::~topo3Render()
 }
 
 
-void topo3Render::setDartWidth(float dw)
+void Topo3Render::setDartWidth(float dw)
 {
 	m_topo_dart_width = dw;
 }
 
 
-void topo3Render::setRelationWidth(float pw)
+void Topo3Render::setRelationWidth(float pw)
 {
 	m_topo_relation_width = pw;
 }
 
-void topo3Render::setDartColor(Dart d, float r, float g, float b)
+void Topo3Render::setDartColor(Dart d, float r, float g, float b)
 {
 	float RGB[6];
 	RGB[0]=r; RGB[1]=g; RGB[2]=b;
 	RGB[3]=r; RGB[4]=g; RGB[5]=b;
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+	m_vbo4->bind();
 	glBufferSubData(GL_ARRAY_BUFFER, m_attIndex[d]*3*sizeof(float), 6*sizeof(float),RGB);
 }
 
-void topo3Render::setAllDartsColor(float r, float g, float b)
+void Topo3Render::setAllDartsColor(float r, float g, float b)
 {
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+	m_vbo4->bind();
 	GLvoid* ColorDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	float* colorDartBuf = reinterpret_cast<float*>(ColorDartsBuffer);
 	for (unsigned int i=0; i < 2*m_nbDarts; ++i)
@@ -92,97 +129,118 @@ void topo3Render::setAllDartsColor(float r, float g, float b)
 		*colorDartBuf++ = b;
 	}
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[4]);
+	m_vbo4->bind();
 	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
 }
 
-void topo3Render::drawDarts()
+void Topo3Render::drawDarts()
 {
-//	glColor3f(1.0f,1.0f,1.0f);
+	m_shader2->enableVertexAttribs();
+
 	glLineWidth(m_topo_dart_width);
+	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
+
+	// change the stride to take 1/2 vertices
+	m_shader2->enableVertexAttribs(6*sizeof(GL_FLOAT));
+
 	glPointSize(2.0f*m_topo_dart_width);
+ 	glDrawArrays(GL_POINTS, 0, m_nbDarts);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
-	glColorPointer(3, GL_FLOAT, 0, 0);
-	glEnableClientState(GL_COLOR_ARRAY);
+ 	m_shader2->disableVertexAttribs();
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-
- 	glVertexPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
-
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
- 	glColorPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
- 	glDrawArrays(GL_POINTS, 0, m_nbDarts)
- 	;
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
+//
+////	glColor3f(1.0f,1.0f,1.0f);
+//	glLineWidth(m_topo_dart_width);
+//	glPointSize(2.0f*m_topo_dart_width);
+//
+//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+//	glColorPointer(3, GL_FLOAT, 0, 0);
+//	glEnableClientState(GL_COLOR_ARRAY);
+//
+//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
+//	glVertexPointer(3, GL_FLOAT, 0, 0);
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
+//
+// 	glVertexPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
+//
+//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+// 	glColorPointer(3, GL_FLOAT, 6*sizeof(GL_FLOAT), 0);
+// 	glDrawArrays(GL_POINTS, 0, m_nbDarts)
+// 	;
+//	glDisableClientState(GL_COLOR_ARRAY);
+//	glDisableClientState(GL_VERTEX_ARRAY);
 
 }
 
-void topo3Render::overdrawDart(Dart d, float width, float r, float g, float b)
-{
-	unsigned int indexDart =  m_attIndex[d];
-
-	glColor3f(r,g,b);
-	glLineWidth(width);
-	glPointSize(2.0f*width);
-
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
-
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glDrawArrays(GL_LINES, indexDart, 2);
-
- 	glVertexPointer(3, GL_FLOAT, 0, 0);
- 	glDrawArrays(GL_POINTS, indexDart, 1);
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-}
 
 
-void topo3Render::drawRelation1()
+void Topo3Render::drawRelation1()
 {
 	glLineWidth(m_topo_relation_width);
-	glColor3f(0.0f,1.0f,1.0f);
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glVertexPointer(3, GL_FLOAT, 0, 0);
 
-	glEnableClientState(GL_VERTEX_ARRAY);
+	m_shader1->changeVA_VBO(m_vaId, m_vbo1);
+	m_shader1->setColor(Geom::Vec4f(0.0f,1.0f,1.0f,0.0f));
+	m_shader1->enableVertexAttribs();
+
 	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
-	glDisableClientState(GL_VERTEX_ARRAY);
+
+	m_shader1->disableVertexAttribs();
+
+//	glLineWidth(m_topo_relation_width);
+//	glColor3f(0.0f,1.0f,1.0f);
+//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
+//	glVertexPointer(3, GL_FLOAT, 0, 0);
+//
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
+//	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
-void topo3Render::drawRelation2()
+void Topo3Render::drawRelation2()
 {
-	glLineWidth(m_topo_relation_width);
-	glColor3f(1.0f,0.0f,0.0f);
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[2]);
-	glVertexPointer(3, GL_FLOAT, 0, 0);
+	m_shader1->changeVA_VBO(m_vaId, m_vbo2);
+	m_shader1->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
+	m_shader1->enableVertexAttribs();
 
-	glEnableClientState(GL_VERTEX_ARRAY);
 	glDrawArrays(GL_QUADS, 0, m_nbRel2*4);
-	glDisableClientState(GL_VERTEX_ARRAY);
+
+	m_shader1->disableVertexAttribs();
+
+//	glLineWidth(m_topo_relation_width);
+//	glColor3f(1.0f,0.0f,0.0f);
+//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[2]);
+//	glVertexPointer(3, GL_FLOAT, 0, 0);
+//
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	glDrawArrays(GL_QUADS, 0, m_nbRel2*4);
+//	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
-void topo3Render::drawRelation3()
+void Topo3Render::drawRelation3()
 {
-	glLineWidth(m_topo_relation_width);
-	glColor3f(1.0f,1.0f,0.0f);
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
-	glVertexPointer(3, GL_FLOAT, 0, 0);
+	m_shader1->changeVA_VBO(m_vaId, m_vbo3);
+	m_shader1->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+	m_shader1->enableVertexAttribs();
 
-	glEnableClientState(GL_VERTEX_ARRAY);
 	glDrawArrays(GL_QUADS, 0, m_nbRel3*4);
-	glDisableClientState(GL_VERTEX_ARRAY);
+
+	m_shader1->disableVertexAttribs();
+
+//	glLineWidth(m_topo_relation_width);
+//	glColor3f(1.0f,1.0f,0.0f);
+//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
+//	glVertexPointer(3, GL_FLOAT, 0, 0);
+//
+//	glEnableClientState(GL_VERTEX_ARRAY);
+//	glDrawArrays(GL_QUADS, 0, m_nbRel3*4);
+//	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
-void topo3Render::drawTopo()
+void Topo3Render::drawTopo()
 {
 	drawDarts();
 	drawRelation1();
@@ -190,10 +248,31 @@ void topo3Render::drawTopo()
 	drawRelation3();
 }
 
-void topo3Render::pushColors()
+
+void Topo3Render::overdrawDart(Dart d, float width, float r, float g, float b)
+{
+	unsigned int indexDart =  m_attIndex[d];
+
+	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
+	m_shader1->setColor(Geom::Vec4f(r,g,b,0.0f));
+	m_shader1->enableVertexAttribs();
+
+	glLineWidth(width);
+	glDrawArrays(GL_LINES, indexDart, 2);
+
+	glPointSize(2.0f*width);
+ 	glDrawArrays(GL_POINTS, indexDart, 1);
+
+ 	m_shader2->disableVertexAttribs();
+
+
+}
+
+
+void Topo3Render::pushColors()
 {
 	m_color_save = new float[6*m_nbDarts];
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+	m_vbo4->bind();
 	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	memcpy(m_color_save, colorBuffer, 6*m_nbDarts*sizeof(float));
@@ -201,9 +280,9 @@ void topo3Render::pushColors()
 }
 
 
-void topo3Render::popColors()
+void Topo3Render::popColors()
 {
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
+	m_vbo4->bind();
 	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	memcpy(colorBuffer, m_color_save, 6*m_nbDarts*sizeof(float));
@@ -214,7 +293,7 @@ void topo3Render::popColors()
 }
 
 
-Dart topo3Render::colToDart(float* color)
+Dart Topo3Render::colToDart(float* color)
 {
 	unsigned int r = (unsigned int)(color[0]*255.0f);
 	unsigned int g = (unsigned int)(color[1]*255.0f);
@@ -228,7 +307,7 @@ Dart topo3Render::colToDart(float* color)
 
 }
 
-void topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
+void Topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
 {
 	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
 
@@ -240,7 +319,7 @@ void topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
 }
 
 
-Dart topo3Render::picking(unsigned int x, unsigned int y)
+Dart Topo3Render::picking(unsigned int x, unsigned int y)
 {
 	//more easy picking for
 	unsigned int dw = m_topo_dart_width;

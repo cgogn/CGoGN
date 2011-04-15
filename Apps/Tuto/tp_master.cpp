@@ -26,8 +26,7 @@
 #include <time.h>
 #include <algorithm>
 
-#include "Utils/GLSLShader.h"
-#include "Utils/glutwin.h"
+#include "tp_master.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
@@ -36,14 +35,17 @@
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
-#include "Algo/Render/vbo_MapRender.h"
-#include "Algo/Render/topo_vboRender.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topoRender.h"
 #include "Algo/Geometry/normal.h"
 
 #include "Algo/Selection/raySelector.h"
 
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
+
+#include "Utils/shaderSimpleColor.h"
+#include "Utils/shaderPhong.h"
 
 
 /// pour simplifier l'ecriture du code
@@ -211,67 +213,6 @@ void coupe_carre(Dart dd)
 
 
 
-class myGlutWin: public Utils::SimpleGlutWin
-{
-public:
-
-	/**
-	 * position of object
-	 */
-	PFP::VEC3 gPosObj;
-
-	/**
-	 * width of object
-	 */
-	float gWidthObj;
-
-	Algo::Render::GL2::MapRender_VBO* m_render;
-
-	Algo::Render::GL2::topo_VBORenderMapD* m_render_topo;
-
-	/**
-	 * redraw CB
-	 */
-	void myRedraw();
-
-	/**
-	 * keyboard CB
-	 */
-	void myKeyboard(unsigned char keycode, int x, int y);
-
-	/**
-	 * GL initialization
-	 */
-	void myInitGL();
-
-	/**
-	 * dessine les cellules et brins selectionne
-	 */
-	void drawSelected();
-
-	/**
-	 * mise a jour des modifications de la carte dans les buffer OpenGL
-	 */
-	void updateRender();
-
-
-	/**
-	 * rendering topology ?
-	 */
-	bool renderTopo;
-
-	/**
-	 * rendering help ?
-	 */
-	bool aff_help;
-
-
-	myGlutWin(	int* argc, char **argv, int winX, int winY) :
-		SimpleGlutWin(argc,argv,winX,winY),
-		m_render(NULL),m_render_topo(NULL),aff_help(true) {}
-};
-
-
 /// Variables pour le picking
 PFP::VEC3 rayA;
 PFP::VEC3 rayB;
@@ -281,46 +222,10 @@ std::vector<Dart> d_edges;
 std::vector<Dart> d_vertices;
 
 
-// fonction qui calcule la distance a utiliser pour la selection
-float computeSelectRadius(int x, int y, int pixelRadius)
+
+void MyQT::drawSelected()
 {
-	GLint viewport[4];
-	GLdouble modelview[16];
-	GLdouble projection[16];
-	GLfloat winX, winY, winZ;
-	GLdouble posX, posY, posZ;
-
-	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-	glGetDoublev( GL_PROJECTION_MATRIX, projection );
-	glGetIntegerv( GL_VIEWPORT, viewport );
-
-	// get depth
-	glReadPixels( x, viewport[3]-y , 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ );
-
-	// if we have click on background, consider that we are in the middle of space
-	// to avoid too big radius
-	if (winZ == 1.0f)	// depth vary in [0-1]
-		winZ = 0.5f;
-
-	winX = (float)x;
-	winY = (float)viewport[3] - (float)y;
-
-//	get first point in object space
-	gluUnProject( winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-	PFP::VEC3 p(posX,posY,posZ);
-
-//	get second point in object space
-	gluUnProject( winX+pixelRadius, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
-	PFP::VEC3 q(posX,posY,posZ);
-
-	// compute & return distance
-	q -= p;
-	return float(q.norm());
-}
-
-
-void myGlutWin::drawSelected()
-{
+	/*
 	typedef Dart Dart;
 
 // FACES
@@ -378,6 +283,7 @@ void myGlutWin::drawSelected()
 	glEnd();
 	
 	glLineWidth(7.0f);
+	*/
 	for(unsigned int i=0; i < selected_darts.size(); ++i)
 	{
 		// fait varier la couleur du plus pres au plus loin
@@ -406,130 +312,101 @@ void myGlutWin::drawSelected()
 				break;
 		}
 	}
+
 }
 
-void myGlutWin::myInitGL()
-{
-	glClearColor(0.2,0.2,0.2,0.);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_NORMALIZE);
 
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightZeroColor);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightZeroPosition);
-	glEnable(GL_LIGHT0);
+void MyQT::cb_initGL()
+{
+	// choose to use GL version 2
+	Utils::GLSLShader::setCurrentOGLVersion(2);
+
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
+	m_render_topo = new Algo::Render::GL2::TopoRenderMapD() ;
+
+	// create VBO for position
+	m_positionVBO = new Utils::VBO();
+	m_normalVBO = new Utils::VBO();
+
+	m_shader = new Utils::ShaderPhong();
+	m_shader->setAttributePosition(m_positionVBO);
+	m_shader->setAttributeNormal(m_normalVBO);
+	m_shader->setDiffuse(Geom::Vec4f(0.,0.6,0.,0.));
+//	m_shader->setShininess(10000.0);
+	m_shader->setSpecular(Geom::Vec4f(0.,0.0,0.,0.));
+
+	// using simple shader with color
+	m_shader2 = new Utils::ShaderSimpleColor();
+	m_shader2->setAttributePosition(m_positionVBO);
+	m_shader2->setColor(Geom::Vec4f(0.,0.1,0.,0.));
+	registerRunning(m_shader);
+	registerRunning(m_shader2);
 }
 
-void myGlutWin::updateRender()
+
+
+
+void MyQT::cb_redraw()
 {
-	if (m_render == NULL)
-		m_render = new Algo::Render::GL2::MapRender_VBO() ;
-
-	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::GL2::TRIANGLES);
-//	m_render->initPrimitives<PFP>(myMap, SelectorTrue(),Algo::Render::GL2::LINES);
-	m_render->updateData(Algo::Render::GL2::POSITIONS, position);
-
-	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-	m_render->updateData(Algo::Render::GL2::NORMALS, normal);
-
-
-	if (m_render_topo == NULL)
-		m_render_topo = new Algo::Render::GL2::topo_VBORenderMapD() ;
-
-	m_render_topo->updateData<PFP>(myMap,position,0.9f,0.9f);
-}
-
-void myGlutWin::myRedraw(void)
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	/// centrage de la scene
-	glPushMatrix();
-	float sc = 50./gWidthObj;
-	glScalef(sc,sc,sc);
-	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
-	/// Affichage de la topologie si demande
-	glDisable(GL_LIGHTING);
 
 	drawSelected();
 
-	glEnable( GL_POLYGON_OFFSET_FILL );
-	glPolygonOffset( 0.2f, 0.2f );
-	m_render_topo->drawTopo();
-
-	/// qq setup OpenGL
-	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_CULL_FACE);
-	glShadeModel(GL_FLAT);
-	glFrontFace(GL_CCW);
-
-	/// Rendu faces surlignage
-//	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-//	glLineWidth(2.0f);
-	/// Vert devant
-	glColorMaterial(GL_FRONT, GL_DIFFUSE);
-	glColor3f(0.0f,0.9f,0.3f);
-	/// Rouge derriere
-	glColorMaterial(GL_BACK, GL_DIFFUSE);
-	//glColor3f(0.9f,0.3f,0.3f);
-	glColor3f(0.0f,0.9f,0.3f);
+	if (renderTopo)
+	{
+		glEnable( GL_POLYGON_OFFSET_FILL );
+		glPolygonOffset( 0.2f, 0.2f );
+		m_render_topo->drawTopo();
+	}
 
 	/// decalage pour surlignage non clignotant
 	glEnable( GL_POLYGON_OFFSET_FILL );
 	glPolygonOffset( 1.0f, 1.0f );
+	glLineWidth(1.0f);
+	m_render->draw(m_shader2,Algo::Render::GL2::LINES) ;
 
 	/// Rendu faces pleines
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 	glPolygonMode(GL_FRONT,GL_FILL);
 	glPolygonMode(GL_BACK,GL_NONE);
-	/// Vert devant
-	glColorMaterial(GL_FRONT, GL_DIFFUSE);
-	glColor3f(0.1f,0.5f,0.1f);
 
-	/// Rouge derriere
-	glColorMaterial(GL_BACK, GL_DIFFUSE);
-	//glColor3f(0.5f,0.1f,0.1f);
-	glColor3f(0.1f,0.5f,0.1f);
-
-	m_render->draw(Algo::Render::GL2::TRIANGLES) ;
+	m_render->draw(m_shader,Algo::Render::GL2::TRIANGLES) ;
 
 	glDisable( GL_POLYGON_OFFSET_FILL );
-
-	glPopMatrix();
-
-	if (aff_help)
-	{
-		glColor3f(1.0f,1.0f,1.0f);
-		printString2D(10,20,"Keys:\nt: affichage topologie\nf: selection face (position souris)\na: selection aretes\ns: selection sommet\nd: selection brin\n0: vide la pile des brins selectionnes\nD: info brin");
-	}
 }
 
-void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
+void MyQT::cb_keyPress(int keycode)
 {
+	int x,y;
+	glMousePosition(x,y);
+	std::cout << x << " , "<< y << std::endl;
+
 	switch(keycode)
 	{
 	case 't':
 		renderTopo = !renderTopo;
-		glutPostRedisplay();
+		if (renderTopo)
+			statusMsg("Render Topology");
+		else
+			statusMsg("");
+		updateGL();
 		break;
 
 	case '0':
 		selected_darts.clear();
-		glutPostRedisplay();
+		statusMsg("Cleanning selected darts");
+		updateGL();
 		break;
 
 	case 'd':
 	{
 		if (selected_darts.size()>5) 
+		{
+			statusMsg("Already six darts selected");
 			break;
+		}
 
-		glPushMatrix();
-
-		float sc = 50./gWidthObj;
-		glScalef(sc,sc,sc);
-		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
 
 		/// calcul du rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
@@ -541,26 +418,14 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		d_vertices.clear();
 		std::vector<Dart> darts;
 		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, SelectorTrue());
+		selected_darts.push_back(darts[0]);
 
-		glPopMatrix();
-
-		if (!darts.empty()) 
-		{
-			selected_darts.push_back(darts[0]);
-			redraw();
-			glutSwapBuffers();
-		}
+		updateGL();
 		break;
 	}
 
 	case 'D':
 	{
-		glPushMatrix();
-
-		float sc = 50./gWidthObj;
-		glScalef(sc,sc,sc);
-		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
 		/// calcul du rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
@@ -572,11 +437,8 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		std::vector<Dart> darts;
 		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, SelectorTrue());
 
-		glPopMatrix();
-
 		if (!darts.empty()) 
 		{
-			redraw();
 			std::stringstream ss;
 			Dart d1 = myMap.phi1(darts[0]);
 			Dart d2 = myMap.phi2(darts[0]);
@@ -584,22 +446,13 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			const PFP::VEC3& P = position[darts[0]];
 			ss << " /Emb:" << P;
-			glColor3f(1.,1.,0.);
-			printString2D(x+8,y+8,ss.str());
-			glutSwapBuffers();
+			statusMsg(ss.str().c_str());
 		}
 		break;
 	}
 
 	case 'f':
 	{
-		glPushMatrix();
-
-		float sc = 50./gWidthObj;
-		glScalef(sc,sc,sc);
-		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
-
 		/// calcul du rayon
 		getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
@@ -611,57 +464,36 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 	
 		Algo::Selection:: facesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_faces);
 
-		glPopMatrix();
 
-		if (!d_faces.empty()) {
-			redraw();
+		if (!d_faces.empty())
+		{
 			std::stringstream ss;
-			ss << "face " << d_faces[0].index/3;
-			glColor3f(1.,0.,0.);
-			printString2D(x+8,y+8,ss.str());
-			glutSwapBuffers();
+			ss << "Face " << d_faces[0].index/3;
+			statusMsg(ss.str().c_str());
 		}
 		break;
 	}
 
 	case 'a':
 	{
-		glPushMatrix();
-
-		float sc = 50./gWidthObj;
-		glScalef(sc,sc,sc);
-		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-		
 		/// calcul du rayon
-		getOrthoScreenRay(x,y,rayA,rayB);
+		float dist = getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
 
 		d_faces.clear();
 		d_edges.clear();
 		d_vertices.clear();
 
-		// compute distance  threshold (depends on width of object and scale factor)
-		// not good selection vary with density of point
-//		float dist = gWidthObj/(100.0f*getScale());
-		float dist = computeSelectRadius(x,y,4);
-		std::cout << "Distance obj = "<<dist << std::endl;
-
 		Algo::Selection::edgesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_edges,dist);
-
-		glPopMatrix();
 
 		if (!d_edges.empty())
 		{
-			redraw();
 			std::stringstream ss;
 			Dart dd = myMap.phi2(d_edges[0]);
-			ss << "dart: " << d_edges[0].index<<" phi1: "<< myMap.phi1(d_edges[0]).index;
+			ss << "Arete:  dart: " << d_edges[0].index<<" phi1: "<< myMap.phi1(d_edges[0]).index;
 			if (dd != d_edges[0])
-				ss << std::endl<< "phi2: " << dd.index<<" phi1: "<< myMap.phi1(dd).index;
-
-			glColor3f(1.,1.,0.);
-			printString2D(x+8,y+8,ss.str());
-			glutSwapBuffers();
+				ss << std::endl<< " phi2: " << dd.index<<" phi1: "<< myMap.phi1(dd).index;
+			statusMsg(ss.str().c_str());
 		}
 
 		break;
@@ -669,53 +501,31 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 	case 's':
 	{
-		glPushMatrix();
-
-		float sc = 50./gWidthObj;
-		glScalef(sc,sc,sc);
-		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
 		/// Rayon
-		getOrthoScreenRay(x,y,rayA,rayB);
+		float dist = getOrthoScreenRay(x,y,rayA,rayB);
 		PFP::VEC3 AB = rayB-rayA;
 
 		d_faces.clear();
 		d_edges.clear();
 		d_vertices.clear();
 
-		// compute distance  threshold (depends on width of object and scale factor)
-		// not good selection vary with density of point
-//		float dist = gWidthObj/(100.0f*getScale());
-		float dist = computeSelectRadius(x,y,6);
-
 		Algo::Selection::verticesRaySelection<PFP>(myMap, position,rayA, AB, d_vertices,dist,SelectorTrue());
-		std::cout << "Distance obj = "<<dist << std::endl;
-		
-		glPopMatrix();
 
 		if (!d_vertices.empty())
 		{
-			redraw();
 			std::stringstream ss;
-			ss << "dart: " << d_vertices[0].index << ": " << position[d_vertices[0]];
-			glColor3f(1.,1.,0.);
-			printString2D(x+8,y+8,ss.str());
-			glutSwapBuffers();
+			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]];
+			statusMsg(ss.str().c_str());
 		}
 
 		break;
 	}
 
-	case 'h':
-		aff_help =!aff_help;
-		glutPostRedisplay();
-		break;
-
 	case 'r':
 		if (!selected_darts.empty())
 		{
 			Reduction(selected_darts[0]);
-			glutPostRedisplay();
+			updateGL();
 		}
 		break;
 
@@ -723,7 +533,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		if (!selected_darts.empty())
 		{
 			Tourne(selected_darts[0]);
-			glutPostRedisplay();
+			updateGL();
 		}
 		break;
 
@@ -732,7 +542,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		if (selected_darts.size()>=2)
 		{
 			Colle(selected_darts[0], selected_darts[1]);
-			glutPostRedisplay();
+			updateGL();
 		}
 		break;
 
@@ -740,7 +550,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		if (selected_darts.size()>=2)
 		{
 			ColleMilieu(selected_darts[0], selected_darts[1]);
-			glutPostRedisplay();
+			updateGL();
 		}
 		break;
 
@@ -748,7 +558,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 		if (selected_darts.size()>=2)
 		{
 			Decoupage(selected_darts[0], selected_darts[1]);
-			glutPostRedisplay();
+			updateGL();
 		}
 		break;
 
@@ -757,9 +567,10 @@ void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 int main(int argc, char **argv)
 {
-	/// init glut interface and
-	myGlutWin mgw(&argc,argv,800,800);
-	mgw.init();
+	// interface:
+	QApplication app(argc, argv);
+	MyQT sqt;
+
 
 	if (argc == 2)
 	{
@@ -767,24 +578,43 @@ int main(int argc, char **argv)
 		Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames) ;
 		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
-		mgw.updateRender();
+		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 	}
 	else
 	{
 		position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 		createMap();
-		mgw.updateRender();	// ne pas oublier de mettre à jour openGL après chaque modif dans la carte
 	}
 
 	if (myMap.getNbDarts()==0)
 		exit(0);
 
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    mgw.gWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    mgw.gPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+	// caclul de la bounding box de la scene a afficher
+	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-	mgw.mainLoop();
+	// envoit info BB a l'interface
+	sqt.setParamObject(lWidthObj,lPosObj.data());
 
-	return 0;
+	// show 1 pour optenir le contexte GL
+	sqt.show();
+
+	// update du VBO position (contexte GL necessaire)
+	sqt.m_positionVBO->updateData(position);
+	sqt.m_normalVBO->updateData(normal);
+
+	// update des primitives du renderer
+	SelectorTrue allDarts;
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+
+	sqt.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
+
+	// show final pour premier redraw
+	sqt.show();
+
+	// et on attend la fin.
+	return app.exec();
 }

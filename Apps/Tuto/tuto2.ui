@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>122</width>
-    <height>337</height>
+    <height>335</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -91,6 +91,22 @@
       </widget>
      </item>
      <item>
+      <widget class="QSlider" name="horizontalSlider">
+       <property name="maximum">
+        <number>10</number>
+       </property>
+       <property name="pageStep">
+        <number>2</number>
+       </property>
+       <property name="value">
+        <number>4</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="Line" name="line">
        <property name="lineWidth">
         <number>3</number>
@@ -141,5 +157,38 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>dial_line_width</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>horizontalSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>60</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>horizontalSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>dial_line_width</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>200</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>60</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _TOPO_VBO_RENDER
-#define _TOPO_VBO_RENDER
+#ifndef _GL2_TOPO_RENDER_
+#define _GL2_TOPO_RENDER_
 
 #include <GL/glew.h>
 
@@ -33,6 +33,12 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+
+#include "Utils/vbo.h"
+
+// forward
+namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
+namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
 
 namespace CGoGN
 {
@@ -46,7 +52,7 @@ namespace Render
 namespace GL2
 {
 
-class topoRender
+class TopoRender
 {
 protected:
 	/**
@@ -56,7 +62,12 @@ protected:
 	* 2: vertices relation 2
 	* 3: color
 	*/
-	GLuint m_VBOBuffers[4];
+	Utils::VBO* m_vbo0;
+	Utils::VBO* m_vbo1;
+	Utils::VBO* m_vbo2;
+	Utils::VBO* m_vbo3;
+
+	unsigned int m_vaId;
 
 	/**
 	*number of darts to draw
@@ -82,6 +93,14 @@ protected:
 	 */
 	AttributeHandler<unsigned int> m_attIndex;
 
+	Utils::ShaderSimpleColor* m_shader1;
+	Utils::ShaderColorPerVertex* m_shader2;
+
+
+	Dart colToDart(float* color);
+
+	void dartToCol(Dart d, float& r, float& g, float& b);
+
 public:
 	/**
 	* Constructor
@@ -90,12 +109,12 @@ public:
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/	
 
-	topoRender();
+	TopoRender();
 
 	/**
 	* Destructor
 	*/
-	~topoRender();
+	~TopoRender();
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)
@@ -155,9 +174,19 @@ public:
 	 * @param b blue !
 	 */
 	void overdrawDart(Dart d, float width, float r, float g, float b);
+
+
+	/**
+	 * pick dart with color set bey setDartsIdColor
+	 * Do not forget to apply same transformation to scene before picking than before drawing !
+	 * @param x position of mouse (x)
+	 * @param y position of mouse (pass H-y, classic pb of origin)
+	 * @return the dart or NIL
+	 */
+	Dart picking(unsigned int x, unsigned int y);
 };
 
-class topoRenderMapD : public topoRender
+class TopoRenderMapD : public TopoRender
 {
 public:
 	/**
@@ -172,7 +201,7 @@ public:
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = SelectorTrue());
 };
 
-class topoRenderGMap : public topoRender
+class TopoRenderGMap : public TopoRender
 {
 public:
 	/**

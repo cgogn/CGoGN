@@ -22,32 +22,31 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
+#include "tuto5.h"
 
-#include "Utils/glutwin.h"
+#include <iostream>
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map3.h"
 #include "Topology/generic/embeddedMap3.h"
 
-#include "Geometry/matrix.h"
+
 #include "Geometry/vector_gen.h"
-#include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/map_glRender.h"
-#include "Algo/Render/vbo_MapRender.h"
-#include "Algo/Modelisation/tetrahedron.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/shaderSimpleColor.h"
+
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
 
-#include "Algo/Render/topo3_vboRender.h"
+#include "Algo/Render/GL2/topo3Render.h"
 
 #include "Topology/generic/cellmarker.h"
 #include "Utils/text3d.h"
 
-//#include "testMaps.h"
-
+#include "Utils/pointSprite.h"
+#include "Utils/pointLine.h"
 
 using namespace CGoGN ;
 
@@ -68,45 +67,51 @@ unsigned int idNorm;
 unsigned int idCol;
 
 
-
-
-
-class myGlutWin: public Utils::SimpleGlutWin
+void MyQT::balls_onoff(bool x)
 {
-public:
+	render_balls = !render_balls;
+	updateGL();
+}
 
-     void myRedraw();
+void MyQT::vectors_onoff(bool x)
+{
+	render_vectors = !render_vectors;
+	updateGL();
+}
 
-     float gWidthObj;
-     Geom::Vec3f gPosObj;
+void MyQT::text_onoff(bool x)
+{
+	statusMsg(NULL);
+	render_text = !render_text;
+	updateGL();
+}
 
-     bool aff_help;
-     bool render_line;
-     bool render_volume;
-     bool render_topo;
+void MyQT::topo_onoff(bool x)
+{
+	render_topo = !render_topo;
+	updateGL();
+}
 
-    Algo::Render::GL2::MapRender_VBO* m_render;
-    Algo::Render::GL2::topo3_VBORenderMapD* m_render_topo;
+void MyQT::slider_balls(int x)
+{
+	m_sprite->setSize(0.05f*x);
+	updateGL();
+}
 
-    Utils::Strings3D m_strings;
+void MyQT::slider_vectors(int x)
+{
+	m_lines->setScale(0.02*x);
+	updateGL();
+}
 
-    void updateVBO();
+void MyQT::slider_text(int x)
+{
+	m_strings->setScale(0.02f*x);
+	updateGL();
+}
 
-    void storeVerticesInfo();
 
- 	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY)
-    {
- 	   aff_help = false;
- 	   render_line = true;
- 	   render_volume = false;
- 	   render_topo = true;
-
-    }
-
- 	void myKeyboard(unsigned char keycode, int x, int y);
-};
-
-void myGlutWin::storeVerticesInfo()
+void MyQT::storeVerticesInfo()
 {
 
 	CellMarker mv(myMap,VERTEX_CELL);
@@ -117,359 +122,118 @@ void myGlutWin::storeVerticesInfo()
 			mv.mark(d);
 			std::stringstream ss;
 			ss << d << " : "<< position[d];
-			m_strings.addString(ss.str(),position[d]);
+			m_strings->addString(ss.str(),position[d]);
 		}
 	}
 }
 
-void myGlutWin::myRedraw(void)
+void MyQT::cb_initGL()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
+	// choose to use GL version 2
+	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-	// met l'objet au milieu de l'ecran a la bonne taille
-	float sc = 50.0f/gWidthObj;
-	glScalef(sc,sc,sc);
-	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
+
+    m_render_topo = new Algo::Render::GL2::Topo3RenderMapD();
 
 
 
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	glDisable(GL_LIGHTING);
+ 	// create VBO for position
+	m_positionVBO = new Utils::VBO();
+	m_positionVBO->updateData(position);
 
-	glLineWidth(3.0);
-	glBegin(GL_LINES);
-	glColor3f(1.,0.,0.);
-	glVertex3f(0.0,0.0,0.0);
-	glVertex3f(1.0,0.0,0.0);
+	// using simple shader with color
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(m_positionVBO);
+	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
 
-	glColor3f(0.,1.,0.);
-	glVertex3f(0.0,0.0,0.0);
-	glVertex3f(0.0,1.0,0.0);
+	m_sprite = new Utils::PointSprite();
+	m_sprite->setAttributePosition(m_positionVBO);
 
-	glColor3f(0.,0.,1.);
-	glVertex3f(0.0,0.0,0.0);
-	glVertex3f(0.0,0.0,1.0);
 
-	glEnd();
+    m_strings = new Utils::Strings3D(true,Geom::Vec3f(0.1,0.,0.3));
+    storeVerticesInfo();
+    m_strings->sendToVBO();
 
-	glColor3f(0.0f,1.0f,.0f);
-	m_render->draw(Algo::Render::GL2::POINTS);
 
-	if(render_line)
+    // copy de contenu de VBO a la creation
+	m_dataVBO = new Utils::VBO(*m_positionVBO);
+
+	m_lines = new Utils::PointLine();
+	m_lines->setAttributePosition(m_positionVBO);
+	m_lines->setAttributeData(m_dataVBO);
+	m_lines->setScale(0.2f);
+	m_lines->setColor(Geom::Vec3f(0.0f, 1.0f,0.2f));
+
+	// accede au buffer du VBO pour modification
+	PFP::VEC3* data = static_cast<PFP::VEC3*>(m_dataVBO->lockPtr());
+	for (unsigned int i=0; i< m_dataVBO->nbElts(); ++i)
 	{
-		// on trace les ligne devant
-		glDisable( GL_POLYGON_OFFSET_FILL );
-		glColor3f(1.0f,1.0f,0.0f);
-		m_render->draw(Algo::Render::GL2::LINES);
+		data[i].normalize();
 	}
-	// et on decale les faces vers l'arriere
-
-	if(render_volume)
-	{
-		glEnable( GL_POLYGON_OFFSET_FILL );
-		glPolygonOffset( 1.0f, 1.0f );
-
-		glColor3f(0.0f,0.5f,0.0f);
-		m_render->draw(Algo::Render::GL2::TRIANGLES);
-		glDisable( GL_POLYGON_OFFSET_FILL );
-	}
-
-	if(render_topo)
-	{
-		glDisable( GL_POLYGON_OFFSET_FILL );
-		glColor3f(1.0f,1.0f,0.0f);
-		m_render_topo->drawTopo();
-
-		Dart d = myMap.phi2( myMap.begin());
-		m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
-
-	}
-
-//	m_strings.predraw(Geom::Vec3f(0.0,1.0,1.0));
-//	m_strings.draw(0,Geom::Vec3f(0.5,0.5,0.5));
-//	m_strings.draw(1,Geom::Vec3f(-0.5,0.5,0.5));
-//	m_strings.draw(2,Geom::Vec3f(-0.5,-0.5,0.5));
-//	m_strings.postdraw();
+	m_dataVBO->releasePtr();
 
 
-	m_strings.drawAll(Geom::Vec3f(0.0,1.0,1.0));
+	registerRunning(m_shader);
+	registerRunning(m_strings);
+	registerRunning(m_sprite);
+	registerRunning(m_lines);
 
-    //affichage de l'aide
-    if (aff_help) {
-            glColor3f(1.0f,1.0f,1.0f);
-            printString2D(10,20,"Keys:\n\
-                    l: affichage des lignes de bordures\n\
-                    v: affichage des volumes\n\
-                    h: affiche cette aide\n\n\n\n\
-                    1 : swap 2->2\n");
-    }
+	SelectorTrue allDarts;
 
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
-    glPopMatrix();
-
-
-}
-
-void myGlutWin::updateVBO()
-{
-	m_render->updateData(Algo::Render::GL2::POSITIONS, position );
-	m_render->initPrimitives<PFP>(myMap,allDarts,Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(myMap,allDarts,Algo::Render::GL2::POINTS);
-	m_render->initPrimitives<PFP>(myMap,allDarts,Algo::Render::GL2::TRIANGLES);
 	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
 }
 
 
-/// Gestion des touches clavier
-void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
+void MyQT::cb_redraw()
 {
-        switch(keycode) {
-                /** affichage **/
-        	case 'D':
-        	{
-				Dart d = myMap.begin();
-				m_render_topo->setDartColor(d, 1.0f,0.0f,0.0f);
-				d = myMap.phi1(d);
-				m_render_topo->setDartColor(d, 0.0f,1.0f,0.0f);
-				d = myMap.phi1(d);
-				m_render_topo->setDartColor(d, 0.0f,0.0f,1.0f);
-				glutPostRedisplay();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glEnable(GL_LIGHTING);
 
-        	}
-        		break;
+	m_render->draw(m_shader, Algo::Render::GL2::POINTS);
 
-        	case 'x':
-        	{
-        		// push/pop color is only needed for dart coloring conservation
-        		// can bee long long huge meshes
-        		m_render_topo->pushColors();
+	glLineWidth(2.0f);
+	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+	m_render->draw(m_shader, Algo::Render::GL2::LINES);
 
-        		// setDartsIdColor can be done only once if dart coloring not used
-        		m_render_topo->setDartsIdColor<PFP>(myMap,allDarts);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(1.0f, 1.0f);
 
-        		// transform as in drawing cb
-        		glPushMatrix();
-        		float sc = 50.0f/gWidthObj;
-        		glScalef(sc,sc,sc);
-        		glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-        		//pick
-        		Dart d = m_render_topo->picking(x,H-y);
+	if (render_topo)
+		m_render_topo->drawTopo();
 
-        		glPopMatrix();
-
-        		m_render_topo->popColors();
-
-         		if (d != Dart::nil())
-        		{
-        			m_render_topo->setDartColor(d,1.0,0.0,0.0);
-        			redraw();
-        			std::stringstream ss;
-        			ss << "Pick dart:" << d << std::endl<<"pos="<< position[d];
-        			glColor3f(1.,1.,0.);
-        			printString2D(x+12,y+22,ss.str());
-        			glutSwapBuffers();
-        			std::cout << "Pick dart:" << d << " pos= "<< position[d] << std::endl;
-        		}
+	Dart d = myMap.phi2( myMap.begin());
+	m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
+	 d = myMap.phi1( myMap.begin());
+	m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
 
 
-        		break;
-        	}
-
-        	case 'Q':
-        		m_render_topo->setAllDartsColor(1.0f,1.0f,1.0f);
-        		glutPostRedisplay();
-        	break;
-
-        		case 'c' : { //Cut Edge OK
-						Dart d = 9;
-						//Dart d = dglobal;
-
-						Dart f = myMap.phi1(d);
-						myMap.cutEdge(d);
-						Dart e = myMap.phi1(d);
-						position[e] = position[d];
-						position[e] += position[f];
-						position[e] *= 0.5;
-
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
-						m_render_topo->setDartColor(d, 0.0f,1.0f,0.0f);
-						glutPostRedisplay();
-						break;
-        		}
-        		case 's' : { //Split Face OK
-						Dart d = 25;
-						//Dart d = dglobal;
-
-						myMap.splitFace(d, myMap.phi1(myMap.phi1(d)));
-
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.9);
-						glutPostRedisplay();
-						break;
-        		}
-        		case 'f' : { //Flip Edge
-						//Dart d = 25;
-        				//Dart d = myMap.phi2(25);
-						Dart d = dglobal;
-
-						Dart r = myMap.phi2(d);
-						Dart e = myMap.phi2(myMap.phi3(d));
-
-						unsigned int p1 = myMap.getDartEmbedding(VERTEX_ORBIT, myMap.phi_1(e));
-						unsigned int p2 = myMap.getDartEmbedding(VERTEX_ORBIT, myMap.phi_1(r));
+	glDisable(GL_POLYGON_OFFSET_FILL);
 
 
-						myMap.flipFace(d);
+	if (render_text)
+		m_strings->drawAll(Geom::Vec3f(0.0,1.0,1.0));
 
-						myMap.setDartEmbedding(VERTEX_ORBIT, r, p1 );
-						myMap.setDartEmbedding(VERTEX_ORBIT, e, p2 );
+	if (render_balls)
+	{
+		m_sprite->predraw(Geom::Vec3f(1.,0.,0.));
+		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
+		m_sprite->postdraw();
+	}
 
-						Dart dd = d;
-						do {
-							Dart e = myMap.phi2(dd);
-							Dart e2= myMap.phi<32>(dd);//myMap.phi2(myMap.phi3(dd));
-							myMap.setDartEmbedding(VERTEX_ORBIT, dd, myMap.getDartEmbedding(VERTEX_ORBIT,e));
-							myMap.setDartEmbedding(VERTEX_ORBIT, myMap.phi3(dd), myMap.getDartEmbedding(VERTEX_ORBIT, e2));
-							dd = myMap.phi1(dd);
-						} while( dd!=d);
+	if (render_vectors)
+		m_render->draw(m_lines, Algo::Render::GL2::POINTS);
 
-
-						m_render_topo->updateData<PFP>(myMap, allDarts, position, 0.9, 0.9, 0.5);
-						glutPostRedisplay();
-						break;
-        		}
-        		case 'b' : {
-        			Dart d = dglobal;
-        			//Dart d = myMap.phi<323>(myMap.phi_1(myMap.phi<232>(myMap.phi1(myMap.phi<112>(dglobal)))));
-
-
-        			std::cout << "boundary : " << myMap.isBoundaryVolume(d) << std::endl;
-
-        			updateVBO();
-        			glutPostRedisplay();
-        			break;
-        		}
-        		case 'E' : { //Collapse Edge
-						//Dart d = 10;
-						//Dart d = myMap.phi2(25);
-						Dart d = dglobal;
-
-        				//Dart d = myMap.phi<23>(myMap.phi1(myMap.phi<232>(dglobal)));
-
-//						Dart dd = myMap.phi2(d) ;
-//
-//						PFP::VEC3 a = position[d];
-//						PFP::VEC3 v2 = position[dd] ;
-//
-//						// Compute the approximated position
-//						a =  (a + v2) / PFP::REAL(2);
-//
-//						position[d] = a;
-
-						myMap.collapseEdge(d);
-
-						updateVBO();
-						glutPostRedisplay();
-						break;
-        		}
-        		case 'F' : { //Collapse Face OK
-						Dart d = 10;
-						//Dart d = myMap.phi2(25);
-						//Dart d = myMap.phi<232>(myMap.phi1(myMap.phi<232>(dglobal)));
-        				//Dart d = dglobal;
-
-
-//        				Dart d1 = myMap.phi1(d);
-//        				Dart d11 = myMap.phi1(myMap.phi1(d));
-//        				Dart d111 = myMap.phi1(myMap.phi1(myMap.phi1(d)));
-//
-//        				std::cout << "d=" << d << " d1=" << d1 << " d11=" << d11 << " d111=" << d111 << std::endl;
-
-						myMap.collapseFace(d);
-
-//        				myMap.collapseEdge(d);
-//       				myMap.collapseEdge(d1);
-//        				myMap.collapseEdge(d11,false,false);
-
-						updateVBO();
-						glutPostRedisplay();
-						break;
-        		}
-        		case 'V' : { //Collapse Volume
-        				m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
-        				glutPostRedisplay();
-        				break;
-        		}
-        		case 'd' : { //Volume Degree OK
-        				std::cout << "degree = " << myMap.volumeDegree(dglobal) << std::endl;
-        				break;
-        		}
-        		case 'C' : {
-        				Dart d = dglobal;
-
-						Algo::Modelisation::hexaCutVolume<PFP, AttributeHandler<PFP::VEC3>, PFP::VEC3>(myMap,d , position);
-
-						updateVBO();
-        				glutPostRedisplay();
-        				break;
-        		}
-                case 'l' : {
-                        render_line = !render_line;
-                        glutPostRedisplay();
-                        break;
-                }
-                case 'v' : {
-                		render_volume = !render_volume;
-                		glutPostRedisplay();
-                		break;
-                }
-                case 't' : {
-                		render_topo = !render_topo;
-                		glutPostRedisplay();
-                		break;
-                }
-                case 'h': {
-                        aff_help = !aff_help;
-                        glutPostRedisplay();
-                        break;
-                }
-                case '1': {
-                		Algo::Modelisation::Tetrahedron::swap2To2<PFP>(myMap, dglobal, position);
-                		updateVBO();
-						glutPostRedisplay();
-                        break;
-                }
-                case '2' : {
-						Algo::Modelisation::Tetrahedron::swap4To4<PFP>(myMap, dglobal, position);
-						updateVBO();						glutPostRedisplay();
-						break;
-                }
-                case '3' : {
-						Algo::Modelisation::Tetrahedron::swap2To3<PFP>(myMap, dglobal, position);
-						updateVBO();
-						glutPostRedisplay();
-                		break;
-                }
-                case '4' : {
-                		Algo::Modelisation::Tetrahedron::swap3To2<PFP>(myMap, dglobal, position);
-                		updateVBO();
-                		glutPostRedisplay();
-                		break;
-                }
-                default : {
-                		std::cout << "not implemented" << std::endl;
-                		break;
-                }
-
-        }
 }
 
 
 int main(int argc, char **argv)
 {
-//	std::vector<std::string> attrNames ;
-//	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
-//	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT,"position");
 
@@ -482,70 +246,46 @@ int main(int argc, char **argv)
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
 
-//	Geom::Matrix44f mat;
-//	mat.identity();
-//	Geom::scale(2.0f, 2.0f,2.0f,mat);
-//	prim.transform(mat);
-
-
-//	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,6);
-//	dglobal=d;
-//
-//	position[d] = PFP::VEC3(0);
-//	position[myMap.phi1(d)] = PFP::VEC3(1,0,0);
-//	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(1,0,1);
-//	position[myMap.phi_1(d)] = PFP::VEC3(0,0,1);
-//
-//	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
-//	position[d] = PFP::VEC3(1,1,0);
-//	position[myMap.phi1(d)] = PFP::VEC3(0,1,0);
-//	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(0,1,1);
-//	position[myMap.phi_1(d)] = PFP::VEC3(1,1,1);
-
-//	Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,4);
-//	dglobal=d;
-//
-//	Dart t1 = d;
-//	position[t1] = PFP::VEC3(0.0f, 0.0f, 3.0f);
-//	t1 = myMap.phi1(t1);
-//	position[t1] = PFP::VEC3(0.0f, 1.0f, 3.0f);
-//	t1 = myMap.phi1(t1);
-//	position[t1] = PFP::VEC3(1.0f, 0.5f, 3.0f);
-//	t1 = myMap.phi_1(myMap.phi2(d));
-//	position[t1] = PFP::VEC3(0.5f, 0.5f, 4.0f);
-
-	//Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPrism(myMap);
-//	Algo::Modelisation::Polyhedron<PFP> p(myMap, position);
-//	dglobal = p.cube_topo(3,1,1);
-//	p.embedCube(1.0f,1.0f,1.0f);
-
-
-	//dglobal = createMap9<PFP>(myMap,position);
-
 
     // un peu d'interface
-	myGlutWin mgw(&argc,argv,800,800);
+	QApplication app(argc, argv);
+	MyQT sqt;
 
-    // calcul de la bounding box
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap,position);
-    // pour l'affichage
-    mgw.gWidthObj = std::max<float>( std::max<float>(bb.size(0),bb.size(1)),bb.size(2));
-    mgw.gPosObj =  (bb.min() +  bb.max()) /2.0f;
+	// interface de tuto5.ui
+    Utils::QT::uiDockInterface dock;
+    sqt.setDock(&dock);
+
+ 	// message d'aide
+	sqt.setHelpMsg("");
+
+	sqt.statusMsg("3Map with topo rendering & attribute shader utilization");
+
+	//  bounding box
+    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+
+    // envoit info BB a l'interface
+	sqt.setParamObject(lWidthObj,lPosObj.data());
+
+	sqt.setCallBack( dock.checkBox_balls, SIGNAL(toggled(bool)), SLOT(balls_onoff(bool)) );
+	sqt.setCallBack( dock.checkBox_vectors, SIGNAL(toggled(bool)), SLOT(vectors_onoff(bool)) );
+	sqt.setCallBack( dock.checkBox_text, SIGNAL(toggled(bool)), SLOT(text_onoff(bool)) );
+	sqt.setCallBack( dock.checkBox_topo, SIGNAL(toggled(bool)), SLOT(topo_onoff(bool)) );
+
+	sqt.setCallBack( dock.slider_balls, SIGNAL(valueChanged(int)), SLOT(slider_balls(int)) );
+	sqt.setCallBack( dock.slider_vectors, SIGNAL(valueChanged(int)), SLOT(slider_vectors(int)) );
+	sqt.setCallBack( dock.slider_text, SIGNAL(valueChanged(int)), SLOT(slider_text(int)) );
+
+	sqt.show();
+
+	sqt.slider_balls(50);
+	sqt.slider_vectors(50);
+	sqt.slider_text(50);
 
 
-    // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
-    mgw.m_render_topo = new Algo::Render::GL2::topo3_VBORenderMapD();
 
-    mgw.updateVBO();
+	// et on attend la fin.
+	return app.exec();
 
-    mgw.m_strings.init();
-    mgw.storeVerticesInfo();
-    mgw.m_strings.sendToVBO();
-
-    mgw.mainLoop();
-
-    delete mgw.m_render;
-
-    return 0;
 }

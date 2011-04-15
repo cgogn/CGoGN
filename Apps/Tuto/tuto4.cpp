@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include "Utils/glutwin.h"
+#include "tuto4.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
@@ -33,11 +33,13 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/map_glRender.h"
-#include "Algo/Render/vbo_MapRender.h"
-#include "Algo/Render/topo_vboRender.h"
-
 #include "Topology/generic/cellmarker.h"
+
+#include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topoRender.h"
+#include "Utils/shaderSimpleColor.h"
+#include "Utils/shaderFlat.h"
+
 
 
 using namespace CGoGN ;
@@ -55,90 +57,92 @@ PFP::TVEC3 position ;
 PFP::TVEC3 normal ;
 AttributeHandler<Geom::Vec4f> color ;
 
-class myGlutWin: public Utils::SimpleGlutWin
+
+void MyQT::cb_initGL()
 {
-public:
-     void myRedraw();
+	// choose to use GL version 2
+	Utils::GLSLShader::setCurrentOGLVersion(3);
 
-     float gWidthObj;
-     Geom::Vec3f gPosObj;
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
 
-     bool render_obj;
-     bool render_topo;
+	m_render_topo = new Algo::Render::GL2::TopoRenderMapD();
 
-     Algo::Render::GL2::MapRender_VBO* m_render;
-     Algo::Render::GL2::topo_VBORenderMapD* m_render_topo;
+	// create VBO for position
+	m_positionVBO = new Utils::VBO();
 
- 	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY)
-    {
- 		render_obj = true;
- 		render_topo = false;
-    }
+	// using simple shader with color
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(m_positionVBO);
+	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
 
- 	void myKeyboard(unsigned char keycode, int x, int y);
-};
+	m_shader2 = new Utils::ShaderFlat();
+	m_shader2->setAttributePosition(m_positionVBO);
 
-/// Gestion des touches clavier
-void myGlutWin::myKeyboard(unsigned char keycode, int x, int y)
-{
-        switch(keycode) {
-                /** affichage **/
-                case 'o' : {
-                        render_obj = !render_obj;
-                        glutPostRedisplay();
-                        break;
-                }
-                case 't' : {
-                		render_topo = !render_topo;
-                		glutPostRedisplay();
-                		break;
-                }
-                default : {
-                		std::cout << "not yet implemented" << std::endl;
-                		break;
-                }
+	registerRunning(m_shader);
+	registerRunning(m_shader2);
 
-        }
 }
 
 
-void myGlutWin::myRedraw(void)
+void MyQT::cb_redraw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
-
-	// met l'objet au milieu de l'ecran a la bonne taille
-	float sc = 50.0f/gWidthObj;
-	glScalef(sc,sc,sc);
-	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
-
-
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	glDisable(GL_LIGHTING);
-
-	if(render_obj)
-	{
-		// on trace les ligne devant
-		glDisable( GL_POLYGON_OFFSET_FILL );
-		glColor3f(1.0f,1.0f,0.0f);
-		m_render->draw(Algo::Render::GL2::LINES);
-
-		// et on decale les faces vers l'arriere
-		glEnable( GL_POLYGON_OFFSET_FILL );
-		glPolygonOffset( 1.0f, 1.0f );
-
-		glColor3f(0.0f,0.5f,0.0f);
-		m_render->draw(Algo::Render::GL2::TRIANGLES);
-		glDisable( GL_POLYGON_OFFSET_FILL );
-	}
 
 	if(render_topo)
 	{
 		m_render_topo->drawTopo();
 	}
 
+	if(render_obj)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	glPopMatrix();
+		glEnable( GL_POLYGON_OFFSET_FILL );
+		glPolygonOffset( 1.0f, 1.0f );
+		m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
+
+}
+
+
+void MyQT::cb_keyPress(int code)
+{
+	switch(code)
+	{
+	case 'o':
+		render_obj = !render_obj;
+		updateGL();
+		break;
+
+	case 't':
+		render_topo = !render_topo;
+		updateGL();
+		break;
+
+	}
+}
+
+void MyQT::button_compile()
+{
+	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
+	QString st2 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->fragmentEdit->toPlainText();
+	QString st3 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->geometryEdit->toPlainText();
+
+
+
+	m_shader2->reloadVertexShaderFromMemory(st1.toStdString().c_str());
+	m_shader2->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
+	m_shader2->reloadGeometryShaderFromMemory(st3.toStdString().c_str());
+
+	m_shader2->recompile();
+	updateGLMatrices();
+}
+
+void MyQT::slider_explode(int x)
+{
+	m_shader2->setExplode(0.01*x);
+	updateGL();
 }
 
 
@@ -147,25 +151,23 @@ int main(int argc, char **argv)
 {
 	/// Utilisation des Marker
 
-	/// on reprend la carte de tuto1
-
-	Dart d2 = myMap.newOrientedFace(3);
-	Dart d3 = myMap.newOrientedFace(4);
-	myMap.sewFaces(d2,d3);
-
 	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
 
-	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	position[d2] = PFP::VEC3(2.0f, 0.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	position[d2] = PFP::VEC3(1.0f, 3.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	d3 = myMap.phi<11>(d3);
-	position[d3] = PFP::VEC3(0.0f, -2.0f, 0.0f);
-	d3 = myMap.phi1(d3);
-	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
-	d3 = myMap.phi1(d3);
+	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
+	Dart d2 = prim3.tore_topo(16, 24);
+	prim3.embedTore(1.0f,0.3f);
+
+//	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
+//	d2 = myMap.phi1(d2);
+//	position[d2] = PFP::VEC3(2.0f, 0.0f, 0.0f);
+//	d2 = myMap.phi1(d2);
+//	position[d2] = PFP::VEC3(1.0f, 3.0f, 0.0f);
+//	d2 = myMap.phi1(d2);
+//	d3 = myMap.phi<11>(d3);
+//	position[d3] = PFP::VEC3(0.0f, -2.0f, 0.0f);
+//	d3 = myMap.phi1(d3);
+//	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
+//	d3 = myMap.phi1(d3);
 
 //	unsigned int idAttV2 = myMap.addAttribute<float>(VERTEX_ORBIT,"reel");
 //	PFP::AttributeHandler<float> tableReels(idAttV2,VERTEX_ORBIT,myMap);
@@ -193,37 +195,58 @@ int main(int argc, char **argv)
 
 	CellMarkerStore cm(myMap, VERTEX_ORBIT);
 
+	Dart d3 = myMap.phi1(d2);
 	cm.mark(d2);
 	cm.mark(d3);
 	cm.unmarkAll();
 
 
-    // un peu d'interface
-	myGlutWin mgw(&argc,argv,800,800);
+	// interface:
+	QApplication app(argc, argv);
+	MyQT sqt;
 
-    // calcul de la bounding box
+	// interface de tuto5.ui
+    Utils::QT::uiDockInterface dock;
+    sqt.setDock(&dock);
+
+	// message d'aide
+	sqt.setHelpMsg("Tuto4");
+
+    //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    // pour l'affichage
-    mgw.gWidthObj = std::max<float>( std::max<float>(bb.size(0),bb.size(1)),bb.size(2));
-    mgw.gPosObj =  (bb.min() +  bb.max()) /2.0f;
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+
+    // envoit info BB a l'interface
+	sqt.setParamObject(lWidthObj,lPosObj.data());
+
+	sqt.setCallBack( dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
+	sqt.setCallBack( dock.explodeSlider, SIGNAL(valueChanged(int)), SLOT(slider_explode(int)) );
 
 
-    // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
-    mgw.m_render_topo = new Algo::Render::GL2::topo_VBORenderMapD();
+	// show 1 pour GL context
+	sqt.show();
 
-    // maj des donnees de position
-    mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
-    // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
+	// update du VBO position (context GL necessaire)
+	sqt.m_positionVBO->updateData(position);
 
-    // creation des primitives de rendu de la topologie a partir de la carte
-    mgw.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
+	// update des primitives du renderer
+	SelectorTrue allDarts;
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
-    mgw.mainLoop();
+	sqt.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
 
-    delete mgw.m_render;
 
-    return 0;
+	dock.vertexEdit->setPlainText(QString(sqt.m_shader2->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(sqt.m_shader2->getFragmentShaderSrc()));
+	dock.geometryEdit->setPlainText(QString(sqt.m_shader2->getGeometryShaderSrc()));
+
+	// show final pour premier redraw
+	sqt.show();
+
+	// et on attend la fin.
+	return app.exec();
+
+
 }

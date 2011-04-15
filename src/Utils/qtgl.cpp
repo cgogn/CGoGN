@@ -45,14 +45,14 @@ GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
 	glewInit();
 
 	newModel = 1;
-	trans_x=0.;
-	trans_y=0.;
+	m_cbs->trans_x()=0.;
+	m_cbs->trans_y()=0.;
 	float f = FAR_PLANE;
-	trans_z=-f/5.0f;
+	m_cbs->trans_z()=-f/5.0f;
 	foc=2.0f;
 
 	// init trackball
-	trackball(curquat, 0.0f, 0.0f, 0.0f, 0.0f);
+	trackball(m_cbs->curquat(), 0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 GLWidget::~GLWidget()
@@ -98,10 +98,10 @@ void GLWidget::recalcModelView()
 	oglPopModelViewMatrix();
 	oglPushModelViewMatrix();
 	// positionne l'objet / mvt souris
-	oglTranslate(trans_x,trans_y,trans_z);
+	oglTranslate(m_cbs->trans_x(),m_cbs->trans_y(),m_cbs->trans_z());
 
 	// tourne l'objet / mvt souris
-	build_rotmatrixgl3(m, curquat);
+	build_rotmatrixgl3(m, m_cbs->curquat());
 	// update matrice
 	m_cbs->modelViewMatrix() *= m;
 
@@ -174,25 +174,25 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 	case Qt::RightButton:
 	{
 		float wl;
-		if (trans_z > -20.0f)
+		if (m_cbs->trans_z() > -20.0f)
 			wl = 20.0f/foc;
 		else
-			 wl = -2.0f*trans_z/foc;
-		trans_x += wl/W*(x - beginx);
-		trans_y += wl/H*(beginy - y);
+			 wl = -2.0f*m_cbs->trans_z()/foc;
+		m_cbs->trans_x() += wl/W*(x - beginx);
+		m_cbs->trans_y() += wl/H*(beginy - y);
 	}
 		break;
 	case Qt::MidButton:
 	{
 		float wl = -0.2f*FAR_PLANE/foc;
-		trans_z -= wl/W*(x - beginx);
-		trans_z -= wl/H*(y - beginy);
+		m_cbs->trans_z() -= wl/W*(x - beginx);
+		m_cbs->trans_z() -= wl/H*(y - beginy);
 	}
 		break;
 	case Qt::LeftButton:
-		trackball(lastquat, (2.0f * beginx - W) / W,(H - 2.0f * beginy) / H,
+		trackball(m_cbs->lastquat(), (2.0f * beginx - W) / W,(H - 2.0f * beginy) / H,
 							(2.0f * x - W) / W,(H - 2.0f * y) / H );
-		add_quats(lastquat, curquat, curquat);
+		add_quats(m_cbs->lastquat(), m_cbs->curquat(), m_cbs->curquat());
 		break;
 	}
 	beginx = x;
@@ -209,9 +209,9 @@ void GLWidget::wheelEvent ( QWheelEvent * event )
 	float wl = -0.02f*FAR_PLANE/foc;
 
 	if (event->delta() > 0)
-		trans_z += wl;
+		m_cbs->trans_z() += wl;
 	else
-		trans_z -= wl;
+		m_cbs->trans_z() -= wl;
 
 	newModel = 1;
 	updateGL();
@@ -230,9 +230,7 @@ void GLWidget:: keyPressEvent(QKeyEvent* event)
     if ( (k>=65) && (k<=91) && (event->modifiers() != Qt::ShiftModifier) )
     	k+=32;
 
-    std::cout << "Pressed:"<< std::endl;
-
-	if (m_cbs)
+    if (m_cbs)
 		m_cbs->cb_keyPress(k);
 }
 

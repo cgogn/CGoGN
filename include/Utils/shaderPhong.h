@@ -60,11 +60,17 @@ protected:
 	float m_shininess;
 	Geom::Vec3f m_lightPos;
 
+	VBO* m_vboPos;
+	VBO* m_vboNormal;
+	VBO* m_vboColor;
+
 protected:
 
 	void getLocations();
 
 	void sendParams();
+
+	void restoreUniformsAttribs();
 
 public:
 	ShaderPhong();
@@ -97,11 +103,12 @@ public:
 
 
 	// attributes
-	void setAttributePosition(VBO& vbo)		{this->bindVA_VBO("VertexPosition", vbo);}
-	void setAttributeNormal(VBO& vbo)		{this->bindVA_VBO("VertexNormal", vbo);}
+	unsigned int  setAttributePosition(VBO* vbo);
+
+	unsigned int  setAttributeNormal(VBO* vbo);
 
 	// optionnal attributes
-	void setAttributeColor(VBO& vbo);
+	unsigned int  setAttributeColor(VBO* vbo);
 	void unsetAttributeColor();
 };
 

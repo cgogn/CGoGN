@@ -28,10 +28,9 @@
 #include "Topology/map/map2.h"
 #include "Topology/generic/mapBrowser.h"
 
-#include "Geometry/matrix.h"
-#include "Geometry/vector_gen.h"
-#include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/shaderSimpleColor.h"
 
 #include "tuto2.h"
 
@@ -69,22 +68,16 @@ void MyQT::cb_initGL()
 
 	// using simple shader with color
 	m_shader = new Utils::ShaderSimpleColor();
-	m_shader->setAttributePosition(*m_positionVBO);
+	m_shader->setAttributePosition(m_positionVBO);
 
 	m_color = Geom::Vec4f(0.,1.,0.,0.);
 	m_shader->setColor(m_color);
 
+	registerRunning(m_shader);
+
 	m_with_lines=true;
 	m_line_width=4.0;
 
-}
-
-void MyQT::cb_updateMatrix()
-{
-	if (m_shader)
-	{
-		m_shader->updateMatrices(m_projection_matrix, m_modelView_matrix);
-	}
 }
 
 

@@ -40,22 +40,38 @@ protected:
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
     static std::string geometryShaderText;
+
     // uniform locations
 	GLuint m_unif_ambiant;
 	GLuint m_unif_diffuse;
 	GLuint m_unif_lightPos;
 	GLuint m_unif_explode;
 
+	float m_explode;
+	Geom::Vec4f m_ambiant;
+	Geom::Vec4f m_diffuse;
+	Geom::Vec3f m_light_pos;
+
+	VBO* m_vboPos;
+
+	void getLocations();
+
+	void restoreUniformsAttribs();
+
 public:
 	ShaderFlat();
-	void setAmbiant(float explode) 				 {this->bind(); glUniform1f (m_unif_explode, explode);}
-	void setAmbiant(const Geom::Vec4f& ambiant)  {this->bind(); glUniform4fv(m_unif_ambiant,1, ambiant.data());}
-	void setDiffuse(const Geom::Vec4f& diffuse)  {this->bind(); glUniform4fv(m_unif_diffuse,1, diffuse.data());}
-	void setLightPosition( Geom::Vec3f lp)		 {this->bind(); glUniform3fv(m_unif_lightPos,1,lp.data());}
+
+	void setExplode(float explode);
+
+	void setAmbiant(const Geom::Vec4f& ambiant);
+
+	void setDiffuse(const Geom::Vec4f& diffuse);
+
+	void setLightPosition(const Geom::Vec3f& lp);
 
 	void setParams(float explode, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos);
 
-	void setAttributePosition(VBO& vbo)	{this->bindVA_VBO("VertexPosition", vbo);}
+	void setAttributePosition(VBO* vbo);
 
 };
 

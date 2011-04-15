@@ -54,13 +54,18 @@ protected:
 	unsigned int m_data_size;
 	// shaders that ref this vbo
 	std::vector<GLSLShader*> m_refs;
-
-
+	unsigned int m_nbElts;
+	bool m_lock;
 public:
 	/**
 	 * constructor: allocate the OGL VBO
 	 */
 	VBO();
+
+	/**
+	 * copy constructor, new VBO copy content
+	 */
+	VBO(const VBO& vbo);
 
 	/**
 	 * destructor: release the OGL VBO and clean references between VBO/Shaders
@@ -83,6 +88,10 @@ public:
 	void setDataSize(unsigned int ds) { m_data_size = ds;}
 
 	/**
+	 * bind array vbo
+	 */
+	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER,m_id); }
+	/**
 	 * reference vbo as used by shader sh
 	 */
 	void ref(GLSLShader* sh);
@@ -98,6 +107,13 @@ public:
 	 */
 	template <typename ATTR_HANDLER>
 	void updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv);
+
+
+	void* lockPtr();
+
+	void releasePtr();
+
+	unsigned int nbElts() {return m_nbElts;}
 };
 
 }

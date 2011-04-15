@@ -74,8 +74,8 @@ protected:
 	int m_current_button;
 	int beginx;
 	int beginy;
-	float curquat[4];
-	float lastquat[4];
+//	float curquat[4];
+//	float lastquat[4];
 	int newModel;
 
 	int moving;
@@ -88,10 +88,6 @@ protected:
 	float m_obj_sc;
 	glm::vec3 m_obj_pos;
 
-
-	float trans_x;
-	float trans_y;
-	float trans_z;
 
 	// width and height of windows
 	int W;
@@ -128,6 +124,8 @@ public:
 
 	bool Alt() { return m_state_modifier & Qt::AltModifier; }
 
+	int getHeight() const { return H;}
+
 	/**
 	 * set the focale distance (for a screen width of 2), default value is 1
 	 */
@@ -137,6 +135,8 @@ public:
 	 * get the focale distance
 	 */
 	float getFocal() {return foc;}
+
+	void modelModified() {newModel=1;}
 
 protected:
 	/**

@@ -37,6 +37,8 @@
 
 #include "Utils/vbo.h"
 
+// forward def
+namespace CGoGN { namespace Utils { class GLSLShader;} }
 
 namespace CGoGN
 {
@@ -63,13 +65,9 @@ enum bufferIndex {
 	TRIANGLE_INDICES = 0,
 	LINE_INDICES = 1,
 	POINT_INDICES = 2,
-	FLAT_BUFFER = 3,
+	FLAT_BUFFER = 3
 } ;
 
-//const unsigned int NB_BUFFERS = 16 ;
-
-// forward def
-class Utils::GLSLShader;
 
 class MapRender
 {

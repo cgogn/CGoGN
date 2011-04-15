@@ -31,8 +31,12 @@
 #include <QWidget>
 #include <QtGui>
 #include "Utils/qtgl.h"
+#include <set>
 #include <string>
+#include "Geometry/vector_gen.h"
 
+namespace CGoGN { namespace Utils { class GLSLShader;}}
+//namespace CGoGN { namespace Geom { class Vec3f;}}
 
 namespace CGoGN
 {
@@ -83,6 +87,11 @@ public:
 	 */
 	void dockTitle(const char* dockTitle);
 
+
+	/**
+	 * draw a message in status bar
+	 */
+	void statusMsg(const char* msg);
 	/**
 	 * add an empty dock to the window
 	 */
@@ -112,19 +121,31 @@ public:
 //	void contextMenuEvent(QContextMenuEvent *event);
 
 protected:
-
 	GLWidget *m_glWidget;
+
 	QDockWidget *m_dock;
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *e);
+
 	bool m_dockOn;
+
+	// mouse & matrix
 	glm::mat4 m_projection_matrix;
 	glm::mat4 m_modelView_matrix;
+	float m_curquat[4];
+	float m_lastquat[4];
+	float m_trans_x;
+	float m_trans_y;
+	float m_trans_z;
 
-	std::vector<QAction*> m_popup_actions;
 	QMenu* m_fileMenu;
+
 	QMenu* m_appMenu;
+
 	std::string m_helpString;
+
+	void keyPressEvent(QKeyEvent *event);
+
+	void keyReleaseEvent(QKeyEvent *e);
+
 
 public:
 
@@ -135,6 +156,22 @@ public:
 
 
 	/**
+	 * get the mouse position in GL widget
+	 */
+	void glMousePosition(int& x, int& y);
+
+	/**
+	 * get a ray (2 points) from a pick point in GL area
+	 * @param x mouse position
+	 * @param y mouse position
+	 * @param rayA first computed point
+	 * @param rayA second computed point
+	 * @param radius radius on pixel for clicking precision
+	 * @return the distance in modelview world corresponding to radius pixel in screen
+	 */
+	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius=4);
+
+	/**
 	 * current modelview matrix
 	 */
 	glm::mat4& modelViewMatrix () { return m_modelView_matrix;}
@@ -143,6 +180,28 @@ public:
 	 * current projection matrix
 	 */
 	glm::mat4& projectionMatrix () { return m_projection_matrix;}
+
+	float * curquat() { return m_curquat;}
+
+	float * lastquat() { return m_lastquat;}
+
+	float& trans_x() { return m_trans_x;}
+	float& trans_y() { return m_trans_y;}
+	float& trans_z() { return m_trans_z;}
+
+
+	void synchronize(SimpleQT* sqt);
+
+	/**
+	 * Register a shader as running in this Widget.
+	 * Needed for automatic matrices update
+	 */
+	void registerRunning(GLSLShader* ptr);
+
+	/**
+	 * Unregister a shader as running in this Widget.
+	 */
+	void unregisterRunning(GLSLShader* ptr);
 
 	/**
 	 * GL initialization CB (context is ok)
@@ -182,7 +241,7 @@ public:
 	/**
 	 * matrices need to be updated (context is ok)
 	 */
-	virtual void cb_updateMatrix() {}
+	virtual void cb_updateMatrix();
 
 	/**
 	 * end of program, some things to clean ?
@@ -196,6 +255,12 @@ public:
 	 * Equivalent of glutPostRedisplay()
 	 */
 	void updateGL();
+
+	/**
+	 * Ask to Qt to update matrices and then the GL widget.
+	 */
+	void updateGLMatrices();
+
 
 	public slots:
 	virtual void cb_New() { std::cout << "callback not implemented"<< std::endl;}

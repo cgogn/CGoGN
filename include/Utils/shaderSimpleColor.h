@@ -42,12 +42,18 @@ protected:
     // uniform locations
 	GLuint m_unif_color;
 
+	Geom::Vec4f m_color;
+
+	VBO* m_vboPos;
+
+	void restoreUniformsAttribs();
+
 public:
 	ShaderSimpleColor();
 
 	void setColor(const Geom::Vec4f& color);
 
-	void setAttributePosition(VBO& vbo);
+	unsigned int setAttributePosition(VBO* vbo);
 };
 
 }

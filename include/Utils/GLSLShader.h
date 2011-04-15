@@ -38,6 +38,8 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include <set>
+
 
 namespace CGoGN
 {
@@ -67,6 +69,7 @@ public:
 
 	static unsigned int CURRENT_OGL_VERSION;
 
+	static std::set< std::pair<void*, GLSLShader*> > m_registredRunning;
 
 protected:
 
@@ -75,6 +78,9 @@ protected:
 	static std::string DEFINES_GL3;
 
 	static std::string* DEFINES_GL;
+
+	static std::string defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert);
+
 
 	/**
 	 * handle of vertex shader
@@ -95,6 +101,20 @@ protected:
 	 * handle of program
 	 */
 	GLhandleARB m_program_object;
+
+
+	GLint m_uniMat_Proj;
+	GLint m_uniMat_Model;
+	GLint m_uniMat_ModelProj;
+	GLint m_uniMat_Normal;
+
+
+	char* m_vertex_shader_source;
+	char* m_fragment_shader_source;
+	char* m_geom_shader_source;
+
+	GLint m_geom_inputPrimitives;
+	GLint m_geom_outputPrimitives;
 
 
 	/**
@@ -206,6 +226,12 @@ public:
 	static bool init();
 
 
+	static void registerRunning(GLSLShader* ptr);
+
+	static void unregisterRunning(GLSLShader* ptr);
+//
+//	static void updateMatricesRunningShaders(const glm::mat4& projection, const glm::mat4& modelview);
+
 	/**
 	 * load shaders (compile and link)
 	 * @param vs vertex shader source file
@@ -221,7 +247,7 @@ public:
 	 * @param inputGeometryPrimitive primitives used in geometry shader as input
 	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
 	 */
-	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
+	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLE_STRIP);
 
 
 	/**
@@ -244,6 +270,19 @@ public:
 	bool loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive);
 
 
+	const char* getVertexShaderSrc() {return m_vertex_shader_source;}
+	const char* getFragmentShaderSrc() {return m_fragment_shader_source;}
+	const char* getGeometryShaderSrc() {return m_geom_shader_source;}
+
+
+	bool reloadVertexShaderFromMemory(const char* vs);
+
+	bool reloadFragmentShaderFromMemory(const char* fs);
+
+	bool reloadGeometryShaderFromMemory(const char* gs);
+
+	bool recompile();
+
 	/**
 	 * Link the shader do it just after binding the attributes
 	 */
@@ -255,9 +294,14 @@ public:
 
 	bool			isBinded();
 
-	virtual bool	bind();
+	virtual bool	bind() const;
 
-	virtual void	unbind();
+	virtual void	unbind() const;
+
+	/**
+	 * restore all uniforms and vertex attributes after recompiling
+	 */
+	virtual void restoreUniformsAttribs() {std::cerr << "Warning restoreUniformsAttribs not implemented"<< std::endl;}
 
 
 	/**
@@ -329,13 +373,21 @@ public:
 
 	/**
 	 * associate an attribute name of shader with a vbo
+	 * @return the index in vector of pair binding, negative if fail
 	 */
-	void bindVA_VBO(const std::string& name, VBO& vbo);
+	unsigned int bindVA_VBO(const std::string& name, VBO* vbo);
+
+	/**
+	 * change the vbo of id case of binding vector
+	 */
+	void changeVA_VBO(unsigned int id, VBO* vbo);
 
 	/**
 	 * get binding VA VBO
 	 */
 	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding;}
+
+
 
 
 	void bindAttrib(unsigned int att, const char* name) const;
@@ -344,6 +396,17 @@ public:
 	 * update projection, modelview, ... matrices
 	 */
 	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview);
+
+	/**
+	 * bind, enable, and set all vertex attrib pointers
+	 * @param stride: the stride parameter, number osf byte between two consecutive attributes
+	 */
+	void enableVertexAttribs(unsigned int stride=0) const;
+
+	/**
+	 * disenable all vertex attribs
+	 */
+	void disableVertexAttribs() const;
 };
 
 

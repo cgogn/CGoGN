@@ -136,6 +136,8 @@ void ShaderPhong::sendParams()
 	glUniform3fv(m_unif_lightPos, 1, m_lightPos.data());
 }
 
+
+
 void ShaderPhong::setAmbiant(const Geom::Vec4f& ambiant)
 {
 	this->bind();
@@ -185,8 +187,9 @@ void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffu
 }
 
 
-void ShaderPhong::setAttributeColor(VBO& vbo)
+unsigned int ShaderPhong::setAttributeColor(VBO* vbo)
 {
+	m_vboColor = vbo;
 	if (!m_with_color)
 	{
 		m_with_color=true;
@@ -205,12 +208,13 @@ void ShaderPhong::setAttributeColor(VBO& vbo)
 		sendParams();
 	}
 	// bind th VA with WBO
-	bindVA_VBO("VertexColor", vbo);
+	return bindVA_VBO("VertexColor", vbo);
 }
 
 
 void ShaderPhong::unsetAttributeColor()
 {
+	m_vboColor = NULL;
 	if (m_with_color)
 	{
 		m_with_color=false;
@@ -227,8 +231,32 @@ void ShaderPhong::unsetAttributeColor()
 		getLocations();
 		sendParams();
 	}
-
 }
+
+
+void ShaderPhong::restoreUniformsAttribs()
+{
+	getLocations();
+	sendParams();
+
+	bindVA_VBO("VertexPosition", m_vboPos);
+	bindVA_VBO("VertexNormal", m_vboNormal);
+	if (m_vboColor)
+		bindVA_VBO("VertexColor", m_vboColor);
+}
+
+unsigned int ShaderPhong::setAttributePosition(VBO* vbo)
+{
+	m_vboPos=vbo;
+	return bindVA_VBO("VertexPosition", vbo);
+}
+
+unsigned int ShaderPhong::setAttributeNormal(VBO* vbo)
+{
+	m_vboNormal = vbo;
+	return bindVA_VBO("VertexNormal", vbo);
+}
+
 
 }
 }

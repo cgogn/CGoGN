@@ -39,7 +39,7 @@ namespace GL2
 {
 
 template<typename PFP>
-void topoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -68,15 +68,14 @@ void topoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 	// phi2
 	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
 
-
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* ColorDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	m_vbo3->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	m_vbo0->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
 	unsigned int posDBI = 0;
 
@@ -135,19 +134,19 @@ void topoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 		}
 	}
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo0->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[3]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo3->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	m_vbo1->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionBuffer1 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[2]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	m_vbo2->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionBuffer2 = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
 	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
@@ -171,16 +170,19 @@ void topoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 		*positionF1++ = fv11[e];
 	}
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo1->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[2]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo2->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
 }
 
+
 template<typename PFP>
-void topoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
+	/*
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
@@ -333,7 +335,7 @@ void topoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[2]);
 	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
-
+*/
 }
 
 }//end namespace GL2

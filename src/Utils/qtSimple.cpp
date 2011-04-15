@@ -24,7 +24,9 @@
 
 #include "Utils/qtSimple.h"
 #include "Utils/qtgl.h"
-
+#include "Utils/GLSLShader.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_precision.hpp"
 
 namespace CGoGN
 {
@@ -37,6 +39,7 @@ namespace QT
 SimpleQT::SimpleQT():
 m_dock(NULL)
 {
+
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
 	setWindowTitle(tr("CGoGN"));
@@ -104,6 +107,13 @@ void SimpleQT::setHelpMsg(const std::string& msg)
 
 
 
+void SimpleQT::glMousePosition(int& x, int& y)
+{
+	QPoint xy = m_glWidget->mapFromGlobal(QCursor::pos());
+	x = xy.x();
+	y = m_glWidget->getHeight()- xy.y();
+}
+
 QDockWidget* SimpleQT::addEmptyDock()
 {
 		m_dock = new QDockWidget(tr("Control"), this);
@@ -143,6 +153,16 @@ void SimpleQT::dockTitle(const char* dockTitle)
 		m_dock->setWindowTitle(tr(dockTitle));
 }
 
+void SimpleQT::statusMsg(const char* msg)
+{
+	if (msg)
+	{
+		QString message = tr(msg);
+		statusBar()->showMessage(message);
+	}
+	else
+		statusBar()->hide();
+}
 
 void SimpleQT::setCallBack( const QObject* sender, const char* signal, const char* method)
 {
@@ -205,6 +225,42 @@ void SimpleQT::updateGL()
 	m_glWidget->updateGL();
 }
 
+void SimpleQT::updateGLMatrices()
+{
+	cb_updateMatrix();
+	m_glWidget->updateGL();
+}
+
+void SimpleQT::cb_updateMatrix()
+{
+	for (std::set< std::pair<void*, GLSLShader*> >::iterator it=GLSLShader::m_registredRunning.begin(); it!=GLSLShader::m_registredRunning.end(); ++it)
+	{
+		if ((it->first == NULL) || (it->first == this))
+			it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
+	}
+
+}
+
+void SimpleQT::synchronize(SimpleQT* sqt)
+{
+	m_projection_matrix = sqt->m_projection_matrix;
+	m_modelView_matrix = sqt->m_modelView_matrix;
+	for (unsigned int i=0; i< 4; ++i)
+	{
+		m_curquat[i] = sqt->m_curquat[i];
+		m_lastquat[i] = sqt->m_lastquat[i];
+	}
+	m_trans_x = sqt->trans_x();
+	m_trans_y = sqt->trans_y();
+	m_trans_z = sqt->trans_z();
+
+	SimpleQT::cb_updateMatrix();
+
+	m_glWidget->modelModified();
+	m_glWidget->updateGL();
+}
+
+
 
 void SimpleQT::add_menu_entry(const std::string label, const char* method )
 {
@@ -214,27 +270,68 @@ void SimpleQT::add_menu_entry(const std::string label, const char* method )
 }
 
 
-
-//QMenu *fileMenu
-
-
 /**
- * initialize popup menu
+ * initialize app menu
  */
 void SimpleQT::init_app_menu()
 {
 	m_appMenu->clear();
 }
 
-//void SimpleQT::contextMenuEvent(QContextMenuEvent *event)
-//{
-//	QMenu menu(this);
-//
-//	for (std::vector<QAction*>::iterator act = m_popup_actions.begin(); act != m_popup_actions.end(); ++act)
-//			menu.addAction(*act);
-//
-//	menu.exec(event->globalPos());
-//}
+void SimpleQT::registerRunning(GLSLShader* ptr)
+{
+	GLSLShader::m_registredRunning.insert(std::pair<void*,GLSLShader*>(this,ptr));
+}
+
+void SimpleQT::unregisterRunning(GLSLShader* ptr)
+{
+	GLSLShader::m_registredRunning.erase(std::pair<void*,GLSLShader*>(this,ptr));
+}
+
+
+GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
+{
+	// get Z from depth buffer
+//	int yy =  m_glWidget->getHeight() - y;
+	int yy = y;
+	GLfloat depth;
+	glReadPixels(x, yy,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&depth);
+
+
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT,&(viewport[0]));
+
+	glm::vec3 win(x, yy, 0.0f);
+
+	glm::vec3 P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+
+	rayA[0] = P[0];
+	rayA[1] = P[1];
+	rayA[2] = P[2];
+
+	win[2]=depth;
+
+	P =  glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+	rayB[0] = P[0];
+	rayB[1] = P[1];
+	rayB[2] = P[2];
+
+	if (depth == 1.0f)	// depth vary in [0-1]
+		depth = 0.5f;
+
+	win[0] += radius;
+
+	P =  glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+	Geom::Vec3f Q;
+	Q[0] = P[0];
+	Q[1] = P[1];
+	Q[2] = P[2];
+
+	// compute & return distance
+	Q -= rayB;
+	return float(Q.norm());
+}
+
 
 
 }

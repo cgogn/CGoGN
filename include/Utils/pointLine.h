@@ -22,77 +22,58 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
-#include "Utils/shaderSimpleColor.h"
+#ifndef __POINT_LINE_3D__
+#define __POINT_LINE_3D__
+
+#include "Utils/GLSLShader.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
 namespace Utils
 {
 
-std::string ShaderSimpleColor::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"}";
-
-
-std::string ShaderSimpleColor::fragmentShaderText =
-		"PRECISON;\n"
-		"uniform vec4 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=color;\n"
-		"}";
-
-
-ShaderSimpleColor::ShaderSimpleColor()
+class PointLine : public GLSLShader
 {
-	// get choose GL defines (2 or 3)
-	// ans compile shaders
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+protected:
+    static std::string vertexShaderText;
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+    static std::string geometryShaderText;
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+    static std::string fragmentShaderText;
 
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
+    GLuint m_uniform_scale;
 
-	//Default values
-	Geom::Vec4f color(0.1f,0.9f,0.1f,0.0f);
-	setColor(color);
+    GLuint m_uniform_color;
 
-}
+public:
+    /**
+     * init shaders and variables
+     */
+    PointLine(float scale=1.0f, const Geom::Vec3f& color = Geom::Vec3f(1.0f,1.0f,1.0f));
 
-void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
-{
-	m_color = color;
-	bind();
-	glUniform4fv(m_unif_color,1, color.data());
-}
+    /**
+	 * set the radius of sphere
+	 * @param radius
+	 */
+	void setScale(float scale);
 
+	/**
+	 * set the color
+	 */
+	void setColor(const Geom::Vec3f& color);
 
-unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
-}
+	/**
+	 * set attribute for position
+	 */
+	unsigned int setAttributePosition(VBO* vbo);
 
-void ShaderSimpleColor::restoreUniformsAttribs()
-{
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
-	bind();
-	glUniform4fv(m_unif_color,1, m_color.data());
-	bindVA_VBO("VertexPosition", m_vboPos);
-}
+	/**
+	 * set attribute for data (drawn vector)
+	 */
+	unsigned int setAttributeData(VBO* vbo);
 
-
+};
 }
 }
-
+#endif

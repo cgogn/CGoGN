@@ -74,6 +74,10 @@ public:
 	 */
 	unsigned int sizeElt() { return m_size/m_nb;}
 
+	/**
+	 * get the size of buffer in bytes
+	 */
+	unsigned int nbElt() { return m_nb;}
 
 };
 

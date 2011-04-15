@@ -24,6 +24,8 @@
 
 #include "Utils/vbo.h"
 #include "Utils/GLSLShader.h"
+#include <stdio.h>
+#include <string.h>
 
 namespace CGoGN
 {
@@ -31,15 +33,37 @@ namespace Utils
 {
 
 
-VBO::VBO()
+VBO::VBO():
+m_nbElts(0),m_lock(false)
 {
-	glGenBuffersARB(1,&m_id);
+	glGenBuffers(1,&m_id);
 	m_refs.reserve(4);
 }
 
+VBO::VBO(const VBO& vbo):
+	m_data_size(vbo.m_data_size),m_nbElts(vbo.m_nbElts),m_lock(false)
+{
+
+	unsigned int nbbytes =  sizeof(float)*m_data_size*m_nbElts;
+
+	glGenBuffers(1,&m_id);
+
+	vbo.bind();
+	void* src = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	bind();
+	glBufferData(GL_ARRAY_BUFFER, nbbytes, src, GL_STREAM_DRAW);
+
+	vbo.bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+
 VBO::~VBO()
 {
-	glDeleteBuffersARB(1,&m_id);
+	if (m_lock)
+		releasePtr();
+	glDeleteBuffers(1,&m_id);
 	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
 	{
 		(*it)->unbindVBO(this);
@@ -54,6 +78,27 @@ void VBO::ref(GLSLShader* sh)
 			return;
 	// no then add
 	m_refs.push_back(sh);
+}
+
+
+void* VBO::lockPtr()
+{
+	if (m_lock)
+	{
+		std::cerr <<" Error already locked VBO"<< std::endl;
+		return NULL;
+	}
+
+	m_lock=true;
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+}
+
+void VBO::releasePtr()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	m_lock=false;
 }
 
 

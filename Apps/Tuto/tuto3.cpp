@@ -24,19 +24,20 @@
 
 #include <iostream>
 
-#include "Utils/glutwin.h"
-
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/cellmarker.h"
 
-#include "Geometry/matrix.h"
 #include "Geometry/vector_gen.h"
-#include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/map_glRender.h"
-#include "Algo/Render/vbo_MapRender.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/shaderSimpleColor.h"
+#include "Utils/shaderColorPerVertex.h"
 
+#include "tuto3.h"
+
+MyQT* sqt1_ptr;
+MyQT* sqt2_ptr;
 
 using namespace CGoGN ;
 
@@ -46,83 +47,101 @@ struct PFP: public PFP_STANDARD
 	typedef Map2 MAP;
 };
 
-PFP::MAP myMap;
-
-SelectorTrue allDarts;
 
 
-PFP::TVEC3 position ;
-PFP::TVEC3 normal ;
-AttributeHandler<Geom::Vec4f> color ;
 
 
-class myGlutWin: public Utils::SimpleGlutWin
+void MyQT::cb_initGL()
 {
-public:
+	// choose to use GL version 2
+	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-     void myRedraw();
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
 
-     float gWidthObj;
-     Geom::Vec3f gPosObj;
+	// create VBO for position
+	m_positionVBO = new Utils::VBO();
+	m_colorVBO = new Utils::VBO();
 
-     Algo::Render::GL2::MapRender_VBO* m_render;
+	// using simple shader with color
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(m_positionVBO);
 
- 	myGlutWin(	int* argc, char **argv, int winX, int winY):SimpleGlutWin(argc,argv,winX,winY) {}
-};
 
-void myGlutWin::myRedraw(void)
+	m_shader2 = new Utils::ShaderColorPerVertex();
+	m_shader2->setAttributePosition(m_positionVBO);
+	m_shader2->setAttributeColor(m_colorVBO);
+
+
+	registerRunning(m_shader);
+	registerRunning(m_shader2);
+}
+
+
+void MyQT::cb_redraw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	// met l'objet au milieu de l'ecran a la bonne taille
-	float sc = 50.0f/gWidthObj;
-	glScalef(sc,sc,sc);
-	glTranslatef(-gPosObj[0],-gPosObj[1],-gPosObj[2]);
+	glLineWidth(2.0f);
+	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+	m_render->draw(m_shader, Algo::Render::GL2::LINES);
+
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(1.0f, 1.0f);
+	m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
+	glDisable(GL_POLYGON_OFFSET_FILL);
+
+}
 
 
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	glDisable(GL_LIGHTING);
+void MyQT::cb_keyPress(int code)
+{
+	switch(code)
+	{
+	case 's':
+		if (this == sqt2_ptr)
+			sqt1_ptr->synchronize(sqt2_ptr);
+		if (this == sqt1_ptr)
+			sqt2_ptr->synchronize(sqt1_ptr);
+		break;
+	}
 
-	// on trace les ligne devant
-	glDisable( GL_POLYGON_OFFSET_FILL );
-	glColor3f(1.0f,1.0f,0.0f);
-	m_render->draw(Algo::Render::GL2::LINES);
 
-	// et on decale les faces vers l'arriere
-	glEnable( GL_POLYGON_OFFSET_FILL );
-	glPolygonOffset( 1.0f, 1.0f );
-
-	glColor3f(0.0f,0.5f,0.0f);
-	m_render->draw(Algo::Render::GL2::TRIANGLES);
-	glDisable( GL_POLYGON_OFFSET_FILL );
-
-	glPopMatrix();
 }
 
 
 int main(int argc, char **argv)
 {
-	/// Utilisation des Marker
 
-	/// on reprend la carte de tuto1
+	PFP::MAP myMap;
+	SelectorTrue allDarts;
+
+	PFP::TVEC3 position ;
+	PFP::TVEC3 normal ;
+	AttributeHandler<Geom::Vec3f> color ;
 
 	Dart d2 = myMap.newOrientedFace(3);
 	Dart d3 = myMap.newOrientedFace(4);
 	myMap.sewFaces(d2,d3);
 
-	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	color = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "couleur");
 
 	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
+	color[d2] = PFP::VEC3(1.0f, 0.0f, 0.0f);
 	d2 = myMap.phi1(d2);
 	position[d2] = PFP::VEC3(2.0f, 0.0f, 0.0f);
+	color[d2] = PFP::VEC3(0.0f, 1.0f, 0.0f);
 	d2 = myMap.phi1(d2);
 	position[d2] = PFP::VEC3(1.0f, 3.0f, 0.0f);
+	color[d2] = PFP::VEC3(0.0f, 0.0f, 1.0f);
 	d2 = myMap.phi1(d2);
 	d3 = myMap.phi<11>(d3);
 	position[d3] = PFP::VEC3(0.0f, -2.0f, 0.0f);
+	color[d3] = PFP::VEC3(1.0f, 0.0f, 1.0f);
 	d3 = myMap.phi1(d3);
 	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
+	color[d3] = PFP::VEC3(0.0f, 1.0f, 1.0f);
 	d3 = myMap.phi1(d3);
 
 
@@ -150,30 +169,93 @@ int main(int argc, char **argv)
 			std::cout << "Sommet de dart "<< d.label() << " marque par mcv"<< std::endl;
 	}
 
+
 	//nettoyage
 	cm.unmarkAll();
 
-    // un peu d'interface
-	myGlutWin mgw(&argc,argv,800,800);
 
-    // calcul de la bounding box
+		// interface:
+	QApplication app(argc, argv);
+
+	MyQT sqt;
+	sqt1_ptr= &sqt;
+
+	MyQT sqt2;
+	sqt2_ptr= &sqt2;
+
+	// message d'aide
+	sqt.setHelpMsg("Tuto3:\n"
+			"marker tuto\n"
+			"using two VBO & two shader");
+
+    //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    // pour l'affichage
-    mgw.gWidthObj = std::max<float>( std::max<float>(bb.size(0),bb.size(1)),bb.size(2));
-    mgw.gPosObj =  (bb.min() +  bb.max()) /2.0f;
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-    // allocation des objets necessaires pour le rendu
-    mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
+    // envoit info BB a l'interface
+	sqt.setParamObject(lWidthObj,lPosObj.data());
 
-    // maj des donnees de position
-    mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
-    // creation des primitives de rendu a partir de la carte
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
-    mgw.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
+	// show 1 pour GL context
+	sqt.show();
 
-    mgw.mainLoop();
+	// update du VBO position (context GL necessaire)
+	sqt.m_positionVBO->updateData(position);
+	// update du VBO color
+	sqt.m_colorVBO->updateData(color);
 
-    delete mgw.m_render;
 
-    return 0;
+	// update des primitives du renderer
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+
+	// show final pour premier redraw
+	sqt.show();
+
+	// et pour le fun une deuxieme carte et une deuxieme interface:
+
+	PFP::MAP myMap2;
+	PFP::TVEC3 position2 ;
+	AttributeHandler<Geom::Vec3f> color2 ;
+
+	Dart dx = myMap2.newOrientedFace(4);
+
+	position2 = myMap2.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	color2 = myMap2.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "couleur");
+
+	position2[dx] = PFP::VEC3(0.0f, 0.0f, 0.0f);
+	color2[dx] = PFP::VEC3(1.0f, 1.0f, 0.0f);
+	dx = myMap.phi1(dx);
+	position2[dx] = PFP::VEC3(2.0f, 0.0f, 0.0f);
+	color2[dx] = PFP::VEC3(0.0f, 1.0f, 0.0f);
+	dx = myMap.phi1(dx);
+	position2[dx] = PFP::VEC3(2.0f, 2.0f, 0.0f);
+	color2[dx] = PFP::VEC3(1.0f, 0.0f, 1.0f);
+	dx = myMap.phi1(dx);
+	position2[dx] = PFP::VEC3(0.0f, 2.0f, 0.0f);
+	color2[dx] = PFP::VEC3(0.0f, 1.0f, 1.0f);
+
+
+
+	sqt2.setHelpMsg("Fenetre 2!!");
+
+	sqt2.setParamObject(lWidthObj,lPosObj.data());
+
+	// show 1 pour GL context
+	sqt2.show();
+
+	// update du VBO position (context GL necessaire)
+	sqt2.m_positionVBO->updateData(position2);
+	// update du VBO color
+	sqt2.m_colorVBO->updateData(color2);
+
+
+	// update des primitives du renderer
+	sqt2.m_render->initPrimitives<PFP>(myMap2, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt2.m_render->initPrimitives<PFP>(myMap2, allDarts, Algo::Render::GL2::LINES);
+
+
+	// et on attend la fin.
+	return app.exec();
+
 }

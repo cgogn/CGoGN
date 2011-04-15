@@ -31,6 +31,11 @@ namespace Utils
 template <typename ATTR_HANDLER>
 void VBO::updateData(const ATTR_HANDLER& attrib)
 {
+	if (m_lock)
+	{
+		std::cerr <<" Error locked VBO"<< std::endl;
+		return;
+	}
 	m_data_size = sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
 	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -40,6 +45,8 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 	glBufferData(GL_ARRAY_BUFFER, nbb * byteTableSize, 0, GL_STREAM_DRAW);
+
+	m_nbElts = nbb * byteTableSize / sizeof(typename ATTR_HANDLER::DATA_TYPE);
 
 	unsigned int offset = 0;
 
@@ -53,6 +60,11 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 template <typename ATTR_HANDLER>
 void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
+	if (m_lock)
+	{
+		std::cerr <<" Error locked VBO"<< std::endl;
+		return;
+	}
 	m_data_size = conv->sizeElt();
 	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -66,6 +78,8 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 	// bind buffer to update
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 	glBufferData(GL_ARRAY_BUFFER, nbb * conv->sizeBuffer(), 0, GL_STREAM_DRAW);
+
+	m_nbElts = nbb * conv->nbElt();
 
 	unsigned int offset = 0;
 

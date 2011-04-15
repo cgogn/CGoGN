@@ -34,6 +34,12 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
 
+#include "Utils/vbo.h"
+
+// forward
+namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
+namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
+
 namespace CGoGN
 {
 
@@ -47,7 +53,7 @@ namespace GL2
 {
 
 
-class topo3Render
+class Topo3Render
 {
 protected:
 
@@ -58,7 +64,17 @@ protected:
 	* 2: vertices phi2
 	* 3: vertices phi3
 	*/
-	GLuint m_VBOBuffers[5];
+	Utils::VBO* m_vbo0;
+	Utils::VBO* m_vbo1;
+	Utils::VBO* m_vbo2;
+	Utils::VBO* m_vbo3;
+	Utils::VBO* m_vbo4;
+
+	unsigned int m_vaId;
+
+	Utils::ShaderSimpleColor* m_shader1;
+	Utils::ShaderColorPerVertex* m_shader2;
+
 
 	/**
 	*number of darts to draw
@@ -129,12 +145,12 @@ public:
 	* @param good functor that return true for darts of part to draw
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/
-	topo3Render();
+	Topo3Render();
 
 	/**
 	* Destructor
 	*/
-	~topo3Render();
+	~Topo3Render();
 
 	/**
 	* update all drawing buffers
@@ -268,7 +284,7 @@ public:
 
 
 
-class topo3RenderMapD: public topo3Render
+class Topo3RenderMapD: public Topo3Render
 {
 public:
 	/**
@@ -285,7 +301,7 @@ public:
 };
 //
 //
-//class topo3RenderGMap: public topo3Render
+//class Topo3RenderGMap: public Topo3Render
 //{
 //public:
 //	/**

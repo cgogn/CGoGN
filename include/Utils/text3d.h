@@ -35,7 +35,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class Strings3D
+class Strings3D: public GLSLShader
 {
 protected:
     static const unsigned int WIDTHFONT = 32;
@@ -50,7 +50,14 @@ protected:
 
     static const unsigned int CHARSPERCOL = HEIGHTTEXTURE/WIDTHFONT;
 
-    ILuint m_imgName;
+    static std::string vertexShaderText;
+
+    static std::string fragmentShaderText1;
+    static std::string fragmentShaderText2;
+
+    static ILuint m_imgName;
+
+    static GLuint m_idTexture;
 
 	std::vector<std::string> m_strings;
 
@@ -60,15 +67,11 @@ protected:
 
     std::vector< Geom::Vec3f > m_strTranslate;
 
-    /**
-     * VBO (4f: x,y,u,v)
-     */
-    GLuint m_vbo1;
+
+    Utils::VBO* m_vbo1;
 
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
 
-
-    GLuint m_idTexture;
 
     GLuint m_uniform_texture;
 
@@ -78,20 +81,11 @@ protected:
 
     GLuint m_uniform_color;
 
-    Utils::GLSLShader m_shader;
-
 
 public:
-	Strings3D();
+	Strings3D(bool withBackground=true, const Geom::Vec3f& bgc=Geom::Vec3f(0.0f,0.0f,0.0f));
 
 	~Strings3D();
-
-	/**
-	 * initialization step
-	 * OpenGL context must be opened
-	 * @param scale factor for font rendering
-	 */
-	void init(float scale=1.0f);
 
 	/**
 	 * add astring

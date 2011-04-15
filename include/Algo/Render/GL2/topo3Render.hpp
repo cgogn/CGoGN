@@ -458,7 +458,7 @@ namespace GL2
 
 
 template<typename PFP>
-void topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
+void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -534,14 +534,14 @@ void topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
 	AutoAttributeHandler<VEC3> fv2x(map, DART_ORBIT);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* ColorDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	m_vbo4->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionDartsBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	m_vbo0->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
 	unsigned int posDBI=0;
 
@@ -606,22 +606,22 @@ void topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 		}
 	}
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo0->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	// phi1
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	m_vbo1->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	//phi2
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[2]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	m_vbo2->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	//phi3
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
-	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	m_vbo3->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionBuffer3 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
 	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
@@ -662,17 +662,17 @@ void topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 		} while (d != *face );
 	}
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo3->bind();
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[2]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo2->bind();
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[3]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo1->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[4]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vbo4->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 //
 //
@@ -892,11 +892,11 @@ void topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 
 
 template<typename PFP>
-void topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
+void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[4]);
-	float* colorBuffer =  reinterpret_cast<float*>(glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	m_vbo4->bind();
+	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -924,7 +924,7 @@ void topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 			d = map.end();
 		}
 	}
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 

@@ -5,8 +5,16 @@ project(examples)
 SET(CMAKE_BUILD_TYPE Release)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
+# FOR Qt4
+FIND_PACKAGE(Qt4 REQUIRED)
+SET(QT_USE_QTOPENGL TRUE)
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
 # define includes path
 include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
 	/usr/include/libxml2/
 	${CGoGN_ROOT_DIR}/include
 	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
@@ -57,14 +65,16 @@ target_link_libraries( triangulation
 add_executable( ter_meshes ../ter_meshes.cpp)
 target_link_libraries( ter_meshes
 	container topology utils algo ${COMMON_LIBS} )
-	
-add_executable( polyhedronsView ../polyhedronsView.cpp)
-target_link_libraries( polyhedronsView
-        container topology utils algo ${COMMON_LIBS} )
 
-add_executable( extrusionView ../extrusionView.cpp)
+QT4_WRAP_CPP(polyhedronsView_moc ../polyhedronsView.h)	
+add_executable( polyhedronsView ../polyhedronsView.cpp ${polyhedronsView_moc})
+target_link_libraries( polyhedronsView
+		${CGoGN_LIBS_R} ${COMMON_LIBS}  ${QT_LIBRARIES} )
+
+QT4_WRAP_CPP(extrusionView_moc ../extrusionView.h)	
+add_executable( extrusionView ../extrusionView.cpp ${extrusionView_moc})
 target_link_libraries( extrusionView
-        container topology utils algo ${COMMON_LIBS} )
+		${CGoGN_LIBS_R} ${COMMON_LIBS}  ${QT_LIBRARIES} )
         
 add_executable( scene ../scene.cpp)
 target_link_libraries( scene

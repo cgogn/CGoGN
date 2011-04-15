@@ -21,8 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef TUTO1
-#define TUTO1
+#ifndef __TUTO5_
+#define __TUTO5_
 
 
 #include <iostream>
@@ -30,46 +30,78 @@
 
 #include "Utils/qtSimple.h"
 
+#include "ui_tuto5.h"
+// inclure qtui.h juste après le ui_xxx.h
+#include "Utils/qtui.h"
+
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3RenderMapD; }}}}
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
+namespace CGoGN { namespace Utils { class Strings3D; } }
+namespace CGoGN { namespace Utils { class PointSprite; } }
+namespace CGoGN { namespace Utils { class PointLine; } }
 
 using namespace CGoGN ;
 
 /**
- * A class for a little interface and rendering
+ * Utilisation de designer-qt4:
+ * Faire un DockWiget (laisser le nom par defaut
+ * dans le Contents ajouter le layout choisi (vertical classiquement)
+ * Ajouter les widgets necessaires, mettre des noms clairs pour
+ * les utiliser dans le .cpp (pour les call back principalement)
  */
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
-public:
-	// render
+
+    bool render_text;
+	bool render_balls;
+	bool render_vectors;
+    bool render_topo;
+
 	Algo::Render::GL2::MapRender* m_render;
+	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
 
-	// VBO
 	Utils::VBO* m_positionVBO;
+	Utils::VBO* m_dataVBO;
 
-	// shader basic
 	Utils::ShaderSimpleColor* m_shader;
+	Utils::Strings3D* m_strings;
+	Utils::PointSprite* m_sprite;
+	Utils::PointLine* m_lines;
+public:
 
-	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL) {}
 
-	// callbacks of simpleQT to overdefine:
+
+	MyQT():
+		render_text(true),render_balls(true),render_vectors(true),render_topo(true),
+		m_render(NULL), m_positionVBO(NULL), m_shader(NULL)
+		{}
+
+
+protected:
+//    void updateVBO();
+
+    void storeVerticesInfo();
+
 	void cb_redraw();
 
 	void cb_initGL();
 
-	void cb_keyPress(int code);
-
-	void cb_New() { std::cout << "New ..."<< std::endl;}
-	void cb_Save() { std::cout << "Rien a sauver ..."<< std::endl;
-}
-
-	// callbacks (slots) locally defined
+// slots locaux
 public slots:
-	void menu_slot1() { std::cout << "Exemple de menu"<< std::endl; }
+	void balls_onoff(bool x);
+	void vectors_onoff(bool x);
+	void text_onoff(bool x);
+	void topo_onoff(bool x);
+
+	void slider_balls(int x);
+	void slider_vectors(int x);
+	void slider_text(int x);
+
 
 
 };
