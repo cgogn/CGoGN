@@ -236,7 +236,9 @@ void SimpleQT::cb_updateMatrix()
 	for (std::set< std::pair<void*, GLSLShader*> >::iterator it=GLSLShader::m_registredRunning.begin(); it!=GLSLShader::m_registredRunning.end(); ++it)
 	{
 		if ((it->first == NULL) || (it->first == this))
+		{
 			it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
+		}
 	}
 
 }

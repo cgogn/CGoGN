@@ -47,6 +47,8 @@
 #include "Utils/shaderSimpleColor.h"
 #include "Utils/shaderPhong.h"
 
+#include "Utils/drawer.h"
+
 
 /// pour simplifier l'ecriture du code
 using namespace CGoGN;
@@ -225,65 +227,69 @@ std::vector<Dart> d_vertices;
 
 void MyQT::drawSelected()
 {
-	/*
+
 	typedef Dart Dart;
 
 // FACES
-	glLineWidth(5.0f);
+
+	m_ds->newList(GL_COMPILE_AND_EXECUTE);
+	m_ds->lineWidth(5.0f);
 	for(unsigned int i=0; i < d_faces.size(); ++i)
 	{
+		m_ds->begin(GL_POLYGON);
 		// fait varier la couleur du plus pres au plus loin
 		float c = float (i) / float (d_faces.size());
+		m_ds->color3f(1.0f - c , 0.0f, c);
 
-		glBegin(GL_LINE_LOOP);
-		glColor3f(1.0f - c , c ,0.);
 		Dart d = d_faces[i];
 		do
 		{
 			const PFP::VEC3& P = position[d];
-			glVertex3fv(P.data());
+			m_ds->vertex(P);
 			d = myMap.phi1(d);
 		} while (d!=d_faces[i]);
-		glEnd();
+
+		m_ds->end();
 	}
 
-//edges
-	glLineWidth(7.0f);
-	glBegin(GL_LINES);
 
+//edges
+	m_ds->begin(GL_LINES);
+	m_ds->lineWidth(5.0f);
 	for(unsigned int i=0; i < d_edges.size(); ++i)
 	{
 		// fait varier la couleur du plus pres au plus loin
 		float c = float (i) / float (d_edges.size());
-		glColor3f(1.0f - c , c ,0.);
+		m_ds->color3f(1.0f - c , c ,0.);
 
 		Dart d = d_edges[i];
 		const PFP::VEC3& P = position[d];
-		glVertex3fv(P.data());
+		m_ds->vertex(P);
 		d = myMap.phi1(d);
 		const PFP::VEC3& Q =  position[d];
-		glVertex3fv(Q.data());
+		m_ds->vertex(Q);
 	}
-	glEnd();
+	m_ds->end();
+
 
 //VERTICES
 //edges
-	glPointSize(9.0f);
-	glBegin(GL_POINTS);
+	m_ds->pointSize(9.0f);
+	m_ds->begin(GL_POINTS);
 
 	for(unsigned int i=0; i < d_vertices.size(); ++i)
 	{
 		// fait varier la couleur du plus pres au plus loin
 		float c = float (i) / float (d_vertices.size());
-		glColor3f(1.0f - c , c ,0.);
+		m_ds->color3f(1.0f - c , 0., c);
 		Dart d = d_vertices[i];
 		const PFP::VEC3& P = position[d];
-		glVertex3fv(P.data());
+		m_ds->vertex(P);
 	}
-	glEnd();
+	m_ds->end();
+
+	m_ds->endList();
 	
-	glLineWidth(7.0f);
-	*/
 	for(unsigned int i=0; i < selected_darts.size(); ++i)
 	{
 		// fait varier la couleur du plus pres au plus loin
@@ -325,6 +331,8 @@ void MyQT::cb_initGL()
 	m_render = new Algo::Render::GL2::MapRender();
 	m_render_topo = new Algo::Render::GL2::TopoRenderMapD() ;
 
+	m_ds = new Utils::Drawer();
+
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();
 	m_normalVBO = new Utils::VBO();
@@ -333,8 +341,7 @@ void MyQT::cb_initGL()
 	m_shader->setAttributePosition(m_positionVBO);
 	m_shader->setAttributeNormal(m_normalVBO);
 	m_shader->setDiffuse(Geom::Vec4f(0.,0.6,0.,0.));
-//	m_shader->setShininess(10000.0);
-	m_shader->setSpecular(Geom::Vec4f(0.,0.0,0.,0.));
+	m_shader->setSpecular(Geom::Vec4f(0.,0.0,0.,0.)); // no specular
 
 	// using simple shader with color
 	m_shader2 = new Utils::ShaderSimpleColor();
@@ -351,19 +358,22 @@ void MyQT::cb_redraw()
 {
 
 	drawSelected();
-
 	if (renderTopo)
 	{
 		glEnable( GL_POLYGON_OFFSET_FILL );
-		glPolygonOffset( 0.2f, 0.2f );
+		glPolygonOffset( 1.0f, 1.0f );
 		m_render_topo->drawTopo();
 	}
 
-	/// decalage pour surlignage non clignotant
 	glEnable( GL_POLYGON_OFFSET_FILL );
-	glPolygonOffset( 1.0f, 1.0f );
+	glPolygonOffset( 1.5f, 1.5f );
+
+
+
+	glPolygonOffset( 2.0f, 2.0f );
 	glLineWidth(1.0f);
 	m_render->draw(m_shader2,Algo::Render::GL2::LINES) ;
+
 
 	/// Rendu faces pleines
 	glEnable(GL_CULL_FACE);
@@ -378,6 +388,8 @@ void MyQT::cb_redraw()
 
 void MyQT::cb_keyPress(int keycode)
 {
+	typedef Dart Dart;
+
 	int x,y;
 	glMousePosition(x,y);
 	std::cout << x << " , "<< y << std::endl;
@@ -470,6 +482,7 @@ void MyQT::cb_keyPress(int keycode)
 			std::stringstream ss;
 			ss << "Face " << d_faces[0].index/3;
 			statusMsg(ss.str().c_str());
+			updateGL();
 		}
 		break;
 	}
@@ -494,6 +507,7 @@ void MyQT::cb_keyPress(int keycode)
 			if (dd != d_edges[0])
 				ss << std::endl<< " phi2: " << dd.index<<" phi1: "<< myMap.phi1(dd).index;
 			statusMsg(ss.str().c_str());
+			updateGL();
 		}
 
 		break;
@@ -516,6 +530,8 @@ void MyQT::cb_keyPress(int keycode)
 			std::stringstream ss;
 			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]];
 			statusMsg(ss.str().c_str());
+
+			updateGL();
 		}
 
 		break;

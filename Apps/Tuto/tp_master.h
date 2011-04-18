@@ -37,6 +37,7 @@ namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderPhong; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
+namespace CGoGN { namespace Utils { class Drawer; } }
 
 using namespace CGoGN ;
 
@@ -65,6 +66,11 @@ public:
 	Utils::ShaderSimpleColor* m_shader2;
 
 	bool renderTopo;
+
+	/**
+	 * object that allow easy rendering
+	 */
+	Utils::Drawer* m_ds;
 
 	MyQT():
 		m_render(NULL), m_render_topo(NULL),

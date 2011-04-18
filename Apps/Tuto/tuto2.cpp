@@ -32,10 +32,12 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Utils/shaderSimpleColor.h"
 
+#include "Utils/drawer.h"
+
 #include "tuto2.h"
 
 
-
+Utils::DrawerSimple* ds;
 
 using namespace CGoGN ;
 
@@ -78,6 +80,8 @@ void MyQT::cb_initGL()
 	m_with_lines=true;
 	m_line_width=4.0;
 
+	ds = new Utils::DrawerSimple();
+
 }
 
 
@@ -92,6 +96,21 @@ void MyQT::cb_redraw()
 			glLineWidth(m_line_width);
 			m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
 			m_render->draw(m_shader, Algo::Render::GL2::LINES);
+
+
+			glPointSize(5.0f);
+			float c = 0.0f;
+
+			ds->globalColor(Geom::Vec4f(1.0f , 0.0 ,0.,0.));
+			ds->begin(GL_POINTS);
+
+			ds->vertex(Geom::Vec3f(-1,-1,0));
+			ds->vertex(Geom::Vec3f(-1,4,0));
+			ds->vertex(Geom::Vec3f(4,4,0));
+			ds->vertex(Geom::Vec3f(4,-1,0));
+			ds->end();
+			ds->draw();
+
 		}
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
