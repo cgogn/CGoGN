@@ -85,6 +85,10 @@ std::string ShaderFlat::fragmentShaderText =
 
 ShaderFlat::ShaderFlat()
 {
+	m_nameVS = "ShaderFlat_vs";
+	m_nameFS = "ShaderFlat_fs";
+	m_nameGS = "ShaderFlat_gs";
+
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 

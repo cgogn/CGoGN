@@ -28,6 +28,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_precision.hpp"
 
+#include <QtGui/QTextEdit>
+
 namespace CGoGN
 {
 namespace Utils
@@ -77,6 +79,22 @@ m_dock(NULL)
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_about_cgogn()));
 	m_helpMenu->addAction(action);
 
+
+	m_dockConsole = new QDockWidget(tr("Console"), this);
+	m_dockConsole->setAllowedAreas(Qt::BottomDockWidgetArea);
+	m_dockConsole->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetClosable);
+	addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
+
+	m_textConsole = new QTextEdit();
+	m_textConsole->setLineWrapMode(QTextEdit::NoWrap);
+	m_textConsole->setTabStopWidth(20);
+	m_textConsole->setReadOnly(true);
+
+	m_dockConsole->setWidget(m_textConsole);
+
+	m_dockConsole->hide();
+
+
 }
 
 SimpleQT::~SimpleQT()
@@ -117,29 +135,46 @@ void SimpleQT::glMousePosition(int& x, int& y)
 QDockWidget* SimpleQT::addEmptyDock()
 {
 		m_dock = new QDockWidget(tr("Control"), this);
-		m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea|Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
-		m_dock->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable);
+		m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+		m_dock->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetClosable);
 		addDockWidget(Qt::RightDockWidgetArea, m_dock);
 
 		m_dock->hide();
-		m_dockOn=false;
-
 		return m_dock;
 }
 
 void SimpleQT::visibilityDock(bool visible)
 {
 	if (visible)
-	{
 		m_dock->show();
-		m_dockOn=true;
-	}
 	else
-	{
 		m_dock->hide();
-		m_dockOn=false;
-	}
 }
+
+void SimpleQT::visibilityConsole(bool visible)
+{
+	if (visible)
+		m_dockConsole->show();
+	else
+		m_dockConsole->hide();
+}
+
+void SimpleQT::toggleVisibilityDock()
+{
+	if (m_dock->isHidden())
+		m_dock->show();
+	else
+		m_dock->hide();
+}
+
+void SimpleQT::toggleVisibilityConsole()
+{
+	if (m_dockConsole->isHidden())
+		m_dockConsole->show();
+	else
+		m_dockConsole->hide();
+}
+
 
 
 void SimpleQT::windowTitle(const char* windowTitle)
@@ -153,15 +188,20 @@ void SimpleQT::dockTitle(const char* dockTitle)
 		m_dock->setWindowTitle(tr(dockTitle));
 }
 
-void SimpleQT::statusMsg(const char* msg)
+void SimpleQT::statusMsg(const char* msg, int timeoutms)
 {
 	if (msg)
 	{
 		QString message = tr(msg);
-		statusBar()->showMessage(message);
+		statusBar()->showMessage(message,timeoutms);
 	}
 	else
-		statusBar()->hide();
+	{
+		if (statusBar()->isHidden())
+			statusBar()->show();
+		else
+			statusBar()->hide();
+	}
 }
 
 void SimpleQT::setCallBack( const QObject* sender, const char* signal, const char* method)
@@ -172,29 +212,24 @@ void SimpleQT::setCallBack( const QObject* sender, const char* signal, const cha
 
 void SimpleQT::keyPressEvent(QKeyEvent *e)
 {
-	if ((e->key() == Qt::Key_Return) && m_dock != NULL) // m for menu
+	if (e->modifiers() & Qt::ShiftModifier)
 	{
-
-		if (m_dockOn)
-		{
-			m_dock->hide();
-			m_dockOn=false;
-		}
-		else
-		{
-			m_dock->show();
-			m_dockOn=true;
-		}
+		if ((e->key() == Qt::Key_Return))
+			toggleVisibilityConsole();
+	}
+	else
+	{
+		if ((e->key() == Qt::Key_Return) && m_dock != NULL)
+			toggleVisibilityDock();
 	}
 
+
     if (e->key() == Qt::Key_Escape)
-    {
     	close();
-    }
     else
         QWidget::keyPressEvent(e);
 
-    m_glWidget->keyPressEvent(e);
+    m_glWidget->keyPressEvent(e); // ?
 }
 
 
@@ -209,7 +244,6 @@ void SimpleQT::setDock(QDockWidget *dock)
 {
 	m_dock = dock;
 	addDockWidget(Qt::RightDockWidgetArea, m_dock);
-	m_dockOn=true;
 	m_dock->show();
 }
 

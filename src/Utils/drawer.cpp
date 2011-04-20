@@ -153,7 +153,6 @@ void Drawer::callList()
 	if (m_begins.empty())
 		return;
 
-	//draw
 	m_shader->enableVertexAttribs();
 	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
 	{

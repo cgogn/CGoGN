@@ -63,6 +63,7 @@ protected:
 	* 1: vertices phi1
 	* 2: vertices phi2
 	* 3: vertices phi3
+	* 4: colors
 	*/
 	Utils::VBO* m_vbo0;
 	Utils::VBO* m_vbo1;
@@ -132,6 +133,24 @@ protected:
 	void updateGMap3(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
 
 
+	/**
+	 * save colors
+	 */
+	void pushColors();
+
+
+	/**
+	 * restore colors
+	 */
+	void popColors();
+
+	/**
+	 * pick dart with color set bey setDartsIdColor
+	 * @param x position of mouse (x)
+	 * @param y position of mouse (pass H-y, classic pb of origin)
+	 * @return the dart or NIL
+	 */
+	Dart pickColor(unsigned int x, unsigned int y);
 
 public:
 
@@ -234,16 +253,6 @@ public:
 	void overdrawDart(Dart d, float width, float r, float g, float b);
 
 
-	/**
-	 * save colors
-	 */
-	void pushColors();
-
-
-	/**
-	 * restore colors
-	 */
-	void popColors();
 
 	/*
 	 * store darts in color for picking
@@ -254,14 +263,19 @@ public:
 	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
 
 
+
 	/**
 	 * pick dart with color set bey setDartsIdColor
 	 * Do not forget to apply same transformation to scene before picking than before drawing !
+	 * @param map the map
+	 * @param good a dart selector
 	 * @param x position of mouse (x)
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
-	Dart picking(unsigned int x, unsigned int y);
+	template<typename PFP>
+	Dart picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y);
+
 };
 
 //template<typename MAP>

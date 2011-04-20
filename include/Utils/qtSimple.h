@@ -90,8 +90,10 @@ public:
 
 	/**
 	 * draw a message in status bar
+	 * @param msg message in C format (if NULL swp show/hidden)
+	 * @param timeoutms number of ms message stay (0 = until next msg)
 	 */
-	void statusMsg(const char* msg);
+	void statusMsg(const char* msg, int timeoutms=0);
 	/**
 	 * add an empty dock to the window
 	 */
@@ -101,6 +103,20 @@ public:
 	 * change dock visibility
 	 */
 	void visibilityDock(bool visible);
+
+	/**
+	 * change console visibility
+	 */
+	void visibilityConsole(bool visible);
+
+	/**
+	 * change dock visibility
+	 */
+	void toggleVisibilityDock();
+	/**
+	 * change console visibility
+	 */
+	void toggleVisibilityConsole();
 
 	/**
 	 * add an entry to popup menu
@@ -124,6 +140,10 @@ protected:
 	GLWidget *m_glWidget;
 
 	QDockWidget *m_dock;
+
+	QDockWidget *m_dockConsole;
+
+	QTextEdit* m_textConsole;
 
 	bool m_dockOn;
 
@@ -181,15 +201,42 @@ public:
 	 */
 	glm::mat4& projectionMatrix () { return m_projection_matrix;}
 
-	float * curquat() { return m_curquat;}
 
-	float * lastquat() { return m_lastquat;}
+	float* curquat() { return m_curquat;}
+	float* lastquat() { return m_lastquat;}
 
 	float& trans_x() { return m_trans_x;}
 	float& trans_y() { return m_trans_y;}
 	float& trans_z() { return m_trans_z;}
 
+	/**
+	 * shift key pressed ?
+	 */
+	bool Shift() const { return m_glWidget->Shift(); }
 
+	/**
+	 * control key pressed ?
+	 */
+	bool Control() const { return m_glWidget->Control(); }
+
+	/**
+	 * alt key pressed ?
+	 */
+	bool Alt() const  { return m_glWidget->Alt(); }
+
+	/**
+	 * height of OpenGL widget (for classic yy = H-y
+	 */
+	int getHeight() const { return m_glWidget->getHeight();}
+
+	/**
+	 * console QTextEdit ptr
+	 */
+	QTextEdit* console() { return m_textConsole;}
+
+	/**
+	 * syncronization between SimpleQTs (experimental)
+	 */
 	void synchronize(SimpleQT* sqt);
 
 	/**

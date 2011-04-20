@@ -222,12 +222,12 @@ void GLWidget:: keyPressEvent(QKeyEvent* event)
     if (event->key() == Qt::Key_Escape)
         close();
     else
-        QWidget::keyPressEvent(event);
+    	QWidget::keyPressEvent(event);
 
     m_state_modifier = event->modifiers();
 
     int k = event->key();
-    if ( (k>=65) && (k<=91) && (event->modifiers() != Qt::ShiftModifier) )
+    if ( (k>=65) && (k<=91) && !(event->modifiers() & Qt::ShiftModifier) )
     	k+=32;
 
     if (m_cbs)
@@ -236,6 +236,8 @@ void GLWidget:: keyPressEvent(QKeyEvent* event)
 
 void GLWidget::keyReleaseEvent(QKeyEvent *event)
 {
+	QWidget::keyReleaseEvent(event);
+
 	m_state_modifier = event->modifiers();
 
     int k = event->key();

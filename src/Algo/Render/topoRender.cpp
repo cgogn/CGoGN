@@ -218,7 +218,7 @@ void TopoRender::dartToCol(Dart d, float& r, float& g, float& b)
 }
 
 
-Dart TopoRender::picking(unsigned int x, unsigned int y)
+Dart TopoRender::pickColor(unsigned int x, unsigned int y)
 {
 	//more easy picking for
 	unsigned int dw = m_topo_dart_width;
@@ -249,6 +249,28 @@ Dart TopoRender::picking(unsigned int x, unsigned int y)
 }
 
 
+void TopoRender::pushColors()
+{
+	m_color_save = new float[6*m_nbDarts];
+	m_vbo3->bind();
+	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	memcpy(m_color_save, colorBuffer, 6*m_nbDarts*sizeof(float));
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+
+void TopoRender::popColors()
+{
+	m_vbo3->bind();
+	void* colorBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	memcpy(colorBuffer, m_color_save, 6*m_nbDarts*sizeof(float));
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	delete[] m_color_save;
+	m_color_save=NULL;
+}
 
 
 

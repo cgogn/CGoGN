@@ -91,6 +91,8 @@ protected:
 
 	void cb_initGL();
 
+	void cb_mousePress(int button, int x, int y);
+
 // slots locaux
 public slots:
 	void balls_onoff(bool x);

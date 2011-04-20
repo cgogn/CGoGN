@@ -97,6 +97,10 @@ protected:
 	 */
 	GLhandleARB	m_geom_shader_object;
 
+	std::string m_nameVS;
+	std::string m_nameFS;
+	std::string m_nameGS;
+
 	/**
 	 * handle of program
 	 */

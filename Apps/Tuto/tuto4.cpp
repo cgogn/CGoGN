@@ -40,6 +40,7 @@
 #include "Utils/shaderSimpleColor.h"
 #include "Utils/shaderFlat.h"
 
+#include "Utils/cgognStream.h"
 
 
 using namespace CGoGN ;
@@ -241,7 +242,6 @@ int main(int argc, char **argv)
 	dock.vertexEdit->setPlainText(QString(sqt.m_shader2->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(sqt.m_shader2->getFragmentShaderSrc()));
 	dock.geometryEdit->setPlainText(QString(sqt.m_shader2->getGeometryShaderSrc()));
-
 	// show final pour premier redraw
 	sqt.show();
 

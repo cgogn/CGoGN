@@ -83,12 +83,12 @@ GLSLShader::GLSLShader():
 
 void GLSLShader::registerRunning(GLSLShader* ptr)
 {
-	m_registredRunning.insert(std::pair<void*,GLSLShader*>(NULL,ptr));
+	m_registredRunning.insert(std::pair<void*,GLSLShader*>(reinterpret_cast<void*>(NULL),ptr));
 }
 
 void GLSLShader::unregisterRunning(GLSLShader* ptr)
 {
-	m_registredRunning.erase(std::pair<void*,GLSLShader*>(NULL,ptr));
+	m_registredRunning.erase(std::pair<void*,GLSLShader*>(reinterpret_cast<void*>(NULL),ptr));
 }
 
 
@@ -319,7 +319,8 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	{
 		std::cerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader." << std::endl;
 		info_log = getInfoLog( m_vertex_shader_object );
-		std::cerr << "  COMPILATION " << info_log << std::endl;
+		std::cerr << "  COMPILATION OF "<< m_nameVS<< std::endl;
+		std::cerr << info_log << std::endl;
 		delete [] info_log;
 
 		glDeleteObjectARB( m_vertex_shader_object );
@@ -377,7 +378,7 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	{
 		std::cerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader." << std::endl;
 		info_log = getInfoLog( m_fragment_shader_object );
-		std::cerr << "  COMPILATION " << info_log << std::endl;
+		std::cerr << "  COMPILATION OF "<< m_nameFS<< std::endl << info_log << std::endl;
 		delete [] info_log;
 
 		glDeleteObjectARB( m_fragment_shader_object );
@@ -436,7 +437,8 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	{
 		std::cerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader." << std::endl;
 		info_log = getInfoLog( m_geom_shader_object );
-		std::cerr << "  COMPILATION " << info_log << std::endl;
+		std::cerr << "  COMPILATION OF "<< m_nameGS<< std::endl;
+		std::cerr << info_log << std::endl;
 		delete [] info_log;
 
 		glDeleteObjectARB( m_geom_shader_object );
@@ -691,6 +693,8 @@ bool GLSLShader::init()
 
 bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps)
 {
+	m_nameVS = vs;
+	m_nameFS = ps;
 
 	std::string vss = findFile(vs);
 	if(!loadVertexShader(vss)) return false;
@@ -708,6 +712,10 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps)
 
 bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const std::string& gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive)
 {
+	m_nameVS = vs;
+	m_nameFS = ps;
+	m_nameGS = gs;
+
 	std::string vss = findFile(vs);
 	if(!loadVertexShader(vss)) return false;
 
@@ -815,7 +823,6 @@ bool GLSLShader::reloadVertexShaderFromMemory(const char* vs)
 	m_vertex_shader_source = new char[sz+1];
 	strcpy(m_vertex_shader_source,vs);
 
-	if(!loadVertexShaderSourceString(vs)) return false;
 	return true;
 }
 
@@ -828,7 +835,6 @@ bool GLSLShader::reloadFragmentShaderFromMemory(const char* fs)
 	m_fragment_shader_source = new char[sz+1];
 	strcpy(m_fragment_shader_source,fs);
 
-	if(!loadFragmentShaderSourceString(fs)) return false;
 	return true;
 }
 
@@ -841,20 +847,15 @@ bool GLSLShader::reloadGeometryShaderFromMemory(const char* gs)
 	m_geom_shader_source = new char[sz+1];
 	strcpy(m_geom_shader_source,gs);
 
-	if(!loadGeometryShaderSourceString(gs)) return false;
 	return true;
 }
 
 bool GLSLShader::recompile()
 {
-	std::cout << "Recomp: "<<  m_vertex_shader_source << std::endl;
-
 	if (m_vertex_shader_source)
 		if(!loadVertexShaderSourceString(m_vertex_shader_source)) return false;
-
 	if (m_fragment_shader_source)
 		if(!loadFragmentShaderSourceString(m_fragment_shader_source)) return false;
-
 	if (m_geom_shader_source)
 		if(!loadGeometryShaderSourceString(m_geom_shader_source)) return false;
 
@@ -863,11 +864,13 @@ bool GLSLShader::recompile()
 		std::cout << "Unable to create the shaders !" << std::endl;
 		return false;
 	}
+std::cout << "DDDD"<< std::endl;
 
 	m_uniMat_Proj		= glGetUniformLocation(m_program_object,"ProjectionMatrix");
 	m_uniMat_Model		= glGetUniformLocation(m_program_object,"ModelViewMatrix");
 	m_uniMat_ModelProj	= glGetUniformLocation(m_program_object,"ModelViewProjectionMatrix");
 	m_uniMat_Normal		= glGetUniformLocation(m_program_object,"NormalMatrix");
+std::cout << "EEEE"<< std::endl;
 
 	restoreUniformsAttribs();
 

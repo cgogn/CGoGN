@@ -338,6 +338,55 @@ void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 */
 }
 
+
+template<typename PFP>
+void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
+{
+
+	m_vbo3->bind();
+	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	unsigned int nb=0;
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (nb < m_nbDarts)
+		{
+			if (good(d))
+			{
+				float r,g,b;
+				dartToCol(d, r,g,b);
+				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+				*local++ = r;
+				*local++ = g;
+				*local++ = b;
+
+				nb++;
+			}
+		}
+		else
+		{
+			std::cerr << "Error buffer too small for color picking (change the good parameter ?)" << std::endl;
+			d = map.end();
+		}
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+template<typename PFP>
+Dart TopoRender::picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y)
+{
+	pushColors();
+	setDartsIdColor<PFP>(map,good);
+	Dart d = pickColor(x,y);
+	popColors();
+	return d;
+
+}
+
+
 }//end namespace GL2
 
 }//end namespace Algo

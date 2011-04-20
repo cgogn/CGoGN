@@ -88,6 +88,9 @@ protected:
 	 */
 	float m_topo_relation_width;
 
+
+	float *m_color_save;
+
 	/**
 	 * attribut d'index dans le VBO
 	 */
@@ -100,6 +103,15 @@ protected:
 	Dart colToDart(float* color);
 
 	void dartToCol(Dart d, float& r, float& g, float& b);
+
+	Dart pickColor(unsigned int x, unsigned int y);
+
+	template<typename PFP>
+	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
+
+	void pushColors();
+
+	void popColors();
 
 public:
 	/**
@@ -179,11 +191,14 @@ public:
 	/**
 	 * pick dart with color set bey setDartsIdColor
 	 * Do not forget to apply same transformation to scene before picking than before drawing !
+	 * @param map the map in which we pick (same as drawn !)
+	 * @param good the selector (same as used during drawing)
 	 * @param x position of mouse (x)
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
 	 */
-	Dart picking(unsigned int x, unsigned int y);
+	template<typename PFP>
+	Dart picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y);
 };
 
 class TopoRenderMapD : public TopoRender

@@ -674,6 +674,10 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	m_vbo4->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
+
+
+
+
 //
 //
 //
@@ -926,6 +930,18 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
+
+template<typename PFP>
+Dart Topo3Render::picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y)
+{
+	pushColors();
+	setDartsIdColor<PFP>(map,good);
+	Dart d = pickColor(x,y);
+	popColors();
+	return d;
+
+}
+
 
 
 }//end namespace VBO

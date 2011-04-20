@@ -319,7 +319,7 @@ void Topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
 }
 
 
-Dart Topo3Render::picking(unsigned int x, unsigned int y)
+Dart Topo3Render::pickColor(unsigned int x, unsigned int y)
 {
 	//more easy picking for
 	unsigned int dw = m_topo_dart_width;
@@ -334,6 +334,7 @@ Dart Topo3Render::picking(unsigned int x, unsigned int y)
 
 	glDisable(GL_LIGHTING);
 	// draw in back buffer (not shown on screen)
+
 	drawDarts();
 
 	// restore dart with

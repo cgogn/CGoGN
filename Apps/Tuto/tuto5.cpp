@@ -47,6 +47,8 @@
 
 #include "Utils/pointSprite.h"
 #include "Utils/pointLine.h"
+#include "Utils/cgognStream.h"
+
 
 using namespace CGoGN ;
 
@@ -81,7 +83,6 @@ void MyQT::vectors_onoff(bool x)
 
 void MyQT::text_onoff(bool x)
 {
-	statusMsg(NULL);
 	render_text = !render_text;
 	updateGL();
 }
@@ -231,11 +232,34 @@ void MyQT::cb_redraw()
 
 }
 
+void MyQT::cb_mousePress(int button, int x, int y)
+{
+	if (Shift())
+	{
+		Dart d = m_render_topo->picking<PFP>(myMap,allDarts,x,getHeight()-y);
+		if (d != Dart::nil())
+		{
+//			std::stringstream ss;
+//			ss << "Dart "<< d << " clicked"<< std::endl;
+//			statusMsg(ss.str().c_str());
+
+			CGoGNout << "Dart "<< d << " clicked"<< CGoGNendl;
+		}
+		else
+		{
+			statusMsg("");
+		}
+	}
+}
+
 
 int main(int argc, char **argv)
 {
 
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT,"position");
+
+	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
 
 
 	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
@@ -258,7 +282,17 @@ int main(int argc, char **argv)
  	// message d'aide
 	sqt.setHelpMsg("");
 
-	sqt.statusMsg("3Map with topo rendering & attribute shader utilization");
+	CGoGNout.out2StatuBar(&sqt);
+	CGoGNout <<"CGoGNOut StatusBar"<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+
+	CGoGNout.out2Console(&sqt);
+
+	CGoGNout <<"CGoGNOut dans la console"<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+
+	CGoGNout.out2StatuBar(NULL);
+	CGoGNout <<"tirelipinpon .."<< CGoGNendl;
+	CGoGNout <<"ah aha ah"<< CGoGNendl;
+
 
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
@@ -283,7 +317,12 @@ int main(int argc, char **argv)
 	sqt.slider_vectors(50);
 	sqt.slider_text(50);
 
-
+	GLint texSize;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+	CGoGNdbg2.out2Console(&sqt);
+	CGoGNerr.out2Console(&sqt);
+	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
+	CGoGNerr << " ERROR  " <<  5*7 << CGoGNendl;
 
 	// et on attend la fin.
 	return app.exec();
