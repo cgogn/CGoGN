@@ -27,6 +27,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "Utils/cgognStream.h"
 
 #include "glm/gtx/inverse_transpose.hpp"
 
@@ -166,7 +167,7 @@ char* GLSLShader::loadSourceFile(  const std::string& filename)
 
 	if( !file.good() )
 	{
-		std::cerr << "ERROR - GLSLShader::loadSourceFile() - unable to open the file " << filename << "." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadSourceFile() - unable to open the file " << filename << "." << CGoGNendl;
 		return NULL;
 	}
 
@@ -188,7 +189,7 @@ char* GLSLShader::loadSourceFile(  const std::string& filename)
 	}
 	catch( std::exception& io_exception )
 	{
-		std::cerr << "ERROR - GLSLShader::loadSourceFile() - " << io_exception.what() << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadSourceFile() - " << io_exception.what() << CGoGNendl;
 		file.close();
 		return NULL;
 	}
@@ -212,7 +213,7 @@ bool GLSLShader::loadVertexShader(  const std::string& filename )
 
 	if( !m_vertex_shader_source )
 	{
-		std::cerr << "ERROR - GLSLShader::loadVertexShader() - error occured while loading source file." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadVertexShader() - error occured while loading source file." << CGoGNendl;
 		return false;
 	}
 
@@ -236,7 +237,7 @@ bool GLSLShader::loadFragmentShader(const std::string& filename )
 
 	if( !m_fragment_shader_source )
 	{
-		std::cerr << "ERROR - GLSLShader::loadFragmentShader() - error occured while loading source file." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadFragmentShader() - error occured while loading source file." << CGoGNendl;
 		return false;
 	}
 
@@ -264,7 +265,7 @@ bool GLSLShader::loadGeometryShader(const std::string& filename )
 
 	if( !m_geom_shader_source )
 	{
-		std::cerr << "ERROR - GLSLShader::loadGeometryShader() - error occured while loading source file." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadGeometryShader() - error occured while loading source file." << CGoGNendl;
 		return false;
 	}
 
@@ -292,7 +293,7 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 
 	if( !m_vertex_shader_object )
 	{
-		std::cerr << "ERROR - GLSLShader::loadVertexShader() - unable to create shader object." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadVertexShader() - unable to create shader object." << CGoGNendl;
 		return false;
 	}
 
@@ -300,7 +301,7 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	/*** load source file ***/
 	if( !vertex_shader_source )
 	{
-		std::cerr << "ERROR - GLSLShader::loadVertexShader() - source string is empty." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadVertexShader() - source string is empty." << CGoGNendl;
 
 		glDeleteObjectARB( m_vertex_shader_object );
 		m_vertex_shader_object = 0;
@@ -317,10 +318,9 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	glGetObjectParameterivARB( m_vertex_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
-		std::cerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader." << std::endl;
+		CGoGNerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader " << m_nameVS<< CGoGNendl;
 		info_log = getInfoLog( m_vertex_shader_object );
-		std::cerr << "  COMPILATION OF "<< m_nameVS<< std::endl;
-		std::cerr << info_log << std::endl;
+				CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
 		glDeleteObjectARB( m_vertex_shader_object );
@@ -351,7 +351,7 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 
 	if( !m_fragment_shader_object )
 	{
-		std::cerr << "ERROR - GLSLShader::loadFragmentShader() - unable to create shader object." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadFragmentShader() - unable to create shader object." << CGoGNendl;
 		return false;
 	}
 
@@ -359,7 +359,7 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	/*** load source file ***/
 	if( !fragment_shader_source )
 	{
-		std::cerr << "ERROR - GLSLShader::loadFragmentShader() - source string is empty." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadFragmentShader() - source string is empty." << CGoGNendl;
 
 		glDeleteObjectARB( m_fragment_shader_object );
 		m_fragment_shader_object = 0;
@@ -376,9 +376,9 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	glGetObjectParameterivARB( m_fragment_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
-		std::cerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader." << std::endl;
+		CGoGNerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader " <<  m_nameFS << CGoGNendl;
 		info_log = getInfoLog( m_fragment_shader_object );
-		std::cerr << "  COMPILATION OF "<< m_nameFS<< std::endl << info_log << std::endl;
+		CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
 		glDeleteObjectARB( m_fragment_shader_object );
@@ -410,7 +410,7 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 
 	if( !m_geom_shader_object )
 	{
-		std::cerr << "ERROR - GLSLShader::loadGeometryShader() - unable to create shader object." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadGeometryShader() - unable to create shader object." << CGoGNendl;
 		return false;
 	}
 
@@ -418,7 +418,7 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	/*** load source file ***/
 	if( !geom_shader_source )
 	{
-		std::cerr << "ERROR - GLSLShader::loadGeometryShader() - source string is empty." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::loadGeometryShader() - source string is empty." << CGoGNendl;
 
 		glDeleteObjectARB( m_geom_shader_object );
 		m_geom_shader_object = 0;
@@ -435,10 +435,9 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	glGetObjectParameterivARB( m_geom_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
-		std::cerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader." << std::endl;
+		CGoGNerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader "<< m_nameGS << CGoGNendl;
 		info_log = getInfoLog( m_geom_shader_object );
-		std::cerr << "  COMPILATION OF "<< m_nameGS<< std::endl;
-		std::cerr << info_log << std::endl;
+		CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
 		glDeleteObjectARB( m_geom_shader_object );
@@ -481,7 +480,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	/*** check if shaders are loaded ***/
 	if( !m_vertex_shader_object || !m_fragment_shader_object )
 	{
-		std::cerr << "ERROR - GLSLShader::create() - shaders are not defined." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::create() - shaders are not defined." << CGoGNendl;
 		return false;
 	}
 
@@ -491,7 +490,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 
 	if( !m_program_object )
 	{
-		std::cerr << "ERROR - GLSLShader::create() - unable to create program object." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::create() - unable to create program object." << CGoGNendl;
 		return false;
 	}
 
@@ -517,9 +516,9 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	glGetObjectParameterivARB( m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
 	if( !status )
 	{
-		std::cerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << CGoGNendl;
 		info_log = getInfoLog( m_program_object );
-		std::cerr << "  LINK " << info_log << std::endl;
+		CGoGNerr << "  LINK " << info_log << CGoGNendl;
 		delete [] info_log;
 
 		glDetachObjectARB( m_program_object, m_vertex_shader_object );
@@ -553,9 +552,9 @@ bool GLSLShader::link()
 	glGetObjectParameterivARB( m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
 	if( !status )
 	{
-		std::cerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << std::endl;
+		CGoGNerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << CGoGNendl;
 		info_log = getInfoLog( m_program_object );
-		std::cerr << "  LINK " << info_log << std::endl;
+		CGoGNerr << "  LINK " << info_log << CGoGNendl;
 		delete [] info_log;
 
 		glDetachObjectARB( m_program_object, m_vertex_shader_object );
@@ -677,15 +676,15 @@ bool GLSLShader::init()
 	GLenum error = glewInit();
 
 	if (error != GLEW_OK)
-		std::cerr << "Error: " << glewGetErrorString(error) << std::endl;
+		CGoGNerr << "Error: " << glewGetErrorString(error) << CGoGNendl;
 	else
-		std::cout << "Status: Using GLEW " << glewGetString(GLEW_VERSION) << std::endl;
+		CGoGNout << "Status: Using GLEW " << glewGetString(GLEW_VERSION) << CGoGNendl;
 
 	if (!areVBOSupported())
-		std::cout << "VBO not supported !" << std::endl;
+		CGoGNout << "VBO not supported !" << CGoGNendl;
 
 	if(!areShadersSupported()) {
-		std::cout << "Shaders not supported !" << std::endl;
+		CGoGNout << "Shaders not supported !" << CGoGNendl;
 		return false;
 	}
 	return true; 
@@ -703,10 +702,10 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps)
 	if(!loadFragmentShader(pss)) return false;
 
 	if(!create()) {
-		std::cout << "Unable to create the shaders !" << std::endl;
+		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;
 	}
-	std::cout << "Shaders loaded (" << vs << "," << ps << ")" << std::endl;
+	CGoGNout << "Shaders loaded (" << vs << "," << ps << ")" << CGoGNendl;
 	return true; 
 }
 
@@ -727,17 +726,17 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const
 
 	if (!geomShaderLoaded)
 	{
-		std::cerr << "Error while loading geometry shader" << std::endl;
+		CGoGNerr << "Error while loading geometry shader" << CGoGNendl;
 	}
 
 
 	if(!create(inputGeometryPrimitive,outputGeometryPrimitive))
 	{
-		std::cout << "Unable to create the shaders !" << std::endl;
+		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;
 	}
 
-	std::cout << "Shaders loaded (" << vs << "," << ps << "," << gs <<")" << std::endl;
+	CGoGNout << "Shaders loaded (" << vs << "," << ps << "," << gs <<")" << CGoGNendl;
 	return true;
 }
 
@@ -767,7 +766,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 
 	if(!create())
 	{
-		std::cout << "Unable to create the shaders !" << std::endl;
+		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;
 	}
 	return true;
@@ -805,7 +804,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 
 	if(!create(inputGeometryPrimitive,outputGeometryPrimitive))
 	{
-		std::cout << "Unable to create the shaders !" << std::endl;
+		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;
 	}
 
@@ -861,16 +860,14 @@ bool GLSLShader::recompile()
 
 	if(!create(m_geom_inputPrimitives,m_geom_outputPrimitives))
 	{
-		std::cout << "Unable to create the shaders !" << std::endl;
+		CGoGNerr << "Unable to create the shaders !" << CGoGNendl;
 		return false;
 	}
-std::cout << "DDDD"<< std::endl;
 
 	m_uniMat_Proj		= glGetUniformLocation(m_program_object,"ProjectionMatrix");
 	m_uniMat_Model		= glGetUniformLocation(m_program_object,"ModelViewMatrix");
 	m_uniMat_ModelProj	= glGetUniformLocation(m_program_object,"ModelViewProjectionMatrix");
 	m_uniMat_Normal		= glGetUniformLocation(m_program_object,"NormalMatrix");
-std::cout << "EEEE"<< std::endl;
 
 	restoreUniformsAttribs();
 
@@ -889,12 +886,12 @@ bool GLSLShader::validateProgram()
 
 	if(Result == GL_FALSE)
 	{
-		std::cout << "Validate program:" << std::endl;
+		CGoGNout << "Validate program:" << CGoGNendl;
 		int InfoLogLength;
 		glGetProgramiv(m_program_object, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		std::vector<char> Buffer(InfoLogLength);
 		glGetProgramInfoLog(m_program_object, InfoLogLength, NULL, &Buffer[0]);
-		std::cout <<  &(Buffer[0]) << std::endl;
+		CGoGNout <<  &(Buffer[0]) << CGoGNendl;
 		return false;
 	}
 
@@ -910,7 +907,7 @@ bool GLSLShader::checkProgram()
 	glGetProgramiv(m_program_object, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	std::vector<char> Buffer(std::max(InfoLogLength, int(1)));
 	glGetProgramInfoLog(m_program_object, InfoLogLength, NULL, &Buffer[0]);
-	std::cout << &Buffer[0] << std::endl;
+	CGoGNout << &Buffer[0] << CGoGNendl;
 
 	return Result == GL_TRUE;
 }
@@ -933,7 +930,7 @@ bool GLSLShader::checkShader(int shaderType)
 		id = m_geom_shader_object;
 		break;
 	default:
-		std::cerr << "Error unkown shader type"<< std::endl;
+		CGoGNerr << "Error unkown shader type"<< CGoGNendl;
 		return false;
 		break;
 	}
@@ -942,7 +939,7 @@ bool GLSLShader::checkShader(int shaderType)
 	glGetShaderiv(id, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	std::vector<char> Buffer(InfoLogLength);
 	glGetShaderInfoLog(id, InfoLogLength, NULL, &Buffer[0]);
-	std::cout << &Buffer[0] << std::endl;
+	CGoGNout << &Buffer[0] << CGoGNendl;
 
 	return Result == GL_TRUE;
 }
@@ -983,7 +980,7 @@ unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 	//valid ?
 	if (idVA < 0)
 	{
-		std::cerr << "GLSLShader: Attribute "<<name<< " does not exist in shader"<< std::endl;
+		CGoGNerr << "GLSLShader: Attribute "<<name<< " does not exist in shader"<< CGoGNendl;
 		return idVA;
 	}
 	// search if name already exist
@@ -1015,7 +1012,7 @@ void GLSLShader::unbindVA(const std::string& name)
 	//valid ?
 	if (idVA < 0)
 	{
-		std::cerr << "GLSLShader: Attribute "<<name<< " does not exist in shader, not unbinded"<< std::endl;
+		CGoGNerr << "GLSLShader: Attribute "<<name<< " does not exist in shader, not unbinded"<< CGoGNendl;
 		return;
 	}
 	// search if name already exist
@@ -1030,7 +1027,7 @@ void GLSLShader::unbindVA(const std::string& name)
 			return;
 		}
 	}
-	std::cerr << "GLSLShader: Attribute "<<name<< " not binded"<< std::endl;
+	CGoGNerr << "GLSLShader: Attribute "<<name<< " not binded"<< CGoGNendl;
 }
 
 void GLSLShader::setCurrentOGLVersion(unsigned int version)

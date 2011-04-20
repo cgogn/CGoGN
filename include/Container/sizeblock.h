@@ -26,6 +26,7 @@
 #define _SIZEBLOCK_H_
 
 #include "gzstream.h"
+#include "Utils/cgognStream.h"
 
 #define _BLOCKSIZE_ 4096
 

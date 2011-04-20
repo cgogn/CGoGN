@@ -192,9 +192,7 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 	{
 		if (&os == &CGoGNendl)
 		{
-			m_buffer << std::endl;
 			char bufc[512];
-			m_buffer.getline(bufc,512);
 
 			// for cout & cerr just do the endl
 			if (m_out_mode & STDOUT)
@@ -203,31 +201,56 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 				std::cerr << std::endl;
 
 			if (m_out_mode & FILEOUT)
-				*m_ofs << bufc << std::endl;
+			{
+				while (! m_buffer.eof())
+				{
+					m_buffer.getline(bufc,512);
+					*m_ofs << bufc << std::endl;
+				}
+			}
 
 			if (m_out_mode & QTSTATUSBAR)
-				m_sqt_bar->statusMsg(bufc);
+			{
+				while (! m_buffer.eof())
+				{
+					m_buffer.getline(bufc,512);
+					m_sqt_bar->statusMsg(bufc);
+				}
+			}
 
 			if (m_out_mode & QTCONSOLE)
 			{
-				if (m_code>=100)
-					m_sqt_console->console()->setTextColor( QColor(0, 150 - (m_code-100)*20, 50+(m_code-100)*20) );
-				else
+				while (! m_buffer.eof())
 				{
-					if (m_code>0)
-						m_sqt_console->console()->setTextColor( QColor(150, 0, 0) );
-					else
-						m_sqt_console->console()->setTextColor( QColor(0, 0, 150) );
-				}
+					m_buffer.getline(bufc,512);
 
-				m_sqt_console->console()->insertPlainText(QString(bufc));
-				m_sqt_console->console()->insertPlainText(QString("\n"));
+					if (m_code>=100)
+						m_sqt_console->console()->setTextColor( QColor(0, 150 - (m_code-100)*20, 50+(m_code-100)*20) );
+					else
+					{
+						if (m_code>0)
+							m_sqt_console->console()->setTextColor( QColor(150, 0, 0) );
+						else
+							m_sqt_console->console()->setTextColor( QColor(0, 0, 150) );
+					}
+
+					m_sqt_console->console()->insertPlainText(QString(bufc));
+					m_sqt_console->console()->insertPlainText(QString("\n"));
+				}
 			}
 
 			if (m_out_mode & SSBUFFER)
-				*m_oss  << bufc << std::endl;
+			{
+				while (! m_buffer.eof())
+				{
+					m_buffer.getline(bufc,512);
+					*m_oss  << bufc << std::endl;
+				}
+			}
 		}
 	}
+
+	m_buffer.clear();
 	return *this;
 }
 

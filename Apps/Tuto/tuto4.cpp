@@ -245,6 +245,9 @@ int main(int argc, char **argv)
 	// show final pour premier redraw
 	sqt.show();
 
+	CGoGNout.out2Console(&sqt);
+	CGoGNerr.out2Console(&sqt);
+
 	// et on attend la fin.
 	return app.exec();
 
