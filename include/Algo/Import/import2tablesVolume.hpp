@@ -64,7 +64,7 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 		return importTrianBinGz(filename, attrNames);
 		break;
 	default:
-		std::cerr << "Not yet supported" << std::endl;
+		CGoGNerr << "Not yet supported" << CGoGNendl;
 		break;
 	}
 	return false;
@@ -74,14 +74,20 @@ template <typename PFP>
 bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f)
 {
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+//	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	// open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename<< std::endl;
+		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
 		return false;
 	}
 
@@ -92,13 +98,13 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 	std::stringstream oss(ligne);
 	oss >> nbv;
 
-	//std::cout << "nbV = " << nbv << std::endl;
+	//CGoGNout << "nbV = " << nbv << CGoGNendl;
 
 	std::getline (fp, ligne);
 	std::stringstream oss2(ligne);
 	oss2 >> nbt;
 
-	//std::cout << "nbT = " << nbt << std::endl;
+	//CGoGNout << "nbT = " << nbt << CGoGNendl;
 
 	//lecture sommets
 	std::vector<unsigned int> verticesID;
@@ -119,7 +125,7 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 		// on peut ajouter ici la lecture de couleur si elle existe
 		VEC3 pos(x*scaleFactor,y*scaleFactor,z*scaleFactor);
 
-		//std::cout << "VEC3 = " << pos << std::endl;
+		//CGoGNout << "VEC3 = " << pos << CGoGNendl;
 
 		unsigned int id = container.insertLine();
 		positions[id] = pos;
@@ -128,9 +134,9 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 	}
 	m_nbVertices = verticesID.size();
 
-	//std::cout << "nbVertices = " << m_nbVertices << std::endl;
+	//CGoGNout << "nbVertices = " << m_nbVertices << CGoGNendl;
 	m_nbVolumes = nbt;
-	//std::cout << "nbVolumes = " << m_nbVolumes << std::endl;
+	//CGoGNout << "nbVolumes = " << m_nbVolumes << CGoGNendl;
 
 	// lecture tetra
 	// normalement m_nbVolumes*12 (car on ne charge que des tetra)
@@ -195,7 +201,7 @@ bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename, std::v
 //
 //	if (!fs.good())
 //	{
-//		std::cerr << "Unable to open file " << filename << std::endl;
+//		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 //		return false;
 //	}
 //	// read nb of points
@@ -257,7 +263,7 @@ bool MeshTablesVolume<PFP>::importPly(const std::string& filename, std::vector<s
 //
 //	if (! pid.read_file(filename) )
 //	{
-//		std::cerr << "Unable to open file " << filename<< std::endl;
+//		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
 //		return false;
 //	}
 //

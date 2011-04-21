@@ -323,11 +323,11 @@ public:
 //	{
 //		for (typename std::vector<Dart>::iterator it = m_faces.begin(); it != m_faces.end(); ++it)
 //		{
-//			std::cout << "Dart: "<< (it - m_faces.begin())  <<" = " << (*it)->getLabel()<<std::endl;
+//			CGoGNout << "Dart: "<< (it - m_faces.begin())  <<" = " << (*it)->getLabel()<<CGoGNendl;
 //		}
 //
-//		std::cout << "beg sort op:"<<std::endl;
-//		std::cout <<"  darts "<<d->getLabel() <<" ?? "<< e->getLabel()<<std::endl;
+//		CGoGNout << "beg sort op:"<<CGoGNendl;
+//		CGoGNout <<"  darts "<<d->getLabel() <<" ?? "<< e->getLabel()<<CGoGNendl;
 //		typename PFP::VEC3 P = m_positions[d]; //m_map.getVertexEmb(d)->getPosition() ;
 //		P -= m_A ;
 //		typename PFP::REAL minDist = P*P ;
@@ -353,7 +353,7 @@ public:
 //			it = m_map.phi1(it) ;
 //		} while(it != e) ;
 //
-//		std::cout << "end sort op"<<std::endl;
+//		CGoGNout << "end sort op"<<CGoGNendl;
 //
 ////		return rand()&1;
 //

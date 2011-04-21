@@ -21,7 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#define GL3_PROTOTYPES
+//#define GL3_PROTOTYPES
+#include "tuto1.h"
 
 #include <iostream>
 
@@ -36,11 +37,9 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Utils/shaderSimpleColor.h"
 
-#include "tuto1.h"
 
-#include "Utils/gl2ps.h"
-#include "Algo/Modelisation/polyhedron.h"
 #include <glm/gtc/type_ptr.hpp>
+
 
 using namespace CGoGN ;
 
@@ -102,34 +101,11 @@ void MyQT::cb_redraw()
 void MyQT::cb_keyPress(int code)
 {
 	if ((code >65) && (code< 123 ))
-		std::cout << " key char " << char(code) << "pressed"<< std::endl;
+		CGoGNout << " key char " << char(code) << "pressed"<< CGoGNendl;
 
 	if ((code >'0') && (code<='9'))
-		std::cout << " key num " << code-'0' << "pressed"<< std::endl;
+		CGoGNout << " key num " << code-'0' << "pressed"<< CGoGNendl;
 
-	if (code =='a')
-	{
-		  FILE *fp;
-		  int state = GL2PS_OVERFLOW, buffsize = 0;
-		    fp = fopen("out.svg", "wb");
-		    while(state == GL2PS_OVERFLOW)
-		    {
-		      buffsize += 1024*1024;
-
-//		      gl2psBeginPage("test", "tuto1", NULL, GL2PS_SVG, GL2PS_BSP_SORT,
-//		    		  GL2PS_NO_PS3_SHADING | GL2PS_TIGHT_BOUNDING_BOX| GL2PS_BEST_ROOT | GL2PS_USE_CURRENT_VIEWPORT,
-//		                     GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.svg");
-		      gl2psBeginPage("test", "tuto1", NULL, GL2PS_SVG, GL2PS_BSP_SORT,
-		    		  GL2PS_SIMPLE_LINE_OFFSET | GL2PS_TIGHT_BOUNDING_BOX| GL2PS_BEST_ROOT | GL2PS_USE_CURRENT_VIEWPORT,
-		                     GL_RGBA, 0, NULL, 0, 0, 0, buffsize, fp, "out.svg");
-
-
-		  	cb_redraw();
-			glFlush();
-		      state = gl2psEndPage();
-		    }
-		    fclose(fp);
-	}
 
 }
 
@@ -139,7 +115,7 @@ int main(int argc, char **argv)
 	// declaration of the map
 	PFP::MAP myMap;
 
-	/*
+
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);
 	Dart d2 = myMap.newFace(4);
@@ -159,21 +135,8 @@ int main(int argc, char **argv)
 	position[myMap.phi<11>(d2)] = PFP::VEC3(0, -2, 0);
 	position[myMap.phi_1(d2)] = PFP::VEC3(2, -2, 0);
 
-	// add another triangle
-	Dart d3 = myMap.newOrientedFace(3);
 
-//	position[d3] = PFP::VEC3(4, 0, 0);
-//	position[myMap.phi1(d3)] = PFP::VEC3(2, 0, 0);
-//	position[myMap.phi_1(d3)] = PFP::VEC3(0, 3, 0);
-	position[d3] = PFP::VEC3(-1, -1, 1);
-	position[myMap.phi1(d3)] = PFP::VEC3(3, 0, 1);
-	position[myMap.phi_1(d3)] = PFP::VEC3(1, 3, 1);
-*/
-	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
 
-	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
-	prim3.tore_topo(12, 24);
-	prim3.embedTore(1.0f,0.3f);
 
 	// interface:
 	QApplication app(argc, argv);

@@ -33,7 +33,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 {
 	if (m_lock)
 	{
-		std::cerr <<" Error locked VBO"<< std::endl;
+		CGoGNerr <<" Error locked VBO"<< CGoGNendl;
 		return;
 	}
 	m_data_size = sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
@@ -62,7 +62,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	if (m_lock)
 	{
-		std::cerr <<" Error locked VBO"<< std::endl;
+		CGoGNerr <<" Error locked VBO"<< CGoGNendl;
 		return;
 	}
 	m_data_size = conv->sizeElt();

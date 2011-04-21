@@ -29,6 +29,7 @@
 
 
 #include "Utils/qtSimple.h"
+#include "Utils/cgognStream.h"
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
@@ -63,13 +64,13 @@ public:
 
 	void cb_keyPress(int code);
 
-	void cb_New() { std::cout << "New ..."<< std::endl;}
-	void cb_Save() { std::cout << "Rien a sauver ..."<< std::endl;
+	void cb_New() { CGoGNout << "New ..."<< CGoGNendl;}
+	void cb_Save() { CGoGNout << "Rien a sauver ..."<< CGoGNendl;
 }
 
 	// callbacks (slots) locally defined
 public slots:
-	void menu_slot1() { std::cout << "Exemple de menu"<< std::endl; }
+	void menu_slot1() { CGoGNout << "Exemple de menu"<< CGoGNendl; }
 
 
 };

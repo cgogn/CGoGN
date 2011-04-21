@@ -25,7 +25,7 @@ void Approximator_Centroid<PFP>::approximate(CGoGN::Algo::DecimationVolumique::O
 	Dart d = op->getEdge();
 	VEC3 a = this->m_position[d];
 
-	std::cout << "d=" << d << " a=" << a << std::endl;
+	CGoGNout << "d=" << d << " a=" << a << CGoGNendl;
 
 	// get some darts
 	Dart dd = this->m_map.phi2(d) ;
@@ -49,7 +49,7 @@ void Approximator_Centroid<PFP>::approximate(CGoGN::Algo::DecimationVolumique::O
 			break;
 		}
 		default : {
-			std::cerr << "Approximate : reducer does not exist" << std::endl;
+			CGoGNerr << "Approximate : reducer does not exist" << CGoGNendl;
 			break;
 		}
 	}

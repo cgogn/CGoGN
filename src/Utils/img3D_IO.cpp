@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include "Utils/img3D_IO.h"
+#include "Utils/cgognStream.h"
 
 
 namespace CGoGN
@@ -346,13 +347,13 @@ unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx,
 	h = ilGetInteger(IL_IMAGE_HEIGHT);
 	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
 
-	std::cout << "BPP:"<<bpp<<std::endl;
+	CGoGNout << "BPP:"<<bpp<<CGoGNendl;
 	// image OK ?
 	if (bpp != 2)
 		return NULL;
 
 	unsigned short* ptr= reinterpret_cast<unsigned short*>(ilGetData());
-//	std::cout << "PTR:"<<long(ptr)<<std::endl;
+//	CGoGNout << "PTR:"<<long(ptr)<<CGoGNendl;
 	int* ptr_int = reinterpret_cast<int*>(ptr+(w*(h-1)));
 	int t = *ptr_int++;
 	if (t!= VAL16)
@@ -366,7 +367,7 @@ unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx,
 	vy = *ptr_float++;
 	vz = *ptr_float++;
 
-//	std::cout << "PTR:"<<long(ptr)<<std::endl;
+//	CGoGNout << "PTR:"<<long(ptr)<<CGoGNendl;
 	return ptr;
 
 }

@@ -73,7 +73,7 @@ void decimate(
 						frame[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "frame_N") ; // Normal
 						for (unsigned int i = 0 ; i < 3 ; ++i)
 							if (!frame[i].isValid()) {
-								std::cerr << "In function decimate : frame[" << i << "] is not valid" << std::endl ;
+								CGoGNerr << "In function decimate : frame[" << i << "] is not valid" << CGoGNendl ;
 							}
 
 						AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
@@ -85,7 +85,7 @@ void decimate(
 						colorPTM[5] = map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "colorPTM_f") ;
 						for (unsigned int i = 0 ; i < 6 ; ++i)
 							if (!colorPTM[i].isValid()) {
-								std::cerr << "In function decimate : colorPTM[" << i << "] is not valid" << std::endl ;
+								CGoGNerr << "In function decimate : colorPTM[" << i << "] is not valid" << CGoGNendl ;
 							}
 			*/
 			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
@@ -148,11 +148,11 @@ void decimate(
 
 	while(!finished)
 	{
-		std::cout << "Countdown : " ;
-		std::cout << std::setprecision(8) << (nbVertices - nbWantedVertices) << "\r" << std::flush;
+		CGoGNout << "Countdown : " ;
+		CGoGNout << std::setprecision(8) << (nbVertices - nbWantedVertices) << "\r" << std::flush;
 
 		if(!selector->nextEdge(d)) {
-			std::cout << std::endl << "out" << std::endl ;
+			CGoGNout << CGoGNendl << "out" << CGoGNendl ;
 			break ;
 		}
 
@@ -178,7 +178,7 @@ void decimate(
 
 		if(nbVertices <= nbWantedVertices) {
 			finished = true ;
-			std::cout << std::endl << "done" << std::endl ;
+			CGoGNout << CGoGNendl << "done" << CGoGNendl ;
 		}
 	}
 

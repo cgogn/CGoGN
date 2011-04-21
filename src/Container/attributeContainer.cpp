@@ -60,7 +60,7 @@ bool AttributeContainer::removeAttribute(const std::string& attribName)
 
 	if (index == UNKNOWN)
 	{
-		std::cerr << "removeAttribute by name: attribute not found" << std::endl ;
+		CGoGNerr << "removeAttribute by name: attribute not found" << CGoGNendl ;
 		return false ;
 	}
 
@@ -82,7 +82,7 @@ bool AttributeContainer::removeAttribute(unsigned int index)
 {
 	if(m_tableAttribs[index] == NULL)
 	{
-		std::cerr << "removeAttribute by index: attribute not found" << std::endl ;
+		CGoGNerr << "removeAttribute by index: attribute not found" << CGoGNendl ;
 		return false ;
 	}
 
@@ -382,7 +382,7 @@ void AttributeContainer::removeLine(unsigned int index)
 			m_tableBlocksEmpty.push_back(bi);
 	}
 	else
-		std::cerr << "Error removing non existing index " << index << std::endl;
+		CGoGNerr << "Error removing non existing index " << index << CGoGNendl;
 }
 
 /**************************************
@@ -403,7 +403,7 @@ bool AttributeContainer::loadXmlBWF(xmlNodePtr node)
 	}
 	if (m_tableBlocksWithFree.size() != nb)
 	{
-		std::cerr <<"Erreur lecture fichier XML incoherent"<< std::endl;
+		CGoGNerr <<"Erreur lecture fichier XML incoherent"<< CGoGNendl;
 		return false;
 	}
 	return true;
@@ -434,7 +434,7 @@ bool AttributeContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
 			std::map<std::string, RegisteredBaseAttribute*>::iterator itAtt = m_attributes_registry_map->find(std::string((char*)prop));
 			if (itAtt == m_attributes_registry_map->end())
 			{
-				std::cout << "Skipping non registred attribute "<< std::string((char*)prop)<<std::endl;
+				CGoGNout << "Skipping non registred attribute "<< std::string((char*)prop)<<CGoGNendl;
 			}
 			else
 			{
@@ -447,13 +447,13 @@ bool AttributeContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
 		}
 		else
 		{
-			std::cerr << "Attribute Registry non initialized"<< std::endl;
+			CGoGNerr << "Attribute Registry non initialized"<< CGoGNendl;
 			return false;
 		}
 	}
 //	if (m_attribNameMap.size() != nb)
 //	{
-//		std::cerr << "Pb lecture attributs"<< std::endl;
+//		CGoGNerr << "Pb lecture attributs"<< CGoGNendl;
 //		return false;
 //	}
 	return true;
@@ -480,7 +480,7 @@ bool AttributeContainer::loadXmlDL(xmlNodePtr node)
 //				// if name of data unkwown then error
 //				if (prop == NULL)
 //				{
-//					std::cerr << "inconsistent xml file"<<std::endl;
+//					CGoGNerr << "inconsistent xml file"<<CGoGNendl;
 //					return false;
 //				}
 //				m_tableAttribs[it->second]->input(id, std::string((char*)prop));
@@ -565,7 +565,7 @@ bool AttributeContainer::loadXml(xmlNodePtr node)
 
 	if (bs != _BLOCKSIZE_)
 	{
-		std::cerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << std::endl;
+		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
 		return false;
 	}
 
@@ -625,7 +625,7 @@ void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id)
 	bufferui.push_back(m_size);
 	bufferui.push_back(m_maxSize);
 
-	std::cout << "Save Container: id:" <<id <<"  nbAtt:"<<m_nbAttributes << "  size:"<<m_size<<std::endl;
+	CGoGNout << "Save Container: id:" <<id <<"  nbAtt:"<<m_nbAttributes << "  size:"<<m_size<<CGoGNendl;
 
 	fs.write(reinterpret_cast<const char*>(&bufferui[0]) ,bufferui.size()*sizeof(unsigned int));
 
@@ -655,7 +655,7 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 {
 	if (m_attributes_registry_map == NULL)
 	{
-		std::cerr << "Attribute Registry non initialized"<< std::endl;
+		CGoGNerr << "Attribute Registry non initialized"<< CGoGNendl;
 		return false;
 	}
 
@@ -674,7 +674,7 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 
 	if (bs != _BLOCKSIZE_)
 	{
-		std::cerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << std::endl;
+		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
 		return false;
 	}
 
@@ -687,14 +687,14 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 		std::map<std::string, RegisteredBaseAttribute*>::iterator itAtt = m_attributes_registry_map->find(typeAtt);
 		if (itAtt == m_attributes_registry_map->end())
 		{
-			std::cout << "Skipping non registred attribute of type name"<< typeAtt <<std::endl;
+			CGoGNout << "Skipping non registred attribute of type name"<< typeAtt <<CGoGNendl;
 			AttributeMultiVectorGen::skipLoadBin(fs);
 		}
 		else
 		{
 			RegisteredBaseAttribute* ra = itAtt->second;
 			AttributeMultiVectorGen* amvg = ra->addAttribute(*this, nameAtt);
-			std::cout << "loading attribute " << nameAtt << " : " << typeAtt << std::endl;
+			CGoGNout << "loading attribute " << nameAtt << " : " << typeAtt << CGoGNendl;
 			amvg->loadBin(fs);
 			// no need the set the nb of block (done by binary read of attribmv)
 			m_nbAttributes++;

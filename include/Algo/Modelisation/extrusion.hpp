@@ -226,7 +226,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 			Geom::translate(path[i][0],path[i][1],path[i][2],transf);
 		}
 
-	std::cout << "PATH: "<< i<< std::endl;
+	CGoGNout << "PATH: "<< i<< CGoGNendl;
 		// apply transfo on object to embed Polyhedron.
 		for(typename std::vector<typename PFP::VEC3>::iterator ip=localObj.begin(); ip!=localObj.end(); ++ip)
 		{
@@ -244,7 +244,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 			if (!scalePath.empty())
 				P = path[i] + (scalePath[i]*(P-path[i]));
 
-			std::cout << "P: "<< P<< std::endl;
+			CGoGNout << "P: "<< P<< CGoGNendl;
 
 			// compute the scale factor for angle deformation
 			float coef = 1.0f/(float(sin(M_PI/2.0f - alpha))); // warning here is angle/2 but alpha is half of angle we want to use

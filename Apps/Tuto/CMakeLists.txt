@@ -71,9 +71,10 @@ add_executable( tp_master tp_master.cpp ${tp_master_moc})
 target_link_libraries( tp_master
 	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
 
-add_executable( tuto_mt tuto_mt.cpp)
+QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
+add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
 target_link_libraries( tuto_mt
-	${CGoGN_LIBS_D} ${COMMON_LIBS} boost_thread-mt)
+	${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES}  boost_thread-mt)
 
 QT4_WRAP_CPP(tuto_ogl3_moc tuto_ogl3.h)
 add_executable( tuto_ogl3 tuto_ogl3.cpp ${tuto_ogl3_moc})

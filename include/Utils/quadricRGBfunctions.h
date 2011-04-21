@@ -72,11 +72,11 @@ public:
 	void zero () ;
 
 	friend std::ostream& operator<< (std::ostream &out, const QuadricRGBfunctions& q) {
-		out << "quadricRGBf : " << std::endl ;
-		out << "q.A" << "= " << q.A << std::endl ;
+		out << "quadricRGBf : " << CGoGNendl ;
+		out << "q.A" << "= " << q.A << CGoGNendl ;
 		for (unsigned int i = 0 ; i < 3 ; ++i) {
-			out << "q.b["<<i<<"] = " << q.b[i] << std::endl ;
-			out << "q.c["<<i<<"] = " << q.c[i] << std::endl ;
+			out << "q.b["<<i<<"] = " << q.b[i] << CGoGNendl ;
+			out << "q.c["<<i<<"] = " << q.c[i] << CGoGNendl ;
 		}
 		return out ;
 	} ;

@@ -39,9 +39,9 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d)
 {
 	Dart d1 = map.phi1(d);
 	if (d1 == d)
-		std::cout << "Warning: triangulation of a face with only one edge" << std::endl;
+		CGoGNout << "Warning: triangulation of a face with only one edge" << CGoGNendl;
 	if (map.phi1(d1) == d)
-		std::cout << "Warning: triangulation of a face with only two edges" << std::endl;
+		CGoGNout << "Warning: triangulation of a face with only two edges" << CGoGNendl;
 
 	map.splitFace(d, d1) ;
 	map.cutEdge(map.phi_1(d)) ;
@@ -492,7 +492,7 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 		}
 	}
 
-	std::cout << "nb orig : " << dOrig.size() << std::endl;
+	CGoGNout << "nb orig : " << dOrig.size() << CGoGNendl;
 
 	DartMarkerNoUnmark mCorner(map);
 //	//second pass create corner face

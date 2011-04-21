@@ -18,7 +18,7 @@ template <typename PFP>
 void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 {
 	#ifdef DEBUG
-	std::cout << "vertexState" <<  this->d << std::endl;
+	CGoGNout << "vertexState" <<  this->d << CGoGNendl;
 	#endif
 	if(Algo::Geometry::isPointOnVertex<PFP>(this->m, this->d, this->m_positions, current)) {
 		this->state = VERTEX_ORBIT;
@@ -59,7 +59,7 @@ template <typename PFP>
 void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D sideOfEdge)
 {
 	#ifdef DEBUG
-	std::cout << "edgeState" <<  this->d << std::endl;
+	CGoGNout << "edgeState" <<  this->d << CGoGNendl;
 	#endif
 	memo_cross.push_back( this->d );
 
@@ -102,7 +102,7 @@ template <typename PFP>
 void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 {
 	#ifdef DEBUG
-	std::cout << "faceState" <<  this->d << std::endl;
+	CGoGNout << "faceState" <<  this->d << CGoGNendl;
 	#endif
 	memo_cross.push_back( this->d );
 	Dart dd=this->d;

@@ -185,13 +185,13 @@ int main(int argc, char **argv)
 //	// acces par les brins
 //	for (Dart d = myMap.begin(); d!= myMap.end(); myMap.next(d))
 //	{
-//		std::cout << "Brin "<<d.label()<< " reel="<<tableReels[d]<< "  RGB="<<tableRGB[d]<<std::endl;
+//		CGoGNout << "Brin "<<d.label()<< " reel="<<tableReels[d]<< "  RGB="<<tableRGB[d]<<CGoGNendl;
 //	}
 //
 //	//acces direct par balayge du tableau
 //	for (unsigned int id = tableRGB.begin(); id != tableRGB.end(); tableRGB.next(id))
 //	{
-//		std::cout << "RGB["<<id<<"] = "<<tableRGB.at(id)<<std::endl;
+//		CGoGNout << "RGB["<<id<<"] = "<<tableRGB.at(id)<<CGoGNendl;
 //	}
 
 	CellMarkerStore cm(myMap, VERTEX_ORBIT);
@@ -245,8 +245,8 @@ int main(int argc, char **argv)
 	// show final pour premier redraw
 	sqt.show();
 
-	CGoGNout.out2Console(&sqt);
-	CGoGNerr.out2Console(&sqt);
+	CGoGNout.toConsole(&sqt);
+	CGoGNerr.toConsole(&sqt);
 
 	// et on attend la fin.
 	return app.exec();

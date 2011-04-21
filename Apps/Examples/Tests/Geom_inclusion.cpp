@@ -30,10 +30,10 @@ using namespace CGoGN;
 int main()
 {
 	typedef Geom::Vec3f VEC3;
-	std::cout << "Check Geometry/inclusion.h" << std::endl;
-	std::cout << "Check Status : PARTIAL" << std::endl;
+	CGoGNout << "Check Geometry/inclusion.h" << CGoGNendl;
+	CGoGNout << "Check Status : PARTIAL" << CGoGNendl;
 	
-	std::cout << "Check isPointInTriangle : Start" << std::endl;
+	CGoGNout << "Check isPointInTriangle : Start" << CGoGNendl;
 	VEC3 ta(0,0,0);
 	VEC3 tb(5,0,0);
 	VEC3 tc(0,5,0);
@@ -45,51 +45,51 @@ int main()
 
 	if(Geom::isPointInTriangle<VEC3>(pIn1,ta,tb,tc)!=Geom::FACE_INCLUSION)
 	{
-		std::cout << "ERROR : isPointInTriangle : face inclusion" << std::endl;
+		CGoGNout << "ERROR : isPointInTriangle : face inclusion" << CGoGNendl;
 	}
 
 	if(Geom::isPointInTriangle<VEC3>(pIn2,ta,tb,tc)!=Geom::EDGE_INCLUSION)
 	{
-		std::cout << "ERROR : isPointInTriangle : edge inclusion" << std::endl;
+		CGoGNout << "ERROR : isPointInTriangle : edge inclusion" << CGoGNendl;
 	}
 
 	if(Geom::isPointInTriangle<VEC3>(pIn3,ta,tb,tc)!=Geom::EDGE_INCLUSION)
 	{
-		std::cout << "ERROR : isPointInTriangle : edge inclusion" << std::endl;
+		CGoGNout << "ERROR : isPointInTriangle : edge inclusion" << CGoGNendl;
 	}
 
 	if(Geom::isPointInTriangle<VEC3>(pIn4,ta,tb,tc)!=Geom::EDGE_INCLUSION)
 	{
-		std::cout << "ERROR : isPointInTriangle : edge inclusion" << std::endl;
+		CGoGNout << "ERROR : isPointInTriangle : edge inclusion" << CGoGNendl;
 	}
 
 	if(Geom::isPointInTriangle<VEC3>(ta,ta,tb,tc)!=Geom::VERTEX_INCLUSION)
 	{
-		std::cout << "ERROR : isPointInTriangle : vertex inclusion" << std::endl;
+		CGoGNout << "ERROR : isPointInTriangle : vertex inclusion" << CGoGNendl;
 	}
 
 	if(Geom::isPointInTriangle<VEC3>(pOut,ta,tb,tc)!=Geom::NO_INCLUSION)
 	{
-		std::cout << "ERROR : isPointInTriangle : no inclusion" << std::endl;
+		CGoGNout << "ERROR : isPointInTriangle : no inclusion" << CGoGNendl;
 	}
 
-	std::cout << "Check isPointInTriangle : Done" << std::endl;
+	CGoGNout << "Check isPointInTriangle : Done" << CGoGNendl;
 
 // 	Inclusion isSegmentInTriangle(const VEC3& P1, const VEC3& P2, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& N) ;
 // 	bool isPointInTetrahedron(VEC3 points[4], VEC3& point, bool CCW) ;
 // 	bool isEdgeInOrIntersectingTetrahedron(VEC3 points[4], VEC3& point1, VEC3& point2, bool CCW) ;
 
-	std::cout << "Check arePointsEquals : Start" << std::endl;
+	CGoGNout << "Check arePointsEquals : Start" << CGoGNendl;
 
 	VEC3 p1(0,0,0);
 	VEC3 p2(0.1,0.1,0.1);
 	if(!Geom::arePointsEquals<VEC3>(p1,p1) || !Geom::arePointsEquals<VEC3>(p2,p2) 
 		|| Geom::arePointsEquals<VEC3>(p1,p2) || Geom::arePointsEquals<VEC3>(p2,p1))
 	{
-		std::cout << "ERROR : arePointsEquals" << std::endl;
+		CGoGNout << "ERROR : arePointsEquals" << CGoGNendl;
 	}
 
-	std::cout << "Check arePointsEquals : Done" << std::endl;
+	CGoGNout << "Check arePointsEquals : Done" << CGoGNendl;
 
 	return 0;
 }

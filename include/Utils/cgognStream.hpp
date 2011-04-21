@@ -57,7 +57,7 @@ Out<LEVEL>::~Out()
 }
 
 template<int LEVEL>
-void Out<LEVEL>::out2std(bool yes)
+void Out<LEVEL>::toStd(bool yes)
 {
 	if (LEVEL<=DBG_MAX_LEVEL)
 	{
@@ -79,7 +79,7 @@ void Out<LEVEL>::out2std(bool yes)
 }
 
 //template<int LEVEL>
-//void Err<LEVEL>::out2std(bool yes)
+//void Err<LEVEL>::toStd(bool yes)
 //{
 //	if (LEVEL<=DBG_MAX_LEVEL)
 //	{
@@ -91,7 +91,7 @@ void Out<LEVEL>::out2std(bool yes)
 //}
 
 template<int LEVEL>
-void Out<LEVEL>::out2File(const std::string& filename )
+void Out<LEVEL>::toFile(const std::string& filename )
 {
 	if (LEVEL<=DBG_MAX_LEVEL)
 	{
@@ -110,7 +110,7 @@ void Out<LEVEL>::out2File(const std::string& filename )
 }
 
 template<int LEVEL>
-void Out<LEVEL>::out2StatuBar(Utils::QT::SimpleQT* sqt)
+void Out<LEVEL>::toStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	if (LEVEL<=DBG_MAX_LEVEL)
 	{
@@ -123,7 +123,7 @@ void Out<LEVEL>::out2StatuBar(Utils::QT::SimpleQT* sqt)
 }
 
 template<int LEVEL>
-void Out<LEVEL>::out2Console(Utils::QT::SimpleQT* sqt)
+void Out<LEVEL>::toConsole(Utils::QT::SimpleQT* sqt)
 {
 	if (LEVEL<=DBG_MAX_LEVEL)
 	{
@@ -136,7 +136,7 @@ void Out<LEVEL>::out2Console(Utils::QT::SimpleQT* sqt)
 }
 
 template<int LEVEL>
-void Out<LEVEL>::out2Buffer(std::stringstream* ss)
+void Out<LEVEL>::toBuffer(std::stringstream* ss)
 {
 	if (LEVEL<=DBG_MAX_LEVEL)
 	{
@@ -196,7 +196,7 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 
 			// for cout & cerr just do the endl
 			if (m_out_mode & STDOUT)
-				std::cout << std::endl;
+				std::cout << std::endl;;
 			if (m_out_mode & STDERR)
 				std::cerr << std::endl;
 
@@ -234,8 +234,9 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 							m_sqt_console->console()->setTextColor( QColor(0, 0, 150) );
 					}
 
-					m_sqt_console->console()->insertPlainText(QString(bufc));
-					m_sqt_console->console()->insertPlainText(QString("\n"));
+//					m_sqt_console->console()->insertPlainText(QString(bufc));
+//					m_sqt_console->console()->insertPlainText(QString("\n"));
+					m_sqt_console->console()->append(QString(bufc));
 				}
 			}
 

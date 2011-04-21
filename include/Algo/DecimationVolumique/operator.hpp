@@ -30,12 +30,12 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, typename PFP::TVEC3& 
 	Dart e = d;
 	do
 	{
-		//std::cout << "e=" << e ;
+		//CGoGNout << "e=" << e ;
 		//at border
 		if(m.isBoundaryVolume(e))
 		{
 			canCollapse = false;
-			//std::cout << " at border";
+			//CGoGNout << " at border";
 		}
 		//l'un de ces 2 voisins existe
 		else if(m.phi3(m.phi2(m.phi1(e))) != m.phi2(m.phi1(e)) && m.phi3(m.phi2(m.phi_1(e))) != m.phi2(m.phi_1(e)))
@@ -44,7 +44,7 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, typename PFP::TVEC3& 
 			if(m.isBoundaryVolume(m.phi3(m.phi2(m.phi1(e)))) || m.isBoundaryVolume(m.phi3(m.phi2(m.phi_1(e)))))
 			{
 				canCollapse = false;
-				//std::cout << " neighboors  at border";
+				//CGoGNout << " neighboors  at border";
 			}
 		}
 		else
@@ -73,7 +73,7 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, typename PFP::TVEC3& 
 				if (v1 < 0)
 					canCollapse = false;
 
-				//std::cout << " v1 = " << v1;
+				//CGoGNout << " v1 = " << v1;
 
 				//tetrahedre du bas
 				p2 = position[m.phi1(b)];
@@ -85,18 +85,18 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, typename PFP::TVEC3& 
 				if (v2 < 0)
 					canCollapse = false;
 
-				//std::cout << " v2 = " << v2;
+				//CGoGNout << " v2 = " << v2;
 			}
 		}
 
-		//std::cout << std::endl;
+		//CGoGNout << CGoGNendl;
 
 		e = m.alpha2(e);
 	}while ( e != d && canCollapse);
 
-	//std::cout << std::endl << std::endl;
+	//CGoGNout << CGoGNendl << CGoGNendl;
 
-	//std::cout << "is collapsable ? " << canCollapse << std::endl;
+	//CGoGNout << "is collapsable ? " << canCollapse << CGoGNendl;
 
 
 	return canCollapse;

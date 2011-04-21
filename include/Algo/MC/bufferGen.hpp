@@ -362,12 +362,12 @@ DART BufferGen<DART,DATATYPE>::getExternalNeighbour(int8 _cEdge, int32 _lX, int3
 			break;
 	
 		default:
-			std::cerr << "ERROR"<<std::endl;
+			CGoGNerr << "ERROR"<<CGoGNendl;
 			return m_hcSlice0[0].m_lNX; // pipo value
 	}
 
 	// just for removing the warning never reached because of the default of switch
-std::cerr << "ERROR"<<std::endl;
+CGoGNerr << "ERROR"<<CGoGNendl;
 	return m_hcSlice0[0].m_lNX;
 }
 
@@ -426,7 +426,7 @@ void BufferGen<DART,DATATYPE>::setExternalNeighbour(int8 _cEdge, int32 _lX, int3
 			break;
 	
 		default:
-			std::cerr << "ERROR"<<std::endl;
+			CGoGNerr << "ERROR"<<CGoGNendl;
 	}
 }
 
@@ -469,7 +469,7 @@ template <typename DART, typename DATATYPE>
 DATATYPE BufferGen<DART,DATATYPE>::getData(int32 _lX, int32 _lY)
 {
 // 	if (m_dataSl0[_lX +_lY*m_lWidth] != m_hcSlice0[_lX +_lY*m_lWidth].m_data)
-// 		std::cout << "ERRORRRRR !! "<<std::endl;
+// 		CGoGNout << "ERRORRRRR !! "<<CGoGNendl;
 
 	return m_dataSl0[_lX +_lY*m_lWidth];
 //	return m_hcSlice0[_lX +_lY*m_lWidth].m_data;
@@ -487,7 +487,7 @@ template <typename DART, typename DATATYPE>
 DATATYPE BufferGen<DART,DATATYPE>::getData2(int32 _lX, int32 _lY)
 {
 // 	if (m_dataSl1[_lX +_lY*m_lWidth] != m_hcSlice1[_lX +_lY*m_lWidth].m_data)
-// 		std::cout << "ERRORRRRR !! "<<std::endl;
+// 		CGoGNout << "ERRORRRRR !! "<<CGoGNendl;
 	return m_dataSl1[_lX +_lY*m_lWidth];
 //	return m_hcSlice1[_lX +_lY*m_lWidth].m_data;
 }

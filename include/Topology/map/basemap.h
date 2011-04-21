@@ -58,7 +58,7 @@ public:
 	void deleteDart(Dart d, bool warning=true)
 	{
 		if (warning && !isFree(d)) {
-			std::cout << "Warning: erasing a linked dart" << std::endl;
+			CGoGNout << "Warning: erasing a linked dart" << CGoGNendl;
 		}
 		GenericMap::deleteDart(d);
 	}
@@ -156,7 +156,7 @@ private:
 				setPermutation(a,d,i-m_nbInvolutions);
 		}
 		else {
-			std::cerr << "Warning: darts already linked with alpha" << i << std::endl;
+			CGoGNerr << "Warning: darts already linked with alpha" << i << CGoGNendl;
 		}
 	}
 
@@ -215,7 +215,7 @@ private:
 				setInvolution(a,d,i-1-m_nbPermutations);
 		}
 		else {
-			std::cerr << "Warning: darts already linked with phi" << i << std::endl;
+			CGoGNerr << "Warning: darts already linked with phi" << i << CGoGNendl;
 		}
 	}
 

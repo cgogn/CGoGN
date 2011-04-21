@@ -107,7 +107,7 @@ void fonction_exemple(typename PFP::MAP& map, const AttributeHandler<typename PF
 	Dart e=d;
 	do
 	{
-		std::cout << "Position brin"<<e.index<< " = "<< position[e]<< std::endl;
+		CGoGNout << "Position brin"<<e.index<< " = "<< position[e]<< CGoGNendl;
 		e = map.phi1(e); // dans l'autre sens myMap.phi_1(e)
 	}while (e!=d);
 }
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 	std::vector<std::string> attrNames ;
 	if(!Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames))
 	{
-		std::cerr << "could not import " << argv[1] << std::endl ;
+		CGoGNerr << "could not import " << argv[1] << CGoGNendl ;
 		return 1 ;
 	}
 	// cree un handler d'attribut pour la position des points (créé lors de l'import)

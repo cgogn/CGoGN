@@ -149,7 +149,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 						return VERTEX_INTERSECTION ;
 					}
 					//inter with AB
-					std::cout << __FILE__ << " TODO compute edge coplanar intersection AB" << std::endl ;
+					CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AB" << CGoGNendl ;
 					return EDGE_INTERSECTION ;
 				}
 				if(oA == ALIGNED)
@@ -163,7 +163,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 					return VERTEX_INTERSECTION ;
 				}
 				//inter with AC
-				std::cout << __FILE__ << " TODO compute edge coplanar intersection AC" << std::endl ;
+				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AC" << CGoGNendl ;
 				return EDGE_INTERSECTION ;
 			}
 			if(oPBC == RIGHT) // same side of BC, test this edge
@@ -179,7 +179,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 					return VERTEX_INTERSECTION ;
 				}
 				//inter with BC
-				std::cout << __FILE__ << " TODO compute edge coplanar intersection BC" << std::endl ;
+				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection BC" << CGoGNendl ;
 				return EDGE_INTERSECTION ;
 			}
 
@@ -194,7 +194,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 					return VERTEX_INTERSECTION ;
 				}
 				//inter with AB
-				std::cout << __FILE__ << " TODO compute edge coplanar intersection AB" << std::endl ;
+				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AB" << CGoGNendl ;
 				return EDGE_INTERSECTION ;
 			}
 			if(oPAB == ALIGNED)
@@ -214,7 +214,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 				return VERTEX_INTERSECTION ;
 			}
 			//inter with AC
-			std::cout << __FILE__ << " TODO compute edge coplanar intersection AC" << std::endl ;
+			CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AC" << CGoGNendl ;
 			return EDGE_INTERSECTION ;
 	}
 }
@@ -277,7 +277,7 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
 // template <typename VEC3>
 // Intersection intersectionSegmentSegment2D(const VEC3& PA, const VEC3& PB, const VEC3& PC,  const VEC3& PD, VEC3& Inter) 
 // {
-// 	std::cout << __FILE__ << " " << __LINE__ << " to write intersectionSegmentSegment2D" << std::endl;
+// 	CGoGNout << __FILE__ << " " << __LINE__ << " to write intersectionSegmentSegment2D" << CGoGNendl;
 // 	return NO_INTERSECTION;
 // }
 

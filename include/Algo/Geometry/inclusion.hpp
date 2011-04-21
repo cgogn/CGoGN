@@ -71,7 +71,7 @@ bool isPointInVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& 
 	int countInter = 0;
 
 // 	if(isConvex<PFP>(map,d)) {
-// 		std::cout << "optimize point in volume" << std::endl;
+// 		CGoGNout << "optimize point in volume" << CGoGNendl;
 // 	}
 
 	std::list<Dart> visitedFaces;			// Faces that are traversed
@@ -211,14 +211,14 @@ bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const typename PFP::T
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
 
-// 	std::cout << "point " << point << "d " << d << "faceDeg " << map.faceDegree(d) << std::endl;
+// 	CGoGNout << "point " << point << "d " << d << "faceDeg " << map.faceDegree(d) << CGoGNendl;
 
 	bool convex=true;
 	Geom::Orientation2D o2d;
 	Dart dd = d;
 	do
 	{
-// 		std::cout << "dd " << dd << " ";
+// 		CGoGNout << "dd " << dd << " ";
 		o2d = Geom::testOrientation2D(point, positions[dd], positions[map.phi1(dd)]);
 		if(CCW)
 		{
@@ -251,8 +251,8 @@ bool isPointOnEdge(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& po
 	if((Algo::Geometry::isPointOnHalfEdge<PFP>(map,d,positions,point) && Algo::Geometry::isPointOnHalfEdge<PFP>(map,map.phi2(d),positions,point)) || Algo::Geometry::isPointOnVertex<PFP>(map,d,positions,point) || Algo::Geometry::isPointOnVertex<PFP>(map,map.phi1(d),positions,point))
 		return true;
 	else {
-		std::cout << " point " << point << std::endl;
-		std::cout << " d1 " << positions[d] << " d2 " << positions[map.phi2(d)] << std::endl;
+		CGoGNout << " point " << point << CGoGNendl;
+		CGoGNout << " d1 " << positions[d] << " d2 " << positions[map.phi2(d)] << CGoGNendl;
 		return false;
 	}
 }

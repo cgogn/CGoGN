@@ -117,7 +117,7 @@ public:
 
 void myGlutWin::exitCallback()
 {
-	std::cout << "DESTRUCTOR"<< std::endl;
+	CGoGNout << "DESTRUCTOR"<< CGoGNendl;
 	eraseGraph(root);
 //	if (m_render)
 //		delete m_render;
@@ -217,7 +217,7 @@ int main(int argc, char **argv)
 	glewInit();
 	if (! Utils::GLSLShader::areShadersSupported())
 	{
-		std::cerr << "Shaders not supported"<< std::endl;
+		CGoGNerr << "Shaders not supported"<< CGoGNendl;
 		exit(1);
 	}
 

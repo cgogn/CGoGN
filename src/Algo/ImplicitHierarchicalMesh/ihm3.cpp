@@ -220,7 +220,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 		} while(e != *face) ;
 	}
 
-	std::cout << "vLevel avant=" << vLevel << std::endl;
+	CGoGNout << "vLevel avant=" << vLevel << CGoGNendl;
 
 	//Second : the case of all faces regularly subdivided but not the volume itself
 	unsigned int cur = m_curLevel ;
@@ -245,7 +245,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 
 	m_curLevel = cur ;
 
-	std::cout << "vLevel apres=" << vLevel << std::endl;
+	CGoGNout << "vLevel apres=" << vLevel << CGoGNendl;
 
 	return vLevel;
 }

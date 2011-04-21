@@ -291,7 +291,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 	// test if face has to be rendered
 	if (dd == d)
 	{
-		//std::cout << "POLY: "<<m_nbEdges<<std::endl;
+		//CGoGNout << "POLY: "<<m_nbEdges<<CGoGNendl;
 		VEC3 center = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
 
 		// modify vertex position (explode faces)
@@ -301,7 +301,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 		for(unsigned i=0; i< m_nbEdges; ++i)
 		{
 			vecPos[i] = m_explode * m_positions[dd] + opp_expl * center;
-			//std::cout<< "POS: "<<vecPos[i] << std::endl;
+			//CGoGNout<< "POS: "<<vecPos[i] << CGoGNendl;
 			dd= this->m_map.phi1(dd);
 		}
 		if ( m_lighted && !m_smooth ) // use face normal
@@ -333,7 +333,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 	else if (m_storing) // face is not render, if needed store it
 	{
 		m_poly.push_back(d);
-		//std::cout << "store dart"<<std::endl;
+		//CGoGNout << "store dart"<<CGoGNendl;
 
 	}
 }
@@ -630,7 +630,7 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 	// test if face has to be rendered
 	if (dd == d)
 	{
-		//std::cout << "POLY: "<<m_nbEdges<<std::endl;
+		//CGoGNout << "POLY: "<<m_nbEdges<<CGoGNendl;
 		VEC3 center = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
 
 		// modify vertex position (explode faces)
@@ -640,7 +640,7 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 		for(unsigned i=0; i< m_nbEdges; ++i)
 		{
 			vecPos[i] = m_explode * m_positions[dd] + opp_expl * center;
-			//std::cout<< "POS: "<<vecPos[i] << std::endl;
+			//CGoGNout<< "POS: "<<vecPos[i] << CGoGNendl;
 			dd= this->m_map.phi1(dd);
 		}
 		if ( m_lighted && !m_smooth ) // use face normal
@@ -674,7 +674,7 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 	else if (m_storing) // face is not render, if needed store it
 	{
 		m_poly.push_back(d);
-		//std::cout << "store dart"<<std::endl;
+		//CGoGNout << "store dart"<<CGoGNendl;
 
 	}
 }

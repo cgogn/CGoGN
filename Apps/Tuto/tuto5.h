@@ -92,6 +92,7 @@ protected:
 	void cb_initGL();
 
 	void cb_mousePress(int button, int x, int y);
+	void cb_keyPress(int code) {}
 
 // slots locaux
 public slots:

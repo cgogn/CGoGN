@@ -34,7 +34,7 @@ ECellDart<DIM>::ECellDart(unsigned int i): m_id(i)
 template <int DIM>
 ECellDart<DIM>::ECellDart()
 {
-	m_id = s_cont->insertLine(); /*std::cout << "NEW CELL "<< m_id<< std::endl;*/
+	m_id = s_cont->insertLine(); /*CGoGNout << "NEW CELL "<< m_id<< CGoGNendl;*/
 }
 
 template <int DIM>

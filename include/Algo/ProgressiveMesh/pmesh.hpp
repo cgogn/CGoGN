@@ -41,7 +41,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	) :
 	m_map(map), positionsTable(position), inactiveMarker(inactive), dartSelect(inactiveMarker)
 {
-	std::cout << "  creating approximator and predictor.." << std::flush ;
+	CGoGNout << "  creating approximator and predictor.." << std::flush ;
 	switch(a)
 	{
 		case Algo::Decimation::A_QEM : {
@@ -78,9 +78,9 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 			m_approximators.push_back(new Algo::Decimation::Approximator_RGBfunctions<PFP>(m_map, RGBfunctions)) ;
 			break ; }
 	}
-	std::cout << "..done" << std::endl ;
+	CGoGNout << "..done" << CGoGNendl ;
 
-	std::cout << "  creating selector.." << std::flush ;
+	CGoGNout << "  creating selector.." << std::flush ;
 	switch(s)
 	{
 		case Algo::Decimation::S_MapOrder : {
@@ -105,11 +105,11 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 			m_selector = new Algo::Decimation::EdgeSelector_Lightfield<PFP>(map, positionsTable, m_approximators, dartSelect) ;
 			break ; }
 	}
-	std::cout << "..done" << std::endl ;
+	CGoGNout << "..done" << CGoGNendl ;
 
 	m_initOk = true ;
 
-	std::cout << "  initializing approximators.." << std::flush ;
+	CGoGNout << "  initializing approximators.." << std::flush ;
 	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 	{
 		if(! (*it)->init())
@@ -117,17 +117,17 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		if((*it)->getApproximatedAttributeName() == "position")
 			m_positionApproximator = reinterpret_cast<Algo::Decimation::Approximator<PFP, VEC3>*>(*it) ;
 	}
-	std::cout << "..done" << std::endl ;
+	CGoGNout << "..done" << CGoGNendl ;
 
-	std::cout << "  initializing predictors.." << std::flush ;
+	CGoGNout << "  initializing predictors.." << std::flush ;
 	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
 		if(! (*it)->init())
 			m_initOk = false ;
-	std::cout << "..done" << std::endl ;
+	CGoGNout << "..done" << CGoGNendl ;
 
-	std::cout << "  initializing selector.." << std::flush ;
+	CGoGNout << "  initializing selector.." << std::flush ;
 	m_initOk = m_selector->init() ;
-	std::cout << "..done" << std::endl ;
+	CGoGNout << "..done" << CGoGNendl ;
 
 	m_detailAmount = REAL(1) ;
 	m_localFrameDetailVectors = false ;
@@ -155,7 +155,7 @@ void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 {
 	unsigned int nbVertices = m_map.getNbOrbits(VERTEX_ORBIT) ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
-	std::cout << "  creating PM (" << nbVertices << " vertices).." << std::flush ;
+	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << std::flush ;
 
 	bool finished = false ;
 	Dart d ;
@@ -200,7 +200,7 @@ void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 	m_selector = NULL ;
 
 	m_cur = m_splits.size() ;
-	std::cout << "..done (" << nbVertices << " vertices)" << std::endl ;
+	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
 
 	initQuantization() ;
 }
@@ -442,7 +442,7 @@ void ProgressiveMesh<PFP>::initQuantization()
 			originalDetailVectors[i] = m_positionApproximator->getDetail(m_splits[i]->getEdge()) ;
 		q = new Quantization<VEC3>(originalDetailVectors) ;
 		quantizationInitialized = true ;
-		std::cout << "  Differential Entropy -> " << q->getDifferentialEntropy() << std::endl ;
+		CGoGNout << "  Differential Entropy -> " << q->getDifferentialEntropy() << CGoGNendl ;
 	}
 }
 
@@ -459,7 +459,7 @@ void ProgressiveMesh<PFP>::quantizeDetailVectors(unsigned int nbClasses)
 			m_positionApproximator->setDetail(m_splits[i]->getEdge(), resultat[i]) ;
 		quantizationApplied = true ;
 		gotoLevel(0) ;
-		std::cout << "Discrete Entropy -> " << q->getDiscreteEntropy() << " (codebook size : " << q->getNbCodeVectors() << ")" << std::endl ;
+		CGoGNout << "Discrete Entropy -> " << q->getDiscreteEntropy() << " (codebook size : " << q->getNbCodeVectors() << ")" << CGoGNendl ;
 /*
 		Point p;
 		p.x = q->getEntropieDiscrete() ;
@@ -483,7 +483,7 @@ void ProgressiveMesh<PFP>::quantizeDetailVectors(float distortion)
 			m_positionApproximator->setDetail(m_splits[i]->getEdge(), resultat[i]) ;
 		quantizationApplied = true ;
 		gotoLevel(0) ;
-		std::cout << "Discrete Entropy -> " << q->getDiscreteEntropy() << " (codebook size : " << q->getNbCodeVectors() << ")" << std::endl ;
+		CGoGNout << "Discrete Entropy -> " << q->getDiscreteEntropy() << " (codebook size : " << q->getNbCodeVectors() << ")" << CGoGNendl ;
 	}
 }
 
@@ -535,7 +535,7 @@ void ProgressiveMesh<PFP>::calculCourbeDebitDistortion()
 	float distance;
 	Point p;
 
-	std::cout << "calcul de la courbe débit distortion " << std::flush;
+	CGoGNout << "calcul de la courbe débit distortion " << std::flush;
 
 	// get original detail vectors
 	for(unsigned int i = 0; i < m_splits.size(); ++i)
@@ -573,7 +573,7 @@ void ProgressiveMesh<PFP>::calculCourbeDebitDistortion()
 		courbe.push_back(p);
 		// returns to coarse mesh
 		gotoLevel(nbSplits());
-		std::cout << "..." << std::flush;
+		CGoGNout << "..." << std::flush;
 	}
 	q.erase();
 }

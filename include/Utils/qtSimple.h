@@ -35,6 +35,7 @@
 #include <string>
 #include "Geometry/vector_gen.h"
 
+
 namespace CGoGN { namespace Utils { class GLSLShader;}}
 //namespace CGoGN { namespace Geom { class Vec3f;}}
 
@@ -308,14 +309,24 @@ public:
 	 */
 	void updateGLMatrices();
 
+	/**
+	 * Open a file selector and return the filename
+	 * @param title title of window
+	 * @param dir base directory
+	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
+	 */
+	std::string selectFile(const std::string& title = "open file", const std::string& dir= ".", const std::string& filters="all (*.*)");
+
 
 	public slots:
-	virtual void cb_New() { std::cout << "callback not implemented"<< std::endl;}
-	virtual void cb_Open() { std::cout << "callback not implemented"<< std::endl;}
-	virtual void cb_Save() { std::cout << "callback not implemented"<< std::endl;}
+	virtual void cb_New() { std::cerr << "callback not implemented"<< std::endl;}
+	virtual void cb_Open() { std::cerr << "callback not implemented"<< std::endl;}
+	virtual void cb_Save() { std::cerr << "callback not implemented"<< std::endl;}
 	virtual void cb_Quit() { exit(0);}
 	void cb_about_cgogn();
 	void cb_about();
+	void cb_consoleOnOff() { toggleVisibilityConsole();}
+	void cb_consoleClear() { m_textConsole->clear();}
 
 
 };

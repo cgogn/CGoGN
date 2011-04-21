@@ -327,7 +327,7 @@ int Map3::collapseEdge(Dart d, bool delDegenerateFaces,
 	return i;
 }
 
-//	std::cout << "coll topo" << std::endl;
+//	CGoGNout << "coll topo" << CGoGNendl;
 //	Dart e = d;
 //
 //	//stocke un brin par volume autour de l'arete
@@ -349,7 +349,7 @@ int Map3::collapseEdge(Dart d, bool delDegenerateFaces,
 //		//impossible d'avoir un volume de moins de 4 faces sans avoir de phi2 en points fixe donc on les vire
 //		if(delDegenerateVolumes && Map2::volumeDegree(d) < 4)
 //		{
-//			std::cout << "del vol" << std::endl;
+//			CGoGNout << "del vol" << CGoGNendl;
 //			Dart e = d;
 //			//pour tous les brins de la face adjacente
 //
@@ -397,13 +397,13 @@ void Map3::collapseFace(Dart d, bool delDegenerateFaces,
 	//del the last one (n-1 edge collapse)
 	tmp.pop_back();
 
-	//std::cout << "#voisin=" << tmp.size() << std::endl;
+	//CGoGNout << "#voisin=" << tmp.size() << CGoGNendl;
 
 	//collapse all the edges in the list
 	for(std::list<Dart>::iterator it = tmp.begin() ; it != tmp.end() ; ++it)
 	{
 		Dart d = *it;
-		//std::cout << "collapseEdge" << std::endl;
+		//CGoGNout << "collapseEdge" << CGoGNendl;
 		//collapseEdge(*it, delDegenerateFaces, delDegenerateVolumes);
 		//stocke un brin par volume autour de l'arete
 
@@ -497,7 +497,7 @@ Dart Map3::cutSpike(Dart d)
   Dart dNew;
   int tet=0;
 
-  //std::cout << "cut" << std::endl;
+  //CGoGNout << "cut" << CGoGNendl;
 
   //count the valence of the vertex
   do {
@@ -507,7 +507,7 @@ Dart Map3::cutSpike(Dart d)
 
   if(nb<3)
   {
-	std::cout << "Warning : cannot cut 2 volumes without creating a degenerated face " << std::endl;
+	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
 	return d;
   }
   else
@@ -517,7 +517,7 @@ Dart Map3::cutSpike(Dart d)
 		if(phi1(phi1(phi1(e)))!=e)
 		{
 			splitFace(phi_1(e),phi1(e));
-			//std::cout << "split" << std::endl;
+			//CGoGNout << "split" << CGoGNendl;
 		}
 		else
 			tet++;
@@ -525,12 +525,12 @@ Dart Map3::cutSpike(Dart d)
 		e=phi1(phi2(e));
 	} while (e!=d);
 
-//	std::cout << "#tet= " << tet << std::endl;
-//	std::cout << "#nb= " << nb << std::endl;
+//	CGoGNout << "#tet= " << tet << CGoGNendl;
+//	CGoGNout << "#nb= " << nb << CGoGNendl;
 
 	//si toute ces faces ne sont pas triangulaires (on insere une face)
 	if(tet != nb) {
-		//std::cout << "new face" << std::endl;
+		//CGoGNout << "new face" << CGoGNendl;
 		dNew=newFace(nb);
 		Dart d3 = newFace(nb);
 		sewVolumes(dNew,d3);
@@ -995,62 +995,62 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //
 //bool Map3::check()
 //{
-//    std::cout << "Check: topology begin" << std::endl;
+//    CGoGNout << "Check: topology begin" << CGoGNendl;
 //    Marker m = this->getNewMarker();
 //    for(Dart d = this->begin(); d != this->end(); this->next(d))
 //    {
 //        Dart d3 = phi3(d);
 //        if (phi3(d3) != d) // phi3 involution ?
 //		{
-//            std::cout << "Check: phi3 is not an involution" << std::endl;
+//            CGoGNout << "Check: phi3 is not an involution" << CGoGNendl;
 //            return false;
 //        }
 //
 //        Dart d2 = phi2(d);
 //        if (phi2(d2) != d) // phi2 involution ?
 //		{
-//            std::cout << "Check: phi2 is not an involution" << std::endl;
+//            CGoGNout << "Check: phi2 is not an involution" << CGoGNendl;
 //            return false;
 //        }
 //
 //        Dart d1 = phi1(d);
 //        if (phi_1(d1) != d) // phi1 a une image correcte ?
 //		{
-//            std::cout << "Check: unconsistent phi_1 link" << std::endl;
+//            CGoGNout << "Check: unconsistent phi_1 link" << CGoGNendl;
 //            return false;
 //        }
 //
 //        if (isMarkedDart(d1,m)) // phi1 a un seul antécédent ?
 //		{
-//            std::cout << "Check: dart with two phi1 predecessors" << std::endl;
+//            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
 //            return false;
 //        }
 //        markOrbit(DART_ORBIT,d1,m);
 //
 //        if (d1 == d)
-//            std::cout << "Check: (warning) face loop (one edge)" << std::endl;
+//            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
 //
 //        if (phi1(d1) == d)
-//            std::cout << "Check: (warning) face with only two edges" << std::endl;
+//            CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
 //
 //        if (phi2(d1) == d)
-//            std::cout << "Check: (warning) dandling edge (phi2)" << std::endl;
+//            CGoGNout << "Check: (warning) dandling edge (phi2)" << CGoGNendl;
 //
 //        if (phi3(d1) == d)
-//            std::cout << "Check: (warning) dandling edge (phi3)" << std::endl;
+//            CGoGNout << "Check: (warning) dandling edge (phi3)" << CGoGNendl;
 //    }
 //
 //    for(Dart d = this->begin(); d != this->end(); this->next(d))
 //    {
 //        if (!isMarkedDart(d,m)) // phi1 a au moins un antécédent ?
 //		{
-//            std::cout << "Check: dart with no phi1 predecessor" << std::endl;
+//            CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
 //            return false;
 //        }
 //    }
 //    this->unmarkAll(DART_ORBIT,m);
 //    this->releaseMarker(DART_ORBIT,m);
-//    std::cout << "Check: topology ok" << std::endl;
+//    CGoGNout << "Check: topology ok" << CGoGNendl;
 //    return true;
 //}
 
@@ -1131,10 +1131,10 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //	Dart d = d1;			// Dart d is used to turn around the face
 //
 //	if (d1 == d0)
-//		std::cout << "Warning: triangulation of a face with only one edge" << std::endl;
+//		CGoGNout << "Warning: triangulation of a face with only one edge" << CGoGNendl;
 //
 //	if (phi1(d1) == d0)
-//		std::cout << "Warning: triangulation of a face with only two edges" << std::endl;
+//		CGoGNout << "Warning: triangulation of a face with only two edges" << CGoGNendl;
 //
 //	Dart n = newEdge(2); 	// Create the first edge with n in the central vertex
 //	Dart first = phi2(n); 	// Store the opposite of the first edge
@@ -1195,7 +1195,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //
 //  if(nb<3)
 //  {
-//	std::cout << "Warning : cannot cut 2 volumes without creating a degenerated face " << std::endl;
+//	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
 //	return d;
 //  }
 //  else

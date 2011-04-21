@@ -439,7 +439,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "loop: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "loop: "<< seconds << "sec" << CGoGNendl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -449,7 +449,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -463,7 +463,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "catmull-clark: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "catmull-clark: "<< seconds << "sec" << CGoGNendl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -473,7 +473,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -487,7 +487,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "sqrt3: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "sqrt3: "<< seconds << "sec" << CGoGNendl ;
 
 			normal = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
 			if(!normal.isValid())
@@ -504,7 +504,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -518,7 +518,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "triangulation: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "triangulation: "<< seconds << "sec" << CGoGNendl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -528,7 +528,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -542,7 +542,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "quadrangulation: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "quadrangulation: "<< seconds << "sec" << CGoGNendl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -552,7 +552,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -568,7 +568,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "decimation: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "decimation: "<< seconds << "sec" << CGoGNendl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -578,7 +578,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -597,7 +597,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "dual computation: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "dual computation: "<< seconds << "sec" << CGoGNendl ;
 
 			position = positionF ;
 
@@ -616,7 +616,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -631,7 +631,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "pliant remeshing: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "pliant remeshing: "<< seconds << "sec" << CGoGNendl ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -641,7 +641,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			t2 = glutGet(GLUT_ELAPSED_TIME) ;
 			seconds = (t2 - t1) / 1000.0f ;
-			std::cout << "display update: "<< seconds << "sec" << std::endl ;
+			CGoGNout << "display update: "<< seconds << "sec" << CGoGNendl ;
 
 			glutPostRedisplay() ;
 			break ;
@@ -802,26 +802,26 @@ int main(int argc, char** argv)
 		std::vector<std::string> attrNames ;
 		if(!Algo::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
-			std::cerr << "could not import " << filename << std::endl ;
+			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return 1 ;
 		}
 
 		mgw->position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 		GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 		GLfloat seconds = (t2 - t1) / 1000.0f ;
-		std::cout << "import: " << seconds << " sec" << std::endl ;
+		CGoGNout << "import: " << seconds << " sec" << CGoGNendl ;
 
 //		DartMarker m(myMap) ;
 //		myMap.closeMap(m) ;
 	}
 
-	std::cout << myMap.getNbOrbits(VERTEX_ORBIT) << std::endl ;
-	std::cout << myMap.getNbOrbits(EDGE_ORBIT) << std::endl ;
-	std::cout << myMap.getNbOrbits(FACE_ORBIT) << std::endl ;
+	CGoGNout << myMap.getNbOrbits(VERTEX_ORBIT) << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits(EDGE_ORBIT) << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits(FACE_ORBIT) << CGoGNendl ;
 
 	// compute width and position of object for centering
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, mgw->position) ;
-	std::cout << bb << std::endl ;
+	CGoGNout << bb << CGoGNendl ;
 
 	mgw->gPosObj = bb.center() ;
 	float tailleX = bb.size(0) ;

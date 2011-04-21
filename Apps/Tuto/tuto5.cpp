@@ -240,7 +240,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 		if (d != Dart::nil())
 		{
 //			std::stringstream ss;
-//			ss << "Dart "<< d << " clicked"<< std::endl;
+//			ss << "Dart "<< d << " clicked"<< CGoGNendl;
 //			statusMsg(ss.str().c_str());
 
 			CGoGNout << "Dart "<< d << " clicked"<< CGoGNendl;
@@ -282,14 +282,14 @@ int main(int argc, char **argv)
  	// message d'aide
 	sqt.setHelpMsg("");
 
-	CGoGNout.out2StatuBar(&sqt);
+	CGoGNout.toStatusBar(&sqt);
 	CGoGNout <<"CGoGNOut StatusBar"<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
 
-	CGoGNout.out2Console(&sqt);
+	CGoGNout.toConsole(&sqt);
 
 	CGoGNout <<"CGoGNOut dans la console"<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
 
-	CGoGNout.out2StatuBar(NULL);
+	CGoGNout.toStatusBar(NULL);
 	CGoGNout <<"tirelipinpon .."<< CGoGNendl;
 	CGoGNout <<"ah aha ah"<< CGoGNendl;
 
@@ -319,8 +319,8 @@ int main(int argc, char **argv)
 
 	GLint texSize;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
-	CGoGNdbg2.out2Console(&sqt);
-	CGoGNerr.out2Console(&sqt);
+	CGoGNdbg2.toConsole(&sqt);
+	CGoGNerr.toConsole(&sqt);
 	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
 	CGoGNerr << " ERROR  " <<  5*7 << CGoGNendl;
 

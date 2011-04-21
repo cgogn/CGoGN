@@ -412,7 +412,7 @@ int main(int argc, char **argv)
 		std::vector<std::string> attrNames ;
 		if(!Algo::Import::importMesh<PFP>(myMap, filename, attrNames))
 		{
-			std::cerr <<"Import fail"<< std::endl;
+			CGoGNerr <<"Import fail"<< CGoGNendl;
 			exit(1);
 		}
 		mgw.position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;

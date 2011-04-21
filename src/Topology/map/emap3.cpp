@@ -212,16 +212,16 @@ namespace CGoGN
 //{
 //	bool topo = Map3::check();
 //	if (!topo) return false;
-//	std::cout << "Check: embedding begin" << std::endl;
+//	CGoGNout << "Check: embedding begin" << CGoGNendl;
 //	for(Dart d = this->begin(); d != this->end(); ++d)
 //	{
 //		if (isOrbitEmbedded(VERTEX_ORBIT))
 //			if (getEmbedding(d,VERTEX_ORBIT) != getEmbedding(alpha1(d),VERTEX_ORBIT)) {
-//				std::cout << "Check: different embeddings on vertex" << std::endl;
+//				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl;
 //				return false;
 //			}
 //	}
-//	std::cout << "Check: embedding ok" << std::endl;
+//	CGoGNout << "Check: embedding ok" << CGoGNendl;
 //	return true;
 //}
 //

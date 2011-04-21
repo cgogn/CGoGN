@@ -249,7 +249,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 			Algo::Modelisation::CatmullClarkSubdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "catmull-clark: "<< seconds << "sec" << std::endl;
+			CGoGNout << "catmull-clark: "<< seconds << "sec" << CGoGNendl;
 
 			Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -266,7 +266,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 			Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "loop: "<< seconds << "sec" << std::endl;
+			CGoGNout << "loop: "<< seconds << "sec" << CGoGNendl;
 
 			Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal, allDarts) ;
 
@@ -279,7 +279,7 @@ void myGlutWin::myKeyboard(unsigned char keycode, int, int)
 			Algo::Modelisation::Sqrt3Subdivision<PFP>(myMap, position);
 			GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 			GLfloat seconds = (t2 - t1) / 1000.0f;
-			std::cout << "dual: "<< seconds << "sec" << std::endl;
+			CGoGNout << "dual: "<< seconds << "sec" << CGoGNendl;
 
 			Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal, allDarts) ;
 
@@ -334,17 +334,17 @@ int main(int argc, char **argv)
 	{
 		position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
 
-		std::cout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
+		CGoGNout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<CGoGNendl;
 //		typedef uint8 DATATYPE;
 //		Algo::MC::Image<DATATYPE> myImg;
 //		myImg.loadPNG3D("liver.png");
 //
-//		std::cout << "Image chargee"<<std::endl;
-//		std::cout << myImg.getWidthX() <<"x"<< myImg.getWidthY() <<"x"<< myImg.getWidthZ() << "voxels"<<std::endl;
+//		CGoGNout << "Image chargee"<<CGoGNendl;
+//		CGoGNout << myImg.getWidthX() <<"x"<< myImg.getWidthY() <<"x"<< myImg.getWidthZ() << "voxels"<<CGoGNendl;
 //
 //		// ajouté pour vérifier que ça marche sur les images non bool
 //// 		myImg.Blur3();
-//// 		std::cout << "Image lissee"<<std::endl;
+//// 		CGoGNout << "Image lissee"<<CGoGNendl;
 //
 //		// fonction de fenetrage de type superieur à ...
 //		Algo::MC::WindowingGreater<DATATYPE> myWindFunc;
@@ -353,13 +353,13 @@ int main(int argc, char **argv)
 //		myWindFunc.setIsoValue(DATATYPE(127));
 //
 //		// instanciation du mc
-//		std::cout << "mc init"<<std::endl;
+//		CGoGNout << "mc init"<<CGoGNendl;
 //		Algo::MC::MarchingCube<DATATYPE,Algo::MC::WindowingGreater,PFP> mc(&myImg, &myMap, position, myWindFunc, false);
 //	//	MarchingCube<DATATYPE,WindowingDiff> mc(&myImg, &myMap, myWindFunc, false);
 //
 //		// realisation du maillage
 //		mc.simpleMeshing();
-//		std::cout << "mc ok"<<std::endl;
+//		CGoGNout << "mc ok"<<CGoGNendl;
 
 //		typedef float DATATYPE;
 //
@@ -371,7 +371,7 @@ int main(int argc, char **argv)
 //
 //		Scal3D myImg(256);
 //
-//		std::cout << "mc init"<<std::endl;
+//		CGoGNout << "mc init"<<CGoGNendl;
 //		Algo::MC::MarchingCubeGen<DATATYPE, Scal3D, Algo::MC::WindowingGreater,PFP> mc(&myImg, &myMap, position, myWindFunc, false);
 //
 //		//realisation du maillage
@@ -431,7 +431,7 @@ int main(int argc, char **argv)
 //
 //		GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 //			GLfloat seconds = (t2 - t1) / 1000.0f;
-//			std::cout << "triangulation: "<< seconds << "sec" << std::endl;
+//			CGoGNout << "triangulation: "<< seconds << "sec" << CGoGNendl;
 //
 //		Marker m = myMap.getNewMarker(VERTEX_ORBIT);
 //		myMap.markEmbVertex(myMap.begin(),m);
@@ -439,12 +439,12 @@ int main(int argc, char **argv)
 //		Dart xd = myMap.alpha1(myMap.begin());
 //		if (myMap.isMarkedEmbVertex(xd,m))
 //		{
-//			std::cout << "Marke"<< std::endl;
+//			CGoGNout << "Marke"<< CGoGNendl;
 //		}
 //		xd = myMap.phi2(xd);
 //		if (myMap.isMarkedEmbVertex(xd,m))
 //		{
-//			std::cout << "Marke aussi"<< std::endl;
+//			CGoGNout << "Marke aussi"<< CGoGNendl;
 //		}
 //
 //		myMap.clearEmbMarkers(m,VERTEX_ORBIT);
@@ -459,7 +459,7 @@ int main(int argc, char **argv)
 		std::vector<std::string> attrNames ;
     	if(!Algo::Import::importMesh<PFP>(myMap, std::string(argv[1]), attrNames))
     	{
-    		std::cerr << "could not import " << std::string(argv[1]) << std::endl ;
+    		CGoGNerr << "could not import " << std::string(argv[1]) << CGoGNendl ;
     		exit(1);
     	}
 		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
@@ -487,7 +487,7 @@ int main(int argc, char **argv)
 
 		GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 		GLfloat seconds = (t2 - t1) / 1000.0f;
-		std::cout << "subdiv: "<< seconds << "sec" << std::endl;
+		CGoGNout << "subdiv: "<< seconds << "sec" << CGoGNendl;
 
 
 //        myMap.getAttributeContainer(VERTEX_ORBIT).toggleProcess(position);
@@ -498,22 +498,22 @@ int main(int argc, char **argv)
 //        Algo::Modelisation::triangleSubdivide<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
 //        Algo::Modelisation::triangleSubdivide<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
 
-        std::cout << "Nombre de sommets plonges  "<< myMap.getNbCells(VERTEX_ORBIT)<<std::endl;
-        std::cout << "Nombre de sommets topo: "<< myMap.getNbOrbits(0)<<std::endl;
-        std::cout << "Nombre de faces topo: "<< myMap.getNbOrbits(2)<<std::endl;
+        CGoGNout << "Nombre de sommets plonges  "<< myMap.getNbCells(VERTEX_ORBIT)<<CGoGNendl;
+        CGoGNout << "Nombre de sommets topo: "<< myMap.getNbOrbits(0)<<CGoGNendl;
+        CGoGNout << "Nombre de faces topo: "<< myMap.getNbOrbits(2)<<CGoGNendl;
 
 
 //		GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 //		GLfloat seconds = (t2 - t1) / 1000.0f;
-//		std::cout << "import: "<< seconds << "sec" << std::endl;
+//		CGoGNout << "import: "<< seconds << "sec" << CGoGNendl;
 
 	}
 
 		float area = Algo::Geometry::totalArea<PFP>(myMap, position) ;
-		std::cout << "total area = " << area << std::endl ;
+		CGoGNout << "total area = " << area << CGoGNendl ;
 
 		bool inter = Algo::Geometry::areTrianglesInIntersection<PFP>(myMap,0,10,position) ;
-		std::cout << "intersection = " << inter << std::endl ;
+		CGoGNout << "intersection = " << inter << CGoGNendl ;
 
 		normal = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "normals");
 //		PFP::NORMAL normal(normal,myMap);
@@ -526,17 +526,17 @@ int main(int argc, char **argv)
 //		for (Dart dd=myMap.begin(); dd!= myMap.end(); myMap.next(dd))
 //		{
 //			unsigned int a = myMap.getEmbedding(dd, 0);
-//			std::cout << "dart:"<<dd.index<< " / ";
-//			std::cout << "emb:"<<a<< " / ";
-//			std::cout<<position[a]<< " / ";
-//			std::cout << tm[a]<< std::endl;
+//			CGoGNout << "dart:"<<dd.index<< " / ";
+//			CGoGNout << "emb:"<<a<< " / ";
+//			CGoGNout<<position[a]<< " / ";
+//			CGoGNout << tm[a]<< CGoGNendl;
 //		}
 
 
 
         Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap,position);
 
-        std::cout << "BB: "<< bb.min() << " / "<< bb.max() << std::endl;
+        CGoGNout << "BB: "<< bb.min() << " / "<< bb.max() << CGoGNendl;
 
        // compute width and position of object for centering
 

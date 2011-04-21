@@ -445,32 +445,32 @@ bool GMap2::isBoundaryVertex(Dart d)
 
 bool GMap2::check()
 {
-	std::cout << "Check: topology begin" << std::endl;
+	CGoGNout << "Check: topology begin" << CGoGNendl;
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		Dart dd = beta0(d);
 		if (beta0(dd) != d)	// beta0 involution ?
 		{
-			std::cout << "Check: beta0 is not an involution" << std::endl;
+			CGoGNout << "Check: beta0 is not an involution" << CGoGNendl;
 			return false;
 		}
 
 		dd = beta1(d);
 		if (beta1(dd) != d)	// beta1 involution ?
 		{
-			std::cout << "Check: beta1 is not an involution" << std::endl;
+			CGoGNout << "Check: beta1 is not an involution" << CGoGNendl;
 			return false;
 		}
 
 		dd = beta2(d);
 		if (beta2(dd) != d)	// beta2 involution ?
 		{
-			std::cout << "Check: beta2 is not an involution" << std::endl;
+			CGoGNout << "Check: beta2 is not an involution" << CGoGNendl;
 			return false;
 		}
 	}
 
-	std::cout << "Check: topology ok" << std::endl;
+	CGoGNout << "Check: topology ok" << CGoGNendl;
 	return true;
 }
 

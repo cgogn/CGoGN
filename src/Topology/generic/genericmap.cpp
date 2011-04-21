@@ -141,7 +141,7 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 	RegisteredBaseAttribute* ra = new RegisteredAttribute<R>;
 	if (ra == NULL)
 	{
-		std::cerr << "Erreur enregistrement attribut" << std::endl;
+		CGoGNerr << "Erreur enregistrement attribut" << CGoGNendl;
 		return false;
 	}
 
@@ -227,7 +227,7 @@ void GenericMap::update_m_emb_afterLoad()
 
 			AttributeMultiVector<unsigned int>* amv = cont.getDataVector<unsigned int>(i);
 			m_embeddings[orb] = amv ;
-			std::cout << "Ajoute m_emb[" << orb << "] : " << i << std::endl;
+			CGoGNout << "Ajoute m_emb[" << orb << "] : " << i << CGoGNendl;
 		}
 	}
 }
@@ -286,20 +286,20 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 //	if (strcmp((char*)(map_node->name),(char*)"CGoGN_Map")!=0)
 	if (!chechXmlNode(map_node,"CGoGN_Map"))
 	{
-		std::cerr << "Wrong xml format: Root node != CGoGN_Map"<< std::endl;
+		CGoGNerr << "Wrong xml format: Root node != CGoGN_Map"<< CGoGNendl;
 		return false;
 	}
 
 	// check the file type
 	xmlChar *prop = xmlGetProp(map_node, BAD_CAST "type");
-	std::cout << "Loading "<< prop <<" xml file"<< std::endl;
+	CGoGNout << "Loading "<< prop <<" xml file"<< CGoGNendl;
 
 	// check the nb max orbits
 	prop = xmlGetProp(map_node, BAD_CAST "nb_max_orbits");
 	unsigned int nbo = atoi((char*)prop);
 	if (nbo != NB_ORBITS)
 	{
-		std::cerr << "Wrong nb max orbits in xml map"<< std::endl;
+		CGoGNerr << "Wrong nb max orbits in xml map"<< CGoGNendl;
 		return false;
 	}
 
@@ -312,14 +312,14 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 //		if (strcmp((char*)(cur_node->name),(char*)"Attributes_Container")==0)
 		if (chechXmlNode(cur_node, "Attributes_Container"))
 		{
-			std::cout << "LOAD ATTRIBUT"<< std::endl;
+			CGoGNout << "LOAD ATTRIBUT"<< CGoGNendl;
 			// get the orbit id
 			unsigned int id = AttributeContainer::getIdXmlNode(cur_node);
 			// and load container
 			unsigned int nba = m_attribs[id].getNbAttributes();
 
 
-			std::cout << "attribut "<<id<<" size="<< m_attribs[id].size()<< "  nbatt="<< nba<< std::endl;
+			CGoGNout << "attribut "<<id<<" size="<< m_attribs[id].size()<< "  nbatt="<< nba<< CGoGNendl;
 
 			m_attribs[id].loadXml(cur_node);
 		}
@@ -336,7 +336,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 //	// find orbit frome name and store pointer in right place
 //	for (unsigned int i = 0; i< tableNames.size(); ++i)
 //	{
-////		std::cout << i <<" : "<< tableNames[i]<<std::endl;
+////		CGoGNout << i <<" : "<< tableNames[i]<<CGoGNendl;
 //
 //		std::string& name = tableNames[i];
 //		std::string is_an_emb = name.substr(0,4);
@@ -380,7 +380,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 		else
 		{
 //			if (strcmp((char*)(cur_node->name),(char*)"Boundary_Marker") == 0)
-			std::cout << "Orbit_MarkerSet"<<std::endl;
+			CGoGNout << "Orbit_MarkerSet"<<CGoGNendl;
 //			if (chechXmlNode(cur_node, "Boundary_Marker"))
 //			{
 //				xmlChar* prop = xmlGetProp(cur_node, BAD_CAST "val");
@@ -395,7 +395,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 
 	if (!(read1 && read2))
 	{
-		std::cerr <<"Error reading Marker in xml node"<<std::endl;
+		CGoGNerr <<"Error reading Marker in xml node"<<CGoGNendl;
 		return false;
 	}
 
@@ -411,7 +411,7 @@ bool GenericMap::saveMapBin(const std::string& filename)
 	CGoGNostream fs(filename.c_str(), std::ios::out|std::ios::binary);
 	if (!fs)
 	{
-		std::cerr << "Unable to open file for writing: " << filename << std::endl;
+		CGoGNerr << "Unable to open file for writing: " << filename << CGoGNendl;
 		return false;
 	}
 
@@ -455,7 +455,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	CGoGNistream fs(filename.c_str(), std::ios::in|std::ios::binary);
 	if (!fs)
 	{
-		std::cerr << "Unable to open file for loading" << std::endl;
+		CGoGNerr << "Unable to open file for loading" << CGoGNendl;
 		return false;
 	}
 
@@ -467,13 +467,13 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	// Check file type
 	if (buff_str != "CGoGN_Map")
 	{
-		std::cerr<< "Wrong binary file format"<< std::endl;
+		CGoGNerr<< "Wrong binary file format"<< CGoGNendl;
 		return false;
 	}
 
 	// Check map type
 	buff_str = std::string(buff+32);
-	std::cout << "Map type file = "<< buff_str<< std::endl;
+	CGoGNout << "Map type file = "<< buff_str<< CGoGNendl;
 
 	std::string localType = this->mapTypeName();
 	localType = localType.substr(0,localType.size()-1);
@@ -482,7 +482,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 
 	if (fileType != localType)
 	{
-		std::cerr << "Not possible to load "<< fileType<< " into "<< localType << " object"<<std::endl;
+		CGoGNerr << "Not possible to load "<< fileType<< " into "<< localType << " object"<<CGoGNendl;
 		return false;
 	}
 
@@ -491,7 +491,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	unsigned int nbo = *ptr_nbo;
 	if (nbo != NB_ORBITS)
 	{
-		std::cerr << "Wrond max orbit number in file" << std::endl;
+		CGoGNerr << "Wrond max orbit number in file" << CGoGNendl;
 		return  false;
 	}
 

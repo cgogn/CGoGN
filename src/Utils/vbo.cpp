@@ -85,7 +85,7 @@ void* VBO::lockPtr()
 {
 	if (m_lock)
 	{
-		std::cerr <<" Error already locked VBO"<< std::endl;
+		CGoGNerr <<" Error already locked VBO"<< CGoGNendl;
 		return NULL;
 	}
 

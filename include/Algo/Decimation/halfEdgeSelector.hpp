@@ -537,11 +537,11 @@ void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo&
 
 	VEC3 n1,n2 ;
 	if (! m_frame[d].getSubVectorH(2,0,n1))	{ // get the normals
-		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 1 failed " << std::endl;
+		CGoGNout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 1 failed " << CGoGNendl;
 		exit(2) ;
 	}
 	if (!m_frame[dd].getSubVectorH(2,0,n2))	{ // of the two vertices
-		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 2 failed " << std::endl;
+		CGoGNout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 2 failed " << CGoGNendl;
 		exit(3) ;
 	}
 
@@ -776,11 +776,11 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	VEC3 n1,n2 ;
 	if (! m_frame[d].getSubVectorH(2,0,n1))	{ // get the normals
-		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 1 failed " << std::endl;
+		CGoGNout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 1 failed " << CGoGNendl;
 		exit(2) ;
 	}
 	if (!m_frame[dd].getSubVectorH(2,0,n2))	{ // of the two vertices
-		std::cout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 2 failed " << std::endl;
+		CGoGNout << "EdgeSelector_LightField::computeEdgeInfo --> getSubVectorH 2 failed " << CGoGNendl;
 		exit(3) ;
 	}
 

@@ -120,7 +120,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	}
 
 	if (nbnm > 0)
-		std::cout << "Warning " << nbnm << " darts with phi2 fix points" << std::endl;
+		CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
 
 	return true ;
 }
@@ -391,7 +391,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 //			unsigned int nbf = 0;
 //			Dart good_dart = d;
 //
-//			std::cout << "vec size" << vec.size() << std::endl;
+//			CGoGNout << "vec size" << vec.size() << CGoGNendl;
 //
 //			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 //			{
@@ -419,7 +419,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 //
 //	if (nbnm > 0)
 //	{
-//		std::cout << "Warning " << nbnm << " darts with phi2 fix points" << std::endl;
+//		CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
 //	}
 //
 //	return true ;
@@ -603,7 +603,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 //		}
 //		else
 //		{
-//			std::cout << "Warning " << nbnm << " darts with phi2 fix points" << std::endl;
+//			CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
 //		}
 //	}
 //

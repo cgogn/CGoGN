@@ -168,7 +168,7 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PF
 		}
 	}
 
-//	std::cout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<std::endl;
+//	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;
 }
 
 } //namespace Filters2D

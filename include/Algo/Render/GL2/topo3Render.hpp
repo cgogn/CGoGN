@@ -924,7 +924,7 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 		}
 		else
 		{
-			std::cerr << "Error buffer too small for color picking (change the good parameter ?)" << std::endl;
+			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
 			d = map.end();
 		}
 	}

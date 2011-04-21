@@ -214,7 +214,7 @@ void OptimizedMap2<MAP>::OptimizedBoth(MAP& the_map)
 			the_map.next(d) ;
 	}
 
-	std::cout << "Dart vert before "<< m_nbVertices<<std::endl;
+	CGoGNout << "Dart vert before "<< m_nbVertices<<CGoGNendl;
 
 	// move  dart of faces that are not maked before Y 
 	d = the_map.begin() ;
@@ -232,7 +232,7 @@ void OptimizedMap2<MAP>::OptimizedBoth(MAP& the_map)
 			the_map.next(d) ;
 	}
 
-	std::cout << "Dart vert "<< m_nbVertices<<std::endl;
+	CGoGNout << "Dart vert "<< m_nbVertices<<CGoGNendl;
 
 	m_firstFace[0] = the_map.begin();
 	d = X;

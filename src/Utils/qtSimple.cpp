@@ -27,6 +27,7 @@
 #include "Utils/GLSLShader.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_precision.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <QtGui/QTextEdit>
 
@@ -71,6 +72,14 @@ m_dock(NULL)
 
 	QMenu* m_helpMenu = menuBar()->addMenu(tr("&Help"));
 
+	action= new QAction(tr("console on/off"), this);
+	connect(action, SIGNAL(triggered()), this, SLOT(cb_consoleOnOff()));
+	m_helpMenu->addAction(action);
+
+	action= new QAction(tr("console clear"), this);
+	connect(action, SIGNAL(triggered()), this, SLOT(cb_consoleClear()));
+	m_helpMenu->addAction(action);
+
 	action= new QAction(tr("About"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_about()));
 	m_helpMenu->addAction(action);
@@ -101,6 +110,15 @@ SimpleQT::~SimpleQT()
 {
 	delete m_glWidget; // ??
 }
+
+
+std::string SimpleQT::selectFile(const std::string& title, const std::string& dir, const std::string& filters)
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr(title.c_str()), tr(dir.c_str()),
+    							tr(filters.c_str()), 0, 0);
+    return fileName.toStdString();
+}
+
 
 
 
@@ -261,20 +279,32 @@ void SimpleQT::updateGL()
 
 void SimpleQT::updateGLMatrices()
 {
+	m_glWidget->modelModified();
 	cb_updateMatrix();
 	m_glWidget->updateGL();
 }
 
 void SimpleQT::cb_updateMatrix()
 {
-	for (std::set< std::pair<void*, GLSLShader*> >::iterator it=GLSLShader::m_registredRunning.begin(); it!=GLSLShader::m_registredRunning.end(); ++it)
+	if (GLSLShader::CURRENT_OGL_VERSION == 1)
 	{
-		if ((it->first == NULL) || (it->first == this))
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(glm::value_ptr(m_projection_matrix));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(glm::value_ptr(m_modelView_matrix));
+
+	}
+	else
+	{
+		for (std::set< std::pair<void*, GLSLShader*> >::iterator it=GLSLShader::m_registredRunning.begin(); it!=GLSLShader::m_registredRunning.end(); ++it)
 		{
-			it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
+			if ((it->first == NULL) || (it->first == this))
+			{
+				it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
+			}
 		}
 	}
-
 }
 
 void SimpleQT::synchronize(SimpleQT* sqt)

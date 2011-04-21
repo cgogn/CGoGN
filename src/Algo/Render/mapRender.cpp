@@ -75,7 +75,7 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 			vbo_ind = m_VBOBuffers[POINT_INDICES];
 			break;
 		default:
-			std::cerr << "problem initializing VBO indices" << std::endl;
+			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
 			break;
 	}
 	int size = tableIndices.size();

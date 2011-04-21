@@ -42,7 +42,7 @@ m_positions(p1.m_positions)
 {
 	if (&(p1.map) != &(p2.map))
 	{
-		std::cerr << "Warning, can not merge to Polyhedrons of different maps"<< std::endl;
+		CGoGNerr << "Warning, can not merge to Polyhedrons of different maps"<< CGoGNendl;
 	}
 
 	m_tableVertDarts.reserve(p1.m_tableVertDarts.size() + p2.m_tableVertDarts.size()); // can be too much but ...
@@ -668,7 +668,7 @@ void Polyhedron<PFP>::embedGrid( float x, float y,float z)
 	typedef typename PFP::VEC3 VEC3 ;
 
 	if (m_kind != GRID) {
-		std::cerr << "Warning try to embedGrid something that is not a grid"<<std::endl;
+		CGoGNerr << "Warning try to embedGrid something that is not a grid"<<CGoGNendl;
 		return;
 	}
 
@@ -693,7 +693,7 @@ void Polyhedron<PFP>::embedCylinder( float bottom_radius, float top_radius, floa
 	typedef typename PFP::VEC3 VEC3 ;
 
 	if (m_kind != CYLINDER) {
-		std::cerr << "Warning try to embedCylinder something that is not a cylnder"<<std::endl;
+		CGoGNerr << "Warning try to embedCylinder something that is not a cylnder"<<CGoGNendl;
 		return;
 	}
 
@@ -740,7 +740,7 @@ void Polyhedron<PFP>::embedCone( float radius, float height)
 	typedef typename PFP::VEC3 VEC3 ;
 
 	if (m_kind != CONE) {
-		std::cerr << "Warning try to embedCone something that is not a cone"<<std::endl;
+		CGoGNerr << "Warning try to embedCone something that is not a cone"<<CGoGNendl;
 		return;
 	}
 
@@ -787,7 +787,7 @@ void Polyhedron<PFP>::embedSphere( float radius)
 	typedef typename PFP::VEC3 VEC3 ;
 
 	if (!((m_kind==CYLINDER)&&(m_top_closed)&&(m_bottom_closed))) {
-		std::cerr << "Warning try to embedSphere something that is not a sphere (closed cylinder)"<<std::endl;
+		CGoGNerr << "Warning try to embedSphere something that is not a sphere (closed cylinder)"<<CGoGNendl;
 		return;
 	}
 
@@ -830,7 +830,7 @@ void Polyhedron<PFP>::embedTore( float big_radius, float small_radius)
 	typedef typename PFP::VEC3 VEC3 ;
 
 	if (m_kind !=TORE) {
-		std::cerr << "Warning try to embedTore something that is not a tore"<<std::endl;
+		CGoGNerr << "Warning try to embedTore something that is not a tore"<<CGoGNendl;
 		return;
 	}
 
@@ -859,7 +859,7 @@ void Polyhedron<PFP>::embedCube( float sx, float sy, float sz)
 	typedef typename PFP::VEC3 VEC3 ;
 
 	if (m_kind != CUBE) {
-		std::cerr << "Warning try to embedCube something that is not a cube"<<std::endl;
+		CGoGNerr << "Warning try to embedCube something that is not a cube"<<CGoGNendl;
 		return;
 	}
 

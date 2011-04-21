@@ -387,8 +387,8 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal, select
 	) ;
 
-//	std::cout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<std::endl;
-//	std::cout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<std::endl;
+//	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;
+//	CGoGNout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<CGoGNendl;
 }
 
 template <typename PFP>
@@ -546,8 +546,8 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 		map, position, position2, faceArea, faceCentroid, faceNormal, faceNewNormal, select
 	) ;
 
-//	std::cout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<std::endl;
-//	std::cout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<std::endl;
+//	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;
+//	CGoGNout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<CGoGNendl;
 }
 
 } //namespace Filters2D

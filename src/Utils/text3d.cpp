@@ -256,7 +256,7 @@ void Strings3D::drawAll(const Geom::Vec3f& color)
 	predraw(color);
 	if (m_strpos.size() != m_strTranslate.size())
 	{
-		std::cerr << "Strings3D: for drawAll use exclusively addString with position"<< std::endl;
+		CGoGNerr << "Strings3D: for drawAll use exclusively addString with position"<< CGoGNendl;
 		return;
 	}
 

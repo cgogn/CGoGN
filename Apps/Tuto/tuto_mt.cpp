@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include "Utils/glutwin.h"
+#include "tuto_mt.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
@@ -34,16 +34,19 @@
 
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/vbo_MapRender.h"
-
+#include "Algo/Render/GL1/map_glRender.h"
+#include "Utils/GLSLShader.h"
 #include "Algo/Geometry/area.h"
 #include "Algo/Geometry/normal.h"
+#include "Algo/Modelisation/polyhedron.h"
+
 
 #include "Algo/Parallel/parallel_foreach.h"
 
+// for file input
+ #include <QDialog>
 
 using namespace CGoGN ;
-
 
 
 
@@ -58,54 +61,121 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2<Map2> MAP;
 };
 
-/**
- * A class for a little interface and rendering
- */
-class MyGlutWin: public Utils::SimpleGlutWin
+
+// declaration of the map
+PFP::MAP myMap;
+// this selector is going to select all the darts
+SelectorTrue allDarts;
+
+// attribute handlers
+AttributeHandler<PFP::VEC3> position;
+AttributeHandler<PFP::VEC3> normal;
+
+// open file
+void MyQT::cb_Open()
 {
-public:
-     void myRedraw();
+	// set some filters
+	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)");
 
-     PFP::REAL gWidthObj;
-     PFP::VEC3 gPosObj;
+	std::string filename = selectFile("OpenMesh","",filters);
 
-     Algo::Render::GL2::MapRender_VBO* m_render;
+	std::vector<std::string> attrNames ;
+	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+	{
+		CGoGNerr << "could not import " << filename << CGoGNendl ;
+		return;
+	}
 
- 	MyGlutWin(int* argc, char **argv, int winX, int winY) : SimpleGlutWin(argc, argv, winX, winY), m_render(NULL) {}
- 	~MyGlutWin()
- 	{
- 		if (m_render !=NULL)
- 		delete m_render ;
- 	}
-};
+	// recuper l'attribut pour la position des points (créé lors de l'import)
+	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
-// Routine d'affichage
-void MyGlutWin::myRedraw()
+	if (!normal.isValid())
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
+
+	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+
+    //  bounding box
+    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+
+
+    // envoit info BB a l'interface
+	setParamObject(lWidthObj,lPosObj.data());
+	updateGLMatrices();
+}
+
+// new
+void MyQT::cb_New()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushMatrix();
+	if (!position.isValid())
+		position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
 
-	// center the object
-	float sc = 50.0f / gWidthObj;
-	glScalef(sc, sc, sc);
-	glTranslatef(-gPosObj[0], -gPosObj[1], -gPosObj[2]);
+	// create a sphere
+	Algo::Modelisation::Polyhedron<PFP> prim(myMap, position);
+	prim.cylinder_topo(16,16, true, true); // topo of sphere is a closed cylinder
+	prim.embedSphere(10.0f);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDisable(GL_LIGHTING);
+	if (!normal.isValid())
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 
+	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+
+
+   //  bounding box
+	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+
+	setParamObject(lWidthObj,lPosObj.data());
+
+	updateGLMatrices();
+}
+
+void MyQT::cb_initGL()
+{
+// Old school openGL ;)
+	Utils::GLSLShader::setCurrentOGLVersion(1);
+
+	glewInit();
+
+	// init lighting parameters
+	float lightPosition[4]= {0.0f,0.0f,10000.0f,1.0f};
+	float lightColor[4]= {0.9f,0.9f,0.9f,1.0f};
+
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+}
+
+
+
+void MyQT::cb_redraw()
+{
 	// draw the lines
-	glColor3f(1.0f, 1.0f, 0.0f);
-	m_render->draw(Algo::Render::GL2::LINES);
+	glDisable(GL_LIGHTING);
+	glColor3f(0.0f, 0.0f, 0.3f);
+	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_SMOOTH);
+	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::LINE, 1.0f,position, normal);
 
 	// draw the faces
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1.0f, 1.0f);
-	glColor3f(0.0f, 0.5f, 0.0f);
-	m_render->draw(Algo::Render::GL2::TRIANGLES);
+	glColor3f(0.1f, 0.8f, 0.0f);
+	glEnable(GL_LIGHTING);
+	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::SMOOTH, 1.0f,position, normal);
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-	glPopMatrix();
 }
+
+
 
 
 
@@ -169,20 +239,20 @@ public:
 //
 //	void operator()()
 //	{
-//		std::cout << "Begin render init"<<std::endl;
+//		CGoGNout << "Begin render init"<<CGoGNendl;
 //		m_mgw.useContext();
 //
 //		// instanciation of the renderer (here using VBOs)
-//		m_mgw.m_render = new Algo::Render::GL2::MapRender_VBO();
+//		m_mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
 //
 //	    // update the renderer (geometry and primitives)
-//	    m_mgw.m_render->updateData(Algo::Render::GL2::POSITIONS, position);
+//	    m_mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
 //
-//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::GL2::TRIANGLES,m_th);
-//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::GL2::LINES,m_th);
+//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::VBO::TRIANGLES,m_th);
+//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::VBO::LINES,m_th);
 //
 //	    m_mgw.releaseContext();
-//	    std::cout<< "Render OK "<< std::endl;
+//	    CGoGNout<< "Render OK "<< CGoGNendl;
 //
 //	}
 //};
@@ -264,52 +334,15 @@ public:
 
 
 
-
-
-int main(int argc, char **argv)
+void MyQT::menu_slot1()
 {
 
-	if (argc < 2)
-	{
-		std::cerr << argv[0] << "  mesh"<< std::endl;
-		exit(1);
-	}
-
-
-	// declaration of the map
-	PFP::MAP myMap;
-
-	// this selector is going to select all the darts
-	SelectorTrue allDarts;
-
-
-    // instanciation of the interface
-	MyGlutWin mgw(&argc, argv, 800, 800);
-	glewInit();
-
-
-
-	std::vector<std::string> attrNames ;
-	if(!Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames))
-	{
-		std::cerr << "could not import " << argv[1] << std::endl ;
-		return 1 ;
-	}
-
-	AttributeHandler<PFP::VEC3> position;
-	AttributeHandler<PFP::VEC3> facesnormals;
-
-	// cree un handler d'attribut pour la position des points (créé lors de l'import)
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
-
 	// cree un handler pour les normales aux sommets
-	AttributeHandler<PFP::VEC3> normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 	AttributeHandler<PFP::VEC3> normal2 = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal2");
 
 
 	// ajout de 4 threads pour les markers
 	myMap.addThreadMarker(4);
-
 
 
 	//Algorithmes en //
@@ -322,7 +355,7 @@ int main(int argc, char **argv)
 	// parallelisation de boucle sans resultat
 	calculFunctor1<PFP> tf1(myMap,position,normal);
 	Algo::Parallel::foreach_orbit<PFP>(myMap,VERTEX_ORBIT, tf1,4);
-	std::cout << "ok:"<< std::endl;
+	CGoGNout << "ok:"<< CGoGNendl;
 
 
 	// parallelisation de boucle avec resultats stockes
@@ -334,12 +367,36 @@ int main(int argc, char **argv)
 	Algo::Parallel::foreach_orbit_res< PFP,std::pair<double,unsigned int> >(myMap,EDGE_ORBIT, tflef, 4 , 16384,lengthp);
 	// on calcule la somme des resultats
 	std::pair<double,unsigned int> le = Algo::Parallel::sumPairResult<double,unsigned int>(lengthp);
-	std::cout << "length :" <<le.first/le.second<< std::endl;
+	CGoGNout << "length :" <<le.first/le.second<< CGoGNendl;
 
 
 	// on enleve les markers ajoutes
 	myMap.removeThreadMarker(4);
+}
 
 
-    return 0;
+
+
+int main(int argc, char **argv)
+{
+
+	// interface:
+	QApplication app(argc, argv);
+	MyQT sqt;
+
+	// ajout entree dans le menu application
+	sqt.add_menu_entry("test threads", SLOT(menu_slot1()));
+
+	// message d'aide
+	sqt.setHelpMsg("Tuto:\n"
+			"multi-threading \n"
+			"utilisation GL 1.1\n"
+			"file sector");
+
+ 	sqt.show();
+
+ 	sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
+ 	CGoGNStream::allToConsole(&sqt);
+
+	return app.exec();
 }

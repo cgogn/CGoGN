@@ -461,47 +461,47 @@ bool Map2::isTriangular()
 
 bool Map2::check()
 {
-	std::cout << "Check: topology begin" << std::endl;
+	CGoGNout << "Check: topology begin" << CGoGNendl;
 	DartMarker m(*this);
 	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		Dart d2 = phi2(d);
 		if (phi2(d2) != d)	// phi2 involution ?
 		{
-			std::cout << "Check: phi2 is not an involution" << std::endl;
+			CGoGNout << "Check: phi2 is not an involution" << CGoGNendl;
 			return false;
 		}
 
 		Dart d1 = phi1(d);
 		if (phi_1(d1) != d)	// phi1 a une image correcte ?
 		{
-			std::cout << "Check: inconsistent phi_1 link" << std::endl;
+			CGoGNout << "Check: inconsistent phi_1 link" << CGoGNendl;
 			return false;
 		}
 
 		if (m.isMarked(d1))	// phi1 a un seul antécédent ?
 		{
-			std::cout << "Check: dart with two phi1 predecessors" << std::endl;
+			CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
 			return false;
 		}
 		m.mark(d1);
 
 		if (d1 == d)
-			std::cout << "Check: (warning) face loop (one edge)" << std::endl;
+			CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
 		if (phi1(d1) == d)
-			std::cout << "Check: (warning) face with only two edges" << std::endl;
+			CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
 		if (phi2(d1) == d)
-			std::cout << "Check: (warning) dangling edge" << std::endl;
+			CGoGNout << "Check: (warning) dangling edge" << CGoGNendl;
 	}
 	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		if (!m.isMarked(d))	// phi1 a au moins un antécédent ?
 		{
-			std::cout << "Check: dart with no phi1 predecessor" << std::endl;
+			CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
 			return false;
 		}
 	}
-	std::cout << "Check: topology ok" << std::endl;
+	CGoGNout << "Check: topology ok" << CGoGNendl;
 	return true;
 }
 

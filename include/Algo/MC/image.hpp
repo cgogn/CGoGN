@@ -87,7 +87,7 @@ void Image<DataType>::loadRaw(char *filename)
 	std::ifstream fp( filename, std::ios::in|std::ios::binary);
 	if (!fp.good())
 	{
-		std::cerr << "Mesh_Base::loadRaw: Unable to open file " << std::endl;
+		CGoGNerr << "Mesh_Base::loadRaw: Unable to open file " << CGoGNendl;
 		exit(0);
 	}
 
@@ -120,7 +120,7 @@ void Image<DataType>::loadVox(char *filename)
 	std::ifstream in(filename);
 	if (!in)
 	{
-		std::cerr << "Mesh_Base::loadVox: Unable to open file " << std::endl;
+		CGoGNerr << "Mesh_Base::loadVox: Unable to open file " << CGoGNendl;
 		exit(0);
 	}
 
@@ -141,7 +141,7 @@ void Image<DataType>::loadVox(char *filename)
 			std::string encoding_str ;
 			line_input >> encoding_str ;
 			if(encoding_str != "GRAY") {
-				std::cerr << "loadVox : invalid encoding: \'" << encoding_str << "\'" << std::endl ;
+				CGoGNerr << "loadVox : invalid encoding: \'" << encoding_str << "\'" << CGoGNendl ;
 				exit(0) ;
 			}
 		} else if(keyword == "nu") {
@@ -192,7 +192,7 @@ bool Image<DataType>::loadPNG3D(const char* filename)
 
 	if (m_Data==NULL)
 	{
-		std::cerr << " ERROR : try to load an image of type " << typeid(DataType).name() << " although file ";
+		CGoGNerr << " ERROR : try to load an image of type " << typeid(DataType).name() << " although file ";
 		return false;
 	}
 
@@ -223,7 +223,7 @@ bool Image<DataType>::loadInrgz(const char* filename)
 
 		if (m_Data==NULL)
 		{
-			std::cerr << "problem loading image" << std::endl;
+			CGoGNerr << "problem loading image" << CGoGNendl;
 			return false;
 		}
 

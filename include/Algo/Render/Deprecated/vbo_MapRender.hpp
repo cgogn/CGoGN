@@ -57,7 +57,7 @@ inline void MapRender_VBO::enableVertexAttrib(const std::string& name)
 	if (it != m_attributebyName.end())
 		enableVertexAttrib(it->second);
 	else
-		std::cerr <<"enableVertexAttrib: unknown attribute "<< name << std::endl;
+		CGoGNerr <<"enableVertexAttrib: unknown attribute "<< name << CGoGNendl;
 }
 
 inline void MapRender_VBO::disableVertexAttrib(const std::string& name)
@@ -66,7 +66,7 @@ inline void MapRender_VBO::disableVertexAttrib(const std::string& name)
 	if (it != m_attributebyName.end())
 		disableVertexAttrib(it->second);
 	else
-		std::cerr <<"disableVertexAttrib: unknown attribute "<< name << std::endl;
+		CGoGNerr <<"disableVertexAttrib: unknown attribute "<< name << CGoGNendl;
 }
 
 inline unsigned int MapRender_VBO::useVertexAttributeName(const std::string& name, const Utils::GLSLShader& sh)
@@ -118,7 +118,7 @@ void MapRender_VBO::updateVAData(const std::string& name, const ATTR_HANDLER& at
 	{
 		vertex_attrib = m_nbVertexAttrib++;
 		m_attributebyName.insert(std::pair<std::string,unsigned int>(name,vertex_attrib));
-		std::cerr << "warning update data with unknown name, adding vertex attribute"<< std::endl;
+		CGoGNerr << "warning update data with unknown name, adding vertex attribute"<< CGoGNendl;
 	}
 	else
 		vertex_attrib = it->second;
@@ -139,7 +139,7 @@ void MapRender_VBO::updateData(int upType, const ATTR_HANDLER& attrib, ConvertAt
 		indexVBO = COLORS_BUFFER ;
 	else
 	{
-		std::cout << "MapRender_VBO::updateData : should not get here.. Bad type to update.." << std::endl ;
+		CGoGNout << "MapRender_VBO::updateData : should not get here.. Bad type to update.." << CGoGNendl ;
 		return ;
 	}
 
@@ -415,7 +415,7 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 			vbo_ind = m_VBOBuffers[POINT_INDICES];
 			break;
 		default:
-			std::cerr << "problem initializing VBO indices" << std::endl;
+			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
 			break;
 	}
 	int size = tableIndices.size();

@@ -246,7 +246,7 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 			vbo_ind = m_VBOBuffers[POINT_INDICES];
 			break;
 		default:
-			std::cerr << "problem initializing VBO indices" << std::endl;
+			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
 			break;
 	}
 	unsigned int size = tableIndices.size();

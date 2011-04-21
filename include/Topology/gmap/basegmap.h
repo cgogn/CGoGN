@@ -58,7 +58,7 @@ public:
 
 	void deleteDart(Dart d,bool warning=true) {
 		if (warning && !isFree(d)) {
-			std::cout << "Warning: erasing a linked dart" << std::endl;
+			CGoGNout << "Warning: erasing a linked dart" << CGoGNendl;
 		}
 		tGenericMap<DART>::deleteDart(d);
 	}
@@ -95,7 +95,7 @@ private:
 		}
 		else
 		{
-			std::cerr << "Warning: darts already linked with beta" << i << std::endl;
+			CGoGNerr << "Warning: darts already linked with beta" << i << CGoGNendl;
 		}
 	}
 

@@ -46,7 +46,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(eLevel) ;
 
-	std::cout << "eLevel=" << eLevel << std::endl;
+	CGoGNout << "eLevel=" << eLevel << CGoGNendl;
 
 	Dart dd = map.phi2(d) ;
 	typename PFP::VEC3 p1 = position[d] ;
@@ -81,7 +81,7 @@ Dart subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
-	std::cout << "fLevel=" << fLevel << std::endl;
+	CGoGNout << "fLevel=" << fLevel << CGoGNendl;
 
 	unsigned int degree = 0 ;
 	typename PFP::VEC3 p ;
@@ -154,7 +154,7 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	typename PFP::VEC3 volCenter;// = Algo::Geometry::volumeCentroidGen<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, d, position);
 
 
-	std::cout << "vLevel=" << vLevel << std::endl;
+	CGoGNout << "vLevel=" << vLevel << CGoGNendl;
 
 	/*
 	 * ou niveau du volume courant i
@@ -228,12 +228,12 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 
 
 
-		std::cout << "subdiv de toutes les faces" << std::endl;
+		CGoGNout << "subdiv de toutes les faces" << CGoGNendl;
 		if(!map.faceIsSubdivided(d))
 		{
 
 			Dart cf = Algo::IHM3::subdivideFace<PFP>(map, *face, position);
-			std::cout << "face faite" << std::endl;
+			CGoGNout << "face faite" << CGoGNendl;
 
 
 			unsigned int fLevel = map.getDartLevel(cf) ;
@@ -254,7 +254,7 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 
 	map.setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
 
-	std::cout << "vLevel+1=" << vLevel + 1 << std::endl;
+	CGoGNout << "vLevel+1=" << vLevel + 1 << CGoGNendl;
 
 	DartMarker moe(map) ; //mark edge
 
@@ -340,7 +340,7 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 
 	map.setCurrentLevel(cur) ;
 
-	std::cout << std::endl << std::endl;
+	CGoGNout << CGoGNendl << CGoGNendl;
 }
 
 template <typename PFP>

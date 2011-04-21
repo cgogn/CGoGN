@@ -45,7 +45,7 @@ namespace Algo
 namespace Render
 {
 
-namespace Direct
+namespace GL1
 {
 
 enum RenderType { NO_LIGHT=1, LINE, FLAT, SMOOTH };

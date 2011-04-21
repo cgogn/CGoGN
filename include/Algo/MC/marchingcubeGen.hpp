@@ -204,7 +204,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::simpleMeshing()
 		m_Buffer->nextSlice();
 	}
 
-	std::cout << "Taille 2-carte:"<<m_map->size()<<" brins"<<std::endl;
+	CGoGNout << "Taille 2-carte:"<<m_map->size()<<" brins"<<CGoGNendl;
 
 }
 
@@ -1187,24 +1187,24 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createLocalFaces(const uns
 	}
 
 
-// std::cout << "NB TRIS: "<< lNumFaces <<std::endl;
+// CGoGNout << "NB TRIS: "<< lNumFaces <<CGoGNendl;
 // for (int i=0; i< lNumFaces; ++i)
 // {
 // 	L_DART d = lFacesTab[i];
 // 	L_DART dd = L_MAP::phi2(d);
 // 	L_DART ddd = L_MAP::phi2(dd);
-// 	std::cout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< std::endl;
+// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
 //
 //
 // 	d = m_map->phi1(d);
 // 	dd = L_MAP::phi2(d);
 // 	ddd = L_MAP::phi2(dd);
-// 	std::cout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< std::endl;
+// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
 //
 // 	d = m_map->phi1(d);
 // 	dd = L_MAP::phi2(d);
 // 	ddd = L_MAP::phi2(dd);
-// 	std::cout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< std::endl;
+// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
 //
 // }
 

@@ -49,7 +49,7 @@ typename PFP::VEC3 stringToEmb(std::string s)
 
 	typename PFP::VEC3 coord(x,y,z);
 
-	std::cout << coord << std::endl;
+	CGoGNout << coord << CGoGNendl;
 
 	return coord;
 }
@@ -68,7 +68,7 @@ bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vecto
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename << std::endl;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
 

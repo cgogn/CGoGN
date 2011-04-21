@@ -78,7 +78,7 @@ void EdgeSelector_MapOrder<PFP>::updateAfterOperation(Algo::DecimationVolumique:
 
 		while(!op->canPerform(m,cur,this->m_position))
 		{
-			//std::cout << "update " << cur << std::endl;
+			//CGoGNout << "update " << cur << CGoGNendl;
 			m.next(cur) ;
 			if(cur == m.end())
 				break ;
@@ -140,7 +140,7 @@ void EdgeSelector_Random<PFP>::updateAfterOperation(Algo::DecimationVolumique::O
 	if(this->nextOp == Algo::DecimationVolumique::O_CEdge)
 	{
 //		for(typename std::vector<Dart>::iterator it = darts.begin() ; it != darts.end() ; ++it)
-//			std::cout << *it << std::endl;
+//			CGoGNout << *it << CGoGNendl;
 
 		do
 		{

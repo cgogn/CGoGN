@@ -45,66 +45,66 @@ int main(int, char**) {
 	// One first edge
 	d1 = myMap.newEdge();
 	PFP::MAP::OrientedFaceIterator face;
-	std::cout << "First edge : ";
-	for (face.begin(d1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "First edge : ";
+	for (face.begin(d1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
 	// Cut first edge gives two edges
 	f1 = myMap.cutEdge(d1);
-	std::cout << "Second edge : ";
-	for (face.begin(d1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "Second edge : ";
+	for (face.begin(d1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
 	// New face with 10 edges
 	d1 = myMap.newFace(10);
-	std::cout << "First face : ";
-	for (face.begin(d1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "First face : ";
+	for (face.begin(d1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
 	// Delete two edges
 	myMap.deleteEdgeAfter(d1);
 	e1 = myMap.phi1(d1);
 	myMap.deleteEdge(e1);
-	std::cout << "Face with 2 less edges : ";
-	for (face.begin(d1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "Face with 2 less edges : ";
+	for (face.begin(d1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
 	// Delete face
 	myMap.deleteOrientedFace(d1);
 	
 	// New face with 10 edges
 	d1 = myMap.newFace(10);
-	std::cout << "Second face : ";
-	for (face.begin(d1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "Second face : ";
+	for (face.begin(d1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
 	FunctorCount fcount1;
 	myMap.foreach_dart_of_face(d1,fcount1);
-	std::cout << "nbEdges = " << fcount1.getNb() << std::endl;
+	CGoGNout << "nbEdges = " << fcount1.getNb() << CGoGNendl;
 	
 	// Search for the middle of the face and split face
 	e1 = d1;
 	for (unsigned i=0; i<fcount1.getNb()/2; ++i) e1 = myMap.phi1(e1);
 	myMap.splitFace(d1,e1);
 
-	std::cout << "nbEdges d1 = " << myMap.faceDegree(d1) << std::endl;
-	std::cout << "nbEdges e1 = " << myMap.faceDegree(e1) << std::endl;
+	CGoGNout << "nbEdges d1 = " << myMap.faceDegree(d1) << CGoGNendl;
+	CGoGNout << "nbEdges e1 = " << myMap.faceDegree(e1) << CGoGNendl;
 
-	std::cout << "First splitted face : ";
-	for (face.begin(d1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "First splitted face : ";
+	for (face.begin(d1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
-	std::cout << "Second splitted face : ";
-	for (face.begin(e1); !face.end(); ++face) std::cout << **face << " ";
-	std::cout << "(" << face.length() << " traversed darts)" << std::endl;
+	CGoGNout << "Second splitted face : ";
+	for (face.begin(e1); !face.end(); ++face) CGoGNout << **face << " ";
+	CGoGNout << "(" << face.length() << " traversed darts)" << CGoGNendl;
 
 	// Merge splitted faces
 	myMap.mergeFaces(d1,e1);
-	std::cout << "nbEdges d1+e1 = " << myMap.faceDegree(d1) << std::endl;
+	CGoGNout << "nbEdges d1+e1 = " << myMap.faceDegree(d1) << CGoGNendl;
 
 	// Reverse linking in the face
 	myMap.reverseFace(d1);
-	if (myMap.sameFace(d1,e1)) std::cout << "ok" << std::endl;
+	if (myMap.sameFace(d1,e1)) CGoGNout << "ok" << CGoGNendl;
 	
 	// Test of markers
 	Marker m1 = myMap.getNewMarker();
@@ -122,18 +122,18 @@ int main(int, char**) {
 	
 	// Load the saved map
 	myMap.loadMap("test.map",true);
-	std::cout << "MarkerSet = " << myMap.getMarkerVal() << std::endl;
-	std::cout << "Boundary Marker = " << myMap.m_BoundaryMarkerVal.getMarkerVal() << std::endl;
+	CGoGNout << "MarkerSet = " << myMap.getMarkerVal() << CGoGNendl;
+	CGoGNout << "Boundary Marker = " << myMap.m_BoundaryMarkerVal.getMarkerVal() << CGoGNendl;
 	for (Dart d = myMap.begin(); d != myMap.end(); ++d) {
-		std::cout << "[" << d->getLabel() << "] " << *d << " (" << d->getMarkerVal() << ")" << std::endl;
+		CGoGNout << "[" << d->getLabel() << "] " << *d << " (" << d->getMarkerVal() << ")" << CGoGNendl;
 	}
 
 	// Load a second map (append the load darts)
 	myMap.loadMapBin("test.bmap");
-	std::cout << "MarkerSet = " << myMap.getMarkerVal() << std::endl;
-	std::cout << "Boundary Marker = " << myMap.m_BoundaryMarkerVal.getMarkerVal() << std::endl;
+	CGoGNout << "MarkerSet = " << myMap.getMarkerVal() << CGoGNendl;
+	CGoGNout << "Boundary Marker = " << myMap.m_BoundaryMarkerVal.getMarkerVal() << CGoGNendl;
 	for (Dart d = myMap.begin(); d != myMap.end(); ++d) {
-		std::cout << "[" << d->getLabel() << "] " << *d << " (" << d->getMarkerVal() << ")" << std::endl;
+		CGoGNout << "[" << d->getLabel() << "] " << *d << " (" << d->getMarkerVal() << ")" << CGoGNendl;
 	}
 
 	myMap.unmarkAll(m1);

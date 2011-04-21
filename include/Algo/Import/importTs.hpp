@@ -57,7 +57,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename<< std::endl;
+		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
 		return false;
 	}
 
@@ -70,10 +70,10 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	std::stringstream oss(ligne);
 	oss >> nbv;
 
-	//std::cout << "nbV = " << nbv << std::endl;
+	//CGoGNout << "nbV = " << nbv << CGoGNendl;
 	oss >> nbt;
 
-	//std::cout << "nbT = " << nbt << std::endl;
+	//CGoGNout << "nbT = " << nbt << CGoGNendl;
 
 	//lecture sommets
 	std::vector<unsigned int> verticesID;
@@ -95,7 +95,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		// on peut ajouter ici la lecture de couleur si elle existe
 		VEC3 pos(x*scaleFactor,y*scaleFactor,z*scaleFactor);
 
-		//std::cout << "VEC3 = " << pos << std::endl;
+		//CGoGNout << "VEC3 = " << pos << CGoGNendl;
 
 		unsigned int id = container.insertLine();
 		position[id] = pos;
@@ -108,16 +108,16 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	}
 	m_nbVertices = verticesID.size();
 
-	//std::cout << "nbVertices = " << m_nbVertices << std::endl;
+	//CGoGNout << "nbVertices = " << m_nbVertices << CGoGNendl;
 	m_nbVolumes = nbt;
-	//std::cout << "nbVolumes = " << m_nbVolumes << std::endl;
+	//CGoGNout << "nbVolumes = " << m_nbVolumes << CGoGNendl;
 
 	// lecture tetra
 	// normalement m_nbVolumes*12 (car on ne charge que des tetra)
 
 	m_nbFaces = nbt*4;
 
-	std::cout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << std::endl;
+	CGoGNout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << CGoGNendl;
 
 	//Read and embed tetrahedra TODO
 	for(unsigned int i = 0; i < m_nbVolumes ; ++i)
@@ -129,7 +129,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		} while(ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-//		std::cout << "tetra number : " << nbe << std::endl;
+//		CGoGNout << "tetra number : " << nbe << CGoGNendl;
 
 		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(map);
 		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map,4);
@@ -142,12 +142,12 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		//regions ?
 		oss >> nbe;
 
-//		std::cout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << std::endl;
+//		CGoGNout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << CGoGNendl;
 
 		// Embed three vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-//			std::cout << "\t embedding number : " << pt[j];
+//			CGoGNout << "\t embedding number : " << pt[j];
 
 			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[j]]);
 
@@ -162,11 +162,11 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 
 			d = map.phi1(d);
 
-//			std::cout << " done" << std::endl;
+//			CGoGNout << " done" << CGoGNendl;
 		}
 
 		//Embed the last vertex
-//		std::cout << "\t embedding number : " << pt[3] << std::endl;
+//		CGoGNout << "\t embedding number : " << pt[3] << CGoGNendl;
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[3]]);
@@ -174,16 +174,16 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		do
 		{
 			femb(dd);
-//			std::cout << "embed" << std::endl;
+//			CGoGNout << "embed" << CGoGNendl;
 			//vecDartPtrEmb[pt[3]].push_back(dd);
 			vecDartsPerVertex[pt[3]].push_back(dd);
 			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 
-//		std::cout << "end tetra" << std::endl;
+//		CGoGNout << "end tetra" << CGoGNendl;
 	}
 
-//	std::cout << "end 1/2" << std::endl;
+//	CGoGNout << "end 1/2" << CGoGNendl;
 
 	//Association des phi3
 	for (Dart d = map.begin(); d != map.end(); map.next(d))

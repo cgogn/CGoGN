@@ -165,11 +165,11 @@ void Texture<T>::initGL(GLint filter, GLenum format, const char* uniformName, GL
 	{
 	case GL_RGB:
 			if (m_cpp != 3)
-				std::cout << "Warning using GL_RGB with image not in RGB format"<<std::endl;
+				CGoGNout << "Warning using GL_RGB with image not in RGB format"<<CGoGNendl;
 			break;
 	case GL_LUMINANCE:
 			if (m_cpp != 1)
-				std::cout << "Warning using GL_LUMINANCE with image not in grey level format"<<std::endl;
+				CGoGNout << "Warning using GL_LUMINANCE with image not in grey level format"<<CGoGNendl;
 			break;
 
 	}

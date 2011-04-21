@@ -246,7 +246,7 @@ void ColourConverter<REAL>::convertLabToXYZ() {
 template<typename REAL>
 bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncoding to) {
 	if (to == from) {
-		std::cerr << "ColourConverter::convert(from,to) : conversion into same colour space" << std::endl ;
+		CGoGNerr << "ColourConverter::convert(from,to) : conversion into same colour space" << CGoGNendl ;
 		return false ;
 	}
 
@@ -270,7 +270,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertXYZtoLab() ;
 					break ;
 				default :
-					std::cerr << "Colour conversion not supported" << std::endl ;
+					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
 					return false ;
 			}
 			break ;
@@ -298,7 +298,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					}
 					break ;
 				default :
-					std::cerr << "Colour conversion not supported" << std::endl ;
+					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
 					return false ;
 			}
 			break ;
@@ -318,7 +318,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertXYZtoLab() ;
 					break ;
 				default :
-					std::cerr << "Colour conversion not supported" << std::endl ;
+					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
 					return false ;
 			}
 			break ;
@@ -346,13 +346,13 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					}
 					break ;
 				default :
-					std::cerr << "Colour conversion not supported" << std::endl ;
+					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
 					return false ;
 			}
 			break ;
 
 		default :
-			std::cerr << "Colour conversion not supported" << std::endl ;
+			CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
 			return false ;
 	}
 

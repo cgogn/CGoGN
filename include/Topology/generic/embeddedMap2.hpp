@@ -481,14 +481,14 @@ bool EmbeddedMap2<MAP2>::check()
 	if (!topo)
 		return false ;
 
-	std::cout << "Check: embedding begin" << std::endl ;
+	CGoGNout << "Check: embedding begin" << CGoGNendl ;
 	for(Dart d = MAP2::begin(); d != MAP2::end(); MAP2::next(d))
 	{
 		if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 		{
 			if (MAP2::getEmbedding(d, VERTEX_ORBIT) != MAP2::getEmbedding(MAP2::alpha1(d), VERTEX_ORBIT))
 			{
-				std::cout << "Check: different embeddings on vertex" << std::endl ;
+				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl ;
 				return false ;
 			}
 		}
@@ -497,7 +497,7 @@ bool EmbeddedMap2<MAP2>::check()
 		{
 			if (MAP2::getEmbedding(d, EDGE_ORBIT) != MAP2::getEmbedding(MAP2::phi2(d), EDGE_ORBIT))
 			{
-				std::cout << "Check: different embeddings on edge" << std::endl ;
+				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
 				return false ;
 			}
 		}
@@ -506,12 +506,12 @@ bool EmbeddedMap2<MAP2>::check()
 		{
 			if (MAP2::getEmbedding(d, FACE_ORBIT) != MAP2::getEmbedding(MAP2::phi1(d), FACE_ORBIT))
 		{
-				std::cout << "Check: different embeddings on face" << std::endl ;
+				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
 				return false ;
 			}
 		}
 	}
-	std::cout << "Check: embedding ok" << std::endl ;
+	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 	return true ;
 }
 

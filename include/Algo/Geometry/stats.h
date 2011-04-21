@@ -94,11 +94,11 @@ void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
 		}
 	}
 
-	std::cout << "number of faces                : " << nbFaces << std::endl;
-	std::cout << "number of vertices             : " << nbVertex << std::endl;
-	std::cout << "mean ratio min max             : " << (ratioMinMax / (float) nbFaces) << std::endl;
-	std::cout << "mean number of edge per vertex : " << ((float) nbEdgePerVertex / (float) nbVertex) << std::endl;
-	std::cout << "mean edge length               : " << lengthSeg / (float) nbEdge<< std::endl;
+	CGoGNout << "number of faces                : " << nbFaces << CGoGNendl;
+	CGoGNout << "number of vertices             : " << nbVertex << CGoGNendl;
+	CGoGNout << "mean ratio min max             : " << (ratioMinMax / (float) nbFaces) << CGoGNendl;
+	CGoGNout << "mean number of edge per vertex : " << ((float) nbEdgePerVertex / (float) nbVertex) << CGoGNendl;
+	CGoGNout << "mean edge length               : " << lengthSeg / (float) nbEdge<< CGoGNendl;
 }
 
 } // namespace Geometry

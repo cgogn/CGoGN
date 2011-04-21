@@ -212,7 +212,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
         				break;
         		}
                 default : {
-                		std::cout << "not implemented" << std::endl;
+                		CGoGNout << "not implemented" << CGoGNendl;
                 		break;
                 }
 

@@ -230,12 +230,12 @@ void quadranguleVolumes(typename PFP::MAP& map, EMBV& attributs, const FunctorSe
 //			if (vStore.size()==0)
 //			{
 //				if (the_map.phi1(d)==d)
-//					std::cout << "plop" << std::endl;
+//					CGoGNout << "plop" << CGoGNendl;
 //				if (the_map.phi2(d)==d)
-//					std::cout << "plip" << std::endl;
+//					CGoGNout << "plip" << CGoGNendl;
 //
-//				std::cout << the_map.getVertexEmb(d)->getPosition() << std::endl;
-//				std::cout << "tiens tiens, c'est etrange" << std::endl;
+//				CGoGNout << the_map.getVertexEmb(d)->getPosition() << CGoGNendl;
+//				CGoGNout << "tiens tiens, c'est etrange" << CGoGNendl;
 //			}
 //			//prepare the list of embeddings of the current volume
 //			std::vector<EMB *> lstEmb;

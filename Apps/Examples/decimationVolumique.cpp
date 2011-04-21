@@ -237,13 +237,13 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
         		{
         				int nbVertices = myMap.getNbOrbits(VERTEX_ORBIT) ;
 
-        				std::cout << "nb darts = " << myMap.getNbOrbits(DART_ORBIT) << std::endl;
+        				CGoGNout << "nb darts = " << myMap.getNbOrbits(DART_ORBIT) << CGoGNendl;
 
         				GLint t1 = glutGet(GLUT_ELAPSED_TIME);
         			 	Algo::DecimationVolumique::decimate<PFP>(myMap, Algo::DecimationVolumique::S_Random, Algo::DecimationVolumique::A_Centroid, position, nbVertices * 0.75);
         				GLint t2 = glutGet(GLUT_ELAPSED_TIME);
         				GLfloat seconds = (t2 - t1) / 1000.0f;
-        				std::cout << "decimation: "<< seconds << "sec" << std::endl;
+        				CGoGNout << "decimation: "<< seconds << "sec" << CGoGNendl;
         				break;
         		}
         		case 'h':
@@ -253,7 +253,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
         		}
                 default :
                 {
-                		std::cout << "not implemented" << std::endl;
+                		CGoGNout << "not implemented" << CGoGNendl;
                 		break;
                 }
 
@@ -274,21 +274,21 @@ void MyGlutWin::initRender()
     m_render->updateData(Algo::Render::GL2::POSITIONS, position );
 	GLint t2 = glutGet(GLUT_ELAPSED_TIME);
 	GLfloat seconds = (t2 - t1) / 1000.0f;
-	std::cout << "updateData: "<< seconds << "sec" << std::endl;
+	CGoGNout << "updateData: "<< seconds << "sec" << CGoGNendl;
     // creation des primitives de rendu a partir de la carte
 	t1 = glutGet(GLUT_ELAPSED_TIME);
     m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
     m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
     t2 = glutGet(GLUT_ELAPSED_TIME);
     seconds = (t2 - t1) / 1000.0f;
-    std::cout << "initPrimitives: "<< seconds << "sec" << std::endl;
+    CGoGNout << "initPrimitives: "<< seconds << "sec" << CGoGNendl;
 
     // creation des primitives de rendu de la topologie a partir de la carte
     t1 = glutGet(GLUT_ELAPSED_TIME);
 	//m_render_topo->updateData<PFP>(myMap,allDarts,position,coefTopoExplod[0],coefTopoExplod[1],coefTopoExplod[2]);
     t2 = glutGet(GLUT_ELAPSED_TIME);
     seconds = (t2 - t1) / 1000.0f;
-    std::cout << "map update: "<< seconds << "sec" << std::endl;
+    CGoGNout << "map update: "<< seconds << "sec" << CGoGNendl;
 }
 
 void MyGlutWin::initGUI()
@@ -354,18 +354,18 @@ int main(int argc, char **argv)
 	std::vector<std::string> attrNames ;
 	if(argc < 2)
 	{
-			std::cerr << "usage : " << argv[0] << " -off" << std::endl;
-			std::cerr << "or" << std::endl;
-			std::cerr << "usage : " << argv[0] << " -tet" << std::endl;
-			std::cerr << "or" << std::endl;
-			std::cerr << "usage : " << argv[0] << " -ts" << std::endl;
+			CGoGNerr << "usage : " << argv[0] << " -off" << CGoGNendl;
+			CGoGNerr << "or" << CGoGNendl;
+			CGoGNerr << "usage : " << argv[0] << " -tet" << CGoGNendl;
+			CGoGNerr << "or" << CGoGNendl;
+			CGoGNerr << "usage : " << argv[0] << " -ts" << CGoGNendl;
 			return 1;
 	}
 	else if(std::string(argv[1]) == "-off")
 	{
-		std::cout << argv[1] << std::endl;
+		CGoGNout << argv[1] << CGoGNendl;
 		if (argc != 4) {
-			std::cerr << "usage : " << argv[0] << " -off <filename.off> <filename.ele>" << std::endl;
+			CGoGNerr << "usage : " << argv[0] << " -off <filename.off> <filename.ele>" << CGoGNendl;
 			return 1;
 		}
 
@@ -375,7 +375,7 @@ int main(int argc, char **argv)
 	else if(std::string(argv[1]) == "-tet")
 	{
 			if (argc != 3) {
-				std::cerr << "usage : " << argv[0] << " -tet <filename.tet>" << std::endl;
+				CGoGNerr << "usage : " << argv[0] << " -tet <filename.tet>" << CGoGNendl;
 				return 1;
 			}
 
@@ -385,7 +385,7 @@ int main(int argc, char **argv)
 	else if(std::string(argv[1]) == "-ts")
 	{
 			if (argc != 3) {
-				std::cerr << "usage : " << argv[0] << " -ts <filename.ts>" << std::endl;
+				CGoGNerr << "usage : " << argv[0] << " -ts <filename.ts>" << CGoGNendl;
 				return 1;
 			}
 
@@ -399,9 +399,9 @@ int main(int argc, char **argv)
 		maillageTest();
 	}
 
-	//std::cout << "Nb Tetrahedron = " << myMap.getNbOrbits(VOLUME_ORBIT) << std::endl;
+	//CGoGNout << "Nb Tetrahedron = " << myMap.getNbOrbits(VOLUME_ORBIT) << CGoGNendl;
 	//		" / Nb Edges = " << myMap.getNbOrbits(EDGE_ORBIT) <<
-	//		" / Nb Vertices = " << myMap.getNbOrbits(VERTEX_ORBIT) << std::endl;
+	//		" / Nb Vertices = " << myMap.getNbOrbits(VERTEX_ORBIT) << CGoGNendl;
 
     // un peu d'interface
 	MyGlutWin* mgw = new MyGlutWin(&argc,argv,1200,800);

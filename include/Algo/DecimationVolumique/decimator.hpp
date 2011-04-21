@@ -23,7 +23,7 @@ void decimate(
 			break ;
 
 		default :
-			std::cout << "not yet implemented" << std::endl;
+			CGoGNout << "not yet implemented" << CGoGNendl;
 			break;
 	}
 
@@ -38,7 +38,7 @@ void decimate(
 			break ;
 
 		default:
-			std::cout << "not yet implemented" << std::endl;
+			CGoGNout << "not yet implemented" << CGoGNendl;
 			break;
 	}
 
@@ -49,7 +49,7 @@ void decimate(
 	//Init nbCell in the mesh
 	unsigned int nbCell = map.getNbOrbits(VOLUME_ORBIT);
 
-	std::cout << "nbCell = " << nbCell << std::endl;
+	CGoGNout << "nbCell = " << nbCell << CGoGNendl;
 
 	bool finished = false ;
 	while(!finished)

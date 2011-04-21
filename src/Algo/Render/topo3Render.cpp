@@ -315,7 +315,7 @@ void Topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
 	g = float(lab%255) / 255.0f; lab = lab/255;
 	b = float(lab%255) / 255.0f; lab = lab/255;
 	if (lab!=0)
-		std::cerr << "Error picking color, too many darts"<< std::endl;
+		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
 }
 
 

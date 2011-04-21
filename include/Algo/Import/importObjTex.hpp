@@ -41,7 +41,7 @@ bool importObjWithTex(typename PFP::MAP& map, const std::string& filename)
 	std::ifstream fp(filename.c_str(), std::ios::binary);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename<< std::endl;
+		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bool importObjWithTex(typename PFP::MAP& map, const std::string& filename)
 			Emb::TexCoord2* tc = Emb::TexCoord2::create(gmtl::Vec2f(u,v)); 
 			tc->setLabel(j);
 			texcoords.push_back(tc);
-// 			std::cout << "vt :"<<tc->getTexCoord()<<std::endl;
+// 			CGoGNout << "vt :"<<tc->getTexCoord()<<CGoGNendl;
 			j++;
 		}
 
@@ -176,12 +176,12 @@ bool importObjWithTex(typename PFP::MAP& map, const std::string& filename)
 					std::stringstream iss(str.substr(ind2+1,str.length()));
 					iss >> index;
 
-//					std::cout << "Tex: "<< index<<std::endl;
+//					CGoGNout << "Tex: "<< index<<CGoGNendl;
 					tableTex.push_back(index);
 				}
     		}
 
-// 			std::cout << "Face: ";
+// 			CGoGNout << "Face: ";
 			int n = table.size();	
 			Dart d = map.newFace(n);
 			for (int j=0;j<n; ++j)
@@ -192,13 +192,13 @@ bool importObjWithTex(typename PFP::MAP& map, const std::string& filename)
 				if (!tableTex.empty())
 				{
 					map.setFaceVertexEmb(d,texcoords[tableTex[j]]); // pas -1 car on a utilisé
-// 					std::cout <<texcoords[tableTex[j]]->getTexCoord()<< " / ";
+// 					CGoGNout <<texcoords[tableTex[j]]->getTexCoord()<< " / ";
 				}
 				else 
 					map.setFaceVertexEmb(d,texcoords[0]);
 				d = map.phi1(d);
     		}
-// 			std::cout << std::endl;;
+// 			CGoGNout << CGoGNendl;;
     	}
 		fp >> tag;
     	std::getline (fp, ligne);

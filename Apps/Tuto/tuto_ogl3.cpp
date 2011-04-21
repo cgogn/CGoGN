@@ -25,8 +25,14 @@
 #include <iostream>
 
 #include "tuto_ogl3.h"
+#include "Utils/vbo.h"
 
 using namespace CGoGN ;
+
+// declarations globales (plus simple)
+PFP::MAP myMap;
+AttributeHandler<PFP::VEC3> position;
+AttributeHandler<PFP::VEC3> normal;
 
 
 void MyQT::sliderFocale_cb(int x)
@@ -42,20 +48,34 @@ void MyQT::color_cb()
 	QColor color = QColorDialog::getColor ();
 	if (color.isValid())
 	{
-		std::cout <<"Color " << color.red()<<","<< color.green()<<","<<color.blue()<< std::endl;
+		CGoGNout <<"Color " << color.red()<<","<< color.green()<<","<<color.blue()<< CGoGNendl;
 		shader1->setDiffuse(Geom::Vec4f(float(color.red())/255.0f,float(color.green())/255.0f,float(color.blue())/255.0f,0.0f));
 		updateGL();
 	}
 	else
 	{
-		std::cout << "Cancel"<< std::endl;
+		CGoGNout << "Cancel"<< CGoGNendl;
 	}
+}
+
+void MyQT::pervertex_cb(bool val)
+{
+	if (val)
+	{
+		shader1->setAttributeColor(colorVBO);
+		CGoGNout << "color per vertex"<< CGoGNendl;
+	}
+	else
+	{
+		shader1->unsetAttributeColor();
+		CGoGNout << "global color"<< CGoGNendl;
+	}
+	updateGLMatrices();
 }
 
 
 MyQT::MyQT(): m_render(NULL)
 {
-//	currentShader = NULL;
 }
 
 
@@ -73,10 +93,30 @@ void MyQT::cb_initGL()
 	positionVBO = new Utils::VBO();
 	normalVBO = new Utils::VBO();
 
-	shader1 = new Utils::ShaderPhong();
+	positionVBO->updateData(position);
+	normalVBO->updateData(normal);
 
+
+	// create colors from normal (remap [-1,1] to [0,1]
+	colorVBO = new Utils::VBO(*normalVBO);
+	Geom::Vec3f* colors= reinterpret_cast<Geom::Vec3f*>(colorVBO->lockPtr());
+	for (unsigned int i =0 ; i<colorVBO->nbElts();++i)
+	{
+		*colors = (Geom::Vec3f(1.,1.,1.)+ *colors)/2.0f;
+		colors++;
+	}
+	colorVBO->releasePtr();
+
+	// update the renderer (primitives and geometry)
+	SelectorTrue allDarts;
+	m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::POINTS);
+
+	shader1 = new Utils::ShaderPhong();
 	shader1->setAttributePosition(positionVBO);
 	shader1->setAttributeNormal(normalVBO);
+
 	registerRunning(shader1);
 
 	currentShader = shader1;
@@ -97,69 +137,12 @@ void MyQT::cb_redraw()
 }
 
 
-//void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
-//{
-//	switch(keycode)
-//	{
-//	case 'f':
-//		focale-=0.1f;
-//		setFoc(focale);
-//		break;
-//	case 'F':
-//		focale+=0.1f;
-//		setFoc(focale);
-//		break;
-//	}
-////
-////	switch(keycode)
-////	{
-////	case 'c':
-////		rt=0;
-////		current_shader = &shaders[0];
-////		setCurrentShader(current_shader);
-////		std::cout << "Color"<< std::endl;
-////		break;
-////	case 'p':
-////		rt=1;
-////		current_shader = &shaders[1];
-////		setCurrentShader(current_shader);
-////		std::cout << "Phong"<< std::endl;
-////		break;
-////	}
-////	glutPostRedisplay();
-//
-//
-//	switch(keycode)
-//	{
-//	case 'r':
-//		shader1.setDiffuse(Geom::Vec4f(1.,0.,0.,0.));
-//		break;
-//	case 'v':
-//		shader1.setDiffuse(Geom::Vec4f(0.,1.,0.,0.));
-//		break;
-//	case 'j':
-//		shader1.setDiffuse(Geom::Vec4f(1.,1.,0.,0.));
-//		break;
-//
-//	case 'w':
-//		shader1.setAttributeColor(normalVBO);
-//		break;
-//	case 'x':
-//		shader1.unsetAttributeColor();
-//		break;
-//
-//	}
-//	glutPostRedisplay();
-//}
-
-
 int main(int argc, char **argv)
 {
-	// declaration of the map
-	PFP::MAP myMap;
 
-	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-	AttributeHandler<PFP::VEC3> normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
+
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 
 	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
 	prim3.tore_topo(32, 64);
@@ -189,6 +172,9 @@ int main(int argc, char **argv)
 	QPushButton* buttonColor = new QPushButton("Color");
 	layout->addWidget(buttonColor);
 
+	QCheckBox* perVertexColor = new QCheckBox("PerVertex");
+	layout->addWidget(perVertexColor);
+
 	// on tasse  vers le haut
 	layout->addItem(new QSpacerItem(0,0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
@@ -202,6 +188,7 @@ int main(int argc, char **argv)
 	// connection widget callback
 	sqt.setCallBack( slider_foc, SIGNAL(valueChanged(int)), SLOT(sliderFocale_cb(int)) );
 	sqt.setCallBack( buttonColor, SIGNAL(clicked()), SLOT(color_cb()) );
+	sqt.setCallBack( perVertexColor, SIGNAL(toggled(bool)), SLOT(pervertex_cb(bool)) );
 
 	// computation of the bounding box
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
@@ -213,14 +200,9 @@ int main(int argc, char **argv)
 	// first show to init GL Context before initializing VBO
 	sqt.show();
 
-	sqt.positionVBO->updateData(position);
-	sqt.normalVBO->updateData(normal);
+	CGoGNStream::allToConsole(&sqt);
+	CGoGNStream::allToStd(false);
 
-	// update the renderer (primitives and geometry)
-	SelectorTrue allDarts;
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::POINTS);
 
 	// second show to have a good initial redraw
 	sqt.show();

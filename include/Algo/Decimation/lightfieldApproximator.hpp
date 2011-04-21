@@ -63,7 +63,7 @@ bool Approximator_RGBfunctionsHalf<PFP>::init()
 	// Check on embeddings
 	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions.isValid())
 	{
-		std::cerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << std::endl ;
+		CGoGNerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << CGoGNendl ;
 		return false ;
 	}
 
@@ -133,7 +133,7 @@ bool Approximator_Frame<PFP>::init()
 
 	if (!m_position.isValid() || !m_approxPosition.isValid())
 	{
-		std::cerr << "Approximator_Frame::init() --> No approxPosition or no quadricRGBfunctions specified" << std::endl ;
+		CGoGNerr << "Approximator_Frame::init() --> No approxPosition or no quadricRGBfunctions specified" << CGoGNendl ;
 		return false ;
 	}
 	return true ;
@@ -206,7 +206,7 @@ bool Approximator_RGBfunctions<PFP>::init()
 	// Check on embeddings
 	if (!m_frame.isValid() || !m_approxFrame.isValid() || !m_quadricRGBfunctions.isValid())
 	{
-		std::cerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << std::endl ;
+		CGoGNerr << "Approximator_RGBfunctions::init() --> No approxPosition or no quadricRGBfunctions specified" << CGoGNendl ;
 		return false ;
 	}
 	return true ;
@@ -267,17 +267,17 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 		this->m_approx[d] = this->m_attrV[d]; // if fail take first one
 	}
 //	MATRIX36 &newF = this->m_approx[d] ;
-//	std::cout << "Approx of : " <<std::endl ;
-//	std::cout << "Frame1 : " << m_frame[d] << std::endl ;
-//	std::cout << "Function1 : "<< this->m_attrV[d] << std::endl ;
-//	std::cout << "gamma1 : " << gamma1 << std::endl ;
-//	std::cout << "Frame2 : " << m_frame[dd] << std::endl ;
-//	std::cout << "Function2 : "<< this->m_attrV[dd] << std::endl ;
-//	std::cout << "gamma2 : " << gamma2 << std::endl ;
-//	std::cout << "is " << std::endl ;
-//	std::cout << "Frame :" << m_approxFrame[d] << std::endl ;
-//	std::cout << "Function : " << this->m_approx[d] << std::endl ;
-//	std::cout << std::endl ;
+//	CGoGNout << "Approx of : " <<CGoGNendl ;
+//	CGoGNout << "Frame1 : " << m_frame[d] << CGoGNendl ;
+//	CGoGNout << "Function1 : "<< this->m_attrV[d] << CGoGNendl ;
+//	CGoGNout << "gamma1 : " << gamma1 << CGoGNendl ;
+//	CGoGNout << "Frame2 : " << m_frame[dd] << CGoGNendl ;
+//	CGoGNout << "Function2 : "<< this->m_attrV[dd] << CGoGNendl ;
+//	CGoGNout << "gamma2 : " << gamma2 << CGoGNendl ;
+//	CGoGNout << "is " << CGoGNendl ;
+//	CGoGNout << "Frame :" << m_approxFrame[d] << CGoGNendl ;
+//	CGoGNout << "Function : " << this->m_approx[d] << CGoGNendl ;
+//	CGoGNout << CGoGNendl ;
 }
 
 } //namespace Decimation

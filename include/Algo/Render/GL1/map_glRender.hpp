@@ -58,7 +58,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 	// get untreated quads & polygons
 	std::vector<Dart>& polygons = fgl_tri.getPolyDarts();
-	//std::cout<< "Reste a rendre: "<< polygons.size()<<std::endl;
+	//CGoGNout<< "Reste a rendre: "<< polygons.size()<<CGoGNendl;
 
 	if (rt==LINE)
 	{
@@ -124,7 +124,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 	// get untreated quads & polygons
 	std::vector<Dart>& polygons = fgl_tri.getPolyDarts();
-	//std::cout<< "Reste a rendre: "<< polygons.size()<<std::endl;
+	//CGoGNout<< "Reste a rendre: "<< polygons.size()<<CGoGNendl;
 
 	if (rt==LINE)
 	{

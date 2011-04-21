@@ -143,7 +143,7 @@ bool HoleBlockRef::updateHoles(unsigned int nb)
 
 void HoleBlockRef::saveBin(CGoGNostream& fs)
 {
-//	std::cout << "save bf "<< m_nb<< " / "<< m_nbref<< " / "<< m_nbfree << std::endl;
+//	CGoGNout << "save bf "<< m_nb<< " / "<< m_nbref<< " / "<< m_nbfree << CGoGNendl;
 
 	// on sauve les trois nombres;
 	unsigned int numbers[3];

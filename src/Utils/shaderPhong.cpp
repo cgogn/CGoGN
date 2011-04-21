@@ -54,7 +54,7 @@ std::string ShaderPhong::vertexShaderText =
 "	LightDir = lightPosition - Position;\n"
 "	EyeVector = -Position;\n"
 "	#ifdef WITH_COLOR\n"
-"	Color = (VertexColor+vec3(1.0,1.0,1.0))/2.0;\n"
+"	Color = VertexColor;\n"
 "	#endif\n"
 "	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
 "}";

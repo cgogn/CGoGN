@@ -152,7 +152,7 @@ void MyQT::color_slot()
 	}
 	else
 	{
-		std::cout << "Cancel Color"<< std::endl;
+		CGoGNout << "Cancel Color"<< CGoGNendl;
 	}
 }
 
@@ -164,7 +164,7 @@ void TestDeParcoursAFF(typename PFP::MAP& m, MapBrowser& mb, const typename PFP:
 	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
 	{
 		typename PFP::VEC3 P = pos[d];
-		std::cout << "P "<< P << std::endl;
+		CGoGNout << "P "<< P << CGoGNendl;
 	}
 }
 
@@ -194,14 +194,14 @@ int main(int argc, char **argv)
 	d3 = myMap.phi1(d3);
 
 	// MapBrowser: la carte elle meme
-	std::cout << "Parcours avec la carte"<<std::endl;
+	CGoGNout << "Parcours avec la carte"<<CGoGNendl;
 	TestDeParcoursAFF<PFP>(myMap, myMap, position);
 
 
 
 	// MapBrowserLinkedAuto
 	// sous-carte dans une liste avec attribut gere par le browser
-	std::cout << "Parcours avec le browser (les sommets)"<<std::endl;
+	CGoGNout << "Parcours avec le browser (les sommets)"<<CGoGNendl;
 
 	// creation d'un browser avec attribut cree a la volee
 	MapBrowserLinkedAuto<PFP::MAP>mbl(myMap);
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
 
 	// MapBrowserLinkedAttr
 	// sous-carte dans une liste avec attribut gere par l'appelant
-	std::cout << "Parcours avec le browser (le triangle)"<<std::endl;
+	CGoGNout << "Parcours avec le browser (le triangle)"<<CGoGNendl;
 
 	// on cree un attribut Dart pour la liste
 	AutoAttributeHandler<Dart> tableLink(myMap, DART_ORBIT);
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
 
 	// MapBrowserSelector
 	// sous-carte  avec des brins marques (equivalent de l'utilisation de good dans les algos)
-	std::cout << "Parcours avec le browser selector"<<std::endl;
+	CGoGNout << "Parcours avec le browser selector"<<CGoGNendl;
 
 	// on marque 2 brins pour le test
 	DartMarker mk(myMap);

@@ -3,9 +3,9 @@
 template <typename PFP>
 void ParticleCell2D<PFP>::display()
 {
-// 	std::cout << "pos : " << this->m_position << std::endl;
-// 	std::cout << "d : " << this->d << std::endl;
-// 	std::cout << "state : " << this->state << std::endl;
+// 	CGoGNout << "pos : " << this->m_position << CGoGNendl;
+// 	CGoGNout << "d : " << this->d << CGoGNendl;
+// 	CGoGNout << "state : " << this->state << CGoGNendl;
 }
 
 template <typename PFP>
@@ -22,7 +22,7 @@ typename PFP::VEC3 ParticleCell2D<PFP>::pointInFace(Dart d)
 		p3 = m_positions[dd];
 	}
 
-	std::cout << "pointInFace " << (p1+p3)*0.5f << std::endl;
+	CGoGNout << "pointInFace " << (p1+p3)*0.5f << CGoGNendl;
 
 	return (p1+p3)*0.5f;
 }
@@ -46,9 +46,9 @@ typename PFP::VEC3 ParticleCell2D<PFP>::intersectLineEdge(const VEC3& pA, const 
 	Geom::intersection2DSegmentSegment(pA,pB,q1,q2,Inter);
 
 // 	if(VEC3(Inter-pA).norm()>VEC3(pA-pB).norm()) {
-// 		std::cout << "probleme : " << pA << "/" << pB << "/" << q1 << "/" << q2 << "/" << Inter << std::endl;
-// 		std::cout << "isPointOnHalf " << Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,Inter) << std::endl;
-// 		std::cout << "isPointOnHalf " << Algo::Geometry::isPointOnHalfEdge<PFP>(m,m.phi1(d),m_positions,Inter) << std::endl;
+// 		CGoGNout << "probleme : " << pA << "/" << pB << "/" << q1 << "/" << q2 << "/" << Inter << CGoGNendl;
+// 		CGoGNout << "isPointOnHalf " << Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,Inter) << CGoGNendl;
+// 		CGoGNout << "isPointOnHalf " << Algo::Geometry::isPointOnHalfEdge<PFP>(m,m.phi1(d),m_positions,Inter) << CGoGNendl;
 // 	}
 
 	return Inter;
@@ -65,7 +65,7 @@ template <typename PFP>
 void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 {
 	#ifdef DEBUG
-	std::cout << "vertexState" << d << std::endl;
+	CGoGNout << "vertexState" << d << CGoGNendl;
 	#endif
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 
@@ -126,7 +126,7 @@ template <typename PFP>
 void ParticleCell2D<PFP>::edgeState(const VEC3& current, Geom::Orientation2D sideOfEdge)
 {
 	#ifdef DEBUG
-	std::cout << "edgeState" <<  d << std::endl;
+	CGoGNout << "edgeState" <<  d << CGoGNendl;
 	#endif
 
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
@@ -171,7 +171,7 @@ template <typename PFP>
 void ParticleCell2D<PFP>::faceState(const VEC3& current)
 {
 	#ifdef DEBUG
-	std::cout << "faceState" <<  d << std::endl;
+	CGoGNout << "faceState" <<  d << CGoGNendl;
 	#endif
 
  	assert(std::isfinite(m_position[0]) && std::isfinite(m_position[1]) && std::isfinite(m_position[2]));
@@ -200,10 +200,10 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 									edgeState(current);
 									return;
 				case Geom::RIGHT :
-									std::cout << "smthg went bad " << m_position << " " << current << std::endl;
-									std::cout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << std::endl;
+									CGoGNout << "smthg went bad " << m_position << " " << current << CGoGNendl;
+									CGoGNout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << CGoGNendl;
 									m_position = intersectLineEdge(current,m_position,d);
-									std::cout << " " << m_position << std::endl;
+									CGoGNout << " " << m_position << CGoGNendl;
 
 // 									if(!obstacle.isMarked(m.phi2(d)))
 										edgeState(current,Geom::RIGHT);
@@ -243,14 +243,14 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 				case Geom::LEFT : 			d=m.phi1(d);
 									break;
 				case Geom::ALIGNED :			
-// 									std::cout << "pic" << std::endl;
+// 									CGoGNout << "pic" << CGoGNendl;
 									m_position = current;
 									edgeState(current);
 									return;
 				case Geom::RIGHT :
-									std::cout << "smthg went bad(2) " << m_position << std::endl;
+									CGoGNout << "smthg went bad(2) " << m_position << CGoGNendl;
 									m_position = intersectLineEdge(current,m_position,d);
-// 									std::cout << " " << m_position << std::endl;
+// 									CGoGNout << " " << m_position << CGoGNendl;
 // 									if(!obstacle.isMarked(m.phi2(d)))
 										edgeState(current,Geom::RIGHT);
 // 									else 
@@ -277,7 +277,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 // 							vertexState(current);
 // 						}
 // 						else {
-// 							std::cout << "poc" << std::endl;
+// 							CGoGNout << "poc" << CGoGNendl;
 // 							m_position = current;
 // 		 					state = EDGE_ORBIT;
 // 						}
@@ -288,11 +288,11 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 							vertexState(current);
 						}
 						else {
-// 							std::cout << "wsoe : " << wsoe << std::endl;
-// 							std::cout << "current " << current << " " << m_position << std::endl;
-// 							std::cout << "d " << d << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi2(d)] << std::endl;
+// 							CGoGNout << "wsoe : " << wsoe << CGoGNendl;
+// 							CGoGNout << "current " << current << " " << m_position << CGoGNendl;
+// 							CGoGNout << "d " << d << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi2(d)] << CGoGNendl;
 							m_position = intersectLineEdge(current,m_position,d);
-// 							std::cout << " inter : " << m_position << std::endl;
+// 							CGoGNout << " inter : " << m_position << CGoGNendl;
 // 							if(!obstacle.isMarked(m.phi2(d)))
 								edgeState(current,Geom::RIGHT);
 // 							else

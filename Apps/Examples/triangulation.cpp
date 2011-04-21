@@ -106,14 +106,14 @@ void TriangulateFromIndices(const AttributeHandler<typename PFP::VEC3>& position
 	typedef typename PFP::VEC3 VEC3F;
 
 	// combien de sommets ?
-	std::cout << "Nombre de sommets: "<< indices.size()<< std::endl;
+	CGoGNout << "Nombre de sommets: "<< indices.size()<< CGoGNendl;
 
 	//juste une boucle pour les afficher
 	unsigned int num=0;
 	for (std::vector<unsigned int>::const_iterator it = indices.begin(); it != indices.end(); ++it)
 	{
 		VEC3F P = position[*it];
-		std::cout << "Sommet num "<< num++ << " : indice "<< *it << " = "<< P << std::endl;
+		CGoGNout << "Sommet num "<< num++ << " : indice "<< *it << " = "<< P << CGoGNendl;
 	}
 
 }

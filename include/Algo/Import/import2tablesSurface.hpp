@@ -78,35 +78,35 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 	switch (kind)
 	{
 	case ImportSurfacique::TRIAN:
-		std::cout << "TYPE: TRIAN" << std::endl;
+		CGoGNout << "TYPE: TRIAN" << CGoGNendl;
 		return importTrian(filename, attrNames);
 		break;
 	case ImportSurfacique::TRIANBGZ:
-		std::cout << "TYPE: TRIANBGZ" << std::endl;
+		CGoGNout << "TYPE: TRIANBGZ" << CGoGNendl;
 		return importTrianBinGz(filename, attrNames);
 		break;
 	case ImportSurfacique::CTM:
-		std::cout << "TYPE: CTM" << std::endl;
+		CGoGNout << "TYPE: CTM" << CGoGNendl;
 		return importCTM(filename, attrNames);
 		break;
 	case ImportSurfacique::OFF:
-		std::cout << "TYPE: OFF" << std::endl;
+		CGoGNout << "TYPE: OFF" << CGoGNendl;
 		return importOff(filename, attrNames);
 		break;
 	case ImportSurfacique::PLY:
-		std::cout << "TYPE: PLY" << std::endl;
+		CGoGNout << "TYPE: PLY" << CGoGNendl;
 		return importPly(filename, attrNames);
 		break;
 	case ImportSurfacique::PLYPTM:
-		std::cout << "TYPE: PLYPTM" << std::endl;
+		CGoGNout << "TYPE: PLYPTM" << CGoGNendl;
 		return importPlyPTM(filename, attrNames);
 		break;
 	case ImportSurfacique::OBJ:
-		std::cout << "TYPE: OBJ" << std::endl;
+		CGoGNout << "TYPE: OBJ" << CGoGNendl;
 		return importObj(filename, attrNames);
 		break;
 	default:
-		std::cout << "TYPE: ASSIMP" << std::endl;
+		CGoGNout << "TYPE: ASSIMP" << CGoGNendl;
 		return importASSIMP(filename, attrNames);
 		break;
 	}
@@ -116,7 +116,11 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importTrian(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
@@ -125,7 +129,7 @@ bool MeshTablesSurface<PFP>::importTrian(const std::string& filename, std::vecto
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename << std::endl;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
 
@@ -179,7 +183,11 @@ bool MeshTablesSurface<PFP>::importTrian(const std::string& filename, std::vecto
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
@@ -189,7 +197,7 @@ bool MeshTablesSurface<PFP>::importTrianBinGz(const std::string& filename, std::
 
 	if (!fs.good())
 	{
-		std::cerr << "Unable to open file " << filename << std::endl;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
 
@@ -245,7 +253,11 @@ bool MeshTablesSurface<PFP>::importTrianBinGz(const std::string& filename, std::
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
@@ -254,7 +266,7 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename << std::endl;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
 
@@ -264,8 +276,8 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
     std::getline (fp, ligne);
     if (ligne.rfind("OFF") == std::string::npos)
     {
-		std::cerr << "Problem reading off file: not an off file" << std::endl;
-		std::cerr << ligne << std::endl;
+		CGoGNerr << "Problem reading off file: not an off file" << CGoGNendl;
+		CGoGNerr << ligne << CGoGNendl;
 		return false;
     }
 
@@ -340,7 +352,11 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
@@ -349,7 +365,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
 	std::ifstream fp(filename.c_str(), std::ios::binary);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename << std::endl;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
 
@@ -459,7 +475,11 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
@@ -468,7 +488,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 
 	if (! pid.read_file(filename) )
 	{
-		std::cerr << "Unable to open file " << filename << std::endl;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
 	
@@ -510,7 +530,11 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeHandler<typename PFP::VEC3> frame[3] ;
@@ -536,7 +560,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 	std::ifstream fp(filename.c_str(), std::ios::binary);
 	if (!fp.good())
 	{
-		std::cerr << "Unable to open file " << filename<< std::endl;
+		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
 		return false;
 	}
 
@@ -546,7 +570,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 	fp >> tag;
 	if (tag != std::string("ply"))
 	{
-		std::cerr <<filename<< " is not a ply file !" <<  std::endl;
+		CGoGNerr <<filename<< " is not a ply file !" <<  CGoGNendl;
 		return false;
 	}
 
@@ -632,7 +656,11 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importCTM(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+
 	attrNames.push_back(positions.name()) ;
 
 	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
@@ -725,7 +753,7 @@ void MeshTablesSurface<PFP>::extractMeshRec(AttributeContainer& container, Attri
 	// recurse on all children of node
 	for (unsigned int n = 0; n < nd->mNumChildren; ++n)
 	{
-//		std::cout << "Children "<<n<< std::endl;
+//		CGoGNout << "Children "<<n<< CGoGNendl;
 		extractMeshRec(container, positions, scene, nd->mChildren[n], trafo);
 	}
 	*trafo = prev;

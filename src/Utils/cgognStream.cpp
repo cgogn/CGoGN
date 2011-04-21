@@ -40,145 +40,57 @@ CGoGNStream::Dbg<2> CGoGNdbg2;
 CGoGNStream::Dbg<3> CGoGNdbg3;
 CGoGNStream::Special CGoGNendl;
 
-//namespace CGoGNStream
-//{
-//
-//
-//
-//
-//Out::Out():
-//	m_out_mode(STDOUT),
-//	m_sqt(NULL),
-//	m_qte(NULL),
-//	m_ofs(NULL),
-//	m_oss(NULL)
-//{}
-//
-//Out::~Out()
-//{
-//	if (m_ofs!=NULL)
-//	{
-//		m_ofs->close();
-//		delete m_ofs;
-//	}
-//
-//}
-//
-//void Out::out2std(bool yes)
-//{
-//	if (yes)
-//		m_out_mode |= STDOUT;
-//	else
-//		m_out_mode &= ~STDOUT;
-//}
-//
-//void Err::out2std(bool yes)
-//{
-//	if (yes)
-//		m_out_mode |= STDERR;
-//	else
-//		m_out_mode &= ~STDERR;
-//}
-//
-//void Out::out2File(const std::string& filename )
-//{
-//	if (!filename.empty())
-//		m_out_mode |= FILEOUT;
-//	else
-//		m_out_mode &= ~FILEOUT;
-//
-//	if (m_ofs!=NULL)
-//	{
-//		m_ofs->close();
-//		delete m_ofs;
-//	}
-//	m_ofs = new std::ofstream(filename.c_str());
-//}
-//
-//void Out::out2StatuBar(Utils::QT::SimpleQT* sqt)
-//{
-//	if (sqt != NULL)
-//		m_out_mode |= QTSTATUSBAR;
-//	else
-//		m_out_mode &= ~QTSTATUSBAR;
-//	m_sqt = sqt;
-//}
-//
-//void Out::out2TextEdit(QTextEdit* qte)
-//{
-//	if (qte)
-//		m_out_mode |= QTTEXTEDIT;
-//	else
-//		m_out_mode &= ~QTTEXTEDIT;
-//	m_qte=qte;
-//}
-//
-//void Out::out2Buffer(std::stringstream* ss)
-//{
-//	if (ss != NULL)
-//		m_out_mode |= SSBUFFER;
-//	else
-//		m_out_mode &= ~SSBUFFER;
-//
-//	m_oss = ss;
-//}
-//
-//Out&  Out::operator<< (Out& os)
-//{
-//	return *this;
-//}
-//
-//void Out::close()
-//{
-//	if (m_ofs!=NULL)
-//	{
-//		m_ofs->close();
-//	}
-//
-//}
-//
-//
-//Out&  Out::operator<< (Special& os  )
-//{
-//	if (&os == &CGoGNendl)
-//	{
-//		m_buffer << std::endl;
-//		char bufc[512];
-//		m_buffer.getline(bufc,512);
-//
-//		if (m_out_mode & STDOUT)
-//			std::cout << std::endl;
-//
-//		if (m_out_mode & STDERR)
-//			std::cerr << std::endl;
-//
-////		if (m_out_mode & STDOUT)
-////			std::cout << bufc << std::endl;
-////
-////		if (m_out_mode & STDERR)
-////			std::cerr << bufc << std::endl;
-//
-//		if (m_out_mode & FILEOUT)
-//			*m_ofs << bufc << std::endl;
-//
-//		if (m_out_mode & QTSTATUSBAR)
-//			m_sqt->statusMsg(bufc);
-//
-//		if (m_out_mode & QTTEXTEDIT)
-//		{
-//			m_qte->insertPlainText(QString(bufc));
-//			m_qte->insertPlainText(QString("\n"));
-//		}
-//
-//		if (m_out_mode & SSBUFFER)
-//			*m_oss  << bufc << std::endl;
-//	}
-//
-//	return *this;
-//}
-//
-//}
+namespace CGoGNStream
+{
 
+void allToStd(bool yes)
+{
+	CGoGNout.toStd(yes);
+	CGoGNerr.toStd(yes);
+	CGoGNdbg.toStd(yes);
+	CGoGNdbg2.toStd(yes);
+	CGoGNdbg3.toStd(yes);
+}
+
+void allToFile(const std::string& filename )
+{
+	CGoGNout.toFile(filename);
+	CGoGNerr.toFile(filename);
+	CGoGNdbg.toFile(filename);
+	CGoGNdbg2.toFile(filename);
+	CGoGNdbg3.toFile(filename);
+}
+
+
+void allToStatusBar(Utils::QT::SimpleQT* sqt)
+{
+	CGoGNout.toStatusBar(sqt);
+	CGoGNerr.toStatusBar(sqt);
+	CGoGNdbg.toStatusBar(sqt);
+	CGoGNdbg2.toStatusBar(sqt);
+	CGoGNdbg3.toStatusBar(sqt);
+}
+
+
+void allToConsole(Utils::QT::SimpleQT* sqt)
+{
+	CGoGNout.toConsole(sqt);
+	CGoGNerr.toConsole(sqt);
+	CGoGNdbg.toConsole(sqt);
+	CGoGNdbg2.toConsole(sqt);
+	CGoGNdbg3.toConsole(sqt);
+}
+
+void allToBuffer(std::stringstream* ss)
+{
+	CGoGNout.toBuffer(ss);
+	CGoGNerr.toBuffer(ss);
+	CGoGNdbg.toBuffer(ss);
+	CGoGNdbg2.toBuffer(ss);
+	CGoGNdbg3.toBuffer(ss);
+}
+
+}
 }
 
 

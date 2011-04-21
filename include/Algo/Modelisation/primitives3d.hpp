@@ -188,7 +188,7 @@ void Primitive3D<PFP>::embedHexaGrid( float x, float y, float z)
 {
 	if (m_kind != HEXAGRID)
 	{
-		std::cerr << "Warning try to embedHexaGrid something that is not a grid of hexahedron"<<std::endl;
+		CGoGNerr << "Warning try to embedHexaGrid something that is not a grid of hexahedron"<<CGoGNendl;
 		return;
 	}
 

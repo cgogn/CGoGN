@@ -162,11 +162,11 @@ int main(int argc, char **argv)
 	for (Dart d = myMap.begin(); d!= myMap.end(); myMap.next(d))
 	{
 		if (me.isMarked(d))
-			std::cout << "Dart "<< d.label() << " marque par me"<< std::endl;
+			CGoGNout << "Dart "<< d.label() << " marque par me"<< CGoGNendl;
 		if (mf.isMarked(d))
-			std::cout << "Dart "<< d.label() << " marque par mf"<< std::endl;
+			CGoGNout << "Dart "<< d.label() << " marque par mf"<< CGoGNendl;
 		if (cm.isMarked(d))
-			std::cout << "Sommet de dart "<< d.label() << " marque par mcv"<< std::endl;
+			CGoGNout << "Sommet de dart "<< d.label() << " marque par mcv"<< CGoGNendl;
 	}
 
 

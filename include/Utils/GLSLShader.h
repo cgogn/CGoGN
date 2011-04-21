@@ -305,7 +305,7 @@ public:
 	/**
 	 * restore all uniforms and vertex attributes after recompiling
 	 */
-	virtual void restoreUniformsAttribs() {std::cerr << "Warning restoreUniformsAttribs not implemented"<< std::endl;}
+	virtual void restoreUniformsAttribs() {CGoGNerr << "Warning restoreUniformsAttribs not implemented"<< CGoGNendl;}
 
 
 	/**

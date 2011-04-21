@@ -188,12 +188,12 @@ bool AttributeMultiVector<T>::copy(const AttributeMultiVectorGen* atmvg)
 
 	if (atmv == NULL)
 	{
-		std::cerr << "trying to copy attributes of different type" << std::endl;
+		CGoGNerr << "trying to copy attributes of different type" << CGoGNendl;
 		return false;
 	}
 	if (atmv->m_typeName != m_typeName)
 	{
-		std::cerr << "trying to swap attributes with different type names" << std::endl;
+		CGoGNerr << "trying to swap attributes with different type names" << CGoGNendl;
 		return false;
 	}
 
@@ -210,12 +210,12 @@ bool AttributeMultiVector<T>::swap(AttributeMultiVectorGen* atmvg)
 
 	if (atmv == NULL)
 	{
-		std::cerr << "trying to swap attributes of different type" << std::endl;
+		CGoGNerr << "trying to swap attributes of different type" << CGoGNendl;
 		return false;
 	}
 	if (atmv->m_typeName != m_typeName)
 	{
-		std::cerr << "trying to swap attributes with different type names" << std::endl;
+		CGoGNerr << "trying to swap attributes with different type names" << CGoGNendl;
 		return false;
 	}
 
@@ -229,13 +229,13 @@ bool AttributeMultiVector<T>::merge(const AttributeMultiVectorGen& att)
 	const AttributeMultiVector<T>* attrib = dynamic_cast< const AttributeMultiVector<T>* >(&att);
 	if (attrib==NULL)
 	{
-		std::cerr << "trying to merge attributes of different type" << std::endl;
+		CGoGNerr << "trying to merge attributes of different type" << CGoGNendl;
 		return false;
 	}
 
 	if (attrib->m_typeName != m_typeName)
 	{
-		std::cerr << "trying to merge attributes with different type names" << std::endl;
+		CGoGNerr << "trying to merge attributes with different type names" << CGoGNendl;
 		return false;
 	}
 
@@ -357,8 +357,8 @@ void AttributeMultiVector<T>::lerp(unsigned res, unsigned int i, unsigned int j,
 		v1 += v2;
 		m_tableData[res/_BLOCKSIZE_][res%_BLOCKSIZE_] = v1;
 
-		std::cout << "LERP " << m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] << " & " << m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
-		std::cout << " = " << m_tableData[res/_BLOCKSIZE_][res%_BLOCKSIZE_] << std::endl;
+		CGoGNout << "LERP " << m_tableData[i/_BLOCKSIZE_][i%_BLOCKSIZE_] << " & " << m_tableData[j/_BLOCKSIZE_][j%_BLOCKSIZE_];
+		CGoGNout << " = " << m_tableData[res/_BLOCKSIZE_][res%_BLOCKSIZE_] << CGoGNendl;
 	}
 }
 
@@ -460,7 +460,7 @@ inline bool AttributeMultiVectorGen::skipLoadBin(CGoGNistream& fs)
 	// check if nbb ok
 	if (nbb % _BLOCKSIZE_ != 0)
 	{
-		std::cerr << "Error skipping wrong number of byte in attributes reading"<< std::endl;
+		CGoGNerr << "Error skipping wrong number of byte in attributes reading"<< CGoGNendl;
 		return false;
 	}
 

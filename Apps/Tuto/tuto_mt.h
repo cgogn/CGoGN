@@ -21,81 +21,49 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef ATTRIBOPS_H_
-#define ATTRIBOPS_H_
+#ifndef TUTO_MT_H
+#define TUTO_MT_T
 
+
+#include <iostream>
+
+
+#include "Utils/qtSimple.h"
 #include "Utils/cgognStream.h"
 
-namespace CGoGN
-{
+// forward definitions (minimize includes)
+namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; }}}}
+namespace CGoGN { namespace Utils { class VBO; } }
+namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 
-namespace AttribOps
+using namespace CGoGN ;
+
+/**
+ * A class for a little interface and rendering
+ */
+
+class MyQT: public Utils::QT::SimpleQT
 {
+	Q_OBJECT
+public:
+
+	MyQT() {}
+
+	// callbacks of simpleQT to overdefine:
+	void cb_redraw();
+
+	void cb_initGL();
+
+	void cb_Open();
+
+	void cb_New();
+
+	// callbacks (slots) locally defined
+public slots:
+	void menu_slot1();
 
 
-template <typename X, typename PFP>
-struct lerpStruct
-{
-	static X apply( X u, X v, double a)
-	{
-		return u*a + v*(1.0-a);
-	}
 };
 
-template <typename PFP>
-struct lerpStruct<typename PFP::EVERTEX ,PFP>
-{
-	static typename PFP::EVERTEX apply(typename PFP::EVERTEX u, typename PFP::EVERTEX v, double a)
-	{
-		CGoGNout << "Static Lerp"<< CGoGNendl;
-		typename PFP::EVERTEX ec;
-		ec.lerp(u,v,a);
-		return ec;
-	}
-};
+#endif
 
-
-template < typename X, typename PFP>
-X  lerp( X u, X v, double a )
-{
-	CGoGNout << "function Lerp"<< CGoGNendl;
-	return lerpStruct< X, PFP >::apply( u,v,a );
-}
-
-
-
-template <typename X, typename PFP>
-struct zeroStruct
-{
-	static X  apply()
-	{
-		return X(0);
-	}
-};
-
-template <typename PFP>
-struct zeroStruct<typename PFP::EVERTEX ,PFP>
-{
-	static typename PFP::EVERTEX apply()
-	{
-		typename PFP::EVERTEX ev;
-		ev.zero();
-		return ev;
-	}
-};
-
-
-template < typename X, typename PFP>
-X zero()
-{
-	return zeroStruct< X, PFP >::apply();
-}
-
-
-} // end namespace
-}
-
-
-
-
-#endif /* ATTRIBOPS_H_ */

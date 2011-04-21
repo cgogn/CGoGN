@@ -47,6 +47,31 @@ namespace CGoGN
 {
 namespace  CGoGNStream
 {
+/**
+ * set all outputs to std
+ */
+void allToStd(bool yes = true);
+
+/**
+ * set all outputs to file
+ */
+void allToFile(const std::string& filename );
+
+/**
+ * set all outputs to status bar of Qt interface
+ */
+void allToStatusBar(Utils::QT::SimpleQT* sqt);
+
+/**
+ * set all outputs to console of Qt interface
+ */
+void allToConsole(Utils::QT::SimpleQT* sqt);
+
+/**
+ * set all outputs to string stream buffer
+ */
+void allToBuffer(std::stringstream* ss);
+
 
 enum drawingType {	STDOUT = 1,
 					STDERR = 2,
@@ -92,27 +117,27 @@ public:
 	/**
 	 * set output to standard
 	 */
-	void out2std(bool yes = true);
+	void toStd(bool yes = true);
 
 	/**
 	 * set output to file
 	 */
-	void out2File(const std::string& filename );
+	void toFile(const std::string& filename );
 
 	/**
 	 * set output to status bar of Qt interface
 	 */
-	void out2StatuBar(Utils::QT::SimpleQT* sqt);
+	void toStatusBar(Utils::QT::SimpleQT* sqt);
 
 	/**
 	 * set output to console of Qt interface
 	 */
-	void out2Console(Utils::QT::SimpleQT* sqt);
+	void toConsole(Utils::QT::SimpleQT* sqt);
 
 	/**
 	 * set output to string stream buffer
 	 */
-	void out2Buffer(std::stringstream* ss);
+	void toBuffer(std::stringstream* ss);
 
 	/**
 	 * recursive stream operator

@@ -52,14 +52,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 	std::ifstream foff(filenameOFF.c_str(), std::ios::in);
 	if (!foff.good())
 	{
-		std::cerr << "Unable to open OFF file " << std::endl;
+		CGoGNerr << "Unable to open OFF file " << CGoGNendl;
 		return false;
 	}
 
 	std::ifstream fele(filenameELE.c_str(), std::ios::in);
 	if (!fele.good())
 	{
-		std::cerr << "Unable to open ELE file " << std::endl;
+		CGoGNerr << "Unable to open ELE file " << CGoGNendl;
 		return false;
 	}
 
@@ -69,8 +69,8 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 	std::getline(foff, line);
 	if(line.rfind("OFF") == std::string::npos)
 	{
-		std::cerr << "Problem reading off file: not an off file"<<std::endl;
-		std::cerr << line << std::endl;
+		CGoGNerr << "Problem reading off file: not an off file"<<CGoGNendl;
+		CGoGNerr << line << CGoGNendl;
 		return false;
 	}
 
@@ -102,7 +102,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		oss >> nbv ; oss >> nbv;
 	}
 
-	std::cout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << std::endl;
+	CGoGNout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << CGoGNendl;
 
 	//Reading vertices
 	std::vector<unsigned int> verticesID;
@@ -127,7 +127,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		unsigned int id = container.insertLine();
 		position[id] = pos;
 
-//		std::cout << "emb : " << pos << " / id = " << id << std::endl;
+//		CGoGNout << "emb : " << pos << " / id = " << id << CGoGNendl;
 		verticesID.push_back(id);
 	}
 
@@ -144,7 +144,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 
 		std::stringstream oss(line);
 		oss >> nbe;
-//		std::cout << "tetra number : " << nbe << std::endl;
+//		CGoGNout << "tetra number : " << nbe << CGoGNendl;
 
 		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(map);
 		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map, 4);
@@ -157,12 +157,12 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		//regions ?
 		oss >> nbe;
 
-//		std::cout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << std::endl;
+//		CGoGNout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << CGoGNendl;
 
 		// Embed three vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-//			std::cout << "\t embedding number : " << pt[j];
+//			CGoGNout << "\t embedding number : " << pt[j];
 
 			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[j]]);
 
@@ -176,27 +176,27 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 
 			d = map.phi1(d);
 
-//			std::cout << " done" << std::endl;
+//			CGoGNout << " done" << CGoGNendl;
 		}
 
 		//Embed the last vertex
-//		std::cout << "\t embedding number : " << pt[3] << std::endl;
+//		CGoGNout << "\t embedding number : " << pt[3] << CGoGNendl;
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[3]]);
 		Dart dd = d;
 		do {
 			femb(dd);
-//			std::cout << "embed" << std::endl;
+//			CGoGNout << "embed" << CGoGNendl;
 			//vecDartPtrEmb[pt[3]].push_back(dd);
 			vecDartsPerVertex[pt[3]].push_back(dd);
 			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 
-//		std::cout << "end tetra" << std::endl;
+//		CGoGNout << "end tetra" << CGoGNendl;
 	}
 
-//	std::cout << "end 1/2" << std::endl;
+//	CGoGNout << "end 1/2" << CGoGNendl;
 
 	foff.close();
 	fele.close();
@@ -224,7 +224,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		}
 	}
 
-//	std::cout << "end 2/2" << std::endl;
+//	CGoGNout << "end 2/2" << CGoGNendl;
 
 	return true;
 }

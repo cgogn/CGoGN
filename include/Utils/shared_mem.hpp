@@ -51,14 +51,14 @@ bool SharedMemSeg<DATA>::initMaster(int key)
 	m_mem_id = shmget(key, 2*sizeof(DATA)+2*sizeof(int), IPC_CREAT|0666);
 	if (m_mem_id < 0)
 	{
-		std::cerr << "Error shmget"<<std::endl;
+		CGoGNerr << "Error shmget"<<CGoGNendl;
 		return false;
 	}
 
 	m_ptr = reinterpret_cast<int*>(shmat(m_mem_id, NULL, 0));
 	if (m_ptr ==  (int*)-1)
 	{
-		std::cerr << "Error shmat"<<std::endl;
+		CGoGNerr << "Error shmat"<<CGoGNendl;
 		return false;
 	}
 
@@ -75,14 +75,14 @@ bool SharedMemSeg<DATA>::initSlave(int key)
 	m_mem_id = shmget(key, 2*sizeof(DATA)+2*sizeof(int), 0444);
 	if (m_mem_id < 0)
 	{
-		std::cerr <<"Shared Memory "<< key << " does not exist can not read"<< std::endl;
+		CGoGNerr <<"Shared Memory "<< key << " does not exist can not read"<< CGoGNendl;
 		return false;
 	}
 
 	m_ptr = reinterpret_cast<int*>(shmat(m_mem_id, NULL, 0));
 	if (m_ptr ==  (int*)-1)
 	{
-		std::cerr <<"Problem getting shared memory ptr for "<< key << std::endl;
+		CGoGNerr <<"Problem getting shared memory ptr for "<< key << CGoGNendl;
 		return false;
 	}
 		

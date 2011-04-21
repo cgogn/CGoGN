@@ -148,7 +148,7 @@ void Quantization<VEC>::algoLloydMax()
 	while(!finished) ;
 
 	// sort the codeVectors by ascending distortion
-	std::cout << "nbLloydIt -> " << nbLloydIt << std::endl ;
+	CGoGNout << "nbLloydIt -> " << nbLloydIt << CGoGNendl ;
 	codeVectors.sort() ;
 }
 

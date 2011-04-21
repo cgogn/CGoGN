@@ -351,12 +351,12 @@ DART Buffer<DART>::getExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY) const
 			break;
 	
 		default:
-			std::cerr << "ERROR"<<std::endl;
+			CGoGNerr << "ERROR"<<CGoGNendl;
 			return m_hcSlice0[0].m_lNX; // pipo value
 	}
 
 	// just for removing the warning never reached because of the default of switch
-std::cerr << "ERROR"<<std::endl;
+CGoGNerr << "ERROR"<<CGoGNendl;
 	return m_hcSlice0[0].m_lNX;
 }
 
@@ -415,7 +415,7 @@ void Buffer<DART>::setExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY, DART 
 			break;
 	
 		default:
-			std::cerr << "ERROR"<<std::endl;
+			CGoGNerr << "ERROR"<<CGoGNendl;
 	}
 }
 
