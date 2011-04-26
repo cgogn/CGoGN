@@ -405,7 +405,8 @@ int main(int argc, char **argv)
  	int cc=2;
 
 
- 	{using namespace CGoGN::Utils::QT;
+ 	{
+ 	using namespace CGoGN::Utils::QT;
 
  	inputValues(	VarInt(0,20,xx, "Entier",
  					VarBool(zz, "Bool",
