@@ -62,9 +62,9 @@ add_executable( tuto5 tuto5.cpp ${tuto5_ui} ${tuto5_moc})
 target_link_libraries( tuto5
 	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
 
-add_executable( tuto_subdivision tuto_subdivision.cpp)
-target_link_libraries( tuto_subdivision
-	${CGoGN_LIBS_D}  ${COMMON_LIBS} )
+#add_executable( tuto_subdivision tuto_subdivision.cpp)
+#target_link_libraries( tuto_subdivision
+#	${CGoGN_LIBS_D}  ${COMMON_LIBS} )
 
 QT4_WRAP_CPP(tp_master_moc tp_master.h)
 add_executable( tp_master tp_master.cpp ${tp_master_moc})
@@ -81,6 +81,6 @@ add_executable( tuto_ogl3 tuto_ogl3.cpp ${tuto_ogl3_moc})
 target_link_libraries( tuto_ogl3
 	${CGoGN_LIBS_D}  ${COMMON_LIBS} ${QT_LIBRARIES} )
 
-add_executable( tuto_ogl2 tuto_ogl2.cpp)
-target_link_libraries( tuto_ogl2
-	${CGoGN_LIBS_D}  ${COMMON_LIBS} )
+#add_executable( tuto_ogl2 tuto_ogl2.cpp)
+#target_link_libraries( tuto_ogl2
+#	${CGoGN_LIBS_D}  ${COMMON_LIBS} )

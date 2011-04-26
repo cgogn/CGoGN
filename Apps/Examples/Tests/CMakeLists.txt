@@ -6,6 +6,13 @@ SET(CMAKE_BUILD_TYPE Debug)
 
 #SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} gzstream AntTweakBar openctm)
 
+# FOR Qt4
+FIND_PACKAGE(Qt4 REQUIRED)
+SET(QT_USE_QTOPENGL TRUE)
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
 # define includes path
 include_directories(
 	${CGoGN_ROOT_DIR}/include
@@ -30,11 +37,11 @@ link_directories(
 
 add_executable( Geom_orientationD ./Geom_orientation.cpp)
 target_link_libraries( Geom_orientationD
-	${COMMON_LIBS} )
+	${CGoGN_LIBS_D} ${COMMON_LIBS} )
 
 add_executable( Geom_inclusionD ./Geom_inclusion.cpp)
 target_link_libraries( Geom_inclusionD
-	${COMMON_LIBS} )
+	${CGoGN_LIBS_D} ${COMMON_LIBS} )
 
 
 #add_executable( Algo_Geom_inclusionD ./Algo_Geom_inclusion.cpp)

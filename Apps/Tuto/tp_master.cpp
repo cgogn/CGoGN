@@ -505,7 +505,7 @@ void MyQT::cb_keyPress(int keycode)
 			Dart dd = myMap.phi2(d_edges[0]);
 			ss << "Arete:  dart: " << d_edges[0].index<<" phi1: "<< myMap.phi1(d_edges[0]).index;
 			if (dd != d_edges[0])
-				ss << CGoGNendl<< " phi2: " << dd.index<<" phi1: "<< myMap.phi1(dd).index;
+				ss << " phi2: " << dd.index<<" phi1: "<< myMap.phi1(dd).index;
 			statusMsg(ss.str().c_str());
 			updateGL();
 		}

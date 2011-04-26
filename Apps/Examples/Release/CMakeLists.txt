@@ -34,37 +34,37 @@ link_directories(
 
 #define exec to compile
 
-add_executable( miniTest ../miniTest.cpp)
-target_link_libraries( miniTest
-	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
+#add_executable( miniTest ../miniTest.cpp)
+#target_link_libraries( miniTest
+#	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
 
-add_executable( Viewer ../Viewer.cpp)
-target_link_libraries( Viewer
-	container topology utils algo  ${COMMON_LIBS} )
+#add_executable( Viewer ../Viewer.cpp)
+#target_link_libraries( Viewer
+#	container topology utils algo  ${COMMON_LIBS} )
 
-add_executable( simpleGMap2 ../simpleGMap2.cpp)
-target_link_libraries( simpleGMap2
-	container topology utils algo ${COMMON_LIBS} Zinri)
+#add_executable( simpleGMap2 ../simpleGMap2.cpp)
+#target_link_libraries( simpleGMap2
+#	container topology utils algo ${COMMON_LIBS} Zinri)
 
 # add_executable( hm_convexhull ../hm_convexhull.cpp)
 # target_link_libraries( hm_convexhull
 # 	topology utils algo ${COMMON_LIBS})
 
-add_executable( squelette3carte ../squelette3carte.cpp)
-target_link_libraries( squelette3carte
-	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
+#add_executable( squelette3carte ../squelette3carte.cpp)
+#target_link_libraries( squelette3carte
+#	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
 	
-add_executable( decimationVolumique ../decimationVolumique.cpp)
-target_link_libraries( decimationVolumique
-	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
+#add_executable( decimationVolumique ../decimationVolumique.cpp)
+#target_link_libraries( decimationVolumique
+#	container topology utils algo  numerical lapack blas f2c ${COMMON_LIBS} )
 	
-add_executable( triangulation ../triangulation.cpp)
-target_link_libraries( triangulation
-	container topology utils algo ${COMMON_LIBS} )
+#add_executable( triangulation ../triangulation.cpp)
+#target_link_libraries( triangulation
+#	container topology utils algo ${COMMON_LIBS} )
 
-add_executable( ter_meshes ../ter_meshes.cpp)
-target_link_libraries( ter_meshes
-	container topology utils algo ${COMMON_LIBS} )
+#add_executable( ter_meshes ../ter_meshes.cpp)
+#target_link_libraries( ter_meshes
+#	container topology utils algo ${COMMON_LIBS} )
 
 QT4_WRAP_CPP(polyhedronsView_moc ../polyhedronsView.h)	
 add_executable( polyhedronsView ../polyhedronsView.cpp ${polyhedronsView_moc})
@@ -76,6 +76,6 @@ add_executable( extrusionView ../extrusionView.cpp ${extrusionView_moc})
 target_link_libraries( extrusionView
 		${CGoGN_LIBS_R} ${COMMON_LIBS}  ${QT_LIBRARIES} )
         
-add_executable( scene ../scene.cpp)
-target_link_libraries( scene
-        container topology utils algo ${COMMON_LIBS} )
+#add_executable( scene ../scene.cpp)
+#target_link_libraries( scene
+#        container topology utils algo ${COMMON_LIBS} )
