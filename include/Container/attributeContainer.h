@@ -159,6 +159,7 @@ public:
 	* @param attribName name of the attribute to remove
 	* @return removed or not
 	*/
+	template <typename T>
 	bool removeAttribute(const std::string& attribName);
 
 	/**
@@ -166,6 +167,7 @@ public:
 	* @param index index of the attribute to remove
 	* @return removed or not
 	*/
+	template <typename T>
 	bool removeAttribute(unsigned int index);
 
 	/**************************************
@@ -191,6 +193,11 @@ public:
 	* Total memory cost of container
 	*/
 	unsigned int memoryTotalSize() const;
+
+	/**
+	* Memory cost of every used line
+	*/
+	unsigned int memorySize() const;
 
 	/**
 	* is the line used in the container
