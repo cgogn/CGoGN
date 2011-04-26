@@ -73,6 +73,16 @@ public: // methods
 
 	/**
 	 * getR
+	 * @return original value (in its original space)
+	 */
+	VEC3 getOriginal() ;
+	/**
+	 * getR
+	 * @return enc value of provided colour
+	 */
+	VEC3 getColour(enum ColourEncoding enc) ;
+	/**
+	 * getR
 	 * @return RGB value of provided colour
 	 */
 	VEC3 getRGB() ;

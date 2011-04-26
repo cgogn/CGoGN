@@ -66,6 +66,36 @@ ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 }
 
 template<typename REAL>
+Geom::Vector<3,REAL> ColourConverter<REAL>::getColour(enum ColourEncoding enc) {
+	switch (enc) {
+	case (C_RGB) :
+		return getRGB() ;
+		break ;
+
+	case (C_XYZ) :
+		return getXYZ() ;
+		break ;
+
+	case (C_Luv) :
+		return getLuv() ;
+		break ;
+
+	case (C_Lab) :
+		return getLab() ;
+		break ;
+
+	default :
+		assert(!"Should never arrive here : ColourConverter::getColour default case") ;
+		return getOriginal() ;
+	}
+}
+
+template<typename REAL>
+Geom::Vector<3,REAL> ColourConverter<REAL>::getOriginal() {
+	return getColour(this->originalEnc) ;
+}
+
+template<typename REAL>
 Geom::Vector<3,REAL> ColourConverter<REAL>::getRGB() {
 	if (RGB == NULL)
 		convert(originalEnc,C_RGB) ;
@@ -150,7 +180,7 @@ void ColourConverter<REAL>::convertXYZtoLuv() {
 
 	REAL Ydiv = Y/Yn ;
 	if (Ydiv > 0.008856)
-		L = 116.0 * pow(Ydiv,1.0f/3.0) - 16.0 ;
+		L = 116.0 * pow(Ydiv,1.0/3.0) - 16.0 ;
 	else // near black
 		L = 903.3 * Ydiv ;
 

@@ -405,9 +405,11 @@ bool Matrix<M,N,T>::operator==(const Matrix<M,N,T>& m) const {
 template <unsigned int M, unsigned int N, typename T>
 std::ostream& operator<<(std::ostream& out, const Matrix<M,N,T>& m)
 {
-	for(unsigned int i = 0; i < M; ++i)
+	for(unsigned int i = 0; i < M; ++i) {
 		for(unsigned int j = 0; j < N; ++j)
 			out << m(i,j) << " " ;
+		std::cout << std::endl ;
+	}
 	return out ;
 }
 
@@ -443,6 +445,15 @@ Matrix<M,N,T> operator*(T s, const Matrix<M,N,T>& m)
 	for(unsigned int i = 0; i < M; ++i)
 		for(unsigned int j = 0; j < N; ++j)
 			res(i,j) = m(i,j) * s ;
+	return res ;
+}
+
+template <unsigned int M, unsigned int N, typename T>
+Matrix<M,N,T> transposed_vectors_mult(const Vector<M,T>& v1, const Vector<N,T>& v2) {
+	Matrix<M,N,T> res ;
+	for(unsigned int i = 0; i < M; ++i)
+		for(unsigned int j = 0; j < N; ++j)
+			res(i,j) = v1[i] * v2[j] ;
 	return res ;
 }
 
