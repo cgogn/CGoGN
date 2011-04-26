@@ -205,6 +205,8 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
+//std::cout << "volumeLevel" << std::endl;
+
 	if(m_curLevel == 0)
 		return 0 ;
 
@@ -228,6 +230,8 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 	for(face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
 		Dart e = *face ;
+
+//std::cout << "dart from face = " << e << std::endl;
 
 		// in a first time, the level of a face
 		//the level of the volume is the minimum of the
@@ -294,6 +298,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 		do
 		{
 			Dart ee = phi2(e) ;
+//std::cout << "\t face a cote =" << ee << std::endl;
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
@@ -302,6 +307,8 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 			e = phi1(e) ;
 		} while(e != *face) ;
 	}
+
+//std::cout << "fin" << std::endl << std::endl;
 
 	//Second : the case of all faces regularly subdivided but not the volume itself
 	unsigned int cur = m_curLevel ;

@@ -437,6 +437,23 @@ int main(int argc, char **argv)
 //	Algo::Import::importInESS<PFP>(myMap, argv[1], attrNames);
 //	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
 
+	if(argc == 3)
+	{
+			std::cout << argv[2] << std::endl;
+			std::vector<std::string> attrNames ;
+				if(!Algo::Import::importMesh<PFP>(myMap, argv[2], attrNames))
+				{
+					std::cerr << "could not import "  << std::endl ;
+					return 1 ;
+				}
+
+				position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+//				std::cout << argv[2] << std::endl;
+//				myMap.loadMapXml(argv[2]);
+				dglobal = myMap.begin();
+	}
+	else
+	{
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT,"position");
 
 
@@ -446,7 +463,7 @@ int main(int argc, char **argv)
 		nb = atoi(argv[1]);
 	dglobal = prim.hexaGrid_topo(nb,nb,nb);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
-
+	}
 
 //	Geom::Matrix44f mat;
 //	mat.identity();

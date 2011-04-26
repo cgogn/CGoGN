@@ -101,6 +101,7 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 			dd = MAP3::phi1(dd) ;
 		} while(dd != d) ;
 	}
+
 }
 
 template <typename MAP3>

@@ -639,6 +639,11 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			Algo::Export::exportOFF<PFP>(myMap, position, "export.off") ;
 			break ;
 		}
+
+		case 'n':
+		{
+			myMap.saveMapBin("plop");
+		}
 	}
 }
 

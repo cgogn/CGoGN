@@ -146,8 +146,8 @@ bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const
 	out << "object {myMesh" << std::endl;
  	out << "translate <" << translate[0] << "," << translate[1] << "," << translate[2] << ">" << std::endl;
  	out << "rotate <" << angleX << "," << angleY << "," << angleZ << "> " << std::endl;
- 	out << "texture{ pigment{ color rgb<1.0,1.0,1>} finish { ambient rgb 0.05 brilliance 0.5 } } }" << std::endl;
-
+ 	out << "texture{ pigment{ color rgb<1.0,1.0,1,0.7>} finish { ambient rgb 0.05 brilliance 0.5 } } }" << std::endl;
+ 	//rajouter f avec coeff
 	out.close();
 	return true;
 }

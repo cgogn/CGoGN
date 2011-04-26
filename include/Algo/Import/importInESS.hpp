@@ -73,7 +73,7 @@ unsigned int gcd(unsigned int a, unsigned int b)
 }
 
 template <typename PFP>
-bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
+bool importInESSSurfacique(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -451,6 +451,101 @@ bool importInESS(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	//IDEE : marquage des brins lors du plongement en fonction
 
+
+	return true;
+}
+
+template <typename PFP>
+bool importInESSVolumique(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
+{
+	typedef typename PFP::VEC3 VEC3;
+
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	attrNames.push_back(position.name()) ;
+
+	AttributeHandler<int> objects = map.template addAttribute<int>(FACE_ORBIT, "objects") ;
+	attrNames.push_back(objects.name()) ;
+
+
+	//stocker les boundingbox contenu dans le fichier
+	std::vector<std::pair<VEC3,VEC3> > coordonnees; //tableau de paires (x,y)
+	coordonnees.reserve(50);
+
+	//classer les coordonnees en x
+	std::multimap<int, unsigned int>  coordonneesX;
+	//classer les coordonnees en y
+	std::multimap<int, unsigned int>  coordonneesY;
+
+	std::set<int> sx;
+	std::set<int> sy;
+
+	// open file
+	std::ifstream fp(filename.c_str(), std::ios::in);
+	if (!fp.good())
+	{
+		std::cerr << "Unable to open file " << filename << std::endl;
+		return false;
+	}
+
+	//
+	// Lecture du fichier
+	//
+
+	std::string line;
+	size_t posData, posCoord;
+	std::string bg;
+
+	unsigned int size = 0;
+
+	//two columns cutted
+	std::getline(fp, line);
+	posData = line.find("\t");
+
+	// First column
+	//Bounding box : first coord & second coord
+	bg = line.substr(0, posData);
+	posCoord = bg.find(") (");
+	VEC3 c1 = stringToEmb<PFP>(bg.substr(0, posCoord));
+	VEC3 c2 = stringToEmb<PFP>(bg.substr(posCoord+3));
+	std::cout << std::endl;
+
+	//coordonnees.push_back(std::pair<VEC3,VEC3>(c1,c2));
+//	coordonneesX.insert(std::pair<int, unsigned int >(c1[0],size));
+//	coordonneesY.insert(std::pair<int, unsigned int >(c1[1],size));
+	sx.insert(c1[0]);
+	sx.insert(c2[0]);
+
+	sy.insert(c1[1]);
+	sy.insert(c2[1]);
+	size++;
+
+	while ( std::getline( fp, line ) )
+	{
+		posData = line.find("\t");
+
+		// First column
+		//Bounding box : first coord & second coord
+		bg = line.substr(0, posData);
+		posCoord = bg.find(") (");
+
+		VEC3 c1 = stringToEmb<PFP>(bg.substr(0, posCoord));
+		VEC3 c2 = stringToEmb<PFP>(bg.substr(posCoord+3));
+		std::cout << std::endl;
+
+		coordonnees.push_back(std::pair<VEC3,VEC3>(c1,c2));
+//		coordonneesX.insert(std::pair<int, unsigned int >(c1[0],size));
+//		coordonneesY.insert(std::pair<int, unsigned int >(c1[1],size));
+
+		sx.insert(c1[0]);
+		sx.insert(c2[0]);
+
+		sy.insert(c1[1]);
+		sy.insert(c2[1]);
+
+		size++;
+	}
+
+	fp.close();
 
 	return true;
 }

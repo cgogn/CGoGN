@@ -385,6 +385,9 @@ void MapRender_VBO::initPrimitives(typename PFP::MAP& map, const FunctorSelect& 
 {
 	std::vector<GLuint> tableIndices;
 
+	if (map.dimension()>2)
+			optimized=false;
+
 	// indice du VBO a utiliser
 	int vbo_ind = 0;
 	switch(prim)
