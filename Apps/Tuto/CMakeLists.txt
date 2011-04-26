@@ -37,7 +37,7 @@ link_directories(${CGoGN_ROOT_DIR}/lib/Release ${CGoGN_ROOT_DIR}/lib/Debug)
 QT4_WRAP_CPP(tuto1_moc tuto1.h)
 add_executable( tuto1 tuto1.cpp ${tuto1_moc})
 target_link_libraries( tuto1
-	${CGoGN_LIBS_D}  ${COMMON_LIBS} ${QT_LIBRARIES} gl2ps)
+	${CGoGN_LIBS_D}  ${COMMON_LIBS} ${QT_LIBRARIES} )
 
 QT4_WRAP_UI( tuto2_ui tuto2.ui )
 QT4_WRAP_CPP(tuto2_moc tuto2.h)
