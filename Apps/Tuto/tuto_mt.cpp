@@ -40,11 +40,11 @@
 #include "Algo/Geometry/normal.h"
 #include "Algo/Modelisation/polyhedron.h"
 
-
 #include "Algo/Parallel/parallel_foreach.h"
 
+
 // for file input
- #include <QDialog>
+ #include "Utils/qtInputs.h"
 
 using namespace CGoGN ;
 
@@ -397,6 +397,26 @@ int main(int argc, char **argv)
 
  	sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
  	CGoGNStream::allToConsole(&sqt);
+
+ 	int xx = 3;
+ 	double yy = 2.5;
+ 	bool zz=true;
+ 	int kk=32;
+ 	int cc=2;
+
+
+ 	{using namespace CGoGN::Utils::QT;
+
+ 	inputValues(	VarInt(0,20,xx, "Entier",
+ 					VarBool(zz, "Bool",
+ 					VarDbl(0.314,3.14,yy,"Double",
+ 					VarSlider(10,100,kk,"Slider",
+ 					VarCombo("Riri;Fifi;Loulou;Donald",cc,"Combo") )))));
+ 	}
+
+ 	std::cout << "Int:" << xx << "  Bool:"<<zz<< std::endl;
+ 	std::cout << "Dbl:" << yy << "  Slider:"<<kk<< std::endl;
+ 	std::cout << "Combo:" << cc << std::endl;
 
 	return app.exec();
 }
