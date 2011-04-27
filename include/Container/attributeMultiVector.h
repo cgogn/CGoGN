@@ -153,6 +153,8 @@ public:
 
 	virtual void copyElt(unsigned int dst, unsigned int src) = 0;
 
+	virtual void swapElt(unsigned int id1, unsigned int id2) = 0;
+
 	virtual void overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id) = 0;
 
 	/**************************************
@@ -280,6 +282,8 @@ public:
 	void initElt(unsigned int id);
 
 	void copyElt(unsigned int dst, unsigned int src);
+
+	void swapElt(unsigned int id1, unsigned int id2);
 
 	/**
 	* swap two elements in container (useful for compact function)

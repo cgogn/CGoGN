@@ -22,58 +22,55 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __POINT_LINE_3D__
-#define __POINT_LINE_3D__
+#ifndef __CGOGN_SHADER_VPV__
+#define __CGOGN_SHADER_VPV__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-class PointLine : public GLSLShader
+class ShaderVectorPerVertex : public GLSLShader
 {
 protected:
+	// shader sources
     static std::string vertexShaderText;
-
     static std::string geometryShaderText;
-
     static std::string fragmentShaderText;
 
     GLuint m_uniform_scale;
-
     GLuint m_uniform_color;
 
-public:
-    /**
-     * init shaders and variables
-     */
-    PointLine(float scale=1.0f, const Geom::Vec3f& color = Geom::Vec3f(1.0f,1.0f,1.0f));
+	float m_scale;
+	Geom::Vec4f m_color;
 
-    /**
-	 * set the radius of sphere
-	 * @param radius
-	 */
+    VBO* m_vboPos;
+    VBO* m_vboVec;
+
+	void getLocations();
+
+	void sendParams();
+
+	void restoreUniformsAttribs();
+
+public:
+    ShaderVectorPerVertex();
+
 	void setScale(float scale);
 
-	/**
-	 * set the color
-	 */
-	void setColor(const Geom::Vec3f& color);
+	void setColor(const Geom::Vec4f& color);
 
-	/**
-	 * set attribute for position
-	 */
 	unsigned int setAttributePosition(VBO* vbo);
 
-	/**
-	 * set attribute for data (drawn vector)
-	 */
-	unsigned int setAttributeData(VBO* vbo);
-
+	unsigned int setAttributeVector(VBO* vbo);
 };
-}
-}
+
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

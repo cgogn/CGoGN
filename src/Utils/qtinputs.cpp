@@ -47,7 +47,6 @@ public:
 	void getResults(std::vector<const Var*>& params);
 };
 
-
 CGoGNDialog::CGoGNDialog(std::vector<const Var*>& params, const std::string& title)
 {
 	int nbr=0;
@@ -82,9 +81,10 @@ CGoGNDialog::CGoGNDialog(std::vector<const Var*>& params, const std::string& tit
 void CGoGNDialog::getResults(std::vector<const Var*>& params)
 {
 	unsigned int nb = params.size();
-	for (unsigned int i=0; i<nb; ++i)
+	for (unsigned int i = 0; i < nb; ++i)
 		params[i]->updateFrom(m_wid[i]);
 }
+
 
 // class Var
 
@@ -105,23 +105,19 @@ QLabel* Var::label() const
 }
 
 
-
-
 // class VarBool
 
-
-VarBool::VarBool(bool& val, const std::string& label):
-		m_val(val)
+VarBool::VarBool(bool& val, const std::string& label) :
+	m_val(val)
 {
-	m_label= label;
+	m_label = label;
 }
 
-VarBool::VarBool(bool& val, const std::string& label, const Var& var):
-		Var(var), m_val(val)
+VarBool::VarBool(bool& val, const std::string& label, const Var& var) :
+	Var(var), m_val(val)
 {
-	m_label= label;
+	m_label = label;
 }
-
 
 QWidget* VarBool::createInput() const
 {
@@ -130,7 +126,6 @@ QWidget* VarBool::createInput() const
 	return check;
 }
 
-
 void VarBool::updateFrom( QWidget* widg) const
 {
 	QCheckBox* check = dynamic_cast<QCheckBox*>(widg);
@@ -138,24 +133,19 @@ void VarBool::updateFrom( QWidget* widg) const
 }
 
 
-
-
-
 //class VarInt
 
-
-VarInt::VarInt(int min, int max, int& val, const std::string& label):
+VarInt::VarInt(int min, int max, int& val, const std::string& label) :
 		m_min(min),m_max(max), m_val(val)
 {
-	m_label= label;
+	m_label = label;
 }
 
-VarInt::VarInt(int min, int max, int& val, const std::string& label, const Var& var):
-		Var(var), m_min(min),m_max(max), m_val(val)
+VarInt::VarInt(int min, int max, int& val, const std::string& label, const Var& var) :
+		Var(var), m_min(min), m_max(max), m_val(val)
 {
-	m_label= label;
+	m_label = label;
 }
-
 
 QWidget* VarInt::createInput() const
 {
@@ -174,21 +164,17 @@ void VarInt::updateFrom( QWidget* widg) const
 
 // class VarDbl
 
-VarDbl::VarDbl(double min, double max, double& val, const std::string& label):
-		m_min(min),m_max(max), m_val(val)
+VarDbl::VarDbl(double min, double max, double& val, const std::string& label) :
+	m_min(min), m_max(max), m_val(val)
 {
-	m_label= label;
+	m_label = label;
 }
 
-
-VarDbl::VarDbl(double min, double max, double& val, const std::string& label, const Var& var):
-		Var(var), m_min(min),m_max(max), m_val(val)
+VarDbl::VarDbl(double min, double max, double& val, const std::string& label, const Var& var) :
+	Var(var), m_min(min), m_max(max), m_val(val)
 {
-	m_label= label;
+	m_label = label;
 }
-
-
-
 
 QWidget* VarDbl::createInput() const
 {
@@ -205,7 +191,6 @@ void VarDbl::updateFrom( QWidget* widg) const
 }
 
 
-
 // class VarSlider
 
 VarSlider::VarSlider(int min, int max, int& val, const std::string& label):
@@ -214,15 +199,11 @@ VarSlider::VarSlider(int min, int max, int& val, const std::string& label):
 	m_label= label;
 }
 
-
 VarSlider::VarSlider(int min, int max, int& val, const std::string& label, const Var& var):
 		Var(var),m_min(min),m_max(max), m_val(val)
 {
 	m_label= label;
 }
-
-
-
 
 QWidget* VarSlider::createInput() const
 {
@@ -232,17 +213,14 @@ QWidget* VarSlider::createInput() const
 	return slider;
 }
 
-void VarSlider::updateFrom( QWidget* widg) const
+void VarSlider::updateFrom(QWidget* widg) const
 {
 	QSlider* slider = dynamic_cast<QSlider*>(widg);
 	m_val = slider->value();
 }
 
 
-
-
 // class VarCombo
-
 
 VarCombo::VarCombo(const std::string& choices, int& v, const std::string& label):
 		m_choices(choices),m_val(v)
@@ -256,9 +234,6 @@ VarCombo::VarCombo(const std::string& choices, int& v, const std::string& label,
 	m_label= label;
 }
 
-
-
-
 QWidget* VarCombo::createInput() const
 {
 	QComboBox *combo = new QComboBox();
@@ -266,16 +241,16 @@ QWidget* VarCombo::createInput() const
 	size_t pos = 0;
 	while (pos != std::string::npos)
 	{
-		size_t pos2 = m_choices.find(';',pos);
+		size_t pos2 = m_choices.find(';', pos);
 		if (pos2!= std::string::npos)
 		{
-			std::string choice = m_choices.substr(pos,pos2-pos);
+			std::string choice = m_choices.substr(pos, pos2 - pos);
 			combo->addItem(QString(choice.c_str()));
-			pos = pos2+1;
+			pos = pos2 + 1;
 		}
 		else
 		{
-			std::string choice = m_choices.substr(pos,pos2);
+			std::string choice = m_choices.substr(pos, pos2);
 			combo->addItem(QString(choice.c_str()));
 			pos = pos2;
 		}
@@ -293,27 +268,25 @@ void VarCombo::updateFrom( QWidget* widg) const
 	m_val = combo->currentIndex();
 }
 
-
-
 bool inputValues(const Var& v1, const std::string& title)
 {
 	std::vector<const Var*> params;
 	const Var* ptr = &v1;
-	while (ptr !=NULL)
+	while (ptr != NULL)
 	{
 		params.push_back(ptr);
 		ptr = ptr->next();
 	}
 
-	CGoGNDialog dialog(params,title);
+	CGoGNDialog dialog(params, title);
 	int ret = dialog.exec();
-	if ( ret != 0)
+	if (ret != 0)
 		dialog.getResults(params);
 	return true;
 }
 
+} // namespace QT
 
-}
-} // end namespaces
-}
+} // namespace Utils
 
+} // namespace CGoGN

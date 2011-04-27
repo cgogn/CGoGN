@@ -22,14 +22,12 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #include <GL/glew.h>
 #include "Utils/shaderPhong.h"
 
-
-
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -94,14 +92,13 @@ std::string ShaderPhong::fragmentShaderText =
 "}";
 
 
-
 ShaderPhong::ShaderPhong():
-		m_with_color(false),
-		m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
-		m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
-		m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
-		m_shininess(100.0f),
-		m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f))
+	m_with_color(false),
+	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
+	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
+	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
+	m_shininess(100.0f),
+	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f))
 {
 	// get choose GL defines (2 or 3)
 	// ans compile shaders
@@ -120,11 +117,11 @@ ShaderPhong::ShaderPhong():
 
 void ShaderPhong::getLocations()
 {
-	m_unif_ambiant   = glGetUniformLocation(this->program_handler(),"materialAmbient");
-	m_unif_diffuse   = glGetUniformLocation(this->program_handler(),"materialDiffuse");
-	m_unif_specular  = glGetUniformLocation(this->program_handler(),"materialSpecular");
-	m_unif_shininess = glGetUniformLocation(this->program_handler(),"shininess");
-	m_unif_lightPos =  glGetUniformLocation(this->program_handler(),"lightPosition");
+	m_unif_ambiant   = glGetUniformLocation(this->program_handler(), "materialAmbient");
+	m_unif_diffuse   = glGetUniformLocation(this->program_handler(), "materialDiffuse");
+	m_unif_specular  = glGetUniformLocation(this->program_handler(), "materialSpecular");
+	m_unif_shininess = glGetUniformLocation(this->program_handler(), "shininess");
+	m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
 }
 
 void ShaderPhong::sendParams()
@@ -135,8 +132,6 @@ void ShaderPhong::sendParams()
 	glUniform1f(m_unif_shininess,    m_shininess);
 	glUniform3fv(m_unif_lightPos, 1, m_lightPos.data());
 }
-
-
 
 void ShaderPhong::setAmbiant(const Geom::Vec4f& ambiant)
 {
@@ -173,7 +168,6 @@ void ShaderPhong::setLightPosition( Geom::Vec3f lightPos)
 	m_lightPos = lightPos;
 }
 
-
 void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos)
 {
 	m_ambiant = ambiant;
@@ -183,9 +177,7 @@ void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffu
 	m_lightPos = lightPos;
 	bind();
 	sendParams();
-
 }
-
 
 unsigned int ShaderPhong::setAttributeColor(VBO* vbo)
 {
@@ -211,7 +203,6 @@ unsigned int ShaderPhong::setAttributeColor(VBO* vbo)
 	return bindVA_VBO("VertexColor", vbo);
 }
 
-
 void ShaderPhong::unsetAttributeColor()
 {
 	m_vboColor = NULL;
@@ -233,7 +224,6 @@ void ShaderPhong::unsetAttributeColor()
 	}
 }
 
-
 void ShaderPhong::restoreUniformsAttribs()
 {
 	getLocations();
@@ -247,7 +237,7 @@ void ShaderPhong::restoreUniformsAttribs()
 
 unsigned int ShaderPhong::setAttributePosition(VBO* vbo)
 {
-	m_vboPos=vbo;
+	m_vboPos = vbo;
 	return bindVA_VBO("VertexPosition", vbo);
 }
 
@@ -257,7 +247,6 @@ unsigned int ShaderPhong::setAttributeNormal(VBO* vbo)
 	return bindVA_VBO("VertexNormal", vbo);
 }
 
+} // namespace Utils
 
-}
-}
-
+} // namespace CGoGN

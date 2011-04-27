@@ -80,8 +80,8 @@ void MyQT::cb_initGL()
 	m_shader2->setColor(Geom::Vec4f(1.,1.,0.,0.));
 
 
-	registerRunning(m_shader);
-	registerRunning(m_shader2);
+	registerShader(m_shader);
+	registerShader(m_shader2);
 }
 
 

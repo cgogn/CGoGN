@@ -29,24 +29,24 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-
-VBO::VBO():
-m_nbElts(0),m_lock(false)
+VBO::VBO() : m_nbElts(0), m_lock(false)
 {
-	glGenBuffers(1,&m_id);
+	glGenBuffers(1, &m_id);
 	m_refs.reserve(4);
 }
 
-VBO::VBO(const VBO& vbo):
-	m_data_size(vbo.m_data_size),m_nbElts(vbo.m_nbElts),m_lock(false)
+VBO::VBO(const VBO& vbo) :
+	m_data_size(vbo.m_data_size),
+	m_nbElts(vbo.m_nbElts),
+	m_lock(false)
 {
+	unsigned int nbbytes =  sizeof(float) * m_data_size * m_nbElts;
 
-	unsigned int nbbytes =  sizeof(float)*m_data_size*m_nbElts;
-
-	glGenBuffers(1,&m_id);
+	glGenBuffers(1, &m_id);
 
 	vbo.bind();
 	void* src = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
@@ -58,12 +58,11 @@ VBO::VBO(const VBO& vbo):
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-
 VBO::~VBO()
 {
 	if (m_lock)
 		releasePtr();
-	glDeleteBuffers(1,&m_id);
+	glDeleteBuffers(1, &m_id);
 	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
 	{
 		(*it)->unbindVBO(this);
@@ -74,12 +73,11 @@ void VBO::ref(GLSLShader* sh)
 {
 	//already referenced ?
 	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
-		if (*it == sh )
+		if (*it == sh)
 			return;
 	// no then add
 	m_refs.push_back(sh);
 }
-
 
 void* VBO::lockPtr()
 {
@@ -89,7 +87,7 @@ void* VBO::lockPtr()
 		return NULL;
 	}
 
-	m_lock=true;
+	m_lock = true;
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
@@ -98,10 +96,9 @@ void VBO::releasePtr()
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-	m_lock=false;
+	m_lock = false;
 }
 
+} // namespace Utils
 
-}
-}
-
+} // namespace CGoGN

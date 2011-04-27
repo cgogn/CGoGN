@@ -34,14 +34,11 @@ PFP::MAP myMap;
 AttributeHandler<PFP::VEC3> position;
 AttributeHandler<PFP::VEC3> normal;
 
-
 void MyQT::sliderFocale_cb(int x)
 {
 	m_glWidget->setFocal(0.01f*x);
 	updateGL();
 }
-
-
 
 void MyQT::color_cb()
 {
@@ -73,16 +70,11 @@ void MyQT::pervertex_cb(bool val)
 	updateGLMatrices();
 }
 
-
 MyQT::MyQT(): m_render(NULL)
-{
-}
-
+{}
 
 MyQT::~MyQT()
-{ }
-
-
+{}
 
 void MyQT::cb_initGL()
 {
@@ -95,7 +87,6 @@ void MyQT::cb_initGL()
 
 	positionVBO->updateData(position);
 	normalVBO->updateData(normal);
-
 
 	// create colors from normal (remap [-1,1] to [0,1]
 	colorVBO = new Utils::VBO(*normalVBO);
@@ -117,14 +108,10 @@ void MyQT::cb_initGL()
 	shader1->setAttributePosition(positionVBO);
 	shader1->setAttributeNormal(normalVBO);
 
-	registerRunning(shader1);
+	registerShader(shader1);
 
 	currentShader = shader1;
-
 }
-
-
-
 
 void MyQT::cb_redraw()
 {
@@ -136,11 +123,8 @@ void MyQT::cb_redraw()
 	}
 }
 
-
 int main(int argc, char **argv)
 {
-
-
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
 	normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
 
@@ -149,7 +133,6 @@ int main(int argc, char **argv)
 	prim3.embedTore(1.0f,0.3f);
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap,position,normal);
-
 
 	QApplication app(argc, argv);
 	MyQT sqt;
@@ -202,7 +185,6 @@ int main(int argc, char **argv)
 
 	CGoGNStream::allToConsole(&sqt);
 	CGoGNStream::allToStd(false);
-
 
 	// second show to have a good initial redraw
 	sqt.show();

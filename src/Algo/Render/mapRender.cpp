@@ -37,24 +37,17 @@ namespace Render
 namespace GL2
 {
 
-MapRender::MapRender():
-	m_nbIndicesTri(0),
-	m_nbIndicesLines(0),
-	m_nbIndicesPoints(0),
-	m_nbFlatElts(0)
+MapRender::MapRender()
 {
-	glGenBuffersARB(4, m_VBOBuffers) ;
+	glGenBuffersARB(4, m_indexBuffers) ;
+	for(unsigned int i = 0; i < 4; ++i)
+		m_nbIndices[i] = 0 ;
 }
-
 
 MapRender::~MapRender()
 {
-	glDeleteBuffersARB(4, m_VBOBuffers);
-	delete[] m_VBOBuffers ;
-
+	glDeleteBuffersARB(4, m_indexBuffers);
 }
-
-
 
 void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 {
@@ -62,17 +55,17 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 	int vbo_ind = 0;
 	switch(prim)
 	{
-		case TRIANGLES:
-			m_nbIndicesTri = tableIndices.size();
-			vbo_ind = m_VBOBuffers[TRIANGLE_INDICES];
+		case POINTS:
+			m_nbIndices[POINT_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[POINT_INDICES];
 			break;
 		case LINES:
-			m_nbIndicesLines = tableIndices.size();
-			vbo_ind = m_VBOBuffers[LINE_INDICES];
+			m_nbIndices[LINE_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[LINE_INDICES];
 			break;
-		case POINTS:
-			m_nbIndicesPoints = tableIndices.size();
-			vbo_ind = m_VBOBuffers[POINT_INDICES];
+		case TRIANGLES:
+			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
@@ -84,7 +77,6 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
 	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
-
 
 void MapRender::draw(Utils::GLSLShader* sh, int prim)
 {
@@ -100,17 +92,17 @@ void MapRender::draw(Utils::GLSLShader* sh, int prim)
 
 	switch(prim)
 	{
-		case TRIANGLES:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[TRIANGLE_INDICES]);
-			glDrawElements(GL_TRIANGLES, m_nbIndicesTri, GL_UNSIGNED_INT, 0);
+		case POINTS:
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[POINT_INDICES]);
+			glDrawElements(GL_POINTS, m_nbIndices[POINT_INDICES], GL_UNSIGNED_INT, 0) ;
 			break;
 		case LINES:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[LINE_INDICES]);
-			glDrawElements(GL_LINES, m_nbIndicesLines, GL_UNSIGNED_INT, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[LINE_INDICES]);
+			glDrawElements(GL_LINES, m_nbIndices[LINE_INDICES], GL_UNSIGNED_INT, 0);
 			break;
-		case POINTS:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[POINT_INDICES]);
-			glDrawElements(GL_POINTS, m_nbIndicesPoints, GL_UNSIGNED_INT, 0) ;
+		case TRIANGLES:
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[TRIANGLE_INDICES]);
+			glDrawElements(GL_TRIANGLES, m_nbIndices[TRIANGLE_INDICES], GL_UNSIGNED_INT, 0);
 			break;
 		default:
 			break;
@@ -122,11 +114,6 @@ void MapRender::draw(Utils::GLSLShader* sh, int prim)
 //	}
 	sh->disableVertexAttribs();
 }
-
-
-
-
-
 
 } // namespace GL2
 

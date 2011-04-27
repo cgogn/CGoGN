@@ -21,12 +21,11 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef __TUTO2_
-#define __TUTO2_
 
+#ifndef _TUTO2_
+#define _TUTO2_
 
 #include <iostream>
-
 
 #include "Utils/qtSimple.h"
 #include "ui_tuto2.h"
@@ -35,7 +34,7 @@
 #include "Geometry/vector_gen.h"
 
 // forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 
@@ -56,8 +55,8 @@ class MyQT: public Utils::QT::SimpleQT
 	bool m_with_lines;
 	Geom::Vec4f m_color;
 	int m_line_width;
-public:
 
+public:
 	// render
 	Algo::Render::GL2::MapRender* m_render;
 
@@ -67,8 +66,8 @@ public:
 	// shader basic
 	Utils::ShaderSimpleColor* m_shader;
 
-	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL) {}
-
+	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL)
+	{}
 
 	void cb_redraw();
 
@@ -79,9 +78,6 @@ public slots:
 	void lines_slot(bool x);
 	void line_width_slot(int x);
 	void color_slot();
-
-
 };
 
 #endif
-

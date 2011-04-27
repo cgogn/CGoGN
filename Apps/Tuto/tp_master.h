@@ -25,15 +25,13 @@
 #ifndef TP_MASTER_H_
 #define TP_MASTER_H_
 
-
 #include <iostream>
-
 
 #include "Utils/qtSimple.h"
 
 // forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class TopoRenderMapD; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class TopoRenderMapD; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderPhong; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
@@ -44,7 +42,6 @@ using namespace CGoGN ;
 /**
  * A class for a little interface and rendering
  */
-
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
@@ -52,6 +49,7 @@ class MyQT: public Utils::QT::SimpleQT
 protected:
 	bool m_drawTopo;
 	void drawSelected();
+
 public:
 	// render
 	Algo::Render::GL2::MapRender* m_render;
@@ -76,7 +74,8 @@ public:
 		m_render(NULL), m_render_topo(NULL),
 		m_positionVBO(NULL), m_normalVBO(NULL),
 		m_shader(NULL), m_shader2(NULL),
-		renderTopo(true) {}
+		renderTopo(true)
+	{}
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();
@@ -87,4 +86,3 @@ public:
 };
 
 #endif
-

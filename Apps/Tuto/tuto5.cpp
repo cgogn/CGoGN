@@ -46,7 +46,7 @@
 #include "Utils/text3d.h"
 
 #include "Utils/pointSprite.h"
-#include "Utils/pointLine.h"
+#include "Utils/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
 
 
@@ -57,17 +57,12 @@ struct PFP: public PFP_STANDARD
 	// definition de la carte
 	typedef EmbeddedMap3<Map3> MAP;
 	//typedef Map3 MAP;
-
 };
 
 PFP::MAP myMap;
 SelectorTrue allDarts;
 PFP::TVEC3 position ;
 Dart dglobal;
-
-unsigned int idNorm;
-unsigned int idCol;
-
 
 void MyQT::balls_onoff(bool x)
 {
@@ -111,7 +106,6 @@ void MyQT::slider_text(int x)
 	updateGL();
 }
 
-
 void MyQT::storeVerticesInfo()
 {
 
@@ -138,8 +132,6 @@ void MyQT::cb_initGL()
 
     m_render_topo = new Algo::Render::GL2::Topo3RenderMapD();
 
-
-
  	// create VBO for position
 	m_positionVBO = new Utils::VBO();
 	m_positionVBO->updateData(position);
@@ -152,20 +144,18 @@ void MyQT::cb_initGL()
 	m_sprite = new Utils::PointSprite();
 	m_sprite->setAttributePosition(m_positionVBO);
 
-
-    m_strings = new Utils::Strings3D(true,Geom::Vec3f(0.1,0.,0.3));
+    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1,0.,0.3));
     storeVerticesInfo();
     m_strings->sendToVBO();
-
 
     // copy de contenu de VBO a la creation
 	m_dataVBO = new Utils::VBO(*m_positionVBO);
 
-	m_lines = new Utils::PointLine();
+	m_lines = new Utils::ShaderVectorPerVertex();
 	m_lines->setAttributePosition(m_positionVBO);
-	m_lines->setAttributeData(m_dataVBO);
+	m_lines->setAttributeVector(m_dataVBO);
 	m_lines->setScale(0.2f);
-	m_lines->setColor(Geom::Vec3f(0.0f, 1.0f,0.2f));
+	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
 
 	// accede au buffer du VBO pour modification
 	PFP::VEC3* data = static_cast<PFP::VEC3*>(m_dataVBO->lockPtr());
@@ -175,11 +165,10 @@ void MyQT::cb_initGL()
 	}
 	m_dataVBO->releasePtr();
 
-
-	registerRunning(m_shader);
-	registerRunning(m_strings);
-	registerRunning(m_sprite);
-	registerRunning(m_lines);
+	registerShader(m_shader);
+	registerShader(m_strings);
+	registerShader(m_sprite);
+	registerShader(m_lines);
 
 	SelectorTrue allDarts;
 
@@ -189,7 +178,6 @@ void MyQT::cb_initGL()
 
 	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
 }
-
 
 void MyQT::cb_redraw()
 {
@@ -208,42 +196,42 @@ void MyQT::cb_redraw()
 	if (render_topo)
 		m_render_topo->drawTopo();
 
-	Dart d = myMap.phi2( myMap.begin());
-	m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
-	 d = myMap.phi1( myMap.begin());
-	m_render_topo->overdrawDart(d,5,1.0f,0.0f,1.0f);
-
+	Dart d = myMap.phi2(myMap.begin());
+	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
+	 d = myMap.phi1(myMap.begin());
+	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-
 	if (render_text)
-		m_strings->drawAll(Geom::Vec3f(0.0,1.0,1.0));
+		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
 
 	if (render_balls)
 	{
-		m_sprite->predraw(Geom::Vec3f(1.,0.,0.));
+		m_sprite->predraw(Geom::Vec3f(1.0f, 0.0f ,0.0f));
 		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
 		m_sprite->postdraw();
 	}
 
 	if (render_vectors)
+	{
+		glLineWidth(1.0f);
 		m_render->draw(m_lines, Algo::Render::GL2::POINTS);
-
+	}
 }
 
 void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap,allDarts,x,getHeight()-y);
+		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x, getHeight() - y);
 		if (d != Dart::nil())
 		{
 //			std::stringstream ss;
 //			ss << "Dart "<< d << " clicked"<< CGoGNendl;
 //			statusMsg(ss.str().c_str());
 
-			CGoGNout << "Dart "<< d << " clicked"<< CGoGNendl;
+			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
 		}
 		else
 		{
@@ -252,24 +240,20 @@ void MyQT::cb_mousePress(int button, int x, int y)
 	}
 }
 
-
 int main(int argc, char **argv)
 {
-
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT,"position");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
 
 	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
 	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
 
 
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
+	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	int nb=3;
 	if (argc>1)
 		nb = atoi(argv[1]);
 	dglobal = prim.hexaGrid_topo(nb,nb,nb);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
-
-
 
     // un peu d'interface
 	QApplication app(argc, argv);
@@ -283,16 +267,15 @@ int main(int argc, char **argv)
 	sqt.setHelpMsg("");
 
 	CGoGNout.toStatusBar(&sqt);
-	CGoGNout <<"CGoGNOut StatusBar"<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+	CGoGNout << "CGoGNOut StatusBar" << Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
 
 	CGoGNout.toConsole(&sqt);
 
-	CGoGNout <<"CGoGNOut dans la console"<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
 
 	CGoGNout.toStatusBar(NULL);
-	CGoGNout <<"tirelipinpon .."<< CGoGNendl;
-	CGoGNout <<"ah aha ah"<< CGoGNendl;
-
+	CGoGNout << "tirelipinpon .." << CGoGNendl;
+	CGoGNout << "ah aha ah" << CGoGNendl;
 
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
@@ -300,7 +283,7 @@ int main(int argc, char **argv)
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
     // envoit info BB a l'interface
-	sqt.setParamObject(lWidthObj,lPosObj.data());
+	sqt.setParamObject(lWidthObj, lPosObj.data());
 
 	sqt.setCallBack( dock.checkBox_balls, SIGNAL(toggled(bool)), SLOT(balls_onoff(bool)) );
 	sqt.setCallBack( dock.checkBox_vectors, SIGNAL(toggled(bool)), SLOT(vectors_onoff(bool)) );
@@ -326,5 +309,4 @@ int main(int argc, char **argv)
 
 	// et on attend la fin.
 	return app.exec();
-
 }

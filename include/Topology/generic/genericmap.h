@@ -136,7 +136,7 @@ public:
 	/**
 	 * @return the number of darts in the map
 	 */
-	unsigned getNbDarts();
+	unsigned int getNbDarts();
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -404,20 +404,18 @@ public:
 	 * 	@return the number of orbits
 	 */
 	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = SelectorTrue());
-
 } ;
 
 
-
 template <typename MAP>
-bool foreach_dart_of_orbit_in_parent( MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread=0)
+bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
 {
 	switch(orbit)
 	{
 		case  DART_ORBIT: return f(d);
-		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f,thread);
-		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f,thread);
-		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f,thread);
+		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread);
+		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread);
+		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread);
 		case  VOLUME_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}
@@ -425,20 +423,19 @@ bool foreach_dart_of_orbit_in_parent( MAP* ptrMap, unsigned int orbit, Dart d, F
 }
 
 template <typename MAP>
-bool foreach_dart_of_orbit_in_parent2( MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread=0)
+bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
 {
 	switch(orbit)
 	{
 		case  DART_ORBIT: return f(d);
 		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread);
-		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f,thread);
-		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f,thread);
+		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread);
+		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread);
 		case  VOLUME_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}
 	return false;
 }
-
 
 } //namespace CGoGN
 

@@ -300,6 +300,14 @@ void AttributeMultiVector<T>::copyElt(unsigned int dst, unsigned int src)
 }
 
 template <typename T>
+void AttributeMultiVector<T>::swapElt(unsigned int id1, unsigned int id2)
+{
+	T data = m_tableData[id1 / _BLOCKSIZE_][id1 % _BLOCKSIZE_] ;
+	m_tableData[id1 / _BLOCKSIZE_][id1 % _BLOCKSIZE_] = m_tableData[id2 / _BLOCKSIZE_][id2 % _BLOCKSIZE_] ;
+	m_tableData[id2 / _BLOCKSIZE_][id2 % _BLOCKSIZE_] = data ;
+}
+
+template <typename T>
 void AttributeMultiVector<T>::overwrite(unsigned int src_b, unsigned int src_id, unsigned int dst_b, unsigned int dst_id)
 {
 	m_tableData[dst_b][dst_id] = m_tableData[src_b][src_id];

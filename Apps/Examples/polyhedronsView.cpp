@@ -44,17 +44,13 @@
 
 using namespace CGoGN;
 
-
-
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
 	typedef EmbeddedMap2<Map2> MAP;
 };
 
-
 PFP::MAP myMap;
-
 
 void MyQT::cb_initGL()
 {
@@ -78,10 +74,9 @@ void MyQT::cb_initGL()
 	m_shader2->setColor(Geom::Vec4f(1.,1.,0.,0.));
 
 
-	registerRunning(m_shader);
-	registerRunning(m_shader2);
+	registerShader(m_shader);
+	registerShader(m_shader2);
 }
-
 
 void MyQT::cb_redraw()
 {
@@ -98,8 +93,6 @@ void MyQT::cb_redraw()
 	glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
-
-
 int main(int argc, char **argv)
 {
 	// interface:
@@ -107,7 +100,6 @@ int main(int argc, char **argv)
 	MyQT sqt;
 
 	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-
 
 	// create a cylinder
 	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, position);
@@ -148,7 +140,6 @@ int main(int argc, char **argv)
 	Geom::translate<float>(270.0f,0.0,0.0,trf);
 	prim4.transform(trf);
 
-
     //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -174,8 +165,5 @@ int main(int argc, char **argv)
 	// et on attend la fin.
 	return app.exec();
 
-
 	return 0;
 }
-
-

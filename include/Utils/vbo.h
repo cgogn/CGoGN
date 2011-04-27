@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #ifndef __CGoGN_GLSL_VBO__
 #define __CGoGN_GLSL_VBO__
 
@@ -34,12 +33,14 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
 class GLSLShader;
+
 /**
- * Encaptusaltion of OpenGL Vertex Buffer Object
+ * Encapsulation of OpenGL Vertex Buffer Object
  * Manage
  * - alloc /release of GL buffer
  * - ref by Shaders
@@ -56,6 +57,7 @@ protected:
 	std::vector<GLSLShader*> m_refs;
 	unsigned int m_nbElts;
 	bool m_lock;
+
 public:
 	/**
 	 * constructor: allocate the OGL VBO
@@ -75,17 +77,17 @@ public:
 	/**
 	 * get id of vbo
 	 */
-	unsigned int id() const { return m_id;}
+	unsigned int id() const { return m_id; }
 
 	/**
 	 * get dataSize
 	 */
-	unsigned int dataSize() const { return m_data_size;}
+	unsigned int dataSize() const { return m_data_size; }
 
 	/**
 	 * set the data size (in number of float)
 	 */
-	void setDataSize(unsigned int ds) { m_data_size = ds;}
+	void setDataSize(unsigned int ds) { m_data_size = ds; }
 
 	/**
 	 * bind array vbo
@@ -108,7 +110,6 @@ public:
 	template <typename ATTR_HANDLER>
 	void updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv);
 
-
 	void* lockPtr();
 
 	void releasePtr();
@@ -116,11 +117,10 @@ public:
 	unsigned int nbElts() {return m_nbElts;}
 };
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN
 
 #include "Utils/vbo.hpp"
 
 #endif
-
-

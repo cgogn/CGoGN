@@ -35,20 +35,20 @@
 #include <string>
 #include "Geometry/vector_gen.h"
 
-
-namespace CGoGN { namespace Utils { class GLSLShader;}}
-//namespace CGoGN { namespace Geom { class Vec3f;}}
+namespace CGoGN { namespace Utils { class GLSLShader; } }
+//namespace CGoGN { namespace Geom { class Vec3f; } }
 
 namespace CGoGN
 {
+
 namespace Utils
 {
+
 namespace QT
 {
 
 // forward definition
 class GLWidget;
-
 
 class SimpleQT : public QMainWindow
 {
@@ -88,13 +88,13 @@ public:
 	 */
 	void dockTitle(const char* dockTitle);
 
-
 	/**
 	 * draw a message in status bar
 	 * @param msg message in C format (if NULL swp show/hidden)
 	 * @param timeoutms number of ms message stay (0 = until next msg)
 	 */
-	void statusMsg(const char* msg, int timeoutms=0);
+	void statusMsg(const char* msg, int timeoutms = 0);
+
 	/**
 	 * add an empty dock to the window
 	 */
@@ -114,6 +114,7 @@ public:
 	 * change dock visibility
 	 */
 	void toggleVisibilityDock();
+
 	/**
 	 * change console visibility
 	 */
@@ -122,7 +123,7 @@ public:
 	/**
 	 * add an entry to popup menu
 	 */
-	void add_menu_entry(const std::string label, const char* method );
+	void add_menu_entry(const std::string label, const char* method);
 
 	/**
 	 * re-initialize popup menu
@@ -133,7 +134,6 @@ public:
 	 * set the help message
 	 */
 	void setHelpMsg(const std::string& msg);
-
 
 //	void contextMenuEvent(QContextMenuEvent *event);
 
@@ -167,14 +167,11 @@ protected:
 
 	void keyReleaseEvent(QKeyEvent *e);
 
-
 public:
-
 	/**
 	 * set width and pos center of object to draw
 	 */
-	void setParamObject(float width, float* pos) { m_glWidget->setParamObject(width,pos);}
-
+	void setParamObject(float width, float* pos) { m_glWidget->setParamObject(width, pos); }
 
 	/**
 	 * get the mouse position in GL widget
@@ -190,25 +187,25 @@ public:
 	 * @param radius radius on pixel for clicking precision
 	 * @return the distance in modelview world corresponding to radius pixel in screen
 	 */
-	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius=4);
+	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius = 4);
 
 	/**
 	 * current modelview matrix
 	 */
-	glm::mat4& modelViewMatrix () { return m_modelView_matrix;}
+	glm::mat4& modelViewMatrix () { return m_modelView_matrix; }
 
 	/**
 	 * current projection matrix
 	 */
-	glm::mat4& projectionMatrix () { return m_projection_matrix;}
+	glm::mat4& projectionMatrix () { return m_projection_matrix; }
 
 
-	float* curquat() { return m_curquat;}
-	float* lastquat() { return m_lastquat;}
+	float* curquat() { return m_curquat; }
+	float* lastquat() { return m_lastquat; }
 
-	float& trans_x() { return m_trans_x;}
-	float& trans_y() { return m_trans_y;}
-	float& trans_z() { return m_trans_z;}
+	float& trans_x() { return m_trans_x; }
+	float& trans_y() { return m_trans_y; }
+	float& trans_z() { return m_trans_z; }
 
 	/**
 	 * shift key pressed ?
@@ -228,12 +225,12 @@ public:
 	/**
 	 * height of OpenGL widget (for classic yy = H-y
 	 */
-	int getHeight() const { return m_glWidget->getHeight();}
+	int getHeight() const { return m_glWidget->getHeight(); }
 
 	/**
 	 * console QTextEdit ptr
 	 */
-	QTextEdit* console() { return m_textConsole;}
+	QTextEdit* console() { return m_textConsole; }
 
 	/**
 	 * syncronization between SimpleQTs (experimental)
@@ -244,12 +241,12 @@ public:
 	 * Register a shader as running in this Widget.
 	 * Needed for automatic matrices update
 	 */
-	void registerRunning(GLSLShader* ptr);
+	void registerShader(GLSLShader* ptr);
 
 	/**
 	 * Unregister a shader as running in this Widget.
 	 */
-	void unregisterRunning(GLSLShader* ptr);
+	void unregisterShader(GLSLShader* ptr);
 
 	/**
 	 * GL initialization CB (context is ok)
@@ -296,8 +293,6 @@ public:
 	 */
 	virtual void cb_exit() {}
 
-
-
 	/**
 	 * Ask to Qt to update the GL widget.
 	 * Equivalent of glutPostRedisplay()
@@ -315,27 +310,23 @@ public:
 	 * @param dir base directory
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
-	std::string selectFile(const std::string& title = "open file", const std::string& dir= ".", const std::string& filters="all (*.*)");
+	std::string selectFile(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
 
-
-	public slots:
-	virtual void cb_New() { std::cerr << "callback not implemented"<< std::endl;}
-	virtual void cb_Open() { std::cerr << "callback not implemented"<< std::endl;}
-	virtual void cb_Save() { std::cerr << "callback not implemented"<< std::endl;}
-	virtual void cb_Quit() { exit(0);}
+public slots:
+	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }
+	virtual void cb_Open() { std::cerr << "callback not implemented" << std::endl; }
+	virtual void cb_Save() { std::cerr << "callback not implemented" << std::endl; }
+	virtual void cb_Quit() { exit(0); }
 	void cb_about_cgogn();
 	void cb_about();
-	void cb_consoleOnOff() { toggleVisibilityConsole();}
-	void cb_consoleClear() { m_textConsole->clear();}
-
-
+	void cb_consoleOnOff() { toggleVisibilityConsole(); }
+	void cb_consoleClear() { m_textConsole->clear(); }
 };
 
+} // namespace QT
 
-}
-}
-}
+} // namespace Utils
 
+} // namespace CGoGN
 
 #endif
-

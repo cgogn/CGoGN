@@ -42,14 +42,10 @@
 
 #include "Algo/Parallel/parallel_foreach.h"
 
-
 // for file input
  #include "Utils/qtInputs.h"
 
 using namespace CGoGN ;
-
-
-
 
 /**
  * Struct that contains some informations about the types of the manipulated objects
@@ -60,7 +56,6 @@ struct PFP: public PFP_STANDARD
 	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 };
-
 
 // declaration of the map
 PFP::MAP myMap;
@@ -99,7 +94,6 @@ void MyQT::cb_Open()
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-
     // envoit info BB a l'interface
 	setParamObject(lWidthObj,lPosObj.data());
 	updateGLMatrices();
@@ -121,7 +115,6 @@ void MyQT::cb_New()
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
-
    //  bounding box
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -134,7 +127,7 @@ void MyQT::cb_New()
 
 void MyQT::cb_initGL()
 {
-// Old school openGL ;)
+	// Old school openGL ;)
 	Utils::GLSLShader::setCurrentOGLVersion(1);
 
 	glewInit();
@@ -151,8 +144,6 @@ void MyQT::cb_initGL()
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 }
-
-
 
 void MyQT::cb_redraw()
 {
@@ -172,12 +163,7 @@ void MyQT::cb_redraw()
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::SMOOTH, 1.0f,position, normal);
 	glDisable(GL_POLYGON_OFFSET_FILL);
-
 }
-
-
-
-
 
 
 template <typename XXX>
@@ -187,10 +173,11 @@ protected:
 	const typename XXX::TVEC3& m_positions;
 	float area;
 public:
-	ThreadArea(typename XXX::MAP& map, const typename XXX::TVEC3& pos, unsigned int th):
+	ThreadArea(typename XXX::MAP& map, const typename XXX::TVEC3& pos, unsigned int th) :
 		Algo::Parallel::CGoGNThread<typename XXX::MAP>(map,th),
 		m_positions(pos),
-		area(0.0f) {}
+		area(0.0f)
+	{}
 
 	void operator()()
 	{
@@ -200,7 +187,7 @@ public:
 		area += Algo::Geometry::totalArea<XXX>(this->m_map, m_positions, SelectorTrue(), this->m_threadId);
 	}
 
-	float getTripleValue() { return area;}
+	float getTripleValue() { return area; }
 };
 
 
@@ -214,7 +201,8 @@ public:
 	ThreadNormals(typename XXX::MAP& map, const typename XXX::TVEC3& pos, typename XXX::TVEC3& norm, unsigned int th):
 		Algo::Parallel::CGoGNThread<typename XXX::MAP>(map,th),
 		m_positions(pos),
-		m_normals(norm) {}
+		m_normals(norm)
+	{}
 
 	void operator()()
 	{
@@ -224,7 +212,6 @@ public:
 };
 
 
-//
 //template<typename XXX>
 //class Thread0
 //{
@@ -293,11 +280,6 @@ public:
 };
 
 
-
-
-
-
-
 template <typename XXX>
 class LengthEdgeFunctor : public Algo::Parallel::FunctorMapThreadedResult<typename XXX::MAP, std::pair<double,unsigned int> >
 {
@@ -332,18 +314,13 @@ public:
 };
 
 
-
-
 void MyQT::menu_slot1()
 {
-
 	// cree un handler pour les normales aux sommets
 	AttributeHandler<PFP::VEC3> normal2 = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal2");
 
-
 	// ajout de 4 threads pour les markers
 	myMap.addThreadMarker(4);
-
 
 	//Algorithmes en //
 
@@ -357,7 +334,6 @@ void MyQT::menu_slot1()
 	Algo::Parallel::foreach_orbit<PFP>(myMap,VERTEX_ORBIT, tf1,4);
 	CGoGNout << "ok:"<< CGoGNendl;
 
-
 	// parallelisation de boucle avec resultats stockes
 
 	// vector pour le resultat (ici paire double/int pour faire la moyenne des longueurs des aretes)
@@ -369,17 +345,13 @@ void MyQT::menu_slot1()
 	std::pair<double,unsigned int> le = Algo::Parallel::sumPairResult<double,unsigned int>(lengthp);
 	CGoGNout << "length :" <<le.first/le.second<< CGoGNendl;
 
-
 	// on enleve les markers ajoutes
 	myMap.removeThreadMarker(4);
 }
 
 
-
-
 int main(int argc, char **argv)
 {
-
 	// interface:
 	QApplication app(argc, argv);
 	MyQT sqt;
@@ -403,7 +375,6 @@ int main(int argc, char **argv)
  	bool zz=true;
  	int kk=32;
  	int cc=2;
-
 
  	{
  	using namespace CGoGN::Utils::QT;

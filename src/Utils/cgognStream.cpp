@@ -21,6 +21,7 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
+
 #include "Utils/cgognStream.h"
 
 namespace CGoGN
@@ -61,7 +62,6 @@ void allToFile(const std::string& filename )
 	CGoGNdbg3.toFile(filename);
 }
 
-
 void allToStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	CGoGNout.toStatusBar(sqt);
@@ -70,7 +70,6 @@ void allToStatusBar(Utils::QT::SimpleQT* sqt)
 	CGoGNdbg2.toStatusBar(sqt);
 	CGoGNdbg3.toStatusBar(sqt);
 }
-
 
 void allToConsole(Utils::QT::SimpleQT* sqt)
 {
@@ -90,7 +89,6 @@ void allToBuffer(std::stringstream* ss)
 	CGoGNdbg3.toBuffer(ss);
 }
 
-}
-}
+} // namespace CGoGNStream
 
-
+} // namespace CGoGN

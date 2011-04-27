@@ -24,9 +24,9 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
-
 
 template <typename ATTR_HANDLER>
 void VBO::updateData(const ATTR_HANDLER& attrib)
@@ -97,7 +97,6 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 	conv->release();
 }
 
+} // namespace Utils
 
-
-}
-}
+} // namespace CGoGN

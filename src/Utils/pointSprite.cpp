@@ -26,14 +26,14 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-GLuint PointSprite::m_idTexture=0;
-GLuint PointSprite::m_uniform_texture=0;
+GLuint PointSprite::m_idTexture = 0;
+GLuint PointSprite::m_uniform_texture = 0;
 
-unsigned char* PointSprite::m_ptrSphere=NULL;
-
+unsigned char* PointSprite::m_ptrSphere = NULL;
 
 std::string PointSprite::vertexShaderText =
 "ATTRIBUTE vec3 VertexPosition;\n"
@@ -41,7 +41,6 @@ std::string PointSprite::vertexShaderText =
 "{\n"
 "	gl_Position = vec4(VertexPosition,1.0);\n"
 "}";
-
 
 
 std::string PointSprite::geometryShaderText =
@@ -101,10 +100,8 @@ std::string PointSprite::fragmentShaderText =
 
 PointSprite::PointSprite(float radius)
 {
-
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
-
 
 	std::string glxgeom = GLSLShader::defines_Geom("points","triangle_strip",4);
 	glxgeom.append(geometryShaderText);
@@ -142,30 +139,26 @@ PointSprite::~PointSprite()
 	}
 }
 
-
 unsigned int PointSprite::setAttributePosition(VBO* vbo)
 {
 	return bindVA_VBO("VertexPosition", vbo);
 }
 
-
 void PointSprite::predraw(const Geom::Vec3f& color)
 {
 	bind();
-	glUniform1i(m_uniform_texture,0);
+	glUniform1i(m_uniform_texture, 0);
 	glUniform3fv(m_uniform_color, 1, color.data());
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_idTexture);
 	glEnable(GL_TEXTURE_2D);
 }
 
-
 void PointSprite::postdraw()
 {
 	glDisable(GL_TEXTURE_2D);
 	unbind();
 }
-
 
 void PointSprite::setSize(float radius)
 {
@@ -174,39 +167,38 @@ void PointSprite::setSize(float radius)
 	unbind();
 }
 
-
-
 void PointSprite::computeSphere()
 {
-	if (m_ptrSphere==NULL) // normaly useless
+	if (m_ptrSphere == NULL) // normally useless
 	{
 		m_ptrSphere = new unsigned char[WIDTHSPRITE*WIDTHSPRITE];
 	}
+
 	unsigned char* ptr = m_ptrSphere;
 
-	Geom::Vec3f eye(0.0,.0,-1.0);
-	Geom::Vec3f light(5,3,10);
+	Geom::Vec3f eye(0.0f , 0.0f, -1.0f);
+	Geom::Vec3f light(5.0f, 3.0f, 10.0f);
 	light.normalize();
-	float r2 = float((WIDTHSPRITE-1)*(WIDTHSPRITE-1))/4.0f;
-	float mid = 0.5f - float(WIDTHSPRITE/2);
+	float r2 = float((WIDTHSPRITE - 1) * (WIDTHSPRITE - 1)) / 4.0f;
+	float mid = 0.5f - float(WIDTHSPRITE / 2);
 
-	for (unsigned int i=0; i<WIDTHSPRITE;++i)
+	for (unsigned int i = 0; i < WIDTHSPRITE; ++i)
 	{
-		for (unsigned int j=0; j<WIDTHSPRITE;++j)
+		for (unsigned int j = 0; j < WIDTHSPRITE; ++j)
 		{
 			float x = float(i) + mid;
-			float y =  float(j)+ mid;
+			float y = float(j) + mid;
 			float a =  x*x + y*y;
 			if (r2 >= a)
 			{
-				float z = sqrt(r2-a);
-				Geom::Vec3f P(x,y,z);
+				float z = sqrt(r2 - a);
+				Geom::Vec3f P(x, y, z);
 				P.normalize();
-				float col = P*light;
+				float col = P * light;
 				if (col < 0.0f)
-					col= 0.02; // ambiant
+					col = 0.02f; // ambiant
 
-				*ptr++ = (unsigned char)(255.0f*col);
+				*ptr++ = (unsigned char)(255.0f * col);
 			}
 			else
 				*ptr++ = (unsigned char)0;
@@ -214,5 +206,6 @@ void PointSprite::computeSphere()
 	}
 }
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN

@@ -25,7 +25,6 @@
 #ifndef TEXTURE_RENDER
 #define TEXTURE_RENDER
 
-
 #include <GL/gl.h>
 #include <IL/ilu.h>
 
@@ -87,7 +86,6 @@ public:
 	* constructor 
 	*/
 	Texture();
-	
 
 	/**
 	* constructor 
@@ -124,7 +122,6 @@ public:
 	*/
 	void setData( T* ptr, int w, int h, int cpp);
 
-
 	/**
 	* get the width of texture
 	* @return width of texture
@@ -135,24 +132,23 @@ public:
 	* get the height of texture
 	* @return height of texture
 	*/
-	int getHeight() { return m_height;}
+	int getHeight() { return m_height; }
 
 	/**
 	* get the number of component per pixel
 	* @return component per pixel
 	*/
-	int getCPP() { return m_cpp;}
+	int getCPP() { return m_cpp; }
 
 	/**
 	* get a pointer on texture image
 	*/
-	T* getPtr() { return m_data; }	
-
+	T* getPtr() { return m_data; }
 
 	/**
 	* get texture name
 	*/
-	GLuint getTextureName() { return m_texName;}
+	GLuint getTextureName() { return m_texName; }
 
 	/**
 	* initialisation GL
@@ -169,8 +165,10 @@ public:
 	void useGL(unsigned int textureEngineIndex);
 };
 
-}
-}
+} // namespace utils
+
+} // namespace CGoGN
 
 #include "texture.hpp"
+
 #endif

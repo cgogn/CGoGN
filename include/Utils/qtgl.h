@@ -36,16 +36,16 @@
 #include "glm/gtc/matrix_projection.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-
 namespace CGoGN
 {
+
 namespace Utils
 {
+
 namespace QT
 {
 
 class SimpleQT;
-
 
 class GLWidget : public QGLWidget
 {
@@ -60,16 +60,13 @@ public:
 
     QSize sizeHint() const;
 
-
 protected:
-	static const float FAR_PLANE=500.0f;
+	static const float FAR_PLANE = 500.0f;
 
 	SimpleQT* m_cbs;
 
 	// Matrix
-
 	std::stack<glm::mat4> m_stack_mv;
-
 
 	int m_current_button;
 	int beginx;
@@ -87,7 +84,6 @@ protected:
 
 	float m_obj_sc;
 	glm::vec3 m_obj_pos;
-
 
 	// width and height of windows
 	int W;
@@ -124,7 +120,7 @@ public:
 
 	bool Alt() { return m_state_modifier & Qt::AltModifier; }
 
-	int getHeight() const { return H;}
+	int getHeight() const { return H; }
 
 	/**
 	 * set the focale distance (for a screen width of 2), default value is 1
@@ -134,9 +130,9 @@ public:
 	/**
 	 * get the focale distance
 	 */
-	float getFocal() {return foc;}
+	float getFocal() { return foc; }
 
-	void modelModified() {newModel=1;}
+	void modelModified() { newModel = 1; }
 
 protected:
 	/**
@@ -164,17 +160,16 @@ protected:
 	 */
 	bool oglPopModelViewMatrix();
 
-
-
 	/**
 	 * get the focale distance
 	 */
-	float getScale() {return scalefactor/foc;}
-
+	float getScale() { return scalefactor / foc; }
 };
 
+} // namespace QT
 
-}
-}	// namespaces
-}
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

@@ -21,9 +21,9 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
+
 #include "Utils/qtSimple.h"
 #include <QtGui/QTextEdit>
-
 
 namespace CGoGN
 {
@@ -42,13 +42,12 @@ Out<LEVEL>::Out():
 	m_code(0)
 {}
 
-
 template<int LEVEL>
 Out<LEVEL>::~Out()
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
-		if (m_ofs!=NULL)
+		if (m_ofs != NULL)
 		{
 			m_ofs->close();
 			delete m_ofs;
@@ -93,14 +92,14 @@ void Out<LEVEL>::toStd(bool yes)
 template<int LEVEL>
 void Out<LEVEL>::toFile(const std::string& filename )
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
 		if (!filename.empty())
 			m_out_mode |= FILEOUT;
 		else
 			m_out_mode &= ~FILEOUT;
 
-		if (m_ofs!=NULL)
+		if (m_ofs != NULL)
 		{
 			m_ofs->close();
 			delete m_ofs;
@@ -112,7 +111,7 @@ void Out<LEVEL>::toFile(const std::string& filename )
 template<int LEVEL>
 void Out<LEVEL>::toStatusBar(Utils::QT::SimpleQT* sqt)
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
 		if (sqt != NULL)
 			m_out_mode |= QTSTATUSBAR;
@@ -125,20 +124,20 @@ void Out<LEVEL>::toStatusBar(Utils::QT::SimpleQT* sqt)
 template<int LEVEL>
 void Out<LEVEL>::toConsole(Utils::QT::SimpleQT* sqt)
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
 		if (sqt)
 			m_out_mode |= QTCONSOLE;
 		else
 			m_out_mode &= ~QTCONSOLE;
-		m_sqt_console=sqt;
+		m_sqt_console = sqt;
 	}
 }
 
 template<int LEVEL>
 void Out<LEVEL>::toBuffer(std::stringstream* ss)
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
 		if (ss != NULL)
 			m_out_mode |= SSBUFFER;
@@ -158,16 +157,15 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Out& os)
 template<int LEVEL>
 void Out<LEVEL>::close()
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
-		if (m_ofs!=NULL)
+		if (m_ofs != NULL)
 		{
 			m_ofs->close();
 		}
 	}
 
 }
-
 
 template<int LEVEL>
 template <typename T>
@@ -184,11 +182,10 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (const T& val)
 	return *this;
 }
 
-
 template<int LEVEL>
 Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 {
-	if (LEVEL<=DBG_MAX_LEVEL)
+	if (LEVEL <= DBG_MAX_LEVEL)
 	{
 		if (&os == &CGoGNendl)
 		{
@@ -224,14 +221,14 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 				{
 					m_buffer.getline(bufc,512);
 
-					if (m_code>=100)
-						m_sqt_console->console()->setTextColor( QColor(0, 150 - (m_code-100)*20, 50+(m_code-100)*20) );
+					if (m_code >= 100)
+						m_sqt_console->console()->setTextColor(QColor(0, 150 - (m_code-100) * 20, 50 + (m_code-100) * 20));
 					else
 					{
-						if (m_code>0)
-							m_sqt_console->console()->setTextColor( QColor(150, 0, 0) );
+						if (m_code > 0)
+							m_sqt_console->console()->setTextColor(QColor(150, 0, 0));
 						else
-							m_sqt_console->console()->setTextColor( QColor(0, 0, 150) );
+							m_sqt_console->console()->setTextColor(QColor(0, 0, 150));
 					}
 
 //					m_sqt_console->console()->insertPlainText(QString(bufc));
@@ -244,7 +241,7 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 			{
 				while (! m_buffer.eof())
 				{
-					m_buffer.getline(bufc,512);
+					m_buffer.getline(bufc, 512);
 					*m_oss  << bufc << std::endl;
 				}
 			}
@@ -255,7 +252,6 @@ Out<LEVEL>&  Out<LEVEL>::operator<< (Special& os  )
 	return *this;
 }
 
+} // namespace CGoGNStream
 
-}
-}
-
+} // namespace CGoGN

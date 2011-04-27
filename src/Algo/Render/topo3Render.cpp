@@ -41,7 +41,6 @@ namespace Render
 namespace GL2
 {
 
-
 Topo3Render::Topo3Render():
 m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
 {
@@ -68,16 +67,15 @@ m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
 	m_shader2->setAttributeColor(m_vbo4);
 
 	// registering for auto matrices update
-	Utils::GLSLShader::registerRunning(m_shader1);
-	Utils::GLSLShader::registerRunning(m_shader2);
+	Utils::GLSLShader::registerShader(NULL, m_shader1);
+	Utils::GLSLShader::registerShader(NULL, m_shader2);
 
 }
 
-
 Topo3Render::~Topo3Render()
 {
-	Utils::GLSLShader::unregisterRunning(m_shader2);
-	Utils::GLSLShader::unregisterRunning(m_shader1);
+	Utils::GLSLShader::unregisterShader(NULL, m_shader2);
+	Utils::GLSLShader::unregisterShader(NULL, m_shader1);
 
 	delete m_shader2;
 	delete m_shader1;
@@ -96,12 +94,10 @@ Topo3Render::~Topo3Render()
 	}
 }
 
-
 void Topo3Render::setDartWidth(float dw)
 {
 	m_topo_dart_width = dw;
 }
-
 
 void Topo3Render::setRelationWidth(float pw)
 {

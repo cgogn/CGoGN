@@ -47,10 +47,6 @@ struct PFP: public PFP_STANDARD
 	typedef Map2 MAP;
 };
 
-
-
-
-
 void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
@@ -72,11 +68,9 @@ void MyQT::cb_initGL()
 	m_shader2->setAttributePosition(m_positionVBO);
 	m_shader2->setAttributeColor(m_colorVBO);
 
-
-	registerRunning(m_shader);
-	registerRunning(m_shader2);
+	registerShader(m_shader);
+	registerShader(m_shader2);
 }
-
 
 void MyQT::cb_redraw()
 {
@@ -90,9 +84,7 @@ void MyQT::cb_redraw()
 	glPolygonOffset(1.0f, 1.0f);
 	m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
 	glDisable(GL_POLYGON_OFFSET_FILL);
-
 }
-
 
 void MyQT::cb_keyPress(int code)
 {
@@ -105,14 +97,10 @@ void MyQT::cb_keyPress(int code)
 			sqt2_ptr->synchronize(sqt1_ptr);
 		break;
 	}
-
-
 }
-
 
 int main(int argc, char **argv)
 {
-
 	PFP::MAP myMap;
 	SelectorTrue allDarts;
 
@@ -144,7 +132,6 @@ int main(int argc, char **argv)
 	color[d3] = PFP::VEC3(0.0f, 1.0f, 1.0f);
 	d3 = myMap.phi1(d3);
 
-
 	//MARK !!!
 
 	// on reserve des marqueur de brins
@@ -169,19 +156,17 @@ int main(int argc, char **argv)
 			CGoGNout << "Sommet de dart "<< d.label() << " marque par mcv"<< CGoGNendl;
 	}
 
-
 	//nettoyage
 	cm.unmarkAll();
 
-
-		// interface:
+	// interface:
 	QApplication app(argc, argv);
 
 	MyQT sqt;
-	sqt1_ptr= &sqt;
+	sqt1_ptr = &sqt;
 
 	MyQT sqt2;
-	sqt2_ptr= &sqt2;
+	sqt2_ptr = &sqt2;
 
 	// message d'aide
 	sqt.setHelpMsg("Tuto3:\n"
@@ -194,7 +179,7 @@ int main(int argc, char **argv)
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
     // envoit info BB a l'interface
-	sqt.setParamObject(lWidthObj,lPosObj.data());
+	sqt.setParamObject(lWidthObj, lPosObj.data());
 
 	// show 1 pour GL context
 	sqt.show();
@@ -203,7 +188,6 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 	// update du VBO color
 	sqt.m_colorVBO->updateData(color);
-
 
 	// update des primitives du renderer
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
@@ -235,8 +219,6 @@ int main(int argc, char **argv)
 	position2[dx] = PFP::VEC3(0.0f, 2.0f, 0.0f);
 	color2[dx] = PFP::VEC3(0.0f, 1.0f, 1.0f);
 
-
-
 	sqt2.setHelpMsg("Fenetre 2!!");
 
 	sqt2.setParamObject(lWidthObj,lPosObj.data());
@@ -249,13 +231,10 @@ int main(int argc, char **argv)
 	// update du VBO color
 	sqt2.m_colorVBO->updateData(color2);
 
-
 	// update des primitives du renderer
 	sqt2.m_render->initPrimitives<PFP>(myMap2, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt2.m_render->initPrimitives<PFP>(myMap2, allDarts, Algo::Render::GL2::LINES);
 
-
 	// et on attend la fin.
 	return app.exec();
-
 }

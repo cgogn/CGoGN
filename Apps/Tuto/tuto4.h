@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #ifndef _TUTO4_H_
 #define _TUTO4_H_
 
@@ -31,7 +32,7 @@
 #include "Utils/qtui.h"
 
 // forward definitions (minimize includes) syntax a little bit tricky !!
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; class TopoRenderMapD; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; class TopoRenderMapD; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 namespace CGoGN { namespace Utils { class ShaderFlat; } }
@@ -44,6 +45,7 @@ using namespace CGoGN ;
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public:
 	// render
 	Algo::Render::GL2::MapRender* m_render;

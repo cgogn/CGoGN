@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #include "Algo/Render/GL2/topoRender.h"
 #include "Utils/shaderSimpleColor.h"
 #include "Utils/shaderColorPerVertex.h"
@@ -63,14 +62,14 @@ m_topo_dart_width(2.0f), m_topo_relation_width(3.0f)
 	m_shader2->setAttributeColor(m_vbo3);
 
 	// registering for auto matrices update
-	Utils::GLSLShader::registerRunning(m_shader1);
-	Utils::GLSLShader::registerRunning(m_shader2);
+	Utils::GLSLShader::registerShader(NULL, m_shader1);
+	Utils::GLSLShader::registerShader(NULL, m_shader2);
 }
 
 TopoRender::~TopoRender()
 {
-	Utils::GLSLShader::unregisterRunning(m_shader2);
-	Utils::GLSLShader::unregisterRunning(m_shader1);
+	Utils::GLSLShader::unregisterShader(NULL, m_shader2);
+	Utils::GLSLShader::unregisterShader(NULL, m_shader1);
 
 	delete m_shader2;
 	delete m_shader1;
@@ -83,7 +82,6 @@ TopoRender::~TopoRender()
 		static_cast<AttribMap*>(m_attIndex.map())->removeAttribute(m_attIndex);
 
 }
-
 
 void TopoRender::setDartWidth(float dw)
 {
@@ -119,8 +117,6 @@ void TopoRender::setAllDartsColor(float r, float g, float b)
 	m_vbo3->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
-
-
 
 void TopoRender::drawDarts()
 {
@@ -171,8 +167,6 @@ void TopoRender::drawTopo()
 	drawRelation2();
 }
 
-
-
 void TopoRender::overdrawDart(Dart d, float width, float r, float g, float b)
 {
 	unsigned int indexDart =  m_attIndex[d];
@@ -189,8 +183,6 @@ void TopoRender::overdrawDart(Dart d, float width, float r, float g, float b)
 
  	m_shader2->disableVertexAttribs();
 }
-
-
 
 Dart TopoRender::colToDart(float* color)
 {
@@ -216,7 +208,6 @@ void TopoRender::dartToCol(Dart d, float& r, float& g, float& b)
 	if (lab!=0)
 		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
 }
-
 
 Dart TopoRender::pickColor(unsigned int x, unsigned int y)
 {
@@ -248,7 +239,6 @@ Dart TopoRender::pickColor(unsigned int x, unsigned int y)
 	return colToDart(color);
 }
 
-
 void TopoRender::pushColors()
 {
 	m_color_save = new float[6*m_nbDarts];
@@ -258,7 +248,6 @@ void TopoRender::pushColors()
 	memcpy(m_color_save, colorBuffer, 6*m_nbDarts*sizeof(float));
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
-
 
 void TopoRender::popColors()
 {
@@ -271,11 +260,6 @@ void TopoRender::popColors()
 	delete[] m_color_save;
 	m_color_save=NULL;
 }
-
-
-
-
-
 
 }//end namespace GL2
 

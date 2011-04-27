@@ -21,21 +21,22 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #ifndef _TUTO3_H_
 #define _TUTO3_H_
 
 #include "Utils/qtSimple.h"
 
 // forward definition (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; class ShaderColorPerVertex; } }
 
 using namespace CGoGN ;
+
 /**
  * A class for a little interface and rendering
  */
-
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
@@ -53,7 +54,8 @@ public:
 
 	bool m_sync;
 
-	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL), m_sync(false) {}
+	MyQT() : m_render(NULL), m_positionVBO(NULL), m_shader(NULL), m_sync(false)
+	{}
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();

@@ -49,7 +49,7 @@ namespace GL1
 {
 
 enum RenderType { NO_LIGHT=1, LINE, FLAT, SMOOTH };
-enum RenderPrimitives { NONE=0, TRIANGLES=3, QUADS=4, POLYGONS=5, TRIFAN=6};
+enum RenderPrimitives { NONE=0, TRIANGLES=3, QUADS=4, POLYGONS=5, TRIFAN=6 };
 
 /**
 * @param the_map the map to render

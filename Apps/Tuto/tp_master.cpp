@@ -49,10 +49,8 @@
 
 #include "Utils/drawer.h"
 
-
 /// pour simplifier l'ecriture du code
 using namespace CGoGN;
-
 
 /// definition de la structure qui decrit le type de carte utilise
 
@@ -93,10 +91,6 @@ Dart d_maison;
 ///
 ///  Creer un face: newOrientedFace(nb_cotes); renvoit un Dart
 ///
-
-
-
-
 
 
 ///  Fonction Carre: construit un carre et renvoit un brin
@@ -347,8 +341,8 @@ void MyQT::cb_initGL()
 	m_shader2 = new Utils::ShaderSimpleColor();
 	m_shader2->setAttributePosition(m_positionVBO);
 	m_shader2->setColor(Geom::Vec4f(0.,0.1,0.,0.));
-	registerRunning(m_shader);
-	registerRunning(m_shader2);
+	registerShader(m_shader);
+	registerShader(m_shader2);
 }
 
 

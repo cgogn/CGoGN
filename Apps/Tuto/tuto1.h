@@ -21,18 +21,17 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef TUTO1
-#define TUTO1
 
+#ifndef _TUTO1_
+#define _TUTO1_
 
 #include <iostream>
-
 
 #include "Utils/qtSimple.h"
 #include "Utils/cgognStream.h"
 
 // forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 
@@ -41,10 +40,10 @@ using namespace CGoGN ;
 /**
  * A class for a little interface and rendering
  */
-
-class MyQT: public Utils::QT::SimpleQT
+class MyQT : public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public:
 	// render
 	Algo::Render::GL2::MapRender* m_render;
@@ -55,25 +54,22 @@ public:
 	// shader basic
 	Utils::ShaderSimpleColor* m_shader;
 
-	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL) {}
+	MyQT() : m_render(NULL), m_positionVBO(NULL), m_shader(NULL)
+	{}
 
 	// callbacks of simpleQT to overdefine:
-	void cb_redraw();
-
 	void cb_initGL();
+
+	void cb_redraw();
 
 	void cb_keyPress(int code);
 
-	void cb_New() { CGoGNout << "New ..."<< CGoGNendl;}
-	void cb_Save() { CGoGNout << "Rien a sauver ..."<< CGoGNendl;
-}
+	void cb_New() { CGoGNout << "New ..." << CGoGNendl; }
+	void cb_Save() { CGoGNout << "Rien a sauver ..." << CGoGNendl; }
 
 	// callbacks (slots) locally defined
 public slots:
-	void menu_slot1() { CGoGNout << "Exemple de menu"<< CGoGNendl; }
-
-
+	void menu_slot1() { CGoGNout << "Exemple de menu" << CGoGNendl; }
 };
 
 #endif
-

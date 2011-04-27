@@ -26,7 +26,6 @@ protected:
 	 * size of buffer in number of elements
 	 */
 	unsigned int m_nb;
-	
 
 	/**
 	 * buffer
@@ -37,7 +36,7 @@ public:
 	/**
 	 * size of buffer in
 	 */
-	 ConvertAttrib():m_size(0),m_nb(0),m_buffer(NULL) {}
+	 ConvertAttrib() : m_size(0),m_nb(0),m_buffer(NULL) {}
 
 	/**
 	 * size of buffer in
@@ -47,7 +46,7 @@ public:
 	/**
 	 * set the number of element to convert & reserve memory for buffer
 	 */
-	virtual void reserve(unsigned int nb)=0;
+	virtual void reserve(unsigned int nb) = 0;
 
 	/**
 	 * release memory buffer ( and set ptr to null)
@@ -57,31 +56,28 @@ public:
 	/**
 	 * convert a table to tbe buffer
 	 */
-	virtual void convert(const void* ptrIn)=0;
+	virtual void convert(const void* ptrIn) = 0;
 
 	/**
 	 * get the buffer (void*)
 	 */
-	void* buffer() { return m_buffer;}
+	void* buffer() { return m_buffer; }
 
 	/**
 	 * get the size of buffer in bytes
 	 */
-	unsigned int sizeBuffer() { return m_size;}
+	unsigned int sizeBuffer() { return m_size; }
 
 	/**
 	 * get the size of buffer in bytes
 	 */
-	unsigned int sizeElt() { return m_size/m_nb;}
+	unsigned int sizeElt() { return m_size/m_nb; }
 
 	/**
 	 * get the size of buffer in bytes
 	 */
-	unsigned int nbElt() { return m_nb;}
-
+	unsigned int nbElt() { return m_nb; }
 };
-
-
 
 
 /**
@@ -94,21 +90,25 @@ protected:
 	TYPE_OUT* m_typedBuffer; 
 
 public:
-	~ConvertSimpleCast(){ if (m_typedBuffer) delete[] m_typedBuffer;}
+	~ConvertSimpleCast()
+	{
+		if (m_typedBuffer)
+			delete[] m_typedBuffer;
+	}
 
 	void release()
 	{
 		if (m_typedBuffer)
 		{
 			delete[] m_typedBuffer;
-			m_typedBuffer=NULL;
-			m_buffer=NULL;
+			m_typedBuffer = NULL;
+			m_buffer = NULL;
 		}
 	}
 	
 	void reserve(unsigned int nb)
 	{
-		m_nb=nb;							// store number of elements
+		m_nb = nb;							// store number of elements
 		m_typedBuffer = new TYPE_OUT[nb];	// allocate buffer typed (not possible to delete void*)
 		m_buffer = m_typedBuffer;			// store void* casted ptr
 		m_size = nb*sizeof(TYPE_OUT);		// store size of buffer in bytes
@@ -120,12 +120,10 @@ public:
 		const TYPE_IN* typedIn = reinterpret_cast<const TYPE_IN*>(ptrIn);
 		TYPE_OUT* typedOut = reinterpret_cast<TYPE_OUT*>(m_buffer);
 		// compute conversion
-		for (int i=0; i <m_nb; ++i)
+		for (int i = 0; i < m_nb; ++i)
 			*typedOut++ = TYPE_OUT(*typedIn++);
 	}
 };
-
-
 
 
 /**
@@ -140,21 +138,25 @@ protected:
 	TYPE_OUT* m_typedBuffer;
 	
 public:
-	~ConvertNormalized(){ if (m_typedBuffer) delete[] m_typedBuffer;}
+	~ConvertNormalized()
+	{
+		if (m_typedBuffer)
+			delete[] m_typedBuffer;
+	}
 
 	void release()
 	{
 		if (m_typedBuffer)
 		{
 			delete[] m_typedBuffer;
-			m_typedBuffer=NULL;
-			m_buffer=NULL;
+			m_typedBuffer = NULL;
+			m_buffer = NULL;
 		}
 	}
 	
 	void reserve(unsigned int nb)
 	{
-		m_nb=nb;							// store number of elements
+		m_nb = nb;							// store number of elements
 		m_typedBuffer = new TYPE_OUT[nb];	// allocate buffer
 		m_buffer = m_typedBuffer;			// store void* casted ptr
 		m_size = nb*sizeof(TYPE_OUT);		// store size of buffer in bytes
@@ -169,12 +171,13 @@ public:
 		// compute conversion
 		for (int i=0; i <m_nb; ++i)
 		{
-			TYPE_OUT val =(float(*typedIn++) - TYPE_OUT(std::numeric_limits<TYPE_IN>::min()));
+			TYPE_OUT val = (float(*typedIn++) - TYPE_OUT(std::numeric_limits<TYPE_IN>::min()));
 			val /= TYPE_OUT(std::numeric_limits<TYPE_IN>::max()) - TYPE_OUT(std::numeric_limits<TYPE_IN>::min());
 			*typedOut++ = val;
 		}
 	}
 };
+
 
 /**
 * Convertit un type scalaire (char, short, int, float ..)
@@ -188,24 +191,29 @@ protected:
 	float* m_typedBuffer;
 	TYPE_IN m_min;
 	TYPE_IN m_diff;
+
 public:
-	ConvertFloatToRGBf(TYPE_IN min, TYPE_IN max): m_min(min), m_diff(max-min) {}
+	ConvertFloatToRGBf(TYPE_IN min, TYPE_IN max) : m_min(min), m_diff(max-min) {}
 	
-	~ConvertFloatToRGBf(){ if (m_typedBuffer) delete[] m_typedBuffer;}
+	~ConvertFloatToRGBf()
+	{
+		if (m_typedBuffer)
+			delete[] m_typedBuffer;
+	}
 
 	void release()
 	{
 		if (m_typedBuffer)
 		{
 			delete[] m_typedBuffer;
-			m_typedBuffer=NULL;
-			m_buffer=NULL;
+			m_typedBuffer = NULL;
+			m_buffer = NULL;
 		}
 	}
 	
 	void reserve(unsigned int nb)
 	{
-		m_nb=nb;							// store number of elements
+		m_nb = nb;							// store number of elements
 		m_typedBuffer = new float[3*nb];	// allocate buffer
 		m_buffer = m_typedBuffer;			// store void* casted ptr
 		m_size = 3*nb*sizeof(float);		// store size of buffer in bytes
@@ -222,7 +230,7 @@ public:
 		{
 			float h = (360.0f /(m_diff))*(*typedIn++ - m_min); // normalize in 0-360
 			int hi = int(floor(h / 60.0f)) % 6;
-			float f =  (h / 60.0) - floor(h / 60.0);
+			float f = (h / 60.0) - floor(h / 60.0);
 			float q = 1.0f - f;
 			switch(hi)
 			{

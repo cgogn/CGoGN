@@ -42,7 +42,6 @@
 
 #include "Utils/cgognStream.h"
 
-
 using namespace CGoGN ;
 
 struct PFP: public PFP_STANDARD
@@ -57,7 +56,6 @@ SelectorTrue allDarts ;
 PFP::TVEC3 position ;
 PFP::TVEC3 normal ;
 AttributeHandler<Geom::Vec4f> color ;
-
 
 void MyQT::cb_initGL()
 {
@@ -80,15 +78,12 @@ void MyQT::cb_initGL()
 	m_shader2 = new Utils::ShaderFlat();
 	m_shader2->setAttributePosition(m_positionVBO);
 
-	registerRunning(m_shader);
-	registerRunning(m_shader2);
-
+	registerShader(m_shader);
+	registerShader(m_shader2);
 }
-
 
 void MyQT::cb_redraw()
 {
-
 	if(render_topo)
 	{
 		m_render_topo->drawTopo();
@@ -103,7 +98,6 @@ void MyQT::cb_redraw()
 		m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
-
 }
 
 
@@ -120,7 +114,6 @@ void MyQT::cb_keyPress(int code)
 		render_topo = !render_topo;
 		updateGL();
 		break;
-
 	}
 }
 
@@ -129,8 +122,6 @@ void MyQT::button_compile()
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
 	QString st2 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->fragmentEdit->toPlainText();
 	QString st3 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->geometryEdit->toPlainText();
-
-
 
 	m_shader2->reloadVertexShaderFromMemory(st1.toStdString().c_str());
 	m_shader2->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
@@ -146,12 +137,9 @@ void MyQT::slider_explode(int x)
 	updateGL();
 }
 
-
-
 int main(int argc, char **argv)
 {
 	/// Utilisation des Marker
-
 	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
 
 	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
@@ -201,7 +189,6 @@ int main(int argc, char **argv)
 	cm.mark(d3);
 	cm.unmarkAll();
 
-
 	// interface:
 	QApplication app(argc, argv);
 	MyQT sqt;
@@ -224,7 +211,6 @@ int main(int argc, char **argv)
 	sqt.setCallBack( dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
 	sqt.setCallBack( dock.explodeSlider, SIGNAL(valueChanged(int)), SLOT(slider_explode(int)) );
 
-
 	// show 1 pour GL context
 	sqt.show();
 
@@ -238,7 +224,6 @@ int main(int argc, char **argv)
 
 	sqt.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
 
-
 	dock.vertexEdit->setPlainText(QString(sqt.m_shader2->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(sqt.m_shader2->getFragmentShaderSrc()));
 	dock.geometryEdit->setPlainText(QString(sqt.m_shader2->getGeometryShaderSrc()));
@@ -250,6 +235,4 @@ int main(int argc, char **argv)
 
 	// et on attend la fin.
 	return app.exec();
-
-
 }

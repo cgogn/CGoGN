@@ -22,8 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef __TUTO_OGL3_
-#define __TUTO_OGL3_
+#ifndef _TUTO_OGL3_
+#define _TUTO_OGL3_
 
 #include <iostream>
 
@@ -35,12 +35,11 @@
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Geometry/normal.h"
 
-
 #include "Algo/Render/GL2/mapRender.h"
 #include "Geometry/vector_gen.h"
 
-
 #include "Utils/shaderPhong.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QMainWindow>
@@ -57,15 +56,15 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2<Map2> MAP;
 };
 
-
-
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
+
 public slots:
 	void sliderFocale_cb(int x);
 	void color_cb();
 	void pervertex_cb(bool val);
+
 public:
 	MyQT();
 	~MyQT();
@@ -78,12 +77,9 @@ public:
 	Utils::VBO* normalVBO;
 	Utils::VBO* colorVBO;
 
-
 	Utils::ShaderPhong* shader1;
 	Utils::GLSLShader* currentShader;
 	void cb_initGL();
-
-
 };
 
 #endif

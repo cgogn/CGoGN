@@ -22,14 +22,15 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_CPV_
-#define __CGOGN_SHADER_CPV_
+#ifndef __CGOGN_SHADER_CPV__
+#define __CGOGN_SHADER_CPV__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -46,15 +47,15 @@ protected:
     void restoreUniformsAttribs();
 
 public:
-
     ShaderColorPerVertex();
 
 	unsigned int setAttributePosition(VBO* vbo);
 
 	unsigned int setAttributeColor(VBO* vbo);
-
 };
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

@@ -22,56 +22,59 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/pointLine.h"
+#include <GL/glew.h>
+#include "Utils/shaderVectorPerVertex.h"
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-
-std::string PointLine::vertexShaderText =
-"ATTRIBUTE vec3 VertexPosition;\n"
-"ATTRIBUTE vec3 Data\n;"
-"VARYING_VERT vec3 DataVector;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = vec4(VertexPosition,1.0);\n"
-"	DataVector = Data;\n"
-"}";
-
-
-
-std::string PointLine::geometryShaderText =
-"uniform float scale;\n"
-"uniform mat4 ModelViewProjectionMatrix;\n"
-"VARYING_IN vec3 DataVector[];\n"
-"void main()\n"
-"{\n"
-"	gl_Position = ModelViewProjectionMatrix *  POSITION_IN(0);\n"
-"	EmitVertex();\n"
-"	vec4 P2 = POSITION_IN(0)+vec4(scale*DataVector[0],0.0);\n"
-"	gl_Position = ModelViewProjectionMatrix * P2;\n"
-"	EmitVertex();\n"
-"	EndPrimitive();\n"
-"}";
+std::string ShaderVectorPerVertex::vertexShaderText =
+		"ATTRIBUTE vec3 VertexPosition;\n"
+		"ATTRIBUTE vec3 VertexVector;\n"
+		"VARYING_VERT vec3 VectorAttrib;\n"
+		"INVARIANT_POS;\n"
+		"void main ()\n"
+		"{\n"
+		"	VectorAttrib = VertexVector;\n"
+		"	gl_Position = vec4(VertexPosition, 1.0);\n"
+		"}";
 
 
-std::string PointLine::fragmentShaderText =
-"uniform vec3 color;\n"
-"void main(void)\n"
-"{\n"
-"	gl_FragColor = vec4(color,0.0);\n"
-"}";
+std::string ShaderVectorPerVertex::geometryShaderText =
+		"uniform float vectorScale;\n"
+		"uniform mat4 ModelViewProjectionMatrix;\n"
+		"VARYING_IN vec3 VectorAttrib[];\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = ModelViewProjectionMatrix * POSITION_IN(0);\n"
+		"	EmitVertex();\n"
+		"	gl_Position = ModelViewProjectionMatrix * (POSITION_IN(0) + vec4(VectorAttrib[0] * vectorScale, 0.0));\n"
+		"	EmitVertex();\n"
+		"	EndPrimitive();\n"
+		"}";
 
 
+std::string ShaderVectorPerVertex::fragmentShaderText =
+		"PRECISON;\n"
+		"uniform vec4 vectorColor;\n"
+		"FRAG_OUT_DEF;\n"
+		"void main()\n"
+		"{\n"
+		"	gl_FragColor = vectorColor;\n"
+		"}";
 
-PointLine::PointLine(float scale, const Geom::Vec3f& color)
+
+ShaderVectorPerVertex::ShaderVectorPerVertex() :
+	m_scale(1.0f),
+	m_color(Geom::Vec4f(1.0f, 0.0f, 0.0f, 0.0f))
 {
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("points","line_strip",4);
+	std::string glxgeom = GLSLShader::defines_Geom("points", "line_strip", 4);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
@@ -79,42 +82,59 @@ PointLine::PointLine(float scale, const Geom::Vec3f& color)
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP);
 
+	// get and fill uniforms
 	bind();
-	m_uniform_scale = glGetUniformLocation(program_handler(),"scale");
-	m_uniform_color = glGetUniformLocation(program_handler(),"color");
-	glUniform1f(m_uniform_scale, scale);
-	glUniform3fv(m_uniform_color, 1, color.data());
-	unbind();
-
+	getLocations();
+	sendParams();
 }
 
-
-unsigned int PointLine::setAttributePosition(VBO* vbo)
+void ShaderVectorPerVertex::getLocations()
 {
+	m_uniform_scale = glGetUniformLocation(this->program_handler(), "vectorScale");
+	m_uniform_color = glGetUniformLocation(this->program_handler(), "vectorColor");
+}
+
+void ShaderVectorPerVertex::sendParams()
+{
+	glUniform1f(m_uniform_scale, m_scale);
+	glUniform4fv(m_uniform_color, 1, m_color.data());
+}
+
+void ShaderVectorPerVertex::setScale(float scale)
+{
+	bind();
+	glUniform1f(m_uniform_scale, scale);
+	m_scale = scale;
+}
+
+void ShaderVectorPerVertex::setColor(const Geom::Vec4f& color)
+{
+	bind();
+	glUniform3fv(m_uniform_color, 1, color.data());
+	m_color = color;
+}
+
+unsigned int ShaderVectorPerVertex::setAttributePosition(VBO* vbo)
+{
+	m_vboPos = vbo;
 	return bindVA_VBO("VertexPosition", vbo);
 }
 
-
-unsigned int PointLine::setAttributeData(VBO* vbo)
+unsigned int ShaderVectorPerVertex::setAttributeVector(VBO* vbo)
 {
-	return bindVA_VBO("Data", vbo);
+	m_vboVec = vbo;
+	return bindVA_VBO("VertexVector", vbo);
 }
 
-
-
-void PointLine::setScale(float scale)
+void ShaderVectorPerVertex::restoreUniformsAttribs()
 {
-	bind();
-	glUniform1f(m_uniform_scale, scale);
-	unbind();
+	getLocations();
+	sendParams();
+
+	bindVA_VBO("VertexPosition", m_vboPos);
+	bindVA_VBO("VertexVector", m_vboVec);
 }
 
-void PointLine::setColor(const Geom::Vec3f& color)
-{
-	bind();
-	glUniform3fv(m_uniform_color, 1, color.data());
-	unbind();
-}
+} // namespace Utils
 
-}
-}
+} // namespace CGoGN

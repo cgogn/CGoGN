@@ -21,18 +21,17 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef TUTO_MT_H
-#define TUTO_MT_T
 
+#ifndef TUTO_MT_H
+#define TUTO_MT_H
 
 #include <iostream>
-
 
 #include "Utils/qtSimple.h"
 #include "Utils/cgognStream.h"
 
 // forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 
@@ -41,13 +40,13 @@ using namespace CGoGN ;
 /**
  * A class for a little interface and rendering
  */
-
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
-public:
 
-	MyQT() {}
+public:
+	MyQT()
+	{}
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();
@@ -58,12 +57,9 @@ public:
 
 	void cb_New();
 
-	// callbacks (slots) locally defined
+// callbacks (slots) locally defined
 public slots:
 	void menu_slot1();
-
-
 };
 
 #endif
-

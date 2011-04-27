@@ -30,23 +30,21 @@
 #define DBG_MAX_LEVEL 5
 #endif
 
-
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 
-//forward defs
-namespace CGoGN { namespace Utils { namespace QT {class SimpleQT; } } }
+//forward definitions
+namespace CGoGN { namespace Utils { namespace QT { class SimpleQT; } } }
 class QTextEdit;
-
-
-
 
 namespace CGoGN
 {
+
 namespace  CGoGNStream
 {
+
 /**
  * set all outputs to std
  */
@@ -55,7 +53,7 @@ void allToStd(bool yes = true);
 /**
  * set all outputs to file
  */
-void allToFile(const std::string& filename );
+void allToFile(const std::string& filename);
 
 /**
  * set all outputs to status bar of Qt interface
@@ -72,13 +70,15 @@ void allToConsole(Utils::QT::SimpleQT* sqt);
  */
 void allToBuffer(std::stringstream* ss);
 
-
-enum drawingType {	STDOUT = 1,
-					STDERR = 2,
-					FILEOUT = 4,
-					QTSTATUSBAR = 8,
-					QTCONSOLE = 16,
-					SSBUFFER = 32};
+enum drawingType
+{
+	STDOUT = 1,
+	STDERR = 2,
+	FILEOUT = 4,
+	QTSTATUSBAR = 8,
+	QTCONSOLE = 16,
+	SSBUFFER = 32
+};
 
 class Special
 {};
@@ -122,7 +122,7 @@ public:
 	/**
 	 * set output to file
 	 */
-	void toFile(const std::string& filename );
+	void toFile(const std::string& filename);
 
 	/**
 	 * set output to status bar of Qt interface
@@ -168,18 +168,17 @@ template<int LEVEL>
 class Err: public Out<LEVEL>
 {
 public:
-	Err() {this->m_code=1;}
+	Err() { this->m_code = 1; }
 };
 
 template<int LEVEL>
 class Dbg: public Out<LEVEL>
 {
 public:
-	Dbg() {this->m_code=100+LEVEL;}
+	Dbg() { this->m_code = 100 + LEVEL; }
 };
 
-
-}
+} // namespace CGoGNStream
 
 // glocal stream definitions
 extern CGoGNStream::Out<0> CGoGNout;
@@ -189,7 +188,7 @@ extern CGoGNStream::Dbg<2> CGoGNdbg2;
 extern CGoGNStream::Dbg<3> CGoGNdbg3;
 extern CGoGNStream::Special CGoGNendl;
 
-}
+} // namespace CGoGN
 
 #include "Utils/cgognStream.hpp"
 

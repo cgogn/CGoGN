@@ -46,16 +46,23 @@ inline Dart GenericMap::newDart()
 inline void GenericMap::deleteDart(Dart d)
 {
 	m_attribs[DART_ORBIT].removeLine(d.index) ;
+	for (unsigned int t = 0; t < m_nbThreads; ++t)
+		m_markerTables[DART_ORBIT][t]->operator[](d.index).clear() ;
+
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if (m_embeddings[orbit])
 		{
 			unsigned int emb = (*m_embeddings[orbit])[d.index] ;
 			if(emb != EMBNULL)
-				m_attribs[orbit].unrefLine(emb) ;
+			{
+				if(m_attribs[orbit].unrefLine(emb))
+				{
+					for (unsigned int t = 0; t < m_nbThreads; ++t)
+						m_markerTables[orbit][t]->operator[](emb).clear() ;
+				}
+			}
 		}
-		for (unsigned int t=0; t<m_nbThreads; ++t)
-			m_markerTables[DART_ORBIT][t]->operator[](d.index).clear() ;
 	}
 }
 
@@ -173,7 +180,7 @@ inline unsigned int GenericMap::newCell(unsigned int orbit)
 inline void GenericMap::embedOrbit(unsigned int orbit, Dart d, unsigned int em)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	FunctorSetEmb<GenericMap> fsetemb(*this,orbit,em);
+	FunctorSetEmb<GenericMap> fsetemb(*this, orbit, em);
 	foreach_dart_of_orbit(orbit, d, fsetemb);
 }
 

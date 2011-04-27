@@ -36,8 +36,6 @@
 
 #include "tuto2.h"
 
-
-
 using namespace CGoGN ;
 
 struct PFP: public PFP_STANDARD
@@ -46,7 +44,6 @@ struct PFP: public PFP_STANDARD
 	typedef Map2 MAP;
 };
 
-
 PFP::MAP myMap;
 
 SelectorTrue allDarts;
@@ -54,7 +51,6 @@ SelectorTrue allDarts;
 PFP::TVEC3 position ;
 PFP::TVEC3 normal ;
 AttributeHandler<Geom::Vec4f> color ;
-
 
 void MyQT::cb_initGL()
 {
@@ -74,14 +70,11 @@ void MyQT::cb_initGL()
 	m_color = Geom::Vec4f(0.,1.,0.,0.);
 	m_shader->setColor(m_color);
 
-	registerRunning(m_shader);
+	registerShader(m_shader);
 
-	m_with_lines=true;
-	m_line_width=4.0;
-
-
+	m_with_lines = true;
+	m_line_width = 4.0;
 }
-
 
 void MyQT::cb_redraw()
 {
@@ -106,14 +99,11 @@ void MyQT::cb_redraw()
 	}
 }
 
-
 void MyQT::lines_slot(bool x)
 {
 	m_with_lines = x;
 	updateGL();
 }
-
-
 
 void MyQT::line_width_slot(int x)
 {
@@ -121,8 +111,6 @@ void MyQT::line_width_slot(int x)
 	m_line_width=x;
 	updateGL();
 }
-
-
 
 void MyQT::color_slot()
 {
@@ -135,12 +123,11 @@ void MyQT::color_slot()
 	}
 	else
 	{
-		CGoGNout << "Cancel Color"<< CGoGNendl;
+		CGoGNout << "Cancel Color" << CGoGNendl;
 	}
 }
 
 // Algorithme qui parcours une carte et affiche l'attribut position de chaque brin
-//
 template<typename PFP>
 void TestDeParcoursAFF(typename PFP::MAP& m, MapBrowser& mb, const typename PFP::TVEC3& pos)
 {
@@ -151,7 +138,6 @@ void TestDeParcoursAFF(typename PFP::MAP& m, MapBrowser& mb, const typename PFP:
 	}
 }
 
-
 int main(int argc, char **argv)
 {
 	/// Utilisation des MapBrowsers
@@ -160,7 +146,7 @@ int main(int argc, char **argv)
 
 	Dart d2 = myMap.newOrientedFace(3);
 	Dart d3 = myMap.newOrientedFace(4);
-	myMap.sewFaces(d2,d3);
+	myMap.sewFaces(d2, d3);
 
 	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
 
@@ -176,11 +162,10 @@ int main(int argc, char **argv)
 	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
 	d3 = myMap.phi1(d3);
 
+
 	// MapBrowser: la carte elle meme
-	CGoGNout << "Parcours avec la carte"<<CGoGNendl;
+	CGoGNout << "Parcours avec la carte" << CGoGNendl;
 	TestDeParcoursAFF<PFP>(myMap, myMap, position);
-
-
 
 	// MapBrowserLinkedAuto
 	// sous-carte dans une liste avec attribut gere par le browser
@@ -194,7 +179,6 @@ int main(int argc, char **argv)
 
 	// et on parcours la sous-carte avec ce browser
 	TestDeParcoursAFF<PFP>(myMap, mbl, position);
-
 
 
 	// MapBrowserLinkedAttr
@@ -215,7 +199,6 @@ int main(int argc, char **argv)
 
 	// et on parcours la sous-carte avec ce browser
 	TestDeParcoursAFF<PFP>(myMap, mbl2, position);
-
 
 
 	// MapBrowserSelector
@@ -248,7 +231,6 @@ int main(int argc, char **argv)
 	sqt.setCallBack( dock.color_button , SIGNAL(pressed()), SLOT(color_slot()) );
 	sqt.setCallBack( dock.dial_line_width , SIGNAL(valueChanged(int)), SLOT(line_width_slot(int)) );
 
-
 	// message d'aide
 	sqt.setHelpMsg("Second Tuto");
 
@@ -278,5 +260,4 @@ int main(int argc, char **argv)
 
 	// et on attend la fin.
 	return app.exec();
-
 }

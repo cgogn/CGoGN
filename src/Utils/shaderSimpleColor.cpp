@@ -27,6 +27,7 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -52,8 +53,8 @@ std::string ShaderSimpleColor::fragmentShaderText =
 
 ShaderSimpleColor::ShaderSimpleColor()
 {
-	// get choose GL defines (2 or 3)
-	// ans compile shaders
+	// chose GL defines (2 or 3)
+	// and compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
@@ -65,18 +66,16 @@ ShaderSimpleColor::ShaderSimpleColor()
 	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
 
 	//Default values
-	Geom::Vec4f color(0.1f,0.9f,0.1f,0.0f);
+	Geom::Vec4f color(0.1f, 0.9f, 0.1f, 0.0f);
 	setColor(color);
-
 }
 
 void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
 {
 	m_color = color;
 	bind();
-	glUniform4fv(m_unif_color,1, color.data());
+	glUniform4fv(m_unif_color, 1, color.data());
 }
-
 
 unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
 {
@@ -86,13 +85,12 @@ unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
 
 void ShaderSimpleColor::restoreUniformsAttribs()
 {
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
+	m_unif_color = glGetUniformLocation(this->program_handler(), "color");
 	bind();
-	glUniform4fv(m_unif_color,1, m_color.data());
+	glUniform4fv(m_unif_color, 1, m_color.data());
 	bindVA_VBO("VertexPosition", m_vboPos);
 }
 
+} // namespace Utils
 
-}
-}
-
+} // namespace CGoGN

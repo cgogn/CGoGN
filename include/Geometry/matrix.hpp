@@ -405,10 +405,11 @@ bool Matrix<M,N,T>::operator==(const Matrix<M,N,T>& m) const {
 template <unsigned int M, unsigned int N, typename T>
 std::ostream& operator<<(std::ostream& out, const Matrix<M,N,T>& m)
 {
-	for(unsigned int i = 0; i < M; ++i) {
+	for(unsigned int i = 0; i < M; ++i)
+	{
 		for(unsigned int j = 0; j < N; ++j)
 			out << m(i,j) << " " ;
-		std::cout << std::endl ;
+		out << std::endl ;
 	}
 	return out ;
 }

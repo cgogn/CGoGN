@@ -22,14 +22,15 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_FLAT_
-#define __CGOGN_SHADER_FLAT_
+#ifndef __CGOGN_SHADER_FLAT__
+#define __CGOGN_SHADER_FLAT__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -72,9 +73,10 @@ public:
 	void setParams(float explode, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos);
 
 	void setAttributePosition(VBO* vbo);
-
 };
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

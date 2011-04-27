@@ -40,19 +40,15 @@
 #include <vector>
 #include <set>
 
-
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-
 class GLSLShader
 {
-
-
 public:
-
 	struct VAStr
 	{
 		int va_id;
@@ -61,7 +57,6 @@ public:
 //		unsigned int size;
 	};
 
-
 	/**
 	 * enum of supported shader type
 	 */
@@ -69,10 +64,9 @@ public:
 
 	static unsigned int CURRENT_OGL_VERSION;
 
-	static std::set< std::pair<void*, GLSLShader*> > m_registredRunning;
+	static std::set< std::pair<void*, GLSLShader*> > m_registeredShaders;
 
 protected:
-
 	static std::string DEFINES_GL2;
 
 	static std::string DEFINES_GL3;
@@ -80,7 +74,6 @@ protected:
 	static std::string* DEFINES_GL;
 
 	static std::string defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert);
-
 
 	/**
 	 * handle of vertex shader
@@ -106,12 +99,10 @@ protected:
 	 */
 	GLhandleARB m_program_object;
 
-
 	GLint m_uniMat_Proj;
 	GLint m_uniMat_Model;
 	GLint m_uniMat_ModelProj;
 	GLint m_uniMat_Normal;
-
 
 	char* m_vertex_shader_source;
 	char* m_fragment_shader_source;
@@ -120,13 +111,11 @@ protected:
 	GLint m_geom_inputPrimitives;
 	GLint m_geom_outputPrimitives;
 
-
 	/**
 	 * a set of pair VA_id / VBO_id
 	 */
 //	std::vector<pair<int,unsigned int> > m_va_vbo_binding;
 	std::vector<VAStr> m_va_vbo_binding;
-
 
 	static std::vector<std::string> m_pathes;
 
@@ -177,7 +166,6 @@ protected:
 	 */
 	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
 
-
 	/**
 	 * get log after compiling
 	 * @param obj what log do you want ?
@@ -191,15 +179,12 @@ public:
 	 */
 	GLSLShader();
 
-
 	/**
 	 * destructor
 	 */
 	virtual ~GLSLShader();
 
-
 	static void setCurrentOGLVersion(unsigned int version);
-
 
 	/*
 	 * search file in different path
@@ -226,14 +211,12 @@ public:
 	 */
 	static bool	isGL3Supported();
 
-
 	static bool init();
 
+	static void registerShader(void* ptr, GLSLShader* shader);
 
-	static void registerRunning(GLSLShader* ptr);
+	static void unregisterShader(void* ptr, GLSLShader* shader);
 
-	static void unregisterRunning(GLSLShader* ptr);
-//
 //	static void updateMatricesRunningShaders(const glm::mat4& projection, const glm::mat4& modelview);
 
 	/**
@@ -252,7 +235,6 @@ public:
 	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
 	 */
 	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLE_STRIP);
-
 
 	/**
 	 * load shaders (compile and link)
@@ -273,11 +255,9 @@ public:
 	 */
 	bool loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive);
 
-
-	const char* getVertexShaderSrc() {return m_vertex_shader_source;}
-	const char* getFragmentShaderSrc() {return m_fragment_shader_source;}
-	const char* getGeometryShaderSrc() {return m_geom_shader_source;}
-
+	const char* getVertexShaderSrc() { return m_vertex_shader_source; }
+	const char* getFragmentShaderSrc() { return m_fragment_shader_source; }
+	const char* getGeometryShaderSrc() { return m_geom_shader_source; }
 
 	bool reloadVertexShaderFromMemory(const char* vs);
 
@@ -292,8 +272,6 @@ public:
 	 */
 	bool link();
 
-
-
 	inline bool		isCreated();
 
 	bool			isBinded();
@@ -307,20 +285,15 @@ public:
 	 */
 	virtual void restoreUniformsAttribs() {CGoGNerr << "Warning restoreUniformsAttribs not implemented"<< CGoGNendl;}
 
-
 	/**
 	 *
 	 */
 //	GLuint 	getAttribIndex( char* attribName );
-
 	
 	/**
 	 * get handler of program for external use og gl functions
 	 */
 	GLuint program_handler() { return m_program_object;}
-	
-
-
 
 	/**
 	 * check shader validity width official GLSL syntax
@@ -338,7 +311,6 @@ public:
 	bool checkShader(int shaderType);
 
 public:
-
 	/**
 	 * set uniform shader float variable
 	 * @warning practical but less efficient that storing id (get with glGetUniformLocation) and use glUniform*fvARB
@@ -389,10 +361,7 @@ public:
 	/**
 	 * get binding VA VBO
 	 */
-	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding;}
-
-
-
+	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding; }
 
 	void bindAttrib(unsigned int att, const char* name) const;
 
@@ -426,24 +395,24 @@ template<unsigned int NB>
 void GLSLShader::setuniformf( const char* name, const float* val)
 {
 	GLint uni = glGetUniformLocationARB(m_program_object,name);
-	if (uni>=0)
+	if (uni >= 0)
 	{
 		switch(NB)
 		{
 		case 1:
-			glUniform1fvARB( uni, 1, val) ;
+			glUniform1fvARB(uni, 1, val) ;
 			break;
 		case 2:
-			glUniform2fvARB( uni, 1, val) ;
+			glUniform2fvARB(uni, 1, val) ;
 			break;
 		case 3:
-			glUniform3fvARB( uni, 1, val) ;
+			glUniform3fvARB(uni, 1, val) ;
 			break;
 		case 4:
-			glUniform4fvARB( uni, 1, val) ;
+			glUniform4fvARB(uni, 1, val) ;
 			break;
 		case 16:
-			glUniformMatrix4fv(uni, 1 , false, val);
+			glUniformMatrix4fv(uni, 1, false, val);
 			break;
 		}
 	}
@@ -458,30 +427,23 @@ void GLSLShader::setuniformi( const char* name, const int* val)
 		switch(NB)
 		{
 		case 1:
-			glUniform1ivARB( uni, 1, val) ;
+			glUniform1ivARB(uni, 1, val) ;
 			break;
 		case 2:
-			glUniform2ivARB( uni, 1, val) ;
+			glUniform2ivARB(uni, 1, val) ;
 			break;
 		case 3:
-			glUniform3ivARB( uni, 1, val) ;
+			glUniform3ivARB(uni, 1, val) ;
 			break;
 		case 4:
-			glUniform4ivARB( uni, 1, val) ;
+			glUniform4ivARB(uni, 1, val) ;
 			break;
 		}
 	}
 }
 
-
-
-
-
-
 } //namespace Utils
+
 } //namespace CGoGN
-
-
-
 
 #endif

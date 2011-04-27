@@ -23,12 +23,14 @@
  *******************************************************************************/
 
 #ifndef __QT_UI_H__
-#define ___QT_UI_H__
+#define __QT_UI_H__
 
 namespace CGoGN
 {
+
 namespace Utils
 {
+
 namespace QT
 {
 
@@ -38,11 +40,8 @@ public:
 	uiDockInterface() { setupUi(this); }
 };
 
-
 }
 }
 }
-
 
 #endif
-

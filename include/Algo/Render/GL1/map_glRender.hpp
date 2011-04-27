@@ -192,8 +192,6 @@ void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& 
 	glEnd();
 }
 
-
-
 } // namespace GL1
 
 } // namespace Render

@@ -37,8 +37,8 @@
 
 #include "Utils/vbo.h"
 
-// forward def
-namespace CGoGN { namespace Utils { class GLSLShader;} }
+// forward definition
+namespace CGoGN { namespace Utils { class GLSLShader; } }
 
 namespace CGoGN
 {
@@ -52,7 +52,8 @@ namespace Render
 namespace GL2
 {
 
-enum drawingType {
+enum drawingType
+{
 	TRIANGLES = 1,
 	LINES = 2,
 	POINTS = 4,
@@ -61,10 +62,11 @@ enum drawingType {
 	ERR = 32
 } ;
 
-enum bufferIndex {
-	TRIANGLE_INDICES = 0,
+enum bufferIndex
+{
+	POINT_INDICES = 0,
 	LINE_INDICES = 1,
-	POINT_INDICES = 2,
+	TRIANGLE_INDICES = 2,
 	FLAT_BUFFER = 3
 } ;
 
@@ -76,27 +78,12 @@ protected:
 	/**
 	 * vbo buffers
 	 */
-	GLuint m_VBOBuffers[4] ;
+	GLuint m_indexBuffers[4] ;
 
 	/**
-	 * number of indices of triangles
+	 * nb indices
 	 */
-	GLuint m_nbIndicesTri ;
-
-	/**
-	 * number of indices of lines
-	 */
-	GLuint m_nbIndicesLines ;
-
-	/**
-	 * number of indices of points
-	 */
-	GLuint m_nbIndicesPoints ;
-
-	/**
-	 * number of elts for flat vbo
-	 */
-	GLuint m_nbFlatElts;
+	GLuint m_nbIndices[4] ;
 
 public:
 	/**
@@ -158,19 +145,18 @@ public:
 	/**
 	 * initialization of the VBO indices primitives
 	 * computed by a traversal of the map
-	 * @param prim primitive to draw: VBO_TRIANGLES, VBO_LINES
+	 * @param prim primitive to draw: POINTS, LINES, TRIANGLES
 	 */
 	template <typename PFP>
-	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true, unsigned int thread=0) ;
+	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true, unsigned int thread = 0) ;
 
 	/**
 	 * initialization of the VBO indices primitives
 	 * using the given table
-	 * @param prim primitive to draw: VBO_TRIANGLES, VBO_LINES
+	 * @param prim primitive to draw: POINTS, LINES, TRIANGLES
 	 */
 	void initPrimitives(int prim, std::vector<GLuint>& tableIndices) ;
 
-public:
 	/**
 	 * draw the VBO (function to call in the drawing callback)
 	 */

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_PHONG_
-#define __CGOGN_SHADER_PHONG_
+#ifndef __CGOGN_SHADER_PHONG__
+#define __CGOGN_SHADER_PHONG__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
@@ -32,6 +32,7 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -44,7 +45,6 @@ protected:
 	// shader sources OGL3
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
-
 
     // uniform locations
 	GLuint m_unif_ambiant;
@@ -64,8 +64,6 @@ protected:
 	VBO* m_vboNormal;
 	VBO* m_vboColor;
 
-protected:
-
 	void getLocations();
 
 	void sendParams();
@@ -84,34 +82,35 @@ public:
 
 	void setShininess(float shininess);
 
-	void setLightPosition( Geom::Vec3f lp);
+	void setLightPosition(Geom::Vec3f lp);
 
-	const Geom::Vec4f& getAmbiant() const { return m_ambiant;}
+	const Geom::Vec4f& getAmbiant() const { return m_ambiant; }
 
-	const Geom::Vec4f& getDiffuse() const { return m_diffuse;}
+	const Geom::Vec4f& getDiffuse() const { return m_diffuse; }
 
-	const Geom::Vec4f& getSpecular() const { return m_specular;}
+	const Geom::Vec4f& getSpecular() const { return m_specular; }
 
-	float getShininess() const { return m_shininess;}
+	float getShininess() const { return m_shininess; }
 
-	const Geom::Vec3f& getLightPosition() const { return m_lightPos;}
+	const Geom::Vec3f& getLightPosition() const { return m_lightPos; }
 
 	/**
 	 * set all parameter in on call (one bind also)
 	 */
 	void setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos);
 
-
 	// attributes
-	unsigned int  setAttributePosition(VBO* vbo);
+	unsigned int setAttributePosition(VBO* vbo);
 
-	unsigned int  setAttributeNormal(VBO* vbo);
+	unsigned int setAttributeNormal(VBO* vbo);
 
-	// optionnal attributes
-	unsigned int  setAttributeColor(VBO* vbo);
+	// optional attributes
+	unsigned int setAttributeColor(VBO* vbo);
 	void unsetAttributeColor();
 };
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

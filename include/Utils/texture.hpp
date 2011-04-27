@@ -61,7 +61,7 @@ Texture<T>::Texture(std::string fileName)
 	m_height = ilGetInteger(IL_IMAGE_HEIGHT);
 	m_cpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL) / sizeof(T);
 	m_data = reinterpret_cast<T*>(ilGetData());
-	m_texName=0;
+	m_texName = 0;
 }
 
 template<typename T>
@@ -71,8 +71,8 @@ Texture<T>::Texture( T* ptr, int w, int h, int cpp)
 	m_width = w;
 	m_height = h;
 	m_cpp = cpp;
-	m_ilName =0;
-	m_texName=0;
+	m_ilName = 0;
+	m_texName = 0;
 }
 
 template<typename T>
@@ -99,9 +99,7 @@ void Texture<T>::load( std::string fileName)
 	m_height = ilGetInteger(IL_IMAGE_HEIGHT);
 	m_cpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL) / sizeof(T);
 	m_data = reinterpret_cast<T*>(ilGetData());
-	m_texName=0;
-
-
+	m_texName = 0;
 }
 
 template<typename T>
@@ -118,33 +116,30 @@ void Texture<T>::setData( T* ptr, int w, int h, int cpp)
 	m_width = w;
 	m_height = h;
 	m_cpp = cpp;
-	m_ilName =0;
-	m_texName=0;
-
+	m_ilName = 0;
+	m_texName = 0;
 }
 
 template<typename T>
 Texture<T>::~Texture()
 {
-	if (m_ilName !=0)
-		ilDeleteImages(1,&m_ilName);
-	else if(m_data !=0)	
+	if (m_ilName != 0)
+		ilDeleteImages(1, &m_ilName);
+	else if(m_data != 0)
 		delete[] m_data;
 
 	if (m_texName != 0)
 		glDeleteTextures( 1, &m_texName );
-
 }
-
 
 template<typename T>
 void Texture<T>::initGL(GLint filter, GLenum format, const char* uniformName, GLuint prg)
 {
 	// allocate a texture name
-	glGenTextures( 1, &m_texName );
+	glGenTextures(1, &m_texName );
 
 	// select our current texture
-	glBindTexture( GL_TEXTURE_2D, m_texName );
+	glBindTexture(GL_TEXTURE_2D, m_texName);
 
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter );
@@ -164,13 +159,13 @@ void Texture<T>::initGL(GLint filter, GLenum format, const char* uniformName, GL
 	switch(format)
 	{
 	case GL_RGB:
-			if (m_cpp != 3)
-				CGoGNout << "Warning using GL_RGB with image not in RGB format"<<CGoGNendl;
-			break;
+		if (m_cpp != 3)
+			CGoGNout << "Warning using GL_RGB with image not in RGB format"<<CGoGNendl;
+		break;
 	case GL_LUMINANCE:
-			if (m_cpp != 1)
-				CGoGNout << "Warning using GL_LUMINANCE with image not in grey level format"<<CGoGNendl;
-			break;
+		if (m_cpp != 1)
+			CGoGNout << "Warning using GL_LUMINANCE with image not in grey level format"<<CGoGNendl;
+		break;
 
 	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -180,16 +175,15 @@ void Texture<T>::initGL(GLint filter, GLenum format, const char* uniformName, GL
 	m_uniform_tex=glGetUniformLocationARB(prg,uniformName);
 }
 
-
 template<typename T>
 void Texture<T>::useGL(unsigned int textureEngineIndex)
 {
-	glActiveTextureARB(GL_TEXTURE0_ARB + textureEngineIndex );
+	glActiveTextureARB(GL_TEXTURE0_ARB + textureEngineIndex);
 	glUniform1iARB(m_uniform_tex, textureEngineIndex);
 	glBindTexture(GL_TEXTURE_2D, m_texName);
 	glEnable(GL_TEXTURE_2D);
 }
 
+} // namespace Utils
 
-}
-} // end namespaces
+} // namespace CGoGN

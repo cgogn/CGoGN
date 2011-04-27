@@ -35,13 +35,13 @@
 #include "Utils/qtui.h"
 
 // forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3RenderMapD; }}}}
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3RenderMapD; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 namespace CGoGN { namespace Utils { class Strings3D; } }
 namespace CGoGN { namespace Utils { class PointSprite; } }
-namespace CGoGN { namespace Utils { class PointLine; } }
+namespace CGoGN { namespace Utils { class ShaderVectorPerVertex; } }
 
 using namespace CGoGN ;
 
@@ -52,7 +52,6 @@ using namespace CGoGN ;
  * Ajouter les widgets necessaires, mettre des noms clairs pour
  * les utiliser dans le .cpp (pour les call back principalement)
  */
-
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
@@ -69,22 +68,27 @@ class MyQT: public Utils::QT::SimpleQT
 	Utils::VBO* m_dataVBO;
 
 	Utils::ShaderSimpleColor* m_shader;
+	Utils::ShaderVectorPerVertex* m_lines;
 	Utils::Strings3D* m_strings;
 	Utils::PointSprite* m_sprite;
-	Utils::PointLine* m_lines;
+
 public:
-
-
-
 	MyQT():
-		render_text(true),render_balls(true),render_vectors(true),render_topo(true),
-		m_render(NULL), m_positionVBO(NULL), m_shader(NULL)
-		{}
-
+		render_text(true),
+		render_balls(true),
+		render_vectors(true),
+		render_topo(true),
+		m_render(NULL),
+		m_render_topo(NULL),
+		m_positionVBO(NULL),
+		m_dataVBO(NULL),
+		m_shader(NULL),
+		m_lines(NULL),
+		m_strings(NULL),
+		m_sprite(NULL)
+	{}
 
 protected:
-//    void updateVBO();
-
     void storeVerticesInfo();
 
 	void cb_redraw();
@@ -92,7 +96,9 @@ protected:
 	void cb_initGL();
 
 	void cb_mousePress(int button, int x, int y);
-	void cb_keyPress(int code) {}
+
+	void cb_keyPress(int code)
+	{}
 
 // slots locaux
 public slots:
@@ -104,10 +110,6 @@ public slots:
 	void slider_balls(int x);
 	void slider_vectors(int x);
 	void slider_text(int x);
-
-
-
 };
 
 #endif
-

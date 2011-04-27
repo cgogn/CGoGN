@@ -59,8 +59,8 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 template<typename PFP>
 void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map,thread);
-	tableIndices.reserve(4*map.getNbDarts()/3);
+	DartMarker m(map, thread);
+	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
 	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
@@ -76,11 +76,11 @@ template<typename PFP>
 void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
-	DartMarker m(map,thread);
+	DartMarker m(map, thread);
 	// reserve memory for triangles ( nb indices == nb darts )
 	// and a little bit more
 	// if lots of polygonal faces, realloc is done by vector
-	tableIndices.reserve(4*map.getNbDarts()/3);
+	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
 	for (Dart dd = map.begin(); dd != map.end(); map.next(dd))
 	{
@@ -89,7 +89,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 			std::list<Dart> bound;
 
 			if(good(dd))
-				addTri<PFP>(map,dd,tableIndices);
+				addTri<PFP>(map, dd, tableIndices);
 			m.markOrbit(FACE_ORBIT, dd);
 			bound.push_back(dd);
 			int nb = 1;
@@ -131,7 +131,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 template<typename PFP>
 void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map,thread);
+	DartMarker m(map, thread);
 	tableIndices.reserve(map.getNbDarts());
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -149,8 +149,7 @@ template<typename PFP>
 void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
 #define LIST_SIZE 20
-
-	DartMarker m(map,thread);
+	DartMarker m(map, thread);
 
 	// reserve memory for edges indices ( nb indices == nb darts)
 	tableIndices.reserve(map.getNbDarts());
@@ -198,8 +197,8 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 template<typename PFP>
 void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	CellMarker m(map, VERTEX_ORBIT,thread) ;
-	tableIndices.reserve(map.getNbDarts()/5);
+	CellMarker m(map, VERTEX_ORBIT, thread) ;
+	tableIndices.reserve(map.getNbDarts() / 5);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -211,54 +210,6 @@ void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, st
 	}
 }
 
-template<typename PFP>
-void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
-{
-	std::vector<GLuint> tableIndices;
-
-	// indice du VBO a utiliser
-	int vbo_ind = 0;
-
-
-	switch(prim)
-	{
-		case FLAT_TRIANGLES:
-			break;
-		case TRIANGLES:
-			if(optimized)
-				initTrianglesOptimized<PFP>(map,good,tableIndices,thread);
-			else
-				initTriangles<PFP>(map,good,tableIndices,thread) ;
-			m_nbIndicesTri = tableIndices.size();
-			vbo_ind = m_VBOBuffers[TRIANGLE_INDICES];
-			break;
-		case LINES:
-			if(optimized)
-				initLinesOptimized<PFP>(map,good,tableIndices,thread);
-			else
-				initLines<PFP>(map,good,tableIndices,thread) ;
-			m_nbIndicesLines = tableIndices.size();
-			vbo_ind = m_VBOBuffers[LINE_INDICES];
-			break;
-		case POINTS:
-			initPoints<PFP>(map,good,tableIndices,thread);
-			m_nbIndicesPoints = tableIndices.size();
-			vbo_ind = m_VBOBuffers[POINT_INDICES];
-			break;
-		default:
-			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
-			break;
-	}
-	unsigned int size = tableIndices.size();
-
-	// setup du buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
-}
-
-
-
-//
 //template<typename PFP>
 //void MapRender::initFlatTriangles( typename PFP::MAP& map,  const Utils::GL2& vbopos, const FunctorSelect& good, unsigned int thread)
 //{
@@ -314,9 +265,49 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 //
 //}
 
+template<typename PFP>
+void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
+{
+	std::vector<GLuint> tableIndices;
 
+	// indice du VBO a utiliser
+	int vbo_ind = 0;
 
+	switch(prim)
+	{
+		case POINTS:
+			initPoints<PFP>(map, good, tableIndices, thread);
+			m_nbIndices[POINT_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[POINT_INDICES];
+			break;
+		case LINES:
+			if(optimized)
+				initLinesOptimized<PFP>(map, good, tableIndices, thread);
+			else
+				initLines<PFP>(map, good, tableIndices, thread) ;
+			m_nbIndices[LINE_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[LINE_INDICES];
+			break;
+		case TRIANGLES:
+			if(optimized)
+				initTrianglesOptimized<PFP>(map, good, tableIndices, thread);
+			else
+				initTriangles<PFP>(map, good, tableIndices, thread) ;
+			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
+			break;
+		case FLAT_TRIANGLES:
+			break;
+		default:
+			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
+			break;
+	}
+	unsigned int size = tableIndices.size();
 
+	// setup du buffer d'indices
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
+	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+}
 
 } // namespace GL2
 

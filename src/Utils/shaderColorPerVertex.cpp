@@ -27,6 +27,7 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -64,7 +65,6 @@ ShaderColorPerVertex::ShaderColorPerVertex()
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 }
 
-
 unsigned int ShaderColorPerVertex::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
@@ -83,6 +83,6 @@ void ShaderColorPerVertex::restoreUniformsAttribs()
 	bindVA_VBO("VertexColor", m_vboCol);
 }
 
-}
-}
+} // namespace Utils
 
+} // namespace CGoGN

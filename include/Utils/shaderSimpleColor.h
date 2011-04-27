@@ -22,14 +22,15 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_SIMPLECOLOR_
-#define __CGOGN_SHADER_SIMPLECOLOR_
+#ifndef __CGOGN_SHADER_SIMPLECOLOR__
+#define __CGOGN_SHADER_SIMPLECOLOR__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -39,6 +40,7 @@ protected:
 	// shader sources
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
+
     // uniform locations
 	GLuint m_unif_color;
 
@@ -56,6 +58,8 @@ public:
 	unsigned int setAttributePosition(VBO* vbo);
 };
 
-}
-}
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

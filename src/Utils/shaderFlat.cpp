@@ -22,15 +22,13 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #include <string.h>
 #include <GL/glew.h>
 #include "Utils/shaderFlat.h"
 
-
-
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -92,7 +90,7 @@ ShaderFlat::ShaderFlat()
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom = GLSLShader::defines_Geom("triangles","triangle_strip",3);
+	std::string glxgeom = GLSLShader::defines_Geom("triangles", "triangle_strip", 3);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
@@ -103,20 +101,20 @@ ShaderFlat::ShaderFlat()
 	getLocations();
 
 	//Default values
-	m_explode=1.0f;
-	m_ambiant = Geom::Vec4f(0.05f,0.05f,0.1f,0.0f);
-	m_diffuse = Geom::Vec4f(0.1f,1.0f,0.1f,0.0f);
-	m_light_pos = Geom::Vec3f(10.0f,10.0f,1000.0f);
+	m_explode = 1.0f;
+	m_ambiant = Geom::Vec4f(0.05f, 0.05f, 0.1f, 0.0f);
+	m_diffuse = Geom::Vec4f(0.1f, 1.0f, 0.1f, 0.0f);
+	m_light_pos = Geom::Vec3f(10.0f, 10.0f, 1000.0f);
 
 	setParams(m_explode, m_ambiant, m_diffuse, m_light_pos);
 }
 
 void ShaderFlat::getLocations()
 {
-	m_unif_explode   = glGetUniformLocation(program_handler(),"explode");
-	m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
-	m_unif_diffuse   = glGetUniformLocation(program_handler(),"diffuse");
-	m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
+	m_unif_explode  = glGetUniformLocation(program_handler(),"explode");
+	m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
+	m_unif_diffuse  = glGetUniformLocation(program_handler(),"diffuse");
+	m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 }
 
 void ShaderFlat::setAttributePosition(VBO* vbo)
@@ -134,10 +132,10 @@ void ShaderFlat::setParams(float expl, const Geom::Vec4f& ambiant, const Geom::V
 
 	bind();
 
-	glUniform1f (m_unif_explode, expl);
-	glUniform4fv(m_unif_ambiant,  1, ambiant.data());
-	glUniform4fv(m_unif_diffuse,  1, diffuse.data());
-	glUniform3fv(m_unif_lightPos, 1,lightPos.data());
+	glUniform1f(m_unif_explode, expl);
+	glUniform4fv(m_unif_ambiant, 1, ambiant.data());
+	glUniform4fv(m_unif_diffuse, 1, diffuse.data());
+	glUniform3fv(m_unif_lightPos, 1, lightPos.data());
 
 	unbind(); // ??
 }
@@ -146,9 +144,8 @@ void ShaderFlat::setExplode(float explode)
 {
 	m_explode = explode;
 	bind();
-	glUniform1f (m_unif_explode, explode);
+	glUniform1f(m_unif_explode, explode);
 }
-
 
 void ShaderFlat::setAmbiant(const Geom::Vec4f& ambiant)
 {
@@ -162,9 +159,7 @@ void ShaderFlat::setDiffuse(const Geom::Vec4f& diffuse)
 	m_diffuse = diffuse;
 	bind();
 	glUniform4fv(m_unif_diffuse,1, diffuse.data());
-
 }
-
 
 void ShaderFlat::setLightPosition(const Geom::Vec3f& lp)
 {
@@ -172,7 +167,6 @@ void ShaderFlat::setLightPosition(const Geom::Vec3f& lp)
 	bind();
 	glUniform3fv(m_unif_lightPos,1,lp.data());
 }
-
 
 void ShaderFlat::restoreUniformsAttribs()
 {
@@ -191,8 +185,6 @@ void ShaderFlat::restoreUniformsAttribs()
 	unbind();
 }
 
+} // namespace Utils
 
-}
-}
-
-
+} // namespace CGoGN

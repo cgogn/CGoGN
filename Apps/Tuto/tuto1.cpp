@@ -21,7 +21,9 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 //#define GL3_PROTOTYPES
+
 #include "tuto1.h"
 
 #include <iostream>
@@ -37,12 +39,9 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Utils/shaderSimpleColor.h"
 
-
 #include <glm/gtc/type_ptr.hpp>
 
-
 using namespace CGoGN ;
-
 
 /**
  * Struct that contains some informations about the types of the manipulated objects
@@ -53,8 +52,6 @@ struct PFP: public PFP_STANDARD
 	// definition of the type of the map
 	typedef EmbeddedMap2<Map2> MAP;
 };
-
-
 
 void MyQT::cb_initGL()
 {
@@ -70,11 +67,9 @@ void MyQT::cb_initGL()
 	// using simple shader with color
 	m_shader = new Utils::ShaderSimpleColor();
 	m_shader->setAttributePosition(m_positionVBO);
-	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
-	registerRunning(m_shader);
+	m_shader->setColor(Geom::Vec4f(0.0f, 1.0f, 0.0f, 0.0f));
+	registerShader(m_shader);
 }
-
-
 
 void MyQT::cb_redraw()
 {
@@ -97,7 +92,6 @@ void MyQT::cb_redraw()
 	}
 }
 
-
 void MyQT::cb_keyPress(int code)
 {
 	if ((code >65) && (code< 123 ))
@@ -105,16 +99,12 @@ void MyQT::cb_keyPress(int code)
 
 	if ((code >'0') && (code<='9'))
 		CGoGNout << " key num " << code-'0' << "pressed"<< CGoGNendl;
-
-
 }
-
 
 int main(int argc, char **argv)
 {
 	// declaration of the map
 	PFP::MAP myMap;
-
 
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);
@@ -135,9 +125,6 @@ int main(int argc, char **argv)
 	position[myMap.phi<11>(d2)] = PFP::VEC3(0, -2, 0);
 	position[myMap.phi_1(d2)] = PFP::VEC3(2, -2, 0);
 
-
-
-
 	// interface:
 	QApplication app(argc, argv);
 	MyQT sqt;
@@ -157,7 +144,7 @@ int main(int argc, char **argv)
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
     // envoit info BB a l'interface
-	sqt.setParamObject(lWidthObj,lPosObj.data());
+	sqt.setParamObject(lWidthObj, lPosObj.data());
 
 	// show 1 pour GL context
 	sqt.show();
@@ -175,5 +162,4 @@ int main(int argc, char **argv)
 
 	// et on attend la fin.
 	return app.exec();
-
 }

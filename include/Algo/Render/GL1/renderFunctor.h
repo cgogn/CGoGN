@@ -274,9 +274,6 @@ public:
 	bool operator() (Dart d);
 };
 
-
-
-
 } // namespace GL1
 
 } // namespace Render

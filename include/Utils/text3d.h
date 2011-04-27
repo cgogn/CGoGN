@@ -32,10 +32,11 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-class Strings3D: public GLSLShader
+class Strings3D : public GLSLShader
 {
 protected:
     static const unsigned int WIDTHFONT = 32;
@@ -67,11 +68,9 @@ protected:
 
     std::vector< Geom::Vec3f > m_strTranslate;
 
-
     Utils::VBO* m_vbo1;
 
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
-
 
     GLuint m_uniform_texture;
 
@@ -81,9 +80,8 @@ protected:
 
     GLuint m_uniform_color;
 
-
 public:
-	Strings3D(bool withBackground=true, const Geom::Vec3f& bgc=Geom::Vec3f(0.0f,0.0f,0.0f));
+	Strings3D(bool withBackground = true, const Geom::Vec3f& bgc = Geom::Vec3f(0));
 
 	~Strings3D();
 
@@ -138,6 +136,9 @@ public:
 	void setScale(float scale);
 
 };
-}
-}
+
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif

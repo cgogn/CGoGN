@@ -35,9 +35,7 @@
 
 #include "Algo/Modelisation/subdivision.h"
 
-
 using namespace CGoGN ;
-
 
 /**
  * Struct that contains some informations about the types of the manipulated objects
@@ -48,7 +46,6 @@ struct PFP: public PFP_STANDARD
 	// definition of the map
 	typedef EmbeddedMap2<Map2> MAP;
 };
-
 
 int main(int argc, char **argv)
 {

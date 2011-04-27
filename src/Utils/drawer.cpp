@@ -28,13 +28,11 @@
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
-
-
-Drawer::Drawer():
-		m_currentWidth(1.0f)
+Drawer::Drawer() : m_currentWidth(1.0f)
 {
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(3);
@@ -47,7 +45,7 @@ Drawer::Drawer():
 	m_shader->setAttributePosition(m_vboPos);
 	m_shader->setAttributeColor(m_vboCol);
 
-	Utils::GLSLShader::registerRunning(m_shader);
+	Utils::GLSLShader::registerShader(NULL, m_shader);
 
 	m_dataPos.reserve(128);
 	m_dataCol.reserve(128);
@@ -57,16 +55,15 @@ Drawer::Drawer():
 
 Drawer::~Drawer()
 {
-	Utils::GLSLShader::unregisterRunning(m_shader);
+	Utils::GLSLShader::unregisterShader(NULL, m_shader);
 	delete m_shader;
 	delete m_vboPos;
 	delete m_vboCol;
 }
 
-
 void Drawer::lineWidth(float lw)
 {
-	m_currentWidth=lw;
+	m_currentWidth = lw;
 }
 
 void Drawer::pointSize(float ps)
@@ -76,14 +73,13 @@ void Drawer::pointSize(float ps)
 
 void Drawer::begin(GLenum mode)
 {
-	m_begins.push_back(PrimParam(m_dataPos.size(),mode, m_currentWidth));
+	m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentWidth));
 }
 
 void Drawer::end()
 {
 	m_begins.back().nb = m_dataPos.size() - m_begins.back().begin;
 }
-
 
 void Drawer::color(const Geom::Vec3f& col)
 {
@@ -103,7 +99,7 @@ void Drawer::vertex(const Geom::Vec3f& v)
 	if (m_dataPos.size() == m_dataCol.size())
 	{
 		if (m_dataCol.empty())
-			m_dataCol.push_back(Geom::Vec3f(1.,1.,1.));
+			m_dataCol.push_back(Geom::Vec3f(1.0f, 1.0f, 1.0f));
 		else
 			m_dataCol.push_back( m_dataCol.back());
 	}
@@ -116,7 +112,6 @@ void Drawer::vertex3f(float r, float g, float b)
 	vertex(Geom::Vec3f(r,g,b));
 }
 
-
 void Drawer::newList(GLenum comp)
 {
 	m_compile = comp;
@@ -125,17 +120,15 @@ void Drawer::newList(GLenum comp)
 	m_begins.clear();
 }
 
-
-
 void Drawer::endList()
 {
 	unsigned int nbElts = m_dataPos.size();
 
 	m_vboPos->bind();
-	glBufferData(GL_ARRAY_BUFFER, nbElts*sizeof(Geom::Vec3f), &(m_dataPos[0]), GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nbElts * sizeof(Geom::Vec3f), &(m_dataPos[0]), GL_STREAM_DRAW);
 
 	m_vboCol->bind();
-	glBufferData(GL_ARRAY_BUFFER, nbElts*sizeof(Geom::Vec3f), &(m_dataCol[0]), GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nbElts * sizeof(Geom::Vec3f), &(m_dataCol[0]), GL_STREAM_DRAW);
 
 	// free memory
 	std::vector<Geom::Vec3f> tempo;
@@ -146,7 +139,6 @@ void Drawer::endList()
 	if (m_compile != GL_COMPILE)
 		callList();
 }
-
 
 void Drawer::callList()
 {
@@ -165,8 +157,6 @@ void Drawer::callList()
  	m_shader->disableVertexAttribs();
 }
 
+} // namespace Utils
 
-}
-}
-
-
+} // namespace CGoGN

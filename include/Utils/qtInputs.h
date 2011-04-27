@@ -33,7 +33,6 @@
 #include <QDialog>
 #include <QLabel>
 
-
 namespace CGoGN
 {
 
@@ -51,6 +50,7 @@ class Var
 protected:
 	const Var* m_next;
 	std::string m_label;
+
 public:
 	Var(const Var& v);
 	Var();
@@ -58,9 +58,8 @@ public:
 	const Var* next() const;
 	QLabel* label() const;
 
-	virtual QWidget* createInput() const =0;
-	virtual void updateFrom( QWidget* widg) const =0;
-
+	virtual QWidget* createInput() const = 0;
+	virtual void updateFrom( QWidget* widg) const = 0;
 };
 
 /**
@@ -71,11 +70,12 @@ class VarBool: public Var
 {
 public:
 	bool& m_val;
+
 public:
 	VarBool(bool& val, const std::string& label);
 	VarBool(bool& val, const std::string& label, const Var& var);
 	QWidget* createInput() const;
-	void updateFrom( QWidget* widg) const;
+	void updateFrom(QWidget* widg) const;
 };
 
 /**
@@ -88,11 +88,12 @@ public:
 	int m_min;
 	int m_max;
 	int& m_val;
+
 public:
 	VarInt(int min, int max, int& val, const std::string& label);
 	VarInt(int min, int max, int& val, const std::string& label, const Var& var);
 	QWidget* createInput() const;
-	void updateFrom( QWidget* widg) const;
+	void updateFrom(QWidget* widg) const;
 };
 
 /**
@@ -105,11 +106,12 @@ public:
 	double m_min;
 	double m_max;
 	double& m_val;
+
 public:
 	VarDbl(double min, double max, double& val, const std::string& label);
 	VarDbl(double min, double max, double& val, const std::string& label, const Var& var);
 	QWidget* createInput() const;
-	void updateFrom( QWidget* widg) const;
+	void updateFrom(QWidget* widg) const;
 };
 
 /**
@@ -122,11 +124,12 @@ public:
 	int m_min;
 	int m_max;
 	int& m_val;
+
 public:
 	VarSlider(int min, int max, int& val, const std::string& label);
 	VarSlider(int min, int max, int& val, const std::string& label, const Var& var);
 	QWidget* createInput() const;
-	void updateFrom( QWidget* widg) const;
+	void updateFrom(QWidget* widg) const;
 };
 
 /**
@@ -139,14 +142,13 @@ class VarCombo: public Var
 public:
 	const std::string& m_choices;
 	int& m_val;
+
 public:
 	VarCombo(const std::string& choices, int& v, const std::string& label);
 	VarCombo(const std::string& choices, int& v, const std::string& label, const Var& var);
 	QWidget* createInput() const;
-	void updateFrom( QWidget* widg) const;
+	void updateFrom(QWidget* widg) const;
 };
-
-
 
 /**
  * Open a QtDialog for inputs of all chain Var defined
@@ -160,11 +162,13 @@ public:
  *				VarCombo("Riri;Fifi;Loulou;Donald",c,"Combo"))))) );
  * } // limit scope of using namespace
  */
-bool inputValues(const Var& v1, const std::string& title ="input data");
+bool inputValues(const Var& v1, const std::string& title = "input data");
 
 
-}
-} // end namespaces
-}
+} // namespace QT
+
+} // namespace Utils
+
+} // namespace CGoGN
 
 #endif

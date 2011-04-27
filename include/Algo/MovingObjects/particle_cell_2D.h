@@ -20,35 +20,37 @@ namespace Algo
 namespace MovingObjects
 {
 
+enum {
+	NO_CROSS,
+	CROSS_EDGE,
+	CROSS_OTHER
+};
+
 template <typename PFP>
 class ParticleCell2D : public ParticleBase
 {
-	public :
+public :
 	typedef typename PFP::MAP Map;
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::TVEC3 TAB_POS;
 
 	Map& m;
+
+	const TAB_POS& m_positions;
 	
 	Dart d;
-
-	TAB_POS m_positions;
-
-	VEC3 prevPos;
+	Dart lastCrossed;
 
 	unsigned int state;
 
-	DartMarker& obstacle;
+	unsigned int crossCell ;
 
-	bool changeCell ;
+	ParticleCell2D(Map& map) : m(map)
+	{}
 
-	ParticleCell2D() {}
-
-	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, TAB_POS tabPos, DartMarker& obst) : ParticleBase(pos), m(map), d(belonging_cell), m_positions(tabPos), obstacle(obst)
-	{
-		state = 2;
-		prevPos = pos;
-	}
+	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(2), crossCell(NO_CROSS)
+	{}
 
 	Dart getCell() { return d; }
 
@@ -73,11 +75,9 @@ class ParticleCell2D : public ParticleBase
 
 	void move(const VEC3& newCurrent)
 	{
-		changeCell = false ;
-		if(!Geom::arePointsEquals(newCurrent, m_position)) {
-//			std::cout << "-- " << m_position << "--" << newCurrent << std::endl;
-			prevPos = m_position;
-
+		crossCell = NO_CROSS ;
+		if(!Geom::arePointsEquals(newCurrent, m_position))
+		{
 			switch(state) {
 			case VERTEX_ORBIT : vertexState(newCurrent); break;
 			case EDGE_ORBIT : 	edgeState(newCurrent);   break;
@@ -87,8 +87,6 @@ class ParticleCell2D : public ParticleBase
 			display();
 		}
 	}
-
-
 };
 
 #include "particle_cell_2D.hpp"

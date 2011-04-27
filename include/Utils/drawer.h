@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #ifndef _CGOGN_DRAWER_H_
 #define _CGOGN_DRAWER_H_
 
@@ -31,11 +32,12 @@
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderColorPerVertex; } }
 
-
 namespace CGoGN
 {
+
 namespace Utils
 {
+
 /**
  * A class that allow easy drawing, allmost as easy as
  * display lists in old school OpenGL 1.1
@@ -81,8 +83,7 @@ public:
 	 * init the data structure
 	 * @param com say if compile only, or compile and execute (GL_COMPILE/ GL_COMPILE_AND_EXECUTE)
 	 */
-	void newList(GLenum comp=GL_COMPILE);
-
+	void newList(GLenum comp = GL_COMPILE);
 
 	/**
 	 * as glBegin, but need a newList call before
@@ -95,13 +96,11 @@ public:
 	 */
 	void end();
 
-
 	/**
 	 * finalize the data initialization
 	 * drawn is done if newList called with GL_COMPILE_AND_EXECUTE
 	 */
 	void endList();
-
 
 	/**
 	 * use as glVertex
@@ -112,7 +111,6 @@ public:
 	 * use as glVertex
 	 */
 	void vertex3f(float x, float y, float z);
-
 
 	/**
 	 * use as glColor
@@ -140,10 +138,8 @@ public:
 	void pointSize(float ps);
 };
 
+} // namespace Utils
 
+} // namespace CGoGN
 
-}
-}
-
-
-#endif /* DRAWER_H_ */
+#endif
