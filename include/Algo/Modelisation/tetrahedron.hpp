@@ -122,7 +122,7 @@ void swap2To2(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions
 	Dart e = d;
 	do
 	{
-		the_map.unsewFace(e);
+		//the_map.unsewFace(e);
 		e = the_map.phi1(e);
 	}
 	while (e != d);
@@ -175,20 +175,20 @@ void swap3To2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
     Dart fi = map.phi2(en1);
 
     //Decouture de la premiere face
-    map.unsewFace(map.phi2(en1));
-    map.unsewFace(map.phi2(en2));
-
-    //Decouture de la seconde face
-    en1 = map.phi1(map.phi2(en1));
-    en2 = map.phi_1(map.phi2(en2));
-    map.unsewFace(map.phi2(en1));
-    map.unsewFace(map.phi2(en2));
-
-    //Decouture de la troisieme face
-    en1 = map.phi1(map.phi2(en1));
-    en2 = map.phi_1(map.phi2(en2));
-    map.unsewFace(map.phi2(en1));
-    map.unsewFace(map.phi2(en2));
+//    map.unsewFace(map.phi2(en1));
+//    map.unsewFace(map.phi2(en2));
+//
+//    //Decouture de la seconde face
+//    en1 = map.phi1(map.phi2(en1));
+//    en2 = map.phi_1(map.phi2(en2));
+//    map.unsewFace(map.phi2(en1));
+//    map.unsewFace(map.phi2(en2));
+//
+//    //Decouture de la troisieme face
+//    en1 = map.phi1(map.phi2(en1));
+//    en2 = map.phi_1(map.phi2(en2));
+//    map.unsewFace(map.phi2(en1));
+//    map.unsewFace(map.phi2(en2));
 
     //Faces interieurs
     Dart fi2 = map.phi2(map.phi1(fi));

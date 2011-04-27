@@ -147,13 +147,13 @@ public:
 	/*! @param d dart from the edge
 	 *  @param e dart from the face
 	 */
-	virtual void sewFace(Dart d, Dart e);
+	//virtual void sewFace(Dart d, Dart e);
 
 	//! Unsew a face d from an edge
 	/*! \pre Dart d is a dart from the face to unsew
 	 *  @param d the edge to unlink
 	 */
-	virtual void unsewFace(Dart d);
+	//virtual void unsewFace(Dart d);
 
 	//!
 	/*! Flip the edge of d (rotation in phi1 order)
@@ -240,6 +240,10 @@ public:
 	 */
 	virtual bool isBoundaryVolume(Dart d);
 
+	/**
+	 *
+	 */
+	virtual bool isBoundaryVertex(Dart d);
 
 	//@}
 
