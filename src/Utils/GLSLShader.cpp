@@ -41,22 +41,22 @@ unsigned int GLSLShader::CURRENT_OGL_VERSION=2;
 
 std::string GLSLShader::DEFINES_GL2=\
 "#version 110\n"
-"#define PRECISON\n"
+"#define PRECISON float pipo_PRECISION\n"
 "#define ATTRIBUTE attribute\n"
 "#define VARYING_VERT varying\n"
 "#define VARYING_FRAG varying\n"
-"#define FRAG_OUT_DEF \n"
-"#define INVARIANT_POS \n";
+"#define FRAG_OUT_DEF float pipo_FRAGDEF\n"
+"#define INVARIANT_POS float pipo_INVARIANT\n";
 
 
 std::string GLSLShader::DEFINES_GL3=\
 "#version 150\n"
-"#define PRECISON precision highp float;\n"
+"#define PRECISON precision highp float\n"
 "#define ATTRIBUTE in\n"
 "#define VARYING_VERT smooth out\n"
 "#define VARYING_FRAG smooth in\n"
 "#define FRAG_OUT_DEF out vec4 gl_FragColor\n"
-"#define INVARIANT_POS \n";
+"#define INVARIANT_POS invariant gl_Position\n";
 
 std::string* GLSLShader::DEFINES_GL =NULL;
 
@@ -113,6 +113,7 @@ std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std:
 		str.append("#define VARYING_IN in\n");
 		str.append("#define VARYING_OUT smooth out\n");
 		str.append("#define POSITION_IN(X) gl_in[X].gl_Position\n");
+		str.append("#define NBVERTS_IN gl_in.length()\n");
 		return str;
 	}
 	else
@@ -123,6 +124,7 @@ std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std:
 		str.append("#define VARYING_IN varying in\n");
 		str.append("#define VARYING_OUT varying out\n");
 		str.append("#define POSITION_IN(X) gl_PositionIn[X]\n");
+		str.append("#define NBVERTS_IN gl_VerticesIn\n");
 		return str;
 	}
 }

@@ -33,7 +33,7 @@ namespace Utils
 std::string ShaderSimpleColor::vertexShaderText =
 		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
 		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"INVARIANT_POS;\n"
+//		"INVARIANT_POS;\n"
 		"void main ()\n"
 		"{\n"
 		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"

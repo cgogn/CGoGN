@@ -62,7 +62,7 @@ AttributeHandler<Geom::Vec4f> color ;
 void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(3);
+	Utils::GLSLShader::setCurrentOGLVersion(2);
 
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
