@@ -101,6 +101,7 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 			dd = MAP3::phi1(dd) ;
 		} while(dd != d) ;
 	}
+
 }
 
 template <typename MAP3>
@@ -310,53 +311,10 @@ Dart EmbeddedMap3<MAP3>::cutSpike(Dart d)
 
 	Dart e = MAP3::cutSpike(d);
 
-//	if(MAP3::isOrbitEmbedded(VERTEX_ORBIT))
-//	{
-//	}
-
 	return e;
 }
 
 
-template <typename MAP3>
-void EmbeddedMap3<MAP3>::unsewFaces(Dart d)
-{
-//	unsigned int vEmb1 = EMBNULL ;
-//	unsigned int vEmb2 = EMBNULL ;
-//	if (MAP3::isOrbitEmbedded(VERTEX_ORBIT))
-//	{
-//		vEmb1 = MAP3::getEmbedding(d, VERTEX_ORBIT) ;
-//		vEmb2 = MAP3::getEmbedding(MAP3::phi1(d), VERTEX_ORBIT) ;
-//	}
-//	unsigned int eEmb = EMBNULL ;
-//	if (MAP3::isOrbitEmbedded(EDGE_ORBIT))
-//	{
-//		eEmb = MAP3::getEmbedding(d, EDGE_ORBIT) ;
-//	}
-
-	Dart e = MAP3::phi2(d) ;
-	MAP3::unsewFaces(d) ;
-
-//	if (MAP3::isOrbitEmbedded(VERTEX_ORBIT))
-//	{
-//		MAP3::setDartEmbedding(VERTEX_ORBIT, d, vEmb1) ;
-//		MAP3::setDartEmbedding(VERTEX_ORBIT, MAP3::phi1(d), vEmb2) ;
-//		if(e != d)
-//		{
-//			MAP3::embedNewCell(VERTEX_ORBIT, e) ;
-//			MAP3::copyCell(VERTEX_ORBIT, e, d) ;
-//			MAP3::embedNewCell(VERTEX_ORBIT, MAP3::phi1(e)) ;
-//			MAP3::copyCell(VERTEX_ORBIT, MAP3::phi1(e), MAP3::phi1(d)) ;
-//		}
-//	}
-//
-//	if (MAP3::isOrbitEmbedded(EDGE_ORBIT))
-//	{
-//		MAP3::setDartEmbedding(EDGE_ORBIT, d, eEmb) ;
-//		MAP3::embedNewCell(EDGE_ORBIT, e) ;
-//		MAP3::copyCell(EDGE_ORBIT, e, d) ;
-//	}
-}
 
 
 } // namespace CGoGN

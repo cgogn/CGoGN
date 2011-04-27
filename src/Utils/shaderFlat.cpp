@@ -64,7 +64,7 @@ std::string ShaderFlat::geometryShaderText =
 "	if(lambertTerm > 0.0)\n"
 "		ColorFS += diffuse * lambertTerm;\n"
 "	int i;\n"
-"	for(i=0; i< gl_in.length(); i++)\n"
+"	for(i=0; i< NBVERTS_IN; i++)\n"
 "	{\n"
 "		vec4 pos =  explode * POSITION_IN(i) + (1.0-explode)* vec4(center,1.0);\n"
 "		gl_Position = ModelViewProjectionMatrix *  pos;\n"

@@ -72,7 +72,11 @@ template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 template <typename PFP>
-bool importInESS(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames);
+bool importInESSSurfacique(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames);
+
+template <typename PFP>
+bool importInESSVolumique(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames);
+
 
 } // namespace Import
 

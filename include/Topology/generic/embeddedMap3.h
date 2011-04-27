@@ -113,8 +113,6 @@ public:
 	 */
 	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
 			bool delDegenerateVolumes = true);
-
-	virtual void unsewFaces(Dart d);
 } ;
 
 } // namespace CGoGN

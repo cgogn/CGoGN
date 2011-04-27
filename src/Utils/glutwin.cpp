@@ -69,7 +69,7 @@ SimpleGlutWin::SimpleGlutWin(int* argc, char **argv, int winX, int winY)
 	scalefactor = 1.0f;
 	trans_x=0.;
 	trans_y=0.;
-	trans_z=-200.0f;
+	trans_z=-50.0f;
 
 
 	std::cout << "Initialisation Glut" << std::endl;
@@ -160,10 +160,13 @@ void SimpleGlutWin::recalcModelView(void)
 	glPopMatrix();
 	glPushMatrix();
 
-	glTranslatef(trans_x,trans_y,trans_z);
+	glTranslatef(trans_x,trans_y,trans_z+foc);
 
 	build_rotmatrix(m, curquat);
 	glMultMatrixf(&m[0][0]);
+
+	float sc = getScale();
+	glScalef(sc,sc,sc);
 
 	newModel = 0;
 }
@@ -212,13 +215,12 @@ void SimpleGlutWin::motion(int x, int y)
 		{
 			if (scaling) 
 			{
-				trans_z -= 0.1f*(x - beginx);
-				trans_z -= 0.1f*(y - beginy);
+				scalefactor = scalefactor * (1.0f + (((float) (beginy - y)) / H));
 			}
 			else if (translating) 
 			{
-				trans_x += 0.05f*(x - beginx);
-				trans_y += 0.05f*(beginy - y);
+				trans_x += 0.01f*(x - beginx);
+				trans_y += 0.01f*(beginy - y);
 			}
 			beginx = x;
 			beginy = y;

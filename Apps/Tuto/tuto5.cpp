@@ -264,7 +264,7 @@ int main(int argc, char **argv)
     sqt.setDock(&dock);
 
  	// message d'aide
-	sqt.setHelpMsg("");
+	sqt.setHelpMsg("Enter pour dock on/off\nShift Enter pour console on/off\nShift Click gauche pour selectionner un brin");
 
 	CGoGNout.toStatusBar(&sqt);
 	CGoGNout << "CGoGNOut StatusBar" << Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;

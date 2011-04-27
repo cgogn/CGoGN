@@ -88,6 +88,8 @@ public:
 	// add a dart to the list
 	virtual void add(Dart d) = 0;
 
+	virtual void popFront() = 0;
+
 	void addSelected(MAP& map, const FunctorSelect& fs)
 	{
 		for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -125,6 +127,9 @@ public:
 
 	/// add a dart to linked list
 	void add(Dart d) { m_links[d.index] = this->m_first; this->m_first = d; }
+
+	//pop the first
+	void popFront() { this->m_first = m_links[this->m_first.index]; }
 };
 
 /**
@@ -152,6 +157,9 @@ public:
 
 	/// add a dart to linked list
 	void add(Dart d) { m_links[d.index] = this->m_first; this->m_first = d; }
+
+	//pop the first
+	void popFront() { this->m_first = m_links[this->m_first.index]; }
 };
 
 } // end namespace CGoGN
