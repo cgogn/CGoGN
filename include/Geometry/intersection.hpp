@@ -149,7 +149,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 						return VERTEX_INTERSECTION ;
 					}
 					//inter with AB
-					CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AB" << CGoGNendl ;
+//					CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AB" << CGoGNendl ;
 					return EDGE_INTERSECTION ;
 				}
 				if(oA == ALIGNED)
@@ -163,7 +163,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 					return VERTEX_INTERSECTION ;
 				}
 				//inter with AC
-				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AC" << CGoGNendl ;
+//				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AC" << CGoGNendl ;
 				return EDGE_INTERSECTION ;
 			}
 			if(oPBC == RIGHT) // same side of BC, test this edge
@@ -179,7 +179,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 					return VERTEX_INTERSECTION ;
 				}
 				//inter with BC
-				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection BC" << CGoGNendl ;
+//				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection BC" << CGoGNendl ;
 				return EDGE_INTERSECTION ;
 			}
 
@@ -194,7 +194,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 					return VERTEX_INTERSECTION ;
 				}
 				//inter with AB
-				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AB" << CGoGNendl ;
+//				CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AB" << CGoGNendl ;
 				return EDGE_INTERSECTION ;
 			}
 			if(oPAB == ALIGNED)
@@ -214,7 +214,7 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
 				return VERTEX_INTERSECTION ;
 			}
 			//inter with AC
-			CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AC" << CGoGNendl ;
+//			CGoGNout << __FILE__ << " TODO compute edge coplanar intersection AC" << CGoGNendl ;
 			return EDGE_INTERSECTION ;
 	}
 }
@@ -282,14 +282,27 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
 // }
 
 template <typename VEC3, typename PLANE3D>
-Intersection intersectPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter)
+Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter)
 {
-	typename VEC3::DATA_TYPE isect;
-	isect = (pl.normal()*(pl.normal()*pl.d()-p1)) / (pl.normal()*dir);
+	typename VEC3::DATA_TYPE denom = pl.normal()*dir;
+
+	if(denom==0)
+	{
+		if(pl.distance(p1)==0)
+		{
+				Inter = p1;
+				return FACE_INTERSECTION;
+		}
+		else
+			return NO_INTERSECTION;
+	}
+
+	typename VEC3::DATA_TYPE isect = ( pl.normal() * (pl.normal()*-1.0f*pl.d()-p1) ) / denom;
+
+	Inter = p1 + dir * isect;
 
 	if(0.0f <= isect)
 	{
-		Inter = p1 + dir * isect;
 		return FACE_INTERSECTION;
 	}
 

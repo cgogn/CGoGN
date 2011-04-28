@@ -43,7 +43,6 @@ add_executable( Geom_inclusionD ./Geom_inclusion.cpp)
 target_link_libraries( Geom_inclusionD
 	${CGoGN_LIBS_D} ${COMMON_LIBS} )
 
-
-#add_executable( Algo_Geom_inclusionD ./Algo_Geom_inclusion.cpp)
-#target_link_libraries( Algo_Geom_inclusionD
-#	containerD topologyD utilsD algoD ${COMMON_LIBS} )
+add_executable( Geom_intersectionD ./Geom_intersection.cpp)
+target_link_libraries( Geom_intersectionD
+	${CGoGN_LIBS_D} ${COMMON_LIBS} )
