@@ -41,7 +41,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	) :
 	m_map(map), positionsTable(position), inactiveMarker(inactive), dartSelect(inactiveMarker)
 {
-	CGoGNout << "  creating approximator and predictor.." << std::flush ;
+	CGoGNout << "  creating approximator and predictor.." << /* flush */ CGoGNendl ;
 	switch(a)
 	{
 		case Algo::Decimation::A_QEM : {
@@ -70,17 +70,10 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, positionsTable, pred)) ;
 			break ; }
-		case Algo::Decimation::A_LightfieldFull :	{
-			m_approximators.push_back(new Algo::Decimation::Approximator_QEM<PFP>(m_map, positionsTable)) ;
-			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = m_map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX_ORBIT, "frame") ;
-			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = m_map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX_ORBIT, "RGBfunctions") ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_Frame<PFP>(m_map, frame)) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_RGBfunctions<PFP>(m_map, RGBfunctions)) ;
-			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  creating selector.." << std::flush ;
+	CGoGNout << "  creating selector.." << /* flush */ CGoGNendl ;
 	switch(s)
 	{
 		case Algo::Decimation::S_MapOrder : {
@@ -101,15 +94,12 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		case Algo::Decimation::S_Curvature : {
 			m_selector = new Algo::Decimation::EdgeSelector_Curvature<PFP>(m_map, positionsTable, m_approximators, dartSelect) ;
 			break ; }
-		case Algo::Decimation::S_Lightfield : {
-			m_selector = new Algo::Decimation::EdgeSelector_Lightfield<PFP>(map, positionsTable, m_approximators, dartSelect) ;
-			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
 	m_initOk = true ;
 
-	CGoGNout << "  initializing approximators.." << std::flush ;
+	CGoGNout << "  initializing approximators.." << /* flush */ CGoGNendl ;
 	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 	{
 		if(! (*it)->init())
@@ -119,13 +109,13 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  initializing predictors.." << std::flush ;
+	CGoGNout << "  initializing predictors.." << /* flush */ CGoGNendl ;
 	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
 		if(! (*it)->init())
 			m_initOk = false ;
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  initializing selector.." << std::flush ;
+	CGoGNout << "  initializing selector.." << /* flush */ CGoGNendl ;
 	m_initOk = m_selector->init() ;
 	CGoGNout << "..done" << CGoGNendl ;
 
@@ -155,7 +145,7 @@ void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 {
 	unsigned int nbVertices = m_map.getNbOrbits(VERTEX_ORBIT) ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
-	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << std::flush ;
+	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
 
 	bool finished = false ;
 	Dart d ;
@@ -535,7 +525,7 @@ void ProgressiveMesh<PFP>::calculCourbeDebitDistortion()
 	float distance;
 	Point p;
 
-	CGoGNout << "calcul de la courbe débit distortion " << std::flush;
+	CGoGNout << "calcul de la courbe débit distortion " << CGoGNendl;
 
 	// get original detail vectors
 	for(unsigned int i = 0; i < m_splits.size(); ++i)
@@ -573,7 +563,7 @@ void ProgressiveMesh<PFP>::calculCourbeDebitDistortion()
 		courbe.push_back(p);
 		// returns to coarse mesh
 		gotoLevel(nbSplits());
-		CGoGNout << "..." << std::flush;
+		CGoGNout << "..." << CGoGNendl;
 	}
 	q.erase();
 }

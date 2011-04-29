@@ -56,8 +56,7 @@ typename PFP::VEC3 stringToEmb(std::string s)
 	return coord;
 }
 
-
-unsigned int gcd(unsigned int a, unsigned int b)
+inline unsigned int gcd(unsigned int a, unsigned int b)
 {
 
 	while ( true )

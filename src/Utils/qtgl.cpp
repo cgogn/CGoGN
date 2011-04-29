@@ -69,8 +69,8 @@ void GLWidget::setParamObject(float width, float* pos)
 
 void  GLWidget::setFocal(float df)
 {
-	if (df > 3.0f)
-		df = 3.0f;
+	if (df > 5.0f)
+		df = 5.0f;
 	if (df < 0.2f)
 		df = 0.2f;
 
@@ -180,7 +180,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 			break;
 		case Qt::MidButton:
 		{
-			float wl = -0.2f * FAR_PLANE / foc;
+			float wl = -0.5f * FAR_PLANE / foc;
 			m_cbs->trans_z() -= wl / W * (x - beginx);
 			m_cbs->trans_z() -= wl / H * (y - beginy);
 		}
@@ -209,7 +209,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 
 void GLWidget::wheelEvent ( QWheelEvent * event )
 {
-	float wl = -0.02f * FAR_PLANE / foc;
+	float wl = -0.05f * FAR_PLANE / foc;
 
 	if (event->delta() > 0)
 		m_cbs->trans_z() += wl;

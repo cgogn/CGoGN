@@ -47,7 +47,6 @@ using namespace CGoGN ;
  * Ajouter les widgets necessaires, mettre des noms clairs pour
  * les utiliser dans le .cpp (pour les call back principalement)
  */
-
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
