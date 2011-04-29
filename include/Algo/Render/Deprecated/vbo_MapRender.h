@@ -316,6 +316,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Render/vbo_MapRender.hpp"
+#include "Algo/Render/Deprecated/vbo_MapRender.hpp"
 
 #endif

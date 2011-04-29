@@ -27,6 +27,7 @@
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
+#include "Utils/cgognStream.h"
 
 namespace CGoGN {
 
