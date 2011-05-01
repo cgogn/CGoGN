@@ -62,7 +62,7 @@ public:
 
 
 protected:
-	static const float FAR_PLANE=500.0f;
+	static float FAR_PLANE;
 
 	SimpleQT* m_cbs;
 

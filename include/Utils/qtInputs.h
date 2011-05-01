@@ -82,15 +82,15 @@ public:
  * Class for integer input in dialog window (with spinbox)
  * Use: VarBool(min,max,ref_to_val, "label" [,nextVar])
  */
-class VarInt: public Var
+class VarInteger: public Var
 {
 public:
 	int m_min;
 	int m_max;
 	int& m_val;
 public:
-	VarInt(int min, int max, int& val, const std::string& label);
-	VarInt(int min, int max, int& val, const std::string& label, const Var& var);
+	VarInteger(int min, int max, int& val, const std::string& label);
+	VarInteger(int min, int max, int& val, const std::string& label, const Var& var);
 	QWidget* createInput() const;
 	void updateFrom( QWidget* widg) const;
 };

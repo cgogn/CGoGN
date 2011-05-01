@@ -50,8 +50,6 @@ MapRender::MapRender():
 MapRender::~MapRender()
 {
 	glDeleteBuffersARB(4, m_VBOBuffers);
-	delete[] m_VBOBuffers ;
-
 }
 
 

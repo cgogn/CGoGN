@@ -35,6 +35,7 @@ namespace Utils
 namespace QT
 {
 
+float GLWidget::FAR_PLANE=500.0f;
 
 GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
 		QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
