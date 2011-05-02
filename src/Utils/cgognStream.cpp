@@ -40,6 +40,7 @@ CGoGNStream::Dbg<1> CGoGNdbg;
 CGoGNStream::Dbg<2> CGoGNdbg2;
 CGoGNStream::Dbg<3> CGoGNdbg3;
 CGoGNStream::Special CGoGNendl;
+CGoGNStream::Special CGoGNflush;
 
 namespace CGoGNStream
 {

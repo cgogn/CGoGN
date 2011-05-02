@@ -68,24 +68,29 @@ void MyQT::balls_onoff(bool x)
 {
 	render_balls = !render_balls;
 	updateGL();
+	CGoGNerr << " balls_onoff  "<< CGoGNendl;
 }
 
 void MyQT::vectors_onoff(bool x)
 {
 	render_vectors = !render_vectors;
 	updateGL();
+	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
 }
 
 void MyQT::text_onoff(bool x)
 {
 	render_text = !render_text;
 	updateGL();
+	CGoGNerr << " text_onoff  " << CGoGNflush;
 }
+
 
 void MyQT::topo_onoff(bool x)
 {
 	render_topo = !render_topo;
 	updateGL();
+	CGoGNerr << " topo_onoff  " << CGoGNflush;
 }
 
 void MyQT::slider_balls(int x)
@@ -305,7 +310,8 @@ int main(int argc, char **argv)
 	CGoGNdbg2.toConsole(&sqt);
 	CGoGNerr.toConsole(&sqt);
 	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
-	CGoGNerr << " ERROR  " <<  5*7 << CGoGNendl;
+	CGoGNerr << " ERROR  " <<  5*7 << CGoGNflush;
+
 
 	// et on attend la fin.
 	return app.exec();
