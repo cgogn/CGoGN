@@ -2,12 +2,8 @@ cmake_minimum_required(VERSION 2.6)
 
 project(Tutos)
 
-#SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} gzstream AntTweakBar openctm)
-
 
 SET (CMAKE_BUILD_TYPE Debug)
-
-
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
 # FOR Qt4
@@ -28,9 +24,14 @@ include_directories(
 	${CGoGN_ROOT_DIR}/include
 )
 
-
 # define libs path
-link_directories(${CGoGN_ROOT_DIR}/lib/Release ${CGoGN_ROOT_DIR}/lib/Debug)
+IF(WIN32)
+	link_directories(${CGoGN_ROOT_DIR}/lib/$(ConfigurationName))
+ELSE(WIN32)
+	link_directories(${CGoGN_ROOT_DIR}/lib/Release ${CGoGN_ROOT_DIR}/lib/Debug)
+ENDIF(WIN32)
+
+
 
 #define exec to compile
 

@@ -8,19 +8,10 @@
 	#include <stdio.h>
 	#include <limits>
 	#include <cmath>
-	#ifndef PI_DEFINED
-	#define PI_DEFINED
-		const double M_PI = 3.14159265359;
-	#endif
-  #ifdef EXPORTING
- //   #define APIEXPORT __declspec(dllexport)
-   #define APIEXPORT 
-#else
-//    #define APIEXPORT __declspec(dllimport)
-    #define APIEXPORT 
-  #endif
-#else
-  #define APIEXPORT
+	//#ifndef PI_DEFINED
+	//#define PI_DEFINED
+	//double M_PI=3.14159265359;
+	//#endif
 #endif
 
 // SPECIFIC FOR MAC 
