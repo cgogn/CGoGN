@@ -280,7 +280,7 @@ void Quantization<VEC>::vectorQuantizationDistortion(float distortionGoal, std::
 	computeDiscreteEntropy() ;
 }
 
-float log2(float x)
+inline float log2(float x)
 {
     return log(x) / log(2.0f) ;
 }

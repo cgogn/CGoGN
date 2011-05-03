@@ -36,7 +36,6 @@
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN { namespace Utils { class GLSLShader; } }
-//namespace CGoGN { namespace Geom { class Vec3f; } }
 
 namespace CGoGN
 {
@@ -172,6 +171,11 @@ public:
 	 * set width and pos center of object to draw
 	 */
 	void setParamObject(float width, float* pos) { m_glWidget->setParamObject(width, pos); }
+
+	/**
+	 * set focal
+	 */
+	void setFocal(float f) { m_glWidget->setFocal(f); }
 
 	/**
 	 * get the mouse position in GL widget
@@ -312,7 +316,7 @@ public:
 	 * @param dir base directory
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
-	std::string selectFile(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
+	std::string selectFile(const std::string& title = "open file", const std::string& dir = ".", const std::string& filters = "all (*.*)");
 
 	/**
 	 * Open a file selector and return the filename (for saving a file)

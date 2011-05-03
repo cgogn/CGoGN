@@ -86,28 +86,28 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		}
 	}
 
-	out << "ply" << CGoGNendl ;
-	out << "format ascii 1.0" << CGoGNendl ;
-	out << "comment no comment" << CGoGNendl ;
-	out << "element vertex " << vertices.size() << CGoGNendl ;
-	out << "property float x" << CGoGNendl ;
-	out << "property float y" << CGoGNendl ;
-	out << "property float z" << CGoGNendl ;
-	out << "element face " << facesSize.size() << CGoGNendl ;
-	out << "property list uchar int vertex_indices" << CGoGNendl ;
-	out << "end_header" << CGoGNendl ;
+	out << "ply" << std::endl ;
+	out << "format ascii 1.0" << std::endl ;
+	out << "comment no comment" << std::endl ;
+	out << "element vertex " << vertices.size() << std::endl ;
+	out << "property float x" << std::endl ;
+	out << "property float y" << std::endl ;
+	out << "property float z" << std::endl ;
+	out << "element face " << facesSize.size() << std::endl ;
+	out << "property list uchar int vertex_indices" << std::endl ;
+	out << "end_header" << std::endl ;
 
 	for(unsigned int i = 0; i < vertices.size(); ++i)
 	{
 		const VEC3& v = position[vertices[i]] ;
-		out << v[0] << " " << v[1] << " " << v[2] << CGoGNendl ;
+		out << v[0] << " " << v[1] << " " << v[2] << std::endl ;
 	}
 	for(unsigned int i = 0; i < facesSize.size(); ++i)
 	{
 		out << facesSize[i] ;
 		for(unsigned int j = 0; j < facesIdx[i].size(); ++j)
 			out << " " << facesIdx[i][j] ;
-		out << CGoGNendl ;
+		out << std::endl ;
 	}
 
 	out.close() ;
@@ -164,20 +164,20 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		}
 	}
 
-	out << "OFF" << CGoGNendl ;
-	out << vertices.size() << " " << facesSize.size() << " " << 0 << CGoGNendl ;
+	out << "OFF" << std::endl ;
+	out << vertices.size() << " " << facesSize.size() << " " << 0 << std::endl ;
 
 	for(unsigned int i = 0; i < vertices.size(); ++i)
 	{
 		const VEC3& v = position[vertices[i]] ;
-		out << v[0] << " " << v[1] << " " << v[2] << CGoGNendl ;
+		out << v[0] << " " << v[1] << " " << v[2] << std::endl ;
 	}
 	for(unsigned int i = 0; i < facesSize.size(); ++i)
 	{
 		out << facesSize[i] ;
 		for(unsigned int j = 0; j < facesIdx[i].size(); ++j)
 			out << " " << facesIdx[i][j] ;
-		out << CGoGNendl ;
+		out << std::endl ;
 	}
 
 	out.close() ;
@@ -219,20 +219,12 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 					verticesBuffer.push_back(vert[0]);
 					verticesBuffer.push_back(vert[1]);
 					verticesBuffer.push_back(vert[2]);
-//					CGoGNout << vert<< CGoGNendl;
 				}
 				indicesBuffer.push_back(tableVertLab[e]);
 				e = the_map.phi1(e);
 			} while (e!=d);
 		}
 	}
-
-//	for (int i=0; i< indicesBuffer.size(); ++i)
-//	{
-//		CGoGNout << indicesBuffer[i]<<", "<< CGoGNendl;
-//		if (i%3==0)
-//			CGoGNout << CGoGNendl;
-//	}
 
 	// Save the file using the OpenCTM API
 	CTMexporter ctm;
@@ -311,43 +303,43 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		}
 	}
 
-	out << "ply" << CGoGNendl ;
-	out << "format ascii 1.0" << CGoGNendl ;
-	out << "comment ply PTM (F. Larue format)" << CGoGNendl ;
-	out << "element vertex " << vertices.size() << CGoGNendl ;
-	out << "property float x" << CGoGNendl ;
-	out << "property float y" << CGoGNendl ;
-	out << "property float z" << CGoGNendl ;
-	out << "property float tx" << CGoGNendl ;
-	out << "property float ty" << CGoGNendl ;
-	out << "property float tz" << CGoGNendl ;
-	out << "property float bx" << CGoGNendl ;
-	out << "property float by" << CGoGNendl ;
-	out << "property float bz" << CGoGNendl ;
-	out << "property float nx" << CGoGNendl ;
-	out << "property float ny" << CGoGNendl ;
-	out << "property float nz" << CGoGNendl ;
-	out << "property float L1_a" << CGoGNendl ;
-	out << "property float L1_b" << CGoGNendl ;
-	out << "property float L1_c" << CGoGNendl ;
-	out << "property float L1_d" << CGoGNendl ;
-	out << "property float L1_e" << CGoGNendl ;
-	out << "property float L1_f" << CGoGNendl ;
-	out << "property float L2_a" << CGoGNendl ;
-	out << "property float L2_b" << CGoGNendl ;
-	out << "property float L2_c" << CGoGNendl ;
-	out << "property float L2_d" << CGoGNendl ;
-	out << "property float L2_e" << CGoGNendl ;
-	out << "property float L2_f" << CGoGNendl ;
-	out << "property float L3_a" << CGoGNendl ;
-	out << "property float L3_b" << CGoGNendl ;
-	out << "property float L3_c" << CGoGNendl ;
-	out << "property float L3_d" << CGoGNendl ;
-	out << "property float L3_e" << CGoGNendl ;
-	out << "property float L3_f" << CGoGNendl ;
-	out << "element face " << nbf << CGoGNendl ;
-	out << "property list uchar int vertex_indices" << CGoGNendl ;
-	out << "end_header" << CGoGNendl ;
+	out << "ply" << std::endl ;
+	out << "format ascii 1.0" << std::endl ;
+	out << "comment ply PTM (F. Larue format)" << std::endl ;
+	out << "element vertex " << vertices.size() << std::endl ;
+	out << "property float x" << std::endl ;
+	out << "property float y" << std::endl ;
+	out << "property float z" << std::endl ;
+	out << "property float tx" << std::endl ;
+	out << "property float ty" << std::endl ;
+	out << "property float tz" << std::endl ;
+	out << "property float bx" << std::endl ;
+	out << "property float by" << std::endl ;
+	out << "property float bz" << std::endl ;
+	out << "property float nx" << std::endl ;
+	out << "property float ny" << std::endl ;
+	out << "property float nz" << std::endl ;
+	out << "property float L1_a" << std::endl ;
+	out << "property float L1_b" << std::endl ;
+	out << "property float L1_c" << std::endl ;
+	out << "property float L1_d" << std::endl ;
+	out << "property float L1_e" << std::endl ;
+	out << "property float L1_f" << std::endl ;
+	out << "property float L2_a" << std::endl ;
+	out << "property float L2_b" << std::endl ;
+	out << "property float L2_c" << std::endl ;
+	out << "property float L2_d" << std::endl ;
+	out << "property float L2_e" << std::endl ;
+	out << "property float L2_f" << std::endl ;
+	out << "property float L3_a" << std::endl ;
+	out << "property float L3_b" << std::endl ;
+	out << "property float L3_c" << std::endl ;
+	out << "property float L3_d" << std::endl ;
+	out << "property float L3_e" << std::endl ;
+	out << "property float L3_f" << std::endl ;
+	out << "element face " << nbf << std::endl ;
+	out << "property list uchar int vertex_indices" << std::endl ;
+	out << "end_header" << std::endl ;
 
 	for(unsigned int i = 0; i < vertices.size(); ++i)
 	{
@@ -358,7 +350,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		out << frame[2][vi][0] << " " << frame[2][vi][1] << " " << frame[2][vi][2] << " " ;
 		out << colorPTM[0][vi][0] << " " << colorPTM[1][vi][0] << " " << colorPTM[2][vi][0] << " " << colorPTM[3][vi][0] << " " << colorPTM[4][vi][0] << " " << colorPTM[5][vi][0] <<" " ;
 		out << colorPTM[0][vi][1] << " " << colorPTM[1][vi][1] << " " << colorPTM[2][vi][1] << " " << colorPTM[3][vi][1] << " " << colorPTM[4][vi][1] << " " << colorPTM[5][vi][1] <<" " ;
-		out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << CGoGNendl ;
+		out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << std::endl ;
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();
@@ -368,7 +360,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		out << nbe ;
 		for(unsigned int j = 0; j < nbe; ++j)
 			out << " " << *it++;
-		out << CGoGNendl ;
+		out << std::endl ;
 	}
 
 	out.close() ;

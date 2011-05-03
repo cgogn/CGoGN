@@ -43,7 +43,6 @@ namespace QT
 SimpleQT::SimpleQT():
 m_dock(NULL)
 {
-
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
 	setWindowTitle(tr("CGoGN"));

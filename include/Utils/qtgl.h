@@ -72,8 +72,6 @@ protected:
 	int m_current_button;
 	int beginx;
 	int beginy;
-//	float curquat[4];
-//	float lastquat[4];
 	int newModel;
 
 	int moving;

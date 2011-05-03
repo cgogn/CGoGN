@@ -34,14 +34,16 @@ namespace Utils
 namespace QT
 {
 
-class uiDockInterface: public QDockWidget, public Ui::DockWidget
+class uiDockInterface : public QDockWidget, public Ui::DockWidget
 {
 public:
 	uiDockInterface() { setupUi(this); }
 };
 
-}
-}
-}
+} // namespace QT
+
+} // namespace Utils
+
+} // namespace CGoGN
 
 #endif

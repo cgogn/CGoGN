@@ -28,6 +28,7 @@
 #include "Algo/ProgressiveMesh/vsplit.h"
 
 #include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/edgeSelector.h"
 #include "Algo/Decimation/geometryApproximator.h"
 #include "Algo/Decimation/geometryPredictor.h"
 #include "Algo/Decimation/lightfieldApproximator.h"
