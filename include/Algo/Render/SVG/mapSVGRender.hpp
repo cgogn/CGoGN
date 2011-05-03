@@ -22,8 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/GLSLShader.h"
+
+#include "GL/glew.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
@@ -34,79 +35,73 @@ namespace Algo
 namespace Render
 {
 
-namespace GL2
+namespace SVG
 {
 
-MapRender::MapRender()
+template <typename PFP>
+void SVGOut::renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
 {
-	glGenBuffersARB(4, m_indexBuffers) ;
-	for(unsigned int i = 0; i < 4; ++i)
-		m_nbIndices[i] = 0 ;
-}
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
 
-MapRender::~MapRender()
-{
-	glDeleteBuffersARB(4, m_indexBuffers);
-}
-
-void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
-{
-	// indice du VBO a utiliser
-	int vbo_ind = 0;
-	switch(prim)
+	DartMarker m(map, thread);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		case POINTS:
-			m_nbIndices[POINT_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[POINT_INDICES];
-			break;
-		case LINES:
-			m_nbIndices[LINE_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[LINE_INDICES];
-			break;
-		case TRIANGLES:
-			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
-			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
-			break;
-		default:
-			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
-			break;
-	}
-	int size = tableIndices.size();
+		if(!m.isMarked(d) && good(d))
+		{
+			const Geom::Vec3f& P = position[d];
+			glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,viewport);
 
-	// setup du buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+			const Geom::Vec3f& P2 = position[map.phi1(d)];
+			glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,viewport);
+
+			SvgPolyline* pol = new SvgPolyline();
+			pol->addVertex(Geom::Vec3f(Q[0],float(viewport[3])-Q[1],Q[2]));
+			pol->addVertex(Geom::Vec3f(Q2[0],float(viewport[3])-Q2[1],Q2[2]));
+			pol->setColor(global_color);
+			pol->setWidth(global_width);
+			m_objs.push_back(pol);
+			m.markOrbit(EDGE_ORBIT, d);
+		}
+	}
 }
 
-void MapRender::draw(Utils::GLSLShader* sh, int prim)
+
+template <typename PFP>
+void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, const FunctorSelect& good, unsigned int thread)
 {
-	sh->enableVertexAttribs();
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
 
-	switch(prim)
+	DartMarker m(map, thread);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		case POINTS:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[POINT_INDICES]);
-			glDrawElements(GL_POINTS, m_nbIndices[POINT_INDICES], GL_UNSIGNED_INT, 0) ;
-			break;
-		case LINES:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[LINE_INDICES]);
-			glDrawElements(GL_LINES, m_nbIndices[LINE_INDICES], GL_UNSIGNED_INT, 0);
-			break;
-		case TRIANGLES:
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[TRIANGLE_INDICES]);
-			glDrawElements(GL_TRIANGLES, m_nbIndices[TRIANGLE_INDICES], GL_UNSIGNED_INT, 0);
-			break;
-		default:
-			break;
-	}
+		if(!m.isMarked(d) && good(d))
+		{
+			typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,d,position);
+			SvgPolyline* pol = new SvgPolyline();
+			Dart dd = d;
+			do
+			{
+				Geom::Vec3f P = position[d];
+				P = P*shrink + center*(1.0f-shrink);
+				glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,viewport);
+				pol->addVertex(Geom::Vec3f(Q[0],float(viewport[3])-Q[1],Q[2]));
+				d = map.phi1(d);
+			}while (d!=dd);
 
-	sh->disableVertexAttribs();
+			pol->close();
+			pol->setColor(global_color);
+			pol->setWidth(global_width);
+			m_objs.push_back(pol);
+
+			m.markOrbit(FACE_ORBIT, d);
+		}
+	}
 }
 
-} // namespace GL2
 
+} // namespace SVG
 } // namespace Render
-
 } // namespace Algo
-
 } // namespace CGoGN

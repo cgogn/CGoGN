@@ -79,6 +79,15 @@ void VBO::ref(GLSLShader* sh)
 	m_refs.push_back(sh);
 }
 
+void VBO::sameAllocSameBufferSize(const VBO& vbo)
+{
+	m_data_size = vbo.m_data_size;
+	m_nbElts = vbo.m_nbElts;
+	unsigned int nbbytes =  sizeof(float) * m_data_size * m_nbElts;
+	bind();
+	glBufferData(GL_ARRAY_BUFFER, nbbytes, NULL, GL_STREAM_DRAW);
+}
+
 void* VBO::lockPtr()
 {
 	if (m_lock)
@@ -92,7 +101,20 @@ void* VBO::lockPtr()
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
-void VBO::releasePtr()
+const void* VBO::lockPtr() const
+{
+	if (m_lock)
+	{
+		CGoGNerr <<" Error already locked VBO"<< CGoGNendl;
+		return NULL;
+	}
+
+	m_lock = true;
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+}
+
+void VBO::releasePtr() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 	glUnmapBuffer(GL_ARRAY_BUFFER);

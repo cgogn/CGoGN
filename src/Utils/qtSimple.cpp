@@ -114,6 +114,12 @@ std::string SimpleQT::selectFile(const std::string& title, const std::string& di
     return fileName.toStdString();
 }
 
+std::string SimpleQT::selectFileSave(const std::string& title, const std::string& dir, const std::string& filters)
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
+    return fileName.toStdString();
+}
+
 void SimpleQT::cb_about_cgogn()
 {
 	QString str("CGoGN:\nCombinatorial and Geometric modeling\n"
