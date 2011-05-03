@@ -273,9 +273,14 @@ public:
 	virtual void cb_mouseRelease(int button, int x, int y) {}
 
 	/**
+	 * Mouse button has been clicked
+	 */
+	virtual void cb_mouseClick(int button, int x, int y) {}
+
+	/**
 	 * the mouse has been move (with button still pressed)
 	 */
-	virtual void cb_mouseMove(int x, int y) {}
+	virtual void cb_mouseMove(int button, int x, int y) {}
 
 	/**
 	 * key press CB (context is ok)
