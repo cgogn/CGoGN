@@ -220,7 +220,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 		m_cbs->cb_mouseMove(event->button(), event->x(), getHeight() - event->y());
 }
 
-void GLWidget::wheelEvent ( QWheelEvent * event )
+void GLWidget::wheelEvent(QWheelEvent* event)
 {
 	float wl = -0.05f * FAR_PLANE / foc;
 
@@ -233,7 +233,7 @@ void GLWidget::wheelEvent ( QWheelEvent * event )
 	updateGL();
 }
 
-void GLWidget:: keyPressEvent(QKeyEvent* event)
+void GLWidget::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape)
         close();
