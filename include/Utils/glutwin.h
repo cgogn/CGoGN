@@ -30,7 +30,7 @@
 
 #define __X_GL_H
 #define GLAPIENTRY
-#include <GL/freeglut.h>
+#include <GL/glut.h>
 
 #ifndef WIN32
 	#ifdef MAC_OSX
@@ -54,7 +54,7 @@ namespace CGoGN
 namespace Utils
 {
 
-APIEXPORT class SimpleGlutWin
+class SimpleGlutWin
 {
 protected:
 	// internal values used for the manipulation of object

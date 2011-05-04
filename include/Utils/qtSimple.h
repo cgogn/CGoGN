@@ -196,12 +196,14 @@ public:
 	/**
 	 * current modelview matrix
 	 */
-	glm::mat4& modelViewMatrix () { return m_modelView_matrix; }
+	const glm::mat4& modelViewMatrix() const { return m_modelView_matrix; }
+	glm::mat4& modelViewMatrix() { return m_modelView_matrix; }
 
 	/**
 	 * current projection matrix
 	 */
-	glm::mat4& projectionMatrix () { return m_projection_matrix; }
+	const glm::mat4& projectionMatrix() const { return m_projection_matrix; }
+	glm::mat4& projectionMatrix() { return m_projection_matrix; }
 
 
 	float* curquat() { return m_curquat; }
@@ -273,9 +275,14 @@ public:
 	virtual void cb_mouseRelease(int button, int x, int y) {}
 
 	/**
+	 * Mouse button has been clicked
+	 */
+	virtual void cb_mouseClick(int button, int x, int y) {}
+
+	/**
 	 * the mouse has been move (with button still pressed)
 	 */
-	virtual void cb_mouseMove(int x, int y) {}
+	virtual void cb_mouseMove(int button, int x, int y) {}
 
 	/**
 	 * key press CB (context is ok)
@@ -315,6 +322,15 @@ public:
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
 	std::string selectFile(const std::string& title = "open file", const std::string& dir = ".", const std::string& filters = "all (*.*)");
+
+	/**
+	 * Open a file selector and return the filename (for saving a file)
+	 * @param title title of window
+	 * @param dir base directory
+	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
+	 */
+	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
+
 
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }

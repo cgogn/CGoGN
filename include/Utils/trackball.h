@@ -64,7 +64,7 @@ namespace Utils
  * The resulting rotation is returned as a quaternion rotation in the
  * first paramater.
  */
-APIEXPORT void
+void
 trackball(float q[4], float p1x, float p1y, float p2x, float p2y);
 
 /*
@@ -75,14 +75,14 @@ trackball(float q[4], float p1x, float p1y, float p2x, float p2y);
  * rotation, the second and third the total rotation (which will be
  * over-written with the resulting new total rotation).
  */
-APIEXPORT void
+void
 add_quats(float *q1, float *q2, float *dest);
 
 /*
  * A useful function, builds a rotation matrix in Matrix based on
  * given quaternion.
  */
-APIEXPORT void
+void
 build_rotmatrix(float m[4][4], float q[4]);
 
 
@@ -93,7 +93,7 @@ void build_rotmatrixgl3(glm::mat4& m, float q[4]);
  * the given vector) and an angle about which to rotate.  The angle is
  * expressed in radians.  The result is put into the third argument.
  */
-APIEXPORT void
+void
 axis_to_quat(float a[3], float phi, float q[4]);
 
 } //namespace Utils

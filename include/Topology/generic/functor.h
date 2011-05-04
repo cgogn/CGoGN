@@ -25,6 +25,7 @@
 #ifndef __FUNCTOR_H__
 #define __FUNCTOR_H__
 
+#include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
 #include <vector>
 
