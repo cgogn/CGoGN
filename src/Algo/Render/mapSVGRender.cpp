@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 #include "Algo/Render/SVG/mapSVGRender.h"
+#include <algorithm>
+#include <typeinfo>
 
 /**
 * A set of functions that allow the creation of rendering
@@ -41,15 +43,42 @@ namespace Render
 namespace SVG
 {
 
-void SvgPolyline::addVertex(const Geom::Vec3f& v)
+void SvgObj::addVertex(const Geom::Vec3f& v)
 {
 	m_vertices.push_back(v);
 }
 
-void SvgPolyline::close()
+
+void SvgObj::setColor(const Geom::Vec3f& c)
+{
+	m_color=c;
+}
+
+
+void SvgObj::close()
 {
 	m_vertices.push_back(m_vertices.front());
 }
+
+
+Geom::Vec3f SvgObj::normal()
+{
+	if (m_vertices.size()<3)
+	{
+		CGoGNerr << "Error SVG normal computing (not enough points)"<<CGoGNendl;
+		return Geom::Vec3f(0.0f,0.0f,0.0f);
+	}
+
+	Geom::Vec3f U = m_vertices[2] - m_vertices[1];
+	Geom::Vec3f V = m_vertices[0] - m_vertices[1];
+
+	Geom::Vec3f N = U^V;
+
+	N.normalize(); // TO DO verify that is necessary
+
+	return N;
+}
+
 
 void SvgPolyline::save(std::ofstream& out)
 {
@@ -64,6 +93,46 @@ void SvgPolyline::save(std::ofstream& out)
 	out<< int(m_color[1]*255);
 	out.width(2); out.fill('0');
 	out << int(m_color[2]*255)<<std::dec;
+	out <<"\" stroke-width=\""<<m_width<<"\" points=\"";
+	out.fill(prev);
+	out.width(wp);
+	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
+	{
+		out << (*it)[0] << ","<< (*it)[1]<< " ";
+	}
+	out <<"\"/>"<< std::endl;
+
+}
+
+void SvgPolygon::setColorFill(const Geom::Vec3f& c)
+{
+	m_colorFill=c;
+}
+
+
+void SvgPolygon::save(std::ofstream& out)
+{
+	std::stringstream ss;
+
+	out << "<polyline fill=\"";
+	out << std::hex;
+	unsigned int wp = out.width(2);
+	char prev = out.fill('0');
+	out << int(m_colorFill[0]*255);
+	out.width(2); out.fill('0');
+	out<< int(m_colorFill[1]*255);
+	out.width(2); out.fill('0');
+	out << int(m_colorFill[2]*255);
+
+	out << "none\" stroke=\"#";
+	wp = out.width(2);
+	prev = out.fill('0');
+	out << int(m_color[0]*255);
+	out.width(2); out.fill('0');
+	out<< int(m_color[1]*255);
+	out.width(2); out.fill('0');
+	out << int(m_color[2]*255)<<std::dec;
+
 	out <<"\" stroke-width=\""<<m_width<<"\" points=\"";
 	out.fill(prev);
 	out.width(wp);
@@ -132,6 +201,10 @@ void SVGOut::setWidth(float w)
 void SVGOut::closeFile()
 {
 	// here do the sort in necessary
+	compSvgObj cmp;
+//	std::sort(m_objs.begin(),m_objs.end(),cmp);
+	bubble_sort(m_objs,cmp);
+
 	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
 	{
 		(*it)->save(*m_out);
@@ -143,6 +216,92 @@ void SVGOut::closeFile()
 }
 
 
+
+// all points behind the plane +
+// all points before the plane -
+// all points colinear to the plane 0
+int compSvgObj::points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane)
+{
+	Geom::Vec3f N = pol_plane->normal();
+
+	if (N[2] > 0.0f)
+		N = -1.0f*N;
+
+	unsigned int nb = pol_points->nbv();
+	unsigned int nbback=0;
+	unsigned int nbfront=0;
+	unsigned int nb_col=0;
+	for (unsigned int i=0; i< nb; ++i)
+	{
+		Geom::Vec3f U = pol_points->P(i) - pol_plane->P(0);
+		float ps = U*N;
+
+		if (fabs(ps) < 0.0001f)
+			nb_col++;
+		else
+		{
+			if (ps <0)
+				nbback++;
+			else
+				nbfront++;
+		}
+	}
+
+	if (nbfront==0)
+		return 1;
+
+	if (nbback==0)
+		return -1;
+
+	return 0;
+}
+
+bool compSvgObj::operator() (SvgObj* a, SvgObj*b)
+{
+//	std::cout << typeid(*a).name()<< " / "<< typeid(*b).name()<< std::endl;
+
+	SvgPolygon* p_a = dynamic_cast<SvgPolygon*>(a);
+	SvgPolygon* p_b = dynamic_cast<SvgPolygon*>(b);
+
+
+	if ((p_a!= NULL) && (p_b!=NULL)) // first case polygon/polygon
+	{
+		if (points_plane(p_a,p_b)>0)
+			return true;
+		if (points_plane(p_b,p_a)<0)
+			return true;
+		return false;
+	}
+
+	std::cout << "Cas non traite !!"<< std::endl;
+	return false;
+}
+
+
+void bubble_sort(std::vector<SvgObj*>& table, compSvgObj& cmp)
+{
+	unsigned int nb = table.size()-1;
+	unsigned int nbswap=1;
+	while (nbswap>0)
+	{
+		nbswap=0;
+		for (unsigned int i=0; i<nb;++i)
+		{
+			if (cmp(table[i+1], table[i]))
+			{
+				SvgObj* tempo = table[i];
+				table[i] = table[i+1];
+				table[i+1] = tempo;
+				nbswap++;
+				std::cout << "SWAP "<< i << " / "<< i+1 << std::endl;
+
+			}
+		}
+		std::cout << "NB SWAP = "<< nbswap<< std::endl;
+	}
+
+
+}
 
 } // namespace SVG
 } // namespace Render

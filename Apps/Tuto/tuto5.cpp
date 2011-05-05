@@ -249,7 +249,7 @@ void MyQT::cb_keyPress(int code)
 		std::string filename = selectFileSave("Export SVG file ");
 		CGoGNout << "Exporting "<<filename<<CGoGNendl;
 		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
-		svg.renderLinesToSVG<PFP>(myMap,position);
+//		svg.renderLinesToSVG<PFP>(myMap,position);
 		svg.setColor(Geom::Vec3f(1.,0.,0.));
 		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
 		//svg destruction close the file

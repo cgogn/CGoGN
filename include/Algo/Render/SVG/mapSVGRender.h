@@ -62,38 +62,49 @@ namespace SVG
 class SvgObj
 {
 protected:
+	std::vector<Geom::Vec3f> m_vertices;
 	Geom::Vec3f m_color;
+	float m_width;
 public:
+	void addVertex(const Geom::Vec3f& v);
+
+	void setColor(const Geom::Vec3f& c);
+
+	void setWidth(float w) { m_width=w;}
+
+	void close();
+
 	virtual void save(std::ofstream& out)=0;
+
+	unsigned int nbv() const { return m_vertices.size();}
+
+	const Geom::Vec3f& P(unsigned int i) const  { return m_vertices[i];}
+
+	Geom::Vec3f normal();
+
 };
 
 class SvgPolyline: public SvgObj
 {
 protected:
-	std::vector<Geom::Vec3f> m_vertices;
-	float m_width;
+
+
 public:
-	void addVertex(const Geom::Vec3f& v);
-
-	void close();
-
-	void setColor(const Geom::Vec3f& c) { m_color=c;}
-
-	void setWidth(float w) { m_width=w;}
 
 	void save(std::ofstream& out);
 
 };
 
 
-class Svg_Polygon: public SvgObj
+class SvgPolygon: public SvgObj
 {
 protected:
-	std::vector<Geom::Vec3f> m_vertices;
+	Geom::Vec3f m_colorFill;
 public:
-	void addVertex(const Geom::Vec3f& v) {}
-	void close() {}
-	void save(std::ofstream& out) {}
+
+	void setColorFill(const Geom::Vec3f& c);
+
+	void save(std::ofstream& out);
 };
 
 
@@ -141,6 +152,15 @@ public:
 
 };
 
+
+struct compSvgObj
+{
+	int points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane);
+	bool operator() (SvgObj* a, SvgObj*b);
+};
+
+
+void bubble_sort(std::vector<SvgObj*>& table, compSvgObj& cmp);
 
 
 } // namespace SVG

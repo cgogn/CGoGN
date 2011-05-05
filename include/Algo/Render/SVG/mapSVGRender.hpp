@@ -79,7 +79,7 @@ void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3&
 		if(!m.isMarked(d) && good(d))
 		{
 			typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,d,position);
-			SvgPolyline* pol = new SvgPolyline();
+			SvgPolygon* pol = new SvgPolygon();
 			Dart dd = d;
 			do
 			{
