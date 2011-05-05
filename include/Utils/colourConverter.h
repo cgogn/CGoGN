@@ -39,8 +39,8 @@ namespace Utils {
 enum ColourEncoding
 {
 	C_RGB = 0,
-	C_Luv = 1,
-	C_XYZ = 2,
+	C_XYZ = 1,
+	C_Luv = 2,
 	C_Lab = 3
 } ;
 
