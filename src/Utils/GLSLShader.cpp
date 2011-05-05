@@ -542,7 +542,8 @@ bool GLSLShader::bind() const
 		glUseProgramObjectARB( m_program_object );
 		return true;
 	}
-	else  return false;
+	else
+		return false;
 }
 
 void GLSLShader::unbind() const

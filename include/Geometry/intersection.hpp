@@ -284,8 +284,7 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
 template <typename VEC3, typename PLANE3D>
 Intersection intersectPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter)
 {
-	typename VEC3::DATA_TYPE isect;
-	isect = (pl.normal()*(pl.normal()*pl.d()-p1)) / (pl.normal()*dir);
+	typename VEC3::DATA_TYPE isect = (pl.normal() * (pl.normal()*pl.d()-p1)) / (pl.normal()*dir);
 
 	if(0.0f <= isect)
 	{

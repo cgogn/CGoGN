@@ -70,10 +70,9 @@ protected:
 	std::stack<glm::mat4> m_stack_mv;
 
 	int m_current_button;
+	QPoint clickPoint;
 	int beginx;
 	int beginy;
-//	float curquat[4];
-//	float lastquat[4];
 	int newModel;
 
 	int moving;
@@ -103,17 +102,20 @@ public:
 
 	void resizeGL(int width, int height);
 
-	void mousePressEvent(QMouseEvent *event);
+public:
+	void mousePressEvent(QMouseEvent* event);
 
-	void mouseReleaseEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent* event);
 
-	void mouseMoveEvent(QMouseEvent *event);
+	void mouseClickEvent(QMouseEvent* event);
 
-	void keyPressEvent(QKeyEvent *event);
+	void mouseMoveEvent(QMouseEvent* event);
 
-	void keyReleaseEvent(QKeyEvent *event);
+	void keyPressEvent(QKeyEvent* event);
 
-	void wheelEvent ( QWheelEvent * event );
+	void keyReleaseEvent(QKeyEvent* event);
+
+	void wheelEvent(QWheelEvent* event);
 
 	bool Shift() { return m_state_modifier & Qt::ShiftModifier; }
 

@@ -34,7 +34,6 @@ namespace Algo
 namespace PMesh
 {
 
-
 template <typename PFP>
 class VSplit 
 {
@@ -97,7 +96,6 @@ public:
 		approxEdgeId2 = id ;
 	}
 } ;
-
 
 } //namespace PMesh
 
