@@ -24,6 +24,7 @@
 
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
+#include "Utils/vbo.h"
 
 namespace CGoGN
 {
@@ -210,60 +211,7 @@ void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, st
 	}
 }
 
-//template<typename PFP>
-//void MapRender::initFlatTriangles( typename PFP::MAP& map,  const Utils::GL2& vbopos, const FunctorSelect& good, unsigned int thread)
-//{
-//	std::vector<Geom::Vec3f> tableFlat;
-//	tableFlat.reserve(3*map.getNbDarts()); // 3 in case of polygonal faces (less chance of realloc, but bigger allocation)
-//
-//	// map VBO of points for vertices positions
-//	glBindBufferARB(GL_ARRAY_BUFFER, vbopos.id());
-//	Geom::Vec3f* tablePos = reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER,GL_READ_ONLY));
-//
-//	m_nbFlatElts=0;
-//	// traversal of map for creating buffers
-//	DartMarker m(map,thread);
-//	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
-//	{
-//		if(!m.isMarked(dd) && good(dd))
-//		{
-//			Dart a = dd;
-//			Dart b = map.phi1(a);
-//			Dart c = map.phi1(b);
-//
-//			Geom::Vec3f& P = tablePos[map.getEmbedding(a, VERTEX_ORBIT)];
-//			Geom::Vec3f& Q = tablePos[map.getEmbedding(b, VERTEX_ORBIT)];
-//			Geom::Vec3f& R = tablePos[map.getEmbedding(c, VERTEX_ORBIT)];
-//
-//			Geom::Vec3f U = Q-P;
-//			Geom::Vec3f V = R-P;
-//			Geom::Vec3f N = U^V;
-//			N.normalize();
-//
-//			// loop to cut a polygon in triangle on the fly (works only with convex faces)
-//			do
-//			{
-//				tableFlat.push_back(tablePos[map.getEmbedding(a, VERTEX_ORBIT)]);
-//				tableFlat.push_back(N);
-//				tableFlat.push_back(tablePos[map.getEmbedding(b, VERTEX_ORBIT)]);
-//				tableFlat.push_back(N);
-//				tableFlat.push_back(tablePos[map.getEmbedding(c, VERTEX_ORBIT)]);
-//				tableFlat.push_back(N);
-//				b = c;
-//				c = map.phi1(b);
-//			} while (c != dd);
-//			m.markOrbit(FACE_ORBIT, dd);
-//		}
-//	}
-//	glUnmapBuffer(GL_ARRAY_BUFFER);
-//
-//	m_nbFlatElts = tableFlat.size()/2;
-//
-//	//creating VBO for flat
-//	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[FLAT_BUFFER]);
-//	glBufferDataARB(GL_ARRAY_BUFFER, tableFlat.size() * sizeof(Geom::Vec3f), (char*)(&(tableFlat[0])), GL_STREAM_DRAW);
-//
-//}
+
 
 template<typename PFP>
 void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)

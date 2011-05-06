@@ -22,8 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-//#define GL3_PROTOTYPES
-
 #include "tuto1.h"
 
 #include <iostream>
@@ -41,6 +39,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Algo/Render/SVG/mapSVGRender.h"
+
+
 using namespace CGoGN ;
 
 /**
@@ -52,6 +53,11 @@ struct PFP: public PFP_STANDARD
 	// definition of the type of the map
 	typedef EmbeddedMap2<Map2> MAP;
 };
+
+// declaration of the map
+PFP::MAP myMap;
+// and attribute of position
+AttributeHandler<PFP::VEC3> position;
 
 void MyQT::cb_initGL()
 {
@@ -99,12 +105,21 @@ void MyQT::cb_keyPress(int code)
 
 	if ((code >'0') && (code<='9'))
 		CGoGNout << " key num " << code-'0' << "pressed"<< CGoGNendl;
+
+	if (code  == 's')
+	{
+		std::string filename = selectFileSave("Export SVG file ");
+		CGoGNout << "Exporting "<<filename<<CGoGNendl;
+		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+		svg.renderLinesToSVG<PFP>(myMap,position);
+		svg.setColor(Geom::Vec3f(0.7f,0.0f,0.4f));
+		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
+		//svg destruction close the file
+	}
 }
 
 int main(int argc, char **argv)
 {
-	// declaration of the map
-	PFP::MAP myMap;
 
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);
@@ -115,7 +130,7 @@ int main(int argc, char **argv)
 
 	// creation of a new attribute on vertices of type 3D vector
 	// a handler to this attribute is returned
-	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
 
 	// affect a position to the vertices of the mesh
 	position[d1] = PFP::VEC3(0, 0, 0);

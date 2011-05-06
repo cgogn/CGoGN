@@ -36,10 +36,10 @@
         #include <stdio.h>
         #include <limits>
         #include <cmath>
-        #ifndef PI_DEFINED
-        #define PI_DEFINED
-                const double M_PI = 3.14159265359;
-        #endif
+        //#ifndef PI_DEFINED
+        //#define PI_DEFINED
+        //double M_PI = 3.14159265359;
+        //#endif
 #endif
 
 

@@ -9,7 +9,8 @@ SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
 
 SET(CMAKE_MODULE_PATH " ${CMAKE_MODULE_PATH} ${CGoGN_ROOT_DIR}/cmake_modules/")
 
-find_package(OpenGL)
+find_package(OpenGL REQUIRED)
+find_package(Qt4 REQUIRED)
 find_package(GLUT)
 
 # qq definition specifiques pour mac
@@ -28,7 +29,6 @@ IF(WIN32)
 	SET(LIBXML2_LIBRARIES xml2)
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/)
 	LINK_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/lib/)
-#	add_subdirectory(${CGoGN_ROOT_DIR}/ThirdParty ThirdParty)
 	add_subdirectory(Release)
 	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 	if (EXISTS "${CGoGN_ROOT_DIR}/Perso")
@@ -37,7 +37,7 @@ IF(WIN32)
 
 	if(CMAKE_CONFIGURATION_TYPES)
 		set(CMAKE_CONFIGURATION_TYPES Release Debug)
-		set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Use only Release configuration for ThirdParty" FORCE)
+		set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
 	endif()
 	
 ELSE(WIN32)
@@ -51,7 +51,7 @@ ELSE(WIN32)
 	ELSE(IL_LIBRARIES)
 		SET(DEVIL_LIBRARIES ${IL_LIBRARY} ${ILU_LIBRARY} ${ILUT_LIBRARY})
 	ENDIF(IL_LIBRARIES)
-#	add_subdirectory(${CGoGN_ROOT_DIR}/ThirdParty ThirdParty)
+
 	add_subdirectory(Release)
 	add_subdirectory(Debug)
 	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)

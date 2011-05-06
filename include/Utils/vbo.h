@@ -56,7 +56,7 @@ protected:
 	// shaders that ref this vbo
 	std::vector<GLSLShader*> m_refs;
 	unsigned int m_nbElts;
-	bool m_lock;
+	mutable bool m_lock;
 
 public:
 	/**
@@ -98,6 +98,9 @@ public:
 	 */
 	void ref(GLSLShader* sh);
 
+
+	void sameAllocSameBufferSize(const VBO& vbo);
+
 	/**
 	 * update data from attribute handler to the vbo
 	 */
@@ -112,7 +115,9 @@ public:
 
 	void* lockPtr();
 
-	void releasePtr();
+	const void* lockPtr() const;
+
+	void releasePtr() const;
 
 	unsigned int nbElts() {return m_nbElts;}
 };

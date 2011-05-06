@@ -187,6 +187,7 @@ extern CGoGNStream::Dbg<1> CGoGNdbg;
 extern CGoGNStream::Dbg<2> CGoGNdbg2;
 extern CGoGNStream::Dbg<3> CGoGNdbg3;
 extern CGoGNStream::Special CGoGNendl;
+extern CGoGNStream::Special CGoGNflush;
 
 } // namespace CGoGN
 

@@ -43,7 +43,6 @@ namespace QT
 SimpleQT::SimpleQT():
 m_dock(NULL)
 {
-
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
 	setWindowTitle(tr("CGoGN"));
@@ -111,6 +110,12 @@ SimpleQT::~SimpleQT()
 std::string SimpleQT::selectFile(const std::string& title, const std::string& dir, const std::string& filters)
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
+    return fileName.toStdString();
+}
+
+std::string SimpleQT::selectFileSave(const std::string& title, const std::string& dir, const std::string& filters)
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
     return fileName.toStdString();
 }
 

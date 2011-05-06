@@ -135,19 +135,20 @@ void VarBool::updateFrom( QWidget* widg) const
 
 //class VarInt
 
-VarInt::VarInt(int min, int max, int& val, const std::string& label) :
+VarInteger::VarInteger(int min, int max, int& val, const std::string& label):
 		m_min(min),m_max(max), m_val(val)
 {
 	m_label = label;
 }
 
-VarInt::VarInt(int min, int max, int& val, const std::string& label, const Var& var) :
-		Var(var), m_min(min), m_max(max), m_val(val)
+
+VarInteger::VarInteger(int min, int max, int& val, const std::string& label, const Var& var):
+		Var(var), m_min(min),m_max(max), m_val(val)
 {
 	m_label = label;
 }
 
-QWidget* VarInt::createInput() const
+QWidget* VarInteger::createInput() const
 {
 	QSpinBox *spin = new QSpinBox();
 	spin->setRange(m_min, m_max);
@@ -155,7 +156,7 @@ QWidget* VarInt::createInput() const
 	return spin;
 }
 
-void VarInt::updateFrom( QWidget* widg) const
+void VarInteger::updateFrom( QWidget* widg) const
 {
 	QSpinBox* spin = dynamic_cast<QSpinBox*>(widg);
 	m_val = spin->value();

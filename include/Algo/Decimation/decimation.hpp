@@ -149,7 +149,7 @@ void decimate(
 	while(!finished)
 	{
 		CGoGNout << "Countdown : " ;
-		CGoGNout << std::setprecision(8) << (nbVertices - nbWantedVertices) << "\r" << std::flush;
+		CGoGNout << std::setprecision(8) << (nbVertices - nbWantedVertices) << "\r" << /* flush */ CGoGNendl ;
 
 		if(!selector->nextEdge(d)) {
 			CGoGNout << CGoGNendl << "out" << CGoGNendl ;
