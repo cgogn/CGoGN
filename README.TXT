@@ -1,6 +1,10 @@
 Dépendences Linux:
 installer les paquets suivants:
+<<<<<<< HEAD
+cmake libXi-dev libXmu-dev freeglut3-dev libdevil-dev libglew-dev libgmp3-dev libxml2-dev libboost-dev libzip-dev libqt4-help qt4-designer qt4-dev-tools
+=======
 cmake libXi-dev libXmu-dev freeglut3-dev libdevil-dev libglew-dev libgmp3-dev libxml2-dev libboost-dev lizip-dev libqt4-dev qt4-designer qt4-dev-tools
+>>>>>>> 84fe346d20a65b08cb049bffc98c793c70f687f2
 
 
 Pour compiler CGoGN:
