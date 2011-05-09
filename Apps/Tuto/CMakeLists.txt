@@ -77,7 +77,8 @@ target_link_libraries( tp_master
 #BOOST_LIBS macro: allow using compiled boost in windows (see readme)
 # -first argument variable that will contain the libs
 # -second argument list of boost libs separated by ; in " "
-BOOST_LIBS(boost_lib_lists "boost_thread-mt;boost_iostreams-mt")
+# exemple: BOOST_LIBS(boost_lib_lists "boost_thread-mt;boost_iostreams-mt")
+BOOST_LIBS(boost_lib_lists "boost_thread-mt")
 
 QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
 add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
