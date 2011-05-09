@@ -112,6 +112,16 @@ void MyQT::slider_text(int x)
 	updateGL();
 }
 
+
+
+void MyQT::animate()
+{
+//	transfoMatrix() = glm::rotate(transfoMatrix(), 0.5f, glm::vec3(0.5773f,0.5773f,0.5773f));
+	transfoRotate( 0.5f, 0.5773f,0.5773f,0.5773f);
+	updateGLMatrices();
+}
+
+
 void MyQT::storeVerticesInfo()
 {
 
@@ -183,6 +193,11 @@ void MyQT::cb_initGL()
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
 	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
+
+
+	// timer example for animation
+	m_timer = new QTimer( m_glWidget );
+	connect( m_timer, SIGNAL(timeout()), SLOT(animate()) );
 }
 
 void MyQT::cb_redraw()
@@ -230,7 +245,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x, getHeight() - y);
+		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x,y);
 		if (d != Dart::nil())
 		{
 			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
@@ -254,7 +269,15 @@ void MyQT::cb_keyPress(int code)
 		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
 		//svg destruction close the file
 	}
+	if (code  == 't')
+	{
+		if (m_timer->isActive())
+			m_timer->stop();
+		else
+			m_timer->start(1000/30); // 30 fps
+	}
 }
+
 
 
 int main(int argc, char **argv)
@@ -322,7 +345,8 @@ int main(int argc, char **argv)
 	CGoGNdbg2.toConsole(&sqt);
 	CGoGNerr.toConsole(&sqt);
 	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
-	CGoGNerr << " ERROR  " <<  5*7 << CGoGNflush;
+	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
+
 
 
 	// et on attend la fin.

@@ -48,6 +48,12 @@ void SvgObj::addVertex(const Geom::Vec3f& v)
 	m_vertices.push_back(v);
 }
 
+void SvgObj::addVertex3D(const Geom::Vec3f& v)
+{
+	m_vertices3D.push_back(v);
+}
+
+
 
 void SvgObj::setColor(const Geom::Vec3f& c)
 {
@@ -69,8 +75,8 @@ Geom::Vec3f SvgObj::normal()
 		return Geom::Vec3f(0.0f,0.0f,0.0f);
 	}
 
-	Geom::Vec3f U = m_vertices[2] - m_vertices[1];
-	Geom::Vec3f V = m_vertices[0] - m_vertices[1];
+	Geom::Vec3f U = m_vertices3D[2] - m_vertices3D[1];
+	Geom::Vec3f V = m_vertices3D[0] - m_vertices3D[1];
 
 	Geom::Vec3f N = U^V;
 
@@ -78,6 +84,7 @@ Geom::Vec3f SvgObj::normal()
 
 	return N;
 }
+
 
 
 void SvgPolyline::save(std::ofstream& out)
@@ -201,11 +208,12 @@ void SVGOut::setWidth(float w)
 void SVGOut::closeFile()
 {
 	// here do the sort in necessary
-	compSvgObj cmp;
-//	std::sort(m_objs.begin(),m_objs.end(),cmp);
-	bubble_sort(m_objs,cmp);
+	compNormObj cmp;
+	std::sort(m_objs.begin(),m_objs.end(),cmp);
 
-	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
+	std::list<SvgObj*> primitives;
+
+	for (std::list<SvgObj*>::iterator it = primitives.begin(); it != primitives.end(); ++it)
 	{
 		(*it)->save(*m_out);
 	}
@@ -217,10 +225,11 @@ void SVGOut::closeFile()
 
 
 
-// all points behind the plane +
-// all points before the plane -
+// all points behind the plane +1
+// all points before the plane -1
 // all points colinear to the plane 0
-int compSvgObj::points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane)
+// undefined 999
+int compSvgObj::points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane, float& averageZ)
 {
 	Geom::Vec3f N = pol_plane->normal();
 
@@ -231,9 +240,13 @@ int compSvgObj::points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane)
 	unsigned int nbback=0;
 	unsigned int nbfront=0;
 	unsigned int nb_col=0;
+	averageZ=0.0f;
 	for (unsigned int i=0; i< nb; ++i)
 	{
-		Geom::Vec3f U = pol_points->P(i) - pol_plane->P(0);
+		const Geom::Vec3f& Q = pol_points->P(i);
+		averageZ += Q[2];
+		Geom::Vec3f U = Q - pol_plane->P(0);
+
 		float ps = U*N;
 
 		if (fabs(ps) < 0.0001f)
@@ -247,29 +260,55 @@ int compSvgObj::points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane)
 		}
 	}
 
+	averageZ /= float(nb);
+
 	if (nbfront==0)
 		return 1;
 
 	if (nbback==0)
 		return -1;
 
-	return 0;
+	if (nb_col==nb)
+		return 0;
+
+	return 999;
 }
+
 
 bool compSvgObj::operator() (SvgObj* a, SvgObj*b)
 {
-//	std::cout << typeid(*a).name()<< " / "<< typeid(*b).name()<< std::endl;
-
 	SvgPolygon* p_a = dynamic_cast<SvgPolygon*>(a);
 	SvgPolygon* p_b = dynamic_cast<SvgPolygon*>(b);
 
-
 	if ((p_a!= NULL) && (p_b!=NULL)) // first case polygon/polygon
 	{
-		if (points_plane(p_a,p_b)>0)
+		float avz_a;
+		int  t1 = points_plane(p_a,p_b,avz_a);
+
+		if (t1==0) // colinear choose farthest
+		{
+			float za = p_a->P(0)[2];
+			float zb = p_b->P(0)[2];
+			return za > zb;
+		}
+
+		float avz_b;
+		int  t2 = points_plane(p_b,p_a,avz_b);
+
+		// all point of a behind b
+		if ((t1 == 1)&&(t2==999))
 			return true;
-		if (points_plane(p_b,p_a)<0)
+
+		// all point of b infront of a
+		if ((t2 == -1) && (t1==999))
 			return true;
+
+		if ((t1 == t2 )&& (t2!=999))
+		{
+			return avz_a > avz_b;
+		}
+
+		// all other cases ??
 		return false;
 	}
 
@@ -278,30 +317,31 @@ bool compSvgObj::operator() (SvgObj* a, SvgObj*b)
 }
 
 
-void bubble_sort(std::vector<SvgObj*>& table, compSvgObj& cmp)
-{
-	unsigned int nb = table.size()-1;
-	unsigned int nbswap=1;
-	while (nbswap>0)
-	{
-		nbswap=0;
-		for (unsigned int i=0; i<nb;++i)
-		{
-			if (cmp(table[i+1], table[i]))
-			{
-				SvgObj* tempo = table[i];
-				table[i] = table[i+1];
-				table[i+1] = tempo;
-				nbswap++;
-				std::cout << "SWAP "<< i << " / "<< i+1 << std::endl;
 
-			}
-		}
-		std::cout << "NB SWAP = "<< nbswap<< std::endl;
+bool compNormObj::operator() (SvgObj* a, SvgObj*b)
+{
+	SvgPolygon* p_a = dynamic_cast<SvgPolygon*>(a);
+	SvgPolygon* p_b = dynamic_cast<SvgPolygon*>(b);
+
+
+	if ((p_a!= NULL) && (p_b!=NULL)) // first case polygon/polygon
+	{
+		Geom::Vec3f Na = p_a->normal();
+		Geom::Vec3f Nb = p_b->normal();
+		return fabs(Na[2]) > fabs(Nb[2]);
 	}
 
+	if ((p_a!= NULL)) // second case polygon/other
+	{
+		return true;	// all polygon before segments.
+	}
 
+	std::cout << "Cas non traite !!"<< std::endl;
+	return false;
 }
+
+
+
 
 } // namespace SVG
 } // namespace Render

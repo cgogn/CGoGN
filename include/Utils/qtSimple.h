@@ -150,6 +150,7 @@ protected:
 	// mouse & matrix
 	glm::mat4 m_projection_matrix;
 	glm::mat4 m_modelView_matrix;
+	glm::mat4 m_transfo_matrix;
 	float m_curquat[4];
 	float m_lastquat[4];
 	float m_trans_x;
@@ -161,6 +162,9 @@ protected:
 	QMenu* m_appMenu;
 
 	std::string m_helpString;
+
+	std::stack<glm::mat4> m_stack_trf;
+
 
 	void keyPressEvent(QKeyEvent *event);
 
@@ -192,6 +196,9 @@ public:
 	 * @return the distance in modelview world corresponding to radius pixel in screen
 	 */
 	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius = 4);
+
+	const glm::mat4& transfoMatrix() const { return m_transfo_matrix; }
+	glm::mat4& transfoMatrix() { return m_transfo_matrix; }
 
 	/**
 	 * current modelview matrix
@@ -314,6 +321,33 @@ public:
 	 * Ask to Qt to update matrices and then the GL widget.
 	 */
 	void updateGLMatrices();
+
+
+	/**
+	 * apply rotation to transformation matrix
+	 */
+	void transfoRotate(float angle, float x, float y, float z);
+
+	/**
+	 * apply translation to transformation matrix
+	 */
+	void transfoTranslate(float tx, float ty, float tz);
+
+	/**
+	 * apply scale to transformation matrix
+	 */
+	void transfoScale(float sx, float sy, float sz);
+
+	/**
+	 * push the transfo matrix on stack
+	 */
+	void pushTransfoMatrix();
+
+
+	/**
+	 * pop the transfo matrix from stack
+	 */
+	bool popTransfoMatrix();
 
 	/**
 	 * Open a file selector and return the filename

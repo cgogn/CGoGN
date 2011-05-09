@@ -63,10 +63,13 @@ class SvgObj
 {
 protected:
 	std::vector<Geom::Vec3f> m_vertices;
+	std::vector<Geom::Vec3f> m_vertices3D;
 	Geom::Vec3f m_color;
 	float m_width;
 public:
 	void addVertex(const Geom::Vec3f& v);
+
+	void addVertex3D(const Geom::Vec3f& v);
 
 	void setColor(const Geom::Vec3f& c);
 
@@ -76,9 +79,9 @@ public:
 
 	virtual void save(std::ofstream& out)=0;
 
-	unsigned int nbv() const { return m_vertices.size();}
+	unsigned int nbv() const { return m_vertices3D.size();}
 
-	const Geom::Vec3f& P(unsigned int i) const  { return m_vertices[i];}
+	const Geom::Vec3f& P(unsigned int i) const  { return m_vertices3D[i];}
 
 	Geom::Vec3f normal();
 
@@ -150,17 +153,35 @@ public:
 	template <typename PFP>
 	void renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
 
+	void orderPrimitives(std::list<SvgObj*>& primitives);
 };
 
 
 struct compSvgObj
 {
-	int points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane);
+	int points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane, float& averageZ);
 	bool operator() (SvgObj* a, SvgObj*b);
 };
 
+struct compNormObj
+{
+//	int points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane);
+	bool operator() (SvgObj* a, SvgObj*b);
+};
 
-void bubble_sort(std::vector<SvgObj*>& table, compSvgObj& cmp);
+//
+//class BSP_SVG
+//{
+//protected:
+//	std::list<BSP_SVG*> m_front;
+//	std::list<BSP_SVG*> m_back;
+//	std::list<BSP_SVG*> m_intersect;
+//	SvgObj* m_obj;
+//
+//public:
+//	void insert(SvgObj*)
+//};
+
 
 
 } // namespace SVG

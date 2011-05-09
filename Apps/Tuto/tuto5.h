@@ -72,6 +72,8 @@ class MyQT: public Utils::QT::SimpleQT
 	Utils::Strings3D* m_strings;
 	Utils::PointSprite* m_sprite;
 
+	QTimer *m_timer;
+
 public:
 	MyQT():
 		render_text(true),
@@ -85,7 +87,8 @@ public:
 		m_shader(NULL),
 		m_lines(NULL),
 		m_strings(NULL),
-		m_sprite(NULL)
+		m_sprite(NULL),
+		m_timer(NULL)
 	{}
 
 protected:
@@ -109,6 +112,8 @@ public slots:
 	void slider_balls(int x);
 	void slider_vectors(int x);
 	void slider_text(int x);
+
+	void animate();
 };
 
 #endif

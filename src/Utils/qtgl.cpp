@@ -98,8 +98,8 @@ void GLWidget::recalcModelView()
 {
 	glm::mat4 m;
 
-	oglPopModelViewMatrix();
 	oglPushModelViewMatrix();
+
 	// positionne l'objet / mvt souris
 	oglTranslate(m_cbs->trans_x(), m_cbs->trans_y(), m_cbs->trans_z());
 
@@ -112,10 +112,15 @@ void GLWidget::recalcModelView()
 	oglScale(m_obj_sc, m_obj_sc, m_obj_sc);
 	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
 
+	// ajout transformation in screen
+	m_cbs->modelViewMatrix()*= m_cbs->transfoMatrix();
+
 	newModel = 0;
 
 	if (m_cbs)
 		m_cbs->cb_updateMatrix();
+
+	oglPopModelViewMatrix();
 }
 
 void GLWidget::initializeGL()
@@ -176,7 +181,8 @@ void GLWidget::mouseClickEvent(QMouseEvent* event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent* event)
 {
-	if(m_state_modifier == Qt::NoModifier)
+	// move object only if no special keys pressed
+	if (!(m_state_modifier & ( Qt::ShiftModifier|Qt::ControlModifier|Qt::AltModifier| Qt::MetaModifier)))
 	{
 		int x = event->x();
 		int y = event->y();
