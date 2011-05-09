@@ -87,7 +87,7 @@ template <typename VEC3>
 Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 template <typename VEC3, typename PLANE3D>
-Intersection intersectPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter);
+Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter);
 
 template <typename VEC3>
 Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA,  const VEC3& QB, VEC3& Inter) ;
