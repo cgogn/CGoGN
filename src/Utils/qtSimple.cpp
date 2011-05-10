@@ -100,6 +100,8 @@ m_dock(NULL)
 	m_dockConsole->setWidget(m_textConsole);
 
 	m_dockConsole->hide();
+
+	m_transfo_matrix = glm::mat4(1.0f);
 }
 
 SimpleQT::~SimpleQT()
@@ -110,6 +112,12 @@ SimpleQT::~SimpleQT()
 std::string SimpleQT::selectFile(const std::string& title, const std::string& dir, const std::string& filters)
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
+    return fileName.toStdString();
+}
+
+std::string SimpleQT::selectFileSave(const std::string& title, const std::string& dir, const std::string& filters)
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
     return fileName.toStdString();
 }
 
@@ -261,7 +269,6 @@ void SimpleQT::updateGL()
 void SimpleQT::updateGLMatrices()
 {
 	m_glWidget->modelModified();
-	cb_updateMatrix();
 	m_glWidget->updateGL();
 }
 
@@ -326,13 +333,11 @@ void SimpleQT::init_app_menu()
 void SimpleQT::registerShader(GLSLShader* ptr)
 {
 	GLSLShader::registerShader(this, ptr) ;
-//	GLSLShader::m_registeredShaders.insert(std::pair<void*,GLSLShader*>(this, ptr));
 }
 
 void SimpleQT::unregisterShader(GLSLShader* ptr)
 {
 	GLSLShader::unregisterShader(this, ptr) ;
-//	GLSLShader::m_registeredShaders.erase(std::pair<void*,GLSLShader*>(this, ptr));
 }
 
 GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
@@ -376,6 +381,37 @@ GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f
 	Q -= rayB;
 	return float(Q.norm());
 }
+
+
+void SimpleQT::transfoRotate(float angle, float x, float y, float z)
+{
+	transfoMatrix() = glm::rotate(transfoMatrix(), angle, glm::vec3(x,y,z));
+}
+
+void SimpleQT::transfoTranslate(float tx, float ty, float tz)
+{
+	transfoMatrix() = glm::translate(transfoMatrix(), glm::vec3(tx,ty,tz));
+}
+
+void SimpleQT::transfoScale(float sx, float sy, float sz)
+{
+	transfoMatrix() = glm::scale(transfoMatrix(), glm::vec3(sx,sy,sz));
+}
+
+void SimpleQT::pushTransfoMatrix()
+{
+	m_stack_trf.push(transfoMatrix());
+}
+
+bool SimpleQT::popTransfoMatrix()
+{
+	if (m_stack_trf.empty())
+		return false;
+	transfoMatrix() = m_stack_trf.top();
+	m_stack_trf.pop();
+	return true;
+}
+
 
 } // namespace QT
 

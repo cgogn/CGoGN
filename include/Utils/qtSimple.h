@@ -150,6 +150,7 @@ protected:
 	// mouse & matrix
 	glm::mat4 m_projection_matrix;
 	glm::mat4 m_modelView_matrix;
+	glm::mat4 m_transfo_matrix;
 	float m_curquat[4];
 	float m_lastquat[4];
 	float m_trans_x;
@@ -161,6 +162,9 @@ protected:
 	QMenu* m_appMenu;
 
 	std::string m_helpString;
+
+	std::stack<glm::mat4> m_stack_trf;
+
 
 	void keyPressEvent(QKeyEvent *event);
 
@@ -193,15 +197,20 @@ public:
 	 */
 	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius = 4);
 
+	const glm::mat4& transfoMatrix() const { return m_transfo_matrix; }
+	glm::mat4& transfoMatrix() { return m_transfo_matrix; }
+
 	/**
 	 * current modelview matrix
 	 */
-	glm::mat4& modelViewMatrix () { return m_modelView_matrix; }
+	const glm::mat4& modelViewMatrix() const { return m_modelView_matrix; }
+	glm::mat4& modelViewMatrix() { return m_modelView_matrix; }
 
 	/**
 	 * current projection matrix
 	 */
-	glm::mat4& projectionMatrix () { return m_projection_matrix; }
+	const glm::mat4& projectionMatrix() const { return m_projection_matrix; }
+	glm::mat4& projectionMatrix() { return m_projection_matrix; }
 
 
 	float* curquat() { return m_curquat; }
@@ -313,6 +322,33 @@ public:
 	 */
 	void updateGLMatrices();
 
+
+	/**
+	 * apply rotation to transformation matrix
+	 */
+	void transfoRotate(float angle, float x, float y, float z);
+
+	/**
+	 * apply translation to transformation matrix
+	 */
+	void transfoTranslate(float tx, float ty, float tz);
+
+	/**
+	 * apply scale to transformation matrix
+	 */
+	void transfoScale(float sx, float sy, float sz);
+
+	/**
+	 * push the transfo matrix on stack
+	 */
+	void pushTransfoMatrix();
+
+
+	/**
+	 * pop the transfo matrix from stack
+	 */
+	bool popTransfoMatrix();
+
 	/**
 	 * Open a file selector and return the filename
 	 * @param title title of window
@@ -320,6 +356,15 @@ public:
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
 	std::string selectFile(const std::string& title = "open file", const std::string& dir = ".", const std::string& filters = "all (*.*)");
+
+	/**
+	 * Open a file selector and return the filename (for saving a file)
+	 * @param title title of window
+	 * @param dir base directory
+	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
+	 */
+	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
+
 
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }

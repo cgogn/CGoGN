@@ -81,14 +81,6 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 void MapRender::draw(Utils::GLSLShader* sh, int prim)
 {
 	sh->enableVertexAttribs();
-//	const std::vector<Utils::GLSLShader::VAStr>& vastr = sh->getVA_VBO_Bindings();
-//
-//	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= vastr.begin(); it != vastr.end(); ++it)
-//	{
-//		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
-//		glEnableVertexAttribArray(it->va_id);
-//		glVertexAttribPointer(it->va_id ,it->vbo_ptr->dataSize(), GL_FLOAT, false, 0, 0);
-//	}
 
 	switch(prim)
 	{
@@ -108,10 +100,6 @@ void MapRender::draw(Utils::GLSLShader* sh, int prim)
 			break;
 	}
 
-//	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= vastr.begin(); it != vastr.end(); ++it)
-//	{
-//		glDisableVertexAttribArray(it->va_id);
-//	}
 	sh->disableVertexAttribs();
 }
 

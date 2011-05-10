@@ -108,8 +108,6 @@ void MyQT::cb_initGL()
 	shader1->setAttributePosition(positionVBO);
 	shader1->setAttributeNormal(normalVBO);
 
-	registerShader(shader1);
-
 	currentShader = shader1;
 }
 

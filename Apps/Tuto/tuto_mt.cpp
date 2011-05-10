@@ -379,7 +379,7 @@ int main(int argc, char **argv)
  	{
  	using namespace CGoGN::Utils::QT;
 
- 	inputValues(	VarInt(0,20,xx, "Entier",
+ 	inputValues(	VarInteger(0,20,xx, "Entier",
  					VarBool(zz, "Bool",
  					VarDbl(0.314,3.14,yy,"Double",
  					VarSlider(10,100,kk,"Slider",

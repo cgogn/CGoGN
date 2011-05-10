@@ -49,6 +49,7 @@
 #include "Utils/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
 
+#include "Algo/Render/SVG/mapSVGRender.h"
 
 using namespace CGoGN ;
 
@@ -68,24 +69,29 @@ void MyQT::balls_onoff(bool x)
 {
 	render_balls = !render_balls;
 	updateGL();
+	CGoGNerr << " balls_onoff  "<< CGoGNendl;
 }
 
 void MyQT::vectors_onoff(bool x)
 {
 	render_vectors = !render_vectors;
 	updateGL();
+	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
 }
 
 void MyQT::text_onoff(bool x)
 {
 	render_text = !render_text;
 	updateGL();
+	CGoGNerr << " text_onoff  " << CGoGNflush;
 }
+
 
 void MyQT::topo_onoff(bool x)
 {
 	render_topo = !render_topo;
 	updateGL();
+	CGoGNerr << " topo_onoff  " << CGoGNflush;
 }
 
 void MyQT::slider_balls(int x)
@@ -105,6 +111,16 @@ void MyQT::slider_text(int x)
 	m_strings->setScale(0.02f*x);
 	updateGL();
 }
+
+
+
+void MyQT::animate()
+{
+//	transfoMatrix() = glm::rotate(transfoMatrix(), 0.5f, glm::vec3(0.5773f,0.5773f,0.5773f));
+	transfoRotate( 0.5f, 0.5773f,0.5773f,0.5773f);
+	updateGLMatrices();
+}
+
 
 void MyQT::storeVerticesInfo()
 {
@@ -177,6 +193,11 @@ void MyQT::cb_initGL()
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
 	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
+
+
+	// timer example for animation
+	m_timer = new QTimer( m_glWidget );
+	connect( m_timer, SIGNAL(timeout()), SLOT(animate()) );
 }
 
 void MyQT::cb_redraw()
@@ -224,13 +245,9 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x, getHeight() - y);
+		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x,y);
 		if (d != Dart::nil())
 		{
-//			std::stringstream ss;
-//			ss << "Dart "<< d << " clicked"<< CGoGNendl;
-//			statusMsg(ss.str().c_str());
-
 			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
 		}
 		else
@@ -239,6 +256,29 @@ void MyQT::cb_mousePress(int button, int x, int y)
 		}
 	}
 }
+
+void MyQT::cb_keyPress(int code)
+{
+	if (code  == 's')
+	{
+		std::string filename = selectFileSave("Export SVG file ");
+		CGoGNout << "Exporting "<<filename<<CGoGNendl;
+		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+//		svg.renderLinesToSVG<PFP>(myMap,position);
+		svg.setColor(Geom::Vec3f(1.,0.,0.));
+		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
+		//svg destruction close the file
+	}
+	if (code  == 't')
+	{
+		if (m_timer->isActive())
+			m_timer->stop();
+		else
+			m_timer->start(1000/30); // 30 fps
+	}
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -305,7 +345,9 @@ int main(int argc, char **argv)
 	CGoGNdbg2.toConsole(&sqt);
 	CGoGNerr.toConsole(&sqt);
 	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
-	CGoGNerr << " ERROR  " <<  5*7 << CGoGNendl;
+	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
+
+
 
 	// et on attend la fin.
 	return app.exec();
