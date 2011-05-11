@@ -146,6 +146,8 @@ public:
 	 */
 	float getFocal() { return foc; }
 
+	static float getFarPlane() { return FAR_PLANE ; }
+
 	void modelModified() { newModel = 1; }
 
 protected:
