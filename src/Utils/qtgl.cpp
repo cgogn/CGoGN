@@ -28,6 +28,7 @@
 #include "Utils/trackball.h"
 
 #include "Utils/qtSimple.h"
+#include "glm/gtc/type_precision.hpp"
 
 namespace CGoGN
 {
@@ -96,32 +97,72 @@ QSize GLWidget::sizeHint() const
 
 void GLWidget::recalcModelView()
 {
-	glm::mat4 m;
-
-	oglPushModelViewMatrix();
+	m_cbs->modelViewMatrix()= glm::mat4(1.0f);
 
 	// positionne l'objet / mvt souris
 	oglTranslate(m_cbs->trans_x(), m_cbs->trans_y(), m_cbs->trans_z());
 
 	// tourne l'objet / mvt souris
+	glm::mat4 m;
 	build_rotmatrixgl3(m, m_cbs->curquat());
 	// update matrice
 	m_cbs->modelViewMatrix() *= m;
 
+	// ajout transformation in screen
+	m_cbs->modelViewMatrix()*= m_cbs->transfoMatrix();
+
 	// transfo pour que l'objet soit centre et a la bonne taille
 	oglScale(m_obj_sc, m_obj_sc, m_obj_sc);
 	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
-
-	// ajout transformation in screen
-	m_cbs->modelViewMatrix()*= m_cbs->transfoMatrix();
 
 	newModel = 0;
 
 	if (m_cbs)
 		m_cbs->cb_updateMatrix();
 
-	oglPopModelViewMatrix();
 }
+
+void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
+{
+	oglPushModelViewMatrix();
+
+	m_cbs->modelViewMatrix()= glm::mat4(1.0f);
+
+	// positionne l'objet / mvt souris
+	oglTranslate(m_cbs->trans_x(), m_cbs->trans_y(), m_cbs->trans_z());
+
+	// tourne l'objet / mvt souris
+	glm::mat4 m;
+	build_rotmatrixgl3(m, m_cbs->curquat());
+	// update matrice
+	m_cbs->modelViewMatrix() *= m;
+
+
+	// ajout transformation in screen
+	m_cbs->modelViewMatrix()*= m_cbs->transfoMatrix();
+
+	// transfo pour que l'objet soit centre et a la bonne taille
+	oglScale(m_obj_sc, m_obj_sc, m_obj_sc);
+	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
+
+
+	oglTranslate(newCenter[0], newCenter[1], newCenter[2]);
+	oglScale(1.0f/m_obj_sc, 1.0f/m_obj_sc, 1.0f/m_obj_sc);
+
+	m = glm::inverse(m_cbs->transfoMatrix());
+	m_cbs->modelViewMatrix()*= m;
+
+	matrix_to_quat( m_cbs->curquat(), m_cbs->modelViewMatrix());
+
+	m_cbs->trans_x() = m_cbs->modelViewMatrix()[3][0];
+	m_cbs->trans_y() = m_cbs->modelViewMatrix()[3][1];
+	m_cbs->trans_z() = m_cbs->modelViewMatrix()[3][2];
+
+	oglPopModelViewMatrix();
+
+	m_obj_pos = glm::vec3(-newCenter[0],-newCenter[1],-newCenter[2]);
+}
+
 
 void GLWidget::initializeGL()
 {
@@ -175,9 +216,30 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event)
 
 void GLWidget::mouseClickEvent(QMouseEvent* event)
 {
+
 	if (m_cbs)
 		m_cbs->cb_mouseClick(event->button(), event->x(), getHeight() - event->y());
 }
+
+void GLWidget::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	if (event->button()==1)
+	{
+		GLint x = event->x();
+		GLint y = getHeight() - event->y();
+		GLfloat depth;
+		glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+		if (depth < 1.0f)
+		{
+			glm::i32vec4 viewport;
+			glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+			glm::vec3 win(x, y, depth);
+			glm::vec3 P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+			changeCenterOfRotation(P);
+		}
+	}
+}
+
 
 void GLWidget::mouseMoveEvent(QMouseEvent* event)
 {
@@ -265,8 +327,34 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 	QWidget::keyReleaseEvent(event);
 
 	m_state_modifier = event->modifiers();
-
     int k = event->key();
+
+    // align on axis
+	if ((k=='Z') && (event->modifiers() & Qt::ShiftModifier))
+	{
+	    float Z[3]={0.0f,0.0f,1.0f};
+		axis_to_quat(Z,0.0f,m_cbs->curquat());
+		newModel=1;
+		updateGL();
+	}
+
+	if ((k=='Y') && (event->modifiers() & Qt::ShiftModifier))
+	{
+		float X[3]={1.0f,0.0f,0.0f};
+		axis_to_quat(X,M_PI/2.0f,m_cbs->curquat());
+		newModel=1;
+		updateGL();
+	}
+
+	if ((k=='X') && (event->modifiers() & Qt::ShiftModifier))
+	{
+		float Y[3]={0.0f,1.0f,0.0f};
+		axis_to_quat(Y,-M_PI/2.0f,m_cbs->curquat());
+		newModel=1;
+		updateGL();
+	}
+
+
     if ( (k >= 65) && (k <= 91) && (event->modifiers() != Qt::ShiftModifier) )
     	k += 32;
 
