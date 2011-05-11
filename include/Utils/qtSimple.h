@@ -292,6 +292,11 @@ public:
 	virtual void cb_mouseMove(int button, int x, int y) {}
 
 	/**
+	 * the mouse has been move (with button still pressed)
+	 */
+	virtual void cb_wheelEvent(int delta, int x, int y) {}
+
+	/**
 	 * key press CB (context is ok)
 	 */
 	virtual void cb_keyPress(int code) {}
@@ -364,7 +369,6 @@ public:
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
 	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
-
 
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }

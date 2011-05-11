@@ -241,6 +241,9 @@ void GLWidget::wheelEvent(QWheelEvent* event)
 
 	newModel = 1;
 	updateGL();
+
+	if (m_cbs)
+		m_cbs->cb_wheelEvent(event->delta(), event->x(), getHeight() - event->y());
 }
 
 void GLWidget::keyPressEvent(QKeyEvent* event)
