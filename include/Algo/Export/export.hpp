@@ -256,7 +256,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
 	{
-		std::cerr << "Unable to open file " << std::endl ;
+		CGoGNerr << "Unable to open file " << CGoGNout ;
 		return false ;
 	}
 
