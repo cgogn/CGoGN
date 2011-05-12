@@ -248,7 +248,7 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 }
 
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[15], const FunctorSelect& good)
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[15], const typename PFP::TREAL errL2, const typename PFP::TREAL errLmax, const typename PFP::TREAL stdDev, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -364,6 +364,12 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	out << "property float L3_a12" << std::endl ;
 	out << "property float L3_a13" << std::endl ;
 	out << "property float L3_a14" << std::endl ;
+	if (errL2.isValid())
+		out << "property float errL2" << std::endl ;
+	if (errLmax.isValid())
+		out << "property float errLmax" << std::endl ;
+	if (stdDev.isValid())
+		out << "property float stdDev" << std::endl ;
 
 	out << "element face " << nbf << std::endl ;
 	out << "property list uchar int vertex_indices" << std::endl ;
@@ -378,7 +384,14 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		out << frame[2][vi][0] << " " << frame[2][vi][1] << " " << frame[2][vi][2] << " " ;
 		out << colorPTM[0][vi][0] << " " << colorPTM[1][vi][0] << " " << colorPTM[2][vi][0] << " " << colorPTM[3][vi][0] << " " << colorPTM[4][vi][0] << " " << colorPTM[5][vi][0] << " " << colorPTM[6][vi][0] << " " << colorPTM[7][vi][0] << " " << colorPTM[8][vi][0] << " " << colorPTM[9][vi][0] << " " << colorPTM[10][vi][0] << " " << colorPTM[11][vi][0] << " " << colorPTM[12][vi][0] << " " << colorPTM[13][vi][0] << " " << colorPTM[14][vi][0] << " " ;
 		out << colorPTM[0][vi][1] << " " << colorPTM[1][vi][1] << " " << colorPTM[2][vi][1] << " " << colorPTM[3][vi][1] << " " << colorPTM[4][vi][1] << " " << colorPTM[5][vi][1] << " " << colorPTM[6][vi][1] << " " << colorPTM[7][vi][1] << " " << colorPTM[8][vi][1] << " " << colorPTM[9][vi][1] << " " << colorPTM[10][vi][1] << " " << colorPTM[11][vi][1] << " " << colorPTM[12][vi][1] << " " << colorPTM[13][vi][1] << " " << colorPTM[14][vi][1] << " " ;
-		out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << " " << colorPTM[6][vi][2] << " " << colorPTM[7][vi][2] << " " << colorPTM[8][vi][2] << " " << colorPTM[9][vi][2] << " " << colorPTM[10][vi][2] << " " << colorPTM[11][vi][2] << " " << colorPTM[12][vi][2] << " " << colorPTM[13][vi][2] << " " << colorPTM[14][vi][2] << std::endl ;
+		out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << " " << colorPTM[6][vi][2] << " " << colorPTM[7][vi][2] << " " << colorPTM[8][vi][2] << " " << colorPTM[9][vi][2] << " " << colorPTM[10][vi][2] << " " << colorPTM[11][vi][2] << " " << colorPTM[12][vi][2] << " " << colorPTM[13][vi][2] << " " << colorPTM[14][vi][2] << " " ;
+		if (errL2.isValid())
+			out << errL2[vi] << " " ;
+		if (errLmax.isValid())
+			out << errLmax[vi] << " " ;
+		if (stdDev.isValid())
+			out << stdDev[vi] << " " ;
+		out << std::endl ;
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();

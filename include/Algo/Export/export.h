@@ -82,7 +82,7 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 * @return true
 */
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good = SelectorTrue()) ;
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const typename PFP::TREAL errL2 = AttributeHandler<typename PFP::REAL>(), const typename PFP::TREAL errLmax = AttributeHandler<typename PFP::REAL>(), const typename PFP::TREAL stdDev = AttributeHandler<typename PFP::REAL>(), const FunctorSelect& good = SelectorTrue()) ;
 
 } // namespace Export
 

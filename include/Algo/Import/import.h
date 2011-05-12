@@ -25,6 +25,10 @@
 #ifndef __IMPORT_H__
 #define __IMPORT_H__
 
+#include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/cellmarker.h"
+#include "Topology/generic/dartmarker.h"
+
 #include "Algo/Import/import2tables.h"
 
 namespace CGoGN

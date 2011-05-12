@@ -579,6 +579,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		return false;
 	}
 
+
 	// va au nombre de sommets
 	do
 	{
@@ -591,6 +592,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 	std::vector<unsigned int> verticesID;
 	verticesID.reserve(nbp);
 
+	AttributeHandler<typename PFP::REAL> errors[3] ;
 	// va au nombre de faces en comptant le nombre de "property"
 	unsigned int nb_props = 0;
 	do
@@ -598,6 +600,16 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		fp >> tag;
 		if (tag == std::string("property"))
 			nb_props++;
+		if (tag == std::string("errL2")) {
+			CGoGNout << "errors" << CGoGNendl ;
+			errors[0] = m_map.template addAttribute<typename PFP::REAL>(VERTEX_ORBIT, "errL2") ;
+			errors[1] = m_map.template addAttribute<typename PFP::REAL>(VERTEX_ORBIT, "errLmax") ;
+			errors[2] = m_map.template addAttribute<typename PFP::REAL>(VERTEX_ORBIT, "stdDev") ;
+			for (unsigned int i = 0 ; i < 3 ; ++i)
+					attrNames.push_back(errors[i].name()) ;
+		}
+
+
 	} while (tag != std::string("face"));
 
 	fp >> m_nbFaces;
@@ -633,6 +645,10 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		for (unsigned int k = 0 ; k < 3 ; ++k)
 			for (unsigned int l = 0 ; l < 15 ; ++l)
 				colorPTM[l][id][k] = properties[12+(15*k+l)];
+
+		if (errors[0].isValid())
+			for (unsigned int k = 0 ; k < 3 ; ++k)
+				errors[k][id] = properties[57 + k] ;
 	}
 
 	m_nbVertices = verticesID.size();
