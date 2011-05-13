@@ -196,7 +196,7 @@ void MyQT::cb_initGL()
 
 
 	// timer example for animation
-	m_timer = new QTimer( m_glWidget );
+	m_timer = new QTimer( this );
 	connect( m_timer, SIGNAL(timeout()), SLOT(animate()) );
 }
 

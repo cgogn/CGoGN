@@ -91,7 +91,16 @@ protected:
 
 	int m_state_modifier;
 
+	/**
+	 * met a jour la matrice modelview
+	 */
 	void recalcModelView();
+
+	/**
+	 * recalcul le quaternion ainsi que le deplacement courant
+	 * pour un nouveau centre de rotation
+	 */
+	void changeCenterOfRotation(const glm::vec3& newCenter);
 
 public:
 	void setParamObject(float width, float* pos);
@@ -108,6 +117,8 @@ public:
 	void mouseReleaseEvent(QMouseEvent* event);
 
 	void mouseClickEvent(QMouseEvent* event);
+
+	void mouseDoubleClickEvent(QMouseEvent* event);
 
 	void mouseMoveEvent(QMouseEvent* event);
 
