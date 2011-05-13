@@ -601,7 +601,6 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		if (tag == std::string("property"))
 			nb_props++;
 		if (tag == std::string("errL2")) {
-			CGoGNout << "errors" << CGoGNendl ;
 			errors[0] = m_map.template addAttribute<typename PFP::REAL>(VERTEX_ORBIT, "errL2") ;
 			errors[1] = m_map.template addAttribute<typename PFP::REAL>(VERTEX_ORBIT, "errLmax") ;
 			errors[2] = m_map.template addAttribute<typename PFP::REAL>(VERTEX_ORBIT, "stdDev") ;
