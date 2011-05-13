@@ -166,6 +166,8 @@ int main(int argc, char **argv)
 	sqt.windowTitle("OGL3 QT");
 	sqt.dockTitle("interface");
 
+	sqt.setDock(dock) ;
+
 	// connection widget callback
 	sqt.setCallBack( slider_foc, SIGNAL(valueChanged(int)), SLOT(sliderFocale_cb(int)) );
 	sqt.setCallBack( buttonColor, SIGNAL(clicked()), SLOT(color_cb()) );
