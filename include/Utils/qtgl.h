@@ -135,6 +135,7 @@ public:
 	bool Alt() { return m_state_modifier & Qt::AltModifier; }
 
 	int getHeight() const { return H; }
+	int getWidth() const { return W; }
 
 	/**
 	 * set the focale distance (for a screen width of 2), default value is 1
@@ -144,7 +145,13 @@ public:
 	/**
 	 * get the focale distance
 	 */
-	float getFocal() { return foc; }
+	float getFocal() const { return foc; }
+
+	/**
+	 * get current state
+	 */
+	int getStateModifier() const { return m_state_modifier ; }
+	int getCurrentButton() const { return m_current_button ; }
 
 	static float getFarPlane() { return FAR_PLANE ; }
 
