@@ -110,7 +110,7 @@ void ShaderVectorPerVertex::setScale(float scale)
 void ShaderVectorPerVertex::setColor(const Geom::Vec4f& color)
 {
 	bind();
-	glUniform3fv(m_uniform_color, 1, color.data());
+	glUniform4fv(m_uniform_color, 1, color.data());
 	m_color = color;
 }
 
