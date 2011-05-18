@@ -37,9 +37,9 @@ namespace Modelisation
 namespace Tetrahedron
 {
 
-/***********************************************************************************************
- * 									Tetrahedron functions									   *
- ***********************************************************************************************/
+/************************************************************************************************
+ * 																Tetrahedron functions																	   *
+ ************************************************************************************************/
 
 
 /**
@@ -51,25 +51,25 @@ template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d);
 
 
-/***********************************************************************************************
- *										Swap Functions 										   *
- ***********************************************************************************************/
+/************************************************************************************************
+ *																		Swap Functions 																	   *
+ ************************************************************************************************/
 
 /**
  * Swap a configuration of 2 Tetrahedron to another one
  * @param map
- * @param d
+ * @param d a dart from the face between the two tetahedron to swap
  *
  * TODO ajouter image
  */
 template <typename PFP>
-void swap2To2(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
+void swap2To2(typename PFP::MAP& map, Dart d);
 
 /**
  *
  */
 template <typename PFP>
-void swap4To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
+void swap4To4(typename PFP::MAP& map, Dart d);
 
 /**
  * Swap a configuration of 3 tetrahedron to another one with 2 tetrahedron
@@ -80,14 +80,13 @@ void swap4To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions
  *
  */
 template <typename PFP>
-void swap3To2(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
-
+void swap3To2(typename PFP::MAP& map, Dart d);
 
 /**
  *
  */
 template <typename PFP>
-void swap2To3(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
+void swap2To3(typename PFP::MAP& map, Dart d);
 
 /**
  *

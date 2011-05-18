@@ -221,33 +221,6 @@ void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 //	}
 }
 
-//template <typename MAP3>
-//bool EmbeddedMap3<MAP3>::flipEdge(Dart d)
-//{
-//	unsigned int eEmbd = EMBNULL;;
-//	unsigned int eEmbd2 = EMBNULL;;
-//
-//	bool res = MAP3::flipEdge(d);
-//
-//	if(MAP3::isOrbitEmbedded(EDGE_ORBIT))
-//	{
-//		eEmbd = MAP3::getEmbedding(d, EDGE_ORBIT);
-//		eEmbd2 = MAP3::getEmbedding(MAP3::phi2(d), EDGE_ORBIT);
-//	}
-//
-//	return res;
-//}
-//
-//
-//template <typename MAP3>
-//bool EmbeddedMap3<MAP3>::flipBackEdge(Dart d)
-//{
-//
-//	bool res = false;
-//
-//
-//	return res;
-//}
 
 template <typename MAP3>
 int EmbeddedMap3<MAP3>::collapseEdge(Dart d, bool delDegenerateFaces,

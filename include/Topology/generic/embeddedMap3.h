@@ -82,19 +82,6 @@ public:
 	 */
 	virtual Dart cutSpike(Dart d);
 
-	/**
-	 * Flip the edge of d (rotation in phi1 order)
-	 * WARNING : works only if the edge is owned by exactly one or two volumes
-	 * @param d the edge to flip
-	 */
-	//virtual bool flipEdge(Dart d);
-
-	/**
-	 * Flip the edge of d (rotation in phi_1 order)
-	 * WARNING : works only if the edge is owned by exactly one or two volumes
-	 * @param d the edge to flip
-	 */
-	//virtual bool flipBackEdge(Dart d);
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate

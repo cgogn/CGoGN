@@ -35,9 +35,9 @@ namespace Modelisation
 
 namespace Tetrahedron
 {
-/***********************************************************************************************
- * 										Tetrahedron functions								   *
- ***********************************************************************************************/
+/************************************************************************************************
+ * 																		Tetrahedron functions															   *
+ ************************************************************************************************/
 
 template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
@@ -98,138 +98,239 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 	return isTetrahedron;
 }
 
+/************************************************************************************************
+ * 																		Topological functions															   *
+ ************************************************************************************************/
+
+//sew a face into the edge
+template <typename PFP>
+Dart linkIntoEdge(typename PFP::MAP& map, Dart d, Dart e)
+{
+	Dart e2 = map.phi2(e);
+	Dart d3 = map.phi3(d);
+
+	//Decoud les 2 brins
+	map.unsewFaces(e);
+
+	//Coudre la nouvelle face au milieu de l'ancienne arête
+	map.sewFaces(e2,d3);
+	map.sewFaces(e,d);
+
+	map.setDartEmbedding(VERTEX_ORBIT, d, map.getEmbedding(e2,VERTEX_ORBIT)) ;
+	map.setDartEmbedding(VERTEX_ORBIT, d3, map.getEmbedding(e,VERTEX_ORBIT)) ;
+
+	return e2;
+}
+
+//unsew a face from the edge
+template <typename PFP>
+void unlinkFromEdge(typename PFP::MAP& map, Dart d)
+{
+	Dart d3 = map.phi3(d);
+
+	if(map.isOrbitEmbedded(VERTEX_ORBIT))
+	{
+		//Si la face n'est pas libre en phi2
+		if(map.phi2(d) != d && map.phi2(d3) != d3)
+		{
+			unsigned int dVEmb = map.getDartEmbedding(VERTEX_ORBIT, d) ;
+			if(dVEmb != EMBNULL)
+			{
+				map.embedOrbit(VERTEX_ORBIT, d, dVEmb) ;
+				map.setDartEmbedding(VERTEX_ORBIT, d, EMBNULL) ;
+			}
+
+			unsigned int d3VEmb = map.getDartEmbedding(VERTEX_ORBIT, d3) ;
+			if(d3VEmb != EMBNULL)
+			{
+				map.embedOrbit(VERTEX_ORBIT, d3, d3VEmb) ;
+				map.setDartEmbedding(VERTEX_ORBIT, d3, EMBNULL) ;
+			}
+		}
+		//Si la face est libre en phi2
+		else
+		{
+
+		}
+	}
+
+	Dart e2 = map.phi2(d3);
+	Dart d2 = map.phi2(d);
+	map.unsewFaces(e2);
+	map.unsewFaces(d2);
+	map.sewFaces(d2,e2);
+}
+
+template <typename PFP>
+void unlinkFace(typename PFP::MAP& map, Dart d)
+{
+	Dart e = d;
+	do
+	{
+		unlinkFromEdge<PFP>(map, e);
+		e = map.phi1(e);
+	}
+	while (e != d);
+}
+
+template <typename PFP>
+void insertFace(typename PFP::MAP& map, Dart d, Dart nF)
+{
+	Dart dd = d;
+	Dart nFd = nF;
+
+	do {
+		//TODO linkIntoEdge
+
+		Dart d2 = map.phi2(dd);
+		map.unsewFaces(dd);
+		map.sewFaces(dd,nFd);
+		map.sewFaces(d2,map.phi3(nFd));
+
+		map.setDartEmbedding(VERTEX_ORBIT, nFd, map.getEmbedding(d2,VERTEX_ORBIT)) ;
+		map.setDartEmbedding(VERTEX_ORBIT, map.phi3(nFd), map.getEmbedding(dd,VERTEX_ORBIT)) ;
+
+		dd = map.phi_1(map.phi2(map.phi_1(dd)));
+		nFd = map.phi1(nFd);
+
+	} while (nFd != nF);
+}
 
 /***********************************************************************************************
  * 										swap functions										   *
  ***********************************************************************************************/
 //ok
 template <typename PFP>
-void swap2To2(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions)
+void swap2To2(typename PFP::MAP& map, Dart d)
 {
-	unsigned int p1 = EMBNULL;
-	unsigned int p2 = EMBNULL;
+	//save a dart from a non-modifed-face of one tetrahedron
+	Dart r = map.phi2(d);
 
-	Dart r = the_map.phi2(d);
-	Dart f = the_map.phi2(the_map.phi3(d));
+	//detach common face from tetrahedron from the rest of the faces
+	unlinkFace<PFP>(map, d);
 
-	Dart s1 = the_map.phi_1(r);
-	Dart s2 = the_map.phi_1(f);
+	//flip the middle edge
+	map.flipEdge(r);
+	Dart e = map.phi2(r);
 
-	p1 = the_map.getEmbedding(the_map.phi_1(r), VERTEX_ORBIT);
-	p2 = the_map.getEmbedding(the_map.phi_1(f), VERTEX_ORBIT);
-
-	// Topological swap
-	Dart e = d;
-	do
+	unsigned int dVEmb = map.getDartEmbedding(VERTEX_ORBIT, r) ;
+	if(dVEmb != EMBNULL)
 	{
-		//the_map.unsewFace(e);
-		e = the_map.phi1(e);
+		map.setDartEmbedding(VERTEX_ORBIT, map.phi_1(r), dVEmb) ;
+		map.setDartEmbedding(VERTEX_ORBIT, r, EMBNULL) ;
 	}
-	while (e != d);
 
-	the_map.flipEdge(r);
-	the_map.insertFace(r,d);
+	unsigned int eVEmb = map.getDartEmbedding(VERTEX_ORBIT, e) ;
+	if(eVEmb != EMBNULL)
+	{
+		map.setDartEmbedding(VERTEX_ORBIT, map.phi_1(e), eVEmb) ;
+		map.setDartEmbedding(VERTEX_ORBIT, e, EMBNULL) ;
+	}
 
-
-	the_map.setDartEmbedding(VERTEX_ORBIT,r,p2);
-	the_map.setDartEmbedding(VERTEX_ORBIT,f,p1);
+	//insert the face in the flipped edge
+	insertFace<PFP>(map, r, d);
 
 	Dart dd = d;
 	do {
-		Dart e = the_map.phi2(dd);
-		Dart e2 = the_map.template phi<32>(dd);
-		the_map.setDartEmbedding(VERTEX_ORBIT, dd, the_map.getEmbedding(e2,VERTEX_ORBIT)) ;
-		the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi3(dd), the_map.getEmbedding(e,VERTEX_ORBIT)) ;
-		dd = the_map.phi1(dd);
-	}while(dd!=d);
+		Dart e = map.phi2(dd);
+		Dart e2= map.phi2(map.phi3(dd));
 
+		map.setDartEmbedding(VERTEX_ORBIT, dd, map.getEmbedding(e2,VERTEX_ORBIT)) ;
+		map.setDartEmbedding(VERTEX_ORBIT, map.phi3(dd), map.getEmbedding(e,VERTEX_ORBIT)) ;
+
+
+		dd = map.phi1(dd);
+	} while( dd!=d);
 
 }
 
 //ok
 template <typename PFP>
-void swap4To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions)
+void swap4To4(typename PFP::MAP& map, Dart d)
 {
 	//!! 4 decouture inutile, seule l'intersection du centre doit etre decousu puis recousu
 
-	Dart e = the_map.phi2(the_map.phi3(d));
-	Dart dd = the_map.phi2(d);
+	Dart e = map.phi2(map.phi3(d));
+	Dart dd = map.phi2(d);
 
 	//unsew middle crossing darts
-	the_map.unsewVolumes(d);
-	the_map.unsewVolumes(the_map.phi2(the_map.phi3(dd)));
+	map.unsewVolumes(d);
+	map.unsewVolumes(map.phi2(map.phi3(dd)));
 
-	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(the_map, dd, positions);
-	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(the_map, e, positions);
+	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(map, dd);
+	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(map, e);
 
 	//sew middle darts so that they do not cross
-	the_map.sewVolumes(d,the_map.phi2(the_map.phi3(e)));
-	the_map.sewVolumes(the_map.phi2(the_map.phi3(dd)),the_map.phi2(e));
+	map.sewVolumes(d,map.phi2(map.phi3(e)));
+	map.sewVolumes(map.phi2(map.phi3(dd)),map.phi2(e));
 }
 
 template <typename PFP>
-void swap3To2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
+void swap3To2(typename PFP::MAP& map, Dart d)
 {
-    Dart en1 = map.phi_1(map.phi2(d));
-    Dart en2 = map.phi1(d);
-    Dart fi = map.phi2(en1);
+	Dart en1 = map.phi_1(map.phi2(d));
+	Dart en2 = map.phi1(d);
+	Dart fi = map.phi2(en1);
 
-    //Decouture de la premiere face
-//    map.unsewFace(map.phi2(en1));
-//    map.unsewFace(map.phi2(en2));
-//
-//    //Decouture de la seconde face
-//    en1 = map.phi1(map.phi2(en1));
-//    en2 = map.phi_1(map.phi2(en2));
-//    map.unsewFace(map.phi2(en1));
-//    map.unsewFace(map.phi2(en2));
-//
-//    //Decouture de la troisieme face
-//    en1 = map.phi1(map.phi2(en1));
-//    en2 = map.phi_1(map.phi2(en2));
-//    map.unsewFace(map.phi2(en1));
-//    map.unsewFace(map.phi2(en2));
+	//Decouture de la premiere face
+	unlinkFromEdge<PFP>(map, map.phi2(en1));
+	unlinkFromEdge<PFP>(map, map.phi2(en2));
 
-    //Faces interieurs
-    Dart fi2 = map.phi2(map.phi1(fi));
-    Dart fi3 = map.phi2(map.phi3(map.phi1(fi)));
+	//Decouture de la seconde face
+	en1 = map.phi1(map.phi2(en1));
+	en2 = map.phi_1(map.phi2(en2));
+	unlinkFromEdge<PFP>(map, map.phi2(en1));
+	unlinkFromEdge<PFP>(map, map.phi2(en2));
 
-    map.deleteFace(fi);
-    map.deleteFace(fi2);
-    map.deleteFace(fi3);
+	//Decouture de la troisieme face
+	en1 = map.phi1(map.phi2(en1));
+	en2 = map.phi_1(map.phi2(en2));
+	unlinkFromEdge<PFP>(map, map.phi2(en1));
+	unlinkFromEdge<PFP>(map, map.phi2(en2));
 
-    //Couture de cette face au milieu des 2 tetraedres
-    Dart f = map.newFace(3);
-//    Dart g = map.newFace(3);
-//    map.sewVolumes(f,g);
-//
-//    map.sewFace(f,d);
+	//Faces interieurs
+	Dart fi2 = map.phi2(map.phi1(fi));
+	Dart fi3 = map.phi2(map.phi3(map.phi1(fi)));
 
-    Dart ff=f;
-    Dart en= d;
-    do {
-        Dart e2 = map.phi2(en);
-        Dart d3 = map.phi3(ff);
-        map.unsewFaces(en);
-        map.sewFaces(e2,d3);
-        map.sewFaces(en,ff);
+	map.deleteFace(fi);
+	map.deleteFace(fi2);
+	map.deleteFace(fi3);
 
-        en = map.phi_1(map.phi2(map.phi_1(en)));
+	    //Couture de cette face au milieu des 2 tetraedres
+	    Dart f = map.newFace(3);
+	    Dart fprim = map.newFace(3);
+	    map.sewVolumes(f,fprim);
+	//     Dart en = linkIntoEdge(f,d);
 
-        ff = map.phi1(ff);
-   } while(ff!=f);
+	    Dart ff=f;
+	    Dart en= d;
+	    do {
+	        Dart e2 = map.phi2(en);
+	        Dart d3 = map.phi3(ff);
+	        map.unsewFaces(en);
+	        map.sewFaces(e2,d3);
+	        map.sewFaces(en,ff);
 
-	//tMap3<DART>::flipTetra3To2(d);
+	        en = map.phi_1(map.phi2(map.phi_1(en)));
 
-	Dart dd = d;
+	        ff = map.phi1(ff);
+	    } while(ff!=f);
 
-	do {
-		Dart e = map.phi2(map.phi3(map.phi2(dd)));
-		map.setDartEmbedding(VERTEX_ORBIT, map.phi2(dd), map.getEmbedding(e,VERTEX_ORBIT)) ;
-		map.setDartEmbedding(VERTEX_ORBIT, map.phi2(e), map.getEmbedding(dd,VERTEX_ORBIT)) ;
 
-		dd = map.phi1(map.phi2(map.phi1(dd)));
-	} while( dd!=d);
+		Dart dd = d;
+
+		do {
+			Dart e = map.phi2(map.phi3(map.phi2(dd)));
+
+			unsigned int eVEmb = map.getDartEmbedding(VERTEX_ORBIT, e) ;
+			unsigned int ddVEmb = map.getDartEmbedding(VERTEX_ORBIT, dd) ;
+
+			map.setDartEmbedding(VERTEX_ORBIT, map.phi2(dd), eVEmb) ;
+			map.setDartEmbedding(VERTEX_ORBIT, map.phi2(e), ddVEmb) ;
+
+			dd = map.phi1(map.phi2(map.phi1(dd)));
+		} while( dd!=d);
+
 }
 
 
@@ -237,90 +338,56 @@ void swap3To2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
 //[precond] le brin doit venir d'une face partagé par 2 tetraèdres
 // renvoie un brin de l'ancienne couture entre les 2 tetras qui est devenu une arête
 template <typename PFP>
-void swap2To3(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& attributs)
+void swap2To3(typename PFP::MAP& map, Dart d)
 {
-	Dart e = map.phi2(d);
-	map.mergeVolumes(d);
+	Dart e = map.phi1(map.phi2(map.phi3(d)));
 
-	Dart f = map.phi1(e);
-	map.Map2::cutEdge(e);
-	Dart g = map.phi1(e);
-	attributs[g] = attributs[e];
-	attributs[g] += attributs[f];
-	attributs[g] *= 0.5;
+	unsigned int p1 = map.getDartEmbedding(VERTEX_ORBIT, map.phi_1(map.phi2(d))) ;
+	unsigned int p2 = map.getDartEmbedding(VERTEX_ORBIT, map.phi2(map.phi1(map.phi2(map.phi3(d))))) ;
 
-	map.splitFace(f, map.phi1(map.phi1(f)));
+	//détachement des demi-faces du milieu
+	//garde la relation volumique qui les lies
+	//relie les faces de bords des 2 tetraèdres
+	//renvoie le brin de base d'un des 2 tétraèdres
+	unlinkFace<PFP>(map, d);
 
-//		unsigned int p1 = EMBNULL;
-//		unsigned int p2 = EMBNULL;
-//
-//		Dart t1 = the_map.phi1(the_map.phi2(the_map.phi3(d)));
-//		Dart t2 = the_map.phi_1(the_map.phi2(d));
-//
-//		p1 = the_map.getEmbedding(the_map.phi2(t1), VERTEX_ORBIT);
-//		p2 = the_map.getEmbedding(t2, VERTEX_ORBIT);
-//
-//		//unsew the middle face
-//		Dart temp = d;
-//		do{
-//			the_map.unsewFace(temp);
-//			temp = the_map.phi1(temp);
-//		}while(temp != d);
-//
-//		//the_map.deleteFace(d);
-//		//Dart f = the_map.newFace(3);
-//
-//		//sew a first face
-//		the_map.sewFace(t1, d);
-//		the_map.sewFace(t2,the_map.phi1(d));
-//
-//		positions[the_map.phi_1(d)] = positions[t2];
-//		positions[the_map.phi1(the_map.phi3(d))] = positions[the_map.phi2(t1)];
-//		//the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi_1(d), p2) ;
-//		//the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi1(the_map.phi3(d)), p1) ;
-//
-//
-//		//Couture de la seconde face
-//		t1 = the_map.phi2(the_map.phi1(t1));
-//		t2 = the_map.phi2(the_map.phi1(the_map.phi1(t2)));
-//
-//		Dart f1 = the_map.newFace(3);
-//		the_map.sewFace(t1,f1);
-//		the_map.sewFace(t2, the_map.phi1(f1));
-//
-//		positions[the_map.phi_1(f1)] = positions[t2];
-//		positions[the_map.phi1(the_map.phi3(f1))] = positions[the_map.phi2(t1)];
+	//Couture de la premiere face
+	Dart en1 = linkIntoEdge<PFP>(map,d,e);
+	Dart en2 = linkIntoEdge<PFP>(map, map.phi1(d), map.phi_1(map.phi2(map.phi_1(e))));
+	map.setDartEmbedding(VERTEX_ORBIT, map.phi_1(d), p1);
+	map.setDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi3(d)), p2);
 
+	///Couture de la seconde face
+	en1 = map.phi1(map.phi1(en1));
+	en2 = map.phi_1(map.phi_1(en2));
 
-//		//the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi_1(f1), p2) ;
-//		//the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi1(the_map.phi3(f1)), p1) ;
-//		the_map.embedOrbit(VERTEX_ORBIT, the_map.phi_1(f1), p2);
-//		the_map.embedOrbit(VERTEX_ORBIT, the_map.phi1(the_map.phi3(f1)), p1);
-//		the_map.embedOrbit(VERTEX_ORBIT, f1, the_map.getEmbedding(t1 ,VERTEX_ORBIT));
-//		the_map.embedOrbit(VERTEX_ORBIT, the_map.phi1(f1), the_map.getEmbedding(the_map.phi1(t2) ,VERTEX_ORBIT));
+	Dart f1 = map.newFace(3);
+	Dart f1prim = map.newFace(3);
+	map.sewVolumes(f1,f1prim);
+	en1 = linkIntoEdge<PFP>(map, f1,en1);
+	en2 = linkIntoEdge<PFP>(map, map.phi1(f1),en2);
 
+	map.setDartEmbedding(VERTEX_ORBIT, map.phi_1(f1), p1);
+	map.setDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi3(f1)), p2);
 
-		///Couture de la troisieme face
-//		t1 = the_map.phi2(the_map.phi1(t1));
-//		t2 = the_map.phi2(the_map.phi1(the_map.phi1(t2)));
-//
-//		Dart f2 = the_map.newFace(3);
-//		the_map.sewFace(t1,f2);
-//		the_map.sewFace(t2,the_map.phi1(f2));
-//
-////		the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi_1(f2), p2) ;
-////		the_map.setDartEmbedding(VERTEX_ORBIT, the_map.phi1(the_map.phi3(f2)), p1) ;
-//		the_map.embedOrbit(VERTEX_ORBIT, the_map.phi_1(f2), p2);
-//		the_map.embedOrbit(VERTEX_ORBIT, the_map.phi1(the_map.phi3(f2)), p1);
+	///Couture de la troisieme face
+	en1 = map.phi1(map.phi1(en1));
+	en2 = map.phi_1(map.phi_1(en2));
 
+	Dart f2 = map.newFace(3);
+	Dart f2prim = map.newFace(3);
+	map.sewVolumes(f2,f2prim);
+	en1 = linkIntoEdge<PFP>(map, f2,en1);
+	en2 = linkIntoEdge<PFP>(map, map.phi1(f2),en2);
 
-		//couture des 3 faces du milieu
-//		the_map.sewFaces(the_map.phi_1(d),the_map.phi1(the_map.phi3(f2)));
-//		the_map.sewFaces(the_map.phi1(the_map.phi3(d)),the_map.phi_1(f1));
-//		the_map.sewFaces(the_map.phi1(the_map.phi3(f1)),the_map.phi_1(f2));
+	//couture des 3 faces du milieu
+	map.sewFaces(map.phi_1(d), map.phi1(map.phi3(f2)));
+	map.sewFaces(map.phi1(map.phi3(d)), map.phi_1(f1));
+	map.sewFaces(map.phi1(map.phi3(f1)), map.phi_1(f2));
 
-//		the_map.embedOrbit(VERTEX_ORBIT, d, p1);
-//		the_map.embedOrbit(VERTEX_ORBIT, the_map.phi1(the_map.phi3(d)), p2);
+	map.setDartEmbedding(VERTEX_ORBIT, map.phi_1(f2), p1);
+	map.setDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi3(f2)), p2);
+
 }
 
 template <typename PFP>
