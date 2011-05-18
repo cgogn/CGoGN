@@ -308,6 +308,12 @@ void GLWidget::wheelEvent(QWheelEvent* event)
 		m_cbs->cb_wheelEvent(event->delta(), event->x(), getHeight() - event->y());
 }
 
+void GLWidget::closeEvent(QCloseEvent *event)
+{
+	if (m_cbs)
+		m_cbs->cb_exit() ;
+}
+
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape)

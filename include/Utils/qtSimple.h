@@ -55,6 +55,7 @@ class SimpleQT : public QMainWindow
 
 public:
 	SimpleQT();
+	SimpleQT(const SimpleQT&) ;
 
 	virtual ~SimpleQT();
 
@@ -165,12 +166,15 @@ protected:
 
 	std::stack<glm::mat4> m_stack_trf;
 
+	void closeEvent(QCloseEvent *event);
 
 	void keyPressEvent(QKeyEvent *event);
 
 	void keyReleaseEvent(QKeyEvent *e);
 
 public:
+	void operator=(const SimpleQT& v) ;
+
 	/**
 	 * set width and pos center of object to draw
 	 */
@@ -314,7 +318,7 @@ public:
 	/**
 	 * end of program, some things to clean ?
 	 */
-	virtual void cb_exit() {}
+	virtual void cb_exit() { }
 
 	/**
 	 * Ask to Qt to update the GL widget.

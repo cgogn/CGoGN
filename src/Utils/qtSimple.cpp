@@ -104,9 +104,52 @@ m_dock(NULL)
 	m_transfo_matrix = glm::mat4(1.0f);
 }
 
+SimpleQT::SimpleQT(const SimpleQT& sqt)
+{
+	m_glWidget = new GLWidget(this);
+	setCentralWidget(m_glWidget);
+
+	m_dock = new QDockWidget(sqt.m_dock) ;
+	m_dockConsole = new QDockWidget(sqt.m_dockConsole) ;
+	m_textConsole = new QTextEdit(sqt.m_textConsole) ;
+	m_dockOn = sqt.m_dockOn ;
+
+	m_projection_matrix = sqt.m_projection_matrix;
+	m_modelView_matrix = sqt.m_modelView_matrix;
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		m_curquat[i] = sqt.m_curquat[i];
+		m_lastquat[i] = sqt.m_lastquat[i];
+	}
+	m_trans_x = sqt.m_trans_x ;
+	m_trans_y = sqt.m_trans_y ;
+	m_trans_z = sqt.m_trans_z ;
+}
+
 SimpleQT::~SimpleQT()
 {
 	delete m_glWidget; // ??
+}
+
+void SimpleQT::operator=(const SimpleQT& sqt) {
+	m_glWidget = new GLWidget(this);
+	setCentralWidget(m_glWidget) ;
+
+	m_dock = new QDockWidget(sqt.m_dock) ;
+	m_dockConsole = new QDockWidget(sqt.m_dockConsole) ;
+	m_textConsole = new QTextEdit(sqt.m_textConsole) ;
+	m_dockOn = sqt.m_dockOn ;
+
+	m_projection_matrix = sqt.m_projection_matrix;
+	m_modelView_matrix = sqt.m_modelView_matrix;
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		m_curquat[i] = sqt.m_curquat[i];
+		m_lastquat[i] = sqt.m_lastquat[i];
+	}
+	m_trans_x = sqt.m_trans_x ;
+	m_trans_y = sqt.m_trans_y ;
+	m_trans_z = sqt.m_trans_z ;
 }
 
 std::string SimpleQT::selectFile(const std::string& title, const std::string& dir, const std::string& filters)
@@ -220,6 +263,11 @@ void SimpleQT::statusMsg(const char* msg, int timeoutms)
 void SimpleQT::setCallBack( const QObject* sender, const char* signal, const char* method)
 {
 	connect(sender, signal, this, method);
+}
+
+void SimpleQT::closeEvent(QCloseEvent *event) {
+	m_glWidget->closeEvent(event) ;
+	QWidget::closeEvent(event) ;
 }
 
 void SimpleQT::keyPressEvent(QKeyEvent *e)
