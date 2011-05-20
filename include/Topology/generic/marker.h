@@ -38,7 +38,7 @@ protected:
 public:
 	Marker(Mark m, unsigned int cell): Mark(m), m_cell(cell) {}
 #ifndef DART_ORBIT
-#define DART_ORBIT	(unsigned int)(4)
+#define DART_ORBIT	(unsigned int)(5)
 #endif
 	Marker(): Mark(0), m_cell(DART_ORBIT) {} // TODO trouver un moyen propre de faire ça
 

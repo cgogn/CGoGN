@@ -119,14 +119,13 @@ void GLWidget::recalcModelView()
 
 	if (m_cbs)
 		m_cbs->cb_updateMatrix();
-
 }
 
 void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 {
 	oglPushModelViewMatrix();
 
-	m_cbs->modelViewMatrix()= glm::mat4(1.0f);
+	m_cbs->modelViewMatrix() = glm::mat4(1.0f);
 
 	// positionne l'objet / mvt souris
 	oglTranslate(m_cbs->trans_x(), m_cbs->trans_y(), m_cbs->trans_z());
@@ -137,7 +136,6 @@ void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 	// update matrice
 	m_cbs->modelViewMatrix() *= m;
 
-
 	// ajout transformation in screen
 	m_cbs->modelViewMatrix()*= m_cbs->transfoMatrix();
 
@@ -145,12 +143,11 @@ void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 	oglScale(m_obj_sc, m_obj_sc, m_obj_sc);
 	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
 
-
 	oglTranslate(newCenter[0], newCenter[1], newCenter[2]);
-	oglScale(1.0f/m_obj_sc, 1.0f/m_obj_sc, 1.0f/m_obj_sc);
+	oglScale(1.0f / m_obj_sc, 1.0f / m_obj_sc, 1.0f / m_obj_sc);
 
 	m = glm::inverse(m_cbs->transfoMatrix());
-	m_cbs->modelViewMatrix()*= m;
+	m_cbs->modelViewMatrix() *= m;
 
 	matrix_to_quat( m_cbs->curquat(), m_cbs->modelViewMatrix());
 
@@ -160,9 +157,8 @@ void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 
 	oglPopModelViewMatrix();
 
-	m_obj_pos = glm::vec3(-newCenter[0],-newCenter[1],-newCenter[2]);
+	m_obj_pos = glm::vec3(-newCenter[0], -newCenter[1], -newCenter[2]);
 }
-
 
 void GLWidget::initializeGL()
 {
@@ -240,11 +236,10 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent* event)
 	}
 }
 
-
 void GLWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	// move object only if no special keys pressed
-	if (!(m_state_modifier & ( Qt::ShiftModifier|Qt::ControlModifier|Qt::AltModifier| Qt::MetaModifier)))
+	if (!(m_state_modifier & ( Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
 	{
 		int x = event->x();
 		int y = event->y();

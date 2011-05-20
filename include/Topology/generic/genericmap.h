@@ -36,14 +36,15 @@
 
 #define EMBNULL 0xffffffff
 
-#define NB_ORBITS 5
+#define NB_ORBITS 6
 #define NBTHREAD 16
 
-#define VERTEX_ORBIT	(unsigned int)(0)
-#define EDGE_ORBIT		(unsigned int)(1)
-#define FACE_ORBIT		(unsigned int)(2)
-#define VOLUME_ORBIT	(unsigned int)(3)
-#define DART_ORBIT		(unsigned int)(4)
+#define VERTEX_ORBIT		(unsigned int)(0)
+#define EDGE_ORBIT			(unsigned int)(1)
+#define ORIENTED_FACE_ORBIT	(unsigned int)(2)
+#define FACE_ORBIT			(unsigned int)(3)
+#define VOLUME_ORBIT		(unsigned int)(4)
+#define DART_ORBIT			(unsigned int)(5)
 
 
 #include "Container/attributeContainer.h"
@@ -386,6 +387,7 @@ public:
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
@@ -415,6 +417,7 @@ bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, Fu
 		case  DART_ORBIT: return f(d);
 		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread);
 		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread);
+		case  ORIENTED_FACE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread);
 		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread);
 		case  VOLUME_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");
@@ -430,6 +433,7 @@ bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, F
 		case  DART_ORBIT: return f(d);
 		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread);
 		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread);
+		case  ORIENTED_FACE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread);
 		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread);
 		case  VOLUME_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");

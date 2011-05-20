@@ -536,11 +536,12 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 {
 	switch(orbit)
 	{
-		case  DART_ORBIT: return f(d);
-		case  VERTEX_ORBIT: return foreach_dart_of_vertex(d, f,thread);
-		case  EDGE_ORBIT: return foreach_dart_of_edge(d, f,thread);
-		case  FACE_ORBIT: return foreach_dart_of_face(d, f,thread);
-		case  VOLUME_ORBIT: return foreach_dart_of_volume(d, f, thread);
+		case DART_ORBIT: return f(d);
+		case VERTEX_ORBIT: return foreach_dart_of_vertex(d, f, thread);
+		case EDGE_ORBIT: return foreach_dart_of_edge(d, f, thread);
+		case ORIENTED_FACE_ORBIT: return foreach_dart_of_oriented_face(d, f, thread);
+		case FACE_ORBIT: return foreach_dart_of_face(d, f, thread);
+		case VOLUME_ORBIT: return foreach_dart_of_volume(d, f, thread);
 //		case -1: return foreach_dart_of_cc(d,f,thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}
