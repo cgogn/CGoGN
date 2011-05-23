@@ -346,6 +346,8 @@ void SimpleQT::cb_updateMatrix()
 
 void SimpleQT::synchronize(SimpleQT* sqt)
 {
+	m_glWidget->getObjPos() = sqt->m_glWidget->getObjPos() ;
+
 	m_projection_matrix = sqt->m_projection_matrix;
 	m_modelView_matrix = sqt->m_modelView_matrix;
 	for (unsigned int i = 0; i < 4; ++i)

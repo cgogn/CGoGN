@@ -163,6 +163,10 @@ void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 	m_obj_pos = glm::vec3(-newCenter[0],-newCenter[1],-newCenter[2]);
 }
 
+glm::vec3& GLWidget::getObjPos()
+{
+	return m_obj_pos ;
+}
 
 void GLWidget::initializeGL()
 {

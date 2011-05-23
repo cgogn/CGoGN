@@ -157,6 +157,8 @@ public:
 
 	static float getFarPlane() { return FAR_PLANE ; }
 
+	glm::vec3& getObjPos() ;
+
 	void modelModified() { newModel = 1; }
 
 protected:
