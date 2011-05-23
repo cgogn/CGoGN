@@ -258,8 +258,8 @@ inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
 	{
 		unsigned int cur = m_curLevel ;
 		m_curLevel = m_maxLevel ;
-		this->embedOrbit(FACE_ORBIT, d, this->getDartEmbedding(FACE_ORBIT, d)) ;
-		this->embedOrbit(FACE_ORBIT, e, this->getDartEmbedding(FACE_ORBIT, e)) ;
+		this->embedOrbit(FACE_ORBIT, d, this->getEmbedding(FACE_ORBIT, d)) ;
+		this->embedOrbit(FACE_ORBIT, e, this->getEmbedding(FACE_ORBIT, e)) ;
 		m_curLevel = cur ;
 	}
 }
@@ -345,7 +345,7 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(d, orbit) ;
+	unsigned int index = m->getEmbedding(orbit, d) ;
 
 	if(index == EMBNULL)
 	{
@@ -381,7 +381,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(d, orbit) ;
+	unsigned int index = m->getEmbedding(orbit, d) ;
 
 	unsigned int step = 0 ;
 	while(step < nbSteps)

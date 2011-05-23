@@ -628,7 +628,7 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(d, orbit) ;
+	unsigned int index = m->getEmbedding(orbit, d) ;
 
 	if(index == EMBNULL)
 	{
@@ -664,7 +664,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(d, orbit) ;
+	unsigned int index = m->getEmbedding(orbit, d) ;
 
 	unsigned int step = 0 ;
 	while(step < nbSteps)

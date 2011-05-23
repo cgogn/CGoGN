@@ -94,7 +94,7 @@ inline T& AttributeHandler<T>::operator[](Dart d)
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
 	unsigned int orbit = m_attrib->getOrbit() ;
-	unsigned int a = m_map->getEmbedding(d, orbit) ;
+	unsigned int a = m_map->getEmbedding(orbit, d) ;
 
 	if (a == EMBNULL)
 		a = m_map->embedNewCell(orbit, d);
@@ -106,7 +106,7 @@ template <typename T>
 inline const T& AttributeHandler<T>::operator[](Dart d) const
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int a = m_map->getEmbedding(d, m_attrib->getOrbit()) ;
+	unsigned int a = m_map->getEmbedding(m_attrib->getOrbit(), d) ;
 	return m_attrib->operator[](a) ;
 }
 

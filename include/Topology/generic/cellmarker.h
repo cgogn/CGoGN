@@ -88,7 +88,7 @@ public:
 	virtual void mark(Dart d)
 	{
 		unsigned int cell = m_marker.getCell() ;
-		unsigned int a = m_map.getEmbedding(d, cell);
+		unsigned int a = m_map.getEmbedding(cell, d);
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(cell, d);
 
@@ -101,7 +101,7 @@ public:
 	virtual void unmark(Dart d)
 	{
 		unsigned int cell = m_marker.getCell() ;
-		unsigned int a = m_map.getEmbedding(d, cell);
+		unsigned int a = m_map.getEmbedding(cell, d);
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(cell, d);
 
@@ -114,7 +114,7 @@ public:
 	virtual bool isMarked(Dart d)
 	{
 		unsigned int cell = m_marker.getCell() ;
-		unsigned int a = m_map.getEmbedding(d, cell);
+		unsigned int a = m_map.getEmbedding(cell, d);
 		if (a == EMBNULL)
 			return false;
 
@@ -198,7 +198,7 @@ public:
 	void mark(Dart d)
 	{
 		CellMarker::mark(d) ;
-		m_markedCells.push_back(m_map.getEmbedding(d, m_marker.getCell())) ;
+		m_markedCells.push_back(m_map.getEmbedding(m_marker.getCell(), d)) ;
 	}
 
 	/**
