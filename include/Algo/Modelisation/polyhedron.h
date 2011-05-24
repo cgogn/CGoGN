@@ -206,7 +206,7 @@ public:
 	* @param y nb of quads in y
 	* @return the dart
 	*/
-	Dart grid_topo(int x, int y);
+	Dart grid_topo(unsigned int x, unsigned int y);
 
 	/**
 	* Create a subdivided (surface) cylinder

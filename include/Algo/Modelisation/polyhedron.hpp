@@ -202,7 +202,7 @@ Dart Polyhedron<PFP>::createOrientedPolyhedron(typename PFP::MAP& the_map, int n
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::grid_topo(int x, int y)
+Dart Polyhedron<PFP>::grid_topo(unsigned int x, unsigned int y)
 {
 	if (m_kind != NONE) return m_dart;
 
@@ -216,29 +216,30 @@ Dart Polyhedron<PFP>::grid_topo(int x, int y)
 	m_tableVertDarts.reserve(nb);
 
 	// creation of quads and storing vertices
-	for (int i=0;i<y;++i)
+	for (unsigned int i = 0; i < y; ++i)
 	{
-		for (int j=1;j<=x;++j)
+		for (unsigned int j = 1; j <= x; ++j)
 		{
 			Dart d = m_map.newFace(4);
 			m_tableVertDarts.push_back(d);
-			if (j==x)
+			if (j == x)
 				m_tableVertDarts.push_back(m_map.phi1(d));
 		}
 	}
+
 	// store last row of vertices
-	for (int i=0;i<x;++i)
+	for (unsigned int i = 0; i < x; ++i)
 	{
 		m_tableVertDarts.push_back( m_map.phi_1(m_tableVertDarts[(y-1)*(x+1) + i]) );	
 	}
 	m_tableVertDarts.push_back( m_map.phi1(m_tableVertDarts[(y-1)*(x+1) +x]) );	
 
 	//sewing the quads
-	for (int i=0;i<y;++i)
+	for (unsigned int i = 0; i < y; ++i)
 	{
-		for (int j=0;j<x;++j)
+		for (unsigned int j = 0; j < x; ++j)
 		{
-			if (i>0) // sew with preceeding row
+			if (i > 0) // sew with preceeding row
 			{
 				int pos = i*(x+1)+j;
 				Dart d = m_tableVertDarts[pos];
@@ -246,7 +247,7 @@ Dart Polyhedron<PFP>::grid_topo(int x, int y)
 				e = m_map.phi1(m_map.phi1(e));
 				m_map.sewFaces(d,e);
 			}
-			if (j>0) // sew with preceeding column
+			if (j > 0) // sew with preceeding column
 			{
 				int pos = i*(x+1)+j;
 				Dart d = m_tableVertDarts[pos];

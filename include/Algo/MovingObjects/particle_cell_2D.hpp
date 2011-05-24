@@ -1,4 +1,4 @@
-// #define DEBUG
+//#define DEBUG
 
 template <typename PFP>
 void ParticleCell2D<PFP>::display()

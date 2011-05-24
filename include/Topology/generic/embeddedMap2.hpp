@@ -168,13 +168,13 @@ bool EmbeddedMap2<MAP2>::flipEdge(Dart d)
 
 		if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 		{
-			MAP2::setDartEmbedding(VERTEX_ORBIT, d, MAP2::getEmbedding(VERTEX_ORBIT, MAP2::phi1(e))) ;
-			MAP2::setDartEmbedding(VERTEX_ORBIT, e, MAP2::getEmbedding(VERTEX_ORBIT, MAP2::phi1(d))) ;
+			MAP2::copyDartEmbedding(VERTEX_ORBIT, d, MAP2::phi1(e)) ;
+			MAP2::copyDartEmbedding(VERTEX_ORBIT, e, MAP2::phi1(d)) ;
 		}
 		if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 		{
-			MAP2::setDartEmbedding(FACE_ORBIT, MAP2::phi_1(d), MAP2::getEmbedding(FACE_ORBIT, d)) ;
-			MAP2::setDartEmbedding(FACE_ORBIT, MAP2::phi_1(e), MAP2::getEmbedding(FACE_ORBIT, e)) ;
+			MAP2::copyDartEmbedding(FACE_ORBIT, MAP2::phi_1(d), d) ;
+			MAP2::copyDartEmbedding(FACE_ORBIT, MAP2::phi_1(e), e) ;
 		}
 		return true ;
 	}
@@ -190,13 +190,13 @@ bool EmbeddedMap2<MAP2>::flipBackEdge(Dart d)
 
 		if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 		{
-			MAP2::setDartEmbedding(VERTEX_ORBIT, d, MAP2::getEmbedding(VERTEX_ORBIT, MAP2::phi1(e))) ;
-			MAP2::setDartEmbedding(VERTEX_ORBIT, e, MAP2::getEmbedding(VERTEX_ORBIT, MAP2::phi1(d))) ;
+			MAP2::copyDartEmbedding(VERTEX_ORBIT, d, MAP2::phi1(e)) ;
+			MAP2::copyDartEmbedding(VERTEX_ORBIT, e, MAP2::phi1(d)) ;
 		}
 		if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 		{
-			MAP2::setDartEmbedding(FACE_ORBIT, MAP2::phi1(d), MAP2::getEmbedding(FACE_ORBIT, d)) ;
-			MAP2::setDartEmbedding(FACE_ORBIT, MAP2::phi1(e), MAP2::getEmbedding(FACE_ORBIT, e)) ;
+			MAP2::copyDartEmbedding(FACE_ORBIT, MAP2::phi1(d), d) ;
+			MAP2::copyDartEmbedding(FACE_ORBIT, MAP2::phi1(e), e) ;
 		}
 		return true ;
 	}
@@ -281,7 +281,7 @@ bool EmbeddedMap2<MAP2>::collapseDegeneratedFace(Dart d)
 	{
 		if (MAP2::isOrbitEmbedded(EDGE_ORBIT))
 		{
-			MAP2::setDartEmbedding(EDGE_ORBIT, MAP2::phi2(e), MAP2::getEmbedding(EDGE_ORBIT, e)) ;
+			MAP2::copyDartEmbedding(EDGE_ORBIT, MAP2::phi2(e), e) ;
 		}
 		return true ;
 	}
@@ -295,8 +295,8 @@ void EmbeddedMap2<MAP2>::splitFace(Dart d, Dart e)
 
 	if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
 	{
-		MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::phi_1(e), MAP2::getEmbedding(VERTEX_ORBIT, d)) ;
-		MAP2::setDartEmbedding(VERTEX_ORBIT, MAP2::phi_1(d), MAP2::getEmbedding(VERTEX_ORBIT, e)) ;
+		MAP2::copyDartEmbedding(VERTEX_ORBIT, MAP2::phi_1(e), d) ;
+		MAP2::copyDartEmbedding(VERTEX_ORBIT, MAP2::phi_1(d), e) ;
 	}
 	if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 	{
@@ -362,6 +362,27 @@ bool EmbeddedMap2<MAP2>::mergeVolumes(Dart d, Dart e)
 		return true ;
 	}
 	return false ;
+}
+
+template <typename MAP2>
+unsigned int EmbeddedMap2<MAP2>::closeHole(Dart d)
+{
+	unsigned int nbE = MAP2::closeHole(d) ;
+	Dart dd = MAP2::phi2(d) ;
+	Dart f = dd ;
+	do
+	{
+		if (MAP2::isOrbitEmbedded(VERTEX_ORBIT))
+		{
+			MAP2::copyDartEmbedding(VERTEX_ORBIT, f, MAP2::alpha1(f)) ;
+		}
+		if (MAP2::isOrbitEmbedded(EDGE_ORBIT))
+		{
+			MAP2::copyDartEmbedding(EDGE_ORBIT, f, MAP2::phi2(f)) ;
+		}
+		f = MAP2::phi1(f) ;
+	} while(dd != f) ;
+	return nbE ;
 }
 
 template <typename MAP2>

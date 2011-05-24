@@ -49,7 +49,7 @@ public :
 	{}
 
 	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(2), crossCell(NO_CROSS)
+		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(FACE_ORBIT), crossCell(NO_CROSS)
 	{}
 
 	Dart getCell() { return d; }

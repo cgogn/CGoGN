@@ -113,6 +113,11 @@ public:
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e) ;
 
+	/**
+	 * No attribute is attached to the new face
+	 */
+	virtual unsigned int closeHole(Dart d);
+
 	virtual bool check() ;
 } ;
 
