@@ -314,7 +314,7 @@ bool EmbeddedMap2<MAP2>::mergeFaces(Dart d)
 	{
 		if (MAP2::isOrbitEmbedded(FACE_ORBIT))
 		{
-			MAP2::embedOrbit(FACE_ORBIT, dNext, MAP2::getEmbedding(VERTEX_ORBIT, dNext)) ;
+			MAP2::embedOrbit(FACE_ORBIT, dNext, MAP2::getEmbedding(FACE_ORBIT, dNext)) ;
 		}
 		return true ;
 	}
