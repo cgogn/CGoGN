@@ -88,6 +88,10 @@ void Map2::cutEdge(Dart d)
 	}
 }
 
+void Map2::uncutEdge(Dart d)
+{
+}
+
 Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 	Dart resV ;
