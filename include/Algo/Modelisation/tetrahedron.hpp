@@ -128,31 +128,31 @@ void unlinkFromEdge(typename PFP::MAP& map, Dart d)
 {
 	Dart d3 = map.phi3(d);
 
-	if(map.isOrbitEmbedded(VERTEX_ORBIT))
-	{
-		//Si la face n'est pas libre en phi2
-		if(map.phi2(d) != d && map.phi2(d3) != d3)
-		{
-			unsigned int dVEmb = map.getDartEmbedding(VERTEX_ORBIT, d) ;
-			if(dVEmb != EMBNULL)
-			{
-				map.embedOrbit(VERTEX_ORBIT, d, dVEmb) ;
-				map.setDartEmbedding(VERTEX_ORBIT, d, EMBNULL) ;
-			}
-
-			unsigned int d3VEmb = map.getDartEmbedding(VERTEX_ORBIT, d3) ;
-			if(d3VEmb != EMBNULL)
-			{
-				map.embedOrbit(VERTEX_ORBIT, d3, d3VEmb) ;
-				map.setDartEmbedding(VERTEX_ORBIT, d3, EMBNULL) ;
-			}
-		}
-		//Si la face est libre en phi2
-		else
-		{
-
-		}
-	}
+//	if(map.isOrbitEmbedded(VERTEX_ORBIT))
+//	{
+//		//Si la face n'est pas libre en phi2
+//		if(map.phi2(d) != d && map.phi2(d3) != d3)
+//		{
+//			unsigned int dVEmb = map.getDartEmbedding(VERTEX_ORBIT, d) ;
+//			if(dVEmb != EMBNULL)
+//			{
+//				map.embedOrbit(VERTEX_ORBIT, d, dVEmb) ;
+//				map.setDartEmbedding(VERTEX_ORBIT, d, EMBNULL) ;
+//			}
+//
+//			unsigned int d3VEmb = map.getDartEmbedding(VERTEX_ORBIT, d3) ;
+//			if(d3VEmb != EMBNULL)
+//			{
+//				map.embedOrbit(VERTEX_ORBIT, d3, d3VEmb) ;
+//				map.setDartEmbedding(VERTEX_ORBIT, d3, EMBNULL) ;
+//			}
+//		}
+//		//Si la face est libre en phi2
+//		else
+//		{
+//
+//		}
+//	}
 
 	Dart e2 = map.phi2(d3);
 	Dart d2 = map.phi2(d);
@@ -338,7 +338,7 @@ void swap3To2(typename PFP::MAP& map, Dart d)
 //[precond] le brin doit venir d'une face partagé par 2 tetraèdres
 // renvoie un brin de l'ancienne couture entre les 2 tetras qui est devenu une arête
 template <typename PFP>
-void swap2To3(typename PFP::MAP& map, Dart d)
+Dart swap2To3(typename PFP::MAP& map, Dart d)
 {
 	Dart e = map.phi1(map.phi2(map.phi3(d)));
 
@@ -388,12 +388,248 @@ void swap2To3(typename PFP::MAP& map, Dart d)
 	map.setDartEmbedding(VERTEX_ORBIT, map.phi_1(f2), p1);
 	map.setDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi3(f2)), p2);
 
+	return map.phi_1(d);
 }
 
 template <typename PFP>
 void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
 {
 
+
+}
+
+/************************************************************************************************
+ *																		Flip Functions 																	   *
+ ************************************************************************************************/
+
+
+template <typename PFP>
+void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+{
+	typedef typename PFP::TVEC3 TVEC3;
+	typedef typename PFP::VEC3 VEC3;
+
+
+	//parcourir le tetra est sauvegarder un brin de chaque face + calcul du centroid
+	VEC3 volCenter;
+	unsigned count = 0 ;
+
+	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
+	DartMarkerStore mv(map);		// Lock a vertex marker to compute volume center
+
+	std::vector<Dart> visitedFaces;
+	visitedFaces.reserve(4);
+	visitedFaces.push_back(d);
+
+	mf.markOrbit(FACE_ORBIT, d) ;
+
+	//TODO diminuer complexite avec boucle specifique aux tetras
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		Dart e = *face ;
+		do
+		{
+			//compute volume centroid
+			if(!mv.isMarked(e))
+			{
+				volCenter += position[e];
+				++count;
+				mv.markOrbit(VERTEX_ORBIT, e);
+			}
+
+			// add all face neighbours to the table
+			Dart ee = map.phi2(e) ;
+			if(!mf.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mf.markOrbit(FACE_ORBIT, ee) ;
+			}
+
+			e = map.phi1(e) ;
+		} while(e != *face) ;
+	}
+
+	volCenter /= typename PFP::REAL(count) ;
+
+	//store the new faces to 3-sew
+	std::vector<std::pair<Dart,Dart> > nFaces;
+	nFaces.reserve(6);
+
+	//triangule chaque face avec plongement au centroid
+	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+
+		// on decoud et on ferme le trou
+		Dart temp = *face;
+		do
+		{
+			nFaces.push_back(std::pair<Dart,Dart>(temp, map.phi2(temp)));
+			map.unsewFaces(temp);
+			temp = map.phi1(temp);
+		}
+		while(temp != *face);
+
+		map.closeHole(*face);
+
+		Dart fi = map.phi2(*face);
+
+		Dart cd = Algo::Modelisation::trianguleFace<PFP>(map, fi);
+		position[cd] = volCenter;
+	}
+
+	//coudre les nouveaux brins entre eux par phi3
+	for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
+	{
+
+		if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
+			map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
+	}
+}
+
+/************************************************************************************************
+ *																		Bisection Functions 															   *
+ ************************************************************************************************/
+template <typename PFP>
+void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+{
+	//coupe l'arete en 2
+	Dart f = map.phi1(d);
+	map.cutEdge(d);
+	Dart e = map.phi1(d);
+	position[e] = position[d];
+	position[e] += position[f];
+	position[e] *= 0.5;
+
+
+	//split de la face de d
+	map.splitFace(map.phi_1(d), map.phi1(d));
+
+	//alpha2(d)
+	Dart dd = map.alpha2(d);
+
+	//si alpha2 == d
+	if(dd == d)
+	{
+		map.splitFace(map.phi2(d), map.phi1(map.phi1(map.phi2(d))));
+		std::cout << "dd == d" << std::endl;
+	}
+	else
+	{
+		Dart prev = d;
+
+		while (dd!=d)
+		{
+			prev = dd;
+			dd = map.alpha2(dd);
+
+			std::cout << "plop" << std::endl;
+			map.splitFace(map.phi_1(prev), map.phi1(prev));
+		}
+
+		if(map.phi3(map.phi2(dd)) == map.phi2(dd))
+		{
+			map.splitFace(map.phi2(dd), map.phi1(map.phi1(map.phi2(dd))));
+		}
+
+	}
+
+	Dart temp = d;
+	do{
+
+
+		//insertion de la face
+		//decouture des 2 bouts
+		Dart etemp = map.phi2(map.phi1(temp));
+
+		map.unsewFaces(map.phi1(temp));
+		map.unsewFaces(map.phi_1(map.phi2(temp)));
+		map.unsewFaces(map.phi1(map.phi2(map.phi_1(temp))));
+
+		//fermture des 2 trous
+		map.closeHole(map.phi1(temp));
+		map.closeHole(etemp);
+
+		//recouture par phi3
+		map.sewVolumes(map.phi2(map.phi1(temp)), map.phi2(etemp));
+
+
+		temp = map.alpha2(temp);
+	}
+	while(temp != d);
+
+
+//	if(map.phi3(d) == d)
+//	{
+//		map.splitFace(map.phi_1(d), map.phi1(d));
+//		d = map.phi2(d);
+//	}
+//
+//
+//	Dart prev = d;
+//	Dart dd = map.alpha2(d);
+//
+//	//
+//	map.splitFace(d, map.phi1(map.phi1(d)));
+//
+//	//si phi3(d) != d
+//	map.splitFace(map.phi_1(d), map.phi1(d));
+//
+//	//map.splitFace(map.phi2(d), map.phi1(map.phi1(map.phi2(d))));
+//
+//	//map.Map2::splitFace(map.phi_1(d), map.phi1(d));
+//	//map.Map2::splitFace(map.phi2(d), map.phi1(map.phi1(map.phi2(d))));
+//
+//	//		if(map.phi3(d) == d)
+//	//		{
+//	//			map.splitFace(map.phi2(d), map.phi1(map.phi1(map.phi2(d))));
+//	//		}
+//
+//	while (dd!=d)
+//	{
+//		prev = dd;
+//		dd = map.alpha2(dd);
+//
+//		map.splitFace(map.phi_1(prev), map.phi1(prev));
+//	}
+
+
+
+//	DartMarkerStore mf(map);
+//
+//
+//	//tout autour de l'arete
+//	Dart temp = d;
+//	do{
+//
+//		if(!mf.isMarked(temp))
+//		{
+//			//split les 2 faces le long
+//			map.splitFace(map.phi_1(temp), map.phi1(temp));
+//			map.splitFace(map.phi2(temp), map.phi1(map.phi1(map.phi2(temp))));
+//
+//			mf.markOrbit(FACE_ORBIT, temp);
+//			mf.markOrbit(FACE_ORBIT, map.phi2(temp));
+//		}
+//			//insertion de la face
+//			//decouture des 2 bouts
+//			Dart etemp = map.phi2(map.phi1(temp));
+//
+//			map.unsewFaces(map.phi1(temp));
+//			map.unsewFaces(map.phi_1(map.phi2(temp)));
+//			map.unsewFaces(map.phi1(map.phi2(map.phi_1(temp))));
+//
+//			//fermture des 2 trous
+//			map.closeHole(map.phi1(temp));
+//			map.closeHole(etemp);
+//
+//			//recouture par phi3
+//			map.sewVolumes(map.phi2(map.phi1(temp)), map.phi2(etemp));
+//
+//
+//
+//		temp = map.alpha2(temp);
+//	}
+//	while(temp != d);
 
 }
 

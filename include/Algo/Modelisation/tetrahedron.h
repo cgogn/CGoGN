@@ -86,13 +86,35 @@ void swap3To2(typename PFP::MAP& map, Dart d);
  *
  */
 template <typename PFP>
-void swap2To3(typename PFP::MAP& map, Dart d);
+Dart swap2To3(typename PFP::MAP& map, Dart d);
 
 /**
  *
  */
 template <typename PFP>
 void swap5To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
+
+
+/************************************************************************************************
+ *																		Flip Functions 																	   *
+ ************************************************************************************************/
+
+/*
+ *
+ */
+template <typename PFP>
+void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
+
+
+
+
+/**
+ *
+ */
+template <typename PFP>
+void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
 
 } //end namespace Tetrahedron
 } //end namespace Modelisation
