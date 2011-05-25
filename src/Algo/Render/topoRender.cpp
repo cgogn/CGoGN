@@ -23,8 +23,9 @@
 *******************************************************************************/
 
 #include "Algo/Render/GL2/topoRender.h"
-#include "Utils/shaderSimpleColor.h"
-#include "Utils/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 namespace CGoGN
 {

@@ -23,7 +23,8 @@
 *******************************************************************************/
 
 #include "Utils/drawer.h"
-#include "Utils/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 #include "Utils/vbo.h"
 
 namespace CGoGN

@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include <GL/glew.h>
-#include "Utils/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
 
 namespace CGoGN
 {
@@ -31,64 +31,108 @@ namespace CGoGN
 namespace Utils
 {
 
-std::string ShaderSimpleColor::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-//		"INVARIANT_POS;\n"
+std::string ShaderVectorPerVertex::vertexShaderText =
+		"ATTRIBUTE vec3 VertexPosition;\n"
+		"ATTRIBUTE vec3 VertexVector;\n"
+		"VARYING_VERT vec3 VectorAttrib;\n"
+		"INVARIANT_POS;\n"
 		"void main ()\n"
 		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
+		"	VectorAttrib = VertexVector;\n"
+		"	gl_Position = vec4(VertexPosition, 1.0);\n"
 		"}";
 
 
-std::string ShaderSimpleColor::fragmentShaderText =
+std::string ShaderVectorPerVertex::geometryShaderText =
+		"uniform float vectorScale;\n"
+		"uniform mat4 ModelViewProjectionMatrix;\n"
+		"VARYING_IN vec3 VectorAttrib[];\n"
+		"void main()\n"
+		"{\n"
+		"	gl_Position = ModelViewProjectionMatrix * POSITION_IN(0);\n"
+		"	EmitVertex();\n"
+		"	gl_Position = ModelViewProjectionMatrix * (POSITION_IN(0) + vec4(VectorAttrib[0] * vectorScale, 0.0));\n"
+		"	EmitVertex();\n"
+		"	EndPrimitive();\n"
+		"}";
+
+
+std::string ShaderVectorPerVertex::fragmentShaderText =
 		"PRECISON;\n"
-		"uniform vec4 color;\n"
+		"uniform vec4 vectorColor;\n"
 		"FRAG_OUT_DEF;\n"
 		"void main()\n"
 		"{\n"
-		"	gl_FragColor=color;\n"
+		"	gl_FragColor = vectorColor;\n"
 		"}";
 
 
-ShaderSimpleColor::ShaderSimpleColor()
+ShaderVectorPerVertex::ShaderVectorPerVertex() :
+	m_scale(1.0f),
+	m_color(Geom::Vec4f(1.0f, 0.0f, 0.0f, 0.0f))
 {
-	// chose GL defines (2 or 3)
-	// and compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
+
+	std::string glxgeom = GLSLShader::defines_Geom("points", "line_strip", 4);
+	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP);
 
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
-
-	//Default values
-	Geom::Vec4f color(0.1f, 0.9f, 0.1f, 0.0f);
-	setColor(color);
-}
-
-void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
-{
-	m_color = color;
+	// get and fill uniforms
 	bind();
-	glUniform4fv(m_unif_color, 1, color.data());
+	getLocations();
+	sendParams();
 }
 
-unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
+void ShaderVectorPerVertex::getLocations()
+{
+	m_uniform_scale = glGetUniformLocation(this->program_handler(), "vectorScale");
+	m_uniform_color = glGetUniformLocation(this->program_handler(), "vectorColor");
+}
+
+void ShaderVectorPerVertex::sendParams()
+{
+	glUniform1f(m_uniform_scale, m_scale);
+	glUniform4fv(m_uniform_color, 1, m_color.data());
+}
+
+void ShaderVectorPerVertex::setScale(float scale)
+{
+	bind();
+	glUniform1f(m_uniform_scale, scale);
+	m_scale = scale;
+}
+
+void ShaderVectorPerVertex::setColor(const Geom::Vec4f& color)
+{
+	bind();
+	glUniform4fv(m_uniform_color, 1, color.data());
+	m_color = color;
+}
+
+unsigned int ShaderVectorPerVertex::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
 	return bindVA_VBO("VertexPosition", vbo);
 }
 
-void ShaderSimpleColor::restoreUniformsAttribs()
+unsigned int ShaderVectorPerVertex::setAttributeVector(VBO* vbo)
 {
-	m_unif_color = glGetUniformLocation(this->program_handler(), "color");
-	bind();
-	glUniform4fv(m_unif_color, 1, m_color.data());
+	m_vboVec = vbo;
+	return bindVA_VBO("VertexVector", vbo);
+}
+
+void ShaderVectorPerVertex::restoreUniformsAttribs()
+{
+	getLocations();
+	sendParams();
+
 	bindVA_VBO("VertexPosition", m_vboPos);
+	bindVA_VBO("VertexVector", m_vboVec);
 }
 
 } // namespace Utils

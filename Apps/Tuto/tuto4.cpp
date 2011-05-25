@@ -37,8 +37,8 @@
 
 #include "Algo/Render/GL2/mapRender.h"
 #include "Algo/Render/GL2/topoRender.h"
-#include "Utils/shaderSimpleColor.h"
-#include "Utils/shaderFlat.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderFlat.h"
 
 #include "Utils/cgognStream.h"
 

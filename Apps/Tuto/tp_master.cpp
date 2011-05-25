@@ -44,8 +44,8 @@
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
 
-#include "Utils/shaderSimpleColor.h"
-#include "Utils/shaderPhong.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderPhong.h"
 
 #include "Utils/drawer.h"
 

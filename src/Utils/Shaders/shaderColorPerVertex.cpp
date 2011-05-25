@@ -23,7 +23,8 @@
 *******************************************************************************/
 
 #include <GL/glew.h>
-#include "Utils/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 namespace CGoGN
 {

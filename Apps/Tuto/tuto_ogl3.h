@@ -38,7 +38,7 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Geometry/vector_gen.h"
 
-#include "Utils/shaderPhong.h"
+#include "Utils/Shaders/shaderPhong.h"
 
 #include <QApplication>
 #include <QDesktopWidget>

@@ -24,8 +24,9 @@
 
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Topology/generic/dart.h"
-#include "Utils/shaderSimpleColor.h"
-#include "Utils/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 #include <string.h>
 

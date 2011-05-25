@@ -31,8 +31,9 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/shaderSimpleColor.h"
-#include "Utils/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 
 #include "tuto3.h"
 

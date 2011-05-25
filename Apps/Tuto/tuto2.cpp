@@ -30,7 +30,7 @@
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
 
 #include "Utils/drawer.h"
 

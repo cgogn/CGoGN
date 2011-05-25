@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include <GL/glew.h>
-#include "Utils/shaderPhong.h"
+#include "Utils/Shaders/shaderPhong.h"
 
 namespace CGoGN
 {
