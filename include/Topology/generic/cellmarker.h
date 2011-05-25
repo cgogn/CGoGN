@@ -269,6 +269,19 @@ public:
 	}
 };
 
+class SelectorCellUnmarked: public FunctorSelect
+{
+protected:
+	CellMarker& m_cmarker;
+public:
+	SelectorCellUnmarked(CellMarker& cm): m_cmarker(cm) {}
+	bool operator()(Dart d) const
+	{
+		if (!m_cmarker.isMarked(d))
+			return true;
+		return false;
+	}
+};
 
 
 } // namespace CGoGN

@@ -178,7 +178,7 @@ Dart  Polyhedron<PFP>::createOrientedPrism(typename PFP::MAP& the_map)
 	Dart top = the_map.newOrientedFace(3);
 	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)));
 	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)));
-	the_map.sewFaces(the_map.phi1(the_map.phi1(top)),the_map.phi1(the_map.phi1(side3)));
+	the_map.sewFaces(the_map.phi1(top),the_map.phi1(the_map.phi1(side3)));
 
 	return base;
 }

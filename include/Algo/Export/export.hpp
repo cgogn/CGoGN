@@ -515,6 +515,23 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	return true ;
 }*/
 
+
+template <typename PFP>
+bool exportInESS(typename PFP::MAP& map, const char *filename, const typename PFP::TVEC3& position)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+
+}
+
 } // namespace Export
 
 } // namespace Algo

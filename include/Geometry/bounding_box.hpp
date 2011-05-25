@@ -94,7 +94,7 @@ bool BoundingBox<VEC>::intersects(const BoundingBox<VEC>& bb)
 {
 	VEC bbmin = bb.min() ;
 	VEC bbmax = bb.max() ;
-	for(unsigned int i = 0; i < bbmin.size(); ++i)
+	for(unsigned int i = 0; i < bbmin.dimension(); ++i)
 	{
 		if(m_pMax[i] < bbmin[i])
 			return false ;
