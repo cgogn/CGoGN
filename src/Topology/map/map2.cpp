@@ -90,6 +90,20 @@ void Map2::cutEdge(Dart d)
 
 void Map2::uncutEdge(Dart d)
 {
+	assert(vertexDegree(phi1(d)) == 2) ;
+	Dart ne = phi2(d) ;
+	if(ne == d)
+		collapseEdge(d) ;
+	else
+	{
+		Dart nd = phi1(d) ;
+		Dart e = phi_1(ne) ;
+		phi2unsew(e) ;
+		phi2unsew(d) ;
+		Map1::collapseEdge(nd) ;
+		Map1::collapseEdge(ne) ;
+		phi2sew(d, e) ;
+	}
 }
 
 Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
@@ -112,11 +126,11 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 
 		if (f != e && delDegenerateFaces)
 		{
-			Map1::collapseEdge(e);		// Collapse edge e
-			collapseDegeneratedFace(f);	// and collapse its face if degenerated
+			Map1::collapseEdge(e) ;		// Collapse edge e
+			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 		}
 		else
-			Map1::collapseEdge(e);	// Just collapse edge e
+			Map1::collapseEdge(e) ;	// Just collapse edge e
 	}
 
 	Dart f = phi1(d) ;
@@ -134,11 +148,11 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 
 	if (f != d && delDegenerateFaces)
 	{
-		Map1::collapseEdge(d);		// Collapse edge d
-		collapseDegeneratedFace(f);	// and collapse its face if degenerated
+		Map1::collapseEdge(d) ;		// Collapse edge d
+		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
-		Map1::collapseEdge(d);	// Just collapse edge d
+		Map1::collapseEdge(d) ;	// Just collapse edge d
 
 	return resV ;
 }
