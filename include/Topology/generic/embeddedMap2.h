@@ -56,6 +56,11 @@ public:
 	virtual void cutEdge(Dart d) ;
 
 	/**
+	 * The attributes attached to the edge of d are kept on the resulting edge
+	 */
+	virtual void uncutEdge(Dart d) ;
+
+	/**
 	 * Check if the edge of d can be collapsed or not based on some topological conditions
 	 * @param d a dart of the edge to test
 	 * @return true if the edge can be collapsed, false otherwise
