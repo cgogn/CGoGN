@@ -97,7 +97,7 @@ GenericMap::~GenericMap()
 void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	unsigned int old = getDartEmbedding(orbit, d);
+	unsigned int old = getEmbedding(orbit, d);
 
 	// if same emb nothing to do
 	if (old == emb)
@@ -129,7 +129,7 @@ void GenericMap::initOrbitEmbedding(unsigned int orbit, bool realloc)
 		if(!mark.isMarked(d))
 		{
 			mark.markOrbit(orbit, d) ;
-			if(realloc || getEmbedding(d, orbit) == EMBNULL)
+			if(realloc || getEmbedding(orbit, d) == EMBNULL)
 				embedNewCell(orbit, d) ;
 		}
 	}

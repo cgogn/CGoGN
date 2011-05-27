@@ -71,7 +71,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding(dd, VERTEX_ORBIT) ;
+				unsigned int vNum = map.getEmbedding(VERTEX_ORBIT, dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;
@@ -149,7 +149,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding(dd, VERTEX_ORBIT) ;
+				unsigned int vNum = map.getEmbedding(VERTEX_ORBIT, dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;
@@ -286,7 +286,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 			{
 				if (!markV.isMarked(e))
 				{
-					vertices.push_back(map.getEmbedding(e, VERTEX_ORBIT));
+					vertices.push_back(map.getEmbedding(VERTEX_ORBIT, e));
 					tableVertLab[e] = lab++;
 
 					markV.mark(e);
@@ -434,7 +434,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 			{
 				if (!markV.isMarked(e))
 				{
-					vertices.push_back(map.getEmbedding(e, VERTEX_ORBIT));
+					vertices.push_back(map.getEmbedding(VERTEX_ORBIT, e));
 					tableVertLab[e] = lab++;
 
 					markV.mark(e);
@@ -514,6 +514,23 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	out.close() ;
 	return true ;
 }*/
+
+
+template <typename PFP>
+bool exportInESS(typename PFP::MAP& map, const char *filename, const typename PFP::TVEC3& position)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+
+}
 
 } // namespace Export
 

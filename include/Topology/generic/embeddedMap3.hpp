@@ -86,7 +86,7 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 	{
 		Dart dd = d ;
 		do {
-			vEmb1 = MAP3::getEmbedding(d, VERTEX_ORBIT);
+			vEmb1 = MAP3::getEmbedding(VERTEX_ORBIT, d);
 			MAP3::embedOrbit(VERTEX_ORBIT, d, vEmb1) ;
 			dd = MAP3::phi1(dd) ;
 		} while(dd != d) ;
@@ -130,7 +130,7 @@ void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 		{
 			Dart e = MAP3::phi3(dd);
 
-			vEmb1 = MAP3::getEmbedding(dd, EDGE_ORBIT);
+			vEmb1 = MAP3::getEmbedding(EDGE_ORBIT, dd);
 
 			MAP3::setDartEmbedding(EDGE_ORBIT, dd, vEmb1) ;
 
@@ -158,14 +158,14 @@ bool EmbeddedMap3<MAP3>::mergeVolumes(Dart d)
 
 	if (MAP3::isOrbitEmbedded(VOLUME_ORBIT))
 	{
-		fEmb = MAP3::getEmbedding(d, VOLUME_ORBIT);
+		fEmb = MAP3::getEmbedding(VOLUME_ORBIT, d);
 		if(fEmb != EMBNULL)
 			MAP3::setDartEmbedding(VOLUME_ORBIT, d2, fEmb) ;
 	}
 
 	if (MAP3::isOrbitEmbedded(EDGE_ORBIT))
 	{
-		eEmb = MAP3::getEmbedding(d, EDGE_ORBIT);
+		eEmb = MAP3::getEmbedding(EDGE_ORBIT, d);
 		if(eEmb != EMBNULL)
 			MAP3::setDartEmbedding(EDGE_ORBIT, a2, eEmb);
 	}
@@ -221,33 +221,6 @@ void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 //	}
 }
 
-//template <typename MAP3>
-//bool EmbeddedMap3<MAP3>::flipEdge(Dart d)
-//{
-//	unsigned int eEmbd = EMBNULL;;
-//	unsigned int eEmbd2 = EMBNULL;;
-//
-//	bool res = MAP3::flipEdge(d);
-//
-//	if(MAP3::isOrbitEmbedded(EDGE_ORBIT))
-//	{
-//		eEmbd = MAP3::getEmbedding(d, EDGE_ORBIT);
-//		eEmbd2 = MAP3::getEmbedding(MAP3::phi2(d), EDGE_ORBIT);
-//	}
-//
-//	return res;
-//}
-//
-//
-//template <typename MAP3>
-//bool EmbeddedMap3<MAP3>::flipBackEdge(Dart d)
-//{
-//
-//	bool res = false;
-//
-//
-//	return res;
-//}
 
 template <typename MAP3>
 int EmbeddedMap3<MAP3>::collapseEdge(Dart d, bool delDegenerateFaces,
@@ -257,7 +230,7 @@ int EmbeddedMap3<MAP3>::collapseEdge(Dart d, bool delDegenerateFaces,
 	unsigned int vEmb = EMBNULL ;
 	if(MAP3::isOrbitEmbedded(VERTEX_ORBIT))
 	{
-		vEmb = MAP3::getEmbedding(d, VERTEX_ORBIT) ;
+		vEmb = MAP3::getEmbedding(VERTEX_ORBIT, d) ;
 		MAP3::embedOrbit(VERTEX_ORBIT,d,vEmb);
 		MAP3::embedOrbit(VERTEX_ORBIT,MAP3::phi2(d),vEmb);
 	}

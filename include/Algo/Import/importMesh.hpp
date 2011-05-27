@@ -96,11 +96,11 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			// darts incident to end vertex of edge
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
-			unsigned int embd = map.getDartEmbedding(VERTEX_ORBIT, d);
+			unsigned int embd = map.getEmbedding(VERTEX_ORBIT, d);
 			Dart good_dart;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == Dart::nil(); ++it)
 			{
-				if (map.getDartEmbedding(VERTEX_ORBIT, map.phi1(*it)) == embd)
+				if (map.getEmbedding(VERTEX_ORBIT, map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 
@@ -260,14 +260,14 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
 			//Phi3 reconstruction
-			unsigned int emb1d = map.getDartEmbedding(VERTEX_ORBIT, map.phi_1(d));
-			unsigned int emb2d = map.getDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi1(d)));
+			unsigned int emb1d = map.getEmbedding(VERTEX_ORBIT, map.phi_1(d));
+			unsigned int emb2d = map.getEmbedding(VERTEX_ORBIT, map.phi1(map.phi1(d)));
 
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 			{
 				Dart dprim=*it;
-				unsigned int emb1dprim = map.getDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi1(dprim)));
-				unsigned int emb2dprim = map.getDartEmbedding(VERTEX_ORBIT, map.phi_1(dprim));
+				unsigned int emb1dprim = map.getEmbedding(VERTEX_ORBIT, map.phi1(map.phi1(dprim)));
+				unsigned int emb2dprim = map.getEmbedding(VERTEX_ORBIT, map.phi_1(dprim));
 
 				if(emb1d == emb1dprim && emb2d == emb2dprim)
 				{
@@ -276,14 +276,14 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 			}
 
 			//Phi2 reconstruction
-			emb1d = map.getDartEmbedding(VERTEX_ORBIT, d);
-			emb2d = map.getDartEmbedding(VERTEX_ORBIT, map.phi1(d));
+			emb1d = map.getEmbedding(VERTEX_ORBIT, d);
+			emb2d = map.getEmbedding(VERTEX_ORBIT, map.phi1(d));
 
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 			{
 				Dart dprim=*it;
-				unsigned int emb1dprim = map.getDartEmbedding(VERTEX_ORBIT, map.phi1(dprim));
-				unsigned int emb2dprim = map.getDartEmbedding(VERTEX_ORBIT, dprim);
+				unsigned int emb1dprim = map.getEmbedding(VERTEX_ORBIT, map.phi1(dprim));
+				unsigned int emb2dprim = map.getEmbedding(VERTEX_ORBIT, dprim);
 
 				if(emb1d == emb1dprim && emb2d == emb2dprim)
 				{
@@ -294,8 +294,6 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 			m.unmarkOrbit(DART_ORBIT,d);
 		}
 	}
-
-
 
 	return true ;
 
@@ -387,7 +385,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 //			// darts incident to end vertex of edge
 //			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 //
-//			unsigned int embd = map.getDartEmbedding(VERTEX_ORBIT, d);
+//			unsigned int embd = map.getEmbedding(VERTEX_ORBIT, d);
 //			unsigned int nbf = 0;
 //			Dart good_dart = d;
 //
@@ -395,7 +393,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 //
 //			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 //			{
-//				if (map.getDartEmbedding(VERTEX_ORBIT, map.phi1(*it)) == embd)
+//				if (map.getEmbedding(VERTEX_ORBIT, map.phi1(*it)) == embd)
 //				{
 //					good_dart = *it;
 //					nbf++;
@@ -520,12 +518,12 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 //			// darts incident to end vertex of edge
 //			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 //
-//			unsigned int embd = map.getDartEmbedding(VERTEX_ORBIT, d);
+//			unsigned int embd = map.getEmbedding(VERTEX_ORBIT, d);
 //			unsigned int nbf=0;
 //			Dart good_dart;
 //			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
 //			{
-//				if ( map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*it))==embd)
+//				if ( map.getEmbedding(VERTEX_ORBIT,map.phi1(*it))==embd)
 //				{
 //					good_dart = *it;
 //					nbf++;
@@ -566,7 +564,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 ////					typename std::vector<Dart>::iterator jt = vd.begin();
 ////					while (!map.isMarkedDart(*jt, m))
 ////						jt++;
-////					unsigned int P = map.getDartEmbedding(VERTEX_ORBIT, *jt);
+////					unsigned int P = map.getEmbedding(VERTEX_ORBIT, *jt);
 ////					// while vertex if a "non manifold point"
 ////					while (vecEmbNbFp[index] > 1)
 ////					{
@@ -576,9 +574,9 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 ////						{
 ////							e = map.phi1(e);
 ////							// embedding of boundary darts on the fly
-////							unsigned int emb = map.getDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi2(e)));
+////							unsigned int emb = map.getEmbedding(VERTEX_ORBIT, map.phi1(map.phi2(e)));
 ////							map.setDartEmbedding(VERTEX_ORBIT, e, emb);
-////						} while (map.getDartEmbedding(VERTEX_ORBIT, map.phi2(e)) != P);
+////						} while (map.getEmbedding(VERTEX_ORBIT, map.phi2(e)) != P);
 ////						// separate the face
 ////						map.phi1sew(map.phi2(*jt), e);
 ////						vecEmbNbFp[index]--;
@@ -586,11 +584,11 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 ////					// copy embedding of vertex of boundary of last face
 ////					Dart e = map.phi2(*jt);
 ////					Dart d = e;
-////					if (map.getDartEmbedding(VERTEX_ORBIT, d) == EMBNULL)
+////					if (map.getEmbedding(VERTEX_ORBIT, d) == EMBNULL)
 ////					{
 ////						do
 ////						{
-////							unsigned int emb = map.getDartEmbedding(VERTEX_ORBIT, map.phi1(map.phi2(d)));
+////							unsigned int emb = map.getEmbedding(VERTEX_ORBIT, map.phi1(map.phi2(d)));
 ////							map.setDartEmbedding(VERTEX_ORBIT, d, emb);
 ////							d = map.phi1(d);
 ////						} while (d != e);

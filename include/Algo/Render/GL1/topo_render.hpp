@@ -168,7 +168,7 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
 	AutoAttributeHandler<Geom::Vec3f> vert(the_map, DART_ORBIT);
 
 	glLineWidth(2.0f);
-	glColor3f(0.0f,0.0f,0.0f);
+	glColor3f(0.9f,0.9f,0.9f);
 	glBegin(GL_LINES);
 
 	DartMarker mf(the_map);

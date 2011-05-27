@@ -877,8 +877,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	unsigned int v1 = m.getEmbedding(d, VERTEX_ORBIT) ;
-	unsigned int v2 = m.getEmbedding(dd, VERTEX_ORBIT) ;
+	unsigned int v1 = m.getEmbedding(VERTEX_ORBIT, d) ;
+	unsigned int v2 = m.getEmbedding(VERTEX_ORBIT, dd) ;
 
 	m_positionApproximator->approximate(d) ;
 

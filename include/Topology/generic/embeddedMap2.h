@@ -39,20 +39,12 @@ class EmbeddedMap2 : public MAP2
 {
 public:
 	/**
-	 *
-	 */
-	virtual void deleteFace(Dart d) ;
-
-	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 * No attribute is attached to the new edge
-	 * Nothing has to be done for the faces
 	 */
 	virtual void splitVertex(Dart d, Dart e) ;
 
 	/**
-	 * Nothing has to be done for the vertices
-	 * Nothing has to be done for the edges
 	 * The attributes attached to the face of d are kept on the resulting face
 	 */
 	virtual bool deleteVertex(Dart d) ;
@@ -60,7 +52,6 @@ public:
 	/**
 	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
-	 * Nothing has to be done for the faces
 	 */
 	virtual void cutEdge(Dart d) ;
 
@@ -91,34 +82,27 @@ public:
 	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
 	 * The attributes attached to the edge of d are kept on the resulting edge
-	 * Nothing has to be done for the faces
 	 */
 	virtual void sewFaces(Dart d, Dart e) ;
 
 	/**
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
 	 * The attributes attached to the old edge are duplicated on both resulting edges
-	 * Nothing has to be done for the faces
 	 */
 	virtual void unsewFaces(Dart d) ;
 
 	/**
-	 * Nothing has to be done for the vertices
 	 * The attributes attached to the edge of d are kept on the resulting edge
-	 * Nothing has to be done for the faces
 	 */
 	virtual bool collapseDegeneratedFace(Dart d);
 
 	/**
-	 * Nothing has to be done for the vertices
 	 * No attribute is attached to the new edge
 	 * The attributes attached to the old face are duplicated on both resulting faces
 	 */
 	virtual void splitFace(Dart d, Dart e) ;
 
 	/**
-	 * Nothing has to be done for the vertices
-	 * Nothing has to be done for the edges
 	 * The attributes attached to the face of dart d are kept on the resulting face
 	 */
 	virtual bool mergeFaces(Dart d) ;
@@ -126,9 +110,13 @@ public:
 	/**
 	 * The attributes attached to the vertices of the face of d are kept on the resulting vertices
 	 * The attributes attached to the edges of the face of d are kept on the resulting edges
-	 * Nothing has to be done for the faces
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e) ;
+
+	/**
+	 * No attribute is attached to the new face
+	 */
+	virtual unsigned int closeHole(Dart d);
 
 	virtual bool check() ;
 } ;

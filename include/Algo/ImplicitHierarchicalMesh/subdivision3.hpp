@@ -286,7 +286,7 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 			map.unsewFaces(map.phi1(map.phi1(e)));
 
 			//TODO utile ?
-			if(map.phi2(map.phi1(e)) != map.phi1(e))
+			//if(map.phi2(map.phi1(e)) != map.phi1(e))
 				map.unsewFaces(map.phi1(e));
 
 			e = map.phi2(map.phi_1(e));

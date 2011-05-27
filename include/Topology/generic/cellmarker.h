@@ -32,6 +32,7 @@
 
 #define VERTEX_CELL	VERTEX_ORBIT
 #define EDGE_CELL	EDGE_ORBIT
+#define ORIENTED_FACE_CELL	ORIENTED_FACE_ORBIT
 #define FACE_CELL	FACE_ORBIT
 #define VOLUME_CELL	VOLUME_ORBIT
 #define DART_CELL	DART_ORBIT	// ??
@@ -88,7 +89,7 @@ public:
 	virtual void mark(Dart d)
 	{
 		unsigned int cell = m_marker.getCell() ;
-		unsigned int a = m_map.getEmbedding(d, cell);
+		unsigned int a = m_map.getEmbedding(cell, d);
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(cell, d);
 
@@ -101,7 +102,7 @@ public:
 	virtual void unmark(Dart d)
 	{
 		unsigned int cell = m_marker.getCell() ;
-		unsigned int a = m_map.getEmbedding(d, cell);
+		unsigned int a = m_map.getEmbedding(cell, d);
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(cell, d);
 
@@ -114,7 +115,7 @@ public:
 	virtual bool isMarked(Dart d)
 	{
 		unsigned int cell = m_marker.getCell() ;
-		unsigned int a = m_map.getEmbedding(d, cell);
+		unsigned int a = m_map.getEmbedding(cell, d);
 		if (a == EMBNULL)
 			return false;
 
@@ -198,7 +199,7 @@ public:
 	void mark(Dart d)
 	{
 		CellMarker::mark(d) ;
-		m_markedCells.push_back(m_map.getEmbedding(d, m_marker.getCell())) ;
+		m_markedCells.push_back(m_map.getEmbedding(m_marker.getCell(), d)) ;
 	}
 
 	/**
@@ -268,6 +269,19 @@ public:
 	}
 };
 
+class SelectorCellUnmarked: public FunctorSelect
+{
+protected:
+	CellMarker& m_cmarker;
+public:
+	SelectorCellUnmarked(CellMarker& cm): m_cmarker(cm) {}
+	bool operator()(Dart d) const
+	{
+		if (!m_cmarker.isMarked(d))
+			return true;
+		return false;
+	}
+};
 
 
 } // namespace CGoGN

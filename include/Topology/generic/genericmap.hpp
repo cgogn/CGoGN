@@ -94,68 +94,7 @@ inline unsigned int GenericMap::nbEmbeddings() const
 	return nb ;
 }
 
-inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
-{
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-
-	if (orbit == DART_ORBIT)
-		return d.index;
-
-	unsigned int emb = (*m_embeddings[orbit])[d.index] ;
-	if(emb != EMBNULL)
-		return emb ;
-
-	class FunctorGetLazyEmb: public FunctorType
-	{
-	protected:
-		GenericMap& m_map;
-		unsigned int m_orbit;
-		AttributeMultiVector<unsigned int>* m_emb;
-		unsigned int m_val;
-		std::vector<Dart> m_darts;
-
-	public:
-		FunctorGetLazyEmb(GenericMap& map, unsigned int orbit):
-			m_map(map), m_orbit(orbit), m_val(EMBNULL)
-		{
-			m_emb = m_map.getEmbeddingAttributeVector(orbit) ;
-			m_darts.reserve(8) ;
-		}
-
-		bool operator()(Dart d)
-		{
-			if ((*m_emb)[d.index] != EMBNULL)
-			{
-				m_val = (*m_emb)[d.index];
-				return true;
-			}
-			m_darts.push_back(d);
-			return false;
-		}
-
-		unsigned int getVal()
-		{
-			if(m_val != EMBNULL)
-			{
-				AttributeContainer& cont = m_map.getAttributeContainer(m_orbit) ;
-				for(std::vector<Dart>::iterator it = m_darts.begin(); it != m_darts.end(); ++it)
-				{
-					(*m_emb)[it->index] = m_val;
-					cont.refLine(m_val) ;
-				}
-			}
-
-			return m_val;
-		}
-	};
-
-	FunctorGetLazyEmb fle(*this, orbit);
-	foreach_dart_of_orbit(orbit, d, fle);
-
-	return fle.getVal();
-}
-
-inline unsigned int GenericMap::getDartEmbedding(unsigned int orbit, Dart d)
+inline unsigned int GenericMap::getEmbedding(unsigned int orbit, Dart d)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 
@@ -165,10 +104,20 @@ inline unsigned int GenericMap::getDartEmbedding(unsigned int orbit, Dart d)
 	return (*m_embeddings[orbit])[d.index] ;
 }
 
+//inline unsigned int GenericMap::getDartEmbedding(unsigned int orbit, Dart d)
+//{
+//	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
+//
+//	if (orbit == DART_ORBIT)
+//		return d.index;
+//
+//	return (*m_embeddings[orbit])[d.index] ;
+//}
+
 inline void GenericMap::copyDartEmbedding(unsigned int orbit, Dart d, Dart e)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	setDartEmbedding(orbit, d, getDartEmbedding(orbit, e));
+	setDartEmbedding(orbit, d, getEmbedding(orbit, e));
 }
 
 inline unsigned int GenericMap::newCell(unsigned int orbit)
@@ -188,7 +137,6 @@ inline unsigned int GenericMap::embedNewCell(unsigned int orbit, Dart d)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	unsigned int em = newCell(orbit);
-//	setDartEmbedding(orbit, d, em) ; // possible ?? utile ??
 	embedOrbit(orbit, d, em);
 	return em;
 }
@@ -196,14 +144,12 @@ inline unsigned int GenericMap::embedNewCell(unsigned int orbit, Dart d)
 inline void GenericMap::copyCell(unsigned int orbit, Dart d, Dart e)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	unsigned int dE = getEmbedding(d, orbit) ;
-	unsigned int eE = getEmbedding(e, orbit) ;
+	unsigned int dE = getEmbedding(orbit, d) ;
+	unsigned int eE = getEmbedding(orbit, e) ;
 	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
 	{
 		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-		{
 			dE = embedNewCell(orbit, d) ;
-		}
 		m_attribs[orbit].copyLine(dE, eE) ;	// copy the data
 	}
 }
@@ -211,7 +157,7 @@ inline void GenericMap::copyCell(unsigned int orbit, Dart d, Dart e)
 inline void GenericMap::copyCell(unsigned int orbit, unsigned int i, unsigned int j)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	m_attribs[orbit].copyLine(i,j) ;
+	m_attribs[orbit].copyLine(i, j) ;
 }
 
 inline void GenericMap::initCell(unsigned int orbit, unsigned int i)
