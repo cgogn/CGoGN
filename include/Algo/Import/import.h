@@ -71,12 +71,6 @@ bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vec
 template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
-template <typename PFP>
-bool importInESSSurfacique(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, std::vector<std::pair<typename PFP::VEC3, typename PFP::VEC3> >& influences);
-
-template <typename PFP>
-bool importInESSVolumique(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames);
-
 
 } // namespace Import
 
