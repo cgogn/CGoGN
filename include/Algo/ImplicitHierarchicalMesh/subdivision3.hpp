@@ -168,10 +168,12 @@ void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 }
 
 template <typename PFP>
-void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
+
+	std::cout << "SUUUUUUB marine" << std::endl;
 
 	unsigned int vLevel = map.volumeLevel(d) ;
 	Dart old = map.volumeOldestDart(d) ;
@@ -362,6 +364,8 @@ void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	}
 
 	map.setCurrentLevel(cur) ;
+
+	return subdividedfaces.begin()->first;
 }
 
 

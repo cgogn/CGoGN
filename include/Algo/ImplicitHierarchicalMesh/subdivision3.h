@@ -48,7 +48,7 @@ template <typename PFP>
 void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_QUAD);
 
 template <typename PFP>
-void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 
 template <typename PFP>
