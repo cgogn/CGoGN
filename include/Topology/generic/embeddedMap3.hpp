@@ -170,6 +170,21 @@ void EmbeddedMap3<MAP3>::splitFace(Dart d, Dart e)
 
 	}
 
+	if(MAP3::isOrbitEmbedded(VOLUME_ORBIT))
+	{
+		MAP3::copyDartEmbedding(VOLUME_ORBIT, MAP3::phi_1(d),  d);
+		MAP3::copyDartEmbedding(VOLUME_ORBIT, MAP3::phi2(MAP3::phi_1(d)),  d);
+
+		if(MAP3::phi3(d) != d)
+		{
+			Dart d3 = MAP3::phi3(d);
+
+			MAP3::copyDartEmbedding(VOLUME_ORBIT, MAP3::phi1(d3), d3);
+			MAP3::copyDartEmbedding(VOLUME_ORBIT, MAP3::phi2(MAP3::phi1(d3)), d3);
+		}
+
+	}
+
 }
 
 template <typename MAP3>
@@ -178,6 +193,22 @@ void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 
 	MAP3::cutEdge(d);
 
+	if(MAP3::isOrbitEmbedded(VOLUME_ORBIT))
+	{
+		Dart demb = d;
+		if(MAP3::phi3(demb) == demb)
+			demb = MAP3::phi2(demb);
+
+		Dart f = demb;
+		do
+		{
+			MAP3::copyDartEmbedding(VOLUME_ORBIT, MAP3::phi1(f), f);
+			MAP3::copyDartEmbedding(VOLUME_ORBIT, MAP3::phi2(f), MAP3::phi2(MAP3::phi1(f)));
+
+			f = MAP3::alpha2(f);
+		}
+		while(f != demb);
+	}
 }
 
 
@@ -260,6 +291,8 @@ unsigned int EmbeddedMap3<MAP3>::closeHole(Dart d)
 			MAP3::copyDartEmbedding(VERTEX_ORBIT,f, MAP3::phi1(MAP3::phi2(f)));
 		if(MAP3::isOrbitEmbedded(EDGE_ORBIT))
 			MAP3::copyDartEmbedding(EDGE_ORBIT, f, MAP3::phi2(f));
+		if(MAP3::isOrbitEmbedded(VOLUME_ORBIT))
+			MAP3::copyDartEmbedding(VOLUME_ORBIT, f, MAP3::phi2(f));
 
 		f = MAP3::phi1(f);
 	}
