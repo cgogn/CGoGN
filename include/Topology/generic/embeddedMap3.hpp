@@ -29,54 +29,14 @@ namespace CGoGN
 {
 
 template <typename MAP3>
-void EmbeddedMap3<MAP3>::deleteOrientedVolume(Dart d)
-{
-//	DartMarkerStore mark(*this);		// Lock a marker
-//
-//	std::vector<Dart> visitedFaces;		// Faces that are traversed
-//	visitedFaces.reserve(16);
-//	visitedFaces.push_back(d);			// Start with the face of d
-//	std::vector<Dart>::iterator face;
-//
-//	//For every face added to the list
-//	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-//	{
-//		if (!mark.isMarked(*face))		// Face has not been visited yet
-//		{
-//			Dart dNext = *face ;
-//
-//			do
-//			{
-//				mark.mark(dNext);					// Mark
-//
-//				unsigned int vEmb1 = EMBNULL;		//Manage the embedding
-//				if(MAP3::isOrbitEmbedded(VERTEX_ORBIT))
-//				{
-//					vEmb1 = MAP3::getDartEmbedding(VERTEX_ORBIT, dNext);
-//					MAP3::embedOrbit(VERTEX_ORBIT, d, vEmb1) ; //alpha1 peut ne pas fonctionner
-//				}
-//
-//				if(MAP3::isOrbitEmbedded(EDGE_ORBIT))
-//				{
-//					vEmb1 = MAP3::getDartEmbedding(EDGE_ORBIT, dNext);
-//					MAP3::setDartEmbedding(VERTEX_ORBIT, MAP3::alpha2(dNext), vEmb1);
-//				}
-//
-//				Dart adj = MAP3::phi2(dNext);				// Get adjacent face
-//				if (adj != dNext && !mark.isMarked(adj))
-//					visitedFaces.push_back(adj);	// Add it
-//				dNext = MAP3::phi1(dNext);
-//			} while(dNext != *face);
-//		}
-//	}
-
-	MAP3::deleteOrientedVolume(d);
-}
-
-template <typename MAP3>
 void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 {
 	unsigned int vEmb1 = EMBNULL ;
+
+	if(MAP3::isOrbitEmbedded(VERTEX_ORBIT))
+	{
+
+	}
 
 	//topological sewing
 	MAP3::sewVolumes(d,e);
@@ -101,6 +61,7 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 			dd = MAP3::phi1(dd) ;
 		} while(dd != d) ;
 	}
+
 
 }
 
@@ -191,34 +152,32 @@ bool EmbeddedMap3<MAP3>::mergeVolumes(Dart d)
 template <typename MAP3>
 void EmbeddedMap3<MAP3>::splitFace(Dart d, Dart e)
 {
-
 	MAP3::splitFace(d,e);
+
+	if(MAP3::isOrbitEmbedded(VERTEX_ORBIT))
+	{
+		MAP3::copyDartEmbedding(VERTEX_ORBIT, MAP3::phi2(MAP3::phi_1(d)),  d);
+		MAP3::copyDartEmbedding(VERTEX_ORBIT, MAP3::phi2(MAP3::phi_1(e)),  e);
+
+		if(MAP3::phi3(d) != d)
+		{
+			Dart d3 = MAP3::phi3(d);
+			Dart e3 = MAP3::phi3(e);
+
+			MAP3::copyDartEmbedding(VERTEX_ORBIT, MAP3::phi1(d3), MAP3::phi1(MAP3::phi2(MAP3::phi1(d3))));
+			MAP3::copyDartEmbedding(VERTEX_ORBIT, MAP3::phi1(e3), MAP3::phi1(MAP3::phi2(MAP3::phi1(e3))));
+		}
+
+	}
+
 }
 
 template <typename MAP3>
 void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 {
-//	unsigned int dEmb = EMBNULL ;
-//	unsigned int fEmb = EMBNULL;
-//
-//	if (MAP3::isOrbitEmbedded(VERTEX_ORBIT))
-//	{
-//		dEmb = MAP3::getEmbedding(d, VERTEX_ORBIT) ;
-//	}
-//
-//	Dart f = MAP3::phi1(d) ;
+
 	MAP3::cutEdge(d);
-//	Dart e = MAP3::phi1(d);
-//
-//	if (MAP3::isOrbitEmbedded(VERTEX_ORBIT))
-//	{
-//		fEmb = MAP3::getEmbedding(f, VERTEX_ORBIT);
-//
-//
-//		MAP3::setDartEmbedding(EDGE_ORBIT, d, dEmb) ;
-//		MAP3::embedNewCell(EDGE_ORBIT, e) ;
-//		MAP3::copyCell(EDGE_ORBIT, e, d) ;
-//	}
+
 }
 
 
@@ -288,6 +247,26 @@ Dart EmbeddedMap3<MAP3>::cutSpike(Dart d)
 }
 
 
+template <typename MAP3>
+unsigned int EmbeddedMap3<MAP3>::closeHole(Dart d)
+{
+	unsigned int nbE = MAP3::closeHole(d);
+	Dart dd = MAP3::phi2(d);
+	Dart f = dd;
+
+	do
+	{
+		if(MAP3::isOrbitEmbedded(VERTEX_ORBIT))
+			MAP3::copyDartEmbedding(VERTEX_ORBIT,f, MAP3::phi1(MAP3::phi2(f)));
+		if(MAP3::isOrbitEmbedded(EDGE_ORBIT))
+			MAP3::copyDartEmbedding(EDGE_ORBIT, f, MAP3::phi2(f));
+
+		f = MAP3::phi1(f);
+	}
+	while(dd != f);
+
+	return nbE;
+}
 
 
 } // namespace CGoGN

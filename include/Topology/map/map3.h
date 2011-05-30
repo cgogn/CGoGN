@@ -143,6 +143,11 @@ public:
 	 */
 	virtual void cutEdge(Dart d);
 
+	//! Uncut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	//virtual void uncutEdge(Dart d);
+
 	//! Sew a face e in the edge d
 	/*! @param d dart from the edge
 	 *  @param e dart from the face

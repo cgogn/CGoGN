@@ -173,8 +173,6 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
 
-	std::cout << "SUUUUUUB marine" << std::endl;
-
 	unsigned int vLevel = map.volumeLevel(d) ;
 	Dart old = map.volumeOldestDart(d) ;
 
@@ -294,7 +292,6 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 			e = map.phi2(map.phi_1(e));
 		}
 		while(e != *edge);
-
 
 		map.closeHole(f1);
 
