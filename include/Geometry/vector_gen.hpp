@@ -278,6 +278,15 @@ inline bool Vector<DIM,T>::operator==(const Vector<DIM,T>& v) const
 }
 
 template <unsigned int DIM, typename T>
+inline bool Vector<DIM,T>::operator!=(const Vector<DIM,T>& v) const
+{
+	for(unsigned int i = 0 ; i < DIM ; ++i)
+		if(v[i] != m_data[i])
+			return true ;
+	return false ;
+}
+
+template <unsigned int DIM, typename T>
 inline bool Vector<DIM,T>::hasNan() const
 {
 	for(unsigned int i = 0 ; i < DIM ; ++i)
@@ -314,7 +323,6 @@ inline Vector<DIM,T> operator*(T a, const Vector<DIM,T>& v)
 	return v * a ;
 }
 
-
 template <unsigned int DIM, typename T>
 inline Vector<DIM,T> operator/(T a, const Vector<DIM,T>& v)
 {
@@ -345,7 +353,6 @@ inline Vector<DIM,T> slerp(const Vector<DIM,T> &v1, const Vector<DIM,T> &v2, con
 
 	return res ;
 }
-
 
 } // namespace Geom
 
