@@ -9,11 +9,10 @@ IF(WIN32)
 	add_subdirectory(Examples/Release)
 	add_subdirectory(Tuto)
 ELSE(WIN32)
-	SET(CGoGN_LIBS_D topologyD algoD  containerD utilsD)
+	SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
 	add_subdirectory(Examples/Release)
 	add_subdirectory(Examples/Debug)
 	add_subdirectory(Examples/Tests)
 	add_subdirectory(Tuto)
 ENDIF(WIN32)
-
 
