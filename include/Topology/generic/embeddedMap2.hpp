@@ -88,6 +88,20 @@ void EmbeddedMap2<MAP2>::cutEdge(Dart d)
 }
 
 template <typename MAP2>
+void EmbeddedMap2<MAP2>::uncutEdge(Dart d)
+{
+	bool doSomethg = (d != MAP2::phi2(d)) ;
+
+	MAP2::uncutEdge(d) ;
+
+	if(doSomethg)
+	{
+		if(MAP2::isOrbitEmbedded(EDGE_ORBIT))
+			MAP2::copyDartEmbedding(EDGE_ORBIT, MAP2::phi2(d), d) ;
+	}
+}
+
+template <typename MAP2>
 bool EmbeddedMap2<MAP2>::edgeCanCollapse(Dart d)
 {
 	if(MAP2::phi2(d) == d)

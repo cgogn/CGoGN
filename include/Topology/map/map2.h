@@ -130,6 +130,11 @@ public:
 	 */
 	virtual void cutEdge(Dart d);
 
+	//! Undo the cut of the edge of d and its opposite edge if it exists
+	/*! @param d a dart of the edge to uncut
+	 */
+	virtual void uncutEdge(Dart d);
+
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
 	 *  faces are built (faces with less than 3 edges). If it occurs the faces
