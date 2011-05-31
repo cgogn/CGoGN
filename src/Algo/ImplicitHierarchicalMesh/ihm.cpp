@@ -190,7 +190,10 @@ Dart ImplicitHierarchicalMap::faceOldestDart(Dart d)
 	do
 	{
 		unsigned int l = m_dartLevel[it] ;
-		if(l < l_old || (l == l_old && it < oldest))
+		if(l == 0)
+			return it ;
+		if(l < l_old)
+//		if(l < l_old || (l == l_old && it < oldest))
 		{
 			oldest = it ;
 			l_old = l ;
