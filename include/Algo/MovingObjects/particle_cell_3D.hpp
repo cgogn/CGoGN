@@ -242,13 +242,19 @@ Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d,CellMarker& mark)
 
 		if(!mark.isMarked(d1))
 		{
-			break;
+			for (std::list<Dart>::iterator it=darts_list.begin(); it!=darts_list.end(); ++it)
+			{
+				markCC.unmark(*it);
+			}
+
+			return d1;
 		}
 
 		// add phi1, phi2 and phi3 successor if they are not yet marked
 		Dart d2 = m.phi1(d1);
 		Dart d3 = m.phi2(d1);
 		Dart d4 = m.phi_1(d1);
+
 		if (!markCC.isMarked(d2))
 		{
 			darts_list.push_back(d2);
@@ -272,10 +278,10 @@ Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d,CellMarker& mark)
 		markCC.unmark(*it);
 	}
 
-	if(beg==darts_list.end())
+//	if(beg==darts_list.end())
 		return d;
 
-	return d1;
+//	return d1;
 }
 
 template <typename PFP>
@@ -317,6 +323,8 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 	#ifdef DEBUG
 	std::cout << "vertexState" << d << std::endl;
 	#endif
+
+	crossCell = CROSS_OTHER ;
 
 	VEC3 som = position[d];
 
@@ -429,6 +437,8 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 
 	#endif
 
+	crossCell = CROSS_OTHER ;
+
 	bool onEdge=false;
 	Dart dd=d;
 	Geom::Orientation3D wsof = whichSideOfFace(current,m.alpha2(d));
@@ -441,7 +451,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 		if(d==dd)
 			onEdge = true;
 
-		if(wsof==0) {
+		if(wsof==Geom::ON) {
 			switch(whichSideOfEdge(current,d)) {
 			case Geom::ON :
 				 onEdge=true;
@@ -459,7 +469,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 	else {
 		wsof = whichSideOfFace(current,d);
 
-		while(wsof==1 && dd != m.alpha_2(d)) {
+		while(wsof==Geom::UNDER && dd != m.alpha_2(d)) {
 			d = m.alpha_2(d);
 			wsof = whichSideOfFace(current,d);
 		}
@@ -510,6 +520,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 	std::cout << "faceState" <<  d << std::endl;
 	#endif
 
+	crossCell = CROSS_FACE ;
 
 	if(wsof==Geom::ON)
 		wsof = whichSideOfFace(current,d);

@@ -74,7 +74,7 @@ public:
 	virtual ~CellMarker()
 	{
 		unmarkAll();
-		m_map.releaseMarker(m_marker,m_thread);
+		m_map.releaseMarker(m_marker, m_thread);
 	}
 
 protected:
@@ -183,14 +183,19 @@ public:
 	CellMarkerStore(AttribMap& map, unsigned int cell): CellMarker(map, cell)
 	{}
 
-	CellMarkerStore(AttribMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell,thread)
+	CellMarkerStore(AttribMap& map, unsigned int cell, unsigned int thread): CellMarker(map, cell, thread)
 	{}
+
+	~CellMarkerStore()
+	{
+		unmarkAll();
+		m_map.releaseMarker(m_marker, m_thread);
+	}
 
 protected:
 	// protected copy constructor to forbid its usage
 	CellMarkerStore(const CellMarkerStore& cm) : CellMarker(cm)
 	{}
-
 
 public:
 	/**

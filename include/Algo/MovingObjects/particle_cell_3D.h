@@ -21,6 +21,12 @@ namespace Algo
 namespace MovingObjects
 {
 
+enum {
+	NO_CROSS,
+	CROSS_FACE,
+	CROSS_OTHER
+};
+
 template <typename PFP>
 class ParticleCell3D : public ParticleBase
 {
@@ -96,6 +102,8 @@ public :
 
 	void move(const VEC3& newCurrent)
 	{
+		crossCell = NO_CROSS ;
+
 		if(!Geom::arePointsEquals(newCurrent, m_position))
 		{
 			switch(state) {
