@@ -245,6 +245,26 @@ public:
 	 * has already been subdivided to the next level
 	 */
 	bool volumeIsSubdivided(Dart d);
+
+	/**
+	 * Return true if the edge of d in the current level map
+	 * is subdivided to the next level,
+	 * none of its resulting edges is in turn subdivided to the next level
+	 * and the middle vertex is of degree 2
+	 */
+	bool edgeCanBeCoarsened(Dart d);
+
+	/**
+	 *
+	 */
+	bool faceIsSubdividedOnce(Dart d);
+
+	/**
+	 *
+	 */
+	bool volumeIsSubdividedOnce(Dart d);
+
+
 } ;
 
 template <typename T>

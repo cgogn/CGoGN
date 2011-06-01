@@ -48,12 +48,19 @@ template <typename PFP>
 void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_QUAD);
 
 template <typename PFP>
-void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 template <typename PFP>
 void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
+template <typename PFP>
+void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
+template <typename PFP>
+void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
+template <typename PFP>
+void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 /*******************************************************
  *

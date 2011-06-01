@@ -178,30 +178,11 @@ void Map3::cutEdge(Dart d)
 	}
 }
 
-//void Map3::sewFace(Dart d, Dart e)
-//{
-//	Dart d2 = phi2(d);
-//
-//	unsewFaces(d);
-//
-//	sewFaces(d2,phi3(e));
-//	sewFaces(d,e);
-//}
-//
-//void Map3::unsewFace(Dart d)
-//{
-//	if(phi3(d) != d)
-//	{
-//		Dart e = phi2(phi3(d));
-//
-//		Dart d2 = phi2(d);
-//		Dart e2 = phi2(e);
-//
-//		unsewFaces(d);
-//		unsewFaces(e);
-//		sewFaces(d2 , e);
-//	}
-//}
+void Map3::unCutEdge(Dart d)
+{
+
+}
+
 
 //TODO
 //bool Map3::flipEdge(Dart d)
@@ -236,49 +217,49 @@ void Map3::cutEdge(Dart d)
 //	return false;
 //}
 
-//TODO
-bool Map3::flipFace(Dart d)
-{
-	//prevoir de refaire un linkFace et de ne pas
-	//faire inserFace si flipEdge renvoie faux
+////TODO
+//bool Map3::flipFace(Dart d)
+//{
+//	//prevoir de refaire un linkFace et de ne pas
+//	//faire inserFace si flipEdge renvoie faux
+//
+//	//save a dart from a non-modifed-face of one tetrahedron
+//	Dart r = phi2(d);
+//
+//	//detach common face from tetrahedron from the rest of the faces
+//	//unlinkFace(d);
+//	Map3::mergeVolumes(d);
+//
+//	//flip the common edge
+//	Map2::flipEdge(r);
+//
+//	//insert the old face in the new flipped edge
+//	//Map3::insertFace(r,d);
+//	Map3::splitFace(r,d);
+//
+//	return true;
+//}
 
-	//save a dart from a non-modifed-face of one tetrahedron
-	Dart r = phi2(d);
-
-	//detach common face from tetrahedron from the rest of the faces
-	//unlinkFace(d);
-	Map3::mergeVolumes(d);
-
-	//flip the common edge
-	Map2::flipEdge(r);
-
-	//insert the old face in the new flipped edge
-	//Map3::insertFace(r,d);
-	Map3::splitFace(r,d);
-
-	return true;
-}
-
-void Map3::insertFace(Dart d, Dart e)
-{
-	assert(faceDegree(d) == faceDegree(e)); //les faces ont la meme longueur
-
-    Dart dd = d;
-    Dart nFd = e;
-
-    do {
-    	//sewFace(dd,nFd);
-
-    	Dart d2 = phi2(dd);
-        unsewFaces(dd);
-        sewFaces(d2,phi3(nFd));
-        sewFaces(dd,nFd);
-
-        dd = phi_1(phi2(phi_1(dd)));
-        nFd = phi1(nFd);
-    } while (nFd != e);
-
-}
+//void Map3::insertFace(Dart d, Dart e)
+//{
+//	assert(faceDegree(d) == faceDegree(e)); //les faces ont la meme longueur
+//
+//    Dart dd = d;
+//    Dart nFd = e;
+//
+//    do {
+//    	//sewFace(dd,nFd);
+//
+//    	Dart d2 = phi2(dd);
+//        unsewFaces(dd);
+//        sewFaces(d2,phi3(nFd));
+//        sewFaces(dd,nFd);
+//
+//        dd = phi_1(phi2(phi_1(dd)));
+//        nFd = phi1(nFd);
+//    } while (nFd != e);
+//
+//}
 
 
 int Map3::collapseEdge(Dart d, bool delDegenerateFaces,
@@ -913,53 +894,51 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 
 
 
-//Marker Map3::closeMap()
-//{
-//	Marker md = this->getNewMarker();
-//	std::list<Dart> dartList;
-//
-//// step 1: double,mark & store darts that have fixed point phi3
-//	for(Dart d = this->begin(); d != this->end(); this->next(d))
-//	{
-//		if (phi3(d) == d)
-//		{
-//			Dart e = this->newDart();
-//			this->markOrbit(DART_ORBIT,e,md);
-//			phi3sew(d,e);
-//			dartList.push_back(e);
-//		}
-//	}
-//
-//// step 2: update phi1 of new darts
-//	for (std::list<Dart>::iterator it=dartList.begin(); it!=dartList.end(); ++it)
-//	{
-//		Dart d = *it;		// external dart
-//		Dart e = phi3(d);	// internal dart
-//
-//		// update phi1 if not already sewn (the last dart of the dart is automatiquely sewn)
-//		// test à faire dans sewPhi ?
-//		//if (phi1(d) != phi3(phi_1(e))) phi1sew(d, phi3(phi_1(e)));
-//		if (phi1(d) == d) {
-//			Dart eNext = phi1(e);
-//			do {
-//				phi1sew(d, phi3(eNext));
-//				eNext = phi1(eNext);
-//			} while (eNext != e);
-//		}
-//		// search the dart for phi2:
-//		e = phi3(phi2(e));
-//		while (!this->isMarkedDart(e,md))
-//		{
-//			e = phi3(phi2(e));
-//		}
-//		//update phi2 if not already sewn (if e have previously been sewn with d)
-//		//test à faire dans sewPhi ?
-//		if (phi2(d) != e) phi2sew(d,e);
-//	}
-//	return md;
-//
-//}
-//
+void Map3::closeMap(DartMarker& marker)
+{
+	std::list<Dart> dartList;
+
+// step 1: double,mark & store darts that have fixed point phi3
+	for(Dart d = this->begin(); d != this->end(); this->next(d))
+	{
+		if (phi3(d) == d)
+		{
+			Dart e = this->newDart();
+			marker.markOrbit(DART_ORBIT,e);
+			phi3sew(d,e);
+			dartList.push_back(e);
+		}
+	}
+
+// step 2: update phi1 of new darts
+	for (std::list<Dart>::iterator it=dartList.begin(); it!=dartList.end(); ++it)
+	{
+		Dart d = *it;		// external dart
+		Dart e = phi3(d);	// internal dart
+
+		// update phi1 if not already sewn (the last dart of the dart is automatiquely sewn)
+		// test à faire dans sewPhi ?
+		//if (phi1(d) != phi3(phi_1(e))) phi1sew(d, phi3(phi_1(e)));
+		if (phi1(d) == d) {
+			Dart eNext = phi1(e);
+			do {
+				phi1sew(d, phi3(eNext));
+				eNext = phi1(eNext);
+			} while (eNext != e);
+		}
+		// search the dart for phi2:
+		e = phi3(phi2(e));
+		while (!marker.isMarked(e))
+		{
+			e = phi3(phi2(e));
+		}
+		//update phi2 if not already sewn (if e have previously been sewn with d)
+		//test à faire dans sewPhi ?
+		if (phi2(d) != e) phi2sew(d,e);
+	}
+
+}
+
 //void Map3::reverseOrientation()
 //{
 //	Marker mf2 = this->getNewMarker();

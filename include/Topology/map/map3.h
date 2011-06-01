@@ -143,17 +143,11 @@ public:
 	 */
 	virtual void cutEdge(Dart d);
 
-	//! Sew a face e in the edge d
-	/*! @param d dart from the edge
-	 *  @param e dart from the face
+	//! Uncut the edge of d
+	/*! @param d a dart of the edge to cut
 	 */
-	//virtual void sewFace(Dart d, Dart e);
+	virtual void unCutEdge(Dart d);
 
-	//! Unsew a face d from an edge
-	/*! \pre Dart d is a dart from the face to unsew
-	 *  @param d the edge to unlink
-	 */
-	//virtual void unsewFace(Dart d);
 
 	//!
 	/*! Flip the edge of d (rotation in phi1 order)
@@ -173,14 +167,14 @@ public:
 	/*!
 	 *
 	 */
-	virtual bool flipFace(Dart d);
+	//virtual bool flipFace(Dart d);
 
     //! Insert a face in phi2 along the orbit phi<-1,2,-1>
     /*! The cardinality of <phi1>(nF) must be equal to the cardinality of <phi(-1,2,-1)>(d)
      *  @param d a dart where the face should be inserted
      *  @param e a dart from the face to insert
      */
-	virtual void insertFace(Dart d, Dart e);
+	//virtual void insertFace(Dart d, Dart e);
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -324,7 +318,7 @@ public:
 	* WARNING: all added dart are marked !!
 	* @ return index of the marker which with addes darts are marked
 	*/
-	//virtual Marker closeMap();
+	virtual void closeMap(DartMarker& marker);
 
 	//TODO a mettre en algo
 	/**

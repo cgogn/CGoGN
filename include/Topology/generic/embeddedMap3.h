@@ -39,11 +39,6 @@ class EmbeddedMap3 : public MAP3
 {
 public:
 
-	//!
-	/*!
-	 *
-	 */
-	virtual void deleteOrientedVolume(Dart d);
 
 	//!
 	/*!
@@ -100,6 +95,11 @@ public:
 	 */
 	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
 			bool delDegenerateVolumes = true);
+
+
+	virtual unsigned int closeHole(Dart d);
+
+	virtual void closeMap(DartMarker &marker);
 } ;
 
 } // namespace CGoGN

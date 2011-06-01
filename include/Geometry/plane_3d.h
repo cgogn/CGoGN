@@ -84,7 +84,7 @@ class Plane3D
 		// project the point p onto the plane
 		void project(Vector<3,T>& p) const;
 
-		// return true or false according to the side of the plane where point p is
+		// return on/over/under according to the side of the plane where point p is
 		Orientation3D orient(const Vector<3,T>& p) const;
 
 		/**********************************************/
