@@ -71,7 +71,7 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
-		for (unsigned int j = 0; j < NBTHREAD; ++j)
+		for (unsigned int j = 0; j < NB_THREAD; ++j)
 			m_markerTables[i][j] = NULL ;
 	}
 }
@@ -211,7 +211,7 @@ void GenericMap::removeThreadMarker(unsigned int nb)
 void GenericMap::update_m_emb_afterLoad()
 {
 	// get container of dart orbit
-	AttributeContainer& cont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& cont = m_attribs[DART] ;
 
 	// get the list of attributes
 	std::vector<std::string> listeNames;
@@ -329,7 +329,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 	*   creation of the m_embeddings pointers table
 	************************************************/
 //	// get attribute names of dart orbit
-//	AttributeContainer& contDart = m_attribs[DART_ORBIT] ;
+//	AttributeContainer& contDart = m_attribs[DART] ;
 //	std::vector< std::string > tableNames;
 //	contDart.getAttributesStrings(tableNames);
 //
@@ -536,12 +536,12 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 {
 	switch(orbit)
 	{
-		case DART_ORBIT: return f(d);
-		case VERTEX_ORBIT: return foreach_dart_of_vertex(d, f, thread);
-		case EDGE_ORBIT: return foreach_dart_of_edge(d, f, thread);
-		case ORIENTED_FACE_ORBIT: return foreach_dart_of_oriented_face(d, f, thread);
-		case FACE_ORBIT: return foreach_dart_of_face(d, f, thread);
-		case VOLUME_ORBIT: return foreach_dart_of_volume(d, f, thread);
+		case DART: return f(d);
+		case VERTEX: return foreach_dart_of_vertex(d, f, thread);
+		case EDGE: return foreach_dart_of_edge(d, f, thread);
+		case ORIENTED_FACE: return foreach_dart_of_oriented_face(d, f, thread);
+		case FACE: return foreach_dart_of_face(d, f, thread);
+		case VOLUME: return foreach_dart_of_volume(d, f, thread);
 //		case -1: return foreach_dart_of_cc(d,f,thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}

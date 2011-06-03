@@ -59,7 +59,7 @@ bool HalfEdgeSelector_QEMml<PFP>::init()
 	if(!ok)
 		return false ;
 
-	CellMarker vMark(m, VERTEX_CELL) ;
+	CellMarker vMark(m, VERTEX) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -81,7 +81,7 @@ bool HalfEdgeSelector_QEMml<PFP>::init()
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.markOrbit(FACE_ORBIT, d) ;
+			mark.markOrbit(FACE, d) ;
 		}
 	}
 
@@ -315,7 +315,7 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 		return false ;
 
 	// Set quadric per vertex
-	CellMarker vMark(m, VERTEX_CELL) ;
+	CellMarker vMark(m, VERTEX) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -339,7 +339,7 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 			quadric[d] += q ;						// and add the contribution of
 			quadric[d1] += q ;						// this quadric to the ones
 			quadric[d_1] += q ;						// of the 3 incident vertices
-			mark.markOrbit(FACE_ORBIT, d) ;
+			mark.markOrbit(FACE, d) ;
 		}
 	}
 
@@ -594,7 +594,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker vMark(m, VERTEX_CELL) ;
+	CellMarker vMark(m, VERTEX) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -617,11 +617,11 @@ bool EdgeSelector_Lightfield<PFP>::init()
 			quadric[d] += q ;						// and add the contribution of
 			quadric[d1] += q ;						// this quadric to the ones
 			quadric[d_1] += q ;						// of the 3 incident vertices
-			mark.markOrbit(FACE_ORBIT, d) ;
+			mark.markOrbit(FACE, d) ;
 		}
 	}
 
-	CellMarker eMark(m, EDGE_CELL) ;
+	CellMarker eMark(m, EDGE) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))

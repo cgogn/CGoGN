@@ -73,7 +73,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 
 	if(Algo::Geometry::isPointOnVertex<PFP>(m,d,m_positions,current))
 	{
-		state = VERTEX_ORBIT;
+		state = VERTEX;
 		return;
 	}
 	else
@@ -101,7 +101,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& current)
 				}
 				else
 				{
-					state = VERTEX_ORBIT;
+					state = VERTEX;
 					return;
 				}
 			}
@@ -160,7 +160,7 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& current, Geom::Orientation2D sid
 			faceState(current);
 			return;
 		default :
-			state = EDGE_ORBIT;
+			state = EDGE;
 	}
 
 	if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m, d, m_positions, current))
@@ -225,7 +225,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 				}
 			} while(d != dd);
 			m_position = current;
-			state = FACE_ORBIT;
+			state = FACE;
 
 // 			m_position = Algo::Geometry::faceCentroid<PFP>(m,d,m_positions);
 // 			d = m.phi1(d);
@@ -274,7 +274,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 			} while(d != dd);
 
 			m_position = current;
-			state = FACE_ORBIT;
+			state = FACE;
 			return;
 		}
 	}
@@ -284,7 +284,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 	{
 	case Geom::LEFT :
 		m_position = current;
-		state = FACE_ORBIT;;
+		state = FACE;;
 		break;
 // 	case Geom::ALIGNED :
 //		if(wsoe==Geom::ALIGNED) {
@@ -294,7 +294,7 @@ void ParticleCell2D<PFP>::faceState(const VEC3& current)
 // 		else {
 // 			CGoGNout << "poc" << CGoGNendl;
 // 			m_position = current;
-// 			state = EDGE_ORBIT;
+// 			state = EDGE;
 // 		}
 // 		break;
 	default :

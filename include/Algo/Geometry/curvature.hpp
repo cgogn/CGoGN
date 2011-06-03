@@ -54,7 +54,7 @@ void computeCurvatureVertices(
 		typename PFP::TVEC3& K2,
 		const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX_CELL);
+	CellMarker marker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))

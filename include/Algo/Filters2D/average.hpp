@@ -36,7 +36,7 @@ void filterAverage(typename PFP::MAP& map, const typename PFP::TVEC3& position, 
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	
-	CellMarker markV(map, VERTEX_CELL);
+	CellMarker markV(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markV.isMarked(d))

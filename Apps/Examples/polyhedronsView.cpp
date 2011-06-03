@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position") ;
 
 	// create a cylinder
 	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, position);

@@ -52,7 +52,7 @@ void computeNewPositionsFromFaceNormals(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	CellMarker markV(map, VERTEX_CELL);
+	CellMarker markV(map, VERTEX);
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markV.isMarked(d))
@@ -90,18 +90,18 @@ void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE_ORBIT, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE_ORBIT, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE_ORBIT, "faceCentroid") ;
+	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
+	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
+	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE_ORBIT, "faceNewNormal") ;
+	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
-	CellMarker markF(map, FACE_CELL);
+	CellMarker markF(map, FACE);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markF.isMarked(d))
@@ -154,18 +154,18 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE_ORBIT, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE_ORBIT, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE_ORBIT, "faceCentroid") ;
+	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
+	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
+	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE_ORBIT, "faceNewNormal") ;
+	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
-	CellMarker markF(map,FACE_CELL);
+	CellMarker markF(map,FACE);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if( select(d) && !markF.isMarked(d))
@@ -258,22 +258,22 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE_ORBIT, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE_ORBIT, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE_ORBIT, "faceCentroid") ;
+	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
+	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
+	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE_ORBIT, "faceNewNormal") ;
+	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
 	long nbTot = 0 ;
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	CellMarker markF(map, FACE_CELL);
+	CellMarker markF(map, FACE);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if( select(d) && !markF.isMarked(d))
@@ -398,23 +398,23 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE_ORBIT, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE_ORBIT, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE_ORBIT, "faceCentroid") ;
+	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
+	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
+	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<REAL> vertexArea(map, VERTEX_ORBIT, "vertexArea") ;
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE_ORBIT, "faceNewNormal") ;
-	AutoAttributeHandler<VEC3> vertexNewNormal(map, VERTEX_ORBIT, "vertexNewNormal") ;
+	AutoAttributeHandler<REAL> vertexArea(map, VERTEX, "vertexArea") ;
+	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
+	AutoAttributeHandler<VEC3> vertexNewNormal(map, VERTEX, "vertexNewNormal") ;
 
 	long nbTot = 0 ;
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	CellMarker markV(map, VERTEX_CELL);
+	CellMarker markV(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if( select(d) && !markV.isMarked(d))
@@ -518,7 +518,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	}
 
 	// Compute face normals from vertex normals
-	CellMarker markF(map,FACE_CELL);
+	CellMarker markF(map,FACE);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if (select(d) && !markF.isMarked(d))

@@ -118,7 +118,7 @@ public:
 	EdgeSelector_Length(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
 	}
 	~EdgeSelector_Length()
 	{
@@ -165,8 +165,8 @@ public:
 	EdgeSelector_QEM(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
-		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
 	}
 	~EdgeSelector_QEM()
 	{
@@ -214,8 +214,8 @@ public:
 	EdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
-		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX_ORBIT, "QEMquadric") ;
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
 	}
 	~EdgeSelector_QEMml()
 	{
@@ -266,29 +266,29 @@ public:
 	EdgeSelector_Curvature(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		normal = m.template getAttribute<VEC3>(VERTEX_ORBIT, "normal") ;
+		normal = m.template getAttribute<VEC3>(VERTEX, "normal") ;
 		if(!normal.isValid())
 		{
-			normal = m.template addAttribute<VEC3>(VERTEX_ORBIT, "normal") ;
+			normal = m.template addAttribute<VEC3>(VERTEX, "normal") ;
 			Algo::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
-		k1 = m.template getAttribute<REAL>(VERTEX_ORBIT, "k1") ;
-		k2 = m.template getAttribute<REAL>(VERTEX_ORBIT, "k2") ;
-		K1 = m.template getAttribute<VEC3>(VERTEX_ORBIT, "K1") ;
-		K2 = m.template getAttribute<VEC3>(VERTEX_ORBIT, "K2") ;
+		k1 = m.template getAttribute<REAL>(VERTEX, "k1") ;
+		k2 = m.template getAttribute<REAL>(VERTEX, "k2") ;
+		K1 = m.template getAttribute<VEC3>(VERTEX, "K1") ;
+		K2 = m.template getAttribute<VEC3>(VERTEX, "K2") ;
 		// as all these attributes are computed simultaneously by computeCurvatureVertices
 		// one can assume that if one of them is not valid, the others must be created too
 		if(!k1.isValid())
 		{
-			k1 = m.template addAttribute<REAL>(VERTEX_ORBIT, "k1") ;
-			k2 = m.template addAttribute<REAL>(VERTEX_ORBIT, "k2") ;
-			K1 = m.template addAttribute<VEC3>(VERTEX_ORBIT, "K1") ;
-			K2 = m.template addAttribute<VEC3>(VERTEX_ORBIT, "K2") ;
+			k1 = m.template addAttribute<REAL>(VERTEX, "k1") ;
+			k2 = m.template addAttribute<REAL>(VERTEX, "k2") ;
+			K1 = m.template addAttribute<VEC3>(VERTEX, "K1") ;
+			K2 = m.template addAttribute<VEC3>(VERTEX, "K2") ;
 			Algo::Geometry::computeCurvatureVertices<PFP>(m, this->m_position, normal, k1, k2, K1, K2) ;
 		}
 
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
 	}
 	~EdgeSelector_Curvature()
 	{
@@ -338,7 +338,7 @@ public:
 	EdgeSelector_MinDetail(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
 	}
 	~EdgeSelector_MinDetail()
 	{

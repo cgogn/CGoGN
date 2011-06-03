@@ -60,7 +60,7 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d, AttributeHandler<unsigned i
 
 	for (unsigned int i = 0; i< val_vd; ++i)
 	{
-		unsigned int ve = map.getEmbedding(map.phi2(vit1),VERTEX_ORBIT);
+		unsigned int ve = map.getEmbedding(map.phi2(vit1),VERTEX);
 		vu1[i] = ve;
 		vit1 = map.alpha1(vit1);
 	}
@@ -70,7 +70,7 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d, AttributeHandler<unsigned i
 	Dart vit2 = map.alpha1(map.alpha1(dd));
 	for (unsigned int i = 0; i< val_vdd; ++i)
 	{
-		unsigned int ve = map.getEmbedding(map.phi2(vit2),VERTEX_ORBIT);
+		unsigned int ve = map.getEmbedding(map.phi2(vit2),VERTEX);
 
 		int j = val_vd;
 		while ( j>=0)
@@ -119,7 +119,7 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d)
 
 	for (int i = 0; i < val_vd; ++i)
 	{
-		unsigned int ve = map.getEmbedding(map.phi2(vit1),VERTEX_ORBIT);
+		unsigned int ve = map.getEmbedding(map.phi2(vit1),VERTEX);
 		vu1[i] = ve;
 		vit1 = map.alpha1(vit1);
 	}
@@ -129,7 +129,7 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d)
 	Dart vit2 = map.alpha1(map.alpha1(dd));
 	for (int i = 0; i < val_vdd; ++i)
 	{
-		unsigned int ve = map.getEmbedding(map.phi2(vit2),VERTEX_ORBIT);
+		unsigned int ve = map.getEmbedding(map.phi2(vit2),VERTEX);
 
 		int j = val_vd;
 		while (j >= 0)

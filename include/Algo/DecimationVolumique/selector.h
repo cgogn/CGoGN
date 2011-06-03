@@ -269,7 +269,7 @@ public:
 	EdgeSelector_Length(MAP& m, typename PFP::TVEC3&  pos) :
 		EdgeSelector<PFP>(m, pos)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE_ORBIT, "edgeInfo") ;
+		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
 	}
 
 	~EdgeSelector_Length()

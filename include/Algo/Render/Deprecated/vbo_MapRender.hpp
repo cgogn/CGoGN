@@ -217,9 +217,9 @@ inline void MapRender_VBO::addTri(typename PFP::MAP& map, Dart d, std::vector<GL
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
 	do
 	{
-		tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
-		tableIndices.push_back(map.getEmbedding(b, VERTEX_ORBIT));
-		tableIndices.push_back(map.getEmbedding(c, VERTEX_ORBIT));
+		tableIndices.push_back(map.getEmbedding(d, VERTEX));
+		tableIndices.push_back(map.getEmbedding(b, VERTEX));
+		tableIndices.push_back(map.getEmbedding(c, VERTEX));
 		b = c;
 		c = map.phi1(b);
 	} while (c != d);
@@ -236,7 +236,7 @@ void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& g
 		if(!m.isMarked(dd) && good(dd))
 		{
 			addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE_ORBIT, dd);
+			m.markOrbit(FACE, dd);
 		}
 	}
 }
@@ -259,7 +259,7 @@ void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const Functor
 
 			if(good(dd))
 				addTri<PFP>(map,dd,tableIndices);
-			m.markOrbit(FACE_ORBIT, dd);
+			m.markOrbit(FACE, dd);
 			bound.push_back(dd);
 			int nb = 1;
 			do
@@ -275,7 +275,7 @@ void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const Functor
 						{
 							if(good(f))
 								addTri<PFP>(map, f, tableIndices);
-							m.markOrbit(FACE_ORBIT, f);
+							m.markOrbit(FACE, f);
 							bound.push_back(map.phi1(f));
 							++nb;
 							if (nb > LIST_SIZE)
@@ -307,9 +307,9 @@ void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good,
 	{
 		if(!m.isMarked(d) && good(d))
 		{
-			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
-			tableIndices.push_back(map.getEmbedding(map.phi1(d), VERTEX_ORBIT));
-			m.markOrbit(EDGE_ORBIT, d);
+			tableIndices.push_back(map.getEmbedding(d, VERTEX));
+			tableIndices.push_back(map.getEmbedding(map.phi1(d), VERTEX));
+			m.markOrbit(EDGE, d);
 		}
 	}
 }
@@ -341,10 +341,10 @@ void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSele
 					if (!m.isMarked(ee))
 					{
 						if(good(ee))
-							tableIndices.push_back(map.getEmbedding(ee, VERTEX_ORBIT));
+							tableIndices.push_back(map.getEmbedding(ee, VERTEX));
 						if(good(f))
-							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX_ORBIT));
-						m.markOrbit(EDGE_ORBIT, f);
+							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX));
+						m.markOrbit(EDGE, f);
 
 						bound.push_back(f);
 						++nb;
@@ -367,14 +367,14 @@ void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSele
 template<typename PFP>
 void MapRender_VBO::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	CellMarker m(map, VERTEX_ORBIT,thread) ;
+	CellMarker m(map, VERTEX,thread) ;
 	tableIndices.reserve(map.getNbDarts()/5);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(!m.isMarked(d) && good(d))
 		{
-			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
+			tableIndices.push_back(map.getEmbedding(d, VERTEX));
 			m.mark(d) ;
 		}
 	}
@@ -449,9 +449,9 @@ void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelec
 			Dart b = map.phi1(a);
 			Dart c = map.phi1(b);
 
-			Geom::Vec3f& P = tablePos[map.getEmbedding(a, VERTEX_ORBIT)];
-			Geom::Vec3f& Q = tablePos[map.getEmbedding(b, VERTEX_ORBIT)];
-			Geom::Vec3f& R = tablePos[map.getEmbedding(c, VERTEX_ORBIT)];
+			Geom::Vec3f& P = tablePos[map.getEmbedding(a, VERTEX)];
+			Geom::Vec3f& Q = tablePos[map.getEmbedding(b, VERTEX)];
+			Geom::Vec3f& R = tablePos[map.getEmbedding(c, VERTEX)];
 
 			Geom::Vec3f U = Q-P;
 			Geom::Vec3f V = R-P;
@@ -461,16 +461,16 @@ void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelec
 			// loop to cut a polygon in triangle on the fly (works only with convex faces)
 			do
 			{
-				tableFlat.push_back(tablePos[map.getEmbedding(a, VERTEX_ORBIT)]);
+				tableFlat.push_back(tablePos[map.getEmbedding(a, VERTEX)]);
 				tableFlat.push_back(N);
-				tableFlat.push_back(tablePos[map.getEmbedding(b, VERTEX_ORBIT)]);
+				tableFlat.push_back(tablePos[map.getEmbedding(b, VERTEX)]);
 				tableFlat.push_back(N);
-				tableFlat.push_back(tablePos[map.getEmbedding(c, VERTEX_ORBIT)]);
+				tableFlat.push_back(tablePos[map.getEmbedding(c, VERTEX)]);
 				tableFlat.push_back(N);
 				b = c;
 				c = map.phi1(b);
 			} while (c != dd);
-			m.markOrbit(FACE_ORBIT, dd);
+			m.markOrbit(FACE, dd);
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);

@@ -24,56 +24,104 @@
 
 #include <iostream>
 
+#include "Utils/qtSimple.h"
+#include "ui_viewer.h"
+#include "Utils/qtui.h"
+
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
 #include "Topology/generic/embeddedMap2.h"
 
 #include "Geometry/vector_gen.h"
+#include "Geometry/matrix.h"
 
 #include "Algo/Import/import.h"
-#include "Algo/Export/export.h"
 
-#include "Algo/Modelisation/subdivision.h"
+#include "Algo/Render/GL2/mapRender.h"
+
+#include "Utils/shaderPhong.h"
+#include "Utils/shaderFlat.h"
+#include "Utils/shaderSimpleColor.h"
+#include "Utils/shaderVectorPerVertex.h"
+#include "Utils/pointSprite.h"
+
+#include "Algo/Geometry/boundingbox.h"
+#include "Algo/Geometry/normal.h"
 
 using namespace CGoGN ;
 
-/**
- * Struct that contains some informations about the types of the manipulated objects
- * Mainly here to be used by the algorithms that are parameterized by it
- */
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef EmbeddedMap2<Map2> MAP;
+	typedef EmbeddedMap2<Map2> MAP ;
 };
 
-int main(int argc, char **argv)
+typedef PFP::MAP MAP ;
+
+class Viewer : public Utils::QT::SimpleQT
 {
-	if(argc != 3)
-	{
-		CGoGNout << "Usage : " << argv[0] << " filename nbSteps" << CGoGNendl;
-		return 0;
-	}
+	Q_OBJECT
 
-	std::string filename(argv[1]);
+public:
+	MAP myMap ;
+	SelectorTrue allDarts ;
 
-	unsigned int nbSteps;
-	std::istringstream iss(argv[2]);
-	iss >> nbSteps;
+    Utils::QT::uiDockInterface dock ;
 
-	// declaration of the map
-	PFP::MAP myMap;
+	enum renderMode { FLAT, PHONG } ;
 
-	std::vector<std::string> attrNames ;
-	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+	Geom::Vec4f colDif ;
+	Geom::Vec4f colSpec ;
+	Geom::Vec4f colClear ;
+	Geom::Vec4f colNormal ;
 
-	// get a handler to the 3D vector attribute created by the import
-	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]);
+	float shininess ;
 
-	for(unsigned int i = 0; i < nbSteps; ++i)
-		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
+	Geom::Vec3f gPosObj ;
+	float gWidthObj ;
+	float normalBaseSize ;
+	float normalScaleFactor ;
+	float vertexBaseSize ;
+	float vertexScaleFactor ;
+	float faceShrinkage ;
 
-	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
+	int m_renderStyle ;
+	bool m_drawVertices ;
+	bool m_drawEdges ;
+	bool m_drawFaces ;
+	bool m_drawNormals ;
 
-    return 0;
-}
+	PFP::TVEC3 position ;
+	PFP::TVEC3 normal ;
+
+	Algo::Render::GL2::MapRender* m_render ;
+
+	Utils::VBO* m_positionVBO ;
+	Utils::VBO* m_normalVBO ;
+
+	Utils::ShaderPhong* m_phongShader ;
+	Utils::ShaderFlat* m_flatShader ;
+	Utils::ShaderVectorPerVertex* m_vectorShader ;
+	Utils::ShaderSimpleColor* m_simpleColorShader ;
+	Utils::PointSprite* m_pointSprite ;
+
+	Viewer() ;
+
+	void initGUI() ;
+
+	void cb_initGL() ;
+	void cb_redraw() ;
+	void cb_Open() ;
+
+	void importMesh(std::string& filename) ;
+
+public slots:
+	void slot_drawVertices(bool b) ;
+	void slot_verticesSize(int i) ;
+	void slot_drawEdges(bool b) ;
+	void slot_drawFaces(bool b) ;
+	void slot_faceLighting(int i) ;
+	void slot_drawNormals(bool b) ;
+	void slot_normalsSize(int i) ;
+};
+

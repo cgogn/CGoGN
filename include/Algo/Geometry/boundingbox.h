@@ -43,7 +43,7 @@ Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map,
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb(position[map.begin()]) ;
 
-	CellMarker vmarker(map, VERTEX_CELL);
+	CellMarker vmarker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !vmarker.isMarked(d))
