@@ -42,7 +42,7 @@ void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position,
 
 	feature.unmarkAll() ;
 
-	AttributeHandler<VEC3> fNormal = map.template addAttribute<VEC3>(FACE_ORBIT, "fNormal") ;
+	AttributeHandler<VEC3> fNormal = map.template addAttribute<VEC3>(FACE, "fNormal") ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
 	DartMarker m(map) ;
@@ -50,9 +50,9 @@ void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position,
 	{
 		if(!m.isMarked(d))
 		{
-			m.markOrbit(EDGE_ORBIT, d) ;
+			m.markOrbit(EDGE, d) ;
 			if(Geom::angle(fNormal[d], fNormal[map.phi2(d)]) > M_PI / REAL(6))
-				feature.markOrbit(EDGE_ORBIT, d) ;
+				feature.markOrbit(EDGE, d) ;
 		}
 	}
 

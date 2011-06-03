@@ -92,14 +92,14 @@ template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void setupEqualityMatrix(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index, float amount)
 {
 	EqualityConstraint_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(m, s, attr, index, amount) ;
-	m.foreach_orbit(VERTEX_ORBIT, ec) ;
+	m.foreach_orbit(VERTEX, ec) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void setupEqualityMatrix(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index, float amount)
 {
 	EqualityConstraint_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(m, s, attr, coord, index, amount) ;
-	m.foreach_orbit(VERTEX_ORBIT, ec) ;
+	m.foreach_orbit(VERTEX, ec) ;
 }
 
 }

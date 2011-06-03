@@ -311,8 +311,8 @@ MyGlutWin::MyGlutWin(int* argc, char **argv, int winX, int winY) :
 
 void MyGlutWin::init()
 {
-	normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-	laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
+	laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX, "laplacian") ;
 
 	vbo_render = new Algo::Render::GL2::MapRender_VBO() ;
 	updateVBOdata(Algo::Render::GL2::POSITIONS | Algo::Render::GL2::NORMALS) ;
@@ -489,12 +489,12 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			GLfloat seconds = (t2 - t1) / 1000.0f ;
 			CGoGNout << "sqrt3: "<< seconds << "sec" << CGoGNendl ;
 
-			normal = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
 			if(!normal.isValid())
-				normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+				normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
+			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX, "laplacian") ;
 			if(!laplacian.isValid())
-				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX, "laplacian") ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -560,7 +560,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 's':
 		{
-			unsigned int nbVertices = myMap.getNbOrbits(VERTEX_ORBIT) ;
+			unsigned int nbVertices = myMap.getNbOrbits(VERTEX) ;
 
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -586,9 +586,9 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 'd':
 		{
-			AttributeHandler<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+			AttributeHandler<PFP::VEC3> positionF = myMap.getAttribute<PFP::VEC3>(FACE, "position") ;
 			if(!positionF.isValid())
-				positionF = myMap.addAttribute<PFP::VEC3>(FACE_ORBIT, "position") ;
+				positionF = myMap.addAttribute<PFP::VEC3>(FACE, "position") ;
 			Algo::Geometry::computeCentroidFaces<PFP>(myMap, position, positionF) ;
 
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
@@ -601,12 +601,12 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 			position = positionF ;
 
-			normal = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+			normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
 			if(!normal.isValid())
-				normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
-			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+				normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
+			laplacian = myMap.getAttribute<PFP::VEC3>(VERTEX, "laplacian") ;
 			if(!laplacian.isValid())
-				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "laplacian") ;
+				laplacian = myMap.addAttribute<PFP::VEC3>(VERTEX, "laplacian") ;
 
 			t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -649,12 +649,12 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case '9':
 		{
-			CellMarker markVisit(myMap, VERTEX_CELL) ;
+			CellMarker markVisit(myMap, VERTEX) ;
 
-			CellMarker markNoDelete(myMap, VERTEX_CELL) ;
+			CellMarker markNoDelete(myMap, VERTEX) ;
 
 			std::vector<Dart> visited ;
-			visited.reserve(myMap.getNbCells(VERTEX_CELL)) ;
+			visited.reserve(myMap.getNbCells(VERTEX)) ;
 
 			visited.push_back(myMap.begin()) ;
 			markVisit.mark(myMap.begin()) ;
@@ -811,7 +811,7 @@ int main(int argc, char** argv)
 			return 1 ;
 		}
 
-		mgw->position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+		mgw->position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 		GLint t2 = glutGet(GLUT_ELAPSED_TIME) ;
 		GLfloat seconds = (t2 - t1) / 1000.0f ;
 		CGoGNout << "import: " << seconds << " sec" << CGoGNendl ;
@@ -820,9 +820,9 @@ int main(int argc, char** argv)
 //		myMap.closeMap(m) ;
 	}
 
-	CGoGNout << myMap.getNbOrbits(VERTEX_ORBIT) << CGoGNendl ;
-	CGoGNout << myMap.getNbOrbits(EDGE_ORBIT) << CGoGNendl ;
-	CGoGNout << myMap.getNbOrbits(FACE_ORBIT) << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits(VERTEX) << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits(EDGE) << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits(FACE) << CGoGNendl ;
 
 	// compute width and position of object for centering
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, mgw->position) ;

@@ -107,10 +107,10 @@ public :
 		if(!Geom::arePointsEquals(newCurrent, m_position))
 		{
 			switch(state) {
-			case VERTEX_ORBIT : vertexState(newCurrent); break;
-			case EDGE_ORBIT : 	edgeState(newCurrent);   break;
-			case FACE_ORBIT : 	faceState(newCurrent);   break;
-			case VOLUME_ORBIT : volumeState(newCurrent);   break;
+			case VERTEX : vertexState(newCurrent); break;
+			case EDGE : 	edgeState(newCurrent);   break;
+			case FACE : 	faceState(newCurrent);   break;
+			case VOLUME : volumeState(newCurrent);   break;
 			}
 
 			display();

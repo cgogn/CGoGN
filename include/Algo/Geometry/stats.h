@@ -41,7 +41,7 @@ void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
 	int nbVertex = 0;
 
 	DartMarker mFace(map);
-	CellMarker mVertex(map, VERTEX_ORBIT);
+	CellMarker mVertex(map, VERTEX);
 
 	float ratioMinMax = 0;
 	int nbEdgePerVertex = 0;

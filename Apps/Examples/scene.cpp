@@ -211,8 +211,8 @@ int main(int argc, char **argv)
 	myGlutWin mgw(&argc,argv,800,800);
 	mgw.init();
 
-	mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
-	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+	mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position") ;
+	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 
 	glewInit();
 	if (! Utils::GLSLShader::areShadersSupported())
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
 	prim1.cylinder_topo(16,15, true, true);
 	prim1.embedCylinder(30.0f,20.0f,50.0f);
 
-	CellMarker mark1(myMap,VERTEX_CELL);
+	CellMarker mark1(myMap,VERTEX);
 	prim1.mark(mark1);
 
 	// create a sphere
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
 	prim2.cylinder_topo(16,16, true, true);
 	prim2.embedSphere(40.0f);
 
-	CellMarker mark2(myMap,VERTEX_CELL);
+	CellMarker mark2(myMap,VERTEX);
 	prim2.mark(mark2);
 
 	// create a sphere
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 	prim3.tore_topo(12,48);
 	prim3.embedTore(50.0f,10.0f);
 
-	CellMarker mark3(myMap,VERTEX_CELL);
+	CellMarker mark3(myMap,VERTEX);
 	prim3.mark(mark3);
 
 

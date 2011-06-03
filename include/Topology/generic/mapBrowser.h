@@ -150,7 +150,7 @@ public:
 	 * @param nameAtt attributeName
 	 */
 	MapBrowserLinkedAuto(MAP& m):
-		MapBrowserLinked<MAP>(), m_links(m, DART_ORBIT)
+		MapBrowserLinked<MAP>(), m_links(m, DART)
 	{}
 
 	void next(Dart& d) { d = m_links[d]; }

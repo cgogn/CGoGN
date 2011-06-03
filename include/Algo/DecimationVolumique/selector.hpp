@@ -165,7 +165,7 @@ void EdgeSelector_Length<PFP>::init(Algo::DecimationVolumique::Approximator<PFP>
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE_CELL) ;
+	CellMarker eMark(m, EDGE) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))

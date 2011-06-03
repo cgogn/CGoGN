@@ -85,7 +85,7 @@ inline unsigned int AttribMap::getNbCells(unsigned int orbit)
 
 inline AttributeMultiVector<Dart>* AttribMap::addRelation(const std::string& name)
 {
-	AttributeContainer& cont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& cont = m_attribs[DART] ;
 	AttributeMultiVector<Dart>* amv = cont.addAttribute<Dart>(name) ;
 
 	// set new relation to fix point for all the darts of the map

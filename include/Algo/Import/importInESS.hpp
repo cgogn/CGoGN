@@ -77,10 +77,10 @@ bool importInESSSurfacique(typename PFP::MAP& map, const std::string& filename, 
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX, "position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeHandler<int> objects = map.template addAttribute<int>(FACE_ORBIT, "objects") ;
+	AttributeHandler<int> objects = map.template addAttribute<int>(FACE, "objects") ;
 	attrNames.push_back(objects.name()) ;
 
 
@@ -268,10 +268,10 @@ bool importInESSVolumique(typename PFP::MAP& map, const std::string& filename, s
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX, "position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeHandler<int> objects = map.template addAttribute<int>(FACE_ORBIT, "objects") ;
+	AttributeHandler<int> objects = map.template addAttribute<int>(FACE, "objects") ;
 	attrNames.push_back(objects.name()) ;
 
 
@@ -400,7 +400,7 @@ bool importInESSVolumique(typename PFP::MAP& map, const std::string& filename, s
 //			{
 //				Dart d = tableVertDarts[ i*nbs+j*(cx+1)+k ];
 //
-//				map.embedNewCell(VERTEX_ORBIT,d);
+//				map.embedNewCell(VERTEX,d);
 //
 //				position[d] = VEC3(float(k), float(j), float(i));
 //

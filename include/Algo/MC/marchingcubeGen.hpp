@@ -273,7 +273,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge0(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData(_lX,_lY), m_Buffer->getData(_lX+1,_lY) );
 
-		lVertTable[0] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[0] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[0]] = recalPoint(vPos,typename PFP::VEC3(interp, 0., 0.));
 		m_Buffer->setPointEdge0(_lX, _lY,lVertTable[0]);
 
@@ -292,7 +292,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge1(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData(_lX,_lY), m_Buffer->getData(_lX,_lY+1) );
 
-		lVertTable[1] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[1] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[1]] = recalPoint(vPos,typename PFP::VEC3(1.,interp, 0.));
 		m_Buffer->setPointEdge1(_lX, _lY,lVertTable[1]);
 	}
@@ -308,7 +308,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge2(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData(_lX-1,_lY), m_Buffer->getData(_lX,_lY) );
 
-		lVertTable[2] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[2] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[2]] = recalPoint(vPos,typename PFP::VEC3(interp, 1., 0.));
 		m_Buffer->setPointEdge2(_lX, _lY,lVertTable[2]);
 	}
@@ -323,7 +323,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge3(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData(_lX,_lY-1), m_Buffer->getData(_lX,_lY-1) );
 
-		lVertTable[3] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[3] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[3]] = recalPoint(vPos,typename PFP::VEC3(0., interp, 0.));
 		m_Buffer->setPointEdge3(_lX, _lY,lVertTable[3]);
 	}
@@ -339,7 +339,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge4(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData2(_lX,_lY), m_Buffer->getData2(_lX+1,_lY) );
 
-		lVertTable[4] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[4] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[4]] = recalPoint(vPos,typename PFP::VEC3(interp, 0., 1.));
 		m_Buffer->setPointEdge4(_lX, _lY,lVertTable[4]);
 	}
@@ -355,7 +355,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge5(const uns
  	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData2(_lX,_lY), m_Buffer->getData2(_lX,_lY+1) );
 
-		lVertTable[5] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[5] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[5]] = recalPoint(vPos,typename PFP::VEC3(1., interp, 1.));
 		m_Buffer->setPointEdge5(_lX, _lY,lVertTable[5]);
 	}
@@ -371,7 +371,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge6(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData2(_lX-1,_lY), m_Buffer->getData2(_lX,_lY) );
 
-		lVertTable[6] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[6] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[6]] = recalPoint(vPos,typename PFP::VEC3(interp, 1., 1.));
 		m_Buffer->setPointEdge6(_lX, _lY,lVertTable[6]);
 	}
@@ -387,7 +387,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge7(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData2(_lX,_lY-1), m_Buffer->getData2(_lX,_lY) );
 
-		lVertTable[7] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[7] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[7]] = recalPoint(vPos,typename PFP::VEC3(0., interp, 1.));
 		m_Buffer->setPointEdge7(_lX, _lY,lVertTable[7]);
 	}
@@ -404,7 +404,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge8(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData2(_lX,_lY), m_Buffer->getData2(_lX,_lY) );
 
-		lVertTable[8] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[8] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[8]] = recalPoint(vPos,typename PFP::VEC3(0., 0., interp));
 		m_Buffer->setPointEdge8(_lX, _lY,lVertTable[8]);
 	}
@@ -420,7 +420,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge9(const uns
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData2(_lX,_lY), m_Buffer->getData2(_lX,_lY+1) );
 
-		lVertTable[9] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[9] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[9]] = recalPoint(vPos,typename PFP::VEC3(1., 0., interp));
 		m_Buffer->setPointEdge9(_lX, _lY,lVertTable[9]);
 	}
@@ -436,7 +436,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge10(const un
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData(_lX,_lY), m_Buffer->getData2(_lX,_lY) );
 
-		lVertTable[10] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[10] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[10]] = recalPoint(vPos,typename PFP::VEC3(1., 1., interp));
 		m_Buffer->setPointEdge10(_lX, _lY,lVertTable[10]);
 	}
@@ -452,7 +452,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge11(const un
 	{
 		float interp = m_windowFunc.interpole( m_Buffer->getData(_lX,_lY), m_Buffer->getData2(_lX,_lY) );
 
-		lVertTable[11] = m_map->newCell(VERTEX_ORBIT);
+		lVertTable[11] = m_map->newCell(VERTEX);
 		m_positions[lVertTable[11]] = recalPoint(vPos,typename PFP::VEC3(0., 1., interp));
 		m_Buffer->setPointEdge11(_lX, _lY,lVertTable[11]);
 	}

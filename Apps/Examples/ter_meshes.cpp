@@ -131,9 +131,9 @@ int main(int argc, char **argv)
 		return 1 ;
 	}
 	// cree un handler d'attribut pour la position des points (créé lors de l'import)
-	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 	// cree un handler pour les normales aux sommets
-	AttributeHandler<PFP::VEC3> normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
+	AttributeHandler<PFP::VEC3> normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
 
 
 //	// parcours de tous les brins de la carte:
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 		{
 			fonction_exemple<PFP>(myMap, position, d);
 			// marque tous les brins de la face de d
-			mf.markOrbit(FACE_ORBIT, d);
+			mf.markOrbit(FACE, d);
 		}
 	}
 

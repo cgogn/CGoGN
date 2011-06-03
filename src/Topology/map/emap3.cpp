@@ -32,9 +32,9 @@ namespace CGoGN
 //	Dart dd = phi2(phi_1(d));
 //	Map3::edgeCollapse(d,delDegenerateFaces,delDegenerateVolumes);
 //
-//	if (this->isOrbitEmbedded(VERTEX_ORBIT))
+//	if (this->isOrbitEmbedded(VERTEX))
 //	{
-//		embedNewCell(VERTEX_ORBIT,dd);
+//		embedNewCell(VERTEX,dd);
 //	}
 //
 //	return dd;
@@ -45,40 +45,40 @@ namespace CGoGN
 //	Dart nd = Map3::cutFace(d,e);
 //	Dart ne = phi2(nd);
 //
-//	if (this->isOrbitEmbedded(VERTEX_ORBIT))
+//	if (this->isOrbitEmbedded(VERTEX))
 //	{
 //		// nd & phi3(ne) are in vertex of e
-//		unsigned int em =  getEmbedding(e,VERTEX_ORBIT);
-//		setDartEmbedding(nd, VERTEX_ORBIT, em);
-//		setDartEmbedding(phi3(ne), VERTEX_ORBIT, em);
+//		unsigned int em =  getEmbedding(e,VERTEX);
+//		setDartEmbedding(nd, VERTEX, em);
+//		setDartEmbedding(phi3(ne), VERTEX, em);
 //
 //		// ne & phi3(nd) are in vertex of d
 //
-//		copyEmbedding(ne, d, VERTEX_ORBIT);
-//		copyEmbedding(phi3(nd), d, VERTEX_ORBIT);
+//		copyEmbedding(ne, d, VERTEX);
+//		copyEmbedding(phi3(nd), d, VERTEX);
 //	}
 //
-//	if (this->isOrbitEmbedded(EDGE_ORBIT))
+//	if (this->isOrbitEmbedded(EDGE))
 //	{
-//		embedNewCell(EDGE_ORBIT,nd);
+//		embedNewCell(EDGE,nd);
 //	}
 //
-//	if (this->isOrbitEmbedded(FACE_ORBIT))
+//	if (this->isOrbitEmbedded(FACE))
 //	{
-//		embedNewCell(FACE_ORBIT,nd);
-//		embedNewCell(FACE_ORBIT,ne);
+//		embedNewCell(FACE,nd);
+//		embedNewCell(FACE,ne);
 //	}
 //
-//	if (this->isOrbitEmbedded(VOLUME_ORBIT))
+//	if (this->isOrbitEmbedded(VOLUME))
 //	{
 //		// nd share volume embedding with d
-//		setDartEmbedding(nd, VOLUME_ORBIT, getEmbedding(d,VOLUME_ORBIT));
+//		setDartEmbedding(nd, VOLUME, getEmbedding(d,VOLUME));
 //		// phi3(nd) share volume embedding with phi3(d)
-//		setDartEmbedding(phi3(nd), VOLUME_ORBIT, getEmbedding(phi3(d),VOLUME_ORBIT));
+//		setDartEmbedding(phi3(nd), VOLUME, getEmbedding(phi3(d),VOLUME));
 //		// ne share volume embedding with e
-//		setDartEmbedding(ne, VOLUME_ORBIT, getEmbedding(e,VOLUME_ORBIT));
+//		setDartEmbedding(ne, VOLUME, getEmbedding(e,VOLUME));
 //		// phi3(ne) share volume embedding with phi3(e)
-//		setDartEmbedding(phi3(ne), VOLUME_ORBIT, getEmbedding(phi3(e),VOLUME_ORBIT));
+//		setDartEmbedding(phi3(ne), VOLUME, getEmbedding(phi3(e),VOLUME));
 //	}
 //
 //	return nd;
@@ -87,46 +87,46 @@ namespace CGoGN
 //void EMap3::embeddxxguledFace(Dart d, Dart n)
 //{
 //	// create embedding for the center (if necessary)
-//	if (this->isOrbitEmbedded(VERTEX_ORBIT))
+//	if (this->isOrbitEmbedded(VERTEX))
 //	{
-//		embedNewCell(VERTEX_ORBIT,n);
+//		embedNewCell(VERTEX,n);
 //	}
 //
 //	// create embedding for new edges
-//	if (this->isOrbitEmbedded(EDGE_ORBIT))
+//	if (this->isOrbitEmbedded(EDGE))
 //	{
 //		Dart nn = n;
 //		do
 //		{
-//			embedNewCell(EDGE_ORBIT,nn);
+//			embedNewCell(EDGE,nn);
 //			nn = alpha1(nn);
 //		} while (nn!=n);
 //	}
 //
 //	// create embedding for new faces
-//	if (this->isOrbitEmbedded(FACE_ORBIT))
+//	if (this->isOrbitEmbedded(FACE))
 //	{
 //		Dart nn = n;
 //		do
 //		{
-//			embedNewCell(FACE_ORBIT,nn);
+//			embedNewCell(FACE,nn);
 //			nn = alpha1(nn);
 //		} while (nn!=n);
 //	}
 //
 //	// embed new darts with volume embedding if necessary
-//	if (this->isOrbitEmbedded(VOLUME_ORBIT))
+//	if (this->isOrbitEmbedded(VOLUME))
 //	{
-//		unsigned int v1 = getEmbedding(d,VOLUME_ORBIT);
-//		unsigned int v2 = getEmbedding(phi3(d),VOLUME_ORBIT);
+//		unsigned int v1 = getEmbedding(d,VOLUME);
+//		unsigned int v2 = getEmbedding(phi3(d),VOLUME);
 //		Dart nn = n;
 //		do
 //		{
 //			Dart xx = phi2(nn);
-//			setDartEmbedding(nn, VOLUME_ORBIT, v1);
-//			setDartEmbedding(xx, VOLUME_ORBIT, v1);
-//			setDartEmbedding(phi3(nn), VOLUME_ORBIT, v2);
-//			setDartEmbedding(phi3(xx), VOLUME_ORBIT, v2);
+//			setDartEmbedding(nn, VOLUME, v1);
+//			setDartEmbedding(xx, VOLUME, v1);
+//			setDartEmbedding(phi3(nn), VOLUME, v2);
+//			setDartEmbedding(phi3(xx), VOLUME, v2);
 //			nn = alpha1(nn);
 //		} while (nn!=n);
 //	}
@@ -151,26 +151,26 @@ namespace CGoGN
 //	Dart dd=Map3::cutEdge(d);
 //
 //	// create embedding for new vertex
-//	if (this->isOrbitEmbedded(VERTEX_ORBIT))
+//	if (this->isOrbitEmbedded(VERTEX))
 //	{
-//		embedNewCell(VERTEX_ORBIT,dd);
+//		embedNewCell(VERTEX,dd);
 //	}
 //
 //	// create embedding for new edges
-//	if (this->isOrbitEmbedded(EDGE_ORBIT))
+//	if (this->isOrbitEmbedded(EDGE))
 //	{
-//		embedNewCell(EDGE_ORBIT,d);
-//		embedNewCell(EDGE_ORBIT,dd);
+//		embedNewCell(EDGE,d);
+//		embedNewCell(EDGE,dd);
 //	}
 //
 //	// embed new darts with face & volume embeddings if necessary
 //	Dart dNext = d;
 //	do
 //	{
-//		if (this->isOrbitEmbedded(FACE_ORBIT))
-//			copyEmbedding(phi1(dNext), dNext, FACE_ORBIT);
-//		if (this->isOrbitEmbedded(VOLUME_ORBIT))
-//			copyEmbedding(phi1(dNext), dNext, VOLUME_ORBIT);
+//		if (this->isOrbitEmbedded(FACE))
+//			copyEmbedding(phi1(dNext), dNext, FACE);
+//		if (this->isOrbitEmbedded(VOLUME))
+//			copyEmbedding(phi1(dNext), dNext, VOLUME);
 //		dNext = alpha2(dNext);
 //	} while (dNext != d);
 //
@@ -184,23 +184,23 @@ namespace CGoGN
 //	Dart nd = Map3::tetrahedrizeVolume(d);
 //
 //	// create embedding for new vertex
-//	if (this->isOrbitEmbedded(VERTEX_ORBIT))
+//	if (this->isOrbitEmbedded(VERTEX))
 //	{
-//		embedNewCell(VERTEX_ORBIT,nd);
+//		embedNewCell(VERTEX,nd);
 //	}
 //
 //	// create embedding for new edges
-//	if (this->isOrbitEmbedded(EDGE_ORBIT))
+//	if (this->isOrbitEmbedded(EDGE))
 //	{
 //
 //	}
 //
-//	if (this->isOrbitEmbedded(FACE_ORBIT))
+//	if (this->isOrbitEmbedded(FACE))
 //	{
 //
 //	}
 //
-//	if (this->isOrbitEmbedded(VOLUME_ORBIT))
+//	if (this->isOrbitEmbedded(VOLUME))
 //	{
 //
 //	}
@@ -215,8 +215,8 @@ namespace CGoGN
 //	CGoGNout << "Check: embedding begin" << CGoGNendl;
 //	for(Dart d = this->begin(); d != this->end(); ++d)
 //	{
-//		if (isOrbitEmbedded(VERTEX_ORBIT))
-//			if (getEmbedding(d,VERTEX_ORBIT) != getEmbedding(alpha1(d),VERTEX_ORBIT)) {
+//		if (isOrbitEmbedded(VERTEX))
+//			if (getEmbedding(d,VERTEX) != getEmbedding(alpha1(d),VERTEX)) {
 //				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl;
 //				return false;
 //			}
@@ -230,19 +230,19 @@ namespace CGoGN
 //	Map3::flipEdge(d);
 //	Dart e= phi2(d);
 //
-//	if (this->isOrbitEmbedded(VERTEX_ORBIT))
+//	if (this->isOrbitEmbedded(VERTEX))
 //	{
-//		copyEmbedding(d,  phi1(phi2(d)), VERTEX_ORBIT);
-//		copyEmbedding(e,  phi1(d), VERTEX_ORBIT);
+//		copyEmbedding(d,  phi1(phi2(d)), VERTEX);
+//		copyEmbedding(e,  phi1(d), VERTEX);
 //	}
 //
-//	if (this->isOrbitEmbedded(FACE_ORBIT))
+//	if (this->isOrbitEmbedded(FACE))
 //	{
-//		embedNewCell(FACE_ORBIT,d);
-//		embedNewCell(FACE_ORBIT,e);
+//		embedNewCell(FACE,d);
+//		embedNewCell(FACE,e);
 //	}
 //
-//	if (this->isOrbitEmbedded(VOLUME_ORBIT))
+//	if (this->isOrbitEmbedded(VOLUME))
 //	{
 //
 //	}

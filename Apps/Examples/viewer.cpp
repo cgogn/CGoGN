@@ -179,7 +179,7 @@ void Viewer::importMesh(std::string& filename)
 		CGoGNerr << "could not import " << filename << CGoGNendl ;
 		return;
 	}
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+	position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
@@ -195,7 +195,7 @@ void Viewer::importMesh(std::string& filename)
 	vertexBaseSize = normalBaseSize * 2.0f ;
 
 	if(!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 

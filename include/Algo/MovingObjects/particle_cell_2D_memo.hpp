@@ -6,9 +6,9 @@ void ParticleCell2DMemo<PFP>::move(const VEC3& newCurrent)
 	this->prevPos = this->m_position;
 
 	switch(this->state) {
-	case VERTEX_ORBIT : vertexState(newCurrent); break;
-	case EDGE_ORBIT : 	edgeState(newCurrent);   break;
-	case FACE_ORBIT : 	faceState(newCurrent);   break;
+	case VERTEX : vertexState(newCurrent); break;
+	case EDGE : 	edgeState(newCurrent);   break;
+	case FACE : 	faceState(newCurrent);   break;
 	}
 
 	this->display();
@@ -21,7 +21,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 	CGoGNout << "vertexState" <<  this->d << CGoGNendl;
 	#endif
 	if(Algo::Geometry::isPointOnVertex<PFP>(this->m, this->d, this->m_positions, current)) {
-		this->state = VERTEX_ORBIT;
+		this->state = VERTEX;
 		return;
 	}
 	else {
@@ -34,7 +34,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 			}while(getOrientationEdge(current, this->m.alpha1( this->d ))!=Geom::RIGHT && dd_vert!=this->d);
 
 			if(dd_vert==this->d) {
-    			this->state = VERTEX_ORBIT;
+    			this->state = VERTEX;
 				return;
 			}
 		}
@@ -79,7 +79,7 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 								faceState(current);
 								return;
 							}
-		default :  this->state = EDGE_ORBIT;
+		default :  this->state = EDGE;
 	}
 
 	if(!Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->m_positions,current)) {
@@ -126,13 +126,13 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 									if(!this->obstacle.isMarked(this->m.phi2( this->d )))
 										edgeState(current);
 									else 
-										this->state = EDGE_ORBIT;
+										this->state = EDGE;
 									return;
 				}
 			}while(this->d!=dd);
 			this->prevPos = this->m_position;
 			this->m_position = current;
-			this->state = FACE_ORBIT;
+			this->state = FACE;
 			return;
 		}
 	}
@@ -154,13 +154,13 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 									if(!this->obstacle.isMarked(this->m.phi2( this->d )))
 										edgeState(current);
 									else 
-										this->state = EDGE_ORBIT;
+										this->state = EDGE;
 									return;
 				}
 			} while(this->d!=dd);
 
 			this->m_position = current;
-			this->state = FACE_ORBIT;
+			this->state = FACE;
 			return;
 		}
 	}
@@ -170,15 +170,15 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 	//displacement step
 	switch (getOrientationEdge(current,this->d)) {
 	case Geom::LEFT :	this->m_position = current;
-		 				this->state = FACE_ORBIT;;
+		 				this->state = FACE;;
 		 				break;
 	case Geom::ALIGNED :this->m_position = current;
-		 				this->state = EDGE_ORBIT;
+		 				this->state = EDGE;
 		 				break;
 	default :			this->m_position = intersectLineEdge(current, this->m_position,this->d);
 						if(!this->obstacle.isMarked(this->m.phi2( this->d )))
 							edgeState(current);
 						else
-							this->state = EDGE_ORBIT;
+							this->state = EDGE;
 	}
 }
