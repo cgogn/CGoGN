@@ -186,8 +186,8 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 				bool sewn = false;
 				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
 				{
-					if(map.getDartEmbedding(VERTEX,map.phi1(*it))==map.getDartEmbedding(VERTEX,map.phi_1(*itnext))
-					&& map.getDartEmbedding(VERTEX,map.phi_1(*it))==map.getDartEmbedding(VERTEX,map.phi1(*itnext)))
+					if(map.getEmbedding(VERTEX,map.phi1(*it))==map.getEmbedding(VERTEX,map.phi_1(*itnext))
+					&& map.getEmbedding(VERTEX,map.phi_1(*it))==map.getEmbedding(VERTEX,map.phi1(*itnext)))
 					{
 						map.sewVolumes(*it, map.phi_1(*itnext));
 						sewn = true;
