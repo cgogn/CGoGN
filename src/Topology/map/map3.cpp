@@ -672,7 +672,7 @@ unsigned int Map3::vertexDegree(Dart d)
 		if(!me.isMarked(*darts))
 		{
 			++count;
-			me.markOrbit(EDGE_ORBIT, *darts);
+			me.markOrbit(EDGE, *darts);
 		}
 	}
 

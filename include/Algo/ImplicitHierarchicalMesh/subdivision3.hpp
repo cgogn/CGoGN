@@ -673,7 +673,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	visitedFaces.reserve(20);
 	visitedFaces.push_back(d);
 
-	mf.markOrbit(FACE_ORBIT, d) ;
+	mf.markOrbit(FACE, d) ;
 
 	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
@@ -685,7 +685,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE_ORBIT, ee) ;
+				mf.markOrbit(FACE, ee) ;
 			}
 
 			e = map.phi1(e) ;
