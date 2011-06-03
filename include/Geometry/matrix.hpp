@@ -431,12 +431,24 @@ std::istream& operator>>(std::istream& in, Matrix<M,N,T>& m)
 template <unsigned int M, unsigned int N, typename T>
 Vector<N,T> operator*(const Vector<M,T>& v, const Matrix<M,N,T>& m)
 {
-	Vector<N,T> res ;
+	Vector<N,T> res (0);
 	for(unsigned int i = 0; i < M; ++i)
 		for(unsigned int j = 0; j < N; ++j)
 			res[j] += m(i,j) * v[i] ;
 	return res ;
 }
+
+// Matrix / Vector multiplication
+template <unsigned int M, unsigned int N, typename T>
+Vector<M,T> operator*(const Matrix<M,N,T>& m,const Vector<N,T>& v) {
+	Vector<M,T> res (0);
+	for(unsigned int i = 0; i < M; ++i)
+		for(unsigned int j = 0; j < N; ++j)
+			res[i] += m(i,j) * v[j] ;
+	return res ;
+}
+
+
 
 // Scalar / Matrix multiplication
 template <unsigned int M, unsigned int N, typename T>
