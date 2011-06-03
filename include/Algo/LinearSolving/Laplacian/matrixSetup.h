@@ -158,11 +158,11 @@ void setupLaplacianMatrix(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, 
 	{
 	case TOPOLOGICAL : {
 		LaplacianTopo<PFP, SOLVER_TRAITS> lt(m, s, index) ;
-		m.foreach_orbit(VERTEX_ORBIT, lt) ;
+		m.foreach_orbit(VERTEX, lt) ;
 		break ; }
 	case COTWEIGHT : {
 		LaplacianTopo<PFP, SOLVER_TRAITS> lt(m, s, index) ;
-		m.foreach_orbit(VERTEX_ORBIT, lt) ;
+		m.foreach_orbit(VERTEX, lt) ;
 		break ; }
 	}
 }

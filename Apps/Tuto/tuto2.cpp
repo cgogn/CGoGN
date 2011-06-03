@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 	Dart d3 = myMap.newOrientedFace(4);
 	myMap.sewFaces(d2, d3);
 
-	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");
 
 	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
 	d2 = myMap.phi1(d2);
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
 	MapBrowserLinkedAuto<PFP::MAP>mbl(myMap);
 
 	// on ajoute un brin par sommet dans le browser
-	myMap.foreach_orbit(VERTEX_ORBIT, mbl);
+	myMap.foreach_orbit(VERTEX, mbl);
 
 	// et on parcours la sous-carte avec ce browser
 	TestDeParcoursAFF<PFP>(myMap, mbl, position);
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
 	CGoGNout << "Parcours avec le browser (le triangle)"<<CGoGNendl;
 
 	// on cree un attribut Dart pour la liste
-	AutoAttributeHandler<Dart> tableLink(myMap, DART_ORBIT);
+	AutoAttributeHandler<Dart> tableLink(myMap, DART);
 	// le browser
 	MapBrowserLinkedAttr<PFP::MAP>mbl2(tableLink);
 	// que l'on remplit a la main

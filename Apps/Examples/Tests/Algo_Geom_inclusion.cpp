@@ -43,7 +43,7 @@ int main()
 	std::cout << "Check Status : PARTIAL" << std::endl;
 
 	PFP::MAP map;
-	AttributeHandler<PFP::VEC3> position = map.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	AttributeHandler<PFP::VEC3> position = map.addAttribute<PFP::VEC3>(VERTEX, "position");
 	map.newFace(3);
 
 	PFP::VEC3 ta(0,0,0);

@@ -96,11 +96,11 @@ namespace CGoGN
 //{
 //	switch(orbit)
 //	{
-//		case  DART_ORBIT: return f(d);
-//		case  VERTEX_ORBIT: return ptrMap->TRAV::foreach_dart_of_vertex(d, f,thread);
-//		case  EDGE_ORBIT: return ptrMap->TRAV::foreach_dart_of_edge(d, f,thread);
-//		case  FACE_ORBIT: return ptrMap->TRAV::foreach_dart_of_face(d, f,thread);
-//		case  VOLUME_ORBIT: return ptrMap->TRAV::foreach_dart_of_volume(d, f, thread);
+//		case  DART: return f(d);
+//		case  VERTEX: return ptrMap->TRAV::foreach_dart_of_vertex(d, f,thread);
+//		case  EDGE: return ptrMap->TRAV::foreach_dart_of_edge(d, f,thread);
+//		case  FACE: return ptrMap->TRAV::foreach_dart_of_face(d, f,thread);
+//		case  VOLUME: return ptrMap->TRAV::foreach_dart_of_volume(d, f, thread);
 ////		case -1: return foreach_dart_of_cc(d,f,thread);
 //		default: assert(!"Cells of this dimension are not handled");
 //	}

@@ -73,13 +73,13 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f)
 {
-	AttributeContainer& container = m_map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
 
-//	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
-	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+//	AttributeHandler<typename PFP::VEC3> positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	if (!positions.isValid())
-		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	attrNames.push_back(positions.name()) ;
 

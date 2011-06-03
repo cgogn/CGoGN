@@ -76,7 +76,7 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& 
 	{
 		if(select(d) && !mark.isMarked(d))
 		{
-			mark.markOrbit(FACE_ORBIT, d) ;
+			mark.markOrbit(FACE, d) ;
 			area += convexFaceArea<PFP>(map, d, position) ;
 		}
 	}
@@ -86,7 +86,7 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& 
 template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select)
 {
-	CellMarker marker(map, FACE_CELL);
+	CellMarker marker(map, FACE);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))

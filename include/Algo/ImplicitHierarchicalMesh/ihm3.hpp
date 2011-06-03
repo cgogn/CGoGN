@@ -503,7 +503,7 @@ inline unsigned int ImplicitHierarchicalMap3::getEdgeId(Dart d)
 
 inline void ImplicitHierarchicalMap3::setEdgeId(Dart d, unsigned int i, unsigned int orbit)
 {
-	if(orbit == EDGE_ORBIT)
+	if(orbit == EDGE)
 	{
 		Dart e = d;
 
@@ -515,7 +515,7 @@ inline void ImplicitHierarchicalMap3::setEdgeId(Dart d, unsigned int i, unsigned
 			e = Map3::alpha2(e);
 		} while(e != d);
 	}
-	else if(orbit == DART_ORBIT)
+	else if(orbit == DART)
 	{
 		m_edgeId[d] = i;
 	}
@@ -538,7 +538,7 @@ inline unsigned int ImplicitHierarchicalMap3::getFaceId(Dart d)
 inline void ImplicitHierarchicalMap3::setFaceId(unsigned int orbit, Dart d)
 {
 	//Mise a jour de l'id de face pour les brins autour d'une arete
-	if(orbit == EDGE_ORBIT)
+	if(orbit == EDGE)
 	{
 		Dart e = d;
 
@@ -556,7 +556,7 @@ inline void ImplicitHierarchicalMap3::setFaceId(Dart d, unsigned int i, unsigned
 {
 
 	//Mise a jour de l'id de face pour les brins autour de la face
-	if(orbit == FACE_ORBIT)
+	if(orbit == FACE)
 	{
 		Dart e = d;
 
@@ -571,7 +571,7 @@ inline void ImplicitHierarchicalMap3::setFaceId(Dart d, unsigned int i, unsigned
 			e = Map3::phi1(e);
 		} while(e != d);
 	}
-	else if(orbit == DART_ORBIT)
+	else if(orbit == DART)
 	{
 		m_faceId[d] = i;
 

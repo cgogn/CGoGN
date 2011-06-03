@@ -297,7 +297,7 @@ void maillageTest()
 int main(int argc, char **argv)
 {
 	//Initilisation du plongement geometrique
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
 	/*
 	 * Chargement de maillages

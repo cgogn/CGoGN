@@ -105,7 +105,7 @@ public:
 		{
 			if (isMarkedDart(d,m))
 			{
-				copyEmbedding(d, phi1(phi3(d)), VERTEX_ORBIT);
+				copyEmbedding(d, phi1(phi3(d)), VERTEX);
 			}
 		}
 	}
