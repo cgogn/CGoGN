@@ -769,8 +769,6 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 
 	mv.mark(d);
 
-	std::cout << "plop vertex" << std::endl;
-
 	for(darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
 	{
 		Dart dc = *darts;
@@ -800,8 +798,6 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 
 bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-	std::cout << "plop edge" << std::endl;
-
 	Dart dNext = d;
 	do {
 		if (Map2::foreach_dart_of_edge(dNext,f,thread)) return true;
@@ -812,8 +808,6 @@ bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 
 bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-
-	std::cout << "plop open edge" << std::endl;
 
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
