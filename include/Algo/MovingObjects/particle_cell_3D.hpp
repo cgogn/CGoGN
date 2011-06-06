@@ -763,7 +763,6 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 	std::vector<Dart> dart_list;
 	std::vector<float> dist_list;
 
-	bool found = false;						// Last functor return value
 	std::list<Dart> visitedFaces;			// Faces that are traversed
 	visitedFaces.push_back(d);				// Start with the face of d
 	std::list<Dart>::iterator face;
