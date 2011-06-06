@@ -161,7 +161,11 @@ class Matrix
 
 // Vector / Matrix multiplication
 template <unsigned int M, unsigned int N, typename T>
-Vector<M,T> operator*(const Vector<N,T>& v, const Matrix<M,N,T>& m) ;
+Vector<N,T> operator*(const Vector<M,T>& v, const Matrix<M,N,T>& m) ;
+
+// Matrix / Vector multiplication
+template <unsigned int M, unsigned int N, typename T>
+Vector<M,T> operator*(const Matrix<M,N,T>& m,const Vector<N,T>& v) ;
 
 // Scalar / Matrix multiplication
 template <unsigned int M, unsigned int N, typename T>

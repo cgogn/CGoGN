@@ -600,11 +600,8 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
 
 	unsigned int cur = map.getCurrentLevel() ;
-	Dart d2 = map.phi2(d) ;
 	map.setCurrentLevel(cur + 1) ;
-	unsigned int dl = map.getDartLevel(d2) ;
-	map.setDartLevel(map.phi1(d2), dl) ;
-	map.collapseEdge(d2) ;
+	map.uncutEdge(d) ;
 	map.setCurrentLevel(cur) ;
 }
 
@@ -612,8 +609,47 @@ template <typename PFP>
 void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-	//assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
+	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
 
+	unsigned int cur = map.getCurrentLevel() ;
+
+	unsigned int degree = 0 ;
+	Dart fit = d ;
+	do
+	{
+		++degree ;
+		fit = map.phi1(fit) ;
+	} while(fit != d) ;
+
+	if(degree == 3)
+	{
+//		fit = d ;
+//		do
+//		{
+//			map.setCurrentLevel(cur + 1) ;
+//			Dart innerEdge = map.phi1(fit) ;
+//			map.setCurrentLevel(map.getMaxLevel()) ;
+//			map.mergeFaces(innerEdge) ;
+//			map.setCurrentLevel(cur) ;
+//			fit = map.phi1(fit) ;
+//		} while(fit != d) ;
+	}
+	else
+	{
+		map.setCurrentLevel(cur + 1) ;
+		Dart centralV = map.phi1(map.phi1(d)) ;
+		map.setCurrentLevel(map.getMaxLevel()) ;
+		map.deleteVertex(centralV) ;
+		map.setCurrentLevel(cur) ;
+	}
+
+//	fit = d ;
+//	do
+//	{
+//		if(map.edgeCanBeCoarsened(fit))
+//			coarsenEdge<PFP>(map, fit, position) ;
+//		fit = map.phi1(fit) ;
+//	} while(fit != d) ;
 }
 
 template <typename PFP>
@@ -622,6 +658,85 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	//assert(map.volumeIsSubdivdedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
 
+	unsigned int cur = map.getCurrentLevel() ;
+
+	/*
+	 * au niveau du volume courant i
+	 * stockage d'un brin de chaque face de celui-ci
+	 * avec calcul du centroid
+	 */
+
+	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
+
+	//Store faces that are traversed and start with the face of d
+	std::vector<Dart> visitedFaces;
+	visitedFaces.reserve(20);
+	visitedFaces.push_back(d);
+
+	mf.markOrbit(FACE, d) ;
+
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		Dart e = *face ;
+		do
+		{
+			// add all face neighbours to the table
+			Dart ee = map.phi2(e) ;
+			if(!mf.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mf.markOrbit(FACE, ee) ;
+			}
+
+			e = map.phi1(e) ;
+		} while(e != *face) ;
+	}
+
+	/*
+	 * fusionner tous les volumes internes
+	 */
+	map.setCurrentLevel(cur + 1) ;
+	Dart centralV = map.phi_1(map.phi2(map.phi1(d)));
+	map.deleteVertex(centralV) ;
+	map.setCurrentLevel(cur) ;
+
+	/*
+	 * simplifier les faces
+	 */
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		Dart d = *face;
+
+		if(map.faceIsSubdividedOnce(d))
+		{
+			std::cout << "once : " << d << std::endl;
+			coarsenFace<PFP>(map, d, position);
+		}
+	}
+
+	map.setCurrentLevel(cur) ;
+
+	/*
+	 * simplifier les aretes
+	 */
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+			Dart fit = *face ;
+			do
+			{
+				if(map.edgeCanBeCoarsened(fit))
+				{
+					std::cout << "edge coarsened = " << fit << std::endl;
+				}
+					//coarsenEdge<PFP>(map, fit, position) ;
+				std::cout << "boucle = " << fit << std::endl;
+				fit = map.phi1(fit) ;
+			} while(fit != *face) ;
+	}
+
+	std::cout << "end" << std::endl;
+
+	map.setCurrentLevel(cur) ;
 }
 
 /***********************************************************************************

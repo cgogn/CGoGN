@@ -503,9 +503,9 @@ bool  ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		subd = true ;
 		Dart d2 = phi2(d) ;
 		++m_curLevel ;
+
 		if(vertexDegree(phi1(d)) == 2)
 		{
-
 			degree2 = true ;
 			if(edgeIsSubdivided(d) || edgeIsSubdivided(d2))
 				subdOnce = false ;
@@ -515,7 +515,7 @@ bool  ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 	return subd && degree2 && subdOnce ;
 }
 
-bool ImplicitHierarchicalMap3:: faceIsSubdividedOnce(Dart d)
+bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	unsigned int fLevel = faceLevel(d) ;
@@ -540,6 +540,7 @@ bool ImplicitHierarchicalMap3:: faceIsSubdividedOnce(Dart d)
 		--m_curLevel ;
 		++degree ;
 		fit = phi1(fit) ;
+
 	} while(subd && subdOnce && fit != d) ;
 
 	if(degree == 3 && subd)

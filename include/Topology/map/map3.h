@@ -144,10 +144,15 @@ public:
 	virtual void cutEdge(Dart d);
 
 	//! Uncut the edge of d
-	/*! @param d a dart of the edge to cut
+	/*! @param d a dart of the edge to uncut
 	 */
-	virtual void unCutEdge(Dart d);
+	virtual void uncutEdge(Dart d);
 
+	//!
+	/*!
+	 *
+	 */
+	virtual bool deleteVertex(Dart d);
 
 	//!
 	/*! Flip the edge of d (rotation in phi1 order)
@@ -227,6 +232,11 @@ public:
 	 *
 	 */
 	virtual int edgeDegree(Dart d);
+
+	/**
+	 * compute the number of edges of the vertex of d
+	 */
+	unsigned int vertexDegree(Dart d) ;
 
 	//!
 	/* Tell if a face of the volume is on the boundary
