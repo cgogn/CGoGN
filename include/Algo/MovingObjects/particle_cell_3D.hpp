@@ -331,13 +331,13 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 
 	if(Geom::arePointsEquals(current, m_position)) {
 		m_position = m_positionFace = som;
-		state = VERTEX_ORBIT;
+		state = VERTEX;
 		return;
 	}
 
 	Dart dd=d;
 	Geom::Orientation3D wsof;
-	CellMarkerStore mark(m, FACE_CELL);
+	CellMarkerStore mark(m, FACE);
 
 	do {
 		VEC3 dualsp = (som+ Algo::Geometry::vertexNormal<PFP>(m,d,position));
@@ -555,7 +555,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 				case Geom::OVER : d=m.phi_1(d);
 					break;
 				case Geom::ON :m_position = current;
-					state = EDGE_ORBIT;
+					state = EDGE;
 					return;
 				default :
 					Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
@@ -571,7 +571,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 			} while(d!=dd);
 
 			m_position = m_positionFace = current;
-			state = FACE_ORBIT;
+			state = FACE;
 			return;
 		}
 	}
@@ -588,7 +588,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 					d=m.phi_1(d);
 					break;
 				case Geom::ON :m_position = current;
-					state = EDGE_ORBIT;
+					state = EDGE;
 					return;
 				default :
 					 Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
@@ -603,7 +603,7 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 			}while(d!=dd);
 
 			m_position = m_positionFace = current;
-			state = FACE_ORBIT;
+			state = FACE;
 			return;
 		}
 	}
@@ -613,11 +613,11 @@ void ParticleCell3D<PFP>::edgeState(const VEC3& current)
 	{
 	case Geom::OVER :
 		 m_position = m_positionFace = current;
-		 state = FACE_ORBIT;
+		 state = FACE;
 		 break;
 	case Geom::ON :
 		 m_position = m_positionFace = current;
-		 state = EDGE_ORBIT;
+		 state = EDGE;
 		 break;
 	default :
 		 Geom::Plane3D<typename PFP::REAL> pl = Algo::Geometry::facePlane<PFP>(m,d,position);
@@ -640,7 +640,7 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 	std::cout << "volumeState " <<  d << std::endl;
 	#endif
 
-	CellMarkerStore mark(m,FACE_CELL);
+	CellMarkerStore mark(m,FACE);
 	bool above;
 
 	Geom::Orientation3D testRight=Geom::OVER;
@@ -722,12 +722,12 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 
 	if(wsof==Geom::UNDER) {
 		m_position = current;
-		state = VOLUME_ORBIT;
+		state = VOLUME;
 	}
 	else if(wsof==Geom::ON) {
 		if(isAbove(current,d,m_position)==Geom::UNDER) {
 			m_position = m_positionFace = current;
-			state = FACE_ORBIT;
+			state = FACE;
 		}
 		else {
 			m_position = m_positionFace = current;
@@ -756,7 +756,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 	#endif
 
 	Dart dd;
-	CellMarkerStore mark(m,FACE_CELL);
+	CellMarkerStore mark(m,FACE);
 
 	Dart d_min;
 
@@ -840,16 +840,16 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 
 	if(wsof==Geom::UNDER) {
 		m_position = current;
-		state = VOLUME_ORBIT;
+		state = VOLUME;
 	}
 	else if(wsof==Geom::ON) {
 		if(isAbove(current,d,m_position)==Geom::UNDER) {
 			m_position = current;
-			state = FACE_ORBIT;
+			state = FACE;
 		}
 		else {
 			m_position = current;
-			state = EDGE_ORBIT;
+			state = EDGE;
 		}
 	}
 	else {

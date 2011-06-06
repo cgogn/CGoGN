@@ -332,7 +332,7 @@ int main(int argc, char **argv)
 
 	if (argc == 1)
 	{
-		position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
+		position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");
 
 		CGoGNout <<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<CGoGNendl;
 //		typedef uint8 DATATYPE;
@@ -422,10 +422,10 @@ int main(int argc, char **argv)
 //
 //		GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 //
-//		myMap.getAttributeContainer(VERTEX_ORBIT).toggleProcess(position);
-////		myMap.getAttributeContainer(VERTEX_ORBIT).toggleProcess(idPipo);
+//		myMap.getAttributeContainer(VERTEX).toggleProcess(position);
+////		myMap.getAttributeContainer(VERTEX).toggleProcess(idPipo);
 //
-//		PFP::MAP::EVertex::setContainer(myMap.getAttributeContainer(VERTEX_ORBIT));
+//		PFP::MAP::EVertex::setContainer(myMap.getAttributeContainer(VERTEX));
 //		PFP::MAP::EVertex::setMap(myMap);
 //		PFP::MAP::EVertex ec(0);
 //
@@ -433,7 +433,7 @@ int main(int argc, char **argv)
 //			GLfloat seconds = (t2 - t1) / 1000.0f;
 //			CGoGNout << "triangulation: "<< seconds << "sec" << CGoGNendl;
 //
-//		Marker m = myMap.getNewMarker(VERTEX_ORBIT);
+//		Marker m = myMap.getNewMarker(VERTEX);
 //		myMap.markEmbVertex(myMap.begin(),m);
 //
 //		Dart xd = myMap.alpha1(myMap.begin());
@@ -447,8 +447,8 @@ int main(int argc, char **argv)
 //			CGoGNout << "Marke aussi"<< CGoGNendl;
 //		}
 //
-//		myMap.clearEmbMarkers(m,VERTEX_ORBIT);
-//		myMap.releaseEmbMarker(m,VERTEX_ORBIT);
+//		myMap.clearEmbMarkers(m,VERTEX);
+//		myMap.releaseEmbMarker(m,VERTEX);
 //
 //	}
 	else
@@ -462,7 +462,7 @@ int main(int argc, char **argv)
     		CGoGNerr << "could not import " << std::string(argv[1]) << CGoGNendl ;
     		exit(1);
     	}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 
 		GLint t1 = glutGet(GLUT_ELAPSED_TIME);
 
@@ -474,10 +474,10 @@ int main(int argc, char **argv)
 //        Algo::Modelisation::CatmullClark<PFP, PFP::TVEC3, PFP::VEC3>(myMap,position);
 
 
-//		PFP::MAP::EVertex::setContainer(myMap.getAttributeContainer(VERTEX_ORBIT));
+//		PFP::MAP::EVertex::setContainer(myMap.getAttributeContainer(VERTEX));
 //		PFP::MAP::EVertex::setMap(myMap);
 //		PFP::MAP::EVertex ec(0);
-//		myMap.getAttributeContainer(VERTEX_ORBIT).toggleProcess(position);
+//		myMap.getAttributeContainer(VERTEX).toggleProcess(position);
 //
 //		Algo::Modelisation::LoopSubdivision<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
 //		Algo::Modelisation::LoopSubdivision<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
@@ -490,15 +490,15 @@ int main(int argc, char **argv)
 		CGoGNout << "subdiv: "<< seconds << "sec" << CGoGNendl;
 
 
-//        myMap.getAttributeContainer(VERTEX_ORBIT).toggleProcess(position);
-//		PFP::MAP::EVertex::setContainer(myMap.getAttributeContainer(VERTEX_ORBIT));
+//        myMap.getAttributeContainer(VERTEX).toggleProcess(position);
+//		PFP::MAP::EVertex::setContainer(myMap.getAttributeContainer(VERTEX));
 //		PFP::MAP::EVertex::setMap(myMap);
 //		PFP::MAP::EVertex ec(0);
 //        Algo::Modelisation::triangleSubdivide<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
 //        Algo::Modelisation::triangleSubdivide<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
 //        Algo::Modelisation::triangleSubdivide<PFP, PFP::EVERTEX, PFP::EVERTEX>(myMap,ec);
 
-        CGoGNout << "Nombre de sommets plonges  "<< myMap.getNbCells(VERTEX_ORBIT)<<CGoGNendl;
+        CGoGNout << "Nombre de sommets plonges  "<< myMap.getNbCells(VERTEX)<<CGoGNendl;
         CGoGNout << "Nombre de sommets topo: "<< myMap.getNbOrbits(0)<<CGoGNendl;
         CGoGNout << "Nombre de faces topo: "<< myMap.getNbOrbits(2)<<CGoGNendl;
 
@@ -515,7 +515,7 @@ int main(int argc, char **argv)
 		bool inter = Algo::Geometry::areTrianglesInIntersection<PFP>(myMap,0,10,position) ;
 		CGoGNout << "intersection = " << inter << CGoGNendl ;
 
-		normal = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "normals");
+		normal = myMap.addAttribute<Geom::Vec3f>(VERTEX, "normals");
 //		PFP::NORMAL normal(normal,myMap);
 
 

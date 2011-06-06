@@ -237,7 +237,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 
 			(*ip)= Geom::transform((*ip), transf);
 
-			unsigned int em = the_map.newCell(VERTEX_ORBIT);
+			unsigned int em = the_map.newCell(VERTEX);
 //			positions[em] = (*ip);
 			typename PFP::VEC3 P = (*ip); //positions.at(em);
 
@@ -259,7 +259,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 			else position[em] = P;
 
 			Dart d = vertD[index++];
-			the_map.embedOrbit(VERTEX_ORBIT,d,em);
+			the_map.embedOrbit(VERTEX,d,em);
 
 			// rotate again to put profile in the good position along the path
 //			pos4=Geom::Vec4f ((*ip)[0],(*ip)[1],(*ip)[2], 1.0f);

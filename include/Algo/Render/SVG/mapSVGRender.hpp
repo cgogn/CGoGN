@@ -68,7 +68,7 @@ void SVGOut::renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3&
 			pol->setColor(global_color);
 			pol->setWidth(global_width);
 			m_objs.push_back(pol);
-			m.markOrbit(EDGE_ORBIT, d);
+			m.markOrbit(EDGE, d);
 		}
 	}
 }
@@ -104,7 +104,7 @@ void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3&
 			pol->setWidth(global_width);
 			m_objs.push_back(pol);
 
-			m.markOrbit(FACE_ORBIT, d);
+			m.markOrbit(FACE, d);
 		}
 	}
 }

@@ -63,7 +63,7 @@ void Map3::deleteOrientedVolume(Dart d)
 //		}
 //	}
 
-	mark.markOrbit(FACE_ORBIT, d) ;
+	mark.markOrbit(FACE, d) ;
 
 	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
@@ -77,7 +77,7 @@ void Map3::deleteOrientedVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE_ORBIT, ee) ;
+				mark.markOrbit(FACE, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != *face) ;
@@ -557,7 +557,7 @@ bool Map3::isBoundaryVolume(Dart d)
 	std::vector<Dart> visitedFaces ;
 	visitedFaces.reserve(100) ;
 	visitedFaces.push_back(d) ;
-	mark.markOrbit(FACE_ORBIT, d) ;
+	mark.markOrbit(FACE, d) ;
 
 	for(std::vector<Dart>::iterator face = visitedFaces.begin(); !isBoundary && face != visitedFaces.end(); ++face)
 	{
@@ -576,7 +576,7 @@ bool Map3::isBoundaryVolume(Dart d)
 				if(!mark.isMarked(ee)) // not already marked
 				{
 					visitedFaces.push_back(ee) ;
-					mark.markOrbit(FACE_ORBIT, ee) ;
+					mark.markOrbit(FACE, ee) ;
 				}
 				e = phi1(e) ;
 			} while(e != *face) ;
@@ -772,7 +772,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //	std::list<Dart> darts_list;
 //	std::list<Dart> neighbours_list;
 //	darts_list.push_back(d);
-//	this->markOrbit(DART_ORBIT,d,m);
+//	this->markOrbit(DART,d,m);
 //
 //	std::list<Dart>::iterator prem = darts_list.begin();
 //
@@ -785,7 +785,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //					dd=d1;
 //					std::list<Dart> darts_list2;
 //					darts_list2.push_back(dd);
-//					this->markOrbit(DART_ORBIT,dd,m);
+//					this->markOrbit(DART,dd,m);
 //					neighbours_list.push_back(dd);
 //					std::list<Dart>::iterator prem2 = darts_list2.begin();
 //
@@ -800,12 +800,12 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //
 //						if(!this->isMarkedDart(d2,m)) {
 //							darts_list2.push_back(d2);
-//							markOrbit(DART_ORBIT,d2,m);
+//							markOrbit(DART,d2,m);
 //						}
 //
 //						if(!this->isMarkedDart(d4,m)) {
 //							darts_list2.push_back(d4);
-//							markOrbit(DART_ORBIT,d4,m);
+//							markOrbit(DART,d4,m);
 //						}
 //
 //						++prem2;
@@ -817,7 +817,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //				neighbours_list.push_back(dd);
 //				do {
 //					if(!this->isMarkedDart(dd,m)) {
-//						markOrbit(DART_ORBIT,dd,m);
+//						markOrbit(DART,dd,m);
 //						if(s(dd))
 //							found =  f(dd);
 //					}
@@ -842,11 +842,11 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //
 //		if (!this->isMarkedDart(d2,m)) {
 //			darts_list.push_back(d2);
-//			this->markOrbit(DART_ORBIT,d2,m);
+//			this->markOrbit(DART,d2,m);
 //		}
 //		if (!this->isMarkedDart(d3,m)) {
 //			darts_list.push_back(d3);
-//			this->markOrbit(DART_ORBIT,d3,m);
+//			this->markOrbit(DART,d3,m);
 //		}
 //
 //		++prem;
@@ -854,7 +854,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //
 //	//unmark current volume
 //	for (std::list<Dart>::iterator it = darts_list.begin(); it != darts_list.end(); ++it) {
-//		this->unmarkOrbit(DART_ORBIT,(*it),m);
+//		this->unmarkOrbit(DART,(*it),m);
 //	}
 //
 //	//unmark connex volumes checked
@@ -871,7 +871,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //				foreach_dart_of_face((*it),fum);
 //		}
 //	}
-//	this->releaseMarker(DART_ORBIT,m);
+//	this->releaseMarker(DART,m);
 //	return found;
 //}
 
@@ -888,7 +888,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 //// 			this->markVolume(d,markOV);  // mark all dart of the vol
 //// 		}
 //// 	}
-//// 	this->releaseMarker(DART_ORBIT,markOV);
+//// 	this->releaseMarker(DART,markOV);
 //// }
 
 
@@ -904,7 +904,7 @@ void Map3::closeMap(DartMarker& marker)
 		if (phi3(d) == d)
 		{
 			Dart e = this->newDart();
-			marker.markOrbit(DART_ORBIT,e);
+			marker.markOrbit(DART,e);
 			phi3sew(d,e);
 			dartList.push_back(e);
 		}
@@ -954,8 +954,8 @@ void Map3::closeMap(DartMarker& marker)
 //			Dart e=d;
 //			do
 //			{
-//				markOrbit(DART_ORBIT,e,mf2);
-//				markOrbit(DART_ORBIT,e,mf3);
+//				markOrbit(DART,e,mf2);
+//				markOrbit(DART,e,mf3);
 //				e=phi1(e);
 //			}
 //			while (e!=d);
@@ -982,8 +982,8 @@ void Map3::closeMap(DartMarker& marker)
 //	{
 //		if (isMarkedDart(d,mf2))
 //		{
-//			unmarkOrbit(DART_ORBIT,d,mf2); // unmark the two darts
-//			unmarkOrbit(DART_ORBIT,*id2,mf2);
+//			unmarkOrbit(DART,d,mf2); // unmark the two darts
+//			unmarkOrbit(DART,*id2,mf2);
 //
 //			if (phi2(d) != d)
 //				phi2unsew(d);	// unsew the two darts if necessary
@@ -994,8 +994,8 @@ void Map3::closeMap(DartMarker& marker)
 //
 //		if (isMarkedDart(d,mf3))
 //		{
-//			unmarkOrbit(DART_ORBIT,d,mf3); // unmark the two darts
-//			unmarkOrbit(DART_ORBIT,*id3,mf3);
+//			unmarkOrbit(DART,d,mf3); // unmark the two darts
+//			unmarkOrbit(DART,*id3,mf3);
 //
 //			if (phi3(d) != d)
 //				phi3unsew(d);	// unsew the two darts if necessary
@@ -1006,8 +1006,8 @@ void Map3::closeMap(DartMarker& marker)
 //	}
 //
 //	// no need to clear marker second pass do it
-//	this->releaseMarker(DART_ORBIT,mf2);
-//	this->releaseMarker(DART_ORBIT,mf3);
+//	this->releaseMarker(DART,mf2);
+//	this->releaseMarker(DART,mf3);
 //}
 //
 //bool Map3::check()
@@ -1042,7 +1042,7 @@ void Map3::closeMap(DartMarker& marker)
 //            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
 //            return false;
 //        }
-//        markOrbit(DART_ORBIT,d1,m);
+//        markOrbit(DART,d1,m);
 //
 //        if (d1 == d)
 //            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
@@ -1065,8 +1065,8 @@ void Map3::closeMap(DartMarker& marker)
 //            return false;
 //        }
 //    }
-//    this->unmarkAll(DART_ORBIT,m);
-//    this->releaseMarker(DART_ORBIT,m);
+//    this->unmarkAll(DART,m);
+//    this->releaseMarker(DART,m);
 //    CGoGNout << "Check: topology ok" << CGoGNendl;
 //    return true;
 //}
@@ -1127,14 +1127,14 @@ void Map3::closeMap(DartMarker& marker)
 //	{
 //		if (!this->isMarkedDart(*it,toMerge))
 //		{
-//			this->markOrbit(DART_ORBIT,this->phi3(this->phi_1(*it)),toMerge);
+//			this->markOrbit(DART,this->phi3(this->phi_1(*it)),toMerge);
 //		}
 //		else
 //		{
 //			this->removeFace(*it);
 //		}
 //	}
-//	this->releaseMarker(DART_ORBIT,toMerge);
+//	this->releaseMarker(DART,toMerge);
 //}
 //
 //
@@ -1159,7 +1159,7 @@ void Map3::closeMap(DartMarker& marker)
 //	Dart next = phi1(d); 	// Get the next edge in the face of d
 //	phi1sew(n,d); 			// Insert the edge in the face of d (between d and next)
 //
-//	AttributeHandler<Marker> dmarkers( VERTEX_ORBIT<<24 ,*this); // a modifier pour virer <<24
+//	AttributeHandler<Marker> dmarkers( VERTEX<<24 ,*this); // a modifier pour virer <<24
 //
 //	dmarkers[n] = dmarkers[d]; //	n->setMarkerVal(d->getMarkerVal());
 //	dmarkers[phi2(n)] = dmarkers[d]; //	phi2(n)->setMarkerVal(d->getMarkerVal());
@@ -1265,8 +1265,8 @@ void Map3::closeMap(DartMarker& marker)
 //			Dart dc2 = phi2(dc);
 //
 //			//mark the dart
-//			markOrbit(DART_ORBIT,dc,traite);
-//			markOrbit(DART_ORBIT,dc2,traite);
+//			markOrbit(DART,dc,traite);
+//			markOrbit(DART,dc2,traite);
 //
 //			//create the new triangles
 //			Dart dd=this->newFace(3);
@@ -1294,15 +1294,15 @@ void Map3::closeMap(DartMarker& marker)
 //			Dart dc2 = phi_1(dc);
 //
 //			//unmark them
-//			unmarkOrbit(DART_ORBIT,dc,traite);
+//			unmarkOrbit(DART,dc,traite);
 //
 //			//and sew them to create the tetra
 //			phi2sew(phi1(phi2(dc)),phi_1(phi2(dc2)));
 //		}
 //	}
 //
-//	this->unmarkAll(DART_ORBIT,traite);
-//	this->releaseMarker(DART_ORBIT,traite);
+//	this->unmarkAll(DART,traite);
+//	this->releaseMarker(DART,traite);
 //
 //	return ret;
 //

@@ -54,7 +54,7 @@ bool isConvex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positio
 		Dart e = *it;
 		if (!m.isMarked(e))
 		{
-			m.markOrbit(EDGE_ORBIT, e) ;
+			m.markOrbit(EDGE, e) ;
 			convex = isTetrahedronWellOriented<PFP>(map, e, positions, CCW) ;
 		}
 	}

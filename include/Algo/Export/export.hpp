@@ -59,19 +59,19 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	std::vector<unsigned int> vertices ;
 	vertices.reserve(nbDarts/6) ;
 
-	CellMarker markV(map, VERTEX_CELL) ;
+	CellMarker markV(map, VERTEX) ;
 	DartMarker markF(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(good(d) && !markF.isMarked(d))
 		{
-			markF.markOrbit(FACE_ORBIT, d) ;
+			markF.markOrbit(FACE, d) ;
 			std::vector<unsigned int> fidx ;
 			fidx.reserve(4) ;
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding(VERTEX_ORBIT, dd) ;
+				unsigned int vNum = map.getEmbedding(VERTEX, dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;
@@ -137,19 +137,19 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	std::vector<unsigned int> vertices ;
 	vertices.reserve(nbDarts/6) ;
 
-	CellMarker markV(map, VERTEX_CELL) ;
+	CellMarker markV(map, VERTEX) ;
 	DartMarker markF(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(good(d) && !markF.isMarked(d))
 		{
-			markF.markOrbit(FACE_ORBIT, d) ;
+			markF.markOrbit(FACE, d) ;
 			std::vector<unsigned int> fidx ;
 			fidx.reserve(4) ;
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding(VERTEX_ORBIT, dd) ;
+				unsigned int vNum = map.getEmbedding(VERTEX, dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;
@@ -190,9 +190,9 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
 
-	AutoAttributeHandler<unsigned int> tableVertLab(the_map, VERTEX_ORBIT);
+	AutoAttributeHandler<unsigned int> tableVertLab(the_map, VERTEX);
 
-	CellMarker markV(the_map,VERTEX_CELL);
+	CellMarker markV(the_map,VERTEX);
 
 	unsigned int nbDarts = the_map.getNbDarts() ;
 
@@ -207,7 +207,7 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 	{
 		if(good(d) && !markF.isMarked(d))
 		{
-			markF.markOrbit(FACE_ORBIT, d) ;
+			markF.markOrbit(FACE, d) ;
 			Dart e = d;
 			do
 			{
@@ -260,9 +260,9 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		return false ;
 	}
 
-	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX_ORBIT);
+	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
 
-	CellMarker markV(map,VERTEX_CELL);
+	CellMarker markV(map,VERTEX);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -279,14 +279,14 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	{
 		if(good(d) && !markF.isMarked(d))
 		{
-			markF.markOrbit(FACE_ORBIT, d) ;
+			markF.markOrbit(FACE, d) ;
 			Dart e = d;
 			std::vector<unsigned int> face ;
 			do
 			{
 				if (!markV.isMarked(e))
 				{
-					vertices.push_back(map.getEmbedding(VERTEX_ORBIT, e));
+					vertices.push_back(map.getEmbedding(VERTEX, e));
 					tableVertLab[e] = lab++;
 
 					markV.mark(e);
@@ -408,9 +408,9 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		return false ;
 	}
 
-	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX_ORBIT);
+	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
 
-	CellMarker markV(map,VERTEX_CELL);
+	CellMarker markV(map,VERTEX);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -427,14 +427,14 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	{
 		if(good(d) && !markF.isMarked(d))
 		{
-			markF.markOrbit(FACE_ORBIT, d) ;
+			markF.markOrbit(FACE, d) ;
 			Dart e = d;
 			std::vector<unsigned int> face ;
 			do
 			{
 				if (!markV.isMarked(e))
 				{
-					vertices.push_back(map.getEmbedding(VERTEX_ORBIT, e));
+					vertices.push_back(map.getEmbedding(VERTEX, e));
 					tableVertLab[e] = lab++;
 
 					markV.mark(e);

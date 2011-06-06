@@ -347,7 +347,7 @@ void GMap2::closeMap(DartMarker& marker)
 		if (phi2(d) == d)
 		{
 			closeHole(d);
-			marker.markOrbit(FACE_ORBIT, phi2(d)) ;
+			marker.markOrbit(FACE, phi2(d)) ;
 		}
 	}
 }

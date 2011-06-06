@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position") ;
 
 	// define the face extruded (here a cross)
 	std::vector<PFP::VEC3> objV;

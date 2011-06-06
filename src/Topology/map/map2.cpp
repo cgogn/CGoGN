@@ -366,7 +366,7 @@ void Map2::closeMap(DartMarker& marker)
 		if (phi2(d) == d)
 		{
 			closeHole(d);
-			marker.markOrbit(FACE_ORBIT, phi2(d)) ;
+			marker.markOrbit(FACE, phi2(d)) ;
 		}
 	}
 }
@@ -465,7 +465,7 @@ bool Map2::isTriangular()
 	{
 		if(!m.isMarked(d))
 		{
-			m.markOrbit(FACE_ORBIT, d) ;
+			m.markOrbit(FACE, d) ;
 			Dart dd = d ;
 			bool t = isFaceTriangle(d) ;
 			if(!t)
@@ -589,7 +589,7 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 
 bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
 {
-	if(orbit == VERTEX_ORBIT)
+	if(orbit == VERTEX)
 	{
 
 		Dart dNext = d;
@@ -603,7 +603,7 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsi
 
 		return false;
 	}
-	else if(orbit == FACE_ORBIT)
+	else if(orbit == FACE)
 	{
 		if(Map1::foreach_dart_of_face(d,f,thread))
 			return true;
@@ -619,7 +619,7 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsi
 
 bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
 {
-	if(orbit == VERTEX_ORBIT)
+	if(orbit == VERTEX)
 	{
 		Dart dNext = d;
 		do
@@ -632,7 +632,7 @@ bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsi
 
 		return false;
 	}
-	else if(orbit == FACE_ORBIT)
+	else if(orbit == FACE)
 	{
 		if(Map2::foreach_dart_of_vertex(phi_1(d),f,thread))
 			return true;

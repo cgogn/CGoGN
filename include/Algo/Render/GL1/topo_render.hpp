@@ -162,10 +162,10 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 	
-	AutoAttributeHandler<Geom::Vec3f> fv1(the_map, DART_ORBIT);
-	AutoAttributeHandler<Geom::Vec3f> fv11(the_map, DART_ORBIT);
-	AutoAttributeHandler<Geom::Vec3f> fv2(the_map, DART_ORBIT);
-	AutoAttributeHandler<Geom::Vec3f> vert(the_map, DART_ORBIT);
+	AutoAttributeHandler<Geom::Vec3f> fv1(the_map, DART);
+	AutoAttributeHandler<Geom::Vec3f> fv11(the_map, DART);
+	AutoAttributeHandler<Geom::Vec3f> fv2(the_map, DART);
+	AutoAttributeHandler<Geom::Vec3f> vert(the_map, DART);
 
 	glLineWidth(2.0f);
 	glColor3f(0.9f,0.9f,0.9f);
@@ -219,7 +219,7 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
 				fv11[d] = f;
 				d = the_map.phi1(d);
 			}
-			mf.markOrbit(FACE_ORBIT, d);
+			mf.markOrbit(FACE, d);
 		}
 	}
 
@@ -372,7 +372,7 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
 //	vecDarts.reserve(50);
 //	FunctorStore fvol(vecDarts);
 //
-//	Marker markerFace = the_map.getNewMarker(DART_ORBIT);
+//	Marker markerFace = the_map.getNewMarker(DART);
 //	FunctorMD3Face<PFP> fgl_cd(the_map,vPosPhi23,ke,kf,kv,markerFace,drawPhi1);
 //
 //	// Scan all darts of the map

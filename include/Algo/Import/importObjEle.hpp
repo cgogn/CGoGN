@@ -39,14 +39,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX, "position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeContainer& container = map.getAttributeContainer(VERTEX_CELL) ;
+	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX_ORBIT, "incidents");
+	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
 
 	// open files
 	std::ifstream foff(filenameOFF.c_str(), std::ios::in);
@@ -164,7 +164,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		{
 //			CGoGNout << "\t embedding number : " << pt[j];
 
-			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[j]]);
+			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX, verticesID[pt[j]]);
 
 			Dart dd = d;
 			do {
@@ -183,7 +183,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 //		CGoGNout << "\t embedding number : " << pt[3] << CGoGNendl;
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX_ORBIT, verticesID[pt[3]]);
+		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX, verticesID[pt[3]]);
 		Dart dd = d;
 		do {
 			femb(dd);
@@ -213,8 +213,8 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 				bool sewn=false;
 				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
 				{
-					if(map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*itnext))
-					&& map.getDartEmbedding(VERTEX_ORBIT,map.phi_1(*it))==map.getDartEmbedding(VERTEX_ORBIT,map.phi1(*itnext)))
+					if(map.getDartEmbedding(VERTEX,map.phi1(*it))==map.getDartEmbedding(VERTEX,map.phi_1(*itnext))
+					&& map.getDartEmbedding(VERTEX,map.phi_1(*it))==map.getDartEmbedding(VERTEX,map.phi1(*itnext)))
 					{
 						map.sewVolumes(*it,map.phi_1(*itnext));
 						sewn = true;

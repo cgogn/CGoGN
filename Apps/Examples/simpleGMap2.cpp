@@ -384,7 +384,7 @@ int main(int argc, char **argv)
 
 	if(argc < 2)
 	{
-		mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position") ;
+		mgw.position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position") ;
 
 		Dart d = myMap.newFace(4);
 		Dart e = myMap.newFace(3);
@@ -415,10 +415,10 @@ int main(int argc, char **argv)
 			CGoGNerr <<"Import fail"<< CGoGNendl;
 			exit(1);
 		}
-		mgw.position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+		mgw.position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 	}
 
-	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal") ;
+	mgw.normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 
 	// pour le rendu
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, mgw.position) ;

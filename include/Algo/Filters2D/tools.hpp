@@ -45,7 +45,7 @@ float computeHaussdorf(typename PFP::MAP& map, const typename PFP::TVEC3& origin
 	float dist_o = 0.0f ;
 	float dist_f = 0.0f ;
 
-	CellMarker mv(map, VERTEX_CELL) ;
+	CellMarker mv(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
@@ -100,7 +100,7 @@ void computeNoise(typename PFP::MAP& map, long amount, const typename PFP::TVEC3
 	srand(time(NULL)) ;
 
 	// apply noise on each vertex
-	CellMarker mv(map, VERTEX_CELL) ;
+	CellMarker mv(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
