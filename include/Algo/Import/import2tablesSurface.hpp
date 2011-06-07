@@ -443,7 +443,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
     			oss >> str;
 
     			unsigned int ind = 0;
-    			while ( (str[ind]!='/')&& (ind<str.length()) )
+    			while ( (ind<str.length()) &&  (str[ind]!='/'))
     				ind++;
 
 				if (ind > 0)

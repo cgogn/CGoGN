@@ -26,6 +26,7 @@
 #define _MARKER_H_
 
 #include "Utils/mark.h"
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
@@ -37,9 +38,9 @@ protected:
 
 public:
 	Marker(Mark m, unsigned int cell): Mark(m), m_cell(cell) {}
-#ifndef DART
-#define DART	(unsigned int)(5)
-#endif
+//#ifndef DART
+//#define DART	(unsigned int)(5)
+//#endif
 	Marker(): Mark(0), m_cell(DART) {} // TODO trouver un moyen propre de faire ça
 
 	Marker operator+(const Marker m) const
