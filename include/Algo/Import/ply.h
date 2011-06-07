@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -63,6 +63,7 @@ extern "C" {
 #include <stdio.h>
 #include <stddef.h>
 
+
 #define PLY_ASCII      1        /* ascii PLY file */
 #define PLY_BINARY_BE  2        /* binary PLY file, big endian */
 #define PLY_BINARY_LE  3        /* binary PLY file, little endian */
@@ -72,16 +73,16 @@ extern "C" {
 
 /* scalar data types supported by PLY format */
 
-#define StartType  0
-#define Int8       1
-#define Int16      2
-#define Int32      3
-#define Uint8      4
-#define Uint16     5
-#define Uint32     6
-#define Float32    7
-#define Float64    8
-#define EndType    9
+#define PLY_StartType  0
+#define PLY_Int8       1
+#define PLY_Int16      2
+#define PLY_Int32      3
+#define PLY_Uint8      4
+#define PLY_Uint16     5
+#define PLY_Uint32     6
+#define PLY_Float32    7
+#define PLY_Float64    8
+#define PLY_EndType    9
 
 #define  PLY_SCALAR  0
 #define  PLY_LIST    1
@@ -248,7 +249,6 @@ int matches_rule_name (char *);
 
 int equal_strings(char *, char *);
 char *recreate_command_line (int, char *argv[]);
-
 
 #ifdef __cplusplus
 }

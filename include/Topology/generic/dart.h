@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -29,6 +29,19 @@
 
 namespace CGoGN
 {
+
+const unsigned int EMBNULL = 0xffffffff;
+
+const unsigned int NB_ORBITS = 6;
+const unsigned int NB_THREAD = 16;
+
+const unsigned int VERTEX       = 0;
+const unsigned int EDGE         = 1;
+const unsigned int ORIENTED_FACE= 2;
+const unsigned int FACE         = 3;
+const unsigned int VOLUME       = 4;
+const unsigned int DART         = 5;
+
 
 struct Dart
 {

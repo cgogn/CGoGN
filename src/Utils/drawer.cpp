@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,13 +17,14 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 #include "Utils/drawer.h"
-#include "Utils/shaderColorPerVertex.h"
+#include "Utils/Shaders/shaderColorPerVertex.h"
+
 #include "Utils/vbo.h"
 
 namespace CGoGN
@@ -78,6 +79,9 @@ void Drawer::begin(GLenum mode)
 
 void Drawer::end()
 {
+	if (m_begins.empty())
+		return;
+
 	m_begins.back().nb = m_dataPos.size() - m_begins.back().begin;
 }
 
@@ -123,6 +127,9 @@ void Drawer::newList(GLenum comp)
 void Drawer::endList()
 {
 	unsigned int nbElts = m_dataPos.size();
+	
+	if (nbElts == 0)
+		return;
 
 	m_vboPos->bind();
 	glBufferData(GL_ARRAY_BUFFER, nbElts * sizeof(Geom::Vec3f), &(m_dataPos[0]), GL_STREAM_DRAW);
