@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -186,8 +186,8 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 				bool sewn = false;
 				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
 				{
-					if(map.getDartEmbedding(VERTEX,map.phi1(*it))==map.getDartEmbedding(VERTEX,map.phi_1(*itnext))
-					&& map.getDartEmbedding(VERTEX,map.phi_1(*it))==map.getDartEmbedding(VERTEX,map.phi1(*itnext)))
+					if(map.getEmbedding(VERTEX,map.phi1(*it))==map.getEmbedding(VERTEX,map.phi_1(*itnext))
+					&& map.getEmbedding(VERTEX,map.phi_1(*it))==map.getEmbedding(VERTEX,map.phi1(*itnext)))
 					{
 						map.sewVolumes(*it, map.phi_1(*itnext));
 						sewn = true;

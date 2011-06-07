@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -503,9 +503,9 @@ bool  ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		subd = true ;
 		Dart d2 = phi2(d) ;
 		++m_curLevel ;
+
 		if(vertexDegree(phi1(d)) == 2)
 		{
-
 			degree2 = true ;
 			if(edgeIsSubdivided(d) || edgeIsSubdivided(d2))
 				subdOnce = false ;
@@ -515,7 +515,7 @@ bool  ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 	return subd && degree2 && subdOnce ;
 }
 
-bool ImplicitHierarchicalMap3:: faceIsSubdividedOnce(Dart d)
+bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 	unsigned int fLevel = faceLevel(d) ;
@@ -540,6 +540,7 @@ bool ImplicitHierarchicalMap3:: faceIsSubdividedOnce(Dart d)
 		--m_curLevel ;
 		++degree ;
 		fit = phi1(fit) ;
+
 	} while(subd && subdOnce && fit != d) ;
 
 	if(degree == 3 && subd)

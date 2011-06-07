@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -178,11 +178,92 @@ void Map3::cutEdge(Dart d)
 	}
 }
 
-void Map3::unCutEdge(Dart d)
+void Map3::uncutEdge(Dart d)
 {
+	if(phi3(d) == d)
+		d = phi_1(phi2(d));
+
+	Dart prev = d;
+	Dart dd = alpha2(d);
+
+	Map2::uncutEdge(prev);
+
+	if(phi3(dd) != dd)
+		phi3sew(dd,phi2(prev));
+
+	while (dd!=d)
+	{
+		prev = dd;
+		dd = alpha2(dd);
+
+		Map2::uncutEdge(prev);
+
+		phi3sew(dd, phi2(prev));
+	}
 
 }
 
+bool Map3::deleteVertex(Dart d)
+{
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	std::list<Dart>::iterator darts;
+
+	mv.mark(d);
+
+	std::list<Dart> unique_darts_list;
+	//unique_darts_list.reserve(30);
+	unique_darts_list.push_back(d);
+
+
+	bool boundary = false;
+	if(isBoundaryVertex(d))
+		boundary = true;
+
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts_list.push_back(d21);
+			mv.mark(d21);
+		}
+
+		if((d23!=d2) && !mv.isMarked(d23))
+		{
+			darts_list.push_back(d23);
+			unique_darts_list.push_back(d23);
+			mv.mark(d23);
+		}
+	}
+
+	for(darts = unique_darts_list.begin(); darts != unique_darts_list.end() ; ++darts)
+	{
+		mergeVolumes(*darts);
+	}
+
+	if(boundary)
+	{
+		Dart vit = d ;
+			do
+			{
+				Dart f = phi_1(phi2(vit)) ;
+				phi1sew(vit, f) ;
+				vit = phi2(phi_1((vit))) ;
+			} while(vit != d) ;
+			Map1::deleteFace(d) ;
+	}
+
+	return true;
+}
 
 //TODO
 //bool Map3::flipEdge(Dart d)
@@ -549,6 +630,55 @@ int Map3::edgeDegree(Dart d)
 	return deg;
 }
 
+unsigned int Map3::vertexDegree(Dart d)
+{
+	int count = 0;
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	std::list<Dart>::iterator darts;
+
+	mv.mark(d);
+
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts_list.push_back(d21);
+			mv.mark(d21);
+		}
+
+		if((d23!=d2) && !mv.isMarked(d23))
+		{
+			darts_list.push_back(d23);
+			mv.mark(d23);
+		}
+	}
+
+	std::cout << "#darts = " << darts_list.size() << std::endl;
+
+	DartMarkerStore me(*this);
+
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	{
+		if(!me.isMarked(*darts))
+		{
+			++count;
+			me.markOrbit(EDGE, *darts);
+		}
+	}
+
+	return count;
+}
+
 bool Map3::isBoundaryVolume(Dart d)
 {
 	bool isBoundary = false;
@@ -678,6 +808,7 @@ bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 
 bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread)
 {
+
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 

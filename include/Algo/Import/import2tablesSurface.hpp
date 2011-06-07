@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -443,7 +443,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
     			oss >> str;
 
     			unsigned int ind = 0;
-    			while ( (str[ind]!='/')&& (ind<str.length()) )
+    			while ( (ind<str.length()) &&  (str[ind]!='/'))
     				ind++;
 
 				if (ind > 0)
@@ -579,6 +579,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		return false;
 	}
 
+
 	// va au nombre de sommets
 	do
 	{
@@ -591,6 +592,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 	std::vector<unsigned int> verticesID;
 	verticesID.reserve(nbp);
 
+	AttributeHandler<typename PFP::REAL> errors[3] ;
 	// va au nombre de faces en comptant le nombre de "property"
 	unsigned int nb_props = 0;
 	do
@@ -598,6 +600,15 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		fp >> tag;
 		if (tag == std::string("property"))
 			nb_props++;
+		if (tag == std::string("errL2")) {
+			errors[0] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, "errL2") ;
+			errors[1] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, "errLmax") ;
+			errors[2] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, "stdDev") ;
+			for (unsigned int i = 0 ; i < 3 ; ++i)
+					attrNames.push_back(errors[i].name()) ;
+		}
+
+
 	} while (tag != std::string("face"));
 
 	fp >> m_nbFaces;
@@ -633,6 +644,10 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 		for (unsigned int k = 0 ; k < 3 ; ++k)
 			for (unsigned int l = 0 ; l < 15 ; ++l)
 				colorPTM[l][id][k] = properties[12+(15*k+l)];
+
+		if (errors[0].isValid())
+			for (unsigned int k = 0 ; k < 3 ; ++k)
+				errors[k][id] = properties[57 + k] ;
 	}
 
 	m_nbVertices = verticesID.size();

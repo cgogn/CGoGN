@@ -117,7 +117,7 @@ bool ParticleCell3D<PFP>::isRightDFace(VEC3 c, Dart d, VEC3 base, VEC3 normal)
 
 
 template <typename PFP>
-Dart ParticleCell3D<PFP>::nextDartOfVertexNotMarked(Dart d, CellMarker& mark)
+Dart ParticleCell3D<PFP>::nextDartOfVertexNotMarked(Dart d, CellMarkerGen& mark)
 {
 	// lock a marker
 	Dart d1;
@@ -221,7 +221,7 @@ Dart ParticleCell3D<PFP>::nextNonPlanar(Dart d)
 }
 
 template <typename PFP>
-Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d,CellMarker& mark)
+Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d, CellMarkerGen& mark)
 {
 	// lock a marker
 	Dart d1;
@@ -272,6 +272,7 @@ Dart ParticleCell3D<PFP>::nextFaceNotMarked(Dart d,CellMarker& mark)
 		}
 		beg++;
 	}
+
 	// clear markers
 	for (std::list<Dart>::iterator it=darts_list.begin(); it!=darts_list.end(); ++it)
 	{
@@ -652,6 +653,7 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 		Geom::Orientation3D testLeft = isLeftL1DVol(current,d,m_positionFace,m_position);
 
 		if(testLeft!=Geom::UNDER) {
+
 			d = m.phi_1(d);
 
 			while(dd!=d && isLeftL1DVol(current,d,m_positionFace,m_position)!=Geom::UNDER)
@@ -693,9 +695,6 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 
 		if(testAbove!=Geom::UNDER || (testRight==Geom::ON && isAbove(current,m.phi_1(d),m_position)!=Geom::UNDER)) {
 
-			if(testAbove==Geom::UNDER)
-				d= m.phi1(d);
-
 			if(testAbove==Geom::OVER || whichSideOfFace(current,d)==Geom::UNDER) {
 
 				mark.mark(d);
@@ -706,6 +705,7 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 				if(mark.isMarked(d)) {
 					dd = d;
 					d = nextFaceNotMarked(d,mark);
+					mark.mark(d);
 
 					if(d==dd) {
 						volumeSpecialCase(current);
@@ -756,14 +756,13 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 	#endif
 
 	Dart dd;
-	CellMarker mark(m,FACE);
+	CellMarkerStore mark(m,FACE);
 
 	Dart d_min;
 
 	std::vector<Dart> dart_list;
 	std::vector<float> dist_list;
 
-	bool found = false;						// Last functor return value
 	std::list<Dart> visitedFaces;			// Faces that are traversed
 	visitedFaces.push_back(d);				// Start with the face of d
 	std::list<Dart>::iterator face;

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,18 +17,16 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_PHONG__
-#define __CGOGN_SHADER_PHONG__
+#ifndef __CGOGN_SHADER_SIMPLECOLOR__
+#define __CGOGN_SHADER_SIMPLECOLOR__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
-
-#include <string>
 
 namespace CGoGN
 {
@@ -36,77 +34,28 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderPhong : public GLSLShader
+class ShaderSimpleColor : public GLSLShader
 {
 protected:
-	// flag color per vertex or not
-	bool m_with_color;
-
-	// shader sources OGL3
+	// shader sources
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
 
     // uniform locations
-	GLuint m_unif_ambiant;
-	GLuint m_unif_diffuse;
-	GLuint m_unif_specular;
-	GLuint m_unif_shininess;
-	GLuint m_unif_lightPos;
+	GLuint m_unif_color;
 
-	//values
-	Geom::Vec4f m_ambiant;
-	Geom::Vec4f m_diffuse;
-	Geom::Vec4f m_specular;
-	float m_shininess;
-	Geom::Vec3f m_lightPos;
+	Geom::Vec4f m_color;
 
 	VBO* m_vboPos;
-	VBO* m_vboNormal;
-	VBO* m_vboColor;
-
-	void getLocations();
-
-	void sendParams();
 
 	void restoreUniformsAttribs();
 
 public:
-	ShaderPhong();
+	ShaderSimpleColor();
 
-	// inviduals parameter setting functions
-	void setAmbiant(const Geom::Vec4f& ambiant);
+	void setColor(const Geom::Vec4f& color);
 
-	void setDiffuse(const Geom::Vec4f& diffuse);
-
-	void setSpecular(const Geom::Vec4f& specular);
-
-	void setShininess(float shininess);
-
-	void setLightPosition(Geom::Vec3f lp);
-
-	const Geom::Vec4f& getAmbiant() const { return m_ambiant; }
-
-	const Geom::Vec4f& getDiffuse() const { return m_diffuse; }
-
-	const Geom::Vec4f& getSpecular() const { return m_specular; }
-
-	float getShininess() const { return m_shininess; }
-
-	const Geom::Vec3f& getLightPosition() const { return m_lightPos; }
-
-	/**
-	 * set all parameter in on call (one bind also)
-	 */
-	void setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos);
-
-	// attributes
 	unsigned int setAttributePosition(VBO* vbo);
-
-	unsigned int setAttributeNormal(VBO* vbo);
-
-	// optional attributes
-	unsigned int setAttributeColor(VBO* vbo);
-	void unsetAttributeColor();
 };
 
 } // namespace Utils

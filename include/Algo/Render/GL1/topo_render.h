@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -29,6 +29,8 @@
 //#include <gmtl/VecOps.h>
 //#include <gmtl/Output.h>
 #include <GL/gl.h>
+
+#include "Topology/generic/functor.h"
 
 // OpenGL direct mode rendering of darts of maps
 
@@ -76,7 +78,11 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
  * @param kv exploding coefficient for volumes (0.0 normal draw)
  */
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& the_map, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+void renderTopoMD3(typename PFP::MAP& the_map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+
+template <typename PFP>
+void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
+
 
 }// end namespace
 }// end namespace

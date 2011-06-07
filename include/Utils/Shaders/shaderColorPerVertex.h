@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,13 +17,13 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_VPV__
-#define __CGOGN_SHADER_VPV__
+#ifndef __CGOGN_SHADER_CPV__
+#define __CGOGN_SHADER_CPV__
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
@@ -34,39 +34,24 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderVectorPerVertex : public GLSLShader
+class ShaderColorPerVertex : public GLSLShader
 {
 protected:
 	// shader sources
     static std::string vertexShaderText;
-    static std::string geometryShaderText;
     static std::string fragmentShaderText;
 
-    GLuint m_uniform_scale;
-    GLuint m_uniform_color;
-
-	float m_scale;
-	Geom::Vec4f m_color;
-
     VBO* m_vboPos;
-    VBO* m_vboVec;
+    VBO* m_vboCol;
 
-	void getLocations();
-
-	void sendParams();
-
-	void restoreUniformsAttribs();
+    void restoreUniformsAttribs();
 
 public:
-    ShaderVectorPerVertex();
-
-	void setScale(float scale);
-
-	void setColor(const Geom::Vec4f& color);
+    ShaderColorPerVertex();
 
 	unsigned int setAttributePosition(VBO* vbo);
 
-	unsigned int setAttributeVector(VBO* vbo);
+	unsigned int setAttributeColor(VBO* vbo);
 };
 
 } // namespace Utils

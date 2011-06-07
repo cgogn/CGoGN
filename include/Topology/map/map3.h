@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -144,10 +144,15 @@ public:
 	virtual void cutEdge(Dart d);
 
 	//! Uncut the edge of d
-	/*! @param d a dart of the edge to cut
+	/*! @param d a dart of the edge to uncut
 	 */
-	virtual void unCutEdge(Dart d);
+	virtual void uncutEdge(Dart d);
 
+	//!
+	/*!
+	 *
+	 */
+	virtual bool deleteVertex(Dart d);
 
 	//!
 	/*! Flip the edge of d (rotation in phi1 order)
@@ -227,6 +232,11 @@ public:
 	 *
 	 */
 	virtual int edgeDegree(Dart d);
+
+	/**
+	 * compute the number of edges of the vertex of d
+	 */
+	unsigned int vertexDegree(Dart d) ;
 
 	//!
 	/* Tell if a face of the volume is on the boundary
