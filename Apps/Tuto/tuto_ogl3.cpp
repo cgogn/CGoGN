@@ -123,8 +123,8 @@ void MyQT::cb_redraw()
 
 int main(int argc, char **argv)
 {
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-	normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
 
 	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
 	prim3.tore_topo(32, 64);

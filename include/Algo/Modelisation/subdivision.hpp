@@ -71,7 +71,7 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 			Dart fit = cd ;
 			do
 			{
-				m.markOrbit(FACE_ORBIT, fit);
+				m.markOrbit(FACE, fit);
 				fit = map.alpha1(fit);
 			} while(fit != cd);
 		}
@@ -90,8 +90,8 @@ void trianguleFaces(
 		typename PFP::TVEC3& position, typename PFP::TVEC3& positionF,
 		const FunctorSelect& selected)
 {
-	assert(position.getOrbit() == VERTEX_ORBIT) ;
-	assert(positionF.getOrbit() == FACE_ORBIT) ;
+	assert(position.getOrbit() == VERTEX) ;
+	assert(positionF.getOrbit() == FACE) ;
 
 	DartMarker m(map) ;
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -104,7 +104,7 @@ void trianguleFaces(
 			Dart fit = cd ;
 			do
 			{
-				m.markOrbit(FACE_ORBIT, fit);
+				m.markOrbit(FACE, fit);
 				fit = map.alpha1(fit);
 			} while(fit != cd);
 		}
@@ -149,9 +149,9 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit(EDGE_ORBIT, d);
-			me.markOrbit(EDGE_ORBIT, e);
-			mf.markOrbit(VERTEX_ORBIT, e);
+			me.markOrbit(EDGE, d);
+			me.markOrbit(EDGE, e);
+			mf.markOrbit(VERTEX, e);
 		}
 	}
 
@@ -166,7 +166,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			Dart e = cf;
 			do
 			{
-				mf.markOrbit(FACE_ORBIT, e);
+				mf.markOrbit(FACE, e);
 				e = map.alpha1(e);
 			} while (e != cf);
 		}
@@ -185,7 +185,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
-	CellMarkerNoUnmark m0(map, VERTEX_CELL);
+	CellMarkerNoUnmark m0(map, VERTEX);
 	DartMarkerNoUnmark mf(map);
 	DartMarkerNoUnmark me(map);
 
@@ -213,8 +213,8 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit(EDGE_ORBIT, d);
-			me.markOrbit(EDGE_ORBIT, e);
+			me.markOrbit(EDGE, d);
+			me.markOrbit(EDGE, e);
 
 			mf.mark(d) ;
 			mf.mark(map.phi2(e)) ;
@@ -336,7 +336,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
-	CellMarkerNoUnmark m0(map, VERTEX_CELL);
+	CellMarkerNoUnmark m0(map, VERTEX);
 	DartMarkerNoUnmark mv(map);
 	DartMarkerNoUnmark me(map);
 
@@ -365,10 +365,10 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit(EDGE_ORBIT, d);
-			me.markOrbit(EDGE_ORBIT, e);
+			me.markOrbit(EDGE, d);
+			me.markOrbit(EDGE, e);
 
-			mv.markOrbit(VERTEX_ORBIT, e);
+			mv.markOrbit(VERTEX, e);
 
 			l_middles.push_back(e);
 		}
@@ -458,8 +458,8 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-	AutoAttributeHandler< Dart > tablePred(map,EDGE_ORBIT);
-	CellMarker m0(map, EDGE_CELL);
+	AutoAttributeHandler< Dart > tablePred(map,EDGE);
+	CellMarker m0(map, EDGE);
 
 	std::vector<Dart> dOrig;
 	std::vector<EMB> cOrig;
@@ -532,28 +532,28 @@ void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
 template <typename PFP>
 void reverseOrientation(typename PFP::MAP& map)
 {
-	AttributeHandler<unsigned int> emb0(&map, map.getEmbeddingAttributeVector(VERTEX_ORBIT)) ;
+	AttributeHandler<unsigned int> emb0(&map, map.getEmbeddingAttributeVector(VERTEX)) ;
 	if(emb0.isValid())
 	{
-		AttributeHandler<unsigned int> new_emb0 = map.template addAttribute<unsigned int>(DART_ORBIT, "new_EMB_0") ;
+		AttributeHandler<unsigned int> new_emb0 = map.template addAttribute<unsigned int>(DART, "new_EMB_0") ;
 		for(Dart d = map.begin(); d != map.end(); map.next(d))
 			new_emb0[d] = emb0[map.phi1(d)] ;
 		map.template swapAttributes<unsigned int>(emb0, new_emb0) ;
 		map.template removeAttribute<unsigned int>(new_emb0) ;
 	}
 
-	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
-	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART_ORBIT, "phi_1") ;
+	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART, "phi1") ;
+	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART, "phi_1") ;
 	map.template swapAttributes<Dart>(phi1, phi_1) ;
 }
 
 template <typename PFP>
 void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 {
-	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART_ORBIT, "phi1") ;
-	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART_ORBIT, "phi_1") ;
-	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi1") ;
-	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART_ORBIT, "new_phi_1") ;
+	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART, "phi1") ;
+	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART, "phi_1") ;
+	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART, "new_phi1") ;
+	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART, "new_phi_1") ;
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -568,7 +568,7 @@ void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 	map.template removeAttribute<Dart>(new_phi1) ;
 	map.template removeAttribute<Dart>(new_phi_1) ;
 
-	map.swapEmbeddingContainers(VERTEX_ORBIT, FACE_ORBIT) ;
+	map.swapEmbeddingContainers(VERTEX, FACE) ;
 
 	reverseOrientation<PFP>(map) ;
 }
@@ -601,9 +601,9 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AttributeHandler<VEC3> positionF = map.template getAttribute<VEC3>(FACE_ORBIT, "position") ;
+	AttributeHandler<VEC3> positionF = map.template getAttribute<VEC3>(FACE, "position") ;
 	if(!positionF.isValid())
-		positionF = map.template addAttribute<VEC3>(FACE_ORBIT, "position") ;
+		positionF = map.template addAttribute<VEC3>(FACE, "position") ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
 
 	computeDual<PFP>(map, selected);
@@ -612,7 +612,7 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 	position = positionF ;
 	positionF = tmp ;
 
-	CellMarker m(map, VERTEX_ORBIT) ;
+	CellMarker m(map, VERTEX) ;
 	m.markAll() ;
 
 	trianguleFaces<PFP>(map, position, positionF, selected);
@@ -719,8 +719,8 @@ void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
 				attributs[e] += attributs[f];
 				attributs[e] *= 0.5;
 
-				me.markOrbit(EDGE_ORBIT, d);
-				me.markOrbit(EDGE_ORBIT, e);
+				me.markOrbit(EDGE, d);
+				me.markOrbit(EDGE, e);
 			}
 
 		}while (dNext != *face);
@@ -746,7 +746,7 @@ void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
 	{
 
 		map.unsewFaces(map.phi1(*edge));
-		moe.markOrbit(DART_ORBIT,map.phi1(*edge));
+		moe.markOrbit(DART,map.phi1(*edge));
 	}
 
 	//Thourth pass : close the hole
@@ -881,7 +881,7 @@ void dooSabinVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
 				map.sewFaces(e2, map.phi1(map.phi1(ne)));
 
 				//marquage de l'orbite arete
-				me.markOrbit(EDGE_ORBIT,e);
+				me.markOrbit(EDGE,e);
 			}
 
 			e = map.phi1(e);

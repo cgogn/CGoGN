@@ -45,7 +45,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::T
 			unsigned int nb=0;
 			Dart dd=d;
 			do {
-				traite.markOrbit(DART_ORBIT,dd);
+				traite.markOrbit(DART,dd);
 				dd = map.phi1(dd);
 				nb++;
 			} while(dd!=d);
@@ -81,7 +81,7 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TV
 			unsigned int nb=0;
 			Dart dd=d;
 			do {
-				traite.markOrbit(DART_ORBIT,dd);
+				traite.markOrbit(DART,dd);
 				dd = map.phi1(dd);
 				nb++;
 			} while(dd!=d);

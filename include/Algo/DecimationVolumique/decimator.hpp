@@ -47,7 +47,7 @@ void decimate(
 	selector->init(approximator);
 
 	//Init nbCell in the mesh
-	unsigned int nbCell = map.getNbOrbits(VOLUME_ORBIT);
+	unsigned int nbCell = map.getNbOrbits(VOLUME);
 
 	CGoGNout << "nbCell = " << nbCell << CGoGNendl;
 

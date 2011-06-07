@@ -73,7 +73,7 @@ void explodeVolume_VBORender::updateData(typename PFP::MAP& map, const FunctorSe
 	{
 		if (good(d))
 		{
-			CellMarkerStore markVert(map, VERTEX_CELL);		//marker for vertices
+			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 			VEC3 center(0, 0, 0);
 			unsigned int nbv = 0;
 			unsigned int nbf = 0;

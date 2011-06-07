@@ -94,17 +94,17 @@ public:
 
 	virtual void next(Dart& d) ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f) ;
+	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f) ;
+	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f);
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f) ;
+	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0);
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f);
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f) ;
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0);
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f) ;
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
 	/***************************************************
 	 *               MAP MANIPULATION                  *

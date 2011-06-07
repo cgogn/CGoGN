@@ -267,7 +267,7 @@ void quadranguleVolumes(typename PFP::MAP& map, EMBV& attributs, const FunctorSe
 //					do
 //					{
 //						nbe++;
-//						m.markOrbit(DART_ORBIT,e);
+//						m.markOrbit(DART,e);
 //						ee=the_map.phi1(the_map.phi2(ee));
 //					}
 //					while (ee!=e);

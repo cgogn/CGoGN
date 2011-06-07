@@ -49,7 +49,7 @@ void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 
 	if (m_attIndex.map() != &map)
 	{
-		m_attIndex  = map.template addAttribute<unsigned int>(DART_ORBIT, "dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
@@ -62,11 +62,11 @@ void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv1(map, DART);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv11(map, DART);
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv2(map, DART);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -130,7 +130,7 @@ void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 				fv11[d] = f;
 				d = map.phi1(d);
 			}
-			mf.markOrbit(FACE_ORBIT, d);
+			mf.markOrbit(FACE, d);
 		}
 	}
 
@@ -191,7 +191,7 @@ void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 
 	if (m_attIndex.map() != &map)
 	{
-		m_attIndex  = map.template addAttribute<unsigned int>(DART_ORBIT, "dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
@@ -204,13 +204,13 @@ void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 	m_nbDarts = vecDarts.size();
 
 	// beta1
-	AutoAttributeHandler<VEC3> fv1(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv1(map, DART);
 	// beta2
-	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv2(map, DART);
 	// sommets du brin
-//	AutoAttributeHandler<VEC3> vert(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> vert(map, DART);
 	// 2ieme sommet du brin
-//	AutoAttributeHandler<VEC3> vert2(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> vert2(map, DART);
 
 	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[3]);
 	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -289,7 +289,7 @@ void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 
 				d = map.phi1(d);
 			}
-			mf.markOrbit(FACE_ORBIT, d);
+			mf.markOrbit(FACE, d);
 		}
 	}
 

@@ -49,7 +49,7 @@ public :
 	{}
 
 	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(2), crossCell(NO_CROSS)
+		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(FACE), crossCell(NO_CROSS)
 	{}
 
 	Dart getCell() { return d; }
@@ -79,9 +79,9 @@ public :
 		if(!Geom::arePointsEquals(newCurrent, m_position))
 		{
 			switch(state) {
-			case VERTEX_ORBIT : vertexState(newCurrent); break;
-			case EDGE_ORBIT : 	edgeState(newCurrent);   break;
-			case FACE_ORBIT : 	faceState(newCurrent);   break;
+			case VERTEX : vertexState(newCurrent); break;
+			case EDGE : 	edgeState(newCurrent);   break;
+			case FACE : 	faceState(newCurrent);   break;
 			}
 
 			display();

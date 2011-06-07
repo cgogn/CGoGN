@@ -67,7 +67,7 @@ namespace GL2
 //	{
 //		if (good(d))
 //		{
-//			CellMarkerStore markVert(map, VERTEX_CELL);		//marker for vertices
+//			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 //			VEC3 center(0, 0, 0);
 //			unsigned int nbv = 0;
 //			unsigned int nbf = 0;
@@ -107,13 +107,13 @@ namespace GL2
 //	}
 //
 //	// debut phi1
-//	AutoAttributeHandler<VEC3> fv1(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv1(map, DART);
 //	// fin phi1
-//	AutoAttributeHandler<VEC3> fv11(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv11(map, DART);
 //
 //	// phi2
-//	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
-//	AutoAttributeHandler<VEC3> fv2x(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv2(map, DART);
+//	AutoAttributeHandler<VEC3> fv2x(map, DART);
 //
 //	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
 //	glBufferDataARB(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -266,7 +266,7 @@ namespace GL2
 //	{
 //		if (good(d))
 //		{
-//			CellMarkerStore markVert(map, VERTEX_CELL);		//marker for vertices
+//			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 //			VEC3 center(0, 0, 0);
 //			unsigned int nbv = 0;
 //			unsigned int nbf = 0;
@@ -307,15 +307,15 @@ namespace GL2
 //	}
 //
 //	// sommets du brin
-////	AutoAttributeHandler<VEC3> vert(map, DART_ORBIT);
-////	AutoAttributeHandler<VEC3> vert2(map, DART_ORBIT);
+////	AutoAttributeHandler<VEC3> vert(map, DART);
+////	AutoAttributeHandler<VEC3> vert2(map, DART);
 //
 //	// debut phi1
-//	AutoAttributeHandler<VEC3> fv1(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv1(map, DART);
 //
 //	// phi2/3
-//	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
-//	AutoAttributeHandler<VEC3> fv2x(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv2(map, DART);
+//	AutoAttributeHandler<VEC3> fv2x(map, DART);
 //
 //	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
 //	glBufferDataARB(GL_ARRAY_BUFFER, 6*m_nbDarts*sizeof(GLfloat), 0, GL_STREAM_DRAW);
@@ -466,7 +466,7 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 
 	if (m_attIndex.map() != &map)
 	{
-		m_attIndex  = map.template addAttribute<unsigned int>(DART_ORBIT, "dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
 
 	m_nbDarts = 0;
@@ -486,7 +486,7 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	{
 		if (good(d))
 		{
-			CellMarkerStore markVert(map, VERTEX_CELL);		//marker for vertices
+			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 			VEC3 center(0, 0, 0);
 			unsigned int nbv = 0;
 			unsigned int nbf = 0;
@@ -526,13 +526,13 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	}
 
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv1(map, DART);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv11(map, DART);
 
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
-	AutoAttributeHandler<VEC3> fv2x(map, DART_ORBIT);
+	AutoAttributeHandler<VEC3> fv2(map, DART);
+	AutoAttributeHandler<VEC3> fv2x(map, DART);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -704,7 +704,7 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 //	{
 //		if (good(d))
 //		{
-//			CellMarkerStore markVert(map, VERTEX_CELL);		//marker for vertices
+//			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 //			VEC3 center(0, 0, 0);
 //			unsigned int nbv = 0;
 //			unsigned int nbf = 0;
@@ -745,15 +745,15 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 //	}
 //
 //	// sommets du brin
-////	AutoAttributeHandler<VEC3> vert(map, DART_ORBIT);
-////	AutoAttributeHandler<VEC3> vert2(map, DART_ORBIT);
+////	AutoAttributeHandler<VEC3> vert(map, DART);
+////	AutoAttributeHandler<VEC3> vert2(map, DART);
 //
 //	// debut phi1
-//	AutoAttributeHandler<VEC3> fv1(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv1(map, DART);
 //
 //	// phi2/3
-//	AutoAttributeHandler<VEC3> fv2(map, DART_ORBIT);
-//	AutoAttributeHandler<VEC3> fv2x(map, DART_ORBIT);
+//	AutoAttributeHandler<VEC3> fv2(map, DART);
+//	AutoAttributeHandler<VEC3> fv2x(map, DART);
 //
 //	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
 //	glBufferDataARB(GL_ARRAY_BUFFER, 6*m_nbDarts*sizeof(GLfloat), 0, GL_STREAM_DRAW);

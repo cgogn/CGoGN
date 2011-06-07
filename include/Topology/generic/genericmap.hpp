@@ -36,7 +36,7 @@ inline bool GenericMap::chechXmlNode(xmlNodePtr node, const std::string& name)
 
 inline Dart GenericMap::newDart()
 {
-	Dart d = Dart::create(m_attribs[DART_ORBIT].insertLine());
+	Dart d = Dart::create(m_attribs[DART].insertLine());
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		if (m_embeddings[i])
 			(*m_embeddings[i])[d.index] = EMBNULL ;
@@ -45,9 +45,9 @@ inline Dart GenericMap::newDart()
 
 inline void GenericMap::deleteDart(Dart d)
 {
-	m_attribs[DART_ORBIT].removeLine(d.index) ;
+	m_attribs[DART].removeLine(d.index) ;
 	for (unsigned int t = 0; t < m_nbThreads; ++t)
-		m_markerTables[DART_ORBIT][t]->operator[](d.index).clear() ;
+		m_markerTables[DART][t]->operator[](d.index).clear() ;
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
@@ -68,12 +68,12 @@ inline void GenericMap::deleteDart(Dart d)
 
 inline bool GenericMap::isDartValid(Dart d)
 {
-	return !d.isNil() && m_attribs[DART_ORBIT].used(d.index) ;
+	return !d.isNil() && m_attribs[DART].used(d.index) ;
 }
 
 inline unsigned int GenericMap::getNbDarts()
 {
-	return m_attribs[DART_ORBIT].size() ;
+	return m_attribs[DART].size() ;
 }
 
 /****************************************
@@ -82,7 +82,7 @@ inline unsigned int GenericMap::getNbDarts()
 
 inline bool GenericMap::isOrbitEmbedded(unsigned int orbit) const
 {
-	return (orbit == DART_ORBIT) || (m_embeddings[orbit] != NULL) ;
+	return (orbit == DART) || (m_embeddings[orbit] != NULL) ;
 }
 
 inline unsigned int GenericMap::nbEmbeddings() const
@@ -94,81 +94,30 @@ inline unsigned int GenericMap::nbEmbeddings() const
 	return nb ;
 }
 
-inline unsigned int GenericMap::getEmbedding(Dart d, unsigned int orbit)
+inline unsigned int GenericMap::getEmbedding(unsigned int orbit, Dart d)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 
-	if (orbit == DART_ORBIT)
-		return d.index;
-
-	unsigned int emb = (*m_embeddings[orbit])[d.index] ;
-	if(emb != EMBNULL)
-		return emb ;
-
-	class FunctorGetLazyEmb: public FunctorType
-	{
-	protected:
-		GenericMap& m_map;
-		unsigned int m_orbit;
-		AttributeMultiVector<unsigned int>* m_emb;
-		unsigned int m_val;
-		std::vector<Dart> m_darts;
-
-	public:
-		FunctorGetLazyEmb(GenericMap& map, unsigned int orbit):
-			m_map(map), m_orbit(orbit), m_val(EMBNULL)
-		{
-			m_emb = m_map.getEmbeddingAttributeVector(orbit) ;
-			m_darts.reserve(8) ;
-		}
-
-		bool operator()(Dart d)
-		{
-			if ((*m_emb)[d.index] != EMBNULL)
-			{
-				m_val = (*m_emb)[d.index];
-				return true;
-			}
-			m_darts.push_back(d);
-			return false;
-		}
-
-		unsigned int getVal()
-		{
-			if(m_val != EMBNULL)
-			{
-				AttributeContainer& cont = m_map.getAttributeContainer(m_orbit) ;
-				for(std::vector<Dart>::iterator it = m_darts.begin(); it != m_darts.end(); ++it)
-				{
-					(*m_emb)[it->index] = m_val;
-					cont.refLine(m_val) ;
-				}
-			}
-
-			return m_val;
-		}
-	};
-
-	FunctorGetLazyEmb fle(*this, orbit);
-	foreach_dart_of_orbit(orbit, d, fle);
-
-	return fle.getVal();
-}
-
-inline unsigned int GenericMap::getDartEmbedding(unsigned int orbit, Dart d)
-{
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-
-	if (orbit == DART_ORBIT)
+	if (orbit == DART)
 		return d.index;
 
 	return (*m_embeddings[orbit])[d.index] ;
 }
 
+//inline unsigned int GenericMap::getDartEmbedding(unsigned int orbit, Dart d)
+//{
+//	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
+//
+//	if (orbit == DART)
+//		return d.index;
+//
+//	return (*m_embeddings[orbit])[d.index] ;
+//}
+
 inline void GenericMap::copyDartEmbedding(unsigned int orbit, Dart d, Dart e)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	setDartEmbedding(orbit, d, getDartEmbedding(orbit, e));
+	setDartEmbedding(orbit, d, getEmbedding(orbit, e));
 }
 
 inline unsigned int GenericMap::newCell(unsigned int orbit)
@@ -188,7 +137,6 @@ inline unsigned int GenericMap::embedNewCell(unsigned int orbit, Dart d)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	unsigned int em = newCell(orbit);
-//	setDartEmbedding(orbit, d, em) ; // possible ?? utile ??
 	embedOrbit(orbit, d, em);
 	return em;
 }
@@ -196,14 +144,12 @@ inline unsigned int GenericMap::embedNewCell(unsigned int orbit, Dart d)
 inline void GenericMap::copyCell(unsigned int orbit, Dart d, Dart e)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	unsigned int dE = getEmbedding(d, orbit) ;
-	unsigned int eE = getEmbedding(e, orbit) ;
+	unsigned int dE = getEmbedding(orbit, d) ;
+	unsigned int eE = getEmbedding(orbit, e) ;
 	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
 	{
 		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-		{
 			dE = embedNewCell(orbit, d) ;
-		}
 		m_attribs[orbit].copyLine(dE, eE) ;	// copy the data
 	}
 }
@@ -211,7 +157,7 @@ inline void GenericMap::copyCell(unsigned int orbit, Dart d, Dart e)
 inline void GenericMap::copyCell(unsigned int orbit, unsigned int i, unsigned int j)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-	m_attribs[orbit].copyLine(i,j) ;
+	m_attribs[orbit].copyLine(i, j) ;
 }
 
 inline void GenericMap::initCell(unsigned int orbit, unsigned int i)
@@ -243,7 +189,7 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVect
 inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
 {
 	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
-	assert((orbit1 != DART_ORBIT && orbit2 != DART_ORBIT) || !"Cannot swap the darts container") ;
+	assert((orbit1 != DART && orbit2 != DART) || !"Cannot swap the darts container") ;
 
 	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
 	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
@@ -285,17 +231,17 @@ inline void GenericMap::releaseMarker(Marker m, unsigned int thread)
 
 inline Dart GenericMap::begin()
 {
-	return Dart::create(m_attribs[DART_ORBIT].begin());
+	return Dart::create(m_attribs[DART].begin());
 }
 
 inline Dart GenericMap::end()
 {
-	return Dart::create(m_attribs[DART_ORBIT].end()) ;
+	return Dart::create(m_attribs[DART].end()) ;
 }
 
 inline void GenericMap::next(Dart& d)
 {
-	m_attribs[DART_ORBIT].next(d.index) ;
+	m_attribs[DART].next(d.index) ;
 }
 
 } //namespace CGoGN

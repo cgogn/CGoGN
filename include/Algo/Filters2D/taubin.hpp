@@ -40,7 +40,7 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;
 
-	CellMarkerNoUnmark mv(map, VERTEX_CELL);
+	CellMarkerNoUnmark mv(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))

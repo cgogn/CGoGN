@@ -163,14 +163,14 @@ template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void setupVariables(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, CellMarker& lm, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index)
 {
 	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(m, s, lm, attr, index) ;
-	m.foreach_orbit(VERTEX_ORBIT, fmts) ;
+	m.foreach_orbit(VERTEX, fmts) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void setupVariables(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, CellMarker& lm, const AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index)
 {
 	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(m, s, lm, attr, coord, index) ;
-	m.foreach_orbit(VERTEX_ORBIT, fmts) ;
+	m.foreach_orbit(VERTEX, fmts) ;
 }
 
 template <class SOLVER_TRAITS>
@@ -242,14 +242,14 @@ template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void getResult(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index)
 {
 	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(m, s, attr, index) ;
-	m.foreach_orbit(VERTEX_ORBIT, fstm) ;
+	m.foreach_orbit(VERTEX, fstm) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void getResult(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index)
 {
 	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(m, s, attr, coord, index) ;
-	m.foreach_orbit(VERTEX_ORBIT, fstm) ;
+	m.foreach_orbit(VERTEX, fstm) ;
 }
 
 } // namespace LinearSolving

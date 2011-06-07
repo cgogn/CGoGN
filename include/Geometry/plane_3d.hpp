@@ -106,7 +106,7 @@ T Plane3D<T>::distance(const Vector<3,T>& p) const
 template <typename T>
 void Plane3D<T>::project(Vector<3,T>& p) const
 {
-#define PRECISION 1e-20
+#define PRECISION 1e-5
 	T d = -distance(p) ;
 	if(abs(d) > PRECISION)
 	{
@@ -119,7 +119,7 @@ void Plane3D<T>::project(Vector<3,T>& p) const
 template <typename T>
 Orientation3D Plane3D<T>::orient(const Vector<3,T>& p) const
 {
-#define PRECISION 1e-20
+#define PRECISION 1e-5
 	T dist = distance(p) ;
 	if(dist < -PRECISION)
 		return UNDER ;

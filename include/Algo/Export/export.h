@@ -84,6 +84,13 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const typename PFP::TREAL errL2 = AttributeHandler<typename PFP::REAL>(), const typename PFP::TREAL errLmax = AttributeHandler<typename PFP::REAL>(), const typename PFP::TREAL stdDev = AttributeHandler<typename PFP::REAL>(), const FunctorSelect& good = SelectorTrue()) ;
 
+
+/**
+ *  export pout l'InESS
+ */
+template <typename PFP>
+bool exportInESS(typename PFP::MAP& map, const char *filename, const typename PFP::TVEC3& position);
+
 } // namespace Export
 
 } // namespace Algo

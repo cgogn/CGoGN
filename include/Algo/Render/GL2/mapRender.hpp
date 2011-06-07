@@ -48,9 +48,9 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
 	do
 	{
-		tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
-		tableIndices.push_back(map.getEmbedding(b, VERTEX_ORBIT));
-		tableIndices.push_back(map.getEmbedding(c, VERTEX_ORBIT));
+		tableIndices.push_back(map.getEmbedding(VERTEX, d));
+		tableIndices.push_back(map.getEmbedding(VERTEX, b));
+		tableIndices.push_back(map.getEmbedding(VERTEX, c));
 		b = c;
 		c = map.phi1(b);
 	} while (c != d);
@@ -68,7 +68,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good,
 		if(!m.isMarked(dd) && good(dd))
 		{
 			addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE_ORBIT, dd);
+			m.markOrbit(FACE, dd);
 		}
 	}
 }
@@ -91,7 +91,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 
 			if(good(dd))
 				addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE_ORBIT, dd);
+			m.markOrbit(FACE, dd);
 			bound.push_back(dd);
 			int nb = 1;
 			do
@@ -107,7 +107,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 						{
 							if(good(f))
 								addTri<PFP>(map, f, tableIndices);
-							m.markOrbit(FACE_ORBIT, f);
+							m.markOrbit(FACE, f);
 							bound.push_back(map.phi1(f));
 							++nb;
 							if (nb > LIST_SIZE)
@@ -139,9 +139,9 @@ void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std
 	{
 		if(!m.isMarked(d) && good(d))
 		{
-			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
-			tableIndices.push_back(map.getEmbedding(map.phi2(d), VERTEX_ORBIT));
-			m.markOrbit(EDGE_ORBIT, d);
+			tableIndices.push_back(map.getEmbedding(VERTEX, d));
+			tableIndices.push_back(map.getEmbedding(VERTEX, map.phi2(d)));
+			m.markOrbit(EDGE, d);
 		}
 	}
 }
@@ -172,10 +172,10 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 					if (!m.isMarked(ee))
 					{
 						if(good(ee))
-							tableIndices.push_back(map.getEmbedding(ee, VERTEX_ORBIT));
+							tableIndices.push_back(map.getEmbedding(VERTEX, ee));
 						if(good(f))
-							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX_ORBIT));
-						m.markOrbit(EDGE_ORBIT, f);
+							tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(ee)));
+						m.markOrbit(EDGE, f);
 
 						bound.push_back(f);
 						++nb;
@@ -198,14 +198,14 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 template<typename PFP>
 void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	CellMarker m(map, VERTEX_ORBIT, thread) ;
+	CellMarker m(map, VERTEX, thread) ;
 	tableIndices.reserve(map.getNbDarts() / 5);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(!m.isMarked(d) && good(d))
 		{
-			tableIndices.push_back(map.getEmbedding(d, VERTEX_ORBIT));
+			tableIndices.push_back(map.getEmbedding(VERTEX, d));
 			m.mark(d) ;
 		}
 	}

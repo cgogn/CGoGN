@@ -140,7 +140,7 @@ void MyQT::slider_explode(int x)
 int main(int argc, char **argv)
 {
 	/// Utilisation des Marker
-	position = myMap.addAttribute<Geom::Vec3f>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");
 
 	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
 	Dart d2 = prim3.tore_topo(16, 24);
@@ -158,15 +158,15 @@ int main(int argc, char **argv)
 //	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
 //	d3 = myMap.phi1(d3);
 
-//	unsigned int idAttV2 = myMap.addAttribute<float>(VERTEX_ORBIT,"reel");
-//	PFP::AttributeHandler<float> tableReels(idAttV2,VERTEX_ORBIT,myMap);
+//	unsigned int idAttV2 = myMap.addAttribute<float>(VERTEX,"reel");
+//	PFP::AttributeHandler<float> tableReels(idAttV2,VERTEX,myMap);
 //
 //	tableReels[d2] = 3.5f;
 //	tableReels[myMap.phi1(d2)] = 3.7f;
 //
 //	// Attention ici on cree un attribut de FACE donc les face sont maintenant plangees
 //	// l'attribut cree se detruira a la fin de la portee de l'objet
-//	PFP::MAP::AutoAttributeHandler<Geom::Vec3f> tableRGB(myMap, FACE_ORBIT, "RGB"); // "RGB" optionnel
+//	PFP::MAP::AutoAttributeHandler<Geom::Vec3f> tableRGB(myMap, FACE, "RGB"); // "RGB" optionnel
 //
 //	tableRGB[d3] = Geom::Vec3f(1.0f,2.0f,3.0f);
 //
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 //		CGoGNout << "RGB["<<id<<"] = "<<tableRGB.at(id)<<CGoGNendl;
 //	}
 
-	CellMarkerStore cm(myMap, VERTEX_ORBIT);
+	CellMarkerStore cm(myMap, VERTEX);
 
 	Dart d3 = myMap.phi1(d2);
 	cm.mark(d2);

@@ -88,6 +88,24 @@ void Map2::cutEdge(Dart d)
 	}
 }
 
+void Map2::uncutEdge(Dart d)
+{
+	assert(vertexDegree(phi1(d)) == 2) ;
+	Dart ne = phi2(d) ;
+	if(ne == d)
+		collapseEdge(d) ;
+	else
+	{
+		Dart nd = phi1(d) ;
+		Dart e = phi_1(ne) ;
+		phi2unsew(e) ;
+		phi2unsew(d) ;
+		Map1::collapseEdge(nd) ;
+		Map1::collapseEdge(ne) ;
+		phi2sew(d, e) ;
+	}
+}
+
 Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 	Dart resV ;
@@ -108,11 +126,11 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 
 		if (f != e && delDegenerateFaces)
 		{
-			Map1::collapseEdge(e);		// Collapse edge e
-			collapseDegeneratedFace(f);	// and collapse its face if degenerated
+			Map1::collapseEdge(e) ;		// Collapse edge e
+			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 		}
 		else
-			Map1::collapseEdge(e);	// Just collapse edge e
+			Map1::collapseEdge(e) ;	// Just collapse edge e
 	}
 
 	Dart f = phi1(d) ;
@@ -130,11 +148,11 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 
 	if (f != d && delDegenerateFaces)
 	{
-		Map1::collapseEdge(d);		// Collapse edge d
-		collapseDegeneratedFace(f);	// and collapse its face if degenerated
+		Map1::collapseEdge(d) ;		// Collapse edge d
+		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
-		Map1::collapseEdge(d);	// Just collapse edge d
+		Map1::collapseEdge(d) ;	// Just collapse edge d
 
 	return resV ;
 }
@@ -348,7 +366,7 @@ void Map2::closeMap(DartMarker& marker)
 		if (phi2(d) == d)
 		{
 			closeHole(d);
-			marker.markOrbit(FACE_ORBIT, phi2(d)) ;
+			marker.markOrbit(FACE, phi2(d)) ;
 		}
 	}
 }
@@ -447,7 +465,7 @@ bool Map2::isTriangular()
 	{
 		if(!m.isMarked(d))
 		{
-			m.markOrbit(FACE_ORBIT, d) ;
+			m.markOrbit(FACE, d) ;
 			Dart dd = d ;
 			bool t = isFaceTriangle(d) ;
 			if(!t)
@@ -571,7 +589,7 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 
 bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
 {
-	if(orbit == VERTEX_ORBIT)
+	if(orbit == VERTEX)
 	{
 
 		Dart dNext = d;
@@ -585,7 +603,7 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsi
 
 		return false;
 	}
-	else if(orbit == FACE_ORBIT)
+	else if(orbit == FACE)
 	{
 		if(Map1::foreach_dart_of_face(d,f,thread))
 			return true;
@@ -601,7 +619,7 @@ bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsi
 
 bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
 {
-	if(orbit == VERTEX_ORBIT)
+	if(orbit == VERTEX)
 	{
 		Dart dNext = d;
 		do
@@ -614,7 +632,7 @@ bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsi
 
 		return false;
 	}
-	else if(orbit == FACE_ORBIT)
+	else if(orbit == FACE)
 	{
 		if(Map2::foreach_dart_of_vertex(phi_1(d),f,thread))
 			return true;

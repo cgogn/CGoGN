@@ -160,7 +160,7 @@ inline void ImplicitHierarchicalMap::next(Dart& d)
 	} while(d != Map2::end() && m_dartLevel[d] > m_curLevel) ;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
 	do
@@ -172,7 +172,7 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_vertex(Dart d, FunctorType&
  	return false;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_edge(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d))
 		return true;
@@ -184,7 +184,7 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_edge(Dart d, FunctorType& f
 		return false;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_face(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d ;
 	do
@@ -196,12 +196,12 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_face(Dart d, Funct
 	return false ;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_face(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	return foreach_dart_of_oriented_face(d, f) ;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_volume(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mark(*this);	// Lock a marker
 	bool found = false;				// Last functor return value
@@ -237,12 +237,12 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_oriented_volume(Dart d, Fun
 	return found;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_volume(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
 {
 	return foreach_dart_of_oriented_volume(d, f) ;
 }
 
-inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f)
+inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	return foreach_dart_of_oriented_volume(d, f) ;
 }
@@ -254,12 +254,12 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f)
 inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
 {
 	EmbeddedMap2<Map2>::splitFace(d, e) ;
-	if(isOrbitEmbedded(FACE_ORBIT))
+	if(isOrbitEmbedded(FACE))
 	{
 		unsigned int cur = m_curLevel ;
 		m_curLevel = m_maxLevel ;
-		this->embedOrbit(FACE_ORBIT, d, this->getDartEmbedding(FACE_ORBIT, d)) ;
-		this->embedOrbit(FACE_ORBIT, e, this->getDartEmbedding(FACE_ORBIT, e)) ;
+		this->embedOrbit(FACE, d, this->getEmbedding(FACE, d)) ;
+		this->embedOrbit(FACE, e, this->getEmbedding(FACE, e)) ;
 		m_curLevel = cur ;
 	}
 }
@@ -345,7 +345,7 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(d, orbit) ;
+	unsigned int index = m->getEmbedding(orbit, d) ;
 
 	if(index == EMBNULL)
 	{
@@ -381,7 +381,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(d, orbit) ;
+	unsigned int index = m->getEmbedding(orbit, d) ;
 
 	unsigned int step = 0 ;
 	while(step < nbSteps)

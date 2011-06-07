@@ -223,7 +223,7 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
  * Traverse cells of a map in parallel. Use embedding marker
  * Functor application must be independant
  * @param map the map
- * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param orbit the cell (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of thread to use (use twice as threads of processor)
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)

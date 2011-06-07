@@ -41,7 +41,7 @@ void computeLaplacianVertices(
 		typename PFP::TVEC3& laplacian,
 		const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX_CELL);
+	CellMarker marker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))

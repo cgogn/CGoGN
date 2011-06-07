@@ -390,8 +390,8 @@ int main(int argc, char **argv)
 {
 	myGlutWin mgw(&argc,argv,800,800);
 
-	mgw.idAttr_Position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position", "Geom::Vec3f") ;
-	mgw.idAttr_Normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal", "Geom::Vec3f") ;
+	mgw.idAttr_Position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position", "Geom::Vec3f") ;
+	mgw.idAttr_Normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal", "Geom::Vec3f") ;
 	AttributeHandler<PFP::VEC3> tablePositions(myMap, mgw.idAttr_Position) ;
 
 	PFP::VEC3 gMax;

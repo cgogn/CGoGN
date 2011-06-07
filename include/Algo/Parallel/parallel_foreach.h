@@ -86,7 +86,7 @@ public:
  * Traverse orbits of a map in parallel. Use topological marker
  * Functor application must be independant
  * @param map the map
- * @param orbit the orbit (VERTEX_ORBIT/EDGE_ORBIT/FACE_ORBIT/..
+ * @param orbit the orbit (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of thread to use
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
@@ -101,7 +101,7 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
  * Traverse cells of a map in parallel. Use embedding marker
  * Functor application must be independant
  * @param map the map
- * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param orbit the cell (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of threads
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
@@ -131,7 +131,7 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
  * Traverse orbits of a map in parallel. Use topo marker
  * Use this version if you want to store a result for traversal (sum, average, max, etc..)
  * @param map the map
- * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param orbit the cell (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of threads
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
@@ -146,7 +146,7 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
  * Traverse cells of a map in parallel. Use embedding marker
  * Use this version if you want to store a result for traversal (sum, average, max, etc..)
  * @param map the map
- * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param orbit the cell (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of threads
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
@@ -161,7 +161,7 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
  * Traverse cells of a map in parallel. Use embedding marker
  * Use this version if you want to store a result for traversal (sum, average, max, etc..)
  * @param map the map
- * @param orbit the cell (VERTEX_CELL/EDGE_CELL/FACE_CELL/..
+ * @param orbit the cell (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of threads
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)

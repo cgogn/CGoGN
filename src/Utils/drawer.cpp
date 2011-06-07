@@ -79,6 +79,9 @@ void Drawer::begin(GLenum mode)
 
 void Drawer::end()
 {
+	if (m_begins.empty())
+		return;
+
 	m_begins.back().nb = m_dataPos.size() - m_begins.back().begin;
 }
 
@@ -124,6 +127,9 @@ void Drawer::newList(GLenum comp)
 void Drawer::endList()
 {
 	unsigned int nbElts = m_dataPos.size();
+	
+	if (nbElts == 0)
+		return;
 
 	m_vboPos->bind();
 	glBufferData(GL_ARRAY_BUFFER, nbElts * sizeof(Geom::Vec3f), &(m_dataPos[0]), GL_STREAM_DRAW);

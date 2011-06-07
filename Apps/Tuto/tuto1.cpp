@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 
 	// creation of a new attribute on vertices of type 3D vector
 	// a handler to this attribute is returned
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
 	// affect a position to the vertices of the mesh
 	position[d1] = PFP::VEC3(0, 0, 0);

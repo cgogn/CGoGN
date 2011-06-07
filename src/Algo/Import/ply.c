@@ -40,6 +40,7 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <string.h>
 #include "Algo/Import/ply.h"
 
+
 char *type_names[] = {  /* names of scalar types */
 "invalid",
 "int8", "int16", "int32", "uint8", "uint16", "uint32", "float32", "float64",
@@ -1674,7 +1675,7 @@ void write_scalar_type (FILE *fp, int code)
 {
   /* make sure this is a valid code */
 
-  if (code <= StartType || code >= EndType) {
+  if (code <= PLY_StartType || code >= PLY_EndType) {
     fprintf (stderr, "write_scalar_type: bad data code = %d\n", code);
     exit (-1);
   }
@@ -1825,35 +1826,35 @@ double get_item_value(char *item, int type)
   double double_value;
 
   switch (type) {
-    case Int8:
+    case PLY_Int8:
       pchar = (char *) item;
       int_value = *pchar;
       return ((double) int_value);
-    case Uint8:
+    case PLY_Uint8:
       puchar = (unsigned char *) item;
       int_value = *puchar;
       return ((double) int_value);
-    case Int16:
+    case PLY_Int16:
       pshort = (short int *) item;
       int_value = *pshort;
       return ((double) int_value);
-    case Uint16:
+    case PLY_Uint16:
       pushort = (unsigned short int *) item;
       int_value = *pushort;
       return ((double) int_value);
-    case Int32:
+    case PLY_Int32:
       pint = (int *) item;
       int_value = *pint;
       return ((double) int_value);
-    case Uint32:
+    case PLY_Uint32:
       puint = (unsigned int *) item;
       uint_value = *puint;
       return ((double) uint_value);
-    case Float32:
+    case PLY_Float32:
       pfloat = (float *) item;
       double_value = *pfloat;
       return (double_value);
-    case Float64:
+    case PLY_Float64:
       pdouble = (double *) item;
       double_value = *pdouble;
       return (double_value);
@@ -1892,33 +1893,33 @@ void write_binary_item(
   float float_val;
 
   switch (type) {
-    case Int8:
+    case PLY_Int8:
       char_val = int_val;
       fwrite (&char_val, 1, 1, fp);
       break;
-    case Int16:
+    case PLY_Int16:
       short_val = int_val;
       fwrite (&short_val, 2, 1, fp);
       break;
-    case Int32:
+    case PLY_Int32:
       fwrite (&int_val, 4, 1, fp);
       break;
-    case Uint8:
+    case PLY_Uint8:
       uchar_val = uint_val;
       fwrite (&uchar_val, 1, 1, fp);
       break;
-    case Uint16:
+    case PLY_Uint16:
       ushort_val = uint_val;
       fwrite (&ushort_val, 2, 1, fp);
       break;
-    case Uint32:
+    case PLY_Uint32:
       fwrite (&uint_val, 4, 1, fp);
       break;
-    case Float32:
+    case PLY_Float32:
       float_val = (float) double_val;
       fwrite (&float_val, 4, 1, fp);
       break;
-    case Float64:
+    case PLY_Float64:
       fwrite (&double_val, 8, 1, fp);
       break;
     default:
@@ -1948,18 +1949,18 @@ void write_ascii_item(
 )
 {
   switch (type) {
-    case Int8:
-    case Int16:
-    case Int32:
+    case PLY_Int8:
+    case PLY_Int16:
+    case PLY_Int32:
       fprintf (fp, "%d ", int_val);
       break;
-    case Uint8:
-    case Uint16:
-    case Uint32:
+    case PLY_Uint8:
+    case PLY_Uint16:
+    case PLY_Uint32:
       fprintf (fp, "%u ", uint_val);
       break;
-    case Float32:
-    case Float64:
+    case PLY_Float32:
+    case PLY_Float64:
       fprintf (fp, "%g ", double_val);
       break;
     default:
@@ -1992,42 +1993,42 @@ void get_stored_item(
 )
 {
   switch (type) {
-    case Int8:
+    case PLY_Int8:
       *int_val = *((char *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint8:
+    case PLY_Uint8:
       *uint_val = *((unsigned char *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Int16:
+    case PLY_Int16:
       *int_val = *((short int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint16:
+    case PLY_Uint16:
       *uint_val = *((unsigned short int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Int32:
+    case PLY_Int32:
       *int_val = *((int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint32:
+    case PLY_Uint32:
       *uint_val = *((unsigned int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Float32:
+    case PLY_Float32:
       *double_val = *((float *) ptr);
       *int_val = *double_val;
       *uint_val = *double_val;
       break;
-    case Float64:
+    case PLY_Float64:
       *double_val = *((double *) ptr);
       *int_val = *double_val;
       *uint_val = *double_val;
@@ -2067,49 +2068,49 @@ void get_binary_item(
   ptr = (void *) c;
 
   switch (type) {
-    case Int8:
+    case PLY_Int8:
       fread (ptr, 1, 1, fp);
       *int_val = *((char *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint8:
+    case PLY_Uint8:
       fread (ptr, 1, 1, fp);
       *uint_val = *((unsigned char *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Int16:
+    case PLY_Int16:
       fread (ptr, 2, 1, fp);
       *int_val = *((short int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint16:
+    case PLY_Uint16:
       fread (ptr, 2, 1, fp);
       *uint_val = *((unsigned short int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Int32:
+    case PLY_Int32:
       fread (ptr, 4, 1, fp);
       *int_val = *((int *) ptr);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
-    case Uint32:
+    case PLY_Uint32:
       fread (ptr, 4, 1, fp);
       *uint_val = *((unsigned int *) ptr);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
-    case Float32:
+    case PLY_Float32:
       fread (ptr, 4, 1, fp);
       *double_val = *((float *) ptr);
       *int_val = *double_val;
       *uint_val = *double_val;
       break;
-    case Float64:
+    case PLY_Float64:
       fread (ptr, 8, 1, fp);
       *double_val = *((double *) ptr);
       *int_val = *double_val;
@@ -2145,24 +2146,24 @@ void get_ascii_item(
 )
 {
   switch (type) {
-    case Int8:
-    case Uint8:
-    case Int16:
-    case Uint16:
-    case Int32:
+    case PLY_Int8:
+    case PLY_Uint8:
+    case PLY_Int16:
+    case PLY_Uint16:
+    case PLY_Int32:
       *int_val = atoi (word);
       *uint_val = *int_val;
       *double_val = *int_val;
       break;
 
-    case Uint32:
+    case PLY_Uint32:
       *uint_val = strtoul (word, (char **) NULL, 10);
       *int_val = *uint_val;
       *double_val = *uint_val;
       break;
 
-    case Float32:
-    case Float64:
+    case PLY_Float32:
+    case PLY_Float64:
       *double_val = atof (word);
       *int_val = (int) *double_val;
       *uint_val = (unsigned int) *double_val;
@@ -2206,34 +2207,34 @@ void store_item (
   double *pdouble;
 
   switch (type) {
-    case Int8:
+    case PLY_Int8:
       *item = int_val;
       break;
-    case Uint8:
+    case PLY_Uint8:
       puchar = (unsigned char *) item;
       *puchar = uint_val;
       break;
-    case Int16:
+    case PLY_Int16:
       pshort = (short *) item;
       *pshort = int_val;
       break;
-    case Uint16:
+    case PLY_Uint16:
       pushort = (unsigned short *) item;
       *pushort = uint_val;
       break;
-    case Int32:
+    case PLY_Int32:
       pint = (int *) item;
       *pint = int_val;
       break;
-    case Uint32:
+    case PLY_Uint32:
       puint = (unsigned int *) item;
       *puint = uint_val;
       break;
-    case Float32:
+    case PLY_Float32:
       pfloat = (float *) item;
       *pfloat = (float) double_val;
       break;
-    case Float64:
+    case PLY_Float64:
       pdouble = (double *) item;
       *pdouble = double_val;
       break;
@@ -2291,12 +2292,12 @@ int get_prop_type(char *type_name)
   int i;
 
   /* try to match the type name */
-  for (i = StartType + 1; i < EndType; i++)
+  for (i = PLY_StartType + 1; i < PLY_EndType; i++)
     if (equal_strings (type_name, type_names[i]))
       return (i);
 
   /* see if we can match an old type name */
-  for (i = StartType + 1; i < EndType; i++)
+  for (i = PLY_StartType + 1; i < PLY_EndType; i++)
     if (equal_strings (type_name, old_type_names[i]))
       return (i);
 
@@ -2332,8 +2333,8 @@ void add_property (PlyFile *plyfile, char **words, int nwords)
     prop->is_list = PLY_LIST;
   }
   else if (equal_strings (words[1], "string")) {   /* string */
-    prop->count_external = Int8;
-    prop->external_type = Int8;
+    prop->count_external = PLY_Int8;
+    prop->external_type = PLY_Int8;
     prop->name = strdup (words[2]);
     prop->is_list = PLY_STRING;
   }
@@ -3316,4 +3317,5 @@ int matches_rule_name (char *name)
 
   return (0);
 }
+
 

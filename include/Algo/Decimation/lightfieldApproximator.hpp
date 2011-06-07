@@ -49,12 +49,12 @@ template <typename PFP>
 bool Approximator_RGBfunctionsHalf<PFP>::init()
 {
 	// get actual frames and hypothetical approximated frames
-	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX_ORBIT, "frame") ;
-	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE_ORBIT, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "quadricRGBfunctions") ;
+	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX, "frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
 
 	MapBrowserLinkedAuto<typename PFP::MAP> mb(this->m_map) ;
-	this->m_map.foreach_orbit(EDGE_ORBIT, mb) ;
+	this->m_map.foreach_orbit(EDGE, mb) ;
 
 	// create quadric embedding for computing and set them to 0
 	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))
@@ -128,8 +128,8 @@ void Approximator_RGBfunctionsHalf<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_Frame<PFP>::init()
 {
-	m_position = this->m_map.template getAttribute<VEC3>(VERTEX_ORBIT, "position") ;
-	m_approxPosition = this->m_map.template getAttribute<VEC3>(EDGE_ORBIT, "approx_position") ;
+	m_position = this->m_map.template getAttribute<VEC3>(VERTEX, "position") ;
+	m_approxPosition = this->m_map.template getAttribute<VEC3>(EDGE, "approx_position") ;
 
 	if (!m_position.isValid() || !m_approxPosition.isValid())
 	{
@@ -192,12 +192,12 @@ template <typename PFP>
 bool Approximator_RGBfunctions<PFP>::init()
 {
 	// get actual frames and hypothetical approximated frames
-	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX_ORBIT, "frame") ;
-	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE_ORBIT, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE_ORBIT, "quadricRGBfunctions") ;
+	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX, "frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
 
 	MapBrowserLinkedAuto<typename PFP::MAP> mb(this->m_map) ;
-	this->m_map.foreach_orbit(EDGE_ORBIT, mb) ;
+	this->m_map.foreach_orbit(EDGE, mb) ;
 
 	// create quadric embedding for computing and set them to 0
 	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))

@@ -34,26 +34,27 @@
 #include <map>
 
 
-#define EMBNULL 0xffffffff
-
-#define NB_ORBITS 5
-#define NBTHREAD 16
-
-#define VERTEX_ORBIT	(unsigned int)(0)
-#define EDGE_ORBIT		(unsigned int)(1)
-#define FACE_ORBIT		(unsigned int)(2)
-#define VOLUME_ORBIT	(unsigned int)(3)
-#define DART_ORBIT		(unsigned int)(4)
-
-
 #include "Container/attributeContainer.h"
 #include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
 
-
 namespace CGoGN
 {
+
+/*
+const unsigned int EMBNULL = 0xffffffff;
+
+const unsigned int NB_ORBITS = 6;
+const unsigned int NB_THREAD = 16;
+
+const unsigned int VERTEX	= 0;
+const unsigned int EDGE		= 1;
+const unsigned int ORIENTED_FACE= 2;
+const unsigned int FACE		= 3;
+const unsigned int VOLUME	= 4;
+const unsigned int DART		= 5;
+*/
 
 /**
  * Class that allows to browse a map
@@ -72,9 +73,7 @@ public:
 
 class GenericMap : public MapBrowser
 {
-	friend class DartMarker ;
-	friend class DartMarkerStore ;
-	friend class DartMarkerNoUnmark ;
+	friend class DartMarkerGen ;
 
 	template<typename T> friend class AutoAttributeHandler ;
 
@@ -95,12 +94,12 @@ protected:
 	/**
 	 * Markers manager
 	 */
-	MarkerSet m_orbMarker[NB_ORBITS][NBTHREAD] ;
+	MarkerSet m_orbMarker[NB_ORBITS][NB_THREAD] ;
 
 	/**
 	 * Direct access to the attributes that store Marks
 	 */
-	AttributeMultiVector<Mark>* m_markerTables[NB_ORBITS][NBTHREAD];
+	AttributeMultiVector<Mark>* m_markerTables[NB_ORBITS][NB_THREAD];
 
 	unsigned int m_nbThreads;
 
@@ -148,7 +147,7 @@ public:
 	bool isOrbitEmbedded(unsigned int orbit) const;
 
 	/**
-	 * return the number of embedded orbits (including DART_ORBIT)
+	 * return the number of embedded orbits (including DART)
 	 */
 	unsigned int nbEmbeddings() const;
 
@@ -157,12 +156,12 @@ public:
 	 * (can go through the whole orbit due to lazy embedding)
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
-	unsigned int getEmbedding(Dart d, unsigned int orbit);
+	unsigned int getEmbedding(unsigned int orbit, Dart d);
 
-	/**
-	 * Get the cell index of the given dimension associated to dart d
-	 */
-	unsigned int getDartEmbedding(unsigned int orbit, Dart d);
+//	/**
+//	 * Get the cell index of the given dimension associated to dart d
+//	 */
+//	unsigned int getDartEmbedding(unsigned int orbit, Dart d);
 
 	/**
 	 * Set the cell index of the given dimension associated to dart d
@@ -272,7 +271,7 @@ protected:
 	 * @param orbit the orbit of cell to use (xxx_ORBIT)
 	 * @return the marker to use
 	 */
-	Marker getNewMarker(unsigned int cell = DART_ORBIT, unsigned int thread = 0);
+	Marker getNewMarker(unsigned int cell = DART, unsigned int thread = 0);
 
 	/**
 	 * release a marker of cell.
@@ -386,6 +385,7 @@ public:
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
 	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
@@ -412,11 +412,12 @@ bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, Fu
 {
 	switch(orbit)
 	{
-		case  DART_ORBIT: return f(d);
-		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread);
-		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread);
-		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread);
-		case  VOLUME_ORBIT: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread);
+		case  DART: return f(d);
+		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread);
+		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread);
+		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread);
+		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread);
+		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}
 	return false;
@@ -427,11 +428,12 @@ bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, F
 {
 	switch(orbit)
 	{
-		case  DART_ORBIT: return f(d);
-		case  VERTEX_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread);
-		case  EDGE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread);
-		case  FACE_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread);
-		case  VOLUME_ORBIT: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread);
+		case  DART: return f(d);
+		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread);
+		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread);
+		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread);
+		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread);
+		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");
 	}
 	return false;

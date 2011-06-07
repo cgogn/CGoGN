@@ -40,10 +40,10 @@ SimplifTrian<PFP>::SimplifTrian(MAP& the_map, unsigned int idPos, CRIT* cr):
 	m_map(the_map),
 	m_crit(cr),
 	m_positions(the_map, idPos),
-	m_edgeEmb(the_map, EDGE_ORBIT),
-	m_valences(the_map, VERTEX_ORBIT),
-	m_edgeMarkers(the_map, EDGE_ORBIT << 24),
-	m_protectMarker(the_map, EDGE_CELL),
+	m_edgeEmb(the_map, EDGE),
+	m_valences(the_map, VERTEX),
+	m_edgeMarkers(the_map, EDGE << 24),
+	m_protectMarker(the_map, EDGE),
 	m_passe(0)
 {
 	computeVerticesValences(false);
@@ -67,7 +67,7 @@ SimplifTrian<PFP>::SimplifTrian(MAP& the_map, unsigned int idPos, CRIT* cr):
 			m_edgeEmb[d] = it;
 
 			// mark cell for traversal
-			m.markOrbit(EDGE_ORBIT, d);
+			m.markOrbit(EDGE, d);
 		}
 	}
 }
@@ -101,7 +101,7 @@ void SimplifTrian<PFP>::changeCriteria(CRIT* cr)
 			m_edgeEmb[d] = it;
 
 			// mark cell for traversal
-			m.markOrbit(EDGE_ORBIT, d);
+			m.markOrbit(EDGE, d);
 		}
 	}
 }
@@ -174,8 +174,8 @@ void SimplifTrian<PFP>::updateCriterias(Dart d)
 		float key = cr->computeKey(m_map, m_positions);
 		CRIT_IT it = m_edgeCrit.insert(std::make_pair(key,cr));
 		// store iterator on edge
-		unsigned int em = m_map.getEmbedding(d, EDGE_ORBIT);
-		m_map.embedOrbit(EDGE_ORBIT, d, em);
+		unsigned int em = m_map.getEmbedding(d, EDGE);
+		m_map.embedOrbit(EDGE, d, em);
 		m_edgeEmb[em] = it;
 
 		m_protectMarker.mark(em) ;
@@ -234,8 +234,8 @@ Dart SimplifTrian<PFP>::edgeCollapse(Dart d, typename PFP::VEC3& newPos)
 	m_map.sewFaces(dd1, dd2);
 
 	// embed new vertex
-	unsigned int emb = m_map.getEmbedding(d2, VERTEX_ORBIT);
-	m_map.embedOrbit(VERTEX_ORBIT, d2, emb);
+	unsigned int emb = m_map.getEmbedding(d2, VERTEX);
+	m_map.embedOrbit(VERTEX, d2, emb);
 
 	m_positions[d2] = newPos;
 	m_valences[d2] = v_d + v_dd - 4;

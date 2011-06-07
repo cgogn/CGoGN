@@ -235,9 +235,9 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
                 /** affichage **/
         		case 'd' :
         		{
-        				int nbVertices = myMap.getNbOrbits(VERTEX_ORBIT) ;
+        				int nbVertices = myMap.getNbOrbits(VERTEX) ;
 
-        				CGoGNout << "nb darts = " << myMap.getNbOrbits(DART_ORBIT) << CGoGNendl;
+        				CGoGNout << "nb darts = " << myMap.getNbOrbits(DART) << CGoGNendl;
 
         				GLint t1 = glutGet(GLUT_ELAPSED_TIME);
         			 	Algo::DecimationVolumique::decimate<PFP>(myMap, Algo::DecimationVolumique::S_Random, Algo::DecimationVolumique::A_Centroid, position, nbVertices * 0.75);
@@ -370,7 +370,7 @@ int main(int argc, char **argv)
 		}
 
 		Algo::Import::importOFFWithELERegions<PFP>(myMap,argv[2],argv[3],attrNames);
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 	}
 	else if(std::string(argv[1]) == "-tet")
 	{
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
 			}
 
 			Algo::Import::importTet<PFP>(myMap, argv[2], attrNames);
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+			position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 	}
 	else if(std::string(argv[1]) == "-ts")
 	{
@@ -390,18 +390,18 @@ int main(int argc, char **argv)
 			}
 
 			Algo::Import::importTs<PFP>(myMap,argv[2],attrNames);
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
+			position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 
-			//scalar = myMap.getAttribute<PFP::REAL>(VERTEX_ORBIT, "scalar");
+			//scalar = myMap.getAttribute<PFP::REAL>(VERTEX, "scalar");
 	}
 	else
 	{
 		maillageTest();
 	}
 
-	//CGoGNout << "Nb Tetrahedron = " << myMap.getNbOrbits(VOLUME_ORBIT) << CGoGNendl;
-	//		" / Nb Edges = " << myMap.getNbOrbits(EDGE_ORBIT) <<
-	//		" / Nb Vertices = " << myMap.getNbOrbits(VERTEX_ORBIT) << CGoGNendl;
+	//CGoGNout << "Nb Tetrahedron = " << myMap.getNbOrbits(VOLUME) << CGoGNendl;
+	//		" / Nb Edges = " << myMap.getNbOrbits(EDGE) <<
+	//		" / Nb Vertices = " << myMap.getNbOrbits(VERTEX) << CGoGNendl;
 
     // un peu d'interface
 	MyGlutWin* mgw = new MyGlutWin(&argc,argv,1200,800);

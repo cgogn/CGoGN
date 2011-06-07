@@ -106,17 +106,17 @@ public:
 
 	virtual void next(Dart& d) ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f) ;
+	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f) ;
+	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f);
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f) ;
+	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0);
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f);
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f) ;
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0);
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f) ;
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
 
 	/****************************************************
@@ -245,6 +245,26 @@ public:
 	 * has already been subdivided to the next level
 	 */
 	bool volumeIsSubdivided(Dart d);
+
+	/**
+	 * Return true if the edge of d in the current level map
+	 * is subdivided to the next level,
+	 * none of its resulting edges is in turn subdivided to the next level
+	 * and the middle vertex is of degree 2
+	 */
+	bool edgeCanBeCoarsened(Dart d);
+
+	/**
+	 *
+	 */
+	bool faceIsSubdividedOnce(Dart d);
+
+	/**
+	 *
+	 */
+	bool volumeIsSubdividedOnce(Dart d);
+
+
 } ;
 
 template <typename T>

@@ -39,7 +39,7 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 	EMB center = AttribOps::zero<EMB,PFP>() ;
 	unsigned count = 0 ;
 
-//	CellMarkerStore marker(map, VERTEX_CELL) ;
+//	CellMarkerStore marker(map, VERTEX) ;
 //
 //	std::vector<Dart> visitedVertices ;
 //	visitedVertices.reserve(100) ;
@@ -69,7 +69,7 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 	visitedFaces.push_back(d);			// Start with the face of d
 	std::vector<Dart>::iterator face;
 
-	mark.markOrbit(VERTEX_ORBIT, d) ;
+	mark.markOrbit(VERTEX, d) ;
 
 	for(face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
@@ -84,7 +84,7 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(VERTEX_ORBIT, ee) ;
+				mark.markOrbit(VERTEX, ee) ;
 			}
 			e = map.phi1(e) ;
 		} while(e != *face) ;
@@ -130,7 +130,7 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vol_centroid, const FunctorSelect& select)
 {
-	CellMarker marker(map, VOLUME_CELL) ;
+	CellMarker marker(map, VOLUME) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))
@@ -144,7 +144,7 @@ void computeCentroidVolumes(typename PFP::MAP& map, const typename PFP::TVEC3& p
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_centroid, const FunctorSelect& select)
 {
-	CellMarker marker(map, FACE_CELL) ;
+	CellMarker marker(map, FACE) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))
@@ -158,7 +158,7 @@ void computeCentroidFaces(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vertex_centroid, const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX_CELL) ;
+	CellMarker marker(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))

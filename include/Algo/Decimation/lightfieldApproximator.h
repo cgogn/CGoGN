@@ -50,7 +50,7 @@ public:
 
 public:
 	Approximator_FrameHalf(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
-		Approximator<PFP, MATRIX33>(m, frame, EDGE_ORBIT, pred)
+		Approximator<PFP, MATRIX33>(m, frame, EDGE, pred)
 	{}
 	~Approximator_FrameHalf()
 	{}
@@ -77,7 +77,7 @@ protected:
 
 public:
 	Approximator_RGBfunctionsHalf(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
-		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE_ORBIT, pred)
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE, pred)
 	{ }
 	~Approximator_RGBfunctionsHalf	()
 	{}
@@ -103,7 +103,7 @@ protected:
 
 public:
 	Approximator_Frame(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
-		Approximator<PFP, MATRIX33>(m, frame, EDGE_ORBIT, pred)
+		Approximator<PFP, MATRIX33>(m, frame, EDGE, pred)
 	{}
 	~Approximator_Frame()
 	{}
@@ -130,7 +130,7 @@ protected:
 
 public:
 	Approximator_RGBfunctions(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
-		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE_ORBIT, pred)
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE, pred)
 	{ }
 	~Approximator_RGBfunctions()
 	{}

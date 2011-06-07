@@ -49,7 +49,7 @@ protected:
 
 public:
 	Approximator_QEM(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE_ORBIT, pred)
+		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
 	{}
 	~Approximator_QEM()
 	{}
@@ -71,7 +71,7 @@ protected:
 
 public:
 	Approximator_QEMhalfEdge(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE_ORBIT, pred)
+		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
 	{}
 	~Approximator_QEMhalfEdge()
 	{}
@@ -89,7 +89,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	Approximator_MidEdge(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE_ORBIT, pred)
+		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
 	{}
 	~Approximator_MidEdge()
 	{}
@@ -107,7 +107,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	Approximator_HalfCollapse(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE_ORBIT, pred)
+		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
 	{}
 	~Approximator_HalfCollapse()
 	{}
@@ -125,7 +125,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	Approximator_CornerCutting(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE_ORBIT, pred)
+		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
 	{}
 	~Approximator_CornerCutting()
 	{}

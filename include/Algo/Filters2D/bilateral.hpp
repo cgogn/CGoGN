@@ -43,7 +43,7 @@ void sigmaBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position,
 	float sumAngles = 0.0f ;
 	long nbEdges = 0 ;
 
-	CellMarker mv(map, VERTEX_CELL) ;
+	CellMarker mv(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
@@ -81,7 +81,7 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 	float sigmaC, sigmaS ;
 	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS, select) ;
 
-	CellMarker mv(map, VERTEX_CELL) ;
+	CellMarker mv(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
@@ -122,7 +122,7 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PF
 	long nbTot = 0 ;
 	long nbSusan = 0 ;
 
-	CellMarker mv(map, VERTEX_CELL);
+	CellMarker mv(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))

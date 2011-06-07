@@ -53,7 +53,7 @@ void facesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
 	// get back intersected faces
 	vecFaces.clear();
 	Algo::Selection::FuncFaceInter<PFP> ffi(map, position, vecFaces, iPoints, rayA, rayAB);
-	map.foreach_orbit(FACE_ORBIT, ffi, good);
+	map.foreach_orbit(FACE, ffi, good);
 
 	// compute all distances to observer for each dart of intersected face
 	// and put them in a vector for sorting
@@ -94,7 +94,7 @@ void edgesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
 	// recuperation des aretes intersectees
 	vecEdges.clear();
 	Algo::Selection::FuncEdgeInter<PFP> ffi(map, position, vecEdges, rayA, rayAB, AB2, dist2);
-	map.foreach_orbit(EDGE_ORBIT, ffi, good);
+	map.foreach_orbit(EDGE, ffi, good);
 
 	typedef std::pair<typename PFP::REAL, Dart> DartDist;
 	std::vector<DartDist> distndart;
@@ -137,7 +137,7 @@ void verticesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 	// recuperation des sommets intersectes
 	vecVertices.clear();
 	Algo::Selection::FuncVertexInter<PFP> ffi(map, position, vecVertices, rayA, rayAB, AB2, dist2);
-	map.foreach_orbit(VERTEX_ORBIT, ffi, good);
+	map.foreach_orbit(VERTEX, ffi, good);
 
 	typedef std::pair<typename PFP::REAL, Dart> DartDist;
 	std::vector<DartDist> distndart;
@@ -177,7 +177,7 @@ void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 	std::vector<Dart> vecFaces ;
 	std::vector<typename PFP::VEC3> iPoints ;
 	Algo::Selection::FuncFaceInter<PFP> ffi(map, position, vecFaces, iPoints, rayA, rayAB) ;
-	map.foreach_orbit(FACE_ORBIT, ffi, good) ;
+	map.foreach_orbit(FACE, ffi, good) ;
 	if(vecFaces.size() > 0)
 	{
 		typedef std::pair<typename PFP::REAL, unsigned int> IndexedDist;
@@ -232,7 +232,7 @@ void dartsRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
 	// recuperation des brins intersectes
 	vecDarts.clear();
 	Algo::Selection::FuncDartMapD2Inter<PFP> ffi(map, position, vecDarts, rayA, rayAB);
-	map.foreach_orbit(FACE_ORBIT, ffi, good);
+	map.foreach_orbit(FACE, ffi, good);
 
 	typedef std::pair<typename PFP::REAL, Dart> DartDist;
 	std::vector<DartDist> distndart;

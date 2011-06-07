@@ -29,9 +29,9 @@ namespace CGoGN
 
 AttribMap::AttribMap() : GenericMap()
 {
-	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& dartCont = m_attribs[DART] ;
 	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
-	m_markerTables[DART_ORBIT][0] = amv ;
+	m_markerTables[DART][0] = amv ;
 }
 
 /****************************************
@@ -45,7 +45,7 @@ void AttribMap::addEmbedding(unsigned int orbit)
 	std::ostringstream oss;
 	oss << "EMB_" << orbit;
 
-	AttributeContainer& dartCont = m_attribs[DART_ORBIT] ;
+	AttributeContainer& dartCont = m_attribs[DART] ;
 	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
 	m_embeddings[orbit] = amv ;
 

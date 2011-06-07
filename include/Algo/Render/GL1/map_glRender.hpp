@@ -53,7 +53,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 	glBegin(GL_TRIANGLES);
-	the_map.foreach_orbit(FACE_ORBIT, fgl_tri, good);
+	the_map.foreach_orbit(FACE, fgl_tri, good);
 	glEnd();
 
 	// get untreated quads & polygons
@@ -119,7 +119,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 	glBegin(GL_TRIANGLES);
-	the_map.foreach_orbit(FACE_ORBIT, fgl_tri, good);
+	the_map.foreach_orbit(FACE, fgl_tri, good);
 	glEnd();
 
 	// get untreated quads & polygons
@@ -178,7 +178,7 @@ void renderNormalVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3&
 	FunctorGLNormal<PFP> fgl_norm(the_map, good, position, normal, scale);
 
 	glBegin(GL_LINES);
-	the_map.foreach_orbit(VERTEX_ORBIT, fgl_norm, good);
+	the_map.foreach_orbit(VERTEX, fgl_norm, good);
 	glEnd();
 }
 
@@ -188,7 +188,7 @@ void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& 
 	FunctorGLFrame<PFP> fgl_frame(the_map, good, position, frame, scale) ;
 
 	glBegin(GL_LINES) ;
-	the_map.foreach_orbit(VERTEX_ORBIT, fgl_frame, good) ;
+	the_map.foreach_orbit(VERTEX, fgl_frame, good) ;
 	glEnd();
 }
 

@@ -586,14 +586,14 @@ int main(int argc, char **argv)
 	{
 		std::vector<std::string> attrNames ;
 		Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames) ;
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX_ORBIT, attrNames[0]) ;
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
 		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 	}
 	else
 	{
-		position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "normal");
+		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
 		createMap();
 	}
 

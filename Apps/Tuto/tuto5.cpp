@@ -125,7 +125,7 @@ void MyQT::animate()
 void MyQT::storeVerticesInfo()
 {
 
-	CellMarker mv(myMap,VERTEX_CELL);
+	CellMarker mv(myMap,VERTEX);
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
 		if (!mv.isMarked(d))
@@ -282,7 +282,7 @@ void MyQT::cb_keyPress(int code)
 
 int main(int argc, char **argv)
 {
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
 	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
 	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
@@ -342,9 +342,9 @@ int main(int argc, char **argv)
 
 	GLint texSize;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
-	CGoGNdbg2.toConsole(&sqt);
+	CGoGNdbg.toConsole(&sqt);
 	CGoGNerr.toConsole(&sqt);
-	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
+	CGoGNdbg << " TextureSize " <<  texSize << CGoGNendl;
 	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
 
 

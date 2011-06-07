@@ -113,8 +113,8 @@ int main(int argc, char **argv)
 	Dart d3 = myMap.newOrientedFace(4);
 	myMap.sewFaces(d2,d3);
 
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-	color = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "couleur");
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	color = myMap.addAttribute<PFP::VEC3>(VERTEX, "couleur");
 
 	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
 	color[d2] = PFP::VEC3(1.0f, 0.0f, 0.0f);
@@ -140,11 +140,11 @@ int main(int argc, char **argv)
 	DartMarkerStore me(myMap);
 
 	// avec lesquels on peut marquer des orbits
-	mf.markOrbit(FACE_ORBIT, d2);
-	me.markOrbit(EDGE_ORBIT, d2);
+	mf.markOrbit(FACE, d2);
+	me.markOrbit(EDGE, d2);
 
 	// les sommet sont plonges, on peut utiliser un marqueur de cellule sommet
-	CellMarker cm(myMap, VERTEX_ORBIT);
+	CellMarker cm(myMap, VERTEX);
 	cm.mark(d3);
 
 	for (Dart d = myMap.begin(); d!= myMap.end(); myMap.next(d))
@@ -205,8 +205,8 @@ int main(int argc, char **argv)
 
 	Dart dx = myMap2.newOrientedFace(4);
 
-	position2 = myMap2.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
-	color2 = myMap2.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "couleur");
+	position2 = myMap2.addAttribute<PFP::VEC3>(VERTEX, "position");
+	color2 = myMap2.addAttribute<PFP::VEC3>(VERTEX, "couleur");
 
 	position2[dx] = PFP::VEC3(0.0f, 0.0f, 0.0f);
 	color2[dx] = PFP::VEC3(1.0f, 1.0f, 0.0f);

@@ -127,7 +127,7 @@ void TriangulateFromDart(typename PFP::MAP& map, const AttributeHandler<typename
 	Dart e = d;
 	do
 	{
-		indices.push_back( map.getEmbedding(e,VERTEX_ORBIT) ); // recupere l'indice du point dans le handler
+		indices.push_back( map.getEmbedding(e,VERTEX) ); // recupere l'indice du point dans le handler
 		e = map.phi1(e); // brin suivant dans la face
 	} while (e != d); // tq par revenu au debut
 
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 
 	// creation of a new attribute on vertices of type 3D vector
 	// a handler to this attribute is returned
-	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX_ORBIT, "position");
+	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
 	// creation face 1 (convexe)
 	Dart d1 = myMap.newFace(5);
