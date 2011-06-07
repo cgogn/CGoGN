@@ -25,6 +25,9 @@
 namespace CGoGN
 {
 
+namespace Algo
+{
+
 namespace Selection
 {
 
@@ -200,5 +203,7 @@ void Collector_WithinSphere<PFP>::computeArea()
 }
 
 } // namespace Selection
+
+} // namespace Algo
 
 } // namespace CGoGN

@@ -35,6 +35,9 @@
 namespace CGoGN
 {
 
+namespace Algo
+{
+
 namespace Selection
 {
 
@@ -153,6 +156,8 @@ public:
 };
 
 } // namespace Selection
+
+} // namespace Algo
 
 } // namespace CGoGN
 

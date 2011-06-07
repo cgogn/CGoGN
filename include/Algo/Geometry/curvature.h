@@ -116,7 +116,7 @@ void computeCurvatureVertex_NormalCycles(
 	typename PFP::TVEC3& Kmin,
 	typename PFP::TVEC3& Knormal) ;
 
-} // namespace Geoemtry
+} // namespace Geometry
 
 } // namespace Algo
 
