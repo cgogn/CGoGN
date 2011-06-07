@@ -135,7 +135,6 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const typename PFP::T
 	visitedFaces.push_back(d);				// Start with the face of d
 	std::list<Dart>::iterator face;
 	VEC3 N;
-	float offset;
 
 	DartMarkerStore mark(map);					// Lock a marker
 	for (face = visitedFaces.begin(); inside && face != visitedFaces.end(); ++face)

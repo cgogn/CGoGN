@@ -30,6 +30,8 @@
 //#include <gmtl/Output.h>
 #include <GL/gl.h>
 
+#include "Topology/generic/functor.h"
+
 // OpenGL direct mode rendering of darts of maps
 
 namespace CGoGN
@@ -76,7 +78,11 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
  * @param kv exploding coefficient for volumes (0.0 normal draw)
  */
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& the_map, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+void renderTopoMD3(typename PFP::MAP& the_map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+
+template <typename PFP>
+void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
+
 
 }// end namespace
 }// end namespace
