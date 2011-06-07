@@ -435,6 +435,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 	return importMesh<PFP>(map, mts);
 }
 
+/*
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind)
 {
@@ -445,7 +446,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 
 	return importMesh<PFP>(map, mtv);
 }
-
+*/
 
 //
 //

@@ -52,8 +52,8 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 /**
  * import a volumic mesh
  */
-template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME);
+//template <typename PFP>
+//bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME);
 
 //template <typename PFP>
 //bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
