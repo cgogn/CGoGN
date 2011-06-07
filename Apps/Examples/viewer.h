@@ -39,10 +39,10 @@
 
 #include "Algo/Render/GL2/mapRender.h"
 
-#include "Utils/shaderPhong.h"
-#include "Utils/shaderFlat.h"
-#include "Utils/shaderSimpleColor.h"
-#include "Utils/shaderVectorPerVertex.h"
+#include "Utils/Shaders/shaderPhong.h"
+#include "Utils/Shaders/shaderFlat.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
 
 #include "Algo/Geometry/boundingbox.h"

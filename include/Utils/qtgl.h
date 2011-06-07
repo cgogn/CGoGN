@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+ * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+ * Web site: http://cgogn.u-strasbg.fr/                                         *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -122,6 +122,8 @@ public:
 
 	void mouseMoveEvent(QMouseEvent* event);
 
+	void closeEvent(QCloseEvent *event);
+
 	void keyPressEvent(QKeyEvent* event);
 
 	void keyReleaseEvent(QKeyEvent* event);
@@ -135,6 +137,7 @@ public:
 	bool Alt() { return m_state_modifier & Qt::AltModifier; }
 
 	int getHeight() const { return H; }
+	int getWidth() const { return W; }
 
 	/**
 	 * set the focale distance (for a screen width of 2), default value is 1
@@ -144,9 +147,17 @@ public:
 	/**
 	 * get the focale distance
 	 */
-	float getFocal() { return foc; }
+	float getFocal() const { return foc; }
+
+	/**
+	 * get current state
+	 */
+	int getStateModifier() const { return m_state_modifier ; }
+	int getCurrentButton() const { return m_current_button ; }
 
 	static float getFarPlane() { return FAR_PLANE ; }
+
+	glm::vec3& getObjPos() ;
 
 	void modelModified() { newModel = 1; }
 

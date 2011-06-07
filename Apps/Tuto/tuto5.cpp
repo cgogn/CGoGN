@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -34,7 +34,7 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
 
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
@@ -46,7 +46,7 @@
 #include "Utils/text3d.h"
 
 #include "Utils/pointSprite.h"
-#include "Utils/shaderVectorPerVertex.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
 
 #include "Algo/Render/SVG/mapSVGRender.h"
