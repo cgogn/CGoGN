@@ -83,7 +83,7 @@ enum drawingType
 class Special
 {};
 
-template<int LEVEL>
+
 class Out
 {
 protected:
@@ -142,18 +142,18 @@ public:
 	/**
 	 * recursive stream operator
 	 */
-	Out<LEVEL>& operator<< (Out& cgstr);
+	Out& operator<< (Out& cgstr);
 
 	/**
 	 * classic stream operator
 	 */
 	template <typename T>
-	Out<LEVEL>& operator<< (const T& val);
+	Out& operator<< (const T& val);
 
 	/**
 	 * special cases (endl) stream operator
 	 */
-	Out<LEVEL>&  operator<< (Special& os  );
+	Out&  operator<< (Special& os  );
 
 	/**
 	 * for file closing
@@ -164,33 +164,43 @@ public:
 /**
  * output stream class for error output (replace cout by cerr)
  */
-template<int LEVEL>
-class Err: public Out<LEVEL>
+class Err: public Out
 {
 public:
 	Err() { this->m_code = 1; }
 };
 
-template<int LEVEL>
-class Dbg: public Out<LEVEL>
+class Dbg: public Out
 {
 public:
-	Dbg() { this->m_code = 100 + LEVEL; }
+	Dbg() { this->m_code = 100; }
 };
+
+
+template <typename T>
+Out&  Out::operator<< (const T& val)
+{
+	if (m_out_mode & STDOUT)
+		std::cout << val;
+	if (m_out_mode & STDERR)
+		std::cerr << val;
+
+	if (m_out_mode && (FILEOUT|QTSTATUSBAR|QTCONSOLE|SSBUFFER))
+		m_buffer << val;
+
+	return *this;
+}
 
 } // namespace CGoGNStream
 
 // glocal stream definitions
-extern CGoGNStream::Out<0> CGoGNout;
-extern CGoGNStream::Err<0> CGoGNerr;
-extern CGoGNStream::Dbg<1> CGoGNdbg;
-extern CGoGNStream::Dbg<2> CGoGNdbg2;
-extern CGoGNStream::Dbg<3> CGoGNdbg3;
+extern CGoGNStream::Out CGoGNout;
+extern CGoGNStream::Err CGoGNerr;
+extern CGoGNStream::Dbg CGoGNdbg;
 extern CGoGNStream::Special CGoGNendl;
 extern CGoGNStream::Special CGoGNflush;
 
 } // namespace CGoGN
 
-#include "Utils/cgognStream.hpp"
 
 #endif /* CGOGNSTREAM_H_ */

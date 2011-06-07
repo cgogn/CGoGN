@@ -342,9 +342,9 @@ int main(int argc, char **argv)
 
 	GLint texSize;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
-	CGoGNdbg2.toConsole(&sqt);
+	CGoGNdbg.toConsole(&sqt);
 	CGoGNerr.toConsole(&sqt);
-	CGoGNdbg2 << " TextureSize " <<  texSize << CGoGNendl;
+	CGoGNdbg << " TextureSize " <<  texSize << CGoGNendl;
 	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
 
 
