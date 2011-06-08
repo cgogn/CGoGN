@@ -110,6 +110,7 @@ public:
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importCTM(const std::string& filename, std::vector<std::string>& attrNames);
 
