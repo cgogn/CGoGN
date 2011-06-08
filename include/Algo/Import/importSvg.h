@@ -19,7 +19,7 @@ namespace Import
 bool chechXmlNode(xmlNodePtr node, const std::string& name);
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons);
 
 
 
