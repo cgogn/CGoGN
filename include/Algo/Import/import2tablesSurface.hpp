@@ -540,12 +540,13 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
  *  - 1 attrName for geometric position (VEC3)
  *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
  *  - N attrNames for the function coefficients (NxVEC3) : N RGB coefficients being successively the constants, the linears (v then u), the quadratics, etc. :  : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
- *  N = 1 for constant polynomial,
- *  N = 3 for linear polynomial,
- *  N = 6 for quadratic polynomial,
- *  N = 10 for cubic degree polynomial,
- *  N = 15 for 4th degree polynomial,
- *  ...
+ * N = 1 for constant polynomial,
+ * N = 3 for linear polynomial,
+ * N = 6 for quadratic polynomial,
+ * N = 10 for cubic degree polynomial,
+ * N = 15 for 4th degree polynomial,
+ * ...
+ * Hint : N = attrNames.size() - 4 ;
  * @return bool : success.
  */
 template <typename PFP>
