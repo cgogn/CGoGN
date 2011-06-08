@@ -157,19 +157,15 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 	typename PFP::REAL c = n1 * n2 ;
 	typename PFP::REAL a(0) ;
 	// the following trick is useful for avoiding NaNs (due to floating point errors)
-	if (c > 0.5)
-		a = asin(s) ;
+	if (c > 0.5) a = asin(s) ;
 	else
 	{
-		if(c < -1)
-			c = -1 ;
-		if (s >= 0)
-			a = acos(c) ;
-		else
-			a = -acos(c) ;
+		if(c < -1) c = -1 ;
+		if (s >= 0) a = acos(c) ;
+		else a = -acos(c) ;
 	}
 	if (isnan(a))
-		std::cerr<< "Warning : computeAngleBetweenNormalsOnEdge returns NaN on edge "<< d << "-" << dd << std::endl ;
+		std::cerr<< "Warning : computeAngleBetweenNormalsOnEdge returns NaN on edge " << d << "-" << dd << std::endl ;
 	return a ;
 }
 

@@ -107,6 +107,7 @@ template <typename PFP>
 void computeCurvatureVertex_NormalCycles(
 	typename PFP::MAP& map,
 	Dart dart,
+	typename PFP::REAL radius,
 	const typename PFP::TVEC3& position,
 	const typename PFP::TVEC3& normal,
 	const typename PFP::TREAL& angles,
