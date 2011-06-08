@@ -86,6 +86,8 @@ public :
 
 			display();
 		}
+		else
+			m_position = newCurrent;
 	}
 };
 
