@@ -99,6 +99,10 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 		break;
 	case ImportSurfacique::PLYPTM:
 		CGoGNout << "TYPE: PLYPTM" << CGoGNendl;
+		return importPlyPTM(filename, attrNames);
+		break;
+	case ImportSurfacique::PLYPTMgeneric:
+		CGoGNout << "TYPE: PLYPTMgeneric" << CGoGNendl;
 		return importPlyPTMgeneric(filename, attrNames);
 		break;
 	case ImportSurfacique::OBJ:
@@ -529,9 +533,19 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 
 /**
  * Import plyPTM (K Vanhoey generic format).
- * It can handle polynomials of higher degrees and returns the appropriate attrNames
- * @param filename : the file to import;
- * @param attrNames : reference that will be filled with the attribute names (depends on degree : 6,10,15 or more names);
+ * It can handle bivariable polynomials of any degree and returns the appropriate attrNames
+ * @param filename the file to import;
+ * @param attrNames reference that will be filled with the attribute names
+ * the number of attrNames returned depends on the degree of the polynomials :
+ *  - 1 attrName for geometric position (VEC3)
+ *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
+ *  - N attrNames for the function coefficients (NxVEC3) : N RGB coefficients being successively the constants, the linears (v then u), the quadratics, etc. :  : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
+ *  N = 1 for constant polynomial,
+ *  N = 3 for linear polynomial,
+ *  N = 6 for quadratic polynomial,
+ *  N = 10 for cubic degree polynomial,
+ *  N = 15 for 4th degree polynomial,
+ *  ...
  * @return bool : success.
  */
 template <typename PFP>
@@ -654,7 +668,11 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
  * Import plyPTM (F Larue format).
  * It handles only 2nd degree polynomials
  * @param filename : the file to import;
- * @param attrNames : reference that will be filled with the attribute names (depends on degree);
+ * @param attrNames : reference that will be filled with the attribute names ;
+ *  - 1 attrName for geometric position (VEC3)
+ *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
+ *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the constants, the linears (v then u) and the quadratics : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
+ * @return bool : success.
  * @return bool : success.
  */
 template <typename PFP>
