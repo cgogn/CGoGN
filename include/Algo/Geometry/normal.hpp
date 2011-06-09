@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+ * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+ * Web site: http://cgogn.u-strasbg.fr/                                         *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -112,7 +112,7 @@ void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 }
 
 template <typename PFP>
-class computeNormalVerticesFunctor: public FunctorMap<typename PFP::MAP>
+class computeNormalVerticesFunctor : public FunctorMap<typename PFP::MAP>
 {
 protected:
 	typename PFP::MAP& m_map;
@@ -120,8 +120,8 @@ protected:
 	typename PFP::TVEC3& m_normal;
 public:
 	computeNormalVerticesFunctor(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal):
-		m_map(map), m_position(position), m_normal(normal) {}
-
+		m_map(map), m_position(position), m_normal(normal)
+	{}
 	bool operator()(Dart d)
 	{
 		m_normal[d] = vertexNormal<PFP>(m_map, d, m_position) ;
@@ -129,18 +129,56 @@ public:
 	}
 };
 
-
-
 template <typename PFP>
 void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select, unsigned int thread)
 {
-	CellMarker marker(map, VERTEX,thread);
+	CellMarker marker(map, VERTEX, thread);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !marker.isMarked(d))
 		{
 			marker.mark(d);
 			normal[d] = vertexNormal<PFP>(map, d, position) ;
+		}
+	}
+}
+
+template <typename PFP>
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+{
+	typedef typename PFP::VEC3 VEC3 ;
+
+	Dart dd = map.phi2(d) ;
+	const VEC3 n1 = faceNormal<PFP>(map, d, position) ;
+	const VEC3 n2 = faceNormal<PFP>(map, dd, position) ;
+	VEC3 e = position[dd] - position[d] ;
+	e.normalize() ;
+	typename PFP::REAL s = e * (n1 ^ n2) ;
+	typename PFP::REAL c = n1 * n2 ;
+	typename PFP::REAL a(0) ;
+	// the following trick is useful for avoiding NaNs (due to floating point errors)
+	if (c > 0.5) a = asin(s) ;
+	else
+	{
+		if(c < -1) c = -1 ;
+		if (s >= 0) a = acos(c) ;
+		else a = -acos(c) ;
+	}
+	if (isnan(a))
+		std::cerr<< "Warning : computeAngleBetweenNormalsOnEdge returns NaN on edge " << d << "-" << dd << std::endl ;
+	return a ;
+}
+
+template <typename PFP>
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select, unsigned int thread)
+{
+	CellMarker me(map, EDGE, thread) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(select(d) && !me.isMarked(d))
+		{
+			me.mark(d) ;
+			angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, position) ;
 		}
 	}
 }

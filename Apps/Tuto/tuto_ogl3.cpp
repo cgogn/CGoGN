@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+ * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+ * Web site: http://cgogn.u-strasbg.fr/                                         *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -165,6 +165,8 @@ int main(int argc, char **argv)
 
 	sqt.windowTitle("OGL3 QT");
 	sqt.dockTitle("interface");
+
+	sqt.setDock(dock) ;
 
 	// connection widget callback
 	sqt.setCallBack( slider_foc, SIGNAL(valueChanged(int)), SLOT(sliderFocale_cb(int)) );

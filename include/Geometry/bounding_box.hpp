@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -29,11 +29,18 @@ namespace Geom
 {
 
 template <typename VEC>
-BoundingBox<VEC>::BoundingBox(const VEC& p) :
-m_pMin(p),
-m_pMax(p)
+BoundingBox<VEC>::BoundingBox() :
+	m_initialized(false),
+	m_pMin(0),
+	m_pMax(0)
 {}
 
+template <typename VEC>
+BoundingBox<VEC>::BoundingBox(const VEC& p) :
+	m_initialized(true),
+	m_pMin(p),
+	m_pMax(p)
+{}
 
 template <typename VEC>
 VEC& BoundingBox<VEC>::min()
@@ -67,6 +74,44 @@ typename VEC::DATA_TYPE BoundingBox<VEC>::size(unsigned int coord) const
 }
 
 template <typename VEC>
+typename VEC::DATA_TYPE BoundingBox<VEC>::maxSize() const
+{
+	typename VEC::DATA_TYPE max = m_pMax[0] - m_pMin[0] ;
+	for(unsigned int i = 1; i < m_pMax.dimension(); ++i)
+	{
+		typename VEC::DATA_TYPE size = m_pMax[i] - m_pMin[i] ;
+		if(size > max)
+			max = size ;
+	}
+	return max ;
+}
+
+template <typename VEC>
+typename VEC::DATA_TYPE BoundingBox<VEC>::minSize() const
+{
+	typename VEC::DATA_TYPE min = m_pMax[0] - m_pMin[0] ;
+	for(unsigned int i = 1; i < m_pMax.dimension(); ++i)
+	{
+		typename VEC::DATA_TYPE size = m_pMax[i] - m_pMin[i] ;
+		if(size < min)
+			min = size ;
+	}
+	return min ;
+}
+
+template <typename VEC>
+VEC BoundingBox<VEC>::diag() const
+{
+	return m_pMax - m_pMin ;
+}
+
+template <typename VEC>
+typename VEC::DATA_TYPE BoundingBox<VEC>::diagSize() const
+{
+	return (m_pMax - m_pMin).norm() ;
+}
+
+template <typename VEC>
 VEC BoundingBox<VEC>::center() const
 {
 	VEC center = (m_pMax + m_pMin) / typename VEC::DATA_TYPE(2) ;
@@ -80,12 +125,20 @@ VEC BoundingBox<VEC>::center() const
 template <typename VEC>
 void BoundingBox<VEC>::addPoint(const VEC& p)
 {
-	for(unsigned int i = 0; i < p.dimension(); ++i)
+	if(!m_initialized)
 	{
-		if(p[i] < m_pMin[i])
-			m_pMin[i] = p[i] ;
-		if(p[i] > m_pMax[i])
-			m_pMax[i] = p[i] ;
+		m_pMin = p ;
+		m_pMax = p ;
+	}
+	else
+	{
+		for(unsigned int i = 0; i < p.dimension(); ++i)
+		{
+			if(p[i] < m_pMin[i])
+				m_pMin[i] = p[i] ;
+			if(p[i] > m_pMax[i])
+				m_pMax[i] = p[i] ;
+		}
 	}
 }
 
@@ -118,7 +171,6 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 	}
 }
 
-
 //template <typename VEC>
 //friend std::ostream& BoundingBox<VEC>::operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
 //{
@@ -133,8 +185,6 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 //	return in ;
 //}
 
-//end namespace
-}
-}
+} // namespace Geom
 
-
+} // namespace CGoGN

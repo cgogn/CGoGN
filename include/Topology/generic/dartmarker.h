@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -148,30 +148,6 @@ public:
 	{
 		return m_map.getMarkerVector(DART, m_thread)->operator[](d.index).testMark(m_marker);
 	}
-
-//	/**
-//	 * mark the dart
-//	 */
-//	virtual void mark(unsigned int d)
-//	{
-//		m_map.getMarkerVector(DART, m_thread)->operator[](d).setMark(m_marker);
-//	}
-//
-//	/**
-//	 * unmark the cell
-//	 */
-//	virtual void unmark(unsigned int d)
-//	{
-//		m_map.getMarkerVector(DART, m_thread)->operator[](d).unsetMark(m_marker);
-//	}
-//
-//	/**
-//	 * test if dart is marked
-//	 */
-//	virtual bool isMarked(unsigned int d)
-//	{
-//		return m_map.getMarkerVector(DART, m_thread)->operator[](d).testMark(m_marker);
-//	}
 
 	/**
 	 * mark the darts of the given orbit of d

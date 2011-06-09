@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -34,20 +34,20 @@ char* PlyImportData::elem_names[] = { /* list of the elements in the object */
 	};
 	
 PlyProperty PlyImportData::vert_props[] = { /* list of property information for a vertex */
-	{(char*) "x", Float32, Float32, offsetof(Vertex,x), 0, 0, 0, 0},
-	{(char*) "y", Float32, Float32, offsetof(Vertex,y), 0, 0, 0, 0},
-	{(char*) "z", Float32, Float32, offsetof(Vertex,z), 0, 0, 0, 0},
-	{(char*) "r", Float32, Float32, offsetof(Vertex,r), 0, 0, 0, 0},
-	{(char*) "g", Float32, Float32, offsetof(Vertex,g), 0, 0, 0, 0},
-	{(char*) "b", Float32, Float32, offsetof(Vertex,b), 0, 0, 0, 0},
-	{(char*) "nx", Float32, Float32, offsetof(Vertex,nx), 0, 0, 0, 0},
-	{(char*) "ny", Float32, Float32, offsetof(Vertex,ny), 0, 0, 0, 0},
-	{(char*) "nz", Float32, Float32, offsetof(Vertex,nz), 0, 0, 0, 0},
+	{(char*) "x", PLY_Float32, PLY_Float32, offsetof(Vertex,x), 0, 0, 0, 0},
+	{(char*) "y", PLY_Float32, PLY_Float32, offsetof(Vertex,y), 0, 0, 0, 0},
+	{(char*) "z", PLY_Float32, PLY_Float32, offsetof(Vertex,z), 0, 0, 0, 0},
+	{(char*) "r", PLY_Float32, PLY_Float32, offsetof(Vertex,r), 0, 0, 0, 0},
+	{(char*) "g", PLY_Float32, PLY_Float32, offsetof(Vertex,g), 0, 0, 0, 0},
+	{(char*) "b", PLY_Float32, PLY_Float32, offsetof(Vertex,b), 0, 0, 0, 0},
+	{(char*) "nx", PLY_Float32, PLY_Float32, offsetof(Vertex,nx), 0, 0, 0, 0},
+	{(char*) "ny", PLY_Float32, PLY_Float32, offsetof(Vertex,ny), 0, 0, 0, 0},
+	{(char*) "nz", PLY_Float32, PLY_Float32, offsetof(Vertex,nz), 0, 0, 0, 0},
 	};
 	
 PlyProperty PlyImportData::face_props[] = { /* list of property information for a face */
-	{(char*) "vertex_indices", Int32, Int32, offsetof(Face,verts),
-	1, Uint8, Uint8, offsetof(Face,nverts)},
+	{(char*) "vertex_indices", PLY_Int32, PLY_Int32, offsetof(Face,verts),
+	1, PLY_Uint8, PLY_Uint8, offsetof(Face,nverts)},
 	};
 
 

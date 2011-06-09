@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,13 +17,16 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.u-strasbg.fr/                                         *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
-#include "Utils/shaderColorPerVertex.h"
+#ifndef __CGOGN_SHADER_VPV__
+#define __CGOGN_SHADER_VPV__
+
+#include "Utils/GLSLShader.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -31,58 +34,43 @@ namespace CGoGN
 namespace Utils
 {
 
-std::string ShaderColorPerVertex::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition;\n"
-		"ATTRIBUTE vec3 VertexColor;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"VARYING_VERT vec3 color;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"	color = VertexColor;\n"
-		"}";
-
-
-std::string ShaderColorPerVertex::fragmentShaderText =
-		"PRECISON;\n"
-		"VARYING_FRAG vec3 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=vec4(color,0.0);\n"
-		"}";
-
-
-ShaderColorPerVertex::ShaderColorPerVertex()
+class ShaderVectorPerVertex : public GLSLShader
 {
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+protected:
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string geometryShaderText;
+    static std::string fragmentShaderText;
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+    GLuint m_uniform_scale;
+    GLuint m_uniform_color;
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
-}
+	float m_scale;
+	Geom::Vec4f m_color;
 
-unsigned int ShaderColorPerVertex::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
-}
+    VBO* m_vboPos;
+    VBO* m_vboVec;
 
-unsigned int ShaderColorPerVertex::setAttributeColor(VBO* vbo)
-{
-	m_vboCol = vbo;
-	return bindVA_VBO("VertexColor", vbo);
-}
+	void getLocations();
 
-void ShaderColorPerVertex::restoreUniformsAttribs()
-{
-	bindVA_VBO("VertexPosition", m_vboPos);
-	bindVA_VBO("VertexColor", m_vboCol);
-}
+	void sendParams();
+
+	void restoreUniformsAttribs();
+
+public:
+    ShaderVectorPerVertex();
+
+	void setScale(float scale);
+
+	void setColor(const Geom::Vec4f& color);
+
+	unsigned int setAttributePosition(VBO* vbo);
+
+	unsigned int setAttributeVector(VBO* vbo);
+};
 
 } // namespace Utils
 
 } // namespace CGoGN
+
+#endif
