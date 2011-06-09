@@ -23,8 +23,11 @@ inline bool valueOf(const std::string &s, T &obj)
 }
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons)
+bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons, CellMarker& polygonsFaces)
 {
+	typedef typename PFP::VEC3 VEC3;
+	typedef std::vector<VEC3 > POLYGON;
+
 	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
 	xmlNodePtr map_node = xmlDocGetRootElement(doc);
 
@@ -34,7 +37,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 		return false;
 	}
 
-	typedef std::vector<typename PFP::VEC3 > POLYGON;
+
 	std::vector<POLYGON> allPoly;
 
 	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
@@ -54,7 +57,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 //					CGoGNout << "path "<< prop << CGoGNendl;
 					std::string allcoords((reinterpret_cast<const char*>(prop)));
 					std::stringstream is(allcoords);
-					bool relative;
+					bool relative=false;
 					bool push_point;
 					std::string coord;
 					int mode = -1;
@@ -113,57 +116,61 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 						{
 							switch(mode)
 							{
-							case 0 : //relative
-							break;
-							case 1 : //absolute
-							break;
-							case 2 : //horizontal
-							{
-								std::stringstream streamCoord(coord);
-								std::string xS;
-								std::getline(streamCoord, xS, ',' );
+								case 0 : //relative
+								break;
+								case 1 : //absolute
+								break;
+								case 2 : //horizontal
+								{
+									std::stringstream streamCoord(coord);
+									std::string xS;
+									std::getline(streamCoord, xS, ',' );
 
-								valueOf(xS,x);
+									valueOf(xS,x);
 
-								POLYGON curPoly = allPoly[allPoly.size()-1];
-								typename PFP::VEC3 previous = (curPoly)[(curPoly).size()-1];
-								y = previous[1];
+									POLYGON curPoly = allPoly[allPoly.size()-1];
+									VEC3 previous = (curPoly)[(curPoly).size()-1];
+									y = previous[1];
 
-								push_point=true;
+									push_point=true;
+								}
+								break;
+								case 3 : //vertical
+								{
+									std::stringstream streamCoord(coord);
+									std::string yS;
+									std::getline(streamCoord, yS, ',' );
+
+									valueOf(yS,y);
+
+									POLYGON curPoly = allPoly[allPoly.size()-1];
+									typename PFP::VEC3 previous = (curPoly)[(curPoly).size()-1];
+									x = previous[0];
+
+									push_point=true;
+								}
+								break;
+								case 4 : //bezier
+								{
+									std::getline( is, coord, ' ' ); //ignore first control point
+									std::getline( is, coord, ' ' ); //ignore second control point
+								}
+								break;
+								case 5 : //bezier 2
+								{
+									std::getline( is, coord, ' ' ); //ignore control point
+
+								}
+								break;
+								case 6 : //elliptic
+									std::getline( is, coord, ' ' ); //ignore rx
+									std::getline( is, coord, ' ' ); //ignore ry
+									std::getline( is, coord, ' ' ); //ignore x-rotation
+									std::getline( is, coord, ' ' ); //ignore large arc flag
+									std::getline( is, coord, ' ' ); //ignore sweep flag
+								break;
 							}
-							break;
-							case 3 : //vertical
-							{
-								std::stringstream streamCoord(coord);
-								std::string yS;
-								std::getline(streamCoord, yS, ',' );
 
-								valueOf(yS,y);
-
-								POLYGON curPoly = allPoly[allPoly.size()-1];
-								typename PFP::VEC3 previous = (curPoly)[(curPoly).size()-1];
-								x = previous[0];
-
-								push_point=true;
-							}
-							break;
-							case 4 : //bezier
-							{
-								std::getline( is, coord, ' ' ); //ignore first control point
-								std::getline( is, coord, ' ' ); //ignore second control point
-							}
-							break;
-							case 5 : //bezier 2
-								std::getline( is, coord, ' ' ); //ignore control point
-							break;
-							case 6 : //elliptic
-								std::getline( is, coord, ' ' ); //ignore rx
-								std::getline( is, coord, ' ' ); //ignore ry
-								std::getline( is, coord, ' ' ); //ignore x-rotation
-								std::getline( is, coord, ' ' ); //ignore large arc flag
-								std::getline( is, coord, ' ' ); //ignore sweep flag
-							break;
-							}
 							std::stringstream streamCoord(coord);
 							std::string xS,yS;
 							std::getline(streamCoord, xS, ',' );
@@ -182,15 +189,29 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 							if(relative && curPoly.size()>0)
 							{
-								typename PFP::VEC3 previous = (curPoly)[(curPoly).size()-1];
+								VEC3 previous = (curPoly)[(curPoly).size()-1];
 								x += previous[0];
 								y += previous[1];
 							}
 
-//							std::cout << "coord " << x << " " << y << std::endl;
-							curPoly.push_back(typename PFP::VEC3(x,y,0));
+							std::cout << "coord " << x << " " << y << std::endl;
+							curPoly.push_back(VEC3(x,y,0));
 						}
 					}
+
+					//check orientation : set in CCW
+					POLYGON& curPoly = allPoly[allPoly.size()-1];
+					if(curPoly.size()>2)
+					{
+						VEC3 v1(curPoly[1]-curPoly[0]);
+						VEC3 v2(curPoly[2]-curPoly[1]);
+						if((v1^v2)[2]<0)
+						{
+							std::cout << "reverse !" << std::endl;
+							std::reverse(curPoly.begin(), curPoly.end());
+						}
+					}
+
 				}
 			}
 		}
@@ -204,13 +225,15 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 	for(it = allPoly.begin() ; it != allPoly.end() ; ++it)
 	{
 
-		if(it->size()<3)
+		if(it->size()<4)
 		{
 			it = allPoly.erase(it);
 		}
 		else
 		{
 			Dart d = map.newFace(it->size()-1);
+			std::cout << "newFace " << it->size()-1 << std::endl;
+			polygonsFaces.mark(d);
 			for(typename POLYGON::iterator emb = it->begin() ; emb != it->end() ; emb++)
 			{
 				position[d] = *emb;
@@ -242,19 +265,32 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 	DartMarker close(map);
 	map.closeMap(close);
 
-	CellMarker linked(map,FACE);
+	float maxDistSq=40.0f*40.0f;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		VEC3 p1 =position[d];
+		VEC3 p2 =position[map.phi1(d)];
+		if((p1-p2).norm2()>maxDistSq)
+		{
+			VEC3 p3 = (p1+p2)/2.0f;
+			map.cutEdge(d);
+			position[map.phi1(d)] = p3;
+		}
+	}
+
+	CellMarker linked(map,VERTEX);
+	for(Dart d = map.begin();d != map.end(); map.next(d))
 	{
 		if(!linked.isMarked(d) && !inside.isMarked(d))
 		{
 			linked.mark(d);
-			Dart dMin;
-			float distMin = (bb.max()-bb.min()).norm2();
+			Dart dMin=map.end();
+			float distMin = 1.0f/0.0f;
 			for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 			{
-				if(!map.sameFace(d,dd))
+				if(!inside.isMarked(dd) && !map.sameFace(d,dd))
 				{
-					float dist = (position[dd]-position[d]).norm2();
+					float dist = (position[dd]-position[d]).norm();
 					if(dist<distMin)
 					{
 						distMin = dist;
@@ -263,11 +299,23 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 				}
 			}
 
-//			map.splitFace(d,d);
-//			map.splitFace(dMin,dMin);
+			if(dMin!=map.end())
+			{
+				Dart dChoose = d;
+				Dart dStart = d;
+				do {
+					float dist = (position[dMin]-position[d]).norm();
+					if(dist<distMin)
+					{
+						distMin = dist;
+						dChoose = d;
+					}
 
-//			map.sewFaces(map.phi_1(d),map.phi_1(dMin));
-//			map.mergeFaces(map.phi_1(d));
+					d = map.phi1(d);
+				} while(d!= dStart);
+
+				map.linkVertices(dMin,dChoose);
+			}
 		}
 	}
 

@@ -320,6 +320,25 @@ void EmbeddedMap2<MAP2>::splitFace(Dart d, Dart e)
 }
 
 template <typename MAP2>
+void EmbeddedMap2<MAP2>::linkVertices(Dart d, Dart e)
+{
+	Dart dNext = MAP2::phi1(d) ;
+
+	MAP2::linkVertices(d,e);
+
+	if (MAP2::isOrbitEmbedded(VERTEX))
+	{
+		MAP2::copyDartEmbedding(VERTEX, MAP2::phi_1(e), d) ;
+		MAP2::copyDartEmbedding(VERTEX, MAP2::phi_1(d), e) ;
+	}
+
+	if (MAP2::isOrbitEmbedded(FACE))
+	{
+		MAP2::embedOrbit(FACE, dNext, MAP2::getEmbedding(FACE, dNext)) ;
+	}
+}
+
+template <typename MAP2>
 bool EmbeddedMap2<MAP2>::mergeFaces(Dart d)
 {
 	Dart dNext = MAP2::phi1(d) ;

@@ -190,6 +190,13 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  @param d first dart in the face
+	 *  @param e second dart in the face
+	 */
+	virtual void linkVertices(Dart d, Dart e);
+
 	//! Merge the two faces incident to the edge of d.
 	/*! Works only for non-border edges.
 	 *  \warning Darts d & phi2(d) no longer exist after the call

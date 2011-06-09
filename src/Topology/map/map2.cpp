@@ -226,6 +226,12 @@ void Map2::splitFace(Dart d, Dart e)
 	phi2sew(phi_1(d), phi_1(e));	// Sew the two resulting faces along the new edge
 }
 
+void Map2::linkVertices(Dart d, Dart e)
+{
+	Map1::linkVertices(d, e);			// Split the face
+	phi2sew(phi_1(d), phi_1(e));	// Sew the two resulting faces along the new edge
+}
+
 bool Map2::mergeFaces(Dart d)
 {
 	Dart e = phi2(d) ;

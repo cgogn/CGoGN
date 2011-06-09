@@ -108,6 +108,12 @@ public:
 	virtual void splitFace(Dart d, Dart e) ;
 
 	/**
+	 * No attribute is attached to the new edge
+	 * The attributes attached to the face of dart d are kept on the resulting face
+	 */
+	virtual void linkVertices(Dart d, Dart e) ;
+
+	/**
 	 * The attributes attached to the face of dart d are kept on the resulting face
 	 */
 	virtual bool mergeFaces(Dart d) ;
