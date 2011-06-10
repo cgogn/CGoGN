@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Geometry/bounding_box.h"
+#include <limits>
 
 namespace CGoGN
 {
@@ -22,6 +23,14 @@ inline bool valueOf(const std::string &s, T &obj)
   return is >> obj;
 }
 
+template <typename VEC>
+bool posSort(const std::pair<VEC, Dart>& a1, const std::pair<VEC, Dart>& a2)
+{
+	VEC v1 = a1.first;
+	VEC v2 = a2.first;
+	return v1[0] < v2[0] || (v1[0] == v2[0] && v1[1] < v2[1]);
+}
+
 template <typename PFP>
 bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons, CellMarker& polygonsFaces)
 {
@@ -39,6 +48,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 
 	std::vector<POLYGON> allPoly;
+	std::vector<POLYGON> allBrokenLines;
+	std::vector<float> allBrokenLinesWidth;
 
 	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
 	{
@@ -51,7 +62,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 			{
 				if (chechXmlNode(cur_path, "path"))
 				{
-					allPoly.push_back(POLYGON());
+					bool closedPoly=false;
+					POLYGON curPoly;
 					CGoGNout << "--load a path--"<< CGoGNendl;
 					xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "d");
 //					CGoGNout << "path "<< prop << CGoGNendl;
@@ -111,6 +123,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 						else if(coord[0]=='z')
 						{
 //							std::cout << "the end" << std::endl;
+							closedPoly = true;
 						}
 						else //coordinates
 						{
@@ -128,7 +141,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 									valueOf(xS,x);
 
-									POLYGON curPoly = allPoly[allPoly.size()-1];
 									VEC3 previous = (curPoly)[(curPoly).size()-1];
 									y = previous[1];
 
@@ -143,7 +155,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 									valueOf(yS,y);
 
-									POLYGON curPoly = allPoly[allPoly.size()-1];
 									typename PFP::VEC3 previous = (curPoly)[(curPoly).size()-1];
 									x = previous[0];
 
@@ -185,7 +196,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 						//if there is a point to push
 						if(push_point)
 						{
-							POLYGON& curPoly = allPoly[allPoly.size()-1];
 
 							if(relative && curPoly.size()>0)
 							{
@@ -200,7 +210,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 					}
 
 					//check orientation : set in CCW
-					POLYGON& curPoly = allPoly[allPoly.size()-1];
 					if(curPoly.size()>2)
 					{
 						VEC3 v1(curPoly[1]-curPoly[0]);
@@ -212,6 +221,29 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 						}
 					}
 
+					if(closedPoly)
+						allPoly.push_back(curPoly);
+					else {
+						allBrokenLines.push_back(curPoly);
+						xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "style");
+						std::string allstyle((reinterpret_cast<const char*>(prop)));
+						std::stringstream is(allstyle);
+						std::string style;
+						while ( std::getline( is, style, ';' ) )
+						{
+							if(style.find("stroke-width:")!=std::string::npos)
+							{
+								std::stringstream isSize(style);
+								std::getline( isSize, style, ':' );
+								float sizeOfLine;
+								isSize >> sizeOfLine;
+								std::cout << "sizeOfLine : " << sizeOfLine << std::endl;
+								allBrokenLinesWidth.push_back(sizeOfLine);
+							}
+						}
+
+					}
+
 				}
 			}
 		}
@@ -219,8 +251,53 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 	xmlFreeDoc(doc);
 
-	Geom::BoundingBox<typename PFP::VEC3> bb(*(allPoly.begin()->begin()));
+	Geom::BoundingBox<typename PFP::VEC3> bb(*(allBrokenLines.begin()->begin()));
 
+	CellMarker brokenMark(map,EDGE);
+	AttributeHandler<float> edgeWidth = map.template addAttribute<float>(FACE, "width");
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//create broken lines
+	std::vector<float >::iterator itW = allBrokenLinesWidth.begin();
+	for(typename std::vector<POLYGON >::iterator it = allBrokenLines.begin() ; it != allBrokenLines.end() ; ++it)
+	{
+		if(it->size()<2)
+		{
+			it = allBrokenLines.erase(it);
+			itW = allBrokenLinesWidth.erase(itW);
+		}
+		else
+		{
+			unsigned int faceDegree = it->size()*2-2;
+			Dart d = map.newFace(faceDegree);
+			edgeWidth[d] = *itW;
+			std::cout << "newFace " << faceDegree << std::endl;
+
+			polygonsFaces.mark(d);
+
+			Dart d1=d;
+			Dart d_1=map.phi_1(d);
+			for(unsigned int i = 0; i<faceDegree/2 ; ++i)
+			{
+				map.sewFaces(d1,d_1);
+				d1 = map.phi1(d1);
+				d_1 = map.phi_1(d_1);
+			}
+
+
+			for(typename POLYGON::iterator emb = it->begin() ; emb != it->end() ; emb++)
+			{
+				position[d] = *emb;
+				bb.addPoint(*emb);
+				d = map.phi1(d);
+			}
+		}
+
+		itW++;
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//create polygons
 	typename std::vector<POLYGON >::iterator it;
 	for(it = allPoly.begin() ; it != allPoly.end() ; ++it)
 	{
@@ -243,81 +320,242 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 		}
 	}
 
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//add bounding box
+
+	CellMarker boundingBox(map,VERTEX);
 	Dart dBorder = map.newFace(4);
-	typename PFP::VEC3 bmin = bb.min();
-	typename PFP::VEC3 bmax = bb.max();
-	position[dBorder] = bmin-0.1f*bmin;
-	position[map.phi1(dBorder)] = VEC3(bmax[0],bmin[1],0) + 0.1f*VEC3(bmax[0],-bmin[1],0);
-	position[map.phi1(map.phi1(dBorder))] = VEC3(bmax[0],bmax[1],0) + 0.1f*bmax;
-	position[map.phi_1(dBorder)] = VEC3(bmin[0],bmax[1],0) + 0.1f*VEC3(-bmin[0],bmax[1],0);;
+
+	VEC3 bbCenter = bb.center();
+	VEC3 bmin = bb.min();
+	bmin += 0.3f*(bmin-bbCenter);
+	VEC3 bmax = bb.max();
+	bmax -= 0.3f*(bmin-bbCenter);
+
+	position[dBorder] = bmin;
+	position[map.phi1(dBorder)] = VEC3(bmax[0],bmin[1],0);
+	position[map.phi1(map.phi1(dBorder))] = VEC3(bmax[0],bmax[1],0);
+	position[map.phi_1(dBorder)] = VEC3(bmin[0],bmax[1],0);
+
+	Dart d = dBorder;
+	do
+	{
+		boundingBox.mark(d);
+		d = map.phi1(d);
+	} while(d!=dBorder);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//cut the edges to have a more regular sampling
+//	float maxDist=60.0f;
+//	CellMarker treated(map,EDGE);
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if(!treated.isMarked(d))
+//		{
+//			treated.mark(d);
+//			VEC3 p1 =position[d];
+//			VEC3 p2 =position[map.phi1(d)];
+//
+//			if((p1-p2).norm()>maxDist)
+//			{
+//				unsigned int nbSeg = ((p1-p2).norm())/int(maxDist);
+//				for(unsigned int i=0;i<nbSeg-1;++i)
+//				{
+//					map.cutEdge(d);
+//
+//					if(boundingBox.isMarked(d))
+//						boundingBox.mark(map.phi1(d));
+//				}
+//
+//				Dart dd = map.phi1(d);
+//				VEC3 interv(p2-p1);
+//				interv /= nbSeg;
+//
+//				for(unsigned int i=1;i<nbSeg;++i)
+//				{
+//					position[dd] = p1+interv*i;
+//					dd = map.phi1(dd);
+//				}
+//			}
+//		}
+//	}
 
 	DartMarker inside(map);
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(map.phi2(d) == d)
-		{
-			polygons.mark(d);
-			inside.mark(d);
-		}
+		polygons.mark(d);
+		inside.mark(d);
 	}
 
 	DartMarker close(map);
 	map.closeMap(close);
 
-	float maxDistSq=40.0f*40.0f;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		VEC3 p1 =position[d];
-		VEC3 p2 =position[map.phi1(d)];
-		if((p1-p2).norm2()>maxDistSq)
-		{
-			VEC3 p3 = (p1+p2)/2.0f;
-			map.cutEdge(d);
-			position[map.phi1(d)] = p3;
-		}
-	}
-
-	CellMarker linked(map,VERTEX);
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//process broken lines
 	for(Dart d = map.begin();d != map.end(); map.next(d))
 	{
-		if(!linked.isMarked(d) && !inside.isMarked(d))
+		if(map.phi2(d) != d && map.sameFace(map.phi2(d),d) && !boundingBox.isMarked(d) && inside.isMarked(d))
 		{
-			linked.mark(d);
-			Dart dMin=map.end();
-			float distMin = 1.0f/0.0f;
-			for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
+			std::cout << "add face" << std::endl;
+
+			Dart d1 = d;
+			Dart d2 = map.phi2(d);
+			VEC3 p1 = position[d1];
+			VEC3 p2 = position[d2];
+			float width = edgeWidth[d1];
+
+			VEC3 v = p2-p1;
+			map.unsewFaces(d);
+
+			Dart dN = map.newFace(4);
+
+			VEC3 ortho = v^VEC3(0,0,1);
+			ortho.normalize();
+
+			if(map.alpha1(d1)==d1)
 			{
-				if(!inside.isMarked(dd) && !map.sameFace(d,dd))
-				{
-					float dist = (position[dd]-position[d]).norm();
-					if(dist<distMin)
-					{
-						distMin = dist;
-						dMin = dd;
-					}
-				}
+				std::cout << "cut1 " << std::endl;
+				map.cutEdge(map.phi_1(d1));
+
+				position[map.phi_1(d1)]=p1-width*ortho;
+				position[d1]=p1+width*ortho;
+			}
+			else
+			{
+				Dart d_1 = map.phi_1(d1);
+				VEC3 v2 = p1-position[d_1];
+
+				VEC3 ortho2 = v2^VEC3(0,0,1);
+				ortho2.normalize();
+				ortho += ortho2;
+				ortho.normalize();
+				position[d1]=p1+width*ortho;
 			}
 
-			if(dMin!=map.end())
+			if(map.alpha1(d2)==d2)
 			{
-				Dart dChoose = d;
-				Dart dStart = d;
-				do {
-					float dist = (position[dMin]-position[d]).norm();
-					if(dist<distMin)
-					{
-						distMin = dist;
-						dChoose = d;
-					}
+				std::cout << "cut2 " << std::endl;
+				map.cutEdge(map.phi_1(d2));
 
-					d = map.phi1(d);
-				} while(d!= dStart);
-
-				map.linkVertices(dMin,dChoose);
+				position[map.phi_1(d2)]=p2+width*ortho;
+				position[d2]=p2-width*ortho;
 			}
+			else
+			{
+				Dart d_1 = map.phi_1(d2);
+				VEC3 v2 = p2-position[d_1];
+
+				VEC3 ortho2 = v2^VEC3(0,0,1);
+				ortho2.normalize();
+				ortho -= ortho2;
+				ortho.normalize();
+				position[d2]=p2-2.0f*width*ortho;
+			}
+
+			map.sewFaces(d1,dN);
+			map.sewFaces(d2,map.phi1(map.phi1(dN)));
+
 		}
 	}
+
+	for(Dart d = map.begin();d != map.end(); map.next(d))
+	{
+		if(d==map.phi2(d))
+			map.closeHole(d);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//process polygons
+
+
+//	std::vector<std::pair<VEC3,Dart> > toConnect;
+//	CellMarker connected(map,VERTEX);
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if( ((!boundingBox.isMarked(d) && !inside.isMarked(d)) || (boundingBox.isMarked(d) && inside.isMarked(d)))
+//			&& !connected.isMarked(d)
+//		  )
+//		{
+//			connected.mark(d);
+//			toConnect.push_back(std::make_pair(position[d],d));
+//		}
+//	}
+//
+//	std::sort(toConnect.begin(), toConnect.end(),posSort<VEC3>);
+//
+//	for(typename std::vector<std::pair<VEC3 ,Dart > >::iterator it = toConnect.begin(); it != toConnect.end() ; ++it)
+//	{
+//		Dart d = it->second;
+//		typename std::vector<std::pair<VEC3,Dart> >::iterator it2 = it+1;
+//		if(it2!= toConnect.end())
+//		{
+//			Dart dd = it2->second;
+//			if(!map.sameFace(map.phi2(d),map.phi2(dd)))
+//			{
+//				if(!map.sameFace(dd,d)) {
+//					std::cout << "link" << std::endl;
+//					map.linkVertices(dd,d);
+//				}
+//				else
+//				{
+//					map.splitFace(dd,d);
+//					std::cout << "split" << std::endl;
+//				}
+//			}
+//		}
+//
+//	}
+
+//	CellMarker connected(map,VERTEX);
+//	unsigned int i=0;
+//	for(Dart d = map.begin();d != map.end(); map.next(d))
+//	{
+//		if(!connected.isMarked(d) && !boundingBox.isMarked(d) && !inside.isMarked(d))
+//		{
+//			i++;
+//			Dart dMin=map.end();
+//			float distMin = std::numeric_limits<float>::max();
+//			for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
+//			{
+//				if(    (
+//						(boundingBox.isMarked(dd) && inside.isMarked(dd))
+//					|| (!boundingBox.isMarked(dd) && !inside.isMarked(dd))
+//					   )
+//						&& !map.sameFace(map.phi2(d),map.phi2(dd)))
+//				{
+//					if(Geom::testOrientation2D(position[dd], position[d], position[map.phi1(d)]) == Geom::LEFT
+//							&& Geom::testOrientation2D(position[dd], position[d], position[map.phi_1(d)]) == Geom::RIGHT)
+//					{
+//						float dist = (position[dd]-position[d]).norm();
+//						if(dist<distMin)
+//						{
+//							distMin = dist;
+//							dMin = dd;
+//						}
+//					}
+//				}
+//			}
+//
+//			if(dMin!=map.end())
+//			{
+//				if(!map.sameFace(dMin,d)) {
+//					std::cout << "link" << std::endl;
+//					connected.mark(d);
+//					connected.mark(dMin);
+//					map.linkVertices(dMin,d);
+//				}
+//				else
+//				{
+//					map.splitFace(dMin,d);
+//					connected.mark(d);
+//					connected.mark(dMin);
+//					std::cout << "split" << std::endl;
+//				}
+//			}
+//		}
+//	}
 
 	return true ;
 }
