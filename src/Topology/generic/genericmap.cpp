@@ -550,8 +550,8 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 
 bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
 {
-	DartMarker marker(*this,thread);	// Lock a marker
-	bool found = false;			// Store the result
+	DartMarker marker(*this, thread);	// Lock a marker
+	bool found = false;					// Store the result
 
 	// Scan all darts of the map
 	for (Dart d = begin(); !found && d != end(); next(d))

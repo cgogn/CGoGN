@@ -42,8 +42,9 @@ namespace Selection
 {
 
 /*********************************************************
- * Collector
+ * Generic Collector
  *********************************************************/
+
 template <typename PFP>
 class Collector
 {
@@ -68,6 +69,8 @@ public:
 	virtual void init(Dart d, REAL r = 0) = 0;
 
 	virtual void collect() = 0;
+
+	bool apply(FunctorType& f);
 
 	void sort()
 	{
@@ -135,6 +138,7 @@ protected:
 	typename PFP::REAL radius_2;
 	typename PFP::VEC3 centerPosition;
 	typename PFP::REAL area;
+
 public:
 	Collector_WithinSphere(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition) :
 		Collector<PFP>(mymap,myposition)

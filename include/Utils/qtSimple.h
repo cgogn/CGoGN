@@ -216,7 +216,6 @@ public:
 	const glm::mat4& projectionMatrix() const { return m_projection_matrix; }
 	glm::mat4& projectionMatrix() { return m_projection_matrix; }
 
-
 	float* curquat() { return m_curquat; }
 	float* lastquat() { return m_lastquat; }
 

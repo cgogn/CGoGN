@@ -31,14 +31,24 @@ namespace Algo
 namespace Selection
 {
 
-/********************************************
- * GENERIC COLLECTOR
- ********************************************/
+/*********************************************************
+ * Generic Collector
+ *********************************************************/
+
 template <typename PFP>
 Collector<PFP>::Collector(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition):
 	map(mymap),
 	position(myposition)
 {}
+
+template <typename PFP>
+bool Collector<PFP>::apply(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = insideVertices.begin(); iv != insideVertices.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
 
 template <typename PPFP>
 std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c)
@@ -121,6 +131,7 @@ void Collector_WithinSphere<PFP>::collect()
 	vm.mark(this->centerDart);
 
 	unsigned int i = 0;
+//	for(std::vector<Dart>::iterator iv = this->insideVertices.begin(); iv != this->insideVertices.end(); ++iv)
 	while (i < this->insideVertices.size())
 	{
 		Dart end = this->insideVertices[i];
@@ -132,7 +143,7 @@ void Collector_WithinSphere<PFP>::collect()
 				const Dart f = this->map.phi1(e);
 				const Dart g = this->map.phi1(f);
 
-				if (!this->isInside(f))
+				if (! this->isInside(f))
 				{
 					this->border.push_back(e); // add to border
 					em.mark(e);
@@ -163,17 +174,17 @@ void Collector_WithinSphere<PFP>::collect()
 	}
 }
 
-template <typename PFP>
-typename PFP::REAL Collector_WithinSphere<PFP>::intersect_SphereEdge(const Dart din, const Dart dout)
-{
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-	VEC3 p = this->position[din] - this->centerPosition;
-	VEC3 qminusp = this->position[dout] - this->centerPosition - p;
-	REAL s = p*qminusp;
-	REAL n2 = qminusp.norm2();
-	return (- s + sqrt (s*s + n2*(this->radius_2 - p.norm2())))/(n2);
-}
+//template <typename PFP>
+//typename PFP::REAL Collector_WithinSphere<PFP>::intersect_SphereEdge(const Dart din, const Dart dout)
+//{
+//	typedef typename PFP::VEC3 VEC3;
+//	typedef typename PFP::REAL REAL;
+//	VEC3 p = this->position[din] - this->centerPosition;
+//	VEC3 qminusp = this->position[dout] - this->centerPosition - p;
+//	REAL s = p * qminusp;
+//	REAL n2 = qminusp.norm2();
+//	return (- s + sqrt(s * s + n2 * (this->radius_2 - p.norm2()))) / n2;
+//}
 
 template <typename PFP>
 void Collector_WithinSphere<PFP>::computeArea()
@@ -189,14 +200,14 @@ void Collector_WithinSphere<PFP>::computeArea()
 		const Dart g = this->map.phi1(f);
 		if (this->isInside(g))
 		{ // only f is outside
-			typename PFP::REAL alpha = this->intersect_SphereEdge (*it, f);
-			typename PFP::REAL beta = this->intersect_SphereEdge (g, f);
+			typename PFP::REAL alpha = this->intersect_SphereEdge(*it, f);
+			typename PFP::REAL beta = this->intersect_SphereEdge(g, f);
 			this->area += (alpha+beta - alpha*beta) * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 		else
 		{ // f and g are outside
-			typename PFP::REAL alpha = this->intersect_SphereEdge (*it, f);
-			typename PFP::REAL beta = this->intersect_SphereEdge (*it, g);
+			typename PFP::REAL alpha = this->intersect_SphereEdge(*it, f);
+			typename PFP::REAL beta = this->intersect_SphereEdge(*it, g);
 			this->area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 	}

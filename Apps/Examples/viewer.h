@@ -78,7 +78,6 @@ public:
 	float shininess ;
 
 	Geom::BoundingBox<PFP::VEC3> bb ;
-	Geom::Vec3f gPosObj ;
 	float normalBaseSize ;
 	float normalScaleFactor ;
 	float vertexBaseSize ;

@@ -27,6 +27,7 @@
 
 #include "Geometry/basic.h"
 #include "Geometry/intersection.h"
+#include "Geometry/inclusion.h"
 
 namespace CGoGN
 {
@@ -75,11 +76,17 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typenam
 template <typename PFP>
 bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const typename PFP::TVEC3& positions) ;
 
-}
+/**
+ *
+ */
+template <typename PFP>
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const typename PFP::TVEC3& positions, typename PFP::REAL& alpha) ;
 
-}
+} // namespace Geometry
 
-}
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/Geometry/intersection.hpp"
 

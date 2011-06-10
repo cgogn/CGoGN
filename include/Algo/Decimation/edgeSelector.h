@@ -27,6 +27,11 @@
 
 #include "Algo/Decimation/selector.h"
 
+#include "Container/fakeAttribute.h"
+#include "Utils/qem.h"
+#include "Utils/quadricRGBfunctions.h"
+#include "Algo/Geometry/curvature.h"
+
 namespace CGoGN
 {
 
@@ -246,12 +251,17 @@ private:
 	} CurvatureEdgeInfo ;
 	typedef NoMathIOAttribute<CurvatureEdgeInfo> EdgeInfo ;
 
+	Geom::BoundingBox<VEC3> bb ;
+	REAL radius ;
+
 	typename PFP::TVEC3 normal ;
 	AttributeHandler<EdgeInfo> edgeInfo ;
-	typename PFP::TREAL k1 ;
-	typename PFP::TREAL k2 ;
-	typename PFP::TVEC3 K1 ;
-	typename PFP::TVEC3 K2 ;
+	typename PFP::TREAL edgeangle ;
+	typename PFP::TREAL kmax ;
+	typename PFP::TREAL kmin ;
+	typename PFP::TVEC3 Kmax ;
+	typename PFP::TVEC3 Kmin ;
+	typename PFP::TVEC3 Knormal ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -266,6 +276,9 @@ public:
 	EdgeSelector_Curvature(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
+		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
+		radius = bb.diagSize() * 0.003 ;
+
 		normal = m.template getAttribute<VEC3>(VERTEX, "normal") ;
 		if(!normal.isValid())
 		{
@@ -273,29 +286,40 @@ public:
 			Algo::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
-		k1 = m.template getAttribute<REAL>(VERTEX, "k1") ;
-		k2 = m.template getAttribute<REAL>(VERTEX, "k2") ;
-		K1 = m.template getAttribute<VEC3>(VERTEX, "K1") ;
-		K2 = m.template getAttribute<VEC3>(VERTEX, "K2") ;
+		edgeangle = m.template getAttribute<REAL>(VERTEX, "edgeangle") ;
+		if(!edgeangle.isValid())
+		{
+			edgeangle = m.template addAttribute<REAL>(EDGE, "edgeangle") ;
+			Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(m, pos, edgeangle) ;
+		}
+
+		kmax = m.template getAttribute<REAL>(VERTEX, "kmax") ;
+		kmin = m.template getAttribute<REAL>(VERTEX, "kmin") ;
+		Kmax = m.template getAttribute<VEC3>(VERTEX, "Kmax") ;
+		Kmin = m.template getAttribute<VEC3>(VERTEX, "Kmin") ;
+		Knormal = m.template getAttribute<VEC3>(VERTEX, "Knormal") ;
 		// as all these attributes are computed simultaneously by computeCurvatureVertices
 		// one can assume that if one of them is not valid, the others must be created too
-		if(!k1.isValid())
+		if(!kmax.isValid())
 		{
-			k1 = m.template addAttribute<REAL>(VERTEX, "k1") ;
-			k2 = m.template addAttribute<REAL>(VERTEX, "k2") ;
-			K1 = m.template addAttribute<VEC3>(VERTEX, "K1") ;
-			K2 = m.template addAttribute<VEC3>(VERTEX, "K2") ;
-			Algo::Geometry::computeCurvatureVertices<PFP>(m, this->m_position, normal, k1, k2, K1, K2) ;
+			kmax = m.template addAttribute<REAL>(VERTEX, "kmax") ;
+			kmin = m.template addAttribute<REAL>(VERTEX, "kmin") ;
+			Kmax = m.template addAttribute<VEC3>(VERTEX, "Kmax") ;
+			Kmin = m.template addAttribute<VEC3>(VERTEX, "Kmin") ;
+			Knormal = m.template addAttribute<VEC3>(VERTEX, "Knormal") ;
+			Algo::Geometry::computeCurvatureVertices_NormalCycles<PFP>(m, radius, pos, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 
 		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
 	}
 	~EdgeSelector_Curvature()
 	{
-		this->m_map.removeAttribute(k1) ;
-		this->m_map.removeAttribute(k2) ;
-		this->m_map.removeAttribute(K1) ;
-		this->m_map.removeAttribute(K2) ;
+		this->m_map.removeAttribute(edgeangle) ;
+		this->m_map.removeAttribute(kmax) ;
+		this->m_map.removeAttribute(kmin) ;
+		this->m_map.removeAttribute(Kmax) ;
+		this->m_map.removeAttribute(Kmin) ;
+		this->m_map.removeAttribute(Knormal) ;
 		this->m_map.removeAttribute(edgeInfo) ;
 	}
 	SelectorType getType() { return S_Curvature ; }

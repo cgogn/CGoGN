@@ -304,7 +304,7 @@ void computeCurvatureVertices_NormalCycles(
 	typename PFP::REAL radius,
 	const typename PFP::TVEC3& position,
 	const typename PFP::TVEC3& normal,
-	const typename PFP::TREAL& angles,
+	const typename PFP::TREAL& edgeangle,
 	typename PFP::TREAL& kmax,
 	typename PFP::TREAL& kmin,
 	typename PFP::TVEC3& Kmax,
@@ -318,7 +318,7 @@ void computeCurvatureVertices_NormalCycles(
 		if(select(d) && !marker.isMarked(d))
 		{
 			marker.mark(d);
-			computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, angles, kmax, kmin, Kmax, Kmin, Knormal) ;
+			computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 		}
 	}
 }
@@ -330,7 +330,7 @@ void computeCurvatureVertex_NormalCycles(
 	typename PFP::REAL radius,
 	const typename PFP::TVEC3& position,
 	const typename PFP::TVEC3& normal,
-	const typename PFP::TREAL& angles,
+	const typename PFP::TREAL& edgeangle,
 	typename PFP::TREAL& kmax,
 	typename PFP::TREAL& kmin,
 	typename PFP::TVEC3& Kmax,
@@ -354,16 +354,15 @@ void computeCurvatureVertex_NormalCycles(
 	for (std::vector<Dart>::const_iterator it = vd1.begin(); it != vd1.end(); ++it)
 	{
 		const VEC3 e = position[map.phi2(*it)] - position[*it] ;
-		tensor += Geom::transposed_vectors_mult(e,e) * angles[*it] * (1 / e.norm()) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
 	}
-
 	// border
 	const std::vector<Dart>& vd2 = neigh.getBorder() ;
 	for (std::vector<Dart>::const_iterator it = vd2.begin(); it != vd2.end(); ++it)
 	{
 		const VEC3 e = position[map.phi2(*it)] - position[*it] ;
 		const REAL alpha = neigh.intersect_SphereEdge(*it, map.phi2(*it)) ;
-		tensor += Geom::transposed_vectors_mult(e,e) * angles[*it] * (1 / e.norm()) * alpha ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) * alpha ;
 	}
 
 	tensor /= neigh.getArea() ;

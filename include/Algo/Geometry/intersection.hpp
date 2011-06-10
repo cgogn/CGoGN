@@ -46,10 +46,10 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
 	const float SMALL_NUM = std::numeric_limits<typename PFP::REAL>::min() * 5.0f;
 
 	VEC3 p1 = positions[d];
-	VEC3 n = faceNormal<PFP>(map,d,positions);
+	VEC3 n = faceNormal<PFP>(map, d, positions);
 	VEC3 w0 = P - p1;
-    float a = -(n*w0);
-    float b = n*Dir;
+    float a = -(n * w0);
+    float b = n * Dir;
 
     if (fabs(b) < SMALL_NUM)
 		return false;
@@ -225,8 +225,25 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 	return intersection;
 }
 
+template <typename PFP>
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const typename PFP::TVEC3& positions, typename PFP::REAL& alpha)
+{
+	typename PFP::VEC3& p1 = position[d];
+	typename PFP::VEC3& p2 = position[map.phi1(d)];
+	if(Geom::isPointInSphere(p1, center, radius) && !Geom::isPointInSphere(p2, center, radius))
+	{
+		VEC3 p = p1 - center;
+		VEC3 qminusp = p2 - center - p;
+		REAL s = p * qminusp;
+		REAL n2 = qminusp.norm2();
+		alpha = (- s + sqrt(s*s + n2 * (radius*radius - p.norm2()))) / n2;
+		return true ;
+	}
+	return false ;
 }
 
-}
+} // namespace Geometry
 
-}
+} // namespace Algo
+
+} // namespace CGoGN

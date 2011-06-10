@@ -43,6 +43,9 @@ enum Intersection
 	FACE_INTERSECTION = 3
 } ;
 
+/**
+ * test the intersection between a ray and a triangle
+ */
 template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
