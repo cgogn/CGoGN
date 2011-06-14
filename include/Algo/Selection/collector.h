@@ -25,6 +25,8 @@
 #ifndef __COLLECTOR_H__
 #define __COLLECTOR_H__
 
+#include "Algo/Geometry/intersection.h"
+
 /*****************************************
  * Class hierarchy :
  * Collector (virtual)
@@ -135,7 +137,6 @@ template <typename PFP>
 class Collector_WithinSphere : public Collector<PFP>
 {
 protected:
-	typename PFP::REAL radius_2;
 	typename PFP::VEC3 centerPosition;
 	typename PFP::REAL area;
 
@@ -145,16 +146,6 @@ public:
 	{}
 	void init(Dart d, typename PFP::REAL r = 0);
 	void collect();
-
-	bool isInside(Dart d)
-	{
-		return (this->position[d] - centerPosition).norm2() < radius_2;
-	}
-	// alpha = coef d'interpolation dans [0 ,1] tel que v= (1-alpha)*pin + alpha*pout
-	// est le point d'intersection entre la sphère et le segment [pin, pout]
-	// avec pin = position[din] à l'intérieur de la sphère
-	// avec pout = position[dout] à l'extérieur de la sphère
-	typename PFP::REAL intersect_SphereEdge(const Dart din, const Dart dout);
 	void computeArea();
 	typename PFP::REAL getArea() const { return area; }
 };

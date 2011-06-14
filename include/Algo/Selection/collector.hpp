@@ -112,7 +112,6 @@ void Collector_WithinSphere<PFP>::init(Dart d, typename PFP::REAL r)
 	this->insideEdges.clear();
 	this->insideFaces.clear();
 	this->border.clear();
-	radius_2 = r * r;
 	centerPosition = this->position[d];
 	area = 0;
 }
@@ -143,7 +142,7 @@ void Collector_WithinSphere<PFP>::collect()
 				const Dart f = this->map.phi1(e);
 				const Dart g = this->map.phi1(f);
 
-				if (! this->isInside(f))
+				if (! Geom::isPointInSphere(this->position[f], centerPosition, this->radius))
 				{
 					this->border.push_back(e); // add to border
 					em.mark(e);
@@ -161,7 +160,7 @@ void Collector_WithinSphere<PFP>::collect()
 						this->insideEdges.push_back(e);
 						em.mark(e);
 					}
-					if (! fm.isMarked(e) && this->isInside(g))
+					if (! fm.isMarked(e) && Geom::isPointInSphere(this->position[g], centerPosition, this->radius))
 					{
 						this->insideFaces.push_back(e);
 						fm.mark(e);
@@ -174,41 +173,31 @@ void Collector_WithinSphere<PFP>::collect()
 	}
 }
 
-//template <typename PFP>
-//typename PFP::REAL Collector_WithinSphere<PFP>::intersect_SphereEdge(const Dart din, const Dart dout)
-//{
-//	typedef typename PFP::VEC3 VEC3;
-//	typedef typename PFP::REAL REAL;
-//	VEC3 p = this->position[din] - this->centerPosition;
-//	VEC3 qminusp = this->position[dout] - this->centerPosition - p;
-//	REAL s = p * qminusp;
-//	REAL n2 = qminusp.norm2();
-//	return (- s + sqrt(s * s + n2 * (this->radius_2 - p.norm2()))) / n2;
-//}
-
 template <typename PFP>
 void Collector_WithinSphere<PFP>::computeArea()
 {
 	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
 	{
-		this->area += Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
+		area += Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 	}
 
 	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const Dart f = this->map.phi1(*it); // we know that f is outside
 		const Dart g = this->map.phi1(f);
-		if (this->isInside(g))
+		if (Geom::isPointInSphere(this->position[g], centerPosition, this->radius))
 		{ // only f is outside
-			typename PFP::REAL alpha = this->intersect_SphereEdge(*it, f);
-			typename PFP::REAL beta = this->intersect_SphereEdge(g, f);
-			this->area += (alpha+beta - alpha*beta) * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
+			typename PFP::REAL alpha, beta;
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, this->position, alpha);
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(f), this->position, beta);
+			area += (alpha+beta - alpha*beta) * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 		else
 		{ // f and g are outside
-			typename PFP::REAL alpha = this->intersect_SphereEdge(*it, f);
-			typename PFP::REAL beta = this->intersect_SphereEdge(*it, g);
-			this->area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
+			typename PFP::REAL alpha, beta;
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, this->position, alpha);
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(g), this->position, beta);
+			area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 	}
 }

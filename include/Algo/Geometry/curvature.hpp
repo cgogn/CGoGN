@@ -360,8 +360,9 @@ void computeCurvatureVertex_NormalCycles(
 	const std::vector<Dart>& vd2 = neigh.getBorder() ;
 	for (std::vector<Dart>::const_iterator it = vd2.begin(); it != vd2.end(); ++it)
 	{
-		const VEC3 e = position[map.phi2(*it)] - position[*it] ;
-		const REAL alpha = neigh.intersect_SphereEdge(*it, map.phi2(*it)) ;
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, *it, position) ;
+		REAL alpha ;
+		Algo::Geometry::intersectionSphereEdge<PFP>(map, center, radius, *it, position, alpha) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) * alpha ;
 	}
 

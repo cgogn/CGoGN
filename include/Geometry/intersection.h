@@ -95,9 +95,9 @@ Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& d
 template <typename VEC3>
 Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA,  const VEC3& QB, VEC3& Inter) ;
 
-}
+} // namespace Geom
 
-}
+} // namespace CGoGN
 
 #include "intersection.hpp"
 
