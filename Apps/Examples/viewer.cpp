@@ -185,13 +185,9 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	gPosObj = bb.center() ;
-	float tailleX = bb.size(0) ;
-	float tailleY = bb.size(1) ;
-	float tailleZ = bb.size(2) ;
-	gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
-	normalBaseSize = std::min<float>(std::min<float>(tailleX,tailleY),tailleZ) / 50.0f ;
+	normalBaseSize = bb.diagSize() / 100.0f ;
 	vertexBaseSize = normalBaseSize * 2.0f ;
 
 	if(!normal.isValid())
@@ -202,7 +198,7 @@ void Viewer::importMesh(std::string& filename)
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
 
-	setParamObject(gWidthObj, gPosObj.data()) ;
+	setParamObject(bb.maxSize(), gPosObj.data()) ;
 	updateGLMatrices() ;
 }
 

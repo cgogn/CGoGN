@@ -76,6 +76,7 @@ void EmbeddedMap2<MAP2>::cutEdge(Dart d)
 	if (MAP2::isOrbitEmbedded(EDGE))
 	{
 		MAP2::embedNewCell(EDGE, nd) ;
+		MAP2::copyDartEmbedding(EDGE, MAP2::phi2(d), d) ;
 		MAP2::copyCell(EDGE, nd, d) ;
 	}
 	if(MAP2::isOrbitEmbedded(FACE))

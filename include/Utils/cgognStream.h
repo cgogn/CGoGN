@@ -42,7 +42,7 @@ class QTextEdit;
 namespace CGoGN
 {
 
-namespace  CGoGNStream
+namespace CGoGNStream
 {
 
 /**
@@ -201,6 +201,5 @@ extern CGoGNStream::Special CGoGNendl;
 extern CGoGNStream::Special CGoGNflush;
 
 } // namespace CGoGN
-
 
 #endif /* CGOGNSTREAM_H_ */

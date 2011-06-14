@@ -149,30 +149,6 @@ public:
 		return m_map.getMarkerVector(DART, m_thread)->operator[](d.index).testMark(m_marker);
 	}
 
-//	/**
-//	 * mark the dart
-//	 */
-//	virtual void mark(unsigned int d)
-//	{
-//		m_map.getMarkerVector(DART, m_thread)->operator[](d).setMark(m_marker);
-//	}
-//
-//	/**
-//	 * unmark the cell
-//	 */
-//	virtual void unmark(unsigned int d)
-//	{
-//		m_map.getMarkerVector(DART, m_thread)->operator[](d).unsetMark(m_marker);
-//	}
-//
-//	/**
-//	 * test if dart is marked
-//	 */
-//	virtual bool isMarked(unsigned int d)
-//	{
-//		return m_map.getMarkerVector(DART, m_thread)->operator[](d).testMark(m_marker);
-//	}
-
 	/**
 	 * mark the darts of the given orbit of d
 	 */

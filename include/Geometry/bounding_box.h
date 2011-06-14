@@ -42,37 +42,47 @@ class BoundingBox
 		/*                CONSTRUCTORS                */
 		/**********************************************/
 
-		// must initialize the bounding box with one first point
-		BoundingBox(const VEC& p);
+		BoundingBox() ;
+
+		// initialize the bounding box with one first point
+		BoundingBox(const VEC& p) ;
 
 		/**********************************************/
 		/*                 ACCESSORS                  */
 		/**********************************************/
 
-		VEC& min();
+		VEC& min() ;
 
-		const VEC& min() const;
+		const VEC& min() const ;
 
-		VEC& max();
+		VEC& max() ;
 
-		const VEC& max() const;
+		const VEC& max() const ;
 
-		typename VEC::DATA_TYPE size(unsigned int coord) const;
+		typename VEC::DATA_TYPE size(unsigned int coord) const ;
 
-		VEC center() const;
+		typename VEC::DATA_TYPE maxSize() const ;
+
+		typename VEC::DATA_TYPE minSize() const ;
+
+		VEC diag() const ;
+
+		typename VEC::DATA_TYPE diagSize() const ;
+
+		VEC center() const ;
 
 		/**********************************************/
 		/*                 FUNCTIONS                  */
 		/**********************************************/
 
 		// add a point to the bounding box
-		void addPoint(const VEC& p);
+		void addPoint(const VEC& p) ;
 
 		// return true if bb intersects the bounding box
-		bool intersects(const BoundingBox<VEC>& bb);
+		bool intersects(const BoundingBox<VEC>& bb) ;
 
 		// fusion with the given bounding box
-		void fusion(const BoundingBox<VEC>& bb);
+		void fusion(const BoundingBox<VEC>& bb) ;
 
 		/**********************************************/
 		/*             STREAM OPERATORS               */
@@ -81,7 +91,6 @@ class BoundingBox
 //		friend std::ostream& operator<<(std::ostream& out, const BoundingBox<VEC>& bb);
 //
 //		friend std::istream& operator>>(std::istream& in, BoundingBox<VEC>& bb);
-
 
 		friend std::ostream& operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
 		{
@@ -96,11 +105,13 @@ class BoundingBox
 		}
 
 	private:
+		bool m_initialized ;
 		VEC m_pMin, m_pMax ;
 } ;
 
-}
-}
+} // namespace Geom
+
+} // namespace CGoGN
 
 #include "bounding_box.hpp"
 #endif
