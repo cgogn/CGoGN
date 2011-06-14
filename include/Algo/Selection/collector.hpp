@@ -36,15 +36,40 @@ namespace Selection
  *********************************************************/
 
 template <typename PFP>
-Collector<PFP>::Collector(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition):
-	map(mymap),
-	position(myposition)
+Collector<PFP>::Collector(typename PFP::MAP& m) : map(m)
 {}
 
 template <typename PFP>
-bool Collector<PFP>::apply(FunctorType& f)
+inline bool Collector<PFP>::applyOnInsideVertices(FunctorType& f)
 {
 	for(std::vector<Dart>::iterator iv = insideVertices.begin(); iv != insideVertices.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnInsideEdges(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = insideEdges.begin(); iv != insideEdges.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnInsideFaces(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = insideFaces.begin(); iv != insideFaces.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnBorder(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = border.begin(); iv != border.end(); ++iv)
 		if(f(*iv))
 			return true ;
 	return false ;
@@ -55,16 +80,16 @@ std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c)
 {
     out << "Collector around " << c.centerDart << std::endl;
     out << "insideVertices (" << c.insideVertices.size() << ") = {";
-    for (unsigned int i=0; i< c.insideVertices.size(); ++i) out << c.insideVertices[i] << " ";
+    for (unsigned int i = 0; i< c.insideVertices.size(); ++i) out << c.insideVertices[i] << " ";
     out << "}" << std::endl ;
     out << "insideEdges (" << c.insideEdges.size() << ") = {";
-    for (unsigned int i=0; i< c.insideEdges.size(); ++i) out << c.insideEdges[i] << " ";
+    for (unsigned int i = 0; i< c.insideEdges.size(); ++i) out << c.insideEdges[i] << " ";
     out << "}" << std::endl ;
     out << "insideFaces (" << c.insideFaces.size() << ") = {";
-    for (unsigned int i=0; i< c.insideFaces.size(); ++i) out << c.insideFaces[i] << " ";
+    for (unsigned int i = 0; i< c.insideFaces.size(); ++i) out << c.insideFaces[i] << " ";
     out << "}" << std::endl ;
     out << "border (" << c.border.size() << ") = {";
-    for (unsigned int i=0; i< c.border.size(); ++i) out << c.border[i] << " ";
+    for (unsigned int i = 0; i< c.border.size(); ++i) out << c.border[i] << " ";
     out << "}" << std::endl;
     return out;
 }
@@ -74,19 +99,13 @@ std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c)
  *********************************************************/
 
 template <typename PFP>
-void Collector_OneRing<PFP>::init(Dart d, typename PFP::REAL r)
+void Collector_OneRing<PFP>::collectAll(Dart d)
 {
-	this->centerDart = d;
-	this->radius = r;
-	this->insideVertices.clear();
-	this->insideEdges.clear();
-	this->insideFaces.clear();
-	this->border.clear();
-}
+	this->init(d);
+	this->insideEdges.reserve(12);
+	this->insideFaces.reserve(12);
+	this->border.reserve(12);
 
-template <typename PFP>
-void Collector_OneRing<PFP>::collect()
-{
 	const Dart end = this->centerDart;
 	this->insideVertices.push_back(end);
 	Dart dd = end;
@@ -99,36 +118,44 @@ void Collector_OneRing<PFP>::collect()
 	} while(dd != end);
 }
 
+template <typename PFP>
+void Collector_OneRing<PFP>::collectBorder(Dart d)
+{
+	this->init(d);
+	this->border.reserve(12);
+
+	const Dart end = this->centerDart;
+	Dart dd = end;
+	do
+	{
+		this->border.push_back(this->map.phi1(dd));
+		dd = this->map.alpha1(dd);
+	} while(dd != end);
+}
+
 /*********************************************************
  * Collector Within Sphere
  *********************************************************/
 
 template <typename PFP>
-void Collector_WithinSphere<PFP>::init(Dart d, typename PFP::REAL r)
-{
-	this->centerDart = d;
-	this->radius = r;
-	this->insideVertices.clear();
-	this->insideEdges.clear();
-	this->insideFaces.clear();
-	this->border.clear();
-	centerPosition = this->position[d];
-	area = 0;
-}
-
-template <typename PFP>
-void Collector_WithinSphere<PFP>::collect()
+void Collector_WithinSphere<PFP>::collectAll(Dart d)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	CellMarkerStore vm(this->map,VERTEX); // mark the collected inside-vertices
-	CellMarkerStore em(this->map,EDGE); // mark the collected inside-edges + border-edges
-	CellMarkerStore fm(this->map,FACE); // mark the collected inside-faces + border-faces
+	this->init(d);
+	this->insideEdges.reserve(24);
+	this->insideFaces.reserve(24);
+	this->border.reserve(24);
+
+	CellMarkerStore vm(this->map, VERTEX);	// mark the collected inside-vertices
+	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges
+	CellMarkerStore fm(this->map, FACE);	// mark the collected inside-faces + border-faces
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
 
+	VEC3 centerPosition = this->position[d];
 	unsigned int i = 0;
 //	for(std::vector<Dart>::iterator iv = this->insideVertices.begin(); iv != this->insideVertices.end(); ++iv)
 	while (i < this->insideVertices.size())
@@ -174,12 +201,51 @@ void Collector_WithinSphere<PFP>::collect()
 }
 
 template <typename PFP>
+void Collector_WithinSphere<PFP>::collectBorder(Dart d)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	this->init(d);
+	this->border.reserve(100);
+
+	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges
+	CellMarkerStore fm(this->map, FACE);	// mark the collected inside-faces + border-faces
+
+	VEC3 centerPosition = this->position[d];
+	unsigned int i = 0;
+	while (i < this->insideVertices.size())
+	{
+		Dart end = this->insideVertices[i];
+		Dart e = end;
+		do
+		{
+			if (! em.isMarked(e) || ! fm.isMarked(e)) // are both tests useful ?
+			{
+				const Dart f = this->map.phi1(e);
+				const Dart g = this->map.phi1(f);
+
+				if (! Geom::isPointInSphere(this->position[f], centerPosition, this->radius))
+				{
+					this->border.push_back(e); // add to border
+					em.mark(e);
+					fm.mark(e); // is it useful ?
+				}
+			}
+			e = this->map.alpha1(e);
+		} while (e != end);
+		++i;
+	}
+}
+
+template <typename PFP>
 void Collector_WithinSphere<PFP>::computeArea()
 {
+	area = 0;
+	typename PFP::VEC3 centerPosition = this->position[this->centerDart];
+
 	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
-	{
 		area += Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
-	}
 
 	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{

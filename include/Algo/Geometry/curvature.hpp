@@ -340,12 +340,11 @@ void computeCurvatureVertex_NormalCycles(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position) ;
-	neigh.init(dart, radius) ;
-	neigh.collect() ;
+	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius) ;
+	neigh.collectAll(dart) ;
 	neigh.computeArea() ;
 
-	VEC3 center = position[neigh.getCenter()] ;
+	VEC3 center = position[dart] ;
 
 	typename PFP::MATRIX33 tensor(0) ;
 

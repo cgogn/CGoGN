@@ -55,10 +55,8 @@ protected:
 	typedef typename PFP::REAL REAL;
 
 	typename PFP::MAP& map;
-	const typename PFP::TVEC3& position;
 
 	Dart centerDart;
-	REAL radius;
 
 	std::vector<Dart> insideVertices;
 	std::vector<Dart> insideEdges;
@@ -66,15 +64,26 @@ protected:
 	std::vector<Dart> border;
 
 public:
-	Collector(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition);
+	Collector(typename PFP::MAP& m);
 
-	virtual void init(Dart d, REAL r = 0) = 0;
+	inline void init(Dart d)
+	{
+		centerDart = d;
+		insideVertices.clear();
+		insideEdges.clear();
+		insideFaces.clear();
+		border.clear();
+	}
 
-	virtual void collect() = 0;
+	virtual void collectAll(Dart d) = 0;
+	virtual void collectBorder(Dart d) = 0;
 
-	bool apply(FunctorType& f);
+	bool applyOnInsideVertices(FunctorType& f);
+	bool applyOnInsideEdges(FunctorType& f);
+	bool applyOnInsideFaces(FunctorType& f);
+	bool applyOnBorder(FunctorType& f);
 
-	void sort()
+	inline void sort()
 	{
 		std::sort(insideVertices.begin(), insideVertices.end());
 		std::sort(insideEdges.begin(), insideEdges.end());
@@ -82,21 +91,19 @@ public:
 		std::sort(border.begin(), border.end());
 	}
 
-	typename PFP::MAP& getMap() { return map; }
-	const AttributeHandler<typename PFP::VEC3>& getPosition() const { return position; }
+	inline typename PFP::MAP& getMap() { return map; }
 
-	Dart getCenter() const { return centerDart; }
-	REAL getRadius() const { return radius; }
+	inline Dart getCenterDart() const { return centerDart; }
 
-	const std::vector<Dart>& getInsideVertices() const { return insideVertices; }
-	const std::vector<Dart>& getInsideEdges() const { return insideEdges; }
-	const std::vector<Dart>& getInsideFaces() const { return insideFaces; }
-	const std::vector<Dart>& getBorder() const { return border; }
+	inline const std::vector<Dart>& getInsideVertices() const { return insideVertices; }
+	inline const std::vector<Dart>& getInsideEdges() const { return insideEdges; }
+	inline const std::vector<Dart>& getInsideFaces() const { return insideFaces; }
+	inline const std::vector<Dart>& getBorder() const { return border; }
 
-	unsigned int getNbInsideVertices() const { return insideVertices.size(); }
-	unsigned int getNbInsideEdges() const { return insideEdges.size(); }
-	unsigned int getNbInsideFaces() const { return insideFaces.size(); }
-	unsigned int getNbBorder() const { return border.size(); }
+	inline unsigned int getNbInsideVertices() const { return insideVertices.size(); }
+	inline unsigned int getNbInsideEdges() const { return insideEdges.size(); }
+	inline unsigned int getNbInsideFaces() const { return insideFaces.size(); }
+	inline unsigned int getNbBorder() const { return border.size(); }
 
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
@@ -117,11 +124,11 @@ template <typename PFP>
 class Collector_OneRing : public Collector<PFP>
 {
 public:
-	Collector_OneRing(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition) :
-		Collector<PFP>(mymap, myposition)
+	Collector_OneRing(typename PFP::MAP& m) :
+		Collector<PFP>(m)
 	{}
-	void init(Dart d, typename PFP::REAL r = 0);
-	void collect();
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
 };
 
 /*********************************************************
@@ -137,17 +144,26 @@ template <typename PFP>
 class Collector_WithinSphere : public Collector<PFP>
 {
 protected:
-	typename PFP::VEC3 centerPosition;
+	const typename PFP::TVEC3& position;
+	typename PFP::REAL radius;
 	typename PFP::REAL area;
 
 public:
-	Collector_WithinSphere(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition) :
-		Collector<PFP>(mymap,myposition)
+	Collector_WithinSphere(typename PFP::MAP& m, const typename PFP::TVEC3& p, typename PFP::REAL r = 0) :
+		Collector<PFP>(m),
+		position(p),
+		radius(r),
+		area(0)
 	{}
-	void init(Dart d, typename PFP::REAL r = 0);
-	void collect();
+	inline void setRadius(typename PFP::REAL r) { radius = r; }
+	inline typename PFP::REAL getRadius() const { return radius; }
+	inline const typename PFP::TVEC3& getPosition() const { return position; }
+
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
+
 	void computeArea();
-	typename PFP::REAL getArea() const { return area; }
+	inline typename PFP::REAL getArea() const { return area; }
 };
 
 } // namespace Selection
