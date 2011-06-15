@@ -170,7 +170,7 @@ void verticesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& pos
  * @param map the map we want to test
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param vertex (out) dart of selected vertex (set to map.end() if no vertex selected)
+ * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
  */
 template<typename PFP>
 void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = SelectorTrue())
@@ -191,9 +191,8 @@ void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 		distnint.resize(nbi);
 		for (unsigned int i = 0; i < nbi; ++i)
 		{
+			distnint[i].first = (iPoints[i] - rayA).norm2();
 			distnint[i].second = i;
-			typename PFP::VEC3 V = iPoints[i] - rayA;
-			distnint[i].first = V.norm2();
 		}
 
 		// sort the vector of pair dist/dart
@@ -207,6 +206,7 @@ void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 		Dart d = vecFaces[first];
 		Dart it = d;
 		typename PFP::REAL minDist = (ip - position[it]).norm2();
+		vertex = it;
 		it = map.phi1(it);
 		while(it != d)
 		{
@@ -220,7 +220,7 @@ void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 		}
 	}
 	else
-		vertex = map.end();
+		vertex = NIL;
 }
 
 /**
