@@ -66,54 +66,46 @@ public:
 class SelectorTrue : public FunctorSelect
 {
 public:
-	bool operator()(Dart) const {
-		return true;
-	}
+	bool operator()(Dart) const { return true; }
 };
 
 class SelectorFalse : public FunctorSelect
 {
 public:
-	bool operator()(Dart) const {
-		return false;
-	}
+	bool operator()(Dart) const { return false; }
 };
 
 // Counting Functors : increment its value every time it is applied
 /********************************************************/
 
-class FunctorCount: public virtual FunctorType
+class FunctorCount : public virtual FunctorType
 {
 private:
 	unsigned m_count;
 public:
 	FunctorCount(): m_count(0) {}
-	bool operator()(Dart) {
+	bool operator()(Dart)
+	{
 		m_count++;
 		return false;
 	}
-	unsigned getNb() const {
-		return m_count;
-	}
-	void init() {
-		m_count=0;
-	}
-	void increment() {
-		++m_count;
-	}
+	unsigned getNb() const { return m_count; }
+	void init() { m_count = 0; }
+	void increment() { ++m_count; }
 };
 
 // Embedding Functors
 /********************************************************/
 
 template <typename MAP>
-class FunctorSetEmb: public FunctorMap<MAP>
+class FunctorSetEmb : public FunctorMap<MAP>
 {
 protected:
 	unsigned int orbit;
 	unsigned int emb;
 public:
-	FunctorSetEmb(MAP& map, unsigned int orb, unsigned int e): FunctorMap<MAP>(map), orbit(orb), emb(e) {}
+	FunctorSetEmb(MAP& map, unsigned int orb, unsigned int e) : FunctorMap<MAP>(map), orbit(orb), emb(e)
+	{}
 	bool operator()(Dart d)
 	{
 		this->m_map.setDartEmbedding(orbit, d, emb);
@@ -125,58 +117,60 @@ public:
 /********************************************************/
 
 template <typename MAP>
-class FunctorSearch: public FunctorType
+class FunctorSearch : public FunctorType
 {
 protected:
 	bool m_found;
 	Dart dart;
 public:
-	FunctorSearch(Dart d): m_found(false), dart(d) {}
-	void setDart(Dart d) {
+	FunctorSearch(Dart d) : m_found(false), dart(d) {}
+	void setDart(Dart d)
+	{
 		dart = d;
 		m_found = false;
 	}
-	bool operator()(Dart d) {
-		if (d==dart) {
+	bool operator()(Dart d)
+	{
+		if (d == dart)
+		{
 			m_found = true;
 			return true;
 		}
 		return false;
 	}
-	bool found() {
-		return m_found;
+	bool found() { return m_found; }
+};
+
+// Functor Store: to store the traversed darts in a given vector
+/********************************************************/
+
+class FunctorStore : public FunctorType
+{
+protected:
+	std::vector<Dart>& m_vec;
+public:
+	FunctorStore(std::vector<Dart>& vec) : m_vec(vec) {}
+	bool operator()(Dart d)
+	{
+		m_vec.push_back(d);
+		return false;
 	}
 };
 
 // Multiple Functor: to apply several Functors in turn to a dart
 /********************************************************/
 
-class FunctorDoubleFunctor: public FunctorType
+class FunctorDoubleFunctor : public FunctorType
 {
 protected:
 	FunctorType& m_fonct1;
 	FunctorType& m_fonct2;
 public:
-	FunctorDoubleFunctor(FunctorType& f1, FunctorType& f2): m_fonct1(f1), m_fonct2(f2) {}
+	FunctorDoubleFunctor(FunctorType& f1, FunctorType& f2) : m_fonct1(f1), m_fonct2(f2) {}
 	bool operator()(Dart d)
 	{
 		if (m_fonct1(d)) return true;
 		return m_fonct2(d);
-	}
-};
-
-// Functor Store: to store the traversed darts in a given vector
-/********************************************************/
-
-class FunctorStore: public FunctorType
-{
-protected:
-	std::vector<Dart>& m_vec;
-public:
-	FunctorStore(std::vector<Dart>& vec): m_vec(vec) {}
-	bool operator()(Dart d) {
-		m_vec.push_back(d);
-		return false;
 	}
 };
 

@@ -30,7 +30,7 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Filters2D
+namespace Filtering
 {
 
 
@@ -57,8 +57,7 @@ void sigmaBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position,
 				Dart e = map.phi2(dd) ;
 				if(!mv.isMarked(e))
 				{
-					VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, dd, position) ;
-					sumLengths += vec.norm() ;
+					sumLengths += Algo::Geometry::edgeLength<PFP>(map, dd, position) ;
 					sumAngles += Geom::angle(normal[d], normal[e]) ;
 					++nbEdges ;
 				}
@@ -74,7 +73,7 @@ void sigmaBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position,
 }
 
 template <typename PFP>
-void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select)
+void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -112,7 +111,7 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 }
 
 template <typename PFP>
-void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select)
+void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -171,7 +170,7 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PF
 //	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;
 }
 
-} //namespace Filters2D
+} //namespace Filtering
 
 } //namespace Algo
 

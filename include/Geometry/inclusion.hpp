@@ -82,6 +82,12 @@ Inclusion isPointInTriangle(const VEC3& point,const VEC3& Ta,const VEC3& Tb,cons
 }
 
 template <typename VEC3>
+bool isPointInSphere(const VEC3& point, const VEC3& center, const typename VEC3::DATA_TYPE& radius)
+{
+	return (point - center).norm() < radius;
+}
+
+template <typename VEC3>
 Inclusion isSegmentInTriangle2D(const VEC3& P1, const VEC3& P2, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& N)
 {
 	Orientation2D oP1P2A = testOrientation2D(Ta,P1,P2,N) ;
