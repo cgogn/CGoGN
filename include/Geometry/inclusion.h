@@ -53,6 +53,9 @@ enum Inclusion
 template <typename VEC3>
 Inclusion isPointInTriangle(const VEC3& point, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc) ;
 
+template <typename VEC3>
+bool isPointInSphere(const VEC3& point, const VEC3& center, const typename VEC3::DATA_TYPE& radius) ;
+
 /**
  * test if a segment is inside a triangle, the segment MUST be in the plane of the triangle
  * TODO to test
@@ -93,9 +96,9 @@ bool isEdgeInOrIntersectingTetrahedron(VEC3 points[4], VEC3& point1, VEC3& point
 template <typename VEC3>
 bool arePointsEquals(const VEC3& point1,const VEC3& point2) ;
 
-}
+} // namespace Geom
 
-}
+} // namespace CGoGN
 
 #include "inclusion.hpp"
 

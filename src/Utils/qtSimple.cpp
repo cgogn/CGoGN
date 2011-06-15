@@ -40,8 +40,7 @@ namespace Utils
 namespace QT
 {
 
-SimpleQT::SimpleQT():
-m_dock(NULL)
+SimpleQT::SimpleQT() : m_dock(NULL)
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -131,7 +130,8 @@ SimpleQT::~SimpleQT()
 	delete m_glWidget; // ??
 }
 
-void SimpleQT::operator=(const SimpleQT& sqt) {
+void SimpleQT::operator=(const SimpleQT& sqt)
+{
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget) ;
 
@@ -152,42 +152,48 @@ void SimpleQT::operator=(const SimpleQT& sqt) {
 	m_trans_z = sqt.m_trans_z ;
 }
 
-std::string SimpleQT::selectFile(const std::string& title, const std::string& dir, const std::string& filters)
+void SimpleQT::setDock(QDockWidget *dock)
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
-    return fileName.toStdString();
+	m_dock = dock;
+	addDockWidget(Qt::RightDockWidgetArea, m_dock);
+	m_dock->show();
 }
 
-std::string SimpleQT::selectFileSave(const std::string& title, const std::string& dir, const std::string& filters)
+QDockWidget* SimpleQT::dockWidget()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
-    return fileName.toStdString();
+	return m_dock;
 }
 
-void SimpleQT::cb_about_cgogn()
+void SimpleQT::setCallBack( const QObject* sender, const char* signal, const char* method)
 {
-	QString str("CGoGN:\nCombinatorial and Geometric modeling\n"
-				"with Generic N-dimensional Maps\n"
-				"Web site: https://cgogn.u-strasbg.fr \n"
-				"Contact information: cgogn@unistra.fr");
-	QMessageBox::about(this, tr("About CGoGN"), str);
+	connect(sender, signal, this, method);
 }
 
-void SimpleQT::cb_about()
+void SimpleQT::windowTitle(const char* windowTitle)
 {
-   QMessageBox::about(this, tr("About App"), m_helpString.c_str());
+	setWindowTitle(tr(windowTitle));
 }
 
-void SimpleQT::setHelpMsg(const std::string& msg)
+void SimpleQT::dockTitle(const char* dockTitle)
 {
-	m_helpString = msg;
+	if (m_dock)
+		m_dock->setWindowTitle(tr(dockTitle));
 }
 
-void SimpleQT::glMousePosition(int& x, int& y)
+void SimpleQT::statusMsg(const char* msg, int timeoutms)
 {
-	QPoint xy = m_glWidget->mapFromGlobal(QCursor::pos());
-	x = xy.x();
-	y = m_glWidget->getHeight() - xy.y();
+	if (msg)
+	{
+		QString message = tr(msg);
+		statusBar()->showMessage(message,timeoutms);
+	}
+	else
+	{
+		if (statusBar()->isHidden())
+			statusBar()->show();
+		else
+			statusBar()->hide();
+	}
 }
 
 QDockWidget* SimpleQT::addEmptyDock()
@@ -233,39 +239,30 @@ void SimpleQT::toggleVisibilityConsole()
 		m_dockConsole->hide();
 }
 
-void SimpleQT::windowTitle(const char* windowTitle)
+void SimpleQT::add_menu_entry(const std::string label, const char* method)
 {
-	setWindowTitle(tr(windowTitle));
+	QAction * action = new QAction(tr(label.c_str()), this);
+	connect(action, SIGNAL(triggered()), this, method);
+	m_appMenu->addAction(action);
 }
 
-void SimpleQT::dockTitle(const char* dockTitle)
+void SimpleQT::init_app_menu()
 {
-	if (m_dock)
-		m_dock->setWindowTitle(tr(dockTitle));
+	m_appMenu->clear();
 }
 
-void SimpleQT::statusMsg(const char* msg, int timeoutms)
+void SimpleQT::setHelpMsg(const std::string& msg)
 {
-	if (msg)
-	{
-		QString message = tr(msg);
-		statusBar()->showMessage(message,timeoutms);
-	}
-	else
-	{
-		if (statusBar()->isHidden())
-			statusBar()->show();
-		else
-			statusBar()->hide();
-	}
+	m_helpString = msg;
 }
 
-void SimpleQT::setCallBack( const QObject* sender, const char* signal, const char* method)
+void SimpleQT::setGLWidgetMouseTracking(bool b)
 {
-	connect(sender, signal, this, method);
+	m_glWidget->setMouseTracking(b);
 }
 
-void SimpleQT::closeEvent(QCloseEvent *event) {
+void SimpleQT::closeEvent(QCloseEvent *event)
+{
 	m_glWidget->closeEvent(event) ;
 	QWidget::closeEvent(event) ;
 }
@@ -283,7 +280,6 @@ void SimpleQT::keyPressEvent(QKeyEvent *e)
 			toggleVisibilityDock();
 	}
 
-
     if (e->key() == Qt::Key_Escape)
     	close();
     else
@@ -297,97 +293,11 @@ void SimpleQT::keyReleaseEvent(QKeyEvent *e)
     m_glWidget->keyReleaseEvent(e);
 }
 
-void SimpleQT::setDock(QDockWidget *dock)
+void SimpleQT::glMousePosition(int& x, int& y)
 {
-	m_dock = dock;
-	addDockWidget(Qt::RightDockWidgetArea, m_dock);
-	m_dock->show();
-}
-
-QDockWidget* SimpleQT::dockWidget()
-{
-	return m_dock;
-}
-
-void SimpleQT::updateGL()
-{
-	m_glWidget->updateGL();
-}
-
-void SimpleQT::updateGLMatrices()
-{
-	m_glWidget->modelModified();
-	m_glWidget->updateGL();
-}
-
-void SimpleQT::cb_updateMatrix()
-{
-	if (GLSLShader::CURRENT_OGL_VERSION == 1)
-	{
-		glMatrixMode(GL_PROJECTION);
-		glLoadMatrixf(glm::value_ptr(m_projection_matrix));
-
-		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(glm::value_ptr(m_modelView_matrix));
-	}
-	else
-	{
-		for(std::set< std::pair<void*, GLSLShader*> >::iterator it = GLSLShader::m_registeredShaders.begin();
-			it != GLSLShader::m_registeredShaders.end();
-			++it)
-		{
-			if ((it->first == NULL) || (it->first == this))
-			{
-				it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
-			}
-		}
-	}
-}
-
-void SimpleQT::synchronize(SimpleQT* sqt)
-{
-	m_glWidget->getObjPos() = sqt->m_glWidget->getObjPos() ;
-
-	m_projection_matrix = sqt->m_projection_matrix;
-	m_modelView_matrix = sqt->m_modelView_matrix;
-	for (unsigned int i = 0; i < 4; ++i)
-	{
-		m_curquat[i] = sqt->m_curquat[i];
-		m_lastquat[i] = sqt->m_lastquat[i];
-	}
-	m_trans_x = sqt->trans_x();
-	m_trans_y = sqt->trans_y();
-	m_trans_z = sqt->trans_z();
-
-	SimpleQT::cb_updateMatrix();
-
-	m_glWidget->modelModified();
-	m_glWidget->updateGL();
-}
-
-void SimpleQT::add_menu_entry(const std::string label, const char* method)
-{
-	QAction * action = new QAction(tr(label.c_str()), this);
-	connect(action, SIGNAL(triggered()), this, method);
-	m_appMenu->addAction(action);
-}
-
-/**
- * initialize app menu
- */
-void SimpleQT::init_app_menu()
-{
-	m_appMenu->clear();
-}
-
-void SimpleQT::registerShader(GLSLShader* ptr)
-{
-	GLSLShader::registerShader(this, ptr) ;
-}
-
-void SimpleQT::unregisterShader(GLSLShader* ptr)
-{
-	GLSLShader::unregisterShader(this, ptr) ;
+	QPoint xy = m_glWidget->mapFromGlobal(QCursor::pos());
+	x = xy.x();
+	y = m_glWidget->getHeight() - xy.y();
 }
 
 GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
@@ -432,6 +342,71 @@ GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f
 	return float(Q.norm());
 }
 
+void SimpleQT::synchronize(SimpleQT* sqt)
+{
+	m_glWidget->getObjPos() = sqt->m_glWidget->getObjPos() ;
+
+	m_projection_matrix = sqt->m_projection_matrix;
+	m_modelView_matrix = sqt->m_modelView_matrix;
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		m_curquat[i] = sqt->m_curquat[i];
+		m_lastquat[i] = sqt->m_lastquat[i];
+	}
+	m_trans_x = sqt->trans_x();
+	m_trans_y = sqt->trans_y();
+	m_trans_z = sqt->trans_z();
+
+	SimpleQT::cb_updateMatrix();
+
+	m_glWidget->modelModified();
+	m_glWidget->updateGL();
+}
+
+void SimpleQT::registerShader(GLSLShader* ptr)
+{
+	GLSLShader::registerShader(this, ptr) ;
+}
+
+void SimpleQT::unregisterShader(GLSLShader* ptr)
+{
+	GLSLShader::unregisterShader(this, ptr) ;
+}
+
+void SimpleQT::cb_updateMatrix()
+{
+	if (GLSLShader::CURRENT_OGL_VERSION == 1)
+	{
+		glMatrixMode(GL_PROJECTION);
+		glLoadMatrixf(glm::value_ptr(m_projection_matrix));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadMatrixf(glm::value_ptr(m_modelView_matrix));
+	}
+	else
+	{
+		for(std::set< std::pair<void*, GLSLShader*> >::iterator it = GLSLShader::m_registeredShaders.begin();
+			it != GLSLShader::m_registeredShaders.end();
+			++it)
+		{
+			if ((it->first == NULL) || (it->first == this))
+			{
+				it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
+			}
+		}
+	}
+}
+
+void SimpleQT::updateGL()
+{
+	m_glWidget->updateGL();
+}
+
+void SimpleQT::updateGLMatrices()
+{
+	m_glWidget->modelModified();
+	m_glWidget->updateGL();
+}
 
 void SimpleQT::transfoRotate(float angle, float x, float y, float z)
 {
@@ -462,6 +437,31 @@ bool SimpleQT::popTransfoMatrix()
 	return true;
 }
 
+std::string SimpleQT::selectFile(const std::string& title, const std::string& dir, const std::string& filters)
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
+    return fileName.toStdString();
+}
+
+std::string SimpleQT::selectFileSave(const std::string& title, const std::string& dir, const std::string& filters)
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr(title.c_str()), tr(dir.c_str()), tr(filters.c_str()), 0, 0);
+    return fileName.toStdString();
+}
+
+void SimpleQT::cb_about_cgogn()
+{
+	QString str("CGoGN:\nCombinatorial and Geometric modeling\n"
+				"with Generic N-dimensional Maps\n"
+				"Web site: https://cgogn.u-strasbg.fr \n"
+				"Contact information: cgogn@unistra.fr");
+	QMessageBox::about(this, tr("About CGoGN"), str);
+}
+
+void SimpleQT::cb_about()
+{
+   QMessageBox::about(this, tr("About App"), m_helpString.c_str());
+}
 
 } // namespace QT
 

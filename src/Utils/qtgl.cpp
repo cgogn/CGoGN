@@ -294,15 +294,18 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 
 void GLWidget::wheelEvent(QWheelEvent* event)
 {
-	float wl = -0.05f * FAR_PLANE / foc;
+	if (!(m_state_modifier & ( Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier)))
+	{
+		float wl = -0.05f * FAR_PLANE / foc;
 
-	if (event->delta() > 0)
-		m_cbs->trans_z() += wl;
-	else
-		m_cbs->trans_z() -= wl;
+		if (event->delta() > 0)
+			m_cbs->trans_z() += wl;
+		else
+			m_cbs->trans_z() -= wl;
 
-	newModel = 1;
-	updateGL();
+		newModel = 1;
+		updateGL();
+	}
 
 	if (m_cbs)
 		m_cbs->cb_wheelEvent(event->delta(), event->x(), getHeight() - event->y());
@@ -339,27 +342,27 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
     int k = event->key();
 
     // align on axis
-	if ((k=='Z') && (event->modifiers() & Qt::ShiftModifier))
+	if ((k == 'Z') && (event->modifiers() & Qt::ShiftModifier))
 	{
-	    float Z[3]={0.0f,0.0f,1.0f};
-		axis_to_quat(Z,0.0f,m_cbs->curquat());
-		newModel=1;
+	    float Z[3] = { 0.0f, 0.0f, 1.0f };
+		axis_to_quat(Z, 0.0f, m_cbs->curquat());
+		newModel = 1;
 		updateGL();
 	}
 
-	if ((k=='Y') && (event->modifiers() & Qt::ShiftModifier))
+	if ((k == 'Y') && (event->modifiers() & Qt::ShiftModifier))
 	{
-		float X[3]={1.0f,0.0f,0.0f};
-		axis_to_quat(X,M_PI/2.0f,m_cbs->curquat());
-		newModel=1;
+		float X[3] = { 1.0f, 0.0f, 0.0f };
+		axis_to_quat(X, M_PI / 2.0f, m_cbs->curquat());
+		newModel = 1;
 		updateGL();
 	}
 
-	if ((k=='X') && (event->modifiers() & Qt::ShiftModifier))
+	if ((k == 'X') && (event->modifiers() & Qt::ShiftModifier))
 	{
-		float Y[3]={0.0f,1.0f,0.0f};
-		axis_to_quat(Y,-M_PI/2.0f,m_cbs->curquat());
-		newModel=1;
+		float Y[3] = { 0.0f, 1.0f, 0.0f };
+		axis_to_quat(Y, -M_PI / 2.0f, m_cbs->curquat());
+		newModel = 1;
 		updateGL();
 	}
 

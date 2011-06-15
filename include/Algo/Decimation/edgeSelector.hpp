@@ -795,14 +795,14 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	MAP& m = this->m_map ;
 
 	normal[d2] = Algo::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
-	Algo::Geometry::computeCurvatureVertex<PFP>(m, d2, this->m_position, normal, k1, k2, K1, K2) ;
+	Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 	Dart vit = d2 ;
 	do
 	{
 		Dart nVert = m.phi1(vit) ;
 		normal[nVert] = Algo::Geometry::vertexNormal<PFP>(m, nVert, this->m_position) ;
-		Algo::Geometry::computeCurvatureVertex<PFP>(m, nVert, this->m_position, normal, k1, k2, K1, K2) ;
+		Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, nVert, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 
 		updateEdgeInfo(m.phi1(vit), false) ;			// must recompute some edge infos in the
 		if(vit == d2 || vit == dd2)						// neighborhood of the collapsed edge
@@ -891,11 +891,11 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// compute things on the coarse version of the mesh
 	normal[newV] = Algo::Geometry::vertexNormal<PFP>(m, d2, this->m_position) ;
-	Algo::Geometry::computeCurvatureVertex<PFP>(m, d2, this->m_position, normal, k1, k2, K1, K2) ;
+	Algo::Geometry::computeCurvatureVertex_NormalCycles<PFP>(m, d2, radius, this->m_position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 
-	VEC3 norm = normal[newV] ;
-	REAL mCurv = ( k1[newV] + k2[newV] ) / REAL(2) ;
-	VEC3 cDir1 = K1[newV] ;
+//	VEC3 norm = normal[newV] ;
+	REAL mCurv = (kmax[newV] + kmin[newV]) / REAL(2) ;
+//	VEC3 cDir1 = Kmax[newV] ;
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
@@ -904,17 +904,17 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	REAL err = 0 ;
 
-	REAL norm_deviation_1 = REAL(1) / abs(norm * normal[v1]) ;
-	REAL norm_deviation_2 = REAL(1) / abs(norm * normal[v2]) ;
-	err += norm_deviation_1 + norm_deviation_2 ;
+//	REAL norm_deviation_1 = REAL(1) / abs(norm * normal[v1]) ;
+//	REAL norm_deviation_2 = REAL(1) / abs(norm * normal[v2]) ;
+//	err += norm_deviation_1 + norm_deviation_2 ;
 
-	REAL mCurv_deviation_1 = abs(mCurv - (k1[v1] + k2[v1] / REAL(2))) ;
-	REAL mCurv_deviation_2 = abs(mCurv - (k1[v2] + k2[v2] / REAL(2))) ;
+	REAL mCurv_deviation_1 = abs(mCurv - (kmax[v1] + kmin[v1] / REAL(2))) ;
+	REAL mCurv_deviation_2 = abs(mCurv - (kmax[v2] + kmin[v2] / REAL(2))) ;
 	err += mCurv_deviation_1 + mCurv_deviation_2 ;
 
-	REAL cDir1_deviation_1 = REAL(1) / abs(cDir1 * K1[v1]) ;
-	REAL cDir1_deviation_2 = REAL(1) / abs(cDir1 * K1[v2]) ;
-	err += cDir1_deviation_1 + cDir1_deviation_2 ;
+//	REAL cDir1_deviation_1 = REAL(1) / abs(cDir1 * Kmax[v1]) ;
+//	REAL cDir1_deviation_2 = REAL(1) / abs(cDir1 * Kmax[v2]) ;
+//	err += cDir1_deviation_1 + cDir1_deviation_2 ;
 
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;

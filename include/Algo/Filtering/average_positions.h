@@ -22,85 +22,43 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Filtering/functors.h"
+#include "Algo/Selection/collector.h"
+
 namespace CGoGN
 {
 
 namespace Algo
 {
 
-namespace Filters2D
+namespace Filtering
 {
 
-
 template <typename PFP>
-void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select)
+void filterAveragePositions(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	const float lambda = 0.6307 ;
-	const float mu = -0.6732 ;
+	FunctorAverage<typename PFP::MAP, typename PFP::VEC3> fa(map, position) ;
+	Algo::Selection::Collector_OneRing<PFP> c(map) ;
 
-	CellMarkerNoUnmark mv(map, VERTEX);
+	CellMarker markV(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(select(d) && !mv.isMarked(d))
+		if(select(d) && !markV.isMarked(d))
 		{
-			mv.mark(d);
+			markV.mark(d);
 
-			// get pos of vertex
-			const VEC3& pos_d = position[d] ;
-
-			// traversal of vertices neighborhood
-			VEC3 l(0) ;
-			int nbE = 0 ;
-			Dart dd = d ;
-			do
-			{
-				Dart e = map.phi2(dd) ;
-				l += position[e] - pos_d ;
-				nbE++ ;
-				dd = map.phi1(e) ;
-			} while(dd != d) ;
-
-			l /= float(nbE) ;
-			l *= lambda ;
-
-			position2[d] = pos_d + l ;
-		}
-	}
-
-	// unshrinking step
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && mv.isMarked(d))
-		{
-			mv.unmark(d);
-
-			// get pos of vertex
-			const VEC3& pos_d = position2[d] ;
-
-			// traversal of vertices neighborhood
-			VEC3 l(0) ;
-			int nbE = 0 ;
-			Dart dd = d ;
-			do
-			{
-				Dart e = map.phi2(dd) ;
-				l += position2[e] - pos_d ;
-				nbE++ ;
-				dd = map.phi1(e) ;
-			} while(dd != d) ;
-
-			l /= float(nbE) ;
-			l *= mu ;
-
-			position[d] = pos_d + l ;
+			c.collectBorder(d) ;
+			fa.reset() ;
+			c.applyOnBorder(fa) ;
+			position2[d] = fa.getAverage() ;
 		}
 	}
 }
 
-} //namespace Filters2D
+} // namespace Filtering
 
-} //namespace Algo
+} // namespace Algo
 
-} //namespace CGoGN
+} // namespace CGoGN

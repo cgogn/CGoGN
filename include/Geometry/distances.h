@@ -108,10 +108,10 @@ typename VEC3::DATA_TYPE squaredDistanceLine2Seg(const VEC3& A, const VEC3& AB, 
 template <typename VEC3>
 typename VEC3::DATA_TYPE squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB, typename VEC3::DATA_TYPE AB2, const VEC3& P) ;
 
-}
+} // namespace Geom
 
-}
+} // namespace CGoGN
 
-#include "distances.hpp"
+#include "Geometry/distances.hpp"
 
 #endif

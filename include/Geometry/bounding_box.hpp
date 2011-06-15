@@ -129,6 +129,7 @@ void BoundingBox<VEC>::addPoint(const VEC& p)
 	{
 		m_pMin = p ;
 		m_pMax = p ;
+		m_initialized = true ;
 	}
 	else
 	{

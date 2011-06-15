@@ -43,6 +43,9 @@ enum Intersection
 	FACE_INTERSECTION = 3
 } ;
 
+/**
+ * test the intersection between a ray and a triangle
+ */
 template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
@@ -92,9 +95,9 @@ Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& d
 template <typename VEC3>
 Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA,  const VEC3& QB, VEC3& Inter) ;
 
-}
+} // namespace Geom
 
-}
+} // namespace CGoGN
 
 #include "intersection.hpp"
 

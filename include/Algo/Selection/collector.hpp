@@ -31,30 +31,65 @@ namespace Algo
 namespace Selection
 {
 
-/********************************************
- * GENERIC COLLECTOR
- ********************************************/
+/*********************************************************
+ * Generic Collector
+ *********************************************************/
+
 template <typename PFP>
-Collector<PFP>::Collector(typename PFP::MAP& mymap, const typename PFP::TVEC3& myposition):
-	map(mymap),
-	position(myposition)
+Collector<PFP>::Collector(typename PFP::MAP& m) : map(m)
 {}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnInsideVertices(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = insideVertices.begin(); iv != insideVertices.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnInsideEdges(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = insideEdges.begin(); iv != insideEdges.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnInsideFaces(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = insideFaces.begin(); iv != insideFaces.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
+
+template <typename PFP>
+inline bool Collector<PFP>::applyOnBorder(FunctorType& f)
+{
+	for(std::vector<Dart>::iterator iv = border.begin(); iv != border.end(); ++iv)
+		if(f(*iv))
+			return true ;
+	return false ;
+}
 
 template <typename PPFP>
 std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c)
 {
     out << "Collector around " << c.centerDart << std::endl;
     out << "insideVertices (" << c.insideVertices.size() << ") = {";
-    for (unsigned int i=0; i< c.insideVertices.size(); ++i) out << c.insideVertices[i] << " ";
+    for (unsigned int i = 0; i< c.insideVertices.size(); ++i) out << c.insideVertices[i] << " ";
     out << "}" << std::endl ;
     out << "insideEdges (" << c.insideEdges.size() << ") = {";
-    for (unsigned int i=0; i< c.insideEdges.size(); ++i) out << c.insideEdges[i] << " ";
+    for (unsigned int i = 0; i< c.insideEdges.size(); ++i) out << c.insideEdges[i] << " ";
     out << "}" << std::endl ;
     out << "insideFaces (" << c.insideFaces.size() << ") = {";
-    for (unsigned int i=0; i< c.insideFaces.size(); ++i) out << c.insideFaces[i] << " ";
+    for (unsigned int i = 0; i< c.insideFaces.size(); ++i) out << c.insideFaces[i] << " ";
     out << "}" << std::endl ;
     out << "border (" << c.border.size() << ") = {";
-    for (unsigned int i=0; i< c.border.size(); ++i) out << c.border[i] << " ";
+    for (unsigned int i = 0; i< c.border.size(); ++i) out << c.border[i] << " ";
     out << "}" << std::endl;
     return out;
 }
@@ -64,19 +99,13 @@ std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c)
  *********************************************************/
 
 template <typename PFP>
-void Collector_OneRing<PFP>::init(Dart d, typename PFP::REAL r)
+void Collector_OneRing<PFP>::collectAll(Dart d)
 {
-	this->centerDart = d;
-	this->radius = r;
-	this->insideVertices.clear();
-	this->insideEdges.clear();
-	this->insideFaces.clear();
-	this->border.clear();
-}
+	this->init(d);
+	this->insideEdges.reserve(12);
+	this->insideFaces.reserve(12);
+	this->border.reserve(12);
 
-template <typename PFP>
-void Collector_OneRing<PFP>::collect()
-{
 	const Dart end = this->centerDart;
 	this->insideVertices.push_back(end);
 	Dart dd = end;
@@ -89,38 +118,46 @@ void Collector_OneRing<PFP>::collect()
 	} while(dd != end);
 }
 
+template <typename PFP>
+void Collector_OneRing<PFP>::collectBorder(Dart d)
+{
+	this->init(d);
+	this->border.reserve(12);
+
+	const Dart end = this->centerDart;
+	Dart dd = end;
+	do
+	{
+		this->border.push_back(this->map.phi1(dd));
+		dd = this->map.alpha1(dd);
+	} while(dd != end);
+}
+
 /*********************************************************
  * Collector Within Sphere
  *********************************************************/
 
 template <typename PFP>
-void Collector_WithinSphere<PFP>::init(Dart d, typename PFP::REAL r)
-{
-	this->centerDart = d;
-	this->radius = r;
-	this->insideVertices.clear();
-	this->insideEdges.clear();
-	this->insideFaces.clear();
-	this->border.clear();
-	radius_2 = r * r;
-	centerPosition = this->position[d];
-	area = 0;
-}
-
-template <typename PFP>
-void Collector_WithinSphere<PFP>::collect()
+void Collector_WithinSphere<PFP>::collectAll(Dart d)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	CellMarkerStore vm(this->map,VERTEX); // mark the collected inside-vertices
-	CellMarkerStore em(this->map,EDGE); // mark the collected inside-edges + border-edges
-	CellMarkerStore fm(this->map,FACE); // mark the collected inside-faces + border-faces
+	this->init(d);
+	this->insideEdges.reserve(24);
+	this->insideFaces.reserve(24);
+	this->border.reserve(24);
+
+	CellMarkerStore vm(this->map, VERTEX);	// mark the collected inside-vertices
+	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges
+	CellMarkerStore fm(this->map, FACE);	// mark the collected inside-faces + border-faces
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
 
+	VEC3 centerPosition = this->position[d];
 	unsigned int i = 0;
+//	for(std::vector<Dart>::iterator iv = this->insideVertices.begin(); iv != this->insideVertices.end(); ++iv)
 	while (i < this->insideVertices.size())
 	{
 		Dart end = this->insideVertices[i];
@@ -132,7 +169,7 @@ void Collector_WithinSphere<PFP>::collect()
 				const Dart f = this->map.phi1(e);
 				const Dart g = this->map.phi1(f);
 
-				if (!this->isInside(f))
+				if (! Geom::isPointInSphere(this->position[f], centerPosition, this->radius))
 				{
 					this->border.push_back(e); // add to border
 					em.mark(e);
@@ -150,7 +187,7 @@ void Collector_WithinSphere<PFP>::collect()
 						this->insideEdges.push_back(e);
 						em.mark(e);
 					}
-					if (! fm.isMarked(e) && this->isInside(g))
+					if (! fm.isMarked(e) && Geom::isPointInSphere(this->position[g], centerPosition, this->radius))
 					{
 						this->insideFaces.push_back(e);
 						fm.mark(e);
@@ -164,40 +201,69 @@ void Collector_WithinSphere<PFP>::collect()
 }
 
 template <typename PFP>
-typename PFP::REAL Collector_WithinSphere<PFP>::intersect_SphereEdge(const Dart din, const Dart dout)
+void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
-	VEC3 p = this->position[din] - this->centerPosition;
-	VEC3 qminusp = this->position[dout] - this->centerPosition - p;
-	REAL s = p*qminusp;
-	REAL n2 = qminusp.norm2();
-	return (- s + sqrt (s*s + n2*(this->radius_2 - p.norm2())))/(n2);
+
+	this->init(d);
+	this->border.reserve(100);
+
+	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges
+	CellMarkerStore fm(this->map, FACE);	// mark the collected inside-faces + border-faces
+
+	VEC3 centerPosition = this->position[d];
+	unsigned int i = 0;
+	while (i < this->insideVertices.size())
+	{
+		Dart end = this->insideVertices[i];
+		Dart e = end;
+		do
+		{
+			if (! em.isMarked(e) || ! fm.isMarked(e)) // are both tests useful ?
+			{
+				const Dart f = this->map.phi1(e);
+				const Dart g = this->map.phi1(f);
+
+				if (! Geom::isPointInSphere(this->position[f], centerPosition, this->radius))
+				{
+					this->border.push_back(e); // add to border
+					em.mark(e);
+					fm.mark(e); // is it useful ?
+				}
+			}
+			e = this->map.alpha1(e);
+		} while (e != end);
+		++i;
+	}
 }
 
 template <typename PFP>
 void Collector_WithinSphere<PFP>::computeArea()
 {
+	area = 0;
+	typename PFP::VEC3 centerPosition = this->position[this->centerDart];
+
 	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
-	{
-		this->area += Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
-	}
+		area += Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 
 	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
 	{
 		const Dart f = this->map.phi1(*it); // we know that f is outside
 		const Dart g = this->map.phi1(f);
-		if (this->isInside(g))
+		if (Geom::isPointInSphere(this->position[g], centerPosition, this->radius))
 		{ // only f is outside
-			typename PFP::REAL alpha = this->intersect_SphereEdge (*it, f);
-			typename PFP::REAL beta = this->intersect_SphereEdge (g, f);
-			this->area += (alpha+beta - alpha*beta) * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
+			typename PFP::REAL alpha, beta;
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, this->position, alpha);
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(f), this->position, beta);
+			area += (alpha+beta - alpha*beta) * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 		else
 		{ // f and g are outside
-			typename PFP::REAL alpha = this->intersect_SphereEdge (*it, f);
-			typename PFP::REAL beta = this->intersect_SphereEdge (*it, g);
-			this->area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
+			typename PFP::REAL alpha, beta;
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, *it, this->position, alpha);
+			Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, this->radius, this->map.phi2(g), this->position, beta);
+			area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 	}
 }

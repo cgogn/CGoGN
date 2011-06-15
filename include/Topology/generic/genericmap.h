@@ -33,8 +33,8 @@
 #include <vector>
 #include <map>
 
-
 #include "Container/attributeContainer.h"
+
 #include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
 #include "Topology/generic/functor.h"
