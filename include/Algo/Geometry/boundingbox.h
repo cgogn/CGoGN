@@ -41,7 +41,7 @@ namespace Geometry
 template <typename PFP>
 Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue())
 {
-	Geom::BoundingBox<typename PFP::VEC3> bb(position[map.begin()]) ;
+	Geom::BoundingBox<typename PFP::VEC3> bb ;
 
 	CellMarker vmarker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))

@@ -26,6 +26,7 @@
 #define __EDGESELECTOR_H__
 
 #include "Algo/Decimation/selector.h"
+#include "Algo/Geometry/boundingbox.h"
 
 #include "Container/fakeAttribute.h"
 #include "Utils/qem.h"
