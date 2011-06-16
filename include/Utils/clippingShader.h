@@ -22,8 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
-#include "Utils/Shaders/shaderSimpleColor.h"
+#ifndef _CGoGN_CLIPPINGSHADER_H_
+#define _CGoGN_CLIPPINGSHADER_H_
+
+#include "Utils/GLSLShader.h"
+#include "Geometry/vector_gen.h"
+#include "Utils/cgognStream.h"
+#include "Utils/shaderMutator.h"
+#include <string>
 
 namespace CGoGN
 {
@@ -31,70 +37,67 @@ namespace CGoGN
 namespace Utils
 {
 
-std::string ShaderSimpleColor::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-//		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"}";
-
-
-std::string ShaderSimpleColor::fragmentShaderText =
-		"PRECISON;\n"
-		"uniform vec4 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=color;\n"
-		"}";
-
-
-ShaderSimpleColor::ShaderSimpleColor()
+class ClippingShader : public GLSLShader
 {
-	m_nameVS = "ShaderSimpleColor_vs";
-	m_nameFS = "ShaderSimpleColor_fs";
-	m_nameGS = "ShaderSimpleColor_gs";
 
-	// chose GL defines (2 or 3)
-	// and compile shaders
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+public:
+	/**
+	 * constructor
+	 */
+	ClippingShader();
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+	/**
+	 * set the plane equation for plane clipping
+	 * @param newClipPlane plane equation
+	 */
+	void setPlaneClippingParams(Geom::Vec4f clipPlane);
+	
+	/**
+	 * set the color attenuation factor for clipping
+	 * @param newColorAttenuationFactor color attenuation factor
+	 */
+	void setClippingColorAttenuationFactor(float colorAttenuationFactor);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+	/**
+	 * insert plane clipping instructions into vertex and fragment shader source code
+	 * - does not modify the geometry shader source code
+	 * @warning this function is designed for shaders which do not use a geometry shader
+	 */
+	void addPlaneClippingToShaderSource();
+	
+	/**
+	 * update uniforms (get their locations and resent their values) for clipping
+	 */
+	void updateClippingUniforms();
 
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
 
-	//Default values
-	Geom::Vec4f color(0.1f, 0.9f, 0.1f, 0.0f);
-	setColor(color);
-}
+private:
 
-void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
-{
-	m_color = color;
-	bind();
-	glUniform4fv(m_unif_color, 1, color.data());
-}
+	/**
+	 * clip plane vector (a, b, c, d)
+	 */
+	Geom::Vec4f m_clipPlane;
+	
+	/**
+	 * clip plane vector uniform id
+	 */
+	GLint m_unif_clipPlane;
+	
+	/**
+	 * color attenuation factor
+	 */
+	float m_colorAttenuationFactor;
+	
+	/**
+	 * color attenuation factor uniform id
+	 */
+	GLint m_unif_colorAttenuationFactor;
 
-unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
-}
+};
 
-void ShaderSimpleColor::restoreUniformsAttribs()
-{
-	m_unif_color = glGetUniformLocation(this->program_handler(), "color");
-	bind();
-	glUniform4fv(m_unif_color, 1, m_color.data());
-	bindVA_VBO("VertexPosition", m_vboPos);
-}
 
 } // namespace Utils
 
 } // namespace CGoGN
+
+#endif

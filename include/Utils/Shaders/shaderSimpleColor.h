@@ -26,8 +26,8 @@
 #define __CGOGN_SHADER_SIMPLECOLOR__
 
 #include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
-// TODO ajuter include
 
 namespace CGoGN
 {
@@ -35,7 +35,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderSimpleColor : public GLSLShader
+class ShaderSimpleColor : public ClippingShader
 {
 protected:
 	// shader sources
