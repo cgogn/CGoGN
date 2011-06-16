@@ -51,7 +51,7 @@ namespace Import
 * @return a boolean indicating if import was successfull
 */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE, bool mergeCloseVertices=false);
 
 /**
  * import a volumic mesh
