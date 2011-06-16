@@ -1,6 +1,8 @@
 SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
 
-SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} gzstream AntTweakBar openctm assimp)
+BOOST_LIBS(boost_regex_lib_lists "boost_regex-mt")
+
+SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} ${boost_regex_lib_lists} gzstream AntTweakBar openctm assimp)
 
 SET(CGoGN_LIBS_R topology algo container utils)
 
