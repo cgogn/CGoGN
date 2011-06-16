@@ -115,6 +115,8 @@ public:
 	bool importCTM(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
+	
+	bool mergeCloseVertices();
 
 	/**
 	 * @param container container of vertex orbite
