@@ -75,6 +75,22 @@ void StageShader::slot_explodTopoPhi3(double c)
 	updateGL();
 }
 
+void StageShader::slot_doubleSpinBox_Plane(double c)
+{
+	float aPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_aPlane->value();
+	float bPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_bPlane->value();
+	float cPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_cPlane->value();
+	float dPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_dPlane->value();
+	m_shader->setPlaneClippingParams(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
+	updateGL();
+}
+
+void StageShader::slot_doubleSpinBox_ColorAttenuationFactor(double c)
+{
+	m_shader->setClippingColorAttenuationFactor((float)c);
+	updateGL();
+}
+
 void StageShader::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
@@ -125,7 +141,7 @@ StageShader::StageShader():
 void StageShader::initGUI()
 {
 	CGoGNStream::allToConsole(this) ;
-	CGoGNStream::allToStd(false) ;
+	CGoGNStream::allToStd(true) ;
 
 	setDock(&dock);
 
@@ -139,6 +155,13 @@ void StageShader::initGUI()
 	setCallBack(dock.explod_phi1, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi1(double)));
 	setCallBack(dock.explod_phi2, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi2(double)));
 	setCallBack(dock.explod_phi3, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi3(double)));
+
+	setCallBack(dock.doubleSpinBox_aPlane, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
+	setCallBack(dock.doubleSpinBox_bPlane, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
+	setCallBack(dock.doubleSpinBox_cPlane, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
+	setCallBack(dock.doubleSpinBox_dPlane, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
+
+	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
 
 	setCallBack(&dock, SIGNAL(topLevelChanged(bool)), SLOT(dockWidget_topLevelChanged(bool)));
 
@@ -230,6 +253,8 @@ void StageShader::cb_initGL()
 	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
 
 	registerShader(m_shader);
+
+	m_shader->addPlaneClippingToShaderSource();
 }
 
 void StageShader::updateVBOprimitives(int upType)

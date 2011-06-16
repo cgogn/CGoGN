@@ -119,6 +119,10 @@ public slots:
 	void slot_explodTopoPhi2(double c);
 	void slot_explodTopoPhi3(double c);
 
+	void slot_doubleSpinBox_Plane(double c);
+
+	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
+
 	void dockWidget_topLevelChanged(bool isFloating);
 
 	void button_compile();
