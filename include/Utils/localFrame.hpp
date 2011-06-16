@@ -84,7 +84,29 @@ typename PFP::VEC3 LocalFrame<PFP>::getCompressed()
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isDirect()
+bool LocalFrame<PFP>::equals(const Utils::LocalFrame<PFP>& lf, REAL epsilon) const
+{
+	VEC3 dT = m_T - lf.getT() ;
+	VEC3 dB = m_B - lf.getB() ;
+	VEC3 dN = m_N - lf.getN() ;
+
+	return dT.norm2() < epsilon && dB.norm2() < epsilon && dN.norm2() < epsilon ;
+}
+
+template<typename PFP>
+bool LocalFrame<PFP>::operator==(const LocalFrame<PFP>& lf) const
+{
+	return this->equals(lf) ;
+}
+
+template<typename PFP>
+bool LocalFrame<PFP>::operator!=(const LocalFrame<PFP>& lf) const
+{
+	return !(this->equals(lf)) ;
+}
+
+template<typename PFP>
+bool LocalFrame<PFP>::isDirect() const
 {
 	VEC3 new_B = m_N ^ m_T ;		// direct
 	VEC3 diffs = new_B - m_B ;		// differences with existing B
@@ -94,27 +116,27 @@ bool LocalFrame<PFP>::isDirect()
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isOrthogonal()
+bool LocalFrame<PFP>::isOrthogonal() const
 {
-	return (abs(m_T * m_B) < 1e-10) && (abs(m_N * m_B) < 1e-10) && (abs(m_T * m_N) < 1e-10) ;
+	return (fabs(m_T * m_B) < 1e-5) && (fabs(m_N * m_B) < 1e-5) && (fabs(m_T * m_N) < 1e-5) ;
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isNormalized()
+bool LocalFrame<PFP>::isNormalized() const
 {
-	return 		(1-1e-10 < m_N.norm2() && m_N.norm2() < 1+1e-10)
-			&& 	(1-1e-10 < m_T.norm2() && m_T.norm2() < 1+1e-10)
-			&&	(1-1e-10 < m_B.norm2() && m_B.norm2() < 1+1e-10) ;
+	return 		(1-1e-5 < m_N.norm2() && m_N.norm2() < 1+1e-5)
+			&& 	(1-1e-5 < m_T.norm2() && m_T.norm2() < 1+1e-5)
+			&&	(1-1e-5 < m_B.norm2() && m_B.norm2() < 1+1e-5) ;
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isOrthoNormalDirect()
+bool LocalFrame<PFP>::isOrthoNormalDirect() const
 {
 	return isOrthogonal() && isNormalized() && isDirect() ;
 }
 
 template<typename PFP>
-typename PFP::VEC2 LocalFrame<PFP>::carthToSpherical (const VEC3& carth) const
+typename Geom::Vector<2,typename PFP::REAL> LocalFrame<PFP>::carthToSpherical (const VEC3& carth) const
 {
 	VEC2 res ;
 

@@ -45,7 +45,7 @@ template <typename PFP>
 class LocalFrame
 {
 	typedef typename PFP::REAL REAL ;
-	typedef typename PFP::VEC2 VEC2 ;
+	typedef typename Geom::Vector<2,REAL> VEC2 ;
 	typedef typename PFP::VEC3 VEC3 ;
 
 private: // fields
@@ -75,28 +75,50 @@ public: // methods
 	VEC3 getCompressed() ;
 
 	/**
+	 * Tests if the frames are identical
+	 * @param lf the frame to compare to the current frame
+	 * @param epsilon the authorized deviation
+	 * @return true if frames are identical (or deviate less than epsilon)
+	 */
+	bool equals(const LocalFrame<PFP>& lf, REAL epsilon = 1e-5) const ;
+
+	/**
+	 * Equality of frames
+	 * Identical to calling equals with default epsilon
+	 * @return true if frames are identical
+	 */
+	bool operator==(const LocalFrame<PFP>& lf) const ;
+
+	/**
+	 * Inequality of frames
+	 * Identical to calling !equals with default epsilon
+	 * @return false if frames are identical
+	 */
+	bool operator!=(const LocalFrame<PFP>& lf) const ;
+
+	/**
 	 * Tests if the frame is direct
 	 * @return true if the frame is direct
 	 */
-	bool isDirect() ;
+	bool isDirect() const ;
 
 	/**
 	 * Tests if the frame is orthogonal
 	 * @return true if the frame is orthogonal
 	 */
-	bool isOrthogonal() ;
+	bool isOrthogonal() const ;
 
 	/**
 	 * Tests if the frame is normalized
 	 * @return true if the frame is normalized
 	 */
-	bool isNormalized() ;
+	bool isNormalized() const ;
 
 	/**
 	 * Tests if the frame is direct, normalized and orthogonal
 	 * @return true if the frame is direct, normalized and orthogonal
 	 */
-	bool isOrthoNormalDirect() ;
+	bool isOrthoNormalDirect() const ;
 
 	/**
 	 * @return current tangent vector
