@@ -285,6 +285,9 @@ public:
 	 */
 	virtual void restoreUniformsAttribs() {CGoGNerr << "Warning restoreUniformsAttribs not implemented"<< CGoGNendl;}
 
+	virtual void updateClippingUniforms() {CGoGNerr << "Warning updateClippingUniforms not implemented"<< CGoGNendl;}
+
+
 	/**
 	 *
 	 */

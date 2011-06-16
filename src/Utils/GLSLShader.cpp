@@ -823,6 +823,8 @@ bool GLSLShader::recompile()
 
 	restoreUniformsAttribs();
 
+	updateClippingUniforms();
+
 	return true;
 }
 

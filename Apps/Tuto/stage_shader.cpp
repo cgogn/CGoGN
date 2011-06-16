@@ -97,9 +97,12 @@ void StageShader::button_compile()
 	QString st2 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->fragmentEdit->toPlainText();
 	QString st3 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->geometryEdit->toPlainText();
 
-	m_shader->reloadVertexShaderFromMemory(st1.toStdString().c_str());
-	m_shader->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
-	m_shader->reloadGeometryShaderFromMemory(st3.toStdString().c_str());
+	if (st1.toStdString().length() > 0)
+		m_shader->reloadVertexShaderFromMemory(st1.toStdString().c_str());
+	if (st2.toStdString().length() > 0)
+		m_shader->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
+	if (st3.toStdString().length() > 0)
+		m_shader->reloadGeometryShaderFromMemory(st3.toStdString().c_str());
 
 	m_shader->recompile();
 	updateGLMatrices();
