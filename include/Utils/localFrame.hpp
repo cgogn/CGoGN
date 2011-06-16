@@ -38,21 +38,22 @@ LocalFrame<PFP>::LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N)
 template<typename PFP>
 LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 {
-	VEC2 Nspher ;
-	VEC2 Tspher ;
-
-	REAL& thetaN = Nspher[0] ; // known
-	REAL& phiN = Nspher[1] ; // known
-	REAL& thetaT = Tspher[0] ; // known
-	REAL& phiT = Tspher[1] ; // to be decoded
+	// get known data
+	const REAL& thetaN = compressedFrame[0] ;
+	const REAL& phiN = compressedFrame[1] ;
+	const REAL& thetaT = compressedFrame[2] ;
 
 	// compute phiT
-	REAL Den,Nom ;
-	Den = sin(phiN)*(cos(thetaN)*cos(thetaT) + sin(thetaN)*sin(thetaT)) ; // Based on orthogonality
-	Nom = cos(phiN) ;
-	phiT = -atan(Nom/Den) ; // if A==0, atan returns Pi/2
-	if (phiT < 0.0)
-		phiT = M_PI + phiT ; // = Pi - |phiT|
+	const REAL quot = std::tan(phiN)*(std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT)) ; // Based on orthogonality
+	REAL phiT = -std::atan(1/quot) ; // if quot==0, atan returns Pi/2
+	if (phiT < 0.0) {
+		phiT += M_PI ; // = Pi - |phiT|
+//		std::cout << compressedFrame << phiT << std::endl ;
+//		std::cout << "New phiT = " << -std::atan(1/Den) << std::endl ;
+	}
+
+	VEC2 Nspher(thetaN,phiN) ;
+	VEC2 Tspher(thetaT,phiT) ;
 
 	// convert to carthesian
 	m_N = sphericalToCarth(Nspher) ;
@@ -63,7 +64,7 @@ LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 }
 
 template<typename PFP>
-typename PFP::VEC3 LocalFrame<PFP>::getCompressed()
+typename PFP::VEC3 LocalFrame<PFP>::getCompressed() const
 {
 	VEC3 res ;
 
@@ -79,6 +80,7 @@ typename PFP::VEC3 LocalFrame<PFP>::getCompressed()
 	thetaN = Nspher[0] ;
 	phiN = Nspher[1] ;
 	thetaT = Tspher[0] ;
+	std::cout << "Original phiT: " << Tspher[1] << std::endl ;
 
 	return res ;
 }
@@ -89,6 +91,11 @@ bool LocalFrame<PFP>::equals(const Utils::LocalFrame<PFP>& lf, REAL epsilon) con
 	VEC3 dT = m_T - lf.getT() ;
 	VEC3 dB = m_B - lf.getB() ;
 	VEC3 dN = m_N - lf.getN() ;
+
+	if (dT.norm2() > epsilon)
+		std::cout << dT.norm2() << std::endl ;
+	if (dB.norm2() > epsilon)
+		std::cout << dB.norm2() << std::endl ;
 
 	return dT.norm2() < epsilon && dB.norm2() < epsilon && dN.norm2() < epsilon ;
 }
@@ -106,33 +113,33 @@ bool LocalFrame<PFP>::operator!=(const LocalFrame<PFP>& lf) const
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isDirect() const
+bool LocalFrame<PFP>::isDirect(REAL epsilon) const
 {
 	VEC3 new_B = m_N ^ m_T ;		// direct
 	VEC3 diffs = new_B - m_B ;		// differences with existing B
 	REAL diffNorm = diffs.norm2() ;	// Norm of this differences vector
 
-	return (diffNorm < 1e-10) ;		// Verify that this difference is very small
+	return (diffNorm < epsilon) ;		// Verify that this difference is very small
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isOrthogonal() const
+bool LocalFrame<PFP>::isOrthogonal(REAL epsilon) const
 {
-	return (fabs(m_T * m_B) < 1e-5) && (fabs(m_N * m_B) < 1e-5) && (fabs(m_T * m_N) < 1e-5) ;
+	return (fabs(m_T * m_B) < epsilon) && (fabs(m_N * m_B) < epsilon) && (fabs(m_T * m_N) < epsilon) ;
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isNormalized() const
+bool LocalFrame<PFP>::isNormalized(REAL epsilon) const
 {
-	return 		(1-1e-5 < m_N.norm2() && m_N.norm2() < 1+1e-5)
-			&& 	(1-1e-5 < m_T.norm2() && m_T.norm2() < 1+1e-5)
-			&&	(1-1e-5 < m_B.norm2() && m_B.norm2() < 1+1e-5) ;
+	return 		(1-1e-5 < m_N.norm2() && m_N.norm2() < epsilon)
+			&& 	(1-1e-5 < m_T.norm2() && m_T.norm2() < epsilon)
+			&&	(1-1e-5 < m_B.norm2() && m_B.norm2() < epsilon) ;
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isOrthoNormalDirect() const
+bool LocalFrame<PFP>::isOrthoNormalDirect(REAL epsilon) const
 {
-	return isOrthogonal() && isNormalized() && isDirect() ;
+	return isOrthogonal(epsilon) && isNormalized(epsilon) && isDirect(epsilon) ;
 }
 
 template<typename PFP>
@@ -144,20 +151,14 @@ typename Geom::Vector<2,typename PFP::REAL> LocalFrame<PFP>::carthToSpherical (c
 	const REAL& y = carth[1] ;
 	const REAL& z = carth[2] ;
 
-	REAL& theta = res[0] ;
-	REAL& phi = res[1] ;
-
-	phi = acos(z) ;
-	const REAL sinphi = sin(phi) ;
-	if (sinphi == 0.0)
+	REAL theta = ((y < 0) ? -1 : 1) * std::acos(x / REAL(sqrt(x*x + y*y)) )  ;
+	if (isnan(theta))
 		theta = 0.0 ;
-	else
-		theta = ((y > 0) ? 1 : -1) * acos(std::min(REAL(1.0),std::max(REAL(-1.0),x / sinphi))) ;
 
-	assert (-(M_PI+0.000001) <= theta && theta <= M_PI+0.000001) ;
-	assert (-0.000001 < phi && phi <= M_PI+0.000001) ;
-	assert (!isnan(theta) || !"carthToSpherical : Theta is NaN !") ;
-	assert (!isnan(phi) || !"carthToSpherical : Phi is NaN !") ;
+	REAL phi = std::acos(z) ;
+
+	res[0] = theta ;
+	res[1] = phi ;
 
 	return res ;
 }

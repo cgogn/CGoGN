@@ -25,6 +25,8 @@
 #ifndef LOCALFRAME_H_
 #define LOCALFRAME_H_
 
+#include <cmath>
+
 namespace CGoGN {
 
 namespace Utils {
@@ -72,7 +74,7 @@ public: // methods
 	/**
 	 * Returns a compressed version of the current local frame
 	 */
-	VEC3 getCompressed() ;
+	VEC3 getCompressed() const ;
 
 	/**
 	 * Tests if the frames are identical
@@ -80,7 +82,7 @@ public: // methods
 	 * @param epsilon the authorized deviation
 	 * @return true if frames are identical (or deviate less than epsilon)
 	 */
-	bool equals(const LocalFrame<PFP>& lf, REAL epsilon = 1e-5) const ;
+	bool equals(const LocalFrame<PFP>& lf, REAL epsilon = 1e-3) const ;
 
 	/**
 	 * Equality of frames
@@ -100,25 +102,25 @@ public: // methods
 	 * Tests if the frame is direct
 	 * @return true if the frame is direct
 	 */
-	bool isDirect() const ;
+	bool isDirect(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * Tests if the frame is orthogonal
 	 * @return true if the frame is orthogonal
 	 */
-	bool isOrthogonal() const ;
+	bool isOrthogonal(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * Tests if the frame is normalized
 	 * @return true if the frame is normalized
 	 */
-	bool isNormalized() const ;
+	bool isNormalized(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * Tests if the frame is direct, normalized and orthogonal
 	 * @return true if the frame is direct, normalized and orthogonal
 	 */
-	bool isOrthoNormalDirect() const ;
+	bool isOrthoNormalDirect(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * @return current tangent vector
