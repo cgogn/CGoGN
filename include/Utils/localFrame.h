@@ -49,6 +49,7 @@ class LocalFrame
 	typedef typename PFP::REAL REAL ;
 	typedef typename Geom::Vector<2,REAL> VEC2 ;
 	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<4,REAL> VEC4 ;
 
 private: // fields
 	/**
@@ -64,17 +65,31 @@ public: // methods
 	 * @param N the normal vector
 	 */
 	LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N) ;
+
 	/**
 	 * Constructor from implicit (compressed representation)
 	 * @param compressedFrame an implicit (compressed) version of the local frame
 	 */
 	LocalFrame(const VEC3& compressedFrame) ;
+
+	/**
+	 * Constructor from implicit (compressed representation)
+	 * @param secureCompressedFrame an implicit (compressed) version of the local frame
+	 */
+	LocalFrame(const VEC4& secureCompressedFrame) ;
+
 	~LocalFrame() {} ;
 
 	/**
 	 * Returns a compressed version of the current local frame
+	 * A VEC3 is not sufficient to completely define a local frame (if phiN=0, the decompression is not unique).
 	 */
 	VEC3 getCompressed() const ;
+
+	/**
+	 * Returns a compressed version of the current local frame (fully defined, no ambiguities)
+	 */
+	VEC4 getCompressedSecure() const ;
 
 	/**
 	 * Tests if the frames are identical

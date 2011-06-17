@@ -44,16 +44,29 @@ LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 	const REAL& thetaT = compressedFrame[2] ;
 
 	// compute phiT
-//	const REAL quot = std::tan(phiN)*(std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT)) ; // Based on orthogonality
-//	REAL phiT = -std::atan(1/quot) ; // if quot==0, atan returns Pi/2
-	REAL phiT = -std::atan((std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT))*std::cos(phiN) / std::sin(phiN)) ; // if quot==0, atan returns Pi/2
+	REAL phiT = 0.0 ;
+	if (std::fabs(phiN) < M_PI/2.0 - 1e-3)
+		phiT = -std::atan((std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT))*std::cos(phiN) / std::sin(phiN)) ; // if quot==0, atan returns Pi/2
 
-//	if (phiT < 0.0) {
-		std::cout << " ; New set = " << compressedFrame << phiT << std::endl ;
-//		phiT += M_PI ; // = Pi - |phiT|
-//		std::cout << compressedFrame << phiT << std::endl ;
-//		std::cout << "New phiT = " << -std::atan(1/Den) << std::endl ;
-//	}
+	VEC2 Nspher(thetaN,phiN) ;
+	VEC2 Tspher(thetaT,phiT) ;
+
+	// convert to carthesian
+	m_N = sphericalToCarth(Nspher) ;
+	m_T = sphericalToCarth(Tspher) ;
+
+	// compute B
+	m_B = m_N ^ m_T ;
+}
+
+template<typename PFP>
+LocalFrame<PFP>::LocalFrame(const VEC4& compressedFrame)
+{
+	// get known data
+	const REAL& thetaN = compressedFrame[0] ;
+	const REAL& phiN = compressedFrame[1] ;
+	const REAL& thetaT = compressedFrame[2] ;
+	const REAL& phiT = compressedFrame[3] ;
 
 	VEC2 Nspher(thetaN,phiN) ;
 	VEC2 Tspher(thetaT,phiT) ;
@@ -83,9 +96,29 @@ typename PFP::VEC3 LocalFrame<PFP>::getCompressed() const
 	thetaN = Nspher[0] ;
 	phiN = Nspher[1] ;
 	thetaT = Tspher[0] ;
-	//if (thetaT == 0.0 && phiN == 0.0)
-		//phiN = (Tspher[1] > 0 ? -1 : 1) * 1e-8 ;
-	std::cout << "Original Set: " << res << Tspher[1] ;
+
+	return res ;
+}
+
+template<typename PFP>
+typename Geom::Vector<4,typename PFP::REAL> LocalFrame<PFP>::getCompressedSecure() const
+{
+	VEC4 res ;
+
+	REAL& thetaN = res[0] ;
+	REAL& phiN = res[1] ;
+	REAL& thetaT = res[2] ;
+	REAL& phiT = res[3] ;
+
+	// convert to spherical coordinates
+	VEC2 Nspher = carthToSpherical(m_N) ;
+	VEC2 Tspher = carthToSpherical(m_T) ;
+
+	// extract the three scalars
+	thetaN = Nspher[0] ;
+	phiN = Nspher[1] ;
+	thetaT = Tspher[0] ;
+	phiT = Tspher[1] ;
 
 	return res ;
 }
@@ -156,11 +189,7 @@ typename Geom::Vector<2,typename PFP::REAL> LocalFrame<PFP>::carthToSpherical (c
 		theta = 0.0 ;
 
 	REAL phi = std::asin(z) ;
-/*	if (phi < -1.57)
-		std::cout << theta << std::endl ;
-	if (phi > 1.57)
-		std::cout << theta << std::endl ;
-*/
+
 	res[0] = theta ;
 	res[1] = phi ;
 
