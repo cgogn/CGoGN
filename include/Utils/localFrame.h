@@ -34,12 +34,13 @@ namespace Utils {
 /**
  * Class for representing a direct local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
  * This class can compress/decompress a local frame, switching from its explicit representation (3 vectors) to its compressed representation (1 vector).
+ * Two different compressions coexist : one which is not correct on the extreme values (VEC3 getCompressed()) and one which is totally correct (VEC4 getCompressedSecure()).
  * Usage :
  *  VEC3 T,B,N ;							// current set of orthonormal vectors composing the direct frame.
- *  LocalFrame<PFP::VEC3> lf(T,B,N) ; 				// Constructor from explicit expression.
+ *  LocalFrame<PFP> lf(T,B,N) ; 				// Constructor from explicit expression.
  *  if (lf.isOrthoNormalDirect())			// test if the frame is Orthogonal, Normalized and Direct
- *   VEC3 compressed = lf.getCompressed() ;	// Extract compressed frame
- *  LocalFrame<PFP::VEC3> decompressed(compressed) ;	// Constructor from implicit (compressed) expression.
+ *   VEC4 compressed = lf.getCompressedSecure() ;	// Extract compressed frame
+ *  LocalFrame<PFP> decompressed(compressed) ;	// Constructor from implicit (compressed) expression.
  *
  * All formulae were provided by "Représentation compacte d'un repère local", june 14th, 2011 by K. Vanhoey
  */
