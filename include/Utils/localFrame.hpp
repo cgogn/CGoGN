@@ -44,13 +44,16 @@ LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 	const REAL& thetaT = compressedFrame[2] ;
 
 	// compute phiT
-	const REAL quot = std::tan(phiN)*(std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT)) ; // Based on orthogonality
-	REAL phiT = -std::atan(1/quot) ; // if quot==0, atan returns Pi/2
-	if (phiT < 0.0) {
-		phiT += M_PI ; // = Pi - |phiT|
+//	const REAL quot = std::tan(phiN)*(std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT)) ; // Based on orthogonality
+//	REAL phiT = -std::atan(1/quot) ; // if quot==0, atan returns Pi/2
+	REAL phiT = -std::atan((std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT))*std::cos(phiN) / std::sin(phiN)) ; // if quot==0, atan returns Pi/2
+
+//	if (phiT < 0.0) {
+		std::cout << " ; New set = " << compressedFrame << phiT << std::endl ;
+//		phiT += M_PI ; // = Pi - |phiT|
 //		std::cout << compressedFrame << phiT << std::endl ;
 //		std::cout << "New phiT = " << -std::atan(1/Den) << std::endl ;
-	}
+//	}
 
 	VEC2 Nspher(thetaN,phiN) ;
 	VEC2 Tspher(thetaT,phiT) ;
@@ -80,7 +83,9 @@ typename PFP::VEC3 LocalFrame<PFP>::getCompressed() const
 	thetaN = Nspher[0] ;
 	phiN = Nspher[1] ;
 	thetaT = Tspher[0] ;
-	std::cout << "Original phiT: " << Tspher[1] << std::endl ;
+	//if (thetaT == 0.0 && phiN == 0.0)
+		//phiN = (Tspher[1] > 0 ? -1 : 1) * 1e-8 ;
+	std::cout << "Original Set: " << res << Tspher[1] ;
 
 	return res ;
 }
@@ -91,11 +96,6 @@ bool LocalFrame<PFP>::equals(const Utils::LocalFrame<PFP>& lf, REAL epsilon) con
 	VEC3 dT = m_T - lf.getT() ;
 	VEC3 dB = m_B - lf.getB() ;
 	VEC3 dN = m_N - lf.getN() ;
-
-	if (dT.norm2() > epsilon)
-		std::cout << dT.norm2() << std::endl ;
-	if (dB.norm2() > epsilon)
-		std::cout << dB.norm2() << std::endl ;
 
 	return dT.norm2() < epsilon && dB.norm2() < epsilon && dN.norm2() < epsilon ;
 }
@@ -155,8 +155,12 @@ typename Geom::Vector<2,typename PFP::REAL> LocalFrame<PFP>::carthToSpherical (c
 	if (isnan(theta))
 		theta = 0.0 ;
 
-	REAL phi = std::acos(z) ;
-
+	REAL phi = std::asin(z) ;
+/*	if (phi < -1.57)
+		std::cout << theta << std::endl ;
+	if (phi > 1.57)
+		std::cout << theta << std::endl ;
+*/
 	res[0] = theta ;
 	res[1] = phi ;
 
@@ -175,9 +179,9 @@ typename PFP::VEC3 LocalFrame<PFP>::sphericalToCarth (const VEC2& sph) const
 	REAL& y = res[1] ;
 	REAL& z = res[2] ;
 
-	x = cos(theta)*sin(phi) ;
-	y = sin(theta)*sin(phi) ;
-	z = cos(phi) ;
+	x = cos(theta)*cos(phi) ;
+	y = sin(theta)*cos(phi) ;
+	z = sin(phi) ;
 
 	assert(-1.000001 < x && x < 1.000001) ;
 	assert(-1.000001 < y && y < 1.000001) ;
