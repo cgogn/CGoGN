@@ -398,16 +398,6 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_5">
-             <attribute name="title">
-              <string>Geometry</string>
-             </attribute>
-             <layout class="QGridLayout" name="gridLayout_11">
-              <item row="0" column="0">
-               <widget class="QTextEdit" name="geometryEdit"/>
-              </item>
-             </layout>
-            </widget>
            </widget>
           </item>
          </layout>

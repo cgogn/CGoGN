@@ -95,33 +95,12 @@ void StageShader::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
 	QString st2 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->fragmentEdit->toPlainText();
-	QString st3 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->geometryEdit->toPlainText();
 
-	if (st1.toStdString().length() > 0)
-		m_shader->reloadVertexShaderFromMemory(st1.toStdString().c_str());
-	if (st2.toStdString().length() > 0)
-		m_shader->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
-	if (st3.toStdString().length() > 0)
-		m_shader->reloadGeometryShaderFromMemory(st3.toStdString().c_str());
+	m_shader->reloadVertexShaderFromMemory(st1.toStdString().c_str());
+	m_shader->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
 
 	m_shader->recompile();
 	updateGLMatrices();
-}
-
-/*******************************************************************************
- *														QT TRICK
- *******************************************************************************/
-
-void StageShader::dockWidget_topLevelChanged(bool isFloating)
-{
-	if(isFloating)
-	{
-		dockWidget()->setWindowFlags(Qt::Window);
-
-		// setWindowFlags calls setParent() when changing the flags for a window, causing the widget to be hidden.
-		// You must call show() to make the widget visible again
-		dockWidget()->show();
-	}
 }
 
 /*******************************************************************************
@@ -166,13 +145,10 @@ void StageShader::initGUI()
 
 	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
 
-	setCallBack(&dock, SIGNAL(topLevelChanged(bool)), SLOT(dockWidget_topLevelChanged(bool)));
-
 	setCallBack(dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
 
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
-	dock.geometryEdit->setPlainText(QString(m_shader->getGeometryShaderSrc()));
 
 }
 

@@ -123,8 +123,6 @@ public slots:
 
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
 
-	void dockWidget_topLevelChanged(bool isFloating);
-
 	void button_compile();
 };
 
