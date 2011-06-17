@@ -49,7 +49,7 @@ class LocalFrame
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename Geom::Vector<2,REAL> VEC2 ;
-	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<3,REAL> VEC3 ;
 	typedef typename Geom::Vector<4,REAL> VEC4 ;
 
 private: // fields
@@ -159,7 +159,7 @@ public: // methods
 	friend std::ostream& operator<< (std::ostream &out, const LocalFrame& lf) {
 		out << "T : " << lf.m_T << std::endl ;
 		out << "B : " << lf.m_B << std::endl ;
-		out << "N : " << lf.m_N << std::endl ;
+		out << "N : " << lf.m_N ;
 		return out ;
 	} ;
 

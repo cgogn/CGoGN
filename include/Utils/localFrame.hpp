@@ -44,9 +44,7 @@ LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 	const REAL& thetaT = compressedFrame[2] ;
 
 	// compute phiT
-	REAL phiT = 0.0 ;
-	if (std::fabs(phiN) < M_PI/2.0 - 1e-3)
-		phiT = -std::atan((std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT))*std::cos(phiN) / std::sin(phiN)) ; // if quot==0, atan returns Pi/2
+	REAL phiT = -std::atan((std::cos(thetaN)*std::cos(thetaT) + std::sin(thetaN)*std::sin(thetaT))*std::cos(phiN) / std::sin(phiN)) ; // if quot==0, atan returns Pi/2
 
 	VEC2 Nspher(thetaN,phiN) ;
 	VEC2 Tspher(thetaT,phiT) ;
@@ -80,7 +78,7 @@ LocalFrame<PFP>::LocalFrame(const VEC4& compressedFrame)
 }
 
 template<typename PFP>
-typename PFP::VEC3 LocalFrame<PFP>::getCompressed() const
+typename Geom::Vector<3,typename PFP::REAL> LocalFrame<PFP>::getCompressed() const
 {
 	VEC3 res ;
 
@@ -197,7 +195,7 @@ typename Geom::Vector<2,typename PFP::REAL> LocalFrame<PFP>::carthToSpherical (c
 }
 
 template<typename PFP>
-typename PFP::VEC3 LocalFrame<PFP>::sphericalToCarth (const VEC2& sph) const
+typename Geom::Vector<3,typename PFP::REAL> LocalFrame<PFP>::sphericalToCarth (const VEC2& sph) const
 {
 	VEC3 res ;
 
