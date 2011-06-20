@@ -32,7 +32,7 @@ namespace IHM
 {
 
 /***************************************************
- *             ATTRIBUTES MANAGEMENT               *
+ *  		       	    ATTRIBUTES MANAGEMENT    	           	 *
  ***************************************************/
 
 template <typename T>
@@ -64,7 +64,7 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap3::getAttribute(unsigned int orbi
 }
 
 /***************************************************
- *                 MAP TRAVERSAL                   *
+ *          			 	    MAP TRAVERSAL         		  		         *
  ***************************************************/
 
 inline Dart ImplicitHierarchicalMap3::newDart()

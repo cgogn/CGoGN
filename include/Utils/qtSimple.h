@@ -55,9 +55,12 @@ class SimpleQT : public QMainWindow
 
 public:
 	SimpleQT();
+
 	SimpleQT(const SimpleQT&) ;
 
 	virtual ~SimpleQT();
+
+	void operator=(const SimpleQT& v) ;
 
 	/**
 	 * set the main widget of the dock
@@ -137,6 +140,13 @@ public:
 
 //	void contextMenuEvent(QContextMenuEvent *event);
 
+	/**
+	 * set mouse tracking on the GLWidget
+	 * if true : mouseMove events are generated for each mouse move
+	 * if false : mouseMove events are only generated when a button is pressed
+	 */
+	void setGLWidgetMouseTracking(bool b);
+
 protected:
 	GLWidget *m_glWidget;
 
@@ -173,8 +183,6 @@ protected:
 	void keyReleaseEvent(QKeyEvent *e);
 
 public:
-	void operator=(const SimpleQT& v) ;
-
 	/**
 	 * set width and pos center of object to draw
 	 */
@@ -317,7 +325,7 @@ public:
 	/**
 	 * end of program, some things to clean ?
 	 */
-	virtual void cb_exit() { }
+	virtual void cb_exit() {}
 
 	/**
 	 * Ask to Qt to update the GL widget.
@@ -329,7 +337,6 @@ public:
 	 * Ask to Qt to update matrices and then the GL widget.
 	 */
 	void updateGLMatrices();
-
 
 	/**
 	 * apply rotation to transformation matrix
@@ -350,7 +357,6 @@ public:
 	 * push the transfo matrix on stack
 	 */
 	void pushTransfoMatrix();
-
 
 	/**
 	 * pop the transfo matrix from stack

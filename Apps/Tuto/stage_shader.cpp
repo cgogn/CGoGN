@@ -189,14 +189,6 @@ void StageShader::importMesh(std::string& filename)
 		else
 			position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
 	}
-	else
-	{
-		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-		Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
-		prim.hexaGrid_topo(10,10,10);
-		prim.embedHexaGrid(1.0f,1.0f,1.0f);
-	}
-
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
@@ -316,6 +308,13 @@ int main(int argc, char** argv)
             std::string filename(argv[1]) ;
             sqt.importMesh(filename) ;
     }
+	else
+	{
+		sqt.position = sqt.myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		Algo::Modelisation::Primitive3D<PFP> prim(sqt.myMap, sqt.position);
+		prim.hexaGrid_topo(10,10,10);
+		prim.embedHexaGrid(1.0f,1.0f,1.0f);
+	}
 
     sqt.initGUI() ;
 
