@@ -150,7 +150,7 @@ void ShaderMutator::VS_insertCodeAtMainFunctionEnd(const std::string& insertedCo
 		<< "Unable to insert source code in vertex shader of "
 		<< m_shaderName
 		<< ". You should check if the shader has a main function declaration "
-		<< "and as many '{' as '}'"
+		<< "and as many '{' as '}' in main"
 		<< CGoGNendl;
 	}
 }
@@ -165,7 +165,7 @@ void ShaderMutator::FS_insertCodeAtMainFunctionEnd(const std::string& insertedCo
 		<< "Unable to insert source code in fragment shader of "
 		<< m_shaderName
 		<< ". You should check if the shader has a main function declaration "
-		<< "and as many '{' as '}'"
+		<< "and as many '{' as '}' in main"
 		<< CGoGNendl;
 	}
 }
@@ -180,7 +180,7 @@ void ShaderMutator::GS_insertCodeAtMainFunctionEnd(const std::string& insertedCo
 		<< "Unable to insert source code in geometry shader of "
 		<< m_shaderName
 		<< ". You should check if the shader has a main function declaration "
-		<< "and as many '{' as '}'"
+		<< "and as many '{' as '}' in main"
 		<< CGoGNendl;
 	}
 }

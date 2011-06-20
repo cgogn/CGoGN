@@ -32,9 +32,11 @@ namespace Utils
 
 ClippingShader::ClippingShader()
 {
+	// Default values for plane clipping
 	m_clipPlane = Geom::Vec4f(0.5, 0.5, 0.5, 0.0);
 	m_unif_clipPlane = 0;
 	
+	// Default values for color attenuation
 	m_colorAttenuationFactor = 0.0;
 	m_unif_colorAttenuationFactor = 0;
 }
@@ -55,6 +57,9 @@ void ClippingShader::setClippingColorAttenuationFactor(float colorAttenuationFac
 
 void ClippingShader::addPlaneClippingToShaderSource()
 {
+	// Shader name
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
 	// Verify that the shader has been well created
 	if (!isCreated())
 	{
@@ -62,10 +67,9 @@ void ClippingShader::addPlaneClippingToShaderSource()
 		<< "ERROR - "
 		<< "ClippingShader::addPlaneClippingToShaderSource"
 		<< " - Could not process shader "
-		<< m_nameVS
+		<< shaderName
 		<< " source code : shader has not been created or has failed to compile"
 		<< CGoGNendl;
-		// TODO : add real shader name - add m_name attribute to GLSLShader Class
 		return;
 	}
 	
@@ -76,10 +80,9 @@ void ClippingShader::addPlaneClippingToShaderSource()
 		<< "ERROR - "
 		<< "ClippingShader::addPlaneClippingToShaderSource"
 		<< " - Could not process shader "
-		<< m_nameVS
+		<< shaderName
 		<< " source code : unable to add clipping to a shader which uses a geometry shader"
 		<< CGoGNendl;
-		// TODO : add real shader name - add m_name attribute to GLSLShader Class
 		return;
 	}
 
@@ -128,7 +131,7 @@ void ClippingShader::addPlaneClippingToShaderSource()
 
 	
 	// Use a shader mutator
-	ShaderMutator SM("Shader", getVertexShaderSrc(), getFragmentShaderSrc(), ""); // TODO : send the real shader name
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc(), "");
 	
 	// First check if the vertex shader contains the VertexPosition attribute
 	if (!SM.VS_containsVariableDeclaration("VertexPosition"))
@@ -162,6 +165,9 @@ void ClippingShader::addPlaneClippingToShaderSource()
 
 void ClippingShader::updateClippingUniforms()
 {
+	// Shader name
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
 	// Get uniforms locations
 	m_unif_clipPlane = glGetUniformLocation(program_handler(), "clip_ClipPlane");
 	if (m_unif_clipPlane == -1)
@@ -170,10 +176,9 @@ void ClippingShader::updateClippingUniforms()
 		<< "ERROR - "
 		<< "ClippingShader::addPlaneClippingToShaderSource"
 		<< " - uniform 'clip_ClipPlane' not found in shader "
-		<< m_nameVS
+		<< shaderName
 		<< CGoGNendl;
 	}
-	// TODO : add real shader name - add m_name attribute to GLSLShader Class
 	m_unif_colorAttenuationFactor = glGetUniformLocation(program_handler(), "clip_ColorAttenuationFactor");
 	if (m_unif_colorAttenuationFactor == -1)
 	{
@@ -181,10 +186,9 @@ void ClippingShader::updateClippingUniforms()
 		<< "ERROR - "
 		<< "ClippingShader::addPlaneClippingToShaderSource"
 		<< " - uniform 'clip_ColorAttenuationFactor' not found in shader "
-		<< m_nameVS
+		<< shaderName
 		<< CGoGNendl;
 	}
-	// TODO : add real shader name - add m_name attribute to GLSLShader Class
 	
 	// Set uniforms values
 	setPlaneClippingParams(m_clipPlane);

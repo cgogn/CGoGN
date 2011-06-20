@@ -76,7 +76,15 @@ std::string ShaderPhong::fragmentShaderText =
 "	float lambertTerm = dot(N,L);\n"
 
 "	vec4 finalColor = materialAmbient;\n"
-"	if(lambertTerm > 0.0)\n"
+"	#ifdef DOUBLE_SIDED\n"
+"	if (lambertTerm < 0.0)\n"
+"	{\n"
+"		N = -1.0*N;\n"
+"		lambertTerm = -1.0*lambertTerm;\n"
+"	}\n"
+"	#else\n"
+"	if (lambertTerm > 0.0)\n"
+"	#endif\n"
 "	{\n"
 "		#ifndef WITH_COLOR\n"
 "		finalColor += materialDiffuse * lambertTerm;\n"
@@ -92,19 +100,25 @@ std::string ShaderPhong::fragmentShaderText =
 "}";
 
 
-ShaderPhong::ShaderPhong():
+ShaderPhong::ShaderPhong(bool doubleSided):
 	m_with_color(false),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
 	m_shininess(100.0f),
-	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f))
+	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
+	m_vboPos(NULL),
+	m_vboNormal(NULL),
+	m_vboColor(NULL)
 {
 	// get choose GL defines (2 or 3)
 	// ans compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	// Use double sided lighting if set
+	if (doubleSided)
+		glxfrag.append("#define DOUBLE_SIDED\n");
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
@@ -227,12 +241,15 @@ void ShaderPhong::unsetAttributeColor()
 void ShaderPhong::restoreUniformsAttribs()
 {
 	getLocations();
+
+	bind();
 	sendParams();
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexNormal", m_vboNormal);
 	if (m_vboColor)
 		bindVA_VBO("VertexColor", m_vboColor);
+	unbind();
 }
 
 unsigned int ShaderPhong::setAttributePosition(VBO* vbo)

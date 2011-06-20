@@ -93,6 +93,7 @@ void ShaderSimpleColor::restoreUniformsAttribs()
 	bind();
 	glUniform4fv(m_unif_color, 1, m_color.data());
 	bindVA_VBO("VertexPosition", m_vboPos);
+	unbind();
 }
 
 } // namespace Utils

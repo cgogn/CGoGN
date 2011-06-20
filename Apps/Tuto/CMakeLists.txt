@@ -72,6 +72,12 @@ add_executable( stage_shader stage_shader.cpp ${stage_shader_ui} ${stage_shader_
 target_link_libraries( stage_shader
 	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
 
+QT4_WRAP_UI( stage_shader_number_two_ui stage_shader_number_two.ui )
+QT4_WRAP_CPP( stage_shader_number_two_moc stage_shader_number_two.h )
+add_executable( stage_shader_number_two stage_shader_number_two.cpp ${stage_shader_number_two_moc} ${stage_shader_number_two_ui})
+target_link_libraries( stage_shader_number_two 
+	${CGoGN_LIBS_D} ${NUMERICAL_LIBS} ${COMMON_LIBS} ${QT_LIBRARIES} )
+
 
 #add_executable( tuto_subdivision tuto_subdivision.cpp)
 #target_link_libraries( tuto_subdivision

@@ -130,9 +130,10 @@ void ShaderVectorPerVertex::restoreUniformsAttribs()
 {
 	getLocations();
 	sendParams();
-
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexVector", m_vboVec);
+	unbind();
 }
 
 } // namespace Utils

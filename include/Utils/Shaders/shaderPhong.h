@@ -26,6 +26,7 @@
 #define __CGOGN_SHADER_PHONG__
 
 #include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
 
 #include <string>
@@ -36,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderPhong : public GLSLShader
+class ShaderPhong : public ClippingShader
 {
 protected:
 	// flag color per vertex or not
@@ -71,7 +72,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderPhong();
+	ShaderPhong(bool doubleSided = false);
 
 	// inviduals parameter setting functions
 	void setAmbiant(const Geom::Vec4f& ambiant);

@@ -39,10 +39,10 @@ class ShaderSimpleColor : public ClippingShader
 {
 protected:
 	// shader sources
-    static std::string vertexShaderText;
-    static std::string fragmentShaderText;
+	static std::string vertexShaderText;
+	static std::string fragmentShaderText;
 
-    // uniform locations
+	// uniform locations
 	GLuint m_unif_color;
 
 	Geom::Vec4f m_color;

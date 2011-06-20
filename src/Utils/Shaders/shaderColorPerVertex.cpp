@@ -80,8 +80,10 @@ unsigned int ShaderColorPerVertex::setAttributeColor(VBO* vbo)
 
 void ShaderColorPerVertex::restoreUniformsAttribs()
 {
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexColor", m_vboCol);
+	unbind();
 }
 
 } // namespace Utils
