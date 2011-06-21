@@ -28,6 +28,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <list>
+#include <utility>
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/functor.h"
@@ -67,7 +68,8 @@ enum bufferIndex
 	POINT_INDICES = 0,
 	LINE_INDICES = 1,
 	TRIANGLE_INDICES = 2,
-	FLAT_BUFFER = 3
+	FLAT_BUFFER = 3,
+	SIZE_BUFFER
 } ;
 
 
@@ -78,12 +80,14 @@ protected:
 	/**
 	 * vbo buffers
 	 */
-	GLuint m_indexBuffers[4] ;
+	GLuint m_indexBuffers[SIZE_BUFFER] ;
 
 	/**
 	 * nb indices
 	 */
-	GLuint m_nbIndices[4] ;
+	GLuint m_nbIndices[SIZE_BUFFER] ;
+
+	typedef std::pair<GLuint*, unsigned int> buffer_array;
 
 public:
 	/**
@@ -100,6 +104,9 @@ public:
 	 * Destructor
 	 */
 	~MapRender() ;
+
+	buffer_array get_index_buffer() { return std::make_pair(m_indexBuffers, SIZE_BUFFER); }
+	buffer_array get_nb_index_buffer() { return std::make_pair(m_nbIndices, SIZE_BUFFER); }
 
 protected:
 	/**
