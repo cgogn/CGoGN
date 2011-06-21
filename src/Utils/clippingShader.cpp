@@ -33,19 +33,74 @@ namespace Utils
 ClippingShader::ClippingShader()
 {
 	// Default values for plane clipping
-	m_clipPlane = Geom::Vec4f(0.5, 0.5, 0.5, 0.0);
+	m_clipPlaneEquation = Geom::Vec4f(0.0, 0.0, 1.0, 0.0);
 	m_unif_clipPlane = 0;
+	m_clipPlaneQuaternion[0] = 1.0;
+	m_clipPlaneQuaternion[1] = 0.0;
+	m_clipPlaneQuaternion[2] = 0.0;
+	m_clipPlaneQuaternion[3] = 0.0;
 	
 	// Default values for color attenuation
 	m_colorAttenuationFactor = 0.0;
 	m_unif_colorAttenuationFactor = 0;
+
+	// Plane Drawer
+	float planeSize = 100.0;
+	m_planeDrawer = new Drawer();
+	m_planeDrawer->newList(GL_COMPILE);
+	m_planeDrawer->begin(GL_QUADS);
+	m_planeDrawer->color3f(0.7, 0.7, 0.2);
+	m_planeDrawer->vertex3f(-planeSize/2.0, -planeSize/2.0, 0.0);
+	m_planeDrawer->vertex3f(-planeSize/2.0, planeSize/2.0, 0.0);
+	m_planeDrawer->vertex3f(planeSize/2.0, planeSize/2.0, 0.0);
+	m_planeDrawer->vertex3f(planeSize/2.0, -planeSize/2.0, 0.0);
+	m_planeDrawer->end();
+	m_planeDrawer->endList();
 }
 
-void ClippingShader::setPlaneClippingParams(Geom::Vec4f clipPlane)
+ClippingShader::~ClippingShader()
 {
-	m_clipPlane = clipPlane;
+	delete m_planeDrawer;
+}
+
+void ClippingShader::setClippingPlaneEquation(Geom::Vec4f clipPlane)
+{
+	m_clipPlaneEquation = clipPlane;
+
+	// Recalculate quaternion rotation
+	float m[4][4];
+	build_rotmatrix(m, m_clipPlaneQuaternion);
+	Geom::Matrix44f rotMat;
+	int i, j;
+	for (i = 0; i < 4; i++)
+		for (j = 0; j < 4; j++)
+			rotMat(i, j) = m[i][j];
+	Geom::Vec4f rotatedVec = rotMat * m_clipPlaneEquation;
+
+	// Send the resulting plane equation to shader
 	bind();
-	glUniform4fv(m_unif_clipPlane, 1, m_clipPlane.data());
+	glUniform4fv(m_unif_clipPlane, 1, rotatedVec.data());
+}
+
+Geom::Vec4f ClippingShader::getClippingPlaneEquation()
+{
+	return m_clipPlaneEquation;
+}
+
+void ClippingShader::setClippingPlaneQuaternion(float quat[4])
+{
+	m_clipPlaneQuaternion[0] = quat[0];
+	m_clipPlaneQuaternion[1] = quat[1];
+	m_clipPlaneQuaternion[2] = quat[2];
+	m_clipPlaneQuaternion[3] = quat[3];
+
+	// Recalculate and resend the clipping plane equation
+	setClippingPlaneEquation(m_clipPlaneEquation);
+}
+
+Geom::Vec4f ClippingShader::getClippingPlaneQuaternion()
+{
+	return Geom::Vec4f (m_clipPlaneQuaternion[0], m_clipPlaneQuaternion[1], m_clipPlaneQuaternion[2], m_clipPlaneQuaternion[3]);
 }
 
 void ClippingShader::setClippingColorAttenuationFactor(float colorAttenuationFactor)
@@ -53,6 +108,11 @@ void ClippingShader::setClippingColorAttenuationFactor(float colorAttenuationFac
 	m_colorAttenuationFactor = colorAttenuationFactor;
 	bind();
 	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
+}
+
+float ClippingShader::getClippingColorAttenuationFactor()
+{
+	return m_colorAttenuationFactor;
 }
 
 void ClippingShader::addPlaneClippingToShaderSource()
@@ -191,8 +251,14 @@ void ClippingShader::updateClippingUniforms()
 	}
 	
 	// Set uniforms values
-	setPlaneClippingParams(m_clipPlane);
+	setClippingPlaneEquation(m_clipPlaneEquation);
+	setClippingPlaneQuaternion(m_clipPlaneQuaternion);
 	setClippingColorAttenuationFactor(m_colorAttenuationFactor);
+}
+
+void ClippingShader::displayClippingPlane()
+{
+	m_planeDrawer->callList();
 }
 
 } // namespace Utils

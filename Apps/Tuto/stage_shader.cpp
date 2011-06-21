@@ -81,7 +81,7 @@ void StageShader::slot_doubleSpinBox_Plane(double c)
 	float bPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_bPlane->value();
 	float cPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_cPlane->value();
 	float dPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_dPlane->value();
-	m_shader->setPlaneClippingParams(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
+	m_shader->setClippingPlaneEquation(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
 	updateGL();
 }
 
