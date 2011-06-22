@@ -75,7 +75,7 @@ void ClippingShader::setClippingPlaneEquation(Geom::Vec4f clipPlane)
 	for (i = 0; i < 4; i++)
 		for (j = 0; j < 4; j++)
 			rotMat(i, j) = m[i][j];
-	Geom::Vec4f rotatedVec = rotMat * m_clipPlaneEquation;
+	Geom::Vec4f rotatedVec = /*rotMat * */m_clipPlaneEquation;
 
 	// Send the resulting plane equation to shader
 	bind();
@@ -210,6 +210,9 @@ void ClippingShader::addPlaneClippingToShaderSource()
 	SM.VS_insertCodeBeforeMainFunction(VS_head_insertion);
 	SM.VS_insertCodeAtMainFunctionBeginning(VS_mainBegin_insertion);
 	
+	// Following code insertions need shading language 120 at least (GLSL arrays)
+	SM.VS_FS_GS_setMinShadingLanguageVersion(120);
+
 	// Modify fragment shader source code
 	SM.FS_insertCodeBeforeMainFunction(FS_head_insertion);
 	SM.FS_insertCodeAtMainFunctionEnd(FS_mainEnd_insertion);
@@ -219,7 +222,7 @@ void ClippingShader::addPlaneClippingToShaderSource()
 	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
 	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
 
-	// Recompile shaders (automatically calls updateClippingUniforms
+	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();
 }
 

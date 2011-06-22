@@ -56,6 +56,13 @@ bool ShaderMutator::GS_containsVariableDeclaration(const std::string& variableNa
 	return containsVariableDeclaration(variableName, m_gShaderMutation);
 }
 
+void ShaderMutator::VS_FS_GS_setMinShadingLanguageVersion(int version)
+{
+	setMinShadingLanguageVersion(version, m_vShaderMutation);
+	setMinShadingLanguageVersion(version, m_fShaderMutation);
+	setMinShadingLanguageVersion(version, m_gShaderMutation);
+}
+
 void ShaderMutator::VS_insertCodeBeforeMainFunction(const std::string& insertedCode)
 {
 	if (!insertCodeBeforeMainFunction(insertedCode, m_vShaderMutation))
@@ -297,6 +304,61 @@ bool ShaderMutator::containsVariableDeclaration(const std::string& variableName,
 	
 	// At this point no correct match was found
 	return false;
+}
+
+bool ShaderMutator::setMinShadingLanguageVersion(int version, std::string& modifiedSrc)
+{
+	// Regular expression for shading language version
+	// <#version> <space> <digit>[1 or more times]
+	boost::regex version_re("#version (\\d+)");
+
+	// Matches results
+	boost::match_results <std::string::iterator> matches;
+
+	// Build the version string
+	std::string versionStr;
+	std::stringstream ss;
+	ss << version;
+	versionStr = ss.str();
+
+	// Search for the first expression that matches and isn't commented
+	std::string::iterator start = modifiedSrc.begin();
+	std::string::iterator end = modifiedSrc.end();
+	while (regex_search(start, end, matches, version_re, boost::format_first_only))
+	{
+		// Start position of the match
+		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
+
+		// Change the version number if the matched "#version ..." is the good one (i.e. not commented)
+		if (!isCommented(startPosition, modifiedSrc))
+		{
+			// Match[1] should be the version number
+			std::string oldVersion(matches[1].first, matches[1].second);
+			int oldVersionValue = atoi(oldVersion.c_str());
+			size_t oldVersionLength = oldVersion.length();
+			size_t oldVersionPosition = std::distance(modifiedSrc.begin(), matches[1].first);
+
+			// Replace the version value only if it is lower than 'version'
+			if (oldVersionValue < version)
+			{
+				modifiedSrc.replace(oldVersionPosition, oldVersionLength, versionStr);
+				return true;
+			}
+			else
+				return false;
+		}
+		// Else continue to search for it after last match
+		else
+		{
+			start = matches[0].second;
+		}
+	}
+
+	// At this point no correct match was found : insert directly the "#version ..." line
+	std::string versionLineStr = "#version " + versionStr + "\n";
+	modifiedSrc.insert(0, versionLineStr);
+
+	return true;
 }
 
 bool ShaderMutator::insertCodeBeforeMainFunction(const std::string& insertedCode, std::string& modifiedSrc)

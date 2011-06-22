@@ -28,6 +28,7 @@
 #include "Utils/cgognStream.h"
 #include <boost/regex.hpp>
 #include <string>
+#include <sstream>
 
 namespace CGoGN
 {
@@ -65,6 +66,12 @@ public:
 	  */
 	 bool GS_containsVariableDeclaration(const std::string& variableName);
 	 
+	 /**
+	  * set or change shading language version if the current version is lower
+	  * @param version the version to set (110, 120, 150...)
+	  */
+	 void VS_FS_GS_setMinShadingLanguageVersion(int version);
+
 	 /**
 	  * insert code before main function into shader vertex source code
 	  * @param insertedCode source code to insert into shader
@@ -179,6 +186,13 @@ private:
 	 */
 	bool containsVariableDeclaration(const std::string& variableName, std::string& src);
 	
+	/**
+	 * set or change shading language version if the current version is lower
+	 * @param version the version to set (110, 120, 150...)
+	 * @param modifiedSrc shader source code to modify
+	 */
+	bool setMinShadingLanguageVersion(int version, std::string& modifiedSrc);
+
 	/**
 	 * insert code before main function into source code
 	 * @param insertedCode source code to insert into shader
