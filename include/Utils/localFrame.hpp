@@ -28,10 +28,7 @@ namespace CGoGN {
 namespace Utils {
 
 template<typename PFP>
-LocalFrame<PFP>::LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N) :
-	T(1,0,0), // (T,B,N) can be any orthonormal direct frame
-	B(0,1,0), // but has to be initialized exactly the same
-	N(0,0,1)  // in every constructor !
+LocalFrame<PFP>::LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N)
 {
 	m_T = T ;
 	m_B = B ;
@@ -39,11 +36,11 @@ LocalFrame<PFP>::LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N) :
 }
 
 template<typename PFP>
-LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame) :
-	T(1,0,0), // (T,B,N) can be any orthonormal direct frame
-	B(0,1,0), // but has to be initialized exactly the same
-	N(0,0,1)  // in every constructor !{
+LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 {
+	const VEC3 T(Tx,Ty,Tz) ;
+	const VEC3 N(Nx,Ny,Nz) ;
+
 	// get known data
 	const REAL& theta1 = compressedFrame[0] ;
 	const REAL& phi = compressedFrame[1] ;
@@ -59,6 +56,10 @@ template<typename PFP>
 typename Geom::Vector<3,typename PFP::REAL> LocalFrame<PFP>::getCompressed() const
 {
 	VEC3 res ;
+
+	const VEC3 T(Tx,Ty,Tz) ;
+	const VEC3 B(Bx,By,Bz) ;
+	const VEC3 N(Nx,Ny,Nz) ;
 
 	REAL& theta1 = res[0] ;
 	REAL& phi = res[1] ;

@@ -179,9 +179,18 @@ public: // methods
 	} ;
 
 private : // private constants
-	const VEC3 T ;
-	const VEC3 B ;
-	const VEC3 N ;
+	// (T,B,N) can be any orthonormal direct frame
+	// zeros are not recommended since they can
+	// generate zero vectors after a dot product
+	static const REAL Tx = 0.267261 ;
+	static const REAL Ty = 0.534522 ;
+	static const REAL Tz = 0.801784 ;
+	static const REAL Bx = 0.844416 ;
+	static const REAL By = -0.530776 ;
+	static const REAL Bz = 0.0723785 ;
+	static const REAL Nx = 0.464255 ;
+	static const REAL Ny = 0.657695 ;
+	static const REAL Nz = -0.593215 ;
 } ;
 
 } // Utils

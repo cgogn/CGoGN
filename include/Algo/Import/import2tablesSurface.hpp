@@ -674,9 +674,8 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
  * @param attrNames : reference that will be filled with the attribute names ;
  *  - 1 attrName for geometric position (VEC3)
  *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
- *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the constants, the linears (v then u) and the quadratics : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
- * @return bool : success.
- * @return bool : success.
+ *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the quadratic members, the linears and the constants (u then v) : a*u^2 + b*v^2 + c*uv + d*u + e*v +f.
+  * @return bool : success.
  */
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames)
