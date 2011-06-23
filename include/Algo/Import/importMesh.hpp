@@ -114,6 +114,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			}
 			else
 			{
+				m.unmark(d);
 				++nbnm;
 			}
 		}
