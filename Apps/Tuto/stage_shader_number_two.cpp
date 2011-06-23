@@ -123,7 +123,7 @@ void Stage_shader_number_two::cb_initGL()
 	registerShader(m_simpleColorShader) ;
 	registerShader(m_pointSprite) ;
 
-	m_phongShader->addPlaneClippingToShaderSource();
+	m_phongShader->setPlaneClipping(1);
 }
 
 void Stage_shader_number_two::cb_redraw()
@@ -200,8 +200,8 @@ void Stage_shader_number_two::cb_mouseMove(int button, int x, int y)
 		if (button == Qt::LeftButton)
 		{
 			Geom::Vec4f clipPlane = m_phongShader->getClippingPlaneEquation();
-			clipPlane[0] += (m_mouseLastX - x)/20.0;
-			clipPlane[1] += (m_mouseLastY - y)/20.0;
+			clipPlane[0] += (m_mouseLastX - x)/40.0;
+			clipPlane[1] += (m_mouseLastY - y)/40.0;
 
 			m_phongShader->setClippingPlaneEquation(clipPlane);
 

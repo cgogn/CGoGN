@@ -233,7 +233,7 @@ void StageShader::cb_initGL()
 
 	registerShader(m_shader);
 
-	m_shader->addPlaneClippingToShaderSource();
+	m_shader->setPlaneClipping(1);
 }
 
 void StageShader::updateVBOprimitives(int upType)

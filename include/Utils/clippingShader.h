@@ -34,6 +34,8 @@
 #include "Utils/shaderMutator.h"
 #include "Utils/drawer.h"
 #include <string>
+#include <sstream>
+#include <vector>
 
 namespace CGoGN
 {
@@ -57,25 +59,29 @@ public:
 
 	/**
 	 * set the plane equation for plane clipping
+	 * @warning planeIndex starts at 0
 	 * @param clipPlane plane equation
+	 * @param planeIndex index of plane to modify
 	 */
-	void setClippingPlaneEquation(Geom::Vec4f clipPlane);
+	void setClippingPlaneEquation(Geom::Vec4f clipPlane, int planeIndex = 0);
 	
 	/**
 	 * get the plane equation for plane clipping
+	 * @warning planeIndex starts at 0
+	 * @param planeIndex index of plane to get
 	 */
-	Geom::Vec4f getClippingPlaneEquation();
+	Geom::Vec4f getClippingPlaneEquation(int planeIndex = 0);
 
 	/**
 	 * set the plane quaternion for plane clipping
 	 * @param quat plane quaternion
 	 */
-	void setClippingPlaneQuaternion(float quat[4]);
+	//void setClippingPlaneQuaternion(float quat[4]);
 
 	/**
 	 * get the plane quaternion for plane clipping
 	 */
-	Geom::Vec4f getClippingPlaneQuaternion();
+	//Geom::Vec4f getClippingPlaneQuaternion();
 
 	/**
 	 * set the color attenuation factor for clipping
@@ -91,10 +97,16 @@ public:
 	/**
 	 * insert plane clipping instructions into vertex and fragment shader source code
 	 * - does not modify the geometry shader source code
-	 * @warning this function is designed for shaders which do not use a geometry shader
+	 * @param planesCount the clipping planes count to use
+	 * @warning this function is designed for shaders which *do not* use a geometry shader
 	 */
-	void addPlaneClippingToShaderSource();
+	void setPlaneClipping(int planesCount);
 	
+	/**
+	 * get the clipping planes count used for plane clipping
+	 */
+	int getClippingPlanesCount() { return (int)m_clipPlanesEquations.size(); }
+
 	/**
 	 * update uniforms (get their locations and resend their values) for clipping
 	 */
@@ -109,19 +121,29 @@ public:
 private:
 
 	/**
-	 * clip plane vector (a, b, c, d)
+	 * sends the clipping planes uniform to shader
 	 */
-	Geom::Vec4f m_clipPlaneEquation;
+	void sendClippingPlanesUniform();
+
+	/**
+	 * sends the color attenuation factor uniform to shader
+	 */
+	void sendColorAttenuationFactorUniform();
+
+	/**
+	 * clip planes equations (a, b, c, d)*planes count
+	 */
+	std::vector<float> m_clipPlanesEquations;
 	
 	/**
 	 * clip plane quaternion
 	 */
-	float m_clipPlaneQuaternion[4];
+	//float m_clipPlaneQuaternion[4];
 
 	/**
-	 * clip plane vector uniform id
+	 * clip planes vector uniform id
 	 */
-	GLint m_unif_clipPlane;
+	GLint m_unif_clipPlanes;
 	
 	/**
 	 * color attenuation factor

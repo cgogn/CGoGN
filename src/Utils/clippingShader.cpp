@@ -32,15 +32,14 @@ namespace Utils
 
 ClippingShader::ClippingShader()
 {
-	// Default values for plane clipping
-	m_clipPlaneEquation = Geom::Vec4f(0.0, 0.0, 1.0, 0.0);
-	m_unif_clipPlane = 0;
-	m_clipPlaneQuaternion[0] = 1.0;
+	// Initialize clipping planes variables
+	m_unif_clipPlanes = 0;
+	/*m_clipPlaneQuaternion[0] = 1.0;
 	m_clipPlaneQuaternion[1] = 0.0;
 	m_clipPlaneQuaternion[2] = 0.0;
-	m_clipPlaneQuaternion[3] = 0.0;
+	m_clipPlaneQuaternion[3] = 0.0;*/
 	
-	// Default values for color attenuation
+	// Initialize color attenuation variables
 	m_colorAttenuationFactor = 0.0;
 	m_unif_colorAttenuationFactor = 0;
 
@@ -63,51 +62,83 @@ ClippingShader::~ClippingShader()
 	delete m_planeDrawer;
 }
 
-void ClippingShader::setClippingPlaneEquation(Geom::Vec4f clipPlane)
+void ClippingShader::setClippingPlaneEquation(Geom::Vec4f clipPlane, int planeIndex)
 {
-	m_clipPlaneEquation = clipPlane;
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || ((4*planeIndex) > ((int)m_clipPlanesEquations.size() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlaneEquation"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return;
+	}
+
+	// Copy the given clipPlane
+	int i;
+	for (i = 0; i < 4; i++)
+		m_clipPlanesEquations[4*planeIndex + i] = clipPlane[i];
 
 	// Recalculate quaternion rotation
-	float m[4][4];
+	/*float m[4][4];
 	build_rotmatrix(m, m_clipPlaneQuaternion);
 	Geom::Matrix44f rotMat;
 	int i, j;
 	for (i = 0; i < 4; i++)
 		for (j = 0; j < 4; j++)
 			rotMat(i, j) = m[i][j];
-	Geom::Vec4f rotatedVec = /*rotMat * */m_clipPlaneEquation;
+	Geom::Vec4f rotatedVec = rotMat * m_clipPlaneEquation;*/
 
-	// Send the resulting plane equation to shader
-	bind();
-	glUniform4fv(m_unif_clipPlane, 1, rotatedVec.data());
+	// Send again the whole planes equations array to shader
+	sendClippingPlanesUniform();
 }
 
-Geom::Vec4f ClippingShader::getClippingPlaneEquation()
+Geom::Vec4f ClippingShader::getClippingPlaneEquation(int planeIndex)
 {
-	return m_clipPlaneEquation;
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (4*planeIndex > ((int)m_clipPlanesEquations.size() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlaneEquation"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return Geom::Vec4f(0.0, 0.0, 0.0, 0.0);
+	}
+	else
+	{
+		return Geom::Vec4f(
+				m_clipPlanesEquations[4*planeIndex + 0],
+				m_clipPlanesEquations[4*planeIndex + 1],
+				m_clipPlanesEquations[4*planeIndex + 2],
+				m_clipPlanesEquations[4*planeIndex + 3]);
+	}
 }
 
-void ClippingShader::setClippingPlaneQuaternion(float quat[4])
+/*void ClippingShader::setClippingPlaneQuaternion(float quat[4])
 {
 	m_clipPlaneQuaternion[0] = quat[0];
 	m_clipPlaneQuaternion[1] = quat[1];
 	m_clipPlaneQuaternion[2] = quat[2];
 	m_clipPlaneQuaternion[3] = quat[3];
 
-	// Recalculate and resend the clipping plane equation
+	// Recalculate and send again the clipping plane equation
 	setClippingPlaneEquation(m_clipPlaneEquation);
 }
 
 Geom::Vec4f ClippingShader::getClippingPlaneQuaternion()
 {
 	return Geom::Vec4f (m_clipPlaneQuaternion[0], m_clipPlaneQuaternion[1], m_clipPlaneQuaternion[2], m_clipPlaneQuaternion[3]);
-}
+}*/
 
 void ClippingShader::setClippingColorAttenuationFactor(float colorAttenuationFactor)
 {
+	// Copy the given value
 	m_colorAttenuationFactor = colorAttenuationFactor;
-	bind();
-	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
+
+	// Send again the uniform to shader
+	sendColorAttenuationFactorUniform();
 }
 
 float ClippingShader::getClippingColorAttenuationFactor()
@@ -115,17 +146,23 @@ float ClippingShader::getClippingColorAttenuationFactor()
 	return m_colorAttenuationFactor;
 }
 
-void ClippingShader::addPlaneClippingToShaderSource()
+void ClippingShader::setPlaneClipping(int planesCount)
 {
 	// Shader name
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// String for clipping planes count
+	std::string planesCountStr;
+	std::stringstream ss;
+	ss << planesCount;
+	planesCountStr = ss.str();
 
 	// Verify that the shader has been well created
 	if (!isCreated())
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::addPlaneClippingToShaderSource"
+		<< "ClippingShader::setPlaneClipping"
 		<< " - Could not process shader "
 		<< shaderName
 		<< " source code : shader has not been created or has failed to compile"
@@ -138,10 +175,21 @@ void ClippingShader::addPlaneClippingToShaderSource()
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::addPlaneClippingToShaderSource"
+		<< "ClippingShader::setPlaneClipping"
 		<< " - Could not process shader "
 		<< shaderName
 		<< " source code : unable to add clipping to a shader which uses a geometry shader"
+		<< CGoGNendl;
+		return;
+	}
+
+	// Verify that the given clipping planes count is valid
+	if (planesCount < 0)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setPlanesClipping"
+		<< " - Given clipping planes count given is not positive !"
 		<< CGoGNendl;
 		return;
 	}
@@ -160,8 +208,9 @@ void ClippingShader::addPlaneClippingToShaderSource()
 
 	std::string FS_head_insertion =
 	"\n"
-	"uniform vec4 clip_ClipPlane;\n"
+	"#define CLIP_PLANES_COUNT " + planesCountStr + "\n"
 	"\n"
+	"uniform vec4 clip_ClipPlanes[CLIP_PLANES_COUNT];\n"
 	"uniform float clip_ColorAttenuationFactor;\n"
 	"\n"
 	"VARYING_FRAG vec3 clip_NonTransformedPos;\n"
@@ -169,25 +218,46 @@ void ClippingShader::addPlaneClippingToShaderSource()
 
 	std::string FS_mainBegin_insertion =
 	"\n"
-	"	// Signed distance between the point and the plane\n"
-	"	float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_ClipPlane.xyz) + clip_ClipPlane.w;\n"
-	"	float clip_NPlane = length(clip_ClipPlane.xyz);\n"
-	"	if (clip_NPlane != 0.0)\n"
+	"	// Distance to the nearest plane, stored for color attenuation\n"
+	"	float clip_MinDistanceToPlanes = -1.0;\n"
+	"\n"
+	"	// Do clipping for each plane\n"
+	"	int i;\n"
+	"	for (i = 0; i < CLIP_PLANES_COUNT; i++)\n"
+	"	{\n"
+	"		// Copy the plane to make it modifiable\n"
+	"		vec4 clip_CurrClipPlane = clip_ClipPlanes[i];\n"
+	"\n"
+	"		// If the plane normal is zero, use a default normal vector (0.0, 0.0, 1.0)\n"
+	"		float clip_NPlane = length(clip_CurrClipPlane.xyz);\n"
+	"		if (clip_NPlane == 0.0)\n"
+	"		{\n"
+	"			clip_CurrClipPlane.z = 1.0;\n"
+	"			clip_NPlane = 1.0;\n"
+	"		}\n"
+	"\n"
+	"		// Signed distance between the point and the plane\n"
+	"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz) + clip_CurrClipPlane.w;\n"
 	"		clip_DistanceToPlane /= clip_NPlane;\n"
 	"\n"
-	"	// Keep the fragment only if it is 'above' the plane\n"
-	"	if (clip_DistanceToPlane < 0.0)\n"
-	"		discard;\n"
-	"	else\n"
-	"	{\n";
+	"		// Keep the fragment only if it is 'above' the plane\n"
+	"		if (clip_DistanceToPlane < 0.0)\n"
+	"			discard;\n"
+	"		// Else keep the positive distance to the nearest plane\n"
+	"		else\n"
+	"		{\n"
+	"			if (clip_MinDistanceToPlanes < 0.0)\n"
+	"				clip_MinDistanceToPlanes = clip_DistanceToPlane;\n"
+	"			else\n"
+	"				clip_MinDistanceToPlanes = min(clip_MinDistanceToPlanes, clip_DistanceToPlane);\n"
+	"		}\n"
+	"	}\n";
 
 	std::string FS_mainEnd_insertion =
 	"\n"
-	"	}\n"
-	"\n"
-	"	// Attenuate the final fragment color depending on its distance to the plane\n"
-	"	if (clip_DistanceToPlane > 0.0)\n"
-	"	gl_FragColor.rgb /= (1.0 + clip_DistanceToPlane*clip_ColorAttenuationFactor);\n";
+	"	// Attenuate the final fragment color depending on its distance to the nearest plane\n"
+	"	if (clip_MinDistanceToPlanes > 0.0)\n"
+	"		gl_FragColor.rgb /= (1.0 + clip_MinDistanceToPlanes*clip_ColorAttenuationFactor);\n";
 
 	
 	// Use a shader mutator
@@ -198,7 +268,7 @@ void ClippingShader::addPlaneClippingToShaderSource()
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::addPlaneClippingToShaderSource"
+		<< "ClippingShader::setPlaneClipping"
 		<< " - Could not process shader "
 		<< m_nameVS
 		<< " source code : no VertexPosition attribute found"
@@ -210,7 +280,7 @@ void ClippingShader::addPlaneClippingToShaderSource()
 	SM.VS_insertCodeBeforeMainFunction(VS_head_insertion);
 	SM.VS_insertCodeAtMainFunctionBeginning(VS_mainBegin_insertion);
 	
-	// Following code insertions need shading language 120 at least (GLSL arrays)
+	// Following code insertions need at least shading language 120 (GLSL arrays)
 	SM.VS_FS_GS_setMinShadingLanguageVersion(120);
 
 	// Modify fragment shader source code
@@ -222,6 +292,9 @@ void ClippingShader::addPlaneClippingToShaderSource()
 	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
 	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
 
+	// Resize the planes equations uniform to the right size
+	m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
+
 	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();
 }
@@ -232,12 +305,12 @@ void ClippingShader::updateClippingUniforms()
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
 
 	// Get uniforms locations
-	m_unif_clipPlane = glGetUniformLocation(program_handler(), "clip_ClipPlane");
-	if (m_unif_clipPlane == -1)
+	m_unif_clipPlanes = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
+	if (m_unif_clipPlanes == -1)
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::addPlaneClippingToShaderSource"
+		<< "ClippingShader::updateClippingUniforms"
 		<< " - uniform 'clip_ClipPlane' not found in shader "
 		<< shaderName
 		<< CGoGNendl;
@@ -247,21 +320,32 @@ void ClippingShader::updateClippingUniforms()
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::addPlaneClippingToShaderSource"
+		<< "ClippingShader::updateClippingUniforms"
 		<< " - uniform 'clip_ColorAttenuationFactor' not found in shader "
 		<< shaderName
 		<< CGoGNendl;
 	}
 	
-	// Set uniforms values
-	setClippingPlaneEquation(m_clipPlaneEquation);
-	setClippingPlaneQuaternion(m_clipPlaneQuaternion);
-	setClippingColorAttenuationFactor(m_colorAttenuationFactor);
+	// Send again uniforms values
+	sendClippingPlanesUniform();
+	sendColorAttenuationFactorUniform();
 }
 
 void ClippingShader::displayClippingPlane()
 {
 	m_planeDrawer->callList();
+}
+
+void ClippingShader::sendClippingPlanesUniform()
+{
+	bind();
+	glUniform4fv(m_unif_clipPlanes, m_clipPlanesEquations.size()/4, &m_clipPlanesEquations.front());
+}
+
+void ClippingShader::sendColorAttenuationFactorUniform()
+{
+	bind();
+	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
 }
 
 } // namespace Utils
