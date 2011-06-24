@@ -50,6 +50,12 @@ public:
 	virtual bool deleteVertex(Dart d) ;
 
 	/**
+	 * No attribute is attached to the new edge
+	 * The attributes attached to the face of dart d are kept on the resulting face
+	 */
+	virtual void linkVertices(Dart d, Dart e) ;
+
+	/**
 	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
@@ -85,6 +91,18 @@ public:
 	virtual bool flipBackEdge(Dart d) ;
 
 	/**
+	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
+	 * The attributes attached to the face of dart d are overwritten on the face of dart e
+	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+
+	/**
+	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
+	 * The attributes attached to the face of dart d are overwritten on the face of dart e
+	 */
+	virtual void removeEdgeFromVertex(Dart d);
+
+	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
@@ -106,12 +124,6 @@ public:
 	 * The attributes attached to the old face are duplicated on both resulting faces
 	 */
 	virtual void splitFace(Dart d, Dart e) ;
-
-	/**
-	 * No attribute is attached to the new edge
-	 * The attributes attached to the face of dart d are kept on the resulting face
-	 */
-	virtual void linkVertices(Dart d, Dart e) ;
 
 	/**
 	 * The attributes attached to the face of dart d are kept on the resulting face

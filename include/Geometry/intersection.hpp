@@ -314,15 +314,28 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 {
 	typedef typename VEC3::DATA_TYPE T ;
 
-	VEC3 vp1p2(PB);
-	vp1p2 -= PA;
-	VEC3 vq1q2(QB);
-	vq1q2 -= QA;
-	VEC3 vp1q1(QA);
-	vp1q1 -= PA;
+	VEC3 vp1p2 = PB - PA;
+	VEC3 vq1q2 = QB - QA;
+	VEC3 vp1q1 = QA - PA;
 	T delta = vp1p2[0]*vq1q2[1]- vp1p2[1]*vq1q2[0];
 	T coeff = vp1q1[0]*vq1q2[1]- vp1q1[1]*vq1q2[0];
-	Inter = VEC3((PA[0]*delta+vp1p2[0]*coeff)/delta,(PA[1]*delta+vp1p2[1]*coeff)/delta,(PA[2]*delta+vp1p2[2]*coeff)/delta);
+
+	if(delta==0) //parallel
+	{
+		//test if collinear
+		if(coeff==0)
+		{
+			//collinear
+			//TODO : check if there is a common point between the two edges
+			Inter = QA;
+			return EDGE_INTERSECTION;
+		}
+		else
+			return NO_INTERSECTION;
+	}
+	else
+		Inter = VEC3((PA[0]*delta+vp1p2[0]*coeff)/delta,(PA[1]*delta+vp1p2[1]*coeff)/delta,(PA[2]*delta+vp1p2[2]*coeff)/delta);
+
 
 	//test if inter point is outside the edges
 	if( (Inter[0]<PA[0] && Inter[0]<PB[0]) || (Inter[0]>PA[0] && Inter[0]>PB[0])
@@ -331,6 +344,9 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 			|| (Inter[1]<QA[1] && Inter[1]<QB[1]) || (Inter[1]>QA[1] && Inter[1]>QB[1])
 	)
 		return NO_INTERSECTION;
+
+	if(Geom::arePointsEquals(PA,Inter) || Geom::arePointsEquals(PB,Inter) || Geom::arePointsEquals(QA,Inter) || Geom::arePointsEquals(QB,Inter))
+		return VERTEX_INTERSECTION;
 
 	return EDGE_INTERSECTION;
 }

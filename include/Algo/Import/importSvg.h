@@ -16,7 +16,7 @@ namespace Import
  * @param name the name
  * @ return true if node has the good name
  */
-bool chechXmlNode(xmlNodePtr node, const std::string& name);
+bool checkXmlNode(xmlNodePtr node, const std::string& name);
 
 template <typename PFP>
 bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons);
