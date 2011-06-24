@@ -148,14 +148,19 @@ float ClippingShader::getClippingColorAttenuationFactor()
 
 void ClippingShader::setPlaneClipping(int planesCount)
 {
+	// Verify that the given clipping planes count is valid
+	if (planesCount < 0)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setPlanesClipping"
+		<< " - Given clipping planes count given is not positive !"
+		<< CGoGNendl;
+		return;
+	}
+
 	// Shader name
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-	// String for clipping planes count
-	std::string planesCountStr;
-	std::stringstream ss;
-	ss << planesCount;
-	planesCountStr = ss.str();
 
 	// Verify that the shader has been well created
 	if (!isCreated())
@@ -183,16 +188,11 @@ void ClippingShader::setPlaneClipping(int planesCount)
 		return;
 	}
 
-	// Verify that the given clipping planes count is valid
-	if (planesCount < 0)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setPlanesClipping"
-		<< " - Given clipping planes count given is not positive !"
-		<< CGoGNendl;
-		return;
-	}
+	// String for clipping planes count
+	std::string planesCountStr;
+	std::stringstream ss;
+	ss << planesCount;
+	planesCountStr = ss.str();
 
 	// Strings that will be inserted into the source code
 
@@ -259,38 +259,58 @@ void ClippingShader::setPlaneClipping(int planesCount)
 	"	if (clip_MinDistanceToPlanes > 0.0)\n"
 	"		gl_FragColor.rgb /= (1.0 + clip_MinDistanceToPlanes*clip_ColorAttenuationFactor);\n";
 
-	
-	// Use a shader mutator
-	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc(), "");
-	
-	// First check if the vertex shader contains the VertexPosition attribute
-	if (!SM.VS_containsVariableDeclaration("VertexPosition"))
+
+	// If the previous plane count was zero, the previous shader source codes were the original ones. Store them
+	if (getClippingPlanesCount() == 0)
 	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setPlaneClipping"
-		<< " - Could not process shader "
-		<< m_nameVS
-		<< " source code : no VertexPosition attribute found"
-		<< CGoGNendl;
-		return;
+		originalVertShaderSrc = getVertexShaderSrc();
+		originalFragShaderSrc = getFragmentShaderSrc();
 	}
-	
-	// Modify vertex shader source code
-	SM.VS_insertCodeBeforeMainFunction(VS_head_insertion);
-	SM.VS_insertCodeAtMainFunctionBeginning(VS_mainBegin_insertion);
-	
-	// Following code insertions need at least shading language 120 (GLSL arrays)
-	SM.VS_FS_GS_setMinShadingLanguageVersion(120);
 
-	// Modify fragment shader source code
-	SM.FS_insertCodeBeforeMainFunction(FS_head_insertion);
-	SM.FS_insertCodeAtMainFunctionEnd(FS_mainEnd_insertion);
-	SM.FS_insertCodeAtMainFunctionBeginning(FS_mainBegin_insertion);
+	// If the given plane count is > 0, modify the original shader sources
+	if (planesCount > 0)
+	{
 
-	// Reload both shaders
-	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+		// Use a shader mutator
+		ShaderMutator SM(shaderName, originalVertShaderSrc, originalFragShaderSrc, "");
+	
+		// First check if the vertex shader contains the VertexPosition attribute
+		if (!SM.VS_containsVariableDeclaration("VertexPosition"))
+		{
+			CGoGNerr
+			<< "ERROR - "
+			<< "ClippingShader::setPlaneClipping"
+			<< " - Could not process shader "
+			<< m_nameVS
+			<< " source code : no VertexPosition attribute found"
+			<< CGoGNendl;
+			return;
+		}
+
+		// Modify vertex shader source code
+		SM.VS_insertCodeBeforeMainFunction(VS_head_insertion);
+		SM.VS_insertCodeAtMainFunctionBeginning(VS_mainBegin_insertion);
+	
+		// Following code insertions need at least shading language 120 (GLSL arrays)
+		SM.VS_FS_GS_setMinShadingLanguageVersion(120);
+
+		// Modify fragment shader source code
+		SM.FS_insertCodeBeforeMainFunction(FS_head_insertion);
+		SM.FS_insertCodeAtMainFunctionEnd(FS_mainEnd_insertion);
+		SM.FS_insertCodeAtMainFunctionBeginning(FS_mainBegin_insertion);
+
+		// Reload both shaders
+		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	}
+	// Else no clipping is wanted anymore, so get back the original shader sources
+	else
+	{
+		// Reload both original shaders
+		reloadVertexShaderFromMemory(originalVertShaderSrc.c_str());
+		reloadFragmentShaderFromMemory(originalFragShaderSrc.c_str());
+	}
 
 	// Resize the planes equations uniform to the right size
 	m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
@@ -301,6 +321,10 @@ void ClippingShader::setPlaneClipping(int planesCount)
 
 void ClippingShader::updateClippingUniforms()
 {
+	// These uniforms only exist if the clipping planes count is > 0
+	if (getClippingPlanesCount() <= 0)
+		return;
+
 	// Shader name
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
 

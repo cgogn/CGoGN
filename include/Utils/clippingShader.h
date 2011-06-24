@@ -105,7 +105,7 @@ public:
 	/**
 	 * get the clipping planes count used for plane clipping
 	 */
-	int getClippingPlanesCount() { return (int)m_clipPlanesEquations.size(); }
+	int getClippingPlanesCount() { return (int)m_clipPlanesEquations.size() / 4; }
 
 	/**
 	 * update uniforms (get their locations and resend their values) for clipping
@@ -129,6 +129,16 @@ private:
 	 * sends the color attenuation factor uniform to shader
 	 */
 	void sendColorAttenuationFactorUniform();
+
+	/**
+	 * stored original vertex shader source code (without clipping)
+	 */
+	std::string originalVertShaderSrc;
+
+	/**
+	 * stored original fragment shader source code (without clipping)
+	 */
+	std::string originalFragShaderSrc;
 
 	/**
 	 * clip planes equations (a, b, c, d)*planes count

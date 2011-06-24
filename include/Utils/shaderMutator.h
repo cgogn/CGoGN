@@ -49,19 +49,19 @@ public:
 	 ShaderMutator(const std::string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc);
 	 
 	 /**
-	  * check if a variable is declared in the vertex shader source or not
+	  * check if a variable is declared in the vertex shader source
 	  * @param variableName the variable to search for
 	  */
 	 bool VS_containsVariableDeclaration(const std::string& variableName);
 
 	 /**
-	  * check if a variable is declared in the fragment shader source or not
+	  * check if a variable is declared in the fragment shader source
 	  * @param variableName the variable to search for
 	  */
 	 bool FS_containsVariableDeclaration(const std::string& variableName);
 	 
 	 /**
-	  * check if a variable is declared in the geometry shader source or not
+	  * check if a variable is declared in the geometry shader source
 	  * @param variableName the variable to search for
 	  */
 	 bool GS_containsVariableDeclaration(const std::string& variableName);
