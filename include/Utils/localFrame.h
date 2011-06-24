@@ -61,7 +61,6 @@ Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth) ;
 /**
  * Class for representing a direct local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
  * This class can compress/decompress a local frame, switching from its explicit representation (3 vectors) to its compressed representation (1 vector).
- * Two different compressions coexist : one which is not correct on the extreme values (VEC3 getCompressed()) and one which is totally correct (VEC4 getCompressedSecure()).
  * Usage :
  *  VEC3 T,B,N ;							// current set of orthonormal vectors composing the direct frame.
  *  LocalFrame<PFP> lf(T,B,N) ; 				// Constructor from explicit expression.
@@ -182,15 +181,25 @@ private : // private constants
 	// (T,B,N) can be any orthonormal direct frame
 	// zeros are not recommended since they can
 	// generate zero vectors after a dot product
-	static const REAL Tx = 0.267261 ;
-	static const REAL Ty = 0.534522 ;
-	static const REAL Tz = 0.801784 ;
-	static const REAL Bx = 0.844416 ;
-	static const REAL By = -0.530776 ;
-	static const REAL Bz = 0.0723785 ;
-	static const REAL Nx = 0.464255 ;
-	static const REAL Ny = 0.657695 ;
-	static const REAL Nz = -0.593215 ;
+//	static const REAL Tx = 0.267261 ;
+//	static const REAL Ty = 0.534522 ;
+//	static const REAL Tz = 0.801784 ;
+//	static const REAL Bx = 0.844416 ;
+//	static const REAL By = -0.530776 ;
+//	static const REAL Bz = 0.0723785 ;
+//	static const REAL Nx = 0.464255 ;
+//	static const REAL Ny = 0.657695 ;
+//	static const REAL Nz = -0.593215 ;
+	static const REAL Tx = 0.0766965 ;
+	static const REAL Ty = 0.383483 ;
+	static const REAL Tz = 0.920358 ;
+	static const REAL Bx = -0.760734 ;
+	static const REAL By = 0.619202 ;
+	static const REAL Bz = -0.194606 ;
+	static const REAL Nx = -0.644516 ;
+	static const REAL Ny = -0.685222 ;
+	static const REAL Nz = 0.339219 ;
+
 } ;
 
 } // Utils
