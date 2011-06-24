@@ -52,6 +52,9 @@
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
 
+#include <string>
+#include <sstream>
+
 using namespace CGoGN ;
 
 struct PFP: public PFP_STANDARD
@@ -78,8 +81,8 @@ public:
 	//Render
 	bool m_drawVertices;
 	bool m_drawLines;
-    bool m_drawFaces;
-    bool m_drawTopo;
+	bool m_drawFaces;
+	bool m_drawTopo;
 
 	Algo::Render::GL2::MapRender* m_render;
 	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
@@ -92,13 +95,13 @@ public:
 	Utils::Drawer* chips_area;
 
 	Geom::Vec3f m_coeffTopoExplod;
-    Geom::Vec3f gPosObj ;
-    float gWidthObj ;
+	Geom::Vec3f gPosObj ;
+	float gWidthObj ;
 
-    //QT
-    Utils::QT::uiDockInterface dock;
+	//QT
+	Utils::QT::uiDockInterface dock;
 
-    StageShader();
+	StageShader();
 
 	void initGUI();
 	void cb_Open();
@@ -118,6 +121,11 @@ public slots:
 	void slot_explodTopoPhi1(double c);
 	void slot_explodTopoPhi2(double c);
 	void slot_explodTopoPhi3(double c);
+
+	void slot_pushButton_addPlane();
+	void slot_pushButton_deletePlane();
+
+	void slot_comboBox_PlaneIndexChanged(int newIndex);
 
 	void slot_doubleSpinBox_Plane(double c);
 

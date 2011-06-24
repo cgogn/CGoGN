@@ -101,7 +101,7 @@ Geom::Vec4f ClippingShader::getClippingPlaneEquation(int planeIndex)
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::setClippingPlaneEquation"
+		<< "ClippingShader::getClippingPlaneEquation"
 		<< " - Given plane index is out of range"
 		<< CGoGNendl;
 		return Geom::Vec4f(0.0, 0.0, 0.0, 0.0);
@@ -237,7 +237,8 @@ void ClippingShader::setPlaneClipping(int planesCount)
 	"		}\n"
 	"\n"
 	"		// Signed distance between the point and the plane\n"
-	"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz) + clip_CurrClipPlane.w;\n"
+	"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz);\n"
+	"		clip_DistanceToPlane += clip_CurrClipPlane.w;\n"
 	"		clip_DistanceToPlane /= clip_NPlane;\n"
 	"\n"
 	"		// Keep the fragment only if it is 'above' the plane\n"

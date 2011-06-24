@@ -75,14 +75,61 @@ void StageShader::slot_explodTopoPhi3(double c)
 	updateGL();
 }
 
+void StageShader::slot_pushButton_addPlane()
+{
+
+	m_shader->setPlaneClipping(dock.comboBox_PlaneIndex->count() + 1);
+
+	std::string indexStr;
+	std::stringstream ss;
+	ss << (dock.comboBox_PlaneIndex->count() + 1);
+	indexStr = ss.str();
+
+	std::string str = "Plane " + indexStr;
+
+	dock.comboBox_PlaneIndex->addItem(QString(str.c_str()));
+
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	updateGLMatrices();
+}
+
+void StageShader::slot_pushButton_deletePlane()
+{
+	m_shader->setPlaneClipping(dock.comboBox_PlaneIndex->count() - 1);
+
+	dock.comboBox_PlaneIndex->removeItem(dock.comboBox_PlaneIndex->count() - 1);
+
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	updateGLMatrices();
+}
+
+void StageShader::slot_comboBox_PlaneIndexChanged(int newIndex)
+{
+	if (newIndex >= 0)
+	{
+		Geom::Vec4f currPlaneEquation = m_shader->getClippingPlaneEquation(newIndex);
+		dock.doubleSpinBox_aPlane->setValue(currPlaneEquation[0]);
+		dock.doubleSpinBox_bPlane->setValue(currPlaneEquation[1]);
+		dock.doubleSpinBox_cPlane->setValue(currPlaneEquation[2]);
+		dock.doubleSpinBox_dPlane->setValue(currPlaneEquation[3]);
+	}
+}
+
 void StageShader::slot_doubleSpinBox_Plane(double c)
 {
-	float aPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_aPlane->value();
-	float bPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_bPlane->value();
-	float cPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_cPlane->value();
-	float dPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_dPlane->value();
-	m_shader->setClippingPlaneEquation(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
-	updateGL();
+	if (dock.comboBox_PlaneIndex->currentIndex() >= 0)
+	{
+		float aPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_aPlane->value();
+		float bPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_bPlane->value();
+		float cPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_cPlane->value();
+		float dPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_dPlane->value();
+		m_shader->setClippingPlaneEquation(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane), dock.comboBox_PlaneIndex->currentIndex());
+		updateGL();
+	}
 }
 
 void StageShader::slot_doubleSpinBox_ColorAttenuationFactor(double c)
@@ -137,6 +184,11 @@ void StageShader::initGUI()
 	setCallBack(dock.explod_phi1, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi1(double)));
 	setCallBack(dock.explod_phi2, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi2(double)));
 	setCallBack(dock.explod_phi3, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi3(double)));
+
+	setCallBack(dock.pushButton_addPlane, SIGNAL(clicked()), SLOT(slot_pushButton_addPlane()));
+	setCallBack(dock.pushButton_deletePlane, SIGNAL(clicked()), SLOT(slot_pushButton_deletePlane()));
+
+	setCallBack(dock.comboBox_PlaneIndex, SIGNAL(currentIndexChanged(int)), SLOT(slot_comboBox_PlaneIndexChanged(int)));
 
 	setCallBack(dock.doubleSpinBox_aPlane, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
 	setCallBack(dock.doubleSpinBox_bPlane, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
@@ -232,8 +284,6 @@ void StageShader::cb_initGL()
 	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
 
 	registerShader(m_shader);
-
-	m_shader->setPlaneClipping(1);
 }
 
 void StageShader::updateVBOprimitives(int upType)
