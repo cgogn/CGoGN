@@ -289,8 +289,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 	}
 
 	if (m_cbs)
-		//m_cbs->cb_mouseMove(event->button(), event->x(), getHeight() - event->y());
-		m_cbs->cb_mouseMove(m_current_button, event->x(), getHeight() - event->y()); // TODO ???
+		m_cbs->cb_mouseMove(event->buttons(), event->x(), getHeight() - event->y());
 }
 
 void GLWidget::wheelEvent(QWheelEvent* event)
@@ -327,6 +326,8 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
 
     m_state_modifier = event->modifiers();
 
+    std::cout << "Press : " << m_state_modifier << std::endl;
+
     int k = event->key();
     if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
     	k += 32;
@@ -341,6 +342,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 
 	m_state_modifier = event->modifiers();
     int k = event->key();
+
+    std::cout << "Up : " << m_state_modifier << std::endl;
 
     // align on axis
 	if ((k == 'Z') && (event->modifiers() & Qt::ShiftModifier))
