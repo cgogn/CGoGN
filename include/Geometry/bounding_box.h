@@ -71,6 +71,8 @@ class BoundingBox
 
 		VEC center() const ;
 
+		bool isInitialized() const ;
+
 		/**********************************************/
 		/*                 FUNCTIONS                  */
 		/**********************************************/

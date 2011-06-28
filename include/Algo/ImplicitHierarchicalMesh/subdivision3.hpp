@@ -173,12 +173,11 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
 
-	unsigned int vLevel = map.volumeLevel(d) ;
-	Dart old = map.volumeOldestDart(d) ;
+	unsigned int vLevel = map.volumeLevel(d);
+	Dart old = map.volumeOldestDart(d);
 
-	unsigned int cur = map.getCurrentLevel() ;
-	map.setCurrentLevel(vLevel) ;		// go to the level of the face to subdivide its edges
-
+	unsigned int cur = map.getCurrentLevel();
+	map.setCurrentLevel(vLevel);
 
 	/*
 	 * au niveau du volume courant i
@@ -740,9 +739,80 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 }
 
 /***********************************************************************************
+ *												Raffinement
+ ***********************************************************************************/
+template <typename PFP>
+void splitVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+{
+	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
+
+	unsigned int cur = map.getCurrentLevel() ;
+	unsigned int vLevel = map.volumeLevel(d) ;
+	map.setCurrentLevel(vLevel) ;
+
+	// first cut the edges (if they are not already)
+	Dart t = d;
+	do
+	{
+		if(!map.edgeIsSubdivided(map.phi1(map.phi2(t))))
+			Algo::IHM::subdivideEdge<PFP>(map, map.phi1(map.phi2(t)), position) ;
+		t = map.phi1(t);
+	}
+	while(t != d);
+
+	unsigned int fLevel = map.faceLevel(map.phi1(d));
+	map.setCurrentLevel(fLevel+1) ;		// go to the level of the face to subdivide its edges
+	Dart neighboordVolume = map.phi1(map.phi1(map.phi2(d)));
+	//map.setCurrentLevel(cur) ; // go to the next level to perform volume subdivision
+
+	//Split the faces and open the midlle
+	do
+	{
+		Dart t2 = map.phi2(t);
+
+		unsigned int fLevel = map.faceLevel(t2) ;
+		map.setCurrentLevel(fLevel+1) ;		// go to the level of the face to subdivide its edges
+
+		Dart face2 = map.phi1(map.phi1(t2));
+		map.splitFace(map.phi_1(t2), face2);
+		map.unsewFaces(map.phi1(map.phi1(t2)));
+
+		//id de face pour les 2 nouveaux brins
+		unsigned int idface = map.getFaceId(t2);
+		map.setFaceId(map.phi1(map.phi1(t2)), idface, DART);
+		map.setFaceId(map.phi_1(face2), idface, DART);
+
+		t = map.phi1(t);
+	}
+	while(t != d);
+
+	//close the middle to create volumes & sew them
+	map.setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
+
+	map.closeHole(map.phi1(map.phi1(map.phi2(d))));
+	map.closeHole(map.phi_1(neighboordVolume));
+	map.sewVolumes(map.phi2(map.phi1(map.phi1(map.phi2(d)))), map.phi2(map.phi_1(neighboordVolume)));
+
+	unsigned int idface = map.getNewFaceId();
+	map.setFaceId(map.phi2(map.phi_1(neighboordVolume)), idface, FACE);
+
+	do
+	{
+		Dart t211 = map.phi1(map.phi1(map.phi2(t)));
+
+		unsigned int idedge = map.getNewEdgeId();
+		map.setEdgeId(t211, idedge, EDGE);
+		t = map.phi1(t);
+	}
+	while(t != d);
+
+	map.setCurrentLevel(cur) ;
+}
+
+/*************************************************************************************
  *
  */
-
 
 template <typename PFP>
 void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType)

@@ -1141,66 +1141,74 @@ void Map3::closeMap(DartMarker& marker)
 //	this->releaseMarker(DART,mf3);
 //}
 //
-//bool Map3::check()
-//{
-//    CGoGNout << "Check: topology begin" << CGoGNendl;
-//    Marker m = this->getNewMarker();
-//    for(Dart d = this->begin(); d != this->end(); this->next(d))
-//    {
-//        Dart d3 = phi3(d);
-//        if (phi3(d3) != d) // phi3 involution ?
-//		{
-//            CGoGNout << "Check: phi3 is not an involution" << CGoGNendl;
-//            return false;
-//        }
-//
-//        Dart d2 = phi2(d);
-//        if (phi2(d2) != d) // phi2 involution ?
-//		{
-//            CGoGNout << "Check: phi2 is not an involution" << CGoGNendl;
-//            return false;
-//        }
-//
-//        Dart d1 = phi1(d);
-//        if (phi_1(d1) != d) // phi1 a une image correcte ?
-//		{
-//            CGoGNout << "Check: unconsistent phi_1 link" << CGoGNendl;
-//            return false;
-//        }
-//
-//        if (isMarkedDart(d1,m)) // phi1 a un seul antécédent ?
-//		{
-//            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
-//            return false;
-//        }
-//        markOrbit(DART,d1,m);
-//
-//        if (d1 == d)
-//            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
-//
-//        if (phi1(d1) == d)
-//            CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
-//
-//        if (phi2(d1) == d)
-//            CGoGNout << "Check: (warning) dandling edge (phi2)" << CGoGNendl;
-//
-//        if (phi3(d1) == d)
-//            CGoGNout << "Check: (warning) dandling edge (phi3)" << CGoGNendl;
-//    }
-//
-//    for(Dart d = this->begin(); d != this->end(); this->next(d))
-//    {
-//        if (!isMarkedDart(d,m)) // phi1 a au moins un antécédent ?
-//		{
-//            CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
-//            return false;
-//        }
-//    }
-//    this->unmarkAll(DART,m);
-//    this->releaseMarker(DART,m);
-//    CGoGNout << "Check: topology ok" << CGoGNendl;
-//    return true;
-//}
+bool Map3::check()
+{
+    CGoGNout << "Check: topology begin" << CGoGNendl;
+    DartMarker m(*this);
+    for(Dart d = this->begin(); d != this->end(); this->next(d))
+    {
+        Dart d3 = phi3(d);
+        if (phi3(d3) != d) // phi3 involution ?
+		{
+             CGoGNout << "Check: phi3 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        if(d3 != d)
+        {
+        	if(phi1(d3) != phi3(phi_1(d)))
+        	{
+        		CGoGNout << "Check: phi3 , faces are not entirely sewn" << CGoGNendl;
+        		return false;
+        	}
+        }
+
+        Dart d2 = phi2(d);
+        if (phi2(d2) != d) // phi2 involution ?
+		{
+            CGoGNout << "Check: phi2 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        Dart d1 = phi1(d);
+        if (phi_1(d1) != d) // phi1 a une image correcte ?
+		{
+            CGoGNout << "Check: unconsistent phi_1 link" << CGoGNendl;
+            return false;
+        }
+
+        if (m.isMarked(d1)) // phi1 a un seul antécédent ?
+		{
+            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
+            return false;
+        }
+        m.mark(d1);
+
+        if (d1 == d)
+            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
+
+        if (phi1(d1) == d)
+            CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
+
+        if (phi2(d1) == d)
+            CGoGNout << "Check: (warning) dandling edge (phi2)" << CGoGNendl;
+
+        if (phi3(d1) == d)
+            CGoGNout << "Check: (warning) dandling edge (phi3)" << CGoGNendl;
+    }
+
+    for(Dart d = this->begin(); d != this->end(); this->next(d))
+    {
+        if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
+		{
+            CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
+            return false;
+        }
+    }
+
+    CGoGNout << "Check: topology ok" << CGoGNendl;
+    return true;
+}
 
 
 
