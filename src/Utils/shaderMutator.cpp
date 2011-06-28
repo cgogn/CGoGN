@@ -30,6 +30,12 @@ namespace CGoGN
 namespace Utils
 {
 
+/***********************************************
+ *
+ * 		Public Section
+ *
+ ***********************************************/
+
 ShaderMutator::ShaderMutator(const std:: string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc)
 {
 	// Store the shader name
@@ -41,167 +47,265 @@ ShaderMutator::ShaderMutator(const std:: string& shaderName, const std::string& 
 	m_gShaderMutation = geomShaderSrc;
 }
 
-bool ShaderMutator::VS_containsVariableDeclaration(const std::string& variableName)
+bool ShaderMutator::containsVariableDeclaration(shaderSrcType srcType, const std::string& variableName)
 {
-	return containsVariableDeclaration(variableName, m_vShaderMutation);
-}
+	bool result = false;
 
-bool ShaderMutator::FS_containsVariableDeclaration(const std::string& variableName)
-{
-	return containsVariableDeclaration(variableName, m_fShaderMutation);
-}
-
-bool ShaderMutator::GS_containsVariableDeclaration(const std::string& variableName)
-{
-	return containsVariableDeclaration(variableName, m_gShaderMutation);
-}
-
-void ShaderMutator::VS_FS_GS_setMinShadingLanguageVersion(int version)
-{
-	setMinShadingLanguageVersion(version, m_vShaderMutation);
-	setMinShadingLanguageVersion(version, m_fShaderMutation);
-	setMinShadingLanguageVersion(version, m_gShaderMutation);
-}
-
-void ShaderMutator::VS_insertCodeBeforeMainFunction(const std::string& insertedCode)
-{
-	if (!insertCodeBeforeMainFunction(insertedCode, m_vShaderMutation))
+	switch (srcType)
 	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::VS_insertCodeBeforeMainFunction : "
-		<< "Unable to insert source code in vertex shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration"
-		<< CGoGNendl;
+		case VERTEX_SHADER :
+			result = srcContainsVariableDeclaration(variableName, m_vShaderMutation);
+			break;
+
+		case FRAGMENT_SHADER :
+			result = srcContainsVariableDeclaration(variableName, m_fShaderMutation);
+			break;
+
+		case GEOMETRY_SHADER :
+			result = srcContainsVariableDeclaration(variableName, m_gShaderMutation);
+			break;
+	}
+
+	return result;
+}
+
+void ShaderMutator::setMinShadingLanguageVersion(shaderSrcType srcType, int version)
+{
+	switch (srcType)
+	{
+		case VERTEX_SHADER :
+			srcSetMinShadingLanguageVersion(version, m_vShaderMutation);
+			break;
+
+		case FRAGMENT_SHADER :
+			srcSetMinShadingLanguageVersion(version, m_fShaderMutation);
+			break;
+
+		case GEOMETRY_SHADER :
+			srcSetMinShadingLanguageVersion(version, m_gShaderMutation);
+			break;
 	}
 }
 
-void ShaderMutator::FS_insertCodeBeforeMainFunction(const std::string& insertedCode)
+void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, int newVal)
 {
-	if (!insertCodeBeforeMainFunction(insertedCode, m_fShaderMutation))
+	switch (srcType)
 	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::FS_insertCodeBeforeMainFunction : "
-		<< "Unable to insert source code in fragment shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration"
-		<< CGoGNendl;
+		case VERTEX_SHADER :
+			if (!srcChangeIntConstantValue(newVal, m_vShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::changeIntConstantValue : "
+				<< "Unable to change int constant value in vertex shader of "
+				<< m_shaderName
+				<< ". Constant declaration not found"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
+
+		case FRAGMENT_SHADER :
+			if (!srcChangeIntConstantValue(newVal, m_fShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::changeIntConstantValue : "
+				<< "Unable to change int constant value in fragment shader of "
+				<< m_shaderName
+				<< ". Constant declaration not found"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
+
+		case GEOMETRY_SHADER :
+			if (!srcChangeIntConstantValue(newVal, m_gShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::changeIntConstantValue : "
+				<< "Unable to change int constant value in geometry shader of "
+				<< m_shaderName
+				<< ". Constant declaration not found"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
 	}
 }
 
-void ShaderMutator::GS_insertCodeBeforeMainFunction(const std::string& insertedCode)
+void ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode)
 {
-	if (!insertCodeBeforeMainFunction(insertedCode, m_gShaderMutation))
+	switch (srcType)
 	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::GS_insertCodeBeforeMainFunction : "
-		<< "Unable to insert source code in geometry shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration"
-		<< CGoGNendl;
+		case VERTEX_SHADER :
+			if (!srcInsertCodeBeforeMainFunction(insertedCode, m_vShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeBeforeMainFunction : "
+				<< "Unable to insert source code in vertex shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
+
+		case FRAGMENT_SHADER :
+			if (!srcInsertCodeBeforeMainFunction(insertedCode, m_fShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeBeforeMainFunction : "
+				<< "Unable to insert source code in fragment shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
+
+		case GEOMETRY_SHADER :
+			if (!srcInsertCodeBeforeMainFunction(insertedCode, m_gShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeBeforeMainFunction : "
+				<< "Unable to insert source code in geometry shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
 	}
 }
 
-void ShaderMutator::VS_insertCodeAtMainFunctionBeginning(const std::string& insertedCode)
+void ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType srcType, const std::string& insertedCode)
 {
-	if (!insertCodeAtMainFunctionBeginning(insertedCode, m_vShaderMutation))
+	switch (srcType)
 	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::VS_insertCodeAtMainFunctionBeginnning : "
-		<< "Unable to insert source code vertex shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration"
-		<< CGoGNendl;
+		case VERTEX_SHADER :
+			if (!srcInsertCodeAtMainFunctionBeginning(insertedCode, m_vShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeAtMainFunctionBeginnning : "
+				<< "Unable to insert source code in vertex shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
+
+		case FRAGMENT_SHADER :
+			if (!srcInsertCodeAtMainFunctionBeginning(insertedCode, m_fShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeAtMainFunctionBeginnning : "
+				<< "Unable to insert source code in fragment shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
+
+		case GEOMETRY_SHADER :
+			if (!srcInsertCodeAtMainFunctionBeginning(insertedCode, m_gShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeAtMainFunctionBeginnning : "
+				<< "Unable to insert source code in geometry shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
 	}
 }
 
-void ShaderMutator::FS_insertCodeAtMainFunctionBeginning(const std::string& insertedCode)
+void ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode)
 {
-	if (!insertCodeAtMainFunctionBeginning(insertedCode, m_fShaderMutation))
+	switch (srcType)
 	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::FS_insertCodeAtMainFunctionBeginnning : "
-		<< "Unable to insert source code in fragment shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration"
-		<< CGoGNendl;
-	}
-}
+		case VERTEX_SHADER :
+			if (!srcInsertCodeAtMainFunctionEnd(insertedCode, m_vShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeAtMainFunctionEnd : "
+				<< "Unable to insert source code in vertex shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration "
+				<< "and as many '{' as '}' in main"
+				<< CGoGNendl;
 
-void ShaderMutator::GS_insertCodeAtMainFunctionBeginning(const std::string& insertedCode)
-{
-	if (!insertCodeAtMainFunctionBeginning(insertedCode, m_gShaderMutation))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::GS_insertCodeAtMainFunctionBeginnning : "
-		<< "Unable to insert source code in geometry shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration"
-		<< CGoGNendl;
-	}
-}
+				return;
+			}
+			break;
 
-void ShaderMutator::VS_insertCodeAtMainFunctionEnd(const std::string& insertedCode)
-{
-	if (!insertCodeAtMainFunctionEnd(insertedCode, m_vShaderMutation))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::VS_insertCodeAtMainFunctionEnd : "
-		<< "Unable to insert source code in vertex shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration "
-		<< "and as many '{' as '}' in main"
-		<< CGoGNendl;
-	}
-}
+		case FRAGMENT_SHADER :
+			if (!srcInsertCodeAtMainFunctionEnd(insertedCode, m_fShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeAtMainFunctionEnd : "
+				<< "Unable to insert source code in fragment shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration "
+				<< "and as many '{' as '}' in main"
+				<< CGoGNendl;
 
-void ShaderMutator::FS_insertCodeAtMainFunctionEnd(const std::string& insertedCode)
-{
-	if (!insertCodeAtMainFunctionEnd(insertedCode, m_fShaderMutation))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::FS_insertCodeAtMainFunctionEnd : "
-		<< "Unable to insert source code in fragment shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration "
-		<< "and as many '{' as '}' in main"
-		<< CGoGNendl;
-	}
-}
+				return;
+			}
+			break;
 
-void ShaderMutator::GS_insertCodeAtMainFunctionEnd(const std::string& insertedCode)
-{
-	if (!insertCodeAtMainFunctionEnd(insertedCode, m_gShaderMutation))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ShaderMutator::GS_insertCodeAtMainFunctionEnd : "
-		<< "Unable to insert source code in geometry shader of "
-		<< m_shaderName
-		<< ". You should check if the shader has a main function declaration "
-		<< "and as many '{' as '}' in main"
-		<< CGoGNendl;
+		case GEOMETRY_SHADER :
+			if (!srcInsertCodeAtMainFunctionEnd(insertedCode, m_gShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::insertCodeAtMainFunctionEnd : "
+				<< "Unable to insert source code in geometry shader of "
+				<< m_shaderName
+				<< ". You should check if the shader has a main function declaration "
+				<< "and as many '{' as '}' in main"
+				<< CGoGNendl;
+
+				return;
+			}
+			break;
 	}
 }
 
 
+/***********************************************
+ *
+ * 		Private Section
+ *
+ ***********************************************/
 
 
-
-
-
-bool ShaderMutator::isCommented(size_t pos, const std::string& str)
+bool ShaderMutator::srcIsCommented(size_t pos, const std::string& src)
 {
-	// Verify that the given position is not out of the string
-	if (pos >= str.length())
+	// Verify that the given position is not out of the source
+	if (pos >= src.length())
 	{
 		CGoGNerr
 		<< "ERROR - "
@@ -211,33 +315,33 @@ bool ShaderMutator::isCommented(size_t pos, const std::string& str)
 		return false;
 	}
 	
-	// Look backward in the string to see if there is any comment symbol (// or /* */)
+	// Look backward in the source to see if there is any comment symbol (// or /* */)
 	
 	// First look for one-line comments
-	if (isOneLineCommented(pos, str))
+	if (srcIsOneLineCommented(pos, src))
 		return true;
 	
 	// Now look for multi-line comments 
 	size_t i;
 	for (i = pos; i > 0; i--)
 	{	
-		if (str[i] == '/')
+		if (src[i] == '/')
 		{
 			// End of multi-line comment
-			if (str[i-1] == '*')
+			if (src[i-1] == '*')
 			{
 				// Verify that the end of multi-line comment is not one-line commented !
-				if (!isOneLineCommented(i, str))
+				if (!srcIsOneLineCommented(i, src))
 					return false;
 			}
 		}
-		else if (str[i] == '*')
+		else if (src[i] == '*')
 		{
 			// Beginning of multi-line comment
-			if (str[i-1] == '/')
+			if (src[i-1] == '/')
 			{
 				// Verify that the beginning of multi-line comment is not one-line commented !
-				if (!isOneLineCommented(i, str))
+				if (!srcIsOneLineCommented(i, src))
 					return true;
 			}
 		}
@@ -248,10 +352,10 @@ bool ShaderMutator::isCommented(size_t pos, const std::string& str)
 	
 }
 
-bool ShaderMutator::isOneLineCommented(size_t pos, const std::string& str)
+bool ShaderMutator::srcIsOneLineCommented(size_t pos, const std::string& src)
 {
-	// Verify that the given position is not out of the string
-	if (pos >= str.length())
+	// Verify that the given position is not out of the source
+	if (pos >= src.length())
 	{
 		CGoGNerr
 		<< "ERROR - "
@@ -261,15 +365,15 @@ bool ShaderMutator::isOneLineCommented(size_t pos, const std::string& str)
 		return false;
 	}
 	
-	// Look backward in the string to see if there is any "//"
+	// Look backward in the source to see if there is any "//"
 	size_t i;
 	for (i = pos; i > 0; i--)
 	{
 		// As soon as a '\n' is found, any other "//" will not affect this line anymore
-		if (str[i] == '\n')
+		if (src[i] == '\n')
 			return false;
-		else if (str[i] == '/')
-			if (str[i-1] == '/')
+		else if (src[i] == '/')
+			if (src[i-1] == '/')
 				return true;
 	}
 	
@@ -277,7 +381,7 @@ bool ShaderMutator::isOneLineCommented(size_t pos, const std::string& str)
 	return false;
 }
 
-bool ShaderMutator::containsVariableDeclaration(const std::string& variableName, std::string& src)
+bool ShaderMutator::srcContainsVariableDeclaration(const std::string& variableName, std::string& src)
 {
 	// Regular expression for variable declaration
 	// <',' OR white-space[1 or more times]> <variableName> <',' OR ';' OR white-space>
@@ -295,7 +399,7 @@ bool ShaderMutator::containsVariableDeclaration(const std::string& variableName,
 		size_t startPosition = std::distance(src.begin(), matches[0].first);
 		
 		// Finish if the matched variable is the good one (i.e. not commented)
-		if (!isCommented(startPosition, src))
+		if (!srcIsCommented(startPosition, src))
 			return true;
 		// Else continue to search for it after last match
 		else
@@ -306,11 +410,11 @@ bool ShaderMutator::containsVariableDeclaration(const std::string& variableName,
 	return false;
 }
 
-bool ShaderMutator::setMinShadingLanguageVersion(int version, std::string& modifiedSrc)
+bool ShaderMutator::srcSetMinShadingLanguageVersion(int version, std::string& modifiedSrc)
 {
 	// Regular expression for shading language version
-	// <#version> <space> <digit>[1 or more times]
-	boost::regex version_re("#version (\\d+)");
+	// <#version> <white-space>[1 or more times] <digit>[1 or more times]
+	boost::regex version_re("#version\\s+(\\d+)");
 
 	// Matches results
 	boost::match_results <std::string::iterator> matches;
@@ -330,9 +434,9 @@ bool ShaderMutator::setMinShadingLanguageVersion(int version, std::string& modif
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
 
 		// Change the version number if the matched "#version ..." is the good one (i.e. not commented)
-		if (!isCommented(startPosition, modifiedSrc))
+		if (!srcIsCommented(startPosition, modifiedSrc))
 		{
-			// Match[1] should be the version number
+			// The submatch Match[1] should be the version number
 			std::string oldVersion(matches[1].first, matches[1].second);
 			int oldVersionValue = atoi(oldVersion.c_str());
 			size_t oldVersionLength = oldVersion.length();
@@ -361,7 +465,53 @@ bool ShaderMutator::setMinShadingLanguageVersion(int version, std::string& modif
 	return true;
 }
 
-bool ShaderMutator::insertCodeBeforeMainFunction(const std::string& insertedCode, std::string& modifiedSrc)
+bool ShaderMutator::srcChangeIntConstantValue(int newVal, std::string& modifiedSrc)
+{
+	// Regular expression for constant expression
+	// <#define> <white-space>[1 or more times] <digit>[1 or more times]
+	boost::regex const_re("#define\\s+(\\d+)");
+
+	// Matches results
+	boost::match_results <std::string::iterator> matches;
+
+	// Build the constant value string
+	std::string newValStr;
+	std::stringstream ss;
+	ss << newVal;
+	newValStr = ss.str();
+
+	// Search for the first expression that matches and isn't commented
+	std::string::iterator start = modifiedSrc.begin();
+	std::string::iterator end = modifiedSrc.end();
+	while (regex_search(start, end, matches, const_re, boost::format_first_only))
+	{
+		// Start position of the match
+		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
+
+		// Change the constant value if the matched "#define ..." is the good one (i.e. not commented)
+		if (!srcIsCommented(startPosition, modifiedSrc))
+		{
+			// The submatch Match[1] should be the old constant value
+			std::string oldValStr(matches[1].first, matches[1].second);
+			size_t oldValLength = oldValStr.length();
+			size_t oldValPosition = std::distance(modifiedSrc.begin(), matches[1].first);
+
+			// Replace the constant value
+			modifiedSrc.replace(oldValPosition, oldValLength, newValStr);
+			return true;
+		}
+		// Else continue to search for it after last match
+		else
+		{
+			start = matches[0].second;
+		}
+	}
+
+	// At this point no correct match was found
+	return false;
+}
+
+bool ShaderMutator::srcInsertCodeBeforeMainFunction(const std::string& insertedCode, std::string& modifiedSrc)
 {
 	// Regular expression for main function
 	// <void> <white-space>[1 or more times] <main> <white-space>[0 or more times] <'('>
@@ -379,7 +529,7 @@ bool ShaderMutator::insertCodeBeforeMainFunction(const std::string& insertedCode
 		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
 		
 		// Insert and finish if the matched "main" is the good one (i.e. not commented)
-		if (!isCommented(startPosition, modifiedSrc))
+		if (!srcIsCommented(startPosition, modifiedSrc))
 		{
 			modifiedSrc.insert(startPosition, insertedCode);
 			return true;
@@ -395,7 +545,7 @@ bool ShaderMutator::insertCodeBeforeMainFunction(const std::string& insertedCode
 	return false;
 }
 
-bool ShaderMutator::insertCodeAtMainFunctionBeginning(const std::string& insertedCode, std::string& modifiedSrc)
+bool ShaderMutator::srcInsertCodeAtMainFunctionBeginning(const std::string& insertedCode, std::string& modifiedSrc)
 {
 	// Regular expression for main function
 	// <void> <white-space>[1 or more times] <main> <white-space>[0 or more times]
@@ -418,7 +568,7 @@ bool ShaderMutator::insertCodeAtMainFunctionBeginning(const std::string& inserte
 		size_t endPosition = std::distance(modifiedSrc.begin(), matches[0].second);
 		
 		// Insert and finish if the matched "main" is the good one (i.e. not commented)
-		if (!isCommented(startPosition, modifiedSrc))
+		if (!srcIsCommented(startPosition, modifiedSrc))
 		{
 			modifiedSrc.insert(endPosition, insertedCode);
 			return true;
@@ -434,7 +584,7 @@ bool ShaderMutator::insertCodeAtMainFunctionBeginning(const std::string& inserte
 	return false;
 }
 
-bool ShaderMutator::insertCodeAtMainFunctionEnd(const std::string& insertedCode, std::string& modifiedSrc)
+bool ShaderMutator::srcInsertCodeAtMainFunctionEnd(const std::string& insertedCode, std::string& modifiedSrc)
 {
 	// Regular expression for main function
 	// <void> <white-space>[1 or more times] <main> <white-space>[0 or more times]
@@ -448,7 +598,7 @@ bool ShaderMutator::insertCodeAtMainFunctionEnd(const std::string& insertedCode,
 	// Search for the first expression that matches and isn't commented
 	std::string::iterator start = modifiedSrc.begin();
 	std::string::iterator end = modifiedSrc.end();
-	size_t mainFirstBracePos = 0;  // The aim is to find this position
+	size_t mainFirstBracePos = 0;  // The aim is first to find this position
 	while (regex_search(start, end, matches, main_re, boost::format_first_only) && (mainFirstBracePos == 0))
 	{
 		// Start position of the match
@@ -458,7 +608,7 @@ bool ShaderMutator::insertCodeAtMainFunctionEnd(const std::string& insertedCode,
 		size_t endPosition = std::distance(modifiedSrc.begin(), matches[0].second);
 		
 		// Get the main first brace position if the matched "main" is the good one (i.e. not commented)
-		if (!isCommented(startPosition, modifiedSrc))
+		if (!srcIsCommented(startPosition, modifiedSrc))
 			mainFirstBracePos = endPosition;
 		// Else continue to search for it after last match
 		else
@@ -478,12 +628,12 @@ bool ShaderMutator::insertCodeAtMainFunctionEnd(const std::string& insertedCode,
 	{
 		closestOpeningBracePos = modifiedSrc.find_first_of('{', closestBracePos + 1);
 		// If this brace appears to be commented, try to get the next one
-		while ((closestOpeningBracePos != std::string::npos) && isCommented(closestOpeningBracePos, modifiedSrc))
+		while ((closestOpeningBracePos != std::string::npos) && srcIsCommented(closestOpeningBracePos, modifiedSrc))
 			closestOpeningBracePos = modifiedSrc.find_first_of('{', closestOpeningBracePos + 1);
 		
 		closestClosingBracePos = modifiedSrc.find_first_of('}', closestBracePos + 1);
 		// If this brace appears to be commented, try to get the next one
-		while ((closestClosingBracePos != std::string::npos) && isCommented(closestClosingBracePos, modifiedSrc))
+		while ((closestClosingBracePos != std::string::npos) && srcIsCommented(closestClosingBracePos, modifiedSrc))
 			closestClosingBracePos = modifiedSrc.find_first_of('}', closestClosingBracePos + 1);
 
 		// Happens if there is not enough "}" for the corresponding "{"

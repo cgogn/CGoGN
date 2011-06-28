@@ -261,7 +261,8 @@ void ClippingShader::setPlaneClipping(int planesCount)
 	"		gl_FragColor.rgb /= (1.0 + clip_MinDistanceToPlanes*clip_ColorAttenuationFactor);\n";
 
 
-	// If the previous plane count was zero, the previous shader source codes were the original ones. Store them
+	// If the previous planes count was zero, the previous shader source codes were the original ones. Store them
+	// (the planes count is initially zero when the object is constructed)
 	if (getClippingPlanesCount() == 0)
 	{
 		originalVertShaderSrc = getVertexShaderSrc();
@@ -276,7 +277,7 @@ void ClippingShader::setPlaneClipping(int planesCount)
 		ShaderMutator SM(shaderName, originalVertShaderSrc, originalFragShaderSrc, "");
 	
 		// First check if the vertex shader contains the VertexPosition attribute
-		if (!SM.VS_containsVariableDeclaration("VertexPosition"))
+		if (!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"))
 		{
 			CGoGNerr
 			<< "ERROR - "
@@ -289,16 +290,15 @@ void ClippingShader::setPlaneClipping(int planesCount)
 		}
 
 		// Modify vertex shader source code
-		SM.VS_insertCodeBeforeMainFunction(VS_head_insertion);
-		SM.VS_insertCodeAtMainFunctionBeginning(VS_mainBegin_insertion);
-	
-		// Following code insertions need at least shading language 120 (GLSL arrays)
-		SM.VS_FS_GS_setMinShadingLanguageVersion(120);
+		SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_head_insertion);
+		SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainBegin_insertion);
+
 
 		// Modify fragment shader source code
-		SM.FS_insertCodeBeforeMainFunction(FS_head_insertion);
-		SM.FS_insertCodeAtMainFunctionEnd(FS_mainEnd_insertion);
-		SM.FS_insertCodeAtMainFunctionBeginning(FS_mainBegin_insertion);
+		SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120); // Following code insertions need at least shading language 120 (GLSL arrays)
+		SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_head_insertion);
+		SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEnd_insertion);
+		SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBegin_insertion);
 
 		// Reload both shaders
 		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
@@ -356,11 +356,6 @@ void ClippingShader::updateClippingUniforms()
 	sendColorAttenuationFactorUniform();
 }
 
-void ClippingShader::displayClippingPlane()
-{
-	m_planeDrawer->callList();
-}
-
 void ClippingShader::sendClippingPlanesUniform()
 {
 	bind();
@@ -371,6 +366,11 @@ void ClippingShader::sendColorAttenuationFactorUniform()
 {
 	bind();
 	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
+}
+
+void ClippingShader::displayClippingPlane()
+{
+	m_planeDrawer->callList();
 }
 
 } // namespace Utils

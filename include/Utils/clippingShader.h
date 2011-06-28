@@ -27,9 +27,6 @@
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
-#include "glm/glm.hpp"
-#include "Geometry/matrix.h"
-#include "Utils/trackball.h"
 #include "Utils/cgognStream.h"
 #include "Utils/shaderMutator.h"
 #include "Utils/drawer.h"

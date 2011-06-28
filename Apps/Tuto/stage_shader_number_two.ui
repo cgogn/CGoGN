@@ -24,7 +24,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -269,22 +269,6 @@
  </widget>
  <resources/>
  <connections>
-  <connection>
-   <sender>check_drawFaces</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>combo_faceLighting</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>65</x>
-     <y>98</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>65</x>
-     <y>127</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>check_drawNormals</sender>
    <signal>toggled(bool)</signal>
