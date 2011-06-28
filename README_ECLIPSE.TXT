@@ -44,4 +44,11 @@ REMARQUE : en bas de cette fenêtre, le bouton "Export Settings" permet d'export
 de l'importer dans les autres projets.
  - Pour finir, un petit clic-droit sur le projet -> Index -> Freshen all files et le tour est joué.
 
-
+ * Coloration syntaxique des shaders
+ - Télécharger et décompresser EclipseShaders : http://sourceforge.net/projects/glshaders/
+ - Copier les répertoires plugins et features dans le répertoire d'installation eclipse
+ - Relancer Eclipse au moins une fois avec l'option --clean (relecture des répertoires locaux)
+Eclipse reconnaîtra désormais les fichiers .frag et .vert.
+Pour associer d'autres fichiers au programme GLSLeditor :
+ - Preferences -> General -> Editors -> File Associations
+Dans Preferences -> Shaders Preferences, on peut désormais configurer certaines options liées au shaders.
