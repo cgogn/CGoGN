@@ -125,6 +125,13 @@ public:
 	 */
 	virtual bool deleteVertex(Dart d) ;
 
+	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  @param d first dart in the face
+	 *  @param e second dart in the face
+	 */
+	virtual void linkVertices(Dart d, Dart e);
+
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */
@@ -162,6 +169,20 @@ public:
 	 * @return true if the flip has been executed, false otherwise
 	 */
 	virtual bool flipBackEdge(Dart d);
+
+	//! Insert an edge after a dart in the vertex orbit
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  \pre Dart e must be phi2-linked with its phi_1 dart
+	 *  @param d dart of the vertex
+	 *  @param e dart of the edge
+	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+
+	//! Remove an edge from a vertex orbit
+	/*! \pre Dart d must be phi2 sewn
+	 *  @param d the dart of the edge to remove from the vertex
+	 */
+	virtual void removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
