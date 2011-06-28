@@ -25,19 +25,48 @@
 #ifndef LOCALFRAME_H_
 #define LOCALFRAME_H_
 
+#include <cmath>
+
 namespace CGoGN {
 
 namespace Utils {
+
+/**
+ * Util for rotation of a 3D point (or vector) around a given line (going through the origin) and of a given angle
+ * @param axis the rotation axis direction
+ * @param angle the rotation angle
+ * @param p the point to rotate
+ */
+template <typename REAL>
+Geom::Vector<3,REAL> rotate (Geom::Vector<3,REAL> axis, REAL angle, Geom::Vector<3,REAL> p) ;
+
+/**
+ * Util for conversion from spherical to carthesian coordinates.
+ * The spherical coordinates are in radius-longitude-latitude
+ * @param sph the spherical coordinates
+ * @return the carthesian coordinates
+ */
+template<typename REAL>
+Geom::Vector<3,REAL> sphericalToCarth (const Geom::Vector<3,REAL>& sph) ;
+
+/**
+ * Util for conversion from carthesian to spherical coordinates.
+ * The spherical coordinates are in radius-longitude-latitude
+ * @param carth the carthesian coordinates
+ * @return the spherical coordinates
+ */
+template<typename REAL>
+Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth) ;
 
 /**
  * Class for representing a direct local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
  * This class can compress/decompress a local frame, switching from its explicit representation (3 vectors) to its compressed representation (1 vector).
  * Usage :
  *  VEC3 T,B,N ;							// current set of orthonormal vectors composing the direct frame.
- *  LocalFrame<PFP::VEC3> lf(T,B,N) ; 				// Constructor from explicit expression.
+ *  LocalFrame<PFP> lf(T,B,N) ; 				// Constructor from explicit expression.
  *  if (lf.isOrthoNormalDirect())			// test if the frame is Orthogonal, Normalized and Direct
  *   VEC3 compressed = lf.getCompressed() ;	// Extract compressed frame
- *  LocalFrame<PFP::VEC3> decompressed(compressed) ;	// Constructor from implicit (compressed) expression.
+ *  LocalFrame<PFP> decompressed(compressed) ;	// Constructor from implicit (compressed) expression.
  *
  * All formulae were provided by "Représentation compacte d'un repère local", june 14th, 2011 by K. Vanhoey
  */
@@ -46,7 +75,7 @@ class LocalFrame
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename Geom::Vector<2,REAL> VEC2 ;
-	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<3,REAL> VEC3 ;
 
 private: // fields
 	/**
@@ -62,17 +91,20 @@ public: // methods
 	 * @param N the normal vector
 	 */
 	LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N) ;
+
 	/**
 	 * Constructor from implicit (compressed representation)
-	 * @param compressedFrame an implicit (compressed) version of the local frame
+	 * @param compressedFrame an implicit (compressed) version of the local frame (can be produced by localFrame.getCompressed())
 	 */
 	LocalFrame(const VEC3& compressedFrame) ;
+
 	~LocalFrame() {} ;
 
 	/**
 	 * Returns a compressed version of the current local frame
+	 * A VEC3 is not sufficient to completely define a local frame (if phiN=0, the decompression is not unique).
 	 */
-	VEC3 getCompressed() ;
+	VEC3 getCompressed() const ;
 
 	/**
 	 * Tests if the frames are identical
@@ -80,7 +112,7 @@ public: // methods
 	 * @param epsilon the authorized deviation
 	 * @return true if frames are identical (or deviate less than epsilon)
 	 */
-	bool equals(const LocalFrame<PFP>& lf, REAL epsilon = 1e-5) const ;
+	bool equals(const LocalFrame<PFP>& lf, REAL epsilon = 1e-6) const ;
 
 	/**
 	 * Equality of frames
@@ -100,25 +132,25 @@ public: // methods
 	 * Tests if the frame is direct
 	 * @return true if the frame is direct
 	 */
-	bool isDirect() const ;
+	bool isDirect(REAL epsilon = 1e-7) const ;
 
 	/**
 	 * Tests if the frame is orthogonal
 	 * @return true if the frame is orthogonal
 	 */
-	bool isOrthogonal() const ;
+	bool isOrthogonal(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * Tests if the frame is normalized
 	 * @return true if the frame is normalized
 	 */
-	bool isNormalized() const ;
+	bool isNormalized(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * Tests if the frame is direct, normalized and orthogonal
 	 * @return true if the frame is direct, normalized and orthogonal
 	 */
-	bool isOrthoNormalDirect() const ;
+	bool isOrthoNormalDirect(REAL epsilon = 1e-5) const ;
 
 	/**
 	 * @return current tangent vector
@@ -141,13 +173,33 @@ public: // methods
 	friend std::ostream& operator<< (std::ostream &out, const LocalFrame& lf) {
 		out << "T : " << lf.m_T << std::endl ;
 		out << "B : " << lf.m_B << std::endl ;
-		out << "N : " << lf.m_N << std::endl ;
+		out << "N : " << lf.m_N ;
 		return out ;
 	} ;
 
-private : // methods
-	VEC2 carthToSpherical(const VEC3& carth) const ;
-	VEC3 sphericalToCarth(const VEC2& sph) const ;
+private : // private constants
+	// (T,B,N) can be any orthonormal direct frame
+	// zeros are not recommended since they can
+	// generate zero vectors after a dot product
+//	static const REAL Tx = 0.267261 ;
+//	static const REAL Ty = 0.534522 ;
+//	static const REAL Tz = 0.801784 ;
+//	static const REAL Bx = 0.844416 ;
+//	static const REAL By = -0.530776 ;
+//	static const REAL Bz = 0.0723785 ;
+//	static const REAL Nx = 0.464255 ;
+//	static const REAL Ny = 0.657695 ;
+//	static const REAL Nz = -0.593215 ;
+	static const REAL Tx = 0.0766965 ;
+	static const REAL Ty = 0.383483 ;
+	static const REAL Tz = 0.920358 ;
+	static const REAL Bx = -0.760734 ;
+	static const REAL By = 0.619202 ;
+	static const REAL Bz = -0.194606 ;
+	static const REAL Nx = -0.644516 ;
+	static const REAL Ny = -0.685222 ;
+	static const REAL Nz = 0.339219 ;
+
 } ;
 
 } // Utils

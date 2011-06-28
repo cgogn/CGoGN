@@ -166,6 +166,8 @@ void Viewer::cb_Open()
 {
 	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)") ;
 	std::string filename = selectFile("Open Mesh", "", filters) ;
+	if (filename.empty())
+		return ;
 
 	importMesh(filename) ;
 	updateGL() ;

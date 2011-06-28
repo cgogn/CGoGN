@@ -38,47 +38,39 @@ LocalFrame<PFP>::LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N)
 template<typename PFP>
 LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
 {
-	VEC2 Nspher ;
-	VEC2 Tspher ;
+	const VEC3 T(Tx,Ty,Tz) ;
+	const VEC3 N(Nx,Ny,Nz) ;
 
-	REAL& thetaN = Nspher[0] ; // known
-	REAL& phiN = Nspher[1] ; // known
-	REAL& thetaT = Tspher[0] ; // known
-	REAL& phiT = Tspher[1] ; // to be decoded
+	// get known data
+	const REAL& theta1 = compressedFrame[0] ;
+	const REAL& phi = compressedFrame[1] ;
+	const REAL& theta2 = compressedFrame[2] ;
 
-	// compute phiT
-	REAL Den,Nom ;
-	Den = sin(phiN)*(cos(thetaN)*cos(thetaT) + sin(thetaN)*sin(thetaT)) ; // Based on orthogonality
-	Nom = cos(phiN) ;
-	phiT = -atan(Nom/Den) ; // if A==0, atan returns Pi/2
-	if (phiT < 0.0)
-		phiT = M_PI + phiT ; // = Pi - |phiT|
-
-	// convert to carthesian
-	m_N = sphericalToCarth(Nspher) ;
-	m_T = sphericalToCarth(Tspher) ;
-
-	// compute B
+	const VEC3 Tprime = rotate<REAL>(N,theta1,T) ;
+	m_N = rotate<REAL>(Tprime,phi,N) ;
+	m_T = rotate<REAL>(m_N,theta2,Tprime) ;
 	m_B = m_N ^ m_T ;
 }
 
 template<typename PFP>
-typename PFP::VEC3 LocalFrame<PFP>::getCompressed()
+typename Geom::Vector<3,typename PFP::REAL> LocalFrame<PFP>::getCompressed() const
 {
 	VEC3 res ;
 
-	REAL& thetaN = res[0] ;
-	REAL& phiN = res[1] ;
-	REAL& thetaT = res[2] ;
+	const VEC3 T(Tx,Ty,Tz) ;
+	const VEC3 B(Bx,By,Bz) ;
+	const VEC3 N(Nx,Ny,Nz) ;
 
-	// convert to spherical coordinates
-	VEC2 Nspher = carthToSpherical(m_N) ;
-	VEC2 Tspher = carthToSpherical(m_T) ;
+	REAL& theta1 = res[0] ;
+	REAL& phi = res[1] ;
+	REAL& theta2 = res[2] ;
 
-	// extract the three scalars
-	thetaN = Nspher[0] ;
-	phiN = Nspher[1] ;
-	thetaT = Tspher[0] ;
+	VEC3 Tprime = N ^ m_N ;
+	Tprime.normalize() ;
+
+	theta1 = (B*Tprime > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), T*Tprime ),REAL(-1.0))) ;
+	phi = std::acos(std::max(std::min(REAL(1.0), N*m_N ),REAL(-1.0))) ; // phi1 is always positive because the direction of vector Tp=N^N1 (around which a rotation of angle phi is done later on) changes depending on the side on which they lay w.r.t eachother.
+	theta2 = (m_B*Tprime > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), m_T*Tprime ),REAL(-1.0))) ;
 
 	return res ;
 }
@@ -106,81 +98,107 @@ bool LocalFrame<PFP>::operator!=(const LocalFrame<PFP>& lf) const
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isDirect() const
+bool LocalFrame<PFP>::isDirect(REAL epsilon) const
 {
 	VEC3 new_B = m_N ^ m_T ;		// direct
 	VEC3 diffs = new_B - m_B ;		// differences with existing B
 	REAL diffNorm = diffs.norm2() ;	// Norm of this differences vector
 
-	return (diffNorm < 1e-10) ;		// Verify that this difference is very small
+	return (diffNorm < epsilon) ;		// Verify that this difference is very small
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isOrthogonal() const
+bool LocalFrame<PFP>::isOrthogonal(REAL epsilon) const
 {
-	return (fabs(m_T * m_B) < 1e-5) && (fabs(m_N * m_B) < 1e-5) && (fabs(m_T * m_N) < 1e-5) ;
+	return (fabs(m_T * m_B) < epsilon) && (fabs(m_N * m_B) < epsilon) && (fabs(m_T * m_N) < epsilon) ;
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isNormalized() const
+bool LocalFrame<PFP>::isNormalized(REAL epsilon) const
 {
-	return 		(1-1e-5 < m_N.norm2() && m_N.norm2() < 1+1e-5)
-			&& 	(1-1e-5 < m_T.norm2() && m_T.norm2() < 1+1e-5)
-			&&	(1-1e-5 < m_B.norm2() && m_B.norm2() < 1+1e-5) ;
+	return 		(1-epsilon < m_N.norm2() && m_N.norm2() < 1+epsilon)
+			&& 	(1-epsilon < m_T.norm2() && m_T.norm2() < 1+epsilon)
+			&&	(1-epsilon < m_B.norm2() && m_B.norm2() < 1+epsilon) ;
 }
 
 template<typename PFP>
-bool LocalFrame<PFP>::isOrthoNormalDirect() const
+bool LocalFrame<PFP>::isOrthoNormalDirect(REAL epsilon) const
 {
-	return isOrthogonal() && isNormalized() && isDirect() ;
+	return isOrthogonal(epsilon) && isNormalized(epsilon) && isDirect(epsilon) ;
 }
 
-template<typename PFP>
-typename Geom::Vector<2,typename PFP::REAL> LocalFrame<PFP>::carthToSpherical (const VEC3& carth) const
+
+template<typename REAL>
+Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth)
 {
-	VEC2 res ;
+	Geom::Vector<3,REAL> res ;
 
 	const REAL& x = carth[0] ;
 	const REAL& y = carth[1] ;
 	const REAL& z = carth[2] ;
 
-	REAL& theta = res[0] ;
-	REAL& phi = res[1] ;
+	REAL& rho = res[0] ;
+	REAL& theta = res[1] ;
+	REAL& phi = res[2] ;
 
-	phi = acos(z) ;
-	const REAL sinphi = sin(phi) ;
-	if (sinphi == 0.0)
+	rho = carth.norm() ;
+	theta = ((y < 0) ? -1 : 1) * std::acos(x / REAL(sqrt(x*x + y*y)) )  ;
+	if (isnan(theta))
 		theta = 0.0 ;
-	else
-		theta = ((y > 0) ? 1 : -1) * acos(std::min(REAL(1.0),std::max(REAL(-1.0),x / sinphi))) ;
-
-	assert (-(M_PI+0.000001) <= theta && theta <= M_PI+0.000001) ;
-	assert (-0.000001 < phi && phi <= M_PI+0.000001) ;
-	assert (!isnan(theta) || !"carthToSpherical : Theta is NaN !") ;
-	assert (!isnan(phi) || !"carthToSpherical : Phi is NaN !") ;
+	phi = std::asin(z) ;
 
 	return res ;
 }
 
-template<typename PFP>
-typename PFP::VEC3 LocalFrame<PFP>::sphericalToCarth (const VEC2& sph) const
+template<typename REAL>
+Geom::Vector<3,REAL> sphericalToCarth (const Geom::Vector<3,REAL>& sph)
 {
-	VEC3 res ;
+	Geom::Vector<3,REAL> res ;
 
-	const REAL& theta = sph[0] ;
-	const REAL& phi = sph[1] ;
+	const REAL& rho = sph[0] ;
+	const REAL& theta = sph[1] ;
+	const REAL& phi = sph[2] ;
 
 	REAL& x = res[0] ;
 	REAL& y = res[1] ;
 	REAL& z = res[2] ;
 
-	x = cos(theta)*sin(phi) ;
-	y = sin(theta)*sin(phi) ;
-	z = cos(phi) ;
+	x = rho*cos(theta)*cos(phi) ;
+	y = rho*sin(theta)*cos(phi) ;
+	z = rho*sin(phi) ;
 
 	assert(-1.000001 < x && x < 1.000001) ;
 	assert(-1.000001 < y && y < 1.000001) ;
 	assert(-1.000001 < z && z < 1.000001) ;
+
+	return res ;
+}
+
+template <typename REAL>
+Geom::Vector<3,REAL> rotate (Geom::Vector<3,REAL> axis, REAL angle, Geom::Vector<3,REAL> vector)
+{
+	axis.normalize() ;
+
+	const REAL& u = axis[0] ;
+	const REAL& v = axis[1] ;
+	const REAL& w = axis[2] ;
+
+	const REAL& x = vector[0] ;
+	const REAL& y = vector[1] ;
+	const REAL& z = vector[2] ;
+
+	Geom::Vector<3,REAL> res ;
+	REAL& xp = res[0] ;
+	REAL& yp = res[1] ;
+	REAL& zp = res[2] ;
+
+	const REAL tmp1 = u*x+v*y+w*z ;
+	const REAL cos = std::cos(angle) ;
+	const REAL sin = std::sin(angle) ;
+
+	xp = u*tmp1*(1-cos) + x*cos+(v*z-w*y)*sin ;
+	yp = v*tmp1*(1-cos) + y*cos-(u*z-w*x)*sin ;
+	zp = w*tmp1*(1-cos) + z*cos+(u*y-v*x)*sin ;
 
 	return res ;
 }
