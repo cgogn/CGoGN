@@ -87,12 +87,12 @@ void ShaderMutator::setMinShadingLanguageVersion(shaderSrcType srcType, int vers
 	}
 }
 
-void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, int newVal)
+void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal)
 {
 	switch (srcType)
 	{
 		case VERTEX_SHADER :
-			if (!srcChangeIntConstantValue(newVal, m_vShaderMutation))
+			if (!srcChangeIntConstantValue(newVal, constantName, m_vShaderMutation))
 			{
 				CGoGNerr
 				<< "ERROR - "
@@ -107,7 +107,7 @@ void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, int newVal)
 			break;
 
 		case FRAGMENT_SHADER :
-			if (!srcChangeIntConstantValue(newVal, m_fShaderMutation))
+			if (!srcChangeIntConstantValue(newVal, constantName, m_fShaderMutation))
 			{
 				CGoGNerr
 				<< "ERROR - "
@@ -122,7 +122,7 @@ void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, int newVal)
 			break;
 
 		case GEOMETRY_SHADER :
-			if (!srcChangeIntConstantValue(newVal, m_gShaderMutation))
+			if (!srcChangeIntConstantValue(newVal, constantName, m_gShaderMutation))
 			{
 				CGoGNerr
 				<< "ERROR - "
@@ -465,11 +465,11 @@ bool ShaderMutator::srcSetMinShadingLanguageVersion(int version, std::string& mo
 	return true;
 }
 
-bool ShaderMutator::srcChangeIntConstantValue(int newVal, std::string& modifiedSrc)
+bool ShaderMutator::srcChangeIntConstantValue(int newVal, const std::string& constantName, std::string& modifiedSrc)
 {
 	// Regular expression for constant expression
-	// <#define> <white-space>[1 or more times] <digit>[1 or more times]
-	boost::regex const_re("#define\\s+(\\d+)");
+	// <#define> <white-space>[1 or more times] <constant name> <white-space>[1 or more times] <digit>[1 or more times]
+	boost::regex const_re("#define\\s+" + constantName + "\\s+(\\d+)");
 
 	// Matches results
 	boost::match_results <std::string::iterator> matches;

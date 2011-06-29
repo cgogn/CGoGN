@@ -260,49 +260,67 @@ void ClippingShader::setPlaneClipping(int planesCount)
 	"	if (clip_MinDistanceToPlanes > 0.0)\n"
 	"		gl_FragColor.rgb /= (1.0 + clip_MinDistanceToPlanes*clip_ColorAttenuationFactor);\n";
 
+	// Previous planes count
+	int previousPlanesCount = getClippingPlanesCount();
 
 	// If the previous planes count was zero, the previous shader source codes were the original ones. Store them
 	// (the planes count is initially zero when the object is constructed)
-	if (getClippingPlanesCount() == 0)
+	if (previousPlanesCount == 0)
 	{
 		originalVertShaderSrc = getVertexShaderSrc();
 		originalFragShaderSrc = getFragmentShaderSrc();
 	}
 
-	// If the given plane count is > 0, modify the original shader sources
+	// If the given plane count is > 0, modify the shader sources
 	if (planesCount > 0)
 	{
 
-		// Use a shader mutator
-		ShaderMutator SM(shaderName, originalVertShaderSrc, originalFragShaderSrc, "");
-	
-		// First check if the vertex shader contains the VertexPosition attribute
-		if (!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"))
+		// If the previous planes count wasn't zero, there is only one constant to change in the fragment shader
+		if (previousPlanesCount != 0)
 		{
-			CGoGNerr
-			<< "ERROR - "
-			<< "ClippingShader::setPlaneClipping"
-			<< " - Could not process shader "
-			<< m_nameVS
-			<< " source code : no VertexPosition attribute found"
-			<< CGoGNendl;
-			return;
+			// Use a shader mutator
+			ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+			// Modify the constant in the fragment shader
+			SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount);
+
+			// Reload fragment shader
+			reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
 		}
+		// Else the whole clipping code must be inserted in the original shader sources
+		else
+		{
+			// Use a shader mutator
+			ShaderMutator SM(shaderName, originalVertShaderSrc, originalFragShaderSrc);
 
-		// Modify vertex shader source code
-		SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_head_insertion);
-		SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainBegin_insertion);
+			// First check if the vertex shader contains the VertexPosition attribute
+			if (!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ClippingShader::setPlaneClipping"
+				<< " - Could not process shader "
+				<< m_nameVS
+				<< " source code : no VertexPosition attribute found"
+				<< CGoGNendl;
+				return;
+			}
+
+			// Modify vertex shader source code
+			SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_head_insertion);
+			SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainBegin_insertion);
 
 
-		// Modify fragment shader source code
-		SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120); // Following code insertions need at least shading language 120 (GLSL arrays)
-		SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_head_insertion);
-		SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEnd_insertion);
-		SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBegin_insertion);
+			// Modify fragment shader source code
+			SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120); // Following code insertions need at least shading language 120 (GLSL arrays)
+			SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_head_insertion);
+			SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEnd_insertion);
+			SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBegin_insertion);
 
-		// Reload both shaders
-		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+			// Reload both shaders
+			reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+			reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+		}
 
 	}
 	// Else no clipping is wanted anymore, so get back the original shader sources

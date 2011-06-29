@@ -52,7 +52,7 @@ public:
 	 * @param fragShaderSrc the fragment shader source to store
 	 * @param geomShaderSrc the geometry shader source to store
 	 */
-	 ShaderMutator(const std::string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc);
+	 ShaderMutator(const std::string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc = "");
 	 
 	 /**
 	  * check if a variable is declared in the shader source
@@ -74,7 +74,7 @@ public:
 	  * @param srcType the shader source to use (vertex, fragment or geometry)
 	  * @param newVal the new value
 	  */
-	 void changeIntConstantValue(shaderSrcType srcType, int newVal);
+	 void changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal);
 
 	 /**
 	  * insert code before main function into shader source
@@ -167,7 +167,7 @@ private:
 	 * @param newVal the new value
 	 * @param modifiedSrc shader source code to modify
 	 */
-	bool srcChangeIntConstantValue(int newVal, std::string& modifiedSrc);
+	bool srcChangeIntConstantValue(int newVal, const std::string& constantName, std::string& modifiedSrc);
 
 	/**
 	 * insert code before main function into source code
