@@ -111,6 +111,11 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 	m_vboNormal(NULL),
 	m_vboColor(NULL)
 {
+
+	m_nameVS = "ShaderPhong_vs";
+	m_nameFS = "ShaderPhong_fs";
+	m_nameGS = "ShaderPhong_gs";
+
 	// get choose GL defines (2 or 3)
 	// ans compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
