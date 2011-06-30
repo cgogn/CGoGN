@@ -3,7 +3,7 @@ Pour utiliser Eclipse (testé avec la version Helios, Galileo & Indigo)
  * Configurer un projet dans Eclipse :
  - Faire un nouveau projet C++
  - Choisir Makefile project -> Empty Project
- - Choisir Comme "Location": la racine de NewCGoGN
+ - Choisir Comme "Location": la racine de CGoGN
  - Choisir Toolchains: Linux GCC
 
  * Compilation avec le petit marteau ;) (l'icone)
