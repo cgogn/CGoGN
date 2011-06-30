@@ -41,7 +41,7 @@ namespace CGoGN
  */
 class Mark
 {
-	friend class MarkerSet;
+	friend class MarkSet;
 
 	typedef unsigned int value_type;
 	value_type m_bits;
@@ -51,15 +51,15 @@ public:
 	static unsigned getNbMarks()
 	{
 		return 8 * sizeof(Mark);
-	};
+	}
 
 	//! Constructor
-	Mark() : m_bits(0) {};
+	Mark() : m_bits(0) {}
 
-	Mark(unsigned int a) : m_bits(a) {};
+	Mark(unsigned int a) : m_bits(a) {}
 
 	//! Copy constructor
-	Mark(const Mark& m) : m_bits(m.m_bits) {};
+	Mark(const Mark& m) : m_bits(m.m_bits) {}
 
 	static std::string CGoGNnameOfType() { return "Mark"; }
 

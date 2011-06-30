@@ -121,7 +121,7 @@ namespace GL1
 //};
 //
 //template <typename PFP>
-//void renderTopoGM2(typename PFP::MAP& map, Marker m)
+//void renderTopoGM2(typename PFP::MAP& map, Mark m)
 //{
 //
 //
@@ -642,9 +642,11 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
 
 }
 
+} // namespace GL1
 
-} // endnamespace
-} // endnamespace
-} // endnamespace
-} // endnamespace
+} // namespace Render
+
+} // namespace Algo
+
+} // namespace CGoGN
 
