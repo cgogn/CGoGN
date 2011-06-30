@@ -42,8 +42,7 @@ namespace Algo
 namespace Modelisation
 {
 
-enum {NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED};
-
+enum { NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
 /**
 * sudivide the all quads of primtive into 2 triangles
@@ -326,7 +325,7 @@ public:
 	* mark all embedded vertices of the Polyhedron
 	* @param m the marker to use
 	*/
-	void markEmbVertices(Marker m);
+//	void markEmbVertices(Mark m);
 
 	/**
 	* test if a vertex is in the Polyhedron

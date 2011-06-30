@@ -72,7 +72,7 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
 		for (unsigned int j = 0; j < NB_THREAD; ++j)
-			m_markerTables[i][j] = NULL ;
+			m_markTables[i][j] = NULL ;
 	}
 }
 
@@ -107,7 +107,7 @@ void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 	{
 		if(m_attribs[orbit].unrefLine(old))
 			for (unsigned int t=0; t<m_nbThreads; ++t)
-				m_markerTables[orbit][t]->operator[](old).clear();
+				m_markTables[orbit][t]->operator[](old).clear();
 	}
 	// ref the new emb
 	if (emb != EMBNULL)
@@ -172,7 +172,7 @@ void GenericMap::addThreadMarker(unsigned int nb)
 				ss << "Mark_"<< th ;
 				AttributeContainer& cellCont = m_attribs[i] ;
 				AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-				m_markerTables[i][th] = amvMark ;
+				m_markTables[i][th] = amvMark ;
 			}
 		}
 	}
@@ -198,7 +198,7 @@ void GenericMap::removeThreadMarker(unsigned int nb)
 				ss << "Mark_"<< th ;
 				AttributeContainer& cellCont = m_attribs[i] ;
 				cellCont.removeAttribute<Mark>(ss.str()) ;
-				m_markerTables[i][th] = NULL ;
+				m_markTables[i][th] = NULL ;
 			}
 		}
 	}
@@ -255,9 +255,9 @@ bool GenericMap::saveMapXml(const std::string& filename, bool compress)
 	{
 		int rc = xmlTextWriterStartElement(writer, BAD_CAST "MarkerSet");
 		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "orbit", "%u", i);
-		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_orbMarker[i][0].getMarkVal());
-//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "bin", BAD_CAST m_orbMarker[i][0].getMarkerAsBinaryString().c_str());
-//		m_orbMarker[i] ;
+		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_marksets[i][0].getMarkVal());
+//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "bin", BAD_CAST m_marksets[i][0].getMarkerAsBinaryString().c_str());
+//		m_marksets[i] ;
 		rc = xmlTextWriterEndElement(writer);
 	}
 	rc = xmlTextWriterEndElement(writer);
@@ -373,7 +373,7 @@ bool GenericMap::loadMapXml(const std::string& filename, bool compress)
 				unsigned int orb = atoi((char*)prop);
 				prop = xmlGetProp(mark_node, BAD_CAST "val");
 				unsigned int val = atoi((char*)prop);
-				m_orbMarker[orb][0].setMarkVal(val);
+				m_marksets[orb][0].setMarkVal(val);
 			}
 			read1 =true;
 		}
@@ -441,7 +441,7 @@ bool GenericMap::saveMapBin(const std::string& filename)
 	buffer.reserve(NB_ORBITS+1);
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
 	{
-		buffer.push_back(m_orbMarker[i][0].getMarkVal());
+		buffer.push_back(m_marksets[i][0].getMarkVal());
 	}
 //	buffer.push_back(m_BoundaryMarkerVal.getMarkVal());
 
@@ -508,7 +508,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	fs.read(reinterpret_cast<char*>(&(buffer[0])), (NB_ORBITS+1)*sizeof(unsigned int));
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
 	{
-		m_orbMarker[i][0].setMarkVal(buffer[i]);
+		m_marksets[i][0].setMarkVal(buffer[i]);
 	}
 //	m_BoundaryMarkerVal.setMarkVal(buffer[NB_ORBITS]);
 
