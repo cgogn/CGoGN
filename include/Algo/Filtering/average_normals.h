@@ -30,7 +30,7 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Filters2D
+namespace Filtering
 {
 
 /**
@@ -48,7 +48,6 @@ void computeNewPositionsFromFaceNormals(
 	const typename PFP::TVEC3& faceNewNormal,
 	const FunctorSelect& select)
 {
-	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -70,9 +69,7 @@ void computeNewPositionsFromFaceNormals(
 			{
 				sumAreas += faceArea[dd] ;
 				VEC3 vT = faceCentroid[dd] - pos_d ;
-				const VEC3& normal = faceNewNormal[dd] ;
-				REAL scal = vT * normal ;
-				vT = scal * faceNormal[dd] ;
+				vT = (vT * faceNewNormal[dd]) * faceNormal[dd] ;
 				displ += faceArea[dd] * vT ;
 				dd = map.phi1(map.phi2(dd)) ;
 			} while(dd != d) ;
@@ -84,9 +81,8 @@ void computeNewPositionsFromFaceNormals(
 
 
 template <typename PFP>
-void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select)
+void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -148,9 +144,8 @@ void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 }
 
 template <typename PFP>
-void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select)
+void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -252,9 +247,8 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 }
 
 template <typename PFP>
-void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select)
+void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -392,9 +386,8 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 }
 
 template <typename PFP>
-void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select)
+void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
@@ -550,7 +543,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 //	CGoGNout <<" adaptive rate = "<< float(nbAdapt)/float(nbTot)<<CGoGNendl;
 }
 
-} //namespace Filters2D
+} //namespace Filtering
 
 } //namespace Algo
 

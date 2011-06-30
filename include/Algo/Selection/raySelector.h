@@ -37,43 +37,44 @@ namespace Algo
 
 namespace Selection
 {
+
 /**
  * Function that does the selection of faces, returned darts are sorted from closest to farthest
  * @param map the map we want to test
  * @param good a dart selector
- * @param rayA first point of  ray (user side)
- * @param rayAB vector of ray (directed ot the scene)
- * @param vecFaces (out) vector to store dart of intersected faces
+ * @param rayA first point of ray (user side)
+ * @param rayAB direction of ray (directed to the scene)
+ * @param vecFaces (out) vector to store the darts of intersected faces
  */
 template<typename PFP>
 void facesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces)
 {
-	std::vector<typename PFP::VEC3> iPoints ;
+	std::vector<typename PFP::VEC3> iPoints;
 
 	// get back intersected faces
 	vecFaces.clear();
 	Algo::Selection::FuncFaceInter<PFP> ffi(map, position, vecFaces, iPoints, rayA, rayAB);
 	map.foreach_orbit(FACE, ffi, good);
 
-	// compute all distances to observer for each dart of intersected face
+	// compute all distances to observer for each intersected face
 	// and put them in a vector for sorting
 	typedef std::pair<typename PFP::REAL, Dart> DartDist;
 	std::vector<DartDist> distndart;
 
 	unsigned int nbi = vecFaces.size();
 	distndart.resize(nbi);
-	for (unsigned int i=0; i< nbi; ++i)
+	for (unsigned int i = 0; i < nbi; ++i)
 	{
 		distndart[i].second = vecFaces[i];
 		typename PFP::VEC3 V = iPoints[i] - rayA;
-		distndart[i].first = V*V;
+		distndart[i].first = V.norm2();
 	}
 
 	// sort the vector of pair dist/dart
 	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
 
 	// store sorted darts in returned vector
-	for (unsigned int i=0; i< nbi; ++i)
+	for (unsigned int i = 0; i < nbi; ++i)
 		vecFaces[i] = distndart[i].second;
 }
 
@@ -83,13 +84,13 @@ void facesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
  * @param vecEdges (out) vector to store dart of intersected edges
- * @param dist radius of cylinder modelling the edge
+ * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
 void edgesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist)
 {
-	typename PFP::REAL dist2 = dist*dist;
-	typename PFP::REAL AB2 =rayAB*rayAB;
+	typename PFP::REAL dist2 = dist * dist;
+	typename PFP::REAL AB2 = rayAB * rayAB;
 
 	// recuperation des aretes intersectees
 	vecEdges.clear();
@@ -102,22 +103,22 @@ void edgesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
 	unsigned int nbi = vecEdges.size();
 	distndart.resize(nbi);
 
-	// compute all distances to observer for each dart of middle of edge
+	// compute all distances to observer for each middle of intersected edge
 	// and put them in a vector for sorting
 	for (unsigned int i = 0; i < nbi; ++i)
 	{
 		Dart d = vecEdges[i];
 		distndart[i].second = d;
-		typename PFP::VEC3 V = (position[d] + position[map.phi1(d)])/2.0;
+		typename PFP::VEC3 V = (position[d] + position[map.phi1(d)]) / typename PFP::REAL(2);
 		V -= rayA;
-		distndart[i].first = V*V;
+		distndart[i].first = V.norm2();
 	}
 
 	// sort the vector of pair dist/dart
 	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
 
 	// store sorted darts in returned vector
-	for (unsigned int i=0; i< nbi; ++i)
+	for (unsigned int i = 0; i < nbi; ++i)
 		vecEdges[i] = distndart[i].second;
 }
 
@@ -126,14 +127,15 @@ void edgesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
  * @param map the map we want to test
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param vecEdges (out) vector to store dart of intersected vertices
- * @param dist radius of sphere modelling the vertex
+ * @param vecVertices (out) vector to store dart of intersected vertices
+ * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
 void verticesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good= SelectorTrue())
 {
-	typename PFP::REAL dist2 = dist*dist;
-	typename PFP::REAL AB2 = rayAB*rayAB;
+	typename PFP::REAL dist2 = dist * dist;
+	typename PFP::REAL AB2 = rayAB * rayAB;
+
 	// recuperation des sommets intersectes
 	vecVertices.clear();
 	Algo::Selection::FuncVertexInter<PFP> ffi(map, position, vecVertices, rayA, rayAB, AB2, dist2);
@@ -145,21 +147,21 @@ void verticesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 	unsigned int nbi = vecVertices.size();
 	distndart.resize(nbi);
 
-	// compute all distances to observer for each dart of middle of edge
+	// compute all distances to observer for each intersected vertex
 	// and put them in a vector for sorting
 	for (unsigned int i = 0; i < nbi; ++i)
 	{
 		Dart d = vecVertices[i];
 		distndart[i].second = d;
 		typename PFP::VEC3 V = position[d] - rayA;
-		distndart[i].first = V*V;
+		distndart[i].first = V.norm2();
 	}
 
 	// sort the vector of pair dist/dart
 	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
 
 	// store sorted darts in returned vector
-	for (unsigned int i=0; i< nbi; ++i)
+	for (unsigned int i = 0; i < nbi; ++i)
 		vecVertices[i] = distndart[i].second;
 }
 
@@ -168,16 +170,18 @@ void verticesRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& pos
  * @param map the map we want to test
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
- * @param vertex (out) dart of selected vertex (set to map.end() if no vertex selected)
+ * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
  */
 template<typename PFP>
 void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = SelectorTrue())
 {
+	std::vector<Dart> vecFaces;
+	std::vector<typename PFP::VEC3> iPoints;
+
 	// recuperation des faces intersectes
-	std::vector<Dart> vecFaces ;
-	std::vector<typename PFP::VEC3> iPoints ;
-	Algo::Selection::FuncFaceInter<PFP> ffi(map, position, vecFaces, iPoints, rayA, rayAB) ;
-	map.foreach_orbit(FACE, ffi, good) ;
+	Algo::Selection::FuncFaceInter<PFP> ffi(map, position, vecFaces, iPoints, rayA, rayAB);
+	map.foreach_orbit(FACE, ffi, good);
+
 	if(vecFaces.size() > 0)
 	{
 		typedef std::pair<typename PFP::REAL, unsigned int> IndexedDist;
@@ -187,40 +191,41 @@ void vertexRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 		distnint.resize(nbi);
 		for (unsigned int i = 0; i < nbi; ++i)
 		{
+			distnint[i].first = (iPoints[i] - rayA).norm2();
 			distnint[i].second = i;
-			typename PFP::VEC3 V = iPoints[i] - rayA;
-			distnint[i].first = V*V;
 		}
 
 		// sort the vector of pair dist/dart
 		std::sort(distnint.begin(), distnint.end(), distnintOrdering<PFP>);
 
-		// recuperation du poitns d'intersection sur la face la plus proche
+		// recuperation du point d'intersection sur la face la plus proche
 		unsigned int first = distnint[0].second;
-		typename PFP::VEC3 ip = iPoints[first] ;
+		typename PFP::VEC3 ip = iPoints[first];
+
 		// recuperation du sommet le plus proche du point d'intersection
-		Dart d = vecFaces[first] ;
-		Dart it = d ;
-		typename PFP::REAL minDist = 1e10 ; // ??
-		do
+		Dart d = vecFaces[first];
+		Dart it = d;
+		typename PFP::REAL minDist = (ip - position[it]).norm2();
+		vertex = it;
+		it = map.phi1(it);
+		while(it != d)
 		{
-			typename PFP::VEC3 vec = ip - position[it];
-			typename PFP::REAL dist = vec*vec ;
+			typename PFP::REAL dist = (ip - position[it]).norm2();
 			if(dist < minDist)
 			{
-				minDist = dist ;
-				vertex = it ;
+				minDist = dist;
+				vertex = it;
 			}
-			it = map.phi1(it) ;
-		} while(it != d) ;
+			it = map.phi1(it);
+		}
 	}
 	else
-		vertex = map.end() ;
+		vertex = NIL;
 }
 
 /**
- * Fonction that do the selection of darts, returned darts are sorted from closer to farther
- * Dart is here considered as a small triangle from vertex to middle distance to center
+ * Fonction that do the selection of darts, returned darts are sorted from closest to farthest
+ * Dart is here considered as a triangle formed by the 2 end vertices of the edge and the face centroid
  * @param map the map we want to test
  * @param rayA first point of  ray (user side)
  * @param rayAB vector of ray (directed ot the scene)
@@ -246,9 +251,9 @@ void dartsRaySelection(typename PFP::MAP& map, const typename PFP::TVEC3& positi
 	{
 		Dart d = vecDarts[i];
 		distndart[i].second = d;
-		typename PFP::VEC3 V = (position[d] + position[map.phi1(d)])/2.0;
+		typename PFP::VEC3 V = (position[d] + position[map.phi1(d)]) / typename PFP::REAL(2);
 		V -= rayA;
-		distndart[i].first = V*V;
+		distndart[i].first = V.norm2();
 	}
 
 	// sort the vector of pair dist/dart

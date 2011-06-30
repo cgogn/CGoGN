@@ -67,11 +67,10 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(100);
 	visitedFaces.push_back(d);			// Start with the face of d
-	std::vector<Dart>::iterator face;
 
 	mark.markOrbit(VERTEX, d) ;
 
-	for(face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
 		Dart e = *face ;
 
@@ -89,7 +88,6 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 			e = map.phi1(e) ;
 		} while(e != *face) ;
 	}
-
 
 	center /= double(count) ;
 	return center ;

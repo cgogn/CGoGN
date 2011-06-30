@@ -166,6 +166,8 @@ void Viewer::cb_Open()
 {
 	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)") ;
 	std::string filename = selectFile("Open Mesh", "", filters) ;
+	if (filename.empty())
+		return ;
 
 	importMesh(filename) ;
 	updateGL() ;
@@ -186,7 +188,6 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
-	gPosObj = bb.center() ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
 	vertexBaseSize = normalBaseSize * 2.0f ;
 
@@ -198,7 +199,7 @@ void Viewer::importMesh(std::string& filename)
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
 
-	setParamObject(bb.maxSize(), gPosObj.data()) ;
+	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
 }
 

@@ -50,7 +50,7 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, OFF, OBJ, CTM, VRML };
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, PLYPTMgeneric, OFF, OBJ, CTM, VRML };
 	}
 
 	namespace ImportVolumique
@@ -110,10 +110,13 @@ public:
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importCTM(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
+	
+	bool mergeCloseVertices();
 
 	/**
 	 * @param container container of vertex orbite

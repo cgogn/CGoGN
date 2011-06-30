@@ -25,11 +25,6 @@
 #ifndef __SELECTOR_H__
 #define __SELECTOR_H__
 
-#include "Utils/qem.h"
-#include "Utils/quadricRGBfunctions.h"
-#include "Container/fakeAttribute.h"
-#include "Algo/Geometry/curvature.h"
-
 namespace CGoGN
 {
 
@@ -38,7 +33,6 @@ namespace Algo
 
 namespace Decimation
 {
-
 
 enum SelectorType
 {
@@ -53,10 +47,8 @@ enum SelectorType
 	S_hLightfield
 } ;
 
-
 template <typename PFP> class ApproximatorGen ;
 template <typename PFP, typename T> class Approximator ;
-
 
 template <typename PFP>
 class EdgeSelector
@@ -90,6 +82,5 @@ public:
 } // namespace Algo
 
 } // namespace CGoGN
-
 
 #endif

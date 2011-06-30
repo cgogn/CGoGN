@@ -38,6 +38,32 @@ namespace Render
 namespace SVG
 {
 
+
+template <typename PFP>
+void SVGOut::renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
+{
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	SvgPoints* points = new SvgPoints();
+	points->setColor(global_color);
+	points->setWidth(global_width);
+	DartMarker m(map, thread);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d) && good(d))
+		{
+			const Geom::Vec3f& P = position[d];
+			glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,viewport);
+			glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),viewport);
+			points->addVertex(Geom::Vec3f(Q[0],float(viewport[3])-Q[1],Q[2]));
+			m.markOrbit(VERTEX, d);
+		}
+	}
+	m_objs.push_back(points);
+}
+
+
 template <typename PFP>
 void SVGOut::renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
 {

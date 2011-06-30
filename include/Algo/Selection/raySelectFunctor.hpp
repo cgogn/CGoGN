@@ -44,13 +44,13 @@ class FuncFaceInter: public FunctorMap<typename PFP::MAP>
 {
 	typedef typename PFP::MAP MAP;
 	
-
 protected:
 	std::vector<Dart>& m_faces;
 	std::vector<typename PFP::VEC3>& m_Ipoints ;
 	const typename PFP::VEC3& m_A;
 	const typename PFP::VEC3& m_AB;
 	const typename PFP::TVEC3& m_positions;
+
 public:
 	/**
  	* @param map the map
@@ -64,7 +64,7 @@ public:
 
 	bool operator()(Dart d)
 	{
-		const typename PFP::VEC3& Ta = m_positions[d];//this->m_map.getVertexEmb(d)->getPosition();
+		const typename PFP::VEC3& Ta = m_positions[d];
 
 		Dart dd  = this->m_map.phi1(d);
 		Dart ddd = this->m_map.phi1(dd);
@@ -72,13 +72,13 @@ public:
 		do 
 		{
 			// get back position of triangle Ta,Tb,Tc
-			const typename PFP::VEC3& Tb = m_positions[dd]; //this->m_map.getVertexEmb(dd)->getPosition();
-			const typename PFP::VEC3& Tc = m_positions[ddd]; //this->m_map.getVertexEmb(ddd)->getPosition();
+			const typename PFP::VEC3& Tb = m_positions[dd];
+			const typename PFP::VEC3& Tc = m_positions[ddd];
 			typename PFP::VEC3 I;
 			if (Geom::intersectionLineTriangle<typename PFP::VEC3>(m_A, m_AB, Ta, Tb, Tc, I))
 			{
 				m_faces.push_back(d);
-				m_Ipoints.push_back(I) ;
+				m_Ipoints.push_back(I);
 				notfound = false;
 			}
 			// next triangle if we are in polygon
@@ -95,7 +95,6 @@ class FuncEdgeInter: public FunctorMap<typename PFP::MAP>
 {
 	typedef typename PFP::MAP MAP;
 	
-
 protected:
 	std::vector<Dart>& m_edges;
 	const typename PFP::VEC3& m_A;
@@ -103,6 +102,7 @@ protected:
 	float m_AB2;
 	float m_distMax;
 	const typename PFP::TVEC3& m_positions;
+
 public:
 	/**
  	* @param map the map
@@ -119,9 +119,9 @@ public:
 	bool operator()(Dart d)
 	{
 		// get back position of segment PQ
-		const typename PFP::VEC3& P = m_positions[d];//this->m_map.getVertexEmb(d)->getPosition();
+		const typename PFP::VEC3& P = m_positions[d];
 		Dart dd = this->m_map.phi1(d);
-		const typename PFP::VEC3& Q = m_positions[dd];//this->m_map.getVertexEmb(dd)->getPosition();
+		const typename PFP::VEC3& Q = m_positions[dd];
 		// the three distance to P, Q and (PQ) not used here
 		float dist = Geom::squaredDistanceLine2Seg(m_A, m_AB, m_AB2, P, Q);
 
@@ -161,7 +161,7 @@ public:
 
 	bool operator()(Dart d)
 	{
-		const typename PFP::VEC3& P = m_positions[d];//this->m_map.getVertexEmb(d)->getPosition();
+		const typename PFP::VEC3& P = m_positions[d];
 		float dist = Geom::squaredDistanceLine2Point(m_A, m_AB, m_AB2, P);
 		if (dist < m_distMax)
 		{
@@ -172,7 +172,7 @@ public:
 };
 
 /**
- * Fonctor which store the dart that correspond to the subpart of face
+ * Functor which store the dart that correspond to the subpart of face
  * that is intersected
  * Must be called in foreachface
  */
@@ -372,7 +372,6 @@ bool distnintOrdering(const std::pair<typename PFP::REAL, unsigned int>& e1, con
 {
 	return (e1.first < e2.first);
 }
-
 
 } //namespace Selection
 

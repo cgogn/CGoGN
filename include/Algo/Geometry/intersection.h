@@ -27,6 +27,7 @@
 
 #include "Geometry/basic.h"
 #include "Geometry/intersection.h"
+#include "Geometry/inclusion.h"
 
 namespace CGoGN
 {
@@ -49,12 +50,12 @@ namespace Geometry
  * @return true if segment intersects the face
  */
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3& PA, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter) ;
+bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter) ;
 
 /**
  * test the intersection between a segment and a n-sided face (n>=3)
  * (works with triangular faces but not optimized)
- * TODO to optimize -based on intersectionLineConvexFace- check whether the points are on both sides of the face before computing intersection
+ * TODO optimize - based on intersectionLineConvexFace - check whether the points are on both sides of the face before computing intersection
  * @param map the map
  * @param d a dart defining the n-sided face
  * @param PA segment point 1
@@ -63,7 +64,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
  * @return true if segment intersects the face
  */
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter) ;
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter) ;
 
 /**
  * test if two triangles intersect
@@ -73,13 +74,22 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typenam
  * @param a dart of the second triangle
  */
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const typename PFP::TVEC3& positions) ;
+bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const typename PFP::TVEC3& position) ;
 
-}
+/**
+ * alpha = coef d'interpolation dans [0 ,1] tel que v = (1-alpha)*pin + alpha*pout
+ * est le point d'intersection entre la sphère et le segment [pin, pout]
+ * avec pin = position[din] à l'intérieur de la sphère
+ * avec pout = position[dout] à l'extérieur de la sphère
+ */
+template <typename PFP>
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const typename PFP::TVEC3& position, typename PFP::REAL& alpha) ;
 
-}
+} // namespace Geometry
 
-}
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/Geometry/intersection.hpp"
 
