@@ -59,8 +59,8 @@ template<typename REAL>
 Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth) ;
 
 /**
- * Class for representing a direct local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
- * This class can compress/decompress a local frame, switching from its explicit representation (3 vectors) to its compressed representation (1 vector).
+ * Class for representing a direct right-handed local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
+ * This class can compress/decompress a local frame, switching from its explicit representation (3 vectors) to its compressed representation (1 vector composed of the Euler angles).
  * Usage :
  *  VEC3 T,B,N ;							// current set of orthonormal vectors composing the direct frame.
  *  LocalFrame<PFP> lf(T,B,N) ; 				// Constructor from explicit expression.
