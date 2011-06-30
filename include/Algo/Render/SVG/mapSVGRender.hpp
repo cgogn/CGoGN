@@ -47,7 +47,7 @@ void SVGOut::renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3
 
 	SvgPoints* points = new SvgPoints();
 	points->setColor(global_color);
-
+	points->setWidth(global_width);
 	DartMarker m(map, thread);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{

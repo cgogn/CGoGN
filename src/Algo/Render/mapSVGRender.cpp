@@ -90,13 +90,11 @@ void SvgPoints::save(std::ofstream& out)
 {
 	std::stringstream ss;
 
-	std::cout << "SAVE" << std::endl;
-
 	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
 	{
 		out << "<circle cx=\""<< (*it)[0];
 		out << "\" cy=\""<< (*it)[1];
-		out << "\" r=\""<< m_pointSize;
+		out << "\" r=\""<< m_width;
 		out << "\" style=\"stroke: none; fill: #";
 
 		out << std::hex;

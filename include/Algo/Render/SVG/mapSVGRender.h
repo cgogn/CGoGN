@@ -89,12 +89,8 @@ public:
 
 class SvgPoints: public SvgObj
 {
-protected:
-	float m_pointSize;
 public:
-	SvgPoints(): m_pointSize(4) {}
 	void save(std::ofstream& out);
-	void setPointSize(float ps) {m_pointSize=ps;}
 };
 
 
