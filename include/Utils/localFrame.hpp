@@ -36,43 +36,46 @@ LocalFrame<PFP>::LocalFrame(const VEC3& T, const VEC3& B, const VEC3& N)
 }
 
 template<typename PFP>
-LocalFrame<PFP>::LocalFrame(const VEC3& compressedFrame)
+LocalFrame<PFP>::LocalFrame(const VEC3& EulerAngles)
 {
 	const VEC3 T(Tx,Ty,Tz) ;
 	const VEC3 N(Nx,Ny,Nz) ;
 
 	// get known data
-	const REAL& theta1 = compressedFrame[0] ;
-	const REAL& phi = compressedFrame[1] ;
-	const REAL& theta2 = compressedFrame[2] ;
+	const REAL& alpha = EulerAngles[0] ;
+	const REAL& gamma = EulerAngles[1] ;
+	const REAL& beta = EulerAngles[2] ;
 
-	const VEC3 Tprime = rotate<REAL>(N,theta1,T) ;
-	m_N = rotate<REAL>(Tprime,phi,N) ;
-	m_T = rotate<REAL>(m_N,theta2,Tprime) ;
+	const VEC3 lineOfNodes = rotate<REAL>(N,alpha,T) ; // rotation around reference normal of vector T
+	m_N = rotate<REAL>(lineOfNodes,gamma,N) ; // rotation around line of nodes of vector N
+	m_T = rotate<REAL>(m_N,beta,lineOfNodes) ; // rotation around new normal of vector represented by line of nodes
 	m_B = m_N ^ m_T ;
 }
 
 template<typename PFP>
 typename Geom::Vector<3,typename PFP::REAL> LocalFrame<PFP>::getCompressed() const
 {
-	VEC3 res ;
+	VEC3 EulerAngles ;
 
 	const VEC3 T(Tx,Ty,Tz) ;
 	const VEC3 B(Bx,By,Bz) ;
 	const VEC3 N(Nx,Ny,Nz) ;
 
-	REAL& theta1 = res[0] ;
-	REAL& phi = res[1] ;
-	REAL& theta2 = res[2] ;
+	REAL& alpha = EulerAngles[0] ;
+	REAL& gamma = EulerAngles[1] ;
+	REAL& beta = EulerAngles[2] ;
 
-	VEC3 Tprime = N ^ m_N ;
-	Tprime.normalize() ;
+	VEC3 lineOfNodes = N ^ m_N ;
+	lineOfNodes.normalize() ;
 
-	theta1 = (B*Tprime > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), T*Tprime ),REAL(-1.0))) ;
-	phi = std::acos(std::max(std::min(REAL(1.0), N*m_N ),REAL(-1.0))) ; // phi1 is always positive because the direction of vector Tp=N^N1 (around which a rotation of angle phi is done later on) changes depending on the side on which they lay w.r.t eachother.
-	theta2 = (m_B*Tprime > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), m_T*Tprime ),REAL(-1.0))) ;
+	// angle between reference T and line of nodes
+	alpha = (B*lineOfNodes > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), T*lineOfNodes ),REAL(-1.0))) ;
+	// angle between line of nodes and T
+	gamma = std::acos(std::max(std::min(REAL(1.0), N*m_N ),REAL(-1.0))) ; // beta is always positive because the direction of vector lineOfNodes=(reference normal)^(normal) (around which a rotation of angle beta is done later on) changes depending on the side on which they lay w.r.t eachother.
+	// angle between reference normal and normal
+	beta = (m_B*lineOfNodes > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), m_T*lineOfNodes ),REAL(-1.0))) ;
 
-	return res ;
+	return EulerAngles ;
 }
 
 template<typename PFP>
