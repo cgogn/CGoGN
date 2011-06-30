@@ -153,7 +153,7 @@ public:
 	void renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
 
 	template <typename PFP>
-	void renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
+	void renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, bool cull = false, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
 
 	template <typename PFP>
 	void renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
