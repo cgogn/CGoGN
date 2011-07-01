@@ -41,22 +41,22 @@ template <typename REAL>
 Geom::Vector<3,REAL> rotate (Geom::Vector<3,REAL> axis, REAL angle, Geom::Vector<3,REAL> p) ;
 
 /**
- * Util for conversion from spherical to carthesian coordinates.
+ * Util for conversion from spherical to cartesian coordinates.
  * The spherical coordinates are in radius-longitude-latitude
  * @param sph the spherical coordinates
- * @return the carthesian coordinates
+ * @return the cartesian coordinates
  */
 template<typename REAL>
-Geom::Vector<3,REAL> sphericalToCarth (const Geom::Vector<3,REAL>& sph) ;
+Geom::Vector<3,REAL> sphericalTocart (const Geom::Vector<3,REAL>& sph) ;
 
 /**
- * Util for conversion from carthesian to spherical coordinates.
+ * Util for conversion from cartesian to spherical coordinates.
  * The spherical coordinates are in radius-longitude-latitude
- * @param carth the carthesian coordinates
+ * @param cart the cartesian coordinates
  * @return the spherical coordinates
  */
 template<typename REAL>
-Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth) ;
+Geom::Vector<3,REAL> cartToSpherical (const Geom::Vector<3,REAL>& cart) ;
 
 /**
  * Class for representing a direct right-handed local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
@@ -180,7 +180,8 @@ public: // methods
 private : // private constants
 	// (T,B,N) can be any orthonormal direct frame
 	// zeros are not recommended since they can
-	// generate zero vectors after a dot product
+	// easily generate zero vectors after a dot product
+	// UPDATE : this problem should be handled in compression
 //	static const REAL Tx = 0.267261 ;
 //	static const REAL Ty = 0.534522 ;
 //	static const REAL Tz = 0.801784 ;

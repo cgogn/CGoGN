@@ -43,8 +43,8 @@ LocalFrame<PFP>::LocalFrame(const VEC3& EulerAngles)
 
 	// get known data
 	const REAL& alpha = EulerAngles[0] ;
-	const REAL& gamma = EulerAngles[1] ;
-	const REAL& beta = EulerAngles[2] ;
+	const REAL& beta = EulerAngles[1] ;
+	const REAL& gamma = EulerAngles[2] ;
 
 	const VEC3 lineOfNodes = rotate<REAL>(N,alpha,T) ; // rotation around reference normal of vector T
 	m_N = rotate<REAL>(lineOfNodes,gamma,N) ; // rotation around line of nodes of vector N
@@ -62,17 +62,26 @@ typename Geom::Vector<3,typename PFP::REAL> LocalFrame<PFP>::getCompressed() con
 	const VEC3 N(Nx,Ny,Nz) ;
 
 	REAL& alpha = EulerAngles[0] ;
-	REAL& gamma = EulerAngles[1] ;
-	REAL& beta = EulerAngles[2] ;
+	REAL& beta = EulerAngles[1] ;
+	REAL& gamma = EulerAngles[2] ;
 
 	VEC3 lineOfNodes = N ^ m_N ;
-	lineOfNodes.normalize() ;
+	if (lineOfNodes.norm2() < 1e-5) // if N ~= m_N
+	{
+		lineOfNodes = T ; // = reference T
+		alpha = 0 ;
+		gamma = 0 ;
+	}
+	else
+	{
+		lineOfNodes.normalize() ;
 
-	// angle between reference T and line of nodes
-	alpha = (B*lineOfNodes > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), T*lineOfNodes ),REAL(-1.0))) ;
+		// angle between reference T and line of nodes
+		alpha = (B*lineOfNodes > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), T*lineOfNodes ),REAL(-1.0))) ;
+		// angle between reference normal and normal
+		gamma = std::acos(std::max(std::min(REAL(1.0), N*m_N ),REAL(-1.0))) ; // gamma is always positive because the direction of vector lineOfNodes=(reference normal)^(normal) (around which a rotation of angle beta is done later on) changes depending on the side on which they lay w.r.t eachother.
+	}
 	// angle between line of nodes and T
-	gamma = std::acos(std::max(std::min(REAL(1.0), N*m_N ),REAL(-1.0))) ; // beta is always positive because the direction of vector lineOfNodes=(reference normal)^(normal) (around which a rotation of angle beta is done later on) changes depending on the side on which they lay w.r.t eachother.
-	// angle between reference normal and normal
 	beta = (m_B*lineOfNodes > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), m_T*lineOfNodes ),REAL(-1.0))) ;
 
 	return EulerAngles ;
