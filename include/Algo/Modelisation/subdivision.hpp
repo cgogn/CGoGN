@@ -642,11 +642,6 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 	}
 }
 
-template <typename PFP, typename EMBV, typename EMB>
-void quadranguleFacesVolume(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
-{
-
-}
 
 template <typename PFP, typename EMBV, typename EMB>
 void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
@@ -826,82 +821,77 @@ void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
 //	}
 }
 
-template <typename PFP, typename EMBV, typename EMB>
-void dooSabinVolume(typename PFP::MAP& map, Dart d, EMBV& attributs)
+
+template <typename PFP>
+void splitVolumes(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
-	DartMarker mf(map) ; //mark face
-	DartMarker me(map) ; //mark edge
-
-	DartMarkerStore mark(map);		// Lock a marker
-
-	//Store faces that are traversed and start with the face of d
-	std::vector<Dart> visitedFaces;
-	visitedFaces.reserve(100);
-	visitedFaces.push_back(d);
-	std::vector<Dart>::iterator face;
-
-	//Store a dart from a each face
-	std::vector<Dart> faces;
-	faces.reserve(100);
-
-	// First pass : for every face added to the list save a dart
-	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	//Cut the edges
+	DartMarker me(map, EDGE);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (!mark.isMarked(*face))		// Face has not been visited yet
+		if(!me.isMarked(d))
 		{
+			// Cut the edge
+			Dart dd = map.phi2(d) ;
+			typename PFP::VEC3 p1 = position[d] ;
+			typename PFP::VEC3 p2 = position[map.phi1(d)] ;
+			map.cutEdge(d) ;
 
-			faces.push_back(*face);
+			position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
 
-			Dart dNext = *face ;
-			do
-			{
-				mark.mark(dNext);					// Mark
-				Dart adj = map.phi2(dNext);				// Get adjacent face
-				if (adj != dNext && !mark.isMarked(adj))
-					visitedFaces.push_back(adj);	// Add it
-				dNext = map.phi1(dNext);
-			} while(dNext != *face);
+			me.markOrbit(EDGE, d);
+			me.markOrbit(EDGE, map.phi1(d));
 		}
 	}
 
-	// Second pass : for every edges insert a face
-	for(face = faces.begin() ; face != faces.end() ; ++face)
+	DartMarker mf(map, FACE);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		Dart e = *face;
-		do
+		if(!mf.isMarked(d))
 		{
-			if(!me.isMarked(e))
-			{
-				//insertion d'une face dans l'arete
-				Dart e2 = map.phi2(e);
-				map.unsewFaces(e);
-				Dart ne = map.newOrientedFace(4);
 
-				map.sewFaces(e,ne);
-				map.sewFaces(e2, map.phi1(map.phi1(ne)));
 
-				//marquage de l'orbite arete
-				me.markOrbit(EDGE,e);
-			}
-
-			e = map.phi1(e);
-		}while (e != *face);
+			mf.markOrbit(FACE, d);
+		}
 	}
 
-//	Dart f = map.phi1(d);
-//	map.cutEdge(d);
-//	Dart e = map.phi1(d);
-//	attributs[e] = attributs[d];
-//	attributs[e] += attributs[f];
-//	attributs[e] *= 0.5;
+
+//	//and split the faces
 //
-//	Dart dPrev = d;
-//	Dart ePrev = map.phi2(d);
-//	map.splitFace(dPrev,ePrev);
+//	//Insert the middleFaces
 //
-//	attributs[map.phi_1(d)] = attributs[map.phi1(ePrev)];
+//	// first cut the edges (if they are not already)
+//	Dart t = d;
+//	do
+//	{
+//		if(!map.edgeIsSubdivided(map.phi1(map.phi2(t))))
+//			Algo::IHM::subdivideEdge<PFP>(map, map.phi1(map.phi2(t)), position) ;
+//		t = map.phi1(t);
+//	}
+//	while(t != d);
+//
+//	Dart neighboordVolume = map.phi1(map.phi1(map.phi2(d)));
+//
+//	//Split the faces and open the midlle
+//	do
+//	{
+//		Dart t2 = map.phi2(t);
+//
+//		Dart face2 = map.phi1(map.phi1(t2));
+//		map.splitFace(map.phi_1(t2), face2);
+//		map.unsewFaces(map.phi1(map.phi1(t2)));
+//
+//		t = map.phi1(t);
+//	}
+//	while(t != d);
+//
+//
+//	map.closeHole(map.phi1(map.phi1(map.phi2(d))));
+//	map.closeHole(map.phi_1(neighboordVolume));
+//	map.sewVolumes(map.phi2(map.phi1(map.phi1(map.phi2(d)))), map.phi2(map.phi_1(neighboordVolume)));
 
 }
+
 
 } // namespace Modelisation
 

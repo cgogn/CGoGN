@@ -1148,6 +1148,7 @@ bool Map3::check()
 {
     CGoGNout << "Check: topology begin" << CGoGNendl;
     DartMarker m(*this);
+    m.unmarkAll();
     for(Dart d = this->begin(); d != this->end(); this->next(d))
     {
         Dart d3 = phi3(d);

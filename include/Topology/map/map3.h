@@ -308,7 +308,7 @@ public:
 	* @param f the functor
 	* @param s the selector
 	*/
-	bool foreach_connex_volume(Dart d, int degree, FunctorType& f, FunctorSelect& s, unsigned int thread=0);
+	 bool foreach_connex_volume(Dart d, int degree, FunctorType& f, FunctorSelect& s, unsigned int thread=0);
 	//@}
 
 //	template<typename TMAP>
@@ -345,7 +345,7 @@ public:
 	//@{
 	// TODO devrait disparaitre
 	// pour les mêmes raisons que dans map2
-	bool check();
+	virtual bool check();
 	//@}
 };
 
