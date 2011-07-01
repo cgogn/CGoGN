@@ -138,7 +138,7 @@ public:
 	unsigned int insert(const T& elt) ;
 
 	/**
-	 * insert un element with default value (warning we add here a complete line in container)
+	 * insert an element with default value (warning we add here a complete line in container)
 	 */
 	unsigned int newElt() ;
 

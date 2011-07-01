@@ -22,91 +22,61 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
-
-#include "Topology/generic/genericmap.h"
-
 namespace CGoGN
 {
 
-/**
-* Class of 3-dimensional maps
-* with lazily managed embeddings
-*/
-template <typename MAP3>
-class EmbeddedMap3 : public MAP3
+namespace Algo
 {
-public:
 
+namespace BooleanOperator
+{
 
-	//!
-	/*!
-	 *
-	 */
-	virtual void sewVolumes(Dart d, Dart e);
+template <typename PFP>
+void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e)
+{
+	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
+	Dart dd;
+	do
+	{
+		dd = map.alpha1(d);
+		map.removeEdgeFromVertex(dd);
+		Dart ee = e;
+		do
+		{
+			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
+					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.alpha1(ee))])==Geom::RIGHT)
+			{
+				break;
+			}
+			ee = map.alpha1(ee);
+		} while(ee != e);
+		map.insertEdgeInVertex(ee,dd);
+	} while(dd!=d);
+}
 
-	//!
-	/*!
-	 *
-	 */
-	virtual void unsewVolumes(Dart d);
+template <typename PFP>
+void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions)
+{
+	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		CellMarker vM(map,VERTEX);
+		vM.mark(d);
+		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
+		{
+			if(!vM.isMarked(dd))
+			{
+				vM.mark(dd);
+				if(Geom::arePointsEquals(positions[d],positions[dd]))
+				{
+					mergeVertex<PFP>(map,positions,d,dd);
+				}
+			}
+		}
+	}
+}
 
-	//!
-	/*!
-	 *
-	 */
-	virtual bool mergeVolumes(Dart d);
+}
 
-	//! Split a face inserting an edge between two vertices
-	/*! \pre Dart d and e should belong to the same face and be distinct
-	 *  @param d dart of first vertex
-	 *  @param e dart of second vertex
-	 *  @return the dart of the new edge lying in the vertex of d after the cut
-	 */
-	virtual void splitFace(Dart d, Dart e);
+}
 
-	//! Cut the edge of d
-	/*! @param d a dart of the edge to cut
-	 */
-	virtual void cutEdge(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart cutSpike(Dart d);
-
-
-	//! Collapse an edge (that is deleted) possibly merging its vertices
-	/*! If delDegenerateFaces is true, the method checks that no degenerate
-	 *  faces are build (faces with less than 3 edges). If it occurs the faces
-	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
-	 *  \warning This may produce two distinct vertices if the edge
-	 *  was the only link between two border faces
-	 *  @param d a dart in the deleted edge
-	 *  @param delDegenerateFaces a boolean (default to true)
-	 */
-	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true,
-			bool delDegenerateVolumes = true);
-	//!
-	/*!
-	 *
-	 */
-	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
-			bool delDegenerateVolumes = true);
-
-
-	virtual unsigned int closeHole(Dart d);
-
-	virtual void closeMap(DartMarker &marker);
-
-
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
-
-#include "embeddedMap3.hpp"
-
-#endif
+}
