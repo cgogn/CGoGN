@@ -41,8 +41,8 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 		unsigned int vEmb1 = EMBNULL ;
 		Dart dd = d ;
 		do {
-			vEmb1 = MAP3::getEmbedding(VERTEX, d);
-			MAP3::embedOrbit(VERTEX, d, vEmb1) ;
+			vEmb1 = MAP3::getEmbedding(VERTEX, dd);
+			MAP3::embedOrbit(VERTEX, dd, vEmb1) ;
 			dd = MAP3::phi1(dd) ;
 		} while(dd != d) ;
 	}
@@ -328,9 +328,12 @@ bool EmbeddedMap3<MAP3>::check()
 				return false ;
 			}
 
-			 if(MAP3::phi3(d) != d && MAP3::getEmbedding(VERTEX, d) != MAP3::getEmbedding(VERTEX, MAP3::phi3(MAP3::phi2(d))))
+			 if(MAP3::phi3(d) != d && MAP3::getEmbedding(VERTEX, d) != MAP3::getEmbedding(VERTEX, MAP3::phi1(MAP3::phi3(d))))
 			 {
 					CGoGNout << "Check: different embeddings on vertex in the 2 oriented faces" << CGoGNendl ;
+					std::cout << "Dart #" << d << std::endl;
+					std::cout << "Emb(d) = " << MAP3::getEmbedding(VERTEX, d) << std::endl;
+					std::cout << "Emb(phi32(d)) = " << MAP3::getEmbedding(VERTEX, MAP3::phi3(MAP3::phi2(d))) << std::endl;
 					return false ;
 			 }
 
