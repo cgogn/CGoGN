@@ -42,7 +42,7 @@ class ShaderMutator
 public:
 
 	/**
-	 * enums used to choose which shader src to modify
+	 * enums used to choose which shader src type to modify
 	 */
 	enum shaderSrcType { VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER };
 

@@ -87,6 +87,8 @@ public:
 	Algo::Render::GL2::MapRender* m_render;
 	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
 
+	Geom::BoundingBox<PFP::VEC3> m_bb;
+
 	Utils::VBO* m_positionVBO;
 
 	Utils::ShaderSimpleColor* m_shader;
@@ -127,7 +129,9 @@ public slots:
 
 	void slot_comboBox_PlaneIndexChanged(int newIndex);
 
-	void slot_doubleSpinBox_Plane(double c);
+	void slot_doubleSpinBox_PlaneVec1(double c);
+	void slot_doubleSpinBox_PlaneVec2(double c);
+	void slot_doubleSpinBox_PlaneOrigin(double c);
 
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
 

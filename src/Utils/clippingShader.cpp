@@ -32,105 +32,205 @@ namespace Utils
 
 ClippingShader::ClippingShader()
 {
-	// Initialize clipping planes variables
-	m_unif_clipPlanes = 0;
-	/*m_clipPlaneQuaternion[0] = 1.0;
-	m_clipPlaneQuaternion[1] = 0.0;
-	m_clipPlaneQuaternion[2] = 0.0;
-	m_clipPlaneQuaternion[3] = 0.0;*/
+	// Initialize clipping planes variables (planes equations table has zero size by default)
+	m_unif_clipPlanesEquations = 0;
 	
 	// Initialize color attenuation variables
 	m_colorAttenuationFactor = 0.0;
 	m_unif_colorAttenuationFactor = 0;
 
-	// Plane Drawer
-	float planeSize = 100.0;
-	m_planeDrawer = new Drawer();
-	m_planeDrawer->newList(GL_COMPILE);
-	m_planeDrawer->begin(GL_QUADS);
-	m_planeDrawer->color3f(0.7, 0.7, 0.2);
-	m_planeDrawer->vertex3f(-planeSize/2.0, -planeSize/2.0, 0.0);
-	m_planeDrawer->vertex3f(-planeSize/2.0, planeSize/2.0, 0.0);
-	m_planeDrawer->vertex3f(planeSize/2.0, planeSize/2.0, 0.0);
-	m_planeDrawer->vertex3f(planeSize/2.0, -planeSize/2.0, 0.0);
-	m_planeDrawer->end();
-	m_planeDrawer->endList();
+	// Initialize display variables
+	m_planeDisplaySize = 10.0;
 }
 
 ClippingShader::~ClippingShader()
 {
-	delete m_planeDrawer;
+	// Destroy remaining clip planes drawers
+	size_t i;
+	for (i = 0; i < m_clipPlanesDrawers.size(); i++)
+		delete m_clipPlanesDrawers[i];
 }
 
-void ClippingShader::setClippingPlaneEquation(Geom::Vec4f clipPlane, int planeIndex)
+void ClippingShader::setClippingPlane(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex)
 {
 	// Check if the given index is not out of range
-	if ((planeIndex < 0) || ((4*planeIndex) > ((int)m_clipPlanesEquations.size() - 1)))
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::setClippingPlaneEquation"
+		<< "ClippingShader::setClippingPlane"
 		<< " - Given plane index is out of range"
 		<< CGoGNendl;
 		return;
 	}
 
-	// Copy the given clipPlane
-	int i;
-	for (i = 0; i < 4; i++)
-		m_clipPlanesEquations[4*planeIndex + i] = clipPlane[i];
+	// Copy the given clipping plane parameters
+	m_clipPlanes[planeIndex].firstVec = vec1;
+	m_clipPlanes[planeIndex].firstVec.normalize();
+	m_clipPlanes[planeIndex].secondVec = vec2;
+	m_clipPlanes[planeIndex].secondVec.normalize();
+	m_clipPlanes[planeIndex].origin = origin;
 
-	// Recalculate quaternion rotation
-	/*float m[4][4];
-	build_rotmatrix(m, m_clipPlaneQuaternion);
-	Geom::Matrix44f rotMat;
-	int i, j;
-	for (i = 0; i < 4; i++)
-		for (j = 0; j < 4; j++)
-			rotMat(i, j) = m[i][j];
-	Geom::Vec4f rotatedVec = rotMat * m_clipPlaneEquation;*/
+	// Update the planes equations array
+	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
+	float d = -(planeNormal * m_clipPlanes[planeIndex].origin);
+	m_clipPlanesEquations[4*planeIndex + 0] = planeNormal[0];
+	m_clipPlanesEquations[4*planeIndex + 1] = planeNormal[1];
+	m_clipPlanesEquations[4*planeIndex + 2] = planeNormal[2];
+	m_clipPlanesEquations[4*planeIndex + 3] = d;
 
 	// Send again the whole planes equations array to shader
 	sendClippingPlanesUniform();
+
+	// Update plane VBO
+	updateClippingPlaneVBO(planeIndex);
 }
 
-Geom::Vec4f ClippingShader::getClippingPlaneEquation(int planeIndex)
+void ClippingShader::setClippingPlaneFirstVec(Geom::Vec3f vec1, int planeIndex)
 {
 	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (4*planeIndex > ((int)m_clipPlanesEquations.size() - 1)))
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ClippingShader::getClippingPlaneEquation"
+		<< "ClippingShader::setClippingPlane"
 		<< " - Given plane index is out of range"
 		<< CGoGNendl;
-		return Geom::Vec4f(0.0, 0.0, 0.0, 0.0);
+		return;
 	}
-	else
+
+	// Copy the given clipping plane parameter
+	m_clipPlanes[planeIndex].firstVec = vec1;
+	m_clipPlanes[planeIndex].firstVec.normalize();
+
+	// Update the planes equations array
+	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
+	float d = -(planeNormal * m_clipPlanes[planeIndex].origin);
+	m_clipPlanesEquations[4*planeIndex + 0] = planeNormal[0];
+	m_clipPlanesEquations[4*planeIndex + 1] = planeNormal[1];
+	m_clipPlanesEquations[4*planeIndex + 2] = planeNormal[2];
+	m_clipPlanesEquations[4*planeIndex + 3] = d;
+
+	// Send again the whole planes equations array to shader
+	sendClippingPlanesUniform();
+
+	// Update plane VBO
+	updateClippingPlaneVBO(planeIndex);
+}
+
+void ClippingShader::setClippingPlaneSecondVec(Geom::Vec3f vec2, int planeIndex)
+{
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
 	{
-		return Geom::Vec4f(
-				m_clipPlanesEquations[4*planeIndex + 0],
-				m_clipPlanesEquations[4*planeIndex + 1],
-				m_clipPlanesEquations[4*planeIndex + 2],
-				m_clipPlanesEquations[4*planeIndex + 3]);
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlane"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return;
 	}
+
+	// Copy the given clipping plane parameter
+	m_clipPlanes[planeIndex].secondVec = vec2;
+	m_clipPlanes[planeIndex].secondVec.normalize();
+
+	// Update the planes equations array
+	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
+	float d = -(planeNormal * m_clipPlanes[planeIndex].origin);
+	m_clipPlanesEquations[4*planeIndex + 0] = planeNormal[0];
+	m_clipPlanesEquations[4*planeIndex + 1] = planeNormal[1];
+	m_clipPlanesEquations[4*planeIndex + 2] = planeNormal[2];
+	m_clipPlanesEquations[4*planeIndex + 3] = d;
+
+	// Send again the whole planes equations array to shader
+	sendClippingPlanesUniform();
+
+	// Update plane VBO
+	updateClippingPlaneVBO(planeIndex);
 }
 
-/*void ClippingShader::setClippingPlaneQuaternion(float quat[4])
+void ClippingShader::setClippingPlaneOrigin(Geom::Vec3f origin, int planeIndex)
 {
-	m_clipPlaneQuaternion[0] = quat[0];
-	m_clipPlaneQuaternion[1] = quat[1];
-	m_clipPlaneQuaternion[2] = quat[2];
-	m_clipPlaneQuaternion[3] = quat[3];
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlane"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return;
+	}
 
-	// Recalculate and send again the clipping plane equation
-	setClippingPlaneEquation(m_clipPlaneEquation);
+	// Copy the given clipping plane parameter
+	m_clipPlanes[planeIndex].origin = origin;
+
+	// Update the planes equations array
+	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
+	float d = -(planeNormal * m_clipPlanes[planeIndex].origin);
+	m_clipPlanesEquations[4*planeIndex + 0] = planeNormal[0];
+	m_clipPlanesEquations[4*planeIndex + 1] = planeNormal[1];
+	m_clipPlanesEquations[4*planeIndex + 2] = planeNormal[2];
+	m_clipPlanesEquations[4*planeIndex + 3] = d;
+
+	// Send again the whole planes equations array to shader
+	sendClippingPlanesUniform();
+
+	// Update plane VBO
+	updateClippingPlaneVBO(planeIndex);
 }
 
-Geom::Vec4f ClippingShader::getClippingPlaneQuaternion()
+Geom::Vec3f ClippingShader::getClippingPlaneFirstVec(int planeIndex)
 {
-	return Geom::Vec4f (m_clipPlaneQuaternion[0], m_clipPlaneQuaternion[1], m_clipPlaneQuaternion[2], m_clipPlaneQuaternion[3]);
-}*/
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlane"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	}
+
+	// Return the parameter
+	return m_clipPlanes[planeIndex].firstVec;
+}
+
+Geom::Vec3f ClippingShader::getClippingPlaneSecondVec(int planeIndex)
+{
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlane"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	}
+
+	// Return the parameter
+	return m_clipPlanes[planeIndex].secondVec;
+}
+
+Geom::Vec3f ClippingShader::getClippingPlaneOrigin(int planeIndex)
+{
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::setClippingPlane"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	}
+
+	// Return the parameter
+	return m_clipPlanes[planeIndex].origin;
+}
 
 void ClippingShader::setClippingColorAttenuationFactor(float colorAttenuationFactor)
 {
@@ -141,12 +241,7 @@ void ClippingShader::setClippingColorAttenuationFactor(float colorAttenuationFac
 	sendColorAttenuationFactorUniform();
 }
 
-float ClippingShader::getClippingColorAttenuationFactor()
-{
-	return m_colorAttenuationFactor;
-}
-
-void ClippingShader::setPlaneClipping(int planesCount)
+void ClippingShader::setClippingPlanesCount(int planesCount)
 {
 	// Verify that the given clipping planes count is valid
 	if (planesCount < 0)
@@ -154,7 +249,7 @@ void ClippingShader::setPlaneClipping(int planesCount)
 		CGoGNerr
 		<< "ERROR - "
 		<< "ClippingShader::setPlanesClipping"
-		<< " - Given clipping planes count given is not positive !"
+		<< " - Given clipping planes count is not positive !"
 		<< CGoGNendl;
 		return;
 	}
@@ -331,8 +426,38 @@ void ClippingShader::setPlaneClipping(int planesCount)
 		reloadFragmentShaderFromMemory(originalFragShaderSrc.c_str());
 	}
 
-	// Resize the planes equations uniform to the right size
+	// Resize the planes array to the right size
+	m_clipPlanes.resize((size_t)planesCount);
+
+	// Resize the planes equations array to the right size
 	m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
+
+	// Resize the planes drawers array to the right size, and create/destroy objects
+	if (planesCount > previousPlanesCount)
+	{
+		m_clipPlanesDrawers.resize((size_t)planesCount, NULL);
+		int i;
+		for (i = previousPlanesCount; i < planesCount; i++)
+			m_clipPlanesDrawers[i] = new Drawer;
+	}
+	else
+	{
+		int i;
+		for (i = planesCount; i < previousPlanesCount; i++)
+			delete m_clipPlanesDrawers[i];
+	}
+
+	// Set default parameters values for new planes
+	if (planesCount > previousPlanesCount)
+	{
+		Geom::Vec3f defaultFirstVec (1.0, 0.0, 0.0);
+		Geom::Vec3f defaultSecondVec (0.0, 1.0, 0.0);
+		Geom::Vec3f defaultOrigin (0.0, 0.0, 0.0);
+
+		int i;
+		for (i = previousPlanesCount; i < planesCount; i++)
+			setClippingPlane(defaultFirstVec, defaultSecondVec, defaultOrigin, i);
+	}
 
 	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();
@@ -348,8 +473,8 @@ void ClippingShader::updateClippingUniforms()
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
 
 	// Get uniforms locations
-	m_unif_clipPlanes = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
-	if (m_unif_clipPlanes == -1)
+	m_unif_clipPlanesEquations = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
+	if (m_unif_clipPlanesEquations == -1)
 	{
 		CGoGNerr
 		<< "ERROR - "
@@ -374,10 +499,17 @@ void ClippingShader::updateClippingUniforms()
 	sendColorAttenuationFactorUniform();
 }
 
+void ClippingShader::displayClippingPlanes()
+{
+	size_t i;
+	for (i = 0; i < m_clipPlanesDrawers.size(); i++)
+		m_clipPlanesDrawers[i]->callList();
+}
+
 void ClippingShader::sendClippingPlanesUniform()
 {
 	bind();
-	glUniform4fv(m_unif_clipPlanes, m_clipPlanesEquations.size()/4, &m_clipPlanesEquations.front());
+	glUniform4fv(m_unif_clipPlanesEquations, getClippingPlanesCount(), &m_clipPlanesEquations.front());
 }
 
 void ClippingShader::sendColorAttenuationFactorUniform()
@@ -386,9 +518,43 @@ void ClippingShader::sendColorAttenuationFactorUniform()
 	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
 }
 
-void ClippingShader::displayClippingPlane()
+void ClippingShader::updateClippingPlaneVBO(int planeIndex)
 {
-	m_planeDrawer->callList();
+	// Check if the given index is not out of range
+	if ((planeIndex < 0) || (planeIndex > (getClippingPlanesCount() - 1)))
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::updateClippingPlaneVBO"
+		<< " - Given plane index is out of range"
+		<< CGoGNendl;
+		return;
+	}
+
+	// Compute four point of the plane at equal distance from plane origin
+	Geom::Vec3f p1 = m_clipPlanes[planeIndex].origin
+			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+	Geom::Vec3f p2 = m_clipPlanes[planeIndex].origin
+			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+	Geom::Vec3f p3 = m_clipPlanes[planeIndex].origin
+			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+	Geom::Vec3f p4 = m_clipPlanes[planeIndex].origin
+			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+
+	// Reset the VBO with the new points
+	m_clipPlanesDrawers[planeIndex]->newList(GL_COMPILE);
+	m_clipPlanesDrawers[planeIndex]->begin(GL_LINE_LOOP);
+	m_clipPlanesDrawers[planeIndex]->color3f(0.7f, 0.7f, 0.2f);
+	m_clipPlanesDrawers[planeIndex]->vertex3f(p1[0], p1[1], p1[2]);
+	m_clipPlanesDrawers[planeIndex]->vertex3f(p2[0], p2[1], p2[2]);
+	m_clipPlanesDrawers[planeIndex]->vertex3f(p3[0], p3[1], p3[2]);
+	m_clipPlanesDrawers[planeIndex]->vertex3f(p4[0], p4[1], p4[2]);
+	m_clipPlanesDrawers[planeIndex]->end();
+	m_clipPlanesDrawers[planeIndex]->endList();
 }
 
 } // namespace Utils

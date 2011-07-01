@@ -123,7 +123,7 @@ void Stage_shader_number_two::cb_initGL()
 	registerShader(m_simpleColorShader) ;
 	registerShader(m_pointSprite) ;
 
-	m_phongShader->setPlaneClipping(1);
+	m_phongShader->setClippingPlanesCount(1);
 }
 
 void Stage_shader_number_two::cb_redraw()
@@ -170,7 +170,7 @@ void Stage_shader_number_two::cb_redraw()
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
 
-	m_phongShader->displayClippingPlane();
+	m_phongShader->displayClippingPlanes();
 }
 
 void Stage_shader_number_two::cb_Open()
@@ -199,11 +199,15 @@ void Stage_shader_number_two::cb_mouseMove(int button, int x, int y)
 	{
 		if (button == Qt::LeftButton)
 		{
-			Geom::Vec4f clipPlane = m_phongShader->getClippingPlaneEquation();
-			clipPlane[0] += (m_mouseLastX - x)/40.0;
-			clipPlane[1] += (m_mouseLastY - y)/40.0;
+			Geom::Vec3f clipPlaneVec1 = m_phongShader->getClippingPlaneFirstVec();
+			Geom::Vec3f clipPlaneVec2 = m_phongShader->getClippingPlaneSecondVec();
+			clipPlaneVec1[0] += (m_mouseLastX - x)/40.0;
+			clipPlaneVec1[1] += (m_mouseLastY - y)/40.0;
+			clipPlaneVec2[1] += (m_mouseLastX - x)/40.0;
+			clipPlaneVec2[2] += (m_mouseLastY - y)/40.0;
 
-			m_phongShader->setClippingPlaneEquation(clipPlane);
+			m_phongShader->setClippingPlaneFirstVec(clipPlaneVec1);
+			m_phongShader->setClippingPlaneSecondVec(clipPlaneVec2);
 
 			updateGL();
 		}
@@ -241,6 +245,9 @@ void Stage_shader_number_two::importMesh(std::string& filename)
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
+
+	m_phongShader->setPlaneDisplaySize(bb.maxSize()*1.2f);
+	m_phongShader->setClippingPlaneOrigin(bb.center());
 }
 
 void Stage_shader_number_two::slot_drawVertices(bool b)
@@ -291,7 +298,7 @@ void Stage_shader_number_two::slot_doubleSpinBox_Plane(double c)
 	float bPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_b->value();
 	float cPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_c->value();
 	float dPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_d->value();
-	m_phongShader->setClippingPlaneEquation(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
+	//m_phongShader->setClippingPlaneEquation(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
 	updateGL();
 }
 

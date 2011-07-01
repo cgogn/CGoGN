@@ -55,30 +55,59 @@ public:
 	~ClippingShader();
 
 	/**
-	 * set the plane equation for plane clipping
+	 * set all parameters for one clipping plane
 	 * @warning planeIndex starts at 0
-	 * @param clipPlane plane equation
-	 * @param planeIndex index of plane to modify
+	 * @param vec1 first basis vector
+	 * @param vec2 second basis vector
+	 * @param origin point of the plane that will be used as origin to display it
+	 * @param planeIndex index of the plane to modify
 	 */
-	void setClippingPlaneEquation(Geom::Vec4f clipPlane, int planeIndex = 0);
+	void setClippingPlane(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex = 0);
+
+	/**
+	 * set first vector parameter for one clipping plane
+	 * @warning planeIndex starts at 0
+	 * @param vec1 first basis vector
+	 * @param planeIndex index of the plane to modify
+	 */
+	void setClippingPlaneFirstVec(Geom::Vec3f vec1, int planeIndex = 0);
+
+	/**
+	 * set second vector parameter for one clipping plane
+	 * @warning planeIndex starts at 0
+	 * @param vec2 second basis vector
+	 * @param planeIndex index of the plane to modify
+	 */
+	void setClippingPlaneSecondVec(Geom::Vec3f vec2, int planeIndex = 0);
 	
 	/**
-	 * get the plane equation for plane clipping
+	 * set origin parameter for one clipping plane
 	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of plane to get
+	 * @param origin point of the plane that will be used as origin to display it
+	 * @param planeIndex index of the plane to modify
 	 */
-	Geom::Vec4f getClippingPlaneEquation(int planeIndex = 0);
+	void setClippingPlaneOrigin(Geom::Vec3f origin, int planeIndex = 0);
 
 	/**
-	 * set the plane quaternion for plane clipping
-	 * @param quat plane quaternion
+	 * get first parameter for one clipping plane
+	 * @warning planeIndex starts at 0
+	 * @param planeIndex index of the plane to modify
 	 */
-	//void setClippingPlaneQuaternion(float quat[4]);
+	Geom::Vec3f getClippingPlaneFirstVec(int planeIndex = 0);
 
 	/**
-	 * get the plane quaternion for plane clipping
+	 * get second vector parameter for one clipping plane
+	 * @warning planeIndex starts at 0
+	 * @param planeIndex index of the plane to modify
 	 */
-	//Geom::Vec4f getClippingPlaneQuaternion();
+	Geom::Vec3f getClippingPlaneSecondVec(int planeIndex = 0);
+
+	/**
+	 * get origin parameter for one clipping plane
+	 * @warning planeIndex starts at 0
+	 * @param planeIndex index of the plane to modify
+	 */
+	Geom::Vec3f getClippingPlaneOrigin(int planeIndex = 0);
 
 	/**
 	 * set the color attenuation factor for clipping
@@ -89,33 +118,53 @@ public:
 	/**
 	 * get the color attenuation factor for clipping
 	 */
-	float getClippingColorAttenuationFactor();
+	float getClippingColorAttenuationFactor() { return m_colorAttenuationFactor; }
 
 	/**
-	 * insert plane clipping instructions into vertex and fragment shader source code
-	 * - does not modify the geometry shader source code
+	 * set the clipping planes count used for plane clipping
+	 * - insert plane clipping instructions into vertex and fragment shader source code
+	 * but does not modify the geometry shader source code
 	 * @param planesCount the clipping planes count to use
 	 * @warning this function is designed for shaders which *do not* use a geometry shader
 	 */
-	void setPlaneClipping(int planesCount);
+	void setClippingPlanesCount(int planesCount);
 	
 	/**
 	 * get the clipping planes count used for plane clipping
 	 */
-	int getClippingPlanesCount() { return (int)m_clipPlanesEquations.size() / 4; }
+	int getClippingPlanesCount() { return (int)m_clipPlanes.size(); }
 
 	/**
-	 * update uniforms (get their locations and resend their values) for clipping
+	 * update uniforms (get their locations and send their values again) for clipping
 	 */
 	void updateClippingUniforms();
 
 	/**
-	 * displays a quad corresponding to the current clipping plane position and orientation
+	 * display all clipping planes
 	 */
-	void displayClippingPlane();
+	void displayClippingPlanes();
+
+	/**
+	 * set the plane display size
+	 * @param size the new size
+	 */
+	void setPlaneDisplaySize(float size) { m_planeDisplaySize = size; }
+
+	/**
+	 * get the plane display size
+	 */
+	float getPlaneDisplaySize() { return m_planeDisplaySize; }
 
 
 private:
+
+	/**
+	 * clipping planes structure
+	 */
+	struct clipPlane
+	{
+		Geom::Vec3f firstVec, secondVec, origin;
+	};
 
 	/**
 	 * sends the clipping planes uniform to shader
@@ -128,29 +177,36 @@ private:
 	void sendColorAttenuationFactorUniform();
 
 	/**
-	 * stored original vertex shader source code (without clipping)
+	 * update VBO for one plane(recalculate quad)
+	 * @param planeIndex index of the plane
+	 */
+	void updateClippingPlaneVBO(int planeIndex);
+
+	/**
+	 * original vertex shader source code (without clipping)
 	 */
 	std::string originalVertShaderSrc;
 
 	/**
-	 * stored original fragment shader source code (without clipping)
+	 * original fragment shader source code (without clipping)
 	 */
 	std::string originalFragShaderSrc;
 
 	/**
-	 * clip planes equations (a, b, c, d)*planes count
+	 * clip planes array
 	 */
-	std::vector<float> m_clipPlanesEquations;
-	
-	/**
-	 * clip plane quaternion
-	 */
-	//float m_clipPlaneQuaternion[4];
+	std::vector<clipPlane> m_clipPlanes;
 
 	/**
-	 * clip planes vector uniform id
+	 * clip planes equations array (size = 4*(planes count))
+	 * - used only for sending planes data to shader
 	 */
-	GLint m_unif_clipPlanes;
+	std::vector<float> m_clipPlanesEquations;
+
+	/**
+	 * clip planes equations vector uniform id
+	 */
+	GLint m_unif_clipPlanesEquations;
 	
 	/**
 	 * color attenuation factor
@@ -163,9 +219,14 @@ private:
 	GLint m_unif_colorAttenuationFactor;
 
 	/**
-	 * plane drawer
+	 * clip planes drawers array
 	 */
-	Drawer* m_planeDrawer;
+	std::vector<Drawer*> m_clipPlanesDrawers;
+
+	/**
+	 * plane display size
+	 */
+	float m_planeDisplaySize;
 
 };
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>324</width>
-    <height>569</height>
+    <height>628</height>
    </rect>
   </property>
   <property name="allowedAreas">
@@ -184,7 +184,7 @@
           <property name="title">
            <string>Clipping</string>
           </property>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_aPlane">
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec1x">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -201,67 +201,13 @@
            </property>
            <property name="value">
             <double>0.000000000000000</double>
-           </property>
-          </widget>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_bPlane">
-           <property name="geometry">
-            <rect>
-             <x>60</x>
-             <y>90</y>
-             <width>63</width>
-             <height>28</height>
-            </rect>
-           </property>
-           <property name="minimum">
-            <double>-99.989999999999995</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.000000000000000</double>
-           </property>
-          </widget>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_cPlane">
-           <property name="geometry">
-            <rect>
-             <x>120</x>
-             <y>90</y>
-             <width>63</width>
-             <height>28</height>
-            </rect>
-           </property>
-           <property name="minimum">
-            <double>-99.989999999999995</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>0.000000000000000</double>
-           </property>
-          </widget>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_dPlane">
-           <property name="geometry">
-            <rect>
-             <x>180</x>
-             <y>90</y>
-             <width>63</width>
-             <height>28</height>
-            </rect>
-           </property>
-           <property name="minimum">
-            <double>-99.989999999999995</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
            </property>
           </widget>
           <widget class="QLabel" name="label_Plane">
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>30</y>
+             <y>40</y>
              <width>69</width>
              <height>18</height>
             </rect>
@@ -270,63 +216,11 @@
             <string>Plane :</string>
            </property>
           </widget>
-          <widget class="QLabel" name="label_aPlane">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>70</y>
-             <width>31</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>a :</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_bPlane">
-           <property name="geometry">
-            <rect>
-             <x>70</x>
-             <y>70</y>
-             <width>31</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>b :</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_cPlane">
-           <property name="geometry">
-            <rect>
-             <x>130</x>
-             <y>70</y>
-             <width>31</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>c :</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_dPlane">
-           <property name="geometry">
-            <rect>
-             <x>190</x>
-             <y>70</y>
-             <width>31</width>
-             <height>18</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>d :</string>
-           </property>
-          </widget>
           <widget class="QLabel" name="label_ColorAttenuationFactor">
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>140</y>
+             <y>200</y>
              <width>201</width>
              <height>18</height>
             </rect>
@@ -339,7 +233,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>160</y>
+             <y>230</y>
              <width>63</width>
              <height>28</height>
             </rect>
@@ -354,11 +248,14 @@
            </property>
            <property name="geometry">
             <rect>
-             <x>80</x>
+             <x>60</x>
              <y>30</y>
              <width>99</width>
              <height>28</height>
             </rect>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="editable">
             <bool>false</bool>
@@ -370,9 +267,9 @@
           <widget class="QPushButton" name="pushButton_addPlane">
            <property name="geometry">
             <rect>
-             <x>180</x>
-             <y>10</y>
-             <width>51</width>
+             <x>190</x>
+             <y>30</y>
+             <width>31</width>
              <height>28</height>
             </rect>
            </property>
@@ -383,14 +280,166 @@
           <widget class="QPushButton" name="pushButton_deletePlane">
            <property name="geometry">
             <rect>
-             <x>180</x>
-             <y>40</y>
-             <width>51</width>
+             <x>220</x>
+             <y>30</y>
+             <width>31</width>
              <height>28</height>
             </rect>
            </property>
            <property name="text">
             <string>-</string>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec1y">
+           <property name="geometry">
+            <rect>
+             <x>70</x>
+             <y>90</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec1z">
+           <property name="geometry">
+            <rect>
+             <x>140</x>
+             <y>90</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec2z">
+           <property name="geometry">
+            <rect>
+             <x>140</x>
+             <y>120</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec2x">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>120</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec2y">
+           <property name="geometry">
+            <rect>
+             <x>70</x>
+             <y>120</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneOriginz">
+           <property name="geometry">
+            <rect>
+             <x>140</x>
+             <y>150</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneOriginy">
+           <property name="geometry">
+            <rect>
+             <x>70</x>
+             <y>150</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneOriginx">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>150</y>
+             <width>63</width>
+             <height>28</height>
+            </rect>
+           </property>
+           <property name="minimum">
+            <double>-99.989999999999995</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </widget>
