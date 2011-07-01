@@ -22,6 +22,19 @@ template <typename PFP>
 bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons);
 
 
+/**
+ *
+ */
+
+template <typename PFP>
+bool readSVG(const std::string& filename, std::vector<std::vector<typename PFP::VEC3 > > &allPoly);
+
+template <typename PFP>
+bool importBB(const std::string& filename, std::vector<Geom::BoundingBox<typename PFP::VEC3> > &bb);
+
+template <typename PFP>
+bool importSVG(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+
 
 }
 

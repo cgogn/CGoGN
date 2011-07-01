@@ -27,6 +27,7 @@
 #include "Topology/generic/autoAttributeHandler.h"
 
 #include "openctm.h"
+#include "Algo/Import/AHEM.h"
 
 #include "assimp.h"
 #include "aiPostProcess.h"
@@ -63,8 +64,11 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 	if ((filename.rfind(".obj")!=std::string::npos) || (filename.rfind(".OBJ")!=std::string::npos))
 		return ImportSurfacique::OBJ;
 
-	if ((filename.rfind(".ctm")!=std::string::npos) || (filename.rfind(".OBJ")!=std::string::npos))
+	if ((filename.rfind(".ctm")!=std::string::npos) || (filename.rfind(".CTM")!=std::string::npos))
 		return ImportSurfacique::CTM;
+
+	if ((filename.rfind(".ahem")!=std::string::npos) || (filename.rfind(".AHEM")!=std::string::npos))
+		return ImportSurfacique::AHEM;
 
 	return ImportSurfacique::UNKNOWNSURFACE;
 }
@@ -110,6 +114,10 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 	case ImportSurfacique::OBJ:
 		CGoGNout << "TYPE: OBJ" << CGoGNendl;
 		return importObj(filename, attrNames);
+		break;
+	case ImportSurfacique::AHEM:
+		CGoGNout << "TYPE: AHEM" << CGoGNendl;
+		return importAHEM(filename, attrNames);
 		break;
 	default:
 		CGoGNout << "TYPE: ASSIMP" << CGoGNendl;
@@ -449,6 +457,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
     			oss >> str;
 
     			unsigned int ind = 0;
+
     			while ( (ind<str.length()) &&  (str[ind]!='/'))
     				ind++;
 
@@ -855,6 +864,158 @@ bool MeshTablesSurface<PFP>::importCTM(const std::string& filename, std::vector<
 
 	return true;
 }
+
+
+
+
+
+template <typename PFP>
+bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector<std::string>& attrNames)
+{
+	// Open file
+
+	std::ifstream fp(filename.c_str(), std::ios::binary);
+
+	if (!fp.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
+
+
+	// Read header
+
+	AHEMHeader hdr;
+
+	fp.read((char*)&hdr, sizeof(AHEMHeader));
+
+	if(hdr.magic != AHEM_MAGIC)
+		CGoGNerr << "Warning: " << filename << " invalid magic" << CGoGNendl;
+
+
+	m_nbVertices = hdr.meshHdr.vxCount;
+	m_nbFaces = hdr.meshHdr.faceCount;
+
+
+	// Read attributes
+
+	AHEMAttributeDescriptor* ahemAttrDesc = new AHEMAttributeDescriptor[hdr.attributesChunkNumber];
+	char** ahemAttrNames = new char*[hdr.attributesChunkNumber];
+
+	for(unsigned int i = 0 ; i < hdr.attributesChunkNumber ; i++)
+	{
+		fp.read((char*)(ahemAttrDesc + i), sizeof(AHEMAttributeDescriptor));
+		
+		ahemAttrNames[i] = new char[ahemAttrDesc[i].nameSize + 1];
+		fp.read(ahemAttrNames[i], ahemAttrDesc[i].nameSize);
+		ahemAttrNames[i][ahemAttrDesc[i].nameSize] = '\0';
+	}
+	
+
+	// Compute buffer size for largest chunk and allocate
+
+	unsigned int bufferSize = hdr.meshHdr.meshChunkSize;
+
+	for(unsigned int i = 0 ; i < hdr.attributesChunkNumber ; i++)
+		if(ahemAttrDesc[i].attributeChunkSize > bufferSize)
+			bufferSize = ahemAttrDesc[i].attributeChunkSize;
+
+
+	char* buffer = new char[bufferSize];
+
+
+    // Allocate vertices
+
+	AttributeContainer& vxContainer = m_map.getAttributeContainer(VERTEX);
+
+
+	std::vector<unsigned int> verticesId;
+	verticesId.resize(hdr.meshHdr.vxCount);
+
+	for(unsigned int i = 0 ; i < hdr.meshHdr.vxCount ; i++)
+		verticesId[i] = vxContainer.insertLine();
+
+
+
+	// Read faces stream
+
+	m_nbEdges.resize(hdr.meshHdr.faceCount);
+	m_emb.resize(hdr.meshHdr.heCount);
+
+	fp.read(buffer, hdr.meshHdr.meshChunkSize);
+	char* batch = buffer;
+
+	unsigned int fCount = 0;
+
+	unsigned int fId = 0;
+	unsigned int j = 0;
+
+	while(fCount < hdr.meshHdr.faceCount)
+	{
+		AHEMFaceBatchDescriptor* fbd = (AHEMFaceBatchDescriptor*)batch;
+		stUInt32* ix = (stUInt32*)(batch + sizeof(AHEMFaceBatchDescriptor));
+
+		for(unsigned int i = 0 ; i < fbd->batchLength ; i++)
+		{
+			m_nbEdges[fId++] = fbd->batchFaceSize;
+
+			for(unsigned int k = 0 ; k < fbd->batchFaceSize ; k++)
+				m_emb[j++] = *ix++;
+		}
+
+		fCount += fbd->batchLength;
+		batch = (char*)ix;
+	}
+	
+
+
+	// Read positions
+
+	AttributeHandler<typename PFP::VEC3> position =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+
+	if (!position.isValid())
+		position = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+
+	attrNames.push_back(position.name()) ;
+
+	AHEMAttributeDescriptor* posDesc = NULL;
+	
+	for(unsigned int i = 0 ; i < hdr.attributesChunkNumber ; i++)
+		if(IsEqualGUID(ahemAttrDesc[i].semantic, AHEMATTRIBUTE_POSITION))
+		{
+			posDesc = ahemAttrDesc + i;
+			break;
+		}
+
+	fp.seekg(posDesc->fileStartOffset, std::ios_base::beg);
+	fp.read(buffer, posDesc->attributeChunkSize);
+
+	float* q = (float*)buffer;
+
+	for(unsigned int i = 0 ; i < hdr.meshHdr.vxCount ; i++)
+	{
+		position[verticesId[i]] = VEC3(q[0], q[1], q[2]);
+		q += 3;
+	}
+
+	
+
+
+	// Close file and release allocated stuff
+
+	fp.close();
+
+	for(unsigned int i = 0 ; i < hdr.attributesChunkNumber ; i++)
+		delete[] ahemAttrNames[i];
+
+	delete[] ahemAttrNames;
+	delete[] ahemAttrDesc;
+	delete[] buffer;
+
+	return true;
+}
+
+
 
 template<typename PFP>
 void MeshTablesSurface<PFP>::extractMeshRec(AttributeContainer& container, AttributeHandler<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo)

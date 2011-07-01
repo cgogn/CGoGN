@@ -78,7 +78,7 @@ Intersection intersectionLineTriangle(const VEC3& P, const VEC3& Dir, const VEC3
 
 #define PRECISION 1e-20
     if(fabs(b) < PRECISION)			//ray parallel to triangle
-		return NO_INTERSECTION ;
+			return NO_INTERSECTION ;
 #undef PRECISION
 
 	T r = a / b ;
@@ -282,33 +282,35 @@ Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const V
 // }
 
 template <typename VEC3, typename PLANE3D>
-Intersection intersectionPlaneRay(const PLANE3D& pl, const VEC3& p1, const VEC3& dir, VEC3& Inter)
+Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter)
 {
-	typename VEC3::DATA_TYPE denom = pl.normal() * dir;
+	typename VEC3::DATA_TYPE denom = pl.normal()*dir;
 
-	if(denom == 0)
+	if(denom==0)
 	{
-		if(pl.distance(p1) == 0)
+		if(pl.distance(p1)==0)
 		{
-			Inter = p1;
-			return FACE_INTERSECTION;
+				Inter = p1;
+				return FACE_INTERSECTION;
 		}
 		else
 			return NO_INTERSECTION;
 	}
 
-	typename VEC3::DATA_TYPE isect = ( pl.normal() * (pl.normal() * -1.0f * pl.d() - p1) ) / denom;
+	typename VEC3::DATA_TYPE isect = ( pl.normal() * (pl.normal()*-1.0f*pl.d()-p1) ) / denom;
 
 	Inter = p1 + dir * isect;
 
 	if(0.0f <= isect)
+	{
 		return FACE_INTERSECTION;
+	}
 
 	return NO_INTERSECTION;
 }
 
 template <typename VEC3>
-Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA, const VEC3& QB, VEC3& Inter)
+Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA,  const VEC3& QB, VEC3& Inter)
 {
 	typedef typename VEC3::DATA_TYPE T ;
 
@@ -336,10 +338,10 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 
 	//test if inter point is outside the edges
 	if(
-		(Inter[0] < PA[0] && Inter[0] < PB[0]) || (Inter[0] > PA[0] && Inter[0] > PB[0]) ||
-		(Inter[0] < QA[0] && Inter[0] < QB[0]) || (Inter[0] > QA[0] && Inter[0] > QB[0]) ||
-		(Inter[1] < PA[1] && Inter[1] < PB[1]) || (Inter[1] > PA[1] && Inter[1] > PB[1]) ||
-		(Inter[1] < QA[1] && Inter[1] < QB[1]) || (Inter[1] > QA[1] && Inter[1] > QB[1])
+		(Inter[0]<PA[0] && Inter[0]<PB[0]) || (Inter[0]>PA[0] && Inter[0]>PB[0]) ||
+		(Inter[0]<QA[0] && Inter[0]<QB[0]) || (Inter[0]>QA[0] && Inter[0]>QB[0]) ||
+		(Inter[1]<PA[1] && Inter[1]<PB[1]) || (Inter[1]>PA[1] && Inter[1]>PB[1]) ||
+		(Inter[1]<QA[1] && Inter[1]<QB[1]) || (Inter[1]>QA[1] && Inter[1]>QB[1])
 	)
 		return NO_INTERSECTION;
 
@@ -349,6 +351,6 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 	return EDGE_INTERSECTION;
 }
 
-} // namespace Geom
+}
 
-} // namespace CGoGN
+}

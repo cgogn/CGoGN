@@ -100,6 +100,9 @@ public:
 	virtual unsigned int closeHole(Dart d);
 
 	virtual void closeMap(DartMarker &marker);
+
+
+	virtual bool check();
 } ;
 
 } // namespace CGoGN

@@ -2,6 +2,7 @@
 #include "Geometry/bounding_box.h"
 #include "Geometry/plane_3d.h"
 #include "Algo/BooleanOperator/mergeVertices.h"
+#include "Container/fakeAttribute.h"
 #include <limits>
 
 namespace CGoGN
@@ -124,7 +125,7 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 
 					valueOf(yS,y);
 
-					typename PFP::VEC3 previous = (curPoly)[(curPoly).size()-1];
+					VEC3 previous = (curPoly)[(curPoly).size()-1];
 					x = previous[0];
 
 					push_point=true;
