@@ -144,6 +144,7 @@ unsigned int ImplicitHierarchicalMap3::faceLevel(Dart d)
 		fLevel = l < fLevel ? l : fLevel ;		// of its edges
 	} while(it != d) ;
 
+
 	unsigned int cur = m_curLevel ;
 	m_curLevel = fLevel ;
 
@@ -171,7 +172,6 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-//std::cout << "volumeLevel" << std::endl;
 
 	if(m_curLevel == 0)
 		return 0 ;

@@ -345,7 +345,7 @@ public:
 	//@{
 	// TODO devrait disparaitre
 	// pour les mêmes raisons que dans map2
-	//bool check();
+	bool check();
 	//@}
 };
 

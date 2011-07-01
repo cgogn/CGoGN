@@ -24,6 +24,7 @@
 
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/centroid.h"
+#include "intersection.h"
 
 #include <limits>
 
@@ -37,17 +38,18 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
+bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
 {
+	
 	typedef typename PFP::VEC3 VEC3 ;
 
 	const float SMALL_NUM = std::numeric_limits<typename PFP::REAL>::min() * 5.0f;
 
-	VEC3 p1 = position[d];
-	VEC3 n = faceNormal<PFP>(map, d, position);
+	VEC3 p1 = positions[d];
+	VEC3 n = faceNormal<PFP>(map,d,positions);
 	VEC3 w0 = P - p1;
-    float a = -(n * w0);
-    float b = n * Dir;
+    float a = -(n*w0);
+    float b = n*Dir;
 
     if (fabs(b) < SMALL_NUM)
 		return false;
@@ -56,7 +58,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
 	Inter = P + r * Dir;           // intersect point of ray and plane
 
     // is I inside the face?
-	VEC3 p2 = position[map.phi1(d)];
+	VEC3 p2 = positions[map.phi1(d)];
 	VEC3 v = p2 - p1 ;
 	VEC3 vInter = Inter - p1;
 	float dirV = v * vInter;
@@ -67,7 +69,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
 	while(it != d)
 	{
 		p1 = p2;
-		p2 = position[map.phi1(it)];
+		p2 = positions[map.phi1(it)];
 		v = p2 - p1;
 		vInter = Inter - p1;
 		float dirD = v * vInter;
@@ -83,22 +85,22 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
 }
 
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
 {
 	typename PFP::VEC3 dir = PB - PA;
-	if (intersectionLineConvexFace(map, d, position, PA, dir, Inter))
+	if (intersectionLineConvexFace(map,d,positions,PA,dir,Inter))
 	{
 		typename PFP::VEC3 dirA = PA - Inter;
-		typename PFP::VEC3 dirB = PB - Inter;
+		typename PFP::VEC3 dirB = PB  -Inter;
 
-		if (dirA * dirB < 0)
+		if ( (dirA*dirB) < 0 )
 			return true;
 	}
 	return false;
 }
 
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const typename PFP::TVEC3& position)
+bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const typename PFP::TVEC3& positions)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -107,8 +109,8 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 	VEC3 tris2[3];
 	for (unsigned int i = 0; i < 3; ++i)
 	{
-		tris1[i] = position[tri1];
-		tris2[i] = position[tri2];
+		tris1[i] = positions[tri1];
+		tris2[i] = positions[tri2];
 		tri1 = map.phi1(tri1);
 		tri2 = map.phi1(tri2);
 	}
@@ -165,8 +167,8 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 // 	return isSegmentInTriangle2D(inter1,inter2,tris2[0],tris2[1],triS2[2],nTri2);
 
 	//compute face normal
-	VEC3 normale1 = faceNormal<PFP>(map, tri1, position);
-	VEC3 bary1 = faceCentroid<PFP>(map, tri1, position);
+	VEC3 normale1 = faceNormal<PFP>(map,tri1,positions);
+	VEC3 bary1 = faceCentroid<PFP>(map,tri1,positions);
 
 	int pos = 0;
 	int neg = 0;
@@ -186,8 +188,8 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 		return false;
 
 	//same for the second triangle
-	VEC3 normale2 = faceNormal<PFP>(map, tri2, position);
-	VEC3 bary2 = faceCentroid<PFP>(map, tri2, position);
+	VEC3 normale2 = faceNormal<PFP>(map,tri2,positions);
+	VEC3 bary2 = faceCentroid<PFP>(map,tri2,positions);
 	pos = 0;
 	neg = 0;
 	for (unsigned int i = 0; i < 3 ; ++i)
@@ -208,7 +210,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 	for (unsigned int i = 0; i < 3 && !intersection; ++i)
 	{
 		VEC3 inter;
-		intersection = Geom::intersectionSegmentTriangle(tris1[i], tris1[(i+1)%3], tris2[0], tris2[1], tris2[2], inter);
+		intersection = Geom::intersectionSegmentTriangle(tris1[i],tris1[(i+1)%3],tris2[0],tris2[1],tris2[2],inter);
 	}
 
 	if (intersection)
@@ -217,34 +219,14 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 	for (unsigned int i = 0; i < 3 && !intersection; ++i)
 	{
 		VEC3 inter;
-		intersection = Geom::intersectionSegmentTriangle(tris2[i], tris2[(i+1)%3], tris1[0], tris1[1], tris1[2], inter);
+		intersection = Geom::intersectionSegmentTriangle(tris2[i],tris2[(i+1)%3],tris1[0],tris1[1],tris1[2],inter);
 	}
 
 	return intersection;
 }
 
-template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const typename PFP::TVEC3& position, typename PFP::REAL& alpha)
-{
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-	const typename PFP::VEC3& p1 = position[d];
-	const typename PFP::VEC3& p2 = position[map.phi1(d)];
-	if(Geom::isPointInSphere(p1, center, radius) && !Geom::isPointInSphere(p2, center, radius))
-	{
-		VEC3 p = p1 - center;
-		VEC3 qminusp = p2 - center - p;
-		REAL s = p * qminusp;
-		REAL n2 = qminusp.norm2();
-		alpha = (- s + sqrt(s*s + n2 * (radius*radius - p.norm2()))) / n2;
-		return true ;
-	}
-	return false ;
 }
 
-} // namespace Geometry
+}
 
-} // namespace Algo
-
-} // namespace CGoGN
+}
