@@ -143,6 +143,15 @@ public:
 	 * unmark all the cells
 	 */
 	virtual void unmarkAll() = 0 ;
+
+	bool isAllUnmarked()
+	{
+		AttributeContainer& cont = m_map.getAttributeContainer(m_cell) ;
+		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+			if(m_map.getMarkVector(m_cell, m_thread)->operator[](i).testMark(m_mark))
+				return false ;
+		return true ;
+	}
 };
 
 /**
@@ -190,6 +199,7 @@ public:
 	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
+		assert(isAllUnmarked());
 	}
 
 protected:
@@ -225,9 +235,7 @@ class CellMarkerNoUnmark: public CellMarkerGen
 {
 public:
 	CellMarkerNoUnmark(AttribMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
-	{
-		std::cout << "CellMarkerNoUnmark.." << std::endl ;
-	}
+	{}
 
 	virtual ~CellMarkerNoUnmark()
 	{
@@ -237,15 +245,6 @@ public:
 protected:
 	CellMarkerNoUnmark(const CellMarkerNoUnmark& cm) : CellMarkerGen(cm)
 	{}
-
-	bool isAllUnmarked()
-	{
-		AttributeContainer& cont = m_map.getAttributeContainer(m_cell) ;
-		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			if(m_map.getMarkVector(m_cell, m_thread)->operator[](i).testMark(m_mark))
-				return false ;
-		return true ;
-	}
 
 public:
 	void unmarkAll()
