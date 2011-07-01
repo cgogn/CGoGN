@@ -29,45 +29,21 @@ namespace Geom {
 template<typename PFP>
 Frame<PFP>::Frame(const VEC3& X, const VEC3& Y, const VEC3& Z)
 {
-	m_X = X ;
-	m_Y = Y ;
-	m_Z = Z ;
-}
+	const VEC3 refX(Xx,Xy,Xz) ;
+	const VEC3 refY(Yx,Yy,Yz) ;
+	const VEC3 refZ(Zx,Zy,Zz) ;
 
-template<typename PFP>
-Frame<PFP>::Frame(const VEC3& EulerAngles)
-{
-	const VEC3 X(Xx,Xy,Xz) ;
-	const VEC3 Z(Zx,Zy,Zz) ;
+	if (!isDirectOrthoNormalFrame<PFP>(X,Y,Z))
+		return ;
 
-	// get known data
-	const REAL& alpha = EulerAngles[0] ;
-	const REAL& beta = EulerAngles[1] ;
-	const REAL& gamma = EulerAngles[2] ;
+	REAL& alpha = m_EulerAngles[0] ;
+	REAL& beta = m_EulerAngles[1] ;
+	REAL& gamma = m_EulerAngles[2] ;
 
-	const VEC3 lineOfNodes = rotate<REAL>(Z,alpha,X) ; // rotation around reference normal of vector T
-	m_Z = rotate<REAL>(lineOfNodes,gamma,Z) ; // rotation around line of nodes of vector N
-	m_X = rotate<REAL>(m_Z,beta,lineOfNodes) ; // rotation around new normal of vector represented by line of nodes
-	m_Y = m_Z ^ m_X ;
-}
-
-template<typename PFP>
-typename Geom::Vector<3,typename PFP::REAL> Frame<PFP>::getCompressed() const
-{
-	VEC3 EulerAngles ;
-
-	const VEC3 X(Xx,Xy,Xz) ;
-	const VEC3 Y(Yx,Yy,Yz) ;
-	const VEC3 Z(Zx,Zy,Zz) ;
-
-	REAL& alpha = EulerAngles[0] ;
-	REAL& beta = EulerAngles[1] ;
-	REAL& gamma = EulerAngles[2] ;
-
-	VEC3 lineOfNodes = Z ^ m_Z ;
+	VEC3 lineOfNodes = refZ ^ Z ;
 	if (lineOfNodes.norm2() < 1e-5) // if Z ~= m_Z
 	{
-		lineOfNodes = X ; // = reference T
+		lineOfNodes = refX ; // = reference T
 		alpha = 0 ;
 		gamma = 0 ;
 	}
@@ -76,24 +52,41 @@ typename Geom::Vector<3,typename PFP::REAL> Frame<PFP>::getCompressed() const
 		lineOfNodes.normalize() ;
 
 		// angle between reference T and line of nodes
-		alpha = (Y*lineOfNodes > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), X*lineOfNodes ),REAL(-1.0))) ;
+		alpha = (refY*lineOfNodes > 0 ? 1 : -1) * std::acos(std::max(std::min(REAL(1.0), refX*lineOfNodes ),REAL(-1.0))) ;
 		// angle between reference normal and normal
-		gamma = std::acos(std::max(std::min(REAL(1.0), Z*m_Z ),REAL(-1.0))) ; // gamma is always positive because the direction of vector lineOfNodes=(reference normal)^(normal) (around which a rotation of angle beta is done later on) changes depending on the side on which they lay w.r.t eachother.
+		gamma = std::acos(std::max(std::min(REAL(1.0), refZ*Z ),REAL(-1.0))) ; // gamma is always positive because the direction of vector lineOfNodes=(reference normal)^(normal) (around which a rotation of angle beta is done later on) changes depending on the side on which they lay w.r.t eachother.
 	}
 	// angle between line of nodes and T
-	beta = (m_Y*lineOfNodes > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), m_X*lineOfNodes ),REAL(-1.0))) ;
+	beta = (Y*lineOfNodes > 0 ? -1 : 1) * std::acos(std::max(std::min(REAL(1.0), X*lineOfNodes ),REAL(-1.0))) ;
+}
 
-	return EulerAngles ;
+template<typename PFP>
+Frame<PFP>::Frame(const VEC3& EulerAngles)
+{
+	m_EulerAngles = EulerAngles ;
+}
+
+template<typename PFP>
+void Frame<PFP>::getFrame(VEC3& X, VEC3& Y, VEC3& Z) const
+{
+	const VEC3 refX(Xx,Xy,Xz) ;
+	const VEC3 refZ(Zx,Zy,Zz) ;
+
+	// get known data
+	const REAL& alpha = m_EulerAngles[0] ;
+	const REAL& beta = m_EulerAngles[1] ;
+	const REAL& gamma = m_EulerAngles[2] ;
+
+	const VEC3 lineOfNodes = rotate<REAL>(refZ,alpha,refX) ; // rotation around reference normal of vector T
+	Z = rotate<REAL>(lineOfNodes,gamma,refZ) ; // rotation around line of nodes of vector N
+	X = rotate<REAL>(Z,beta,lineOfNodes) ; // rotation around new normal of vector represented by line of nodes
+	Y = Z ^ X ;
 }
 
 template<typename PFP>
 bool Frame<PFP>::equals(const Geom::Frame<PFP>& lf, REAL epsilon) const
 {
-	VEC3 dX = m_X - lf.getX() ;
-	VEC3 dY = m_Y - lf.getY() ;
-	VEC3 dZ = m_Z - lf.getZ() ;
-
-	return dX.norm2() < epsilon && dY.norm2() < epsilon && dZ.norm2() < epsilon ;
+	return (m_EulerAngles - lf.m_EulerAngles).norm2() < epsilon ;
 }
 
 template<typename PFP>
@@ -109,50 +102,66 @@ bool Frame<PFP>::operator!=(const Frame<PFP>& lf) const
 }
 
 template<typename PFP>
-bool Frame<PFP>::isDirect(REAL epsilon) const
+bool isNormalizedFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
 {
-	VEC3 new_Y = m_Z ^ m_X ;		// direct
-	VEC3 diffs = new_Y - m_Y ;		// differences with existing B
-	REAL diffNorm = diffs.norm2() ;	// Norm of this differences vector
+	return X.isNormalized(epsilon) && Y.isNormalized(epsilon) && Z.isNormalized(epsilon) ;
+}
+
+template<typename PFP>
+bool isOrthogonalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
+{
+	return X.isOrthogonal(Y,epsilon) && X.isOrthogonal(Z,epsilon) && Y.isOrthogonal(Z,epsilon) ;
+}
+
+template<typename PFP>
+bool isDirectFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
+{
+	typename PFP::VEC3 new_Y = Z ^ X ;		// direct
+	typename PFP::VEC3 diffs = new_Y - Y ;		// differences with existing B
+	typename PFP::REAL diffNorm = diffs.norm2() ;	// Norm of this differences vector
 
 	return (diffNorm < epsilon) ;		// Verify that this difference is very small
 }
 
 template<typename PFP>
-bool Frame<PFP>::isOrthogonal(REAL epsilon) const
+bool isDirectOrthoNormalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon)
 {
-	return (fabs(m_X * m_Y) < epsilon) && (fabs(m_Z * m_Y) < epsilon) && (fabs(m_X * m_Z) < epsilon) ;
-}
+	if (!isNormalizedFrame<PFP>(X,Y,Z,epsilon))
+	{
+		CGoGNerr << "The Frame you want to create and compress is not normalized" << CGoGNendl ;
+		return false ;
+	}
 
-template<typename PFP>
-bool Frame<PFP>::isNormalized(REAL epsilon) const
-{
-	return 		(1-epsilon < m_Z.norm2() && m_Z.norm2() < 1+epsilon)
-			&& 	(1-epsilon < m_X.norm2() && m_X.norm2() < 1+epsilon)
-			&&	(1-epsilon < m_Y.norm2() && m_Y.norm2() < 1+epsilon) ;
-}
+	if (!isOrthogonalFrame<PFP>(X,Y,Z,epsilon))
+	{
+		CGoGNerr << "The Frame you want to create and compress is not orthogonal" << CGoGNendl ;
+		return false ;
+	}
 
-template<typename PFP>
-bool Frame<PFP>::isOrthoNormalDirect(REAL epsilon) const
-{
-	return isOrthogonal(epsilon) && isNormalized(epsilon) && isDirect(epsilon) ;
+	if (!isDirectFrame<PFP>(X,Y,Z,epsilon))
+	{
+		CGoGNerr << "The Frame you want to create and compress is not direct" << CGoGNendl ;
+		return false ;
+	}
+
+	return true ;
 }
 
 
 template<typename REAL>
-Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth)
+Geom::Vector<3,REAL> cartToSpherical (const Geom::Vector<3,REAL>& cart)
 {
 	Geom::Vector<3,REAL> res ;
 
-	const REAL& x = carth[0] ;
-	const REAL& y = carth[1] ;
-	const REAL& z = carth[2] ;
+	const REAL& x = cart[0] ;
+	const REAL& y = cart[1] ;
+	const REAL& z = cart[2] ;
 
 	REAL& rho = res[0] ;
 	REAL& theta = res[1] ;
 	REAL& phi = res[2] ;
 
-	rho = carth.norm() ;
+	rho = cart.norm() ;
 	theta = ((y < 0) ? -1 : 1) * std::acos(x / REAL(sqrt(x*x + y*y)) )  ;
 	if (isnan(theta))
 		theta = 0.0 ;
@@ -162,7 +171,7 @@ Geom::Vector<3,REAL> carthToSpherical (const Geom::Vector<3,REAL>& carth)
 }
 
 template<typename REAL>
-Geom::Vector<3,REAL> sphericalToCarth (const Geom::Vector<3,REAL>& sph)
+Geom::Vector<3,REAL> sphericalToCart (const Geom::Vector<3,REAL>& sph)
 {
 	Geom::Vector<3,REAL> res ;
 

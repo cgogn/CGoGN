@@ -59,14 +59,58 @@ template<typename REAL>
 Geom::Vector<3,REAL> cartToSpherical (const Geom::Vector<3,REAL>& cart) ;
 
 /**
+ * Tests if the frame is direct, normalized and orthogonal
+ * @param X the first vector of the frame
+ * @param Y the second vector of the frame
+ * @param Z the third vector of the frame
+ * @param epsilon tolerated error
+ * @return true if the frame is direct, normalized and orthogonal
+ */
+template<typename PFP>
+bool isDirectOrthoNormalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+
+/**
+ * Tests if the frame is direct
+ * @param X the first vector of the frame
+ * @param Y the second vector of the frame
+ * @param Z the third vector of the frame
+ * @param epsilon tolerated error
+ * @return true if the frame is direct
+ */
+template<typename PFP>
+bool isDirectFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-7) ;
+
+/**
+ * Tests if the frame is orthogonal
+ * @param X the first vector of the frame
+ * @param Y the second vector of the frame
+ * @param Z the third vector of the frame
+ * @param epsilon tolerated error
+ * @return true if the frame is orthogonal
+ */
+template<typename PFP>
+bool isOrthogonalFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+
+/**
+ * Tests if the frame is normalized
+ * @param X the first vector of the frame
+ * @param Y the second vector of the frame
+ * @param Z the third vector of the frame
+ * @param epsilon tolerated error
+ * @return true if the frame is normalized
+ */
+template<typename PFP>
+bool isNormalizedFrame(const typename PFP::VEC3& X, const typename PFP::VEC3& Y, const typename PFP::VEC3& Z, typename PFP::REAL epsilon = 1e-5) ;
+
+/**
  * Class for representing a direct right-handed local frame composed of 3 orthonormal vectors T (tangent), B (bitangent) and N (normal).
  * This class can compress/decompress a local frame, switching from its explicit representation (3 vectors) to its compressed representation (1 vector composed of the Euler angles).
  * Usage :
  *  VEC3 X,Y,Z ;							// current set of orthonormal vectors composing the direct frame.
- *  Frame<PFP> lf(X,Y,Z) ; 				// Constructor from explicit expression.
+ *  Frame<PFP> lf(X,Y,Z) ; 					// Constructor from explicit expression.
  *  if (lf.isOrthoNormalDirect())			// test if the frame is Orthogonal, Normalized and Direct
  *   VEC3 compressed = lf.getCompressed() ;	// Extract compressed frame
- *  Frame<PFP> decompressed(compressed) ;	// Constructor from implicit (compressed) expression.
+ *  Frame<PFP> newLf(compressed) ;			// Constructor from implicit (compressed) expression.
  */
 template <typename PFP>
 class Frame
@@ -77,9 +121,10 @@ class Frame
 
 private: // fields
 	/**
-	 * The three explicit vectors
+	 * The Euler angles
 	 */
-	VEC3 m_X,m_Y,m_Z ;
+	VEC3 m_EulerAngles ;
+
 
 public: // methods
 	/**
@@ -92,17 +137,24 @@ public: // methods
 
 	/**
 	 * Constructor from implicit (compressed representation)
-	 * @param compressedFrame an implicit (compressed) version of the local frame (can be produced by localFrame.getCompressed())
+	 * @param compressedFrame an implicit (compressed) version of the local frame (can be produced by Frame.getCompressed())
 	 */
-	Frame(const VEC3& eulerAngles) ;
+	Frame(const VEC3& compressedFrame) ;
 
 	~Frame() {} ;
 
 	/**
 	 * Returns a compressed version of the current local frame
-	 * A VEC3 is not sufficient to completely define a local frame (if phiN=0, the decompression is not unique).
 	 */
-	VEC3 getCompressed() const ;
+	const VEC3& getCompressed() const { return m_EulerAngles ; } ;
+
+	/**
+	 * Returns a decompressed frame (set of 3 VEC3)
+	 * @param X : the X vector
+	 * @param Y : the Y vector
+	 * @param Z : the Z vector
+	 */
+	void getFrame(VEC3& X, VEC3& Y, VEC3& Z) const ;
 
 	/**
 	 * Tests if the frames are identical
@@ -126,52 +178,12 @@ public: // methods
 	 */
 	bool operator!=(const Frame<PFP>& lf) const ;
 
-	/**
-	 * Tests if the frame is direct
-	 * @return true if the frame is direct
-	 */
-	bool isDirect(REAL epsilon = 1e-7) const ;
-
-	/**
-	 * Tests if the frame is orthogonal
-	 * @return true if the frame is orthogonal
-	 */
-	bool isOrthogonal(REAL epsilon = 1e-5) const ;
-
-	/**
-	 * Tests if the frame is normalized
-	 * @return true if the frame is normalized
-	 */
-	bool isNormalized(REAL epsilon = 1e-5) const ;
-
-	/**
-	 * Tests if the frame is direct, normalized and orthogonal
-	 * @return true if the frame is direct, normalized and orthogonal
-	 */
-	bool isOrthoNormalDirect(REAL epsilon = 1e-5) const ;
-
-	/**
-	 * @return current tangent vector
-	 */
-	VEC3& getX() { return m_X ; }
-	const VEC3& getX() const { return m_X ; }
-
-	/**
-	 * @return current bitangent vector
-	 */
-	VEC3& getY() { return m_Y ; }
-	const VEC3& getY() const { return m_Y ; }
-
-	/**
-	 * @return current normal vector
-	 */
-	VEC3& getZ() { return m_Z ; }
-	const VEC3& getZ() const { return m_Z ; }
-
 	friend std::ostream& operator<< (std::ostream &out, const Frame& lf) {
-		out << "X : " << lf.m_X << std::endl ;
-		out << "Y : " << lf.m_Y << std::endl ;
-		out << "Z : " << lf.m_Z ;
+		out << "Compressed : " << std::endl << lf.getCompressed() ;
+
+		VEC3 X,Y,Z ;
+		lf.getFrame(X,Y,Z) ;
+		out << std::endl << "Decompressed : " << std::endl << X << std::endl << Y << std::endl << Z ;
 		return out ;
 	} ;
 
