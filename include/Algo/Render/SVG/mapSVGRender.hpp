@@ -38,6 +38,32 @@ namespace Render
 namespace SVG
 {
 
+
+template <typename PFP>
+void SVGOut::renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
+{
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	SvgPoints* points = new SvgPoints();
+	points->setColor(global_color);
+	points->setWidth(global_width);
+	DartMarker m(map, thread);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d) && good(d))
+		{
+			const Geom::Vec3f& P = position[d];
+			glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,viewport);
+			glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),viewport);
+			points->addVertex(Geom::Vec3f(Q[0],float(viewport[3])-Q[1],Q[2]));
+			m.markOrbit(VERTEX, d);
+		}
+	}
+	m_objs.push_back(points);
+}
+
+
 template <typename PFP>
 void SVGOut::renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
 {
@@ -75,7 +101,7 @@ void SVGOut::renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3&
 
 
 template <typename PFP>
-void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, const FunctorSelect& good, unsigned int thread)
+void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, bool cull, const FunctorSelect& good, unsigned int thread)
 {
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
@@ -85,25 +111,42 @@ void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3&
 	{
 		if(!m.isMarked(d) && good(d))
 		{
-			typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,d,position);
-			SvgPolygon* pol = new SvgPolygon();
-			Dart dd = d;
-			do
+			bool cullFace=false;
+			if (cull)
 			{
-				Geom::Vec3f P = position[d];
-				P = P*shrink + center*(1.0f-shrink);
+				const Geom::Vec3f& P = position[d];
+
 				glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,viewport);
-				glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),viewport);
-				pol->addVertex(Geom::Vec3f(Q[0],float(viewport[3])-Q[1],Q[2]));
-				pol->addVertex3D(Geom::Vec3f(R[0],R[1],R[2]));
-				d = map.phi1(d);
-			}while (d!=dd);
+				const Geom::Vec3f& P2 = position[map.phi1(d)];
+				glm::vec3 R = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,viewport);
+				const Geom::Vec3f& P3 = position[map.phi1(map.phi1(d))];
+				glm::vec3 S = glm::project(glm::vec3(P3[0],P3[1],P3[2]),m_model,m_proj,viewport);
+				glm::vec3 N = glm::cross(S-R,Q-R);
+				if (N[2]<0.0f)
+					cullFace=true;
+			}
 
-			pol->close();
-			pol->setColor(global_color);
-			pol->setWidth(global_width);
-			m_objs.push_back(pol);
+			if (!cullFace)
+			{
+				typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,d,position);
+				SvgPolygon* pol = new SvgPolygon();
+				Dart dd = d;
+				do
+				{
+					Geom::Vec3f P = position[d];
+					P = P*shrink + center*(1.0f-shrink);
+					glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,viewport);
+					glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),viewport);
+					pol->addVertex(Geom::Vec3f(Q[0],float(viewport[3])-Q[1],Q[2]));
+					pol->addVertex3D(Geom::Vec3f(R[0],R[1],R[2]));
+					d = map.phi1(d);
+				}while (d!=dd);
 
+				pol->close();
+				pol->setColor(global_color);
+				pol->setWidth(global_width);
+				m_objs.push_back(pol);
+			}
 			m.markOrbit(FACE, d);
 		}
 	}

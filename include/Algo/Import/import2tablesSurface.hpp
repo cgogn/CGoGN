@@ -23,6 +23,8 @@
 *******************************************************************************/
 
 #include "Algo/Import/importPlyData.h"
+#include "Algo/Geometry/boundingbox.h"
+#include "Topology/generic/autoAttributeHandler.h"
 
 #include "openctm.h"
 
@@ -433,7 +435,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
 	m_emb.reserve(verticesID.size()*8);
 
 	std::vector<int> table;
-	table.reserve(64); // 64 cotes pour une face devrait suffire
+	table.reserve(64); // NBV cotes pour une face devrait suffire
 	m_nbFaces = 0;
     do
     {
@@ -672,9 +674,8 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
  * @param attrNames : reference that will be filled with the attribute names ;
  *  - 1 attrName for geometric position (VEC3)
  *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
- *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the constants, the linears (v then u) and the quadratics : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
- * @return bool : success.
- * @return bool : success.
+ *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the quadratic members, the linears and the constants (u then v) : a*u^2 + b*v^2 + c*uv + d*u + e*v +f.
+  * @return bool : success.
  */
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames)
@@ -930,6 +931,158 @@ bool MeshTablesSurface<PFP>::importASSIMP(const std::string& filename, std::vect
 
 	return true;
 }
+
+template<typename PFP>
+bool MeshTablesSurface<PFP>::mergeCloseVertices()
+{
+	const unsigned int NBV=64; // seems to be good
+
+	const int NEIGH[27]={
+	-NBV*NBV - NBV - 1, 	-NBV*NBV - NBV, 	-NBV*NBV - NBV + 1,
+	-NBV*NBV - 1, 	-NBV*NBV, 	-NBV*NBV + 1,
+	-NBV*NBV + NBV - 1,	-NBV*NBV + NBV,	- NBV*NBV + NBV + 1,
+	-NBV - 1,	- NBV,	-NBV + 1,
+	-1,	0,	1,
+	NBV - 1,	NBV,	NBV + 1,
+	NBV*NBV - NBV - 1,	NBV*NBV - NBV,	NBV*NBV - NBV + 1,
+	NBV*NBV - 1,	NBV*NBV,	NBV*NBV + 1,
+	NBV*NBV + NBV - 1,	NBV*NBV + NBV,	NBV*NBV + NBV + 1};
+
+	std::vector<unsigned int>** grid;
+	grid = new std::vector<unsigned int>*[NBV*NBV*NBV];
+
+	// init grid with null ptrs	
+	for (unsigned int i=0; i<NBV*NBV*NBV; ++i)
+		grid[i]=NULL;
+	
+	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position");
+	
+	// compute BB
+	Geom::BoundingBox<typename PFP::VEC3> bb(positions[ positions.begin() ]) ;
+	for (unsigned int i = positions.begin(); i != positions.end(); positions.next(i))
+	{
+		bb.addPoint(positions[i]) ;
+	}
+
+	// add one voxel around to avoid testing		
+	typename PFP::VEC3 bbsize = (bb.max() - bb.min());
+	typename PFP::VEC3 one = bbsize/(NBV-2);
+	one*= 1.001f;
+	bb.addPoint( bb.min() - one);
+	bb.addPoint( bb.max() + one);
+	bbsize = (bb.max() - bb.min());
+	
+
+	AutoAttributeHandler<unsigned int> gridIndex(m_map,VERTEX, "gridIndex");
+	AutoAttributeHandler<unsigned int> newIndices(m_map,VERTEX, "newIndices");
+	
+	
+	// Store each vertex in the grid and store voxel index in vertex attribute
+	for (unsigned int i = positions.begin(); i != positions.end(); positions.next(i))
+	{
+		typename PFP::VEC3 P = positions[i];
+		P -= bb.min();
+		float pz = floor((P[2]/bbsize[2])*NBV);
+		float py = floor((P[1]/bbsize[1])*NBV);
+		float px = floor((P[0]/bbsize[0])*NBV);
+
+		unsigned int index = NBV*NBV*pz + NBV*py + px;
+		
+		if (pz==63) 
+			std::cout << "z 63 bb:"<<bb<<"  P="<<positions[i]<< std::endl;
+		
+		std::vector<unsigned int>* vox = grid[index];
+		if (vox==NULL)
+		{
+			grid[index] = new std::vector<unsigned int>();
+			grid[index]->reserve(8);
+			vox = grid[index];
+		}
+		vox->push_back(i);
+		gridIndex[i] = index;
+		newIndices[i] = 0xffffffff;
+	}
+	
+	// compute EPSILON: average length of 50 of 100 first edges of first faces divide by 10000
+	int nb = 100;
+	if (m_nbEdges.size()< 100) 
+		nb = m_nbEdges.size();
+		
+	int k=0;
+	typename PFP::REAL d=0;
+	for (int i=0; i< nb; i+=2)
+	{
+		typename PFP::VEC3 e1 = positions[m_emb[k+1]] - positions[m_emb[k]];
+		d += e1.norm();
+		k += m_nbEdges[i];
+	}
+	d /= float(nb/2);
+	
+	typename PFP::REAL EPSILON = d/10000.0f;
+	
+	
+	// traverse vertices
+	for (unsigned int i = positions.begin(); i != positions.end(); positions.next(i))
+	{
+		if (newIndices[i] == 0xffffffff) 
+		{
+			const typename PFP::VEC3& P = positions[i];
+			
+			for (unsigned int n=0; n<27; ++n)
+			{
+				std::vector<unsigned int>* voxel = grid[gridIndex[i]+NEIGH[n]];
+				if (voxel != NULL)
+				{
+					for (std::vector<unsigned int>::iterator v = voxel->begin(); v != voxel->end(); ++v)
+					{
+						if ((*v != i) && (*v != 0xffffffff))
+						{
+							typename PFP::VEC3 Q = positions[*v];
+							Q -= P;
+							typename PFP::REAL d2 = Q*Q;
+							if (d2 < EPSILON*EPSILON)
+							{
+								newIndices[*v] = i;
+								*v = 0xffffffff;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// update faces indices
+	for	(std::vector<unsigned int>::iterator it = m_emb.begin(); it != m_emb.end(); ++it)
+	{
+		if (newIndices[*it] != 0xffffffff)
+		{
+			*it = newIndices[*it];
+		}
+	}
+
+	// delete embeddings
+	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
+
+	for (unsigned int i = positions.begin(); i != positions.end(); positions.next(i))
+	{
+		if (newIndices[i] != 0xffffffff)
+		{
+			container.removeLine(i);
+		}
+	}
+
+	// release grid memory	
+	for (unsigned int i=0; i<NBV*NBV*NBV; ++i)
+		if (grid[i]!=NULL)
+			delete grid[i];
+
+	delete[] grid;
+
+	return true;
+}
+
+
 
 } // namespace Import
 

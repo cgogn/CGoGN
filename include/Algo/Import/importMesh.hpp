@@ -114,6 +114,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			}
 			else
 			{
+				m.unmark(d);
 				++nbnm;
 			}
 		}
@@ -425,12 +426,15 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 }
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind, bool mergeCloseVertices)
 {
 	MeshTablesSurface<PFP> mts(map);
 
 	if(!mts.importMesh(filename, attrNames, kind))
 		return false;
+	
+	if (mergeCloseVertices)
+		mts.mergeCloseVertices();
 
 	return importMesh<PFP>(map, mts);
 }
