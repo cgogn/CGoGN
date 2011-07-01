@@ -926,7 +926,7 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 
     // Allocate vertices
 
-	AttributeContainer& vxContainer = m_map.getAttributeContainer(VERTEX_CELL);
+	AttributeContainer& vxContainer = m_map.getAttributeContainer(VERTEX);
 
 
 	std::vector<unsigned int> verticesId;
@@ -971,10 +971,10 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 
 	// Read positions
 
-	AttributeHandler<typename PFP::VEC3> position =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> position =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	if (!position.isValid())
-		position = m_map.template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+		position = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	attrNames.push_back(position.name()) ;
 
