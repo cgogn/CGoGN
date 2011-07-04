@@ -44,6 +44,12 @@ class ClippingShader : public GLSLShader
 {
 
 public:
+
+	/**
+	 * enum used to choose which type of clip plane grid to display
+	 */
+	enum clipPlaneDisplayGridType { STRAIGHT_GRID, RADIAL_GRID };
+
 	/**
 	 * constructor
 	 */
@@ -145,15 +151,59 @@ public:
 	void displayClippingPlanes();
 
 	/**
-	 * set the plane display size
-	 * @param size the new size
+	 * set the planes display color
+	 * @param color the new color
 	 */
-	void setPlaneDisplaySize(float size) { m_planeDisplaySize = size; }
+	void setPlaneDisplayColor(Geom::Vec3f color) { m_clipPlanesDisplayColor = color; }
 
 	/**
-	 * get the plane display size
+	 * get the planes display color
 	 */
-	float getPlaneDisplaySize() { return m_planeDisplaySize; }
+	Geom::Vec3f getPlaneDisplayColor() { return m_clipPlanesDisplayColor; }
+
+	/**
+	 * set the planes display grids type
+	 * @param gridType the new grid type
+	 */
+	void setPlaneDisplayType(clipPlaneDisplayGridType gridType) { m_clipPlanesDisplayType = gridType; }
+
+	/**
+	 * get the planes display grids type
+	 */
+	clipPlaneDisplayGridType getPlaneDisplayType() { return m_clipPlanesDisplayType; }
+
+	/**
+	 * set the planes display grid x resolution
+	 * @param res the new resolution
+	 */
+	void setPlaneDisplayXRes(size_t res) { m_clipPlanesDisplayXRes = res; }
+
+	/**
+	 * get the planes display grid x resolution
+	 */
+	size_t getPlaneDisplayXRes() { return m_clipPlanesDisplayXRes; }
+
+	/**
+	 * set the planes display grid y resolution
+	 * @param res the new resolution
+	 */
+	void setPlaneDisplayYRes(size_t res) { m_clipPlanesDisplayYRes = res; }
+
+	/**
+	 * get the planes display grid y resolution
+	 */
+	size_t getPlaneDisplayYRes() { return m_clipPlanesDisplayYRes; }
+
+	/**
+	 * set the planes display size
+	 * @param size the new size
+	 */
+	void setPlaneDisplaySize(float size) { m_clipPlanesDisplaySize = size; }
+
+	/**
+	 * get the planes display size
+	 */
+	float getPlaneDisplaySize() { return m_clipPlanesDisplaySize; }
 
 
 private:
@@ -224,9 +274,29 @@ private:
 	std::vector<Drawer*> m_clipPlanesDrawers;
 
 	/**
-	 * plane display size
+	 * clip planes display color
 	 */
-	float m_planeDisplaySize;
+	Geom::Vec3f m_clipPlanesDisplayColor;
+
+	/**
+	 * clip planes display grid type
+	 */
+	clipPlaneDisplayGridType m_clipPlanesDisplayType;
+
+	/**
+	 * clip planes x grid display resolution
+	 */
+	size_t m_clipPlanesDisplayXRes;
+
+	/**
+	 * clip planes y grid display resolution
+	 */
+	size_t m_clipPlanesDisplayYRes;
+
+	/**
+	 * clip planes display size
+	 */
+	float m_clipPlanesDisplaySize;
 
 };
 

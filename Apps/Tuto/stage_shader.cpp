@@ -326,6 +326,11 @@ void StageShader::cb_initGL()
 	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
 
 	registerShader(m_shader);
+
+	m_shader->setPlaneDisplayColor(Geom::Vec3f (1.0, 0.0, 0.0));
+	m_shader->setPlaneDisplayXRes(10);
+	m_shader->setPlaneDisplayYRes(5);
+	m_shader->setPlaneDisplayType(Utils::ClippingShader::STRAIGHT_GRID);
 }
 
 void StageShader::updateVBOprimitives(int upType)

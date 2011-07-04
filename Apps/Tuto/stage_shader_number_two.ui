@@ -109,143 +109,11 @@
        <attribute name="title">
         <string>Clipping</string>
        </attribute>
-       <widget class="QLabel" name="label_Plane">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>69</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Plane :</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_plane_a">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>30</y>
-          <width>21</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>a :</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_plane_a">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>63</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="minimum">
-         <double>-99.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_plane_b">
-        <property name="geometry">
-         <rect>
-          <x>80</x>
-          <y>50</y>
-          <width>63</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <double>-99.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_plane_b">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>30</y>
-          <width>21</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>b :</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_plane_c">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>63</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <double>-99.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_plane_c">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>90</y>
-          <width>21</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>c :</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_plane_d">
-        <property name="geometry">
-         <rect>
-          <x>80</x>
-          <y>110</y>
-          <width>63</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="minimum">
-         <double>-99.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_plane_d">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>90</y>
-          <width>21</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>d :</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_color_attenuation">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>150</y>
+          <y>20</y>
           <width>141</width>
           <height>18</height>
          </rect>
@@ -258,7 +126,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>180</y>
+          <y>50</y>
           <width>63</width>
           <height>28</height>
          </rect>

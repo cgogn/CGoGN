@@ -71,11 +71,6 @@ void Stage_shader_number_two::initGUI()
 	setCallBack( dock.check_drawNormals, SIGNAL(toggled(bool)), SLOT(slot_drawNormals(bool)) ) ;
 	setCallBack( dock.slider_normalsSize, SIGNAL(valueChanged(int)), SLOT(slot_normalsSize(int)) ) ;
 
-	setCallBack(dock.doubleSpinBox_plane_a, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
-	setCallBack(dock.doubleSpinBox_plane_b, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
-	setCallBack(dock.doubleSpinBox_plane_c, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
-	setCallBack(dock.doubleSpinBox_plane_d, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_Plane(double)));
-
 	setCallBack(dock.doubleSpinBox_color_attenuation, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
 }
 
@@ -290,16 +285,6 @@ void Stage_shader_number_two::slot_normalsSize(int i)
 {
 	normalScaleFactor = i / 50.0f ;
 	updateGL() ;
-}
-
-void Stage_shader_number_two::slot_doubleSpinBox_Plane(double c)
-{
-	float aPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_a->value();
-	float bPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_b->value();
-	float cPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_c->value();
-	float dPlane = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_plane_d->value();
-	//m_phongShader->setClippingPlaneEquation(Geom::Vec4f(aPlane, bPlane, cPlane, dPlane));
-	updateGL();
 }
 
 void Stage_shader_number_two::slot_doubleSpinBox_ColorAttenuationFactor(double c)

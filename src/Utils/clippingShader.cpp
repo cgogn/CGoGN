@@ -40,7 +40,11 @@ ClippingShader::ClippingShader()
 	m_unif_colorAttenuationFactor = 0;
 
 	// Initialize display variables
-	m_planeDisplaySize = 10.0;
+	m_clipPlanesDisplayColor = Geom::Vec3f (1.0, 0.6, 0.0);
+	m_clipPlanesDisplayType = STRAIGHT_GRID;
+	m_clipPlanesDisplayXRes = 2;
+	m_clipPlanesDisplayYRes = 2;
+	m_clipPlanesDisplaySize = 10.0;
 }
 
 ClippingShader::~ClippingShader()
@@ -533,31 +537,146 @@ void ClippingShader::updateClippingPlaneVBO(int planeIndex)
 
 	// Compute four point of the plane at equal distance from plane origin
 	Geom::Vec3f p1 = m_clipPlanes[planeIndex].origin
-			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
 	Geom::Vec3f p2 = m_clipPlanes[planeIndex].origin
-			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
 	Geom::Vec3f p3 = m_clipPlanes[planeIndex].origin
-			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
 	Geom::Vec3f p4 = m_clipPlanes[planeIndex].origin
-			- (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			+ (0.5f * m_planeDisplaySize) * m_clipPlanes[planeIndex].secondVec;
+			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
+			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
 
-	// Reset the VBO with the new points
+	// Build again the VBO with the new points
 	m_clipPlanesDrawers[planeIndex]->newList(GL_COMPILE);
-	m_clipPlanesDrawers[planeIndex]->begin(GL_LINE_LOOP);
-	m_clipPlanesDrawers[planeIndex]->color3f(0.7f, 0.7f, 0.2f);
-	m_clipPlanesDrawers[planeIndex]->vertex3f(p1[0], p1[1], p1[2]);
-	m_clipPlanesDrawers[planeIndex]->vertex3f(p2[0], p2[1], p2[2]);
-	m_clipPlanesDrawers[planeIndex]->vertex3f(p3[0], p3[1], p3[2]);
-	m_clipPlanesDrawers[planeIndex]->vertex3f(p4[0], p4[1], p4[2]);
-	m_clipPlanesDrawers[planeIndex]->end();
+
+	// Only display the grid if both x and y resolutions are not zero
+	if ( (m_clipPlanesDisplayXRes != 0) && (m_clipPlanesDisplayYRes != 0) )
+	{
+		size_t i;
+		float t;
+		Geom::Vec3f p1p2Interp;
+		Geom::Vec3f p4p3Interp;
+		Geom::Vec3f p3p4Interp; // Used for non straight grid construction
+		Geom::Vec3f p2p3Interp;
+		Geom::Vec3f p1p4Interp;
+		Geom::Vec3f p4p1Interp; // Used for non straight grid construction
+
+		// X lines
+		for (i = 0; i <= m_clipPlanesDisplayXRes; i++)
+		{
+			// Compute the linear interpolation parameter from the current value of 'i'
+			t = (float)i / (float)m_clipPlanesDisplayXRes;
+
+			// Straight grid construction
+			if (m_clipPlanesDisplayType == STRAIGHT_GRID)
+			{
+				// Compute linear interpolations between points
+				p1p2Interp = p1*t + p2*(1.0 - t);
+				p4p3Interp = p4*t + p3*(1.0 - t);
+
+				// Draw lines between the resulting points
+				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
+				m_clipPlanesDrawers[planeIndex]->color3f(
+						m_clipPlanesDisplayColor[0],
+						m_clipPlanesDisplayColor[1],
+						m_clipPlanesDisplayColor[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p1p2Interp[0],
+						p1p2Interp[1],
+						p1p2Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p4p3Interp[0],
+						p4p3Interp[1],
+						p4p3Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->end();
+			}
+			// Radial grid construction
+			else if (m_clipPlanesDisplayType == RADIAL_GRID)
+			{
+				// Compute linear interpolations between points
+				p1p2Interp = p1*t + p2*(1.0 - t);
+				p3p4Interp = p3*t + p4*(1.0 - t);
+
+				// Draw lines between the resulting points
+				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
+				m_clipPlanesDrawers[planeIndex]->color3f(
+						m_clipPlanesDisplayColor[0],
+						m_clipPlanesDisplayColor[1],
+						m_clipPlanesDisplayColor[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p1p2Interp[0],
+						p1p2Interp[1],
+						p1p2Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p3p4Interp[0],
+						p3p4Interp[1],
+						p3p4Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->end();
+			}
+		}
+
+		// Y lines
+		for (i = 0; i <= m_clipPlanesDisplayYRes; i++)
+		{
+			// Compute the linear interpolation parameter from the current value of 'i'
+			t = (float)i / (float)m_clipPlanesDisplayYRes;
+
+			// Straight grid construction
+			if (m_clipPlanesDisplayType == STRAIGHT_GRID)
+			{
+				// Compute linear interpolations between points
+				p2p3Interp = p2*t + p3*(1.0 - t);
+				p1p4Interp = p1*t + p4*(1.0 - t);
+
+				// Draw lines between the resulting points
+				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
+				m_clipPlanesDrawers[planeIndex]->color3f(
+						m_clipPlanesDisplayColor[0],
+						m_clipPlanesDisplayColor[1],
+						m_clipPlanesDisplayColor[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p2p3Interp[0],
+						p2p3Interp[1],
+						p2p3Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p1p4Interp[0],
+						p1p4Interp[1],
+						p1p4Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->end();
+			}
+			// Radial grid construction
+			else if (m_clipPlanesDisplayType == RADIAL_GRID)
+			{
+				// Compute linear interpolations between points
+				p2p3Interp = p2*t + p3*(1.0 - t);
+				p4p1Interp = p4*t + p1*(1.0 - t);
+
+				// Draw lines between the resulting points
+				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
+				m_clipPlanesDrawers[planeIndex]->color3f(
+						m_clipPlanesDisplayColor[0],
+						m_clipPlanesDisplayColor[1],
+						m_clipPlanesDisplayColor[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p2p3Interp[0],
+						p2p3Interp[1],
+						p2p3Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->vertex3f(
+						p4p1Interp[0],
+						p4p1Interp[1],
+						p4p1Interp[2]);
+				m_clipPlanesDrawers[planeIndex]->end();
+			}
+		}
+
+	}
+
 	m_clipPlanesDrawers[planeIndex]->endList();
 }
 
 } // namespace Utils
 
 } // namespace CGoGN
-

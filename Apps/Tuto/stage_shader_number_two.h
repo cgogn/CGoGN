@@ -128,7 +128,6 @@ public slots:
 	void slot_faceLighting(int i) ;
 	void slot_drawNormals(bool b) ;
 	void slot_normalsSize(int i) ;
-	void slot_doubleSpinBox_Plane(double c);
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
 };
 
