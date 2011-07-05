@@ -1205,6 +1205,7 @@ bool Map3::check()
     {
         if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
 		{
+        	std::cout << "dart = " << d << std::endl;
             CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
             return false;
         }
