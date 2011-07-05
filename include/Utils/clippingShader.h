@@ -154,7 +154,7 @@ public:
 	 * set the planes display color
 	 * @param color the new color
 	 */
-	void setPlaneDisplayColor(Geom::Vec3f color) { m_clipPlanesDisplayColor = color; }
+	void setPlaneDisplayColor(Geom::Vec3f color) { m_clipPlanesDisplayColor = color; updateAllClippingPlanesVBOs(); }
 
 	/**
 	 * get the planes display color
@@ -165,7 +165,7 @@ public:
 	 * set the planes display grids type
 	 * @param gridType the new grid type
 	 */
-	void setPlaneDisplayType(clipPlaneDisplayGridType gridType) { m_clipPlanesDisplayType = gridType; }
+	void setPlaneDisplayType(clipPlaneDisplayGridType gridType) { m_clipPlanesDisplayType = gridType; updateAllClippingPlanesVBOs(); }
 
 	/**
 	 * get the planes display grids type
@@ -176,7 +176,7 @@ public:
 	 * set the planes display grid x resolution
 	 * @param res the new resolution
 	 */
-	void setPlaneDisplayXRes(size_t res) { m_clipPlanesDisplayXRes = res; }
+	void setPlaneDisplayXRes(size_t res) { m_clipPlanesDisplayXRes = res; updateAllClippingPlanesVBOs(); }
 
 	/**
 	 * get the planes display grid x resolution
@@ -187,7 +187,7 @@ public:
 	 * set the planes display grid y resolution
 	 * @param res the new resolution
 	 */
-	void setPlaneDisplayYRes(size_t res) { m_clipPlanesDisplayYRes = res; }
+	void setPlaneDisplayYRes(size_t res) { m_clipPlanesDisplayYRes = res; updateAllClippingPlanesVBOs(); }
 
 	/**
 	 * get the planes display grid y resolution
@@ -198,7 +198,7 @@ public:
 	 * set the planes display size
 	 * @param size the new size
 	 */
-	void setPlaneDisplaySize(float size) { m_clipPlanesDisplaySize = size; }
+	void setPlaneDisplaySize(float size) { m_clipPlanesDisplaySize = size; updateAllClippingPlanesVBOs(); }
 
 	/**
 	 * get the planes display size
@@ -227,10 +227,15 @@ private:
 	void sendColorAttenuationFactorUniform();
 
 	/**
-	 * update VBO for one plane(recalculate quad)
+	 * update VBO for one plane
 	 * @param planeIndex index of the plane
 	 */
 	void updateClippingPlaneVBO(int planeIndex);
+
+	/**
+	 * update VBOs for all planes
+	 */
+	void updateAllClippingPlanesVBOs();
 
 	/**
 	 * original vertex shader source code (without clipping)
@@ -249,9 +254,27 @@ private:
 
 	/**
 	 * clip planes equations array (size = 4*(planes count))
-	 * - used only for sending planes data to shader
+	 * - ** only used for sending planes data to shader **
 	 */
 	std::vector<float> m_clipPlanesEquations;
+
+	/**
+	 * clip planes first vectors array (size = 3*(planes count))
+	 * - ** only used for sending planes data to shader **
+	 */
+	std::vector<float> m_clipPlanesFirstVectors;
+
+	/**
+	 * clip planes second vectors array (size = 3*(planes count))
+	 * - ** only used for sending planes data to shader **
+	 */
+	std::vector<float> m_clipPlanesSecondVectors;
+
+	/**
+	 * clip planes origins array (size = 3*(planes count))
+	 * - ** only used for sending planes data to shader **
+	 */
+	std::vector<float> m_clipPlanesOrigins;
 
 	/**
 	 * clip planes equations vector uniform id

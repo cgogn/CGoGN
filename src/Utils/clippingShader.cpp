@@ -36,7 +36,7 @@ ClippingShader::ClippingShader()
 	m_unif_clipPlanesEquations = 0;
 	
 	// Initialize color attenuation variables
-	m_colorAttenuationFactor = 0.0;
+	m_colorAttenuationFactor = 1.0;
 	m_unif_colorAttenuationFactor = 0;
 
 	// Initialize display variables
@@ -343,9 +343,9 @@ void ClippingShader::setClippingPlanesCount(int planesCount)
 	"		// Keep the fragment only if it is 'above' the plane\n"
 	"		if (clip_DistanceToPlane < 0.0)\n"
 	"			discard;\n"
-	"		// Else keep the positive distance to the nearest plane\n"
 	"		else\n"
 	"		{\n"
+	"			// Keep the distance to the nearest plane\n"
 	"			if (clip_MinDistanceToPlanes < 0.0)\n"
 	"				clip_MinDistanceToPlanes = clip_DistanceToPlane;\n"
 	"			else\n"
@@ -549,7 +549,9 @@ void ClippingShader::updateClippingPlaneVBO(int planeIndex)
 			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
 			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
 
+
 	// Build again the VBO with the new points
+
 	m_clipPlanesDrawers[planeIndex]->newList(GL_COMPILE);
 
 	// Only display the grid if both x and y resolutions are not zero
@@ -559,10 +561,10 @@ void ClippingShader::updateClippingPlaneVBO(int planeIndex)
 		float t;
 		Geom::Vec3f p1p2Interp;
 		Geom::Vec3f p4p3Interp;
-		Geom::Vec3f p3p4Interp; // Used for non straight grid construction
+		Geom::Vec3f p3p4Interp; // Used for radial grid construction
 		Geom::Vec3f p2p3Interp;
 		Geom::Vec3f p1p4Interp;
-		Geom::Vec3f p4p1Interp; // Used for non straight grid construction
+		Geom::Vec3f p4p1Interp; // Used for radial grid construction
 
 		// X lines
 		for (i = 0; i <= m_clipPlanesDisplayXRes; i++)
@@ -675,6 +677,13 @@ void ClippingShader::updateClippingPlaneVBO(int planeIndex)
 	}
 
 	m_clipPlanesDrawers[planeIndex]->endList();
+}
+
+void ClippingShader::updateAllClippingPlanesVBOs()
+{
+	int i;
+	for (i = 0; i < getClippingPlanesCount(); i++)
+		updateClippingPlaneVBO(i);
 }
 
 } // namespace Utils
