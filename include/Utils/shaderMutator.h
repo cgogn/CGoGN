@@ -48,52 +48,52 @@ public:
 
 	/**
 	 * constructor
-	 * @param vertShaderSrc the vertex shader source to store
-	 * @param fragShaderSrc the fragment shader source to store
-	 * @param geomShaderSrc the geometry shader source to store
+	 * @param vertShaderSrc vertex shader source to store
+	 * @param fragShaderSrc fragment shader source to store
+	 * @param geomShaderSrc geometry shader source to store (optional)
 	 */
 	 ShaderMutator(const std::string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc = "");
 	 
 	 /**
-	  * check if a variable is declared in the shader source
-	  * @param srcType the shader source to use (vertex, fragment or geometry)
-	  * @param variableName the variable to search for
+	  * checks if a variable is declared in the shader source
+	  * @param srcType shader source to use
+	  * @param variableName variable to search for
 	  */
 	 bool containsVariableDeclaration(shaderSrcType srcType, const std::string& variableName);
 	 
 	 /**
-	  * set or change shading language version in the shader source
+	  * sets or changes shading language version in the shader source
 	  * - only if the current version is lower
-	  * @param srcType the shader source to use (vertex, fragment or geometry)
-	  * @param version the version to set (110, 120, 150...)
+	  * @param srcType shader source to use
+	  * @param version version to set (110, 120, 150...)
 	  */
 	 void setMinShadingLanguageVersion(shaderSrcType srcType, int version);
 
 	 /**
-	  * change int constant value in the shader source
-	  * @param srcType the shader source to use (vertex, fragment or geometry)
-	  * @param newVal the new value
+	  * changes int constant value in the shader source
+	  * @param srcType shader source to use
+	  * @param newVal new constant value
 	  */
 	 void changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal);
 
 	 /**
-	  * insert code before main function into shader source
-	  * @param srcType the shader source to use (vertex, fragment or geometry)
+	  * inserts code before main function in the shader source
+	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
 	  */
 	 void insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode);
 	 
 	 /**
-	  * insert code at the beginning of main function into shader source
-	  * @param srcType the shader source to use (vertex, fragment or geometry)
+	  * inserts code at the beginning of main function in the shader source
+	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
 	  */
 	 void insertCodeAtMainFunctionBeginning(shaderSrcType srcType, const std::string& insertedCode);
 	 
 	 /**
-	  * insert code at the end of main function into shader source
+	  * inserts code at the end of main function in the shader source
 	  * @warning takes the number of opening and closing braces of main function into account
-	  * @param srcType the shader source to use (vertex, fragment or geometry)
+	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
 	  */
 	 void insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode);
@@ -136,56 +136,58 @@ private:
 	std::string m_gShaderMutation;
 	
 	/**
-	 * check if the given position in the source is commented
-	 * @param pos the position
-	 * @param src the source to analyze
+	 * checks if the given position is commented
+	 * @param pos position in the source (like in a string)
+	 * @param src source to analyze
 	 */
 	bool srcIsCommented(size_t pos, const std::string& src);
 	
 	/**
-	 * check if the given position in the source is commented with a one-line comment
-	 * @param pos the position
-	 * @param src the source to analyze
+	 * checks if the given position is commented with a one-line comment
+	 * @param pos position in the source (like in a string)
+	 * @param src source to analyze
 	 */
 	bool srcIsOneLineCommented(size_t pos, const std::string& src);
 	
 	/**
-	  * check if a variable is declared in a source code
-	  * @param variable the variable to search for
+	  * checks if a variable is declared
+	  * @param variableName variable to search for
+	  * @param src source to analyze
 	 */
 	bool srcContainsVariableDeclaration(const std::string& variableName, std::string& src);
 	
 	/**
-	 * set or change shading language version if the current version is lower
-	 * @param version the version to set (110, 120, 150...)
+	 * sets or changes shading language version if the current version is lower
+	 * @param version version to set (110, 120, 150...)
 	 * @param modifiedSrc shader source code to modify
 	 */
 	bool srcSetMinShadingLanguageVersion(int version, std::string& modifiedSrc);
 
 	/**
-	 * change int constant value
-	 * @param newVal the new value
+	 * changes int constant value
+	 * @param newVal new constant value
+	 * @param constantName constant name as it is declared
 	 * @param modifiedSrc shader source code to modify
 	 */
 	bool srcChangeIntConstantValue(int newVal, const std::string& constantName, std::string& modifiedSrc);
 
 	/**
-	 * insert code before main function into source code
-	 * @param insertedCode source code to insert into shader
+	 * inserts code before main function
+	 * @param insertedCode source code to insert
 	 * @param modifiedSrc shader source code to modify
 	 */
 	bool srcInsertCodeBeforeMainFunction(const std::string& insertedCode, std::string& modifiedSrc);
 	
 	/**
-	 * insert code at the beginning of main function into source code
-	 * @param insertedCode source code to insert into shader
+	 * inserts code at the beginning of main function
+	 * @param insertedCode source code to insert
 	 * @param modifiedSrc shader source code to modify
 	 */
 	bool srcInsertCodeAtMainFunctionBeginning(const std::string& insertedCode, std::string& modifiedSrc);
 
 	/**
-	 * insert code at the end of main function into source code
-	 * @param insertedCode source code to insert into shader
+	 * inserts code at the end of main function
+	 * @param insertedCode source code to insert
 	 * @param modifiedSrc shader source code to modify
 	 */
 	bool srcInsertCodeAtMainFunctionEnd(const std::string& insertedCode, std::string& modifiedSrc);

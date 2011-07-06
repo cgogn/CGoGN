@@ -40,13 +40,11 @@ void StageShader::slot_drawVertices(bool b)
 	updateGL();
 }
 
-
 void StageShader::slot_drawLines(bool b)
 {
 	m_drawLines = b;
 	updateGL();
 }
-
 
 void StageShader::slot_drawFaces(bool b)
 {
@@ -77,9 +75,9 @@ void StageShader::slot_explodTopoPhi3(double c)
 
 void StageShader::slot_pushButton_addPlane()
 {
-	m_shader->setClippingPlanesCount(dock.comboBox_PlaneIndex->count() + 1);
+	m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() + 1);
 
-	m_shader->setClippingPlaneOrigin(m_bb.center(), dock.comboBox_PlaneIndex->count() + 1 - 1);
+	m_shader->setClipPlaneOrigin(m_bb.center(), dock.comboBox_PlaneIndex->count() + 1 - 1);
 
 	std::string indexStr;
 	std::stringstream ss;
@@ -98,7 +96,7 @@ void StageShader::slot_pushButton_addPlane()
 
 void StageShader::slot_pushButton_deletePlane()
 {
-	m_shader->setClippingPlanesCount(dock.comboBox_PlaneIndex->count() - 1);
+	m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() - 1);
 
 	dock.comboBox_PlaneIndex->removeItem(dock.comboBox_PlaneIndex->count() - 1);
 
@@ -112,17 +110,17 @@ void StageShader::slot_comboBox_PlaneIndexChanged(int newIndex)
 {
 	if (newIndex >= 0)
 	{
-		Geom::Vec3f currPlaneVec1 = m_shader->getClippingPlaneFirstVec(newIndex);
+		Geom::Vec3f currPlaneVec1 = m_shader->getClipPlaneFirstVec(newIndex);
 		dock.doubleSpinBox_PlaneVec1x->setValue(currPlaneVec1[0]);
 		dock.doubleSpinBox_PlaneVec1y->setValue(currPlaneVec1[1]);
 		dock.doubleSpinBox_PlaneVec1z->setValue(currPlaneVec1[2]);
 
-		Geom::Vec3f currPlaneVec2 = m_shader->getClippingPlaneSecondVec(newIndex);
+		Geom::Vec3f currPlaneVec2 = m_shader->getClipPlaneSecondVec(newIndex);
 		dock.doubleSpinBox_PlaneVec2x->setValue(currPlaneVec2[0]);
 		dock.doubleSpinBox_PlaneVec2y->setValue(currPlaneVec2[1]);
 		dock.doubleSpinBox_PlaneVec2z->setValue(currPlaneVec2[2]);
 
-		Geom::Vec3f currPlaneOrigin = m_shader->getClippingPlaneOrigin(newIndex);
+		Geom::Vec3f currPlaneOrigin = m_shader->getClipPlaneOrigin(newIndex);
 		dock.doubleSpinBox_PlaneOriginx->setValue(currPlaneOrigin[0]);
 		dock.doubleSpinBox_PlaneOriginy->setValue(currPlaneOrigin[1]);
 		dock.doubleSpinBox_PlaneOriginz->setValue(currPlaneOrigin[2]);
@@ -136,7 +134,7 @@ void StageShader::slot_doubleSpinBox_PlaneVec1(double c)
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1x->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1y->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1z->value();
-		m_shader->setClippingPlaneFirstVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
+		m_shader->setClipPlaneFirstVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
 		updateGL();
 	}
 }
@@ -148,7 +146,7 @@ void StageShader::slot_doubleSpinBox_PlaneVec2(double c)
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2x->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2y->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2z->value();
-		m_shader->setClippingPlaneSecondVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
+		m_shader->setClipPlaneSecondVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
 		updateGL();
 	}
 }
@@ -160,14 +158,14 @@ void StageShader::slot_doubleSpinBox_PlaneOrigin(double c)
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginx->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginy->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginz->value();
-		m_shader->setClippingPlaneOrigin(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
+		m_shader->setClipPlaneOrigin(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
 		updateGL();
 	}
 }
 
 void StageShader::slot_doubleSpinBox_ColorAttenuationFactor(double c)
 {
-	m_shader->setClippingColorAttenuationFactor((float)c);
+	m_shader->setClipColorAttenuationFactor((float)c);
 	updateGL();
 }
 
@@ -287,7 +285,7 @@ void StageShader::initGUI()
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
-	dock.doubleSpinBox_ColorAttenuationFactor->setValue(m_shader->getClippingColorAttenuationFactor());
+	dock.doubleSpinBox_ColorAttenuationFactor->setValue(m_shader->getClipColorAttenuationFactor());
 	dock.doubleSpinBox_GridDisplaySize->setValue(m_shader->getPlaneDisplaySize());
 	dock.spinBox_GridResolutionX->setValue(m_shader->getPlaneDisplayXRes());
 	dock.spinBox_GridResolutionY->setValue(m_shader->getPlaneDisplayYRes());
@@ -436,7 +434,7 @@ void StageShader::cb_redraw()
 	if (m_drawTopo)
 		m_render_topo->drawTopo();
 
-	m_shader->displayClippingPlanes();
+	m_shader->displayClipPlanes();
 
 }
 

@@ -309,7 +309,7 @@ bool ShaderMutator::srcIsCommented(size_t pos, const std::string& src)
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ShaderMutator::isCommented : "
+		<< "ShaderMutator::srcIsCommented : "
 		<< "Given position is out of range"
 		<< CGoGNendl;
 		return false;
@@ -359,7 +359,7 @@ bool ShaderMutator::srcIsOneLineCommented(size_t pos, const std::string& src)
 	{
 		CGoGNerr
 		<< "ERROR - "
-		<< "ShaderMutator::isOneLineCommented : "
+		<< "ShaderMutator::srcIsOneLineCommented : "
 		<< "Given position is out of range"
 		<< CGoGNendl;
 		return false;
@@ -372,6 +372,7 @@ bool ShaderMutator::srcIsOneLineCommented(size_t pos, const std::string& src)
 		// As soon as a '\n' is found, any other "//" will not affect this line anymore
 		if (src[i] == '\n')
 			return false;
+		// Else if a '/' is found, look if it is followed by another
 		else if (src[i] == '/')
 			if (src[i-1] == '/')
 				return true;
@@ -442,7 +443,7 @@ bool ShaderMutator::srcSetMinShadingLanguageVersion(int version, std::string& mo
 			size_t oldVersionLength = oldVersion.length();
 			size_t oldVersionPosition = std::distance(modifiedSrc.begin(), matches[1].first);
 
-			// Replace the version value only if it is lower than 'version'
+			// Replace the old version value only if it is lower than 'version'
 			if (oldVersionValue < version)
 			{
 				modifiedSrc.replace(oldVersionPosition, oldVersionLength, versionStr);
@@ -496,7 +497,7 @@ bool ShaderMutator::srcChangeIntConstantValue(int newVal, const std::string& con
 			size_t oldValLength = oldValStr.length();
 			size_t oldValPosition = std::distance(modifiedSrc.begin(), matches[1].first);
 
-			// Replace the constant value
+			// Replace the old constant value
 			modifiedSrc.replace(oldValPosition, oldValLength, newValStr);
 			return true;
 		}
