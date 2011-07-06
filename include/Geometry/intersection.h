@@ -47,7 +47,7 @@ enum Intersection
  * test the intersection between a ray and a triangle
  */
 template <typename VEC3>
-Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
+Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 /**
  * test the intersection between a line and a triangle
@@ -60,7 +60,7 @@ Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3&
  * @return the intersection
  */
 template <typename VEC3>
-Intersection intersectionLineTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
+Intersection intersectionLineTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 /**
  * test the intersection between a line and a triangle the line MUST be in the plane of the triangle, assumed to be CCW
@@ -74,7 +74,7 @@ Intersection intersectionLineTriangle(const VEC3& P, const VEC3& Dir, const VEC3
  * @return the intersection
  */
 template <typename VEC3>
-Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
+Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 /**
  * test the intersection between a segment and a triangle
@@ -87,13 +87,13 @@ Intersection intersectionLineTriangle2D(const VEC3& P, const VEC3& Dir, const VE
  * @return the intersection
  */
 template <typename VEC3>
-Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
+Intersection intersectionSegmentTriangle(const VEC3& PA, const VEC3& PB, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 template <typename VEC3, typename PLANE3D>
-Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter);
+Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& dir, VEC3& Inter) ;
 
 template <typename VEC3>
-Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA,  const VEC3& QB, VEC3& Inter) ;
+Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA, const VEC3& QB, VEC3& Inter) ;
 
 } // namespace Geom
 

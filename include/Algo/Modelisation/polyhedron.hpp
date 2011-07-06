@@ -974,21 +974,21 @@ void Polyhedron<PFP>::transform(const Geom::Matrix44f& matrice)
 template <typename PFP>
 void Polyhedron<PFP>::mark(CellMarker& m)
 {
-	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
+	for(typename std::vector<Dart>::iterator di = m_tableVertDarts.begin(); di != m_tableVertDarts.end(); ++di)
 	{
 		m.mark(*di);
 	}
 }
 
-template <typename PFP>
-void Polyhedron<PFP>::markEmbVertices(Marker m)
-{
-	AttributeHandler<Mark> markers(VERTEX<<24,m_map);
-	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
-	{
-		markers[*di].setMark(m);
-	}
-}
+//template <typename PFP>
+//void Polyhedron<PFP>::markEmbVertices(Mark m)
+//{
+//	AttributeHandler<Mark> markers(VERTEX << 24, m_map);
+//	for(typename std::vector<Dart>::iterator di = m_tableVertDarts.begin(); di != m_tableVertDarts.end(); ++di)
+//	{
+//		markers[*di].setMark(m);
+//	}
+//}
 
 
 
@@ -1018,7 +1018,7 @@ void Polyhedron<PFP>::embedTwistedStrip( float radius_min,  float radius_max, fl
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient)
+void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float maxHeight, float nbTurn, int orient)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

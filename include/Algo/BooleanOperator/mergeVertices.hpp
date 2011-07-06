@@ -22,60 +22,61 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/attribmap.h"
-
 namespace CGoGN
 {
 
-AttribMap::AttribMap() : GenericMap()
+namespace Algo
 {
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
-	m_markTables[DART][0] = amv ;
+
+namespace BooleanOperator
+{
+
+template <typename PFP>
+void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e)
+{
+	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
+	Dart dd;
+	do
+	{
+		dd = map.alpha1(d);
+		map.removeEdgeFromVertex(dd);
+		Dart ee = e;
+		do
+		{
+			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
+					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.alpha1(ee))])==Geom::RIGHT)
+			{
+				break;
+			}
+			ee = map.alpha1(ee);
+		} while(ee != e);
+		map.insertEdgeInVertex(ee,dd);
+	} while(dd!=d);
 }
 
-/****************************************
- *   EMBEDDING ATTRIBUTES MANAGEMENT    *
- ****************************************/
-
-void AttribMap::addEmbedding(unsigned int orbit)
+template <typename PFP>
+void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions)
 {
-	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
-
-	std::ostringstream oss;
-	oss << "EMB_" << orbit;
-
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[orbit] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		amv->operator[](i) = EMBNULL ;
-
-	AttributeContainer& cellCont = m_attribs[orbit];
-	for (unsigned int t = 0; t < m_nbThreads; ++t)
+	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{
-		std::stringstream ss ;
-		ss << "Mark_"<< t ;
-		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
-			amvMark->operator[](i).clear() ;
-		m_markTables[orbit][t] = amvMark ;
+		CellMarker vM(map,VERTEX);
+		vM.mark(d);
+		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
+		{
+			if(!vM.isMarked(dd))
+			{
+				vM.mark(dd);
+				if(Geom::arePointsEquals(positions[d],positions[dd]))
+				{
+					mergeVertex<PFP>(map,positions,d,dd);
+				}
+			}
+		}
 	}
 }
 
-/****************************************
- *               UTILITIES              *
- ****************************************/
-
-unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
-{
-	AttributeContainer& cont = m_attribs[idx.getOrbit()] ;
-	unsigned int cpt = 0 ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		idx[i] = cpt++ ;
-	return cpt ;
 }
 
-} // namespace CGoGN
+}
+
+}

@@ -145,6 +145,13 @@ public:
 	 */
 	void splitFace(Dart d, Dart e);
 
+	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  @param d first dart in the face
+	 *  @param e second dart in the face
+	 */
+	void linkVertices(Dart d, Dart e);
+
 	//! Merge the two faces of d and e, darts d & e disappear
 	/*! \pre Dart d and e MUST belong to distinct faces
 	 *  \warning Darts d and e no longer exist after the call

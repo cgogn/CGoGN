@@ -67,6 +67,25 @@ bool EmbeddedMap2<MAP2>::deleteVertex(Dart d)
 }
 
 template <typename MAP2>
+void EmbeddedMap2<MAP2>::linkVertices(Dart d, Dart e)
+{
+	Dart dNext = MAP2::phi1(d) ;
+
+	MAP2::linkVertices(d,e);
+
+	if (MAP2::isOrbitEmbedded(VERTEX))
+	{
+		MAP2::copyDartEmbedding(VERTEX, MAP2::phi_1(e), d) ;
+		MAP2::copyDartEmbedding(VERTEX, MAP2::phi_1(d), e) ;
+	}
+
+	if (MAP2::isOrbitEmbedded(FACE))
+	{
+		MAP2::embedOrbit(FACE, dNext, MAP2::getEmbedding(FACE, dNext)) ;
+	}
+}
+
+template <typename MAP2>
 void EmbeddedMap2<MAP2>::cutEdge(Dart d)
 {
 	MAP2::cutEdge(d) ;
@@ -216,6 +235,57 @@ bool EmbeddedMap2<MAP2>::flipBackEdge(Dart d)
 		return true ;
 	}
 	return false ;
+}
+
+template <typename MAP2>
+void EmbeddedMap2<MAP2>::insertEdgeInVertex(Dart d, Dart e)
+{
+	MAP2::insertEdgeInVertex(d, e);
+
+	if (MAP2::isOrbitEmbedded(VERTEX))
+	{
+		MAP2::copyDartEmbedding(VERTEX, e, d) ;
+	}
+
+	if (MAP2::isOrbitEmbedded(FACE))
+	{
+		if(!MAP2::sameFace(d,e))
+		{
+			MAP2::embedNewCell(FACE, e);
+			MAP2::copyCell(FACE, e, d) ;
+		}
+		else
+		{
+			MAP2::embedOrbit(FACE, d, MAP2::getEmbedding(FACE, d)) ;
+		}
+	}
+}
+
+template <typename MAP2>
+void EmbeddedMap2<MAP2>::removeEdgeFromVertex(Dart d)
+{
+	Dart dPrev = MAP2::alpha_1(d);
+
+	MAP2::removeEdgeFromVertex(d);
+
+	if (MAP2::isOrbitEmbedded(VERTEX))
+	{
+		MAP2::embedNewCell(VERTEX, d);
+		MAP2::copyCell(VERTEX, d, dPrev);
+	}
+
+	if (MAP2::isOrbitEmbedded(FACE))
+	{
+		if(!MAP2::sameFace(d, dPrev))
+		{
+			MAP2::embedNewCell(FACE, d);
+			MAP2::copyCell(FACE, d, dPrev) ;
+		}
+		else
+		{
+			MAP2::embedOrbit(FACE, d, MAP2::getEmbedding(FACE, d)) ;
+		}
+	}
 }
 
 template <typename MAP2>

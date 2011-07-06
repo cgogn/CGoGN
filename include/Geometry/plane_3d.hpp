@@ -28,13 +28,25 @@ namespace CGoGN
 namespace Geom
 {
 
+template <typename T>
+std::string Plane3D<T>::CGoGNnameOfType()
+{
+	std::stringstream ss ;
+	ss << "Geom::Plane3D<" ;
+	ss << nameOfType(T()) ;
+	ss << ">" ;
+
+	return ss.str() ;
+}
+
 /**********************************************/
 /*                CONSTRUCTORS                */
 /**********************************************/
 
 template <typename T>
-Plane3D<T>::Plane3D()
-{}
+Plane3D<T>::Plane3D(int d) :
+m_normal(0), m_d(d)
+{ }
 
 template <typename T>
 Plane3D<T>::Plane3D(const Plane3D<T>& p)
@@ -110,7 +122,7 @@ void Plane3D<T>::project(Vector<3,T>& p) const
 	T d = -distance(p) ;
 	if(abs(d) > PRECISION)
 	{
-		Vector<3,T> v = m_normal / d ;
+		Vector<3,T> v = m_normal * d ;
 		p += v ;
 	}
 #undef PRECISION

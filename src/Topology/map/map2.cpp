@@ -73,6 +73,12 @@ bool Map2::deleteVertex(Dart d)
 	return true ;
 }
 
+void Map2::linkVertices(Dart d, Dart e)
+{
+	Map1::linkVertices(d, e);			// Split the face
+	phi2sew(phi_1(d), phi_1(e));	// Sew the two resulting faces along the new edge
+}
+
 void Map2::cutEdge(Dart d)
 {
 	Map1::cutEdge(d);		// Cut the edge of d
@@ -191,6 +197,20 @@ bool Map2::flipBackEdge(Dart d)
 		return true ;
 	}
 	return false ; // cannot flip a border edge
+}
+
+void Map2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+
+	phi1sew(phi_1(d),phi_1(e));
+}
+
+void Map2::removeEdgeFromVertex(Dart d)
+{
+	assert(phi2(d)!=d);
+
+	phi1sew(phi_1(d),phi2(d));
 }
 
 void Map2::sewFaces(Dart d, Dart e)

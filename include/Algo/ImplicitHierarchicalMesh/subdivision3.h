@@ -62,6 +62,15 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 template <typename PFP>
 void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
+/***********************************************************************************
+ *												Raffinement
+ ***********************************************************************************/
+/*
+ * Un brin de la face oppose aux faces a spliter
+ */
+template <typename PFP>
+void splitVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
 /*******************************************************
  *
  */

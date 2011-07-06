@@ -46,11 +46,11 @@ namespace Render
 namespace GL1
 {
 
-/**
-* Render darts of generalized map
-*/
-template <typename PFP>
-void renderTopoGM2(typename PFP::MAP& the_map, Marker m);
+///**
+//* Render darts of generalized map
+//*/
+//template <typename PFP>
+//void renderTopoGM2(typename PFP::MAP& the_map, Mark m);
 
 /**
 * Render darts of dual map
@@ -83,11 +83,13 @@ void renderTopoMD3(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
 template <typename PFP>
 void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
 
+} // namespace GL1
 
-}// end namespace
-}// end namespace
-}// end namespace
-}// end namespace
+} // namespace Render
+
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/Render/GL1/topo_render.hpp"
 

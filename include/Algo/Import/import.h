@@ -63,6 +63,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 //bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
 //
 
+
 /*
  * TODO a transformer en utilisant un MeshTableVolume.
  */

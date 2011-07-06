@@ -45,11 +45,14 @@ template <typename T>
 class Plane3D
 {
 	public:
+
+		static std::string CGoGNnameOfType() ;
+
 		/**********************************************/
 		/*                CONSTRUCTORS                */
 		/**********************************************/
 
-		Plane3D();
+		Plane3D(int d = 0);
 
 		Plane3D(const Plane3D<T>& p);
 

@@ -39,21 +39,23 @@ template <typename MAP>
 class FunctorMarker : public FunctorMap<MAP>
 {
 protected:
-	Marker m_marker ;
-	AttributeMultiVector<Mark>* m_markerTable ;
+	Mark m_mark ;
+	AttributeMultiVector<Mark>* m_markTable ;
 public:
-	FunctorMarker(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable) : FunctorMap<MAP>(map), m_marker(m), m_markerTable(mTable) {}
-	Marker getMarker() { return m_marker ; }
+	FunctorMarker(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMap<MAP>(map), m_mark(m), m_markTable(mTable)
+	{}
+//	Mark getMark() { return m_mark ; }
 } ;
 
 template <typename MAP>
 class FunctorMark : public FunctorMarker<MAP>
 {
 public:
-	FunctorMark(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable) {}
+	FunctorMark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
+	{}
 	bool operator()(Dart d)
 	{
-		this->m_markerTable->operator[](d.index).setMark(this->m_marker) ;
+		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
 		return false ;
 	}
 } ;
@@ -64,13 +66,13 @@ class FunctorMarkStore : public FunctorMarker<MAP>
 protected:
 	std::vector<unsigned int>& m_markedDarts ;
 public:
-	FunctorMarkStore(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable, std::vector<unsigned int>& marked) :
+	FunctorMarkStore(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable, std::vector<unsigned int>& marked) :
 		FunctorMarker<MAP>(map, m, mTable),
 		m_markedDarts(marked)
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markerTable->operator[](d.index).setMark(this->m_marker) ;
+		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
 		m_markedDarts.push_back(d.index) ;
 		return false ;
 	}
@@ -80,10 +82,11 @@ template <typename MAP>
 class FunctorUnmark : public FunctorMarker<MAP>
 {
 public:
-	FunctorUnmark(MAP& map, Marker m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable) {}
+	FunctorUnmark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
+	{}
 	bool operator()(Dart d)
 	{
-		this->m_markerTable->operator[](d.index).unsetMark(this->m_marker) ;
+		this->m_markTable->operator[](d.index).unsetMark(this->m_mark) ;
 		return false ;
 	}
 } ;
@@ -95,7 +98,7 @@ public:
 class DartMarkerGen
 {
 protected:
-	Marker m_marker;
+	Mark m_mark;
 	GenericMap& m_map;
 	unsigned int m_thread;
 
@@ -106,17 +109,17 @@ public:
 	 */
 	DartMarkerGen(GenericMap& map): m_map(map), m_thread(0)
 	{
-		m_marker = map.getNewMarker(DART);
+		m_mark = map.getNewMark(DART);
 	}
 
 	DartMarkerGen(GenericMap& map, unsigned int thread): m_map(map), m_thread(thread)
 	{
-		m_marker = map.getNewMarker(DART, thread);
+		m_mark = map.getNewMark(DART, thread);
 	}
 
 	virtual ~DartMarkerGen()
 	{
-		m_map.releaseMarker(m_marker, m_thread);
+		m_map.releaseMark(m_mark, DART, m_thread);
 	}
 
 protected:
@@ -130,7 +133,7 @@ public:
 	 */
 	virtual void mark(Dart d)
 	{
-		m_map.getMarkerVector(DART, m_thread)->operator[](d.index).setMark(m_marker);
+		m_map.getMarkVector(DART, m_thread)->operator[](d.index).setMark(m_mark);
 	}
 
 	/**
@@ -138,7 +141,7 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
-		m_map.getMarkerVector(DART, m_thread)->operator[](d.index).unsetMark(m_marker);
+		m_map.getMarkVector(DART, m_thread)->operator[](d.index).unsetMark(m_mark);
 	}
 
 	/**
@@ -146,7 +149,7 @@ public:
 	 */
 	virtual bool isMarked(Dart d)
 	{
-		return m_map.getMarkerVector(DART, m_thread)->operator[](d.index).testMark(m_marker);
+		return m_map.getMarkVector(DART, m_thread)->operator[](d.index).testMark(m_mark);
 	}
 
 	/**
@@ -154,7 +157,7 @@ public:
 	 */
 	virtual void markOrbit(unsigned int orbit, Dart d)
 	{
-		FunctorMark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART, m_thread)) ;
+		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 
@@ -163,7 +166,7 @@ public:
 	 */
 	virtual void unmarkOrbit(unsigned int orbit, Dart d)
 	{
-		FunctorUnmark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART, m_thread)) ;
+		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 
@@ -173,7 +176,7 @@ public:
 	template <typename MAP>
 	void markOrbitInParent(unsigned int orbit, Dart d)
 	{
-		FunctorMark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART, m_thread)) ;
+		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
 	}
 
@@ -183,7 +186,7 @@ public:
 	template <typename MAP>
 	void unmarkOrbitInParent(unsigned int orbit, Dart d)
 	{
-		FunctorUnmark<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART, m_thread)) ;
+		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
 	}
 
@@ -194,7 +197,7 @@ public:
 	{
 		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(DART, m_thread)->operator[](i).setMark(m_marker);
+			m_map.getMarkVector(DART, m_thread)->operator[](i).setMark(m_mark);
 	}
 
 	/**
@@ -230,7 +233,7 @@ public:
 	{
 		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(DART, m_thread)->operator[](i).unsetMark(m_marker);
+			m_map.getMarkVector(DART, m_thread)->operator[](i).unsetMark(m_mark);
 	}
 };
 
@@ -269,14 +272,14 @@ public:
 
 	void markOrbit(unsigned int orbit, Dart d)
 	{
-		FunctorMarkStore<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART, m_thread), m_markedDarts) ;
+		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 
 	template <typename MAP>
 	void markOrbitInParent(unsigned int orbit, Dart d)
 	{
-		FunctorMarkStore<GenericMap> fm(m_map, m_marker, m_map.getMarkerVector(DART, m_thread), m_markedDarts) ;
+		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
 		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
 	}
 
@@ -289,7 +292,7 @@ public:
 	void unmarkAll()
 	{
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
-			m_map.getMarkerVector(DART, m_thread)->operator[](*it).unsetMark(m_marker) ;
+			m_map.getMarkVector(DART, m_thread)->operator[](*it).unsetMark(m_mark) ;
 	}
 };
 
@@ -319,7 +322,7 @@ public:
 	{
 		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkerVector(DART, m_thread)->operator[](i).unsetMark(m_marker) ;
+			m_map.getMarkVector(DART, m_thread)->operator[](i).unsetMark(m_mark) ;
 	}
 };
 
