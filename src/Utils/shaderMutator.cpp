@@ -30,11 +30,13 @@ namespace CGoGN
 namespace Utils
 {
 
+
 /***********************************************
  *
  * 		Public Section
  *
  ***********************************************/
+
 
 ShaderMutator::ShaderMutator(const std:: string& shaderName, const std::string& vertShaderSrc, const std::string& fragShaderSrc, const std::string& geomShaderSrc)
 {
@@ -322,8 +324,7 @@ bool ShaderMutator::srcIsCommented(size_t pos, const std::string& src)
 		return true;
 	
 	// Now look for multi-line comments 
-	size_t i;
-	for (i = pos; i > 0; i--)
+	for (size_t i = pos; i > 0; i--)
 	{	
 		if (src[i] == '/')
 		{
@@ -366,8 +367,7 @@ bool ShaderMutator::srcIsOneLineCommented(size_t pos, const std::string& src)
 	}
 	
 	// Look backward in the source to see if there is any "//"
-	size_t i;
-	for (i = pos; i > 0; i--)
+	for (size_t i = pos; i > 0; i--)
 	{
 		// As soon as a '\n' is found, any other "//" will not affect this line anymore
 		if (src[i] == '\n')

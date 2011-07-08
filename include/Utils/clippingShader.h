@@ -116,17 +116,6 @@ public:
 	Geom::Vec3f getClipPlaneOrigin(int planeIndex = 0);
 
 	/**
-	 * set the color attenuation factor for clipping
-	 * @param colorAttenuationFactor color attenuation factor
-	 */
-	void setClipColorAttenuationFactor(float colorAttenuationFactor);
-
-	/**
-	 * get the color attenuation factor for clipping
-	 */
-	float getClipColorAttenuationFactor() { return m_colorAttenuationFactor; }
-
-	/**
 	 * set the clip planes count
 	 * - inserts plane clipping instructions into vertex and fragment shader source code
 	 * but does not modify the geometry shader source code
@@ -139,11 +128,6 @@ public:
 	 * get the clip planes count
 	 */
 	int getClipPlanesCount() { return (int)m_clipPlanes.size(); }
-
-	/**
-	 * update uniforms (get their locations and send their values again) for clipping
-	 */
-	void updateClippingUniforms();
 
 	/**
 	 * display all clipping planes
@@ -198,12 +182,28 @@ public:
 	 * set the planes display size
 	 * @param size the new size
 	 */
-	void setPlaneDisplaySize(float size) { m_clipPlanesDisplaySize = size;sendClippingPlanesUniform();updateAllClippingPlanesVBOs(); }
+	void setPlaneDisplaySize(float size) { m_clipPlanesDisplaySize = size;/*sendClippingPlanesUniform();*/updateAllClippingPlanesVBOs(); }
 
 	/**
 	 * get the planes display size
 	 */
 	float getPlaneDisplaySize() { return m_clipPlanesDisplaySize; }
+
+	/**
+	 * set the color attenuation factor for clipping
+	 * @param colorAttenuationFactor color attenuation factor
+	 */
+	void setClipColorAttenuationFactor(float colorAttenuationFactor);
+
+	/**
+	 * get the color attenuation factor for clipping
+	 */
+	float getClipColorAttenuationFactor() { return m_colorAttenuationFactor; }
+
+	/**
+	 * update uniforms (get their locations and send their values again) for clipping
+	 */
+	void updateClippingUniforms();
 
 
 private:
@@ -230,7 +230,7 @@ private:
 	 * update clip planes parameters arrays
 	 * @param planeIndex index of the plane
 	 */
-	void updateClippingPlanesArrays(int planeIndex);
+	void updateClippingPlaneArray(int planeIndex);
 
 	/**
 	 * update VBO for one plane
@@ -265,47 +265,9 @@ private:
 	std::vector<float> m_clipPlanesEquations;
 
 	/**
-	 * clip planes first vectors array (size = 3*(planes count))
-	 * - ** only used for sending planes data to shader **
-	 */
-	std::vector<float> m_clipPlanesFirstVectors;
-
-	/**
-	 * clip planes second vectors array (size = 3*(planes count))
-	 * - ** only used for sending planes data to shader **
-	 */
-	std::vector<float> m_clipPlanesSecondVectors;
-
-	/**
-	 * clip planes origins array (size = 3*(planes count))
-	 * - ** only used for sending planes data to shader **
-	 */
-	std::vector<float> m_clipPlanesOrigins;
-
-	/**
 	 * clip planes equations vector uniform id
 	 */
 	GLint m_unif_clipPlanesEquations;
-	
-	/**
-	 * clip planes first vectors uniform id
-	 */
-	GLint m_unif_clipPlanesFirstVectors;
-
-	/**
-	 * clip planes second vectors uniform id
-	 */
-	GLint m_unif_clipPlanesSecondVectors;
-
-	/**
-	 * clip planes origins uniform id
-	 */
-	GLint m_unif_clipPlanesOrigins;
-
-	/**
-	 * clip planes size uniform id
-	 */
-	GLint m_unif_clipPlanesDisplaySize;
 
 	/**
 	 * color attenuation factor
@@ -346,11 +308,6 @@ private:
 	 * clip planes display size
 	 */
 	float m_clipPlanesDisplaySize;
-
-	/**
-	 * use advanced plane clipping ?
-	 */
-	bool m_useAdvancedPlaneClipping;
 
 };
 

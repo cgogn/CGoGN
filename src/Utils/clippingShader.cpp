@@ -30,6 +30,12 @@ namespace CGoGN
 namespace Utils
 {
 
+/***********************************************
+ *
+ * 		Public Section
+ *
+ ***********************************************/
+
 ClippingShader::ClippingShader()
 {
 	// Initialize uniforms ids
@@ -45,9 +51,6 @@ ClippingShader::ClippingShader()
 	m_clipPlanesDisplayXRes = 2;
 	m_clipPlanesDisplayYRes = 2;
 	m_clipPlanesDisplaySize = 10.0;
-
-	// Initialize default special variables
-	m_useAdvancedPlaneClipping = false;
 }
 
 ClippingShader::~ClippingShader()
@@ -79,7 +82,7 @@ void ClippingShader::setClipPlane(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3
 	m_clipPlanes[planeIndex].origin = origin;
 
 	// Update the plane arrays
-	updateClippingPlanesArrays(planeIndex);
+	updateClippingPlaneArray(planeIndex);
 
 	// Send again the whole planes equations array to shader
 	sendClippingPlanesUniform();
@@ -106,7 +109,7 @@ void ClippingShader::setClipPlaneFirstVec(Geom::Vec3f vec1, int planeIndex)
 	m_clipPlanes[planeIndex].firstVec.normalize();
 
 	// Update the plane arrays
-	updateClippingPlanesArrays(planeIndex);
+	updateClippingPlaneArray(planeIndex);
 
 	// Send again the whole planes equations array to shader
 	sendClippingPlanesUniform();
@@ -133,7 +136,7 @@ void ClippingShader::setClipPlaneSecondVec(Geom::Vec3f vec2, int planeIndex)
 	m_clipPlanes[planeIndex].secondVec.normalize();
 
 	// Update the plane arrays
-	updateClippingPlanesArrays(planeIndex);
+	updateClippingPlaneArray(planeIndex);
 
 	// Send again the whole planes equations array to shader
 	sendClippingPlanesUniform();
@@ -159,7 +162,7 @@ void ClippingShader::setClipPlaneOrigin(Geom::Vec3f origin, int planeIndex)
 	m_clipPlanes[planeIndex].origin = origin;
 
 	// Update the plane arrays
-	updateClippingPlanesArrays(planeIndex);
+	updateClippingPlaneArray(planeIndex);
 
 	// Send again the whole planes equations array to shader
 	sendClippingPlanesUniform();
@@ -217,15 +220,6 @@ Geom::Vec3f ClippingShader::getClipPlaneOrigin(int planeIndex)
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].origin;
-}
-
-void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
-{
-	// Copy the given value
-	m_colorAttenuationFactor = colorAttenuationFactor;
-
-	// Send again the uniform to shader
-	sendColorAttenuationFactorUniform();
 }
 
 void ClippingShader::setClipPlanesCount(int planesCount)
@@ -288,139 +282,53 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 	"	// Pass the non transformed vertex position to the fragment shader for clipping\n"
 	"	clip_NonTransformedPos = VertexPosition;\n";
 
-	std::string FS_head_insertion;
-	std::string FS_mainBegin_insertion;
+	std::string FS_head_insertion =
+	"\n"
+	"#define CLIP_PLANES_COUNT " + planesCountStr + "\n"
+	"\n"
+	"uniform vec4 clip_ClipPlanes[CLIP_PLANES_COUNT];\n"
+	"uniform float clip_ColorAttenuationFactor;\n"
+	"\n"
+	"VARYING_FRAG vec3 clip_NonTransformedPos;\n"
+	"\n";
 
-	if (!m_useAdvancedPlaneClipping) // the shader is slightly different for advanced plane clipping
-	{
-		FS_head_insertion =
-		"\n"
-		"#define CLIP_PLANES_COUNT " + planesCountStr + "\n"
-		"\n"
-		"uniform vec4 clip_ClipPlanes[CLIP_PLANES_COUNT];\n"
-		"uniform float clip_ColorAttenuationFactor;\n"
-		"\n"
-		"VARYING_FRAG vec3 clip_NonTransformedPos;\n"
-		"\n";
-
-		FS_mainBegin_insertion =
-		"\n"
-		"	// Distance to the nearest plane, stored for color attenuation\n"
-		"	float clip_MinDistanceToPlanes = -1.0;\n"
-		"\n"
-		"	// Do clipping for each plane\n"
-		"	int i;\n"
-		"	for (i = 0; i < CLIP_PLANES_COUNT; i++)\n"
-		"	{\n"
-		"		// Copy the plane to make it modifiable\n"
-		"		vec4 clip_CurrClipPlane = clip_ClipPlanes[i];\n"
-		"\n"
-		"		// If the plane normal is zero, use a default normal vector (0.0, 0.0, 1.0)\n"
-		"		float clip_NPlane = length(clip_CurrClipPlane.xyz);\n"
-		"		if (clip_NPlane == 0.0)\n"
-		"		{\n"
-		"			clip_CurrClipPlane.z = 1.0;\n"
-		"			clip_NPlane = 1.0;\n"
-		"		}\n"
-		"\n"
-		"		// Signed distance between the point and the plane\n"
-		"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz);\n"
-		"		clip_DistanceToPlane += clip_CurrClipPlane.w;\n"
-		"		clip_DistanceToPlane /= clip_NPlane;\n"
-		"\n"
-		"		// Keep the fragment only if it is 'above' the plane\n"
-		"		if (clip_DistanceToPlane < 0.0)\n"
-		"			discard;\n"
-		"		else\n"
-		"		{\n"
-		"			// Keep the distance to the nearest plane\n"
-		"			if (clip_MinDistanceToPlanes < 0.0)\n"
-		"				clip_MinDistanceToPlanes = clip_DistanceToPlane;\n"
-		"			else\n"
-		"				clip_MinDistanceToPlanes = min(clip_MinDistanceToPlanes, clip_DistanceToPlane);\n"
-		"		}\n"
-		"	}\n";
-	}
-	else
-	{
-		FS_head_insertion =
-		"\n"
-		"#define CLIP_PLANES_COUNT " + planesCountStr + "\n"
-		"\n"
-		"uniform vec4 clip_ClipPlanes[CLIP_PLANES_COUNT];\n"
-		"uniform vec3 clip_ClipPlanesFirstVec[CLIP_PLANES_COUNT];\n"
-		"uniform vec3 clip_ClipPlanesSecondVec[CLIP_PLANES_COUNT];\n"
-		"uniform vec3 clip_ClipPlanesOrigin[CLIP_PLANES_COUNT];\n"
-		"\n"
-		"uniform float clip_ClipPlanesSize;\n"
-		"\n"
-		"uniform float clip_ColorAttenuationFactor;\n"
-		"\n"
-		"VARYING_FRAG vec3 clip_NonTransformedPos;\n"
-		"\n";
-
-		FS_mainBegin_insertion =
-		"\n"
-		"	// Distance to the nearest plane, stored for color attenuation\n"
-		"	float clip_MinDistanceToPlanes = -1.0;\n"
-		"\n"
-		"	// Do clipping for each plane\n"
-		"	int i;\n"
-		"	for (i = 0; i < CLIP_PLANES_COUNT; i++)\n"
-		"	{\n"
-		"		// Copy the plane to make it modifiable\n"
-		"		vec4 clip_CurrClipPlane = clip_ClipPlanes[i];\n"
-		"\n"
-		"		// If the plane normal is zero, use a default normal vector (0.0, 0.0, 1.0)\n"
-		"		float clip_NPlane = length(clip_CurrClipPlane.xyz);\n"
-		"		if (clip_NPlane == 0.0)\n"
-		"		{\n"
-		"			clip_CurrClipPlane.z = 1.0;\n"
-		"			clip_NPlane = 1.0;\n"
-		"		}\n"
-		"\n"
-		"		// Signed distance between the point and the plane\n"
-		"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz);\n"
-		"		clip_DistanceToPlane += clip_CurrClipPlane.w;\n"
-		"		clip_DistanceToPlane /= clip_NPlane;\n"
-		"\n"
-		"		// Keep the fragment only if it is 'above' or 'outside' the plane\n"
-		"		if (clip_DistanceToPlane < 0.0)\n"
-		"		{\n"
-		"			// Get the orthogonal projection of the point on the plane\n"
-		"			vec3 clip_PosPlaneProj = clip_NonTransformedPos;\n"
-		"			clip_PosPlaneProj -= (clip_DistanceToPlane*clip_NPlane) * clip_CurrClipPlane.xyz;\n"
-		"\n"
-		"			// Get the distance of the point to origin on each plane vector\n"
-		"			vec3 clip_ToPlaneOrigin = clip_PosPlaneProj - clip_ClipPlanesOrigin[i];\n"
-		"			float clip_PosVec1Val = abs(dot(clip_ToPlaneOrigin, vec3(clip_ClipPlanesFirstVec[i].x, clip_ClipPlanesFirstVec[i].y, clip_ClipPlanesFirstVec[i].z)));\n"
-		"			clip_PosVec1Val /= length(clip_ClipPlanesFirstVec[i]);\n"
-		"			float clip_PosVec2Val = abs(dot(clip_ToPlaneOrigin, vec3(clip_ClipPlanesSecondVec[i].x, clip_ClipPlanesSecondVec[i].y, clip_ClipPlanesSecondVec[i].z)));\n"
-		"			clip_PosVec2Val /= length(clip_ClipPlanesSecondVec[i]);\n"
-		"\n"
-		"			// Check if the projected point is 'inside' the plane\n"
-		"			if ( ( clip_PosVec1Val < (length(clip_ClipPlanesFirstVec[i]) * 0.5 * clip_ClipPlanesSize))\n"
-		"			&& ( clip_PosVec2Val < (length(clip_ClipPlanesSecondVec[i]) * 0.5 * clip_ClipPlanesSize)) )\n"
-		"				discard;\n"
-		"			else\n"
-		"			{\n"
-		"				// Keep the distance to the nearest plane\n"
-		"				if (clip_MinDistanceToPlanes < 0.0)\n"
-		"					clip_MinDistanceToPlanes = -clip_DistanceToPlane;\n"
-		"				else\n"
-		"					clip_MinDistanceToPlanes = min(clip_MinDistanceToPlanes, -clip_DistanceToPlane);\n"
-		"			}\n"
-		"		}\n"
-		"		else\n"
-		"		{\n"
-		"			// Keep the distance to the nearest plane\n"
-		"			if (clip_MinDistanceToPlanes < 0.0)\n"
-		"				clip_MinDistanceToPlanes = clip_DistanceToPlane;\n"
-		"			else\n"
-		"				clip_MinDistanceToPlanes = min(clip_MinDistanceToPlanes, clip_DistanceToPlane);\n"
-		"		}\n"
-		"	}\n";
-	}
+	std::string FS_mainBegin_insertion =
+	"\n"
+	"	// Distance to the nearest plane, stored for color attenuation\n"
+	"	float clip_MinDistanceToPlanes = -1.0;\n"
+	"\n"
+	"	// Do clipping for each plane\n"
+	"	int i;\n"
+	"	for (i = 0; i < CLIP_PLANES_COUNT; i++)\n"
+	"	{\n"
+	"		// Copy the plane to make it modifiable\n"
+	"		vec4 clip_CurrClipPlane = clip_ClipPlanes[i];\n"
+	"\n"
+	"		// If the plane normal is zero, use a default normal vector (0.0, 0.0, 1.0)\n"
+	"		float clip_NPlane = length(clip_CurrClipPlane.xyz);\n"
+	"		if (clip_NPlane == 0.0)\n"
+	"		{\n"
+	"			clip_CurrClipPlane.z = 1.0;\n"
+	"			clip_NPlane = 1.0;\n"
+	"		}\n"
+	"\n"
+	"		// Signed distance between the point and the plane\n"
+	"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz);\n"
+	"		clip_DistanceToPlane += clip_CurrClipPlane.w;\n"
+	"		clip_DistanceToPlane /= clip_NPlane;\n"
+	"\n"
+	"		// Keep the fragment only if it is 'above' the plane\n"
+	"		if (clip_DistanceToPlane < 0.0)\n"
+	"			discard;\n"
+	"		else\n"
+	"		{\n"
+	"			// Keep the distance to the nearest plane\n"
+	"			if (clip_MinDistanceToPlanes < 0.0)\n"
+	"				clip_MinDistanceToPlanes = clip_DistanceToPlane;\n"
+	"			else\n"
+	"				clip_MinDistanceToPlanes = min(clip_MinDistanceToPlanes, clip_DistanceToPlane);\n"
+	"		}\n"
+	"	}\n";
 
 	std::string FS_mainEnd_insertion =
 	"\n"
@@ -502,9 +410,6 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 	// Resize the planes arrays to the right size
 	m_clipPlanes.resize((size_t)planesCount);
 	m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
-	m_clipPlanesFirstVectors.resize(4*(size_t)planesCount, 0.0);
-	m_clipPlanesSecondVectors.resize(4*(size_t)planesCount, 0.0);
-	m_clipPlanesOrigins.resize(4*(size_t)planesCount, 0.0);
 
 	// Resize the planes drawers array to the right size, and create/destroy objects
 	if (planesCount > previousPlanesCount)
@@ -517,8 +422,9 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 	else
 	{
 		int i;
-		for (i = planesCount; i < previousPlanesCount; i++)
-			delete m_clipPlanesDrawers[i];
+		//for (i = planesCount; i < previousPlanesCount; i++)
+			//delete m_clipPlanesDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
+		m_clipPlanesDrawers.resize((size_t)planesCount);
 	}
 
 	// Set default parameters values for new planes
@@ -535,6 +441,22 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 
 	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();
+}
+
+void ClippingShader::displayClipPlanes()
+{
+	size_t i;
+	for (i = 0; i < m_clipPlanesDrawers.size(); i++)
+		m_clipPlanesDrawers[i]->callList();
+}
+
+void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
+{
+	// Copy the given value
+	m_colorAttenuationFactor = colorAttenuationFactor;
+
+	// Send again the uniform to shader
+	sendColorAttenuationFactorUniform();
 }
 
 void ClippingShader::updateClippingUniforms()
@@ -569,78 +491,24 @@ void ClippingShader::updateClippingUniforms()
 		<< shaderName
 		<< CGoGNendl;
 	}
-	
-	// For advanced plane clipping
-	if (m_useAdvancedPlaneClipping)
-	{
-		m_unif_clipPlanesFirstVectors = glGetUniformLocation(program_handler(), "clip_ClipPlanesFirstVec");
-		if (m_unif_clipPlanesFirstVectors == -1)
-		{
-			CGoGNerr
-			<< "ERROR - "
-			<< "ClippingShader::updateClippingUniforms"
-			<< " - uniform 'clip_ClipPlanesFirstVec' not found in shader "
-			<< shaderName
-			<< CGoGNendl;
-		}
-		m_unif_clipPlanesSecondVectors = glGetUniformLocation(program_handler(), "clip_ClipPlanesSecondVec");
-		if (m_unif_clipPlanesSecondVectors == -1)
-		{
-			CGoGNerr
-			<< "ERROR - "
-			<< "ClippingShader::updateClippingUniforms"
-			<< " - uniform 'clip_ClipPlanesSecondVec' not found in shader "
-			<< shaderName
-			<< CGoGNendl;
-		}
-		m_unif_clipPlanesOrigins = glGetUniformLocation(program_handler(), "clip_ClipPlanesOrigin");
-		if (m_unif_clipPlanesOrigins == -1)
-		{
-			CGoGNerr
-			<< "ERROR - "
-			<< "ClippingShader::updateClippingUniforms"
-			<< " - uniform 'clip_ClipPlanesOrigin' not found in shader "
-			<< shaderName
-			<< CGoGNendl;
-		}
-		m_unif_clipPlanesDisplaySize = glGetUniformLocation(program_handler(), "clip_ClipPlanesSize");
-		if (m_unif_clipPlanesDisplaySize == -1)
-		{
-			CGoGNerr
-			<< "ERROR - "
-			<< "ClippingShader::updateClippingUniforms"
-			<< " - uniform 'clip_ClipPlanesSize' not found in shader "
-			<< shaderName
-			<< CGoGNendl;
-		}
-	}
 
 	// Send again uniforms values
 	sendClippingPlanesUniform();
 	sendColorAttenuationFactorUniform();
 }
 
-void ClippingShader::displayClipPlanes()
-{
-	size_t i;
-	for (i = 0; i < m_clipPlanesDrawers.size(); i++)
-		m_clipPlanesDrawers[i]->callList();
-}
+
+/***********************************************
+ *
+ * 		Private Section
+ *
+ ***********************************************/
+
 
 void ClippingShader::sendClippingPlanesUniform()
 {
 	bind();
-
 	glUniform4fv(m_unif_clipPlanesEquations, getClipPlanesCount(), &m_clipPlanesEquations.front());
-
-	// For advanced plane clipping
-	if (m_useAdvancedPlaneClipping)
-	{
-		glUniform3fv(m_unif_clipPlanesFirstVectors, getClipPlanesCount(), &m_clipPlanesFirstVectors.front());
-		glUniform3fv(m_unif_clipPlanesSecondVectors, getClipPlanesCount(), &m_clipPlanesSecondVectors.front());
-		glUniform3fv(m_unif_clipPlanesOrigins, getClipPlanesCount(), &m_clipPlanesOrigins.front());
-		glUniform1f(m_unif_clipPlanesDisplaySize, m_clipPlanesDisplaySize);
-	}
 }
 
 void ClippingShader::sendColorAttenuationFactorUniform()
@@ -649,7 +517,7 @@ void ClippingShader::sendColorAttenuationFactorUniform()
 	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
 }
 
-void ClippingShader::updateClippingPlanesArrays(int planeIndex)
+void ClippingShader::updateClippingPlaneArray(int planeIndex)
 {
 	// Check if the given index is not out of range
 	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
@@ -662,16 +530,7 @@ void ClippingShader::updateClippingPlanesArrays(int planeIndex)
 		return;
 	}
 
-	// Update the plane first vector, second vector and origin arrays
-	int i;
-	for (i = 0; i < 3; i++)
-	{
-		m_clipPlanesFirstVectors[4*planeIndex + i] = m_clipPlanes[planeIndex].firstVec[i];
-		m_clipPlanesSecondVectors[4*planeIndex + i] = m_clipPlanes[planeIndex].secondVec[i];
-		m_clipPlanesOrigins[4*planeIndex + i] = m_clipPlanes[planeIndex].origin[i];
-	}
-
-	// Update the plane equation array
+	// Update the planes equations array
 	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
 	float d = -(planeNormal * m_clipPlanes[planeIndex].origin);
 	m_clipPlanesEquations[4*planeIndex + 0] = planeNormal[0];
