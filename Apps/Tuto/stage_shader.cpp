@@ -77,7 +77,7 @@ void StageShader::slot_pushButton_addPlane()
 {
 	m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() + 1);
 
-	m_shader->setClipPlaneOrigin(m_bb.center(), dock.comboBox_PlaneIndex->count() + 1 - 1);
+	m_shader->setClipPlaneParamsOrigin(m_bb.center(), dock.comboBox_PlaneIndex->count() + 1 - 1);
 
 	std::string indexStr;
 	std::stringstream ss;
@@ -110,17 +110,17 @@ void StageShader::slot_comboBox_PlaneIndexChanged(int newIndex)
 {
 	if (newIndex >= 0)
 	{
-		Geom::Vec3f currPlaneVec1 = m_shader->getClipPlaneFirstVec(newIndex);
+		Geom::Vec3f currPlaneVec1 = m_shader->getClipPlaneParamsFirstVec(newIndex);
 		dock.doubleSpinBox_PlaneVec1x->setValue(currPlaneVec1[0]);
 		dock.doubleSpinBox_PlaneVec1y->setValue(currPlaneVec1[1]);
 		dock.doubleSpinBox_PlaneVec1z->setValue(currPlaneVec1[2]);
 
-		Geom::Vec3f currPlaneVec2 = m_shader->getClipPlaneSecondVec(newIndex);
+		Geom::Vec3f currPlaneVec2 = m_shader->getClipPlaneParamsSecondVec(newIndex);
 		dock.doubleSpinBox_PlaneVec2x->setValue(currPlaneVec2[0]);
 		dock.doubleSpinBox_PlaneVec2y->setValue(currPlaneVec2[1]);
 		dock.doubleSpinBox_PlaneVec2z->setValue(currPlaneVec2[2]);
 
-		Geom::Vec3f currPlaneOrigin = m_shader->getClipPlaneOrigin(newIndex);
+		Geom::Vec3f currPlaneOrigin = m_shader->getClipPlaneParamsOrigin(newIndex);
 		dock.doubleSpinBox_PlaneOriginx->setValue(currPlaneOrigin[0]);
 		dock.doubleSpinBox_PlaneOriginy->setValue(currPlaneOrigin[1]);
 		dock.doubleSpinBox_PlaneOriginz->setValue(currPlaneOrigin[2]);
@@ -134,7 +134,7 @@ void StageShader::slot_doubleSpinBox_PlaneVec1(double c)
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1x->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1y->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1z->value();
-		m_shader->setClipPlaneFirstVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
+		m_shader->setClipPlaneParamsFirstVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
 		updateGL();
 	}
 }
@@ -146,7 +146,7 @@ void StageShader::slot_doubleSpinBox_PlaneVec2(double c)
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2x->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2y->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2z->value();
-		m_shader->setClipPlaneSecondVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
+		m_shader->setClipPlaneParamsSecondVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
 		updateGL();
 	}
 }
@@ -158,7 +158,7 @@ void StageShader::slot_doubleSpinBox_PlaneOrigin(double c)
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginx->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginy->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginz->value();
-		m_shader->setClipPlaneOrigin(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
+		m_shader->setClipPlaneParamsOrigin(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
 		updateGL();
 	}
 }

@@ -41,9 +41,7 @@ class ShaderMutator
 	
 public:
 
-	/**
-	 * enum used to choose which shader src type to modify
-	 */
+	/// enum used to choose which shader src type to modify
 	enum shaderSrcType { VERTEX_SHADER, FRAGMENT_SHADER, GEOMETRY_SHADER };
 
 	/**
@@ -98,41 +96,27 @@ public:
 	  */
 	 void insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode);
 	 
-	 /**
-	  * returns the modified vertex shader source code
-	  */
+	 /// returns the modified vertex shader source code
 	 std::string getModifiedVertexShaderSrc() { return m_vShaderMutation; }
 	 
-	 /**
-	  * returns the modified fragment shader source code
-	  */
+	 /// returns the modified fragment shader source code
 	 std::string getModifiedFragmentShaderSrc() { return m_fShaderMutation; }
 	 
-	 /**
-	  * returns the modified geometry shader source code
-	  */
+	 /// returns the modified geometry shader source code
 	 std::string getModifiedGeometryShaderSrc() { return m_gShaderMutation; }
 	
 private:
 
-	 /**
-	  * processed shader name stored for log purpose
-	  */
+	 /// processed shader name stored for log purpose
 	 std::string m_shaderName;
 	
-	/**
-	 * modified version of the original vertex shader source code
-	 */
+	/// modified version of the original vertex shader source code
 	std::string m_vShaderMutation;
 	
-	/**
-	 * modified version of the original fragment shader source code
-	 */
+	/// modified version of the original fragment shader source code
 	std::string m_fShaderMutation;
 	
-	/**
-	 * modified version of the original geometry shader source code
-	 */
+	/// modified version of the original geometry shader source code
 	std::string m_gShaderMutation;
 	
 	/**
