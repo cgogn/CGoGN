@@ -171,19 +171,19 @@ void StageShader::slot_doubleSpinBox_ColorAttenuationFactor(double c)
 
 void StageShader::slot_doubleSpinBox_GridDisplaySize(double c)
 {
-	m_shader->setPlaneDisplaySize((float)c);
+	m_shader->setClipPlanesDisplaySize((float)c);
 	updateGL();
 }
 
 void StageShader::slot_spinBox_GridResolutionX(int i)
 {
-	m_shader->setPlaneDisplayXRes((size_t)i);
+	m_shader->setClipPlanesDisplayXRes((size_t)i);
 	updateGL();
 }
 
 void StageShader::slot_spinBox_GridResolutionY(int i)
 {
-	m_shader->setPlaneDisplayYRes((size_t)i);
+	m_shader->setClipPlanesDisplayYRes((size_t)i);
 	updateGL();
 }
 
@@ -193,16 +193,16 @@ void StageShader::slot_doubleSpinBox_GridColor(double c)
 	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorG->value();
 	float b = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorB->value();
 
-	m_shader->setPlaneDisplayColor(Geom::Vec3f(r, g, b));
+	m_shader->setClipPlanesDisplayColor(Geom::Vec3f(r, g, b));
 	updateGL();
 }
 
 void StageShader::slot_horizontalSlider_GridType(int i)
 {
 	if (i == 0)
-		m_shader->setPlaneDisplayType(Utils::ClippingShader::STRAIGHT_GRID);
+		m_shader->setClipPlanesDisplayType(Utils::ClippingShader::STRAIGHT_GRID);
 	else if (i == 1)
-		m_shader->setPlaneDisplayType(Utils::ClippingShader::RADIAL_GRID);
+		m_shader->setClipPlanesDisplayType(Utils::ClippingShader::RADIAL_GRID);
 
 	updateGL();
 }
@@ -286,16 +286,16 @@ void StageShader::initGUI()
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
 	dock.doubleSpinBox_ColorAttenuationFactor->setValue(m_shader->getClipColorAttenuationFactor());
-	dock.doubleSpinBox_GridDisplaySize->setValue(m_shader->getPlaneDisplaySize());
-	dock.spinBox_GridResolutionX->setValue(m_shader->getPlaneDisplayXRes());
-	dock.spinBox_GridResolutionY->setValue(m_shader->getPlaneDisplayYRes());
-	Geom::Vec3f col = m_shader->getPlaneDisplayColor();
+	dock.doubleSpinBox_GridDisplaySize->setValue(m_shader->getClipPlanesDisplaySize());
+	dock.spinBox_GridResolutionX->setValue(m_shader->getClipPlanesDisplayXRes());
+	dock.spinBox_GridResolutionY->setValue(m_shader->getClipPlanesDisplayYRes());
+	Geom::Vec3f col = m_shader->getClipPlanesDisplayColor();
 	dock.doubleSpinBox_GridColorR->setValue(col[0]);
 	dock.doubleSpinBox_GridColorG->setValue(col[1]);
 	dock.doubleSpinBox_GridColorB->setValue(col[2]);
-	if (m_shader->getPlaneDisplayType() == Utils::ClippingShader::STRAIGHT_GRID)
+	if (m_shader->getClipPlanesDisplayType() == Utils::ClippingShader::STRAIGHT_GRID)
 		dock.horizontalSlider_GridType->setValue(0);
-	else if (m_shader->getPlaneDisplayType() == Utils::ClippingShader::RADIAL_GRID)
+	else if (m_shader->getClipPlanesDisplayType() == Utils::ClippingShader::RADIAL_GRID)
 		dock.horizontalSlider_GridType->setValue(1);
 }
 
@@ -356,7 +356,7 @@ void StageShader::importMesh(std::string& filename)
 
 	updateGLMatrices() ;
 
-	m_shader->setPlaneDisplaySize((m_bb.maxSize())*1.2f);
+	m_shader->setClipPlanesDisplaySize((m_bb.maxSize())*1.2f);
 }
 
 /*******************************************************************************
@@ -382,9 +382,9 @@ void StageShader::cb_initGL()
 
 	registerShader(m_shader);
 
-	m_shader->setPlaneDisplayColor(Geom::Vec3f (1.0, 0.0, 0.0));
-	m_shader->setPlaneDisplayXRes(10);
-	m_shader->setPlaneDisplayYRes(5);
+	m_shader->setClipPlanesDisplayColor(Geom::Vec3f (1.0, 0.0, 0.0));
+	m_shader->setClipPlanesDisplayXRes(10);
+	m_shader->setClipPlanesDisplayYRes(5);
 }
 
 void StageShader::updateVBOprimitives(int upType)

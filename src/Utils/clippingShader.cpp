@@ -42,10 +42,9 @@ ClippingShader::ClippingShader()
 {
 	// Initialize uniforms ids
 	m_unif_clipPlanesEquations = 0;
-	m_unif_colorAttenuationFactor = 0;
+	m_unif_clipColorAttenuationFactor = 0;
 
-
-	// Initialize default display clipping variables
+	// Initialize default display variables
 	m_clipPlanesDisplayColor = Geom::Vec3f (1.0, 0.6, 0.0);
 	m_clipPlanesDisplayType = STRAIGHT_GRID;
 	m_clipPlanesDisplayXRes = 2;
@@ -53,7 +52,7 @@ ClippingShader::ClippingShader()
 	m_clipPlanesDisplaySize = 10.0;
 
 	// Initialize default global clipping variables
-	m_colorAttenuationFactor = 1.0;
+	m_clipColorAttenuationFactor = 1.0;
 }
 
 ClippingShader::~ClippingShader()
@@ -308,21 +307,30 @@ void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, G
 		return;
 	}
 
-	// Copy the given clipping plane parameters
-	m_clipPlanes[planeIndex].firstVec = vec1;
-	m_clipPlanes[planeIndex].firstVec.normalize();
-	m_clipPlanes[planeIndex].secondVec = vec2;
-	m_clipPlanes[planeIndex].secondVec.normalize();
-	m_clipPlanes[planeIndex].origin = origin;
+	// Normalize
+	Geom::Vec3f vec1Normalized = vec1;
+	vec1Normalized.normalize();
+	Geom::Vec3f vec2Normalized = vec2;
+	vec2Normalized.normalize();
 
-	// Update the plane arrays
-	updateClippingPlaneArray(planeIndex);
+	if ((vec1Normalized != m_clipPlanes[planeIndex].firstVec)
+			|| (vec2Normalized != m_clipPlanes[planeIndex].secondVec)
+			|| (origin != m_clipPlanes[planeIndex].origin))
+	{
+		// Copy the given clipping plane parameters
+		m_clipPlanes[planeIndex].firstVec = vec1Normalized;
+		m_clipPlanes[planeIndex].secondVec = vec2Normalized;
+		m_clipPlanes[planeIndex].origin = origin;
 
-	// Send again the whole planes equations array to shader
-	sendClippingPlanesUniform();
+		// Update the plane arrays
+		updateClipPlaneArray(planeIndex);
 
-	// Update plane VBO
-	updateClippingPlaneVBO(planeIndex);
+		// Send again the whole planes equations array to shader
+		sendClipPlanesEquationsUniform();
+
+		// Update plane VBO
+		updateClipPlaneVBO(planeIndex);
+	}
 }
 
 void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex)
@@ -338,18 +346,24 @@ void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex
 		return;
 	}
 
-	// Copy the given clipping plane parameter
-	m_clipPlanes[planeIndex].firstVec = vec1;
-	m_clipPlanes[planeIndex].firstVec.normalize();
+	// Normalize
+	Geom::Vec3f vec1Normalized = vec1;
+	vec1Normalized.normalize();
 
-	// Update the plane arrays
-	updateClippingPlaneArray(planeIndex);
+	if (vec1Normalized != m_clipPlanes[planeIndex].firstVec)
+	{
+		// Copy the given clipping plane parameter
+		m_clipPlanes[planeIndex].firstVec = vec1Normalized;
 
-	// Send again the whole planes equations array to shader
-	sendClippingPlanesUniform();
+		// Update the plane arrays
+		updateClipPlaneArray(planeIndex);
 
-	// Update plane VBO
-	updateClippingPlaneVBO(planeIndex);
+		// Send again the whole planes equations array to shader
+		sendClipPlanesEquationsUniform();
+
+		// Update plane VBO
+		updateClipPlaneVBO(planeIndex);
+	}
 }
 
 void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex)
@@ -365,18 +379,24 @@ void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeInde
 		return;
 	}
 
-	// Copy the given clipping plane parameter
-	m_clipPlanes[planeIndex].secondVec = vec2;
-	m_clipPlanes[planeIndex].secondVec.normalize();
+	// Normalize
+	Geom::Vec3f vec2Normalized = vec2;
+	vec2Normalized.normalize();
 
-	// Update the plane arrays
-	updateClippingPlaneArray(planeIndex);
+	if (vec2Normalized != m_clipPlanes[planeIndex].secondVec)
+	{
+		// Copy the given clipping plane parameter
+		m_clipPlanes[planeIndex].secondVec = vec2Normalized;
 
-	// Send again the whole planes equations array to shader
-	sendClippingPlanesUniform();
+		// Update the plane arrays
+		updateClipPlaneArray(planeIndex);
 
-	// Update plane VBO
-	updateClippingPlaneVBO(planeIndex);
+		// Send again the whole planes equations array to shader
+		sendClipPlanesEquationsUniform();
+
+		// Update plane VBO
+		updateClipPlaneVBO(planeIndex);
+	}
 }
 
 void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex)
@@ -392,17 +412,20 @@ void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex
 		return;
 	}
 
-	// Copy the given clipping plane parameter
-	m_clipPlanes[planeIndex].origin = origin;
+	if (origin != m_clipPlanes[planeIndex].origin)
+	{
+		// Copy the given clipping plane parameter
+		m_clipPlanes[planeIndex].origin = origin;
 
-	// Update the plane arrays
-	updateClippingPlaneArray(planeIndex);
+		// Update the plane arrays
+		updateClipPlaneArray(planeIndex);
 
-	// Send again the whole planes equations array to shader
-	sendClippingPlanesUniform();
+		// Send again the whole planes equations array to shader
+		sendClipPlanesEquationsUniform();
 
-	// Update plane VBO
-	updateClippingPlaneVBO(planeIndex);
+		// Update plane VBO
+		updateClipPlaneVBO(planeIndex);
+	}
 }
 
 Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(int planeIndex)
@@ -456,101 +479,7 @@ Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(int planeIndex)
 	return m_clipPlanes[planeIndex].origin;
 }
 
-void ClippingShader::displayClipPlanes()
-{
-	for (size_t i = 0; i < m_clipPlanesDrawers.size(); i++)
-		m_clipPlanesDrawers[i]->callList();
-}
-
-
-/***********************************************
- *
- * 		Global Clipping Stuff
- *
- ***********************************************/
-
-
-void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
-{
-	// Copy the given value
-	m_colorAttenuationFactor = colorAttenuationFactor;
-
-	// Send again the uniform to shader
-	sendColorAttenuationFactorUniform();
-}
-
-float ClippingShader::getClipColorAttenuationFactor()
-{
-	return m_colorAttenuationFactor;
-}
-
-
-/***********************************************
- *
- * 		Clipping Uniforms Handling
- *
- ***********************************************/
-
-
-void ClippingShader::updateClippingUniforms()
-{
-	// These uniforms only exist if the clipping planes count is > 0
-	if (getClipPlanesCount() <= 0)
-		return;
-
-	// Shader name
-	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-	// Get uniforms locations
-
-	m_unif_clipPlanesEquations = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
-	if (m_unif_clipPlanesEquations == -1)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::updateClippingUniforms"
-		<< " - uniform 'clip_ClipPlane' not found in shader "
-		<< shaderName
-		<< CGoGNendl;
-	}
-
-	m_unif_colorAttenuationFactor = glGetUniformLocation(program_handler(), "clip_ColorAttenuationFactor");
-	if (m_unif_colorAttenuationFactor == -1)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::updateClippingUniforms"
-		<< " - uniform 'clip_ColorAttenuationFactor' not found in shader "
-		<< shaderName
-		<< CGoGNendl;
-	}
-
-	// Send again uniforms values
-	sendClippingPlanesUniform();
-	sendColorAttenuationFactorUniform();
-}
-
-
-/***********************************************
- *
- * 		Private Section
- *
- ***********************************************/
-
-
-void ClippingShader::sendClippingPlanesUniform()
-{
-	bind();
-	glUniform4fv(m_unif_clipPlanesEquations, getClipPlanesCount(), &m_clipPlanesEquations.front());
-}
-
-void ClippingShader::sendColorAttenuationFactorUniform()
-{
-	bind();
-	glUniform1f(m_unif_colorAttenuationFactor, m_colorAttenuationFactor);
-}
-
-void ClippingShader::updateClippingPlaneArray(int planeIndex)
+void ClippingShader::updateClipPlaneArray(int planeIndex)
 {
 	// Check if the given index is not out of range
 	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
@@ -573,7 +502,21 @@ void ClippingShader::updateClippingPlaneArray(int planeIndex)
 
 }
 
-void ClippingShader::updateClippingPlaneVBO(int planeIndex)
+
+/***********************************************
+ *
+ * 		Plane Clipping Display
+ *
+ ***********************************************/
+
+
+void ClippingShader::displayClipPlanes()
+{
+	for (size_t i = 0; i < m_clipPlanesDrawers.size(); i++)
+		m_clipPlanesDrawers[i]->callList();
+}
+
+void ClippingShader::updateClipPlaneVBO(int planeIndex)
 {
 	// Check if the given index is not out of range
 	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
@@ -729,10 +672,93 @@ void ClippingShader::updateClippingPlaneVBO(int planeIndex)
 	m_clipPlanesDrawers[planeIndex]->endList();
 }
 
-void ClippingShader::updateAllClippingPlanesVBOs()
+void ClippingShader::updateClipPlanesVBOs()
 {
 	for (int i = 0; i < getClipPlanesCount(); i++)
-		updateClippingPlaneVBO(i);
+		updateClipPlaneVBO(i);
+}
+
+
+/***********************************************
+ *
+ * 		Global Clipping Stuff
+ *
+ ***********************************************/
+
+
+void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
+{
+	if (m_clipColorAttenuationFactor != colorAttenuationFactor)
+	{
+		// Copy the given value
+		m_clipColorAttenuationFactor = colorAttenuationFactor;
+
+		// Send again the uniform to shader
+		sendClipColorAttenuationFactorUniform();
+	}
+}
+
+float ClippingShader::getClipColorAttenuationFactor()
+{
+	return m_clipColorAttenuationFactor;
+}
+
+
+/***********************************************
+ *
+ * 		Clipping Uniforms Handling
+ *
+ ***********************************************/
+
+
+void ClippingShader::updateClippingUniforms()
+{
+	// These uniforms only exist if the clipping planes count is > 0
+	if (getClipPlanesCount() <= 0)
+		return;
+
+	// Shader name
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Get uniforms locations
+
+	m_unif_clipPlanesEquations = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
+	if (m_unif_clipPlanesEquations == -1)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::updateClippingUniforms"
+		<< " - uniform 'clip_ClipPlane' not found in shader "
+		<< shaderName
+		<< CGoGNendl;
+	}
+
+	m_unif_clipColorAttenuationFactor = glGetUniformLocation(program_handler(), "clip_ColorAttenuationFactor");
+	if (m_unif_clipColorAttenuationFactor == -1)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< "ClippingShader::updateClippingUniforms"
+		<< " - uniform 'clip_ColorAttenuationFactor' not found in shader "
+		<< shaderName
+		<< CGoGNendl;
+	}
+
+	// Send again uniforms values
+	sendClipPlanesEquationsUniform();
+	sendClipColorAttenuationFactorUniform();
+}
+
+void ClippingShader::sendClipPlanesEquationsUniform()
+{
+	bind();
+	glUniform4fv(m_unif_clipPlanesEquations, getClipPlanesCount(), &m_clipPlanesEquations.front());
+}
+
+void ClippingShader::sendClipColorAttenuationFactorUniform()
+{
+	bind();
+	glUniform1f(m_unif_clipColorAttenuationFactor, m_clipColorAttenuationFactor);
 }
 
 } // namespace Utils

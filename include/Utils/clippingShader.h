@@ -65,10 +65,13 @@ public :
 	 *
 	 ***********************************************/
 
-public:
+private:
 
-	/// enum used to choose which type of clip plane grid to display
-	enum clipPlaneDisplayGridType { STRAIGHT_GRID, RADIAL_GRID };
+	/// original vertex shader source code (without clipping)
+	std::string originalVertShaderSrc;
+
+	/// original fragment shader source code (without clipping)
+	std::string originalFragShaderSrc;
 
 
 	/***********************************************
@@ -76,6 +79,8 @@ public:
 	 * 		Plane Clipping
 	 *
 	 ***********************************************/
+
+public:
 
 	/**
 	 * set the clip planes count
@@ -97,7 +102,7 @@ public:
 	 * @param origin point of the plane that will be used as origin to display it
 	 * @param planeIndex index of the plane to modify
 	 */
-	void setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex = 0);
+	void setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex);
 
 	/**
 	 * set first vector for one clip plane
@@ -105,7 +110,7 @@ public:
 	 * @param vec1 first basis vector
 	 * @param planeIndex index of the plane to modify
 	 */
-	void setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex = 0);
+	void setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex);
 
 	/**
 	 * set second vector for one clip plane
@@ -113,7 +118,7 @@ public:
 	 * @param vec2 second basis vector
 	 * @param planeIndex index of the plane to modify
 	 */
-	void setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex = 0);
+	void setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex);
 	
 	/**
 	 * set origin for one clip plane
@@ -121,144 +126,42 @@ public:
 	 * @param origin point of the plane that will be used as origin to display it
 	 * @param planeIndex index of the plane to modify
 	 */
-	void setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex = 0);
+	void setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex);
 
 	/**
 	 * get first vector for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param planeIndex index of the plane to modify
 	 */
-	Geom::Vec3f getClipPlaneParamsFirstVec(int planeIndex = 0);
+	Geom::Vec3f getClipPlaneParamsFirstVec(int planeIndex);
 
 	/**
 	 * get second vector for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param planeIndex index of the plane to modify
 	 */
-	Geom::Vec3f getClipPlaneParamsSecondVec(int planeIndex = 0);
+	Geom::Vec3f getClipPlaneParamsSecondVec(int planeIndex);
 
 	/**
 	 * get origin for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param planeIndex index of the plane to modify
 	 */
-	Geom::Vec3f getClipPlaneParamsOrigin(int planeIndex = 0);
-
-	/// display all clipping planes
-	void displayClipPlanes();
-
-	/**
-	 * set the planes display color
-	 * @param color the new color
-	 */
-	void setPlaneDisplayColor(Geom::Vec3f color) { m_clipPlanesDisplayColor = color; updateAllClippingPlanesVBOs(); }
-
-	/// get the planes display color
-	Geom::Vec3f getPlaneDisplayColor() { return m_clipPlanesDisplayColor; }
-
-	/**
-	 * set the planes display grids type
-	 * @param gridType the new grid type
-	 */
-	void setPlaneDisplayType(clipPlaneDisplayGridType gridType) { m_clipPlanesDisplayType = gridType; updateAllClippingPlanesVBOs(); }
-
-	/// get the planes display grids type
-	clipPlaneDisplayGridType getPlaneDisplayType() { return m_clipPlanesDisplayType; }
-
-	/**
-	 * set the planes display grid x resolution
-	 * @param res the new resolution
-	 */
-	void setPlaneDisplayXRes(size_t res) { m_clipPlanesDisplayXRes = res; updateAllClippingPlanesVBOs(); }
-
-	/// get the planes display grid x resolution
-	size_t getPlaneDisplayXRes() { return m_clipPlanesDisplayXRes; }
-
-	/**
-	 * set the planes display grid y resolution
-	 * @param res the new resolution
-	 */
-	void setPlaneDisplayYRes(size_t res) { m_clipPlanesDisplayYRes = res; updateAllClippingPlanesVBOs(); }
-
-	/// get the planes display grid y resolution
-	size_t getPlaneDisplayYRes() { return m_clipPlanesDisplayYRes; }
-
-	/**
-	 * set the planes display size
-	 * @param size the new size
-	 */
-	void setPlaneDisplaySize(float size) { m_clipPlanesDisplaySize = size; updateAllClippingPlanesVBOs(); }
-
-	/// get the planes display size
-	float getPlaneDisplaySize() { return m_clipPlanesDisplaySize; }
-
-
-	/***********************************************
-	 *
-	 * 		Global Clipping Stuff
-	 *
-	 ***********************************************/
-
-	/**
-	 * set the color attenuation factor for clipping
-	 * @param colorAttenuationFactor color attenuation factor
-	 */
-	void setClipColorAttenuationFactor(float colorAttenuationFactor);
-
-	/// get the color attenuation factor for clipping
-	float getClipColorAttenuationFactor();
-
-
-	/***********************************************
-	 *
-	 * 		Clipping Uniforms Handling
-	 *
-	 ***********************************************/
-
-	/// update uniforms (get their locations and send their values again) for clipping
-	void updateClippingUniforms();
-
-
-	/***********************************************
-	 *
-	 * 		Private Section
-	 *
-	 ***********************************************/
+	Geom::Vec3f getClipPlaneParamsOrigin(int planeIndex);
 
 private:
+
+	/**
+	 * update clip plane equation array
+	 * @param planeIndex index of the plane
+	 */
+	void updateClipPlaneArray(int planeIndex);
 
 	/// clip planes structure
 	struct clipPlane
 	{
 		Geom::Vec3f firstVec, secondVec, origin;
 	};
-
-	/// sends the clip planes arrays to shader
-	void sendClippingPlanesUniform();
-
-	/// sends the color attenuation factor to shader
-	void sendColorAttenuationFactorUniform();
-
-	/**
-	 * update clip planes parameters arrays
-	 * @param planeIndex index of the plane
-	 */
-	void updateClippingPlaneArray(int planeIndex);
-
-	/**
-	 * update VBO for one plane
-	 * @param planeIndex index of the plane
-	 */
-	void updateClippingPlaneVBO(int planeIndex);
-
-	/// update VBOs for all planes
-	void updateAllClippingPlanesVBOs();
-
-	/// original vertex shader source code (without clipping)
-	std::string originalVertShaderSrc;
-
-	/// original fragment shader source code (without clipping)
-	std::string originalFragShaderSrc;
 
 	/// clip planes array
 	std::vector<clipPlane> m_clipPlanes;
@@ -272,11 +175,76 @@ private:
 	/// clip planes equations vector uniform id
 	GLint m_unif_clipPlanesEquations;
 
-	/// color attenuation factor
-	float m_colorAttenuationFactor;
 
-	/// color attenuation factor uniform id
-	GLint m_unif_colorAttenuationFactor;
+	/***********************************************
+	 *
+	 * 		Plane Clipping Display
+	 *
+	 ***********************************************/
+
+public:
+
+	/// enum used to choose which type of clip plane grid to display
+	enum clipPlaneDisplayGridType { STRAIGHT_GRID, RADIAL_GRID };
+
+	/// display all clipping planes
+	void displayClipPlanes();
+
+	/**
+	 * set the planes display color
+	 * @param color the new color
+	 */
+	void setClipPlanesDisplayColor(Geom::Vec3f color) { m_clipPlanesDisplayColor = color; updateClipPlanesVBOs(); }
+
+	/// get the planes display color
+	Geom::Vec3f getClipPlanesDisplayColor() { return m_clipPlanesDisplayColor; }
+
+	/**
+	 * set the planes display grids type
+	 * @param gridType the new grid type
+	 */
+	void setClipPlanesDisplayType(clipPlaneDisplayGridType gridType) { m_clipPlanesDisplayType = gridType; updateClipPlanesVBOs(); }
+
+	/// get the planes display grids type
+	clipPlaneDisplayGridType getClipPlanesDisplayType() { return m_clipPlanesDisplayType; }
+
+	/**
+	 * set the planes display grid x resolution
+	 * @param res the new resolution
+	 */
+	void setClipPlanesDisplayXRes(size_t res) { m_clipPlanesDisplayXRes = res; updateClipPlanesVBOs(); }
+
+	/// get the planes display grid x resolution
+	size_t getClipPlanesDisplayXRes() { return m_clipPlanesDisplayXRes; }
+
+	/**
+	 * set the planes display grid y resolution
+	 * @param res the new resolution
+	 */
+	void setClipPlanesDisplayYRes(size_t res) { m_clipPlanesDisplayYRes = res; updateClipPlanesVBOs(); }
+
+	/// get the planes display grid y resolution
+	size_t getClipPlanesDisplayYRes() { return m_clipPlanesDisplayYRes; }
+
+	/**
+	 * set the planes display size
+	 * @param size the new size
+	 */
+	void setClipPlanesDisplaySize(float size) { m_clipPlanesDisplaySize = size; updateClipPlanesVBOs(); }
+
+	/// get the planes display size
+	float getClipPlanesDisplaySize() { return m_clipPlanesDisplaySize; }
+
+private:
+
+	/**
+	 * update VBO for one plane
+	 * @param planeIndex index of the plane
+	 */
+	void updateClipPlaneVBO(int planeIndex);
+
+	/// update VBOs for all planes
+	void updateClipPlanesVBOs();
 
 	/// clip planes drawers array
 	std::vector<Drawer*> m_clipPlanesDrawers;
@@ -295,6 +263,52 @@ private:
 
 	/// clip planes display size
 	float m_clipPlanesDisplaySize;
+
+
+	/***********************************************
+	 *
+	 * 		Global Clipping Stuff
+	 *
+	 ***********************************************/
+
+public:
+
+	/**
+	 * set the color attenuation factor for clipping
+	 * @param colorAttenuationFactor color attenuation factor
+	 */
+	void setClipColorAttenuationFactor(float colorAttenuationFactor);
+
+	/// get the color attenuation factor for clipping
+	float getClipColorAttenuationFactor();
+
+private:
+
+	/// color attenuation factor
+	float m_clipColorAttenuationFactor;
+
+	/// color attenuation factor uniform id
+	GLint m_unif_clipColorAttenuationFactor;
+
+
+	/***********************************************
+	 *
+	 * 		Clipping Uniforms Handling
+	 *
+	 ***********************************************/
+
+public:
+
+	/// update uniforms (get their locations and send their values again) for clipping
+	void updateClippingUniforms();
+
+private:
+
+	/// sends the clip planes equations array to shader
+	void sendClipPlanesEquationsUniform();
+
+	/// sends the color attenuation factor to shader
+	void sendClipColorAttenuationFactorUniform();
 
 };
 
