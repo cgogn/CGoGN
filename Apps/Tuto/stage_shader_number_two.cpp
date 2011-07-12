@@ -118,7 +118,7 @@ void Stage_shader_number_two::cb_initGL()
 	registerShader(m_simpleColorShader) ;
 	registerShader(m_pointSprite) ;
 
-	m_phongShader->setClippingPlanesCount(1);
+	m_phongShader->setClipPlanesCount(1);
 }
 
 void Stage_shader_number_two::cb_redraw()
@@ -165,7 +165,7 @@ void Stage_shader_number_two::cb_redraw()
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
 
-	m_phongShader->displayClippingPlanes();
+	m_phongShader->displayClipPlanes();
 }
 
 void Stage_shader_number_two::cb_Open()
@@ -194,15 +194,15 @@ void Stage_shader_number_two::cb_mouseMove(int button, int x, int y)
 	{
 		if (button == Qt::LeftButton)
 		{
-			Geom::Vec3f clipPlaneVec1 = m_phongShader->getClippingPlaneFirstVec();
-			Geom::Vec3f clipPlaneVec2 = m_phongShader->getClippingPlaneSecondVec();
+			Geom::Vec3f clipPlaneVec1 = m_phongShader->getClipPlaneParamsFirstVec(0);
+			Geom::Vec3f clipPlaneVec2 = m_phongShader->getClipPlaneParamsSecondVec(0);
 			clipPlaneVec1[0] += (m_mouseLastX - x)/40.0;
 			clipPlaneVec1[1] += (m_mouseLastY - y)/40.0;
 			clipPlaneVec2[1] += (m_mouseLastX - x)/40.0;
 			clipPlaneVec2[2] += (m_mouseLastY - y)/40.0;
 
-			m_phongShader->setClippingPlaneFirstVec(clipPlaneVec1);
-			m_phongShader->setClippingPlaneSecondVec(clipPlaneVec2);
+			m_phongShader->setClipPlaneParamsFirstVec(clipPlaneVec1, 0);
+			m_phongShader->setClipPlaneParamsSecondVec(clipPlaneVec2, 0);
 
 			updateGL();
 		}
@@ -241,8 +241,8 @@ void Stage_shader_number_two::importMesh(std::string& filename)
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
 
-	m_phongShader->setPlaneDisplaySize(bb.maxSize()*1.2f);
-	m_phongShader->setClippingPlaneOrigin(bb.center());
+	m_phongShader->setClipPlanesDisplaySize(bb.maxSize()*1.2f);
+	m_phongShader->setClipPlaneParamsOrigin(bb.center(), 0);
 }
 
 void Stage_shader_number_two::slot_drawVertices(bool b)
@@ -289,7 +289,7 @@ void Stage_shader_number_two::slot_normalsSize(int i)
 
 void Stage_shader_number_two::slot_doubleSpinBox_ColorAttenuationFactor(double c)
 {
-	m_phongShader->setClippingColorAttenuationFactor((float)c);
+	m_phongShader->setClipColorAttenuationFactor((float)c);
 	updateGL();
 }
 

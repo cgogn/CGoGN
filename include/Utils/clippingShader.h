@@ -61,7 +61,7 @@ public :
 
 	/***********************************************
 	 *
-	 * 		Miscellaneous Stuff
+	 * 		Original Shader Sources
 	 *
 	 ***********************************************/
 
@@ -194,46 +194,46 @@ public:
 	 * set the planes display color
 	 * @param color the new color
 	 */
-	void setClipPlanesDisplayColor(Geom::Vec3f color) { m_clipPlanesDisplayColor = color; updateClipPlanesVBOs(); }
+	void setClipPlanesDisplayColor(Geom::Vec3f color);
 
 	/// get the planes display color
-	Geom::Vec3f getClipPlanesDisplayColor() { return m_clipPlanesDisplayColor; }
+	Geom::Vec3f getClipPlanesDisplayColor();
 
 	/**
 	 * set the planes display grids type
 	 * @param gridType the new grid type
 	 */
-	void setClipPlanesDisplayType(clipPlaneDisplayGridType gridType) { m_clipPlanesDisplayType = gridType; updateClipPlanesVBOs(); }
+	void setClipPlanesDisplayType(clipPlaneDisplayGridType gridType);
 
 	/// get the planes display grids type
-	clipPlaneDisplayGridType getClipPlanesDisplayType() { return m_clipPlanesDisplayType; }
+	clipPlaneDisplayGridType getClipPlanesDisplayType();
 
 	/**
 	 * set the planes display grid x resolution
 	 * @param res the new resolution
 	 */
-	void setClipPlanesDisplayXRes(size_t res) { m_clipPlanesDisplayXRes = res; updateClipPlanesVBOs(); }
+	void setClipPlanesDisplayXRes(size_t res);
 
 	/// get the planes display grid x resolution
-	size_t getClipPlanesDisplayXRes() { return m_clipPlanesDisplayXRes; }
+	size_t getClipPlanesDisplayXRes();
 
 	/**
 	 * set the planes display grid y resolution
 	 * @param res the new resolution
 	 */
-	void setClipPlanesDisplayYRes(size_t res) { m_clipPlanesDisplayYRes = res; updateClipPlanesVBOs(); }
+	void setClipPlanesDisplayYRes(size_t res);
 
 	/// get the planes display grid y resolution
-	size_t getClipPlanesDisplayYRes() { return m_clipPlanesDisplayYRes; }
+	size_t getClipPlanesDisplayYRes();
 
 	/**
 	 * set the planes display size
 	 * @param size the new size
 	 */
-	void setClipPlanesDisplaySize(float size) { m_clipPlanesDisplaySize = size; updateClipPlanesVBOs(); }
+	void setClipPlanesDisplaySize(float size);
 
 	/// get the planes display size
-	float getClipPlanesDisplaySize() { return m_clipPlanesDisplaySize; }
+	float getClipPlanesDisplaySize();
 
 private:
 
@@ -309,6 +309,62 @@ private:
 
 	/// sends the color attenuation factor to shader
 	void sendClipColorAttenuationFactorUniform();
+
+
+	/***********************************************
+	 *
+	 * 		Error Raising
+	 *
+	 ***********************************************/
+
+private:
+
+	/**
+	 * Output a "parameter not positive" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 * @param paramName name of the parameter
+	 */
+	bool errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName);
+
+	/**
+	 * Output a "shader has not been well created" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 */
+	bool errorRaiseShaderHasNotBeenWellCreated(bool condition, const std::string& location);
+
+	/**
+	 * Output a "shader uses a geometry shader" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 */
+	bool errorRaiseShaderUsesGeometryShader(bool condition, const std::string& location);
+
+	/**
+	 * Output a ".. not found in shader" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 * @param shaderType type of the shader
+	 * @param varName name of the variable that may not be found
+	 */
+	bool errorRaiseVariableNotFoundInShader(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType, const std::string& varName);
+
+	/**
+	 * Output a "parameter is out of range" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 * @param paramName name of the parameter
+	 */
+	bool errorRaiseParameterIsOutOfRange(bool condition, const std::string& location, const std::string& paramName);
+
+	/**
+	 * Output a "uniform .. not found in shader" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 * @param uniformName name of the uniform that may not be found
+	 */
+	bool errorRaiseUniformNotFoundInShader(bool condition, const std::string& location, const std::string& uniformName);
 
 };
 

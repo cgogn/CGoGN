@@ -73,51 +73,26 @@ ClippingShader::~ClippingShader()
 
 void ClippingShader::setClipPlanesCount(int planesCount)
 {
-	// Verify that the given clipping planes count is valid
-	if (planesCount < 0)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setPlanesClipping"
-		<< " - Given clipping planes count is not positive !"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given clipping planes count is valid
+	if (errorRaiseParameterIsNotPositive((planesCount < 0), "ClippingShader::setClipPlanesCount", "planesCount"))
+			return;
 
-	// Shader name
-	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-	// Verify that the shader has been well created
-	if (!isCreated())
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setPlaneClipping"
-		<< " - Could not process shader "
-		<< shaderName
-		<< " source code : shader has not been created or has failed to compile"
-		<< CGoGNendl;
+	// Check if the shader has been well created
+	if (errorRaiseShaderHasNotBeenWellCreated((!isCreated()), "ClippingShader::setClipPlanesCount"))
 		return;
-	}
 	
-	// Verify that the shader does not use a geometry shader
-	if (getGeometryShaderSrc() != NULL)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setPlaneClipping"
-		<< " - Could not process shader "
-		<< shaderName
-		<< " source code : unable to add clipping to a shader which uses a geometry shader"
-		<< CGoGNendl;
+	// Check if the shader does not use a geometry shader
+	if (errorRaiseShaderUsesGeometryShader((getGeometryShaderSrc() != NULL), "ClippingShader::setClipPlanesCount"))
 		return;
-	}
 
-	// String for clipping planes count
+	// Clipping planes count string
 	std::string planesCountStr;
 	std::stringstream ss;
 	ss << planesCount;
 	planesCountStr = ss.str();
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
 
 	// Strings that will be inserted into the source code
 
@@ -219,17 +194,8 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 			ShaderMutator SM(shaderName, originalVertShaderSrc, originalFragShaderSrc);
 
 			// First check if the vertex shader contains the VertexPosition attribute
-			if (!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"))
-			{
-				CGoGNerr
-				<< "ERROR - "
-				<< "ClippingShader::setPlaneClipping"
-				<< " - Could not process shader "
-				<< m_nameVS
-				<< " source code : no VertexPosition attribute found"
-				<< CGoGNendl;
+			if (errorRaiseVariableNotFoundInShader(!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"), "ClippingShader::setClipPlanesCount", ShaderMutator::VERTEX_SHADER, "VertexPosition"))
 				return;
-			}
 
 			// Modify vertex shader source code
 			SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_head_insertion);
@@ -296,16 +262,9 @@ int ClippingShader::getClipPlanesCount()
 
 void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsAll", "planeIndex"))
+			return;
 
 	// Normalize
 	Geom::Vec3f vec1Normalized = vec1;
@@ -335,16 +294,9 @@ void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, G
 
 void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsFirstVec", "planeIndex"))
+			return;
 
 	// Normalize
 	Geom::Vec3f vec1Normalized = vec1;
@@ -368,16 +320,9 @@ void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex
 
 void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsSecondVec", "planeIndex"))
+			return;
 
 	// Normalize
 	Geom::Vec3f vec2Normalized = vec2;
@@ -401,16 +346,9 @@ void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeInde
 
 void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsOrigin", "planeIndex"))
+			return;
 
 	if (origin != m_clipPlanes[planeIndex].origin)
 	{
@@ -430,16 +368,9 @@ void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex
 
 Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return Geom::Vec3f(0.0, 0.0, 0.0);
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::getClipPlaneParamsFirstVec", "planeIndex"))
+			return Geom::Vec3f(0.0, 0.0, 0.0);
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].firstVec;
@@ -447,16 +378,9 @@ Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(int planeIndex)
 
 Geom::Vec3f ClippingShader::getClipPlaneParamsSecondVec(int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return Geom::Vec3f(0.0, 0.0, 0.0);
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::getClipPlaneParamsSecondVec", "planeIndex"))
+			return Geom::Vec3f(0.0, 0.0, 0.0);
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].secondVec;
@@ -464,16 +388,9 @@ Geom::Vec3f ClippingShader::getClipPlaneParamsSecondVec(int planeIndex)
 
 Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::setClippingPlane"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return Geom::Vec3f(0.0, 0.0, 0.0);
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::getClipPlaneParamsOrigin", "planeIndex"))
+			return Geom::Vec3f(0.0, 0.0, 0.0);
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].origin;
@@ -481,16 +398,9 @@ Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(int planeIndex)
 
 void ClippingShader::updateClipPlaneArray(int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::updateClippingPlaneVBO"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::updateClipPlaneArray", "planeIndex"))
+			return;
 
 	// Update the planes equations array
 	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
@@ -516,18 +426,81 @@ void ClippingShader::displayClipPlanes()
 		m_clipPlanesDrawers[i]->callList();
 }
 
+void ClippingShader::setClipPlanesDisplayColor(Geom::Vec3f color)
+{
+	if (color != m_clipPlanesDisplayColor)
+	{
+		m_clipPlanesDisplayColor = color;
+		updateClipPlanesVBOs();
+	}
+}
+
+Geom::Vec3f ClippingShader::getClipPlanesDisplayColor()
+{
+	return m_clipPlanesDisplayColor;
+}
+
+void ClippingShader::setClipPlanesDisplayType(clipPlaneDisplayGridType gridType)
+{
+	if (gridType != m_clipPlanesDisplayType)
+	{
+		m_clipPlanesDisplayType = gridType;
+		updateClipPlanesVBOs();
+	}
+}
+
+ClippingShader::clipPlaneDisplayGridType ClippingShader::getClipPlanesDisplayType()
+{
+	return m_clipPlanesDisplayType;
+}
+
+void ClippingShader::setClipPlanesDisplayXRes(size_t res)
+{
+	if (res != m_clipPlanesDisplayXRes)
+	{
+		m_clipPlanesDisplayXRes = res;
+		updateClipPlanesVBOs();
+	}
+}
+
+size_t ClippingShader::getClipPlanesDisplayXRes()
+{
+	return m_clipPlanesDisplayXRes;
+}
+
+void ClippingShader::setClipPlanesDisplayYRes(size_t res)
+{
+	if (res != m_clipPlanesDisplayYRes)
+	{
+		m_clipPlanesDisplayYRes = res;
+		updateClipPlanesVBOs();
+	}
+}
+
+size_t ClippingShader::getClipPlanesDisplayYRes()
+{
+	return m_clipPlanesDisplayYRes;
+}
+
+void ClippingShader::setClipPlanesDisplaySize(float size)
+{
+	if (size != m_clipPlanesDisplaySize)
+	{
+		m_clipPlanesDisplaySize = size;
+		updateClipPlanesVBOs();
+	}
+}
+
+float ClippingShader::getClipPlanesDisplaySize()
+{
+	return m_clipPlanesDisplaySize;
+}
+
 void ClippingShader::updateClipPlaneVBO(int planeIndex)
 {
-	// Check if the given index is not out of range
-	if ((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1)))
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::updateClippingPlaneVBO"
-		<< " - Given plane index is out of range"
-		<< CGoGNendl;
-		return;
-	}
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::updateClipPlaneVBO", "planeIndex"))
+			return;
 
 	// Compute four point of the plane at equal distance from plane origin
 	Geom::Vec3f p1 = m_clipPlanes[planeIndex].origin
@@ -717,32 +690,11 @@ void ClippingShader::updateClippingUniforms()
 	if (getClipPlanesCount() <= 0)
 		return;
 
-	// Shader name
-	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
 	// Get uniforms locations
-
 	m_unif_clipPlanesEquations = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
-	if (m_unif_clipPlanesEquations == -1)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::updateClippingUniforms"
-		<< " - uniform 'clip_ClipPlane' not found in shader "
-		<< shaderName
-		<< CGoGNendl;
-	}
-
+	errorRaiseUniformNotFoundInShader((m_unif_clipPlanesEquations == -1), "ClippingShader::updateClippingUniforms", "clip_ClipPlanes");
 	m_unif_clipColorAttenuationFactor = glGetUniformLocation(program_handler(), "clip_ColorAttenuationFactor");
-	if (m_unif_clipColorAttenuationFactor == -1)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< "ClippingShader::updateClippingUniforms"
-		<< " - uniform 'clip_ColorAttenuationFactor' not found in shader "
-		<< shaderName
-		<< CGoGNendl;
-	}
+	errorRaiseUniformNotFoundInShader((m_unif_clipColorAttenuationFactor == -1), "ClippingShader::updateClippingUniforms", "clip_ColorAttenuationFactor");
 
 	// Send again uniforms values
 	sendClipPlanesEquationsUniform();
@@ -759,6 +711,129 @@ void ClippingShader::sendClipColorAttenuationFactorUniform()
 {
 	bind();
 	glUniform1f(m_unif_clipColorAttenuationFactor, m_clipColorAttenuationFactor);
+}
+
+
+/***********************************************
+ *
+ * 		Error Raising
+ *
+ ***********************************************/
+
+
+bool ClippingShader::errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName)
+{
+	if (condition)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Given value for "
+		<< paramName
+		<< " is not positive"
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+
+bool ClippingShader::errorRaiseShaderHasNotBeenWellCreated(bool condition, const std::string& location)
+{
+
+	if (condition)
+	{
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Could not process shader "
+		<< shaderName
+		<< " source code : shader has not been created or has failed to compile"
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+
+bool ClippingShader::errorRaiseShaderUsesGeometryShader(bool condition, const std::string& location)
+{
+	if (condition)
+	{
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Could not process shader "
+		<< shaderName
+		<< " source code : unable to add clipping to a shader which uses a geometry shader"
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+
+bool ClippingShader::errorRaiseVariableNotFoundInShader(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType, const std::string& varName)
+{
+	if (condition)
+	{
+		std::string shaderName;
+		if (shaderType == ShaderMutator::VERTEX_SHADER)
+			 shaderName = m_nameVS;
+		else if (shaderType == ShaderMutator::FRAGMENT_SHADER)
+			shaderName = m_nameFS;
+		else if (shaderType == ShaderMutator::GEOMETRY_SHADER)
+			shaderName = m_nameGS;
+		else
+			shaderName = m_nameVS;
+
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Could not process shader "
+		<< shaderName
+		<< " source code : "
+		<< varName
+		<< " not found"
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+bool ClippingShader::errorRaiseParameterIsOutOfRange(bool condition, const std::string& location, const std::string& paramName)
+{
+	if (condition)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Given value for "
+		<< paramName
+		<< " is out of range"
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+
+bool ClippingShader::errorRaiseUniformNotFoundInShader(bool condition, const std::string& location, const std::string& uniformName)
+{
+	if (condition)
+	{
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - uniform "
+		<< uniformName
+		<< " not found in shader "
+		<< shaderName
+		<< CGoGNendl;
+	}
+
+	return condition;
 }
 
 } // namespace Utils
