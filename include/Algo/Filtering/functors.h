@@ -71,14 +71,14 @@ protected:
 	T sum ;
 	unsigned int count ;
 public:
-	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T>& a, const AttributeHandler<VEC3>& p, VEC3& c = VEC3(0), typename PFP::REAL r = 0) :
-		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), center(c), radius(r), sum(0), count(0)
-	{}
+	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T>& a, const AttributeHandler<VEC3>& p) :
+		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), sum(0), count(0)
+	{center = VEC3(0); radius = 0;}
 	bool operator()(Dart d)
 	{
 		typename PFP::REAL alpha = 0;
-		Algo::Geometry::intersectionSphereEdge<PFP>(this->map, center, radius, d, position, alpha);
-		sum += (1 - alpha) * attr[d] + alpha * attr[this->map.phi1(d)] ;
+		Algo::Geometry::intersectionSphereEdge<PFP>(this->m_map, center, radius, d, position, alpha);
+		sum += (1 - alpha) * attr[d] + alpha * attr[this->m_map.phi1(d)] ;
 		++count ;
 		return false ;
 	}

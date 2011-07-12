@@ -94,6 +94,7 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;
 
+	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa1(map, position, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> c1(map, position, radius) ;
 	CellMarkerNoUnmark mv(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -103,16 +104,19 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 			mv.mark(d);
 
 			c1.collectBorder(d) ;
+
 			VEC3 center = position[d] ;
-			FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa(map, position, position, center, radius) ;
-			c1.applyOnBorder(fa) ;
-			VEC3 displ = fa.getAverage() - center ;
+			fa1.reset (center, radius) ;
+
+			c1.applyOnBorder(fa1) ;
+			VEC3 displ = fa1.getAverage() - center ;
 			displ *= lambda ;
 			position2[d] = center + displ ;
 		}
 	}
 
 	// unshrinking step
+	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa2(map, position2, position2) ;
 	Algo::Selection::Collector_WithinSphere<PFP> c2(map, position2, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -122,9 +126,9 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 
 			c2.collectBorder(d) ;
 			VEC3 center = position2[d] ;
-			FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa(map, position2, position2, center, radius) ;
-			c2.applyOnBorder(fa) ;
-			VEC3 displ = fa.getAverage() - center ;
+			fa2.reset(center, radius) ;
+			c2.applyOnBorder(fa2) ;
+			VEC3 displ = fa2.getAverage() - center ;
 			displ *= mu ;
 			position[d] = center + displ ;
 		}
