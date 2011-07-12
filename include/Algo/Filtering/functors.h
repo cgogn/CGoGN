@@ -26,7 +26,7 @@
 #define __FILTERING_FUNCTORS_H__
 
 #include "Topology/generic/functor.h"
-#include "Utils/intersection.h"
+#include "Algo/Geometry/intersection.h"
 
 namespace CGoGN
 {
@@ -38,7 +38,7 @@ namespace Filtering
 {
 
 template <typename T>
-class FunctorAverage : public FunctorType
+class FunctorAverage : public virtual FunctorType
 {
 protected:
 	const AttributeHandler<T>& attr ;

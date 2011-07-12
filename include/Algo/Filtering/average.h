@@ -33,26 +33,28 @@ namespace Algo
 
 namespace Filtering
 {
-enum neighborhood {INSIDE = 1, BORDER = 2};
+
+enum neighborhood { INSIDE = 1, BORDER = 2 };
 
 template <typename PFP, typename T>
-void filterAverageAttribute_OneRing(typename PFP::MAP& map,
-		const typename AttributeHandler<T>& attIn,
-		typename AttributeHandler<T>& attOut,
-		neighborhood neigh,
-		const FunctorSelect& select = SelectorTrue())
+void filterAverageAttribute_OneRing(
+	typename PFP::MAP& map,
+	const AttributeHandler<T>& attIn,
+	AttributeHandler<T>& attOut,
+	neighborhood neigh,
+	const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	FunctorAverage<typename PFP::VEC3> fa(attIn) ;
+	FunctorAverage<VEC3> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
 
-	CellMarker markV(map, VERTEX);
+	CellMarker markV(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markV.isMarked(d))
 		{
-			markV.mark(d);
+			markV.mark(d) ;
 
 			if (neigh & INSIDE)
 				col.collectAll(d) ;
@@ -60,8 +62,10 @@ void filterAverageAttribute_OneRing(typename PFP::MAP& map,
 				col.collectBorder(d) ;
 
 			fa.reset() ;
-			if (neigh & INSIDE){
-				switch (attIn.getOrbit()) {
+			if (neigh & INSIDE)
+			{
+				switch (attIn.getOrbit())
+				{
 				case VERTEX :
 					col.applyOnInsideVertices(fa) ;
 					break;
@@ -80,25 +84,26 @@ void filterAverageAttribute_OneRing(typename PFP::MAP& map,
 }
 
 template <typename PFP, typename T>
-void filterAverageEdgesAttribute_WithinSphere(typename PFP::MAP& map,
-		const typename AttributeHandler<T>& attIn,
-		typename AttributeHandler<T>& attOut,
-		neighborhood neigh,
-		typename PFP::TVEC3 & position,
-		typename PFP::REAL radius,
-		const FunctorSelect& select = SelectorTrue())
+void filterAverageEdgesAttribute_WithinSphere(
+	typename PFP::MAP& map,
+	const AttributeHandler<T>& attIn,
+	AttributeHandler<T>& attOut,
+	neighborhood neigh,
+	typename PFP::TVEC3 & position,
+	typename PFP::REAL radius,
+	const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	FunctorAverage<typename PFP::VEC3> fa(attIn) ;
+	FunctorAverage<VEC3> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	CellMarker markV(map, VERTEX);
+	CellMarker markV(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markV.isMarked(d))
 		{
-			markV.mark(d);
+			markV.mark(d) ;
 
 			if (neigh & INSIDE)
 				col.collectAll(d) ;
@@ -114,25 +119,26 @@ void filterAverageEdgesAttribute_WithinSphere(typename PFP::MAP& map,
 }
 
 template <typename PFP, typename T>
-void filterAverageFacesAttribute_WithinSphere(typename PFP::MAP& map,
-		const typename AttributeHandler<T>& attIn,
-		typename AttributeHandler<T>& attOut,
-		neighborhood neigh,
-		typename PFP::TVEC3 & position,
-		typename PFP::REAL radius,
-		const FunctorSelect& select = SelectorTrue())
+void filterAverageFacesAttribute_WithinSphere(
+	typename PFP::MAP& map,
+	const AttributeHandler<T>& attIn,
+	AttributeHandler<T>& attOut,
+	neighborhood neigh,
+	typename PFP::TVEC3 & position,
+	typename PFP::REAL radius,
+	const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	FunctorAverage<typename PFP::VEC3> fa(attIn) ;
+	FunctorAverage<VEC3> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	CellMarker markV(map, VERTEX);
+	CellMarker markV(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markV.isMarked(d))
 		{
-			markV.mark(d);
+			markV.mark(d) ;
 
 			if (neigh & INSIDE)
 				col.collectAll(d) ;
@@ -148,26 +154,27 @@ void filterAverageFacesAttribute_WithinSphere(typename PFP::MAP& map,
 }
 
 template <typename PFP, typename T>
-void filterAverageVertexAttribute_WithinSphere(typename PFP::MAP& map,
-		const typename AttributeHandler<T>& attIn,
-		typename AttributeHandler<T>& attOut,
-		neighborhood neigh,
-		typename PFP::TVEC3 & position,
-		typename PFP::REAL radius,
-		const FunctorSelect& select = SelectorTrue())
+void filterAverageVertexAttribute_WithinSphere(
+	typename PFP::MAP& map,
+	const AttributeHandler<T>& attIn,
+	AttributeHandler<T>& attOut,
+	neighborhood neigh,
+	typename PFP::TVEC3 & position,
+	typename PFP::REAL radius,
+	const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	FunctorAverage<typename PFP::VEC3> faInside(attIn) ;
+	FunctorAverage<VEC3> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> faBorder(map, attIn, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	CellMarker markV(map, VERTEX);
+	CellMarker markV(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !markV.isMarked(d))
 		{
-			markV.mark(d);
+			markV.mark(d) ;
 
 			if (neigh & INSIDE)
 				col.collectAll(d) ;
