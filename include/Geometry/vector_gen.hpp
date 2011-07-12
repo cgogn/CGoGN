@@ -64,7 +64,7 @@ Vector<DIM,T>::Vector(const Vector<DIM,T>& v)
 template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y)
 {
-	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension) ;
+	CGoGN_STATIC_ASSERT(DIM == 2, incompatible_Vector_constructor_dimension) ;
 	m_data[0] = x ;
 	m_data[1] = y ;
 }
@@ -72,7 +72,7 @@ Vector<DIM,T>::Vector(T x, T y)
 template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y, T z)
 {
-	CGoGN_STATIC_ASSERT(DIM==3, incompatible_Vector_constructor_dimension) ;
+	CGoGN_STATIC_ASSERT(DIM == 3, incompatible_Vector_constructor_dimension) ;
 	m_data[0] = x ;
 	m_data[1] = y ;
 	m_data[2] = z ;
@@ -81,7 +81,7 @@ Vector<DIM,T>::Vector(T x, T y, T z)
 template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y, T z, T w)
 {
-	CGoGN_STATIC_ASSERT(DIM==4, incompatible_Vector_constructor_dimension) ;
+	CGoGN_STATIC_ASSERT(DIM == 4, incompatible_Vector_constructor_dimension) ;
 	m_data[0] = x ;
 	m_data[1] = y ;
 	m_data[2] = z ;
