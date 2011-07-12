@@ -26,6 +26,7 @@
 #define __FILTERING_FUNCTORS_H__
 
 #include "Topology/generic/functor.h"
+#include "Utils/intersection.h"
 
 namespace CGoGN
 {
@@ -36,15 +37,15 @@ namespace Algo
 namespace Filtering
 {
 
-template <typename MAP, typename T>
-class FunctorAverage : public FunctorMap<MAP>
+template <typename T>
+class FunctorAverage : public FunctorType
 {
 protected:
 	const AttributeHandler<T>& attr ;
 	T sum ;
 	unsigned int count ;
 public:
-	FunctorAverage(MAP& map, const AttributeHandler<T>& a) : FunctorMap<MAP>(map), attr(a), sum(0), count(0)
+	FunctorAverage(const AttributeHandler<T>& a) : FunctorType(), attr(a), sum(0), count(0)
 	{}
 	bool operator()(Dart d)
 	{
@@ -54,6 +55,36 @@ public:
 	}
 	inline void reset() { sum = T(0) ; count = 0 ; }
 	inline T getSum() { return sum ; }
+	inline unsigned int getCount() { return count ; }
+	inline T getAverage() { return sum / typename T::DATA_TYPE(count) ; }
+} ;
+
+template <typename PFP, typename T>
+class FunctorAverageOnSphereBorder : public FunctorMap<typename PFP::MAP>
+{
+	typedef typename PFP::VEC3 VEC3;
+protected:
+	const AttributeHandler<T>& attr ;
+	const AttributeHandler<VEC3>& position ;
+	VEC3 center;
+	typename PFP::REAL radius;
+	T sum ;
+	unsigned int count ;
+public:
+	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T>& a, const AttributeHandler<VEC3>& p, VEC3& c = VEC3(0), typename PFP::REAL r = 0) :
+		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), center(c), radius(r), sum(0), count(0)
+	{}
+	bool operator()(Dart d)
+	{
+		typename PFP::REAL alpha = 0;
+		Algo::Geometry::intersectionSphereEdge<PFP>(this->map, center, radius, d, position, alpha);
+		sum += (1 - alpha) * attr[d] + alpha * attr[this->map.phi1(d)] ;
+		++count ;
+		return false ;
+	}
+	inline void reset(VEC3& c, typename PFP::REAL r) { center = c; radius = r; sum = T(0) ; count = 0 ; }
+	inline T getSum() { return sum ; }
+	inline unsigned int getCount() { return count ; }
 	inline T getAverage() { return sum / typename T::DATA_TYPE(count) ; }
 } ;
 

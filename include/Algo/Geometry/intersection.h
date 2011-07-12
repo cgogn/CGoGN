@@ -79,8 +79,8 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 /**
  * alpha = coef d'interpolation dans [0 ,1] tel que v = (1-alpha)*pin + alpha*pout
  * est le point d'intersection entre la sphère et le segment [pin, pout]
- * avec pin = position[din] à l'intérieur de la sphère
- * avec pout = position[dout] à l'extérieur de la sphère
+ * avec pin = position[d] à l'intérieur de la sphère
+ * avec pout = position[phi1(d)] à l'extérieur de la sphère
  */
 template <typename PFP>
 bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const typename PFP::TVEC3& position, typename PFP::REAL& alpha) ;

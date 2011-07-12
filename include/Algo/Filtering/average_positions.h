@@ -39,7 +39,7 @@ void filterAveragePositions(typename PFP::MAP& map, const typename PFP::TVEC3& p
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	FunctorAverage<typename PFP::MAP, typename PFP::VEC3> fa(map, position) ;
+	FunctorAverage<typename PFP::VEC3> fa(position) ;
 	Algo::Selection::Collector_OneRing<PFP> c(map) ;
 
 	CellMarker markV(map, VERTEX);
