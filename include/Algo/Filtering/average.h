@@ -41,12 +41,10 @@ void filterAverageAttribute_OneRing(
 	typename PFP::MAP& map,
 	const AttributeHandler<T>& attIn,
 	AttributeHandler<T>& attOut,
-	neighborhood neigh,
+	int neigh,
 	const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::VEC3 VEC3 ;
-
-	FunctorAverage<VEC3> fa(attIn) ;
+	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
 
 	CellMarker markV(map, VERTEX) ;
@@ -88,14 +86,12 @@ void filterAverageEdgesAttribute_WithinSphere(
 	typename PFP::MAP& map,
 	const AttributeHandler<T>& attIn,
 	AttributeHandler<T>& attOut,
-	neighborhood neigh,
+	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::VEC3 VEC3 ;
-
-	FunctorAverage<VEC3> fa(attIn) ;
+	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	CellMarker markV(map, VERTEX) ;
@@ -123,14 +119,13 @@ void filterAverageFacesAttribute_WithinSphere(
 	typename PFP::MAP& map,
 	const AttributeHandler<T>& attIn,
 	AttributeHandler<T>& attOut,
-	neighborhood neigh,
+	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::VEC3 VEC3 ;
 
-	FunctorAverage<VEC3> fa(attIn) ;
+	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	CellMarker markV(map, VERTEX) ;
@@ -158,15 +153,13 @@ void filterAverageVertexAttribute_WithinSphere(
 	typename PFP::MAP& map,
 	const AttributeHandler<T>& attIn,
 	AttributeHandler<T>& attOut,
-	neighborhood neigh,
+	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = SelectorTrue())
 {
-	typedef typename PFP::VEC3 VEC3 ;
-
-	FunctorAverage<VEC3> faInside(attIn) ;
-	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> faBorder(map, attIn, position) ;
+	FunctorAverage<T> faInside(attIn) ;
+	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	CellMarker markV(map, VERTEX) ;
@@ -192,7 +185,7 @@ void filterAverageVertexAttribute_WithinSphere(
 				col.applyOnBorder(faBorder) ;
 				attOut[d] += faBorder.getSum();
 			}
-			attOut[d] /= faInside.getCout() + faBorder.getCount() ;
+			attOut[d] /= faInside.getCount() + faBorder.getCount() ;
 		}
 	}
 }
