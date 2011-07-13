@@ -58,13 +58,14 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 			c.applyOnBorder(fa1) ;
 			VEC3 p = position[d] ;
 			VEC3 displ = fa1.getAverage() - p ;
+//			VEC3 displ = (fa1.getSum() - p * fa1.getCount()) / fa1.getCount() ;
 			displ *= lambda ;
 			position2[d] = p + displ ;
 		}
 	}
 
 	// unshrinking step
-	FunctorAverage<VEC3> fa2(position) ;
+	FunctorAverage<VEC3> fa2(position2) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && mv.isMarked(d))
@@ -76,6 +77,7 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 			c.applyOnBorder(fa2) ;
 			VEC3 p = position2[d] ;
 			VEC3 displ = fa2.getAverage() - p ;
+//			VEC3 displ = (fa2.getSum() - p * fa2.getCount()) / fa2.getCount() ;
 			displ *= mu ;
 			position[d] = p + displ ;
 		}
