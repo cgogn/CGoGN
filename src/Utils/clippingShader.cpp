@@ -713,6 +713,7 @@ void ClippingShader::updateClipSphereVBO(int sphereIndex)
 
 	m_clipSpheresDrawers[sphereIndex]->begin(GL_LINES);
 
+	// Compute angle displacement steps
 	float dTheta = 0.0;
 	if (m_clipSpheresDisplayXRes != 0)
 		dTheta = 2 * M_PI / (float)m_clipSpheresDisplayXRes;
@@ -720,28 +721,38 @@ void ClippingShader::updateClipSphereVBO(int sphereIndex)
 	if (m_clipSpheresDisplayYRes != 0)
 		dPhi = M_PI / (float)m_clipSpheresDisplayYRes;
 
+	// Draw the sphere in wireframe
 	for (size_t i = 0; i < m_clipSpheresDisplayXRes; i++)
 	{
 		for (size_t j = 0; j < m_clipSpheresDisplayYRes; j++)
 		{
+			// Compute 3 points according to the parametric equation of the sphere
 			Geom::Vec3f p1 (
-					m_clipSpheres[sphereIndex].radius * cos(i*dTheta) * sin(j*dPhi),
-					m_clipSpheres[sphereIndex].radius * sin(i*dTheta) * sin(j*dPhi),
-					m_clipSpheres[sphereIndex].radius * cos(j*dPhi));
-
+					cos(i*dTheta) * sin(j*dPhi),
+					sin(i*dTheta) * sin(j*dPhi),
+					cos(j*dPhi));
 			Geom::Vec3f p2 (
-					m_clipSpheres[sphereIndex].radius * cos((i+1)*dTheta) * sin(j*dPhi),
-					m_clipSpheres[sphereIndex].radius * sin((i+1)*dTheta) * sin(j*dPhi),
-					m_clipSpheres[sphereIndex].radius * cos(j*dPhi));
-
+					cos((i+1)*dTheta) * sin(j*dPhi),
+					sin((i+1)*dTheta) * sin(j*dPhi),
+					cos(j*dPhi));
 			Geom::Vec3f p3 (
-					m_clipSpheres[sphereIndex].radius * cos(i*dTheta) * sin((j+1)*dPhi),
-					m_clipSpheres[sphereIndex].radius * sin(i*dTheta) * sin((j+1)*dPhi),
-					m_clipSpheres[sphereIndex].radius * cos((j+1)*dPhi));
+					cos(i*dTheta) * sin((j+1)*dPhi),
+					sin(i*dTheta) * sin((j+1)*dPhi),
+					cos((j+1)*dPhi));
 
+			// Scale with the radius
+			p1 *= m_clipSpheres[sphereIndex].radius;
+			p2 *= m_clipSpheres[sphereIndex].radius;
+			p3 *= m_clipSpheres[sphereIndex].radius;
+
+			// Translate to the center
+			p1 += m_clipSpheres[sphereIndex].center;
+			p2 += m_clipSpheres[sphereIndex].center;
+			p3 += m_clipSpheres[sphereIndex].center;
+
+			// Draw two lines with the 3 points
 			m_clipSpheresDrawers[sphereIndex]->vertex(p1);
 			m_clipSpheresDrawers[sphereIndex]->vertex(p2);
-
 			m_clipSpheresDrawers[sphereIndex]->vertex(p1);
 			m_clipSpheresDrawers[sphereIndex]->vertex(p3);
 		}
@@ -900,9 +911,9 @@ bool ClippingShader::insertClippingCode()
 	"				{\n"
 	"					// Keep the distance to the nearest sphere\n"
 	"					if (minDistanceToClipping < 0.0)\n"
-	"						minDistanceToClipping = distanceToSphere;\n"
+	"						minDistanceToClipping = -distanceToSphere;\n"
 	"					else\n"
-	"						minDistanceToClipping = min(minDistanceToClipping, distanceToSphere);\n"
+	"						minDistanceToClipping = min(minDistanceToClipping, -distanceToSphere);\n"
 	"				}\n"
 	"			}\n"
 	"\n"

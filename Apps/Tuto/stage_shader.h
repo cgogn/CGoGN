@@ -139,6 +139,18 @@ public slots:
 	void slot_spinBox_GridResolutionY(int i);
 	void slot_doubleSpinBox_GridColor(double c);
 
+	void slot_pushButton_addSphere();
+	void slot_pushButton_deleteSphere();
+
+	void slot_comboBox_SphereIndexChanged(int newIndex);
+
+	void slot_doubleSpinBox_SphereCenter(double c);
+	void slot_doubleSpinBox_SphereRadius(double c);
+
+	void slot_spinBox_SphereGridResolutionX(int i);
+	void slot_spinBox_SphereGridResolutionY(int i);
+	void slot_doubleSpinBox_SphereGridColor(double c);
+
 	void button_compile();
 };
 

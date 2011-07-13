@@ -197,6 +197,96 @@ void StageShader::slot_doubleSpinBox_GridColor(double c)
 	updateGL();
 }
 
+void StageShader::slot_pushButton_addSphere()
+{
+	m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() + 1);
+
+	m_shader->setClipSphereParamsCenter(m_bb.center(), dock.comboBox_SphereIndex->count() + 1 - 1);
+	m_shader->setClipSphereParamsRadius((m_bb.maxSize())*1.0, dock.comboBox_SphereIndex->count() + 1 - 1);
+
+	std::string indexStr;
+	std::stringstream ss;
+	ss << (dock.comboBox_PlaneIndex->count() + 1);
+	indexStr = ss.str();
+
+	std::string str = "Sphere " + indexStr;
+
+	dock.comboBox_SphereIndex->addItem(QString(str.c_str()));
+
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	updateGLMatrices();
+}
+
+void StageShader::slot_pushButton_deleteSphere()
+{
+	m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() - 1);
+
+	dock.comboBox_SphereIndex->removeItem(dock.comboBox_SphereIndex->count() - 1);
+
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	updateGLMatrices();
+}
+
+void StageShader::slot_comboBox_SphereIndexChanged(int newIndex)
+{
+	if (newIndex >= 0)
+	{
+		Geom::Vec3f currSphereCenter = m_shader->getClipSphereParamsCenter(newIndex);
+		dock.doubleSpinBox_SphereCenterx->setValue(currSphereCenter[0]);
+		dock.doubleSpinBox_SphereCentery->setValue(currSphereCenter[1]);
+		dock.doubleSpinBox_SphereCenterz->setValue(currSphereCenter[2]);
+
+		dock.doubleSpinBox_SphereRadius->setValue(m_shader->getClipSphereParamsRadius(newIndex));
+	}
+}
+
+void StageShader::slot_doubleSpinBox_SphereCenter(double c)
+{
+	if (dock.comboBox_SphereIndex->currentIndex() >= 0)
+	{
+		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCenterx->value();
+		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCentery->value();
+		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCenterz->value();
+		m_shader->setClipSphereParamsCenter(Geom::Vec3f(x, y, z), dock.comboBox_SphereIndex->currentIndex());
+		updateGL();
+	}
+}
+
+void StageShader::slot_doubleSpinBox_SphereRadius(double c)
+{
+	if (dock.comboBox_SphereIndex->currentIndex() >= 0)
+	{
+		m_shader->setClipSphereParamsRadius((float)c, dock.comboBox_SphereIndex->currentIndex());
+		updateGL();
+	}
+}
+
+void StageShader::slot_spinBox_SphereGridResolutionX(int i)
+{
+	m_shader->setClipSpheresDisplayXRes((size_t)i);
+	updateGL();
+}
+
+void StageShader::slot_spinBox_SphereGridResolutionY(int i)
+{
+	m_shader->setClipSpheresDisplayYRes((size_t)i);
+	updateGL();
+}
+
+void StageShader::slot_doubleSpinBox_SphereGridColor(double c)
+{
+	float r = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorR->value();
+	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorG->value();
+	float b = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorB->value();
+
+	m_shader->setClipSpheresDisplayColor(Geom::Vec3f(r, g, b));
+	updateGL();
+}
+
 void StageShader::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
@@ -278,10 +368,37 @@ void StageShader::initGUI()
 	dock.doubleSpinBox_GridDisplaySize->setValue(m_shader->getClipPlanesDisplaySize());
 	dock.spinBox_GridResolutionX->setValue(m_shader->getClipPlanesDisplayXRes());
 	dock.spinBox_GridResolutionY->setValue(m_shader->getClipPlanesDisplayYRes());
-	Geom::Vec3f col = m_shader->getClipPlanesDisplayColor();
-	dock.doubleSpinBox_GridColorR->setValue(col[0]);
-	dock.doubleSpinBox_GridColorG->setValue(col[1]);
-	dock.doubleSpinBox_GridColorB->setValue(col[2]);
+	Geom::Vec3f planesCol = m_shader->getClipPlanesDisplayColor();
+	dock.doubleSpinBox_GridColorR->setValue(planesCol[0]);
+	dock.doubleSpinBox_GridColorG->setValue(planesCol[1]);
+	dock.doubleSpinBox_GridColorB->setValue(planesCol[2]);
+
+
+
+	setCallBack(dock.pushButton_addSphere, SIGNAL(clicked()), SLOT(slot_pushButton_addSphere()));
+	setCallBack(dock.pushButton_deleteSphere, SIGNAL(clicked()), SLOT(slot_pushButton_deleteSphere()));
+
+	setCallBack(dock.comboBox_SphereIndex, SIGNAL(currentIndexChanged(int)), SLOT(slot_comboBox_SphereIndexChanged(int)));
+
+	setCallBack(dock.doubleSpinBox_SphereCenterx, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereCenter(double)));
+	setCallBack(dock.doubleSpinBox_SphereCentery, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereCenter(double)));
+	setCallBack(dock.doubleSpinBox_SphereCenterz, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereCenter(double)));
+
+	setCallBack(dock.doubleSpinBox_SphereRadius, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereRadius(double)));
+
+	setCallBack(dock.spinBox_SphereGridResolutionX, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereGridResolutionX(int)));
+	setCallBack(dock.spinBox_SphereGridResolutionY, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereGridResolutionY(int)));
+	setCallBack(dock.doubleSpinBox_SphereGridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
+	setCallBack(dock.doubleSpinBox_SphereGridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
+	setCallBack(dock.doubleSpinBox_SphereGridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
+
+	dock.spinBox_SphereGridResolutionX->setValue(m_shader->getClipSpheresDisplayXRes());
+	dock.spinBox_SphereGridResolutionY->setValue(m_shader->getClipSpheresDisplayYRes());
+	Geom::Vec3f spheresCol = m_shader->getClipSpheresDisplayColor();
+	dock.doubleSpinBox_SphereGridColorR->setValue(spheresCol[0]);
+	dock.doubleSpinBox_SphereGridColorG->setValue(spheresCol[1]);
+	dock.doubleSpinBox_SphereGridColorB->setValue(spheresCol[2]);
+
 }
 
 void StageShader::cb_Open()
@@ -367,11 +484,15 @@ void StageShader::cb_initGL()
 
 	registerShader(m_shader);
 
+	m_shader->insertClippingCode();
+
 	m_shader->setClipPlanesDisplayColor(Geom::Vec3f (1.0, 0.0, 0.0));
 	m_shader->setClipPlanesDisplayXRes(10);
 	m_shader->setClipPlanesDisplayYRes(5);
 
-	m_shader->insertClippingCode();
+	m_shader->setClipSpheresDisplayColor(Geom::Vec3f(0.0, 0.4, 1.0));
+	m_shader->setClipSpheresDisplayXRes(20);
+	m_shader->setClipSpheresDisplayYRes(15);
 }
 
 void StageShader::updateVBOprimitives(int upType)
@@ -422,6 +543,7 @@ void StageShader::cb_redraw()
 		m_render_topo->drawTopo();
 
 	m_shader->displayClipPlanes();
+	m_shader->displayClipSpheres();
 
 }
 
