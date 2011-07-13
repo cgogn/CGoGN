@@ -106,10 +106,8 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 			mv.mark(d);
 
 			c1.collectBorder(d) ;
-
 			VEC3 center = position[d] ;
-			fa1.reset (center, radius) ;
-
+			fa1.reset(center, radius) ;
 			c1.applyOnBorder(fa1) ;
 			VEC3 displ = fa1.getAverage() - center ;
 			displ *= lambda ;

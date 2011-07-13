@@ -73,7 +73,10 @@ protected:
 public:
 	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T>& a, const AttributeHandler<VEC3>& p) :
 		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), sum(0), count(0)
-	{center = VEC3(0); radius = 0;}
+	{
+		center = VEC3(0);
+		radius = 0;
+	}
 	bool operator()(Dart d)
 	{
 		typename PFP::REAL alpha = 0;
