@@ -138,7 +138,6 @@ public slots:
 	void slot_spinBox_GridResolutionX(int i);
 	void slot_spinBox_GridResolutionY(int i);
 	void slot_doubleSpinBox_GridColor(double c);
-	void slot_horizontalSlider_GridType(int i);
 
 	void button_compile();
 };

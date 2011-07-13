@@ -197,16 +197,6 @@ void StageShader::slot_doubleSpinBox_GridColor(double c)
 	updateGL();
 }
 
-void StageShader::slot_horizontalSlider_GridType(int i)
-{
-	if (i == 0)
-		m_shader->setClipPlanesDisplayType(Utils::ClippingShader::STRAIGHT_GRID);
-	else if (i == 1)
-		m_shader->setClipPlanesDisplayType(Utils::ClippingShader::RADIAL_GRID);
-
-	updateGL();
-}
-
 void StageShader::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
@@ -278,7 +268,6 @@ void StageShader::initGUI()
 	setCallBack(dock.doubleSpinBox_GridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
 	setCallBack(dock.doubleSpinBox_GridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
 	setCallBack(dock.doubleSpinBox_GridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
-	setCallBack(dock.horizontalSlider_GridType, SIGNAL(valueChanged(int)), SLOT(slot_horizontalSlider_GridType(int)));
 
 	setCallBack(dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
 
@@ -293,10 +282,6 @@ void StageShader::initGUI()
 	dock.doubleSpinBox_GridColorR->setValue(col[0]);
 	dock.doubleSpinBox_GridColorG->setValue(col[1]);
 	dock.doubleSpinBox_GridColorB->setValue(col[2]);
-	if (m_shader->getClipPlanesDisplayType() == Utils::ClippingShader::STRAIGHT_GRID)
-		dock.horizontalSlider_GridType->setValue(0);
-	else if (m_shader->getClipPlanesDisplayType() == Utils::ClippingShader::RADIAL_GRID)
-		dock.horizontalSlider_GridType->setValue(1);
 }
 
 void StageShader::cb_Open()
@@ -385,6 +370,8 @@ void StageShader::cb_initGL()
 	m_shader->setClipPlanesDisplayColor(Geom::Vec3f (1.0, 0.0, 0.0));
 	m_shader->setClipPlanesDisplayXRes(10);
 	m_shader->setClipPlanesDisplayYRes(5);
+
+	m_shader->insertClippingCode();
 }
 
 void StageShader::updateVBOprimitives(int upType)

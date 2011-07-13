@@ -42,16 +42,20 @@ ClippingShader::ClippingShader()
 {
 	// Initialize uniforms ids
 	m_unif_clipPlanesEquations = 0;
+	m_unif_clipSpheresCentersAndRadiuses = 0;
 	m_unif_clipColorAttenuationFactor = 0;
 
 	// Initialize default display variables
 	m_clipPlanesDisplayColor = Geom::Vec3f (1.0, 0.6, 0.0);
-	m_clipPlanesDisplayType = STRAIGHT_GRID;
 	m_clipPlanesDisplayXRes = 2;
 	m_clipPlanesDisplayYRes = 2;
 	m_clipPlanesDisplaySize = 10.0;
+	m_clipSpheresDisplayColor = Geom::Vec3f (0.0, 0.4, 1.0);
+	m_clipSpheresDisplayXRes = 15;
+	m_clipSpheresDisplayYRes = 10;
 
 	// Initialize default global clipping variables
+	m_hasClippingCodeBeenInserted = false;
 	m_clipColorAttenuationFactor = 1.0;
 }
 
@@ -73,154 +77,31 @@ ClippingShader::~ClippingShader()
 
 void ClippingShader::setClipPlanesCount(int planesCount)
 {
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipPlanesCount"))
+		return;
+
 	// Check if the given clipping planes count is valid
 	if (errorRaiseParameterIsNotPositive((planesCount < 0), "ClippingShader::setClipPlanesCount", "planesCount"))
-			return;
-
-	// Check if the shader has been well created
-	if (errorRaiseShaderHasNotBeenWellCreated((!isCreated()), "ClippingShader::setClipPlanesCount"))
 		return;
-	
-	// Check if the shader does not use a geometry shader
-	if (errorRaiseShaderUsesGeometryShader((getGeometryShaderSrc() != NULL), "ClippingShader::setClipPlanesCount"))
-		return;
-
-	// Clipping planes count string
-	std::string planesCountStr;
-	std::stringstream ss;
-	ss << planesCount;
-	planesCountStr = ss.str();
 
 	// Shader name string
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
 
-	// Strings that will be inserted into the source code
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
 
-	std::string VS_head_insertion =
-	"\n"
-	"VARYING_VERT vec3 clip_NonTransformedPos;\n"
-	"\n";
+	// Modify the clip planes count constant in both shader
+	SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", planesCount);
+	SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount);
 
-	std::string VS_mainBegin_insertion =
-	"\n"
-	"	// Pass the non transformed vertex position to the fragment shader for clipping\n"
-	"	clip_NonTransformedPos = VertexPosition;\n";
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
 
-	std::string FS_head_insertion =
-	"\n"
-	"#define CLIP_PLANES_COUNT " + planesCountStr + "\n"
-	"\n"
-	"uniform vec4 clip_ClipPlanes[CLIP_PLANES_COUNT];\n"
-	"uniform float clip_ColorAttenuationFactor;\n"
-	"\n"
-	"VARYING_FRAG vec3 clip_NonTransformedPos;\n"
-	"\n";
-
-	std::string FS_mainBegin_insertion =
-	"\n"
-	"	// Distance to the nearest plane, stored for color attenuation\n"
-	"	float clip_MinDistanceToPlanes = -1.0;\n"
-	"\n"
-	"	// Do clipping for each plane\n"
-	"	int i;\n"
-	"	for (i = 0; i < CLIP_PLANES_COUNT; i++)\n"
-	"	{\n"
-	"		// Copy the plane to make it modifiable\n"
-	"		vec4 clip_CurrClipPlane = clip_ClipPlanes[i];\n"
-	"\n"
-	"		// If the plane normal is zero, use a default normal vector (0.0, 0.0, 1.0)\n"
-	"		float clip_NPlane = length(clip_CurrClipPlane.xyz);\n"
-	"		if (clip_NPlane == 0.0)\n"
-	"		{\n"
-	"			clip_CurrClipPlane.z = 1.0;\n"
-	"			clip_NPlane = 1.0;\n"
-	"		}\n"
-	"\n"
-	"		// Signed distance between the point and the plane\n"
-	"		float clip_DistanceToPlane = dot(clip_NonTransformedPos, clip_CurrClipPlane.xyz);\n"
-	"		clip_DistanceToPlane += clip_CurrClipPlane.w;\n"
-	"		clip_DistanceToPlane /= clip_NPlane;\n"
-	"\n"
-	"		// Keep the fragment only if it is 'above' the plane\n"
-	"		if (clip_DistanceToPlane < 0.0)\n"
-	"			discard;\n"
-	"		else\n"
-	"		{\n"
-	"			// Keep the distance to the nearest plane\n"
-	"			if (clip_MinDistanceToPlanes < 0.0)\n"
-	"				clip_MinDistanceToPlanes = clip_DistanceToPlane;\n"
-	"			else\n"
-	"				clip_MinDistanceToPlanes = min(clip_MinDistanceToPlanes, clip_DistanceToPlane);\n"
-	"		}\n"
-	"	}\n";
-
-	std::string FS_mainEnd_insertion =
-	"\n"
-	"	// Attenuate the final fragment color depending on its distance to the nearest plane\n"
-	"	if (clip_MinDistanceToPlanes > 0.0)\n"
-	"		gl_FragColor.rgb /= (1.0 + clip_MinDistanceToPlanes*clip_ColorAttenuationFactor);\n";
 
 	// Previous planes count
 	int previousPlanesCount = getClipPlanesCount();
-
-	// If the previous planes count was zero, the previous shader source codes were the original ones. Store them
-	// (the planes count is initially zero when the object is constructed)
-	if (previousPlanesCount == 0)
-	{
-		originalVertShaderSrc = getVertexShaderSrc();
-		originalFragShaderSrc = getFragmentShaderSrc();
-	}
-
-	// If the given plane count is > 0, modify the shader sources
-	if (planesCount > 0)
-	{
-
-		// If the previous planes count wasn't zero, there is only one constant to change in the fragment shader
-		if (previousPlanesCount != 0)
-		{
-			// Use a shader mutator
-			ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-			// Modify the constant in the fragment shader
-			SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount);
-
-			// Reload fragment shader
-			reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-		}
-		// Else the whole clipping code must be inserted in the original shader sources
-		else
-		{
-			// Use a shader mutator
-			ShaderMutator SM(shaderName, originalVertShaderSrc, originalFragShaderSrc);
-
-			// First check if the vertex shader contains the VertexPosition attribute
-			if (errorRaiseVariableNotFoundInShader(!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"), "ClippingShader::setClipPlanesCount", ShaderMutator::VERTEX_SHADER, "VertexPosition"))
-				return;
-
-			// Modify vertex shader source code
-			SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_head_insertion);
-			SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainBegin_insertion);
-
-
-			// Modify fragment shader source code
-			SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120); // Following code insertions need at least shading language 120 (GLSL arrays)
-			SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_head_insertion);
-			SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEnd_insertion);
-			SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBegin_insertion);
-
-			// Reload both shaders
-			reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-			reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-		}
-
-	}
-	// Else no clipping is wanted anymore, so get back the original shader sources
-	else
-	{
-		// Reload both original shaders
-		reloadVertexShaderFromMemory(originalVertShaderSrc.c_str());
-		reloadFragmentShaderFromMemory(originalFragShaderSrc.c_str());
-	}
 
 	// Resize the planes arrays to the right size
 	m_clipPlanes.resize((size_t)planesCount);
@@ -440,20 +321,6 @@ Geom::Vec3f ClippingShader::getClipPlanesDisplayColor()
 	return m_clipPlanesDisplayColor;
 }
 
-void ClippingShader::setClipPlanesDisplayType(clipPlaneDisplayGridType gridType)
-{
-	if (gridType != m_clipPlanesDisplayType)
-	{
-		m_clipPlanesDisplayType = gridType;
-		updateClipPlanesVBOs();
-	}
-}
-
-ClippingShader::clipPlaneDisplayGridType ClippingShader::getClipPlanesDisplayType()
-{
-	return m_clipPlanesDisplayType;
-}
-
 void ClippingShader::setClipPlanesDisplayXRes(size_t res)
 {
 	if (res != m_clipPlanesDisplayXRes)
@@ -517,7 +384,7 @@ void ClippingShader::updateClipPlaneVBO(int planeIndex)
 			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
 
 
-	// Build again the VBO with the new points
+	// Build the VBO with the new points
 
 	m_clipPlanesDrawers[planeIndex]->newList(GL_COMPILE);
 
@@ -527,10 +394,8 @@ void ClippingShader::updateClipPlaneVBO(int planeIndex)
 		float t;
 		Geom::Vec3f p1p2Interp;
 		Geom::Vec3f p4p3Interp;
-		Geom::Vec3f p3p4Interp; // Used for radial grid construction
 		Geom::Vec3f p2p3Interp;
 		Geom::Vec3f p1p4Interp;
-		Geom::Vec3f p4p1Interp; // Used for radial grid construction
 
 		// X lines
 		for (size_t i = 0; i <= m_clipPlanesDisplayXRes; i++)
@@ -538,52 +403,27 @@ void ClippingShader::updateClipPlaneVBO(int planeIndex)
 			// Compute the linear interpolation parameter from the current value of 'i'
 			t = (float)i / (float)m_clipPlanesDisplayXRes;
 
-			// Straight grid construction
-			if (m_clipPlanesDisplayType == STRAIGHT_GRID)
-			{
-				// Compute linear interpolations between points
-				p1p2Interp = p1*t + p2*(1.0 - t);
-				p4p3Interp = p4*t + p3*(1.0 - t);
+			// Grid construction
 
-				// Draw lines between the resulting points
-				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
-				m_clipPlanesDrawers[planeIndex]->color3f(
-						m_clipPlanesDisplayColor[0],
-						m_clipPlanesDisplayColor[1],
-						m_clipPlanesDisplayColor[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p1p2Interp[0],
-						p1p2Interp[1],
-						p1p2Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p4p3Interp[0],
-						p4p3Interp[1],
-						p4p3Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->end();
-			}
-			// Radial grid construction
-			else if (m_clipPlanesDisplayType == RADIAL_GRID)
-			{
-				// Compute linear interpolations between points
-				p1p2Interp = p1*t + p2*(1.0 - t);
-				p3p4Interp = p3*t + p4*(1.0 - t);
+			// Compute linear interpolations between points
+			p1p2Interp = p1*t + p2*(1.0 - t);
+			p4p3Interp = p4*t + p3*(1.0 - t);
 
-				// Draw lines between the resulting points
-				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
-				m_clipPlanesDrawers[planeIndex]->color3f(
-						m_clipPlanesDisplayColor[0],
-						m_clipPlanesDisplayColor[1],
-						m_clipPlanesDisplayColor[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p1p2Interp[0],
-						p1p2Interp[1],
-						p1p2Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p3p4Interp[0],
-						p3p4Interp[1],
-						p3p4Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->end();
-			}
+			// Draw lines between the resulting points
+			m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
+			m_clipPlanesDrawers[planeIndex]->color3f(
+					m_clipPlanesDisplayColor[0],
+					m_clipPlanesDisplayColor[1],
+					m_clipPlanesDisplayColor[2]);
+			m_clipPlanesDrawers[planeIndex]->vertex3f(
+					p1p2Interp[0],
+					p1p2Interp[1],
+					p1p2Interp[2]);
+			m_clipPlanesDrawers[planeIndex]->vertex3f(
+					p4p3Interp[0],
+					p4p3Interp[1],
+					p4p3Interp[2]);
+			m_clipPlanesDrawers[planeIndex]->end();
 		}
 
 		// Y lines
@@ -592,52 +432,27 @@ void ClippingShader::updateClipPlaneVBO(int planeIndex)
 			// Compute the linear interpolation parameter from the current value of 'i'
 			t = (float)i / (float)m_clipPlanesDisplayYRes;
 
-			// Straight grid construction
-			if (m_clipPlanesDisplayType == STRAIGHT_GRID)
-			{
-				// Compute linear interpolations between points
-				p2p3Interp = p2*t + p3*(1.0 - t);
-				p1p4Interp = p1*t + p4*(1.0 - t);
+			// Grid construction
 
-				// Draw lines between the resulting points
-				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
-				m_clipPlanesDrawers[planeIndex]->color3f(
-						m_clipPlanesDisplayColor[0],
-						m_clipPlanesDisplayColor[1],
-						m_clipPlanesDisplayColor[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p2p3Interp[0],
-						p2p3Interp[1],
-						p2p3Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p1p4Interp[0],
-						p1p4Interp[1],
-						p1p4Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->end();
-			}
-			// Radial grid construction
-			else if (m_clipPlanesDisplayType == RADIAL_GRID)
-			{
-				// Compute linear interpolations between points
-				p2p3Interp = p2*t + p3*(1.0 - t);
-				p4p1Interp = p4*t + p1*(1.0 - t);
+			// Compute linear interpolations between points
+			p2p3Interp = p2*t + p3*(1.0 - t);
+			p1p4Interp = p1*t + p4*(1.0 - t);
 
-				// Draw lines between the resulting points
-				m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
-				m_clipPlanesDrawers[planeIndex]->color3f(
-						m_clipPlanesDisplayColor[0],
-						m_clipPlanesDisplayColor[1],
-						m_clipPlanesDisplayColor[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p2p3Interp[0],
-						p2p3Interp[1],
-						p2p3Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->vertex3f(
-						p4p1Interp[0],
-						p4p1Interp[1],
-						p4p1Interp[2]);
-				m_clipPlanesDrawers[planeIndex]->end();
-			}
+			// Draw lines between the resulting points
+			m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
+			m_clipPlanesDrawers[planeIndex]->color3f(
+					m_clipPlanesDisplayColor[0],
+					m_clipPlanesDisplayColor[1],
+					m_clipPlanesDisplayColor[2]);
+			m_clipPlanesDrawers[planeIndex]->vertex3f(
+					p2p3Interp[0],
+					p2p3Interp[1],
+					p2p3Interp[2]);
+			m_clipPlanesDrawers[planeIndex]->vertex3f(
+					p1p4Interp[0],
+					p1p4Interp[1],
+					p1p4Interp[2]);
+			m_clipPlanesDrawers[planeIndex]->end();
 		}
 
 	}
@@ -654,10 +469,496 @@ void ClippingShader::updateClipPlanesVBOs()
 
 /***********************************************
  *
+ * 		Sphere Clipping
+ *
+ ***********************************************/
+
+
+void ClippingShader::setClipSpheresCount(int spheresCount)
+{
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipSpheresCount"))
+		return;
+
+	// Check if the given clipping spheres count is valid
+	if (errorRaiseParameterIsNotPositive((spheresCount < 0), "ClippingShader::setClipSpheresCount", "spheresCount"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Modify the clip spheres count constant in both shader
+	SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
+	SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+
+	// Previous spheres count
+	int previousSpheresCount = getClipSpheresCount();
+
+	// Resize the spheres arrays to the right size
+	m_clipSpheres.resize((size_t)spheresCount);
+	m_clipSpheresCentersAndRadiuses.resize(4*(size_t)spheresCount, 0.0);
+
+	// Resize the spheres drawers array to the right size, and create/destroy objects
+	if (spheresCount > previousSpheresCount)
+	{
+		m_clipSpheresDrawers.resize((size_t)spheresCount, NULL);
+		for (int i = previousSpheresCount; i < spheresCount; i++)
+			m_clipSpheresDrawers[i] = new Drawer;
+	}
+	else
+	{
+		//for (int i = spheresCount; i < previousSpheresCount; i++)
+			//delete m_clipSpheresDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
+		m_clipSpheresDrawers.resize((size_t)spheresCount);
+	}
+
+	// Set default parameters values for new spheres
+	if (spheresCount > previousSpheresCount)
+	{
+		Geom::Vec3f defaultCenter (0.0, 0.0, 0.0);
+		float defaultRadius = 10.0;
+
+		for (int i = previousSpheresCount; i < spheresCount; i++)
+			setClipSphereParamsAll(defaultCenter, defaultRadius, i);
+	}
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
+}
+
+int ClippingShader::getClipSpheresCount()
+{
+	return (int)m_clipSpheres.size();
+}
+
+void ClippingShader::setClipSphereParamsAll(Geom::Vec3f center, float radius, int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::setClipSphereParamsAll", "sphereIndex"))
+			return;
+
+	if ((center != m_clipSpheres[sphereIndex].center)
+			|| (radius != m_clipSpheres[sphereIndex].radius))
+	{
+		// Copy the given clipping sphere parameters
+		m_clipSpheres[sphereIndex].center = center;
+		m_clipSpheres[sphereIndex].radius = radius;
+
+		// Update the sphere array
+		updateClipSphereArray(sphereIndex);
+
+		// Send again the whole spheres centers and radiuses array to shader
+		sendClipSpheresCentersAndRadiusesUniform();
+
+		// Update sphere VBO
+		updateClipSphereVBO(sphereIndex);
+	}
+}
+
+void ClippingShader::setClipSphereParamsCenter(Geom::Vec3f center, int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::setClipSphereParamsCenter", "sphereIndex"))
+			return;
+
+	if (center != m_clipSpheres[sphereIndex].center)
+	{
+		// Copy the given clipping sphere parameter
+		m_clipSpheres[sphereIndex].center = center;
+
+		// Update the sphere array
+		updateClipSphereArray(sphereIndex);
+
+		// Send again the whole spheres centers and radiuses array to shader
+		sendClipSpheresCentersAndRadiusesUniform();
+
+		// Update sphere VBO
+		updateClipSphereVBO(sphereIndex);
+	}
+}
+
+void ClippingShader::setClipSphereParamsRadius(float radius, int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::setClipSphereParamsRadius", "sphereIndex"))
+			return;
+
+	if (radius != m_clipSpheres[sphereIndex].radius)
+	{
+		// Copy the given clipping sphere parameter
+		m_clipSpheres[sphereIndex].radius = radius;
+
+		// Update the sphere array
+		updateClipSphereArray(sphereIndex);
+
+		// Send again the whole spheres centers and radiuses array to shader
+		sendClipSpheresCentersAndRadiusesUniform();
+
+		// Update sphere VBO
+		updateClipSphereVBO(sphereIndex);
+	}
+}
+
+Geom::Vec3f ClippingShader::getClipSphereParamsCenter(int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::getClipSphereParamsCenter", "sphereIndex"))
+			return Geom::Vec3f(0.0, 0.0, 0.0);
+
+	// Return the parameter
+	return m_clipSpheres[sphereIndex].center;
+}
+
+float ClippingShader::getClipSphereParamsRadius(int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::getClipSphereParamsRadius", "sphereIndex"))
+			return 0.0;
+
+	// Return the parameter
+	return m_clipSpheres[sphereIndex].radius;
+}
+
+void ClippingShader::updateClipSphereArray(int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::updateClipSphereArray", "sphereIndex"))
+			return;
+
+	// Update the spheres centers and radiuses array
+	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 0] = m_clipSpheres[sphereIndex].center[0];
+	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 1] = m_clipSpheres[sphereIndex].center[1];
+	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 2] = m_clipSpheres[sphereIndex].center[2];
+	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 3] = m_clipSpheres[sphereIndex].radius;
+
+}
+
+
+/***********************************************
+ *
+ * 		Sphere Clipping Display
+ *
+ ***********************************************/
+
+
+void ClippingShader::displayClipSpheres()
+{
+	for (size_t i = 0; i < m_clipSpheresDrawers.size(); i++)
+		m_clipSpheresDrawers[i]->callList();
+}
+
+void ClippingShader::setClipSpheresDisplayColor(Geom::Vec3f color)
+{
+	if (color != m_clipSpheresDisplayColor)
+	{
+		m_clipSpheresDisplayColor = color;
+		updateClipSpheresVBOs();
+	}
+}
+
+Geom::Vec3f ClippingShader::getClipSpheresDisplayColor()
+{
+	return m_clipSpheresDisplayColor;
+}
+
+void ClippingShader::setClipSpheresDisplayXRes(size_t res)
+{
+	if (res != m_clipSpheresDisplayXRes)
+	{
+		m_clipSpheresDisplayXRes = res;
+		updateClipSpheresVBOs();
+	}
+}
+
+size_t ClippingShader::getClipSpheresDisplayXRes()
+{
+	return m_clipSpheresDisplayXRes;
+}
+
+void ClippingShader::setClipSpheresDisplayYRes(size_t res)
+{
+	if (res != m_clipSpheresDisplayYRes)
+	{
+		m_clipSpheresDisplayYRes = res;
+		updateClipSpheresVBOs();
+	}
+}
+
+size_t ClippingShader::getClipSpheresDisplayYRes()
+{
+	return m_clipSpheresDisplayYRes;
+}
+
+void ClippingShader::updateClipSphereVBO(int sphereIndex)
+{
+	// Check if the given index is out of range
+	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::updateClipSphereVBO", "sphereIndex"))
+			return;
+
+	// Build the VBO
+	m_clipSpheresDrawers[sphereIndex]->newList(GL_COMPILE);
+
+	m_clipSpheresDrawers[sphereIndex]->color3f(
+			m_clipSpheresDisplayColor[0],
+			m_clipSpheresDisplayColor[1],
+			m_clipSpheresDisplayColor[2]);
+
+	m_clipSpheresDrawers[sphereIndex]->begin(GL_LINES);
+
+	float dTheta = 0.0;
+	if (m_clipSpheresDisplayXRes != 0)
+		dTheta = 2 * M_PI / (float)m_clipSpheresDisplayXRes;
+	float dPhi = 0.0;
+	if (m_clipSpheresDisplayYRes != 0)
+		dPhi = M_PI / (float)m_clipSpheresDisplayYRes;
+
+	for (size_t i = 0; i < m_clipSpheresDisplayXRes; i++)
+	{
+		for (size_t j = 0; j < m_clipSpheresDisplayYRes; j++)
+		{
+			Geom::Vec3f p1 (
+					m_clipSpheres[sphereIndex].radius * cos(i*dTheta) * sin(j*dPhi),
+					m_clipSpheres[sphereIndex].radius * sin(i*dTheta) * sin(j*dPhi),
+					m_clipSpheres[sphereIndex].radius * cos(j*dPhi));
+
+			Geom::Vec3f p2 (
+					m_clipSpheres[sphereIndex].radius * cos((i+1)*dTheta) * sin(j*dPhi),
+					m_clipSpheres[sphereIndex].radius * sin((i+1)*dTheta) * sin(j*dPhi),
+					m_clipSpheres[sphereIndex].radius * cos(j*dPhi));
+
+			Geom::Vec3f p3 (
+					m_clipSpheres[sphereIndex].radius * cos(i*dTheta) * sin((j+1)*dPhi),
+					m_clipSpheres[sphereIndex].radius * sin(i*dTheta) * sin((j+1)*dPhi),
+					m_clipSpheres[sphereIndex].radius * cos((j+1)*dPhi));
+
+			m_clipSpheresDrawers[sphereIndex]->vertex(p1);
+			m_clipSpheresDrawers[sphereIndex]->vertex(p2);
+
+			m_clipSpheresDrawers[sphereIndex]->vertex(p1);
+			m_clipSpheresDrawers[sphereIndex]->vertex(p3);
+		}
+	}
+
+	m_clipSpheresDrawers[sphereIndex]->end();
+
+	m_clipSpheresDrawers[sphereIndex]->endList();
+}
+
+void ClippingShader::updateClipSpheresVBOs()
+{
+	for (int i = 0; i < getClipSpheresCount(); i++)
+		updateClipSphereVBO(i);
+}
+
+
+/***********************************************
+ *
  * 		Global Clipping Stuff
  *
  ***********************************************/
 
+
+bool ClippingShader::insertClippingCode()
+{
+	// Check if the code has not been already inserted
+	if (errorRaiseClippingCodeAlreadyInserted(m_hasClippingCodeBeenInserted, "ClippingShader::insertClippingCode"))
+		return false;
+
+	// Check if the vertex and fragment sources are not empty
+	if (errorRaiseShaderSourceIsEmpty((getVertexShaderSrc() == NULL), "ClippingShader::insertClippingCode", ShaderMutator::VERTEX_SHADER))
+		return false;
+	if (errorRaiseShaderSourceIsEmpty((getFragmentShaderSrc() == NULL), "ClippingShader::insertClippingCode", ShaderMutator::FRAGMENT_SHADER))
+			return false;
+
+	// Check if the shader does not use a geometry shader
+	if (errorRaiseShaderUsesGeometryShader((getGeometryShaderSrc() != NULL), "ClippingShader::insertClippingCode"))
+		return false;
+
+
+	// Strings to insert in shader sources
+
+	std::string VS_headInsertion =
+	"\n"
+	"#define CLIP_PLANES_COUNT 0\n"
+	"#define CLIP_SPHERES_COUNT 0\n"
+	"\n"
+	"#define PLANE_CLIPPING_ENABLED (CLIP_PLANES_COUNT > 0)\n"
+	"#define SPHERE_CLIPPING_ENABLED (CLIP_SPHERES_COUNT > 0)\n"
+	"\n"
+	"#define CLIPPING_ENABLED (PLANE_CLIPPING_ENABLED || SPHERE_CLIPPING_ENABLED)\n"
+	"\n"
+	"#if CLIPPING_ENABLED\n"
+	"	VARYING_VERT vec3 clip_nonTransformedPos;\n"
+	"#endif\n"
+	"\n";
+
+	std::string VS_mainEndInsertion =
+	"\n"
+	"	#if CLIPPING_ENABLED\n"
+	"		// Pass the non transformed vertex position to the fragment shader for clipping\n"
+	"		clip_nonTransformedPos = VertexPosition;\n"
+	"	#endif\n";
+
+	std::string FS_headInsertion =
+	"\n"
+	"#define CLIP_PLANES_COUNT 0\n"
+	"#define CLIP_SPHERES_COUNT 0\n"
+	"\n"
+	"#define PLANE_CLIPPING_ENABLED (CLIP_PLANES_COUNT > 0)\n"
+	"#define SPHERE_CLIPPING_ENABLED (CLIP_SPHERES_COUNT > 0)\n"
+	"\n"
+	"#define CLIPPING_ENABLED (PLANE_CLIPPING_ENABLED || SPHERE_CLIPPING_ENABLED)\n"
+	"\n"
+	"#if CLIPPING_ENABLED\n"
+	"\n"
+	"	#if PLANE_CLIPPING_ENABLED\n"
+	"		uniform vec4 clip_clipPlanesEquations[CLIP_PLANES_COUNT];\n"
+	"	#endif\n"
+	"\n"
+	"	#if SPHERE_CLIPPING_ENABLED\n"
+	"		uniform vec4 clip_clipSpheresCentersAndRadiuses[CLIP_SPHERES_COUNT];\n"
+	"	#endif\n"
+	"\n"
+	"	uniform float clip_clipColorAttenuationFactor;\n"
+	"\n"
+	"	VARYING_FRAG vec3 clip_nonTransformedPos;\n"
+	"\n"
+	"#endif\n"
+	"\n"
+	"#if CLIPPING_ENABLED\n"
+
+	"	float clip_doClippingAndGetClippingDistance()\n"
+	"	{\n"
+	"		// Distance to the nearest clipping object\n"
+	"		float minDistanceToClipping = -1.0;\n"
+	"\n"
+	"		#if PLANE_CLIPPING_ENABLED\n"
+	"\n"
+	"			// Do clipping for each plane\n"
+	"			for (int i = 0; i < CLIP_PLANES_COUNT; i++)\n"
+	"			{\n"
+	"				// Get the current plane equation\n"
+	"				vec4 currClipPlane = clip_clipPlanesEquations[i];\n"
+	"\n"
+	"				// If the plane normal is zero, use a default normal vector (0.0, 0.0, 1.0)\n"
+	"				float clipPlaneNormalLength = length(currClipPlane.xyz);\n"
+	"				if (clipPlaneNormalLength == 0.0)\n"
+	"				{\n"
+	"					currClipPlane.z = 1.0;\n"
+	"					clipPlaneNormalLength = 1.0;\n"
+	"				}\n"
+	"\n"
+	"				// Signed distance between the point and the plane\n"
+	"				float distanceToPlane = dot(clip_nonTransformedPos, currClipPlane.xyz);\n"
+	"				distanceToPlane += currClipPlane.w;\n"
+	"				distanceToPlane /= clipPlaneNormalLength;\n"
+	"\n"
+	"				// Keep the fragment only if it is 'above' the plane\n"
+	"				if (distanceToPlane < 0.0)\n"
+	"					discard;\n"
+	"				else\n"
+	"				{\n"
+	"					// Keep the distance to the nearest plane\n"
+	"					if (minDistanceToClipping < 0.0)\n"
+	"						minDistanceToClipping = distanceToPlane;\n"
+	"					else\n"
+	"						minDistanceToClipping = min(minDistanceToClipping, distanceToPlane);\n"
+	"				}\n"
+	"			}\n"
+	"\n"
+	"		#endif\n"
+	"\n"
+	"		#if SPHERE_CLIPPING_ENABLED\n"
+
+	"			// Do clipping for each sphere\n"
+	"			for (int i = 0; i < CLIP_SPHERES_COUNT; i++)\n"
+	"			{\n"
+	"				// Get the current sphere center and radius\n"
+	"				vec3 currClipSphereCenter = clip_clipSpheresCentersAndRadiuses[i].xyz;\n"
+	"				float currClipSphereRadius = clip_clipSpheresCentersAndRadiuses[i].w;\n"
+	"\n"
+	"				// If the sphere radius is negative, bring it back to zero\n"
+	"				if (currClipSphereRadius < 0.0)\n"
+	"					currClipSphereRadius = 0.0;\n"
+	"\n"
+	"				// Signed distance between the point and the sphere\n"
+	"				float distanceToSphere = length(clip_nonTransformedPos - currClipSphereCenter);\n"
+	"				distanceToSphere -= currClipSphereRadius;\n"
+	"\n"
+	"				// Keep the fragment only if it is inside the sphere\n"
+	"				if (distanceToSphere > 0.0)\n"
+	"					discard;\n"
+	"				else\n"
+	"				{\n"
+	"					// Keep the distance to the nearest sphere\n"
+	"					if (minDistanceToClipping < 0.0)\n"
+	"						minDistanceToClipping = distanceToSphere;\n"
+	"					else\n"
+	"						minDistanceToClipping = min(minDistanceToClipping, distanceToSphere);\n"
+	"				}\n"
+	"			}\n"
+	"\n"
+	"		#endif\n"
+	"\n"
+	"		return minDistanceToClipping;\n"
+	"	}\n"
+	"\n"
+	"#endif\n"
+	"\n";
+
+	std::string FS_mainBeginInsertion =
+	"\n"
+	"	#if CLIPPING_ENABLED\n"
+	"		// Apply clipping and get the clipping distance\n"
+	"		float clip_minDistanceToClipping = clip_doClippingAndGetClippingDistance();\n"
+	"	#endif\n";
+
+	std::string FS_mainEndInsertion =
+	"\n"
+	"	#if CLIPPING_ENABLED\n"
+	"		// Attenuate the final fragment color depending on its distance to the clipping\n"
+	"		gl_FragColor.rgb /= (1.0 + clip_minDistanceToClipping * clip_clipColorAttenuationFactor);\n"
+	"	#endif\n";
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// First check if the vertex shader contains the VertexPosition attribute
+	if (errorRaiseVariableNotFoundInShader(!SM.containsVariableDeclaration(ShaderMutator::VERTEX_SHADER, "VertexPosition"), "ClippingShader::insertClippingCode", ShaderMutator::VERTEX_SHADER, "VertexPosition"))
+		return false;
+
+	// Modify vertex shader source code
+	SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_headInsertion);
+	SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainEndInsertion);
+
+	// Modify fragment shader source code
+	SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120); // Following code insertions need at least shading language 120 (GLSL arrays)
+	SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_headInsertion);
+	SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBeginInsertion);
+	SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEndInsertion);
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
+
+	m_hasClippingCodeBeenInserted = true;
+
+	return true;
+}
 
 void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
 {
@@ -686,25 +987,50 @@ float ClippingShader::getClipColorAttenuationFactor()
 
 void ClippingShader::updateClippingUniforms()
 {
-	// These uniforms only exist if the clipping planes count is > 0
-	if (getClipPlanesCount() <= 0)
-		return;
+	// Plane clipping uniforms
+	if (getClipPlanesCount() > 0)
+	{
+		// Get uniform location
+		m_unif_clipPlanesEquations = glGetUniformLocation(program_handler(), "clip_clipPlanesEquations");
+		errorRaiseUniformNotFoundInShader((m_unif_clipPlanesEquations == -1), "ClippingShader::updateClippingUniforms", "clip_clipPlanesEquations");
 
-	// Get uniforms locations
-	m_unif_clipPlanesEquations = glGetUniformLocation(program_handler(), "clip_ClipPlanes");
-	errorRaiseUniformNotFoundInShader((m_unif_clipPlanesEquations == -1), "ClippingShader::updateClippingUniforms", "clip_ClipPlanes");
-	m_unif_clipColorAttenuationFactor = glGetUniformLocation(program_handler(), "clip_ColorAttenuationFactor");
-	errorRaiseUniformNotFoundInShader((m_unif_clipColorAttenuationFactor == -1), "ClippingShader::updateClippingUniforms", "clip_ColorAttenuationFactor");
+		// Send again uniform value
+		sendClipPlanesEquationsUniform();
+	}
 
-	// Send again uniforms values
-	sendClipPlanesEquationsUniform();
-	sendClipColorAttenuationFactorUniform();
+	// Sphere clipping uniforms
+	if (getClipSpheresCount() > 0)
+	{
+		// Get uniform location
+		m_unif_clipSpheresCentersAndRadiuses = glGetUniformLocation(program_handler(), "clip_clipSpheresCentersAndRadiuses");
+		errorRaiseUniformNotFoundInShader((m_unif_clipSpheresCentersAndRadiuses == -1), "ClippingShader::updateClippingUniforms", "clip_clipSpheresCentersAndRadiuses");
+
+		// Send again uniform value
+		sendClipSpheresCentersAndRadiusesUniform();
+	}
+
+	// Global clipping uniforms
+	if ((getClipPlanesCount() > 0) || (getClipSpheresCount() > 0))
+	{
+		// Get uniform location
+		m_unif_clipColorAttenuationFactor = glGetUniformLocation(program_handler(), "clip_clipColorAttenuationFactor");
+		errorRaiseUniformNotFoundInShader((m_unif_clipColorAttenuationFactor == -1), "ClippingShader::updateClippingUniforms", "clip_clipColorAttenuationFactor");
+
+		// Send again uniform value
+		sendClipColorAttenuationFactorUniform();
+	}
 }
 
 void ClippingShader::sendClipPlanesEquationsUniform()
 {
 	bind();
 	glUniform4fv(m_unif_clipPlanesEquations, getClipPlanesCount(), &m_clipPlanesEquations.front());
+}
+
+void ClippingShader::sendClipSpheresCentersAndRadiusesUniform()
+{
+	bind();
+	glUniform4fv(m_unif_clipSpheresCentersAndRadiuses, getClipSpheresCount(), &m_clipSpheresCentersAndRadiuses.front());
 }
 
 void ClippingShader::sendClipColorAttenuationFactorUniform()
@@ -737,19 +1063,36 @@ bool ClippingShader::errorRaiseParameterIsNotPositive(bool condition, const std:
 	return condition;
 }
 
-bool ClippingShader::errorRaiseShaderHasNotBeenWellCreated(bool condition, const std::string& location)
+bool ClippingShader::errorRaiseShaderSourceIsEmpty(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType)
 {
-
 	if (condition)
 	{
-		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+		std::string shaderName;
+		switch (shaderType)
+		{
+			case ShaderMutator::VERTEX_SHADER :
+				shaderName = m_nameVS;
+				break;
+
+			case ShaderMutator::FRAGMENT_SHADER :
+				shaderName = m_nameFS;
+				break;
+
+			case ShaderMutator::GEOMETRY_SHADER :
+				shaderName = m_nameGS;
+				break;
+
+			default :
+				shaderName = m_nameVS;
+				break;
+		}
 
 		CGoGNerr
 		<< "ERROR - "
 		<< location
 		<< " - Could not process shader "
 		<< shaderName
-		<< " source code : shader has not been created or has failed to compile"
+		<< " source code : shader source is empty"
 		<< CGoGNendl;
 	}
 
@@ -779,14 +1122,24 @@ bool ClippingShader::errorRaiseVariableNotFoundInShader(bool condition, const st
 	if (condition)
 	{
 		std::string shaderName;
-		if (shaderType == ShaderMutator::VERTEX_SHADER)
-			 shaderName = m_nameVS;
-		else if (shaderType == ShaderMutator::FRAGMENT_SHADER)
-			shaderName = m_nameFS;
-		else if (shaderType == ShaderMutator::GEOMETRY_SHADER)
-			shaderName = m_nameGS;
-		else
-			shaderName = m_nameVS;
+		switch (shaderType)
+		{
+			case ShaderMutator::VERTEX_SHADER :
+				shaderName = m_nameVS;
+				break;
+
+			case ShaderMutator::FRAGMENT_SHADER :
+				shaderName = m_nameFS;
+				break;
+
+			case ShaderMutator::GEOMETRY_SHADER :
+				shaderName = m_nameGS;
+				break;
+
+			default :
+				shaderName = m_nameVS;
+				break;
+		}
 
 		CGoGNerr
 		<< "ERROR - "
@@ -826,10 +1179,45 @@ bool ClippingShader::errorRaiseUniformNotFoundInShader(bool condition, const std
 		CGoGNerr
 		<< "ERROR - "
 		<< location
-		<< " - uniform "
+		<< " - Uniform "
 		<< uniformName
 		<< " not found in shader "
 		<< shaderName
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+
+bool ClippingShader::errorRaiseClippingCodeAlreadyInserted(bool condition, const std::string& location)
+{
+	if (condition)
+	{
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Clipping code has already been inserted into shader "
+		<< shaderName
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
+
+bool ClippingShader::errorRaiseClippingCodeNotInserted(bool condition, const std::string& location)
+{
+	if (condition)
+	{
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Clipping code must be inserted into shader "
+		<< shaderName
+		<< " before adding clipping objects"
 		<< CGoGNendl;
 	}
 

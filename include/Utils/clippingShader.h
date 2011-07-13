@@ -33,6 +33,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <cmath>
 
 namespace CGoGN
 {
@@ -61,21 +62,6 @@ public :
 
 	/***********************************************
 	 *
-	 * 		Original Shader Sources
-	 *
-	 ***********************************************/
-
-private:
-
-	/// original vertex shader source code (without clipping)
-	std::string originalVertShaderSrc;
-
-	/// original fragment shader source code (without clipping)
-	std::string originalFragShaderSrc;
-
-
-	/***********************************************
-	 *
 	 * 		Plane Clipping
 	 *
 	 ***********************************************/
@@ -84,10 +70,8 @@ public:
 
 	/**
 	 * set the clip planes count
-	 * - inserts plane clipping instructions into vertex and fragment shader source code
-	 * - does not modify the geometry shader source code
 	 * @param planesCount the clip planes count to use
-	 * @warning this function is designed for shaders which *do not* use a geometry shader
+	 * @warning insertClippingCode must be called first
 	 */
 	void setClipPlanesCount(int planesCount);
 
@@ -131,21 +115,21 @@ public:
 	/**
 	 * get first vector for one clip plane
 	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of the plane to modify
+	 * @param planeIndex index of the plane
 	 */
 	Geom::Vec3f getClipPlaneParamsFirstVec(int planeIndex);
 
 	/**
 	 * get second vector for one clip plane
 	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of the plane to modify
+	 * @param planeIndex index of the plane
 	 */
 	Geom::Vec3f getClipPlaneParamsSecondVec(int planeIndex);
 
 	/**
 	 * get origin for one clip plane
 	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of the plane to modify
+	 * @param planeIndex index of the plane
 	 */
 	Geom::Vec3f getClipPlaneParamsOrigin(int planeIndex);
 
@@ -184,9 +168,6 @@ private:
 
 public:
 
-	/// enum used to choose which type of clip plane grid to display
-	enum clipPlaneDisplayGridType { STRAIGHT_GRID, RADIAL_GRID };
-
 	/// display all clipping planes
 	void displayClipPlanes();
 
@@ -198,15 +179,6 @@ public:
 
 	/// get the planes display color
 	Geom::Vec3f getClipPlanesDisplayColor();
-
-	/**
-	 * set the planes display grids type
-	 * @param gridType the new grid type
-	 */
-	void setClipPlanesDisplayType(clipPlaneDisplayGridType gridType);
-
-	/// get the planes display grids type
-	clipPlaneDisplayGridType getClipPlanesDisplayType();
 
 	/**
 	 * set the planes display grid x resolution
@@ -252,9 +224,6 @@ private:
 	/// clip planes display color
 	Geom::Vec3f m_clipPlanesDisplayColor;
 
-	/// clip planes display grid type
-	clipPlaneDisplayGridType m_clipPlanesDisplayType;
-
 	/// clip planes x grid display resolution
 	size_t m_clipPlanesDisplayXRes;
 
@@ -267,11 +236,164 @@ private:
 
 	/***********************************************
 	 *
+	 * 		Sphere Clipping
+	 *
+	 ***********************************************/
+
+public:
+
+	/**
+	 * set the clip spheres count
+	 * @param spheresCount the clip spheres count to use
+	 * @warning insertClippingCode must be called first
+	 */
+	void setClipSpheresCount(int spheresCount);
+
+	/// get the clip spheres count
+	int getClipSpheresCount();
+
+	/**
+	 * set all parameters for one clip sphere
+	 * @warning sphereIndex starts at 0
+	 * @param center center
+	 * @param radius radius
+	 * @param sphereIndex index of the sphere to modify
+	 */
+	void setClipSphereParamsAll(Geom::Vec3f center, float radius, int sphereIndex);
+
+	/**
+	 * set center for one clip sphere
+	 * @warning sphereIndex starts at 0
+	 * @param center center
+	 * @param sphereIndex index of the sphere to modify
+	 */
+	void setClipSphereParamsCenter(Geom::Vec3f center, int sphereIndex);
+
+	/**
+	 * set radius for one clip sphere
+	 * @warning sphereIndex starts at 0
+	 * @param radius radius
+	 * @param sphereIndex index of the sphere to modify
+	 */
+	void setClipSphereParamsRadius(float radius, int sphereIndex);
+
+	/**
+	 * get center for one clip sphere
+	 * @warning sphereIndex starts at 0
+	 * @param sphereIndex index of the sphere
+	 */
+	Geom::Vec3f getClipSphereParamsCenter(int sphereIndex);
+
+	/**
+	 * get radius for one clip sphere
+	 * @warning sphereIndex starts at 0
+	 * @param sphereIndex index of the sphere
+	 */
+	float getClipSphereParamsRadius(int sphereIndex);
+
+private:
+
+	/**
+	 * update clip sphere center and radius array
+	 * @param sphereIndex index of the sphere
+	 */
+	void updateClipSphereArray(int sphereIndex);
+
+	/// clip spheres structure
+	struct clipSphere
+	{
+		Geom::Vec3f center;
+		float radius;
+	};
+
+	/// clip spheres array
+	std::vector<clipSphere> m_clipSpheres;
+
+	/**
+	 * clip spheres centers and radiuses array (size = 4*(spheres count))
+	 * - ** only used for sending sphere data to shader **
+	 */
+	std::vector<float> m_clipSpheresCentersAndRadiuses;
+
+	/// clip spheres equations vector uniform id
+	GLint m_unif_clipSpheresCentersAndRadiuses;
+
+
+	/***********************************************
+	 *
+	 * 		Sphere Clipping Display
+	 *
+	 ***********************************************/
+
+public:
+
+	/// display all clipping spheres
+	void displayClipSpheres();
+
+	/**
+	 * set the spheres display color
+	 * @param color the new color
+	 */
+	void setClipSpheresDisplayColor(Geom::Vec3f color);
+
+	/// get the spheres display color
+	Geom::Vec3f getClipSpheresDisplayColor();
+
+	/**
+	 * set the spheres display grid x resolution
+	 * @param res the new resolution
+	 */
+	void setClipSpheresDisplayXRes(size_t res);
+
+	/// get the spheres display grid x resolution
+	size_t getClipSpheresDisplayXRes();
+
+	/**
+	 * set the spheres display grid y resolution
+	 * @param res the new resolution
+	 */
+	void setClipSpheresDisplayYRes(size_t res);
+
+	/// get the spheres display grid y resolution
+	size_t getClipSpheresDisplayYRes();
+
+private:
+
+	/**
+	 * update VBO for one sphere
+	 * @param sphereIndex index of the sphere
+	 */
+	void updateClipSphereVBO(int sphereIndex);
+
+	/// update VBOs for all spheres
+	void updateClipSpheresVBOs();
+
+	/// clip spheres drawers array
+	std::vector<Drawer*> m_clipSpheresDrawers;
+
+	/// clip spheres display color
+	Geom::Vec3f m_clipSpheresDisplayColor;
+
+	/// clip spheres x grid display resolution
+	size_t m_clipSpheresDisplayXRes;
+
+	/// clip spheres y grid display resolution
+	size_t m_clipSpheresDisplayYRes;
+
+
+	/***********************************************
+	 *
 	 * 		Global Clipping Stuff
 	 *
 	 ***********************************************/
 
 public:
+
+	/**
+	 * insert clipping instructions into shader source code
+	 * @warning this function is designed for shaders which *do not* use a geometry shader
+	 */
+	bool insertClippingCode();
 
 	/**
 	 * set the color attenuation factor for clipping
@@ -283,6 +405,9 @@ public:
 	float getClipColorAttenuationFactor();
 
 private:
+
+	/// to control clipping code has been inserted before clipping objects have been added
+	bool m_hasClippingCodeBeenInserted;
 
 	/// color attenuation factor
 	float m_clipColorAttenuationFactor;
@@ -307,6 +432,9 @@ private:
 	/// sends the clip planes equations array to shader
 	void sendClipPlanesEquationsUniform();
 
+	/// sends the clip spheres centers and radiuses array to shader
+	void sendClipSpheresCentersAndRadiusesUniform();
+
 	/// sends the color attenuation factor to shader
 	void sendClipColorAttenuationFactorUniform();
 
@@ -328,11 +456,12 @@ private:
 	bool errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName);
 
 	/**
-	 * Output a "shader has not been well created" error if the condition is satisfied
+	 * Output a "shader source is empty" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
+	 * @param shaderType type of the shader
 	 */
-	bool errorRaiseShaderHasNotBeenWellCreated(bool condition, const std::string& location);
+	bool errorRaiseShaderSourceIsEmpty(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType);
 
 	/**
 	 * Output a "shader uses a geometry shader" error if the condition is satisfied
@@ -365,6 +494,20 @@ private:
 	 * @param uniformName name of the uniform that may not be found
 	 */
 	bool errorRaiseUniformNotFoundInShader(bool condition, const std::string& location, const std::string& uniformName);
+
+	/**
+	 * Output a "clipping code was already inserted" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 */
+	bool errorRaiseClippingCodeAlreadyInserted(bool condition, const std::string& location);
+
+	/**
+	 * Output a "clipping code has not been inserted yet" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising is done
+	 */
+	bool errorRaiseClippingCodeNotInserted(bool condition, const std::string& location);
 
 };
 

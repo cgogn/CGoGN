@@ -34,7 +34,7 @@
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_3">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_Object">
            <attribute name="title">
@@ -305,23 +305,6 @@
                     <widget class="QSpinBox" name="spinBox_GridResolutionY">
                      <property name="maximum">
                       <number>200</number>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="0">
-                    <widget class="QLabel" name="label_GridType">
-                     <property name="text">
-                      <string>Type</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="1">
-                    <widget class="QSlider" name="horizontalSlider_GridType">
-                     <property name="maximum">
-                      <number>1</number>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
                      </property>
                     </widget>
                    </item>
