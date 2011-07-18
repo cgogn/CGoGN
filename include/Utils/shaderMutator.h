@@ -107,8 +107,8 @@ public:
 	
 private:
 
-	 /// processed shader name stored for log purpose
-	 std::string m_shaderName;
+	/// processed shader name stored for log purpose
+	std::string m_shaderName;
 	
 	/// modified version of the original vertex shader source code
 	std::string m_vShaderMutation;

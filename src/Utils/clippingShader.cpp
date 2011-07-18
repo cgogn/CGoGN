@@ -57,6 +57,7 @@ ClippingShader::ClippingShader()
 	// Initialize default global clipping variables
 	m_hasClippingCodeBeenInserted = false;
 	m_clipColorAttenuationFactor = 1.0;
+	m_clipMode = CLIPPING_MODE_AND;
 }
 
 ClippingShader::~ClippingShader()
@@ -77,63 +78,66 @@ ClippingShader::~ClippingShader()
 
 void ClippingShader::setClipPlanesCount(int planesCount)
 {
-	// Check if the clipping code has been inserted into shader
-	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipPlanesCount"))
-		return;
-
-	// Check if the given clipping planes count is valid
-	if (errorRaiseParameterIsNotPositive((planesCount < 0), "ClippingShader::setClipPlanesCount", "planesCount"))
-		return;
-
-	// Shader name string
-	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-	// Use a shader mutator
-	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-	// Modify the clip planes count constant in both shader
-	SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", planesCount);
-	SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount);
-
-	// Reload both shaders
-	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-
-
-	// Previous planes count
-	int previousPlanesCount = getClipPlanesCount();
-
-	// Resize the planes arrays to the right size
-	m_clipPlanes.resize((size_t)planesCount);
-	m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
-
-	// Resize the planes drawers array to the right size, and create/destroy objects
-	if (planesCount > previousPlanesCount)
+	if (planesCount != getClipPlanesCount())
 	{
-		m_clipPlanesDrawers.resize((size_t)planesCount, NULL);
-		for (int i = previousPlanesCount; i < planesCount; i++)
-			m_clipPlanesDrawers[i] = new Drawer;
-	}
-	else
-	{
-		//for (int i = planesCount; i < previousPlanesCount; i++)
-			//delete m_clipPlanesDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
-		m_clipPlanesDrawers.resize((size_t)planesCount);
-	}
+		// Check if the clipping code has been inserted into shader
+		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipPlanesCount"))
+			return;
 
-	// Set default parameters values for new planes
-	if (planesCount > previousPlanesCount)
-	{
-		Geom::Vec3f defaultFirstVec (1.0, 0.0, 0.0);
-		Geom::Vec3f defaultSecondVec (0.0, 1.0, 0.0);
-		Geom::Vec3f defaultOrigin (0.0, 0.0, 0.0);
+		// Check if the given clipping planes count is valid
+		if (errorRaiseParameterIsNotPositive((planesCount < 0), "ClippingShader::setClipPlanesCount", "planesCount"))
+			return;
 
-		for (int i = previousPlanesCount; i < planesCount; i++)
-			setClipPlaneParamsAll(defaultFirstVec, defaultSecondVec, defaultOrigin, i);
+		// Shader name string
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		// Use a shader mutator
+		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+		// Modify the clip planes count constant in both shader
+		SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", planesCount);
+		SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount);
+
+		// Reload both shaders
+		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+
+		// Previous planes count
+		int previousPlanesCount = getClipPlanesCount();
+
+		// Resize the planes arrays to the right size
+		m_clipPlanes.resize((size_t)planesCount);
+		m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
+
+		// Resize the planes drawers array to the right size, and create/destroy objects
+		if (planesCount > previousPlanesCount)
+		{
+			m_clipPlanesDrawers.resize((size_t)planesCount, NULL);
+			for (int i = previousPlanesCount; i < planesCount; i++)
+				m_clipPlanesDrawers[i] = new Drawer;
+		}
+		else
+		{
+			//for (int i = planesCount; i < previousPlanesCount; i++)
+				//delete m_clipPlanesDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
+			m_clipPlanesDrawers.resize((size_t)planesCount);
+		}
+
+		// Set default parameters values for new planes
+		if (planesCount > previousPlanesCount)
+		{
+			Geom::Vec3f defaultFirstVec (1.0, 0.0, 0.0);
+			Geom::Vec3f defaultSecondVec (0.0, 1.0, 0.0);
+			Geom::Vec3f defaultOrigin (0.0, 0.0, 0.0);
+
+			for (int i = previousPlanesCount; i < planesCount; i++)
+				setClipPlaneParamsAll(defaultFirstVec, defaultSecondVec, defaultOrigin, i);
+		}
+
+		// Recompile shaders (automatically calls updateClippingUniforms)
+		recompile();
 	}
-
-	// Recompile shaders (automatically calls updateClippingUniforms)
-	recompile();
 }
 
 int ClippingShader::getClipPlanesCount()
@@ -476,62 +480,65 @@ void ClippingShader::updateClipPlanesVBOs()
 
 void ClippingShader::setClipSpheresCount(int spheresCount)
 {
-	// Check if the clipping code has been inserted into shader
-	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipSpheresCount"))
-		return;
-
-	// Check if the given clipping spheres count is valid
-	if (errorRaiseParameterIsNotPositive((spheresCount < 0), "ClippingShader::setClipSpheresCount", "spheresCount"))
-		return;
-
-	// Shader name string
-	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-	// Use a shader mutator
-	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-	// Modify the clip spheres count constant in both shader
-	SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
-	SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
-
-	// Reload both shaders
-	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-
-
-	// Previous spheres count
-	int previousSpheresCount = getClipSpheresCount();
-
-	// Resize the spheres arrays to the right size
-	m_clipSpheres.resize((size_t)spheresCount);
-	m_clipSpheresCentersAndRadiuses.resize(4*(size_t)spheresCount, 0.0);
-
-	// Resize the spheres drawers array to the right size, and create/destroy objects
-	if (spheresCount > previousSpheresCount)
+	if (spheresCount != getClipSpheresCount())
 	{
-		m_clipSpheresDrawers.resize((size_t)spheresCount, NULL);
-		for (int i = previousSpheresCount; i < spheresCount; i++)
-			m_clipSpheresDrawers[i] = new Drawer;
-	}
-	else
-	{
-		//for (int i = spheresCount; i < previousSpheresCount; i++)
-			//delete m_clipSpheresDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
-		m_clipSpheresDrawers.resize((size_t)spheresCount);
-	}
+		// Check if the clipping code has been inserted into shader
+		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipSpheresCount"))
+			return;
 
-	// Set default parameters values for new spheres
-	if (spheresCount > previousSpheresCount)
-	{
-		Geom::Vec3f defaultCenter (0.0, 0.0, 0.0);
-		float defaultRadius = 10.0;
+		// Check if the given clipping spheres count is valid
+		if (errorRaiseParameterIsNotPositive((spheresCount < 0), "ClippingShader::setClipSpheresCount", "spheresCount"))
+			return;
 
-		for (int i = previousSpheresCount; i < spheresCount; i++)
-			setClipSphereParamsAll(defaultCenter, defaultRadius, i);
+		// Shader name string
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		// Use a shader mutator
+		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+		// Modify the clip spheres count constant in both shader
+		SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
+		SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
+
+		// Reload both shaders
+		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+
+		// Previous spheres count
+		int previousSpheresCount = getClipSpheresCount();
+
+		// Resize the spheres arrays to the right size
+		m_clipSpheres.resize((size_t)spheresCount);
+		m_clipSpheresCentersAndRadiuses.resize(4*(size_t)spheresCount, 0.0);
+
+		// Resize the spheres drawers array to the right size, and create/destroy objects
+		if (spheresCount > previousSpheresCount)
+		{
+			m_clipSpheresDrawers.resize((size_t)spheresCount, NULL);
+			for (int i = previousSpheresCount; i < spheresCount; i++)
+				m_clipSpheresDrawers[i] = new Drawer;
+		}
+		else
+		{
+			//for (int i = spheresCount; i < previousSpheresCount; i++)
+				//delete m_clipSpheresDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
+			m_clipSpheresDrawers.resize((size_t)spheresCount);
+		}
+
+		// Set default parameters values for new spheres
+		if (spheresCount > previousSpheresCount)
+		{
+			Geom::Vec3f defaultCenter (0.0, 0.0, 0.0);
+			float defaultRadius = 10.0;
+
+			for (int i = previousSpheresCount; i < spheresCount; i++)
+				setClipSphereParamsAll(defaultCenter, defaultRadius, i);
+		}
+
+		// Recompile shaders (automatically calls updateClippingUniforms)
+		recompile();
 	}
-
-	// Recompile shaders (automatically calls updateClippingUniforms)
-	recompile();
 }
 
 int ClippingShader::getClipSpheresCount()
@@ -711,54 +718,77 @@ void ClippingShader::updateClipSphereVBO(int sphereIndex)
 			m_clipSpheresDisplayColor[1],
 			m_clipSpheresDisplayColor[2]);
 
-	m_clipSpheresDrawers[sphereIndex]->begin(GL_LINES);
+	// Sphere segments and rings subdivisions
+	const int segSubdivs = 100;
+	const int ringsSubdivs = 100;
 
 	// Compute angle displacement steps
 	float dTheta = 0.0;
 	if (m_clipSpheresDisplayXRes != 0)
-		dTheta = 2 * M_PI / (float)m_clipSpheresDisplayXRes;
+		dTheta = 2.0 * M_PI / (float)m_clipSpheresDisplayXRes;
 	float dPhi = 0.0;
 	if (m_clipSpheresDisplayYRes != 0)
 		dPhi = M_PI / (float)m_clipSpheresDisplayYRes;
 
-	// Draw the sphere in wireframe
+	// Compute angle displacement steps for subdivisions
+	float dSegSubdiv = M_PI / (float)segSubdivs;
+	float dRingsSubdiv = 2.0 * M_PI / (float)ringsSubdivs;
+
+	// Draw the segments of the sphere
 	for (size_t i = 0; i < m_clipSpheresDisplayXRes; i++)
 	{
-		for (size_t j = 0; j < m_clipSpheresDisplayYRes; j++)
+
+		m_clipSpheresDrawers[sphereIndex]->begin(GL_LINE_STRIP);
+
+		for (size_t j = 0; j < segSubdivs + 1; j++)
 		{
-			// Compute 3 points according to the parametric equation of the sphere
-			Geom::Vec3f p1 (
-					cos(i*dTheta) * sin(j*dPhi),
-					sin(i*dTheta) * sin(j*dPhi),
-					cos(j*dPhi));
-			Geom::Vec3f p2 (
-					cos((i+1)*dTheta) * sin(j*dPhi),
-					sin((i+1)*dTheta) * sin(j*dPhi),
-					cos(j*dPhi));
-			Geom::Vec3f p3 (
-					cos(i*dTheta) * sin((j+1)*dPhi),
-					sin(i*dTheta) * sin((j+1)*dPhi),
-					cos((j+1)*dPhi));
+			// Compute a point on the current subdivision according to the parametric equation of the sphere
+			Geom::Vec3f point (
+					cos(i*dTheta) * sin(j*dSegSubdiv),
+					sin(i*dTheta) * sin(j*dSegSubdiv),
+					cos(j*dSegSubdiv));
 
 			// Scale with the radius
-			p1 *= m_clipSpheres[sphereIndex].radius;
-			p2 *= m_clipSpheres[sphereIndex].radius;
-			p3 *= m_clipSpheres[sphereIndex].radius;
+			point *= m_clipSpheres[sphereIndex].radius;
 
 			// Translate to the center
-			p1 += m_clipSpheres[sphereIndex].center;
-			p2 += m_clipSpheres[sphereIndex].center;
-			p3 += m_clipSpheres[sphereIndex].center;
+			point += m_clipSpheres[sphereIndex].center;
 
-			// Draw two lines with the 3 points
-			m_clipSpheresDrawers[sphereIndex]->vertex(p1);
-			m_clipSpheresDrawers[sphereIndex]->vertex(p2);
-			m_clipSpheresDrawers[sphereIndex]->vertex(p1);
-			m_clipSpheresDrawers[sphereIndex]->vertex(p3);
+			// Draw a line through this point
+			m_clipSpheresDrawers[sphereIndex]->vertex(point);
 		}
+
+		m_clipSpheresDrawers[sphereIndex]->end();
+
 	}
 
-	m_clipSpheresDrawers[sphereIndex]->end();
+	// Draw the rings of the sphere
+	for (size_t i = 0; i < m_clipSpheresDisplayYRes; i++)
+	{
+
+		m_clipSpheresDrawers[sphereIndex]->begin(GL_LINE_STRIP);
+
+		for (size_t j = 0; j < ringsSubdivs + 1; j++)
+		{
+			// Compute a point on the current subdivision according to the parametric equation of the sphere
+			Geom::Vec3f point (
+					cos(j*dRingsSubdiv) * sin(i*dPhi),
+					sin(j*dRingsSubdiv) * sin(i*dPhi),
+					cos(i*dPhi));
+
+			// Scale with the radius
+			point *= m_clipSpheres[sphereIndex].radius;
+
+			// Translate to the center
+			point += m_clipSpheres[sphereIndex].center;
+
+			// Draw a line through this point
+			m_clipSpheresDrawers[sphereIndex]->vertex(point);
+		}
+
+		m_clipSpheresDrawers[sphereIndex]->end();
+
+	}
 
 	m_clipSpheresDrawers[sphereIndex]->endList();
 }
@@ -828,6 +858,13 @@ bool ClippingShader::insertClippingCode()
 	"\n"
 	"#define CLIPPING_ENABLED (PLANE_CLIPPING_ENABLED || SPHERE_CLIPPING_ENABLED)\n"
 	"\n"
+	"// In following clipping modes, pixels may be deleted :\n"
+	"//  - OR : only after being matched with every object\n"
+	"//  - AND : on the fly as soon as one object does not match\n"
+	"#define CLIPPING_MODE_AND 0\n"
+	"#define CLIPPING_MODE_OR 1\n"
+	"#define CLIPPING_MODE 0\n"
+	"\n"
 	"#if CLIPPING_ENABLED\n"
 	"\n"
 	"	#if PLANE_CLIPPING_ENABLED\n"
@@ -851,6 +888,12 @@ bool ClippingShader::insertClippingCode()
 	"		// Distance to the nearest clipping object\n"
 	"		float minDistanceToClipping = -1.0;\n"
 	"\n"
+	"		// OR clipping mode needs a boolean to know if the pixel must be clipped or not\n"
+	"		// By default set to true : one clipping object matched sets it to false\n"
+	"		#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
+	"			bool discardPixel = true;\n"
+	"		#endif\n"
+	"\n"
 	"		#if PLANE_CLIPPING_ENABLED\n"
 	"\n"
 	"			// Do clipping for each plane\n"
@@ -873,15 +916,25 @@ bool ClippingShader::insertClippingCode()
 	"				distanceToPlane /= clipPlaneNormalLength;\n"
 	"\n"
 	"				// Keep the fragment only if it is 'above' the plane\n"
-	"				if (distanceToPlane < 0.0)\n"
-	"					discard;\n"
+	"				if (distanceToPlane > 0.0)\n"
+	"				{\n"
+	"					// AND clipping mode discards at first unmatched clipping object\n"
+	"					#if (CLIPPING_MODE == CLIPPING_MODE_AND)\n"
+	"						discard;\n"
+	"					#endif\n"
+	"				}\n"
 	"				else\n"
 	"				{\n"
+	"					// In OR clipping mode, one match = no pixel clipping\n"
+	"					#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
+	"						discardPixel = false;\n"
+	"					#endif\n"
+	"\n"
 	"					// Keep the distance to the nearest plane\n"
 	"					if (minDistanceToClipping < 0.0)\n"
-	"						minDistanceToClipping = distanceToPlane;\n"
+	"						minDistanceToClipping = abs(distanceToPlane);\n"
 	"					else\n"
-	"						minDistanceToClipping = min(minDistanceToClipping, distanceToPlane);\n"
+	"						minDistanceToClipping = min(minDistanceToClipping, abs(distanceToPlane));\n"
 	"				}\n"
 	"			}\n"
 	"\n"
@@ -896,27 +949,42 @@ bool ClippingShader::insertClippingCode()
 	"				vec3 currClipSphereCenter = clip_clipSpheresCentersAndRadiuses[i].xyz;\n"
 	"				float currClipSphereRadius = clip_clipSpheresCentersAndRadiuses[i].w;\n"
 	"\n"
-	"				// If the sphere radius is negative, bring it back to zero\n"
-	"				if (currClipSphereRadius < 0.0)\n"
-	"					currClipSphereRadius = 0.0;\n"
-	"\n"
 	"				// Signed distance between the point and the sphere\n"
 	"				float distanceToSphere = length(clip_nonTransformedPos - currClipSphereCenter);\n"
-	"				distanceToSphere -= currClipSphereRadius;\n"
+	"				distanceToSphere -= abs(currClipSphereRadius);\n"
+	"\n"
+	"				// If the sphere radius is negative, this inverses the clipping effect\n"
+	"				distanceToSphere *= sign(currClipSphereRadius);\n"
 	"\n"
 	"				// Keep the fragment only if it is inside the sphere\n"
 	"				if (distanceToSphere > 0.0)\n"
-	"					discard;\n"
+	"				{\n"
+	"					// AND clipping mode discards at first unmatched clipping object\n"
+	"					#if (CLIPPING_MODE == CLIPPING_MODE_AND)\n"
+	"						discard;\n"
+	"					#endif\n"
+	"				}\n"
 	"				else\n"
 	"				{\n"
+	"					// In OR clipping mode, one match = no pixel clipping\n"
+	"					#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
+	"						discardPixel = false;\n"
+	"					#endif\n"
+	"\n"
 	"					// Keep the distance to the nearest sphere\n"
 	"					if (minDistanceToClipping < 0.0)\n"
-	"						minDistanceToClipping = -distanceToSphere;\n"
+	"						minDistanceToClipping = abs(distanceToSphere);\n"
 	"					else\n"
-	"						minDistanceToClipping = min(minDistanceToClipping, -distanceToSphere);\n"
+	"						minDistanceToClipping = min(minDistanceToClipping, abs(distanceToSphere));\n"
 	"				}\n"
 	"			}\n"
 	"\n"
+	"		#endif\n"
+	"\n"
+	"		// In OR clipping mode, the pixel may be deleted only after being matched with every object\n"
+	"		#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
+	"			if (discardPixel)\n"
+	"				discard;\n"
 	"		#endif\n"
 	"\n"
 	"		return minDistanceToClipping;\n"
@@ -973,7 +1041,7 @@ bool ClippingShader::insertClippingCode()
 
 void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
 {
-	if (m_clipColorAttenuationFactor != colorAttenuationFactor)
+	if (colorAttenuationFactor != m_clipColorAttenuationFactor)
 	{
 		// Copy the given value
 		m_clipColorAttenuationFactor = colorAttenuationFactor;
@@ -986,6 +1054,54 @@ void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
 float ClippingShader::getClipColorAttenuationFactor()
 {
 	return m_clipColorAttenuationFactor;
+}
+
+void ClippingShader::setClipMode(clippingMode clipMode)
+{
+	if (clipMode != m_clipMode)
+	{
+		// Check if the clipping code has been inserted into shader
+		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipPlanesCount"))
+			return;
+
+		// Shader name string
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		// Copy the given value
+		m_clipMode = clipMode;
+
+		// Use a shader mutator
+		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+		// Change clipping mode constant
+		int newConstantValue;
+		switch (clipMode)
+		{
+			case CLIPPING_MODE_AND :
+				newConstantValue = 0;
+				break;
+
+			case CLIPPING_MODE_OR :
+				newConstantValue = 1;
+				break;
+
+			default :
+				newConstantValue = 0;
+				break;
+		}
+		SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_MODE", newConstantValue);
+
+		// Reload modified shader
+		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+		// Recompile shaders (automatically calls updateClippingUniforms)
+		recompile();
+	}
+}
+
+ClippingShader::clippingMode ClippingShader::getClipMode()
+{
+	return m_clipMode;
 }
 
 

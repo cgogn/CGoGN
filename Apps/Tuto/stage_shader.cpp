@@ -163,12 +163,6 @@ void StageShader::slot_doubleSpinBox_PlaneOrigin(double c)
 	}
 }
 
-void StageShader::slot_doubleSpinBox_ColorAttenuationFactor(double c)
-{
-	m_shader->setClipColorAttenuationFactor((float)c);
-	updateGL();
-}
-
 void StageShader::slot_doubleSpinBox_GridDisplaySize(double c)
 {
 	m_shader->setClipPlanesDisplaySize((float)c);
@@ -206,7 +200,7 @@ void StageShader::slot_pushButton_addSphere()
 
 	std::string indexStr;
 	std::stringstream ss;
-	ss << (dock.comboBox_PlaneIndex->count() + 1);
+	ss << (dock.comboBox_SphereIndex->count() + 1);
 	indexStr = ss.str();
 
 	std::string str = "Sphere " + indexStr;
@@ -287,6 +281,25 @@ void StageShader::slot_doubleSpinBox_SphereGridColor(double c)
 	updateGL();
 }
 
+void StageShader::slot_doubleSpinBox_ColorAttenuationFactor(double c)
+{
+	m_shader->setClipColorAttenuationFactor((float)c);
+	updateGL();
+}
+
+void StageShader::slot_horizontalSlider_ClippingMode(int i)
+{
+	if (i == 0)
+		m_shader->setClipMode(Utils::ClippingShader::CLIPPING_MODE_AND);
+	else if (i == 1)
+		m_shader->setClipMode(Utils::ClippingShader::CLIPPING_MODE_OR);
+
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	updateGLMatrices();
+}
+
 void StageShader::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
@@ -351,7 +364,6 @@ void StageShader::initGUI()
 	setCallBack(dock.doubleSpinBox_PlaneOriginy, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
 	setCallBack(dock.doubleSpinBox_PlaneOriginz, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
 
-	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
 	setCallBack(dock.doubleSpinBox_GridDisplaySize, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridDisplaySize(double)));
 	setCallBack(dock.spinBox_GridResolutionX, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolutionX(int)));
 	setCallBack(dock.spinBox_GridResolutionY, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolutionY(int)));
@@ -364,7 +376,6 @@ void StageShader::initGUI()
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
-	dock.doubleSpinBox_ColorAttenuationFactor->setValue(m_shader->getClipColorAttenuationFactor());
 	dock.doubleSpinBox_GridDisplaySize->setValue(m_shader->getClipPlanesDisplaySize());
 	dock.spinBox_GridResolutionX->setValue(m_shader->getClipPlanesDisplayXRes());
 	dock.spinBox_GridResolutionY->setValue(m_shader->getClipPlanesDisplayYRes());
@@ -398,6 +409,18 @@ void StageShader::initGUI()
 	dock.doubleSpinBox_SphereGridColorR->setValue(spheresCol[0]);
 	dock.doubleSpinBox_SphereGridColorG->setValue(spheresCol[1]);
 	dock.doubleSpinBox_SphereGridColorB->setValue(spheresCol[2]);
+
+
+
+	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
+	setCallBack(dock.horizontalSlider_ClippingMode, SIGNAL(valueChanged(int)), SLOT(slot_horizontalSlider_ClippingMode(int)));
+
+	dock.doubleSpinBox_ColorAttenuationFactor->setValue(m_shader->getClipColorAttenuationFactor());
+	Utils::ClippingShader::clippingMode clipMode = m_shader->getClipMode();
+	if (clipMode == Utils::ClippingShader::CLIPPING_MODE_AND)
+		dock.horizontalSlider_ClippingMode->setValue(0);
+	else if (clipMode == Utils::ClippingShader::CLIPPING_MODE_OR)
+		dock.horizontalSlider_ClippingMode->setValue(1);
 
 }
 

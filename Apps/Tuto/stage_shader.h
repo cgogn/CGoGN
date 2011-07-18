@@ -133,7 +133,6 @@ public slots:
 	void slot_doubleSpinBox_PlaneVec2(double c);
 	void slot_doubleSpinBox_PlaneOrigin(double c);
 
-	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
 	void slot_doubleSpinBox_GridDisplaySize(double c);
 	void slot_spinBox_GridResolutionX(int i);
 	void slot_spinBox_GridResolutionY(int i);
@@ -150,6 +149,9 @@ public slots:
 	void slot_spinBox_SphereGridResolutionX(int i);
 	void slot_spinBox_SphereGridResolutionY(int i);
 	void slot_doubleSpinBox_SphereGridColor(double c);
+
+	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
+	void slot_horizontalSlider_ClippingMode(int i);
 
 	void button_compile();
 };

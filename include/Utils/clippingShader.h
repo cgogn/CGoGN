@@ -389,6 +389,9 @@ private:
 
 public:
 
+	/// enum used to choose which clipping mode to use
+	enum clippingMode { CLIPPING_MODE_AND, CLIPPING_MODE_OR };
+
 	/**
 	 * insert clipping instructions into shader source code
 	 * @warning this function is designed for shaders which *do not* use a geometry shader
@@ -404,6 +407,15 @@ public:
 	/// get the color attenuation factor for clipping
 	float getClipColorAttenuationFactor();
 
+	/*
+	 * set the clipping mode
+	 * @param clipMode clipping mode
+	 */
+	void setClipMode(clippingMode clipMode);
+
+	/// get the clipping mode
+	clippingMode getClipMode();
+
 private:
 
 	/// to control clipping code has been inserted before clipping objects have been added
@@ -414,6 +426,9 @@ private:
 
 	/// color attenuation factor uniform id
 	GLint m_unif_clipColorAttenuationFactor;
+
+	/// clipping mode
+	clippingMode m_clipMode;
 
 
 	/***********************************************

@@ -72,6 +72,8 @@ void Stage_shader_number_two::initGUI()
 	setCallBack( dock.slider_normalsSize, SIGNAL(valueChanged(int)), SLOT(slot_normalsSize(int)) ) ;
 
 	setCallBack(dock.doubleSpinBox_color_attenuation, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
+
+	dock.doubleSpinBox_color_attenuation->setValue(m_phongShader->getClipColorAttenuationFactor());
 }
 
 void Stage_shader_number_two::cb_initGL()
@@ -117,6 +119,8 @@ void Stage_shader_number_two::cb_initGL()
 	registerShader(m_vectorShader) ;
 	registerShader(m_simpleColorShader) ;
 	registerShader(m_pointSprite) ;
+
+	m_phongShader->insertClippingCode();
 
 	m_phongShader->setClipPlanesCount(1);
 }
