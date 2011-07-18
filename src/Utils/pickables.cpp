@@ -331,14 +331,15 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 		parfactor = 2;
 
 	unsigned int merAll = merfactor * mer;
-	unsigned int parAll = parfactor* par;
+	unsigned int parAll = parfactor* (par+1);
 
-	parAll += 1;
+//	parAll += 1;
 
 	std::vector<Geom::Vec3f> points;
 	points.reserve(parAll*merAll+2);
 
 
+	std::cout << "PAR="<<par << " / PARFACTOR="<<parfactor<< " / PARALL="<<parAll<< std::endl;
 
 	for (unsigned int i=0; i<parAll; ++i)
 	{
@@ -372,7 +373,7 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 
 	for (unsigned int i=0; i<par; ++i)
 	{
-		unsigned int k = i*parfactor*merAll + parfactor/2*merAll;
+		unsigned int k = i*parfactor*merAll + parfactor*merAll;
 		for (unsigned int j=0; j<merAll; ++j)
 		{
 			tableIndices.push_back(k+j);
@@ -869,7 +870,7 @@ void IcoSphere::subdivide(std::vector<unsigned int>& triangles, std::vector<Geom
 
 void IcoSphere::changeTopo(unsigned int sub)
 {
-	unsigned int subd = (unsigned int)(log(sub/2)/log(2.0))-1;
+	int subd = int(log(sub/2)/log(2.0))-1;
 	if (subd<0)
 		subd=0;
 
