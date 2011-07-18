@@ -95,7 +95,7 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TV
 						if(position[dd][0]!=position[map.phi1(dd)][0] || position[dd][1]!=position[map.phi1(dd)][1] || position[dd][2]!=position[map.phi1(dd)][2]) {
 							out << "cylinder{ " << std::endl;
 							out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
-							out << "<" << position[map.phi1(dd)][0] << "," << position[map.phi1(dd)][2] << "," << position[map.phi1(dd)][1] << ">, 0.5" << std::endl;
+							out << "<" << position[map.phi1(dd)][0] << "," << position[map.phi1(dd)][2] << "," << position[map.phi1(dd)][1] << ">, 1.5" << std::endl;
 							out << "}" << std::endl;
 						}
 						dd = map.phi1(dd);

@@ -45,7 +45,7 @@ public:
 // Base Class for Functors that need access to the map
 /********************************************************/
 template <typename MAP>
-class FunctorMap: public virtual FunctorType
+class FunctorMap : public virtual FunctorType
 {
 protected:
 	MAP& m_map ;

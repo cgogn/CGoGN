@@ -108,6 +108,20 @@ typename VEC3::DATA_TYPE squaredDistanceLine2Seg(const VEC3& A, const VEC3& AB, 
 template <typename VEC3>
 typename VEC3::DATA_TYPE squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB, typename VEC3::DATA_TYPE AB2, const VEC3& P) ;
 
+
+/**
+ * compute the closest points on a line from an other
+ * @param P1 one point on first line
+ * @param V1 vector defining first line
+ * @param P2 one point on second line
+ * @param P1 vector defining second line
+ * @param Q1 computed point of (P1,V1) closest of (P2,V2)
+ * @param Q2 computed point of (P2,V2) closest of (P1,V1)
+ * &return true if computaable
+ */
+template <typename VEC3>
+bool lineLineClosestPoints(const VEC3& P1, const VEC3& V1, const VEC3& P2, const VEC3& V2, VEC3& Q1, VEC3& Q2);
+
 } // namespace Geom
 
 } // namespace CGoGN

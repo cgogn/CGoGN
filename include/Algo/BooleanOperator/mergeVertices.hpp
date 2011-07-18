@@ -22,43 +22,61 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Algo/Filtering/functors.h"
-#include "Algo/Selection/collector.h"
-
 namespace CGoGN
 {
 
 namespace Algo
 {
 
-namespace Filtering
+namespace BooleanOperator
 {
 
 template <typename PFP>
-void filterAveragePositions(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
+void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e)
 {
-	typedef typename PFP::VEC3 VEC3 ;
-
-	FunctorAverage<typename PFP::MAP, typename PFP::VEC3> fa(map, position) ;
-	Algo::Selection::Collector_OneRing<PFP> c(map) ;
-
-	CellMarker markV(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
+	Dart dd;
+	do
 	{
-		if(select(d) && !markV.isMarked(d))
+		dd = map.alpha1(d);
+		map.removeEdgeFromVertex(dd);
+		Dart ee = e;
+		do
 		{
-			markV.mark(d);
+			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
+					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.alpha1(ee))])==Geom::RIGHT)
+			{
+				break;
+			}
+			ee = map.alpha1(ee);
+		} while(ee != e);
+		map.insertEdgeInVertex(ee,dd);
+	} while(dd!=d);
+}
 
-			c.collectBorder(d) ;
-			fa.reset() ;
-			c.applyOnBorder(fa) ;
-			position2[d] = fa.getAverage() ;
+template <typename PFP>
+void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions)
+{
+	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		CellMarker vM(map,VERTEX);
+		vM.mark(d);
+		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
+		{
+			if(!vM.isMarked(dd))
+			{
+				vM.mark(dd);
+				if(Geom::arePointsEquals(positions[d],positions[dd]))
+				{
+					mergeVertex<PFP>(map,positions,d,dd);
+				}
+			}
 		}
 	}
 }
 
-} // namespace Filtering
+}
 
-} // namespace Algo
+}
 
-} // namespace CGoGN
+}

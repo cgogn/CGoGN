@@ -122,26 +122,15 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 
 
 /*
- * TODO quadrangule volume
+ * volume subdivision scheme
  */
-
-/**
- * Quadrangule all the faces of the mesh
- */
-template <typename PFP, typename EMBV, typename EMB>
-void quadranguleFacesVolume(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
 
 template <typename PFP, typename EMBV, typename EMB>
 void hexaCutVolume(typename PFP::MAP& map, Dart d, EMBV& attributs);
 
-template <typename PFP, typename EMBV, typename EMB>
-void dooSabinVolume(typename PFP::MAP& map, Dart d, EMBV& attributs);
 
-/*
- * Quadrangule a Volume
- */
-template <typename PFP, typename EMBV, typename EMB>
-void quadranguleVolumes(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue());
+template <typename PFP>
+void splitVolumes(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 
 // TODO a mettre ailleurs ?
