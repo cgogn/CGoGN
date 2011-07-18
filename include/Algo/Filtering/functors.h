@@ -22,60 +22,79 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/attribmap.h"
+#ifndef __FILTERING_FUNCTORS_H__
+#define __FILTERING_FUNCTORS_H__
+
+#include "Topology/generic/functor.h"
+#include "Algo/Geometry/intersection.h"
 
 namespace CGoGN
 {
 
-AttribMap::AttribMap() : GenericMap()
+namespace Algo
 {
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
-	m_markTables[DART][0] = amv ;
-}
 
-/****************************************
- *   EMBEDDING ATTRIBUTES MANAGEMENT    *
- ****************************************/
-
-void AttribMap::addEmbedding(unsigned int orbit)
+namespace Filtering
 {
-	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
 
-	std::ostringstream oss;
-	oss << "EMB_" << orbit;
-
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[orbit] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		amv->operator[](i) = EMBNULL ;
-
-	AttributeContainer& cellCont = m_attribs[orbit];
-	for (unsigned int t = 0; t < m_nbThreads; ++t)
+template <typename T>
+class FunctorAverage : public virtual FunctorType
+{
+protected:
+	const AttributeHandler<T>& attr ;
+	T sum ;
+	unsigned int count ;
+public:
+	FunctorAverage(const AttributeHandler<T>& a) : FunctorType(), attr(a), sum(0), count(0)
+	{}
+	bool operator()(Dart d)
 	{
-		std::stringstream ss ;
-		ss << "Mark_"<< t ;
-		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
-			amvMark->operator[](i).clear() ;
-		m_markTables[orbit][t] = amvMark ;
+		sum += attr[d] ;
+		++count ;
+		return false ;
 	}
-}
+	inline void reset() { sum = T(0) ; count = 0 ; }
+	inline T getSum() { return sum ; }
+	inline unsigned int getCount() { return count ; }
+	inline T getAverage() { return sum / typename T::DATA_TYPE(count) ; }
+} ;
 
-/****************************************
- *               UTILITIES              *
- ****************************************/
-
-unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
+template <typename PFP, typename T>
+class FunctorAverageOnSphereBorder : public FunctorMap<typename PFP::MAP>
 {
-	AttributeContainer& cont = m_attribs[idx.getOrbit()] ;
-	unsigned int cpt = 0 ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		idx[i] = cpt++ ;
-	return cpt ;
-}
+	typedef typename PFP::VEC3 VEC3;
+protected:
+	const AttributeHandler<T>& attr ;
+	const AttributeHandler<VEC3>& position ;
+	VEC3 center;
+	typename PFP::REAL radius;
+	T sum ;
+	unsigned int count ;
+public:
+	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T>& a, const AttributeHandler<VEC3>& p) :
+		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), sum(0), count(0)
+	{
+		center = VEC3(0);
+		radius = 0;
+	}
+	bool operator()(Dart d)
+	{
+		typename PFP::REAL alpha = 0;
+		Algo::Geometry::intersectionSphereEdge<PFP>(this->m_map, center, radius, d, position, alpha);
+		sum += (1 - alpha) * attr[d] + alpha * attr[this->m_map.phi1(d)] ;
+		++count ;
+		return false ;
+	}
+	inline void reset(VEC3& c, typename PFP::REAL r) { center = c; radius = r; sum = T(0) ; count = 0 ; }
+	inline T getSum() { return sum ; }
+	inline unsigned int getCount() { return count ; }
+	inline T getAverage() { return sum / typename T::DATA_TYPE(count) ; }
+} ;
+
+} // namespace Filtering
+
+} // namespace Algo
 
 } // namespace CGoGN
+
+#endif

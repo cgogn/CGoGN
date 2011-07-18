@@ -92,14 +92,14 @@ protected:
 	AttributeMultiVector<unsigned int>* m_embeddings[NB_ORBITS] ;
 
 	/**
-	 * Markers manager
+	 * Marks manager
 	 */
-	MarkerSet m_orbMarker[NB_ORBITS][NB_THREAD] ;
+	MarkSet m_marksets[NB_ORBITS][NB_THREAD] ;
 
 	/**
 	 * Direct access to the attributes that store Marks
 	 */
-	AttributeMultiVector<Mark>* m_markerTables[NB_ORBITS][NB_THREAD];
+	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD];
 
 	unsigned int m_nbThreads;
 
@@ -233,10 +233,10 @@ public:
 	AttributeContainer& getAttributeContainer(unsigned int orbit);
 
 	/**
-	 * get a multi vector of marker attribute (direct access with [i])
+	 * get a multi vector of mark attribute (direct access with [i])
 	 * @param orbit code
 	 */
-	AttributeMultiVector<Mark>* getMarkerVector(unsigned int orbit, unsigned int thread = 0);
+	AttributeMultiVector<Mark>* getMarkVector(unsigned int orbit, unsigned int thread = 0);
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
@@ -271,13 +271,13 @@ protected:
 	 * @param orbit the orbit of cell to use (xxx_ORBIT)
 	 * @return the marker to use
 	 */
-	Marker getNewMarker(unsigned int cell = DART, unsigned int thread = 0);
+	Mark getNewMark(unsigned int cell, unsigned int thread = 0);
 
 	/**
 	 * release a marker of cell.
 	 * @param m the marker to release
 	 */
-	void releaseMarker(Marker m, unsigned int thread = 0);
+	void releaseMark(Mark m, unsigned int cell, unsigned int thread = 0);
 
 	/****************************************
 	 *          THREAD MANAGEMENT           *
@@ -297,7 +297,7 @@ public:
 	unsigned int getNbThreadMarkers();
 
 	/**
-	 *	Remove some added threads
+	 * Remove some added threads
 	 * @return remaining number of threads (including principal)
 	 */
 	void removeThreadMarker(unsigned int nb);

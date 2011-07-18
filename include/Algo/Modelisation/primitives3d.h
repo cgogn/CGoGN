@@ -141,7 +141,7 @@ public:
 	* mark all darts of the primitive 
 	* @param m the marker to use 
 	*/
-	void mark(Marker m);
+//	void mark(Mark m);
 
 
 	/**

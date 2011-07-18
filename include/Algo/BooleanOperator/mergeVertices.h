@@ -22,60 +22,34 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/attribmap.h"
+#ifndef __ALGO_BOOLEANOPERATOR_VERTICES_H__
+#define __ALGO_BOOLEANOPERATOR_VERTICES_H__
+
+#include "Geometry/basic.h"
+#include "Geometry/inclusion.h"
+#include "Geometry/orientation.h"
 
 namespace CGoGN
 {
 
-AttribMap::AttribMap() : GenericMap()
+namespace Algo
 {
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
-	m_markTables[DART][0] = amv ;
+
+namespace BooleanOperator
+{
+
+template <typename PFP>
+void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e);
+
+template <typename PFP>
+void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions);
+
 }
 
-/****************************************
- *   EMBEDDING ATTRIBUTES MANAGEMENT    *
- ****************************************/
-
-void AttribMap::addEmbedding(unsigned int orbit)
-{
-	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
-
-	std::ostringstream oss;
-	oss << "EMB_" << orbit;
-
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[orbit] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		amv->operator[](i) = EMBNULL ;
-
-	AttributeContainer& cellCont = m_attribs[orbit];
-	for (unsigned int t = 0; t < m_nbThreads; ++t)
-	{
-		std::stringstream ss ;
-		ss << "Mark_"<< t ;
-		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
-			amvMark->operator[](i).clear() ;
-		m_markTables[orbit][t] = amvMark ;
-	}
 }
 
-/****************************************
- *               UTILITIES              *
- ****************************************/
-
-unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
-{
-	AttributeContainer& cont = m_attribs[idx.getOrbit()] ;
-	unsigned int cpt = 0 ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		idx[i] = cpt++ ;
-	return cpt ;
 }
 
-} // namespace CGoGN
+#include "mergeVertices.hpp"
+
+#endif
