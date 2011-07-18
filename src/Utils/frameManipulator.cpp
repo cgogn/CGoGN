@@ -618,17 +618,21 @@ void FrameManipulator::setTransformation( const glm::mat4& transfo)
 	m_rotations[2][2] = Rz[2];
 }
 
-void  FrameManipulator::lock(unsigned int axis)
+void FrameManipulator::lock(unsigned int axis)
 {
 	m_locked_axis[axis] = true;
 }
 
 
-void  FrameManipulator::unlock(unsigned int axis)
+void FrameManipulator::unlock(unsigned int axis)
 {
 	m_locked_axis[axis] = false;
 }
 
+bool FrameManipulator::locked(unsigned int axis)
+{
+	return m_locked_axis[axis];
+}
 
 Geom::Vec3f  FrameManipulator::getAxis(unsigned int ax)
 {
@@ -641,19 +645,20 @@ Geom::Vec3f  FrameManipulator::getAxis(unsigned int ax)
 void FrameManipulator::storeProjection(unsigned int ax)
 {
 	Geom::Vec3f O = getPosition();
-	Geom::Vec3f A = getAxis(ax);
-	A += O;
 
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
 	glm::vec3 winO = glm::project(glm::vec3(O[0],O[1],O[2]), GLSLShader::currentModelView(), GLSLShader::currentProjection(), viewport);
-	glm::vec3 winA = glm::project(glm::vec3(A[0],A[1],A[2]), GLSLShader::currentModelView(), GLSLShader::currentProjection(), viewport);
+	m_projectedOrigin = Geom::Vec3f(winO[0], winO[1], winO[2]);
 
-	m_projectedOrigin = Geom::Vec3f(winO[0],winO[1],0.0f);
-	if (winA[2]-winO[2] < 0.0f)
-		m_projectedSelectedAxis = Geom::Vec3f(winA[0]-winO[0], winA[1]-winO[1],-1.0f);
-	else
-		m_projectedSelectedAxis = Geom::Vec3f(winA[0]-winO[0], winA[1]-winO[1],1.0f);
+	if (ax>CENTER)
+	{
+		Geom::Vec3f A = getAxis(ax);
+		A += O;
+		glm::vec3 winA = glm::project(glm::vec3(A[0],A[1],A[2]), GLSLShader::currentModelView(), GLSLShader::currentProjection(), viewport);
+		m_projectedSelectedAxis = Geom::Vec3f(winA[0]-winO[0], winA[1]-winO[1],winA[2]-winO[2]);
+	}
+
 }
 
 
@@ -692,6 +697,41 @@ float FrameManipulator::scaleFromMouse(int dx, int dy)
 
 	return 1.0f + sc;
 }
+
+void FrameManipulator::translateInScreen(int dx, int dy)
+{
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	Geom::Vec3f NO = m_projectedOrigin+Geom::Vec3f(float(dx), float(dy), 0.0f);
+
+	glm::vec3 P = glm::unProject(glm::vec3(NO[0],NO[1],NO[2]), GLSLShader::currentModelView(), GLSLShader::currentProjection(), viewport);
+
+	m_trans[0] = P[0];
+	m_trans[1] = P[1];
+	m_trans[2] = P[2];
+	storeProjection(NONE);
+
+}
+
+void FrameManipulator::rotateInScreen(int dx, int dy)
+{
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	Geom::Vec3f NO = m_projectedOrigin+Geom::Vec3f(float(-dy), float(dx), 0.0f);
+
+	glm::vec3 P = glm::unProject(glm::vec3(NO[0],NO[1],NO[2]), GLSLShader::currentModelView(), GLSLShader::currentProjection(), viewport);
+
+	Geom::Vec3f axisRotation(P[0]-m_trans[0], P[1]-m_trans[1], P[2]-m_trans[2]);
+	axisRotation.normalize();
+
+	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),float(sqrtf(dx*dx+dy*dy))/2.0f,glm::vec3(axisRotation[0],axisRotation[1],axisRotation[2]));
+	m_rotations = tr*m_rotations;
+
+}
+
+
 
 }
 }

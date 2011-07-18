@@ -174,9 +174,6 @@ void  MyQT::cb_mousePress(int button, int x, int y)
 			m_pickedAxis=fr_picked;
 	}
 
-	// project center & axis on screen for easy manipulation
-	if (m_pickedAxis != Utils::FrameManipulator::NONE)
-		m_frame->storeProjection(m_pickedAxis);
 
 	// highlighting
 	m_frame->highlight(m_pickedAxis);
@@ -192,33 +189,60 @@ void  MyQT::cb_mousePress(int button, int x, int y)
 		}
 	}
 
+	// store origin & selected axis on on screen projection for easy manipulation.
+	m_frame->storeProjection(m_pickedAxis);
+
 	updateGL();
 
 }
 
-void  MyQT::cb_mouseMove(int button, int x, int y)
+void  MyQT::cb_mouseMove(int buttons, int x, int y)
 {
 	if (!Shift())
 		return;
 
+	// rotation selected ?
 	if (Utils::FrameManipulator::rotationAxis(m_pickedAxis))
 	{
-		float angle = m_frame->angleFromMouse(x,y,x-m_begX, y-m_begY);
-		m_frame->rotate(m_pickedAxis, angle);
+		if (buttons&1)
+		{
+			float angle = m_frame->angleFromMouse(x,y,x-m_begX, y-m_begY);
+			m_frame->rotate(m_pickedAxis, angle);
+		}
+		else if (buttons&2)
+			m_frame->rotateInScreen(x-m_begX, y-m_begY);
+
 		m_lastPickedObject->transfo() = m_frame->transfo();
 	}
+	// translation selected
 	else if (Utils::FrameManipulator::translationAxis(m_pickedAxis))
 	{
-		float dist =  m_frame->distanceFromMouse(x-m_begX, y-m_begY);
-		m_frame->translate(m_pickedAxis, dist);
+		if (buttons&1)
+		{
+			float dist =  m_frame->distanceFromMouse(x-m_begX, y-m_begY);
+			m_frame->translate(m_pickedAxis, dist);
+		}
+		else if (buttons&2)
+			m_frame->translateInScreen(x-m_begX, y-m_begY);
+
 		m_lastPickedObject->transfo() = m_frame->transfo();
 	}
+	// scale selected
 	else if (Utils::FrameManipulator::scaleAxis(m_pickedAxis) )
 	{
 		float scale = m_frame->scaleFromMouse(x-m_begX, y-m_begY);
 		m_frame->scale(m_pickedAxis, scale );
 		m_lastPickedObject->transfo() = m_frame->transfo();
 	}
+//	// nothing selected: using screen translation/rotation (button left/right)
+//	else if (m_lastPickedObject)
+//	{
+//		if (buttons&1)
+//			m_frame->translateInScreen(x-m_begX, y-m_begY);
+//		else if (buttons&2)
+//			m_frame->rotateInScreen(x-m_begX, y-m_begY);
+//		m_lastPickedObject->transfo() = m_frame->transfo();
+//	}
 
 	m_begX = x;
 	m_begY = y;
@@ -274,42 +298,61 @@ void  MyQT::cb_keyPress(int code)
 			m_frame->setTransformation(m_lastPickedObject->transfo());
 		break;
 	case 'x':
-		m_frame->lock(Utils::FrameManipulator::Xt);
+		if (m_frame->locked(Utils::FrameManipulator::Xt))
+			m_frame->unlock(Utils::FrameManipulator::Xt);
+		else
+			m_frame->lock(Utils::FrameManipulator::Xt);
 		break;
 	case 'y':
-		m_frame->lock(Utils::FrameManipulator::Yt);
+		if (m_frame->locked(Utils::FrameManipulator::Yt))
+			m_frame->unlock(Utils::FrameManipulator::Yt);
+		else
+			m_frame->lock(Utils::FrameManipulator::Yt);
 		break;
 	case 'z':
-		m_frame->lock(Utils::FrameManipulator::Zt);
+		if (m_frame->locked(Utils::FrameManipulator::Zt))
+			m_frame->unlock(Utils::FrameManipulator::Zt);
+		else
+			m_frame->lock(Utils::FrameManipulator::Zt);
 		break;
-	case 'X':
-		m_frame->unlock(Utils::FrameManipulator::Xt);
-		break;
-	case 'Y':
-		m_frame->unlock(Utils::FrameManipulator::Yt);
-		break;
-	case 'Z':
-		m_frame->unlock(Utils::FrameManipulator::Zt);
-		break;
-
 	case 'a':
-		m_frame->lock(Utils::FrameManipulator::Xr);
+		if (m_frame->locked(Utils::FrameManipulator::Xr))
+			m_frame->unlock(Utils::FrameManipulator::Xr);
+		else
+			m_frame->lock(Utils::FrameManipulator::Xr);
 		break;
 	case 'b':
-		m_frame->lock(Utils::FrameManipulator::Yr);
+		if (m_frame->locked(Utils::FrameManipulator::Yr))
+			m_frame->unlock(Utils::FrameManipulator::Yr);
+		else
+			m_frame->lock(Utils::FrameManipulator::Yr);
 		break;
 	case 'c':
-		m_frame->lock(Utils::FrameManipulator::Zr);
+		if (m_frame->locked(Utils::FrameManipulator::Zr))
+			m_frame->unlock(Utils::FrameManipulator::Zr);
+		else
+			m_frame->lock(Utils::FrameManipulator::Zr);
 		break;
-	case 'A':
-		m_frame->unlock(Utils::FrameManipulator::Xr);
+
+	case 's':
+		if (m_frame->locked(Utils::FrameManipulator::Xs))
+			m_frame->unlock(Utils::FrameManipulator::Xs);
+		else
+			m_frame->lock(Utils::FrameManipulator::Xs);
 		break;
-	case 'B':
-		m_frame->unlock(Utils::FrameManipulator::Yr);
+	case 't':
+		if (m_frame->locked(Utils::FrameManipulator::Ys))
+			m_frame->unlock(Utils::FrameManipulator::Ys);
+		else
+			m_frame->lock(Utils::FrameManipulator::Ys);
 		break;
-	case 'C':
-		m_frame->unlock(Utils::FrameManipulator::Zr);
+	case 'u':
+		if (m_frame->locked(Utils::FrameManipulator::Zs))
+			m_frame->unlock(Utils::FrameManipulator::Zs);
+		else
+			m_frame->lock(Utils::FrameManipulator::Zs);
 		break;
+
 	}
 	updateGL();
 }
@@ -325,6 +368,11 @@ int main(int argc, char **argv)
 
 	if (argc>1)
 		sqt.NBP = atoi(argv[1]);
+
+
+	sqt.setHelpMsg("Param :size of grid (number of objects)\nMpuse:\n"
+			" -click on object: selection\n -left click on frame: constraint 3d Rotation/Translation/Scale\n"
+			" -right click on frame :free 2D Rotation/Translation\nKeys:\n  x/y/z lock/unlock translation\n  a/b/c lock/unlock rotation\n   s/t/u lock/unlock scaling");
 
     //  bounding box
     Geom::Vec3f lPosObj = Geom::Vec3f(0.0f,0.0f,0.0f);

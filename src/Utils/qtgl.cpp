@@ -294,7 +294,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 	}
 
 	if (m_cbs)
-		m_cbs->cb_mouseMove(event->button(), event->x(), getHeight() - event->y());
+		m_cbs->cb_mouseMove(event->buttons(), event->x(), getHeight() - event->y());
 }
 
 void GLWidget::wheelEvent(QWheelEvent* event)
