@@ -43,6 +43,21 @@ enum Intersection
 	FACE_INTERSECTION = 3
 } ;
 
+
+/**
+ * test the intersection between a line and a triangle
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param PlaneP point of plane
+ * @param NormP normal of plane
+ * @param Inter store the intersection point
+ * @return the intersection ( FACE_INTERSECTION = OK, EDGE_INTERSECTION = line inside of plane)
+ */
+template <typename VEC3>
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP,  const VEC3& NormP, VEC3& Inter) ;
+
+
+
 /**
  * test the intersection between a ray and a triangle
  */

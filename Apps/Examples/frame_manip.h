@@ -21,112 +21,73 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#ifndef POLYHEDRONSVIEW_H_
+#define POLYHEDRONSVIEW_H_
 
-#ifndef __CGoGN_GLSL_VBO__
-#define __CGoGN_GLSL_VBO__
+#include <iostream>
 
-#include <vector>
-#include <GL/glew.h>
 
-#include "Topology/generic/attributeHandler.h"
-#include "Container/convert.h"
+#include "Utils/qtSimple.h"
+#include "Utils/frameManipulator.h"
+#include "Utils/drawer.h"
 
-namespace CGoGN
-{
+// forward definitions (minimize includes)
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
+namespace CGoGN { namespace Utils { class VBO; } }
+namespace CGoGN { namespace Utils { class ShaderFlat; } }
+namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 
-namespace Utils
-{
-
-class GLSLShader;
+using namespace CGoGN ;
 
 /**
- * Encapsulation of OpenGL Vertex Buffer Object
- * Manage
- * - alloc /release of GL buffer
- * - ref by Shaders
- * - size of data (invidual cells)
+ * A class for a little interface and rendering
  */
-class VBO
+
+class MyQT: public Utils::QT::SimpleQT
 {
-protected:
-	// VBO id
-	GLuint m_id;
-	// size of data (in floats)
-	unsigned int m_data_size;
-	// shaders that ref this vbo
-	std::vector<GLSLShader*> m_refs;
-	unsigned int m_nbElts;
-	mutable bool m_lock;
-
+	Q_OBJECT
 public:
-	/**
-	 * constructor: allocate the OGL VBO
-	 */
-	VBO();
+	// render
+	Algo::Render::GL2::MapRender* m_render;
 
-	/**
-	 * copy constructor, new VBO copy content
-	 */
-	VBO(const VBO& vbo);
+	// VBO
+	Utils::VBO* m_positionVBO;
 
-	/**
-	 * destructor: release the OGL VBO and clean references between VBO/Shaders
-	 */
-	~VBO();
+	Utils::FrameManipulator* m_frame;
+	unsigned int m_pickedAxis;
 
-	/**
-	 * get id of vbo
-	 */
-	unsigned int id() const { return m_id; }
+	///vector of six drawables
+	std::vector<Utils::LineDrawable*> m_ld;
 
-	/**
-	 * get dataSize
-	 */
-	unsigned int dataSize() const { return m_data_size; }
+	/// precision of drawing (number of subdivisions)
+	unsigned int m_precDraw;
 
-	/**
-	 * set the data size (in number of float)
-	 */
-	void setDataSize(unsigned int ds) { m_data_size = ds; }
+	std::vector<Utils::Pickable*> m_pickables;
+	Utils::Pickable* m_lastPickedObject;
 
-	/**
-	 * bind array vbo
-	 */
-	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER,m_id); }
+	// width of cube of pickable
+	unsigned int NBP;
 
-	/**
-	 * reference vbo as used by shader sh
-	 */
-	void ref(GLSLShader* sh);
+	MyQT():m_render(NULL), m_positionVBO(NULL),NBP(2){}
 
+	// callbacks of simpleQT to overdefine:
+	void cb_redraw();
 
-	void sameAllocSameBufferSize(const VBO& vbo);
+	void cb_initGL();
 
-	/**
-	 * update data from attribute handler to the vbo
-	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib);
+	void cb_mousePress(int button, int x, int y);
 
-	/**
-	 * update data from attribute handler to the vbo, with conversion
-	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv);
+	void  cb_wheelEvent(int delta, int x, int y);
 
-	void* lockPtr();
+	void cb_keyPress(int code);
 
-	const void* lockPtr() const;
+	void cb_mouseMove(int button, int x, int y);
 
-	void releasePtr() const;
-
-	unsigned int nbElts() {return m_nbElts;}
+	int m_begX;
+	int m_begY;
+	Geom::Vec3f m_projAxis;
+	Geom::Vec3f m_projCenter;
 };
 
-} // namespace Utils
-
-} // namespace CGoGN
-
-#include "Utils/vbo.hpp"
-
 #endif
+

@@ -29,6 +29,7 @@
 
 #include "Utils/qtSimple.h"
 #include "glm/gtc/type_precision.hpp"
+#include "Utils/GLSLShader.h"
 
 namespace CGoGN
 {
@@ -105,15 +106,15 @@ void GLWidget::recalcModelView()
 	// tourne l'objet / mvt souris
 	glm::mat4 m;
 	build_rotmatrixgl3(m, m_cbs->curquat());
-	// update matrice
+//	// update matrice
 	m_cbs->modelViewMatrix() *= m;
-
-	// ajout transformation in screen
-	m_cbs->modelViewMatrix()*= m_cbs->transfoMatrix();
 
 	// transfo pour que l'objet soit centre et a la bonne taille
 	oglScale(m_obj_sc, m_obj_sc, m_obj_sc);
 	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
+
+	// ajout transformation
+//	m_cbs->modelViewMatrix() *=m_cbs->transfoMatrix();
 
 	newModel = 0;
 
@@ -123,7 +124,7 @@ void GLWidget::recalcModelView()
 
 void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 {
-	oglPushModelViewMatrix();
+	glm::mat4 storeMVM(m_cbs->modelViewMatrix());
 
 	m_cbs->modelViewMatrix() = glm::mat4(1.0f);
 
@@ -155,7 +156,7 @@ void GLWidget::changeCenterOfRotation(const glm::vec3& newCenter)
 	m_cbs->trans_y() = m_cbs->modelViewMatrix()[3][1];
 	m_cbs->trans_z() = m_cbs->modelViewMatrix()[3][2];
 
-	oglPopModelViewMatrix();
+	m_cbs->modelViewMatrix() = storeMVM;
 
 	m_obj_pos = glm::vec3(-newCenter[0], -newCenter[1], -newCenter[2]);
 }
@@ -192,7 +193,11 @@ void GLWidget::paintGL()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (m_cbs)
+	{
+		Utils::GLSLShader::s_current_matrices = m_cbs->matricesPtr();
 		m_cbs->cb_redraw();
+	}
+
 }
 
 void GLWidget::mousePressEvent(QMouseEvent* event)
@@ -319,10 +324,11 @@ void GLWidget::closeEvent(QCloseEvent *event)
 
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Escape)
+
+	if (event->key() == Qt::Key_Escape)
         close();
-    else
-    	QWidget::keyPressEvent(event);
+//    else
+//    	QWidget::keyPressEvent(event);
 
     m_state_modifier = event->modifiers();
 
@@ -336,7 +342,7 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
 
 void GLWidget::keyReleaseEvent(QKeyEvent *event)
 {
-	QWidget::keyReleaseEvent(event);
+//	QWidget::keyReleaseEvent(event);
 
 	m_state_modifier = event->modifiers();
     int k = event->key();
@@ -389,19 +395,6 @@ void GLWidget::oglScale(float sx, float sy, float sz)
 	m_cbs->modelViewMatrix() = glm::scale(m_cbs->modelViewMatrix(), glm::vec3(sx,sy,sz));
 }
 
-void GLWidget::oglPushModelViewMatrix()
-{
-	m_stack_mv.push(m_cbs->modelViewMatrix());
-}
-
-bool GLWidget::oglPopModelViewMatrix()
-{
-	if (m_stack_mv.empty())
-		return false;
-	m_cbs->modelViewMatrix() = m_stack_mv.top();
-	m_stack_mv.pop();
-	return true;
-}
 
 } // namespace QT
 
