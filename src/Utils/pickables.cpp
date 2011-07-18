@@ -333,13 +333,8 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 	unsigned int merAll = merfactor * mer;
 	unsigned int parAll = parfactor* (par+1);
 
-//	parAll += 1;
-
 	std::vector<Geom::Vec3f> points;
 	points.reserve(parAll*merAll+2);
-
-
-	std::cout << "PAR="<<par << " / PARFACTOR="<<parfactor<< " / PARALL="<<parAll<< std::endl;
 
 	for (unsigned int i=0; i<parAll; ++i)
 	{
