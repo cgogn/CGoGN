@@ -370,7 +370,7 @@ int main(int argc, char **argv)
 		sqt.NBP = atoi(argv[1]);
 
 
-	sqt.setHelpMsg("Param :size of grid (number of objects)\nMpuse:\n"
+	sqt.setHelpMsg("Param :size of grid (number of objects)\nMpuse (with shift):\n"
 			" -click on object: selection\n -left click on frame: constraint 3d Rotation/Translation/Scale\n"
 			" -right click on frame :free 2D Rotation/Translation\nKeys:\n  x/y/z lock/unlock translation\n  a/b/c lock/unlock rotation\n   s/t/u lock/unlock scaling");
 
