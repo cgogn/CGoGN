@@ -259,7 +259,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
 	{
-		CGoGNerr << "Unable to open file " << CGoGNout ;
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
 		return false ;
 	}
 
