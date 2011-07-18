@@ -318,12 +318,11 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 		name << "colorPTM_a" << i ;
 		colorPTM[i] = map.template getAttribute<VEC3>(VERTEX,name.str()) ;
 	}
-	const unsigned int degree = colorPTM[14].isValid() ? 4 : (colorPTM[9].isValid() ? 3 : 2) ;
-
+	const unsigned int nbCoefs = colorPTM[14].isValid() ? 15 : (colorPTM[9].isValid() ? 10 : 6) ;
 
 	out << "ply" << std::endl ;
 	out << "format ascii 1.0" << std::endl ;
-	out << "comment ply PTM" << std::endl ;
+	out << "comment ply PTM (K. Vanhoey generic format)" << std::endl ;
 	out << "element vertex " << vertices.size() << std::endl ;
 	out << "property float x" << std::endl ;
 	out << "property float y" << std::endl ;
@@ -337,63 +336,12 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	out << "property float nx" << std::endl ;
 	out << "property float ny" << std::endl ;
 	out << "property float nz" << std::endl ;
-	out << "property float L1_a0" << std::endl ;
-	out << "property float L1_a1" << std::endl ;
-	out << "property float L1_a2" << std::endl ;
-	out << "property float L1_a3" << std::endl ;
-	out << "property float L1_a4" << std::endl ;
-	out << "property float L1_a5" << std::endl ;
-	if (degree > 2) {
-		out << "property float L1_a6" << std::endl ;
-		out << "property float L1_a7" << std::endl ;
-		out << "property float L1_a8" << std::endl ;
-		out << "property float L1_a9" << std::endl ;
-		if (degree > 3) {
-			out << "property float L1_a10" << std::endl ;
-			out << "property float L1_a11" << std::endl ;
-			out << "property float L1_a12" << std::endl ;
-			out << "property float L1_a13" << std::endl ;
-			out << "property float L1_a14" << std::endl ;
-		}
-	}
-	out << "property float L2_a0" << std::endl ;
-	out << "property float L2_a1" << std::endl ;
-	out << "property float L2_a2" << std::endl ;
-	out << "property float L2_a3" << std::endl ;
-	out << "property float L2_a4" << std::endl ;
-	out << "property float L2_a5" << std::endl ;
-	if (degree > 2) {
-		out << "property float L2_a6" << std::endl ;
-		out << "property float L2_a7" << std::endl ;
-		out << "property float L2_a8" << std::endl ;
-		out << "property float L2_a9" << std::endl ;
-		if (degree > 3) {
-			out << "property float L2_a10" << std::endl ;
-			out << "property float L2_a11" << std::endl ;
-			out << "property float L2_a12" << std::endl ;
-			out << "property float L2_a13" << std::endl ;
-			out << "property float L2_a14" << std::endl ;
-		}
-	}
-	out << "property float L3_a0" << std::endl ;
-	out << "property float L3_a1" << std::endl ;
-	out << "property float L3_a2" << std::endl ;
-	out << "property float L3_a3" << std::endl ;
-	out << "property float L3_a4" << std::endl ;
-	out << "property float L3_a5" << std::endl ;
-	if (degree > 2) {
-		out << "property float L3_a6" << std::endl ;
-		out << "property float L3_a7" << std::endl ;
-		out << "property float L3_a8" << std::endl ;
-		out << "property float L3_a9" << std::endl ;
-		if (degree > 3) {
-			out << "property float L3_a10" << std::endl ;
-			out << "property float L3_a11" << std::endl ;
-			out << "property float L3_a12" << std::endl ;
-			out << "property float L3_a13" << std::endl ;
-			out << "property float L3_a14" << std::endl ;
-		}
-	}
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		out << "property float L1_a" << coefI << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		out << "property float L2_a" << coefI << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		out << "property float L3_a" << coefI << std::endl ;
 
 	TREAL errL2 = map.template getAttribute<REAL>(VERTEX,"errL2") ;
 	TREAL errLmax = map.template getAttribute<REAL>(VERTEX,"errLmax") ;
@@ -409,72 +357,24 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	out << "property list uchar int vertex_indices" << std::endl ;
 	out << "end_header" << std::endl ;
 
-	switch (degree) {
-	case(2) :
-			for(unsigned int i = 0; i < vertices.size(); ++i)
-			{
-				unsigned int vi = vertices[i];
-				out << position[vi][0] << " " << position[vi][1] << " " << position[vi][2] << " " ;
-				out << frame[0][vi][0] << " " << frame[0][vi][1] << " " << frame[0][vi][2] << " " ;
-				out << frame[1][vi][0] << " " << frame[1][vi][1] << " " << frame[1][vi][2] << " " ;
-				out << frame[2][vi][0] << " " << frame[2][vi][1] << " " << frame[2][vi][2] << " " ;
-				out << colorPTM[0][vi][0] << " " << colorPTM[1][vi][0] << " " << colorPTM[2][vi][0] << " " << colorPTM[3][vi][0] << " " << colorPTM[4][vi][0] << " " << colorPTM[5][vi][0] << " " ;
-				out << colorPTM[0][vi][1] << " " << colorPTM[1][vi][1] << " " << colorPTM[2][vi][1] << " " << colorPTM[3][vi][1] << " " << colorPTM[4][vi][1] << " " << colorPTM[5][vi][1] << " " ;
-				out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << " " ;
-				if (errL2.isValid())
-					out << errL2[vi] << " " ;
-				if (errLmax.isValid())
-					out << errLmax[vi] << " " ;
-				if (stdDev.isValid())
-					out << stdDev[vi] << " " ;
-				out << std::endl ;
-			}
-			break ;
-	case(3) :
-			for(unsigned int i = 0; i < vertices.size(); ++i)
-			{
-				unsigned int vi = vertices[i];
-				out << position[vi][0] << " " << position[vi][1] << " " << position[vi][2] << " " ;
-				out << frame[0][vi][0] << " " << frame[0][vi][1] << " " << frame[0][vi][2] << " " ;
-				out << frame[1][vi][0] << " " << frame[1][vi][1] << " " << frame[1][vi][2] << " " ;
-				out << frame[2][vi][0] << " " << frame[2][vi][1] << " " << frame[2][vi][2] << " " ;
-				out << colorPTM[0][vi][0] << " " << colorPTM[1][vi][0] << " " << colorPTM[2][vi][0] << " " << colorPTM[3][vi][0] << " " << colorPTM[4][vi][0] << " " << colorPTM[5][vi][0] << " " << colorPTM[6][vi][0] << " " << colorPTM[7][vi][0] << " " << colorPTM[8][vi][0] << " " << colorPTM[9][vi][0] << " " ;
-				out << colorPTM[0][vi][1] << " " << colorPTM[1][vi][1] << " " << colorPTM[2][vi][1] << " " << colorPTM[3][vi][1] << " " << colorPTM[4][vi][1] << " " << colorPTM[5][vi][1] << " " << colorPTM[6][vi][1] << " " << colorPTM[7][vi][1] << " " << colorPTM[8][vi][1] << " " << colorPTM[9][vi][1] << " " ;
-				out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << " " << colorPTM[6][vi][2] << " " << colorPTM[7][vi][2] << " " << colorPTM[8][vi][2] << " " << colorPTM[9][vi][2] << " " ;
-				if (errL2.isValid())
-					out << errL2[vi] << " " ;
-				if (errLmax.isValid())
-					out << errLmax[vi] << " " ;
-				if (stdDev.isValid())
-					out << stdDev[vi] << " " ;
-				out << std::endl ;
-			}
-
-			break ;
-	case (4) :
-			for(unsigned int i = 0; i < vertices.size(); ++i)
-			{
-				unsigned int vi = vertices[i];
-				out << position[vi][0] << " " << position[vi][1] << " " << position[vi][2] << " " ;
-				out << frame[0][vi][0] << " " << frame[0][vi][1] << " " << frame[0][vi][2] << " " ;
-				out << frame[1][vi][0] << " " << frame[1][vi][1] << " " << frame[1][vi][2] << " " ;
-				out << frame[2][vi][0] << " " << frame[2][vi][1] << " " << frame[2][vi][2] << " " ;
-				out << colorPTM[0][vi][0] << " " << colorPTM[1][vi][0] << " " << colorPTM[2][vi][0] << " " << colorPTM[3][vi][0] << " " << colorPTM[4][vi][0] << " " << colorPTM[5][vi][0] << " " << colorPTM[6][vi][0] << " " << colorPTM[7][vi][0] << " " << colorPTM[8][vi][0] << " " << colorPTM[9][vi][0] << " " << colorPTM[10][vi][0] << " " << colorPTM[11][vi][0] << " " << colorPTM[12][vi][0] << " " << colorPTM[13][vi][0] << " " << colorPTM[14][vi][0] << " " ;
-				out << colorPTM[0][vi][1] << " " << colorPTM[1][vi][1] << " " << colorPTM[2][vi][1] << " " << colorPTM[3][vi][1] << " " << colorPTM[4][vi][1] << " " << colorPTM[5][vi][1] << " " << colorPTM[6][vi][1] << " " << colorPTM[7][vi][1] << " " << colorPTM[8][vi][1] << " " << colorPTM[9][vi][1] << " " << colorPTM[10][vi][1] << " " << colorPTM[11][vi][1] << " " << colorPTM[12][vi][1] << " " << colorPTM[13][vi][1] << " " << colorPTM[14][vi][1] << " " ;
-				out << colorPTM[0][vi][2] << " " << colorPTM[1][vi][2] << " " << colorPTM[2][vi][2] << " " << colorPTM[3][vi][2] << " " << colorPTM[4][vi][2] << " " << colorPTM[5][vi][2] << " " << colorPTM[6][vi][2] << " " << colorPTM[7][vi][2] << " " << colorPTM[8][vi][2] << " " << colorPTM[9][vi][2] << " " << colorPTM[10][vi][2] << " " << colorPTM[11][vi][2] << " " << colorPTM[12][vi][2] << " " << colorPTM[13][vi][2] << " " << colorPTM[14][vi][2] << " " ;
-				if (errL2.isValid())
-					out << errL2[vi] << " " ;
-				if (errLmax.isValid())
-					out << errLmax[vi] << " " ;
-				if (stdDev.isValid())
-					out << stdDev[vi] << " " ;
-				out << std::endl ;
-			}
-
-			break ;
-	default :
-		assert(false || !"exportPlyPTM : degree not in {2,3,4} unhandled") ;
-		break ;
+	for(unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		unsigned int vi = vertices[i];
+		for(unsigned int coord = 0 ; coord < 3 ; ++coord) // position
+			out << position[vi][coord] << " " ;
+		for (unsigned int coord = 0 ; coord < 3 ; ++coord) // frame
+			for(unsigned int axis = 0 ; axis < 3 ; ++axis)
+				out << frame[axis][vi][coord] << " " ;
+		for (unsigned int channel = 0 ; channel < 3 ; ++channel) // coefficients
+			for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+				out << colorPTM[coefI][vi][channel] << " "  ;
+		if (errL2.isValid()) // fitting errors (if any)
+			out << errL2[vi] << " " ;
+		if (errLmax.isValid())
+			out << errLmax[vi] << " " ;
+		if (stdDev.isValid())
+			out << stdDev[vi] << " " ;
+		out << std::endl ;
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();
@@ -490,7 +390,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	out.close() ;
 	return true ;
 }
-/*
+
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good)
 {
@@ -609,7 +509,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 
 	out.close() ;
 	return true ;
-}*/
+}
 
 
 template <typename PFP>

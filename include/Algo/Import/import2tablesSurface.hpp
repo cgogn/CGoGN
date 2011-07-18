@@ -558,8 +558,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
  * N = 10 for cubic degree polynomial,
  * N = 15 for 4th degree polynomial,
  * ...
- *  - K remaining attributes named "remainderNo<k>" where k is an integer from 0 to K-1.
- * Hint : N = attrNames.size() - 4 ;
+ *  - K remaining attrNames named "remainderNo<k>" where k is an integer from 0 to K-1.
  * @return bool : success.
  */
 template <typename PFP>
