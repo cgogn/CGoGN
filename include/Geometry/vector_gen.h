@@ -137,6 +137,22 @@ public:
 
 	bool hasNan() const ;
 
+	/**
+	 * Tests if the vector is normalized
+	 * @param epsilon tolerated error
+	 * @return true if the given vector has a unit norm +/- epsilon
+	 */
+	bool isNormalized(const T& epsilon) const ;
+
+	/**
+	 * Tests if current and given vectors are orthogonal
+	 * @param V a vector
+	 * @param epsilon tolerated error
+	 * @return true if orthogonal
+	 */
+	bool isOrthogonal(const Vector<DIM,T>& V, const T& epsilon = 1e-5) const ;
+
+
 	/**********************************************/
 	/*             STREAM OPERATORS               */
 	/**********************************************/

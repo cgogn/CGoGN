@@ -295,6 +295,18 @@ inline bool Vector<DIM,T>::hasNan() const
 	return false ;
 }
 
+template <unsigned int DIM, typename T>
+inline bool Vector<DIM,T>::isNormalized(const T& epsilon) const
+{
+	return (1-epsilon < norm2() && norm2() < 1+epsilon) ;
+}
+
+template <unsigned int DIM, typename T>
+inline bool Vector<DIM,T>::isOrthogonal(const Vector<DIM,T>& V, const T& epsilon) const
+{
+	return (fabs(V * (*this)) < epsilon) ;
+}
+
 /**********************************************/
 /*             STREAM OPERATORS               */
 /**********************************************/

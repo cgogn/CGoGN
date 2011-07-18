@@ -222,7 +222,7 @@ void AHEMImporter<PFP>::LoadTopology()
 {
     // Allocate vertices
 
-	AttributeContainer& vxContainer = map->getAttributeContainer(VERTEX_CELL);
+	AttributeContainer& vxContainer = map->getAttributeContainer(VERTEX);
 
 
 	verticesId = new unsigned int[hdr.meshHdr.vxCount];
@@ -234,10 +234,10 @@ void AHEMImporter<PFP>::LoadTopology()
 
 	// Ensure vertices are created by querying the position attribute
 
-	AttributeHandler<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	if (!position.isValid())
-		position = map->template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+		position = map->template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 
 
@@ -272,7 +272,7 @@ void AHEMImporter<PFP>::LoadTopology()
 				addedHE[heId].vxIdFrom = prevVx;
 				addedHE[heId].vxIdTo = verticesId[*ix];
 
-				map->setDartEmbedding(VERTEX_ORBIT, d, prevVx);
+				map->setDartEmbedding(VERTEX, d, prevVx);
 				d = map->phi1(d);
 
 				prevVx = *ix++;
@@ -286,7 +286,7 @@ void AHEMImporter<PFP>::LoadTopology()
 			addedHE[heId].vxIdFrom = prevVx;
 			addedHE[heId].vxIdTo = firstVx;
 
-			map->setDartEmbedding(VERTEX_ORBIT, d, prevVx);
+			map->setDartEmbedding(VERTEX, d, prevVx);
 			heId++;
 		}
 
@@ -315,10 +315,10 @@ void AHEMImporter<PFP>::LoadTopology()
 template <typename PFP>
 void AHEMImporter<PFP>::LoadPosition(AHEMAttributeDescriptor* posDescr)
 {
-	AttributeHandler<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+	AttributeHandler<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	if (!position.isValid())
-		position = map->template addAttribute<typename PFP::VEC3>(VERTEX_ORBIT, "position") ;
+		position = map->template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 
 	f.seekg(posDescr->fileStartOffset, std::ios_base::beg);
