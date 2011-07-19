@@ -28,7 +28,6 @@
 
 #include "Utils/vbo.h"
 #include "glm/glm.hpp"
-//#include "Utils/Shaders/shaderColorPerVertex.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/pickables.h"
 
@@ -39,276 +38,11 @@ namespace Utils
 {
 
 
-//
-//
-//class LineDrawable
-//{
-//protected:
-//
-//	/**
-//	 * VBO for position
-//	 */
-//	Utils::VBO* m_vboPos;
-//
-//	/**
-//	 * Shader
-//	 */
-//	Utils::ShaderSimpleColor* m_shader;
-//
-//	/**
-//	 * number of indices in vbo
-//	 */
-//	unsigned int m_nb;
-//
-//public:
-//	/**
-//	 * constructor
-//	 */
-//	LineDrawable();
-//
-//	/**
-//	 * destructor
-//	 */
-//	virtual ~LineDrawable();
-//
-//	/**
-//	 * set the color of drawing
-//	 */
-//	void setColor(const Geom::Vec4f& col);
-//
-//	/**
-//	 * draw the Drawable at origin with size=1
-//	 */
-//	virtual void draw();
-//
-//	/**
-//	 * picking
-//	 * @param P camera point
-//	 * @param V vector ray direction
-//	 * @param epsilon distance epsilon for picking
-//	 * @return code picking (0: nothing picked / != 0 something picked)
-//	 */
-//	virtual unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f) = 0;
-//
-//};
-//
-//
-//class Pickable
-//{
-//protected:
-//	/**
-//	 * type of drawable
-//	 */
-//	LineDrawable* m_drawable;
-//
-//	/**
-//	 * transformation matrix
-//	 */
-//	glm::mat4 m_transfo;
-//
-//	/**
-//	 * id of pickable
-//	 */
-//	unsigned int m_id;
-//
-//public:
-//	/**
-//	 * constructor
-//	 * @param ld LineDrawable to use for drawing & picking
-//	 */
-//	Pickable(LineDrawable* ld, unsigned int id):
-//		m_drawable(ld),m_transfo(1.0f), m_id(id)
-//		{}
-//
-//	/**
-//	 * picking
-//	 * @param P camera point
-//	 * @param V vector ray direction
-//	 * @param epsilon distance epsilon for picking
-//	 * @return code picking (0: nothing picked / != 0 something picked)
-//	 */
-//	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
-//
-//	/**
-//	 * apply inverse transfo on picking ray
-//	 */
-//	static void invertPV(const Geom::Vec3f& P, const Geom::Vec3f& V, const glm::mat4& transfo, Geom::Vec3f& PP, Geom::Vec3f& VV);
-//
-//	/**
-//	 * draw
-//	 */
-//	void draw() { m_drawable->draw();}
-//
-//	/**
-//	 * return a ref on the transformation matrix
-//	 */
-//	glm::mat4&  transfo();
-//
-//	void rotate(float angle, const Geom::Vec3f& Axis);
-//
-//	void translate(const Geom::Vec3f& P);
-//
-//	void scale(const Geom::Vec3f& S);
-//
-//	/**
-//	 * pick a vector of pickable and return the closest
-//	 */
-//	static unsigned int pick(const std::vector<Pickable*>& picks,const Geom::Vec3f& P, const Geom::Vec3f& V, Pickable*& res);
-//
-//	float distancefrom(const Geom::Vec3f& P);
-//
-//
-//};
-//
-//
-///**
-// * Grid (-1,-1,0 ; 1,1,0)
-// */
-//class Grid: public LineDrawable
-//{
-//public:
-//	/**
-//	 * constructor
-//	 * @param sub number of subdivision of grig
-//	 */
-//	Grid(unsigned int sub=5);
-//
-//	/**
-//	 * change topo subdivision
-//	 */
-//	void changeTopo(unsigned int sub);
-//
-//	/**
-//	 * picking
-//	 */
-//	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
-//};
-//
-//
-///**
-// * Sphere of radius 1 drawon with lines
-// */
-//class Sphere: public LineDrawable
-//{
-//protected:
-//	GLuint m_ind;
-//public:
-//	/**
-//	 * constructor
-//	 * @param par number of parallels
-//	 * @param mer number of meridians
-//	 */
-//	Sphere(unsigned int par=5, unsigned int mer=5);
-//
-//	/**
-//	 * change topo subdivision
-//	 */
-//	void changeTopo(unsigned int par, unsigned int mer);
-//
-//	/**
-//	 * specific drawing function for sphere (with indexed vbos)
-//	 */
-//	void draw();
-//
-//	/**
-//	 * picking
-//	 */
-//	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
-//};
-//
-//
-///**
-// * Cone of radius 1 drawon with lines
-// */
-//class Cone: public Sphere
-//{
-//public:
-//	/**
-//	 * constructor
-//	 * @param par number of parallels
-//	 * @param mer number of meridians
-//	 */
-//	Cone(unsigned int par=5, unsigned int mer=5);
-//
-//	/**
-//	 * change topo subdivision
-//	 */
-//	void changeTopo(unsigned int par, unsigned int mer);
-//
-//	/**
-//	 * picking
-//	 */
-//	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
-//};
-//
-///**
-// * Cone of radius 1 drawon with lines
-// */
-//class Cylinder: public Sphere
-//{
-//public:
-//	/**
-//	 * constructor
-//	 * @param par number of parallels
-//	 * @param mer number of meridians
-//	 */
-//	Cylinder(unsigned int par=5, unsigned int mer=5);
-//
-//	/**
-//	 * change topo subdivision
-//	 */
-//	void changeTopo(unsigned int par, unsigned int mer);
-//
-//	/**
-//	 * picking
-//	 */
-//	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
-//};
-//
-//
-///**
-// * Sphere of radius 1 drawon with lines
-// */
-//class Cube: public LineDrawable
-//{
-//protected:
-//	GLuint m_ind;
-//public:
-//	/**
-//	 * constructor
-//	 * @param par number of parallels
-//	 * @param mer number of meridians
-//	 */
-//	Cube(unsigned int sub=0);
-//
-//	/**
-//	 * destructor
-//	 */
-//	~Cube();
-//
-//	/**
-//	 * change topo subdivision
-//	 */
-//	void changeTopo(unsigned int sub);
-//
-//	/**
-//	 * specific drawing function for sphere (with indexed vbos)
-//	 */
-//	void draw();
-//
-//	/**
-//	 * picking
-//	 */
-//	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
-//};
-//
-//
-
 
 class FrameManipulator//: public Pickable
 {
 public:
-	enum AXIS {NONE=0, CENTER, Xt, Yt, Zt, Xr, Yr, Zr, Xs, Ys, Zs};
+	enum AXIS {NONE=0, CENTER, Xt, Yt, Zt, Xr, Yr, Zr, Xs, Ys, Zs, Translations, Rotations, Scales};
 
 protected:
 
@@ -324,6 +58,11 @@ protected:
 	 * locking table
 	 */
 	bool m_locked_axis[11];
+
+	/**
+	 * pinking only locking table
+	 */
+	bool m_lockedPicking_axis[11];
 
 	/**
 	 * VBO for position
@@ -389,6 +128,8 @@ protected:
 	 */
 	glm::mat4 transfoRenderFrame();
 
+	bool axisPickable(unsigned int a) { return (!m_locked_axis[a]) && (!m_lockedPicking_axis[a]);}
+
 public:
 	FrameManipulator();
 
@@ -419,19 +160,54 @@ public:
 
 
 	 /**
-	  * lock an axis
+	  * lock an axis (drawing & picking are disabled)
+	  * @param axis the axis Xt/Yt/Zt/Xs/Yx/Zs/Xr/Yr/Zr or group Translations/Scales/Rotations)
 	  */
 	 void lock(unsigned int axis);
 
 	 /**
 	  * unlock an axis
+	  * @param axis the axis Xt/Yt/Zt/Xs/Yx/Zs/Xr/Yr/Zr or group Translations/Scales/Rotations)
 	  */
 	 void unlock(unsigned int axis);
 
 	 /**
 	  * is an axis locked
+	  * @param axis the axis to test
 	  */
 	 bool locked(unsigned int axis);
+
+	 /**
+	  * lock an axis only for pinking
+	  */
+	 void lockPicking(unsigned int axis);
+
+	 /// lock translations for picking only
+	 void lockPickingTranslations();
+
+	 /// lock rotations for picking only
+	 void lockPickingRotations();
+
+	 /// lock scales for picking only
+	 void lockPickingScales();
+
+	 /**
+	  * unlock an axis (only for pinking)
+	  */
+	 void unlockPicking(unsigned int axis);
+
+	 /// unlock translations for picking only
+	 void unlockPickingTranslations();
+
+	 /// unlock rotations for picking only
+	 void unlockPickingRotations();
+
+	 /// unlock scales for picking only
+	 void unlockPickingScales();
+	 /**
+	  * is an axis locked (only for pinking)
+	  */
+	 bool lockedPicking(unsigned int axis);
 
 	/**
 	 * higlight an axis (change width rendering).
