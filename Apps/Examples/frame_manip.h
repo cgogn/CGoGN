@@ -21,8 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef POLYHEDRONSVIEW_H_
-#define POLYHEDRONSVIEW_H_
+#ifndef FRAME_MANIP_EX_H_
+#define FRAME_MANIP_EX_H_
 
 #include <iostream>
 
