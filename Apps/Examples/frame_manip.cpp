@@ -47,7 +47,6 @@
 #include "glm/gtc/type_precision.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "Utils/textures.h"
 
 using namespace CGoGN;
 
