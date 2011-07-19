@@ -264,6 +264,34 @@ float squaredDistanceSeg2Point(const VEC3& A, const VEC3& AB, typename VEC3::DAT
 	return X.norm2() / AB2 ;
 }
 
+
+template <typename VEC3>
+bool lineLineClosestPoints(const VEC3& P1, const VEC3& V1, const VEC3& P2, const VEC3& V2, VEC3& Q1, VEC3& Q2)
+{
+	   Geom::Vec3f P12 = P1 - P2;
+
+	   float d1343 = P12 * V2;
+	   float d4321 = V2*V1;
+	   float d1321 = P12*V1;
+	   float d4343 = V2*V2;
+	   float d2121 = V1*V1;
+
+	   float denom = d2121 * d4343 - d4321 * d4321;
+
+	   if (fabs(denom) < 0.0000001)
+	      return false;
+
+	   float numer = d1343 * d4321 - d1321 * d4343;
+
+	   float mua = numer / denom;
+	   float mub = (d1343 + d4321 * mua) / d4343;
+
+	   Q1 = P1 + mua*V1;
+	   Q2 = P2 + mub*V2;
+	   return true;
+}
+
+
 }
 
 }

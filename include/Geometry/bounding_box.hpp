@@ -118,6 +118,12 @@ VEC BoundingBox<VEC>::center() const
 	return center ;
 }
 
+template <typename VEC>
+bool BoundingBox<VEC>::isInitialized() const
+{
+	return m_initialized;
+}
+
 /**********************************************/
 /*                 FUNCTIONS                  */
 /**********************************************/

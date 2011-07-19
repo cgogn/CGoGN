@@ -42,6 +42,11 @@ add_executable( polyhedronsView ../polyhedronsView.cpp ${polyhedronsView_moc})
 target_link_libraries( polyhedronsView
 		${CGoGN_LIBS_R} ${COMMON_LIBS}  ${QT_LIBRARIES} )
 
+QT4_WRAP_CPP(frame_manip_moc ../frame_manip.h)	
+add_executable( frame_manip ../frame_manip.cpp ${frame_manip_moc})
+target_link_libraries( frame_manip
+		${CGoGN_LIBS_R} ${COMMON_LIBS}  ${QT_LIBRARIES} )
+
 QT4_WRAP_CPP(extrusionView_moc ../extrusionView.h)	
 add_executable( extrusionView ../extrusionView.cpp ${extrusionView_moc})
 target_link_libraries( extrusionView

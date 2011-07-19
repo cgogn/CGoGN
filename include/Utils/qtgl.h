@@ -66,9 +66,6 @@ protected:
 
 	SimpleQT* m_cbs;
 
-	// Matrix
-	std::stack<glm::mat4> m_stack_mv;
-
 	int m_current_button;
 	QPoint clickPoint;
 	int beginx;
@@ -176,16 +173,6 @@ protected:
 	 * equivalent to old school glScale
 	 */
 	void oglScale(float sx, float sy, float sz);
-
-	/**
-	 * pseudo-equivalent to old school glPushMatrix
-	 */
-	void oglPushModelViewMatrix();
-
-	/**
-	 * pseudo-equivalent to old school glPopMatrix
-	 */
-	bool oglPopModelViewMatrix();
 
 	/**
 	 * get the focale distance

@@ -208,9 +208,13 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 
 	this->init(d);
 	this->border.reserve(100);
+	this->insideVertices.reserve(100);
 
+	CellMarkerStore vm(this->map, VERTEX);	// mark the collected inside-vertices
 	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges
-	CellMarkerStore fm(this->map, FACE);	// mark the collected inside-faces + border-faces
+
+	this->insideVertices.push_back(this->centerDart);
+	vm.mark(this->centerDart);
 
 	VEC3 centerPosition = this->position[d];
 	unsigned int i = 0;
@@ -220,22 +224,29 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 		Dart e = end;
 		do
 		{
-			if (! em.isMarked(e) || ! fm.isMarked(e)) // are both tests useful ?
+			if ( ! em.isMarked(e) )
 			{
 				const Dart f = this->map.phi1(e);
-				const Dart g = this->map.phi1(f);
 
 				if (! Geom::isPointInSphere(this->position[f], centerPosition, this->radius))
 				{
 					this->border.push_back(e); // add to border
-					em.mark(e);
-					fm.mark(e); // is it useful ?
 				}
+				else
+				{
+					if (! vm.isMarked(f))
+					{
+						this->insideVertices.push_back(f);
+						vm.mark(f);
+					}
+				}
+				em.mark(e);
 			}
 			e = this->map.alpha1(e);
 		} while (e != end);
 		++i;
 	}
+	this->insideVertices.clear();
 }
 
 template <typename PFP>

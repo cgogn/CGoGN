@@ -24,6 +24,7 @@
 
 #include "Algo/Geometry/normal.h"
 #include "Algo/Geometry/centroid.h"
+#include "intersection.h"
 
 #include <limits>
 
@@ -44,10 +45,10 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
 	const float SMALL_NUM = std::numeric_limits<typename PFP::REAL>::min() * 5.0f;
 
 	VEC3 p1 = position[d];
-	VEC3 n = faceNormal<PFP>(map, d, position);
+	VEC3 n = faceNormal<PFP>(map,d,position);
 	VEC3 w0 = P - p1;
-    float a = -(n * w0);
-    float b = n * Dir;
+    float a = -(n*w0);
+    float b = n*Dir;
 
     if (fabs(b) < SMALL_NUM)
 		return false;

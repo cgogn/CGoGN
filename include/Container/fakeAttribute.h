@@ -69,7 +69,7 @@ public:
 
 	NoMathNameAttribute(const T& att): T(att) {}
 
-	NoMathNameAttribute<T>& operator = (const T& fa) { *this = NoMathNameAttribute<T>(fa); }
+	NoMathNameAttribute<T>& operator = (const T& fa) { return *this = NoMathNameAttribute<T>(fa); }
 	void operator += (const NoMathNameAttribute<T>& fa) {}
 	void operator -= (const NoMathNameAttribute<T>& fa) {}
 	void operator *= (double v) {}

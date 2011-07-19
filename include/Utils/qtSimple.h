@@ -34,6 +34,7 @@
 #include <set>
 #include <string>
 #include "Geometry/vector_gen.h"
+#include "Utils/gl_matrices.h"
 
 namespace CGoGN { namespace Utils { class GLSLShader; } }
 
@@ -138,8 +139,6 @@ public:
 	 */
 	void setHelpMsg(const std::string& msg);
 
-//	void contextMenuEvent(QContextMenuEvent *event);
-
 	/**
 	 * set mouse tracking on the GLWidget
 	 * if true : mouseMove events are generated for each mouse move
@@ -159,9 +158,15 @@ protected:
 	bool m_dockOn;
 
 	// mouse & matrix
-	glm::mat4 m_projection_matrix;
-	glm::mat4 m_modelView_matrix;
-	glm::mat4 m_transfo_matrix;
+	Utils::GL_Matrices m_mat;
+
+	/// ref to projection matrix
+	glm::mat4& m_projection_matrix;
+	/// ref to modelview matrix
+	glm::mat4& m_modelView_matrix;
+	/// ref to transformation matrix
+	glm::mat4& m_transfo_matrix;
+
 	float m_curquat[4];
 	float m_lastquat[4];
 	float m_trans_x;
@@ -209,6 +214,13 @@ public:
 	 */
 	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius = 4);
 
+	/**
+	 * transform a pixel distance on screen in distance in world
+	 * @param pixel_width width on pixel on screen
+	 * @param center reference point on world to use (defaut 0,0,0)
+	 */
+	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center=Geom::Vec3f(0.0f,0.0f,0.0f));
+
 	const glm::mat4& transfoMatrix() const { return m_transfo_matrix; }
 	glm::mat4& transfoMatrix() { return m_transfo_matrix; }
 
@@ -231,6 +243,8 @@ public:
 	float& trans_y() { return m_trans_y; }
 	float& trans_z() { return m_trans_z; }
 
+//	glm::mat4* matricesPtr() { return  m_mat.m_matrices;}
+	Utils::GL_Matrices* matricesPtr() { return &m_mat;}
 	/**
 	 * shift key pressed ?
 	 */
