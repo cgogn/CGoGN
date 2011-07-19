@@ -259,7 +259,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
 	{
-		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
 		return false ;
 	}
 
@@ -345,7 +345,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 
 	TREAL errL2 = map.template getAttribute<REAL>(VERTEX,"errL2") ;
 	TREAL errLmax = map.template getAttribute<REAL>(VERTEX,"errLmax") ;
-	TREAL stdDev = map.template getAttribute<REAL>(VERTEX,"StdDev") ;
+	TREAL stdDev = map.template getAttribute<REAL>(VERTEX,"stdDev") ;
 	if (errL2.isValid())
 		out << "property float errL2" << std::endl ;
 	if (errLmax.isValid())
@@ -360,15 +360,19 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	for(unsigned int i = 0; i < vertices.size(); ++i)
 	{
 		unsigned int vi = vertices[i];
-		for(unsigned int coord = 0 ; coord < 3 ; ++coord) // position
+		 // position
+		for(unsigned int coord = 0 ; coord < 3 ; ++coord)
 			out << position[vi][coord] << " " ;
-		for (unsigned int coord = 0 ; coord < 3 ; ++coord) // frame
-			for(unsigned int axis = 0 ; axis < 3 ; ++axis)
+		 // frame
+		for(unsigned int axis = 0 ; axis < 3 ; ++axis)
+			for (unsigned int coord = 0 ; coord < 3 ; ++coord)
 				out << frame[axis][vi][coord] << " " ;
-		for (unsigned int channel = 0 ; channel < 3 ; ++channel) // coefficients
+		 // coefficients
+		for (unsigned int channel = 0 ; channel < 3 ; ++channel)
 			for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
 				out << colorPTM[coefI][vi][channel] << " "  ;
-		if (errL2.isValid()) // fitting errors (if any)
+		 // fitting errors (if any)
+		if (errL2.isValid())
 			out << errL2[vi] << " " ;
 		if (errLmax.isValid())
 			out << errLmax[vi] << " " ;
