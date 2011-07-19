@@ -32,7 +32,7 @@
 //#include "glm/gtc/type_precision.hpp"
 //#include "glm/gtc/type_ptr.hpp"
 
-#include <cmath>
+//#include <cmath>
 
 namespace CGoGN
 {
@@ -49,7 +49,10 @@ FrameManipulator::FrameManipulator():
 {
 
 	for (unsigned int i=0; i<11; ++i)
+	{
 		m_locked_axis[i]=false;
+		m_lockedPicking_axis[i]=false;
+	}
 
 	m_vboPos = new VBO();
 	m_vboPos->setDataSize(3);
@@ -315,7 +318,8 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 	// click on center
 	if (dist2 < 0.02f*0.02f)
 	{
-		if  (! m_locked_axis[CENTER])
+//		if  (! m_locked_axis[CENTER])
+		if (axisPickable(CENTER))
 			return CENTER;
 		else
 			return NONE;
@@ -335,73 +339,89 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 	Geom::Vec3f Qx;
 	Geom::Intersection inter = Geom::intersectionLinePlane<Geom::Vec3f>(P,V,origin, Geom::Vec3f(1.0f,0.0f,0.0f), Qx);
 
-	if (inter == Geom::FACE_INTERSECTION)
-		dist_target[3] = Qx.norm() - 1.0f;
-	else if (inter == Geom::EDGE_INTERSECTION)
-		dist_target[3] = sqrtf(dist2) - 1.0f;
+	if (axisPickable(Xr))
+	{
+		if (inter == Geom::FACE_INTERSECTION)
+			dist_target[3] = Qx.norm() - 1.0f;
+		else if (inter == Geom::EDGE_INTERSECTION)
+			dist_target[3] = sqrt(dist2) - 1.0f;
 
-	if (fabs(dist_target[3]) < ring_half_width )
-		dist_cam[3] = (P-Qx)*(P-Qx);
+		if (fabs(dist_target[3]) < ring_half_width )
+			dist_cam[3] = (P-Qx)*(P-Qx);
+	}
 
 	// plane Y=0
 	Geom::Vec3f Qy;
 	inter = Geom::intersectionLinePlane<Geom::Vec3f>(P,V,origin, Geom::Vec3f(0.0f,1.0f,0.0f), Qy);
 
-	if (inter == Geom::FACE_INTERSECTION)
-		dist_target[4] = Qy.norm() - 1.0f;
-	else if (inter == Geom::EDGE_INTERSECTION)
-		dist_target[4] = sqrtf(dist2) - 1.0f;
+	if (axisPickable(Yr))
+	{
+		if (inter == Geom::FACE_INTERSECTION)
+			dist_target[4] = Qy.norm() - 1.0f;
+		else if (inter == Geom::EDGE_INTERSECTION)
+			dist_target[4] = sqrt(dist2) - 1.0f;
 
-	if (fabs(dist_target[4]) < ring_half_width )
-		dist_cam[4] = (P-Qy)*(P-Qy);
+		if (fabs(dist_target[4]) < ring_half_width )
+			dist_cam[4] = (P-Qy)*(P-Qy);
+	}
 
 	// plane Z=0
 	Geom::Vec3f Qz;
 	inter = Geom::intersectionLinePlane<Geom::Vec3f>(P,V,origin, Geom::Vec3f(0.0f,0.0f,1.0f), Qz);
 
-	if (inter == Geom::FACE_INTERSECTION)
-		dist_target[5] = Qz.norm() - 1.0f;
-	else if (inter == Geom::EDGE_INTERSECTION)
-		dist_target[5] = sqrtf(dist2) - 1.0f;
+	if (axisPickable(Zr))
+	{
+		if (inter == Geom::FACE_INTERSECTION)
+			dist_target[5] = Qz.norm() - 1.0f;
+		else if (inter == Geom::EDGE_INTERSECTION)
+			dist_target[5] = sqrt(dist2) - 1.0f;
 
-	if (fabs(dist_target[5]) <  ring_half_width )
-		dist_cam[5] = (P-Qz)*(P-Qz);
-
+		if (fabs(dist_target[5]) <  ring_half_width )
+			dist_cam[5] = (P-Qz)*(P-Qz);
+	}
 
 	// axes:
 
-	Geom::Vec3f PX(1.0f,0.0f,0.0f);
-	dist_target[0] = sqrtf(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PX)) ;
-
-	if (fabs(dist_target[0]) < 0.02f)
+	if (axisPickable(Xt) || axisPickable(Xs))
 	{
-		if ( (Qz - origin).norm() > m_lengthAxes[0])
-			dist_cam[0] = (P-PX)*(P-PX);
-		else
-			dist_cam[6] = (P-origin)*(P-origin);
+		Geom::Vec3f PX(1.0f,0.0f,0.0f);
+		dist_target[0] = sqrt(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PX)) ;
+
+		if (fabs(dist_target[0]) < 0.02f)
+		{
+			if ( (Qz - origin).norm() > m_lengthAxes[0])
+				dist_cam[0] = (P-PX)*(P-PX);
+			else
+				dist_cam[6] = (P-origin)*(P-origin);
+		}
+	}
+
+	if (axisPickable(Yt) || axisPickable(Ys))
+	{
+		Geom::Vec3f PY(0.0f,1.0f,0.0f);
+		dist_target[1] = sqrt(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PY)) ;
+		if (fabs(dist_target[1]) < 0.02f )
+		{
+			if ((Qz - origin).norm() > m_lengthAxes[1])
+				dist_cam[1] = (P-PY)*(P-PY);
+			else
+				dist_cam[7] = (P-origin)*(P-origin);
+		}
 	}
 
 
-	Geom::Vec3f PY(0.0f,1.0f,0.0f);
-	dist_target[1] = sqrtf(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PY)) ;
-	if (fabs(dist_target[1]) < 0.02f )
+	if (axisPickable(Zt) || axisPickable(Zs))
 	{
-		if ((Qz - origin).norm() > m_lengthAxes[1])
-			dist_cam[1] = (P-PY)*(P-PY);
-		else
-			dist_cam[7] = (P-origin)*(P-origin);
+		Geom::Vec3f PZ(0.0f,0.0f,1.0f);
+		dist_target[2] = sqrt(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PZ));
+		if (fabs(dist_target[2]) < 0.02f )
+		{
+			if ((Qx - origin).norm() > m_lengthAxes[2])
+				dist_cam[2] = (P-PZ)*(P-PZ);
+			else
+				dist_cam[8] = (P-origin)*(P-origin);
+		}
 	}
-
-	Geom::Vec3f PZ(0.0f,0.0f,1.0f);
-	dist_target[2] = sqrtf(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PZ));
-	if (fabs(dist_target[2]) < 0.02f )
-	{
-		if ((Qx - origin).norm() > m_lengthAxes[2])
-			dist_cam[2] = (P-PZ)*(P-PZ);
-		else
-			dist_cam[8] = (P-origin)*(P-origin);
-	}
-
 
 	// find min dist_cam value;
 	unsigned int min_index=0;
@@ -417,7 +437,8 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 
 	if (min_val < std::numeric_limits<float>::max())
 	{
-		if  (! m_locked_axis[Xt+min_index])
+//		if  (! m_locked_axis[Xt+min_index])
+		if (axisPickable(Xt+min_index))
 			return Xt+min_index;
 	}
 
@@ -454,13 +475,17 @@ void FrameManipulator::setLengthAxes()
 	float sc1 = m_scale[1]/avgScale;
 	float sc2 = m_scale[2]/avgScale;
 
+
 	positions[ind] = 0.23f*sc0;
 	ind+=7;
 	positions[ind] = 0.23f*sc1;
 	ind+=7;
 	positions[ind] = 0.23f*sc2;
 	ind++;
-	positions[ind] = 0.27f*sc0;
+	if (m_locked_axis[Xs])
+		positions[ind] = 0.0f;
+	else
+		positions[ind] = 0.27f*sc0;
 	ind+=3;
 	positions[ind] = 0.75f*sc0;
 	ind+=3;
@@ -478,7 +503,10 @@ void FrameManipulator::setLengthAxes()
 	positions[ind] = le;
 	ind+=4;
 
-	positions[ind] = 0.27f*sc1;
+	if (m_locked_axis[Ys])
+		positions[ind] = 0.0f;
+	else
+		positions[ind] = 0.27f*sc1;
 	ind+=3;
 	positions[ind] = 0.75f*sc1;
 	ind+=3;
@@ -496,7 +524,10 @@ void FrameManipulator::setLengthAxes()
 	positions[ind] = le;
 	ind+=4;
 
-	positions[ind] = 0.27f*sc2;
+	if (m_locked_axis[Zs])
+		positions[ind] = 0.0f;
+	else
+		positions[ind] = 0.27f*sc2;
 	ind+=3;
 	positions[ind] = 0.75f*sc2;
 	ind+=3;
@@ -620,19 +651,130 @@ void FrameManipulator::setTransformation( const glm::mat4& transfo)
 
 void FrameManipulator::lock(unsigned int axis)
 {
-	m_locked_axis[axis] = true;
+	assert(axis <=Scales);
+	switch (axis)
+	{
+	case Translations:
+		m_locked_axis[Xt] = true;
+		m_locked_axis[Yt] = true;
+		m_locked_axis[Zt] = true;
+		break;
+	case Rotations:
+		m_locked_axis[Xr] = true;
+		m_locked_axis[Yr] = true;
+		m_locked_axis[Zr] = true;
+		break;
+	case Scales:
+		m_locked_axis[Xs] = true;
+		m_locked_axis[Ys] = true;
+		m_locked_axis[Zs] = true;
+		break;
+	default:
+		m_locked_axis[axis] = true;
+		break;
+	}
+	setLengthAxes();
 }
+
 
 
 void FrameManipulator::unlock(unsigned int axis)
 {
-	m_locked_axis[axis] = false;
+	assert(axis <=Scales);
+	switch (axis)
+	{
+	case Translations:
+		m_locked_axis[Xt] = false;
+		m_locked_axis[Yt] = false;
+		m_locked_axis[Zt] = false;
+		break;
+	case Rotations:
+		m_locked_axis[Xr] = false;
+		m_locked_axis[Yr] = false;
+		m_locked_axis[Zr] = false;
+		break;
+	case Scales:
+		m_locked_axis[Xs] = false;
+		m_locked_axis[Ys] = false;
+		m_locked_axis[Zs] = false;
+		break;
+	default:
+		m_locked_axis[axis] = false;
+		break;
+	}
+	setLengthAxes();
 }
+
 
 bool FrameManipulator::locked(unsigned int axis)
 {
+	assert(axis <=Zs);
 	return m_locked_axis[axis];
 }
+
+void FrameManipulator::lockPicking(unsigned int axis)
+{
+	assert(axis <=Scales);
+	switch (axis)
+	{
+	case Translations:
+		m_lockedPicking_axis[Xt] = true;
+		m_lockedPicking_axis[Yt] = true;
+		m_lockedPicking_axis[Zt] = true;
+		break;
+	case Rotations:
+		m_lockedPicking_axis[Xr] = true;
+		m_lockedPicking_axis[Yr] = true;
+		m_lockedPicking_axis[Zr] = true;
+		break;
+	case Scales:
+		m_lockedPicking_axis[Xs] = true;
+		m_lockedPicking_axis[Ys] = true;
+		m_lockedPicking_axis[Zs] = true;
+		break;
+	default:
+		m_lockedPicking_axis[axis] = true;
+		break;
+	}
+	setLengthAxes();
+}
+
+
+
+void FrameManipulator::unlockPicking(unsigned int axis)
+{
+	assert(axis <=Scales);
+	switch (axis)
+	{
+	case Translations:
+		m_lockedPicking_axis[Xt] = false;
+		m_lockedPicking_axis[Yt] = false;
+		m_lockedPicking_axis[Zt] = false;
+		break;
+	case Rotations:
+		m_lockedPicking_axis[Xr] = false;
+		m_lockedPicking_axis[Yr] = false;
+		m_lockedPicking_axis[Zr] = false;
+		break;
+	case Scales:
+		m_lockedPicking_axis[Xs] = false;
+		m_lockedPicking_axis[Ys] = false;
+		m_lockedPicking_axis[Zs] = false;
+		break;
+	default:
+		m_lockedPicking_axis[axis] = false;
+		break;
+	}
+	setLengthAxes();
+}
+
+
+
+bool FrameManipulator::lockedPicking(unsigned int axis)
+{
+	return m_lockedPicking_axis[axis];
+}
+
 
 Geom::Vec3f  FrameManipulator::getAxis(unsigned int ax)
 {
@@ -726,7 +868,7 @@ void FrameManipulator::rotateInScreen(int dx, int dy)
 	Geom::Vec3f axisRotation(P[0]-m_trans[0], P[1]-m_trans[1], P[2]-m_trans[2]);
 	axisRotation.normalize();
 
-	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),float(sqrtf(dx*dx+dy*dy))/2.0f,glm::vec3(axisRotation[0],axisRotation[1],axisRotation[2]));
+	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),float(sqrt(dx*dx+dy*dy))/2.0f,glm::vec3(axisRotation[0],axisRotation[1],axisRotation[2]));
 	m_rotations = tr*m_rotations;
 
 }

@@ -308,7 +308,7 @@ namespace Utils
 class FrameManipulator//: public Pickable
 {
 public:
-	enum AXIS {NONE=0, CENTER, Xt, Yt, Zt, Xr, Yr, Zr, Xs, Ys, Zs};
+	enum AXIS {NONE=0, CENTER, Xt, Yt, Zt, Xr, Yr, Zr, Xs, Ys, Zs, Translations, Rotations, Scales};
 
 protected:
 
@@ -324,6 +324,11 @@ protected:
 	 * locking table
 	 */
 	bool m_locked_axis[11];
+
+	/**
+	 * pinking only locking table
+	 */
+	bool m_lockedPicking_axis[11];
 
 	/**
 	 * VBO for position
@@ -389,6 +394,8 @@ protected:
 	 */
 	glm::mat4 transfoRenderFrame();
 
+	bool axisPickable(unsigned int a) { return (!m_locked_axis[a]) && (!m_lockedPicking_axis[a]);}
+
 public:
 	FrameManipulator();
 
@@ -419,19 +426,54 @@ public:
 
 
 	 /**
-	  * lock an axis
+	  * lock an axis (drawing & picking are disabled)
+	  * @param axis the axis Xt/Yt/Zt/Xs/Yx/Zs/Xr/Yr/Zr or group Translations/Scales/Rotations)
 	  */
 	 void lock(unsigned int axis);
 
 	 /**
 	  * unlock an axis
+	  * @param axis the axis Xt/Yt/Zt/Xs/Yx/Zs/Xr/Yr/Zr or group Translations/Scales/Rotations)
 	  */
 	 void unlock(unsigned int axis);
 
 	 /**
 	  * is an axis locked
+	  * @param axis the axis to test
 	  */
 	 bool locked(unsigned int axis);
+
+	 /**
+	  * lock an axis only for pinking
+	  */
+	 void lockPicking(unsigned int axis);
+
+	 /// lock translations for picking only
+	 void lockPickingTranslations();
+
+	 /// lock rotations for picking only
+	 void lockPickingRotations();
+
+	 /// lock scales for picking only
+	 void lockPickingScales();
+
+	 /**
+	  * unlock an axis (only for pinking)
+	  */
+	 void unlockPicking(unsigned int axis);
+
+	 /// unlock translations for picking only
+	 void unlockPickingTranslations();
+
+	 /// unlock rotations for picking only
+	 void unlockPickingRotations();
+
+	 /// unlock scales for picking only
+	 void unlockPickingScales();
+	 /**
+	  * is an axis locked (only for pinking)
+	  */
+	 bool lockedPicking(unsigned int axis);
 
 	/**
 	 * higlight an axis (change width rendering).

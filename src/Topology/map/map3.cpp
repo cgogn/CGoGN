@@ -764,12 +764,13 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed
+
 	darts_list.push_back(d);			//Start with the dart d
-	std::list<Dart>::iterator darts;
 
 	mv.mark(d);
 
-	for(darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+	for(std::list<Dart>::iterator darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+
 	{
 		Dart dc = *darts;
 
@@ -795,6 +796,7 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 
 	return found;
 }
+
 
 bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
