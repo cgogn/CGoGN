@@ -120,7 +120,6 @@ inline void GenericMap::embedOrbit(unsigned int orbit, Dart d, unsigned int em)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 	FunctorSetEmb<GenericMap> fsetemb(*this, orbit, em);
-std::cout << "EMBEDORBIT"<< std::endl;
 	foreach_dart_of_orbit(orbit, d, fsetemb);
 }
 
