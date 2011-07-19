@@ -428,6 +428,11 @@ public:
 	  */
 	 void unlock(unsigned int axis);
 
+	 /**
+	  * is an axis locked
+	  */
+	 bool locked(unsigned int axis);
+
 	/**
 	 * higlight an axis (change width rendering).
 	 * To unhighlight, just highlight NONE or highlight a already highlighted  axis
@@ -508,6 +513,12 @@ public:
 	static bool translationAxis(unsigned int axis) { return (axis>=Xt) && (axis<=Zt);}
 	static bool scaleAxis(unsigned int axis) { return ((axis>=Xs) && (axis<=Zs))|| (axis==CENTER);}
 
+	/**
+	 * translate from screen mouse move
+	 */
+	void translateInScreen(int dx, int dy);
+
+	void rotateInScreen(int dx, int dy);
 };
 
 
