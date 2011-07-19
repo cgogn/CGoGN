@@ -248,20 +248,12 @@ void ShaderPhong::restoreUniformsAttribs()
 	getLocations();
 
 	bind();
-<<<<<<< HEAD
-=======
-
->>>>>>> 04f3042b58ff23e91cb7277bd02643f6a7e846ce
 	sendParams();
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexNormal", m_vboNormal);
 	if (m_vboColor)
 		bindVA_VBO("VertexColor", m_vboColor);
-<<<<<<< HEAD
-=======
-
->>>>>>> 04f3042b58ff23e91cb7277bd02643f6a7e846ce
 	unbind();
 }
 
