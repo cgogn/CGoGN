@@ -60,24 +60,13 @@ VBO::VBO(const VBO& vbo) :
 
 VBO::~VBO()
 {
+	std::cout << "VBO delete"<< std::endl;
 	if (m_lock)
 		releasePtr();
 	glDeleteBuffers(1, &m_id);
-	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
-	{
-		(*it)->unbindVBO(this);
-	}
 }
 
-void VBO::ref(GLSLShader* sh)
-{
-	//already referenced ?
-	for(std::vector<GLSLShader*>::iterator it = m_refs.begin(); it != m_refs.end(); ++it)
-		if (*it == sh)
-			return;
-	// no then add
-	m_refs.push_back(sh);
-}
+
 
 void VBO::sameAllocSameBufferSize(const VBO& vbo)
 {

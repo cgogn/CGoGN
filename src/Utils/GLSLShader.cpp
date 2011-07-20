@@ -908,25 +908,9 @@ void GLSLShader::addPathFileSeach(const std::string& path)
 	m_pathes.push_back(path);
 }
 
-void GLSLShader::unbindVBO(VBO* ptr)
-{
-	unsigned int nb = m_va_vbo_binding.size();
-	for (unsigned int i = 0; i < nb; ++i)
-	{
-		if (m_va_vbo_binding[i].vbo_ptr == ptr)
-		{
-			if (i != (nb-1))
-				m_va_vbo_binding[i] = m_va_vbo_binding[nb-1];
-			m_va_vbo_binding.pop_back();
-			return;
-		}
-	}
-}
 
 unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 {
-	vbo->ref(this);
-
 	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
 	//valid ?
 	if (idVA < 0)
@@ -951,10 +935,15 @@ unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 	return (m_va_vbo_binding.size() -1);
 }
 
+
+
+
 void GLSLShader::changeVA_VBO(unsigned int id, VBO* vbo)
 {
 	m_va_vbo_binding[id].vbo_ptr = vbo;
 }
+
+
 
 void GLSLShader::unbindVA(const std::string& name)
 {
@@ -979,6 +968,9 @@ void GLSLShader::unbindVA(const std::string& name)
 	}
 	CGoGNerr << "GLSLShader: Attribute "<<name<< " not binded"<< CGoGNendl;
 }
+
+
+
 
 void GLSLShader::setCurrentOGLVersion(unsigned int version)
 {
