@@ -34,5 +34,8 @@ namespace CGoGN
 #define CGoGN_STATIC_ASSERT(expr, msg) \
 	{ CGoGN::CompileTimeError<((expr) != 0)> STATIC_ASSERT_ERROR_##msg; (void)STATIC_ASSERT_ERROR_##msg; }
 
+
+#define CGoGN_ASSERT(expr) if (CGOGN_ASSERT_BOOL) assert(expr);
+
 #endif
 

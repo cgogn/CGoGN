@@ -60,7 +60,6 @@ VBO::VBO(const VBO& vbo) :
 
 VBO::~VBO()
 {
-	std::cout << "VBO delete"<< std::endl;
 	if (m_lock)
 		releasePtr();
 	glDeleteBuffers(1, &m_id);

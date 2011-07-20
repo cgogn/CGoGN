@@ -764,7 +764,6 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	bool found = false;					// Last functor return value
 
 	std::list<Dart> darts_list;			//Darts that are traversed
-
 	darts_list.push_back(d);			//Start with the dart d
 	mv.mark(d);
 

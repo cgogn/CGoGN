@@ -29,6 +29,7 @@
 #include "Topology/generic/attribmap.h"
 
 #include "Topology/generic/functor.h"
+#include "Utils/static_assert.h"
 
 namespace CGoGN
 {
@@ -196,10 +197,12 @@ public:
 	CellMarkerStore(AttribMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
 	{}
 
+
 	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
-		assert(isAllUnmarked()) ;
+//		assert(isAllUnmarked);
+		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:
@@ -239,7 +242,8 @@ public:
 
 	virtual ~CellMarkerNoUnmark()
 	{
-		assert(isAllUnmarked()) ;
+//		assert(isAllUnmarked()) ;
+		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:
