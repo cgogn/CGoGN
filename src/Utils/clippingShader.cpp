@@ -119,8 +119,8 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 		}
 		else
 		{
-			//for (int i = planesCount; i < previousPlanesCount; i++)
-				//delete m_clipPlanesDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
+			for (int i = planesCount; i < previousPlanesCount; i++)
+				delete m_clipPlanesDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
 			m_clipPlanesDrawers.resize((size_t)planesCount);
 		}
 
@@ -521,8 +521,8 @@ void ClippingShader::setClipSpheresCount(int spheresCount)
 		}
 		else
 		{
-			//for (int i = spheresCount; i < previousSpheresCount; i++)
-				//delete m_clipSpheresDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
+			for (int i = spheresCount; i < previousSpheresCount; i++)
+				delete m_clipSpheresDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
 			m_clipSpheresDrawers.resize((size_t)spheresCount);
 		}
 
