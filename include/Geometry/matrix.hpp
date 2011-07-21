@@ -299,6 +299,16 @@ Matrix<M,N,T> Matrix<M,N,T>::operator*(T s) const
 	return res ;
 }
 
+template <unsigned int M, unsigned int N, typename T>
+Matrix<M,N,T> Matrix<M,N,T>::operator/(T s) const
+{
+	Matrix<M,N,T> res ;
+	for(unsigned int i = 0; i < M; ++i)
+		for(unsigned int j = 0; j < N; ++j)
+			res(i,j) = m_data[i][j] / s ;
+	return res ;
+}
+
 /**********************************************/
 /*             UTILITY FUNCTIONS              */
 /**********************************************/
