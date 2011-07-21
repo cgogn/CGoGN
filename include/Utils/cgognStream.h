@@ -25,10 +25,6 @@
 #ifndef _CGOGNSTREAM_H_
 #define _CGOGNSTREAM_H_
 
-// pb of compilation ??
-#ifndef DBG_MAX_LEVEL
-#define DBG_MAX_LEVEL 5
-#endif
 
 #include <string>
 #include <iostream>

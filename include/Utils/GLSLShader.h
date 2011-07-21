@@ -54,8 +54,6 @@ public:
 	{
 		int va_id;
 		VBO* vbo_ptr;
-//		GLuint vbo_id;
-//		unsigned int size;
 	};
 
 	/**
@@ -118,7 +116,6 @@ protected:
 	/**
 	 * a set of pair VA_id / VBO_id
 	 */
-//	std::vector<pair<int,unsigned int> > m_va_vbo_binding;
 	std::vector<VAStr> m_va_vbo_binding;
 
 	static std::vector<std::string> m_pathes;
@@ -344,10 +341,6 @@ public:
 	 */
 	void addPathFileSeach(const std::string& path);
 
-	/**
-	 * remove VBO index from binding
-	 */
-	void unbindVBO(VBO* ptr);
 
 	/**
 	 * remove VBO index from binding
@@ -368,7 +361,7 @@ public:
 	/**
 	 * get binding VA VBO
 	 */
-	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding; }
+//	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding; }
 
 	void bindAttrib(unsigned int att, const char* name) const;
 

@@ -38,7 +38,7 @@ template <typename MAP3>
 class EmbeddedMap3 : public MAP3
 {
 public:
-
+	typedef MAP3 TOPO_MAP;
 
 	//!
 	/*!

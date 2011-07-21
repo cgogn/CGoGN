@@ -13,6 +13,14 @@ find_package(OpenGL REQUIRED)
 find_package(Qt4 REQUIRED)
 find_package(GLUT)
 
+IF (DEFINED ASSERTON)
+	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
+ELSE (DEFINED ASSERTON)
+	add_definitions(-DCGOGN_ASSERT_BOOL=false)
+ENDIF (DEFINED ASSERTON)
+
+add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
+
 # qq definition specifiques pour mac
 IF(APPLE)
 # attention a changer pour chercher la bonne version automatiquement

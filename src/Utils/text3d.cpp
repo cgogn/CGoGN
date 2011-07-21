@@ -109,7 +109,6 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 
 	m_vbo1 = new Utils::VBO();
 	m_vbo1->setDataSize(4);
-	m_vbo1->ref(this);
 
 	bindVA_VBO("VertexPosition", m_vbo1);
 

@@ -57,9 +57,9 @@ Drawer::Drawer() : m_currentWidth(1.0f)
 Drawer::~Drawer()
 {
 	Utils::GLSLShader::unregisterShader(NULL, m_shader);
-	delete m_shader;
 	delete m_vboPos;
 	delete m_vboCol;
+	delete m_shader;
 }
 
 void Drawer::lineWidth(float lw)

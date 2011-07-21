@@ -32,6 +32,7 @@ namespace Algo
 namespace Import 
 {
 
+
 template <typename PFP>
 bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
@@ -177,19 +178,18 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 	//Association des phi3
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		std::vector<Dart>& vec = vecDartsPerVertex[d];
-
-		for(typename std::vector<Dart>::iterator it = vec.begin(); it!=vec.end(); ++it)
+		const std::vector<Dart>& vec = vecDartsPerVertex[d];
+		for(typename std::vector<Dart>::const_iterator it = vec.begin(); it!=vec.end(); ++it)
 		{
 			if(map.phi3(*it) == *it)
 			{
 				bool sewn = false;
-				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
+				for(typename std::vector<Dart>::const_iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
 				{
 					if(map.getEmbedding(VERTEX,map.phi1(*it))==map.getEmbedding(VERTEX,map.phi_1(*itnext))
 					&& map.getEmbedding(VERTEX,map.phi_1(*it))==map.getEmbedding(VERTEX,map.phi1(*itnext)))
 					{
-						map.sewVolumes(*it, map.phi_1(*itnext));
+						map.PFP::MAP::TOPO_MAP::sewVolumes(*it, map.phi_1(*itnext));
 						sewn = true;
 					}
 				}
