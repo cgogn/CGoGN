@@ -310,6 +310,10 @@ Sphere::Sphere(unsigned int par, unsigned int mer)
 
 void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 {
+	if (parp<2)
+		parp=2;
+	if (mer<2)
+		mer=2;
 	// to obtain right number of slice
 	unsigned int par = parp-1;
 
@@ -438,6 +442,11 @@ Cone::Cone(unsigned int par, unsigned int mer)
 
 void Cone::changeTopo(unsigned int par, unsigned int mer)
 {
+	if (par<2)
+		par=2;
+	if (mer<2)
+		mer=2;
+
 	unsigned int merfactor=1;
 
 	if (mer<8)
@@ -558,9 +567,13 @@ Cylinder::Cylinder(unsigned int par, unsigned int mer)
 
 void Cylinder::changeTopo(unsigned int parp, unsigned int mer)
 {
+	if (parp<2)
+		parp=2;
+	if (mer<2)
+		mer=2;
+
 	// to obtain right number of slice (with almost same code as sphere)
 	unsigned int par = parp+1;
-
 
 	unsigned int merfactor=1;
 
@@ -865,6 +878,8 @@ void IcoSphere::subdivide(std::vector<unsigned int>& triangles, std::vector<Geom
 
 void IcoSphere::changeTopo(unsigned int sub)
 {
+	if (sub<2)
+		sub=2;
 	int subd = int(log(sub/2)/log(2.0))-1;
 	if (subd<0)
 		subd=0;
