@@ -429,7 +429,7 @@ public:
 	 * @param par number of parallels
 	 * @param mer number of meridians
 	 */
-	IcoSphere(unsigned int sub=1);
+	IcoSphere(unsigned int sub=5);
 
 
 	/**

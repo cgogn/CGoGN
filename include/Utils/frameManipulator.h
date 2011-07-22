@@ -182,28 +182,11 @@ public:
 	  */
 	 void lockPicking(unsigned int axis);
 
-	 /// lock translations for picking only
-	 void lockPickingTranslations();
-
-	 /// lock rotations for picking only
-	 void lockPickingRotations();
-
-	 /// lock scales for picking only
-	 void lockPickingScales();
-
 	 /**
 	  * unlock an axis (only for pinking)
 	  */
 	 void unlockPicking(unsigned int axis);
 
-	 /// unlock translations for picking only
-	 void unlockPickingTranslations();
-
-	 /// unlock rotations for picking only
-	 void unlockPickingRotations();
-
-	 /// unlock scales for picking only
-	 void unlockPickingScales();
 	 /**
 	  * is an axis locked (only for pinking)
 	  */
@@ -233,9 +216,6 @@ public:
 	 * @param sc scale factor to apply on
 	 */
 	void scale(unsigned int axis, float sc);
-
-
-
 
 	/**
 	 * get the matrix transformation
