@@ -110,6 +110,7 @@ public:
 	Utils::LineDrawable* m_sphereDrawable;
 	Utils::FrameManipulator* m_frameManipulator;
 	std::vector<Utils::Pickable*> m_pickables;
+	Utils::Pickable* m_lastPickedObject;
 
 	StageShaderReloaded();
 
@@ -141,9 +142,7 @@ public slots:
 	void slot_doubleSpinBox_PlaneVec2(double c);
 	void slot_doubleSpinBox_PlaneOrigin(double c);
 
-	void slot_doubleSpinBox_GridDisplaySize(double c);
-	void slot_spinBox_GridResolutionX(int i);
-	void slot_spinBox_GridResolutionY(int i);
+	void slot_spinBox_GridResolution(int i);
 	void slot_doubleSpinBox_GridColor(double c);
 
 	void slot_pushButton_addSphere();
@@ -154,8 +153,7 @@ public slots:
 	void slot_doubleSpinBox_SphereCenter(double c);
 	void slot_doubleSpinBox_SphereRadius(double c);
 
-	void slot_spinBox_SphereGridResolutionX(int i);
-	void slot_spinBox_SphereGridResolutionY(int i);
+	void slot_spinBox_SphereResolution(int i);
 	void slot_doubleSpinBox_SphereGridColor(double c);
 
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);

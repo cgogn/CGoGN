@@ -208,7 +208,7 @@
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QSpinBox" name="spinBox_GridResolutionX">
+                    <widget class="QSpinBox" name="spinBox_GridResolution">
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -252,13 +252,6 @@
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="2">
-                    <widget class="QSpinBox" name="spinBox_GridResolutionY">
-                     <property name="maximum">
-                      <number>200</number>
                      </property>
                     </widget>
                    </item>
@@ -506,14 +499,14 @@
                     </widget>
                    </item>
                    <item row="0" column="0">
-                    <widget class="QLabel" name="label_SphereGridResolution">
+                    <widget class="QLabel" name="label_SphereResolution">
                      <property name="text">
                       <string>Res.</string>
                      </property>
                     </widget>
                    </item>
                    <item row="0" column="1">
-                    <widget class="QSpinBox" name="spinBox_SphereGridResolutionX">
+                    <widget class="QSpinBox" name="spinBox_SphereResolution">
                      <property name="maximum">
                       <number>200</number>
                      </property>
@@ -543,13 +536,6 @@
                      </property>
                      <property name="singleStep">
                       <double>0.100000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <widget class="QSpinBox" name="spinBox_SphereGridResolutionY">
-                     <property name="maximum">
-                      <number>200</number>
                      </property>
                     </widget>
                    </item>

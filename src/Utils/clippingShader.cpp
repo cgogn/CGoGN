@@ -45,27 +45,10 @@ ClippingShader::ClippingShader()
 	m_unif_clipSpheresCentersAndRadiuses = 0;
 	m_unif_clipColorAttenuationFactor = 0;
 
-	// Initialize default display variables
-	m_clipPlanesDisplayColor = Geom::Vec3f (1.0, 0.6, 0.0);
-	m_clipPlanesDisplayXRes = 2;
-	m_clipPlanesDisplayYRes = 2;
-	m_clipPlanesDisplaySize = 10.0;
-	m_clipSpheresDisplayColor = Geom::Vec3f (0.0, 0.4, 1.0);
-	m_clipSpheresDisplayXRes = 15;
-	m_clipSpheresDisplayYRes = 10;
-
 	// Initialize default global clipping variables
 	m_hasClippingCodeBeenInserted = false;
 	m_clipColorAttenuationFactor = 1.0;
 	m_clipMode = CLIPPING_MODE_AND;
-}
-
-ClippingShader::~ClippingShader()
-{
-	// Destroy remaining clip planes drawers
-	size_t i;
-	for (i = 0; i < m_clipPlanesDrawers.size(); i++)
-		delete m_clipPlanesDrawers[i];
 }
 
 
@@ -109,20 +92,6 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 		// Resize the planes arrays to the right size
 		m_clipPlanes.resize((size_t)planesCount);
 		m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
-
-		// Resize the planes drawers array to the right size, and create/destroy objects
-		if (planesCount > previousPlanesCount)
-		{
-			m_clipPlanesDrawers.resize((size_t)planesCount, NULL);
-			for (int i = previousPlanesCount; i < planesCount; i++)
-				m_clipPlanesDrawers[i] = new Drawer;
-		}
-		else
-		{
-			for (int i = planesCount; i < previousPlanesCount; i++)
-				delete m_clipPlanesDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
-			m_clipPlanesDrawers.resize((size_t)planesCount);
-		}
 
 		// Set default parameters values for new planes
 		if (planesCount > previousPlanesCount)
@@ -171,9 +140,6 @@ void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, G
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
-
-		// Update plane VBO
-		updateClipPlaneVBO(planeIndex);
 	}
 }
 
@@ -197,9 +163,6 @@ void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
-
-		// Update plane VBO
-		updateClipPlaneVBO(planeIndex);
 	}
 }
 
@@ -223,9 +186,6 @@ void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeInde
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
-
-		// Update plane VBO
-		updateClipPlaneVBO(planeIndex);
 	}
 }
 
@@ -245,9 +205,6 @@ void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
-
-		// Update plane VBO
-		updateClipPlaneVBO(planeIndex);
 	}
 }
 
@@ -300,179 +257,6 @@ void ClippingShader::updateClipPlaneArray(int planeIndex)
 
 /***********************************************
  *
- * 		Plane Clipping Display
- *
- ***********************************************/
-
-
-void ClippingShader::displayClipPlanes()
-{
-	for (size_t i = 0; i < m_clipPlanesDrawers.size(); i++)
-		m_clipPlanesDrawers[i]->callList();
-}
-
-void ClippingShader::setClipPlanesDisplayColor(Geom::Vec3f color)
-{
-	if (color != m_clipPlanesDisplayColor)
-	{
-		m_clipPlanesDisplayColor = color;
-		updateClipPlanesVBOs();
-	}
-}
-
-Geom::Vec3f ClippingShader::getClipPlanesDisplayColor()
-{
-	return m_clipPlanesDisplayColor;
-}
-
-void ClippingShader::setClipPlanesDisplayXRes(size_t res)
-{
-	if (res != m_clipPlanesDisplayXRes)
-	{
-		m_clipPlanesDisplayXRes = res;
-		updateClipPlanesVBOs();
-	}
-}
-
-size_t ClippingShader::getClipPlanesDisplayXRes()
-{
-	return m_clipPlanesDisplayXRes;
-}
-
-void ClippingShader::setClipPlanesDisplayYRes(size_t res)
-{
-	if (res != m_clipPlanesDisplayYRes)
-	{
-		m_clipPlanesDisplayYRes = res;
-		updateClipPlanesVBOs();
-	}
-}
-
-size_t ClippingShader::getClipPlanesDisplayYRes()
-{
-	return m_clipPlanesDisplayYRes;
-}
-
-void ClippingShader::setClipPlanesDisplaySize(float size)
-{
-	if (size != m_clipPlanesDisplaySize)
-	{
-		m_clipPlanesDisplaySize = size;
-		updateClipPlanesVBOs();
-	}
-}
-
-float ClippingShader::getClipPlanesDisplaySize()
-{
-	return m_clipPlanesDisplaySize;
-}
-
-void ClippingShader::updateClipPlaneVBO(int planeIndex)
-{
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::updateClipPlaneVBO", "planeIndex"))
-			return;
-
-	// Compute four point of the plane at equal distance from plane origin
-	Geom::Vec3f p1 = m_clipPlanes[planeIndex].origin
-			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
-	Geom::Vec3f p2 = m_clipPlanes[planeIndex].origin
-			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
-	Geom::Vec3f p3 = m_clipPlanes[planeIndex].origin
-			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
-	Geom::Vec3f p4 = m_clipPlanes[planeIndex].origin
-			- (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].firstVec
-			+ (0.5f * m_clipPlanesDisplaySize) * m_clipPlanes[planeIndex].secondVec;
-
-
-	// Build the VBO with the new points
-
-	m_clipPlanesDrawers[planeIndex]->newList(GL_COMPILE);
-
-	// Only display the grid if both x and y resolutions are not zero
-	if ( (m_clipPlanesDisplayXRes != 0) && (m_clipPlanesDisplayYRes != 0) )
-	{
-		float t;
-		Geom::Vec3f p1p2Interp;
-		Geom::Vec3f p4p3Interp;
-		Geom::Vec3f p2p3Interp;
-		Geom::Vec3f p1p4Interp;
-
-		// X lines
-		for (size_t i = 0; i <= m_clipPlanesDisplayXRes; i++)
-		{
-			// Compute the linear interpolation parameter from the current value of 'i'
-			t = (float)i / (float)m_clipPlanesDisplayXRes;
-
-			// Grid construction
-
-			// Compute linear interpolations between points
-			p1p2Interp = p1*t + p2*(1.0 - t);
-			p4p3Interp = p4*t + p3*(1.0 - t);
-
-			// Draw lines between the resulting points
-			m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
-			m_clipPlanesDrawers[planeIndex]->color3f(
-					m_clipPlanesDisplayColor[0],
-					m_clipPlanesDisplayColor[1],
-					m_clipPlanesDisplayColor[2]);
-			m_clipPlanesDrawers[planeIndex]->vertex3f(
-					p1p2Interp[0],
-					p1p2Interp[1],
-					p1p2Interp[2]);
-			m_clipPlanesDrawers[planeIndex]->vertex3f(
-					p4p3Interp[0],
-					p4p3Interp[1],
-					p4p3Interp[2]);
-			m_clipPlanesDrawers[planeIndex]->end();
-		}
-
-		// Y lines
-		for (size_t i = 0; i <= m_clipPlanesDisplayYRes; i++)
-		{
-			// Compute the linear interpolation parameter from the current value of 'i'
-			t = (float)i / (float)m_clipPlanesDisplayYRes;
-
-			// Grid construction
-
-			// Compute linear interpolations between points
-			p2p3Interp = p2*t + p3*(1.0 - t);
-			p1p4Interp = p1*t + p4*(1.0 - t);
-
-			// Draw lines between the resulting points
-			m_clipPlanesDrawers[planeIndex]->begin(GL_LINES);
-			m_clipPlanesDrawers[planeIndex]->color3f(
-					m_clipPlanesDisplayColor[0],
-					m_clipPlanesDisplayColor[1],
-					m_clipPlanesDisplayColor[2]);
-			m_clipPlanesDrawers[planeIndex]->vertex3f(
-					p2p3Interp[0],
-					p2p3Interp[1],
-					p2p3Interp[2]);
-			m_clipPlanesDrawers[planeIndex]->vertex3f(
-					p1p4Interp[0],
-					p1p4Interp[1],
-					p1p4Interp[2]);
-			m_clipPlanesDrawers[planeIndex]->end();
-		}
-
-	}
-
-	m_clipPlanesDrawers[planeIndex]->endList();
-}
-
-void ClippingShader::updateClipPlanesVBOs()
-{
-	for (int i = 0; i < getClipPlanesCount(); i++)
-		updateClipPlaneVBO(i);
-}
-
-
-/***********************************************
- *
  * 		Sphere Clipping
  *
  ***********************************************/
@@ -512,20 +296,6 @@ void ClippingShader::setClipSpheresCount(int spheresCount)
 		m_clipSpheres.resize((size_t)spheresCount);
 		m_clipSpheresCentersAndRadiuses.resize(4*(size_t)spheresCount, 0.0);
 
-		// Resize the spheres drawers array to the right size, and create/destroy objects
-		if (spheresCount > previousSpheresCount)
-		{
-			m_clipSpheresDrawers.resize((size_t)spheresCount, NULL);
-			for (int i = previousSpheresCount; i < spheresCount; i++)
-				m_clipSpheresDrawers[i] = new Drawer;
-		}
-		else
-		{
-			for (int i = spheresCount; i < previousSpheresCount; i++)
-				delete m_clipSpheresDrawers[i]; // TODO : Bug dans drawer, crash le prochain affichage
-			m_clipSpheresDrawers.resize((size_t)spheresCount);
-		}
-
 		// Set default parameters values for new spheres
 		if (spheresCount > previousSpheresCount)
 		{
@@ -564,9 +334,6 @@ void ClippingShader::setClipSphereParamsAll(Geom::Vec3f center, float radius, in
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
-
-		// Update sphere VBO
-		updateClipSphereVBO(sphereIndex);
 	}
 }
 
@@ -586,9 +353,6 @@ void ClippingShader::setClipSphereParamsCenter(Geom::Vec3f center, int sphereInd
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
-
-		// Update sphere VBO
-		updateClipSphereVBO(sphereIndex);
 	}
 }
 
@@ -608,9 +372,6 @@ void ClippingShader::setClipSphereParamsRadius(float radius, int sphereIndex)
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
-
-		// Update sphere VBO
-		updateClipSphereVBO(sphereIndex);
 	}
 }
 
@@ -646,157 +407,6 @@ void ClippingShader::updateClipSphereArray(int sphereIndex)
 	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 2] = m_clipSpheres[sphereIndex].center[2];
 	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 3] = m_clipSpheres[sphereIndex].radius;
 
-}
-
-
-/***********************************************
- *
- * 		Sphere Clipping Display
- *
- ***********************************************/
-
-
-void ClippingShader::displayClipSpheres()
-{
-	for (size_t i = 0; i < m_clipSpheresDrawers.size(); i++)
-		m_clipSpheresDrawers[i]->callList();
-}
-
-void ClippingShader::setClipSpheresDisplayColor(Geom::Vec3f color)
-{
-	if (color != m_clipSpheresDisplayColor)
-	{
-		m_clipSpheresDisplayColor = color;
-		updateClipSpheresVBOs();
-	}
-}
-
-Geom::Vec3f ClippingShader::getClipSpheresDisplayColor()
-{
-	return m_clipSpheresDisplayColor;
-}
-
-void ClippingShader::setClipSpheresDisplayXRes(size_t res)
-{
-	if (res != m_clipSpheresDisplayXRes)
-	{
-		m_clipSpheresDisplayXRes = res;
-		updateClipSpheresVBOs();
-	}
-}
-
-size_t ClippingShader::getClipSpheresDisplayXRes()
-{
-	return m_clipSpheresDisplayXRes;
-}
-
-void ClippingShader::setClipSpheresDisplayYRes(size_t res)
-{
-	if (res != m_clipSpheresDisplayYRes)
-	{
-		m_clipSpheresDisplayYRes = res;
-		updateClipSpheresVBOs();
-	}
-}
-
-size_t ClippingShader::getClipSpheresDisplayYRes()
-{
-	return m_clipSpheresDisplayYRes;
-}
-
-void ClippingShader::updateClipSphereVBO(int sphereIndex)
-{
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::updateClipSphereVBO", "sphereIndex"))
-			return;
-
-	// Build the VBO
-	m_clipSpheresDrawers[sphereIndex]->newList(GL_COMPILE);
-
-	m_clipSpheresDrawers[sphereIndex]->color3f(
-			m_clipSpheresDisplayColor[0],
-			m_clipSpheresDisplayColor[1],
-			m_clipSpheresDisplayColor[2]);
-
-	// Sphere segments and rings subdivisions
-	const int segSubdivs = 100;
-	const int ringsSubdivs = 100;
-
-	// Compute angle displacement steps
-	float dTheta = 0.0;
-	if (m_clipSpheresDisplayXRes != 0)
-		dTheta = 2.0 * M_PI / (float)m_clipSpheresDisplayXRes;
-	float dPhi = 0.0;
-	if (m_clipSpheresDisplayYRes != 0)
-		dPhi = M_PI / (float)m_clipSpheresDisplayYRes;
-
-	// Compute angle displacement steps for subdivisions
-	float dSegSubdiv = M_PI / (float)segSubdivs;
-	float dRingsSubdiv = 2.0 * M_PI / (float)ringsSubdivs;
-
-	// Draw the segments of the sphere
-	for (size_t i = 0; i < m_clipSpheresDisplayXRes; i++)
-	{
-
-		m_clipSpheresDrawers[sphereIndex]->begin(GL_LINE_STRIP);
-
-		for (size_t j = 0; j < segSubdivs + 1; j++)
-		{
-			// Compute a point on the current subdivision according to the parametric equation of the sphere
-			Geom::Vec3f point (
-					cos(i*dTheta) * sin(j*dSegSubdiv),
-					sin(i*dTheta) * sin(j*dSegSubdiv),
-					cos(j*dSegSubdiv));
-
-			// Scale with the radius
-			point *= m_clipSpheres[sphereIndex].radius;
-
-			// Translate to the center
-			point += m_clipSpheres[sphereIndex].center;
-
-			// Draw a line through this point
-			m_clipSpheresDrawers[sphereIndex]->vertex(point);
-		}
-
-		m_clipSpheresDrawers[sphereIndex]->end();
-
-	}
-
-	// Draw the rings of the sphere
-	for (size_t i = 0; i < m_clipSpheresDisplayYRes; i++)
-	{
-
-		m_clipSpheresDrawers[sphereIndex]->begin(GL_LINE_STRIP);
-
-		for (size_t j = 0; j < ringsSubdivs + 1; j++)
-		{
-			// Compute a point on the current subdivision according to the parametric equation of the sphere
-			Geom::Vec3f point (
-					cos(j*dRingsSubdiv) * sin(i*dPhi),
-					sin(j*dRingsSubdiv) * sin(i*dPhi),
-					cos(i*dPhi));
-
-			// Scale with the radius
-			point *= m_clipSpheres[sphereIndex].radius;
-
-			// Translate to the center
-			point += m_clipSpheres[sphereIndex].center;
-
-			// Draw a line through this point
-			m_clipSpheresDrawers[sphereIndex]->vertex(point);
-		}
-
-		m_clipSpheresDrawers[sphereIndex]->end();
-
-	}
-
-	m_clipSpheresDrawers[sphereIndex]->endList();
-}
-
-void ClippingShader::updateClipSpheresVBOs()
-{
-	for (int i = 0; i < getClipSpheresCount(); i++)
-		updateClipSphereVBO(i);
 }
 
 

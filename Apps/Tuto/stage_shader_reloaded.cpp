@@ -167,21 +167,9 @@ void StageShaderReloaded::slot_doubleSpinBox_PlaneOrigin(double c)
 	}
 }
 
-void StageShaderReloaded::slot_doubleSpinBox_GridDisplaySize(double c)
+void StageShaderReloaded::slot_spinBox_GridResolution(int i)
 {
-	m_shader->setClipPlanesDisplaySize((float)c);
-	updateGL();
-}
-
-void StageShaderReloaded::slot_spinBox_GridResolutionX(int i)
-{
-	m_shader->setClipPlanesDisplayXRes((size_t)i);
-	updateGL();
-}
-
-void StageShaderReloaded::slot_spinBox_GridResolutionY(int i)
-{
-	m_shader->setClipPlanesDisplayYRes((size_t)i);
+	m_planeDrawable->updatePrecisionDrawing(i);
 	updateGL();
 }
 
@@ -191,7 +179,7 @@ void StageShaderReloaded::slot_doubleSpinBox_GridColor(double c)
 	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorG->value();
 	float b = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorB->value();
 
-	m_shader->setClipPlanesDisplayColor(Geom::Vec3f(r, g, b));
+	m_planeDrawable->setColor(Geom::Vec4f(r, g, b, 1.0));
 	updateGL();
 }
 
@@ -267,15 +255,9 @@ void StageShaderReloaded::slot_doubleSpinBox_SphereRadius(double c)
 	}
 }
 
-void StageShaderReloaded::slot_spinBox_SphereGridResolutionX(int i)
+void StageShaderReloaded::slot_spinBox_SphereResolution(int i)
 {
-	m_shader->setClipSpheresDisplayXRes((size_t)i);
-	updateGL();
-}
-
-void StageShaderReloaded::slot_spinBox_SphereGridResolutionY(int i)
-{
-	m_shader->setClipSpheresDisplayYRes((size_t)i);
+	m_sphereDrawable->updatePrecisionDrawing(i);
 	updateGL();
 }
 
@@ -285,7 +267,7 @@ void StageShaderReloaded::slot_doubleSpinBox_SphereGridColor(double c)
 	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorG->value();
 	float b = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorB->value();
 
-	m_shader->setClipSpheresDisplayColor(Geom::Vec3f(r, g, b));
+	m_sphereDrawable->setColor(Geom::Vec4f(r, g, b, 1.0));
 	updateGL();
 }
 
@@ -372,9 +354,7 @@ void StageShaderReloaded::initGUI()
 	setCallBack(dock.doubleSpinBox_PlaneOriginy, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
 	setCallBack(dock.doubleSpinBox_PlaneOriginz, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
 
-	setCallBack(dock.doubleSpinBox_GridDisplaySize, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridDisplaySize(double)));
-	setCallBack(dock.spinBox_GridResolutionX, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolutionX(int)));
-	setCallBack(dock.spinBox_GridResolutionY, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolutionY(int)));
+	setCallBack(dock.spinBox_GridResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolution(int)));
 	setCallBack(dock.doubleSpinBox_GridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
 	setCallBack(dock.doubleSpinBox_GridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
 	setCallBack(dock.doubleSpinBox_GridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
@@ -384,10 +364,8 @@ void StageShaderReloaded::initGUI()
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
-	dock.doubleSpinBox_GridDisplaySize->setValue(m_shader->getClipPlanesDisplaySize());
-	dock.spinBox_GridResolutionX->setValue(m_shader->getClipPlanesDisplayXRes());
-	dock.spinBox_GridResolutionY->setValue(m_shader->getClipPlanesDisplayYRes());
-	Geom::Vec3f planesCol = m_shader->getClipPlanesDisplayColor();
+	dock.spinBox_GridResolution->setValue(5); // TODO : Utiliser un getteur
+	Geom::Vec3f planesCol = Geom::Vec3f(1.0, 0.0, 0.0);  // TODO : utiliser un getteur
 	dock.doubleSpinBox_GridColorR->setValue(planesCol[0]);
 	dock.doubleSpinBox_GridColorG->setValue(planesCol[1]);
 	dock.doubleSpinBox_GridColorB->setValue(planesCol[2]);
@@ -405,15 +383,13 @@ void StageShaderReloaded::initGUI()
 
 	setCallBack(dock.doubleSpinBox_SphereRadius, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereRadius(double)));
 
-	setCallBack(dock.spinBox_SphereGridResolutionX, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereGridResolutionX(int)));
-	setCallBack(dock.spinBox_SphereGridResolutionY, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereGridResolutionY(int)));
+	setCallBack(dock.spinBox_SphereResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereResolution(int)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
 
-	dock.spinBox_SphereGridResolutionX->setValue(m_shader->getClipSpheresDisplayXRes());
-	dock.spinBox_SphereGridResolutionY->setValue(m_shader->getClipSpheresDisplayYRes());
-	Geom::Vec3f spheresCol = m_shader->getClipSpheresDisplayColor();
+	dock.spinBox_SphereResolution->setValue(3); // TODO : utiliser un getteur
+	Geom::Vec3f spheresCol = Geom::Vec3f(0.0, 0.4, 1.0); // TODO : utiliser un getteur
 	dock.doubleSpinBox_SphereGridColorR->setValue(spheresCol[0]);
 	dock.doubleSpinBox_SphereGridColorG->setValue(spheresCol[1]);
 	dock.doubleSpinBox_SphereGridColorB->setValue(spheresCol[2]);
@@ -487,9 +463,7 @@ void StageShaderReloaded::importMesh(std::string& filename)
 
 	setParamObject(gWidthObj, gPosObj.data()) ;
 
-	updateGLMatrices() ;
-
-	m_shader->setClipPlanesDisplaySize((m_bb.maxSize())*1.2f);
+	updateGLMatrices();
 }
 
 /*******************************************************************************
@@ -517,21 +491,18 @@ void StageShaderReloaded::cb_initGL()
 
 	// setup clipping
 	m_shader->insertClippingCode();
-	m_shader->setClipPlanesDisplayColor(Geom::Vec3f (1.0, 0.0, 0.0));
-	m_shader->setClipPlanesDisplayXRes(10);
-	m_shader->setClipPlanesDisplayYRes(5);
-	m_shader->setClipSpheresDisplayColor(Geom::Vec3f(0.0, 0.4, 1.0));
-	m_shader->setClipSpheresDisplayXRes(20);
-	m_shader->setClipSpheresDisplayYRes(15);
 
 	// setup clipping shapes
 	m_planeDrawable = new Utils::Grid;
 	m_planeDrawable->setColor(Geom::Vec4f(1.0, 0.0, 0.0, 1.0));
-	m_sphereDrawable = new Utils::IcoSphere(20);
+	m_planeDrawable->updatePrecisionDrawing(5);
+	m_sphereDrawable = new Utils::IcoSphere;
 	m_sphereDrawable->setColor(Geom::Vec4f(0.0, 0.4, 1.0, 1.0));
+	m_sphereDrawable->updatePrecisionDrawing(3);
 
 	// setup clipping picking frame
 	m_frameManipulator = new Utils::FrameManipulator();
+	m_lastPickedObject = NULL;
 }
 
 void StageShaderReloaded::updateVBOprimitives(int upType)
@@ -582,10 +553,12 @@ void StageShaderReloaded::cb_redraw()
 		m_render_topo->drawTopo();
 
 	// Display clipping shapes
-	m_shader->displayClipPlanes();
-	m_shader->displayClipSpheres();
 	for (size_t i = 0; i < m_pickables.size(); i++)
 		m_pickables[i]->draw();
+
+	// Display picking frame
+	if (m_lastPickedObject)
+		m_frameManipulator->draw();
 
 }
 
@@ -605,16 +578,16 @@ void StageShaderReloaded::cb_mousePress(int button, int x, int y)
 
 int main(int argc, char** argv)
 {
-    QApplication app(argc, argv) ;
+    QApplication app(argc, argv);
 
-    StageShaderReloaded sqt ;
-    sqt.setGeometry(0, 0, 1000, 800) ;
-    sqt.show() ;
+    StageShaderReloaded sqt;
+    sqt.setGeometry(0, 0, 1000, 800);
+    sqt.show();
 
-	if(argc ==  2)
+	if(argc == 2)
     {
-            std::string filename(argv[1]) ;
-            sqt.importMesh(filename) ;
+            std::string filename(argv[1]);
+            sqt.importMesh(filename);
     }
 	else
 	{
@@ -624,7 +597,7 @@ int main(int argc, char** argv)
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
 	}
 
-    sqt.initGUI() ;
+    sqt.initGUI();
 
-    return app.exec() ;
+    return app.exec();
 }

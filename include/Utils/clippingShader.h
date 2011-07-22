@@ -29,7 +29,6 @@
 #include "Geometry/vector_gen.h"
 #include "Utils/cgognStream.h"
 #include "Utils/shaderMutator.h"
-#include "Utils/drawer.h"
 #include <string>
 #include <sstream>
 #include <vector>
@@ -55,9 +54,6 @@ public :
 
 	/// constructor
 	ClippingShader();
-
-	/// destructor
-	~ClippingShader();
 
 
 	/***********************************************
@@ -156,82 +152,8 @@ private:
 	 */
 	std::vector<float> m_clipPlanesEquations;
 
-	/// clip planes equations vector uniform id
+	/// clip planes equations array uniform id
 	GLint m_unif_clipPlanesEquations;
-
-
-	/***********************************************
-	 *
-	 * 		Plane Clipping Display
-	 *
-	 ***********************************************/
-
-public:
-
-	/// display all clipping planes
-	void displayClipPlanes();
-
-	/**
-	 * set the planes display color
-	 * @param color the new color
-	 */
-	void setClipPlanesDisplayColor(Geom::Vec3f color);
-
-	/// get the planes display color
-	Geom::Vec3f getClipPlanesDisplayColor();
-
-	/**
-	 * set the planes display grid x resolution
-	 * @param res the new resolution
-	 */
-	void setClipPlanesDisplayXRes(size_t res);
-
-	/// get the planes display grid x resolution
-	size_t getClipPlanesDisplayXRes();
-
-	/**
-	 * set the planes display grid y resolution
-	 * @param res the new resolution
-	 */
-	void setClipPlanesDisplayYRes(size_t res);
-
-	/// get the planes display grid y resolution
-	size_t getClipPlanesDisplayYRes();
-
-	/**
-	 * set the planes display size
-	 * @param size the new size
-	 */
-	void setClipPlanesDisplaySize(float size);
-
-	/// get the planes display size
-	float getClipPlanesDisplaySize();
-
-private:
-
-	/**
-	 * update VBO for one plane
-	 * @param planeIndex index of the plane
-	 */
-	void updateClipPlaneVBO(int planeIndex);
-
-	/// update VBOs for all planes
-	void updateClipPlanesVBOs();
-
-	/// clip planes drawers array
-	std::vector<Drawer*> m_clipPlanesDrawers;
-
-	/// clip planes display color
-	Geom::Vec3f m_clipPlanesDisplayColor;
-
-	/// clip planes x grid display resolution
-	size_t m_clipPlanesDisplayXRes;
-
-	/// clip planes y grid display resolution
-	size_t m_clipPlanesDisplayYRes;
-
-	/// clip planes display size
-	float m_clipPlanesDisplaySize;
 
 
 	/***********************************************
@@ -317,68 +239,6 @@ private:
 
 	/// clip spheres equations vector uniform id
 	GLint m_unif_clipSpheresCentersAndRadiuses;
-
-
-	/***********************************************
-	 *
-	 * 		Sphere Clipping Display
-	 *
-	 ***********************************************/
-
-public:
-
-	/// display all clipping spheres
-	void displayClipSpheres();
-
-	/**
-	 * set the spheres display color
-	 * @param color the new color
-	 */
-	void setClipSpheresDisplayColor(Geom::Vec3f color);
-
-	/// get the spheres display color
-	Geom::Vec3f getClipSpheresDisplayColor();
-
-	/**
-	 * set the spheres display grid x resolution
-	 * @param res the new resolution
-	 */
-	void setClipSpheresDisplayXRes(size_t res);
-
-	/// get the spheres display grid x resolution
-	size_t getClipSpheresDisplayXRes();
-
-	/**
-	 * set the spheres display grid y resolution
-	 * @param res the new resolution
-	 */
-	void setClipSpheresDisplayYRes(size_t res);
-
-	/// get the spheres display grid y resolution
-	size_t getClipSpheresDisplayYRes();
-
-private:
-
-	/**
-	 * update VBO for one sphere
-	 * @param sphereIndex index of the sphere
-	 */
-	void updateClipSphereVBO(int sphereIndex);
-
-	/// update VBOs for all spheres
-	void updateClipSpheresVBOs();
-
-	/// clip spheres drawers array
-	std::vector<Drawer*> m_clipSpheresDrawers;
-
-	/// clip spheres display color
-	Geom::Vec3f m_clipSpheresDisplayColor;
-
-	/// clip spheres x grid display resolution
-	size_t m_clipSpheresDisplayXRes;
-
-	/// clip spheres y grid display resolution
-	size_t m_clipSpheresDisplayYRes;
 
 
 	/***********************************************
