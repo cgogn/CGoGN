@@ -217,9 +217,6 @@ public:
 	 */
 	void scale(unsigned int axis, float sc);
 
-
-
-
 	/**
 	 * get the matrix transformation
 	 */

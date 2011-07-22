@@ -135,12 +135,15 @@ FrameManipulator::FrameManipulator():
 
 void FrameManipulator::setSize(float radius)
 {
-	m_scaleRendering = radius;
+	if (m_scaleRendering >0.0f)
+		m_scaleRendering = radius;
 }
 
 void FrameManipulator::addSize(float radius)
 {
 	m_scaleRendering += radius;
+	if (m_scaleRendering <= 0.0f)
+		m_scaleRendering -= radius;
 }
 
 float FrameManipulator::getSize()
@@ -186,10 +189,17 @@ void FrameManipulator::draw()
 		glDrawArrays(GL_TRIANGLE_STRIP, 4*nb_segments+4, 2*nb_segments+2);
 	}
 
-
+	if ((!m_locked_axis[CENTER]) && (m_highlighted == CENTER))
+	{
+		glLineWidth(6.0f);
+		m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		glDrawArrays(GL_LINES, 6*nb_segments+6, 6);
+	}
+	else
+	{
 	if (!m_locked_axis[Xs])
 	{
-		if ((m_highlighted == CENTER) || (m_highlighted == Xs))
+		if (m_highlighted == Xs)
 		{
 			glLineWidth(6.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
@@ -204,7 +214,7 @@ void FrameManipulator::draw()
 
 	if (!m_locked_axis[Ys])
 	{
-		if ((m_highlighted == CENTER) || (m_highlighted == Ys))
+		if (m_highlighted == Ys)
 		{
 			glLineWidth(6.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
@@ -219,7 +229,7 @@ void FrameManipulator::draw()
 
 	if (!m_locked_axis[Zs])
 	{
-		if ((m_highlighted == CENTER) || (m_highlighted == Zs))
+		if (m_highlighted == Zs)
 		{
 			glLineWidth(6.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
@@ -231,6 +241,8 @@ void FrameManipulator::draw()
 		}
 		glDrawArrays(GL_LINES, 6*nb_segments+10, 2);
 	}
+	}
+
 
 	if (!m_locked_axis[Xt])
 	{
@@ -501,7 +513,7 @@ void FrameManipulator::setLengthAxes()
 	ind+=7;
 	positions[ind] = 0.23f*sc2;
 	ind++;
-	if (m_locked_axis[Xs])
+	if ((m_locked_axis[Xs])&&(m_highlighted!=CENTER))
 		positions[ind] = 0.0f;
 	else
 		positions[ind] = 0.27f*sc0;
@@ -522,7 +534,7 @@ void FrameManipulator::setLengthAxes()
 	positions[ind] = le;
 	ind+=4;
 
-	if (m_locked_axis[Ys])
+	if ((m_locked_axis[Ys])&&(m_highlighted!=CENTER))
 		positions[ind] = 0.0f;
 	else
 		positions[ind] = 0.27f*sc1;
@@ -543,7 +555,7 @@ void FrameManipulator::setLengthAxes()
 	positions[ind] = le;
 	ind+=4;
 
-	if (m_locked_axis[Zs])
+	if ((m_locked_axis[Zs])&&(m_highlighted!=CENTER))
 		positions[ind] = 0.0f;
 	else
 		positions[ind] = 0.27f*sc2;

@@ -112,6 +112,7 @@ void Pickable::draw()
 	Utils::GLSLShader::updateCurrentMatrices();
 	m_drawable->draw();
 	Utils::GLSLShader::currentTransfo() = store;
+	Utils::GLSLShader::updateCurrentMatrices();
 }
 
 
