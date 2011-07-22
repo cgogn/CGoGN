@@ -135,12 +135,15 @@ FrameManipulator::FrameManipulator():
 
 void FrameManipulator::setSize(float radius)
 {
-	m_scaleRendering = radius;
+	if (m_scaleRendering >0.0f)
+		m_scaleRendering = radius;
 }
 
 void FrameManipulator::addSize(float radius)
 {
 	m_scaleRendering += radius;
+	if (m_scaleRendering <= 0.0f)
+		m_scaleRendering -= radius;
 }
 
 float FrameManipulator::getSize()
@@ -186,10 +189,17 @@ void FrameManipulator::draw()
 		glDrawArrays(GL_TRIANGLE_STRIP, 4*nb_segments+4, 2*nb_segments+2);
 	}
 
-
+	if ((!m_locked_axis[CENTER]) && (m_highlighted == CENTER))
+	{
+		glLineWidth(6.0f);
+		m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+		glDrawArrays(GL_LINES, 6*nb_segments+6, 6);
+	}
+	else
+	{
 	if (!m_locked_axis[Xs])
 	{
-		if ((m_highlighted == CENTER) || (m_highlighted == Xs))
+		if (m_highlighted == Xs)
 		{
 			glLineWidth(6.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
@@ -204,7 +214,7 @@ void FrameManipulator::draw()
 
 	if (!m_locked_axis[Ys])
 	{
-		if ((m_highlighted == CENTER) || (m_highlighted == Ys))
+		if (m_highlighted == Ys)
 		{
 			glLineWidth(6.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
@@ -219,7 +229,7 @@ void FrameManipulator::draw()
 
 	if (!m_locked_axis[Zs])
 	{
-		if ((m_highlighted == CENTER) || (m_highlighted == Zs))
+		if (m_highlighted == Zs)
 		{
 			glLineWidth(6.0f);
 			m_shader->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
@@ -231,6 +241,8 @@ void FrameManipulator::draw()
 		}
 		glDrawArrays(GL_LINES, 6*nb_segments+10, 2);
 	}
+	}
+
 
 	if (!m_locked_axis[Xt])
 	{
@@ -312,13 +324,17 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 
 	// intersection possible between line and frame (10% margin)?
 	float dist2 = Geom::squaredDistanceLine2Point<Geom::Vec3f>(P,V,V*V,origin);
-	if (dist2 > (1.05))
+
+	float distMax= std::max(m_lengthAxes[0],std::max(m_lengthAxes[1],m_lengthAxes[2]));
+	distMax *=3.6f;
+	distMax= std::max(distMax,1.0f+ring_half_width);
+
+	if (dist2 > distMax*distMax)
 		return NONE;
 
 	// click on center
 	if (dist2 < 0.02f*0.02f)
 	{
-//		if  (! m_locked_axis[CENTER])
 		if (axisPickable(CENTER))
 			return CENTER;
 		else
@@ -384,42 +400,57 @@ unsigned int FrameManipulator::pick(const Geom::Vec3f& PP, const Geom::Vec3f& VV
 
 	if (axisPickable(Xt) || axisPickable(Xs))
 	{
-		Geom::Vec3f PX(1.0f,0.0f,0.0f);
+		Geom::Vec3f PX(3.6f*m_lengthAxes[0],0.0f,0.0f);
 		dist_target[0] = sqrt(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PX)) ;
-
 		if (fabs(dist_target[0]) < 0.02f)
 		{
-			if ( (Qz - origin).norm() > m_lengthAxes[0])
+			if (axisPickable(Xt) && !axisPickable(Xs))
 				dist_cam[0] = (P-PX)*(P-PX);
 			else
-				dist_cam[6] = (P-origin)*(P-origin);
+			{
+				if ( Qz.norm() > m_lengthAxes[0])
+					dist_cam[0] = (P-PX)*(P-PX);
+				else
+					dist_cam[6] = P*P;
+			}
 		}
 	}
 
+
 	if (axisPickable(Yt) || axisPickable(Ys))
 	{
-		Geom::Vec3f PY(0.0f,1.0f,0.0f);
+		Geom::Vec3f PY(0.0f,3.6f*m_lengthAxes[1],0.0f);
 		dist_target[1] = sqrt(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PY)) ;
-		if (fabs(dist_target[1]) < 0.02f )
+		if (fabs(dist_target[1]) < 0.02f)
 		{
-			if ((Qz - origin).norm() > m_lengthAxes[1])
+			if (axisPickable(Yt) && !axisPickable(Ys))
 				dist_cam[1] = (P-PY)*(P-PY);
 			else
-				dist_cam[7] = (P-origin)*(P-origin);
+			{
+				if (Qz.norm() > m_lengthAxes[1])
+					dist_cam[1] = (P-PY)*(P-PY);
+				else
+					dist_cam[7] = P*P;
+			}
 		}
 	}
 
 
 	if (axisPickable(Zt) || axisPickable(Zs))
 	{
-		Geom::Vec3f PZ(0.0f,0.0f,1.0f);
+		Geom::Vec3f PZ(0.0f,0.0f,3.6f*m_lengthAxes[2]);
 		dist_target[2] = sqrt(Geom::squaredDistanceLine2Seg(P, V, V*V, origin, PZ));
 		if (fabs(dist_target[2]) < 0.02f )
 		{
-			if ((Qx - origin).norm() > m_lengthAxes[2])
+			if (axisPickable(Zt) && !axisPickable(Zs))
 				dist_cam[2] = (P-PZ)*(P-PZ);
 			else
-				dist_cam[8] = (P-origin)*(P-origin);
+			{
+				if (Qx.norm() > m_lengthAxes[2])
+					dist_cam[2] = (P-PZ)*(P-PZ);
+				else
+					dist_cam[8] = P*P;
+			}
 		}
 	}
 
@@ -482,7 +513,7 @@ void FrameManipulator::setLengthAxes()
 	ind+=7;
 	positions[ind] = 0.23f*sc2;
 	ind++;
-	if (m_locked_axis[Xs])
+	if ((m_locked_axis[Xs])&&(m_highlighted!=CENTER))
 		positions[ind] = 0.0f;
 	else
 		positions[ind] = 0.27f*sc0;
@@ -503,7 +534,7 @@ void FrameManipulator::setLengthAxes()
 	positions[ind] = le;
 	ind+=4;
 
-	if (m_locked_axis[Ys])
+	if ((m_locked_axis[Ys])&&(m_highlighted!=CENTER))
 		positions[ind] = 0.0f;
 	else
 		positions[ind] = 0.27f*sc1;
@@ -524,7 +555,7 @@ void FrameManipulator::setLengthAxes()
 	positions[ind] = le;
 	ind+=4;
 
-	if (m_locked_axis[Zs])
+	if ((m_locked_axis[Zs])&&(m_highlighted!=CENTER))
 		positions[ind] = 0.0f;
 	else
 		positions[ind] = 0.27f*sc2;
