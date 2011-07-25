@@ -77,8 +77,8 @@ void StageShaderReloaded::slot_explodTopoPhi3(double c)
 void StageShaderReloaded::slot_pushButton_addPlane()
 {
 	m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() + 1);
-	Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, 0);
-	m_pickables.push_back(pickable);
+	Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, dock.comboBox_PlaneIndex->count() + 1);
+	m_pickablePlanes.push_back(pickable);
 
 	m_shader->setClipPlaneParamsOrigin(m_bb.center(), dock.comboBox_PlaneIndex->count() + 1 - 1);
 	pickable->translate(m_bb.center());
@@ -100,14 +100,23 @@ void StageShaderReloaded::slot_pushButton_addPlane()
 
 void StageShaderReloaded::slot_pushButton_deletePlane()
 {
-	m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() - 1);
+	if (m_pickablePlanes.size() > 0)
+	{
+		if (m_lastPickedObject == m_pickablePlanes.back())
+			m_lastPickedObject = NULL;
 
-	dock.comboBox_PlaneIndex->removeItem(dock.comboBox_PlaneIndex->count() - 1);
+		delete m_pickablePlanes.back();
+		m_pickablePlanes.pop_back();
 
-	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
-	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+		m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() - 1);
 
-	updateGLMatrices();
+		dock.comboBox_PlaneIndex->removeItem(dock.comboBox_PlaneIndex->count() - 1);
+
+		dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+		updateGLMatrices();
+	}
 }
 
 void StageShaderReloaded::slot_comboBox_PlaneIndexChanged(int newIndex)
@@ -186,8 +195,8 @@ void StageShaderReloaded::slot_doubleSpinBox_GridColor(double c)
 void StageShaderReloaded::slot_pushButton_addSphere()
 {
 	m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() + 1);
-	Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, 0);
-	m_pickables.push_back(pickable);
+	Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, dock.comboBox_SphereIndex->count() + 1);
+	m_pickableSpheres.push_back(pickable);
 
 	m_shader->setClipSphereParamsCenter(m_bb.center(), dock.comboBox_SphereIndex->count() + 1 - 1);
 	m_shader->setClipSphereParamsRadius((m_bb.maxSize())*1.0, dock.comboBox_SphereIndex->count() + 1 - 1);
@@ -211,14 +220,23 @@ void StageShaderReloaded::slot_pushButton_addSphere()
 
 void StageShaderReloaded::slot_pushButton_deleteSphere()
 {
-	m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() - 1);
+	if (m_pickableSpheres.size() > 0)
+	{
+		if (m_lastPickedObject == m_pickableSpheres.back())
+			m_lastPickedObject = NULL;
 
-	dock.comboBox_SphereIndex->removeItem(dock.comboBox_SphereIndex->count() - 1);
+		delete m_pickableSpheres.back();
+		m_pickableSpheres.pop_back();
 
-	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
-	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+		m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() - 1);
 
-	updateGLMatrices();
+		dock.comboBox_SphereIndex->removeItem(dock.comboBox_SphereIndex->count() - 1);
+
+		dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+		updateGLMatrices();
+	}
 }
 
 void StageShaderReloaded::slot_comboBox_SphereIndexChanged(int newIndex)
@@ -236,21 +254,24 @@ void StageShaderReloaded::slot_comboBox_SphereIndexChanged(int newIndex)
 
 void StageShaderReloaded::slot_doubleSpinBox_SphereCenter(double c)
 {
-	if (dock.comboBox_SphereIndex->currentIndex() >= 0)
+	int index = dock.comboBox_SphereIndex->currentIndex();
+	if (index >= 0)
 	{
 		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCenterx->value();
 		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCentery->value();
 		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCenterz->value();
-		m_shader->setClipSphereParamsCenter(Geom::Vec3f(x, y, z), dock.comboBox_SphereIndex->currentIndex());
+		m_shader->setClipSphereParamsCenter(Geom::Vec3f(x, y, z), index);
 		updateGL();
 	}
 }
 
 void StageShaderReloaded::slot_doubleSpinBox_SphereRadius(double c)
 {
-	if (dock.comboBox_SphereIndex->currentIndex() >= 0)
+	int index = dock.comboBox_SphereIndex->currentIndex();
+	if (index >= 0)
 	{
-		m_shader->setClipSphereParamsRadius((float)c, dock.comboBox_SphereIndex->currentIndex());
+		m_shader->setClipSphereParamsRadius((float)c, index);
+		m_pickableSpheres[index]->scale(Geom::Vec3f((float)c));
 		updateGL();
 	}
 }
@@ -553,8 +574,10 @@ void StageShaderReloaded::cb_redraw()
 		m_render_topo->drawTopo();
 
 	// Display clipping shapes
-	for (size_t i = 0; i < m_pickables.size(); i++)
-		m_pickables[i]->draw();
+	for (size_t i = 0; i < m_pickablePlanes.size(); i++)
+		m_pickablePlanes[i]->draw();
+	for (size_t i = 0; i < m_pickableSpheres.size(); i++)
+		m_pickableSpheres[i]->draw();
 
 	// Display picking frame
 	if (m_lastPickedObject)
@@ -569,6 +592,88 @@ void StageShaderReloaded::cb_keyPress(int code)
 
 void StageShaderReloaded::cb_mousePress(int button, int x, int y)
 {
+	if (!Shift())
+		return;
+
+	m_lastClickedX = x;
+	m_lastClickedY = y;
+
+	// get ray of selection
+	Geom::Vec3f rayA, rayB;
+	float dist = getOrthoScreenRay(x, y, rayA, rayB);
+	Geom::Vec3f AB = rayB - rayA;
+
+
+	unsigned int newPickedFrameAxis = 0;
+	unsigned int lastPickedFrameAxis = m_frameManipulatorPickedAxis;
+	if (m_lastPickedObject)	// an object is already picked ? => frame is drawn
+	{
+		// picking the frame -> axis
+		newPickedFrameAxis = m_frameManipulator->pick(rayA, AB, dist);
+		m_frameManipulatorPickedAxis = newPickedFrameAxis;
+	}
+
+	// highlighting new axis
+	if (lastPickedFrameAxis != newPickedFrameAxis)
+		m_frameManipulator->highlight(m_frameManipulatorPickedAxis);
+
+	if (newPickedFrameAxis == 0)	// frame not picked -> pick the pickable objects
+	{
+		m_lastPickedObject = Utils::Pickable::pick(m_pickablePlanes, rayA, AB);
+		// set FrameManipulator on picked object
+		if (m_lastPickedObject)
+			m_frameManipulator->setTransformation(m_lastPickedObject->transfo());
+	}
+
+	// store origin & selected axis on screen projection for easy manipulation.
+	m_frameManipulator->storeProjection(m_frameManipulatorPickedAxis);
+
+	updateGL();
+}
+
+void StageShaderReloaded::cb_mouseMove(int buttons, int x, int y)
+{
+	if (!Shift())
+		return;
+
+	// rotation selected ?
+	if (Utils::FrameManipulator::rotationAxis(m_frameManipulatorPickedAxis))
+	{
+		if (buttons & 1)
+		{
+			float angle = m_frameManipulator->angleFromMouse(x, y, x - m_lastClickedX, y - m_lastClickedY);
+			m_frameManipulator->rotate(m_frameManipulatorPickedAxis, angle);
+		}
+		else if (buttons & 2)
+			m_frameManipulator->rotateInScreen(x - m_lastClickedX, y - m_lastClickedY);
+
+		m_lastPickedObject->transfo() = m_frameManipulator->transfo();
+	}
+	// translation selected
+	else if (Utils::FrameManipulator::translationAxis(m_frameManipulatorPickedAxis))
+	{
+		if (buttons & 1)
+		{
+			float dist =  m_frameManipulator->distanceFromMouse(x - m_lastClickedX, y - m_lastClickedY);
+			m_frameManipulator->translate(m_frameManipulatorPickedAxis, dist);
+		}
+		else if (buttons & 2)
+			m_frameManipulator->translateInScreen(x - m_lastClickedX, y - m_lastClickedY);
+
+		m_lastPickedObject->transfo() = m_frameManipulator->transfo();
+	}
+	// scale selected
+	else if (Utils::FrameManipulator::scaleAxis(m_frameManipulatorPickedAxis) )
+	{
+		float scale = m_frameManipulator->scaleFromMouse(x - m_lastClickedX, y - m_lastClickedY);
+		m_frameManipulator->scale(m_frameManipulatorPickedAxis, scale );
+		m_lastPickedObject->transfo() = m_frameManipulator->transfo();
+	}
+
+	m_lastClickedX = x;
+	m_lastClickedY = y;
+
+	updateGL();
 
 }
 

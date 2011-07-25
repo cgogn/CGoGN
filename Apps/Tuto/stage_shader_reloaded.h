@@ -105,12 +105,15 @@ public:
 	//QT
 	Utils::QT::uiDockInterface dock;
 
-	// Clipping
+	// Picking
 	Utils::LineDrawable* m_planeDrawable;
 	Utils::LineDrawable* m_sphereDrawable;
 	Utils::FrameManipulator* m_frameManipulator;
-	std::vector<Utils::Pickable*> m_pickables;
+	unsigned int m_frameManipulatorPickedAxis;
+	std::vector<Utils::Pickable*> m_pickablePlanes;
+	std::vector<Utils::Pickable*> m_pickableSpheres;
 	Utils::Pickable* m_lastPickedObject;
+	int m_lastClickedX, m_lastClickedY;
 
 	StageShaderReloaded();
 
@@ -120,6 +123,7 @@ public:
 	void cb_initGL();
 	void cb_redraw();
 	void cb_mousePress(int button, int x, int y);
+	void cb_mouseMove(int buttons, int x, int y);
 	void cb_keyPress(int code);
 	void importMesh(std::string& filename);
 
