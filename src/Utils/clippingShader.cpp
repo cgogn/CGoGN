@@ -38,17 +38,18 @@ namespace Utils
  ***********************************************/
 
 
-ClippingShader::ClippingShader()
-{
-	// Initialize uniforms ids
-	m_unif_clipPlanesEquations = 0;
-	m_unif_clipSpheresCentersAndRadiuses = 0;
-	m_unif_clipColorAttenuationFactor = 0;
+ClippingShader::ClippingShader():
+		// Initialize clipping shapes variables
+		m_unif_clipPlanesEquations (0),
+		m_unif_clipSpheresCentersAndRadiuses (0),
 
-	// Initialize default global clipping variables
-	m_hasClippingCodeBeenInserted = false;
-	m_clipColorAttenuationFactor = 1.0;
-	m_clipMode = CLIPPING_MODE_AND;
+		// Initialize default global clipping variables
+		m_hasClippingCodeBeenInserted (false),
+		m_clipColorAttenuationFactor (1.0),
+		m_unif_clipColorAttenuationFactor (0),
+		m_clipMode (CLIPPING_MODE_AND)
+{
+
 }
 
 
@@ -136,7 +137,7 @@ void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, G
 		m_clipPlanes[planeIndex].origin = origin;
 
 		// Update the plane arrays
-		updateClipPlaneArray(planeIndex);
+		updateClipPlaneUniformsArray(planeIndex);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
@@ -159,7 +160,7 @@ void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex
 		m_clipPlanes[planeIndex].firstVec = vec1Normalized;
 
 		// Update the plane arrays
-		updateClipPlaneArray(planeIndex);
+		updateClipPlaneUniformsArray(planeIndex);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
@@ -182,7 +183,7 @@ void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeInde
 		m_clipPlanes[planeIndex].secondVec = vec2Normalized;
 
 		// Update the plane arrays
-		updateClipPlaneArray(planeIndex);
+		updateClipPlaneUniformsArray(planeIndex);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
@@ -201,7 +202,7 @@ void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex
 		m_clipPlanes[planeIndex].origin = origin;
 
 		// Update the plane arrays
-		updateClipPlaneArray(planeIndex);
+		updateClipPlaneUniformsArray(planeIndex);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
@@ -238,7 +239,7 @@ Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(int planeIndex)
 	return m_clipPlanes[planeIndex].origin;
 }
 
-void ClippingShader::updateClipPlaneArray(int planeIndex)
+void ClippingShader::updateClipPlaneUniformsArray(int planeIndex)
 {
 	// Check if the given index is out of range
 	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::updateClipPlaneArray", "planeIndex"))
@@ -330,7 +331,7 @@ void ClippingShader::setClipSphereParamsAll(Geom::Vec3f center, float radius, in
 		m_clipSpheres[sphereIndex].radius = radius;
 
 		// Update the sphere array
-		updateClipSphereArray(sphereIndex);
+		updateClipSphereUniformsArray(sphereIndex);
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
@@ -349,7 +350,7 @@ void ClippingShader::setClipSphereParamsCenter(Geom::Vec3f center, int sphereInd
 		m_clipSpheres[sphereIndex].center = center;
 
 		// Update the sphere array
-		updateClipSphereArray(sphereIndex);
+		updateClipSphereUniformsArray(sphereIndex);
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
@@ -368,7 +369,7 @@ void ClippingShader::setClipSphereParamsRadius(float radius, int sphereIndex)
 		m_clipSpheres[sphereIndex].radius = radius;
 
 		// Update the sphere array
-		updateClipSphereArray(sphereIndex);
+		updateClipSphereUniformsArray(sphereIndex);
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
@@ -395,7 +396,7 @@ float ClippingShader::getClipSphereParamsRadius(int sphereIndex)
 	return m_clipSpheres[sphereIndex].radius;
 }
 
-void ClippingShader::updateClipSphereArray(int sphereIndex)
+void ClippingShader::updateClipSphereUniformsArray(int sphereIndex)
 {
 	// Check if the given index is out of range
 	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::updateClipSphereArray", "sphereIndex"))

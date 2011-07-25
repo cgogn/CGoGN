@@ -65,65 +65,65 @@ public :
 public:
 
 	/**
-	 * set the clip planes count
-	 * @param planesCount the clip planes count to use
+	 * sets the clip planes count
+	 * @param planesCount clip planes count to use
 	 * @warning insertClippingCode must be called first
 	 */
 	void setClipPlanesCount(int planesCount);
 
-	/// get the clip planes count
+	/// gets the clip planes count
 	int getClipPlanesCount();
 
 	/**
-	 * set all parameters for one clip plane
+	 * sets all parameters for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param vec1 first basis vector
 	 * @param vec2 second basis vector
-	 * @param origin point of the plane that will be used as origin to display it
-	 * @param planeIndex index of the plane to modify
+	 * @param origin origin
+	 * @param planeIndex index of the plane
 	 */
 	void setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex);
 
 	/**
-	 * set first vector for one clip plane
+	 * sets first vector for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param vec1 first basis vector
-	 * @param planeIndex index of the plane to modify
+	 * @param planeIndex index of the plane
 	 */
 	void setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex);
 
 	/**
-	 * set second vector for one clip plane
+	 * sets second vector for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param vec2 second basis vector
-	 * @param planeIndex index of the plane to modify
+	 * @param planeIndex index of the plane
 	 */
 	void setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex);
 	
 	/**
-	 * set origin for one clip plane
+	 * sets origin for one clip plane
 	 * @warning planeIndex starts at 0
-	 * @param origin point of the plane that will be used as origin to display it
-	 * @param planeIndex index of the plane to modify
+	 * @param origin origin
+	 * @param planeIndex index of the plane
 	 */
 	void setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex);
 
 	/**
-	 * get first vector for one clip plane
+	 * gets first vector for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param planeIndex index of the plane
 	 */
 	Geom::Vec3f getClipPlaneParamsFirstVec(int planeIndex);
 
 	/**
-	 * get second vector for one clip plane
+	 * gets second vector for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param planeIndex index of the plane
 	 */
 	Geom::Vec3f getClipPlaneParamsSecondVec(int planeIndex);
 
 	/**
-	 * get origin for one clip plane
+	 * gets origin for one clip plane
 	 * @warning planeIndex starts at 0
 	 * @param planeIndex index of the plane
 	 */
@@ -132,10 +132,10 @@ public:
 private:
 
 	/**
-	 * update clip plane equation array
+	 * updates clip plane equation uniforms array
 	 * @param planeIndex index of the plane
 	 */
-	void updateClipPlaneArray(int planeIndex);
+	void updateClipPlaneUniformsArray(int planeIndex);
 
 	/// clip planes structure
 	struct clipPlane
@@ -146,13 +146,10 @@ private:
 	/// clip planes array
 	std::vector<clipPlane> m_clipPlanes;
 
-	/**
-	 * clip planes equations array (size = 4*(planes count))
-	 * - ** only used for sending planes data to shader **
-	 */
+	/// clip planes equations uniforms array
 	std::vector<float> m_clipPlanesEquations;
 
-	/// clip planes equations array uniform id
+	/// clip planes equations uniforms array id
 	GLint m_unif_clipPlanesEquations;
 
 
@@ -165,49 +162,49 @@ private:
 public:
 
 	/**
-	 * set the clip spheres count
-	 * @param spheresCount the clip spheres count to use
+	 * sets the clip spheres count
+	 * @param spheresCount clip spheres count to use
 	 * @warning insertClippingCode must be called first
 	 */
 	void setClipSpheresCount(int spheresCount);
 
-	/// get the clip spheres count
+	/// gets the clip spheres count
 	int getClipSpheresCount();
 
 	/**
-	 * set all parameters for one clip sphere
+	 * sets all parameters for one clip sphere
 	 * @warning sphereIndex starts at 0
 	 * @param center center
 	 * @param radius radius
-	 * @param sphereIndex index of the sphere to modify
+	 * @param sphereIndex index of the sphere
 	 */
 	void setClipSphereParamsAll(Geom::Vec3f center, float radius, int sphereIndex);
 
 	/**
-	 * set center for one clip sphere
+	 * sets center for one clip sphere
 	 * @warning sphereIndex starts at 0
 	 * @param center center
-	 * @param sphereIndex index of the sphere to modify
+	 * @param sphereIndex index of the sphere
 	 */
 	void setClipSphereParamsCenter(Geom::Vec3f center, int sphereIndex);
 
 	/**
-	 * set radius for one clip sphere
+	 * sets radius for one clip sphere
 	 * @warning sphereIndex starts at 0
 	 * @param radius radius
-	 * @param sphereIndex index of the sphere to modify
+	 * @param sphereIndex index of the sphere
 	 */
 	void setClipSphereParamsRadius(float radius, int sphereIndex);
 
 	/**
-	 * get center for one clip sphere
+	 * gets center for one clip sphere
 	 * @warning sphereIndex starts at 0
 	 * @param sphereIndex index of the sphere
 	 */
 	Geom::Vec3f getClipSphereParamsCenter(int sphereIndex);
 
 	/**
-	 * get radius for one clip sphere
+	 * gets radius for one clip sphere
 	 * @warning sphereIndex starts at 0
 	 * @param sphereIndex index of the sphere
 	 */
@@ -216,10 +213,10 @@ public:
 private:
 
 	/**
-	 * update clip sphere center and radius array
+	 * updates clip sphere center and radius uniforms array
 	 * @param sphereIndex index of the sphere
 	 */
-	void updateClipSphereArray(int sphereIndex);
+	void updateClipSphereUniformsArray(int sphereIndex);
 
 	/// clip spheres structure
 	struct clipSphere
@@ -231,13 +228,10 @@ private:
 	/// clip spheres array
 	std::vector<clipSphere> m_clipSpheres;
 
-	/**
-	 * clip spheres centers and radiuses array (size = 4*(spheres count))
-	 * - ** only used for sending sphere data to shader **
-	 */
+	/// clip spheres centers and radiuses uniforms array
 	std::vector<float> m_clipSpheresCentersAndRadiuses;
 
-	/// clip spheres equations vector uniform id
+	/// clip spheres centers and radiuses uniforms array id
 	GLint m_unif_clipSpheresCentersAndRadiuses;
 
 
@@ -249,36 +243,37 @@ private:
 
 public:
 
-	/// enum used to choose which clipping mode to use
+	/// enum used to choose clipping mode
 	enum clippingMode { CLIPPING_MODE_AND, CLIPPING_MODE_OR };
 
 	/**
-	 * insert clipping instructions into shader source code
+	 * inserts clipping instructions into shader source code
 	 * @warning this function is designed for shaders which *do not* use a geometry shader
+	 * @return true if shader was processed successfully
 	 */
 	bool insertClippingCode();
 
 	/**
-	 * set the color attenuation factor for clipping
+	 * sets the color attenuation factor
 	 * @param colorAttenuationFactor color attenuation factor
 	 */
 	void setClipColorAttenuationFactor(float colorAttenuationFactor);
 
-	/// get the color attenuation factor for clipping
+	/// gets the color attenuation factor
 	float getClipColorAttenuationFactor();
 
 	/*
-	 * set the clipping mode
+	 * sets the clipping mode
 	 * @param clipMode clipping mode
 	 */
 	void setClipMode(clippingMode clipMode);
 
-	/// get the clipping mode
+	/// gets the clipping mode
 	clippingMode getClipMode();
 
 private:
 
-	/// to control clipping code has been inserted before clipping objects have been added
+	/// used to control clipping code has been inserted before adding clipping objects
 	bool m_hasClippingCodeBeenInserted;
 
 	/// color attenuation factor
@@ -299,18 +294,18 @@ private:
 
 public:
 
-	/// update uniforms (get their locations and send their values again) for clipping
+	/// updates uniforms (get their locations and send their values again)
 	void updateClippingUniforms();
 
 private:
 
-	/// sends the clip planes equations array to shader
+	/// sends the clip planes equations uniforms array to shader
 	void sendClipPlanesEquationsUniform();
 
-	/// sends the clip spheres centers and radiuses array to shader
+	/// sends the clip spheres centers and radiuses uniforms array to shader
 	void sendClipSpheresCentersAndRadiusesUniform();
 
-	/// sends the color attenuation factor to shader
+	/// sends the color attenuation factor uniform to shader
 	void sendClipColorAttenuationFactorUniform();
 
 
@@ -323,64 +318,72 @@ private:
 private:
 
 	/**
-	 * Output a "parameter not positive" error if the condition is satisfied
+	 * Outputs a "parameter not positive" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
 	 * @param paramName name of the parameter
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName);
 
 	/**
-	 * Output a "shader source is empty" error if the condition is satisfied
+	 * Outputs a "shader source is empty" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
 	 * @param shaderType type of the shader
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseShaderSourceIsEmpty(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType);
 
 	/**
-	 * Output a "shader uses a geometry shader" error if the condition is satisfied
+	 * Outputs a "shader uses a geometry shader" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseShaderUsesGeometryShader(bool condition, const std::string& location);
 
 	/**
-	 * Output a ".. not found in shader" error if the condition is satisfied
+	 * Outputs a ".. not found in shader" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
 	 * @param shaderType type of the shader
 	 * @param varName name of the variable that may not be found
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseVariableNotFoundInShader(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType, const std::string& varName);
 
 	/**
-	 * Output a "parameter is out of range" error if the condition is satisfied
+	 * Outputs a "parameter is out of range" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
 	 * @param paramName name of the parameter
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseParameterIsOutOfRange(bool condition, const std::string& location, const std::string& paramName);
 
 	/**
-	 * Output a "uniform .. not found in shader" error if the condition is satisfied
+	 * Outputs a "uniform .. not found in shader" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
 	 * @param uniformName name of the uniform that may not be found
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseUniformNotFoundInShader(bool condition, const std::string& location, const std::string& uniformName);
 
 	/**
-	 * Output a "clipping code was already inserted" error if the condition is satisfied
+	 * Outputs a "clipping code was already inserted" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseClippingCodeAlreadyInserted(bool condition, const std::string& location);
 
 	/**
-	 * Output a "clipping code has not been inserted yet" error if the condition is satisfied
+	 * Outputs a "clipping code has not been inserted yet" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising is done
+	 * @return true if the error has been raised
 	 */
 	bool errorRaiseClippingCodeNotInserted(bool condition, const std::string& location);
 
