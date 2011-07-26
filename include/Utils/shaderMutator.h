@@ -56,6 +56,7 @@ public:
 	  * checks if a variable is declared in the shader source
 	  * @param srcType shader source to use
 	  * @param variableName variable to search for
+	  * @return true if the variable was declared
 	  */
 	 bool containsVariableDeclaration(shaderSrcType srcType, const std::string& variableName);
 	 
@@ -64,37 +65,42 @@ public:
 	  * - only if the current version is lower
 	  * @param srcType shader source to use
 	  * @param version version to set (110, 120, 150...)
+	  * @return true if the version was set or changed
 	  */
-	 void setMinShadingLanguageVersion(shaderSrcType srcType, int version);
+	 bool setMinShadingLanguageVersion(shaderSrcType srcType, int version);
 
 	 /**
 	  * changes int constant value in the shader source
 	  * @param srcType shader source to use
 	  * @param newVal new constant value
+	  * @return true on success
 	  */
-	 void changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal);
+	 bool changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal);
 
 	 /**
 	  * inserts code before main function in the shader source
 	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
+	  * @return true on success
 	  */
-	 void insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode);
+	 bool insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode);
 	 
 	 /**
 	  * inserts code at the beginning of main function in the shader source
 	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
+	  * @return true on success
 	  */
-	 void insertCodeAtMainFunctionBeginning(shaderSrcType srcType, const std::string& insertedCode);
+	 bool insertCodeAtMainFunctionBeginning(shaderSrcType srcType, const std::string& insertedCode);
 	 
 	 /**
 	  * inserts code at the end of main function in the shader source
 	  * @warning takes the number of opening and closing braces of main function into account
 	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
+	  * @return true on success
 	  */
-	 void insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode);
+	 bool insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode);
 	 
 	 /// returns the modified vertex shader source code
 	 std::string getModifiedVertexShaderSrc() { return m_vShaderMutation; }
@@ -123,13 +129,15 @@ private:
 	 * checks if the given position is commented
 	 * @param pos position in the source (like in a string)
 	 * @param src source to analyze
+	 * @return true if the given position is commented
 	 */
 	bool srcIsCommented(size_t pos, const std::string& src);
 	
 	/**
-	 * checks if the given position is commented with a one-line comment
+	 * checks if the given position is one-line commented
 	 * @param pos position in the source (like in a string)
 	 * @param src source to analyze
+	 * @return true if the given position is one-line commented
 	 */
 	bool srcIsOneLineCommented(size_t pos, const std::string& src);
 	
@@ -137,6 +145,7 @@ private:
 	  * checks if a variable is declared
 	  * @param variableName variable to search for
 	  * @param src source to analyze
+	  * @return true if the variable was declared
 	 */
 	bool srcContainsVariableDeclaration(const std::string& variableName, std::string& src);
 	
@@ -144,6 +153,7 @@ private:
 	 * sets or changes shading language version if the current version is lower
 	 * @param version version to set (110, 120, 150...)
 	 * @param modifiedSrc shader source code to modify
+	 * @return true if the version was set or changed
 	 */
 	bool srcSetMinShadingLanguageVersion(int version, std::string& modifiedSrc);
 
@@ -152,6 +162,7 @@ private:
 	 * @param newVal new constant value
 	 * @param constantName constant name as it is declared
 	 * @param modifiedSrc shader source code to modify
+	 * @return true on success
 	 */
 	bool srcChangeIntConstantValue(int newVal, const std::string& constantName, std::string& modifiedSrc);
 
@@ -159,6 +170,7 @@ private:
 	 * inserts code before main function
 	 * @param insertedCode source code to insert
 	 * @param modifiedSrc shader source code to modify
+	 * @return true on success
 	 */
 	bool srcInsertCodeBeforeMainFunction(const std::string& insertedCode, std::string& modifiedSrc);
 	
@@ -166,6 +178,7 @@ private:
 	 * inserts code at the beginning of main function
 	 * @param insertedCode source code to insert
 	 * @param modifiedSrc shader source code to modify
+	 * @return true on success
 	 */
 	bool srcInsertCodeAtMainFunctionBeginning(const std::string& insertedCode, std::string& modifiedSrc);
 
@@ -173,6 +186,7 @@ private:
 	 * inserts code at the end of main function
 	 * @param insertedCode source code to insert
 	 * @param modifiedSrc shader source code to modify
+	 * @return true on success
 	 */
 	bool srcInsertCodeAtMainFunctionEnd(const std::string& insertedCode, std::string& modifiedSrc);
 	

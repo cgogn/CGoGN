@@ -71,25 +71,29 @@ bool ShaderMutator::containsVariableDeclaration(shaderSrcType srcType, const std
 	return result;
 }
 
-void ShaderMutator::setMinShadingLanguageVersion(shaderSrcType srcType, int version)
+bool ShaderMutator::setMinShadingLanguageVersion(shaderSrcType srcType, int version)
 {
+	bool result = false;
+
 	switch (srcType)
 	{
 		case VERTEX_SHADER :
-			srcSetMinShadingLanguageVersion(version, m_vShaderMutation);
+			result = srcSetMinShadingLanguageVersion(version, m_vShaderMutation);
 			break;
 
 		case FRAGMENT_SHADER :
-			srcSetMinShadingLanguageVersion(version, m_fShaderMutation);
+			result = srcSetMinShadingLanguageVersion(version, m_fShaderMutation);
 			break;
 
 		case GEOMETRY_SHADER :
-			srcSetMinShadingLanguageVersion(version, m_gShaderMutation);
+			result = srcSetMinShadingLanguageVersion(version, m_gShaderMutation);
 			break;
 	}
+
+	return result;
 }
 
-void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal)
+bool ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal)
 {
 	switch (srcType)
 	{
@@ -104,7 +108,7 @@ void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::str
 				<< ". Constant declaration not found"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -119,7 +123,7 @@ void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::str
 				<< ". Constant declaration not found"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -134,13 +138,15 @@ void ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::str
 				<< ". Constant declaration not found"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 	}
+
+	return true;
 }
 
-void ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode)
+bool ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode)
 {
 	switch (srcType)
 	{
@@ -155,7 +161,7 @@ void ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const st
 				<< ". You should check if the shader has a main function declaration"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -170,7 +176,7 @@ void ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const st
 				<< ". You should check if the shader has a main function declaration"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -185,13 +191,15 @@ void ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const st
 				<< ". You should check if the shader has a main function declaration"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 	}
+
+	return true;
 }
 
-void ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType srcType, const std::string& insertedCode)
+bool ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType srcType, const std::string& insertedCode)
 {
 	switch (srcType)
 	{
@@ -206,7 +214,7 @@ void ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType srcType, con
 				<< ". You should check if the shader has a main function declaration"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -221,7 +229,7 @@ void ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType srcType, con
 				<< ". You should check if the shader has a main function declaration"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -236,13 +244,15 @@ void ShaderMutator::insertCodeAtMainFunctionBeginning(shaderSrcType srcType, con
 				<< ". You should check if the shader has a main function declaration"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 	}
+
+	return true;
 }
 
-void ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode)
+bool ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std::string& insertedCode)
 {
 	switch (srcType)
 	{
@@ -258,7 +268,7 @@ void ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std
 				<< "and as many '{' as '}' in main"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -274,7 +284,7 @@ void ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std
 				<< "and as many '{' as '}' in main"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 
@@ -290,10 +300,12 @@ void ShaderMutator::insertCodeAtMainFunctionEnd(shaderSrcType srcType, const std
 				<< "and as many '{' as '}' in main"
 				<< CGoGNendl;
 
-				return;
+				return false;
 			}
 			break;
 	}
+
+	return true;
 }
 
 
