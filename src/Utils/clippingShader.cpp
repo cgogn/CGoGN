@@ -79,8 +79,11 @@ void ClippingShader::setClipPlanesCount(int planesCount)
 		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
 
 		// Modify the clip planes count constant in both shader
-		SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", planesCount);
-		SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount);
+		if (errorRaiseShaderMutatorFailure(
+				   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", planesCount))
+				|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount)),
+				"ClippingShader::setClipPlanesCount"))
+			return;
 
 		// Reload both shaders
 		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
@@ -282,8 +285,11 @@ void ClippingShader::setClipSpheresCount(int spheresCount)
 		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
 
 		// Modify the clip spheres count constant in both shader
-		SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
-		SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", spheresCount);
+		if (errorRaiseShaderMutatorFailure(
+				   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", spheresCount))
+				|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", spheresCount)),
+				"ClippingShader::setClipSpheresCount"))
+			return;
 
 		// Reload both shaders
 		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
@@ -420,7 +426,7 @@ void ClippingShader::updateClipSphereUniformsArray(int sphereIndex)
 
 bool ClippingShader::insertClippingCode()
 {
-	// Check if the code has not been already inserted
+	// Check if the code has not already been inserted
 	if (errorRaiseClippingCodeAlreadyInserted(m_hasClippingCodeBeenInserted, "ClippingShader::insertClippingCode"))
 		return false;
 
@@ -428,7 +434,7 @@ bool ClippingShader::insertClippingCode()
 	if (errorRaiseShaderSourceIsEmpty((getVertexShaderSrc() == NULL), "ClippingShader::insertClippingCode", ShaderMutator::VERTEX_SHADER))
 		return false;
 	if (errorRaiseShaderSourceIsEmpty((getFragmentShaderSrc() == NULL), "ClippingShader::insertClippingCode", ShaderMutator::FRAGMENT_SHADER))
-			return false;
+		return false;
 
 	// Check if the shader does not use a geometry shader
 	if (errorRaiseShaderUsesGeometryShader((getGeometryShaderSrc() != NULL), "ClippingShader::insertClippingCode"))
@@ -629,14 +635,20 @@ bool ClippingShader::insertClippingCode()
 		return false;
 
 	// Modify vertex shader source code
-	SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_headInsertion);
-	SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainEndInsertion);
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.insertCodeBeforeMainFunction(ShaderMutator::VERTEX_SHADER, VS_headInsertion))
+			|| (!SM.insertCodeAtMainFunctionBeginning(ShaderMutator::VERTEX_SHADER, VS_mainEndInsertion)),
+			"ClippingShader::insertClippingCode"))
+		return false;
 
 	// Modify fragment shader source code
-	SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120); // Following code insertions need at least shading language 120 (GLSL arrays)
-	SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_headInsertion);
-	SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBeginInsertion);
-	SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEndInsertion);
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.setMinShadingLanguageVersion(ShaderMutator::FRAGMENT_SHADER, 120)) // Following code insertions need at least shading language 120 (GLSL arrays)
+			|| (!SM.insertCodeBeforeMainFunction(ShaderMutator::FRAGMENT_SHADER, FS_headInsertion))
+			|| (!SM.insertCodeAtMainFunctionBeginning(ShaderMutator::FRAGMENT_SHADER, FS_mainBeginInsertion))
+			|| (!SM.insertCodeAtMainFunctionEnd(ShaderMutator::FRAGMENT_SHADER, FS_mainEndInsertion)),
+			"ClippingShader::insertClippingCode"))
+		return false;
 
 	// Reload both shaders
 	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
@@ -700,7 +712,10 @@ void ClippingShader::setClipMode(clippingMode clipMode)
 				newConstantValue = 0;
 				break;
 		}
-		SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_MODE", newConstantValue);
+		if (errorRaiseShaderMutatorFailure(
+				(!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_MODE", newConstantValue)),
+				"ClippingShader::setClipMode"))
+			return;
 
 		// Reload modified shader
 		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
@@ -784,6 +799,20 @@ void ClippingShader::sendClipColorAttenuationFactorUniform()
  *
  ***********************************************/
 
+
+bool ClippingShader::errorRaiseShaderMutatorFailure(bool condition, const std::string& location)
+{
+	if (condition)
+	{
+		CGoGNerr
+		<< "ERROR - "
+		<< location
+		<< " - Shader Mutator failure"
+		<< CGoGNendl;
+	}
+
+	return condition;
+}
 
 bool ClippingShader::errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName)
 {

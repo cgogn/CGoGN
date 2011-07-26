@@ -318,9 +318,17 @@ private:
 private:
 
 	/**
+	 * Outputs a "shader mutator failure" error if the condition is satisfied
+	 * @param condition condition to satisfy
+	 * @param location name of the function where the error raising was done
+	 * @return true if the error has been raised
+	 */
+	bool errorRaiseShaderMutatorFailure(bool condition, const std::string& location);
+
+	/**
 	 * Outputs a "parameter not positive" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @param paramName name of the parameter
 	 * @return true if the error has been raised
 	 */
@@ -329,7 +337,7 @@ private:
 	/**
 	 * Outputs a "shader source is empty" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @param shaderType type of the shader
 	 * @return true if the error has been raised
 	 */
@@ -338,7 +346,7 @@ private:
 	/**
 	 * Outputs a "shader uses a geometry shader" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @return true if the error has been raised
 	 */
 	bool errorRaiseShaderUsesGeometryShader(bool condition, const std::string& location);
@@ -346,7 +354,7 @@ private:
 	/**
 	 * Outputs a ".. not found in shader" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @param shaderType type of the shader
 	 * @param varName name of the variable that may not be found
 	 * @return true if the error has been raised
@@ -356,7 +364,7 @@ private:
 	/**
 	 * Outputs a "parameter is out of range" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @param paramName name of the parameter
 	 * @return true if the error has been raised
 	 */
@@ -365,7 +373,7 @@ private:
 	/**
 	 * Outputs a "uniform .. not found in shader" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @param uniformName name of the uniform that may not be found
 	 * @return true if the error has been raised
 	 */
@@ -374,7 +382,7 @@ private:
 	/**
 	 * Outputs a "clipping code was already inserted" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @return true if the error has been raised
 	 */
 	bool errorRaiseClippingCodeAlreadyInserted(bool condition, const std::string& location);
@@ -382,7 +390,7 @@ private:
 	/**
 	 * Outputs a "clipping code has not been inserted yet" error if the condition is satisfied
 	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising is done
+	 * @param location name of the function where the error raising was done
 	 * @return true if the error has been raised
 	 */
 	bool errorRaiseClippingCodeNotInserted(bool condition, const std::string& location);
