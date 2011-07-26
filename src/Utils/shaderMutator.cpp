@@ -146,6 +146,59 @@ bool ShaderMutator::changeIntConstantValue(shaderSrcType srcType, const std::str
 	return true;
 }
 
+bool ShaderMutator::changeFloatConstantValue(shaderSrcType srcType, const std::string& constantName, float newVal)
+{
+	switch (srcType)
+	{
+		case VERTEX_SHADER :
+			if (!srcChangeFloatConstantValue(newVal, constantName, m_vShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::changeFloatConstantValue : "
+				<< "Unable to change float constant value in vertex shader of "
+				<< m_shaderName
+				<< ". Constant declaration not found"
+				<< CGoGNendl;
+
+				return false;
+			}
+			break;
+
+		case FRAGMENT_SHADER :
+			if (!srcChangeFloatConstantValue(newVal, constantName, m_fShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::changeFloatConstantValue : "
+				<< "Unable to change float constant value in fragment shader of "
+				<< m_shaderName
+				<< ". Constant declaration not found"
+				<< CGoGNendl;
+
+				return false;
+			}
+			break;
+
+		case GEOMETRY_SHADER :
+			if (!srcChangeFloatConstantValue(newVal, constantName, m_gShaderMutation))
+			{
+				CGoGNerr
+				<< "ERROR - "
+				<< "ShaderMutator::changeFloatConstantValue : "
+				<< "Unable to change float constant value in geometry shader of "
+				<< m_shaderName
+				<< ". Constant declaration not found"
+				<< CGoGNendl;
+
+				return false;
+			}
+			break;
+	}
+
+	return true;
+}
+
 bool ShaderMutator::insertCodeBeforeMainFunction(shaderSrcType srcType, const std::string& insertedCode)
 {
 	switch (srcType)
@@ -483,6 +536,53 @@ bool ShaderMutator::srcChangeIntConstantValue(int newVal, const std::string& con
 	// Regular expression for constant expression
 	// <#define> <white-space>[1 or more times] <constant name> <white-space>[1 or more times] <digit>[1 or more times]
 	boost::regex const_re("#define\\s+" + constantName + "\\s+(\\d+)");
+
+	// Matches results
+	boost::match_results <std::string::iterator> matches;
+
+	// Build the constant value string
+	std::string newValStr;
+	std::stringstream ss;
+	ss << newVal;
+	newValStr = ss.str();
+
+	// Search for the first expression that matches and isn't commented
+	std::string::iterator start = modifiedSrc.begin();
+	std::string::iterator end = modifiedSrc.end();
+	while (regex_search(start, end, matches, const_re, boost::format_first_only))
+	{
+		// Start position of the match
+		size_t startPosition = std::distance(modifiedSrc.begin(), matches[0].first);
+
+		// Change the constant value if the matched "#define ..." is the good one (i.e. not commented)
+		if (!srcIsCommented(startPosition, modifiedSrc))
+		{
+			// The submatch Match[1] should be the old constant value
+			std::string oldValStr(matches[1].first, matches[1].second);
+			size_t oldValLength = oldValStr.length();
+			size_t oldValPosition = std::distance(modifiedSrc.begin(), matches[1].first);
+
+			// Replace the old constant value
+			modifiedSrc.replace(oldValPosition, oldValLength, newValStr);
+			return true;
+		}
+		// Else continue to search for it after last match
+		else
+		{
+			start = matches[0].second;
+		}
+	}
+
+	// At this point no correct match was found
+	return false;
+}
+
+bool ShaderMutator::srcChangeFloatConstantValue(float newVal, const std::string& constantName, std::string& modifiedSrc)
+{
+	// Regular expression for constant expression
+	// <#define> <white-space>[1 or more times] <constant name> <white-space>[1 or more times]
+	// <digit>[1 or more times] <.>[0 or 1 time] <digit>[0 or more times]
+	boost::regex const_re("#define\\s+" + constantName + "\\s+(\\d+\\.?\\d*)");
 
 	// Matches results
 	boost::match_results <std::string::iterator> matches;

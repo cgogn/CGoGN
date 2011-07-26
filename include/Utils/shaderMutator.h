@@ -78,6 +78,14 @@ public:
 	 bool changeIntConstantValue(shaderSrcType srcType, const std::string& constantName, int newVal);
 
 	 /**
+	  * changes float constant value in the shader source
+	  * @param srcType shader source to use
+	  * @param newVal new constant value
+	  * @return true on success
+	  */
+	 bool changeFloatConstantValue(shaderSrcType srcType, const std::string& constantName, float newValue);
+
+	 /**
 	  * inserts code before main function in the shader source
 	  * @param srcType shader source to use
 	  * @param insertedCode source code to insert into shader
@@ -165,6 +173,15 @@ private:
 	 * @return true on success
 	 */
 	bool srcChangeIntConstantValue(int newVal, const std::string& constantName, std::string& modifiedSrc);
+
+	/**
+	 * changes float constant value
+	 * @param newVal new constant value
+	 * @param constantName constant name as it is declared
+	 * @param modifiedSrc shader source code to modify
+	 * @return true on success
+	 */
+	bool srcChangeFloatConstantValue(float newVal, const std::string& constantName, std::string& modifiedSrc);
 
 	/**
 	 * inserts code before main function
