@@ -298,6 +298,7 @@ void FrameManipulator::draw()
  	glPopAttrib();
 
 	Utils::GLSLShader::currentTransfo() = store;
+	Utils::GLSLShader::updateCurrentMatrices();
 
 }
 
