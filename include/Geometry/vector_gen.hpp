@@ -62,6 +62,15 @@ Vector<DIM,T>::Vector(const Vector<DIM,T>& v)
 }
 
 template <unsigned int DIM, typename T>
+template <typename T2>
+Vector<DIM,T>::Vector(const Vector<DIM,T2>& v)
+{
+	for(unsigned int i = 0; i < DIM; ++i)
+		m_data[i] = T(v[i]) ;
+}
+
+
+template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y)
 {
 	CGoGN_STATIC_ASSERT(DIM == 2, incompatible_Vector_constructor_dimension) ;

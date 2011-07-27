@@ -59,6 +59,9 @@ public:
 
 	Vector(const Vector<DIM,T>& v) ;
 
+	template <typename T2>
+	Vector(const Vector<DIM,T2>& v) ;
+
 	Vector(T x, T y) ;
 
 	Vector(T x, T y, T z) ;

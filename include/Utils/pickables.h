@@ -61,6 +61,13 @@ protected:
 	 */
 	unsigned int m_nb;
 
+	/// color
+	Geom::Vec4f m_color;
+
+	unsigned int m_sub1;
+
+	unsigned int m_sub2;
+
 
 public:
 	/**
@@ -79,10 +86,18 @@ public:
 	void setColor(const Geom::Vec4f& col);
 
 	/**
+	 * get the color
+	 */
+	const Geom::Vec4f&  getColor();
+
+	/**
 	 * draw the Drawable at origin with size=1
 	 */
 	virtual void draw();
 
+	/**
+	 * get the shape (virtual
+	 */
 	virtual std::string shape() { return "unknown shape";}
 
 	/**
@@ -100,6 +115,12 @@ public:
 	 * @param sub2 number of subdivisions (if two needed), default value is same as first
 	 */
 	virtual void updatePrecisionDrawing(unsigned int sub, unsigned int sub2=0)=0;
+
+	/**
+	 * get the precision of drawing
+	 */
+	void getPrecisionDrawing(unsigned int& sub, unsigned int& sub2);
+
 
 };
 
@@ -212,6 +233,29 @@ public:
 	 * pick a vector of pickable and return the picked object ordered from closed to farthest
 	 */
 	static std::vector<Pickable*> sortedPick(std::vector<Pickable*>& picks, const Geom::Vec3f& P, const Geom::Vec3f& V);
+
+	/**
+	 * check the type of drawable associate to pickable
+	 */
+	template <typename T>
+	bool checkType()
+	{
+		return dynamic_cast<T*>(m_drawable) != NULL;
+	}
+
+	/**
+	 * get position of pickable
+	 */
+	Geom::Vec3f getPosition();
+
+	/**
+	 * get axis and associated scale
+	 * @param ax axis: 0/1/2 for X,Y,Z
+	 * @param the scale of axis (output)
+	 * @return the axis vector normalized
+	 */
+	Geom::Vec3f getAxisScale(unsigned int ax, float& scale);
+
 
 };
 
