@@ -64,78 +64,80 @@ public :
 
 public:
 
-	/**
-	 * sets the clip planes count
-	 * @param planesCount clip planes count to use
+	/*
+	 * adds a clip plane
+	 * @return clip plane id (positive value on success, else -1)
 	 * @warning insertClippingCode must be called first
 	 */
-	void setClipPlanesCount(int planesCount);
+	int addClipPlane();
+
+	/*
+	 * deletes a clip plane
+	 * @param id clip plane id
+	 */
+	void deleteClipPlane(unsigned int id);
 
 	/// gets the clip planes count
 	int getClipPlanesCount();
 
 	/**
 	 * sets all parameters for one clip plane
-	 * @warning planeIndex starts at 0
+	 * @param id clip plane id
 	 * @param vec1 first basis vector
 	 * @param vec2 second basis vector
 	 * @param origin origin
-	 * @param planeIndex index of the plane
 	 */
-	void setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex);
+	void setClipPlaneParamsAll(unsigned int id, Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin);
 
 	/**
 	 * sets first vector for one clip plane
-	 * @warning planeIndex starts at 0
+	 * @param id clip plane id
 	 * @param vec1 first basis vector
-	 * @param planeIndex index of the plane
 	 */
-	void setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex);
+	void setClipPlaneParamsFirstVec(unsigned int id, Geom::Vec3f vec1);
 
 	/**
 	 * sets second vector for one clip plane
-	 * @warning planeIndex starts at 0
+	 * @param id clip plane id
 	 * @param vec2 second basis vector
-	 * @param planeIndex index of the plane
 	 */
-	void setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex);
+	void setClipPlaneParamsSecondVec(unsigned int id, Geom::Vec3f vec2);
 	
 	/**
 	 * sets origin for one clip plane
-	 * @warning planeIndex starts at 0
+	 * @param id clip plane id
 	 * @param origin origin
-	 * @param planeIndex index of the plane
 	 */
-	void setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex);
+	void setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origin);
 
 	/**
 	 * gets first vector for one clip plane
-	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of the plane
+	 * @param id clip plane id
 	 */
-	Geom::Vec3f getClipPlaneParamsFirstVec(int planeIndex);
+	Geom::Vec3f getClipPlaneParamsFirstVec(unsigned int id);
 
 	/**
 	 * gets second vector for one clip plane
-	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of the plane
+	 * @param id clip plane id
 	 */
-	Geom::Vec3f getClipPlaneParamsSecondVec(int planeIndex);
+	Geom::Vec3f getClipPlaneParamsSecondVec(unsigned int id);
 
 	/**
 	 * gets origin for one clip plane
-	 * @warning planeIndex starts at 0
-	 * @param planeIndex index of the plane
+	 * @param id clip plane id
 	 */
-	Geom::Vec3f getClipPlaneParamsOrigin(int planeIndex);
+	Geom::Vec3f getClipPlaneParamsOrigin(unsigned int id);
 
 private:
 
+	/// gets a non used clip plane id
+	unsigned int getFreeClipPlaneId();
+
 	/**
 	 * updates clip plane equation uniforms array
-	 * @param planeIndex index of the plane
+	 * @param id clip plane id
 	 */
-	void updateClipPlaneUniformsArray(int planeIndex);
+	void updateClipPlaneUniformsArray(unsigned int id);
 
 	/// clip planes structure
 	struct clipPlane
@@ -145,6 +147,16 @@ private:
 
 	/// clip planes array
 	std::vector<clipPlane> m_clipPlanes;
+
+	/// clip planes ids structure
+	struct clipPlaneId
+	{
+		bool used;
+		int index; // Corresponding index in the clip planes array
+	};
+
+	/// clip planes ids array
+	std::vector<clipPlaneId> m_clipPlanesIds;
 
 	/// clip planes equations uniforms array
 	std::vector<float> m_clipPlanesEquations;
@@ -161,62 +173,66 @@ private:
 
 public:
 
-	/**
-	 * sets the clip spheres count
-	 * @param spheresCount clip spheres count to use
+	/*
+	 * adds a clip sphere
+	 * @return clip sphere id (positive value on success, else -1)
 	 * @warning insertClippingCode must be called first
 	 */
-	void setClipSpheresCount(int spheresCount);
+	int addClipSphere();
+
+	/*
+	 * deletes a clip sphere
+	 * @param id clip sphere id
+	 */
+	void deleteClipSphere(unsigned int id);
 
 	/// gets the clip spheres count
 	int getClipSpheresCount();
 
 	/**
 	 * sets all parameters for one clip sphere
-	 * @warning sphereIndex starts at 0
+	 * @param id clip sphere id
 	 * @param center center
 	 * @param radius radius
-	 * @param sphereIndex index of the sphere
 	 */
-	void setClipSphereParamsAll(Geom::Vec3f center, float radius, int sphereIndex);
+	void setClipSphereParamsAll(unsigned int id, Geom::Vec3f center, float radius);
 
 	/**
 	 * sets center for one clip sphere
-	 * @warning sphereIndex starts at 0
+	 * @param id clip sphere id
 	 * @param center center
-	 * @param sphereIndex index of the sphere
 	 */
-	void setClipSphereParamsCenter(Geom::Vec3f center, int sphereIndex);
+	void setClipSphereParamsCenter(unsigned int id, Geom::Vec3f center);
 
 	/**
 	 * sets radius for one clip sphere
-	 * @warning sphereIndex starts at 0
+	 * @param id clip sphere id
 	 * @param radius radius
-	 * @param sphereIndex index of the sphere
 	 */
-	void setClipSphereParamsRadius(float radius, int sphereIndex);
+	void setClipSphereParamsRadius(unsigned int id, float radius);
 
 	/**
 	 * gets center for one clip sphere
-	 * @warning sphereIndex starts at 0
-	 * @param sphereIndex index of the sphere
+	 * @param id clip sphere id
 	 */
-	Geom::Vec3f getClipSphereParamsCenter(int sphereIndex);
+	Geom::Vec3f getClipSphereParamsCenter(unsigned int id);
 
 	/**
 	 * gets radius for one clip sphere
-	 * @warning sphereIndex starts at 0
-	 * @param sphereIndex index of the sphere
+	 * @param id clip sphere id
 	 */
-	float getClipSphereParamsRadius(int sphereIndex);
+	float getClipSphereParamsRadius(unsigned int id);
 
 private:
 
+	/// gets a non used clip sphere id
+	unsigned int getFreeClipSphereId();
+
 	/**
 	 * updates clip sphere center and radius uniforms array
-	 * @param sphereIndex index of the sphere
+	 * @param id clip sphere id
 	 */
-	void updateClipSphereUniformsArray(int sphereIndex);
+	void updateClipSphereUniformsArray(unsigned int id);
 
 	/// clip spheres structure
 	struct clipSphere
@@ -227,6 +243,16 @@ private:
 
 	/// clip spheres array
 	std::vector<clipSphere> m_clipSpheres;
+
+	/// clip spheres ids structure
+	struct clipSphereId
+	{
+		bool used;
+		int index; // Corresponding index in the clip spheres array
+	};
+
+	/// clip spheres ids array
+	std::vector<clipSphereId> m_clipSpheresIds;
 
 	/// clip spheres centers and radiuses uniforms array
 	std::vector<float> m_clipSpheresCentersAndRadiuses;
@@ -326,15 +352,6 @@ private:
 	bool errorRaiseShaderMutatorFailure(bool condition, const std::string& location);
 
 	/**
-	 * Outputs a "parameter not positive" error if the condition is satisfied
-	 * @param condition condition to satisfy
-	 * @param location name of the function where the error raising was done
-	 * @param paramName name of the parameter
-	 * @return true if the error has been raised
-	 */
-	bool errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName);
-
-	/**
 	 * Outputs a "shader source is empty" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising was done
@@ -362,13 +379,12 @@ private:
 	bool errorRaiseVariableNotFoundInShader(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType, const std::string& varName);
 
 	/**
-	 * Outputs a "parameter is out of range" error if the condition is satisfied
+	 * Outputs a "wrong ID" error if the condition is satisfied
 	 * @param condition condition to satisfy
 	 * @param location name of the function where the error raising was done
-	 * @param paramName name of the parameter
 	 * @return true if the error has been raised
 	 */
-	bool errorRaiseParameterIsOutOfRange(bool condition, const std::string& location, const std::string& paramName);
+	bool errorRaiseWrongId(bool condition, const std::string& location);
 
 	/**
 	 * Outputs a "uniform .. not found in shader" error if the condition is satisfied

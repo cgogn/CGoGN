@@ -60,57 +60,102 @@ ClippingShader::ClippingShader():
  ***********************************************/
 
 
-void ClippingShader::setClipPlanesCount(int planesCount)
+int ClippingShader::addClipPlane()
 {
-	if (planesCount != getClipPlanesCount())
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::addClipPlane"))
+		return -1;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Previous planes count
+	int previousPlanesCount = getClipPlanesCount();
+
+	// Modify the clip planes count constant in both shader
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", previousPlanesCount + 1))
+			|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", previousPlanesCount + 1)),
+			"ClippingShader::addClipPlane"))
+		return -1;
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Get new plane id
+	unsigned int newPlaneId = getFreeClipPlaneId();
+
+	// Resize planes arrays to the right size
+	m_clipPlanes.resize((size_t)(previousPlanesCount + 1));
+	m_clipPlanesIds.resize((size_t)newPlaneId);
+	m_clipPlanesEquations.resize(4*(size_t)(previousPlanesCount + 1), 0.0);
+
+	// Set new plane id
+	m_clipPlanesIds[newPlaneId].used = true;
+	m_clipPlanesIds[newPlaneId].index = previousPlanesCount;
+
+	// Set default parameters values for the new plane
+	Geom::Vec3f defaultFirstVec (1.0, 0.0, 0.0);
+	Geom::Vec3f defaultSecondVec (0.0, 1.0, 0.0);
+	Geom::Vec3f defaultOrigin (0.0, 0.0, 0.0);
+	setClipPlaneParamsAll(newPlaneId, defaultFirstVec, defaultSecondVec, defaultOrigin);
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
+
+	return newPlaneId;
+}
+
+void ClippingShader::deleteClipPlane(unsigned int id)
+{
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::deleteClipPlane"))
+		return;
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::deleteClipPlane"))
+		return;
+
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::deleteClipPlane"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Previous planes count
+	int previousPlanesCount = getClipPlanesCount();
+
+	// Modify the clip planes count constant in both shader
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", previousPlanesCount - 1))
+			|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", previousPlanesCount - 1)),
+			"ClippingShader::deleteClipPlane"))
+		return;
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Rearrange planes arrays
+	m_clipPlanes.erase(m_clipPlanes.begin() + m_clipPlanesIds[id].index);
+	for (size_t i; i < m_clipPlanesIds.size(); i++)
 	{
-		// Check if the clipping code has been inserted into shader
-		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipPlanesCount"))
-			return;
-
-		// Check if the given clipping planes count is valid
-		if (errorRaiseParameterIsNotPositive((planesCount < 0), "ClippingShader::setClipPlanesCount", "planesCount"))
-			return;
-
-		// Shader name string
-		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-		// Use a shader mutator
-		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-		// Modify the clip planes count constant in both shader
-		if (errorRaiseShaderMutatorFailure(
-				   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", planesCount))
-				|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", planesCount)),
-				"ClippingShader::setClipPlanesCount"))
-			return;
-
-		// Reload both shaders
-		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-
-
-		// Previous planes count
-		int previousPlanesCount = getClipPlanesCount();
-
-		// Resize the planes arrays to the right size
-		m_clipPlanes.resize((size_t)planesCount);
-		m_clipPlanesEquations.resize(4*(size_t)planesCount, 0.0);
-
-		// Set default parameters values for new planes
-		if (planesCount > previousPlanesCount)
-		{
-			Geom::Vec3f defaultFirstVec (1.0, 0.0, 0.0);
-			Geom::Vec3f defaultSecondVec (0.0, 1.0, 0.0);
-			Geom::Vec3f defaultOrigin (0.0, 0.0, 0.0);
-
-			for (int i = previousPlanesCount; i < planesCount; i++)
-				setClipPlaneParamsAll(defaultFirstVec, defaultSecondVec, defaultOrigin, i);
-		}
-
-		// Recompile shaders (automatically calls updateClippingUniforms)
-		recompile();
+		if (m_clipPlanesIds[i].index > m_clipPlanesIds[id].index)
+			m_clipPlanesIds[i].index -= 1;
 	}
+	m_clipPlanesIds[id].used = false;
+	m_clipPlanesEquations.erase(
+			m_clipPlanesEquations.begin() + 4*m_clipPlanesIds[id].index,
+			m_clipPlanesEquations.begin() + 4*m_clipPlanesIds[id].index + 4);
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
 }
 
 int ClippingShader::getClipPlanesCount()
@@ -118,11 +163,16 @@ int ClippingShader::getClipPlanesCount()
 	return (int)m_clipPlanes.size();
 }
 
-void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin, int planeIndex)
+void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsAll", "planeIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsAll"))
+		return;
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsAll"))
+		return;
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Normalize
 	Geom::Vec3f vec1Normalized = vec1;
@@ -140,18 +190,23 @@ void ClippingShader::setClipPlaneParamsAll(Geom::Vec3f vec1, Geom::Vec3f vec2, G
 		m_clipPlanes[planeIndex].origin = origin;
 
 		// Update the plane arrays
-		updateClipPlaneUniformsArray(planeIndex);
+		updateClipPlaneUniformsArray(id);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
 	}
 }
 
-void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex)
+void ClippingShader::setClipPlaneParamsFirstVec(unsigned int id, Geom::Vec3f vec1)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsFirstVec", "planeIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsFirstVec"))
+		return;
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsFirstVec"))
+		return;
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Normalize
 	Geom::Vec3f vec1Normalized = vec1;
@@ -163,18 +218,23 @@ void ClippingShader::setClipPlaneParamsFirstVec(Geom::Vec3f vec1, int planeIndex
 		m_clipPlanes[planeIndex].firstVec = vec1Normalized;
 
 		// Update the plane arrays
-		updateClipPlaneUniformsArray(planeIndex);
+		updateClipPlaneUniformsArray(id);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
 	}
 }
 
-void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeIndex)
+void ClippingShader::setClipPlaneParamsSecondVec(unsigned int id, Geom::Vec3f vec2)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsSecondVec", "planeIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsSecondVec"))
+		return;
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsSecondVec"))
+		return;
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Normalize
 	Geom::Vec3f vec2Normalized = vec2;
@@ -186,18 +246,23 @@ void ClippingShader::setClipPlaneParamsSecondVec(Geom::Vec3f vec2, int planeInde
 		m_clipPlanes[planeIndex].secondVec = vec2Normalized;
 
 		// Update the plane arrays
-		updateClipPlaneUniformsArray(planeIndex);
+		updateClipPlaneUniformsArray(id);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
 	}
 }
 
-void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex)
+void ClippingShader::setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origin)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::setClipPlaneParamsOrigin", "planeIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsOrigin"))
+		return;
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsOrigin"))
+		return;
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	if (origin != m_clipPlanes[planeIndex].origin)
 	{
@@ -205,48 +270,84 @@ void ClippingShader::setClipPlaneParamsOrigin(Geom::Vec3f origin, int planeIndex
 		m_clipPlanes[planeIndex].origin = origin;
 
 		// Update the plane arrays
-		updateClipPlaneUniformsArray(planeIndex);
+		updateClipPlaneUniformsArray(id);
 
 		// Send again the whole planes equations array to shader
 		sendClipPlanesEquationsUniform();
 	}
 }
 
-Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(int planeIndex)
+Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(unsigned int id)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::getClipPlaneParamsFirstVec", "planeIndex"))
-			return Geom::Vec3f(0.0, 0.0, 0.0);
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::getClipPlaneParamsFirstVec"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::getClipPlaneParamsFirstVec"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].firstVec;
 }
 
-Geom::Vec3f ClippingShader::getClipPlaneParamsSecondVec(int planeIndex)
+Geom::Vec3f ClippingShader::getClipPlaneParamsSecondVec(unsigned int id)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::getClipPlaneParamsSecondVec", "planeIndex"))
-			return Geom::Vec3f(0.0, 0.0, 0.0);
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::getClipPlaneParamsSecondVec"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::getClipPlaneParamsSecondVec"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].secondVec;
 }
 
-Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(int planeIndex)
+Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(unsigned int id)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::getClipPlaneParamsOrigin", "planeIndex"))
-			return Geom::Vec3f(0.0, 0.0, 0.0);
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::getClipPlaneParamsOrigin"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::getClipPlaneParamsOrigin"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Return the parameter
 	return m_clipPlanes[planeIndex].origin;
 }
 
-void ClippingShader::updateClipPlaneUniformsArray(int planeIndex)
+unsigned int ClippingShader::getFreeClipPlaneId()
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((planeIndex < 0) || (planeIndex > (getClipPlanesCount() - 1))), "ClippingShader::updateClipPlaneArray", "planeIndex"))
-			return;
+	unsigned int freeId = 0;
+
+	// Free id = either out of current ids vector size or no more used
+	while (freeId < m_clipPlanesIds.size())
+	{
+		if (!m_clipPlanesIds[freeId].used)
+			return freeId;
+		else
+			freeId++;
+	}
+
+	return freeId;
+}
+
+void ClippingShader::updateClipPlaneUniformsArray(unsigned int id)
+{
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::updateClipPlaneUniformsArray"))
+		return;
+	if (errorRaiseWrongId(m_clipPlanesIds[id].used, "ClippingShader::updateClipPlaneUniformsArray"))
+		return;
+
+	// Get the corresponding plane index
+	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Update the planes equations array
 	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
@@ -266,56 +367,101 @@ void ClippingShader::updateClipPlaneUniformsArray(int planeIndex)
  ***********************************************/
 
 
-void ClippingShader::setClipSpheresCount(int spheresCount)
+int ClippingShader::addClipSphere()
 {
-	if (spheresCount != getClipSpheresCount())
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::addClipSphere"))
+		return -1;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Previous spheres count
+	int previousSpheresCount = getClipSpheresCount();
+
+	// Modify the clip spheres count constant in both shader
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", previousSpheresCount + 1))
+			|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", previousSpheresCount + 1)),
+			"ClippingShader::addClipSphere"))
+		return -1;
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Get new sphere id
+	unsigned int newSphereId = getFreeClipSphereId();
+
+	// Resize spheres arrays to the right size
+	m_clipSpheres.resize((size_t)(previousSpheresCount + 1));
+	m_clipSpheresIds.resize((size_t)newSphereId);
+	m_clipSpheresCentersAndRadiuses.resize(4*(size_t)(previousSpheresCount + 1), 0.0);
+
+	// Set new sphere id
+	m_clipSpheresIds[newSphereId].used = true;
+	m_clipSpheresIds[newSphereId].index = previousSpheresCount;
+
+	// Set default parameters values for the new sphere
+	Geom::Vec3f defaultCenter (0.0, 0.0, 0.0);
+	float defaultRadius = 10.0;
+	setClipSphereParamsAll(newSphereId, defaultCenter, defaultRadius);
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
+
+	return newSphereId;
+}
+
+void ClippingShader::deleteClipSphere(unsigned int id)
+{
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::deleteClipSphere"))
+		return;
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::deleteClipSphere"))
+		return;
+
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::deleteClipSphere"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Previous spheres count
+	int previousSpheresCount = getClipSpheresCount();
+
+	// Modify the clip spheres count constant in both shader
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", previousSpheresCount - 1))
+			|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", previousSpheresCount - 1)),
+			"ClippingShader::deleteClipSphere"))
+		return;
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Rearrange spheres arrays
+	m_clipSpheres.erase(m_clipSpheres.begin() + m_clipSpheresIds[id].index);
+	for (size_t i; i < m_clipSpheresIds.size(); i++)
 	{
-		// Check if the clipping code has been inserted into shader
-		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipSpheresCount"))
-			return;
-
-		// Check if the given clipping spheres count is valid
-		if (errorRaiseParameterIsNotPositive((spheresCount < 0), "ClippingShader::setClipSpheresCount", "spheresCount"))
-			return;
-
-		// Shader name string
-		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
-
-		// Use a shader mutator
-		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-		// Modify the clip spheres count constant in both shader
-		if (errorRaiseShaderMutatorFailure(
-				   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", spheresCount))
-				|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", spheresCount)),
-				"ClippingShader::setClipSpheresCount"))
-			return;
-
-		// Reload both shaders
-		reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
-		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-
-
-		// Previous spheres count
-		int previousSpheresCount = getClipSpheresCount();
-
-		// Resize the spheres arrays to the right size
-		m_clipSpheres.resize((size_t)spheresCount);
-		m_clipSpheresCentersAndRadiuses.resize(4*(size_t)spheresCount, 0.0);
-
-		// Set default parameters values for new spheres
-		if (spheresCount > previousSpheresCount)
-		{
-			Geom::Vec3f defaultCenter (0.0, 0.0, 0.0);
-			float defaultRadius = 10.0;
-
-			for (int i = previousSpheresCount; i < spheresCount; i++)
-				setClipSphereParamsAll(defaultCenter, defaultRadius, i);
-		}
-
-		// Recompile shaders (automatically calls updateClippingUniforms)
-		recompile();
+		if (m_clipSpheresIds[i].index > m_clipSpheresIds[id].index)
+			m_clipSpheresIds[i].index -= 1;
 	}
+	m_clipSpheresIds[id].used = false;
+	m_clipSpheresCentersAndRadiuses.erase(
+			m_clipSpheresCentersAndRadiuses.begin() + 4*m_clipSpheresIds[id].index,
+			m_clipSpheresCentersAndRadiuses.begin() + 4*m_clipSpheresIds[id].index + 4);
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
 }
 
 int ClippingShader::getClipSpheresCount()
@@ -323,11 +469,16 @@ int ClippingShader::getClipSpheresCount()
 	return (int)m_clipSpheres.size();
 }
 
-void ClippingShader::setClipSphereParamsAll(Geom::Vec3f center, float radius, int sphereIndex)
+void ClippingShader::setClipSphereParamsAll(unsigned int id, Geom::Vec3f center, float radius)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::setClipSphereParamsAll", "sphereIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::setClipSphereParamsAll"))
+		return;
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::setClipSphereParamsAll"))
+		return;
+
+	// Get the corresponding sphere index
+	int sphereIndex = m_clipSpheresIds[id].index;
 
 	if ((center != m_clipSpheres[sphereIndex].center)
 			|| (radius != m_clipSpheres[sphereIndex].radius))
@@ -337,18 +488,23 @@ void ClippingShader::setClipSphereParamsAll(Geom::Vec3f center, float radius, in
 		m_clipSpheres[sphereIndex].radius = radius;
 
 		// Update the sphere array
-		updateClipSphereUniformsArray(sphereIndex);
+		updateClipSphereUniformsArray(id);
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
 	}
 }
 
-void ClippingShader::setClipSphereParamsCenter(Geom::Vec3f center, int sphereIndex)
+void ClippingShader::setClipSphereParamsCenter(unsigned int id, Geom::Vec3f center)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::setClipSphereParamsCenter", "sphereIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::setClipSphereParamsCenter"))
+		return;
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::setClipSphereParamsCenter"))
+		return;
+
+	// Get the corresponding sphere index
+	int sphereIndex = m_clipSpheresIds[id].index;
 
 	if (center != m_clipSpheres[sphereIndex].center)
 	{
@@ -356,18 +512,23 @@ void ClippingShader::setClipSphereParamsCenter(Geom::Vec3f center, int sphereInd
 		m_clipSpheres[sphereIndex].center = center;
 
 		// Update the sphere array
-		updateClipSphereUniformsArray(sphereIndex);
+		updateClipSphereUniformsArray(id);
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
 	}
 }
 
-void ClippingShader::setClipSphereParamsRadius(float radius, int sphereIndex)
+void ClippingShader::setClipSphereParamsRadius(unsigned int id, float radius)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::setClipSphereParamsRadius", "sphereIndex"))
-			return;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::setClipSphereParamsRadius"))
+		return;
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::setClipSphereParamsRadius"))
+		return;
+
+	// Get the corresponding sphere index
+	int sphereIndex = m_clipSpheresIds[id].index;
 
 	if (radius != m_clipSpheres[sphereIndex].radius)
 	{
@@ -375,38 +536,69 @@ void ClippingShader::setClipSphereParamsRadius(float radius, int sphereIndex)
 		m_clipSpheres[sphereIndex].radius = radius;
 
 		// Update the sphere array
-		updateClipSphereUniformsArray(sphereIndex);
+		updateClipSphereUniformsArray(id);
 
 		// Send again the whole spheres centers and radiuses array to shader
 		sendClipSpheresCentersAndRadiusesUniform();
 	}
 }
 
-Geom::Vec3f ClippingShader::getClipSphereParamsCenter(int sphereIndex)
+Geom::Vec3f ClippingShader::getClipSphereParamsCenter(unsigned int id)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::getClipSphereParamsCenter", "sphereIndex"))
-			return Geom::Vec3f(0.0, 0.0, 0.0);
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::getClipSphereParamsCenter"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::getClipSphereParamsCenter"))
+		return Geom::Vec3f(0.0, 0.0, 0.0);
+
+	// Get the corresponding sphere index
+	int sphereIndex = m_clipSpheresIds[id].index;
 
 	// Return the parameter
 	return m_clipSpheres[sphereIndex].center;
 }
 
-float ClippingShader::getClipSphereParamsRadius(int sphereIndex)
+float ClippingShader::getClipSphereParamsRadius(unsigned int id)
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::getClipSphereParamsRadius", "sphereIndex"))
-			return 0.0;
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::getClipSphereParamsRadius"))
+		return 0.0;
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::getClipSphereParamsRadius"))
+		return 0.0;
+
+	// Get the corresponding sphere index
+	int sphereIndex = m_clipSpheresIds[id].index;
 
 	// Return the parameter
 	return m_clipSpheres[sphereIndex].radius;
 }
 
-void ClippingShader::updateClipSphereUniformsArray(int sphereIndex)
+unsigned int ClippingShader::getFreeClipSphereId()
 {
-	// Check if the given index is out of range
-	if (errorRaiseParameterIsOutOfRange(((sphereIndex < 0) || (sphereIndex > (getClipSpheresCount() - 1))), "ClippingShader::updateClipSphereArray", "sphereIndex"))
-			return;
+	unsigned int freeId = 0;
+
+	// Free id = either out of current ids vector size or no more used
+	while (freeId < m_clipSpheresIds.size())
+	{
+		if (!m_clipSpheresIds[freeId].used)
+			return freeId;
+		else
+			freeId++;
+	}
+
+	return freeId;
+}
+
+void ClippingShader::updateClipSphereUniformsArray(unsigned int id)
+{
+	// Check if the given id is valid
+	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::updateClipSphereUniformsArray"))
+		return;
+	if (errorRaiseWrongId(m_clipSpheresIds[id].used, "ClippingShader::updateClipSphereUniformsArray"))
+		return;
+
+	// Get the corresponding sphere index
+	int sphereIndex = m_clipSpheresIds[id].index;
 
 	// Update the spheres centers and radiuses array
 	m_clipSpheresCentersAndRadiuses[4*sphereIndex + 0] = m_clipSpheres[sphereIndex].center[0];
@@ -814,22 +1006,6 @@ bool ClippingShader::errorRaiseShaderMutatorFailure(bool condition, const std::s
 	return condition;
 }
 
-bool ClippingShader::errorRaiseParameterIsNotPositive(bool condition, const std::string& location, const std::string& paramName)
-{
-	if (condition)
-	{
-		CGoGNerr
-		<< "ERROR - "
-		<< location
-		<< " - Given value for "
-		<< paramName
-		<< " is not positive"
-		<< CGoGNendl;
-	}
-
-	return condition;
-}
-
 bool ClippingShader::errorRaiseShaderSourceIsEmpty(bool condition, const std::string& location, ShaderMutator::shaderSrcType shaderType)
 {
 	if (condition)
@@ -921,16 +1097,14 @@ bool ClippingShader::errorRaiseVariableNotFoundInShader(bool condition, const st
 
 	return condition;
 }
-bool ClippingShader::errorRaiseParameterIsOutOfRange(bool condition, const std::string& location, const std::string& paramName)
+bool ClippingShader::errorRaiseWrongId(bool condition, const std::string& location)
 {
 	if (condition)
 	{
 		CGoGNerr
 		<< "ERROR - "
 		<< location
-		<< " - Given value for "
-		<< paramName
-		<< " is out of range"
+		<< " - Given ID is not valid"
 		<< CGoGNendl;
 	}
 
