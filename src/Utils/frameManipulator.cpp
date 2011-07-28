@@ -900,7 +900,7 @@ void FrameManipulator::rotateInScreen(int dx, int dy)
 	Geom::Vec3f axisRotation(P[0]-m_trans[0], P[1]-m_trans[1], P[2]-m_trans[2]);
 	axisRotation.normalize();
 
-	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),sqrt(float(dx*dx+dy*dy))/2.0f,glm::vec3(axisRotation[0],axisRotation[1],axisRotation[2]));
+	glm::mat4 tr = glm::rotate(glm::mat4(1.0f),sqrtf(float(dx*dx+dy*dy))/2.0f,glm::vec3(axisRotation[0],axisRotation[1],axisRotation[2]));
 	m_rotations = tr*m_rotations;
 
 }
