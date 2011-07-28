@@ -178,7 +178,7 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3" stretch="3,1,2">
+             <layout class="QVBoxLayout" name="verticalLayout_3" stretch="3,1">
               <item>
                <widget class="QGroupBox" name="groupBox_PlanesDisplayParams">
                 <property name="enabled">
@@ -315,157 +315,6 @@
                 </widget>
                </widget>
               </item>
-              <item>
-               <widget class="QGroupBox" name="groupBox_PlaneVectors">
-                <property name="title">
-                 <string>Plane Vectors</string>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout">
-                 <item>
-                  <layout class="QGridLayout" name="gridLayout_11">
-                   <item row="0" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec1x">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec1y">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="3">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec1z">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec2x">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneOriginy">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec2y">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="3">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneOriginz">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneOriginx">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="3">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_PlaneVec2z">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="label_Vec1">
-                     <property name="text">
-                      <string>Vec 1</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="label_Vec2">
-                     <property name="text">
-                      <string>Vec 2</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="0">
-                    <widget class="QLabel" name="label_Origin">
-                     <property name="text">
-                      <string>Origin</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </item>
              </layout>
             </item>
            </layout>
@@ -476,7 +325,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_5" stretch="3,1,2">
+             <layout class="QVBoxLayout" name="verticalLayout_5" stretch="3,1">
               <item>
                <widget class="QGroupBox" name="groupBox_SpheresDisplayParams">
                 <property name="enabled">
@@ -597,85 +446,6 @@
                   <number>-1</number>
                  </property>
                 </widget>
-               </widget>
-              </item>
-              <item>
-               <widget class="QGroupBox" name="groupBox_SphereParams">
-                <property name="title">
-                 <string>Sphere Params</string>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <layout class="QGridLayout" name="gridLayout_14">
-                   <item row="0" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_SphereCenterx">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_SphereCentery">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="3">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_SphereCenterz">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QDoubleSpinBox" name="doubleSpinBox_SphereRadius">
-                     <property name="minimum">
-                      <double>-99.989999999999995</double>
-                     </property>
-                     <property name="singleStep">
-                      <double>0.100000000000000</double>
-                     </property>
-                     <property name="value">
-                      <double>0.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="label_SphereCenter">
-                     <property name="text">
-                      <string>Center</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="label_SphereRadius">
-                     <property name="text">
-                      <string>Radius</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
                </widget>
               </item>
              </layout>

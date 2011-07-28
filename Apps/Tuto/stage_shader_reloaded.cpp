@@ -76,22 +76,16 @@ void StageShaderReloaded::slot_explodTopoPhi3(double c)
 
 void StageShaderReloaded::slot_pushButton_addPlane()
 {
-	m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() + 1);
-	Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, dock.comboBox_PlaneIndex->count() + 1);
+	// Create clipping and pickable objects
+	int newPlaneId = m_shader->addClipPlane();
+	Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, newPlaneId);
 	m_pickablePlanes.push_back(pickable);
 
-	m_shader->setClipPlaneParamsOrigin(m_bb.center(), dock.comboBox_PlaneIndex->count() + 1 - 1);
+	// Set params
+	m_shader->setClipPlaneParamsOrigin(newPlaneId, m_bb.center());
 	pickable->translate(m_bb.center());
 
-	std::string indexStr;
-	std::stringstream ss;
-	ss << (dock.comboBox_PlaneIndex->count() + 1);
-	indexStr = ss.str();
-
-	std::string str = "Plane " + indexStr;
-
-	dock.comboBox_PlaneIndex->addItem(QString(str.c_str()));
-
+	// Update shader sources edits
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
@@ -100,7 +94,11 @@ void StageShaderReloaded::slot_pushButton_addPlane()
 
 void StageShaderReloaded::slot_pushButton_deletePlane()
 {
-	if (m_pickablePlanes.size() > 0)
+	if (m_lastPickedObject)
+	{
+
+	}
+	/*if (m_pickablePlanes.size() > 0)
 	{
 		if (m_lastPickedObject == m_pickablePlanes.back())
 			m_lastPickedObject = NULL;
@@ -116,64 +114,7 @@ void StageShaderReloaded::slot_pushButton_deletePlane()
 		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
 		updateGLMatrices();
-	}
-}
-
-void StageShaderReloaded::slot_comboBox_PlaneIndexChanged(int newIndex)
-{
-	if (newIndex >= 0)
-	{
-		Geom::Vec3f currPlaneVec1 = m_shader->getClipPlaneParamsFirstVec(newIndex);
-		dock.doubleSpinBox_PlaneVec1x->setValue(currPlaneVec1[0]);
-		dock.doubleSpinBox_PlaneVec1y->setValue(currPlaneVec1[1]);
-		dock.doubleSpinBox_PlaneVec1z->setValue(currPlaneVec1[2]);
-
-		Geom::Vec3f currPlaneVec2 = m_shader->getClipPlaneParamsSecondVec(newIndex);
-		dock.doubleSpinBox_PlaneVec2x->setValue(currPlaneVec2[0]);
-		dock.doubleSpinBox_PlaneVec2y->setValue(currPlaneVec2[1]);
-		dock.doubleSpinBox_PlaneVec2z->setValue(currPlaneVec2[2]);
-
-		Geom::Vec3f currPlaneOrigin = m_shader->getClipPlaneParamsOrigin(newIndex);
-		dock.doubleSpinBox_PlaneOriginx->setValue(currPlaneOrigin[0]);
-		dock.doubleSpinBox_PlaneOriginy->setValue(currPlaneOrigin[1]);
-		dock.doubleSpinBox_PlaneOriginz->setValue(currPlaneOrigin[2]);
-	}
-}
-
-void StageShaderReloaded::slot_doubleSpinBox_PlaneVec1(double c)
-{
-	if (dock.comboBox_PlaneIndex->currentIndex() >= 0)
-	{
-		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1x->value();
-		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1y->value();
-		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec1z->value();
-		m_shader->setClipPlaneParamsFirstVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
-		updateGL();
-	}
-}
-
-void StageShaderReloaded::slot_doubleSpinBox_PlaneVec2(double c)
-{
-	if (dock.comboBox_PlaneIndex->currentIndex() >= 0)
-	{
-		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2x->value();
-		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2y->value();
-		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneVec2z->value();
-		m_shader->setClipPlaneParamsSecondVec(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
-		updateGL();
-	}
-}
-
-void StageShaderReloaded::slot_doubleSpinBox_PlaneOrigin(double c)
-{
-	if (dock.comboBox_PlaneIndex->currentIndex() >= 0)
-	{
-		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginx->value();
-		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginy->value();
-		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_PlaneOriginz->value();
-		m_shader->setClipPlaneParamsOrigin(Geom::Vec3f(x, y, z), dock.comboBox_PlaneIndex->currentIndex());
-		updateGL();
-	}
+	}*/
 }
 
 void StageShaderReloaded::slot_spinBox_GridResolution(int i)
@@ -194,24 +135,18 @@ void StageShaderReloaded::slot_doubleSpinBox_GridColor(double c)
 
 void StageShaderReloaded::slot_pushButton_addSphere()
 {
-	m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() + 1);
-	Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, dock.comboBox_SphereIndex->count() + 1);
+	// Create clipping and pickable objects
+	int newSphereId = m_shader->addClipSphere();
+	Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, newSphereId);
 	m_pickableSpheres.push_back(pickable);
 
-	m_shader->setClipSphereParamsCenter(m_bb.center(), dock.comboBox_SphereIndex->count() + 1 - 1);
-	m_shader->setClipSphereParamsRadius((m_bb.maxSize())*1.0, dock.comboBox_SphereIndex->count() + 1 - 1);
+	// Set params
+	m_shader->setClipSphereParamsCenter(newSphereId, m_bb.center());
+	m_shader->setClipSphereParamsRadius(newSphereId, (m_bb.maxSize())*1.0);
 	pickable->translate(m_bb.center());
 	pickable->scale(Geom::Vec3f(m_bb.maxSize()*1.0));
 
-	std::string indexStr;
-	std::stringstream ss;
-	ss << (dock.comboBox_SphereIndex->count() + 1);
-	indexStr = ss.str();
-
-	std::string str = "Sphere " + indexStr;
-
-	dock.comboBox_SphereIndex->addItem(QString(str.c_str()));
-
+	// Update shader sources edits
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
@@ -220,7 +155,7 @@ void StageShaderReloaded::slot_pushButton_addSphere()
 
 void StageShaderReloaded::slot_pushButton_deleteSphere()
 {
-	if (m_pickableSpheres.size() > 0)
+	/*if (m_pickableSpheres.size() > 0)
 	{
 		if (m_lastPickedObject == m_pickableSpheres.back())
 			m_lastPickedObject = NULL;
@@ -236,44 +171,7 @@ void StageShaderReloaded::slot_pushButton_deleteSphere()
 		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
 		updateGLMatrices();
-	}
-}
-
-void StageShaderReloaded::slot_comboBox_SphereIndexChanged(int newIndex)
-{
-	if (newIndex >= 0)
-	{
-		Geom::Vec3f currSphereCenter = m_shader->getClipSphereParamsCenter(newIndex);
-		dock.doubleSpinBox_SphereCenterx->setValue(currSphereCenter[0]);
-		dock.doubleSpinBox_SphereCentery->setValue(currSphereCenter[1]);
-		dock.doubleSpinBox_SphereCenterz->setValue(currSphereCenter[2]);
-
-		dock.doubleSpinBox_SphereRadius->setValue(m_shader->getClipSphereParamsRadius(newIndex));
-	}
-}
-
-void StageShaderReloaded::slot_doubleSpinBox_SphereCenter(double c)
-{
-	int index = dock.comboBox_SphereIndex->currentIndex();
-	if (index >= 0)
-	{
-		float x = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCenterx->value();
-		float y = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCentery->value();
-		float z = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereCenterz->value();
-		m_shader->setClipSphereParamsCenter(Geom::Vec3f(x, y, z), index);
-		updateGL();
-	}
-}
-
-void StageShaderReloaded::slot_doubleSpinBox_SphereRadius(double c)
-{
-	int index = dock.comboBox_SphereIndex->currentIndex();
-	if (index >= 0)
-	{
-		m_shader->setClipSphereParamsRadius((float)c, index);
-		m_pickableSpheres[index]->scale(Geom::Vec3f((float)c));
-		updateGL();
-	}
+	}*/
 }
 
 void StageShaderReloaded::slot_spinBox_SphereResolution(int i)
@@ -361,20 +259,6 @@ void StageShaderReloaded::initGUI()
 	setCallBack(dock.pushButton_addPlane, SIGNAL(clicked()), SLOT(slot_pushButton_addPlane()));
 	setCallBack(dock.pushButton_deletePlane, SIGNAL(clicked()), SLOT(slot_pushButton_deletePlane()));
 
-	setCallBack(dock.comboBox_PlaneIndex, SIGNAL(currentIndexChanged(int)), SLOT(slot_comboBox_PlaneIndexChanged(int)));
-
-	setCallBack(dock.doubleSpinBox_PlaneVec1x, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneVec1(double)));
-	setCallBack(dock.doubleSpinBox_PlaneVec1y, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneVec1(double)));
-	setCallBack(dock.doubleSpinBox_PlaneVec1z, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneVec1(double)));
-
-	setCallBack(dock.doubleSpinBox_PlaneVec2x, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneVec2(double)));
-	setCallBack(dock.doubleSpinBox_PlaneVec2y, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneVec2(double)));
-	setCallBack(dock.doubleSpinBox_PlaneVec2z, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneVec2(double)));
-
-	setCallBack(dock.doubleSpinBox_PlaneOriginx, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
-	setCallBack(dock.doubleSpinBox_PlaneOriginy, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
-	setCallBack(dock.doubleSpinBox_PlaneOriginz, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_PlaneOrigin(double)));
-
 	setCallBack(dock.spinBox_GridResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolution(int)));
 	setCallBack(dock.doubleSpinBox_GridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
 	setCallBack(dock.doubleSpinBox_GridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
@@ -395,14 +279,6 @@ void StageShaderReloaded::initGUI()
 
 	setCallBack(dock.pushButton_addSphere, SIGNAL(clicked()), SLOT(slot_pushButton_addSphere()));
 	setCallBack(dock.pushButton_deleteSphere, SIGNAL(clicked()), SLOT(slot_pushButton_deleteSphere()));
-
-	setCallBack(dock.comboBox_SphereIndex, SIGNAL(currentIndexChanged(int)), SLOT(slot_comboBox_SphereIndexChanged(int)));
-
-	setCallBack(dock.doubleSpinBox_SphereCenterx, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereCenter(double)));
-	setCallBack(dock.doubleSpinBox_SphereCentery, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereCenter(double)));
-	setCallBack(dock.doubleSpinBox_SphereCenterz, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereCenter(double)));
-
-	setCallBack(dock.doubleSpinBox_SphereRadius, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereRadius(double)));
 
 	setCallBack(dock.spinBox_SphereResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereResolution(int)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
@@ -529,19 +405,13 @@ void StageShaderReloaded::cb_initGL()
 void StageShaderReloaded::updateVBOprimitives(int upType)
 {
 	if(upType & Algo::Render::GL2::TRIANGLES)
-	{
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
-	}
 
 	if(upType & Algo::Render::GL2::LINES)
-	{
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES,false) ;
-	}
 
 	if(upType & Algo::Render::GL2::POINTS)
-	{
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
-	}
 }
 
 void StageShaderReloaded::cb_redraw()
@@ -587,7 +457,12 @@ void StageShaderReloaded::cb_redraw()
 
 void StageShaderReloaded::cb_keyPress(int code)
 {
-
+	switch (code)
+	{
+		case 16777223 : // Suppr
+			printf("Suppression\n");
+			break;
+	}
 }
 
 void StageShaderReloaded::cb_mousePress(int button, int x, int y)
@@ -611,18 +486,29 @@ void StageShaderReloaded::cb_mousePress(int button, int x, int y)
 		// picking the frame -> axis
 		newPickedFrameAxis = m_frameManipulator->pick(rayA, AB, dist);
 		m_frameManipulatorPickedAxis = newPickedFrameAxis;
-	}
 
-	// highlighting new axis
-	if (lastPickedFrameAxis != newPickedFrameAxis)
-		m_frameManipulator->highlight(m_frameManipulatorPickedAxis);
+		// highlight new axis
+		if (lastPickedFrameAxis != newPickedFrameAxis)
+			m_frameManipulator->highlight(m_frameManipulatorPickedAxis);
+	}
 
 	if (newPickedFrameAxis == 0)	// frame not picked -> pick the pickable objects
 	{
-		m_lastPickedObject = Utils::Pickable::pick(m_pickablePlanes, rayA, AB);
+		std::vector<Utils::Pickable*> tempo = m_pickablePlanes;
+		tempo.insert(tempo.end(), m_pickableSpheres.begin(), m_pickableSpheres.end());
+		m_lastPickedObject = Utils::Pickable::pick(tempo, rayA, AB);
+
 		// set FrameManipulator on picked object
 		if (m_lastPickedObject)
+		{
+			std::cout << m_lastPickedObject->shape() << std::endl;
+
+			/*if (m_lastPickedObject->checkType<Utils::Grid>())
+				std::cout << "GRID clicked" << std::endl;
+			if (m_lastPickedObject->checkType<Utils::Sphere>())
+				std::cout << "SPHERE clicked" << std::endl;*/
 			m_frameManipulator->setTransformation(m_lastPickedObject->transfo());
+		}
 	}
 
 	// store origin & selected axis on screen projection for easy manipulation.

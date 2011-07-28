@@ -140,22 +140,11 @@ public slots:
 	void slot_pushButton_addPlane();
 	void slot_pushButton_deletePlane();
 
-	void slot_comboBox_PlaneIndexChanged(int newIndex);
-
-	void slot_doubleSpinBox_PlaneVec1(double c);
-	void slot_doubleSpinBox_PlaneVec2(double c);
-	void slot_doubleSpinBox_PlaneOrigin(double c);
-
 	void slot_spinBox_GridResolution(int i);
 	void slot_doubleSpinBox_GridColor(double c);
 
 	void slot_pushButton_addSphere();
 	void slot_pushButton_deleteSphere();
-
-	void slot_comboBox_SphereIndexChanged(int newIndex);
-
-	void slot_doubleSpinBox_SphereCenter(double c);
-	void slot_doubleSpinBox_SphereRadius(double c);
 
 	void slot_spinBox_SphereResolution(int i);
 	void slot_doubleSpinBox_SphereGridColor(double c);
