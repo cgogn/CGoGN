@@ -160,7 +160,7 @@ void MyQT::cb_initGL()
 	m_sprite = new Utils::PointSprite();
 	m_sprite->setAttributePosition(m_positionVBO);
 
-    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1,0.,0.3));
+    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
     storeVerticesInfo();
     m_strings->sendToVBO();
 
@@ -192,7 +192,7 @@ void MyQT::cb_initGL()
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
-	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9, 0.9, 0.9);
+	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9f, 0.9f, 0.9f);
 
 
 	// timer example for animation
@@ -284,7 +284,7 @@ int main(int argc, char **argv)
 {
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
-	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
 
 
@@ -307,11 +307,11 @@ int main(int argc, char **argv)
 	sqt.setHelpMsg("Enter pour dock on/off\nShift Enter pour console on/off\nShift Click gauche pour selectionner un brin");
 
 	CGoGNout.toStatusBar(&sqt);
-	CGoGNout << "CGoGNOut StatusBar" << Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+	CGoGNout << "CGoGNOut StatusBar" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 
 	CGoGNout.toConsole(&sqt);
 
-	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5, 2.2, 4.3) << CGoGNendl;
+	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 
 	CGoGNout.toStatusBar(NULL);
 	CGoGNout << "tirelipinpon .." << CGoGNendl;

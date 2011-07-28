@@ -26,8 +26,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Geometry/distances.h"
 #include "Geometry/intersection.h"
-#include <cmath>
 #include <algorithm>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 namespace CGoGN
 {
@@ -61,7 +62,13 @@ LineDrawable::~LineDrawable()
 
 void LineDrawable::setColor(const Geom::Vec4f& col)
 {
+	m_color=col;
 	m_shader->setColor(col);
+}
+
+const Geom::Vec4f&  LineDrawable::getColor()
+{
+	return m_color;
 }
 
 void LineDrawable::draw()
@@ -71,6 +78,11 @@ void LineDrawable::draw()
 	m_shader->disableVertexAttribs();
 }
 
+void LineDrawable::getPrecisionDrawing(unsigned int& sub, unsigned int& sub2)
+{
+	sub = m_sub1;
+	sub2 = m_sub2;
+}
 
 
 Pickable::Pickable(LineDrawable* ld, unsigned int id):
@@ -245,8 +257,17 @@ std::vector<Pickable*> Pickable::sortedPick(std::vector<Pickable*>& picks, const
 }
 
 
+Geom::Vec3f Pickable::getPosition()
+{
+	return Geom::Vec3f(m_transfo[3][0],m_transfo[3][1],m_transfo[3][2]);
+}
 
-
+Geom::Vec3f Pickable::getAxisScale(unsigned int ax, float& scale)
+{
+	Geom::Vec3f tempo(m_transfo[ax][0],m_transfo[ax][1],m_transfo[ax][2]);
+	scale = tempo.normalize();
+	return tempo;
+}
 
 
 
@@ -280,18 +301,20 @@ void Grid::changeTopo(unsigned int sub)
 
 void Grid::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 {
+	m_sub1 = sub;
+	m_sub2 = sub2;
 	changeTopo(sub);
 }
 
 
 unsigned int Grid::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
 {
-	if (fabsf(V[2])>=0.0000001f)
+	if (fabs(V[2])>=0.0000001f)
 	{
 		float a = -1.0f*P[2]/V[2];
 		Geom::Vec3f Q = Geom::Vec3f(P+a*V);	// intersection with plane z=0
 
-		if ( (fabsf(Q[0])<=1.0f) && (fabsf(Q[1])<=1.0f) )
+		if ( (fabs(Q[0])<=1.0f) && (fabs(Q[1])<=1.0f) )
 			return 1;
 	}
 
@@ -404,6 +427,9 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 
 void Sphere::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 {
+	m_sub1 = sub;
+	m_sub2 = sub2;
+
 	if (sub2)
 		changeTopo(sub,sub2);
 	else
@@ -514,6 +540,9 @@ void Cone::changeTopo(unsigned int par, unsigned int mer)
 
 void Cone::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 {
+	m_sub1 = sub;
+	m_sub2 = sub2;
+
 	if (sub2)
 		changeTopo(sub,sub2);
 	else
@@ -644,6 +673,9 @@ void Cylinder::changeTopo(unsigned int parp, unsigned int mer)
 
 void Cylinder::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 {
+	m_sub1 = sub;
+	m_sub2 = sub2;
+
 	if (sub2)
 		changeTopo(sub,sub2);
 	else
@@ -771,6 +803,9 @@ void Cube::changeTopo(unsigned int sub)
 
 void Cube::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 {
+	m_sub1 = sub;
+	m_sub2 = sub2;
+
 	changeTopo(sub);
 }
 
@@ -881,7 +916,7 @@ void IcoSphere::changeTopo(unsigned int sub)
 {
 	if (sub<2)
 		sub=2;
-	int subd = int(log(sub/2)/log(2.0))-1;
+	int subd = int(log(0.5*sub)/log(2.0))-1;
 	if (subd<0)
 		subd=0;
 
@@ -895,7 +930,7 @@ void IcoSphere::changeTopoSubdivision(unsigned int sub)
 
 	m_sub = sub;
 
-	unsigned int subEdge = powf(2.0f,4.0f-sub);
+	unsigned int subEdge = (unsigned int)(powf(2.0f,4.0f-sub));
 
 	std::vector<Geom::Vec3f> points;
 	points.reserve(10000);
@@ -1035,6 +1070,8 @@ void IcoSphere::changeTopoSubdivision(unsigned int sub)
 
 void IcoSphere::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 {
+	m_sub1 = sub;
+	m_sub2 = sub2;
 	changeTopo(sub);
 }
 
