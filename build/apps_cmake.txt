@@ -1,5 +1,6 @@
 
 # A mettre juste apres la definition de CGoGN_ROOT_DIR  a la racine du CGoGN_Apps
+# include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
 
 SET(CMAKE_MODULE_PATH " ${CMAKE_MODULE_PATH} ${CGoGN_ROOT_DIR}/cmake_modules/")
 
