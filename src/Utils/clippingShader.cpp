@@ -99,10 +99,9 @@ int ClippingShader::addClipPlane()
 	m_clipPlanesIds[newPlaneId].index = previousPlanesCount;
 
 	// Set default parameters values for the new plane
-	Geom::Vec3f defaultFirstVec (1.0, 0.0, 0.0);
-	Geom::Vec3f defaultSecondVec (0.0, 1.0, 0.0);
+	Geom::Vec3f defaultNormal (0.0, 0.0, 1.0);
 	Geom::Vec3f defaultOrigin (0.0, 0.0, 0.0);
-	setClipPlaneParamsAll(newPlaneId, defaultFirstVec, defaultSecondVec, defaultOrigin);
+	setClipPlaneParamsAll(newPlaneId, defaultNormal, defaultOrigin);
 
 	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();
@@ -163,7 +162,7 @@ int ClippingShader::getClipPlanesCount()
 	return (int)m_clipPlanes.size();
 }
 
-void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin)
+void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f normal, Geom::Vec3f origin)
 {
 	// Check if the given id is valid
 	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsAll"))
@@ -175,18 +174,14 @@ void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f vec1, Ge
 	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Normalize
-	Geom::Vec3f vec1Normalized = vec1;
-	vec1Normalized.normalize();
-	Geom::Vec3f vec2Normalized = vec2;
-	vec2Normalized.normalize();
+	Geom::Vec3f normalNormalized = normal;
+	normalNormalized.normalize();
 
-	if ((vec1Normalized != m_clipPlanes[planeIndex].firstVec)
-			|| (vec2Normalized != m_clipPlanes[planeIndex].secondVec)
+	if ((normalNormalized != m_clipPlanes[planeIndex].normal)
 			|| (origin != m_clipPlanes[planeIndex].origin))
 	{
 		// Copy the given clipping plane parameters
-		m_clipPlanes[planeIndex].firstVec = vec1Normalized;
-		m_clipPlanes[planeIndex].secondVec = vec2Normalized;
+		m_clipPlanes[planeIndex].normal = normalNormalized;
 		m_clipPlanes[planeIndex].origin = origin;
 
 		// Update the plane arrays
@@ -197,7 +192,7 @@ void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f vec1, Ge
 	}
 }
 
-void ClippingShader::setClipPlaneParamsFirstVec(unsigned int id, Geom::Vec3f vec1)
+void ClippingShader::setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f normal)
 {
 	// Check if the given id is valid
 	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsFirstVec"))
@@ -209,41 +204,13 @@ void ClippingShader::setClipPlaneParamsFirstVec(unsigned int id, Geom::Vec3f vec
 	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Normalize
-	Geom::Vec3f vec1Normalized = vec1;
-	vec1Normalized.normalize();
+	Geom::Vec3f normalNormalized = normal;
+	normalNormalized.normalize();
 
-	if (vec1Normalized != m_clipPlanes[planeIndex].firstVec)
+	if (normalNormalized != m_clipPlanes[planeIndex].normal)
 	{
 		// Copy the given clipping plane parameter
-		m_clipPlanes[planeIndex].firstVec = vec1Normalized;
-
-		// Update the plane arrays
-		updateClipPlaneUniformsArray(id);
-
-		// Send again the whole planes equations array to shader
-		sendClipPlanesEquationsUniform();
-	}
-}
-
-void ClippingShader::setClipPlaneParamsSecondVec(unsigned int id, Geom::Vec3f vec2)
-{
-	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsSecondVec"))
-		return;
-	if (errorRaiseWrongId(!m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsSecondVec"))
-		return;
-
-	// Get the corresponding plane index
-	int planeIndex = m_clipPlanesIds[id].index;
-
-	// Normalize
-	Geom::Vec3f vec2Normalized = vec2;
-	vec2Normalized.normalize();
-
-	if (vec2Normalized != m_clipPlanes[planeIndex].secondVec)
-	{
-		// Copy the given clipping plane parameter
-		m_clipPlanes[planeIndex].secondVec = vec2Normalized;
+		m_clipPlanes[planeIndex].normal = normalNormalized;
 
 		// Update the plane arrays
 		updateClipPlaneUniformsArray(id);
@@ -277,7 +244,7 @@ void ClippingShader::setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origi
 	}
 }
 
-Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(unsigned int id)
+Geom::Vec3f ClippingShader::getClipPlaneParamsNormal(unsigned int id)
 {
 	// Check if the given id is valid
 	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::getClipPlaneParamsFirstVec"))
@@ -289,22 +256,7 @@ Geom::Vec3f ClippingShader::getClipPlaneParamsFirstVec(unsigned int id)
 	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Return the parameter
-	return m_clipPlanes[planeIndex].firstVec;
-}
-
-Geom::Vec3f ClippingShader::getClipPlaneParamsSecondVec(unsigned int id)
-{
-	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::getClipPlaneParamsSecondVec"))
-		return Geom::Vec3f(0.0, 0.0, 0.0);
-	if (errorRaiseWrongId(!m_clipPlanesIds[id].used, "ClippingShader::getClipPlaneParamsSecondVec"))
-		return Geom::Vec3f(0.0, 0.0, 0.0);
-
-	// Get the corresponding plane index
-	int planeIndex = m_clipPlanesIds[id].index;
-
-	// Return the parameter
-	return m_clipPlanes[planeIndex].secondVec;
+	return m_clipPlanes[planeIndex].normal;
 }
 
 Geom::Vec3f ClippingShader::getClipPlaneParamsOrigin(unsigned int id)
@@ -350,11 +302,10 @@ void ClippingShader::updateClipPlaneUniformsArray(unsigned int id)
 	int planeIndex = m_clipPlanesIds[id].index;
 
 	// Update the planes equations array
-	Geom::Vec3f planeNormal = m_clipPlanes[planeIndex].firstVec ^ m_clipPlanes[planeIndex].secondVec;
-	float d = -(planeNormal * m_clipPlanes[planeIndex].origin);
-	m_clipPlanesEquations[4*planeIndex + 0] = planeNormal[0];
-	m_clipPlanesEquations[4*planeIndex + 1] = planeNormal[1];
-	m_clipPlanesEquations[4*planeIndex + 2] = planeNormal[2];
+	float d = -(m_clipPlanes[planeIndex].normal * m_clipPlanes[planeIndex].origin);
+	m_clipPlanesEquations[4*planeIndex + 0] = m_clipPlanes[planeIndex].normal[0];
+	m_clipPlanesEquations[4*planeIndex + 1] = m_clipPlanes[planeIndex].normal[1];
+	m_clipPlanesEquations[4*planeIndex + 2] = m_clipPlanes[planeIndex].normal[2];
 	m_clipPlanesEquations[4*planeIndex + 3] = d;
 
 }

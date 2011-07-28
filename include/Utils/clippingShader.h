@@ -83,25 +83,17 @@ public:
 	/**
 	 * sets all parameters for one clip plane
 	 * @param id clip plane id
-	 * @param vec1 first basis vector
-	 * @param vec2 second basis vector
+	 * @param normal normal
 	 * @param origin origin
 	 */
-	void setClipPlaneParamsAll(unsigned int id, Geom::Vec3f vec1, Geom::Vec3f vec2, Geom::Vec3f origin);
+	void setClipPlaneParamsAll(unsigned int id, Geom::Vec3f normal, Geom::Vec3f origin);
 
 	/**
 	 * sets first vector for one clip plane
 	 * @param id clip plane id
-	 * @param vec1 first basis vector
+	 * @param normal normal
 	 */
-	void setClipPlaneParamsFirstVec(unsigned int id, Geom::Vec3f vec1);
-
-	/**
-	 * sets second vector for one clip plane
-	 * @param id clip plane id
-	 * @param vec2 second basis vector
-	 */
-	void setClipPlaneParamsSecondVec(unsigned int id, Geom::Vec3f vec2);
+	void setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f normal);
 	
 	/**
 	 * sets origin for one clip plane
@@ -111,16 +103,10 @@ public:
 	void setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origin);
 
 	/**
-	 * gets first vector for one clip plane
+	 * gets normal vector for one clip plane
 	 * @param id clip plane id
 	 */
-	Geom::Vec3f getClipPlaneParamsFirstVec(unsigned int id);
-
-	/**
-	 * gets second vector for one clip plane
-	 * @param id clip plane id
-	 */
-	Geom::Vec3f getClipPlaneParamsSecondVec(unsigned int id);
+	Geom::Vec3f getClipPlaneParamsNormal(unsigned int id);
 
 	/**
 	 * gets origin for one clip plane
@@ -142,7 +128,7 @@ private:
 	/// clip planes structure
 	struct clipPlane
 	{
-		Geom::Vec3f firstVec, secondVec, origin;
+		Geom::Vec3f normal, origin;
 	};
 
 	/// clip planes array
