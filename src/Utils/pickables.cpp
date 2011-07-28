@@ -26,8 +26,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Geometry/distances.h"
 #include "Geometry/intersection.h"
-#include <cmath>
 #include <algorithm>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 namespace CGoGN
 {
@@ -915,7 +916,7 @@ void IcoSphere::changeTopo(unsigned int sub)
 {
 	if (sub<2)
 		sub=2;
-	int subd = int(log(sub/2)/log(2.0))-1;
+	int subd = int(log(0.5*sub)/log(2.0))-1;
 	if (subd<0)
 		subd=0;
 
@@ -929,7 +930,7 @@ void IcoSphere::changeTopoSubdivision(unsigned int sub)
 
 	m_sub = sub;
 
-	unsigned int subEdge = powf(2.0f,4.0f-sub);
+	unsigned int subEdge = (unsigned int)(powf(2.0f,4.0f-sub));
 
 	std::vector<Geom::Vec3f> points;
 	points.reserve(10000);

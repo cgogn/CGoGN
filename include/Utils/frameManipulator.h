@@ -51,8 +51,7 @@ protected:
 	 */
 	static const unsigned int nb_segments = 64;
 
-	static const float ring_half_width = 0.08f;
-
+	static const float ring_half_width;
 
 	/**
 	 * locking table

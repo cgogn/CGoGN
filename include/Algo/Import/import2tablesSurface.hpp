@@ -1096,7 +1096,7 @@ bool MeshTablesSurface<PFP>::importASSIMP(const std::string& filename, std::vect
 template<typename PFP>
 bool MeshTablesSurface<PFP>::mergeCloseVertices()
 {
-	const unsigned int NBV=64; // seems to be good
+	const int NBV=64; // seems to be good
 
 	const int NEIGH[27]={
 	-NBV*NBV - NBV - 1, 	-NBV*NBV - NBV, 	-NBV*NBV - NBV + 1,

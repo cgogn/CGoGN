@@ -334,13 +334,13 @@ void MyQT::cb_initGL()
 	m_shader = new Utils::ShaderPhong();
 	m_shader->setAttributePosition(m_positionVBO);
 	m_shader->setAttributeNormal(m_normalVBO);
-	m_shader->setDiffuse(Geom::Vec4f(0.,0.6,0.,0.));
-	m_shader->setSpecular(Geom::Vec4f(0.,0.0,0.,0.)); // no specular
+	m_shader->setDiffuse(Geom::Vec4f(0.0f,0.6f,0.0f,0.0f));
+	m_shader->setSpecular(Geom::Vec4f(0.0f,0.0f,0.0f,0.0f)); // no specular
 
 	// using simple shader with color
 	m_shader2 = new Utils::ShaderSimpleColor();
 	m_shader2->setAttributePosition(m_positionVBO);
-	m_shader2->setColor(Geom::Vec4f(0.,0.1,0.,0.));
+	m_shader2->setColor(Geom::Vec4f(0.0f,0.1f,0.0f,0.0f));
 	registerShader(m_shader);
 	registerShader(m_shader2);
 }

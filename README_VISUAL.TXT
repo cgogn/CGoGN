@@ -2,25 +2,32 @@ Prérequis:
 Visual Studio ou C++ Express (au moins 2005)
 CMake (au moins 2.6)
 
+Unziper le windows_dependencies.zip (http://iggservis.u-strasbg.fr/Data/) a la racine de CGoGN
 
 Lancer CMake
-Mettre le chemin de la racine de CGoGN + /build pour les sources
-Mettre le chemin de la racine de CGoGN + /Visual (par exemple) pour le build
+Mettre le chemin de la racine de CGoGN + /ThirdParty pour les sources
+Mettre le chemin de la racine de CGoGN + /ThirdParty/Visual (par exemple) pour le build
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
 Recliquer sur Configure
 Cliquer sur Generate
-Unziper le windows_dependencies.zip (http://iggservis.u-strasbg.fr/Data/) a la racine de CGoGN
+Aller compiler sous visual(en release)
+
+Relancer CMake
+Mettre le chemin de la racine de CGoGN + /build pour les sources
+Mettre le chemin de la racine de CGoGN + /Visual (par exemple) pour le build
+ajouter deux entrees dans le cache (pour utilisation de boost precompile: www.boostpro.com)
+	boost_path avec le chemin d'acces (exemple: C:\Program Files\boost\boost_1_44\)
+	boost_extension avec ce que vous voulez utiliser (exemple: -vc100-mt-1_44)
+Cliquer sur Configure
+Choisir le bon compilateur (celui de votre version de Visual C++)
+Recliquer sur Configure
+Cliquer sur Generate
+
 Aller dans Visual et double-cliquer sur CGoGN.sln !!
 
 Pour que les executables fonctionnent ajouter le chemin vers les dll dans la variable d'environnement path
 (ou copier les dll dans un répertoire déjà dans le path)
-
-Remarque pour l'utilisation de boost (manière simple):
--installer les binaires a l'aide de boostpro (www.boostpro.com)
--definir la varible d'env "boost_extension" avec ce que vous voulez utiliser (exemple: -vc100-mt-1_44)
--definir la varible d'env "boost_path" avec le chemin d'acces (exemple: C:\Program Files\boost\boost_1_44\)
--ajouter le chemin vers les dll dans le path (comme cf ci-dessus)
 
 
 
