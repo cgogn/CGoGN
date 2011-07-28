@@ -144,7 +144,7 @@ void ClippingShader::deleteClipPlane(unsigned int id)
 
 	// Rearrange planes arrays
 	m_clipPlanes.erase(m_clipPlanes.begin() + m_clipPlanesIds[id].index);
-	for (size_t i; i < m_clipPlanesIds.size(); i++)
+	for (size_t i = 0; i < m_clipPlanesIds.size(); i++)
 	{
 		if (m_clipPlanesIds[i].index > m_clipPlanesIds[id].index)
 			m_clipPlanesIds[i].index -= 1;
@@ -450,7 +450,7 @@ void ClippingShader::deleteClipSphere(unsigned int id)
 
 	// Rearrange spheres arrays
 	m_clipSpheres.erase(m_clipSpheres.begin() + m_clipSpheresIds[id].index);
-	for (size_t i; i < m_clipSpheresIds.size(); i++)
+	for (size_t i = 0; i < m_clipSpheresIds.size(); i++)
 	{
 		if (m_clipSpheresIds[i].index > m_clipSpheresIds[id].index)
 			m_clipSpheresIds[i].index -= 1;
