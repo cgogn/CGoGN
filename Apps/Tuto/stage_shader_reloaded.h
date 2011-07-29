@@ -138,19 +138,19 @@ public slots:
 	void slot_explodTopoPhi3(double c);
 
 	void slot_pushButton_addPlane();
-	void slot_pushButton_deletePlane();
 
 	void slot_spinBox_GridResolution(int i);
 	void slot_doubleSpinBox_GridColor(double c);
 
 	void slot_pushButton_addSphere();
-	void slot_pushButton_deleteSphere();
 
 	void slot_spinBox_SphereResolution(int i);
 	void slot_doubleSpinBox_SphereGridColor(double c);
 
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
 	void slot_horizontalSlider_ClippingMode(int i);
+
+	void slot_pushButton_deleteSelectedObject();
 
 	void button_compile();
 };

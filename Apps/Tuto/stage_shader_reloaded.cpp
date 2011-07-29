@@ -92,31 +92,6 @@ void StageShaderReloaded::slot_pushButton_addPlane()
 	updateGLMatrices();
 }
 
-void StageShaderReloaded::slot_pushButton_deletePlane()
-{
-	if (m_lastPickedObject)
-	{
-
-	}
-	/*if (m_pickablePlanes.size() > 0)
-	{
-		if (m_lastPickedObject == m_pickablePlanes.back())
-			m_lastPickedObject = NULL;
-
-		delete m_pickablePlanes.back();
-		m_pickablePlanes.pop_back();
-
-		m_shader->setClipPlanesCount(dock.comboBox_PlaneIndex->count() - 1);
-
-		dock.comboBox_PlaneIndex->removeItem(dock.comboBox_PlaneIndex->count() - 1);
-
-		dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
-		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
-
-		updateGLMatrices();
-	}*/
-}
-
 void StageShaderReloaded::slot_spinBox_GridResolution(int i)
 {
 	m_planeDrawable->updatePrecisionDrawing(i);
@@ -153,27 +128,6 @@ void StageShaderReloaded::slot_pushButton_addSphere()
 	updateGLMatrices();
 }
 
-void StageShaderReloaded::slot_pushButton_deleteSphere()
-{
-	/*if (m_pickableSpheres.size() > 0)
-	{
-		if (m_lastPickedObject == m_pickableSpheres.back())
-			m_lastPickedObject = NULL;
-
-		delete m_pickableSpheres.back();
-		m_pickableSpheres.pop_back();
-
-		m_shader->setClipSpheresCount(dock.comboBox_SphereIndex->count() - 1);
-
-		dock.comboBox_SphereIndex->removeItem(dock.comboBox_SphereIndex->count() - 1);
-
-		dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
-		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
-
-		updateGLMatrices();
-	}*/
-}
-
 void StageShaderReloaded::slot_spinBox_SphereResolution(int i)
 {
 	m_sphereDrawable->updatePrecisionDrawing(i);
@@ -207,6 +161,50 @@ void StageShaderReloaded::slot_horizontalSlider_ClippingMode(int i)
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
 	updateGLMatrices();
+}
+
+void StageShaderReloaded::slot_pushButton_deleteSelectedObject()
+{
+	if (m_lastPickedObject)
+	{
+		// Delete clipping object
+		if (m_lastPickedObject->checkType<Utils::Grid>())
+			m_shader->deleteClipPlane(m_lastPickedObject->id());
+		else if (m_lastPickedObject->checkType<Utils::Sphere>())
+			m_shader->deleteClipSphere(m_lastPickedObject->id());
+
+		// Delete pickable
+		if (m_lastPickedObject->checkType<Utils::Grid>())
+		{
+			for (size_t i = 0; i < m_pickablePlanes.size(); i++)
+			{
+				if (m_pickablePlanes[i] == m_lastPickedObject)
+				{
+					delete m_pickablePlanes[i];
+					m_pickablePlanes.erase(m_pickablePlanes.begin() + i);
+				}
+			}
+		}
+		else if (m_lastPickedObject->checkType<Utils::Sphere>())
+		{
+			for (size_t i = 0; i < m_pickableSpheres.size(); i++)
+			{
+				if (m_pickableSpheres[i] == m_lastPickedObject)
+				{
+					delete m_pickableSpheres[i];
+					m_pickableSpheres.erase(m_pickableSpheres.begin() + i);
+				}
+			}
+		}
+		m_lastPickedObject = NULL;
+
+		// Update shader sources edits
+		dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+		dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+		updateGLMatrices();
+
+	}
 }
 
 void StageShaderReloaded::button_compile()
@@ -257,7 +255,6 @@ void StageShaderReloaded::initGUI()
 	setCallBack(dock.explod_phi3, SIGNAL(valueChanged(double)), SLOT(slot_explodTopoPhi3(double)));
 
 	setCallBack(dock.pushButton_addPlane, SIGNAL(clicked()), SLOT(slot_pushButton_addPlane()));
-	setCallBack(dock.pushButton_deletePlane, SIGNAL(clicked()), SLOT(slot_pushButton_deletePlane()));
 
 	setCallBack(dock.spinBox_GridResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolution(int)));
 	setCallBack(dock.doubleSpinBox_GridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
@@ -269,7 +266,9 @@ void StageShaderReloaded::initGUI()
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
 
-	dock.spinBox_GridResolution->setValue(5); // TODO : Utiliser un getteur
+	unsigned int planesPrecision1, planesPrecision2;
+	m_planeDrawable->getPrecisionDrawing(planesPrecision1, planesPrecision2);
+	dock.spinBox_GridResolution->setValue(planesPrecision1);
 	Geom::Vec3f planesCol = Geom::Vec3f(1.0, 0.0, 0.0);  // TODO : utiliser un getteur
 	dock.doubleSpinBox_GridColorR->setValue(planesCol[0]);
 	dock.doubleSpinBox_GridColorG->setValue(planesCol[1]);
@@ -278,14 +277,15 @@ void StageShaderReloaded::initGUI()
 
 
 	setCallBack(dock.pushButton_addSphere, SIGNAL(clicked()), SLOT(slot_pushButton_addSphere()));
-	setCallBack(dock.pushButton_deleteSphere, SIGNAL(clicked()), SLOT(slot_pushButton_deleteSphere()));
 
 	setCallBack(dock.spinBox_SphereResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereResolution(int)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
 	setCallBack(dock.doubleSpinBox_SphereGridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
 
-	dock.spinBox_SphereResolution->setValue(3); // TODO : utiliser un getteur
+	unsigned int spheresPrecision1, spheresPrecision2;
+	m_sphereDrawable->getPrecisionDrawing(spheresPrecision1, spheresPrecision2);
+	dock.spinBox_GridResolution->setValue(spheresPrecision1);
 	Geom::Vec3f spheresCol = Geom::Vec3f(0.0, 0.4, 1.0); // TODO : utiliser un getteur
 	dock.doubleSpinBox_SphereGridColorR->setValue(spheresCol[0]);
 	dock.doubleSpinBox_SphereGridColorG->setValue(spheresCol[1]);
@@ -460,7 +460,7 @@ void StageShaderReloaded::cb_keyPress(int code)
 	switch (code)
 	{
 		case 16777223 : // Suppr
-			printf("Suppression\n");
+			slot_pushButton_deleteSelectedObject();
 			break;
 	}
 }
@@ -501,13 +501,13 @@ void StageShaderReloaded::cb_mousePress(int button, int x, int y)
 		// set FrameManipulator on picked object
 		if (m_lastPickedObject)
 		{
-			std::cout << m_lastPickedObject->shape() << std::endl;
-
-			/*if (m_lastPickedObject->checkType<Utils::Grid>())
-				std::cout << "GRID clicked" << std::endl;
-			if (m_lastPickedObject->checkType<Utils::Sphere>())
-				std::cout << "SPHERE clicked" << std::endl;*/
 			m_frameManipulator->setTransformation(m_lastPickedObject->transfo());
+
+			// Lock individual scale axes for the sphere
+			if (m_lastPickedObject->checkType<Utils::Grid>())
+				m_frameManipulator->unlock(Utils::FrameManipulator::Scales);
+			else if (m_lastPickedObject->checkType<Utils::Sphere>())
+				m_frameManipulator->lock(Utils::FrameManipulator::Scales);
 		}
 	}
 
@@ -522,6 +522,8 @@ void StageShaderReloaded::cb_mouseMove(int buttons, int x, int y)
 	if (!Shift())
 		return;
 
+	bool clippingUpdateNeeded = false;
+
 	// rotation selected ?
 	if (Utils::FrameManipulator::rotationAxis(m_frameManipulatorPickedAxis))
 	{
@@ -534,6 +536,8 @@ void StageShaderReloaded::cb_mouseMove(int buttons, int x, int y)
 			m_frameManipulator->rotateInScreen(x - m_lastClickedX, y - m_lastClickedY);
 
 		m_lastPickedObject->transfo() = m_frameManipulator->transfo();
+
+		clippingUpdateNeeded = true;
 	}
 	// translation selected
 	else if (Utils::FrameManipulator::translationAxis(m_frameManipulatorPickedAxis))
@@ -547,6 +551,8 @@ void StageShaderReloaded::cb_mouseMove(int buttons, int x, int y)
 			m_frameManipulator->translateInScreen(x - m_lastClickedX, y - m_lastClickedY);
 
 		m_lastPickedObject->transfo() = m_frameManipulator->transfo();
+
+		clippingUpdateNeeded = true;
 	}
 	// scale selected
 	else if (Utils::FrameManipulator::scaleAxis(m_frameManipulatorPickedAxis) )
@@ -554,6 +560,34 @@ void StageShaderReloaded::cb_mouseMove(int buttons, int x, int y)
 		float scale = m_frameManipulator->scaleFromMouse(x - m_lastClickedX, y - m_lastClickedY);
 		m_frameManipulator->scale(m_frameManipulatorPickedAxis, scale );
 		m_lastPickedObject->transfo() = m_frameManipulator->transfo();
+
+		clippingUpdateNeeded = true;
+	}
+
+	// Update clipping shape if needed
+	if (clippingUpdateNeeded && m_lastPickedObject)
+	{
+		if (m_lastPickedObject->checkType<Utils::Grid>())
+		{
+			// Get plane position and normal
+			Geom::Vec3f planeNewPos = m_lastPickedObject->getPosition();
+			float planeNewAxisScale; // Not used
+			Geom::Vec3f planeNewNormal = m_lastPickedObject->getAxisScale(2, planeNewAxisScale); // 2 = Z axis = plane normal
+			std::cout << planeNewNormal << std::endl;
+
+			// Update clipping shape
+			m_shader->setClipPlaneParamsAll(m_lastPickedObject->id(), planeNewNormal, planeNewPos);
+		}
+		else if (m_lastPickedObject->checkType<Utils::Sphere>())
+		{
+			// Get sphere position and size
+			Geom::Vec3f sphereNewPos = m_lastPickedObject->getPosition();
+			float sphereNewSize;
+			m_lastPickedObject->getAxisScale(0, sphereNewSize); // On the sphere, every axis has the same size, so take 0 as default
+
+			// Update clipping shape
+			m_shader->setClipSphereParamsAll(m_lastPickedObject->id(), sphereNewPos, sphereNewSize);
+		}
 	}
 
 	m_lastClickedX = x;
