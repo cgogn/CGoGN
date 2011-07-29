@@ -91,7 +91,8 @@ int ClippingShader::addClipPlane()
 
 	// Resize planes arrays to the right size
 	m_clipPlanes.resize((size_t)(previousPlanesCount + 1));
-	m_clipPlanesIds.resize((size_t)(newPlaneId + 1));
+	if (newPlaneId >= m_clipPlanesIds.size())
+		m_clipPlanesIds.resize((size_t)(newPlaneId + 1));
 	m_clipPlanesEquations.resize(4*(size_t)(previousPlanesCount + 1), 0.0);
 
 	// Set new plane id
@@ -349,7 +350,8 @@ int ClippingShader::addClipSphere()
 
 	// Resize spheres arrays to the right size
 	m_clipSpheres.resize((size_t)(previousSpheresCount + 1));
-	m_clipSpheresIds.resize((size_t)(newSphereId + 1));
+	if (newSphereId >= m_clipSpheresIds.size())
+		m_clipSpheresIds.resize((size_t)(newSphereId + 1));
 	m_clipSpheresCentersAndRadiuses.resize(4*(size_t)(previousSpheresCount + 1), 0.0);
 
 	// Set new sphere id
