@@ -34,5 +34,6 @@ ELSE(WIN32)
 	add_subdirectory(AntTweakBar)
 	add_subdirectory(Numerical)
 	add_subdirectory(Assimp)
+	add_subdirectory(Tools)
 ENDIF(WIN32)
 

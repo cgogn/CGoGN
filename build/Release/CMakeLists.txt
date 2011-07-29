@@ -21,6 +21,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
 	/usr/include/libxml2
 	${CGoGN_ROOT_DIR}/include
 	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
@@ -83,6 +84,24 @@ add_library(
 
 file(
 	GLOB_RECURSE
+	shaders_src
+	${CGoGN_ROOT_DIR}/include/Utils/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/*.geom	
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
+)
+
+add_custom_target(shader_target ${CGoGN_ROOT_DIR}/ThirdParty/Tools/shader_to_h ${shaders_src}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_src} 
+)
+
+
+
+file(
+	GLOB_RECURSE
 	files_utils
 	${CGoGN_ROOT_DIR}/src/Utils/*.cpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.hpp
@@ -104,6 +123,7 @@ add_library(
 	${files_utils_withQt}
 )
 
+add_dependencies(utils shader_target )
 
 
 
