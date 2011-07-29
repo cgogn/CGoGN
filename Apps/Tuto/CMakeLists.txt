@@ -65,12 +65,6 @@ add_executable( tuto5 tuto5.cpp ${tuto5_ui} ${tuto5_moc})
 target_link_libraries( tuto5
 	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
 
-QT4_WRAP_UI( stage_shader_reloaded_ui stage_shader_reloaded.ui )
-QT4_WRAP_CPP(stage_shader_reloaded_moc stage_shader_reloaded.h)
-add_executable( stage_shader_reloaded stage_shader_reloaded.cpp ${stage_shader_reloaded_ui} ${stage_shader_reloaded_moc})
-target_link_libraries( stage_shader_reloaded
-	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
-
 
 #add_executable( tuto_subdivision tuto_subdivision.cpp)
 #target_link_libraries( tuto_subdivision

@@ -22,14 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __STAGE_SHADER_RELOADED_H__
-#define __STAGE_SHADER_RELOADED_H__
+#ifndef __CLIPPING_H__
+#define __CLIPPING_H__
 
 #include <iostream>
 
 #include "Utils/qtSimple.h"
 
-#include "ui_stage_shader_reloaded.h"
+#include "ui_clipping.h"
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/qtui.h"
 
@@ -66,7 +66,7 @@ struct PFP: public PFP_STANDARD
 };
 
 
-class StageShaderReloaded: public Utils::QT::SimpleQT
+class Clipping: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
@@ -115,7 +115,7 @@ public:
 	Utils::Pickable* m_lastPickedObject;
 	int m_lastClickedX, m_lastClickedY;
 
-	StageShaderReloaded();
+	Clipping();
 
 	void initGUI();
 	void cb_Open();

@@ -22,59 +22,59 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "stage_shader_reloaded.h"
+#include "clipping.h"
 #include "Utils/static_assert.h"
 
 /*******************************************************************************
  *														SLOTS
  *******************************************************************************/
 
-void StageShaderReloaded::slot_drawTopo(bool b)
+void Clipping::slot_drawTopo(bool b)
 {
 	m_drawTopo = b;
 	updateGL();
 }
 
-void StageShaderReloaded::slot_drawVertices(bool b)
+void Clipping::slot_drawVertices(bool b)
 {
 	m_drawVertices = b;
 	updateGL();
 }
 
-void StageShaderReloaded::slot_drawLines(bool b)
+void Clipping::slot_drawLines(bool b)
 {
 	m_drawLines = b;
 	updateGL();
 }
 
-void StageShaderReloaded::slot_drawFaces(bool b)
+void Clipping::slot_drawFaces(bool b)
 {
 	m_drawFaces = b;
 	updateGL();
 }
 
-void StageShaderReloaded::slot_explodTopoPhi1(double c)
+void Clipping::slot_explodTopoPhi1(double c)
 {
 	m_coeffTopoExplod[0] = (float)c;
 	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
-void StageShaderReloaded::slot_explodTopoPhi2(double c)
+void Clipping::slot_explodTopoPhi2(double c)
 {
 	m_coeffTopoExplod[1] = (float)c;
 	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
-void StageShaderReloaded::slot_explodTopoPhi3(double c)
+void Clipping::slot_explodTopoPhi3(double c)
 {
 	m_coeffTopoExplod[2] = (float)c;
 	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
 	updateGL();
 }
 
-void StageShaderReloaded::slot_pushButton_addPlane()
+void Clipping::slot_pushButton_addPlane()
 {
 	// Create clipping and pickable objects
 	int newPlaneId = m_shader->addClipPlane();
@@ -92,13 +92,13 @@ void StageShaderReloaded::slot_pushButton_addPlane()
 	updateGLMatrices();
 }
 
-void StageShaderReloaded::slot_spinBox_GridResolution(int i)
+void Clipping::slot_spinBox_GridResolution(int i)
 {
 	m_planeDrawable->updatePrecisionDrawing(i);
 	updateGL();
 }
 
-void StageShaderReloaded::slot_doubleSpinBox_GridColor(double c)
+void Clipping::slot_doubleSpinBox_GridColor(double c)
 {
 	float r = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorR->value();
 	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorG->value();
@@ -108,7 +108,7 @@ void StageShaderReloaded::slot_doubleSpinBox_GridColor(double c)
 	updateGL();
 }
 
-void StageShaderReloaded::slot_pushButton_addSphere()
+void Clipping::slot_pushButton_addSphere()
 {
 	// Create clipping and pickable objects
 	int newSphereId = m_shader->addClipSphere();
@@ -128,13 +128,13 @@ void StageShaderReloaded::slot_pushButton_addSphere()
 	updateGLMatrices();
 }
 
-void StageShaderReloaded::slot_spinBox_SphereResolution(int i)
+void Clipping::slot_spinBox_SphereResolution(int i)
 {
 	m_sphereDrawable->updatePrecisionDrawing(i);
 	updateGL();
 }
 
-void StageShaderReloaded::slot_doubleSpinBox_SphereGridColor(double c)
+void Clipping::slot_doubleSpinBox_SphereGridColor(double c)
 {
 	float r = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorR->value();
 	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorG->value();
@@ -144,13 +144,13 @@ void StageShaderReloaded::slot_doubleSpinBox_SphereGridColor(double c)
 	updateGL();
 }
 
-void StageShaderReloaded::slot_doubleSpinBox_ColorAttenuationFactor(double c)
+void Clipping::slot_doubleSpinBox_ColorAttenuationFactor(double c)
 {
 	m_shader->setClipColorAttenuationFactor((float)c);
 	updateGL();
 }
 
-void StageShaderReloaded::slot_horizontalSlider_ClippingMode(int i)
+void Clipping::slot_horizontalSlider_ClippingMode(int i)
 {
 	if (i == 0)
 		m_shader->setClipMode(Utils::ClippingShader::CLIPPING_MODE_AND);
@@ -163,7 +163,7 @@ void StageShaderReloaded::slot_horizontalSlider_ClippingMode(int i)
 	updateGLMatrices();
 }
 
-void StageShaderReloaded::slot_pushButton_deleteSelectedObject()
+void Clipping::slot_pushButton_deleteSelectedObject()
 {
 	if (m_lastPickedObject)
 	{
@@ -207,7 +207,7 @@ void StageShaderReloaded::slot_pushButton_deleteSelectedObject()
 	}
 }
 
-void StageShaderReloaded::button_compile()
+void Clipping::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
 	QString st2 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->fragmentEdit->toPlainText();
@@ -223,7 +223,7 @@ void StageShaderReloaded::button_compile()
  *														Init Functions
  *******************************************************************************/
 
-StageShaderReloaded::StageShaderReloaded():
+Clipping::Clipping():
 	m_drawVertices(false),
 	m_drawLines(true),
 	m_drawFaces(true),
@@ -236,7 +236,7 @@ StageShaderReloaded::StageShaderReloaded():
 	m_coeffTopoExplod = Geom::Vec3f(0.9,0.9,0.9);
 }
 
-void StageShaderReloaded::initGUI()
+void Clipping::initGUI()
 {
 	CGoGNStream::allToConsole(this) ;
 	CGoGNStream::allToStd(true) ;
@@ -269,10 +269,10 @@ void StageShaderReloaded::initGUI()
 	unsigned int planesPrecision1, planesPrecision2;
 	m_planeDrawable->getPrecisionDrawing(planesPrecision1, planesPrecision2);
 	dock.spinBox_GridResolution->setValue(planesPrecision1);
-	Geom::Vec3f planesCol = Geom::Vec3f(1.0, 0.0, 0.0);  // TODO : utiliser un getteur
-	dock.doubleSpinBox_GridColorR->setValue(planesCol[0]);
-	dock.doubleSpinBox_GridColorG->setValue(planesCol[1]);
-	dock.doubleSpinBox_GridColorB->setValue(planesCol[2]);
+	Geom::Vec4f planesColor = m_planeDrawable->getColor();
+	dock.doubleSpinBox_GridColorR->setValue(planesColor[0]);
+	dock.doubleSpinBox_GridColorG->setValue(planesColor[1]);
+	dock.doubleSpinBox_GridColorB->setValue(planesColor[2]);
 
 
 
@@ -286,10 +286,10 @@ void StageShaderReloaded::initGUI()
 	unsigned int spheresPrecision1, spheresPrecision2;
 	m_sphereDrawable->getPrecisionDrawing(spheresPrecision1, spheresPrecision2);
 	dock.spinBox_GridResolution->setValue(spheresPrecision1);
-	Geom::Vec3f spheresCol = Geom::Vec3f(0.0, 0.4, 1.0); // TODO : utiliser un getteur
-	dock.doubleSpinBox_SphereGridColorR->setValue(spheresCol[0]);
-	dock.doubleSpinBox_SphereGridColorG->setValue(spheresCol[1]);
-	dock.doubleSpinBox_SphereGridColorB->setValue(spheresCol[2]);
+	Geom::Vec4f spheresColor = m_sphereDrawable->getColor();
+	dock.doubleSpinBox_SphereGridColorR->setValue(spheresColor[0]);
+	dock.doubleSpinBox_SphereGridColorG->setValue(spheresColor[1]);
+	dock.doubleSpinBox_SphereGridColorB->setValue(spheresColor[2]);
 
 
 
@@ -305,7 +305,7 @@ void StageShaderReloaded::initGUI()
 
 }
 
-void StageShaderReloaded::cb_Open()
+void Clipping::cb_Open()
 {
 	std::string filters("all (*.*)") ;
 	std::string filename = selectFile("Open Mesh", "", filters) ;
@@ -314,7 +314,7 @@ void StageShaderReloaded::cb_Open()
 	updateGL() ;
 }
 
-void StageShaderReloaded::importMesh(std::string& filename)
+void Clipping::importMesh(std::string& filename)
 {
 	std::vector<std::string> attrNames ;
 
@@ -367,7 +367,7 @@ void StageShaderReloaded::importMesh(std::string& filename)
  *														GL FUNCTIONS
  *******************************************************************************/
 
-void StageShaderReloaded::cb_initGL()
+void Clipping::cb_initGL()
 {
 	// choose to use GL version 2
 	Utils::GLSLShader::setCurrentOGLVersion(2);
@@ -402,7 +402,7 @@ void StageShaderReloaded::cb_initGL()
 	m_lastPickedObject = NULL;
 }
 
-void StageShaderReloaded::updateVBOprimitives(int upType)
+void Clipping::updateVBOprimitives(int upType)
 {
 	if(upType & Algo::Render::GL2::TRIANGLES)
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
@@ -414,7 +414,7 @@ void StageShaderReloaded::updateVBOprimitives(int upType)
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 }
 
-void StageShaderReloaded::cb_redraw()
+void Clipping::cb_redraw()
 {
 	if(m_drawVertices)
 	{
@@ -455,7 +455,7 @@ void StageShaderReloaded::cb_redraw()
 
 }
 
-void StageShaderReloaded::cb_keyPress(int code)
+void Clipping::cb_keyPress(int code)
 {
 	switch (code)
 	{
@@ -465,7 +465,7 @@ void StageShaderReloaded::cb_keyPress(int code)
 	}
 }
 
-void StageShaderReloaded::cb_mousePress(int button, int x, int y)
+void Clipping::cb_mousePress(int button, int x, int y)
 {
 	if (!Shift())
 		return;
@@ -517,7 +517,7 @@ void StageShaderReloaded::cb_mousePress(int button, int x, int y)
 	updateGL();
 }
 
-void StageShaderReloaded::cb_mouseMove(int buttons, int x, int y)
+void Clipping::cb_mouseMove(int buttons, int x, int y)
 {
 	if (!Shift())
 		return;
@@ -605,7 +605,7 @@ int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    StageShaderReloaded sqt;
+    Clipping sqt;
     sqt.setGeometry(0, 0, 1000, 800);
     sqt.show();
 
