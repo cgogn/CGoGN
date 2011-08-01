@@ -79,10 +79,21 @@ file(
 	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
 )
 
+IF(WIN32)
+add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/Tools/Release/shader_to_h ${shaders_srcD}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_srcD} 
+)
+ELSE(WIN32)
 add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/Tools/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_srcD} 
 )
+ENDIF(WIN32)
+
+
+
+
 
 
 file(

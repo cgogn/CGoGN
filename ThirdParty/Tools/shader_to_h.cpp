@@ -5,7 +5,7 @@
 int main(int argc, char **argv)
 {
 	char buffer[512];
-	for (unsigned int i=1; i< argc; ++i)
+	for (int i=1; i< argc; ++i)
 	{
 		std::string filename(argv[i]);
 
@@ -54,13 +54,22 @@ int main(int argc, char **argv)
 		sso << "std::string "<<sub<< " =";
 
 		// text of shader		
+		unsigned int nbbl=0;
 		while (!fs.eof())
 		{
 			fs.getline(buffer,512);
-			if (!fs.eof() && (*buffer!=0))
+			//std::cout << buffer << std::endl;
+			if (*buffer!=0)
+			{
+				for (unsigned int i=0; i<nbbl;++i)
+					sso << std::endl <<"\"\\n\"";
+				nbbl=0;
 				sso << std::endl << "\"" << buffer <<"\\n\"";
+			}
+			else
+				nbbl++;
 		};
-		sso << ";"<< std::endl<< std::endl;
+		sso << ";"<< std::endl<< std::endl;	
 		
 		std::string ssostr = sso.str();
 		if (ssostr != ssi.str())

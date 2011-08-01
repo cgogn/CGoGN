@@ -7,4 +7,4 @@ FRAG_OUT_DEF;
 void main (void)
 {
 	float lum = texture2D(FontTexture, tex_coord).s;;
-}
+// no "}" because it is added in the shader class code (with other things)
