@@ -140,12 +140,12 @@ public slots:
 	void slot_pushButton_addPlane();
 
 	void slot_spinBox_GridResolution(int i);
-	void slot_doubleSpinBox_GridColor(double c);
+	void slot_pushButton_changePlanesColor();
 
 	void slot_pushButton_addSphere();
 
 	void slot_spinBox_SphereResolution(int i);
-	void slot_doubleSpinBox_SphereGridColor(double c);
+	void slot_pushButton_changeSpheresColor();
 
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
 	void slot_radioButton_ClippingMode(bool b);

@@ -98,14 +98,17 @@ void Clipping::slot_spinBox_GridResolution(int i)
 	updateGL();
 }
 
-void Clipping::slot_doubleSpinBox_GridColor(double c)
+void Clipping::slot_pushButton_changePlanesColor()
 {
-	float r = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorR->value();
-	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorG->value();
-	float b = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_GridColorB->value();
+	QColor NewColor;
+	QColorDialog ColDialog;
 
-	m_planeDrawable->setColor(Geom::Vec4f(r, g, b, 1.0));
-	updateGL();
+	NewColor = ColDialog.getColor();
+
+	int r, g, b;
+	NewColor.getRgb(&r, &g, &b);
+
+	m_planeDrawable->setColor(Geom::Vec4f((float)r/255.0, (float)g/255.0, (float)b/255.0, 1.0));
 }
 
 void Clipping::slot_pushButton_addSphere()
@@ -134,14 +137,17 @@ void Clipping::slot_spinBox_SphereResolution(int i)
 	updateGL();
 }
 
-void Clipping::slot_doubleSpinBox_SphereGridColor(double c)
+void Clipping::slot_pushButton_changeSpheresColor()
 {
-	float r = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorR->value();
-	float g = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorG->value();
-	float b = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->doubleSpinBox_SphereGridColorB->value();
+	QColor NewColor;
+	QColorDialog ColDialog;
 
-	m_sphereDrawable->setColor(Geom::Vec4f(r, g, b, 1.0));
-	updateGL();
+	NewColor = ColDialog.getColor();
+
+	int r, g, b;
+	NewColor.getRgb(&r, &g, &b);
+
+	m_sphereDrawable->setColor(Geom::Vec4f((float)r/255.0, (float)g/255.0, (float)b/255.0, 1.0));
 }
 
 void Clipping::slot_doubleSpinBox_ColorAttenuationFactor(double c)
@@ -270,9 +276,7 @@ void Clipping::initGUI()
 	setCallBack(dock.pushButton_addPlane, SIGNAL(clicked()), SLOT(slot_pushButton_addPlane()));
 
 	setCallBack(dock.spinBox_GridResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolution(int)));
-	setCallBack(dock.doubleSpinBox_GridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
-	setCallBack(dock.doubleSpinBox_GridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
-	setCallBack(dock.doubleSpinBox_GridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_GridColor(double)));
+	setCallBack(dock.pushButton_changePlanesColor, SIGNAL(clicked()), SLOT(slot_pushButton_changePlanesColor()));
 
 	setCallBack(dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
 
@@ -282,27 +286,17 @@ void Clipping::initGUI()
 	unsigned int planesPrecision1, planesPrecision2;
 	m_planeDrawable->getPrecisionDrawing(planesPrecision1, planesPrecision2);
 	dock.spinBox_GridResolution->setValue(planesPrecision1);
-	Geom::Vec4f planesColor = m_planeDrawable->getColor();
-	dock.doubleSpinBox_GridColorR->setValue(planesColor[0]);
-	dock.doubleSpinBox_GridColorG->setValue(planesColor[1]);
-	dock.doubleSpinBox_GridColorB->setValue(planesColor[2]);
 
 
 
 	setCallBack(dock.pushButton_addSphere, SIGNAL(clicked()), SLOT(slot_pushButton_addSphere()));
 
 	setCallBack(dock.spinBox_SphereResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereResolution(int)));
-	setCallBack(dock.doubleSpinBox_SphereGridColorR, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
-	setCallBack(dock.doubleSpinBox_SphereGridColorG, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
-	setCallBack(dock.doubleSpinBox_SphereGridColorB, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_SphereGridColor(double)));
+	setCallBack(dock.pushButton_changeSpheresColor, SIGNAL(clicked()), SLOT(slot_pushButton_changeSpheresColor()));
 
 	unsigned int spheresPrecision1, spheresPrecision2;
 	m_sphereDrawable->getPrecisionDrawing(spheresPrecision1, spheresPrecision2);
 	dock.spinBox_GridResolution->setValue(spheresPrecision1);
-	Geom::Vec4f spheresColor = m_sphereDrawable->getColor();
-	dock.doubleSpinBox_SphereGridColorR->setValue(spheresColor[0]);
-	dock.doubleSpinBox_SphereGridColorG->setValue(spheresColor[1]);
-	dock.doubleSpinBox_SphereGridColorB->setValue(spheresColor[2]);
 
 
 
