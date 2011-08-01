@@ -24,8 +24,9 @@
 
 #include "Utils/cgognStream.h"
 #include "Utils/qtSimple.h"
+#ifndef NO_QT
 #include <QtGui/QTextEdit>
-
+#endif
 namespace CGoGN
 {
 
@@ -54,6 +55,7 @@ void allToFile(const std::string& filename )
 
 }
 
+#ifndef NO_QT
 void allToStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	CGoGNout.toStatusBar(sqt);
@@ -69,6 +71,7 @@ void allToConsole(Utils::QT::SimpleQT* sqt)
 	CGoGNdbg.toConsole(sqt);
 
 }
+#endif
 
 void allToBuffer(std::stringstream* ss)
 {
@@ -84,9 +87,11 @@ void allToBuffer(std::stringstream* ss)
 
 Out::Out():
 	m_out_mode(STDOUT),
+#ifndef NO_QT
 	m_sqt_bar(NULL),
 	m_sqt_console(NULL),
 	m_qte(NULL),
+#endif
 	m_ofs(NULL),
 	m_oss(NULL),
 	m_code(0)
@@ -139,6 +144,7 @@ void Out::toFile(const std::string& filename )
 	m_ofs = new std::ofstream(filename.c_str());
 }
 
+#ifndef NO_QT
 void Out::toStatusBar(Utils::QT::SimpleQT* sqt)
 {
 	if (sqt != NULL)
@@ -157,7 +163,7 @@ void Out::toConsole(Utils::QT::SimpleQT* sqt)
 		m_out_mode &= ~QTCONSOLE;
 	m_sqt_console = sqt;
 }
-
+#endif
 
 void Out::toBuffer(std::stringstream* ss)
 {
@@ -205,13 +211,12 @@ Out&  Out::operator<< (Special& os  )
 				*m_ofs << bufc << std::endl;
 			}
 		}
-
+#ifndef NO_QT
 		if (m_out_mode & QTSTATUSBAR)
 		{
 			while (! m_buffer.eof())
 			{
 				m_buffer.getline(bufc,512);
-//				m_sqt_bar->statusMsg(bufc);
 			}
 		}
 
@@ -230,13 +235,10 @@ Out&  Out::operator<< (Special& os  )
 					else
 						m_sqt_console->console()->setTextColor(QColor(0, 0, 150));
 				}
-
-//					m_sqt_console->console()->insertPlainText(QString(bufc));
-//					m_sqt_console->console()->insertPlainText(QString("\n"));
 				m_sqt_console->console()->append(QString(bufc));
 			}
 		}
-
+#endif
 		if (m_out_mode & SSBUFFER)
 		{
 			while (! m_buffer.eof())
@@ -265,13 +267,12 @@ Out&  Out::operator<< (Special& os  )
 						*m_ofs << bufc << std::flush;
 					}
 				}
-
+#ifndef NO_QT
 				if (m_out_mode & QTSTATUSBAR)
 				{
 					while (! m_buffer.eof())
 					{
 						m_buffer.getline(bufc,512);
-//						m_sqt_bar->statusMsg(bufc);
 					}
 				}
 
@@ -295,7 +296,7 @@ Out&  Out::operator<< (Special& os  )
 						m_sqt_console->console()->insertPlainText(QString(bufc));
 					}
 				}
-
+#endif
 				if (m_out_mode & SSBUFFER)
 				{
 					while (! m_buffer.eof())
