@@ -255,6 +255,9 @@ private:
 
 public:
 
+	// enum used to choose clipping color attenuation mode
+	enum colorAttenuationMode { COLOR_ATTENUATION_MODE_LINEAR, COLOR_ATTENUATION_MODE_QUADRATIC };
+
 	/// enum used to choose clipping mode
 	enum clippingMode { CLIPPING_MODE_AND, CLIPPING_MODE_OR };
 
@@ -273,6 +276,16 @@ public:
 
 	/// gets the color attenuation factor
 	float getClipColorAttenuationFactor();
+
+	/**
+	 * sets the color attenuation mode
+	 * @param colAttMode color attenuation mode
+	 */
+	void setClipColorAttenuationMode(colorAttenuationMode colAttMode);
+
+
+	/// gets the color attenuation mode
+	colorAttenuationMode getClipColorAttenuationMode();
 
 	/*
 	 * sets the clipping mode
@@ -293,6 +306,9 @@ private:
 
 	/// color attenuation factor uniform id
 	GLint m_unif_clipColorAttenuationFactor;
+
+	/// color attenuation mode
+	colorAttenuationMode m_colorAttenuationMode;
 
 	/// clipping mode
 	clippingMode m_clipMode;

@@ -47,6 +47,7 @@ ClippingShader::ClippingShader():
 		m_hasClippingCodeBeenInserted (false),
 		m_clipColorAttenuationFactor (1.0),
 		m_unif_clipColorAttenuationFactor (0),
+		m_colorAttenuationMode (COLOR_ATTENUATION_MODE_LINEAR),
 		m_clipMode (CLIPPING_MODE_AND)
 {
 
@@ -627,6 +628,10 @@ bool ClippingShader::insertClippingCode()
 	"#define CLIPPING_MODE_OR 1\n"
 	"#define CLIPPING_MODE 0\n"
 	"\n"
+	"#define CLIPPING_COLOR_ATTENUATION_MODE_LINEAR 0\n"
+	"#define CLIPPING_COLOR_ATTENUATION_MODE_QUADRATIC 1\n"
+	"#define CLIPPING_COLOR_ATTENUATION_MODE 0\n"
+	"\n"
 	"#if CLIPPING_ENABLED\n"
 	"\n"
 	"	#if PLANE_CLIPPING_ENABLED\n"
@@ -644,7 +649,7 @@ bool ClippingShader::insertClippingCode()
 	"#endif\n"
 	"\n"
 	"#if CLIPPING_ENABLED\n"
-
+	"\n"
 	"	float clip_doClippingAndGetClippingDistance()\n"
 	"	{\n"
 	"		// Distance to the nearest clipping object\n"
@@ -677,33 +682,29 @@ bool ClippingShader::insertClippingCode()
 	"				distanceToPlane += currClipPlane.w;\n"
 	"				distanceToPlane /= clipPlaneNormalLength;\n"
 	"\n"
-	"				// Keep the fragment only if it is 'above' the plane\n"
-	"				if (distanceToPlane > 0.0)\n"
-	"				{\n"
-	"					// AND clipping mode discards at first unmatched clipping object\n"
-	"					#if (CLIPPING_MODE == CLIPPING_MODE_AND)\n"
+	"				// AND clipping mode discards at first unmatched clipping object\n"
+	"				#if (CLIPPING_MODE == CLIPPING_MODE_AND)\n"
+	"					if (distanceToPlane > 0.0)\n"
 	"						discard;\n"
-	"					#endif\n"
-	"				}\n"
-	"				else\n"
-	"				{\n"
-	"					// In OR clipping mode, one match = no pixel clipping\n"
-	"					#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
-	"						discardPixel = false;\n"
-	"					#endif\n"
+	"				#endif\n"
 	"\n"
-	"					// Keep the distance to the nearest plane\n"
-	"					if (minDistanceToClipping < 0.0)\n"
-	"						minDistanceToClipping = abs(distanceToPlane);\n"
-	"					else\n"
-	"						minDistanceToClipping = min(minDistanceToClipping, abs(distanceToPlane));\n"
-	"				}\n"
+	"				// In OR clipping mode, one match = no pixel clipping\n"
+	"				#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
+	"					if (distanceToPlane < 0.0)\n"
+	"						discardPixel = false;\n"
+	"				#endif\n"
+	"\n"
+	"				// Keep the distance to the nearest plane\n"
+	"				if (minDistanceToClipping < 0.0)\n"
+	"					minDistanceToClipping = abs(distanceToPlane);\n"
+	"				else\n"
+	"					minDistanceToClipping = min(minDistanceToClipping, abs(distanceToPlane));\n"
 	"			}\n"
 	"\n"
 	"		#endif\n"
 	"\n"
 	"		#if SPHERE_CLIPPING_ENABLED\n"
-
+	"\n"
 	"			// Do clipping for each sphere\n"
 	"			for (int i = 0; i < CLIP_SPHERES_COUNT; i++)\n"
 	"			{\n"
@@ -718,27 +719,23 @@ bool ClippingShader::insertClippingCode()
 	"				// If the sphere radius is negative, this inverses the clipping effect\n"
 	"				distanceToSphere *= sign(currClipSphereRadius);\n"
 	"\n"
-	"				// Keep the fragment only if it is inside the sphere\n"
-	"				if (distanceToSphere > 0.0)\n"
-	"				{\n"
-	"					// AND clipping mode discards at first unmatched clipping object\n"
-	"					#if (CLIPPING_MODE == CLIPPING_MODE_AND)\n"
+	"				// AND clipping mode discards at first unmatched clipping object\n"
+	"				#if (CLIPPING_MODE == CLIPPING_MODE_AND)\n"
+	"					if (distanceToSphere > 0.0)\n"
 	"						discard;\n"
-	"					#endif\n"
-	"				}\n"
-	"				else\n"
-	"				{\n"
-	"					// In OR clipping mode, one match = no pixel clipping\n"
-	"					#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
-	"						discardPixel = false;\n"
-	"					#endif\n"
+	"				#endif\n"
 	"\n"
-	"					// Keep the distance to the nearest sphere\n"
-	"					if (minDistanceToClipping < 0.0)\n"
-	"						minDistanceToClipping = abs(distanceToSphere);\n"
-	"					else\n"
-	"						minDistanceToClipping = min(minDistanceToClipping, abs(distanceToSphere));\n"
-	"				}\n"
+	"				// In OR clipping mode, one match = no pixel clipping\n"
+	"				#if (CLIPPING_MODE == CLIPPING_MODE_OR)\n"
+	"					if (distanceToSphere < 0.0)\n"
+	"						discardPixel = false;\n"
+	"				#endif\n"
+	"\n"
+	"				// Keep the distance to the nearest sphere\n"
+	"				if (minDistanceToClipping < 0.0)\n"
+	"					minDistanceToClipping = abs(distanceToSphere);\n"
+	"				else\n"
+	"					minDistanceToClipping = min(minDistanceToClipping, abs(distanceToSphere));\n"
 	"			}\n"
 	"\n"
 	"		#endif\n"
@@ -765,9 +762,13 @@ bool ClippingShader::insertClippingCode()
 	std::string FS_mainEndInsertion =
 	"\n"
 	"	#if CLIPPING_ENABLED\n"
-	"		// Attenuate the final fragment color depending on its distance to the clipping\n"
-	"		gl_FragColor.rgb /= (1.0 + clip_minDistanceToClipping * clip_clipColorAttenuationFactor);\n"
-	"	#endif\n";
+	"		// Attenuate the final fragment color depending on its distance to clipping objects\n"
+	"		float clip_colorAttenuation = clip_minDistanceToClipping * clip_clipColorAttenuationFactor;\n"
+	"		#if (CLIPPING_COLOR_ATTENUATION_MODE == CLIPPING_COLOR_ATTENUATION_MODE_QUADRATIC)\n"
+	"			clip_colorAttenuation *= clip_colorAttenuation;\n"
+	"		#endif\n"
+	"		gl_FragColor.rgb /= (1.0 + clip_colorAttenuation);\n"
+	"	#endif;\n";
 
 	// Shader name string
 	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
@@ -824,12 +825,63 @@ float ClippingShader::getClipColorAttenuationFactor()
 	return m_clipColorAttenuationFactor;
 }
 
+void ClippingShader::setClipColorAttenuationMode(colorAttenuationMode colAttMode)
+{
+	if (colAttMode != m_colorAttenuationMode)
+	{
+		// Check if the clipping code has been inserted into shader
+		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipColorAttenuationMode"))
+			return;
+
+		// Shader name string
+		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+		// Copy the given value
+		m_colorAttenuationMode = colAttMode;
+
+		// Use a shader mutator
+		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+		// Change color attenuation mode constant
+		int newConstantValue;
+		switch (colAttMode)
+		{
+			case COLOR_ATTENUATION_MODE_LINEAR :
+				newConstantValue = 0;
+				break;
+
+			case COLOR_ATTENUATION_MODE_QUADRATIC :
+				newConstantValue = 1;
+				break;
+
+			default :
+				newConstantValue = 0;
+				break;
+		}
+		if (errorRaiseShaderMutatorFailure(
+				(!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_COLOR_ATTENUATION_MODE", newConstantValue)),
+				"ClippingShader::setClipColorAttenuationMode"))
+			return;
+
+		// Reload modified shader
+		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+		// Recompile shaders (automatically calls updateClippingUniforms)
+		recompile();
+	}
+}
+
+ClippingShader::colorAttenuationMode ClippingShader::getClipColorAttenuationMode()
+{
+	return m_colorAttenuationMode;
+}
+
 void ClippingShader::setClipMode(clippingMode clipMode)
 {
 	if (clipMode != m_clipMode)
 	{
 		// Check if the clipping code has been inserted into shader
-		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipPlanesCount"))
+		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipMode"))
 			return;
 
 		// Shader name string

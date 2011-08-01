@@ -150,12 +150,25 @@ void Clipping::slot_doubleSpinBox_ColorAttenuationFactor(double c)
 	updateGL();
 }
 
-void Clipping::slot_horizontalSlider_ClippingMode(int i)
+void Clipping::slot_radioButton_ClippingMode(bool b)
 {
-	if (i == 0)
+	if (b)
 		m_shader->setClipMode(Utils::ClippingShader::CLIPPING_MODE_AND);
-	else if (i == 1)
+	else
 		m_shader->setClipMode(Utils::ClippingShader::CLIPPING_MODE_OR);
+
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	updateGLMatrices();
+}
+
+void Clipping::slot_radioButton_ColorAttenuationMode(bool b)
+{
+	if (b)
+		m_shader->setClipColorAttenuationMode(Utils::ClippingShader::COLOR_ATTENUATION_MODE_LINEAR);
+	else
+		m_shader->setClipColorAttenuationMode(Utils::ClippingShader::COLOR_ATTENUATION_MODE_QUADRATIC);
 
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
@@ -294,14 +307,20 @@ void Clipping::initGUI()
 
 
 	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
-	setCallBack(dock.horizontalSlider_ClippingMode, SIGNAL(valueChanged(int)), SLOT(slot_horizontalSlider_ClippingMode(int)));
+	setCallBack(dock.radioButton_ClippingModeAnd, SIGNAL(toggled(bool)), SLOT(slot_radioButton_ClippingMode(bool)));
+	setCallBack(dock.radioButton_ColorAttenuationModeLinear, SIGNAL(toggled(bool)), SLOT(slot_radioButton_ColorAttenuationMode(bool)));
 
 	dock.doubleSpinBox_ColorAttenuationFactor->setValue(m_shader->getClipColorAttenuationFactor());
 	Utils::ClippingShader::clippingMode clipMode = m_shader->getClipMode();
 	if (clipMode == Utils::ClippingShader::CLIPPING_MODE_AND)
-		dock.horizontalSlider_ClippingMode->setValue(0);
+		dock.radioButton_ClippingModeAnd->setChecked(true);
 	else if (clipMode == Utils::ClippingShader::CLIPPING_MODE_OR)
-		dock.horizontalSlider_ClippingMode->setValue(1);
+		dock.radioButton_ClippingModeOr->setChecked(true);
+	Utils::ClippingShader::colorAttenuationMode colorAttMode = m_shader->getClipColorAttenuationMode();
+	if (colorAttMode == Utils::ClippingShader::COLOR_ATTENUATION_MODE_LINEAR)
+		dock.radioButton_ColorAttenuationModeLinear->setChecked(true);
+	else if (colorAttMode == Utils::ClippingShader::COLOR_ATTENUATION_MODE_QUADRATIC)
+		dock.radioButton_ColorAttenuationModeQuadratic->setChecked(true);
 
 }
 
@@ -573,7 +592,6 @@ void Clipping::cb_mouseMove(int buttons, int x, int y)
 			Geom::Vec3f planeNewPos = m_lastPickedObject->getPosition();
 			float planeNewAxisScale; // Not used
 			Geom::Vec3f planeNewNormal = m_lastPickedObject->getAxisScale(2, planeNewAxisScale); // 2 = Z axis = plane normal
-			std::cout << planeNewNormal << std::endl;
 
 			// Update clipping shape
 			m_shader->setClipPlaneParamsAll(m_lastPickedObject->id(), planeNewNormal, planeNewPos);

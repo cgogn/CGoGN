@@ -148,7 +148,8 @@ public slots:
 	void slot_doubleSpinBox_SphereGridColor(double c);
 
 	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
-	void slot_horizontalSlider_ClippingMode(int i);
+	void slot_radioButton_ClippingMode(bool b);
+	void slot_radioButton_ColorAttenuationMode(bool b);
 
 	void slot_pushButton_deleteSelectedObject();
 
