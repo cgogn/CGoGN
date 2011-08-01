@@ -93,12 +93,10 @@ public:
 	 * bind array vbo
 	 */
 	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER,m_id); }
+
 	/**
-	 * reference vbo as used by shader sh
+	 * alloc buffer of same size than parameter
 	 */
-	void ref(GLSLShader* sh);
-
-
 	void sameAllocSameBufferSize(const VBO& vbo);
 
 	/**

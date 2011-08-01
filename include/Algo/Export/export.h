@@ -73,17 +73,31 @@ template <typename PFP>
 bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good = SelectorTrue()) ;
 
 /**
-* export the map into a PLYPTM file
-* @param the_map map to be exported
+* export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
+*
+* exports position + any attribute named : "frame_T" (frame tangent : VEC3), "frame_B" (frame binormal : VEC3), "frame_N" (frame normal : VEC3),
+* "colorPTM_a<i> : VEC3" (coefficient number i of the 3 polynomials - one per channel - ; the max i depends on the degree of the PTM polynomial),
+* "errL2 : REAL" (L2 fitting error), "errLmax : REAL" (maximal fitting error), "stdDev : REAL" (standard deviation of the L2 fitting errors).
+*
+* @param map map to be exported
 * @param filename filename of ply file
 * @param position the position container
-* @param frame[3] table of 3 vectors representing the local frame
-* @param colorPTM[6] function coefficients (6) for each color channel (3)
 * @return true
 */
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const typename PFP::TREAL errL2 = AttributeHandler<typename PFP::REAL>(), const typename PFP::TREAL errLmax = AttributeHandler<typename PFP::REAL>(), const typename PFP::TREAL stdDev = AttributeHandler<typename PFP::REAL>(), const FunctorSelect& good = SelectorTrue()) ;
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good = SelectorTrue()) ;
 
+/**
+* export the map into a PLYPTMgeneric file (K. Vanhoey generic format)
+* @param map map to be exported
+* @param filename filename of ply file
+* @param position the position container
+* @param the local frame (3xVEC3 : tangent, bitangent, normal)
+* @param colorPTM the 6 coefficients (x3 channels) of the PTM functions
+* @return true
+*/
+template <typename PFP>
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good) ;
 
 /**
  *  export pout l'InESS

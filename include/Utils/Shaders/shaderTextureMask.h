@@ -22,43 +22,66 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Algo/Filtering/functors.h"
-#include "Algo/Selection/collector.h"
+#ifndef __CGOGN_SHADERTEXTUREMASK_H_
+#define __CGOGN_SHADERTEXTUREMASK_H_
+
+
+#include "Geometry/vector_gen.h"
+#include "Utils/GLSLShader.h"
+#include "Utils/textures.h"
 
 namespace CGoGN
 {
 
-namespace Algo
+namespace Utils
 {
 
-namespace Filtering
+class ShaderTextureMask : public GLSLShader
 {
+protected:
+	// shader sources
+	static std::string vertexShaderText;
+	static std::string fragmentShaderText;
 
-template <typename PFP>
-void filterAveragePositions(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
-{
-	typedef typename PFP::VEC3 VEC3 ;
+	GLuint m_unif_unit;
+	int m_unit;
+	GLuint m_unif_unitMask;
+	int m_unitMask;
 
-	FunctorAverage<typename PFP::MAP, typename PFP::VEC3> fa(map, position) ;
-	Algo::Selection::Collector_OneRing<PFP> c(map) ;
+	Utils::GTexture* m_tex_ptr;
+	Utils::GTexture* m_texMask_ptr;
 
-	CellMarker markV(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !markV.isMarked(d))
-		{
-			markV.mark(d);
+	VBO* m_vboPos;
+	VBO* m_vboTexCoord;
 
-			c.collectBorder(d) ;
-			fa.reset() ;
-			c.applyOnBorder(fa) ;
-			position2[d] = fa.getAverage() ;
-		}
-	}
-}
+	void restoreUniformsAttribs();
 
-} // namespace Filtering
+public:
+	ShaderTextureMask();
 
-} // namespace Algo
+	/**
+	 * choose the texture unit engine to use for this texture
+	 */
+	void setTextureUnits(GLenum texture_unit, GLenum texture_unitMask);
+
+	/**
+	 * set the texture to use
+	 */
+	void setTextures(Utils::GTexture* tex, Utils::GTexture* texMask);
+
+	/**
+	 * activation of texture unit
+	 */
+	void activeTextures();
+
+	unsigned int setAttributePosition(VBO* vbo);
+
+	unsigned int setAttributeTexCoord(VBO* vbo);
+};
+
+} // namespace Utils
 
 } // namespace CGoGN
+
+
+#endif /* __CGOGN_SHADER_SIMPLETEXTURE__ */

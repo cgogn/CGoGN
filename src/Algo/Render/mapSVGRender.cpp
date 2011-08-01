@@ -86,6 +86,33 @@ Geom::Vec3f SvgObj::normal()
 }
 
 
+void SvgPoints::save(std::ofstream& out)
+{
+	std::stringstream ss;
+
+	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
+	{
+		out << "<circle cx=\""<< (*it)[0];
+		out << "\" cy=\""<< (*it)[1];
+		out << "\" r=\""<< m_width;
+		out << "\" style=\"stroke: none; fill: #";
+
+		out << std::hex;
+		unsigned int wp = out.width(2);
+		char prev = out.fill('0');
+		out << int(m_color[0]*255);
+		out.width(2); out.fill('0');
+		out<< int(m_color[1]*255);
+		out.width(2); out.fill('0');
+		out << int(m_color[2]*255)<<std::dec;
+		out.fill(prev);
+		out.width(wp);
+
+		out <<"\"/>"<< std::endl;
+	}
+
+}
+
 
 void SvgPolyline::save(std::ofstream& out)
 {
@@ -208,12 +235,13 @@ void SVGOut::setWidth(float w)
 void SVGOut::closeFile()
 {
 	// here do the sort in necessary
-	compNormObj cmp;
-	std::sort(m_objs.begin(),m_objs.end(),cmp);
+//	compNormObj cmp;
+//	std::sort(m_objs.begin(),m_objs.end(),cmp);
 
-	std::list<SvgObj*> primitives;
+	std::cout << "CLOSE"<< std::endl;
+//	std::list<SvgObj*> primitives;
 
-	for (std::list<SvgObj*>::iterator it = primitives.begin(); it != primitives.end(); ++it)
+	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
 	{
 		(*it)->save(*m_out);
 	}

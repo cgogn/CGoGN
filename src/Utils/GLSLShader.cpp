@@ -67,6 +67,9 @@ std::vector<std::string> GLSLShader::m_pathes;
 std::set< std::pair<void*, GLSLShader*> > GLSLShader::m_registeredShaders;
 
 
+//glm::mat4* GLSLShader::s_current_matrices=NULL;
+Utils::GL_Matrices* GLSLShader::s_current_matrices=NULL;
+
 GLSLShader::GLSLShader() :
 	m_vertex_shader_object(0),
 	m_fragment_shader_object(0),
@@ -905,25 +908,9 @@ void GLSLShader::addPathFileSeach(const std::string& path)
 	m_pathes.push_back(path);
 }
 
-void GLSLShader::unbindVBO(VBO* ptr)
-{
-	unsigned int nb = m_va_vbo_binding.size();
-	for (unsigned int i = 0; i < nb; ++i)
-	{
-		if (m_va_vbo_binding[i].vbo_ptr == ptr)
-		{
-			if (i != (nb-1))
-				m_va_vbo_binding[i] = m_va_vbo_binding[nb-1];
-			m_va_vbo_binding.pop_back();
-			return;
-		}
-	}
-}
 
 unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 {
-	vbo->ref(this);
-
 	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
 	//valid ?
 	if (idVA < 0)
@@ -948,10 +935,15 @@ unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 	return (m_va_vbo_binding.size() -1);
 }
 
+
+
+
 void GLSLShader::changeVA_VBO(unsigned int id, VBO* vbo)
 {
 	m_va_vbo_binding[id].vbo_ptr = vbo;
 }
+
+
 
 void GLSLShader::unbindVA(const std::string& name)
 {
@@ -976,6 +968,9 @@ void GLSLShader::unbindVA(const std::string& name)
 	}
 	CGoGNerr << "GLSLShader: Attribute "<<name<< " not binded"<< CGoGNendl;
 }
+
+
+
 
 void GLSLShader::setCurrentOGLVersion(unsigned int version)
 {
@@ -1010,22 +1005,36 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 		glUniformMatrix4fv(m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 }
 
-void GLSLShader::enableVertexAttribs(unsigned int stride) const
+void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) const
 {
 	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
-		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, 0);
+		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)begin);
 	}
 }
 
 void GLSLShader::disableVertexAttribs() const
 {
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
-		glEnableVertexAttribArray(it->va_id);
+		glDisableVertexAttribArray(it->va_id);
+	this->unbind();
 }
+
+
+void GLSLShader::updateCurrentMatrices()
+{
+	glm::mat4 model(currentModelView());
+	model *= currentTransfo();
+
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin();it != m_registeredShaders.end();++it)
+			it->second->updateMatrices(currentProjection(), model);
+}
+
+
+
 
 } // namespace Utils
 

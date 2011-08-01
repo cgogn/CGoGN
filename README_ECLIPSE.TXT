@@ -52,3 +52,8 @@ Eclipse reconnaîtra désormais les fichiers .frag et .vert.
 Pour associer d'autres fichiers au programme GLSLeditor :
  - Preferences -> General -> Editors -> File Associations
 Dans Preferences -> Shaders Preferences, on peut désormais configurer certaines options liées au shaders.
+
+ * Coloration syntaxique des fichiers CMake
+ - Installer CMakeEditor pour Eclipse en ajoutant l'URL dans Help -> Install New Software ... : http://cmakeed.sourceforge.net/eclipse/
+ - Installer et redémarrer
+ - Dans Preferences -> General -> Editors -> File Associations il est possible d'associer les CMakeLists.txt à ce logiciel d'édition

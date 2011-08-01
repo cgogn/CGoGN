@@ -38,6 +38,7 @@ template <typename MAP2>
 class EmbeddedMap2 : public MAP2
 {
 public:
+	typedef MAP2 TOPO_MAP;
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 * No attribute is attached to the new edge

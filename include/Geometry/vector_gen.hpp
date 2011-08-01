@@ -62,9 +62,18 @@ Vector<DIM,T>::Vector(const Vector<DIM,T>& v)
 }
 
 template <unsigned int DIM, typename T>
+template <typename T2>
+Vector<DIM,T>::Vector(const Vector<DIM,T2>& v)
+{
+	for(unsigned int i = 0; i < DIM; ++i)
+		m_data[i] = T(v[i]) ;
+}
+
+
+template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y)
 {
-	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension) ;
+	CGoGN_STATIC_ASSERT(DIM == 2, incompatible_Vector_constructor_dimension) ;
 	m_data[0] = x ;
 	m_data[1] = y ;
 }
@@ -72,7 +81,7 @@ Vector<DIM,T>::Vector(T x, T y)
 template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y, T z)
 {
-	CGoGN_STATIC_ASSERT(DIM==3, incompatible_Vector_constructor_dimension) ;
+	CGoGN_STATIC_ASSERT(DIM == 3, incompatible_Vector_constructor_dimension) ;
 	m_data[0] = x ;
 	m_data[1] = y ;
 	m_data[2] = z ;
@@ -81,7 +90,7 @@ Vector<DIM,T>::Vector(T x, T y, T z)
 template <unsigned int DIM, typename T>
 Vector<DIM,T>::Vector(T x, T y, T z, T w)
 {
-	CGoGN_STATIC_ASSERT(DIM==4, incompatible_Vector_constructor_dimension) ;
+	CGoGN_STATIC_ASSERT(DIM == 4, incompatible_Vector_constructor_dimension) ;
 	m_data[0] = x ;
 	m_data[1] = y ;
 	m_data[2] = z ;
@@ -293,6 +302,18 @@ inline bool Vector<DIM,T>::hasNan() const
 		if(m_data[i] != m_data[i])
 			return true ;
 	return false ;
+}
+
+template <unsigned int DIM, typename T>
+inline bool Vector<DIM,T>::isNormalized(const T& epsilon) const
+{
+	return (1-epsilon < norm2() && norm2() < 1+epsilon) ;
+}
+
+template <unsigned int DIM, typename T>
+inline bool Vector<DIM,T>::isOrthogonal(const Vector<DIM,T>& V, const T& epsilon) const
+{
+	return (fabs(V * (*this)) < epsilon) ;
 }
 
 /**********************************************/

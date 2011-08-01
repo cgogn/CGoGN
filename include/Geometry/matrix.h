@@ -120,6 +120,9 @@ class Matrix
 		// Matrix / Scalar multiplication
 		Matrix<M,N,T> operator*(T s) const;
 
+		// Matrix / Scalar division
+		Matrix<M,N,T> operator/(T s) const;
+
 		/**********************************************/
 		/*             UTILITY FUNCTIONS              */
 		/**********************************************/

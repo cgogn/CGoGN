@@ -31,6 +31,7 @@
 
 #include "Utils/os_spec.h"
 #include "Utils/vbo.h"
+#include "Utils/gl_matrices.h"
 
 #include "glm/glm.hpp"
 #include <GL/glew.h>
@@ -53,8 +54,6 @@ public:
 	{
 		int va_id;
 		VBO* vbo_ptr;
-//		GLuint vbo_id;
-//		unsigned int size;
 	};
 
 	/**
@@ -65,6 +64,9 @@ public:
 	static unsigned int CURRENT_OGL_VERSION;
 
 	static std::set< std::pair<void*, GLSLShader*> > m_registeredShaders;
+
+//	static glm::mat4* s_current_matrices;
+	static Utils::GL_Matrices* s_current_matrices;
 
 protected:
 	static std::string DEFINES_GL2;
@@ -114,7 +116,6 @@ protected:
 	/**
 	 * a set of pair VA_id / VBO_id
 	 */
-//	std::vector<pair<int,unsigned int> > m_va_vbo_binding;
 	std::vector<VAStr> m_va_vbo_binding;
 
 	static std::vector<std::string> m_pathes;
@@ -337,10 +338,6 @@ public:
 	 */
 	void addPathFileSeach(const std::string& path);
 
-	/**
-	 * remove VBO index from binding
-	 */
-	void unbindVBO(VBO* ptr);
 
 	/**
 	 * remove VBO index from binding
@@ -361,7 +358,7 @@ public:
 	/**
 	 * get binding VA VBO
 	 */
-	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding; }
+//	const std::vector<VAStr>& getVA_VBO_Bindings() { return m_va_vbo_binding; }
 
 	void bindAttrib(unsigned int att, const char* name) const;
 
@@ -374,12 +371,28 @@ public:
 	 * bind, enable, and set all vertex attrib pointers
 	 * @param stride: the stride parameter, number osf byte between two consecutive attributes
 	 */
-	void enableVertexAttribs(unsigned int stride=0) const;
+	void enableVertexAttribs(unsigned int stride=0, unsigned int begin=0) const;
 
 	/**
 	 * disenable all vertex attribs
 	 */
 	void disableVertexAttribs() const;
+
+	/// sent current matrices to all shaders
+	static void updateCurrentMatrices();
+	/// get current transformation matrix
+	static glm::mat4& currentTransfo() { return s_current_matrices->m_matrices[2];}
+	/// get current modelview matrix
+	static glm::mat4& currentModelView() { return s_current_matrices->m_matrices[1];}
+	/// get current projection matrix
+	static glm::mat4& currentProjection() { return s_current_matrices->m_matrices[0];}
+
+	/// push transformation matrix
+	static void pushTransfo() {s_current_matrices->pushTransfo();}
+	/// pop transformation matrix
+	static void popTransfo() {s_current_matrices->popTransfo();}
+
+
 };
 
 

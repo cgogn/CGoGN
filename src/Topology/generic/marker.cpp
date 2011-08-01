@@ -28,23 +28,4 @@
 namespace CGoGN
 {
 
-Marker MarkerSet::getNewMarker(unsigned int cell)
-{
-	Mark m;
-	m.m_bits = 1;
-	for (unsigned i=0; i < getNbMarks(); ++i)
-	{
-		if (!testMark(m))
-		{
-			setMark(m);
-			return Marker(m,cell);
-		}
-		m.m_bits <<= 1;
-	};
-	assert(!"No more markers");
-	m.m_bits = 0;
-	return Marker(m, cell);
-}
-
 } // namespace CGoGN
-

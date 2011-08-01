@@ -98,7 +98,10 @@ ShaderPhong::ShaderPhong():
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
 	m_shininess(100.0f),
-	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f))
+	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
+	m_vboPos(NULL),
+	m_vboNormal(NULL),
+	m_vboColor(NULL)
 {
 	// get choose GL defines (2 or 3)
 	// ans compile shaders
@@ -227,12 +230,17 @@ void ShaderPhong::unsetAttributeColor()
 void ShaderPhong::restoreUniformsAttribs()
 {
 	getLocations();
+
+	bind();
+
 	sendParams();
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexNormal", m_vboNormal);
 	if (m_vboColor)
 		bindVA_VBO("VertexColor", m_vboColor);
+
+	unbind();
 }
 
 unsigned int ShaderPhong::setAttributePosition(VBO* vbo)

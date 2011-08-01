@@ -59,6 +59,9 @@ public:
 
 	Vector(const Vector<DIM,T>& v) ;
 
+	template <typename T2>
+	Vector(const Vector<DIM,T2>& v) ;
+
 	Vector(T x, T y) ;
 
 	Vector(T x, T y, T z) ;
@@ -136,6 +139,22 @@ public:
 	bool operator!=(const Vector<DIM,T>& v) const ;
 
 	bool hasNan() const ;
+
+	/**
+	 * Tests if the vector is normalized
+	 * @param epsilon tolerated error
+	 * @return true if the given vector has a unit norm +/- epsilon
+	 */
+	bool isNormalized(const T& epsilon) const ;
+
+	/**
+	 * Tests if current and given vectors are orthogonal
+	 * @param V a vector
+	 * @param epsilon tolerated error
+	 * @return true if orthogonal
+	 */
+	bool isOrthogonal(const Vector<DIM,T>& V, const T& epsilon = 1e-5) const ;
+
 
 	/**********************************************/
 	/*             STREAM OPERATORS               */

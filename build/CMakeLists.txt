@@ -13,6 +13,14 @@ find_package(OpenGL REQUIRED)
 find_package(Qt4 REQUIRED)
 find_package(GLUT)
 
+IF (DEFINED ASSERTON)
+	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
+ELSE (DEFINED ASSERTON)
+	add_definitions(-DCGOGN_ASSERT_BOOL=false)
+ENDIF (DEFINED ASSERTON)
+
+add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
+
 # qq definition specifiques pour mac
 IF(APPLE)
 # attention a changer pour chercher la bonne version automatiquement
@@ -31,15 +39,15 @@ IF(WIN32)
 	MACRO(BOOST_LIBS lib_lists names)
 	SET (${lib_lists} "")
 	FOREACH(name ${names})
-		STRING(REGEX REPLACE "-mt" $ENV{boost_extension} newname ${name})
+		STRING(REGEX REPLACE "-mt" ${boost_extension} newname ${name})
 		SET (${lib_lists} ${${lib_lists}} ${newname} )
 	ENDFOREACH(name)
 	ENDMACRO(BOOST_LIBS)
 
-	set (BOOST_INCLUDE_PATH $ENV{boost_path})
+	set (BOOST_INCLUDE_PATH ${boost_path})
 	
 	INCLUDE_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/include/)
-	LINK_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/lib/ $ENV{boost_path}/lib)
+	LINK_DIRECTORIES(${CGoGN_ROOT_DIR}/windows_dependencies/lib/ ${boost_path}/lib)
 	add_subdirectory(Release)
 	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 	if (EXISTS "${CGoGN_ROOT_DIR}/Perso")

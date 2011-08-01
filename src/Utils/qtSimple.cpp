@@ -40,7 +40,11 @@ namespace Utils
 namespace QT
 {
 
-SimpleQT::SimpleQT() : m_dock(NULL)
+SimpleQT::SimpleQT() :
+		m_dock(NULL),
+		m_projection_matrix(m_mat.m_matrices[0]),
+		m_modelView_matrix(m_mat.m_matrices[1]),
+		m_transfo_matrix(m_mat.m_matrices[2])
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -103,7 +107,12 @@ SimpleQT::SimpleQT() : m_dock(NULL)
 	m_transfo_matrix = glm::mat4(1.0f);
 }
 
-SimpleQT::SimpleQT(const SimpleQT& sqt)
+SimpleQT::SimpleQT(const SimpleQT& sqt):
+				m_dock(NULL),
+				m_mat(m_mat),
+				m_projection_matrix(m_mat.m_matrices[0]),
+				m_modelView_matrix(m_mat.m_matrices[1]),
+				m_transfo_matrix(m_mat.m_matrices[2])
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -113,8 +122,7 @@ SimpleQT::SimpleQT(const SimpleQT& sqt)
 	m_textConsole = new QTextEdit(sqt.m_textConsole) ;
 	m_dockOn = sqt.m_dockOn ;
 
-	m_projection_matrix = sqt.m_projection_matrix;
-	m_modelView_matrix = sqt.m_modelView_matrix;
+
 	for (unsigned int i = 0; i < 4; ++i)
 	{
 		m_curquat[i] = sqt.m_curquat[i];
@@ -290,6 +298,7 @@ void SimpleQT::keyPressEvent(QKeyEvent *e)
 
 void SimpleQT::keyReleaseEvent(QKeyEvent *e)
 {
+	QWidget::keyReleaseEvent(e);
     m_glWidget->keyReleaseEvent(e);
 }
 
@@ -303,10 +312,24 @@ void SimpleQT::glMousePosition(int& x, int& y)
 GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
 {
 	// get Z from depth buffer
-//	int yy =  m_glWidget->getHeight() - y;
 	int yy = y;
-	GLfloat depth;
-	glReadPixels(x, yy, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+	GLfloat depth_t[25];
+	glReadPixels(x-2, yy-2, 5, 5, GL_DEPTH_COMPONENT, GL_FLOAT, depth_t);
+
+	GLfloat depth=0.0f;
+	unsigned int nb=0;
+	for (unsigned int i=0; i< 25; ++i)
+	{
+		if (depth_t[i] != 1.0f)
+		{
+			depth += depth_t[i];
+			nb++;
+		}
+	}
+	if (nb>0)
+		depth /= float(nb);
+	else
+		depth = 0.5f;
 
 	glm::i32vec4 viewport;
 	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
@@ -327,10 +350,9 @@ GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f
 	rayB[2] = P[2];
 
 	if (depth == 1.0f)	// depth vary in [0-1]
-		depth = 0.5f;
+		win[2] = 0.5f;
 
 	win[0] += radius;
-
 	P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
 	Geom::Vec3f Q;
 	Q[0] = P[0];
@@ -341,6 +363,30 @@ GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f
 	Q -= rayB;
 	return float(Q.norm());
 }
+
+float SimpleQT::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center)
+{
+
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	glm::vec3 win = glm::project(glm::vec3(center[0],center[1],center[2]), m_modelView_matrix, m_projection_matrix, viewport);
+
+	win[0]-= pixel_width/2;
+
+	glm::vec3 P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+
+	win[0] += pixel_width;
+
+	glm::vec3 Q = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+
+	return glm::distance(P,Q);
+}
+
+
+
+
+
 
 void SimpleQT::synchronize(SimpleQT* sqt)
 {
@@ -375,13 +421,16 @@ void SimpleQT::unregisterShader(GLSLShader* ptr)
 
 void SimpleQT::cb_updateMatrix()
 {
+	glm::mat4 model(m_modelView_matrix);
+	model *= m_transfo_matrix;
+
 	if (GLSLShader::CURRENT_OGL_VERSION == 1)
 	{
 		glMatrixMode(GL_PROJECTION);
 		glLoadMatrixf(glm::value_ptr(m_projection_matrix));
 
 		glMatrixMode(GL_MODELVIEW);
-		glLoadMatrixf(glm::value_ptr(m_modelView_matrix));
+		glLoadMatrixf(glm::value_ptr(model));
 	}
 	else
 	{
@@ -391,7 +440,7 @@ void SimpleQT::cb_updateMatrix()
 		{
 			if ((it->first == NULL) || (it->first == this))
 			{
-				it->second->updateMatrices(m_projection_matrix, m_modelView_matrix);
+				it->second->updateMatrices(m_projection_matrix, model);
 			}
 		}
 	}

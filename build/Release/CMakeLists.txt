@@ -80,8 +80,6 @@ add_library(
 #	${files_geometry}
 #)
 
-add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
-add_definitions(-DDBG_MAX_LEVEL=0)
 
 file(
 	GLOB_RECURSE

@@ -218,7 +218,7 @@ void Primitive3D<PFP>::embedHexaGrid( float x, float y, float z)
 template <typename PFP>
 void Primitive3D<PFP>::transform(const Geom::Matrix44f& matrice)
 {
-	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
+	for(typename std::vector<Dart>::iterator di = m_tableVertDarts.begin(); di != m_tableVertDarts.end(); ++di)
 	{
 		typename PFP::VEC3& pos = m_positions[*di];
 		pos = Geom::transform(pos, matrice);
@@ -226,14 +226,14 @@ void Primitive3D<PFP>::transform(const Geom::Matrix44f& matrice)
 
 }
 
-template <typename PFP>
-void Primitive3D<PFP>::mark(Marker m)
-{
-	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
-	{
-		m_map.markOrbit(0,*di,m);
-	}
-}
+//template <typename PFP>
+//void Primitive3D<PFP>::mark(Mark m)
+//{
+//	for(typename std::vector<Dart>::iterator di = m_tableVertDarts.begin(); di != m_tableVertDarts.end(); ++di)
+//	{
+//		m_map.markOrbit(0, *di, m);
+//	}
+//}
 
 }//end namespace
 }//end namespace

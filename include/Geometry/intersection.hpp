@@ -28,6 +28,31 @@ namespace CGoGN
 namespace Geom
 {
 
+
+template <typename VEC3>
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP,  const VEC3& NormP, VEC3& Inter)
+{
+	float b = NormP * Dir;
+
+	#define PRECISION 1e-20
+	if(fabs(b) < PRECISION)		//ray parallel to triangle
+	{
+		VEC3 v= PlaneP - P;
+		float c = NormP * v;
+		if(fabs(c) < PRECISION)
+			return EDGE_INTERSECTION;
+		return NO_INTERSECTION ;
+	}
+    #undef PRECISION
+
+	float a = NormP * (PlaneP - P);
+
+	Inter = P + (a/b)*Dir;
+	return FACE_INTERSECTION;
+}
+
+
+
 template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter)
 {
