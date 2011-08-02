@@ -179,19 +179,20 @@ void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f normal, 
 	Geom::Vec3f normalNormalized = normal;
 	normalNormalized.normalize();
 
-	if ((normalNormalized != m_clipPlanes[planeIndex].normal)
-			|| (origin != m_clipPlanes[planeIndex].origin))
-	{
-		// Copy the given clipping plane parameters
-		m_clipPlanes[planeIndex].normal = normalNormalized;
-		m_clipPlanes[planeIndex].origin = origin;
+	// Check if it is worth updating values !
+	if ((normalNormalized == m_clipPlanes[planeIndex].normal)
+			&& (origin == m_clipPlanes[planeIndex].origin))
+		return;
 
-		// Update the plane arrays
-		updateClipPlaneUniformsArray(id);
+	// Copy the given clipping plane parameters
+	m_clipPlanes[planeIndex].normal = normalNormalized;
+	m_clipPlanes[planeIndex].origin = origin;
 
-		// Send again the whole planes equations array to shader
-		sendClipPlanesEquationsUniform();
-	}
+	// Update the plane arrays
+	updateClipPlaneUniformsArray(id);
+
+	// Send again the whole planes equations array to shader
+	sendClipPlanesEquationsUniform();
 }
 
 void ClippingShader::setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f normal)
@@ -209,17 +210,18 @@ void ClippingShader::setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f norma
 	Geom::Vec3f normalNormalized = normal;
 	normalNormalized.normalize();
 
-	if (normalNormalized != m_clipPlanes[planeIndex].normal)
-	{
-		// Copy the given clipping plane parameter
-		m_clipPlanes[planeIndex].normal = normalNormalized;
+	// Check if it is worth updating values !
+	if (normalNormalized == m_clipPlanes[planeIndex].normal)
+		return;
 
-		// Update the plane arrays
-		updateClipPlaneUniformsArray(id);
+	// Copy the given clipping plane parameter
+	m_clipPlanes[planeIndex].normal = normalNormalized;
 
-		// Send again the whole planes equations array to shader
-		sendClipPlanesEquationsUniform();
-	}
+	// Update the plane arrays
+	updateClipPlaneUniformsArray(id);
+
+	// Send again the whole planes equations array to shader
+	sendClipPlanesEquationsUniform();
 }
 
 void ClippingShader::setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origin)
@@ -233,17 +235,18 @@ void ClippingShader::setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origi
 	// Get the corresponding plane index
 	int planeIndex = m_clipPlanesIds[id].index;
 
-	if (origin != m_clipPlanes[planeIndex].origin)
-	{
-		// Copy the given clipping plane parameter
-		m_clipPlanes[planeIndex].origin = origin;
+	// Check if it is worth updating values !
+	if (origin == m_clipPlanes[planeIndex].origin)
+		return;
 
-		// Update the plane arrays
-		updateClipPlaneUniformsArray(id);
+	// Copy the given clipping plane parameter
+	m_clipPlanes[planeIndex].origin = origin;
 
-		// Send again the whole planes equations array to shader
-		sendClipPlanesEquationsUniform();
-	}
+	// Update the plane arrays
+	updateClipPlaneUniformsArray(id);
+
+	// Send again the whole planes equations array to shader
+	sendClipPlanesEquationsUniform();
 }
 
 Geom::Vec3f ClippingShader::getClipPlaneParamsNormal(unsigned int id)
@@ -434,19 +437,20 @@ void ClippingShader::setClipSphereParamsAll(unsigned int id, Geom::Vec3f center,
 	// Get the corresponding sphere index
 	int sphereIndex = m_clipSpheresIds[id].index;
 
-	if ((center != m_clipSpheres[sphereIndex].center)
-			|| (radius != m_clipSpheres[sphereIndex].radius))
-	{
-		// Copy the given clipping sphere parameters
-		m_clipSpheres[sphereIndex].center = center;
-		m_clipSpheres[sphereIndex].radius = radius;
+	// Check if it is worth updating values !
+	if ((center == m_clipSpheres[sphereIndex].center)
+			&& (radius == m_clipSpheres[sphereIndex].radius))
+		return;
 
-		// Update the sphere array
-		updateClipSphereUniformsArray(id);
+	// Copy the given clipping sphere parameters
+	m_clipSpheres[sphereIndex].center = center;
+	m_clipSpheres[sphereIndex].radius = radius;
 
-		// Send again the whole spheres centers and radiuses array to shader
-		sendClipSpheresCentersAndRadiusesUniform();
-	}
+	// Update the sphere array
+	updateClipSphereUniformsArray(id);
+
+	// Send again the whole spheres centers and radiuses array to shader
+	sendClipSpheresCentersAndRadiusesUniform();
 }
 
 void ClippingShader::setClipSphereParamsCenter(unsigned int id, Geom::Vec3f center)
@@ -460,17 +464,18 @@ void ClippingShader::setClipSphereParamsCenter(unsigned int id, Geom::Vec3f cent
 	// Get the corresponding sphere index
 	int sphereIndex = m_clipSpheresIds[id].index;
 
-	if (center != m_clipSpheres[sphereIndex].center)
-	{
-		// Copy the given clipping sphere parameter
-		m_clipSpheres[sphereIndex].center = center;
+	// Check if it is worth updating values !
+	if (center == m_clipSpheres[sphereIndex].center)
+		return;
 
-		// Update the sphere array
-		updateClipSphereUniformsArray(id);
+	// Copy the given clipping sphere parameter
+	m_clipSpheres[sphereIndex].center = center;
 
-		// Send again the whole spheres centers and radiuses array to shader
-		sendClipSpheresCentersAndRadiusesUniform();
-	}
+	// Update the sphere array
+	updateClipSphereUniformsArray(id);
+
+	// Send again the whole spheres centers and radiuses array to shader
+	sendClipSpheresCentersAndRadiusesUniform();
 }
 
 void ClippingShader::setClipSphereParamsRadius(unsigned int id, float radius)
@@ -484,17 +489,18 @@ void ClippingShader::setClipSphereParamsRadius(unsigned int id, float radius)
 	// Get the corresponding sphere index
 	int sphereIndex = m_clipSpheresIds[id].index;
 
-	if (radius != m_clipSpheres[sphereIndex].radius)
-	{
-		// Copy the given clipping sphere parameter
-		m_clipSpheres[sphereIndex].radius = radius;
+	// Check if it is worth updating values !
+	if (radius == m_clipSpheres[sphereIndex].radius)
+		return;
 
-		// Update the sphere array
-		updateClipSphereUniformsArray(id);
+	// Copy the given clipping sphere parameter
+	m_clipSpheres[sphereIndex].radius = radius;
 
-		// Send again the whole spheres centers and radiuses array to shader
-		sendClipSpheresCentersAndRadiusesUniform();
-	}
+	// Update the sphere array
+	updateClipSphereUniformsArray(id);
+
+	// Send again the whole spheres centers and radiuses array to shader
+	sendClipSpheresCentersAndRadiusesUniform();
 }
 
 Geom::Vec3f ClippingShader::getClipSphereParamsCenter(unsigned int id)
@@ -810,14 +816,15 @@ bool ClippingShader::insertClippingCode()
 
 void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
 {
-	if (colorAttenuationFactor != m_clipColorAttenuationFactor)
-	{
-		// Copy the given value
-		m_clipColorAttenuationFactor = colorAttenuationFactor;
+	// Check if it is worth updating values !
+	if (colorAttenuationFactor == m_clipColorAttenuationFactor)
+		return;
 
-		// Send again the uniform to shader
-		sendClipColorAttenuationFactorUniform();
-	}
+	// Copy the given value
+	m_clipColorAttenuationFactor = colorAttenuationFactor;
+
+	// Send again the uniform to shader
+	sendClipColorAttenuationFactorUniform();
 }
 
 float ClippingShader::getClipColorAttenuationFactor()
@@ -827,48 +834,49 @@ float ClippingShader::getClipColorAttenuationFactor()
 
 void ClippingShader::setClipColorAttenuationMode(colorAttenuationMode colAttMode)
 {
-	if (colAttMode != m_colorAttenuationMode)
+	// Check if it is worth updating values !
+	if (colAttMode == m_colorAttenuationMode)
+		return;
+
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipColorAttenuationMode"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Copy the given value
+	m_colorAttenuationMode = colAttMode;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Change color attenuation mode constant
+	int newConstantValue;
+	switch (colAttMode)
 	{
-		// Check if the clipping code has been inserted into shader
-		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipColorAttenuationMode"))
-			return;
+		case COLOR_ATTENUATION_MODE_LINEAR :
+			newConstantValue = 0;
+			break;
 
-		// Shader name string
-		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+		case COLOR_ATTENUATION_MODE_QUADRATIC :
+			newConstantValue = 1;
+			break;
 
-		// Copy the given value
-		m_colorAttenuationMode = colAttMode;
-
-		// Use a shader mutator
-		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-		// Change color attenuation mode constant
-		int newConstantValue;
-		switch (colAttMode)
-		{
-			case COLOR_ATTENUATION_MODE_LINEAR :
-				newConstantValue = 0;
-				break;
-
-			case COLOR_ATTENUATION_MODE_QUADRATIC :
-				newConstantValue = 1;
-				break;
-
-			default :
-				newConstantValue = 0;
-				break;
-		}
-		if (errorRaiseShaderMutatorFailure(
-				(!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_COLOR_ATTENUATION_MODE", newConstantValue)),
-				"ClippingShader::setClipColorAttenuationMode"))
-			return;
-
-		// Reload modified shader
-		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-
-		// Recompile shaders (automatically calls updateClippingUniforms)
-		recompile();
+		default :
+			newConstantValue = 0;
+			break;
 	}
+	if (errorRaiseShaderMutatorFailure(
+			(!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_COLOR_ATTENUATION_MODE", newConstantValue)),
+			"ClippingShader::setClipColorAttenuationMode"))
+		return;
+
+	// Reload modified shader
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
 }
 
 ClippingShader::colorAttenuationMode ClippingShader::getClipColorAttenuationMode()
@@ -878,48 +886,49 @@ ClippingShader::colorAttenuationMode ClippingShader::getClipColorAttenuationMode
 
 void ClippingShader::setClipMode(clippingMode clipMode)
 {
-	if (clipMode != m_clipMode)
+	// Check if it is worth updating values !
+	if (clipMode == m_clipMode)
+		return;
+
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipMode"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Copy the given value
+	m_clipMode = clipMode;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Change clipping mode constant
+	int newConstantValue;
+	switch (clipMode)
 	{
-		// Check if the clipping code has been inserted into shader
-		if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::setClipMode"))
-			return;
+		case CLIPPING_MODE_AND :
+			newConstantValue = 0;
+			break;
 
-		// Shader name string
-		std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+		case CLIPPING_MODE_OR :
+			newConstantValue = 1;
+			break;
 
-		// Copy the given value
-		m_clipMode = clipMode;
-
-		// Use a shader mutator
-		ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
-
-		// Change clipping mode constant
-		int newConstantValue;
-		switch (clipMode)
-		{
-			case CLIPPING_MODE_AND :
-				newConstantValue = 0;
-				break;
-
-			case CLIPPING_MODE_OR :
-				newConstantValue = 1;
-				break;
-
-			default :
-				newConstantValue = 0;
-				break;
-		}
-		if (errorRaiseShaderMutatorFailure(
-				(!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_MODE", newConstantValue)),
-				"ClippingShader::setClipMode"))
-			return;
-
-		// Reload modified shader
-		reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
-
-		// Recompile shaders (automatically calls updateClippingUniforms)
-		recompile();
+		default :
+			newConstantValue = 0;
+			break;
 	}
+	if (errorRaiseShaderMutatorFailure(
+			(!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIPPING_MODE", newConstantValue)),
+			"ClippingShader::setClipMode"))
+		return;
+
+	// Reload modified shader
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
 }
 
 ClippingShader::clippingMode ClippingShader::getClipMode()
