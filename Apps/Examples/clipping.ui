@@ -302,6 +302,9 @@
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_ColorAttenuationFactor">
+                 <property name="decimals">
+                  <number>4</number>
+                 </property>
                  <property name="singleStep">
                   <double>1.000000000000000</double>
                  </property>

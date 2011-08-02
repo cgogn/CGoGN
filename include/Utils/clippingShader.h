@@ -272,7 +272,14 @@ public:
 	 * sets the color attenuation factor
 	 * @param colorAttenuationFactor color attenuation factor
 	 */
-	void setClipColorAttenuationFactor(float colorAttenuationFactor);
+	void setClipColorAttenuationFactorAbsolute(float colorAttenuationFactor);
+
+	/**
+	 * sets the color attenuation factor according to an object size
+	 * @param size size with which the color attenuation will be normalized
+	 * @param factor attenuation factor
+	 */
+	void setClipColorAttenuationFactorRelative(float size, float factor);
 
 	/// gets the color attenuation factor
 	float getClipColorAttenuationFactor();

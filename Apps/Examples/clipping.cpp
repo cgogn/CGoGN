@@ -84,6 +84,7 @@ void Clipping::slot_pushButton_addPlane()
 	// Set params
 	m_shader->setClipPlaneParamsOrigin(newPlaneId, m_bb.center());
 	pickable->translate(m_bb.center());
+	pickable->scale(Geom::Vec3f(m_bb.maxSize()*0.5));
 
 	// Update shader sources edits
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
@@ -120,9 +121,9 @@ void Clipping::slot_pushButton_addSphere()
 
 	// Set params
 	m_shader->setClipSphereParamsCenter(newSphereId, m_bb.center());
-	m_shader->setClipSphereParamsRadius(newSphereId, (m_bb.maxSize())*1.0);
+	m_shader->setClipSphereParamsRadius(newSphereId, (m_bb.maxSize())*0.5);
 	pickable->translate(m_bb.center());
-	pickable->scale(Geom::Vec3f(m_bb.maxSize()*1.0));
+	pickable->scale(Geom::Vec3f(m_bb.maxSize()*0.5));
 
 	// Update shader sources edits
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
@@ -152,7 +153,7 @@ void Clipping::slot_pushButton_changeSpheresColor()
 
 void Clipping::slot_doubleSpinBox_ColorAttenuationFactor(double c)
 {
-	m_shader->setClipColorAttenuationFactor((float)c);
+	m_shader->setClipColorAttenuationFactorAbsolute((float)c);
 	updateGL();
 }
 
@@ -374,6 +375,8 @@ void Clipping::importMesh(std::string& filename)
 	setParamObject(gWidthObj, gPosObj.data()) ;
 
 	updateGLMatrices();
+
+	m_shader->setClipColorAttenuationFactorRelative(m_bb.maxSize(), 5.0);
 }
 
 /*******************************************************************************

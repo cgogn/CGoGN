@@ -814,7 +814,7 @@ bool ClippingShader::insertClippingCode()
 	return true;
 }
 
-void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
+void ClippingShader::setClipColorAttenuationFactorAbsolute(float colorAttenuationFactor)
 {
 	// Check if it is worth updating values !
 	if (colorAttenuationFactor == m_clipColorAttenuationFactor)
@@ -825,6 +825,19 @@ void ClippingShader::setClipColorAttenuationFactor(float colorAttenuationFactor)
 
 	// Send again the uniform to shader
 	sendClipColorAttenuationFactorUniform();
+}
+
+void ClippingShader::setClipColorAttenuationFactorRelative(float size, float factor)
+{
+	// Compute the relative color attenuation factor
+	float colAttFact;
+	if (size != 0.0)
+		colAttFact = factor / size;
+	else
+		colAttFact = factor;
+
+	// Set the resulting factor in absolute
+	setClipColorAttenuationFactorAbsolute(colAttFact);
 }
 
 float ClippingShader::getClipColorAttenuationFactor()
