@@ -28,6 +28,7 @@
 
 #include "Geometry/vector_gen.h"
 #include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Utils/textures.h"
 
 namespace CGoGN
@@ -36,7 +37,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderTextureMask : public GLSLShader
+class ShaderTextureMask : public ClippingShader
 {
 protected:
 	// shader sources
