@@ -278,7 +278,7 @@ void Clipping::initGUI()
 	setCallBack(dock.spinBox_GridResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_GridResolution(int)));
 	setCallBack(dock.pushButton_changePlanesColor, SIGNAL(clicked()), SLOT(slot_pushButton_changePlanesColor()));
 
-	setCallBack(dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
+	setCallBack(dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()));
 
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
 	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
@@ -296,7 +296,7 @@ void Clipping::initGUI()
 
 	unsigned int spheresPrecision1, spheresPrecision2;
 	m_sphereDrawable->getPrecisionDrawing(spheresPrecision1, spheresPrecision2);
-	dock.spinBox_GridResolution->setValue(spheresPrecision1);
+	dock.spinBox_SphereResolution->setValue(spheresPrecision1);
 
 
 
@@ -408,7 +408,7 @@ void Clipping::cb_initGL()
 	m_planeDrawable->updatePrecisionDrawing(5);
 	m_sphereDrawable = new Utils::IcoSphere;
 	m_sphereDrawable->setColor(Geom::Vec4f(0.0, 0.4, 1.0, 1.0));
-	m_sphereDrawable->updatePrecisionDrawing(3);
+	m_sphereDrawable->updatePrecisionDrawing(1);
 
 	// setup clipping picking frame
 	m_frameManipulator = new Utils::FrameManipulator();
@@ -458,9 +458,21 @@ void Clipping::cb_redraw()
 
 	// Display clipping shapes
 	for (size_t i = 0; i < m_pickablePlanes.size(); i++)
+	{
+		if (m_pickablePlanes[i] == m_lastPickedObject)
+			glLineWidth(5.0);
+		else
+			glLineWidth(2.0);
 		m_pickablePlanes[i]->draw();
+	}
 	for (size_t i = 0; i < m_pickableSpheres.size(); i++)
+	{
+		if (m_pickableSpheres[i] == m_lastPickedObject)
+			glLineWidth(5.0);
+		else
+			glLineWidth(2.0);
 		m_pickableSpheres[i]->draw();
+	}
 
 	// Display picking frame
 	if (m_lastPickedObject)
