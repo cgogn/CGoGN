@@ -57,6 +57,10 @@ std::string ShaderColorPerVertex::fragmentShaderText =
 
 ShaderColorPerVertex::ShaderColorPerVertex()
 {
+	m_nameVS = "ShaderColorPerVertex_vs";
+	m_nameFS = "ShaderColorPerVertex_fs";
+	m_nameGS = "ShaderColorPerVertex_gs";
+
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
@@ -80,8 +84,10 @@ unsigned int ShaderColorPerVertex::setAttributeColor(VBO* vbo)
 
 void ShaderColorPerVertex::restoreUniformsAttribs()
 {
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexColor", m_vboCol);
+	unbind();
 }
 
 } // namespace Utils

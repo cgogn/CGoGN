@@ -53,6 +53,10 @@ std::string ShaderSimpleColor::fragmentShaderText =
 
 ShaderSimpleColor::ShaderSimpleColor()
 {
+	m_nameVS = "ShaderSimpleColor_vs";
+	m_nameFS = "ShaderSimpleColor_fs";
+	m_nameGS = "ShaderSimpleColor_gs";
+
 	// chose GL defines (2 or 3)
 	// and compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
@@ -89,6 +93,7 @@ void ShaderSimpleColor::restoreUniformsAttribs()
 	bind();
 	glUniform4fv(m_unif_color, 1, m_color.data());
 	bindVA_VBO("VertexPosition", m_vboPos);
+	unbind();
 }
 
 } // namespace Utils

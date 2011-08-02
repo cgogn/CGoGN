@@ -26,6 +26,7 @@
 #define __CGOGN_SHADER_SIMPLECOLOR__
 
 #include "Utils/GLSLShader.h"
+#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN
@@ -34,14 +35,14 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderSimpleColor : public GLSLShader
+class ShaderSimpleColor : public ClippingShader
 {
 protected:
 	// shader sources
-    static std::string vertexShaderText;
-    static std::string fragmentShaderText;
+	static std::string vertexShaderText;
+	static std::string fragmentShaderText;
 
-    // uniform locations
+	// uniform locations
 	GLuint m_unif_color;
 
 	Geom::Vec4f m_color;
