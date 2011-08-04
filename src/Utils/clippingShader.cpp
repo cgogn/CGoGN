@@ -61,7 +61,7 @@ ClippingShader::ClippingShader():
  ***********************************************/
 
 
-int ClippingShader::addClipPlane()
+unsigned int ClippingShader::addClipPlane()
 {
 	// Check if the clipping code has been inserted into shader
 	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::addClipPlane"))
@@ -154,6 +154,38 @@ void ClippingShader::deleteClipPlane(unsigned int id)
 	m_clipPlanesEquations.erase(
 			m_clipPlanesEquations.begin() + 4*m_clipPlanesIds[id].index,
 			m_clipPlanesEquations.begin() + 4*m_clipPlanesIds[id].index + 4);
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
+}
+
+void ClippingShader::deleteAllClipPlanes()
+{
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::deleteAllClipPlanes"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Modify the clip planes count constant in both shader
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_PLANES_COUNT", 0))
+			|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_PLANES_COUNT", 0)),
+			"ClippingShader::deleteAllClipPlanes"))
+		return;
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Rearrange planes arrays
+	m_clipPlanes.resize(0);
+	m_clipPlanesIds.resize(0);
+	m_clipPlanesEquations.resize(0);
 
 	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();
@@ -323,7 +355,7 @@ void ClippingShader::updateClipPlaneUniformsArray(unsigned int id)
  ***********************************************/
 
 
-int ClippingShader::addClipSphere()
+unsigned int ClippingShader::addClipSphere()
 {
 	// Check if the clipping code has been inserted into shader
 	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::addClipSphere"))
@@ -416,6 +448,38 @@ void ClippingShader::deleteClipSphere(unsigned int id)
 	m_clipSpheresCentersAndRadiuses.erase(
 			m_clipSpheresCentersAndRadiuses.begin() + 4*m_clipSpheresIds[id].index,
 			m_clipSpheresCentersAndRadiuses.begin() + 4*m_clipSpheresIds[id].index + 4);
+
+	// Recompile shaders (automatically calls updateClippingUniforms)
+	recompile();
+}
+
+void ClippingShader::deleteAllClipSpheres()
+{
+	// Check if the clipping code has been inserted into shader
+	if (errorRaiseClippingCodeNotInserted(!m_hasClippingCodeBeenInserted, "ClippingShader::deleteAllClipSpheres"))
+		return;
+
+	// Shader name string
+	std::string shaderName = m_nameVS + "/" + m_nameFS + "/" + m_nameGS;
+
+	// Use a shader mutator
+	ShaderMutator SM(shaderName, getVertexShaderSrc(), getFragmentShaderSrc());
+
+	// Modify the clip spheres count constant in both shader
+	if (errorRaiseShaderMutatorFailure(
+			   (!SM.changeIntConstantValue(ShaderMutator::VERTEX_SHADER, "CLIP_SPHERES_COUNT", 0))
+			|| (!SM.changeIntConstantValue(ShaderMutator::FRAGMENT_SHADER, "CLIP_SPHERES_COUNT", 0)),
+			"ClippingShader::deleteAllClipSpheres"))
+		return;
+
+	// Reload both shaders
+	reloadVertexShaderFromMemory(SM.getModifiedVertexShaderSrc().c_str());
+	reloadFragmentShaderFromMemory(SM.getModifiedFragmentShaderSrc().c_str());
+
+	// Rearrange spheres arrays
+	m_clipSpheres.resize(0);
+	m_clipSpheresIds.resize(0);
+	m_clipSpheresCentersAndRadiuses.resize(0);
 
 	// Recompile shaders (automatically calls updateClippingUniforms)
 	recompile();

@@ -69,13 +69,16 @@ public:
 	 * @return clip plane id (positive value on success, else -1)
 	 * @warning insertClippingCode must be called first
 	 */
-	int addClipPlane();
+	unsigned int addClipPlane();
 
 	/*
 	 * deletes a clip plane
 	 * @param id clip plane id
 	 */
 	void deleteClipPlane(unsigned int id);
+
+	/// deletes all clip planes
+	void deleteAllClipPlanes();
 
 	/// gets the clip planes count
 	int getClipPlanesCount();
@@ -164,13 +167,16 @@ public:
 	 * @return clip sphere id (positive value on success, else -1)
 	 * @warning insertClippingCode must be called first
 	 */
-	int addClipSphere();
+	unsigned int addClipSphere();
 
 	/*
 	 * deletes a clip sphere
 	 * @param id clip sphere id
 	 */
 	void deleteClipSphere(unsigned int id);
+
+	/// deletes all clip spheres
+	void deleteAllClipSpheres();
 
 	/// gets the clip spheres count
 	int getClipSpheresCount();
