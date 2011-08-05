@@ -26,6 +26,36 @@
 #include "Utils/static_assert.h"
 
 /*******************************************************************************
+ *														MISCELLANOUS
+ *******************************************************************************/
+
+void computeBasisFromVector(const Geom::Vec3f& vec1, Geom::Vec3f& vec2, Geom::Vec3f& vec3)
+{
+	const float epsilon = 0.0001f;
+
+	// Check if the given vector length is acceptable
+	if (vec1.norm() < epsilon)
+		return;
+
+	// First take a non colinear second vector to cross product with vec1
+	// (by default (0.0, 0.0, 1.0)
+	Geom::Vec3f tempVec (0.0, 0.0, 1.0);
+
+	// Construct second vector, check other vectors non colinearity at the same time
+	vec2 = vec1 ^ tempVec;
+	float sinAngle = vec2.norm() / (vec1.norm() + tempVec.norm());
+	if (sinAngle < epsilon) // f:x->sin(x) ~ f:x->x when x ~ 0
+	{
+		tempVec = Geom::Vec3f (1.0, 0.0, 0.0);
+		vec2 = vec1 ^ tempVec;
+	}
+
+	// Get third vector
+	vec3 = vec1 ^ vec2;
+
+}
+
+/*******************************************************************************
  *														SLOTS
  *******************************************************************************/
 
@@ -77,7 +107,7 @@ void Clipping::slot_explodTopoPhi3(double c)
 void Clipping::slot_pushButton_addPlane()
 {
 	// Create clipping and pickable objects
-	int newPlaneId = m_shader->addClipPlane();
+	unsigned int newPlaneId = m_shader->addClipPlane();
 	Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, newPlaneId);
 	m_pickablePlanes.push_back(pickable);
 
@@ -115,7 +145,7 @@ void Clipping::slot_pushButton_changePlanesColor()
 void Clipping::slot_pushButton_addSphere()
 {
 	// Create clipping and pickable objects
-	int newSphereId = m_shader->addClipSphere();
+	unsigned int newSphereId = m_shader->addClipSphere();
 	Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, newSphereId);
 	m_pickableSpheres.push_back(pickable);
 
@@ -227,6 +257,106 @@ void Clipping::slot_pushButton_deleteSelectedObject()
 	}
 }
 
+void Clipping::slot_pushButton_applyClippingPreset()
+{
+	// Create and apply preset
+	Utils::ClippingPreset *preset = NULL;
+	switch (dock.comboBox_ClippingPresets->currentIndex())
+	{
+		case 0 : // Dual planes
+		 	{
+		 	using namespace CGoGN::Utils::QT;
+
+		 	double centerX = (double)m_bb.center()[0];
+		 	double centerY = (double)m_bb.center()[1];
+		 	double centerZ = (double)m_bb.center()[2];
+		 	double size = (double)m_bb.maxSize()*0.75;
+		 	int axis = 0;
+		 	bool facing = false;
+		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
+		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
+		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
+		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 					VarSlider(0, 2, axis, "Axis",
+		 					VarBool(facing, "Facing"
+		 				)))))), "Preset Setup"))
+		 		preset = Utils::ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, axis, facing);
+		 	}
+			break;
+
+		case 1 : // Cube
+		 	{
+		 	using namespace CGoGN::Utils::QT;
+
+		 	double centerX = (double)m_bb.center()[0];
+		 	double centerY = (double)m_bb.center()[1];
+		 	double centerZ = (double)m_bb.center()[2];
+		 	double size = (double)m_bb.maxSize()*0.75;
+		 	bool facing = false;
+		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
+		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
+		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
+		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 					VarBool(facing, "Facing"
+		 				))))), "Preset Setup"))
+		 		preset = Utils::ClippingPreset::CreateCubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, facing);
+		 	}
+			break;
+	}
+	std::vector<unsigned int> planesIds;
+	std::vector<unsigned int> spheresIds;
+	preset->apply(m_shader, &planesIds, &spheresIds);
+	delete preset;
+
+	// Cleanup of pickables before adding new ones
+	m_lastPickedObject = NULL;
+	for (size_t i = 0; i < m_pickablePlanes.size(); i++)
+		delete m_pickablePlanes[i];
+	m_pickablePlanes.resize(0);
+	for (size_t i = 0; i < m_pickableSpheres.size(); i++)
+		delete m_pickableSpheres[i];
+	m_pickableSpheres.resize(0);
+
+	// Add new pickable objects
+	for (size_t i = 0; i < planesIds.size(); i++)
+	{
+		Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, planesIds[i]);
+		pickable->translate(m_shader->getClipPlaneParamsOrigin(planesIds[i]));
+		Geom::Vec3f vec1, vec2, vec3;
+		vec1 = m_shader->getClipPlaneParamsNormal(planesIds[i]);
+		computeBasisFromVector(vec1, vec2, vec3);
+		glm::mat4& transfoMat = pickable->transfo();
+		for (int i = 0; i < 3; i++)
+		{
+			transfoMat[0][i] = vec2[i];
+			transfoMat[1][i] = vec3[i];
+			transfoMat[2][i] = vec1[i];
+		}
+
+		m_pickablePlanes.push_back(pickable);
+	}
+	for (size_t i = 0; i < spheresIds.size(); i++)
+	{
+		Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, spheresIds[i]);
+		pickable->translate(m_shader->getClipSphereParamsCenter(spheresIds[i]));
+		pickable->scale(m_shader->getClipSphereParamsRadius(spheresIds[i]));
+	}
+
+	// Update shader sources edits
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	// Update clipping parameters in interface
+	Utils::ClippingShader::clippingMode clipMode = m_shader->getClipMode();
+	if (clipMode == Utils::ClippingShader::CLIPPING_MODE_AND)
+		dock.radioButton_ClippingModeAnd->setChecked(true);
+	else if (clipMode == Utils::ClippingShader::CLIPPING_MODE_OR)
+		dock.radioButton_ClippingModeOr->setChecked(true);
+
+
+	updateGLMatrices();
+}
+
 void Clipping::button_compile()
 {
 	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
@@ -316,6 +446,12 @@ void Clipping::initGUI()
 		dock.radioButton_ColorAttenuationModeLinear->setChecked(true);
 	else if (colorAttMode == Utils::ClippingShader::COLOR_ATTENUATION_MODE_QUADRATIC)
 		dock.radioButton_ColorAttenuationModeQuadratic->setChecked(true);
+
+
+	setCallBack(dock.PushButton_ApplyClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyClippingPreset()));
+
+	dock.comboBox_ClippingPresets->addItem("Dual Planes");
+	dock.comboBox_ClippingPresets->addItem("Cube");
 
 }
 

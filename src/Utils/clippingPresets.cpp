@@ -45,50 +45,66 @@ ClippingPreset* ClippingPreset::CreateEmptyPreset()
 	return preset;
 }
 
-ClippingPreset* ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f center, float distance, int axis, bool facing)
+ClippingPreset* ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f center, float size, int axis, bool facing)
 {
 	ClippingPreset *preset = new ClippingPreset;
 
 	// Axis on which planes will be aligned
 	if ((axis < 0) || (axis > 2))
 		axis = 0;
-	Geom::Vec3f positDir (0.0, 0.0, 0.0);
-	positDir[axis] = 1.0;
-	Geom::Vec3f negDir (0.0, 0.0, 0.0);
-	negDir[axis] = -1.0;
+	Geom::Vec3f positDir (0.0f, 0.0f, 0.0f);
+	positDir[axis] = 1.0f;
+	Geom::Vec3f negDir (0.0f, 0.0f, 0.0f);
+	negDir[axis] = -1.0f;
+
+	// Facing of planes
+	float side = 1.0;
+	if (facing)
+		side = -1.0;
 
 	// Add planes to preset
-	preset->addClipPlane(positDir, center + positDir*(distance / 2.0));
-	preset->addClipPlane(negDir, center + negDir*(distance / 2.0));
+	preset->addClipPlane(positDir, center + positDir*(size / 2.0f)*(side));
+	preset->addClipPlane(negDir, center + negDir*(size / 2.0f)*(side));
 
 	// Set clipping mode
-	preset->setClippingMode(ClippingShader::CLIPPING_MODE_AND);
+	ClippingShader::clippingMode clipMode = ClippingShader::CLIPPING_MODE_AND;
+	if (facing)
+		clipMode = ClippingShader::CLIPPING_MODE_OR;
+	preset->setClippingMode(clipMode);
 
 	return preset;
 }
 
-ClippingPreset* ClippingPreset::CreateCubePreset(Geom::Vec3f center, float distance, bool facing)
+ClippingPreset* ClippingPreset::CreateCubePreset(Geom::Vec3f center, float size, bool facing)
 {
 	ClippingPreset *preset = new ClippingPreset;
 
 	// Directions
-	Geom::Vec3f xAxisPos = Geom::Vec3f (1.0, 0.0, 0.0);
-	Geom::Vec3f xAxisNeg = Geom::Vec3f (-1.0, 0.0, 0.0);
-	Geom::Vec3f yAxisPos = Geom::Vec3f (0.0, 1.0, 0.0);
-	Geom::Vec3f yAxisNeg = Geom::Vec3f (0.0, -1.0, 0.0);
-	Geom::Vec3f zAxisPos = Geom::Vec3f (0.0, 0.0, 1.0);
-	Geom::Vec3f zAxisNeg = Geom::Vec3f (0.0, 0.0, -1.0);
+	Geom::Vec3f xAxisPos = Geom::Vec3f (1.0f, 0.0f, 0.0f);
+	Geom::Vec3f xAxisNeg = Geom::Vec3f (-1.0f, 0.0f, 0.0f);
+	Geom::Vec3f yAxisPos = Geom::Vec3f (0.0f, 1.0f, 0.0f);
+	Geom::Vec3f yAxisNeg = Geom::Vec3f (0.0f, -1.0f, 0.0f);
+	Geom::Vec3f zAxisPos = Geom::Vec3f (0.0f, 0.0f, 1.0f);
+	Geom::Vec3f zAxisNeg = Geom::Vec3f (0.0f, 0.0f, -1.0f);
+
+	// Facing of planes
+	float side = 1.0;
+	if (facing)
+		side = -1.0;
 
 	// Add planes to preset
-	preset->addClipPlane(xAxisPos, center + xAxisPos*(distance / 2.0));
-	preset->addClipPlane(xAxisNeg, center + xAxisNeg*(distance / 2.0));
-	preset->addClipPlane(yAxisPos, center + yAxisPos*(distance / 2.0));
-	preset->addClipPlane(yAxisNeg, center + yAxisNeg*(distance / 2.0));
-	preset->addClipPlane(zAxisPos, center + zAxisPos*(distance / 2.0));
-	preset->addClipPlane(zAxisNeg, center + zAxisNeg*(distance / 2.0));
+	preset->addClipPlane(xAxisPos, center + xAxisPos*(size / 2.0f)*(side));
+	preset->addClipPlane(xAxisNeg, center + xAxisNeg*(size / 2.0f)*(side));
+	preset->addClipPlane(yAxisPos, center + yAxisPos*(size / 2.0f)*(side));
+	preset->addClipPlane(yAxisNeg, center + yAxisNeg*(size / 2.0f)*(side));
+	preset->addClipPlane(zAxisPos, center + zAxisPos*(size / 2.0f)*(side));
+	preset->addClipPlane(zAxisNeg, center + zAxisNeg*(size / 2.0f)*(side));
 
 	// Set clipping mode
-	preset->setClippingMode(ClippingShader::CLIPPING_MODE_AND);
+	ClippingShader::clippingMode clipMode = ClippingShader::CLIPPING_MODE_AND;
+	if (facing)
+		clipMode = ClippingShader::CLIPPING_MODE_OR;
+	preset->setClippingMode(clipMode);
 
 	return preset;
 }

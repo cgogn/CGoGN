@@ -57,7 +57,7 @@ public :
 	 * @param axis axis on which planes are aligned (0 for x, 1 for y, 2 for z)
 	 * @param facing true means having facing planes
 	 */
-	static ClippingPreset* CreateDualPlanesPreset(Geom::Vec3f center, float distance, int axis, bool facing);
+	static ClippingPreset* CreateDualPlanesPreset(Geom::Vec3f center, float size, int axis, bool facing);
 
 	/**
 	 * public static constructor
@@ -65,7 +65,7 @@ public :
 	 * @param distance distance between planes
 	 * @param facing true means having facing planes
 	 */
-	static ClippingPreset* CreateCubePreset(Geom::Vec3f center, float distance, bool facing);
+	static ClippingPreset* CreateCubePreset(Geom::Vec3f center, float size, bool facing);
 
 private :
 
