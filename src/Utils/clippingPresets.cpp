@@ -49,18 +49,20 @@ ClippingPreset* ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f center, float
 {
 	ClippingPreset *preset = new ClippingPreset;
 
-	// Axis on which planes will be aligned
+	// Correct axis if necessary
 	if ((axis < 0) || (axis > 2))
 		axis = 0;
+
+	// Axis on which planes will be aligned
 	Geom::Vec3f positDir (0.0f, 0.0f, 0.0f);
 	positDir[axis] = 1.0f;
 	Geom::Vec3f negDir (0.0f, 0.0f, 0.0f);
 	negDir[axis] = -1.0f;
 
 	// Facing of planes
-	float side = 1.0;
+	float side = 1.0f;
 	if (facing)
-		side = -1.0;
+		side = -1.0f;
 
 	// Add planes to preset
 	preset->addClipPlane(positDir, center + positDir*(size / 2.0f)*(side));
@@ -88,9 +90,9 @@ ClippingPreset* ClippingPreset::CreateCubePreset(Geom::Vec3f center, float size,
 	Geom::Vec3f zAxisNeg = Geom::Vec3f (0.0f, 0.0f, -1.0f);
 
 	// Facing of planes
-	float side = 1.0;
+	float side = 1.0f;
 	if (facing)
-		side = -1.0;
+		side = -1.0f;
 
 	// Add planes to preset
 	preset->addClipPlane(xAxisPos, center + xAxisPos*(size / 2.0f)*(side));
@@ -103,6 +105,66 @@ ClippingPreset* ClippingPreset::CreateCubePreset(Geom::Vec3f center, float size,
 	// Set clipping mode
 	ClippingShader::clippingMode clipMode = ClippingShader::CLIPPING_MODE_AND;
 	if (facing)
+		clipMode = ClippingShader::CLIPPING_MODE_OR;
+	preset->setClippingMode(clipMode);
+
+	return preset;
+}
+
+ClippingPreset* ClippingPreset::CreateTubePreset(Geom::Vec3f center, float size, int axis, int precision, bool facing)
+{
+	ClippingPreset *preset = new ClippingPreset;
+
+	// Correct axis if necessary
+	if ((axis < 0) || (axis > 2))
+		axis = 0;
+
+	// Correct precision if necessary
+	if (precision < 1)
+		precision = 1;
+
+	// Facing of planes
+	float side = 1.0f;
+	if (facing)
+		side = -1.0f;
+
+	// Add planes to preset
+	Geom::Vec3f direction (0.0, 0.0, 0.0);
+	float dAngle = 2.0f * M_PI / precision;
+	for (int i = 0; i < precision; i++)
+	{
+		direction[(axis + 1) % 3] = cos(i*dAngle);
+		direction[(axis + 2) % 3] = sin(i*dAngle);
+		preset->addClipPlane(direction, center + direction*(size / 2.0f)*(side));
+	}
+
+	// Set clipping mode
+	ClippingShader::clippingMode clipMode = ClippingShader::CLIPPING_MODE_AND;
+	if (facing)
+		clipMode = ClippingShader::CLIPPING_MODE_OR;
+	preset->setClippingMode(clipMode);
+
+	return preset;
+}
+
+ClippingPreset* ClippingPreset::CreateMoleculePreset(Geom::Vec3f center, float size, float atomsRadiuses, bool orClipping)
+{
+	ClippingPreset *preset = new ClippingPreset;
+
+	// Add spheres to preset on each axis
+	for (int i = 0; i < 3; i++)
+	{
+		Geom::Vec3f positDir (0.0f, 0.0f, 0.0f);
+		positDir[i] = 1.0f;
+		Geom::Vec3f negDir (0.0f, 0.0f, 0.0f);
+		negDir[i] = -1.0f;
+		preset->addClipSphere(center + positDir*(size / 2.0f), atomsRadiuses);
+		preset->addClipSphere(center + negDir*(size / 2.0f), atomsRadiuses);
+	}
+
+	// Set clipping mode
+	ClippingShader::clippingMode clipMode = ClippingShader::CLIPPING_MODE_AND;
+	if (orClipping)
 		clipMode = ClippingShader::CLIPPING_MODE_OR;
 	preset->setClippingMode(clipMode);
 

@@ -302,6 +302,50 @@ void Clipping::slot_pushButton_applyClippingPreset()
 		 		preset = Utils::ClippingPreset::CreateCubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, facing);
 		 	}
 			break;
+
+		case 2 : // Tube
+		 	{
+		 	using namespace CGoGN::Utils::QT;
+
+		 	double centerX = (double)m_bb.center()[0];
+		 	double centerY = (double)m_bb.center()[1];
+		 	double centerZ = (double)m_bb.center()[2];
+		 	double size = (double)m_bb.maxSize()*0.75;
+		 	int axis = 0;
+		 	int precision = 1;
+		 	bool facing = false;
+		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
+		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
+		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
+		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 					VarSlider(0, 2, axis, "Axis",
+		 					VarSlider(1, 30, precision, "Precision",
+		 					VarBool(facing, "Facing"
+		 				))))))), "Preset Setup"))
+		 		preset = Utils::ClippingPreset::CreateTubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, axis, precision, facing);
+		 	}
+			break;
+
+		case 3 : // Molecule
+		 	{
+		 	using namespace CGoGN::Utils::QT;
+
+		 	double centerX = (double)m_bb.center()[0];
+		 	double centerY = (double)m_bb.center()[1];
+		 	double centerZ = (double)m_bb.center()[2];
+		 	double size = (double)m_bb.maxSize()*0.75;
+		 	double atomsRadiuses = (double)m_bb.maxSize()*0.25;
+		 	bool orClipping = true;
+		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
+		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
+		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
+		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 					VarDbl(atomsRadiuses - 100.0, atomsRadiuses + 100.0, atomsRadiuses, "Atoms radiuses",
+		 					VarBool(orClipping, "OR clipping mode"
+		 				)))))), "Preset Setup"))
+		 		preset = Utils::ClippingPreset::CreateMoleculePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, atomsRadiuses, orClipping);
+		 	}
+			break;
 	}
 	std::vector<unsigned int> planesIds;
 	std::vector<unsigned int> spheresIds;
@@ -340,6 +384,8 @@ void Clipping::slot_pushButton_applyClippingPreset()
 		Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, spheresIds[i]);
 		pickable->translate(m_shader->getClipSphereParamsCenter(spheresIds[i]));
 		pickable->scale(m_shader->getClipSphereParamsRadius(spheresIds[i]));
+
+		m_pickableSpheres.push_back(pickable);
 	}
 
 	// Update shader sources edits
@@ -452,6 +498,8 @@ void Clipping::initGUI()
 
 	dock.comboBox_ClippingPresets->addItem("Dual Planes");
 	dock.comboBox_ClippingPresets->addItem("Cube");
+	dock.comboBox_ClippingPresets->addItem("Tube");
+	dock.comboBox_ClippingPresets->addItem("Molecule");
 
 }
 

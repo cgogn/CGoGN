@@ -28,6 +28,7 @@
 #include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
 #include <vector>
+#include <cmath>
 
 namespace CGoGN
 {
@@ -53,7 +54,7 @@ public :
 	/**
 	 * public static constructor
 	 * @param center center between planes
-	 * @param distance distance between planes
+	 * @param size distance between planes
 	 * @param axis axis on which planes are aligned (0 for x, 1 for y, 2 for z)
 	 * @param facing true means having facing planes
 	 */
@@ -62,10 +63,29 @@ public :
 	/**
 	 * public static constructor
 	 * @param center center between planes
-	 * @param distance distance between planes
+	 * @param size distance between planes
 	 * @param facing true means having facing planes
 	 */
 	static ClippingPreset* CreateCubePreset(Geom::Vec3f center, float size, bool facing);
+
+	/**
+	 * public static constructor
+	 * @param center center of the tube
+	 * @param size tube diameter
+	 * @param axis axis of the tube (0 for x, 1 for y, 2 for z)
+	 * @param precision planes count used to build tube
+	 * @param facing true means an outer tube, false an inner tube
+	 */
+	static ClippingPreset* CreateTubePreset(Geom::Vec3f center, float size, int axis, int precision, bool facing);
+
+	/**
+	 * public static constructor
+	 * @param center center of molecule
+	 * @param size molecule size
+	 * @param atomsRadiuses radiuses of atoms
+	 * @param orClipping set it to true for OR clipping mode
+	 */
+	static ClippingPreset* CreateMoleculePreset(Geom::Vec3f center, float size, float atomsRadiuses, bool orClipping);
 
 private :
 
