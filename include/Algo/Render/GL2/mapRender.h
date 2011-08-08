@@ -89,6 +89,129 @@ protected:
 
 	typedef std::pair<GLuint*, unsigned int> buffer_array;
 
+
+
+
+	class VertexPoly
+	{
+	public:
+		int id;
+		float value;
+		VertexPoly* prev;
+		VertexPoly* next;
+		VertexPoly* store_link;
+
+		VertexPoly(int i, float v, VertexPoly* p=NULL): id(i),value(v), prev(p), next(NULL),store_link(NULL)
+		{
+			if (prev!=NULL)
+			{
+				prev->next = this;
+				prev->store_link = this;
+			}
+		}
+
+		static void close(VertexPoly* first, VertexPoly* last)
+		{
+			last->next = first;
+			last->store_link = first;
+			first->prev = last;
+		}
+
+		VertexPoly* unlink()
+		{
+			this->prev->next = this->next;
+			this->next->prev = this->prev;
+			this->value = 20.0f;
+
+			return this->prev;
+		}
+
+		static void erasePoly(VertexPoly* vp)
+		{
+			VertexPoly* curr = vp;
+			do
+			{
+				VertexPoly* tmp = curr;
+				curr = curr->store_link;
+				delete tmp;
+			}while (curr != vp);
+		}
+	};
+
+
+//	struct VertexPoly
+//	{
+//		int id;
+//		float value;
+//		unsigned int prev;
+//		unsigned int next;
+//		VertexPoly(int i, float v): id(i),value(v) {}
+//	};
+//
+//	class Polygon
+//	{
+//	protected:
+//		std::vector<VertexPoly> m_vertices;
+//	public:
+//		Polygon()
+//		{
+//			m_vertices.reserve(256);
+//		}
+//
+//		inline void addVertex(int id, float val)
+//		{
+//			m_vertices.push_back(VertexPoly(id,val));
+//		}
+//
+//		inline void link_all()
+//		{
+//			unsigned int sz = m_vertices.size()-1;
+//			for (unsigned int i = 1; i<sz; ++i)
+//			{
+//				m_vertices[i].next = i+1;
+//				m_vertices[i].prev = i-1;
+//			}
+//			m_vertices[0].next = 1;
+//			m_vertices[0].prev = m_vertices.size();
+//			m_vertices[sz].next = 0;
+//			m_vertices[sz].prev = sz-1;
+//		}
+//
+//		inline void unlink(unsigned int v)
+//		{
+//			m_vertices[ m_vertices[v].prev].next = m_vertices[v].next;
+//			m_vertices[ m_vertices[v].next].prev = m_vertices[v].prev;
+//		}
+//
+//		inline const VertexPoly& prev(unsigned int v) const
+//		{
+//			return  m_vertices[m_vertices[v].prev];
+//		}
+//
+//		inline const VertexPoly& next(unsigned int v) const
+//		{
+//			return  m_vertices[m_vertices[v].next];
+//		}
+//
+//		inline unsigned int prevId(unsigned int v) const
+//		{
+//			return  m_vertices[v].prev;
+//		}
+//
+//		inline unsigned int nextId(unsigned int v) const
+//		{
+//			return  m_vertices[v].next;
+//		}
+//
+//		inline VertexPoly&  operator()(unsigned int v)
+//		{
+//			return  m_vertices[v];
+//		}
+//	};
+
+
+
+
 public:
 	/**
 	 * Constructor
@@ -109,6 +232,7 @@ public:
 	buffer_array get_nb_index_buffer() { return std::make_pair(m_nbIndices, SIZE_BUFFER); }
 
 protected:
+
 	/**
 	 * addition of indices table of one triangle
 	 * @param d a dart of the triangle
@@ -116,6 +240,19 @@ protected:
 	 */
 	template <typename PFP>
 	void addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices) ;
+
+	template<typename PFP>
+	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices);
+
+	template<typename PFP>
+	float computeEarAngle(AttributeHandler<typename PFP::VEC3>& position, const typename PFP::VEC3& normalPoly, unsigned int i, unsigned int j, unsigned int k);
+
+	template<typename PFP>
+	bool computeEarIntersection(AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly);
+
+	template<typename PFP>
+	void recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, std::multimap<float, VertexPoly*>& ears, bool convex);
+
 
 public:
 	/**
@@ -162,6 +299,8 @@ public:
 	 * draw the VBO (function to call in the drawing callback)
 	 */
 	void draw(Utils::GLSLShader* sh, int prim) ;
+
+	unsigned int drawSub(Utils::GLSLShader* sh, int prim, unsigned int nb_elm);
 } ;
 
 } // namespace GL2
