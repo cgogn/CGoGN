@@ -28,6 +28,7 @@
 #include <iostream>
 
 #include "Utils/qtSimple.h"
+#include "Utils/qtInputs.h"
 
 #include "ui_clipping.h"
 // inclure qtui.h juste après le ui_xxx.h
@@ -50,6 +51,8 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 
 #include "Utils/frameManipulator.h"
+
+#include "Utils/clippingPresets.h"
 
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
@@ -152,6 +155,8 @@ public slots:
 	void slot_radioButton_ColorAttenuationMode(bool b);
 
 	void slot_pushButton_deleteSelectedObject();
+
+	void slot_pushButton_applyClippingPreset();
 
 	void button_compile();
 };
