@@ -28,6 +28,7 @@
 #include <GL/glew.h>
 #include <vector>
 #include <list>
+#include <set>
 #include <utility>
 
 #include "Topology/generic/dart.h"
@@ -89,6 +90,50 @@ protected:
 
 	typedef std::pair<GLuint*, unsigned int> buffer_array;
 
+	// forward declaration
+	class VertexPoly;
+
+	// comparaison function for multiset
+	static bool cmpVP(VertexPoly* lhs, VertexPoly* rhs);
+
+	// multiset typedef for simple writing
+	typedef std::multiset< VertexPoly*,bool(*)(VertexPoly*,VertexPoly*)> VPMS;
+
+	class VertexPoly
+	{
+	public:
+		int id;
+		float value;
+		VertexPoly* prev;
+		VertexPoly* next;
+		VPMS::iterator ear;
+
+		VertexPoly(int i, float v, VertexPoly* p=NULL): id(i),value(v), prev(p), next(NULL)
+		{
+			if (prev!=NULL)
+				prev->next = this;
+		}
+
+		static void close(VertexPoly* first, VertexPoly* last)
+		{
+			last->next = first;
+			first->prev = last;
+		}
+
+		static VertexPoly* erase(VertexPoly* vp)
+		{
+			VertexPoly* tmp = vp->prev;
+			tmp->next = vp->next;
+			vp->next->prev = tmp;
+			vp->value = 20.0f; //??
+			delete vp;
+			return tmp;
+		}
+
+	};
+
+
+
 public:
 	/**
 	 * Constructor
@@ -109,6 +154,7 @@ public:
 	buffer_array get_nb_index_buffer() { return std::make_pair(m_nbIndices, SIZE_BUFFER); }
 
 protected:
+
 	/**
 	 * addition of indices table of one triangle
 	 * @param d a dart of the triangle
@@ -116,6 +162,22 @@ protected:
 	 */
 	template <typename PFP>
 	void addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices) ;
+
+	template<typename PFP>
+	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices);
+
+//	template<typename PFP>
+//	float computeEarAngle(AttributeHandler<typename PFP::VEC3>& position, const typename PFP::VEC3& normalPoly, unsigned int i, unsigned int j, unsigned int k);
+
+	template<typename PFP>
+	float computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2, const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly);
+
+	template<typename PFP>
+	bool computeEarIntersection(AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly);
+
+	template<typename PFP>
+	void recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
+
 
 public:
 	/**
@@ -162,6 +224,8 @@ public:
 	 * draw the VBO (function to call in the drawing callback)
 	 */
 	void draw(Utils::GLSLShader* sh, int prim) ;
+
+	unsigned int drawSub(Utils::GLSLShader* sh, int prim, unsigned int nb_elm);
 } ;
 
 } // namespace GL2

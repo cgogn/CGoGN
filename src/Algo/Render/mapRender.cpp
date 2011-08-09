@@ -37,6 +37,7 @@ namespace Render
 namespace GL2
 {
 
+
 MapRender::MapRender()
 {
 	glGenBuffersARB(4, m_indexBuffers) ;
@@ -102,6 +103,40 @@ void MapRender::draw(Utils::GLSLShader* sh, int prim)
 
 	sh->disableVertexAttribs();
 }
+
+
+unsigned int MapRender::drawSub(Utils::GLSLShader* sh, int prim, unsigned int nb_elm)
+{
+	sh->enableVertexAttribs();
+	switch(prim)
+	{
+		case POINTS:
+			if (nb_elm > m_nbIndices[POINT_INDICES])
+				nb_elm = m_nbIndices[POINT_INDICES];
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[POINT_INDICES]);
+			glDrawElements(GL_POINTS, nb_elm, GL_UNSIGNED_INT, 0) ;
+
+			break;
+		case LINES:
+			if (2*nb_elm > m_nbIndices[LINE_INDICES])
+				nb_elm = m_nbIndices[LINE_INDICES]/2;
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[LINE_INDICES]);
+			glDrawElements(GL_LINES, 2*nb_elm, GL_UNSIGNED_INT, 0);
+			break;
+		case TRIANGLES:
+			if (3*nb_elm > m_nbIndices[TRIANGLE_INDICES])
+				nb_elm = m_nbIndices[TRIANGLE_INDICES]/3;
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[TRIANGLE_INDICES]);
+			glDrawElements(GL_TRIANGLES, 3*nb_elm, GL_UNSIGNED_INT, 0);
+			break;
+		default:
+			break;
+	}
+
+	sh->disableVertexAttribs();
+	return nb_elm;
+}
+
 
 } // namespace GL2
 
