@@ -31,29 +31,31 @@ namespace CGoGN
 
 namespace Utils
 {
+#include "shaderSimpleTexture.vert"
+#include "shaderSimpleTexture.frag"
 
-std::string ShaderSimpleTexture::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition;\n"
-		"ATTRIBUTE vec2 VertexTexCoord;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"VARYING_VERT vec2 texCoord;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"	texCoord = VertexTexCoord;\n"
-		"}";
-
-
-std::string ShaderSimpleTexture::fragmentShaderText =
-		"PRECISON;\n"
-		"VARYING_FRAG vec2 texCoord;\n"
-		"uniform sampler2D textureUnit;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=texture2D(textureUnit,texCoord);\n"
-		"}";
+//std::string ShaderSimpleTexture::vertexShaderText =
+//		"ATTRIBUTE vec3 VertexPosition;\n"
+//		"ATTRIBUTE vec2 VertexTexCoord;\n"
+//		"uniform mat4 ModelViewProjectionMatrix;\n"
+//		"VARYING_VERT vec2 texCoord;\n"
+//		"INVARIANT_POS;\n"
+//		"void main ()\n"
+//		"{\n"
+//		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
+//		"	texCoord = VertexTexCoord;\n"
+//		"}";
+//
+//
+//std::string ShaderSimpleTexture::fragmentShaderText =
+//		"PRECISON;\n"
+//		"VARYING_FRAG vec2 texCoord;\n"
+//		"uniform sampler2D textureUnit;\n"
+//		"FRAG_OUT_DEF;\n"
+//		"void main()\n"
+//		"{\n"
+//		"	gl_FragColor=texture2D(textureUnit,texCoord);\n"
+//		"}";
 
 
 ShaderSimpleTexture::ShaderSimpleTexture()

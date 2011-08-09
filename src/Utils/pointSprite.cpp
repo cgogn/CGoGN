@@ -30,72 +30,77 @@ namespace CGoGN
 namespace Utils
 {
 
+#include "pointSprite.vert"
+#include "pointSprite.frag"
+#include "pointSprite.geom"
+
 GLuint PointSprite::m_idTexture = 0;
 GLuint PointSprite::m_uniform_texture = 0;
 
 unsigned char* PointSprite::m_ptrSphere = NULL;
 
-std::string PointSprite::vertexShaderText =
-"ATTRIBUTE vec3 VertexPosition;\n"
-"void main ()\n"
-"{\n"
-"	gl_Position = vec4(VertexPosition,1.0);\n"
-"}";
+
+//std::string PointSprite::vertexShaderText =
+//"ATTRIBUTE vec3 VertexPosition;\n"
+//"void main ()\n"
+//"{\n"
+//"	gl_Position = vec4(VertexPosition,1.0);\n"
+//"}";
 
 
-std::string PointSprite::geometryShaderText =
-"uniform float size;\n"
-"uniform mat4 ModelViewMatrix;\n"
-"uniform mat4 ProjectionMatrix;\n"
-"VARYING_OUT vec2 texCoord;\n"
-"VARYING_OUT vec2 positionFragIn;\n"
-"VARYING_OUT vec4 mvpFragIn;\n"
-"void main()\n"
-"{\n"
-"	vec4 posCenter = ModelViewMatrix * POSITION_IN(0);\n"
-"	vec4 pos = posCenter + vec4(-size, size, 0.0, 0.0);\n"
-"	positionFragIn = posCenter.zw;\n"
-"	mvpFragIn.x = ProjectionMatrix[2][2];\n"
-"	mvpFragIn.y = ProjectionMatrix[3][2];\n"
-"	mvpFragIn.z = ProjectionMatrix[2][3];\n"
-"	mvpFragIn.w = ProjectionMatrix[3][3];\n"
-"	texCoord = vec2(0.0,1.0);\n"
-"	gl_Position = ProjectionMatrix *  pos;\n"
-"	EmitVertex();\n"
-"	pos = posCenter + vec4(-size, -size, 0.0, 0.0);\n"
-"	texCoord = vec2(0.0,0.0);\n"
-"	gl_Position = ProjectionMatrix *  pos;\n"
-"	EmitVertex();\n"
-"	pos = posCenter + vec4( size, size, 0.0, 0.0);\n"
-"	texCoord = vec2(1.0,1.0);\n"
-"	gl_Position = ProjectionMatrix *  pos;\n"
-"	EmitVertex();\n"
-"	pos = posCenter + vec4( size,-size, 0.0, 0.0);\n"
-"	texCoord = vec2(1.0,0.0);\n"
-"	gl_Position = ProjectionMatrix *  pos;\n"
-"	EmitVertex();\n"
-"	EndPrimitive();\n"
-"}";
+//std::string PointSprite::geometryShaderText =
+//"uniform float size;\n"
+//"uniform mat4 ModelViewMatrix;\n"
+//"uniform mat4 ProjectionMatrix;\n"
+//"VARYING_OUT vec2 texCoord;\n"
+//"VARYING_OUT vec2 positionFragIn;\n"
+//"VARYING_OUT vec4 mvpFragIn;\n"
+//"void main()\n"
+//"{\n"
+//"	vec4 posCenter = ModelViewMatrix * POSITION_IN(0);\n"
+//"	vec4 pos = posCenter + vec4(-size, size, 0.0, 0.0);\n"
+//"	positionFragIn = posCenter.zw;\n"
+//"	mvpFragIn.x = ProjectionMatrix[2][2];\n"
+//"	mvpFragIn.y = ProjectionMatrix[3][2];\n"
+//"	mvpFragIn.z = ProjectionMatrix[2][3];\n"
+//"	mvpFragIn.w = ProjectionMatrix[3][3];\n"
+//"	texCoord = vec2(0.0,1.0);\n"
+//"	gl_Position = ProjectionMatrix *  pos;\n"
+//"	EmitVertex();\n"
+//"	pos = posCenter + vec4(-size, -size, 0.0, 0.0);\n"
+//"	texCoord = vec2(0.0,0.0);\n"
+//"	gl_Position = ProjectionMatrix *  pos;\n"
+//"	EmitVertex();\n"
+//"	pos = posCenter + vec4( size, size, 0.0, 0.0);\n"
+//"	texCoord = vec2(1.0,1.0);\n"
+//"	gl_Position = ProjectionMatrix *  pos;\n"
+//"	EmitVertex();\n"
+//"	pos = posCenter + vec4( size,-size, 0.0, 0.0);\n"
+//"	texCoord = vec2(1.0,0.0);\n"
+//"	gl_Position = ProjectionMatrix *  pos;\n"
+//"	EmitVertex();\n"
+//"	EndPrimitive();\n"
+//"}";
 
 
-std::string PointSprite::fragmentShaderText =
-"uniform sampler2D SpriteTexture;\n"
-"uniform float size;\n"
-"uniform vec3 color;\n"
-"VARYING_FRAG vec2 texCoord;\n"
-"VARYING_FRAG vec2 positionFragIn;\n"
-"VARYING_FRAG vec4 mvpFragIn;\n"
-"void main(void)\n"
-"{\n"
-"	float lum = texture2D(SpriteTexture, texCoord).s;\n"
-"	if (lum==0.0)\n"
-"		discard;\n"
-"	vec2 v = texCoord-vec2(0.5,0.5);\n"
-"	float z = size * sqrt(1.0-dot(v,v));\n"
-"	vec2 zfrag = positionFragIn + vec2(z,0.0);\n"
-"	gl_FragDepth = 0.5 + 0.5 * dot(zfrag, mvpFragIn.xy) / dot(zfrag, mvpFragIn.zw);\n"
-"	gl_FragColor = vec4(color,0.0)*lum;\n"
-"}";
+//std::string PointSprite::fragmentShaderText =
+//"uniform sampler2D SpriteTexture;\n"
+//"uniform float size;\n"
+//"uniform vec3 color;\n"
+//"VARYING_FRAG vec2 texCoord;\n"
+//"VARYING_FRAG vec2 positionFragIn;\n"
+//"VARYING_FRAG vec4 mvpFragIn;\n"
+//"void main(void)\n"
+//"{\n"
+//"	float lum = texture2D(SpriteTexture, texCoord).s;\n"
+//"	if (lum==0.0)\n"
+//"		discard;\n"
+//"	vec2 v = texCoord-vec2(0.5,0.5);\n"
+//"	float z = size * sqrt(1.0-dot(v,v));\n"
+//"	vec2 zfrag = positionFragIn + vec2(z,0.0);\n"
+//"	gl_FragDepth = 0.5 + 0.5 * dot(zfrag, mvpFragIn.xy) / dot(zfrag, mvpFragIn.zw);\n"
+//"	gl_FragColor = vec4(color,0.0)*lum;\n"
+//"}";
 
 
 PointSprite::PointSprite(float radius)

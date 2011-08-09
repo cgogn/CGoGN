@@ -31,54 +31,57 @@ namespace CGoGN
 
 namespace Utils
 {
+#include "shaderFlat.vert"
+#include "shaderFlat.frag"
+#include "shaderFlat.geom"
 
-std::string ShaderFlat::vertexShaderText =
-"ATTRIBUTE vec3 VertexPosition;\n"
-"void main()\n"
-"{\n"
-"	gl_Position = vec4(VertexPosition, 1.0);\n"
-"}";
+//std::string ShaderFlat::vertexShaderText =
+//"ATTRIBUTE vec3 VertexPosition;\n"
+//"void main()\n"
+//"{\n"
+//"	gl_Position = vec4(VertexPosition, 1.0);\n"
+//"}";
 
 
-std::string ShaderFlat::geometryShaderText =
-"uniform float explode;\n"
-"uniform mat4 ModelViewProjectionMatrix;\n"
-"uniform mat4 NormalMatrix;\n"
-"uniform mat4 ModelViewMatrix;\n"
-"uniform vec3 lightPosition;\n"
-"uniform vec4 diffuse;\n"
-"uniform vec4 ambient;\n"
-"VARYING_OUT vec4 ColorFS;\n"
-"void main(void)\n"
-"{\n"
-"	vec3 v1 = POSITION_IN(1).xyz - POSITION_IN(0).xyz;\n"
-"	vec3 v2 = POSITION_IN(2).xyz - POSITION_IN(0).xyz;\n"
-"	vec3 N  = cross(v1,v2);\n"
-"	N  =  normalize (vec3(NormalMatrix*vec4(N,0.0))); \n"
-"	vec3 center = POSITION_IN(0).xyz + POSITION_IN(1).xyz + POSITION_IN(2).xyz; \n"
-"	center /= 3.0;\n"
-"	vec4 newPos =  ModelViewMatrix * vec4(center,0.0);\n"
-"	vec3 L =  normalize (lightPosition - newPos.xyz);\n"
-"	float lambertTerm = dot(N,L);\n"
-"	ColorFS = ambient;\n"
-"	if(lambertTerm > 0.0)\n"
-"		ColorFS += diffuse * lambertTerm;\n"
-"	int i;\n"
-"	for(i=0; i< NBVERTS_IN; i++)\n"
-"	{\n"
-"		vec4 pos =  explode * POSITION_IN(i) + (1.0-explode)* vec4(center,1.0);\n"
-"		gl_Position = ModelViewProjectionMatrix *  pos;\n"
-"		EmitVertex();\n"
-"	}\n"
-"	EndPrimitive();\n"
-"}";
+//std::string ShaderFlat::geometryShaderText =
+//"uniform float explode;\n"
+//"uniform mat4 ModelViewProjectionMatrix;\n"
+//"uniform mat4 NormalMatrix;\n"
+//"uniform mat4 ModelViewMatrix;\n"
+//"uniform vec3 lightPosition;\n"
+//"uniform vec4 diffuse;\n"
+//"uniform vec4 ambient;\n"
+//"VARYING_OUT vec4 ColorFS;\n"
+//"void main(void)\n"
+//"{\n"
+//"	vec3 v1 = POSITION_IN(1).xyz - POSITION_IN(0).xyz;\n"
+//"	vec3 v2 = POSITION_IN(2).xyz - POSITION_IN(0).xyz;\n"
+//"	vec3 N  = cross(v1,v2);\n"
+//"	N  =  normalize (vec3(NormalMatrix*vec4(N,0.0))); \n"
+//"	vec3 center = POSITION_IN(0).xyz + POSITION_IN(1).xyz + POSITION_IN(2).xyz; \n"
+//"	center /= 3.0;\n"
+//"	vec4 newPos =  ModelViewMatrix * vec4(center,0.0);\n"
+//"	vec3 L =  normalize (lightPosition - newPos.xyz);\n"
+//"	float lambertTerm = dot(N,L);\n"
+//"	ColorFS = ambient;\n"
+//"	if(lambertTerm > 0.0)\n"
+//"		ColorFS += diffuse * lambertTerm;\n"
+//"	int i;\n"
+//"	for(i=0; i< NBVERTS_IN; i++)\n"
+//"	{\n"
+//"		vec4 pos =  explode * POSITION_IN(i) + (1.0-explode)* vec4(center,1.0);\n"
+//"		gl_Position = ModelViewProjectionMatrix *  pos;\n"
+//"		EmitVertex();\n"
+//"	}\n"
+//"	EndPrimitive();\n"
+//"}";
 
-std::string ShaderFlat::fragmentShaderText =
-"VARYING_FRAG vec4 ColorFS; \n"
-"void main()\n"
-"{\n"
-"	gl_FragColor = ColorFS;\n"
-"}";
+//std::string ShaderFlat::fragmentShaderText =
+//"VARYING_FRAG vec4 ColorFS; \n"
+//"void main()\n"
+//"{\n"
+//"	gl_FragColor = ColorFS;\n"
+//"}";
 
 
 ShaderFlat::ShaderFlat()

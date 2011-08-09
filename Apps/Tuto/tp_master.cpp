@@ -522,7 +522,7 @@ void MyQT::cb_keyPress(int keycode)
 		if (!d_vertices.empty())
 		{
 			std::stringstream ss;
-			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]];
+			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]]<< "( id emb:"<< myMap.getEmbedding(VERTEX,d_vertices[0])<<")"<< std::endl; ;
 			statusMsg(ss.str().c_str());
 
 			updateGL();

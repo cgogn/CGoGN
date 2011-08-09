@@ -22,77 +22,54 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
-#include "Utils/Shaders/shaderColorPerVertex.h"
+#ifndef _TUTO1_
+#define _TUTO1_
 
+#include <iostream>
 
-namespace CGoGN
+#include "Utils/qtSimple.h"
+#include "Utils/cgognStream.h"
+
+// forward definitions (minimize includes)
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
+namespace CGoGN { namespace Utils { class VBO; } }
+namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
+
+using namespace CGoGN ;
+
+/**
+ * A class for a little interface and rendering
+ */
+class MyQT : public Utils::QT::SimpleQT
 {
+	Q_OBJECT
 
-namespace Utils
-{
+public:
+	// render
+	Algo::Render::GL2::MapRender* m_render;
 
-#include "shaderColorPerVertex.vert"
-#include "shaderColorPerVertex.frag"
+	// VBO
+	Utils::VBO* m_positionVBO;
 
-//std::string ShaderColorPerVertex::vertexShaderText =
-//		"ATTRIBUTE vec3 VertexPosition;\n"
-//		"ATTRIBUTE vec3 VertexColor;\n"
-//		"uniform mat4 ModelViewProjectionMatrix;\n"
-//		"VARYING_VERT vec3 color;\n"
-//		"INVARIANT_POS;\n"
-//		"void main ()\n"
-//		"{\n"
-//		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-//		"	color = VertexColor;\n"
-//		"}";
-//
-//
-//std::string ShaderColorPerVertex::fragmentShaderText =
-//		"PRECISON;\n"
-//		"VARYING_FRAG vec3 color;\n"
-//		"FRAG_OUT_DEF;\n"
-//		"void main()\n"
-//		"{\n"
-//		"	gl_FragColor=vec4(color,0.0);\n"
-//		"}";
+	// shader basic
+	Utils::ShaderSimpleColor* m_shader;
 
+	MyQT() : m_render(NULL), m_positionVBO(NULL), m_shader(NULL)
+	{}
 
-ShaderColorPerVertex::ShaderColorPerVertex()
-{
-	m_nameVS = "ShaderColorPerVertex_vs";
-	m_nameFS = "ShaderColorPerVertex_fs";
-	m_nameGS = "ShaderColorPerVertex_gs";
+	// callbacks of simpleQT to overdefine:
+	void cb_initGL();
 
-	std::string glxvert(*GLSLShader::DEFINES_GL);
-	glxvert.append(vertexShaderText);
+	void cb_redraw();
 
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
-	glxfrag.append(fragmentShaderText);
+	void cb_keyPress(int code);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
-}
+	void cb_New() { CGoGNout << "New ..." << CGoGNendl; }
+	void cb_Save() { CGoGNout << "Rien a sauver ..." << CGoGNendl; }
 
-unsigned int ShaderColorPerVertex::setAttributePosition(VBO* vbo)
-{
-	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
-}
+	// callbacks (slots) locally defined
+public slots:
+	void menu_slot1() { CGoGNout << "Exemple de menu" << CGoGNendl; }
+};
 
-unsigned int ShaderColorPerVertex::setAttributeColor(VBO* vbo)
-{
-	m_vboCol = vbo;
-	return bindVA_VBO("VertexColor", vbo);
-}
-
-void ShaderColorPerVertex::restoreUniformsAttribs()
-{
-	bind();
-	bindVA_VBO("VertexPosition", m_vboPos);
-	bindVA_VBO("VertexColor", m_vboCol);
-	unbind();
-}
-
-} // namespace Utils
-
-} // namespace CGoGN
+#endif
