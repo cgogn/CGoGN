@@ -19,6 +19,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 include_directories(
+	${CMAKE_CURRENT_BINARY_DIR}
 	/usr/include/libxml2
 	${CGoGN_ROOT_DIR}/include
 	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
@@ -66,17 +67,33 @@ add_library(
 	${files_algo}
 )
 
-#file(
-#	GLOB_RECURSE
-#	files_geometry
-#	${CGoGN_ROOT_DIR}/src/Geometry/*.cpp
-#	${CGoGN_ROOT_DIR}/include/Geometry/*.hpp
-#	${CGoGN_ROOT_DIR}/include/Geometry/*.h
-#)
-#add_library(
-#	geometryD
-#	${files_geometry}
-#)
+
+file(
+	GLOB_RECURSE
+	shaders_srcD
+	${CGoGN_ROOT_DIR}/include/Utils/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/*.geom	
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
+)
+
+IF(WIN32)
+add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/Tools/Release/shader_to_h ${shaders_srcD}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_srcD} 
+)
+ELSE(WIN32)
+add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/Tools/shader_to_h ${shaders_srcD}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_srcD} 
+)
+ENDIF(WIN32)
+
+
+
+
 
 
 file(
@@ -102,4 +119,5 @@ add_library(
 	${files_utils_withQt}
 )
 
+add_dependencies(utilsD shader_targetD )
 

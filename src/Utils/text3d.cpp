@@ -31,31 +31,33 @@ namespace CGoGN
 
 namespace Utils
 {
+#include "text3d.vert"
+#include "text3d.frag"
 
-std::string Strings3D::vertexShaderText =
-"ATTRIBUTE vec4 VertexPosition;\n"
-"uniform mat4 ModelViewMatrix;\n"
-"uniform mat4 ProjectionMatrix;\n"
-"uniform vec3 strPos;\n"
-"uniform float scale;\n"
-"VARYING_VERT vec2 tex_coord;\n"
-"INVARIANT_POS;\n"
-"void main ()\n"
-"{\n"
-"	vec4 pos = ModelViewMatrix * vec4(strPos,1.0) + vec4(VertexPosition[0]*scale,VertexPosition[1]*scale,0.0,0.0);\n"
-"	tex_coord = vec2(VertexPosition[2],VertexPosition[3]);\n"
-"	gl_Position = ProjectionMatrix * pos;\n"
-"}";
-
-
-std::string Strings3D::fragmentShaderText1 =
-"VARYING_FRAG vec2 tex_coord;\n"
-"uniform sampler2D FontTexture;\n"
-"uniform vec3 color;\n"
-"FRAG_OUT_DEF;\n"
-"void main (void)\n"
-"{\n"
-"	float lum = texture2D(FontTexture, tex_coord).s;\n";
+//std::string Strings3D::vertexShaderText =
+//"ATTRIBUTE vec4 VertexPosition;\n"
+//"uniform mat4 ModelViewMatrix;\n"
+//"uniform mat4 ProjectionMatrix;\n"
+//"uniform vec3 strPos;\n"
+//"uniform float scale;\n"
+//"VARYING_VERT vec2 tex_coord;\n"
+//"INVARIANT_POS;\n"
+//"void main ()\n"
+//"{\n"
+//"	vec4 pos = ModelViewMatrix * vec4(strPos,1.0) + vec4(VertexPosition[0]*scale,VertexPosition[1]*scale,0.0,0.0);\n"
+//"	tex_coord = vec2(VertexPosition[2],VertexPosition[3]);\n"
+//"	gl_Position = ProjectionMatrix * pos;\n"
+//"}";
+//
+//
+//std::string Strings3D::fragmentShaderText1 =
+//"VARYING_FRAG vec2 tex_coord;\n"
+//"uniform sampler2D FontTexture;\n"
+//"uniform vec3 color;\n"
+//"FRAG_OUT_DEF;\n"
+//"void main (void)\n"
+//"{\n"
+//"	float lum = texture2D(FontTexture, tex_coord).s;\n";
 
 std::string Strings3D::fragmentShaderText2 =
 "	gl_FragColor = vec4(color,0.0)*lum;\n"

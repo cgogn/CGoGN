@@ -30,25 +30,27 @@ namespace CGoGN
 
 namespace Utils
 {
+#include "shaderSimpleColor.vert"
+#include "shaderSimpleColor.frag"
 
-std::string ShaderSimpleColor::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-//		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"}";
-
-
-std::string ShaderSimpleColor::fragmentShaderText =
-		"PRECISON;\n"
-		"uniform vec4 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=color;\n"
-		"}";
+//std::string ShaderSimpleColor::vertexShaderText =
+//		"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
+//		"uniform mat4 ModelViewProjectionMatrix;\n"
+////		"INVARIANT_POS;\n"
+//		"void main ()\n"
+//		"{\n"
+//		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
+//		"}";
+//
+//
+//std::string ShaderSimpleColor::fragmentShaderText =
+//		"PRECISON;\n"
+//		"uniform vec4 color;\n"
+//		"FRAG_OUT_DEF;\n"
+//		"void main()\n"
+//		"{\n"
+//		"	gl_FragColor=color;\n"
+//		"}";
 
 
 ShaderSimpleColor::ShaderSimpleColor()

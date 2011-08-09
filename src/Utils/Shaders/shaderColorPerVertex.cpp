@@ -32,27 +32,30 @@ namespace CGoGN
 namespace Utils
 {
 
-std::string ShaderColorPerVertex::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition;\n"
-		"ATTRIBUTE vec3 VertexColor;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"VARYING_VERT vec3 color;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"	color = VertexColor;\n"
-		"}";
+#include "shaderColorPerVertex.vert"
+#include "shaderColorPerVertex.frag"
 
-
-std::string ShaderColorPerVertex::fragmentShaderText =
-		"PRECISON;\n"
-		"VARYING_FRAG vec3 color;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor=vec4(color,0.0);\n"
-		"}";
+//std::string ShaderColorPerVertex::vertexShaderText =
+//		"ATTRIBUTE vec3 VertexPosition;\n"
+//		"ATTRIBUTE vec3 VertexColor;\n"
+//		"uniform mat4 ModelViewProjectionMatrix;\n"
+//		"VARYING_VERT vec3 color;\n"
+//		"INVARIANT_POS;\n"
+//		"void main ()\n"
+//		"{\n"
+//		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
+//		"	color = VertexColor;\n"
+//		"}";
+//
+//
+//std::string ShaderColorPerVertex::fragmentShaderText =
+//		"PRECISON;\n"
+//		"VARYING_FRAG vec3 color;\n"
+//		"FRAG_OUT_DEF;\n"
+//		"void main()\n"
+//		"{\n"
+//		"	gl_FragColor=vec4(color,0.0);\n"
+//		"}";
 
 
 ShaderColorPerVertex::ShaderColorPerVertex()
