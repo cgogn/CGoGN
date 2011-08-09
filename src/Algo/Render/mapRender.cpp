@@ -37,6 +37,7 @@ namespace Render
 namespace GL2
 {
 
+
 MapRender::MapRender()
 {
 	glGenBuffersARB(4, m_indexBuffers) ;

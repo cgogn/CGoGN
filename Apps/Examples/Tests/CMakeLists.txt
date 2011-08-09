@@ -25,6 +25,7 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
 	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
+	${CGoGN_ROOT_DIR}/ThirdParty/glm
 )
 
 # define libs path
@@ -46,3 +47,9 @@ target_link_libraries( Geom_inclusionD
 add_executable( Geom_intersectionD ./Geom_intersection.cpp)
 target_link_libraries( Geom_intersectionD
 	${CGoGN_LIBS_D} ${COMMON_LIBS} )
+	
+	
+QT4_WRAP_CPP(concave_rendering_moc concave_rendering.h)
+add_executable( concave_renderingD concave_rendering.cpp ${concave_rendering_moc})
+target_link_libraries( concave_renderingD
+	${CGoGN_LIBS_D}  ${COMMON_LIBS} ${QT_LIBRARIES} )

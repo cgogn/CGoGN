@@ -24,6 +24,7 @@
 
 #include "Utils/pickables.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/norm.hpp"
 #include "Geometry/distances.h"
 #include "Geometry/intersection.h"
 #include <algorithm>
@@ -106,13 +107,13 @@ void Pickable::invertPV(const Geom::Vec3f& P, const Geom::Vec3f& V, const glm::m
 
 
 
-bool Pickable::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
+bool Pickable::pick(const Geom::Vec3f& P, const Geom::Vec3f& V,  Geom::Vec3f& I, float epsilon)
 {
 	Geom::Vec3f PP;
 	Geom::Vec3f VV;
 	invertPV(P,V,m_transfo,PP,VV);
 
-	return m_drawable->pick(PP,VV,epsilon) != 0;
+	return m_drawable->pick(PP,VV,I,epsilon) != 0;
 
 }
 
@@ -207,12 +208,21 @@ Pickable* Pickable::pick(const std::vector<Pickable*>& picks,const Geom::Vec3f& 
 {
 	float mdist = std::numeric_limits<float>::max();
 	Pickable* res=NULL;
+	Geom::Vec3f I;
 
 	for (std::vector<Utils::Pickable*>::const_iterator it=picks.begin(); it != picks.end(); ++it)
 	{
-		if ((*it)->pick(P,V))
+		if ((*it)->pick(P,V,I))
 		{
-			float dist = (*it)->distancefrom(P);
+			std::cout << "I="<<I <<std::endl;
+
+//			float dist = (*it)->distancefrom(P);
+			glm::mat4 tr = (*it)->transfo();
+			glm::vec4 ii(I[0],I[1],I[2],1.0f);
+			glm::vec4 IWglm = tr*ii;
+			Geom::Vec3f IW(IWglm[0]/IWglm[3],IWglm[1]/IWglm[3],IWglm[2]/IWglm[3]);
+			IW -= P;
+			float dist = IW.norm();
 			if (dist < mdist)
 			{
 				res = *it;
@@ -231,15 +241,21 @@ bool Pickable::distOrder(const std::pair<float, Pickable*>& e1, const std::pair<
 
 std::vector<Pickable*> Pickable::sortedPick(std::vector<Pickable*>& picks, const Geom::Vec3f& P, const Geom::Vec3f& V)
 {
-
+	Geom::Vec3f I;
 	std::vector< std::pair<float, Pickable*> > sorted;
 	sorted.reserve(picks.size());
 
 	for (std::vector<Utils::Pickable*>::const_iterator it=picks.begin(); it != picks.end(); ++it)
 	{
-		if ((*it)->pick(P,V))
+		if ((*it)->pick(P,V,I))
 		{
-			float dist = (*it)->distancefrom(P);
+//			float dist = (*it)->distancefrom(P);
+			glm::mat4 tr = (*it)->transfo();
+			glm::vec4 ii(I[0],I[1],I[2],1.0f);
+			glm::vec4 IWglm = tr*ii;
+			Geom::Vec3f IW(IWglm[0]/IWglm[3],IWglm[1]/IWglm[3],IWglm[2]/IWglm[3]);
+			IW -= P;
+			float dist = IW.norm();
 			sorted.push_back(std::pair<float, Pickable*>(dist,*it));
 		}
 	}
@@ -307,14 +323,14 @@ void Grid::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 }
 
 
-unsigned int Grid::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
+unsigned int Grid::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon)
 {
 	if (fabs(V[2])>=0.0000001f)
 	{
 		float a = -1.0f*P[2]/V[2];
-		Geom::Vec3f Q = Geom::Vec3f(P+a*V);	// intersection with plane z=0
+		I = Geom::Vec3f(P+a*V);	// intersection with plane z=0
 
-		if ( (fabs(Q[0])<=1.0f) && (fabs(Q[1])<=1.0f) )
+		if ( (fabs(I[0])<=1.0f) && (fabs(I[1])<=1.0f) )
 			return 1;
 	}
 
@@ -447,14 +463,18 @@ void Sphere::draw()
 }
 
 
-unsigned int Sphere::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
+unsigned int Sphere::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon)
 {
 	float dist = Geom::squaredDistanceLine2Point<Geom::Vec3f>(P,V,V*V, Geom::Vec3f(0.0f,0.0f,0.0f));
 
-	if (dist <= 1.0f)
-		return 1;
+	if (dist > 1.0f)
+		return 0;
 
-	return 0;
+
+	I=P;
+	I.normalize();			// grossiere approximation TODO amelioerer approxim ?
+
+	return 1;
 }
 
 
@@ -555,7 +575,7 @@ void Cone::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 
 
 
-unsigned int Cone::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
+unsigned int Cone::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon)
 {
 	Geom::Vec3f Z,Q;
 	if (Geom::lineLineClosestPoints<Geom::Vec3f>(P, V, Geom::Vec3f(0.0f,0.0f,0.0f), Geom::Vec3f(0.0f,0.0f,1.0f), Q, Z))
@@ -565,25 +585,29 @@ unsigned int Cone::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilo
 			float dist = Q[0]*Q[0] + Q[1]*Q[1];
 			float cdist = (1.0f - Q[2])/2.0f;
 			if (dist <= cdist*cdist) // squared !!
+			{
+				I = Q; 					// WARNING VERY BAD APPROXIMATON : TODO better approxim.
 				return 1;
+			}
+
 		}
 		// else check inter with base
 		// Z=-1
 		float a = (-1.0f - P[2]) / V[2];
-		Q = Geom::Vec3f(P+a*V);
-		float dist = Q[0]*Q[0] + Q[1]*Q[1];
-		if (dist <= 1.0f)
-			return 1;
-		//else no inter
-		return 0;
+		I = Geom::Vec3f(P+a*V);
+		float dist = I[0]*I[0] + I[1]*I[1];
+		if (dist > 1.0f)
+			return 0;
+		return 1;
 	}
 
 	// ray in Z direction
 	float dist = P[0]*P[0] + P[1]*P[1];
-	if (dist <= 1.0f)
-		return 1;
-
-	return 0;
+	if (dist > 1.0f)
+		return 0;
+	I=P;
+	I[2]=-1.0f;
+	return 1;
 }
 
 
@@ -684,7 +708,7 @@ void Cylinder::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 
 
 
-unsigned int Cylinder::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
+unsigned int Cylinder::pick(const Geom::Vec3f& P, const Geom::Vec3f& V,  Geom::Vec3f& I, float epsilon)
 {
 	Geom::Vec3f Z,Q;
 	if (Geom::lineLineClosestPoints<Geom::Vec3f>(P, V, Geom::Vec3f(0.0f,0.0f,0.0f), Geom::Vec3f(0.0f,0.0f,1.0f), Q, Z))
@@ -693,19 +717,23 @@ unsigned int Cylinder::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float ep
 		{
 			float dist = Q[0]*Q[0] + Q[1]*Q[1];
 			if (dist < 1.0f)
+			{
+				I = Q; 					// WARNING VERY BAD APPROXIMATON : TODO better approxim.
 				return 1;
+			}
+
 		}
 		// else check inter with bases
 		// Z=1
 		float a = (1.0f - P[2]) / V[2];
-		Q = Geom::Vec3f(P+a*V);
-		float dist = Q[0]*Q[0] + Q[1]*Q[1];
+		I = Geom::Vec3f(P+a*V);
+		float dist = I[0]*I[0] + I[1]*I[1];
 		if (dist < 1.0f)
 			return 1;
 		// Z=-1
 		a = (-1.0f - P[2]) / V[2];
-		Q = Geom::Vec3f(P+a*V);
-		dist = Q[0]*Q[0] + Q[1]*Q[1];
+		I = Geom::Vec3f(P+a*V);
+		dist = I[0]*I[0] + I[1]*I[1];
 		if (dist < 1.0f)
 			return 1;
 		//else no inter
@@ -714,10 +742,14 @@ unsigned int Cylinder::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float ep
 
 	// ray in Z direction
 	float dist = P[0]*P[0] + P[1]*P[1];
-	if (dist <= 1.0f)
-		return 1;
-
-	return 0;
+	if (dist > 1.0f)
+		return 0;
+	I=P;
+	if (V[2]<0.0f)
+		I[2]=-1.0f;
+	else
+		I[2]=1.0f;
+	return 1;
 }
 
 
@@ -820,7 +852,7 @@ void Cube::draw()
 }
 
 
-unsigned int Cube::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon)
+unsigned int Cube::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon)
 {
 
 //	// firs quick picking with bounding sphere
@@ -828,22 +860,23 @@ unsigned int Cube::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilo
 	if (dist2 > 3.0f)
 		return 0;
 
+	I=P;
+	I.normalize();			// grossiere approximation TODO amelioerer approxim ?
+
+	std::vector<Geom::Vec3f> intersections;
+
 	for (unsigned int i=0; i<3; ++i)
 	{
-		if (fabsf(V[i])>=0.0000001f)
+		if (fabs(V[i])>=0.0000001f)
 		{
 			float a = (-1.0f-P[i])/V[i];
 			Geom::Vec3f Q = Geom::Vec3f(P+a*V);	// intersection with plane z=0
-			if ( (fabsf(Q[(i+1)%3])<=1.0f) && (fabsf(Q[(i+2)%3])<=1.0f) )
-			{
+			if ( (fabs(Q[(i+1)%3])<=1.0f) && (fabs(Q[(i+2)%3])<=1.0f) )
 				return 1;
-			}
 			a = (1.0f-P[i])/V[i];
 			Q = Geom::Vec3f(P+a*V);	// intersection with plane z=0
-			if ( (fabsf(Q[(i+1)%3])<=1.0f) && (fabsf(Q[(i+2)%3])<=1.0f) )
-			{
+			if ( (fabs(Q[(i+1)%3])<=1.0f) && (fabs(Q[(i+2)%3])<=1.0f) )
 				return 1;
-			}
 		}
 	}
 

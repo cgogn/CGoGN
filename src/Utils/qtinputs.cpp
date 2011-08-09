@@ -192,6 +192,36 @@ void VarDbl::updateFrom( QWidget* widg) const
 }
 
 
+
+// class VarFloat
+
+VarFloat::VarFloat(float min, float max, float& val, const std::string& label) :
+	m_min(min), m_max(max), m_val(val)
+{
+	m_label = label;
+}
+
+VarFloat::VarFloat(float min, float max, float& val, const std::string& label, const Var& var) :
+	Var(var), m_min(min), m_max(max), m_val(val)
+{
+	m_label = label;
+}
+
+QWidget* VarFloat::createInput() const
+{
+	QDoubleSpinBox *spin = new QDoubleSpinBox();
+	spin->setRange(double(m_min), double(m_max));
+	spin->setValue(double(m_val));
+	return spin;
+}
+
+void VarFloat::updateFrom( QWidget* widg) const
+{
+	QDoubleSpinBox* spin = dynamic_cast<QDoubleSpinBox*>(widg);
+	m_val = float(spin->value());
+}
+
+
 // class VarSlider
 
 VarSlider::VarSlider(int min, int max, int& val, const std::string& label):
@@ -281,9 +311,12 @@ bool inputValues(const Var& v1, const std::string& title)
 
 	CGoGNDialog dialog(params, title);
 	int ret = dialog.exec();
-	if (ret != 0)
+	if (ret == QDialog::Accepted)
+	{
 		dialog.getResults(params);
-	return true;
+		return true;
+	}
+	return false;
 }
 
 } // namespace QT
