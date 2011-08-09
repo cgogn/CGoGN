@@ -17,8 +17,16 @@ void main()
 	float lambertTerm = dot(N,L);
 
 	vec4 finalColor = materialAmbient;
-	if(lambertTerm > 0.0)
+	
+	#ifdef DOUBLE_SIDED
+	if (lambertTerm < 0.0)
 	{
+		N = -1.0*N;
+		lambertTerm = -1.0*lambertTerm;
+	#else
+	if (lambertTerm > 0.0)
+	{
+	#endif
 		#ifndef WITH_COLOR
 		finalColor += materialDiffuse * lambertTerm;
 		#else

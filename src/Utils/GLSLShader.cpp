@@ -826,6 +826,8 @@ bool GLSLShader::recompile()
 
 	restoreUniformsAttribs();
 
+	updateClippingUniforms();
+
 	return true;
 }
 
@@ -1018,6 +1020,7 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 
 void GLSLShader::disableVertexAttribs() const
 {
+	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 		glDisableVertexAttribArray(it->va_id);
 	this->unbind();
