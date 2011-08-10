@@ -52,6 +52,146 @@ Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& P
 }
 
 
+//template <typename VEC3>
+//Intersection intersectionRayTriangleFaceOnly(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc)
+//{
+//	typedef typename VEC3::DATA_TYPE T ;
+//
+//	VEC3 u = Ta - P ;
+//	VEC3 v = Tb - P ;
+//	VEC3 w = Tc - P ;
+//	T x = tripleProduct(Dir, u, v) ;
+//	T y = tripleProduct(Dir, v, w) ;
+//	T z = tripleProduct(Dir, w, u) ;
+//	if((x < T(0) && y < T(0) && z < T(0)) || (x > T(0) && y > T(0) && z > T(0)))
+//		return FACE_INTERSECTION ;
+//	return NO_INTERSECTION ;
+//}
+
+
+template <typename VEC3>
+Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter)
+{
+	typedef typename VEC3::DATA_TYPE T ;
+
+	VEC3 u = Ta - P ;
+	VEC3 v = Tb - P ;
+	VEC3 w = Tc - P ;
+
+	T x = tripleProduct(Dir, u, v) ;
+	T y = tripleProduct(Dir, v, w) ;
+	T z = tripleProduct(Dir, w, u) ;
+
+	unsigned int np=0;
+	unsigned int nn=0;
+	unsigned int nz=0;
+
+	if (x>T(0))
+		++np;
+	else
+		if (x<T(0))
+			++nn;
+		else ++nz;
+
+	if (y>T(0))
+		++np;
+	else
+		if (y<T(0))
+			++nn;
+		else ++nz;
+
+	if (z>T(0))
+		++np;
+	else
+		if (z<T(0))
+			++nn;
+		else ++nz;
+
+	if ((np !=0) && (nn!=0))
+		return NO_INTERSECTION;
+
+	T sum = x + y + z ;
+	T alpha = y / sum ;
+	T beta = z / sum ;
+	T gamma = T(1) - alpha - beta ;
+	Inter = Ta * alpha + Tb * beta + Tc * gamma ;
+
+
+	return Intersection(FACE_INTERSECTION-nz);
+
+//	switch(nz)
+//	{
+//	case 0:
+//		{
+//			T sum = x + y + z ;
+//			T alpha = y / sum ;
+//			T beta = z / sum ;
+//			T gamma = T(1) - alpha - beta ;
+//			Inter = Ta * alpha + Tb * beta + Tc * gamma ;
+//			return FACE_INTERSECTION ;
+//		}
+//		break;
+//	case 1:
+//		return EDGE_INTERSECTION;
+//		break;
+//	case 2:
+//		return VERTEX_INTERSECTION;
+//		break;
+//	default:
+//		return NO_INTERSECTION;
+//		break;
+//	}
+//	// just for no warning compilation
+//	return NO_INTERSECTION;
+}
+
+
+
+template <typename VEC3>
+Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc)
+{
+	typedef typename VEC3::DATA_TYPE T ;
+
+	VEC3 u = Ta - P ;
+	VEC3 v = Tb - P ;
+	VEC3 w = Tc - P ;
+
+	T x = tripleProduct(Dir, u, v) ;
+	T y = tripleProduct(Dir, v, w) ;
+	T z = tripleProduct(Dir, w, u) ;
+
+	unsigned int np=0;
+	unsigned int nn=0;
+	unsigned int nz=0;
+
+	if (x>T(0))
+		++np;
+	else
+		if (x<T(0))
+			++nn;
+		else ++nz;
+
+	if (y>T(0))
+		++np;
+	else
+		if (y<T(0))
+			++nn;
+		else ++nz;
+
+	if (z>T(0))
+		++np;
+	else
+		if (z<T(0))
+			++nn;
+		else ++nz;
+
+	if ((np !=0) && (nn!=0))
+		return NO_INTERSECTION;
+
+	return Intersection(FACE_INTERSECTION-nz);
+
+}
+
 
 template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter)

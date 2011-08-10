@@ -59,10 +59,58 @@ Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& P
 
 
 /**
- * test the intersection between a ray and a triangle
+ * test the intersection between a ray and a triangle (optimized version with triple product
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param Ta triangle point 1
+ * @param Tb triangle point 2
+ * @param Tc triangle point 3
+ * @param Inter store the intersection point
+ * @return the intersection ( FACE_INTERSECTION / EDGE_INTERSECTION / VERTEX_INTERSECTION / NO_INTERSECTION)
  */
 template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
+
+/**
+ * test the intersection between a ray and a triangle (optimized version with triple product
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param Ta triangle point 1
+ * @param Tb triangle point 2
+ * @param Tc triangle point 3
+ * @param Inter store the intersection point
+ * @return the intersection ( FACE_INTERSECTION / EDGE_INTERSECTION / VERTEX_INTERSECTION / NO_INTERSECTION)
+ */
+template <typename VEC3>
+Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter);
+
+
+
+/**
+ * test the intersection between a ray and a triangle (optimized version with triple product
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param Ta triangle point 1
+ * @param Tb triangle point 2
+ * @param Tc triangle point 3
+ * @return the intersection ( FACE_INTERSECTION / EDGE_INTERSECTION / VERTEX_INTERSECTION / NO_INTERSECTION)
+ */
+template <typename VEC3>
+Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
+
+
+/**
+ * test the intersection between a ray and a triangle, but test only face intersection and
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param Ta triangle point 1
+ * @param Tb triangle point 2
+ * @param Tc triangle point 3
+ * @param Inter store the intersection point
+ * @return the intersection ( FACE_INTERSECTION / EDGE_INTERSECTION / VERTEX_INTERSECTION / NO_INTERSECTION)
+ */
+//template <typename VEC3>
+//Intersection intersectionRayTriangleFaceOnly(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc)
 
 /**
  * test the intersection between a line and a triangle

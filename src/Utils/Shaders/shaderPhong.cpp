@@ -30,74 +30,8 @@ namespace CGoGN
 
 namespace Utils
 {
-
-std::string ShaderPhong::vertexShaderText =
-"ATTRIBUTE vec3 VertexPosition, VertexNormal;\n"
-"#ifdef WITH_COLOR\n"
-"ATTRIBUTE vec3 VertexColor;\n"
-"#endif\n"
-"uniform mat4 ModelViewProjectionMatrix;\n"
-"uniform mat4 ModelViewMatrix;\n"
-"uniform mat4 NormalMatrix;\n"
-"uniform vec3 lightPosition;\n"
-"VARYING_VERT vec3 EyeVector, Normal, LightDir;\n"
-"#ifdef WITH_COLOR\n"
-"VARYING_VERT vec3 Color;\n"
-"#endif\n"
-"INVARIANT_POS;\n"
-"void main ()\n"
-"{\n"
-"	Normal = vec3 (NormalMatrix * vec4 (VertexNormal, 0.0));\n"
-" 	vec3 Position = vec3 (ModelViewMatrix * vec4 (VertexPosition, 1.0));\n"
-"	LightDir = lightPosition - Position;\n"
-"	EyeVector = -Position;\n"
-"	#ifdef WITH_COLOR\n"
-"	Color = VertexColor;\n"
-"	#endif\n"
-"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-"}";
-
-
-std::string ShaderPhong::fragmentShaderText =
-"PRECISON;\n"
-"VARYING_FRAG vec3 EyeVector, Normal, LightDir;\n"
-"#ifdef WITH_COLOR\n"
-"VARYING_FRAG vec3 Color;\n"
-"#endif\n"
-"uniform vec4 materialDiffuse;\n"
-"uniform vec4 materialSpecular;\n"
-"uniform vec4 materialAmbient;\n"
-"uniform float shininess;\n"
-"FRAG_OUT_DEF;\n"
-"void main()\n"
-"{\n"
-"	vec3 N = normalize (Normal);\n"
-"	vec3 L = normalize (LightDir);\n"
-"	float lambertTerm = dot(N,L);\n"
-
-"	vec4 finalColor = materialAmbient;\n"
-"	#ifdef DOUBLE_SIDED\n"
-"	if (lambertTerm < 0.0)\n"
-"	{\n"
-"		N = -1.0*N;\n"
-"		lambertTerm = -1.0*lambertTerm;\n"
-"	}\n"
-"	#else\n"
-"	if (lambertTerm > 0.0)\n"
-"	#endif\n"
-"	{\n"
-"		#ifndef WITH_COLOR\n"
-"		finalColor += materialDiffuse * lambertTerm;\n"
-"		#else\n"
-"		finalColor += vec4((Color*lambertTerm),0.0) ;\n"
-"		#endif\n"
-"		vec3 E = normalize(EyeVector);\n"
-"		vec3 R = reflect(-L, N);\n"
-"		float specular = pow( max(dot(R, E), 0.0), shininess );\n"
-"		finalColor += materialSpecular * specular;\n"
-"	}\n"
-"	gl_FragColor=finalColor;\n"
-"}";
+#include "shaderPhong.vert"
+#include "shaderPhong.frag"
 
 
 ShaderPhong::ShaderPhong(bool doubleSided):

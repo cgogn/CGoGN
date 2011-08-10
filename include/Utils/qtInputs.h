@@ -114,6 +114,26 @@ public:
 	void updateFrom(QWidget* widg) const;
 };
 
+
+/**
+ * Class for double input in dialog window (with spinbox)
+ * Use: VarBool(min,max,ref_to_val, "label" [,nextVar])
+ */
+class VarFloat: public Var
+{
+public:
+	float m_min;
+	float m_max;
+	float& m_val;
+
+public:
+	VarFloat(float min, float max, float& val, const std::string& label);
+	VarFloat(float min, float max, float& val, const std::string& label, const Var& var);
+	QWidget* createInput() const;
+	void updateFrom(QWidget* widg) const;
+};
+
+
 /**
  * Class for integer input in dialog window (with slider)
  * Use: VarBool(min,max,ref_to_val, "label" [,nextVar])

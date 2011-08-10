@@ -30,41 +30,44 @@ namespace CGoGN
 
 namespace Utils
 {
+#include "shaderVectorPerVertex.vert"
+#include "shaderVectorPerVertex.geom"
+#include "shaderVectorPerVertex.frag"
 
-std::string ShaderVectorPerVertex::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition;\n"
-		"ATTRIBUTE vec3 VertexVector;\n"
-		"VARYING_VERT vec3 VectorAttrib;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	VectorAttrib = VertexVector;\n"
-		"	gl_Position = vec4(VertexPosition, 1.0);\n"
-		"}";
-
-
-std::string ShaderVectorPerVertex::geometryShaderText =
-		"uniform float vectorScale;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"VARYING_IN vec3 VectorAttrib[];\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * POSITION_IN(0);\n"
-		"	EmitVertex();\n"
-		"	gl_Position = ModelViewProjectionMatrix * (POSITION_IN(0) + vec4(VectorAttrib[0] * vectorScale, 0.0));\n"
-		"	EmitVertex();\n"
-		"	EndPrimitive();\n"
-		"}";
-
-
-std::string ShaderVectorPerVertex::fragmentShaderText =
-		"PRECISON;\n"
-		"uniform vec4 vectorColor;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	gl_FragColor = vectorColor;\n"
-		"}";
+//std::string ShaderVectorPerVertex::vertexShaderText =
+//		"ATTRIBUTE vec3 VertexPosition;\n"
+//		"ATTRIBUTE vec3 VertexVector;\n"
+//		"VARYING_VERT vec3 VectorAttrib;\n"
+//		"INVARIANT_POS;\n"
+//		"void main ()\n"
+//		"{\n"
+//		"	VectorAttrib = VertexVector;\n"
+//		"	gl_Position = vec4(VertexPosition, 1.0);\n"
+//		"}";
+//
+//
+//std::string ShaderVectorPerVertex::geometryShaderText =
+//		"uniform float vectorScale;\n"
+//		"uniform mat4 ModelViewProjectionMatrix;\n"
+//		"VARYING_IN vec3 VectorAttrib[];\n"
+//		"void main()\n"
+//		"{\n"
+//		"	gl_Position = ModelViewProjectionMatrix * POSITION_IN(0);\n"
+//		"	EmitVertex();\n"
+//		"	gl_Position = ModelViewProjectionMatrix * (POSITION_IN(0) + vec4(VectorAttrib[0] * vectorScale, 0.0));\n"
+//		"	EmitVertex();\n"
+//		"	EndPrimitive();\n"
+//		"}";
+//
+//
+//std::string ShaderVectorPerVertex::fragmentShaderText =
+//		"PRECISON;\n"
+//		"uniform vec4 vectorColor;\n"
+//		"FRAG_OUT_DEF;\n"
+//		"void main()\n"
+//		"{\n"
+//		"	gl_FragColor = vectorColor;\n"
+//		"}";
 
 
 ShaderVectorPerVertex::ShaderVectorPerVertex() :

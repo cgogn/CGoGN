@@ -26,6 +26,10 @@
 #include "Topology/generic/cellmarker.h"
 #include "Utils/vbo.h"
 
+#include "Topology/generic/attributeHandler.h"
+#include "Geometry/intersection.h"
+#include "Algo/Geometry/normal.h"
+
 namespace CGoGN
 {
 
@@ -38,12 +42,242 @@ namespace Render
 namespace GL2
 {
 
+
+inline bool MapRender::cmpVP(VertexPoly* lhs, VertexPoly* rhs)
+{
+	 return lhs->value < rhs->value;
+}
+
+
+template<typename PFP>
+void MapRender::recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex)
+{
+	VertexPoly* vprev = vp->prev;
+	VertexPoly* vp2 = vp->next;
+	VertexPoly* vnext = vp2->next;
+	const typename PFP::VEC3& Ta = position[vp->id];
+	const typename PFP::VEC3& Tb = position[vp2->id];
+	const typename PFP::VEC3& Tc = position[vprev->id];
+	const typename PFP::VEC3& Td = position[vnext->id];
+
+	// compute angle
+	typename PFP::VEC3 v1= Tb - Ta;
+	typename PFP::VEC3 v2= Tc - Ta;
+	typename PFP::VEC3 v3= Td - Tb;
+
+	v1.normalize();
+	v2.normalize();
+	v3.normalize();
+
+	float dotpr1 = 1.0f - (v1*v2);
+	float dotpr2 = 1.0f + (v1*v3);
+
+	if (!convex)	// if convex no need to test if vertex is an ear (yes)
+	{
+		typename PFP::VEC3 nv1 = v1^v2;
+		typename PFP::VEC3 nv2 = v1^v3;
+
+		if (nv1*normalPoly < 0.0)
+			dotpr1 = 10.0f - dotpr1;// not an ears  (concave)
+		if (nv2*normalPoly < 0.0)
+			dotpr2 = 10.0f - dotpr2;// not an ears  (concave)
+
+		bool finished = false;
+		for (VPMS::reverse_iterator it = ears.rbegin(); (!finished)&&(it != ears.rend())&&((*it)->value > 5.0f); ++it)
+		{
+			int id = (*it)->id;
+			const typename PFP::VEC3& P = position[id];
+//			typename PFP::VEC3 inter;
+
+			if ((dotpr1 != 5.0f) && (id !=vprev->id))
+				if (Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(P, normalPoly, Ta,Tb,Tc) > Geom::VERTEX_INTERSECTION)
+
+
+					dotpr1 = 5.0f;// not an ears !
+
+			if ((dotpr2 != 5.0f) && (id !=vnext->id) )
+				if (Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(P, normalPoly, Tb,Td,Ta) > Geom::VERTEX_INTERSECTION)
+					dotpr2 = 5.0f;// not an ears !
+
+			finished = ((dotpr1 == 5.0f)&&(dotpr2 == 5.0f));
+		}
+	}
+
+	vp->value  = dotpr1;
+	vp->ear = ears.insert(vp);
+	vp2->value = dotpr2;
+	vp2->ear = ears.insert(vp2);
+}
+
+
+template<typename PFP>
+float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2,  const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly)
+{
+	typename PFP::VEC3 v1 = P1-P2;
+	typename PFP::VEC3 v2 = P3-P2;
+	v1.normalize();
+	v2.normalize();
+
+	float dotpr = 1.0f - (v1*v2);
+
+	typename PFP::VEC3 vn = v1^v2;
+	if (vn*normalPoly > 0.0f)
+		dotpr = 10.0f - dotpr; 		// not an ears  (concave, store at the end for optimized use for intersections)
+
+	return dotpr;
+}
+
+
+template<typename PFP>
+bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
+{
+	VertexPoly* endV = vp->prev;
+	VertexPoly* curr = vp->next;
+	const typename PFP::VEC3& Ta = position[vp->id];
+	const typename PFP::VEC3& Tb = position[curr->id];
+	const typename PFP::VEC3& Tc = position[endV->id];
+	curr = curr->next;
+
+	while (curr != endV)
+	{
+//		typename PFP::VEC3 inter;
+		Geom::Intersection res = Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(position[curr->id], normalPoly, Ta,Tb,Tc);
+		if (res > Geom::VERTEX_INTERSECTION)
+		{
+			vp->value = 5.0f;// not an ears !
+			return false;
+		}
+		curr = curr->next;
+	}
+
+	return true;
+}
+
+
+template<typename PFP>
+inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
+{
+
+	bool(*fn_pt)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
+	VPMS ears(fn_pt);
+
+	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX,"position");
+
+	// compute normal to polygon
+	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(map, d, position);
+
+	// first pass create polygon in chained list witht angle computation
+	VertexPoly* vpp=NULL;
+	VertexPoly* prem=NULL;
+	unsigned int nbv = 0;
+	unsigned int nbe = 0;
+	Dart a = d;
+	Dart b = map.phi1(a);
+	Dart c = map.phi1(b);
+	do
+	{
+//		typename PFP::VEC3 v1= position[map.getEmbedding(VERTEX,a)]-position[map.getEmbedding(VERTEX,b)];
+//		typename PFP::VEC3 v2= position[map.getEmbedding(VERTEX,c)]-position[map.getEmbedding(VERTEX,b)];
+//		typename PFP::VEC3 v3= position[map.getEmbedding(VERTEX,c)]-position[map.getEmbedding(VERTEX,a)];
+		typename PFP::VEC3 P1= position[map.getEmbedding(VERTEX,a)];
+		typename PFP::VEC3 P2= position[map.getEmbedding(VERTEX,b)];
+		typename PFP::VEC3 P3= position[map.getEmbedding(VERTEX,c)];
+
+		float val = computeEarAngle<PFP>(P1,P2,P3,normalPoly);
+		VertexPoly* vp = new VertexPoly(map.getEmbedding(VERTEX,b),val,vpp);
+		if (vp->value <5.0f)
+			nbe++;
+		if (vpp==NULL)
+			prem = vp;
+		vpp = vp;
+		a = b;
+		b = c;
+		c = map.phi1(c);
+		nbv++;
+	}while (a!=d);
+
+	VertexPoly::close(prem,vpp);
+
+//	bool convex = nbe==nbv;
+	bool convex = false;
+	if (convex)
+	{
+		// second pass with no test of intersections with polygons
+		vpp = prem;
+		for (unsigned int i=0; i< nbv; ++i)
+		{
+			vpp->ear = ears.insert(vpp);
+			vpp = vpp->next;
+		}
+	}
+	else
+	{
+		// second pass test intersections with polygons
+		vpp = prem;
+		for (unsigned int i=0; i< nbv; ++i)
+		{
+			if (vpp->value <5.0f)
+			{
+				computeEarIntersection<PFP>(position,vpp,normalPoly);
+			}
+			vpp->ear = ears.insert(vpp);
+			vpp = vpp->next;
+		}
+	}
+
+// 	DBG: AFF ears
+//	for (std::multimap< float, VertexPoly* >::iterator it = ears.begin(); it != ears.end(); ++it )
+//		std::cout << it->first <<" , "<< it->second->id<<" , "<< it->second->value<< " / ";
+//	std::cout << std::endl;
+
+	// NO WE HAVE THE POLYGON AND EARS
+	// LET'S REMOVE THEM
+	while (nbv>3)
+	{
+		// take best (and valid!) ear
+		VPMS::iterator be_it = ears.begin(); // best ear is big value cos -> last in map
+		VertexPoly* be = *be_it;
+
+		tableIndices.push_back(be->id);
+		tableIndices.push_back(be->next->id);
+		tableIndices.push_back(be->prev->id);
+
+		//remove 3 ears
+		ears.erase(be_it);					// from map of ears
+		ears.erase(be->next->ear);
+		ears.erase(be->prev->ear);
+
+		be = VertexPoly::erase(be); 	// and remove ear vertex from polygon
+		nbv--;
+
+		if (nbv>3)	// do not recompute if only one triangle left
+			recompute2Ears<PFP>(position,be,normalPoly,ears,convex);
+		else		// finish
+		{
+			tableIndices.push_back(be->id);
+			tableIndices.push_back(be->next->id);	// last triangle
+			tableIndices.push_back(be->prev->id);
+			// release memory of last triangle in polygon
+			delete be->next;
+			delete be->prev;
+			delete be;
+		}
+	}
+}
+
+
 template<typename PFP>
 inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
 {
 	Dart a = d;
 	Dart b = map.phi1(a);
 	Dart c = map.phi1(b);
+
+	if (map.phi1(c) != a)
+	{
+		addEarTri<PFP>(map, d, tableIndices);	//TODO version optimisee pour 4 cotes  ?
+		return;
+	}
 
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
 	do

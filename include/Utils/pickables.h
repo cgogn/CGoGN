@@ -104,10 +104,11 @@ public:
 	 * picking
 	 * @param P camera point
 	 * @param V vector ray direction
+	 * @param I intersection point (out) for Z sorting
 	 * @param epsilon distance epsilon for picking
 	 * @return code picking (0: nothing picked / != 0 something picked)
 	 */
-	virtual unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f) = 0;
+	virtual unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon=0.0f) = 0;
 
 	/**
 	 * update the precision of drawing
@@ -153,10 +154,11 @@ public:
 	 * picking
 	 * @param P camera point
 	 * @param V vector ray direction
+	 * @param I intersection point (out) for Z sorting
 	 * @param epsilon distance epsilon for picking
-//	 * @return picked ?
+	 * @return picked
 	 */
-	bool pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
+	bool pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon=0.0f);
 
 	/**
 	 * apply inverse transfo on picking ray
@@ -280,7 +282,7 @@ public:
 	/**
 	 * picking
 	 */
-	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
+	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon=0.0f);
 
 	/**
 	 * return a string with shape of object
@@ -323,7 +325,7 @@ public:
 	/**
 	 * picking
 	 */
-	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
+	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon=0.0f);
 
 	/**
 	 * return a string with shape of object
@@ -360,7 +362,7 @@ public:
 	/**
 	 * picking
 	 */
-	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
+	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V,  Geom::Vec3f& I, float epsilon=0.0f);
 
 	/**
 	 * return a string with shape of object
@@ -397,7 +399,7 @@ public:
 	/**
 	 * picking
 	 */
-	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
+	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon=0.0f);
 
 	/**
 	 * return a string with shape of object
@@ -441,7 +443,7 @@ public:
 	/**
 	 * picking
 	 */
-	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, float epsilon=0.0f);
+	unsigned int pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3f& I, float epsilon=0.0f);
 
 	/**
 	 * return a string with shape of object

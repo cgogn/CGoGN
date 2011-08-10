@@ -32,32 +32,35 @@ namespace CGoGN
 namespace Utils
 {
 
-std::string ShaderTextureMask::vertexShaderText =
-		"ATTRIBUTE vec3 VertexPosition;\n"
-		"ATTRIBUTE vec2 VertexTexCoord;\n"
-		"uniform mat4 ModelViewProjectionMatrix;\n"
-		"VARYING_VERT vec2 texCoord;\n"
-		"INVARIANT_POS;\n"
-		"void main ()\n"
-		"{\n"
-		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
-		"	texCoord = VertexTexCoord;\n"
-		"}";
+#include "shaderTextureMask.vert"
+#include "shaderTextureMask.frag"
 
-
-std::string ShaderTextureMask::fragmentShaderText =
-		"PRECISON;\n"
-		"VARYING_FRAG vec2 texCoord;\n"
-		"uniform sampler2D textureUnit;\n"
-		"uniform sampler2D textureUnitMask;\n"
-		"FRAG_OUT_DEF;\n"
-		"void main()\n"
-		"{\n"
-		"	float m = texture2D(textureUnitMask,texCoord).r;\n"
-		"	if (m < 0.5)"
-		"		discard;"
-		"	gl_FragColor=texture2D(textureUnit,texCoord)*m;\n"
-		"}";
+//std::string ShaderTextureMask::vertexShaderText =
+//		"ATTRIBUTE vec3 VertexPosition;\n"
+//		"ATTRIBUTE vec2 VertexTexCoord;\n"
+//		"uniform mat4 ModelViewProjectionMatrix;\n"
+//		"VARYING_VERT vec2 texCoord;\n"
+//		"INVARIANT_POS;\n"
+//		"void main ()\n"
+//		"{\n"
+//		"	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);\n"
+//		"	texCoord = VertexTexCoord;\n"
+//		"}";
+//
+//
+//std::string ShaderTextureMask::fragmentShaderText =
+//		"PRECISON;\n"
+//		"VARYING_FRAG vec2 texCoord;\n"
+//		"uniform sampler2D textureUnit;\n"
+//		"uniform sampler2D textureUnitMask;\n"
+//		"FRAG_OUT_DEF;\n"
+//		"void main()\n"
+//		"{\n"
+//		"	float m = texture2D(textureUnitMask,texCoord).r;\n"
+//		"	if (m < 0.5)"
+//		"		discard;"
+//		"	gl_FragColor=texture2D(textureUnit,texCoord)*m;\n"
+//		"}";
 
 
 ShaderTextureMask::ShaderTextureMask()
