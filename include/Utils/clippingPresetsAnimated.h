@@ -127,9 +127,10 @@ public :
 	 * @param size distance between planes
 	 * @param axis axis on which planes are aligned (0 for x, 1 for y, 2 for z)
 	 * @param facing true means having facing planes
+	 * @param zigzag true to enable zigzag mode
 	 */
 	ClippingPresetAnimatedDualPlanes(
-			Geom::Vec3f centerStart, Geom::Vec3f centerEnd, float size, int axis, bool facing);
+			Geom::Vec3f centerStart, Geom::Vec3f centerEnd, float size, int axis, bool facing, bool zigzag);
 
 	/**
 	 * runs the animation some steps further
@@ -147,6 +148,9 @@ private :
 
 	/// end point of the animation
 	Geom::Vec3f m_endPoint;
+
+	/// zigzag mode ?
+	bool m_zigzag;
 
 };
 

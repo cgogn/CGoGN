@@ -447,6 +447,7 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 		 	double size = (double)m_bb.maxSize()*0.1;
 		 	int axis = 0;
 		 	bool facing = false;
+		 	bool zigzag = false;
 		 	if (inputValues(VarDbl(centerStartX - 100.0, centerStartX + 100.0, centerStartX, "Center Start X",
 		 					VarDbl(centerStartY - 100.0, centerStartY + 100.0, centerStartY, "Center Start Y",
 		 					VarDbl(centerStartZ - 100.0, centerStartZ + 100.0, centerStartZ, "Center Start Z",
@@ -455,11 +456,12 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 		 					VarDbl(centerEndZ - 100.0, centerEndZ + 100.0, centerEndZ, "Center End Z",
 		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
 		 					VarSlider(0, 2, axis, "Axis",
-		 					VarBool(facing, "Facing"
-		 				))))))))), "Preset Setup"))
+		 					VarBool(facing, "Facing",
+		 					VarBool(zigzag, "Zigzag"
+		 				)))))))))), "Preset Setup"))
 		 		preset = new Utils::ClippingPresetAnimatedDualPlanes(
 		 				Geom::Vec3f((float)centerStartX, (float)centerStartY, (float)centerStartZ), Geom::Vec3f((float)centerEndX, (float)centerEndY, (float)centerEndZ),
-		 				(float)size, axis, facing);
+		 				(float)size, axis, facing, zigzag);
 
 		 	animatedPreset = preset;
 		 	}

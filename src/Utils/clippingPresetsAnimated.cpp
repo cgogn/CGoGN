@@ -65,13 +65,14 @@ void ClippingPresetAnimated::apply(ClippingShader* clipShader, std::vector<unsig
 
 
 ClippingPresetAnimatedDualPlanes::ClippingPresetAnimatedDualPlanes(
-		Geom::Vec3f centerStart, Geom::Vec3f centerEnd, float size, int axis, bool facing)
+		Geom::Vec3f centerStart, Geom::Vec3f centerEnd, float size, int axis, bool facing, bool zigzag)
 {
 	// Store the animation settings
 	m_dirVec = centerEnd - centerStart;
 	m_dirVec.normalize();
 	m_startPoint = centerStart;
 	m_endPoint = centerEnd;
+	m_zigzag = zigzag;
 
 	// Correct axis if necessary
 	if ((axis < 0) || (axis > 2))
@@ -123,10 +124,29 @@ void ClippingPresetAnimatedDualPlanes::step(unsigned int amount)
 
 	// Update animation parameter value
 	m_animParam += (float)amount * m_animationOneStepIncrement * m_animationSpeedFactor;
-	while (m_animParam < 0.0f)
-		m_animParam += 1.0f;
-	while (m_animParam > 1.0f)
-		m_animParam -= 1.0f;
+	if (!m_zigzag)
+	{
+		while (m_animParam < 0.0f)
+			m_animParam += 1.0f;
+		while (m_animParam > 1.0f)
+			m_animParam -= 1.0f;
+	}
+	else
+	{
+		while ( (m_animParam < 0.0f) || (m_animParam > 1.0f) )
+		{
+			if (m_animParam < 0.0f)
+			{
+				m_animParam = -m_animParam;
+				m_animationOneStepIncrement = -m_animationOneStepIncrement;
+			}
+			else if (m_animParam > 1.0f)
+			{
+				m_animParam = 1.0f - (m_animParam - 1.0f);
+				m_animationOneStepIncrement = -m_animationOneStepIncrement;
+			}
+		}
+	}
 
 	// Calculate new center
 	Geom::Vec3f newCenter = (1.0f - m_animParam)*m_startPoint + m_animParam*m_endPoint;
