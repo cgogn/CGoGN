@@ -29,12 +29,12 @@
  *														MISCELLANOUS
  *******************************************************************************/
 
-void computeBasisFromVector(const Geom::Vec3f& vec1, Geom::Vec3f& vec2, Geom::Vec3f& vec3)
+void computeBasisFromVector(const Geom::Vec3f& inVec1, Geom::Vec3f& vec2, Geom::Vec3f& vec3)
 {
-	const float epsilon = 0.0001f;
+	const float epsilon = 0.000001f;
 
 	// Check if the given vector length is acceptable
-	if (vec1.norm() < epsilon)
+	if (inVec1.norm() < epsilon)
 		return;
 
 	// First take a non colinear second vector to cross product with vec1
@@ -42,17 +42,49 @@ void computeBasisFromVector(const Geom::Vec3f& vec1, Geom::Vec3f& vec2, Geom::Ve
 	Geom::Vec3f tempVec (0.0, 0.0, 1.0);
 
 	// Construct second vector, check other vectors non colinearity at the same time
-	vec2 = vec1 ^ tempVec;
-	float sinAngle = vec2.norm() / (vec1.norm() + tempVec.norm());
+	vec2 = inVec1 ^ tempVec;
+	float sinAngle = vec2.norm() / (inVec1.norm()*tempVec.norm());
 	if (sinAngle < epsilon) // f:x->sin(x) ~ f:x->x when x ~ 0
 	{
 		tempVec = Geom::Vec3f (1.0, 0.0, 0.0);
-		vec2 = vec1 ^ tempVec;
+		vec2 = inVec1 ^ tempVec;
 	}
 
-	// Get third vector
-	vec3 = vec1 ^ vec2;
+	// Normalize second vector
+	vec2.normalize();
 
+	// Get third vector
+	vec3 = inVec1 ^ vec2;
+
+	// Normalize third vector
+	vec3.normalize();
+
+}
+
+void Clipping::updatePickables()
+{
+	for (size_t i = 0; i < m_pickablePlanes.size(); i++)
+	{
+		unsigned int id = m_pickablePlanes[i]->id();
+		Geom::Vec3f pos = m_shader->getClipPlaneParamsOrigin(id);
+		Geom::Vec3f vec1, vec2, vec3;
+		vec1 = m_shader->getClipPlaneParamsNormal(id);
+		computeBasisFromVector(vec1, vec2, vec3);
+		glm::mat4& transfoMat = m_pickablePlanes[i]->transfo();
+		for (int j = 0; j < 3; j++)
+		{
+			transfoMat[0][j] = vec2[j];
+			transfoMat[1][j] = vec3[j];
+			transfoMat[2][j] = vec1[j];
+			transfoMat[3][j] = pos[j];
+		}
+	}
+	for (size_t i = 0; i < m_pickableSpheres.size(); i++)
+	{
+		unsigned int id = m_pickableSpheres[i]->id();
+		m_pickableSpheres[i]->translate(m_shader->getClipSphereParamsCenter(id));
+		m_pickableSpheres[i]->scale(m_shader->getClipSphereParamsRadius(id));
+	}
 }
 
 /*******************************************************************************
@@ -247,6 +279,8 @@ void Clipping::slot_pushButton_deleteSelectedObject()
 			}
 		}
 		m_lastPickedObject = NULL;
+		m_frameManipulator->highlight(m_frameManipulatorPickedAxis);
+		m_frameManipulatorPickedAxis = 0;
 
 		// Update shader sources edits
 		dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
@@ -257,11 +291,11 @@ void Clipping::slot_pushButton_deleteSelectedObject()
 	}
 }
 
-void Clipping::slot_pushButton_applyClippingPreset()
+void Clipping::slot_pushButton_applyStaticClippingPreset()
 {
 	// Create and apply preset
 	Utils::ClippingPreset *preset = NULL;
-	switch (dock.comboBox_ClippingPresets->currentIndex())
+	switch (dock.comboBox_StaticClippingPresets->currentIndex())
 	{
 		case 0 : // Dual planes
 		 	{
@@ -347,6 +381,10 @@ void Clipping::slot_pushButton_applyClippingPreset()
 		 	}
 			break;
 	}
+
+	if (preset == NULL)
+		return;
+
 	std::vector<unsigned int> planesIds;
 	std::vector<unsigned int> spheresIds;
 	preset->apply(m_shader, &planesIds, &spheresIds);
@@ -365,28 +403,14 @@ void Clipping::slot_pushButton_applyClippingPreset()
 	for (size_t i = 0; i < planesIds.size(); i++)
 	{
 		Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, planesIds[i]);
-		pickable->translate(m_shader->getClipPlaneParamsOrigin(planesIds[i]));
-		Geom::Vec3f vec1, vec2, vec3;
-		vec1 = m_shader->getClipPlaneParamsNormal(planesIds[i]);
-		computeBasisFromVector(vec1, vec2, vec3);
-		glm::mat4& transfoMat = pickable->transfo();
-		for (int i = 0; i < 3; i++)
-		{
-			transfoMat[0][i] = vec2[i];
-			transfoMat[1][i] = vec3[i];
-			transfoMat[2][i] = vec1[i];
-		}
-
 		m_pickablePlanes.push_back(pickable);
 	}
 	for (size_t i = 0; i < spheresIds.size(); i++)
 	{
 		Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, spheresIds[i]);
-		pickable->translate(m_shader->getClipSphereParamsCenter(spheresIds[i]));
-		pickable->scale(m_shader->getClipSphereParamsRadius(spheresIds[i]));
-
 		m_pickableSpheres.push_back(pickable);
 	}
+	updatePickables();
 
 	// Update shader sources edits
 	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
@@ -401,6 +425,124 @@ void Clipping::slot_pushButton_applyClippingPreset()
 
 
 	updateGLMatrices();
+}
+
+void Clipping::slot_pushButton_applyAnimatedClippingPreset()
+{
+	// Create and apply preset
+	Utils::ClippingPresetAnimated *animatedPreset = NULL;
+	switch (dock.comboBox_AnimatedClippingPresets->currentIndex())
+	{
+		case 0 : // Moving Dual planes
+		 	{
+		 	Utils::ClippingPresetAnimatedDualPlanes *preset = NULL;
+		 	using namespace CGoGN::Utils::QT;
+
+		 	double centerStartX = (double)m_bb.center()[0] - (double)m_bb.size(0)*0.25;
+		 	double centerStartY = (double)m_bb.center()[1];
+		 	double centerStartZ = (double)m_bb.center()[2];
+		 	double centerEndX = (double)m_bb.center()[0] + (double)m_bb.size(0)*0.25;
+		 	double centerEndY = (double)m_bb.center()[1];
+		 	double centerEndZ = (double)m_bb.center()[2];
+		 	double size = (double)m_bb.maxSize()*0.1;
+		 	int axis = 0;
+		 	bool facing = false;
+		 	if (inputValues(VarDbl(centerStartX - 100.0, centerStartX + 100.0, centerStartX, "Center Start X",
+		 					VarDbl(centerStartY - 100.0, centerStartY + 100.0, centerStartY, "Center Start Y",
+		 					VarDbl(centerStartZ - 100.0, centerStartZ + 100.0, centerStartZ, "Center Start Z",
+		 					VarDbl(centerEndX - 100.0, centerEndX + 100.0, centerEndX, "Center End X",
+		 					VarDbl(centerEndY - 100.0, centerEndY + 100.0, centerEndY, "Center End Y",
+		 					VarDbl(centerEndZ - 100.0, centerEndZ + 100.0, centerEndZ, "Center End Z",
+		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 					VarSlider(0, 2, axis, "Axis",
+		 					VarBool(facing, "Facing"
+		 				))))))))), "Preset Setup"))
+		 		preset = new Utils::ClippingPresetAnimatedDualPlanes(
+		 				Geom::Vec3f((float)centerStartX, (float)centerStartY, (float)centerStartZ), Geom::Vec3f((float)centerEndX, (float)centerEndY, (float)centerEndZ),
+		 				(float)size, axis, facing);
+
+		 	animatedPreset = preset;
+		 	}
+			break;
+
+
+	}
+
+	if (animatedPreset == NULL)
+		return;
+
+	std::vector<unsigned int> planesIds;
+	std::vector<unsigned int> spheresIds;
+	animatedPreset->apply(m_shader, &planesIds, &spheresIds);
+
+	// Cleanup of pickables before adding new ones
+	m_lastPickedObject = NULL;
+	for (size_t i = 0; i < m_pickablePlanes.size(); i++)
+		delete m_pickablePlanes[i];
+	m_pickablePlanes.resize(0);
+	for (size_t i = 0; i < m_pickableSpheres.size(); i++)
+		delete m_pickableSpheres[i];
+	m_pickableSpheres.resize(0);
+
+	// Add new pickable objects
+	for (size_t i = 0; i < planesIds.size(); i++)
+	{
+		Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, planesIds[i]);
+		m_pickablePlanes.push_back(pickable);
+	}
+	for (size_t i = 0; i < spheresIds.size(); i++)
+	{
+		Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, spheresIds[i]);
+		m_pickableSpheres.push_back(pickable);
+	}
+	updatePickables();
+
+	// Update shader sources edits
+	dock.vertexEdit->setPlainText(QString(m_shader->getVertexShaderSrc()));
+	dock.fragmentEdit->setPlainText(QString(m_shader->getFragmentShaderSrc()));
+
+	// Update clipping parameters in interface
+	Utils::ClippingShader::clippingMode clipMode = m_shader->getClipMode();
+	if (clipMode == Utils::ClippingShader::CLIPPING_MODE_AND)
+		dock.radioButton_ClippingModeAnd->setChecked(true);
+	else if (clipMode == Utils::ClippingShader::CLIPPING_MODE_OR)
+		dock.radioButton_ClippingModeOr->setChecked(true);
+
+	// Set on animated mode
+	m_lastAnimatedClippingPreset = animatedPreset;
+	m_timer->start(1000.0f/60.0f);
+
+
+	updateGLMatrices();
+}
+
+void Clipping::slot_pushButton_StopAnimation()
+{
+	if (m_lastAnimatedClippingPreset != NULL)
+	{
+		delete m_lastAnimatedClippingPreset;
+		m_lastAnimatedClippingPreset = NULL;
+	}
+}
+
+void Clipping::slot_doubleSpinBox_AnimatedClippingPresetSpeed(double c)
+{
+	if (m_lastAnimatedClippingPreset != NULL)
+		m_lastAnimatedClippingPreset->setAnimationSpeedFactor((float)c);
+}
+
+void Clipping::slot_animationTimer()
+{
+	if (m_lastAnimatedClippingPreset == NULL)
+	{
+		m_timer->stop();
+		return;
+	}
+
+	m_lastAnimatedClippingPreset->step(1);
+	updatePickables();
+
+	updateGL();
 }
 
 void Clipping::button_compile()
@@ -427,7 +569,9 @@ Clipping::Clipping():
 	m_render(NULL),
 	m_render_topo(NULL),
 	m_positionVBO(NULL),
-	m_shader(NULL)
+	m_shader(NULL),
+	m_timer(NULL),
+	m_lastAnimatedClippingPreset(NULL)
 {
 	m_coeffTopoExplod = Geom::Vec3f(0.9,0.9,0.9);
 }
@@ -494,12 +638,24 @@ void Clipping::initGUI()
 		dock.radioButton_ColorAttenuationModeQuadratic->setChecked(true);
 
 
-	setCallBack(dock.PushButton_ApplyClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyClippingPreset()));
+	setCallBack(dock.PushButton_ApplyStaticClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyStaticClippingPreset()));
 
-	dock.comboBox_ClippingPresets->addItem("Dual Planes");
-	dock.comboBox_ClippingPresets->addItem("Cube");
-	dock.comboBox_ClippingPresets->addItem("Tube");
-	dock.comboBox_ClippingPresets->addItem("Molecule");
+	dock.comboBox_StaticClippingPresets->addItem("Dual Planes");
+	dock.comboBox_StaticClippingPresets->addItem("Cube");
+	dock.comboBox_StaticClippingPresets->addItem("Tube");
+	dock.comboBox_StaticClippingPresets->addItem("Molecule");
+
+
+	setCallBack(dock.PushButton_ApplyAnimatedClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyAnimatedClippingPreset()));
+
+	dock.comboBox_AnimatedClippingPresets->addItem("Moving Dual Planes");
+
+	setCallBack(dock.pushButton_StopAnimation, SIGNAL(clicked()), SLOT(slot_pushButton_StopAnimation()));
+	setCallBack(dock.doubleSpinBox_AnimatedClippingPresetSpeed, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_AnimatedClippingPresetSpeed(double)));
+
+	// timer used for animation
+	m_timer = new QTimer( this );
+	setCallBack( m_timer, SIGNAL(timeout()), SLOT(slot_animationTimer()) );
 
 }
 

@@ -196,12 +196,20 @@ int ClippingShader::getClipPlanesCount()
 	return (int)m_clipPlanes.size();
 }
 
+bool ClippingShader::isClipPlaneIdValid(unsigned int id)
+{
+	if (id > m_clipPlanesIds.size())
+		return false;
+	if (!m_clipPlanesIds[id].used)
+		return false;
+
+	return true;
+}
+
 void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f normal, Geom::Vec3f origin)
 {
 	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsAll"))
-		return;
-	if (errorRaiseWrongId(!m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsAll"))
+	if (errorRaiseWrongId(!isClipPlaneIdValid(id), "ClippingShader::setClipPlaneParamsAll"))
 		return;
 
 	// Get the corresponding plane index
@@ -230,9 +238,7 @@ void ClippingShader::setClipPlaneParamsAll(unsigned int id, Geom::Vec3f normal, 
 void ClippingShader::setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f normal)
 {
 	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsFirstVec"))
-		return;
-	if (errorRaiseWrongId(!m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsFirstVec"))
+	if (errorRaiseWrongId(!isClipPlaneIdValid(id), "ClippingShader::setClipPlaneParamsFirstVec"))
 		return;
 
 	// Get the corresponding plane index
@@ -259,9 +265,7 @@ void ClippingShader::setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f norma
 void ClippingShader::setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origin)
 {
 	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipPlanesIds.size()), "ClippingShader::setClipPlaneParamsOrigin"))
-		return;
-	if (errorRaiseWrongId(!m_clipPlanesIds[id].used, "ClippingShader::setClipPlaneParamsOrigin"))
+	if (errorRaiseWrongId(!isClipPlaneIdValid(id), "ClippingShader::setClipPlaneParamsOrigin"))
 		return;
 
 	// Get the corresponding plane index
@@ -490,12 +494,20 @@ int ClippingShader::getClipSpheresCount()
 	return (int)m_clipSpheres.size();
 }
 
+bool ClippingShader::isClipSphereIdValid(unsigned int id)
+{
+	if (id > m_clipSpheresIds.size())
+		return false;
+	if (!m_clipSpheresIds[id].used)
+		return false;
+
+	return true;
+}
+
 void ClippingShader::setClipSphereParamsAll(unsigned int id, Geom::Vec3f center, float radius)
 {
 	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::setClipSphereParamsAll"))
-		return;
-	if (errorRaiseWrongId(!m_clipSpheresIds[id].used, "ClippingShader::setClipSphereParamsAll"))
+	if (errorRaiseWrongId(!isClipSphereIdValid(id), "ClippingShader::setClipSphereParamsAll"))
 		return;
 
 	// Get the corresponding sphere index
@@ -520,9 +532,7 @@ void ClippingShader::setClipSphereParamsAll(unsigned int id, Geom::Vec3f center,
 void ClippingShader::setClipSphereParamsCenter(unsigned int id, Geom::Vec3f center)
 {
 	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::setClipSphereParamsCenter"))
-		return;
-	if (errorRaiseWrongId(!m_clipSpheresIds[id].used, "ClippingShader::setClipSphereParamsCenter"))
+	if (errorRaiseWrongId(!isClipSphereIdValid(id), "ClippingShader::setClipSphereParamsCenter"))
 		return;
 
 	// Get the corresponding sphere index
@@ -545,9 +555,7 @@ void ClippingShader::setClipSphereParamsCenter(unsigned int id, Geom::Vec3f cent
 void ClippingShader::setClipSphereParamsRadius(unsigned int id, float radius)
 {
 	// Check if the given id is valid
-	if (errorRaiseWrongId(id > (m_clipSpheresIds.size()), "ClippingShader::setClipSphereParamsRadius"))
-		return;
-	if (errorRaiseWrongId(!m_clipSpheresIds[id].used, "ClippingShader::setClipSphereParamsRadius"))
+	if (errorRaiseWrongId(!isClipSphereIdValid(id), "ClippingShader::setClipSphereParamsRadius"))
 		return;
 
 	// Get the corresponding sphere index

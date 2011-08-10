@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>374</width>
-    <height>783</height>
+    <height>780</height>
    </rect>
   </property>
   <property name="allowedAreas">
@@ -317,29 +317,6 @@
                </layout>
               </item>
               <item>
-               <layout class="QVBoxLayout" name="verticalLayout_7">
-                <item>
-                 <widget class="QGroupBox" name="groupBox_ClippingPresets">
-                  <property name="title">
-                   <string>Clipping Presets</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_12">
-                   <item>
-                    <widget class="QComboBox" name="comboBox_ClippingPresets"/>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="PushButton_ApplyClippingPreset">
-                     <property name="text">
-                      <string>Apply Preset</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
                <layout class="QVBoxLayout" name="verticalLayout_10">
                 <item>
                  <widget class="QGroupBox" name="groupBox_ColorAttenuation">
@@ -400,6 +377,108 @@
             </item>
             <item>
              <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_ClippingPresets">
+           <attribute name="title">
+            <string>Clipping Presets</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_14">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_13">
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_7">
+                <item>
+                 <widget class="QGroupBox" name="groupBox_StaticClippingPresets">
+                  <property name="title">
+                   <string>Static Clipping Presets</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_12">
+                   <item>
+                    <widget class="QComboBox" name="comboBox_StaticClippingPresets"/>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="PushButton_ApplyStaticClippingPreset">
+                     <property name="text">
+                      <string>Apply Static Preset</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <widget class="QGroupBox" name="groupBox_AnimatedClippingPresets">
+                  <property name="title">
+                   <string>Animated Clipping Presets</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_16">
+                   <item>
+                    <widget class="QComboBox" name="comboBox_AnimatedClippingPresets"/>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="PushButton_ApplyAnimatedClippingPreset">
+                     <property name="text">
+                      <string>Apply Animated Preset</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButton_StopAnimation">
+                     <property name="text">
+                      <string>Stop Animation</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QGroupBox" name="groupBox_AnimatedClippingPresetSpeed">
+                     <property name="title">
+                      <string>Speed Factor</string>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_17">
+                      <item>
+                       <widget class="QDoubleSpinBox" name="doubleSpinBox_AnimatedClippingPresetSpeed">
+                        <property name="minimum">
+                         <double>-10.000000000000000</double>
+                        </property>
+                        <property name="maximum">
+                         <double>10.000000000000000</double>
+                        </property>
+                        <property name="singleStep">
+                         <double>0.100000000000000</double>
+                        </property>
+                        <property name="value">
+                         <double>1.000000000000000</double>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>

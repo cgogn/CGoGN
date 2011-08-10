@@ -53,6 +53,7 @@
 #include "Utils/frameManipulator.h"
 
 #include "Utils/clippingPresets.h"
+#include "Utils/clippingPresetsAnimated.h"
 
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
@@ -107,6 +108,7 @@ public:
 
 	//QT
 	Utils::QT::uiDockInterface dock;
+	QTimer *m_timer;
 
 	// Picking
 	Utils::LineDrawable* m_planeDrawable;
@@ -117,6 +119,9 @@ public:
 	std::vector<Utils::Pickable*> m_pickableSpheres;
 	Utils::Pickable* m_lastPickedObject;
 	int m_lastClickedX, m_lastClickedY;
+
+	// Clipping
+	Utils::ClippingPresetAnimated *m_lastAnimatedClippingPreset;
 
 	Clipping();
 
@@ -129,6 +134,7 @@ public:
 	void cb_mouseMove(int buttons, int x, int y);
 	void cb_keyPress(int code);
 	void importMesh(std::string& filename);
+	void updatePickables();
 
 public slots:
 	void slot_drawVertices(bool b);
@@ -156,7 +162,13 @@ public slots:
 
 	void slot_pushButton_deleteSelectedObject();
 
-	void slot_pushButton_applyClippingPreset();
+	void slot_pushButton_applyStaticClippingPreset();
+
+	void slot_pushButton_applyAnimatedClippingPreset();
+	void slot_pushButton_StopAnimation();
+	void slot_doubleSpinBox_AnimatedClippingPresetSpeed(double c);
+
+	void slot_animationTimer();
 
 	void button_compile();
 };

@@ -129,7 +129,7 @@ ClippingPreset* ClippingPreset::CreateTubePreset(Geom::Vec3f center, float size,
 		side = -1.0f;
 
 	// Add planes to preset
-	Geom::Vec3f direction (0.0, 0.0, 0.0);
+	Geom::Vec3f direction (0.0f, 0.0f, 0.0f);
 	float dAngle = 2.0f * M_PI / precision;
 	for (int i = 0; i < precision; i++)
 	{
