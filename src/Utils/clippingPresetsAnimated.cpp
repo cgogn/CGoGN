@@ -158,6 +158,60 @@ void ClippingPresetAnimatedDualPlanes::step(unsigned int amount)
 	m_attachedClippingShader->setClipPlaneParamsOrigin(m_planesIds[1], plane2CurrPos + newCenter - oldCenter);
 }
 
+
+ClippingPresetAnimatedRotatingPlane::ClippingPresetAnimatedRotatingPlane(Geom::Vec3f center, int axis)
+{
+	// Correct axis if necessary and store it
+	if ((axis < 0) || (axis > 2))
+		axis = 0;
+	m_axis = axis;
+
+	// Axis on which planes will be aligned
+	Geom::Vec3f normal (0.0f, 0.0f, 0.0f);
+	normal[(axis + 1) % 3] = 1.0f;
+
+	// Add plane to preset
+	addClipPlane(normal, center);
+
+	// Set clipping mode
+	setClippingMode(ClippingShader::CLIPPING_MODE_AND);
+}
+
+void ClippingPresetAnimatedRotatingPlane::step(unsigned int amount)
+{
+	// Check if the animation has been stopped
+	if (m_animationSpeedFactor == 0.0f)
+		return;
+
+	// Check the validity of planes or spheres ids
+	if (!m_attachedClippingShader->isClipPlaneIdValid(m_planesIds[0]))
+	{
+		CGoGNerr
+		<< "ERROR -"
+		<< "ClippingPresetAnimatedDualPlanes::step"
+		<< " - Some planes or spheres ids are not valid anymore - Animation stopped"
+		<< CGoGNendl;
+		m_animationSpeedFactor = 0.0f;
+		return;
+	}
+
+	// Update animation parameter value
+	m_animParam += (float)amount * m_animationOneStepIncrement * m_animationSpeedFactor;
+	while (m_animParam < 0.0f)
+		m_animParam += 1.0f;
+	while (m_animParam > 1.0f)
+		m_animParam -= 1.0f;
+
+	// Calculate new normal
+	Geom::Vec3f planeNormal = m_attachedClippingShader->getClipPlaneParamsNormal(m_planesIds[0]);
+	float angle = m_animParam*2.0*M_PI;
+	planeNormal[(m_axis + 1) % 3] = cos(angle);
+	planeNormal[(m_axis + 2) % 3] = sin(angle);
+	m_attachedClippingShader->setClipPlaneParamsNormal(m_planesIds[0], planeNormal);
+
+
+}
+
 } // namespace Utils
 
 } // namespace CGoGN

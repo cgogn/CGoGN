@@ -28,6 +28,7 @@
 #include "Utils/clippingPresets.h"
 #include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
+#include <cmath>
 
 namespace CGoGN
 {
@@ -151,6 +152,31 @@ private :
 
 	/// zigzag mode ?
 	bool m_zigzag;
+
+};
+
+class ClippingPresetAnimatedRotatingPlane : public ClippingPresetAnimated
+{
+
+public :
+
+	/**
+	 * constructor
+	 * @param center center of plane
+	 * @param axis axis on which plane is aligned (0 for x, 1 for y, 2 for z)
+	 */
+	ClippingPresetAnimatedRotatingPlane(Geom::Vec3f center, int axis);
+
+	/**
+	 * runs the animation some steps further
+	 * @param amount amount of steps the animation should do
+	 */
+	void step(unsigned int amount);
+
+private :
+
+	/// axis of plane
+	int m_axis;
 
 };
 

@@ -138,6 +138,10 @@ void Clipping::slot_explodTopoPhi3(double c)
 
 void Clipping::slot_pushButton_addPlane()
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	// Create clipping and pickable objects
 	unsigned int newPlaneId = m_shader->addClipPlane();
 	Utils::Pickable* pickable = new Utils::Pickable(m_planeDrawable, newPlaneId);
@@ -176,6 +180,10 @@ void Clipping::slot_pushButton_changePlanesColor()
 
 void Clipping::slot_pushButton_addSphere()
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	// Create clipping and pickable objects
 	unsigned int newSphereId = m_shader->addClipSphere();
 	Utils::Pickable* pickable = new Utils::Pickable(m_sphereDrawable, newSphereId);
@@ -247,6 +255,10 @@ void Clipping::slot_radioButton_ColorAttenuationMode(bool b)
 
 void Clipping::slot_pushButton_deleteSelectedObject()
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	if (m_lastPickedObject)
 	{
 		// Delete clipping object
@@ -293,12 +305,16 @@ void Clipping::slot_pushButton_deleteSelectedObject()
 
 void Clipping::slot_pushButton_applyStaticClippingPreset()
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	// Create and apply preset
 	Utils::ClippingPreset *preset = NULL;
 	switch (dock.comboBox_StaticClippingPresets->currentIndex())
 	{
 		case 0 : // Dual planes
-		 	{
+	 	{
 		 	using namespace CGoGN::Utils::QT;
 
 		 	double centerX = (double)m_bb.center()[0];
@@ -315,11 +331,11 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 		 					VarBool(facing, "Facing"
 		 				)))))), "Preset Setup"))
 		 		preset = Utils::ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, axis, facing);
-		 	}
-			break;
+	 	}
+		break;
 
 		case 1 : // Cube
-		 	{
+	 	{
 		 	using namespace CGoGN::Utils::QT;
 
 		 	double centerX = (double)m_bb.center()[0];
@@ -334,11 +350,11 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 		 					VarBool(facing, "Facing"
 		 				))))), "Preset Setup"))
 		 		preset = Utils::ClippingPreset::CreateCubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, facing);
-		 	}
-			break;
+	 	}
+		break;
 
 		case 2 : // Tube
-		 	{
+	 	{
 		 	using namespace CGoGN::Utils::QT;
 
 		 	double centerX = (double)m_bb.center()[0];
@@ -357,11 +373,11 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 		 					VarBool(facing, "Facing"
 		 				))))))), "Preset Setup"))
 		 		preset = Utils::ClippingPreset::CreateTubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, axis, precision, facing);
-		 	}
-			break;
+	 	}
+		break;
 
 		case 3 : // Molecule
-		 	{
+	 	{
 		 	using namespace CGoGN::Utils::QT;
 
 		 	double centerX = (double)m_bb.center()[0];
@@ -378,8 +394,8 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 		 					VarBool(orClipping, "OR clipping mode"
 		 				)))))), "Preset Setup"))
 		 		preset = Utils::ClippingPreset::CreateMoleculePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, atomsRadiuses, orClipping);
-		 	}
-			break;
+	 	}
+		break;
 	}
 
 	if (preset == NULL)
@@ -429,12 +445,16 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 
 void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	// Create and apply preset
 	Utils::ClippingPresetAnimated *animatedPreset = NULL;
 	switch (dock.comboBox_AnimatedClippingPresets->currentIndex())
 	{
 		case 0 : // Moving Dual planes
-		 	{
+	 	{
 		 	Utils::ClippingPresetAnimatedDualPlanes *preset = NULL;
 		 	using namespace CGoGN::Utils::QT;
 
@@ -464,9 +484,29 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 		 				(float)size, axis, facing, zigzag);
 
 		 	animatedPreset = preset;
-		 	}
-			break;
+	 	}
+		break;
 
+		case 1 : // Rotating Plane
+	 	{
+		 	Utils::ClippingPresetAnimatedRotatingPlane *preset = NULL;
+		 	using namespace CGoGN::Utils::QT;
+
+		 	double centerX = (double)m_bb.center()[0];
+		 	double centerY = (double)m_bb.center()[1];
+		 	double centerZ = (double)m_bb.center()[2];
+		 	int axis = 0;
+		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
+		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
+		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
+		 					VarSlider(0, 2, axis, "Axis"
+		 				)))), "Preset Setup"))
+		 		preset = new Utils::ClippingPresetAnimatedRotatingPlane(
+		 				Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), axis);
+
+		 	animatedPreset = preset;
+	 	}
+		break;
 
 	}
 
@@ -651,6 +691,7 @@ void Clipping::initGUI()
 	setCallBack(dock.PushButton_ApplyAnimatedClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyAnimatedClippingPreset()));
 
 	dock.comboBox_AnimatedClippingPresets->addItem("Moving Dual Planes");
+	dock.comboBox_AnimatedClippingPresets->addItem("Rotating Plane");
 
 	setCallBack(dock.pushButton_StopAnimation, SIGNAL(clicked()), SLOT(slot_pushButton_StopAnimation()));
 	setCallBack(dock.doubleSpinBox_AnimatedClippingPresetSpeed, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_AnimatedClippingPresetSpeed(double)));
@@ -832,11 +873,25 @@ void Clipping::cb_keyPress(int code)
 		case 16777223 : // Suppr
 			slot_pushButton_deleteSelectedObject();
 			break;
+
+		case '+' :
+			dock.doubleSpinBox_AnimatedClippingPresetSpeed->setValue(
+					dock.doubleSpinBox_AnimatedClippingPresetSpeed->value() + 0.1);
+			break;
+
+		case '-' :
+			dock.doubleSpinBox_AnimatedClippingPresetSpeed->setValue(
+					dock.doubleSpinBox_AnimatedClippingPresetSpeed->value() - 0.1);
+			break;
 	}
 }
 
 void Clipping::cb_mousePress(int button, int x, int y)
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	if (!Shift())
 		return;
 
@@ -889,6 +944,10 @@ void Clipping::cb_mousePress(int button, int x, int y)
 
 void Clipping::cb_mouseMove(int buttons, int x, int y)
 {
+	// Check if no animation is active
+	if (m_lastAnimatedClippingPreset != NULL)
+		return;
+
 	if (!Shift())
 		return;
 
