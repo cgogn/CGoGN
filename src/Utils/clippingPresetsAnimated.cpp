@@ -67,22 +67,21 @@ void ClippingPresetAnimated::apply(ClippingShader* clipShader, std::vector<unsig
 ClippingPresetAnimatedDualPlanes::ClippingPresetAnimatedDualPlanes(
 		Geom::Vec3f centerStart, Geom::Vec3f centerEnd, float size, int axis, bool facing, bool zigzag)
 {
-	// Store the animation settings
+	// Store animation settings
 	m_dirVec = centerEnd - centerStart;
 	m_dirVec.normalize();
 	m_startPoint = centerStart;
 	m_endPoint = centerEnd;
 	m_zigzag = zigzag;
-
-	// Correct axis if necessary
-	if ((axis < 0) || (axis > 2))
-		axis = 0;
+	int usedAxis = axis;
+	if ((usedAxis < 0) || (usedAxis > 2))
+		usedAxis = 0;
 
 	// Axis on which planes will be aligned
 	Geom::Vec3f positDir (0.0f, 0.0f, 0.0f);
-	positDir[axis] = 1.0f;
+	positDir[usedAxis] = 1.0f;
 	Geom::Vec3f negDir (0.0f, 0.0f, 0.0f);
-	negDir[axis] = -1.0f;
+	negDir[usedAxis] = -1.0f;
 
 	// Facing of planes
 	float side = 1.0f;
@@ -113,7 +112,7 @@ void ClippingPresetAnimatedDualPlanes::step(unsigned int amount)
 		CGoGNerr
 		<< "ERROR -"
 		<< "ClippingPresetAnimatedDualPlanes::step"
-		<< " - Some planes or spheres ids are not valid anymore - Animation stopped"
+		<< " - Some planes or spheres ids are not valid anymore - Animation paused"
 		<< CGoGNendl;
 		m_animationSpeedFactor = 0.0f;
 		return;
@@ -161,14 +160,14 @@ void ClippingPresetAnimatedDualPlanes::step(unsigned int amount)
 
 ClippingPresetAnimatedRotatingPlane::ClippingPresetAnimatedRotatingPlane(Geom::Vec3f center, int axis)
 {
-	// Correct axis if necessary and store it
-	if ((axis < 0) || (axis > 2))
-		axis = 0;
+	// Store animation settings
 	m_axis = axis;
+	if ((m_axis < 0) || (m_axis))
+		m_axis = 0;
 
 	// Axis on which planes will be aligned
 	Geom::Vec3f normal (0.0f, 0.0f, 0.0f);
-	normal[(axis + 1) % 3] = 1.0f;
+	normal[(m_axis + 1) % 3] = 1.0f;
 
 	// Add plane to preset
 	addClipPlane(normal, center);
@@ -188,8 +187,8 @@ void ClippingPresetAnimatedRotatingPlane::step(unsigned int amount)
 	{
 		CGoGNerr
 		<< "ERROR -"
-		<< "ClippingPresetAnimatedDualPlanes::step"
-		<< " - Some planes or spheres ids are not valid anymore - Animation stopped"
+		<< "ClippingPresetAnimatedRotatingPlane::step"
+		<< " - Some planes or spheres ids are not valid anymore - Animation paused"
 		<< CGoGNendl;
 		m_animationSpeedFactor = 0.0f;
 		return;
@@ -208,8 +207,153 @@ void ClippingPresetAnimatedRotatingPlane::step(unsigned int amount)
 	planeNormal[(m_axis + 1) % 3] = cos(angle);
 	planeNormal[(m_axis + 2) % 3] = sin(angle);
 	m_attachedClippingShader->setClipPlaneParamsNormal(m_planesIds[0], planeNormal);
+}
 
+ClippingPresetAnimatedScaledSphere::ClippingPresetAnimatedScaledSphere(Geom::Vec3f center, float radiusStart, float radiusEnd, bool zigzag)
+{
+	// Store animation settings
+	m_startRadius = radiusStart;
+	m_endRadius = radiusEnd;
+	std::cout << "Given Start Radius : " << radiusStart << std::endl;
+	std::cout << "Actual Start Radius : " << m_startRadius << std::endl;
+	std::cout << "Given End Radius : " << radiusEnd << std::endl;
+	std::cout << "Actual End Radius : " << m_endRadius << std::endl;
+	m_zigzag = zigzag;
 
+	// Add sphere to preset
+	addClipSphere(center, m_startRadius);
+
+	// Set clipping mode
+	setClippingMode(ClippingShader::CLIPPING_MODE_AND);
+}
+
+void ClippingPresetAnimatedScaledSphere::step(unsigned int amount)
+{
+	// Check if the animation has been stopped
+	if (m_animationSpeedFactor == 0.0f)
+		return;
+
+	// Check the validity of planes or spheres ids
+	if (!m_attachedClippingShader->isClipSphereIdValid(m_spheresIds[0]))
+	{
+		CGoGNerr
+		<< "ERROR -"
+		<< "ClippingPresetAnimatedScaledSphere::step"
+		<< " - Some planes or spheres ids are not valid anymore - Animation paused"
+		<< CGoGNendl;
+		m_animationSpeedFactor = 0.0f;
+		return;
+	}
+
+	// Update animation parameter value
+	m_animParam += (float)amount * m_animationOneStepIncrement * m_animationSpeedFactor;
+	if (!m_zigzag)
+	{
+		while (m_animParam < 0.0f)
+			m_animParam += 1.0f;
+		while (m_animParam > 1.0f)
+			m_animParam -= 1.0f;
+	}
+	else
+	{
+		while ( (m_animParam < 0.0f) || (m_animParam > 1.0f) )
+		{
+			if (m_animParam < 0.0f)
+			{
+				m_animParam = -m_animParam;
+				m_animationOneStepIncrement = -m_animationOneStepIncrement;
+			}
+			else if (m_animParam > 1.0f)
+			{
+				m_animParam = 1.0f - (m_animParam - 1.0f);
+				m_animationOneStepIncrement = -m_animationOneStepIncrement;
+			}
+		}
+	}
+
+	// Calculate new radius
+	float radius = (1.0f - m_animParam)*m_startRadius + m_animParam*m_endRadius;
+	m_attachedClippingShader->setClipSphereParamsRadius(m_spheresIds[0], radius);
+}
+
+ClippingPresetAnimatedSpheresCubeCollision::ClippingPresetAnimatedSpheresCubeCollision(Geom::Vec3f center, float size, int spheresCount, float radius)
+{
+	// Store animation settings
+	m_cubeCenter = center;
+	m_cubeSize = size;
+	int usedSpheresCount = spheresCount;
+	if (usedSpheresCount < 1)
+		usedSpheresCount = 1;
+
+	// Add spheres to preset
+	for (int i = 0; i < usedSpheresCount; i++)
+		addClipSphere(m_cubeCenter, radius);
+
+	// Store spheres random directions
+	m_spheresDirections.resize(usedSpheresCount);
+	srand(time(NULL));
+	for (size_t i = 0; i < m_spheresDirections.size(); i++)
+	{
+		Geom::Vec3f dir ((rand() % 1000) - 500, (rand() % 1000) - 500, (rand() % 1000) - 500);
+		dir.normalize();
+		m_spheresDirections[i] = dir;
+	}
+
+	// Set clipping mode
+	setClippingMode(ClippingShader::CLIPPING_MODE_AND);
+}
+
+void ClippingPresetAnimatedSpheresCubeCollision::step(unsigned int amount)
+{
+	// Check if the animation has been stopped
+	if (m_animationSpeedFactor == 0.0f)
+		return;
+
+	// Check the validity of planes or spheres ids
+	for (size_t i = 0; i < m_spheresIds.size(); i++)
+	{
+		if (!m_attachedClippingShader->isClipSphereIdValid(m_spheresIds[i]))
+		{
+			CGoGNerr
+			<< "ERROR -"
+			<< "ClippingPresetAnimatedSpheresCubeCollision::step"
+			<< " - Some planes or spheres ids are not valid anymore - Animation paused"
+			<< CGoGNendl;
+			m_animationSpeedFactor = 0.0f;
+			return;
+		}
+	}
+
+	// Update animation parameter value
+	float dParam = (float)amount * m_animationOneStepIncrement * m_animationSpeedFactor;
+	m_animParam += dParam;
+	while (m_animParam < 0.0f)
+		m_animParam += 1.0f;
+	while (m_animParam > 1.0f)
+		m_animParam -= 1.0f;
+
+	// Calculate new center and detect collisions with cube faces
+	for (size_t i = 0; i < m_spheresIds.size(); i++)
+	{
+		Geom::Vec3f oldCenter = m_attachedClippingShader->getClipSphereParamsCenter(m_spheresIds[i]);
+		Geom::Vec3f newCenter = oldCenter + dParam*m_spheresDirections[i];
+		m_attachedClippingShader->setClipSphereParamsCenter(m_spheresIds[i], newCenter);
+		Geom::Vec3f posToCube = newCenter - m_cubeCenter;
+		for (int j = 0; j < 3; j++)
+		{
+			if ( (posToCube[j] < -m_cubeSize*0.5f) || (posToCube[j] > m_cubeSize*0.5f) )
+			{
+				Geom::Vec3f cubeNormal (0.0f, 0.0f, 0.0f);
+				if (posToCube[j] < 0.0f)
+					cubeNormal[j] = 1.0f;
+				else
+					cubeNormal[j] = -1.0f;
+				// Reflect
+				if ( (m_spheresDirections[i] * cubeNormal) < 0.0f)
+					m_spheresDirections[i] = (2.0f * ((cubeNormal*m_spheresDirections[i])*cubeNormal) - m_spheresDirections[i])*-1.0f;
+			}
+		}
+	}
 }
 
 } // namespace Utils

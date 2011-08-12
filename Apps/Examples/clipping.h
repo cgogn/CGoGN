@@ -168,6 +168,8 @@ public slots:
 	void slot_pushButton_StopAnimation();
 	void slot_doubleSpinBox_AnimatedClippingPresetSpeed(double c);
 
+	void slot_setAnimationState(bool state);
+
 	void slot_animationTimer();
 
 	void button_compile();

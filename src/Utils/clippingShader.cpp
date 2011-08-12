@@ -198,7 +198,7 @@ int ClippingShader::getClipPlanesCount()
 
 bool ClippingShader::isClipPlaneIdValid(unsigned int id)
 {
-	if (id > m_clipPlanesIds.size())
+	if (id >= m_clipPlanesIds.size())
 		return false;
 	if (!m_clipPlanesIds[id].used)
 		return false;
@@ -496,7 +496,7 @@ int ClippingShader::getClipSpheresCount()
 
 bool ClippingShader::isClipSphereIdValid(unsigned int id)
 {
-	if (id > m_clipSpheresIds.size())
+	if (id >= m_clipSpheresIds.size())
 		return false;
 	if (!m_clipSpheresIds[id].used)
 		return false;

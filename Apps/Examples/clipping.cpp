@@ -78,12 +78,31 @@ void Clipping::updatePickables()
 			transfoMat[2][j] = vec1[j];
 			transfoMat[3][j] = pos[j];
 		}
+		transfoMat[0][3] = 0.0;
+		transfoMat[1][3] = 0.0;
+		transfoMat[2][3] = 0.0;
+		transfoMat[3][3] = 1.0;
 	}
 	for (size_t i = 0; i < m_pickableSpheres.size(); i++)
 	{
 		unsigned int id = m_pickableSpheres[i]->id();
-		m_pickableSpheres[i]->translate(m_shader->getClipSphereParamsCenter(id));
-		m_pickableSpheres[i]->scale(m_shader->getClipSphereParamsRadius(id));
+		Geom::Vec3f pos = m_shader->getClipSphereParamsCenter(id);
+		float radius = m_shader->getClipSphereParamsRadius(id);
+		Geom::Vec3f vec1 (radius, 0.0, 0.0);
+		Geom::Vec3f vec2 (0.0, radius, 0.0);
+		Geom::Vec3f vec3 (0.0, 0.0, radius);
+		glm::mat4& transfoMat = m_pickableSpheres[i]->transfo();
+		for (int j = 0; j < 3; j++)
+		{
+			transfoMat[0][j] = vec2[j];
+			transfoMat[1][j] = vec3[j];
+			transfoMat[2][j] = vec1[j];
+			transfoMat[3][j] = pos[j];
+		}
+		transfoMat[0][3] = 0.0;
+		transfoMat[1][3] = 0.0;
+		transfoMat[2][3] = 0.0;
+		transfoMat[3][3] = 1.0;
 	}
 }
 
@@ -317,20 +336,20 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 	 	{
 		 	using namespace CGoGN::Utils::QT;
 
-		 	double centerX = (double)m_bb.center()[0];
-		 	double centerY = (double)m_bb.center()[1];
-		 	double centerZ = (double)m_bb.center()[2];
-		 	double size = (double)m_bb.maxSize()*0.75;
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
+		 	float size = m_bb.maxSize()*0.75f;
 		 	int axis = 0;
 		 	bool facing = false;
-		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
-		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
-		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
-		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
+		 					VarFloat(size - 100.0f, size + 100.0f, size, "Size",
 		 					VarSlider(0, 2, axis, "Axis",
 		 					VarBool(facing, "Facing"
 		 				)))))), "Preset Setup"))
-		 		preset = Utils::ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, axis, facing);
+		 		preset = Utils::ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f(centerX, centerY, centerZ), size, axis, facing);
 	 	}
 		break;
 
@@ -338,18 +357,18 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 	 	{
 		 	using namespace CGoGN::Utils::QT;
 
-		 	double centerX = (double)m_bb.center()[0];
-		 	double centerY = (double)m_bb.center()[1];
-		 	double centerZ = (double)m_bb.center()[2];
-		 	double size = (double)m_bb.maxSize()*0.75;
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
+		 	float size = m_bb.maxSize()*0.75f;
 		 	bool facing = false;
-		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
-		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
-		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
-		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
+		 					VarFloat(size - 100.0f, size + 100.0f, size, "Size",
 		 					VarBool(facing, "Facing"
 		 				))))), "Preset Setup"))
-		 		preset = Utils::ClippingPreset::CreateCubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, facing);
+		 		preset = Utils::ClippingPreset::CreateCubePreset(Geom::Vec3f(centerX, centerY, centerZ), size, facing);
 	 	}
 		break;
 
@@ -357,22 +376,22 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 	 	{
 		 	using namespace CGoGN::Utils::QT;
 
-		 	double centerX = (double)m_bb.center()[0];
-		 	double centerY = (double)m_bb.center()[1];
-		 	double centerZ = (double)m_bb.center()[2];
-		 	double size = (double)m_bb.maxSize()*0.75;
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
+		 	float size = m_bb.maxSize()*0.75f;
 		 	int axis = 0;
 		 	int precision = 1;
 		 	bool facing = false;
-		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
-		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
-		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
-		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
+		 					VarFloat(size - 100.0f, size + 100.0f, size, "Size",
 		 					VarSlider(0, 2, axis, "Axis",
 		 					VarSlider(1, 30, precision, "Precision",
 		 					VarBool(facing, "Facing"
 		 				))))))), "Preset Setup"))
-		 		preset = Utils::ClippingPreset::CreateTubePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, axis, precision, facing);
+		 		preset = Utils::ClippingPreset::CreateTubePreset(Geom::Vec3f(centerX, centerY, centerZ), size, axis, precision, facing);
 	 	}
 		break;
 
@@ -380,20 +399,20 @@ void Clipping::slot_pushButton_applyStaticClippingPreset()
 	 	{
 		 	using namespace CGoGN::Utils::QT;
 
-		 	double centerX = (double)m_bb.center()[0];
-		 	double centerY = (double)m_bb.center()[1];
-		 	double centerZ = (double)m_bb.center()[2];
-		 	double size = (double)m_bb.maxSize()*0.75;
-		 	double atomsRadiuses = (double)m_bb.maxSize()*0.25;
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
+		 	float size = m_bb.maxSize()*0.75f;
+		 	float atomsRadiuses = m_bb.maxSize()*0.25f;
 		 	bool orClipping = true;
-		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
-		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
-		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
-		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
-		 					VarDbl(atomsRadiuses - 100.0, atomsRadiuses + 100.0, atomsRadiuses, "Atoms radiuses",
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
+		 					VarFloat(size - 100.0f, size + 100.0f, size, "Size",
+		 					VarFloat(atomsRadiuses - 100.0f, atomsRadiuses + 100.0f, atomsRadiuses, "Atoms radiuses",
 		 					VarBool(orClipping, "OR clipping mode"
 		 				)))))), "Preset Setup"))
-		 		preset = Utils::ClippingPreset::CreateMoleculePreset(Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), (float)size, atomsRadiuses, orClipping);
+		 		preset = Utils::ClippingPreset::CreateMoleculePreset(Geom::Vec3f(centerX, centerY, centerZ), size, atomsRadiuses, orClipping);
 	 	}
 		break;
 	}
@@ -458,30 +477,30 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 		 	Utils::ClippingPresetAnimatedDualPlanes *preset = NULL;
 		 	using namespace CGoGN::Utils::QT;
 
-		 	double centerStartX = (double)m_bb.center()[0] - (double)m_bb.size(0)*0.25;
-		 	double centerStartY = (double)m_bb.center()[1];
-		 	double centerStartZ = (double)m_bb.center()[2];
-		 	double centerEndX = (double)m_bb.center()[0] + (double)m_bb.size(0)*0.25;
-		 	double centerEndY = (double)m_bb.center()[1];
-		 	double centerEndZ = (double)m_bb.center()[2];
-		 	double size = (double)m_bb.maxSize()*0.1;
+		 	float centerStartX = m_bb.center()[0] - m_bb.size(0)*0.25f;
+		 	float centerStartY = m_bb.center()[1];
+		 	float centerStartZ = m_bb.center()[2];
+		 	float centerEndX = m_bb.center()[0] + m_bb.size(0)*0.25f;
+		 	float centerEndY = m_bb.center()[1];
+		 	float centerEndZ = m_bb.center()[2];
+		 	float size = m_bb.maxSize()*0.1f;
 		 	int axis = 0;
 		 	bool facing = false;
 		 	bool zigzag = false;
-		 	if (inputValues(VarDbl(centerStartX - 100.0, centerStartX + 100.0, centerStartX, "Center Start X",
-		 					VarDbl(centerStartY - 100.0, centerStartY + 100.0, centerStartY, "Center Start Y",
-		 					VarDbl(centerStartZ - 100.0, centerStartZ + 100.0, centerStartZ, "Center Start Z",
-		 					VarDbl(centerEndX - 100.0, centerEndX + 100.0, centerEndX, "Center End X",
-		 					VarDbl(centerEndY - 100.0, centerEndY + 100.0, centerEndY, "Center End Y",
-		 					VarDbl(centerEndZ - 100.0, centerEndZ + 100.0, centerEndZ, "Center End Z",
-		 					VarDbl(size - 100.0, size + 100.0, size, "Size",
+		 	if (inputValues(VarFloat(centerStartX - 100.0f, centerStartX + 100.0f, centerStartX, "Center Start X",
+		 					VarFloat(centerStartY - 100.0f, centerStartY + 100.0f, centerStartY, "Center Start Y",
+		 					VarFloat(centerStartZ - 100.0f, centerStartZ + 100.0f, centerStartZ, "Center Start Z",
+		 					VarFloat(centerEndX - 100.0f, centerEndX + 100.0f, centerEndX, "Center End X",
+		 					VarFloat(centerEndY - 100.0f, centerEndY + 100.0f, centerEndY, "Center End Y",
+		 					VarFloat(centerEndZ - 100.0f, centerEndZ + 100.0f, centerEndZ, "Center End Z",
+		 					VarFloat(size - 100.0f, size + 100.0f, size, "Size",
 		 					VarSlider(0, 2, axis, "Axis",
 		 					VarBool(facing, "Facing",
 		 					VarBool(zigzag, "Zigzag"
 		 				)))))))))), "Preset Setup"))
 		 		preset = new Utils::ClippingPresetAnimatedDualPlanes(
-		 				Geom::Vec3f((float)centerStartX, (float)centerStartY, (float)centerStartZ), Geom::Vec3f((float)centerEndX, (float)centerEndY, (float)centerEndZ),
-		 				(float)size, axis, facing, zigzag);
+		 				Geom::Vec3f(centerStartX, centerStartY, centerStartZ), Geom::Vec3f(centerEndX, centerEndY, centerEndZ),
+		 				size, axis, facing, zigzag);
 
 		 	animatedPreset = preset;
 	 	}
@@ -492,22 +511,73 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 		 	Utils::ClippingPresetAnimatedRotatingPlane *preset = NULL;
 		 	using namespace CGoGN::Utils::QT;
 
-		 	double centerX = (double)m_bb.center()[0];
-		 	double centerY = (double)m_bb.center()[1];
-		 	double centerZ = (double)m_bb.center()[2];
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
 		 	int axis = 0;
-		 	if (inputValues(VarDbl(centerX - 100.0, centerX + 100.0, centerX, "Center X",
-		 					VarDbl(centerY - 100.0, centerY + 100.0, centerY, "Center Y",
-		 					VarDbl(centerZ - 100.0, centerZ + 100.0, centerZ, "Center Z",
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
 		 					VarSlider(0, 2, axis, "Axis"
 		 				)))), "Preset Setup"))
 		 		preset = new Utils::ClippingPresetAnimatedRotatingPlane(
-		 				Geom::Vec3f((float)centerX, (float)centerY, (float)centerZ), axis);
+		 				Geom::Vec3f(centerX, centerY, centerZ), axis);
 
 		 	animatedPreset = preset;
 	 	}
 		break;
 
+		case 2 : // Scaled Sphere
+	 	{
+		 	Utils::ClippingPresetAnimatedScaledSphere *preset = NULL;
+		 	using namespace CGoGN::Utils::QT;
+
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
+		 	float radiusStart = m_bb.maxSize()*0.1f;
+		 	float radiusEnd = m_bb.maxSize()*1.0f;
+		 	bool zigzag = false;
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
+		 					VarFloat(-radiusEnd*4.0f, radiusEnd*4.0f, radiusStart, "Radius Start",
+		 					VarFloat(-radiusEnd*4.0f, radiusEnd*4.0f, radiusEnd, "Radius End",
+		 					VarBool(zigzag, "Zigzag"
+		 				)))))), "Preset Setup"))
+		 		preset = new Utils::ClippingPresetAnimatedScaledSphere(
+		 				Geom::Vec3f(centerX, centerY, centerZ), radiusStart, radiusEnd, zigzag);
+
+		 	animatedPreset = preset;
+	 	}
+		break;
+
+		case 3 : // Spheres Cube Collision
+	 	{
+		 	Utils::ClippingPresetAnimatedSpheresCubeCollision *preset = NULL;
+		 	using namespace CGoGN::Utils::QT;
+
+		 	float centerX = m_bb.center()[0];
+		 	float centerY = m_bb.center()[1];
+		 	float centerZ = m_bb.center()[2];
+		 	float size = m_bb.maxSize()*1.0f;
+		 	int spheresCount = 5;
+		 	float radius = m_bb.maxSize()*0.2f;
+		 	if (inputValues(VarFloat(centerX - 100.0f, centerX + 100.0f, centerX, "Center X",
+		 					VarFloat(centerY - 100.0f, centerY + 100.0f, centerY, "Center Y",
+		 					VarFloat(centerZ - 100.0f, centerZ + 100.0f, centerZ, "Center Z",
+		 					VarFloat(-size*4.0f, size*4.0f, size, "Cube Size",
+		 					VarSlider(1, 20, spheresCount, "Spheres Count",
+		 					VarFloat(-radius*4.0f, radius*4.0f, radius, "Spheres Radius"
+		 				)))))), "Preset Setup"))
+		 	{
+		 		preset = new Utils::ClippingPresetAnimatedSpheresCubeCollision(
+		 				Geom::Vec3f(centerX, centerY, centerZ), size, spheresCount, radius);
+		 	}
+
+		 	animatedPreset = preset;
+	 	}
+		break;
 	}
 
 	if (animatedPreset == NULL)
@@ -553,6 +623,8 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 	// Set on animated mode
 	m_lastAnimatedClippingPreset = animatedPreset;
 	m_timer->start(1000.0f/60.0f);
+	m_lastAnimatedClippingPreset->setAnimationSpeedFactor((float)dock.doubleSpinBox_AnimatedClippingPresetSpeed->value());
+	slot_setAnimationState(true);
 
 
 	updateGLMatrices();
@@ -565,12 +637,21 @@ void Clipping::slot_pushButton_StopAnimation()
 		delete m_lastAnimatedClippingPreset;
 		m_lastAnimatedClippingPreset = NULL;
 	}
+	slot_setAnimationState(false);
 }
 
 void Clipping::slot_doubleSpinBox_AnimatedClippingPresetSpeed(double c)
 {
 	if (m_lastAnimatedClippingPreset != NULL)
 		m_lastAnimatedClippingPreset->setAnimationSpeedFactor((float)c);
+}
+
+void Clipping::slot_setAnimationState(bool state)
+{
+	dock.pushButton_addPlane->setEnabled(!state);
+	dock.pushButton_addSphere->setEnabled(!state);
+	dock.PushButton_ApplyStaticClippingPreset->setEnabled(!state);
+	dock.PushButton_ApplyAnimatedClippingPreset->setEnabled(!state);
 }
 
 void Clipping::slot_animationTimer()
@@ -692,6 +773,8 @@ void Clipping::initGUI()
 
 	dock.comboBox_AnimatedClippingPresets->addItem("Moving Dual Planes");
 	dock.comboBox_AnimatedClippingPresets->addItem("Rotating Plane");
+	dock.comboBox_AnimatedClippingPresets->addItem("Scaled Sphere");
+	dock.comboBox_AnimatedClippingPresets->addItem("Spheres Cube Collision");
 
 	setCallBack(dock.pushButton_StopAnimation, SIGNAL(clicked()), SLOT(slot_pushButton_StopAnimation()));
 	setCallBack(dock.doubleSpinBox_AnimatedClippingPresetSpeed, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_AnimatedClippingPresetSpeed(double)));

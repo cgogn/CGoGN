@@ -29,6 +29,9 @@
 #include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
 #include <cmath>
+#include <vector>
+#include <cstdlib>
+#include <time.h>
 
 namespace CGoGN
 {
@@ -177,6 +180,73 @@ private :
 
 	/// axis of plane
 	int m_axis;
+
+};
+
+class ClippingPresetAnimatedScaledSphere : public ClippingPresetAnimated
+{
+
+public :
+
+	/**
+	 * constructor
+	 * @param center center of sphere
+	 * @param radiusStart radius of the sphere at the beginning of the animation
+	 * @param radiusEnd radius of the sphere at the end of the animation
+	 * @param zigzag true to enable zigzag mode
+	 */
+	ClippingPresetAnimatedScaledSphere(Geom::Vec3f center, float radiusStart, float radiusEnd, bool zigzag);
+
+	/**
+	 * runs the animation some steps further
+	 * @param amount amount of steps the animation should do
+	 */
+	void step(unsigned int amount);
+
+private :
+
+	/// start radius of the animation
+	float m_startRadius;
+
+	/// end radius of the animation
+	float m_endRadius;
+
+	/// zigzag mode ?
+	bool m_zigzag;
+
+};
+
+
+class ClippingPresetAnimatedSpheresCubeCollision : public ClippingPresetAnimated
+{
+
+public :
+
+	/**
+	 * constructor
+	 * @param center center of cube
+	 * @param size size of cube
+	 * @param spheresCount spheres count
+	 * @param radius radius of spheres
+	 */
+	ClippingPresetAnimatedSpheresCubeCollision(Geom::Vec3f center, float size, int spheresCount, float radius);
+
+	/**
+	 * runs the animation some steps further
+	 * @param amount amount of steps the animation should do
+	 */
+	void step(unsigned int amount);
+
+private :
+
+	/// center of cube
+	Geom::Vec3f m_cubeCenter;
+
+	/// size of cube
+	float m_cubeSize;
+
+	/// direction vector of spheres
+	std::vector<Geom::Vec3f> m_spheresDirections;
 
 };
 
