@@ -477,10 +477,10 @@ void Clipping::slot_pushButton_applyAnimatedClippingPreset()
 		 	Utils::ClippingPresetAnimatedDualPlanes *preset = NULL;
 		 	using namespace CGoGN::Utils::QT;
 
-		 	float centerStartX = m_bb.center()[0] - m_bb.size(0)*0.25f;
+		 	float centerStartX = m_bb.center()[0] - m_bb.size(0)*0.75f;
 		 	float centerStartY = m_bb.center()[1];
 		 	float centerStartZ = m_bb.center()[2];
-		 	float centerEndX = m_bb.center()[0] + m_bb.size(0)*0.25f;
+		 	float centerEndX = m_bb.center()[0] + m_bb.size(0)*0.75f;
 		 	float centerEndY = m_bb.center()[1];
 		 	float centerEndZ = m_bb.center()[2];
 		 	float size = m_bb.maxSize()*0.1f;
