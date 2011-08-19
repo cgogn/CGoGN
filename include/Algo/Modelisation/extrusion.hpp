@@ -56,7 +56,7 @@ Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, typename PFP::TVEC3
 	for(int i=0; i< nbSides; ++i)
 	{
 		float alpha = float(2.0*M_PI/nbSides*i);
-		VEC3 P = circCenter + cosf(alpha)*V + sinf(alpha)*U;
+		VEC3 P = circCenter + cos(alpha)*V + sin(alpha)*U;
 		path.push_back(P);
 	}
 	// do the extrusion with good parameters

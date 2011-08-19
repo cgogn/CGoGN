@@ -26,10 +26,10 @@
 #define IMAGE_H
 
 
-#include <gmtl/Vec.h>
+#include "Geometry/vector_gen.h"
 #include "Algo/MC/type.h"
 
-#include "img3D_IO.h"
+#include "Utils/img3D_IO.h"
 
 #include "Zinrimage.h"
 
@@ -228,7 +228,7 @@ public:
 	 * get the origin
 	 * @return a vector with origin
 	 */
-	gmtl::Vec3i getOrigin() const { return gmtl::Vec3i(m_OX, m_OY, m_OZ);}
+	Geom::Vec3i getOrigin() const { return Geom::Vec3i(m_OX, m_OY, m_OZ);}
 
 	/**
 	* get the data const version
@@ -287,7 +287,7 @@ public:
 	* @param  _Vec vector of voxel position
 	* @return the value of the voxel
 	*/
-	DataType getVoxel( const gmtl::Vec3i &_Vec);
+	DataType getVoxel( const Geom::Vec3i &_Vec);
 
 
 	/**
@@ -308,13 +308,13 @@ public:
 	 * Get the lower corner of bounding AABB
 	 */
 //	gmtl::Vec3f boundMin() const { return gmtl::Vec3f(0.0f, 0.0f, 0.0f);}
-	gmtl::Vec3f boundMin() const { return gmtl::Vec3f(m_SX*m_OX, m_SY*m_OY, m_SZ*m_OZ);}
+	Geom::Vec3f boundMin() const { return Geom::Vec3f(m_SX*m_OX, m_SY*m_OY, m_SZ*m_OZ);}
 
 	/**
 	 * Get the upper corner of bounding AABB
 	 */
 //	gmtl::Vec3f boundMax() const { return gmtl::Vec3f(m_SX*(m_WX-2*m_OX), m_SY*(m_WY-2*m_OY), m_SZ*(m_WZ-2*m_OZ));}
-	gmtl::Vec3f boundMax() const { return gmtl::Vec3f(m_SX*(m_WX-m_OX), m_SY*(m_WY-m_OY), m_SZ*(m_WZ-m_OZ));}
+	Geom::Vec3f boundMax() const { return Geom::Vec3f(m_SX*(m_WX-m_OX), m_SY*(m_WY-m_OY), m_SZ*(m_WZ-m_OZ));}
 	/**
 	 * Compute the volume in cm3
 	 * @param wind the windowing function
@@ -322,7 +322,10 @@ public:
 	template< typename Windowing >
 	float computeVolume(const Windowing& wind) const;
 
-	void Blur3();
+	/**
+	 * local (3x3) blur of image
+	 */
+	Image<DataType>* Blur3();
 
 
 	void createMaskOffsetSphere(std::vector<int>& table, int _i32radius);
@@ -336,7 +339,7 @@ public:
 } // end namespace
 } // end namespace
 
-#include "image.hpp"
+#include "Algo/MC/image.hpp"
 
 
 

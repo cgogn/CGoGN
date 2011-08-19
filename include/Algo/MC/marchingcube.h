@@ -30,8 +30,7 @@
 #include "Algo/MC/buffer.h"
 #include "Algo/MC/tables.h"
 
-#include <gmtl/Vec.h>
-#include <gmtl/VecOps.h>
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -193,9 +192,10 @@ protected:
 
 	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3) {
 		L_DART d = m_map->newFace(3);
-		m_map->setSingleVertexEmb(d,e1); d = m_map->phi1(d);
-		m_map->setSingleVertexEmb(d,e2); d = m_map->phi1(d);
-		m_map->setSingleVertexEmb(d,e3); d = m_map->phi1(d);
+		//TODO change this which work only with 2-maps
+		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
+		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
+		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
 		return d;
 	}
 
@@ -222,7 +222,7 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCube(Image<DataType>* img, L_MAP* map, unsigned int idPos,  Windowing<DataType> wind, bool boundRemoved);
+	MarchingCube(Image<DataType>* img, L_MAP* map, const typename PFP::TVEC3& position,  Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* destructor
@@ -267,5 +267,5 @@ public:
 } // end namespace
 } // end namespace
 
-#include "marchingcube.hpp"
+#include "Algo/MC/marchingcube.hpp"
 #endif

@@ -29,7 +29,7 @@
 #include <math.h>
 #include <typeinfo>
 
-#include "img3D_IO.h"
+#include "Utils/img3D_IO.h"
 #include "Zinrimage.h"
 
 namespace CGoGN
@@ -205,8 +205,6 @@ bool Image<DataType>::loadPNG3D(const char* filename)
 template< typename  DataType >
 bool Image<DataType>::loadInrgz(const char* filename)
 {
-
-
 		mImage = readZInrimage(filename);
 
 		// A modifier en verifiant le type de donne
@@ -309,7 +307,7 @@ Image<DataType>* Image<DataType>::addFrame(int frameMax)
 	float realFS = static_cast<float>(frameMax) * minVS;
 
     // real frame size for anisotropic images
-    	int32 lFX = static_cast<int32>( ceilf( realFS / m_SX) );
+    int32 lFX = static_cast<int32>( ceilf( realFS / m_SX) );
 	int32 lFY = static_cast<int32>( ceilf( realFS / m_SY) );
 	int32 lFZ = static_cast<int32>( ceilf( realFS / m_SZ) );
 
@@ -418,45 +416,37 @@ float Image<DataType>::computeVolume(const Windowing& wind) const
 }
 
 template< typename  DataType >
-void Image<DataType>::Blur3()
+Image<DataType>* Image<DataType>::Blur3()
 {
+
 	int txm = m_WX-1;
 	int tym = m_WY-1;
 	int tzm = m_WZ-1;
 
+	DataType* data2 = new DataType[m_WX*m_WY*m_WZ];
+	Image<DataType>* newImg = new Image<DataType>(data2,m_WX,m_WY,m_WZ,getVoxSizeX(),getVoxSizeY(),getVoxSizeZ());
+	newImg->m_Alloc=true;
+	// set origin of real data in image ??
 
-	// coef sur le mask 3x3: 8/4/2/1 pour vox/6-vois/18-vois/26-vois
+	// for frame
+	for(int y=0; y<=tym; ++y)
+		for(int x=0; x<=txm; ++x)
+			*(newImg->getVoxelPtr(x,y,0)) = *(getVoxelPtr(x,y,0));
 
-	for(int x=1; x<txm; ++x)
+	for(int z=1; z<tzm; ++z)
 	{
+		for(int x=0; x<=txm; ++x)
+			*(newImg->getVoxelPtr(x,0,z)) = *(getVoxelPtr(x,0,z));
 		for(int y=1; y<tym; ++y)
 		{
-			for(int z=1; z<tzm; ++z)
+			*(newImg->getVoxelPtr(0,y,z)) = *(getVoxelPtr(0,y,z));
+			#pragma omp parallel for // OpenMP
+			for(int x=1; x<txm; ++x)
 			{
-
-				DataType* ptr = getVoxelPtr(x,y,z) - m_WXY - m_WX -1;
-				DataType* ori = ptr;
-				double val=0;
-// 				for (int i=0; i<3;++i)
-// 				{
-// 					double coef=1.0f;
-// 					if (i%2)
-// 						coef=2.0f;
-//
-// 					val += coef*(*ptr++);
-// 					val += 2.0*coef*(*ptr++);
-// 					val += coef*(*ptr);
-// 					ptr += m_WX;
-// 					val += 2.0*coef*(*ptr--);
-// 					val += 4.0*coef*(*ptr--);
-// 					val += 2.0*coef*(*ptr);
-// 					ptr += m_WX;
-// 					val += coef*(*ptr++);
-// 					val += 2.0*coef*(*ptr++);
-// 					val += coef*(*ptr);
-// 					ptr += m_WXY -( 2+m_WX*2);
-// 				}
-// 				val /= 64.0;
+				DataType* ori = getVoxelPtr(x,y,z);
+				DataType* dest = newImg->getVoxelPtr(x,y,z);
+				DataType* ptr = ori - m_WXY - m_WX -1;
+				double val=0.0;
 				for (int i=0; i<3;++i)
 				{
 					val += (*ptr++);
@@ -472,12 +462,24 @@ void Image<DataType>::Blur3()
 					val += (*ptr);
 					ptr += m_WXY -( 2+m_WX*2);
 				}
-				val /= 27.0;
-
-				*ori= DataType(val);
+				val += 3.0 * (*ori);
+				val /= (27.0 + 3.0);
+				DataType res(val);
+				*dest= res;
 			}
+			*(newImg->getVoxelPtr(txm,y,z)) = *(getVoxelPtr(txm,y,z));
 		}
+		for(int x=0; x<=txm; ++x)
+			*(newImg->getVoxelPtr(x,tym,z)) = *(getVoxelPtr(x,tym,z));
+
 	}
+	for(int y=0; y<=tym; ++y)
+		for(int x=1; x<txm; ++x)
+			*(newImg->getVoxelPtr(x,y,tzm)) = *(getVoxelPtr(x,y,tzm));
+
+
+	return newImg;
+
 }
 
 template<typename DataType>
@@ -501,8 +503,8 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 		{
 			for (int x = -_i32radius;  x<=_i32radius; x++)
 			{
-				gmtl::Vec3f v((float)x,(float)y,(float)z);
-				float fLength =  gmtl::lengthSquared(v);
+				Geom::Vec3f v((float)x,(float)y,(float)z);
+				float fLength =  v.norm2();
 				// if inside the sphere
 				if (fLength<=fRad2)
 				{
@@ -518,8 +520,9 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 template<typename DataType>
 float Image<DataType>::computeCurvatureCount(const DataType *ptrVox, const std::vector<int>& sphere, DataType val)
 {
-	int noir =0;
+	int noir = 0;
 	int blanc = 0;
+
 
 	for (std::vector<int>::const_iterator it=sphere.begin(); it!=sphere.end();it++)
 	{
@@ -534,7 +537,7 @@ float Image<DataType>::computeCurvatureCount(const DataType *ptrVox, const std::
 		}
 	}
 
-	if (blanc > noir)
+	if (blanc >= noir)
 	{
 		return 1.0f - ((float)noir) / ((float)blanc);
 	}

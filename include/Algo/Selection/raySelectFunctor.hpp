@@ -75,7 +75,8 @@ public:
 			const typename PFP::VEC3& Tb = m_positions[dd];
 			const typename PFP::VEC3& Tc = m_positions[ddd];
 			typename PFP::VEC3 I;
-			if (Geom::intersectionLineTriangle<typename PFP::VEC3>(m_A, m_AB, Ta, Tb, Tc, I))
+//			if (Geom::intersectionLineTriangle<typename PFP::VEC3>(m_A, m_AB, Ta, Tb, Tc, I))
+			if (Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(m_A, m_AB, Ta, Tb, Tc, I))
 			{
 				m_faces.push_back(d);
 				m_Ipoints.push_back(I);
@@ -207,8 +208,9 @@ public:
 			// get back position of triangle
 			const typename PFP::VEC3& Tb = m_positions[face]; //this->m_map.getVertexEmb(face)->getPosition() ;
 			const typename PFP::VEC3& Tc = m_positions[this->m_map.phi1(face)]; //this->m_map.getVertexEmb(this->m_map.phi1(face))->getPosition() ;
-			typename PFP::VEC3 I;
-			if (Geom::intersectionLineTriangle(m_A, m_AB, center, Tb, Tc, I))
+//			typename PFP::VEC3 I;
+//			if (Geom::intersectionLineTriangle(m_A, m_AB, center, Tb, Tc, I))
+			if (Geom::intersectionRayTriangleOpt(m_A, m_AB, center, Tb, Tc))
 			{
 				m_darts.push_back(face) ;
 				notfound = false ;

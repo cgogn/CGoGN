@@ -45,8 +45,31 @@ namespace GL2
 
 inline bool MapRender::cmpVP(VertexPoly* lhs, VertexPoly* rhs)
 {
-	 return lhs->value < rhs->value;
+//	 return lhs->value < rhs->value;
+
+	if (fabs(lhs->value - rhs->value)<0.2f)
+			return lhs->length < rhs->length;
+	return lhs->value < rhs->value;
 }
+
+
+template<typename VEC3>
+bool MapRender::inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc)
+{
+	typedef typename VEC3::DATA_TYPE T ;
+
+	if (Geom::tripleProduct(P-Ta, (Tb-Ta), normal) >= T(0))
+		return false;
+
+	if (Geom::tripleProduct(P-Tb, (Tc-Tb), normal) >= T(0))
+		return false;
+
+	if (Geom::tripleProduct(P-Tc, (Ta-Tc), normal) >= T(0))
+		return false;
+
+	return true;
+}
+
 
 
 template<typename PFP>
@@ -69,8 +92,11 @@ void MapRender::recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, 
 	v2.normalize();
 	v3.normalize();
 
-	float dotpr1 = 1.0f - (v1*v2);
-	float dotpr2 = 1.0f + (v1*v3);
+//	float dotpr1 = 1.0f - (v1*v2);
+//	float dotpr2 = 1.0f + (v1*v3);
+	float dotpr1 = acos(v1*v2) / (M_PI/2.0f);
+	float dotpr2 = acos(-(v1*v3)) / (M_PI/2.0f);
+
 
 	if (!convex)	// if convex no need to test if vertex is an ear (yes)
 	{
@@ -82,30 +108,29 @@ void MapRender::recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, 
 		if (nv2*normalPoly < 0.0)
 			dotpr2 = 10.0f - dotpr2;// not an ears  (concave)
 
-		bool finished = false;
+		bool finished = (dotpr1>=5.0f) && (dotpr2>=5.0f);
 		for (VPMS::reverse_iterator it = ears.rbegin(); (!finished)&&(it != ears.rend())&&((*it)->value > 5.0f); ++it)
 		{
 			int id = (*it)->id;
 			const typename PFP::VEC3& P = position[id];
-//			typename PFP::VEC3 inter;
 
-			if ((dotpr1 != 5.0f) && (id !=vprev->id))
-				if (Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(P, normalPoly, Ta,Tb,Tc) > Geom::VERTEX_INTERSECTION)
-
-
+			if ((dotpr1 < 5.0f) && (id !=vprev->id))
+				if (inTriangle<typename PFP::VEC3>(P, normalPoly,Tb,Tc,Ta))
 					dotpr1 = 5.0f;// not an ears !
 
-			if ((dotpr2 != 5.0f) && (id !=vnext->id) )
-				if (Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(P, normalPoly, Tb,Td,Ta) > Geom::VERTEX_INTERSECTION)
+			if ((dotpr2 < 5.0f) && (id !=vnext->id) )
+				if (inTriangle<typename PFP::VEC3>(P, normalPoly,Td,Ta,Tb))
 					dotpr2 = 5.0f;// not an ears !
 
-			finished = ((dotpr1 == 5.0f)&&(dotpr2 == 5.0f));
+			finished = ((dotpr1 >= 5.0f)&&(dotpr2 >= 5.0f));
 		}
 	}
 
 	vp->value  = dotpr1;
+	vp->length = (Tb-Tc).norm2();
 	vp->ear = ears.insert(vp);
 	vp2->value = dotpr2;
+	vp->length = (Td-Ta).norm2();
 	vp2->ear = ears.insert(vp2);
 }
 
@@ -118,7 +143,8 @@ float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PF
 	v1.normalize();
 	v2.normalize();
 
-	float dotpr = 1.0f - (v1*v2);
+//	float dotpr = 1.0f - (v1*v2);
+	float dotpr = acos(v1*v2) / (M_PI/2.0f);
 
 	typename PFP::VEC3 vn = v1^v2;
 	if (vn*normalPoly > 0.0f)
@@ -131,6 +157,7 @@ float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PF
 template<typename PFP>
 bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
 {
+
 	VertexPoly* endV = vp->prev;
 	VertexPoly* curr = vp->next;
 	const typename PFP::VEC3& Ta = position[vp->id];
@@ -140,9 +167,7 @@ bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& pos
 
 	while (curr != endV)
 	{
-//		typename PFP::VEC3 inter;
-		Geom::Intersection res = Geom::intersectionRayTriangleOpt<typename PFP::VEC3>(position[curr->id], normalPoly, Ta,Tb,Tc);
-		if (res > Geom::VERTEX_INTERSECTION)
+		if (inTriangle<typename PFP::VEC3>(position[curr->id], normalPoly,Tb,Tc,Ta))
 		{
 			vp->value = 5.0f;// not an ears !
 			return false;
@@ -154,12 +179,13 @@ bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& pos
 }
 
 
+
 template<typename PFP>
 inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
 {
+	bool(*fn_pt1)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
+	VPMS ears(fn_pt1);
 
-	bool(*fn_pt)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
-	VPMS ears(fn_pt);
 
 	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX,"position");
 
@@ -176,15 +202,13 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	Dart c = map.phi1(b);
 	do
 	{
-//		typename PFP::VEC3 v1= position[map.getEmbedding(VERTEX,a)]-position[map.getEmbedding(VERTEX,b)];
-//		typename PFP::VEC3 v2= position[map.getEmbedding(VERTEX,c)]-position[map.getEmbedding(VERTEX,b)];
-//		typename PFP::VEC3 v3= position[map.getEmbedding(VERTEX,c)]-position[map.getEmbedding(VERTEX,a)];
 		typename PFP::VEC3 P1= position[map.getEmbedding(VERTEX,a)];
 		typename PFP::VEC3 P2= position[map.getEmbedding(VERTEX,b)];
 		typename PFP::VEC3 P3= position[map.getEmbedding(VERTEX,c)];
 
 		float val = computeEarAngle<PFP>(P1,P2,P3,normalPoly);
-		VertexPoly* vp = new VertexPoly(map.getEmbedding(VERTEX,b),val,vpp);
+		VertexPoly* vp = new VertexPoly(map.getEmbedding(VERTEX,b),val,(P3-P1).norm2(),vpp);
+
 		if (vp->value <5.0f)
 			nbe++;
 		if (vpp==NULL)
@@ -198,8 +222,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 
 	VertexPoly::close(prem,vpp);
 
-//	bool convex = nbe==nbv;
-	bool convex = false;
+	bool convex = nbe==nbv;
 	if (convex)
 	{
 		// second pass with no test of intersections with polygons
@@ -217,45 +240,42 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 		for (unsigned int i=0; i< nbv; ++i)
 		{
 			if (vpp->value <5.0f)
-			{
 				computeEarIntersection<PFP>(position,vpp,normalPoly);
-			}
 			vpp->ear = ears.insert(vpp);
 			vpp = vpp->next;
 		}
 	}
-
-// 	DBG: AFF ears
-//	for (std::multimap< float, VertexPoly* >::iterator it = ears.begin(); it != ears.end(); ++it )
-//		std::cout << it->first <<" , "<< it->second->id<<" , "<< it->second->value<< " / ";
-//	std::cout << std::endl;
 
 	// NO WE HAVE THE POLYGON AND EARS
 	// LET'S REMOVE THEM
 	while (nbv>3)
 	{
 		// take best (and valid!) ear
-		VPMS::iterator be_it = ears.begin(); // best ear is big value cos -> last in map
+		VPMS::iterator be_it = ears.begin(); // best ear
 		VertexPoly* be = *be_it;
 
 		tableIndices.push_back(be->id);
 		tableIndices.push_back(be->next->id);
 		tableIndices.push_back(be->prev->id);
-
-		//remove 3 ears
-		ears.erase(be_it);					// from map of ears
-		ears.erase(be->next->ear);
-		ears.erase(be->prev->ear);
-
-		be = VertexPoly::erase(be); 	// and remove ear vertex from polygon
 		nbv--;
 
 		if (nbv>3)	// do not recompute if only one triangle left
-			recompute2Ears<PFP>(position,be,normalPoly,ears,convex);
-		else		// finish
 		{
+			//remove ears and two sided ears
+			ears.erase(be_it);					// from map of ears
+			ears.erase(be->next->ear);
+			ears.erase(be->prev->ear);
+			be = VertexPoly::erase(be); 	// and remove ear vertex from polygon
+			recompute2Ears<PFP>(position,be,normalPoly,ears,convex);
+			convex = (*(ears.rbegin()))->value < 5.0f;
+		}
+		else		// finish (no need to update ears)
+		{
+			// remove ear from polygon
+			be = VertexPoly::erase(be);
+			// last triangle
 			tableIndices.push_back(be->id);
-			tableIndices.push_back(be->next->id);	// last triangle
+			tableIndices.push_back(be->next->id);
 			tableIndices.push_back(be->prev->id);
 			// release memory of last triangle in polygon
 			delete be->next;
@@ -275,19 +295,24 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 
 	if (map.phi1(c) != a)
 	{
-		addEarTri<PFP>(map, d, tableIndices);	//TODO version optimisee pour 4 cotes  ?
+		addEarTri<PFP>(map, d, tableIndices);
 		return;
 	}
 
+	tableIndices.push_back(map.getEmbedding(VERTEX, d));
+	tableIndices.push_back(map.getEmbedding(VERTEX, b));
+	tableIndices.push_back(map.getEmbedding(VERTEX, c));
+
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
-	do
-	{
-		tableIndices.push_back(map.getEmbedding(VERTEX, d));
-		tableIndices.push_back(map.getEmbedding(VERTEX, b));
-		tableIndices.push_back(map.getEmbedding(VERTEX, c));
-		b = c;
-		c = map.phi1(b);
-	} while (c != d);
+//	do
+//	{
+//		tableIndices.push_back(map.getEmbedding(VERTEX, d));
+//		tableIndices.push_back(map.getEmbedding(VERTEX, b));
+//		tableIndices.push_back(map.getEmbedding(VERTEX, c));
+//		b = c;
+//		c = map.phi1(b);
+//	} while (c != d);
+
 }
 
 

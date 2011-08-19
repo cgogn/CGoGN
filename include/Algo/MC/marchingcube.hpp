@@ -60,12 +60,12 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, Windo
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, unsigned int idPos, Windowing<DataType> wind, bool boundRemoved):
+MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, const typename PFP::TVEC3& position, Windowing<DataType> wind, bool boundRemoved):
 	m_Image(img),
 	m_windowFunc(wind),
 	m_Buffer(NULL),
 	m_map(map),
-	m_positions(idPos,*map),
+	m_positions(position),
 	m_fOrigin(typename PFP::VEC3(0.0,0.0,0.0)),
 	m_fScal(typename PFP::VEC3(1.0,1.0,1.0)),
 	m_brem(boundRemoved)
@@ -101,7 +101,6 @@ void MarchingCube<DataType, Windowing, PFP>::deleteMesh()
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 {
-
 
 	// create the mesh if needed
 	if (m_map==NULL)
@@ -208,7 +207,7 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 		m_Buffer->nextSlice();
 	}
 
-//	CGoGNout << "Taille 2-carte:"<<m_map->size()<<" brins"<<CGoGNendl;
+	CGoGNout << "Taille 2-carte:"<<m_map->getNbDarts()<<" brins"<<CGoGNendl;
 
 }
 
