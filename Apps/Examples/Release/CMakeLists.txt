@@ -63,3 +63,9 @@ add_executable( viewer ../viewer.cpp ${viewer_moc} ${viewer_ui})
 target_link_libraries( viewer
 	${CGoGN_LIBS_R} ${NUMERICAL_LIBS} ${COMMON_LIBS} ${QT_LIBRARIES} )
 
+QT4_WRAP_UI( clipping_ui ../clipping.ui )
+QT4_WRAP_CPP( clipping_moc ../clipping.h )
+add_executable( clipping ../clipping.cpp ${clipping_ui} ${clipping_moc})
+target_link_libraries( clipping
+	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
+

@@ -22,14 +22,15 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __STAGE_SHADER_H__
-#define __STAGE_SHADER_H__
+#ifndef __CLIPPING_H__
+#define __CLIPPING_H__
 
 #include <iostream>
 
 #include "Utils/qtSimple.h"
+#include "Utils/qtInputs.h"
 
-#include "ui_stage_shader.h"
+#include "ui_clipping.h"
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/qtui.h"
 
@@ -49,10 +50,15 @@
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 
+#include "Utils/frameManipulator.h"
 
+#include "Utils/clippingPresets.h"
 
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
+
+#include <string>
+#include <sstream>
 
 using namespace CGoGN ;
 
@@ -63,7 +69,7 @@ struct PFP: public PFP_STANDARD
 };
 
 
-class StageShader: public Utils::QT::SimpleQT
+class Clipping: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
@@ -80,11 +86,13 @@ public:
 	//Render
 	bool m_drawVertices;
 	bool m_drawLines;
-    bool m_drawFaces;
-    bool m_drawTopo;
+	bool m_drawFaces;
+	bool m_drawTopo;
 
 	Algo::Render::GL2::MapRender* m_render;
 	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
+
+	Geom::BoundingBox<PFP::VEC3> m_bb;
 
 	Utils::VBO* m_positionVBO;
 
@@ -94,13 +102,23 @@ public:
 	Utils::Drawer* chips_area;
 
 	Geom::Vec3f m_coeffTopoExplod;
-    Geom::Vec3f gPosObj ;
-    float gWidthObj ;
+	Geom::Vec3f gPosObj ;
+	float gWidthObj ;
 
-    //QT
-    Utils::QT::uiDockInterface dock;
+	//QT
+	Utils::QT::uiDockInterface dock;
 
-    StageShader();
+	// Picking
+	Utils::LineDrawable* m_planeDrawable;
+	Utils::LineDrawable* m_sphereDrawable;
+	Utils::FrameManipulator* m_frameManipulator;
+	unsigned int m_frameManipulatorPickedAxis;
+	std::vector<Utils::Pickable*> m_pickablePlanes;
+	std::vector<Utils::Pickable*> m_pickableSpheres;
+	Utils::Pickable* m_lastPickedObject;
+	int m_lastClickedX, m_lastClickedY;
+
+	Clipping();
 
 	void initGUI();
 	void cb_Open();
@@ -108,6 +126,7 @@ public:
 	void cb_initGL();
 	void cb_redraw();
 	void cb_mousePress(int button, int x, int y);
+	void cb_mouseMove(int buttons, int x, int y);
 	void cb_keyPress(int code);
 	void importMesh(std::string& filename);
 
@@ -121,7 +140,23 @@ public slots:
 	void slot_explodTopoPhi2(double c);
 	void slot_explodTopoPhi3(double c);
 
-	void dockWidget_topLevelChanged(bool isFloating);
+	void slot_pushButton_addPlane();
+
+	void slot_spinBox_GridResolution(int i);
+	void slot_pushButton_changePlanesColor();
+
+	void slot_pushButton_addSphere();
+
+	void slot_spinBox_SphereResolution(int i);
+	void slot_pushButton_changeSpheresColor();
+
+	void slot_doubleSpinBox_ColorAttenuationFactor(double c);
+	void slot_radioButton_ClippingMode(bool b);
+	void slot_radioButton_ColorAttenuationMode(bool b);
+
+	void slot_pushButton_deleteSelectedObject();
+
+	void slot_pushButton_applyClippingPreset();
 
 	void button_compile();
 };

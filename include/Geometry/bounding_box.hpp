@@ -178,6 +178,30 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 	}
 }
 
+
+template <typename VEC>
+bool BoundingBox<VEC>::contains(const VEC& p)
+{
+	for(unsigned int i = 0; i < m_pMin.dimension(); ++i)
+	{
+		if(m_pMin[i] > p[i])
+			return false ;
+		if(p[i] > m_pMax[i])
+			return false ;
+	}
+
+	return true;
+}
+
+template <typename VEC>
+bool BoundingBox<VEC>::contains(const BoundingBox<VEC>& bb)
+{
+	return this->contains(bb.min()) && this->contains(bb.max());
+}
+
+
+
+
 //template <typename VEC>
 //friend std::ostream& BoundingBox<VEC>::operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
 //{

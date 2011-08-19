@@ -74,6 +74,11 @@ ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	m_scale(1.0f),
 	m_color(Geom::Vec4f(1.0f, 0.0f, 0.0f, 0.0f))
 {
+
+	m_nameVS = "ShaderVectorPerVertex_vs";
+	m_nameFS = "ShaderVectorPerVertex_fs";
+	m_nameGS = "ShaderVectorPerVertex_gs";
+
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
@@ -133,9 +138,10 @@ void ShaderVectorPerVertex::restoreUniformsAttribs()
 {
 	getLocations();
 	sendParams();
-
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexVector", m_vboVec);
+	unbind();
 }
 
 } // namespace Utils

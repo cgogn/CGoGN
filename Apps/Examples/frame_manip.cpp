@@ -47,7 +47,6 @@
 #include "glm/gtc/type_precision.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-
 using namespace CGoGN;
 
 struct PFP: public PFP_STANDARD
