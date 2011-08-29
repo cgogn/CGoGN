@@ -142,6 +142,13 @@ inline unsigned int AttributeHandler<T>::newElt()
 }
 
 template <typename T>
+inline void AttributeHandler<T>::setAllValues(T& v)
+{
+	for(unsigned int i = begin(); i != end(); next(i))
+		m_attrib->operator[](i) = v ;
+}
+
+template <typename T>
 inline unsigned int AttributeHandler<T>::begin() const
 {
 	assert(isValid() || !"Invalid AttributeHandler") ;

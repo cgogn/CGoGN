@@ -143,6 +143,11 @@ public:
 	unsigned int newElt() ;
 
 	/**
+	 *
+	 */
+	void setAllValues(T& v) ;
+
+	/**
 	 * begin of table
 	 * @return the iterator of the begin of container
 	 */
