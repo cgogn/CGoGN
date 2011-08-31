@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Topology/generic/genericmap.h"
+#include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/dartmarker.h"
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -110,6 +111,12 @@ void GenericMap::clear(bool removeAttrib)
 			m_marksets[i][j].clear() ;
 			m_markTables[i][j] = NULL ;
 		}
+	}
+
+	if(removeAttrib)
+	{
+		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
+			(*it).second->setInvalid() ;
 	}
 }
 

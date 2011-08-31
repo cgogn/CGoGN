@@ -26,30 +26,47 @@ namespace CGoGN
 {
 
 template <typename T>
-AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
-	AttributeHandlerGen(m), m_attrib(amv)
+AttributeHandler<T>::AttributeHandler() :
+	AttributeHandlerGen(), m_attrib(NULL)
 {}
 
 template <typename T>
-AttributeHandler<T>::AttributeHandler() :
-	AttributeHandlerGen(NULL), m_attrib(NULL)
-{}
+AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
+	AttributeHandlerGen(m), m_attrib(amv)
+{
+	m->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(amv, this)) ;
+}
 
 template <typename T>
 AttributeHandler<T>::AttributeHandler(const AttributeHandler<T>& ta) :
 	AttributeHandlerGen(ta.m_map), m_attrib(ta.m_attrib)
-{}
+{
+	this->m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
+}
 
 template <typename T>
 inline void AttributeHandler<T>::operator=(const AttributeHandler<T>& ta)
 {
 	this->m_map = ta.m_map ;
 	m_attrib = ta.m_attrib ;
+	this->m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
 }
 
 template <typename T>
 AttributeHandler<T>::~AttributeHandler()
-{}
+{
+	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
+	std::pair<IT, IT> bounds = this->m_map->attributeHandlers.equal_range(m_attrib) ;
+	for(IT i = bounds.first; i != bounds.second; ++i)
+	{
+		if((*i).second == this)
+		{
+			this->m_map->attributeHandlers.erase(i) ;
+			return ;
+		}
+	}
+	assert(false || !"Should not get here") ;
+}
 
 template <typename T>
 AttributeMultiVector<T>* AttributeHandler<T>::getDataVector() const

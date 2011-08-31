@@ -40,12 +40,20 @@ protected:
 	GenericMap* m_map;
 
 public:
+	AttributeHandlerGen() : m_map(NULL)
+	{}
+
 	AttributeHandlerGen(GenericMap* m) : m_map(m)
 	{}
 
 	GenericMap* map() const
 	{
 		return m_map ;
+	}
+
+	void setInvalid()
+	{
+		m_map = NULL ;
 	}
 };
 
@@ -67,17 +75,17 @@ public:
 	typedef T DATA_TYPE ;
 
 	/**
+	 * Default constructor
+	 * Constructs a non-valid AttributeHandler (i.e. not linked to any attribute)
+	 */
+	AttributeHandler() ;
+
+	/**
 	 * Constructor
 	 * @param m the map which belong attribute
 	 * @param amv a pointer to the AttributeMultiVector
 	 */
 	AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) ;
-
-	/**
-	 * Default constructor
-	 * Constructs a non-valid AttributeHandler (i.e. not linked to any attribute)
-	 */
-	AttributeHandler() ;
 
 	/**
 	 * Copy constructor

@@ -193,7 +193,6 @@ void Viewer::importMesh(std::string& filename)
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize /5.0f ;
 
-	normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
 	if(!normal.isValid())
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 

@@ -77,6 +77,7 @@ class GenericMap : public MapBrowser
 {
 	friend class DartMarkerGen ;
 
+	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
 
 protected:
@@ -105,7 +106,7 @@ protected:
 
 	unsigned int m_nbThreads ;
 
-//	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
+	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
