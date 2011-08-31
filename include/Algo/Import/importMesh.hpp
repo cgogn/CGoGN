@@ -432,7 +432,7 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 
 	if(!mts.importMesh(filename, attrNames, kind))
 		return false;
-	
+
 	if (mergeCloseVertices)
 		mts.mergeCloseVertices();
 
