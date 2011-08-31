@@ -27,11 +27,29 @@
 namespace CGoGN
 {
 
-AttribMap::AttribMap() : GenericMap()
+void AttribMap::init()
 {
 	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<Mark>* amv = dartCont.addAttribute<Mark>("Mark") ;
-	m_markTables[DART][0] = amv ;
+	for (unsigned int t = 0; t < m_nbThreads; ++t)
+	{
+		std::stringstream ss ;
+		ss << "Mark_"<< t ;
+		AttributeMultiVector<Mark>* amvMark = dartCont.addAttribute<Mark>(ss.str()) ;
+		for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
+			amvMark->operator[](i).clear() ;
+		m_markTables[DART][t] = amvMark ;
+	}
+}
+
+AttribMap::AttribMap() : GenericMap()
+{
+	init() ;
+}
+
+void AttribMap::clear(bool removeAttrib)
+{
+	GenericMap::clear(removeAttrib) ;
+	init() ;
 }
 
 /****************************************

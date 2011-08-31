@@ -36,7 +36,7 @@ namespace CGoGN
  *  - A dual 1-map is made of darts linked by the phi1 permutation.
  *  - In this class darts are interpreted as oriented edges.
  *  - The phi1 relation defines cycles of darts or (oriented) faces.
- *    - Faces may have abitrary size.
+ *    - Faces may have arbitrary size.
  *    - Faces with only one edge (sometime called loops) are accepted.
  *    - Degenerated faces with only two edges are accepted.
  *  @param DART the type of dart used in the class
@@ -47,12 +47,16 @@ protected:
 	AttributeMultiVector<Dart>* m_phi1 ;
 	AttributeMultiVector<Dart>* m_phi_1 ;
 
+	void init() ;
+
 public:
 	Map1();
 
 	virtual std::string mapTypeName();
 
 	virtual unsigned int dimension();
+
+	virtual void clear(bool removeAttrib);
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification

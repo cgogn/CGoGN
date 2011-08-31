@@ -52,6 +52,8 @@ class Map3 : public Map2
 protected:
 	AttributeMultiVector<Dart>* m_phi3 ;
 
+	void init() ;
+
 public:
 	typedef Map2 ParentMap;
 
@@ -60,6 +62,8 @@ public:
 	virtual std::string mapTypeName();
 
 	virtual unsigned int dimension();
+
+	virtual void clear(bool removeAttrib);
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification
