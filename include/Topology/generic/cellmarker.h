@@ -49,19 +49,19 @@ protected:
 public:
 	/**
 	 * constructor
-	 * @param map the map on which we work (not stored use to get table of markers and new marker.
+	 * @param map the map on which we work
 	 * @param cell the type of cell we want to mark VERTEX, EDGE,...
 	 */
 	CellMarkerGen(AttribMap& map, unsigned int cell, unsigned int thread = 0) : m_map(map), m_cell(cell), m_thread(thread)
 	{
 		if(!map.isOrbitEmbedded(cell))
 			map.addEmbedding(cell) ;
-		m_mark = map.getNewMark(cell, thread) ;
+		m_mark = m_map.m_marksets[m_cell][m_thread].getNewMark() ;
 	}
 
 	virtual ~CellMarkerGen()
 	{
-		m_map.releaseMark(m_mark, m_cell, m_thread);
+		m_map.m_marksets[m_cell][m_thread].releaseMark(m_mark) ;
 	}
 
 protected:

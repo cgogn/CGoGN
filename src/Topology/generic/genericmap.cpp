@@ -71,8 +71,11 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
-		for (unsigned int j = 0; j < NB_THREAD; ++j)
+		for(unsigned int j = 0; j < NB_THREAD; ++j)
+		{
+			m_marksets[i][j].clear() ;
 			m_markTables[i][j] = NULL ;
+		}
 	}
 }
 
@@ -83,10 +86,30 @@ GenericMap::~GenericMap()
 		if(isOrbitEmbedded(i))
 			m_attribs[i].clear(true) ;
 	}
-	if (m_attributes_registry_map)
+	if(m_attributes_registry_map)
 	{
 		delete m_attributes_registry_map;
 		m_attributes_registry_map = NULL;
+	}
+}
+
+void GenericMap::clear(bool removeAttrib)
+{
+	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	{
+		if(i == DART)
+			m_attribs[i].clear(true) ;
+		else
+		{
+			m_attribs[i].clear(removeAttrib) ;
+			m_embeddings[i] = NULL ;
+		}
+
+		for(unsigned int j = 0; j < NB_THREAD; ++j)
+		{
+			m_marksets[i][j].clear() ;
+			m_markTables[i][j] = NULL ;
+		}
 	}
 }
 
@@ -106,8 +129,10 @@ void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 	if (old != EMBNULL)
 	{
 		if(m_attribs[orbit].unrefLine(old))
-			for (unsigned int t=0; t<m_nbThreads; ++t)
+		{
+			for (unsigned int t = 0; t < m_nbThreads; ++t)
 				m_markTables[orbit][t]->operator[](old).clear();
+		}
 	}
 	// ref the new emb
 	if (emb != EMBNULL)

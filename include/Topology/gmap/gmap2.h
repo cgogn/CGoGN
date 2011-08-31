@@ -38,12 +38,16 @@ class GMap2 : public GMap1
 protected:
 	AttributeMultiVector<Dart>* m_beta2 ;
 
+	void init() ;
+
 public:
 	GMap2();
 
 	virtual std::string mapTypeName();
 
 	virtual unsigned int dimension();
+
+	virtual void clear(bool removeAttrib);
 
 	virtual int getDartsPerTriangle();
 

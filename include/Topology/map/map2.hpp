@@ -27,9 +27,14 @@ namespace CGoGN
 
 /// INLINE FUNCTIONS
 
-inline Map2::Map2() : Map1()
+inline void Map2::init()
 {
 	m_phi2 = addRelation("phi2") ;
+}
+
+inline Map2::Map2() : Map1()
+{
+	init() ;
 }
 
 inline std::string Map2::mapTypeName()
@@ -40,6 +45,12 @@ inline std::string Map2::mapTypeName()
 inline unsigned int Map2::dimension()
 {
 	return 2 ;
+}
+
+inline void Map2::clear(bool removeAttrib)
+{
+	Map1::clear(removeAttrib) ;
+	init() ;
 }
 
 /*! @name Basic Topological Operators

@@ -71,6 +71,8 @@ public:
 	virtual void next(Dart& d) = 0;
 };
 
+class AttributeHandlerGen ;
+
 class GenericMap : public MapBrowser
 {
 	friend class DartMarkerGen ;
@@ -99,18 +101,28 @@ protected:
 	/**
 	 * Direct access to the attributes that store Marks
 	 */
-	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD];
+	AttributeMultiVector<Mark>* m_markTables[NB_ORBITS][NB_THREAD] ;
 
-	unsigned int m_nbThreads;
+	unsigned int m_nbThreads ;
+
+//	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
-	GenericMap();
+	GenericMap() ;
 
-	~GenericMap();
+	~GenericMap() ;
 
-	virtual std::string mapTypeName() = 0;
+	virtual std::string mapTypeName() = 0 ;
+
+	/**
+	 * Clear the map
+	 * @param removeAttrib
+	 *   if false -> data is deleted but all attributes remain (all AttributeHandlers are still valid)
+	 *   if true -> data and attributes are deleted (AttributeHandlers are invalid)
+	 */
+	virtual void clear(bool removeAttrib) ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -119,12 +131,12 @@ protected:
 	/**
 	 * Add a dart to the map
 	 */
-	virtual Dart newDart();
+	virtual Dart newDart() ;
 
 	/**
 	 * Erase a dart of the map
 	 */
-	void deleteDart(Dart d);
+	void deleteDart(Dart d) ;
 
 public:
 	/**
@@ -135,7 +147,7 @@ public:
 	/**
 	 * @return the number of darts in the map
 	 */
-	unsigned int getNbDarts();
+	unsigned int getNbDarts() ;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -144,29 +156,24 @@ public:
 	/**
 	 * tell if an orbit is embedded or not
 	 */
-	bool isOrbitEmbedded(unsigned int orbit) const;
+	bool isOrbitEmbedded(unsigned int orbit) const ;
 
 	/**
 	 * return the number of embedded orbits (including DART)
 	 */
-	unsigned int nbEmbeddings() const;
+	unsigned int nbEmbeddings() const ;
 
 	/**
 	 * get the cell index of the given dimension associated to dart d
 	 * (can go through the whole orbit due to lazy embedding)
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
-	unsigned int getEmbedding(unsigned int orbit, Dart d);
-
-//	/**
-//	 * Get the cell index of the given dimension associated to dart d
-//	 */
-//	unsigned int getDartEmbedding(unsigned int orbit, Dart d);
+	unsigned int getEmbedding(unsigned int orbit, Dart d) ;
 
 	/**
 	 * Set the cell index of the given dimension associated to dart d
 	 */
-	void setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb);
+	void setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb) ;
 
 	/**
 	 * Copy the index of the cell associated to a dart over an other dart
@@ -174,14 +181,14 @@ public:
 	 * @param e the dart to copy (src)
 	 * @param orbit the id of orbit embedding
 	 */
-	void copyDartEmbedding(unsigned int orbit, Dart d, Dart e);
+	void copyDartEmbedding(unsigned int orbit, Dart d, Dart e) ;
 
 	/**
 	 * Allocation of some place in attrib table
 	 * @param orbit the orbit of embedding
 	 * @return the index to use as embedding
 	 */
-	unsigned int newCell(unsigned int orbit);
+	unsigned int newCell(unsigned int orbit) ;
 
 	/**
 	* Set the index of the associated cell to all the darts of an orbit
@@ -189,7 +196,7 @@ public:
 	* @param d a dart of the topological vertex
 	* @param em index of attribute to store as embedding
 	*/
-	void embedOrbit(unsigned int orbit, Dart d, unsigned int em);
+	void embedOrbit(unsigned int orbit, Dart d, unsigned int em) ;
 
 	/**
 	* Associate an new embedding to all darts of a vertex
@@ -197,7 +204,7 @@ public:
 	* @param d a dart of the topological cell
 	* @return index of the attribute in table
 	*/
-	unsigned int embedNewCell(unsigned int orbit, Dart d);
+	unsigned int embedNewCell(unsigned int orbit, Dart d) ;
 
 	/**
 	* Copy the cell associated to a dart over an other dart
@@ -205,7 +212,7 @@ public:
 	* @param d the dart to overwrite (dest)
 	* @param e the dart to copy (src)
 	 */
-	void copyCell(unsigned int orbit, Dart d, Dart e);
+	void copyCell(unsigned int orbit, Dart d, Dart e) ;
 
 	/**
 	 * Line of attributes i is overwritten with line j
@@ -213,14 +220,14 @@ public:
 	 * @param i line destination of copy
 	 * @param j line source of copy
 	 */
-	void copyCell(unsigned int orbit, unsigned int i, unsigned int j);
+	void copyCell(unsigned int orbit, unsigned int i, unsigned int j) ;
 
 	/**
 	 * Line of attributes i is initialized
 	 * @param orbit attribute orbit to use
 	 * @param i line to init
 	 */
-	void initCell(unsigned int orbit, unsigned int i);
+	void initCell(unsigned int orbit, unsigned int i) ;
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
@@ -230,24 +237,24 @@ public:
 	 * get the attrib container of a given orbit
 	 * @param orbit the orbit !!! (bilbo the orbit !)
 	 */
-	AttributeContainer& getAttributeContainer(unsigned int orbit);
+	AttributeContainer& getAttributeContainer(unsigned int orbit) ;
 
 	/**
 	 * get a multi vector of mark attribute (direct access with [i])
 	 * @param orbit code
 	 */
-	AttributeMultiVector<Mark>* getMarkVector(unsigned int orbit, unsigned int thread = 0);
+	AttributeMultiVector<Mark>* getMarkVector(unsigned int orbit, unsigned int thread = 0) ;
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
 	 * (may be NULL if the orbit is not embedded)
 	 */
-	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit);
+	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit) ;
 
 	/**
 	 * swap two attribute containers
 	 */
-	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2);
+	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2) ;
 
 	/**
 	 * static function for type registration
@@ -259,25 +266,7 @@ public:
 	 * Traverse the map and embed all orbits of the given dimension with a new cell
 	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
 	 */
-	void initOrbitEmbedding(unsigned int orbit, bool realloc = false);
-
-	/****************************************
-	 *          MARKERS MANAGEMENT          *
-	 ****************************************/
-protected:
-	/**
-	 * get a new marker on cell
-	 * \pre the orbit must be already embedded
-	 * @param orbit the orbit of cell to use (xxx_ORBIT)
-	 * @return the marker to use
-	 */
-	Mark getNewMark(unsigned int cell, unsigned int thread = 0);
-
-	/**
-	 * release a marker of cell.
-	 * @param m the marker to release
-	 */
-	void releaseMark(Mark m, unsigned int cell, unsigned int thread = 0);
+	void initOrbitEmbedding(unsigned int orbit, bool realloc = false) ;
 
 	/****************************************
 	 *          THREAD MANAGEMENT           *
@@ -288,19 +277,19 @@ public:
 	 * to allow MT
 	 * @param nb thread to add
 	 */
-	void addThreadMarker(unsigned int nb);
+	void addThreadMarker(unsigned int nb) ;
 
 	/**
 	 * return allowed threads
 	 * @return the number of threads (including principal)
 	 */
-	unsigned int getNbThreadMarkers();
+	unsigned int getNbThreadMarkers() ;
 
 	/**
 	 * Remove some added threads
 	 * @return remaining number of threads (including principal)
 	 */
-	void removeThreadMarker(unsigned int nb);
+	void removeThreadMarker(unsigned int nb) ;
 
 	/****************************************
 	 *             SAVE & LOAD              *
@@ -312,7 +301,7 @@ public:
 	 * @param name the name
 	 * @ return true if node has the good name
 	 */
-	bool chechXmlNode(xmlNodePtr node, const std::string& name);
+	bool chechXmlNode(xmlNodePtr node, const std::string& name) ;
 
 	/**
 	 * update the pointer of embedding vector after loading
@@ -324,28 +313,28 @@ public:
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool saveMapXml(const std::string& filename, bool compress = false);
+	bool saveMapXml(const std::string& filename, bool compress = false) ;
 
 	 /**
 	 * Load map from a XML file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool loadMapXml(const std::string& filename, bool compress = false);
+	bool loadMapXml(const std::string& filename, bool compress = false) ;
 
 	/**
 	 * Save map in a binary file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool saveMapBin(const std::string& filename);
+	bool saveMapBin(const std::string& filename) ;
 
 	/**
 	 * Load map from a binary file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool loadMapBin(const std::string& filename);
+	bool loadMapBin(const std::string& filename) ;
 
 	/****************************************
 	 *           DARTS TRAVERSALS           *
@@ -355,40 +344,40 @@ public:
 	 * Begin of map
 	 * @return the first dart of the map
 	 */
-	Dart begin();
+	Dart begin() ;
 
 	/**
 	 * End of map
 	 * @return the end iterator (next of last) of the map
 	 */
-	Dart end();
+	Dart end() ;
 
 	/**
 	 * allow to go from a dart to the next
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	void next(Dart& d);
+	void next(Dart& d) ;
 
 	/**
 	 * Apply a functor on each dart of the map
 	 * @param f a ref to the functor obj
 	 */
-	bool foreach_dart(FunctorType& f, const FunctorSelect& good = SelectorTrue());
+	bool foreach_dart(FunctorType& f, const FunctorSelect& good = SelectorTrue()) ;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit
 	 *  @param d a dart of the orbit
 	 *  @param f a functor obj
 	 */
-	bool foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0);
+	bool foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
-	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
-	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0;
+	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
 
 	/**
 	* execute functor for each orbit
@@ -396,14 +385,14 @@ public:
 	* @param f the functor
 	* @param good the selector of darts
 	*/
-	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0);
+	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) ;
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
 	 *	@param good the selector of darts
 	 * 	@return the number of orbits
 	 */
-	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = SelectorTrue());
+	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = SelectorTrue()) ;
 } ;
 
 
@@ -413,14 +402,14 @@ bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, Fu
 	switch(orbit)
 	{
 		case  DART: return f(d);
-		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread);
-		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread);
-		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread);
-		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread);
-		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread);
-		default: assert(!"Cells of this dimension are not handled");
+		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread) ;
+		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread) ;
+		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
+		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread) ;
+		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread) ;
+		default: assert(!"Cells of this dimension are not handled") ;
 	}
-	return false;
+	return false ;
 }
 
 template <typename MAP>
@@ -429,14 +418,14 @@ bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, F
 	switch(orbit)
 	{
 		case  DART: return f(d);
-		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread);
-		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread);
-		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread);
-		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread);
-		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread);
-		default: assert(!"Cells of this dimension are not handled");
+		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread) ;
+		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread) ;
+		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
+		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread) ;
+		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread) ;
+		default: assert(!"Cells of this dimension are not handled") ;
 	}
-	return false;
+	return false ;
 }
 
 } //namespace CGoGN

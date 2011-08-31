@@ -98,9 +98,9 @@ public:
 class DartMarkerGen
 {
 protected:
-	Mark m_mark;
-	GenericMap& m_map;
-	unsigned int m_thread;
+	GenericMap& m_map ;
+	unsigned int m_thread ;
+	Mark m_mark ;
 
 public:
 	/**
@@ -109,17 +109,17 @@ public:
 	 */
 	DartMarkerGen(GenericMap& map): m_map(map), m_thread(0)
 	{
-		m_mark = map.getNewMark(DART);
+		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
 	}
 
 	DartMarkerGen(GenericMap& map, unsigned int thread): m_map(map), m_thread(thread)
 	{
-		m_mark = map.getNewMark(DART, thread);
+		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
 	}
 
 	virtual ~DartMarkerGen()
 	{
-		m_map.releaseMark(m_mark, DART, m_thread);
+		m_map.m_marksets[DART][m_thread].releaseMark(m_mark) ;
 	}
 
 protected:

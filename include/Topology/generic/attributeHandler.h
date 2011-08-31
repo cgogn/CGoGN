@@ -33,6 +33,22 @@
 namespace CGoGN
 {
 
+class AttributeHandlerGen
+{
+protected:
+	// the map that contains the linked attribute
+	GenericMap* m_map;
+
+public:
+	AttributeHandlerGen(GenericMap* m) : m_map(m)
+	{}
+
+	GenericMap* map() const
+	{
+		return m_map ;
+	}
+};
+
 /**
  * Class that create an access-table to an existing attribute
  * Main available operations are:
@@ -41,13 +57,10 @@ namespace CGoGN
  * - begin / end / next to manage indexing
  */
 template <typename T>
-class AttributeHandler
+class AttributeHandler : public AttributeHandlerGen
 {
 protected:
-	// we need the map to use dart as index
-	GenericMap* m_map;
-
-	// access to the data
+	// the multi-vector that contains attribute data
 	AttributeMultiVector<T>* m_attrib;
 
 public:
@@ -60,6 +73,10 @@ public:
 	 */
 	AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) ;
 
+	/**
+	 * Default constructor
+	 * Constructs a non-valid AttributeHandler (i.e. not linked to any attribute)
+	 */
 	AttributeHandler() ;
 
 	/**
@@ -78,11 +95,6 @@ public:
 	 * Destructor (empty & virtual)
 	 */
 	virtual ~AttributeHandler() ;
-
-	/**
-	 * get associated map
-	 */
-	GenericMap* map() const ;
 
 	/**
 	 * get attribute data vector
@@ -143,7 +155,7 @@ public:
 	unsigned int newElt() ;
 
 	/**
-	 *
+	 * initialize all the lines of the attribute with the given value
 	 */
 	void setAllValues(T& v) ;
 
