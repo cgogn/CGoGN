@@ -42,6 +42,8 @@
 #include "Algo/Render/SVG/mapSVGRender.h"
 
 
+#include "Algo/Modelisation/triangulation.h"
+
 using namespace CGoGN ;
 
 
@@ -156,7 +158,7 @@ void MyQT::cb_initGL()
 void MyQT::cb_redraw()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_LIGHTING);
 	if (m_shader)
 	{
@@ -170,7 +172,7 @@ void MyQT::cb_redraw()
 		m_render->draw(m_shader, Algo::Render::GL2::LINES);
 
 		glPolygonOffset(0.8f, 0.8f);
-		m_shader->setColor(Geom::Vec4f(1.0,0.,0.,0.));
+		m_shader->setColor(Geom::Vec4f(0.0,0.,0.,0.));
 		glLineWidth(1.0f);
 		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 		m_render->drawSub(m_shader, Algo::Render::GL2::TRIANGLES, nb_ears);
@@ -185,39 +187,64 @@ void MyQT::cb_redraw()
 
 void MyQT::cb_keyPress(int code)
 {
-	if (code == '+')
+	switch(code)
 	{
+	case '+':
 		nb_ears++;
 		// born sup dans drawing
 		updateGL();
-	}
-
-	if (code == '-')
-	{
+		break;
+	case '-':
 		if (nb_ears>=1)
 			nb_ears--;
 		updateGL();
-	}
-
-	if (code == 'n')
-	{
+		break;
+	case 'n':
 		nb_ears=0;
 		updateGL();
-	}
+		break;
 
-	if (code == 'a')
-	{
+	case 'a':
 		nb_ears=99999999;
 		updateGL();
-	}
+		break;
+	case 't':
+		{
 
+			Algo::Modelisation::EarTriangulation<PFP> triangulation(myMap);
+			triangulation.triangule();
+
+			SelectorTrue allDarts;
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+			updateGL();
+		}
+		break;
+//	case 'u':
+//		{
+//			Dart d=myMap.begin();
+//			while (d != myMap.end())
+//			{
+//				if (myMap.phi2(d) != d)
+//				{
+//					Dart e = d;
+//					myMap.next(d);
+//					if (d== myMap.phi2(e))
+//						myMap.next(d);
+//					myMap.mergeFaces(e);
+//				}
+//				else
+//					myMap.next(d);
+//			}
+//		}
+//		break;
+	}
 }
 
 int main(int argc, char **argv)
 {
 
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-
 
 	Dart d0 = myMap.newFace(12);
 	position[d0] = PFP::VEC3(0, 20, 0);
@@ -241,7 +268,7 @@ int main(int argc, char **argv)
 	position[d0] = PFP::VEC3(5, 30, 0);
 	d0 = myMap.phi1(d0);
 	position[d0] = PFP::VEC3(0, 30, 0);
-	d0 = myMap.phi1(d0);
+
 
 
 	d0 = myMap.newFace(4);
@@ -382,7 +409,6 @@ int main(int argc, char **argv)
 	for (int i=0; i<174;++i)
 	{
 		float a = float(rand()-RAND_MAX/2)/float(RAND_MAX) * 0.25f;
-
 		position[d9] = PFP::VEC3(60.0,60.0,0.0f) + Gfont[2*i] * V1 + Gfont[2*i+1]*V2 + a*V3;
 		d9 = myMap.phi1(d9);
 	}
@@ -417,8 +443,10 @@ int main(int argc, char **argv)
 	SelectorTrue allDarts;
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
-	// show final pour premier redraw
+
+//	 show final pour premier redraw
 	sqt.show();
 
 	// et on attend la fin.

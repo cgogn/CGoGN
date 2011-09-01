@@ -38,7 +38,7 @@ Viewer::Viewer() :
 	m_pointSprite(NULL)
 {
 	normalScaleFactor = 1.0f ;
-	vertexScaleFactor = 1.0f ;
+	vertexScaleFactor = 0.1f ;
 	faceShrinkage = 1.0f ;
 
 	colClear = Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f) ;
@@ -121,7 +121,7 @@ void Viewer::cb_redraw()
 {
 	if(m_drawVertices)
 	{
-		float size = vertexBaseSize * vertexScaleFactor ;
+		float size = vertexScaleFactor ;
 		m_pointSprite->setSize(size) ;
 		m_pointSprite->predraw(Geom::Vec3f(0.0f, 0.0f, 1.0f)) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
@@ -175,6 +175,8 @@ void Viewer::cb_Open()
 
 void Viewer::importMesh(std::string& filename)
 {
+	myMap.clear(true) ;
+
 	std::vector<std::string> attrNames ;
 	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
 	{
@@ -189,7 +191,7 @@ void Viewer::importMesh(std::string& filename)
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
-	vertexBaseSize = normalBaseSize * 2.0f ;
+//	vertexBaseSize = normalBaseSize /5.0f ;
 
 	if(!normal.isValid())
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
@@ -211,7 +213,7 @@ void Viewer::slot_drawVertices(bool b)
 
 void Viewer::slot_verticesSize(int i)
 {
-	vertexScaleFactor = i / 50.0f ;
+	vertexScaleFactor = i / 500.0f ;
 	updateGL() ;
 }
 

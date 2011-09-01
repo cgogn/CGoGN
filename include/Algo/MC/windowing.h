@@ -205,7 +205,7 @@ public:
 	 * @return true if voxel is inside the object
 	 */
 	bool inside(DataType val) const {
-		return  (val>=this->m_value);
+		return  (val >= this->m_value);
 	}
 
 	/**

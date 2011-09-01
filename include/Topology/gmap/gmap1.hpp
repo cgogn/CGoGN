@@ -25,9 +25,14 @@
 namespace CGoGN
 {
 
-inline GMap1::GMap1() : GMap0()
+inline void GMap1::init()
 {
 	m_beta1 = addRelation("beta1") ;
+}
+
+inline GMap1::GMap1() : GMap0()
+{
+	init() ;
 }
 
 inline std::string GMap1::mapTypeName()
@@ -38,6 +43,12 @@ inline std::string GMap1::mapTypeName()
 inline unsigned int GMap1::dimension()
 {
 	return 1;
+}
+
+inline void GMap1::clear(bool removeAttrib)
+{
+	GMap0::clear(removeAttrib) ;
+	init() ;
 }
 
 inline int GMap1::getDartsPerTriangle()

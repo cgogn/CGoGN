@@ -104,11 +104,12 @@ protected:
 	public:
 		int id;
 		float value;
+		float length;
 		VertexPoly* prev;
 		VertexPoly* next;
 		VPMS::iterator ear;
 
-		VertexPoly(int i, float v, VertexPoly* p=NULL): id(i),value(v), prev(p), next(NULL)
+		VertexPoly(int i, float v, float l, VertexPoly* p=NULL): id(i),value(v), length(l), prev(p), next(NULL)
 		{
 			if (prev!=NULL)
 				prev->next = this;
@@ -125,7 +126,6 @@ protected:
 			VertexPoly* tmp = vp->prev;
 			tmp->next = vp->next;
 			vp->next->prev = tmp;
-			vp->value = 20.0f; //??
 			delete vp;
 			return tmp;
 		}
@@ -166,9 +166,6 @@ protected:
 	template<typename PFP>
 	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices);
 
-//	template<typename PFP>
-//	float computeEarAngle(AttributeHandler<typename PFP::VEC3>& position, const typename PFP::VEC3& normalPoly, unsigned int i, unsigned int j, unsigned int k);
-
 	template<typename PFP>
 	float computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2, const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly);
 
@@ -178,6 +175,8 @@ protected:
 	template<typename PFP>
 	void recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
 
+	template<typename VEC3>
+	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
 
 public:
 	/**

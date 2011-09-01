@@ -38,7 +38,15 @@ template <typename T>
 inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
 {
 	assert(attr.isValid() || !"Invalid attribute handler") ;
-	return m_attribs[attr.getOrbit()].removeAttribute<T>(attr.getIndex()) ;
+	if(m_attribs[attr.getOrbit()].removeAttribute<T>(attr.getIndex()))
+	{
+		typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
+		std::pair<IT, IT> bounds = attributeHandlers.equal_range(attr.getDataVector()) ;
+		for(IT i = bounds.first; i != bounds.second; ++i)
+			(*i).second->setInvalid() ;
+		return true ;
+	}
+	return false ;
 }
 
 template <typename T>

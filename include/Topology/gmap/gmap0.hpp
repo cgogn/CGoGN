@@ -27,9 +27,14 @@ namespace CGoGN
 
 /// INLINE FUNCTIONS
 
-inline GMap0::GMap0() : AttribMap()
+inline void GMap0::init()
 {
 	m_beta0 = addRelation("beta0") ;
+}
+
+inline GMap0::GMap0() : AttribMap()
+{
+	init() ;
 }
 
 inline std::string GMap0::mapTypeName()
@@ -40,6 +45,12 @@ inline std::string GMap0::mapTypeName()
 inline unsigned int GMap0::dimension()
 {
 	return 0;
+}
+
+inline void GMap0::clear(bool removeAttrib)
+{
+	AttribMap::clear(removeAttrib) ;
+	init() ;
 }
 
 /*! @name Basic Topological Operators

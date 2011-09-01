@@ -25,10 +25,14 @@
 namespace CGoGN
 {
 
+inline void GMap3::init()
+{
+	m_beta3 = addRelation("beta3") ;
+}
 
 inline GMap3::GMap3() : GMap2()
 {
-	m_beta3 = addRelation("beta3") ;
+	init() ;
 }
 
 inline std::string GMap3::mapTypeName()
@@ -41,6 +45,11 @@ inline unsigned int GMap3::dimension()
 	return 3;
 }
 
+inline void GMap3::clear(bool removeAttrib)
+{
+	GMap2::clear(removeAttrib) ;
+	init() ;
+}
 
 /*! @name Basic Topological Operators
  * Access and Modification

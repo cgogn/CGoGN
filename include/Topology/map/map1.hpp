@@ -27,20 +27,31 @@ namespace CGoGN
 
 /// INLINE FUNCTIONS
 
-inline Map1::Map1() : AttribMap()
+inline void Map1::init()
 {
 	m_phi1 = addRelation("phi1") ;
 	m_phi_1 = addRelation("phi_1") ;
 }
 
+inline Map1::Map1() : AttribMap()
+{
+	init() ;
+}
+
 inline std::string Map1::mapTypeName()
 {
-	return "Map1";
+	return "Map1" ;
 }
 
 inline unsigned int Map1::dimension()
 {
-	return 1;
+	return 1 ;
+}
+
+inline void Map1::clear(bool removeAttrib)
+{
+	AttribMap::clear(removeAttrib) ;
+	init() ;
 }
 
 /*! @name Basic Topological Operators
