@@ -44,6 +44,7 @@ inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
 		std::pair<IT, IT> bounds = attributeHandlers.equal_range(attr.getDataVector()) ;
 		for(IT i = bounds.first; i != bounds.second; ++i)
 			(*i).second->setInvalid() ;
+		attributeHandlers.erase(bounds.first, bounds.second) ;
 		return true ;
 	}
 	return false ;

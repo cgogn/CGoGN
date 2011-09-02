@@ -35,7 +35,6 @@ class AttribMap : public GenericMap
 {
 private:
 	friend class CellMarkerGen ;
-
 	template<typename T> friend class AutoAttributeHandler ;
 
 	void init() ;

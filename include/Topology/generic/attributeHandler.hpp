@@ -26,46 +26,72 @@ namespace CGoGN
 {
 
 template <typename T>
+void AttributeHandler<T>::registerInMap()
+{
+	m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
+}
+
+template <typename T>
+void AttributeHandler<T>::unregisterFromMap()
+{
+	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
+	std::pair<IT, IT> bounds = m_map->attributeHandlers.equal_range(m_attrib) ;
+	for(IT i = bounds.first; i != bounds.second; ++i)
+	{
+		if((*i).second == this)
+		{
+			m_map->attributeHandlers.erase(i) ;
+			return ;
+		}
+	}
+	assert(false || !"Should not get here") ;
+}
+
+// =================================================================
+
+template <typename T>
 AttributeHandler<T>::AttributeHandler() :
-	AttributeHandlerGen(), m_attrib(NULL)
+	AttributeHandlerGen(NULL, false), m_attrib(NULL)
 {}
 
 template <typename T>
 AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
-	AttributeHandlerGen(m), m_attrib(amv)
+	AttributeHandlerGen(m, false), m_attrib(amv)
 {
-	m->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(amv, this)) ;
+	if(amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
+	{
+		valid = true ;
+		registerInMap() ;
+	}
+	else
+		valid = false ;
 }
 
 template <typename T>
 AttributeHandler<T>::AttributeHandler(const AttributeHandler<T>& ta) :
-	AttributeHandlerGen(ta.m_map), m_attrib(ta.m_attrib)
+	AttributeHandlerGen(ta.m_map, ta.valid), m_attrib(ta.m_attrib)
 {
-	this->m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
+	if(valid)
+		registerInMap() ;
 }
 
 template <typename T>
 inline void AttributeHandler<T>::operator=(const AttributeHandler<T>& ta)
 {
-	this->m_map = ta.m_map ;
+	if(valid)
+		unregisterFromMap() ;
+	m_map = ta.m_map ;
 	m_attrib = ta.m_attrib ;
-	this->m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
+	valid = ta.valid ;
+	if(valid)
+		registerInMap() ;
 }
 
 template <typename T>
 AttributeHandler<T>::~AttributeHandler()
 {
-	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
-	std::pair<IT, IT> bounds = this->m_map->attributeHandlers.equal_range(m_attrib) ;
-	for(IT i = bounds.first; i != bounds.second; ++i)
-	{
-		if((*i).second == this)
-		{
-			this->m_map->attributeHandlers.erase(i) ;
-			return ;
-		}
-	}
-	assert(false || !"Should not get here") ;
+	if(valid)
+		unregisterFromMap() ;
 }
 
 template <typename T>
@@ -93,22 +119,14 @@ const std::string& AttributeHandler<T>::name() const
 }
 
 template <typename T>
-bool AttributeHandler<T>::isValid() const
-{
-	return !(this->m_map == NULL ||
-			m_attrib == NULL ||
-			m_attrib->getIndex() == AttributeContainer::UNKNOWN) ;
-}
-
-template <typename T>
 inline T& AttributeHandler<T>::operator[](Dart d)
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
+	assert(valid || !"Invalid AttributeHandler") ;
 	unsigned int orbit = m_attrib->getOrbit() ;
-	unsigned int a = this->m_map->getEmbedding(orbit, d) ;
+	unsigned int a = m_map->getEmbedding(orbit, d) ;
 
 	if (a == EMBNULL)
-		a = this->m_map->embedNewCell(orbit, d) ;
+		a = m_map->embedNewCell(orbit, d) ;
 
 	return m_attrib->operator[](a) ;
 }
@@ -116,30 +134,30 @@ inline T& AttributeHandler<T>::operator[](Dart d)
 template <typename T>
 inline const T& AttributeHandler<T>::operator[](Dart d) const
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int a = this->m_map->getEmbedding(m_attrib->getOrbit(), d) ;
+	assert(valid || !"Invalid AttributeHandler") ;
+	unsigned int a = m_map->getEmbedding(m_attrib->getOrbit(), d) ;
 	return m_attrib->operator[](a) ;
 }
 
 template <typename T>
 inline T& AttributeHandler<T>::operator[](unsigned int a)
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
+	assert(valid || !"Invalid AttributeHandler") ;
 	return m_attrib->operator[](a) ;
 }
 
 template <typename T>
 inline const T& AttributeHandler<T>::operator[](unsigned int a) const
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
+	assert(valid || !"Invalid AttributeHandler") ;
 	return m_attrib->operator[](a) ;
 }
 
 template <typename T>
 inline unsigned int AttributeHandler<T>::insert(const T& elt)
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int idx = this->m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine() ;
+	assert(valid || !"Invalid AttributeHandler") ;
+	unsigned int idx = m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine() ;
 	m_attrib->operator[](idx) = elt ;
 	return idx ;
 }
@@ -147,8 +165,8 @@ inline unsigned int AttributeHandler<T>::insert(const T& elt)
 template <typename T>
 inline unsigned int AttributeHandler<T>::newElt()
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
-	unsigned int idx = this->m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine() ;
+	assert(valid || !"Invalid AttributeHandler") ;
+	unsigned int idx = m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine() ;
 	return idx ;
 }
 
@@ -162,22 +180,22 @@ inline void AttributeHandler<T>::setAllValues(T& v)
 template <typename T>
 inline unsigned int AttributeHandler<T>::begin() const
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
-	return this->m_map->getAttributeContainer(m_attrib->getOrbit()).begin() ;
+	assert(valid || !"Invalid AttributeHandler") ;
+	return m_map->getAttributeContainer(m_attrib->getOrbit()).begin() ;
 }
 
 template <typename T>
 inline unsigned int AttributeHandler<T>::end() const
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
-	return this->m_map->getAttributeContainer(m_attrib->getOrbit()).end() ;
+	assert(valid || !"Invalid AttributeHandler") ;
+	return m_map->getAttributeContainer(m_attrib->getOrbit()).end() ;
 }
 
 template <typename T>
 inline void AttributeHandler<T>::next(unsigned int& iter) const
 {
-	assert(isValid() || !"Invalid AttributeHandler") ;
-	this->m_map->getAttributeContainer(m_attrib->getOrbit()).next(iter) ;
+	assert(valid || !"Invalid AttributeHandler") ;
+	m_map->getAttributeContainer(m_attrib->getOrbit()).next(iter) ;
 }
 
 } //namespace CGoGN

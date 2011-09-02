@@ -117,6 +117,7 @@ void GenericMap::clear(bool removeAttrib)
 	{
 		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 			(*it).second->setInvalid() ;
+		attributeHandlers.clear() ;
 	}
 }
 
