@@ -63,7 +63,10 @@ AttributeMultiVector<T>* AttributeContainer::addAttribute(const std::string& att
 	{
 		index = getAttributeIndex(attribName) ;
 		if (index != UNKNOWN)
+		{
+			std::cout << "attribute " << attribName << " already found.." << std::endl ;
 			return NULL ;
+		}
 	}
 
 	// create the new attribute

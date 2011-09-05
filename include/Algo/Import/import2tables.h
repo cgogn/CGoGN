@@ -65,9 +65,9 @@ class MeshTablesSurface
 protected:
 	typename PFP::MAP& m_map;
 
-	unsigned m_nbVertices;
+	unsigned int m_nbVertices;
 
-	unsigned m_nbFaces;
+	unsigned int m_nbFaces;
 
 	unsigned int m_lab;
 
@@ -138,11 +138,11 @@ class MeshTablesVolume
 protected:
 	typename PFP::MAP& m_map;
 
-	unsigned m_nbVertices;
+	unsigned int m_nbVertices;
 
-	unsigned m_nbFaces;
+	unsigned int m_nbFaces;
 
-	unsigned m_nbVolumes;
+	unsigned int m_nbVolumes;
 
 	/**
 	* number of edges per face

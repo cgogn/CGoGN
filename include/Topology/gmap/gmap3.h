@@ -38,12 +38,16 @@ class GMap3 : public GMap2
 protected:
 	AttributeMultiVector<Dart>* m_beta3 ;
 
+	void init() ;
+
 public:
 	GMap3();
 
 	virtual std::string mapTypeName();
 
 	virtual unsigned int dimension();
+
+	virtual void clear(bool removeAttrib);
 
 	/*! @name Basic Topological Operators
 	 * Access and Modification

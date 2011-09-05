@@ -200,22 +200,6 @@ inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned in
 }
 
 /****************************************
- *          MARKERS MANAGEMENT          *
- ****************************************/
-
-inline Mark GenericMap::getNewMark(unsigned int cell, unsigned int thread)
-{
-	assert(isOrbitEmbedded(cell) || !"Try to get a marker on non embedded cell! ") ;
-	return m_marksets[cell][thread].getNewMark() ;
-}
-
-inline void GenericMap::releaseMark(Mark m, unsigned int cell, unsigned int thread)
-{
-	assert(isOrbitEmbedded(cell) || !"Try to release a marker on non embedded cell! ") ;
-	m_marksets[cell][thread].releaseMark(m) ;
-}
-
-/****************************************
  *           DARTS TRAVERSALS           *
  ****************************************/
 

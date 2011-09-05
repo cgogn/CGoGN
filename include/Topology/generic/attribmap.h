@@ -33,14 +33,18 @@ namespace CGoGN
 
 class AttribMap : public GenericMap
 {
+private:
 	friend class CellMarkerGen ;
-
 	template<typename T> friend class AutoAttributeHandler ;
+
+	void init() ;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
-	AttribMap();
+	AttribMap() ;
+
+	virtual void clear(bool removeAttrib) ;
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
@@ -50,10 +54,10 @@ public:
 	* Create an attribute for a given orbit
 	* @param orbit
 	* @param nameAttr attribute name
-	* @return  a "code orbit" : 8 bits for orbit & 24 bits for index of attribute in container
+	* @return an AttributeHandler
 	*/
 	template <typename T>
-	AttributeHandler<T> addAttribute(unsigned int orbit, const std::string& nameAttr);
+	AttributeHandler<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
 	 * remove an attribute
@@ -61,16 +65,16 @@ public:
 	 * @return true if remove succeed else false
 	 */
 	template <typename T>
-	bool removeAttribute(AttributeHandler<T>& attr);
+	bool removeAttribute(AttributeHandler<T>& attr) ;
 
 	/**
 	* search an attribute for a given orbit
 	* @param orbit
 	* @param nameAttr attribute name
-	* @return id of attribute : 8 bits for orbit & 24 bits for index of attribute in container
+	* @return an AttributeHandler
 	*/
 	template <typename T>
-	AttributeHandler<T> getAttribute(unsigned int orbit, const std::string& nameAttr);
+	AttributeHandler<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
 	/**
 	 * swap the content of two attributes (efficient, only swap pointers)
@@ -98,7 +102,7 @@ protected:
 	 * Create the dart attribute to store the embedding of this orbit (for internal use only)
 	 * Also adds a Marker attribute to the container
 	 */
-	void addEmbedding(unsigned int orbit);
+	void addEmbedding(unsigned int orbit) ;
 
 	/****************************************
 	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
@@ -108,7 +112,7 @@ protected:
 	 * Add a toological relation in the map
 	 * @param name name of relation
 	 */
-	AttributeMultiVector<Dart>* addRelation(const std::string& name);
+	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
 
 public:
 	/****************************************

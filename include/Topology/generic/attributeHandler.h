@@ -33,6 +33,38 @@
 namespace CGoGN
 {
 
+class AttributeHandlerGen
+{
+protected:
+	friend class GenericMap ;
+	friend class AttribMap ;
+
+	// the map that contains the linked attribute
+	GenericMap* m_map ;
+	// boolean that states the validity of the handler
+	bool valid ;
+
+public:
+	AttributeHandlerGen(GenericMap* m, bool v) : m_map(m), valid(v)
+	{}
+
+	GenericMap* map() const
+	{
+		return m_map ;
+	}
+
+	bool isValid() const
+	{
+		return valid ;
+	}
+
+protected:
+	void setInvalid()
+	{
+		valid = false ;
+	}
+} ;
+
 /**
  * Class that create an access-table to an existing attribute
  * Main available operations are:
@@ -41,17 +73,23 @@ namespace CGoGN
  * - begin / end / next to manage indexing
  */
 template <typename T>
-class AttributeHandler
+class AttributeHandler : public AttributeHandlerGen
 {
 protected:
-	// we need the map to use dart as index
-	GenericMap* m_map;
-
-	// access to the data
+	// the multi-vector that contains attribute data
 	AttributeMultiVector<T>* m_attrib;
+
+	void registerInMap() ;
+	void unregisterFromMap() ;
 
 public:
 	typedef T DATA_TYPE ;
+
+	/**
+	 * Default constructor
+	 * Constructs a non-valid AttributeHandler (i.e. not linked to any attribute)
+	 */
+	AttributeHandler() ;
 
 	/**
 	 * Constructor
@@ -59,8 +97,6 @@ public:
 	 * @param amv a pointer to the AttributeMultiVector
 	 */
 	AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) ;
-
-	AttributeHandler() ;
 
 	/**
 	 * Copy constructor
@@ -78,11 +114,6 @@ public:
 	 * Destructor (empty & virtual)
 	 */
 	virtual ~AttributeHandler() ;
-
-	/**
-	 * get associated map
-	 */
-	GenericMap* map() const ;
 
 	/**
 	 * get attribute data vector
@@ -103,14 +134,6 @@ public:
 	 * get attribute name
 	 */
 	const std::string& name() const ;
-
-	/**
-	 * check if the attribute handler is linked to a valid attribute
-	 * -> MUST BE USED AFTER A CALL TO :
-	 * getAttribute(unsigned int orbit, const std::string& nameAttr)
-	 * addAttribute(unsigned int orbit, const std::string& nameAttr)
-	 */
-	bool isValid() const ;
 
 	/**
 	 * [] operator with dart parameter
@@ -143,7 +166,7 @@ public:
 	unsigned int newElt() ;
 
 	/**
-	 *
+	 * initialize all the lines of the attribute with the given value
 	 */
 	void setAllValues(T& v) ;
 

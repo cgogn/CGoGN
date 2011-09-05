@@ -30,6 +30,7 @@ namespace CGoGN
 
 namespace Utils
 {
+
 #include "shaderSimpleColor.vert"
 #include "shaderSimpleColor.frag"
 
@@ -49,7 +50,7 @@ namespace Utils
 //		"FRAG_OUT_DEF;\n"
 //		"void main()\n"
 //		"{\n"
-//		"	gl_FragColor=color;\n"
+//		"	gl_FragColor = color;\n"
 //		"}";
 
 

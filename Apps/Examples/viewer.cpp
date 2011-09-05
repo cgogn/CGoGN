@@ -175,6 +175,8 @@ void Viewer::cb_Open()
 
 void Viewer::importMesh(std::string& filename)
 {
+	myMap.clear(true) ;
+
 	std::vector<std::string> attrNames ;
 	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
 	{
@@ -190,7 +192,6 @@ void Viewer::importMesh(std::string& filename)
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize /5.0f ;
-
 
 	if(!normal.isValid())
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
