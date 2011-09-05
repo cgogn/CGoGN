@@ -55,13 +55,15 @@ public:
 		AttributeContainer& cellCont = this->m_map->m_attribs[orbit] ;
 		AttributeMultiVector<T>* amv = cellCont.addAttribute<T>(nameAttr) ;
 		this->m_attrib = amv ;
+		this->valid = true ;
+		this->registerInMap() ;
 	}
 
 	~AutoAttributeHandler()
 	{
 		reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
 	}
-};
+} ;
 
 } // namespace CGoGN
 
