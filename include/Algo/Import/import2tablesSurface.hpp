@@ -1195,24 +1195,24 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 		newIndices[i] = 0xffffffff;
 	}
 	
-	// compute EPSILON: average length of 50 of 100 first edges of first faces divide by 10000
-	int nb = 100;
-	if (m_nbEdges.size()< 100) 
-		nb = m_nbEdges.size();
-		
+	// compute EPSILON: average length of 50 of 100 first edges of faces divide by 10000 (very very closed)
+	unsigned int nbf = 100;
+	if (nbf> m_nbFaces)
+		nbf = m_nbFaces;
+
 	int k=0;
-	typename PFP::REAL d=0;
-	for (int i=0; i< nb; i+=2)
+	double d=0;
+	for (unsigned int i=0; i< nbf;++i)
 	{
 		typename PFP::VEC3 e1 = positions[m_emb[k+1]] - positions[m_emb[k]];
-		d += e1.norm();
+		d += double(e1.norm());
 		k += m_nbEdges[i];
 	}
-	d /= float(nb/2);
+	d /= double(nbf);
 	
-	typename PFP::REAL EPSILON = d/10000.0f;
+	typename PFP::REAL EPSILON = d/10000.0;
 	
-	
+
 	// traverse vertices
 	for (unsigned int i = positions.begin(); i != positions.end(); positions.next(i))
 	{
