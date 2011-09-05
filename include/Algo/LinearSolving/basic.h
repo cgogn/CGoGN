@@ -179,45 +179,30 @@ void startMatrix(LinearSolver<SOLVER_TRAITS>* s)
 	s->begin_system() ;
 }
 
-enum ConstraintType
+template <typename PFP, class SOLVER_TRAITS>
+void addRows_Laplacian_Topo(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<unsigned int> index)
 {
-	LAPLACIAN_TOPO,
-	LAPLACIAN_COTWEIGHT,
-	EQUALITY
-};
+	FunctorLaplacianTopo<PFP, SOLVER_TRAITS> lt(m, s, index) ;
+	m.foreach_orbit(VERTEX, lt) ;
+}
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void addMatrixRows(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, ConstraintType ct, const AttributeHandler<unsigned int> index, float* params = NULL)
+template <typename PFP, class SOLVER_TRAITS>
+void addRows_Laplacian_Cotan(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<unsigned int> index, const typename PFP::TREAL& edgeWeight, const typename PFP::TREAL& vertexArea)
 {
-	switch(ct)
-	{
-	case LAPLACIAN_TOPO :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, TOPOLOGICAL, index) ;
-		break ;
-	case LAPLACIAN_COTWEIGHT :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, COTWEIGHT, index) ;
-		break ;
-	case EQUALITY :
-		setupEqualityMatrix<PFP, ATTR_TYPE, SOLVER_TRAITS>(m, s, attr, index, params[0]) ;
-		break ;
-	}
+	FunctorLaplacianCotan<PFP, SOLVER_TRAITS> lt(m, s, index, edgeWeight, vertexArea) ;
+	m.foreach_orbit(VERTEX, lt) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void addMatrixRows(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, ConstraintType ct, unsigned int coord, const AttributeHandler<unsigned int> index, float* params = NULL)
+void addRows_Equality(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index, float amount)
 {
-	switch(ct)
-	{
-	case LAPLACIAN_TOPO :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, TOPOLOGICAL, index) ;
-		break ;
-	case LAPLACIAN_COTWEIGHT :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, COTWEIGHT, index) ;
-		break ;
-	case EQUALITY :
-		setupEqualityMatrix<PFP, ATTR_TYPE, SOLVER_TRAITS>(m, s, attr, coord, index, params[0]) ;
-		break ;
-	}
+	setupEqualityMatrix<PFP, ATTR_TYPE, SOLVER_TRAITS>(m, s, attr, index, amount) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRows_Equality(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index, float amount)
+{
+	setupEqualityMatrix<PFP, ATTR_TYPE, SOLVER_TRAITS>(m, s, attr, coord, index, amount) ;
 }
 
 template <class SOLVER_TRAITS>

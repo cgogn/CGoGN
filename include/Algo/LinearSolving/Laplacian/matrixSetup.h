@@ -31,14 +31,8 @@ namespace CGoGN
 namespace LinearSolving
 {
 
-enum LaplacianType
-{
-	TOPOLOGICAL,
-	COTWEIGHT
-};
-
 template<typename PFP, class SOLVER_TRAITS>
-class LaplacianTopo : public FunctorMap<typename PFP::MAP>
+class FunctorLaplacianTopo : public FunctorMap<typename PFP::MAP>
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
@@ -46,9 +40,8 @@ protected:
 
 public:
 	typedef typename PFP::MAP MAP ;
-	
 
-	LaplacianTopo(MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<unsigned int> index) :
+	FunctorLaplacianTopo(MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<unsigned int> index) :
 		FunctorMap<MAP>(m), solver(s), indexTable(index)
 	{}
 
@@ -72,100 +65,43 @@ public:
 	}
 } ;
 
-/*
 template<typename PFP, class SOLVER_TRAITS>
-class LaplacianCotWeight : public FunctorMap<typename PFP::MAP>
+class FunctorLaplacianCotan : public FunctorMap<typename PFP::MAP>
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const typename PFP::TREAL& edgeWeight ;
+	const typename PFP::TREAL& vertexArea ;
 
 public:
-	LaplacianCotWeight(MAP& m, LinearSolver<SOLVER_TRAITS>* s) :
-		FunctorMap<MAP>(m), solver(s)
-	{}
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
 
-//	float half_w(Dart d)
-//	{
-//		Dart d1 = this->m_map.phi2( this->m_map.phi1( d)) ;
-//		gmtl::Vec3f V1 = this->m_map.getVertexEmb(d1)->getPosition() ;
-//		V1 -= this->m_map.getVertexEmb(this->m_map.phi2(d1))->getPosition() ;
-//		Dart d2 = this->m_map.phi_1( d) ;
-//		gmtl::Vec3f V2 = this->m_map.getVertexEmb(d2)->getPosition() ;
-//		V1 -= this->m_map.getVertexEmb(this->m_map.phi2(d2))->getPosition() ;
-//		float nV1 = gmtl::lengthSquared(V1) ;
-//		float nV2 = gmtl::lengthSquared(V2) ;
-//		float cos_angle = gmtl::dot(V1, V2) / sqrt(nV1 * nV2) ;
-//		float angle = acos(cos_angle) ;
-//		return 1.0 / tan(angle) ;
-//	}
-//
-//	float w(Dart d)
-//	{
-//		float result = 0.0f ;
-//		Dart dd = this->m_map.phi2(d) ;
-//		result += half_w(d) ;
-//		result += half_w(dd) ;
-//		gmtl::Vec3f vec = this->m_map.getVertexEmb(d)->getPosition() ;
-//		vec -= this->m_map.getVertexEmb(dd)->getPosition() ;
-//		result *= gmtl::lengthSquared(vec) ;
-//		return result ;
-//	}
-//
-//	float one_ring_area(Dart d)
-//	{
-//		float result = 0.0 ;
-//		Dart dd = d ;
-//		do
-//		{
-//			gmtl::Vec3f n ;
-//			Algo::Geometry::faceNormal<PFP>(this->m_map, d, n) ;
-//			result += 0.5f * gmtl::length(n) ;
-//			dd = this->m_map.phi1(this->m_map.phi2(dd)) ;
-//		} while(dd != d) ;
-//		return result ;
-//	}
+	FunctorLaplacianCotan(MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<unsigned int> index, const typename PFP::TREAL& eWeight, const typename PFP::TREAL& vArea) :
+		FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea)
+	{}
 
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart dd = d ;
-		EMB* e = reinterpret_cast<EMB*>(this->m_map.getVertexEmb(d)) ;
-		unsigned int idx = e->getIndex() ;
-		float area = one_ring_area(d) ;
-		float aii = 0.0f ;
+		Dart it = d ;
+		REAL vArea = vertexArea[d] ;
+		REAL aii = 0 ;
 		do
 		{
-			float aij = w(dd) / area ;
+			typename PFP::REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
-			EMB* ne = reinterpret_cast<EMB*>(this->m_map.getVertexEmb(this->m_map.phi2(dd))) ;
-			unsigned int neighbour_idx = ne->getIndex() ;
-			this->solver->add_coefficient(neighbour_idx, aij) ;
-			dd = this->m_map.phi1(this->m_map.phi2(dd)) ;
-		} while(dd != d) ;
-		solver->add_coefficient(idx, -aii) ;
+			solver->add_coefficient(indexTable[this->m_map.phi2(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->set_right_hand_side(0.0f) ;
 		solver->normalize_row() ;
 		solver->end_row() ;
 		return false ;
 	}
 } ;
-*/
-
-template <typename PFP, class SOLVER_TRAITS>
-void setupLaplacianMatrix(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, LaplacianType lt, const AttributeHandler<unsigned int> index)
-{
-	switch(lt)
-	{
-	case TOPOLOGICAL : {
-		LaplacianTopo<PFP, SOLVER_TRAITS> lt(m, s, index) ;
-		m.foreach_orbit(VERTEX, lt) ;
-		break ; }
-	case COTWEIGHT : {
-		LaplacianTopo<PFP, SOLVER_TRAITS> lt(m, s, index) ;
-		m.foreach_orbit(VERTEX, lt) ;
-		break ; }
-	}
-}
 
 }
 

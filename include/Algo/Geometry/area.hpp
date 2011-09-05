@@ -70,7 +70,7 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename
 template <typename PFP>
 typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select, unsigned int th)
 {
-	float area = 0.0f ;
+	typename PFP::REAL area(0) ;
 	DartMarker mark(map,th) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -84,6 +84,32 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& 
 }
 
 template <typename PFP>
+typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+{
+	typename PFP::REAL area(0) ;
+	Dart it = d ;
+	do
+	{
+		area += convexFaceArea<PFP>(map, it, position) ;
+		it = map.alpha1(it) ;
+	} while(it != d) ;
+	return area ;
+}
+
+template <typename PFP>
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+{
+	typename PFP::REAL area(0) ;
+	Dart it = d ;
+	do
+	{
+		area += convexFaceArea<PFP>(map, it, position) ;
+		it = map.alpha1(it) ;
+	} while(it != d) ;
+	return area ;
+}
+
+template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select)
 {
 	CellMarker marker(map, FACE);
@@ -93,6 +119,34 @@ void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& positio
 		{
 			marker.mark(d);
 			face_area[d] = convexFaceArea<PFP>(map, d, position) ;
+		}
+	}
+}
+
+template <typename PFP>
+void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
+{
+	CellMarker marker(map, VERTEX);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(select(d) && !marker.isMarked(d))
+		{
+			marker.mark(d);
+			vertex_area[d] = vertexOneRingArea<PFP>(map, d, position) ;
+		}
+	}
+}
+
+template <typename PFP>
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
+{
+	CellMarker marker(map, VERTEX);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(select(d) && !marker.isMarked(d))
+		{
+			marker.mark(d);
+			vertex_area[d] = vertexVoronoiArea<PFP>(map, d, position) ;
 		}
 	}
 }

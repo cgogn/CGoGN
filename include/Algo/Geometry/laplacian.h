@@ -40,25 +40,48 @@ namespace Algo
 namespace Geometry
 {
 
-enum LaplacianType
-{
-	TOPOLOGICAL
-};
+template <typename PFP>
+typename PFP::VEC3 computeLaplacianTopoVertex(
+	typename PFP::MAP& map,
+	Dart d,
+	const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-void computeLaplacianVertices(
+typename PFP::VEC3 computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
-	LaplacianType type,
+	Dart d,
+	const typename PFP::TVEC3& position,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea) ;
+
+template <typename PFP>
+void computeLaplacianTopoVertices(
+	typename PFP::MAP& map,
 	const typename PFP::TVEC3& position,
 	typename PFP::TVEC3& laplacian,
 	const FunctorSelect& select = SelectorTrue()) ;
 
 template <typename PFP>
-void computeLaplacianVertex_Topo(
+void computeLaplacianCotanVertices(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& position,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea,
+	typename PFP::TVEC3& laplacian,
+	const FunctorSelect& select = SelectorTrue()) ;
+
+template <typename PFP>
+typename PFP::REAL computeCotanWeightEdge(
 	typename PFP::MAP& map,
 	Dart d,
+	const typename PFP::TVEC3& position) ;
+
+template <typename PFP>
+void computeCotanWeightEdges(
+	typename PFP::MAP& map,
 	const typename PFP::TVEC3& position,
-	typename PFP::TVEC3& laplacian) ;
+	typename PFP::TREAL& edgeWeight,
+	const FunctorSelect& select = SelectorTrue()) ;
 
 } // namespace Geoemtry
 
