@@ -40,34 +40,34 @@ namespace Algo
 namespace Geometry
 {
 
-template <typename PFP>
-typename PFP::VEC3 computeLaplacianTopoVertex(
+template <typename PFP, typename ATTR_TYPE>
+ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position) ;
+	const AttributeHandler<ATTR_TYPE>& attr) ;
 
-template <typename PFP>
-typename PFP::VEC3 computeLaplacianCotanVertex(
+template <typename PFP, typename ATTR_TYPE>
+ATTR_TYPE computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea) ;
-
-template <typename PFP>
-void computeLaplacianTopoVertices(
-	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
-	typename PFP::TVEC3& laplacian,
-	const FunctorSelect& select = SelectorTrue()) ;
-
-template <typename PFP>
-void computeLaplacianCotanVertices(
-	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
 	const typename PFP::TREAL& edgeWeight,
 	const typename PFP::TREAL& vertexArea,
-	typename PFP::TVEC3& laplacian,
+	const AttributeHandler<ATTR_TYPE>& attr) ;
+
+template <typename PFP, typename ATTR_TYPE>
+void computeLaplacianTopoVertices(
+	typename PFP::MAP& map,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	AttributeHandler<ATTR_TYPE>& laplacian,
+	const FunctorSelect& select = SelectorTrue()) ;
+
+template <typename PFP, typename ATTR_TYPE>
+void computeLaplacianCotanVertices(
+	typename PFP::MAP& map,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	AttributeHandler<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select = SelectorTrue()) ;
 
 template <typename PFP>

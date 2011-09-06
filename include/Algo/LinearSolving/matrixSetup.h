@@ -22,10 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __LINEAR_SOLVING_CONSTRAINTS__
-#define __LINEAR_SOLVING_CONSTRAINTS__
-
-#include "Algo/LinearSolving/Laplacian/matrixSetup.h"
+#ifndef __LINEAR_SOLVING_MATRIX_SETUP__
+#define __LINEAR_SOLVING_MATRIX_SETUP__
 
 namespace CGoGN
 {
@@ -33,26 +31,32 @@ namespace CGoGN
 namespace LinearSolving
 {
 
+/*******************************************************************************
+ * EQUALITY MATRIX : right-hand-side SCALAR
+ *******************************************************************************/
+
 template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class EqualityConstraint_Scalar : public FunctorMap<typename PFP::MAP>
+class FunctorEquality_Scalar : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
 	const AttributeHandler<unsigned int>& indexTable ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
 	float weight ;
 
 public:
-	typedef typename PFP::MAP MAP ;
-	
-
-	EqualityConstraint_Scalar(MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index, float w) :
-		FunctorMap<MAP>(m), solver(s), attrTable(attr), indexTable(index), weight(w)
+	FunctorEquality_Scalar(
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const AttributeHandler<ATTR_TYPE>& attr,
+		float w
+	) :	solver(s), indexTable(index), attrTable(attr), weight(w)
 	{}
+
 	bool operator()(Dart d)
 	{
-		this->solver->begin_row() ;
-		solver->add_coefficient(indexTable[d], 1.0f) ;
+		solver->begin_row() ;
+		solver->add_coefficient(indexTable[d], 1) ;
 		solver->set_right_hand_side(attrTable[d]) ;
 		solver->normalize_row(weight) ;
 		solver->end_row() ;
@@ -60,27 +64,34 @@ public:
 	}
 } ;
 
+/*******************************************************************************
+ * EQUALITY MATRIX : right-hand-side VECTOR + coordinate
+ *******************************************************************************/
+
 template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class EqualityConstraint_Vector : public FunctorMap<typename PFP::MAP>
+class FunctorEquality_Vector : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
 	const AttributeHandler<unsigned int>& indexTable ;
-	unsigned int coord ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
 	float weight ;
+	unsigned int coord ;
 
 public:
-	typedef typename PFP::MAP MAP ;
-	
-
-	EqualityConstraint_Vector(MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, int c, const AttributeHandler<unsigned int> index, float w) :
-		FunctorMap<MAP>(m), solver(s), attrTable(attr), indexTable(index), coord(c), weight(w)
+	FunctorEquality_Vector(
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const AttributeHandler<ATTR_TYPE>& attr,
+		float w,
+		unsigned int c
+	) :	solver(s), indexTable(index), attrTable(attr), weight(w), coord(c)
 	{}
+
 	bool operator()(Dart d)
 	{
-		this->solver->begin_row() ;
-		solver->add_coefficient(indexTable[d], 1.0f) ;
+		solver->begin_row() ;
+		solver->add_coefficient(indexTable[d], 1) ;
 		solver->set_right_hand_side((attrTable[d])[coord]) ;
 		solver->normalize_row(weight) ;
 		solver->end_row() ;
@@ -88,22 +99,287 @@ public:
 	}
 } ;
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void setupEqualityMatrix(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index, float amount)
+/*******************************************************************************
+ * LAPLACIAN TOPO MATRIX : right-hand-side 0
+ *******************************************************************************/
+
+template<typename PFP, class SOLVER_TRAITS>
+class FunctorLaplacianTopo : public FunctorMap<typename PFP::MAP>
 {
-	EqualityConstraint_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(m, s, attr, index, amount) ;
-	m.foreach_orbit(VERTEX, ec) ;
-}
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void setupEqualityMatrix(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index, float amount)
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+
+	FunctorLaplacianTopo(
+		MAP& m,
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index
+	) :	FunctorMap<MAP>(m), solver(s), indexTable(index)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		Dart it = d ;
+		REAL aii = 0 ;
+		do
+		{
+			REAL aij = 1 ;
+			aii += aij ;
+			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
+		solver->normalize_row() ;
+		solver->set_right_hand_side(0) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+/*******************************************************************************
+ * LAPLACIAN TOPO MATRIX : right-hand-side SCALAR
+ *******************************************************************************/
+
+template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+class FunctorLaplacianTopoRHS_Scalar : public FunctorMap<typename PFP::MAP>
 {
-	EqualityConstraint_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(m, s, attr, coord, index, amount) ;
-	m.foreach_orbit(VERTEX, ec) ;
-}
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
 
-}
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
 
-}
+	FunctorLaplacianTopoRHS_Scalar(
+		MAP& m,
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const AttributeHandler<ATTR_TYPE>& attr
+	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), attrTable(attr)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		Dart it = d ;
+		REAL aii = 0 ;
+		do
+		{
+			REAL aij = 1 ;
+			aii += aij ;
+			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
+		solver->normalize_row() ;
+		solver->set_right_hand_side(attrTable[d]) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+/*******************************************************************************
+ * LAPLACIAN TOPO MATRIX : right-hand-side VECTOR + coordinate
+ *******************************************************************************/
+
+template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+class FunctorLaplacianTopoRHS_Vector : public FunctorMap<typename PFP::MAP>
+{
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	unsigned int coord ;
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+
+	FunctorLaplacianTopoRHS_Vector(
+		MAP& m,
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const AttributeHandler<ATTR_TYPE>& attr,
+		unsigned int c
+	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), attrTable(attr), coord(c)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		Dart it = d ;
+		REAL aii = 0 ;
+		do
+		{
+			REAL aij = 1 ;
+			aii += aij ;
+			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
+		solver->normalize_row() ;
+		solver->set_right_hand_side((attrTable[d])[coord]) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+/*******************************************************************************
+ * LAPLACIAN COTAN MATRIX : right-hand-side 0
+ *******************************************************************************/
+
+template<typename PFP, class SOLVER_TRAITS>
+class FunctorLaplacianCotan : public FunctorMap<typename PFP::MAP>
+{
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const typename PFP::TREAL& edgeWeight ;
+	const typename PFP::TREAL& vertexArea ;
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+
+	FunctorLaplacianCotan(
+		MAP& m,
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const typename PFP::TREAL& eWeight,
+		const typename PFP::TREAL& vArea
+	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		Dart it = d ;
+		REAL vArea = vertexArea[d] ;
+		REAL aii = 0 ;
+		do
+		{
+			REAL aij = edgeWeight[it] / vArea ;
+			aii += aij ;
+			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
+		solver->normalize_row() ;
+		solver->set_right_hand_side(0) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+/*******************************************************************************
+ * LAPLACIAN COTAN MATRIX : right-hand-side SCALAR
+ *******************************************************************************/
+
+template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+class FunctorLaplacianCotanRHS_Scalar : public FunctorMap<typename PFP::MAP>
+{
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const typename PFP::TREAL& edgeWeight ;
+	const typename PFP::TREAL& vertexArea ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+
+	FunctorLaplacianCotanRHS_Scalar(
+		MAP& m,
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const typename PFP::TREAL& eWeight,
+		const typename PFP::TREAL& vArea,
+		const AttributeHandler<ATTR_TYPE>& attr
+	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		Dart it = d ;
+		REAL vArea = vertexArea[d] ;
+		REAL aii = 0 ;
+		do
+		{
+			REAL aij = edgeWeight[it] / vArea ;
+			aii += aij ;
+			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
+		solver->normalize_row() ;
+		solver->set_right_hand_side(attrTable[d]) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+/*******************************************************************************
+ * LAPLACIAN COTAN MATRIX : right-hand-side VECTOR + coordinate
+ *******************************************************************************/
+
+template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+class FunctorLaplacianCotanRHS_Vector : public FunctorMap<typename PFP::MAP>
+{
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const typename PFP::TREAL& edgeWeight ;
+	const typename PFP::TREAL& vertexArea ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	unsigned int coord ;
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+
+	FunctorLaplacianCotanRHS_Vector(
+		MAP& m,
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const typename PFP::TREAL& eWeight,
+		const typename PFP::TREAL& vArea,
+		const AttributeHandler<ATTR_TYPE>& attr,
+		unsigned int c
+	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr), coord(c)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		Dart it = d ;
+		REAL vArea = vertexArea[d] ;
+		REAL aii = 0 ;
+		do
+		{
+			REAL aij = edgeWeight[it] / vArea ;
+			aii += aij ;
+			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
+			it = this->m_map.alpha1(it) ;
+		} while(it != d) ;
+		solver->add_coefficient(indexTable[d], -aii) ;
+		solver->normalize_row() ;
+		solver->set_right_hand_side((attrTable[d])[coord]) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+} // namespace LinearSolving
+
+} // namespace CGoGN
 
 #endif

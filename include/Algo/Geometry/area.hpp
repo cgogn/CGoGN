@@ -103,7 +103,7 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typen
 	Dart it = d ;
 	do
 	{
-		area += convexFaceArea<PFP>(map, it, position) ;
+		area += convexFaceArea<PFP>(map, it, position) / 3 ;
 		it = map.alpha1(it) ;
 	} while(it != d) ;
 	return area ;

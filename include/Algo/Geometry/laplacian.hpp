@@ -33,45 +33,42 @@ namespace Algo
 namespace Geometry
 {
 
-template <typename PFP>
-typename PFP::VEC3 computeLaplacianTopoVertex(
+template <typename PFP, typename ATTR_TYPE>
+ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position)
+	const AttributeHandler<ATTR_TYPE>& attr)
 {
-	typedef typename PFP::VEC3 VEC3 ;
-	VEC3 l(0) ;
+	ATTR_TYPE l(0) ;
 	unsigned int val = 0 ;
-	Dart dd = d ;
+	Dart it = d ;
 	do
 	{
-		l += vectorOutOfDart<PFP>(map, dd, position) ;
+		l += attr[map.phi1(it)] - attr[it] ;
 		val++ ;
-		dd = map.alpha1(dd) ;
-	} while(dd != d) ;
+		it = map.alpha1(it) ;
+	} while(it != d) ;
 	l /= val ;
 	return l ;
 }
 
-template <typename PFP>
-typename PFP::VEC3 computeLaplacianCotanVertex(
+template <typename PFP, typename ATTR_TYPE>
+ATTR_TYPE computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position,
 	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea)
+	const typename PFP::TREAL& vertexArea,
+	const AttributeHandler<ATTR_TYPE>& attr)
 {
-	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
-	VEC3 l(0) ;
+	ATTR_TYPE l(0) ;
 	Dart it = d ;
 	REAL vArea = vertexArea[d] ;
 	REAL val = 0 ;
 	do
 	{
 		REAL w = edgeWeight[it] / vArea ;
-		VEC3 v = vectorOutOfDart<PFP>(map, it, position) * w ;
-		l += v ;
+		l += (attr[map.phi1(it)] - attr[it]) * w ;
 		val += w ;
 		it = map.alpha1(it) ;
 	} while(it != d) ;
@@ -79,12 +76,12 @@ typename PFP::VEC3 computeLaplacianCotanVertex(
 	return l ;
 }
 
-template <typename PFP>
+template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
-		typename PFP::MAP& map,
-		const typename PFP::TVEC3& position,
-		typename PFP::TVEC3& laplacian,
-		const FunctorSelect& select)
+	typename PFP::MAP& map,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	AttributeHandler<ATTR_TYPE>& laplacian,
+	const FunctorSelect& select)
 {
 	CellMarker marker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -92,19 +89,19 @@ void computeLaplacianTopoVertices(
 		if(select(d) && !marker.isMarked(d))
 		{
 			marker.mark(d);
-			laplacian[d] = computeLaplacianTopoVertex<PFP>(map, d, position) ;
+			laplacian[d] = computeLaplacianTopoVertex<PFP, ATTR_TYPE>(map, d, attr) ;
 		}
 	}
 }
 
-template <typename PFP>
+template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
-		typename PFP::MAP& map,
-		const typename PFP::TVEC3& position,
-		const typename PFP::TREAL& edgeWeight,
-		const typename PFP::TREAL& vertexArea,
-		typename PFP::TVEC3& laplacian,
-		const FunctorSelect& select)
+	typename PFP::MAP& map,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	AttributeHandler<ATTR_TYPE>& laplacian,
+	const FunctorSelect& select)
 {
 	CellMarker marker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
@@ -112,7 +109,7 @@ void computeLaplacianCotanVertices(
 		if(select(d) && !marker.isMarked(d))
 		{
 			marker.mark(d);
-			laplacian[d] = computeLaplacianCotanVertex<PFP>(map, d, position, edgeWeight, vertexArea) ;
+			laplacian[d] = computeLaplacianCotanVertex<PFP, ATTR_TYPE>(map, d, edgeWeight, vertexArea, attr) ;
 		}
 	}
 }
