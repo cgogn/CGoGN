@@ -26,6 +26,7 @@
 #define __LINEAR_SOLVING_BASIC__
 
 #include "OpenNL/linear_solver.h"
+#include "Algo/LinearSolving/variablesSetup.h"
 #include "Algo/LinearSolving/matrixSetup.h"
 
 namespace CGoGN
@@ -34,112 +35,9 @@ namespace CGoGN
 namespace LinearSolving
 {
 
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class FunctorMeshToSolver_Scalar : public FunctorMap<typename PFP::MAP>
-{
-protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
-	CellMarker& lockingMarker ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	bool lockedVertices ;
-
-public:
-	typedef typename PFP::MAP MAP ;
-	
-	FunctorMeshToSolver_Scalar(MAP& m, LinearSolver<SOLVER_TRAITS>* s, CellMarker& lm, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index) :
-		FunctorMap<MAP>(m), solver(s), lockingMarker(lm), attrTable(attr), indexTable(index), lockedVertices(false)
-	{}
-
-	bool operator()(Dart d)
-	{
-		solver->variable(indexTable[d]).set_value(attrTable[d]) ;
-		if(lockingMarker.isMarked(d))
-		{
-			solver->variable(indexTable[d]).lock() ;
-			lockedVertices = true ;
-		}
-		return false ;
-	}
-	bool hasLockedVertices() { return lockedVertices ; }
-} ;
-
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class FunctorMeshToSolver_Vector : public FunctorMap<typename PFP::MAP>
-{
-protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
-	CellMarker& lockingMarker ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	unsigned int coord ;
-	bool lockedVertices ;
-
-public:
-	typedef typename PFP::MAP MAP ;
-	
-	FunctorMeshToSolver_Vector(MAP& m, LinearSolver<SOLVER_TRAITS>* s, CellMarker& lm, const AttributeHandler<ATTR_TYPE>& attr, unsigned int c, const AttributeHandler<unsigned int> index) :
-		FunctorMap<MAP>(m), solver(s), lockingMarker(lm), attrTable(attr), indexTable(index), coord(c), lockedVertices(false)
-	{}
-
-	bool operator()(Dart d)
-	{
-		solver->variable(indexTable[d]).set_value((attrTable[d])[coord]) ;
-		if(lockingMarker.isMarked(d))
-		{
-			solver->variable(indexTable[d]).lock() ;
-			lockedVertices = true ;
-		}
-		return false ;
-	}
-	bool hasLockedVertices() { return lockedVertices ; }
-} ;
-
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class FunctorSolverToMesh_Scalar : public FunctorMap<typename PFP::MAP>
-{
-protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
-	AttributeHandler<ATTR_TYPE>& attrTable ;
-	const AttributeHandler<unsigned int>& indexTable ;
-
-public:
-	typedef typename PFP::MAP MAP ;
-	
-	FunctorSolverToMesh_Scalar(MAP& m, LinearSolver<SOLVER_TRAITS>* s, AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index) :
-		FunctorMap<MAP>(m), solver(s), attrTable(attr), indexTable(index)
-	{}
-
-	bool operator()(Dart d)
-	{
-		attrTable[d] = solver->variable(indexTable[d]).value() ;
-		return false ;
-	}
-} ;
-
-template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class FunctorSolverToMesh_Vector : public FunctorMap<typename PFP::MAP>
-{
-protected:
-	LinearSolver<SOLVER_TRAITS>* solver ;
-	AttributeHandler<ATTR_TYPE>& attrTable ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	unsigned int coord ;
-
-public:
-	typedef typename PFP::MAP MAP ;
-
-	FunctorSolverToMesh_Vector(MAP& m, LinearSolver<SOLVER_TRAITS>* s, AttributeHandler<ATTR_TYPE>& attr, unsigned int c, const AttributeHandler<unsigned int> index) :
-		FunctorMap<MAP>(m), solver(s), attrTable(attr), indexTable(index), coord(c)
-	{}
-
-	bool operator()(Dart d)
-	{
-		(attrTable[d])[coord] = solver->variable(indexTable[d]).value() ;
-		return false ;
-	}
-} ;
-
+/*******************************************************************************
+ * SOLVER INIT
+ *******************************************************************************/
 
 template <class SOLVER_TRAITS>
 void initSolver(LinearSolver<SOLVER_TRAITS>* s, unsigned int nb_variables, bool least_squares, bool direct)
@@ -159,19 +57,38 @@ void initSolver(LinearSolver<SOLVER_TRAITS>* s, unsigned int nb_variables, bool 
 	s->set_direct(direct) ;
 }
 
+/*******************************************************************************
+ * VARIABLES SETUP
+ *******************************************************************************/
+
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void setupVariables(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, CellMarker& lm, const AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index)
+void setupVariables(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	CellMarker& lm,
+	const AttributeHandler<ATTR_TYPE>& attr)
 {
-	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(m, s, lm, attr, index) ;
+	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(s, index, lm, attr) ;
 	m.foreach_orbit(VERTEX, fmts) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void setupVariables(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, CellMarker& lm, const AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index)
+void setupVariables(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	CellMarker& lm,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	unsigned int coord)
 {
-	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(m, s, lm, attr, coord, index) ;
+	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(s, index, lm, attr, coord) ;
 	m.foreach_orbit(VERTEX, fmts) ;
 }
+
+/*******************************************************************************
+ * START MATRIX DEFINITION
+ *******************************************************************************/
 
 template <class SOLVER_TRAITS>
 void startMatrix(LinearSolver<SOLVER_TRAITS>* s)
@@ -179,46 +96,118 @@ void startMatrix(LinearSolver<SOLVER_TRAITS>* s)
 	s->begin_system() ;
 }
 
-enum ConstraintType
-{
-	LAPLACIAN_TOPO,
-	LAPLACIAN_COTWEIGHT,
-	EQUALITY
-};
+/*******************************************************************************
+ * MATRIX SETUP : EQUALITY
+ *******************************************************************************/
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void addMatrixRows(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, ConstraintType ct, const AttributeHandler<unsigned int> index, float* params = NULL)
+void addRowsRHS_Equality(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	float amount)
 {
-	switch(ct)
-	{
-	case LAPLACIAN_TOPO :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, TOPOLOGICAL, index) ;
-		break ;
-	case LAPLACIAN_COTWEIGHT :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, COTWEIGHT, index) ;
-		break ;
-	case EQUALITY :
-		setupEqualityMatrix<PFP, ATTR_TYPE, SOLVER_TRAITS>(m, s, attr, index, params[0]) ;
-		break ;
-	}
+	FunctorEquality_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, amount) ;
+	m.foreach_orbit(VERTEX, ec) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void addMatrixRows(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, const AttributeHandler<ATTR_TYPE>& attr, ConstraintType ct, unsigned int coord, const AttributeHandler<unsigned int> index, float* params = NULL)
+void addRowsRHS_Equality(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	float amount,
+	unsigned int coord)
 {
-	switch(ct)
-	{
-	case LAPLACIAN_TOPO :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, TOPOLOGICAL, index) ;
-		break ;
-	case LAPLACIAN_COTWEIGHT :
-		setupLaplacianMatrix<PFP, SOLVER_TRAITS>(m, s, COTWEIGHT, index) ;
-		break ;
-	case EQUALITY :
-		setupEqualityMatrix<PFP, ATTR_TYPE, SOLVER_TRAITS>(m, s, attr, coord, index, params[0]) ;
-		break ;
-	}
+	FunctorEquality_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, amount, coord) ;
+	m.foreach_orbit(VERTEX, ec) ;
 }
+
+/*******************************************************************************
+ * MATRIX SETUP : LAPLACIAN TOPO
+ *******************************************************************************/
+
+template <typename PFP, class SOLVER_TRAITS>
+void addRows_Laplacian_Topo(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index)
+{
+	FunctorLaplacianTopo<PFP, SOLVER_TRAITS> flt(m, s, index) ;
+	m.foreach_orbit(VERTEX, flt) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRowsRHS_Laplacian_Topo(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const AttributeHandler<ATTR_TYPE>& attr)
+{
+	FunctorLaplacianTopoRHS_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> flt(m, s, index, attr) ;
+	m.foreach_orbit(VERTEX, flt) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRowsRHS_Laplacian_Topo(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	unsigned int coord)
+{
+	FunctorLaplacianTopoRHS_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> flt(m, s, index, attr, coord) ;
+	m.foreach_orbit(VERTEX, flt) ;
+}
+
+/*******************************************************************************
+ * MATRIX SETUP : LAPLACIAN COTAN
+ *******************************************************************************/
+
+template <typename PFP, class SOLVER_TRAITS>
+void addRows_Laplacian_Cotan(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea)
+{
+	FunctorLaplacianCotan<PFP, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea) ;
+	m.foreach_orbit(VERTEX, flc) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRowsRHS_Laplacian_Cotan(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea,
+	const AttributeHandler<ATTR_TYPE>& attr)
+{
+	FunctorLaplacianCotanRHS_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea, attr) ;
+	m.foreach_orbit(VERTEX, flc) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRowsRHS_Laplacian_Cotan(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const typename PFP::TREAL& edgeWeight,
+	const typename PFP::TREAL& vertexArea,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	unsigned int coord)
+{
+	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea, attr, coord) ;
+	m.foreach_orbit(VERTEX, flc) ;
+}
+
+/*******************************************************************************
+ * END MATRIX DEFINITION
+ *******************************************************************************/
 
 template <class SOLVER_TRAITS>
 void endMatrix(LinearSolver<SOLVER_TRAITS>* s)
@@ -226,11 +215,19 @@ void endMatrix(LinearSolver<SOLVER_TRAITS>* s)
 	s->end_system() ;
 }
 
+/*******************************************************************************
+ * SOLVE SYSTEM
+ *******************************************************************************/
+
 template <class SOLVER_TRAITS>
 void solve(LinearSolver<SOLVER_TRAITS>* s)
 {
 	s->solve() ;
 }
+
+/*******************************************************************************
+ * RESET SOLVER
+ *******************************************************************************/
 
 template <class SOLVER_TRAITS>
 void resetSolver(LinearSolver<SOLVER_TRAITS>* s, bool keepMatrix)
@@ -238,17 +235,30 @@ void resetSolver(LinearSolver<SOLVER_TRAITS>* s, bool keepMatrix)
 	s->reset(keepMatrix) ;
 }
 
+/*******************************************************************************
+ * GET RESULTS
+ *******************************************************************************/
+
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void getResult(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, AttributeHandler<ATTR_TYPE>& attr, const AttributeHandler<unsigned int> index)
+void getResult(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	AttributeHandler<ATTR_TYPE>& attr)
 {
-	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(m, s, attr, index) ;
+	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(s, index, attr) ;
 	m.foreach_orbit(VERTEX, fstm) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-void getResult(typename PFP::MAP& m, LinearSolver<SOLVER_TRAITS>* s, AttributeHandler<ATTR_TYPE>& attr, unsigned int coord, const AttributeHandler<unsigned int> index)
+void getResult(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	AttributeHandler<ATTR_TYPE>& attr,
+	unsigned int coord)
 {
-	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(m, s, attr, coord, index) ;
+	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(s, index, attr, coord) ;
 	m.foreach_orbit(VERTEX, fstm) ;
 }
 
