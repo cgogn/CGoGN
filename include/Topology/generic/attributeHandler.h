@@ -36,14 +36,16 @@ namespace CGoGN
 class AttributeHandlerGen
 {
 protected:
+	friend class GenericMap ;
+	friend class AttribMap ;
+
 	// the map that contains the linked attribute
-	GenericMap* m_map;
+	GenericMap* m_map ;
+	// boolean that states the validity of the handler
+	bool valid ;
 
 public:
-	AttributeHandlerGen() : m_map(NULL)
-	{}
-
-	AttributeHandlerGen(GenericMap* m) : m_map(m)
+	AttributeHandlerGen(GenericMap* m, bool v) : m_map(m), valid(v)
 	{}
 
 	GenericMap* map() const
@@ -51,11 +53,17 @@ public:
 		return m_map ;
 	}
 
+	bool isValid() const
+	{
+		return valid ;
+	}
+
+protected:
 	void setInvalid()
 	{
-		m_map = NULL ;
+		valid = false ;
 	}
-};
+} ;
 
 /**
  * Class that create an access-table to an existing attribute
@@ -70,6 +78,9 @@ class AttributeHandler : public AttributeHandlerGen
 protected:
 	// the multi-vector that contains attribute data
 	AttributeMultiVector<T>* m_attrib;
+
+	void registerInMap() ;
+	void unregisterFromMap() ;
 
 public:
 	typedef T DATA_TYPE ;
@@ -123,14 +134,6 @@ public:
 	 * get attribute name
 	 */
 	const std::string& name() const ;
-
-	/**
-	 * check if the attribute handler is linked to a valid attribute
-	 * -> MUST BE USED AFTER A CALL TO :
-	 * getAttribute(unsigned int orbit, const std::string& nameAttr)
-	 * addAttribute(unsigned int orbit, const std::string& nameAttr)
-	 */
-	bool isValid() const ;
 
 	/**
 	 * [] operator with dart parameter
