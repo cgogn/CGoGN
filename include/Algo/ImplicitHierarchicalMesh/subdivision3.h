@@ -53,6 +53,9 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 template <typename PFP>
 Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
+template <typename PFP>
+Dart subdivideVolumeOld(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
 //template <typename PFP>
 //void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
