@@ -264,6 +264,10 @@ public:
 	 */
 	bool volumeIsSubdividedOnce(Dart d);
 
+	/**
+	 *
+	 */
+	bool neighborhoodLevelDiffersByOne(Dart d);
 
 } ;
 
