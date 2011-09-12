@@ -50,24 +50,22 @@ typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const typename
 	return N ;
 }
 
-
 template<typename PFP>
 typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	Dart e=d;
+	Dart e = d;
 	typename PFP::VEC3 normal(0);
 	do
 	{
 		const typename PFP::VEC3& P = position[e];
 		e = map.phi1(e);
 		const typename PFP::VEC3& Q = position[e];
-		normal[0] += (P[1]-Q[1])*(P[2]+Q[2]);
-		normal[1] += (P[2]-Q[2])*(P[0]+Q[0]);
-		normal[2] += (P[0]-Q[0])*(P[1]+Q[1]);
-	}while (e !=d);
+		normal[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
+		normal[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
+		normal[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
+	} while (e != d);
 
 	normal.normalize();
-
 	return normal;
 }
 
