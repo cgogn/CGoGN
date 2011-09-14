@@ -82,11 +82,15 @@ public:
 	/// gets the clip planes count
 	int getClipPlanesCount();
 
+	/// checks if clip plane id is valid
+	bool isClipPlaneIdValid(unsigned int id);
+
 	/**
 	 * sets all parameters for one clip plane
 	 * @param id clip plane id
 	 * @param normal normal
 	 * @param origin origin
+	 * @return true on success
 	 */
 	void setClipPlaneParamsAll(unsigned int id, Geom::Vec3f normal, Geom::Vec3f origin);
 
@@ -94,6 +98,7 @@ public:
 	 * sets first vector for one clip plane
 	 * @param id clip plane id
 	 * @param normal normal
+	 * @return true on success
 	 */
 	void setClipPlaneParamsNormal(unsigned int id, Geom::Vec3f normal);
 	
@@ -101,6 +106,7 @@ public:
 	 * sets origin for one clip plane
 	 * @param id clip plane id
 	 * @param origin origin
+	 * @return true on success
 	 */
 	void setClipPlaneParamsOrigin(unsigned int id, Geom::Vec3f origin);
 
@@ -180,11 +186,15 @@ public:
 	/// gets the clip spheres count
 	int getClipSpheresCount();
 
+	/// checks if clip sphere id is valid
+	bool isClipSphereIdValid(unsigned int id);
+
 	/**
 	 * sets all parameters for one clip sphere
 	 * @param id clip sphere id
 	 * @param center center
 	 * @param radius radius
+	 * @return true on success
 	 */
 	void setClipSphereParamsAll(unsigned int id, Geom::Vec3f center, float radius);
 
@@ -192,6 +202,7 @@ public:
 	 * sets center for one clip sphere
 	 * @param id clip sphere id
 	 * @param center center
+	 * @return true on success
 	 */
 	void setClipSphereParamsCenter(unsigned int id, Geom::Vec3f center);
 
@@ -199,6 +210,7 @@ public:
 	 * sets radius for one clip sphere
 	 * @param id clip sphere id
 	 * @param radius radius
+	 * @return true on success
 	 */
 	void setClipSphereParamsRadius(unsigned int id, float radius);
 

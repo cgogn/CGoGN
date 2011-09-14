@@ -332,6 +332,17 @@ public:
 
 	float computeCurvatureCount(const DataType *ptrVox, const std::vector<int>& sphere, DataType val);
 
+	float computeCurvatureCount3(const DataType *ptrVox, const std::vector<int>& cylX, const std::vector<int>& cylY, const std::vector<int>& cyl2, DataType val);
+
+	void createMaskOffsetCylinders(std::vector<int>& tableX, std::vector<int>& tableY, std::vector<int>& tableZ, int _i32radius);
+
+	Image<DataType>* cropz(unsigned int zmin, unsigned int zmax);
+
+	void createNormalSphere(std::vector<Geom::Vec3f>& table, int _i32radius);
+
+	Geom::Vec3f computeNormal(DataType *ptrVox, const std::vector<Geom::Vec3f>& sphere, DataType val, unsigned int radius);
+
+	bool checkSaddlecomputeNormal(const Geom::Vec3f& P, const Geom::Vec3f& normal, unsigned int radius);
 };
 
 

@@ -70,14 +70,21 @@ AttributeHandler<PFP::VEC3> normal;
 void MyQT::cb_Open()
 {
 	// set some filters
-	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)");
-
-	std::string filename = selectFile("OpenMesh","",filters);
+//	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)");
+//
+//	std::string filename = selectFile("OpenMesh","",filters);
+//
+//	std::vector<std::string> attrNames ;
+//	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+//	{
+//		CGoGNerr << "could not import " << filename << CGoGNendl ;
+//		return;
+//	}
 
 	std::vector<std::string> attrNames ;
-	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+	if(!Algo::Import::importMesh<PFP>(myMap, "/home/thery/Data/liver.trian", attrNames))
 	{
-		CGoGNerr << "could not import " << filename << CGoGNendl ;
+		CGoGNerr << "could not import xxx" << CGoGNendl ;
 		return;
 	}
 
@@ -133,34 +140,45 @@ void MyQT::cb_initGL()
 	glewInit();
 
 	// init lighting parameters
-	float lightPosition[4]= {0.0f,0.0f,10000.0f,1.0f};
+	float lightPosition[4]= {10.0f,10.0f,10000.0f,1.0f};
 	float lightColor[4]= {0.9f,0.9f,0.9f,1.0f};
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, 1);
+	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+	glEnable(GL_NORMALIZE);
+//	glDisable(GL_CULL_FACE);
+//	glFrontFace(GL_CCW);
+
 }
 
 void MyQT::cb_redraw()
 {
+    GLfloat diff[4]= {0.0f,1.0f,0.1f,1.0f};
+    GLfloat amb[4]= {0.1f,0.0f,0.1f,1.0f};
+    GLfloat spec[4]= {1.0f,1.0f,1.0f,1.0f};
+    float shininess=125.0f;
+
 	// draw the lines
-	glDisable(GL_LIGHTING);
-	glColor3f(0.0f, 0.0f, 0.3f);
-	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-	glDisable(GL_LIGHTING);
-	glEnable(GL_SMOOTH);
-	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::LINE, 1.0f,position, normal);
+//	glDisable(GL_LIGHTING);
+//	glColor3f(0.0f, 0.0f, 0.3f);
+//	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+//	glDisable(GL_LIGHTING);
+//
+//	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::LINE, 1.0f,position, normal);
 
 	// draw the faces
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1.0f, 1.0f);
-	glColor3f(0.1f, 0.8f, 0.0f);
 	glEnable(GL_LIGHTING);
+	glEnable(GL_SMOOTH);
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
+    glMaterialfv(GL_FRONT,GL_SPECULAR,spec);
+    glMaterialf( GL_FRONT, GL_SHININESS, shininess);
 	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::SMOOTH, 1.0f,position, normal);
 	glDisable(GL_POLYGON_OFFSET_FILL);
 }
@@ -370,25 +388,27 @@ int main(int argc, char **argv)
  	sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
  	CGoGNStream::allToConsole(&sqt);
 
- 	int xx = 3;
- 	double yy = 2.5;
- 	bool zz=true;
- 	int kk=32;
- 	int cc=2;
+ 	sqt.cb_Open();
 
- 	{
- 	using namespace CGoGN::Utils::QT;
-
- 	inputValues(	VarInteger(0,20,xx, "Entier",
- 					VarBool(zz, "Bool",
- 					VarDbl(0.314,3.14,yy,"Double",
- 					VarSlider(10,100,kk,"Slider",
- 					VarCombo("Riri;Fifi;Loulou;Donald",cc,"Combo") )))));
- 	}
-
- 	std::cout << "Int:" << xx << "  Bool:"<<zz<< std::endl;
- 	std::cout << "Dbl:" << yy << "  Slider:"<<kk<< std::endl;
- 	std::cout << "Combo:" << cc << std::endl;
+// 	int xx = 3;
+// 	double yy = 2.5;
+// 	bool zz=true;
+// 	int kk=32;
+// 	int cc=2;
+//
+// 	{
+// 	using namespace CGoGN::Utils::QT;
+//
+// 	inputValues(	VarInteger(0,20,xx, "Entier",
+// 					VarBool(zz, "Bool",
+// 					VarDbl(0.314,3.14,yy,"Double",
+// 					VarSlider(10,100,kk,"Slider",
+// 					VarCombo("Riri;Fifi;Loulou;Donald",cc,"Combo") )))));
+// 	}
+//
+// 	std::cout << "Int:" << xx << "  Bool:"<<zz<< std::endl;
+// 	std::cout << "Dbl:" << yy << "  Slider:"<<kk<< std::endl;
+// 	std::cout << "Combo:" << cc << std::endl;
 
 	return app.exec();
 }

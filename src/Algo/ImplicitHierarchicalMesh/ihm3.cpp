@@ -515,6 +515,51 @@ bool ImplicitHierarchicalMap3:: volumeIsSubdividedOnce(Dart d)
 	return true;
 }
 
+bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+
+	bool found = false;
+
+	unsigned int vLevel = volumeLevel(d) + 1;
+
+	Dart old = volumeOldestDart(d);
+
+	DartMarkerStore mf(*this);		// Lock a face marker to save one dart per face
+
+	//Store faces that are traversed and start with the face of d
+	std::vector<Dart> visitedFaces;
+	visitedFaces.reserve(20);
+	visitedFaces.push_back(old);
+
+	mf.markOrbit(FACE, old) ;
+
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		Dart e = *face ;
+		do
+		{
+			// add all face neighbours to the table
+
+			if(phi3(e) != e && (abs(volumeLevel(phi3(e)) - vLevel) > 1))
+			{
+				found = true;
+			}
+
+			Dart ee = phi2(e) ;
+			if(!mf.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mf.markOrbit(FACE, ee) ;
+			}
+
+			e = phi1(e) ;
+		} while(e != *face) ;
+	}
+
+	return found;
+}
+
 } //namespace IHM
 
 } //namespace Algo

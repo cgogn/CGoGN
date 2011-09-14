@@ -87,9 +87,9 @@ public :
 	 */
 	static ClippingPreset* CreateMoleculePreset(Geom::Vec3f center, float size, float atomsRadiuses, bool orClipping);
 
-private :
+protected :
 
-	/// private constructor (used by public static constructors)
+	/// protected constructor (used by public static constructors or child class)
 	ClippingPreset();
 
 
@@ -159,9 +159,9 @@ public :
 	 * @param clipShader pointer to the clipping shader object
 	 * @param planesIds returns the new added planes ids
 	 * @param spheresIds returns the new added spheres ids
-	 * @warning planesIds and spheresIds must not be NULL, otherwise the function does nothing
+	 * @warning clipShader, planesIds and spheresIds must not be NULL, otherwise the function does nothing
 	 */
-	void apply(ClippingShader* clipShader, std::vector<unsigned int> *planesIds, std::vector<unsigned int> *spheresIds);
+	virtual void apply(ClippingShader* clipShader, std::vector<unsigned int> *planesIds, std::vector<unsigned int> *spheresIds);
 
 
 };

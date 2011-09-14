@@ -75,7 +75,6 @@ class AttributeHandlerGen ;
 
 class GenericMap : public MapBrowser
 {
-	friend class DartMarkerGen ;
 
 	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
@@ -124,6 +123,11 @@ public:
 	 *   if true -> data and attributes are deleted (AttributeHandlers are invalid)
 	 */
 	virtual void clear(bool removeAttrib) ;
+
+	/**
+	 * get the marker_set of an orbit and thread (used for Cell & Dart Marker)
+	 */
+	MarkSet& getMarkerSet(unsigned int orbit, unsigned int thread) { return m_marksets[orbit][thread]; }
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -394,6 +398,11 @@ public:
 	 * 	@return the number of orbits
 	 */
 	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = SelectorTrue()) ;
+
+	/**
+	 * print attributes name of map in std::cout (for debugging)
+	 */
+	void viewAttributesTables();
 } ;
 
 

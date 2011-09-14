@@ -50,7 +50,8 @@ inline unsigned int Map2::dimension()
 inline void Map2::clear(bool removeAttrib)
 {
 	Map1::clear(removeAttrib) ;
-	init() ;
+	if (removeAttrib)
+		init() ;
 }
 
 /*! @name Basic Topological Operators

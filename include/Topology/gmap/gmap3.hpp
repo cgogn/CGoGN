@@ -48,7 +48,8 @@ inline unsigned int GMap3::dimension()
 inline void GMap3::clear(bool removeAttrib)
 {
 	GMap2::clear(removeAttrib) ;
-	init() ;
+	if (removeAttrib)
+		init() ;
 }
 
 /*! @name Basic Topological Operators
