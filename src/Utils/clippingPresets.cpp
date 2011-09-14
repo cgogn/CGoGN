@@ -50,14 +50,15 @@ ClippingPreset* ClippingPreset::CreateDualPlanesPreset(Geom::Vec3f center, float
 	ClippingPreset *preset = new ClippingPreset;
 
 	// Correct axis if necessary
-	if ((axis < 0) || (axis > 2))
-		axis = 0;
+	int usedAxis = axis;
+	if ((usedAxis < 0) || (usedAxis > 2))
+		usedAxis = 0;
 
 	// Axis on which planes will be aligned
 	Geom::Vec3f positDir (0.0f, 0.0f, 0.0f);
-	positDir[axis] = 1.0f;
+	positDir[usedAxis] = 1.0f;
 	Geom::Vec3f negDir (0.0f, 0.0f, 0.0f);
-	negDir[axis] = -1.0f;
+	negDir[usedAxis] = -1.0f;
 
 	// Facing of planes
 	float side = 1.0f;
@@ -116,8 +117,9 @@ ClippingPreset* ClippingPreset::CreateTubePreset(Geom::Vec3f center, float size,
 	ClippingPreset *preset = new ClippingPreset;
 
 	// Correct axis if necessary
-	if ((axis < 0) || (axis > 2))
-		axis = 0;
+	int usedAxis = axis;
+	if ((usedAxis < 0) || (usedAxis > 2))
+		usedAxis = 0;
 
 	// Correct precision if necessary
 	if (precision < 1)
@@ -129,12 +131,12 @@ ClippingPreset* ClippingPreset::CreateTubePreset(Geom::Vec3f center, float size,
 		side = -1.0f;
 
 	// Add planes to preset
-	Geom::Vec3f direction (0.0, 0.0, 0.0);
+	Geom::Vec3f direction (0.0f, 0.0f, 0.0f);
 	float dAngle = 2.0f * M_PI / precision;
 	for (int i = 0; i < precision; i++)
 	{
-		direction[(axis + 1) % 3] = cos(i*dAngle);
-		direction[(axis + 2) % 3] = sin(i*dAngle);
+		direction[(usedAxis + 1) % 3] = cos(i*dAngle);
+		direction[(usedAxis + 2) % 3] = sin(i*dAngle);
 		preset->addClipPlane(direction, center + direction*(size / 2.0f)*(side));
 	}
 
