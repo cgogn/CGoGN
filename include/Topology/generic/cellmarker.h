@@ -56,12 +56,12 @@ public:
 	{
 		if(!map.isOrbitEmbedded(cell))
 			map.addEmbedding(cell) ;
-		m_mark = m_map.m_marksets[m_cell][m_thread].getNewMark() ;
+		m_mark = m_map.getMarkerSet(m_cell,m_thread).getNewMark() ;
 	}
 
 	virtual ~CellMarkerGen()
 	{
-		m_map.m_marksets[m_cell][m_thread].releaseMark(m_mark) ;
+		m_map.getMarkerSet(m_cell,m_thread).releaseMark(m_mark) ;
 	}
 
 protected:
@@ -75,6 +75,9 @@ public:
 	 */
 	virtual void mark(Dart d)
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
+
 		unsigned int a = m_map.getEmbedding(m_cell, d) ;
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(m_cell, d) ;
@@ -87,6 +90,9 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
+
 		unsigned int a = m_map.getEmbedding(m_cell, d) ;
 		if (a == EMBNULL)
 			a = m_map.embedNewCell(m_cell, d) ;
@@ -99,6 +105,9 @@ public:
 	 */
 	virtual bool isMarked(Dart d)
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
+
 		unsigned int a = m_map.getEmbedding(m_cell, d) ;
 		if (a == EMBNULL)
 			return false ;
@@ -111,6 +120,9 @@ public:
 	 */
 	virtual void mark(unsigned int em)
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
+
 		m_map.getMarkVector(m_cell, m_thread)->operator[](em).setMark(m_mark) ;
 	}
 
@@ -119,6 +131,9 @@ public:
 	 */
 	virtual void unmark(unsigned int em)
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
+
 		m_map.getMarkVector(m_cell, m_thread)->operator[](em).unsetMark(m_mark) ;
 	}
 
@@ -127,6 +142,9 @@ public:
 	 */
 	virtual bool isMarked(unsigned int em)
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
+
 		return m_map.getMarkVector(m_cell, m_thread)->operator[](em).testMark(m_mark) ;
 	}
 
@@ -135,9 +153,13 @@ public:
 	 */
 	virtual void markAll()
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
+		assert(mark_vect != NULL);
+
 		AttributeContainer& cont = m_map.getAttributeContainer(m_cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkVector(m_cell, m_thread)->operator[](i).setMark(m_mark) ;
+			mark_vect->operator[](i).setMark(m_mark) ;
 	}
 
 	/**
@@ -147,9 +169,14 @@ public:
 
 	bool isAllUnmarked()
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+
+		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
+		assert(mark_vect != NULL);
+
 		AttributeContainer& cont = m_map.getAttributeContainer(m_cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			if(m_map.getMarkVector(m_cell, m_thread)->operator[](i).testMark(m_mark))
+			if(mark_vect->operator[](i).testMark(m_mark))
 				return false ;
 		return true ;
 	}
@@ -177,9 +204,13 @@ protected:
 public:
 	virtual void unmarkAll()
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
+		assert(mark_vect != NULL);
+
 		AttributeContainer& cont = m_map.getAttributeContainer(m_cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkVector(m_cell, m_thread)->operator[](i).unsetMark(m_mark) ;
+			mark_vect->operator[](i).unsetMark(m_mark) ;
 	}
 };
 
@@ -224,8 +255,12 @@ public:
 
 	void unmarkAll()
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
+		assert(mark_vect != NULL);
+
 		for (std::vector<unsigned int>::iterator it = m_markedCells.begin(); it != m_markedCells.end(); ++it)
-			m_map.getMarkVector(m_cell, m_thread)->operator[](*it).unsetMark(m_mark) ;
+			mark_vect->operator[](*it).unsetMark(m_mark) ;
 	}
 };
 
@@ -253,9 +288,13 @@ protected:
 public:
 	void unmarkAll()
 	{
+		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
+		assert(mark_vect != NULL);
+
 		AttributeContainer& cont = m_map.getAttributeContainer(m_cell) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-			m_map.getMarkVector(m_cell, m_thread)->operator[](i).unsetMark(m_mark) ;
+			mark_vect->operator[](i).unsetMark(m_mark) ;
 	}
 };
 

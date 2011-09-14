@@ -49,7 +49,8 @@ AttribMap::AttribMap() : GenericMap()
 void AttribMap::clear(bool removeAttrib)
 {
 	GenericMap::clear(removeAttrib) ;
-	init() ;
+	if (removeAttrib)
+		init() ;
 }
 
 /****************************************

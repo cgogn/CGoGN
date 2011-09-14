@@ -48,7 +48,8 @@ inline unsigned int GMap1::dimension()
 inline void GMap1::clear(bool removeAttrib)
 {
 	GMap0::clear(removeAttrib) ;
-	init() ;
+	if (removeAttrib)
+		init() ;
 }
 
 inline int GMap1::getDartsPerTriangle()
