@@ -22,7 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "windowing.h"
+#include "Algo/MC/windowing.h"
+#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {
@@ -1189,6 +1190,64 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 	#undef EVENMASK
 	#undef ODDMASK
 }
+
+
+
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth)
+{
+
+	float xmin = frameWidth;
+	float xmax = m_Image->getWidthX() - frameWidth;
+	float ymin = frameWidth;
+	float ymax = m_Image->getWidthY() - frameWidth;
+	float zmin = frameWidth;
+	float zmax = m_Image->getWidthZ() - frameWidth;
+
+
+
+	// traverse position and create bound attrib
+	for(unsigned int it = m_positions.begin(); it != m_positions.end(); m_positions.next(it))
+	{
+		bool bound = (m_positions[it][0]<=xmin) || (m_positions[it][0]>=xmax) || \
+					 (m_positions[it][1]<=ymin) || (m_positions[it][1]>=ymax) || \
+					 (m_positions[it][2]<=zmin) || (m_positions[it][2]>=zmax);
+
+		if (bound)
+		{
+			boundVertices[it] = 1;
+		}
+		else
+			boundVertices[it] = 0;
+	}
+
+	// traverse face and check if all vertices are bound
+	DartMarker mf(*m_map);
+	for (Dart d = m_map->begin(); d != m_map->end();)
+	{
+		if (!mf.isMarked(d))
+		{
+			Dart dd = d;
+			Dart e = m_map->phi1(d);
+			Dart f = m_map->phi1(e);
+			m_map->next(d);
+			while ((d==e) || (d==f))
+			{
+				m_map->next(d);
+			}
+			if ((boundVertices[dd]!=0) && (boundVertices[e]!=0) && (boundVertices[f]!=0))
+				m_map->deleteFace(dd);
+			else
+				mf.markOrbit(FACE,dd);
+		}
+	}
+
+
+
+}
+
+
+
 
 
 

@@ -479,7 +479,6 @@ Image<DataType>* Image<DataType>::Blur3()
 
 
 	return newImg;
-
 }
 
 template<typename DataType>
@@ -546,6 +545,325 @@ float Image<DataType>::computeCurvatureCount(const DataType *ptrVox, const std::
 		return 1.0f - ((float)blanc)/((float)noir);
 	}
 }
+
+
+// TESTING NEW CURVATURE METHODS
+template<typename DataType>
+void Image<DataType>::createMaskOffsetCylinders(std::vector<int>& tableX, std::vector<int>& tableY, std::vector<int>& tableZ, int _i32radius)
+{
+	// compute the width of the sphere for memory allocation
+	int i32Width = 2*_i32radius + 1;
+	// squared radius
+    float fRad2 = (float)(_i32radius*_i32radius);
+
+	// memory allocation
+	// difficult to know how many voxels before computing,
+	// so the reserve for the BB
+	tableX.reserve(i32Width*i32Width*7);
+	tableX.clear();
+	tableY.reserve(i32Width*i32Width*7);
+	tableY.clear();
+	tableZ.reserve(i32Width*i32Width*7);
+	tableZ.clear();
+
+
+	// scan all the BB of the sphere
+	for (int z = -_i32radius;  z<=_i32radius; z++)
+	{
+		for (int y = -_i32radius;  y<=_i32radius; y++)
+		{
+			for (int x = -_i32radius;  x<=_i32radius; x++)
+			{
+				Geom::Vec3f v((float)x,(float)y,(float)z);
+				float fLength =  v.norm2();
+				// if inside the sphere
+				if (fLength<=fRad2)
+				{
+					// the the index of the voxel
+					int index = z * m_WXY + y * m_WX + x;
+
+					if ((x<=3) && (x>=-3))
+						tableX.push_back(index);
+					if ((y<=3) && (y>=-3))
+						tableY.push_back(index);
+					if ((z<=3) && (z>=-3))
+						tableZ.push_back(index);
+
+				}
+			}
+		}
+	}
+}
+
+template<typename DataType>
+float Image<DataType>::computeCurvatureCount3(const DataType *ptrVox, const std::vector<int>& cylX, const std::vector<int>& cylY, const std::vector<int>& cylZ, DataType val)
+{
+	int noir = 0;
+	int blanc = 0;
+
+	float vals[3];
+
+	for (std::vector<int>::const_iterator it=cylX.begin(); it!=cylX.end();it++)
+	{
+		const DataType *data = ptrVox + *it;
+		if (*data != val)
+		{
+			blanc++;
+		}
+		else
+		{
+			noir++;
+		}
+	}
+
+
+	if (blanc >= noir)
+	{
+		vals[0] = 1.0f - ((float)noir) / ((float)blanc);
+	}
+	else
+	{
+		vals[0] =  -1.0f + ((float)blanc)/((float)noir);
+	}
+
+	noir = 0;
+	blanc = 0;
+
+	for (std::vector<int>::const_iterator it=cylY.begin(); it!=cylY.end();it++)
+	{
+		const DataType *data = ptrVox + *it;
+		if (*data != val)
+		{
+			blanc++;
+		}
+		else
+		{
+			noir++;
+		}
+	}
+
+	if (blanc >= noir)
+	{
+		vals[1] = 1.0f - ((float)noir) / ((float)blanc);
+	}
+	else
+	{
+		vals[1] =  -1.0f + ((float)blanc)/((float)noir);
+	}
+
+
+	noir = 0;
+	blanc = 0;
+
+	for (std::vector<int>::const_iterator it=cylZ.begin(); it!=cylZ.end();it++)
+	{
+		const DataType *data = ptrVox + *it;
+		if (*data != val)
+		{
+			blanc++;
+		}
+		else
+		{
+			noir++;
+		}
+	}
+
+	if (blanc >= noir)
+	{
+		vals[2] = 1.0f - ((float)noir) / ((float)blanc);
+	}
+	else
+	{
+		vals[2] =  -1.0f + ((float)blanc)/((float)noir);
+	}
+
+//	if ((valZ>valX) && (valZ>valY))
+//		return (valX + valY)/2.0f;
+//
+//	if ((valY>valX) && (valY>valZ))
+//		return (valX + valZ)/2.0f;
+//
+//	return (valY + valZ)/2.0f;
+
+	unsigned short m1,m2;
+	if ((abs(vals[0]) < abs(vals[1])) && (abs(vals[0]) < abs(vals[2])))
+	{
+		m1 =1;
+		m2 =2;
+	}
+	else
+	{
+		m1=0;
+		if (abs(vals[1]) < abs(vals[2]))
+			m2 = 2;
+		else
+			m2 = 1;
+	}
+
+	if (vals[m1]>0.0f)
+		if (vals[m2]<0.0f)
+			if ((vals[m1] - vals[m2])>0.8f)
+				return 1.0f;
+
+	if (vals[m1]<0.0f)
+		if (vals[m2]>0.0f)
+			if ((vals[m2] - vals[m1])>0.8f)
+			return 1.0f;
+
+	return std::max(std::max(abs(vals[0]),abs(vals[1])),abs(vals[2]));
+
+}
+
+
+
+template< typename  DataType >
+Image<DataType>* Image<DataType>::cropz(unsigned int zmin, unsigned int nb)
+{
+
+	unsigned int zmax = zmin+nb;
+	if (zmax> m_WZ)
+	{
+		zmax = m_WZ;
+		nb = zmax - zmin;
+	}
+
+	DataType* data2 = new DataType[150*m_WY*m_WZ];
+	Image<DataType>* newImg = new Image<DataType>(data2,150,m_WY,nb,getVoxSizeX(),getVoxSizeY(),getVoxSizeZ());
+	newImg->m_Alloc=true;
+	// set origin of real data in image ??
+
+	for(unsigned int z=zmin; z< zmax; ++z)
+	{
+		for(int y=0; y<m_WY; ++y)
+		{
+			for(int x=0; x<150; ++x)
+			{
+				DataType* ori = getVoxelPtr(x,y,z);
+				DataType* dest = newImg->getVoxelPtr(x,y,z-zmin);
+				*dest = *ori;
+			}
+		}
+	}
+
+	return newImg;
+}
+
+
+
+template<typename DataType>
+void Image<DataType>::createNormalSphere(std::vector<Geom::Vec3f>& table, int _i32radius)
+{
+	// compute the width of the sphere for memory allocation
+	int i32Width = 2*_i32radius + 1;
+
+	table.reserve(i32Width*i32Width*i32Width);
+	table.clear();
+
+	// scan all the BB of the sphere
+	for (int z = -_i32radius;  z<=_i32radius; z++)
+	{
+		for (int y = -_i32radius;  y<=_i32radius; y++)
+		{
+			for (int x = -_i32radius;  x<=_i32radius; x++)
+			{
+				Geom::Vec3f v((float)x,(float)y,(float)z);
+				float fLength =  v.normalize();
+				// if inside the sphere
+				if (fLength<=_i32radius)
+					table.push_back(v);
+				else
+					table.push_back(Geom::Vec3f(0.0f,0.0f,0.0f));
+			}
+		}
+	}
+}
+
+
+template<typename DataType>
+Geom::Vec3f Image<DataType>::computeNormal(DataType *ptrVox, const std::vector<Geom::Vec3f>& sphere, DataType val, unsigned int radius)
+{
+
+	DataType *ucDat1 = ptrVox - radius*(m_WX + m_WX*m_WY);
+	Geom::Vec3f normal(0.0f,0.0f,0.0f);
+	unsigned int width = 2*radius+1;
+
+	unsigned int ind = 0;
+	for (unsigned int i=0; i<width;++i)
+	{
+		DataType *ucDat2 = ucDat1;
+		for (unsigned int j=0; j<width;++j)
+		{
+			DataType *ucDat3 = ucDat2;
+			for (unsigned int k=0; k<width;++k)
+			{
+				if (*ucDat3 == val)
+				{
+					normal += sphere[ind];
+				}
+				++ucDat3;
+				++ind;
+			}
+
+			ucDat2 += m_WX;
+		}
+		ucDat1 += m_WXY;
+	}
+
+	normal.normalize();
+	return normal;
+}
+
+template<typename DataType>
+bool Image<DataType>::checkSaddlecomputeNormal(const Geom::Vec3f& P, const Geom::Vec3f& normal, unsigned int radius)
+{
+	Geom::Vec3f V1;
+	if ( (fabs(normal[0]) <fabs(normal[1])) && (fabs(normal[0]) <fabs(normal[2])) )
+	{
+		V1 = normal ^ Geom::Vec3f(1.0f,0.0f,0.0);
+	}
+	else if (fabs(normal[1]) <fabs(normal[2]))
+	{
+		V1 = normal ^ Geom::Vec3f(0.0f,1.0f,0.0);
+	}
+	else
+	{
+		V1 = normal ^ Geom::Vec3f(0.0f,0.0f,1.0);
+	}
+
+	Geom::Vec3f V2 = normal ^ V1;
+
+	Geom::Vec3f Q = P + (0.5f * radius)*normal;
+
+	float le = 0.866f * radius; // (cos30)
+	Geom::Vec3f Q1 = Q + le*V1;
+	Geom::Vec3f Q2 = Q - le*V1;
+	DataType X1 = getVoxel(int(floor(Q1[0])), int(floor(Q1[1])), int(floor(Q1[2])));
+	DataType X2 = getVoxel(int(floor(Q2[0])), int(floor(Q2[1])), int(floor(Q2[2])));
+	Q1 = Q + le*V2;
+	Q2 = Q - le*V2;
+	DataType X3 = getVoxel(int(floor(Q1[0])), int(floor(Q1[1])), int(floor(Q1[2])));
+	DataType X4 = getVoxel(int(floor(Q2[0])), int(floor(Q2[1])), int(floor(Q2[2])));
+
+	le *= 0.707f; // (sqrt(2)/2)
+	Q1 = Q + le*(V1+V2);
+	Q2 = Q - le*(V1+V2);
+	DataType X5 = getVoxel(int(floor(Q1[0])), int(floor(Q1[1])), int(floor(Q1[2])));
+	DataType X6 = getVoxel(int(floor(Q2[0])), int(floor(Q2[1])), int(floor(Q2[2])));
+
+	Q1 = Q + le*(V1-V2);
+	Q2 = Q - le*(V1-V2);
+	DataType X7 = getVoxel(int(floor(Q1[0])), int(floor(Q1[1])), int(floor(Q1[2])));
+	DataType X8 = getVoxel(int(floor(Q2[0])), int(floor(Q2[1])), int(floor(Q2[2])));
+
+	if  ((X1 == X2) && (X3==X4) && (X1!=X3))
+		return true;
+
+	if  ((X5 == X6) && (X7==X8) && (X5!=X7))
+		return true;
+
+	return false;
+}
+
 
 
 } // end namespace

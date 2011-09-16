@@ -176,8 +176,8 @@ void GLWidget::initializeGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-	if (w > 0) W = w;
-	if (h > 0) H = h;
+	W = w;
+	H = h;
 
 	glViewport(0, 0, W, H);
 	float f = FAR_PLANE;

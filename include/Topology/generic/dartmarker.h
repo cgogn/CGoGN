@@ -109,17 +109,20 @@ public:
 	 */
 	DartMarkerGen(GenericMap& map): m_map(map), m_thread(0)
 	{
-		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
+//		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
+		m_mark = m_map.getMarkerSet(DART,m_thread).getNewMark() ;
 	}
 
 	DartMarkerGen(GenericMap& map, unsigned int thread): m_map(map), m_thread(thread)
 	{
-		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
+//		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
+		m_mark = m_map.getMarkerSet(DART,m_thread).getNewMark() ;
 	}
 
 	virtual ~DartMarkerGen()
 	{
-		m_map.m_marksets[DART][m_thread].releaseMark(m_mark) ;
+//		m_map.m_marksets[DART][m_thread].releaseMark(m_mark) ;
+		m_map.getMarkerSet(DART,m_thread).releaseMark(m_mark) ;
 	}
 
 protected:
@@ -133,6 +136,7 @@ public:
 	 */
 	virtual void mark(Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		m_map.getMarkVector(DART, m_thread)->operator[](d.index).setMark(m_mark);
 	}
 
@@ -141,6 +145,7 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		m_map.getMarkVector(DART, m_thread)->operator[](d.index).unsetMark(m_mark);
 	}
 
@@ -149,6 +154,7 @@ public:
 	 */
 	virtual bool isMarked(Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		return m_map.getMarkVector(DART, m_thread)->operator[](d.index).testMark(m_mark);
 	}
 
@@ -157,6 +163,7 @@ public:
 	 */
 	virtual void markOrbit(unsigned int orbit, Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
@@ -166,6 +173,7 @@ public:
 	 */
 	virtual void unmarkOrbit(unsigned int orbit, Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
@@ -176,6 +184,7 @@ public:
 	template <typename MAP>
 	void markOrbitInParent(unsigned int orbit, Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
 	}
@@ -186,6 +195,7 @@ public:
 	template <typename MAP>
 	void unmarkOrbitInParent(unsigned int orbit, Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
 		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
 	}
@@ -195,6 +205,7 @@ public:
 	 */
 	virtual void markAll()
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkVector(DART, m_thread)->operator[](i).setMark(m_mark);
@@ -231,6 +242,8 @@ protected:
 public:
 	void unmarkAll()
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+
 		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkVector(DART, m_thread)->operator[](i).unsetMark(m_mark);
@@ -272,6 +285,7 @@ public:
 
 	void markOrbit(unsigned int orbit, Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
@@ -279,6 +293,7 @@ public:
 	template <typename MAP>
 	void markOrbitInParent(unsigned int orbit, Dart d)
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
 		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
 	}
@@ -291,6 +306,7 @@ public:
 
 	void unmarkAll()
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		for (std::vector<unsigned int>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
 			m_map.getMarkVector(DART, m_thread)->operator[](*it).unsetMark(m_mark) ;
 	}
@@ -320,6 +336,7 @@ protected:
 public:
 	void unmarkAll()
 	{
+		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
 		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 			m_map.getMarkVector(DART, m_thread)->operator[](i).unsetMark(m_mark) ;

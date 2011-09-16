@@ -260,6 +260,8 @@ public:
 	 */
 	Geom::Vec3f boundMax() const {return m_Image->boundMax();}
 
+	void removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth);
+
 };
 
 

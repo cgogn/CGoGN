@@ -96,29 +96,32 @@ GenericMap::~GenericMap()
 
 void GenericMap::clear(bool removeAttrib)
 {
-	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	if (removeAttrib)
 	{
-		if(i == DART)
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+		{
 			m_attribs[i].clear(true) ;
-		else
-		{
-			m_attribs[i].clear(removeAttrib) ;
 			m_embeddings[i] = NULL ;
-		}
 
-		for(unsigned int j = 0; j < NB_THREAD; ++j)
-		{
-			m_marksets[i][j].clear() ;
-			m_markTables[i][j] = NULL ;
+			for(unsigned int j = 0; j < NB_THREAD; ++j)
+			{
+				if (i != DART)		// keep Marker reservation for DartMarker
+					m_marksets[i][j].clear() ;
+				m_markTables[i][j] = NULL ;
+			}
 		}
-	}
-
-	if(removeAttrib)
-	{
 		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 			(*it).second->setInvalid() ;
 		attributeHandlers.clear() ;
 	}
+	else
+	{
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+		{
+			m_attribs[i].clear(false) ;
+		}
+	}
+
 }
 
 /****************************************
@@ -609,5 +612,33 @@ unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& go
 	foreach_orbit(orbit, fcount, good);
 	return fcount.getNb();
 }
+
+void GenericMap::viewAttributesTables()
+{
+	std::cout << "======================="<< std::endl;
+	for (unsigned int i=0; i< NB_ORBITS; ++i)
+	{
+		std::cout << "ATTRIBUTE_CONTAINER "<<i<< std::endl;
+		AttributeContainer& cont = m_attribs[i] ;
+
+		// get the list of attributes
+		std::vector<std::string> listeNames;
+		cont.getAttributesNames(listeNames);
+		for (std::vector<std::string>::iterator it=listeNames.begin(); it!=listeNames.end(); ++it)
+			std::cout<< "    " << *it << std::endl;
+		std::cout << "-------------------------"<< std::endl;
+	}
+	std::cout << "m_embeddings: "<<std::hex;
+	for (unsigned int i=0; i< NB_ORBITS; ++i)
+		std::cout << (long)(m_embeddings[i]) << " / ";
+	std::cout << std::endl<< "-------------------------"<< std::endl;
+
+	std::cout << "m_markTables: ";
+	for (unsigned int i=0; i< NB_ORBITS; ++i)
+		std::cout << (long)(m_markTables[i][0]) << " / ";
+	std::cout << std::endl<< "-------------------------"<< std::endl<< std::dec;
+
+}
+
 
 } // namespace CGoGN
