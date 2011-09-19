@@ -12,6 +12,8 @@ INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
+find_package(Boost COMPONENTS regex REQUIRED)
+
 # define includes path
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
