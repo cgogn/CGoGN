@@ -541,7 +541,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 		{
 			// add all face neighbours to the table
 
-			if(phi3(e) != e && (abs(volumeLevel(phi3(e)) - vLevel) > 1))
+			if(phi3(e) != e && (abs(int(volumeLevel(phi3(e)) - vLevel)) > 1))
 			{
 				found = true;
 			}
