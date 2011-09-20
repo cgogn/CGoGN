@@ -30,6 +30,12 @@ link_directories(
 	${CGoGN_ROOT_DIR}/lib/Debug
 	${CGoGN_ROOT_DIR}/lib/Release
 )
+IF(WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)  ${Boost_LIBRARY_DIRS})
+ELSE(WIN32)
+		
+	link_directories( ${CGoGN_ROOT_DIR}/lib/Debug  ${CGoGN_ROOT_DIR}/lib/Release )
+ENDIF(WIN32)
 
 #define exec to compile
 

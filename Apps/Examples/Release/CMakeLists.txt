@@ -12,6 +12,8 @@ INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
+find_package(Boost COMPONENTS regex REQUIRED)
+
 # define includes path
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -25,11 +27,12 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
 	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${Boost_INCLUDE_DIRS}
 )
 
 # define libs path
 IF(WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName) )
+	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)  ${Boost_LIBRARY_DIRS})
 ELSE(WIN32)
 	link_directories( ${CGoGN_ROOT_DIR}/lib/Release )
 ENDIF(WIN32)
