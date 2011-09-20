@@ -29,6 +29,7 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
 	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${Boost_INCLUDE_DIRS}
 
 )
 

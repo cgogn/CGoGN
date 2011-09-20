@@ -13,9 +13,6 @@ INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
-# define includes path
-
-MESSAGE (STATUS ${BOOST_INCLUDE_PATH})
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 	/usr/include/libxml2/
@@ -24,16 +21,19 @@ include_directories(
 	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
 	${CGoGN_ROOT_DIR}/ThirdParty/glm
 	${CGoGN_ROOT_DIR}/include
-	${BOOST_INCLUDE_PATH}
+	${Boost_INCLUDE_DIRS}
 )
 
 # define libs path
 IF(WIN32)
-	link_directories(${CGoGN_ROOT_DIR}/lib/$(ConfigurationName))
+	link_directories(${CGoGN_ROOT_DIR}/lib/$(ConfigurationName) ${Boost_LIBRARY_DIRS})
 ELSE(WIN32)
 	link_directories(${CGoGN_ROOT_DIR}/lib/Release ${CGoGN_ROOT_DIR}/lib/Debug)
 ENDIF(WIN32)
 
+
+# define boost component usage (here only thread)
+find_package(Boost COMPONENTS thread REQUIRED)
 
 #define exec to compile
 
@@ -79,17 +79,19 @@ target_link_libraries( tp_master
 # -first argument variable that will contain the libs
 # -second argument list of boost libs separated by ; in " "
 # exemple: BOOST_LIBS(boost_lib_lists "boost_thread-mt;boost_iostreams-mt")
-BOOST_LIBS(boost_lib_lists "boost_thread-mt")
+#BOOST_LIBS(boost_lib_lists "boost_thread-mt")
+
 
 QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
 add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
 target_link_libraries( tuto_mt
-	${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} ${boost_lib_lists})
+	${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} ${Boost_THREAD_LIBRARY})
+
 
 QT4_WRAP_CPP(tuto_ogl3_moc tuto_ogl3.h)
 add_executable( tuto_ogl3 tuto_ogl3.cpp ${tuto_ogl3_moc})
 target_link_libraries( tuto_ogl3
-	${CGoGN_LIBS_D}  ${COMMON_LIBS} ${QT_LIBRARIES} )
+	${CGoGN_LIBS_D}  ${COMMON_LIBS} ${QT_LIBRARIES})
 
 
 
