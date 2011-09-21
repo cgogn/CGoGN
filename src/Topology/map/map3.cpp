@@ -635,15 +635,15 @@ unsigned int Map3::vertexDegree(Dart d)
 	int count = 0;
 	DartMarkerStore mv(*this);	// Lock a marker
 
-	std::list<Dart> darts_list;			//Darts that are traversed
-	darts_list.push_back(d);			//Start with the dart d
-	std::list<Dart>::iterator darts;
+	std::vector<Dart> darts;			//Darts that are traversed
+	darts.reserve(512);
+	darts.push_back(d);			//Start with the dart d
 
 	mv.mark(d);
 
-	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
 	{
-		Dart dc = *darts;
+		Dart dc = *it;
 
 		//add phi21 and phi23 successor if they are not marked yet
 		Dart d2 = phi2(dc);
@@ -652,27 +652,27 @@ unsigned int Map3::vertexDegree(Dart d)
 
 		if(!mv.isMarked(d21))
 		{
-			darts_list.push_back(d21);
+			darts.push_back(d21);
 			mv.mark(d21);
 		}
 
 		if((d23!=d2) && !mv.isMarked(d23))
 		{
-			darts_list.push_back(d23);
+			darts.push_back(d23);
 			mv.mark(d23);
 		}
 	}
 
-	std::cout << "#darts = " << darts_list.size() << std::endl;
+	std::cout << "#darts = " << darts.size() << std::endl;
 
 	DartMarkerStore me(*this);
 
-	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
 	{
-		if(!me.isMarked(*darts))
+		if(!me.isMarked(*it))
 		{
 			++count;
-			me.markOrbit(EDGE, *darts);
+			me.markOrbit(EDGE, *it);
 		}
 	}
 

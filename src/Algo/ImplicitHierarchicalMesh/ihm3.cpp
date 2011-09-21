@@ -382,6 +382,7 @@ bool ImplicitHierarchicalMap3::faceIsSubdivided(Dart d)
 	if(m_dartLevel[phi1(d)] == m_curLevel && m_edgeId[phi1(d)] != m_edgeId[d])
 		subd = true ;
 	--m_curLevel ;
+
 	return subd ;
 }
 
@@ -402,7 +403,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 
 
 	Dart old = d ;
-	bool facesAreSubdivided = false;
+	bool facesAreSubdivided = faceIsSubdivided(d) ;
 
 	//parcours les faces du volume au niveau courant
 	//on cherche le brin de niveau le plus bas de la hierarchie
@@ -417,7 +418,6 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 		//levels of its faces
 
 		facesAreSubdivided &= faceIsSubdivided(e) ;
-
 
 		do	// add all face neighbours to the table
 		{
@@ -441,7 +441,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 }
 
 
-bool  ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
+bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
@@ -464,6 +464,49 @@ bool  ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		--m_curLevel ;
 	}
 	return subd && degree2 && subdOnce ;
+}
+
+bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+
+	bool subd = false;
+	bool subdOnce = true;
+	bool subdNeighborhood = false; //deux volumes voisins de la face ne sont pas subdivise
+
+	if(faceIsSubdivided(d))
+	{
+		subd = true;
+		Dart d3 = phi3(d);
+
+		std::cout << "d3 = " << d3 << std::endl;
+		std::cout << "d = " << d << std::endl;
+		std::cout << "curLevel = " << m_curLevel << std::endl;
+		std::cout << "volSubd(d3) = " << volumeIsSubdivided(d3) << std::endl;
+
+		//tester si le volume voisin est subdivise
+		if(d3 != d && volumeIsSubdivided(d3))
+			subdNeighborhood = true;
+
+		++m_curLevel;
+		//tester si la face subdivise a des faces subdivise
+		Dart cf = phi1(d);
+
+		do
+		{
+			if(faceIsSubdivided(cf))
+				subdOnce = false;
+
+			cf = phi2(phi1(cf));
+		}
+		while(subdOnce && cf != phi1(d));
+
+		--m_curLevel;
+	}
+
+	std::cout << "subdNeighborhood = " << subdNeighborhood << std::endl;
+
+	return subd && !subdNeighborhood && subdOnce;
 }
 
 bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
