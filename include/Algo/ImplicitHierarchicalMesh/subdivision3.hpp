@@ -748,7 +748,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 		//test si la face est triangulaire ou non
 		if(map.phi1(map.phi1(map.phi1(d))) == d)
 		{
-			std::cout << "trian" << std::endl;
+			//std::cout << "trian" << std::endl;
 			Dart cf = map.phi2(map.phi1(d));
 			Dart e = cf;
 			do
@@ -759,7 +759,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 		}
 		else
 		{
-			std::cout << "quad" << std::endl;
+			//std::cout << "quad" << std::endl;
 			Dart cf = map.phi1(d);
 			Dart e = cf;
 			do

@@ -298,6 +298,40 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(d), vv1) ;
 }
 
+void Map2::unsewAroundVertex(Dart d)
+{
+	Dart e = d;
+
+	do
+	{
+		Dart temp = phi1(e);
+		Dart e_1 = phi_1(e);
+
+		do
+		{
+			unsewFaces(temp);
+			temp = phi1(temp);
+		}while(temp != e_1);
+
+		e = alpha1(e);
+	}
+	while(e != d);
+}
+
+void Map2::explodPolyhedron(Dart d)
+{
+	unsewAroundVertex(d);
+	closeHole(phi1(d));
+
+	//Recherche du (ou un des) sommet oppose
+		//tourner autour du sommet
+			//si quad  alors sommet oppose
+			//
+		//si pas de quad alors un sommet du trian
+
+	//
+}
+
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
 	// First traversal of both faces to check the face sizes

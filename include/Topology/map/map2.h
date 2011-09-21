@@ -236,6 +236,20 @@ public:
 	 */
 	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
 
+	/**
+	 * Unsew opposite edges from the faces around a vertex
+	 * \warning Darts may have
+	 * @param d a dart from the vertex
+	 */
+	void unsewAroundVertex(Dart d) ;
+
+	/**
+	 * Unsex the Umbrella aroud a vertex, close the hole and then
+	 * create a symetric to construct a polyedron
+	 * @param d a dart from the vertex
+	 */
+	void explodPolyhedron(Dart d);
+
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
 	 *  The faces adjacent to the two given faces are pairwise phi2-linked

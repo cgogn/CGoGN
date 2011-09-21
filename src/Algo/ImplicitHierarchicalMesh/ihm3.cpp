@@ -172,7 +172,6 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-
 	if(m_curLevel == 0)
 		return 0 ;
 
@@ -182,7 +181,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 	DartMarkerStore mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(16);
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 	std::vector<Dart>::iterator face;
 
@@ -265,6 +264,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
+				std::cout << "brin ajoute = " << ee << std::endl;
 				mark.markOrbit(FACE, ee) ;
 			}
 			e = phi1(e) ;
@@ -541,9 +541,11 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 		{
 			// add all face neighbours to the table
 
-			if(phi3(e) != e && (abs(volumeLevel(phi3(e)) - vLevel) > 1))
+			if(phi3(e) != e)
 			{
-				found = true;
+				Dart old = volumeOldestDart(phi3(e));
+				if((abs(volumeLevel(old) - vLevel) > 1))
+					found = true;
 			}
 
 			Dart ee = phi2(e) ;
