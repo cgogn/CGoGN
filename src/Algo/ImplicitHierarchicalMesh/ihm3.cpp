@@ -264,7 +264,6 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				std::cout << "brin ajoute = " << ee << std::endl;
 				mark.markOrbit(FACE, ee) ;
 			}
 			e = phi1(e) ;
