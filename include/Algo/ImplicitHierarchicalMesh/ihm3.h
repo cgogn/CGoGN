@@ -257,6 +257,11 @@ public:
 	/**
 	 *
 	 */
+	bool faceCanBeCoarsened(Dart d);
+
+	/**
+	 *
+	 */
 	bool faceIsSubdividedOnce(Dart d);
 
 	/**

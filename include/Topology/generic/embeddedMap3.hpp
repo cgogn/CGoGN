@@ -68,37 +68,37 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 template <typename MAP3>
 void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 {
-	Dart d3 = MAP3::phi3(d);
-
-	bool boundaryD = false;
-	bool boundaryE = false;
-
-	if(MAP3::isOrbitEmbedded(VERTEX))
-	{
-		if(MAP3::isBoundaryVertex(d))
-			boundaryD = true;
-		if(MAP3::isBoundaryVertex(MAP3::phi1(d)))
-			boundaryE = true;
-	}
-
+//	Dart d3 = MAP3::phi3(d);
+//
+//	bool boundaryD = false;
+//	bool boundaryE = false;
+//
+//	if(MAP3::isOrbitEmbedded(VERTEX))
+//	{
+//		if(MAP3::isBoundaryVertex(d))
+//			boundaryD = true;
+//		if(MAP3::isBoundaryVertex(MAP3::phi1(d)))
+//			boundaryE = true;
+//	}
+//
 	MAP3::unsewVolumes(d);
-
-	Dart dd = d;
-	Dart dd3 = d3;
-
-	do
-	{
-		if(MAP3::isOrbitEmbedded(VERTEX))
-			MAP3::copyCell(VERTEX, dd3, MAP3::phi1(dd));
-
-		if(MAP3::isOrbitEmbedded(EDGE))
-
-
-		if(MAP3::isOrbitEmbedded(FACE))
-
-
-		dd = MAP3::phi1(dd) ;
-	}while( dd != d );
+//
+//	Dart dd = d;
+//	Dart dd3 = d3;
+//
+//	do
+//	{
+//		if(MAP3::isOrbitEmbedded(VERTEX))
+//			MAP3::copyCell(VERTEX, dd3, MAP3::phi1(dd));
+//
+//		if(MAP3::isOrbitEmbedded(EDGE))
+//
+//
+//		if(MAP3::isOrbitEmbedded(FACE))
+//
+//
+//		dd = MAP3::phi1(dd) ;
+//	}while( dd != d );
 
 
 }
@@ -168,34 +168,52 @@ void EmbeddedMap3<MAP3>::splitFace(Dart d, Dart e)
 template <typename MAP3>
 void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 {
-
 	MAP3::cutEdge(d);
 
 	if(MAP3::isOrbitEmbedded(EDGE))
 	{
+		Dart nd = MAP3::phi1(d) ;
 
+		MAP3::embedNewCell(EDGE, nd) ;
+		MAP3::copyCell(EDGE, nd, d) ;
+
+		unsigned int vEmb = MAP3::getEmbedding(EDGE, d);
+		MAP3::embedOrbit(EDGE, d, vEmb) ;
 	}
 
 	if(MAP3::isOrbitEmbedded(FACE))
 	{
+		Dart f = d;
+		do
+		{
+			Dart nd = MAP3::phi1(f) ;
+			MAP3::copyDartEmbedding(FACE, nd, f);
 
+			Dart f2 = MAP3::phi2(nd);
+			if(f2!=nd)
+			{
+				Dart nd2 = MAP3::phi2(f);
+				MAP3::copyDartEmbedding(FACE, nd2, f2);
+			}
+
+			f = MAP3::alpha2(f);
+		} while(f != d);
 	}
 
 	if(MAP3::isOrbitEmbedded(VOLUME))
 	{
-		Dart demb = d;
-		if(MAP3::phi3(demb) == demb)
-			demb = MAP3::phi2(demb);
-
-		Dart f = demb;
+		Dart f = d;
 		do
 		{
-			MAP3::copyDartEmbedding(VOLUME, MAP3::phi1(f), f);
-			MAP3::copyDartEmbedding(VOLUME, MAP3::phi2(f), MAP3::phi2(MAP3::phi1(f)));
+			Dart nd = MAP3::phi1(f) ;
+			MAP3::copyDartEmbedding(VOLUME, nd, f);
+
+			Dart nd2 = MAP3::phi2(f);
+			if(f!=nd2)
+				MAP3::copyDartEmbedding(VOLUME, nd2, f);
 
 			f = MAP3::alpha2(f);
-		}
-		while(f != demb);
+		} while(f != d);
 	}
 }
 

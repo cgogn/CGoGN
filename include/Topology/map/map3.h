@@ -230,7 +230,6 @@ public:
 	 */
 	virtual Dart cutSpike(Dart d);
 
-
 	//!
 	/*
 	 *
