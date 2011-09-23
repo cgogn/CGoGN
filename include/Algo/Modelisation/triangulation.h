@@ -32,6 +32,7 @@
 #include <set>
 #include <utility>
 
+#include "Algo/Geometry/normal.h"
 
 namespace CGoGN
 {
