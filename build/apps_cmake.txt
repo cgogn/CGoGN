@@ -72,7 +72,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 BOOST_LIBS(boost_regex_lib_lists "boost_regex-mt")
 
-SET(CGoGN_INCLUDES_DIR
+SET(CGoGN_INCLUDE_DIRS
 	/usr/include/libxml2/
 	${CGoGN_ROOT_DIR}/include
 	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
