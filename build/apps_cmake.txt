@@ -71,11 +71,24 @@ ENDIF(WIN32)
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 BOOST_LIBS(boost_regex_lib_lists "boost_regex-mt")
+
+SET(CGoGN_INCLUDES_DIR
+	/usr/include/libxml2/
+	${CGoGN_ROOT_DIR}/include
+	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
+	${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig
+	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
+	${CGoGN_ROOT_DIR}/ThirdParty/Zinri
+	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
+	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
+	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
+	${CGoGN_ROOT_DIR}/ThirdParty/glm
+)
+
 SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} ${boost_regex_lib_lists} gzstream AntTweakBar openctm assimp)
 
 SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
 SET(CGoGN_LIBS_R topology algo container utils)
 SET(NUMERICAL_LIBS numerical lapack blas f2c)
-
 
 
