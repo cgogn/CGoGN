@@ -244,7 +244,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType
 	bool found = false;					// Last functor return value
 
 	std::vector<Dart> darts_list;			//Darts that are traversed
-	darts_list.reserve(50);
+	darts_list.reserve(512);
 
 	darts_list.push_back(d);			//Start with the dart d
 	mv.mark(d);
@@ -288,11 +288,8 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge(Dart d, FunctorType& 
 		if (f(dNext))
 			return true;
 
-		Dart d2 = phi2(dNext);
-		if (d2 != dNext)
-			return f(d2);
-		else
-			return false;
+		if (f(phi2(dNext)))
+			return true;
 
 		dNext = alpha2(dNext);
 	} while (dNext != d);

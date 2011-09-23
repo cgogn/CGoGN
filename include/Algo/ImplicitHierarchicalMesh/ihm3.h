@@ -274,6 +274,10 @@ public:
 	 */
 	bool neighborhoodLevelDiffersByOne(Dart d);
 
+	/**
+	 * wired !!!
+	 */
+	bool coarsenNeighborhoodLevelDiffersByOne(Dart d);
 } ;
 
 template <typename T>

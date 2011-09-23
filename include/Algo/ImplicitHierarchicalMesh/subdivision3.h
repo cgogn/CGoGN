@@ -41,11 +41,15 @@ enum SubdivideType
 	S_QUAD
 } ;
 
+/***********************************************************************************
+ *								 Subdivision									   *
+ ***********************************************************************************/
+
 template <typename PFP>
 void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
 Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
@@ -54,16 +58,18 @@ template <typename PFP>
 Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 template <typename PFP>
-Dart subdivideVolumeOld(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
-//template <typename PFP>
-//void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
+/***********************************************************************************
+ *								 Simplification									   *
+ ***********************************************************************************/
 
 template <typename PFP>
 void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
 void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
@@ -77,27 +83,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 template <typename PFP>
 void splitVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
-/*******************************************************
- *
- */
-template <typename PFP>
-void subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType);
 
-
-template <typename PFP>
-Dart subdivideFaceTri(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-void subdivideVolumeTri(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-void macCrackenJoy(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-void bajaj(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-typename PFP::VEC3 bajajMask(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 
 } //namespace IHM

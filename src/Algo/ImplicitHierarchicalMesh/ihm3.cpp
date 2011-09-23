@@ -397,7 +397,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 	DartMarkerStore mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(16);
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 	std::vector<Dart>::iterator face;
 
@@ -454,6 +454,8 @@ bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		subd = true ;
 		Dart d2 = phi2(d) ;
 		++m_curLevel ;
+
+		std::cout << "vertex degree = " << vertexDegree(phi1(d)) << std::endl;
 
 		if(vertexDegree(phi1(d)) == 2)
 		{
@@ -553,6 +555,7 @@ bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
 
 bool ImplicitHierarchicalMap3:: volumeIsSubdividedOnce(Dart d)
 {
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
 	return true;
 }
@@ -563,7 +566,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 
 	bool found = false;
 
-	unsigned int vLevel = volumeLevel(d) + 1;
+	unsigned int vLevel = volumeLevel(d);// + 1;
 
 	Dart old = volumeOldestDart(d);
 
@@ -571,7 +574,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 
 	//Store faces that are traversed and start with the face of d
 	std::vector<Dart> visitedFaces;
-	visitedFaces.reserve(20);
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(old);
 
 	mf.markOrbit(FACE, old) ;
@@ -586,10 +589,60 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 			if(phi3(e) != e)
 			{
 				Dart old = volumeOldestDart(phi3(e));
-				if((abs(volumeLevel(old) - vLevel) > 1))
+				//if((abs(volumeLevel(old) - vLevel) > 1))
+				if(volumeLevel(old) < vLevel)
 					found = true;
 			}
 
+			Dart ee = phi2(e) ;
+			if(!mf.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mf.markOrbit(FACE, ee) ;
+			}
+
+			e = phi1(e) ;
+		} while(e != *face) ;
+	}
+
+	return found;
+}
+
+bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersByOne(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+
+	bool found = false;
+
+	//unsigned int vLevel = volumeLevel(d);
+
+	Dart old = volumeOldestDart(d);
+
+	DartMarkerStore mf(*this);		// Lock a face marker to save one dart per face
+
+	//Store faces that are traversed and start with the face of d
+	std::vector<Dart> visitedFaces;
+	visitedFaces.reserve(512);
+	visitedFaces.push_back(old);
+
+	mf.markOrbit(FACE, old) ;
+
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		Dart e = *face ;
+		do
+		{
+			// add all face neighbours to the table
+
+			if(faceIsSubdivided(e))
+			{
+				++m_curLevel;
+
+				if(faceIsSubdividedOnce(e))
+					found = true;
+
+				--m_curLevel;
+			}
 			Dart ee = phi2(e) ;
 			if(!mf.isMarked(ee)) // not already marked
 			{

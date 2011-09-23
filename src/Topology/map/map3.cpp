@@ -41,7 +41,7 @@ void Map3::deleteOrientedVolume(Dart d)
 	DartMarkerStore mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(16);
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 
 //	// For every face added to the list
@@ -207,14 +207,15 @@ bool Map3::deleteVertex(Dart d)
 {
 	DartMarkerStore mv(*this);	// Lock a marker
 
-	std::list<Dart> darts_list;			//Darts that are traversed
+	std::vector<Dart> darts_list;			//Darts that are traversed
+	darts_list.reserve(512);
 	darts_list.push_back(d);			//Start with the dart d
-	std::list<Dart>::iterator darts;
+	std::vector<Dart>::iterator darts;
 
 	mv.mark(d);
 
-	std::list<Dart> unique_darts_list;
-	//unique_darts_list.reserve(30);
+	std::vector<Dart> unique_darts_list;
+	unique_darts_list.reserve(512);
 	unique_darts_list.push_back(d);
 
 
@@ -546,9 +547,10 @@ void Map3::collapseVolume(Dart d, bool delDegenerateFaces,
 	//contracter toutes les faces de la liste
 }
 
-//TODO
-void Map3::mergeFaces(Dart d, Dart e)
+
+bool Map3::mergeFaces(Dart d, Dart e)
 {
+
 
 }
 
@@ -662,8 +664,6 @@ unsigned int Map3::vertexDegree(Dart d)
 			mv.mark(d23);
 		}
 	}
-
-	std::cout << "#darts = " << darts.size() << std::endl;
 
 	DartMarkerStore me(*this);
 
@@ -810,7 +810,6 @@ bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 
 bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 

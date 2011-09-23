@@ -222,7 +222,7 @@ public:
 	 *  @param d a dart in the first face
 	 *  @param e a dart in the second face
 	 */
-	virtual void mergeFaces(Dart d, Dart e);
+	virtual bool mergeFaces(Dart d, Dart e);
 
 	//!
 	/*!
