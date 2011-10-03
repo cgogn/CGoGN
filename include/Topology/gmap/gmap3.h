@@ -115,6 +115,33 @@ public:
 	bool mergeVolumes(Dart d);
 
 
+	//! Collapse an edge (that is deleted) possibly merging its vertices
+	/*! If delDegenerateFaces is true, the method checks that no degenerate
+	 *  faces are build (faces with less than 3 edges). If it occurs the faces
+	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
+	 *  \warning This may produce two distinct vertices if the edge
+	 *  was the only link between two border faces
+	 *  @param d a dart in the deleted edge
+	 *  @param delDegenerateFaces a boolean (default to true)
+	 */
+	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true, bool delDegenerateVolumes = true);
+
+	//!
+	/*!
+	 *
+	 * @param
+	 * @param
+	 * @param
+	 */
+	virtual void collapseFace(Dart d, bool delDegenerateFaces = true, bool delDegenerateVolumes = true);
+
+	//!
+	/*!
+	 *
+	 */
+	virtual Dart cutSpike(Dart d);
+
+
 	/*! @name Cell Functors
 	 *  Apply functors to all darts of a cell
 	 *************************************************************************/

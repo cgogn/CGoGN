@@ -110,7 +110,185 @@ bool GMap3::mergeVolumes(Dart d)
 	return false ;
 }
 
+int GMap3::collapseEdge(Dart d, bool delDegenerateFaces,
+		bool delDegenerateVolumes)
+{
+	Dart e = d;
+	int i = 0;
 
+	//stocke un brin par volume autour de l'arete
+	std::list<Dart> tmp;
+	do
+	{
+		tmp.push_back(e);
+		e = alpha2(e);
+		i++;
+	} while (e != d);
+
+	for (std::list<Dart>::iterator it = tmp.begin(); it != tmp.end(); ++it)
+	{
+		Dart e = phi2(*it);
+
+		cutSpike(e);
+
+		Dart t1=e,t2=e;
+		//si les faces opposées ont un tetraedre cousu
+		if(phi3(phi2(phi1(e))) != phi2(phi1(e))) {
+			t1 = phi3(phi2(phi1(e)));
+			unsewVolumes(t1);
+		}
+
+		if(phi3(phi2(phi_1(e))) != phi2(phi_1(e))) {
+			t2 = phi3(phi2(phi_1(e)));
+			unsewVolumes(t2);
+		}
+
+		if(t1 != e && t2 != e) {
+			sewVolumes(t1,t2);
+		}
+
+		//unsewVolumes(e);
+		//unsewVolumes(*it);
+
+		deleteOrientedVolume(*it);
+	}
+
+	return i;
+}
+
+//TODO
+void GMap3::collapseFace(Dart d, bool delDegenerateFaces,
+		bool delDegenerateVolumes)
+{
+	Dart e = d;
+	std::list<Dart> tmp;
+
+	//save a dart from the edge for all neighbors
+	do
+	{
+		//if(phi3(phi2(e)) != phi2(e))
+		//		tmp.push_back(phi3(phi2(e)));
+		tmp.push_back(phi3(phi2(e)));
+		e = phi1(e);
+	}while(e != d);
+
+	//del the last one (n-1 edge collapse)
+	tmp.pop_back();
+
+	//CGoGNout << "#voisin=" << tmp.size() << CGoGNendl;
+
+	//collapse all the edges in the list
+	for(std::list<Dart>::iterator it = tmp.begin() ; it != tmp.end() ; ++it)
+	{
+		Dart d = *it;
+		//CGoGNout << "collapseEdge" << CGoGNendl;
+		//collapseEdge(*it, delDegenerateFaces, delDegenerateVolumes);
+		//stocke un brin par volume autour de l'arete
+
+		Dart e = d;
+
+		//stocke un brin par volume autour de l'arete
+		std::list<Dart> tmpedge;
+		do
+		{
+			tmpedge.push_back(e);
+			e = alpha2(e);
+		} while (e != d);
+
+		for (std::list<Dart>::iterator it = tmpedge.begin(); it != tmpedge.end(); ++it)
+		{
+			Dart e = phi2(*it);
+
+			cutSpike(e);
+
+			Dart t1=e,t2=e;
+			//si les faces opposées ont un tetraedre cousu
+			if(phi3(phi2(phi1(e))) != phi2(phi1(e))) {
+				t1 = phi3(phi2(phi1(e)));
+				unsewVolumes(t1);
+			}
+
+			if(phi3(phi2(phi_1(e))) != phi2(phi_1(e))) {
+				t2 = phi3(phi2(phi_1(e)));
+				unsewVolumes(t2);
+			}
+
+			if(t1 != e && t2 != e) {
+				sewVolumes(t1,t2);
+			}
+
+			//deleteOrientedVolume(*it);
+		}
+	}
+//	for(std::list<Dart>::iterator it = tmp.begin() ; it != tmp.end() ; ++it)
+//	{
+//		deleteOrientedVolume(*it);
+//	}
+}
+
+Dart GMap3::cutSpike(Dart d)
+{
+  Dart e=d;
+  int nb=0;
+  Dart dNew;
+  int tet=0;
+
+  //CGoGNout << "cut" << CGoGNendl;
+
+  //count the valence of the vertex
+  do {
+    nb++;
+    e=phi1(phi2(e));
+  } while (e!=d);
+
+  if(nb<3)
+  {
+	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
+	return d;
+  }
+  else
+  {
+	 //triangulate around the vertex
+	do {
+		if(phi1(phi1(phi1(e)))!=e)
+		{
+			splitFace(phi_1(e),phi1(e));
+			//CGoGNout << "split" << CGoGNendl;
+		}
+		else
+			tet++;
+
+		e=phi1(phi2(e));
+	} while (e!=d);
+
+//	CGoGNout << "#tet= " << tet << CGoGNendl;
+//	CGoGNout << "#nb= " << nb << CGoGNendl;
+
+	//si toute ces faces ne sont pas triangulaires (on insere une face)
+	if(tet != nb) {
+		//CGoGNout << "new face" << CGoGNendl;
+		dNew=newFace(nb);
+		Dart d3 = newFace(nb);
+		sewVolumes(dNew,d3);
+
+		//sew a face following the triangles
+		Dart dTurn=dNew;
+		do {
+			Dart d1 = phi1(e);
+			Dart dSym = phi2(d1);
+			phi2unsew(d1);
+			phi2sew(dTurn,d1);
+			phi2sew(phi3(dTurn),dSym);
+			dTurn = phi1(dTurn);
+			e=phi1(phi2(e));
+		}while(e!=d);
+	}
+	else
+		dNew = d;
+  }
+
+  return dNew;
+}
 
 
 bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
