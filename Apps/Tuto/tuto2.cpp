@@ -26,6 +26,7 @@
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
+#include "Topology/gmap/gmap2.h"
 #include "Topology/generic/mapBrowser.h"
 
 #include "Algo/Geometry/boundingbox.h"
@@ -41,7 +42,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-	typedef Map2 MAP;
+	typedef GMap2 MAP;
 };
 
 PFP::MAP myMap;

@@ -86,7 +86,25 @@ void GMap2::cutEdge(Dart d)
 	}
 }
 
-Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
+void GMap2::uncutEdge(Dart d)
+{
+	assert(vertexDegree(phi1(d)) == 2) ;
+	Dart ne = phi2(d) ;
+	if(ne == d)
+		collapseEdge(d) ;
+	else
+	{
+		Dart nd = phi1(d) ;
+		Dart e = phi_1(ne) ;
+		phi2unsew(e) ;
+		phi2unsew(d) ;
+		GMap1::collapseEdge(nd) ;
+		GMap1::collapseEdge(ne) ;
+		phi2sew(d, e) ;
+	}
+}
+
+Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 	Dart resV ;
 
@@ -171,6 +189,20 @@ bool GMap2::flipBackEdge(Dart d)
 		return true ;
 	}
 	return false ; // cannot flip a border edge
+}
+
+void GMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+
+	phi1sew(phi_1(d),phi_1(e));
+}
+
+void GMap2::removeEdgeFromVertex(Dart d)
+{
+	assert(phi2(d)!=d);
+
+	phi1sew(phi_1(d),phi2(d));
 }
 
 void GMap2::sewFaces(Dart d, Dart e)

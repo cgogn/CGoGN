@@ -116,6 +116,11 @@ public:
 	 */
 	virtual void cutEdge(Dart d);
 
+	//! Undo the cut of the edge of d and its opposite edge if it exists
+	/*! @param d a dart of the edge to uncut
+	 */
+	virtual void uncutEdge(Dart d);
+
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
 	 *  faces are build (faces with less than 3 edges). If it occurs the faces
@@ -126,7 +131,7 @@ public:
 	 *  @param delDegenerateFaces a boolean (default to true)
 	 *  @return a dart of the resulting vertex
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
 	 * Flip the edge of d. (rotation in phi1 order)
@@ -143,6 +148,20 @@ public:
 	 * @return true if the flip has been executed, false otherwise
 	 */
 	virtual bool flipBackEdge(Dart d);
+
+	//! Insert an edge after a dart in the vertex orbit
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  \pre Dart e must be phi2-linked with its phi_1 dart
+	 *  @param d dart of the vertex
+	 *  @param e dart of the edge
+	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+
+	//! Remove an edge from a vertex orbit
+	/*! \pre Dart d must be phi2 sewn
+	 *  @param d the dart of the edge to remove from the vertex
+	 */
+	virtual void removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges (pay attention to the orientation !)
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation

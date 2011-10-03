@@ -234,6 +234,14 @@ inline void GMap1::mergeFaces(Dart d, Dart e)
 	deleteEdge(e) ;
 }
 
+inline void GMap1::linkVertices(Dart d, Dart e)
+{
+	assert(d != e && !sameOrientedFace(d, e)) ;
+	GMap1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
+	GMap1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
+	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
+}
+
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/

@@ -119,8 +119,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 
-	std::cout << "test" << std::endl;
-
 //	mv.unmarkAll();
 
 	// first pass: cut edges
@@ -235,7 +233,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 		//close the generated hole and create the central vertex
 		unsigned int degree = map.closeHole(map.phi1(d));
-		std::cout << "degree " << degree << std::endl;
 
 		Dart dd = map.phi1(map.phi2(map.phi1(d)));
 		map.splitFace(map.phi_1(dd),map.phi1(dd));
