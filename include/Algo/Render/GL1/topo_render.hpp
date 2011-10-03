@@ -649,122 +649,63 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 	AutoAttributeHandler<Geom::Vec3f> fv1(map, DART);
 	AutoAttributeHandler<Geom::Vec3f> fv11(map, DART);
 	AutoAttributeHandler<Geom::Vec3f> fv2(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv2x(map, DART);
 	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
 
-	int m_nbDarts = 0;
-
-	// table of center of volume
-	std::vector<VEC3> vecCenters;
-	vecCenters.reserve(1000);
-	// table of nbfaces per volume
-	std::vector<unsigned int> vecNbFaces;
-	vecNbFaces.reserve(1000);
-	// table of face (one dart of each)
-	std::vector<Dart> vecDartFaces;
-	vecDartFaces.reserve(map.getNbDarts()/4);
-
-	DartMarker mark(map);					// marker for darts
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
-			VEC3 center(0, 0, 0);
-			unsigned int nbv = 0;
-			unsigned int nbf = 0;
-			std::list<Dart> visitedFaces;	// Faces that are traversed
-			visitedFaces.push_back(d);		// Start with the face of d
-
-			// For every face added to the list
-			for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-			{
-				if (!mark.isMarked(*face))		// Face has not been visited yet
-				{
-					// store a dart of face
-					vecDartFaces.push_back(*face);
-					nbf++;
-					Dart dNext = *face ;
-					do
-					{
-						if (!markVert.isMarked(dNext))
-						{
-							markVert.mark(dNext);
-							center += positions[dNext];
-							nbv++;
-						}
-						mark.mark(dNext);					// Mark
-						m_nbDarts++;
-						Dart adj = map.phi2(dNext);				// Get adjacent face
-						if (adj != dNext && !mark.isMarked(adj))
-							visitedFaces.push_back(adj);	// Add it
-						dNext = map.phi1(dNext);
-					} while(dNext != *face);
-				}
-			}
-			center /= typename PFP::REAL(nbv);
-			vecCenters.push_back(center);
-			vecNbFaces.push_back(nbf);
-	}
-
- 	glLineWidth(1.0f);
+	glLineWidth(2.0f);
+	glColor3f(0.9f,0.9f,0.9f);
 	glBegin(GL_LINES);
-	glColor3f(1.0f,1.0f,1.0f);
 
-	std::vector<Dart>::iterator face = vecDartFaces.begin();
-	for (unsigned int iVol=0; iVol<vecNbFaces.size(); ++iVol)
+	DartMarker mf(map);
+	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
-		for (unsigned int iFace = 0; iFace < vecNbFaces[iVol]; ++iFace)
+		if (!mf.isMarked(d))
 		{
-			Dart d = *face++;
-
 			std::vector<VEC3> vecPos;
 			vecPos.reserve(16);
 
+			std::vector<VEC3> vecF1;
+			vecF1.reserve(16);
+
 			// store the face & center
-			VEC3 center(0, 0, 0);
+			VEC3 center(0.0f,0.0f,0.0f);
 			Dart dd = d;
 			do
 			{
 				const VEC3& P = positions[d];
-				vecPos.push_back(P);
-				//m_attIndex[d] = posDBI;
+				vecPos.push_back(positions[d]);
 				center += P;
 				d = map.phi1(d);
-			} while (d != dd);
+			}while (d!=dd);
 			center /= REAL(vecPos.size());
 
 			//shrink the face
 			unsigned int nb = vecPos.size();
-			float okf = 1.0f - kf;
-			for (unsigned int i = 0; i < nb; ++i)
+			float k = 1.0f - kf;
+			for (unsigned int i=0; i<nb; ++i)
 			{
-				vecPos[i] = center*okf + vecPos[i]*kf;
+				vecPos[i] = center*k + vecPos[i]*kf;
 			}
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
-			// compute position of points to use for drawing topo
-			float oke = 1.0f - ke;
-			for (unsigned int i = 0; i < nb; ++i)
+			k = 1.0f - ke;
+			for (unsigned int i=0; i<nb; ++i)
 			{
-				VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
-				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
-
-				vert[d] = P;
-
+				VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
+				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
 				glVertex3fv(P.data());
 				glVertex3fv(Q.data());
-
-				fv1[d] = P*0.1f + Q*0.9f;
-				fv11[d] = P*0.9f + Q*0.1f;
-
-				fv2[d] = P*0.52f + Q*0.48f;
-				fv2x[d] = P*0.48f + Q*0.52f;
-
+				vert[d] = P;
+				VEC3 f = P*0.5f + Q*0.5f;
+				fv2[d] = f;
+				f = P*0.1f + Q*0.9f;
+				fv1[d] = f;
+				f = P*0.9f + Q*0.1f;
+				fv11[d] = f;
 				d = map.phi1(d);
 			}
-
+			mf.markOrbit(FACE, d);
 		}
 	}
-
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -779,7 +720,6 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 		e = map.beta1(d);
 		if ((d<e) && drawBeta1)
 		{
-			e = map.beta1(d);
 			glColor3f(0.0f,1.0f,1.0f);
 			glVertex3fv(fv1[d].data());
 			glVertex3fv(fv11[e].data());
@@ -796,7 +736,6 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 		glVertex3fv(vert[d].data());
 	}
 	glEnd();
-
 }
 
 template <typename PFP>
