@@ -26,7 +26,6 @@
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"
-#include "Topology/gmap/gmap2.h"
 #include "Topology/generic/mapBrowser.h"
 
 #include "Algo/Geometry/boundingbox.h"
@@ -42,7 +41,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-	typedef GMap2 MAP;
+	typedef Map2 MAP;
 };
 
 PFP::MAP myMap;
@@ -145,8 +144,8 @@ int main(int argc, char **argv)
 
 	/// on reprend la carte de tuto1
 
-	Dart d2 = myMap.newOrientedFace(3);
-	Dart d3 = myMap.newOrientedFace(4);
+	Dart d2 = myMap.newFace(3);
+	Dart d3 = myMap.newFace(4);
 	myMap.sewFaces(d2, d3);
 
 	position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");
