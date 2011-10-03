@@ -61,7 +61,7 @@ void SimpleGMap2::cb_redraw()
 {
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	Algo::Render::GL1::renderTopoGMD2<PFP>(myMap, position, false, true, 0.9f, 0.9f);
+	Algo::Render::GL1::renderTopoGMD2<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 }
 
 

@@ -641,14 +641,13 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
 }
 
 template <typename PFP>
-void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta1, bool drawBeta2, float ke, float kf)
+void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float kd, float ke, float kf)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AutoAttributeHandler<Geom::Vec3f> fv1(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv11(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv2(map, DART);
+	AutoAttributeHandler<Geom::Vec3f> posBeta1(map, DART);
+	AutoAttributeHandler<Geom::Vec3f> posBeta2(map, DART);
 	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
 
 	glLineWidth(2.0f);
@@ -656,6 +655,7 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 	glBegin(GL_LINES);
 
 	DartMarker mf(map);
+	//draw all darts and potentially all beta0
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
 		if (!mf.isMarked(d))
@@ -663,28 +663,24 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 			std::vector<VEC3> vecPos;
 			vecPos.reserve(16);
 
-			std::vector<VEC3> vecF1;
-			vecF1.reserve(16);
-
 			// store the face & center
-			VEC3 center(0.0f,0.0f,0.0f);
+			VEC3 center(0);
 			Dart dd = d;
 			do
 			{
-				const VEC3& P = positions[d];
-				vecPos.push_back(positions[d]);
+				const VEC3& P = positions[dd];
+				vecPos.push_back(positions[dd]);
 				center += P;
-				d = map.phi1(d);
-			}while (d!=dd);
+				dd = map.phi1(dd);
+			} while (dd!=d);
 			center /= REAL(vecPos.size());
 
 			//shrink the face
 			unsigned int nb = vecPos.size();
 			float k = 1.0f - kf;
 			for (unsigned int i=0; i<nb; ++i)
-			{
 				vecPos[i] = center*k + vecPos[i]*kf;
-			}
+
 			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
 
 			k = 1.0f - ke;
@@ -692,42 +688,61 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 			{
 				VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
 				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
+				VEC3 P_mid = P+(Q-P)*kd*0.5f;
+				VEC3 Q_mid = Q+(P-Q)*kd*0.5f;
 				glVertex3fv(P.data());
+				glVertex3fv(P_mid.data());
+
+				if(drawBeta0)
+				{
+					glColor3f(0.0f,0.0f,1.0f);
+					glVertex3fv(P_mid.data());
+					glVertex3fv(Q_mid.data());
+				}
+
+				glColor3f(0.9f,0.9f,0.9f);
 				glVertex3fv(Q.data());
+				glVertex3fv(Q_mid.data());
 				vert[d] = P;
-				VEC3 f = P*0.5f + Q*0.5f;
-				fv2[d] = f;
-				f = P*0.1f + Q*0.9f;
-				fv1[d] = f;
-				f = P*0.9f + Q*0.1f;
-				fv11[d] = f;
+
+				VEC3 f = P*0.5f + P_mid*0.5f;
+				posBeta2[d] = f;
+
+				f = Q*0.5f + Q_mid*0.5f;
+				posBeta2[map.beta0(d)] = f;
+
+				f = P*0.9f + P_mid*0.1f;
+				posBeta1[d] = f;
+				f = Q*0.9f + Q_mid*0.1f;
+				posBeta1[map.beta0(d)] = f;
 				d = map.phi1(d);
 			}
 			mf.markOrbit(FACE, d);
 		}
 	}
 
+	//draw links beta 1 and beta 2
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		Dart e = map.beta2(d);
-		if ((d<e) && drawBeta2)
+		if (drawBeta2)
 		{
 			glColor3f(1.0,0.0,0.0);
-			glVertex3fv(fv2[d].data());
-			glVertex3fv(fv2[e].data());
+			glVertex3fv(posBeta2[d].data());
+			glVertex3fv(posBeta2[e].data());
 		}
 
 		e = map.beta1(d);
 		if ((d<e) && drawBeta1)
 		{
 			glColor3f(0.0f,1.0f,1.0f);
-			glVertex3fv(fv1[d].data());
-			glVertex3fv(fv11[e].data());
+			glVertex3fv(posBeta1[d].data());
+			glVertex3fv(posBeta1[e].data());
 		}
 	}
-
 	glEnd(); // LINES
 
+	//draw vertices
 	glPointSize(5.0f);
 	glColor3f(0.0f,0.0f,0.0f);
 	glBegin(GL_POINTS);
