@@ -22,63 +22,46 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "simpleGMap2.h"
-#include "Utils/GLSLShader.h"
-#include "Algo/Geometry/boundingbox.h"
-#include "Algo/Modelisation/polyhedron.h"
+#include <iostream>
 
+#include "Utils/qtSimple.h"
+#include "ui_viewer.h"
+#include "Utils/qtui.h"
 
-SimpleGMap2::SimpleGMap2()
+#include "Topology/generic/parameters.h"
+#include "Topology/gmap/gmap2.h"
+#include "Topology/generic/embeddedMap2.h"
+
+#include "Geometry/vector_gen.h"
+
+#include "Algo/Render/GL1/topo_render.h"
+
+using namespace CGoGN ;
+
+struct PFP: public PFP_STANDARD
 {
-	 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	// definition of the map
+	typedef EmbeddedMap2<GMap2> MAP ;
+};
 
-     Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(myMap);
-     position[d] = VEC3(0,0,0);
-     position[myMap.phi1(d)] = VEC3(10,0,0);
-     position[myMap.phi_1(d)] = VEC3(10,20,0);
-     position[myMap.phi_1(myMap.phi2(d))] = VEC3(0,0,15);
-}
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
-void SimpleGMap2::initGUI()
+class SimpleGMap2 : public Utils::QT::SimpleQT
 {
+	Q_OBJECT
 
-}
+public:
+	MAP myMap ;
+	SelectorTrue allDarts ;
 
-void SimpleGMap2::cb_initGL()
-{
-	Utils::GLSLShader::setCurrentOGLVersion(1) ;
+	PFP::TVEC3 position ;
 
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
-	VEC3 gPosObj = bb.center() ;
-	float tailleX = bb.size(0) ;
-	float tailleY = bb.size(1) ;
-	float tailleZ = bb.size(2) ;
-	float gWidthObj = std::max<float>(std::max<float>(tailleX, tailleY), tailleZ) ;
-	setParamObject(gWidthObj, gPosObj.data());
-}
+	SimpleGMap2() ;
 
-void SimpleGMap2::cb_redraw()
-{
-	glDisable(GL_LIGHTING);
-	glLineWidth(1.0f);
-	Algo::Render::GL1::renderTopoGMD2<PFP>(myMap, position, true, true, 0.9f, 0.9f);
-}
+	void initGUI() ;
 
-
-/**********************************************************************************************
- *                                      MAIN FUNCTION                                         *
- **********************************************************************************************/
-
-int main(int argc, char **argv)
-{
-	QApplication app(argc, argv) ;
-
-	SimpleGMap2 sqt ;
-	sqt.setGeometry(0, 0, 1000, 800) ;
- 	sqt.show() ;
-
-	sqt.initGUI() ;
-
-	return app.exec() ;
-}
+	void cb_initGL() ;
+	void cb_redraw() ;
+};
 
