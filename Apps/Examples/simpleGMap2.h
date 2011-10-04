@@ -25,8 +25,6 @@
 #include <iostream>
 
 #include "Utils/qtSimple.h"
-#include "ui_viewer.h"
-#include "Utils/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/gmap/gmap2.h"
