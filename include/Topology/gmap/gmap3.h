@@ -114,6 +114,14 @@ public:
 	 */
 	bool mergeVolumes(Dart d);
 
+	//! Split a face inserting an edge between two vertices
+	/*! \pre Dart d and e should belong to the same face and be distinct
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 *  @return the dart of the new edge lying in the vertex of d after the cut
+	 */
+	virtual void splitFace(Dart d, Dart e);
+
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate

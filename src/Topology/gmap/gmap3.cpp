@@ -110,6 +110,22 @@ bool GMap3::mergeVolumes(Dart d)
 	return false ;
 }
 
+void GMap3::splitFace(Dart d, Dart e)
+{
+	GMap2::splitFace(d,e);
+
+	if (phi3(d) != d)
+	{
+		Dart dd = phi1(phi3(d));
+		Dart ee = phi1(phi3(e));
+
+		GMap2::splitFace(dd,ee);
+
+		phi3sew(phi_1(d), phi_1(ee));
+		phi3sew(phi_1(e), phi_1(dd));
+	}
+}
+
 int GMap3::collapseEdge(Dart d, bool delDegenerateFaces,
 		bool delDegenerateVolumes)
 {

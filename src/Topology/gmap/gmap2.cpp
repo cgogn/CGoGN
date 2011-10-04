@@ -333,10 +333,9 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
-//	TODO check this function
 unsigned int GMap2::closeHole(Dart d)
 {
-	assert(phi2(d) == d);	// Nothing to close
+	assert(beta2(d) == d);	// Nothing to close
 
 	Dart first = GMap1::newEdge();	// First edge of the face that will fill the hole
 	unsigned int countEdges = 1;
@@ -355,7 +354,7 @@ unsigned int GMap2::closeHole(Dart d)
 
 		if (dPhi1 != d)
 		{
-			Dart next = newDart();	// Add a new edge there and link it to the face
+			Dart next = GMap1::newEdge();	// Add a new edge there and link it to the face
 			++countEdges;
 			phi1sew(first, next);	// the edge is linked to the face
 			phi2sew(dNext, next);	// the face is linked to the hole

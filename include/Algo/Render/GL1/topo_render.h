@@ -94,7 +94,7 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
  * @param kf exploding coefficient for face (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta1, bool drawBeta2, float ke, float kf);
+void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float ke, float kf);
 
 /**
  * Render darts of g-map
@@ -108,7 +108,7 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
  * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta1, bool drawBeta2, bool drawBeta3, float ke, float kf, float kv);
+void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv);
 
 
 } // namespace GL1
