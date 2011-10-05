@@ -316,45 +316,45 @@ void EmbeddedMap2<MAP2>::sewFaces(Dart d, Dart e)
 template <typename MAP2>
 void EmbeddedMap2<MAP2>::unsewFaces(Dart d)
 {
-//	bool boundaryD = false ;
-//	bool boundaryE = false ;
-//	if (MAP2::isOrbitEmbedded(VERTEX))
-//	{
-//		if(MAP2::isBoundaryVertex(d))
-//			boundaryD = true ;
-//		if(MAP2::isBoundaryVertex(MAP2::phi1(d)))
-//			boundaryE = true ;
-//	}
-//
-//	Dart e = MAP2::phi2(d) ;
+	bool boundaryD = false ;
+	bool boundaryE = false ;
+	if (MAP2::isOrbitEmbedded(VERTEX))
+	{
+		if(MAP2::isBoundaryVertex(d))
+			boundaryD = true ;
+		if(MAP2::isBoundaryVertex(MAP2::phi1(d)))
+			boundaryE = true ;
+	}
+
+	Dart e = MAP2::phi2(d) ;
 	MAP2::unsewFaces(d) ;
 
-//	if (MAP2::isOrbitEmbedded(VERTEX))
-//	{
-//		if(boundaryD)
-//		{
-//			if(e != d)
-//			{
-//				Dart ee = MAP2::phi1(e) ;
-//				MAP2::embedNewCell(VERTEX, ee) ;
-//				MAP2::copyCell(VERTEX, ee, d) ;
-//			}
-//		}
-//
-//		if(boundaryE)
-//		{
-//			if(e != d)
-//			{
-//				MAP2::embedNewCell(VERTEX, e) ;
-//				MAP2::copyCell(VERTEX, e, MAP2::phi1(d)) ;
-//			}
-//		}
-//	}
-//	if (MAP2::isOrbitEmbedded(EDGE))
-//	{
-//		MAP2::embedNewCell(EDGE, e) ;
-//		MAP2::copyCell(EDGE, e, d) ;
-//	}
+	if (MAP2::isOrbitEmbedded(VERTEX))
+	{
+		if(boundaryD)
+		{
+			if(e != d)
+			{
+				Dart ee = MAP2::phi1(e) ;
+				MAP2::embedNewCell(VERTEX, ee) ;
+				MAP2::copyCell(VERTEX, ee, d) ;
+			}
+		}
+
+		if(boundaryE)
+		{
+			if(e != d)
+			{
+				MAP2::embedNewCell(VERTEX, e) ;
+				MAP2::copyCell(VERTEX, e, MAP2::phi1(d)) ;
+			}
+		}
+	}
+	if (MAP2::isOrbitEmbedded(EDGE))
+	{
+		MAP2::embedNewCell(EDGE, e) ;
+		MAP2::copyCell(EDGE, e, d) ;
+	}
 }
 
 template <typename MAP2>
