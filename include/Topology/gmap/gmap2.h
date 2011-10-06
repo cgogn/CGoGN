@@ -163,14 +163,14 @@ public:
 	 */
 	virtual void removeEdgeFromVertex(Dart d);
 
-	//! Sew two oriented faces along oriented edges (pay attention to the orientation !)
+	//! Sew two faces along an edge (pay attention to the orientation !)
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
 	 */
 	virtual void sewFaces(Dart d, Dart e);
 
-	//! Unsew two oriented faces along oriented edges
+	//! Unsew two faces along an edges
 	 /*! @param d a dart of one face
 	 */
 	virtual void unsewFaces(Dart d);

@@ -34,9 +34,22 @@ SimpleGMap2::SimpleGMap2()
 
      Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(myMap);
      position[d] = VEC3(0,0,0);
-     position[myMap.phi1(d)] = VEC3(10,0,0);
-     position[myMap.phi_1(d)] = VEC3(10,20,0);
-     position[myMap.phi_1(myMap.phi2(d))] = VEC3(0,0,15);
+     position[myMap.phi1(d)] = VEC3(10,0,15);
+     position[myMap.phi_1(d)] = VEC3(10,20,15);
+     position[myMap.phi_1(myMap.phi2(d))] = VEC3(0,0,30);
+
+     Algo::Modelisation::Polyhedron<PFP> poly(myMap,position);
+
+     d = poly.cylinder_topo(5,1,false,false);
+
+     poly.embedCylinder(10,10,5);
+
+     d = myMap.phi1(d);
+     Dart dd = myMap.beta2(d);
+     myMap.unsewFaces(d);
+     myMap.sewFaces(d,dd);
+
+     position[d][1] += 3.0f;
 }
 
 void SimpleGMap2::initGUI()
