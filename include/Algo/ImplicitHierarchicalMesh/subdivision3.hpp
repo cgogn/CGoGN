@@ -265,7 +265,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		//test si la face est triangulaire ou non
 		if(map.phi1(map.phi1(map.phi1(d))) == d)
 		{
-			std::cout << "trian" << std::endl;
+			//std::cout << "trian" << std::endl;
 			Dart cf = map.phi2(map.phi1(d));
 			Dart e = cf;
 			do
@@ -276,7 +276,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		}
 		else
 		{
-			std::cout << "quad" << std::endl;
+			//std::cout << "quad" << std::endl;
 			Dart cf = map.phi1(d);
 			Dart e = cf;
 			do
@@ -359,7 +359,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			//cas de la pyramide
 			if(dd == stop)
 			{
-				std::cout << "pyramide" << std::endl;
+				//std::cout << "pyramide" << std::endl;
 				map.splitFace(dd, map.phi1(map.phi1(dd)));
 			}
 			else
@@ -370,7 +370,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 				if(!( (map.Map2::faceDegree(map.phi_1(stop)) == 3 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 4) ||
 						(map.Map2::faceDegree(map.phi_1(stop)) == 4 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 3) ))
 				{
-					std::cout << "octaedre ou hexaedre" << std::endl;
+					//std::cout << "octaedre ou hexaedre" << std::endl;
 
 					Dart ne = map.phi_1(stop) ;
 					map.cutEdge(ne);
@@ -413,7 +413,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 				}
 				else
 				{
-					std::cout << "prisme" << std::endl;
+					//std::cout << "prisme" << std::endl;
 					//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
 					//map.closeHole(f2);
 				}
@@ -424,14 +424,14 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		//sinon cas du tetraedre
 		else
 		{
-			std::cout << "tetraedre" << std::endl;
+			//std::cout << "tetraedre" << std::endl;
 			//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
 			//map.closeHole(f2);
 		}
 
 	}
 
-	std::cout << "1ere etape finished" << std::endl;
+	//std::cout << "1ere etape finished" << std::endl;
 
 	CellMarker mtf(map, FACE);
 
@@ -447,7 +447,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 				map.Map2::faceDegree(map.phi2(map.phi_1(f2))) == 3) && map.Map2::vertexDegree(f2) == 3)
 		{ //cas du tetrahedre
 
-			std::cout << "ajout d'une face" << std::endl;
+			//std::cout << "ajout d'une face" << std::endl;
 
 			if(map.phi3(map.phi2(f2)) == map.phi2(f2))
 			{
@@ -470,13 +470,13 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 				if(map.Map2::faceDegree(map.phi2(f2)) == 3)
 				{
-					std::cout << "ajout d'un tetraedre" << std::endl;
+					//std::cout << "ajout d'un tetraedre" << std::endl;
 					Dart x = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
 					position[x] = volCenter;
 				}
 				else
 				{
-					std::cout << "ajout d'un prisme" << std::endl;
+					//std::cout << "ajout d'un prisme" << std::endl;
 					//Dart x = Algo::Modelisation::extrudeFace<PFP>(map,position,map.phi2(f1),5.0);
 					Dart c = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
 
@@ -524,7 +524,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 	}
 
-	std::cout << "2e etape finished" << std::endl;
+	//std::cout << "2e etape finished" << std::endl;
 
 
 	{

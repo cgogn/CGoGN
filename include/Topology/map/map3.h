@@ -346,6 +346,14 @@ public:
 	 *************************************************************************/
 
 	//@{
+
+	//! Test if dart d and e belong to the same oriented face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameFace(Dart d, Dart e);
+
+
 	// TODO devrait disparaitre
 	// pour les mêmes raisons que dans map2
 	virtual bool check();

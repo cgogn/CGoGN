@@ -1142,6 +1142,17 @@ void Map3::closeMap(DartMarker& marker)
 //	this->releaseMarker(DART,mf3);
 //}
 //
+
+
+bool Map3::sameFace(Dart d, Dart e)
+{
+	if(phi3(d) != d)
+		if(Map2::sameOrientedFace(phi3(d), e))
+			return true;
+
+	return Map2::sameOrientedFace(d,e);
+}
+
 bool Map3::check()
 {
     CGoGNout << "Check: topology begin" << CGoGNendl;
