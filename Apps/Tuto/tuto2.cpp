@@ -144,8 +144,8 @@ int main(int argc, char **argv)
 
 	/// on reprend la carte de tuto1
 
-	Dart d2 = myMap.newOrientedFace(3);
-	Dart d3 = myMap.newOrientedFace(4);
+	Dart d2 = myMap.newFace(3);
+	Dart d3 = myMap.newFace(4);
 	myMap.sewFaces(d2, d3);
 
 	position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");

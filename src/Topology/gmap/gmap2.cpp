@@ -86,7 +86,25 @@ void GMap2::cutEdge(Dart d)
 	}
 }
 
-Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
+void GMap2::uncutEdge(Dart d)
+{
+	assert(vertexDegree(phi1(d)) == 2) ;
+	Dart ne = phi2(d) ;
+	if(ne == d)
+		collapseEdge(d) ;
+	else
+	{
+		Dart nd = phi1(d) ;
+		Dart e = phi_1(ne) ;
+		phi2unsew(e) ;
+		phi2unsew(d) ;
+		GMap1::collapseEdge(nd) ;
+		GMap1::collapseEdge(ne) ;
+		phi2sew(d, e) ;
+	}
+}
+
+Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 	Dart resV ;
 
@@ -171,6 +189,20 @@ bool GMap2::flipBackEdge(Dart d)
 		return true ;
 	}
 	return false ; // cannot flip a border edge
+}
+
+void GMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+
+	phi1sew(phi_1(d),phi_1(e));
+}
+
+void GMap2::removeEdgeFromVertex(Dart d)
+{
+	assert(phi2(d)!=d);
+
+	phi1sew(phi_1(d),phi2(d));
 }
 
 void GMap2::sewFaces(Dart d, Dart e)
@@ -301,10 +333,9 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
-//	TODO check this function
 unsigned int GMap2::closeHole(Dart d)
 {
-	assert(phi2(d) == d);	// Nothing to close
+	assert(beta2(d) == d);	// Nothing to close
 
 	Dart first = GMap1::newEdge();	// First edge of the face that will fill the hole
 	unsigned int countEdges = 1;
@@ -323,7 +354,7 @@ unsigned int GMap2::closeHole(Dart d)
 
 		if (dPhi1 != d)
 		{
-			Dart next = newDart();	// Add a new edge there and link it to the face
+			Dart next = GMap1::newEdge();	// Add a new edge there and link it to the face
 			++countEdges;
 			phi1sew(first, next);	// the edge is linked to the face
 			phi2sew(dNext, next);	// the face is linked to the hole
@@ -563,6 +594,35 @@ bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 		}
 	}
 	return found;
+}
+
+bool GMap2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
+{
+	if(orbit == VERTEX)
+	{
+		Dart dNext = d;
+		do
+		{
+			if(GMap2::foreach_dart_of_edge(phi1(dNext),f,thread))
+				return true;
+
+			dNext = alpha1(dNext);
+		} while (dNext != d);
+
+		return false;
+	}
+	else if(orbit == FACE)
+	{
+		if(GMap2::foreach_dart_of_vertex(phi_1(d),f,thread))
+			return true;
+
+		if(GMap2::foreach_dart_of_vertex(phi_1(phi2(d)),f,thread))
+			return true;
+
+		return false;
+	}
+
+	return false;
 }
 
 } // namespace CGoGN

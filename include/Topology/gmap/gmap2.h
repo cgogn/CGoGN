@@ -116,6 +116,11 @@ public:
 	 */
 	virtual void cutEdge(Dart d);
 
+	//! Undo the cut of the edge of d and its opposite edge if it exists
+	/*! @param d a dart of the edge to uncut
+	 */
+	virtual void uncutEdge(Dart d);
+
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
 	 *  faces are build (faces with less than 3 edges). If it occurs the faces
@@ -126,7 +131,7 @@ public:
 	 *  @param delDegenerateFaces a boolean (default to true)
 	 *  @return a dart of the resulting vertex
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
 	 * Flip the edge of d. (rotation in phi1 order)
@@ -144,14 +149,28 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d);
 
-	//! Sew two oriented faces along oriented edges (pay attention to the orientation !)
+	//! Insert an edge after a dart in the vertex orbit
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  \pre Dart e must be phi2-linked with its phi_1 dart
+	 *  @param d dart of the vertex
+	 *  @param e dart of the edge
+	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+
+	//! Remove an edge from a vertex orbit
+	/*! \pre Dart d must be phi2 sewn
+	 *  @param d the dart of the edge to remove from the vertex
+	 */
+	virtual void removeEdgeFromVertex(Dart d);
+
+	//! Sew two faces along an edge (pay attention to the orientation !)
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
 	 */
 	virtual void sewFaces(Dart d, Dart e);
 
-	//! Unsew two oriented faces along oriented edges
+	//! Unsew two faces along an edges
 	 /*! @param d a dart of one face
 	 */
 	virtual void unsewFaces(Dart d);
@@ -304,6 +323,13 @@ public:
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0);
+
+	//!
+	/*! TODO Ajout a valider
+	 * restreint aux complexes simpliciaux
+	 * Apply a functor on the all darts in the set of the link from orbit
+	 */
+	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 	//@}
 };
 
