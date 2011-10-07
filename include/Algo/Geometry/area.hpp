@@ -116,16 +116,19 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typen
 	Dart it = d ;
 	do
 	{
-		if(!isTriangleObtuse<PFP>(map, it, position))
+		const typename PFP::VEC3& p1 = position[it] ;
+		const typename PFP::VEC3& p2 = position[map.phi1(it)] ;
+		const typename PFP::VEC3& p3 = position[map.phi_1(it)] ;
+		if(!Geom::isTriangleObtuse(p1, p2, p3))
 		{
-			typename PFP::REAL a = angle<PFP>(map, map.phi1(it), map.phi2(it), position) ;
-			typename PFP::REAL b = angle<PFP>(map, map.phi_1(it), map.phi2(map.phi1(it)), position) ;
-			area += (vectorOutOfDart<PFP>(map, it, position).norm2() / tan(a) + vectorOutOfDart<PFP>(map, map.phi_1(it), position).norm2() / tan(b)) / 8 ;
+			typename PFP::REAL a = Geom::angle(p3 - p2, p1 - p2) ;
+			typename PFP::REAL b = Geom::angle(p1 - p3, p2 - p3) ;
+			area += ( (p2 - p1).norm2() / tan(b) + (p3 - p1).norm2() / tan(a) ) / 8 ;
 		}
 		else
 		{
-			typename PFP::REAL tArea = convexFaceArea<PFP>(map, it, position) ;
-			if(angle<PFP>(map, it, map.phi2(map.phi_1(it)), position) > M_PI / 2)
+			typename PFP::REAL tArea = Geom::triangleArea(p1, p2, p3) ;
+			if(Geom::angle(p2 - p1, p3 - p1) > M_PI / 2)
 				area += tArea / 2 ;
 			else
 				area += tArea / 4 ;

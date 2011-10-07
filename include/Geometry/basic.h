@@ -106,10 +106,10 @@ VEC3 triangleNormal(const VEC3& p1, const VEC3& p2, const VEC3& p3)
 template <typename VEC3>
 bool isTriangleObtuse(const VEC3& p1, const VEC3& p2, const VEC3& p3)
 {
-	typename VEC3::DATA_TYPE a1 = angle(p2-p1, p3-p1) ;
+	typename VEC3::DATA_TYPE a1 = angle(p2 - p1, p3 - p1) ;
 	if(a1 > M_PI / 2)
 		return true ;
-	typename VEC3::DATA_TYPE a2 = angle(p3-p2, p1-p2) ;
+	typename VEC3::DATA_TYPE a2 = angle(p3 - p2, p1 - p2) ;
 	if(a2 > M_PI / 2 || a1 + a2 < M_PI / 2)
 		return true ;
 	return false ;
