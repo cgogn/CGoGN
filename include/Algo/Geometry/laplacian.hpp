@@ -120,10 +120,12 @@ typename PFP::REAL computeCotanWeightEdge(
 	Dart d,
 	const typename PFP::TVEC3& position)
 {
-	typename PFP::REAL alpha = angle<PFP>(map, map.phi_1(d), map.phi2(map.phi1(d)), position) ;
+	typename PFP::REAL cot_alpha = 1 / tan(angle<PFP>(map, map.phi_1(d), map.phi2(map.phi1(d)), position)) ;
+	typename PFP::REAL cot_beta = 0 ;
 	Dart dd = map.phi2(d) ;
-	typename PFP::REAL beta = angle<PFP>(map, map.phi_1(dd), map.phi2(map.phi1(dd)), position) ;
-	return 0.5 * ( 1 / tan(alpha) + 1 / tan(beta) ) ;
+	if(dd != d)
+		cot_beta = 1 / tan(angle<PFP>(map, map.phi_1(dd), map.phi2(map.phi1(dd)), position)) ;
+	return 0.5 * ( cot_alpha + cot_beta ) ;
 }
 
 template <typename PFP>
