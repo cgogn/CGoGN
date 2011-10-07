@@ -67,26 +67,26 @@ void decimate(
 		{
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, position)) ;
 			/*
-						PFP::TVEC3 frame[3] ;
-						frame[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "frame_T") ; // Tangent
-						frame[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "frame_B") ; // Bitangent
-						frame[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "frame_N") ; // Normal
-						for (unsigned int i = 0 ; i < 3 ; ++i)
-							if (!frame[i].isValid()) {
-								CGoGNerr << "In function decimate : frame[" << i << "] is not valid" << CGoGNendl ;
-							}
+			PFP::TVEC3 frame[3] ;
+			frame[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "frame_T") ; // Tangent
+			frame[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "frame_B") ; // Bitangent
+			frame[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "frame_N") ; // Normal
+			for (unsigned int i = 0 ; i < 3 ; ++i)
+				if (!frame[i].isValid()) {
+					CGoGNerr << "In function decimate : frame[" << i << "] is not valid" << CGoGNendl ;
+				}
 
-						AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
-						colorPTM[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_a") ;
-						colorPTM[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_b") ;
-						colorPTM[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_c") ;
-						colorPTM[3] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_d") ;
-						colorPTM[4] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_e") ;
-						colorPTM[5] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_f") ;
-						for (unsigned int i = 0 ; i < 6 ; ++i)
-							if (!colorPTM[i].isValid()) {
-								CGoGNerr << "In function decimate : colorPTM[" << i << "] is not valid" << CGoGNendl ;
-							}
+			AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
+			colorPTM[0] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_a") ;
+			colorPTM[1] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_b") ;
+			colorPTM[2] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_c") ;
+			colorPTM[3] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_d") ;
+			colorPTM[4] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_e") ;
+			colorPTM[5] = map.template getAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_f") ;
+			for (unsigned int i = 0 ; i < 6 ; ++i)
+				if (!colorPTM[i].isValid()) {
+					CGoGNerr << "In function decimate : colorPTM[" << i << "] is not valid" << CGoGNendl ;
+				}
 			*/
 			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX, "frame") ;
 			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX, "colorPTM") ;
@@ -108,31 +108,31 @@ void decimate(
 	switch(s)
 	{
 		case S_MapOrder :
-			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_Random :
-			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_EdgeLength :
-			selector = new EdgeSelector_Length<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_Length<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_QEMml :
-			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_QEM :
-			selector = new EdgeSelector_QEM<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_QEM<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_Curvature :
-			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_MinDetail :
-			selector = new EdgeSelector_Random<PFP>(map, position, approximators) ;
+			selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_hLightfield :
-			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators) ;
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_hQEMml :
-			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators) ;
+			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
 			break ;
 	}
 
