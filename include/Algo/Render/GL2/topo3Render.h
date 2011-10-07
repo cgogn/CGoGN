@@ -76,7 +76,6 @@ protected:
 	Utils::ShaderSimpleColor* m_shader1;
 	Utils::ShaderColorPerVertex* m_shader2;
 
-
 	/**
 	*number of darts to draw
 	*/
@@ -172,19 +171,6 @@ public:
 	~Topo3Render();
 
 	/**
-	* update all drawing buffers
-	* @param map the map
-	* @param good selector
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
-	*/
-//	template<typename PFP>
-//	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
-
-
-	/**
 	 * set the with of line use to draw darts (default val is 2)
 	 * @param dw width
 	 */
@@ -278,24 +264,6 @@ public:
 
 };
 
-//template<typename MAP>
-//class topo3_VBORenderMap: public topo3_VBORender
-//{
-//public:
-//	/**
-//	* update all drawing buffers
-//	* @param map the map
-//	* @param good selector
-//	* @param positions  attribute of position vertices
-//	* @param ke exploding coef for edge
-//	* @param kf exploding coef for face
-// 	* @param kv exploding coef for face
-//	*/
-//	template<typename PFP>
-//	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv) {}
-//};
-
-
 
 
 class Topo3RenderMapD: public Topo3Render
@@ -313,23 +281,23 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
 };
-//
-//
-//class Topo3RenderGMap: public Topo3Render
-//{
-//public:
-//	/**
-//	* update all drawing buffers
-//	* @param map the map
-//	* @param good selector
-//	* @param positions  attribute of position vertices
-//	* @param ke exploding coef for edge
-//	* @param kf exploding coef for face
-// 	* @param kv exploding coef for face
-//	*/
-//	template<typename PFP>
-//	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
-//};
+
+
+class Topo3RenderGMap: public Topo3Render
+{
+public:
+	/**
+	* update all drawing buffers
+	* @param map the map
+	* @param good selector
+	* @param positions  attribute of position vertices
+	* @param ke exploding coef for edge
+	* @param kf exploding coef for face
+ 	* @param kv exploding coef for face
+	*/
+	template<typename PFP>
+	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float kd, float ke, float kf, float kv);
+};
 
 }//end namespace VBO
 
