@@ -546,6 +546,42 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 	return false ;
 }
 
+bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	DartMarkerStore mark(*this,thread);	// Lock a marker
+	bool found = false;				// Last functor return value
+
+	std::list<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.push_back(d);		// Start with the face of d
+	std::list<Dart>::iterator face;
+
+	// For every face added to the list
+	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+			// Apply functor to the darts of the face
+			found = foreach_dart_of_oriented_face(*face, f);
+
+			// If functor returns false then mark visited darts (current face)
+			// and add non visited adjacent faces to the list of face
+			if (!found)
+			{
+				Dart dNext = *face ;
+				do
+				{
+					mark.mark(dNext);					// Mark
+					Dart adj = phi2(dNext);				// Get adjacent face
+					if (adj != dNext && !mark.isMarked(adj))
+						visitedFaces.push_back(adj);	// Add it
+					dNext = phi1(dNext);
+				} while(dNext != *face);
+			}
+		}
+	}
+	return found;
+}
+
 bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	bool found = false;

@@ -319,8 +319,8 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	AutoAttributeHandler<Geom::Vec3f> posBeta2x(map, DART); //beta 3 link is represented at the same location as beta2
 	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
 
-//	if (m_attIndex.map() != &map)
-	if(!m_attIndex.isValid())
+	if (m_attIndex.map() != &map)
+//	if(!m_attIndex.isValid())
 	{
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}

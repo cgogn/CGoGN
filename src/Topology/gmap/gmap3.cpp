@@ -34,7 +34,7 @@ void GMap3::deleteOrientedVolume(Dart d)
 	bool found = false;					// Last functor return value
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(16);
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 	std::vector<Dart>::iterator face;
 
@@ -65,6 +65,7 @@ void GMap3::deleteOrientedVolume(Dart d)
 
 		}
 	}
+
 	// delete every visited face
 	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 		GMap1::deleteFace(*face);
@@ -395,7 +396,7 @@ bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 
 bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return GMap1::foreach_dart_of_face(d, f, thread) || GMap1::foreach_dart_of_face(beta3(d), f, thread) ;
+	return GMap1::foreach_dart_of_face(d, f, thread) || (beta3(d)==d) || GMap1::foreach_dart_of_face(beta3(d), f, thread) ;
 }
 
 bool GMap3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
