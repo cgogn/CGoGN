@@ -95,10 +95,24 @@ typename VEC3::DATA_TYPE triangleArea(const VEC3& p1, const VEC3& p2, const VEC3
 	return 0.5 * ((p2 - p1) ^ (p3 - p1)).norm() ;
 }
 
+// normal of the plane spanned by 3 points in 3D
 template <typename VEC3>
 VEC3 triangleNormal(const VEC3& p1, const VEC3& p2, const VEC3& p3)
 {
 	return (p2 - p1) ^ (p3 - p1) ;
+}
+
+// return true if the triangle formed by 3 points in 3D is obtuse, false otherwise
+template <typename VEC3>
+bool isTriangleObtuse(const VEC3& p1, const VEC3& p2, const VEC3& p3)
+{
+	typename VEC3::DATA_TYPE a1 = angle(p2-p1, p3-p1) ;
+	if(a1 > M_PI / 2)
+		return true ;
+	typename VEC3::DATA_TYPE a2 = angle(p3-p2, p1-p2) ;
+	if(a2 > M_PI / 2 || a1 + a2 < M_PI / 2)
+		return true ;
+	return false ;
 }
 
 // signed volume of the tetrahedron formed by 4 points in 3D
