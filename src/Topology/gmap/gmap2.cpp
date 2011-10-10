@@ -48,7 +48,7 @@ void GMap2::deleteFace(Dart d)
 
 void GMap2::splitVertex(Dart d, Dart e)
 {
-	assert(sameOrientedVertex(d, e));
+	assert(sameVertex(d, e));
 	Dart dd = phi2(d) ;
 	Dart ee = phi2(e) ;
 	GMap1::cutEdge(dd);			// Cut the edge of dd (make a new edge)
@@ -272,7 +272,7 @@ void GMap2::extractTrianglePair(Dart d)
 
 void GMap2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 {
-	assert(v1 != v2 && sameOrientedVertex(v1, v2)) ;
+	assert(v1 != v2 && sameVertex(v1, v2)) ;
 	assert(isFaceTriangle(d) && phi2(phi1(d)) == phi1(d) && phi2(phi_1(d)) == phi_1(d)) ;
 	Dart e = phi2(d) ;
 	if(e != d)
@@ -426,18 +426,6 @@ void GMap2::closeMap(DartMarker& marker)
  *  Return or set various topological information
  *************************************************************************/
 
-bool GMap2::sameOrientedVertex(Dart d, Dart e)
-{
-	Dart dNext = d;				// Foreach dart dNext in the vertex of d
-	do
-	{
-		if (dNext == e)			// Test equality with e
-			return true;
-		dNext = alpha1(dNext);
-	} while (dNext != d);
-	return false;				// None is equal to e => vertices are distinct
-}
-
 bool GMap2::sameVertex(Dart d, Dart e)
 {
 	Dart dNext = d;				// Foreach dart dNext in the vertex of d
@@ -448,6 +436,37 @@ bool GMap2::sameVertex(Dart d, Dart e)
 		dNext = alpha1(dNext);
 	} while (dNext != d);
 	return false;				// None is equal to e => vertices are distinct
+}
+
+bool GMap2::sameVolume(Dart d, Dart e)
+{
+	DartMarkerStore mark(*this);	// Lock a marker
+	bool found = false;				// Last functor return value
+
+	std::list<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.push_back(d);		// Start with the face of d
+	std::list<Dart>::iterator face;
+
+	// For every face added to the list
+	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+			Dart dNext = *face ;
+			do
+			{
+				if(dNext==e || beta0(dNext)==e)
+					return true;
+
+				mark.mark(dNext);					// Mark
+				Dart adj = phi2(dNext);				// Get adjacent face
+				if (adj != dNext && !mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+				dNext = phi1(dNext);
+			} while(dNext != *face);
+		}
+	}
+	return false;
 }
 
 unsigned int GMap2::vertexDegree(Dart d)
