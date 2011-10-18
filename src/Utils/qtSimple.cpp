@@ -316,9 +316,9 @@ GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f
 	GLfloat depth_t[25];
 	glReadPixels(x-2, yy-2, 5, 5, GL_DEPTH_COMPONENT, GL_FLOAT, depth_t);
 
-	GLfloat depth=0.0f;
-	unsigned int nb=0;
-	for (unsigned int i=0; i< 25; ++i)
+	GLfloat depth = 0.0f;
+	unsigned int nb = 0;
+	for (unsigned int i = 0; i < 25; ++i)
 	{
 		if (depth_t[i] != 1.0f)
 		{
@@ -326,7 +326,7 @@ GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f
 			nb++;
 		}
 	}
-	if (nb>0)
+	if (nb > 0)
 		depth /= float(nb);
 	else
 		depth = 0.5f;

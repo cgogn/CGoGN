@@ -37,9 +37,9 @@ namespace Geometry
 template <typename PFP>
 typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typename PFP::VEC3 p1 = position[d];
-	typename PFP::VEC3 p2 = position[map.phi1(d)];
-	typename PFP::VEC3 p3 = position[map.phi_1(d)];
+	typename PFP::VEC3 p1 = position[d] ;
+	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
+	typename PFP::VEC3 p3 = position[map.phi_1(d)] ;
 
 	return Geom::triangleArea(p1, p2, p3) ;
 }
@@ -47,7 +47,7 @@ typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename P
 template <typename PFP>
 typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::VEC3 VEC3 ;
 
 	if(map.isFaceTriangle(d))
 		return triangleArea<PFP>(map, d, position) ;
@@ -58,8 +58,8 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename
 		Dart it = d ;
 		do
 		{
-			VEC3 p1 = position[it];
-			VEC3 p2 = position[map.phi1(it)];
+			VEC3 p1 = position[it] ;
+			VEC3 p2 = position[map.phi1(it)] ;
 			area += Geom::triangleArea(p1, p2, centroid) ;
 			it = map.phi1(it) ;
 		} while (it != d) ;
