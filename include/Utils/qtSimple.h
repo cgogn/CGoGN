@@ -80,7 +80,7 @@ public:
 	 * @param signal use macro SIGNAL(qt_signal)
 	 * @param method use macro SLOT(name_of_method(params))
 	 */
-	void setCallBack( const QObject* sender, const char* signal, const char* method);
+	void setCallBack(const QObject* sender, const char* signal, const char* method);
 
 	/**
 	 * set window Title
@@ -149,11 +149,11 @@ public:
 	void setGLWidgetMouseTracking(bool b);
 
 protected:
-	GLWidget *m_glWidget;
+	GLWidget* m_glWidget;
 
-	QDockWidget *m_dock;
+	QDockWidget* m_dock;
 
-	QDockWidget *m_dockConsole;
+	QDockWidget* m_dockConsole;
 
 	QTextEdit* m_textConsole;
 
@@ -222,6 +222,7 @@ public:
 	 * @param center reference point on world to use (defaut 0,0,0)
 	 */
 	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center) { return m_glWidget->getWidthInWorld(pixel_width,center);}
+
 
 	const glm::mat4& transfoMatrix() const { return m_transfo_matrix; }
 	glm::mat4& transfoMatrix() { return m_transfo_matrix; }

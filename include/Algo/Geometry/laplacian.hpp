@@ -40,15 +40,22 @@ ATTR_TYPE computeLaplacianTopoVertex(
 	const AttributeHandler<ATTR_TYPE>& attr)
 {
 	ATTR_TYPE l(0) ;
-	unsigned int val = 0 ;
+	ATTR_TYPE value = attr[d] ;
+	unsigned int wSum = 0 ;
 	Dart it = d ;
 	do
 	{
-		l += attr[map.phi1(it)] - attr[it] ;
-		val++ ;
+		l += attr[map.phi1(it)] - value ;
+		++wSum ;
+		Dart dboundary = map.phi_1(it) ;
+		if(map.phi2(dboundary) == dboundary)
+		{
+			l += attr[dboundary] - value ;
+			++wSum ;
+		}
 		it = map.alpha1(it) ;
 	} while(it != d) ;
-	l /= val ;
+	l /= wSum ;
 	return l ;
 }
 
@@ -64,15 +71,23 @@ ATTR_TYPE computeLaplacianCotanVertex(
 	ATTR_TYPE l(0) ;
 	Dart it = d ;
 	REAL vArea = vertexArea[d] ;
-	REAL val = 0 ;
+	ATTR_TYPE value = attr[d] ;
+	REAL wSum = 0 ;
 	do
 	{
 		REAL w = edgeWeight[it] / vArea ;
-		l += (attr[map.phi1(it)] - attr[it]) * w ;
-		val += w ;
+		l += (attr[map.phi1(it)] - value) * w ;
+		wSum += w ;
+		Dart dboundary = map.phi_1(it) ;
+		if(map.phi2(dboundary) == dboundary)
+		{
+			w = edgeWeight[dboundary] / vArea ;
+			l += (attr[dboundary] - value) * w ;
+			wSum += w ;
+		}
 		it = map.alpha1(it) ;
 	} while(it != d) ;
-	l /= val ;
+	l /= wSum ;
 	return l ;
 }
 
@@ -120,10 +135,18 @@ typename PFP::REAL computeCotanWeightEdge(
 	Dart d,
 	const typename PFP::TVEC3& position)
 {
-	typename PFP::REAL alpha = angle<PFP>(map, map.phi_1(d), map.phi2(map.phi1(d)), position) ;
+	const typename PFP::VEC3& p1 = position[d] ;
+	const typename PFP::VEC3& p2 = position[map.phi1(d)] ;
+	const typename PFP::VEC3& p3 = position[map.phi_1(d)] ;
+	typename PFP::REAL cot_alpha = 1 / tan(Geom::angle(p1 - p3, p2 - p3)) ;
+	typename PFP::REAL cot_beta = 0 ;
 	Dart dd = map.phi2(d) ;
-	typename PFP::REAL beta = angle<PFP>(map, map.phi_1(dd), map.phi2(map.phi1(dd)), position) ;
-	return 0.5 * ( 1 / tan(alpha) + 1 / tan(beta) ) ;
+	if(dd != d)
+	{
+		const typename PFP::VEC3& p4 = position[map.phi_1(map.phi2(d))] ;
+		cot_beta = 1 / tan(Geom::angle(p2 - p4, p1 - p4)) ;
+	}
+	return 0.5 * ( cot_alpha + cot_beta ) ;
 }
 
 template <typename PFP>

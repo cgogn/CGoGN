@@ -40,14 +40,13 @@ namespace Utils
 namespace QT
 {
 
-
-float GLWidget::FAR_PLANE=500.0f;
-
+float GLWidget::FAR_PLANE = 500.0f;
 
 GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
 	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
 	m_cbs(cbs),
-	m_state_modifier(0)
+	m_state_modifier(0),
+	allow_rotation(true)
 {
 	makeCurrent();
 	glewInit();
@@ -71,6 +70,11 @@ void GLWidget::setParamObject(float width, float* pos)
 {
 	m_obj_sc = ((FAR_PLANE / 5.0f) / foc) / width;
 	m_obj_pos = glm::vec3(-pos[0], -pos[1], -pos[2]);
+}
+
+void GLWidget::setRotation(bool b)
+{
+	allow_rotation = b;
 }
 
 void  GLWidget::setFocal(float df)
@@ -106,7 +110,7 @@ void GLWidget::recalcModelView()
 	// tourne l'objet / mvt souris
 	glm::mat4 m;
 	build_rotmatrixgl3(m, m_cbs->curquat());
-//	// update matrice
+	// update matrice
 	m_cbs->modelViewMatrix() *= m;
 
 	// transfo pour que l'objet soit centre et a la bonne taille
@@ -197,7 +201,6 @@ void GLWidget::paintGL()
 		Utils::GLSLShader::s_current_matrices = m_cbs->matricesPtr();
 		m_cbs->cb_redraw();
 	}
-
 }
 
 void GLWidget::mousePressEvent(QMouseEvent* event)
@@ -276,13 +279,16 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 				break;
 			case Qt::LeftButton:
 			{
-				trackball(
-					m_cbs->lastquat(),
-					(2.0f * beginx - W) / W,
-					(H - 2.0f * beginy) / H,
-					(2.0f * x - W) / W,(H - 2.0f * y) / H
-				);
-				add_quats(m_cbs->lastquat(), m_cbs->curquat(), m_cbs->curquat());
+				if(allow_rotation)
+				{
+					trackball(
+						m_cbs->lastquat(),
+						(2.0f * beginx - W) / W,
+						(H - 2.0f * beginy) / H,
+						(2.0f * x - W) / W,(H - 2.0f * y) / H
+					);
+					add_quats(m_cbs->lastquat(), m_cbs->curquat(), m_cbs->curquat());
+				}
 			}
 				break;
 		}
@@ -324,19 +330,16 @@ void GLWidget::closeEvent(QCloseEvent *event)
 
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
-
 	if (event->key() == Qt::Key_Escape)
-        close();
-//    else
-//    	QWidget::keyPressEvent(event);
+		close();
 
-    m_state_modifier = event->modifiers();
+	m_state_modifier = event->modifiers();
 
-    int k = event->key();
-    if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
-    	k += 32;
+	int k = event->key();
+//	if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
+//		k += 32;
 
-    if (m_cbs)
+	if (m_cbs)
 		m_cbs->cb_keyPress(k);
 }
 
@@ -372,7 +375,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 		updateGL();
 	}
 
-
     if ( (k >= 65) && (k <= 91) && (event->modifiers() != Qt::ShiftModifier) )
     	k += 32;
 
@@ -403,6 +405,7 @@ void GLWidget::oglScale(float sx, float sy, float sz)
 {
 	m_cbs->modelViewMatrix() = glm::scale(m_cbs->modelViewMatrix(), glm::vec3(sx,sy,sz));
 }
+
 
 GLfloat GLWidget::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
 {

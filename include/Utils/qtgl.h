@@ -92,6 +92,8 @@ protected:
 	/// stack for transformation matrix
 	std::stack<glm::mat4> m_stack_trf;
 
+	bool allow_rotation;
+
 	/**
 	 * met a jour la matrice modelview
 	 */
@@ -105,6 +107,8 @@ protected:
 
 public:
 	void setParamObject(float width, float* pos);
+
+	void setRotation(bool b);
 
 	void initializeGL();
 
