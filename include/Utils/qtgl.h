@@ -35,6 +35,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_projection.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -87,6 +88,9 @@ protected:
 	int H;
 
 	int m_state_modifier;
+
+	/// stack for transformation matrix
+	std::stack<glm::mat4> m_stack_trf;
 
 	/**
 	 * met a jour la matrice modelview
@@ -157,6 +161,56 @@ public:
 	glm::vec3& getObjPos() ;
 
 	void modelModified() { newModel = 1; }
+
+	void glMousePosition(int& x, int& y);
+
+	/**
+	 * get a ray (2 points) from a pick point in GL area
+	 * @param x mouse position
+	 * @param y mouse position
+	 * @param rayA first computed point of ray
+	 * @param rayA second computed point of ray
+	 * @param radius radius on pixel for clicking precision
+	 * @return the distance in modelview world corresponding to radius pixel in screen
+	 */
+	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius=4);
+
+	/**
+	 * transform a pixel distance on screen in distance in world
+	 * @param pixel_width width on pixel on screen
+	 * @param center reference point on world to use (defaut 0,0,0)
+	 */
+	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center=Geom::Vec3f(0.0f,0.0f,0.0f));
+
+	/**
+	 * current transfo matrix
+	 */
+	const glm::mat4& transfoMatrix() const;
+	glm::mat4& transfoMatrix();
+
+	/**
+	 * current modelview matrix
+	 */
+	const glm::mat4& modelViewMatrix() const;
+	glm::mat4& modelViewMatrix();
+
+	/**
+	 * current projection matrix
+	 */
+	const glm::mat4& projectionMatrix() const;
+	glm::mat4& projectionMatrix();
+
+
+	void transfoRotate(float angle, float x, float y, float z);
+
+	void transfoTranslate(float tx, float ty, float tz);
+
+	void transfoScale(float sx, float sy, float sz);
+
+	void pushTransfoMatrix();
+
+	bool popTransfoMatrix();
+
 
 protected:
 	/**

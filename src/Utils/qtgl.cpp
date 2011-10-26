@@ -380,6 +380,15 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 		m_cbs->cb_keyRelease(k);
 }
 
+
+void GLWidget::glMousePosition(int& x, int& y)
+{
+	QPoint xy = mapFromGlobal(QCursor::pos());
+	x = xy.x();
+	y = getHeight() - xy.y();
+}
+
+
 void GLWidget::oglRotate(float angle, float x, float y, float z)
 {
 	m_cbs->modelViewMatrix() = glm::rotate(m_cbs->modelViewMatrix(), angle, glm::vec3(x,y,z));
@@ -394,6 +403,128 @@ void GLWidget::oglScale(float sx, float sy, float sz)
 {
 	m_cbs->modelViewMatrix() = glm::scale(m_cbs->modelViewMatrix(), glm::vec3(sx,sy,sz));
 }
+
+GLfloat GLWidget::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
+{
+	// get Z from depth buffer
+	int yy = y;
+	GLfloat depth_t[25];
+	glReadPixels(x-2, yy-2, 5, 5, GL_DEPTH_COMPONENT, GL_FLOAT, depth_t);
+
+	GLfloat depth=0.0f;
+	unsigned int nb=0;
+	for (unsigned int i=0; i< 25; ++i)
+	{
+		if (depth_t[i] != 1.0f)
+		{
+			depth += depth_t[i];
+			nb++;
+		}
+	}
+	if (nb>0)
+		depth /= float(nb);
+	else
+		depth = 0.5f;
+
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	glm::vec3 win(x, yy, 0.0f);
+
+	glm::vec3 P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+
+	rayA[0] = P[0];
+	rayA[1] = P[1];
+	rayA[2] = P[2];
+
+	win[2] = depth;
+
+	P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+	rayB[0] = P[0];
+	rayB[1] = P[1];
+	rayB[2] = P[2];
+
+	if (depth == 1.0f)	// depth vary in [0-1]
+		win[2] = 0.5f;
+
+	win[0] += radius;
+	P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+	Geom::Vec3f Q;
+	Q[0] = P[0];
+	Q[1] = P[1];
+	Q[2] = P[2];
+
+	// compute & return distance
+	Q -= rayB;
+	return float(Q.norm());
+}
+
+float GLWidget::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center)
+{
+
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	glm::vec3 win = glm::project(glm::vec3(center[0],center[1],center[2]), m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+
+	win[0]-= pixel_width/2;
+
+	glm::vec3 P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+
+	win[0] += pixel_width;
+
+	glm::vec3 Q = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
+
+	return glm::distance(P,Q);
+}
+
+void GLWidget::transfoRotate(float angle, float x, float y, float z)
+{
+	m_cbs->transfoMatrix() = glm::rotate( m_cbs->transfoMatrix(), angle, glm::vec3(x,y,z));
+}
+
+void GLWidget::transfoTranslate(float tx, float ty, float tz)
+{
+	m_cbs->transfoMatrix() = glm::translate( m_cbs->transfoMatrix(), glm::vec3(tx,ty,tz));
+}
+
+void GLWidget::transfoScale(float sx, float sy, float sz)
+{
+	m_cbs->transfoMatrix() = glm::scale( m_cbs->transfoMatrix(), glm::vec3(sx,sy,sz));
+}
+
+void GLWidget::pushTransfoMatrix()
+{
+	m_stack_trf.push( m_cbs->transfoMatrix());
+}
+
+bool GLWidget::popTransfoMatrix()
+{
+	if (m_stack_trf.empty())
+		return false;
+	 m_cbs->transfoMatrix() = m_stack_trf.top();
+	m_stack_trf.pop();
+	return true;
+}
+
+/**
+ * current transfo matrix
+ */
+const glm::mat4& GLWidget::transfoMatrix() const { return m_cbs->transfoMatrix(); }
+glm::mat4& GLWidget::transfoMatrix() { return m_cbs->transfoMatrix(); }
+
+/**
+ * current modelview matrix
+ */
+const glm::mat4& GLWidget::modelViewMatrix() const { return m_cbs->modelViewMatrix(); }
+glm::mat4& GLWidget::modelViewMatrix() { return m_cbs->modelViewMatrix(); }
+
+/**
+ * current projection matrix
+ */
+const glm::mat4& GLWidget::projectionMatrix() const { return m_cbs->projectionMatrix(); }
+glm::mat4& GLWidget::projectionMatrix() { return m_cbs->projectionMatrix(); }
+
 
 
 } // namespace QT
