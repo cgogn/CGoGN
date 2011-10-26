@@ -36,7 +36,36 @@ namespace LinearSolving
  *******************************************************************************/
 
 template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class FunctorEquality_Scalar : public FunctorType
+class FunctorEquality_PerVertexWeight_Scalar : public FunctorType
+{
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	const AttributeHandler<typename PFP::REAL>& weightTable ;
+
+public:
+	FunctorEquality_PerVertexWeight_Scalar(
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const AttributeHandler<ATTR_TYPE>& attr,
+		const AttributeHandler<typename PFP::REAL>& weight
+	) :	solver(s), indexTable(index), attrTable(attr), weightTable(weight)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		solver->add_coefficient(indexTable[d], 1) ;
+		solver->set_right_hand_side(attrTable[d]) ;
+		solver->normalize_row(weightTable[d]) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+class FunctorEquality_UniformWeight_Scalar : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
@@ -45,7 +74,7 @@ protected:
 	float weight ;
 
 public:
-	FunctorEquality_Scalar(
+	FunctorEquality_UniformWeight_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int>& index,
 		const AttributeHandler<ATTR_TYPE>& attr,
@@ -69,7 +98,38 @@ public:
  *******************************************************************************/
 
 template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
-class FunctorEquality_Vector : public FunctorType
+class FunctorEquality_PerVertexWeight_Vector : public FunctorType
+{
+protected:
+	LinearSolver<SOLVER_TRAITS>* solver ;
+	const AttributeHandler<unsigned int>& indexTable ;
+	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	const AttributeHandler<typename PFP::REAL>& weightTable ;
+	unsigned int coord ;
+
+public:
+	FunctorEquality_PerVertexWeight_Vector(
+		LinearSolver<SOLVER_TRAITS>* s,
+		const AttributeHandler<unsigned int>& index,
+		const AttributeHandler<ATTR_TYPE>& attr,
+		const AttributeHandler<typename PFP::REAL>& weight,
+		unsigned int c
+	) :	solver(s), indexTable(index), attrTable(attr), weightTable(weight), coord(c)
+	{}
+
+	bool operator()(Dart d)
+	{
+		solver->begin_row() ;
+		solver->add_coefficient(indexTable[d], 1) ;
+		solver->set_right_hand_side((attrTable[d])[coord]) ;
+		solver->normalize_row(weightTable[d]) ;
+		solver->end_row() ;
+		return false ;
+	}
+} ;
+
+template<typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+class FunctorEquality_UniformWeight_Vector : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
@@ -79,7 +139,7 @@ protected:
 	unsigned int coord ;
 
 public:
-	FunctorEquality_Vector(
+	FunctorEquality_UniformWeight_Vector(
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int>& index,
 		const AttributeHandler<ATTR_TYPE>& attr,

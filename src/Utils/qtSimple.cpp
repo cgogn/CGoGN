@@ -41,10 +41,10 @@ namespace QT
 {
 
 SimpleQT::SimpleQT() :
-		m_dock(NULL),
-		m_projection_matrix(m_mat.m_matrices[0]),
-		m_modelView_matrix(m_mat.m_matrices[1]),
-		m_transfo_matrix(m_mat.m_matrices[2])
+	m_dock(NULL),
+	m_projection_matrix(m_mat.m_matrices[0]),
+	m_modelView_matrix(m_mat.m_matrices[1]),
+	m_transfo_matrix(m_mat.m_matrices[2])
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -56,17 +56,17 @@ SimpleQT::SimpleQT() :
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_New()));
 	m_fileMenu->addAction(action);
 
-	action= new QAction(tr("Open"), this);
+	action = new QAction(tr("Open"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_Open()));
 	m_fileMenu->addAction(action);
 
-	action= new QAction(tr("Save"), this);
+	action = new QAction(tr("Save"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_Save()));
 	m_fileMenu->addAction(action);
 
 	m_fileMenu->addSeparator();
 
-	action= new QAction(tr("Quit"), this);
+	action = new QAction(tr("Quit"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_Quit()));
 	m_fileMenu->addAction(action);
 
@@ -74,25 +74,25 @@ SimpleQT::SimpleQT() :
 
 	QMenu* m_helpMenu = menuBar()->addMenu(tr("&Help"));
 
-	action= new QAction(tr("console on/off"), this);
+	action = new QAction(tr("console on/off"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_consoleOnOff()));
 	m_helpMenu->addAction(action);
 
-	action= new QAction(tr("console clear"), this);
+	action = new QAction(tr("console clear"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_consoleClear()));
 	m_helpMenu->addAction(action);
 
-	action= new QAction(tr("About"), this);
+	action = new QAction(tr("About"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_about()));
 	m_helpMenu->addAction(action);
 
-	action= new QAction(tr("About CGoGN"), this);
+	action = new QAction(tr("About CGoGN"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_about_cgogn()));
 	m_helpMenu->addAction(action);
 
 	m_dockConsole = new QDockWidget(tr("Console"), this);
 	m_dockConsole->setAllowedAreas(Qt::BottomDockWidgetArea);
-	m_dockConsole->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetClosable);
+	m_dockConsole->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
 	addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
 
 	m_textConsole = new QTextEdit();
@@ -108,11 +108,11 @@ SimpleQT::SimpleQT() :
 }
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
-				m_dock(NULL),
-				m_mat(m_mat),
-				m_projection_matrix(m_mat.m_matrices[0]),
-				m_modelView_matrix(m_mat.m_matrices[1]),
-				m_transfo_matrix(m_mat.m_matrices[2])
+	m_dock(NULL),
+	m_mat(m_mat),
+	m_projection_matrix(m_mat.m_matrices[0]),
+	m_modelView_matrix(m_mat.m_matrices[1]),
+	m_transfo_matrix(m_mat.m_matrices[2])
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -383,11 +383,6 @@ float SimpleQT::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& cen
 	return glm::distance(P,Q);
 }
 
-
-
-
-
-
 void SimpleQT::synchronize(SimpleQT* sqt)
 {
 	m_glWidget->getObjPos() = sqt->m_glWidget->getObjPos() ;
@@ -454,7 +449,7 @@ void SimpleQT::updateGL()
 void SimpleQT::updateGLMatrices()
 {
 	m_glWidget->modelModified();
-	m_glWidget->updateGL();
+//	m_glWidget->updateGL();
 }
 
 void SimpleQT::transfoRotate(float angle, float x, float y, float z)

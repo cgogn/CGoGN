@@ -38,7 +38,7 @@ template <typename PFP>
 void featureEdgeDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& featureEdge) ;
 
 template <typename PFP>
-std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& viewDir, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
+std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
 
 } // namespace Geometry
 

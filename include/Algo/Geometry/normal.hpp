@@ -84,7 +84,7 @@ typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const typename PFP
 		{
 			VEC3 n = triangleNormal<PFP>(map, it, position) ;
 			//if(!std::isnan(n[0]) && !std::isnan(n[1]) && !std::isnan(n[2]))
-			if (n[0] == n[0] && n[1] == n[1] && n[2] == n[2])
+			if(!n.hasNan())
 				N += n ;
 			it = map.phi1(it) ;
 		} while (it != d) ;
@@ -131,24 +131,6 @@ void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& posit
 }
 
 template <typename PFP>
-class computeNormalVerticesFunctor : public FunctorMap<typename PFP::MAP>
-{
-protected:
-	typename PFP::MAP& m_map;
-	const typename PFP::TVEC3& m_position;
-	typename PFP::TVEC3& m_normal;
-public:
-	computeNormalVerticesFunctor(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal):
-		m_map(map), m_position(position), m_normal(normal)
-	{}
-	bool operator()(Dart d)
-	{
-		m_normal[d] = vertexNormal<PFP>(m_map, d, m_position) ;
-		return false;
-	}
-};
-
-template <typename PFP>
 void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select, unsigned int thread)
 {
 	CellMarker marker(map, VERTEX, thread);
@@ -186,7 +168,8 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 		if (s >= 0) a = acos(c) ;
 		else a = -acos(c) ;
 	}
-	if (isnan(a))
+//	if (isnan(a))
+	if(a != a)
 		std::cerr<< "Warning : computeAngleBetweenNormalsOnEdge returns NaN on edge " << d << "-" << dd << std::endl ;
 	return a ;
 }

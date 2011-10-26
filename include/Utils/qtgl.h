@@ -88,6 +88,8 @@ protected:
 
 	int m_state_modifier;
 
+	bool allow_rotation;
+
 	/**
 	 * met a jour la matrice modelview
 	 */
@@ -101,6 +103,8 @@ protected:
 
 public:
 	void setParamObject(float width, float* pos);
+
+	void setRotation(bool b);
 
 	void initializeGL();
 
