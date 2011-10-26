@@ -104,7 +104,8 @@ protected:
 	/*! The phi2-links around the face are removed
 	 *  @param d a dart of the face
 	 */
-	void deleteOrientedFace(Dart d) ;
+	void deleteOrientedFace(Dart d) ;	//TODO remove ?
+
 
 public:
 	virtual void deleteFace(Dart d) ;
@@ -120,31 +121,36 @@ public:
 	 *  @param d first dart in vertex v
 	 *  @param e second dart in vertex v
 	 */
-	virtual void splitVertex(Dart d, Dart e);
+	virtual void splitVertex(Dart d, Dart e);	//TODO modification for new boundary managing method
+
 
 	//! Delete the vertex of d (works only for internal vertices)
 	/*! All the faces around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d) ;
+	virtual bool deleteVertex(Dart d) ;	//TODO modification for new boundary managing method
+
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	virtual void linkVertices(Dart d, Dart e);
+	virtual void linkVertices(Dart d, Dart e);	//TODO removing ??
+
 
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */
-	virtual void cutEdge(Dart d);
+	virtual void cutEdge(Dart d);	//TODO modification for new boundary managing method
+
 
 	//! Undo the cut of the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to uncut
 	 */
-	virtual void uncutEdge(Dart d);
+	virtual void uncutEdge(Dart d);	//TODO modification for new boundary managing method
+
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -156,7 +162,8 @@ public:
 	 *  @param delDegenerateFaces a boolean (default to true)
 	 *  @return a dart of the resulting vertex
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);	//TODO modification for new boundary managing method
+
 
 	/**
 	 * Flip the edge of d (rotation in phi1 order)
@@ -180,25 +187,29 @@ public:
 	 *  @param d dart of the vertex
 	 *  @param e dart of the edge
 	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
+	virtual void insertEdgeInVertex(Dart d, Dart e);	//TODO modification for new boundary managing method
+
 
 	//! Remove an edge from a vertex orbit
 	/*! \pre Dart d must be phi2 sewn
 	 *  @param d the dart of the edge to remove from the vertex
 	 */
-	virtual void removeEdgeFromVertex(Dart d);
+	virtual void removeEdgeFromVertex(Dart d);	//TODO modification for new boundary managing method
+
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
 	 */
-	virtual void sewFaces(Dart d, Dart e);
+	virtual void sewFaces(Dart d, Dart e);	//TODO modification for new boundary managing method
+
 
 	//! Unsew two oriented faces along oriented edges
 	 /*! @param d a dart of one face
 	 */
-	virtual void unsewFaces(Dart d);
+	virtual void unsewFaces(Dart d);	//TODO modification for new boundary managing method
+
 	
 	//! Delete an oriented face if and only if it has one or two edges
 	/*! If the face is phi2-linked to two distinct adjacent faces,
@@ -206,7 +217,8 @@ public:
 	 *  @param d a dart of the face
 	 *  @return true if the collapse has been executed, false otherwise
 	 */
-	virtual bool collapseDegeneratedFace(Dart d);
+	virtual bool collapseDegeneratedFace(Dart d);	//TODO modification for new boundary managing method
+
 
 	//! Split a face f between d and e inserting an edge between vertices d & e
 	/*! \pre Darts d & e MUST belong to the same face
@@ -227,28 +239,32 @@ public:
 	 * Extract a pair of sewed triangles and sew their adjacent faces
 	 * d is a dart of the common edge of the pair of triangles
 	 */
-	void extractTrianglePair(Dart d) ;
+	void extractTrianglePair(Dart d) ;	//TODO modification for new boundary managing method
+
 
 	/**
 	 * Insert a pair of sewed triangles in a vertex by exploding the edges of v1 and v2
 	 * v1 and v2 belong to the same vertex
 	 * d is a dart of the common edge of the pair of triangles
 	 */
-	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
+	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;	//TODO modification for new boundary managing method
+
 
 	/**
 	 * Unsew opposite edges from the faces around a vertex
 	 * \warning Darts may have
 	 * @param d a dart from the vertex
 	 */
-	void unsewAroundVertex(Dart d) ;
+	void unsewAroundVertex(Dart d) ;	//TODO modification for new boundary managing method ???
+
 
 	/**
 	 * Unsex the Umbrella aroud a vertex, close the hole and then
 	 * create a symetric to construct a polyedron
 	 * @param d a dart from the vertex
 	 */
-	void explodPolyhedron(Dart d);
+	void explodPolyhedron(Dart d);	//TODO modification for new boundary managing method ???
+
 
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
@@ -260,7 +276,8 @@ public:
 	 *  @param e a dart of the second face
 	 *  @return true if the merge has been executed, false otherwise
 	 */
-	virtual bool mergeVolumes(Dart d, Dart e);
+	virtual bool mergeVolumes(Dart d, Dart e);	//TODO modification for new boundary managing method
+
 
 	//! Close a topological hole (a sequence of connected fixed point of phi2).
 	/*! \pre dart d MUST be fixed point of phi2 relation
@@ -269,7 +286,8 @@ public:
 	 *  @param d a dart of the hole (with phi2(d)==d)
 	 *  @return the degree of the created face
 	 */
-	virtual unsigned int closeHole(Dart d);
+	virtual unsigned int closeHole(Dart d);	//TODO modification for new boundary managing method
+
 
 	//TODO a mettre en algo
 	//! Close the map removing topological holes.
@@ -278,7 +296,8 @@ public:
 	 *  \warning The embeddings of vertices are not updated
 	 *  @param marker
 	 */
-	void closeMap(DartMarker& marker);
+	void closeMap(DartMarker& marker);	//TODO modification for new boundary managing method
+
 	//@}
 
 	/*! @name Topological Queries
