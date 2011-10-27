@@ -298,7 +298,7 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(d), vv1) ;
 }
 
-void Map2::unsewAroundVertex(Dart d)
+void Map2::unsewVertexUmbrella(Dart d)
 {
 	Dart e = d;
 
@@ -316,20 +316,6 @@ void Map2::unsewAroundVertex(Dart d)
 		e = alpha1(e);
 	}
 	while(e != d);
-}
-
-void Map2::explodPolyhedron(Dart d)
-{
-	unsewAroundVertex(d);
-	closeHole(phi1(d));
-
-	//Recherche du (ou un des) sommet oppose
-		//tourner autour du sommet
-			//si quad  alors sommet oppose
-			//
-		//si pas de quad alors un sommet du trian
-
-	//
 }
 
 bool Map2::mergeVolumes(Dart d, Dart e)
@@ -439,6 +425,19 @@ bool Map2::sameOrientedVertex(Dart d, Dart e)
 		dNext = alpha1(dNext);
 	} while (dNext != d);
 	return false;				// None is equal to e => vertices are distinct
+}
+
+bool Map2::sameOrientedFace(Dart d, Dart e)
+{
+	Dart dNext = d;
+	do							//Foreach dart dNext of the face
+	{
+		if(dNext == e)			//Test equality with e
+			return true;
+		dNext = phi1(dNext);
+	}
+	while(dNext != d);
+	return false;				// None is equal to e => Faces are distinct
 }
 
 unsigned int Map2::vertexDegree(Dart d)
