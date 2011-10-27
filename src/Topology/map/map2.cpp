@@ -31,15 +31,34 @@ namespace CGoGN
  *  To generate or delete faces in a 2-map
  *************************************************************************/
 
-void Map2::deleteOrientedFace(Dart d)
+void Map2::mergeFacewithBoundary(Dart d)
 {
 	Dart e = d ;
-	do
+	do									// foreach edge of face
 	{
-		phi2unsew(e) ;		// unsew the face of d
-		e = phi1(e) ;		// from all its adjacent faces
+		Dart f = phi2(e);
+		if (isBoundaryMarked(f))		// if sewed to boundary
+		{
+			phi2unsew(e);// ?? not necessary
+			Dart ff = phi_1(f);
+			if (e != ff)
+				phi1sew(e, ff) ;		//    merge with it
+			Dart ee = phi_1(e);
+			if (f != ee)
+				phi1sew(f, ee) ;
+			deleteOrientedFace(e) ;
+		}
+		e = phi1(e) ;
 	} while (e != d) ;
-	Map1::deleteOrientedFace(d);	// delete the face
+}
+
+
+void Map2::deleteOrientedFace(Dart d)
+{
+	// tag face in boundary
+	boundaryMarkOrbit(FACE,d);
+	mergeFacewithBoundary(d);
+
 }
 
 /*! @name Topological Operators

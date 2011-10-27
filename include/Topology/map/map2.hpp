@@ -96,57 +96,55 @@ inline Dart Map2::alpha0(Dart d)
 	return phi2(d) ;
 }
 
-#ifdef NO_BOUND_MAP
+
 inline Dart Map2::alpha1(Dart d)
 {
 	return phi2(phi_1(d)) ;
 }
-#else
-// alpha1 avec bord
-inline Dart Map2::alpha1(Dart d)
-{
-	Dart e = phi_1(d);
-	Dart f = phi2(e);
 
-	if (f != e)
-		return f;
+// alpha1 avec bord: bye bye
+//inline Dart Map2::alpha1(Dart d)
+//{
+//	Dart e = phi_1(d);
+//	Dart f = phi2(e);
+//
+//	if (f != e)
+//		return f;
+//
+//	f = d;
+//	e = phi2(f);
+//	while (e != f)
+//	{
+//		f = phi1(e);
+//		e = phi2(f);
+//	}
+//	return f;
+//}
 
-	f = d;
-	e = phi2(f);
-	while (e != f)
-	{
-		f = phi1(e);
-		e = phi2(f);
-	}
-	return f;
-}
-#endif
 
-#ifdef NO_BOUND_MAP
 inline Dart Map2::alpha_1(Dart d)
 {
 	return phi1(phi2(d)) ;
 }
 
-#else
-// alpha_1 avec bord
-inline Dart Map2::alpha_1(Dart d)
-{
-	Dart e = phi2(d);
+// alpha_1 avec bord : bye bye !!
+//inline Dart Map2::alpha_1(Dart d)
+//{
+//	Dart e = phi2(d);
+//
+//	if (e != d)
+//		return phi1(e);
+//
+//	e = d;
+//	Dart f = phi_1(d);
+//	while (phi2(f) != f)
+//	{
+//		e = phi2(f);
+//		f = phi_1(e);
+//	}
+//	return e;
+//}
 
-	if (e != d)
-		return phi1(e);
-
-	e = d;
-	Dart f = phi_1(d);
-	while (phi2(f) != f)
-	{
-		e = phi2(f);
-		f = phi_1(e);
-	}
-	return e;
-}
-#endif
 
 inline void Map2::phi2sew(Dart d, Dart e)
 {
