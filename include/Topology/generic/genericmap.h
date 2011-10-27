@@ -403,6 +403,42 @@ public:
 	 * print attributes name of map in std::cout (for debugging)
 	 */
 	void viewAttributesTables();
+
+
+protected:
+	/// boundary marker
+	Mark m_boundaryMarker;
+
+	/**
+	 * mark a dart as  belonging to boundary
+	 */
+	void boundaryMark(Dart d);
+
+	/**
+	 * unmark a dart from the boundary
+	 */
+	void boundaryUnmark(Dart d);
+
+	/**
+	 * test if a dart belong to the boundary
+	 */
+	bool isBoundaryMarked(Dart d);
+
+	/**
+	 * mark an orbit of dart as belonging to boundary
+	 */
+	void boundaryMarkOrbit(unsigned int orbit, Dart d);
+
+	/**
+	 * unmark an orbit of dart from the boundary
+	 */
+	void boundaryUnmarkOrbit(unsigned int orbit, Dart d);
+
+	/**
+	 * clear all boundary markers
+	 */
+	void boundaryUnmarkAll();
+
 } ;
 
 

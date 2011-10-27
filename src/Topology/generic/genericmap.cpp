@@ -78,10 +78,16 @@ GenericMap::GenericMap() : m_nbThreads(1)
 			m_markTables[i][j] = NULL ;
 		}
 	}
+
+	// get & lock marker for boundary
+	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
 }
 
 GenericMap::~GenericMap()
 {
+	// release marker for boundary
+	m_marksets[DART][0].releaseMark(m_boundaryMarker);
+
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		if(isOrbitEmbedded(i))
@@ -639,6 +645,46 @@ void GenericMap::viewAttributesTables()
 	std::cout << std::endl<< "-------------------------"<< std::endl<< std::dec;
 
 }
+
+
+
+void GenericMap::boundaryMark(Dart d)
+{
+	m_markTables[DART][0]->operator[](d.index).setMark(m_boundaryMarker);
+}
+
+void GenericMap::boundaryUnmark(Dart d)
+{
+	m_markTables[DART][0]->operator[](d.index).unsetMark(m_boundaryMarker);
+}
+
+bool GenericMap::isBoundaryMarked(Dart d)
+{
+	return m_markTables[DART][0]->operator[](d.index).testMark(m_boundaryMarker);
+}
+
+
+void GenericMap::boundaryMarkOrbit(unsigned int orbit, Dart d)
+{
+	FunctorMark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
+	foreach_dart_of_orbit(orbit, d, fm, 0) ;
+}
+
+
+void GenericMap::boundaryUnmarkOrbit(unsigned int orbit, Dart d)
+{
+	FunctorUnmark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
+	foreach_dart_of_orbit(orbit, d, fm, 0) ;
+}
+
+
+void GenericMap::boundaryUnmarkAll()
+{
+	AttributeContainer& cont = getAttributeContainer(DART) ;
+	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
+}
+
 
 
 } // namespace CGoGN
