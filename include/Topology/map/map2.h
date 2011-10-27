@@ -95,6 +95,14 @@ protected:
 	 */
 	void phi2unsew(Dart d);
 
+
+	//! merge a face that has been tag as boundary with existing boundary if needed
+	/*  @param d a dart of the face
+	 */
+	void mergeFacewithBoundary(Dart d);
+
+
+
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
 	 *************************************************************************/
