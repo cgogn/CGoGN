@@ -27,6 +27,7 @@
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
+#include "Container/attributeMultiVector.h"
 #include <vector>
 
 namespace CGoGN
@@ -173,6 +174,67 @@ public:
 		return m_fonct2(d);
 	}
 };
+
+
+// Marker Functors
+/********************************************************/
+
+template <typename MAP>
+class FunctorMarker : public FunctorMap<MAP>
+{
+protected:
+	Mark m_mark ;
+	AttributeMultiVector<Mark>* m_markTable ;
+public:
+	FunctorMarker(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMap<MAP>(map), m_mark(m), m_markTable(mTable)
+	{}
+//	Mark getMark() { return m_mark ; }
+} ;
+
+template <typename MAP>
+class FunctorMark : public FunctorMarker<MAP>
+{
+public:
+	FunctorMark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
+		return false ;
+	}
+} ;
+
+template <typename MAP>
+class FunctorMarkStore : public FunctorMarker<MAP>
+{
+protected:
+	std::vector<unsigned int>& m_markedDarts ;
+public:
+	FunctorMarkStore(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable, std::vector<unsigned int>& marked) :
+		FunctorMarker<MAP>(map, m, mTable),
+		m_markedDarts(marked)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
+		m_markedDarts.push_back(d.index) ;
+		return false ;
+	}
+} ;
+
+template <typename MAP>
+class FunctorUnmark : public FunctorMarker<MAP>
+{
+public:
+	FunctorUnmark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_markTable->operator[](d.index).unsetMark(this->m_mark) ;
+		return false ;
+	}
+} ;
+
 
 } //namespace CGoGN
 
