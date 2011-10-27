@@ -63,6 +63,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 	position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
 
+
 	map.setCurrentLevel(cur) ;
 }
 
@@ -155,7 +156,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		}
 
 		unsigned int idface = map.getFaceId(old);
-		Dart e = dd;
+		//Dart e = dd;
 		do
 		{
 			map.setFaceId(dd, idface, DART) ;
@@ -296,354 +297,354 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 	std::vector<Dart> newEdges;	//save darts from inner edges
 	newEdges.reserve(50);
 
-	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
-	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
-	{
-		//std::vector<Dart>::iterator edge = oldEdges.begin();
-		Dart e = *edge;
-
-		Dart f1 = map.phi1(*edge);
-		Dart f2 = map.phi2(f1);
-
-		do
-		{
-			if(map.phi1(map.phi1(map.phi1(e))) != e)
-			{
-				map.unsewFaces(map.phi1(map.phi1(e))); //remplacer par une boucle qui découd toute la face et non juste une face carre (jusqu'a phi_1(e))
-			}
-
-			map.unsewFaces(map.phi1(e));
-
-
-			e = map.phi2(map.phi_1(e));
-		}
-		while(e != *edge);
-
-		map.closeHole(f1);
-
-		//degree du sommet exterieur
-		unsigned int cornerDegree = map.Map2::vertexDegree(*edge);
-
-		//tourner autour du sommet pour connaitre le brin d'un sommet de valence < cornerDegree
-		bool found = false;
-		Dart stop = e;
-		do
-		{
-
-			if(map.Map2::vertexDegree(map.phi2(map.phi1(e))) < cornerDegree)
-			{
-				stop = map.phi2(map.phi1(e));
-				found = true;
-			}
-
-			e = map.phi2(map.phi_1(e));
-		}
-		while(!found && e != *edge);
-
-		//si il existe un sommet de degre inferieur au degree du coin
-		if(found)
-		{
-			//chercher le brin de faible degree suivant
-			bool found2 = false;
-			Dart dd = map.phi1(stop);
-
-			do
-			{
-				if(map.Map2::vertexDegree(dd) < cornerDegree)
-					found2 = true;
-				else
-					dd = map.phi1(dd);
-			}
-			while(!found2);
-
-			//cas de la pyramide
-			if(dd == stop)
-			{
-				//std::cout << "pyramide" << std::endl;
-				map.splitFace(dd, map.phi1(map.phi1(dd)));
-			}
-			else
-			{
-				map.splitFace(dd, stop);
-
-				//calcul de la taille des faces de chaque cote de stop
-				if(!( (map.Map2::faceDegree(map.phi_1(stop)) == 3 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 4) ||
-						(map.Map2::faceDegree(map.phi_1(stop)) == 4 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 3) ))
-				{
-					//std::cout << "octaedre ou hexaedre" << std::endl;
-
-					Dart ne = map.phi_1(stop) ;
-					map.cutEdge(ne);
-					position[map.phi1(ne)] = volCenter;
-					stop = map.phi2(map.phi1(ne));
-
-					bool finished = false;
-					Dart it = map.phi2(ne);
-
-					do
-					{
-						//chercher le brin de faible degree suivant
-						bool found2 = false;
-						Dart dd = map.phi1(it);
-
-						do
-						{
-							if(dd == stop)
-								finished = true;
-							else if(map.Map2::vertexDegree(dd) < cornerDegree)
-								found2 = true;
-							else
-								dd = map.phi1(dd);
-						}
-						while(!found2 & !finished);
-
-						if(found2)
-						{
-							map.splitFace(it,dd);
-						}
-
-						it = map.phi_1(dd);
-
-						if(it == stop)
-							finished = true;
-
-					}
-					while(!finished);
-
-				}
-				else
-				{
-					//std::cout << "prisme" << std::endl;
-					//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
-					//map.closeHole(f2);
-				}
-
-			}
-
-		}
-		//sinon cas du tetraedre
-		else
-		{
-			//std::cout << "tetraedre" << std::endl;
-			//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
-			//map.closeHole(f2);
-		}
-
-	}
-
-	//std::cout << "1ere etape finished" << std::endl;
-
-	CellMarker mtf(map, FACE);
-
-	//Etape 2
-	for (std::vector<std::pair<Dart,Dart> >::iterator edges = subdividedfacesT.begin(); edges != subdividedfacesT.end(); ++edges)
-	{
-		Dart f1 = (*edges).first;
-		Dart f2 = (*edges).second;
-
-//Fonction isTetrahedron ??
-//		//if(Algo::Modelisation::Tetrahedron::isTetrahedron<PFP>(map,f2))
-		if(  (map.Map2::faceDegree(f2) == 3 && map.Map2::faceDegree(map.phi2(f2)) == 3 &&
-				map.Map2::faceDegree(map.phi2(map.phi_1(f2))) == 3) && map.Map2::vertexDegree(f2) == 3)
-		{ //cas du tetrahedre
-
-			//std::cout << "ajout d'une face" << std::endl;
-
-			if(map.phi3(map.phi2(f2)) == map.phi2(f2))
-			{
-				Dart nf = map.newFace(3);
-				map.sewVolumes(map.phi2(f2),nf);
-			}
-
-			if(map.phi2(map.phi3(map.phi2(f2))) == map.phi3(map.phi2(f2)))
-			{
-				map.sewFaces(map.phi3(map.phi2(f2)), f1);
-			}
-		}
-		else
-		{
-			if(!mtf.isMarked(f1))
-			{
-				mtf.mark(f1);
-
-				map.closeHole(f1);
-
-				if(map.Map2::faceDegree(map.phi2(f2)) == 3)
-				{
-					//std::cout << "ajout d'un tetraedre" << std::endl;
-					Dart x = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
-					position[x] = volCenter;
-				}
-				else
-				{
-					//std::cout << "ajout d'un prisme" << std::endl;
-					//Dart x = Algo::Modelisation::extrudeFace<PFP>(map,position,map.phi2(f1),5.0);
-					Dart c = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
-
-					Dart cc = c;
-					// cut edges
-					do
-					{
-
-						typename PFP::VEC3 p1 = position[cc] ;
-						typename PFP::VEC3 p2 = position[map.phi1(cc)] ;
-
-						map.cutEdge(cc);
-
-						position[map.phi1(cc)] = (p1 + p2) * typename PFP::REAL(0.5) ;
-
-						cc = map.phi2(map.phi_1(cc));
-					}while (cc != c);
-
-					// cut faces
-					do
-					{
-						Dart d1 = map.phi1(cc);
-						Dart d2 = map.phi_1(cc);
-						map.splitFace(d1,d2);
-						cc = map.phi2(map.phi_1(cc));//map.Map2::alpha1(cc);
-					}while (cc != c);
-
-					//merge central faces by removing edges
-					bool notFinished=true;
-					do
-					{
-						Dart d1 = map.Map2::alpha1(cc);
-						if (d1 == cc)			// last edge is pending edge inside of face
-							notFinished = false;
-						map.deleteFace(cc);
-						cc = d1;
-					} while (notFinished);
-
-
-					map.closeHole(map.phi1(map.phi1(map.phi2(f1))));
-
-				}
-			}
-		}
-
-	}
-
-	//std::cout << "2e etape finished" << std::endl;
-
-
-	{
-		//Third step : 3-sew internal faces
-		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesT.begin(); it != subdividedfacesT.end(); ++it)
-		{
-			Dart f1 = (*it).first;
-			Dart f2 = (*it).second;
-
-
-
-			if(map.phi3(map.phi2(f1)) == map.phi2(f1) && map.phi3(map.phi2(f2)) == map.phi2(f2))
-			{
-				if(map.getEmbedding(VERTEX, map.phi_1(map.phi2(f2))) == map.getEmbedding(VERTEX, map.phi_1(map.phi2(f1))))
-				{
-					map.Map3::sewVolumes(map.phi2(f2), map.phi2(f1));
-				}
-				else
-				{
-
-				//id pour toutes les faces interieures
-				map.sewVolumes(map.phi2(f2), map.phi2(f1));
-
-
-				}
-
-				//Fais a la couture !!!!!
-				unsigned int idface = map.getNewFaceId();
-				map.setFaceId(map.phi2(f1),idface, FACE);
-			}
-
-
-			//FAIS a la couture !!!!!!!
-			//id pour toutes les aretes exterieurs des faces quadrangulees
-			unsigned int idedge = map.getEdgeId(f1);
-			map.setEdgeId(map.phi2(f1), idedge, DART);
-			map.setEdgeId( map.phi2(f2), idedge, DART);
-
-		}
-
-		//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
-		//id pour les aretes interieurs : (i.e. 16 pour un octa)
-		DartMarker mne(map);
-		for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
-		{
-			if(!mne.isMarked(*it))
-			{
-				unsigned int idedge = map.getNewEdgeId();
-				map.setEdgeId(*it, idedge, EDGE);
-				mne.markOrbit(EDGE,*it);
-			}
-		}
-	}
-
-	{
-		//Third step : 3-sew internal faces
-		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesQ.begin(); it != subdividedfacesQ.end(); ++it)
-		{
-			Dart f1 = (*it).first;
-			Dart f2 = (*it).second;
-
-			if(map.phi3(map.phi2(f1)) == map.phi2(f1) && map.phi3(map.phi2(f2)) == map.phi2(f2))
-			{
-				//id pour toutes les faces interieures
-				map.sewVolumes(map.phi2(f2), map.phi2(f1));
-
-				//Fais a la couture !!!!!
-				unsigned int idface = map.getNewFaceId();
-				map.setFaceId(map.phi2(f1),idface, FACE);
-			}
-
-			//FAIS a la couture !!!!!!!
-			//id pour toutes les aretes exterieurs des faces quadrangulees
-			unsigned int idedge = map.getEdgeId(f1);
-			map.setEdgeId(map.phi2(f1), idedge, DART);
-			map.setEdgeId( map.phi2(f2), idedge, DART);
-		}
-		//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
-		//id pour les aretes interieurs : (i.e. 16 pour un octa)
-		DartMarker mne(map);
-		for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
-		{
-			if(!mne.isMarked(*it))
-			{
-				unsigned int idedge = map.getNewEdgeId();
-				map.setEdgeId(*it, idedge, EDGE);
-				mne.markOrbit(EDGE,*it);
-			}
-		}
-	}
-
-
-	//cas tordu pour le prisme
-	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesT.begin(); it != subdividedfacesT.end(); ++it)
-	{
-		Dart f1 = (*it).first;
-		Dart f2 = (*it).second;
-
-		if(  !(map.Map2::faceDegree(f2) == 3 && map.Map2::faceDegree(map.phi2(f2)) == 3 &&
-				map.Map2::faceDegree(map.phi2(map.phi1(f2))) == 3 && map.Map2::faceDegree(map.phi2(map.phi_1(f2))) == 3))
-		{
-
-
-			if(map.phi2(map.phi1(map.phi1(map.phi2(f1)))) == map.phi3(map.phi2(map.phi1(map.phi1(map.phi2(f1))))) &&
-					map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi2(map.phi1(map.phi1(map.phi2(f1))))))))))) ==
-							map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi2(map.phi1(map.phi1(map.phi2(f1))))))))))))
-			)
-			{
-				map.sewVolumes(map.phi2(map.phi1(map.phi1(map.phi2(f1)))),
-						map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi1(map.phi1(map.phi2(f1))))))))));
-			}
-
-		}
-
-	}
-
-
-	map.setCurrentLevel(cur) ;
-
+//	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
+//	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
+//	{
+//		//std::vector<Dart>::iterator edge = oldEdges.begin();
+//		Dart e = *edge;
+//
+//		Dart f1 = map.phi1(*edge);
+//		//Dart f2 = map.phi2(f1);
+//
+//		do
+//		{
+//			if(map.phi1(map.phi1(map.phi1(e))) != e)
+//			{
+//				map.unsewFaces(map.phi1(map.phi1(e))); //remplacer par une boucle qui découd toute la face et non juste une face carre (jusqu'a phi_1(e))
+//			}
+//
+//			map.unsewFaces(map.phi1(e));
+//
+//
+//			e = map.phi2(map.phi_1(e));
+//		}
+//		while(e != *edge);
+//
+//		map.closeHole(f1);
+//
+//		//degree du sommet exterieur
+//		unsigned int cornerDegree = map.Map2::vertexDegree(*edge);
+//
+//		//tourner autour du sommet pour connaitre le brin d'un sommet de valence < cornerDegree
+//		bool found = false;
+//		Dart stop = e;
+//		do
+//		{
+//
+//			if(map.Map2::vertexDegree(map.phi2(map.phi1(e))) < cornerDegree)
+//			{
+//				stop = map.phi2(map.phi1(e));
+//				found = true;
+//			}
+//
+//			e = map.phi2(map.phi_1(e));
+//		}
+//		while(!found && e != *edge);
+//
+//		//si il existe un sommet de degre inferieur au degree du coin
+//		if(found)
+//		{
+//			//chercher le brin de faible degree suivant
+//			bool found2 = false;
+//			Dart dd = map.phi1(stop);
+//
+//			do
+//			{
+//				if(map.Map2::vertexDegree(dd) < cornerDegree)
+//					found2 = true;
+//				else
+//					dd = map.phi1(dd);
+//			}
+//			while(!found2);
+//
+//			//cas de la pyramide
+//			if(dd == stop)
+//			{
+//				//std::cout << "pyramide" << std::endl;
+//				map.splitFace(dd, map.phi1(map.phi1(dd)));
+//			}
+//			else
+//			{
+//				map.splitFace(dd, stop);
+//
+//				//calcul de la taille des faces de chaque cote de stop
+//				if(!( (map.Map2::faceDegree(map.phi_1(stop)) == 3 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 4) ||
+//						(map.Map2::faceDegree(map.phi_1(stop)) == 4 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 3) ))
+//				{
+//					//std::cout << "octaedre ou hexaedre" << std::endl;
+//
+//					Dart ne = map.phi_1(stop) ;
+//					map.cutEdge(ne);
+//					position[map.phi1(ne)] = volCenter;
+//					stop = map.phi2(map.phi1(ne));
+//
+//					bool finished = false;
+//					Dart it = map.phi2(ne);
+//
+//					do
+//					{
+//						//chercher le brin de faible degree suivant
+//						bool found2 = false;
+//						Dart dd = map.phi1(it);
+//
+//						do
+//						{
+//							if(dd == stop)
+//								finished = true;
+//							else if(map.Map2::vertexDegree(dd) < cornerDegree)
+//								found2 = true;
+//							else
+//								dd = map.phi1(dd);
+//						}
+//						while(!found2 & !finished);
+//
+//						if(found2)
+//						{
+//							map.splitFace(it,dd);
+//						}
+//
+//						it = map.phi_1(dd);
+//
+//						if(it == stop)
+//							finished = true;
+//
+//					}
+//					while(!finished);
+//
+//				}
+//				else
+//				{
+//					//std::cout << "prisme" << std::endl;
+//					//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
+//					//map.closeHole(f2);
+//				}
+//
+//			}
+//
+//		}
+//		//sinon cas du tetraedre
+//		else
+//		{
+//			//std::cout << "tetraedre" << std::endl;
+//			//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
+//			//map.closeHole(f2);
+//		}
+//
+//	}
+//
+//	//std::cout << "1ere etape finished" << std::endl;
+//
+//	CellMarker mtf(map, FACE);
+//
+//	//Etape 2
+//	for (std::vector<std::pair<Dart,Dart> >::iterator edges = subdividedfacesT.begin(); edges != subdividedfacesT.end(); ++edges)
+//	{
+//		Dart f1 = (*edges).first;
+//		Dart f2 = (*edges).second;
+//
+////Fonction isTetrahedron ??
+////		//if(Algo::Modelisation::Tetrahedron::isTetrahedron<PFP>(map,f2))
+//		if(  (map.Map2::faceDegree(f2) == 3 && map.Map2::faceDegree(map.phi2(f2)) == 3 &&
+//				map.Map2::faceDegree(map.phi2(map.phi_1(f2))) == 3) && map.Map2::vertexDegree(f2) == 3)
+//		{ //cas du tetrahedre
+//
+//			//std::cout << "ajout d'une face" << std::endl;
+//
+//			if(map.phi3(map.phi2(f2)) == map.phi2(f2))
+//			{
+//				Dart nf = map.newFace(3);
+//				map.sewVolumes(map.phi2(f2),nf);
+//			}
+//
+//			if(map.phi2(map.phi3(map.phi2(f2))) == map.phi3(map.phi2(f2)))
+//			{
+//				map.sewFaces(map.phi3(map.phi2(f2)), f1);
+//			}
+//		}
+//		else
+//		{
+//			if(!mtf.isMarked(f1))
+//			{
+//				mtf.mark(f1);
+//
+//				map.closeHole(f1);
+//
+//				if(map.Map2::faceDegree(map.phi2(f2)) == 3)
+//				{
+//					//std::cout << "ajout d'un tetraedre" << std::endl;
+//					Dart x = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
+//					position[x] = volCenter;
+//				}
+//				else
+//				{
+//					//std::cout << "ajout d'un prisme" << std::endl;
+//					//Dart x = Algo::Modelisation::extrudeFace<PFP>(map,position,map.phi2(f1),5.0);
+//					Dart c = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
+//
+//					Dart cc = c;
+//					// cut edges
+//					do
+//					{
+//
+//						typename PFP::VEC3 p1 = position[cc] ;
+//						typename PFP::VEC3 p2 = position[map.phi1(cc)] ;
+//
+//						map.cutEdge(cc);
+//
+//						position[map.phi1(cc)] = (p1 + p2) * typename PFP::REAL(0.5) ;
+//
+//						cc = map.phi2(map.phi_1(cc));
+//					}while (cc != c);
+//
+//					// cut faces
+//					do
+//					{
+//						Dart d1 = map.phi1(cc);
+//						Dart d2 = map.phi_1(cc);
+//						map.splitFace(d1,d2);
+//						cc = map.phi2(map.phi_1(cc));//map.Map2::alpha1(cc);
+//					}while (cc != c);
+//
+//					//merge central faces by removing edges
+//					bool notFinished=true;
+//					do
+//					{
+//						Dart d1 = map.Map2::alpha1(cc);
+//						if (d1 == cc)			// last edge is pending edge inside of face
+//							notFinished = false;
+//						map.deleteFace(cc);
+//						cc = d1;
+//					} while (notFinished);
+//
+//
+//					map.closeHole(map.phi1(map.phi1(map.phi2(f1))));
+//
+//				}
+//			}
+//		}
+//
+//	}
+//
+//	//std::cout << "2e etape finished" << std::endl;
+//
+//
+//	{
+//		//Third step : 3-sew internal faces
+//		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesT.begin(); it != subdividedfacesT.end(); ++it)
+//		{
+//			Dart f1 = (*it).first;
+//			Dart f2 = (*it).second;
+//
+//
+//
+//			if(map.phi3(map.phi2(f1)) == map.phi2(f1) && map.phi3(map.phi2(f2)) == map.phi2(f2))
+//			{
+//				if(map.getEmbedding(VERTEX, map.phi_1(map.phi2(f2))) == map.getEmbedding(VERTEX, map.phi_1(map.phi2(f1))))
+//				{
+//					map.Map3::sewVolumes(map.phi2(f2), map.phi2(f1));
+//				}
+//				else
+//				{
+//
+//				//id pour toutes les faces interieures
+//				map.sewVolumes(map.phi2(f2), map.phi2(f1));
+//
+//
+//				}
+//
+//				//Fais a la couture !!!!!
+//				unsigned int idface = map.getNewFaceId();
+//				map.setFaceId(map.phi2(f1),idface, FACE);
+//			}
+//
+//
+//			//FAIS a la couture !!!!!!!
+//			//id pour toutes les aretes exterieurs des faces quadrangulees
+//			unsigned int idedge = map.getEdgeId(f1);
+//			map.setEdgeId(map.phi2(f1), idedge, DART);
+//			map.setEdgeId( map.phi2(f2), idedge, DART);
+//
+//		}
+//
+//		//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
+//		//id pour les aretes interieurs : (i.e. 16 pour un octa)
+//		DartMarker mne(map);
+//		for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
+//		{
+//			if(!mne.isMarked(*it))
+//			{
+//				unsigned int idedge = map.getNewEdgeId();
+//				map.setEdgeId(*it, idedge, EDGE);
+//				mne.markOrbit(EDGE,*it);
+//			}
+//		}
+//	}
+//
+//	{
+//		//Third step : 3-sew internal faces
+//		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesQ.begin(); it != subdividedfacesQ.end(); ++it)
+//		{
+//			Dart f1 = (*it).first;
+//			Dart f2 = (*it).second;
+//
+//			if(map.phi3(map.phi2(f1)) == map.phi2(f1) && map.phi3(map.phi2(f2)) == map.phi2(f2))
+//			{
+//				//id pour toutes les faces interieures
+//				map.sewVolumes(map.phi2(f2), map.phi2(f1));
+//
+//				//Fais a la couture !!!!!
+//				unsigned int idface = map.getNewFaceId();
+//				map.setFaceId(map.phi2(f1),idface, FACE);
+//			}
+//
+//			//FAIS a la couture !!!!!!!
+//			//id pour toutes les aretes exterieurs des faces quadrangulees
+//			unsigned int idedge = map.getEdgeId(f1);
+//			map.setEdgeId(map.phi2(f1), idedge, DART);
+//			map.setEdgeId( map.phi2(f2), idedge, DART);
+//		}
+//		//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
+//		//id pour les aretes interieurs : (i.e. 16 pour un octa)
+//		DartMarker mne(map);
+//		for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
+//		{
+//			if(!mne.isMarked(*it))
+//			{
+//				unsigned int idedge = map.getNewEdgeId();
+//				map.setEdgeId(*it, idedge, EDGE);
+//				mne.markOrbit(EDGE,*it);
+//			}
+//		}
+//	}
+//
+//
+//	//cas tordu pour le prisme
+//	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesT.begin(); it != subdividedfacesT.end(); ++it)
+//	{
+//		Dart f1 = (*it).first;
+//		Dart f2 = (*it).second;
+//
+//		if(  !(map.Map2::faceDegree(f2) == 3 && map.Map2::faceDegree(map.phi2(f2)) == 3 &&
+//				map.Map2::faceDegree(map.phi2(map.phi1(f2))) == 3 && map.Map2::faceDegree(map.phi2(map.phi_1(f2))) == 3))
+//		{
+//
+//
+//			if(map.phi2(map.phi1(map.phi1(map.phi2(f1)))) == map.phi3(map.phi2(map.phi1(map.phi1(map.phi2(f1))))) &&
+//					map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi2(map.phi1(map.phi1(map.phi2(f1))))))))))) ==
+//							map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi2(map.phi1(map.phi1(map.phi2(f1))))))))))))
+//			)
+//			{
+//				map.sewVolumes(map.phi2(map.phi1(map.phi1(map.phi2(f1)))),
+//						map.phi2(map.phi3(map.phi2(map.phi3(map.phi2(map.phi3(map.phi1(map.phi1(map.phi2(f1))))))))));
+//			}
+//
+//		}
+//
+//	}
+//
+//
+//	map.setCurrentLevel(cur) ;
+//
 	return subdividedfacesQ.begin()->first;
 }
 
@@ -1212,10 +1213,55 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, 
 		fit = map.phi1(fit) ;
 	} while(fit != d) ;
 
-	Dart d3 = map.phi3(d);
 
 	if(degree == 3 && sType == Algo::IHM::S_TRI)
 	{
+
+	}
+	else
+	{
+		// boucler sur d avec phi2(phi_1()) et faire des unsewvolumes
+		// delete le vertex sur d
+		// si le volume d'a cote n'est pas subdiv
+		// alors delete le vertex aussi
+		// recouture du tout
+
+		Dart d3 = map.phi3(d);
+
+		map.setCurrentLevel(cur + 1) ;
+
+		Dart centralV = map.phi1(map.phi1(d));
+		//Tester si il y a un volume voisin
+		if(d != d3)
+		{
+			//on decoud
+			Dart it = centralV;
+
+			do
+			{
+				map.unsewVolumes(it);
+				it = map.phi2(map.phi_1(it));
+			}while(it != centralV);
+
+			//Si ce volume voisin n'est pas subdivise
+			if(!map.volumeIsSubdivided(d3))
+				//alors on supprime le sommet en face
+				map.deleteVertex(map.phi1(map.phi1(d3)));
+
+		}
+
+		//On supprime le sommet sur la face du volume courant
+		map.deleteVertex(centralV);
+
+		if(d != d3)
+			map.sewVolumes(d,map.phi1(d3));
+
+		map.setCurrentLevel(cur) ;
+	}
+
+
+//	if(degree == 3 && sType == Algo::IHM::S_TRI)
+//	{
 //		fit = d ;
 //		do
 //		{
@@ -1226,48 +1272,10 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, 
 //			map.setCurrentLevel(cur) ;
 //			fit = map.phi1(fit) ;
 //		} while(fit != d) ;
-	}
-	else
-	{
-		//map.setCurrentLevel(cur + 1) ;
-		//Dart centralV = map.phi1(map.phi1(d)) ;
-		//map.setCurrentLevel(map.getMaxLevel()) ;
-		//map.deleteVertex(centralV) ;
-		//map.setCurrentLevel(cur) ;
+//	}
 
-		map.setCurrentLevel(cur + 1) ;
-		Dart d3 = map.phi3(d);
-		map.setCurrentLevel(cur) ;
 
-		fit = d ;
-		do
-		{
-			map.setCurrentLevel(cur + 1) ;
-
-			Dart innerEdge = map.phi1(fit);
-			Dart innerEdge3 = map.phi3(innerEdge);
-
-			if(innerEdge != innerEdge3)
-			{
-				map.unsewVolumes(innerEdge);
-				map.Map2::mergeFaces(innerEdge3);
-			}
-
-			map.Map2::mergeFaces(innerEdge) ;
-
-			map.setCurrentLevel(cur) ;
-			fit = map.phi1(fit);
-
-		}while(fit != d);
-
-		map.setCurrentLevel(cur + 1) ;
-		if(d != d3)
-			map.sewVolumes(d, d3);
-		map.setCurrentLevel(cur) ;
-
-	}
-
-// A faire de coarsenVolume
+// A faire dans coarsenVolume
 //	fit = d ;
 //	do
 //	{
@@ -1286,10 +1294,11 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 	unsigned int cur = map.getCurrentLevel() ;
 
+	std::cout << "cur = " << cur << std::endl;
+
 	/*
 	 * au niveau du volume courant i
 	 * stockage d'un brin de chaque face de celui-ci
-	 * avec calcul du centroid
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
@@ -1319,12 +1328,24 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	}
 
 	/*
-	 * fusionner tous les volumes internes
+	 * Deconnecter toutes les faces interieurs
 	 */
-	map.setCurrentLevel(cur + 1) ;
-	Dart centralV = map.phi_1(map.phi2(map.phi1(d)));
-	map.deleteVertex(centralV) ;
-	map.setCurrentLevel(cur) ;
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		Dart fit = *face;
+
+		do
+		{
+			map.setCurrentLevel(cur + 1) ;
+
+			Dart nf = map.phi2(map.phi1(fit));
+			if(map.getDartLevel(map.faceOldestDart(nf)) != cur)
+				map.mergeVolumes(nf);
+
+			map.setCurrentLevel(cur) ;
+			fit = map.phi1(fit);
+		}while(fit != *face);
+	}
 
 	/*
 	 * simplifier les faces

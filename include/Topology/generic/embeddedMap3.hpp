@@ -173,6 +173,13 @@ void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 {
 	MAP3::cutEdge(d);
 
+	if(MAP3::isOrbitEmbedded(VERTEX))
+	{
+		Dart nd = MAP3::phi1(d) ;
+
+		MAP3::embedNewCell(VERTEX, nd) ;
+	}
+
 	if(MAP3::isOrbitEmbedded(EDGE))
 	{
 		Dart nd = MAP3::phi1(d) ;
@@ -218,6 +225,7 @@ void EmbeddedMap3<MAP3>::cutEdge(Dart d)
 			f = MAP3::alpha2(f);
 		} while(f != d);
 	}
+
 }
 
 
