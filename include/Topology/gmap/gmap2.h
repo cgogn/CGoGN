@@ -246,12 +246,28 @@ public:
 	 *  Return or set various topological information
 	 *************************************************************************/
 
+	//! Test if dart d and e belong to the same oriented vertex
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVertex(Dart d, Dart e);
+
 	//! Test if dart d and e belong to the same vertex
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
 	bool sameVertex(Dart d, Dart e);
 
+	//! Test if dart d and e belong to the same oriented volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVolume(Dart d, Dart e);
+
+	//! Test if dart d and e belong to the same volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
 	bool sameVolume(Dart d, Dart e);
 
 	/**

@@ -167,10 +167,10 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 current, Geom::Orientation3D sid
 			faceState(current);
 			return;
 		case Geom::OVER:
-
+		{
 			//transform the displacement into the new entered face
 			VEC3 displ = current-m_position;
-			VEC3 edge = Algo::Geom::vectorOutOfDart<PFP>(m,m.phi2(d),m_positions);
+			VEC3 edge = Algo::Geometry::vectorOutOfDart<PFP>(m,m.phi2(d),m_positions);
 			edge.normalize();
 			VEC3 n = Algo::Geometry::faceNormal<PFP>(m,m.phi2(d),m_positions);
 			current = m_position+((displ^n)*displ.norm());
@@ -178,6 +178,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 current, Geom::Orientation3D sid
 			d = m.phi1(m.phi2(d));
 			faceState(current);
 			return;
+		}
 		default :
 			state = EDGE;
 	}
@@ -311,12 +312,13 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
 	default :
 		if(wsoe == Geom::ON)
 		{
-			d = m.phi1(d); //to check
-			m_position = m_positions[d];
-
-			vertexState(current);
+			std::cout << __FILE__ << " to uncomment and check" << std::endl;
+//			d = m.phi1(d); //to check
+//			m_position = m_positions[d];
+//
+//			vertexState(current);
 		}
-		else
+//		else
 		{
 // 			CGoGNout << "wsoe : " << wsoe << CGoGNendl;
 // 			CGoGNout << "current " << current << " " << m_position << CGoGNendl;
