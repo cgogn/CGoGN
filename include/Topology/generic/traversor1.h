@@ -30,6 +30,10 @@
 namespace CGoGN
 {
 
+/*******************************************************************************
+					VERTEX CENTERED TRAVERSALS
+*******************************************************************************/
+
 // Traverse the edges incident to a given vertex
 template <typename MAP>
 class Traversor1VE
@@ -102,6 +106,10 @@ public:
 		return current ;
 	}
 } ;
+
+/*******************************************************************************
+					EDGE CENTERED TRAVERSALS
+*******************************************************************************/
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
