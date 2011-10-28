@@ -34,6 +34,47 @@ namespace CGoGN
 					VERTEX CENTERED TRAVERSALS
 *******************************************************************************/
 
+// Traverse all the vertices of the map
+template <typename MAP>
+class TraversorV
+{
+private:
+	MAP& m ;
+	DartMarker mark ;
+	Dart current ;
+
+public:
+	TraversorV(MAP& map, Dart dart) : m(map), mark(map)
+	{}
+
+	Dart begin()
+	{
+		mark.unmarkAll() ;
+		current = m.begin() ;
+		if(current == m.end())
+			current = NIL ;
+		else
+			mark.markOrbit(VERTEX, current) ;
+		return current ;
+	}
+	Dart end() { return NIL ; }
+	Dart next()
+	{
+		if(current != NIL)
+		{
+			while(current != NIL && mark.isMarked(current))
+			{
+				m.next(current) ;
+				if(current == m.end())
+					current = NIL ;
+			}
+			if(current != NIL)
+				mark.markOrbit(VERTEX, current) ;
+		}
+		return current ;
+	}
+} ;
+
 // Traverse the edges incident to a given vertex
 template <typename MAP>
 class Traversor2VE
@@ -169,6 +210,47 @@ public:
 					EDGE CENTERED TRAVERSALS
 *******************************************************************************/
 
+// Traverse all the edges of the map
+template <typename MAP>
+class TraversorE
+{
+private:
+	MAP& m ;
+	DartMarker mark ;
+	Dart current ;
+
+public:
+	TraversorE(MAP& map, Dart dart) : m(map), mark(map)
+	{}
+
+	Dart begin()
+	{
+		mark.unmarkAll() ;
+		current = m.begin() ;
+		if(current == m.end())
+			current = NIL ;
+		else
+			mark.markOrbit(EDGE, current) ;
+		return current ;
+	}
+	Dart end() { return NIL ; }
+	Dart next()
+	{
+		if(current != NIL)
+		{
+			while(current != NIL && mark.isMarked(current))
+			{
+				m.next(current) ;
+				if(current == m.end())
+					current = NIL ;
+			}
+			if(current != NIL)
+				mark.markOrbit(EDGE, current) ;
+		}
+		return current ;
+	}
+} ;
+
 // Traverse the vertices incident to a given edge
 template <typename MAP>
 class Traversor2EV
@@ -296,6 +378,47 @@ public:
 /*******************************************************************************
 					FACE CENTERED TRAVERSALS
 *******************************************************************************/
+
+// Traverse all the faces of the map
+template <typename MAP>
+class TraversorF
+{
+private:
+	MAP& m ;
+	DartMarker mark ;
+	Dart current ;
+
+public:
+	TraversorF(MAP& map, Dart dart) : m(map), mark(map)
+	{}
+
+	Dart begin()
+	{
+		mark.unmarkAll() ;
+		current = m.begin() ;
+		if(current == m.end())
+			current = NIL ;
+		else
+			mark.markOrbit(FACE, current) ;
+		return current ;
+	}
+	Dart end() { return NIL ; }
+	Dart next()
+	{
+		if(current != NIL)
+		{
+			while(current != NIL && mark.isMarked(current))
+			{
+				m.next(current) ;
+				if(current == m.end())
+					current = NIL ;
+			}
+			if(current != NIL)
+				mark.markOrbit(FACE, current) ;
+		}
+		return current ;
+	}
+} ;
 
 // Traverse the vertices incident to a given face
 template <typename MAP>
