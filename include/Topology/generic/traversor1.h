@@ -39,15 +39,27 @@ private:
 	Dart start ;
 	Dart current ;
 
+	Dart d2 ;
+
 public:
 	Traversor1VE(MAP& map, Dart dart) : m(map), start(dart)
-	{}
+	{
+		d2 = m.phi_1(start) ;
+		if(d2 == start) // 1 edge loop case
+			d2 = NIL ;
+	}
 
 	Dart begin() { current = start ; return current ; }
 	Dart end() { return NIL ; }
 	Dart next()
 	{
-		current = current == start ? m.phi_1(start) : NIL ;
+		if(current != NIL)
+		{
+			if(current == start)
+				current = d2 ;
+			else
+				current = NIL ;
+		}
 		return current ;
 	}
 } ;
@@ -60,17 +72,33 @@ private:
 	Dart start ;
 	Dart current ;
 
+	Dart d2 ;
+
 public:
 	Traversor1VVaE(MAP& map, Dart dart) : m(map)
 	{
 		start = m.phi_1(dart) ;
+		if(start == dart) // 1 edge loop case
+			start = NIL ;
+		else
+		{
+			d2 = m.phi1(dart) ;
+			if(d2 == start) // 2 edges loop case
+				d2 = NIL ;
+		}
 	}
 
 	Dart begin() { current = start ; return current ; }
 	Dart end() { return NIL ; }
 	Dart next()
 	{
-		current = current == start ? m.phi1(m.phi1(start)) : NIL ;
+		if(current != NIL)
+		{
+			if(current == start)
+				current = d2 ;
+			else
+				current = NIL ;
+		}
 		return current ;
 	}
 } ;
@@ -84,15 +112,27 @@ private:
 	Dart start ;
 	Dart current ;
 
+	Dart d2 ;
+
 public:
 	Traversor1EV(MAP& map, Dart dart) : m(map), start(dart)
-	{}
+	{
+		d2 = m.phi1(start) ;
+		if(d2 == start) // 1 edge loop case
+			d2 = NIL ;
+	}
 
 	Dart begin() { current = start ; return current ; }
 	Dart end() { return NIL ; }
 	Dart next()
 	{
-		current = current == start ? m.phi1(start) : NIL ;
+		if(current != NIL)
+		{
+			if(current == start)
+				current = d2 ;
+			else
+				current = NIL ;
+		}
 		return current ;
 	}
 } ;
@@ -105,17 +145,33 @@ private:
 	Dart start ;
 	Dart current ;
 
+	Dart d2 ;
+
 public:
 	Traversor1EEaV(MAP& map, Dart dart) : m(map)
 	{
 		start = m.phi_1(dart) ;
+		if(start == dart) // 1 edge loop case
+			start = NIL ;
+		else
+		{
+			d2 = m.phi1(dart) ;
+			if(d2 == start) // 2 edges loop case
+				d2 = NIL ;
+		}
 	}
 
 	Dart begin() { current = start ; return current ; }
 	Dart end() { return NIL ; }
 	Dart next()
 	{
-		current = current == start ? m.phi1(m.phi1(start)) : NIL ;
+		if(current != NIL)
+		{
+			if(current == start)
+				current = d2 ;
+			else
+				current = NIL ;
+		}
 		return current ;
 	}
 } ;
