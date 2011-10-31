@@ -112,7 +112,7 @@ protected:
 	/*! The phi2-links around the face are removed
 	 *  @param d a dart of the face
 	 */
-	void deleteOrientedFace(Dart d) ;
+	void deleteOrientedFace(Dart d) ; // OK boundary
 
 public:
 	virtual void deleteFace(Dart d) ;
@@ -128,7 +128,7 @@ public:
 	 *  @param d first dart in vertex v
 	 *  @param e second dart in vertex v
 	 */
-	virtual void splitVertex(Dart d, Dart e);	//TODO modification for new boundary managing method
+	virtual void splitVertex(Dart d, Dart e); // OK boundary
 
 
 	//! Delete the vertex of d (works only for internal vertices)
@@ -136,7 +136,7 @@ public:
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d) ;	//TODO modification for new boundary managing method
+	virtual bool deleteVertex(Dart d) ;	// OK boundary
 
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
@@ -150,13 +150,13 @@ public:
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */
-	virtual void cutEdge(Dart d);	//TODO modification for new boundary managing method
+	virtual void cutEdge(Dart d);// OK boundary
 
 
 	//! Undo the cut of the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to uncut
 	 */
-	virtual void uncutEdge(Dart d);	//TODO modification for new boundary managing method
+	virtual void uncutEdge(Dart d);// OK boundary
 
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
@@ -169,7 +169,7 @@ public:
 	 *  @param delDegenerateFaces a boolean (default to true)
 	 *  @return a dart of the resulting vertex
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);	//TODO modification for new boundary managing method
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);	//TODO close degenerated boundary ???
 
 
 	/**
@@ -246,7 +246,7 @@ public:
 	 * Extract a pair of sewed triangles and sew their adjacent faces
 	 * d is a dart of the common edge of the pair of triangles
 	 */
-	void extractTrianglePair(Dart d) ;	//TODO modification for new boundary managing method
+	void extractTrianglePair(Dart d) ;
 
 
 	/**
@@ -254,7 +254,7 @@ public:
 	 * v1 and v2 belong to the same vertex
 	 * d is a dart of the common edge of the pair of triangles
 	 */
-	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;	//TODO modification for new boundary managing method
+	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
 
 
 	/**
@@ -266,7 +266,7 @@ public:
 
 
 	/**
-	 * Unsex the Umbrella aroud a vertex, close the hole and then
+	 * Unsew the Umbrella aroud a vertex, close the hole and then
 	 * create a symetric to construct a polyedron
 	 * @param d a dart from the vertex
 	 */
@@ -337,14 +337,14 @@ public:
 	/**
 	 * tell if the vertex of d is on the boundary of the map
 	 */
-	bool isBoundaryVertex(Dart d) ;
+	bool isBoundaryVertex(Dart d) ;		// OK boundary
 
 	//! Follow the boundary of a surface as if it was a oriented face.
 	/*! This operation alternate phi1 and phi2 operator until another
 	 *  boudary dart is reached.
 	 *  @param d a boundary dart
 	 */
-	Dart nextOnBoundary(Dart d);
+	Dart nextOnBoundary(Dart d);		// OK boundary
 
 	// TODO a mettre en algo
 	/**
