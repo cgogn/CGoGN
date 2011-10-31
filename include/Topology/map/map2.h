@@ -112,7 +112,7 @@ protected:
 	/*! The phi2-links around the face are removed
 	 *  @param d a dart of the face
 	 */
-	void deleteOrientedFace(Dart d) ;
+	void deleteOrientedFace(Dart d) ; // OK boundary
 
 public:
 	virtual void deleteFace(Dart d) ;
@@ -164,7 +164,7 @@ public:
 	 *  @param delDegenerateFaces a boolean (default to true)
 	 *  @return a dart of the resulting vertex
 	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
+	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);	//TODO close degenerated boundary ???
 
 	/**
 	 * Flip the edge of d (rotation in phi1 order)
@@ -333,7 +333,7 @@ public:
 	 *  boudary dart is reached.
 	 *  @param d a boundary dart
 	 */
-	Dart nextOnBoundary(Dart d);
+	Dart nextOnBoundary(Dart d) ;
 
 	// TODO a mettre en algo
 	/**

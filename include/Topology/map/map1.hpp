@@ -153,6 +153,9 @@ inline void Map1::cutEdge(Dart d)
 {
 	Dart e = newDart() ;	// Create a new dart
 	phi1sew(d, e) ;			// Insert dart e between d and phi1(d)
+
+	if (isBoundaryMarked(d))
+		boundaryMark(e);
 }
 
 inline void Map1::collapseEdge(Dart d)

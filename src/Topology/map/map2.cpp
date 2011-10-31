@@ -46,7 +46,7 @@ void Map2::mergeFacewithBoundary(Dart d)
 			Dart ee = phi_1(e);
 			if (f != ee)
 				phi1sew(f, ee) ;
-			deleteOrientedFace(e) ;
+			Map1::deleteOrientedFace(e) ;
 		}
 		e = phi1(e) ;
 	} while (e != d) ;
@@ -100,45 +100,133 @@ void Map2::linkVertices(Dart d, Dart e)
 
 void Map2::cutEdge(Dart d)
 {
-	Map1::cutEdge(d);		// Cut the edge of d
-	Dart nd = phi1(d);
+//	Map1::cutEdge(d);		// Cut the edge of d
+//	Dart nd = phi1(d);
+//	Dart e = phi2(d);
+//	if (e != d)				// Test if an opposite edge exists
+//	{
+//		Map1::cutEdge(e);	// Cut the opposite edge
+//		Dart ne = phi1(e);
+//		phi2unsew(d);		// Correct the phi2 links
+//		phi2sew(d, ne);
+//		phi2sew(e, nd);
+//	}
+
+	// TODISCUSS: it is not allowed to cut an edge of boundary
+	assert(!isBoundaryMarked(d));
+
+	Map1::cutEdge(d);		// Cut the 1-edge of d
 	Dart e = phi2(d);
-	if (e != d)				// Test if an opposite edge exists
-	{
-		Map1::cutEdge(e);	// Cut the opposite edge
-		Dart ne = phi1(e);
-		phi2unsew(d);		// Correct the phi2 links
-		phi2sew(d, ne);
-		phi2sew(e, nd);
-	}
+	Map1::cutEdge(e);		// Cut the 1-edge of phi2(d)
+
+	phi2unsew(d);			// remove old phi2 links
+
+	Dart nd = phi1(d);
+	Dart ne = phi1(e);
+
+	phi2sew(d, ne);			// Correct the phi2 links
+	phi2sew(e, nd);
+
+	if (isBoundaryMarked(e))
+		boundaryMark(ne);
+
+//	if (isBoundaryMarked(d))
+//		boundaryMark(nd);
+
 }
 
 void Map2::uncutEdge(Dart d)
 {
+//	assert(vertexDegree(phi1(d)) == 2) ;
+//	Dart ne = phi2(d) ;
+//	if(ne == d)
+//		collapseEdge(d) ;
+//	else
+//	{
+//		Dart nd = phi1(d) ;
+//		Dart e = phi_1(ne) ;
+//		phi2unsew(e) ;
+//		phi2unsew(d) ;
+//		Map1::collapseEdge(nd) ;
+//		Map1::collapseEdge(ne) ;
+//		phi2sew(d, e) ;
+//	}
+
 	assert(vertexDegree(phi1(d)) == 2) ;
 	Dart ne = phi2(d) ;
-	if(ne == d)
-		collapseEdge(d) ;
-	else
-	{
-		Dart nd = phi1(d) ;
-		Dart e = phi_1(ne) ;
-		phi2unsew(e) ;
-		phi2unsew(d) ;
-		Map1::collapseEdge(nd) ;
-		Map1::collapseEdge(ne) ;
-		phi2sew(d, e) ;
-	}
+	Dart nd = phi1(d) ;
+	Dart e = phi_1(ne) ;
+	phi2unsew(e) ;
+	phi2unsew(d) ;
+	Map1::collapseEdge(nd) ;
+	Map1::collapseEdge(ne) ;
+	phi2sew(d, e) ;
 }
+
 
 Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
-	Dart resV ;
+//	Dart resV ;
+//
+//	Dart e = phi2(d);
+//	if (e != d)			// Test if an opposite edge exists
+//	{
+//		phi2unsew(d);	// Unlink the opposite edges
+//		Dart f = phi1(e) ;
+//		Dart g = phi_1(e) ;
+//
+//		if(f != d && !isFaceTriangle(e))
+//			resV = f ;
+//		else if(phi2(g) != g)
+//			resV = phi2(g) ;
+//		else if(f != d && phi2(f) != f)
+//			resV = phi1(phi2(f)) ;
+//
+//		if (f != e && delDegenerateFaces)
+//		{
+//			Map1::collapseEdge(e) ;		// Collapse edge e
+//			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+//		}
+//		else
+//			Map1::collapseEdge(e) ;	// Just collapse edge e
+//	}
+//
+//	Dart f = phi1(d) ;
+//	Dart g = phi_1(d) ;
+//
+//	if(resV == Dart::nil())
+//	{
+//		if(!isFaceTriangle(d))
+//			resV = f ;
+//		else if(phi2(g) != g)
+//			resV = phi2(g) ;
+//		else if(phi2(f) != f)
+//			resV = phi1(phi2(f)) ;
+//	}
+//
+//	if (f != d && delDegenerateFaces)
+//	{
+//		Map1::collapseEdge(d) ;		// Collapse edge d
+//		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+//	}
+//	else
+//		Map1::collapseEdge(d) ;	// Just collapse edge d
+//
+//	return resV ;
 
+
+	Dart resV=Dart::nil() ;
 	Dart e = phi2(d);
-	if (e != d)			// Test if an opposite edge exists
+	phi2unsew(d);	// Unlink the opposite edges
+
+	if (isBoundaryMarked(e))
 	{
-		phi2unsew(d);	// Unlink the opposite edges
+		Dart f = phi1(e) ;
+		Map1::collapseEdge(e) ;		// Collapse edge e
+		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+	}
+	else
+	{
 		Dart f = phi1(e) ;
 		Dart g = phi_1(e) ;
 
@@ -184,8 +272,8 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 
 bool Map2::flipEdge(Dart d)
 {
-	Dart e = phi2(d);		// Test if an opposite
-	if (e != d)				// edge exists
+	Dart e = phi2(d);			// Test if an opposite
+	if (!isBoundaryMarked(e))	// edge exists
 	{
 		Dart dNext = phi1(d);
 		Dart eNext = phi1(e);
@@ -202,8 +290,8 @@ bool Map2::flipEdge(Dart d)
 
 bool Map2::flipBackEdge(Dart d)
 {
-	Dart e = phi2(d);		// Test if an opposite
-	if (e != d)				// edge exists
+	Dart e = phi2(d);			// Test if an opposite
+	if (!isBoundaryMarked(e))	// edge exists
 	{
 		Dart dNext = phi1(d);
 		Dart eNext = phi1(e);
@@ -234,11 +322,26 @@ void Map2::removeEdgeFromVertex(Dart d)
 
 void Map2::sewFaces(Dart d, Dart e)
 {
+	Dart dd = phi2(d);
+	Dart ee = phi2(ee);
+	// unsew from boundary
+	phi2unsew(d);
+	phi2unsew(e);
+
+	// remove boundary edge
+	if (ee != phi_1(dd))
+		phi1sew(ee, phi_1(dd)) ;
+	if (ee != phi_1(dd))
+		phi1sew(ee, phi_1(dd)) ;
+	Map1::deleteOrientedFace(d) ;
+
+	// main sewing
 	phi2sew(d, e);
 }
 
 void Map2::unsewFaces(Dart d)
 {
+	// TODO
 	phi2unsew(d);
 }
 
@@ -268,7 +371,7 @@ void Map2::splitFace(Dart d, Dart e)
 bool Map2::mergeFaces(Dart d)
 {
 	Dart e = phi2(d) ;
-	if(e != d)
+	if (!isBoundaryMarked(e))
 	{
 		phi2unsew(d);			// unsew the face of d
 		Map1::mergeFaces(d, e); // merge the two faces along edges of d and e
@@ -281,7 +384,7 @@ void Map2::extractTrianglePair(Dart d)
 {
 	assert(isFaceTriangle(d)) ;
 	Dart e = phi2(d) ;
-	if(e != d)
+	if (!isBoundaryMarked(e))
 	{
 		assert(isFaceTriangle(e)) ;
 		Dart e1 = phi2(phi1(e)) ;
@@ -300,12 +403,12 @@ void Map2::extractTrianglePair(Dart d)
 void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 {
 	assert(sameOrientedVertex(v1, v2)) ;
-	assert((v1 != v2 && phi2(d) != d) || (v1 == v2 && phi2(d) == d)) ;
-	assert(isFaceTriangle(d) && phi2(phi1(d)) == phi1(d) && phi2(phi_1(d)) == phi_1(d)) ;
+	assert((v1 != v2 && !isBoundaryMarked(d)) || (v1 == v2 && isBoundaryMarked(d))) ;
+	assert(isFaceTriangle(d) && isBoundaryMarked(phi1(d)) && isBoundaryMarked(phi_1(d)) ) ;
 	Dart e = phi2(d) ;
-	if(e != d && v1 != v2)
+	if( !isBoundaryMarked(e) && v1 != v2)
 	{
-		assert(isFaceTriangle(e) && phi2(phi1(e)) == phi1(e) && phi2(phi_1(e)) == phi_1(e)) ;
+		assert( isFaceTriangle(e) && isBoundaryMarked(phi1(e)) && isBoundaryMarked(phi_1(e)) ) ;
 		Dart vv2 = phi2(v2) ;
 		phi2unsew(v2) ;
 		phi2sew(phi_1(e), v2) ;
@@ -506,27 +609,47 @@ unsigned int Map2::volumeDegree(Dart d)
 
 bool Map2::isBoundaryVertex(Dart d)
 {
+//	Dart dNext = d ;
+//	do
+//	{
+//		if(phi2(dNext) == dNext)
+//			return true ;
+//		dNext = alpha1(dNext) ;
+//	} while (dNext != d) ;
+//	return false ;
+
 	Dart dNext = d ;
 	do
 	{
-		if(phi2(dNext) == dNext)
+		if (isBoundaryMarked(phi2(dNext)))
 			return true ;
 		dNext = alpha1(dNext) ;
 	} while (dNext != d) ;
 	return false ;
+
 }
 
 Dart Map2::nextOnBoundary(Dart d)
 {
-	assert(phi2(d) == d);	// Only work on boundary dart
+//	assert(phi2(d) == d);	// Only work on boundary dart
+//	Dart dPhi1;
+//	Dart dNext = d;
+//	do
+//	{						// Loop inside the vertex
+//		dPhi1 = phi1(dNext);
+//		dNext = phi2(dPhi1);
+//	} while (dNext != dPhi1);
+//	return dNext;
+
+	assert( isBoundaryMarked(phi2(d)) );	// Only work on boundary dart
 	Dart dPhi1;
 	Dart dNext = d;
 	do
 	{						// Loop inside the vertex
 		dPhi1 = phi1(dNext);
 		dNext = phi2(dPhi1);
-	} while (dNext != dPhi1);
-	return dNext;
+	} while (! isBoundaryMarked(dNext));
+	return dPhi1;
 }
 
 bool Map2::isTriangular()
