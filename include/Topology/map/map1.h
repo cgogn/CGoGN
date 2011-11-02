@@ -114,6 +114,12 @@ public:
 	 */
 	Dart newFace(unsigned int nbEdges) ;
 
+	//! Create an new face for boundary (marked)
+	/*! @param nbEdges the number of edges
+	 *  @return return a dart of the face
+	 */
+	Dart newBoundaryFace(unsigned nbEdges);
+
 	//! Delete an oriented face erasing all its darts
 	/*! @param d a dart of the face
 	 */

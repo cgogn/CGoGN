@@ -95,13 +95,15 @@ protected:
 	 */
 	void phi2unsew(Dart d);
 
-
 	//! merge a face that has been tag as boundary with existing boundary if needed
 	/*  @param d a dart of the face
 	 */
 	void mergeFacewithBoundary(Dart d);
 
-
+	/**
+	 * merge two faces of boundary
+	 */
+	void mergeBoundaryFaces(Dart dd, Dart ee);
 
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
@@ -256,7 +258,7 @@ public:
 	 * create a symetric to construct a polyedron
 	 * @param d a dart from the vertex
 	 */
-	void explodPolyhedron(Dart d);
+//	void explodPolyhedron(Dart d);	//TODO modification for new boundary managing method ???
 
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
@@ -328,6 +330,17 @@ public:
 	 */
 	bool isBoundaryVertex(Dart d) ;
 
+	/**
+	 * find the dart of vertex that belong to the boundary
+	 */
+	Dart findBoundaryVertex(Dart d);
+
+	/**
+	 * tell if the vertex of d is on the boundary of the map
+	 */
+	bool isBoundaryEdge(Dart d) ;		// OK boundary
+
+
 	//! Follow the boundary of a surface as if it was a oriented face.
 	/*! This operation alternate phi1 and phi2 operator until another
 	 *  boudary dart is reached.
@@ -395,6 +408,31 @@ public:
 	 */
 	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 
+	//@}
+
+	//@{
+	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NO USE, only for import algorithm
+	/*! \pre dart d MUST be fixed point of phi2 relation
+	 *  Add a face to the map that closes the hole.
+	 *  The darts of this face are marked with holeMarker.
+	 *  @param d a dart of the hole (with phi2(d)==d)
+	 *  @return the degree of the created face
+	 */
+	virtual unsigned int closeHole(Dart d);
+
+
+	//! Close the map removing topological holes: DO NO USE, only for import algorithm
+	/*! Add faces to the map that close every existing hole.
+	 *  These faces are marked.
+	 *  \warning The embeddings of vertices are not updated
+	 */
+	void closeMap();
+//	void closeMap(DartMarker& marker);
+
+	/**
+	 * sew oriented face, DO NO USE, only for import algorithm
+	 */
+	void sewOrientedFaces(Dart d, Dart e);
 	//@}
 };
 
