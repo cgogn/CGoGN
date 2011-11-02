@@ -40,6 +40,17 @@ Dart Map1::newOrientedFace(unsigned nbEdges)
 	return d ;
 }
 
+Dart Map1::newBoundaryFace(unsigned nbEdges)
+{
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+	Dart d = newDart() ;			// Create the first edge
+	boundaryMark(d);
+	for (unsigned int i = 1 ; i < nbEdges ; ++i)
+		Map1::cutEdge(d) ;				// Subdivide nbEdges-1 times this edge
+	return d ;
+}
+
+
 void Map1::deleteOrientedFace(Dart d)
 {
 	Dart e = phi1(d) ;

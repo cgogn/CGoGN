@@ -31,6 +31,15 @@ namespace CGoGN
  *  To generate or delete faces in a 2-map
  *************************************************************************/
 
+void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
+{
+	if (ee != phi_1(dd))
+		phi1sew(ee, phi_1(dd)) ;
+	if (ee != phi_1(dd))
+		phi1sew(ee, phi_1(dd)) ;
+	Map1::deleteOrientedFace(dd) ;
+}
+
 void Map2::mergeFacewithBoundary(Dart d)
 {
 	Dart e = d ;
@@ -59,6 +68,14 @@ void Map2::deleteOrientedFace(Dart d)
 	boundaryMarkOrbit(FACE,d);
 	mergeFacewithBoundary(d);
 
+}
+
+
+void Map2::sewOrientedFaces(Dart d, Dart e)
+{
+	assert(phi2(d)==d && phi2(e)==e);
+	// sewing the faces
+	phi2sew(d, e);
 }
 
 /*! @name Topological Operators
@@ -112,9 +129,6 @@ void Map2::cutEdge(Dart d)
 //		phi2sew(e, nd);
 //	}
 
-	// TODISCUSS: it is not allowed to cut an edge of boundary
-	assert(!isBoundaryMarked(d));
-
 	Map1::cutEdge(d);		// Cut the 1-edge of d
 	Dart e = phi2(d);
 	Map1::cutEdge(e);		// Cut the 1-edge of phi2(d)
@@ -126,12 +140,6 @@ void Map2::cutEdge(Dart d)
 
 	phi2sew(d, ne);			// Correct the phi2 links
 	phi2sew(e, nd);
-
-	if (isBoundaryMarked(e))
-		boundaryMark(ne);
-
-//	if (isBoundaryMarked(d))
-//		boundaryMark(nd);
 
 }
 
@@ -214,8 +222,8 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 //
 //	return resV ;
 
-
 	Dart resV=Dart::nil() ;
+
 	Dart e = phi2(d);
 	phi2unsew(d);	// Unlink the opposite edges
 
@@ -223,7 +231,8 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	{
 		Dart f = phi1(e) ;
 		Map1::collapseEdge(e) ;		// Collapse edge e
-		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+		if (f!=e)
+			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
 	{
@@ -246,35 +255,47 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 			Map1::collapseEdge(e) ;	// Just collapse edge e
 	}
 
-	Dart f = phi1(d) ;
-	Dart g = phi_1(d) ;
 
-	if(resV == Dart::nil())
-	{
-		if(!isFaceTriangle(d))
-			resV = f ;
-		else if(phi2(g) != g)
-			resV = phi2(g) ;
-		else if(phi2(f) != f)
-			resV = phi1(phi2(f)) ;
-	}
 
-	if (f != d && delDegenerateFaces)
+	if (isBoundaryMarked(d))
 	{
+		Dart f = phi1(d) ;
 		Map1::collapseEdge(d) ;		// Collapse edge d
-		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+		if (f!=d)
+			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
-		Map1::collapseEdge(d) ;	// Just collapse edge d
+	{
+		Dart f = phi1(d) ;
+		Dart g = phi_1(d) ;
+
+		if(resV == Dart::nil())
+		{
+			if(f != e && !isFaceTriangle(d))
+				resV = f ;
+			else if(phi2(g) != g)
+				resV = phi2(g) ;
+			else if(f != e && phi2(f) != f)
+				resV = phi1(phi2(f)) ;
+		}
+
+		if (f != d && delDegenerateFaces)
+		{
+			Map1::collapseEdge(d) ;		// Collapse edge d
+			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+		}
+		else
+			Map1::collapseEdge(d) ;	// Just collapse edge d
+	}
 
 	return resV ;
 }
 
 bool Map2::flipEdge(Dart d)
 {
-	Dart e = phi2(d);			// Test if an opposite
-	if (!isBoundaryMarked(e))	// edge exists
+	if (!isBoundaryEdge(d))
 	{
+		Dart e = phi2(d);
 		Dart dNext = phi1(d);
 		Dart eNext = phi1(e);
 		Dart dPrev = phi_1(d);
@@ -290,9 +311,9 @@ bool Map2::flipEdge(Dart d)
 
 bool Map2::flipBackEdge(Dart d)
 {
-	Dart e = phi2(d);			// Test if an opposite
-	if (!isBoundaryMarked(e))	// edge exists
+	if (!isBoundaryEdge(d))
 	{
+		Dart e = phi2(d);
 		Dart dNext = phi1(d);
 		Dart eNext = phi1(e);
 		Dart dPrev = phi_1(d);
@@ -323,27 +344,44 @@ void Map2::removeEdgeFromVertex(Dart d)
 void Map2::sewFaces(Dart d, Dart e)
 {
 	Dart dd = phi2(d);
-	Dart ee = phi2(ee);
+	Dart ee = phi2(e);
 	// unsew from boundary
 	phi2unsew(d);
 	phi2unsew(e);
 
-	// remove boundary edge
-	if (ee != phi_1(dd))
-		phi1sew(ee, phi_1(dd)) ;
-	if (ee != phi_1(dd))
-		phi1sew(ee, phi_1(dd)) ;
-	Map1::deleteOrientedFace(d) ;
+	// remove boundary edge (could be a Map1::mergeFaces without assert ?)
+	mergeBoundaryFaces(dd,ee);
 
-	// main sewing
+	// sewing the faces
 	phi2sew(d, e);
 }
 
 void Map2::unsewFaces(Dart d)
 {
-	// TODO
+	Dart dd = phi2(d);
+
+
+	Dart e = newBoundaryFace(2);
+
+	if (isBoundaryVertex(d))
+	{
+		Dart f = findBoundaryVertex(d);
+		phi1sew(e,phi_1(f));
+	}
+
+	if (isBoundaryVertex(dd))
+	{
+		Dart f = findBoundaryVertex(dd);
+		phi1sew(phi_1(e),phi_1(f));
+	}
+
 	phi2unsew(d);
+	// sew faces to the boundary
+	phi2sew(d,e);
+	phi2sew(dd,phi1(e));
+
 }
+
 
 bool Map2::collapseDegeneratedFace(Dart d)
 {
@@ -370,9 +408,9 @@ void Map2::splitFace(Dart d, Dart e)
 
 bool Map2::mergeFaces(Dart d)
 {
-	Dart e = phi2(d) ;
-	if (!isBoundaryMarked(e))
+	if (!isBoundaryEdge(d))
 	{
+		Dart e = phi2(d) ;
 		phi2unsew(d);			// unsew the face of d
 		Map1::mergeFaces(d, e); // merge the two faces along edges of d and e
 		return true ;
@@ -382,7 +420,33 @@ bool Map2::mergeFaces(Dart d)
 
 void Map2::extractTrianglePair(Dart d)
 {
-	assert(isFaceTriangle(d)) ;
+//	assert(isFaceTriangle(d)) ;
+//	Dart e = phi2(d) ;
+//	if(e != d)
+//	{
+//		assert(isFaceTriangle(e)) ;
+//		Dart e1 = phi2(phi1(e)) ;
+//		Dart e2 = phi2(phi_1(e)) ;
+//		phi2unsew(e1) ;
+//		phi2unsew(e2) ;
+//		phi2sew(e1, e2) ;
+//	}
+//	Dart d1 = phi2(phi1(d)) ;
+//	Dart d2 = phi2(phi_1(d)) ;
+//	phi2unsew(d1) ;
+//	phi2unsew(d2) ;
+//	phi2sew(d1, d2) ;
+
+	if (!isBoundaryMarked(d))
+	{
+		assert(isFaceTriangle(d)) ;
+		Dart d1 = phi2(phi1(d)) ;
+		Dart d2 = phi2(phi_1(d)) ;
+		phi2unsew(d1) ;
+		phi2unsew(d2) ;
+		phi2sew(d1, d2) ;
+	}
+
 	Dart e = phi2(d) ;
 	if (!isBoundaryMarked(e))
 	{
@@ -393,20 +457,34 @@ void Map2::extractTrianglePair(Dart d)
 		phi2unsew(e2) ;
 		phi2sew(e1, e2) ;
 	}
-	Dart d1 = phi2(phi1(d)) ;
-	Dart d2 = phi2(phi_1(d)) ;
-	phi2unsew(d1) ;
-	phi2unsew(d2) ;
-	phi2sew(d1, d2) ;
+
 }
 
 void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 {
+//	assert(sameOrientedVertex(v1, v2)) ;
+//	assert((v1 != v2 && phi2(d) != d) || (v1 == v2 && phi2(d) == d)) ;
+//	assert(isFaceTriangle(d) && phi2(phi1(d)) == phi1(d) && phi2(phi_1(d)) == phi_1(d)) ;
+//	Dart e = phi2(d) ;
+//	if(e != d && v1 != v2)
+//	{
+//		assert(isFaceTriangle(e) && phi2(phi1(e)) == phi1(e) && phi2(phi_1(e)) == phi_1(e)) ;
+//		Dart vv2 = phi2(v2) ;
+//		phi2unsew(v2) ;
+//		phi2sew(phi_1(e), v2) ;
+//		phi2sew(phi1(e), vv2) ;
+//	}
+//	Dart vv1 = phi2(v1) ;
+//	phi2unsew(v1) ;
+//	phi2sew(phi_1(d), v1) ;
+//	phi2sew(phi1(d), vv1) ;
+
+
 	assert(sameOrientedVertex(v1, v2)) ;
 	assert((v1 != v2 && !isBoundaryMarked(d)) || (v1 == v2 && isBoundaryMarked(d))) ;
 	assert(isFaceTriangle(d) && isBoundaryMarked(phi1(d)) && isBoundaryMarked(phi_1(d)) ) ;
 	Dart e = phi2(d) ;
-	if( !isBoundaryMarked(e) && v1 != v2)
+	if (!isBoundaryEdge(d) && v1 != v2)
 	{
 		assert( isFaceTriangle(e) && isBoundaryMarked(phi1(e)) && isBoundaryMarked(phi_1(e)) ) ;
 		Dart vv2 = phi2(v2) ;
@@ -440,24 +518,68 @@ void Map2::unsewAroundVertex(Dart d)
 	while(e != d);
 }
 
-void Map2::explodPolyhedron(Dart d)
-{
-	unsewAroundVertex(d);
-	closeHole(phi1(d));
-
-	//Recherche du (ou un des) sommet oppose
-		//tourner autour du sommet
-			//si quad  alors sommet oppose
-			//
-		//si pas de quad alors un sommet du trian
-
-	//
-}
+//void Map2::explodPolyhedron(Dart d)
+//{
+//	unsewAroundVertex(d);
+////	closeHole(phi1(d));
+//
+//	//Recherche du (ou un des) sommet oppose
+//		//tourner autour du sommet
+//			//si quad  alors sommet oppose
+//			//
+//		//si pas de quad alors un sommet du trian
+//
+//	//
+//}
 
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
+//	// First traversal of both faces to check the face sizes
+//	// and stored their edges to efficiently access them further
+//	std::vector<Dart> dDarts;
+//	std::vector<Dart> eDarts;
+//	dDarts.reserve(16);		// usual faces have less than 16 edges
+//	eDarts.reserve(16);
+//
+//	Dart dFit = d ;
+//	Dart eFit = phi1(e) ;	// must take phi1 because of the use
+//	do						// of reverse iterator for sewing loop
+//	{
+//		dDarts.push_back(dFit) ;
+//		dFit = phi1(dFit) ;
+//	} while(dFit != d) ;
+//	do
+//	{
+//		eDarts.push_back(eFit) ;
+//		eFit = phi1(eFit) ;
+//	} while(eFit != phi1(e)) ;
+//
+//	if(dDarts.size() != eDarts.size())
+//		return false ;
+//
+//	// Make the sewing: take darts in initial order (clockwise) in first face
+//	// and take darts in reverse order (counter-clockwise) in the second face
+//	std::vector<Dart>::iterator dIt;
+//	std::vector<Dart>::reverse_iterator eIt;
+//	for (dIt = dDarts.begin(), eIt = eDarts.rbegin(); dIt != dDarts.end(); ++dIt, ++eIt)
+//	{
+//		Dart d2 = phi2(*dIt);			// Search the faces adjacent to dNext and eNext
+//		Dart e2 = phi2(*eIt);
+//		if (d2 != *dIt) phi2unsew(d2);	// Unlink the two adjacent faces from dNext and eNext
+//		if (e2 != *eIt) phi2unsew(e2);
+//		if (d2 != *dIt && e2 != *eIt) phi2sew(d2,e2); // Link the two adjacent faces together if they exists
+//	}
+//	Map1::deleteOrientedFace(d);	// Delete the two alone faces
+//	Map1::deleteOrientedFace(e);
+//
+//	return true ;
+
+	if (isBoundaryMarked(d) || isBoundaryMarked(e))
+		return false;
+
 	// First traversal of both faces to check the face sizes
 	// and stored their edges to efficiently access them further
+
 	std::vector<Dart> dDarts;
 	std::vector<Dart> eDarts;
 	dDarts.reserve(16);		// usual faces have less than 16 edges
@@ -487,9 +609,11 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	{
 		Dart d2 = phi2(*dIt);			// Search the faces adjacent to dNext and eNext
 		Dart e2 = phi2(*eIt);
-		if (d2 != *dIt) phi2unsew(d2);	// Unlink the two adjacent faces from dNext and eNext
-		if (e2 != *eIt) phi2unsew(e2);
-		if (d2 != *dIt && e2 != *eIt) phi2sew(d2,e2); // Link the two adjacent faces together if they exists
+		phi2unsew(d2);	// Unlink the two adjacent faces from dNext and eNext
+		phi2unsew(e2);
+		phi2sew(d2,e2); // Link the two adjacent faces together
+		if (isBoundaryMarked(d2) && isBoundaryMarked(e2))
+			mergeBoundaryFaces(d2,e2);
 	}
 	Map1::deleteOrientedFace(d);	// Delete the two alone faces
 	Map1::deleteOrientedFace(e);
@@ -534,15 +658,26 @@ unsigned int Map2::closeHole(Dart d)
 	return countEdges ;
 }
 
-void Map2::closeMap(DartMarker& marker)
-{
-	// Search the map for topological holes (fixed point for phi2)
+//void Map2::closeMap(DartMarker& marker)
+//{
+//	// Search the map for topological holes (fixed point for phi2)
+//	for (Dart d = begin(); d != end(); next(d))
+//	{
+//		if (phi2(d) == d)
+//		{
+//			closeHole(d);
+//			marker.markOrbit(FACE, phi2(d)) ;
+//		}
+//	}
+//
+void Map2::closeMap()
+{	// Search the map for topological holes (fixed point for phi2)
 	for (Dart d = begin(); d != end(); next(d))
 	{
 		if (phi2(d) == d)
 		{
 			closeHole(d);
-			marker.markOrbit(FACE, phi2(d)) ;
+			boundaryMarkOrbit(FACE,phi2(d));
 		}
 	}
 }
@@ -579,6 +714,36 @@ unsigned int Map2::vertexDegree(Dart d)
 
 unsigned int Map2::volumeDegree(Dart d)
 {
+//	unsigned int count = 0;
+//	DartMarkerStore mark(*this);		// Lock a marker
+//
+//	std::vector<Dart> visitedFaces;		// Faces that are traversed
+//	visitedFaces.reserve(16);
+//	visitedFaces.push_back(d);			// Start with the face of d
+//	std::vector<Dart>::iterator face;
+//
+//	// For every face added to the list
+//	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+//	{
+//		if (!mark.isMarked(*face))		// Face has not been visited yet
+//		{
+//			++count;
+//
+//			Dart dNext = *face ;
+//			do
+//			{
+//				mark.mark(dNext);					// Mark
+//				Dart adj = phi2(dNext);				// Get adjacent face
+//				if (adj != dNext && !mark.isMarked(adj))
+//					visitedFaces.push_back(adj);	// Add it
+//				dNext = phi1(dNext);
+//			} while(dNext != *face);
+//		}
+//	}
+//
+//	return count;
+
+
 	unsigned int count = 0;
 	DartMarkerStore mark(*this);		// Lock a marker
 
@@ -588,25 +753,27 @@ unsigned int Map2::volumeDegree(Dart d)
 	std::vector<Dart>::iterator face;
 
 	// For every face added to the list
-	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for (unsigned int i=0; i != visitedFaces.size(); ++i)
 	{
-		if (!mark.isMarked(*face))		// Face has not been visited yet
+		Dart df = visitedFaces[i];
+		if (!isBoundaryMarked(df) && !mark.isMarked(df))		// Face has not been visited yet
 		{
 			++count;
 
-			Dart dNext = *face ;
+			Dart dNext = df ;
 			do
 			{
 				mark.mark(dNext);					// Mark
 				Dart adj = phi2(dNext);				// Get adjacent face
-				if (adj != dNext && !mark.isMarked(adj))
+				if ( !isBoundaryMarked(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);	// Add it
 				dNext = phi1(dNext);
-			} while(dNext != *face);
+			} while(dNext != df);
 		}
 	}
 
 	return count;
+
 }
 
 bool Map2::isBoundaryVertex(Dart d)
@@ -623,13 +790,32 @@ bool Map2::isBoundaryVertex(Dart d)
 	Dart dNext = d ;
 	do
 	{
-		if (isBoundaryMarked(phi2(dNext)))
+		if (isBoundaryMarked(dNext))
 			return true ;
 		dNext = alpha1(dNext) ;
 	} while (dNext != d) ;
 	return false ;
-
 }
+
+Dart Map2::findBoundaryVertex(Dart d)
+{
+	Dart dNext = d ;
+	do
+	{
+		if (isBoundaryMarked(dNext))
+			return dNext ;
+		dNext = alpha1(dNext) ;
+	} while (dNext != d) ;
+	return Dart::nil();
+}
+
+
+bool Map2::isBoundaryEdge(Dart d)
+{
+	Dart e = phi2(d);
+	return  isBoundaryMarked(e) || isBoundaryMarked(d);
+}
+
 
 Dart Map2::nextOnBoundary(Dart d)
 {
@@ -662,11 +848,15 @@ bool Map2::isTriangular()
 		if(!m.isMarked(d))
 		{
 			m.markOrbit(FACE, d) ;
-			Dart dd = d ;
-			bool t = isFaceTriangle(d) ;
-			if(!t)
+			Dart dd = d ; // ???
+
+			if (!isBoundaryMarked(d))
 			{
-				return false ;
+				bool t = isFaceTriangle(d) ;
+				if(!t)
+				{
+					return false ;
+				}
 			}
 		}
 	}
@@ -733,18 +923,23 @@ bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 		dNext = alpha1(dNext);
  	} while (dNext != d);
  	return false;
+
 }
 
 bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
 {
+//	if (fonct(d))
+//		return true;
+//
+//	Dart d2 = phi2(d);
+//	if (d2 != d)
+//		return fonct(d2);
+//	else
+//		return false;
+
 	if (fonct(d))
 		return true;
-
-	Dart d2 = phi2(d);
-	if (d2 != d)
-		return fonct(d2);
-	else
-		return false;
+	return fonct(phi2(d));
 }
 
 bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
