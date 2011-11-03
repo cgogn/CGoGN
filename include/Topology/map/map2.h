@@ -130,31 +130,32 @@ public:
 	 *  @param d first dart in vertex v
 	 *  @param e second dart in vertex v
 	 */
-	virtual void splitVertex(Dart d, Dart e);
+	virtual void splitVertex(Dart d, Dart e); // OK boundary
 
 	//! Delete the vertex of d (works only for internal vertices)
 	/*! All the faces around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d) ;
+	virtual bool deleteVertex(Dart d) ;	// OK boundary
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	virtual void linkVertices(Dart d, Dart e);
+	virtual void linkVertices(Dart d, Dart e);	//TODO removing ??
 
-	//! Cut the edge of d and its opposite edge if it exists
+	//! Cut the edge of d
 	/*! @param d a dart of the edge to cut
 	 */
-	virtual void cutEdge(Dart d);
+	virtual void cutEdge(Dart d);// OK boundary
 
-	//! Undo the cut of the edge of d and its opposite edge if it exists
+	//! Undo the cut of the edge of d
 	/*! @param d a dart of the edge to uncut
+	 * @return true if the uncut has been executed, false otherwise
 	 */
-	virtual void uncutEdge(Dart d);
+	virtual bool uncutEdge(Dart d);// OK boundary
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -336,9 +337,14 @@ public:
 	Dart findBoundaryVertex(Dart d);
 
 	/**
-	 * tell if the vertex of d is on the boundary of the map
+	 * tell if the edge of d is on the boundary of the map
 	 */
 	bool isBoundaryEdge(Dart d) ;		// OK boundary
+
+	/**
+	 * tell if the face of d is on the boundary of the map
+	 */
+	bool isBoundaryFace(Dart d) ;
 
 
 	//! Follow the boundary of a surface as if it was a oriented face.

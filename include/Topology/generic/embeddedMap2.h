@@ -32,13 +32,14 @@ namespace CGoGN
 
 /**
 * Class of 2-dimensional maps
-* with lazily managed embeddings
+* with managed embeddings
 */
 template <typename MAP2>
 class EmbeddedMap2 : public MAP2
 {
 public:
 	typedef MAP2 TOPO_MAP;
+
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 * No attribute is attached to the new edge
@@ -65,7 +66,7 @@ public:
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual void uncutEdge(Dart d) ;
+	virtual bool uncutEdge(Dart d) ;
 
 	/**
 	 * Check if the edge of d can be collapsed or not based on some topological conditions

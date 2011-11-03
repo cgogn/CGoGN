@@ -102,23 +102,20 @@ void EmbeddedMap2<MAP2>::cutEdge(Dart d)
 	{
 		MAP2::copyDartEmbedding(FACE, MAP2::phi1(d), d) ;
 		Dart e = MAP2::phi2(nd) ;
-		if(e != nd)
-			MAP2::copyDartEmbedding(FACE, MAP2::phi1(e), e) ;
+		MAP2::copyDartEmbedding(FACE, MAP2::phi1(e), e) ;
 	}
 }
 
 template <typename MAP2>
-void EmbeddedMap2<MAP2>::uncutEdge(Dart d)
+bool EmbeddedMap2<MAP2>::uncutEdge(Dart d)
 {
-	bool doSomethg = (d != MAP2::phi2(d)) ;
-
-	MAP2::uncutEdge(d) ;
-
-	if(doSomethg)
+	if(MAP2::uncutEdge(d))
 	{
 		if(MAP2::isOrbitEmbedded(EDGE))
 			MAP2::copyDartEmbedding(EDGE, MAP2::phi2(d), d) ;
+		return true ;
 	}
+	return false ;
 }
 
 template <typename MAP2>

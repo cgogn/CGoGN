@@ -138,10 +138,9 @@ void Map2::cutEdge(Dart d)
 
 	phi2sew(d, ne);			// Correct the phi2 links
 	phi2sew(e, nd);
-
 }
 
-void Map2::uncutEdge(Dart d)
+bool Map2::uncutEdge(Dart d)
 {
 //	assert(vertexDegree(phi1(d)) == 2) ;
 //	Dart ne = phi2(d) ;
@@ -158,15 +157,19 @@ void Map2::uncutEdge(Dart d)
 //		phi2sew(d, e) ;
 //	}
 
-	assert(vertexDegree(phi1(d)) == 2) ;
-	Dart ne = phi2(d) ;
-	Dart nd = phi1(d) ;
-	Dart e = phi_1(ne) ;
-	phi2unsew(e) ;
-	phi2unsew(d) ;
-	Map1::collapseEdge(nd) ;
-	Map1::collapseEdge(ne) ;
-	phi2sew(d, e) ;
+	if(vertexDegree(phi1(d)) == 2)
+	{
+		Dart ne = phi2(d) ;
+		Dart nd = phi1(d) ;
+		Dart e = phi_1(ne) ;
+		phi2unsew(e) ;
+		phi2unsew(d) ;
+		Map1::collapseEdge(nd) ;
+		Map1::collapseEdge(ne) ;
+		phi2sew(d, e) ;
+		return true ;
+	}
+	return false ;
 }
 
 Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
@@ -219,7 +222,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 //
 //	return resV ;
 
-	Dart resV=Dart::nil() ;
+	Dart resV = NIL ;
 
 	Dart e = phi2(d);
 	phi2unsew(d);	// Unlink the opposite edges
@@ -228,7 +231,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	{
 		Dart f = phi1(e) ;
 		Map1::collapseEdge(e) ;		// Collapse edge e
-		if (f!=e)
+		if (f != e)
 			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
@@ -256,7 +259,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	{
 		Dart f = phi1(d) ;
 		Map1::collapseEdge(d) ;		// Collapse edge d
-		if (f!=d)
+		if (f != d)
 			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
@@ -264,7 +267,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 		Dart f = phi1(d) ;
 		Dart g = phi_1(d) ;
 
-		if(resV == Dart::nil())
+		if(resV == NIL)
 		{
 			if(f != e && !isFaceTriangle(d))
 				resV = f ;
@@ -309,8 +312,6 @@ bool Map2::flipBackEdge(Dart d)
 	if (!isBoundaryEdge(d))
 	{
 		Dart e = phi2(d);
-		Dart dNext = phi1(d);
-		Dart eNext = phi1(e);
 		Dart dPrev = phi_1(d);
 		Dart ePrev = phi_1(e);
 		phi1sew(d, ePrev);			// Detach the two
@@ -324,14 +325,14 @@ bool Map2::flipBackEdge(Dart d)
 
 void Map2::insertEdgeInVertex(Dart d, Dart e)
 {
-	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+	assert(!sameVertex(d,e) && phi2(e) == phi_1(e));
 
 	phi1sew(phi_1(d),phi_1(e));
 }
 
 void Map2::removeEdgeFromVertex(Dart d)
 {
-	assert(phi2(d)!=d);
+	assert(phi2(d) != d);
 
 	phi1sew(phi_1(d),phi2(d));
 }
@@ -373,12 +374,11 @@ void Map2::unsewFaces(Dart d)
 	// sew faces to the boundary
 	phi2sew(d,e);
 	phi2sew(dd,phi1(e));
-
 }
 
 bool Map2::collapseDegeneratedFace(Dart d)
 {
-	Dart e = phi1(d);				// Check if the face is a loop
+	Dart e = phi1(d);				// Check if the face is degenerated
 	if (phi1(e) == d)				// Yes: it contains one or two edge(s)
 	{
 		Dart d2 = phi2(d);			// Check opposite edges
@@ -783,15 +783,6 @@ unsigned int Map2::volumeDegree(Dart d)
 
 bool Map2::isBoundaryVertex(Dart d)
 {
-//	Dart dNext = d ;
-//	do
-//	{
-//		if(phi2(dNext) == dNext)
-//			return true ;
-//		dNext = alpha1(dNext) ;
-//	} while (dNext != d) ;
-//	return false ;
-
 	Dart dNext = d ;
 	do
 	{
@@ -814,13 +805,23 @@ Dart Map2::findBoundaryVertex(Dart d)
 	return Dart::nil();
 }
 
-
 bool Map2::isBoundaryEdge(Dart d)
 {
 	Dart e = phi2(d);
-	return  isBoundaryMarked(e) || isBoundaryMarked(d);
+	return isBoundaryMarked(e) || isBoundaryMarked(d);
 }
 
+bool Map2::isBoundaryFace(Dart d)
+{
+	Dart it = d ;
+	do
+	{
+		if (isBoundaryMarked(phi2(it)))
+			return true ;
+		it = phi1(it) ;
+	} while (it != d) ;
+	return false ;
+}
 
 Dart Map2::nextOnBoundary(Dart d)
 {
@@ -853,15 +854,10 @@ bool Map2::isTriangular()
 		if(!m.isMarked(d))
 		{
 			m.markOrbit(FACE, d) ;
-			Dart dd = d ; // ???
-
 			if (!isBoundaryMarked(d))
 			{
-				bool t = isFaceTriangle(d) ;
-				if(!t)
-				{
+				if(!isFaceTriangle(d))
 					return false ;
-				}
 			}
 		}
 	}
@@ -878,6 +874,11 @@ bool Map2::check()
 		if (phi2(d2) != d)	// phi2 involution ?
 		{
 			CGoGNout << "Check: phi2 is not an involution" << CGoGNendl;
+			return false;
+		}
+		if(d2 == d)
+		{
+			CGoGNout << "Check: phi2 fixed point" << CGoGNendl;
 			return false;
 		}
 
