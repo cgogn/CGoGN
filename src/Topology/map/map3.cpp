@@ -178,29 +178,33 @@ void Map3::cutEdge(Dart d)
 	}
 }
 
-void Map3::uncutEdge(Dart d)
+bool Map3::uncutEdge(Dart d)
 {
-	if(phi3(d) == d)
-		d = phi_1(phi2(d));
-
-	Dart prev = d;
-	Dart dd = alpha2(d);
-
-	Map2::uncutEdge(prev);
-
-	if(phi3(dd) != dd)
-		phi3sew(dd,phi2(prev));
-
-	while (dd!=d)
+	if(vertexDegree(phi1(d)) == 2)
 	{
-		prev = dd;
-		dd = alpha2(dd);
+		if(phi3(d) == d)
+			d = phi_1(phi2(d));
+
+		Dart prev = d;
+		Dart dd = alpha2(d);
 
 		Map2::uncutEdge(prev);
 
-		phi3sew(dd, phi2(prev));
-	}
+		if(phi3(dd) != dd)
+			phi3sew(dd,phi2(prev));
 
+		while (dd!=d)
+		{
+			prev = dd;
+			dd = alpha2(dd);
+
+			Map2::uncutEdge(prev);
+
+			phi3sew(dd, phi2(prev));
+		}
+		return true;
+	}
+	return false;
 }
 
 bool Map3::deleteVertex(Dart d)

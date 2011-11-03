@@ -95,7 +95,6 @@ protected:
 	 */
 	void phi2unsew(Dart d);
 
-
 	//! merge a face that has been tag as boundary with existing boundary if needed
 	/*  @param d a dart of the face
 	 */
@@ -105,8 +104,6 @@ protected:
 	 * merge two faces of boundary
 	 */
 	void mergeBoundaryFaces(Dart dd, Dart ee);
-
-
 
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
@@ -123,8 +120,6 @@ public:
 	virtual void deleteFace(Dart d) ;
 	//@}
 
-
-
 	/*! @name Topological Operators
 	 *  Topological operations on 2-maps
 	 *************************************************************************/
@@ -137,14 +132,12 @@ public:
 	 */
 	virtual void splitVertex(Dart d, Dart e); // OK boundary
 
-
 	//! Delete the vertex of d (works only for internal vertices)
 	/*! All the faces around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
 	virtual bool deleteVertex(Dart d) ;	// OK boundary
-
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
@@ -153,18 +146,16 @@ public:
 	 */
 	virtual void linkVertices(Dart d, Dart e);	//TODO removing ??
 
-
-	//! Cut the edge of d and its opposite edge if it exists
+	//! Cut the edge of d
 	/*! @param d a dart of the edge to cut
 	 */
 	virtual void cutEdge(Dart d);// OK boundary
 
-
-	//! Undo the cut of the edge of d and its opposite edge if it exists
+	//! Undo the cut of the edge of d
 	/*! @param d a dart of the edge to uncut
+	 * @return true if the uncut has been executed, false otherwise
 	 */
-	virtual void uncutEdge(Dart d);// OK boundary
-
+	virtual bool uncutEdge(Dart d);// OK boundary
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -177,7 +168,6 @@ public:
 	 *  @return a dart of the resulting vertex
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);	//TODO close degenerated boundary ???
-
 
 	/**
 	 * Flip the edge of d (rotation in phi1 order)
@@ -332,9 +322,14 @@ public:
 	Dart findBoundaryVertex(Dart d);
 
 	/**
-	 * tell if the vertex of d is on the boundary of the map
+	 * tell if the edge of d is on the boundary of the map
 	 */
 	bool isBoundaryEdge(Dart d) ;		// OK boundary
+
+	/**
+	 * tell if the face of d is on the boundary of the map
+	 */
+	bool isBoundaryFace(Dart d) ;
 
 
 	//! Follow the boundary of a surface as if it was a oriented face.

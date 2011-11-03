@@ -150,7 +150,7 @@ public:
 	//! Uncut the edge of d
 	/*! @param d a dart of the edge to uncut
 	 */
-	virtual void uncutEdge(Dart d);
+	virtual bool uncutEdge(Dart d);
 
 	//!
 	/*!
