@@ -662,6 +662,74 @@ Dart Map3::cutSpike(Dart d)
   return dNew;
 }
 
+/*! @name Topological Queries
+ *  Return or set various topological information
+ *************************************************************************/
+
+bool Map3::sameOrientedVertex(Dart d, Dart e)
+{
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	mv.mark(d);
+
+	for(std::list<Dart>::iterator darts = darts_list.begin();darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		if(dc==e)
+			return true;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		if(d2 != dc)
+		{
+			Dart d21 = phi1(d2); // turn in volume
+			Dart d23 = phi3(d2); // change volume
+
+			if(!mv.isMarked(d21))
+			{
+				darts_list.push_back(d21);
+				mv.mark(d21);
+			}
+
+			if((d23!=d2) && !mv.isMarked(d23))
+			{
+				darts_list.push_back(d23);
+				mv.mark(d23);
+			}
+		}
+	}
+
+	return false;
+}
+
+bool Map3::sameVertex(Dart d, Dart e)
+{
+	return sameOrientedVertex(d,e);
+}
+
+bool Map3::sameOrientedEdge(Dart d, Dart e)
+{
+	  Dart dd = d;
+	  do
+	  {
+		  if(dd==e || phi2(dd)==e)
+			  return true;
+
+		  dd = alpha2(dd);
+	  } while (dd!=d);
+
+	  return false;
+}
+
+bool Map3::sameEdge(Dart d, Dart e)
+{
+	return sameOrientedEdge(d,e);
+}
+
+
 int Map3::edgeDegree(Dart d)
 {
 	int deg = 0;

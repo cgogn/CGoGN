@@ -122,6 +122,11 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	virtual void cutEdge(Dart d);
+
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -149,6 +154,57 @@ public:
 	 */
 	virtual Dart cutSpike(Dart d);
 
+	/*! @name Topological Queries
+	 *  Return or set various topological information
+	 *************************************************************************/
+
+	//@{
+	//! Test if dart d and e belong to the same oriented vertex
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVertex(Dart d, Dart e) ;
+
+	//! Test if dart d and e belong to the same vertex
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameVertex(Dart d, Dart e) ;
+
+	//@{
+	//! Test if dart d and e belong to the same oriented edge
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedEdge(Dart d, Dart e) ;
+
+	//! Test if dart d and e belong to the same edge
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameEdge(Dart d, Dart e) ;
+
+	//!Test if dart d and e belong to the same oriented face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedFace(Dart d, Dart e);
+
+	//!Test if dart d and e belong to the same oriented face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameFace(Dart d, Dart e);
+
+	/**
+	 * compute the number of edges of the vertex of d
+	 */
+	unsigned int vertexDegree(Dart d) ;
+
+	/**
+	 * compute the number of faces in the volume of d
+	 */
+	unsigned int volumeDegree(Dart d);
 
 	/*! @name Cell Functors
 	 *  Apply functors to all darts of a cell

@@ -60,6 +60,7 @@ protected:
 	GLuint m_uniform_size;
 
 	GLuint m_uniform_color;
+
 public:
 	/**
 	 * init shaders, texture and variables

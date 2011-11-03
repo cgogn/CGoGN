@@ -62,6 +62,12 @@ inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const typename PFP:
 	return Geom::angle(v1, v2) ;
 }
 
+template <typename PFP>
+bool isTriangleObtuse(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+{
+	return Geom::isTriangleObtuse(position[d], position[map.phi1(d)], position[map.phi_1(d)]) ;
+}
+
 } // namespace Geometry
 
 } // namespace Algo

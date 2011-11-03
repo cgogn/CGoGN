@@ -910,14 +910,13 @@ void GLSLShader::addPathFileSeach(const std::string& path)
 	m_pathes.push_back(path);
 }
 
-
 unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 {
 	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
 	//valid ?
 	if (idVA < 0)
 	{
-		CGoGNerr << "GLSLShader: Attribute "<<name<< " does not exist in shader"<< CGoGNendl;
+		CGoGNerr << "GLSLShader: Attribute " << name << " does not exist in shader" << CGoGNendl;
 		return idVA;
 	}
 	// search if name already exist
@@ -937,15 +936,10 @@ unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 	return (m_va_vbo_binding.size() -1);
 }
 
-
-
-
 void GLSLShader::changeVA_VBO(unsigned int id, VBO* vbo)
 {
 	m_va_vbo_binding[id].vbo_ptr = vbo;
 }
-
-
 
 void GLSLShader::unbindVA(const std::string& name)
 {
@@ -970,9 +964,6 @@ void GLSLShader::unbindVA(const std::string& name)
 	}
 	CGoGNerr << "GLSLShader: Attribute "<<name<< " not binded"<< CGoGNendl;
 }
-
-
-
 
 void GLSLShader::setCurrentOGLVersion(unsigned int version)
 {
@@ -1026,7 +1017,6 @@ void GLSLShader::disableVertexAttribs() const
 	this->unbind();
 }
 
-
 void GLSLShader::updateCurrentMatrices()
 {
 	glm::mat4 model(currentModelView());
@@ -1035,9 +1025,6 @@ void GLSLShader::updateCurrentMatrices()
 	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin();it != m_registeredShaders.end();++it)
 			it->second->updateMatrices(currentProjection(), model);
 }
-
-
-
 
 } // namespace Utils
 

@@ -22,15 +22,15 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef __TRANSFO__
-#define __TRANSFO__
+#ifndef __TRANSFO__H__
+#define __TRANSFO__H__
 
 #include "Geometry/matrix.h"
 #include <cmath>
 
-
 namespace CGoGN
 {
+
 namespace Geom
 {
 
@@ -44,7 +44,6 @@ namespace Geom
 template <typename T>
 void scale(T sx, T sy, T sz, Matrix<4,4,T>& mat);
 
-
 /**
  * Apply a translation to matrix
  * @param tx scale in x axis
@@ -55,15 +54,13 @@ void scale(T sx, T sy, T sz, Matrix<4,4,T>& mat);
 template <typename T>
 void translate(T tx, T ty, T tz, Matrix<4,4,T>& mat);
 
-
 /**
- * Apply a rotation around Z axis  to matrix
+ * Apply a rotation around Z axis to matrix
  * @param angle angle of rotation in radian
  * @param mat current matrix
  */
 template <typename T>
 void rotateZ(T angle, Matrix<4,4,T>& mat);
-
 
 /**
  * Apply a rotation around Y axis to matrix
@@ -72,7 +69,6 @@ void rotateZ(T angle, Matrix<4,4,T>& mat);
  */
 template <typename T>
 void rotateY(T angle, Matrix<4,4,T>& mat);
-
 
 /**
  * Apply a rotation around X axis to matrix
@@ -93,7 +89,6 @@ void rotateX(T angle, Matrix<4,4,T>& mat);
 template <typename T>
 void rotate(T axis_x, T axis_y, T axis_z, T angle, Matrix<4,4,T>& mat);
 
-
 /**
  * Apply a transformation (stored in matrix) to a 3D point
  * @param P the point to transfo
@@ -102,9 +97,10 @@ void rotate(T axis_x, T axis_y, T axis_z, T angle, Matrix<4,4,T>& mat);
 template <typename T>
 Vector<3,T> transform(const Vector<3,T>& P,const Matrix<4,4,T>& mat);
 
-}
-}
+} // namespace Geom
 
-#include "transfo.hpp"
+} // namespace CGoGN
+
+#include "Geometry/transfo.hpp"
 
 #endif

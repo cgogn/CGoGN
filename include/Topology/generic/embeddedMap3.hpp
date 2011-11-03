@@ -71,39 +71,42 @@ void EmbeddedMap3<MAP3>::sewVolumes(Dart d, Dart e)
 template <typename MAP3>
 void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 {
-//	Dart d3 = MAP3::phi3(d);
-//
-//	bool boundaryD = false;
-//	bool boundaryE = false;
-//
-//	if(MAP3::isOrbitEmbedded(VERTEX))
-//	{
-//		if(MAP3::isBoundaryVertex(d))
-//			boundaryD = true;
-//		if(MAP3::isBoundaryVertex(MAP3::phi1(d)))
-//			boundaryE = true;
-//	}
-//
+	Dart dd = MAP3::phi1(MAP3::phi3(d));
+
 	MAP3::unsewVolumes(d);
-//
-//	Dart dd = d;
-//	Dart dd3 = d3;
-//
-//	do
-//	{
-//		if(MAP3::isOrbitEmbedded(VERTEX))
-//			MAP3::copyCell(VERTEX, dd3, MAP3::phi1(dd));
-//
-//		if(MAP3::isOrbitEmbedded(EDGE))
-//
-//
-//		if(MAP3::isOrbitEmbedded(FACE))
-//
-//
-//		dd = MAP3::phi1(dd) ;
-//	}while( dd != d );
+
+	Dart ddd = d;
+	do
+	{
+		if(MAP3::isOrbitEmbedded(VERTEX))
+		{
+			if(!MAP3::sameVertex(d,dd))
+			{
+				MAP3::embedNewCell(VERTEX, dd);
+				MAP3::copyCell(VERTEX, dd, d);
+			}
+		}
+
+		dd = MAP3::phi_1(dd);
+
+		if(MAP3::isOrbitEmbedded(EDGE))
+		{
+			if(!MAP3::sameEdge(d,dd))
+			{
+				MAP3::embedNewCell(EDGE, dd);
+				MAP3::copyCell(VERTEX, dd, d);
+			}
+		}
+
+		ddd = MAP3::phi1(ddd);
+	} while(ddd!=d);
 
 
+	if (MAP3::isOrbitEmbedded(FACE))
+	{
+		MAP3::embedNewCell(FACE, dd);
+		MAP3::copyCell(FACE, dd, d);
+	}
 }
 
 template <typename MAP3>

@@ -182,11 +182,13 @@ inline void GMap1::phi1unsew(Dart d)
 
 inline void GMap1::cutEdge(Dart d)
 {
-	Dart e = newEdge() ;	// Create a new edge
-	Dart f = phi1(d) ;
-	beta1unsew(f) ;
-	beta1sew(beta0(d), e) ;
-	beta1sew(beta0(e), f) ;
+   Dart e = newDart();
+   Dart f = newDart();
+   beta1sew(e, f) ;
+   Dart dd = beta0(d) ;
+   beta0unsew(d) ;
+   beta0sew(e, d) ;
+   beta0sew(f, dd) ;
 }
 
 inline void GMap1::collapseEdge(Dart d)

@@ -41,10 +41,10 @@ namespace QT
 {
 
 SimpleQT::SimpleQT() :
-		m_dock(NULL),
-		m_projection_matrix(m_mat.m_matrices[0]),
-		m_modelView_matrix(m_mat.m_matrices[1]),
-		m_transfo_matrix(m_mat.m_matrices[2])
+	m_dock(NULL),
+	m_projection_matrix(m_mat.m_matrices[0]),
+	m_modelView_matrix(m_mat.m_matrices[1]),
+	m_transfo_matrix(m_mat.m_matrices[2])
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -56,17 +56,17 @@ SimpleQT::SimpleQT() :
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_New()));
 	m_fileMenu->addAction(action);
 
-	action= new QAction(tr("Open"), this);
+	action = new QAction(tr("Open"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_Open()));
 	m_fileMenu->addAction(action);
 
-	action= new QAction(tr("Save"), this);
+	action = new QAction(tr("Save"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_Save()));
 	m_fileMenu->addAction(action);
 
 	m_fileMenu->addSeparator();
 
-	action= new QAction(tr("Quit"), this);
+	action = new QAction(tr("Quit"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_Quit()));
 	m_fileMenu->addAction(action);
 
@@ -74,25 +74,25 @@ SimpleQT::SimpleQT() :
 
 	QMenu* m_helpMenu = menuBar()->addMenu(tr("&Help"));
 
-	action= new QAction(tr("console on/off"), this);
+	action = new QAction(tr("console on/off"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_consoleOnOff()));
 	m_helpMenu->addAction(action);
 
-	action= new QAction(tr("console clear"), this);
+	action = new QAction(tr("console clear"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_consoleClear()));
 	m_helpMenu->addAction(action);
 
-	action= new QAction(tr("About"), this);
+	action = new QAction(tr("About"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_about()));
 	m_helpMenu->addAction(action);
 
-	action= new QAction(tr("About CGoGN"), this);
+	action = new QAction(tr("About CGoGN"), this);
 	connect(action, SIGNAL(triggered()), this, SLOT(cb_about_cgogn()));
 	m_helpMenu->addAction(action);
 
 	m_dockConsole = new QDockWidget(tr("Console"), this);
 	m_dockConsole->setAllowedAreas(Qt::BottomDockWidgetArea);
-	m_dockConsole->setFeatures(QDockWidget::DockWidgetMovable|QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetClosable);
+	m_dockConsole->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
 	addDockWidget(Qt::BottomDockWidgetArea, m_dockConsole);
 
 	m_textConsole = new QTextEdit();
@@ -108,11 +108,11 @@ SimpleQT::SimpleQT() :
 }
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
-				m_dock(NULL),
-				m_mat(m_mat),
-				m_projection_matrix(m_mat.m_matrices[0]),
-				m_modelView_matrix(m_mat.m_matrices[1]),
-				m_transfo_matrix(m_mat.m_matrices[2])
+	m_dock(NULL),
+	m_mat(m_mat),
+	m_projection_matrix(m_mat.m_matrices[0]),
+	m_modelView_matrix(m_mat.m_matrices[1]),
+	m_transfo_matrix(m_mat.m_matrices[2])
 {
 	m_glWidget = new GLWidget(this);
 	setCentralWidget(m_glWidget);
@@ -309,82 +309,81 @@ void SimpleQT::glMousePosition(int& x, int& y)
 	y = m_glWidget->getHeight() - xy.y();
 }
 
-GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
-{
-	// get Z from depth buffer
-	int yy = y;
-	GLfloat depth_t[25];
-	glReadPixels(x-2, yy-2, 5, 5, GL_DEPTH_COMPONENT, GL_FLOAT, depth_t);
 
-	GLfloat depth=0.0f;
-	unsigned int nb=0;
-	for (unsigned int i=0; i< 25; ++i)
-	{
-		if (depth_t[i] != 1.0f)
-		{
-			depth += depth_t[i];
-			nb++;
-		}
-	}
-	if (nb>0)
-		depth /= float(nb);
-	else
-		depth = 0.5f;
-
-	glm::i32vec4 viewport;
-	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-
-	glm::vec3 win(x, yy, 0.0f);
-
-	glm::vec3 P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
-
-	rayA[0] = P[0];
-	rayA[1] = P[1];
-	rayA[2] = P[2];
-
-	win[2] = depth;
-
-	P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
-	rayB[0] = P[0];
-	rayB[1] = P[1];
-	rayB[2] = P[2];
-
-	if (depth == 1.0f)	// depth vary in [0-1]
-		win[2] = 0.5f;
-
-	win[0] += radius;
-	P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
-	Geom::Vec3f Q;
-	Q[0] = P[0];
-	Q[1] = P[1];
-	Q[2] = P[2];
-
-	// compute & return distance
-	Q -= rayB;
-	return float(Q.norm());
-}
-
-float SimpleQT::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center)
-{
-
-	glm::i32vec4 viewport;
-	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-
-	glm::vec3 win = glm::project(glm::vec3(center[0],center[1],center[2]), m_modelView_matrix, m_projection_matrix, viewport);
-
-	win[0]-= pixel_width/2;
-
-	glm::vec3 P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
-
-	win[0] += pixel_width;
-
-	glm::vec3 Q = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
-
-	return glm::distance(P,Q);
-}
-
-
-
+//GLfloat SimpleQT::getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius)
+//{
+//	// get Z from depth buffer
+//	int yy = y;
+//	GLfloat depth_t[25];
+//	glReadPixels(x-2, yy-2, 5, 5, GL_DEPTH_COMPONENT, GL_FLOAT, depth_t);
+//
+//	GLfloat depth=0.0f;
+//	unsigned int nb=0;
+//	for (unsigned int i=0; i< 25; ++i)
+//	{
+//		if (depth_t[i] != 1.0f)
+//		{
+//			depth += depth_t[i];
+//			nb++;
+//		}
+//	}
+//	if (nb>0)
+//		depth /= float(nb);
+//	else
+//		depth = 0.5f;
+//
+//	glm::i32vec4 viewport;
+//	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+//
+//	glm::vec3 win(x, yy, 0.0f);
+//
+//	glm::vec3 P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+//
+//	rayA[0] = P[0];
+//	rayA[1] = P[1];
+//	rayA[2] = P[2];
+//
+//	win[2] = depth;
+//
+//	P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+//	rayB[0] = P[0];
+//	rayB[1] = P[1];
+//	rayB[2] = P[2];
+//
+//	if (depth == 1.0f)	// depth vary in [0-1]
+//		win[2] = 0.5f;
+//
+//	win[0] += radius;
+//	P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+//	Geom::Vec3f Q;
+//	Q[0] = P[0];
+//	Q[1] = P[1];
+//	Q[2] = P[2];
+//
+//	// compute & return distance
+//	Q -= rayB;
+//	return float(Q.norm());
+//}
+//
+//float SimpleQT::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center)
+//{
+//
+//	glm::i32vec4 viewport;
+//	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+//
+//	glm::vec3 win = glm::project(glm::vec3(center[0],center[1],center[2]), m_modelView_matrix, m_projection_matrix, viewport);
+//
+//	win[0]-= pixel_width/2;
+//
+//	glm::vec3 P = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+//
+//	win[0] += pixel_width;
+//
+//	glm::vec3 Q = glm::unProject(win, m_modelView_matrix, m_projection_matrix, viewport);
+//
+//	return glm::distance(P,Q);
+//}
+//
 
 
 
@@ -454,7 +453,7 @@ void SimpleQT::updateGL()
 void SimpleQT::updateGLMatrices()
 {
 	m_glWidget->modelModified();
-	m_glWidget->updateGL();
+//	m_glWidget->updateGL();
 }
 
 void SimpleQT::transfoRotate(float angle, float x, float y, float z)

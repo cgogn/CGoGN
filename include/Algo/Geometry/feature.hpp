@@ -35,28 +35,89 @@ namespace Geometry
 {
 
 template <typename PFP>
-void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position, DartMarker& feature)
+void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position, CellMarker& featureEdge)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	feature.unmarkAll() ;
+	featureEdge.unmarkAll() ;
 
-	AttributeHandler<VEC3> fNormal = map.template addAttribute<VEC3>(FACE, "fNormal") ;
+	AttributeHandler<VEC3> fNormal = map.template getAttribute<VEC3>(FACE, "normal") ;
+	if(!fNormal.isValid())
+		fNormal = map.template addAttribute<VEC3>(FACE, "normal") ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
-	DartMarker m(map) ;
+	CellMarker m(map, EDGE) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(!m.isMarked(d))
 		{
-			m.markOrbit(EDGE, d) ;
+			m.mark(d) ;
 			if(Geom::angle(fNormal[d], fNormal[map.phi2(d)]) > M_PI / REAL(6))
-				feature.markOrbit(EDGE, d) ;
+				featureEdge.mark(d) ;
 		}
 	}
 
-	map.template removeAttribute<VEC3>(fNormal) ;
+//	map.template removeAttribute<VEC3>(fNormal) ;
+}
+
+template <typename PFP>
+std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal)
+{
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	std::vector<VEC3> occludingContours ;
+
+	CellMarker m(map, FACE) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!m.isMarked(d))
+		{
+			m.mark(d) ;
+
+			VEC3 p1 = position[d] ;
+			VEC3 p2 = position[map.phi1(d)] ;
+			VEC3 p3 = position[map.phi_1(d)] ;
+
+			REAL dp1 = (p1 - cameraPosition) * normal[d] ;
+			REAL dp2 = (p2 - cameraPosition) * normal[map.phi1(d)] ;
+			REAL dp3 = (p3 - cameraPosition) * normal[map.phi_1(d)] ;
+
+			if(dp1 < 0 && dp2 > 0)
+			{
+				REAL alpha = -dp1 / (-dp1 + dp2) ;
+				occludingContours.push_back(alpha * p1 + (1 - alpha) * p2) ;
+			}
+			if(dp2 < 0 && dp1 > 0)
+			{
+				REAL alpha = dp1 / (dp1 - dp2) ;
+				occludingContours.push_back(alpha * p1 + (1 - alpha) * p2) ;
+			}
+			if(dp1 < 0 && dp3 > 0)
+			{
+				REAL alpha = -dp1 / (-dp1 + dp3) ;
+				occludingContours.push_back(alpha * p1 + (1 - alpha) * p3) ;
+			}
+			if(dp3 < 0 && dp1 > 0)
+			{
+				REAL alpha = dp1 / (dp1 - dp3) ;
+				occludingContours.push_back(alpha * p1 + (1 - alpha) * p3) ;
+			}
+			if(dp2 < 0 && dp3 > 0)
+			{
+				REAL alpha = -dp2 / (-dp2 + dp3) ;
+				occludingContours.push_back(alpha * p2 + (1 - alpha) * p3) ;
+			}
+			if(dp3 < 0 && dp2 > 0)
+			{
+				REAL alpha = dp2 / (dp2 - dp3) ;
+				occludingContours.push_back(alpha * p2 + (1 - alpha) * p3) ;
+			}
+		}
+	}
+
+	return occludingContours ;
 }
 
 } // namespace Geometry

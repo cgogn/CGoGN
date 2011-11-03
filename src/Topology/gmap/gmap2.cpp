@@ -82,7 +82,8 @@ void GMap2::cutEdge(Dart d)
 	{
 		GMap1::cutEdge(e);	// Cut the opposite edge
 		Dart ne = phi1(e);
-		phi2sew(nd, beta0(ne));	// sew the two new edges
+		beta2sew(ne,nd);	// Correct the phi2 links
+		beta2sew(beta1(nd), beta1(ne));
 	}
 }
 
@@ -586,7 +587,14 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int
 
 bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
+	Dart dNext = d;
+	do
+	{
+		if (f(dNext) || f(beta1(dNext)))
+			return true;
+		dNext = alpha1(dNext);
+ 	} while (dNext != d);
+ 	return false;
 }
 
 bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
