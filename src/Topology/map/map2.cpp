@@ -230,66 +230,39 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	Dart e = phi2(d);
 	phi2unsew(d);	// Unlink the opposite edges
 
-	if (isBoundaryMarked(e))
+
+
+	Dart f = phi1(e) ;
+	Dart h = alpha1(e);
+
+	if (h != e)
+		resV=h;
+
+	if (f != e && delDegenerateFaces)
 	{
-		Dart f = phi1(e) ;
 		Map1::collapseEdge(e) ;		// Collapse edge e
-		if (f != e)
-			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
+		Map1::collapseEdge(e) ;	// Just collapse edge e
+
+
+
+	f = phi1(d) ;
+	if(resV == NIL)
 	{
-		Dart f = phi1(e) ;
-		Dart g = phi_1(e) ;
-
-		if(f != d && !isFaceTriangle(e))
-			resV = f ;
-		else if(phi2(g) != g)
-			resV = phi2(g) ;
-		else if(f != d && phi2(f) != f)
-			resV = phi1(phi2(f)) ;
-
-		if (f != e && delDegenerateFaces)
-		{
-			Map1::collapseEdge(e) ;		// Collapse edge e
-			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
-		}
-		else
-			Map1::collapseEdge(e) ;	// Just collapse edge e
+		h = alpha1(d);
+		if (h != d)
+			resV=h;
 	}
 
-
-
-	if (isBoundaryMarked(d))
+	if (f != d && delDegenerateFaces)
 	{
-		Dart f = phi1(d) ;
 		Map1::collapseEdge(d) ;		// Collapse edge d
-		if (f != d)
-			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
+		collapseDegeneratedFace(f) ;// and collapse its face if degenerated
 	}
 	else
-	{
-		Dart f = phi1(d) ;
-		Dart g = phi_1(d) ;
-
-		if(resV == NIL)
-		{
-			if(f != e && !isFaceTriangle(d))
-				resV = f ;
-			else if(phi2(g) != g)
-				resV = phi2(g) ;
-			else if(f != e && phi2(f) != f)
-				resV = phi1(phi2(f)) ;
-		}
-
-		if (f != d && delDegenerateFaces)
-		{
-			Map1::collapseEdge(d) ;		// Collapse edge d
-			collapseDegeneratedFace(f) ;// and collapse its face if degenerated
-		}
-		else
-			Map1::collapseEdge(d) ;	// Just collapse edge d
-	}
+		Map1::collapseEdge(d) ;	// Just collapse edge d
 
 	return resV ;
 }

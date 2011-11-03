@@ -108,7 +108,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			{
 				if (good_dart == map.phi2(good_dart))
 				{
-					map.sewFaces(d, good_dart);
+					map.sewOrientedFaces(d, good_dart);
 					m.unmarkOrbit(EDGE, d);
 				}
 			}
