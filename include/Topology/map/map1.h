@@ -112,7 +112,7 @@ public:
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newFace(unsigned int nbEdges) ;
+	virtual Dart newFace(unsigned int nbEdges) ;
 
 	//! Create an new face for boundary (marked)
 	/*! @param nbEdges the number of edges

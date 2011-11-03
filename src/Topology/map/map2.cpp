@@ -40,25 +40,66 @@ void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
 	Map1::deleteOrientedFace(dd) ;
 }
 
+//void Map2::mergeFacewithBoundary(Dart d)
+//{
+//	Dart e = d ;
+//	do									// foreach edge of face
+//	{
+//		Dart f = phi2(e);
+//		if (isBoundaryMarked(f))		// if sewed to boundary
+//		{
+//			phi2unsew(e);// ?? not necessary
+//			Dart ff = phi_1(f);
+//			if (e != ff)
+//				phi1sew(e, ff) ;		//    merge with it
+//			Dart ee = phi_1(e);
+//			if (f != ee)
+//				phi1sew(f, ee) ;
+//			Map1::deleteOrientedFace(e) ;
+//		}
+//		e = phi1(e) ;
+//	} while (e != d) ;
+//}
+
+
 void Map2::mergeFacewithBoundary(Dart d)
 {
+	std::vector<Dart> storeForLinkVertex;
+	std::vector<Dart> storeForLinkFace;
+
 	Dart e = d ;
-	do									// foreach edge of face
+	do									// foreach vertex/edge of face
 	{
-		Dart f = phi2(e);
-		if (isBoundaryMarked(f))		// if sewed to boundary
+		Dart f = findBoundaryVertex(alpha1(e));	// check if connexion by vertex
+		if (f != e)
 		{
-			phi2unsew(e);// ?? not necessary
-			Dart ff = phi_1(f);
-			if (e != ff)
-				phi1sew(e, ff) ;		//    merge with it
-			Dart ee = phi_1(e);
-			if (f != ee)
-				phi1sew(f, ee) ;
-			Map1::deleteOrientedFace(e) ;
+			storeForLinkVertex.push_back(phi_1(e));
+			storeForLinkVertex.push_back(phi_1(f));
+		}
+
+		Dart g = phi2(f);
+		if (isBoundaryMarked(g))			// check if connextion by a face
+		{
+			storeForLinkFace.push_back(f);
+			storeForLinkFace.push_back(g);
 		}
 		e = phi1(e) ;
 	} while (e != d) ;
+
+	// merge by vertices
+	while (!storeForLinkVertex.empty())
+	{
+		Dart a = storeForLinkVertex.pop_back();
+		Dart b = storeForLinkVertex.pop_back();
+		phi1sew(a,b);
+	}
+	//merge by faces
+	while (!storeForLinkFace.empty())
+	{
+		Dart a = storeForLinkFace.pop_back();
+		Dart b = storeForLinkFace.pop_back();
+		mergeBoundaryFaces(a,b);
+	}
 }
 
 void Map2::deleteOrientedFace(Dart d)
@@ -74,6 +115,22 @@ void Map2::sewOrientedFaces(Dart d, Dart e)
 	assert(phi2(d)==d && phi2(e)==e);
 	// sewing the faces
 	phi2sew(d, e);
+}
+
+
+Dart Map2::newFace(unsigned int nbEdges)
+{
+	Dart d = Map1::newFace(nbEdges);
+	Dart e = Map1::newBoundaryFace(nbEdges);
+
+	Dart x = d;
+	do
+	{
+		phi2sew(d,e);
+		d = phi1(d);
+		e = phi1(e);
+	} while (d != x);
+	return x;
 }
 
 /*! @name Topological Operators
