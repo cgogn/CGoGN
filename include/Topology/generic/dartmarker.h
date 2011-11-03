@@ -69,7 +69,7 @@ public:
 
 protected:
 	// protected copy constructor to forbid its usage
-	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map)
+	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map), m_thread(0), m_mark(NIL)
 	{}
 
 public:
@@ -215,7 +215,7 @@ public:
 	}
 
 protected:
-	DartMarkerStore(const DartMarkerStore& dm) : DartMarkerGen(dm)
+	DartMarkerStore(const DartMarkerStore& dm) : DartMarkerGen(dm),m_markedDarts(dm.m_markedDarts)
 	{}
 
 public:

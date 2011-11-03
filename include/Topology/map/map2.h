@@ -117,6 +117,13 @@ protected:
 	void deleteOrientedFace(Dart d) ; // OK boundary
 
 public:
+
+	//! Create an new face of nbEdges
+	/*! @param nbEdges the number of edges
+	 *  @return return a dart of the face
+	 */
+	virtual Dart newFace(unsigned int nbEdges) ;
+
 	virtual void deleteFace(Dart d) ;
 	//@}
 
