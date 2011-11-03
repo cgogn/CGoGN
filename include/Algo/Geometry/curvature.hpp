@@ -117,12 +117,12 @@ void computeCurvatureVertex_QuadraticFitting(
 
 template <typename PFP>
 void vertexQuadraticFitting(
-		typename PFP::MAP& map,
-		Dart dart,
-		typename PFP::MATRIX33& localFrame,
-		const typename PFP::TVEC3& position,
-		const typename PFP::TVEC3& normal,
-		float& a, float& b, float& c, float& d, float& e)
+	typename PFP::MAP& map,
+	Dart dart,
+	typename PFP::MATRIX33& localFrame,
+	const typename PFP::TVEC3& position,
+	const typename PFP::TVEC3& normal,
+	float& a, float& b, float& c, float& d, float& e)
 {
 	typename PFP::VEC3 p = position[dart] ;
 
@@ -352,7 +352,7 @@ void computeCurvatureVertex_NormalCycles(
 	const std::vector<Dart>& vd1 = neigh.getInsideEdges() ;
 	for (std::vector<Dart>::const_iterator it = vd1.begin(); it != vd1.end(); ++it)
 	{
-		const VEC3 e = position[map.phi2(*it)] - position[*it] ;
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, *it, position) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
 	}
 	// border

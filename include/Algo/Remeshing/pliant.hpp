@@ -81,7 +81,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	}
 
 	// compute feature edges
-	DartMarker featureEdge(map) ;
+	CellMarker featureEdge(map, EDGE) ;
 	Algo::Geometry::featureEdgeDetection<PFP>(map, position, featureEdge) ;
 
 	// compute feature vertices

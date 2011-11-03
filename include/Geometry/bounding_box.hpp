@@ -169,7 +169,7 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 {
 	VEC bbmin = bb.min() ;
 	VEC bbmax = bb.max() ;
-	for(unsigned int i = 0; i < bbmin.size(); ++i)
+	for(unsigned int i = 0; i < bbmin.dimension(); ++i)
 	{
 		if(bbmin[i] < m_pMin[i])
 			m_pMin[i] = bbmin[i] ;

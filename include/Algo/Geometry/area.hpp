@@ -37,9 +37,9 @@ namespace Geometry
 template <typename PFP>
 typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typename PFP::VEC3 p1 = position[d];
-	typename PFP::VEC3 p2 = position[map.phi1(d)];
-	typename PFP::VEC3 p3 = position[map.phi_1(d)];
+	typename PFP::VEC3 p1 = position[d] ;
+	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
+	typename PFP::VEC3 p3 = position[map.phi_1(d)] ;
 
 	return Geom::triangleArea(p1, p2, p3) ;
 }
@@ -47,7 +47,7 @@ typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename P
 template <typename PFP>
 typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::VEC3 VEC3 ;
 
 	if(map.isFaceTriangle(d))
 		return triangleArea<PFP>(map, d, position) ;
@@ -58,8 +58,8 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename
 		Dart it = d ;
 		do
 		{
-			VEC3 p1 = position[it];
-			VEC3 p2 = position[map.phi1(it)];
+			VEC3 p1 = position[it] ;
+			VEC3 p2 = position[map.phi1(it)] ;
 			area += Geom::triangleArea(p1, p2, centroid) ;
 			it = map.phi1(it) ;
 		} while (it != d) ;
@@ -97,13 +97,42 @@ typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typen
 }
 
 template <typename PFP>
-typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
 	typename PFP::REAL area(0) ;
 	Dart it = d ;
 	do
 	{
 		area += convexFaceArea<PFP>(map, it, position) / 3 ;
+		it = map.alpha1(it) ;
+	} while(it != d) ;
+	return area ;
+}
+
+template <typename PFP>
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+{
+	typename PFP::REAL area(0) ;
+	Dart it = d ;
+	do
+	{
+		const typename PFP::VEC3& p1 = position[it] ;
+		const typename PFP::VEC3& p2 = position[map.phi1(it)] ;
+		const typename PFP::VEC3& p3 = position[map.phi_1(it)] ;
+		if(!Geom::isTriangleObtuse(p1, p2, p3))
+		{
+			typename PFP::REAL a = Geom::angle(p3 - p2, p1 - p2) ;
+			typename PFP::REAL b = Geom::angle(p1 - p3, p2 - p3) ;
+			area += ( (p2 - p1).norm2() / tan(b) + (p3 - p1).norm2() / tan(a) ) / 8 ;
+		}
+		else
+		{
+			typename PFP::REAL tArea = Geom::triangleArea(p1, p2, p3) ;
+			if(Geom::angle(p2 - p1, p3 - p1) > M_PI / 2)
+				area += tArea / 2 ;
+			else
+				area += tArea / 4 ;
+		}
 		it = map.alpha1(it) ;
 	} while(it != d) ;
 	return area ;
@@ -133,6 +162,20 @@ void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC
 		{
 			marker.mark(d);
 			vertex_area[d] = vertexOneRingArea<PFP>(map, d, position) ;
+		}
+	}
+}
+
+template <typename PFP>
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
+{
+	CellMarker marker(map, VERTEX);
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(select(d) && !marker.isMarked(d))
+		{
+			marker.mark(d);
+			vertex_area[d] = vertexBarycentricArea<PFP>(map, d, position) ;
 		}
 	}
 }

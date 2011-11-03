@@ -80,7 +80,7 @@ public:
 	 * @param signal use macro SIGNAL(qt_signal)
 	 * @param method use macro SLOT(name_of_method(params))
 	 */
-	void setCallBack( const QObject* sender, const char* signal, const char* method);
+	void setCallBack(const QObject* sender, const char* signal, const char* method);
 
 	/**
 	 * set window Title
@@ -126,6 +126,8 @@ public:
 
 	/**
 	 * add an entry to popup menu
+	 * @param label label printed in menu
+	 * @param method qt slot (function name)
 	 */
 	void add_menu_entry(const std::string label, const char* method);
 
@@ -147,11 +149,11 @@ public:
 	void setGLWidgetMouseTracking(bool b);
 
 protected:
-	GLWidget *m_glWidget;
+	GLWidget* m_glWidget;
 
-	QDockWidget *m_dock;
+	QDockWidget* m_dock;
 
-	QDockWidget *m_dockConsole;
+	QDockWidget* m_dockConsole;
 
 	QTextEdit* m_textConsole;
 
@@ -207,19 +209,20 @@ public:
 	 * get a ray (2 points) from a pick point in GL area
 	 * @param x mouse position
 	 * @param y mouse position
-	 * @param rayA first computed point
-	 * @param rayA second computed point
+	 * @param rayA first computed point of ray
+	 * @param rayA second computed point of ray
 	 * @param radius radius on pixel for clicking precision
 	 * @return the distance in modelview world corresponding to radius pixel in screen
 	 */
-	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius = 4);
+	GLfloat getOrthoScreenRay(int x, int y, Geom::Vec3f& rayA, Geom::Vec3f& rayB, int radius=4) { return m_glWidget->getOrthoScreenRay(x,y,rayA,rayB,radius);}
 
 	/**
 	 * transform a pixel distance on screen in distance in world
 	 * @param pixel_width width on pixel on screen
 	 * @param center reference point on world to use (defaut 0,0,0)
 	 */
-	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center=Geom::Vec3f(0.0f,0.0f,0.0f));
+	float getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& center) { return m_glWidget->getWidthInWorld(pixel_width,center);}
+
 
 	const glm::mat4& transfoMatrix() const { return m_transfo_matrix; }
 	glm::mat4& transfoMatrix() { return m_transfo_matrix; }
@@ -312,9 +315,9 @@ public:
 	virtual void cb_mouseClick(int button, int x, int y) {}
 
 	/**
-	 * the mouse has been move (with button still pressed)
+	 * the mouse has been move (with buttons still pressed)
 	 */
-	virtual void cb_mouseMove(int button, int x, int y) {}
+	virtual void cb_mouseMove(int buttons, int x, int y) {}
 
 	/**
 	 * the mouse has been move (with button still pressed)
