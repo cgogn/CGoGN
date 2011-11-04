@@ -80,10 +80,10 @@ void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 	{
 		if(MAP3::isOrbitEmbedded(VERTEX))
 		{
-			if(!MAP3::sameVertex(d,dd))
+			if(!MAP3::sameVertex(ddd,dd))
 			{
 				MAP3::embedNewCell(VERTEX, dd);
-				MAP3::copyCell(VERTEX, dd, d);
+				MAP3::copyCell(VERTEX, dd, ddd);
 			}
 		}
 
@@ -91,10 +91,10 @@ void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 
 		if(MAP3::isOrbitEmbedded(EDGE))
 		{
-			if(!MAP3::sameEdge(d,dd))
+			if(!MAP3::sameEdge(ddd,dd))
 			{
 				MAP3::embedNewCell(EDGE, dd);
-				MAP3::copyCell(VERTEX, dd, d);
+				MAP3::copyCell(VERTEX, dd, ddd);
 			}
 		}
 
@@ -104,6 +104,8 @@ void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 
 	if (MAP3::isOrbitEmbedded(FACE))
 	{
+		std::cout << "newCell f" << std::endl;
+
 		MAP3::embedNewCell(FACE, dd);
 		MAP3::copyCell(FACE, dd, d);
 	}
