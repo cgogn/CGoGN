@@ -47,6 +47,9 @@ template <typename PFP>
 typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+
+template <typename PFP>
 typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
@@ -54,6 +57,9 @@ void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& positio
 
 template <typename PFP>
 void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = SelectorTrue()) ;
+
+template <typename PFP>
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = SelectorTrue()) ;
 
 template <typename PFP>
 void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = SelectorTrue()) ;

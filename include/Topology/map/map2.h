@@ -106,6 +106,7 @@ protected:
 	 */
 	void deleteOrientedFace(Dart d) ;
 
+
 public:
 	virtual void deleteFace(Dart d) ;
 	//@}
@@ -122,12 +123,14 @@ public:
 	 */
 	virtual void splitVertex(Dart d, Dart e);
 
+
 	//! Delete the vertex of d (works only for internal vertices)
 	/*! All the faces around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
 	virtual bool deleteVertex(Dart d) ;
+
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
@@ -136,15 +139,18 @@ public:
 	 */
 	virtual void linkVertices(Dart d, Dart e);
 
+
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */
 	virtual void cutEdge(Dart d);
 
+
 	//! Undo the cut of the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to uncut
 	 */
 	virtual void uncutEdge(Dart d);
+
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -157,6 +163,7 @@ public:
 	 *  @return a dart of the resulting vertex
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
+
 
 	/**
 	 * Flip the edge of d (rotation in phi1 order)
@@ -182,11 +189,13 @@ public:
 	 */
 	virtual void insertEdgeInVertex(Dart d, Dart e);
 
+
 	//! Remove an edge from a vertex orbit
 	/*! \pre Dart d must be phi2 sewn
 	 *  @param d the dart of the edge to remove from the vertex
 	 */
 	virtual void removeEdgeFromVertex(Dart d);
+
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
@@ -195,10 +204,12 @@ public:
 	 */
 	virtual void sewFaces(Dart d, Dart e);
 
+
 	//! Unsew two oriented faces along oriented edges
 	 /*! @param d a dart of one face
 	 */
 	virtual void unsewFaces(Dart d);
+
 	
 	//! Delete an oriented face if and only if it has one or two edges
 	/*! If the face is phi2-linked to two distinct adjacent faces,
@@ -207,6 +218,7 @@ public:
 	 *  @return true if the collapse has been executed, false otherwise
 	 */
 	virtual bool collapseDegeneratedFace(Dart d);
+
 
 	//! Split a face f between d and e inserting an edge between vertices d & e
 	/*! \pre Darts d & e MUST belong to the same face
@@ -229,6 +241,7 @@ public:
 	 */
 	void extractTrianglePair(Dart d) ;
 
+
 	/**
 	 * Insert a pair of sewed triangles in a vertex by exploding the edges of v1 and v2
 	 * v1 and v2 belong to the same vertex
@@ -236,12 +249,22 @@ public:
 	 */
 	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
 
+
 	/**
 	 * Unsew the faces consisting of the umbrella of a vertex
 	 * \warning Darts may have
 	 * @param d a dart from the vertex
 	 */
-	virtual void unsewVertexUmbrella(Dart d) ;
+	void unsewAroundVertex(Dart d) ;
+
+
+	/**
+	 * Unsew the Umbrella aroud a vertex, close the hole and then
+	 * create a symetric to construct a polyedron
+	 * @param d a dart from the vertex
+	 */
+	void explodPolyhedron(Dart d);
+
 
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
@@ -255,6 +278,7 @@ public:
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e);
 
+
 	//! Close a topological hole (a sequence of connected fixed point of phi2).
 	/*! \pre dart d MUST be fixed point of phi2 relation
 	 *  Add a face to the map that closes the hole.
@@ -264,6 +288,7 @@ public:
 	 */
 	virtual unsigned int closeHole(Dart d);
 
+
 	//TODO a mettre en algo
 	//! Close the map removing topological holes.
 	/*! Add faces to the map that close every existing hole.
@@ -272,6 +297,7 @@ public:
 	 *  @param marker
 	 */
 	void closeMap(DartMarker& marker);
+
 	//@}
 
 	/*! @name Topological Queries

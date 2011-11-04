@@ -106,9 +106,9 @@ void addRowsRHS_Equality(
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int> index,
 	const AttributeHandler<ATTR_TYPE>& attr,
-	float amount)
+	const AttributeHandler<typename PFP::REAL>& weight)
 {
-	FunctorEquality_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, amount) ;
+	FunctorEquality_PerVertexWeight_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight) ;
 	m.foreach_orbit(VERTEX, ec) ;
 }
 
@@ -118,10 +118,35 @@ void addRowsRHS_Equality(
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int> index,
 	const AttributeHandler<ATTR_TYPE>& attr,
-	float amount,
+	float weight)
+{
+	FunctorEquality_UniformWeight_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight) ;
+	m.foreach_orbit(VERTEX, ec) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRowsRHS_Equality(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	const AttributeHandler<typename PFP::REAL>& weight,
 	unsigned int coord)
 {
-	FunctorEquality_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, amount, coord) ;
+	FunctorEquality_PerVertexWeight_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight, coord) ;
+	m.foreach_orbit(VERTEX, ec) ;
+}
+
+template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
+void addRowsRHS_Equality(
+	typename PFP::MAP& m,
+	LinearSolver<SOLVER_TRAITS>* s,
+	const AttributeHandler<unsigned int> index,
+	const AttributeHandler<ATTR_TYPE>& attr,
+	float weight,
+	unsigned int coord)
+{
+	FunctorEquality_UniformWeight_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight, coord) ;
 	m.foreach_orbit(VERTEX, ec) ;
 }
 

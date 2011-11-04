@@ -330,6 +330,32 @@ public:
 	}
 };
 
+// Functor version (needed for use with foreach_xxx)
+
+class FunctorCellIsMarked : public FunctorType
+{
+protected:
+	CellMarkerGen& m_marker;
+public:
+	FunctorCellIsMarked(CellMarkerGen& cm) : m_marker(cm) {}
+	bool operator()(Dart d)
+	{
+		return m_marker.isMarked(d);
+	}
+};
+
+class FunctorCellIsUnmarked : public FunctorType
+{
+protected:
+	CellMarkerGen& m_marker;
+public:
+	FunctorCellIsUnmarked(CellMarkerGen& cm) : m_marker(cm) {}
+	bool operator()(Dart d)
+	{
+		return !m_marker.isMarked(d);
+	}
+};
+
 } // namespace CGoGN
 
 #endif

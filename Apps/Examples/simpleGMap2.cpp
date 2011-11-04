@@ -38,6 +38,10 @@ SimpleGMap2::SimpleGMap2()
      position[myMap.phi_1(d)] = VEC3(10,20,15);
      position[myMap.phi_1(myMap.phi2(d))] = VEC3(0,0,30);
 
+     VEC3 mid = (position[d]+position[myMap.phi1(d)])/2.0f;
+     myMap.cutEdge(d);
+     position[myMap.phi1(d)] = mid;
+
      Algo::Modelisation::Polyhedron<PFP> poly(myMap,position);
 
      d = poly.cylinder_topo(5,1,false,false);

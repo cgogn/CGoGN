@@ -298,7 +298,7 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(d), vv1) ;
 }
 
-void Map2::unsewVertexUmbrella(Dart d)
+void Map2::unsewAroundVertex(Dart d)
 {
 	Dart e = d;
 

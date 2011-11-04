@@ -95,18 +95,18 @@ inline Dart GMap3::beta(const Dart d)
 
 inline Dart GMap3::alpha2(Dart d)
 {
-	Dart e = phi2(d);
-	Dart f = phi3(e);
+	Dart e = beta2(d);
+	Dart f = beta3(e);
 
 	if (f != e)
 		return f;
 
 	f = d;
-	e = phi3(f);
+	e = beta3(f);
 	while (e != f)
 	{
-		f = phi2(e);
-		e = phi3(f);
+		f = beta2(e);
+		e = beta3(f);
 	}
 	return f;
 }

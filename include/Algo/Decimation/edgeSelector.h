@@ -54,7 +54,7 @@ private:
 	Dart cur ;
 
 public:
-	EdgeSelector_MapOrder(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_MapOrder(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{}
 	~EdgeSelector_MapOrder()
@@ -81,7 +81,7 @@ private:
 	bool allSkipped ;
 
 public:
-	EdgeSelector_Random(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_Random(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{}
 	~EdgeSelector_Random()
@@ -121,7 +121,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Length(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_Length(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
@@ -168,7 +168,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_QEM(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_QEM(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
@@ -217,7 +217,7 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	EdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
@@ -274,7 +274,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Curvature(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_Curvature(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
@@ -330,7 +330,6 @@ public:
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 } ;
 
-
 template <typename PFP>
 class EdgeSelector_MinDetail : public EdgeSelector<PFP>
 {
@@ -360,7 +359,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_MinDetail(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_MinDetail(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
