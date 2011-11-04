@@ -98,7 +98,7 @@ protected:
 	//! merge a face that has been tag as boundary with existing boundary if needed
 	/*  @param d a dart of the face
 	 */
-	void mergeFacewithBoundary(Dart d);
+	void mergeFaceWithBoundary(Dart d);
 
 	/**
 	 * merge two faces of boundary
@@ -114,7 +114,7 @@ protected:
 	/*! The phi2-links around the face are removed
 	 *  @param d a dart of the face
 	 */
-	void deleteOrientedFace(Dart d) ; // OK boundary
+	void deleteOrientedFace(Dart d) ;
 
 public:
 

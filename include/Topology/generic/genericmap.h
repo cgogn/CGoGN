@@ -404,7 +404,6 @@ public:
 	 */
 	void viewAttributesTables();
 
-
 protected:
 	/// boundary marker
 	Mark m_boundaryMarker;
@@ -438,7 +437,6 @@ protected:
 	 * clear all boundary markers
 	 */
 	void boundaryUnmarkAll();
-
 } ;
 
 

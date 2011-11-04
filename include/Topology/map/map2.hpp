@@ -143,7 +143,6 @@ inline Dart Map2::alpha_1(Dart d)
 //	return e;
 //}
 
-
 inline void Map2::phi2sew(Dart d, Dart e)
 {
 	assert((*m_phi2)[d.index] == d) ;

@@ -26,6 +26,7 @@
 #define __TRAVERSOR_CELL_H__
 
 #include "Topology/generic/dart.h"
+#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {

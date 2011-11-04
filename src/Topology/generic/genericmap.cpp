@@ -646,8 +646,6 @@ void GenericMap::viewAttributesTables()
 
 }
 
-
-
 void GenericMap::boundaryMark(Dart d)
 {
 	m_markTables[DART][0]->operator[](d.index).setMark(m_boundaryMarker);

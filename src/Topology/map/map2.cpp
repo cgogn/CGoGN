@@ -61,29 +61,31 @@ void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
 //	} while (e != d) ;
 //}
 
-void Map2::mergeFacewithBoundary(Dart d)
+void Map2::mergeFaceWithBoundary(Dart d)
 {
 	std::vector<Dart> storeForLinkVertex;
 	std::vector<Dart> storeForLinkFace;
 
-	Dart e = d ;
-	do									// foreach vertex/edge of face
+	Dart it = d ;
+	do	// foreach vertex/edge of face
 	{
-		Dart f = findBoundaryVertex(alpha1(e));	// check if connexion by vertex
-		if (f != e)
+		Dart e = phi2(it) ;
+		if(isBoundaryMarked(e))	// check if connection by edge
 		{
-			storeForLinkVertex.push_back(phi_1(e));
-			storeForLinkVertex.push_back(phi_1(f));
+			storeForLinkFace.push_back(it);
+			storeForLinkFace.push_back(e);
 		}
-
-		Dart g = phi2(f);
-		if (isBoundaryMarked(g))			// check if connexion by a face
+		else
 		{
-			storeForLinkFace.push_back(f);
-			storeForLinkFace.push_back(g);
+			Dart f = findBoundaryVertex(alpha1(it));	// check if connection by vertex
+			if (f != it)
+			{
+				storeForLinkVertex.push_back(phi_1(it));
+				storeForLinkVertex.push_back(phi_1(f));
+			}
 		}
-		e = phi1(e) ;
-	} while (e != d) ;
+		it = phi1(it) ;
+	} while (it != d) ;
 
 	// merge by vertices
 	while (!storeForLinkVertex.empty())
@@ -108,9 +110,8 @@ void Map2::mergeFacewithBoundary(Dart d)
 void Map2::deleteOrientedFace(Dart d)
 {
 	// tag face in boundary
-	boundaryMarkOrbit(FACE,d);
-	mergeFacewithBoundary(d);
-
+	boundaryMarkOrbit(FACE, d);
+	mergeFaceWithBoundary(d);
 }
 
 void Map2::sewOrientedFaces(Dart d, Dart e)

@@ -50,7 +50,6 @@ Dart Map1::newBoundaryFace(unsigned nbEdges)
 	return d ;
 }
 
-
 void Map1::deleteOrientedFace(Dart d)
 {
 	Dart e = phi1(d) ;
