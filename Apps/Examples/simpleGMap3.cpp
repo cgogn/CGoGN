@@ -32,27 +32,29 @@ SimpleGMap3::SimpleGMap3()
 {
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
-//	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
-//	Dart d = prim.hexaGrid_topo(2,2,1);
-//	prim.embedHexaGrid(1,1,1);
-//
-//	Dart d1 = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-//	VEC3 mid0 = (position[d1]+position[myMap.phi1(d1)])/2.0f;
-//	myMap.cutEdge(d1);
-//	position[myMap.phi1(d1)] = mid0;
-//
-//	VEC3 mid1 = (position[d]+position[myMap.phi1(d)])/2.0f;
-//	myMap.cutEdge(d);
-//	position[myMap.phi1(d)] = mid1;
-//
-////	d = myMap.phi1(myMap.phi1(d));
-//	d = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-//	VEC3 mid = (position[d]+position[myMap.phi1(d)])/2.0f;
-//	myMap.cutEdge(d);
-//	position[myMap.phi1(d)] = mid;
+	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
+	Dart d = prim.hexaGrid_topo(2,2,1);
+	prim.embedHexaGrid(1,1,1);
+
+	Dart d1 = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
+	VEC3 mid0 = (position[d1]+position[myMap.phi1(d1)])/2.0f;
+	myMap.cutEdge(d1);
+	position[myMap.phi1(d1)] = mid0;
+
+	VEC3 mid1 = (position[d]+position[myMap.phi1(d)])/2.0f;
+	myMap.cutEdge(d);
+	position[myMap.phi1(d)] = mid1;
+
+	d = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
+	VEC3 mid = (position[d]+position[myMap.phi1(d)])/2.0f;
+	myMap.cutEdge(d);
+	position[myMap.phi1(d)] = mid;
+
+	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
+		position[i] += VEC3(2,0,0);
 
 	Algo::Modelisation::Primitive3D<PFP> prim2(myMap,position);
-	Dart d = prim2.hexaGrid_topo(2,1,1);
+	d = prim2.hexaGrid_topo(2,1,1);
 	prim2.embedHexaGrid(1,1,1);
 
 	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
