@@ -96,7 +96,6 @@ inline Dart Map2::alpha0(Dart d)
 	return phi2(d) ;
 }
 
-
 inline Dart Map2::alpha1(Dart d)
 {
 	return phi2(phi_1(d)) ;
@@ -120,7 +119,6 @@ inline Dart Map2::alpha1(Dart d)
 //	}
 //	return f;
 //}
-
 
 inline Dart Map2::alpha_1(Dart d)
 {
