@@ -61,7 +61,6 @@ void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
 //	} while (e != d) ;
 //}
 
-
 void Map2::mergeFacewithBoundary(Dart d)
 {
 	std::vector<Dart> storeForLinkVertex;
@@ -102,8 +101,6 @@ void Map2::mergeFacewithBoundary(Dart d)
 	}
 }
 
-
-
 void Map2::deleteOrientedFace(Dart d)
 {
 	// tag face in boundary
@@ -112,14 +109,12 @@ void Map2::deleteOrientedFace(Dart d)
 
 }
 
-
 void Map2::sewOrientedFaces(Dart d, Dart e)
 {
 	assert(phi2(d)==d && phi2(e)==e);
 	// sewing the faces
 	phi2sew(d, e);
 }
-
 
 Dart Map2::newFace(unsigned int nbEdges)
 {
@@ -163,7 +158,6 @@ bool Map2::deleteVertex(Dart d)
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
 	Map1::deleteFace(d) ;
-
 	return true ;
 }
 
