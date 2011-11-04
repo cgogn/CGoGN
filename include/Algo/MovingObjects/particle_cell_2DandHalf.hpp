@@ -39,7 +39,7 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationEdge(const VEC3& p
 	const VEC3& n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
 
 	//orientation relative to the plane orthogonal to the face going through the edge
-	return Geom::testOrientation3D(point,vertexPoint,endPoint, vertexPoint+n1);
+	return Geom::testOrientation3D(point,vertexPoint, endPoint, vertexPoint+n1);
 }
 
 template <typename PFP>
@@ -67,7 +67,7 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationFace(VEC3 point, V
 
 	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
 
-	return Geom::testOrientation3D(point, sourcePoint, dPoint, dPoint+n1);
+	return Geom::testOrientation3D(point, sourcePoint, dPoint+n1, dPoint);
 }
 
 template <typename PFP>
@@ -171,9 +171,19 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 current, Geom::Orientation3D sid
 			//transform the displacement into the new entered face
 			VEC3 displ = current-m_position;
 			VEC3 edge = Algo::Geometry::vectorOutOfDart<PFP>(m,m.phi2(d),m_positions);
-			edge.normalize();
-			VEC3 n = Algo::Geometry::faceNormal<PFP>(m,m.phi2(d),m_positions);
-			current = m_position+((displ^n)*displ.norm());
+
+			VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+			VEC3 n2 = Algo::Geometry::faceNormal<PFP>(m,m.phi2(d),m_positions);
+
+			float angle = acos(n1*n2);
+
+			Geom::Matrix<4,4,float> mRot;
+			mRot.identity();
+
+			Geom::rotate(edge[0],edge[1],edge[2],angle,mRot);
+
+			displ = Geom::transform(displ,mRot);
+			current = m_position+displ;
 
 			d = m.phi1(m.phi2(d));
 			faceState(current);
