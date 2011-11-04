@@ -29,8 +29,7 @@
 #include "Utils/glutwin.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/gmap/gmap2.h"
-#include "Topology/generic/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 #include "Geometry/matrix.h"
 #include "Geometry/vector_gen.h"
@@ -46,7 +45,7 @@ using namespace CGoGN;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef EmbeddedMap2<GMap2> MAP;
+	typedef EmbeddedGMap2 MAP;
 };
 
 PFP::MAP myMap;

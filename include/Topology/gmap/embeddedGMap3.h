@@ -21,86 +21,88 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef _TEXTURE_EXAMPLE_
-#define _TEXTURE_EXAMPLE_
 
-#include <iostream>
+#ifndef __EMBEDDED_GMAP3_H__
+#define __EMBEDDED_GMAP3_H__
 
+#include "Topology/gmap/gmap3.h"
 
-#include "Utils/qtSimple.h"
-#include "Utils/textures.h"
-#include "Utils/Shaders/shaderSimpleTexture.h"
-#include "Utils/Shaders/shaderTextureMask.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/mapRender.h"
-
-
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; }}}}
-namespace CGoGN { namespace Utils { class VBO; } }
-
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP ;
-};
 
-typedef PFP::MAP MAP ;
 /**
- * A class for a little interface and rendering
- */
-
-class TexView: public Utils::QT::SimpleQT
+* Class of 3-dimensional G-maps
+* with managed embeddings
+*/
+class EmbeddedGMap3 : public GMap3
 {
-	Q_OBJECT
-protected:
-	void createMask(unsigned int nb);
-	void computeImage();
 public:
+	typedef GMap3 TOPO_MAP;
 
-	MAP myMap ;
-	SelectorTrue allDarts ;
+	//!
+	/*!
+	 *
+	 */
+	virtual void sewVolumes(Dart d, Dart e);
 
-	// render
-	Algo::Render::GL2::MapRender* m_render;
+	//!
+	/*!
+	 *
+	 */
+	virtual void unsewVolumes(Dart d);
 
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_texcoordVBO;
+	//!
+	/*!
+	 *
+	 */
+	virtual bool mergeVolumes(Dart d);
+
+	//! Split a face inserting an edge between two vertices
+	/*! \pre Dart d and e should belong to the same face and be distinct
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 *  @return the dart of the new edge lying in the vertex of d after the cut
+	 */
+	virtual void splitFace(Dart d, Dart e);
+
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	virtual void cutEdge(Dart d);
+
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual Dart cutSpike(Dart d);
+
+//	//! Collapse an edge (that is deleted) possibly merging its vertices
+//	/*! If delDegenerateFaces is true, the method checks that no degenerate
+//	 *  faces are build (faces with less than 3 edges). If it occurs the faces
+//	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
+//	 *  \warning This may produce two distinct vertices if the edge
+//	 *  was the only link between two border faces
+//	 *  @param d a dart in the deleted edge
+//	 *  @param delDegenerateFaces a boolean (default to true)
+//	 */
+//	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true,
+//			bool delDegenerateVolumes = true);
+
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
+//			bool delDegenerateVolumes = true);
+
+	virtual unsigned int closeHole(Dart d);
+
+	virtual void closeMap(DartMarker &marker);
 
 
-	Utils::Texture<2,Geom::Vec3uc>* m_texture;
-	Utils::Texture<2,float>* m_mask;
+	virtual bool check();
+} ;
 
-	//2 shaders
-	Utils::ShaderSimpleTexture* m_shader;
-	Utils::ShaderTextureMask* m_shader2;
-
-	//with mask or not
-	bool m_modeMask;
-
-	/// filename of last loaded texture
-	std::string m_fileName;
-
-	TexView();
-
-	~TexView();
-
-	// callbacks of simpleQT to overdefine:
-	void cb_redraw();
-
-	void cb_initGL();
-
-	void cb_keyPress(int code);
-
-	void cb_Open();
-
-
-};
+} // namespace CGoGN
 
 #endif
-

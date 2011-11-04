@@ -27,8 +27,7 @@
 #include "frame_manip.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/generic/embeddedMap2.h"
+#include "Topology/map/embeddedMap2.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -42,7 +41,6 @@
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 
-
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_precision.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -52,7 +50,7 @@ using namespace CGoGN;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-	typedef EmbeddedMap2<Map2> MAP;
+	typedef EmbeddedMap2 MAP;
 };
 
 PFP::MAP myMap;
