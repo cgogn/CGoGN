@@ -60,6 +60,16 @@ enum { NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 // template <typename PFP>
 // Dart triangleFan_topo(typename PFP::MAP& the_map, int n);
 
+
+
+/**
+ * Unsex the Umbrella aroud a vertex, close the hole and then
+ * create a symetric to construct a polyedron
+ * @param d a dart from the vertex
+ */
+template <typename PFP>
+void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position);
+
 /**
 * class of geometric Polyhedron
 * It alloaw the creation of:

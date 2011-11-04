@@ -59,7 +59,7 @@ namespace GL1
 * @param drawPhi1 draw the phi1 relation ?
 * @param drawPhi2 draw the phi2 relation ?
 * @param ke exploding coefficient for edge (1.0 normal draw)
-* @param kf exploding coefficient for edge (1.0 normal draw)
+* @param kf exploding coefficient for face (1.0 normal draw)
 */
 
 template <typename PFP>
@@ -74,14 +74,42 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
  * @param drawPhi2 draw the phi2 relation ?
  * @param drawPhi3 draw the phi3 relation ?
  * @param ke exploding coefficient for edge (1.0 normal draw)
- * @param kf exploding coefficient for edge (1.0 normal draw)
- * @param kv exploding coefficient for volumes (0.0 normal draw)
+ * @param kf exploding coefficient for face (1.0 normal draw)
+ * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& the_map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+void renderTopoMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
 
 template <typename PFP>
 void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
+
+
+/**
+ * Render darts of g-map
+ *
+ * @param the_map map to render
+ * @param drawPhi1 draw the beta1 relation ?
+ * @param drawPhi2 draw the beta2 relation ?
+ * @param ke exploding coefficient for edge (1.0 normal draw)
+ * @param kf exploding coefficient for face (1.0 normal draw)
+ */
+template <typename PFP>
+void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float ke, float kf);
+
+/**
+ * Render darts of g-map
+ *
+ * @param the_map map to render
+ * @param drawPhi1 draw the beta1 relation ?
+ * @param drawPhi2 draw the beta2 relation ?
+ * @param drawPhi3 draw the beta3 relation ?
+ * @param ke exploding coefficient for edge (1.0 normal draw)
+ * @param kf exploding coefficient for face (1.0 normal draw)
+ * @param kv exploding coefficient for volumes (1.0 normal draw)
+ */
+template <typename PFP>
+void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv);
+
 
 } // namespace GL1
 

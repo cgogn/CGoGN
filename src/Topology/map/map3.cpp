@@ -41,7 +41,7 @@ void Map3::deleteOrientedVolume(Dart d)
 	DartMarkerStore mark(*this);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(16);
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 
 //	// For every face added to the list
@@ -203,66 +203,111 @@ void Map3::uncutEdge(Dart d)
 
 }
 
+//besoin d'un iterator pour chaque face autour d'un sommet
 bool Map3::deleteVertex(Dart d)
 {
-	DartMarkerStore mv(*this);	// Lock a marker
-
-	std::list<Dart> darts_list;			//Darts that are traversed
-	darts_list.push_back(d);			//Start with the dart d
-	std::list<Dart>::iterator darts;
-
-	mv.mark(d);
-
-	std::list<Dart> unique_darts_list;
-	//unique_darts_list.reserve(30);
-	unique_darts_list.push_back(d);
-
-
-	bool boundary = false;
-	if(isBoundaryVertex(d))
-		boundary = true;
-
-	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	//is boundary
+	if(phi3(d) != d)
 	{
-		Dart dc = *darts;
+		Dart e = d;
+		Dart d3 = phi2(phi3(d));
 
-		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(dc);
-		Dart d21 = phi1(d2); // turn in volume
-		Dart d23 = phi3(d2); // change volume
-
-		if(!mv.isMarked(d21))
+		do
 		{
-			darts_list.push_back(d21);
-			mv.mark(d21);
-		}
+			unsewVolumes(e);
+			e = phi2(phi_1(e));
+		}while(e != d);
 
-		if((d23!=d2) && !mv.isMarked(d23))
-		{
-			darts_list.push_back(d23);
-			unique_darts_list.push_back(d23);
-			mv.mark(d23);
-		}
+		Map2::deleteVertex(d3);
 	}
 
-	for(darts = unique_darts_list.begin(); darts != unique_darts_list.end() ; ++darts)
-	{
-		mergeVolumes(*darts);
-	}
-
-	if(boundary)
-	{
-		Dart vit = d ;
-			do
-			{
-				Dart f = phi_1(phi2(vit)) ;
-				phi1sew(vit, f) ;
-				vit = phi2(phi_1((vit))) ;
-			} while(vit != d) ;
-			Map1::deleteFace(d) ;
-	}
+	Map2::deleteVertex(d);
 
 	return true;
+
+//	std::cout << "map3::deleteVertex" << std::endl;
+//
+//	DartMarkerStore mv(*this);	// Lock a marker
+//
+//	std::vector<Dart> darts_list;			//Darts that are traversed
+//	darts_list.reserve(512);
+//	darts_list.push_back(d);			//Start with the dart d
+//	std::vector<Dart>::iterator darts;
+//
+//	mv.mark(d);
+//
+//	std::vector<Dart> unique_darts_list;
+//	unique_darts_list.reserve(512);
+//	unique_darts_list.push_back(d);
+//
+//
+//	bool boundary = false;
+//	if(isBoundaryVertex(d))
+//		boundary = true;
+//
+//	std::cout << "isBoundary ? " << boundary << std::endl;
+//
+//	CellMarker mvolume(*this, VOLUME);
+//
+//	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+//	{
+//		Dart dc = *darts;
+//
+//		//add phi21 and phi23 successor if they are not marked yet
+//		Dart d2 = phi2(dc);
+//		Dart d21 = phi1(d2); // turn in volume
+//		Dart d23 = phi3(d2); // change volume
+//
+//		if(!mv.isMarked(d21))
+//		{
+//			darts_list.push_back(d21);
+//			mv.mark(d21);
+//		}
+//
+//		if((d23!=d2) && !mv.isMarked(d23))
+//		{
+//			darts_list.push_back(d23);
+//			//if(!mvolume.isMarked(d23))
+//			//{
+//				unique_darts_list.push_back(d23);
+//			//	mvolume.mark(d23);
+//			//}
+//			mv.mark(d23);
+//		}
+//
+//		std::cout << "save a dart" << std::endl;
+//	}
+//
+//	std::cout << "unique_darts_list size = " << unique_darts_list.size() << std::endl;
+//
+//	for(darts = unique_darts_list.begin(); darts != unique_darts_list.end() ; ++darts)
+//	{
+//		//std::cout << "merged ? " << mergeVolumes(*darts) << std::endl;
+//
+//		//if(!mergeVolumes(*darts))
+//		//	return false;
+//
+//		std::cout << "mergevolumes" << std::endl;
+//	}
+//
+//	std::cout << "end merging" << std::endl;
+//
+//	if(boundary)
+//	{
+//		std::cout << "is Boundary " << std::endl;
+//		Dart vit = d ;
+//			do
+//			{
+//				Dart f = phi_1(phi2(vit)) ;
+//				phi1sew(vit, f) ;
+//				vit = phi2(phi_1((vit))) ;
+//			} while(vit != d) ;
+//			Map1::deleteFace(d) ;
+//	}
+//
+//	std::cout << "return" << std::endl;
+//
+//	return true;
 }
 
 //TODO
@@ -546,10 +591,11 @@ void Map3::collapseVolume(Dart d, bool delDegenerateFaces,
 	//contracter toutes les faces de la liste
 }
 
-//TODO
-void Map3::mergeFaces(Dart d, Dart e)
+
+bool Map3::mergeFaces(Dart d, Dart e)
 {
 
+ return false;
 }
 
 Dart Map3::cutSpike(Dart d)
@@ -616,6 +662,74 @@ Dart Map3::cutSpike(Dart d)
   return dNew;
 }
 
+/*! @name Topological Queries
+ *  Return or set various topological information
+ *************************************************************************/
+
+bool Map3::sameOrientedVertex(Dart d, Dart e)
+{
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	mv.mark(d);
+
+	for(std::list<Dart>::iterator darts = darts_list.begin();darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		if(dc==e)
+			return true;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		if(d2 != dc)
+		{
+			Dart d21 = phi1(d2); // turn in volume
+			Dart d23 = phi3(d2); // change volume
+
+			if(!mv.isMarked(d21))
+			{
+				darts_list.push_back(d21);
+				mv.mark(d21);
+			}
+
+			if((d23!=d2) && !mv.isMarked(d23))
+			{
+				darts_list.push_back(d23);
+				mv.mark(d23);
+			}
+		}
+	}
+
+	return false;
+}
+
+bool Map3::sameVertex(Dart d, Dart e)
+{
+	return sameOrientedVertex(d,e);
+}
+
+bool Map3::sameOrientedEdge(Dart d, Dart e)
+{
+	  Dart dd = d;
+	  do
+	  {
+		  if(dd==e || phi2(dd)==e)
+			  return true;
+
+		  dd = alpha2(dd);
+	  } while (dd!=d);
+
+	  return false;
+}
+
+bool Map3::sameEdge(Dart d, Dart e)
+{
+	return sameOrientedEdge(d,e);
+}
+
+
 int Map3::edgeDegree(Dart d)
 {
 	int deg = 0;
@@ -635,15 +749,15 @@ unsigned int Map3::vertexDegree(Dart d)
 	int count = 0;
 	DartMarkerStore mv(*this);	// Lock a marker
 
-	std::vector<Dart> darts;			//Darts that are traversed
-	darts.reserve(512);
-	darts.push_back(d);			//Start with the dart d
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	std::list<Dart>::iterator darts;
 
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
 	{
-		Dart dc = *it;
+		Dart dc = *darts;
 
 		//add phi21 and phi23 successor if they are not marked yet
 		Dart d2 = phi2(dc);
@@ -652,27 +766,25 @@ unsigned int Map3::vertexDegree(Dart d)
 
 		if(!mv.isMarked(d21))
 		{
-			darts.push_back(d21);
+			darts_list.push_back(d21);
 			mv.mark(d21);
 		}
 
 		if((d23!=d2) && !mv.isMarked(d23))
 		{
-			darts.push_back(d23);
+			darts_list.push_back(d23);
 			mv.mark(d23);
 		}
 	}
 
-	std::cout << "#darts = " << darts.size() << std::endl;
-
 	DartMarkerStore me(*this);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
 	{
-		if(!me.isMarked(*it))
+		if(!me.isMarked(*darts))
 		{
 			++count;
-			me.markOrbit(EDGE, *it);
+			me.markOrbit(EDGE, *darts);
 		}
 	}
 
@@ -810,7 +922,6 @@ bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 
 bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
@@ -1143,6 +1254,17 @@ void Map3::closeMap(DartMarker& marker)
 //	this->releaseMarker(DART,mf3);
 //}
 //
+
+
+bool Map3::sameFace(Dart d, Dart e)
+{
+	if(phi3(d) != d)
+		if(Map2::sameOrientedFace(phi3(d), e))
+			return true;
+
+	return Map2::sameOrientedFace(d,e);
+}
+
 bool Map3::check()
 {
     CGoGNout << "Check: topology begin" << CGoGNendl;

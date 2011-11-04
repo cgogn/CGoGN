@@ -251,7 +251,7 @@ public:
 
 
 	/**
-	 * Unsew opposite edges from the faces around a vertex
+	 * Unsew the faces consisting of the umbrella of a vertex
 	 * \warning Darts may have
 	 * @param d a dart from the vertex
 	 */
@@ -259,7 +259,7 @@ public:
 
 
 	/**
-	 * Unsex the Umbrella aroud a vertex, close the hole and then
+	 * Unsew the Umbrella aroud a vertex, close the hole and then
 	 * create a symetric to construct a polyedron
 	 * @param d a dart from the vertex
 	 */
@@ -310,6 +310,12 @@ public:
 	 *  @param e a dart
 	 */
 	bool sameOrientedVertex(Dart d, Dart e) ;
+
+	//!Test if dart d and e belong to the same oriented face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedFace(Dart d, Dart e);
 
 	//! Test if dart d and e belong to the same vertex
 	/*! @param d a dart

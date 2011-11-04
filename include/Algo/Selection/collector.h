@@ -117,7 +117,7 @@ public:
  * insideVertices = centerDart
  * insideEdges = star (edges incident to centerDart)
  * insideFaces = triangles incident to centerDart
- * border = vertices of 1-ring
+ * border = vertices of 1-ring -> link (set of adjacent vertices)
  *        = edges of 1-ring
  */
 template <typename PFP>

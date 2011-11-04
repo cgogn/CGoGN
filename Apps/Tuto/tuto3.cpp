@@ -109,8 +109,8 @@ int main(int argc, char **argv)
 	PFP::TVEC3 normal ;
 	AttributeHandler<Geom::Vec3f> color ;
 
-	Dart d2 = myMap.newOrientedFace(3);
-	Dart d3 = myMap.newOrientedFace(4);
+	Dart d2 = myMap.newFace(3);
+	Dart d3 = myMap.newFace(4);
 	myMap.sewFaces(d2,d3);
 
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
 	PFP::TVEC3 position2 ;
 	AttributeHandler<Geom::Vec3f> color2 ;
 
-	Dart dx = myMap2.newOrientedFace(4);
+	Dart dx = myMap2.newFace(4);
 
 	position2 = myMap2.addAttribute<PFP::VEC3>(VERTEX, "position");
 	color2 = myMap2.addAttribute<PFP::VEC3>(VERTEX, "couleur");

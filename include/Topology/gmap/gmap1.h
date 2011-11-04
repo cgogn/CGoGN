@@ -136,6 +136,15 @@ public:
 	 *  @param e a dart in the second face
 	 */
 	void mergeFaces(Dart d, Dart e);
+
+
+	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  @param d first dart in the face
+	 *  @param e second dart in the face
+	 */
+	void linkVertices(Dart d, Dart e);
+
 	//@}
 
 	/*! @name Topological Queries

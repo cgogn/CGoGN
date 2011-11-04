@@ -54,6 +54,16 @@ add_executable( texturesExampleD ../texturesExample.cpp ${texturesExample_moc} )
 target_link_libraries( texturesExampleD
                 ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
 
+QT4_WRAP_CPP(simpleGMap2_moc ../simpleGMap2.h)  
+add_executable( simpleGMap2D ../simpleGMap2.cpp ${simpleGMap2_moc} )
+target_link_libraries( simpleGMap2D
+                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+
+QT4_WRAP_CPP(simpleGMap3_moc ../simpleGMap3.h)  
+add_executable( simpleGMap3D ../simpleGMap3.cpp ${simpleGMap3_moc} )
+target_link_libraries( simpleGMap3D
+                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+
 QT4_WRAP_CPP(extrusionView_moc ../extrusionView.h)	
 add_executable( extrusionViewD ../extrusionView.cpp ${extrusionView_moc})
 target_link_libraries( extrusionViewD

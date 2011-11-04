@@ -22,9 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __IMPLICIT_HIERARCHICAL_MESH_SUBDIVISION3__
-#define __IMPLICIT_HIERARCHICAL_MESH_SUBDIVISION3__
+#ifndef __SUBDIVISION3MAP_H__
+#define __SUBDIVISION3MAP_H__
 
+#include <math.h>
+#include <vector>
 
 namespace CGoGN
 {
@@ -32,66 +34,48 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace IHM
+namespace Modelisation
 {
 
-enum SubdivideType
+/**
+* Cut a 3D ear from a mesh : the ear is sewn by phi3 to the rest of the volume
+* @param d dart of the point of the ear
+* @return a dart from the new face connecting the ear and the rest of the volume
+*/
+template <typename PFP>
+Dart cut3Ear(typename PFP::MAP& map, Dart d);
+
+/**
+* subdivide a hexahedron into 5 tetrahedron
+* @param d dart of the hexahedron
+*/
+template <typename PFP>
+void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
+
+/**
+* catmull clark volumic : do not move the original vertices
+* @param map the map
+* @param attributs geometric attributes of the vertices
+* @param selected a functor to select volumes to subdivide
+* TODO : test if it works for the functorselect
+*/
+template <typename PFP, typename EMBV, typename EMB>
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= SelectorTrue());
+
+template <typename PFP>
+void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= SelectorTrue())
 {
-	S_TRI,
-	S_QUAD
-} ;
+	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
+}
 
-/***********************************************************************************
- *								 Subdivision									   *
- ***********************************************************************************/
+} // namespace Modelisation
 
-template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position) ;
+} // namespace Algo
 
-template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_TRI);
+} // namespace CGoGN
 
-template <typename PFP>
-Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-
-/***********************************************************************************
- *								 Simplification									   *
- ***********************************************************************************/
-
-template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_TRI);
-
-template <typename PFP>
-void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-/***********************************************************************************
- *												Raffinement
- ***********************************************************************************/
-/*
- * Un brin de la face oppose aux faces a spliter
- */
-template <typename PFP>
-void splitVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
-
-
-
-
-} //namespace IHM
-
-} //namespace Algo
-
-} //namespace CGoGN
-
-#include "Algo/ImplicitHierarchicalMesh/subdivision3.hpp"
+#include "Algo/Modelisation/subdivision3map.hpp"
 
 #endif
+
+

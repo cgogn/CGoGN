@@ -48,7 +48,7 @@ void GMap2::deleteFace(Dart d)
 
 void GMap2::splitVertex(Dart d, Dart e)
 {
-	assert(sameOrientedVertex(d, e));
+	assert(sameVertex(d, e));
 	Dart dd = phi2(d) ;
 	Dart ee = phi2(e) ;
 	GMap1::cutEdge(dd);			// Cut the edge of dd (make a new edge)
@@ -82,11 +82,30 @@ void GMap2::cutEdge(Dart d)
 	{
 		GMap1::cutEdge(e);	// Cut the opposite edge
 		Dart ne = phi1(e);
-		phi2sew(nd, beta0(ne));	// sew the two new edges
+		beta2sew(ne,nd);	// Correct the phi2 links
+		beta2sew(beta1(nd), beta1(ne));
 	}
 }
 
-Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces = true)
+void GMap2::uncutEdge(Dart d)
+{
+	assert(vertexDegree(phi1(d)) == 2) ;
+	Dart ne = phi2(d) ;
+	if(ne == d)
+		collapseEdge(d) ;
+	else
+	{
+		Dart nd = phi1(d) ;
+		Dart e = phi_1(ne) ;
+		phi2unsew(e) ;
+		phi2unsew(d) ;
+		GMap1::collapseEdge(nd) ;
+		GMap1::collapseEdge(ne) ;
+		phi2sew(d, e) ;
+	}
+}
+
+Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 	Dart resV ;
 
@@ -173,6 +192,20 @@ bool GMap2::flipBackEdge(Dart d)
 	return false ; // cannot flip a border edge
 }
 
+void GMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+
+	phi1sew(phi_1(d),phi_1(e));
+}
+
+void GMap2::removeEdgeFromVertex(Dart d)
+{
+	assert(phi2(d)!=d);
+
+	phi1sew(phi_1(d),phi2(d));
+}
+
 void GMap2::sewFaces(Dart d, Dart e)
 {
 	phi2sew(d, e);
@@ -240,7 +273,7 @@ void GMap2::extractTrianglePair(Dart d)
 
 void GMap2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 {
-	assert(v1 != v2 && sameOrientedVertex(v1, v2)) ;
+	assert(v1 != v2 && sameVertex(v1, v2)) ;
 	assert(isFaceTriangle(d) && phi2(phi1(d)) == phi1(d) && phi2(phi_1(d)) == phi_1(d)) ;
 	Dart e = phi2(d) ;
 	if(e != d)
@@ -301,10 +334,9 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
-//	TODO check this function
 unsigned int GMap2::closeHole(Dart d)
 {
-	assert(phi2(d) == d);	// Nothing to close
+	assert(beta2(d) == d);	// Nothing to close
 
 	Dart first = GMap1::newEdge();	// First edge of the face that will fill the hole
 	unsigned int countEdges = 1;
@@ -323,7 +355,7 @@ unsigned int GMap2::closeHole(Dart d)
 
 		if (dPhi1 != d)
 		{
-			Dart next = newDart();	// Add a new edge there and link it to the face
+			Dart next = GMap1::newEdge();	// Add a new edge there and link it to the face
 			++countEdges;
 			phi1sew(first, next);	// the edge is linked to the face
 			phi2sew(dNext, next);	// the face is linked to the hole
@@ -400,12 +432,13 @@ bool GMap2::sameOrientedVertex(Dart d, Dart e)
 	Dart dNext = d;				// Foreach dart dNext in the vertex of d
 	do
 	{
-		if (dNext == e)			// Test equality with e
+		if (dNext == e)	// Test equality with e
 			return true;
 		dNext = alpha1(dNext);
 	} while (dNext != d);
 	return false;				// None is equal to e => vertices are distinct
 }
+
 
 bool GMap2::sameVertex(Dart d, Dart e)
 {
@@ -417,6 +450,68 @@ bool GMap2::sameVertex(Dart d, Dart e)
 		dNext = alpha1(dNext);
 	} while (dNext != d);
 	return false;				// None is equal to e => vertices are distinct
+}
+
+bool GMap2::sameOrientedVolume(Dart d, Dart e)
+{
+	DartMarkerStore mark(*this);	// Lock a marker
+	bool found = false;				// Last functor return value
+
+	std::list<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.push_back(d);		// Start with the face of d
+	std::list<Dart>::iterator face;
+
+	// For every face added to the list
+	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+			Dart dNext = *face ;
+			do
+			{
+				if(dNext==e)
+					return true;
+
+				mark.mark(dNext);					// Mark
+				Dart adj = phi2(dNext);				// Get adjacent face
+				if (adj != dNext && !mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+				dNext = phi1(dNext);
+			} while(dNext != *face);
+		}
+	}
+	return false;
+}
+
+bool GMap2::sameVolume(Dart d, Dart e)
+{
+	DartMarkerStore mark(*this);	// Lock a marker
+	bool found = false;				// Last functor return value
+
+	std::list<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.push_back(d);		// Start with the face of d
+	std::list<Dart>::iterator face;
+
+	// For every face added to the list
+	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+			Dart dNext = *face ;
+			do
+			{
+				if(dNext==e || beta0(dNext)==e)
+					return true;
+
+				mark.mark(dNext);					// Mark
+				Dart adj = phi2(dNext);				// Get adjacent face
+				if (adj != dNext && !mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+				dNext = phi1(dNext);
+			} while(dNext != *face);
+		}
+	}
+	return false;
 }
 
 unsigned int GMap2::vertexDegree(Dart d)
@@ -492,7 +587,14 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int
 
 bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
+	Dart dNext = d;
+	do
+	{
+		if (f(dNext) || f(beta1(dNext)))
+			return true;
+		dNext = alpha1(dNext);
+ 	} while (dNext != d);
+ 	return false;
 }
 
 bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
@@ -513,6 +615,42 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 			return true ;
 	}
 	return false ;
+}
+
+bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	DartMarkerStore mark(*this,thread);	// Lock a marker
+	bool found = false;				// Last functor return value
+
+	std::list<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.push_back(d);		// Start with the face of d
+	std::list<Dart>::iterator face;
+
+	// For every face added to the list
+	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+			// Apply functor to the darts of the face
+			found = foreach_dart_of_oriented_face(*face, f);
+
+			// If functor returns false then mark visited darts (current face)
+			// and add non visited adjacent faces to the list of face
+			if (!found)
+			{
+				Dart dNext = *face ;
+				do
+				{
+					mark.mark(dNext);					// Mark
+					Dart adj = phi2(dNext);				// Get adjacent face
+					if (adj != dNext && !mark.isMarked(adj))
+						visitedFaces.push_back(adj);	// Add it
+					dNext = phi1(dNext);
+				} while(dNext != *face);
+			}
+		}
+	}
+	return found;
 }
 
 bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
@@ -563,6 +701,35 @@ bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 		}
 	}
 	return found;
+}
+
+bool GMap2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
+{
+	if(orbit == VERTEX)
+	{
+		Dart dNext = d;
+		do
+		{
+			if(GMap2::foreach_dart_of_edge(phi1(dNext),f,thread))
+				return true;
+
+			dNext = alpha1(dNext);
+		} while (dNext != d);
+
+		return false;
+	}
+	else if(orbit == FACE)
+	{
+		if(GMap2::foreach_dart_of_vertex(phi_1(d),f,thread))
+			return true;
+
+		if(GMap2::foreach_dart_of_vertex(phi_1(phi2(d)),f,thread))
+			return true;
+
+		return false;
+	}
+
+	return false;
 }
 
 } // namespace CGoGN

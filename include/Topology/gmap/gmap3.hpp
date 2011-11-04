@@ -93,6 +93,24 @@ inline Dart GMap3::beta(const Dart d)
 	}
 }
 
+inline Dart GMap3::alpha2(Dart d)
+{
+	Dart e = beta2(d);
+	Dart f = beta3(e);
+
+	if (f != e)
+		return f;
+
+	f = d;
+	e = beta3(f);
+	while (e != f)
+	{
+		f = beta2(e);
+		e = beta3(f);
+	}
+	return f;
+}
+
 inline Dart GMap3::phi3(Dart d)
 {
 	Dart e = beta3(d) ;
@@ -153,6 +171,8 @@ inline void GMap3::phi3unsew(Dart d)
 	beta3unsew(d) ;
 	beta3unsew(beta0(d)) ;
 }
+
+
 
 
 
