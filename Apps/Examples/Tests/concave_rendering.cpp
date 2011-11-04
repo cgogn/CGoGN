@@ -27,8 +27,7 @@
 #include <iostream>
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/generic/embeddedMap2.h"
+#include "Topology/map/embeddedMap2.h"
 #include "Geometry/vector_gen.h"
 
 #include "Algo/Import/import.h"
@@ -125,7 +124,7 @@ float Gfont[174*2]={
 struct PFP: public PFP_STANDARD
 {
 	// definition of the type of the map
-	typedef EmbeddedMap2<Map2> MAP;
+	typedef EmbeddedMap2 MAP;
 };
 
 // declaration of the map

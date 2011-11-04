@@ -27,8 +27,7 @@
 #include <iostream>
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map3.h"
-#include "Topology/generic/embeddedMap3.h"
+#include "Topology/map/embeddedMap3.h"
 
 
 #include "Geometry/vector_gen.h"
@@ -56,7 +55,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-	typedef EmbeddedMap3<Map3> MAP;
+	typedef EmbeddedMap3 MAP;
 	//typedef Map3 MAP;
 };
 

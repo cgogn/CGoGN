@@ -29,8 +29,7 @@
 #include "tp_master.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/generic/embeddedMap2.h"
+#include "Topology/map/embeddedMap2.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -57,7 +56,7 @@ using namespace CGoGN;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef EmbeddedMap2<Map2> MAP;
+	typedef EmbeddedMap2 MAP;
 };
 
 
