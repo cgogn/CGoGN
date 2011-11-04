@@ -22,57 +22,88 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
+#ifndef __EMBEDDED_MAP3_H__
+#define __EMBEDDED_MAP3_H__
 
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/map3.h"
 
-#include "Geometry/vector_gen.h"
-
-#include "Algo/Import/import.h"
-#include "Algo/Export/export.h"
-
-#include "Algo/Modelisation/subdivision.h"
-
-using namespace CGoGN ;
+namespace CGoGN
+{
 
 /**
- * Struct that contains some informations about the types of the manipulated objects
- * Mainly here to be used by the algorithms that are parameterized by it
- */
-struct PFP: public PFP_STANDARD
+* Class of 3-dimensional maps
+* with managed embeddings
+*/
+class EmbeddedMap3 : public Map3
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP;
-};
+public:
+	typedef Map3 TOPO_MAP;
 
-int main(int argc, char **argv)
-{
-	if(argc != 3)
-	{
-		CGoGNout << "Usage : " << argv[0] << " filename nbSteps" << CGoGNendl;
-		return 0;
-	}
+	//!
+	/*!
+	 *
+	 */
+	virtual void sewVolumes(Dart d, Dart e);
 
-	std::string filename(argv[1]);
+	//!
+	/*!
+	 *
+	 */
+	virtual void unsewVolumes(Dart d);
 
-	unsigned int nbSteps;
-	std::istringstream iss(argv[2]);
-	iss >> nbSteps;
+	//!
+	/*!
+	 *
+	 */
+	virtual bool mergeVolumes(Dart d);
 
-	// declaration of the map
-	PFP::MAP myMap;
+	//! Split a face inserting an edge between two vertices
+	/*! \pre Dart d and e should belong to the same face and be distinct
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 *  @return the dart of the new edge lying in the vertex of d after the cut
+	 */
+	virtual void splitFace(Dart d, Dart e);
 
-	std::vector<std::string> attrNames ;
-	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	virtual void cutEdge(Dart d);
 
-	// get a handler to the 3D vector attribute created by the import
-	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]);
+	//!
+	/*!
+	 *
+	 */
+	virtual Dart cutSpike(Dart d);
 
-	for(unsigned int i = 0; i < nbSteps; ++i)
-		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
 
-	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
+	//! Collapse an edge (that is deleted) possibly merging its vertices
+	/*! If delDegenerateFaces is true, the method checks that no degenerate
+	 *  faces are build (faces with less than 3 edges). If it occurs the faces
+	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
+	 *  \warning This may produce two distinct vertices if the edge
+	 *  was the only link between two border faces
+	 *  @param d a dart in the deleted edge
+	 *  @param delDegenerateFaces a boolean (default to true)
+	 */
+	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true,
+			bool delDegenerateVolumes = true);
+	//!
+	/*!
+	 *
+	 */
+	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
+			bool delDegenerateVolumes = true);
 
-    return 0;
-}
+
+	virtual unsigned int closeHole(Dart d);
+
+	virtual void closeMap(DartMarker &marker);
+
+
+	virtual bool check();
+} ;
+
+} // namespace CGoGN
+
+#endif

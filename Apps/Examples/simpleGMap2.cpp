@@ -27,7 +27,6 @@
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
 
-
 SimpleGMap2::SimpleGMap2()
 {
 	 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");

@@ -430,14 +430,13 @@ bool Map2::sameOrientedVertex(Dart d, Dart e)
 bool Map2::sameOrientedFace(Dart d, Dart e)
 {
 	Dart dNext = d;
-	do							//Foreach dart dNext of the face
+	do							// Foreach dart dNext in the face of d
 	{
-		if(dNext == e)			//Test equality with e
+		if(dNext == e)			// Test equality with e
 			return true;
 		dNext = phi1(dNext);
-	}
-	while(dNext != d);
-	return false;				// None is equal to e => Faces are distinct
+	} while(dNext != d);
+	return false;				// None is equal to e => faces are distinct
 }
 
 unsigned int Map2::vertexDegree(Dart d)

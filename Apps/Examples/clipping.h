@@ -35,8 +35,7 @@
 #include "Utils/qtui.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map3.h"
-#include "Topology/generic/embeddedMap3.h"
+#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -66,7 +65,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef EmbeddedMap3<Map3> MAP;
+	typedef EmbeddedMap3 MAP;
 };
 
 

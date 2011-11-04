@@ -27,8 +27,7 @@
 #include "Utils/qtSimple.h"
 
 #include "Topology/generic/parameters.h"
-#include "Topology/gmap/gmap3.h"
-#include "Topology/generic/embeddedMap3.h"
+#include "Topology/gmap/embeddedGMap3.h"
 
 #include "Geometry/vector_gen.h"
 
@@ -39,7 +38,7 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef EmbeddedMap3<GMap3> MAP ;
+	typedef EmbeddedGMap3 MAP ;
 };
 
 typedef PFP::MAP MAP ;
