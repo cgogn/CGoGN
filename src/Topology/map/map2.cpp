@@ -77,7 +77,7 @@ void Map2::mergeFacewithBoundary(Dart d)
 		}
 
 		Dart g = phi2(f);
-		if (isBoundaryMarked(g))			// check if connextion by a face
+		if (isBoundaryMarked(g))			// check if connexion by a face
 		{
 			storeForLinkFace.push_back(f);
 			storeForLinkFace.push_back(g);
@@ -88,15 +88,19 @@ void Map2::mergeFacewithBoundary(Dart d)
 	// merge by vertices
 	while (!storeForLinkVertex.empty())
 	{
-		Dart a = storeForLinkVertex.pop_back();
-		Dart b = storeForLinkVertex.pop_back();
+		Dart a = storeForLinkVertex.back() ;
+		storeForLinkVertex.pop_back() ;
+		Dart b = storeForLinkVertex.back() ;
+		storeForLinkVertex.pop_back() ;
 		phi1sew(a,b);
 	}
 	//merge by faces
 	while (!storeForLinkFace.empty())
 	{
-		Dart a = storeForLinkFace.pop_back();
-		Dart b = storeForLinkFace.pop_back();
+		Dart a = storeForLinkVertex.back() ;
+		storeForLinkVertex.pop_back() ;
+		Dart b = storeForLinkVertex.back() ;
+		storeForLinkVertex.pop_back() ;
 		mergeBoundaryFaces(a,b);
 	}
 }

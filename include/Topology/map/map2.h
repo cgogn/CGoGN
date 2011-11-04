@@ -279,25 +279,6 @@ public:
 	 *  @return true if the merge has been executed, false otherwise
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e);
-
-	//! Close a topological hole (a sequence of connected fixed point of phi2).
-	/*! \pre dart d MUST be fixed point of phi2 relation
-	 *  Add a face to the map that closes the hole.
-	 *  The darts of this face are marked with holeMarker.
-	 *  @param d a dart of the hole (with phi2(d)==d)
-	 *  @return the degree of the created face
-	 */
-	virtual unsigned int closeHole(Dart d);
-
-	//TODO a mettre en algo
-	//! Close the map removing topological holes.
-	/*! Add faces to the map that close every existing hole.
-	 *  These faces are marked.
-	 *  \warning The embeddings of vertices are not updated
-	 *  @param marker
-	 */
-	void closeMap(DartMarker& marker);
-
 	//@}
 
 	/*! @name Topological Queries
@@ -420,11 +401,10 @@ public:
 	 * Apply a functor on the all darts in the set of the link from orbit
 	 */
 	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
-
 	//@}
 
 	//@{
-	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NO USE, only for import algorithm
+	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NOT USE, only for import algorithm
 	/*! \pre dart d MUST be fixed point of phi2 relation
 	 *  Add a face to the map that closes the hole.
 	 *  The darts of this face are marked with holeMarker.
@@ -433,17 +413,15 @@ public:
 	 */
 	virtual unsigned int closeHole(Dart d);
 
-
-	//! Close the map removing topological holes: DO NO USE, only for import algorithm
+	//! Close the map removing topological holes: DO NOT USE, only for import algorithm
 	/*! Add faces to the map that close every existing hole.
 	 *  These faces are marked.
 	 *  \warning The embeddings of vertices are not updated
 	 */
 	void closeMap();
-//	void closeMap(DartMarker& marker);
 
 	/**
-	 * sew oriented face, DO NO USE, only for import algorithm
+	 * sew oriented face, DO NOT USE, only for import algorithm
 	 */
 	void sewOrientedFaces(Dart d, Dart e);
 	//@}

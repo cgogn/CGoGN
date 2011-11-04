@@ -65,7 +65,7 @@ public:
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual void uncutEdge(Dart d) ;
+	virtual bool uncutEdge(Dart d) ;
 
 	/**
 	 * Check if the edge of d can be collapsed or not based on some topological conditions

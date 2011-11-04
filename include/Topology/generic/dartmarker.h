@@ -32,7 +32,6 @@
 namespace CGoGN
 {
 
-
 /**
  * generic class that allows the marking of darts
  * \warning no default constructor
@@ -51,25 +50,22 @@ public:
 	 */
 	DartMarkerGen(GenericMap& map): m_map(map), m_thread(0)
 	{
-//		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
-		m_mark = m_map.getMarkerSet(DART,m_thread).getNewMark() ;
+		m_mark = m_map.getMarkerSet(DART, m_thread).getNewMark() ;
 	}
 
 	DartMarkerGen(GenericMap& map, unsigned int thread): m_map(map), m_thread(thread)
 	{
-//		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
-		m_mark = m_map.getMarkerSet(DART,m_thread).getNewMark() ;
+		m_mark = m_map.getMarkerSet(DART, m_thread).getNewMark() ;
 	}
 
 	virtual ~DartMarkerGen()
 	{
-//		m_map.m_marksets[DART][m_thread].releaseMark(m_mark) ;
-		m_map.getMarkerSet(DART,m_thread).releaseMark(m_mark) ;
+		m_map.getMarkerSet(DART, m_thread).releaseMark(m_mark) ;
 	}
 
 protected:
 	// protected copy constructor to forbid its usage
-	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map), m_thread(0), m_mark(NIL)
+	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map), m_thread(0), m_mark(0)
 	{}
 
 public:
@@ -78,7 +74,7 @@ public:
 	 */
 	virtual void mark(Dart d)
 	{
-		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		m_map.getMarkVector(DART, m_thread)->operator[](d.index).setMark(m_mark);
 	}
 
@@ -87,7 +83,7 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
-		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		m_map.getMarkVector(DART, m_thread)->operator[](d.index).unsetMark(m_mark);
 	}
 
@@ -96,7 +92,7 @@ public:
 	 */
 	virtual bool isMarked(Dart d)
 	{
-		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		return m_map.getMarkVector(DART, m_thread)->operator[](d.index).testMark(m_mark);
 	}
 

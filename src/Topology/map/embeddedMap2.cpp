@@ -105,17 +105,15 @@ void EmbeddedMap2::cutEdge(Dart d)
 	}
 }
 
-void EmbeddedMap2::uncutEdge(Dart d)
+bool EmbeddedMap2::uncutEdge(Dart d)
 {
-	bool doSomethg = (d != phi2(d)) ;
-
-	Map2::uncutEdge(d) ;
-
-	if(doSomethg)
+	if(Map2::uncutEdge(d))
 	{
 		if(isOrbitEmbedded(EDGE))
 			copyDartEmbedding(EDGE, phi2(d), d) ;
+		return true ;
 	}
+	return false ;
 }
 
 bool EmbeddedMap2::edgeCanCollapse(Dart d)
