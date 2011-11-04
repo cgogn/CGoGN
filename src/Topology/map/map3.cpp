@@ -807,11 +807,12 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
-	std::list<Dart> darts_list;			//Darts that are traversed
+	std::vector<Dart> darts_list;			//Darts that are traversed
+	darts_list.reserve(512);
 	darts_list.push_back(d);			//Start with the dart d
 	mv.mark(d);
 
-	for(std::list<Dart>::iterator darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+	for(std::vector<Dart>::iterator darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
 	{
 		Dart dc = *darts;
 
