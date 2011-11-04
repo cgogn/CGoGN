@@ -230,6 +230,7 @@ bool Map2::uncutEdge(Dart d)
 	return false ;
 }
 
+
 Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 //	Dart resV ;
@@ -289,7 +290,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	Dart h = alpha1(e);
 
 	if (h != e)
-		resV=h;
+		resV = h;
 
 	if (f != e && delDegenerateFaces)
 	{
@@ -304,7 +305,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	{
 		h = alpha1(d);
 		if (h != d)
-			resV=h;
+			resV = h;
 	}
 
 	if (f != d && delDegenerateFaces)
@@ -390,19 +391,19 @@ void Map2::unsewFaces(Dart d)
 	if (isBoundaryVertex(d))
 	{
 		Dart f = findBoundaryVertex(d);
-		phi1sew(e,phi_1(f));
+		phi1sew(e, phi_1(f));
 	}
 
 	if (isBoundaryVertex(dd))
 	{
 		Dart f = findBoundaryVertex(dd);
-		phi1sew(phi_1(e),phi_1(f));
+		phi1sew(phi_1(e), phi_1(f));
 	}
 
 	phi2unsew(d);
 	// sew faces to the boundary
-	phi2sew(d,e);
-	phi2sew(dd,phi1(e));
+	phi2sew(d, e);
+	phi2sew(dd, phi1(e));
 }
 
 bool Map2::collapseDegeneratedFace(Dart d)

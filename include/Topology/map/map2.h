@@ -317,7 +317,23 @@ public:
 	/**
 	 * tell if the vertex of d is on the boundary of the map
 	 */
-	bool isBoundaryVertex(Dart d) ;
+	bool isBoundaryVertex(Dart d) ;		// OK boundary
+
+	/**
+	 * find the dart of vertex that belong to the boundary
+	 */
+	Dart findBoundaryVertex(Dart d);
+
+	/**
+	 * tell if the edge of d is on the boundary of the map
+	 */
+	bool isBoundaryEdge(Dart d) ;		// OK boundary
+
+	/**
+	 * tell if the face of d is on the boundary of the map
+	 */
+	bool isBoundaryFace(Dart d) ;
+
 
 	/**
 	 * find the dart of vertex that belong to the boundary
@@ -340,7 +356,7 @@ public:
 	 *  boudary dart is reached.
 	 *  @param d a boundary dart
 	 */
-	Dart nextOnBoundary(Dart d) ;
+	Dart nextOnBoundary(Dart d);		// OK boundary
 
 	// TODO a mettre en algo
 	/**
@@ -422,6 +438,31 @@ public:
 
 	/**
 	 * sew oriented face, DO NOT USE, only for import algorithm
+	 */
+	void sewOrientedFaces(Dart d, Dart e);
+	//@}
+
+	//@{
+	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NO USE, only for import algorithm
+	/*! \pre dart d MUST be fixed point of phi2 relation
+	 *  Add a face to the map that closes the hole.
+	 *  The darts of this face are marked with holeMarker.
+	 *  @param d a dart of the hole (with phi2(d)==d)
+	 *  @return the degree of the created face
+	 */
+	virtual unsigned int closeHole(Dart d);
+
+
+	//! Close the map removing topological holes: DO NO USE, only for import algorithm
+	/*! Add faces to the map that close every existing hole.
+	 *  These faces are marked.
+	 *  \warning The embeddings of vertices are not updated
+	 */
+	void closeMap();
+//	void closeMap(DartMarker& marker);
+
+	/**
+	 * sew oriented face, DO NO USE, only for import algorithm
 	 */
 	void sewOrientedFaces(Dart d, Dart e);
 	//@}
