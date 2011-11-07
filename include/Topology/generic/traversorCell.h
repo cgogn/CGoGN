@@ -40,7 +40,7 @@ private:
 	Dart current ;
 
 public:
-	TraversorCell(MAP& map, Dart dart) : m(map), mark(map)
+	TraversorCell(MAP& map) : m(map), mark(map)
 	{}
 
 	Dart begin()

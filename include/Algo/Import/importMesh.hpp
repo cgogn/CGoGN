@@ -74,7 +74,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 		nbe = edgesBuffer.size();
 		if (nbe > 2)
 		{
-			Dart d = map.newFace(nbe);
+			Dart d = map.newOrientedFace(nbe);
 			for (unsigned int j = 0; j < nbe; ++j)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
@@ -121,6 +121,9 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	}
 
 	if (nbnm > 0)
+	{
+		map.closeMap();
+	}
 		CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
 
 	return true ;

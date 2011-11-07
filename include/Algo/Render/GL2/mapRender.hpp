@@ -30,6 +30,8 @@
 #include "Geometry/intersection.h"
 #include "Algo/Geometry/normal.h"
 
+#include "Topology/generic/traversorCell.h"
+
 namespace CGoGN
 {
 
@@ -330,6 +332,18 @@ void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good,
 			m.markOrbit(FACE, dd);
 		}
 	}
+
+//	DartMarker m(map, thread);
+//	tableIndices.reserve(4 * map.getNbDarts() / 3);
+//
+////	TraversorF<typename PFP::MAP> trav(map);
+//	TraversorCell<typename PFP::MAP,FACE> trav(map);
+//
+//	for (Dart d = trav.begin(); d!= trav.end(); d = trav.next())
+//	{
+//		if (good(d))
+//			addTri<PFP>(map, d, tableIndices);
+//	}
 }
 
 template<typename PFP>
@@ -348,7 +362,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 		{
 			std::list<Dart> bound;
 
-			if(good(dd))
+			if (good(dd))
 				addTri<PFP>(map, dd, tableIndices);
 			m.markOrbit(FACE, dd);
 			bound.push_back(dd);

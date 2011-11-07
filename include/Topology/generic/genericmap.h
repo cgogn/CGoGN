@@ -78,6 +78,7 @@ class GenericMap : public MapBrowser
 
 	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
+	template <typename T> friend class SelectorNoBoundary ;
 
 protected:
 	/**
