@@ -297,7 +297,6 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 
 	if (map.phi1(c) != a)
 	{
-		std::cout << "non triangle face" << std::endl ;
 		addEarTri<PFP>(map, d, tableIndices);
 		return;
 	}

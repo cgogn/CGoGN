@@ -24,6 +24,9 @@
 
 #include "Algo/Geometry/basic.h"
 #include "Algo/Geometry/area.h"
+
+#include "Topology/generic/traversor2.h"
+
 #include <cmath>
 
 namespace CGoGN
@@ -53,20 +56,22 @@ typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const typename
 template<typename PFP>
 typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	Dart e = d;
-	typename PFP::VEC3 normal(0);
+	Dart it = d;
+	typename PFP::VEC3 N(0);
+
+	Traversor2FV<typename PFP::MAP> t(map, d) ;
+
 	do
 	{
-		const typename PFP::VEC3& P = position[e];
-		e = map.phi1(e);
-		const typename PFP::VEC3& Q = position[e];
-		normal[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
-		normal[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
-		normal[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
-	} while (e != d);
-
-	normal.normalize();
-	return normal;
+		const typename PFP::VEC3& P = position[it];
+		it = map.phi1(it);
+		const typename PFP::VEC3& Q = position[it];
+		N[0] += (P[1] - Q[1]) * (P[2] + Q[2]);
+		N[1] += (P[2] - Q[2]) * (P[0] + Q[0]);
+		N[2] += (P[0] - Q[0]) * (P[1] + Q[1]);
+	} while (it != d);
+	N.normalize();
+	return N;
 }
 
 template <typename PFP>

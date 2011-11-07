@@ -40,7 +40,7 @@ private:
 	Dart current ;
 
 public:
-	TraversorCell(MAP& map) : m(map), mark(map)
+	TraversorCell(MAP& map, unsigned int thread = 0) : m(map), mark(map, thread)
 	{}
 
 	Dart begin()
@@ -77,28 +77,28 @@ template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m) : TraversorCell<MAP, VERTEX>(m) {}
+	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, thread) {}
 };
 
 template <typename MAP>
 class TraversorE : public TraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m) : TraversorCell<MAP, EDGE>(m) {}
+	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, thread) {}
 };
 
 template <typename MAP>
 class TraversorF : public TraversorCell<MAP, FACE>
 {
 public:
-	TraversorF(MAP& m) : TraversorCell<MAP, FACE>(m) {}
+	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, thread) {}
 };
 
 template <typename MAP>
 class TraversorW : public TraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorW(MAP& m) : TraversorCell<MAP, VOLUME>(m) {}
+	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, thread) {}
 };
 
 } // namespace CGoGN
