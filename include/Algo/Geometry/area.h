@@ -41,7 +41,7 @@ template <typename PFP>
 typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int th=0) ;
+typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue(), unsigned int thread = 0) ;
 
 template <typename PFP>
 typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;

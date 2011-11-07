@@ -22,7 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/autoAttributeHandler.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 
 namespace CGoGN
 {
@@ -51,34 +52,30 @@ void computeNewPositionsFromFaceNormals(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	CellMarker markV(map, VERTEX);
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !markV.isMarked(d))
+		if(select(d))
 		{
-			markV.mark(d);
-
-			// get pos of vertex
 			const VEC3& pos_d = position[d] ;
 
-			// traversal of vertices neighbourhood
 			VEC3 displ(0) ;
 			REAL sumAreas = 0 ;
-			Dart dd = d ;
-			do
+
+			Traversor2VF<typename PFP::MAP> tvf(map, d) ;
+			for(Dart it = tvf.begin(); it != tvf.end(); it = tvf.next())
 			{
-				sumAreas += faceArea[dd] ;
-				VEC3 vT = faceCentroid[dd] - pos_d ;
-				vT = (vT * faceNewNormal[dd]) * faceNormal[dd] ;
-				displ += faceArea[dd] * vT ;
-				dd = map.phi1(map.phi2(dd)) ;
-			} while(dd != d) ;
+				sumAreas += faceArea[it] ;
+				VEC3 vT = faceCentroid[it] - pos_d ;
+				vT = (vT * faceNewNormal[it]) * faceNormal[it] ;
+				displ += faceArea[it] * vT ;
+			}
+
 			displ /= sumAreas ;
 			position2[d] = pos_d + displ ;
 		}
 	}
 }
-
 
 template <typename PFP>
 void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
@@ -97,37 +94,21 @@ void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
-	CellMarker markF(map, FACE);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<typename PFP::MAP> tf(map) ;
+	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if(select(d) && !markF.isMarked(d))
+		if(select(d))
 		{
-			markF.mark(d);
-
 			REAL sumArea = 0 ;
 			VEC3 meanFilter(0) ;
 
 			// traversal of adjacent faces (by edges and vertices)
-			Dart d_n = map.phi1(d) ; // next dart in the face
-			Dart d_f = map.phi1(map.phi2(d_n)) ; // test dart for end of vertex turning
-
-			Dart e = map.phi2(d) ; // current dart for the traversal
-			Dart d_last = e ;
-			do
+			Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+			for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 			{
-				// get info from face embedding and sum
-				sumArea += faceArea[e] ;
-				meanFilter += faceArea[e] * faceNormal[e] ;
-				e = map.phi_1(e) ;
-				e = map.phi2(e) ;
-
-				if(e == d_f)
-				{
-					e = map.phi2(d_n) ;
-					d_n = map.phi1(d_n) ;
-					d_f = map.phi1(map.phi2(d_n)) ;
-				}
-			} while(e != d_last) ;
+				sumArea += faceArea[it] ;
+				meanFilter += faceArea[it] * faceNormal[it] ;
+			}
 
 			// finalize the computation of meanFilter normal
 			meanFilter /= sumArea ;
@@ -160,13 +141,11 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
-	CellMarker markF(map,FACE);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<typename PFP::MAP> tf(map) ;
+	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if( select(d) && !markF.isMarked(d))
+		if( select(d))
 		{
-			markF.mark(d);
-
 			// traversal of neighbour vertices
 			REAL sumArea = 0 ;
 			REAL sigmaX2 = 0 ;
@@ -176,31 +155,18 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 			VEC3 meanFilter(0) ;
 
 			// traversal of adjacent faces (by edges and vertices)
-			Dart d_n = map.phi1(d) ; // next dart in the face
-			Dart d_f = map.phi1(map.phi2(d_n)) ; // test dart for end of vertex turning
-
-			Dart e = map.phi2(d) ; // current dart for the traversal
-			Dart d_last = e ;
-			do
+			Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+			for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 			{
 				// get info from face embedding and sum
-				REAL area = faceArea[e] ;
+				REAL area = faceArea[it] ;
 				sumArea += area ;
-				VEC3 normal = faceNormal[e] ;
+				VEC3 normal = faceNormal[it] ;
 				meanFilter += area * normal ;
 				sigmaX2 += area * normal[0] * normal[0] ;
 				sigmaY2 += area * normal[1] * normal[1] ;
 				sigmaZ2 += area * normal[2] * normal[2] ;
-				e = map.phi_1(e) ;
-				e = map.phi2(e) ;
-
-				if(e == d_f)
-				{
-					e = map.phi2(d_n) ;
-					d_n = map.phi1(d_n) ;
-					d_f = map.phi1(map.phi2(d_n)) ;
-				}
-			} while(e != d_last) ;
+			}
 
 			meanFilter /= sumArea ;
 			sigmaX2 /= sumArea ;
@@ -267,13 +233,11 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	CellMarker markF(map, FACE);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<typename PFP::MAP> tf(map) ;
+	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if( select(d) && !markF.isMarked(d))
+		if( select(d))
 		{
-			markF.mark(d);
-
 			const VEC3& normF = faceNormal[d] ;
 
 			// traversal of neighbour vertices
@@ -286,20 +250,16 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 			bool SUSANregion = false ;
 
 			// traversal of adjacent faces (by edges and vertices)
-			Dart d_n = map.phi1(d) ; // next dart in the face
-			Dart d_f = map.phi1(map.phi2(d_n)) ; // test dart for end of vertex turning
-
-			Dart e = map.phi2(d) ; // current dart for the traversal
-			Dart d_last = e ;
-			do
+			Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+			for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 			{
 				// get info from face embedding and sum
-				const VEC3& normal = faceNormal[e] ;
+				const VEC3& normal = faceNormal[it] ;
 
 				float angle = Geom::angle(normF, normal) ;
 				if(angle <= SUSANthreshold)
 				{
-					REAL area = faceArea[e] ;
+					REAL area = faceArea[it] ;
 					sumArea += area ;
 					meanFilter += area * normal ;
 					sigmaX2 += area * normal[0] * normal[0] ;
@@ -307,18 +267,7 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 					sigmaZ2 += area * normal[2] * normal[2] ;
 				}
 				else SUSANregion = true ;
-
-				e = map.phi_1(e) ;
-				e = map.phi2(e) ;
-
-				if(e == d_f)
-				{
-					e = map.phi2(d_n) ;
-					d_n = map.phi1(d_n) ;
-					d_f = map.phi1(map.phi2(d_n)) ;
-				}
-
-			} while(e != d_last) ;
+			}
 
 			if(SUSANregion)
 				++nbSusan ;
@@ -407,13 +356,11 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	CellMarker markV(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> tv(map) ;
+	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
-		if( select(d) && !markV.isMarked(d))
+		if( select(d))
 		{
-			markV.mark(d) ;
-
 			const VEC3& normV = normal[d] ;
 
 			// traversal of neighbour vertices
@@ -426,23 +373,15 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 
 			bool SUSANregion = false ;
 
-			Dart dd = d ;
-			do
+			Traversor2VVaE<typename PFP::MAP> tav(map, d) ;
+			for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 			{
-				Dart e = map.phi2(dd) ;
-				const VEC3& neighborNormal = normal[e] ;
-
+				const VEC3& neighborNormal = normal[it] ;
 				float angle = Geom::angle(normV, neighborNormal) ;
 				if( angle <= SUSANthreshold )
 				{
-					REAL umbArea = 0 ;
-			        Dart ee = e ;
-			        do
-			        {
-			        	umbArea += faceArea[ee] ;
-			        	ee = map.phi1(map.phi2(ee)) ;
-			        } while(ee!=e) ;
-			        vertexArea[e] = umbArea ;
+					REAL umbArea = Algo::Geometry::vertexOneRingArea<PFP>(map, it, position) ;
+			        vertexArea[it] = umbArea ;
 
 			        sumArea += umbArea ;
 					sigmaX2 += umbArea * neighborNormal[0] * neighborNormal[0] ;
@@ -451,9 +390,7 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 					meanFilter += neighborNormal * umbArea ;
 				}
 				else SUSANregion = true ;
-
-				dd = map.phi1(e) ;
-			} while(dd != d) ;
+			}
 
 			if(SUSANregion)
 				++nbSusan ;
@@ -511,24 +448,22 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	}
 
 	// Compute face normals from vertex normals
-	CellMarker markF(map,FACE);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<typename PFP::MAP> tf(map) ;
+	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if (select(d) && !markF.isMarked(d))
+		if (select(d))
 		{
-			markF.mark(d);
             VEC3 newNormal(0) ;
             REAL totArea = 0 ;
-            Dart dd = d ;
-            do
-            {
-            	VEC3 vNorm = vertexNewNormal[dd] ;
-            	REAL area = vertexArea[dd] ;
+            Traversor2FV<typename PFP::MAP> tav(map, d) ;
+			for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
+			{
+            	VEC3 vNorm = vertexNewNormal[it] ;
+            	REAL area = vertexArea[it] ;
             	totArea += area ;
             	vNorm *= area ;
             	newNormal += vNorm ;
-            	dd = map.phi1(dd) ;
-            } while(dd != d) ;
+			}
             newNormal.normalize() ;
             faceNewNormal[d] = newNormal ;
 		}

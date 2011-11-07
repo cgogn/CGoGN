@@ -22,6 +22,9 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Topology/generic/traversor2.h"
+#include "Algo/Geometry/intersection.h"
+
 namespace CGoGN
 {
 
@@ -106,16 +109,18 @@ void Collector_OneRing<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(12);
 	this->border.reserve(12);
 
-	const Dart end = this->centerDart;
-	this->insideVertices.push_back(end);
-	Dart dd = end;
-	do
+	this->insideVertices.push_back(this->centerDart);
+
+	Traversor2VE<typename PFP::MAP> te(this->map, this->centerDart) ;
+	for(Dart it = te.begin(); it != te.end(); it = te.next())
+		this->insideEdges.push_back(it);
+
+	Traversor2VF<typename PFP::MAP> tf(this->map, this->centerDart) ;
+	for(Dart it = tf.begin(); it != tf.end(); it = tf.next())
 	{
-		this->insideEdges.push_back(dd);
-		this->insideFaces.push_back(dd);
-		this->border.push_back(this->map.phi1(dd));
-		dd = this->map.alpha1(dd);
-	} while(dd != end);
+		this->insideFaces.push_back(it);
+		this->border.push_back(this->map.phi1(it));
+	}
 }
 
 template <typename PFP>
@@ -124,13 +129,9 @@ void Collector_OneRing<PFP>::collectBorder(Dart d)
 	this->init(d);
 	this->border.reserve(12);
 
-	const Dart end = this->centerDart;
-	Dart dd = end;
-	do
-	{
-		this->border.push_back(this->map.phi1(dd));
-		dd = this->map.alpha1(dd);
-	} while(dd != end);
+	Traversor2VF<typename PFP::MAP> t(this->map, this->centerDart) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
+		this->border.push_back(this->map.phi1(it));
 }
 
 /*********************************************************

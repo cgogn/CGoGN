@@ -52,6 +52,14 @@ public:
 			dmark = new DartMarker(map, thread) ;
 	}
 
+	~TraversorCell()
+	{
+		if(dmark)
+			delete dmark ;
+		else
+			delete cmark ;
+	}
+
 	Dart begin()
 	{
 		if(!firstTraversal)
@@ -76,6 +84,7 @@ public:
 				cmark->mark(current) ;
 		}
 
+		firstTraversal = false ;
 		return current ;
 	}
 
@@ -121,28 +130,32 @@ template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, thread) {}
+	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, thread)
+	{}
 };
 
 template <typename MAP>
 class TraversorE : public TraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, thread) {}
+	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, thread)
+	{}
 };
 
 template <typename MAP>
 class TraversorF : public TraversorCell<MAP, FACE>
 {
 public:
-	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, thread) {}
+	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, thread)
+	{}
 };
 
 template <typename MAP>
 class TraversorW : public TraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, thread) {}
+	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, thread)
+	{}
 };
 
 } // namespace CGoGN

@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include <math.h>
+#include "Topology/generic/traversorCell.h"
 
 namespace CGoGN
 {
@@ -33,7 +34,6 @@ namespace Algo
 namespace Filtering
 {
 
-
 template <typename PFP>
 void sigmaBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, float& sigmaC, float& sigmaS, const FunctorSelect& select)
 {
@@ -43,27 +43,14 @@ void sigmaBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position,
 	float sumAngles = 0.0f ;
 	long nbEdges = 0 ;
 
-	CellMarker mv(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorE<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !mv.isMarked(d))
+		if(select(d))
 		{
-			mv.mark(d);
-
-			Dart dd = d ;
-			do
-			{
-				// compute length and angle if not yet computed
-				Dart e = map.phi2(dd) ;
-				if(!mv.isMarked(e))
-				{
-					sumLengths += Algo::Geometry::edgeLength<PFP>(map, dd, position) ;
-					sumAngles += Geom::angle(normal[d], normal[e]) ;
-					++nbEdges ;
-				}
-				// step to next face around vertex
-				dd = map.phi1(e) ;
-			} while(dd != d) ;
+			sumLengths += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
+			sumAngles += Geom::angle(normal[d], normal[map.phi1(d)]) ;
+			++nbEdges ;
 		}
 	}
 
@@ -80,30 +67,27 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 	float sigmaC, sigmaS ;
 	sigmaBilateral<PFP>(map, position, normal, sigmaC, sigmaS, select) ;
 
-	CellMarker mv(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !mv.isMarked(d))
+		if(select(d))
 		{
-			mv.mark(d);
-
 			// get position & normal of vertex
 			const VEC3& pos_d = position[d] ;
 			const VEC3& normal_d = normal[d] ;
 
-			// traversal of neighbour vertices
+			// traversal of incident edges
 			float sum = 0.0f, normalizer = 0.0f ;
-			Dart dd = d ;
-			do
+			Traversor2VE<typename PFP::MAP> te(map, d) ;
+			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
-				VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, dd, position) ;
+				VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
 				float h = normal_d * vec ;
 				float t = vec.norm() ;
 				float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) ) ;
 				sum += wcs * h ;
 				normalizer += wcs ;
-				dd = map.phi1(map.phi2(dd)) ;
-			} while (dd != d) ;
+			}
 
 			position2[d] = pos_d + ((sum / normalizer) * normal_d) ;
 		}
@@ -121,29 +105,26 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PF
 	long nbTot = 0 ;
 	long nbSusan = 0 ;
 
-	CellMarker mv(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !mv.isMarked(d))
+		if(select(d))
 		{
-			mv.mark(d);
-
 			// get position & normal of vertex
 			const VEC3& pos_d = position[d] ;
 			const VEC3& normal_d = normal[d] ;
 
-			// traversal of neighbour vertices
+			// traversal of incident edges
 			float sum = 0.0f, normalizer = 0.0f ;
 			bool SUSANregion = false ;
-			Dart dd = d ;
-			do
+			Traversor2VE<typename PFP::MAP> te(map, d) ;
+			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
-				Dart e = map.phi2(dd) ;
-				const VEC3& neighborNormal = normal[e] ;
+				const VEC3& neighborNormal = normal[map.phi1(it)] ;
 				float angle = Geom::angle(normal_d, neighborNormal) ;
 				if( angle <= SUSANthreshold )
 				{
-					VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, dd, position) ;
+					VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
 					float h = normal_d * vec ;
 					float t = vec.norm() ;
 					float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) );
@@ -152,9 +133,7 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PF
 				}
 				else
 					SUSANregion = true ;
-
-				dd = map.phi1(e) ;
-			} while(dd != d) ;
+			}
 
 			if(SUSANregion)
 				nbSusan++ ;

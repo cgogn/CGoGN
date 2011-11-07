@@ -135,7 +135,7 @@ Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 	Dart f = phi1(d) ;
 	Dart g = phi_1(d) ;
 
-	if(resV == Dart::nil())
+	if(resV == NIL)
 	{
 		if(!isFaceTriangle(d))
 			resV = f ;

@@ -232,7 +232,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 //	Dart f = phi1(d) ;
 //	Dart g = phi_1(d) ;
 //
-//	if(resV == Dart::nil())
+//	if(resV == NIL)
 //	{
 //		if(!isFaceTriangle(d))
 //			resV = f ;
@@ -740,7 +740,7 @@ Dart Map2::findBoundaryVertex(Dart d)
 			return dNext ;
 		dNext = alpha1(dNext) ;
 	} while (dNext != d) ;
-	return Dart::nil();
+	return NIL ;
 }
 
 bool Map2::isBoundaryEdge(Dart d)

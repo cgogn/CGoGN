@@ -98,13 +98,13 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 			unsigned int embd = map.getEmbedding(VERTEX, d);
 			Dart good_dart;
-			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == Dart::nil(); ++it)
+			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
 				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 
-			if (good_dart != Dart::nil())
+			if (good_dart != NIL)
 			{
 				if (good_dart == map.phi2(good_dart))
 				{

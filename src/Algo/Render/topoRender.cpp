@@ -193,9 +193,9 @@ Dart TopoRender::colToDart(float* color)
 
 	unsigned int id = r + 255*g +255*255*b;
 
-	if (id==0)
-		return Dart::nil();
-	return  Dart(id-1);
+	if (id == 0)
+		return NIL;
+	return Dart(id-1);
 
 }
 
