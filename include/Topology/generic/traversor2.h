@@ -81,7 +81,7 @@ public:
 		if(current != NIL)
 		{
 			current = m.alpha1(current) ;
-			if(m.isBoundarymarked(current)) // jump over a boundary face
+			if(m.isBoundaryMarked(current)) // jump over a boundary face
 				current = m.alpha1(current) ;
 			if(current == start)
 				current = NIL ;
