@@ -76,6 +76,18 @@ public:
 	bool operator()(Dart) const { return false; }
 };
 
+
+template <typename MAP>
+class SelectorNoBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorNoBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return !m_map.isBoundaryMarked(d); }
+};
+
 // Counting Functors : increment its value every time it is applied
 /********************************************************/
 

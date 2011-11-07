@@ -35,8 +35,8 @@ void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
 {
 	if (ee != phi_1(dd))
 		phi1sew(ee, phi_1(dd)) ;
-	if (ee != phi_1(dd))
-		phi1sew(ee, phi_1(dd)) ;
+	if (dd != phi_1(ee))
+		phi1sew(dd, phi_1(ee)) ;
 	Map1::deleteOrientedFace(dd) ;
 }
 

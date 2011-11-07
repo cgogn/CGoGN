@@ -437,6 +437,7 @@ protected:
 	 * clear all boundary markers
 	 */
 	void boundaryUnmarkAll();
+
 } ;
 
 
