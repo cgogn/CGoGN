@@ -77,16 +77,40 @@ public:
 };
 
 
+//template <typename MAP>
+//class SelectorNoBoundary : public FunctorSelect
+//{
+//public:
+//protected:
+//	MAP& m_map;
+//public:
+//	SelectorNoBoundary(MAP& m): m_map(m) {}
+//	bool operator()(Dart d) const { return !m_map.isBoundaryMarked(d); }
+//};
+
 template <typename MAP>
-class SelectorNoBoundary : public FunctorSelect
+class SelectorEdgeBoundary : public FunctorSelect
 {
 public:
 protected:
 	MAP& m_map;
 public:
-	SelectorNoBoundary(MAP& m): m_map(m) {}
-	bool operator()(Dart d) const { return !m_map.isBoundaryMarked(d); }
+	SelectorEdgeBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return m_map.isBoundaryEdge(d); }
 };
+
+
+template <typename MAP>
+class SelectorEdgeNoBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorEdgeNoBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return !m_map.isBoundaryEdge(d); }
+};
+
 
 // Counting Functors : increment its value every time it is applied
 /********************************************************/

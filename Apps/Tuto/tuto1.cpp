@@ -88,6 +88,11 @@ void MyQT::cb_redraw()
 		m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
 		m_render->draw(m_shader, Algo::Render::GL2::LINES);
 
+		m_shader->setColor(Geom::Vec4f(0.,1.,1.,0.));
+		m_render->draw(m_shader, Algo::Render::GL2::BOUNDARY);
+
+
+
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, 1.0f);
 
@@ -169,9 +174,10 @@ int main(int argc, char **argv)
 
 	// update des primitives du renderer
 	SelectorTrue allDarts;
-//	SelectorNoBoundary<PFP::MAP> allDarts(myMap);
+	SelectorEdgeNoBoundary<PFP::MAP> insideEdges(myMap);// just to draw only inside edges
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	sqt.m_render->initPrimitives<PFP>(myMap, insideEdges, Algo::Render::GL2::LINES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::BOUNDARY);	// special primitive for boundary edges
 
 	// show final pour premier redraw
 	sqt.show();

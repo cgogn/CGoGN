@@ -45,7 +45,7 @@ public:
 
 	Dart begin()
 	{
-		mark.unmarkAll() ;
+		mark.unmarkAll() ;	// TODO ajouter test pour ne pas toujours faire le unmark !!
 		current = m.begin() ;
 		while(m.isBoundaryMarked(current))
 			m.next(current) ;
