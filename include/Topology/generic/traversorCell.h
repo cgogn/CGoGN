@@ -27,6 +27,7 @@
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/dartmarker.h"
+#include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
 {
@@ -36,38 +37,81 @@ class TraversorCell
 {
 private:
 	MAP& m ;
-	DartMarker mark ;
+	DartMarker* dmark ;
+	CellMarker* cmark ;
 	Dart current ;
+	bool firstTraversal ;
 
 public:
-	TraversorCell(MAP& map, unsigned int thread = 0) : m(map), mark(map, thread)
-	{}
+	TraversorCell(MAP& map, unsigned int thread = 0) :
+		m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true)
+	{
+		if(map.isOrbitEmbedded(ORBIT))
+			cmark = new CellMarker(map, ORBIT, thread) ;
+		else
+			dmark = new DartMarker(map, thread) ;
+	}
 
 	Dart begin()
 	{
-		mark.unmarkAll() ;	// TODO ajouter test pour ne pas toujours faire le unmark !!
+		if(!firstTraversal)
+		{
+			if(dmark)
+				dmark->unmarkAll() ;
+			else
+				cmark->unmarkAll() ;
+		}
+
 		current = m.begin() ;
 		while(m.isBoundaryMarked(current))
 			m.next(current) ;
+
 		if(current == m.end())
 			current = NIL ;
 		else
-			mark.markOrbit(ORBIT, current) ;
+		{
+			if(dmark)
+				dmark->markOrbit(ORBIT, current) ;
+			else
+				cmark->mark(current) ;
+		}
+
 		return current ;
 	}
+
 	Dart end() { return NIL ; }
+
 	Dart next()
 	{
 		if(current != NIL)
 		{
-			while(current != NIL && (mark.isMarked(current) || m.isBoundaryMarked(current)))
+			bool ismarked ;
+			if(dmark)
+				ismarked = dmark->isMarked(current) ;
+			else
+				ismarked = cmark->isMarked(current) ;
+
+			while(current != NIL && (ismarked || m.isBoundaryMarked(current)))
 			{
 				m.next(current) ;
 				if(current == m.end())
 					current = NIL ;
+				else
+				{
+					if(dmark)
+						ismarked = dmark->isMarked(current) ;
+					else
+						ismarked = cmark->isMarked(current) ;
+				}
 			}
+
 			if(current != NIL)
-				mark.markOrbit(ORBIT, current) ;
+			{
+				if(dmark)
+					dmark->markOrbit(ORBIT, current) ;
+				else
+					cmark->mark(current) ;
+			}
 		}
 		return current ;
 	}
