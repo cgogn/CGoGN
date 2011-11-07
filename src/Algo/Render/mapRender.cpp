@@ -40,8 +40,8 @@ namespace GL2
 
 MapRender::MapRender()
 {
-	glGenBuffersARB(4, m_indexBuffers) ;
-	for(unsigned int i = 0; i < 4; ++i)
+	glGenBuffersARB(SIZE_BUFFER, m_indexBuffers) ;
+	for(unsigned int i = 0; i < SIZE_BUFFER; ++i)
 		m_nbIndices[i] = 0 ;
 }
 
@@ -67,6 +67,10 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 		case TRIANGLES:
 			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
 			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
+			break;
+		case BOUNDARY:
+			m_nbIndices[BOUNDARY_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[BOUNDARY_INDICES];
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
@@ -97,6 +101,11 @@ void MapRender::draw(Utils::GLSLShader* sh, int prim)
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[TRIANGLE_INDICES]);
 			glDrawElements(GL_TRIANGLES, m_nbIndices[TRIANGLE_INDICES], GL_UNSIGNED_INT, 0);
 			break;
+		case BOUNDARY:
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffers[BOUNDARY_INDICES]);
+			glDrawElements(GL_LINES, m_nbIndices[BOUNDARY_INDICES], GL_UNSIGNED_INT, 0);
+			break;
+
 		default:
 			break;
 	}

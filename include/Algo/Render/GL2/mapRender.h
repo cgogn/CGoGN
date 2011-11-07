@@ -61,7 +61,8 @@ enum drawingType
 	POINTS = 4,
 	EXPLODED = 8,
 	FLAT_TRIANGLES = 16,
-	ERR = 32
+	BOUNDARY = 32,
+	ERR = 64
 } ;
 
 enum bufferIndex
@@ -70,6 +71,7 @@ enum bufferIndex
 	LINE_INDICES = 1,
 	TRIANGLE_INDICES = 2,
 	FLAT_BUFFER = 3,
+	BOUNDARY_INDICES = 4,
 	SIZE_BUFFER
 } ;
 
@@ -204,6 +206,11 @@ public:
 	template <typename PFP>
 	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
 
+
+
+	template <typename PFP>
+	void initBoundaries(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
+
 	/**
 	 * initialization of the VBO indices primitives
 	 * computed by a traversal of the map
@@ -211,6 +218,8 @@ public:
 	 */
 	template <typename PFP>
 	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true, unsigned int thread = 0) ;
+
+
 
 	/**
 	 * initialization of the VBO indices primitives

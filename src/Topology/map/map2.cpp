@@ -120,7 +120,6 @@ void Map2::deleteOrientedFace(Dart d)
 
 Dart Map2::newFace(unsigned int nbEdges)
 {
-	std::cout << "OUCHHH"<< std::endl;
 	Dart d = Map1::newFace(nbEdges);
 	Dart e = Map1::newBoundaryFace(nbEdges);
 
