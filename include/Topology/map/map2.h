@@ -95,6 +95,10 @@ protected:
 	 */
 	void phi2unsew(Dart d);
 
+	/*! @name Boundary marker management
+	 *  Function used to merge boundary faces properly
+	 *************************************************************************/
+
 	//! merge a face that has been tag as boundary with existing boundary if needed
 	/*  @param d a dart of the face
 	 */
@@ -137,32 +141,33 @@ public:
 	 *  @param d first dart in vertex v
 	 *  @param e second dart in vertex v
 	 */
-	virtual void splitVertex(Dart d, Dart e); // OK boundary
+	virtual void splitVertex(Dart d, Dart e);
 
 	//! Delete the vertex of d (works only for internal vertices)
-	/*! All the faces around the vertex are merged into one face
+	/*! Does not create a hole -> all the faces
+	 * 	around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d) ;	// OK boundary
+	virtual bool deleteVertex(Dart d);
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	virtual void linkVertices(Dart d, Dart e);	//TODO removing ??
+	virtual void linkVertices(Dart d, Dart e); //TODO remove ??
 
-	//! Cut the edge of d
+	//! Cut the edge of d by inserting a new vertex
 	/*! @param d a dart of the edge to cut
 	 */
-	virtual void cutEdge(Dart d);// OK boundary
+	virtual void cutEdge(Dart d);
 
 	//! Undo the cut of the edge of d
 	/*! @param d a dart of the edge to uncut
 	 * @return true if the uncut has been executed, false otherwise
 	 */
-	virtual bool uncutEdge(Dart d);// OK boundary
+	virtual bool uncutEdge(Dart d);
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
@@ -188,7 +193,7 @@ public:
 	 * Flip the edge of d (rotation in phi_1 order)
 	 * WARNING : Works only for non-border edges.
 	 * @param d a dart of the edge to flip
-	 * @return true if the flip has been executed, false otherwise
+	 * @return true if the flipBack has been executed, false otherwise
 	 */
 	virtual bool flipBackEdge(Dart d);
 
@@ -207,7 +212,7 @@ public:
 	virtual void removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges
-	/*! \pre Darts d & e MUST be fixed point of phi2 relation
+	/*! \pre Edges of darts d & e MUST be boundary edges
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
 	 */
@@ -401,6 +406,10 @@ public:
 	 */
 	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 	//@}
+
+	/*! @name Close map after import or creation
+	 *  These functions must be used with care, generally only by import algorithms
+	 *************************************************************************/
 
 	//@{
 	//! Close a topological hole (a sequence of connected fixed point of phi2). DO NOT USE, only for import algorithm
