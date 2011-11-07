@@ -47,6 +47,8 @@ public:
 	{
 		mark.unmarkAll() ;
 		current = m.begin() ;
+		while(m.isBoundaryMarked(current))
+			m.next(current) ;
 		if(current == m.end())
 			current = NIL ;
 		else
@@ -58,7 +60,7 @@ public:
 	{
 		if(current != NIL)
 		{
-			while(current != NIL && mark.isMarked(current))
+			while(current != NIL && (mark.isMarked(current) || m.isBoundaryMarked(current)))
 			{
 				m.next(current) ;
 				if(current == m.end())
@@ -73,19 +75,31 @@ public:
 
 template <typename MAP>
 class TraversorV : public TraversorCell<MAP, VERTEX>
-{};
+{
+public:
+	TraversorV(MAP& m) : TraversorCell<MAP, VERTEX>(m) {}
+};
 
 template <typename MAP>
 class TraversorE : public TraversorCell<MAP, EDGE>
-{};
+{
+public:
+	TraversorE(MAP& m) : TraversorCell<MAP, EDGE>(m) {}
+};
 
 template <typename MAP>
 class TraversorF : public TraversorCell<MAP, FACE>
-{};
+{
+public:
+	TraversorF(MAP& m) : TraversorCell<MAP, FACE>(m) {}
+};
 
 template <typename MAP>
 class TraversorW : public TraversorCell<MAP, VOLUME>
-{};
+{
+public:
+	TraversorW(MAP& m) : TraversorCell<MAP, VOLUME>(m) {}
+};
 
 } // namespace CGoGN
 

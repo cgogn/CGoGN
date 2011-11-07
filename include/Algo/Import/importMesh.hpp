@@ -123,8 +123,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	if (nbnm > 0)
 	{
 		map.closeMap();
+		CGoGNout << "Map closed (" << nbnm << " boundary edges)" << CGoGNendl;
 	}
-		CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
 
 	return true ;
 }

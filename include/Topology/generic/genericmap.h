@@ -75,10 +75,8 @@ class AttributeHandlerGen ;
 
 class GenericMap : public MapBrowser
 {
-
 	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
-	template <typename T> friend class SelectorNoBoundary ;
 
 protected:
 	/**
@@ -419,11 +417,13 @@ protected:
 	 */
 	void boundaryUnmark(Dart d);
 
+public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
 	bool isBoundaryMarked(Dart d);
 
+protected:
 	/**
 	 * mark an orbit of dart as belonging to boundary
 	 */

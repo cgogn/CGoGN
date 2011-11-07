@@ -297,6 +297,7 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 
 	if (map.phi1(c) != a)
 	{
+		std::cout << "non triangle face" << std::endl ;
 		addEarTri<PFP>(map, d, tableIndices);
 		return;
 	}
@@ -321,29 +322,27 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 template<typename PFP>
 void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map, thread);
-	tableIndices.reserve(4 * map.getNbDarts() / 3);
-
-	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
-	{
-		if(!m.isMarked(dd) && good(dd))
-		{
-			addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE, dd);
-		}
-	}
-
 //	DartMarker m(map, thread);
 //	tableIndices.reserve(4 * map.getNbDarts() / 3);
 //
-////	TraversorF<typename PFP::MAP> trav(map);
-//	TraversorCell<typename PFP::MAP,FACE> trav(map);
-//
-//	for (Dart d = trav.begin(); d!= trav.end(); d = trav.next())
+//	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
 //	{
-//		if (good(d))
-//			addTri<PFP>(map, d, tableIndices);
+//		if(!m.isMarked(dd) && good(dd))
+//		{
+//			addTri<PFP>(map, dd, tableIndices);
+//			m.markOrbit(FACE, dd);
+//		}
 //	}
+
+	DartMarker m(map, thread);
+	tableIndices.reserve(4 * map.getNbDarts() / 3);
+
+	TraversorF<typename PFP::MAP> trav(map);
+	for (Dart d = trav.begin(); d!= trav.end(); d = trav.next())
+	{
+		if (good(d))
+			addTri<PFP>(map, d, tableIndices);
+	}
 }
 
 template<typename PFP>
