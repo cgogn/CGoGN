@@ -41,6 +41,8 @@ protected:
 	void init() ;
 
 public:
+	typedef GMap1 ParentMap;
+
 	GMap2();
 
 	virtual std::string mapTypeName();

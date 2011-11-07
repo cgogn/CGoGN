@@ -104,8 +104,6 @@ void EmbeddedMap3<MAP3>::unsewVolumes(Dart d)
 
 	if (MAP3::isOrbitEmbedded(FACE))
 	{
-		std::cout << "newCell f" << std::endl;
-
 		MAP3::embedNewCell(FACE, dd);
 		MAP3::copyCell(FACE, dd, d);
 	}

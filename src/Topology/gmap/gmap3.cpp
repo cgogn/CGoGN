@@ -495,6 +495,98 @@ bool GMap3::sameFace(Dart d, Dart e)
 	return false;
 }
 
+unsigned int GMap3::edgeDegree(Dart d)
+{
+	unsigned int deg = 0;
+	Dart e = d;
+
+	do
+	{
+		deg++;
+		e = alpha2(e);
+	} while(e != d);
+
+	return deg;
+}
+
+bool GMap3::check()
+{
+    CGoGNout << "Check: topology begin" << CGoGNendl;
+    DartMarker m(*this);
+    m.unmarkAll();
+    for(Dart d = this->begin(); d != this->end(); this->next(d))
+    {
+        Dart d0 = beta0(d);
+        if (beta0(d0) != d) // beta0 involution ?
+		{
+             CGoGNout << "Check: beta0 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        Dart d3 = beta3(d);
+        if (beta3(d3) != d) // beta3 involution ?
+		{
+             CGoGNout << "Check: beta3 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        if(d3 != d)
+        {
+        	if(beta1(d3) != beta3(beta1(d)))
+        	{
+        		CGoGNout << "Check: beta3 , faces are not entirely sewn" << CGoGNendl;
+        		return false;
+        	}
+        }
+
+        Dart d2 = beta2(d);
+        if (beta2(d2) != d) // beta2 involution ?
+		{
+            CGoGNout << "Check: beta2 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        Dart d1 = phi1(d);
+        if (phi_1(d1) != d) // phi1 a une image correcte ?
+		{
+            CGoGNout << "Check: unconsistent phi_1 link" << CGoGNendl;
+            return false;
+        }
+
+        if (m.isMarked(d1)) // phi1 a un seul antécédent ?
+		{
+            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
+            return false;
+        }
+        m.mark(d1);
+
+        if (d1 == d)
+            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
+
+        if (phi1(d1) == d)
+            CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
+
+        if (phi2(d1) == d)
+            CGoGNout << "Check: (warning) dandling edge (phi2)" << CGoGNendl;
+
+        if (phi3(d1) == d)
+            CGoGNout << "Check: (warning) dandling edge (phi3)" << CGoGNendl;
+    }
+
+    for(Dart d = this->begin(); d != this->end(); this->next(d))
+    {
+        if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
+		{
+        	std::cout << "dart = " << d << std::endl;
+            CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
+            return false;
+        }
+    }
+
+    CGoGNout << "Check: topology ok" << CGoGNendl;
+    return true;
+}
+
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/

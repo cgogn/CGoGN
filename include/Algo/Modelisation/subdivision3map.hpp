@@ -119,8 +119,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 
-//	mv.unmarkAll();
-
 	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -128,23 +126,15 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if(selected(d) && !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-			Dart dd = d;
-			do {
-				mv.mark(dd);
-				dd = map.phi1(map.phi2(dd));
-			} while(dd!=d);
+			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
 		}
 
 		//cut edges
 		if (selected(d) && !me.isMarked(d))
 		{
-			std::cout << "edge to cut " << d << std::endl;
-			std::cout << "edge degree " << map.edgeDegree(d) << std::endl;
-
 			Dart f = map.phi1(d);
 			map.cutEdge(d);
 			Dart e = map.phi1(d) ;
-			std::cout << "cut cut cut " << std::endl;
 
 			attributs[e] =  attributs[d];
 			attributs[e] += attributs[f];
@@ -165,8 +155,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			} while(dd != d);
 		}
 	}
-
-	std::cout << "edge cut" << std::endl;
 
 	// second pass: quandrangule faces
 	std::map<Dart,Dart> toSew;
@@ -199,8 +187,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			attributs[cf] = center;					// affect the data to the central vertex
 		}
 	}
-
-	std::cout << "nb vertices " << l_vertices.size() << std::endl;
 
 	//third pass : create the inner faces
 	for (std::vector<Dart>::iterator it = l_vertices.begin(); it != l_vertices.end(); ++it)

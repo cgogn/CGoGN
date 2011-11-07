@@ -68,37 +68,45 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e)
 
 void EmbeddedMap3::unsewVolumes(Dart d)
 {
-//	Dart d3 = phi3(d);
-//
-//	bool boundaryD = false;
-//	bool boundaryE = false;
-//
-//	if(isOrbitEmbedded(VERTEX))
-//	{
-//		if(isBoundaryVertex(d))
-//			boundaryD = true;
-//		if(isBoundaryVertex(phi1(d)))
-//			boundaryE = true;
-//	}
-//
-	Map3::unsewVolumes(d);
-//
-//	Dart dd = d;
-//	Dart dd3 = d3;
-//
-//	do
-//	{
-//		if(isOrbitEmbedded(VERTEX))
-//			copyCell(VERTEX, dd3, phi1(dd));
-//
-//		if(isOrbitEmbedded(EDGE))
-//
-//
-//		if(isOrbitEmbedded(FACE))
-//
-//
-//		dd = phi1(dd) ;
-//	}while( dd != d );
+	Dart dd = phi1(phi3(d));
+
+	if(phi3(d)!=d)
+	{
+		Map3::unsewVolumes(d);
+
+		Dart ddd = d;
+		do
+		{
+			if(isOrbitEmbedded(VERTEX))
+			{
+				if(!sameVertex(ddd,dd))
+				{
+					embedNewCell(VERTEX, dd);
+					copyCell(VERTEX, dd, ddd);
+				}
+			}
+
+			dd = phi_1(dd);
+
+			if(isOrbitEmbedded(EDGE))
+			{
+				if(!sameEdge(ddd,dd))
+				{
+					embedNewCell(EDGE, dd);
+					copyCell(VERTEX, dd, ddd);
+				}
+			}
+
+			ddd = phi1(ddd);
+		} while(ddd!=d);
+
+
+		if (isOrbitEmbedded(FACE))
+		{
+			embedNewCell(FACE, dd);
+			copyCell(FACE, dd, d);
+		}
+	}
 }
 
 bool EmbeddedMap3::mergeVolumes(Dart d)

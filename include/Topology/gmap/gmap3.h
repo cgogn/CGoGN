@@ -41,6 +41,8 @@ protected:
 	void init() ;
 
 public:
+	typedef GMap2 ParentMap;
+
 	GMap3();
 
 	virtual std::string mapTypeName();
@@ -202,9 +204,16 @@ public:
 	unsigned int vertexDegree(Dart d) ;
 
 	/**
+	 * compute the number of volumes around the edge of d
+	 */
+	virtual unsigned int edgeDegree(Dart d);
+
+	/**
 	 * compute the number of faces in the volume of d
 	 */
 	unsigned int volumeDegree(Dart d);
+
+	virtual bool check();
 
 	/*! @name Cell Functors
 	 *  Apply functors to all darts of a cell
