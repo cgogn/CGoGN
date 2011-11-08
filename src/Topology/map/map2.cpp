@@ -990,18 +990,6 @@ unsigned int Map2::closeHole(Dart d)
 	return countEdges ;
 }
 
-//void Map2::closeMap(DartMarker& marker)
-//{
-//	// Search the map for topological holes (fixed point for phi2)
-//	for (Dart d = begin(); d != end(); next(d))
-//	{
-//		if (phi2(d) == d)
-//		{
-//			closeHole(d);
-//			marker.markOrbit(FACE, phi2(d)) ;
-//		}
-//	}
-
 void Map2::closeMap()
 {
 	// Search the map for topological holes (fix points of phi2)
