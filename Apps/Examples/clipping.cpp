@@ -186,10 +186,7 @@ void Clipping::slot_spinBox_GridResolution(int i)
 
 void Clipping::slot_pushButton_changePlanesColor()
 {
-	QColor NewColor;
-	QColorDialog ColDialog;
-
-	NewColor = ColDialog.getColor();
+	QColor NewColor = QColorDialog::getColor();
 
 	int r, g, b;
 	NewColor.getRgb(&r, &g, &b);
