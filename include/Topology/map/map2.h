@@ -325,11 +325,6 @@ public:
 	bool isBoundaryVertex(Dart d) ;		// OK boundary
 
 	/**
-	 * find the dart of vertex that belong to the boundary
-	 */
-	Dart findBoundaryVertex(Dart d);
-
-	/**
 	 * tell if the edge of d is on the boundary of the map
 	 */
 	bool isBoundaryEdge(Dart d) ;		// OK boundary
@@ -339,12 +334,15 @@ public:
 	 */
 	bool isBoundaryFace(Dart d) ;
 
-	//! Follow the boundary of a surface as if it was a oriented face.
-	/*! This operation alternate phi1 and phi2 operator until another
-	 *  boudary dart is reached.
-	 *  @param d a boundary dart
+	/**
+	 * find the dart of vertex that belong to the boundary
 	 */
-	Dart nextOnBoundary(Dart d);		// OK boundary
+	Dart findBoundaryVertex(Dart d);
+
+	/**
+	 * if the edge of d is on the boundary, return the non-boundaryMarked dart of this edge
+	 */
+	bool getEdgeInteriorDart(Dart d) ;
 
 	// TODO a mettre en algo
 	/**

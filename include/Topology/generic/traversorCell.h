@@ -37,15 +37,15 @@ class TraversorCell
 {
 private:
 	MAP& m ;
+	unsigned int m_orbit ;
 	DartMarker* dmark ;
 	CellMarker* cmark ;
 	Dart current ;
 	bool firstTraversal ;
-	unsigned int m_orbit;
 
 public:
 	TraversorCell(MAP& map, unsigned int orbit, unsigned int thread = 0) :
-		m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_orbit(orbit)
+		m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true)
 	{
 		if(map.isOrbitEmbedded(m_orbit))
 			cmark = new CellMarker(map, m_orbit, thread) ;

@@ -173,6 +173,13 @@ void Viewer::cb_Open()
 	updateGL() ;
 }
 
+void Viewer::cb_Save()
+{
+	std::string filters("off (*.off)") ;
+	std::string filename = selectFileSave("Save Mesh", "", filters) ;
+	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+}
+
 void Viewer::importMesh(std::string& filename)
 {
 	myMap.clear(true) ;

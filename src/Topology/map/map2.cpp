@@ -761,29 +761,6 @@ bool Map2::isBoundaryFace(Dart d)
 	return false ;
 }
 
-Dart Map2::nextOnBoundary(Dart d)
-{
-//	assert(phi2(d) == d);	// Only work on boundary dart
-//	Dart dPhi1;
-//	Dart dNext = d;
-//	do
-//	{						// Loop inside the vertex
-//		dPhi1 = phi1(dNext);
-//		dNext = phi2(dPhi1);
-//	} while (dNext != dPhi1);
-//	return dNext;
-
-	assert( isBoundaryMarked(phi2(d)) );	// Only work on boundary dart
-	Dart dPhi1;
-	Dart dNext = d;
-	do
-	{						// Loop inside the vertex
-		dPhi1 = phi1(dNext);
-		dNext = phi2(dPhi1);
-	} while (! isBoundaryMarked(dNext));
-	return dPhi1;
-}
-
 bool Map2::isTriangular()
 {
 	DartMarker m(*this) ;
@@ -872,15 +849,6 @@ bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 
 bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
 {
-//	if (fonct(d))
-//		return true;
-//
-//	Dart d2 = phi2(d);
-//	if (d2 != d)
-//		return fonct(d2);
-//	else
-//		return false;
-
 	if (fonct(d))
 		return true;
 	return fonct(phi2(d));

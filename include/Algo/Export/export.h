@@ -61,7 +61,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 * @return true
 */
 template <typename PFP>
-bool exportTrian(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, char* filename, const FunctorSelect& good = SelectorTrue()) ;
+bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, char* filename, const FunctorSelect& good = SelectorTrue()) ;
 
 /**
 * export the map into a Trian file
@@ -70,7 +70,7 @@ bool exportTrian(typename PFP::MAP& the_map, const typename PFP::TVEC3& position
 * @return true
 */
 template <typename PFP>
-bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good = SelectorTrue()) ;
+bool exportCTM(typename PFP::MAP& map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good = SelectorTrue()) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format).

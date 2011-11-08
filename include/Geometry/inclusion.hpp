@@ -164,16 +164,16 @@ bool isEdgeInOrIntersectingTetrahedron(VEC3 points[4], VEC3& point1, VEC3& point
 	return false ;
 }
 
-template <typename VEC3>
-bool arePointsEquals(const VEC3& point1, const VEC3& point2)
+template <typename VEC>
+bool arePointsEquals(const VEC& point1, const VEC& point2)
 {
-	VEC3 v(point1 - point2);
+	VEC v(point1 - point2);
 
 #define PRECISION 1e-3
 	return v.norm2() <= PRECISION ;
 #undef PRECISION
 }
 
-}
+} // namespace Geom
 
-}
+} // namespace CGoGN

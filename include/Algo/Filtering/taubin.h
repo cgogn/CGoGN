@@ -58,7 +58,6 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 			c.applyOnBorder(fa1) ;
 			VEC3 p = position[d] ;
 			VEC3 displ = fa1.getAverage() - p ;
-//			VEC3 displ = (fa1.getSum() - p * fa1.getCount()) / fa1.getCount() ;
 			displ *= lambda ;
 			position2[d] = p + displ ;
 		}
@@ -77,7 +76,6 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 			c.applyOnBorder(fa2) ;
 			VEC3 p = position2[d] ;
 			VEC3 displ = fa2.getAverage() - p ;
-//			VEC3 displ = (fa2.getSum() - p * fa2.getCount()) / fa2.getCount() ;
 			displ *= mu ;
 			position[d] = p + displ ;
 		}
@@ -91,7 +89,6 @@ template <typename PFP>
 void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, typename PFP::REAL radius, const FunctorSelect& select = SelectorTrue())
 {
 	typedef typename PFP::VEC3 VEC3 ;
-
 
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;

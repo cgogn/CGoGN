@@ -1,5 +1,5 @@
 #ifndef EXPORT_POV_H
-#define EXPORT_POV
+#define EXPORT_POV_H
 
 #include "Topology/generic/attributeHandler.h"
 #include "Utils/cgognStream.h"
@@ -40,26 +40,30 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::T
 
 	DartMarkerStore traite(map);
 
-	for(Dart d = map.begin() ; d!= map.end() ; map.next(d)) {
-		if(good(d) && !traite.isMarked(d)) {
+	for(Dart d = map.begin() ; d!= map.end() ; map.next(d))
+	{
+		if(good(d) && !traite.isMarked(d))
+		{
 			unsigned int nb=0;
 			Dart dd=d;
-			do {
+			do
+			{
 				traite.markOrbit(DART,dd);
 				dd = map.phi1(dd);
 				nb++;
 			} while(dd!=d);
 
-			if(nb==3) {
+			if(nb == 3)
 				Algo::ExportPov::exportTrianglePlain<PFP>(out,position[dd],position[map.phi1(dd)],position[map.phi1(map.phi1(dd))]);
-			}
-			else {
+			else
+			{
 					out << "polygon{ " << nb+1 << std::endl;
-					dd=d;
-					do {
+					dd = d;
+					do
+					{
 						out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
 						dd = map.phi1(dd);
-					}while(dd!=d);
+					} while(dd!=d);
 					out << "<" << position[d][0] << "," << position[d][2] << "," << position[d][1] << ">" << std::endl;
 					out << "}" << std::endl;
 			}
@@ -76,30 +80,35 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TV
 
 	DartMarkerStore traite(map);
 
-	for(Dart d = map.begin() ; d!= map.end() ; map.next(d)) {
-		if(good(d) && !traite.isMarked(d)) {
-			unsigned int nb=0;
-			Dart dd=d;
-			do {
-				traite.markOrbit(DART,dd);
+	for(Dart d = map.begin() ; d!= map.end() ; map.next(d))
+	{
+		if(good(d) && !traite.isMarked(d))
+		{
+			unsigned int nb = 0;
+			Dart dd = d;
+			do
+			{
+				traite.markOrbit(DART, dd);
 				dd = map.phi1(dd);
 				nb++;
-			} while(dd!=d);
+			} while(dd != d);
 
-			if(nb==3) {
+			if(nb == 3)
 				Algo::ExportPov::exportTriangleWire<PFP>(out,position[dd],position[map.phi1(dd)],position[map.phi1(map.phi1(dd))]);
-			}
-			else {
-					dd=d;
-					do {
-						if(position[dd][0]!=position[map.phi1(dd)][0] || position[dd][1]!=position[map.phi1(dd)][1] || position[dd][2]!=position[map.phi1(dd)][2]) {
+			else
+			{
+					dd = d;
+					do
+					{
+						if(position[dd][0]!=position[map.phi1(dd)][0] || position[dd][1]!=position[map.phi1(dd)][1] || position[dd][2]!=position[map.phi1(dd)][2])
+						{
 							out << "cylinder{ " << std::endl;
 							out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
 							out << "<" << position[map.phi1(dd)][0] << "," << position[map.phi1(dd)][2] << "," << position[map.phi1(dd)][1] << ">, 0.5" << std::endl;
 							out << "}" << std::endl;
 						}
 						dd = map.phi1(dd);
-					}while(dd!=d);
+					} while(dd != d);
 			}
 		}
 	}
@@ -111,7 +120,8 @@ template <typename PFP>
 bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = SelectorTrue())
 {
 	std::ofstream out(filename.c_str(), std::ios::out);
-	if (!out.good()) {
+	if (!out.good())
+	{
 		CGoGNerr << "(export) Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
@@ -147,10 +157,10 @@ bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const
 	return true;
 }
 
-}
+} // namespace ExportPov
 
-}
+} // namespace Algo
 
-}
+} // namespace CGoGN
 
 #endif

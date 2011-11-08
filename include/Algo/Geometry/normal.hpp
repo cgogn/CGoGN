@@ -140,10 +140,10 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	Dart dd = map.phi2(d) ;
-	if(map.isBoundaryMarked(dd))
+	if(map.isBoundaryEdge(d))
 		return 0 ;
 
+	Dart dd = map.phi2(d) ;
 	const VEC3 n1 = faceNormal<PFP>(map, d, position) ;
 	const VEC3 n2 = faceNormal<PFP>(map, dd, position) ;
 	VEC3 e = position[dd] - position[d] ;
