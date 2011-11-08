@@ -24,9 +24,6 @@
 
 #include "viewer.h"
 
-#include "Algo/Filtering/bilateral.h"
-#include "Algo/Filtering/average_normals.h"
-
 Viewer::Viewer() :
 	m_renderStyle(FLAT),
 	m_drawVertices(false),
@@ -200,20 +197,6 @@ void Viewer::importMesh(std::string& filename)
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-
-
-
-
-	AttributeHandler<PFP::VEC3> position2 = myMap.addAttribute<PFP::VEC3>(VERTEX, "position2") ;
-//	for(unsigned int i = 0; i < 3; ++i)
-//	{
-		Algo::Filtering::filterVNBA<PFP>(myMap, 0.01f, 0.35f, position, position2, normal) ;
-		myMap.swapAttributes(position, position2) ;
-		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-//	}
-
-
-
 
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
