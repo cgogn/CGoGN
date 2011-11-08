@@ -73,7 +73,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 {
 	Dart dd = phi1(phi3(d));
 
-	if(phi3(d)!=d)
+	if(beta3(d)!=d)
 	{
 		GMap3::unsewVolumes(d);
 
