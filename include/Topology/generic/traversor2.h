@@ -72,15 +72,12 @@ private:
 
 public:
 	Traversor2VF(MAP& map, Dart dart) : m(map), start(dart)
-	{}
-
-	Dart begin()
 	{
-		current = start ;
-		if(m.isBoundaryMarked(current)) // jump over a boundary face
-			current = m.alpha1(current) ;
-		return current ;
+		if(m.isBoundaryMarked(start)) // jump over a boundary face
+			start = m.alpha1(start) ;
 	}
+
+	Dart begin() { current = start ; return current ; }
 	Dart end() { return NIL ; }
 	Dart next()
 	{
@@ -213,7 +210,10 @@ private:
 
 public:
 	Traversor2EF(MAP& map, Dart dart) : m(map), start(dart)
-	{}
+	{
+		if(m.isBoundaryMarked(start))
+			start = m.phi2(current) ;
+	}
 
 	Dart begin() { current = start ; return current ; }
 	Dart end() { return NIL ; }

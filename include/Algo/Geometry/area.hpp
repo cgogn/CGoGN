@@ -95,12 +95,9 @@ template <typename PFP>
 typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
 	typename PFP::REAL area(0) ;
-	Dart it = d ;
-	do
-	{
+	Traversor2VF<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
 		area += convexFaceArea<PFP>(map, it, position) / 3 ;
-		it = map.alpha1(it) ;
-	} while(it != d) ;
 	return area ;
 }
 
@@ -108,8 +105,8 @@ template <typename PFP>
 typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
 	typename PFP::REAL area(0) ;
-	Dart it = d ;
-	do
+	Traversor2VF<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
 	{
 		const typename PFP::VEC3& p1 = position[it] ;
 		const typename PFP::VEC3& p2 = position[map.phi1(it)] ;
@@ -128,64 +125,51 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typen
 			else
 				area += tArea / 4 ;
 		}
-		it = map.alpha1(it) ;
-	} while(it != d) ;
+	}
 	return area ;
 }
 
 template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select)
 {
-	CellMarker marker(map, FACE);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
+		if(select(d))
 			face_area[d] = convexFaceArea<PFP>(map, d, position) ;
-		}
 	}
 }
 
 template <typename PFP>
 void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
+		if(select(d))
 			vertex_area[d] = vertexOneRingArea<PFP>(map, d, position) ;
-		}
 	}
 }
 
 template <typename PFP>
 void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
+		if(select(d))
 			vertex_area[d] = vertexBarycentricArea<PFP>(map, d, position) ;
-		}
 	}
 }
 
 template <typename PFP>
 void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
+		if(select(d))
 			vertex_area[d] = vertexVoronoiArea<PFP>(map, d, position) ;
-		}
 	}
 }
 
