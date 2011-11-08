@@ -215,6 +215,11 @@ public:
 
 	virtual bool check();
 
+	/**
+	 *
+	 */
+	virtual bool isBoundaryVertex(Dart d);
+
 	/*! @name Cell Functors
 	 *  Apply functors to all darts of a cell
 	 *************************************************************************/

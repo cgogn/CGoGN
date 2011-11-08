@@ -22,14 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "simpleGMap3.h"
+#include "simpleMap3.h"
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/subdivision3map.h"
 
 
-SimpleGMap3::SimpleGMap3()
+SimpleMap3::SimpleMap3()
 {
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
@@ -37,62 +37,46 @@ SimpleGMap3::SimpleGMap3()
 	Dart d = primCat.hexaGrid_topo(2,1,1);
 	primCat.embedHexaGrid(1,1,1);
 
-	myMap.check();
+	unsigned int nb=0;
+	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
+		nb++;
 
-//	DartMarker markOrient(myMap);
-//	std::vector<Dart> orient;
-//	FunctorStore fs(orient);
-//	myMap.foreach_dart_of_oriented_volume(d,fs);
-//
-//	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
-//		markOrient.mark(*it);
-//
-//	SelectorMarked sm(markOrient);
-
-	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap,position);
-
-	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
-		position[i] += VEC3(2,0,0);
-
-//	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
-//	d = prim.hexaGrid_topo(2,2,1);
-//	prim.embedHexaGrid(1,1,1);
-//
-//	Dart d1 = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-//	VEC3 mid0 = (position[d1]+position[myMap.phi1(d1)])/2.0f;
-//	myMap.cutEdge(d1);
-//	position[myMap.phi1(d1)] = mid0;
-//
-//	VEC3 mid1 = (position[d]+position[myMap.phi1(d)])/2.0f;
-//	myMap.cutEdge(d);
-//	position[myMap.phi1(d)] = mid1;
-//
-//	d = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-//	VEC3 mid = (position[d]+position[myMap.phi1(d)])/2.0f;
-//	myMap.cutEdge(d);
-//	position[myMap.phi1(d)] = mid;
-//
-//	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
-//		position[i] += VEC3(0,2,0);
-
-	myMap.check();
-
-	Algo::Modelisation::Primitive3D<PFP> prim2(myMap,position);
-	d = prim2.hexaGrid_topo(2,1,1);
-	prim2.embedHexaGrid(1,1,1);
+	std::cout << "Nb vertices (equals 12) : " << nb << std::endl;
+	assert(nb==12);
 
 	d = myMap.phi2(myMap.phi1(myMap.phi1(myMap.phi2(d))));
+
+	Dart dd = myMap.phi3(d);
+
 	myMap.unsewVolumes(d);
 
 	myMap.check();
+
+	nb=0;
+	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
+		nb++;
+
+	std::cout << "Nb vertices after unsew (equals 16) : " << nb << std::endl;
+	assert(nb==16);
+
+	myMap.sewVolumes(d,dd);
+
+	myMap.check();
+
+	nb=0;
+	for(unsigned int i = position.begin(); i!=position.end(); position.next(i))
+		nb++;
+
+	std::cout << "Nb vertices after resew (equals 12) : " << nb << std::endl;
+	assert(nb==12);
 }
 
-void SimpleGMap3::initGUI()
+void SimpleMap3::initGUI()
 {
 
 }
 
-void SimpleGMap3::cb_initGL()
+void SimpleMap3::cb_initGL()
 {
 	Utils::GLSLShader::setCurrentOGLVersion(1) ;
 
@@ -105,11 +89,11 @@ void SimpleGMap3::cb_initGL()
 	setParamObject(gWidthObj, gPosObj.data());
 }
 
-void SimpleGMap3::cb_redraw()
+void SimpleMap3::cb_redraw()
 {
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	Algo::Render::GL1::renderTopoGMD3<PFP>(myMap, position, true, true, true, true, 0.9f, 0.9f, 0.9f, 0.9f);
+	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 }
 
 
@@ -121,7 +105,7 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv) ;
 
-	SimpleGMap3 sqt ;
+	SimpleMap3 sqt ;
 	sqt.setGeometry(0, 0, 1000, 800) ;
  	sqt.show() ;
 

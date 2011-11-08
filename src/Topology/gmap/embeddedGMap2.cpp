@@ -323,44 +323,31 @@ void EmbeddedGMap2::sewFaces(Dart d, Dart e)
 
 void EmbeddedGMap2::unsewFaces(Dart d)
 {
-	bool boundaryD = false ;
-	bool boundaryE = false ;
-	if (isOrbitEmbedded(VERTEX))
-	{
-		if(isBoundaryVertex(d))
-			boundaryD = true ;
-		if(isBoundaryVertex(phi1(d)))
-			boundaryE = true ;
-	}
-
-	Dart e = phi2(d) ;
-	GMap2::unsewFaces(d) ;
+	Dart e = beta2(d);
+	GMap2::unsewFaces(d);
 
 	if (isOrbitEmbedded(VERTEX))
 	{
-		if(boundaryD)
+		if(!sameVertex(d,e))
 		{
-			if(e != d)
-			{
-				Dart ee = phi1(e) ;
-				embedNewCell(VERTEX, ee) ;
-				copyCell(VERTEX, ee, d) ;
-			}
+			embedNewCell(VERTEX, e);
+			copyCell(VERTEX, e, d);
 		}
 
-		if(boundaryE)
+		d = beta0(d);
+		e = beta0(e);
+
+		if(!sameVertex(d,e))
 		{
-			if(e != d)
-			{
-				embedNewCell(VERTEX, e) ;
-				copyCell(VERTEX, e, phi1(d)) ;
-			}
+			embedNewCell(VERTEX, e);
+			copyCell(VERTEX, e, d);
 		}
 	}
+
 	if (isOrbitEmbedded(EDGE))
 	{
-		embedNewCell(EDGE, e) ;
-		copyCell(EDGE, e, d) ;
+		embedNewCell(EDGE, e);
+		copyCell(EDGE, e, d);
 	}
 }
 
