@@ -224,22 +224,22 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			d= dN;
 		} while (*it!=d);
 
-//		//close the generated hole and create the central vertex
-//		unsigned int degree = map.closeHole(map.phi1(d));
-//
-//		Dart dd = map.phi1(map.phi2(map.phi1(d)));
-//		map.splitFace(map.phi_1(dd),map.phi1(dd));
-//		Dart dS = map.phi1(dd);
-//		map.cutEdge(dS);
-//
-//		attributs[map.phi1(dS)] = attBary[d];
-//
-//		//TODO : test with vertices with degree higher than 3
-//		for(unsigned int i=0; i < (degree/2)-2; ++i)
-//		{
-//			map.splitFace(map.phi2(dS),map.template phi<111>(map.phi2(dS)));
-//			dS = map.template phi<111>(map.phi2(dS));
-//		}
+		//close the generated hole and create the central vertex
+		unsigned int degree = map.closeHole(map.phi1(d));
+
+		Dart dd = map.phi1(map.phi2(map.phi1(d)));
+		map.splitFace(map.phi_1(dd),map.phi1(dd));
+		Dart dS = map.phi1(dd);
+		map.cutEdge(dS);
+
+		attributs[map.phi1(dS)] = attBary[d];
+
+		//TODO : test with vertices with degree higher than 3
+		for(unsigned int i=0; i < (degree/2)-2; ++i)
+		{
+			map.splitFace(map.phi2(dS),map.template phi<111>(map.phi2(dS)));
+			dS = map.template phi<111>(map.phi2(dS));
+		}
 	}
 
 	nb_=0;
@@ -248,15 +248,17 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 	std::cout << "then " << nb_ << std::endl;
 
-//	//sew all faces leading to the central vertex
-//	for (std::map<Dart,Dart>::iterator it = toSew.begin(); it != toSew.end(); ++it)
-//	{
-//		Dart dT = map.phi2(it->first);
-//		if(dT==map.phi3(dT))
-//		{
-//			map.sewVolumes(dT,map.phi2(it->second));
-//		}
-//	}
+	map.check();
+
+	//sew all faces leading to the central vertex
+	for (std::map<Dart,Dart>::iterator it = toSew.begin(); it != toSew.end(); ++it)
+	{
+		Dart dT = map.phi2(it->first);
+		if(dT==map.phi3(dT))
+		{
+			map.sewVolumes(dT,map.phi2(it->second));
+		}
+	}
 }
 
 } //namespace Modelisation

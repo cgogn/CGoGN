@@ -43,6 +43,12 @@ public:
 	/*!
 	 *
 	 */
+	virtual void unsewFaces(Dart d);
+
+	//!
+	/*!
+	 *
+	 */
 	virtual void sewVolumes(Dart d, Dart e);
 
 	//!

@@ -31,6 +31,7 @@
 
 #include "Geometry/vector_gen.h"
 
+#include "Algo/Render/GL1/map_glRender.h"
 #include "Algo/Render/GL1/topo_render.h"
 
 using namespace CGoGN ;
@@ -53,6 +54,7 @@ public:
 	SelectorTrue allDarts ;
 
 	PFP::TVEC3 position ;
+	PFP::TVEC3 normal ;
 
 	SimpleGMap3() ;
 
