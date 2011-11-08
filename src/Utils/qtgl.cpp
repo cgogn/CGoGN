@@ -336,8 +336,8 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
 	m_state_modifier = event->modifiers();
 
 	int k = event->key();
-//	if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
-//		k += 32;
+	if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
+		k += 32;
 
 	if (m_cbs)
 		m_cbs->cb_keyPress(k);
