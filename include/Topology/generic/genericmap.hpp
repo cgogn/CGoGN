@@ -218,4 +218,21 @@ inline void GenericMap::next(Dart& d)
 	m_attribs[DART].next(d.index) ;
 }
 
+/****************************************
+ *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
+ ****************************************/
+
+inline AttributeMultiVector<Dart>* GenericMap::addRelation(const std::string& name)
+{
+	AttributeContainer& cont = m_attribs[DART] ;
+	AttributeMultiVector<Dart>* amv = cont.addAttribute<Dart>(name) ;
+
+	// set new relation to fix point for all the darts of the map
+	for(unsigned int i = cont.begin(); i < cont.end(); cont.next(i))
+		amv->operator[](i) = i ;
+
+	return amv ;
+}
+
+
 } //namespace CGoGN

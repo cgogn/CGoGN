@@ -77,6 +77,7 @@ class GenericMap : public MapBrowser
 {
 	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
+	friend class CellMarkerGen ;
 
 protected:
 	/**
@@ -271,6 +272,26 @@ public:
 	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
 	 */
 	void initOrbitEmbedding(unsigned int orbit, bool realloc = false) ;
+
+protected:
+	/****************************************
+	 *   EMBEDDING ATTRIBUTES MANAGEMENT    *
+	 ****************************************/
+	/**
+	 * Create the dart attribute to store the embedding of this orbit (for internal use only)
+	 * Also adds a Marker attribute to the container
+	 */
+	void addEmbedding(unsigned int orbit) ;
+
+	/****************************************
+	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
+	 ****************************************/
+
+	/**
+	 * Add a toological relation in the map
+	 * @param name name of relation
+	 */
+	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
 
 	/****************************************
 	 *          THREAD MANAGEMENT           *

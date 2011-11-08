@@ -25,6 +25,8 @@
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/dartmarker.h"
+#include "Topology/generic/traversorCell.h"
+
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 #include "Container/registered.h"
@@ -192,6 +194,38 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 	m_attributes_registry_map->insert(std::pair<std::string, RegisteredBaseAttribute*>(nameType,ra));
 	return true;
 }
+
+/****************************************
+ *   EMBEDDING ATTRIBUTES MANAGEMENT    *
+ ****************************************/
+
+void GenericMap::addEmbedding(unsigned int orbit)
+{
+	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
+
+	std::ostringstream oss;
+	oss << "EMB_" << orbit;
+
+	AttributeContainer& dartCont = m_attribs[DART] ;
+	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
+	m_embeddings[orbit] = amv ;
+
+	// set new embedding to EMBNULL for all the darts of the map
+	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
+		amv->operator[](i) = EMBNULL ;
+
+	AttributeContainer& cellCont = m_attribs[orbit];
+	for (unsigned int t = 0; t < m_nbThreads; ++t)
+	{
+		std::stringstream ss ;
+		ss << "Mark_"<< t ;
+		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
+		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
+			amvMark->operator[](i).clear() ;
+		m_markTables[orbit][t] = amvMark ;
+	}
+}
+
 
 /****************************************
  *          THREAD MANAGEMENT           *
@@ -592,24 +626,37 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 
 bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
 {
-	DartMarker marker(*this, thread);	// Lock a marker
-	bool found = false;					// Store the result
+	TraversorCell<GenericMap> trav(*this,orbit,thread);
+	bool found = false;									// Store the result
 
-	// Scan all darts of the map
-	for (Dart d = begin(); !found && d != end(); next(d))
+	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
 	{
 		if (good(d))							// If d is selected
 		{
-			if (!marker.isMarked(d))			// If d is in a not yet visited cell
-			{
-				if ((fonct)(d))					// Apply functor
-					found = true;
-				else
-					marker.markOrbit(orbit, d);	// Mark the cell as visited
-			}
+			if ((fonct)(d))					// Apply functor
+				found = true;
 		}
 	}
 	return found;
+
+//	DartMarker marker(*this, thread);	// Lock a marker
+//	bool found = false;					// Store the result
+//
+//	// Scan all darts of the map
+//	for (Dart d = begin(); !found && d != end(); next(d))
+//	{
+//		if (good(d))							// If d is selected
+//		{
+//			if (!marker.isMarked(d))			// If d is in a not yet visited cell
+//			{
+//				if ((fonct)(d))					// Apply functor
+//					found = true;
+//				else
+//					marker.markOrbit(orbit, d);	// Mark the cell as visited
+//			}
+//		}
+//	}
+//	return found;
 }
 
 unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& good)

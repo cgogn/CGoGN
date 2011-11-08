@@ -32,7 +32,7 @@
 namespace CGoGN
 {
 
-template <typename MAP, unsigned int ORBIT>
+template <typename MAP>
 class TraversorCell
 {
 private:
@@ -41,13 +41,14 @@ private:
 	CellMarker* cmark ;
 	Dart current ;
 	bool firstTraversal ;
+	unsigned int m_orbit;
 
 public:
-	TraversorCell(MAP& map, unsigned int thread = 0) :
-		m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true)
+	TraversorCell(MAP& map, unsigned int orbit, unsigned int thread = 0) :
+		m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_orbit(orbit)
 	{
-		if(map.isOrbitEmbedded(ORBIT))
-			cmark = new CellMarker(map, ORBIT, thread) ;
+		if(map.isOrbitEmbedded(m_orbit))
+			cmark = new CellMarker(map, m_orbit, thread) ;
 		else
 			dmark = new DartMarker(map, thread) ;
 	}
@@ -79,7 +80,7 @@ public:
 		else
 		{
 			if(dmark)
-				dmark->markOrbit(ORBIT, current) ;
+				dmark->markOrbit(m_orbit, current) ;
 			else
 				cmark->mark(current) ;
 		}
@@ -117,7 +118,7 @@ public:
 			if(current != NIL)
 			{
 				if(dmark)
-					dmark->markOrbit(ORBIT, current) ;
+					dmark->markOrbit(m_orbit, current) ;
 				else
 					cmark->mark(current) ;
 			}
@@ -127,34 +128,34 @@ public:
 } ;
 
 template <typename MAP>
-class TraversorV : public TraversorCell<MAP, VERTEX>
+class TraversorV : public TraversorCell<MAP>
 {
 public:
-	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, thread)
+	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorE : public TraversorCell<MAP, EDGE>
+class TraversorE : public TraversorCell<MAP>
 {
 public:
-	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, thread)
+	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorF : public TraversorCell<MAP, FACE>
+class TraversorF : public TraversorCell<MAP>
 {
 public:
-	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, thread)
+	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorW : public TraversorCell<MAP, VOLUME>
+class TraversorW : public TraversorCell<MAP>
 {
 public:
-	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, thread)
+	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, thread)
 	{}
 };
 
