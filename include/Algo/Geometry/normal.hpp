@@ -116,23 +116,17 @@ typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename P
 template <typename PFP>
 void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select, unsigned int thread)
 {
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	{
-		if (select(d))
-			face_normal[d] = faceNormal<PFP>(map, d, position) ;
-	}
+		face_normal[d] = faceNormal<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select, unsigned int thread)
 {
-	TraversorV<typename PFP::MAP> trav(map, thread);
+	TraversorV<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	{
-		if (select(d))
-			normal[d] = vertexNormal<PFP>(map, d, position) ;
-	}
+		normal[d] = vertexNormal<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
@@ -169,12 +163,9 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 template <typename PFP>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select, unsigned int thread)
 {
-	TraversorE<typename PFP::MAP> trav(map, thread);
+	TraversorE<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	{
-		if (select(d))
-			angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, position) ;
-	}
+		angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(map, d, position) ;
 }
 
 } // namespace Geometry

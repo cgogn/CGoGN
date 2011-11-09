@@ -56,12 +56,9 @@ void computeCurvatureVertices_QuadraticFitting(
 	typename PFP::TVEC3& Kmin,
 	const FunctorSelect& select)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			computeCurvatureVertex_QuadraticFitting<PFP>(map, d, position, normal, kmax, kmin, Kmax, Kmin) ;
-	}
+		computeCurvatureVertex_QuadraticFitting<PFP>(map, d, position, normal, kmax, kmin, Kmax, Kmin) ;
 }
 
 template <typename PFP>
@@ -292,14 +289,11 @@ void computeCurvatureVertices_NormalCycles(
 	typename PFP::TVEC3& Kmax,
 	typename PFP::TVEC3& Kmin,
 	typename PFP::TVEC3& Knormal,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
-	}
+		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 }
 
 template <typename PFP>

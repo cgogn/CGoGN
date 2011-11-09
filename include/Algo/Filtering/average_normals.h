@@ -52,28 +52,25 @@ void computeNewPositionsFromFaceNormals(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d))
+		const VEC3& pos_d = position[d] ;
+
+		VEC3 displ(0) ;
+		REAL sumAreas = 0 ;
+
+		Traversor2VF<typename PFP::MAP> tvf(map, d) ;
+		for(Dart it = tvf.begin(); it != tvf.end(); it = tvf.next())
 		{
-			const VEC3& pos_d = position[d] ;
-
-			VEC3 displ(0) ;
-			REAL sumAreas = 0 ;
-
-			Traversor2VF<typename PFP::MAP> tvf(map, d) ;
-			for(Dart it = tvf.begin(); it != tvf.end(); it = tvf.next())
-			{
-				sumAreas += faceArea[it] ;
-				VEC3 vT = faceCentroid[it] - pos_d ;
-				vT = (vT * faceNewNormal[it]) * faceNormal[it] ;
-				displ += faceArea[it] * vT ;
-			}
-
-			displ /= sumAreas ;
-			position2[d] = pos_d + displ ;
+			sumAreas += faceArea[it] ;
+			VEC3 vT = faceCentroid[it] - pos_d ;
+			vT = (vT * faceNewNormal[it]) * faceNormal[it] ;
+			displ += faceArea[it] * vT ;
 		}
+
+		displ /= sumAreas ;
+		position2[d] = pos_d + displ ;
 	}
 }
 
@@ -94,28 +91,25 @@ void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
-	TraversorF<typename PFP::MAP> tf(map) ;
+	TraversorF<typename PFP::MAP> tf(map, select) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if(select(d))
+		REAL sumArea = 0 ;
+		VEC3 meanFilter(0) ;
+
+		// traversal of adjacent faces (by edges and vertices)
+		Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+		for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 		{
-			REAL sumArea = 0 ;
-			VEC3 meanFilter(0) ;
-
-			// traversal of adjacent faces (by edges and vertices)
-			Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
-			for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
-			{
-				sumArea += faceArea[it] ;
-				meanFilter += faceArea[it] * faceNormal[it] ;
-			}
-
-			// finalize the computation of meanFilter normal
-			meanFilter /= sumArea ;
-			meanFilter.normalize() ;
-			// and store it
-			faceNewNormal[d] = meanFilter ;
+			sumArea += faceArea[it] ;
+			meanFilter += faceArea[it] * faceNormal[it] ;
 		}
+
+		// finalize the computation of meanFilter normal
+		meanFilter /= sumArea ;
+		meanFilter.normalize() ;
+		// and store it
+		faceNewNormal[d] = meanFilter ;
 	}
 
 	// Compute new vertices position
@@ -141,69 +135,66 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
 
 	// Compute new normals
-	TraversorF<typename PFP::MAP> tf(map) ;
+	TraversorF<typename PFP::MAP> tf(map, select) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if( select(d))
+		// traversal of neighbour vertices
+		REAL sumArea = 0 ;
+		REAL sigmaX2 = 0 ;
+		REAL sigmaY2 = 0 ;
+		REAL sigmaZ2 = 0 ;
+
+		VEC3 meanFilter(0) ;
+
+		// traversal of adjacent faces (by edges and vertices)
+		Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+		for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 		{
-			// traversal of neighbour vertices
-			REAL sumArea = 0 ;
-			REAL sigmaX2 = 0 ;
-			REAL sigmaY2 = 0 ;
-			REAL sigmaZ2 = 0 ;
-
-			VEC3 meanFilter(0) ;
-
-			// traversal of adjacent faces (by edges and vertices)
-			Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
-			for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
-			{
-				// get info from face embedding and sum
-				REAL area = faceArea[it] ;
-				sumArea += area ;
-				VEC3 normal = faceNormal[it] ;
-				meanFilter += area * normal ;
-				sigmaX2 += area * normal[0] * normal[0] ;
-				sigmaY2 += area * normal[1] * normal[1] ;
-				sigmaZ2 += area * normal[2] * normal[2] ;
-			}
-
-			meanFilter /= sumArea ;
-			sigmaX2 /= sumArea ;
-			sigmaX2 -= meanFilter[0] * meanFilter[0] ;
-			sigmaY2 /= sumArea ;
-			sigmaY2 -= meanFilter[1] * meanFilter[1] ;
-			sigmaZ2 /= sumArea ;
-			sigmaZ2 -= meanFilter[2] * meanFilter[2] ;
-
-			VEC3& oldNormal = faceNormal[d] ;
-			VEC3 newNormal ;
-
-			if(sigmaX2 < sigmaN2)
-				newNormal[0] = meanFilter[0] ;
-			else
-			{
-				newNormal[0] = (1 - (sigmaN2 / sigmaX2)) * oldNormal[0] ;
-				newNormal[0] += (sigmaN2 / sigmaX2) * meanFilter[0] ;
-			}
-			if(sigmaY2 < sigmaN2)
-				newNormal[1] = meanFilter[1] ;
-			else
-			{
-				newNormal[1] = (1 - (sigmaN2 / sigmaY2)) * oldNormal[1] ;
-				newNormal[1] += (sigmaN2 / sigmaY2) * meanFilter[1] ;
-			}
-			if(sigmaZ2 < sigmaN2)
-				newNormal[2] = meanFilter[2] ;
-			else
-			{
-				newNormal[2] = (1 - (sigmaN2 / sigmaZ2)) * oldNormal[2] ;
-				newNormal[2] += (sigmaN2 / sigmaZ2) * meanFilter[2] ;
-			}
-
-			newNormal.normalize() ;
-			faceNewNormal[d] = newNormal ;
+			// get info from face embedding and sum
+			REAL area = faceArea[it] ;
+			sumArea += area ;
+			VEC3 normal = faceNormal[it] ;
+			meanFilter += area * normal ;
+			sigmaX2 += area * normal[0] * normal[0] ;
+			sigmaY2 += area * normal[1] * normal[1] ;
+			sigmaZ2 += area * normal[2] * normal[2] ;
 		}
+
+		meanFilter /= sumArea ;
+		sigmaX2 /= sumArea ;
+		sigmaX2 -= meanFilter[0] * meanFilter[0] ;
+		sigmaY2 /= sumArea ;
+		sigmaY2 -= meanFilter[1] * meanFilter[1] ;
+		sigmaZ2 /= sumArea ;
+		sigmaZ2 -= meanFilter[2] * meanFilter[2] ;
+
+		VEC3& oldNormal = faceNormal[d] ;
+		VEC3 newNormal ;
+
+		if(sigmaX2 < sigmaN2)
+			newNormal[0] = meanFilter[0] ;
+		else
+		{
+			newNormal[0] = (1 - (sigmaN2 / sigmaX2)) * oldNormal[0] ;
+			newNormal[0] += (sigmaN2 / sigmaX2) * meanFilter[0] ;
+		}
+		if(sigmaY2 < sigmaN2)
+			newNormal[1] = meanFilter[1] ;
+		else
+		{
+			newNormal[1] = (1 - (sigmaN2 / sigmaY2)) * oldNormal[1] ;
+			newNormal[1] += (sigmaN2 / sigmaY2) * meanFilter[1] ;
+		}
+		if(sigmaZ2 < sigmaN2)
+			newNormal[2] = meanFilter[2] ;
+		else
+		{
+			newNormal[2] = (1 - (sigmaN2 / sigmaZ2)) * oldNormal[2] ;
+			newNormal[2] += (sigmaN2 / sigmaZ2) * meanFilter[2] ;
+		}
+
+		newNormal.normalize() ;
+		faceNewNormal[d] = newNormal ;
 	}
 
 	// Compute new vertices position
@@ -233,95 +224,92 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	TraversorF<typename PFP::MAP> tf(map) ;
+	TraversorF<typename PFP::MAP> tf(map, select) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if( select(d))
+		const VEC3& normF = faceNormal[d] ;
+
+		// traversal of neighbour vertices
+		REAL sumArea = 0 ;
+		REAL sigmaX2 = 0 ;
+		REAL sigmaY2 = 0 ;
+		REAL sigmaZ2 = 0 ;
+
+		VEC3 meanFilter(0) ;
+		bool SUSANregion = false ;
+
+		// traversal of adjacent faces (by edges and vertices)
+		Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
+		for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
 		{
-			const VEC3& normF = faceNormal[d] ;
+			// get info from face embedding and sum
+			const VEC3& normal = faceNormal[it] ;
 
-			// traversal of neighbour vertices
-			REAL sumArea = 0 ;
-			REAL sigmaX2 = 0 ;
-			REAL sigmaY2 = 0 ;
-			REAL sigmaZ2 = 0 ;
-
-			VEC3 meanFilter(0) ;
-			bool SUSANregion = false ;
-
-			// traversal of adjacent faces (by edges and vertices)
-			Traversor2FFaV<typename PFP::MAP> taf(map, d) ;
-			for(Dart it = taf.begin(); it != taf.end(); it = taf.next())
+			float angle = Geom::angle(normF, normal) ;
+			if(angle <= SUSANthreshold)
 			{
-				// get info from face embedding and sum
-				const VEC3& normal = faceNormal[it] ;
-
-				float angle = Geom::angle(normF, normal) ;
-				if(angle <= SUSANthreshold)
-				{
-					REAL area = faceArea[it] ;
-					sumArea += area ;
-					meanFilter += area * normal ;
-					sigmaX2 += area * normal[0] * normal[0] ;
-					sigmaY2 += area * normal[1] * normal[1] ;
-					sigmaZ2 += area * normal[2] * normal[2] ;
-				}
-				else SUSANregion = true ;
+				REAL area = faceArea[it] ;
+				sumArea += area ;
+				meanFilter += area * normal ;
+				sigmaX2 += area * normal[0] * normal[0] ;
+				sigmaY2 += area * normal[1] * normal[1] ;
+				sigmaZ2 += area * normal[2] * normal[2] ;
 			}
+			else SUSANregion = true ;
+		}
 
-			if(SUSANregion)
-				++nbSusan ;
+		if(SUSANregion)
+			++nbSusan ;
 
-			++nbTot ;
+		++nbTot ;
 
-			if(sumArea > 0.0f)
-			{
-				meanFilter /= sumArea ;
-				sigmaX2 /= sumArea ;
-				sigmaX2 -= meanFilter[0] * meanFilter[0] ;
-				sigmaY2 /= sumArea ;
-				sigmaY2 -= meanFilter[1] * meanFilter[1] ;
-				sigmaZ2 /= sumArea ;
-				sigmaZ2 -= meanFilter[2] * meanFilter[2] ;
+		if(sumArea > 0.0f)
+		{
+			meanFilter /= sumArea ;
+			sigmaX2 /= sumArea ;
+			sigmaX2 -= meanFilter[0] * meanFilter[0] ;
+			sigmaY2 /= sumArea ;
+			sigmaY2 -= meanFilter[1] * meanFilter[1] ;
+			sigmaZ2 /= sumArea ;
+			sigmaZ2 -= meanFilter[2] * meanFilter[2] ;
 
-				VEC3& oldNormal = faceNormal[d] ;
-				VEC3 newNormal ;
+			VEC3& oldNormal = faceNormal[d] ;
+			VEC3 newNormal ;
 
-				bool adapt = false ;
-				if(sigmaX2 < sigmaN2)
-					newNormal[0] = meanFilter[0] ;
-				else
-				{
-					adapt = true ;
-					newNormal[0] = (1 - (sigmaN2 / sigmaX2)) * oldNormal[0] ;
-					newNormal[0] += (sigmaN2 / sigmaX2) * meanFilter[0] ;
-				}
-				if(sigmaY2 < sigmaN2)
-					newNormal[1] = meanFilter[1] ;
-				else
-				{
-					adapt = true ;
-					newNormal[1] = (1 - (sigmaN2 / sigmaY2)) * oldNormal[1] ;
-					newNormal[1] += (sigmaN2 / sigmaY2) * meanFilter[1] ;
-				}
-				if(sigmaZ2 < sigmaN2)
-					newNormal[2] = meanFilter[2] ;
-				else
-				{
-					adapt = true ;
-					newNormal[2] = (1 - (sigmaN2 / sigmaZ2)) * oldNormal[2] ;
-					newNormal[2] += (sigmaN2 / sigmaZ2) * meanFilter[2] ;
-				}
-				if(adapt)
-					++nbAdapt ;
-
-				newNormal.normalize() ;
-				faceNewNormal[d] = newNormal;
-			}
+			bool adapt = false ;
+			if(sigmaX2 < sigmaN2)
+				newNormal[0] = meanFilter[0] ;
 			else
 			{
-				faceNewNormal[d] = normF ;
+				adapt = true ;
+				newNormal[0] = (1 - (sigmaN2 / sigmaX2)) * oldNormal[0] ;
+				newNormal[0] += (sigmaN2 / sigmaX2) * meanFilter[0] ;
 			}
+			if(sigmaY2 < sigmaN2)
+				newNormal[1] = meanFilter[1] ;
+			else
+			{
+				adapt = true ;
+				newNormal[1] = (1 - (sigmaN2 / sigmaY2)) * oldNormal[1] ;
+				newNormal[1] += (sigmaN2 / sigmaY2) * meanFilter[1] ;
+			}
+			if(sigmaZ2 < sigmaN2)
+				newNormal[2] = meanFilter[2] ;
+			else
+			{
+				adapt = true ;
+				newNormal[2] = (1 - (sigmaN2 / sigmaZ2)) * oldNormal[2] ;
+				newNormal[2] += (sigmaN2 / sigmaZ2) * meanFilter[2] ;
+			}
+			if(adapt)
+				++nbAdapt ;
+
+			newNormal.normalize() ;
+			faceNewNormal[d] = newNormal;
+		}
+		else
+		{
+			faceNewNormal[d] = normF ;
 		}
 	}
 
@@ -358,119 +346,113 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 
 	std::cout << "compute new vertices normals.." << std::endl ;
 
-	TraversorV<typename PFP::MAP> tv(map) ;
+	TraversorV<typename PFP::MAP> tv(map, select) ;
 	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
-		if(select(d))
+		const VEC3& normV = normal[d] ;
+
+		REAL sumArea = 0 ;
+		REAL sigmaX2 = 0 ;
+		REAL sigmaY2 = 0 ;
+		REAL sigmaZ2 = 0 ;
+
+		VEC3 meanFilter(0) ;
+
+		bool SUSANregion = false ;
+
+		// traversal of neighbour vertices
+		Traversor2VVaE<typename PFP::MAP> tav(map, d) ;
+		for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 		{
-			const VEC3& normV = normal[d] ;
-
-			REAL sumArea = 0 ;
-			REAL sigmaX2 = 0 ;
-			REAL sigmaY2 = 0 ;
-			REAL sigmaZ2 = 0 ;
-
-			VEC3 meanFilter(0) ;
-
-			bool SUSANregion = false ;
-
-			// traversal of neighbour vertices
-			Traversor2VVaE<typename PFP::MAP> tav(map, d) ;
-			for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
+			const VEC3& neighborNormal = normal[it] ;
+			float angle = Geom::angle(normV, neighborNormal) ;
+			if( angle <= SUSANthreshold )
 			{
-				const VEC3& neighborNormal = normal[it] ;
-				float angle = Geom::angle(normV, neighborNormal) ;
-				if( angle <= SUSANthreshold )
-				{
-					REAL umbArea = Algo::Geometry::vertexOneRingArea<PFP>(map, it, position) ;
-			        vertexArea[it] = umbArea ;
+				REAL umbArea = Algo::Geometry::vertexOneRingArea<PFP>(map, it, position) ;
+				vertexArea[it] = umbArea ;
 
-			        sumArea += umbArea ;
-					sigmaX2 += umbArea * neighborNormal[0] * neighborNormal[0] ;
-					sigmaY2 += umbArea * neighborNormal[1] * neighborNormal[1] ;
-					sigmaZ2 += umbArea * neighborNormal[2] * neighborNormal[2] ;
-					meanFilter += neighborNormal * umbArea ;
-				}
-				else SUSANregion = true ;
+				sumArea += umbArea ;
+				sigmaX2 += umbArea * neighborNormal[0] * neighborNormal[0] ;
+				sigmaY2 += umbArea * neighborNormal[1] * neighborNormal[1] ;
+				sigmaZ2 += umbArea * neighborNormal[2] * neighborNormal[2] ;
+				meanFilter += neighborNormal * umbArea ;
 			}
+			else SUSANregion = true ;
+		}
 
-			if(SUSANregion)
-				++nbSusan ;
+		if(SUSANregion)
+			++nbSusan ;
 
-			++nbTot ;
+		++nbTot ;
 
-			if(sumArea > 0.0f)
-			{
-				meanFilter /= sumArea ;
-				sigmaX2 /= sumArea ;
-				sigmaX2 -= meanFilter[0] * meanFilter[0] ;
-				sigmaY2 /= sumArea ;
-				sigmaY2 -= meanFilter[1] * meanFilter[1] ;
-				sigmaZ2 /= sumArea ;
-				sigmaZ2 -= meanFilter[2] * meanFilter[2] ;
+		if(sumArea > 0.0f)
+		{
+			meanFilter /= sumArea ;
+			sigmaX2 /= sumArea ;
+			sigmaX2 -= meanFilter[0] * meanFilter[0] ;
+			sigmaY2 /= sumArea ;
+			sigmaY2 -= meanFilter[1] * meanFilter[1] ;
+			sigmaZ2 /= sumArea ;
+			sigmaZ2 -= meanFilter[2] * meanFilter[2] ;
 
-				VEC3 newNormal ;
-				bool adapt = false ;
-				if(sigmaX2 < sigmaN2)
-					newNormal[0] = meanFilter[0] ;
-				else
-				{
-					adapt = true ;
-					newNormal[0] = (1 - (sigmaN2 / sigmaX2)) * normV[0] ;
-					newNormal[0] += (sigmaN2 / sigmaX2) * meanFilter[0] ;
-				}
-				if(sigmaY2 < sigmaN2)
-					newNormal[1] = meanFilter[1] ;
-				else
-				{
-					adapt = true ;
-					newNormal[1] = (1 - (sigmaN2 / sigmaY2)) * normV[1] ;
-					newNormal[1] += (sigmaN2 / sigmaY2) * meanFilter[1] ;
-				}
-				if(sigmaZ2 < sigmaN2)
-					newNormal[2] = meanFilter[2] ;
-				else
-				{
-					adapt = true ;
-					newNormal[2] = (1 - (sigmaN2 / sigmaZ2)) * normV[2] ;
-					newNormal[2] += (sigmaN2 / sigmaZ2) * meanFilter[2] ;
-				}
-
-				if(adapt)
-					++nbAdapt ;
-
-				newNormal.normalize() ;
-				vertexNewNormal[d] = newNormal ;
-			}
+			VEC3 newNormal ;
+			bool adapt = false ;
+			if(sigmaX2 < sigmaN2)
+				newNormal[0] = meanFilter[0] ;
 			else
 			{
-				vertexNewNormal[d] = normV ;
+				adapt = true ;
+				newNormal[0] = (1 - (sigmaN2 / sigmaX2)) * normV[0] ;
+				newNormal[0] += (sigmaN2 / sigmaX2) * meanFilter[0] ;
 			}
+			if(sigmaY2 < sigmaN2)
+				newNormal[1] = meanFilter[1] ;
+			else
+			{
+				adapt = true ;
+				newNormal[1] = (1 - (sigmaN2 / sigmaY2)) * normV[1] ;
+				newNormal[1] += (sigmaN2 / sigmaY2) * meanFilter[1] ;
+			}
+			if(sigmaZ2 < sigmaN2)
+				newNormal[2] = meanFilter[2] ;
+			else
+			{
+				adapt = true ;
+				newNormal[2] = (1 - (sigmaN2 / sigmaZ2)) * normV[2] ;
+				newNormal[2] += (sigmaN2 / sigmaZ2) * meanFilter[2] ;
+			}
+
+			if(adapt)
+				++nbAdapt ;
+
+			newNormal.normalize() ;
+			vertexNewNormal[d] = newNormal ;
+		}
+		else
+		{
+			vertexNewNormal[d] = normV ;
 		}
 	}
 
 	std::cout << "update face normals.." << std::endl ;
 
 	// Compute face normals from vertex normals
-	TraversorF<typename PFP::MAP> tf(map) ;
+	TraversorF<typename PFP::MAP> tf(map, select) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
 	{
-		if (select(d))
+		VEC3 newNormal(0) ;
+		REAL totArea = 0 ;
+		Traversor2FV<typename PFP::MAP> tav(map, d) ;
+		for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 		{
-            VEC3 newNormal(0) ;
-            REAL totArea = 0 ;
-            Traversor2FV<typename PFP::MAP> tav(map, d) ;
-			for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
-			{
-            	VEC3 vNorm = vertexNewNormal[it] ;
-            	REAL area = vertexArea[it] ;
-            	totArea += area ;
-            	vNorm *= area ;
-            	newNormal += vNorm ;
-			}
-            newNormal.normalize() ;
-            faceNewNormal[d] = newNormal ;
+			VEC3 vNorm = vertexNewNormal[it] ;
+			REAL area = vertexArea[it] ;
+			totArea += area ;
+			vNorm *= area ;
+			newNormal += vNorm ;
 		}
+		newNormal.normalize() ;
+		faceNewNormal[d] = newNormal ;
 	}
 
 	std::cout << "update vertices positions.." << std::endl ;

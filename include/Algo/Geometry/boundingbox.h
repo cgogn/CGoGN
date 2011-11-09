@@ -42,12 +42,9 @@ template <typename PFP>
 Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue())
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			bb.addPoint(position[d]) ;
-	}
+		bb.addPoint(position[d]) ;
 	return bb ;
 }
 

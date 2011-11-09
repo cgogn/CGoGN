@@ -324,7 +324,6 @@ bool GenericMap::saveMapXml(const std::string& filename, bool compress)
 		m_attribs[i].saveXml(writer,i);
 	}
 
-
 	// save m_orbMarker
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "Orbit_MarkerSet");
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
@@ -626,16 +625,13 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 
 bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
 {
-	TraversorCell<GenericMap> trav(*this,orbit,thread);
+	TraversorCell<GenericMap> trav(*this, orbit, good, thread);
 	bool found = false;									// Store the result
 
 	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
 	{
-		if (good(d))							// If d is selected
-		{
-			if ((fonct)(d))					// Apply functor
-				found = true;
-		}
+		if ((fonct)(d))					// Apply functor
+			found = true;
 	}
 	return found;
 

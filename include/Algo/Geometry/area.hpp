@@ -72,12 +72,9 @@ template <typename PFP>
 typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select, unsigned int thread)
 {
 	typename PFP::REAL area(0) ;
-	TraversorF<typename PFP::MAP> t(map) ;
+	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			area += convexFaceArea<PFP>(map, d, position) ;
-	}
+		area += convexFaceArea<PFP>(map, d, position) ;
 	return area ;
 }
 
@@ -132,45 +129,33 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typen
 template <typename PFP>
 void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select)
 {
-	TraversorF<typename PFP::MAP> t(map) ;
+	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			face_area[d] = convexFaceArea<PFP>(map, d, position) ;
-	}
+		face_area[d] = convexFaceArea<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			vertex_area[d] = vertexOneRingArea<PFP>(map, d, position) ;
-	}
+		vertex_area[d] = vertexOneRingArea<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			vertex_area[d] = vertexBarycentricArea<PFP>(map, d, position) ;
-	}
+		vertex_area[d] = vertexBarycentricArea<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			vertex_area[d] = vertexVoronoiArea<PFP>(map, d, position) ;
-	}
+		vertex_area[d] = vertexVoronoiArea<PFP>(map, d, position) ;
 }
 
 } // namespace Geometry

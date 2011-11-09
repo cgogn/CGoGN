@@ -42,10 +42,11 @@ private:
 	CellMarker* cmark ;
 	Dart current ;
 	bool firstTraversal ;
+	const FunctorSelect& m_good ;
 
 public:
-	TraversorCell(MAP& map, unsigned int orbit, unsigned int thread = 0) :
-		m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true)
+	TraversorCell(MAP& map, unsigned int orbit, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) :
+		m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
 	{
 		if(map.isOrbitEmbedded(m_orbit))
 			cmark = new CellMarker(map, m_orbit, thread) ;
@@ -72,7 +73,7 @@ public:
 		}
 
 		current = m.begin() ;
-		while(m.isBoundaryMarked(current))
+		while(m.isBoundaryMarked(current) || !m_good(current))
 			m.next(current) ;
 
 		if(current == m.end())
@@ -101,7 +102,7 @@ public:
 			else
 				ismarked = cmark->isMarked(current) ;
 
-			while(current != NIL && (ismarked || m.isBoundaryMarked(current)))
+			while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
 			{
 				m.next(current) ;
 				if(current == m.end())
@@ -131,7 +132,7 @@ template <typename MAP>
 class TraversorV : public TraversorCell<MAP>
 {
 public:
-	TraversorV(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, thread)
+	TraversorV(MAP& m, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, good, thread)
 	{}
 };
 
@@ -139,7 +140,7 @@ template <typename MAP>
 class TraversorE : public TraversorCell<MAP>
 {
 public:
-	TraversorE(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, thread)
+	TraversorE(MAP& m, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, good, thread)
 	{}
 };
 
@@ -147,7 +148,7 @@ template <typename MAP>
 class TraversorF : public TraversorCell<MAP>
 {
 public:
-	TraversorF(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, thread)
+	TraversorF(MAP& m, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, good, thread)
 	{}
 };
 
@@ -155,7 +156,7 @@ template <typename MAP>
 class TraversorW : public TraversorCell<MAP>
 {
 public:
-	TraversorW(MAP& m, unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, thread)
+	TraversorW(MAP& m, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, good, thread)
 	{}
 };
 

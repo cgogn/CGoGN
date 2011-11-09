@@ -128,34 +128,25 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vol_centroid, const FunctorSelect& select)
 {
-	TraversorW<typename PFP::MAP> t(map) ;
+	TraversorW<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			vol_centroid[d] = volumeCentroid<PFP>(map, d, position) ;
-	}
+		vol_centroid[d] = volumeCentroid<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_centroid, const FunctorSelect& select)
 {
-	TraversorF<typename PFP::MAP> t(map) ;
+	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			face_centroid[d] = faceCentroid<PFP>(map, d, position) ;
-	}
+		face_centroid[d] = faceCentroid<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vertex_centroid, const FunctorSelect& select)
 {
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-	{
-		if(select(d))
-			vertex_centroid[d] = vertexNeighborhoodCentroid<PFP>(map, d, position) ;
-	}
+		vertex_centroid[d] = vertexNeighborhoodCentroid<PFP>(map, d, position) ;
 }
 
 } // namespace Geometry

@@ -313,12 +313,9 @@ void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good,
 {
 	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
-	TraversorF<typename PFP::MAP> trav(map, thread);
+	TraversorF<typename PFP::MAP> trav(map, good, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	{
-		if (good(d))
-			addTri<PFP>(map, d, tableIndices);
-	}
+		addTri<PFP>(map, d, tableIndices);
 }
 
 template<typename PFP>
@@ -382,14 +379,11 @@ void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std
 {
 	tableIndices.reserve(map.getNbDarts());
 
-	TraversorE<typename PFP::MAP> trav(map, thread);
+	TraversorE<typename PFP::MAP> trav(map, good, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
-		if (good(d))
-		{
-			tableIndices.push_back(map.getEmbedding(VERTEX, d));
-			tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
-		}
+		tableIndices.push_back(map.getEmbedding(VERTEX, d));
+		tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
 	}
 }
 
@@ -398,10 +392,10 @@ void MapRender::initBoundaries(typename PFP::MAP& map, const FunctorSelect& good
 {
 	tableIndices.reserve(map.getNbDarts()); //TODO optimisation ?
 
-	TraversorE<typename PFP::MAP> trav(map, thread);
+	TraversorE<typename PFP::MAP> trav(map, good, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
-		if (good(d) && map.isBoundaryEdge(d))
+		if (map.isBoundaryEdge(d))
 		{
 			tableIndices.push_back(map.getEmbedding(VERTEX, d));
 			tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
@@ -463,12 +457,9 @@ void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, st
 {
 	tableIndices.reserve(map.getNbDarts() / 5);
 
-	TraversorV<typename PFP::MAP> trav(map, thread);
+	TraversorV<typename PFP::MAP> trav(map, good, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-	{
-		if (good(d))
-			tableIndices.push_back(map.getEmbedding(VERTEX, d));
-	}
+		tableIndices.push_back(map.getEmbedding(VERTEX, d));
 }
 
 template<typename PFP>

@@ -48,36 +48,33 @@ void filterAverageAttribute_OneRing(
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
 
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d))
-		{
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
 
-			fa.reset() ;
-			if (neigh & INSIDE)
+		fa.reset() ;
+		if (neigh & INSIDE)
+		{
+			switch (attIn.getOrbit())
 			{
-				switch (attIn.getOrbit())
-				{
-				case VERTEX :
-					col.applyOnInsideVertices(fa) ;
-					break;
-				case EDGE :
-					col.applyOnInsideEdges(fa) ;
-					break;
-				case FACE :
-					col.applyOnInsideFaces(fa) ;
-					break;
-				}
+			case VERTEX :
+				col.applyOnInsideVertices(fa) ;
+				break;
+			case EDGE :
+				col.applyOnInsideEdges(fa) ;
+				break;
+			case FACE :
+				col.applyOnInsideFaces(fa) ;
+				break;
 			}
-			if (neigh & BORDER)
-				col.applyOnBorder(fa) ;
-			attOut[d] = fa.getAverage() ;
 		}
+		if (neigh & BORDER)
+			col.applyOnBorder(fa) ;
+		attOut[d] = fa.getAverage() ;
 	}
 }
 
@@ -95,29 +92,26 @@ void filterAverageVertexAttribute_WithinSphere(
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d))
-		{
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
 
-			attOut[d] = T(0);
-			if (neigh & INSIDE){
-				faInside.reset() ;
-				col.applyOnInsideVertices(faInside) ;
-				attOut[d] += faInside.getSum();
-			}
-			if (neigh & BORDER){
-				faBorder.reset(position[d], radius);
-				col.applyOnBorder(faBorder) ;
-				attOut[d] += faBorder.getSum();
-			}
-			attOut[d] /= faInside.getCount() + faBorder.getCount() ;
+		attOut[d] = T(0);
+		if (neigh & INSIDE){
+			faInside.reset() ;
+			col.applyOnInsideVertices(faInside) ;
+			attOut[d] += faInside.getSum();
 		}
+		if (neigh & BORDER){
+			faBorder.reset(position[d], radius);
+			col.applyOnBorder(faBorder) ;
+			attOut[d] += faBorder.getSum();
+		}
+		attOut[d] /= faInside.getCount() + faBorder.getCount() ;
 	}
 }
 
@@ -134,21 +128,18 @@ void filterAverageEdgeAttribute_WithinSphere(
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d))
-		{
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
 
-			fa.reset() ;
-			if (neigh & INSIDE) col.applyOnInsideEdges(fa) ;
-			if (neigh & BORDER) col.applyOnBorder(fa) ;
-			attOut[d] = fa.getAverage() ;
-		}
+		fa.reset() ;
+		if (neigh & INSIDE) col.applyOnInsideEdges(fa) ;
+		if (neigh & BORDER) col.applyOnBorder(fa) ;
+		attOut[d] = fa.getAverage() ;
 	}
 }
 
@@ -165,21 +156,18 @@ void filterAverageFaceAttribute_WithinSphere(
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorV<typename PFP::MAP> t(map) ;
+	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d))
-		{
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
 
-			fa.reset() ;
-			if (neigh & INSIDE) col.applyOnInsideFaces(fa) ;
-			if (neigh & BORDER) col.applyOnBorder(fa) ;
-			attOut[d] = fa.getAverage() ;
-		}
+		fa.reset() ;
+		if (neigh & INSIDE) col.applyOnInsideFaces(fa) ;
+		if (neigh & BORDER) col.applyOnBorder(fa) ;
+		attOut[d] = fa.getAverage() ;
 	}
 }
 
