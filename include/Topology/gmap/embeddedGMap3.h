@@ -39,21 +39,31 @@ class EmbeddedGMap3 : public GMap3
 public:
 	typedef GMap3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
+	 * The attributes attached to the edge of d are kept on the resulting edge
+	 * The attributes attached to the volume of d are kept on the resulting volume
+	 */
+	void sewFaces(Dart d, Dart e);
+
+	/**
+	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
+	 * The attributes attached to the old edge are duplicated on both resulting edges
+	 * The attributes attached to the old volume are duplicated on both volume if a new one is created
 	 */
 	virtual void unsewFaces(Dart d);
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the vertices of the vertices of the face of d are kept on the vertices of the resulting face
+	 * The attributes attached to the edges of the face of d are kept on the resulting face
+	 * The attributes attached to the face of d are kept on the resulting face
 	 */
 	virtual void sewVolumes(Dart d, Dart e);
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the vertices of the old face of d are duplicated on the vertices of both resulting faces
+	 * The attributes attached to the old edges of the old face of d are duplicated on the edges of both resulting faces
+	 * The attributes attached to the old face d are duplicated on both resulting faces
 	 */
 	virtual void unsewVolumes(Dart d);
 

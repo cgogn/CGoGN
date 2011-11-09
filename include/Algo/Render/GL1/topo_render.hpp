@@ -436,16 +436,16 @@ void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 	vecVolCenters.reserve(vecDartFaces.size()/4); // = nb of volumes for a tetra mesh
 
 	DartMarker mark(map);					// marker for darts
-//	CellMarker mVol(map, VOLUME);
-	DartMarker mVol(map);
+	CellMarker mVol(map, VOLUME);
+//	DartMarker mVol(map);
 
 	//compute barycenter and get a dart by face
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(!mVol.isMarked(d))
 		{
-//			mVol.mark(d);
-			mVol.markOrbit(VOLUME,d);
+			mVol.mark(d);
+//			mVol.markOrbit(VOLUME,d);
 
 			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 			VEC3 center(0);

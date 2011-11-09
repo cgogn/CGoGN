@@ -30,6 +30,33 @@
 namespace CGoGN
 {
 
+void EmbeddedGMap3::sewFaces(Dart d, Dart e)
+{
+	GMap3::sewFaces(d,e);
+
+	unsigned int vEmb;
+	if (isOrbitEmbedded(VERTEX))
+	{
+		vEmb = getEmbedding(VERTEX, d);
+		embedOrbit(VERTEX, d, vEmb) ;
+
+		vEmb = getEmbedding(VERTEX, beta0(d));
+		embedOrbit(VERTEX, beta0(d), vEmb) ;
+	}
+
+	if (isOrbitEmbedded(EDGE))
+	{
+		vEmb = getEmbedding(EDGE, d);
+		embedOrbit(EDGE, e, vEmb) ;
+	}
+
+	if (isOrbitEmbedded(VOLUME))
+	{
+		vEmb = getEmbedding(VOLUME, d);
+		embedOrbit(VOLUME, e, vEmb) ;
+	}
+}
+
 void EmbeddedGMap3::unsewFaces(Dart d)
 {
 	Dart e = beta2(d);
@@ -57,6 +84,15 @@ void EmbeddedGMap3::unsewFaces(Dart d)
 	{
 		embedNewCell(EDGE, e);
 		copyCell(EDGE, e, d);
+	}
+
+	if (isOrbitEmbedded(VOLUME))
+	{
+		if(!sameVolume(d,e))
+		{
+			embedNewCell(VOLUME, e);
+			copyCell(VOLUME, e, d);
+		}
 	}
 }
 
