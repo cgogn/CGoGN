@@ -68,6 +68,7 @@ public:
 	 *  To generate or delete cells in a 0-G-map
 	 *************************************************************************/
 
+	//@{
 	/**
 	* create an edge
 	* @return a dart of the edge
@@ -79,6 +80,7 @@ public:
 	* @param d a dart of the edge
 	*/
 	void deleteEdge(Dart d);
+	//@}
 
 	/*! @name Cell Functors
 	 *  Apply functors to all darts of a cell

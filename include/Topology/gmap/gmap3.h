@@ -85,13 +85,16 @@ public:
 
 	void phi3unsew(Dart d);
 
-
+	/*! @name Generator and Deletor
+	 *  To generate or delete volumes in a 3-map
+	 *************************************************************************/
 
 	//@{
-	//! Delete a volume of
-	/*! @param d a dart of volume
+	//! Delete a volume erasing all its darts.
+	/*! The phi3-links around the volume are removed
+	 *  @param d a dart of the volume
 	 */
-	void deleteOrientedVolume(Dart d);
+	void deleteVolume(Dart d);
 	//@}
 
 	/*! @name Topological Operators
@@ -99,6 +102,24 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	virtual void cutEdge(Dart d);
+
+	//! Split a face inserting an edge between two vertices
+	/*! \pre Dart d and e should belong to the same face and be distinct
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 *  @return the dart of the new edge lying in the vertex of d after the cut
+	 */
+	virtual void splitFace(Dart d, Dart e);
+
+	//! Unsew the "ear" of the vertex of d
+	/*! @param d a dart
+	 */
+	virtual Dart cutSpike(Dart d);
+
 	//! Sew two oriented volumes along their faces.
 	/*! The oriented faces should not be phi3-linked and have the same length
 	 *  @param d a dart of the first volume
@@ -115,46 +136,8 @@ public:
 	/*! @param d a dart of common face
 	 */
 	bool mergeVolumes(Dart d);
+	//@}
 
-	//! Split a face inserting an edge between two vertices
-	/*! \pre Dart d and e should belong to the same face and be distinct
-	 *  @param d dart of first vertex
-	 *  @param e dart of second vertex
-	 *  @return the dart of the new edge lying in the vertex of d after the cut
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	//! Cut the edge of d
-	/*! @param d a dart of the edge to cut
-	 */
-	virtual void cutEdge(Dart d);
-
-
-	//! Collapse an edge (that is deleted) possibly merging its vertices
-	/*! If delDegenerateFaces is true, the method checks that no degenerate
-	 *  faces are build (faces with less than 3 edges). If it occurs the faces
-	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
-	 *  \warning This may produce two distinct vertices if the edge
-	 *  was the only link between two border faces
-	 *  @param d a dart in the deleted edge
-	 *  @param delDegenerateFaces a boolean (default to true)
-	 */
-	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 *
-	 * @param
-	 * @param
-	 * @param
-	 */
-	virtual void collapseFace(Dart d, bool delDegenerateFaces = true, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart cutSpike(Dart d);
 
 	/*! @name Topological Queries
 	 *  Return or set various topological information
@@ -173,7 +156,16 @@ public:
 	 */
 	bool sameVertex(Dart d, Dart e) ;
 
-	//@{
+	//! Compute the number of edges of the vertex of d
+	/*! @param d a dart
+	 */
+	unsigned int vertexDegree(Dart d) ;
+
+	//! Tell if the vertex of d is on the boundary
+	/*! @param d a dart
+	 */
+	virtual bool isBoundaryVertex(Dart d);
+
 	//! Test if dart d and e belong to the same oriented edge
 	/*! @param d a dart
 	 *  @param e a dart
@@ -185,6 +177,11 @@ public:
 	 *  @param e a dart
 	 */
 	bool sameEdge(Dart d, Dart e) ;
+
+	//! Compute the number of volumes around the edge of d
+	/*! @param d a dart
+	 */
+	unsigned int edgeDegree(Dart d);
 
 	//!Test if dart d and e belong to the same oriented face
 	/*! @param d a dart
@@ -198,34 +195,15 @@ public:
 	 */
 	bool sameFace(Dart d, Dart e);
 
-	/**
-	 * compute the number of edges of the vertex of d
-	 */
-	unsigned int vertexDegree(Dart d) ;
-
-	/**
-	 * compute the number of volumes around the edge of d
-	 */
-	virtual unsigned int edgeDegree(Dart d);
-
-	/**
-	 * compute the number of faces in the volume of d
-	 */
-	unsigned int volumeDegree(Dart d);
-
 	virtual bool check();
+	//@}
 
-	/**
-	 *
-	 */
-	virtual bool isBoundaryVertex(Dart d);
 
 	/*! @name Cell Functors
 	 *  Apply functors to all darts of a cell
 	 *************************************************************************/
 
 	//@{
-
 	/**
 	* Apply a functor on each dart of a face
 	* @param d a dart of the face
