@@ -290,13 +290,11 @@ Dart GMap3::cutSpike(Dart d)
   Dart dNew;
   int tet=0;
 
-  //CGoGNout << "cut" << CGoGNendl;
-
   //count the valence of the vertex
   do {
     nb++;
     e=phi1(phi2(e));
-  } while (e!=d);
+  } while (nb<3 && e!=d);
 
   if(nb<3)
   {

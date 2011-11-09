@@ -384,10 +384,43 @@ bool EmbeddedGMap3::check()
 		return false ;
 
 	CGoGNout << "Check: embedding begin" << CGoGNendl ;
+
+	DartMarker * dvMark, * deMark, * dfMark, * dvolMark;
+	CellMarker * vMark, * eMark, * fMark, * volMark;
+
+	if (isOrbitEmbedded(VERTEX))
+	{
+		dvMark = new DartMarker(*this);
+		vMark = new CellMarker(*this, VERTEX);
+	}
+
+	if (isOrbitEmbedded(EDGE))
+	{
+		deMark = new DartMarker(*this);
+		eMark = new CellMarker(*this, EDGE);
+	}
+
+	if (isOrbitEmbedded(FACE))
+	{
+		dfMark = new DartMarker(*this);
+		fMark = new CellMarker(*this, FACE);
+	}
+
+	if (isOrbitEmbedded(VOLUME))
+	{
+		dvolMark = new DartMarker(*this);
+		volMark = new CellMarker(*this, VOLUME);
+	}
+
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		if (isOrbitEmbedded(VERTEX))
 		{
+			if(dvMark->isMarked(d) != vMark->isMarked(d))
+				CGoGNout << "Check: warning different orbits share same vertex attribute" << CGoGNendl ;
+			vMark->mark(d);
+			dvMark->markOrbit(VERTEX,d);
+
 			if (getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta1(d)))
 			{
 				CGoGNout << "Check: different embeddings on vertex (1)" << CGoGNendl ;
@@ -409,6 +442,11 @@ bool EmbeddedGMap3::check()
 
 		if (isOrbitEmbedded(EDGE))
 		{
+			if(deMark->isMarked(d) != eMark->isMarked(d))
+				CGoGNout << "Check: warning different orbits share same edge attribute" << CGoGNendl ;
+			eMark->mark(d);
+			deMark->markOrbit(EDGE,d);
+
 			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, beta0(d)))
 			{
 				CGoGNout << "Check: different embeddings on edge (0)" << CGoGNendl ;
@@ -430,6 +468,11 @@ bool EmbeddedGMap3::check()
 
 		if (isOrbitEmbedded(FACE))
 		{
+			if(dfMark->isMarked(d) != fMark->isMarked(d))
+				CGoGNout << "Check: warning different orbits share same face attribute" << CGoGNendl ;
+			fMark->mark(d);
+			dfMark->markOrbit(FACE,d);
+
 			if (getEmbedding(FACE, d) != getEmbedding(FACE, beta0(d)))
 			{
 				CGoGNout << "Check: different embeddings on face (0)" << CGoGNendl ;
@@ -445,6 +488,11 @@ bool EmbeddedGMap3::check()
 
 		if (isOrbitEmbedded(VOLUME))
 		{
+			if(dvolMark->isMarked(d) != volMark->isMarked(d))
+				CGoGNout << "Check: warning different orbits share same volume attribute" << CGoGNendl ;
+			volMark->mark(d);
+			dvolMark->markOrbit(VOLUME,d);
+
 			if (getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta0(d)))
 			{
 				CGoGNout << "Check: different embeddings in volume (0)" << CGoGNendl ;
@@ -464,6 +512,7 @@ bool EmbeddedGMap3::check()
 			}
 		}
 	}
+
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 	return true ;
 }
