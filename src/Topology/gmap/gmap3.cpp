@@ -669,56 +669,15 @@ bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	return found;
 }
 
-
-// TODO:optimize traversal of edges ?
 bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
-	do
-	{
+	do {
 		if (GMap2::foreach_dart_of_edge(dNext,f,thread))
 			return true;
 		dNext = alpha2(dNext);
 	} while (dNext != d);
 	return false;
-
-//	DartMarkerStore mv(*this,thread);			// Lock a marker
-//	bool found = false;					// Last functor return value
-//	std::list<Dart> darts_list;		//Darts that are traversed
-//	darts_list.push_back(d);			//Start with the dart d
-//	std::list<Dart>::iterator darts;
-//
-//	mv.mark(d);
-//
-//	for(darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
-//	{
-//		Dart dc = *darts;
-//
-//		Dart dx = beta0(dc);
-//		if (!mv.isMarked(dx))
-//		{
-//			mv.mark(dx);
-//			darts_list.push_back(dx);
-//		}
-//
-//		dx = beta2(dc);
-//		if (!mv.isMarked(dx))
-//		{
-//			mv.mark(dx);
-//			darts_list.push_back(dx);
-//		}
-//
-//		dx = beta3(dc);
-//		if (!mv.isMarked(dx))
-//		{
-//			mv.mark(dx);
-//			darts_list.push_back(dx);
-//		}
-//
-//		found = f(dc);
-//	}
-//
-//	return found;
 }
 
 bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)

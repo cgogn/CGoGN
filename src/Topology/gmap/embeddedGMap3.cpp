@@ -53,7 +53,7 @@ void EmbeddedGMap3::sewFaces(Dart d, Dart e)
 	if (isOrbitEmbedded(VOLUME))
 	{
 		vEmb = getEmbedding(VOLUME, d);
-		embedOrbit(VOLUME, e, vEmb) ;
+		embedOrbit(VOLUME, d, vEmb) ;
 	}
 }
 
@@ -101,16 +101,17 @@ void EmbeddedGMap3::sewVolumes(Dart d, Dart e)
 	//topological sewing
 	GMap3::sewVolumes(d,e);
 
+	unsigned int vEmb = EMBNULL ;
+
 	//embed the vertex orbits from the oriented face with dart e
 	//with vertex orbits value from oriented face with dart d
 	if (isOrbitEmbedded(VERTEX))
 	{
-		unsigned int vEmb1 = EMBNULL ;
 		Dart dd = d ;
 		do
 		{
-			vEmb1 = getEmbedding(VERTEX, dd);
-			embedOrbit(VERTEX, dd, vEmb1) ;
+			vEmb = getEmbedding(VERTEX, dd);
+			embedOrbit(VERTEX, dd, vEmb) ;
 			dd = phi1(dd) ;
 		} while(dd != d) ;
 	}
@@ -119,12 +120,11 @@ void EmbeddedGMap3::sewVolumes(Dart d, Dart e)
 	//for all the face
 	if (isOrbitEmbedded(EDGE))
 	{
-		unsigned int vEmb1 = EMBNULL ;
 		Dart dd = d ;
 		do
 		{
-			vEmb1 = getEmbedding(EDGE, dd);
-			embedOrbit(EDGE, dd, vEmb1) ;
+			vEmb = getEmbedding(EDGE, dd);
+			embedOrbit(EDGE, dd, vEmb) ;
 			dd = phi1(dd) ;
 		} while(dd != d) ;
 	}
@@ -132,7 +132,7 @@ void EmbeddedGMap3::sewVolumes(Dart d, Dart e)
 	//embed the face orbit from the volume sewn
 	if (isOrbitEmbedded(FACE))
 	{
-		unsigned int vEmb = getEmbedding(FACE, d);
+		vEmb = getEmbedding(FACE, d);
 		embedOrbit(FACE, e, vEmb) ;
 	}
 }
@@ -385,8 +385,8 @@ bool EmbeddedGMap3::check()
 
 	CGoGNout << "Check: embedding begin" << CGoGNendl ;
 
-	DartMarker * dvMark, * deMark, * dfMark, * dvolMark;
-	CellMarker * vMark, * eMark, * fMark, * volMark;
+	DartMarker * dvMark=NULL, * deMark=NULL, * dfMark=NULL, * dvolMark=NULL;
+	CellMarker * vMark=NULL, * eMark=NULL, * fMark=NULL, * volMark=NULL;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
@@ -423,19 +423,19 @@ bool EmbeddedGMap3::check()
 
 			if (getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta1(d)))
 			{
-				CGoGNout << "Check: different embeddings on vertex (1)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on vertex (beta1)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta2(d)))
 			{
-				CGoGNout << "Check: different embeddings on vertex (2)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on vertex (beta2)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta3(d)))
 			{
-				CGoGNout << "Check: different embeddings on vertex (3)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on vertex (beta3)" << CGoGNendl ;
 				return false ;
 			}
 		}
@@ -449,20 +449,20 @@ bool EmbeddedGMap3::check()
 
 			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, beta0(d)))
 			{
-				CGoGNout << "Check: different embeddings on edge (0)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on edge (beta0)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, beta2(d)))
 			{
-				CGoGNout << "Check: different embeddings on edge (1)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on edge (beta2)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, beta3(d)))
 			{
-				CGoGNout << "Check: different embeddings on edge (2)" << CGoGNendl ;
-				return false ;
+				CGoGNout << "Check: different embeddings on edge (beta3)" << CGoGNendl ;
+//				return false ;
 			}
 		}
 
@@ -475,13 +475,13 @@ bool EmbeddedGMap3::check()
 
 			if (getEmbedding(FACE, d) != getEmbedding(FACE, beta0(d)))
 			{
-				CGoGNout << "Check: different embeddings on face (0)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on face (beta0)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(FACE, d) != getEmbedding(FACE, beta1(d)))
 			{
-				CGoGNout << "Check: different embeddings on face (1)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings on face (beta1)" << CGoGNendl ;
 				return false ;
 			}
 		}
@@ -495,19 +495,19 @@ bool EmbeddedGMap3::check()
 
 			if (getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta0(d)))
 			{
-				CGoGNout << "Check: different embeddings in volume (0)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings in volume (beta0)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta1(d)))
 			{
-				CGoGNout << "Check: different embeddings in volume (1)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings in volume (beta1)" << CGoGNendl ;
 				return false ;
 			}
 
 			if (getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta2(d)))
 			{
-				CGoGNout << "Check: different embeddings in volume (2)" << CGoGNendl ;
+				CGoGNout << "Check: different embeddings in volume (beta2)" << CGoGNendl ;
 				return false ;
 			}
 		}
