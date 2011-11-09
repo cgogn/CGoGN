@@ -350,71 +350,83 @@ bool EmbeddedMap3<MAP3>::check()
 		return false ;
 
 	CGoGNout << "Check: embedding begin" << CGoGNendl ;
+	DartMarker mv(*this);
 	for(Dart d = MAP3::begin(); d != MAP3::end(); MAP3::next(d))
 	{
-		if (MAP3::isOrbitEmbedded(VERTEX))
+		if(MAP3::isOrbitEmbedded(VERTEX))
 		{
-			if (MAP3::phi2(MAP3::phi_1(d)) != MAP3::phi_1(d) && MAP3::getEmbedding(VERTEX, d) != MAP3::getEmbedding(VERTEX, MAP3::phi2(MAP3::phi_1(d))))
+			if(!mv.isMarked(d))
 			{
-				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl ;
-				return false ;
-			}
-
-			if(MAP3::phi3(d) != d && MAP3::getEmbedding(VERTEX, d) != MAP3::getEmbedding(VERTEX, MAP3::phi1(MAP3::phi3(d))))
-			{
-				CGoGNout << "Check: different embeddings on vertex in the 2 oriented faces" << CGoGNendl ;
-				CGoGNout << "Dart #" << d << CGoGNendl;
-				CGoGNout << "Emb(d) = " << MAP3::getEmbedding(VERTEX, d) << CGoGNendl;
-				CGoGNout << "Emb(phi32(d)) = " << MAP3::getEmbedding(VERTEX, MAP3::phi3(MAP3::phi2(d))) << CGoGNendl;
-				return false ;
-			}
-
-		}
-
-		if (MAP3::isOrbitEmbedded(EDGE))
-		{
-			if (MAP3::getEmbedding(EDGE, d) != MAP3::getEmbedding(EDGE, MAP3::phi2(d)))
-			{
-				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
-				return false ;
-			}
-
-			if (MAP3::getEmbedding(EDGE, d) != MAP3::getEmbedding(EDGE, MAP3::phi3(d)))
-			{
-				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
-				return false ;
+				mv.markOrbit(VERTEX, d);
+				unsigned int emb = MAP3::getEmbedding(VERTEX, d);
+				FunctorCheckEmbedding<MAP3> fce(*this, VERTEX, emb);
+				MAP3::foreach_dart_of_orbit(VERTEX, d, fce);
 			}
 		}
 
-		if (MAP3::isOrbitEmbedded(FACE))
-		{
-			if (MAP3::getEmbedding(FACE, d) != MAP3::getEmbedding(FACE, MAP3::phi1(d)))
-			{
-				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
-				return false ;
-			}
-
-			if (MAP3::getEmbedding(FACE, d) != MAP3::getEmbedding(FACE, MAP3::phi3(d)))
-			{
-				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
-				return false ;
-			}
-		}
-
-		if (MAP3::isOrbitEmbedded(VOLUME))
-		{
-			if (MAP3::getEmbedding(VOLUME, d) != MAP3::getEmbedding(VOLUME, MAP3::phi1(d)))
-			{
-				CGoGNout << "Check: different embeddings in volume" << CGoGNendl ;
-				return false ;
-			}
-
-			if (MAP3::getEmbedding(VOLUME, d) != MAP3::getEmbedding(VOLUME, MAP3::phi2(d)))
-			{
-				CGoGNout << "Check: different embeddings in volume" << CGoGNendl ;
-				return false ;
-			}
-		}
+//		if (MAP3::isOrbitEmbedded(VERTEX))
+//		{
+//			if (MAP3::phi2(MAP3::phi_1(d)) != MAP3::phi_1(d) && MAP3::getEmbedding(VERTEX, d) != MAP3::getEmbedding(VERTEX, MAP3::phi2(MAP3::phi_1(d))))
+//			{
+//				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl ;
+//				return false ;
+//			}
+//
+//			if(MAP3::phi3(d) != d && MAP3::getEmbedding(VERTEX, d) != MAP3::getEmbedding(VERTEX, MAP3::phi1(MAP3::phi3(d))))
+//			{
+//				CGoGNout << "Check: different embeddings on vertex in the 2 oriented faces" << CGoGNendl ;
+//				CGoGNout << "Dart #" << d << CGoGNendl;
+//				CGoGNout << "Emb(d) = " << MAP3::getEmbedding(VERTEX, d) << CGoGNendl;
+//				CGoGNout << "Emb(phi32(d)) = " << MAP3::getEmbedding(VERTEX, MAP3::phi3(MAP3::phi2(d))) << CGoGNendl;
+//				return false ;
+//			}
+//
+//		}
+//
+//		if (MAP3::isOrbitEmbedded(EDGE))
+//		{
+//			if (MAP3::getEmbedding(EDGE, d) != MAP3::getEmbedding(EDGE, MAP3::phi2(d)))
+//			{
+//				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
+//				return false ;
+//			}
+//
+//			if (MAP3::getEmbedding(EDGE, d) != MAP3::getEmbedding(EDGE, MAP3::phi3(d)))
+//			{
+//				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
+//				return false ;
+//			}
+//		}
+//
+//		if (MAP3::isOrbitEmbedded(FACE))
+//		{
+//			if (MAP3::getEmbedding(FACE, d) != MAP3::getEmbedding(FACE, MAP3::phi1(d)))
+//			{
+//				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
+//				return false ;
+//			}
+//
+//			if (MAP3::getEmbedding(FACE, d) != MAP3::getEmbedding(FACE, MAP3::phi3(d)))
+//			{
+//				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
+//				return false ;
+//			}
+//		}
+//
+//		if (MAP3::isOrbitEmbedded(VOLUME))
+//		{
+//			if (MAP3::getEmbedding(VOLUME, d) != MAP3::getEmbedding(VOLUME, MAP3::phi1(d)))
+//			{
+//				CGoGNout << "Check: different embeddings in volume" << CGoGNendl ;
+//				return false ;
+//			}
+//
+//			if (MAP3::getEmbedding(VOLUME, d) != MAP3::getEmbedding(VOLUME, MAP3::phi2(d)))
+//			{
+//				CGoGNout << "Check: different embeddings in volume" << CGoGNendl ;
+//				return false ;
+//			}
+//		}
 	}
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 	return true ;
