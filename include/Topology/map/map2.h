@@ -305,18 +305,18 @@ public:
 	 */
 	bool sameVertex(Dart d, Dart e) ;
 
-	/**
-	 * compute the number of edges of the vertex of d
+	//! Compute the number of edges of the vertex of d
+	/*! @param d a dart
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
-	/**
-	 * compute the number of faces in the volume of d
+	//! Compute the number of faces in the volume of d
+	/*! @param d a dart
 	 */
 	unsigned int volumeDegree(Dart d);
 
-	/**
-	 * tell if the vertex of d is on the boundary of the map
+	//! Tell if the vertex of d is on the boundary of the map
+	/*! @param d a dart
 	 */
 	bool isBoundaryVertex(Dart d) ;
 
@@ -372,20 +372,6 @@ public:
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread=0);
-
-	//!
-	/*! TODO Ajout a valider
-	 * restreint aux complexes simpliciaux
-	 * Apply a functor on the all darts in the set of the star from orbit
-	 */
-	bool foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
-
-	//!
-	/*! TODO Ajout a valider
-	 * restreint aux complexes simpliciaux
-	 * Apply a functor on the all darts in the set of the link from orbit
-	 */
-	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread=0);
 
 	//@}
 };

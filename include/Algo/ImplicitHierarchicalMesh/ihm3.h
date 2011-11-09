@@ -25,9 +25,10 @@
 #ifndef __IMPLICIT_HIERARCHICAL_MAP3__
 #define __IMPLICIT_HIERARCHICAL_MAP3__
 
-#include "Topology/map/map3.h"
-#include "Topology/generic/embeddedMap3.h"
-#include "Container/attributeContainer.h"
+//#include "Topology/map/map3.h"
+//#include "Topology/generic/embeddedMap3.h"
+//#include "Container/attributeContainer.h"
+#include "Topology/map/embeddedMap3.h"
 
 namespace CGoGN
 {
@@ -40,7 +41,7 @@ namespace IHM
 
 template<typename T> class AttributeHandler_IHM ;
 
-class ImplicitHierarchicalMap3 : public EmbeddedMap3<Map3>
+class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
 	template<typename T> friend class AttributeHandler_IHM ;
 
