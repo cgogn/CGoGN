@@ -71,29 +71,38 @@ void Map3::deleteVolume(Dart d)
 
 bool Map3::deleteVertex(Dart d)
 {
-	//is boundary
-	if(phi3(d) != d)
+	//Save the darts around the vertex
+	//(one dart per face should be enough)
+	std::vector<Dart> fstoretmp;
+	fstoretmp.reserve(100);
+	FunctorStore fs(fstoretmp);
+	foreach_dart_of_vertex(d, fs);
+
+	//just one dart per face
+	std::vector<Dart> fstore;
+	fstore.reserve(100);
+	DartMarker mf(*this);
+	for(std::vector<Dart>::iterator it = fstoretmp.begin() ; it != fstoretmp.end() ; ++it)
 	{
-		Dart e = d;
-		Dart d3 = phi2(phi3(d));
-
-		do
+		if(!mf.isMarked(*it))
 		{
-			unsewVolumes(e);
-			e = phi2(phi_1(e));
-		}while(e != d);
-
-		Map2::deleteVertex(d3);
+			mf.markOrbit(FACE, *it);
+			fstore.push_back(*it);
+		}
 	}
 
-	Map2::deleteVertex(d);
+	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
+	{
+		if(!mergeVolumes(*it))
+			return false;
+	}
 
 	return true;
 }
 
 void Map3::cutEdge(Dart d)
 {
-	if(phi3(d) == d)
+	if(isBoundaryFace(d))
 		d = phi2(d);
 
 	Dart prev = d;
@@ -116,7 +125,7 @@ void Map3::cutEdge(Dart d)
 		}
 	}
 
-	if (phi3(d) != d)
+	if(!isBoundaryFace(d))
 	{
 		Dart d3 = phi3(d);
 		phi3unsew(d);
@@ -127,7 +136,7 @@ void Map3::cutEdge(Dart d)
 
 void Map3::uncutEdge(Dart d)
 {
-	if(phi3(d) == d)
+	if(isBoundaryFace(d))
 		d = phi_1(phi2(d));
 
 	Dart prev = d;
@@ -154,7 +163,7 @@ void Map3::splitFace(Dart d, Dart e)
 {
 	Map2::splitFace(d,e);
 
-	if (phi3(d) != d)
+	if(!isBoundaryFace(d))
 	{
 		Dart dd = phi1(phi3(d));
 		Dart ee = phi1(phi3(e));
@@ -164,70 +173,6 @@ void Map3::splitFace(Dart d, Dart e)
 		phi3sew(phi_1(d), phi_1(ee));
 		phi3sew(phi_1(e), phi_1(dd));
 	}
-}
-
-Dart Map3::cutSpike(Dart d)
-{
-  Dart e=d;
-  int nb=0;
-  Dart dNew;
-  int tet=0;
-
-  //CGoGNout << "cut" << CGoGNendl;
-
-  //count the valence of the vertex
-  do {
-    nb++;
-    e=phi1(phi2(e));
-  } while (e!=d);
-
-  if(nb<3)
-  {
-	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
-	return d;
-  }
-  else
-  {
-	 //triangulate around the vertex
-	do {
-		if(phi1(phi1(phi1(e)))!=e)
-		{
-			splitFace(phi_1(e),phi1(e));
-			//CGoGNout << "split" << CGoGNendl;
-		}
-		else
-			tet++;
-
-		e=phi1(phi2(e));
-	} while (e!=d);
-
-//	CGoGNout << "#tet= " << tet << CGoGNendl;
-//	CGoGNout << "#nb= " << nb << CGoGNendl;
-
-	//si toute ces faces ne sont pas triangulaires (on insere une face)
-	if(tet != nb) {
-		//CGoGNout << "new face" << CGoGNendl;
-		dNew=newFace(nb);
-		Dart d3 = newFace(nb);
-		sewVolumes(dNew,d3);
-
-		//sew a face following the triangles
-		Dart dTurn=dNew;
-		do {
-			Dart d1 = phi1(e);
-			Dart dSym = phi2(d1);
-			phi2unsew(d1);
-			phi2sew(dTurn,d1);
-			phi2sew(phi3(dTurn),dSym);
-			dTurn = phi1(dTurn);
-			e=phi1(phi2(e));
-		}while(e!=d);
-	}
-	else
-		dNew = d;
-  }
-
-  return dNew;
 }
 
 void Map3::sewVolumes(Dart d, Dart e)
@@ -256,14 +201,31 @@ void Map3::unsewVolumes(Dart d)
 
 bool Map3::mergeVolumes(Dart d)
 {
-	Dart e = phi3(d) ;
-	if(e != d)
+	if(!isBoundaryFace(d))
 	{
-		unsewVolumes(d);
+		Dart e = phi3(d);
+		Map3::unsewVolumes(d);
 		Map2::mergeVolumes(d, e); // merge the two volumes along common face
 		return true ;
 	}
 	return false ;
+}
+
+void Map3::splitVolume(std::vector<Dart>& vd)
+{
+	Dart e = vd.front();
+	Dart e2 = phi2(e);
+
+	//unsew the edge path
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		Map2::unsewFaces(*it);
+
+	//close the two holes
+	Map2::closeHole(e);
+	Map2::closeHole(e2);
+
+	//sew the two connexe componnents
+	Map3::sewVolumes(phi2(e), phi2(e2));
 }
 
 /*! @name Topological Queries
@@ -272,7 +234,7 @@ bool Map3::mergeVolumes(Dart d)
 
 bool Map3::sameOrientedVertex(Dart d, Dart e)
 {
-	return sameOrientedVertex(d,e);
+	return sameVertex(d,e);
 }
 
 bool Map3::sameVertex(Dart d, Dart e)
@@ -316,7 +278,7 @@ bool Map3::sameVertex(Dart d, Dart e)
 
 unsigned int Map3::vertexDegree(Dart d)
 {
-	int count = 0;
+	unsigned int count = 0;
 	DartMarkerStore mv(*this);	// Lock a marker
 
 	std::list<Dart> darts_list;			//Darts that are traversed
@@ -401,7 +363,7 @@ bool Map3::isBoundaryVertex(Dart d)
 
 bool Map3::sameOrientedEdge(Dart d, Dart e)
 {
-	return sameOrientedEdge(d,e);
+	return sameEdge(d,e);
 }
 
 bool Map3::sameEdge(Dart d, Dart e)
@@ -418,9 +380,9 @@ bool Map3::sameEdge(Dart d, Dart e)
 	return false;
 }
 
-int Map3::edgeDegree(Dart d)
+unsigned int Map3::edgeDegree(Dart d)
 {
-	int deg = 0;
+	unsigned int deg = 0;
 	Dart e = d;
 
 	do
@@ -554,6 +516,16 @@ bool Map3::check()
 
     std::cout << "nb vertex orbits" << getNbOrbits(VERTEX) << std::endl ;
     std::cout << "nb vertex cells" << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits" << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells" << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits" << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells" << m_attribs[FACE].size() << std::endl ;
+
+    std::cout << "nb volume orbits" << getNbOrbits(VOLUME) << std::endl ;
+    std::cout << "nb volume cells" << m_attribs[VOLUME].size() << std::endl ;
+
 
 
     return true;

@@ -243,13 +243,6 @@ public:
 	 */
 	void unsewAroundVertex(Dart d) ;
 
-	/**
-	 * Unsew the Umbrella aroud a vertex, close the hole and then
-	 * create a symetric to construct a polyedron
-	 * @param d a dart from the vertex
-	 */
-	void explodPolyhedron(Dart d);
-
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
 	 *  The faces adjacent to the two given faces are pairwise phi2-linked
