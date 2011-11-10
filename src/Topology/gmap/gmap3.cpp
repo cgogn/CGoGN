@@ -135,68 +135,6 @@ void GMap3::splitFace(Dart d, Dart e)
 	}
 }
 
-Dart GMap3::cutSpike(Dart d)
-{
-  Dart e=d;
-  int nb=0;
-  Dart dNew;
-  int tet=0;
-
-  //count the valence of the vertex
-  do {
-    nb++;
-    e=phi1(phi2(e));
-  } while (nb<3 && e!=d);
-
-  if(nb<3)
-  {
-	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
-	return d;
-  }
-  else
-  {
-	 //triangulate around the vertex
-	do {
-		if(phi1(phi1(phi1(e)))!=e)
-		{
-			splitFace(phi_1(e),phi1(e));
-			//CGoGNout << "split" << CGoGNendl;
-		}
-		else
-			tet++;
-
-		e=phi1(phi2(e));
-	} while (e!=d);
-
-//	CGoGNout << "#tet= " << tet << CGoGNendl;
-//	CGoGNout << "#nb= " << nb << CGoGNendl;
-
-	//si toute ces faces ne sont pas triangulaires (on insere une face)
-	if(tet != nb) {
-		//CGoGNout << "new face" << CGoGNendl;
-		dNew=newFace(nb);
-		Dart d3 = newFace(nb);
-		sewVolumes(dNew,d3);
-
-		//sew a face following the triangles
-		Dart dTurn=dNew;
-		do {
-			Dart d1 = phi1(e);
-			Dart dSym = phi2(d1);
-			phi2unsew(d1);
-			phi2sew(dTurn,d1);
-			phi2sew(phi3(dTurn),dSym);
-			dTurn = phi1(dTurn);
-			e=phi1(phi2(e));
-		}while(e!=d);
-	}
-	else
-		dNew = d;
-  }
-
-  return dNew;
-}
-
 void GMap3::sewVolumes(Dart d, Dart e)
 {
 	assert(faceDegree(d) == faceDegree(e));

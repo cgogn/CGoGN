@@ -115,11 +115,6 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
-	//! Unsew the "ear" of the vertex of d
-	/*! @param d a dart
-	 */
-	virtual Dart cutSpike(Dart d);
-
 	//! Sew two oriented volumes along their faces.
 	/*! The oriented faces should not be phi3-linked and have the same length
 	 *  @param d a dart of the first volume
