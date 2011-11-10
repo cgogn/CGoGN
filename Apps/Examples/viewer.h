@@ -64,7 +64,6 @@ class Viewer : public Utils::QT::SimpleQT
 
 public:
 	MAP myMap ;
-	SelectorTrue allDarts ;
 
     Utils::QT::uiDockInterface dock ;
 

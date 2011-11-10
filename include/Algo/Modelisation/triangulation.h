@@ -94,7 +94,7 @@ public:
 
 	void trianguleFace( Dart d, DartMarker& mark);
 
-	void triangule(const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
+	void triangule(const FunctorSelect& good = allDarts, unsigned int thread=0);
 
 };
 

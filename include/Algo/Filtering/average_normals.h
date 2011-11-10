@@ -75,7 +75,7 @@ void computeNewPositionsFromFaceNormals(
 }
 
 template <typename PFP>
-void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
+void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -119,7 +119,7 @@ void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 }
 
 template <typename PFP>
-void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
+void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -204,7 +204,7 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 }
 
 template <typename PFP>
-void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
+void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -323,7 +323,7 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 }
 
 template <typename PFP>
-void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
+void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;

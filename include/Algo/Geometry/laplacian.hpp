@@ -142,7 +142,7 @@ void computeCotanWeightEdges(
 	typename PFP::MAP& map,
 	const typename PFP::TVEC3& position,
 	typename PFP::TREAL& edgeWeight,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select)
 {
 	TraversorE<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())

@@ -103,7 +103,6 @@ void MyQT::cb_keyPress(int code)
 int main(int argc, char **argv)
 {
 	PFP::MAP myMap;
-	SelectorTrue allDarts;
 
 	PFP::TVEC3 position ;
 	PFP::TVEC3 normal ;

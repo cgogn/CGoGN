@@ -81,6 +81,7 @@ public:
 	FunctorSelect* copy() const { return new SelectorFalse();}
 };
 
+const SelectorTrue allDarts = SelectorTrue() ;
 
 
 class SelectorAnd : public FunctorSelect

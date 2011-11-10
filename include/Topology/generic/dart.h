@@ -100,7 +100,6 @@ struct Dart
 };
 
 const Dart NIL = Dart::nil();
-const Dart DART_END = Dart::create(NIL.index - 1);
 
 }
 

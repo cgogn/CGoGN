@@ -150,13 +150,13 @@ public:
 	void closeFile();
 
 	template <typename PFP>
-	void renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
+	void renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts, unsigned int thread=0);
 
 	template <typename PFP>
-	void renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, bool cull = false, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
+	void renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, bool cull = false, const FunctorSelect& good = allDarts, unsigned int thread=0);
 
 	template <typename PFP>
-	void renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = SelectorTrue(), unsigned int thread=0);
+	void renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts, unsigned int thread=0);
 
 
 	void orderPrimitives(std::list<SvgObj*>& primitives);

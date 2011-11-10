@@ -67,7 +67,7 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	HalfEdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	HalfEdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo>(DART, "halfEdgeInfo") ;
@@ -124,7 +124,7 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors) ;
 
 public:
-	HalfEdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	HalfEdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		m_frame = m.template getAttribute<MATRIX33>(VERTEX, "frame") ;
@@ -188,7 +188,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = SelectorTrue()) :
+	EdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		m_frame = m.template getAttribute<FRAME>(VERTEX, "frame") ;

@@ -178,7 +178,6 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 
 	// update des primitives du renderer
-	SelectorTrue allDarts;
 	SelectorEdgeNoBoundary<PFP::MAP> insideEdges(myMap);// just to draw only inside edges
 
 	DartMarker dm(myMap);
