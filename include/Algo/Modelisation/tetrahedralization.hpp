@@ -648,6 +648,249 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 }
 
+//
+///**
+// * create a tetra based on the two triangles that have a common dart and phi2(dart)
+// * return a new dart inside the tetra
+// */
+//template<typename PFP>
+//Dart extractTetra(typename PFP::MAP& the_map, Dart d)
+//{
+//
+//
+//	Dart e = the_map.phi2(d);
+//
+//	//create the new faces
+//	Dart dd = the_map.newFace(3);
+//	Dart ee = the_map.newFace(3);
+//
+//	//update their sew
+//	the_map.sewFaces(dd,ee);
+//	the_map.sewFaces(the_map.phi3(dd),the_map.phi3(ee));
+//
+//	//add the two new faces in the mesh to obtain a tetra
+//	Dart s2d = the_map.phi2(the_map.phi_1(d));
+//	the_map.unsewFaces(the_map.phi_1(d));
+//	the_map.sewFaces(the_map.phi_1(d),the_map.phi_1(dd));
+//	the_map.sewFaces(s2d,the_map.phi3(the_map.phi_1(dd)));
+//
+//	Dart s2e = the_map.phi2(the_map.phi_1(e));
+//	the_map.unsewFaces(the_map.phi_1(e));
+//	the_map.sewFaces(the_map.phi_1(e),the_map.phi_1(ee));
+//	the_map.sewFaces(s2e,the_map.phi3(the_map.phi_1(ee)));
+//
+//	Dart ss2d = the_map.phi2(the_map.phi1(d));
+//	the_map.unsewFaces(the_map.phi1(d));
+//	the_map.sewFaces(the_map.phi1(d),the_map.phi1(ee));
+//	the_map.sewFaces(ss2d,the_map.phi3(the_map.phi1(ee)));
+//
+//	Dart ss2e = the_map.phi2(the_map.phi1(e));
+//	the_map.unsewFaces(the_map.phi1(e));
+//	the_map.sewFaces(the_map.phi1(e),the_map.phi1(dd));
+//	the_map.sewFaces(ss2e,the_map.phi3(the_map.phi1(dd)));
+//
+//
+//
+//	//embed the coords
+//	the_map.setVertexEmb(d,the_map.getVertexEmb(d));
+//	the_map.setVertexEmb(e,the_map.getVertexEmb(e));
+//	the_map.setVertexEmb(the_map.phi_1(d),the_map.getVertexEmb(the_map.phi_1(d)));
+//	the_map.setVertexEmb(the_map.phi_1(e),the_map.getVertexEmb(the_map.phi_1(e)));
+//
+//	return dd;
+//}
+//
+///**
+// * tetrahedrization of the volume
+// * @param the map
+// * @param a dart of the volume
+// * @param true if the faces are in CCW order
+// * @return success of the tetrahedrization
+// */
+//template<typename PFP>
+//bool smartVolumeTetrahedrization(typename PFP::MAP& the_map, Dart d, bool CCW=true)
+//{
+//
+//	typedef typename PFP::EMB EMB;
+//
+//	bool ret=true;
+//
+//	if (!the_map.isTetrahedron(d))
+//	{
+//		//only works on a 3-map
+//		assert(Dart::nbInvolutions()>=2 || "cannot be applied on this map, nbInvolutions must be at least 2");
+//
+//		if (Geometry::isConvex<PFP>(the_map,d,CCW))
+//		{
+//			the_map.tetrahedrizeVolume(d);
+//		}
+//		else
+//		{
+//
+//			//get all the dart of the volume
+//			std::vector<Dart> vStore;
+//			FunctorStore fs(vStore);
+//			the_map.foreach_dart_of_volume(d,fs);
+//
+//			if (vStore.size()==0)
+//			{
+//				if (the_map.phi1(d)==d)
+//					CGoGNout << "plop" << CGoGNendl;
+//				if (the_map.phi2(d)==d)
+//					CGoGNout << "plip" << CGoGNendl;
+//
+//				CGoGNout << the_map.getVertexEmb(d)->getPosition() << CGoGNendl;
+//				CGoGNout << "tiens tiens, c'est etrange" << CGoGNendl;
+//			}
+//			//prepare the list of embeddings of the current volume
+//			std::vector<EMB *> lstEmb;
+//
+//			//get a marker
+//			DartMarker m(the_map);
+//
+//			//all the darts from a vertex that can generate a tetra (3 adjacent faces)
+//			std::vector<Dart> allowTetra;
+//
+//			//all the darts that are not in otherTetra
+//			std::vector<Dart> otherTetra;
+//
+//			//for each dart of the volume
+//			for (typename std::vector<Dart>::iterator it = vStore.begin() ; it != vStore.end() ; ++it )
+//			{
+//				Dart e = *it;
+//				//if the vertex is not treated
+//				if (!m.isMarked(e))
+//				{
+//					//store the embedding
+//					lstEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(e)));
+//					Dart ee=e;
+//
+//					//count the number of adjacent faces and mark the darts
+//					int nbe=0;
+//					do
+//					{
+//						nbe++;
+//						m.markOrbit(DART,e);
+//						ee=the_map.phi1(the_map.phi2(ee));
+//					}
+//					while (ee!=e);
+//
+//					//if 3 adjacents faces, we can create a tetra on this vertex
+//					if (nbe==3)
+//						allowTetra.push_back(e);
+//					else
+//						otherTetra.push_back(e);
+//				}
+//			}
+//
+//			//we haven't created a tetra yet
+//			bool decoupe=false;
+//
+//			//if we have vertex that can be base
+//			if (allowTetra.size()!=0)
+//			{
+//				//foreach possible vertex while we haven't done any cut
+//				for (typename std::vector<Dart>::iterator it=allowTetra.begin();it!=allowTetra.end() && !decoupe ;++it)
+//				{
+//					//get the dart
+//					Dart s=*it;
+//					//store the emb
+//					std::vector<EMB*> lstCurEmb;
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(s)));
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(the_map.phi1(s))));
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(the_map.phi_1(s))));
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(the_map.phi_1(the_map.phi2(s)))));
+//
+//					//store the coords of the point
+//					gmtl::Vec3f points[4];
+//					for (int i=0;i<4;++i)
+//					{
+//						points[i] = lstCurEmb[i]->getPosition();
+//					}
+//
+//					//test if the future tetra is well oriented (concave case)
+//					if (Geometry::isTetrahedronWellOriented(points,CCW))
+//					{
+//						//test if we haven't any point inside the future tetra
+//						bool isEmpty=true;
+//						for (typename std::vector<EMB *>::iterator iter = lstEmb.begin() ; iter != lstEmb.end() && isEmpty ; ++iter)
+//						{
+//							//we don't test the vertex that composes the new tetra
+//							if (std::find(lstCurEmb.begin(),lstCurEmb.end(),*iter)==lstCurEmb.end())
+//							{
+//								isEmpty = !Geometry::isPointInTetrahedron(points, (*iter)->getPosition(), CCW);
+//							}
+//						}
+//
+//						//if no point inside the new tetra
+//						if (isEmpty)
+//						{
+//							//cut the spike to make a tet
+//							Dart dRes = the_map.cutSpike(*it);
+//							decoupe=true;
+//							//and continue with the rest of the volume
+//							ret = ret && smartVolumeTetrahedrization<PFP>(the_map,the_map.phi3(dRes),CCW);
+//						}
+//					}
+//				}
+//			}
+//
+//			if (!decoupe)
+//			{
+//				//foreach other vertex while we haven't done any cut
+//				for (typename std::vector<Dart>::iterator it=otherTetra.begin();it!=otherTetra.end() && !decoupe ;++it)
+//				{
+//					//get the dart
+//					Dart s=*it;
+//					//store the emb
+//					std::vector<EMB*> lstCurEmb;
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(s)));
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(the_map.phi1(s))));
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(the_map.phi_1(s))));
+//					lstCurEmb.push_back(reinterpret_cast<EMB*>(the_map.getVertexEmb(the_map.phi_1(the_map.phi2(s)))));
+//
+//					//store the coords of the point
+//					gmtl::Vec3f points[4];
+//					for (int i=0;i<4;++i)
+//					{
+//						points[i] = lstCurEmb[i]->getPosition();
+//					}
+//
+//					//test if the future tetra is well oriented (concave case)
+//					if (Geometry::isTetrahedronWellOriented(points,CCW))
+//					{
+//						//test if we haven't any point inside the future tetra
+//						bool isEmpty=true;
+//						for (typename std::vector<EMB *>::iterator iter = lstEmb.begin() ; iter != lstEmb.end() && isEmpty ; ++iter)
+//						{
+//							//we don't test the vertex that composes the new tetra
+//							if (std::find(lstCurEmb.begin(),lstCurEmb.end(),*iter)==lstCurEmb.end())
+//							{
+//								isEmpty = !Geometry::isPointInTetrahedron(points, (*iter)->getPosition(), CCW);
+//							}
+//						}
+//
+//						//if no point inside the new tetra
+//						if (isEmpty)
+//						{
+//							//cut the spike to make a tet
+//							Dart dRes = extractTetra<PFP>(the_map,*it);
+//							decoupe=true;
+//							//and continue with the rest of the volume
+//							smartVolumeTetrahedrization<PFP>(the_map,the_map.phi3(dRes),CCW);
+//						}
+//					}
+//				}
+//			}
+//
+//			if (!decoupe)
+//				ret=false;
+//		}
+//	}
+//	return ret;
+//}
+
+
 }//end namespace Tetrahedralization
 }//end namespace Modelisation
 }//end namespace Algo
