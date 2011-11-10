@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SUBDIVISION3MAP_H__
-#define __SUBDIVISION3MAP_H__
+#ifndef __SUBDIVISION3_H__
+#define __SUBDIVISION3_H__
 
 #include <math.h>
 #include <vector>
@@ -45,12 +45,7 @@ namespace Modelisation
 template <typename PFP>
 Dart cut3Ear(typename PFP::MAP& map, Dart d);
 
-/**
-* subdivide a hexahedron into 5 tetrahedron
-* @param d dart of the hexahedron
-*/
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
+
 
 /**
 * catmull clark volumic : do not move the original vertices
@@ -74,7 +69,7 @@ void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
 
 } // namespace CGoGN
 
-#include "Algo/Modelisation/subdivision3map.hpp"
+#include "Algo/Modelisation/subdivision3.hpp"
 
 #endif
 
