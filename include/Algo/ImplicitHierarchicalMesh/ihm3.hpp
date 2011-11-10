@@ -369,43 +369,11 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f,
 //void ImplicitHierarchicalMap3::cutEdge(Dart d)
 //{
 //	Dart dd = phi2(d) ;
-//	EmbeddedMap3<Map3>::cutEdge(d);
+//	EmbeddedMap3::cutEdge(d);
 //
 //	//
 //	//mise a jour de l'id d'arrete sur chaque moitie d'arete
 //	//
-//	unsigned int eId;
-//
-//	//Test si id existe
-//	if(m_edgeId[d] == EMBNULL)
-//	{
-//		eId = getNewEdgeId();
-//	}
-//	else
-//	{
-//		eId = getEdgeId(d) ;
-//	}
-//
-//	//tour de la 1ere moitie de l'arete avec modification
-//	Dart e = d;
-//	do
-//	{
-//		m_edgeId[e] = eId; //cas ou l'arete n'est pas du tout plonge
-//		m_edgeId[Map3::phi2(e)] = eId;
-//
-//		e = Map3::alpha2(e);
-//	} while(e != d);
-//
-//
-//	 e = dd;
-//	do
-//	{
-//		m_edgeId[e] = eId;
-//		m_edgeId[Map3::phi2(e)] = eId;
-//
-//		e = Map3::alpha2(e);
-//	} while(e != dd);
-//
 //
 //	//
 //	//mise a jour de l'id de face sur chaque brin de chaque moitie d'arete

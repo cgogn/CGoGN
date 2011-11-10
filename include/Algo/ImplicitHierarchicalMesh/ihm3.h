@@ -121,9 +121,9 @@ public:
 	 * 				EMBEDDED FUNCTIONS					*
 	 ****************************************************/
 //	virtual void cutEdge(Dart d);
-//
+
 //	virtual void splitFace(Dart d, Dart e);
-//
+
 //	virtual void sewVolumes(Dart d, Dart e);
 
 	/***************************************************

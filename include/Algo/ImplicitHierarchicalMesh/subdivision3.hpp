@@ -35,6 +35,7 @@ namespace Algo
 namespace IHM
 {
 
+
 template <typename PFP>
 void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
