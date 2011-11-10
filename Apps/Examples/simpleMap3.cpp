@@ -26,7 +26,7 @@
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/primitives3d.h"
-#include "Algo/Modelisation/subdivision3map.h"
+#include "Algo/Modelisation/subdivision3.h"
 
 
 SimpleMap3::SimpleMap3()
