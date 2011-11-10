@@ -90,7 +90,7 @@ public:
 	/**
 	 * test if dart is marked
 	 */
-	virtual bool isMarked(Dart d)
+	virtual bool isMarked(Dart d) const
 	{
 		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		return m_map.getMarkVector(DART, m_thread)->operator[](d.index).testMark(m_mark);
@@ -294,6 +294,7 @@ public:
 	{
 		return m_marker.isMarked(d);
 	}
+	FunctorSelect* copy() const { return new SelectorMarked(m_marker);}
 };
 
 class SelectorUnmarked : public FunctorSelect
@@ -306,6 +307,7 @@ public:
 	{
 		return !m_marker.isMarked(d);
 	}
+	FunctorSelect* copy() const { return new SelectorUnmarked(m_marker);}
 };
 
 // Functor version (needed for use with foreach_xxx)
