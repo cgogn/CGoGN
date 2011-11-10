@@ -188,9 +188,9 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 {
 	if(!Map3::isBoundaryFace(d))
 	{
+		Dart dd = phi1(phi3(d));
 		Map3::unsewVolumes(d);
 
-		Dart dd = phi1(phi3(d));
 		Dart dit = d;
 		do
 		{
@@ -212,7 +212,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 				if(!sameEdge(dit,dd))
 				{
 					embedNewCell(EDGE, dd);
-					copyCell(VERTEX, dd, dit);
+					copyCell(EDGE, dd, dit);
 				}
 			}
 
@@ -271,8 +271,8 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 		//embed the volume embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(VOLUME))
 		{
-			copyDartEmbedding(EDGE, dit3, dit);
-			copyDartEmbedding(EDGE, phi2(dit), dit);
+			copyDartEmbedding(VOLUME, dit3, dit);
+			copyDartEmbedding(VOLUME, phi2(dit), dit);
 		}
 	}
 }
