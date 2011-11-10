@@ -210,10 +210,6 @@ void Viewer::importMesh(std::string& filename)
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
-
-	TraversorCell<MAP> t(myMap, VERTEX) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		std::cout << "pos -> " << position[d] << std::endl ;
 }
 
 void Viewer::slot_drawVertices(bool b)
