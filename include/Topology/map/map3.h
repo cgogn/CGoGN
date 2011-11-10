@@ -143,11 +143,6 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
-	//! Unsew the faces from the one-ring of the vertex of d
-	/*! @param d a dart
-	 */
-	virtual Dart cutSpike(Dart d);
-
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same length
 	 *  @param d a dart of the first volume
@@ -164,6 +159,11 @@ public:
 	/*! @param d a dart of common face
 	 */
 	virtual bool mergeVolumes(Dart d);
+
+	//! Split a volume into two volumes along a edge path
+	/*! @param vd a vector of darts
+	 */
+	virtual void splitVolume(std::vector<Dart>& vd);
 
 	//@}
 
@@ -209,7 +209,7 @@ public:
 	//! Compute the number of volumes around the edge of d
 	/*! @param d a dart
 	 */
-	int edgeDegree(Dart d);
+	unsigned int edgeDegree(Dart d);
 
 	//! Test if dart d and e belong to the same oriented face
 	/*! @param d a dart

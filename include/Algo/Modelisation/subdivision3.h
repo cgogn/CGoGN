@@ -22,91 +22,55 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __SUBDIVISION3_H__
+#define __SUBDIVISION3_H__
 
-#include "Topology/generic/genericmap.h"
+#include <math.h>
+#include <vector>
 
 namespace CGoGN
 {
 
-/**
-* Class of 3-dimensional maps
-* with lazily managed embeddings
-*/
-template <typename MAP3>
-class EmbeddedMap3 : public MAP3
+namespace Algo
 {
-public:
-	typedef MAP3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual void sewVolumes(Dart d, Dart e);
+namespace Modelisation
+{
 
-	//!
-	/*!
-	 *
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//! Split a face inserting an edge between two vertices
-	/*! \pre Dart d and e should belong to the same face and be distinct
-	 *  @param d dart of first vertex
-	 *  @param e dart of second vertex
-	 *  @return the dart of the new edge lying in the vertex of d after the cut
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	//! Cut the edge of d
-	/*! @param d a dart of the edge to cut
-	 */
-	virtual void cutEdge(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart cutSpike(Dart d);
+/**
+* Cut a 3D ear from a mesh : the ear is sewn by phi3 to the rest of the volume
+* @param d dart of the point of the ear
+* @return a dart from the new face connecting the ear and the rest of the volume
+*/
+template <typename PFP>
+Dart cut3Ear(typename PFP::MAP& map, Dart d);
 
 
-	//! Collapse an edge (that is deleted) possibly merging its vertices
-	/*! If delDegenerateFaces is true, the method checks that no degenerate
-	 *  faces are build (faces with less than 3 edges). If it occurs the faces
-	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
-	 *  \warning This may produce two distinct vertices if the edge
-	 *  was the only link between two border faces
-	 *  @param d a dart in the deleted edge
-	 *  @param delDegenerateFaces a boolean (default to true)
-	 */
-	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true,
-			bool delDegenerateVolumes = true);
-	//!
-	/*!
-	 *
-	 */
-	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
-			bool delDegenerateVolumes = true);
 
+/**
+* catmull clark volumic : do not move the original vertices
+* @param map the map
+* @param attributs geometric attributes of the vertices
+* @param selected a functor to select volumes to subdivide
+* TODO : test if it works for the functorselect
+*/
+template <typename PFP, typename EMBV, typename EMB>
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= SelectorTrue());
 
-	virtual unsigned int closeHole(Dart d);
+template <typename PFP>
+void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= SelectorTrue())
+{
+	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
+}
 
-	virtual void closeMap(DartMarker &marker);
+} // namespace Modelisation
 
-
-	virtual bool check();
-} ;
+} // namespace Algo
 
 } // namespace CGoGN
 
-#include "embeddedMap3.hpp"
+#include "Algo/Modelisation/subdivision3.hpp"
 
 #endif
+
+

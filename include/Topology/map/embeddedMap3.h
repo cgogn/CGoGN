@@ -64,11 +64,6 @@ public:
 	/*!
 	 *
 	 */
-	virtual Dart cutSpike(Dart d);
-
-	/*!
-	 *
-	 */
 	virtual void sewVolumes(Dart d, Dart e);
 
 	/*!
@@ -80,6 +75,11 @@ public:
 	 *
 	 */
 	virtual bool mergeVolumes(Dart d);
+
+	/*!
+	 *
+	 */
+	virtual void splitVolume(std::vector<Dart>& vd);
 
 	/*!
 	 *
