@@ -39,6 +39,11 @@ class EmbeddedGMap3 : public GMap3
 public:
 	typedef GMap3 TOPO_MAP;
 
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	virtual void cutEdge(Dart d);
+
 	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
 	 * The attributes attached to the edge of d are kept on the resulting edge
@@ -52,6 +57,14 @@ public:
 	 * The attributes attached to the old volume are duplicated on both volume if a new one is created
 	 */
 	virtual void unsewFaces(Dart d);
+
+	//! Split a face inserting an edge between two vertices
+	/*! \pre Dart d and e should belong to the same face and be distinct
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 *  @return the dart of the new edge lying in the vertex of d after the cut
+	 */
+	virtual void splitFace(Dart d, Dart e);
 
 	/**
 	 * The attributes attached to the vertices of the vertices of the face of d are kept on the vertices of the resulting face
@@ -67,49 +80,10 @@ public:
 	 */
 	virtual void unsewVolumes(Dart d);
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the volume of the old volume of d are kept on the resulting volume
 	 */
 	virtual bool mergeVolumes(Dart d);
-
-	//! Split a face inserting an edge between two vertices
-	/*! \pre Dart d and e should belong to the same face and be distinct
-	 *  @param d dart of first vertex
-	 *  @param e dart of second vertex
-	 *  @return the dart of the new edge lying in the vertex of d after the cut
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	//! Cut the edge of d
-	/*! @param d a dart of the edge to cut
-	 */
-	virtual void cutEdge(Dart d);
-
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual Dart cutSpike(Dart d);
-
-//	//! Collapse an edge (that is deleted) possibly merging its vertices
-//	/*! If delDegenerateFaces is true, the method checks that no degenerate
-//	 *  faces are build (faces with less than 3 edges). If it occurs the faces
-//	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
-//	 *  \warning This may produce two distinct vertices if the edge
-//	 *  was the only link between two border faces
-//	 *  @param d a dart in the deleted edge
-//	 *  @param delDegenerateFaces a boolean (default to true)
-//	 */
-//	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true,
-//			bool delDegenerateVolumes = true);
-
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
-//			bool delDegenerateVolumes = true);
 
 	virtual unsigned int closeHole(Dart d);
 
