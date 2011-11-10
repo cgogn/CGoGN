@@ -213,7 +213,6 @@ void MyQT::cb_keyPress(int code)
 			Algo::Modelisation::EarTriangulation<PFP> triangulation(myMap);
 			triangulation.triangule();
 
-			SelectorTrue allDarts;
 			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 			m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 			updateGL();
@@ -439,7 +438,6 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 
 	// update des primitives du renderer
-	SelectorTrue allDarts;
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);

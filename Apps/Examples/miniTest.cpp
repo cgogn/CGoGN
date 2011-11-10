@@ -56,7 +56,6 @@ struct PFP: public PFP_STANDARD
 typedef PFP::MAP MAP;
 
 MAP myMap ;
-SelectorTrue allDarts ;
 
 class MyGlutWin : public Utils::GlutWin_ATB
 {

@@ -76,6 +76,7 @@ public:
 	bool operator()(Dart) const { return false; }
 };
 
+const SelectorTrue allDarts = SelectorTrue() ;
 
 //template <typename MAP>
 //class SelectorNoBoundary : public FunctorSelect

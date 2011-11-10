@@ -388,7 +388,7 @@ public:
 	 * Apply a functor on each dart of the map
 	 * @param f a ref to the functor obj
 	 */
-	bool foreach_dart(FunctorType& f, const FunctorSelect& good = SelectorTrue()) ;
+	bool foreach_dart(FunctorType& f, const FunctorSelect& good = allDarts) ;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit
@@ -410,14 +410,14 @@ public:
 	* @param f the functor
 	* @param good the selector of darts
 	*/
-	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) ;
+	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = allDarts, unsigned int thread = 0) ;
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
 	 *	@param good the selector of darts
 	 * 	@return the number of orbits
 	 */
-	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = SelectorTrue()) ;
+	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * print attributes name of map in std::cout (for debugging)

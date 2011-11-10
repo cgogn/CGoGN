@@ -173,7 +173,6 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 
 	// update des primitives du renderer
-	SelectorTrue allDarts;
 	SelectorEdgeNoBoundary<PFP::MAP> insideEdges(myMap);// just to draw only inside edges
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, insideEdges, Algo::Render::GL2::LINES);

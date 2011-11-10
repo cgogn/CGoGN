@@ -60,10 +60,10 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
 * TODO : test if it works for the functorselect
 */
 template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= SelectorTrue());
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= allDarts);
 
 template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= SelectorTrue())
+void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= allDarts)
 {
 	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
 }

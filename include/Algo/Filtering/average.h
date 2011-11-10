@@ -43,7 +43,7 @@ void filterAverageAttribute_OneRing(
 	const AttributeHandler<T>& attIn,
 	AttributeHandler<T>& attOut,
 	int neigh,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
@@ -86,7 +86,7 @@ void filterAverageVertexAttribute_WithinSphere(
 	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
@@ -123,7 +123,7 @@ void filterAverageEdgeAttribute_WithinSphere(
 	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
@@ -151,7 +151,7 @@ void filterAverageFaceAttribute_WithinSphere(
 	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;

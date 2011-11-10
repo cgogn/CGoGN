@@ -34,7 +34,7 @@ void exportTrianglePlain(std::ofstream& out,typename PFP::VEC3& p1,typename PFP:
 }
 
 template <typename PFP>
-void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = SelectorTrue())
+void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
@@ -74,7 +74,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::T
 }
 
 template <typename PFP>
-void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = SelectorTrue())
+void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
@@ -117,7 +117,7 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TV
 }
 
 template <typename PFP>
-bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = SelectorTrue())
+bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
 {
 	std::ofstream out(filename.c_str(), std::ios::out);
 	if (!out.good())

@@ -46,7 +46,7 @@ template <typename PFP>
 typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue()) ;
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = allDarts) ;
 
 } // namespace Geometry
 

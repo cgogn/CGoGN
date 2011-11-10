@@ -94,7 +94,7 @@ public:
  * @param good a selector
  */
 template <typename PFP>
-void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good= SelectorTrue());
+void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good= allDarts);
 
 
 /**
@@ -109,7 +109,7 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
  * @param good a selector
  */
 template <typename PFP>
-void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good= SelectorTrue());
+void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good= allDarts);
 
 
 /**
@@ -123,7 +123,7 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<
  * @param good a selector
  */
 template <typename PFP>
-void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff=8192, bool needMarkers=false, const FunctorSelect& good = allDarts);
 
 
 
@@ -140,7 +140,7 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
  * @param good a selector
  */
 template <typename PFP, typename T>
-void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = allDarts);
 
 /**
  * Traverse cells of a map in parallel. Use embedding marker
@@ -155,7 +155,7 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
  * @param good a selector
  */
 template <typename PFP, typename T>
-void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = allDarts);
 
 /**
  * Traverse cells of a map in parallel. Use embedding marker
@@ -170,7 +170,7 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
  * @param good a selector
  */
 template <typename PFP, typename T>
-void foreach_dart_res(typename PFP::MAP& map, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = SelectorTrue());
+void foreach_dart_res(typename PFP::MAP& map, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers=false, const FunctorSelect& good = allDarts);
 
 
 

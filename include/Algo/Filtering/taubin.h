@@ -35,7 +35,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
+void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -86,7 +86,7 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
  * Taubin filter modified as proposed by [Lav09]
  */
 template <typename PFP>
-void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, typename PFP::REAL radius, const FunctorSelect& select = SelectorTrue())
+void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, typename PFP::REAL radius, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

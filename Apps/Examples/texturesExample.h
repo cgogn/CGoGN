@@ -63,7 +63,6 @@ protected:
 public:
 
 	MAP myMap ;
-	SelectorTrue allDarts ;
 
 	// render
 	Algo::Render::GL2::MapRender* m_render;

@@ -49,10 +49,10 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d);
  * Triangule all the faces of the mesh
  */
 template <typename PFP, typename EMBV, typename EMB>
-void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Triangule all the faces of the mesh
@@ -62,7 +62,7 @@ template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
 	typename PFP::TVEC3& position, typename PFP::TVEC3& positionF,
-	const FunctorSelect& selected = SelectorTrue()) ;
+	const FunctorSelect& selected = allDarts) ;
 
 /**
 * Quadrangule a face with central vertex
@@ -78,28 +78,28 @@ Dart quadranguleFace(typename PFP::MAP& map, Dart d);
  * Quadrangule all the faces of the mesh
  */
 template <typename PFP, typename EMBV, typename EMB>
-void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+void quadranguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Catmull-Clark subdivision scheme
  */
 template <typename PFP, typename EMBV, typename EMB>
-void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+void CatmullClarkSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Loop subdivision scheme
  */
 template <typename PFP, typename EMBV, typename EMB>
-void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = SelectorTrue()) ;
+void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Reverse the orientation of the map
@@ -111,13 +111,13 @@ void reverseOrientation(typename PFP::MAP& map) ;
  * Dual mesh computation
  */
 template <typename PFP>
-void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = SelectorTrue()) ;
+void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Sqrt(3) subdivision scheme
  */
 template <typename PFP>
-void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = SelectorTrue()) ;
+void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 
 

@@ -57,7 +57,7 @@ void sigmaBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position,
 }
 
 template <typename PFP>
-void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
+void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -89,7 +89,7 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 }
 
 template <typename PFP>
-void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
+void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

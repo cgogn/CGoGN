@@ -50,7 +50,6 @@ class SimpleGMap2 : public Utils::QT::SimpleQT
 
 public:
 	MAP myMap ;
-	SelectorTrue allDarts ;
 
 	PFP::TVEC3 position ;
 

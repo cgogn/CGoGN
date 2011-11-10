@@ -46,7 +46,7 @@ void decimate(
 	ApproximatorType a,
 	typename PFP::TVEC3& position,
 	unsigned int nbWantedVertices,
-	const FunctorSelect& selected = SelectorTrue()
+	const FunctorSelect& selected = allDarts
 ) ;
 
 } //namespace Decimation

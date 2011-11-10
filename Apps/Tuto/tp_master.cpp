@@ -69,9 +69,6 @@ AttributeHandler<PFP::VEC3> position;
 // handler d'attribut de normale par sommet
 AttributeHandler<PFP::VEC3> normal;
 
-/// fonction qui renvoit vrai (appliquée à un brin)
-//SelectorTrue allDarts;
-
 /// encore 1 typedef pour simplifier l'ecriture du code
 typedef PFP::VEC3 Point3D;
 
@@ -615,7 +612,6 @@ int main(int argc, char **argv)
 	sqt.m_normalVBO->updateData(normal);
 
 	// update des primitives du renderer
-	SelectorTrue allDarts;
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
