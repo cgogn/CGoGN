@@ -92,6 +92,9 @@ void MyQT::cb_redraw()
 		m_render->draw(m_shader, Algo::Render::GL2::BOUNDARY);
 
 
+		glPointSize(7.0f);
+		m_shader->setColor(Geom::Vec4f(1.,1.,1.,0.));
+		m_render->draw(m_shader, Algo::Render::GL2::POINTS);
 
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0f, 1.0f);
@@ -122,6 +125,8 @@ void MyQT::cb_keyPress(int code)
 		//svg destruction close the file
 	}
 }
+
+
 
 int main(int argc, char **argv)
 {
@@ -174,9 +179,19 @@ int main(int argc, char **argv)
 
 	// update des primitives du renderer
 	SelectorEdgeNoBoundary<PFP::MAP> insideEdges(myMap);// just to draw only inside edges
+
+	DartMarker dm(myMap);
+	dm.markOrbit(VERTEX,d2);
+	dm.markOrbit(VERTEX,d1);
+	CellMarker cm(myMap,FACE);
+	cm.mark(d2);
+
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, insideEdges, Algo::Render::GL2::LINES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::BOUNDARY);	// special primitive for boundary edges
+	// example of using boolean operator on Selectors
+	sqt.m_render->initPrimitives<PFP>(myMap, ( SelectorFalse() || ( SelectorTrue() && (SelectorMarked(dm) && SelectorCellMarked(cm)))) , Algo::Render::GL2::POINTS);	// special primitive for boundary edges
+
 
 	// show final pour premier redraw
 	sqt.show();

@@ -103,7 +103,7 @@ public:
 	/**
 	 * test if cell of dart is marked
 	 */
-	virtual bool isMarked(Dart d)
+	virtual bool isMarked(Dart d) const
 	{
 		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
@@ -140,7 +140,7 @@ public:
 	/**
 	 * test if cell is marked
 	 */
-	virtual bool isMarked(unsigned int em)
+	virtual bool isMarked(unsigned int em) const
 	{
 		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
@@ -305,29 +305,31 @@ public:
 class SelectorCellMarked : public FunctorSelect
 {
 protected:
-	CellMarkerGen& m_cmarker ;
+	const CellMarkerGen& m_cmarker ;
 public:
-	SelectorCellMarked(CellMarkerGen& cm) : m_cmarker(cm) {}
+	SelectorCellMarked(const CellMarkerGen& cm) : m_cmarker(cm) {}
 	bool operator()(Dart d) const
 	{
 		if (m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
+	FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker);}
 };
 
 class SelectorCellUnmarked : public FunctorSelect
 {
 protected:
-	CellMarkerGen& m_cmarker ;
+	const CellMarkerGen& m_cmarker ;
 public:
-	SelectorCellUnmarked(CellMarkerGen& cm) : m_cmarker(cm) {}
+	SelectorCellUnmarked(const CellMarkerGen& cm) : m_cmarker(cm) {}
 	bool operator()(Dart d) const
 	{
 		if (!m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
+	FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker);}
 };
 
 // Functor version (needed for use with foreach_xxx)
