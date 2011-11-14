@@ -49,16 +49,14 @@ Dart GMap1::newFace(unsigned int n)
 
 void GMap1::deleteFace(Dart d)
 {
-	Dart e = phi1(d) ;
+	Dart e = phi1(d);
 	while (e != d)
 	{
-		Dart f = phi1(e) ;
-		deleteDart(beta0(e)) ;
-		deleteDart(e) ;
-		e = f ;
+		Dart f = phi1(e);
+		deleteEdge(e);
+		e = f;
 	}
-	deleteDart(beta0(d)) ;
-	deleteDart(d) ;
+	deleteEdge(d);
 }
 
 void GMap1::deleteEdge(Dart d)
@@ -87,7 +85,17 @@ bool GMap1::sameOrientedFace(Dart d, Dart e)
 
 bool GMap1::sameFace(Dart d, Dart e)
 {
-	return sameOrientedFace(d, e) || sameOrientedFace(beta0(d), e) ;
+	Dart dNext = d ;
+	do
+	{
+		if (dNext == e)
+			return true ;
+		dNext = beta0(dNext);
+		if (dNext == e)
+			return true ;
+		dNext = beta1(dNext) ;
+	} while (dNext != d) ;
+	return false ;
 }
 
 unsigned int GMap1::faceDegree(Dart d)

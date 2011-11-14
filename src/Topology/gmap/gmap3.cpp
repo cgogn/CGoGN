@@ -28,7 +28,11 @@
 namespace CGoGN
 {
 
-void GMap3::deleteOrientedVolume(Dart d)
+/*! @name Generator and Deletor
+ *  To generate or delete volumes in a 3-map
+ *************************************************************************/
+
+void GMap3::deleteVolume(Dart d)
 {
 	DartMarkerStore mark(*this);				// Lock a marker
 	bool found = false;					// Last functor return value
@@ -71,61 +75,9 @@ void GMap3::deleteOrientedVolume(Dart d)
 		GMap1::deleteFace(*face);
 }
 
-
-
-
-
-void GMap3::sewVolumes(Dart d, Dart e)
-{
-	assert(faceDegree(d) == faceDegree(e));
-
-	Dart fitD = d ;
-	Dart fitE = e ;
-	do
-	{
-		phi3sew(fitD,fitE);
-		fitD = phi1(fitD) ;
-		fitE = phi_1(fitE) ;
-	} while(fitD != d) ;
-}
-
-void GMap3::unsewVolumes(Dart d)
-{
-	Dart fitD = d;
-	do
-	{
-		phi3unsew(fitD);
-		fitD = phi1(fitD);
-	} while(fitD != d);
-}
-
-bool GMap3::mergeVolumes(Dart d)
-{
-	Dart e = phi3(d) ;
-	if(e != d)
-	{
-		unsewVolumes(d);
-		GMap2::mergeVolumes(d, e); // merge the two volumes along common face
-		return true ;
-	}
-	return false ;
-}
-
-void GMap3::splitFace(Dart d, Dart e)
-{
-	GMap2::splitFace(d,e);
-
-	if (phi3(d) != d)
-	{
-		Dart dd = phi1(phi3(d));
-		Dart ee = phi1(phi3(e));
-
-		GMap2::splitFace(dd,ee);
-
-		phi3sew(phi_1(d), phi_1(ee));
-		phi3sew(phi_1(e), phi_1(dd));
-	}
-}
+/*! @name Topological Operators
+ *  Topological operations on 3-maps
+ *************************************************************************/
 
 void GMap3::cutEdge(Dart d)
 {
@@ -167,184 +119,56 @@ void GMap3::cutEdge(Dart d)
 	}
 }
 
-int GMap3::collapseEdge(Dart d, bool delDegenerateFaces,
-		bool delDegenerateVolumes)
+void GMap3::splitFace(Dart d, Dart e)
 {
-	Dart e = d;
-	int i = 0;
+	GMap2::splitFace(d,e);
 
-	//stocke un brin par volume autour de l'arete
-	std::list<Dart> tmp;
-	do
+	if (phi3(d) != d)
 	{
-		tmp.push_back(e);
-		e = alpha2(e);
-		i++;
-	} while (e != d);
+		Dart dd = phi1(phi3(d));
+		Dart ee = phi1(phi3(e));
 
-	for (std::list<Dart>::iterator it = tmp.begin(); it != tmp.end(); ++it)
-	{
-		Dart e = phi2(*it);
+		GMap2::splitFace(dd,ee);
 
-		cutSpike(e);
-
-		Dart t1=e,t2=e;
-		//si les faces opposées ont un tetraedre cousu
-		if(phi3(phi2(phi1(e))) != phi2(phi1(e))) {
-			t1 = phi3(phi2(phi1(e)));
-			unsewVolumes(t1);
-		}
-
-		if(phi3(phi2(phi_1(e))) != phi2(phi_1(e))) {
-			t2 = phi3(phi2(phi_1(e)));
-			unsewVolumes(t2);
-		}
-
-		if(t1 != e && t2 != e) {
-			sewVolumes(t1,t2);
-		}
-
-		//unsewVolumes(e);
-		//unsewVolumes(*it);
-
-		deleteOrientedVolume(*it);
+		phi3sew(phi_1(d), phi_1(ee));
+		phi3sew(phi_1(e), phi_1(dd));
 	}
-
-	return i;
 }
 
-//TODO
-void GMap3::collapseFace(Dart d, bool delDegenerateFaces,
-		bool delDegenerateVolumes)
+void GMap3::sewVolumes(Dart d, Dart e)
 {
-	Dart e = d;
-	std::list<Dart> tmp;
+	assert(faceDegree(d) == faceDegree(e));
 
-	//save a dart from the edge for all neighbors
+	Dart fitD = d ;
+	Dart fitE = e ;
 	do
 	{
-		//if(phi3(phi2(e)) != phi2(e))
-		//		tmp.push_back(phi3(phi2(e)));
-		tmp.push_back(phi3(phi2(e)));
-		e = phi1(e);
-	}while(e != d);
-
-	//del the last one (n-1 edge collapse)
-	tmp.pop_back();
-
-	//CGoGNout << "#voisin=" << tmp.size() << CGoGNendl;
-
-	//collapse all the edges in the list
-	for(std::list<Dart>::iterator it = tmp.begin() ; it != tmp.end() ; ++it)
-	{
-		Dart d = *it;
-		//CGoGNout << "collapseEdge" << CGoGNendl;
-		//collapseEdge(*it, delDegenerateFaces, delDegenerateVolumes);
-		//stocke un brin par volume autour de l'arete
-
-		Dart e = d;
-
-		//stocke un brin par volume autour de l'arete
-		std::list<Dart> tmpedge;
-		do
-		{
-			tmpedge.push_back(e);
-			e = alpha2(e);
-		} while (e != d);
-
-		for (std::list<Dart>::iterator it = tmpedge.begin(); it != tmpedge.end(); ++it)
-		{
-			Dart e = phi2(*it);
-
-			cutSpike(e);
-
-			Dart t1=e,t2=e;
-			//si les faces opposées ont un tetraedre cousu
-			if(phi3(phi2(phi1(e))) != phi2(phi1(e))) {
-				t1 = phi3(phi2(phi1(e)));
-				unsewVolumes(t1);
-			}
-
-			if(phi3(phi2(phi_1(e))) != phi2(phi_1(e))) {
-				t2 = phi3(phi2(phi_1(e)));
-				unsewVolumes(t2);
-			}
-
-			if(t1 != e && t2 != e) {
-				sewVolumes(t1,t2);
-			}
-
-			//deleteOrientedVolume(*it);
-		}
-	}
-//	for(std::list<Dart>::iterator it = tmp.begin() ; it != tmp.end() ; ++it)
-//	{
-//		deleteOrientedVolume(*it);
-//	}
+		phi3sew(fitD,fitE);
+		fitD = phi1(fitD) ;
+		fitE = phi_1(fitE) ;
+	} while(fitD != d) ;
 }
 
-Dart GMap3::cutSpike(Dart d)
+void GMap3::unsewVolumes(Dart d)
 {
-  Dart e=d;
-  int nb=0;
-  Dart dNew;
-  int tet=0;
+	Dart fitD = d;
+	do
+	{
+		phi3unsew(fitD);
+		fitD = phi1(fitD);
+	} while(fitD != d);
+}
 
-  //CGoGNout << "cut" << CGoGNendl;
-
-  //count the valence of the vertex
-  do {
-    nb++;
-    e=phi1(phi2(e));
-  } while (e!=d);
-
-  if(nb<3)
-  {
-	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
-	return d;
-  }
-  else
-  {
-	 //triangulate around the vertex
-	do {
-		if(phi1(phi1(phi1(e)))!=e)
-		{
-			splitFace(phi_1(e),phi1(e));
-			//CGoGNout << "split" << CGoGNendl;
-		}
-		else
-			tet++;
-
-		e=phi1(phi2(e));
-	} while (e!=d);
-
-//	CGoGNout << "#tet= " << tet << CGoGNendl;
-//	CGoGNout << "#nb= " << nb << CGoGNendl;
-
-	//si toute ces faces ne sont pas triangulaires (on insere une face)
-	if(tet != nb) {
-		//CGoGNout << "new face" << CGoGNendl;
-		dNew=newFace(nb);
-		Dart d3 = newFace(nb);
-		sewVolumes(dNew,d3);
-
-		//sew a face following the triangles
-		Dart dTurn=dNew;
-		do {
-			Dart d1 = phi1(e);
-			Dart dSym = phi2(d1);
-			phi2unsew(d1);
-			phi2sew(dTurn,d1);
-			phi2sew(phi3(dTurn),dSym);
-			dTurn = phi1(dTurn);
-			e=phi1(phi2(e));
-		}while(e!=d);
+bool GMap3::mergeVolumes(Dart d)
+{
+	Dart e = phi3(d) ;
+	if(e != d)
+	{
+		unsewVolumes(d);
+		GMap2::mergeVolumes(d, e); // merge the two volumes along common face
+		return true ;
 	}
-	else
-		dNew = d;
-  }
-
-  return dNew;
+	return false ;
 }
 
 /*! @name Topological Queries
@@ -432,6 +256,91 @@ bool GMap3::sameVertex(Dart d, Dart e)
 	return false;
 }
 
+unsigned int GMap3::vertexDegree(Dart d)
+{
+	int count = 0;
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	std::list<Dart>::iterator darts;
+
+	mv.mark(d);
+
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts_list.push_back(d21);
+			mv.mark(d21);
+		}
+
+		if((d23!=d2) && !mv.isMarked(d23))
+		{
+			darts_list.push_back(d23);
+			mv.mark(d23);
+		}
+	}
+
+	DartMarkerStore me(*this);
+
+	for(darts = darts_list.begin(); darts != darts_list.end() ; ++darts)
+	{
+		if(!me.isMarked(*darts))
+		{
+			++count;
+			me.markOrbit(EDGE, *darts);
+		}
+	}
+
+	return count;
+}
+
+bool GMap3::isBoundaryVertex(Dart d)
+{
+	DartMarkerStore mv(*this);			// Lock a marker
+	bool found = false;					// Last functor return value
+
+	std::list<Dart> darts_list;			//Darts that are traversed
+	darts_list.push_back(d);			//Start with the dart d
+	std::list<Dart>::iterator darts;
+
+	mv.mark(d);
+
+	for(darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts_list.push_back(d21);
+			mv.mark(d21);
+		}
+
+		if((d23!=d2) && !mv.isMarked(d23))
+		{
+			darts_list.push_back(d23);
+			mv.mark(d23);
+		}
+
+		found = phi3(dc) == dc;
+	}
+
+	return found;
+}
+
 bool GMap3::sameOrientedEdge(Dart d, Dart e)
 {
 	Dart dNext = d;
@@ -461,6 +370,20 @@ bool GMap3::sameEdge(Dart d, Dart e)
 	} while (dNext != d);
 
 	return false;
+}
+
+unsigned int GMap3::edgeDegree(Dart d)
+{
+	unsigned int deg = 0;
+	Dart e = d;
+
+	do
+	{
+		deg++;
+		e = alpha2(e);
+	} while(e != d);
+
+	return deg;
 }
 
 bool GMap3::sameOrientedFace(Dart d, Dart e)
@@ -493,6 +416,84 @@ bool GMap3::sameFace(Dart d, Dart e)
 	} while (dd!=d);
 
 	return false;
+}
+
+bool GMap3::check()
+{
+    CGoGNout << "Check: topology begin" << CGoGNendl;
+    DartMarker m(*this);
+    m.unmarkAll();
+    for(Dart d = this->begin(); d != this->end(); this->next(d))
+    {
+        Dart d0 = beta0(d);
+        if (beta0(d0) != d) // beta0 involution ?
+		{
+             CGoGNout << "Check: beta0 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        Dart d3 = beta3(d);
+        if (beta3(d3) != d) // beta3 involution ?
+		{
+             CGoGNout << "Check: beta3 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        if(d3 != d)
+        {
+        	if(beta1(d3) != beta3(beta1(d)))
+        	{
+        		CGoGNout << "Check: beta3 , faces are not entirely sewn" << CGoGNendl;
+        		return false;
+        	}
+        }
+
+        Dart d2 = beta2(d);
+        if (beta2(d2) != d) // beta2 involution ?
+		{
+            CGoGNout << "Check: beta2 is not an involution" << CGoGNendl;
+            return false;
+        }
+
+        Dart d1 = phi1(d);
+        if (phi_1(d1) != d) // phi1 a une image correcte ?
+		{
+            CGoGNout << "Check: unconsistent phi_1 link" << CGoGNendl;
+            return false;
+        }
+
+        if (m.isMarked(d1)) // phi1 a un seul antécédent ?
+		{
+            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
+            return false;
+        }
+        m.mark(d1);
+
+        if (d1 == d)
+            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
+
+        if (phi1(d1) == d)
+            CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
+
+        if (phi2(d1) == d)
+            CGoGNout << "Check: (warning) dandling edge (phi2)" << CGoGNendl;
+
+        if (phi3(d1) == d)
+            CGoGNout << "Check: (warning) dandling edge (phi3)" << CGoGNendl;
+    }
+
+    for(Dart d = this->begin(); d != this->end(); this->next(d))
+    {
+        if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
+		{
+        	std::cout << "dart = " << d << std::endl;
+            CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
+            return false;
+        }
+    }
+
+    CGoGNout << "Check: topology ok" << CGoGNendl;
+    return true;
 }
 
 /*! @name Cell Functors
@@ -541,56 +542,15 @@ bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	return found;
 }
 
-
-// TODO:optimize traversal of edges ?
 bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
-	do
-	{
+	do {
 		if (GMap2::foreach_dart_of_edge(dNext,f,thread))
 			return true;
 		dNext = alpha2(dNext);
 	} while (dNext != d);
 	return false;
-
-//	DartMarkerStore mv(*this,thread);			// Lock a marker
-//	bool found = false;					// Last functor return value
-//	std::list<Dart> darts_list;		//Darts that are traversed
-//	darts_list.push_back(d);			//Start with the dart d
-//	std::list<Dart>::iterator darts;
-//
-//	mv.mark(d);
-//
-//	for(darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
-//	{
-//		Dart dc = *darts;
-//
-//		Dart dx = beta0(dc);
-//		if (!mv.isMarked(dx))
-//		{
-//			mv.mark(dx);
-//			darts_list.push_back(dx);
-//		}
-//
-//		dx = beta2(dc);
-//		if (!mv.isMarked(dx))
-//		{
-//			mv.mark(dx);
-//			darts_list.push_back(dx);
-//		}
-//
-//		dx = beta3(dc);
-//		if (!mv.isMarked(dx))
-//		{
-//			mv.mark(dx);
-//			darts_list.push_back(dx);
-//		}
-//
-//		found = f(dc);
-//	}
-//
-//	return found;
 }
 
 bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
@@ -652,13 +612,5 @@ bool GMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 
 	return found;
 }
-
-
-
-
-
-
-
-
 
 } // end namespace

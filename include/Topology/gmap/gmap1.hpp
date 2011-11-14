@@ -180,6 +180,14 @@ inline void GMap1::phi1unsew(Dart d)
  *  Topological operations on 1-maps
  *************************************************************************/
 
+inline void GMap1::linkVertices(Dart d, Dart e)
+{
+	assert(d != e && !sameOrientedFace(d, e)) ;
+	GMap1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
+	GMap1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
+	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
+}
+
 inline void GMap1::cutEdge(Dart d)
 {
    Dart e = newDart();
@@ -204,7 +212,7 @@ inline void GMap1::collapseEdge(Dart d)
 
 inline void GMap1::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameOrientedFace(d, e)) ;
+	assert(d != e && sameFace(d, e)) ;
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
 	Dart dd = newEdge() ;
@@ -234,14 +242,6 @@ inline void GMap1::mergeFaces(Dart d, Dart e)
 	beta1sew(e1, dd1) ;
 	deleteEdge(d) ;
 	deleteEdge(e) ;
-}
-
-inline void GMap1::linkVertices(Dart d, Dart e)
-{
-	assert(d != e && !sameOrientedFace(d, e)) ;
-	GMap1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
-	GMap1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
-	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
 }
 
 /*! @name Cell Functors

@@ -82,19 +82,7 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
   return map.phi2(dRing);
 }
 
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
-{
-	Dart d1 = d;
-	Dart d2 = map.phi1(map.phi1(d));
-	Dart d3 = map.phi_1(map.phi2(d));
-	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
 
-	cut3Ear<PFP>(map,d1);
-	cut3Ear<PFP>(map,d2);
-	cut3Ear<PFP>(map,d3);
-	cut3Ear<PFP>(map,d4);
-}
 
 template <typename PFP, typename EMBV, typename EMB>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
@@ -119,32 +107,23 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 
-//	mv.unmarkAll();
-
 	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		//memorize each vertices per volumes
 		if(selected(d) && !mv.isMarked(d))
 		{
+			std::cout << " d " << d << std::endl;
 			l_vertices.push_back(d);
-			Dart dd = d;
-			do {
-				mv.mark(dd);
-				dd = map.phi1(map.phi2(dd));
-			} while(dd!=d);
+			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
 		}
 
 		//cut edges
 		if (selected(d) && !me.isMarked(d))
 		{
-			std::cout << "edge to cut " << d << std::endl;
-			std::cout << "edge degree " << map.edgeDegree(d) << std::endl;
-
 			Dart f = map.phi1(d);
 			map.cutEdge(d);
 			Dart e = map.phi1(d) ;
-			std::cout << "cut cut cut " << std::endl;
 
 			attributs[e] =  attributs[d];
 			attributs[e] += attributs[f];
@@ -166,7 +145,11 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 
-	std::cout << "edge cut" << std::endl;
+	unsigned int nb_=0;
+	for(unsigned int nb= attributs.begin() ; nb != attributs.end() ; attributs.next(nb))
+		nb_++;
+
+	std::cout << "first " << nb_ << std::endl;
 
 	// second pass: quandrangule faces
 	std::map<Dart,Dart> toSew;
@@ -199,8 +182,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			attributs[cf] = center;					// affect the data to the central vertex
 		}
 	}
-
-	std::cout << "nb vertices " << l_vertices.size() << std::endl;
 
 	//third pass : create the inner faces
 	for (std::vector<Dart>::iterator it = l_vertices.begin(); it != l_vertices.end(); ++it)
@@ -249,6 +230,14 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 
+	nb_=0;
+	for(unsigned int nb= attributs.begin() ; nb != attributs.end() ; attributs.next(nb))
+		nb_++;
+
+	std::cout << "then " << nb_ << std::endl;
+
+	map.check();
+
 	//sew all faces leading to the central vertex
 	for (std::map<Dart,Dart>::iterator it = toSew.begin(); it != toSew.end(); ++it)
 	{
@@ -259,6 +248,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 }
+
 
 } //namespace Modelisation
 

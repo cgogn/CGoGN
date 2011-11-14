@@ -45,37 +45,43 @@ BoundingBox<VEC>::BoundingBox(const VEC& p) :
 template <typename VEC>
 VEC& BoundingBox<VEC>::min()
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	return m_pMin ;
 }
 
 template <typename VEC>
 const VEC& BoundingBox<VEC>::min() const
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	return m_pMin ;
 }
 
 template <typename VEC>
 VEC& BoundingBox<VEC>::max()
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	return m_pMax ;
 }
 
 template <typename VEC>
 const VEC& BoundingBox<VEC>::max() const
 {
+	assert(m_initialized);
 	return m_pMax ;
 }
 
 template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::size(unsigned int coord) const
 {
-	assert(coord < m_pMax.dimension()) ;
+	assert(m_initialized && coord < m_pMax.dimension()) ;
 	return m_pMax[coord] - m_pMin[coord] ;
 }
 
 template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::maxSize() const
 {
+	assert(m_initialized || !"Bounding box not initialized");
+
 	typename VEC::DATA_TYPE max = m_pMax[0] - m_pMin[0] ;
 	for(unsigned int i = 1; i < m_pMax.dimension(); ++i)
 	{
@@ -89,6 +95,8 @@ typename VEC::DATA_TYPE BoundingBox<VEC>::maxSize() const
 template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::minSize() const
 {
+	assert(m_initialized || !"Bounding box not initialized");
+
 	typename VEC::DATA_TYPE min = m_pMax[0] - m_pMin[0] ;
 	for(unsigned int i = 1; i < m_pMax.dimension(); ++i)
 	{
@@ -102,18 +110,21 @@ typename VEC::DATA_TYPE BoundingBox<VEC>::minSize() const
 template <typename VEC>
 VEC BoundingBox<VEC>::diag() const
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	return m_pMax - m_pMin ;
 }
 
 template <typename VEC>
 typename VEC::DATA_TYPE BoundingBox<VEC>::diagSize() const
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	return (m_pMax - m_pMin).norm() ;
 }
 
 template <typename VEC>
 VEC BoundingBox<VEC>::center() const
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	VEC center = (m_pMax + m_pMin) / typename VEC::DATA_TYPE(2) ;
 	return center ;
 }
@@ -127,6 +138,12 @@ bool BoundingBox<VEC>::isInitialized() const
 /**********************************************/
 /*                 FUNCTIONS                  */
 /**********************************************/
+
+template <typename VEC>
+void BoundingBox<VEC>::reset()
+{
+	m_initialized=false;
+}
 
 template <typename VEC>
 void BoundingBox<VEC>::addPoint(const VEC& p)
@@ -152,6 +169,7 @@ void BoundingBox<VEC>::addPoint(const VEC& p)
 template <typename VEC>
 bool BoundingBox<VEC>::intersects(const BoundingBox<VEC>& bb)
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	VEC bbmin = bb.min() ;
 	VEC bbmax = bb.max() ;
 	for(unsigned int i = 0; i < bbmin.dimension(); ++i)
@@ -167,6 +185,7 @@ bool BoundingBox<VEC>::intersects(const BoundingBox<VEC>& bb)
 template <typename VEC>
 void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	VEC bbmin = bb.min() ;
 	VEC bbmax = bb.max() ;
 	for(unsigned int i = 0; i < bbmin.dimension(); ++i)
@@ -182,6 +201,7 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 template <typename VEC>
 bool BoundingBox<VEC>::contains(const VEC& p)
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	for(unsigned int i = 0; i < m_pMin.dimension(); ++i)
 	{
 		if(m_pMin[i] > p[i])
@@ -196,6 +216,7 @@ bool BoundingBox<VEC>::contains(const VEC& p)
 template <typename VEC>
 bool BoundingBox<VEC>::contains(const BoundingBox<VEC>& bb)
 {
+	assert(m_initialized || !"Bounding box not initialized");
 	return this->contains(bb.min()) && this->contains(bb.max());
 }
 

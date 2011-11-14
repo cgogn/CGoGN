@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,65 +17,48 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SUBDIVISION3MAP_H__
-#define __SUBDIVISION3MAP_H__
+#include <iostream>
 
-#include <math.h>
-#include <vector>
+#include "Utils/qtSimple.h"
 
-namespace CGoGN
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap3.h"
+
+#include "Geometry/vector_gen.h"
+
+#include "Algo/Render/GL1/topo_render.h"
+
+using namespace CGoGN ;
+
+struct PFP: public PFP_STANDARD
 {
+	// definition of the map
+	typedef EmbeddedMap3 MAP ;
+};
 
-namespace Algo
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+
+class SimpleMap3 : public Utils::QT::SimpleQT
 {
+	Q_OBJECT
 
-namespace Modelisation
-{
+public:
+	MAP myMap ;
+	SelectorTrue allDarts ;
 
-/**
-* Cut a 3D ear from a mesh : the ear is sewn by phi3 to the rest of the volume
-* @param d dart of the point of the ear
-* @return a dart from the new face connecting the ear and the rest of the volume
-*/
-template <typename PFP>
-Dart cut3Ear(typename PFP::MAP& map, Dart d);
+	PFP::TVEC3 position ;
 
-/**
-* subdivide a hexahedron into 5 tetrahedron
-* @param d dart of the hexahedron
-*/
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
+	SimpleMap3() ;
 
-/**
-* catmull clark volumic : do not move the original vertices
-* @param map the map
-* @param attributs geometric attributes of the vertices
-* @param selected a functor to select volumes to subdivide
-* TODO : test if it works for the functorselect
-*/
-template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= SelectorTrue());
+	void initGUI() ;
 
-template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= SelectorTrue())
-{
-	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
-}
-
-} // namespace Modelisation
-
-} // namespace Algo
-
-} // namespace CGoGN
-
-#include "Algo/Modelisation/subdivision3map.hpp"
-
-#endif
-
+	void cb_initGL() ;
+	void cb_redraw() ;
+};
 

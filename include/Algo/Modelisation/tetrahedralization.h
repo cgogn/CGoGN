@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TETRAHEDRON_H__
-#define __TETRAHEDRON_H__
+#ifndef __TETRAHEDRALIZATION_H__
+#define __TETRAHEDRALIZATION_H__
 
 namespace CGoGN
 {
@@ -34,8 +34,15 @@ namespace Algo
 namespace Modelisation
 {
 
-namespace Tetrahedron
+namespace Tetrahedralization
 {
+
+/**
+* subdivide a hexahedron into 5 tetrahedron
+* @param d dart of the hexahedron
+*/
+template <typename PFP>
+void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
 
 /************************************************************************************************
  * 																Tetrahedron functions																	   *
@@ -116,12 +123,12 @@ template <typename PFP>
 void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 
-} //end namespace Tetrahedron
+} //end namespace Tetrahedralization
 } //end namespace Modelisation
 } //end namespace Algo
 } //end namespace CGoGN
 
-#include "Algo/Modelisation/tetrahedron.hpp"
+#include "Algo/Modelisation/tetrahedralization.hpp"
 
 #endif
 

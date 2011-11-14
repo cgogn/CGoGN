@@ -73,6 +73,20 @@ bool GMap2::deleteVertex(Dart d)
 	return true ;
 }
 
+void GMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+
+	phi1sew(phi_1(d),phi_1(e));
+}
+
+void GMap2::removeEdgeFromVertex(Dart d)
+{
+	assert(phi2(d)!=d);
+
+	phi1sew(phi_1(d),phi2(d));
+}
+
 void GMap2::cutEdge(Dart d)
 {
 	GMap1::cutEdge(d);		// Cut the edge of d
@@ -190,20 +204,6 @@ bool GMap2::flipBackEdge(Dart d)
 		return true ;
 	}
 	return false ; // cannot flip a border edge
-}
-
-void GMap2::insertEdgeInVertex(Dart d, Dart e)
-{
-	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
-
-	phi1sew(phi_1(d),phi_1(e));
-}
-
-void GMap2::removeEdgeFromVertex(Dart d)
-{
-	assert(phi2(d)!=d);
-
-	phi1sew(phi_1(d),phi2(d));
 }
 
 void GMap2::sewFaces(Dart d, Dart e)
@@ -384,45 +384,6 @@ void GMap2::closeMap(DartMarker& marker)
 	}
 }
 
-//DartMarker GMap2::markCCOrientation(Dart d)
-//{
-//	// lock a marker
-//	DartMarker markCC(*this);
-//
-//	// init algo with parameter dart
-//	std::list<Dart> darts_list;
-//	darts_list.push_back(d);
-//	markCC.mark(d);
-//
-//	// use iterator for begin of not yet treated darts
-//	std::list<Dart>::iterator beg = darts_list.begin();
-//
-//	// until all darts treated
-//	while (beg != darts_list.end())
-//	{
-//		Dart d1 = *beg;
-//		// add phi<1> and phi<2> successor if they are not yet marked
-//		Dart d2 = beta2(beta0(d1));
-//		Dart d3 = beta1(beta0(d1));
-//
-//		if (!markCC.isMarked(d2))
-//		{
-//			darts_list.push_back(d2);
-//			markCC.mark(d2);
-////			markCC.mark(beta0(d2));
-//		}
-//		if (!markCC.isMarked(d3))
-//		{
-//			darts_list.push_back(d3);
-//			markCC.mark(d3);
-////			markCC.mark(beta0(d3));
-//		}
-//		// step to next dart of list
-//		beg++;
-//	}
-//	return markCC;
-//}
-
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
@@ -450,6 +411,30 @@ bool GMap2::sameVertex(Dart d, Dart e)
 		dNext = alpha1(dNext);
 	} while (dNext != d);
 	return false;				// None is equal to e => vertices are distinct
+}
+
+unsigned int GMap2::vertexDegree(Dart d)
+{
+	unsigned int count = 0 ;
+	Dart dNext = d ;
+	do
+	{
+		++count ;
+		dNext = alpha1(dNext) ;
+	} while (dNext != d) ;
+	return count ;
+}
+
+bool GMap2::isBoundaryVertex(Dart d)
+{
+	Dart dNext = d ;
+	do
+	{
+		if(beta2(dNext) == dNext)
+			return true ;
+		dNext = alpha1(dNext) ;
+	} while (dNext != d) ;
+	return false ;
 }
 
 bool GMap2::sameOrientedVolume(Dart d, Dart e)
@@ -512,30 +497,6 @@ bool GMap2::sameVolume(Dart d, Dart e)
 		}
 	}
 	return false;
-}
-
-unsigned int GMap2::vertexDegree(Dart d)
-{
-	unsigned int count = 0 ;
-	Dart dNext = d ;
-	do
-	{
-		++count ;
-		dNext = alpha1(dNext) ;
-	} while (dNext != d) ;
-	return count ;
-}
-
-bool GMap2::isBoundaryVertex(Dart d)
-{
-	Dart dNext = d ;
-	do
-	{
-		if(beta2(dNext) == dNext)
-			return true ;
-		dNext = alpha1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
 }
 
 bool GMap2::check()
