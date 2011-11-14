@@ -226,10 +226,8 @@ void Clipping::slot_spinBox_SphereResolution(int i)
 
 void Clipping::slot_pushButton_changeSpheresColor()
 {
-	QColor NewColor;
-	QColorDialog ColDialog;
+	QColor NewColor = QColorDialog::getColor();
 
-	NewColor = ColDialog.getColor();
 
 	int r, g, b;
 	NewColor.getRgb(&r, &g, &b);
