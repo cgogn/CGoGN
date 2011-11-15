@@ -88,6 +88,5 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 #include "Algo/Import/importObjEle.hpp"
 #include "Algo/Import/importTet.hpp"
 #include "Algo/Import/importTs.hpp"
-#include "Algo/Import/importInESS.hpp"
 
 #endif
