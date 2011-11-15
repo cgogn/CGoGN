@@ -251,7 +251,7 @@ template <unsigned int DIM, typename T>
 inline double Vector<DIM,T>::normalize()
 {
 	double n = norm() ;
-	if(n != T(0.0))
+	if(n != T(0))
 		for(unsigned int i = 0; i < DIM; ++i)
 			m_data[i] /= T(n) ;
 	return n ;
@@ -357,7 +357,8 @@ inline T tripleProduct(const Vector<DIM,T>& v1, const Vector<DIM,T>& v2, const V
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM,T> slerp(const Vector<DIM,T> &v1, const Vector<DIM,T> &v2, const T &t) {
+inline Vector<DIM,T> slerp(const Vector<DIM,T>& v1, const Vector<DIM,T>& v2, const T& t)
+{
 	Vector<DIM,T> res ;
 
 	T omega = acos(v1 * v2) ;	// assume v1,v2 normalized
