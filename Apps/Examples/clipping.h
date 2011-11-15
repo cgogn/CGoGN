@@ -57,6 +57,8 @@
 #include "Utils/cgognStream.h"
 #include "Utils/drawer.h"
 
+#include "Algo/Modelisation/primitives3d.h"
+
 #include <string>
 #include <sstream>
 
