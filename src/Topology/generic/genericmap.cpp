@@ -87,6 +87,11 @@ GenericMap::~GenericMap()
 		if(isOrbitEmbedded(i))
 			m_attribs[i].clear(true) ;
 	}
+
+	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
+		(*it).second->setInvalid() ;
+	attributeHandlers.clear() ;
+
 	if(m_attributes_registry_map)
 	{
 		delete m_attributes_registry_map;
