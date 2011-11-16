@@ -286,12 +286,6 @@ public:
 	 */
 	bool sameOrientedVertex(Dart d, Dart e) ;
 
-	//!Test if dart d and e belong to the same oriented face
-	/*! @param d a dart
-	 *  @param e a dart
-	 */
-	bool sameOrientedFace(Dart d, Dart e);
-
 	//! Test if dart d and e belong to the same vertex
 	/*! @param d a dart
 	 *  @param e a dart
@@ -303,15 +297,41 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
-	//! Compute the number of faces in the volume of d
-	/*! @param d a dart
-	 */
-	unsigned int volumeDegree(Dart d);
-
 	//! Tell if the vertex of d is on the boundary of the map
 	/*! @param d a dart
 	 */
 	bool isBoundaryVertex(Dart d) ;
+
+	//!Test if dart d and e belong to the same oriented face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedFace(Dart d, Dart e);
+
+	// TODO a mettre en algo
+	/**
+	 * check if the mesh is triangular or not
+	 * @return a boolean indicating if the mesh is triangular
+	 */
+	bool isTriangular() ;
+
+	//@{
+	//! Test if dart d and e belong to the same oriented volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVolume(Dart d, Dart e) ;
+
+	//! Test if dart d and e belong to the same volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameVolume(Dart d, Dart e) ;
+
+	//! Compute the number of faces in the volume of d
+	/*! @param d a dart
+	 */
+	unsigned int volumeDegree(Dart d);
 
 	//! Follow the boundary of a surface as if it was a oriented face.
 	/*! This operation alternate phi1 and phi2 operator until another
@@ -320,12 +340,6 @@ public:
 	 */
 	Dart nextOnBoundary(Dart d);
 
-	// TODO a mettre en algo
-	/**
-	 * check if the mesh is triangular or not
-	 * @return a boolean indicating if the mesh is triangular
-	 */
-	bool isTriangular() ;
 
 	// TODO a mettre en algo
 	/**
@@ -339,7 +353,6 @@ public:
 	 *  Apply functors to all darts of a cell
 	 *************************************************************************/
 
-	//@{
 	//! Apply a functor on every dart of a vertex
 	/*! @param d a dart of the vertex
 	 *  @param f the functor to apply

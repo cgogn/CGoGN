@@ -213,6 +213,10 @@ inline void GMap1::collapseEdge(Dart d)
 inline void GMap1::splitFace(Dart d, Dart e)
 {
 	assert(d != e && sameFace(d, e)) ;
+
+	if(!sameOrientedFace(d,e))
+		e = beta1(e);
+
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
 	Dart dd = newEdge() ;

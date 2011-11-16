@@ -535,7 +535,7 @@ bool Map3::check()
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+bool Map3::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value

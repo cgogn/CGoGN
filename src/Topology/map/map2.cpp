@@ -427,18 +427,6 @@ bool Map2::sameOrientedVertex(Dart d, Dart e)
 	return false;				// None is equal to e => vertices are distinct
 }
 
-bool Map2::sameOrientedFace(Dart d, Dart e)
-{
-	Dart dNext = d;
-	do							// Foreach dart dNext in the face of d
-	{
-		if(dNext == e)			// Test equality with e
-			return true;
-		dNext = phi1(dNext);
-	} while(dNext != d);
-	return false;				// None is equal to e => faces are distinct
-}
-
 unsigned int Map2::vertexDegree(Dart d)
 {
 	unsigned int count = 0 ;
@@ -451,6 +439,61 @@ unsigned int Map2::vertexDegree(Dart d)
 		dNext = alpha1(dNext) ;
 	} while (dNext != d) ;
 	return count ;
+}
+
+bool Map2::isBoundaryVertex(Dart d)
+{
+	Dart dNext = d ;
+	do
+	{
+		if(phi2(dNext) == dNext)
+			return true ;
+		dNext = alpha1(dNext) ;
+	} while (dNext != d) ;
+	return false ;
+}
+
+bool Map2::sameOrientedFace(Dart d, Dart e)
+{
+	Dart dNext = d;
+	do							// Foreach dart dNext in the face of d
+	{
+		if(dNext == e)			// Test equality with e
+			return true;
+		dNext = phi1(dNext);
+	} while(dNext != d);
+	return false;				// None is equal to e => faces are distinct
+}
+
+bool Map2::sameOrientedVolume(Dart d, Dart e)
+{
+	DartMarkerStore mark(*this);	// Lock a marker
+	bool found = false;				// Last functor return value
+
+	std::list<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.push_back(d);		// Start with the face of d
+	std::list<Dart>::iterator face;
+
+	// For every face added to the list
+	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	{
+		if (!mark.isMarked(*face))		// Face has not been visited yet
+		{
+			Dart dNext = *face ;
+			do
+			{
+				if(dNext==e)
+					return true;
+
+				mark.mark(dNext);					// Mark
+				Dart adj = phi2(dNext);				// Get adjacent face
+				if (adj != dNext && !mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+				dNext = phi1(dNext);
+			} while(dNext != *face);
+		}
+	}
+	return false;
 }
 
 unsigned int Map2::volumeDegree(Dart d)
@@ -483,18 +526,6 @@ unsigned int Map2::volumeDegree(Dart d)
 	}
 
 	return count;
-}
-
-bool Map2::isBoundaryVertex(Dart d)
-{
-	Dart dNext = d ;
-	do
-	{
-		if(phi2(dNext) == dNext)
-			return true ;
-		dNext = alpha1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
 }
 
 Dart Map2::nextOnBoundary(Dart d)
