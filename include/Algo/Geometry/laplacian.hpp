@@ -115,8 +115,6 @@ typename PFP::REAL computeCotanWeightEdge(
 {
 	if(map.isBoundaryEdge(d))
 	{
-		Dart e = map.getEdgeInteriorDart(d) ;
-
 		const typename PFP::VEC3& p1 = position[d] ;
 		const typename PFP::VEC3& p2 = position[map.phi1(d)] ;
 		const typename PFP::VEC3& p3 = position[map.phi_1(d)] ;

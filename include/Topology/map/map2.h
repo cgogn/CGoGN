@@ -339,10 +339,10 @@ public:
 	 */
 	Dart findBoundaryVertex(Dart d);
 
-	/**
-	 * if the edge of d is on the boundary, return the non-boundaryMarked dart of this edge
-	 */
-	bool getEdgeInteriorDart(Dart d) ;
+//	/**
+//	 * if the edge of d is on the boundary, return the non-boundaryMarked dart of this edge
+//	 */
+//	bool getEdgeInteriorDart(Dart d) ;
 
 	// TODO a mettre en algo
 	/**
