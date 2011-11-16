@@ -181,6 +181,11 @@ inline bool Map2::sameVertex(Dart d, Dart e)
 	return sameOrientedVertex(d, e) ;
 }
 
+inline bool Map2::sameVolume(Dart d, Dart e)
+{
+	return sameOrientedVolume(d, e) ;
+}
+
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/

@@ -178,6 +178,11 @@ inline void Map3::phi3unsew(Dart d)
 	(*m_phi3)[e.index] = e ;
 }
 
+inline bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_oriented_vertex(d, f, thread);
+}
+
 //template<typename TMAP>
 //bool Map3::foreach_dart_of_parent_cell(int dim, Dart d, FunctorType& f)
 //{
