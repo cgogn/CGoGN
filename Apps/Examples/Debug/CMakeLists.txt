@@ -86,3 +86,7 @@ add_executable( clippingD ../clipping.cpp ${clipping_ui} ${clipping_moc})
 target_link_libraries( clippingD
 	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
 
+QT4_WRAP_CPP(tutoriel_moc ../tutoriel.h)
+add_executable( tutorielD ../tutoriel.cpp ${tutoriel_moc})
+target_link_libraries( tutorielD
+	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
