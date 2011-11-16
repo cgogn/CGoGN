@@ -23,7 +23,8 @@
 *******************************************************************************/
 
 #include "Topology/generic/attribmap.h"
-
+#include "Topology/generic/autoAttributeHandler.h"
+#include "Topology/generic/dartmarker.h"
 namespace CGoGN
 {
 
@@ -66,5 +67,33 @@ unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
 		idx[i] = cpt++ ;
 	return cpt ;
 }
+
+void AttribMap::bijectiveOrbitEmbedding(unsigned int orbit)
+{
+	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded") ;
+
+	AutoAttributeHandler<int> counter(*this,VERTEX);
+	counter.setAllValues(int(0));
+
+	DartMarker mark(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!mark.isMarked(d))
+		{
+			mark.markOrbit(orbit, d) ;
+			unsigned int emb = getEmbedding(orbit, d);
+			if (emb != EMBNULL)
+			{
+				if (counter[d]>0)
+				{
+					unsigned int newEmb = embedNewCell(orbit, d) ;
+					copyCell(VERTEX,newEmb,emb);
+				}
+				counter[d]++;
+			}
+		}
+	}
+}
+
 
 } // namespace CGoGN

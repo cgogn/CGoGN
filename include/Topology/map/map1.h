@@ -105,29 +105,19 @@ public:
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newOrientedFace(unsigned int nbEdges) ;
-
-	//! Create an new face made of nbEdges linked darts.
-	/*! @param nbEdges the number of edges
-	 *  @return return a dart of the face
-	 */
-	virtual Dart newFace(unsigned int nbEdges) ;
+	Dart newCycle(unsigned int nbEdges) ;
 
 	//! Create an new face for boundary (marked)
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newBoundaryFace(unsigned nbEdges);
+	Dart newBoundaryCycle(unsigned nbEdges);
 
 	//! Delete an oriented face erasing all its darts
 	/*! @param d a dart of the face
 	 */
-	void deleteOrientedFace(Dart d) ;
+	void deleteCycle(Dart d) ;
 
-	//! Delete a face erasing all its darts
-	/*! @param d a dart of the face
-	 */
-	void deleteFace(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators

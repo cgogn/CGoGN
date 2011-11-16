@@ -155,7 +155,9 @@ float EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& no
 
 
 template<typename PFP>
-void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
+//void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
+void EarTriangulation<PFP>::trianguleFace(Dart d)
+
 {
 	// compute normal to polygon
 	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(m_map, d, m_position);
@@ -167,7 +169,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
 
 	if (m_map.template phi<111>(d) ==d)
 	{
-		mark.markOrbit(FACE, d);	// mark the face
+//		mark.markOrbit(FACE, d);	// mark the face
 		return;
 	}
 
@@ -196,7 +198,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
 		Dart e2 = m_map.phi_1(d_e);
 
 		m_map.splitFace(e1,e2);
-		mark.markOrbit(FACE, d_e);
+//		mark.markOrbit(FACE, d_e);
 		nbv--;
 
 		if (nbv>3)	// do not recompute if only one triangle left
@@ -211,8 +213,8 @@ void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
 
 			convex = (m_ears.rbegin()->angle) < 5.0f;
 		}
-		else
-			mark.markOrbit(FACE, e1);	// mark last face
+//		else
+//			mark.markOrbit(FACE, e1);	// mark last face
 	}
 	m_ears.clear();
 
@@ -222,18 +224,27 @@ void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
 template<typename PFP>
 void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int thread)
 {
-	DartMarker m(m_map, thread);
+//	DartMarker m(m_map, thread);
+//
+//	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
+//	{
+//		if(!m.isMarked(d) && good(d))
+//		{
+//			Dart e = m_map.template phi<111>(d);
+//			if (e!=d)
+//				trianguleFace(d, m);
+//		}
+//	}
+//	m.unmarkAll();
 
-	for(Dart d = m_map.begin(); d != m_map.end(); m_map.next(d))
+	TraversorF<typename PFP::MAP> trav(m_map,good,thread);
+
+	for(Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
-		if(!m.isMarked(d) && good(d))
-		{
-			Dart e = m_map.template phi<111>(d);
-			if (e!=d)
-				trianguleFace(d, m);
-		}
+		Dart e = m_map.template phi<111>(d);
+		if (e!=d)
+			trianguleFace(d);
 	}
-	m.unmarkAll();
 }
 
 

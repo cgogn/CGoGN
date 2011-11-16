@@ -277,8 +277,12 @@ void EmbeddedMap2::removeEdgeFromVertex(Dart d)
 	}
 }
 
-void EmbeddedMap2::sewFaces(Dart d, Dart e)
+void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
+	// for fixed point construction (import & primitives)
+	if (!withBoundary)
+		return Map2::sewFaces(d, e, false) ;
+
 	unsigned int vEmb1 = EMBNULL ;
 	unsigned int vEmb2 = EMBNULL ;
 	if (isOrbitEmbedded(VERTEX))
@@ -287,7 +291,7 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e)
 		vEmb2 = getEmbedding(VERTEX, phi1(d)) ;
 	}
 
-	Map2::sewFaces(d, e) ;
+	Map2::sewFaces(d, e, withBoundary) ;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
@@ -432,9 +436,9 @@ bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
 	return false ;
 }
 
-unsigned int EmbeddedMap2::closeHole(Dart d)
+unsigned int EmbeddedMap2::closeHole(Dart d, bool forboundary)
 {
-	unsigned int nbE = Map2::closeHole(d) ;
+	unsigned int nbE = Map2::closeHole(d,forboundary) ;
 	Dart dd = phi2(d) ;
 	Dart f = dd ;
 	do

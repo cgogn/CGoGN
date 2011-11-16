@@ -92,7 +92,8 @@ public:
 		m_position = map.template getAttribute<typename PFP::VEC3>(VERTEX,"position");
 	}
 
-	void trianguleFace( Dart d, DartMarker& mark);
+//	void trianguleFace( Dart d, DartMarker& mark);
+	void trianguleFace( Dart d);
 
 	void triangule(const FunctorSelect& good = allDarts, unsigned int thread=0);
 

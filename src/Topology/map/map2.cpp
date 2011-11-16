@@ -37,29 +37,10 @@ void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
 		phi1sew(ee, phi_1(dd)) ;
 	if (dd != phi_1(ee))
 		phi1sew(dd, phi_1(ee)) ;
-	Map1::deleteOrientedFace(dd) ;
+	deleteCycle(dd);
 }
 
-//void Map2::mergeFacewithBoundary(Dart d)
-//{
-//	Dart e = d ;
-//	do									// foreach edge of face
-//	{
-//		Dart f = phi2(e);
-//		if (isBoundaryMarked(f))		// if sewed to boundary
-//		{
-//			phi2unsew(e);// ?? not necessary
-//			Dart ff = phi_1(f);
-//			if (e != ff)
-//				phi1sew(e, ff) ;		//    merge with it
-//			Dart ee = phi_1(e);
-//			if (f != ee)
-//				phi1sew(f, ee) ;
-//			Map1::deleteOrientedFace(e) ;
-//		}
-//		e = phi1(e) ;
-//	} while (e != d) ;
-//}
+
 
 void Map2::mergeFaceWithBoundary(Dart d)
 {
@@ -111,26 +92,29 @@ void Map2::mergeFaceWithBoundary(Dart d)
  *  To generate or delete faces in a 2-map
  *************************************************************************/
 
-void Map2::deleteOrientedFace(Dart d)
+void Map2::deleteFace(Dart d)
 {
 	// tag face in boundary
 	boundaryMarkOrbit(FACE, d);
 	mergeFaceWithBoundary(d);
 }
 
-Dart Map2::newFace(unsigned int nbEdges)
+Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 {
-	Dart d = Map1::newFace(nbEdges);
-	Dart e = Map1::newBoundaryFace(nbEdges);
-
-	Dart x = d;
-	do
+	Dart d = newCycle(nbEdges);
+	if (withBoundary)
 	{
-		phi2sew(d,e);
-		d = phi1(d);
-		e = phi_1(e);
-	} while (d != x);
-	return x;
+		Dart e = Map1::newBoundaryCycle(nbEdges);
+
+		Dart x = d;
+		do
+		{
+			phi2sew(x,e);
+			x = phi1(x);
+			e = phi_1(e);
+		} while (x != d);
+	}
+	return d;
 }
 
 /*! @name Topological Operators
@@ -159,7 +143,7 @@ bool Map2::deleteVertex(Dart d)
 		phi1sew(vit, f) ;
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
-	Map1::deleteFace(d) ;
+	deleteCycle(d) ;
 	return true ;
 }
 
@@ -336,8 +320,17 @@ void Map2::removeEdgeFromVertex(Dart d)
 	phi1sew(phi_1(d), phi2(d));
 }
 
-void Map2::sewFaces(Dart d, Dart e)
+void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
+	// if sewing with fixed points
+	if (!withBoundary)
+	{
+		assert(phi2(d) == d && phi2(e) == e);
+		// sewing the faces
+		phi2sew(d, e);
+		return;
+	}
+
 	assert(isBoundaryFace(d) && isBoundaryFace(e)) ;
 
 	Dart dd = phi2(d);
@@ -355,7 +348,7 @@ void Map2::unsewFaces(Dart d)
 {
 	Dart dd = phi2(d);
 
-	Dart e = newBoundaryFace(2);
+	Dart e = newBoundaryCycle(2);
 
 	if (isBoundaryVertex(d))
 	{
@@ -386,7 +379,7 @@ bool Map2::collapseDegeneratedFace(Dart d)
 		if (e2 != e) phi2unsew(e);
 		if (d2 != d && e2 != e)
 			phi2sew(d2, e2);
-		Map1::deleteOrientedFace(d);// Delete the single edge or two edges of the loop
+		deleteCycle(d);// Delete the single edge or two edges of the loop
 		return true ;
 	}
 	return false ;
@@ -607,8 +600,8 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 		if (isBoundaryMarked(d2) && isBoundaryMarked(e2))
 			mergeBoundaryFaces(d2,e2);
 	}
-	Map1::deleteOrientedFace(d);	// Delete the two alone faces
-	Map1::deleteOrientedFace(e);
+	deleteCycle(d);					// Delete the two alone faces
+	deleteCycle(e);
 
 	return true ;
 }
@@ -953,7 +946,7 @@ bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsi
  *  These functions must be used with care, generally only by import algorithms
  *************************************************************************/
 
-unsigned int Map2::closeHole(Dart d)
+unsigned int Map2::closeHole(Dart d, bool forboundary)
 {
 	assert(phi2(d) == d);		// Nothing to close
 
@@ -987,6 +980,8 @@ unsigned int Map2::closeHole(Dart d)
 		collapseDegeneratedFace(first); // if the closing face is 2-sided, collapse it
 	}
 
+	boundaryMarkOrbit(FACE, phi2(d));
+
 	return countEdges ;
 }
 
@@ -998,16 +993,8 @@ void Map2::closeMap()
 		if (phi2(d) == d)
 		{
 			closeHole(d);
-			boundaryMarkOrbit(FACE, phi2(d));
 		}
 	}
-}
-
-void Map2::sewOrientedFaces(Dart d, Dart e)
-{
-	assert(phi2(d) == d && phi2(e) == e);
-	// sewing the faces
-	phi2sew(d, e);
 }
 
 } // namespace CGoGN

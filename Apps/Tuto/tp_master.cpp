@@ -447,7 +447,7 @@ void MyQT::cb_keyPress(int keycode)
 			ss << "dart:" << darts[0].index<<" /phi1:"<< d1.index<<" /phi2:"<< d2.index;
 
 			const PFP::VEC3& P = position[darts[0]];
-			ss << " /Emb:" << P;
+			ss << " /Emb:" << myMap.getEmbedding(VERTEX, darts[0])<< "/"<<P;
 			statusMsg(ss.str().c_str());
 		}
 		break;

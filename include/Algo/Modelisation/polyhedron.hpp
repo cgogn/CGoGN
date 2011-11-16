@@ -169,20 +169,20 @@ m_positions(p1.m_positions)
 template <typename PFP>
 Dart Polyhedron<PFP>::createOrientedTetra(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newFace(3);
+	Dart base = the_map.newFace(3,false);
 
-	Dart side1 = the_map.newFace(3);
-	the_map.sewFaces(base,side1);
+	Dart side1 = the_map.newFace(3,false);
+	the_map.sewFaces(base,side1,false);
 
-	Dart side2 = the_map.newFace(3);
-	the_map.sewFaces(the_map.phi1(base),side2);
-	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
+	Dart side2 = the_map.newFace(3,false);
+	the_map.sewFaces(the_map.phi1(base),side2,false);
+	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2),false);
 
-	Dart side3 = the_map.newFace(3);
-	the_map.sewFaces(the_map.phi_1(base),side3);
-	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
+	Dart side3 = the_map.newFace(3,false);
+	the_map.sewFaces(the_map.phi_1(base),side3,false);
+	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3),false);
 
-	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1));
+	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1),false);
 
 	return base;
 }
@@ -190,24 +190,24 @@ Dart Polyhedron<PFP>::createOrientedTetra(typename PFP::MAP& the_map)
 template <typename PFP>
 Dart Polyhedron<PFP>::createOrientedPyra(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newOrientedFace(4);
+	Dart base = the_map.newFace(4,false);
 
-	Dart side1 = the_map.newOrientedFace(3);
-	the_map.sewFaces(base,side1);
+	Dart side1 = the_map.newFace(3,false);
+	the_map.sewFaces(base,side1,false);
 
-	Dart side2 = the_map.newOrientedFace(3);
-	the_map.sewFaces(the_map.phi1(base),side2);
-	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
+	Dart side2 = the_map.newFace(3,false);
+	the_map.sewFaces(the_map.phi1(base),side2,false);
+	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2),false);
 
-	Dart side3 = the_map.newOrientedFace(3);
-	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3);
-	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
+	Dart side3 = the_map.newFace(3,false);
+	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3,false);
+	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3),false);
 
-	Dart side4 = the_map.newOrientedFace(3);
-	the_map.sewFaces(the_map.phi_1(base),side4);
-	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side4));
+	Dart side4 = the_map.newFace(3,false);
+	the_map.sewFaces(the_map.phi_1(base),side4,false);
+	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side4),false);
 
-	the_map.sewFaces(the_map.phi_1(side4), the_map.phi1(side1));
+	the_map.sewFaces(the_map.phi_1(side4), the_map.phi1(side1),false);
 
 	return base;
 }
@@ -215,30 +215,30 @@ Dart Polyhedron<PFP>::createOrientedPyra(typename PFP::MAP& the_map)
 template <typename PFP>
 Dart Polyhedron<PFP>::createOrientedHexa(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newOrientedFace(4);
+	Dart base = the_map.newFace(4,false);
 
-	Dart side1 = the_map.newOrientedFace(4);
-	the_map.sewFaces(base,side1);
+	Dart side1 = the_map.newFace(4,false);
+	the_map.sewFaces(base,side1,false);
 
-	Dart side2 = the_map.newOrientedFace(4);
-	the_map.sewFaces(the_map.phi1(base),side2);
-	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
+	Dart side2 = the_map.newFace(4,false);
+	the_map.sewFaces(the_map.phi1(base),side2,false);
+	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2),false);
 
-	Dart side3 = the_map.newOrientedFace(4);
-	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3);
-	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
+	Dart side3 = the_map.newFace(4,false);
+	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3,false);
+	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3),false);
 
-	Dart side4 = the_map.newOrientedFace(4);
-	the_map.sewFaces(the_map.phi_1(base),side4);
-	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side4));
+	Dart side4 = the_map.newFace(4,false);
+	the_map.sewFaces(the_map.phi_1(base),side4,false);
+	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side4),false);
 
-	the_map.sewFaces(the_map.phi_1(side4), the_map.phi1(side1));
+	the_map.sewFaces(the_map.phi_1(side4), the_map.phi1(side1),false);
 
-	Dart top = the_map.newOrientedFace(4);
-	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)));
-	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)));
-	the_map.sewFaces(the_map.phi1(the_map.phi1(top)),the_map.phi1(the_map.phi1(side3)));
-	the_map.sewFaces(the_map.phi1(top),the_map.phi1(the_map.phi1(side4)));
+	Dart top = the_map.newFace(4,false);
+	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)),false);
+	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)),false);
+	the_map.sewFaces(the_map.phi1(the_map.phi1(top)),the_map.phi1(the_map.phi1(side3)),false);
+	the_map.sewFaces(the_map.phi1(top),the_map.phi1(the_map.phi1(side4)),false);
 
 	return base;
 }
@@ -246,25 +246,25 @@ Dart Polyhedron<PFP>::createOrientedHexa(typename PFP::MAP& the_map)
 template <typename PFP>
 Dart  Polyhedron<PFP>::createOrientedPrism(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newOrientedFace(3);
+	Dart base = the_map.newFace(3,false);
 
-	Dart side1 = the_map.newOrientedFace(4);
-	the_map.sewFaces(base,side1);
+	Dart side1 = the_map.newFace(4,false);
+	the_map.sewFaces(base,side1,false);
 
-	Dart side2 = the_map.newOrientedFace(4);
-	the_map.sewFaces(the_map.phi1(base),side2);
-	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
+	Dart side2 = the_map.newFace(4,false);
+	the_map.sewFaces(the_map.phi1(base),side2,false);
+	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2),false);
 
-	Dart side3 = the_map.newOrientedFace(4);
-	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3);
-	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
+	Dart side3 = the_map.newFace(4,false);
+	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3,false);
+	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3),false);
 
-	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1));
+	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1),false);
 
-	Dart top = the_map.newOrientedFace(3);
-	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)));
-	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)));
-	the_map.sewFaces(the_map.phi1(top),the_map.phi1(the_map.phi1(side3)));
+	Dart top = the_map.newFace(3,false);
+	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)),false);
+	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)),false);
+	the_map.sewFaces(the_map.phi1(top),the_map.phi1(the_map.phi1(side3)),false);
 
 	return base;
 }
@@ -306,7 +306,7 @@ Dart Polyhedron<PFP>::grid_topo(unsigned int x, unsigned int y)
 	{
 		for (unsigned int j = 1; j <= x; ++j)
 		{
-			Dart d = m_map.newFace(4);
+			Dart d = m_map.newFace(4,false);
 			m_tableVertDarts.push_back(d);
 			if (j == x)
 				m_tableVertDarts.push_back(m_map.phi1(d));
@@ -331,7 +331,7 @@ Dart Polyhedron<PFP>::grid_topo(unsigned int x, unsigned int y)
 				Dart d = m_tableVertDarts[pos];
 				Dart e = m_tableVertDarts[pos-(x+1)];
 				e = m_map.phi1(m_map.phi1(e));
-				m_map.sewFaces(d,e);
+				m_map.sewFaces(d,e,false);
 			}
 			if (j > 0) // sew with preceeding column
 			{
@@ -340,7 +340,7 @@ Dart Polyhedron<PFP>::grid_topo(unsigned int x, unsigned int y)
 				d = m_map.phi_1(d);
 				Dart e = m_tableVertDarts[pos-1];
 				e = m_map.phi1(e);
-				m_map.sewFaces(d,e);
+				m_map.sewFaces(d,e,false);
 			}
 		}
 	}
@@ -374,7 +374,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 	{
 		for (int j=0;j<n;++j)
 		{
-			Dart d = m_map.newFace(4);
+			Dart d = m_map.newFace(4,false);
 			m_tableVertDarts.push_back(d);
 		}
 	}
@@ -394,7 +394,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 				Dart d = m_tableVertDarts[pos];
 				Dart e = m_tableVertDarts[pos-n];
 				e = m_map.phi1(m_map.phi1(e));
-				m_map.sewFaces(d,e);
+				m_map.sewFaces(d,e,false);
 			}
 			if (j>0) // sew with preceeding column
 			{
@@ -403,7 +403,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 				d = m_map.phi_1(d);
 				Dart e = m_tableVertDarts[pos-1];
 				e = m_map.phi1(e);
-				m_map.sewFaces(d,e);
+				m_map.sewFaces(d,e,false);
 			}
 			else 
 			{
@@ -412,7 +412,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 				d = m_map.phi_1(d);
 				Dart e = m_tableVertDarts[pos+(n-1)];
 				e = m_map.phi1(e);
-				m_map.sewFaces(d,e);
+				m_map.sewFaces(d,e,false);
 			}
 		}
 	}
@@ -420,7 +420,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 	if (bottom_closed)
 	{
 		Dart d = m_tableVertDarts[0];
-		if(m_map.closeHole(d))
+		if(m_map.closeHole(d,false))
 		{
 			d = m_map.phi2(d);
 			if(!m_map.isFaceTriangle(d))
@@ -443,11 +443,13 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // 			d = precDV(d);
 // 		}
 	}
+	else
+		m_map.closeHole(m_tableVertDarts[0]);
 
 	if (top_closed)
 	{
 		Dart d =  m_map.phi_1(m_tableVertDarts[n*z]);
-		if(m_map.closeHole(d))
+		if(m_map.closeHole(d,true))
 		{
 			d = m_map.phi2(d);
 			if(!m_map.isFaceTriangle(d))
@@ -471,6 +473,8 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // 			d = nextDV(d);
 // 		}
 	}
+	else
+		m_map.closeHole(m_map.phi_1(m_tableVertDarts[n*z]));
 
 	m_dart = m_tableVertDarts.front();
 	return m_dart;
@@ -498,7 +502,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // 			// close bottom with one quad not three triangles
 // 			if (bottom_closed)
 // 			{
-// 				Dart t= m_map.newFace(4);
+// 				Dart t= m_map.newFace(4,false);
 // 				m_map.sewFaces(m_tableVertDarts[0],t);
 // 				t=m_map.phi_1(t);
 // 				m_map.sewFaces(m_tableVertDarts[1],t);
@@ -517,7 +521,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // 			// close bottom with one triangle not three
 // 			if (bottom_closed)
 // 			{
-// 				Dart t= m_map.newFace(3);
+// 				Dart t= m_map.newFace(3,false);
 // 				m_map.sewFaces(d,t);
 // 				d=nextDV(d); t=m_map.phi_1(t);
 // 				m_map.sewFaces(d,t);
@@ -580,7 +584,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // 
 // 			if (bottom_closed)
 // 			{
-// 				Dart t= m_map.newFace(4);
+// 				Dart t= m_map.newFace(4,false);
 // 				m_map.sewFaces(m_tableVertDarts[0],t);
 // 				t=m_map.phi_1(t);
 // 				m_map.sewFaces(m_tableVertDarts[1],t);
@@ -607,7 +611,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // 
 // 			if (bottom_closed)
 // 			{
-// 				Dart t= m_map.newFace(3);
+// 				Dart t= m_map.newFace(3,false);
 // 				m_map.sewFaces(m_tableVertDarts[0],t);
 // 				t=m_map.phi_1(t);
 // 				m_map.sewFaces(m_tableVertDarts[1],t);
@@ -645,27 +649,27 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[i];
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 	for(int i=0;i<y;++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[x+i*(x+1)];
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 	for(int i=0;i<x;++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[(x+1)*(y+1)-2 - i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 	for(int i=0;i<y;++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[(y-1-i)*(x+1)];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 
 	// the bottom
@@ -678,27 +682,27 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[i];
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 	for(int i=0;i<y;++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[x+i*(x+1)];
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 	for(int i=0;i<x;++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[(x+1)*(y+1)-2 - i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 	for(int i=0;i<y;++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[(y-1-i)*(x+1)];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 
 	// and add new vertex in m_tableVertDarts
@@ -739,7 +743,7 @@ Dart Polyhedron<PFP>::tore_topo(int m, int n)
 		Dart d = m_tableVertDarts[i];
 		Dart e = m_tableVertDarts[(m*n)+i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e);
+		m_map.sewFaces(d,e,false);
 	}
 
 	// remove the last n vertex darts that are no more necessary (sewed with n first)
@@ -1186,11 +1190,11 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 // template <typename PFP>
 // Dart triangleFan_topo(typename PFP::MAP& the_map, int n)
 // {
-// 	Dart d = the_map.newFace(3);
+// 	Dart d = the_map.newFace(3,false);
 // 	Dart e = the_map.phi1(d);
 // 	for(int i=1;i<n;++i)
 // 	{
-// 		Dart f = the_map.newFace(3);
+// 		Dart f = the_map.newFace(3,false);
 // 		the_map.sewFaces(the_map.phi_1(f),e);
 // 		e = the_map.phi1(f);
 // 	}

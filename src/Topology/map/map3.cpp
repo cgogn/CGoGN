@@ -86,7 +86,7 @@ void Map3::deleteOrientedVolume(Dart d)
 
 	// delete every visited face
 	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-		Map1::deleteOrientedFace(*face);
+		deleteCycle(*face);
 }
 
 /*! @name Topological Operators
@@ -587,7 +587,7 @@ void Map3::collapseVolume(Dart d, bool delDegenerateFaces,
 
 	// delete every visited face
 	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-		Map1::deleteOrientedFace(*face);
+		deleteCycle(*face);
 
 	//enlever le dernier (n-1) face collapse
 

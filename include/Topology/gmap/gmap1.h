@@ -89,9 +89,10 @@ public:
 	/**
 	* create a face
 	* @param n the number of sides of face
+	* @param withBoundary not used, for compatibility with Map
 	* @return a dart of the edge
 	*/
-	Dart newFace(unsigned int n);
+	Dart newFace(unsigned int n, bool withBoundary=true);
 
 	//! Delete a face erasing all its darts
 	/*! @param d a dart of the face

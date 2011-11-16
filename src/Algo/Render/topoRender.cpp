@@ -156,7 +156,7 @@ void TopoRender::drawRelation2()
 	m_shader1->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 	m_shader1->enableVertexAttribs();
 
-	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
+	glDrawArrays(GL_LINES, 0, m_nbRel2*2);
 
 	m_shader1->disableVertexAttribs();
 }
