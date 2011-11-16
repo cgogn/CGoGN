@@ -279,8 +279,12 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 //	}
 //}
 
-void EmbeddedGMap2::sewFaces(Dart d, Dart e)
+void EmbeddedGMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
+	// for fixed point construction (import & primitives)
+	if (!withBoundary)
+		return GMap2::sewFaces(d, e, false) ;
+
 	unsigned int vEmb1 = EMBNULL ;
 	unsigned int vEmb2 = EMBNULL ;
 	if (isOrbitEmbedded(VERTEX))
@@ -289,7 +293,7 @@ void EmbeddedGMap2::sewFaces(Dart d, Dart e)
 		vEmb2 = getEmbedding(VERTEX, phi1(d)) ;
 	}
 
-	GMap2::sewFaces(d, e) ;
+	GMap2::sewFaces(d, e, true) ;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
@@ -434,7 +438,7 @@ bool EmbeddedGMap2::mergeVolumes(Dart d, Dart e)
 	return false ;
 }
 
-unsigned int EmbeddedGMap2::closeHole(Dart d)
+unsigned int EmbeddedGMap2::closeHole(Dart d, bool withBoundary)
 {
 	unsigned int nbE = GMap2::closeHole(d) ;
 	Dart dd = phi2(d) ;

@@ -104,6 +104,12 @@ public:
 	 * @return the number of cells of the orbit
 	 */
 	unsigned int computeIndexCells(AttributeHandler<unsigned int>& idx) ;
+
+	/**
+	 * ensure that each orbit as one embedding and that each embedding is handle by only one orbit
+	 */
+	void bijectiveOrbitEmbedding(unsigned int orbit);
+
 } ;
 
 } // namespace CGoGN

@@ -131,19 +131,6 @@ inline int Map1::getDartsPerTriangle()
 	return 3 ;
 }
 
-/*! @name Generator and Deletor
- *  To generate or delete faces in a 1-map
- *************************************************************************/
-
-inline Dart Map1::newFace(unsigned int nbEdges)
-{
-	return newOrientedFace(nbEdges) ;
-}
-
-inline void Map1::deleteFace(Dart d)
-{
-	deleteOrientedFace(d) ;
-}
 
 /*! @name Topological Operators
  *  Topological operations on 1-maps
@@ -185,7 +172,7 @@ inline void Map1::mergeFaces(Dart d, Dart e)
 	assert(!sameOrientedFace(d, e)) ;
 	phi1sew(d, phi_1(e)) ;
 	phi1sew(e, phi_1(d)) ;
-	deleteOrientedFace(d) ;
+	deleteCycle(d) ;
 }
 
 /*! @name Topological Queries

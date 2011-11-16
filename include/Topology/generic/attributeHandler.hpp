@@ -171,7 +171,7 @@ inline unsigned int AttributeHandler<T>::newElt()
 }
 
 template <typename T>
-inline void AttributeHandler<T>::setAllValues(T& v)
+inline void AttributeHandler<T>::setAllValues(const T& v)
 {
 	for(unsigned int i = begin(); i != end(); next(i))
 		m_attrib->operator[](i) = v ;

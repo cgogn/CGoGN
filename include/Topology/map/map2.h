@@ -114,21 +114,22 @@ protected:
 	 *************************************************************************/
 
 	//@{
-	//! Delete an oriented face erasing all its darts.
-	/*! The phi2-links around the face are removed
-	 *  @param d a dart of the face
-	 */
-	void deleteOrientedFace(Dart d) ;
 
 public:
 
 	//! Create an new face of nbEdges
 	/*! @param nbEdges the number of edges
+	 *  @param withBoudary create the face and its boundary (default true)
 	 *  @return return a dart of the face
 	 */
-	virtual Dart newFace(unsigned int nbEdges) ;
+	virtual Dart newFace(unsigned int nbEdges, bool withBoundary=true) ;
 
+	//! Delete an oriented face erasing all its darts (not really tags as boundary).
+	/*! The phi2-links around the face are removed
+	 *  @param d a dart of the face
+	 */
 	virtual void deleteFace(Dart d) ;
+
 	//@}
 
 	/*! @name Topological Operators
@@ -215,8 +216,9 @@ public:
 	/*! \pre Edges of darts d & e MUST be boundary edges
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
+	 *  @param withBoundary: face have no fixed points (false only for construction: import/primitives)
 	 */
-	virtual void sewFaces(Dart d, Dart e);
+	virtual void sewFaces(Dart d, Dart e, bool withBoundary=true);
 
 	//! Unsew two oriented faces along oriented edges
 	 /*! @param d a dart of one face
@@ -415,9 +417,10 @@ public:
 	 *  Add a face to the map that closes the hole.
 	 *  The darts of this face are marked with holeMarker.
 	 *  @param d a dart of the hole (with phi2(d)==d)
+	 *  @param forboundary tag the created face as boundary (default is true)
 	 *  @return the degree of the created face
 	 */
-	virtual unsigned int closeHole(Dart d);
+	virtual unsigned int closeHole(Dart d, bool forboundary=true);
 
 	//! Close the map removing topological holes: DO NOT USE, only for import algorithm
 	/*! Add faces to the map that close every existing hole.
@@ -426,10 +429,6 @@ public:
 	 */
 	void closeMap();
 
-	/**
-	 * sew oriented face, DO NOT USE, only for import algorithm
-	 */
-	void sewOrientedFaces(Dart d, Dart e);
 	//@}
 };
 

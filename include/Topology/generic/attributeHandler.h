@@ -168,7 +168,7 @@ public:
 	/**
 	 * initialize all the lines of the attribute with the given value
 	 */
-	void setAllValues(T& v) ;
+	void setAllValues(const T& v) ;
 
 	/**
 	 * begin of table

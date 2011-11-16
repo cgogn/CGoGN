@@ -31,7 +31,7 @@ namespace CGoGN
  *  To generate or delete faces in a 1-map
  *************************************************************************/
 
-Dart Map1::newOrientedFace(unsigned nbEdges)
+Dart Map1::newCycle(unsigned nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge
@@ -40,7 +40,7 @@ Dart Map1::newOrientedFace(unsigned nbEdges)
 	return d ;
 }
 
-Dart Map1::newBoundaryFace(unsigned nbEdges)
+Dart Map1::newBoundaryCycle(unsigned nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge
@@ -50,7 +50,7 @@ Dart Map1::newBoundaryFace(unsigned nbEdges)
 	return d ;
 }
 
-void Map1::deleteOrientedFace(Dart d)
+void Map1::deleteCycle(Dart d)
 {
 	Dart e = phi1(d) ;
 	while (e != d)

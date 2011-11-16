@@ -158,14 +158,6 @@ inline void Map2::phi2unsew(Dart d)
 	(*m_phi2)[e.index] = e ;
 }
 
-/*! @name Generator and Deletor
- *  To generate or delete faces in a 2-map
- *************************************************************************/
-
-inline void Map2::deleteFace(Dart d)
-{
-	deleteOrientedFace(d) ;
-}
 
 /*! @name Topological Queries
  *  Return or set various topological information

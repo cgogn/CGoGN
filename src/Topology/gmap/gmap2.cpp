@@ -206,7 +206,7 @@ void GMap2::removeEdgeFromVertex(Dart d)
 	phi1sew(phi_1(d),phi2(d));
 }
 
-void GMap2::sewFaces(Dart d, Dart e)
+void GMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
 	phi2sew(d, e);
 }

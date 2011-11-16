@@ -350,7 +350,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 					{
 						if (!m.isMarked(f))
 						{
-							if (good(f) && !map.isBoundaryMarked(dd))
+							if (good(f) && !map.isBoundaryMarked(f))
 								addTri<PFP>(map, f, tableIndices);
 							m.markOrbit(FACE, f);
 							bound.push_back(map.phi1(f));
