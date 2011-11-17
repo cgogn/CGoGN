@@ -379,7 +379,7 @@ bool Map2::collapseDegeneratedFace(Dart d)
 		if (e2 != e) phi2unsew(e);
 		if (d2 != d && e2 != e)
 			phi2sew(d2, e2);
-		deleteCycle(d);// Delete the single edge or two edges of the loop
+		deleteCycle(d);				// Delete the single edge or two edges of the loop
 		return true ;
 	}
 	return false ;
@@ -974,13 +974,16 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 		}
 	} while (dPhi1 != d);
 
-	if (countEdges == 2)
+	if (countEdges < 3)
 	{
 		countEdges = 0 ;
 		collapseDegeneratedFace(first); // if the closing face is 2-sided, collapse it
 	}
-
-	boundaryMarkOrbit(FACE, phi2(d));
+	else
+	{
+		if(forboundary)
+			boundaryMarkOrbit(FACE, phi2(d));
+	}
 
 	return countEdges ;
 }
