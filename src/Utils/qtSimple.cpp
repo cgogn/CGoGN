@@ -105,6 +105,8 @@ SimpleQT::SimpleQT() :
 	m_dockConsole->hide();
 
 	m_transfo_matrix = glm::mat4(1.0f);
+
+	resize(1200,800);
 }
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
