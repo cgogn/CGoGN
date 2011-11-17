@@ -43,10 +43,10 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
 
-	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
+	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
 	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
 
-	// open file
+	//open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
 	if (!fp.good())
 	{
@@ -56,20 +56,17 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 	std::string ligne;
 	unsigned int nbv, nbt;
-	// lecture des nombres de sommets/tetra
+	// reading number of vertices
 	std::getline (fp, ligne);
 	std::stringstream oss(ligne);
 	oss >> nbv;
 
-	//CGoGNout << "nbV = " << nbv << CGoGNendl;
-
+	// reading number of tetrahedra
 	std::getline (fp, ligne);
 	std::stringstream oss2(ligne);
 	oss2 >> nbt;
 
-	//CGoGNout << "nbT = " << nbt << CGoGNendl;
-
-	//lecture sommets
+	//reading vertices
 	std::vector<unsigned int> verticesID;
 	verticesID.reserve(nbv);
 	for(unsigned int i = 0; i < nbv;++i)
@@ -85,32 +82,27 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		oss >> x;
 		oss >> y;
 		oss >> z;
-		// on peut ajouter ici la lecture de couleur si elle existe
+		// TODO : if required read other vertices attributes here
 		VEC3 pos(x*scaleFactor,y*scaleFactor,z*scaleFactor);
 
-		//CGoGNout << "VEC3 = " << pos << CGoGNendl;
+//		CGoGNout << "VEC3 = " << pos << CGoGNendl;
 
 		unsigned int id = container.insertLine();
 		position[id] = pos;
 
 		verticesID.push_back(id);
 	}
-	m_nbVertices = verticesID.size();
+	m_nbVertices = nbv;
 
-	//CGoGNout << "nbVertices = " << m_nbVertices << CGoGNendl;
 	m_nbVolumes = nbt;
-	//CGoGNout << "nbVolumes = " << m_nbVolumes << CGoGNendl;
 
-	// lecture tetra
-	// normalement m_nbVolumes*12 (car on ne charge que des tetra)
+	CGoGNout << "nb points = " << m_nbVertices  << " / nb tet = " << m_nbVolumes << CGoGNendl;
 
-	m_nbFaces = nbt*4;
-
-	CGoGNout << "nb points = " << m_nbVertices << " / nb faces = " << m_nbFaces << " / nb edges = " << m_nbEdges << " / nb tet = " << m_nbVolumes << CGoGNendl;
-
-	//Read and embed tetrahedra TODO
+	//Read and embed all tetrahedrons
 	for(unsigned int i = 0; i < m_nbVolumes ; ++i)
 	{
+		//start one tetra
+
 		int nbe;
 		do
 		{
@@ -118,59 +110,53 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		} while(ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-		oss >> nbe;
-//		CGoGNout << "tetra number : " << nbe << CGoGNendl;
+		oss >> nbe; //number of vertices =4
+		assert(nbe == 4);
 
-		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(map);
-		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map,4);
+		Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(map,4);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
 		oss >> pt[2];
 		oss >> pt[3];
 
-		//regions ?
-		oss >> nbe;
+		//if regions are defined use this number
+		oss >> nbe; //ignored here
 
 //		CGoGNout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << CGoGNendl;
 
-		// Embed three vertices
+		// Embed three "base" vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-//			CGoGNout << "\t embedding number : " << pt[j];
-
 			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX, verticesID[pt[j]]);
+			map.foreach_dart_of_vertex(d,femb); //apply foreach for gmaps : cannot be included in the following loop
 
+			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
 			do
 			{
-				femb(dd);
-				//vecDartPtrEmb[pt[j]].push_back(dd);
 				vecDartsPerVertex[pt[j]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
 			} while(dd != d);
 
 			d = map.phi1(d);
-
-//			CGoGNout << " done" << CGoGNendl;
 		}
 
-		//Embed the last vertex
-//		CGoGNout << "\t embedding number : " << pt[3] << CGoGNendl;
+		//Embed the last "top" vertex
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX, verticesID[pt[3]]);
+		map.foreach_dart_of_vertex(d,femb); //apply foreach for gmaps : cannot be included in the following loop
+
+		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
 		do
 		{
-			femb(dd);
-//			CGoGNout << "embed" << CGoGNendl;
-			//vecDartPtrEmb[pt[3]].push_back(dd);
 			vecDartsPerVertex[pt[3]].push_back(dd);
 			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 
-//		CGoGNout << "end tetra" << CGoGNendl;
+		//end of tetra
 	}
 
 //	CGoGNout << "end 1/2" << CGoGNendl;

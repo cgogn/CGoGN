@@ -131,8 +131,8 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		std::stringstream oss(ligne);
 //		CGoGNout << "tetra number : " << nbe << CGoGNendl;
 
-		//Algo::Modelisation::Polyhedron<PFP>::createOrientedTetra(map);
-		Dart d = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(map,4);
+		//Algo::Modelisation::Polyhedron<PFP>::createTetra(map);
+		Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(map,4);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
