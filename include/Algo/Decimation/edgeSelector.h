@@ -287,7 +287,7 @@ public:
 			Algo::Geometry::computeNormalVertices<PFP>(m, pos, normal) ;
 		}
 
-		edgeangle = m.template getAttribute<REAL>(VERTEX, "edgeangle") ;
+		edgeangle = m.template getAttribute<REAL>(EDGE, "edgeangle") ;
 		if(!edgeangle.isValid())
 		{
 			edgeangle = m.template addAttribute<REAL>(EDGE, "edgeangle") ;
