@@ -423,7 +423,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 		if(m_map.closeHole(d,false))
 		{
 			d = m_map.phi2(d);
-			if(!m_map.isFaceTriangle(d))
+			if(m_map.faceDegree(d) > 3)
 			{
 				Algo::Modelisation::trianguleFace<PFP>(m_map,d);
 
@@ -452,7 +452,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 		if(m_map.closeHole(d,true))
 		{
 			d = m_map.phi2(d);
-			if(!m_map.isFaceTriangle(d))
+			if(m_map.faceDegree(d) > 3)
 			{
 				Algo::Modelisation::trianguleFace<PFP>(m_map,d);
 

@@ -31,7 +31,7 @@ namespace CGoGN
  *  To generate or delete faces in a 1-map
  *************************************************************************/
 
-Dart Map1::newCycle(unsigned nbEdges)
+Dart Map1::newCycle(unsigned int nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge
@@ -40,7 +40,7 @@ Dart Map1::newCycle(unsigned nbEdges)
 	return d ;
 }
 
-Dart Map1::newBoundaryCycle(unsigned nbEdges)
+Dart Map1::newBoundaryCycle(unsigned int nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge
@@ -66,7 +66,7 @@ void Map1::deleteCycle(Dart d)
  *  Topological operations on 1-maps
  *************************************************************************/
 
-void Map1::reverseFace(Dart d)
+void Map1::reverseCycle(Dart d)
 {
 	Dart e = phi1(d) ;			// Dart e is the first edge of the new face
 	if (e == d) return ;		// Only one edge: nothing to do
@@ -78,59 +78,10 @@ void Map1::reverseFace(Dart d)
 	while (dNext != d)
 	{
 		phi1unsew(d) ;			// Unsew the edge after d
-		phi1sew(e,dNext) ;		// Sew it after e (thus in reverse order)
+		phi1sew(e, dNext) ;		// Sew it after e (thus in reverse order)
 		dNext = phi1(d) ;
 	}
-	phi1sew(e,d) ;				// Sew the last edge
-}
-
-/*! @name Topological Queries
- *  Return or set various topological information
- *************************************************************************/
-
-bool Map1::sameOrientedFace(Dart d, Dart e)
-{
-	Dart dNext = d ;
-	do
-	{
-		if (dNext == e)
-			return true ;
-		dNext = phi1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
-}
-
-unsigned int Map1::faceDegree(Dart d)
-{
-	unsigned int count = 0 ;
-	Dart dNext = d ;
-	do
-	{
-		++count ;
-		dNext = phi1(dNext) ;
-	} while (dNext != d) ;
-	return count ;
-}
-
-bool Map1::isFaceTriangle(Dart d)
-{
-	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
-}
-
-/*! @name Cell Functors
- *  Apply functors to all darts of a cell
- *************************************************************************/
-
-bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	Dart dNext = d ;
-	do
-	{
-		if (f(dNext))
-			return true ;
-		dNext = phi1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
+	phi1sew(e, d) ;				// Sew the last edge
 }
 
 } // namespace CGoGN

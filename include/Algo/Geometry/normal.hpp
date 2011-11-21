@@ -69,7 +69,7 @@ typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const typename P
 template <typename PFP>
 typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	if(map.isFaceTriangle(d))
+	if(map.faceDegree(d) == 3)
 		return triangleNormal<PFP>(map, d, position) ;
 	else
 		return newellNormal<PFP>(map, d, position) ;

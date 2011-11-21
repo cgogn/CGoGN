@@ -111,7 +111,7 @@ public:
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newBoundaryCycle(unsigned nbEdges);
+	Dart newBoundaryCycle(unsigned int nbEdges);
 
 	//! Delete an oriented face erasing all its darts
 	/*! @param d a dart of the face
@@ -125,44 +125,43 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Cut an edge inserting a new dart between d and its successor in the face
+	//! Cut an edge inserting a new dart between d and its successor in the cycle
 	/*! @param d the edge to cut
 	 * \image hmtl map1_cutEdge.png
 	 */
 	void cutEdge(Dart d);
 
-	//! Collapse an edge of a face
+	//! Collapse an edge of a cycle
 	/*!  \warning Dart d no longer exists after the call
 	 *  @param d the edge
 	 */
 	void collapseEdge(Dart d);
 
-	//! Split a face between vertices d and e
+	//! Split a cycle between vertices d and e
 	/*! \pre Dart d and e MUST be different and belong to the same face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	void splitFace(Dart d, Dart e);
+	void splitCycle(Dart d, Dart e);
 
-	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
+	//! Merge two cycles on vertices d and e
+	/*! \pre Dart d and e MUST belong to distinct faces
+	 *  @param d a dart in the first face
+	 *  @param e a dart in the second face
+	 */
+	void mergeCycles(Dart d, Dart e);
+
+	//! Link two vertices belonging to distinct cycles (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	void linkVertices(Dart d, Dart e);
-
-	//! Merge the two faces of d and e, darts d & e disappear
-	/*! \pre Dart d and e MUST belong to distinct faces
-	 *  \warning Darts d and e no longer exist after the call
-	 *  @param d a dart in the first face
-	 *  @param e a dart in the second face
-	 */
-	void mergeFaces(Dart d, Dart e);
+	void linkCycles(Dart d, Dart e);
 
 	//! reverse a face (phi1 become phi_1 and ...)
 	/*! @param d a dart of face
 	 */
-	void reverseFace(Dart d) ;
+	void reverseCycle(Dart d) ;
 	//@}
 
 	/*! @name Topological Queries
@@ -170,29 +169,23 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Test if dart d and e belong to the same oriented face
+	//! Test if darts d and e belong to the same cycle
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
-	bool sameOrientedFace(Dart d, Dart e) ;
+	bool sameCycle(Dart d, Dart e) ;
 
-	//! Test if dart d and e belong to the same face
-	/*! @param d a dart
-	 *  @param e a dart
+	//! Length of a cycle (its number of oriented edges)
+	/*! @param d a dart of the cycle
+	 *  @return the length of the cycle
 	 */
-	bool sameFace(Dart d, Dart e) ;
-
-	//! Length of a face (its number of oriented edges)
-	/*! @param d a dart of the face
-	 *  @return the length of the face
-	 */
-	unsigned int faceDegree(Dart d) ;
+	unsigned int cycleDegree(Dart d) ;
 
 	/**
-	 * check if the face of d is a triangle
-	 * @return a boolean indicating if the face is a triangle
+	 * check if the cycle of d is a triangle
+	 * @return a boolean indicating if the cycle is a triangle
 	 */
-	bool isFaceTriangle(Dart d);
+	bool isCycleTriangle(Dart d);
 	//@}
 
 	/*! @name Cell Functors
@@ -204,33 +197,37 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of an edge
 	/*! @param d a dart of the edge
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of an oriented face
 	/*! @param d a dart of the face
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread=0) ;
+	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread=0);
+	//! Apply a functor on every dart of a face
+	/*! @param d a dart of the face
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a connected component
-	/*! @param d a dart of the onnected component
+	/*! @param d a dart of the connected component
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
 	//@}
 } ;
 

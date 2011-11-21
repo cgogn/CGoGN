@@ -99,15 +99,15 @@ protected:
 	 *  Function used to merge boundary faces properly
 	 *************************************************************************/
 
-	//! merge a face that has been tag as boundary with existing boundary if needed
-	/*  @param d a dart of the face
-	 */
-	void mergeFaceWithBoundary(Dart d);
+//	/**
+//	 * merge two faces of boundary
+//	 */
+//	void mergeBoundaryFaces(Dart dd, Dart ee);
 
-	/**
-	 * merge two faces of boundary
-	 */
-	void mergeBoundaryFaces(Dart dd, Dart ee);
+//	//! merge a face that has been tag as boundary with existing boundary if needed
+//	/*  @param d a dart of the face
+//	 */
+//	void mergeFaceWithBoundary(Dart d);
 
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
@@ -122,14 +122,18 @@ public:
 	 *  @param withBoudary create the face and its boundary (default true)
 	 *  @return return a dart of the face
 	 */
-	virtual Dart newFace(unsigned int nbEdges, bool withBoundary=true) ;
+	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
 
-	//! Delete an oriented face erasing all its darts (not really tags as boundary).
-	/*! The phi2-links around the face are removed
-	 *  @param d a dart of the face
+	//! Delete the face of d
+	/*! @param d a dart of the face
 	 */
 	virtual void deleteFace(Dart d) ;
 
+	//! Fill a hole with a face
+	/*! \pre Dart d is boundary marked
+	 *  @param d a dart of the face to fill
+	 */
+	virtual void fillHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -151,13 +155,6 @@ public:
 	 * @return true if the deletion has been executed, false otherwise
 	 */
 	virtual bool deleteVertex(Dart d);
-
-	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
-	/*! \pre Dart d and e MUST be different and belong to distinct face
-	 *  @param d first dart in the face
-	 *  @param e second dart in the face
-	 */
-	virtual void linkVertices(Dart d, Dart e); //TODO remove ??
 
 	//! Cut the edge of d by inserting a new vertex
 	/*! @param d a dart of the edge to cut
@@ -198,27 +195,28 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d);
 
-	//! Insert an edge after a dart in the vertex orbit
-	/*! \pre Dart d and e MUST be different and belong to distinct face
-	 *  \pre Dart e must be phi2-linked with its phi_1 dart
-	 *  @param d dart of the vertex
-	 *  @param e dart of the edge
-	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
-
-	//! Remove an edge from a vertex orbit
-	/*! \pre Dart d must be phi2 sewn
-	 *  @param d the dart of the edge to remove from the vertex
-	 */
-	virtual void removeEdgeFromVertex(Dart d);
+//	//! Insert an edge after a dart in the vertex orbit
+//	/*! \pre Dart d and e MUST be different and belong to distinct face
+//	 *  \pre Dart e must be phi2-linked with its phi_1 dart
+//	 *  @param d dart of the vertex
+//	 *  @param e dart of the edge
+//	 */
+//	virtual void insertEdgeInVertex(Dart d, Dart e);
+//
+//	//! Remove an edge from a vertex orbit
+//	/*! \pre Dart d must be phi2 sewed
+//	 *  @param d the dart of the edge to remove from the vertex
+//	 * @return true if the removal has been executed, false otherwise
+//	 */
+//	virtual bool removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Edges of darts d & e MUST be boundary edges
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
-	 *  @param withBoundary: face have no fixed points (false only for construction: import/primitives)
+	 *  @param withBoundary: if false, faces have phi2 fixed points (only for construction: import/primitives)
 	 */
-	virtual void sewFaces(Dart d, Dart e, bool withBoundary=true);
+	virtual void sewFaces(Dart d, Dart e, bool withBoundary = true);
 
 	//! Unsew two oriented faces along oriented edges
 	 /*! @param d a dart of one face
@@ -262,18 +260,10 @@ public:
 	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
 
 	/**
-	 * Unsew the faces consisting of the umbrella of a vertex
-	 * \warning Darts may have
+	 * Unsew the faces of the umbrella of the vertex of d
 	 * @param d a dart from the vertex
 	 */
 	void unsewAroundVertex(Dart d) ;
-
-	/**
-	 * Unsew the Umbrella aroud a vertex, close the hole and then
-	 * create a symetric to construct a polyedron
-	 * @param d a dart from the vertex
-	 */
-//	void explodPolyhedron(Dart d);	//TODO modification for new boundary managing method ???
 
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
@@ -311,10 +301,21 @@ public:
 	 */
 	bool sameVertex(Dart d, Dart e) ;
 
+	//! Test if dart d and e belong to the same face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameFace(Dart d, Dart e) ;
+
 	/**
 	 * compute the number of edges of the vertex of d
 	 */
 	unsigned int vertexDegree(Dart d) ;
+
+	/**
+	 * compute the number of edges of the face of d
+	 */
+	unsigned int faceDegree(Dart d) ;
 
 	/**
 	 * compute the number of faces in the volume of d
@@ -420,7 +421,7 @@ public:
 	 *  @param forboundary tag the created face as boundary (default is true)
 	 *  @return the degree of the created face
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary=true);
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
 	//! Close the map removing topological holes: DO NOT USE, only for import algorithm
 	/*! Add faces to the map that close every existing hole.

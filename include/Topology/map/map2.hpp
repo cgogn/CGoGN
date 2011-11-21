@@ -101,47 +101,10 @@ inline Dart Map2::alpha1(Dart d)
 	return phi2(phi_1(d)) ;
 }
 
-// alpha1 avec bord: bye bye
-//inline Dart Map2::alpha1(Dart d)
-//{
-//	Dart e = phi_1(d);
-//	Dart f = phi2(e);
-//
-//	if (f != e)
-//		return f;
-//
-//	f = d;
-//	e = phi2(f);
-//	while (e != f)
-//	{
-//		f = phi1(e);
-//		e = phi2(f);
-//	}
-//	return f;
-//}
-
 inline Dart Map2::alpha_1(Dart d)
 {
 	return phi1(phi2(d)) ;
 }
-
-// alpha_1 avec bord : bye bye !!
-//inline Dart Map2::alpha_1(Dart d)
-//{
-//	Dart e = phi2(d);
-//
-//	if (e != d)
-//		return phi1(e);
-//
-//	e = d;
-//	Dart f = phi_1(d);
-//	while (phi2(f) != f)
-//	{
-//		e = phi2(f);
-//		f = phi_1(e);
-//	}
-//	return e;
-//}
 
 inline void Map2::phi2sew(Dart d, Dart e)
 {
@@ -158,7 +121,6 @@ inline void Map2::phi2unsew(Dart d)
 	(*m_phi2)[e.index] = e ;
 }
 
-
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
@@ -166,6 +128,16 @@ inline void Map2::phi2unsew(Dart d)
 inline bool Map2::sameVertex(Dart d, Dart e)
 {
 	return sameOrientedVertex(d, e) ;
+}
+
+inline bool Map2::sameFace(Dart d, Dart e)
+{
+	return Map1::sameCycle(d, e) ;
+}
+
+inline unsigned int Map2::faceDegree(Dart d)
+{
+	return Map1::cycleDegree(d) ;
 }
 
 /*! @name Cell Functors

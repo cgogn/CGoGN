@@ -630,33 +630,14 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
 {
 	TraversorCell<GenericMap> trav(*this, orbit, good, thread);
-	bool found = false;									// Store the result
+	bool found = false;
 
 	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
 	{
-		if ((fonct)(d))					// Apply functor
+		if ((fonct)(d))
 			found = true;
 	}
 	return found;
-
-//	DartMarker marker(*this, thread);	// Lock a marker
-//	bool found = false;					// Store the result
-//
-//	// Scan all darts of the map
-//	for (Dart d = begin(); !found && d != end(); next(d))
-//	{
-//		if (good(d))							// If d is selected
-//		{
-//			if (!marker.isMarked(d))			// If d is in a not yet visited cell
-//			{
-//				if ((fonct)(d))					// Apply functor
-//					found = true;
-//				else
-//					marker.markOrbit(orbit, d);	// Mark the cell as visited
-//			}
-//		}
-//	}
-//	return found;
 }
 
 unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& good)
@@ -669,28 +650,27 @@ unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& go
 void GenericMap::viewAttributesTables()
 {
 	std::cout << "======================="<< std::endl;
-	for (unsigned int i=0; i< NB_ORBITS; ++i)
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
-		std::cout << "ATTRIBUTE_CONTAINER "<<i<< std::endl;
+		std::cout << "ATTRIBUTE_CONTAINER " << i << std::endl;
 		AttributeContainer& cont = m_attribs[i] ;
 
 		// get the list of attributes
 		std::vector<std::string> listeNames;
 		cont.getAttributesNames(listeNames);
-		for (std::vector<std::string>::iterator it=listeNames.begin(); it!=listeNames.end(); ++it)
-			std::cout<< "    " << *it << std::endl;
-		std::cout << "-------------------------"<< std::endl;
+		for (std::vector<std::string>::iterator it = listeNames.begin(); it != listeNames.end(); ++it)
+			std::cout << "    " << *it << std::endl;
+		std::cout << "-------------------------" << std::endl;
 	}
-	std::cout << "m_embeddings: "<<std::hex;
-	for (unsigned int i=0; i< NB_ORBITS; ++i)
+	std::cout << "m_embeddings: " << std::hex;
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		std::cout << (long)(m_embeddings[i]) << " / ";
-	std::cout << std::endl<< "-------------------------"<< std::endl;
+	std::cout << std::endl << "-------------------------" << std::endl;
 
 	std::cout << "m_markTables: ";
-	for (unsigned int i=0; i< NB_ORBITS; ++i)
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		std::cout << (long)(m_markTables[i][0]) << " / ";
-	std::cout << std::endl<< "-------------------------"<< std::endl<< std::dec;
-
+	std::cout << std::endl << "-------------------------" << std::endl << std::dec;
 }
 
 void GenericMap::boundaryMark(Dart d)
@@ -708,13 +688,11 @@ bool GenericMap::isBoundaryMarked(Dart d)
 	return m_markTables[DART][0]->operator[](d.index).testMark(m_boundaryMarker);
 }
 
-
 void GenericMap::boundaryMarkOrbit(unsigned int orbit, Dart d)
 {
 	FunctorMark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
 	foreach_dart_of_orbit(orbit, d, fm, 0) ;
 }
-
 
 void GenericMap::boundaryUnmarkOrbit(unsigned int orbit, Dart d)
 {
@@ -722,14 +700,11 @@ void GenericMap::boundaryUnmarkOrbit(unsigned int orbit, Dart d)
 	foreach_dart_of_orbit(orbit, d, fm, 0) ;
 }
 
-
 void GenericMap::boundaryUnmarkAll()
 {
 	AttributeContainer& cont = getAttributeContainer(DART) ;
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
 }
-
-
 
 } // namespace CGoGN

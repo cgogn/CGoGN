@@ -51,7 +51,7 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if(map.isFaceTriangle(d))
+	if(map.faceDegree(d) == 3)
 		return triangleArea<PFP>(map, d, position) ;
 	else
 	{
