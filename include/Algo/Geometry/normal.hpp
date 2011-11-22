@@ -145,7 +145,7 @@ void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& po
 }
 
 template <typename PFP>
-typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -175,7 +175,7 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 }
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select, unsigned int thread)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select, unsigned int thread)
 {
 	CellMarker me(map, EDGE, thread) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))

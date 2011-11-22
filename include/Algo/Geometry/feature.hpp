@@ -164,8 +164,8 @@ std::vector<typename PFP::VEC3> featureLinesDetection(typename PFP::MAP& map, co
 		{
 			mf.mark(d) ;
 			Dart v1 = d ;
-			Dart v2 = myMap.phi1(d) ;
-			Dart v3 = myMap.phi_1(d) ;
+			Dart v2 = map.phi1(d) ;
+			Dart v3 = map.phi_1(d) ;
 			VEC3 v3v2 = position[v3] - position[v2] ;
 			VEC3 v1v3 = position[v1] - position[v3] ;
 			VEC3 v2v1 = position[v2] - position[v1] ;
@@ -178,6 +178,31 @@ std::vector<typename PFP::VEC3> featureLinesDetection(typename PFP::MAP& map, co
 			kminGrad[d] = g2 ;
 		}
 	}
+
+	AttributeHandler<VEC3> Ekmax = map.template addAttribute<VEC3>(VERTEX, "kmaxGradV") ;
+	AttributeHandler<VEC3> Ekmin = map.template addAttribute<VEC3>(VERTEX, "kminGradV") ;
+
+	CellMarker mv(map, VERTEX) ;
+	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if(!mv.isMarked(d))
+		{
+			mv.mark(d) ;
+			REAL res = 0 ;
+			REAL sumArea = 0 ;
+			Dart it = d ;
+			do
+			{
+				REAL area = Algo::Geometry::triangleArea<PFP>(map, it, position) ;
+				res += area * (kmaxGrad[it] * Kmax[d]) ;
+				sumArea += area ;
+				it = map.alpha1(it) ;
+			} while(it != d) ;
+			res /= sumArea ;
+		}
+	}
+
+	return featureLines ;
 }
 
 } // namespace Geometry
