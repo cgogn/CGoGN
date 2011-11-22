@@ -240,6 +240,12 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param fonct the functor
 	 */
+	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread=0);
+
+	//! Apply a functor on each dart of a vertex
+	/*! @param d a dart of the vertex
+	 *  @param fonct the functor
+	 */
 	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread=0);
 
 	//! Apply a functor on each dart of an edge

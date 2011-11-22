@@ -664,33 +664,4 @@ bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 	return found;
 }
 
-bool GMap2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
-{
-	if(orbit == VERTEX)
-	{
-		Dart dNext = d;
-		do
-		{
-			if(GMap2::foreach_dart_of_edge(phi1(dNext),f,thread))
-				return true;
-
-			dNext = alpha1(dNext);
-		} while (dNext != d);
-
-		return false;
-	}
-	else if(orbit == FACE)
-	{
-		if(GMap2::foreach_dart_of_vertex(phi_1(d),f,thread))
-			return true;
-
-		if(GMap2::foreach_dart_of_vertex(phi_1(phi2(d)),f,thread))
-			return true;
-
-		return false;
-	}
-
-	return false;
-}
-
 } // namespace CGoGN

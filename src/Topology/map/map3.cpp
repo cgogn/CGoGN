@@ -91,11 +91,13 @@ bool Map3::deleteVertex(Dart d)
 		}
 	}
 
+
 	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
 	{
 		if(!mergeVolumes(*it))
 			return false;
 	}
+
 
 	return true;
 }
@@ -535,7 +537,7 @@ bool Map3::check()
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+bool Map3::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value

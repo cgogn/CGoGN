@@ -67,8 +67,8 @@ template <typename PFP>
 Dart Primitive3D<PFP>::HexaGrid1Topo(int nx)
 {
 	// first cube
-	Dart d0 = createOrientedHexa();
-	m_tableVertDarts.push_back(d0);
+	Dart d0 = createOrientedHexa(); //return a dart from the base of the cube
+	m_tableVertDarts.push_back(d0); //push_back darts frome the base of cubes
 	Dart d1 = m_map.template phi<2112>(d0);
 
 	for (int i=1; i< nx; ++i)
@@ -80,7 +80,7 @@ Dart Primitive3D<PFP>::HexaGrid1Topo(int nx)
 	}
 
 	// add last vertex (x=nx)
-	d1 = m_map.phi2(d1);
+	d1 = m_map.phi2(d1); //TODO can take phi1 instead > same vertex ??
 	m_tableVertDarts.push_back(d1);
 
 	return d0;

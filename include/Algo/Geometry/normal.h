@@ -40,10 +40,16 @@ template <typename PFP>
 typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
+typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+
+template <typename PFP>
 typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
 typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+
+template <typename PFP>
+typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
 void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread = 0) ;

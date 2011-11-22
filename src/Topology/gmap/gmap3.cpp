@@ -500,6 +500,46 @@ bool GMap3::check()
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
+bool GMap3::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
+{
+	DartMarkerStore mv(*this,thread);	// Lock a marker
+	bool found = false;					// Last functor return value
+
+	std::vector<Dart> darts_list;			//Darts that are traversed
+	darts_list.reserve(512);
+	darts_list.push_back(d);			//Start with the dart d
+	mv.mark(d);
+
+	for(std::vector<Dart>::iterator darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+	{
+		Dart dc = *darts;
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(dc);
+		if(d2 != dc)
+		{
+			Dart d21 = phi1(d2); // turn in volume
+			Dart d23 = phi3(d2); // change volume
+
+			if(!mv.isMarked(d21))
+			{
+				darts_list.push_back(d21);
+				mv.mark(d21);
+			}
+
+			if((d23!=d2) && !mv.isMarked(d23))
+			{
+				darts_list.push_back(d23);
+				mv.mark(d23);
+			}
+		}
+
+		found = f(dc);
+	}
+
+	return found;
+}
+
 bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mv(*this,thread);	// Lock a marker

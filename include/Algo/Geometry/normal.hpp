@@ -117,6 +117,40 @@ typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename P
 }
 
 template <typename PFP>
+typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+{
+	assert(map.dimension() == 3);
+
+	typedef typename PFP::VEC3 VEC3 ;
+
+	VEC3 N(0) ;
+	std::vector<Dart> faces;
+	CellMarker f(map,FACE);
+
+	FunctorStore fs(faces);
+	map.foreach_dart_of_oriented_vertex(d,fs);
+
+	for(std::vector<Dart>::iterator it = faces.begin() ; it != faces.end() ; ++it)
+	{
+		if(!f.isMarked(*it) && map.phi3(*it)==*it)
+		{
+			f.mark(*it);
+			VEC3 n = faceNormal<PFP>(map, *it, position);
+			if(!n.hasNan())
+			{
+				VEC3 v1 = vectorOutOfDart<PFP>(map, *it, position);
+				VEC3 v2 = vectorOutOfDart<PFP>(map, map.phi_1(*it), position);
+				n *= convexFaceArea<PFP>(map, *it, position) / (v1.norm2() * v2.norm2());
+				N += n ;
+			}
+		}
+	}
+
+	N.normalize() ;
+	return N ;
+}
+
+template <typename PFP>
 void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select, unsigned int thread)
 {
 	CellMarker marker(map, FACE,thread);

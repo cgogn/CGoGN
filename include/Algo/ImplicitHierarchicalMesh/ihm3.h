@@ -36,11 +36,11 @@ namespace Algo
 namespace IHM
 {
 
-template<typename T> class AttributeHandler_IHM ;
+//template<typename T> class AttributeHandler_IHM ;
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
-	template<typename T> friend class AttributeHandler_IHM ;
+	//template<typename T> friend class AttributeHandler_IHM ;
 
 public:
 	unsigned int m_curLevel ;
@@ -65,11 +65,11 @@ public:
 	 *             ATTRIBUTES MANAGEMENT               *
 	 ***************************************************/
 
-	template <typename T>
-	AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	//template <typename T>
+	//AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
-	template <typename T>
-	AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	//template <typename T>
+	//AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
 
 	/***************************************************
@@ -116,15 +116,6 @@ public:
 
 	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
-
-	/****************************************************
-	 * 				EMBEDDED FUNCTIONS					*
-	 ****************************************************/
-//	virtual void cutEdge(Dart d);
-//
-//	virtual void splitFace(Dart d, Dart e);
-//
-//	virtual void sewVolumes(Dart d, Dart e);
 
 	/***************************************************
 	 *              LEVELS MANAGEMENT                  *
@@ -278,42 +269,42 @@ public:
 	bool coarsenNeighborhoodLevelDiffersByOne(Dart d);
 } ;
 
-template <typename T>
-class AttributeHandler_IHM : public AttributeHandler<T>
-{
-public:
-	typedef T DATA_TYPE ;
-
-	AttributeHandler_IHM() : AttributeHandler<T>()
-	{}
-
-	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
-	{}
-
-	AttributeMultiVector<T>* getDataVector() const
-	{
-		return AttributeHandler<T>::getDataVector() ;
-	}
-
-	bool isValid() const
-	{
-		return AttributeHandler<T>::isValid() ;
-	}
-
-	T& operator[](Dart d) ;
-
-	const T& operator[](Dart d) const ;
-
-	T& operator[](unsigned int a)
-	{
-		return AttributeHandler<T>::operator[](a) ;
-	}
-
-	const T& operator[](unsigned int a) const
-	{
-		return AttributeHandler<T>::operator[](a) ;
-	}
-} ;
+//template <typename T>
+//class AttributeHandler_IHM : public AttributeHandler<T>
+//{
+//public:
+//	typedef T DATA_TYPE ;
+//
+//	AttributeHandler_IHM() : AttributeHandler<T>()
+//	{}
+//
+//	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
+//	{}
+//
+//	AttributeMultiVector<T>* getDataVector() const
+//	{
+//		return AttributeHandler<T>::getDataVector() ;
+//	}
+//
+//	bool isValid() const
+//	{
+//		return AttributeHandler<T>::isValid() ;
+//	}
+//
+//	T& operator[](Dart d) ;
+//
+//	const T& operator[](Dart d) const ;
+//
+//	T& operator[](unsigned int a)
+//	{
+//		return AttributeHandler<T>::operator[](a) ;
+//	}
+//
+//	const T& operator[](unsigned int a) const
+//	{
+//		return AttributeHandler<T>::operator[](a) ;
+//	}
+//} ;
 
 } //namespace IHM
 
