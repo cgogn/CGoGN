@@ -507,6 +507,7 @@ bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
 	}
 
 	std::cout << "subdNeighborhood = " << subdNeighborhood << std::endl;
+	std::cout << "faceCanBeCoarsened ? " << (subd && !subdNeighborhood && subdOnce) << std::endl;
 
 	return subd && !subdNeighborhood && subdOnce;
 }

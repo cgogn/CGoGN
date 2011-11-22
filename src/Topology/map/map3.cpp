@@ -91,11 +91,13 @@ bool Map3::deleteVertex(Dart d)
 		}
 	}
 
+
 	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
 	{
 		if(!mergeVolumes(*it))
 			return false;
 	}
+
 
 	return true;
 }

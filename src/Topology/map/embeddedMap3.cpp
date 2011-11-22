@@ -143,6 +143,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 			copyDartEmbedding(VOLUME, phi2(phi1(d3)), d3);
 		}
 	}
+
 }
 
 void EmbeddedMap3::sewVolumes(Dart d, Dart e)
@@ -301,39 +302,6 @@ bool EmbeddedMap3::check()
 			}
 		}
 
-//			if (phi2(phi_1(d)) != phi_1(d) && getEmbedding(VERTEX, d) != getEmbedding(VERTEX, phi2(phi_1(d))))
-//			{
-//				std::cout << "Check: different embeddings on vertex" << std::endl ;
-//				return false ;
-//			}
-//
-//			 if(phi3(d) != d && getEmbedding(VERTEX, d) != getEmbedding(VERTEX, phi1(phi3(d))))
-//			 {
-//					std::cout << "Check: different embeddings on vertex in the 2 oriented faces" << std::endl ;
-//					std::cout << "Dart #" << d << std::endl;
-//					std::cout << "Emb(d) = " << getEmbedding(VERTEX, d) << std::endl;
-//					std::cout << "Emb(phi32(d)) = " << getEmbedding(VERTEX, phi3(phi2(d))) << std::endl;
-//					return false ;
-//			 }
-
-
-//		if (isOrbitEmbedded(EDGE))
-//		{
-//			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, phi2(d)))
-//			{
-//				std::cout << "Check: different embeddings on edge" << std::endl ;
-//				return false ;
-//			}
-//		}
-//
-//		if (isOrbitEmbedded(FACE))
-//		{
-//			if (getEmbedding(FACE, d) != getEmbedding(FACE, phi1(d)))
-//		{
-//				std::cout << "Check: different embeddings on face" << std::endl ;
-//				return false ;
-//			}
-//		}
 	}
 	std::cout << "Check: embedding ok" << std::endl ;
 	return true ;
