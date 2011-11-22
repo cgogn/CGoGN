@@ -39,7 +39,7 @@ namespace Geometry
 
 // Normalize the average length of given attribute
 template <typename PFP>
-typename PFP::REAL normalizeLength(typename PFP::MAP & the_map, typename PFP::TVEC3 & m_attr, const typename PFP::REAL scale = 1.0, const FunctorSelect & good = SelectorTrue()) {
+typename PFP::REAL normalizeLength(typename PFP::MAP & the_map, typename PFP::TVEC3 & m_attr, const typename PFP::REAL scale = 1.0, const FunctorSelect & good = allDarts) {
 	typename PFP::REAL sum = 0 ;
 	int count = 0 ;
 

@@ -81,7 +81,6 @@ public:
 
 	//Manip Carte
 	MAP myMap ;
-	SelectorTrue allDarts ;
 	TVEC3 position;
 	Dart dglobal;
 

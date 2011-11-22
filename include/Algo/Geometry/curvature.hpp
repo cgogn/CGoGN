@@ -24,7 +24,8 @@
 
 #include "Algo/Geometry/localFrame.h"
 #include "Geometry/matrix.h"
-#include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 #include "Algo/Selection/collector.h"
 
 extern "C"
@@ -55,15 +56,9 @@ void computeCurvatureVertices_QuadraticFitting(
 	typename PFP::TVEC3& Kmin,
 	const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			computeCurvatureVertex_QuadraticFitting<PFP>(map, d, position, normal, kmax, kmin, Kmax, Kmin) ;
-		}
-	}
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		computeCurvatureVertex_QuadraticFitting<PFP>(map, d, position, normal, kmax, kmin, Kmax, Kmin) ;
 }
 
 template <typename PFP>
@@ -129,22 +124,14 @@ void vertexQuadraticFitting(
 	LinearSolver<CPUSolverTraits> solver(5) ;
 	solver.set_least_squares(true) ;
 	solver.begin_system() ;
-	Dart it = dart ;
-	do
+	Traversor2VVaE<typename PFP::MAP> tav(map, dart) ;
+	for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 	{
-		// 1-ring vertices
-		typename PFP::VEC3 v = position[map.phi2(it)] ;
+		typename PFP::VEC3 v = position[it] ;
 		quadraticFittingAddVertexPos<PFP>(v, p, localFrame, solver) ;
-		typename PFP::VEC3 n = normal[map.phi2(it)] ;
+		typename PFP::VEC3 n = normal[it] ;
 		quadraticFittingAddVertexNormal<PFP>(v, n, p, localFrame, solver) ;
-		// 2-ring vertices
-//		Dart d2 = map.phi1(map.phi1(map.phi2(map.phi1(it)))) ;
-//		VEC3 v2 = position[d2] ;
-//		quadricFittingAddVertexPos(v2, p, localFrame, solver) ;
-//		VEC3 n2 = normal[d2] ;
-//		quadricFittingAddVertexNormal(v2, n2, p, localFrame, solver) ;
-		it = map.phi1( map.phi2(it)) ;
-	} while (it != dart) ;
+	}
 	solver.end_system() ;
 	solver.solve() ;
 
@@ -208,23 +195,15 @@ void vertexCubicFitting(Dart dart, gmtl::Vec3f& normal, float& a, float& b, floa
 	solverC->reset(false) ;
 	solverC->set_least_squares(true) ;
 	solverC->begin_system() ;
-	Dart it = dart ;
-	do
+	Traversor2VVaE<typename PFP::MAP> tav(map, dart) ;
+	for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 	{
 		// 1-ring vertices
-		gmtl::Vec3f v = m_map.getVertexEmb(m_map.phi2(it))->getPosition() ;
+		gmtl::Vec3f v = m_map.getVertexEmb(it)->getPosition() ;
 		cubicFittingAddVertexPos(v,p,localFrame) ;
-		gmtl::Vec3f n = m_normalsV[m_map.getVertexEmb(m_map.phi2(it))->getLabel()] ;
+		gmtl::Vec3f n = m_normalsV[m_map.getVertexEmb(it)->getLabel()] ;
 		cubicFittingAddVertexNormal(v,n,p,localFrame) ;
-		// 2-ring vertices
-//		Dart d2 = m_map.phi1(m_map.phi1(m_map.phi2(m_map.phi1(it)))) ;
-//		gmtl::Vec3f v2 = m_map.getVertexEmb(d2)->getPosition() ;
-//		cubicFittingAddVertexPos(v2,p,localFrame) ;
-//		gmtl::Vec3f n2 = m_normalsV[m_map.getVertexEmb(d2)->getLabel()] ;
-//		cubicFittingAddVertexNormal(v2,n2,p,localFrame) ;
-
-		it = m_map.phi1( m_map.phi2(it)) ;
-	} while (it != dart) ;
+	}
 	solverC->end_system() ;
 	solverC->solve() ;
 	a = solverC->variable(0).value() ;
@@ -310,17 +289,11 @@ void computeCurvatureVertices_NormalCycles(
 	typename PFP::TVEC3& Kmax,
 	typename PFP::TVEC3& Kmin,
 	typename PFP::TVEC3& Knormal,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
-		}
-	}
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
 }
 
 template <typename PFP>

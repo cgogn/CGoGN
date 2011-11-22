@@ -52,7 +52,7 @@ template <typename PFP>
 typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread = 0) ;
+void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 /**
  * compute normals of  vertices
@@ -63,13 +63,13 @@ void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& posit
  * @ param th the thread number
  */
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue(), unsigned int thread = 0) ;
+void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position) ;
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select = SelectorTrue(), unsigned int thread = 0) ;
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 } // namespace Geometry
 

@@ -143,6 +143,16 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
+	 */
+	virtual void cutEdge(Dart d);
+
+	//! Uncut the edge of d
+	/*! @param d a dart of the edge to uncut
+	 */
+	virtual bool uncutEdge(Dart d);
+
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same length
 	 *  @param d a dart of the first volume

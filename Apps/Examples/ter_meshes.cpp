@@ -119,10 +119,6 @@ int main(int argc, char **argv)
 	// declaration of the map
 	PFP::MAP myMap;
 
-	// this selector is going to select all the darts
-	SelectorTrue allDarts;
-
-
 	std::vector<std::string> attrNames ;
 	if(!Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames))
 	{

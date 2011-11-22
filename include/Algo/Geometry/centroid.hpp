@@ -22,6 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
@@ -98,13 +100,12 @@ EMB faceCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 {
 	EMB center = AttribOps::zero<EMB,PFP>();
 	unsigned int count = 0 ;
-	Dart it = d ;
-	do
+	Traversor2FV<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
 	{
 		center += attributs[it];
 		++count ;
-		it = map.phi1(it) ;
-	} while(it != d) ;
+	}
 	center /= double(count);
 	return center ;
 }
@@ -114,13 +115,12 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
 {
 	EMB center = AttribOps::zero<EMB,PFP>();
 	unsigned int count = 0 ;
-	Dart it = d ;
-	do
+	Traversor2VVaE<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
 	{
-		center += attributs[map.phi1(it)];
+		center += attributs[it];
 		++count ;
-		it = map.alpha1(it) ;
-	} while(it != d) ;
+	}
 	center /= count ;
 	return center ;
 }
@@ -128,43 +128,25 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vol_centroid, const FunctorSelect& select)
 {
-	CellMarker marker(map, VOLUME) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			vol_centroid[d] = volumeCentroid<PFP>(map, d, position) ;
-		}
-	}
+	TraversorW<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		vol_centroid[d] = volumeCentroid<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_centroid, const FunctorSelect& select)
 {
-	CellMarker marker(map, FACE) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			face_centroid[d] = faceCentroid<PFP>(map, d, position) ;
-		}
-	}
+	TraversorF<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		face_centroid[d] = faceCentroid<PFP>(map, d, position) ;
 }
 
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vertex_centroid, const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			vertex_centroid[d] = vertexNeighborhoodCentroid<PFP>(map, d, position) ;
-		}
-	}
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		vertex_centroid[d] = vertexNeighborhoodCentroid<PFP>(map, d, position) ;
 }
 
 } // namespace Geometry

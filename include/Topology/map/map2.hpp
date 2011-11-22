@@ -96,57 +96,15 @@ inline Dart Map2::alpha0(Dart d)
 	return phi2(d) ;
 }
 
-#ifdef NO_BOUND_MAP
 inline Dart Map2::alpha1(Dart d)
 {
 	return phi2(phi_1(d)) ;
 }
-#else
-// alpha1 avec bord
-inline Dart Map2::alpha1(Dart d)
-{
-	Dart e = phi_1(d);
-	Dart f = phi2(e);
 
-	if (f != e)
-		return f;
-
-	f = d;
-	e = phi2(f);
-	while (e != f)
-	{
-		f = phi1(e);
-		e = phi2(f);
-	}
-	return f;
-}
-#endif
-
-#ifdef NO_BOUND_MAP
 inline Dart Map2::alpha_1(Dart d)
 {
 	return phi1(phi2(d)) ;
 }
-
-#else
-// alpha_1 avec bord
-inline Dart Map2::alpha_1(Dart d)
-{
-	Dart e = phi2(d);
-
-	if (e != d)
-		return phi1(e);
-
-	e = d;
-	Dart f = phi_1(d);
-	while (phi2(f) != f)
-	{
-		e = phi2(f);
-		f = phi_1(e);
-	}
-	return e;
-}
-#endif
 
 inline void Map2::phi2sew(Dart d, Dart e)
 {
@@ -163,15 +121,6 @@ inline void Map2::phi2unsew(Dart d)
 	(*m_phi2)[e.index] = e ;
 }
 
-/*! @name Generator and Deletor
- *  To generate or delete faces in a 2-map
- *************************************************************************/
-
-inline void Map2::deleteFace(Dart d)
-{
-	deleteOrientedFace(d) ;
-}
-
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
@@ -179,6 +128,21 @@ inline void Map2::deleteFace(Dart d)
 inline bool Map2::sameVertex(Dart d, Dart e)
 {
 	return sameOrientedVertex(d, e) ;
+}
+
+inline bool Map2::sameEdge(Dart d, Dart e)
+{
+	return d == e || phi2(d) == e ;
+}
+
+inline bool Map2::sameFace(Dart d, Dart e)
+{
+	return Map1::sameCycle(d, e) ;
+}
+
+inline unsigned int Map2::faceDegree(Dart d)
+{
+	return Map1::cycleDegree(d) ;
 }
 
 inline bool Map2::sameVolume(Dart d, Dart e)

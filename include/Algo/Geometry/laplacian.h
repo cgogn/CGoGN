@@ -27,10 +27,6 @@
 
 #include "Geometry/basic.h"
 
-#include "OpenNL/linear_solver.h"
-#include "OpenNL/sparse_matrix.h"
-#include "OpenNL/full_vector.h"
-
 namespace CGoGN
 {
 
@@ -59,7 +55,7 @@ void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
 	const AttributeHandler<ATTR_TYPE>& attr,
 	AttributeHandler<ATTR_TYPE>& laplacian,
-	const FunctorSelect& select = SelectorTrue()) ;
+	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
@@ -68,7 +64,7 @@ void computeLaplacianCotanVertices(
 	const typename PFP::TREAL& vertexArea,
 	const AttributeHandler<ATTR_TYPE>& attr,
 	AttributeHandler<ATTR_TYPE>& laplacian,
-	const FunctorSelect& select = SelectorTrue()) ;
+	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
 typename PFP::REAL computeCotanWeightEdge(
@@ -81,7 +77,7 @@ void computeCotanWeightEdges(
 	typename PFP::MAP& map,
 	const typename PFP::TVEC3& position,
 	typename PFP::TREAL& edgeWeight,
-	const FunctorSelect& select = SelectorTrue()) ;
+	const FunctorSelect& select = allDarts) ;
 
 } // namespace Geoemtry
 

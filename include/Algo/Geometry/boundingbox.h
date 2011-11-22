@@ -27,7 +27,7 @@
 
 #include "Geometry/basic.h"
 #include "Geometry/bounding_box.h"
-#include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorCell.h"
 
 namespace CGoGN
 {
@@ -39,20 +39,12 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = SelectorTrue())
+Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = allDarts)
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
-
-	CellMarker vmarker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !vmarker.isMarked(d))
-		{
-			vmarker.mark(d);
-			bb.addPoint(position[d]) ;
-		}
-	}
-
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		bb.addPoint(position[d]) ;
 	return bb ;
 }
 

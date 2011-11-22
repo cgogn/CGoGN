@@ -27,6 +27,8 @@
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/marker.h"
+
+#include "Container/attributeMultiVector.h"
 #include <vector>
 
 namespace CGoGN
@@ -61,19 +63,133 @@ public:
 	FunctorSelect() {}
 	virtual ~FunctorSelect() {}
 	virtual bool operator()(Dart d) const = 0 ;
+	virtual FunctorSelect* copy() const = 0;
 };
 
 class SelectorTrue : public FunctorSelect
 {
 public:
 	bool operator()(Dart) const { return true; }
+	FunctorSelect* copy() const { return new SelectorTrue();}
+
 };
 
 class SelectorFalse : public FunctorSelect
 {
 public:
 	bool operator()(Dart) const { return false; }
+	FunctorSelect* copy() const { return new SelectorFalse();}
 };
+
+const SelectorTrue allDarts = SelectorTrue() ;
+
+
+class SelectorAnd : public FunctorSelect
+{
+protected:
+	const FunctorSelect* m_sel1;
+	const FunctorSelect* m_sel2;
+
+public:
+	SelectorAnd(const FunctorSelect& fs1, const FunctorSelect& fs2) { m_sel1 = fs1.copy(); m_sel2 = fs2.copy();}
+	bool operator()(Dart d) const { return m_sel1->operator()(d) && m_sel2->operator()(d); }
+	~SelectorAnd() { delete m_sel1; delete m_sel2;}
+	FunctorSelect* copy() const  {  return new SelectorAnd(*m_sel1,*m_sel2);}
+};
+
+class SelectorOr : public FunctorSelect
+{
+protected:
+	const FunctorSelect* m_sel1;
+	const FunctorSelect* m_sel2;
+
+public:
+	SelectorOr(const FunctorSelect& fs1, const FunctorSelect& fs2) { m_sel1 = fs1.copy(); m_sel2 = fs2.copy();}
+	bool operator()(Dart d) const { return m_sel1->operator()(d) || m_sel2->operator()(d); }
+	~SelectorOr() { delete m_sel1; delete m_sel2;}
+	FunctorSelect* copy() const  { return new SelectorOr(*m_sel1,*m_sel2);}
+};
+
+inline SelectorAnd operator&&(const FunctorSelect& fs1, const FunctorSelect& fs2)
+{
+	return SelectorAnd(fs1,fs2);
+}
+
+inline SelectorOr operator||(const FunctorSelect& fs1, const FunctorSelect& fs2)
+{
+	return SelectorOr(fs1,fs2);
+}
+
+
+template <typename MAP>
+class SelectorEdgeBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorEdgeBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return m_map.isBoundaryEdge(d); }
+	FunctorSelect* copy() const { return new SelectorEdgeBoundary(m_map);}
+};
+
+
+template <typename MAP>
+class SelectorEdgeNoBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorEdgeNoBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return !m_map.isBoundaryEdge(d); }
+	FunctorSelect* copy() const { return new SelectorEdgeNoBoundary(m_map);}
+};
+
+//
+//class SelectorDartMarked : public FunctorSelect
+//{
+//public:
+//protected:
+//	const DartMarker& m_dm;
+//public:
+//	SelectorDartMarked(const DartMarker& dm): m_dm(dm)  {}
+//	bool operator()(Dart d) const { return m_dm.isMarked(d); }
+//};
+//
+//
+//class SelectorCellMarked : public FunctorSelect
+//{
+//public:
+//protected:
+//	const CellMarker& m_cm;
+//public:
+//	SelectorCellMarked(const CellMarker& cm): m_cm(cm)  {}
+//	bool operator()(Dart d) const { return m_cm.isMarked(d); }
+//};
+//
+//class SelectorDartNotMarked : public FunctorSelect
+//{
+//public:
+//protected:
+//	const DartMarker& m_dm;
+//public:
+//	SelectorDartNotMarked(const DartMarker& dm): m_dm(dm)  {}
+//	bool operator()(Dart d) const { return !m_dm.isMarked(d); }
+//};
+//
+//
+//template <typename MAP>
+//class SelectorCellNotMarked : public FunctorSelect
+//{
+//public:
+//protected:
+//	const CellMarker& m_cm;
+//public:
+//	SelectorCellNotMarked(const CellMarker& cm): m_cm(cm)  {}
+//	bool operator()(Dart d) const { return !m_cm.isMarked(d); }
+//};
+
 
 // Counting Functors : increment its value every time it is applied
 /********************************************************/
@@ -193,6 +309,67 @@ public:
 		return m_fonct2(d);
 	}
 };
+
+
+// Marker Functors
+/********************************************************/
+
+template <typename MAP>
+class FunctorMarker : public FunctorMap<MAP>
+{
+protected:
+	Mark m_mark ;
+	AttributeMultiVector<Mark>* m_markTable ;
+public:
+	FunctorMarker(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMap<MAP>(map), m_mark(m), m_markTable(mTable)
+	{}
+//	Mark getMark() { return m_mark ; }
+} ;
+
+template <typename MAP>
+class FunctorMark : public FunctorMarker<MAP>
+{
+public:
+	FunctorMark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
+		return false ;
+	}
+} ;
+
+template <typename MAP>
+class FunctorMarkStore : public FunctorMarker<MAP>
+{
+protected:
+	std::vector<unsigned int>& m_markedDarts ;
+public:
+	FunctorMarkStore(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable, std::vector<unsigned int>& marked) :
+		FunctorMarker<MAP>(map, m, mTable),
+		m_markedDarts(marked)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
+		m_markedDarts.push_back(d.index) ;
+		return false ;
+	}
+} ;
+
+template <typename MAP>
+class FunctorUnmark : public FunctorMarker<MAP>
+{
+public:
+	FunctorUnmark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_markTable->operator[](d.index).unsetMark(this->m_mark) ;
+		return false ;
+	}
+} ;
+
 
 } //namespace CGoGN
 

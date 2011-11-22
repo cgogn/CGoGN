@@ -131,19 +131,6 @@ inline int Map1::getDartsPerTriangle()
 	return 3 ;
 }
 
-/*! @name Generator and Deletor
- *  To generate or delete faces in a 1-map
- *************************************************************************/
-
-inline Dart Map1::newFace(unsigned int nbEdges)
-{
-	return newOrientedFace(nbEdges) ;
-}
-
-inline void Map1::deleteFace(Dart d)
-{
-	deleteOrientedFace(d) ;
-}
 
 /*! @name Topological Operators
  *  Topological operations on 1-maps
@@ -153,6 +140,9 @@ inline void Map1::cutEdge(Dart d)
 {
 	Dart e = newDart() ;	// Create a new dart
 	phi1sew(d, e) ;			// Insert dart e between d and phi1(d)
+
+	if (isBoundaryMarked(d))
+		boundaryMark(e);
 }
 
 inline void Map1::collapseEdge(Dart d)
@@ -161,37 +151,57 @@ inline void Map1::collapseEdge(Dart d)
 	deleteDart(d) ;			// Dart d is erased
 }
 
-inline void Map1::splitFace(Dart d, Dart e)
+inline void Map1::splitCycle(Dart d, Dart e)
 {
-	assert(d != e && sameOrientedFace(d, e)) ;
+	assert(d != e && sameCycle(d, e)) ;
+	phi1sew(phi_1(d), phi_1(e)) ;
+}
+
+inline void Map1::mergeCycles(Dart d, Dart e)
+{
+	assert(!sameCycle(d, e)) ;
+	phi1sew(phi_1(d), phi_1(e)) ;
+}
+
+inline void Map1::linkCycles(Dart d, Dart e)
+{
+	assert(d != e && !sameCycle(d, e)) ;
 	Map1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
 	Map1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
 	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
-}
-
-inline void Map1::linkVertices(Dart d, Dart e)
-{
-	assert(d != e && !sameOrientedFace(d, e)) ;
-	Map1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
-	Map1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
-	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
-}
-
-inline void Map1::mergeFaces(Dart d, Dart e)
-{
-	assert(!sameOrientedFace(d, e)) ;
-	phi1sew(d, phi_1(e)) ;
-	phi1sew(e, phi_1(d)) ;
-	deleteOrientedFace(d) ;
 }
 
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool Map1::sameFace(Dart d, Dart e)
+inline bool Map1::sameCycle(Dart d, Dart e)
 {
-	return sameOrientedFace(d, e) ;
+	Dart it = d ;
+	do
+	{
+		if(it == e)
+			return true ;
+		it = phi1(it) ;
+	} while(it != d) ;
+	return false ;
+}
+
+inline unsigned int Map1::cycleDegree(Dart d)
+{
+	unsigned int count = 0 ;
+	Dart it = d ;
+	do
+	{
+		++count ;
+		it = phi1(it) ;
+	} while (it != d) ;
+	return count ;
+}
+
+inline bool Map1::isCycleTriangle(Dart d)
+{
+	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }
 
 /*! @name Cell Functors
@@ -206,6 +216,18 @@ inline bool Map1::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int th
 inline bool Map1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	return f(d) ;
+}
+
+inline bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart it = d ;
+	do
+	{
+		if (f(it))
+			return true ;
+		it = phi1(it) ;
+	} while (it != d) ;
+	return false ;
 }
 
 inline bool Map1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)

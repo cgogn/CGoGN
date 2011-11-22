@@ -34,7 +34,6 @@ namespace CGoGN
 class AttribMap : public GenericMap
 {
 private:
-	friend class CellMarkerGen ;
 	template<typename T> friend class AutoAttributeHandler ;
 
 	void init() ;
@@ -94,25 +93,6 @@ public:
 	 */
 	unsigned int getNbCells(unsigned int orbit);
 
-protected:
-	/****************************************
-	 *   EMBEDDING ATTRIBUTES MANAGEMENT    *
-	 ****************************************/
-	/**
-	 * Create the dart attribute to store the embedding of this orbit (for internal use only)
-	 * Also adds a Marker attribute to the container
-	 */
-	void addEmbedding(unsigned int orbit) ;
-
-	/****************************************
-	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
-	 ****************************************/
-
-	/**
-	 * Add a toological relation in the map
-	 * @param name name of relation
-	 */
-	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
 
 public:
 	/****************************************
@@ -124,6 +104,12 @@ public:
 	 * @return the number of cells of the orbit
 	 */
 	unsigned int computeIndexCells(AttributeHandler<unsigned int>& idx) ;
+
+	/**
+	 * ensure that each orbit as one embedding and that each embedding is handle by only one orbit
+	 */
+	void bijectiveOrbitEmbedding(unsigned int orbit);
+
 } ;
 
 } // namespace CGoGN

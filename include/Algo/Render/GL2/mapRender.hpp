@@ -22,11 +22,13 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorCell.h"
+
 #include "Utils/vbo.h"
 
-#include "Topology/generic/attributeHandler.h"
 #include "Geometry/intersection.h"
 #include "Algo/Geometry/normal.h"
 
@@ -42,7 +44,6 @@ namespace Render
 namespace GL2
 {
 
-
 inline bool MapRender::cmpVP(VertexPoly* lhs, VertexPoly* rhs)
 {
 //	 return lhs->value < rhs->value;
@@ -51,7 +52,6 @@ inline bool MapRender::cmpVP(VertexPoly* lhs, VertexPoly* rhs)
 			return lhs->length < rhs->length;
 	return lhs->value < rhs->value;
 }
-
 
 template<typename VEC3>
 bool MapRender::inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc)
@@ -69,8 +69,6 @@ bool MapRender::inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  c
 
 	return true;
 }
-
-
 
 template<typename PFP>
 void MapRender::recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex)
@@ -134,7 +132,6 @@ void MapRender::recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, 
 	vp2->ear = ears.insert(vp2);
 }
 
-
 template<typename PFP>
 float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2,  const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly)
 {
@@ -152,7 +149,6 @@ float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PF
 
 	return dotpr;
 }
-
 
 template<typename PFP>
 bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
@@ -177,8 +173,6 @@ bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& pos
 
 	return true;
 }
-
-
 
 template<typename PFP>
 inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
@@ -285,7 +279,6 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	}
 }
 
-
 template<typename PFP>
 inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
 {
@@ -315,21 +308,14 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 
 }
 
-
 template<typename PFP>
 void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map, thread);
 	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
-	for(Dart dd = map.begin(); dd != map.end(); map.next(dd))
-	{
-		if(!m.isMarked(dd) && good(dd))
-		{
-			addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE, dd);
-		}
-	}
+	TraversorF<typename PFP::MAP> trav(map, good, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		addTri<PFP>(map, d, tableIndices);
 }
 
 template<typename PFP>
@@ -348,7 +334,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 		{
 			std::list<Dart> bound;
 
-			if(good(dd))
+			if (good(dd) && !map.isBoundaryMarked(dd))
 				addTri<PFP>(map, dd, tableIndices);
 			m.markOrbit(FACE, dd);
 			bound.push_back(dd);
@@ -364,7 +350,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 					{
 						if (!m.isMarked(f))
 						{
-							if(good(f))
+							if (good(f) && !map.isBoundaryMarked(f))
 								addTri<PFP>(map, f, tableIndices);
 							m.markOrbit(FACE, f);
 							bound.push_back(map.phi1(f));
@@ -391,16 +377,28 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 template<typename PFP>
 void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	DartMarker m(map, thread);
 	tableIndices.reserve(map.getNbDarts());
 
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorE<typename PFP::MAP> trav(map, good, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
-		if(!m.isMarked(d) && good(d))
+		tableIndices.push_back(map.getEmbedding(VERTEX, d));
+		tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
+	}
+}
+
+template<typename PFP>
+void MapRender::initBoundaries(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+{
+	tableIndices.reserve(map.getNbDarts()); //TODO optimisation ?
+
+	TraversorE<typename PFP::MAP> trav(map, good, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		if (map.isBoundaryEdge(d))
 		{
 			tableIndices.push_back(map.getEmbedding(VERTEX, d));
-			tableIndices.push_back(map.getEmbedding(VERTEX, map.phi2(d)));
-			m.markOrbit(EDGE, d);
+			tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
 		}
 	}
 }
@@ -457,20 +455,12 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 template<typename PFP>
 void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
 {
-	CellMarker m(map, VERTEX, thread) ;
 	tableIndices.reserve(map.getNbDarts() / 5);
 
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(!m.isMarked(d) && good(d))
-		{
-			tableIndices.push_back(map.getEmbedding(VERTEX, d));
-			m.mark(d) ;
-		}
-	}
+	TraversorV<typename PFP::MAP> trav(map, good, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		tableIndices.push_back(map.getEmbedding(VERTEX, d));
 }
-
-
 
 template<typename PFP>
 void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
@@ -504,6 +494,11 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
 			break;
 		case FLAT_TRIANGLES:
+			break;
+		case BOUNDARY:
+			initBoundaries<PFP>(map, good, tableIndices, thread) ;
+			m_nbIndices[BOUNDARY_INDICES] = tableIndices.size();
+			vbo_ind = m_indexBuffers[BOUNDARY_INDICES];
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;

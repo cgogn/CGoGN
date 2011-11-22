@@ -26,7 +26,7 @@
 #define __CELL_MARKER__
 
 #include "Topology/generic/marker.h"
-#include "Topology/generic/attribmap.h"
+#include "Topology/generic/genericmap.h"
 
 #include "Topology/generic/functor.h"
 #include "Utils/static_assert.h"
@@ -42,7 +42,7 @@ class CellMarkerGen
 {
 protected:
 	Mark m_mark ;
-	AttribMap& m_map ;
+	GenericMap& m_map ;
 	unsigned int m_cell ;
 	unsigned int m_thread ;
 
@@ -52,7 +52,7 @@ public:
 	 * @param map the map on which we work
 	 * @param cell the type of cell we want to mark VERTEX, EDGE,...
 	 */
-	CellMarkerGen(AttribMap& map, unsigned int cell, unsigned int thread = 0) : m_map(map), m_cell(cell), m_thread(thread)
+	CellMarkerGen(GenericMap& map, unsigned int cell, unsigned int thread = 0) : m_map(map), m_cell(cell), m_thread(thread)
 	{
 		if(!map.isOrbitEmbedded(cell))
 			map.addEmbedding(cell) ;
@@ -103,7 +103,7 @@ public:
 	/**
 	 * test if cell of dart is marked
 	 */
-	virtual bool isMarked(Dart d)
+	virtual bool isMarked(Dart d) const
 	{
 		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
@@ -140,7 +140,7 @@ public:
 	/**
 	 * test if cell is marked
 	 */
-	virtual bool isMarked(unsigned int em)
+	virtual bool isMarked(unsigned int em) const
 	{
 		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
@@ -189,7 +189,7 @@ public:
 class CellMarker : public CellMarkerGen
 {
 public:
-	CellMarker(AttribMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
+	CellMarker(GenericMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
 	{}
 
 	virtual ~CellMarker()
@@ -225,7 +225,7 @@ protected:
 	std::vector<unsigned int> m_markedCells ;
 
 public:
-	CellMarkerStore(AttribMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
+	CellMarkerStore(GenericMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
 	{}
 
 
@@ -272,7 +272,7 @@ public:
 class CellMarkerNoUnmark: public CellMarkerGen
 {
 public:
-	CellMarkerNoUnmark(AttribMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
+	CellMarkerNoUnmark(GenericMap& map, unsigned int cell, unsigned int thread = 0) : CellMarkerGen(map, cell, thread)
 	{}
 
 	virtual ~CellMarkerNoUnmark()
@@ -305,29 +305,31 @@ public:
 class SelectorCellMarked : public FunctorSelect
 {
 protected:
-	CellMarkerGen& m_cmarker ;
+	const CellMarkerGen& m_cmarker ;
 public:
-	SelectorCellMarked(CellMarkerGen& cm) : m_cmarker(cm) {}
+	SelectorCellMarked(const CellMarkerGen& cm) : m_cmarker(cm) {}
 	bool operator()(Dart d) const
 	{
 		if (m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
+	FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker);}
 };
 
 class SelectorCellUnmarked : public FunctorSelect
 {
 protected:
-	CellMarkerGen& m_cmarker ;
+	const CellMarkerGen& m_cmarker ;
 public:
-	SelectorCellUnmarked(CellMarkerGen& cm) : m_cmarker(cm) {}
+	SelectorCellUnmarked(const CellMarkerGen& cm) : m_cmarker(cm) {}
 	bool operator()(Dart d) const
 	{
 		if (!m_cmarker.isMarked(d))
 			return true ;
 		return false ;
 	}
+	FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker);}
 };
 
 // Functor version (needed for use with foreach_xxx)

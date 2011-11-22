@@ -40,7 +40,6 @@ void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
 	int nbFaces = 0;
 	int nbVertex = 0;
 
-	DartMarker mFace(map);
 	CellMarker mVertex(map, VERTEX);
 
 	float ratioMinMax = 0;
@@ -48,61 +47,101 @@ void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
 	float lengthSeg = 0;
 	int nbEdge = 0;
 
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<typename PFP::MAP> tf(map) ;
+	for(Dart d = tf.begin(); d != tf.end(); tf.next(d))
 	{
-		if (!mFace.isMarked(d))
+		nbFaces++;
+		bool init = true;
+		float min = 0;
+		float max = 0;
+
+		Traversor2FV<typename PFP::MAP> tfe(map, d) ;
+		for(Dart it = tfe.begin(); it != tfe.end(); it = tfe.next())
 		{
-			nbFaces++;
-			bool init = true;
-			float min = 0;
-			float max = 0;
-			Dart e = d;
-			do
+			typename PFP::VEC3 segment = position[it] - position[map.phi1(it)] ;
+
+			float len = segment.norm() ;
+
+			lengthSeg += len;
+			nbEdge++;
+
+			if (init || len < min)
+				min = len;
+			if (init || len > max)
+				max = len;
+
+			init = false;
+
+			if (!mVertex.isMarked(it))
 			{
-				mFace.mark(e);
-				typename PFP::VEC3 segment = position[e] - position[map.phi1(e)] ;
-
-				float len = segment.norm() ;
-
-				lengthSeg += len;
-				nbEdge++;
-
-				if (init || len < min)
-					min = len;
-				if (init || len > max)
-					max = len;
-
-				init = false;
-				e = map.phi1(e);
+				mVertex.mark(it) ;
+				nbVertex++ ;
+				Traversor2VE<typename PFP::MAP> tve(map, it) ;
+				for(Dart it2 = tve.begin(); it2 != tve.end(); it2 = tve.next())
+					nbEdgePerVertex++ ;
 			}
-			while (e != d);
-
-			ratioMinMax += (min / max);
 		}
 
-		if (!mVertex.isMarked(d))
-		{
-			mVertex.mark(d) ;
-			nbVertex++ ;
-			Dart e = d;
-			do
-			{
-				nbEdgePerVertex++ ;
-				e = map.alpha1(e) ;
-			}
-			while (e != d) ;
-		}
+		ratioMinMax += (min / max);
 	}
+
+//	for (Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if (!mFace.isMarked(d))
+//		{
+//			nbFaces++;
+//			bool init = true;
+//			float min = 0;
+//			float max = 0;
+//			Dart e = d;
+//			do
+//			{
+//				mFace.mark(e);
+//				typename PFP::VEC3 segment = position[e] - position[map.phi1(e)] ;
+//
+//				float len = segment.norm() ;
+//
+//				lengthSeg += len;
+//				nbEdge++;
+//
+//				if (init || len < min)
+//					min = len;
+//				if (init || len > max)
+//					max = len;
+//
+//				init = false;
+//				e = map.phi1(e);
+//			}
+//			while (e != d);
+//
+//			ratioMinMax += (min / max);
+//		}
+//
+//		if (!mVertex.isMarked(d))
+//		{
+//			mVertex.mark(d) ;
+//			nbVertex++ ;
+//			Dart e = d;
+//			do
+//			{
+//				nbEdgePerVertex++ ;
+//				e = map.alpha1(e) ;
+//			}
+//			while (e != d) ;
+//		}
+//	}
 
 	CGoGNout << "number of faces                : " << nbFaces << CGoGNendl;
 	CGoGNout << "number of vertices             : " << nbVertex << CGoGNendl;
 	CGoGNout << "mean ratio min max             : " << (ratioMinMax / (float) nbFaces) << CGoGNendl;
 	CGoGNout << "mean number of edge per vertex : " << ((float) nbEdgePerVertex / (float) nbVertex) << CGoGNendl;
-	CGoGNout << "mean edge length               : " << lengthSeg / (float) nbEdge<< CGoGNendl;
+	CGoGNout << "mean edge length               : " << lengthSeg / (float) nbEdge << CGoGNendl;
 }
 
 } // namespace Geometry
+
 } // namespace Algo
+
 } // namespace CGoGN
 
-#endif /*STATS_H*/
+#endif

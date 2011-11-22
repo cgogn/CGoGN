@@ -51,7 +51,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	typename PFP::TREAL& kmin,
 	typename PFP::TVEC3& Kmax,
 	typename PFP::TVEC3& Kmin,
-	const FunctorSelect& select = SelectorTrue()) ;
+	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
 void computeCurvatureVertex_QuadraticFitting(
@@ -101,7 +101,7 @@ void computeCurvatureVertices_NormalCycles(
 	typename PFP::TVEC3& Kmax,
 	typename PFP::TVEC3& Kmin,
 	typename PFP::TVEC3& Knormal,
-	const FunctorSelect& select = SelectorTrue()) ;
+	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
 void computeCurvatureVertex_NormalCycles(

@@ -25,10 +25,6 @@
 #ifndef __ALGO_GEOMETRY_INTERSECTION_H__
 #define __ALGO_GEOMETRY_INTERSECTION_H__
 
-#include "Geometry/basic.h"
-#include "Geometry/intersection.h"
-#include "Geometry/inclusion.h"
-
 namespace CGoGN
 {
 

@@ -23,7 +23,7 @@ void decimate(
 	typename PFP::TVEC3& position,
 	double nbWanted
 );
-//	const FunctorSelect& selected = SelectorTrue()
+//	const FunctorSelect& selected = allDarts
 //) ;
 
 } //namespace DecimationVolumique

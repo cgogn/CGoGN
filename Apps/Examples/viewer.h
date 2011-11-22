@@ -35,6 +35,7 @@
 #include "Geometry/matrix.h"
 
 #include "Algo/Import/import.h"
+#include "Algo/Export/export.h"
 
 #include "Algo/Render/GL2/mapRender.h"
 
@@ -63,7 +64,6 @@ class Viewer : public Utils::QT::SimpleQT
 
 public:
 	MAP myMap ;
-	SelectorTrue allDarts ;
 
     Utils::QT::uiDockInterface dock ;
 
@@ -110,6 +110,7 @@ public:
 	void cb_initGL() ;
 	void cb_redraw() ;
 	void cb_Open() ;
+	void cb_Save() ;
 
 	void importMesh(std::string& filename) ;
 

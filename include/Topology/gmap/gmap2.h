@@ -169,8 +169,9 @@ public:
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
+	 *  @param withBoundary not used only for compatibility with Map
 	 */
-	virtual void sewFaces(Dart d, Dart e);
+	virtual void sewFaces(Dart d, Dart e, bool withBoundary=true);
 
 	//! Unsew two faces along an edges
 	 /*! @param d a dart of one face

@@ -155,7 +155,6 @@ int main(int argc, char **argv)
 	sqt.m_positionVBO->updateData(position);
 
 	// update des primitives du renderer
-	SelectorTrue allDarts;
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 

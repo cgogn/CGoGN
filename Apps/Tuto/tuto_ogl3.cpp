@@ -99,10 +99,9 @@ void MyQT::cb_initGL()
 	colorVBO->releasePtr();
 
 	// update the renderer (primitives and geometry)
-	SelectorTrue allDarts;
-	m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::TRIANGLES);
-	m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(myMap, allDarts,Algo::Render::GL2::POINTS);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
 	shader1 = new Utils::ShaderPhong();
 	shader1->setAttributePosition(positionVBO);

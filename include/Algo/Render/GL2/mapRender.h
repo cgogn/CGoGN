@@ -61,7 +61,8 @@ enum drawingType
 	POINTS = 4,
 	EXPLODED = 8,
 	FLAT_TRIANGLES = 16,
-	ERR = 32
+	BOUNDARY = 32,
+	ERR = 64
 } ;
 
 enum bufferIndex
@@ -70,6 +71,7 @@ enum bufferIndex
 	LINE_INDICES = 1,
 	TRIANGLE_INDICES = 2,
 	FLAT_BUFFER = 3,
+	BOUNDARY_INDICES = 4,
 	SIZE_BUFFER
 } ;
 
@@ -184,25 +186,32 @@ public:
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
+	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
 	template <typename PFP>
-	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
+	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
 
 	/**
 	 * creation of indices table of lines (optimized order)
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initLines(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
+	void initLines(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
 	template <typename PFP>
-	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
+	void initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
 
 	/**
 	 * creation of indices table of points
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initPoints(typename PFP::MAP& map, const FunctorSelect& good,std::vector<GLuint>& tableIndices, unsigned int thread=0) ;
+	void initPoints(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
+
+	/**
+	 * creation of indices table of points
+	 * @param tableIndices the table where indices are stored
+	 */
+	template <typename PFP>
+	void initBoundaries(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
 
 	/**
 	 * initialization of the VBO indices primitives

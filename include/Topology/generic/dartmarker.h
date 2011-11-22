@@ -32,65 +32,6 @@
 namespace CGoGN
 {
 
-// Marker Functors
-/********************************************************/
-
-template <typename MAP>
-class FunctorMarker : public FunctorMap<MAP>
-{
-protected:
-	Mark m_mark ;
-	AttributeMultiVector<Mark>* m_markTable ;
-public:
-	FunctorMarker(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMap<MAP>(map), m_mark(m), m_markTable(mTable)
-	{}
-//	Mark getMark() { return m_mark ; }
-} ;
-
-template <typename MAP>
-class FunctorMark : public FunctorMarker<MAP>
-{
-public:
-	FunctorMark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
-	{}
-	bool operator()(Dart d)
-	{
-		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
-		return false ;
-	}
-} ;
-
-template <typename MAP>
-class FunctorMarkStore : public FunctorMarker<MAP>
-{
-protected:
-	std::vector<unsigned int>& m_markedDarts ;
-public:
-	FunctorMarkStore(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable, std::vector<unsigned int>& marked) :
-		FunctorMarker<MAP>(map, m, mTable),
-		m_markedDarts(marked)
-	{}
-	bool operator()(Dart d)
-	{
-		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
-		m_markedDarts.push_back(d.index) ;
-		return false ;
-	}
-} ;
-
-template <typename MAP>
-class FunctorUnmark : public FunctorMarker<MAP>
-{
-public:
-	FunctorUnmark(MAP& map, Mark m, AttributeMultiVector<Mark>* mTable) : FunctorMarker<MAP>(map, m, mTable)
-	{}
-	bool operator()(Dart d)
-	{
-		this->m_markTable->operator[](d.index).unsetMark(this->m_mark) ;
-		return false ;
-	}
-} ;
-
 /**
  * generic class that allows the marking of darts
  * \warning no default constructor
@@ -109,25 +50,22 @@ public:
 	 */
 	DartMarkerGen(GenericMap& map): m_map(map), m_thread(0)
 	{
-//		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
-		m_mark = m_map.getMarkerSet(DART,m_thread).getNewMark() ;
+		m_mark = m_map.getMarkerSet(DART, m_thread).getNewMark() ;
 	}
 
 	DartMarkerGen(GenericMap& map, unsigned int thread): m_map(map), m_thread(thread)
 	{
-//		m_mark = m_map.m_marksets[DART][m_thread].getNewMark() ;
-		m_mark = m_map.getMarkerSet(DART,m_thread).getNewMark() ;
+		m_mark = m_map.getMarkerSet(DART, m_thread).getNewMark() ;
 	}
 
 	virtual ~DartMarkerGen()
 	{
-//		m_map.m_marksets[DART][m_thread].releaseMark(m_mark) ;
-		m_map.getMarkerSet(DART,m_thread).releaseMark(m_mark) ;
+		m_map.getMarkerSet(DART, m_thread).releaseMark(m_mark) ;
 	}
 
 protected:
 	// protected copy constructor to forbid its usage
-	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map)
+	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map), m_thread(0), m_mark(0)
 	{}
 
 public:
@@ -136,7 +74,7 @@ public:
 	 */
 	virtual void mark(Dart d)
 	{
-		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		m_map.getMarkVector(DART, m_thread)->operator[](d.index).setMark(m_mark);
 	}
 
@@ -145,16 +83,16 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
-		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		m_map.getMarkVector(DART, m_thread)->operator[](d.index).unsetMark(m_mark);
 	}
 
 	/**
 	 * test if dart is marked
 	 */
-	virtual bool isMarked(Dart d)
+	virtual bool isMarked(Dart d) const
 	{
-		assert(m_map.getMarkerSet(DART,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
 		return m_map.getMarkVector(DART, m_thread)->operator[](d.index).testMark(m_mark);
 	}
 
@@ -273,7 +211,7 @@ public:
 	}
 
 protected:
-	DartMarkerStore(const DartMarkerStore& dm) : DartMarkerGen(dm)
+	DartMarkerStore(const DartMarkerStore& dm) : DartMarkerGen(dm),m_markedDarts(dm.m_markedDarts)
 	{}
 
 public:
@@ -356,6 +294,7 @@ public:
 	{
 		return m_marker.isMarked(d);
 	}
+	FunctorSelect* copy() const { return new SelectorMarked(m_marker);}
 };
 
 class SelectorUnmarked : public FunctorSelect
@@ -368,6 +307,7 @@ public:
 	{
 		return !m_marker.isMarked(d);
 	}
+	FunctorSelect* copy() const { return new SelectorUnmarked(m_marker);}
 };
 
 // Functor version (needed for use with foreach_xxx)

@@ -31,7 +31,7 @@ namespace CGoGN
  *  To generate or delete faces in a 1-G-map
  *************************************************************************/
 
-Dart GMap1::newFace(unsigned int n)
+Dart GMap1::newFace(unsigned int n, bool withBoundary)
 {
 	// create the first edge
 	Dart d0 =  GMap0::newEdge();

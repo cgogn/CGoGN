@@ -23,6 +23,8 @@
 *******************************************************************************/
 
 #include "Topology/generic/attribmap.h"
+#include "Topology/generic/autoAttributeHandler.h"
+#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {
@@ -54,37 +56,6 @@ void AttribMap::clear(bool removeAttrib)
 }
 
 /****************************************
- *   EMBEDDING ATTRIBUTES MANAGEMENT    *
- ****************************************/
-
-void AttribMap::addEmbedding(unsigned int orbit)
-{
-	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
-
-	std::ostringstream oss;
-	oss << "EMB_" << orbit;
-
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[orbit] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		amv->operator[](i) = EMBNULL ;
-
-	AttributeContainer& cellCont = m_attribs[orbit];
-	for (unsigned int t = 0; t < m_nbThreads; ++t)
-	{
-		std::stringstream ss ;
-		ss << "Mark_"<< t ;
-		AttributeMultiVector<Mark>* amvMark = cellCont.addAttribute<Mark>(ss.str()) ;
-		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
-			amvMark->operator[](i).clear() ;
-		m_markTables[orbit][t] = amvMark ;
-	}
-}
-
-/****************************************
  *               UTILITIES              *
  ****************************************/
 
@@ -97,4 +68,32 @@ unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
 	return cpt ;
 }
 
+void AttribMap::bijectiveOrbitEmbedding(unsigned int orbit)
+{
+	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded") ;
+
+	AutoAttributeHandler<int> counter(*this, orbit) ;
+	counter.setAllValues(int(0)) ;
+
+	DartMarker mark(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!mark.isMarked(d))
+		{
+			mark.markOrbit(orbit, d) ;
+			unsigned int emb = getEmbedding(orbit, d) ;
+			if (emb != EMBNULL)
+			{
+				if (counter[d] > 0)
+				{
+					unsigned int newEmb = embedNewCell(orbit, d) ;
+					copyCell(orbit, newEmb, emb) ;
+				}
+				counter[d]++ ;
+			}
+		}
+	}
+}
+
 } // namespace CGoGN
+

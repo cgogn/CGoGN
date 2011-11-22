@@ -43,7 +43,7 @@ namespace Export
 * @return true
 */
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = SelectorTrue()) ;
+bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a OFF file
@@ -52,7 +52,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 * @return true
 */
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = SelectorTrue()) ;
+bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a Trian file
@@ -61,7 +61,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 * @return true
 */
 template <typename PFP>
-bool exportTrian(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, char* filename, const FunctorSelect& good = SelectorTrue()) ;
+bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a Trian file
@@ -70,7 +70,7 @@ bool exportTrian(typename PFP::MAP& the_map, const typename PFP::TVEC3& position
 * @return true
 */
 template <typename PFP>
-bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good = SelectorTrue()) ;
+bool exportCTM(typename PFP::MAP& map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
@@ -85,7 +85,7 @@ bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, 
 * @return true
 */
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good = SelectorTrue()) ;
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)

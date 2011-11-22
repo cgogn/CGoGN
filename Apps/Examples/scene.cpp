@@ -140,8 +140,6 @@ void myGlutWin::init()
 
 void myGlutWin::updateRender()
 {
-	SelectorTrue allDarts;
-
 	// create the renderer (first call only)
 	if (m_render == NULL)
 		m_render = new Algo::Render::GL2::MapRender_VBO() ;

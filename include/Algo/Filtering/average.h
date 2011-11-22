@@ -22,6 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Topology/generic/traversorCell.h"
 #include "Algo/Filtering/functors.h"
 #include "Algo/Selection/collector.h"
 
@@ -42,109 +43,38 @@ void filterAverageAttribute_OneRing(
 	const AttributeHandler<T>& attIn,
 	AttributeHandler<T>& attOut,
 	int neigh,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
 
-	CellMarker markV(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !markV.isMarked(d))
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
+
+		fa.reset() ;
+		if (neigh & INSIDE)
 		{
-			markV.mark(d) ;
-
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
-
-			fa.reset() ;
-			if (neigh & INSIDE)
+			switch (attIn.getOrbit())
 			{
-				switch (attIn.getOrbit())
-				{
-				case VERTEX :
-					col.applyOnInsideVertices(fa) ;
-					break;
-				case EDGE :
-					col.applyOnInsideEdges(fa) ;
-					break;
-				case FACE :
-					col.applyOnInsideFaces(fa) ;
-					break;
-				}
+			case VERTEX :
+				col.applyOnInsideVertices(fa) ;
+				break;
+			case EDGE :
+				col.applyOnInsideEdges(fa) ;
+				break;
+			case FACE :
+				col.applyOnInsideFaces(fa) ;
+				break;
 			}
-			if (neigh & BORDER) col.applyOnBorder(fa) ;
-			attOut[d] = fa.getAverage() ;
 		}
-	}
-}
-
-template <typename PFP, typename T>
-void filterAverageEdgesAttribute_WithinSphere(
-	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
-	int neigh,
-	typename PFP::TVEC3 & position,
-	typename PFP::REAL radius,
-	const FunctorSelect& select = SelectorTrue())
-{
-	FunctorAverage<T> fa(attIn) ;
-	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
-
-	CellMarker markV(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !markV.isMarked(d))
-		{
-			markV.mark(d) ;
-
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
-
-			fa.reset() ;
-			if (neigh & INSIDE) col.applyOnInsideEdges(fa) ;
-			if (neigh & BORDER) col.applyOnBorder(fa) ;
-			attOut[d] = fa.getAverage() ;
-		}
-	}
-}
-
-template <typename PFP, typename T>
-void filterAverageFacesAttribute_WithinSphere(
-	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
-	int neigh,
-	typename PFP::TVEC3 & position,
-	typename PFP::REAL radius,
-	const FunctorSelect& select = SelectorTrue())
-{
-
-	FunctorAverage<T> fa(attIn) ;
-	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
-
-	CellMarker markV(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !markV.isMarked(d))
-		{
-			markV.mark(d) ;
-
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
-
-			fa.reset() ;
-			if (neigh & INSIDE) col.applyOnInsideFaces(fa) ;
-			if (neigh & BORDER) col.applyOnBorder(fa) ;
-			attOut[d] = fa.getAverage() ;
-		}
+		if (neigh & BORDER)
+			col.applyOnBorder(fa) ;
+		attOut[d] = fa.getAverage() ;
 	}
 }
 
@@ -156,37 +86,88 @@ void filterAverageVertexAttribute_WithinSphere(
 	int neigh,
 	typename PFP::TVEC3 & position,
 	typename PFP::REAL radius,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select = allDarts)
 {
 	FunctorAverage<T> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	CellMarker markV(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !markV.isMarked(d))
-		{
-			markV.mark(d) ;
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
 
-			if (neigh & INSIDE)
-				col.collectAll(d) ;
-			else
-				col.collectBorder(d) ;
-
-			attOut[d] = T(0);
-			if (neigh & INSIDE){
-				faInside.reset() ;
-				col.applyOnInsideVertices(faInside) ;
-				attOut[d] += faInside.getSum();
-			}
-			if (neigh & BORDER){
-				faBorder.reset(position[d], radius);
-				col.applyOnBorder(faBorder) ;
-				attOut[d] += faBorder.getSum();
-			}
-			attOut[d] /= faInside.getCount() + faBorder.getCount() ;
+		attOut[d] = T(0);
+		if (neigh & INSIDE){
+			faInside.reset() ;
+			col.applyOnInsideVertices(faInside) ;
+			attOut[d] += faInside.getSum();
 		}
+		if (neigh & BORDER){
+			faBorder.reset(position[d], radius);
+			col.applyOnBorder(faBorder) ;
+			attOut[d] += faBorder.getSum();
+		}
+		attOut[d] /= faInside.getCount() + faBorder.getCount() ;
+	}
+}
+
+template <typename PFP, typename T>
+void filterAverageEdgeAttribute_WithinSphere(
+	typename PFP::MAP& map,
+	const AttributeHandler<T>& attIn,
+	AttributeHandler<T>& attOut,
+	int neigh,
+	typename PFP::TVEC3 & position,
+	typename PFP::REAL radius,
+	const FunctorSelect& select = allDarts)
+{
+	FunctorAverage<T> fa(attIn) ;
+	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
+
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
+
+		fa.reset() ;
+		if (neigh & INSIDE) col.applyOnInsideEdges(fa) ;
+		if (neigh & BORDER) col.applyOnBorder(fa) ;
+		attOut[d] = fa.getAverage() ;
+	}
+}
+
+template <typename PFP, typename T>
+void filterAverageFaceAttribute_WithinSphere(
+	typename PFP::MAP& map,
+	const AttributeHandler<T>& attIn,
+	AttributeHandler<T>& attOut,
+	int neigh,
+	typename PFP::TVEC3 & position,
+	typename PFP::REAL radius,
+	const FunctorSelect& select = allDarts)
+{
+	FunctorAverage<T> fa(attIn) ;
+	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
+
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		if (neigh & INSIDE)
+			col.collectAll(d) ;
+		else
+			col.collectBorder(d) ;
+
+		fa.reset() ;
+		if (neigh & INSIDE) col.applyOnInsideFaces(fa) ;
+		if (neigh & BORDER) col.applyOnBorder(fa) ;
+		attOut[d] = fa.getAverage() ;
 	}
 }
 

@@ -57,10 +57,16 @@ struct PFP: public PFP_STANDARD
 	typedef Map2TP MAP;
 };
 
-// fonction qui renvoit vrai (pour sélectioner tous les brins)
-SelectorTrue allDarts;
+/// definition de la carte en  global, plus facile 
+PFP::MAP myMap;
 
-// typedef pour le plongement des sommets
+// handler d'attribut de position par sommet
+AttributeHandler<PFP::VEC3> position;
+
+// handler d'attribut de normale par sommet
+AttributeHandler<PFP::VEC3> normal;
+
+/// encore 1 typedef pour simplifier l'ecriture du code
 typedef PFP::VEC3 Point3D;
 
 // Variables pour la gestion des plongements
@@ -625,7 +631,20 @@ int main(int argc, char **argv)
 	Point3D lPosObj = (bb.min() +  bb.max()) / 2;
 	sqt.setParamObject(lWidthObj,lPosObj.data());
 
-	// show pour optenir le contexte GL
+	// show 1 pour optenir le contexte GL
+	sqt.show();
+
+	// update du VBO position (contexte GL necessaire)
+	sqt.m_positionVBO->updateData(position);
+	sqt.m_normalVBO->updateData(normal);
+
+	// update des primitives du renderer
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+
+	sqt.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
+
+	// show final pour premier redraw
 	sqt.show();
 
 	// et on attend la fin.

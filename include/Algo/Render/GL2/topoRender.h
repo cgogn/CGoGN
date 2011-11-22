@@ -213,7 +213,7 @@ public:
 	* @param good selector
 	*/
 	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = SelectorTrue());
+	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 };
 
 class TopoRenderGMap : public TopoRender
@@ -228,7 +228,7 @@ public:
 	* @param good selector
 	*/
 	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = SelectorTrue());
+	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 };
 
 } // namespace VBO

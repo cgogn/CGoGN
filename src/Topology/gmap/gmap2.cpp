@@ -149,7 +149,7 @@ Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 	Dart f = phi1(d) ;
 	Dart g = phi_1(d) ;
 
-	if(resV == Dart::nil())
+	if(resV == NIL)
 	{
 		if(!isFaceTriangle(d))
 			resV = f ;
@@ -206,7 +206,21 @@ bool GMap2::flipBackEdge(Dart d)
 	return false ; // cannot flip a border edge
 }
 
-void GMap2::sewFaces(Dart d, Dart e)
+void GMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+
+	phi1sew(phi_1(d),phi_1(e));
+}
+
+void GMap2::removeEdgeFromVertex(Dart d)
+{
+	assert(phi2(d)!=d);
+
+	phi1sew(phi_1(d),phi2(d));
+}
+
+void GMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
 	phi2sew(d, e);
 }

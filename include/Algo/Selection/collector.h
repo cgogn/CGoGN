@@ -25,8 +25,6 @@
 #ifndef __COLLECTOR_H__
 #define __COLLECTOR_H__
 
-#include "Algo/Geometry/intersection.h"
-
 /*****************************************
  * Class hierarchy :
  * Collector (virtual)

@@ -75,9 +75,9 @@ class AttributeHandlerGen ;
 
 class GenericMap : public MapBrowser
 {
-
 	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
+	friend class CellMarkerGen ;
 
 protected:
 	/**
@@ -273,6 +273,26 @@ public:
 	 */
 	void initOrbitEmbedding(unsigned int orbit, bool realloc = false) ;
 
+protected:
+	/****************************************
+	 *   EMBEDDING ATTRIBUTES MANAGEMENT    *
+	 ****************************************/
+	/**
+	 * Create the dart attribute to store the embedding of this orbit (for internal use only)
+	 * Also adds a Marker attribute to the container
+	 */
+	void addEmbedding(unsigned int orbit) ;
+
+	/****************************************
+	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *
+	 ****************************************/
+
+	/**
+	 * Add a toological relation in the map
+	 * @param name name of relation
+	 */
+	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
+
 	/****************************************
 	 *          THREAD MANAGEMENT           *
 	 ****************************************/
@@ -368,7 +388,7 @@ public:
 	 * Apply a functor on each dart of the map
 	 * @param f a ref to the functor obj
 	 */
-	bool foreach_dart(FunctorType& f, const FunctorSelect& good = SelectorTrue()) ;
+	bool foreach_dart(FunctorType& f, const FunctorSelect& good = allDarts) ;
 
 	//! Apply a functor on every dart of an orbit
 	/*! @param dim dimension of orbit
@@ -390,19 +410,56 @@ public:
 	* @param f the functor
 	* @param good the selector of darts
 	*/
-	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = SelectorTrue(), unsigned int thread = 0) ;
+	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = allDarts, unsigned int thread = 0) ;
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
 	 *	@param good the selector of darts
 	 * 	@return the number of orbits
 	 */
-	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = SelectorTrue()) ;
+	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * print attributes name of map in std::cout (for debugging)
 	 */
 	void viewAttributesTables();
+
+protected:
+	/// boundary marker
+	Mark m_boundaryMarker;
+
+	/**
+	 * mark a dart as  belonging to boundary
+	 */
+	void boundaryMark(Dart d);
+
+	/**
+	 * unmark a dart from the boundary
+	 */
+	void boundaryUnmark(Dart d);
+
+public:
+	/**
+	 * test if a dart belong to the boundary
+	 */
+	bool isBoundaryMarked(Dart d);
+
+protected:
+	/**
+	 * mark an orbit of dart as belonging to boundary
+	 */
+	void boundaryMarkOrbit(unsigned int orbit, Dart d);
+
+	/**
+	 * unmark an orbit of dart from the boundary
+	 */
+	void boundaryUnmarkOrbit(unsigned int orbit, Dart d);
+
+	/**
+	 * clear all boundary markers
+	 */
+	void boundaryUnmarkAll();
+
 } ;
 
 

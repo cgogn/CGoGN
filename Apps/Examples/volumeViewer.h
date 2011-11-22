@@ -48,7 +48,6 @@ struct PFP: public PFP_STANDARD
 
 
 PFP::MAP myMap;
-SelectorTrue allDarts;
 PFP::TVEC3 position ;
 
 

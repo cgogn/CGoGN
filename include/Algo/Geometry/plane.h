@@ -39,24 +39,24 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::Plane3D<typename PFP::REAL> trianglePlane(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions)
+Geom::Plane3D<typename PFP::REAL> trianglePlane(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typename PFP::VEC3 n = triangleNormal<PFP>(map,d,positions) ;
-	return Geom::Plane3D<typename PFP::REAL>(n, positions[d]) ;
+	typename PFP::VEC3 n = triangleNormal<PFP>(map, d, position) ;
+	return Geom::Plane3D<typename PFP::REAL>(n, position[d]) ;
 }
 
 template <typename PFP>
-Geom::Plane3D<typename PFP::REAL> facePlane(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions)
+Geom::Plane3D<typename PFP::REAL> facePlane(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typename PFP::VEC3 n = faceNormal<PFP>(map,d,positions) ;
-	return Geom::Plane3D<typename PFP::REAL>(n, positions[d]) ;
+	typename PFP::VEC3 n = faceNormal<PFP>(map, d, position) ;
+	return Geom::Plane3D<typename PFP::REAL>(n, position[d]) ;
 }
 
 template <typename PFP>
-Geom::Plane3D<typename PFP::REAL> vertexTangentPlane(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions)
+Geom::Plane3D<typename PFP::REAL> vertexTangentPlane(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
 {
-	typename PFP::VEC3 n = vertexNormal<PFP>(map,d,positions) ;
-	return Geom::Plane3D<typename PFP::REAL>(n, positions[d]) ;
+	typename PFP::VEC3 n = vertexNormal<PFP>(map, d, position) ;
+	return Geom::Plane3D<typename PFP::REAL>(n, position[d]) ;
 }
 
 } // namespace Geometry

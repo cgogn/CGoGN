@@ -123,11 +123,11 @@ bool isPointOnVertex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& 
 template <typename PFP>
 bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, const typename PFP::VEC3 points[4], bool CCW);
 
-}
+} // namespace Geometry
 
-}
+} // namespace Algo
 
-}
+} // namespace CGoGN
 
 #include "Algo/Geometry/inclusion.hpp"
 

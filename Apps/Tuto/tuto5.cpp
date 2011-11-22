@@ -60,7 +60,6 @@ struct PFP: public PFP_STANDARD
 };
 
 PFP::MAP myMap;
-SelectorTrue allDarts;
 PFP::TVEC3 position ;
 Dart dglobal;
 
@@ -184,8 +183,6 @@ void MyQT::cb_initGL()
 	registerShader(m_strings);
 	registerShader(m_sprite);
 	registerShader(m_lines);
-
-	SelectorTrue allDarts;
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);

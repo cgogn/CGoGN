@@ -24,6 +24,8 @@
 
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
 #include "openctm.h"
 
@@ -60,30 +62,27 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	vertices.reserve(nbDarts/6) ;
 
 	CellMarker markV(map, VERTEX) ;
-	DartMarker markF(map) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<MAP> t(map, good) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(good(d) && !markF.isMarked(d))
+		std::vector<unsigned int> fidx ;
+		fidx.reserve(8) ;
+		unsigned int degree = 0 ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
-			markF.markOrbit(FACE, d) ;
-			std::vector<unsigned int> fidx ;
-			fidx.reserve(4) ;
-			Dart dd = d ;
-			do
+			++degree ;
+			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			if(!markV.isMarked(it))
 			{
-				unsigned int vNum = map.getEmbedding(VERTEX, dd) ;
-				if(!markV.isMarked(dd))
-				{
-					markV.mark(dd) ;
-					vIndex[vNum] = vCpt++ ;
-					vertices.push_back(vNum) ;
-				}
-				fidx.push_back(vIndex[vNum]) ;
-				dd = map.phi1(dd) ;
-			} while(dd != d) ;
-			facesSize.push_back(map.faceDegree(d)) ;
-			facesIdx.push_back(fidx) ;
+				markV.mark(it) ;
+				vIndex[vNum] = vCpt++ ;
+				vertices.push_back(vNum) ;
+			}
+			fidx.push_back(vIndex[vNum]) ;
 		}
+		facesSize.push_back(degree) ;
+		facesIdx.push_back(fidx) ;
 	}
 
 	out << "ply" << std::endl ;
@@ -138,30 +137,27 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	vertices.reserve(nbDarts/6) ;
 
 	CellMarker markV(map, VERTEX) ;
-	DartMarker markF(map) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorF<MAP> t(map, good) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(good(d) && !markF.isMarked(d))
+		std::vector<unsigned int> fidx ;
+		fidx.reserve(8) ;
+		unsigned int degree = 0 ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
-			markF.markOrbit(FACE, d) ;
-			std::vector<unsigned int> fidx ;
-			fidx.reserve(4) ;
-			Dart dd = d ;
-			do
+			++degree ;
+			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			if(!markV.isMarked(it))
 			{
-				unsigned int vNum = map.getEmbedding(VERTEX, dd) ;
-				if(!markV.isMarked(dd))
-				{
-					markV.mark(dd) ;
-					vIndex[vNum] = vCpt++ ;
-					vertices.push_back(vNum) ;
-				}
-				fidx.push_back(vIndex[vNum]) ;
-				dd = map.phi1(dd) ;
-			} while(dd != d) ;
-			facesSize.push_back(map.faceDegree(d)) ;
-			facesIdx.push_back(fidx) ;
+				markV.mark(it) ;
+				vIndex[vNum] = vCpt++ ;
+				vertices.push_back(vNum) ;
+			}
+			fidx.push_back(vIndex[vNum]) ;
 		}
+		facesSize.push_back(degree) ;
+		facesIdx.push_back(fidx) ;
 	}
 
 	out << "OFF" << std::endl ;
@@ -185,44 +181,38 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good)
+bool exportCTM(typename PFP::MAP& map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
 
-	AutoAttributeHandler<unsigned int> tableVertLab(the_map, VERTEX);
+	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
 
-	CellMarker markV(the_map,VERTEX);
-
-	unsigned int nbDarts = the_map.getNbDarts() ;
+	unsigned int nbDarts = map.getNbDarts() ;
 
 	std::vector<CTMfloat> verticesBuffer;
 	std::vector<CTMuint> indicesBuffer;
 	verticesBuffer.reserve(nbDarts/5);	// TODO non optimal reservation
 	indicesBuffer.reserve(nbDarts/3);
 
-	DartMarker markF(the_map);
-	unsigned int lab=0;
-	for(Dart d = the_map.begin(); d != the_map.end(); the_map.next(d))
+	CellMarker markV(map, VERTEX);
+	TraversorF<MAP> t(map, good) ;
+	unsigned int lab = 0;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(good(d) && !markF.isMarked(d))
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
-			markF.markOrbit(FACE, d) ;
-			Dart e = d;
-			do
+			if (!markV.isMarked(it))
 			{
-				if (!markV.isMarked(e))
-				{
-					tableVertLab[e] = lab++;
-					markV.mark(e);
-					const VEC3& vert =  position[e];
-					verticesBuffer.push_back(vert[0]);
-					verticesBuffer.push_back(vert[1]);
-					verticesBuffer.push_back(vert[2]);
-				}
-				indicesBuffer.push_back(tableVertLab[e]);
-				e = the_map.phi1(e);
-			} while (e!=d);
+				markV.mark(it);
+				tableVertLab[it] = lab++;
+				const VEC3& vert =  position[it];
+				verticesBuffer.push_back(vert[0]);
+				verticesBuffer.push_back(vert[1]);
+				verticesBuffer.push_back(vert[2]);
+			}
+			indicesBuffer.push_back(tableVertLab[it]);
 		}
 	}
 
@@ -265,7 +255,6 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 
 	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
 
-	CellMarker markV(map,VERTEX);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -275,35 +264,30 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	vertices.reserve(nbDarts/5);	// TODO non optimal reservation
 	faces.reserve(nbDarts/3);
 
-	DartMarker markF(map);
+	CellMarker markV(map, VERTEX);
+	TraversorF<MAP> t(map, good) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(good(d) && !markF.isMarked(d))
+		std::vector<unsigned int> face ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
-			markF.markOrbit(FACE, d) ;
-			Dart e = d;
-			std::vector<unsigned int> face ;
-			do
+			if (!markV.isMarked(it))
 			{
-				if (!markV.isMarked(e))
-				{
-					vertices.push_back(map.getEmbedding(VERTEX, e));
-					tableVertLab[e] = lab++;
-
-					markV.mark(e);
-				}
-				face.push_back(tableVertLab[e]);
-				e = map.phi1(e);
-			} while (e!=d) ;
-
-			faces.push_back(face.size()) ;
-			for (unsigned int i = 0 ; i < face.size() ; ++i)
-				faces.push_back(face.at(i)) ;
-
-			++nbf;
+				markV.mark(it);
+				tableVertLab[it] = lab++;
+				vertices.push_back(map.getEmbedding(VERTEX, it));
+			}
+			face.push_back(tableVertLab[it]);
 		}
+
+		faces.push_back(face.size()) ;
+		for (unsigned int i = 0 ; i < face.size() ; ++i)
+			faces.push_back(face.at(i)) ;
+
+		++nbf;
 	}
 
 	TVEC3 frame[3] ;
@@ -410,8 +394,6 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 
 	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
 
-	CellMarker markV(map,VERTEX);
-
 	unsigned int nbDarts = map.getNbDarts() ;
 
 	std::vector<unsigned int> vertices;
@@ -420,35 +402,30 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	vertices.reserve(nbDarts/5);	// TODO non optimal reservation
 	faces.reserve(nbDarts/3);
 
-	DartMarker markF(map);
+	CellMarker markV(map, VERTEX);
+	TraversorF<MAP> t(map, good) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(good(d) && !markF.isMarked(d))
+		std::vector<unsigned int> face ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
-			markF.markOrbit(FACE, d) ;
-			Dart e = d;
-			std::vector<unsigned int> face ;
-			do
+			if (!markV.isMarked(it))
 			{
-				if (!markV.isMarked(e))
-				{
-					vertices.push_back(map.getEmbedding(VERTEX, e));
-					tableVertLab[e] = lab++;
-
-					markV.mark(e);
-				}
-				face.push_back(tableVertLab[e]);
-				e = map.phi1(e);
-			} while (e!=d) ;
-
-			faces.push_back(face.size()) ;
-			for (unsigned int i = 0 ; i < face.size() ; ++i)
-				faces.push_back(face.at(i)) ;
-
-			++nbf;
+				markV.mark(it);
+				tableVertLab[it] = lab++;
+				vertices.push_back(map.getEmbedding(VERTEX, it));
+			}
+			face.push_back(tableVertLab[it]);
 		}
+
+		faces.push_back(face.size()) ;
+		for (unsigned int i = 0 ; i < face.size() ; ++i)
+			faces.push_back(face.at(i)) ;
+
+		++nbf;
 	}
 
 	out << "ply" << std::endl ;
@@ -515,7 +492,6 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	return true ;
 }
 
-
 template <typename PFP>
 bool exportInESS(typename PFP::MAP& map, const char *filename, const typename PFP::TVEC3& position)
 {
@@ -528,8 +504,6 @@ bool exportInESS(typename PFP::MAP& map, const char *filename, const typename PF
 		CGoGNerr << "Unable to open file " << CGoGNendl ;
 		return false ;
 	}
-
-
 }
 
 } // namespace Export

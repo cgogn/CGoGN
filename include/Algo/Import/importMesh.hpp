@@ -74,7 +74,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 		nbe = edgesBuffer.size();
 		if (nbe > 2)
 		{
-			Dart d = map.newFace(nbe);
+			Dart d = map.newFace(nbe,false);
 			for (unsigned int j = 0; j < nbe; ++j)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
@@ -97,18 +97,18 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
 			unsigned int embd = map.getEmbedding(VERTEX, d);
-			Dart good_dart;
-			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == Dart::nil(); ++it)
+			Dart good_dart=NIL;
+			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
 				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 
-			if (good_dart != Dart::nil())
+			if (good_dart != NIL)
 			{
 				if (good_dart == map.phi2(good_dart))
 				{
-					map.sewFaces(d, good_dart);
+					map.sewFaces(d, good_dart,false);
 					m.unmarkOrbit(EDGE, d);
 				}
 			}
@@ -121,7 +121,13 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	}
 
 	if (nbnm > 0)
-		CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
+	{
+		map.closeMap();
+		CGoGNout << "Map closed (" << nbnm << " boundary edges)" << CGoGNendl;
+		// ensure bijection between topo a embedding
+		map.bijectiveOrbitEmbedding(VERTEX);
+
+	}
 
 	return true ;
 }

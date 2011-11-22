@@ -58,8 +58,6 @@ struct PFP: public PFP_STANDARD
 
 // declaration of the map
 PFP::MAP myMap;
-// this selector is going to select all the darts
-SelectorTrue allDarts;
 
 // attribute handlers
 AttributeHandler<PFP::VEC3> position;

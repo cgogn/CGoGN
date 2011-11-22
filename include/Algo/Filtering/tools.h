@@ -38,52 +38,45 @@ namespace Filtering
 {
 
 template <typename PFP>
-float computeHaussdorf(typename PFP::MAP& map, const typename PFP::TVEC3& originalPosition, const typename PFP::TVEC3& position2, const FunctorSelect& select = SelectorTrue())
+float computeHaussdorf(typename PFP::MAP& map, const typename PFP::TVEC3& originalPosition, const typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
 	float dist_o = 0.0f ;
 	float dist_f = 0.0f ;
 
-	CellMarker mv(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !mv.isMarked(d))
+		const VEC3& posO = originalPosition[d] ;
+		const VEC3& posF = position2[d] ;
+
+		float dv_o = std::numeric_limits<float>::max();
+		float dv_f = std::numeric_limits<float>::max();
+
+		// just test the faces around the vertex => warning not real haussdorff distance!
+		Traversor2VF<typename PFP::MAP> tf(map, d) ;
+		for(Dart it = tf.begin(); it != tf.end(); it = tf.next())
 		{
-			mv.mark(d);
+			Dart e = map.phi1(it) ;
+			const VEC3& Bo = originalPosition[e] ;
+			const VEC3& Bf = position2[e] ;
+			e = map.phi1(e) ;
+			const VEC3& Co = originalPosition[e] ;
+			const VEC3& Cf = position2[e] ;
 
-			const VEC3& posO = originalPosition[d] ;
-			const VEC3& posF = position2[d] ;
-
-			float dv_o = std::numeric_limits<float>::max();
-			float dv_f = std::numeric_limits<float>::max();
-
-			// just test the faces around the vertex => warning not real haussdorff distance!
-			Dart dd = d ;
-			do
-			{
-				Dart e = map.phi1(dd) ;
-				const VEC3& Bo = originalPosition[e] ;
-				const VEC3& Bf = position2[e] ;
-				e = map.phi1(e) ;
-				const VEC3& Co = originalPosition[e] ;
-				const VEC3& Cf = position2[e] ;
-
-				float d = Geom::squaredDistancePoint2Triangle(posO, posF, Bf, Cf) ;
-				if(d < dv_o)
-					dv_o = d ;
-				d = Geom::squaredDistancePoint2Triangle(posF, posO, Bo, Co) ;
-				if(d < dv_f)
-					dv_f = d ;
-
-				dd = map.phi2(e) ;
-			} while(dd != d) ;
-
-			if(dv_o > dist_o)
-				dist_o = dv_o ;
-			if(dv_f > dist_f)
-				dist_f = dv_f ;
+			float d = Geom::squaredDistancePoint2Triangle(posO, posF, Bf, Cf) ;
+			if(d < dv_o)
+				dv_o = d ;
+			d = Geom::squaredDistancePoint2Triangle(posF, posO, Bo, Co) ;
+			if(d < dv_f)
+				dv_f = d ;
 		}
+
+		if(dv_o > dist_o)
+			dist_o = dv_o ;
+		if(dv_f > dist_f)
+			dist_f = dv_f ;
 	}
 
 	if (dist_f > dist_o)
@@ -92,7 +85,7 @@ float computeHaussdorf(typename PFP::MAP& map, const typename PFP::TVEC3& origin
 }
 
 template <typename PFP>
-void computeNoise(typename PFP::MAP& map, long amount, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = SelectorTrue())
+void computeNoise(typename PFP::MAP& map, long amount, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -100,46 +93,39 @@ void computeNoise(typename PFP::MAP& map, long amount, const typename PFP::TVEC3
 	srand(time(NULL)) ;
 
 	// apply noise on each vertex
-	CellMarker mv(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if(select(d) && !mv.isMarked(d))
+		const VEC3& pos = position[d] ;
+		VEC3 norm = normal[d] ;
+
+		float r1 = float(rand() % amount) / 100.0f ;
+		float r2 = 0 ;
+		if (amount >= 5)
+			r2 = float(rand() % (amount/5)) / 100.0f ;
+
+		long sign = rand() % 2 ;
+		if (sign == 1) norm *= -1.0f ;
+		float avEL = 0.0f ;
+		VEC3 td(0) ;
+
+		long nbE = 0 ;
+		Traversor2VVaE<typename PFP::MAP> tav(map, d) ;
+		for(Dart it = tav.begin(); it != tav.end(); it = tav.next())
 		{
-			mv.mark(d);
-
-			const VEC3& pos = position[d] ;
-			VEC3 norm = normal[d] ;
-
-			float r1 = float(rand() % amount) / 100.0f ;
-			float r2 = 0 ;
-			if (amount >= 5)
-				r2 = float(rand() % (amount/5)) / 100.0f ;
-
-			long sign = rand() % 2 ;
-			if (sign == 1) norm *= -1.0f ;
-			float avEL = 0.0f ;
-			VEC3 td(0) ;
-
-			Dart dd = d ;
-			long nbE = 0 ;
-			do	// turn around vertex and get each neighbor vertex
-			{
-				Dart e = map.phi2(dd) ;
-				const VEC3& p = position[e] ;
-				VEC3 vec = p - pos ;
-				float el = vec.norm() ;
-				vec *= r2 ;
-				td += vec ;
-				avEL += el ;
-				nbE++ ;
-				dd = map.phi1(e) ;
-			} while (dd != d) ;
-
-			avEL /= float(nbE) ;
-			norm *= avEL * r1 ;
-			norm += td ;
-			position2[d] = pos + norm ;
+			const VEC3& p = position[it] ;
+			VEC3 vec = p - pos ;
+			float el = vec.norm() ;
+			vec *= r2 ;
+			td += vec ;
+			avEL += el ;
+			nbE++ ;
 		}
+
+		avEL /= float(nbE) ;
+		norm *= avEL * r1 ;
+		norm += td ;
+		position2[d] = pos + norm ;
 	}
 }
 

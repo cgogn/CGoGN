@@ -22,6 +22,7 @@
  *                                                                              *
  *******************************************************************************/
 
+#include "Topology/generic/traversorCell.h"
 #include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
@@ -116,15 +117,9 @@ template <typename PFP>
 float totalVolume(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select)
 {
 	typename PFP::REAL vol = 0 ;
-	DartMarker mark(map) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !mark.isMarked(d))
-		{
-			mark.markOrbit(VOLUME, d) ;
-			vol += convexPolyhedronVolume<PFP>(map, d, position) ;
-		}
-	}
+	TraversorW<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		vol += convexPolyhedronVolume<PFP>(map, d, position) ;
 	return vol ;
 }
 

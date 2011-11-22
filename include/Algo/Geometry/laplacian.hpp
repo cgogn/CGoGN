@@ -22,6 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 #include "Algo/Geometry/basic.h"
 
 namespace CGoGN
@@ -42,19 +44,14 @@ ATTR_TYPE computeLaplacianTopoVertex(
 	ATTR_TYPE l(0) ;
 	ATTR_TYPE value = attr[d] ;
 	unsigned int wSum = 0 ;
-	Dart it = d ;
-	do
+
+	Traversor2VE<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
 	{
 		l += attr[map.phi1(it)] - value ;
 		++wSum ;
-		Dart dboundary = map.phi_1(it) ;
-		if(map.phi2(dboundary) == dboundary)
-		{
-			l += attr[dboundary] - value ;
-			++wSum ;
-		}
-		it = map.alpha1(it) ;
-	} while(it != d) ;
+	}
+
 	l /= wSum ;
 	return l ;
 }
@@ -67,26 +64,19 @@ ATTR_TYPE computeLaplacianCotanVertex(
 	const typename PFP::TREAL& vertexArea,
 	const AttributeHandler<ATTR_TYPE>& attr)
 {
-	typedef typename PFP::REAL REAL ;
 	ATTR_TYPE l(0) ;
-	Dart it = d ;
-	REAL vArea = vertexArea[d] ;
+	typename PFP::REAL vArea = vertexArea[d] ;
 	ATTR_TYPE value = attr[d] ;
-	REAL wSum = 0 ;
-	do
+	typename PFP::REAL wSum = 0 ;
+
+	Traversor2VE<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
 	{
-		REAL w = edgeWeight[it] / vArea ;
+		typename PFP::REAL w = edgeWeight[it] / vArea ;
 		l += (attr[map.phi1(it)] - value) * w ;
 		wSum += w ;
-		Dart dboundary = map.phi_1(it) ;
-		if(map.phi2(dboundary) == dboundary)
-		{
-			w = edgeWeight[dboundary] / vArea ;
-			l += (attr[dboundary] - value) * w ;
-			wSum += w ;
-		}
-		it = map.alpha1(it) ;
-	} while(it != d) ;
+	}
+
 	l /= wSum ;
 	return l ;
 }
@@ -98,15 +88,9 @@ void computeLaplacianTopoVertices(
 	AttributeHandler<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			laplacian[d] = computeLaplacianTopoVertex<PFP, ATTR_TYPE>(map, d, attr) ;
-		}
-	}
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		laplacian[d] = computeLaplacianTopoVertex<PFP, ATTR_TYPE>(map, d, attr) ;
 }
 
 template <typename PFP, typename ATTR_TYPE>
@@ -118,15 +102,9 @@ void computeLaplacianCotanVertices(
 	AttributeHandler<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select)
 {
-	CellMarker marker(map, VERTEX);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			laplacian[d] = computeLaplacianCotanVertex<PFP, ATTR_TYPE>(map, d, edgeWeight, vertexArea, attr) ;
-		}
-	}
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		laplacian[d] = computeLaplacianCotanVertex<PFP, ATTR_TYPE>(map, d, edgeWeight, vertexArea, attr) ;
 }
 
 template <typename PFP>
@@ -135,18 +113,26 @@ typename PFP::REAL computeCotanWeightEdge(
 	Dart d,
 	const typename PFP::TVEC3& position)
 {
-	const typename PFP::VEC3& p1 = position[d] ;
-	const typename PFP::VEC3& p2 = position[map.phi1(d)] ;
-	const typename PFP::VEC3& p3 = position[map.phi_1(d)] ;
-	typename PFP::REAL cot_alpha = 1 / tan(Geom::angle(p1 - p3, p2 - p3)) ;
-	typename PFP::REAL cot_beta = 0 ;
-	Dart dd = map.phi2(d) ;
-	if(dd != d)
+	if(map.isBoundaryEdge(d))
 	{
-		const typename PFP::VEC3& p4 = position[map.phi_1(map.phi2(d))] ;
-		cot_beta = 1 / tan(Geom::angle(p2 - p4, p1 - p4)) ;
+		const typename PFP::VEC3& p1 = position[d] ;
+		const typename PFP::VEC3& p2 = position[map.phi1(d)] ;
+		const typename PFP::VEC3& p3 = position[map.phi_1(d)] ;
+
+		typename PFP::REAL cot_alpha = 1 / tan(Geom::angle(p1 - p3, p2 - p3)) ;
+		return 0.5 * cot_alpha ;
 	}
-	return 0.5 * ( cot_alpha + cot_beta ) ;
+	else
+	{
+		const typename PFP::VEC3& p1 = position[d] ;
+		const typename PFP::VEC3& p2 = position[map.phi1(d)] ;
+		const typename PFP::VEC3& p3 = position[map.phi_1(d)] ;
+		const typename PFP::VEC3& p4 = position[map.phi_1(map.phi2(d))] ;
+
+		typename PFP::REAL cot_alpha = 1 / tan(Geom::angle(p1 - p3, p2 - p3)) ;
+		typename PFP::REAL cot_beta = 1 / tan(Geom::angle(p2 - p4, p1 - p4)) ;
+		return 0.5 * ( cot_alpha + cot_beta ) ;
+	}
 }
 
 template <typename PFP>
@@ -154,17 +140,11 @@ void computeCotanWeightEdges(
 	typename PFP::MAP& map,
 	const typename PFP::TVEC3& position,
 	typename PFP::TREAL& edgeWeight,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select)
 {
-	CellMarker marker(map, EDGE);
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(select(d) && !marker.isMarked(d))
-		{
-			marker.mark(d);
-			edgeWeight[d] = computeCotanWeightEdge<PFP>(map, d, position) ;
-		}
-	}
+	TraversorE<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		edgeWeight[d] = computeCotanWeightEdge<PFP>(map, d, position) ;
 }
 
 } // namespace Geometry

@@ -144,9 +144,6 @@ int main(int argc, char **argv)
 	// declaration of the map
 	PFP::MAP myMap;
 
-	// this selector is going to select all the darts
-	SelectorTrue allDarts;
-
 	// creation of a new attribute on vertices of type 3D vector
 	// a handler to this attribute is returned
 	AttributeHandler<PFP::VEC3> position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
