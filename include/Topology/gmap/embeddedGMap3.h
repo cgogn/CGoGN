@@ -22,41 +22,41 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __EMBEDDED_GMAP3_H__
+#define __EMBEDDED_GMAP3_H__
 
-#include "Topology/generic/genericmap.h"
+#include "Topology/gmap/gmap3.h"
 
 namespace CGoGN
 {
 
 /**
-* Class of 3-dimensional maps
-* with lazily managed embeddings
+* Class of 3-dimensional G-maps
+* with managed embeddings
 */
-template <typename MAP3>
-class EmbeddedMap3 : public MAP3
+class EmbeddedGMap3 : public GMap3
 {
 public:
-	typedef MAP3 TOPO_MAP;
+	typedef GMap3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
+	//! Cut the edge of d
+	/*! @param d a dart of the edge to cut
 	 */
-	virtual void sewVolumes(Dart d, Dart e);
+	virtual void cutEdge(Dart d);
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
+	 * The attributes attached to the edge of d are kept on the resulting edge
+	 * The attributes attached to the volume of d are kept on the resulting volume
 	 */
-	virtual void unsewVolumes(Dart d);
+	void sewFaces(Dart d, Dart e);
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
+	 * The attributes attached to the old edge are duplicated on both resulting edges
+	 * The attributes attached to the old volume are duplicated on both volume if a new one is created
 	 */
-	virtual bool mergeVolumes(Dart d);
+	virtual void unsewFaces(Dart d);
 
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
@@ -66,36 +66,24 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
-	//! Cut the edge of d
-	/*! @param d a dart of the edge to cut
+	/**
+	 * The attributes attached to the vertices of the vertices of the face of d are kept on the vertices of the resulting face
+	 * The attributes attached to the edges of the face of d are kept on the resulting face
+	 * The attributes attached to the face of d are kept on the resulting face
 	 */
-	virtual void cutEdge(Dart d);
+	virtual void sewVolumes(Dart d, Dart e);
 
-	//!
-	/*!
-	 *
+	/**
+	 * The attributes attached to the vertices of the old face of d are duplicated on the vertices of both resulting faces
+	 * The attributes attached to the old edges of the old face of d are duplicated on the edges of both resulting faces
+	 * The attributes attached to the old face d are duplicated on both resulting faces
 	 */
-	virtual Dart cutSpike(Dart d);
+	virtual void unsewVolumes(Dart d);
 
-
-	//! Collapse an edge (that is deleted) possibly merging its vertices
-	/*! If delDegenerateFaces is true, the method checks that no degenerate
-	 *  faces are build (faces with less than 3 edges). If it occurs the faces
-	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
-	 *  \warning This may produce two distinct vertices if the edge
-	 *  was the only link between two border faces
-	 *  @param d a dart in the deleted edge
-	 *  @param delDegenerateFaces a boolean (default to true)
+	/**
+	 * The attributes attached to the volume of the old volume of d are kept on the resulting volume
 	 */
-	virtual int collapseEdge(Dart d, bool delDegenerateFaces = true,
-			bool delDegenerateVolumes = true);
-	//!
-	/*!
-	 *
-	 */
-	virtual void collapseFace(Dart d, bool delDegenerateFaces = true,
-			bool delDegenerateVolumes = true);
-
+	virtual bool mergeVolumes(Dart d);
 
 	virtual unsigned int closeHole(Dart d);
 
@@ -106,7 +94,5 @@ public:
 } ;
 
 } // namespace CGoGN
-
-#include "embeddedMap3.hpp"
 
 #endif

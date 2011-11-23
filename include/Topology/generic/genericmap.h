@@ -204,7 +204,7 @@ public:
 	void embedOrbit(unsigned int orbit, Dart d, unsigned int em) ;
 
 	/**
-	* Associate an new embedding to all darts of a vertex
+	* Associate an new embedding to all darts of an orbit
 	* @param orbit orbit to embed
 	* @param d a dart of the topological cell
 	* @return index of the attribute in table
@@ -212,10 +212,10 @@ public:
 	unsigned int embedNewCell(unsigned int orbit, Dart d) ;
 
 	/**
-	* Copy the cell associated to a dart over an other dart
+	 * Copy the cell associated to a dart over an other dart
 	 * @param orbit attribute orbit to use
-	* @param d the dart to overwrite (dest)
-	* @param e the dart to copy (src)
+	 * @param d the dart to overwrite (dest)
+	 * @param e the dart to copy (src)
 	 */
 	void copyCell(unsigned int orbit, Dart d, Dart e) ;
 

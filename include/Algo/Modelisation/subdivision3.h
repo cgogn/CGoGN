@@ -22,57 +22,55 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
+#ifndef __SUBDIVISION3_H__
+#define __SUBDIVISION3_H__
 
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
+#include <math.h>
+#include <vector>
 
-#include "Geometry/vector_gen.h"
+namespace CGoGN
+{
 
-#include "Algo/Import/import.h"
-#include "Algo/Export/export.h"
+namespace Algo
+{
 
-#include "Algo/Modelisation/subdivision.h"
-
-using namespace CGoGN ;
+namespace Modelisation
+{
 
 /**
- * Struct that contains some informations about the types of the manipulated objects
- * Mainly here to be used by the algorithms that are parameterized by it
- */
-struct PFP: public PFP_STANDARD
+* Cut a 3D ear from a mesh : the ear is sewn by phi3 to the rest of the volume
+* @param d dart of the point of the ear
+* @return a dart from the new face connecting the ear and the rest of the volume
+*/
+template <typename PFP>
+Dart cut3Ear(typename PFP::MAP& map, Dart d);
+
+
+
+/**
+* catmull clark volumic : do not move the original vertices
+* @param map the map
+* @param attributs geometric attributes of the vertices
+* @param selected a functor to select volumes to subdivide
+* TODO : test if it works for the functorselect
+*/
+template <typename PFP, typename EMBV, typename EMB>
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= SelectorTrue());
+
+template <typename PFP>
+void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= SelectorTrue())
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP;
-};
-
-int main(int argc, char **argv)
-{
-	if(argc != 3)
-	{
-		CGoGNout << "Usage : " << argv[0] << " filename nbSteps" << CGoGNendl;
-		return 0;
-	}
-
-	std::string filename(argv[1]);
-
-	unsigned int nbSteps;
-	std::istringstream iss(argv[2]);
-	iss >> nbSteps;
-
-	// declaration of the map
-	PFP::MAP myMap;
-
-	std::vector<std::string> attrNames ;
-	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
-
-	// get a handler to the 3D vector attribute created by the import
-	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]);
-
-	for(unsigned int i = 0; i < nbSteps; ++i)
-		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
-
-	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
-
-    return 0;
+	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
 }
+
+} // namespace Modelisation
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/Modelisation/subdivision3.hpp"
+
+#endif
+
+

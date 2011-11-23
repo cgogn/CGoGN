@@ -318,20 +318,6 @@ void Map2::unsewAroundVertex(Dart d)
 	while(e != d);
 }
 
-void Map2::explodPolyhedron(Dart d)
-{
-	unsewAroundVertex(d);
-	closeHole(phi1(d));
-
-	//Recherche du (ou un des) sommet oppose
-		//tourner autour du sommet
-			//si quad  alors sommet oppose
-			//
-		//si pas de quad alors un sommet du trian
-
-	//
-}
-
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
 	// First traversal of both faces to check the face sizes
@@ -439,6 +425,18 @@ bool Map2::sameOrientedVertex(Dart d, Dart e)
 		dNext = alpha1(dNext);
 	} while (dNext != d);
 	return false;				// None is equal to e => vertices are distinct
+}
+
+bool Map2::sameOrientedFace(Dart d, Dart e)
+{
+	Dart dNext = d;
+	do							// Foreach dart dNext in the face of d
+	{
+		if(dNext == e)			// Test equality with e
+			return true;
+		dNext = phi1(dNext);
+	} while(dNext != d);
+	return false;				// None is equal to e => faces are distinct
 }
 
 unsigned int Map2::vertexDegree(Dart d)
@@ -639,65 +637,6 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 		}
 	}
 	return found;
-}
-
-bool Map2::foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
-{
-	if(orbit == VERTEX)
-	{
-
-		Dart dNext = d;
-		do
-		{
-			if(Map1::foreach_dart_of_face(dNext,f,thread))
-				return true;
-
-			dNext = alpha1(dNext);
-		} while (dNext != d);
-
-		return false;
-	}
-	else if(orbit == FACE)
-	{
-		if(Map1::foreach_dart_of_face(d,f,thread))
-			return true;
-
-		if(phi2(d) != d)
-			return Map1::foreach_dart_of_face(phi2(d),f,thread);
-		else
-			return false;
-	}
-
-	return false;
-}
-
-bool Map2::foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread)
-{
-	if(orbit == VERTEX)
-	{
-		Dart dNext = d;
-		do
-		{
-			if(Map2::foreach_dart_of_edge(phi1(dNext),f,thread))
-				return true;
-
-			dNext = alpha1(dNext);
-		} while (dNext != d);
-
-		return false;
-	}
-	else if(orbit == FACE)
-	{
-		if(Map2::foreach_dart_of_vertex(phi_1(d),f,thread))
-			return true;
-
-		if(Map2::foreach_dart_of_vertex(phi_1(phi2(d)),f,thread))
-			return true;
-
-		return false;
-	}
-
-	return false;
 }
 
 

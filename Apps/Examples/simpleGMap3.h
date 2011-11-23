@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,62 +17,50 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 #include <iostream>
 
+#include "Utils/qtSimple.h"
+
 #include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
+#include "Topology/gmap/embeddedGMap3.h"
 
 #include "Geometry/vector_gen.h"
 
-#include "Algo/Import/import.h"
-#include "Algo/Export/export.h"
-
-#include "Algo/Modelisation/subdivision.h"
+#include "Algo/Render/GL1/map_glRender.h"
+#include "Algo/Render/GL1/topo_render.h"
 
 using namespace CGoGN ;
 
-/**
- * Struct that contains some informations about the types of the manipulated objects
- * Mainly here to be used by the algorithms that are parameterized by it
- */
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef EmbeddedMap2 MAP;
+	typedef EmbeddedGMap3 MAP ;
 };
 
-int main(int argc, char **argv)
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+
+class SimpleGMap3 : public Utils::QT::SimpleQT
 {
-	if(argc != 3)
-	{
-		CGoGNout << "Usage : " << argv[0] << " filename nbSteps" << CGoGNendl;
-		return 0;
-	}
+	Q_OBJECT
 
-	std::string filename(argv[1]);
+public:
+	MAP myMap ;
+	SelectorTrue allDarts ;
 
-	unsigned int nbSteps;
-	std::istringstream iss(argv[2]);
-	iss >> nbSteps;
+	PFP::TVEC3 position ;
+	PFP::TVEC3 normal ;
 
-	// declaration of the map
-	PFP::MAP myMap;
+	SimpleGMap3() ;
 
-	std::vector<std::string> attrNames ;
-	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
+	void initGUI() ;
 
-	// get a handler to the 3D vector attribute created by the import
-	AttributeHandler<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]);
+	void cb_initGL() ;
+	void cb_redraw() ;
+};
 
-	for(unsigned int i = 0; i < nbSteps; ++i)
-		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);
-
-	Algo::Export::exportOFF<PFP>(myMap, position, "result.off");
-
-    return 0;
-}

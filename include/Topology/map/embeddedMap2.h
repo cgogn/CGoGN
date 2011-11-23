@@ -25,20 +25,20 @@
 #ifndef __EMBEDDED_MAP2_H__
 #define __EMBEDDED_MAP2_H__
 
-#include "Topology/generic/genericmap.h"
+#include "Topology/map/map2.h"
 
 namespace CGoGN
 {
 
 /**
 * Class of 2-dimensional maps
-* with lazily managed embeddings
+* with managed embeddings
 */
-template <typename MAP2>
-class EmbeddedMap2 : public MAP2
+class EmbeddedMap2 : public Map2
 {
 public:
-	typedef MAP2 TOPO_MAP;
+	typedef Map2 TOPO_MAP;
+
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 * No attribute is attached to the new edge
@@ -146,7 +146,5 @@ public:
 } ;
 
 } // namespace CGoGN
-
-#include "embeddedMap2.hpp"
 
 #endif

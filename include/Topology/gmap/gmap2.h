@@ -41,6 +41,8 @@ protected:
 	void init() ;
 
 public:
+	typedef GMap1 ParentMap;
+
 	GMap2();
 
 	virtual std::string mapTypeName();
@@ -111,6 +113,20 @@ public:
 	 */
 	virtual bool deleteVertex(Dart d) ;
 
+	//! Insert an edge after a dart in the vertex orbit
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  \pre Dart e must be phi2-linked with its phi_1 dart
+	 *  @param d dart of the vertex
+	 *  @param e dart of the edge
+	 */
+	virtual void insertEdgeInVertex(Dart d, Dart e);
+
+	//! Remove an edge from a vertex orbit
+	/*! \pre Dart d must be phi2 sewn
+	 *  @param d the dart of the edge to remove from the vertex
+	 */
+	virtual void removeEdgeFromVertex(Dart d);
+
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */
@@ -148,20 +164,6 @@ public:
 	 * @return true if the flip has been executed, false otherwise
 	 */
 	virtual bool flipBackEdge(Dart d);
-
-	//! Insert an edge after a dart in the vertex orbit
-	/*! \pre Dart d and e MUST be different and belong to distinct face
-	 *  \pre Dart e must be phi2-linked with its phi_1 dart
-	 *  @param d dart of the vertex
-	 *  @param e dart of the edge
-	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
-
-	//! Remove an edge from a vertex orbit
-	/*! \pre Dart d must be phi2 sewn
-	 *  @param d the dart of the edge to remove from the vertex
-	 */
-	virtual void removeEdgeFromVertex(Dart d);
 
 	//! Sew two faces along an edge (pay attention to the orientation !)
 	/*! \pre Darts d & e MUST be fixed point of phi2 relation
@@ -232,13 +234,12 @@ public:
 	 */
 	virtual unsigned int closeHole(Dart d);
 
-//	/**
-//	* Mark half of dart defining an orientation
-//	* @param d a dart that belong to the orientation we want to mark
-//	* @return the marker which mark th orientation
-//	*/
-//	DartMarker markCCOrientation(Dart d);
-
+	//! Close the map removing topological holes.
+	/*! Add faces to the map that close every existing hole.
+	 *  These faces are marked.
+	 *  \warning The embeddings of vertices are not updated
+	 *  @param marker
+	 */
 	void closeMap(DartMarker& marker);
 	//@}
 
@@ -246,13 +247,18 @@ public:
 	 *  Return or set various topological information
 	 *************************************************************************/
 
+	//@{
+	//! Test if dart d and e belong to the same oriented vertex
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVertex(Dart d, Dart e);
+
 	//! Test if dart d and e belong to the same vertex
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
 	bool sameVertex(Dart d, Dart e);
-
-	bool sameVolume(Dart d, Dart e);
 
 	/**
 	 * compute the number of edges of the vertex of d
@@ -263,6 +269,18 @@ public:
 	 * tell if the vertex of d is on the boundary of the map
 	 */
 	bool isBoundaryVertex(Dart d) ;
+
+	//! Test if dart d and e belong to the same oriented volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedVolume(Dart d, Dart e);
+
+	//! Test if dart d and e belong to the same volume
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameVolume(Dart d, Dart e);
 
 	/**
 	 * Check if map is complete

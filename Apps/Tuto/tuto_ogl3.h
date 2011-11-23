@@ -28,8 +28,7 @@
 #include <iostream>
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/generic/embeddedMap2.h"
+#include "Topology/map/embeddedMap2.h"
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
@@ -53,7 +52,7 @@ using namespace CGoGN;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the type of the map
-	typedef EmbeddedMap2<Map2> MAP;
+	typedef EmbeddedMap2 MAP;
 };
 
 class MyQT: public Utils::QT::SimpleQT

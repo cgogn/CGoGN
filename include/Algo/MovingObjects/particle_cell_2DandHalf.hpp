@@ -171,6 +171,7 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 current, Geom::Orientation3D sid
 			//transform the displacement into the new entered face
 			VEC3 displ = current-m_position;
 			VEC3 edge = Algo::Geometry::vectorOutOfDart<PFP>(m,m.phi2(d),m_positions);
+
 			VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
 			VEC3 n2 = Algo::Geometry::faceNormal<PFP>(m,m.phi2(d),m_positions);
 
@@ -322,7 +323,6 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
 		if(wsoe == Geom::ON)
 		{
 			std::cout << __FILE__ << " to uncomment and check" << std::endl;
-
 //			d = m.phi1(d); //to check
 //			m_position = m_positions[d];
 //

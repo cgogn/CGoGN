@@ -113,6 +113,25 @@ public:
 	}
 };
 
+// Functor Check Embedding : to check the embeddings of the given map
+
+template <typename MAP>
+class FunctorCheckEmbedding : public FunctorMap<MAP>
+{
+protected:
+	unsigned int orbit;
+	unsigned int emb;
+public:
+	FunctorCheckEmbedding(MAP& map, unsigned int orb, unsigned int e) : FunctorMap<MAP>(map), orbit(orb), emb(e)
+	{}
+
+	bool operator()(Dart d)
+	{
+		return (this->m_map.getEmbedding(orbit, d) != emb);
+	}
+};
+
+
 // Search Functor: look for a given dart when applied
 /********************************************************/
 
@@ -156,6 +175,7 @@ public:
 		return false;
 	}
 };
+
 
 // Multiple Functor: to apply several Functors in turn to a dart
 /********************************************************/

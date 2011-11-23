@@ -63,6 +63,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 	position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
 
+
 	map.setCurrentLevel(cur) ;
 }
 
@@ -155,7 +156,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		}
 
 		unsigned int idface = map.getFaceId(old);
-		Dart e = dd;
+		//Dart e = dd;
 		do
 		{
 			map.setFaceId(dd, idface, DART) ;
@@ -265,7 +266,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		//test si la face est triangulaire ou non
 		if(map.phi1(map.phi1(map.phi1(d))) == d)
 		{
-			std::cout << "trian" << std::endl;
+			//std::cout << "trian" << std::endl;
 			Dart cf = map.phi2(map.phi1(d));
 			Dart e = cf;
 			do
@@ -276,7 +277,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		}
 		else
 		{
-			std::cout << "quad" << std::endl;
+			//std::cout << "quad" << std::endl;
 			Dart cf = map.phi1(d);
 			Dart e = cf;
 			do
@@ -303,7 +304,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		Dart e = *edge;
 
 		Dart f1 = map.phi1(*edge);
-		Dart f2 = map.phi2(f1);
+		//Dart f2 = map.phi2(f1);
 
 		do
 		{
@@ -359,7 +360,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			//cas de la pyramide
 			if(dd == stop)
 			{
-				std::cout << "pyramide" << std::endl;
+				//std::cout << "pyramide" << std::endl;
 				map.splitFace(dd, map.phi1(map.phi1(dd)));
 			}
 			else
@@ -370,7 +371,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 				if(!( (map.Map2::faceDegree(map.phi_1(stop)) == 3 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 4) ||
 						(map.Map2::faceDegree(map.phi_1(stop)) == 4 && map.Map2::faceDegree(map.phi2(map.phi_1(stop))) == 3) ))
 				{
-					std::cout << "octaedre ou hexaedre" << std::endl;
+					//std::cout << "octaedre ou hexaedre" << std::endl;
 
 					Dart ne = map.phi_1(stop) ;
 					map.cutEdge(ne);
@@ -413,7 +414,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 				}
 				else
 				{
-					std::cout << "prisme" << std::endl;
+					//std::cout << "prisme" << std::endl;
 					//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
 					//map.closeHole(f2);
 				}
@@ -424,14 +425,14 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 		//sinon cas du tetraedre
 		else
 		{
-			std::cout << "tetraedre" << std::endl;
+			//std::cout << "tetraedre" << std::endl;
 			//tester si besoin de fermer f2 (par exemple pas besoin pour hexa... mais pour tet, octa, prisme oui)
 			//map.closeHole(f2);
 		}
 
 	}
 
-	std::cout << "1ere etape finished" << std::endl;
+	//std::cout << "1ere etape finished" << std::endl;
 
 	CellMarker mtf(map, FACE);
 
@@ -447,7 +448,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 				map.Map2::faceDegree(map.phi2(map.phi_1(f2))) == 3) && map.Map2::vertexDegree(f2) == 3)
 		{ //cas du tetrahedre
 
-			std::cout << "ajout d'une face" << std::endl;
+			//std::cout << "ajout d'une face" << std::endl;
 
 			if(map.phi3(map.phi2(f2)) == map.phi2(f2))
 			{
@@ -470,13 +471,13 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 				if(map.Map2::faceDegree(map.phi2(f2)) == 3)
 				{
-					std::cout << "ajout d'un tetraedre" << std::endl;
+					//std::cout << "ajout d'un tetraedre" << std::endl;
 					Dart x = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
 					position[x] = volCenter;
 				}
 				else
 				{
-					std::cout << "ajout d'un prisme" << std::endl;
+					//std::cout << "ajout d'un prisme" << std::endl;
 					//Dart x = Algo::Modelisation::extrudeFace<PFP>(map,position,map.phi2(f1),5.0);
 					Dart c = Algo::Modelisation::trianguleFace<PFP>(map, map.phi2(f1));
 
@@ -524,7 +525,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 	}
 
-	std::cout << "2e etape finished" << std::endl;
+	//std::cout << "2e etape finished" << std::endl;
 
 
 	{
@@ -1212,10 +1213,55 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, 
 		fit = map.phi1(fit) ;
 	} while(fit != d) ;
 
-	Dart d3 = map.phi3(d);
 
 	if(degree == 3 && sType == Algo::IHM::S_TRI)
 	{
+
+	}
+	else
+	{
+		// boucler sur d avec phi2(phi_1()) et faire des unsewvolumes
+		// delete le vertex sur d
+		// si le volume d'a cote n'est pas subdiv
+		// alors delete le vertex aussi
+		// recouture du tout
+
+		Dart d3 = map.phi3(d);
+
+		map.setCurrentLevel(cur + 1) ;
+
+		Dart centralV = map.phi1(map.phi1(d));
+		//Tester si il y a un volume voisin
+		if(d != d3)
+		{
+			//on decoud
+			Dart it = centralV;
+
+			do
+			{
+				map.unsewVolumes(it);
+				it = map.phi2(map.phi_1(it));
+			}while(it != centralV);
+
+			//Si ce volume voisin n'est pas subdivise
+			if(!map.volumeIsSubdivided(d3))
+				//alors on supprime le sommet en face
+				map.deleteVertex(map.phi1(map.phi1(d3)));
+
+		}
+
+		//On supprime le sommet sur la face du volume courant
+		map.deleteVertex(centralV);
+
+		if(d != d3)
+			map.sewVolumes(d,map.phi1(d3));
+
+		map.setCurrentLevel(cur) ;
+	}
+
+
+//	if(degree == 3 && sType == Algo::IHM::S_TRI)
+//	{
 //		fit = d ;
 //		do
 //		{
@@ -1226,48 +1272,10 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, 
 //			map.setCurrentLevel(cur) ;
 //			fit = map.phi1(fit) ;
 //		} while(fit != d) ;
-	}
-	else
-	{
-		//map.setCurrentLevel(cur + 1) ;
-		//Dart centralV = map.phi1(map.phi1(d)) ;
-		//map.setCurrentLevel(map.getMaxLevel()) ;
-		//map.deleteVertex(centralV) ;
-		//map.setCurrentLevel(cur) ;
+//	}
 
-		map.setCurrentLevel(cur + 1) ;
-		Dart d3 = map.phi3(d);
-		map.setCurrentLevel(cur) ;
 
-		fit = d ;
-		do
-		{
-			map.setCurrentLevel(cur + 1) ;
-
-			Dart innerEdge = map.phi1(fit);
-			Dart innerEdge3 = map.phi3(innerEdge);
-
-			if(innerEdge != innerEdge3)
-			{
-				map.unsewVolumes(innerEdge);
-				map.Map2::mergeFaces(innerEdge3);
-			}
-
-			map.Map2::mergeFaces(innerEdge) ;
-
-			map.setCurrentLevel(cur) ;
-			fit = map.phi1(fit);
-
-		}while(fit != d);
-
-		map.setCurrentLevel(cur + 1) ;
-		if(d != d3)
-			map.sewVolumes(d, d3);
-		map.setCurrentLevel(cur) ;
-
-	}
-
-// A faire de coarsenVolume
+// A faire dans coarsenVolume
 //	fit = d ;
 //	do
 //	{
@@ -1286,10 +1294,11 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 	unsigned int cur = map.getCurrentLevel() ;
 
+	std::cout << "cur = " << cur << std::endl;
+
 	/*
 	 * au niveau du volume courant i
 	 * stockage d'un brin de chaque face de celui-ci
-	 * avec calcul du centroid
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
@@ -1319,12 +1328,24 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	}
 
 	/*
-	 * fusionner tous les volumes internes
+	 * Deconnecter toutes les faces interieurs
 	 */
-	map.setCurrentLevel(cur + 1) ;
-	Dart centralV = map.phi_1(map.phi2(map.phi1(d)));
-	map.deleteVertex(centralV) ;
-	map.setCurrentLevel(cur) ;
+	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		Dart fit = *face;
+
+		do
+		{
+			map.setCurrentLevel(cur + 1) ;
+
+			Dart nf = map.phi2(map.phi1(fit));
+			if(map.getDartLevel(map.faceOldestDart(nf)) != cur)
+				map.mergeVolumes(nf);
+
+			map.setCurrentLevel(cur) ;
+			fit = map.phi1(fit);
+		}while(fit != *face);
+	}
 
 	/*
 	 * simplifier les faces

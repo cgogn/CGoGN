@@ -41,6 +41,8 @@ protected:
 	void init() ;
 
 public:
+	typedef GMap0 ParentMap;
+
 	GMap1();
 
 	virtual std::string mapTypeName();
@@ -110,6 +112,13 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  @param d first dart in the face
+	 *  @param e second dart in the face
+	 */
+	void linkVertices(Dart d, Dart e);
+
 	//! Cut an edge inserting a new dart between d and its successor in the face
 	/*! @param d the edge to cut
 	 * \image hmtl map1_cutEdge.png
@@ -136,15 +145,6 @@ public:
 	 *  @param e a dart in the second face
 	 */
 	void mergeFaces(Dart d, Dart e);
-
-
-	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
-	/*! \pre Dart d and e MUST be different and belong to distinct face
-	 *  @param d first dart in the face
-	 *  @param e second dart in the face
-	 */
-	void linkVertices(Dart d, Dart e);
-
 	//@}
 
 	/*! @name Topological Queries

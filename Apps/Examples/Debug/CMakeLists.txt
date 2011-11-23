@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 project(examplesD)
 
@@ -54,9 +54,19 @@ add_executable( texturesExampleD ../texturesExample.cpp ${texturesExample_moc} )
 target_link_libraries( texturesExampleD
                 ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
 
+QT4_WRAP_CPP(simpleMap3_moc ../simpleMap3.h)  
+add_executable( simpleMap3D ../simpleMap3.cpp ${simpleMap3_moc} )
+target_link_libraries( simpleMap3D
+                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+                
 QT4_WRAP_CPP(simpleGMap2_moc ../simpleGMap2.h)  
 add_executable( simpleGMap2D ../simpleGMap2.cpp ${simpleGMap2_moc} )
 target_link_libraries( simpleGMap2D
+                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+
+QT4_WRAP_CPP(simpleGMap3_moc ../simpleGMap3.h)  
+add_executable( simpleGMap3D ../simpleGMap3.cpp ${simpleGMap3_moc} )
+target_link_libraries( simpleGMap3D
                 ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
 
 QT4_WRAP_CPP(extrusionView_moc ../extrusionView.h)	

@@ -22,60 +22,74 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SUBDIVISION3MAP_H__
-#define __SUBDIVISION3MAP_H__
+#ifndef __EMBEDDED_MAP3_H__
+#define __EMBEDDED_MAP3_H__
 
-#include <math.h>
-#include <vector>
+#include "Topology/map/map3.h"
 
 namespace CGoGN
 {
 
-namespace Algo
-{
-
-namespace Modelisation
-{
-
 /**
-* Cut a 3D ear from a mesh : the ear is sewn by phi3 to the rest of the volume
-* @param d dart of the point of the ear
-* @return a dart from the new face connecting the ear and the rest of the volume
+* Class of 3-dimensional maps
+* with managed embeddings
 */
-template <typename PFP>
-Dart cut3Ear(typename PFP::MAP& map, Dart d);
-
-/**
-* subdivide a hexahedron into 5 tetrahedron
-* @param d dart of the hexahedron
-*/
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
-
-/**
-* catmull clark volumic : do not move the original vertices
-* @param map the map
-* @param attributs geometric attributes of the vertices
-* @param selected a functor to select volumes to subdivide
-* TODO : test if it works for the functorselect
-*/
-template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= SelectorTrue());
-
-template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= SelectorTrue())
+class EmbeddedMap3 : public Map3
 {
-	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
-}
+public:
+	typedef Map3 TOPO_MAP;
 
-} // namespace Modelisation
+	/*!
+	 *
+	 */
+	virtual bool deleteVertex(Dart d);
 
-} // namespace Algo
+	/*! No attribute is attached to the new vertex
+	 *  The attributes attached to the old edge are duplicated on both resulting edges
+	 *  @param d a dart
+	 */
+	virtual void cutEdge(Dart d);
+
+
+	/*! The attributes attached to the edge of d are kept on the resulting edge
+	 *  @param d a dart of the edge to cut
+	 */
+	virtual void uncutEdge(Dart d);
+
+	/*!
+	 *
+	 */
+	virtual void splitFace(Dart d, Dart e);
+
+	/*!
+	 *
+	 */
+	virtual void sewVolumes(Dart d, Dart e);
+
+	/*!
+	 *
+	 */
+	virtual void unsewVolumes(Dart d);
+
+	/*!
+	 *
+	 */
+	virtual bool mergeVolumes(Dart d);
+
+	/*!
+	 *
+	 */
+	virtual void splitVolume(std::vector<Dart>& vd);
+
+	/*!
+	 *
+	 */
+	virtual bool check();
+
+	//????????? fonction de 2-carte
+	virtual unsigned int closeHole(Dart d);
+} ;
 
 } // namespace CGoGN
 
-#include "Algo/Modelisation/subdivision3map.hpp"
-
 #endif
-
-

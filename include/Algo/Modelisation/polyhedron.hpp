@@ -32,6 +32,92 @@ namespace Modelisation
 {
 
 template <typename PFP>
+void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position)
+{
+	map.unsewVertexUmbrella(d);
+	unsigned int newFaceDegree = map.closeHole(map.phi1(d));
+
+
+	if(newFaceDegree != 3)
+	{
+		//chercher le brin ou demarer
+
+		std::multimap<Dart, int> edges ;
+		typename std::multimap<Dart, int>::iterator it ;
+
+		Dart d12 = map.phi2(map.phi1(d));
+		Dart fit = d12;
+		int i;
+
+		do
+		{
+			i = map.faceDegree(map.phi2(fit));
+
+			std::cout << "edge(" << fit << "," << i << ")" << std::endl;
+
+			edges.insert(std::make_pair(fit, i));
+
+			fit  = map.phi1(fit);
+		}
+		while(fit != d12);
+
+		do
+		{
+			//44 44
+			if(edges.find(fit)->second == 4 && edges.find(map.phi1(fit))->second == 4
+				&& !map.sameFace(map.phi2(fit), map.phi2(map.phi1(fit))))
+			{
+				map.splitFace(fit, map.phi1(map.phi1(fit)));
+				fit = map.phi2(map.phi_1(fit));
+				int i = map.faceDegree(fit);
+				edges.insert(std::make_pair(fit, i));
+
+//				Dart fit2 = map.phi2(fit) ;
+//				typename PFP::VEC3 p1 = position[fit] ;
+//				typename PFP::VEC3 p2 = position[fit2] ;
+//
+//				map.cutEdge(fit) ;
+//				position[map.phi1(fit)] = typename PFP::REAL(0.5) * (p1 + p2);
+
+
+				std::cout << "flip cas quad quad " << std::endl;
+			}
+
+			//3 3
+			if(edges.find(fit)->second == 3 && edges.find(map.phi1(fit))->second == 3
+				&& !map.sameFace(map.phi2(fit), map.phi2(map.phi1(fit))))
+			{
+				map.splitFace(fit, map.phi1(fit));
+				fit = map.phi2(map.phi_1(fit));
+				int i = map.faceDegree(fit);
+				edges.insert(std::make_pair(fit, i));
+
+				std::cout << "flip cas tri tri" << std::endl;
+			}
+
+			//3 44 ou 44 3
+			if( ((edges.find(fit)->second == 4 && edges.find(map.phi1(fit))->second == 3)
+				|| (edges.find(fit)->second == 3 && edges.find(map.phi1(fit))->second == 4))
+					&& !map.sameFace(map.phi2(fit), map.phi2(map.phi1(fit))))
+			{
+				map.splitFace(fit, map.phi1(map.phi1(fit)));
+				fit = map.phi2(map.phi_1(fit));
+				int i = map.faceDegree(fit);
+				edges.insert(std::make_pair(fit, i));
+
+				std::cout << "flip cas quad tri" << std::endl;
+			}
+
+
+
+			fit = map.phi1(fit);
+		}
+		while(map.faceDegree(fit) > 4 && fit != d12);
+
+	}
+}
+
+template <typename PFP>
 Polyhedron<PFP>::Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2):
 m_map(p1.m_map),
 m_dart(p1.m_dart),

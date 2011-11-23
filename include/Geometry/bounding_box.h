@@ -77,6 +77,9 @@ class BoundingBox
 		/*                 FUNCTIONS                  */
 		/**********************************************/
 
+		// reinitialize the bounding box
+		void reset() ;
+
 		// add a point to the bounding box
 		void addPoint(const VEC& p) ;
 
