@@ -200,7 +200,14 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a face
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the face
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
+
+	/**
+	* Apply a functor on each dart of a vertex
 	* @param d a dart of the face
 	* @param fonct functor obj ref
 	*/

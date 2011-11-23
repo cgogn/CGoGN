@@ -33,7 +33,7 @@ namespace Modelisation
 
 //TEMPORAIRE
 template <typename PFP>
-Dart Primitive3D<PFP>::createOrientedHexa()
+Dart Primitive3D<PFP>::createHexa()
 {
 	Dart base = m_map.newFace(4);
 
@@ -67,13 +67,13 @@ template <typename PFP>
 Dart Primitive3D<PFP>::HexaGrid1Topo(int nx)
 {
 	// first cube
-	Dart d0 = createOrientedHexa();
+	Dart d0 = createHexa();
 	m_tableVertDarts.push_back(d0);
 	Dart d1 = m_map.template phi<2112>(d0);
 
 	for (int i=1; i< nx; ++i)
 	{
-		Dart d2 = createOrientedHexa();
+		Dart d2 = createHexa();
 		m_tableVertDarts.push_back(d2);
 		m_map.sewVolumes(d1,d2);
 		d1 = m_map.template phi<2112>(d2);

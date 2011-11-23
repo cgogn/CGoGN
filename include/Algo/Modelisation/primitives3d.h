@@ -105,7 +105,7 @@ protected:
 	*/	
 	Dart HexaGrid2Topo(int nx, int ny);
 
-	Dart createOrientedHexa();
+	Dart createHexa();
 
 
 public:
