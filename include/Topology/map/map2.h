@@ -127,7 +127,7 @@ public:
 	 *  @param d a dart of the vertex to delete
 	 * @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d) ;
+	virtual Dart deleteVertex(Dart d) ;
 
 	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
 	/*! \pre Dart d and e MUST be different and belong to distinct face
@@ -139,7 +139,7 @@ public:
 	//! Cut the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to cut
 	 */
-	virtual void cutEdge(Dart d);
+	virtual Dart cutEdge(Dart d);
 
 	//! Undo the cut of the edge of d and its opposite edge if it exists
 	/*! @param d a dart of the edge to uncut

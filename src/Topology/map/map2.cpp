@@ -48,50 +48,51 @@ void Map2::deleteOrientedFace(Dart d)
 
 void Map2::splitVertex(Dart d, Dart e)
 {
-	assert(sameOrientedVertex(d, e));
-	Dart dd = phi2(d) ;
-	Dart ee = phi2(e) ;
-	Map1::cutEdge(dd);			// Cut the edge of dd (make a new half edge)
-	Map1::cutEdge(ee);			// Cut the edge of ee (make a new half edge)
-	phi2sew(phi1(dd), phi1(ee));// Sew the two faces along the new edge
+	assert(sameOrientedVertex(d, e)) ;
+	Dart d2 = phi2(d) ; assert(d != d2) ;
+	Dart e2 = phi2(e) ; assert(e != e2) ;
+	Dart nd = Map1::cutEdge(d2) ;	// Cut the edge of dd (make a new half edge)
+	Dart ne = Map1::cutEdge(e2) ;	// Cut the edge of ee (make a new half edge)
+	phi2sew(nd, ne) ;				// Sew the two faces along the new edge
 }
 
-bool Map2::deleteVertex(Dart d)
+Dart Map2::deleteVertex(Dart d)
 {
 	if(isBoundaryVertex(d))
-		return false ;
+		return NIL ;
 
 	Dart vit = d ;
+	Dart f;
 	do
 	{
-		Dart f = phi_1(phi2(vit)) ;
+		f = phi_1(phi2(vit)) ;
 		phi1sew(vit, f) ;
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
 	Map1::deleteFace(d) ;
 
-	return true ;
+	return f ;
 }
 
 void Map2::linkVertices(Dart d, Dart e)
 {
-	Map1::linkVertices(d, e);			// Split the face
+	Map1::linkVertices(d, e);		// Split the face
 	phi2sew(phi_1(d), phi_1(e));	// Sew the two resulting faces along the new edge
 }
 
-void Map2::cutEdge(Dart d)
+Dart Map2::cutEdge(Dart d)
 {
-	Map1::cutEdge(d);		// Cut the edge of d
-	Dart nd = phi1(d);
+	Dart nd = Map1::cutEdge(d);		// Cut the edge of d
+
 	Dart e = phi2(d);
-	if (e != d)				// Test if an opposite edge exists
+	if (e != d)						// Test if an opposite edge exists
 	{
-		Map1::cutEdge(e);	// Cut the opposite edge
-		Dart ne = phi1(e);
-		phi2unsew(d);		// Correct the phi2 links
+		Dart ne = Map1::cutEdge(e);	// Cut the opposite edge
+		phi2unsew(d);				// Correct the phi2 links
 		phi2sew(d, ne);
 		phi2sew(e, nd);
 	}
+	return nd;
 }
 
 void Map2::uncutEdge(Dart d)

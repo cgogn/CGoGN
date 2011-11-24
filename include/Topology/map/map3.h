@@ -123,12 +123,12 @@ public:
 	 *  @param d a dart of the vertex to delete
 	 *  @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d);
+	virtual Dart deleteVertex(Dart d);
 
 	//! Cut the edge of d (all darts around edge orbit are cutted)
 	/*! @param d a dart of the edge to cut
 	 */
-	virtual void cutEdge(Dart d);
+	virtual Dart cutEdge(Dart d);
 
 	//! Uncut the edge of d (all darts around edge orbit are uncutted)
 	/*! @param d a dart of the edge to uncut

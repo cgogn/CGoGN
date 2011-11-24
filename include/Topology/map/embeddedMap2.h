@@ -48,7 +48,7 @@ public:
 	/**
 	 * The attributes attached to the face of d are kept on the resulting face
 	 */
-	virtual bool deleteVertex(Dart d) ;
+	virtual Dart deleteVertex(Dart d) ;
 
 	/**
 	 * No attribute is attached to the new edge
@@ -60,7 +60,7 @@ public:
 	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
-	virtual void cutEdge(Dart d) ;
+	virtual Dart cutEdge(Dart d) ;
 
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge

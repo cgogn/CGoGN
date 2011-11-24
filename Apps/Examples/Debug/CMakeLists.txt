@@ -90,3 +90,8 @@ QT4_WRAP_CPP(tutoriel_moc ../tutoriel.h)
 add_executable( tutorielD ../tutoriel.cpp ${tutoriel_moc})
 target_link_libraries( tutorielD
 	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
+		
+QT4_WRAP_CPP(essais_moc ../essais.h)
+add_executable( essaisD ../essais.cpp ${essais_moc})
+target_link_libraries( essaisD
+	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )

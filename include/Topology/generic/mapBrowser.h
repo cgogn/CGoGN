@@ -3,18 +3,18 @@
 * version 0.1                                                                  *
 * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
+* This library is free software ; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* Free Software Foundation ; either version 2.1 of the License, or (at your     *
 * option) any later version.                                                   *
 *                                                                              *
 * This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* ANY WARRANTY ; without even the implied warranty of MERCHANTABILITY or        *
 * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
 * for more details.                                                            *
 *                                                                              *
 * You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
+* along with this library ; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
 * Web site: http://cgogn.u-strasbg.fr/                                         *
@@ -37,29 +37,35 @@ namespace CGoGN
  * those not selected by the selector
  */
 template <typename MAP>
-class MapBrowserSelector: public MapBrowser
+class MapBrowserSelector : public MapBrowser
 {
 protected:
-	MAP& m_map;
-	const FunctorSelect& m_selector;
+	MAP& m_map ;
+	const FunctorSelect& m_selector ;
 public:
-	MapBrowserSelector(MAP& m, const FunctorSelect& fs):
+	MapBrowserSelector(MAP& m, const FunctorSelect& fs) :
 		m_map(m), m_selector(fs)
 	{}
 
-	Dart begin() { return m_map.begin(); }
+	Dart begin()
+	{
+		return m_map.begin() ;
+	}
 
-	Dart end() { return m_map.end(); }
+	Dart end()
+	{
+		return m_map.end() ;
+	}
 
 	void next(Dart& d)
 	{
 		do
 		{
-			m_map.next(d);
+			m_map.next(d) ;
 		}
-		while ( (d != m_map.end()) && !m_selector(d) );
+		while ( (d != m_map.end()) && !m_selector(d) ) ;
 	}
-};
+} ;
 
 /**
  * Browser that traverses a "submap" stored in a
@@ -71,96 +77,109 @@ template <typename MAP>
 class MapBrowserLinked: public MapBrowser, public FunctorType
 {
 protected:
-	Dart m_first;
+	// The browsed map
+	MAP& m_map ;
+
+	// The table attributes of links storing the linking
+	// The boolean autoAttribute is set if this attribut is managed by the browser
+	bool autoAttribute ;
+	AttributeHandler<Dart> m_links ;
+
+	Dart m_first ;
+	Dart m_end ;
+
 public:
-	MapBrowserLinked():	m_first(NIL)
-	{}
-
-	MapBrowserLinked(MAP& map, const FunctorSelect& fs): m_first(NIL) { addSelected(map, fs); }
-
-	Dart begin() { return m_first;}
-
-	Dart end() { return NIL;}
-
-	// init the list
-	void init() { m_first = NIL;}
-
-	// add a dart to the list
-	virtual void add(Dart d) = 0;
-
-	virtual void popFront() = 0;
-
-	void addSelected(MAP& map, const FunctorSelect& fs)
+	MapBrowserLinked(MAP& m) :
+		m_map(m), autoAttribute(true), m_first(NIL), m_end(NIL)
 	{
-		for (Dart d = map.begin(); d != map.end(); map.next(d))
+		m_links = m.template addAttribute<Dart>(DART,"") ;
+	}
+
+	MapBrowserLinked(MAP& m, AttributeHandler<Dart>& links) :
+		m_map(m), autoAttribute(false), m_links(links), m_first(NIL), m_end(NIL)
+	{
+	}
+
+	~MapBrowserLinked()
+	{
+		if (autoAttribute)
+			m_map.template removeAttribute<Dart>(m_links) ;
+	}
+
+	void clear()
+	{
+		m_first = NIL ;
+		m_end = NIL ;
+	}
+
+	Dart begin()
+	{
+		return m_first ;
+	}
+
+	Dart end()
+	{
+		return NIL ;
+	}
+
+	void next(Dart& d)
+	{
+		assert(d != NIL) ;
+		d = m_links[d] ;
+	}
+
+	void pushFront(Dart d)
+	{
+		assert(d != NIL) ;
+		m_links[d] = m_first ;
+		m_first = d ;
+		if (m_end == NIL)		// empty list
+			m_end = d ;
+	}
+
+	void pushBack(Dart d)
+	{
+		assert(d != NIL) ;
+		m_links[d] = NIL ;
+		if (m_first == NIL)		// empty list
+		{
+			m_first = d ;
+			m_end = d ;
+		}
+		else
+		{
+			m_links[m_end] = d ;
+			m_end = d ;
+		}
+	}
+
+	void popFront()
+	{
+		if (m_first == m_end)	// one element or empty list
+		{
+			m_first = NIL ;
+			m_end = NIL ;
+		}
+		else m_first = m_links[m_first] ;
+	}
+
+
+	void addSelected(const FunctorSelect& fs)
+	{
+		for (Dart d = m_map.begin() ; d != m_map.end() ; m_map.next(d))
 		{
 			if (fs(d))
-				add(d);
+				pushFront(d) ;
 		}
 	}
 
 	// operator() for use of foreach_cell
 	bool operator()(Dart d)
 	{
-		add(d);
-		return false;
+		pushFront(d) ;
+		return false ;
 	}
-};
-
-/**
- * MapBrowserLinked with AttributeHandler<Dart> given
- * as parameter of construction (ref). the AttributeHandler
- * can be shared by many MapBrowser
- */
-template <typename MAP>
-class MapBrowserLinkedAttr: public MapBrowserLinked<MAP>
-{
-protected:
-	/// ref to the table attributes of links
-	AttributeHandler<Dart>& m_links;
-public:
-	MapBrowserLinkedAttr(AttributeHandler<Dart>& links):
-		MapBrowserLinked<MAP>(), m_links(links)
-	{}
-
-	void next(Dart& d) { d = m_links[d];}
-
-	/// add a dart to linked list
-	void add(Dart d) { m_links[d.index] = this->m_first; this->m_first = d; }
-
-	//pop the first
-	void popFront() { this->m_first = m_links[this->m_first.index]; }
-};
-
-/**
- * MapBrowser with local attribute of linked darts
- * Attribute is added and removed automatically
- * with the scope of object
- */
-template <typename MAP>
-class MapBrowserLinkedAuto: public MapBrowserLinked<MAP>
-{
-protected:
-	/// auto table attributes of links (added to construction and removed at destruction)
-	AutoAttributeHandler<Dart> m_links;
-public:
-	/**
-	 * Constructor
-	 * @param m the map (used to add the attribute)
-	 * @param nameAtt attributeName
-	 */
-	MapBrowserLinkedAuto(MAP& m):
-		MapBrowserLinked<MAP>(), m_links(m, DART)
-	{}
-
-	void next(Dart& d) { d = m_links[d]; }
-
-	/// add a dart to linked list
-	void add(Dart d) { m_links[d.index] = this->m_first; this->m_first = d; }
-
-	//pop the first
-	void popFront() { this->m_first = m_links[this->m_first.index]; }
-};
+} ;
 
 } // end namespace CGoGN
 

@@ -134,7 +134,7 @@ public:
 	/*! @param d the edge to cut
 	 * \image hmtl map1_cutEdge.png
 	 */
-	void cutEdge(Dart d);
+	Dart cutEdge(Dart d);
 
 	//! Collapse an edge of a face
 	/*!  \warning Dart d no longer exists after the call

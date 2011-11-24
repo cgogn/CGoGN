@@ -30,21 +30,19 @@
 namespace CGoGN
 {
 
-bool EmbeddedMap3::deleteVertex(Dart d)
+Dart EmbeddedMap3::deleteVertex(Dart d)
 {
 	//the merge volumes inside deleteVertex merges the volume embedding
 
 	return Map3::deleteVertex(d);
 }
 
-void EmbeddedMap3::cutEdge(Dart d)
+Dart EmbeddedMap3::cutEdge(Dart d)
 {
-	Map3::cutEdge(d);
+	Dart nd = Map3::cutEdge(d);
 
 	if(isOrbitEmbedded(EDGE))
 	{
-		Dart nd = phi1(d) ;
-
 		//embed the new darts created in the cutted edge
 		unsigned int vEmb = getEmbedding(EDGE, d);
 		embedOrbit(EDGE, d, vEmb) ;
@@ -59,14 +57,14 @@ void EmbeddedMap3::cutEdge(Dart d)
 		Dart f = d;
 		do
 		{
-			Dart nd = phi1(f) ;
-			copyDartEmbedding(FACE, nd, f);
+			Dart nf = phi1(f) ;
+			copyDartEmbedding(FACE, nf, f);
 
-			Dart f2 = phi2(nd);
-			if(f2!=nd)
+			Dart f2 = phi2(nf);
+			if(f2!=nf)
 			{
-				Dart nd2 = phi2(f);
-				copyDartEmbedding(FACE, nd2, f2);
+				Dart nf2 = phi2(f);
+				copyDartEmbedding(FACE, nf2, f2);
 			}
 
 			f = alpha2(f);
@@ -78,16 +76,17 @@ void EmbeddedMap3::cutEdge(Dart d)
 		Dart f = d;
 		do
 		{
-			Dart nd = phi1(f) ;
-			copyDartEmbedding(VOLUME, nd, f);
+			Dart nf = phi1(f) ;
+			copyDartEmbedding(VOLUME, nf, f);
 
-			Dart nd2 = phi2(f);
-			if(f!=nd2)
-				copyDartEmbedding(VOLUME, nd2, f);
+			Dart nf2 = phi2(f);
+			if(f!=nf2)
+				copyDartEmbedding(VOLUME, nf2, f);
 
 			f = alpha2(f);
 		} while(f != d);
 	}
+	return nd;
 }
 
 void EmbeddedMap3::uncutEdge(Dart d)

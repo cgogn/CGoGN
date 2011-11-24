@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 	CGoGNout << "Parcours avec le browser (les sommets)"<<CGoGNendl;
 
 	// creation d'un browser avec attribut cree a la volee
-	MapBrowserLinkedAuto<PFP::MAP>mbl(myMap);
+	MapBrowserLinked<PFP::MAP>mbl(myMap);
 
 	// on ajoute un brin par sommet dans le browser
 	myMap.foreach_orbit(VERTEX, mbl);
@@ -188,14 +188,14 @@ int main(int argc, char **argv)
 	// on cree un attribut Dart pour la liste
 	AutoAttributeHandler<Dart> tableLink(myMap, DART);
 	// le browser
-	MapBrowserLinkedAttr<PFP::MAP>mbl2(tableLink);
+	MapBrowserLinked<PFP::MAP>mbl2(myMap,tableLink);
 	// que l'on remplit a la main
 	Dart d = d2;
-	mbl2.add(d);
+	mbl2.pushBack(d);
 	d =  myMap.phi1(d);
-	mbl2.add(d);
+	mbl2.pushBack(d);
 	d =  myMap.phi1(d);
-	mbl2.add(d);
+	mbl2.pushFront(d);
 
 	// et on parcours la sous-carte avec ce browser
 	TestDeParcoursAFF<PFP>(myMap, mbl2, position);

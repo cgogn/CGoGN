@@ -69,7 +69,7 @@ void Map3::deleteVolume(Dart d)
  *  Topological operations on 3-maps
  *************************************************************************/
 
-bool Map3::deleteVertex(Dart d)
+Dart Map3::deleteVertex(Dart d)
 {
 	//Save the darts around the vertex
 	//(one dart per face should be enough)
@@ -100,14 +100,14 @@ bool Map3::deleteVertex(Dart d)
 	return true;
 }
 
-void Map3::cutEdge(Dart d)
+Dart Map3::cutEdge(Dart d)
 {
 	if(isBoundaryFace(d))
 		d = phi2(d);
 
 	Dart prev = d;
 	Dart dd = alpha2(d);
-	Map2::cutEdge(d);
+	Dart nd = Map2::cutEdge(d);
 
 	while (dd!=d)
 	{
@@ -132,6 +132,7 @@ void Map3::cutEdge(Dart d)
 		phi3sew(d, phi1(d3));
 		phi3sew(d3, phi1(d));
 	}
+	return nd;
 }
 
 void Map3::uncutEdge(Dart d)

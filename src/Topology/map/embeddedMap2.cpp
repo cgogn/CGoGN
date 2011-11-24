@@ -52,18 +52,18 @@ void EmbeddedMap2::splitVertex(Dart d, Dart e)
 	}
 }
 
-bool EmbeddedMap2::deleteVertex(Dart d)
+Dart EmbeddedMap2::deleteVertex(Dart d)
 {
-	Dart f = phi1(d) ;
-	if(Map2::deleteVertex(d))
+	Dart f = Map2::deleteVertex(d) ;
+	if(f != NIL)
 	{
 		if (isOrbitEmbedded(FACE))
 		{
 			embedOrbit(FACE, f, getEmbedding(FACE, f)) ;
 		}
-		return true ;
+		return f ;
 	}
-	return false ;
+	return NIL ;
 }
 
 void EmbeddedMap2::linkVertices(Dart d, Dart e)
@@ -84,11 +84,9 @@ void EmbeddedMap2::linkVertices(Dart d, Dart e)
 	}
 }
 
-void EmbeddedMap2::cutEdge(Dart d)
+Dart EmbeddedMap2::cutEdge(Dart d)
 {
-	Map2::cutEdge(d) ;
-
-	Dart nd = phi1(d) ;
+	Dart nd = Map2::cutEdge(d) ;
 
 	if (isOrbitEmbedded(EDGE))
 	{
@@ -103,6 +101,7 @@ void EmbeddedMap2::cutEdge(Dart d)
 		if(e != nd)
 			copyDartEmbedding(FACE, phi1(e), e) ;
 	}
+	return nd;
 }
 
 void EmbeddedMap2::uncutEdge(Dart d)
