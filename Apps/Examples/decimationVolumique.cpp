@@ -321,8 +321,8 @@ void MyGlutWin::initGUI()
 void maillageTest()
 {
 	/// on creer une carte
-	Dart dd = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,4);
-	Dart ee = Algo::Modelisation::Polyhedron<PFP>::createOrientedPolyhedron(myMap,4);
+	Dart dd = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(myMap,4);
+	Dart ee = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(myMap,4);
     myMap.sewVolumes(dd,ee);
 
     // plongement

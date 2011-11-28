@@ -481,10 +481,10 @@ bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
 		subd = true;
 		Dart d3 = phi3(d);
 
-		std::cout << "d3 = " << d3 << std::endl;
-		std::cout << "d = " << d << std::endl;
-		std::cout << "curLevel = " << m_curLevel << std::endl;
-		std::cout << "volSubd(d3) = " << volumeIsSubdivided(d3) << std::endl;
+//		std::cout << "d3 = " << d3 << std::endl;
+//		std::cout << "d = " << d << std::endl;
+//		std::cout << "curLevel = " << m_curLevel << std::endl;
+//		std::cout << "volSubd(d3) = " << volumeIsSubdivided(d3) << std::endl;
 
 		//tester si le volume voisin est subdivise
 		if(d3 != d && volumeIsSubdivided(d3))
@@ -506,8 +506,8 @@ bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
 		--m_curLevel;
 	}
 
-	std::cout << "subdNeighborhood = " << subdNeighborhood << std::endl;
-	std::cout << "faceCanBeCoarsened ? " << (subd && !subdNeighborhood && subdOnce) << std::endl;
+//	std::cout << "subdNeighborhood = " << subdNeighborhood << std::endl;
+// 	std::cout << "faceCanBeCoarsened ? " << (subd && !subdNeighborhood && subdOnce) << std::endl;
 
 	return subd && !subdNeighborhood && subdOnce;
 }

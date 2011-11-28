@@ -189,7 +189,7 @@ public:
 
 
 	/**
-	 * pick dart with color set bey setDartsIdColor
+	 * pick dart with color set by setDartsIdColor
 	 * Do not forget to apply same transformation to scene before picking than before drawing !
 	 * @param map the map in which we pick (same as drawn !)
 	 * @param good the selector (same as used during drawing)
@@ -205,7 +205,7 @@ class TopoRenderMapD : public TopoRender
 {
 public:
 	/**
-	* update all drawing buffers
+	* update all drawing buffers to render a dual map
 	* @param map the map
 	* @param positions  attribute of position vertices
 	* @param ke exploding coef for edge
@@ -220,7 +220,7 @@ class TopoRenderGMap : public TopoRender
 {
 public:
 	/**
-	* update all drawing buffers
+	* update all drawing buffers to render a gmap
 	* @param map the map
 	* @param positions  attribute of position vertices
 	* @param ke exploding coef for edge
