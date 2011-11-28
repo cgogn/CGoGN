@@ -30,7 +30,7 @@
 namespace CGoGN
 {
 
-bool EmbeddedMap3::deleteVertex(Dart d)
+Dart EmbeddedMap3::deleteVertex(Dart d)
 {
 	//the merge volumes inside deleteVertex merges the volume embedding
 

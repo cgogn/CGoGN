@@ -60,7 +60,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 		for (unsigned int j = 0; j < nbe; ++j)
 		{
 			unsigned int em = mts.getEmbIdx(index++);
-			if (em!=prec)
+			if (em != prec)
 			{
 				prec = em;
 				edgesBuffer.push_back(em);
@@ -74,21 +74,21 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 		nbe = edgesBuffer.size();
 		if (nbe > 2)
 		{
-			Dart d = map.newFace(nbe,false);
+			Dart d = map.newFace(nbe, false);
 			for (unsigned int j = 0; j < nbe; ++j)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
-				map.setDartEmbedding(VERTEX, d, em);	// associate to dart
-				vecDartsPerVertex[em].push_back(d);	// store incident darts for fast phi2 reconstruction
+				map.embedOrbit(VERTEX, d, em) ;
+//				map.setDartEmbedding(VERTEX, d, em);	// associate to dart
+				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
 				d = map.phi1(d);
 			}
-			m.markOrbit(FACE, d);	// mark on the fly to unmark on second loop
+			m.markOrbit(ORIENTED_FACE, d);	// mark on the fly to unmark on second loop
 		}
 	}
 
-	unsigned int nbnm = 0;
 	// reconstruct neighbourhood
-
+	unsigned int nbnm = 0;
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if (m.isMarked(d))
@@ -97,7 +97,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
 			unsigned int embd = map.getEmbedding(VERTEX, d);
-			Dart good_dart=NIL;
+			Dart good_dart = NIL;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
 				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
@@ -108,7 +108,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			{
 				if (good_dart == map.phi2(good_dart))
 				{
-					map.sewFaces(d, good_dart,false);
+					map.sewFaces(d, good_dart, false);
 					m.unmarkOrbit(EDGE, d);
 				}
 			}

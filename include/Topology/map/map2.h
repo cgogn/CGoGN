@@ -396,20 +396,6 @@ public:
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
-
-	//!
-	/*! TODO Ajout a valider
-	 * restreint aux complexes simpliciaux
-	 * Apply a functor on the all darts in the set of the star from orbit
-	 */
-	bool foreach_dart_of_star(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread = 0);
-
-	//!
-	/*! TODO Ajout a valider
-	 * restreint aux complexes simpliciaux
-	 * Apply a functor on the all darts in the set of the link from orbit
-	 */
-	bool foreach_dart_of_link(Dart d, unsigned int orbit, FunctorType& f, unsigned int thread = 0);
 	//@}
 
 	/*! @name Close map after import or creation

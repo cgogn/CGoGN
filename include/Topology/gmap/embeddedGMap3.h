@@ -49,7 +49,7 @@ public:
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 * The attributes attached to the volume of d are kept on the resulting volume
 	 */
-	void sewFaces(Dart d, Dart e);
+	void sewFaces(Dart d, Dart e, bool withBoundary = true);
 
 	/**
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
@@ -87,8 +87,7 @@ public:
 
 	virtual unsigned int closeHole(Dart d);
 
-	virtual void closeMap(DartMarker &marker);
-
+//	virtual void closeMap(DartMarker &marker);
 
 	virtual bool check();
 } ;

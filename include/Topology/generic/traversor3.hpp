@@ -22,11 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR1_H__
-#define __TRAVERSOR1_H__
-
-#include "Topology/generic/dart.h"
-
 namespace CGoGN
 {
 
@@ -34,86 +29,35 @@ namespace CGoGN
 					VERTEX CENTERED TRAVERSALS
 *******************************************************************************/
 
-// Traverse the edges incident to a given vertex
+// Traversor3VE
+
 template <typename MAP>
-class Traversor1VE
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+Traversor3VE<MAP>::Traversor3VE(MAP& map, Dart dart) : m(map), start(dart)
+{}
 
-	Dart d2 ;
-
-public:
-	Traversor1VE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the vertices adjacent to a given vertex through sharing a common edge
-class Traversor1VVaE
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
-public:
-	Traversor1VVaE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-/*******************************************************************************
-					EDGE CENTERED TRAVERSALS
-*******************************************************************************/
-
-// Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor1EV
+Dart Traversor3VE<MAP>::begin()
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	current = start ;
+	return current ;
+}
 
-	Dart d2 ;
-
-public:
-	Traversor1EV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the edges adjacent to a given edge through sharing a common vertex
-class Traversor1EEaV
+template <typename MAP>
+Dart Traversor3VE<MAP>::end()
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	return NIL ;
+}
 
-	Dart d2 ;
-
-public:
-	Traversor1EEaV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+template <typename MAP>
+Dart Traversor3VE<MAP>::next()
+{
+	if(current != NIL)
+	{
+		current = m.alpha1(current) ;
+		if(current == start)
+			current = NIL ;
+	}
+	return current ;
+}
 
 } // namespace CGoGN
-
-#include "Topology/generic/traversor1.hpp"
-
-#endif

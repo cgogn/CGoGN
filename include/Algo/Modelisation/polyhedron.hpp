@@ -37,27 +37,23 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 positi
 	map.unsewVertexUmbrella(d);
 	unsigned int newFaceDegree = map.closeHole(map.phi1(d));
 
-
 	if(newFaceDegree != 3)
 	{
-		//chercher le brin ou demarer
+		// chercher le brin ou demarrer
 
 		std::multimap<Dart, int> edges ;
 		typename std::multimap<Dart, int>::iterator it ;
 
 		Dart d12 = map.phi2(map.phi1(d));
 		Dart fit = d12;
-		int i;
+		unsigned int i;
 
 		do
 		{
 			i = map.faceDegree(map.phi2(fit));
-
 			std::cout << "edge(" << fit << "," << i << ")" << std::endl;
-
 			edges.insert(std::make_pair(fit, i));
-
-			fit  = map.phi1(fit);
+			fit = map.phi1(fit);
 		}
 		while(fit != d12);
 
@@ -108,8 +104,6 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 positi
 				std::cout << "flip cas quad tri" << std::endl;
 			}
 
-
-
 			fit = map.phi1(fit);
 		}
 		while(map.faceDegree(fit) > 4 && fit != d12);
@@ -118,13 +112,13 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 positi
 }
 
 template <typename PFP>
-Polyhedron<PFP>::Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2):
-m_map(p1.m_map),
-m_dart(p1.m_dart),
-m_kind(COMPOSED),
-m_nx(-1), m_ny(-1), m_nz(-1),
-m_top_closed(false), m_bottom_closed(false),
-m_positions(p1.m_positions)
+Polyhedron<PFP>::Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2) :
+	m_map(p1.m_map),
+	m_dart(p1.m_dart),
+	m_kind(COMPOSED),
+	m_nx(-1), m_ny(-1), m_nz(-1),
+	m_top_closed(false), m_bottom_closed(false),
+	m_positions(p1.m_positions)
 {
 	if (&(p1.map) != &(p2.map))
 	{
@@ -135,23 +129,23 @@ m_positions(p1.m_positions)
 
 	typename PFP::VEC3 center(0);
 
-	for(typename std::vector<Dart>::const_iterator di=p1.m_tableVertDarts.begin(); di!=p1.m_tableVertDarts.end(); ++di)
+	for(typename std::vector<Dart>::const_iterator di = p1.m_tableVertDarts.begin(); di != p1.m_tableVertDarts.end(); ++di)
 	{
 		m_tableVertDarts.push_back(*di);
 		center += m_positions[*di];
 	}
 
 	// O(n2) pas terrible !!
-	for(typename std::vector<Dart>::const_iterator di=p2.m_tableVertDarts.begin(); di!=p2.m_tableVertDarts.end(); ++di)
+	for(typename std::vector<Dart>::const_iterator di = p2.m_tableVertDarts.begin(); di != p2.m_tableVertDarts.end(); ++di)
 	{
-		unsigned int em = m_map.getEmbedding(*di,VERTEX);
+		unsigned int em = m_map.getEmbedding(*di, VERTEX);
 
 		typename std::vector<Dart>::const_iterator dj=p1.m_tableVertDarts.begin();
 		bool found = false;
 		while ((dj !=p1.m_tableVertDarts.end()) && (!found))
 		{
-			unsigned int xm = m_map.getEmbedding(*dj,VERTEX);
-			if ( xm == em)
+			unsigned int xm = m_map.getEmbedding(*dj, VERTEX);
+			if (xm == em)
 				found = true;
 			else
 				++dj;
@@ -270,7 +264,7 @@ Dart  Polyhedron<PFP>::createPrism(typename PFP::MAP& the_map)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::createPolyhedron(typename PFP::MAP& the_map, int n)
+Dart Polyhedron<PFP>::createPolyhedron(typename PFP::MAP& the_map, unsigned int n)
 {
 	Dart d;
 	switch (n)
@@ -352,7 +346,7 @@ Dart Polyhedron<PFP>::grid_topo(unsigned int x, unsigned int y)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_closed)
+Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_closed, bool bottom_closed)
 {
 	if (m_kind != NONE) return m_dart;
 
@@ -360,8 +354,8 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 	m_nx = n;
 	m_nz = z;
 
-	m_bottom_closed=bottom_closed;
-	m_top_closed=top_closed;
+	m_bottom_closed = bottom_closed;
+	m_top_closed = top_closed;
 
 	int nb = (n)*(z+1);
 	if (bottom_closed) nb++;
@@ -371,40 +365,40 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 	m_tableVertDarts.reserve(nb);
 
 	// creation of quads and storing vertices
-	for (int i=0;i<z;++i)
+	for (unsigned int i = 0; i < z; ++i)
 	{
-		for (int j=0;j<n;++j)
+		for (unsigned int j = 0; j < n; ++j)
 		{
-			Dart d = m_map.newFace(4,false);
+			Dart d = m_map.newFace(4, false);
 			m_tableVertDarts.push_back(d);
 		}
 	}
-	for (int i=0;i<n;++i)
+	for (unsigned int i = 0; i < n; ++i)
 	{
 		m_tableVertDarts.push_back( m_map.phi_1(m_tableVertDarts[(z-1)*n+i]) );	
 	}
 
 	//sewing the quads
-	for (int i=0;i<z;++i)
+	for (unsigned int i = 0; i < z; ++i)
 	{
-		for (int j=0;j<n;++j)
+		for (unsigned int j = 0; j < n; ++j)
 		{
-			if (i>0) // sew with preceeding row
+			if (i > 0) // sew with preceeding row
 			{
 				int pos = i*n+j;
 				Dart d = m_tableVertDarts[pos];
 				Dart e = m_tableVertDarts[pos-n];
 				e = m_map.phi1(m_map.phi1(e));
-				m_map.sewFaces(d,e,false);
+				m_map.sewFaces(d, e, false);
 			}
-			if (j>0) // sew with preceeding column
+			if (j > 0) // sew with preceeding column
 			{
 				int pos = i*n+j;
 				Dart d = m_tableVertDarts[pos];
 				d = m_map.phi_1(d);
 				Dart e = m_tableVertDarts[pos-1];
 				e = m_map.phi1(e);
-				m_map.sewFaces(d,e,false);
+				m_map.sewFaces(d, e, false);
 			}
 			else 
 			{
@@ -413,7 +407,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 				d = m_map.phi_1(d);
 				Dart e = m_tableVertDarts[pos+(n-1)];
 				e = m_map.phi1(e);
-				m_map.sewFaces(d,e,false);
+				m_map.sewFaces(d, e, false);
 			}
 		}
 	}
@@ -450,7 +444,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 	if (top_closed)
 	{
 		Dart d =  m_map.phi_1(m_tableVertDarts[n*z]);
-		if(m_map.closeHole(d,true))
+		if(m_map.closeHole(d, true))
 		{
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
@@ -626,7 +620,7 @@ Dart Polyhedron<PFP>::cylinder_topo(int n, int z, bool top_closed, bool bottom_c
 // }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
+Dart Polyhedron<PFP>::cube_topo(unsigned int x, unsigned int y, unsigned int z)
 {
 	if (m_kind != NONE) return m_dart;
 
@@ -646,31 +640,31 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 	std::vector<Dart>& tableTop = primTop.getVertexDarts();
 
 	int index_side = 2*(x+y)*z;
-	for(int i=0;i<x;++i)
+	for(unsigned int i = 0; i < x; ++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[i];
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
-	for(int i=0;i<y;++i)
+	for(unsigned int i = 0; i < y; ++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[x+i*(x+1)];
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
-	for(int i=0;i<x;++i)
+	for(unsigned int i = 0; i < x; ++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[(x+1)*(y+1)-2 - i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
-	for(int i=0;i<y;++i)
+	for(unsigned int i = 0; i < y; ++i)
 	{
 		Dart d = m_map.phi_1(m_tableVertDarts[index_side++]);
 		Dart e = tableTop[(y-1-i)*(x+1)];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
 
 	// the bottom
@@ -679,57 +673,53 @@ Dart Polyhedron<PFP>::cube_topo(int x, int y,int z)
 	std::vector<Dart>& tableBottom = primBottom.getVertexDarts();
 
 	index_side = 3*(x+y)+(x-1);
-	for(int i=0;i<x;++i)
+	for(unsigned int i = 0; i < x; ++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[i];
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
-	for(int i=0;i<y;++i)
+	for(unsigned int i = 0; i < y; ++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[x+i*(x+1)];
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
-	for(int i=0;i<x;++i)
+	for(unsigned int i = 0; i < x; ++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[(x+1)*(y+1)-2 - i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
-	for(int i=0;i<y;++i)
+	for(unsigned int i = 0; i < y; ++i)
 	{
 		Dart d = m_tableVertDarts[(index_side--)%(2*(x+y))];
 		Dart e = tableBottom[(y-1-i)*(x+1)];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
 
 	// and add new vertex in m_tableVertDarts
 	//top  first
-	for(int i=1;i<y;++i)
+	for(unsigned int i = 1; i < y; ++i)
 	{
-		for(int j=1;j<x;++j)
-		{
+		for(unsigned int j = 1; j < x; ++j)
 			m_tableVertDarts.push_back(tableTop[i*(x+1)+j]);
-		}
 	}
 
 	// then bottom
-	for(int i=1;i<y;++i)
+	for(unsigned int i = 1; i < y; ++i)
 	{
-		for(int j=1;j<x;++j)
-		{
+		for(unsigned int j = 1; j < x; ++j)
 			m_tableVertDarts.push_back(tableBottom[i*(x+1)+j]);
-		}
 	}
 
 	return m_dart;
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::tore_topo(int m, int n)
+Dart Polyhedron<PFP>::tore_topo(unsigned int m, unsigned int n)
 {
 	if (m_kind != NONE) return m_dart;
 
@@ -739,12 +729,12 @@ Dart Polyhedron<PFP>::tore_topo(int m, int n)
 	m_kind = TORE;
 
 	// juste finish to sew
-	for(int i=0; i<n; ++i)
+	for(unsigned int i = 0; i < n; ++i)
 	{
 		Dart d = m_tableVertDarts[i];
 		Dart e = m_tableVertDarts[(m*n)+i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d,e,false);
+		m_map.sewFaces(d, e, false);
 	}
 
 	// remove the last n vertex darts that are no more necessary (sewed with n first)
@@ -755,7 +745,7 @@ Dart Polyhedron<PFP>::tore_topo(int m, int n)
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedGrid( float x, float y,float z)
+void Polyhedron<PFP>::embedGrid(float x, float y, float z)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -767,24 +757,25 @@ void Polyhedron<PFP>::embedGrid( float x, float y,float z)
 	float dx = x/float(m_nx);
 	float dy = y/float(m_ny);
 
-	for(int i=0; i<=m_ny; ++i)
+	for(unsigned int i = 0; i <= m_ny; ++i)
 	{
-		for(int j=0; j<=m_nx;++j)
+		for(unsigned int j = 0; j <= m_nx;++j)
 		{
 			VEC3 pos(-x/2 + dx*float(j), -y/2 + dy*float(i), z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx+1)+j];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedCylinder( float bottom_radius, float top_radius, float height)
+void Polyhedron<PFP>::embedCylinder(float bottom_radius, float top_radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if (m_kind != CYLINDER) {
+	if (m_kind != CYLINDER)
+	{
 		CGoGNerr << "Warning try to embedCylinder something that is not a cylnder"<<CGoGNendl;
 		return;
 	}
@@ -792,11 +783,11 @@ void Polyhedron<PFP>::embedCylinder( float bottom_radius, float top_radius, floa
 	float alpha = float(2.0*M_PI/m_nx);
 	float dz = height/float(m_nz);
 
-	for(int i=0; i<=m_nz; ++i)
+	for(unsigned int i = 0; i <= m_nz; ++i)
 	{
 		float a = float(i)/float(m_nz);
 		float radius = a*top_radius + (1.0f-a)*bottom_radius;
-		for(int j=0; j<m_nx;++j)
+		for(unsigned int j = 0; j < m_nx; ++j)
 		{
 	
 			float x = radius*cos(alpha*float(j));
@@ -804,7 +795,7 @@ void Polyhedron<PFP>::embedCylinder( float bottom_radius, float top_radius, floa
 			VEC3 pos(x, y, -height/2 + dz*float(i));
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx)+j];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 
@@ -814,7 +805,7 @@ void Polyhedron<PFP>::embedCylinder( float bottom_radius, float top_radius, floa
 		VEC3 pos(0.0f, 0.0f, -height/2 );
 		unsigned int em = m_positions.insert(pos);
 		Dart d = m_tableVertDarts[indexUmbrella++];
-		m_map.embedOrbit(VERTEX,d,em);
+		m_map.embedOrbit(VERTEX, d, em);
 	}
 
 	if (m_top_closed)
@@ -822,16 +813,17 @@ void Polyhedron<PFP>::embedCylinder( float bottom_radius, float top_radius, floa
 		VEC3 pos(0.0f ,0.0f, height/2 );
 		unsigned int em = m_positions.insert(pos);
 		Dart d = m_tableVertDarts[indexUmbrella];
-		m_map.embedOrbit(VERTEX,d,em);
+		m_map.embedOrbit(VERTEX, d, em);
 	}
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedCone( float radius, float height)
+void Polyhedron<PFP>::embedCone(float radius, float height)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if (m_kind != CONE) {
+	if (m_kind != CONE)
+	{
 		CGoGNerr << "Warning try to embedCone something that is not a cone"<<CGoGNendl;
 		return;
 	}
@@ -840,9 +832,9 @@ void Polyhedron<PFP>::embedCone( float radius, float height)
 	int zcyl = m_nz-1;
 	float dz = height/float(m_nz);
 	
-	for(int i=0; i<=zcyl; ++i)
+	for(unsigned int i = 0; i <= zcyl; ++i)
 	{
-		for(int j=0; j<m_nx;++j)
+		for(unsigned int j = 0; j < m_nx; ++j)
 		{
 			float rad = radius * float(m_nz-i)/float(m_nz);
 			float h = -height/2 + dz*float(i);
@@ -853,7 +845,7 @@ void Polyhedron<PFP>::embedCone( float radius, float height)
 			VEC3 pos(x, y, h);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx)+j];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 
@@ -863,22 +855,23 @@ void Polyhedron<PFP>::embedCone( float radius, float height)
 		VEC3 pos(0.0f, 0.0f, -height/2 );
 		unsigned int em = m_positions.insert(pos);
 		Dart d = m_tableVertDarts[indexUmbrella++];
-		m_map.embedOrbit(VERTEX,d,em);
+		m_map.embedOrbit(VERTEX, d, em);
 	}
 
 	//  top always closed in cone 
 	VEC3 pos(0.0f ,0.0f, height/2.0f );
 	unsigned int em = m_positions.insert(pos);
 	Dart d = m_tableVertDarts[indexUmbrella];
-	m_map.embedOrbit(VERTEX,d,em);
+	m_map.embedOrbit(VERTEX, d, em);
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedSphere( float radius)
+void Polyhedron<PFP>::embedSphere(float radius)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if (!((m_kind==CYLINDER)&&(m_top_closed)&&(m_bottom_closed))) {
+	if (!((m_kind == CYLINDER) && (m_top_closed) && (m_bottom_closed)))
+	{
 		CGoGNerr << "Warning try to embedSphere something that is not a sphere (closed cylinder)"<<CGoGNendl;
 		return;
 	}
@@ -886,9 +879,9 @@ void Polyhedron<PFP>::embedSphere( float radius)
 	float alpha = float(2.0*M_PI/m_nx);
 	float beta = float(M_PI/(m_nz+2));
 
-	for(int i=0; i<=m_nz; ++i)
+	for(unsigned int i = 0; i <= m_nz; ++i)
 	{
-		for(int j=0; j<m_nx;++j)
+		for(unsigned int j = 0; j < m_nx; ++j)
 		{
 			float h = float(radius * sin(-M_PI/2.0+(i+1)*beta));
 			float rad = float(radius * cos(-M_PI/2.0+(i+1)*beta));
@@ -898,30 +891,30 @@ void Polyhedron<PFP>::embedSphere( float radius)
 			VEC3 pos(x, y, h );
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx)+j];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 
 	// bottom  pole
-	VEC3 pos(0.0f, 0.0f, -radius );
+	VEC3 pos(0.0f, 0.0f, -radius);
 	unsigned int em = m_positions.insert(pos);
 	Dart d = m_tableVertDarts[m_nx*(m_nz+1)];
-	m_map.embedOrbit(VERTEX,d,em);
+	m_map.embedOrbit(VERTEX, d, em);
 
 	//  top pole
-	pos = VEC3(0.0f ,0.0f, radius );
+	pos = VEC3(0.0f, 0.0f, radius);
 	em = m_positions.insert(pos);
 	d = m_tableVertDarts[m_nx*(m_nz+1)+1];
-	m_map.embedOrbit(VERTEX,d,em);
-
+	m_map.embedOrbit(VERTEX, d, em);
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedTore( float big_radius, float small_radius)
+void Polyhedron<PFP>::embedTore(float big_radius, float small_radius)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if (m_kind !=TORE) {
+	if (m_kind != TORE)
+	{
 		CGoGNerr << "Warning try to embedTore something that is not a tore"<<CGoGNendl;
 		return;
 	}
@@ -929,9 +922,9 @@ void Polyhedron<PFP>::embedTore( float big_radius, float small_radius)
 	float alpha = float(2.0*M_PI/m_nx);
 	float beta = float(2.0*M_PI/m_ny);
 
-	for (int i=0;i< m_nx; ++i)
+	for (unsigned int i = 0; i < m_nx; ++i)
 	{
-		for(int j=0; j<m_ny; ++j)
+		for(unsigned int j = 0; j < m_ny; ++j)
 		{
 			float z = small_radius*sin(beta*float(j));
 			float r = big_radius + small_radius*cos(beta*float(j));
@@ -940,17 +933,18 @@ void Polyhedron<PFP>::embedTore( float big_radius, float small_radius)
 			VEC3 pos(x, y, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[j*(m_nx)+i];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 }
 
 template <typename PFP>
-void Polyhedron<PFP>::embedCube( float sx, float sy, float sz)
+void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if (m_kind != CUBE) {
+	if (m_kind != CUBE)
+	{
 		CGoGNerr << "Warning try to embedCube something that is not a cube"<<CGoGNendl;
 		return;
 	}
@@ -961,64 +955,64 @@ void Polyhedron<PFP>::embedCube( float sx, float sy, float sz)
 
 	// first embedding the sides
 	int index = 0;
-	for (int k=0; k<=m_nz; ++k)
+	for (unsigned int k = 0; k <= m_nz; ++k)
 	{
 		float z = float(k)*dz - sz/2.0f;
-		for (int i=0;i<m_nx;++i)
+		for (unsigned int i = 0; i < m_nx; ++i)
 		{
 			float x = float(i)*dx - sx/2.0f;
 			VEC3 pos(x, -sy/2.0f, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
-		for (int i=0;i<m_ny;++i)
+		for (unsigned int i = 0; i < m_ny; ++i)
 		{
 			float y = float(i)*dy - sy/2.0f;
 			VEC3 pos(sx/2.0f, y, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
-		for (int i=0;i<m_nx;++i)
+		for (unsigned int i = 0; i < m_nx; ++i)
 		{
 			float x = sx/2.0f-float(i)*dx;
 			VEC3 pos(x, sy/2.0f, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
-		for (int i=0;i<m_ny;++i)
+		for (unsigned int i = 0; i < m_ny ;++i)
 		{
 			float y = sy/2.0f - float(i)*dy;
 			VEC3 pos(-sx/2.0f, y, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 
 	// the top
-	for(int i=1;i<m_ny;++i)
+	for(unsigned int i = 1; i  <m_ny; ++i)
 	{
-		for(int j=1;j<m_nx;++j)
+		for(unsigned int j = 1; j < m_nx; ++j)
 		{
 			VEC3 pos(-sx/2.0f+float(j)*dx, -sy/2.0f+float(i)*dy, sz/2.0f);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 
 	// the bottom
-	for(int i=1;i<m_ny;++i)
+	for(unsigned int i = 1; i < m_ny; ++i)
 	{
-		for(int j=1;j<m_nx;++j)
+		for(unsigned int j = 1; j < m_nx; ++j)
 		{
 			VEC3 pos(-sx/2.0f+float(j)*dx, sy/2.0f-float(i)*dy, -sz/2.0f);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 }
@@ -1028,7 +1022,7 @@ void Polyhedron<PFP>::computeCenter()
 {
 	typename PFP::VEC3 center(0);
 
-	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
+	for(typename std::vector<Dart>::iterator di = m_tableVertDarts.begin(); di != m_tableVertDarts.end(); ++di)
 	{
 		center += m_positions[*di];
 	}
@@ -1045,7 +1039,7 @@ void Polyhedron<PFP>::transform(const Geom::Matrix44f& matrice)
 //	Geom::Vec4f v3(matrice[2],matrice[6],matrice[10],matrice[14]);
 //	Geom::Vec4f v4(matrice[3],matrice[7],matrice[11],matrice[15]);
 
-	for(typename std::vector<Dart>::iterator di=m_tableVertDarts.begin(); di!=m_tableVertDarts.end(); ++di)
+	for(typename std::vector<Dart>::iterator di = m_tableVertDarts.begin(); di != m_tableVertDarts.end(); ++di)
 	{
 
 		typename PFP::VEC3& pos = m_positions[*di];
@@ -1082,7 +1076,7 @@ void Polyhedron<PFP>::mark(CellMarker& m)
 //}
 
 template <typename PFP>
-void Polyhedron<PFP>::embedTwistedStrip( float radius_min,  float radius_max, float turns)
+void Polyhedron<PFP>::embedTwistedStrip(float radius_min,  float radius_max, float turns)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -1092,16 +1086,16 @@ void Polyhedron<PFP>::embedTwistedStrip( float radius_min,  float radius_max, fl
 	float radius = (radius_max + radius_min)/2.0f;
 	float rdiff = (radius_max - radius_min)/2.0f;
 
-	for(int i=0; i<=m_ny; ++i)
+	for(unsigned int i = 0; i <= m_ny; ++i)
 	{
-		for(int j=0; j<=m_nx; ++j)
+		for(unsigned int j = 0; j <= m_nx; ++j)
 		{
 			float rw = -rdiff + float(j)*2.0f*rdiff/float(m_nx);
 			float r = radius + rw*cos(beta*float(i));
 			VEC3 pos(r*cos(alpha*float(i)), r*sin(alpha*float(i)), rw*sin(beta*float(i)));
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx+1)+j];
-			m_map.embedOrbit(VERTEX,d,em);
+			m_map.embedOrbit(VERTEX, d, em);
 		}
 	}
 }
@@ -1117,9 +1111,9 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 // 	float radius = (radius_max + radius_min)/2.0f;
 // 	float rdiff = (radius_max - radius_min)/2.0f;
 
-	for(int i=0; i<=m_ny; ++i)
+	for(unsigned int i = 0; i <= m_ny; ++i)
 	{
-		for(int j=0; j<=m_nx; ++j)
+		for(unsigned int j = 0; j <= m_nx; ++j)
 		{
 // 			float r = radius_max + radius_min*cos(beta*float(j));
 			float r,x,y;
@@ -1127,7 +1121,7 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 // 				r = radius_max;
 // 			}
 // 			else {
-				r= radius_min+(radius_max-radius_min)*float(i)/float(m_ny);
+				r = radius_min+(radius_max-radius_min)*float(i)/float(m_ny);
 // 			}
 			x = orient*r*sin(alpha*float(j));
 			y = orient*r*cos(alpha*float(j));

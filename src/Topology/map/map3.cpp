@@ -91,13 +91,11 @@ Dart Map3::deleteVertex(Dart d)
 		}
 	}
 
-
 	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
 	{
 		if(!mergeVolumes(*it))
 			return NIL;
 	}
-
 
 	return NIL;
 }
@@ -546,9 +544,9 @@ bool Map3::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int 
 	DartMarkerStore mv(*this,thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
-	std::vector<Dart> darts_list;			//Darts that are traversed
+	std::vector<Dart> darts_list;		// Darts that are traversed
 	darts_list.reserve(512);
-	darts_list.push_back(d);			//Start with the dart d
+	darts_list.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
 	for(std::vector<Dart>::iterator darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
@@ -584,8 +582,10 @@ bool Map3::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int 
 bool Map3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart dNext = d;
-	do {
-		if (Map2::foreach_dart_of_edge(dNext,f,thread)) return true;
+	do
+	{
+		if (Map2::foreach_dart_of_edge(dNext, f, thread))
+			return true;
 		dNext = alpha2(dNext);
 	} while (dNext != d);
 	return false;
@@ -629,10 +629,12 @@ bool Map3::foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread
 
 bool Map3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	if (foreach_dart_of_oriented_face(d,f,thread)) return true;
+	if (foreach_dart_of_oriented_face(d, f, thread))
+		return true;
 
 	Dart d3 = phi3(d);
-	if (d3 != d) return foreach_dart_of_oriented_face(d3,f,thread);
+	if (d3 != d)
+		return foreach_dart_of_oriented_face(d3, f, thread);
 	return false;
 }
 
@@ -675,7 +677,6 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 
 		found = f(d1);	// functor say finish
 	}
-
 
 	return found;
 }

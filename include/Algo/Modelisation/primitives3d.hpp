@@ -35,52 +35,47 @@ namespace Modelisation
 template <typename PFP>
 Dart Primitive3D<PFP>::createHexa()
 {
-	Dart base = m_map.newFace(4);
+	Dart base = m_map.newFace(4, false);
 
-	Dart side1 = m_map.newFace(4);
-	m_map.sewFaces(base,side1);
+	Dart side1 = m_map.newFace(4, false);
+	m_map.sewFaces(base, side1, false);
 
-	Dart side2 = m_map.newFace(4);
-	m_map.sewFaces(m_map.phi1(base),side2);
-	m_map.sewFaces(m_map.phi_1(side1), m_map.phi1(side2));
+	Dart side2 = m_map.newFace(4, false);
+	m_map.sewFaces(m_map.phi1(base), side2, false);
+	m_map.sewFaces(m_map.phi_1(side1), m_map.phi1(side2), false);
 
-	Dart side3 = m_map.newFace(4);
-	m_map.sewFaces(m_map.phi1(m_map.phi1(base)),side3);
-	m_map.sewFaces(m_map.phi_1(side2), m_map.phi1(side3));
+	Dart side3 = m_map.newFace(4, false);
+	m_map.sewFaces(m_map.phi1(m_map.phi1(base)), side3, false);
+	m_map.sewFaces(m_map.phi_1(side2), m_map.phi1(side3), false);
 
-	Dart side4 = m_map.newFace(4);
-	m_map.sewFaces(m_map.phi_1(base),side4);
-	m_map.sewFaces(m_map.phi_1(side3), m_map.phi1(side4));
+	Dart side4 = m_map.newFace(4, false);
+	m_map.sewFaces(m_map.phi_1(base), side4, false);
+	m_map.sewFaces(m_map.phi_1(side3), m_map.phi1(side4), false);
 
-	m_map.sewFaces(m_map.phi_1(side4), m_map.phi1(side1));
+	m_map.sewFaces(m_map.phi_1(side4), m_map.phi1(side1), false);
 
-	Dart top = m_map.newFace(4);
-	m_map.sewFaces(top,m_map.phi1(m_map.phi1(side1)));
-	m_map.sewFaces(m_map.phi_1(top),m_map.phi1(m_map.phi1(side2)));
-	m_map.sewFaces(m_map.phi1(m_map.phi1(top)),m_map.phi1(m_map.phi1(side3)));
-	m_map.sewFaces(m_map.phi1(top),m_map.phi1(m_map.phi1(side4)));
+	Dart top = m_map.newFace(4, false);
+	m_map.sewFaces(top, m_map.phi1(m_map.phi1(side1)), false);
+	m_map.sewFaces(m_map.phi_1(top), m_map.phi1(m_map.phi1(side2)), false);
+	m_map.sewFaces(m_map.phi1(m_map.phi1(top)), m_map.phi1(m_map.phi1(side3)), false);
+	m_map.sewFaces(m_map.phi1(top), m_map.phi1(m_map.phi1(side4)), false);
 
 	return base;
 }
 
 template <typename PFP>
-Dart Primitive3D<PFP>::HexaGrid1Topo(int nx)
+Dart Primitive3D<PFP>::HexaGrid1Topo(unsigned int nx)
 {
 	// first cube
-<<<<<<< HEAD
-	Dart d0 = createOrientedHexa(); //return a dart from the base of the cube
-	m_tableVertDarts.push_back(d0); //push_back darts frome the base of cubes
-=======
 	Dart d0 = createHexa();
 	m_tableVertDarts.push_back(d0);
->>>>>>> 9d09fe01ab3a12525ca57c400eb2777dfbc5b528
 	Dart d1 = m_map.template phi<2112>(d0);
 
-	for (int i=1; i< nx; ++i)
+	for (unsigned int i = 1; i < nx; ++i)
 	{
 		Dart d2 = createHexa();
 		m_tableVertDarts.push_back(d2);
-		m_map.sewVolumes(d1,d2);
+		m_map.sewVolumes(d1, d2);
 		d1 = m_map.template phi<2112>(d2);
 	}
 
@@ -92,20 +87,20 @@ Dart Primitive3D<PFP>::HexaGrid1Topo(int nx)
 }
 
 template <typename PFP>
-Dart Primitive3D<PFP>::HexaGrid2Topo( int nx, int ny)
+Dart Primitive3D<PFP>::HexaGrid2Topo(unsigned int nx, unsigned int ny)
 {
 	// creation premiere ligne
 	Dart d0 = HexaGrid1Topo(nx);
 	Dart d1 = m_map.template phi<112>(d0);
 
-	for (int i=1; i< ny; ++i)
+	for (unsigned int i = 1; i < ny; ++i)
 	{
 		// creation ligne suivante
 		Dart d2 = HexaGrid1Topo(nx);
-		Dart d3 =  m_map.phi2(d2);
+		Dart d3 = m_map.phi2(d2);
 
 		// couture des deux lignes de cubes
-		for (int i=0; i< nx; ++i)
+		for (unsigned int i = 0; i < nx; ++i)
 		{
 			m_map.sewVolumes(d1,d3);
 			d1 = m_map.template phi<11232>(d1);
@@ -118,7 +113,7 @@ Dart Primitive3D<PFP>::HexaGrid2Topo( int nx, int ny)
 	// add last row of vertices (y = ny)
 
 	int index = m_tableVertDarts.size()-(nx+1); // pos of last inserted row of dart
-	for (int i = 0; i< nx; ++i)
+	for (unsigned int i = 0; i < nx; ++i)
 	{
 		Dart dd = m_tableVertDarts[index++];
 		dd =m_map.template phi<112>(dd);
@@ -129,13 +124,11 @@ Dart Primitive3D<PFP>::HexaGrid2Topo( int nx, int ny)
 	dd =m_map.template phi<211>(dd);
 	m_tableVertDarts.push_back(dd);	
 
-
 	return d0;
 }
 
-
 template <typename PFP>
-Dart Primitive3D<PFP>::hexaGrid_topo( int nx, int ny, int nz)
+Dart Primitive3D<PFP>::hexaGrid_topo(unsigned int nx, unsigned int ny, unsigned int nz)
 {
 	m_kind = HEXAGRID;
 	m_nx = nx;
@@ -143,23 +136,22 @@ Dart Primitive3D<PFP>::hexaGrid_topo( int nx, int ny, int nz)
 	m_nz = nz;
 	m_tableVertDarts.clear();
 	m_tableVertDarts.reserve((nx+1)*(ny+1)*(nz+1));
-	
 
 	Dart d0 = HexaGrid2Topo(nx,ny);
 	Dart d1 = m_map.template phi<12>(d0);
 
-	for (int i=1; i< nz; ++i)
+	for (unsigned int i = 1; i < nz; ++i)
 	{
 		// creation grille suivante
 		Dart d2 = HexaGrid2Topo(nx,ny);
 		Dart d3 = m_map.phi2(m_map.phi_1(d2));
 		
 		// couture des deux grilles 2D de cubes
-		for (int j=0; j< ny; ++j)
+		for (unsigned int j = 0; j < ny; ++j)
 		{
 			Dart da = d1;
 			Dart db = d3;
-			for (int k=0; k< nx; ++k)
+			for (unsigned int k = 0; k < nx; ++k)
 			{
 				m_map.sewVolumes(da,db);
 				da = m_map.template phi<11232>(da);
@@ -175,21 +167,20 @@ Dart Primitive3D<PFP>::hexaGrid_topo( int nx, int ny, int nz)
 	}
 
 	// add last slice of vertices to the table
-	int nb = (nx+1)*(ny+1);	// nb of vertices in one slice XY
-	int index = nb*(nz-1);	// last slice
-	for (int i=0; i < nb; ++i)
+	unsigned int nb = (nx+1)*(ny+1);	// nb of vertices in one slice XY
+	unsigned int index = nb*(nz-1);	// last slice
+	for (unsigned int i = 0; i < nb; ++i)
 	{
 		Dart dd = m_tableVertDarts[index++];
-		dd =m_map.phi2(dd);
+		dd = m_map.phi2(dd);
 		m_tableVertDarts.push_back(dd);
 	}
 
 	return d0;
 }
 
-
 template <typename PFP>
-void Primitive3D<PFP>::embedHexaGrid( float x, float y, float z)
+void Primitive3D<PFP>::embedHexaGrid(float x, float y, float z)
 {
 	if (m_kind != HEXAGRID)
 	{
@@ -201,24 +192,23 @@ void Primitive3D<PFP>::embedHexaGrid( float x, float y, float z)
 	float dy = y/float(m_ny);
 	float dz = z/float(m_nz);
 
-	int nbs = (m_nx+1)*(m_ny+1);
+	unsigned int nbs = (m_nx+1)*(m_ny+1);
 
-	for(int i=0; i<=m_nz; ++i)
+	for(unsigned int i = 0; i <= m_nz; ++i)
 	{
-		for(int j=0; j<=m_ny; ++j)
+		for(unsigned int j = 0; j <= m_ny; ++j)
 		{
-			for(int k=0; k<=m_nx;++k)
+			for(unsigned int k = 0; k <= m_nx; ++k)
 			{
 				typename PFP::VEC3 pos(-x/2.0f + dx*float(k), -y/2.0f + dy*float(j), -z/2.0f + dz*float(i));
 				Dart d = m_tableVertDarts[ i*nbs+j*(m_nx+1)+k ];
 
-				m_map.embedNewCell(VERTEX,d);
+				m_map.embedNewCell(VERTEX, d);
 				m_positions[d] = pos;
 			}
 		}
 	}
 }
-
 
 template <typename PFP>
 void Primitive3D<PFP>::transform(const Geom::Matrix44f& matrice)
@@ -240,6 +230,8 @@ void Primitive3D<PFP>::transform(const Geom::Matrix44f& matrice)
 //	}
 //}
 
-}//end namespace
-}//end namespace
-}//end namespace
+} // namespace Modelisation
+
+} // namespace Algo
+
+} // namespace CGoGN

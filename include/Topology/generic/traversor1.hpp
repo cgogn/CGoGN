@@ -22,11 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR1_H__
-#define __TRAVERSOR1_H__
-
-#include "Topology/generic/dart.h"
-
 namespace CGoGN
 {
 
@@ -34,86 +29,164 @@ namespace CGoGN
 					VERTEX CENTERED TRAVERSALS
 *******************************************************************************/
 
-// Traverse the edges incident to a given vertex
+// Traversor1VE
+
 template <typename MAP>
-class Traversor1VE
+Traversor1VE<MAP>::Traversor1VE(MAP& map, Dart dart) : m(map), start(dart)
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	d2 = m.phi_1(start) ;
+	if(d2 == start) // 1 edge loop case
+		d2 = NIL ;
+}
 
-	Dart d2 ;
-
-public:
-	Traversor1VE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the vertices adjacent to a given vertex through sharing a common edge
-class Traversor1VVaE
+template <typename MAP>
+Dart Traversor1VE<MAP>::begin()
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	current = start ;
+	return current ;
+}
 
-	Dart d2 ;
+template <typename MAP>
+Dart Traversor1VE<MAP>::end()
+{
+	return NIL ;
+}
 
-public:
-	Traversor1VVaE(MAP& map, Dart dart) ;
+template <typename MAP>
+Dart Traversor1VE<MAP>::next()
+{
+	if(current != NIL)
+	{
+		if(current == start)
+			current = d2 ;
+		else
+			current = NIL ;
+	}
+	return current ;
+}
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+// Traversor1VVaE
+
+template <typename MAP>
+Traversor1VVaE<MAP>::Traversor1VVaE(MAP& map, Dart dart) : m(map)
+{
+	start = m.phi_1(dart) ;
+	if(start == dart) // 1 edge loop case
+		start = NIL ;
+	else
+	{
+		d2 = m.phi1(dart) ;
+		if(d2 == start) // 2 edges loop case
+			d2 = NIL ;
+	}
+}
+
+template <typename MAP>
+Dart Traversor1VVaE<MAP>::begin()
+{
+	current = start ;
+	return current ;
+}
+
+template <typename MAP>
+Dart Traversor1VVaE<MAP>::end()
+{
+	return NIL ;
+}
+
+template <typename MAP>
+Dart Traversor1VVaE<MAP>::next()
+{
+	if(current != NIL)
+	{
+		if(current == start)
+			current = d2 ;
+		else
+			current = NIL ;
+	}
+	return current ;
+}
 
 /*******************************************************************************
 					EDGE CENTERED TRAVERSALS
 *******************************************************************************/
 
-// Traverse the vertices incident to a given edge
+// Traversor1EV
+
 template <typename MAP>
-class Traversor1EV
+Traversor1EV<MAP>::Traversor1EV(MAP& map, Dart dart) : m(map), start(dart)
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	d2 = m.phi1(start) ;
+	if(d2 == start) // 1 edge loop case
+		d2 = NIL ;
+}
 
-	Dart d2 ;
-
-public:
-	Traversor1EV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the edges adjacent to a given edge through sharing a common vertex
-class Traversor1EEaV
+template <typename MAP>
+Dart Traversor1EV<MAP>::begin()
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	current = start ;
+	return current ;
+}
 
-	Dart d2 ;
+template <typename MAP>
+Dart Traversor1EV<MAP>::end()
+{
+	return NIL ;
+}
 
-public:
-	Traversor1EEaV(MAP& map, Dart dart) ;
+template <typename MAP>
+Dart Traversor1EV<MAP>::next()
+{
+	if(current != NIL)
+	{
+		if(current == start)
+			current = d2 ;
+		else
+			current = NIL ;
+	}
+	return current ;
+}
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+// Traversor1EEaV
+
+template <typename MAP>
+Traversor1EEaV<MAP>::Traversor1EEaV(MAP& map, Dart dart) : m(map)
+{
+	start = m.phi_1(dart) ;
+	if(start == dart) // 1 edge loop case
+		start = NIL ;
+	else
+	{
+		d2 = m.phi1(dart) ;
+		if(d2 == start) // 2 edges loop case
+			d2 = NIL ;
+	}
+}
+
+template <typename MAP>
+Dart Traversor1EEaV<MAP>::begin()
+{
+	current = start ;
+	return current ;
+}
+
+template <typename MAP>
+Dart Traversor1EEaV<MAP>::end()
+{
+	return NIL ;
+}
+
+template <typename MAP>
+Dart Traversor1EEaV<MAP>::next()
+{
+	if(current != NIL)
+	{
+		if(current == start)
+			current = d2 ;
+		else
+			current = NIL ;
+	}
+	return current ;
+}
 
 } // namespace CGoGN
-
-#include "Topology/generic/traversor1.hpp"
-
-#endif

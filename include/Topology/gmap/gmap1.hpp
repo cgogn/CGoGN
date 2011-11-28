@@ -149,10 +149,10 @@ inline void GMap1::beta1unsew(Dart d)
 
 inline void GMap1::cutEdge(Dart d)
 {
+   Dart dd = beta0(d) ;
    Dart e = newDart();
    Dart f = newDart();
    beta1sew(e, f) ;
-   Dart dd = beta0(d) ;
    beta0unsew(d) ;
    beta0sew(e, d) ;
    beta0sew(f, dd) ;
@@ -254,7 +254,7 @@ inline unsigned int GMap1::faceDegree(Dart d)
 	return count ;
 }
 
-bool GMap1::isFaceTriangle(Dart d)
+inline bool GMap1::isFaceTriangle(Dart d)
 {
 	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }
@@ -279,7 +279,7 @@ inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thr
 	return false;
 }
 
-bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d ;
 	do
@@ -291,7 +291,7 @@ bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int t
 	return false ;
 }
 
-bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
 	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(beta0(d), f, thread) ;
 }
@@ -301,7 +301,7 @@ inline bool GMap1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int t
 	return foreach_dart_of_face(d, f, thread) ;
 }
 
-bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	return foreach_dart_of_face(d, f, thread) ;
 }

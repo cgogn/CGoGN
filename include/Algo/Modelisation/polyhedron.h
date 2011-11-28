@@ -117,11 +117,11 @@ protected:
 	/**
 	* numbers that defined the subdivision of  Polyhedron
 	*/
-	int m_nx;
+	unsigned int m_nx;
 
-	int m_ny;
+	unsigned int m_ny;
 
-	int m_nz;
+	unsigned int m_nz;
 
 	bool m_top_closed;
 
@@ -151,14 +151,14 @@ public:
 	* @param idPositions id of attribute position
 	*/
 	Polyhedron(MAP& map, typename PFP::TVEC3& position):
-	 m_map(map),
-	 m_kind(NONE),
-	 m_nx(-1), m_ny(-1), m_nz(-1),
-	 m_top_closed(false), m_bottom_closed(false),
-	 m_positions(position)
-	 {
+		m_map(map),
+		m_kind(NONE),
+		m_nx(-1), m_ny(-1), m_nz(-1),
+		m_top_closed(false), m_bottom_closed(false),
+		m_positions(position)
+	{
 		computeCenter();
-	 }
+	}
 
 	/**
 	* Polyhedron fusion: give a COMPOSED type
@@ -170,7 +170,7 @@ public:
 	/**
 	 * create simple simple polyhedron (not handled by Polyhedron object)
 	 */
-	static Dart createPolyhedron(typename PFP::MAP& the_map, int nbFaces);
+	static Dart createPolyhedron(typename PFP::MAP& the_map, unsigned int nbFaces);
 
 	/**
 	 * create simple simple tetrahedron (not handled by Polyhedron object)
@@ -225,7 +225,7 @@ public:
 	* @param bottom_closed close the bottom with triangles fan
 	* @return the dart
 	*/
-	Dart cylinder_topo(int n, int z, bool top_closed, bool bottom_closed);
+	Dart cylinder_topo(unsigned int n, unsigned int z, bool top_closed, bool bottom_closed);
 
 	/**
 	* Create a subdivided (surface) cone (with param 1,3,true create tetrahedron)
@@ -234,7 +234,7 @@ public:
 	* @param bottom_closed close the bottom with triangles fan
 	* @return the dart
 	*/
-	Dart cone_topo(int n, int z, bool bottom_closed);
+	Dart cone_topo(unsigned int n, unsigned int z, bool bottom_closed);
 
 	/**
 	* Create a subdived (surface) cube
@@ -244,7 +244,7 @@ public:
 	* @param z nb of quads in z
 	* @return the dart
 	*/
-	Dart cube_topo(int x, int y, int z);
+	Dart cube_topo(unsigned int x, unsigned int y, unsigned int z);
 
 	/**
 	* Create a subdivided (surface) cylinder
@@ -254,7 +254,7 @@ public:
 	* @param bottom_closed close the bottom with triangles fan
 	* @return the dart
 	*/
-	Dart tore_topo(int m, int n);
+	Dart tore_topo(unsigned int m, unsigned int n);
 
 	/**
 	* embed the topo grid Polyhedron
@@ -262,7 +262,7 @@ public:
 	* @param x
 	* @param y
 	*/
-	void embedGrid(float x, float y, float z=0.0f);
+	void embedGrid(float x, float y, float z = 0.0f);
 
 	/**
 	* embed the topo cylinder Polyhedron
@@ -317,7 +317,7 @@ public:
 	* @param maxHeight height to reach
 	* @param turns number of turn
 	*/
-	void embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient=1);
+	void embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
 
 	/**
 	* transform the Polyhedron with transformation matrice

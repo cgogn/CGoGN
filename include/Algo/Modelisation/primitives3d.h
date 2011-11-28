@@ -53,7 +53,6 @@ class Primitive3D
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 EMB;
 	
-
 public:
 	enum {NONE,HEXAGRID};
 
@@ -82,20 +81,18 @@ protected:
 	std::vector<Dart> m_tableVertDarts;
 
 	/**
-	* numbers that defined the subdivision of  primitives
+	* numbers that defined the subdivision of primitives
 	*/
-	int m_nx;
-
-	int m_ny;
-
-	int m_nz;
+	unsigned int m_nx;
+	unsigned int m_ny;
+	unsigned int m_nz;
 
 	/**
 	* Create a 3D grid 
 	* @param nx nb of cubes in x
 	* @return the dart of vertex (0,0,0) direction z
 	*/	
-	Dart HexaGrid1Topo(int nx);
+	Dart HexaGrid1Topo(unsigned int nx);
 
 	/**
 	* Create a 3D grid 
@@ -103,10 +100,9 @@ protected:
 	* @param ny nb of cubes in y
 	* @return the dart of vertex (0,0,0) direction z
 	*/	
-	Dart HexaGrid2Topo(int nx, int ny);
+	Dart HexaGrid2Topo(unsigned int nx, unsigned int ny);
 
 	Dart createHexa();
-
 
 public:
 
@@ -130,7 +126,6 @@ public:
 	*/
 	Dart getDart() { return m_dart;}
 
-
 	/**
 	* transform the primitive with transformation matrice
 	* @param matrice 
@@ -143,7 +138,6 @@ public:
 	*/
 //	void mark(Mark m);
 
-
 	/**
 	* Create a 3D grid 
 	* @param nx nb of cubes in x
@@ -151,8 +145,7 @@ public:
 	* @param nz nb of cubes in z
 	* @return the dart of vertex (0,0,0) direction z
 	*/	
-	Dart hexaGrid_topo(int nx, int ny, int nz);
-
+	Dart hexaGrid_topo(unsigned int nx, unsigned int ny, unsigned int nz);
 
 	/**
 	* embed the topo grid primitive 
@@ -162,7 +155,7 @@ public:
 	* @param z
 	* @param positions handler of position attribute
 	*/
-	void embedHexaGrid( float x, float y, float z);
+	void embedHexaGrid(float x, float y, float z);
 
 	/**
 	* Create a 3D grid 
@@ -173,7 +166,6 @@ public:
 	*/	
 // 	Dart prismGrid_topo(int nx,int nz);
 
-
 	/**
 	* embed the topo grid primitive 
 	* Grid has size x,y,z centered on 0
@@ -182,16 +174,13 @@ public:
 	* @param z
 	*/
 // 	void embedPrismGrid( float x, float z);
-
-
-
 };
 
-}//end namespace
-}//end namespace
-}//end namespace
+} // namespace Modelisation
 
+} // namespace Algo
 
+} // namespace CGoGN
 
 #include "primitives3d.hpp"
 

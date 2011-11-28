@@ -82,9 +82,9 @@ void EmbeddedGMap3::cutEdge(Dart d)
 	}
 }
 
-void EmbeddedGMap3::sewFaces(Dart d, Dart e)
+void EmbeddedGMap3::sewFaces(Dart d, Dart e, bool withBoundary)
 {
-	GMap3::sewFaces(d,e);
+	GMap3::sewFaces(d, e, withBoundary);
 
 	unsigned int vEmb;
 	if (isOrbitEmbedded(VERTEX))
@@ -324,22 +324,22 @@ unsigned int EmbeddedGMap3::closeHole(Dart d)
 	return nbE;
 }
 
-void EmbeddedGMap3::closeMap(DartMarker &marker)
-{
-	GMap3::closeMap(marker);
-
-	for(Dart d = begin() ; d != end() ; next(d))
-	{
-		if(marker.isMarked(d))
-		{
-			if(isOrbitEmbedded(VERTEX))
-			{
-				copyDartEmbedding(VERTEX, d, phi1(phi3(d)));
-				copyDartEmbedding(VERTEX, beta0(d), beta0(phi1(phi3(d))));
-			}
-		}
-	}
-}
+//void EmbeddedGMap3::closeMap(DartMarker &marker)
+//{
+//	GMap3::closeMap(marker);
+//
+//	for(Dart d = begin() ; d != end() ; next(d))
+//	{
+//		if(marker.isMarked(d))
+//		{
+//			if(isOrbitEmbedded(VERTEX))
+//			{
+//				copyDartEmbedding(VERTEX, d, phi1(phi3(d)));
+//				copyDartEmbedding(VERTEX, beta0(d), beta0(phi1(phi3(d))));
+//			}
+//		}
+//	}
+//}
 
 bool EmbeddedGMap3::check()
 {

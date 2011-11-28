@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR2_H__
-#define __TRAVERSOR2_H__
+#ifndef __TRAVERSOR3_H__
+#define __TRAVERSOR3_H__
 
 #include "Topology/generic/dart.h"
 
@@ -36,7 +36,7 @@ namespace CGoGN
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor2VE
+class Traversor3VE
 {
 private:
 	MAP& m ;
@@ -44,7 +44,7 @@ private:
 	Dart current ;
 
 public:
-	Traversor2VE(MAP& map, Dart dart) ;
+	Traversor3VE(MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
@@ -53,7 +53,7 @@ public:
 
 // Traverse the faces incident to a given vertex
 template <typename MAP>
-class Traversor2VF
+class Traversor3VF
 {
 private:
 	MAP& m ;
@@ -61,16 +61,16 @@ private:
 	Dart current ;
 
 public:
-	Traversor2VF(MAP& map, Dart dart) ;
+	Traversor3VF(MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
 	Dart next() ;
 } ;
 
-// Traverse the vertices adjacent to a given vertex through sharing a common edge
+// Traverse the volumes incident to a given vertex
 template <typename MAP>
-class Traversor2VVaE
+class Traversor3VW
 {
 private:
 	MAP& m ;
@@ -78,26 +78,7 @@ private:
 	Dart current ;
 
 public:
-	Traversor2VVaE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the vertices adjacent to a given vertex through sharing a common face
-template <typename MAP>
-class Traversor2VVaF
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart stop ;
-
-public:
-	Traversor2VVaF(MAP& map, Dart dart) ;
+	Traversor3VW(MAP& map, Dart dart) ;
 
 	Dart begin() ;
 	Dart end() ;
@@ -108,154 +89,22 @@ public:
 					EDGE CENTERED TRAVERSALS
 *******************************************************************************/
 
-// Traverse the vertices incident to a given edge
-template <typename MAP>
-class Traversor2EV
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
 
-public:
-	Traversor2EV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the faces incident to a given edge
-template <typename MAP>
-class Traversor2EF
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-public:
-	Traversor2EF(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the edges adjacent to a given edge through sharing a common vertex
-template <typename MAP>
-class Traversor2EEaV
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart stop1, stop2 ;
-
-public:
-	Traversor2EEaV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the edges adjacent to a given edge through sharing a common face
-template <typename MAP>
-class Traversor2EEaF
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart stop1, stop2 ;
-
-public:
-	Traversor2EEaF(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
 
 /*******************************************************************************
 					FACE CENTERED TRAVERSALS
 *******************************************************************************/
 
-// Traverse the vertices incident to a given face
-template <typename MAP>
-class Traversor2FV
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
 
-public:
-	Traversor2FV(MAP& map, Dart dart) ;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+/*******************************************************************************
+					VOLUME CENTERED TRAVERSALS
+*******************************************************************************/
 
-// Traverse the edges incident to a given face
-template <typename MAP>
-class Traversor2FE
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
 
-public:
-	Traversor2FE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the faces adjacent to a given face through sharing a common vertex
-template <typename MAP>
-class Traversor2FFaV
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart stop ;
-
-public:
-	Traversor2FFaV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the faces adjacent to a given face through sharing a common edge
-template <typename MAP>
-class Traversor2FFaE
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-public:
-	Traversor2FFaE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor2.hpp"
+#include "Topology/generic/traversor3.hpp"
 
 #endif
