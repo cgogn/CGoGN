@@ -227,7 +227,7 @@ Dart TopoRender::pickColor(unsigned int x, unsigned int y)
 	// draw in back buffer (not shown on screen)
 	drawDarts();
 
-	// restore dart with
+	// restore dart width
 	m_topo_dart_width = dw;
 
 	// read the pixel under the mouse in back buffer
