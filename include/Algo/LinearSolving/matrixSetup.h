@@ -184,21 +184,14 @@ public:
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart it = d ;
 		REAL aii = 0 ;
-		do
+		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			Dart dboundary = this->m_map.phi_1(it) ;
-			if(this->m_map.phi2(dboundary) == dboundary)
-			{
-				aii += aij ;
-				solver->add_coefficient(indexTable[dboundary], aij) ;
-			}
-			it = this->m_map.alpha1(it) ;
-		} while(it != d) ;
+		}
 		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->normalize_row() ;
 		solver->set_right_hand_side(0) ;
@@ -234,21 +227,14 @@ public:
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart it = d ;
 		REAL aii = 0 ;
-		do
+		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			Dart dboundary = this->m_map.phi_1(it) ;
-			if(this->m_map.phi2(dboundary) == dboundary)
-			{
-				aii += aij ;
-				solver->add_coefficient(indexTable[dboundary], aij) ;
-			}
-			it = this->m_map.alpha1(it) ;
-		} while(it != d) ;
+		}
 		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->normalize_row() ;
 		solver->set_right_hand_side(attrTable[d]) ;
@@ -286,21 +272,14 @@ public:
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart it = d ;
 		REAL aii = 0 ;
-		do
+		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = 1 ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			Dart dboundary = this->m_map.phi_1(it) ;
-			if(this->m_map.phi2(dboundary) == dboundary)
-			{
-				aii += aij ;
-				solver->add_coefficient(indexTable[dboundary], aij) ;
-			}
-			it = this->m_map.alpha1(it) ;
-		} while(it != d) ;
+		}
 		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->normalize_row() ;
 		solver->set_right_hand_side((attrTable[d])[coord]) ;
@@ -338,21 +317,16 @@ public:
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart it = d ;
 		REAL vArea = vertexArea[d] ;
 		REAL aii = 0 ;
+		Dart it = d ;
+//		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+//		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		do
 		{
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			Dart dboundary = this->m_map.phi_1(it) ;
-			if(this->m_map.phi2(dboundary) == dboundary)
-			{
-				aij = edgeWeight[dboundary] / vArea ;
-				aii += aij ;
-				solver->add_coefficient(indexTable[dboundary], aij) ;
-			}
 			it = this->m_map.alpha1(it) ;
 		} while(it != d) ;
 		solver->add_coefficient(indexTable[d], -aii) ;
@@ -394,23 +368,15 @@ public:
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart it = d ;
 		REAL vArea = vertexArea[d] ;
 		REAL aii = 0 ;
-		do
+		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			Dart dboundary = this->m_map.phi_1(it) ;
-			if(this->m_map.phi2(dboundary) == dboundary)
-			{
-				aij = edgeWeight[dboundary] / vArea ;
-				aii += aij ;
-				solver->add_coefficient(indexTable[dboundary], aij) ;
-			}
-			it = this->m_map.alpha1(it) ;
-		} while(it != d) ;
+		}
 		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->normalize_row() ;
 		solver->set_right_hand_side(attrTable[d]) ;
@@ -452,23 +418,15 @@ public:
 	bool operator()(Dart d)
 	{
 		solver->begin_row() ;
-		Dart it = d ;
 		REAL vArea = vertexArea[d] ;
 		REAL aii = 0 ;
-		do
+		Traversor2VE<typename PFP::MAP> t(this->m_map, d) ;
+		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			Dart dboundary = this->m_map.phi_1(it) ;
-			if(this->m_map.phi2(dboundary) == dboundary)
-			{
-				aij = edgeWeight[dboundary] / vArea ;
-				aii += aij ;
-				solver->add_coefficient(indexTable[dboundary], aij) ;
-			}
-			it = this->m_map.alpha1(it) ;
-		} while(it != d) ;
+		}
 		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->normalize_row() ;
 		solver->set_right_hand_side((attrTable[d])[coord]) ;

@@ -57,16 +57,7 @@ struct PFP: public PFP_STANDARD
 	typedef Map2TP MAP;
 };
 
-/// definition de la carte en  global, plus facile 
-PFP::MAP myMap;
-
-// handler d'attribut de position par sommet
-AttributeHandler<PFP::VEC3> position;
-
-// handler d'attribut de normale par sommet
-AttributeHandler<PFP::VEC3> normal;
-
-/// encore 1 typedef pour simplifier l'ecriture du code
+/// typedef pour simplifier l'ecriture du code
 typedef PFP::VEC3 Point3D;
 
 // Variables pour la gestion des plongements

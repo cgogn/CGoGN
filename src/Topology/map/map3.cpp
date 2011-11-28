@@ -69,7 +69,7 @@ void Map3::deleteVolume(Dart d)
  *  Topological operations on 3-maps
  *************************************************************************/
 
-bool Map3::deleteVertex(Dart d)
+Dart Map3::deleteVertex(Dart d)
 {
 	//Save the darts around the vertex
 	//(one dart per face should be enough)
@@ -95,11 +95,11 @@ bool Map3::deleteVertex(Dart d)
 	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
 	{
 		if(!mergeVolumes(*it))
-			return false;
+			return NIL;
 	}
 
 
-	return true;
+	return NIL;
 }
 
 void Map3::cutEdge(Dart d)
@@ -808,52 +808,6 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 
 
 
-
-void Map3::closeMap(DartMarker& marker)
-{
-	std::list<Dart> dartList;
-
-// step 1: double,mark & store darts that have fixed point phi3
-	for(Dart d = this->begin(); d != this->end(); this->next(d))
-	{
-		if (phi3(d) == d)
-		{
-			Dart e = this->newDart();
-			marker.markOrbit(DART,e);
-			phi3sew(d,e);
-			dartList.push_back(e);
-		}
-	}
-
-// step 2: update phi1 of new darts
-	for (std::list<Dart>::iterator it=dartList.begin(); it!=dartList.end(); ++it)
-	{
-		Dart d = *it;		// external dart
-		Dart e = phi3(d);	// internal dart
-
-		// update phi1 if not already sewn (the last dart of the dart is automatiquely sewn)
-		// test à faire dans sewPhi ?
-		//if (phi1(d) != phi3(phi_1(e))) phi1sew(d, phi3(phi_1(e)));
-		if (phi1(d) == d) {
-			Dart eNext = phi1(e);
-			do {
-				phi1sew(d, phi3(eNext));
-				eNext = phi1(eNext);
-			} while (eNext != e);
-		}
-		// search the dart for phi2:
-		e = phi3(phi2(e));
-		while (!marker.isMarked(e))
-		{
-			e = phi3(phi2(e));
-		}
-		//update phi2 if not already sewn (if e have previously been sewn with d)
-		//test à faire dans sewPhi ?
-		if (phi2(d) != e) phi2sew(d,e);
-	}
-
-}
-
 //void Map3::reverseOrientation()
 //{
 //	Marker mf2 = this->getNewMarker();
@@ -925,91 +879,6 @@ void Map3::closeMap(DartMarker& marker)
 //	this->releaseMarker(DART,mf3);
 //}
 //
-
-
-bool Map3::sameFace(Dart d, Dart e)
-{
-	if(phi3(d) != d)
-		if(Map2::sameFace(phi3(d), e))
-			return true;
-
-	return Map2::sameFace(d,e);
-}
-
-bool Map3::check()
-{
-    CGoGNout << "Check: topology begin" << CGoGNendl;
-    DartMarker m(*this);
-    m.unmarkAll();
-    for(Dart d = this->begin(); d != this->end(); this->next(d))
-    {
-        Dart d3 = phi3(d);
-        if (phi3(d3) != d) // phi3 involution ?
-		{
-             CGoGNout << "Check: phi3 is not an involution" << CGoGNendl;
-            return false;
-        }
-
-        if(d3 != d)
-        {
-        	if(phi1(d3) != phi3(phi_1(d)))
-        	{
-        		CGoGNout << "Check: phi3 , faces are not entirely sewn" << CGoGNendl;
-        		return false;
-        	}
-        }
-
-        Dart d2 = phi2(d);
-        if (phi2(d2) != d) // phi2 involution ?
-		{
-            CGoGNout << "Check: phi2 is not an involution" << CGoGNendl;
-            return false;
-        }
-
-        Dart d1 = phi1(d);
-        if (phi_1(d1) != d) // phi1 a une image correcte ?
-		{
-            CGoGNout << "Check: unconsistent phi_1 link" << CGoGNendl;
-            return false;
-        }
-
-        if (m.isMarked(d1)) // phi1 a un seul antécédent ?
-		{
-            CGoGNout << "Check: dart with two phi1 predecessors" << CGoGNendl;
-            return false;
-        }
-        m.mark(d1);
-
-        if (d1 == d)
-            CGoGNout << "Check: (warning) face loop (one edge)" << CGoGNendl;
-
-        if (phi1(d1) == d)
-            CGoGNout << "Check: (warning) face with only two edges" << CGoGNendl;
-
-        if (phi2(d1) == d)
-            CGoGNout << "Check: (warning) dandling edge (phi2)" << CGoGNendl;
-
-        if (phi3(d1) == d)
-            CGoGNout << "Check: (warning) dandling edge (phi3)" << CGoGNendl;
-    }
-
-    for(Dart d = this->begin(); d != this->end(); this->next(d))
-    {
-        if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
-		{
-        	std::cout << "dart = " << d << std::endl;
-            CGoGNout << "Check: dart with no phi1 predecessor" << CGoGNendl;
-            return false;
-        }
-    }
-
-    CGoGNout << "Check: topology ok" << CGoGNendl;
-    return true;
-}
-
-
-
-
 
 
 
@@ -1245,6 +1114,5 @@ bool Map3::check()
 //}
 //
 //
->>>>>>> no_boundary
 
 } // namespace CGoGN

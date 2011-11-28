@@ -51,8 +51,6 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
-	virtual int getDartsPerTriangle();
-
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
@@ -75,23 +73,34 @@ public:
 
 	Dart alpha_1(Dart d);
 
+protected:
 	void beta2sew(Dart d, Dart e);
 
 	void beta2unsew(Dart d);
 
-	void phi2sew(Dart d, Dart e);
-
-	void phi2unsew(Dart d);
-
+public:
 	/*! @name Constructors and Destructors
 	 *  To generate or delete cells in a 2-G-map
 	 *************************************************************************/
 
 	//@{
+	//! Create an new face of nbEdges
+	/*! @param nbEdges the number of edges
+	 *  @param withBoudary create the face and its boundary (default true)
+	 *  @return return a dart of the face
+	 */
+	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
+
 	//! Delete a face erasing all its darts
 	/*! @param d a dart of the face
 	 */
 	virtual void deleteFace(Dart d);
+
+	//! Fill a hole with a face
+	/*! \pre Dart d is boundary marked
+	 *  @param d a dart of the face to fill
+	 */
+	virtual void fillHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -99,7 +108,7 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Split a vertex v between d and e
+	//! Split a vertex v between d and e inserting an edge after d and e
 	/*! \pre Darts d & e MUST belong to the same oriented vertex
 	 *  @param d first dart in vertex v
 	 *  @param e second dart in vertex v
@@ -107,40 +116,28 @@ public:
 	virtual void splitVertex(Dart d, Dart e);
 
 	//! Delete the vertex of d (works only for internal vertices)
-	/*! All the faces around the vertex are merged into one face
+	/*! Does not create a hole -> all the faces
+	 * 	around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
-	 * @return true if the deletion has been executed, false otherwise
+	 *  @return a dart of the resulting face (NIL if the deletion has not been executed)
 	 */
-	virtual bool deleteVertex(Dart d) ;
+	virtual Dart deleteVertex(Dart d) ;
 
-	//! Insert an edge after a dart in the vertex orbit
-	/*! \pre Dart d and e MUST be different and belong to distinct face
-	 *  \pre Dart e must be phi2-linked with its phi_1 dart
-	 *  @param d dart of the vertex
-	 *  @param e dart of the edge
-	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
-
-	//! Remove an edge from a vertex orbit
-	/*! \pre Dart d must be phi2 sewn
-	 *  @param d the dart of the edge to remove from the vertex
-	 */
-	virtual void removeEdgeFromVertex(Dart d);
-
-	//! Cut the edge of d and its opposite edge if it exists
+	//! Cut the edge of d by inserting a new vertex
 	/*! @param d a dart of the edge to cut
 	 */
 	virtual void cutEdge(Dart d);
 
-	//! Undo the cut of the edge of d and its opposite edge if it exists
+	//! Undo the cut of the edge of d
 	/*! @param d a dart of the edge to uncut
+	 *  @return true if the uncut has been executed, false otherwise
 	 */
-	virtual void uncutEdge(Dart d);
+	virtual bool uncutEdge(Dart d);
 
 	//! Collapse an edge (that is deleted) possibly merging its vertices
 	/*! If delDegenerateFaces is true, the method checks that no degenerate
 	 *  faces are build (faces with less than 3 edges). If it occurs the faces
-	 *  are deleted and the adjacencies are upadted (see deleteIfDegenerated).
+	 *  are deleted and the adjacencies are updated (see deleteIfDegenerated).
 	 *  \warning This may produce two distinct vertices if the edge
 	 *  was the only link between two border faces
 	 *  @param d a dart in the deleted edge
@@ -150,37 +147,52 @@ public:
 	virtual Dart collapseEdge(Dart d, bool delDegenerateFaces = true);
 
 	/**
-	 * Flip the edge of d. (rotation in phi1 order)
-	 * Works only for non-border edges.
+	 * Flip the edge of d (rotation in phi1 order)
+	 * WARNING : Works only for non-border edges
 	 * @param d a dart of the edge to flip
 	 * @return true if the flip has been executed, false otherwise
 	 */
 	virtual bool flipEdge(Dart d);
 
 	/**
-	 * Flip the edge of d. (rotation in phi_1 order)
-	 * Works only for non-border edges.
+	 * Flip the edge of d (rotation in phi_1 order)
+	 * WARNING : Works only for non-border edges
 	 * @param d a dart of the edge to flip
-	 * @return true if the flip has been executed, false otherwise
+	 * @return true if the flipBack has been executed, false otherwise
 	 */
 	virtual bool flipBackEdge(Dart d);
 
+//	//! Insert an edge after a dart in the vertex orbit
+//	/*! \pre Dart d and e MUST be different and belong to distinct face
+//	 *  \pre Dart e must be phi2-linked with its phi_1 dart
+//	 *  @param d dart of the vertex
+//	 *  @param e dart of the edge
+//	 */
+//	virtual void insertEdgeInVertex(Dart d, Dart e);
+//
+//	//! Remove an edge from a vertex orbit
+//	/*! \pre Dart d must be phi2 sewn
+//	 *  @param d the dart of the edge to remove from the vertex
+//	 */
+//	virtual void removeEdgeFromVertex(Dart d);
+
 	//! Sew two faces along an edge (pay attention to the orientation !)
-	/*! \pre Darts d & e MUST be fixed point of phi2 relation
+	/*! \pre Edges of darts d & e MUST be boundary edges
 	 *  @param d a dart of the first face
 	 *  @param e a dart of the second face
-	 *  @param withBoundary not used only for compatibility with Map
+	 *  @param withBoundary: if false, faces must have beta2 fixed points (only for construction: import/primitives)
 	 */
-	virtual void sewFaces(Dart d, Dart e, bool withBoundary=true);
+	virtual void sewFaces(Dart d, Dart e, bool withBoundary = true);
 
-	//! Unsew two faces along an edges
-	 /*! @param d a dart of one face
+	//! Unsew two faces
+	/*! \pre Edge of dart d MUST NOT be a boundary edge
+	 *  @param d a dart of a face
 	 */
 	virtual void unsewFaces(Dart d);
 
-	//! Delete an oriented face if and only if it has one or two edges
-	/*! If the face is phi2-linked to two distinct adjacent faces,
-	 *  then those two faces are phi2-linked
+	//! Delete a face if and only if it has one or two edges
+	/*! If the face is sewed to two distinct adjacent faces,
+	 *  then those two faces are sewed
 	 *  @param d a dart of the face
 	 *  @return true if the collapse has been executed, false otherwise
 	 */
@@ -194,8 +206,8 @@ public:
 	virtual void splitFace(Dart d, Dart e);
 
 	//! Merge the two faces incident to the edge of d.
-	/*! Works only for non-border edges.
-	 *  \warning Darts d & phi2(d) no longer exist after the call
+	/*! Works only for non-boundary edges.
+	 *  \warning Darts of the edge of d no longer exist after the call
 	 *  @param d a dart in the first face
 	 *  @return true if the merge has been executed, false otherwise
 	 */
@@ -214,9 +226,15 @@ public:
 	 */
 	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
 
+	/**
+	 * Unsew the faces of the umbrella of the vertex of d
+	 * @param d a dart from the vertex
+	 */
+	void unsewAroundVertex(Dart d) ;
+
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
-	 *  The faces adjacent to the two given faces are pairwise phi2-linked
+	 *  The faces adjacent to the two given faces are pairwise sewed
 	 *  then the 2 faces are deleted.
 	 *  If the two faces belong to different surfaces, the surfaces are merged,
 	 *  else a handle is created that increases the genus of the surface.
@@ -225,23 +243,6 @@ public:
 	 *  @return true if the merge has been executed, false otherwise
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e);
-
-	//! Close a topological hole (a sequence of connected fixed point of phi2).
-	/*! \pre dart d MUST be fixed point of phi2 relation
-	 *  Add a face to the map that closes the hole.
-	 *  The darts of this face are marked with holeMarker.
-	 *  @param d a dart of the hole (with phi2(d)==d)
-	 *  @return the degree of the created face
-	 */
-	virtual unsigned int closeHole(Dart d);
-
-	//! Close the map removing topological holes.
-	/*! Add faces to the map that close every existing hole.
-	 *  These faces are marked.
-	 *  \warning The embeddings of vertices are not updated
-	 *  @param marker
-	 */
-	void closeMap(DartMarker& marker);
 	//@}
 
 	/*! @name Topological Queries
@@ -266,10 +267,49 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
-	/**
-	 * tell if the vertex of d is on the boundary of the map
+	//! tell if the vertex of d is on the boundary of the map
+	/*! @param d a dart
 	 */
 	bool isBoundaryVertex(Dart d) ;
+
+	/**
+	 * find the dart of vertex that belong to the boundary
+	 * return NIL if the vertex is not on the boundary
+	 */
+	Dart findBoundaryEdgeOfVertex(Dart d);
+
+	//! Test if dart d and e belong to the same edge
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameEdge(Dart d, Dart e) ;
+
+	/**
+	 * tell if the edge of d is on the boundary of the map
+	 */
+	bool isBoundaryEdge(Dart d) ;
+
+	//!Test if dart d and e belong to the same oriented face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameOrientedFace(Dart d, Dart e);
+
+	//! Test if dart d and e belong to the same face
+	/*! @param d a dart
+	 *  @param e a dart
+	 */
+	bool sameFace(Dart d, Dart e) ;
+
+	/**
+	 * compute the number of edges of the face of d
+	 */
+	unsigned int faceDegree(Dart d) ;
+
+	/**
+	 * tell if the face of d is on the boundary of the map
+	 */
+	bool isBoundaryFace(Dart d) ;
 
 	//! Test if dart d and e belong to the same oriented volume
 	/*! @param d a dart
@@ -283,12 +323,22 @@ public:
 	 */
 	bool sameVolume(Dart d, Dart e);
 
+	//! Compute the number of faces in the volume of d
+	/*! @param d a dart
+	 */
+	unsigned int volumeDegree(Dart d);
+
+	// TODO a mettre en algo
+	/**
+	 * check if the mesh is triangular or not
+	 * @return a boolean indicating if the mesh is triangular
+	 */
+	bool isTriangular() ;
+
+	// TODO a mettre en algo
 	/**
 	 * Check if map is complete
-	 */
-	/* TODO devrait disparaitre :
-	 * Le test doit être fait à l'import. Ensuite closeMap doit être
-	 * utilisé pour fermer la carte si des faces ouvertes sont générées
+	 * Should be executed after import
 	 */
 	virtual bool check();
 	//@}
@@ -303,40 +353,61 @@ public:
 	* @param d a dart of the face
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
+	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
 	* Apply a functor on each dart of a face
 	* @param d a dart of the face
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
+	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
 	* Apply a functor on each dart of an edge
 	* @param d a dart of the oriented face
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0);
+	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
+	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	/**
-	* Apply a functor on each dart of a cc
-	* @param d a dart of the cc
-	* @param fonct functor obj ref
-	*/
-	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0);
+	//! Apply a functor on every dart of a connected component
+	/*! @param d a dart of the connected component
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread = 0);
+	//@}
+
+	/*! @name Close map after import or creation
+	 *  These functions must be used with care, generally only by import algorithms
+	 *************************************************************************/
+
+	//@{
+	//! Close a topological hole (a sequence of connected fixed point of beta2). DO NOT USE, only for import/creation algorithm
+	/*! \pre dart d MUST be fixed point of beta2 relation
+	 *  Add a face to the map that closes the hole.
+	 *  @param d a dart of the hole (with beta2(d)==d)
+	 *  @param forboundary tag the created face as boundary (default is true)
+	 *  @return the degree of the created face
+	 */
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+
+	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
+	/*! Add faces to the map that close every existing hole.
+	 *  These faces are marked as boundary.
+	 */
+	void closeMap();
+	//@}
 };
 
 } // namespace CGoGN

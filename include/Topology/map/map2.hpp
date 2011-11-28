@@ -135,9 +135,14 @@ inline bool Map2::sameEdge(Dart d, Dart e)
 	return d == e || phi2(d) == e ;
 }
 
-inline bool Map2::sameFace(Dart d, Dart e)
+inline bool Map2::sameOrientedFace(Dart d, Dart e)
 {
 	return Map1::sameCycle(d, e) ;
+}
+
+inline bool Map2::sameFace(Dart d, Dart e)
+{
+	return sameOrientedFace(d, e) ;
 }
 
 inline unsigned int Map2::faceDegree(Dart d)

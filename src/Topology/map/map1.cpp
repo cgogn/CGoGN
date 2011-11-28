@@ -36,7 +36,7 @@ Dart Map1::newCycle(unsigned int nbEdges)
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge
 	for (unsigned int i = 1 ; i < nbEdges ; ++i)
-		Map1::cutEdge(d) ;				// Subdivide nbEdges-1 times this edge
+		Map1::cutEdge(d) ;			// Subdivide nbEdges-1 times this edge
 	return d ;
 }
 
@@ -46,7 +46,7 @@ Dart Map1::newBoundaryCycle(unsigned int nbEdges)
 	Dart d = newDart() ;			// Create the first edge
 	boundaryMark(d);
 	for (unsigned int i = 1 ; i < nbEdges ; ++i)
-		Map1::cutEdge(d) ;				// Subdivide nbEdges-1 times this edge
+		Map1::cutEdge(d) ;			// Subdivide nbEdges-1 times this edge
 	return d ;
 }
 

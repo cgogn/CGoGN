@@ -90,16 +90,19 @@ void EmbeddedMap3::cutEdge(Dart d)
 	}
 }
 
-void EmbeddedMap3::uncutEdge(Dart d)
+bool EmbeddedMap3::uncutEdge(Dart d)
 {
-	Map3::uncutEdge(d);
-
-	//embed all darts from the old two edges to one of the two edge embedding
-	if(isOrbitEmbedded(EDGE))
+	if(Map3::uncutEdge(d))
 	{
-		unsigned int vEmb = getEmbedding(EDGE, d);
-		embedOrbit(EDGE, d, vEmb) ;
+		//embed all darts from the old two edges to one of the two edge embedding
+		if(isOrbitEmbedded(EDGE))
+		{
+			unsigned int vEmb = getEmbedding(EDGE, d);
+			embedOrbit(EDGE, d, vEmb) ;
+		}
+		return true ;
 	}
+	return false ;
 }
 
 void EmbeddedMap3::splitFace(Dart d, Dart e)

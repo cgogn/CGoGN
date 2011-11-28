@@ -299,18 +299,8 @@ Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions, Dar
 		cc = the_map.alpha1(cc);
 	}while (cc != c);
 
-	//merge central faces by removing edges
-	bool notFinished=true;
-	do
-	{
-		Dart d1 = the_map.alpha1(cc);
-		if (d1 == cc)			// last edge is pending edge inside of face
-			notFinished = false;
-		the_map.deleteFace(cc);
-		cc = d1;
-	} while (notFinished);
-
-	the_map.closeHole(the_map.phi1(the_map.phi1(d)));
+	// delete the central vertex
+	the_map.deleteVertex(c) ;
 
 	// embedding of new vertices
 	Dart dd = d;

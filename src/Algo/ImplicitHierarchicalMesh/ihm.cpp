@@ -36,16 +36,16 @@ namespace IHM
 
 ImplicitHierarchicalMap::ImplicitHierarchicalMap() : m_curLevel(0), m_maxLevel(0), m_idCount(0)
 {
-	m_dartLevel = Map2::addAttribute<unsigned int>(DART, "dartLevel") ;
-	m_edgeId = Map2::addAttribute<unsigned int>(DART, "edgeId") ;
+	m_dartLevel = addAttribute<unsigned int>(DART, "dartLevel") ;
+	m_edgeId = addAttribute<unsigned int>(DART, "edgeId") ;
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
 }
 
 ImplicitHierarchicalMap::~ImplicitHierarchicalMap()
 {
-	Map2::removeAttribute(m_edgeId) ;
-	Map2::removeAttribute(m_dartLevel) ;
+	removeAttribute(m_edgeId) ;
+	removeAttribute(m_dartLevel) ;
 }
 
 void ImplicitHierarchicalMap::init()

@@ -51,30 +51,35 @@ void filterAverageAttribute_OneRing(
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if (neigh & INSIDE)
-			col.collectAll(d) ;
-		else
-			col.collectBorder(d) ;
-
-		fa.reset() ;
-		if (neigh & INSIDE)
+		if(!map.isBoundaryVertex(d))
 		{
-			switch (attIn.getOrbit())
+			if (neigh & INSIDE)
+				col.collectAll(d) ;
+			else
+				col.collectBorder(d) ;
+
+			fa.reset() ;
+			if (neigh & INSIDE)
 			{
-			case VERTEX :
-				col.applyOnInsideVertices(fa) ;
-				break;
-			case EDGE :
-				col.applyOnInsideEdges(fa) ;
-				break;
-			case FACE :
-				col.applyOnInsideFaces(fa) ;
-				break;
+				switch (attIn.getOrbit())
+				{
+				case VERTEX :
+					col.applyOnInsideVertices(fa) ;
+					break;
+				case EDGE :
+					col.applyOnInsideEdges(fa) ;
+					break;
+				case FACE :
+					col.applyOnInsideFaces(fa) ;
+					break;
+				}
 			}
+			if (neigh & BORDER)
+				col.applyOnBorder(fa) ;
+			attOut[d] = fa.getAverage() ;
 		}
-		if (neigh & BORDER)
-			col.applyOnBorder(fa) ;
-		attOut[d] = fa.getAverage() ;
+		else
+			attOut[d] = attIn[d] ;
 	}
 }
 
@@ -95,23 +100,28 @@ void filterAverageVertexAttribute_WithinSphere(
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		if (neigh & INSIDE)
-			col.collectAll(d) ;
-		else
-			col.collectBorder(d) ;
+		if(!map.isBoundaryVertex(d))
+		{
+			if (neigh & INSIDE)
+				col.collectAll(d) ;
+			else
+				col.collectBorder(d) ;
 
-		attOut[d] = T(0);
-		if (neigh & INSIDE){
-			faInside.reset() ;
-			col.applyOnInsideVertices(faInside) ;
-			attOut[d] += faInside.getSum();
+			attOut[d] = T(0);
+			if (neigh & INSIDE){
+				faInside.reset() ;
+				col.applyOnInsideVertices(faInside) ;
+				attOut[d] += faInside.getSum();
+			}
+			if (neigh & BORDER){
+				faBorder.reset(position[d], radius);
+				col.applyOnBorder(faBorder) ;
+				attOut[d] += faBorder.getSum();
+			}
+			attOut[d] /= faInside.getCount() + faBorder.getCount() ;
 		}
-		if (neigh & BORDER){
-			faBorder.reset(position[d], radius);
-			col.applyOnBorder(faBorder) ;
-			attOut[d] += faBorder.getSum();
-		}
-		attOut[d] /= faInside.getCount() + faBorder.getCount() ;
+		else
+			attOut[d] = attIn[d] ;
 	}
 }
 
@@ -128,7 +138,7 @@ void filterAverageEdgeAttribute_WithinSphere(
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorE<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if (neigh & INSIDE)
@@ -156,7 +166,7 @@ void filterAverageFaceAttribute_WithinSphere(
 	FunctorAverage<T> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
-	TraversorV<typename PFP::MAP> t(map, select) ;
+	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
 		if (neigh & INSIDE)

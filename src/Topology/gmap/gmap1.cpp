@@ -31,19 +31,35 @@ namespace CGoGN
  *  To generate or delete faces in a 1-G-map
  *************************************************************************/
 
-Dart GMap1::newFace(unsigned int n, bool withBoundary)
+Dart GMap1::newFace(unsigned int nbEdges)
 {
-	// create the first edge
-	Dart d0 =  GMap0::newEdge();
-	// store an extremity
-	Dart dp = beta0(d0);
-	for (unsigned int i = 1; i < n; ++i)
+	Dart d0 =  GMap0::newEdge();	// create the first edge
+	Dart dp = beta0(d0);			// store an extremity
+	for (unsigned int i = 1; i < nbEdges; ++i)
 	{
-		Dart di = GMap0::newEdge();// create the next edge
+		Dart di = GMap0::newEdge();	// create the next edge
 		beta1sew(dp,di);
-		dp = beta0(di);// change the preceeding
+		dp = beta0(di);	// change the preceding
 	}
-	beta1sew(dp,d0);// sew the last with the first
+	beta1sew(dp,d0);	// sew the last with the first
+	return d0;
+}
+
+Dart GMap1::newBoundaryFace(unsigned int nbEdges)
+{
+	Dart d0 =  GMap0::newEdge();	// create the first edge
+	boundaryMark(d0);
+	boundaryMark(beta0(d0));
+	Dart dp = beta0(d0);			// store an extremity
+	for (unsigned int i = 1; i < nbEdges; ++i)
+	{
+		Dart di = GMap0::newEdge();	// create the next edge
+		boundaryMark(di);
+		boundaryMark(beta0(di));
+		beta1sew(dp,di);
+		dp = beta0(di);	// change the preceding
+	}
+	beta1sew(dp,d0);	// sew the last with the first
 	return d0;
 }
 
@@ -57,111 +73,6 @@ void GMap1::deleteFace(Dart d)
 		e = f;
 	}
 	deleteEdge(d);
-}
-
-void GMap1::deleteEdge(Dart d)
-{
-	Dart e = beta0(d) ;
-	beta1unsew(d) ;
-	beta1unsew(e) ;
-	GMap0::deleteEdge(d) ;
-}
-
-/*! @name Topological Queries
- *  Return or set various topological information
- *************************************************************************/
-
-bool GMap1::sameOrientedFace(Dart d, Dart e)
-{
-	Dart dNext = d ;
-	do
-	{
-		if (dNext == e)
-			return true ;
-		dNext = phi1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
-}
-
-bool GMap1::sameFace(Dart d, Dart e)
-{
-	Dart dNext = d ;
-	do
-	{
-		if (dNext == e)
-			return true ;
-		dNext = beta0(dNext);
-		if (dNext == e)
-			return true ;
-		dNext = beta1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
-}
-
-unsigned int GMap1::faceDegree(Dart d)
-{
-	unsigned int count = 0 ;
-	Dart dNext = d ;
-	do
-	{
-		++count ;
-		dNext = phi1(dNext) ;
-	} while (dNext != d) ;
-	return count ;
-}
-
-bool GMap1::isFaceTriangle(Dart d)
-{
-	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
-}
-
-/*! @name Cell Functors
- *  Apply functors to all darts of a cell
- *************************************************************************/
-
-bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	Dart dNext = d ;
-	do
-	{
-		if (f(dNext))
-			return true ;
-		dNext = phi1(dNext) ;
-	} while (dNext != d) ;
-	return false ;
-}
-
-bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(beta0(d), f, thread) ;
-}
-
-bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
-{
-	// first go first through beta0
-	Dart d1 = d;
-	Dart d2;
-	do
-	{
-		if (f(d1)) return true;
-		d2 = beta0(d1);
-		if (f(d2)) return true;
-		d1 = beta1(d2);
-	} while ((d1 != d2) && (d1 != d));
-
-	if (d1 == d) return false;
-
-	// if not closed go now through beta1
-	d1 = d;
-	d2 = beta1(d1);
-	while (d2 != d1)  // only need to test fixed point
-	{
-		if (f(d2)) return true;
-		d1 = beta0(d2);
-		if (f(d1)) return true;
-		d1 = beta1(d2);
-	}
-	return false;
 }
 
 } // namespace CGoGN

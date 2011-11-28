@@ -61,7 +61,7 @@ void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	typename PFP::TVEC3& position, typename PFP::TVEC3& positionF,
+	typename PFP::TVEC3& position, const typename PFP::TVEC3& positionF,
 	const FunctorSelect& selected = allDarts) ;
 
 /**
@@ -100,6 +100,10 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 template <typename PFP>
 void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+
+
+template <typename PFP, typename EMBV, typename EMB>
+void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Reverse the orientation of the map

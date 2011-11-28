@@ -126,12 +126,6 @@ inline void Map1::phi1unsew(Dart d)
 	(*m_phi_1)[e.index] = e ;
 }
 
-inline int Map1::getDartsPerTriangle()
-{
-	return 3 ;
-}
-
-
 /*! @name Topological Operators
  *  Topological operations on 1-maps
  *************************************************************************/

@@ -67,24 +67,25 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		// get position & normal of vertex
-		const VEC3& pos_d = position[d] ;
-		const VEC3& normal_d = normal[d] ;
-
-		// traversal of incident edges
-		float sum = 0.0f, normalizer = 0.0f ;
-		Traversor2VE<typename PFP::MAP> te(map, d) ;
-		for(Dart it = te.begin(); it != te.end(); it = te.next())
+		if(!map.isBoundaryVertex(d))
 		{
-			VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
-			float h = normal_d * vec ;
-			float t = vec.norm() ;
-			float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) ) ;
-			sum += wcs * h ;
-			normalizer += wcs ;
-		}
+			// traversal of incident edges
+			float sum = 0.0f, normalizer = 0.0f ;
+			Traversor2VE<typename PFP::MAP> te(map, d) ;
+			for(Dart it = te.begin(); it != te.end(); it = te.next())
+			{
+				VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
+				float h = normal_d * vec ;
+				float t = vec.norm() ;
+				float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) ) ;
+				sum += wcs * h ;
+				normalizer += wcs ;
+			}
 
-		position2[d] = pos_d + ((sum / normalizer) * normal_d) ;
+			position2[d] = position[d] + ((sum / normalizer) * normal[d]) ;
+		}
+		else
+			position2[d] = position[d] ;
 	}
 }
 
@@ -102,39 +103,44 @@ void filterSUSAN(typename PFP::MAP& map, float SUSANthreshold, const typename PF
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		// get position & normal of vertex
-		const VEC3& pos_d = position[d] ;
-		const VEC3& normal_d = normal[d] ;
-
-		// traversal of incident edges
-		float sum = 0.0f, normalizer = 0.0f ;
-		bool SUSANregion = false ;
-		Traversor2VE<typename PFP::MAP> te(map, d) ;
-		for(Dart it = te.begin(); it != te.end(); it = te.next())
+		if(!map.isBoundaryVertex(d))
 		{
-			const VEC3& neighborNormal = normal[map.phi1(it)] ;
-			float angle = Geom::angle(normal_d, neighborNormal) ;
-			if( angle <= SUSANthreshold )
+			// get position & normal of vertex
+			const VEC3& pos_d = position[d] ;
+			const VEC3& normal_d = normal[d] ;
+
+			// traversal of incident edges
+			float sum = 0.0f, normalizer = 0.0f ;
+			bool SUSANregion = false ;
+			Traversor2VE<typename PFP::MAP> te(map, d) ;
+			for(Dart it = te.begin(); it != te.end(); it = te.next())
 			{
-				VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
-				float h = normal_d * vec ;
-				float t = vec.norm() ;
-				float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) );
-				sum += wcs * h ;
-				normalizer += wcs ;
+				const VEC3& neighborNormal = normal[map.phi1(it)] ;
+				float angle = Geom::angle(normal_d, neighborNormal) ;
+				if( angle <= SUSANthreshold )
+				{
+					VEC3 vec = Algo::Geometry::vectorOutOfDart<PFP>(map, it, position) ;
+					float h = normal_d * vec ;
+					float t = vec.norm() ;
+					float wcs = exp( ( -1.0f * (t * t) / (2.0f * sigmaC * sigmaC) ) + ( -1.0f * (h * h) / (2.0f * sigmaS * sigmaS) ) );
+					sum += wcs * h ;
+					normalizer += wcs ;
+				}
+				else
+					SUSANregion = true ;
 			}
+
+			if(SUSANregion)
+				nbSusan++ ;
+			nbTot++ ;
+
+			if (normalizer != 0.0f)
+				position2[d] = pos_d + ((sum / normalizer) * normal_d) ;
 			else
-				SUSANregion = true ;
+				position2[d] = pos_d ;
 		}
-
-		if(SUSANregion)
-			nbSusan++ ;
-		nbTot++ ;
-
-		if (normalizer != 0.0f)
-			position2[d] = pos_d + ((sum / normalizer) * normal_d) ;
 		else
-			position2[d] = pos_d ;
+			position2[d] = position[d] ;
 	}
 
 //	CGoGNout <<" susan rate = "<< float(nbSusan)/float(nbTot)<<CGoGNendl;

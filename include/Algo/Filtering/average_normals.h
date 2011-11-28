@@ -344,8 +344,6 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 	long nbAdapt = 0 ;
 	long nbSusan = 0 ;
 
-	std::cout << "compute new vertices normals.." << std::endl ;
-
 	TraversorV<typename PFP::MAP> tv(map, select) ;
 	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
@@ -434,8 +432,6 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 		}
 	}
 
-	std::cout << "update face normals.." << std::endl ;
-
 	// Compute face normals from vertex normals
 	TraversorF<typename PFP::MAP> tf(map, select) ;
 	for(Dart d = tf.begin(); d != tf.end(); d = tf.next())
@@ -454,8 +450,6 @@ void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 		newNormal.normalize() ;
 		faceNewNormal[d] = newNormal ;
 	}
-
-	std::cout << "update vertices positions.." << std::endl ;
 
 	// Compute new vertices position
 	computeNewPositionsFromFaceNormals<PFP>(

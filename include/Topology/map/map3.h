@@ -123,7 +123,7 @@ public:
 	 *  @param d a dart of the vertex to delete
 	 *  @return true if the deletion has been executed, false otherwise
 	 */
-	virtual bool deleteVertex(Dart d);
+	virtual Dart deleteVertex(Dart d);
 
 	//! Cut the edge of d (all darts around edge orbit are cutted)
 	/*! @param d a dart of the edge to cut
@@ -133,7 +133,7 @@ public:
 	//! Uncut the edge of d (all darts around edge orbit are uncutted)
 	/*! @param d a dart of the edge to uncut
 	 */
-	virtual void uncutEdge(Dart d);
+	virtual bool uncutEdge(Dart d);
 
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
@@ -142,16 +142,6 @@ public:
 	 *  @return the dart of the new edge lying in the vertex of d after the cut
 	 */
 	virtual void splitFace(Dart d, Dart e);
-
-	//! Cut the edge of d
-	/*! @param d a dart of the edge to cut
-	 */
-	virtual void cutEdge(Dart d);
-
-	//! Uncut the edge of d
-	/*! @param d a dart of the edge to uncut
-	 */
-	virtual bool uncutEdge(Dart d);
 
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same length

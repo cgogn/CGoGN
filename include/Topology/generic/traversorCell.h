@@ -45,10 +45,10 @@ private:
 	const FunctorSelect& m_good ;
 
 public:
-	TraversorCell(MAP& map, unsigned int orbit, const FunctorSelect& good = allDarts, unsigned int thread = 0) :
+	TraversorCell(MAP& map, unsigned int orbit, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) :
 		m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
 	{
-		if(map.isOrbitEmbedded(m_orbit))
+		if(!forceDartMarker && map.isOrbitEmbedded(m_orbit))
 			cmark = new CellMarker(map, m_orbit, thread) ;
 		else
 			dmark = new DartMarker(map, thread) ;
@@ -125,6 +125,14 @@ public:
 			}
 		}
 		return current ;
+	}
+
+	void mark(Dart d)
+	{
+		if(dmark)
+			dmark->markOrbit(m_orbit, d) ;
+		else
+			cmark->mark(d) ;
 	}
 } ;
 

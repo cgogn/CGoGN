@@ -347,6 +347,9 @@ Dart Polyhedron<PFP>::grid_topo(unsigned int x, unsigned int y)
 
 	// store & return reference dart
 	m_dart = m_tableVertDarts[0]; // util ?
+
+	m_map.closeHole(m_dart) ;
+
 	return m_dart;
 }
 

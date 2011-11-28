@@ -48,13 +48,7 @@ public:
 	/**
 	 * The attributes attached to the face of d are kept on the resulting face
 	 */
-	virtual bool deleteVertex(Dart d) ;
-
-//	/**
-//	 * No attribute is attached to the new edge
-//	 * The attributes attached to the face of dart d are kept on the resulting face
-//	 */
-	virtual void linkVertices(Dart d, Dart e) ;
+	virtual Dart deleteVertex(Dart d) ;
 
 	/**
 	 * No attribute is attached to the new vertex
@@ -65,7 +59,7 @@ public:
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual void uncutEdge(Dart d) ;
+	virtual bool uncutEdge(Dart d) ;
 
 	/**
 	 * Check if the edge of d can be collapsed or not based on some topological conditions
@@ -91,17 +85,17 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d) ;
 
-	/**
-	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
-	 * The attributes attached to the face of dart d are overwritten on the face of dart e
-	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
-
-	/**
-	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
-	 * The attributes attached to the face of dart d are overwritten on the face of dart e
-	 */
-	virtual void removeEdgeFromVertex(Dart d);
+//	/**
+//	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
+//	 * The attributes attached to the face of dart d are overwritten on the face of dart e
+//	 */
+//	virtual void insertEdgeInVertex(Dart d, Dart e);
+//
+//	/**
+//	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
+//	 * The attributes attached to the face of dart d are overwritten on the face of dart e
+//	 */
+//	virtual void removeEdgeFromVertex(Dart d);
 
 	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
@@ -140,7 +134,7 @@ public:
 	/**
 	 * No attribute is attached to the new face
 	 */
-	virtual unsigned int closeHole(Dart d, bool withBoundary=true);
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
 	virtual bool check() ;
 } ;

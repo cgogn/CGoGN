@@ -40,11 +40,14 @@ namespace CGoGN
  */
 class CellMarkerGen
 {
+	friend class GenericMap ;
+
 protected:
-	Mark m_mark ;
 	GenericMap& m_map ;
+	Mark m_mark ;
 	unsigned int m_cell ;
 	unsigned int m_thread ;
+	bool releaseOnDestruct ;
 
 public:
 	/**
@@ -52,16 +55,29 @@ public:
 	 * @param map the map on which we work
 	 * @param cell the type of cell we want to mark VERTEX, EDGE,...
 	 */
-	CellMarkerGen(GenericMap& map, unsigned int cell, unsigned int thread = 0) : m_map(map), m_cell(cell), m_thread(thread)
+	CellMarkerGen(GenericMap& map, unsigned int cell, unsigned int thread = 0) : m_map(map), m_cell(cell), m_thread(thread), releaseOnDestruct(true)
 	{
 		if(!map.isOrbitEmbedded(cell))
 			map.addEmbedding(cell) ;
-		m_mark = m_map.getMarkerSet(m_cell,m_thread).getNewMark() ;
+		m_mark = m_map.getMarkerSet(m_cell, m_thread).getNewMark() ;
+		m_map.cellMarkers.push_back(this) ;
 	}
 
 	virtual ~CellMarkerGen()
 	{
-		m_map.getMarkerSet(m_cell,m_thread).releaseMark(m_mark) ;
+		if(releaseOnDestruct)
+		{
+			m_map.getMarkerSet(m_cell, m_thread).releaseMark(m_mark) ;
+			for(std::vector<CellMarkerGen*>::iterator it = m_map.cellMarkers.begin(); it != m_map.cellMarkers.end(); ++it)
+			{
+				if(*it == this)
+				{
+					*it = m_map.cellMarkers.back();
+					m_map.cellMarkers.pop_back();
+					return;
+				}
+			}
+		}
 	}
 
 protected:
@@ -69,13 +85,18 @@ protected:
 	CellMarkerGen(const CellMarkerGen& cm) : m_map(cm.m_map)
 	{}
 
+	/**
+	 * set if the mark has to be release on destruction or not
+	 */
+	void setReleaseOnDestruct(bool b) { releaseOnDestruct = b ; }
+
 public:
 	/**
 	 * mark the cell of dart
 	 */
 	virtual void mark(Dart d)
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
 
 		unsigned int a = m_map.getEmbedding(m_cell, d) ;
@@ -90,7 +111,7 @@ public:
 	 */
 	virtual void unmark(Dart d)
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
 
 		unsigned int a = m_map.getEmbedding(m_cell, d) ;
@@ -105,7 +126,7 @@ public:
 	 */
 	virtual bool isMarked(Dart d) const
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
 
 		unsigned int a = m_map.getEmbedding(m_cell, d) ;
@@ -120,7 +141,7 @@ public:
 	 */
 	virtual void mark(unsigned int em)
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
 
 		m_map.getMarkVector(m_cell, m_thread)->operator[](em).setMark(m_mark) ;
@@ -131,7 +152,7 @@ public:
 	 */
 	virtual void unmark(unsigned int em)
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
 
 		m_map.getMarkVector(m_cell, m_thread)->operator[](em).unsetMark(m_mark) ;
@@ -142,7 +163,7 @@ public:
 	 */
 	virtual bool isMarked(unsigned int em) const
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		assert(m_map.getMarkVector(m_cell, m_thread) != NULL);
 
 		return m_map.getMarkVector(m_cell, m_thread)->operator[](em).testMark(m_mark) ;
@@ -153,7 +174,7 @@ public:
 	 */
 	virtual void markAll()
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
 		assert(mark_vect != NULL);
 
@@ -169,7 +190,7 @@ public:
 
 	bool isAllUnmarked()
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 
 		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
 		assert(mark_vect != NULL);
@@ -204,7 +225,7 @@ protected:
 public:
 	virtual void unmarkAll()
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
 		assert(mark_vect != NULL);
 
@@ -255,7 +276,7 @@ public:
 
 	void unmarkAll()
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
 		assert(mark_vect != NULL);
 
@@ -288,7 +309,7 @@ protected:
 public:
 	void unmarkAll()
 	{
-		assert(m_map.getMarkerSet(m_cell,m_thread).testMark(m_mark));
+		assert(m_map.getMarkerSet(m_cell, m_thread).testMark(m_mark));
 		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(m_cell, m_thread);
 		assert(mark_vect != NULL);
 

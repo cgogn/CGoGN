@@ -23,23 +23,53 @@
 *******************************************************************************/
 
 #include "Topology/gmap/gmap2.h"
+#include "Topology/generic/traversorCell.h"
 
 namespace CGoGN
 {
 
-/*! @name Constructors and Destructors
- *  To generate or delete cells in a 2-G-map
+/*! @name Generator and Deletor
+ *  To generate or delete faces in a 2-G-map
  *************************************************************************/
+
+Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
+{
+	Dart d = GMap1::newFace(nbEdges);
+	if (withBoundary)
+	{
+		Dart e = GMap1::newFace(nbEdges);
+
+		Dart it = d;
+		do
+		{
+			beta2sew(it, beta0(e));
+			beta2sew(beta0(it), e);
+			it = phi1(it);
+			e = phi_1(e);
+		} while (it != d);
+	}
+	return d;
+}
 
 void GMap2::deleteFace(Dart d)
 {
-	Dart e = d ;
+	assert(!isBoundaryMarked(d)) ;
+	Dart it = d ;
 	do
 	{
-		phi2unsew(e) ;	// unsew the face of d
-		e = phi1(e) ;	// from all its adjacent faces
-	} while (e != d) ;
-	GMap1::deleteFace(d);	// delete the face
+		if(!isBoundaryEdge(it))
+			unsewFaces(it) ;
+		it = phi1(it) ;
+	} while(it != d) ;
+	Dart dd = phi2(d) ;
+	GMap1::deleteFace(d) ;
+	GMap1::deleteFace(dd) ;
+}
+
+void GMap2::fillHole(Dart d)
+{
+	assert(isBoundaryMarked(d)) ;
+	boundaryUnmarkOrbit(FACE, d) ;
 }
 
 /*! @name Topological Operators
@@ -53,136 +83,140 @@ void GMap2::splitVertex(Dart d, Dart e)
 	Dart ee = phi2(e) ;
 	GMap1::cutEdge(dd);			// Cut the edge of dd (make a new edge)
 	GMap1::cutEdge(ee);			// Cut the edge of ee (make a new edge)
-	phi2sew(phi1(dd),phi1(ee));	// Sew the two faces along the new edge
+	beta2sew(phi1(dd), beta0(phi1(ee)));	// Sew the two faces along the new edge
+	beta2sew(phi1(ee), beta0(phi1(dd)));
 }
 
-bool GMap2::deleteVertex(Dart d)
+Dart GMap2::deleteVertex(Dart d)
 {
 	if(isBoundaryVertex(d))
-		return false ;
+		return NIL ;
 
+	Dart res = NIL ;
 	Dart vit = d ;
 	do
 	{
-		Dart f = phi_1(phi2(vit)) ;
-		phi1sew(vit, f) ;
+		if(res == NIL && phi1(phi1(d)) != d)
+			res = phi1(d) ;
+
+		Dart d0 = beta0(vit) ;
+		Dart d02 = beta2(d0) ;
+		Dart d01 = beta1(d0) ;
+		Dart d021 = beta1(d02) ;
+		beta1unsew(d0) ;
+		beta1unsew(d02) ;
+		beta1sew(d0, d02) ;
+		beta1sew(d01, d021) ;
+
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
-	GMap1::deleteFace(d) ;
-
-	return true ;
-}
-
-void GMap2::insertEdgeInVertex(Dart d, Dart e)
-{
-	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
-
-	phi1sew(phi_1(d),phi_1(e));
-}
-
-void GMap2::removeEdgeFromVertex(Dart d)
-{
-	assert(phi2(d)!=d);
-
-	phi1sew(phi_1(d),phi2(d));
+	deleteFace(d) ;
+	return res ;
 }
 
 void GMap2::cutEdge(Dart d)
 {
-	GMap1::cutEdge(d);		// Cut the edge of d
-	Dart nd = phi1(d);
-	Dart e = beta2(d);
-	if (e != d)				// Test if an opposite edge exists
-	{
-		GMap1::cutEdge(e);	// Cut the opposite edge
-		Dart ne = phi1(e);
-		beta2sew(ne,nd);	// Correct the phi2 links
-		beta2sew(beta1(nd), beta1(ne));
-	}
+	Dart e = phi2(d) ;
+	beta2unsew(d) ;
+	beta2unsew(e) ;
+	GMap1::cutEdge(d) ;
+	GMap1::cutEdge(e) ;
+
+	Dart nd = phi1(d) ;
+	Dart ne = phi1(e) ;
+	beta2sew(d, beta0(ne)) ;
+	beta2sew(beta0(d), ne) ;
+	beta2sew(e, beta0(nd)) ;
+	beta2sew(beta0(e), nd) ;
 }
 
-void GMap2::uncutEdge(Dart d)
+bool GMap2::uncutEdge(Dart d)
 {
-	assert(vertexDegree(phi1(d)) == 2) ;
-	Dart ne = phi2(d) ;
-	if(ne == d)
-		collapseEdge(d) ;
-	else
+	if(vertexDegree(phi1(d)) == 2)
 	{
+		Dart ne = phi2(d) ;
 		Dart nd = phi1(d) ;
 		Dart e = phi_1(ne) ;
-		phi2unsew(e) ;
-		phi2unsew(d) ;
+		beta2unsew(d) ;
+		beta2unsew(ne) ;
+		beta2unsew(e) ;
+		beta2unsew(nd) ;
 		GMap1::collapseEdge(nd) ;
 		GMap1::collapseEdge(ne) ;
-		phi2sew(d, e) ;
+		beta2sew(d, beta0(e)) ;
+		beta2sew(e, beta0(d)) ;
+		return true ;
 	}
+	return false ;
 }
 
 Dart GMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
-	Dart resV ;
+	Dart resV = NIL ;
 
 	Dart e = phi2(d);
-	if (e != d)			// Test if an opposite edge exists
+	beta2unsew(d);	// Unlink the opposite edges
+	beta2unsew(e);
+
+	Dart f = phi1(e) ;
+	Dart h = alpha1(e);
+
+	if (h != e)
+		resV = h;
+
+	if (f != e && delDegenerateFaces)
 	{
-		phi2unsew(d);	// Unlink the opposite edges
-		Dart f = phi1(e) ;
-		Dart g = phi_1(e) ;
-
-		if(f != d && !isFaceTriangle(e))
-			resV = f ;
-		else if(phi2(g) != g)
-			resV = phi2(g) ;
-		else if(f != d && phi2(f) != f)
-			resV = phi1(phi2(f)) ;
-
-		if (f != e && delDegenerateFaces)
-		{
-			GMap1::collapseEdge(e);		// Collapse edge e
-			collapseDegeneratedFace(f);	// and collapse its face if degenerated
-		}
-		else
-			GMap1::collapseEdge(e);	// Just collapse edge e
+		GMap1::collapseEdge(e) ;		// Collapse edge e
+		collapseDegeneratedFace(f) ;	// and collapse its face if degenerated
 	}
+	else
+		GMap1::collapseEdge(e) ;	// Just collapse edge e
 
-	Dart f = phi1(d) ;
-	Dart g = phi_1(d) ;
-
+	f = phi1(d) ;
 	if(resV == NIL)
 	{
-		if(!isFaceTriangle(d))
-			resV = f ;
-		else if(phi2(g) != g)
-			resV = phi2(g) ;
-		else if(phi2(f) != f)
-			resV = phi1(phi2(f)) ;
+		h = alpha1(d);
+		if (h != d)
+			resV = h;
 	}
 
 	if (f != d && delDegenerateFaces)
 	{
-		GMap1::collapseEdge(d);		// Collapse edge d
-		collapseDegeneratedFace(f);	// and collapse its face if degenerated
+		GMap1::collapseEdge(d) ;		// Collapse edge d
+		collapseDegeneratedFace(f) ;	// and collapse its face if degenerated
 	}
 	else
-		GMap1::collapseEdge(d);	// Just collapse edge d
+		GMap1::collapseEdge(d) ;	// Just collapse edge d
 
 	return resV ;
 }
 
 bool GMap2::flipEdge(Dart d)
 {
-	Dart e = phi2(d);			// Test if an opposite
-	if (e != d)					// edge exists
+	if (!isBoundaryEdge(d))
 	{
+		Dart e = phi2(d);
 		Dart dNext = phi1(d);
 		Dart eNext = phi1(e);
 		Dart dPrev = phi_1(d);
 		Dart ePrev = phi_1(e);
-		phi1sew(d, ePrev);		// Detach the two
-		phi1sew(e, dPrev);		// vertices of the edge
-		phi1sew(d, dNext);		// Insert the edge in its
-		phi1sew(e, eNext);		// new vertices after flip
+		Dart dNext2 = phi1(dNext);
+		Dart eNext2 = phi1(eNext);
+
+		beta1unsew(d) ;
+		beta1unsew(eNext) ;
+		beta1unsew(e) ;
+		beta1unsew(dNext) ;
+		beta1unsew(dNext2) ;
+		beta1unsew(eNext2) ;
+
+		beta1sew(beta0(e), eNext2) ;
+		beta1sew(d, beta0(eNext)) ;
+		beta1sew(beta0(d), dNext2) ;
+		beta1sew(e, beta0(dNext)) ;
+		beta1sew(eNext, beta0(dPrev)) ;
+		beta1sew(dNext, beta0(ePrev)) ;
+
 		return true ;
 	}
 	return false ; // cannot flip a border edge
@@ -190,44 +224,132 @@ bool GMap2::flipEdge(Dart d)
 
 bool GMap2::flipBackEdge(Dart d)
 {
-	Dart e = phi2(d);			// Test if an opposite
-	if (e != d)					// edge exists
+	if (!isBoundaryEdge(d))
 	{
+		Dart e = phi2(d);
 		Dart dNext = phi1(d);
 		Dart eNext = phi1(e);
 		Dart dPrev = phi_1(d);
 		Dart ePrev = phi_1(e);
-		phi1sew(d, ePrev);			// Detach the two
-		phi1sew(e, dPrev);			// vertices of the edge
-		phi1sew(e, phi_1(dPrev));	// Insert the edge in its
-		phi1sew(d, phi_1(ePrev));	// new vertices after flip
+		Dart dPrev1 = beta1(dPrev) ;
+		Dart ePrev1 = beta1(ePrev) ;
+
+		beta1unsew(d) ;
+		beta1unsew(eNext) ;
+		beta1unsew(e) ;
+		beta1unsew(dNext) ;
+		beta1unsew(dPrev) ;
+		beta1unsew(ePrev) ;
+
+		beta1sew(beta0(e), dPrev) ;
+		beta1sew(d, dPrev1) ;
+		beta1sew(beta0(d), ePrev) ;
+		beta1sew(e, ePrev1) ;
+		beta1sew(eNext, beta0(dPrev)) ;
+		beta1sew(dNext, beta0(ePrev)) ;
+
 		return true ;
 	}
 	return false ; // cannot flip a border edge
 }
 
-void GMap2::insertEdgeInVertex(Dart d, Dart e)
-{
-	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
-
-	phi1sew(phi_1(d),phi_1(e));
-}
-
-void GMap2::removeEdgeFromVertex(Dart d)
-{
-	assert(phi2(d)!=d);
-
-	phi1sew(phi_1(d),phi2(d));
-}
+//void GMap2::insertEdgeInVertex(Dart d, Dart e)
+//{
+//	assert(!sameVertex(d,e) && phi2(e)==phi_1(e));
+//
+//	phi1sew(phi_1(d),phi_1(e));
+//}
+//
+//void GMap2::removeEdgeFromVertex(Dart d)
+//{
+//	assert(phi2(d)!=d);
+//
+//	phi1sew(phi_1(d),phi2(d));
+//}
 
 void GMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
-	phi2sew(d, e);
+	// if sewing with fixed points
+	if (!withBoundary)
+	{
+		assert(beta2(d) == d && beta2(beta0(d)) == beta0(d) && beta2(e) == e && beta2(beta0(e)) == beta0(e)) ;
+		beta2sew(d, beta0(e)) ;
+		beta2sew(e, beta0(d)) ;
+		return ;
+	}
+
+	assert(isBoundaryEdge(d) && isBoundaryEdge(e)) ;
+
+	Dart dd = phi2(d) ;
+	Dart ee = phi2(e) ;
+
+	beta2unsew(d) ;	// unsew faces from boundary
+	beta2unsew(beta0(d)) ;
+	beta2unsew(e) ;
+	beta2unsew(beta0(e)) ;
+
+	if (ee != phi_1(dd))
+	{
+		Dart eeN = phi1(ee) ;		// remove the boundary edge
+		Dart dd1 = beta1(dd) ;
+		beta1unsew(eeN) ;
+		beta1unsew(dd1) ;
+		beta1sew(beta0(ee), dd) ;
+		beta1sew(eeN, dd1) ;
+	}
+	if (dd != phi_1(ee))
+	{
+		Dart ddN = phi1(dd) ;		// and properly close incident boundaries
+		Dart ee1 = beta1(ee) ;
+		beta1unsew(ddN) ;
+		beta1unsew(ee1) ;
+		beta1sew(beta0(dd), ee) ;
+		beta1sew(ddN, ee1) ;
+	}
+	GMap1::deleteFace(dd) ;
+
+	beta2sew(d, beta0(e)) ; // sew the faces
+	beta2sew(e, beta0(d)) ;
 }
 
 void GMap2::unsewFaces(Dart d)
 {
-	phi2unsew(d);
+	assert(!isBoundaryEdge(d)) ;
+
+	Dart dd = phi2(d);
+
+	Dart e = newBoundaryFace(2);
+	Dart ee = phi1(e) ;
+
+	if (isBoundaryVertex(d))
+	{
+		Dart f = findBoundaryEdgeOfVertex(d);
+		Dart f1 = beta1(f) ;
+		beta1unsew(ee) ;
+		beta1unsew(f) ;
+		beta1sew(f, beta0(e)) ;
+		beta1sew(f1, ee) ;
+	}
+
+	if (isBoundaryVertex(dd))
+	{
+		Dart f = findBoundaryEdgeOfVertex(dd);
+		Dart f1 = beta1(f) ;
+		beta1unsew(e) ;
+		beta1unsew(f) ;
+		beta1sew(f, beta0(ee)) ;
+		beta1sew(f1, e) ;
+	}
+
+	beta2unsew(d) ;
+	beta2unsew(beta0(d)) ;
+	beta2unsew(dd) ;
+	beta2unsew(beta0(dd)) ;
+
+	beta2sew(d, beta0(e)) ;		// sew faces
+	beta2sew(e, beta0(d)) ;
+	beta2sew(dd, beta0(ee)) ;	// to the boundary
+	beta2sew(ee, beta0(dd)) ;
 }
 
 bool GMap2::collapseDegeneratedFace(Dart d)
@@ -235,13 +357,28 @@ bool GMap2::collapseDegeneratedFace(Dart d)
 	Dart e = phi1(d);				// Check if the face is a loop
 	if (phi1(e) == d)				// Yes: it contains one or two edge(s)
 	{
-		Dart d2 = beta2(d);			// Check opposite edges
-		Dart e2 = beta2(e);
-		if (d2 != d) phi2unsew(d);	// Update phi2-links if needed
-		if (e2 != e) phi2unsew(e);
-		if (d2 != d && e2 != e)
-			phi2sew(d2, e2);
-		GMap1::deleteFace(d);		// Delete the single edge or two edges of the loop
+		Dart d2 = phi2(d) ;			// Check opposite edges
+		Dart e2 = phi2(e) ;
+		beta2unsew(d) ;
+		beta2unsew(beta0(d)) ;
+		if(d != e)
+		{
+			beta2unsew(e) ;
+			beta2unsew(beta0(e)) ;
+			beta2sew(d2, beta0(e2)) ;
+			beta2sew(e2, beta0(d2)) ;
+		}
+		else
+		{
+			Dart d21 = beta1(d2) ;
+			Dart d2N = phi1(d2) ;
+			beta1unsew(d2) ;
+			beta1unsew(d2N) ;
+			beta1sew(d21, d2N) ;
+			beta1sew(d2, beta0(d2)) ;
+			GMap1::deleteFace(d2) ;
+		}
+		GMap1::deleteFace(d) ;
 		return true ;
 	}
 	return false ;
@@ -249,17 +386,28 @@ bool GMap2::collapseDegeneratedFace(Dart d)
 
 void GMap2::splitFace(Dart d, Dart e)
 {
-	GMap1::splitFace(d, e);			// Split the face
-	phi2sew(beta1(d), beta1(e));	// Sew the two resulting faces along the new edge
+	assert(d != e && sameFace(d, e)) ;
+
+	if(!sameOrientedFace(d, e))
+		e = beta1(e) ;
+
+	GMap1::cutEdge(phi_1(d)) ;
+	GMap1::cutEdge(phi_1(e)) ;
+	GMap1::splitFace(phi_1(d), phi_1(e)) ;
+	beta2sew(phi_1(d), beta1(e)) ;
+	beta2sew(phi_1(e), beta1(d)) ;
 }
 
 bool GMap2::mergeFaces(Dart d)
 {
-	Dart e = phi2(d) ;
-	if(e != d)
+	if (!isBoundaryEdge(d))
 	{
-		phi2unsew(d);			// unsew the face of d
-		GMap1::mergeFaces(d, e); // merge the two faces along edges of d and e
+		Dart e = phi2(d) ;
+		beta2unsew(d) ;
+		beta2unsew(e) ;
+		GMap1::mergeFaces(d, phi1(e)) ;
+		GMap1::mergeFaces(e, phi1(d)) ;
+		GMap1::deleteFace(d) ;
 		return true ;
 	}
 	return false ;
@@ -267,55 +415,90 @@ bool GMap2::mergeFaces(Dart d)
 
 void GMap2::extractTrianglePair(Dart d)
 {
-	assert(isFaceTriangle(d)) ;
 	Dart e = phi2(d) ;
-	if(e != d)
-	{
-		assert(isFaceTriangle(e)) ;
-		Dart e1 = phi2(phi1(e)) ;
-		Dart e2 = phi2(phi_1(e)) ;
-		phi2unsew(e1) ;
-		phi2unsew(e2) ;
-		phi2sew(e1, e2) ;
-	}
+
+	assert(!isBoundaryFace(d) && !isBoundaryFace(e)) ;
+	assert(faceDegree(d) == 3 && faceDegree(e) == 3) ;
+
 	Dart d1 = phi2(phi1(d)) ;
 	Dart d2 = phi2(phi_1(d)) ;
-	phi2unsew(d1) ;
-	phi2unsew(d2) ;
-	phi2sew(d1, d2) ;
+	beta2unsew(d1) ;
+	beta2unsew(beta0(d1)) ;
+	beta2unsew(d2) ;
+	beta2unsew(beta0(d2)) ;
+	beta2sew(d1, beta0(d2)) ;
+	beta2sew(d2, beta0(d1)) ;
+
+	Dart e1 = phi2(phi1(e)) ;
+	Dart e2 = phi2(phi_1(e)) ;
+	beta2unsew(e1) ;
+	beta2unsew(beta0(e1)) ;
+	beta2unsew(e2) ;
+	beta2unsew(beta0(e2)) ;
+	beta2sew(e1, beta0(e2)) ;
+	beta2sew(e2, beta0(e1)) ;
 }
 
 void GMap2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 {
-	assert(v1 != v2 && sameVertex(v1, v2)) ;
-	assert(isFaceTriangle(d) && phi2(phi1(d)) == phi1(d) && phi2(phi_1(d)) == phi_1(d)) ;
 	Dart e = phi2(d) ;
-	if(e != d)
-	{
-		assert(isFaceTriangle(e) && phi2(phi1(e)) == phi1(e) && phi2(phi_1(e)) == phi_1(e)) ;
-		Dart vv2 = phi2(v2) ;
-		phi2unsew(v2) ;
-		phi2sew(phi_1(e), v2) ;
-		phi2sew(phi1(e), vv2) ;
-	}
+
+	assert(v1 != v2 && sameOrientedVertex(v1, v2)) ;
+	assert(faceDegree(d) == 3 && faceDegree(phi2(d)) == 3) ;
+
 	Dart vv1 = phi2(v1) ;
-	phi2unsew(v1) ;
-	phi2sew(phi_1(d), v1) ;
-	phi2sew(phi1(d), vv1) ;
+	beta2unsew(v1) ;
+	beta2unsew(vv1) ;
+	beta2sew(phi_1(d), beta0(v1)) ;
+	beta2sew(beta1(d), v1) ;
+	beta2sew(phi1(d), beta0(vv1)) ;
+	beta2sew(beta0(phi1(d)), vv1) ;
+
+	Dart vv2 = phi2(v2) ;
+	beta2unsew(v2) ;
+	beta2unsew(vv2) ;
+	beta2sew(phi_1(e), beta0(v2)) ;
+	beta2sew(beta1(e), v2) ;
+	beta2sew(phi1(e), beta0(vv2)) ;
+	beta2sew(beta0(phi1(e)), vv2) ;
 }
 
-//	TODO check this function
+void GMap2::unsewAroundVertex(Dart d)
+{
+	Dart it = d ;
+	do
+	{
+		Dart temp = phi1(it) ;
+		Dart e_1 = phi_1(it) ;
+
+		do
+		{
+			unsewFaces(temp) ;
+			temp = phi1(temp) ;
+		} while(temp != e_1);
+
+		it = alpha1(it);
+	}
+	while(it != d);
+}
+
 bool GMap2::mergeVolumes(Dart d, Dart e)
 {
+	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
+
+	if (isBoundaryFace(d) || isBoundaryFace(e))
+		return false;
+
 	// First traversal of both faces to check the face sizes
-	// and stored their edges to efficiently access them further
+	// and store their edges to efficiently access them further
+
 	std::vector<Dart> dDarts;
 	std::vector<Dart> eDarts;
-	dDarts.reserve(16);	// usual faces have less than 16 edges
+	dDarts.reserve(16);		// usual faces have less than 16 edges
 	eDarts.reserve(16);
 
 	Dart dFit = d ;
-	Dart eFit = phi1(e) ; 	// must take phi1 because of the use
+	Dart eFit = phi1(e) ;	// must take phi1 because of the use
 	do						// of reverse iterator for sewing loop
 	{
 		dDarts.push_back(dFit) ;
@@ -338,64 +521,17 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 	{
 		Dart d2 = phi2(*dIt);			// Search the faces adjacent to dNext and eNext
 		Dart e2 = phi2(*eIt);
-		if (d2 != *dIt) phi2unsew(d2);	// Unlink the two adjacent faces from dNext and eNext
-		if (e2 != *eIt) phi2unsew(e2);
-		if (d2 != *dIt && e2 != *eIt) phi2sew(d2,e2); // Link the two adjacent faces together if they exists
+		beta2unsew(d2);		// Unlink the two adjacent faces from dNext and eNext
+		beta2unsew(beta0(d2));
+		beta2unsew(e2);
+		beta2unsew(beta0(e2));
+		beta2sew(d2, beta0(e2));	// Link the two adjacent faces together
+		beta2sew(e2, beta0(d2));
 	}
-	GMap1::deleteFace(d);	// Delete the two alone faces
-	GMap1::deleteFace(e);
+	deleteFace(d);		// Delete the two alone faces
+	deleteFace(e);
 
 	return true ;
-}
-
-unsigned int GMap2::closeHole(Dart d)
-{
-	assert(beta2(d) == d);	// Nothing to close
-
-	Dart first = GMap1::newEdge();	// First edge of the face that will fill the hole
-	unsigned int countEdges = 1;
-
-	phi2sew(d, first);	// phi2-link the new edge to the hole
-
-	Dart dNext = d;	// Turn around the hole
-	Dart dPhi1;		// to complete the face
-	do
-	{
-		do
-		{
-			dPhi1 = phi1(dNext);	// Search and put in dNext
-			dNext = phi2(dPhi1);	// the next dart of the hole
-		} while (dNext != dPhi1 && dPhi1 != d);
-
-		if (dPhi1 != d)
-		{
-			Dart next = GMap1::newEdge();	// Add a new edge there and link it to the face
-			++countEdges;
-			phi1sew(first, next);	// the edge is linked to the face
-			phi2sew(dNext, next);	// the face is linked to the hole
-		}
-	} while (dPhi1 != d);
-
-	if (countEdges == 2)
-	{
-		countEdges = 0 ;
-		collapseDegeneratedFace(first); // if the closing face is 2-sided, collapse it
-	}
-
-	return countEdges ;
-}
-
-void GMap2::closeMap(DartMarker& marker)
-{
-	// Search the map for topological holes (fixed point for phi2)
-	for (Dart d = begin(); d != end(); next(d))
-	{
-		if (phi2(d) == d)
-		{
-			closeHole(d);
-			marker.markOrbit(FACE, phi2(d)) ;
-		}
-	}
 }
 
 /*! @name Topological Queries
@@ -404,113 +540,141 @@ void GMap2::closeMap(DartMarker& marker)
 
 bool GMap2::sameOrientedVertex(Dart d, Dart e)
 {
-	Dart dNext = d;				// Foreach dart dNext in the vertex of d
+	Dart it = d;
 	do
 	{
-		if (dNext == e)	// Test equality with e
+		if (it == e)	// Test equality with e
 			return true;
-		dNext = alpha1(dNext);
-	} while (dNext != d);
-	return false;				// None is equal to e => vertices are distinct
-}
-
-
-bool GMap2::sameVertex(Dart d, Dart e)
-{
-	Dart dNext = d;				// Foreach dart dNext in the vertex of d
-	do
-	{
-		if (dNext == e || beta2(dNext) == e)	// Test equality with e
-			return true;
-		dNext = alpha1(dNext);
-	} while (dNext != d);
-	return false;				// None is equal to e => vertices are distinct
+		it = alpha1(it);
+	} while (it != d);
+	return false;		// None is equal to e => vertices are distinct
 }
 
 unsigned int GMap2::vertexDegree(Dart d)
 {
 	unsigned int count = 0 ;
-	Dart dNext = d ;
+	Dart it = d ;
 	do
 	{
 		++count ;
-		dNext = alpha1(dNext) ;
-	} while (dNext != d) ;
+		it = alpha1(it) ;
+	} while (it != d) ;
 	return count ;
 }
 
 bool GMap2::isBoundaryVertex(Dart d)
 {
-	Dart dNext = d ;
+	Dart it = d ;
 	do
 	{
-		if(beta2(dNext) == dNext)
+		if (isBoundaryMarked(it))
 			return true ;
-		dNext = alpha1(dNext) ;
-	} while (dNext != d) ;
+		it = alpha1(it) ;
+	} while (it != d) ;
+	return false ;
+}
+
+Dart GMap2::findBoundaryEdgeOfVertex(Dart d)
+{
+	Dart it = d ;
+	do
+	{
+		if (isBoundaryMarked(it))
+			return it ;
+		it = alpha1(it) ;
+	} while (it != d) ;
+	return NIL ;
+}
+
+bool GMap2::isBoundaryEdge(Dart d)
+{
+	Dart e = beta2(d);
+	return isBoundaryMarked(e) || isBoundaryMarked(d);
+}
+
+bool GMap2::isBoundaryFace(Dart d)
+{
+	Dart it = d ;
+	do
+	{
+		if (isBoundaryMarked(beta2(it)))
+			return true ;
+		it = phi1(it) ;
+	} while (it != d) ;
 	return false ;
 }
 
 bool GMap2::sameOrientedVolume(Dart d, Dart e)
 {
 	DartMarkerStore mark(*this);	// Lock a marker
-	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.push_back(d);		// Start with the face of d
 	std::list<Dart>::iterator face;
 
 	// For every face added to the list
-	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
-		if (!mark.isMarked(*face))		// Face has not been visited yet
+		if (!isBoundaryMarked(*face) && !mark.isMarked(*face))		// Face has not been visited yet
 		{
-			Dart dNext = *face ;
+			Dart it = *face ;
 			do
 			{
-				if(dNext==e)
+				if(it == e)
 					return true;
 
-				mark.mark(dNext);					// Mark
-				Dart adj = phi2(dNext);				// Get adjacent face
-				if (adj != dNext && !mark.isMarked(adj))
+				mark.mark(it);						// Mark
+				Dart adj = phi2(it);				// Get adjacent face
+				if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
 					visitedFaces.push_back(adj);	// Add it
-				dNext = phi1(dNext);
-			} while(dNext != *face);
+				it = phi1(it);
+			} while(it != *face);
 		}
 	}
 	return false;
 }
 
-bool GMap2::sameVolume(Dart d, Dart e)
+unsigned int GMap2::volumeDegree(Dart d)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
-	bool found = false;				// Last functor return value
+	unsigned int count = 0;
+	DartMarkerStore mark(*this);		// Lock a marker
 
-	std::list<Dart> visitedFaces;	// Faces that are traversed
-	visitedFaces.push_back(d);		// Start with the face of d
-	std::list<Dart>::iterator face;
+	std::vector<Dart> visitedFaces;		// Faces that are traversed
+	visitedFaces.reserve(16);
+	visitedFaces.push_back(d);			// Start with the face of d
+	std::vector<Dart>::iterator face;
 
 	// For every face added to the list
-	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for (unsigned int i = 0; i != visitedFaces.size(); ++i)
 	{
-		if (!mark.isMarked(*face))		// Face has not been visited yet
+		Dart df = visitedFaces[i];
+		if (!isBoundaryMarked(df) && !mark.isMarked(df))		// Face has not been visited yet
 		{
-			Dart dNext = *face ;
+			++count;
+			Dart it = df ;
 			do
 			{
-				if(dNext==e || beta0(dNext)==e)
-					return true;
-
-				mark.mark(dNext);					// Mark
-				Dart adj = phi2(dNext);				// Get adjacent face
-				if (adj != dNext && !mark.isMarked(adj))
-					visitedFaces.push_back(adj);	// Add it
-				dNext = phi1(dNext);
-			} while(dNext != *face);
+				mark.mark(it);					// Mark
+				Dart adj = phi2(it);			// Get adjacent face
+				if ( !isBoundaryMarked(adj) && !mark.isMarked(adj) )
+					visitedFaces.push_back(adj);// Add it
+				it = phi1(it);
+			} while(it != df);
 		}
 	}
-	return false;
+
+	return count;
+}
+
+bool GMap2::isTriangular()
+{
+	TraversorF<GMap2> t(*this) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		if(faceDegree(d) != 3)
+			return false ;
+	}
+	return true ;
 }
 
 bool GMap2::check()
@@ -550,25 +714,13 @@ bool GMap2::check()
 
 bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	Dart dNext = d;
+	Dart it = d;
 	do
 	{
-		if (f(dNext))
+		if (f(it))
 			return true;
-		dNext = alpha1(dNext);
- 	} while (dNext != d);
- 	return false;
-}
-
-bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
-{
-	Dart dNext = d;
-	do
-	{
-		if (f(dNext) || f(beta1(dNext)))
-			return true;
-		dNext = alpha1(dNext);
- 	} while (dNext != d);
+		it = alpha1(it);
+ 	} while (it != d);
  	return false;
 }
 
@@ -579,16 +731,13 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 	Dart e = beta0(d) ;
 	if (f(e))
 		return true ;
+	e = beta2(d) ;
+	if (f(e))
+		return true ;
+	e = beta0(e) ;
+	if (f(e))
+		return true ;
 
-	Dart d2 = beta2(d) ;
-	if (d2 != d)
-	{
-		if (f(d2))
-			return true ;
-		e = beta0(d2) ;
-		if (f(e))
-			return true ;
-	}
 	return false ;
 }
 
@@ -604,7 +753,7 @@ bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int
 	// For every face added to the list
 	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
 	{
-		if (!mark.isMarked(*face))		// Face has not been visited yet
+		if (!isBoundaryMarked(*face) && !mark.isMarked(*face))		// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
 			found = foreach_dart_of_oriented_face(*face, f);
@@ -618,7 +767,7 @@ bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int
 				{
 					mark.mark(dNext);					// Mark
 					Dart adj = phi2(dNext);				// Get adjacent face
-					if (adj != dNext && !mark.isMarked(adj))
+					if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
 					dNext = phi1(dNext);
 				} while(dNext != *face);
@@ -628,54 +777,66 @@ bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int
 	return found;
 }
 
-bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
+/*! @name Close map after import or creation
+ *  These functions must be used with care, generally only by import/creation algorithms
+ *************************************************************************/
+
+unsigned int GMap2::closeHole(Dart d, bool forboundary)
 {
-	bool found = false;
-	// lock a marker
-	DartMarkerStore markCC(*this,thread);
+	assert(beta2(d) == d);		// Nothing to close
 
-	// init algo with parameter dart
-	std::list<Dart> darts_list;
-	darts_list.push_back(d);
-	markCC.mark(d);
+	Dart first = newEdge();		// First edge of the face that will fill the hole
+	unsigned int countEdges = 1;
 
-	// use iterator for begin of not yet treated darts
-	std::list<Dart>::iterator dit = darts_list.begin();
+	beta2sew(d, beta0(first));	// sew the new edge to the hole
+	beta2sew(first, beta0(d));
 
-	// until all darts treated
-	while (dit != darts_list.end())
+	Dart dNext = d;	// Turn around the hole
+	Dart dPhi1;		// to complete the face
+	do
 	{
-		Dart d1 = *dit;
-		// add phi<1> and phi<2> successor if they are not yet marked
-		Dart d2 = beta0(d1);
-		Dart d3 = beta1(d1);
-		Dart d4 = beta2(d1);
-		if (!markCC.isMarked(d2))
+		dPhi1 = phi1(dNext) ;
+		dNext = beta2(dPhi1) ;
+		while(dNext != dPhi1)
 		{
-			darts_list.push_back(d2);
-			markCC.mark(d2);
+			dPhi1 = beta1(dNext) ;	// Search and put in dNext
+			dNext = beta2(dPhi1) ;	// the next dart of the hole
 		}
-		if (!markCC.isMarked(d3))
-		{
-			darts_list.push_back(d3);
-			markCC.mark(d3);
-		}
-		if (!markCC.isMarked(d4))
-		{
-			darts_list.push_back(d4);
-			markCC.mark(d4);
-		}
-		// step to next dart of list
-		dit++;
 
-		// apply functor
-		if (f(d1))
-		{	// set dit to stop traversal
-			dit = darts_list.end();
-			found = true;
+		if (dPhi1 != d)
+		{
+			Dart next = newEdge();	// Add a new edge there and link it to the face
+			++countEdges;
+			Dart tmp = phi1(first) ;
+			beta1sew(beta0(first), next);	// the edge is linked to the face
+			beta1sew(beta0(next), tmp) ;
+			beta2sew(dNext, beta0(next));	// the face is linked to the hole
+			beta2sew(next, beta0(dNext));
 		}
+	} while (dPhi1 != d);
+
+	if (countEdges < 3)
+	{
+		countEdges = 0 ;
+		collapseDegeneratedFace(first); // if the closing face is 2-sided, collapse it
 	}
-	return found;
+	else
+	{
+		if(forboundary)
+			boundaryMarkOrbit(FACE, phi2(d));
+	}
+
+	return countEdges ;
+}
+
+void GMap2::closeMap()
+{
+	// Search the map for topological holes (fix points of phi2)
+	for (Dart d = begin(); d != end(); next(d))
+	{
+		if (beta2(d) == d)
+			closeHole(d);
+	}
 }
 
 } // namespace CGoGN

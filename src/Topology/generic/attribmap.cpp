@@ -31,15 +31,18 @@ namespace CGoGN
 
 void AttribMap::init()
 {
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	for (unsigned int t = 0; t < m_nbThreads; ++t)
+	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
-		std::stringstream ss ;
-		ss << "Mark_"<< t ;
-		AttributeMultiVector<Mark>* amvMark = dartCont.addAttribute<Mark>(ss.str()) ;
-		for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-			amvMark->operator[](i).clear() ;
-		m_markTables[DART][t] = amvMark ;
+		AttributeContainer& cont = m_attribs[orbit];
+		for (unsigned int t = 0; t < m_nbThreads; ++t)
+		{
+			std::stringstream ss ;
+			ss << "Mark_"<< t ;
+			AttributeMultiVector<Mark>* amvMark = cont.addAttribute<Mark>(ss.str()) ;
+			for(unsigned int i = cont.begin(); i < cont.end(); cont.next(i))
+				amvMark->operator[](i).clear() ;
+			m_markTables[orbit][t] = amvMark ;
+		}
 	}
 }
 

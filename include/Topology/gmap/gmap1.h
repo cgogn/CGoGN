@@ -51,8 +51,6 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
-	virtual int getDartsPerTriangle();
-
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
@@ -75,37 +73,34 @@ public:
 
 	Dart alpha_1(const Dart d);
 
+protected:
 	void beta1sew(Dart d, Dart e);
 
 	void beta1unsew(Dart d);
 
-	void phi1sew(Dart d, Dart e);
-
-	void phi1unsew(Dart d);
-
+public:
 	/*! @name Constructors and Destructors
 	 *  To generate or delete cells in a 1-G-map
 	 *************************************************************************/
 
 	//@{
 	/**
-	* create a face
-	* @param n the number of sides of face
-	* @param withBoundary not used, for compatibility with Map
+	* create a new face
+	* @param nbEdges the number of sides of face
 	* @return a dart of the edge
 	*/
-	Dart newFace(unsigned int n, bool withBoundary=true);
+	Dart newFace(unsigned int nbEdges);
+
+	//! Create an new face for boundary (marked)
+	/*! @param nbEdges the number of edges
+	 *  @return return a dart of the face
+	 */
+	Dart newBoundaryFace(unsigned int nbEdges);
 
 	//! Delete a face erasing all its darts
 	/*! @param d a dart of the face
 	 */
 	void deleteFace(Dart d) ;
-
-	/**
-	 * destroy an edge
-	 * @param d a dart of the edge
-	 */
-	void deleteEdge(Dart d);
 	//@}
 
 	/*! @name Topological Operators
@@ -113,13 +108,6 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Link two vertices belonging to distinct faces (add an edge between the two vertices)
-	/*! \pre Dart d and e MUST be different and belong to distinct face
-	 *  @param d first dart in the face
-	 *  @param e second dart in the face
-	 */
-	void linkVertices(Dart d, Dart e);
-
 	//! Cut an edge inserting a new dart between d and its successor in the face
 	/*! @param d the edge to cut
 	 * \image hmtl map1_cutEdge.png
@@ -146,6 +134,13 @@ public:
 	 *  @param e a dart in the second face
 	 */
 	void mergeFaces(Dart d, Dart e);
+
+	//! Link two faces by adding an edge between two vertices
+	/*! \pre Dart d and e MUST be different and belong to distinct face
+	 *  @param d first dart in the face
+	 *  @param e second dart in the face
+	 */
+	void linkFaces(Dart d, Dart e);
 	//@}
 
 	/*! @name Topological Queries

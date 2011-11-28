@@ -176,29 +176,6 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVect
 	return m_embeddings[orbit] ;
 }
 
-inline void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
-{
-	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
-	assert((orbit1 != DART && orbit2 != DART) || !"Cannot swap the darts container") ;
-
-	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
-	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
-	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
-
-	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
-
-	for(unsigned int t = 0; t < m_nbThreads; ++t)
-	{
-		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
-		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
-		m_markTables[orbit2][t] = m ;
-
-		MarkSet ms = m_marksets[orbit1][t] ;
-		m_marksets[orbit1][t] = m_marksets[orbit2][t] ;
-		m_marksets[orbit2][t] = ms ;
-	}
-}
-
 /****************************************
  *           DARTS TRAVERSALS           *
  ****************************************/

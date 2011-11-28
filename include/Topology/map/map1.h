@@ -94,8 +94,6 @@ protected:
 	void phi1unsew(Dart d);
 
 public:
-	virtual int getDartsPerTriangle();
-
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 1-map
 	 *************************************************************************/
@@ -117,7 +115,6 @@ public:
 	/*! @param d a dart of the face
 	 */
 	void deleteCycle(Dart d) ;
-
 	//@}
 
 	/*! @name Topological Operators
@@ -151,7 +148,7 @@ public:
 	 */
 	void mergeCycles(Dart d, Dart e);
 
-	//! Link two vertices belonging to distinct cycles (add an edge between the two vertices)
+	//! Link two cycles by adding an edge between two vertices
 	/*! \pre Dart d and e MUST be different and belong to distinct face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face

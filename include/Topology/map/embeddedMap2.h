@@ -48,7 +48,7 @@ public:
 	/**
 	 * The attributes attached to the face of d are kept on the resulting face
 	 */
-	virtual bool deleteVertex(Dart d) ;
+	virtual Dart deleteVertex(Dart d) ;
 
 	/**
 	 * No attribute is attached to the new vertex
@@ -134,7 +134,7 @@ public:
 	/**
 	 * No attribute is attached to the new face
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary=true);
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
 	virtual bool check() ;
 } ;

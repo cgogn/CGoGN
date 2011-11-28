@@ -52,11 +52,6 @@ inline void GMap1::clear(bool removeAttrib)
 		init() ;
 }
 
-inline int GMap1::getDartsPerTriangle()
-{
-	return 6 ;
-}
-
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
@@ -96,21 +91,12 @@ inline Dart GMap1::beta(const Dart d)
 
 inline Dart GMap1::phi1(Dart d)
 {
-	Dart e = beta0(d) ;
-	Dart f = beta1(e) ;
-	if(f == e)
-		return d ;
-	else
-		return f ;
+	return beta1(beta0(d)) ;
 }
 
 inline Dart GMap1::phi_1(Dart d)
 {
-	Dart e = beta1(d) ;
-	if(e == d)
-		return d ;
-	else
-		return beta0(e) ;
+	return beta0(beta1(d)) ;
 }
 
 template <int N>
@@ -134,12 +120,12 @@ inline Dart GMap1::phi(Dart d)
 
 inline Dart GMap1::alpha1(Dart d)
 {
-	return phi1(d) ;
+	return beta1(beta0(d)) ;
 }
 
 inline Dart GMap1::alpha_1(Dart d)
 {
-	return phi_1(d) ;
+	return beta0(beta1(d)) ;
 }
 
 inline void GMap1::beta1sew(Dart d, Dart e)
@@ -157,36 +143,9 @@ inline void GMap1::beta1unsew(Dart d)
 	(*m_beta1)[e.index] = e ;
 }
 
-inline void GMap1::phi1sew(Dart d, Dart e)
-{
-	Dart f = phi1(d) ;
-	Dart g = phi1(e) ;
-	beta1unsew(f) ;
-	beta1unsew(g) ;
-	beta1sew(beta0(d), g) ;
-	beta1sew(beta0(e), f) ;
-}
-
-inline void GMap1::phi1unsew(Dart d)
-{
-	Dart e = phi1(d) ;
-	Dart f = phi1(e) ;
-	beta1unsew(e) ;
-	beta1unsew(f) ;
-	beta1sew(beta0(d), f) ;
-}
-
 /*! @name Topological Operators
- *  Topological operations on 1-maps
+ *  Topological operations on 1-G-maps
  *************************************************************************/
-
-inline void GMap1::linkVertices(Dart d, Dart e)
-{
-	assert(d != e && !sameOrientedFace(d, e)) ;
-	GMap1::cutEdge(phi_1(d));		// cut the edge before d (insert a new dart before d)
-	GMap1::cutEdge(phi_1(e));		// cut the edge before e (insert a new dart before e)
-	phi1sew(phi_1(d), phi_1(e)) ;	// phi1sew between the 2 new inserted darts
-}
 
 inline void GMap1::cutEdge(Dart d)
 {
@@ -214,9 +173,32 @@ inline void GMap1::splitFace(Dart d, Dart e)
 {
 	assert(d != e && sameFace(d, e)) ;
 
-	if(!sameOrientedFace(d,e))
-		e = beta1(e);
+	if(!sameOrientedFace(d, e))
+		e = beta1(e) ;
 
+	Dart d1 = beta1(d) ;
+	Dart e1 = beta1(e) ;
+	beta1unsew(d) ;
+	beta1unsew(e) ;
+	beta1sew(d, e1) ;
+	beta1sew(e, d1) ;
+}
+
+inline void GMap1::mergeFaces(Dart d, Dart e)
+{
+	assert(!sameFace(d, e)) ;
+
+	Dart d1 = beta1(d) ;
+	Dart e1 = beta1(e) ;
+	beta1unsew(d) ;
+	beta1unsew(e) ;
+	beta1sew(d, e1) ;
+	beta1sew(e, d1) ;
+}
+
+inline void GMap1::linkFaces(Dart d, Dart e)
+{
+	assert(d != e && !sameFace(d, e)) ;
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
 	Dart dd = newEdge() ;
@@ -224,28 +206,57 @@ inline void GMap1::splitFace(Dart d, Dart e)
 	beta1unsew(d) ;
 	beta1unsew(e) ;
 	beta1sew(d, dd) ;
-	beta1sew(beta0(dd), e1) ;
+	beta1sew(e1, beta0(dd)) ;
 	beta1sew(e, ee) ;
-	beta1sew(beta0(ee), d1) ;
+	beta1sew(d1, beta0(ee)) ;
 }
 
-inline void GMap1::mergeFaces(Dart d, Dart e)
+/*! @name Topological Queries
+ *  Return or set various topological information
+ *************************************************************************/
+
+inline bool GMap1::sameOrientedFace(Dart d, Dart e)
 {
-	assert(!sameFace(d, e)) ;
-	Dart dd = beta0(d) ;
-	Dart d1 = beta1(d) ;
-	Dart dd1 = beta1(dd) ;
-	Dart ee = beta0(e) ;
-	Dart e1 = beta1(e) ;
-	Dart ee1 = beta1(ee) ;
-	beta1unsew(d) ;
-	beta1unsew(dd) ;
-	beta1unsew(e) ;
-	beta1unsew(ee) ;
-	beta1sew(d1, ee1) ;
-	beta1sew(e1, dd1) ;
-	deleteEdge(d) ;
-	deleteEdge(e) ;
+	Dart it = d ;
+	do
+	{
+		if (it == e)
+			return true ;
+		it = phi1(it) ;
+	} while (it != d) ;
+	return false ;
+}
+
+inline bool GMap1::sameFace(Dart d, Dart e)
+{
+	Dart it = d ;
+	do
+	{
+		if (it == e)
+			return true ;
+		it = beta0(it);
+		if (it == e)
+			return true ;
+		it = beta1(it) ;
+	} while (it != d) ;
+	return false ;
+}
+
+inline unsigned int GMap1::faceDegree(Dart d)
+{
+	unsigned int count = 0 ;
+	Dart it = d ;
+	do
+	{
+		++count ;
+		it = phi1(it) ;
+	} while (it != d) ;
+	return count ;
+}
+
+bool GMap1::isFaceTriangle(Dart d)
+{
+	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }
 
 /*! @name Cell Functors
@@ -268,7 +279,29 @@ inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thr
 	return false;
 }
 
+bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart it = d ;
+	do
+	{
+		if (f(it))
+			return true ;
+		it = phi1(it) ;
+	} while (it != d) ;
+	return false ;
+}
+
+bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(beta0(d), f, thread) ;
+}
+
 inline bool GMap1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_face(d, f, thread) ;
+}
+
+bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	return foreach_dart_of_face(d, f, thread) ;
 }

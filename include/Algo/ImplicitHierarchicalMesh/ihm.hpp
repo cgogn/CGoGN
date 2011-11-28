@@ -142,7 +142,7 @@ inline Dart ImplicitHierarchicalMap::alpha_1(Dart d)
 inline Dart ImplicitHierarchicalMap::begin()
 {
 	Dart d = Map2::begin() ;
-	while(m_dartLevel[d] > m_curLevel)
+	while(d != Map2::end() && m_dartLevel[d] > m_curLevel)
 		Map2::next(d) ;
 	return d ;
 }

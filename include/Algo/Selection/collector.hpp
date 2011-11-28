@@ -105,9 +105,9 @@ template <typename PFP>
 void Collector_OneRing<PFP>::collectAll(Dart d)
 {
 	this->init(d);
-	this->insideEdges.reserve(12);
-	this->insideFaces.reserve(12);
-	this->border.reserve(12);
+	this->insideEdges.reserve(16);
+	this->insideFaces.reserve(16);
+	this->border.reserve(16);
 
 	this->insideVertices.push_back(this->centerDart);
 
@@ -145,9 +145,9 @@ void Collector_WithinSphere<PFP>::collectAll(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
-	this->insideEdges.reserve(24);
-	this->insideFaces.reserve(24);
-	this->border.reserve(24);
+	this->insideEdges.reserve(32);
+	this->insideFaces.reserve(32);
+	this->border.reserve(32);
 
 	CellMarkerStore vm(this->map, VERTEX);	// mark the collected inside-vertices
 	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges
@@ -208,8 +208,8 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
-	this->border.reserve(100);
-	this->insideVertices.reserve(100);
+	this->border.reserve(128);
+	this->insideVertices.reserve(128);
 
 	CellMarkerStore vm(this->map, VERTEX);	// mark the collected inside-vertices
 	CellMarkerStore em(this->map, EDGE);	// mark the collected inside-edges + border-edges

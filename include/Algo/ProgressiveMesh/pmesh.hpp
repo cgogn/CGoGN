@@ -41,7 +41,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	) :
 	m_map(map), positionsTable(position), inactiveMarker(inactive), dartSelect(inactiveMarker)
 {
-	CGoGNout << "  creating approximator and predictor.." << /* flush */ CGoGNendl ;
+	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 	switch(a)
 	{
 		case Algo::Decimation::A_QEM : {
@@ -73,7 +73,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  creating selector.." << /* flush */ CGoGNendl ;
+	CGoGNout << "  creating selector.." << CGoGNflush ;
 	switch(s)
 	{
 		case Algo::Decimation::S_MapOrder : {
@@ -99,7 +99,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 
 	m_initOk = true ;
 
-	CGoGNout << "  initializing approximators.." << /* flush */ CGoGNendl ;
+	CGoGNout << "  initializing approximators.." << CGoGNflush ;
 	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 	{
 		if(! (*it)->init())
@@ -109,13 +109,13 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  initializing predictors.." << /* flush */ CGoGNendl ;
+	CGoGNout << "  initializing predictors.." << CGoGNflush ;
 	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
 		if(! (*it)->init())
 			m_initOk = false ;
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  initializing selector.." << /* flush */ CGoGNendl ;
+	CGoGNout << "  initializing selector.." << CGoGNflush ;
 	m_initOk = m_selector->init() ;
 	CGoGNout << "..done" << CGoGNendl ;
 

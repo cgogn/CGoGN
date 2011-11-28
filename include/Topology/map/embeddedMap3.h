@@ -42,7 +42,7 @@ public:
 	/*!
 	 *
 	 */
-	virtual bool deleteVertex(Dart d);
+	virtual Dart deleteVertex(Dart d);
 
 	/*! No attribute is attached to the new vertex
 	 *  The attributes attached to the old edge are duplicated on both resulting edges
@@ -54,7 +54,7 @@ public:
 	/*! The attributes attached to the edge of d are kept on the resulting edge
 	 *  @param d a dart of the edge to cut
 	 */
-	virtual void uncutEdge(Dart d);
+	virtual bool uncutEdge(Dart d);
 
 	/*!
 	 *

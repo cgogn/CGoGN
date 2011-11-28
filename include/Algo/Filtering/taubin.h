@@ -53,13 +53,18 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 		{
 			mv.mark(d);
 
-			c.collectBorder(d) ;
-			fa1.reset() ;
-			c.applyOnBorder(fa1) ;
-			VEC3 p = position[d] ;
-			VEC3 displ = fa1.getAverage() - p ;
-			displ *= lambda ;
-			position2[d] = p + displ ;
+			if(!map.isBoundaryVertex(d))
+			{
+				c.collectBorder(d) ;
+				fa1.reset() ;
+				c.applyOnBorder(fa1) ;
+				VEC3 p = position[d] ;
+				VEC3 displ = fa1.getAverage() - p ;
+				displ *= lambda ;
+				position2[d] = p + displ ;
+			}
+			else
+				position2[d] = position[d] ;
 		}
 	}
 
@@ -71,13 +76,18 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 		{
 			mv.unmark(d);
 
-			c.collectBorder(d) ;
-			fa2.reset() ;
-			c.applyOnBorder(fa2) ;
-			VEC3 p = position2[d] ;
-			VEC3 displ = fa2.getAverage() - p ;
-			displ *= mu ;
-			position[d] = p + displ ;
+			if(!map.isBoundaryVertex(d))
+			{
+				c.collectBorder(d) ;
+				fa2.reset() ;
+				c.applyOnBorder(fa2) ;
+				VEC3 p = position2[d] ;
+				VEC3 displ = fa2.getAverage() - p ;
+				displ *= mu ;
+				position[d] = p + displ ;
+			}
+			else
+				position[d] = position2[d] ;
 		}
 	}
 }
@@ -93,22 +103,28 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;
 
+	CellMarkerNoUnmark mv(map, VERTEX) ;
+
 	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa1(map, position, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> c1(map, position, radius) ;
-	CellMarkerNoUnmark mv(map, VERTEX) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
 		{
 			mv.mark(d);
 
-			c1.collectBorder(d) ;
-			VEC3 center = position[d] ;
-			fa1.reset(center, radius) ;
-			c1.applyOnBorder(fa1) ;
-			VEC3 displ = fa1.getAverage() - center ;
-			displ *= lambda ;
-			position2[d] = center + displ ;
+			if(!map.isBoundaryVertex(d))
+			{
+				c1.collectBorder(d) ;
+				VEC3 center = position[d] ;
+				fa1.reset(center, radius) ;
+				c1.applyOnBorder(fa1) ;
+				VEC3 displ = fa1.getAverage() - center ;
+				displ *= lambda ;
+				position2[d] = center + displ ;
+			}
+			else
+				position2[d] = position[d] ;
 		}
 	}
 
@@ -121,13 +137,18 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 		{
 			mv.unmark(d);
 
-			c2.collectBorder(d) ;
-			VEC3 center = position2[d] ;
-			fa2.reset(center, radius) ;
-			c2.applyOnBorder(fa2) ;
-			VEC3 displ = fa2.getAverage() - center ;
-			displ *= mu ;
-			position[d] = center + displ ;
+			if(!map.isBoundaryVertex(d))
+			{
+				c2.collectBorder(d) ;
+				VEC3 center = position2[d] ;
+				fa2.reset(center, radius) ;
+				c2.applyOnBorder(fa2) ;
+				VEC3 displ = fa2.getAverage() - center ;
+				displ *= mu ;
+				position[d] = center + displ ;
+			}
+			else
+				position[d] = position2[d] ;
 		}
 	}
 }

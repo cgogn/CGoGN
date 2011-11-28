@@ -52,11 +52,6 @@ inline void GMap2::clear(bool removeAttrib)
 		init() ;
 }
 
-inline int GMap2::getDartsPerTriangle()
-{
-	return 6;
-}
-
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
@@ -98,11 +93,7 @@ inline Dart GMap2::beta(const Dart d)
 
 inline Dart GMap2::phi2(Dart d)
 {
-	Dart e = beta2(d) ;
-	if(e == d)
-		return d ;
-	else
-		return beta2(beta0(d)) ;
+	return beta2(beta0(d)) ;
 }
 
 template <int N>
@@ -128,42 +119,17 @@ inline Dart GMap2::phi(Dart d)
 
 inline Dart GMap2::alpha0(Dart d)
 {
-	return phi2(d) ;
+	return beta2(beta0(d)) ;
 }
 
 inline Dart GMap2::alpha1(Dart d)
 {
-	Dart e = beta1(d);
-	Dart f = beta2(e);
-
-	if (f != e)
-		return f;
-
-	f = d;
-	e = beta2(f);
-	while (e != f)
-	{
-		f = beta1(e);
-		e = beta2(f);
-	}
-	return f;
+	return beta2(beta1(d)) ;
 }
 
 inline Dart GMap2::alpha_1(Dart d)
 {
-	Dart e = beta2(d);
-
-	if (e != d)
-		return beta1(e);
-
-	e = d;
-	Dart f = beta1(d);
-	while (beta2(f) != f)
-	{
-		e = beta2(f);
-		f = beta1(e);
-	}
-	return e;
+	return beta1(beta2(d)) ;
 }
 
 inline void GMap2::beta2sew(Dart d, Dart e)
@@ -181,25 +147,57 @@ inline void GMap2::beta2unsew(Dart d)
 	(*m_beta2)[e.index] = e ;
 }
 
-inline void GMap2::phi2sew(Dart d, Dart e)
+/*! @name Topological Queries
+ *  Return or set various topological information
+ *************************************************************************/
+
+inline bool GMap2::sameVertex(Dart d, Dart e)
 {
-	beta2sew(d, beta0(e)) ;
-	beta2sew(beta0(d), e) ;
+	return sameOrientedVertex(d, e) || sameOrientedVertex(beta2(d), e) ;
 }
 
-inline void GMap2::phi2unsew(Dart d)
+inline bool GMap2::sameEdge(Dart d, Dart e)
 {
-	beta2unsew(d) ;
-	beta2unsew(beta0(d)) ;
+	return d == e || beta2(d) == e || beta0(d) == e || beta2(beta0(d)) == e ;
+}
+
+inline bool GMap2::sameOrientedFace(Dart d, Dart e)
+{
+	return GMap1::sameOrientedFace(d, e) ;
+}
+
+inline bool GMap2::sameFace(Dart d, Dart e)
+{
+	return GMap1::sameFace(d, e) ;
+}
+
+inline unsigned int GMap2::faceDegree(Dart d)
+{
+	return GMap1::faceDegree(d) ;
+}
+
+inline bool GMap2::sameVolume(Dart d, Dart e)
+{
+	return sameOrientedVolume(d, e) || sameOrientedVolume(beta2(d), e) ;
 }
 
 /*! @name Cell Functors
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool GMap2::foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread)
+inline bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_cc(d, fonct, thread) ;
+	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
+}
+
+inline bool GMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_oriented_volume(d, f, thread) || foreach_dart_of_oriented_volume(beta0(d), f, thread) ;
+}
+
+inline bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_volume(d, f, thread);
 }
 
 } // namespace CGoGN

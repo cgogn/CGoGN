@@ -52,18 +52,17 @@ void EmbeddedMap2::splitVertex(Dart d, Dart e)
 	}
 }
 
-bool EmbeddedMap2::deleteVertex(Dart d)
+Dart EmbeddedMap2::deleteVertex(Dart d)
 {
-	Dart f = phi1(d) ;
-	if(Map2::deleteVertex(d))
+	Dart f = Map2::deleteVertex(d) ;
+	if(f != NIL)
 	{
 		if (isOrbitEmbedded(FACE))
 		{
 			embedOrbit(FACE, f, getEmbedding(FACE, f)) ;
 		}
-		return true ;
 	}
-	return false ;
+	return f ;
 }
 
 void EmbeddedMap2::cutEdge(Dart d)
@@ -78,12 +77,12 @@ void EmbeddedMap2::cutEdge(Dart d)
 		copyDartEmbedding(EDGE, phi2(d), d) ;
 		copyCell(EDGE, nd, d) ;
 	}
+
 	if(isOrbitEmbedded(FACE))
 	{
-		copyDartEmbedding(FACE, phi1(d), d) ;
+		copyDartEmbedding(FACE, nd, d) ;
 		Dart e = phi2(nd) ;
-		if(e != nd)
-			copyDartEmbedding(FACE, phi1(e), e) ;
+		copyDartEmbedding(FACE, phi1(e), e) ;
 	}
 }
 
@@ -100,9 +99,6 @@ bool EmbeddedMap2::uncutEdge(Dart d)
 
 bool EmbeddedMap2::edgeCanCollapse(Dart d)
 {
-	if(phi2(d) == d)
-		return false ;
-
 	if(isBoundaryVertex(d) || isBoundaryVertex(phi1(d)))
 		return false ;
 
@@ -273,7 +269,7 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 		vEmb2 = getEmbedding(VERTEX, phi1(d)) ;
 	}
 
-	Map2::sewFaces(d, e, withBoundary) ;
+	Map2::sewFaces(d, e, true) ;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
@@ -289,54 +285,43 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 
 void EmbeddedMap2::unsewFaces(Dart d)
 {
-	bool boundaryD = false ;
-	bool boundaryE = false ;
-	if (isOrbitEmbedded(VERTEX))
-	{
-		if(isBoundaryVertex(d))
-			boundaryD = true ;
-		if(isBoundaryVertex(phi1(d)))
-			boundaryE = true ;
-	}
-
 	Dart e = phi2(d) ;
 	Map2::unsewFaces(d) ;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
-		if(boundaryD)
+		Dart ee = phi1(e) ;
+		if(!sameVertex(d, ee))
 		{
-			if(e != d)
-			{
-				Dart ee = phi1(e) ;
-				embedNewCell(VERTEX, ee) ;
-				copyCell(VERTEX, ee, d) ;
-			}
+			embedNewCell(VERTEX, ee);
+			copyCell(VERTEX, ee, d);
 		}
 
-		if(boundaryE)
+		Dart dd = phi1(d) ;
+		if(!sameVertex(e, dd))
 		{
-			if(e != d)
-			{
-				embedNewCell(VERTEX, e) ;
-				copyCell(VERTEX, e, phi1(d)) ;
-			}
+			embedNewCell(VERTEX, dd);
+			copyCell(VERTEX, dd, e);
 		}
 	}
+
 	if (isOrbitEmbedded(EDGE))
 	{
-		embedNewCell(EDGE, e) ;
-		copyCell(EDGE, e, d) ;
+		embedNewCell(EDGE, e);
+		copyCell(EDGE, e, d);
 	}
 }
 
 bool EmbeddedMap2::collapseDegeneratedFace(Dart d)
 {
 	Dart e = phi2(d) ;
+	bool updateEdgeEmb = false ;
+	if(phi1(d) != d)
+		updateEdgeEmb = true ;
 
-	if(phi1(d) != d && Map2::collapseDegeneratedFace(d))
+	if(Map2::collapseDegeneratedFace(d))
 	{
-		if (isOrbitEmbedded(EDGE))
+		if (isOrbitEmbedded(EDGE) && updateEdgeEmb)
 		{
 			copyDartEmbedding(EDGE, phi2(e), e) ;
 		}

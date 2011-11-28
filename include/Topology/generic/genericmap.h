@@ -72,11 +72,14 @@ public:
 };
 
 class AttributeHandlerGen ;
+class DartMarkerGen ;
+class CellMarkerGen ;
 
 class GenericMap : public MapBrowser
 {
 	template<typename T> friend class AttributeHandler ;
 	template<typename T> friend class AutoAttributeHandler ;
+	friend class DartMarkerGen ;
 	friend class CellMarkerGen ;
 
 protected:
@@ -105,7 +108,12 @@ protected:
 
 	unsigned int m_nbThreads ;
 
+	/**
+	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
+	 */
 	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
+	std::vector<DartMarkerGen*> dartMarkers ;
+	std::vector<CellMarkerGen*> cellMarkers ;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
@@ -279,7 +287,6 @@ protected:
 	 ****************************************/
 	/**
 	 * Create the dart attribute to store the embedding of this orbit (for internal use only)
-	 * Also adds a Marker attribute to the container
 	 */
 	void addEmbedding(unsigned int orbit) ;
 
@@ -288,7 +295,7 @@ protected:
 	 ****************************************/
 
 	/**
-	 * Add a toological relation in the map
+	 * Add a topological relation in the map
 	 * @param name name of relation
 	 */
 	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
@@ -459,7 +466,6 @@ protected:
 	 * clear all boundary markers
 	 */
 	void boundaryUnmarkAll();
-
 } ;
 
 
