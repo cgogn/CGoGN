@@ -167,7 +167,7 @@ m_positions(p1.m_positions)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::createOrientedTetra(typename PFP::MAP& the_map)
+Dart Polyhedron<PFP>::createTetra(typename PFP::MAP& the_map)
 {
 	Dart base = the_map.newFace(3);
 
@@ -188,22 +188,22 @@ Dart Polyhedron<PFP>::createOrientedTetra(typename PFP::MAP& the_map)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::createOrientedPyra(typename PFP::MAP& the_map)
+Dart Polyhedron<PFP>::createPyra(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newOrientedFace(4);
+	Dart base = the_map.newFace(4);
 
-	Dart side1 = the_map.newOrientedFace(3);
+	Dart side1 = the_map.newFace(3);
 	the_map.sewFaces(base,side1);
 
-	Dart side2 = the_map.newOrientedFace(3);
+	Dart side2 = the_map.newFace(3);
 	the_map.sewFaces(the_map.phi1(base),side2);
 	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
 
-	Dart side3 = the_map.newOrientedFace(3);
+	Dart side3 = the_map.newFace(3);
 	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3);
 	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
 
-	Dart side4 = the_map.newOrientedFace(3);
+	Dart side4 = the_map.newFace(3);
 	the_map.sewFaces(the_map.phi_1(base),side4);
 	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side4));
 
@@ -213,28 +213,28 @@ Dart Polyhedron<PFP>::createOrientedPyra(typename PFP::MAP& the_map)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::createOrientedHexa(typename PFP::MAP& the_map)
+Dart Polyhedron<PFP>::createHexa(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newOrientedFace(4);
+	Dart base = the_map.newFace(4);
 
-	Dart side1 = the_map.newOrientedFace(4);
+	Dart side1 = the_map.newFace(4);
 	the_map.sewFaces(base,side1);
 
-	Dart side2 = the_map.newOrientedFace(4);
+	Dart side2 = the_map.newFace(4);
 	the_map.sewFaces(the_map.phi1(base),side2);
 	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
 
-	Dart side3 = the_map.newOrientedFace(4);
+	Dart side3 = the_map.newFace(4);
 	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3);
 	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
 
-	Dart side4 = the_map.newOrientedFace(4);
+	Dart side4 = the_map.newFace(4);
 	the_map.sewFaces(the_map.phi_1(base),side4);
 	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side4));
 
 	the_map.sewFaces(the_map.phi_1(side4), the_map.phi1(side1));
 
-	Dart top = the_map.newOrientedFace(4);
+	Dart top = the_map.newFace(4);
 	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)));
 	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)));
 	the_map.sewFaces(the_map.phi1(the_map.phi1(top)),the_map.phi1(the_map.phi1(side3)));
@@ -244,24 +244,24 @@ Dart Polyhedron<PFP>::createOrientedHexa(typename PFP::MAP& the_map)
 }
 
 template <typename PFP>
-Dart  Polyhedron<PFP>::createOrientedPrism(typename PFP::MAP& the_map)
+Dart  Polyhedron<PFP>::createPrism(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newOrientedFace(3);
+	Dart base = the_map.newFace(3);
 
-	Dart side1 = the_map.newOrientedFace(4);
+	Dart side1 = the_map.newFace(4);
 	the_map.sewFaces(base,side1);
 
-	Dart side2 = the_map.newOrientedFace(4);
+	Dart side2 = the_map.newFace(4);
 	the_map.sewFaces(the_map.phi1(base),side2);
 	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2));
 
-	Dart side3 = the_map.newOrientedFace(4);
+	Dart side3 = the_map.newFace(4);
 	the_map.sewFaces(the_map.phi1(the_map.phi1(base)),side3);
 	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3));
 
 	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1));
 
-	Dart top = the_map.newOrientedFace(3);
+	Dart top = the_map.newFace(3);
 	the_map.sewFaces(top,the_map.phi1(the_map.phi1(side1)));
 	the_map.sewFaces(the_map.phi_1(top),the_map.phi1(the_map.phi1(side2)));
 	the_map.sewFaces(the_map.phi1(top),the_map.phi1(the_map.phi1(side3)));
@@ -270,17 +270,17 @@ Dart  Polyhedron<PFP>::createOrientedPrism(typename PFP::MAP& the_map)
 }
 
 template <typename PFP>
-Dart Polyhedron<PFP>::createOrientedPolyhedron(typename PFP::MAP& the_map, int n)
+Dart Polyhedron<PFP>::createPolyhedron(typename PFP::MAP& the_map, int n)
 {
 	Dart d;
 
 	switch (n)
 	{
-		case 4 : d = createOrientedTetra(the_map);
+		case 4 : d = createTetra(the_map);
 				break;
-		case 5 : d = createOrientedPyra(the_map);
+		case 5 : d = createPyra(the_map);
 				break;
-		case 6 : d = createOrientedHexa(the_map);
+		case 6 : d = createHexa(the_map);
 				break;
 	}
 

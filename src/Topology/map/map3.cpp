@@ -206,7 +206,7 @@ bool Map3::mergeVolumes(Dart d)
 	if(!isBoundaryFace(d))
 	{
 		Dart e = phi3(d);
-		Map3::unsewVolumes(d);
+		Map3::unsewVolumes(d); //TODO a enlever ??
 		Map2::mergeVolumes(d, e); // merge the two volumes along common face
 		return true ;
 	}

@@ -170,27 +170,27 @@ public:
 	/**
 	 * create simple simple polyhedron (not handled by Polyhedron object)
 	 */
-	static Dart createOrientedPolyhedron(typename PFP::MAP& the_map, int nbFaces);
+	static Dart createPolyhedron(typename PFP::MAP& the_map, int nbFaces);
 
 	/**
 	 * create simple simple tetrahedron (not handled by Polyhedron object)
 	 */
-	static Dart createOrientedTetra(typename PFP::MAP& the_map);
+	static Dart createTetra(typename PFP::MAP& the_map);
 
 	/**
 	 * create simple simple pyramid (not handled by Polyhedron object)
 	 */
-	static Dart createOrientedPyra(typename PFP::MAP& the_map);
+	static Dart createPyra(typename PFP::MAP& the_map);
 
 	/**
 	 * create simple simple hexaedron (not handled by Polyhedron object)
 	 */
-	static Dart createOrientedHexa(typename PFP::MAP& the_map);
+	static Dart createHexa(typename PFP::MAP& the_map);
 
 	/**
 	 * create simple simple prism (not handled by Polyhedron object)
 	 */
-	static Dart createOrientedPrism(typename PFP::MAP& the_map);
+	static Dart createPrism(typename PFP::MAP& the_map);
 
 	/*
 	* get the reference dart
