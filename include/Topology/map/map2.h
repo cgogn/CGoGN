@@ -312,7 +312,7 @@ public:
 	 */
 	bool isBoundaryEdge(Dart d) ;
 
-	//!Test if dart d and e belong to the same oriented face
+	//! Test if dart d and e belong to the same oriented face
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
