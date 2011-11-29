@@ -39,7 +39,7 @@ void Map3::deleteVolume(Dart d)
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbitInParent(FACE, d) ;
 
 	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
@@ -53,16 +53,15 @@ void Map3::deleteVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbitInParent(FACE, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != *face) ;
 	}
 
-
-	// delete every visited face
-	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-		deleteCycle(*face);
+	Dart dd = phi3(d) ;
+	Map2::deleteCC(d) ;
+	Map2::deleteCC(dd) ;
 }
 
 /*! @name Topological Operators

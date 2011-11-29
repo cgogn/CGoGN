@@ -113,6 +113,11 @@ public:
 	 */
 	virtual void deleteFace(Dart d) ;
 
+	//! Delete a connected component of the map
+	/*! @param d a dart of the connected component
+	 */
+	virtual void deleteCC(Dart d) ;
+
 	//! Fill a hole with a face
 	/*! \pre Dart d is boundary marked
 	 *  @param d a dart of the face to fill

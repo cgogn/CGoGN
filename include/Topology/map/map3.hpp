@@ -111,57 +111,53 @@ inline Dart Map3::alpha0(Dart d)
  */
 inline Dart Map3::alpha1(Dart d)
 {
-	return phi1(phi3(d)) ;
+	return phi_1(phi3(d)) ;
 }
 
-#ifdef NO_BOUND_MAP
 inline Dart Map3::alpha2(Dart d)
-{
-	return phi2(phi3(d));
-}
-#else
-inline Dart Map3::alpha2(Dart d)
-{
-	Dart e = phi2(d);
-	Dart f = phi3(e);
-
-	if (f != e)
-		return f;
-
-	f = d;
-	e = phi3(f);
-	while (e != f)
-	{
-		f = phi2(e);
-		e = phi3(f);
-	}
-	return f;
-}
-#endif
-
-#ifdef NO_BOUND_MAP
-inline Dart Map3::alpha_2(Dart d)
 {
 	return phi3(phi2(d));
 }
-#else
+
+//inline Dart Map3::alpha2(Dart d)
+//{
+//	Dart e = phi2(d);
+//	Dart f = phi3(e);
+//
+//	if (f != e)
+//		return f;
+//
+//	f = d;
+//	e = phi3(f);
+//	while (e != f)
+//	{
+//		f = phi2(e);
+//		e = phi3(f);
+//	}
+//	return f;
+//}
+
 inline Dart Map3::alpha_2(Dart d)
 {
-	Dart e = phi3(d);
-
-	if (e != d)
-		return phi2(e);
-
-	e = d;
-	Dart f = phi2(d);
-	while (phi3(f) != f)
-	{
-		e = phi3(f);
-		f = phi2(e);
-	}
-	return e;
+	return phi2(phi3(d));
 }
-#endif
+
+//inline Dart Map3::alpha_2(Dart d)
+//{
+//	Dart e = phi3(d);
+//
+//	if (e != d)
+//		return phi2(e);
+//
+//	e = d;
+//	Dart f = phi2(d);
+//	while (phi3(f) != f)
+//	{
+//		e = phi3(f);
+//		f = phi2(e);
+//	}
+//	return e;
+//}
 
 inline void Map3::phi3sew(Dart d, Dart e)
 {

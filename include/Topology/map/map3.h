@@ -110,6 +110,12 @@ public:
 	 *  @param d a dart of the volume
 	 */
 	virtual void deleteVolume(Dart d);
+
+	//! Fill a hole with a volume
+	/*! \pre Dart d is boundary marked
+	 *  @param d a dart of the volume to fill
+	 */
+	virtual void fillHole(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators

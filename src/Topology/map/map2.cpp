@@ -24,6 +24,7 @@
 
 #include "Topology/map/map2.h"
 #include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2CC.h"
 
 namespace CGoGN
 {
@@ -122,6 +123,37 @@ void Map2::deleteFace(Dart d)
 	Dart dd = phi2(d) ;
 	Map1::deleteCycle(d) ;
 	Map1::deleteCycle(dd) ;
+}
+
+void Map2::deleteCC(Dart d)
+{
+	DartMarkerStore mark(*this);
+
+	std::vector<Dart> visited;
+	visited.push_back(d);
+	std::vector<Dart>::iterator it;
+
+	for (it = visited.begin(); it != visited.end(); ++it)
+	{
+		if (!mark.isMarked(*it))
+		{
+			Dart d1 = phi1(*it) ;
+			if(!mark.isMarked(d1))
+			{
+				mark.mark(d1);
+				visited.push_back(d1) ;
+			}
+			Dart d2 = phi2(*it) ;
+			if(!mark.isMarked(d2))
+			{
+				mark.mark(d2);
+				visited.push_back(d2) ;
+			}
+		}
+	}
+
+	for(it = visited.begin(); it != visited.end(); ++it)
+		deleteDart(*it) ;
 }
 
 void Map2::fillHole(Dart d)
@@ -709,7 +741,7 @@ bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
 
 bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mark(*this,thread);	// Lock a marker
+	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::list<Dart> visitedFaces;	// Faces that are traversed
@@ -728,15 +760,15 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 			// and add non visited adjacent faces to the list of face
 			if (!found)
 			{
-				Dart dNext = *face ;
+				Dart it = *face ;
 				do
 				{
-					mark.mark(dNext);					// Mark
-					Dart adj = phi2(dNext);				// Get adjacent face
+					mark.mark(it);					// Mark
+					Dart adj = phi2(it);				// Get adjacent face
 					if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
-					dNext = phi1(dNext);
-				} while(dNext != *face);
+					it = phi1(it);
+				} while(it != *face);
 			}
 		}
 	}

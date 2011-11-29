@@ -163,20 +163,20 @@ Polyhedron<PFP>::Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2
 template <typename PFP>
 Dart Polyhedron<PFP>::createTetra(typename PFP::MAP& the_map)
 {
-	Dart base = the_map.newFace(3,false);
+	Dart base = the_map.newFace(3, false);
 
-	Dart side1 = the_map.newFace(3,false);
-	the_map.sewFaces(base,side1,false);
+	Dart side1 = the_map.newFace(3, false);
+	the_map.sewFaces(base, side1, false);
 
-	Dart side2 = the_map.newFace(3,false);
-	the_map.sewFaces(the_map.phi1(base),side2,false);
-	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2),false);
+	Dart side2 = the_map.newFace(3, false);
+	the_map.sewFaces(the_map.phi1(base), side2, false);
+	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2), false);
 
-	Dart side3 = the_map.newFace(3,false);
-	the_map.sewFaces(the_map.phi_1(base),side3,false);
-	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3),false);
+	Dart side3 = the_map.newFace(3, false);
+	the_map.sewFaces(the_map.phi_1(base), side3, false);
+	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3), false);
 
-	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1),false);
+	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1), false);
 
 	return base;
 }
