@@ -377,13 +377,13 @@ public:
 	 */
 	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a edge
+	//! Apply a functor on every dart of an edge
 	/*! @param d a dart of the edge
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a volume
+	//! Apply a functor on every dart of an oriented volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
@@ -393,7 +393,6 @@ public:
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-
 	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a connected component

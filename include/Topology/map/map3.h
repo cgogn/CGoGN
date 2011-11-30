@@ -123,7 +123,6 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//TODO deleteVertex : works only for boundary vertices
 	//! Delete the vertex of d
 	/*! All the faces around the vertex are merged into one face
 	 *  @param d a dart of the vertex to delete
@@ -171,7 +170,6 @@ public:
 	/*! @param vd a vector of darts
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
-
 	//@}
 
 	/*! @name Topological Queries
@@ -179,12 +177,6 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Test if dart d and e belong to the same oriented vertex
-	/*! @param d a dart
-	 *  @param e a dart
-	 */
-	bool sameOrientedVertex(Dart d, Dart e) ;
-
 	//! Test if dart d and e belong to the same vertex
 	/*! @param d a dart
 	 *  @param e a dart
@@ -223,6 +215,12 @@ public:
 	 */
 	bool isBoundaryEdge(Dart d) ;
 
+	/**
+	 * find the dart of edge that belong to the boundary
+	 * return NIL if the edge is not on the boundary
+	 */
+	Dart findBoundaryFaceOfEdge(Dart d);
+
 	//! Test if dart d and e belong to the same oriented face
 	/*! @param d a dart
 	 *  @param e a dart
@@ -252,12 +250,6 @@ public:
 	/*! @param d a dart of the vertex
 	 *  @param fonct the functor
 	 */
-	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int thread = 0);
-
-	//! Apply a functor on each dart of a vertex
-	/*! @param d a dart of the vertex
-	 *  @param fonct the functor
-	 */
 	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on each dart of an edge
@@ -266,23 +258,11 @@ public:
 	 */
 	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
 
-	bool foreach_dart_of_open_edge(Dart d, FunctorType& f, unsigned int thread = 0);
-
 	//! Apply a functor on each dart of an oriented face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0);
-
-	// TODO change to oriented volume to handle higher dimension ?
-	//! Apply a functor on each dart of an volume
-	/*! @param d a dart of the volume
-	 *  @param fonct the functor
-	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0)
-	{
-		return foreach_dart_of_oriented_volume(d,f);
-	}
 
 	//! Apply a functor on each dart of a cc
 	/*! @param d a dart of the cc
@@ -291,6 +271,26 @@ public:
 	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
 	//@}
 
+	/*! @name Close map after import or creation
+	 *  These functions must be used with care, generally only by import algorithms
+	 *************************************************************************/
+
+	//@{
+	//! Close a topological hole (a sequence of connected fixed point of phi3). DO NOT USE, only for import/creation algorithm
+	/*! \pre dart d MUST be fixed point of phi3 relation
+	 *  Add a volume to the map that closes the hole.
+	 *  @param d a dart of the hole (with phi3(d)==d)
+	 *  @param forboundary tag the created face as boundary (default is true)
+	 *  @return the degree of the created volume
+	 */
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+
+	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
+	/*! Add volumes to the map that close every existing hole.
+	 *  These faces are marked as boundary.
+	 */
+	void closeMap();
+	//@}
 };
 
 } // namespace CGoGN

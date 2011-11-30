@@ -30,8 +30,6 @@
 namespace CGoGN
 {
 
-/// INLINE FUNCTIONS
-
 inline void Map3::init()
 {
 	m_phi3 = addRelation("phi3") ;
@@ -98,17 +96,11 @@ inline Dart Map3::phi(Dart d)
 	}
 }
 
-/*
- * N'a pas de sens dans une 3-carte, n'est pas une permutation
- */
 inline Dart Map3::alpha0(Dart d)
 {
 	return phi3(d) ;
 }
 
-/*
- * idem
- */
 inline Dart Map3::alpha1(Dart d)
 {
 	return phi_1(phi3(d)) ;
@@ -119,45 +111,10 @@ inline Dart Map3::alpha2(Dart d)
 	return phi3(phi2(d));
 }
 
-//inline Dart Map3::alpha2(Dart d)
-//{
-//	Dart e = phi2(d);
-//	Dart f = phi3(e);
-//
-//	if (f != e)
-//		return f;
-//
-//	f = d;
-//	e = phi3(f);
-//	while (e != f)
-//	{
-//		f = phi2(e);
-//		e = phi3(f);
-//	}
-//	return f;
-//}
-
 inline Dart Map3::alpha_2(Dart d)
 {
 	return phi2(phi3(d));
 }
-
-//inline Dart Map3::alpha_2(Dart d)
-//{
-//	Dart e = phi3(d);
-//
-//	if (e != d)
-//		return phi2(e);
-//
-//	e = d;
-//	Dart f = phi2(d);
-//	while (phi3(f) != f)
-//	{
-//		e = phi3(f);
-//		f = phi2(e);
-//	}
-//	return e;
-//}
 
 inline void Map3::phi3sew(Dart d, Dart e)
 {
@@ -174,51 +131,32 @@ inline void Map3::phi3unsew(Dart d)
 	(*m_phi3)[e.index] = e ;
 }
 
-inline bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
+/*! @name Topological Queries
+ *  Return or set various topological information
+ *************************************************************************/
+
+inline bool Map3::sameEdge(Dart d, Dart e)
 {
-	return foreach_dart_of_oriented_vertex(d, f, thread);
+	return sameOrientedEdge(d, e) || sameOrientedEdge(phi2(d), e) ;
 }
 
-//template<typename TMAP>
-//bool Map3::foreach_dart_of_parent_cell(int dim, Dart d, FunctorType& f)
-//{
-//	switch(dim)
-//		{
-//			case  0: return this->TMAP::foreach_dart_of_vertex(d,f);
-//			case  1: return this->TMAP::foreach_dart_of_edge(d,f);
-//			case  2: return this->TMAP::foreach_dart_of_face(d,f);
-//			case -1: return this->TMAP::foreach_dart_of_cc(d,f);
-//	}
-//	return false;
-//}
-//
-//template<typename TMAP>
-//bool Map3::markOrbitOf(int dim, Dart d, Marker m)
-//{
-//	FunctorMark<Map3> fmark(*this, m);
-//	switch(dim)
-//		{
-//			case  0: return this->TMAP::foreach_dart_of_vertex(d,fmark);
-//			case  1: return this->TMAP::foreach_dart_of_edge(d,fmark);
-//			case  2: return this->TMAP::foreach_dart_of_face(d,fmark);
-//			case -1: return this->TMAP::foreach_dart_of_cc(d,fmark);
-//	}
-//	return false;
-//}
-//
-//template<typename TMAP>
-//bool Map3::unmarkOrbitOf(int dim, Dart d, Marker m)
-//{
-//	FunctorUnmark<Map3> fumark(*this, m);
-//	switch(dim)
-//		{
-//			case  0: return this->TMAP::foreach_dart_of_vertex(d,fumark);
-//			case  1: return this->TMAP::foreach_dart_of_edge(d,fumark);
-//			case  2: return this->TMAP::foreach_dart_of_face(d,fumark);
-//			case -1: return this->TMAP::foreach_dart_of_cc(d,fumark);
-//	}
-//	return false;
-//}
+inline bool Map3::sameFace(Dart d, Dart e)
+{
+	return Map2::sameOrientedFace(d, e) || Map2::sameOrientedFace(phi3(d), e) ;
+}
+
+inline bool Map3::isBoundaryFace(Dart d)
+{
+	return isBoundaryMarked(d) || isBoundaryMarked(phi3(d));
+}
+
+/*! @name Cell Functors
+ *  Apply functors to all darts of a cell
+ *************************************************************************/
+
+inline bool Map3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return Map2::foreach_dart_of_oriented_face(d, f, thread) || Map2::foreach_dart_of_oriented_face(phi3(d), f, thread);
+}
 
 } // namespace CGoGN
-

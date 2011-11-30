@@ -22,9 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <vector>
-#include <algorithm>
-
 #include "Topology/map/embeddedMap3.h"
 
 namespace CGoGN
@@ -308,28 +305,6 @@ bool EmbeddedMap3::check()
 	}
 	std::cout << "Check: embedding ok" << std::endl ;
 	return true ;
-}
-
-unsigned int EmbeddedMap3::closeHole(Dart d)
-{
-	unsigned int nbE = Map3::closeHole(d);
-	Dart dd = phi2(d);
-	Dart f = dd;
-
-	do
-	{
-		if(isOrbitEmbedded(VERTEX))
-			copyDartEmbedding(VERTEX,f, phi1(phi2(f)));
-		if(isOrbitEmbedded(EDGE))
-			copyDartEmbedding(EDGE, f, phi2(f));
-		if(isOrbitEmbedded(VOLUME))
-			copyDartEmbedding(VOLUME, f, phi2(f));
-
-		f = phi1(f);
-	}
-	while(dd != f);
-
-	return nbE;
 }
 
 } // namespace CGoGN

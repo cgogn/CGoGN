@@ -352,17 +352,13 @@ void Map2::unsewFaces(Dart d)
 	Dart e = newBoundaryCycle(2);
 	Dart ee = phi1(e) ;
 
-	if (isBoundaryVertex(d))
-	{
-		Dart f = findBoundaryEdgeOfVertex(d);
+	Dart f = findBoundaryEdgeOfVertex(d);
+	if(f != NIL)
 		phi1sew(e, phi_1(f));
-	}
 
-	if (isBoundaryVertex(dd))
-	{
-		Dart f = findBoundaryEdgeOfVertex(dd);
+	f = findBoundaryEdgeOfVertex(dd);
+	if(f != NIL)
 		phi1sew(ee, phi_1(f));
-	}
 
 	phi2unsew(d);
 
@@ -575,12 +571,6 @@ Dart Map2::findBoundaryEdgeOfVertex(Dart d)
 	return NIL ;
 }
 
-bool Map2::isBoundaryEdge(Dart d)
-{
-	Dart e = phi2(d);
-	return isBoundaryMarked(e) || isBoundaryMarked(d);
-}
-
 bool Map2::isBoundaryFace(Dart d)
 {
 	Dart it = d ;
@@ -745,31 +735,31 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
-	std::list<Dart> visitedFaces;	// Faces that are traversed
+	std::vector<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	std::list<Dart>::iterator face;
 
 	// For every face added to the list
-	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for (std::vector<Dart>::iterator it = visitedFaces.begin(); !found && it != visitedFaces.end(); ++it)
 	{
-		if (!isBoundaryMarked(*face) && !mark.isMarked(*face))		// Face has not been visited yet
+		if (!isBoundaryMarked(*it) && !mark.isMarked(*it))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(*face, f);
+			found = foreach_dart_of_oriented_face(*it, f);
 
 			// If functor returns false then mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
 			if (!found)
 			{
-				Dart it = *face ;
+				Dart e = *it ;
 				do
 				{
-					mark.mark(it);					// Mark
-					Dart adj = phi2(it);				// Get adjacent face
+					mark.mark(e);					// Mark
+					Dart adj = phi2(e);				// Get adjacent face
 					if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
-					it = phi1(it);
-				} while(it != *face);
+					e = phi1(e);
+				} while(e != *it);
 			}
 		}
 	}
@@ -808,16 +798,8 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 		}
 	} while (dPhi1 != d);
 
-	if (countEdges < 3)
-	{
-		countEdges = 0 ;
-		collapseDegeneratedFace(first); // if the closing face is 2-sided, collapse it
-	}
-	else
-	{
-		if(forboundary)
-			boundaryMarkOrbit(FACE, phi2(d));
-	}
+	if(forboundary)
+		boundaryMarkOrbit(FACE, phi2(d));
 
 	return countEdges ;
 }

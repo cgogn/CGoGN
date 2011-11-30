@@ -30,10 +30,8 @@
 namespace CGoGN
 {
 
-/**
-* Class of 3-dimensional maps
-* with managed embeddings
-*/
+/*! Class of 3-dimensional maps with managed embeddings
+ */
 class EmbeddedMap3 : public Map3
 {
 public:
@@ -81,13 +79,15 @@ public:
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
 
+	/**
+	 * No attribute is attached to the new volume
+	 */
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+
 	/*!
 	 *
 	 */
 	virtual bool check();
-
-	//????????? fonction de 2-carte
-	virtual unsigned int closeHole(Dart d);
 } ;
 
 } // namespace CGoGN
