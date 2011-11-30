@@ -64,22 +64,31 @@ void Map3::deleteVolume(Dart d)
 	Map2::deleteCC(dd) ;
 }
 
+void Map3::fillHole(Dart d)
+{
+	assert(isBoundaryMarked(d)) ;
+	boundaryUnmarkOrbit(VOLUME, d) ;
+}
+
 /*! @name Topological Operators
  *  Topological operations on 3-maps
  *************************************************************************/
 
 Dart Map3::deleteVertex(Dart d)
 {
+	if(isBoundaryVertex(d))
+		return NIL ;
+
 	//Save the darts around the vertex
 	//(one dart per face should be enough)
 	std::vector<Dart> fstoretmp;
-	fstoretmp.reserve(100);
+	fstoretmp.reserve(128);
 	FunctorStore fs(fstoretmp);
 	foreach_dart_of_vertex(d, fs);
 
 	//just one dart per face
 	std::vector<Dart> fstore;
-	fstore.reserve(100);
+	fstore.reserve(128);
 	DartMarker mf(*this);
 	for(std::vector<Dart>::iterator it = fstoretmp.begin() ; it != fstoretmp.end() ; ++it)
 	{
@@ -90,73 +99,74 @@ Dart Map3::deleteVertex(Dart d)
 		}
 	}
 
+	Dart res = NIL ;
 	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
 	{
-		if(!mergeVolumes(*it))
-			return NIL;
+		Dart fit = *it ;
+		Dart end = phi_1(fit) ;
+		fit = phi1(fit) ;
+		while(fit != end)
+		{
+			Dart d2 = phi2(fit) ;
+			Dart d3 = phi3(fit) ;
+			Dart d32 = phi2(d3) ;
+			if(res == NIL)
+				res = d2 ;
+			phi2unsew(d2) ;
+			phi2unsew(d32) ;
+			phi2sew(d2, d32) ;
+			phi2sew(fit, d3) ;
+		}
 	}
+	Map2::deleteCC(d) ;
 
-	return NIL;
+	return res ;
 }
 
 void Map3::cutEdge(Dart d)
 {
-	if(isBoundaryFace(d))
-		d = phi2(d);
-
 	Dart prev = d;
 	Dart dd = alpha2(d);
 	Map2::cutEdge(d);
 
-	while (dd!=d)
+	while (dd != d)
 	{
 		prev = dd;
 		dd = alpha2(dd);
 
 		Map2::cutEdge(prev);
 
-		if (phi3(prev) != prev)
-		{
-			Dart d3 = phi3(prev);
-			phi3unsew(prev);
-			phi3sew(prev, phi1(d3));
-			phi3sew(d3, phi1(prev));
-		}
+		Dart d3 = phi3(prev);
+		phi3unsew(prev);
+		phi3sew(prev, phi1(d3));
+		phi3sew(d3, phi1(prev));
 	}
 
-	if(!isBoundaryFace(d))
-	{
-		Dart d3 = phi3(d);
-		phi3unsew(d);
-		phi3sew(d, phi1(d3));
-		phi3sew(d3, phi1(d));
-	}
+	Dart d3 = phi3(d);
+	phi3unsew(d);
+	phi3sew(d, phi1(d3));
+	phi3sew(d3, phi1(d));
 }
 
 bool Map3::uncutEdge(Dart d)
 {
 	if(vertexDegree(phi1(d)) == 2)
 	{
-		if(isBoundaryFace(d))
-			d = phi_1(phi2(d));
+		Dart prev = d ;
+		phi3unsew(phi1(prev)) ;
 
-		Dart prev = d;
-		Dart dd = alpha2(d);
-
-		Map2::uncutEdge(prev);
-
-		if(phi3(dd) != dd)
-			phi3sew(dd,phi2(prev));
-
-		while (dd!=d)
+		Dart dd = d;
+		do
 		{
 			prev = dd;
 			dd = alpha2(dd);
 
+			phi3unsew(phi2(prev)) ;
+			phi3unsew(phi2(phi1(prev))) ;
 			Map2::uncutEdge(prev);
-
 			phi3sew(dd, phi2(prev));
-		}
+		} while (dd != d) ;
+
 		return true;
 	}
 	return false;
@@ -164,29 +174,63 @@ bool Map3::uncutEdge(Dart d)
 
 void Map3::splitFace(Dart d, Dart e)
 {
-	Map2::splitFace(d,e);
+	assert(d != e && sameOrientedFace(d, e)) ;
+	Map2::splitFace(d, e);
 
-	if(!isBoundaryFace(d))
-	{
-		Dart dd = phi1(phi3(d));
-		Dart ee = phi1(phi3(e));
+	Dart dd = phi1(phi3(d));
+	Dart ee = phi1(phi3(e));
 
-		Map2::splitFace(dd,ee);
+	Map2::splitFace(dd, ee);
 
-		phi3sew(phi_1(d), phi_1(ee));
-		phi3sew(phi_1(e), phi_1(dd));
-	}
+	phi3sew(phi_1(d), phi_1(ee));
+	phi3sew(phi_1(e), phi_1(dd));
 }
 
-void Map3::sewVolumes(Dart d, Dart e)
+void Map3::sewVolumes(Dart d, Dart e, bool withBoundary)
 {
 	assert(faceDegree(d) == faceDegree(e));
+
+	// if sewing with fixed points
+	if (!withBoundary)
+	{
+		assert(phi3(d) == d && phi3(e) == e) ;
+		Dart fitD = d ;
+		Dart fitE = e ;
+		do
+		{
+			phi3sew(fitD, fitE) ;
+			fitD = phi1(fitD) ;
+			fitE = phi_1(fitE) ;
+		} while(fitD != d) ;
+		return ;
+	}
+
+	Dart dd = phi3(d) ;
+	Dart ee = phi3(e) ;
+
+	Dart fitD = dd ;
+	Dart fitE = ee ;
+	do
+	{
+		Dart fitD2 = phi2(fitD) ;
+		Dart fitE2 = phi2(fitE) ;
+		if(fitD2 != fitE)
+		{
+			phi2unsew(fitD) ;
+			phi2unsew(fitE) ;
+			phi2sew(fitD2, fitE2) ;
+			phi2sew(fitD, fitE) ;
+		}
+		fitD = phi1(fitD) ;
+		fitE = phi_1(fitE) ;
+	} while(fitD != d) ;
+	Map2::deleteCC(dd) ;
 
 	Dart fitD = d ;
 	Dart fitE = e ;
 	do
 	{
-		phi3sew(fitD,fitE);
+		phi3sew(fitD, fitE) ;
 		fitD = phi1(fitD) ;
 		fitE = phi_1(fitE) ;
 	} while(fitD != d) ;

@@ -153,8 +153,9 @@ public:
 	/*! The oriented faces should not be phi3-linked and have the same length
 	 *  @param d a dart of the first volume
 	 *  @param e a dart of the second volume
+	 *  @param withBoundary: if false, volumes must have phi3 fixed points (only for construction: import/primitives)
 	 */
-	virtual void sewVolumes(Dart d, Dart e);
+	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
 	//! Unsew two oriented volumes along their faces.
 	/*! @param d a dart of one volume

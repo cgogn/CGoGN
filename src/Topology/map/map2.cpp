@@ -130,6 +130,7 @@ void Map2::deleteCC(Dart d)
 	DartMarkerStore mark(*this);
 
 	std::vector<Dart> visited;
+	visited.reserve(1024) ;
 	visited.push_back(d);
 	std::vector<Dart>::iterator it;
 
@@ -409,7 +410,7 @@ bool Map2::mergeFaces(Dart d)
 		Dart e = phi2(d) ;
 		phi2unsew(d) ;
 		Map1::mergeCycles(d, phi1(e)) ;
-		Map1::mergeCycles(e, phi1(d)) ;
+		Map1::splitCycle(e, phi1(d)) ;
 		Map1::deleteCycle(d) ;
 		return true ;
 	}
