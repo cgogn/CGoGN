@@ -26,7 +26,6 @@
 #include "Algo/Geometry/boundingbox.h"
 #include "Topology/generic/autoAttributeHandler.h"
 
-#include "openctm.h"
 #include "Algo/Import/AHEM.h"
 
 #include "assimp.h"
@@ -64,9 +63,6 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 	if ((filename.rfind(".obj")!=std::string::npos) || (filename.rfind(".OBJ")!=std::string::npos))
 		return ImportSurfacique::OBJ;
 
-	if ((filename.rfind(".ctm")!=std::string::npos) || (filename.rfind(".CTM")!=std::string::npos))
-		return ImportSurfacique::CTM;
-
 	if ((filename.rfind(".ahem")!=std::string::npos) || (filename.rfind(".AHEM")!=std::string::npos))
 		return ImportSurfacique::AHEM;
 
@@ -90,10 +86,6 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 	case ImportSurfacique::TRIANBGZ:
 		CGoGNout << "TYPE: TRIANBGZ" << CGoGNendl;
 		return importTrianBinGz(filename, attrNames);
-		break;
-	case ImportSurfacique::CTM:
-		CGoGNout << "TYPE: CTM" << CGoGNendl;
-		return importCTM(filename, attrNames);
 		break;
 	case ImportSurfacique::OFF:
 		CGoGNout << "TYPE: OFF" << CGoGNendl;
@@ -842,61 +834,6 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 	fp.close();
 	return true;
 }
-
-template <typename PFP>
-bool MeshTablesSurface<PFP>::importCTM(const std::string& filename, std::vector<std::string>& attrNames)
-{
-	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
-	if (!positions.isValid())
-		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
-	attrNames.push_back(positions.name()) ;
-
-	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
-
-	// Load the file using the OpenCTM API
-	CTMimporter ctm;
-	// Load the file
-	ctm.Load(filename.c_str());
-
- 	m_nbVertices = ctm.GetInteger(CTM_VERTEX_COUNT);
-
- 	// read points
-	std::vector<unsigned int> verticesID;
-	verticesID.reserve(m_nbVertices);
-
-	const CTMfloat* vertices = ctm.GetFloatArray(CTM_VERTICES);
-	for (unsigned int i = 0; i < m_nbVertices; ++i)
-	{
-		VEC3 pos(vertices[0], vertices[1], vertices[2]);
-		vertices += 3; // next vertex in float*
-		unsigned int id = container.insertLine();
-		positions[id] = pos;
-		verticesID.push_back(id);
-	}
-
-	// read nb of faces
-	m_nbFaces = ctm.GetInteger(CTM_TRIANGLE_COUNT);
-	m_nbEdges.reserve(m_nbFaces);
-	m_emb.reserve(3*m_nbFaces);
-
-	const CTMuint * indices = ctm.GetIntegerArray(CTM_INDICES);
-
-	// read indices of faces
-	for (unsigned i=0; i<m_nbFaces; i++)
-	{
-		m_nbEdges.push_back(3);
-		// read the three vertices of triangle
-		m_emb.push_back(verticesID[*indices++]);
-		m_emb.push_back(verticesID[*indices++]);
-		m_emb.push_back(verticesID[*indices++]);
-	}
-
-	return true;
-}
-
-
 
 
 

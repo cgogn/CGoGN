@@ -39,7 +39,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Topology/*.h
 )
 add_library(
-	topologyD
+	topologyD ${SHARED_OR_STATIC}
 	${files_topology}
 )
 
@@ -51,7 +51,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Container/*.h
 )
 add_library(
-	containerD
+	containerD ${SHARED_OR_STATIC}
 	${files_container}
 )
 
@@ -64,7 +64,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Algo/*.h
 )
 add_library(
-	algoD
+	algoD ${SHARED_OR_STATIC}
 	${files_algo}
 )
 
@@ -81,12 +81,12 @@ file(
 )
 
 IF(WIN32)
-add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/Tools/Release/shader_to_h ${shaders_srcD}
+add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_srcD} 
 )
 ELSE(WIN32)
-add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/Tools/shader_to_h ${shaders_srcD}
+add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_srcD} 
 )
@@ -116,7 +116,7 @@ QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
 
 add_library(
-	utilsD
+	utilsD ${SHARED_OR_STATIC}
 	${files_utils_withQt}
 )
 

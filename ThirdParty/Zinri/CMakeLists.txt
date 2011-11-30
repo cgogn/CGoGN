@@ -10,7 +10,4 @@ file(
 	${CMAKE_CURRENT_SOURCE_DIR}/*.c
 )
 
-add_library(
-	Zinri
-	${source_files}
-)
+add_library( Zinri ${SHARED_OR_STATIC} ${source_files} )

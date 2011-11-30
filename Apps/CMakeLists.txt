@@ -1,8 +1,26 @@
 SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
 
-#BOOST_LIBS(boost_regex_lib_lists "boost_regex-mt")
+# define  libs
+SET (COMMON_LIBS ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} ${Boost_REGEX_LIBRARY} ${Boost_THREAD_LIBRARY} gzstream assimp)
 
-SET (COMMON_LIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${GLEW_LIBRARY} ${DEVIL_LIBRARIES} ${ZLIB_LIBRARIES} ${LIBXML2_LIBRARIES} ${Boost_REGEX_LIBRARY} ${Boost_THREAD_LIBRARY} gzstream AntTweakBar openctm assimp)
+# define includes of external libs 
+SET(CGoGN_EXT_INCLUDES 
+	${LIBXML2_INCLUDE_DIR}
+	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
+	${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig
+	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
+	${CGoGN_ROOT_DIR}/ThirdParty/Zinri
+	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include )
+
+
+
+# FOR Qt4
+SET(QT_USE_QTOPENGL TRUE)
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+
 
 SET(CGoGN_LIBS_R topology algo container utils)
 

@@ -5,29 +5,12 @@ project(examples)
 SET(CMAKE_BUILD_TYPE Release)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 
-# FOR Qt4
-FIND_PACKAGE(Qt4 REQUIRED)
-SET(QT_USE_QTOPENGL TRUE)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
-
-find_package(Boost COMPONENTS regex REQUIRED)
 
 # define includes path
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
-	/usr/include/libxml2/
 	${CGoGN_ROOT_DIR}/include
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig
-	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
-	${CGoGN_ROOT_DIR}/ThirdParty/Zinri
-	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
-	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
-	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
-	${CGoGN_ROOT_DIR}/ThirdParty/glm
-	${Boost_INCLUDE_DIRS}
+	${CGoGN_EXT_INCLUDES}
 )
 
 # define libs path

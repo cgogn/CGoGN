@@ -4,25 +4,11 @@ project(examplesD)
 
 SET(CMAKE_BUILD_TYPE Debug)
 
-# FOR Qt4
-FIND_PACKAGE(Qt4 REQUIRED)
-SET(QT_USE_QTOPENGL TRUE)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
 # define includes path
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
-	/usr/include/libxml2/
 	${CGoGN_ROOT_DIR}/include
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig
-	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
-	${CGoGN_ROOT_DIR}/ThirdParty/Zinri
-	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
-	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
-	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
-	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${CGoGN_EXT_INCLUDES}
 )
 
 # define libs path

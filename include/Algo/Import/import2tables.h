@@ -35,7 +35,6 @@
 #include "Geometry/matrix.h"
 
 #include "gzstream.h"
-#include "openctm.h"
 #include "assimp.h"
 #include "aiScene.h"
 
@@ -111,8 +110,6 @@ public:
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
 	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importCTM(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 	
