@@ -91,7 +91,9 @@ bool EmbeddedMap2::uncutEdge(Dart d)
 	if(Map2::uncutEdge(d))
 	{
 		if(isOrbitEmbedded(EDGE))
+		{
 			copyDartEmbedding(EDGE, phi2(d), d) ;
+		}
 		return true ;
 	}
 	return false ;
