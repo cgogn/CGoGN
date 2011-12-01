@@ -10,9 +10,6 @@ ELSE(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 ENDIF(WIN32)
-#SET(BUILD_SHARED_LIBS,FALSE)
-
-
 
 # FOR Qt4
 SET(QT_USE_QTOPENGL TRUE)
@@ -22,15 +19,8 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
-	/usr/include/libxml2
 	${CGoGN_ROOT_DIR}/include
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
-	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
-	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
-	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
-	${CGoGN_ROOT_DIR}/ThirdParty/glm
-	${Boost_INCLUDE_DIRS}
-
+	${CGoGN_EXT_INCLUDES}
 )
 
 file(
@@ -41,7 +31,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Topology/*.h
 )
 add_library(
-	topology ${SHARED_OR_STATIC}
+	topology
 	${files_topology}
 )
 
@@ -53,7 +43,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Container/*.h
 )
 add_library(
-	container ${SHARED_OR_STATIC}
+	container
 	${files_container}
 )
 
@@ -66,7 +56,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Algo/*.h
 )
 add_library(
-	algo ${SHARED_OR_STATIC}
+	algo
 	${files_algo}
 )
 
@@ -129,7 +119,7 @@ QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
 
 add_library(
-	utils ${SHARED_OR_STATIC}
+	utils
 	${files_utils_withQt}
 )
 

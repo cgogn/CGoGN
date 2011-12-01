@@ -56,8 +56,6 @@ protected:
     static std::string fragmentShaderText1;
     static std::string fragmentShaderText2;
 
-    static ILuint m_imgName;
-
     static GLuint m_idTexture;
 
 	std::vector<std::string> m_strings;

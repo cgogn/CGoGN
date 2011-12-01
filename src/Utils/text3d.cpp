@@ -25,6 +25,7 @@
 #include "Utils/text3d.h"
 
 #include "Utils/vbo.h"
+#include <QImage>
 
 namespace CGoGN
 {
@@ -34,30 +35,6 @@ namespace Utils
 #include "text3d.vert"
 #include "text3d.frag"
 
-//std::string Strings3D::vertexShaderText =
-//"ATTRIBUTE vec4 VertexPosition;\n"
-//"uniform mat4 ModelViewMatrix;\n"
-//"uniform mat4 ProjectionMatrix;\n"
-//"uniform vec3 strPos;\n"
-//"uniform float scale;\n"
-//"VARYING_VERT vec2 tex_coord;\n"
-//"INVARIANT_POS;\n"
-//"void main ()\n"
-//"{\n"
-//"	vec4 pos = ModelViewMatrix * vec4(strPos,1.0) + vec4(VertexPosition[0]*scale,VertexPosition[1]*scale,0.0,0.0);\n"
-//"	tex_coord = vec2(VertexPosition[2],VertexPosition[3]);\n"
-//"	gl_Position = ProjectionMatrix * pos;\n"
-//"}";
-//
-//
-//std::string Strings3D::fragmentShaderText1 =
-//"VARYING_FRAG vec2 tex_coord;\n"
-//"uniform sampler2D FontTexture;\n"
-//"uniform vec3 color;\n"
-//"FRAG_OUT_DEF;\n"
-//"void main (void)\n"
-//"{\n"
-//"	float lum = texture2D(FontTexture, tex_coord).s;\n";
 
 std::string Strings3D::fragmentShaderText2 =
 "	gl_FragColor = vec4(color,0.0)*lum;\n"
@@ -65,25 +42,19 @@ std::string Strings3D::fragmentShaderText2 =
 
 
 GLuint Strings3D::m_idTexture = 0xffffffff;
-ILuint Strings3D::m_imgName;
 
 
 Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 {
 	if (m_idTexture == 0xffffffff)
 	{
-		std::string font_finename = Utils::GLSLShader::findFile("font_cgogn.png");
-		ilInit();
-		ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
-		ilEnable(IL_ORIGIN_SET);
-
-		ilGenImages(1,&m_imgName);
-		ilBindImage(m_imgName);
-		ilLoadImage(font_finename.c_str());
-
+		std::string font_filename = Utils::GLSLShader::findFile("font_cgogn.png");
+		
+		QImage img(font_filename.c_str());
+		
 		glGenTextures(1, &m_idTexture);
 		glBindTexture(GL_TEXTURE_2D, m_idTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(ilGetData()));
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(img.bits()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
@@ -132,8 +103,6 @@ void Strings3D::setScale(float scale)
 
 Strings3D::~Strings3D()
 {
-	ilDeleteImages(1 ,&m_imgName);
-	delete m_vbo1;
 }
 
 unsigned int Strings3D::addString(const std::string& str)

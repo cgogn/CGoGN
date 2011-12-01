@@ -10,7 +10,6 @@ ELSE(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Debug)
 ENDIF(WIN32)
 
-#SET(BUILD_SHARED_LIBS,FALSE)
 
 # FOR Qt4
 SET(QT_USE_QTOPENGL TRUE)
@@ -20,16 +19,10 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
-	/usr/include/libxml2
 	${CGoGN_ROOT_DIR}/include
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
-	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
-	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
-	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
-	${CGoGN_ROOT_DIR}/ThirdParty/glm
-	${Boost_INCLUDE_DIRS}
-
+	${CGoGN_EXT_INCLUDES}
 )
+
 
 file(
 	GLOB_RECURSE
@@ -39,7 +32,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Topology/*.h
 )
 add_library(
-	topologyD ${SHARED_OR_STATIC}
+	topologyD
 	${files_topology}
 )
 
@@ -51,7 +44,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Container/*.h
 )
 add_library(
-	containerD ${SHARED_OR_STATIC}
+	containerD
 	${files_container}
 )
 
@@ -64,7 +57,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Algo/*.h
 )
 add_library(
-	algoD ${SHARED_OR_STATIC}
+	algoD
 	${files_algo}
 )
 
@@ -80,21 +73,16 @@ file(
 	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
 )
 
-IF(WIN32)
+#IF(WIN32)
 add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	SOURCES ${shaders_srcD} 
-)
-ELSE(WIN32)
-add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
-	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-	SOURCES ${shaders_srcD} 
-)
-ENDIF(WIN32)
-
-
-
-
+	SOURCES ${shaders_srcD} )
+#ELSE(WIN32)
+#add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
+#	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#	SOURCES ${shaders_srcD} 
+#)
+#ENDIF(WIN32)
 
 
 file(
@@ -116,7 +104,7 @@ QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
 
 add_library(
-	utilsD ${SHARED_OR_STATIC}
+	utilsD 
 	${files_utils_withQt}
 )
 

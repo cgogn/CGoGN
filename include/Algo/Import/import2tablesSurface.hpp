@@ -28,10 +28,11 @@
 
 #include "Algo/Import/AHEM.h"
 
+#ifdef WITH_ASSIMP
 #include "assimp.h"
 #include "aiPostProcess.h"
 #include "aiScene.h"
-
+#endif
 
 namespace CGoGN
 {
@@ -112,8 +113,12 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 		return importAHEM(filename, attrNames);
 		break;
 	default:
+	#ifdef WITH_ASSIMP
 		CGoGNout << "TYPE: ASSIMP" << CGoGNendl;
 		return importASSIMP(filename, attrNames);
+	#else
+		CGoGNout << "unsupported file type"<< CGoGNendl;		
+	#endif
 		break;
 	}
 	return false;
@@ -984,7 +989,7 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 }
 
 
-
+#ifdef WITH_ASSIMP
 template<typename PFP>
 void MeshTablesSurface<PFP>::extractMeshRec(AttributeContainer& container, AttributeHandler<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo)
 {
@@ -1038,6 +1043,7 @@ void MeshTablesSurface<PFP>::extractMeshRec(AttributeContainer& container, Attri
 	*trafo = prev;
 }
 
+
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importASSIMP(const std::string& filename, std::vector<std::string>& attrNames)
 {
@@ -1060,6 +1066,7 @@ bool MeshTablesSurface<PFP>::importASSIMP(const std::string& filename, std::vect
 
 	return true;
 }
+#endif
 
 template<typename PFP>
 bool MeshTablesSurface<PFP>::mergeCloseVertices()

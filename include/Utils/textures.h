@@ -28,8 +28,8 @@
 #include "Geometry/vector_gen.h"
 
 #include <GL/gl.h>
-#include <IL/ilu.h>
 #include <string>
+#include <QImage>
 
 
 namespace CGoGN
@@ -192,7 +192,7 @@ public:
 
 protected:
 	/// id of image for DevIL
-	ILuint m_ilName;
+	QImage* m_qimg;
 
 	template <typename TYPEDOUBLE>
 	TYPE applyFilterOneTexel(const Filter<DIM>& filter, const COORD& t) const;
@@ -234,8 +234,6 @@ public:
 	/// load from file
 	void save(const std::string& filename);
 
-	/// delete image and IL associated data
-	void cleanIL();
 
 	/**
 	* crop image

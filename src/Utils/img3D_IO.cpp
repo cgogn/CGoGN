@@ -36,7 +36,7 @@ namespace Utils
 
 namespace Img3D_IO
 {
-
+#ifdef PORTED_TO_QIMAGE
 void initIO()
 {
 	ilInit();
@@ -141,7 +141,7 @@ DataType* uncompressZ8(DataType* src, int w, int h, int d)
 
 
 
-void saveBool(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveBool(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// compress image from bool to 8bit pp
 	int nd;
@@ -160,21 +160,14 @@ void saveBool(ILstring filename, unsigned char* data, int w, int h, int d, float
 
 	// save image2D
 
-	ILuint imgName;
-	ilGenImages(1,&imgName);
-	ilBindImage(imgName);
-	ILuint hh = (h*nd)+1;
-	ilTexImage(w,hh,1,1,IL_LUMINANCE,IL_UNSIGNED_BYTE,dat_comp);
-
-	ilEnable(IL_FILE_OVERWRITE);
-	ilSaveImage(filename);
-	ilDeleteImages(1,&imgName);
-	delete[] dat_comp;
-
+	int hh = (h*nd)+1;
+	QImage img(dat_comp, w, hh, Q, QImage::Format_Indexed8);
+	img.save(filename, QImage::Format_Indexed8);
+		
 }
 
 
-unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+unsigned char* loadVal_8(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
 
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
@@ -189,8 +182,14 @@ unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, f
 	h = ilGetInteger(IL_IMAGE_HEIGHT);
 	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
 
+	QImage img(filename, QImage::Format_Indexed8);
+	w = img->width();
+	h = img.height();
+	int bpp = img.depth();
+
+
 	// image OK ?
-	if ((bpp!=1))
+	if ((bpp!=8))
 		return NULL;
 
 	unsigned char* ptr=ilGetData();
@@ -233,11 +232,7 @@ unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, f
 
 
 
-
-
-
-
-unsigned char* loadRGB(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+unsigned char* loadRGB(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilEnable(IL_ORIGIN_SET);
@@ -275,7 +270,7 @@ unsigned char* loadRGB(ILstring filename, int& w, int& h, int &d, float& vx, flo
 }
 
 
-void saveVal(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveVal(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// init image2D
 	ILuint imgName;
@@ -303,7 +298,7 @@ void saveVal(ILstring filename, unsigned char* data, int w, int h, int d, float 
 	ilDeleteImages(1,&imgName);
 }
 
-void saveRGB(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveRGB(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// init image2D
 	ILuint imgName;
@@ -332,8 +327,9 @@ void saveRGB(ILstring filename, unsigned char* data, int w, int h, int d, float 
 	ilDeleteImages(1,&imgName);
 }
 
-
-unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+/*
+TODO continue porting to Qt ?
+unsigned short* loadVal_16(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilEnable(IL_ORIGIN_SET);
@@ -374,7 +370,7 @@ unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx,
 
 
 
-void saveVal_16(ILstring filename, unsigned short* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveVal_16(const std::string& filename, unsigned short* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// init image2D
 	ILuint imgName;
@@ -403,7 +399,7 @@ void saveVal_16(ILstring filename, unsigned short* data, int w, int h, int d, fl
 }
 
 
-float* loadVal_float(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+float* loadVal_float(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilEnable(IL_ORIGIN_SET);
@@ -441,7 +437,7 @@ float* loadVal_float(ILstring filename, int& w, int& h, int &d, float& vx, float
 }
 
 
-void saveVal_float(ILstring filename, float* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveVal_float(const std::string& filename, float* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// init image2D
 	ILuint imgName;
@@ -468,6 +464,8 @@ void saveVal_float(ILstring filename, float* data, int w, int h, int d, float vx
 	ilSaveImage(filename);
 	ilDeleteImages(1,&imgName);
 }
+*/
+#endif
 
 } //namespace img3D_IO
 

@@ -41,6 +41,8 @@ namespace Img3D_IO
 	*/
 	enum TYPEIMG {BOOL8=1, VAL8, RGB8, VAL16, VALFLOAT};
 
+#ifdef PORTED_TO_QIMAGE
+
 	/**
 	* Initialization of IO
 	* Necessary before any other call
@@ -60,7 +62,7 @@ namespace Img3D_IO
 	* @param tag image tag (reference out)
 	* @return a pointer on the image data (that have been allocated by function)
 	*/
-//	unsigned char* loadBool(char* filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag);
+	unsigned char* loadBool(char* filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag);
 
 	/**
 	* Save bool image (0/255) 
@@ -77,7 +79,7 @@ namespace Img3D_IO
 	* @param vz voxel size z 
 	* @param tag image tag  
 	*/
-	void saveBool(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag);
+	void saveBool(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag);
 
 	/**
 	* Load 8 bits image, if image is boolean compressed, it uncompress it !
@@ -92,7 +94,7 @@ namespace Img3D_IO
 	* @param tag image tag (reference out)
 	* @return a pointer on the image data (that have been allocated by function)
 	*/
-	unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag);
+	unsigned char* loadVal_8(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag);
 
 	/**
 	* Save 8bits val image 
@@ -108,7 +110,7 @@ namespace Img3D_IO
 	* @param vz voxel size z 
 	* @param tag image tag  
 	*/
-	void saveVal(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag);
+	void saveVal(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag);
 
 
 	/**
@@ -124,7 +126,7 @@ namespace Img3D_IO
 	* @param tag image tag (reference out)
 	* @return a pointer on the image data (that have been allocated by function)
 	*/
-	unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag);
+//	unsigned short* loadVal_16(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag);
 
 	/**
 	* Save 16bits val image 
@@ -140,7 +142,7 @@ namespace Img3D_IO
 	* @param vz voxel size z 
 	* @param tag image tag  
 	*/
-	void saveVal_16(ILstring filename, unsigned short* data, int w, int h, int d, float vx, float vy, float vz, int tag);
+//	void saveVal_16(const std::string& filename, unsigned short* data, int w, int h, int d, float vx, float vy, float vz, int tag);
 
 	/**
 	* Load float value image 
@@ -155,7 +157,7 @@ namespace Img3D_IO
 	* @param tag image tag (reference out)
 	* @return a pointer on the image data (that have been allocated by function)
 	*/
-	float* loadVal_float(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& id);
+//	float* loadVal_float(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& id);
 
 	/**
 	* Save float val image 
@@ -171,7 +173,7 @@ namespace Img3D_IO
 	* @param vz voxel size z 
 	* @param tag image tag  
 	*/
-	void saveVal_float(ILstring filename, float* data, int w, int h, int d, float vx, float vy, float vz, int tag);
+//	void saveVal_float(const std::string& filename, float* data, int w, int h, int d, float vx, float vy, float vz, int tag);
 
 
 	/**
@@ -187,7 +189,7 @@ namespace Img3D_IO
 	* @param tag image tag (reference out)
 	* @return a pointer on the image data (that have been allocated by function)
 	*/
-	unsigned char* loadRGB(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& id);
+	unsigned char* loadRGB(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& id);
 
 	/**
 	* Save RGB 8 bits image 
@@ -203,7 +205,8 @@ namespace Img3D_IO
 	* @param vz voxel size z 
 	* @param tag image tag  
 	*/
-	void saveRGB(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag);
+	void saveRGB(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag);
+#endif
 
 } //namespace
 } //namespace

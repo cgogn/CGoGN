@@ -136,7 +136,7 @@ if(BLAS_COMPLEX16)
 endif()
   
 
-add_library(blas ${SHARED_OR_STATIC} ${ALLOBJ})
+add_library(blas ${ALLOBJ})
 if(UNIX)
   target_link_libraries(blas m)
 endif()

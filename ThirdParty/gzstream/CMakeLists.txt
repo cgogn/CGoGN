@@ -10,4 +10,4 @@ file(
 	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
 
-add_library( gzstream ${SHARED_OR_STATIC} ${source_files} )
+add_library( gzstream ${source_files} )
