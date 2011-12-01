@@ -274,22 +274,125 @@ void MyQT::cb_keyPress(int code)
 	}
 }
 
+Dart embedCube()
+{
+	Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(myMap,6);
 
+	myMap.closeMap();
+
+	Dart dres = d;
+	position[d] = PFP::VEC3(0,0,0);
+	position[myMap.phi1(d)] = PFP::VEC3(1,0,0);
+	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(1,0,1);
+	position[myMap.phi_1(d)] = PFP::VEC3(0,0,1);
+	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
+	position[d] = PFP::VEC3(1,1,0);
+	position[myMap.phi1(d)] = PFP::VEC3(0,1,0);
+	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(0,1,1);
+	position[myMap.phi_1(d)] = PFP::VEC3(1,1,1);
+
+	return myMap.phi2(myMap.phi1(dres));
+}
+
+Dart embedCube2()
+{
+	Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(myMap,6);
+
+	myMap.closeMap();
+
+	Dart dres = d;
+	position[d] = PFP::VEC3(2,0,0);
+	position[myMap.phi1(d)] = PFP::VEC3(3,0,0);
+	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(3,0,1);
+	position[myMap.phi_1(d)] = PFP::VEC3(2,0,1);
+	d = myMap.phi_1(myMap.phi2(myMap.phi_1(myMap.phi_1(myMap.phi2(myMap.phi_1(d))))));
+	position[d] = PFP::VEC3(3,1,0);
+	position[myMap.phi1(d)] = PFP::VEC3(2,1,0);
+	position[myMap.phi1(myMap.phi1(d))] = PFP::VEC3(2,1,1);
+	position[myMap.phi_1(d)] = PFP::VEC3(3,1,1);
+
+	return myMap.phi2(myMap.phi_1(dres));
+}
 
 int main(int argc, char **argv)
 {
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	Dart d1 = embedCube() ;
+	Dart d2 = embedCube2() ;
 
-	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
-	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
+	Dart dd = myMap.phi2(d1) ;
 
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
 
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
-	int nb=3;
-	if (argc>1)
-		nb = atoi(argv[1]);
-	dglobal = prim.hexaGrid_topo(nb,nb,nb);
-	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+	myMap.sewVolumes(d1, d2);
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	myMap.mergeVolumes(d1) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	std::vector<Dart> v ;
+	v.push_back(dd) ;
+	dd = myMap.phi1(myMap.phi2(myMap.phi1(dd))) ;
+	v.push_back(dd) ;
+	dd = myMap.phi1(myMap.phi2(myMap.phi1(dd))) ;
+	v.push_back(dd) ;
+	dd = myMap.phi1(myMap.phi2(myMap.phi1(dd))) ;
+	v.push_back(dd) ;
+
+	myMap.splitVolume(v) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	Dart f = myMap.phi2(v.front()) ;
+	Dart f3 = myMap.phi3(f) ;
+	myMap.unsewVolumes(f) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	myMap.sewVolumes(f, f3) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	myMap.splitFace(f, myMap.phi1(myMap.phi1(f))) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	PFP::VEC3 p = position[f] + position[myMap.phi_1(f)] ;
+	p /= 2.0 ;
+	myMap.cutEdge(myMap.phi_1(f)) ;
+	position[myMap.phi_1(f)] = p ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	myMap.uncutEdge(myMap.phi_1(myMap.phi_1(f))) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+	myMap.deleteVolume(f) ;
+
+	myMap.check() ;
+	std::cout << "nb darts -> " << myMap.getNbDarts() << std::endl ;
+
+//	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+//
+//	int nb=3;
+//	if (argc>1)
+//		nb = atoi(argv[1]);
+//	dglobal = prim.hexaGrid_topo(nb,nb,nb);
+//	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+//
+//	myMap.closeMap();
 
     // un peu d'interface
 	QApplication app(argc, argv);

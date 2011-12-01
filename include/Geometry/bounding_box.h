@@ -124,5 +124,5 @@ class BoundingBox
 
 } // namespace CGoGN
 
-#include "bounding_box.hpp"
+#include "Geometry/bounding_box.hpp"
 #endif

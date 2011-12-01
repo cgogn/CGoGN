@@ -103,7 +103,7 @@ inline Dart Map3::alpha0(Dart d)
 
 inline Dart Map3::alpha1(Dart d)
 {
-	return phi_1(phi3(d)) ;
+	return phi3(phi_1(d)) ;
 }
 
 inline Dart Map3::alpha2(Dart d)

@@ -73,7 +73,7 @@ public:
 		}
 
 		current = m.begin() ;
-		while(m.isBoundaryMarked(current) || !m_good(current))
+		while(current != m.end() && (m.isBoundaryMarked(current) || !m_good(current)))
 			m.next(current) ;
 
 		if(current == m.end())

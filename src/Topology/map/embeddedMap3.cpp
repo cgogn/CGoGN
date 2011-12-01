@@ -195,7 +195,8 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 
 void EmbeddedMap3::unsewVolumes(Dart d)
 {
-	Dart dd = phi1(phi3(d));
+	Dart dd = alpha1(d);
+
 	Map3::unsewVolumes(d);
 
 	unsigned int fEmb = EMBNULL ;
@@ -212,6 +213,13 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 			{
 				embedNewCell(VERTEX, dd);
 				copyCell(VERTEX, dd, dit);
+				copyDartEmbedding(VERTEX, alpha1(dit), dit) ;
+			}
+			else
+			{
+				unsigned int vEmb = getEmbedding(VERTEX, dit) ;
+				setDartEmbedding(VERTEX, alpha_2(dit), vEmb) ;
+				setDartEmbedding(VERTEX, alpha_2(dd), vEmb) ;
 			}
 		}
 
@@ -224,6 +232,13 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 			{
 				embedNewCell(EDGE, dd);
 				copyCell(EDGE, dd, dit);
+				copyDartEmbedding(EDGE, phi3(dit), dit) ;
+			}
+			else
+			{
+				unsigned int eEmb = getEmbedding(EDGE, dit) ;
+				setDartEmbedding(EDGE, phi3(dit), eEmb) ;
+				setDartEmbedding(EDGE, alpha_2(dit), eEmb) ;
 			}
 		}
 
@@ -292,7 +307,7 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 
 	if(isOrbitEmbedded(VOLUME))
 	{
-		Dart v = vd.begin() ;
+		Dart v = vd.front() ;
 		Dart v23 = alpha2(v) ;
 		embedNewCell(VOLUME, v23) ;
 		copyCell(VOLUME, v23, v) ;
@@ -302,44 +317,42 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 {
 	unsigned int nbF = Map3::closeHole(d, forboundary) ;
-	Dart d3 = phi3(d) ;
 
 	DartMarkerStore mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
-	visitedFaces.push_back(d);		// Start with the face of d
+	visitedFaces.push_back(phi3(d));// Start with the face of d
+	mark.markOrbit(ORIENTED_FACE, phi3(d)) ;
 
 	// For every face added to the list
 	for (std::vector<Dart>::iterator it = visitedFaces.begin(); it != visitedFaces.end(); ++it)
 	{
-		if (!mark.isMarked(*it))	// Face has not been visited yet
+		Dart f = *it ;
+		do
 		{
-			Dart f = *it ;
-			do
+			if(isOrbitEmbedded(VERTEX))
 			{
-				mark.mark(f);
+				copyDartEmbedding(VERTEX, f, alpha1(f)) ;
+			}
+			if(isOrbitEmbedded(EDGE))
+			{
+				copyDartEmbedding(EDGE, f, phi3(f)) ;
+			}
+			if(isOrbitEmbedded(FACE))
+			{
+				copyDartEmbedding(FACE, f, phi3(f)) ;
+			}
 
-				if(isOrbitEmbedded(VERTEX))
-				{
-					copyDartEmbedding(VERTEX, f, alpha1(f)) ;
-				}
-				if(isOrbitEmbedded(EDGE))
-				{
-					copyDartEmbedding(EDGE, f, phi3(f)) ;
-				}
-				if(isOrbitEmbedded(FACE))
-				{
-					copyDartEmbedding(FACE, f, phi3(f)) ;
-				}
+			Dart adj = phi2(f);	// Get adjacent face
+			if (!mark.isMarked(adj))
+			{
+				visitedFaces.push_back(adj);	// Add it
+				mark.markOrbit(ORIENTED_FACE, adj) ;
+			}
 
-				Dart adj = phi2(f);	// Get adjacent face
-				if (!mark.isMarked(adj))
-					visitedFaces.push_back(adj);	// Add it
-
-				f = phi1(f) ;
-			} while(f != *it) ;
-		}
+			f = phi1(f) ;
+		} while(f != *it) ;
 	}
 
 	return nbF ;

@@ -24,7 +24,6 @@
 
 #include "Topology/map/map2.h"
 #include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2CC.h"
 
 namespace CGoGN
 {
@@ -132,35 +131,35 @@ void Map2::deleteCC(Dart d)
 	std::vector<Dart> visited;
 	visited.reserve(1024) ;
 	visited.push_back(d);
-	std::vector<Dart>::iterator it;
+	mark.mark(d) ;
 
-	for (it = visited.begin(); it != visited.end(); ++it)
+	for (std::vector<Dart>::iterator it = visited.begin(); it != visited.end(); ++it)
 	{
-		if (!mark.isMarked(*it))
+		Dart d1 = phi1(*it) ;
+		if(!mark.isMarked(d1))
 		{
-			Dart d1 = phi1(*it) ;
-			if(!mark.isMarked(d1))
-			{
-				mark.mark(d1);
-				visited.push_back(d1) ;
-			}
-			Dart d2 = phi2(*it) ;
-			if(!mark.isMarked(d2))
-			{
-				mark.mark(d2);
-				visited.push_back(d2) ;
-			}
+			visited.push_back(d1) ;
+			mark.mark(d1);
+		}
+		Dart d2 = phi2(*it) ;
+		if(!mark.isMarked(d2))
+		{
+			visited.push_back(d2) ;
+			mark.mark(d2);
 		}
 	}
 
-	for(it = visited.begin(); it != visited.end(); ++it)
+	for(std::vector<Dart>::iterator it = visited.begin(); it != visited.end(); ++it)
 		deleteDart(*it) ;
 }
 
 void Map2::fillHole(Dart d)
 {
-	assert(isBoundaryMarked(d)) ;
-	boundaryUnmarkOrbit(FACE, d) ;
+	assert(isBoundaryEdge(d)) ;
+	Dart dd = d ;
+	if(!isBoundaryMarked(dd))
+		dd = phi2(dd) ;
+	boundaryUnmarkOrbit(FACE, dd) ;
 }
 
 /*! @name Topological Operators
@@ -757,7 +756,7 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 	// For every face added to the list
 	for (std::vector<Dart>::iterator it = visitedFaces.begin(); !found && it != visitedFaces.end(); ++it)
 	{
-		if (!isBoundaryMarked(*it) && !mark.isMarked(*it))	// Face has not been visited yet
+		if (!mark.isMarked(*it))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
 			found = foreach_dart_of_oriented_face(*it, f);
@@ -769,9 +768,9 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 				Dart e = *it ;
 				do
 				{
-					mark.mark(e);					// Mark
-					Dart adj = phi2(e);				// Get adjacent face
-					if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
+					mark.mark(e);				// Mark
+					Dart adj = phi2(e);			// Get adjacent face
+					if (!mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
 					e = phi1(e);
 				} while(e != *it);
