@@ -259,24 +259,15 @@ bool EmbeddedMap2::flipBackEdge(Dart d)
 
 void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
-	// for fixed point construction (import & primitives)
-	if (!withBoundary)
-		return Map2::sewFaces(d, e, false) ;
+//	if (!withBoundary)
+//		return Map2::sewFaces(d, e, false) ;
 
-	unsigned int vEmb1 = EMBNULL ;
-	unsigned int vEmb2 = EMBNULL ;
-	if (isOrbitEmbedded(VERTEX))
-	{
-		vEmb1 = getEmbedding(VERTEX, d) ;
-		vEmb2 = getEmbedding(VERTEX, phi1(d)) ;
-	}
-
-	Map2::sewFaces(d, e, true) ;
+	Map2::sewFaces(d, e, withBoundary) ;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
-		embedOrbit(VERTEX, d, vEmb1) ;
-		embedOrbit(VERTEX, e, vEmb2) ;
+		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d)) ;
+		embedOrbit(VERTEX, e, getEmbedding(VERTEX, phi1(d))) ;
 	}
 
 	if (isOrbitEmbedded(EDGE))
@@ -343,6 +334,7 @@ void EmbeddedMap2::splitFace(Dart d, Dart e)
 	}
 	if (isOrbitEmbedded(FACE))
 	{
+		copyDartEmbedding(FACE, phi_1(d), d) ;
 		embedNewCell(FACE, e) ;
 		copyCell(FACE, e, d) ;
 	}
@@ -367,7 +359,9 @@ bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
 {
 	std::vector<Dart> darts ;
 	std::vector<unsigned int> vEmb ;
+	vEmb.reserve(32) ;
 	std::vector<unsigned int> eEmb ;
+	eEmb.reserve(32) ;
 	Dart fit = d ;
 	do
 	{
@@ -448,6 +442,15 @@ bool EmbeddedMap2::check()
 			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, phi2(d)))
 			{
 				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
+				return false ;
+			}
+		}
+
+		if (isOrbitEmbedded(ORIENTED_FACE))
+		{
+			if (getEmbedding(ORIENTED_FACE, d) != getEmbedding(ORIENTED_FACE, phi1(d)))
+		{
+				CGoGNout << "Check: different embeddings on oriented face" << CGoGNendl ;
 				return false ;
 			}
 		}

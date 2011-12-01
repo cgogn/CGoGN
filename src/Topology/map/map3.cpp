@@ -175,11 +175,11 @@ bool Map3::uncutEdge(Dart d)
 void Map3::splitFace(Dart d, Dart e)
 {
 	assert(d != e && sameOrientedFace(d, e)) ;
-	Map2::splitFace(d, e);
 
 	Dart dd = phi1(phi3(d));
 	Dart ee = phi1(phi3(e));
 
+	Map2::splitFace(d, e);
 	Map2::splitFace(dd, ee);
 
 	phi3sew(phi_1(d), phi_1(ee));
@@ -276,10 +276,9 @@ void Map3::unsewVolumes(Dart d)
 
 bool Map3::mergeVolumes(Dart d)
 {
-	if(!isBoundaryFace(d))
+	if(!Map3::isBoundaryFace(d))
 	{
-		Dart e = phi3(d);
-		Map2::mergeVolumes(d, e); // merge the two volumes along common face
+		Map2::mergeVolumes(d, phi3(d)); // merge the two volumes along common face
 		return true ;
 	}
 	return false ;
@@ -287,6 +286,8 @@ bool Map3::mergeVolumes(Dart d)
 
 void Map3::splitVolume(std::vector<Dart>& vd)
 {
+	assert(checkSimpleOrientedPath(vd)) ;
+
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 

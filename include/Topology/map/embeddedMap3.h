@@ -62,7 +62,7 @@ public:
 	/*!
 	 *
 	 */
-	virtual void sewVolumes(Dart d, Dart e);
+	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
 	/*!
 	 *

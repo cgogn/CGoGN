@@ -55,15 +55,27 @@ void EmbeddedMap3::cutEdge(Dart d)
 		copyCell(EDGE, nd, d) ;
 	}
 
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded(ORIENTED_FACE))
 	{
 		Dart f = d;
 		do
 		{
 			Dart nd = phi1(f) ;
-			copyDartEmbedding(FACE, nd, f);
-			Dart e = phi2(nd);
-			copyDartEmbedding(FACE, phi1(e), e);
+			copyDartEmbedding(ORIENTED_FACE, nd, f);
+			Dart e = phi3(nd);
+			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
+			f = alpha2(f);
+		} while(f != d);
+	}
+
+	if(isOrbitEmbedded(FACE))
+	{
+		Dart f = d;
+		do
+		{
+			unsigned int fEmb = getEmbedding(FACE, f) ;
+			setDartEmbedding(FACE, phi1(f), fEmb);
+			setDartEmbedding(FACE, phi3(f), fEmb);
 			f = alpha2(f);
 		} while(f != d);
 	}
@@ -97,62 +109,67 @@ bool EmbeddedMap3::uncutEdge(Dart d)
 
 void EmbeddedMap3::splitFace(Dart d, Dart e)
 {
-	Map3::splitFace(d,e);
+	Dart dd = phi1(phi3(d));
+	Dart ee = phi1(phi3(e));
+
+	Map3::splitFace(d, e);
 
 	//copy the vertex embedding to new darts (same vertex embedding for all darts)
 	if(isOrbitEmbedded(VERTEX))
 	{
-		copyDartEmbedding(VERTEX, phi2(phi_1(d)), d);
-		copyDartEmbedding(VERTEX, phi2(phi_1(e)), e);
+		copyDartEmbedding(VERTEX, phi_1(e), d);
+		copyDartEmbedding(VERTEX, phi_1(d), e);
+		copyDartEmbedding(VERTEX, phi_1(ee), dd);
+		copyDartEmbedding(VERTEX, phi_1(dd), ee);
+	}
 
-		if(!isBoundaryFace(d))
-		{
-			Dart d3 = phi3(d);
-			Dart e3 = phi3(e);
+	if(isOrbitEmbedded(ORIENTED_FACE))
+	{
+		copyDartEmbedding(ORIENTED_FACE, phi_1(d), d) ;
+		embedNewCell(ORIENTED_FACE, e) ;
+		copyCell(ORIENTED_FACE, e, d) ;
 
-			copyDartEmbedding(VERTEX, phi1(d3), phi1(phi2(phi1(d3))));
-			copyDartEmbedding(VERTEX, phi1(e3), phi1(phi2(phi1(e3))));
-		}
+		copyDartEmbedding(ORIENTED_FACE, phi_1(dd), dd) ;
+		embedNewCell(ORIENTED_FACE, ee) ;
+		copyCell(ORIENTED_FACE, ee, dd) ;
 	}
 
 	//add a new face embedding to the created face
 	if(isOrbitEmbedded(FACE))
 	{
-		embedNewCell(FACE, phi2(phi_1(d)));
-		copyCell(FACE, phi2(phi_1(d)), d);
+		unsigned int fEmb = getEmbedding(FACE, d) ;
+		setDartEmbedding(FACE, phi_1(d), fEmb) ;
+		setDartEmbedding(FACE, phi3(phi_1(d)), fEmb) ;
+		embedNewCell(FACE, e);
+		copyCell(FACE, e, d);
 	}
 
 	//copy the volume embedding to new darts (same volume embedding for all darts on the faces)
 	if(isOrbitEmbedded(VOLUME))
 	{
-		copyDartEmbedding(VOLUME, phi_1(d),  d);
-		copyDartEmbedding(VOLUME, phi2(phi_1(d)),  d);
+		unsigned int vEmb1 = getEmbedding(VOLUME, d) ;
+		setDartEmbedding(VOLUME, phi_1(d),  vEmb1);
+		setDartEmbedding(VOLUME, phi_1(e),  vEmb1);
 
-		if(!isBoundaryFace(d))
-		{
-			Dart d3 = phi3(d);
-
-			copyDartEmbedding(VOLUME, phi1(d3), d3);
-			copyDartEmbedding(VOLUME, phi2(phi1(d3)), d3);
-		}
+		unsigned int vEmb2 = getEmbedding(VOLUME, dd) ;
+		setDartEmbedding(VOLUME, phi_1(dd),  vEmb2);
+		setDartEmbedding(VOLUME, phi_1(ee),  vEmb2);
 	}
-
 }
 
-void EmbeddedMap3::sewVolumes(Dart d, Dart e)
+void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 {
 	//topological sewing
-	Map3::sewVolumes(d,e);
+	Map3::sewVolumes(d, e, withBoundary);
 
 	//embed the vertex orbits from the oriented face with dart e
 	//with vertex orbits value from oriented face with dart d
 	if (isOrbitEmbedded(VERTEX))
 	{
-		unsigned int vEmb1 = EMBNULL ;
 		Dart dd = d ;
-		do {
-			vEmb1 = getEmbedding(VERTEX, dd);
-			embedOrbit(VERTEX, dd, vEmb1) ;
+		do
+		{
+			embedOrbit(VERTEX, dd, getEmbedding(VERTEX, dd)) ;
 			dd = phi1(dd) ;
 		} while(dd != d) ;
 	}
@@ -161,11 +178,10 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e)
 	//for all the face
 	if (isOrbitEmbedded(EDGE))
 	{
-		unsigned int vEmb1 = EMBNULL ;
 		Dart dd = d ;
-		do {
-			vEmb1 = getEmbedding(EDGE, d);
-			embedOrbit(EDGE, d, vEmb1) ;
+		do
+		{
+			embedOrbit(EDGE, d, getEmbedding(EDGE, d)) ;
 			dd = phi1(dd) ;
 		} while(dd != d) ;
 	}
@@ -173,52 +189,57 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e)
 	//embed the face orbit from the volume sewn
 	if (isOrbitEmbedded(FACE))
 	{
-		unsigned int vEmb1 = getEmbedding(FACE, d);
-		embedOrbit(FACE, e, vEmb1) ;
+		embedOrbit(FACE, e, getEmbedding(FACE, d)) ;
 	}
 }
 
 void EmbeddedMap3::unsewVolumes(Dart d)
 {
-	if(!Map3::isBoundaryFace(d))
+	Dart dd = phi1(phi3(d));
+	Map3::unsewVolumes(d);
+
+	unsigned int fEmb = EMBNULL ;
+	if(isOrbitEmbedded(FACE))
+		fEmb = getEmbedding(FACE, d) ;
+
+	Dart dit = d;
+	do
 	{
-		Dart dd = phi1(phi3(d));
-		Map3::unsewVolumes(d);
-
-		Dart dit = d;
-		do
+		// embed the unsewn vertex orbit with the vertex embedding if it is deconnected
+		if(isOrbitEmbedded(VERTEX))
 		{
-			//embed the unsewn vertex orbit with the vertex embedding if it is deconnected
-			if(isOrbitEmbedded(VERTEX))
+			if(!sameVertex(dit, dd))
 			{
-				if(!sameVertex(dit,dd))
-				{
-					embedNewCell(VERTEX, dd);
-					copyCell(VERTEX, dd, dit);
-				}
+				embedNewCell(VERTEX, dd);
+				copyCell(VERTEX, dd, dit);
 			}
-
-			dd = phi_1(dd);
-
-			//embed the unsewn edge with the edge embedding if it is deconnected
-			if(isOrbitEmbedded(EDGE))
-			{
-				if(!sameEdge(dit,dd))
-				{
-					embedNewCell(EDGE, dd);
-					copyCell(EDGE, dd, dit);
-				}
-			}
-
-			dit = phi1(dit);
-		} while(dit!=d);
-
-		//embed the unsewn face with the face embedding
-		if (isOrbitEmbedded(FACE))
-		{
-			embedNewCell(FACE, dd);
-			copyCell(FACE, dd, d);
 		}
+
+		dd = phi_1(dd);
+
+		// embed the unsewn edge with the edge embedding if it is deconnected
+		if(isOrbitEmbedded(EDGE))
+		{
+			if(!sameEdge(dit, dd))
+			{
+				embedNewCell(EDGE, dd);
+				copyCell(EDGE, dd, dit);
+			}
+		}
+
+		if(isOrbitEmbedded(FACE))
+		{
+			setDartEmbedding(FACE, phi3(dit), fEmb) ;
+		}
+
+		dit = phi1(dit);
+	} while(dit != d);
+
+	// embed the unsewn face with the face embedding
+	if (isOrbitEmbedded(FACE))
+	{
+		embedNewCell(FACE, dd);
+		copyCell(FACE, dd, d);
 	}
 }
 
@@ -230,8 +251,7 @@ bool EmbeddedMap3::mergeVolumes(Dart d)
 	{
 		if (isOrbitEmbedded(VOLUME))
 		{
-				unsigned int vEmb = getEmbedding(VOLUME, d2);
-				embedOrbit(VOLUME, d2, vEmb) ;
+			embedOrbit(VOLUME, d2, getEmbedding(VOLUME, d2)) ;
 		}
 		return true;
 	}
@@ -242,33 +262,87 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 {
 	Map3::splitVolume(vd);
 
-	//follow the edge path a second time to embed the vertex, edge and volume orbits
+	// follow the edge path a second time to embed the vertex, edge and volume orbits
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
 		Dart dit = *it;
-		Dart dit3 = alpha2(dit);
+		Dart dit23 = alpha2(dit);
 
-		//embed the vertex embedded from the origin volume to the new darts
+		// embed the vertex embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(VERTEX))
 		{
-			copyDartEmbedding(VERTEX, dit3, dit);
-			copyDartEmbedding(VERTEX, phi2(dit), phi2(dit3));
+			copyDartEmbedding(VERTEX, dit23, dit);
+			copyDartEmbedding(VERTEX, phi2(dit), phi1(dit));
 		}
 
-		//embed the edge embedded from the origin volume to the new darts
+		// embed the edge embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(EDGE))
 		{
-			copyDartEmbedding(EDGE, dit3, dit);
-			copyDartEmbedding(EDGE, phi2(dit), dit);
+			unsigned int eEmb = getEmbedding(EDGE, dit) ;
+			setDartEmbedding(EDGE, dit23, eEmb);
+			setDartEmbedding(EDGE, phi2(dit), eEmb);
 		}
 
-		//embed the volume embedded from the origin volume to the new darts
+		// embed the volume embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(VOLUME))
 		{
-			copyDartEmbedding(VOLUME, dit3, dit);
 			copyDartEmbedding(VOLUME, phi2(dit), dit);
 		}
 	}
+
+	if(isOrbitEmbedded(VOLUME))
+	{
+		Dart v = vd.begin() ;
+		Dart v23 = alpha2(v) ;
+		embedNewCell(VOLUME, v23) ;
+		copyCell(VOLUME, v23, v) ;
+	}
+}
+
+unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
+{
+	unsigned int nbF = Map3::closeHole(d, forboundary) ;
+	Dart d3 = phi3(d) ;
+
+	DartMarkerStore mark(*this);	// Lock a marker
+
+	std::vector<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.reserve(1024) ;
+	visitedFaces.push_back(d);		// Start with the face of d
+
+	// For every face added to the list
+	for (std::vector<Dart>::iterator it = visitedFaces.begin(); it != visitedFaces.end(); ++it)
+	{
+		if (!mark.isMarked(*it))	// Face has not been visited yet
+		{
+			Dart f = *it ;
+			do
+			{
+				mark.mark(f);
+
+				if(isOrbitEmbedded(VERTEX))
+				{
+					copyDartEmbedding(VERTEX, f, alpha1(f)) ;
+				}
+				if(isOrbitEmbedded(EDGE))
+				{
+					copyDartEmbedding(EDGE, f, phi3(f)) ;
+				}
+				if(isOrbitEmbedded(FACE))
+				{
+					copyDartEmbedding(FACE, f, phi3(f)) ;
+				}
+
+				Dart adj = phi2(f);	// Get adjacent face
+				if (!mark.isMarked(adj))
+					visitedFaces.push_back(adj);	// Add it
+
+				f = phi1(f) ;
+			} while(f != *it) ;
+		}
+	}
+
+	return nbF ;
 }
 
 bool EmbeddedMap3::check()
@@ -278,23 +352,56 @@ bool EmbeddedMap3::check()
 		return false ;
 
 	std::cout << "Check: embedding begin" << std::endl ;
-	DartMarker mv(*this);
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		if(isOrbitEmbedded(VERTEX))
 		{
-			if(!mv.isMarked(d))
+			if( getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha1(d)) ||
+					getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha2(d)) )
 			{
-				mv.markOrbit(VERTEX, d);
-				unsigned int emb = getEmbedding(VERTEX, d);
-				FunctorCheckEmbedding<Map3> fce(*this, VERTEX, emb);
-				if(foreach_dart_of_orbit(VERTEX, d, fce))
-				{
-					std::cout << "Embedding Check : different embeddings on vertex" << std::endl;
-				}
+				std::cout << "Embedding Check : different embeddings on vertex" << std::endl ;
+				return false ;
 			}
 		}
 
+		if(isOrbitEmbedded(EDGE))
+		{
+			if( getEmbedding(EDGE, d) != getEmbedding(EDGE, phi2(d)) ||
+					getEmbedding(EDGE, d) != getEmbedding(EDGE, phi3(d)) )
+			{
+				std::cout << "Embedding Check : different embeddings on edge" << std::endl ;
+				return false ;
+			}
+		}
+
+		if (isOrbitEmbedded(ORIENTED_FACE))
+		{
+			if (getEmbedding(ORIENTED_FACE, d) != getEmbedding(ORIENTED_FACE, phi1(d)))
+			{
+				CGoGNout << "Check: different embeddings on oriented face" << CGoGNendl ;
+				return false ;
+			}
+		}
+
+		if (isOrbitEmbedded(FACE))
+		{
+			if( getEmbedding(FACE, d) != getEmbedding(FACE, phi1(d)) ||
+					getEmbedding(FACE, d) != getEmbedding(FACE, phi3(d)) )
+			{
+				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
+				return false ;
+			}
+		}
+
+		if (isOrbitEmbedded(VOLUME))
+		{
+			if( getEmbedding(VOLUME, d) != getEmbedding(VOLUME, phi1(d)) ||
+					getEmbedding(VOLUME, d) != getEmbedding(VOLUME, phi2(d)) )
+			{
+				CGoGNout << "Check: different embeddings on volume" << CGoGNendl ;
+				return false ;
+			}
+		}
 	}
 	std::cout << "Check: embedding ok" << std::endl ;
 	return true ;

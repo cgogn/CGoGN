@@ -474,7 +474,7 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 {
 	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
 
-	if (isBoundaryFace(d) || isBoundaryFace(e))
+	if (Map2::isBoundaryFace(d) || Map2::isBoundaryFace(e))
 		return false;
 
 	// First traversal of both faces to check the face sizes
@@ -705,6 +705,21 @@ bool Map2::check()
 	}
 	CGoGNout << "Check: topology ok" << CGoGNendl;
 	return true;
+}
+
+bool Map2::checkSimpleOrientedPath(std::vector<Dart>& vd)
+{
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		std::vector<Dart>::iterator prev ;
+		if(it == vd.begin())
+			prev = vd.end() - 1 ;
+		else
+			prev = it - 1 ;
+		if(!sameVertex(*it, phi1(*prev)))
+			return false ;
+	}
+	return true ;
 }
 
 /*! @name Cell Functors

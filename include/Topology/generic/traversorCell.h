@@ -153,6 +153,14 @@ public:
 };
 
 template <typename MAP>
+class TraversorOF : public TraversorCell<MAP>
+{
+public:
+	TraversorOF(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, ORIENTED_FACE, good, thread)
+	{}
+};
+
+template <typename MAP>
 class TraversorF : public TraversorCell<MAP>
 {
 public:

@@ -364,6 +364,11 @@ public:
 	 * Should be executed after import
 	 */
 	virtual bool check();
+
+	/**
+	 * Check if a serie of darts is an oriented simple close path
+	 */
+	virtual bool checkSimpleOrientedPath(std::vector<Dart>& vd);
 	//@}
 
 	/*! @name Cell Functors
