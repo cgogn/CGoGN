@@ -31,6 +31,12 @@
 #include <string>
 #include <QImage>
 
+#ifndef WITH_QT
+#error "Texture class need Qt for loading images, please recompile CGoGN with Qt support"
+#endif
+
+// TODO externaliser le chargement d'image pour enlever la dependance Qt ??
+
 
 namespace CGoGN
 {

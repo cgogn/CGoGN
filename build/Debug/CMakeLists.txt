@@ -67,24 +67,29 @@ file(
 	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
 )
 
-#IF(WIN32)
-add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
+IF(WIN32)
+	add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/Release/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_srcD} )
-#ELSE(WIN32)
-#add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
-#	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#	SOURCES ${shaders_srcD} 
-#)
-#ENDIF(WIN32)
+ELSE(WIN32)
+	add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	SOURCES ${shaders_srcD} 
+)
+ENDIF(WIN32)
+
 
 
 file(
-	GLOB
+	GLOB		# WARNING NO MORE RECURSE TO AVOID TAKING QT FILES
 	files_utils
 	${CGoGN_ROOT_DIR}/src/Utils/*.cpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.hpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.h
+	
+	${CGoGN_ROOT_DIR}/src/Utils/Shaders/*.cpp
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.hpp
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.h
 )
 
 IF(WITH_QT)
@@ -102,9 +107,7 @@ IF(WITH_QT)
 	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
 	add_library( utilsD ${files_utils_withQt} )
-	MESSAGE(STATUS "BIG PB !!!!!!!!!!!!!!!!")
 ELSE(WITH_QT)
-	MESSAGE(STATUS "FILES_UTILS:" ${files_utils})
 	add_library( utilsD ${files_utils} )
 ENDIF (WITH_QT)
 

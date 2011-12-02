@@ -11,12 +11,6 @@ ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOTOPOWARNING")
 ENDIF(WIN32)
 
-# FOR Qt4
-#SET(QT_USE_QTOPENGL TRUE)
-#INCLUDE(${QT_USE_FILE})
-#ADD_DEFINITIONS(${QT_DEFINITIONS})
-
-
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CGoGN_ROOT_DIR}/include
@@ -101,11 +95,15 @@ ENDIF(WIN32)
 
 
 file(
-	GLOB
+	GLOB		# WARNING NO MORE RECURSE TO AVOID TAKING QT FILES
 	files_utils
 	${CGoGN_ROOT_DIR}/src/Utils/*.cpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.hpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.h
+
+	${CGoGN_ROOT_DIR}/src/Utils/Shaders/*.cpp
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.hpp
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.h
 )
 
 IF(WITH_QT)
