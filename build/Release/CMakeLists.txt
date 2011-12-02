@@ -108,20 +108,28 @@ file(
 	${CGoGN_ROOT_DIR}/include/Utils/*.h
 )
 
-file(
-	GLOB_RECURSE
-	utils_qt_headers
-	${CGoGN_ROOT_DIR}/include/Utils/qt*.h
-)
-	
-QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
+IF(WITH_QT)
+	file(
+		GLOB_RECURSE
+		${CGoGN_ROOT_DIR}/src/Utils/Qt/*.cpp
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.hpp
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.h
+	)
 
-SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
+	file(
+		GLOB_RECURSE
+		utils_qt_headers
+		${CGoGN_ROOT_DIR}/include/Utils/qt*.h
+	)
+	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
+	SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
+	add_library( utils ${files_utils_withQt} )
+ELSE(WITH_QT)
+	add_library( utils ${files_utils} )
+ENDIF (WITH_QT)
 
-add_library(
-	utils
-	${files_utils_withQt}
-)
+
+
 
 add_dependencies(utils shader_target )
 

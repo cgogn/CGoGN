@@ -10,9 +10,9 @@ SET(CMAKE_BUILD_TYPE Release)
 SET (BUILD_SHARED_LIBS OFF CACHE BOOL 
 	"if used all library are build as shared type (.so /dylib/dll).")
 
-SET (WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp")
-SET (WITH_NUMERICAL ON CACHE BOOL "build CGoGN with numerical libs")
-
+SET (WITH_ASSIMP ON CACHE BOOL "build with Assimp")
+SET (WITH_NUMERICAL ON CACHE BOOL "build with numerical libs")
+SET (WITH_ZINRI ON CACHE BOOL "build with Zinri libs")
 
 IF (APPLE)
 	SET(CMAKE_OSX_ARCHITECTURES x86_64)
@@ -25,15 +25,20 @@ ELSE(WIN32)
 	SET(LIBRARY_OUTPUT_PATH ${CGoGN_ROOT_DIR}/lib/Release)
 ENDIF(WIN32)
 
-add_subdirectory(Zinri Zinri/build)
-add_subdirectory(gzstream gzstream/build)
+
 add_subdirectory(Tools Tools/build)
 
+# add_subdirectory(gzstream gzstream/build)
+
+IF (WITH_ZINRI)
+	add_subdirectory(Zinri Zinri/build)
+ENDIF(WITH_ZINRI)
+
 IF (WITH_ASSIMP)
-	add_subdirectory(Numerical Numerical/build)
+	add_subdirectory(Assimp Assimp/build)
 ENDIF (WITH_ASSIMP)
 
 IF (WITH_NUMERICAL)
-	add_subdirectory(Assimp Assimp/build)
+	add_subdirectory(Numerical Numerical/build)
 ENDIF (WITH_NUMERICAL)
 
