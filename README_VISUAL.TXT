@@ -12,12 +12,13 @@ pour eviter les pb de compilation.
 
 Le plus sur mais plus long est de compiler soi-même Qt et Boost (bon courage)
 
-
 Lancer CMake
 Mettre le chemin de la racine de CGoGN + /ThirdParty pour les sources
-Mettre le chemin de la racine de CGoGN + /ThirdParty/Visual (par exemple) pour le build
+Mettre le chemin de la racine de CGoGN + /ThirdParty/build pour le build
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
+ajouter la variavle CMAKE_PREFIX_PATH contenant le chemine vers windows_dependencies
+Modifier les variables en fonctions de ce que vous voulez compiler (README.TXT de ThirdParty)
 Recliquer sur Configure
 Cliquer sur Generate
 Aller compiler sous visual(en release)
@@ -27,6 +28,7 @@ Mettre le chemin de la racine de CGoGN + /build pour les sources
 Mettre le chemin de la racine de CGoGN + /Visual (par exemple) pour le build
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
+Modifier les variables comme pour ThirdParty
 Recliquer sur Configure
 Cliquer sur Generate
 
@@ -34,6 +36,12 @@ Aller dans Visual et double-cliquer sur CGoGN.sln !!
 
 Pour que les executables fonctionnent ajouter le chemin vers les dll dans la variable d'environnement path
 (ou copier les dll dans un répertoire déjà dans le path)
+
+
+Remarque:
+Si vous voulez utiliser vos propre versions des dépendance (Zlib / glew / Boost / Qt)
+changer le prefix_path (voir ci dessous)
+Attention pour Boost le prefix path ne marche pas (BOOST_ROOT + ...)
 
 
 Compilation 64bits:

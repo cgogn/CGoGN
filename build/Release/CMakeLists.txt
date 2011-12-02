@@ -80,7 +80,7 @@ file(
 
 
 IF(WIN32)
-add_custom_target(shader_target ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_src}
+add_custom_target(shader_target ${CGoGN_ROOT_DIR}/bin/Release/shader_to_h ${shaders_src}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_src} 
 )
