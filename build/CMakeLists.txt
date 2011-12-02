@@ -52,7 +52,7 @@ SET (CGoGN_EXT_LIBS
 IF (WITH_ASSIMP)
 	add_definitions(-DWITH_ASSIMP)	
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ThirdParty/Assimp/include)
-	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} assimp
+	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} assimp)
 ENDIF (WITH_ASSIMP)
 
 IF (WITH_NUMERICAL)
@@ -101,7 +101,5 @@ ELSE(WIN32)
 	add_subdirectory(Release)
 	add_subdirectory(Debug)
 	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
-	if (EXISTS "${CGoGN_ROOT_DIR}/Perso")
-                add_subdirectory(${CGoGN_ROOT_DIR}/Perso Perso)
-	endif (EXISTS "${CGoGN_ROOT_DIR}/Perso")
 ENDIF(WIN32)
+

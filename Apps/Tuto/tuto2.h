@@ -27,9 +27,9 @@
 
 #include <iostream>
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 #include "ui_tuto2.h"
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 #include "Geometry/vector_gen.h"
 

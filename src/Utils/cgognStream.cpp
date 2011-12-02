@@ -23,8 +23,8 @@
  *******************************************************************************/
 
 #include "Utils/cgognStream.h"
-#include "Utils/qtSimple.h"
-#ifndef NO_QT
+#ifdef WITH_QT
+#include "Utils/Qt/qtSimple.h"
 #include <QtGui/QTextEdit>
 #endif
 namespace CGoGN

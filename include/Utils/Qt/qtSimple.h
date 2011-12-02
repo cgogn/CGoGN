@@ -30,7 +30,7 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QtGui>
-#include "Utils/qtgl.h"
+#include "Utils/Qt/qtgl.h"
 #include <set>
 #include <string>
 #include "Geometry/vector_gen.h"

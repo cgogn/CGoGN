@@ -5,13 +5,6 @@ project(geometryAssertD)
 SET(CMAKE_BUILD_TYPE Debug)
 
 
-# FOR Qt4
-
-SET(QT_USE_QTOPENGL TRUE)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
-
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
 	${CGoGN_ROOT_DIR}/include
@@ -40,7 +33,9 @@ target_link_libraries( Geom_intersectionD
 	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
 	
 	
-QT4_WRAP_CPP(concave_rendering_moc concave_rendering.h)
-add_executable( concave_renderingD concave_rendering.cpp ${concave_rendering_moc})
-target_link_libraries( concave_renderingD
-	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
+IF (WITH_QT)
+	QT4_WRAP_CPP(concave_rendering_moc concave_rendering.h)
+	add_executable( concave_renderingD concave_rendering.cpp ${concave_rendering_moc})
+	target_link_libraries( concave_renderingD
+		${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
+ENDIF (WITH_QT)

@@ -25,7 +25,7 @@
 #ifndef _TUTO3_H_
 #define _TUTO3_H_
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 
 // forward definition (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }

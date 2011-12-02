@@ -12,9 +12,9 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 # FOR Qt4
-SET(QT_USE_QTOPENGL TRUE)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+#SET(QT_USE_QTOPENGL TRUE)
+#INCLUDE(${QT_USE_FILE})
+#ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 include_directories(
@@ -101,7 +101,7 @@ ENDIF(WIN32)
 
 
 file(
-	GLOB_RECURSE
+	GLOB
 	files_utils
 	${CGoGN_ROOT_DIR}/src/Utils/*.cpp
 	${CGoGN_ROOT_DIR}/include/Utils/*.hpp
@@ -110,24 +110,23 @@ file(
 
 IF(WITH_QT)
 	file(
-		GLOB_RECURSE
+		GLOB
+		files_utils_qt
 		${CGoGN_ROOT_DIR}/src/Utils/Qt/*.cpp
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.hpp
-		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.h
-	)
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.h )
 
 	file(
 		GLOB_RECURSE
 		utils_qt_headers
-		${CGoGN_ROOT_DIR}/include/Utils/qt*.h
-	)
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qt*.h )
+		
 	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
-	SET (files_utils_withQt ${files_utils} ${UTILS_QT_HEADERS_MOC})
+	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
 	add_library( utils ${files_utils_withQt} )
 ELSE(WITH_QT)
 	add_library( utils ${files_utils} )
 ENDIF (WITH_QT)
-
 
 
 

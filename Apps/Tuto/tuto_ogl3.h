@@ -44,8 +44,8 @@
 #include <QMainWindow>
 #include <QWidget>
 #include <QtGui>
-#include "Utils/qtSimple.h"
-#include "Utils/qtgl.h"
+#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtgl.h"
 
 using namespace CGoGN;
 

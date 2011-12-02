@@ -25,11 +25,11 @@
 #ifndef _TUTO4_H_
 #define _TUTO4_H_
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 
 #include "ui_tuto4.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 // forward definitions (minimize includes) syntax a little bit tricky !!
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; class TopoRenderMapD; } } } }

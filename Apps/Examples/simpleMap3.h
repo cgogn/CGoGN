@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap3.h"

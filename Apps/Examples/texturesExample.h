@@ -27,7 +27,7 @@
 #include <iostream>
 
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 #include "Utils/textures.h"
 #include "Utils/Shaders/shaderSimpleTexture.h"
 #include "Utils/Shaders/shaderTextureMask.h"

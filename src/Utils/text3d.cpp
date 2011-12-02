@@ -25,7 +25,6 @@
 #include "Utils/text3d.h"
 
 #include "Utils/vbo.h"
-#include <QImage>
 
 namespace CGoGN
 {
@@ -49,14 +48,18 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 	if (m_idTexture == 0xffffffff)
 	{
 		std::string font_filename = Utils::GLSLShader::findFile("font_cgogn.png");
-		
-		QImage img(font_filename.c_str());
+
+		igzstream fs(font_filename.c_str(), std::ios::in|std::ios::binary);
+		char* buff = new char[WIDTHTEXTURE*HEIGHTTEXTURE];
+		fs.read(reinterpret_cast<char*>(buff), WIDTHTEXTURE*HEIGHTTEXTURE );
+		fs.close();
 		
 		glGenTextures(1, &m_idTexture);
 		glBindTexture(GL_TEXTURE_2D, m_idTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(img.bits()));
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, WIDTHTEXTURE, HEIGHTTEXTURE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)(buff));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		delete[] buff;
 	}
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);

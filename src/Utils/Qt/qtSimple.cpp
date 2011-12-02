@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/qtSimple.h"
-#include "Utils/qtgl.h"
+#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtgl.h"
 #include "Utils/GLSLShader.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_precision.hpp"

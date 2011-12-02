@@ -24,9 +24,9 @@
 
 #include <iostream>
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 #include "ui_viewer.h"
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"

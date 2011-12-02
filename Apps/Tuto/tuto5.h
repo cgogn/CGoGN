@@ -28,11 +28,11 @@
 #include <iostream>
 
 
-#include "Utils/qtSimple.h"
+#include "Utils/Qt/qtSimple.h"
 
 #include "ui_tuto5.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
