@@ -101,7 +101,7 @@ public:
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual void sewFaces(Dart d, Dart e, bool withBoundary=true) ;
+	virtual void sewFaces(Dart d, Dart e, bool withBoundary = true) ;
 
 	/**
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges

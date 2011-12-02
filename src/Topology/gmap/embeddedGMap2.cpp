@@ -295,28 +295,22 @@ void EmbeddedGMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
 	// for fixed point construction (import & primitives)
 	if (!withBoundary)
-		return GMap2::sewFaces(d, e, false) ;
-
-	unsigned int vEmb1 = EMBNULL ;
-	unsigned int vEmb2 = EMBNULL ;
-	if (isOrbitEmbedded(VERTEX))
 	{
-		vEmb1 = getEmbedding(VERTEX, d) ;
-		vEmb2 = getEmbedding(VERTEX, phi1(d)) ;
+		GMap2::sewFaces(d, e, false) ;
+		return ;
 	}
 
 	GMap2::sewFaces(d, e, true) ;
 
 	if (isOrbitEmbedded(VERTEX))
 	{
-		embedOrbit(VERTEX, d, vEmb1) ;
-		embedOrbit(VERTEX, e, vEmb2) ;
+		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d)) ;
+		embedOrbit(VERTEX, e, getEmbedding(VERTEX, beta0(d))) ;
 	}
 
 	if (isOrbitEmbedded(EDGE))
 	{
-		vEmb1 = getEmbedding(EDGE, d) ;
-		embedOrbit(EDGE, e, vEmb1) ;
+		embedOrbit(EDGE, e, getEmbedding(EDGE, d)) ;
 	}
 }
 

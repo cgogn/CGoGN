@@ -28,65 +28,6 @@
 namespace CGoGN
 {
 
-/*! @name Boundary marker management
- *  Function used to merge boundary faces properly
- *************************************************************************/
-
-//void Map2::mergeBoundaryFaces(Dart dd, Dart ee)
-//{
-//	if (ee != phi_1(dd))
-//		phi1sew(ee, phi_1(dd)) ;
-//	if (dd != phi_1(ee))
-//		phi1sew(dd, phi_1(ee)) ;
-//	deleteCycle(dd);
-//}
-
-//void Map2::mergeFaceWithBoundary(Dart d)
-//{
-//	std::vector<Dart> storeForLinkVertex;
-//	std::vector<Dart> storeForLinkFace;
-//
-//	Dart it = d ;
-//	do	// foreach vertex/edge of face
-//	{
-//		Dart e = phi2(it) ;
-//		if(isBoundaryMarked(e))	// check if connection by edge
-//		{
-//			storeForLinkFace.push_back(it);
-//			storeForLinkFace.push_back(e);
-//		}
-//		else
-//		{
-//			Dart f = findBoundaryEdgeOfVertex(alpha1(it));	// check if connection by vertex
-//			if (f != it)
-//			{
-//				storeForLinkVertex.push_back(phi_1(it));
-//				storeForLinkVertex.push_back(phi_1(f));
-//			}
-//		}
-//		it = phi1(it) ;
-//	} while (it != d) ;
-//
-//	// merge by vertices
-//	while (!storeForLinkVertex.empty())
-//	{
-//		Dart a = storeForLinkVertex.back() ;
-//		storeForLinkVertex.pop_back() ;
-//		Dart b = storeForLinkVertex.back() ;
-//		storeForLinkVertex.pop_back() ;
-//		phi1sew(a, b);
-//	}
-//	//merge by faces
-//	while (!storeForLinkFace.empty())
-//	{
-//		Dart a = storeForLinkVertex.back() ;
-//		storeForLinkVertex.pop_back() ;
-//		Dart b = storeForLinkVertex.back() ;
-//		storeForLinkVertex.pop_back() ;
-//		mergeBoundaryFaces(a, b);
-//	}
-//}
-
 /*! @name Generator and Deletor
  *  To generate or delete faces in a 2-map
  *************************************************************************/
@@ -694,6 +635,7 @@ bool Map2::check()
 		if (phi2(d1) == d)
 			CGoGNout << "Check: (warning) dangling edge" << CGoGNendl;
 	}
+
 	for(Dart d = Map2::begin(); d != Map2::end(); Map2::next(d))
 	{
 		if (!m.isMarked(d))	// phi1 a au moins un antécédent ?
@@ -702,7 +644,18 @@ bool Map2::check()
 			return false;
 		}
 	}
+
 	CGoGNout << "Check: topology ok" << CGoGNendl;
+
+    std::cout << "nb vertex orbits" << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex cells" << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits" << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells" << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits" << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells" << m_attribs[FACE].size() << std::endl ;
+
 	return true;
 }
 

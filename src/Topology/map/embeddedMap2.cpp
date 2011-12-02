@@ -259,8 +259,11 @@ bool EmbeddedMap2::flipBackEdge(Dart d)
 
 void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
-//	if (!withBoundary)
-//		return Map2::sewFaces(d, e, false) ;
+	if (!withBoundary)
+	{
+		Map2::sewFaces(d, e, false) ;
+		return ;
+	}
 
 	Map2::sewFaces(d, e, withBoundary) ;
 

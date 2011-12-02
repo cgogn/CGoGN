@@ -38,15 +38,13 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-	typedef typename PFP::VEC3 VEC3 ;
-
 	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
 	// buffer for tempo faces (used to remove degenerated edges)
 	std::vector<unsigned int> edgesBuffer;
-	edgesBuffer.reserve(8);
+	edgesBuffer.reserve(16);
 
 	DartMarkerNoUnmark m(map) ;
 
@@ -79,7 +77,6 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
 				map.embedOrbit(VERTEX, d, em) ;
-//				map.setDartEmbedding(VERTEX, d, em);	// associate to dart
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
 				d = map.phi1(d);
 			}
@@ -124,9 +121,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	{
 		map.closeMap();
 		CGoGNout << "Map closed (" << nbnm << " boundary edges)" << CGoGNendl;
-		// ensure bijection between topo a embedding
+		// ensure bijection between topo and embedding
 		map.bijectiveOrbitEmbedding(VERTEX);
-
 	}
 
 	return true ;
