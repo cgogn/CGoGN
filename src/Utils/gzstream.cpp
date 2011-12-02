@@ -27,7 +27,7 @@
 // ============================================================================
 
 
-#include "gzstream.h"
+#include "Utils/gzstream.h"
 #include <iostream>
 #include <string.h>  // for memcpy
 
