@@ -27,8 +27,7 @@
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
-#include <IL/ilu.h>
-#include <IL/ilut.h>
+
 
 namespace CGoGN
 {

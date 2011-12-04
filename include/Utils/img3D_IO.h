@@ -26,7 +26,6 @@
 #define __IMG3D_IO__
 
 #include "Utils/os_spec.h"
-#include <IL/ilu.h>
 
 namespace CGoGN
 {

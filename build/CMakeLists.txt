@@ -55,7 +55,7 @@ SET (CGoGN_EXT_LIBS
 #optionnal libs
 IF (WITH_ASSIMP)
 	add_definitions(-DWITH_ASSIMP)	
-	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ThirdParty/Assimp/include)
+	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include)	
 	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} assimp)
 ENDIF (WITH_ASSIMP)
 
