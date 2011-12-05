@@ -256,15 +256,13 @@ void ImageData<DIM,TYPE>::convert(ImageData<DIM,TYPE2>& output, TYPE2 (*convertF
 // implementation class Image
 
 template < unsigned int DIM, typename TYPE >
-Image<DIM,TYPE>::Image():
-m_qimg(NULL)
+Image<DIM,TYPE>::Image()
 {
 }
 
 template < unsigned int DIM, typename TYPE >
 Image<DIM,TYPE>::Image(const COORD& size):
-ImageData<DIM,TYPE>(size),
-m_qimg(NULL)
+ImageData<DIM,TYPE>(size)
 {
 }
 
@@ -272,12 +270,11 @@ m_qimg(NULL)
 template < unsigned int DIM, typename TYPE >
 Image<DIM,TYPE>::~Image()
 {
-	if (this->m_qimg != NULL)
-		delete this->m_qimg;
-	m_qimg = NULL;
+	delete[] m_data_ptr;
 	this->m_data_ptr = NULL;
 }
 
+/*
 template < unsigned int DIM, typename TYPE >
 void Image<DIM,TYPE>::swap(Image<DIM,TYPE>& img)
 {
@@ -290,8 +287,39 @@ void Image<DIM,TYPE>::swap(Image<DIM,TYPE>& img)
 	
 	ImageData<DIM,TYPE>::swap(img);
 }
+*/
+
+template < unsigned int DIM, typename TYPE >
+bool Image<DIM,TYPE>::load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp)
+{
+	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
+	
+	// compatible TYPE
+	if (bpp != sizeof(TYPE))
+	{
+		CGoGNout << "Image::load incompatible type: bbp=" << bpp << CGoGNendl;
+		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
+		delete ptr;
+		return false;
+	}
+
+	// destroy old data	
+	 if (this->m_data_ptr != NULL)
+		delete[] this->m_data_ptr;
+
+	this->m_data_ptr = new T[sizeof(TYPE)*w*h];
+	memcpy(this->m_data_ptr, img.bits(), sizeof(TYPE)*w*h);
+	this->m_size[0] = w;
+	this->m_size[1] = h;
+
+	this->computeSub();
+
+	return true;
+}
 
 
+
+#ifdef WITH_QT
 template < unsigned int DIM, typename TYPE >
 bool Image<DIM,TYPE>::load(const std::string& filename)
 {
@@ -301,7 +329,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 
 	if (ptr == NULL)
 	{
-		delete ptr;
+		CGoGNout << "Impossible to load "<< filename << std::endl;
 		return false;
 	}
 	
@@ -311,16 +339,14 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 	// compatible TYPE
 	if (bpp < sizeof(TYPE))
 	{
-		CGoGNout << "Image::load incompatible type: bbp="<<bpp<< CGoGNendl;
+		CGoGNout << "Image::load incompatible type: bbp=" << bpp << CGoGNendl;
 		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
 		delete ptr;
 		return false;
 	}
 
 	// destroy old data	
-	if (this->m_qimg != NULL)
-		delete this->m_qimg;
-	else if (this->m_data_ptr != NULL)
+	 if (this->m_data_ptr != NULL)
 		delete[] this->m_data_ptr;
 
 	if (bpp > sizeof(TYPE))
@@ -328,93 +354,27 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 		if (sizeof(TYPE) == 3)
 		{
 			QImage img = ptr->convertToFormat(QImage::Format_RGB888);
-			this->m_qimg = new QImage(img);
+			this->m_data_ptr = new T[3*img.width()*img.height()];
+			memcpy(this->m_data_ptr, img.bits(), 3*img.width()*img.height());
 		}
 		else if (sizeof(TYPE) == 1)
 		{
 			QImage img = ptr->convertToFormat(QImage::Format_Indexed8);
-			this->m_qimg = new QImage(img);
+			this->m_data_ptr = new T[img.width()*img.height()];
+			memcpy(this->m_data_ptr, img.bits(), img.width()*img.height());
 		}
-		delete ptr;
-	}		
-	else 
-		this->m_qimg = ptr;
-
-	this->m_size[0] = this->m_qimg->width();
-	this->m_size[1] = m_qimg->height();
-
-	this->m_data_ptr = reinterpret_cast<TYPE*>(m_qimg->bits());
-	this->computeSub();
-
-	return true;
-}
-
-
-template < unsigned int DIM, typename TYPE >
-template <typename TYPE2 >
-bool Image<DIM,TYPE>::load(const std::string& filename, void (*convertFunc)(const TYPE2&, const TYPE&))
-{
-	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
-
-	QImage* ptr = new QImage(filename.c_str());
-
-	if (ptr == NULL)
-	{
-		delete ptr;
-		return false;
 	}
-	
-	//	get the info of images
-	unsigned int bpp = ptr->depth() / 8;
-
-	// compatible TYPE
-	if (bpp != sizeof(TYPE))
+	else
 	{
-		CGoGNout << "Image::load incompatible type: bbp="<<bpp<< CGoGNendl;
-		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
-		delete ptr;
-		return false;
+		this->m_data_ptr = new T[ptr->width()*ptr->height()];
+		memcpy(this->m_data_ptr, ptr->bits(), ptr->width()*ptr->height());
 	}
 
-	// destroy old data	
-	if (this->m_qimg != NULL)
-		delete this->m_qimg;
-	else if (this->m_data_ptr != NULL)
-		delete[] this->m_data_ptr;
-
-	if (bpp > sizeof(TYPE))
-	{
-		if (sizeof(TYPE) == 3)
-		{
-			QImage img = ptr->convertToFormat(QImage::Format_RGB888);
-			this->m_qimg = new QImage(img);
-		}
-		else if (sizeof(TYPE) == 1)
-		{
-			QImage img = ptr->convertToFormat(QImage::Format_Indexed8);
-			this->m_qimg = new QImage(img);
-		}
-		delete ptr;
-	}		
-	else 
-		this->m_qimg = ptr;
-
-
-	this->m_size[0] = this->m_qimg->width();
-	this->m_size[1] = m_qimg->height();
-
+	this->m_size[0] = ptr->width();
+	this->m_size[1] = ptr->height();
 	this->computeSub();
 
-	this->m_data_ptr = new TYPE[this->m_sizeSub[1]];
-
-	TYPE2 *ptrSrc = reinterpret_cast<TYPE2*>(ptr->bits());
-	TYPE*  ptrDst = this->m_data_ptr;
-
-	for (unsigned int i = 0; i < this->m_sizeSub[1]; ++i)
-		(*convertFunc)(*ptrSrc++, *ptrDst++);
-
-	delete this->m_qimg;
-	this->m_qimg=NULL;
+	delete ptr;
 	return true;
 }
 
@@ -424,24 +384,7 @@ void Image<DIM,TYPE>::save(const std::string& filename)
 {
 	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
 
-	if (this->m_qimg != NULL)
-	{
-		switch(sizeof(TYPE))
-		{
-		case 1:
-			this->m_qimg->save(QString(filename), QImage::Format_Indexed8);
-			break;
-		case 3:
-			this->m_qimg->save(QString(filename), QImage::Format_RGB888);
-			break;
-		case 4:
-			this->m_qimg->save(QString(filename), QImage::Format_ARGB32);
-			break;
-		default:
-			break;
-		}
-	}
-	else if (this->m_data_ptr != NULL)
+	if (this->m_data_ptr != NULL)
 	{
 		switch(sizeof(TYPE))
 		{
@@ -468,7 +411,7 @@ void Image<DIM,TYPE>::save(const std::string& filename)
 		}
 	}
 }
-
+#endif
 
 
 template < unsigned int DIM, typename TYPE >

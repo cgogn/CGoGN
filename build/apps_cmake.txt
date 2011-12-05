@@ -1,7 +1,7 @@
 # A mettre juste apres la definition de CGoGN_ROOT_DIR  a la racine du CGoGN_Apps
 # include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
 
-SET(CMAKE_MODULE_PATH " ${CMAKE_MODULE_PATH} ${CGoGN_ROOT_DIR}/cmake_modules/")
+SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
 
 
 SET ( WITH_ASSIMP ON CACHE BOOL "need Assimp")
@@ -30,7 +30,7 @@ ENDIF (DEFINED ASSERTON)
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
 # define includes of external libs 
-SET(CGoGN_EXT_INCLUDES 
+SET(COMMON_INCLUDES 
 	${CGoGN_ROOT_DIR}/ThirdParty/glm
 	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIRS}
@@ -50,13 +50,13 @@ SET (COMMON_LIBS
 #optionnal libs
 IF (WITH_ASSIMP)
 	add_definitions(-DWITH_ASSIMP)	
-	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ThirdParty/Assimp/include)
+	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ThirdParty/Assimp/include)
 	SET (COMMON_LIBS ${COMMON_LIBS} assimp)
 ENDIF (WITH_ASSIMP)
 
 IF (WITH_ZINRI)
 	add_definitions(-DWITH_ZINRI)
-	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} 	${CGoGN_ROOT_DIR}/ThirdParty/Zinri)
+	SET (COMMON_INCLUDES ${COMMON_INCLUDES} 	${CGoGN_ROOT_DIR}/ThirdParty/Zinri)
 	SET (COMMON_LIBS ${COMMON_LIBS} Zinri)
 ENDIF (WITH_ZINRI)
 
@@ -66,15 +66,19 @@ IF (WITH_QT)
 	SET(QT_USE_QTOPENGL TRUE)
 	INCLUDE(${QT_USE_FILE})
 	ADD_DEFINITIONS(${QT_DEFINITIONS})
-	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${QT_INCLUDE_DIR})
-	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${QT_LIBRARIES})
+	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${QT_INCLUDE_DIR})
+	SET (COMMON_LIBS ${COMMON_LIBS} ${QT_LIBRARIES})
 ENDIF (WITH_QT)
 
 IF (WITH_NUMERICAL)
 	add_definitions(-DWITH_NUMERICAL)
-	SET (NUMERICAL_INCLUDES  ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
-	SET (NUMERICAL_LIBS f2c  blas  numerical lapack)
+#	SET (NUMERICAL_INCLUDES  ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
+#	SET (NUMERICAL_LIBS f2c  blas  numerical lapack)
+
+	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
+	SET (COMMON_LIBS ${COMMON_LIBS} f2c  blas  numerical lapack)
 ENDIF (WITH_NUMERICAL)
+
 
 # qq definition specifiques pour mac
 IF(APPLE)
@@ -85,19 +89,14 @@ IF(APPLE)
 	SET(CMAKE_OSX_ARCHITECTURES x86_64)
 ENDIF(APPLE)
 
+# qq definition specifiques pour windows
 IF(WIN32)
-	add_subdirectory(Release)
-	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
 	set(CMAKE_CONFIGURATION_TYPES Release Debug)
 	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
 ELSE(WIN32)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-	add_subdirectory(Release)
-	add_subdirectory(Debug)
-	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 ENDIF(WIN32)
-
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 

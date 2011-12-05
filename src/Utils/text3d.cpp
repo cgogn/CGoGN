@@ -47,7 +47,7 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 {
 	if (m_idTexture == 0xffffffff)
 	{
-		std::string font_filename = Utils::GLSLShader::findFile("font_cgogn.png");
+		std::string font_filename = Utils::GLSLShader::findFile("font_cgogn.gz");
 
 		igzstream fs(font_filename.c_str(), std::ios::in|std::ios::binary);
 		char* buff = new char[WIDTHTEXTURE*HEIGHTTEXTURE];

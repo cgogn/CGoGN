@@ -197,12 +197,9 @@ public:
 	typedef Geom::Vector<DIM,unsigned int> COORD;
 
 protected:
-	/// id of image for DevIL
-	QImage* m_qimg;
 
 	template <typename TYPEDOUBLE>
 	TYPE applyFilterOneTexel(const Filter<DIM>& filter, const COORD& t) const;
-
 
 	/// swap two texel in dim 1 image
 	void swapTexels(unsigned int x0, unsigned int x1);
@@ -225,21 +222,24 @@ public:
 	/// destructor
 	~Image();
 
-	/**
-	 * swap two images
-	 */
-	virtual void swap(Image<DIM,TYPE>& img);
 
+	/**
+	* Load from memory ptr,
+	* a copy if performed (ptr could be destructed just after calling
+	* @param ptr a pointer on memory source image (allocation must be coherent with other parameters)
+	* @param w width of image
+	* @param h heighy of image
+	* @param bpp byte per pixel of image 
+	*/
+	bool load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp)
+	
+#ifdef WITH_QT
 	/// load from file
 	bool load(const std::string& filename);
 
-	/// load from file with conversion (template type is type pixel image-
-	template <typename TYPE2 >
-	bool load(const std::string& filename, void (*convertFunc)(const TYPE2&, const TYPE&));
-
 	/// load from file
 	void save(const std::string& filename);
-
+#endif
 
 	/**
 	* crop image

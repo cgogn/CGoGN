@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(geometryAssertD)
+project(testing_debug)
 
 SET(CMAKE_BUILD_TYPE Debug)
-
 
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
@@ -12,11 +11,15 @@ include_directories(
 )
 
 
-# define libs path
-link_directories(
-	${CGoGN_ROOT_DIR}/lib/Debug
-	${CGoGN_ROOT_DIR}/lib/Release
-)
+IF(WIN32)
+	link_directories( 
+		${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
+		${CGoGN_ROOT_DIR}/lib/Release )
+ELSE(WIN32)
+	link_directories(
+		${CGoGN_ROOT_DIR}/lib/Debug
+		${CGoGN_ROOT_DIR}/lib/Release )
+ENDIF(WIN32)
 
 #define exec to compile
 
