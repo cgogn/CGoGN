@@ -134,7 +134,7 @@ Dart Map2::deleteVertex(Dart d)
 
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
-	deleteCycle(d) ;
+	Map1::deleteCycle(d) ;
 	return res ;
 }
 
@@ -145,7 +145,7 @@ void Map2::cutEdge(Dart d)
 	Map1::cutEdge(d);		// Cut the 1-edge of d
 	Map1::cutEdge(e);		// Cut the 1-edge of phi2(d)
 
-	phi2sew(d, phi1(e));			// Correct the phi2 links
+	phi2sew(d, phi1(e));	// Correct the phi2 links
 	phi2sew(e, phi1(d));
 }
 
@@ -287,23 +287,23 @@ void Map2::unsewFaces(Dart d)
 {
 	assert(!isBoundaryEdge(d)) ;
 
-	Dart dd = phi2(d);
+	Dart dd = phi2(d) ;
 
-	Dart e = newBoundaryCycle(2);
+	Dart e = newBoundaryCycle(2) ;
 	Dart ee = phi1(e) ;
 
-	Dart f = findBoundaryEdgeOfVertex(d);
+	Dart f = findBoundaryEdgeOfVertex(d) ;
 	if(f != NIL)
-		phi1sew(e, phi_1(f));
+		phi1sew(e, phi_1(f)) ;
 
-	f = findBoundaryEdgeOfVertex(dd);
+	f = findBoundaryEdgeOfVertex(dd) ;
 	if(f != NIL)
-		phi1sew(ee, phi_1(f));
+		phi1sew(ee, phi_1(f)) ;
 
-	phi2unsew(d);
+	phi2unsew(d) ;
 
-	phi2sew(d, e);		// sew faces
-	phi2sew(dd, ee);	// to the boundary
+	phi2sew(d, e) ;		// sew faces
+	phi2sew(dd, ee) ;	// to the boundary
 }
 
 bool Map2::collapseDegeneratedFace(Dart d)
@@ -447,14 +447,14 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	std::vector<Dart>::reverse_iterator eIt;
 	for (dIt = dDarts.begin(), eIt = eDarts.rbegin(); dIt != dDarts.end(); ++dIt, ++eIt)
 	{
-		Dart d2 = phi2(*dIt);			// Search the faces adjacent to dNext and eNext
+		Dart d2 = phi2(*dIt);	// Search the faces adjacent to dNext and eNext
 		Dart e2 = phi2(*eIt);
 		phi2unsew(d2);		// Unlink the two adjacent faces from dNext and eNext
 		phi2unsew(e2);
 		phi2sew(d2, e2);	// Link the two adjacent faces together
 	}
-	deleteCycle(d);		// Delete the two alone faces
-	deleteCycle(e);
+	Map1::deleteCycle(d);		// Delete the two alone faces
+	Map1::deleteCycle(e);
 
 	return true ;
 }
@@ -661,13 +661,19 @@ bool Map2::check()
 
 bool Map2::checkSimpleOrientedPath(std::vector<Dart>& vd)
 {
+	DartMarkerStore dm(*this) ;
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
+		if(dm.isMarked(*it))
+			return false ;
+		dm.markOrbit(VERTEX, *it) ;
+
 		std::vector<Dart>::iterator prev ;
 		if(it == vd.begin())
 			prev = vd.end() - 1 ;
 		else
 			prev = it - 1 ;
+
 		if(!sameVertex(*it, phi1(*prev)))
 			return false ;
 	}

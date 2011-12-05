@@ -83,14 +83,14 @@ Dart Map3::deleteVertex(Dart d)
 	if(isBoundaryVertex(d))
 		return NIL ;
 
-	//Save the darts around the vertex
-	//(one dart per face should be enough)
+	// Save the darts around the vertex
+	// (one dart per face should be enough)
 	std::vector<Dart> fstoretmp;
 	fstoretmp.reserve(128);
 	FunctorStore fs(fstoretmp);
 	foreach_dart_of_vertex(d, fs);
 
-	//just one dart per face
+	// just one dart per face
 	std::vector<Dart> fstore;
 	fstore.reserve(128);
 	DartMarker mf(*this);
@@ -326,7 +326,7 @@ bool Map3::sameVertex(Dart d, Dart e)
 		if(*it == e)
 			return true;
 
-		//add phi21 and phi23 successor if they are not marked yet
+		// add phi21 and phi23 successor if they are not marked yet
 		Dart d2 = phi2(*it);
 		Dart d21 = phi1(d2); // turn in volume
 		Dart d23 = phi3(d2); // change volume
@@ -637,12 +637,10 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 
 	for(std::vector<Dart>::iterator it = darts.begin(); !found && it != darts.end() ; ++it)
 	{
-		Dart d1 = *it;
-
 		// add all successors if they are not marked yet
-		Dart d2 = phi1(d1); // turn in face
-		Dart d3 = phi2(d1); // change face
-		Dart d4 = phi3(d1); // change volume
+		Dart d2 = phi1(*it); // turn in face
+		Dart d3 = phi2(*it); // change face
+		Dart d4 = phi3(*it); // change volume
 
 		if (!mv.isMarked(d2))
 		{
@@ -660,7 +658,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 			mv.mark(d4);
 		}
 
-		found = f(d1);
+		found = f(*it);
 	}
 	return found;
 }

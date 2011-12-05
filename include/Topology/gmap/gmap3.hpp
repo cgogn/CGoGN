@@ -93,31 +93,9 @@ inline Dart GMap3::beta(const Dart d)
 	}
 }
 
-inline Dart GMap3::alpha2(Dart d)
-{
-	Dart e = beta2(d);
-	Dart f = beta3(e);
-
-	if (f != e)
-		return f;
-
-	f = d;
-	e = beta3(f);
-	while (e != f)
-	{
-		f = beta2(e);
-		e = beta3(f);
-	}
-	return f;
-}
-
 inline Dart GMap3::phi3(Dart d)
 {
-	Dart e = beta3(d) ;
-	if(e == d)
-		return d ;
-	else
-		return beta3(beta0(d)) ;
+	return beta3(beta0(d)) ;
 }
 
 template <int N>
@@ -143,7 +121,25 @@ inline Dart GMap3::phi(Dart d)
 	}
 }
 
+inline Dart GMap3::alpha0(Dart d)
+{
+	return beta3(beta0(d)) ;
+}
 
+inline Dart GMap3::alpha1(Dart d)
+{
+	return beta3(beta1(d)) ;
+}
+
+inline Dart GMap3::alpha2(Dart d)
+{
+	return beta3(beta2(d)) ;
+}
+
+inline Dart GMap3::alpha_2(Dart d)
+{
+	return beta2(beta3(d)) ;
+}
 
 inline void GMap3::beta3sew(Dart d, Dart e)
 {
@@ -160,21 +156,27 @@ inline void GMap3::beta3unsew(Dart d)
 	(*m_beta3)[e.index] = e ;
 }
 
-inline void GMap3::phi3sew(Dart d, Dart e)
+/*! @name Topological Queries
+ *  Return or set various topological information
+ *************************************************************************/
+
+inline bool GMap3::sameFace(Dart d, Dart e)
 {
-	beta3sew(d, beta0(e)) ;
-	beta3sew(beta0(d), e) ;
+	return GMap2::sameFace(d, e) || GMap2::sameFace(beta3(d), e) ;
 }
 
-inline void GMap3::phi3unsew(Dart d)
+inline bool GMap3::isBoundaryFace(Dart d)
 {
-	beta3unsew(d) ;
-	beta3unsew(beta0(d)) ;
+	return isBoundaryMarked(d) || isBoundaryMarked(beta3(d));
 }
 
+/*! @name Cell Functors
+ *  Apply functors to all darts of a cell
+ *************************************************************************/
 
+inline bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap2::foreach_dart_of_face(d, f, thread) || GMap2::foreach_dart_of_face(beta3(d), f, thread);
+}
 
-
-
-
-} // end namespace CGoGN
+} // namespace CGoGN

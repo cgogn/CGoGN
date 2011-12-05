@@ -161,6 +161,11 @@ inline bool GMap2::sameEdge(Dart d, Dart e)
 	return d == e || beta2(d) == e || beta0(d) == e || beta2(beta0(d)) == e ;
 }
 
+inline bool GMap2::isBoundaryEdge(Dart d)
+{
+	return isBoundaryMarked(d) || isBoundaryMarked(beta2(d));
+}
+
 inline bool GMap2::sameOrientedFace(Dart d, Dart e)
 {
 	return GMap1::sameOrientedFace(d, e) ;

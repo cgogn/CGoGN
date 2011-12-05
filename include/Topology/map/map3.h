@@ -130,12 +130,12 @@ public:
 	 */
 	virtual Dart deleteVertex(Dart d);
 
-	//! Cut the edge of d (all darts around edge orbit are cutted)
+	//! Cut the edge of d (all darts around edge orbit are cut)
 	/*! @param d a dart of the edge to cut
 	 */
 	virtual void cutEdge(Dart d);
 
-	//! Uncut the edge of d (all darts around edge orbit are uncutted)
+	//! Uncut the edge of d (all darts around edge orbit are uncut)
 	/*! @param d a dart of the edge to uncut
 	 */
 	virtual bool uncutEdge(Dart d);
@@ -144,12 +144,11 @@ public:
 	/*! \pre Dart d and e should belong to the same face and be distinct
 	 *  @param d dart of first vertex
 	 *  @param e dart of second vertex
-	 *  @return the dart of the new edge lying in the vertex of d after the cut
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
 	//! Sew two oriented volumes along their faces. 
-	/*! The oriented faces should not be phi3-linked and have the same length
+	/*! The oriented faces should not be phi3-linked and have the same degree
 	 *  @param d a dart of the first volume
 	 *  @param e a dart of the second volume
 	 *  @param withBoundary: if false, volumes must have phi3 fixed points (only for construction: import/primitives)
@@ -191,7 +190,7 @@ public:
 	//! Tell if the vertex of d is on the boundary
 	/*! @param d a dart
 	 */
-	bool isBoundaryVertex(Dart d);
+	bool isBoundaryVertex(Dart d) ;
 
 	//! Test if dart d and e belong to the same oriented edge
 	/*! @param d a dart
@@ -208,7 +207,7 @@ public:
 	//! Compute the number of volumes around the edge of d
 	/*! @param d a dart
 	 */
-	unsigned int edgeDegree(Dart d);
+	unsigned int edgeDegree(Dart d) ;
 
 	/**
 	 * tell if the edge of d is on the boundary of the map
@@ -219,26 +218,26 @@ public:
 	 * find the dart of edge that belong to the boundary
 	 * return NIL if the edge is not on the boundary
 	 */
-	Dart findBoundaryFaceOfEdge(Dart d);
+	Dart findBoundaryFaceOfEdge(Dart d) ;
 
 	//! Test if dart d and e belong to the same oriented face
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
-	bool sameFace(Dart d, Dart e);
+	bool sameFace(Dart d, Dart e) ;
 
 	//! Test if the face is on the boundary
 	/*! @param d a dart from the face
 	 */
-	bool isBoundaryFace(Dart d);
+	bool isBoundaryFace(Dart d) ;
 
 	//! Tell if a face of the volume is on the boundary
 	/*  @param d a dart
 	 */
-	bool isBoundaryVolume(Dart d);
+	bool isBoundaryVolume(Dart d) ;
 
 	// TODO a mettre dans algo ?
-	virtual bool check();
+	virtual bool check() ;
 	//@}
 
 	/*! @name Cell Functors
