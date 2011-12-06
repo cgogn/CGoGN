@@ -68,11 +68,11 @@ file(
 )
 
 IF(WIN32)
-	add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/Release/shader_to_h ${shaders_srcD}
+	add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/bin/Release/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_srcD} )
 ELSE(WIN32)
-	add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/bin/shader_to_h ${shaders_srcD}
+	add_custom_target(shader_targetD ${CGoGN_ROOT_DIR}/ThirdParty/bin/shader_to_h ${shaders_srcD}
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_srcD} 
 )
