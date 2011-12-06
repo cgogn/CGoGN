@@ -25,12 +25,19 @@ ENDIF (NOT WIN32)
 
 
 
-Le CMakeLists (Release par exemple) doit ensuite contenir
-
+Le CMakeLists (Release par exemple) doit ensuite contenir:
 
 SET(CMAKE_BUILD_TYPE Release)
 
-link_directories( ${CGoGN_ROOT_DIR}/lib/Release/)
+IF(WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName) )
+ELSE (WIN32)
+	link_directories( ${CGoGN_ROOT_DIR}/lib/Release/ )
+ENDIF (WIN32)
+
+# Attention pour la version debug, deux solutions:
+#   soit mettre Debug et Release si on veut utiliser les ThirdParty en release
+#   soit mettre uniquement Debug, mais il faut avoir compiler les ThirdParty en debug
 
 include_directories(
 	${CGoGN_ROOT_DIR}/include		# for CGoGN
@@ -42,8 +49,6 @@ include_directories(
 add_executable( mon_exec ${CMAKE_SOURCE_DIR}/mon_source.cpp)
 
 target_link_libraries( mon_exec ${CGoGN_LIBS_R} ${COMMON_LIBS})
-
-
 
 
 Pour le compiler le plus propre est de faire un repertoire build,
