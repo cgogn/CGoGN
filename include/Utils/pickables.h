@@ -24,7 +24,7 @@
 
 
 #ifndef __PICKABLES_H_
-#define __PICKABLE_H_
+#define __PICKABLES_H_
 
 #include "Utils/vbo.h"
 #include "glm/glm.hpp"
@@ -270,7 +270,7 @@ class Grid: public LineDrawable
 public:
 	/**
 	 * constructor
-	 * @param sub number of subdivision of grig
+	 * @param sub number of subdivision of grid
 	 */
 	Grid(unsigned int sub=5);
 

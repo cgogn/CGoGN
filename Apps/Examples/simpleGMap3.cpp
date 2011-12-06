@@ -32,17 +32,19 @@
 SimpleGMap3::SimpleGMap3()
 {
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
+	volume = myMap.addAttribute<PFP::VEC3>(VOLUME, "volume");
 
 	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
-	Dart d = primCat.hexaGrid_topo(2,1,1);
-	primCat.embedHexaGrid(1,1,1);
+	Dart d = primCat.hexaGrid_topo(3,1,1);
+	primCat.embedHexaGrid(2,1,1);
 
 	myMap.check();
 
 	DartMarker markOrient(myMap);
 	std::vector<Dart> orient;
 	FunctorStore fs(orient);
+	d = 49;
 	myMap.foreach_dart_of_oriented_volume(d,fs);
 
 	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
