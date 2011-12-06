@@ -114,8 +114,10 @@ Dart Map3::deleteVertex(Dart d)
 			Dart d2 = phi2(fit) ;
 			Dart d3 = phi3(fit) ;
 			Dart d32 = phi2(d3) ;
+
 			if(res == NIL)
 				res = d2 ;
+
 			phi2unsew(d2) ;
 			phi2unsew(d32) ;
 			phi2sew(d2, d32) ;
@@ -178,7 +180,7 @@ bool Map3::uncutEdge(Dart d)
 
 void Map3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameOrientedFace(d, e)) ;
+	assert(d != e && Map2::sameOrientedFace(d, e)) ;
 
 	Dart dd = phi1(phi3(d));
 	Dart ee = phi1(phi3(e));

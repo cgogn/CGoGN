@@ -82,51 +82,59 @@ void GMap3::fillHole(Dart d)
 
 Dart GMap3::deleteVertex(Dart d)
 {
-//	if(isBoundaryVertex(d))
-//		return NIL ;
-//
-//	// Save the darts around the vertex
-//	// (one dart per face should be enough)
-//	std::vector<Dart> fstoretmp;
-//	fstoretmp.reserve(128);
-//	FunctorStore fs(fstoretmp);
-//	foreach_dart_of_vertex(d, fs);
-//
-//	// just one dart per face
-//	std::vector<Dart> fstore;
-//	fstore.reserve(128);
-//	DartMarker mf(*this);
-//	for(std::vector<Dart>::iterator it = fstoretmp.begin() ; it != fstoretmp.end() ; ++it)
-//	{
-//		if(!mf.isMarked(*it))
-//		{
-//			mf.markOrbit(FACE, *it);
-//			fstore.push_back(*it);
-//		}
-//	}
-//
-//	Dart res = NIL ;
-//	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
-//	{
-//		Dart fit = *it ;
-//		Dart end = phi_1(fit) ;
-//		fit = phi1(fit) ;
-//		while(fit != end)
-//		{
-//			Dart d2 = phi2(fit) ;
-//			Dart d3 = phi3(fit) ;
-//			Dart d32 = phi2(d3) ;
-//			if(res == NIL)
-//				res = d2 ;
-//			phi2unsew(d2) ;
-//			phi2unsew(d32) ;
-//			phi2sew(d2, d32) ;
-//			phi2sew(fit, d3) ;
-//		}
-//	}
-//	Map2::deleteCC(d) ;
-//
-//	return res ;
+	if(isBoundaryVertex(d))
+		return NIL ;
+
+	// Save the darts around the vertex
+	// (one dart per face should be enough)
+	std::vector<Dart> fstoretmp;
+	fstoretmp.reserve(128);
+	FunctorStore fs(fstoretmp);
+	foreach_dart_of_vertex(d, fs);
+
+	// just one dart per face
+	std::vector<Dart> fstore;
+	fstore.reserve(128);
+	DartMarker mf(*this);
+	for(std::vector<Dart>::iterator it = fstoretmp.begin() ; it != fstoretmp.end() ; ++it)
+	{
+		if(!mf.isMarked(*it))
+		{
+			mf.markOrbit(FACE, *it);
+			fstore.push_back(*it);
+		}
+	}
+
+	Dart res = NIL ;
+	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
+	{
+		Dart fit = *it ;
+		Dart end = phi_1(fit) ;
+		fit = phi1(fit) ;
+		while(fit != end)
+		{
+			Dart d2 = phi2(fit) ;
+			Dart d3 = phi3(fit) ;
+			Dart d32 = phi2(d3) ;
+
+			if(res == NIL)
+				res = d2 ;
+
+			beta2unsew(d2) ;
+			beta2unsew(beta0(d2)) ;
+
+			beta2unsew(d32) ;
+			beta2unsew(beta0(d32)) ;
+
+			beta2sew(d2, beta0(d32)) ;
+			beta2sew(beta0(d2), d32) ;
+			beta2sew(fit, beta0(d3)) ;
+			beta2sew(beta0(fit), d3) ;
+		}
+	}
+	GMap2::deleteCC(d) ;
+
+	return res ;
 	return NIL ;
 }
 
@@ -156,40 +164,37 @@ void GMap3::cutEdge(Dart d)
 
 bool GMap3::uncutEdge(Dart d)
 {
-//	if(vertexDegree(phi1(d)) == 2)
-//	{
-//		Dart prev = d ;
-//		phi3unsew(phi1(prev)) ;
-//
-//		Dart dd = d;
-//		do
-//		{
-//			prev = dd;
-//			dd = alpha2(dd);
-//
-//			phi3unsew(phi2(prev)) ;
-//			phi3unsew(phi2(phi1(prev))) ;
-//			Map2::uncutEdge(prev);
-//			phi3sew(dd, phi2(prev));
-//		} while (dd != d) ;
-//
-//		return true;
-//	}
+	if(vertexDegree(phi1(d)) == 2)
+	{
+		Dart prev = d ;
+
+		Dart dd = d;
+		do
+		{
+			prev = dd;
+			dd = alpha2(dd);
+			GMap2::uncutEdge(prev);
+		} while (dd != d) ;
+
+		return true;
+	}
 	return false;
 }
 
 void GMap3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameOrientedFace(d, e)) ;
+	assert(d != e && GMap2::sameOrientedFace(d, e)) ;
 
-	Dart dd = phi1(phi3(d));
-	Dart ee = phi1(phi3(e));
+	Dart dd = beta1(beta3(d));
+	Dart ee = beta1(beta3(e));
 
 	GMap2::splitFace(d, e);
 	GMap2::splitFace(dd, ee);
 
-	phi3sew(phi_1(d), phi_1(ee));
-	phi3sew(phi_1(e), phi_1(dd));
+	beta3sew(beta1(d), phi_1(ee));
+	beta3sew(phi_1(d), beta1(ee));
+	beta3sew(beta1(e), phi_1(dd));
+	beta3sew(phi_1(e), beta1(dd));
 }
 
 void GMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
@@ -199,46 +204,52 @@ void GMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 	// if sewing with fixed points
 	if (!withBoundary)
 	{
-		assert(phi3(d) == d && phi3(e) == e) ;
+		assert(beta3(d) == d && beta3(e) == e) ;
 		Dart fitD = d ;
 		Dart fitE = e ;
 		do
 		{
-			phi3sew(fitD, fitE) ;
+			beta3sew(fitD, beta0(fitE)) ;
+			beta3sew(beta0(fitD), fitE) ;
 			fitD = phi1(fitD) ;
 			fitE = phi_1(fitE) ;
 		} while(fitD != d) ;
 		return ;
 	}
 
-	Dart dd = phi3(d) ;
-	Dart ee = phi3(e) ;
+	Dart dd = beta3(d) ;
+	Dart ee = beta3(e) ;
 
 	Dart fitD = dd ;
 	Dart fitE = ee ;
 	do
 	{
-		Dart fitD2 = phi2(fitD) ;
-		Dart fitE2 = phi2(fitE) ;
+		Dart fitD2 = beta2(fitD) ;
+		Dart fitE2 = beta2(fitE) ;
 		if(fitD2 != fitE)
 		{
-			phi2unsew(fitD) ;
-			phi2unsew(fitE) ;
-			phi2sew(fitD2, fitE2) ;
-			phi2sew(fitD, fitE) ;
+			beta2unsew(fitD) ;
+			beta2unsew(fitE) ;
+			beta2sew(fitD2, beta0(fitE2)) ;
+			beta2sew(beta0(fitD2), fitE2) ;
+			beta2sew(fitD, beta0(fitE)) ;
+			beta2sew(beta0(fitD), fitE) ;
 		}
-		phi3unsew(fitD) ;
-		phi3unsew(fitE) ;
+		beta3unsew(fitD) ;
+		beta3unsew(beta0(fitD)) ;
+		beta3unsew(fitE) ;
+		beta3unsew(beta0(fitE)) ;
 		fitD = phi1(fitD) ;
 		fitE = phi_1(fitE) ;
 	} while(fitD != dd) ;
-	Map2::deleteCC(dd) ;
+	GMap2::deleteCC(dd) ;
 
 	fitD = d ;
 	fitE = e ;
 	do
 	{
-		phi3sew(fitD, fitE) ;
+		beta3sew(fitD, beta0(fitE)) ;
+		beta3sew(beta0(fitD), fitE) ;
 		fitD = phi1(fitD) ;
 		fitE = phi_1(fitE) ;
 	} while(fitD != d) ;
@@ -264,16 +275,25 @@ void GMap3::unsewVolumes(Dart d)
 		if(f != NIL)
 		{
 			Dart f2 = phi2(f) ;
-			phi2unsew(f) ;
-			phi2sew(fitB1, f) ;
-			phi2sew(fitB2, f2) ;
+			beta2unsew(f) ;
+			beta2unsew(beta0(f)) ;
+			beta2sew(fitB1, beta0(f)) ;
+			beta2sew(beta0(fitB1), f) ;
+			beta2sew(fitB2, beta0(f2)) ;
+			beta2sew(beta0(fitB2), f2) ;
 		}
 		else
-			phi2sew(fitB1, fitB2) ;
+		{
+			beta2sew(fitB1, beta0(fitB2)) ;
+			beta2sew(beta0(fitB1), fitB2) ;
+		}
 
-		phi3unsew(fit1) ;
-		phi3sew(fit1, fitB1) ;
-		phi3sew(fit2, fitB2) ;
+		beta3unsew(fit1) ;
+		beta3unsew(beta0(fit1)) ;
+		beta3sew(fit1, beta0(fitB1)) ;
+		beta3sew(beta0(fit1), fitB1) ;
+		beta3sew(fit2, beta0(fitB2)) ;
+		beta3sew(beta0(fit2), fitB2) ;
 
 		fit1 = phi1(fit1) ;
 		fit2 = phi_1(fit2) ;
@@ -475,7 +495,7 @@ bool GMap3::sameEdge(Dart d, Dart e)
 	Dart it = d;
 	do
 	{
-		if(it == e || beta0(it) == e || beta2(it) == e || phi2(it) == e)
+		if(it == e || beta0(it) == e || beta2(it) == e || phi2(it) == e)
 			return true;
 
 		it = alpha2(it);
@@ -784,13 +804,13 @@ bool GMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 
 unsigned int GMap3::closeHole(Dart d, bool forboundary)
 {
-	assert(phi3(d) == d);		// Nothing to close
+	assert(beta3(d) == d);		// Nothing to close
 	DartMarkerStore m(*this) ;
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	m.markOrbit(ORIENTED_FACE, d) ;
+	m.markOrbit(FACE, d) ;
 
 	unsigned int count = 0 ;
 
@@ -809,26 +829,28 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 			bool found = false ;
 			do
 			{
-				if(phi3(e) == e)
+				if(beta3(e) == e)
 				{
 					found = true ;
 					if(!m.isMarked(e))
 					{
 						visitedFaces.push_back(e) ;
-						m.markOrbit(ORIENTED_FACE, e) ;
+						m.markOrbit(FACE, e) ;
 					}
 				}
 				else if(isBoundaryMarked(e))
 				{
 					found = true ;
-					phi2sew(e, bit) ;
+					beta2sew(e, bit) ;
+					beta2sew(beta0(e), beta0(bit)) ;
 				}
 				else
 					e = alpha2(e) ;
 			} while(!found) ;
 
-			phi3sew(f, bit) ;
-			bit = phi_1(bit) ;
+			beta3sew(f, bit) ;
+			beta3sew(beta0(f), beta0(bit)) ;
+			bit = phi1(bit) ;
 			f = phi1(f);
 		} while(f != *it);
 	}
