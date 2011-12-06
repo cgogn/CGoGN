@@ -25,6 +25,8 @@
 #ifndef __QEM__
 #define __QEM__
 
+#include "Utils/os_spec.h" // allow compilation under windows
+
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 #include "Geometry/plane_3d.h"
@@ -153,9 +155,6 @@ private:
 
 	bool optimize(VEC4& v) const
 	{
-#ifdef WIN32
-#define isnan(X) _isnan(X)
-#endif
 		if (isnan(A(0,0)))
 			return false ;
 
