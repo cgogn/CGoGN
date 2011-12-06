@@ -12,10 +12,12 @@ pour eviter les pb de compilation.
 
 Le plus sur mais plus long est de compiler soi-même Qt et Boost (bon courage)
 
-Lancer CMake
+Pour les "ThirdParty libs":
+Lancer CMake (gui)
 Mettre le chemin de la racine de CGoGN + /ThirdParty pour les sources
 Mettre le chemin de la racine de CGoGN + /ThirdParty/buildRelease pour le build en release
 Mettre le chemin de la racine de CGoGN + /ThirdParty/buildDebug pour le build en debug
+Sous windows les 2 versions sont nécessaires.
 La suite vaut pour les 2 répertoires:
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
@@ -25,9 +27,10 @@ Recliquer sur Configure
 Cliquer sur Generate
 Aller compiler sous visual(en release)
 
+Pour CGoGN:
 Relancer CMake
-Mettre le chemin de la racine de CGoGN + /build pour les sources
-Mettre le chemin de la racine de CGoGN + /Visual (par exemple) pour le build
+Mettre le chemin de la racine de CGoGN pour les sources
+Mettre le chemin de la racine de CGoGN + /build (par exemple) pour le build
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
 Modifier les variables comme pour ThirdParty (et CMAKE_PREFIX_PATH si nécessaire)

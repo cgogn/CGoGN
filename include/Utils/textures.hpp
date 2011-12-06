@@ -270,7 +270,6 @@ ImageData<DIM,TYPE>(size)
 template < unsigned int DIM, typename TYPE >
 Image<DIM,TYPE>::~Image()
 {
-	delete[] m_data_ptr;
 	this->m_data_ptr = NULL;
 }
 
@@ -307,8 +306,8 @@ bool Image<DIM,TYPE>::load(const unsigned char *ptr, unsigned int w, unsigned in
 	 if (this->m_data_ptr != NULL)
 		delete[] this->m_data_ptr;
 
-	this->m_data_ptr = new T[sizeof(TYPE)*w*h];
-	memcpy(this->m_data_ptr, img.bits(), sizeof(TYPE)*w*h);
+	this->m_data_ptr = new TYPE[sizeof(TYPE)*w*h];
+	memcpy(this->m_data_ptr, ptr, sizeof(TYPE)*w*h);
 	this->m_size[0] = w;
 	this->m_size[1] = h;
 
@@ -384,9 +383,9 @@ void Image<DIM,TYPE>::save(const std::string& filename)
 {
 	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
 
+	QImage* ptrIm = NULL;
 	if (this->m_data_ptr != NULL)
 	{
-		QImage* ptrIm = NULL;
 		switch(sizeof(TYPE))
 		{
 		case 1:
@@ -402,8 +401,11 @@ void Image<DIM,TYPE>::save(const std::string& filename)
 			break;
 		}
 	}
-	ptrIm->save(QString(filename.c_str()));
-	delete ptrIm;
+	if (ptrIm != NULL)
+	{
+		ptrIm->save(QString(filename.c_str()));
+		delete ptrIm;
+	}
 }
 #endif
 

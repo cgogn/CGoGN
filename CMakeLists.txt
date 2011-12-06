@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(CGoGN)
 
-SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/..)
+SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR})
 
 # for GLEW
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)

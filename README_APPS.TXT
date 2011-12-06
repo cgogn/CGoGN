@@ -10,7 +10,7 @@ Le CMakeLists.txt a la racine de l'application doit commencer par
 cmake_minimum_required(VERSION 2.8)
 PROJECT(NOM_DE_L_APPLICATION)
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/../../CGoGN)
-INCLUDE(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
+INCLUDE(${CGoGN_ROOT_DIR}/apps_cmake.txt)
 
 Le ../../CGoGN correspond au chemin relatif vers votre version de CGoGN
 (ici placée au même niveau que CGoGN_Apps)
