@@ -4,7 +4,9 @@ Assimp: import de nombreux type de fichiers 3D (maillages)
 
 Compilation:
 ============
-cd build
+cd buildRelease (pour compiler en release)
+ou cd buildDebug (pour compiler en Debug)
+
 cmake .. ou ccmake .. ou cmake-gui ..
 
 options (et valeur par defaut)
@@ -14,3 +16,6 @@ options (et valeur par defaut)
 	WITH_ZINRI         (T)
 	
 Pour utiliser avec CMake -DOPTION=true/false 
+
+Pour compiler make dans le repertoire sous linux
+ou avec VisualStudio souss Linux

@@ -56,11 +56,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Include our stdint.h replacement header for MSVC, take the global header for gcc/mingw
  */
-#ifdef _MSC_VER
-#	include "pstdint.h"
-#else
-#	include <stdint.h>
-#endif
+//#ifdef _MSC_VER
+//#	include "pstdint.h"
+//#else
+//#	include <stdint.h>
+//#endif
+#include <stdint.h>
+
 
 /* Undefine the min/max macros defined by some platform headers (namely Windows.h) to 
  * avoid obvious conflicts with std::min() and std::max(). 

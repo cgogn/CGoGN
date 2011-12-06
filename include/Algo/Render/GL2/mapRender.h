@@ -25,6 +25,9 @@
 #ifndef _GL2_MAP_RENDER_
 #define _GL2_MAP_RENDER_
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <GL/glew.h>
 #include <vector>
 #include <list>

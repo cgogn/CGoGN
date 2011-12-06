@@ -27,6 +27,10 @@
 #include "Utils/img3D_IO.h"
 #include "Utils/cgognStream.h"
 
+#ifdef WITH_QT
+#include <QImage>
+#include <QString>
+#endif
 
 namespace CGoGN
 {
@@ -156,9 +160,8 @@ void saveBool(const std::string& filename, unsigned char* data, int w, int h, in
 	// save image2D
 
 	int hh = (h*nd)+1;
-	QImage img(dat_comp, w, hh, Q, QImage::Format_Indexed8);
-	img.save(filename, QImage::Format_Indexed8);
-		
+	QImage img(dat_comp, w, hh, QImage::Format_Indexed8);
+	img.save(QString(filename.c_str()));
 }
 
 
@@ -177,7 +180,7 @@ unsigned char* loadVal_8(const std::string& filename, int& w, int& h, int &d, fl
 	if ((bpp!=8))
 		return NULL;
 
-	unsigned char* ptr=bits();
+	unsigned char* ptr=ptrImg->bits();
 	int* ptr_int = reinterpret_cast<int*>(ptr+(w*(h-1)));
 	int t = *ptr_int++;
 	
@@ -198,14 +201,14 @@ unsigned char* loadVal_8(const std::string& filename, int& w, int& h, int &d, fl
 		// uncompress data
 		unsigned char* data = uncompressZ8<unsigned char>(ptr,w,h,d);
 	
-		delete prtImg;
+		delete ptrImg;
 		// return 3D image
 		return data;
 	}
 	
 	unsigned char* ptr2 = new unsigned char[w*h*d];
 	memcpy (ptr2, ptr, w*h*d); 
-	delete prtImg;
+	delete ptrImg;
 	return ptr2;
 }
 
@@ -233,7 +236,7 @@ void saveVal(const std::string& filename, unsigned char* data, int w, int h, int
 	*entete2++ = vz;
 
 	// save image
-	img.save(filename.c_str(),QImage::Format_Indexed8);
+	img.save(QString(filename.c_str()));
 }
 
 
@@ -253,7 +256,7 @@ unsigned char* loadRGB(const std::string& filename, int& w, int& h, int &d, floa
 	if ((bpp!=24))
 		return NULL;
 
-	unsigned char* ptr=bits();
+	unsigned char* ptr=ptrImg->bits();
 	int* ptr_int = reinterpret_cast<int*>(ptr+3*(w*(h-1)));
 	int t = *ptr_int++;
 	if (t!= RGB8)
@@ -269,7 +272,7 @@ unsigned char* loadRGB(const std::string& filename, int& w, int& h, int &d, floa
 
 	unsigned char* ptr2 = new unsigned char[3*w*h*d];
 	memcpy (ptr2, ptr, 3*w*h*d); 
-	delete prtImg;
+	delete ptrImg;
 	return ptr2;
 }
 
@@ -296,7 +299,7 @@ void saveRGB(const std::string& filename, unsigned char* data, int w, int h, int
 
 
 	// save image
-	img.save(filename.c_str(),QImage::Format_RGB888);
+	img.save(QString(filename.c_str()));
 }
 
 /*

@@ -310,7 +310,7 @@ void computeCurvatureVertices_NormalCycles(
 	typename PFP::TVEC3& Kmax,
 	typename PFP::TVEC3& Kmin,
 	typename PFP::TVEC3& Knormal,
-	const FunctorSelect& select = SelectorTrue())
+	const FunctorSelect& select)
 {
 	CellMarker marker(map, VERTEX);
 	for(Dart d = map.begin(); d != map.end(); map.next(d))

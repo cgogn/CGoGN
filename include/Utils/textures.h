@@ -231,7 +231,7 @@ public:
 	* @param h heighy of image
 	* @param bpp byte per pixel of image 
 	*/
-	bool load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp)
+	bool load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp);
 	
 #ifdef WITH_QT
 	/// load from file

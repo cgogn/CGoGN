@@ -14,7 +14,7 @@ include_directories(
 IF(WIN32)
 	link_directories( 
 		${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
-		${CGoGN_ROOT_DIR}/lib/Release )
+		${Boost_LIBRARY_DIRS} )
 ELSE(WIN32)
 	link_directories(
 		${CGoGN_ROOT_DIR}/lib/Debug

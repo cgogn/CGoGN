@@ -153,6 +153,9 @@ private:
 
 	bool optimize(VEC4& v) const
 	{
+#ifdef WIN32
+#define isnan(X) _isnan(X)
+#endif
 		if (isnan(A(0,0)))
 			return false ;
 

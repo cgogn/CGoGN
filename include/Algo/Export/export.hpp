@@ -25,7 +25,6 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
 #include "Topology/generic/cellmarker.h"
-#include "openctm.h"
 
 namespace CGoGN
 {

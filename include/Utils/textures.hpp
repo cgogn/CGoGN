@@ -329,7 +329,7 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 
 	if (ptr == NULL)
 	{
-		CGoGNout << "Impossible to load "<< filename << std::endl;
+		CGoGNout << "Impossible to load "<< filename << CGoGNendl;
 		return false;
 	}
 	
@@ -354,19 +354,19 @@ bool Image<DIM,TYPE>::load(const std::string& filename)
 		if (sizeof(TYPE) == 3)
 		{
 			QImage img = ptr->convertToFormat(QImage::Format_RGB888);
-			this->m_data_ptr = new T[3*img.width()*img.height()];
+			this->m_data_ptr = new TYPE[3*img.width()*img.height()];
 			memcpy(this->m_data_ptr, img.bits(), 3*img.width()*img.height());
 		}
 		else if (sizeof(TYPE) == 1)
 		{
 			QImage img = ptr->convertToFormat(QImage::Format_Indexed8);
-			this->m_data_ptr = new T[img.width()*img.height()];
+			this->m_data_ptr = new TYPE[img.width()*img.height()];
 			memcpy(this->m_data_ptr, img.bits(), img.width()*img.height());
 		}
 	}
 	else
 	{
-		this->m_data_ptr = new T[ptr->width()*ptr->height()];
+		this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
 		memcpy(this->m_data_ptr, ptr->bits(), ptr->width()*ptr->height());
 	}
 
@@ -386,30 +386,24 @@ void Image<DIM,TYPE>::save(const std::string& filename)
 
 	if (this->m_data_ptr != NULL)
 	{
+		QImage* ptrIm = NULL;
 		switch(sizeof(TYPE))
 		{
 		case 1:
-			{
-			QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_Indexed8);
-			this->m_qimg->save(QString(filename), QImage::Format_Indexed8);
-			}
+			ptrIm = new QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_Indexed8);
 			break;
 		case 3:
-			{
-			QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_RGB888);
-			this->m_qimg->save(QString(filename), QImage::Format_RGB888);
-			}
+			ptrIm = new QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_RGB888);
 			break;
 		case 4:
-			{
-			QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_ARGB32);
-			this->m_qimg->save(QString(filename), QImage::Format_ARGB32);
-			}
+			ptrIm = new QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_ARGB32);
 			break;
 		default:
 			break;
 		}
 	}
+	ptrIm->save(QString(filename.c_str()));
+	delete ptrIm;
 }
 #endif
 
