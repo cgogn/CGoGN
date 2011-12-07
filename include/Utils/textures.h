@@ -26,8 +26,7 @@
 #define CGOGN_TEXTURES_H_
 
 #include "Geometry/vector_gen.h"
-
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include <string>
 #include <QImage>
 

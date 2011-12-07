@@ -88,7 +88,7 @@ ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP,2);
 
 	// get and fill uniforms
 	bind();
