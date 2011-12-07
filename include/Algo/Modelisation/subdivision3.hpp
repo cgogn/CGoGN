@@ -94,8 +94,8 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	CellMarkerNoUnmark me(map, EDGE);
 	CellMarker mf(map, FACE);
 
-	AutoAttributeHandler< EMB > attBary(map,VOLUME);
-	CellMarker vol(map,VOLUME);
+	AutoAttributeHandler< EMB > attBary(map, VOLUME);
+	CellMarker vol(map, VOLUME);
 
 	//pre-computation : compute the centroid of all volume
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
@@ -103,7 +103,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if(selected(d) && !vol.isMarked(d))
 		{
 			vol.mark(d);
-			attBary[d] = Algo::Geometry::volumeCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
+			attBary[d] = Algo::Geometry::volumeCentroidGen<PFP,EMBV,EMB>(map, d, attributs);
 		}
 	}
 

@@ -864,13 +864,14 @@ unsigned int GMap2::closeHole(Dart d, bool forboundary)
 	beta2sew(d, beta0(first));	// sew the new edge to the hole
 	beta2sew(first, beta0(d));
 
+	Dart prev = first ;
 	Dart dNext = d;	// Turn around the hole
 	Dart dPhi1;		// to complete the face
 	do
 	{
 		dPhi1 = phi1(dNext) ;
 		dNext = beta2(dPhi1) ;
-		while(dNext != dPhi1)
+		while(dNext != dPhi1 && dPhi1 != d)
 		{
 			dPhi1 = beta1(dNext) ;	// Search and put in dNext
 			dNext = beta2(dPhi1) ;	// the next dart of the hole
@@ -880,13 +881,14 @@ unsigned int GMap2::closeHole(Dart d, bool forboundary)
 		{
 			Dart next = newEdge();	// Add a new edge there and link it to the face
 			++countEdges;
-			Dart tmp = phi1(first) ;
-			beta1sew(beta0(first), next);	// the edge is linked to the face
-			beta1sew(beta0(next), tmp) ;
+			beta1sew(beta0(next), prev);	// the edge is linked to the face
+			prev = next ;
 			beta2sew(dNext, beta0(next));	// the face is linked to the hole
 			beta2sew(next, beta0(dNext));
 		}
 	} while (dPhi1 != d);
+
+	beta1sew(prev, beta0(first)) ;
 
 	if(forboundary)
 		boundaryMarkOrbit(FACE, phi2(d));
