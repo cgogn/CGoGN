@@ -4,36 +4,23 @@ project(examplesD)
 
 SET(CMAKE_BUILD_TYPE Debug)
 
-# FOR Qt4
-FIND_PACKAGE(Qt4 REQUIRED)
-SET(QT_USE_QTOPENGL TRUE)
-INCLUDE(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
 # define includes path
 include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}
-	/usr/include/libxml2/
 	${CGoGN_ROOT_DIR}/include
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical
-	${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig
-	${CGoGN_ROOT_DIR}/ThirdParty/gzstream
-	${CGoGN_ROOT_DIR}/ThirdParty/Zinri
-	${CGoGN_ROOT_DIR}/ThirdParty/AntTweakBar/include
-	${CGoGN_ROOT_DIR}/ThirdParty/OpenCTM
-	${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include
-	${CGoGN_ROOT_DIR}/ThirdParty/glm
+	${CGoGN_EXT_INCLUDES}
 )
 
 # define libs path
 link_directories(
 	${CGoGN_ROOT_DIR}/lib/Debug
 	${CGoGN_ROOT_DIR}/lib/Release
+	${Boost_LIBRARY_DIRS}
 )
 IF(WIN32)
-	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)  ${Boost_LIBRARY_DIRS})
+	link_directories( ${CGoGN_ROOT_DIR}/lib/$(ConfigurationName)
+	${Boost_LIBRARY_DIRS})
 ELSE(WIN32)
-		
 	link_directories( ${CGoGN_ROOT_DIR}/lib/Debug  ${CGoGN_ROOT_DIR}/lib/Release )
 ENDIF(WIN32)
 
@@ -42,47 +29,47 @@ ENDIF(WIN32)
 QT4_WRAP_CPP(polyhedronsView_moc ../polyhedronsView.h)	
 add_executable( polyhedronsViewD ../polyhedronsView.cpp ${polyhedronsView_moc})
 target_link_libraries( polyhedronsViewD
-		${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+		${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP(frame_manip_moc ../frame_manip.h)  
 add_executable( frame_manipD ../frame_manip.cpp ${frame_manip_moc})
 target_link_libraries( frame_manipD
-                ${CGoGN_LIBS_D} ${COMMON_LIBS}  ${QT_LIBRARIES} )
+                ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS}  )
 
 QT4_WRAP_CPP(texturesExample_moc ../texturesExample.h)  
 add_executable( texturesExampleD ../texturesExample.cpp ${texturesExample_moc} )
 target_link_libraries( texturesExampleD
-                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+                ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP(simpleMap3_moc ../simpleMap3.h)  
 add_executable( simpleMap3D ../simpleMap3.cpp ${simpleMap3_moc} )
 target_link_libraries( simpleMap3D
-                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+                ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
                 
 QT4_WRAP_CPP(simpleGMap2_moc ../simpleGMap2.h)  
 add_executable( simpleGMap2D ../simpleGMap2.cpp ${simpleGMap2_moc} )
 target_link_libraries( simpleGMap2D
-                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+                ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP(simpleGMap3_moc ../simpleGMap3.h)  
 add_executable( simpleGMap3D ../simpleGMap3.cpp ${simpleGMap3_moc} )
 target_link_libraries( simpleGMap3D
-                ${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+                ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP(extrusionView_moc ../extrusionView.h)	
 add_executable( extrusionViewD ../extrusionView.cpp ${extrusionView_moc})
 target_link_libraries( extrusionViewD
-		${CGoGN_LIBS_D} ${COMMON_LIBS} ${QT_LIBRARIES} )
+		${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_UI( viewer_ui ../viewer.ui )
 QT4_WRAP_CPP( viewer_moc ../viewer.h )
 add_executable( viewerD ../viewer.cpp ${viewer_moc} ${viewer_ui})
 target_link_libraries( viewerD 
-	${CGoGN_LIBS_D} ${NUMERICAL_LIBS} ${COMMON_LIBS} ${QT_LIBRARIES} )
+	${CGoGN_LIBS_D} ${NUMERICAL_LIBS} ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_UI( clipping_ui ../clipping.ui )
 QT4_WRAP_CPP( clipping_moc ../clipping.h )
 add_executable( clippingD ../clipping.cpp ${clipping_ui} ${clipping_moc})
 target_link_libraries( clippingD
-	${CGoGN_LIBS_D}  ${COMMON_LIBS}  ${QT_LIBRARIES} )
+	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 

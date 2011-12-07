@@ -27,7 +27,6 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
-#include "openctm.h"
 
 namespace CGoGN
 {

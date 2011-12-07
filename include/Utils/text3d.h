@@ -27,8 +27,7 @@
 
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
-#include <IL/ilu.h>
-#include <IL/ilut.h>
+
 
 namespace CGoGN
 {
@@ -55,8 +54,6 @@ protected:
 
     static std::string fragmentShaderText1;
     static std::string fragmentShaderText2;
-
-    static ILuint m_imgName;
 
     static GLuint m_idTexture;
 

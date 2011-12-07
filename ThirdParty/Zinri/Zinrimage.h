@@ -12,16 +12,16 @@
 #ifndef ZINRIMAGE_H
 #define ZINRIMAGE_H
 
-#ifdef WIN32
-  #ifdef EXPORTING
-    #define APIEXPORT __declspec(dllexport)
-  #else
-    #define APIEXPORT __declspec(dllimport)
-  #endif
-#else
-  #define APIEXPORT
-#endif
-
+//#ifdef WIN32
+//  #ifdef EXPORTING
+//    #define APIEXPORT __declspec(dllexport)
+//  #else
+//    #define APIEXPORT __declspec(dllimport)
+//  #endif
+//#else
+//  #define APIEXPORT
+//#endif
+ #define APIEXPORT
 
 #ifdef __cplusplus
 extern "C" {

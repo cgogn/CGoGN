@@ -57,7 +57,11 @@
 #include <zlib.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+#ifdef __APPLE__
+	#include <sys/malloc.h>
+#else
+	#include <malloc.h>
+#endif
 #include <string.h>
 #ifndef WIN32
 #include <strings.h>

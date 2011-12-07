@@ -165,7 +165,7 @@ protected:
 	/**
 	 * create the shader (attach and link shaders into program)
 	 */
-	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES);
+	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES, int nb_max_vertices=16);
 
 	/**
 	 * get log after compiling
@@ -235,7 +235,7 @@ public:
 	 * @param inputGeometryPrimitive primitives used in geometry shader as input
 	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
 	 */
-	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLE_STRIP);
+	bool loadShaders(const std::string& vs, const std::string& fs, const std::string& gs, GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLE_STRIP, int nb_max_vertices=16);
 
 	/**
 	 * load shaders (compile and link)
@@ -254,7 +254,7 @@ public:
 	 * @param inputGeometryPrimitive primitives used in geometry shader as input
 	 * @param outputGeometryPrimitive primitives generated in geometry shader as output
 	 */
-	bool loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive);
+	bool loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive, int nb_max_vertices=16);
 
 	const char* getVertexShaderSrc() { return m_vertex_shader_source; }
 	const char* getFragmentShaderSrc() { return m_fragment_shader_source; }

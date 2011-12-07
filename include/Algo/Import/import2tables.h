@@ -34,10 +34,12 @@
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
-#include "gzstream.h"
-#include "openctm.h"
+
+#include "Utils/gzstream.h"
+#ifdef WITH_ASSIMP
 #include "assimp.h"
 #include "aiScene.h"
+#endif
 
 namespace CGoGN
 {
@@ -83,7 +85,9 @@ protected:
 
 	static ImportSurfacique::ImportType getFileType(const std::string& filename);
 
+#ifdef WITH_ASSIMP
 	void extractMeshRec(AttributeContainer& container, AttributeHandler<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
+#endif
 
 public:
 	typedef typename PFP::VEC3 VEC3 ;
@@ -111,11 +115,9 @@ public:
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
 	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importCTM(const std::string& filename, std::vector<std::string>& attrNames);
-
+#ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
-	
+#endif	
 	bool mergeCloseVertices();
 
 	bool importAHEM(const std::string& filename, std::vector<std::string>& attrNames);

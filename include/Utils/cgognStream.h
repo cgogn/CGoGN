@@ -51,7 +51,7 @@ void allToStd(bool yes = true);
  */
 void allToFile(const std::string& filename);
 
-#ifndef NO_QT
+#ifdef WITH_QT
 /**
  * set all outputs to status bar of Qt interface
  */
@@ -89,13 +89,15 @@ protected:
 	int m_out_mode;
 
 	std::stringstream m_buffer;
-#ifndef NO_QT
+	
+#ifdef WITH_QT
 	Utils::QT::SimpleQT* m_sqt_bar;
 
 	Utils::QT::SimpleQT* m_sqt_console;
 
 	QTextEdit* m_qte;
 #endif
+
 	std::ofstream* m_ofs;
 
 	std::stringstream* m_oss;
@@ -123,6 +125,7 @@ public:
 	 */
 	void toFile(const std::string& filename);
 
+#ifdef WITH_QT
 	/**
 	 * set output to status bar of Qt interface
 	 */
@@ -132,6 +135,7 @@ public:
 	 * set output to console of Qt interface
 	 */
 	void toConsole(Utils::QT::SimpleQT* sqt);
+#endif
 
 	/**
 	 * set output to string stream buffer
