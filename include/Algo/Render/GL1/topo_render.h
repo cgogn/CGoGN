@@ -28,7 +28,7 @@
 #include <list>
 //#include <gmtl/VecOps.h>
 //#include <gmtl/Output.h>
-#include <GL/gl.h>
+#include <GL/glew.h>
 
 #include "Topology/generic/functor.h"
 

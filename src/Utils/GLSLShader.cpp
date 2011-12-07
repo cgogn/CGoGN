@@ -442,7 +442,7 @@ char* GLSLShader::getInfoLog( GLhandleARB obj )
 	return info_log;
 }
 
-bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimitive)
+bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimitive, int nb_max_vertices)
 {
 	int		status;
 	char	*info_log;
@@ -475,9 +475,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 
 		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_INPUT_TYPE_EXT,inputGeometryPrimitive);
 		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_OUTPUT_TYPE_EXT,outputGeometryPrimitive);
-		int temp;
-		glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES_EXT,&temp);
-		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,temp);
+		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,nb_max_vertices);
 	}
 
 	/*** link program object ***/
@@ -669,7 +667,7 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps)
 	return true; 
 }
 
-bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const std::string& gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive)
+bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const std::string& gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive, int nb_max_vertices)
 {
 	m_nameVS = vs;
 	m_nameFS = ps;
@@ -689,7 +687,7 @@ bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps, const
 		CGoGNerr << "Error while loading geometry shader" << CGoGNendl;
 	}
 
-	if(!create(inputGeometryPrimitive,outputGeometryPrimitive))
+	if(!create(inputGeometryPrimitive,outputGeometryPrimitive,nb_max_vertices))
 	{
 		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;
@@ -727,7 +725,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 	return true;
 }
 
-bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive)
+bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const char* gs, GLint inputGeometryPrimitive,GLint outputGeometryPrimitive, int nb_max_vertices)
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
@@ -759,7 +757,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 	if(!loadGeometryShaderSourceString(gs))
 		return false;
 
-	if(!create(inputGeometryPrimitive,outputGeometryPrimitive))
+	if(!create(inputGeometryPrimitive,outputGeometryPrimitive,nb_max_vertices))
 	{
 		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;

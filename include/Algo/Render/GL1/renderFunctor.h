@@ -26,7 +26,6 @@
 #define __RENDER_FUNCTOR_GL_H
 
 #include <vector>
-#include <IL/ilut.h>
 
 namespace CGoGN
 {
