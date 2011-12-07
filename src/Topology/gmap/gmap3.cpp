@@ -39,7 +39,6 @@ void GMap3::deleteVolume(Dart d)
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
-
 	mark.markOrbit(FACE, d) ;
 
 	// For every face added to the list
@@ -154,12 +153,11 @@ void GMap3::cutEdge(Dart d)
 		Dart d3 = beta3(prev);
 		beta3sew(beta0(prev), beta0(d3));
 		beta3sew(phi1(prev), phi1(d3));
-
 	}
 
 	Dart d3 = beta3(d);
 	beta3sew(beta0(d), beta0(d3));
-	beta3sew(phi1(prev), phi1(d3));
+	beta3sew(phi1(d), phi1(d3));
 }
 
 bool GMap3::uncutEdge(Dart d)
@@ -173,6 +171,7 @@ bool GMap3::uncutEdge(Dart d)
 		{
 			prev = dd;
 			dd = alpha2(dd);
+
 			GMap2::uncutEdge(prev);
 		} while (dd != d) ;
 
@@ -188,13 +187,27 @@ void GMap3::splitFace(Dart d, Dart e)
 	Dart dd = beta1(beta3(d));
 	Dart ee = beta1(beta3(e));
 
+	Dart dprev = phi_1(d) ;
+	Dart eprev = phi_1(e) ;
+	Dart ddprev = phi_1(dd) ;
+	Dart eeprev = phi_1(ee) ;
+
+	beta3unsew(beta1(d)) ;
+	beta3unsew(beta1(e)) ;
+	beta3unsew(beta1(dd)) ;
+	beta3unsew(beta1(ee)) ;
+
 	GMap2::splitFace(d, e);
 	GMap2::splitFace(dd, ee);
-
 	beta3sew(beta1(d), phi_1(ee));
 	beta3sew(phi_1(d), beta1(ee));
 	beta3sew(beta1(e), phi_1(dd));
 	beta3sew(phi_1(e), beta1(dd));
+
+	beta3sew(beta0(dprev), beta0(beta3(dprev))) ;
+	beta3sew(beta0(eprev), beta0(beta3(eprev))) ;
+	beta3sew(beta0(ddprev), beta0(beta3(ddprev))) ;
+	beta3sew(beta0(eeprev), beta0(beta3(eeprev))) ;
 }
 
 void GMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
@@ -230,6 +243,8 @@ void GMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 		{
 			beta2unsew(fitD) ;
 			beta2unsew(fitE) ;
+			beta2unsew(beta0(fitD)) ;
+			beta2unsew(beta0(fitE)) ;
 			beta2sew(fitD2, beta0(fitE2)) ;
 			beta2sew(beta0(fitD2), fitE2) ;
 			beta2sew(fitD, beta0(fitE)) ;
@@ -327,7 +342,7 @@ void GMap3::splitVolume(std::vector<Dart>& vd)
 	GMap2::fillHole(e2) ;
 
 	//sew the two connected components
-	GMap3::sewVolumes(phi2(e), phi2(e2), false);
+	GMap3::sewVolumes(beta2(e), beta2(e2), false);
 }
 
 /*! @name Topological Queries

@@ -39,56 +39,54 @@ class EmbeddedGMap3 : public GMap3
 public:
 	typedef GMap3 TOPO_MAP;
 
+	/*!
+	 *
+	 */
+	virtual Dart deleteVertex(Dart d);
+
 	//! Cut the edge of d
 	/*! @param d a dart of the edge to cut
 	 */
 	virtual void cutEdge(Dart d);
 
-	/**
-	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
-	 * The attributes attached to the edge of d are kept on the resulting edge
-	 * The attributes attached to the volume of d are kept on the resulting volume
+	/*! The attributes attached to the edge of d are kept on the resulting edge
+	 *  @param d a dart of the edge to cut
 	 */
-	void sewFaces(Dart d, Dart e, bool withBoundary = true);
+	virtual bool uncutEdge(Dart d);
 
-	/**
-	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
-	 * The attributes attached to the old edge are duplicated on both resulting edges
-	 * The attributes attached to the old volume are duplicated on both volume if a new one is created
-	 */
-	virtual void unsewFaces(Dart d);
-
-	//! Split a face inserting an edge between two vertices
-	/*! \pre Dart d and e should belong to the same face and be distinct
-	 *  @param d dart of first vertex
-	 *  @param e dart of second vertex
-	 *  @return the dart of the new edge lying in the vertex of d after the cut
+	/*!
+	 *
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
-	/**
-	 * The attributes attached to the vertices of the vertices of the face of d are kept on the vertices of the resulting face
-	 * The attributes attached to the edges of the face of d are kept on the resulting face
-	 * The attributes attached to the face of d are kept on the resulting face
+	/*!
+	 *
 	 */
-	virtual void sewVolumes(Dart d, Dart e);
+	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
-	/**
-	 * The attributes attached to the vertices of the old face of d are duplicated on the vertices of both resulting faces
-	 * The attributes attached to the old edges of the old face of d are duplicated on the edges of both resulting faces
-	 * The attributes attached to the old face d are duplicated on both resulting faces
+	/*!
+	 *
 	 */
 	virtual void unsewVolumes(Dart d);
 
-	/**
-	 * The attributes attached to the volume of the old volume of d are kept on the resulting volume
+	/*!
+	 *
 	 */
 	virtual bool mergeVolumes(Dart d);
 
-	virtual unsigned int closeHole(Dart d);
+	/*!
+	 *
+	 */
+	virtual void splitVolume(std::vector<Dart>& vd);
 
-//	virtual void closeMap(DartMarker &marker);
+	/**
+	 * No attribute is attached to the new volume
+	 */
+	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
+	/*!
+	 *
+	 */
 	virtual bool check();
 } ;
 

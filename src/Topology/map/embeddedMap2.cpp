@@ -73,8 +73,8 @@ void EmbeddedMap2::cutEdge(Dart d)
 
 	if (isOrbitEmbedded(EDGE))
 	{
-		embedNewCell(EDGE, nd) ;
 		copyDartEmbedding(EDGE, phi2(d), d) ;
+		embedNewCell(EDGE, nd) ;
 		copyCell(EDGE, nd, d) ;
 	}
 

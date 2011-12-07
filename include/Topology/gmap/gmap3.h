@@ -139,12 +139,12 @@ public:
 	//! unsew two oriented volumes along their faces.
 	/*! @param d a dart of one volume
 	 */
-	void unsewVolumes(Dart d);
+	virtual void unsewVolumes(Dart d);
 
 	//! merge to volume sewed by one face
 	/*! @param d a dart of common face
 	 */
-	bool mergeVolumes(Dart d);
+	virtual bool mergeVolumes(Dart d);
 
 	//! Split a volume into two volumes along a edge path
 	/*! @param vd a vector of darts

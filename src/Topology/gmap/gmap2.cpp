@@ -117,12 +117,22 @@ void GMap2::fillHole(Dart d)
 void GMap2::splitVertex(Dart d, Dart e)
 {
 	assert(sameVertex(d, e));
+
+	if(!sameOrientedVertex(d, e))
+		e = beta2(e) ;
+
 	Dart dd = phi2(d) ;
 	Dart ee = phi2(e) ;
+	beta2unsew(d) ;
+	beta2unsew(e) ;
+
 	GMap1::cutEdge(dd);			// Cut the edge of dd (make a new edge)
 	GMap1::cutEdge(ee);			// Cut the edge of ee (make a new edge)
+
 	beta2sew(phi1(dd), beta0(phi1(ee)));	// Sew the two faces along the new edge
 	beta2sew(phi1(ee), beta0(phi1(dd)));
+	beta2sew(d, beta0(dd)) ;
+	beta2sew(e, beta0(ee)) ;
 }
 
 Dart GMap2::deleteVertex(Dart d)
@@ -172,17 +182,8 @@ bool GMap2::uncutEdge(Dart d)
 {
 	if(vertexDegree(phi1(d)) == 2)
 	{
-		Dart ne = phi2(d) ;
-		Dart nd = phi1(d) ;
-		Dart e = phi_1(ne) ;
-		beta2unsew(d) ;
-		beta2unsew(ne) ;
-		beta2unsew(e) ;
-		beta2unsew(nd) ;
-		GMap1::collapseEdge(nd) ;
-		GMap1::collapseEdge(ne) ;
-		beta2sew(d, beta0(e)) ;
-		beta2sew(e, beta0(d)) ;
+		GMap1::uncutEdge(d) ;
+		GMap1::uncutEdge(beta2(d)) ;
 		return true ;
 	}
 	return false ;
@@ -429,11 +430,20 @@ void GMap2::splitFace(Dart d, Dart e)
 	if(!sameOrientedFace(d, e))
 		e = beta1(e) ;
 
+	Dart dprev = phi_1(d) ;
+	Dart eprev = phi_1(e) ;
+
+	beta2unsew(beta1(d)) ;
+	beta2unsew(beta1(e)) ;
+
 	GMap1::cutEdge(phi_1(d)) ;
 	GMap1::cutEdge(phi_1(e)) ;
 	GMap1::splitFace(phi_1(d), phi_1(e)) ;
 	beta2sew(phi_1(d), beta1(e)) ;
 	beta2sew(phi_1(e), beta1(d)) ;
+
+	beta2sew(beta0(dprev), beta0(beta2(dprev))) ;
+	beta2sew(beta0(eprev), beta0(beta2(eprev))) ;
 }
 
 bool GMap2::mergeFaces(Dart d)
@@ -830,7 +840,7 @@ bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int
 				{
 					mark.mark(e);					// Mark
 					Dart adj = phi2(e);				// Get adjacent face
-					if (!mark.isMarked(e))
+					if (!mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
 					e = phi1(e);
 				} while(e != *it);

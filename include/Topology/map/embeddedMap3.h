@@ -48,7 +48,6 @@ public:
 	 */
 	virtual void cutEdge(Dart d);
 
-
 	/*! The attributes attached to the edge of d are kept on the resulting edge
 	 *  @param d a dart of the edge to cut
 	 */

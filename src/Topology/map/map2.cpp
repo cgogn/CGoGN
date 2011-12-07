@@ -144,7 +144,6 @@ void Map2::cutEdge(Dart d)
 	phi2unsew(d);			// remove old phi2 links
 	Map1::cutEdge(d);		// Cut the 1-edge of d
 	Map1::cutEdge(e);		// Cut the 1-edge of phi2(d)
-
 	phi2sew(d, phi1(e));	// Correct the phi2 links
 	phi2sew(e, phi1(d));
 }
@@ -153,13 +152,11 @@ bool Map2::uncutEdge(Dart d)
 {
 	if(vertexDegree(phi1(d)) == 2)
 	{
-		Dart ne = phi2(d) ;
-		Dart nd = phi1(d) ;
-		Dart e = phi_1(ne) ;
+		Dart e = phi2(phi1(d)) ;
 		phi2unsew(e) ;
 		phi2unsew(d) ;
-		Map1::collapseEdge(nd) ;
-		Map1::collapseEdge(ne) ;
+		Map1::uncutEdge(d) ;
+		Map1::uncutEdge(e) ;
 		phi2sew(d, e) ;
 		return true ;
 	}

@@ -139,6 +139,13 @@ inline void Map1::cutEdge(Dart d)
 		boundaryMark(e);
 }
 
+inline void Map1::uncutEdge(Dart d)
+{
+	Dart d1 = phi1(d) ;
+	phi1unsew(d) ;		// Dart d is linked to the successor of its successor
+	deleteDart(d1) ;	// Dart d1 is erased
+}
+
 inline void Map1::collapseEdge(Dart d)
 {
 	phi1unsew(phi_1(d)) ;	// Dart before d is linked to its successor

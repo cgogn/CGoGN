@@ -61,38 +61,38 @@ class MyQT: public Utils::QT::SimpleQT
 	bool render_vectors;
     bool render_topo;
 
-	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
+//	Algo::Render::GL2::MapRender* m_render;
+//	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
+//
+//	Utils::VBO* m_positionVBO;
+//	Utils::VBO* m_dataVBO;
 
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_dataVBO;
-
-	Utils::ShaderSimpleColor* m_shader;
-	Utils::ShaderVectorPerVertex* m_lines;
-	Utils::Strings3D* m_strings;
-	Utils::PointSprite* m_sprite;
+//	Utils::ShaderSimpleColor* m_shader;
+//	Utils::ShaderVectorPerVertex* m_lines;
+//	Utils::Strings3D* m_strings;
+//	Utils::PointSprite* m_sprite;
 
 	QTimer *m_timer;
 
 public:
 	MyQT():
-		render_text(true),
-		render_balls(true),
-		render_vectors(true),
+		render_text(false),
+		render_balls(false),
+		render_vectors(false),
 		render_topo(true),
-		m_render(NULL),
-		m_render_topo(NULL),
-		m_positionVBO(NULL),
-		m_dataVBO(NULL),
-		m_shader(NULL),
-		m_lines(NULL),
-		m_strings(NULL),
-		m_sprite(NULL),
+//		m_render(NULL),
+//		m_render_topo(NULL),
+//		m_positionVBO(NULL),
+//		m_dataVBO(NULL),
+//		m_shader(NULL),
+//		m_lines(NULL),
+//		m_strings(NULL),
+//		m_sprite(NULL),
 		m_timer(NULL)
 	{}
 
 protected:
-    void storeVerticesInfo();
+//	void storeVerticesInfo();
 
 	void cb_redraw();
 
@@ -104,14 +104,14 @@ protected:
 
 // slots locaux
 public slots:
-	void balls_onoff(bool x);
-	void vectors_onoff(bool x);
-	void text_onoff(bool x);
+//	void balls_onoff(bool x);
+//	void vectors_onoff(bool x);
+//	void text_onoff(bool x);
 	void topo_onoff(bool x);
 
-	void slider_balls(int x);
-	void slider_vectors(int x);
-	void slider_text(int x);
+//	void slider_balls(int x);
+//	void slider_vectors(int x);
+//	void slider_text(int x);
 
 	void animate();
 };
