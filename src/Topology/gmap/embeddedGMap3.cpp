@@ -477,6 +477,30 @@ bool EmbeddedGMap3::check()
 		}
 	}
 
+	if (isOrbitEmbedded(VERTEX))
+	{
+		delete dvMark;
+		delete vMark;
+	}
+
+	if (isOrbitEmbedded(EDGE))
+	{
+		delete deMark;
+		delete eMark;
+	}
+
+	if (isOrbitEmbedded(FACE))
+	{
+		delete dfMark;
+		delete fMark;
+	}
+
+	if (isOrbitEmbedded(VOLUME))
+	{
+		delete dvolMark;
+		delete volMark;
+	}
+
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 	return true ;
 }

@@ -144,7 +144,7 @@ protected:
 	void popColors();
 
 	/**
-	 * pick dart with color set bey setDartsIdColor
+	 * pick dart with color set by setDartsIdColor
 	 * @param x position of mouse (x)
 	 * @param y position of mouse (pass H-y, classic pb of origin)
 	 * @return the dart or NIL
@@ -270,7 +270,7 @@ class Topo3RenderMapD: public Topo3Render
 {
 public:
 	/**
-	* update all drawing buffers
+	* update all drawing buffers to render a dual map
 	* @param map the map
 	* @param good selector
 	* @param positions  attribute of position vertices
@@ -287,7 +287,7 @@ class Topo3RenderGMap: public Topo3Render
 {
 public:
 	/**
-	* update all drawing buffers
+	* update all drawing buffers to render a gmap
 	* @param map the map
 	* @param good selector
 	* @param positions  attribute of position vertices

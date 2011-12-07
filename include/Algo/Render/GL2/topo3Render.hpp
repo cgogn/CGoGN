@@ -305,7 +305,6 @@ Dart Topo3Render::picking(typename PFP::MAP& map, const FunctorSelect& good, int
 	Dart d = pickColor(x,y);
 	popColors();
 	return d;
-
 }
 
 template<typename PFP>
@@ -320,7 +319,6 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
 
 	if (m_attIndex.map() != &map)
-//	if(!m_attIndex.isValid())
 	{
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
@@ -388,13 +386,15 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 		}
 	}
 
-	m_nbDarts *= 2;
+	m_nbDarts *= 2; // x2 : only one orientation is used for the previous computation, multiply by 2 to get the number of darts
 
+	//colors
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
 
+	//darts
 	m_vbo0->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
@@ -418,8 +418,11 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 			{
 				const VEC3& P = positions[dd];
 				vecPos.push_back(P);
-//				m_attIndex[dd] = posDBI;
+				m_attIndex[dd] = posDBI;
 				posDBI+=2;
+				m_attIndex[map.beta0(dd)] = posDBI; //for gmap : also affect a number to the other orientation for picking
+				posDBI+=2;
+
 				center += P;
 				dd = map.phi1(dd);
 			} while (dd != d);

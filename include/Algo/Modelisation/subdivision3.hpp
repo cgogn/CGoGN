@@ -113,7 +113,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		//memorize each vertices per volumes
 		if(selected(d) && !mv.isMarked(d))
 		{
-			std::cout << " d " << d << std::endl;
 			l_vertices.push_back(d);
 			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
 		}
@@ -144,12 +143,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			} while(dd != d);
 		}
 	}
-
-	unsigned int nb_=0;
-	for(unsigned int nb= attributs.begin() ; nb != attributs.end() ; attributs.next(nb))
-		nb_++;
-
-	std::cout << "first " << nb_ << std::endl;
 
 	// second pass: quandrangule faces
 	std::map<Dart,Dart> toSew;
@@ -229,12 +222,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			dS = map.template phi<111>(map.phi2(dS));
 		}
 	}
-
-	nb_=0;
-	for(unsigned int nb= attributs.begin() ; nb != attributs.end() ; attributs.next(nb))
-		nb_++;
-
-	std::cout << "then " << nb_ << std::endl;
 
 	map.check();
 
