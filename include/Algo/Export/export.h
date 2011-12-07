@@ -64,15 +64,6 @@ template <typename PFP>
 bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
-* export the map into a Trian file
-* @param the_map map to be exported
-* @param filename filename of ply file
-* @return true
-*/
-template <typename PFP>
-bool exportCTM(typename PFP::MAP& map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good = allDarts) ;
-
-/**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
 *
 * exports position + any attribute named : "frame_T" (frame tangent : VEC3), "frame_B" (frame binormal : VEC3), "frame_N" (frame normal : VEC3),
