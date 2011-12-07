@@ -129,11 +129,11 @@ Dart Map3::deleteVertex(Dart d)
 	return res ;
 }
 
-void Map3::cutEdge(Dart d)
+Dart Map3::cutEdge(Dart d)
 {
 	Dart prev = d;
 	Dart dd = alpha2(d);
-	Map2::cutEdge(d);
+	Dart nd = Map2::cutEdge(d);
 
 	while (dd != d)
 	{
@@ -152,6 +152,8 @@ void Map3::cutEdge(Dart d)
 	phi3unsew(d);
 	phi3sew(d, phi1(d3));
 	phi3sew(d3, phi1(d));
+
+	return nd;
 }
 
 bool Map3::uncutEdge(Dart d)

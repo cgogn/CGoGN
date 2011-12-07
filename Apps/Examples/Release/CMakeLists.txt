@@ -64,4 +64,3 @@ QT4_WRAP_CPP( clipping_moc ../clipping.h )
 add_executable( clipping ../clipping.cpp ${clipping_ui} ${clipping_moc})
 target_link_libraries( clipping
 	${CGoGN_LIBS_R}  ${CGoGN_EXT_LIBS}  )
-

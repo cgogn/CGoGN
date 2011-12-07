@@ -130,13 +130,15 @@ inline void Map1::phi1unsew(Dart d)
  *  Topological operations on 1-maps
  *************************************************************************/
 
-inline void Map1::cutEdge(Dart d)
+inline Dart Map1::cutEdge(Dart d)
 {
 	Dart e = newDart() ;	// Create a new dart
 	phi1sew(d, e) ;			// Insert dart e between d and phi1(d)
 
 	if (isBoundaryMarked(d))
 		boundaryMark(e);
+
+	return e ;
 }
 
 inline void Map1::uncutEdge(Dart d)

@@ -40,14 +40,12 @@ Dart EmbeddedMap3::deleteVertex(Dart d)
 	return v ;
 }
 
-void EmbeddedMap3::cutEdge(Dart d)
+Dart EmbeddedMap3::cutEdge(Dart d)
 {
-	Map3::cutEdge(d);
+	Dart nd = Map3::cutEdge(d);
 
 	if(isOrbitEmbedded(EDGE))
 	{
-		Dart nd = phi1(d) ;
-
 		// embed the new darts created in the cut edge
 		embedOrbit(EDGE, d, getEmbedding(EDGE, d)) ;
 		// embed a new cell for the new edge and copy the attributes' line (c) Lionel
@@ -60,9 +58,9 @@ void EmbeddedMap3::cutEdge(Dart d)
 		Dart f = d;
 		do
 		{
-			Dart nd = phi1(f) ;
-			copyDartEmbedding(ORIENTED_FACE, nd, f);
-			Dart e = phi3(nd);
+			Dart f1 = phi1(f) ;
+			copyDartEmbedding(ORIENTED_FACE, f1, f);
+			Dart e = phi3(f1);
 			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
 			f = alpha2(f);
 		} while(f != d);
@@ -91,6 +89,8 @@ void EmbeddedMap3::cutEdge(Dart d)
 			f = alpha2(f);
 		} while(f != d);
 	}
+
+	return nd ;
 }
 
 bool EmbeddedMap3::uncutEdge(Dart d)

@@ -22,73 +22,67 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef TP_MASTER_H_
+#define TP_MASTER_H_
 
-#include "Topology/map/map3.h"
+#include <iostream>
 
-namespace CGoGN
-{
+#include "Utils/qtSimple.h"
 
-/*! Class of 3-dimensional maps with managed embeddings
+// forward definitions (minimize includes)
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class TopoRenderMapD; } } } }
+namespace CGoGN { namespace Utils { class VBO; } }
+namespace CGoGN { namespace Utils { class ShaderPhong; } }
+namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
+namespace CGoGN { namespace Utils { class Drawer; } }
+
+using namespace CGoGN ;
+
+/**
+ * A class for a little interface and rendering
  */
-class EmbeddedMap3 : public Map3
+class MyQT: public Utils::QT::SimpleQT
 {
+	Q_OBJECT
+
+protected:
+	bool m_drawTopo;
+	void drawSelected();
+
 public:
-	typedef Map3 TOPO_MAP;
+	// render
+	Algo::Render::GL2::MapRender* m_render;
+	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
 
-	/*!
-	 *
-	 */
-	virtual Dart deleteVertex(Dart d);
+	// VBO
+	Utils::VBO* m_positionVBO;
+	Utils::VBO* m_normalVBO;
 
-	/*! No attribute is attached to the new vertex
-	 *  The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+	//2 shaders
+	Utils::ShaderPhong* m_shader;
+	Utils::ShaderSimpleColor* m_shader2;
 
-	/*! The attributes attached to the edge of d are kept on the resulting edge
-	 *  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
-
-	/*!
-	 *
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	/*!
-	 *
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	/*!
-	 *
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	/*!
-	 *
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	/*!
-	 *
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
+	bool renderTopo;
 
 	/**
-	 * No attribute is attached to the new volume
+	 * object that allow easy rendering
 	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+	Utils::Drawer* m_ds;
 
-	/*!
-	 *
-	 */
-	virtual bool check();
-} ;
+	MyQT():
+		m_render(NULL), m_render_topo(NULL),
+		m_positionVBO(NULL), m_normalVBO(NULL),
+		m_shader(NULL), m_shader2(NULL),
+		renderTopo(true)
+	{}
 
-} // namespace CGoGN
+	// callbacks of simpleQT to overdefine:
+	void cb_redraw();
+
+	void cb_initGL();
+
+	void cb_keyPress(int code);
+};
 
 #endif

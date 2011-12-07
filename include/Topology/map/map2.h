@@ -147,8 +147,9 @@ public:
 
 	//! Cut the edge of d by inserting a new vertex
 	/*! @param d a dart of the edge to cut
+	 *  @return a dart of the new vertex
 	 */
-	virtual void cutEdge(Dart d);
+	virtual Dart cutEdge(Dart d);
 
 	//! Undo the cut of the edge of d
 	/*! @param d a dart of the edge to uncut
