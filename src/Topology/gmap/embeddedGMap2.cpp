@@ -72,11 +72,9 @@ Dart EmbeddedGMap2::deleteVertex(Dart d)
 	return f ;
 }
 
-void EmbeddedGMap2::cutEdge(Dart d)
+Dart EmbeddedGMap2::cutEdge(Dart d)
 {
-	GMap2::cutEdge(d) ;
-
-	Dart nd = phi1(d) ;
+	Dart nd = GMap2::cutEdge(d) ;
 
 	if (isOrbitEmbedded(EDGE))
 	{
@@ -97,6 +95,8 @@ void EmbeddedGMap2::cutEdge(Dart d)
 		setDartEmbedding(FACE, phi1(e), f2Emb) ;
 		setDartEmbedding(FACE, beta0(e), f2Emb) ;
 	}
+
+	return nd ;
 }
 
 bool EmbeddedGMap2::uncutEdge(Dart d)

@@ -113,8 +113,9 @@ public:
 
 	//! Cut the edge of d (all darts around edge orbit are cut)
 	/*! @param d a dart of the edge to cut
+	 *  @return a dart of the new vertex
 	 */
-	virtual void cutEdge(Dart d);
+	virtual Dart cutEdge(Dart d);
 
 	//! Uncut the edge of d (all darts around edge orbit are uncut)
 	/*! @param d a dart of the edge to uncut

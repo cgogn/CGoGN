@@ -137,11 +137,11 @@ Dart GMap3::deleteVertex(Dart d)
 	return NIL ;
 }
 
-void GMap3::cutEdge(Dart d)
+Dart GMap3::cutEdge(Dart d)
 {
 	Dart prev = d ;
 	Dart dd = alpha2(d) ;
-	GMap2::cutEdge(d) ;
+	Dart nd = GMap2::cutEdge(d) ;
 
 	while(dd != d)
 	{
@@ -158,6 +158,8 @@ void GMap3::cutEdge(Dart d)
 	Dart d3 = beta3(d);
 	beta3sew(beta0(d), beta0(d3));
 	beta3sew(phi1(d), phi1(d3));
+
+	return nd ;
 }
 
 bool GMap3::uncutEdge(Dart d)

@@ -162,20 +162,20 @@ Dart GMap2::deleteVertex(Dart d)
 	return res ;
 }
 
-void GMap2::cutEdge(Dart d)
+Dart GMap2::cutEdge(Dart d)
 {
 	Dart e = phi2(d) ;
 	beta2unsew(d) ;
 	beta2unsew(e) ;
-	GMap1::cutEdge(d) ;
-	GMap1::cutEdge(e) ;
+	Dart nd = GMap1::cutEdge(d) ;
+	Dart ne = GMap1::cutEdge(e) ;
 
-	Dart nd = phi1(d) ;
-	Dart ne = phi1(e) ;
 	beta2sew(d, beta0(ne)) ;
 	beta2sew(beta0(d), ne) ;
 	beta2sew(e, beta0(nd)) ;
 	beta2sew(beta0(e), nd) ;
+
+	return nd ;
 }
 
 bool GMap2::uncutEdge(Dart d)

@@ -76,7 +76,10 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			for (unsigned int j = 0; j < nbe; ++j)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
-				map.embedOrbit(VERTEX, d, em) ;
+
+				FunctorSetEmb<GenericMap> fsetemb(map, VERTEX, em);
+				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
 				d = map.phi1(d);
 			}
