@@ -183,68 +183,6 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	return true ;
 }
 
-template <typename PFP>
-bool exportCTM(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const std::string& filename, const FunctorSelect& good)
-{
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-
-	AutoAttributeHandler<unsigned int> tableVertLab(the_map, VERTEX);
-
-	CellMarker markV(the_map,VERTEX);
-
-	unsigned int nbDarts = the_map.getNbDarts() ;
-
-	std::vector<CTMfloat> verticesBuffer;
-	std::vector<CTMuint> indicesBuffer;
-	verticesBuffer.reserve(nbDarts/5);	// TODO non optimal reservation
-	indicesBuffer.reserve(nbDarts/3);
-
-	DartMarker markF(the_map);
-	unsigned int lab=0;
-	for(Dart d = the_map.begin(); d != the_map.end(); the_map.next(d))
-	{
-		if(good(d) && !markF.isMarked(d))
-		{
-			markF.markOrbit(FACE, d) ;
-			Dart e = d;
-			do
-			{
-				if (!markV.isMarked(e))
-				{
-					tableVertLab[e] = lab++;
-					markV.mark(e);
-					const VEC3& vert =  position[e];
-					verticesBuffer.push_back(vert[0]);
-					verticesBuffer.push_back(vert[1]);
-					verticesBuffer.push_back(vert[2]);
-				}
-				indicesBuffer.push_back(tableVertLab[e]);
-				e = the_map.phi1(e);
-			} while (e!=d);
-		}
-	}
-
-	// Save the file using the OpenCTM API
-	CTMexporter ctm;
-
-	// Define mesh
-
-	ctm.DefineMesh(&(verticesBuffer[0]) , verticesBuffer.size()/3,
-			&(indicesBuffer[0]) , indicesBuffer.size()/3, NULL);
-
-
-	ctm.VertexPrecisionRel(0.0001f);
-
-	// Set compression method and level
-	ctm.CompressionMethod(CTM_METHOD_MG2);
-	ctm.CompressionLevel(9);
-
-	// Export file
-	ctm.Save(filename.c_str());
-
-	return true ;
-}
 
 template <typename PFP>
 bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good)
