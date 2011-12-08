@@ -53,7 +53,7 @@ bool Approximator_RGBfunctionsHalf<PFP>::init()
 	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
 	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
 
-	MapBrowserLinkedAuto<typename PFP::MAP> mb(this->m_map) ;
+	MapBrowserLinked<typename PFP::MAP> mb(this->m_map) ;
 	this->m_map.foreach_orbit(EDGE, mb) ;
 
 	// create quadric embedding for computing and set them to 0
@@ -196,7 +196,7 @@ bool Approximator_RGBfunctions<PFP>::init()
 	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
 	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
 
-	MapBrowserLinkedAuto<typename PFP::MAP> mb(this->m_map) ;
+	MapBrowserLinked<typename PFP::MAP> mb(this->m_map) ;
 	this->m_map.foreach_orbit(EDGE, mb) ;
 
 	// create quadric embedding for computing and set them to 0

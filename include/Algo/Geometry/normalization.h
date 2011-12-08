@@ -43,7 +43,7 @@ typename PFP::REAL normalizeLength(typename PFP::MAP & the_map, typename PFP::TV
 	typename PFP::REAL sum = 0 ;
 	int count = 0 ;
 
-	MapBrowserLinkedAuto<typename PFP::MAP> mb(the_map) ;
+	MapBrowserLinked<typename PFP::MAP> mb(the_map) ;
 	the_map.foreach_orbit(m_attr.getOrbit(), mb) ;
 
 	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
