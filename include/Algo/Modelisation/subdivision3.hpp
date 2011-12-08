@@ -38,51 +38,49 @@ namespace Modelisation
 template <typename PFP>
 Dart cut3Ear(typename PFP::MAP& map, Dart d)
 {
-  Dart e=d;
-  int nb=0;
-  Dart dNew;
+	Dart e = d;
+	int nb = 0;
+	Dart dNew;
 
-  Dart dRing;
-  Dart dRing2;
+	Dart dRing;
+	Dart dRing2;
 
-  //count the valence of the vertex
-  do
-  {
-    nb++;
-    e=map.phi1(map.phi2(e));
-  } while (e!=d);
-
-  if(nb<3)
-  {
-	CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
-	return d;
-  }
-  else
-  {
-	//triangulate around the vertex
+	//count the valence of the vertex
 	do
 	{
-		Dart dN = map.phi1(map.phi2(e));
-		if(map.template phi<111>(e)!=e)
- 			map.splitFace(map.phi_1(e), map.phi1(e));
+		nb++;
+		e = map.phi1(map.phi2(e));
+	} while (e != d);
 
- 		dRing = map.phi1(e);
-		dRing2 = map.phi2(dRing);
+	if(nb < 3)
+	{
+		CGoGNout << "Warning : cannot cut 2 volumes without creating a degenerated face " << CGoGNendl;
+		return d;
+	}
+	else
+	{
+		//triangulate around the vertex
+		do
+		{
+			Dart dN = map.phi1(map.phi2(e));
+			if(map.template phi<111>(e) != e)
+				map.splitFace(map.phi_1(e), map.phi1(e));
 
-		map.unsewFaces(dRing);
+			dRing = map.phi1(e);
+			dRing2 = map.phi2(dRing);
 
-		e= dN;
-	} while (e!=d);
+			map.unsewFaces(dRing);
 
-	map.closeHole(dRing);
-	map.closeHole(dRing2);
-	map.sewVolumes(map.phi2(dRing),map.phi2(dRing2));
-  }
+			e = dN;
+		} while (e != d);
 
-  return map.phi2(dRing);
+		map.closeHole(dRing);
+		map.closeHole(dRing2);
+		map.sewVolumes(map.phi2(dRing), map.phi2(dRing2));
+	}
+
+	return map.phi2(dRing);
 }
-
-
 
 template <typename PFP, typename EMBV, typename EMB>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
@@ -113,7 +111,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		//memorize each vertices per volumes
 		if(selected(d) && !mv.isMarked(d))
 		{
-			std::cout << " d " << d << std::endl;
 			l_vertices.push_back(d);
 			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
 		}
@@ -144,12 +141,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			} while(dd != d);
 		}
 	}
-
-	unsigned int nb_=0;
-	for(unsigned int nb= attributs.begin() ; nb != attributs.end() ; attributs.next(nb))
-		nb_++;
-
-	std::cout << "first " << nb_ << std::endl;
 
 	// second pass: quandrangule faces
 	std::map<Dart,Dart> toSew;
@@ -230,12 +221,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		}
 	}
 
-	nb_=0;
-	for(unsigned int nb= attributs.begin() ; nb != attributs.end() ; attributs.next(nb))
-		nb_++;
-
-	std::cout << "then " << nb_ << std::endl;
-
 	map.check();
 
 	//sew all faces leading to the central vertex
@@ -249,12 +234,9 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	}
 }
 
-
 } //namespace Modelisation
 
 } //namespace Algo
 
 } //namespace CGoGN
-
-
 

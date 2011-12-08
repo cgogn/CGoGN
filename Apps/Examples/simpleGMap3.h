@@ -54,6 +54,7 @@ public:
 
 	PFP::TVEC3 position ;
 	PFP::TVEC3 normal ;
+	PFP::TVEC3 volume ;
 
 	SimpleGMap3() ;
 
