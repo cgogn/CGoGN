@@ -107,6 +107,36 @@ bool EmbeddedMap3::uncutEdge(Dart d)
 	return false ;
 }
 
+Dart EmbeddedMap3::deleteEdge(Dart d)
+{
+	Dart v = Map3::deleteVertex(d) ;
+	if(v != NIL)
+	{
+		if(isOrbitEmbedded(VOLUME))
+		{
+			embedOrbit(VOLUME, v, getEmbedding(VOLUME, v)) ;
+		}
+	}
+	return v;
+}
+
+Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
+{
+	unsigned int vEmb = getEmbedding(VERTEX, d) ;
+
+	Dart resV = Map3::collapseEdge(d, delDegenerateVolumes);
+
+	if(resV != NIL)
+	{
+		if(isOrbitEmbedded(VERTEX))
+		{
+			embedOrbit(VERTEX,resV,vEmb);
+		}
+	}
+
+	return resV;
+}
+
 void EmbeddedMap3::splitFace(Dart d, Dart e)
 {
 	Dart dd = phi1(phi3(d));

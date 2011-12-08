@@ -140,6 +140,19 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
+	//! Delete an edge and all the faces aroud this edge
+	/*! @param d a dart of the edge to delete
+	 */
+	virtual Dart deleteEdge(Dart d);
+
+	//! Collapse an edge (that is deleted) possibly merging its vertices
+	/*! \warning This may produce two distinct vertices if the edge
+	 *  was the only link between two border faces
+	 *  @param d a dart in the deleted edge
+	 *  @return a dart of the resulting vertex
+	 */
+	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes = true);
+
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
 	 *  @param d dart of first vertex
@@ -237,7 +250,9 @@ public:
 	 */
 	bool isBoundaryVolume(Dart d);
 
-	// TODO a mettre dans algo ?
+	//! Check the map completeness
+	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation
+	 */
 	virtual bool check();
 	//@}
 

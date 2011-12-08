@@ -57,6 +57,16 @@ public:
 	/*!
 	 *
 	 */
+	virtual Dart deleteEdge(Dart d);
+
+	/*!
+	 *
+	 */
+	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
+
+	/*!
+	 *
+	 */
 	virtual void splitFace(Dart d, Dart e);
 
 	/*!

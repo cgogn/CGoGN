@@ -176,6 +176,105 @@ bool Map3::uncutEdge(Dart d)
 	return false;
 }
 
+Dart Map3::deleteEdge(Dart d)
+{
+	if(isBoundaryEdge(d))
+		return NIL ;
+
+	//Save the darts around the edge
+	//(one dart per face should be enough)
+	std::vector<Dart> fstore;
+	fstore.reserve(128);
+	Dart dit = d;
+	do
+	{
+		fstore.push_back(dit);
+		dit = alpha2(dit);
+	}while(dit != d);
+
+
+	Dart res = NIL ;
+	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
+	{
+		Dart fit = *it ;
+		Dart end = phi_1(fit) ;
+		fit = phi1(fit) ;
+		while(fit != end)
+		{
+			Dart d2 = phi2(fit) ;
+			Dart d3 = phi3(fit) ;
+			Dart d32 = phi2(d3) ;
+			if(res == NIL)
+				res = d2 ;
+			phi2unsew(d2) ;
+			phi2unsew(d32) ;
+			phi2sew(d2, d32) ;
+			phi2sew(fit, d3) ;
+		}
+	}
+	Map2::deleteCC(d) ;
+
+	return res ;
+}
+
+Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
+{
+	Dart resV = NIL;
+
+	Dart e = d;
+
+	//stocke un brin par volume autour de l'arete
+	std::vector<Dart> tmp;
+	tmp.reserve(32);
+	do
+	{
+		tmp.push_back(e);
+		e = alpha2(e);
+	} while (e != d);
+
+	//contraction de la 2 carte de chaque 2-arete
+	for (std::vector<Dart>::iterator it = tmp.begin(); it != tmp.end(); ++it)
+	{
+		//un brin d'une face adjacente a l'arrete contracte
+		Dart d = phi2(phi_1(*it));
+		Map2::collapseEdge(*it,false);
+
+		//test de la degeneresence
+		//impossible d'avoir un volume de moins de 4 faces sans avoir de phi2 en points fixe donc on les vire
+		if(delDegenerateVolumes && Map2::volumeDegree(d) < 4)
+		{
+			Dart e = d;
+			//pour tous les brins de la face adjacente
+
+			do
+			{
+				Dart ee = phi3(e);
+				Dart ff = phi3(phi2(e));
+
+				//si les brins ont un voisin par phi3
+				if(ee != e)
+					phi3unsew(ee);
+
+				if(ff != phi2(e))
+					phi3unsew(ff);
+
+				//si les deux en ont un, il faut les coudres ensemble
+				if(ee != e && ff != phi2(e))
+					phi3sew(ee, ff);
+
+				//on peut supprimer les brins de cette arete
+				deleteDart(e);
+				deleteDart(phi2(e));
+				e = phi1(e);
+
+			} while (e != d);
+		}
+	}
+
+
+	return resV;
+}
+
 void Map3::splitFace(Dart d, Dart e)
 {
 	assert(d != e && sameOrientedFace(d, e)) ;

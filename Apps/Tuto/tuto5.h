@@ -24,26 +24,42 @@
 #ifndef __TUTO5_
 #define __TUTO5_
 
-
 #include <iostream>
 
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap3.h"
 
+#include "Geometry/vector_gen.h"
+#include "Algo/Geometry/boundingbox.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topo3Render.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+
+#include "Algo/Render/SVG/mapSVGRender.h"
+
+#include "Algo/Modelisation/primitives3d.h"
+#include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Modelisation/subdivision.h"
+
+#include "Topology/generic/cellmarker.h"
+
+#include "Utils/text3d.h"
+#include "Utils/pointSprite.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
+#include "Utils/cgognStream.h"
 #include "Utils/qtSimple.h"
 
 #include "ui_tuto5.h"
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/qtui.h"
 
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3RenderMapD; } } } }
-namespace CGoGN { namespace Utils { class VBO; } }
-namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
-namespace CGoGN { namespace Utils { class Strings3D; } }
-namespace CGoGN { namespace Utils { class PointSprite; } }
-namespace CGoGN { namespace Utils { class ShaderVectorPerVertex; } }
-
 using namespace CGoGN ;
+
+struct PFP: public PFP_STANDARD
+{
+	// definition de la carte
+	typedef EmbeddedMap3 MAP;
+};
 
 /**
  * Utilisation de designer-qt4:
@@ -52,7 +68,7 @@ using namespace CGoGN ;
  * Ajouter les widgets necessaires, mettre des noms clairs pour
  * les utiliser dans le .cpp (pour les call back principalement)
  */
-class MyQT: public Utils::QT::SimpleQT
+class Tuto5: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
@@ -75,7 +91,12 @@ class MyQT: public Utils::QT::SimpleQT
 	QTimer *m_timer;
 
 public:
-	MyQT():
+	PFP::MAP m;
+	PFP::TVEC3 position ;
+	Dart dglobal;
+
+public:
+	Tuto5():
 		render_text(true),
 		render_balls(true),
 		render_vectors(true),
@@ -114,6 +135,11 @@ public slots:
 	void slider_text(int x);
 
 	void animate();
+
+	Dart embedCube();
+	Dart embedCube2();
+	Dart embedMapCollapse();
+
 };
 
 #endif
