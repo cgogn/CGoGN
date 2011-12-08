@@ -147,15 +147,35 @@ inline void GMap1::beta1unsew(Dart d)
  *  Topological operations on 1-G-maps
  *************************************************************************/
 
-inline void GMap1::cutEdge(Dart d)
+inline Dart GMap1::cutEdge(Dart d)
 {
-   Dart dd = beta0(d) ;
-   Dart e = newDart();
-   Dart f = newDart();
-   beta1sew(e, f) ;
-   beta0unsew(d) ;
-   beta0sew(e, d) ;
-   beta0sew(f, dd) ;
+	Dart dd = beta0(d) ;
+	Dart e = newDart();
+	Dart f = newDart();
+	beta1sew(e, f) ;
+	beta0unsew(d) ;
+	beta0sew(e, d) ;
+	beta0sew(f, dd) ;
+
+	if (isBoundaryMarked(d))
+	{
+		boundaryMark(e);
+		boundaryMark(f);
+	}
+
+	return f ;
+}
+
+inline void GMap1::uncutEdge(Dart d)
+{
+	Dart d0 = beta0(d) ;
+	Dart d1 = phi1(d) ;
+	Dart d10 = beta0(d1) ;
+	beta0unsew(d) ;
+	beta0unsew(d10) ;
+	beta0sew(d, d10) ;
+	deleteDart(d0) ;
+	deleteDart(d1) ;
 }
 
 inline void GMap1::collapseEdge(Dart d)

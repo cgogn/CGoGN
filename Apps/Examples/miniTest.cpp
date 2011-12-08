@@ -657,13 +657,13 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 			visited.push_back(myMap.begin()) ;
 			markVisit.mark(myMap.begin()) ;
 
-			for(std::vector<Dart>::iterator vertex = visited.begin(); vertex != visited.end(); ++vertex)
+			for(unsigned int i = 0; i < visited.size(); ++i)
 			{
 				bool deleteV = true ;
-				if(markNoDelete.isMarked(*vertex))
+				if(markNoDelete.isMarked(visited[i]))
 					deleteV = false ;
 
-				Dart vit = *vertex ;
+				Dart vit = visited[i] ;
 				do	// add all vertex neighbors to the table
 				{
 					Dart nv = myMap.phi1(vit) ;
@@ -675,10 +675,10 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 					if(deleteV)
 						markNoDelete.mark(nv) ;
 					vit = myMap.alpha1(vit) ;
-				} while(vit != *vertex) ;
+				} while(vit != visited[i]) ;
 
 				if(deleteV)
-					myMap.deleteVertex(*vertex) ;
+					myMap.deleteVertex(visited[i]) ;
 			}
 
 //			for(Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))

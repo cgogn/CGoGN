@@ -25,6 +25,8 @@
 #ifndef __QEM__
 #define __QEM__
 
+#include "Utils/os_spec.h" // allow compilation under windows
+
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 #include "Geometry/plane_3d.h"

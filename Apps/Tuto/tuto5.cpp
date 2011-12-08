@@ -24,28 +24,26 @@
 
 #include "tuto5.h"
 
-
-void Tuto5::balls_onoff(bool x)
-{
-	render_balls = !render_balls;
-	updateGL();
-	CGoGNerr << " balls_onoff  "<< CGoGNendl;
-}
-
-void Tuto5::vectors_onoff(bool x)
-{
-	render_vectors = !render_vectors;
-	updateGL();
-	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
-}
-
-void Tuto5::text_onoff(bool x)
-{
-	render_text = !render_text;
-	updateGL();
-	CGoGNerr << " text_onoff  " << CGoGNflush;
-}
-
+//void Tuto5::balls_onoff(bool x)
+//{
+//	render_balls = !render_balls;
+//	updateGL();
+//	CGoGNerr << " balls_onoff  "<< CGoGNendl;
+//}
+//
+//void Tuto5::vectors_onoff(bool x)
+//{
+//	render_vectors = !render_vectors;
+//	updateGL();
+//	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
+//}
+//
+//void Tuto5::text_onoff(bool x)
+//{
+//	render_text = !render_text;
+//	updateGL();
+//	CGoGNerr << " text_onoff  " << CGoGNflush;
+//}
 
 void Tuto5::topo_onoff(bool x)
 {
@@ -54,23 +52,23 @@ void Tuto5::topo_onoff(bool x)
 	CGoGNerr << " topo_onoff  " << CGoGNflush;
 }
 
-void Tuto5::slider_balls(int x)
-{
-	m_sprite->setSize(0.05f*x);
-	updateGL();
-}
-
-void Tuto5::slider_vectors(int x)
-{
-	m_lines->setScale(0.02*x);
-	updateGL();
-}
-
-void Tuto5::slider_text(int x)
-{
-	m_strings->setScale(0.02f*x);
-	updateGL();
-}
+//void Tuto5::slider_balls(int x)
+//{
+//	m_sprite->setSize(0.05f*x);
+//	updateGL();
+//}
+//
+//void Tuto5::slider_vectors(int x)
+//{
+//	m_lines->setScale(0.02*x);
+//	updateGL();
+//}
+//
+//void Tuto5::slider_text(int x)
+//{
+//	m_strings->setScale(0.02f*x);
+//	updateGL();
+//}
 
 void Tuto5::animate()
 {
@@ -79,77 +77,75 @@ void Tuto5::animate()
 	updateGLMatrices();
 }
 
-
-void Tuto5::storeVerticesInfo()
-{
-
-	CellMarker mv(m,VERTEX);
-	for (Dart d=m.begin(); d!=m.end(); m.next(d))
-	{
-		if (!mv.isMarked(d))
-		{
-			mv.mark(d);
-			std::stringstream ss;
-			ss << d << " : "<< position[d];
-			m_strings->addString(ss.str(),position[d]);
-		}
-	}
-}
+//void Tuto5::storeVerticesInfo()
+//{
+//
+//	CellMarker mv(myMap,VERTEX);
+//	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+//	{
+//		if (!mv.isMarked(d))
+//		{
+//			mv.mark(d);
+//			std::stringstream ss;
+//			ss << d << " : "<< position[d];
+//			m_strings->addString(ss.str(),position[d]);
+//		}
+//	}
+//}
 
 void Tuto5::cb_initGL()
 {
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
+//	Utils::GLSLShader::setCurrentOGLVersion(2);
+	Utils::GLSLShader::setCurrentOGLVersion(1) ;
 
-	// create the render
-	m_render = new Algo::Render::GL2::MapRender();
-
-    m_render_topo = new Algo::Render::GL2::Topo3RenderMapD();
-
- 	// create VBO for position
-	m_positionVBO = new Utils::VBO();
-	m_positionVBO->updateData(position);
-
-	// using simple shader with color
-	m_shader = new Utils::ShaderSimpleColor();
-	m_shader->setAttributePosition(m_positionVBO);
-	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
-
-	m_sprite = new Utils::PointSprite();
-	m_sprite->setAttributePosition(m_positionVBO);
-
-    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
-    storeVerticesInfo();
-    m_strings->sendToVBO();
-
-    // copy de contenu de VBO a la creation
-	m_dataVBO = new Utils::VBO(*m_positionVBO);
-
-	m_lines = new Utils::ShaderVectorPerVertex();
-	m_lines->setAttributePosition(m_positionVBO);
-	m_lines->setAttributeVector(m_dataVBO);
-	m_lines->setScale(0.2f);
-	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
-
-	// accede au buffer du VBO pour modification
-	PFP::VEC3* data = static_cast<PFP::VEC3*>(m_dataVBO->lockPtr());
-	for (unsigned int i=0; i< m_dataVBO->nbElts(); ++i)
-	{
-		data[i].normalize();
-	}
-	m_dataVBO->releasePtr();
-
-	registerShader(m_shader);
-	registerShader(m_strings);
-	registerShader(m_sprite);
-	registerShader(m_lines);
-
-	m_render->initPrimitives<PFP>(m, allDarts, Algo::Render::GL2::TRIANGLES);
-	m_render->initPrimitives<PFP>(m, allDarts, Algo::Render::GL2::LINES);
-	m_render->initPrimitives<PFP>(m, allDarts, Algo::Render::GL2::POINTS);
-
-	m_render_topo->updateData<PFP>(m, allDarts, position,  0.9f, 0.9f, 0.9f);
-
+//	// create the render
+//	m_render = new Algo::Render::GL2::MapRender();
+//
+//    m_render_topo = new Algo::Render::GL2::Topo3RenderMapD();
+//
+// 	// create VBO for position
+//	m_positionVBO = new Utils::VBO();
+//	m_positionVBO->updateData(position);
+//
+//	// using simple shader with color
+//	m_shader = new Utils::ShaderSimpleColor();
+//	m_shader->setAttributePosition(m_positionVBO);
+//	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
+//
+//	m_sprite = new Utils::PointSprite();
+//	m_sprite->setAttributePosition(m_positionVBO);
+//
+//	m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
+//	storeVerticesInfo();
+//	m_strings->sendToVBO();
+//
+//	// copy de contenu de VBO a la creation
+//	m_dataVBO = new Utils::VBO(*m_positionVBO);
+//
+//	m_lines = new Utils::ShaderVectorPerVertex();
+//	m_lines->setAttributePosition(m_positionVBO);
+//	m_lines->setAttributeVector(m_dataVBO);
+//	m_lines->setScale(0.2f);
+//	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
+//
+//	// accede au buffer du VBO pour modification
+//	PFP::VEC3* data = static_cast<PFP::VEC3*>(m_dataVBO->lockPtr());
+//	for (unsigned int i=0; i< m_dataVBO->nbElts(); ++i)
+//	{
+//		data[i].normalize();
+//	}
+//	m_dataVBO->releasePtr();
+//
+//	registerShader(m_shader);
+//	registerShader(m_strings);
+//	registerShader(m_sprite);
+//	registerShader(m_lines);
+//
+//	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+//	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+//	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+//
+//	m_render_topo->updateData<PFP>(myMap, allDarts, position,  0.9f, 0.9f, 0.9f);
 
 	// timer example for animation
 	m_timer = new QTimer( this );
@@ -158,73 +154,79 @@ void Tuto5::cb_initGL()
 
 void Tuto5::cb_redraw()
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_LIGHTING);
-
-	m_render->draw(m_shader, Algo::Render::GL2::POINTS);
-
-	glLineWidth(2.0f);
-	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
-	m_render->draw(m_shader, Algo::Render::GL2::LINES);
-
-	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(1.0f, 1.0f);
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//	glEnable(GL_LIGHTING);
+//
+//	m_render->draw(m_shader, Algo::Render::GL2::POINTS);
+//
+//	glLineWidth(2.0f);
+//	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+//	m_render->draw(m_shader, Algo::Render::GL2::LINES);
+//
+//	glEnable(GL_POLYGON_OFFSET_FILL);
+//	glPolygonOffset(1.0f, 1.0f);
 
 	if (render_topo)
-		m_render_topo->drawTopo();
-
-	Dart d = m.phi2(m.begin());
-	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
-	 d = m.phi1(m.begin());
-	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
-
-	glDisable(GL_POLYGON_OFFSET_FILL);
-
-	if (render_text)
-		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
-
-	if (render_balls)
 	{
-		m_sprite->predraw(Geom::Vec3f(1.0f, 0.0f ,0.0f));
-		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
-		m_sprite->postdraw();
-	}
-
-	if (render_vectors)
-	{
+		glDisable(GL_LIGHTING);
 		glLineWidth(1.0f);
-		m_render->draw(m_lines, Algo::Render::GL2::POINTS);
+//		Algo::Render::GL1::renderTopoGMD3<PFP>(m, position, true, true, true, true, 0.9f, 0.9f, 0.9f, 0.9f);
+		Algo::Render::GL1::renderTopoMD3<PFP>(m, position, true, true, true, 0.9f, 0.9f, 0.9f);
+//		m_render_topo->drawTopo();
 	}
+
+//	Dart d = myMap.phi2(myMap.begin());
+//	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
+//	 d = myMap.phi1(myMap.begin());
+//	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
+//
+//	glDisable(GL_POLYGON_OFFSET_FILL);
+//
+//	if (render_text)
+//		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
+//
+//	if (render_balls)
+//	{
+//		m_sprite->predraw(Geom::Vec3f(1.0f, 0.0f ,0.0f));
+//		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
+//		m_sprite->postdraw();
+//	}
+//
+//	if (render_vectors)
+//	{
+//		glLineWidth(1.0f);
+//		m_render->draw(m_lines, Algo::Render::GL2::POINTS);
+//	}
 }
 
 void Tuto5::cb_mousePress(int button, int x, int y)
 {
-	if (Shift())
-	{
-		Dart d = m_render_topo->picking<PFP>(m, allDarts, x,y);
-		if (d != Dart::nil())
-		{
-			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
-		}
-		else
-		{
-			statusMsg("");
-		}
-	}
+//	if (Shift())
+//	{
+//		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x,y);
+//		if (d != Dart::nil())
+//		{
+//			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
+//		}
+//		else
+//		{
+//			statusMsg("");
+//		}
+//	}
 }
 
 void Tuto5::cb_keyPress(int code)
 {
-	if (code  == 's')
-	{
-		std::string filename = selectFileSave("Export SVG file ");
-		CGoGNout << "Exporting "<<filename<<CGoGNendl;
-		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
-//		svg.renderLinesToSVG<PFP>(m,position);
-		svg.setColor(Geom::Vec3f(1.,0.,0.));
-		svg.renderFacesToSVG<PFP>(m,position,0.8f);
-		//svg destruction close the file
-	}
+//	if (code == 's')
+//	{
+//		std::string filename = selectFileSave("Export SVG file ");
+//		CGoGNout << "Exporting "<< filename << CGoGNendl;
+//		Algo::Render::SVG::SVGOut svg(filename, modelViewMatrix(), projectionMatrix());
+////		svg.renderLinesToSVG<PFP>(myMap,position);
+//		svg.setColor(Geom::Vec3f(1.,0.,0.));
+//		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
+//		//svg destruction close the file
+//	}
 	if (code  == 't')
 	{
 		if (m_timer->isActive())
@@ -234,7 +236,7 @@ void Tuto5::cb_keyPress(int code)
 	}
 }
 
-Dart Tuto5::embedCube()
+Dart Tuto5::embedCube1()
 {
 	Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(m,6);
 
@@ -443,23 +445,31 @@ int main(int argc, char **argv)
     // un peu d'interface
 	QApplication app(argc, argv);
 	Tuto5 sqt;
-
-
+	
 	sqt.position = sqt.m.addAttribute<PFP::VEC3>(VERTEX, "position");
 
-	Dart d1 = sqt.embedMapCollapse();
+	Dart t1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(sqt.m) ;
+	Dart t2 = Algo::Modelisation::Polyhedron<PFP>::createTetra(sqt.m) ;
+	sqt.m.sewVolumes(t1, t2, false) ;
+	sqt.m.closeHole(sqt.m.phi2(t1)) ;
 
-	sqt.m.check() ;
-	std::cout << "nb darts -> " << sqt.m.getNbDarts() << std::endl ;
+	Algo::Modelisation::Primitive3D<PFP> primCat(sqt.m, sqt.position);
+	Dart d = primCat.hexaGrid_topo(3, 3, 3);
+	primCat.embedHexaGrid(1, 1, 1);
 
-
-	sqt.m.collapseEdge(d1);
-	sqt.m.check() ;
-	std::cout << "nb darts -> " << sqt.m.getNbDarts() << std::endl ;
-
-//	Dart d1 = sqt.embedCube() ;
-//	Dart d2 = sqt.embedCube2() ;
+//	Dart d1 = sqt.embedMapCollapse();
 //
+//	sqt.m.check() ;
+//	std::cout << "nb darts -> " << sqt.m.getNbDarts() << std::endl ;
+//
+//
+//	sqt.m.collapseEdge(d1);
+//	sqt.m.check() ;
+//	std::cout << "nb darts -> " << sqt.m.getNbDarts() << std::endl ;
+
+//	Dart d1 = embedCube1() ;
+//	Dart d2 = embedCube2() ;
+
 //	Dart dd = sqt.m.phi2(d1) ;
 
 //	sqt.m.check() ;
@@ -523,15 +533,24 @@ int main(int argc, char **argv)
 
 //	sqt.m.check() ;
 //	std::cout << "nb darts -> " << sqt.m.getNbDarts() << std::endl ;
-
+//	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 
 	// interface de tuto5.ui
     Utils::QT::uiDockInterface dock;
     sqt.setDock(&dock);
 
- 	// message d'aide
-	sqt.setHelpMsg("Enter pour dock on/off\nShift Enter pour console on/off\nShift Click gauche pour selectionner un brin");
-
+// 	// message d'aide
+//	sqt.setHelpMsg("Enter pour dock on/off\nShift Enter pour console on/off\nShift Click gauche pour selectionner un brin");
+//
+//	CGoGNout.toStatusBar(&sqt);
+//	CGoGNout << "CGoGNOut StatusBar" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
+//
+//	CGoGNout.toConsole(&sqt);
+//
+//	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
+//
+//	CGoGNout.toStatusBar(NULL);
+	
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(sqt.m, sqt.position);
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
@@ -540,21 +559,27 @@ int main(int argc, char **argv)
     // envoit info BB a l'interface
 	sqt.setParamObject(lWidthObj, lPosObj.data());
 
-	sqt.setCallBack( dock.checkBox_balls, SIGNAL(toggled(bool)), SLOT(balls_onoff(bool)) );
-	sqt.setCallBack( dock.checkBox_vectors, SIGNAL(toggled(bool)), SLOT(vectors_onoff(bool)) );
-	sqt.setCallBack( dock.checkBox_text, SIGNAL(toggled(bool)), SLOT(text_onoff(bool)) );
+//	sqt.setCallBack( dock.checkBox_balls, SIGNAL(toggled(bool)), SLOT(balls_onoff(bool)) );
+//	sqt.setCallBack( dock.checkBox_vectors, SIGNAL(toggled(bool)), SLOT(vectors_onoff(bool)) );
+//	sqt.setCallBack( dock.checkBox_text, SIGNAL(toggled(bool)), SLOT(text_onoff(bool)) );
 	sqt.setCallBack( dock.checkBox_topo, SIGNAL(toggled(bool)), SLOT(topo_onoff(bool)) );
 
-	sqt.setCallBack( dock.slider_balls, SIGNAL(valueChanged(int)), SLOT(slider_balls(int)) );
-	sqt.setCallBack( dock.slider_vectors, SIGNAL(valueChanged(int)), SLOT(slider_vectors(int)) );
-	sqt.setCallBack( dock.slider_text, SIGNAL(valueChanged(int)), SLOT(slider_text(int)) );
+//	sqt.setCallBack( dock.slider_balls, SIGNAL(valueChanged(int)), SLOT(slider_balls(int)) );
+//	sqt.setCallBack( dock.slider_vectors, SIGNAL(valueChanged(int)), SLOT(slider_vectors(int)) );
+//	sqt.setCallBack( dock.slider_text, SIGNAL(valueChanged(int)), SLOT(slider_text(int)) );
 
 	sqt.show();
 
-	sqt.slider_balls(50);
-	sqt.slider_vectors(50);
-	sqt.slider_text(50);
+//	sqt.slider_balls(50);
+//	sqt.slider_vectors(50);
+//	sqt.slider_text(50);
 
+//	GLint texSize;
+//	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+//	CGoGNdbg.toConsole(&sqt);
+//	CGoGNerr.toConsole(&sqt);
+//	CGoGNdbg << " TextureSize " <<  texSize << CGoGNendl;
+//	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
 
 	// et on attend la fin.
 	return app.exec();

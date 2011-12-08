@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/gl.h>
+#include <GL/glew.h>
 #include "Geometry/transfo.h"
 
 namespace CGoGN

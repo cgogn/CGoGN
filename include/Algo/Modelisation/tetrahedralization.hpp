@@ -439,9 +439,9 @@ void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	mf.markOrbit(FACE, d) ;
 
 	//TODO diminuer complexite avec boucle specifique aux tetras
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			//compute volume centroid
@@ -461,7 +461,7 @@ void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 			}
 
 			e = map.phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	volCenter /= typename PFP::REAL(count) ;
@@ -473,7 +473,6 @@ void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 	//triangule chaque face avec plongement au centroid
 	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
-
 		// on decoud et on ferme le trou
 		Dart temp = *face;
 		do

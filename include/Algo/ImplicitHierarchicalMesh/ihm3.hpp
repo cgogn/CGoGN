@@ -243,15 +243,14 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType
 	DartMarkerStore mv(*this,thread);			// Lock a marker
 	bool found = false;					// Last functor return value
 
-	std::vector<Dart> darts_list;			//Darts that are traversed
-	darts_list.reserve(512);
-
-	darts_list.push_back(d);			//Start with the dart d
+	std::vector<Dart> darts;			//Darts that are traversed
+	darts.reserve(512);
+	darts.push_back(d);			//Start with the dart d
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator darts = darts_list.begin(); !found && darts != darts_list.end() ; ++darts)
+	for(unsigned int i = 0; !found && i < darts.size(); ++i)
 	{
-		Dart dc = *darts;
+		Dart dc = darts[i];
 
 		//add phi21 and phi23 successor if they are not marked yet
 		Dart d2 = phi2(dc);
@@ -262,13 +261,13 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType
 
 			if(!mv.isMarked(d21))
 			{
-				darts_list.push_back(d21);
+				darts.push_back(d21);
 				mv.mark(d21);
 			}
 
-			if((d23!=d2) && !mv.isMarked(d23))
+			if((d23 != d2) && !mv.isMarked(d23))
 			{
-				darts_list.push_back(d23);
+				darts.push_back(d23);
 				mv.mark(d23);
 			}
 		}
@@ -281,7 +280,6 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
-
 	Dart dNext = d;
 	do {
 
@@ -322,23 +320,23 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, Fu
 	DartMarkerStore mark(*this);	// Lock a marker
 	bool found = false;				// Last functor return value
 
-	std::list<Dart> visitedFaces;	// Faces that are traversed
+	std::vector<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.reserve(512) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	std::list<Dart>::iterator face;
 
 	// For every face added to the list
-	for (face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
-		if (!mark.isMarked(*face))		// Face has not been visited yet
+		if (!mark.isMarked(visitedFaces[i]))		// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(*face, f);
+			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
 
 			// If functor returns false then mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
 			if (!found)
 			{
-				Dart dNext = *face ;
+				Dart dNext = visitedFaces[i] ;
 				do
 				{
 					mark.mark(dNext);					// Mark
@@ -346,7 +344,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, Fu
 					if (adj != dNext && !mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
 					dNext = phi1(dNext);
-				} while(dNext != *face);
+				} while(dNext != visitedFaces[i]);
 			}
 		}
 	}

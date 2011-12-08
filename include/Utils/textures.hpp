@@ -47,8 +47,15 @@ m_size(img.m_size),
 m_sizeSub(img.m_sizeSub),
 m_localAlloc(true)
 {
-	m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
-	memcpy(m_data_ptr, img.m_data_ptr, sizeof(TYPE)*m_sizeSub[DIM-1]);
+	if (img.m_qimg == NULL)
+	{
+		if (img.m_data_ptr != NULL)
+		{
+			m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
+			memcpy(m_data_ptr, img.m_data_ptr, sizeof(TYPE)*m_sizeSub[DIM-1]);
+			this->m_qimg = NULL;
+		}
+	}
 }
 
 
@@ -59,7 +66,6 @@ m_localAlloc(true)
 {
 	computeSub();
 	m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
-
 }
 
 
@@ -67,8 +73,10 @@ m_localAlloc(true)
 template < unsigned int DIM, typename TYPE >
 ImageData<DIM,TYPE>::~ImageData()
 {
-	if ((m_localAlloc)&&(m_data_ptr!=NULL))
+	if (m_data_ptr!=NULL)
+	{
 		delete[] m_data_ptr;
+	}
 }
 
 
@@ -86,11 +94,6 @@ void ImageData<DIM,TYPE>::swap(ImageData<DIM,TYPE>& img)
 	TYPE* prt_temp= m_data_ptr;
 	m_data_ptr = img.m_data_ptr;
 	img.m_data_ptr = prt_temp;
-
-	bool tmpAlloc = m_localAlloc;
-	m_localAlloc = img.m_localAlloc;
-	img.m_localAlloc = tmpAlloc;
-
 }
 
 
@@ -111,26 +114,33 @@ template < unsigned int DIM, typename TYPE >
 void ImageData<DIM,TYPE>::create(TYPE* data, const COORD& size)
 {
 	// first free old image if exist
-	if ((m_localAlloc)&&(m_data_ptr!=NULL))
-			delete[] m_data_ptr;
+	if (this->m_qimg != NULL)
+	{
+		delete this->m_qmg;
+	}
+	else if (m_data_ptr!=NULL)
+	{
+		delete[] m_data_ptr;
+	}
 
 	m_size = size;
 	computeSub();
 	m_data_ptr = data;
-	m_localAlloc = false;
+	this->m_qimg = NULL;
 }
 
 template < unsigned int DIM, typename TYPE >
 void ImageData<DIM,TYPE>::create(const COORD& size)
 {
 	// first free old image if exist
-	if ((m_localAlloc)&&(m_data_ptr!=NULL))
-			delete[] m_data_ptr;
+	if (m_data_ptr!=NULL)
+	{
+		delete[] m_data_ptr;
+	}
 
 	m_size = size;
 	computeSub();
 	m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
-	m_localAlloc = true;
 }
 
 	
@@ -243,36 +253,16 @@ void ImageData<DIM,TYPE>::convert(ImageData<DIM,TYPE2>& output, TYPE2 (*convertF
 }
 
 
-//template < unsigned int DIM, typename TYPE >
-//template < typename TYPE2 >
-//ImageData<DIM,TYPE>::ImageData(const ImageData<DIM,TYPE2>& img, TYPE (*convertFunc)(const TYPE2&))
-//{
-//	m_size = img.m_size;
-//	m_sizeSub = img.m_sizeSub;
-//	m_data_ptr = new TYPE[m_sizeSub[DIM-1]];
-//	m_localAlloc = true;
-//
-//	TYPE*  ptrDst = m_data_ptr;
-//	TYPE2* ptrSrc = img.m_data_ptr;
-//
-//	for (unsigned int i = 0; i<m_sizeSub[DIM-1]; ++i)
-//		*ptrDst++ = (*convertFunc)(*ptrSrc++);
-//}
-
-
-
 // implementation class Image
 
 template < unsigned int DIM, typename TYPE >
-Image<DIM,TYPE>::Image():
-m_ilName(0)
+Image<DIM,TYPE>::Image()
 {
 }
 
 template < unsigned int DIM, typename TYPE >
 Image<DIM,TYPE>::Image(const COORD& size):
-ImageData<DIM,TYPE>(size),
-m_ilName(0)
+ImageData<DIM,TYPE>(size)
 {
 }
 
@@ -280,124 +270,110 @@ m_ilName(0)
 template < unsigned int DIM, typename TYPE >
 Image<DIM,TYPE>::~Image()
 {
-	if (ilIsImage(m_ilName))
-			ilDeleteImage(m_ilName);
+	this->m_data_ptr = NULL;
 }
 
+/*
 template < unsigned int DIM, typename TYPE >
 void Image<DIM,TYPE>::swap(Image<DIM,TYPE>& img)
 {
+	if ((this->m_qimg != NULL) && (img.m_qimg != NULL))
+	{
+		QImage* ptr = this->m_qimg;
+		this->m_qimg = img.m_qimg;
+		img.m_qimg = ptr;
+	}
+	
 	ImageData<DIM,TYPE>::swap(img);
-	ILuint tempo = m_ilName;
-	m_ilName = img.m_ilName;
-	img.m_ilName = tempo;
+}
+*/
+
+template < unsigned int DIM, typename TYPE >
+bool Image<DIM,TYPE>::load(const unsigned char *ptr, unsigned int w, unsigned int h, unsigned int bpp)
+{
+	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
+	
+	// compatible TYPE
+	if (bpp != sizeof(TYPE))
+	{
+		CGoGNout << "Image::load incompatible type: bbp=" << bpp << CGoGNendl;
+		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
+		delete ptr;
+		return false;
+	}
+
+	// destroy old data	
+	 if (this->m_data_ptr != NULL)
+		delete[] this->m_data_ptr;
+
+	this->m_data_ptr = new TYPE[sizeof(TYPE)*w*h];
+	memcpy(this->m_data_ptr, ptr, sizeof(TYPE)*w*h);
+	this->m_size[0] = w;
+	this->m_size[1] = h;
+
+	this->computeSub();
+
+	return true;
 }
 
 
+
+#ifdef WITH_QT
 template < unsigned int DIM, typename TYPE >
 bool Image<DIM,TYPE>::load(const std::string& filename)
 {
 	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
 
-	ILuint ilName;
-	ilGenImages(1,&ilName);
-	ilBindImage(ilName);
-	// ???
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-	ilEnable(IL_ORIGIN_SET);
+	QImage* ptr = new QImage(filename.c_str());
 
-	bool ok = ilLoadImage(filename.c_str());
-
-	if (!ok)
+	if (ptr == NULL)
 	{
-		ilDeleteImage(ilName);
-		return false;
-	}
-
-	if ((this->m_localAlloc)&&(this->m_data_ptr!=NULL))
-			delete[] this->m_data_ptr;
-	if (ilIsImage(m_ilName))
-		ilDeleteImage(m_ilName);
-	m_ilName = ilName;
-
-
-//	get the info of images
-	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
-
-	// compatible TYPE
-	if (bpp != sizeof(TYPE))
-	{
-		CGoGNout << "Image::load incompatible type: bbp="<<bpp<< CGoGNendl;
-		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
-		ilDeleteImage(m_ilName);
-		return false;
-	}
-
-	this->m_size[0] = ilGetInteger(IL_IMAGE_WIDTH);
-	this->m_size[1] = ilGetInteger(IL_IMAGE_HEIGHT);
-
-	this->m_data_ptr = reinterpret_cast<TYPE*>(ilGetData());
-	this->computeSub();
-
-	this->m_localAlloc=false;
-	return true;
-}
-
-
-template < unsigned int DIM, typename TYPE >
-template <typename TYPE2 >
-bool Image<DIM,TYPE>::load(const std::string& filename, void (*convertFunc)(const TYPE2&, const TYPE&))
-{
-	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
-
-	ILuint ilName;
-	ilGenImages(1,&ilName);
-	ilBindImage(ilName);
-	// ???
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-	ilEnable(IL_ORIGIN_SET);
-
-	bool ok = ilLoadImage(filename.c_str());
-
-	if (!ok)
-	{
-		ilDeleteImage(ilName);
+		CGoGNout << "Impossible to load "<< filename << CGoGNendl;
 		return false;
 	}
 	
-//	get the info of images
-	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
+	//	get the info of images
+	unsigned int bpp = ptr->depth() / 8;
 
 	// compatible TYPE
-	if (bpp != sizeof(TYPE))
+	if (bpp < sizeof(TYPE))
 	{
-		CGoGNout << "Image::load incompatible type"<< CGoGNendl;
-		ilDeleteImage(ilName);
+		CGoGNout << "Image::load incompatible type: bbp=" << bpp << CGoGNendl;
+		CGoGNout << "sizeof(TYPE)="<<sizeof(TYPE)<< CGoGNendl;
+		delete ptr;
 		return false;
 	}
 
-	if ((this->m_localAlloc)&&(this->m_data_ptr!=NULL))
-			delete[] this->m_data_ptr;
-	if (ilIsImage(m_ilName))
-		ilDeleteImage(m_ilName);
+	// destroy old data	
+	 if (this->m_data_ptr != NULL)
+		delete[] this->m_data_ptr;
 
-	m_ilName = 0;
+	if (bpp > sizeof(TYPE))
+	{
+		if (sizeof(TYPE) == 3)
+		{
+			QImage img = ptr->convertToFormat(QImage::Format_RGB888);
+			this->m_data_ptr = new TYPE[3*img.width()*img.height()];
+			memcpy(this->m_data_ptr, img.bits(), 3*img.width()*img.height());
+		}
+		else if (sizeof(TYPE) == 1)
+		{
+			QImage img = ptr->convertToFormat(QImage::Format_Indexed8);
+			this->m_data_ptr = new TYPE[img.width()*img.height()];
+			memcpy(this->m_data_ptr, img.bits(), img.width()*img.height());
+		}
+	}
+	else
+	{
+		this->m_data_ptr = new TYPE[ptr->width()*ptr->height()];
+		memcpy(this->m_data_ptr, ptr->bits(), ptr->width()*ptr->height());
+	}
 
-	this->m_size[0] = ilGetInteger(IL_IMAGE_WIDTH);
-	this->m_size[1] = ilGetInteger(IL_IMAGE_HEIGHT);
-
+	this->m_size[0] = ptr->width();
+	this->m_size[1] = ptr->height();
 	this->computeSub();
 
-	this->m_data_ptr = new TYPE[this->m_sizeSub[1]];
-	this->m_localAlloc = true;
-	TYPE2 *ptrSrc = reinterpret_cast<TYPE*>(ilGetData());
-	TYPE*  ptrDst = this->m_data_ptr;
-
-	for (unsigned int i = 0; i < this->m_sizeSub[1]; ++i)
-		(*convertFunc)(*ptrSrc++, *ptrDst++);
-
-	ilDeleteImage(ilName);
-	this->m_localAlloc=false;
+	delete ptr;
 	return true;
 }
 
@@ -407,54 +383,31 @@ void Image<DIM,TYPE>::save(const std::string& filename)
 {
 	CGoGN_STATIC_ASSERT(DIM==2, incompatible_Vector_constructor_dimension);
 
-	// ???
-	ilOriginFunc(IL_ORIGIN_UPPER_LEFT);
-	ilEnable(IL_ORIGIN_SET);
-
-	if (!ilIsImage(m_ilName))
+	QImage* ptrIm = NULL;
+	if (this->m_data_ptr != NULL)
 	{
-		ilGenImages(1,&m_ilName);
-		ilBindImage(m_ilName);
-
 		switch(sizeof(TYPE))
 		{
 		case 1:
-			ilTexImage(this->m_size[0],this->m_size[1],1,1,IL_LUMINANCE,IL_UNSIGNED_BYTE,this->m_data_ptr);
-			break;
-		case 2:
-			ilTexImage(this->m_size[0],this->m_size[1],1,1,IL_LUMINANCE,IL_UNSIGNED_SHORT,this->m_data_ptr);
+			ptrIm = new QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_Indexed8);
 			break;
 		case 3:
-			ilTexImage(this->m_size[0],this->m_size[1],1,3,IL_RGB,IL_UNSIGNED_BYTE,this->m_data_ptr);
+			ptrIm = new QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_RGB888);
 			break;
 		case 4:
-			ilTexImage(this->m_size[0],this->m_size[1],1,3,IL_RGBA,IL_UNSIGNED_BYTE,this->m_data_ptr);
+			ptrIm = new QImage((uchar *)(this->m_data_ptr), this->m_size[0],this->m_size[1], QImage::Format_ARGB32);
+			break;
+		default:
 			break;
 		}
 	}
-	ilEnable(IL_FILE_OVERWRITE);
-	ilSaveImage(filename.c_str());
-
-	// ilTexImage copy the data so set new pointer to IL zone after free old one
-
-	if (this->m_localAlloc)
+	if (ptrIm != NULL)
 	{
-		delete[] this->m_data_ptr;
-		this->m_data_ptr = reinterpret_cast<TYPE*>(ilGetData());
-		this->m_localAlloc=false;
+		ptrIm->save(QString(filename.c_str()));
+		delete ptrIm;
 	}
 }
-
-
-template < unsigned int DIM, typename TYPE >
-void Image<DIM,TYPE>::cleanIL()
-{
-
-	if (!ilIsImage(m_ilName))
-		ilDeleteImage(m_ilName);
-	m_ilName=0;
-}
-
+#endif
 
 
 template < unsigned int DIM, typename TYPE >

@@ -65,16 +65,14 @@ Dart EmbeddedMap2::deleteVertex(Dart d)
 	return f ;
 }
 
-void EmbeddedMap2::cutEdge(Dart d)
+Dart EmbeddedMap2::cutEdge(Dart d)
 {
-	Map2::cutEdge(d) ;
-
-	Dart nd = phi1(d) ;
+	Dart nd = Map2::cutEdge(d) ;
 
 	if (isOrbitEmbedded(EDGE))
 	{
-		embedNewCell(EDGE, nd) ;
 		copyDartEmbedding(EDGE, phi2(d), d) ;
+		embedNewCell(EDGE, nd) ;
 		copyCell(EDGE, nd, d) ;
 	}
 
@@ -84,6 +82,8 @@ void EmbeddedMap2::cutEdge(Dart d)
 		Dart e = phi2(nd) ;
 		copyDartEmbedding(FACE, phi1(e), e) ;
 	}
+
+	return nd;
 }
 
 bool EmbeddedMap2::uncutEdge(Dart d)
@@ -259,8 +259,11 @@ bool EmbeddedMap2::flipBackEdge(Dart d)
 
 void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
-//	if (!withBoundary)
-//		return Map2::sewFaces(d, e, false) ;
+	if (!withBoundary)
+	{
+		Map2::sewFaces(d, e, false) ;
+		return ;
+	}
 
 	Map2::sewFaces(d, e, withBoundary) ;
 

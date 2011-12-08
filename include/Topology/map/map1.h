@@ -126,7 +126,12 @@ public:
 	/*! @param d the edge to cut
 	 * \image hmtl map1_cutEdge.png
 	 */
-	void cutEdge(Dart d);
+	Dart cutEdge(Dart d);
+
+	//! Undo the cut of the edge of d
+	/*! @param d a dart of the edge to uncut
+	 */
+	void uncutEdge(Dart d);
 
 	//! Collapse an edge of a cycle
 	/*!  \warning Dart d no longer exists after the call

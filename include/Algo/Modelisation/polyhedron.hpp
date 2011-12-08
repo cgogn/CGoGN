@@ -415,28 +415,15 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 	if (bottom_closed)
 	{
 		Dart d = m_tableVertDarts[0];
-		if(m_map.closeHole(d,false))
+		if(m_map.closeHole(d, false))
 		{
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map,d);
-
+				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
-// 		// create bottom 
-// 		Dart d = triangleFan_topo<PFP>(m_map,n);
-// 		// store center vertex dart
-// 		m_tableVertDarts.push_back(m_map.phi_1(d));
-// 
-// 		// sew it
-// 		for (int i=0; i<n; ++i)
-// 		{
-// 			Dart e = m_tableVertDarts[i];
-// 			m_map.sewFaces(d,e);
-// 			d = precDV(d);
-// 		}
 	}
 	else
 		m_map.closeHole(m_tableVertDarts[0]);
@@ -449,24 +436,10 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map,d);
-
+				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
-// 		// create bottom 
-// 		Dart d = triangleFan_topo<PFP>(m_map,n);
-// 		// store center vertex dart
-// 		m_tableVertDarts.push_back(m_map.phi_1(d));
-// 
-// 		// sew it
-// 		for (int i=0; i<n; ++i)
-// 		{
-// 			Dart e = m_tableVertDarts[n*z+i];
-// 			e = m_map.phi_1(e);
-// 			m_map.sewFaces(d,e);
-// 			d = nextDV(d);
-// 		}
 	}
 	else
 		m_map.closeHole(m_map.phi_1(m_tableVertDarts[n*z]));

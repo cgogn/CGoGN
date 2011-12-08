@@ -580,9 +580,9 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 
 	mf.markOrbit(FACE, old) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			// add all face neighbours to the table
@@ -603,7 +603,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 			}
 
 			e = phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	return found;
@@ -628,9 +628,9 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersByOne(Dart d)
 
 	mf.markOrbit(FACE, old) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); !found && face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			// add all face neighbours to the table
@@ -652,7 +652,7 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersByOne(Dart d)
 			}
 
 			e = phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	return found;

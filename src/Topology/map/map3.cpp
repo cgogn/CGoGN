@@ -41,9 +41,9 @@ void Map3::deleteVolume(Dart d)
 
 	mark.markOrbit(ORIENTED_FACE, d) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 
 		if(!isBoundaryFace(e))
 			unsewVolumes(e) ;
@@ -57,7 +57,7 @@ void Map3::deleteVolume(Dart d)
 				mark.markOrbit(ORIENTED_FACE, ee) ;
 			}
 			e = phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	Dart dd = phi3(d) ;
@@ -83,23 +83,23 @@ Dart Map3::deleteVertex(Dart d)
 	if(isBoundaryVertex(d))
 		return NIL ;
 
-	//Save the darts around the vertex
-	//(one dart per face should be enough)
+	// Save the darts around the vertex
+	// (one dart per face should be enough)
 	std::vector<Dart> fstoretmp;
 	fstoretmp.reserve(128);
 	FunctorStore fs(fstoretmp);
 	foreach_dart_of_vertex(d, fs);
 
-	//just one dart per face
+	// just one dart per face
 	std::vector<Dart> fstore;
 	fstore.reserve(128);
 	DartMarker mf(*this);
-	for(std::vector<Dart>::iterator it = fstoretmp.begin() ; it != fstoretmp.end() ; ++it)
+	for(unsigned int i = 0; i < fstoretmp.size(); ++i)
 	{
-		if(!mf.isMarked(*it))
+		if(!mf.isMarked(fstoretmp[i]))
 		{
-			mf.markOrbit(FACE, *it);
-			fstore.push_back(*it);
+			mf.markOrbit(FACE, fstoretmp[i]);
+			fstore.push_back(fstoretmp[i]);
 		}
 	}
 
@@ -114,8 +114,10 @@ Dart Map3::deleteVertex(Dart d)
 			Dart d2 = phi2(fit) ;
 			Dart d3 = phi3(fit) ;
 			Dart d32 = phi2(d3) ;
+
 			if(res == NIL)
 				res = d2 ;
+
 			phi2unsew(d2) ;
 			phi2unsew(d32) ;
 			phi2sew(d2, d32) ;
@@ -127,11 +129,11 @@ Dart Map3::deleteVertex(Dart d)
 	return res ;
 }
 
-void Map3::cutEdge(Dart d)
+Dart Map3::cutEdge(Dart d)
 {
 	Dart prev = d;
 	Dart dd = alpha2(d);
-	Map2::cutEdge(d);
+	Dart nd = Map2::cutEdge(d);
 
 	while (dd != d)
 	{
@@ -150,6 +152,8 @@ void Map3::cutEdge(Dart d)
 	phi3unsew(d);
 	phi3sew(d, phi1(d3));
 	phi3sew(d3, phi1(d));
+
+	return nd;
 }
 
 bool Map3::uncutEdge(Dart d)
@@ -277,7 +281,7 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 
 void Map3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameOrientedFace(d, e)) ;
+	assert(d != e && Map2::sameOrientedFace(d, e)) ;
 
 	Dart dd = phi1(phi3(d));
 	Dart ee = phi1(phi3(e));
@@ -420,13 +424,13 @@ bool Map3::sameVertex(Dart d, Dart e)
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
+	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
-		if(*it == e)
+		if(darts[i] == e)
 			return true;
 
-		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(*it);
+		// add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(darts[i]);
 		Dart d21 = phi1(d2); // turn in volume
 		Dart d23 = phi3(d2); // change volume
 
@@ -454,10 +458,10 @@ unsigned int Map3::vertexDegree(Dart d)
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
+	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
 		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(*it);
+		Dart d2 = phi2(darts[i]);
 		Dart d21 = phi1(d2); // turn in volume
 		Dart d23 = phi3(d2); // change volume
 
@@ -495,13 +499,13 @@ bool Map3::isBoundaryVertex(Dart d)
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
+	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
-		if(isBoundaryMarked(*it))
+		if(isBoundaryMarked(darts[i]))
 			return true ;
 
 		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(*it);
+		Dart d2 = phi2(darts[i]);
 		Dart d21 = phi1(d2); // turn in volume
 		Dart d23 = phi3(d2); // change volume
 
@@ -576,12 +580,12 @@ bool Map3::isBoundaryVolume(Dart d)
 	visitedFaces.push_back(d) ;
 	mark.markOrbit(ORIENTED_FACE, d) ;
 
-	for(std::vector<Dart>::iterator it = visitedFaces.begin(); it != visitedFaces.end(); ++it)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		if (isBoundaryMarked(phi3(*it)))
+		if (isBoundaryMarked(phi3(visitedFaces[i])))
 			return true ;
 
-		Dart e = *it ;
+		Dart e = visitedFaces[i] ;
 		do	// add all face neighbours to the table
 		{
 			Dart ee = phi2(e) ;
@@ -591,7 +595,7 @@ bool Map3::isBoundaryVolume(Dart d)
 				mark.markOrbit(ORIENTED_FACE, ee) ;
 			}
 			e = phi1(e) ;
-		} while(e != *it) ;
+		} while(e != visitedFaces[i]) ;
 	}
 	return false;
 }
@@ -689,10 +693,10 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); !found && it != darts.end() ; ++it)
+	for(unsigned int i = 0; !found && i < darts.size(); ++i)
 	{
 		// add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(*it);
+		Dart d2 = phi2(darts[i]);
 		Dart d21 = phi1(d2); // turn in volume
 		Dart d23 = phi3(d2); // change volume
 
@@ -707,7 +711,7 @@ bool Map3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 			mv.mark(d23);
 		}
 
-		found = f(*it);
+		found = f(darts[i]);
 	}
 	return found;
 }
@@ -734,14 +738,12 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
-	for(std::vector<Dart>::iterator it = darts.begin(); !found && it != darts.end() ; ++it)
+	for(unsigned int i = 0; !found && i < darts.size(); ++i)
 	{
-		Dart d1 = *it;
-
 		// add all successors if they are not marked yet
-		Dart d2 = phi1(d1); // turn in face
-		Dart d3 = phi2(d1); // change face
-		Dart d4 = phi3(d1); // change volume
+		Dart d2 = phi1(darts[i]); // turn in face
+		Dart d3 = phi2(darts[i]); // change face
+		Dart d4 = phi3(darts[i]); // change volume
 
 		if (!mv.isMarked(d2))
 		{
@@ -759,7 +761,7 @@ bool Map3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 			mv.mark(d4);
 		}
 
-		found = f(d1);
+		found = f(darts[i]);
 	}
 	return found;
 }
@@ -781,9 +783,11 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 	unsigned int count = 0 ;
 
 	// For every face added to the list
-	for (std::vector<Dart>::iterator it = visitedFaces.begin(); it != visitedFaces.end(); ++it)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart f = *it ;
+		Dart it = visitedFaces[i] ;
+		Dart f = it ;
+
 		unsigned int degree = faceDegree(f) ;
 		Dart b = newBoundaryCycle(degree) ;
 		++count ;
@@ -816,7 +820,7 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 			phi3sew(f, bit) ;
 			bit = phi_1(bit) ;
 			f = phi1(f);
-		} while(f != *it);
+		} while(f != it) ;
 	}
 
 	return count ;

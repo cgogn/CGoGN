@@ -32,7 +32,7 @@
 SimpleGMap3::SimpleGMap3()
 {
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
 
 	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
 	Dart d = primCat.hexaGrid_topo(2,1,1);
@@ -43,33 +43,33 @@ SimpleGMap3::SimpleGMap3()
 	DartMarker markOrient(myMap);
 	std::vector<Dart> orient;
 	FunctorStore fs(orient);
-	myMap.foreach_dart_of_oriented_volume(d,fs);
+	myMap.foreach_dart_of_oriented_volume(d, fs);
 
 	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
 		markOrient.mark(*it);
 
 	SelectorMarked sm(markOrient);
 
-	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap,position,sm);
+	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);
 
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap,position);
+	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	d = prim.hexaGrid_topo(2,2,1);
 	prim.embedHexaGrid(1,1,1);
 
 	Dart d1 = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-	VEC3 mid0 = (position[d1]+position[myMap.phi1(d1)])/2.0f;
+	VEC3 mid0 = (position[d1] + position[myMap.phi1(d1)]) / 2.0f;
 	myMap.cutEdge(d1);
 	position[myMap.phi1(d1)] = mid0;
 
-	VEC3 mid1 = (position[d]+position[myMap.phi1(d)])/2.0f;
+	VEC3 mid1 = (position[d] + position[myMap.phi1(d)]) / 2.0f;
 	myMap.cutEdge(d);
 	position[myMap.phi1(d)] = mid1;
 
 	d = myMap.phi1(myMap.phi1(myMap.phi2(myMap.phi1(myMap.phi1(d)))));
-	VEC3 mid = (position[d]+position[myMap.phi1(d)])/2.0f;
+	VEC3 mid = (position[d] + position[myMap.phi1(d)]) / 2.0f;
 	myMap.cutEdge(d);
 	position[myMap.phi1(d)] = mid;
 

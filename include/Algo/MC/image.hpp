@@ -180,7 +180,6 @@ void Image<DataType>::loadVox(char *filename)
 template< typename  DataType >
 bool Image<DataType>::loadPNG3D(const char* filename)
 {
-	CGoGN::Utils::Img3D_IO::initIO();
 
 	int tag;
 	//en fonction de DataType utiliser la bonne fonction de chargement,

@@ -75,7 +75,7 @@ Dart Primitive3D<PFP>::HexaGrid1Topo(unsigned int nx)
 	{
 		Dart d2 = createHexa();
 		m_tableVertDarts.push_back(d2);
-		m_map.sewVolumes(d1, d2);
+		m_map.sewVolumes(d1, d2, false);
 		d1 = m_map.template phi<2112>(d2);
 	}
 
@@ -102,7 +102,7 @@ Dart Primitive3D<PFP>::HexaGrid2Topo(unsigned int nx, unsigned int ny)
 		// couture des deux lignes de cubes
 		for (unsigned int i = 0; i < nx; ++i)
 		{
-			m_map.sewVolumes(d1,d3);
+			m_map.sewVolumes(d1, d3, false);
 			d1 = m_map.template phi<11232>(d1);
 			d3 = m_map.template phi<11232>(d3);
 		}
@@ -116,12 +116,12 @@ Dart Primitive3D<PFP>::HexaGrid2Topo(unsigned int nx, unsigned int ny)
 	for (unsigned int i = 0; i < nx; ++i)
 	{
 		Dart dd = m_tableVertDarts[index++];
-		dd =m_map.template phi<112>(dd);
+		dd = m_map.template phi<112>(dd);
 		m_tableVertDarts.push_back(dd);	
 	}
 	// warning last vertex of row has not same dart
 	Dart dd = m_tableVertDarts[index++];
-	dd =m_map.template phi<211>(dd);
+	dd = m_map.template phi<211>(dd);
 	m_tableVertDarts.push_back(dd);	
 
 	return d0;
@@ -137,13 +137,13 @@ Dart Primitive3D<PFP>::hexaGrid_topo(unsigned int nx, unsigned int ny, unsigned 
 	m_tableVertDarts.clear();
 	m_tableVertDarts.reserve((nx+1)*(ny+1)*(nz+1));
 
-	Dart d0 = HexaGrid2Topo(nx,ny);
+	Dart d0 = HexaGrid2Topo(nx, ny);
 	Dart d1 = m_map.template phi<12>(d0);
 
 	for (unsigned int i = 1; i < nz; ++i)
 	{
 		// creation grille suivante
-		Dart d2 = HexaGrid2Topo(nx,ny);
+		Dart d2 = HexaGrid2Topo(nx, ny);
 		Dart d3 = m_map.phi2(m_map.phi_1(d2));
 		
 		// couture des deux grilles 2D de cubes
@@ -153,7 +153,7 @@ Dart Primitive3D<PFP>::hexaGrid_topo(unsigned int nx, unsigned int ny, unsigned 
 			Dart db = d3;
 			for (unsigned int k = 0; k < nx; ++k)
 			{
-				m_map.sewVolumes(da,db);
+				m_map.sewVolumes(da, db, false);
 				da = m_map.template phi<11232>(da);
 				db = m_map.template phi<11232>(db);
 			}
@@ -175,6 +175,8 @@ Dart Primitive3D<PFP>::hexaGrid_topo(unsigned int nx, unsigned int ny, unsigned 
 		dd = m_map.phi2(dd);
 		m_tableVertDarts.push_back(dd);
 	}
+
+	m_map.closeMap() ;
 
 	return d0;
 }

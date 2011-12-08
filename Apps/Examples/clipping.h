@@ -27,12 +27,12 @@
 
 #include <iostream>
 
-#include "Utils/qtSimple.h"
-#include "Utils/qtInputs.h"
+#include "Utils/Qt/qtSimple.h"
+#include "Utils/Qt/qtInputs.h"
 
 #include "ui_clipping.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap3.h"

@@ -67,14 +67,14 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 	DartMarkerStore mark(map);		// Lock a marker
 
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(100);
+	visitedFaces.reserve(128);
 	visitedFaces.push_back(d);			// Start with the face of d
 
 	mark.markOrbit(VERTEX, d) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 
 		center += attributs[e];	// add to center and mark
 		++count;
@@ -88,7 +88,7 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 				mark.markOrbit(VERTEX, ee) ;
 			}
 			e = map.phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	center /= double(count) ;

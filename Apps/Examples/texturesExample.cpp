@@ -210,8 +210,6 @@ void TexView::computeImage()
 
 int main(int argc, char**argv)
 {
-	ilInit();
-
 	// interface:
 	QApplication app(argc, argv);
 	TexView tv;

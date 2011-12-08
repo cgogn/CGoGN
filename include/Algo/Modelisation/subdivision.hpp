@@ -137,8 +137,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 		if (selected(d) && !map.isBoundaryMarked(d) && !me.isMarked(d))
 		{
 			Dart f = map.phi1(d);
-			map.cutEdge(d);
-			Dart e = map.phi1(d);
+			Dart e = map.cutEdge(d);
 //			TODO trouver pourquoi lerp bug avec ECell
 //			attributs[m] = AttribOps::lerp<EMB,PFP>(attributs[d],attributs[f], 0.5);
 			attributs[e] = attributs[d];

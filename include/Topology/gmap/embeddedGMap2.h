@@ -54,7 +54,7 @@ public:
 	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
-	virtual void cutEdge(Dart d) ;
+	virtual Dart cutEdge(Dart d) ;
 
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge
@@ -101,7 +101,7 @@ public:
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
 	 * The attributes attached to the edge of d are kept on the resulting edge
 	 */
-	virtual void sewFaces(Dart d, Dart e, bool withBoundary=true) ;
+	virtual void sewFaces(Dart d, Dart e, bool withBoundary = true) ;
 
 	/**
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges

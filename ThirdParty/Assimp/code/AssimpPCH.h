@@ -56,11 +56,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* Include our stdint.h replacement header for MSVC, take the global header for gcc/mingw
  */
-#ifdef _MSC_VER
-#	include "pstdint.h"
-#else
-#	include <stdint.h>
-#endif
+//#ifdef _MSC_VER
+//#	include "pstdint.h"
+//#else
+//#	include <stdint.h>
+//#endif
+#include <stdint.h>
+
 
 /* Undefine the min/max macros defined by some platform headers (namely Windows.h) to 
  * avoid obvious conflicts with std::min() and std::max(). 
@@ -118,6 +120,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <new>
 #include <cstdio>
 
+// Boost headers
+#include <boost/pointer_cast.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+//#include <boost/make_shared.hpp>
+#include <boost/format.hpp>
+#include <boost/foreach.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/lexical_cast.hpp>
+
 // Public ASSIMP headers
 #include "../include/DefaultLogger.h"
 #include "../include/IOStream.h"
@@ -133,11 +147,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StreamReader.h"
 #include "qnan.h"
 
-// ----------------------------------------------------------------------------------------
-#include <boost/scoped_ptr.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
-#include <boost/static_assert.hpp>
 
 #endif // !! ASSIMP_PCH_INCLUDED

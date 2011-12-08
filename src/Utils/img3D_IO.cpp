@@ -27,6 +27,10 @@
 #include "Utils/img3D_IO.h"
 #include "Utils/cgognStream.h"
 
+#ifdef WITH_QT
+#include <QImage>
+#include <QString>
+#endif
 
 namespace CGoGN
 {
@@ -34,14 +38,9 @@ namespace CGoGN
 namespace Utils
 {
 
+#ifdef WITH_QT
 namespace Img3D_IO
 {
-
-void initIO()
-{
-	ilInit();
-	iluInit();
-}
 
 template<typename DataType>
 DataType* compressZ8(DataType* src, int w, int h, int d, int& new_d)
@@ -141,7 +140,7 @@ DataType* uncompressZ8(DataType* src, int w, int h, int d)
 
 
 
-void saveBool(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveBool(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// compress image from bool to 8bit pp
 	int nd;
@@ -160,44 +159,34 @@ void saveBool(ILstring filename, unsigned char* data, int w, int h, int d, float
 
 	// save image2D
 
-	ILuint imgName;
-	ilGenImages(1,&imgName);
-	ilBindImage(imgName);
-	ILuint hh = (h*nd)+1;
-	ilTexImage(w,hh,1,1,IL_LUMINANCE,IL_UNSIGNED_BYTE,dat_comp);
-
-	ilEnable(IL_FILE_OVERWRITE);
-	ilSaveImage(filename);
-	ilDeleteImages(1,&imgName);
-	delete[] dat_comp;
-
+	int hh = (h*nd)+1;
+	QImage img(dat_comp, w, hh, QImage::Format_Indexed8);
+	img.save(QString(filename.c_str()));
 }
 
 
-unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+unsigned char* loadVal_8(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
-
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-	ilEnable(IL_ORIGIN_SET);
-	ILuint imgName;
-	ilGenImages(1,&imgName);
-	ilBindImage(imgName);
-	ilLoadImage(filename);
+	QImage* ptrImg = new QImage(filename.c_str());
+	if (ptrImg==NULL)
+		return NULL;
 	
 //	get the info of 2D image
-	w = ilGetInteger(IL_IMAGE_WIDTH);
-	h = ilGetInteger(IL_IMAGE_HEIGHT);
-	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
+	w = ptrImg->width();
+	h = ptrImg->height();
+	unsigned int bpp = ptrImg->depth();
 
 	// image OK ?
-	if ((bpp!=1))
+	if ((bpp!=8))
 		return NULL;
 
-	unsigned char* ptr=ilGetData();
+	unsigned char* ptr=ptrImg->bits();
 	int* ptr_int = reinterpret_cast<int*>(ptr+(w*(h-1)));
 	int t = *ptr_int++;
+	
 	if ((t!= BOOL8) && (t!= VAL8))
 		return NULL;
+		
 	tag = *ptr_int++;
 	w = *ptr_int++;
 	h = *ptr_int++;
@@ -212,13 +201,15 @@ unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, f
 		// uncompress data
 		unsigned char* data = uncompressZ8<unsigned char>(ptr,w,h,d);
 	
-		// free il image
-		ilDeleteImages(1,&imgName);
+		delete ptrImg;
 		// return 3D image
 		return data;
 	}
-	// t == VAL8
-	return ptr;
+	
+	unsigned char* ptr2 = new unsigned char[w*h*d];
+	memcpy (ptr2, ptr, w*h*d); 
+	delete ptrImg;
+	return ptr2;
 }
 
 
@@ -226,36 +217,46 @@ unsigned char* loadVal_8(ILstring filename, int& w, int& h, int &d, float& vx, f
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-unsigned char* loadRGB(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+void saveVal(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
-	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-	ilEnable(IL_ORIGIN_SET);
-	ILuint imgName;
-	ilGenImages(1,&imgName);
-	ilBindImage(imgName);
-	ilLoadImage(filename);
+	// init image2D
+	QImage img(w,(h*d)+1,QImage::Format_Indexed8);
+	memcpy(img.bits(), data, w*h*d);
+	
+	// add 3D info
+	int *entete1=reinterpret_cast<int*>(img.bits()+w*h*d); // get the end of 3D data
+	*entete1++ = VAL8; 
+	*entete1++ = tag;
+	*entete1++ = w;
+	*entete1++ = h;
+	*entete1++ = d;
+	float *entete2=reinterpret_cast<float*>(entete1);
+	*entete2++ = vx;
+	*entete2++ = vy;
+	*entete2++ = vz;
+
+	// save image
+	img.save(QString(filename.c_str()));
+}
+
+
+
+unsigned char* loadRGB(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+{
+	QImage* ptrImg = new QImage(filename.c_str());
+	if (ptrImg==NULL)
+		return NULL;
 	
 //	get the info of 2D image
-	w = ilGetInteger(IL_IMAGE_WIDTH);
-	h = ilGetInteger(IL_IMAGE_HEIGHT);
-	ILuint bpp = ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL);
+	w = ptrImg->width();
+	h = ptrImg->height();
+	unsigned int bpp = ptrImg->depth();
 
 	// image OK ?
-	if ((bpp!=3))
+	if ((bpp!=24))
 		return NULL;
 
-	unsigned char* ptr=ilGetData();
+	unsigned char* ptr=ptrImg->bits();
 	int* ptr_int = reinterpret_cast<int*>(ptr+3*(w*(h-1)));
 	int t = *ptr_int++;
 	if (t!= RGB8)
@@ -269,53 +270,23 @@ unsigned char* loadRGB(ILstring filename, int& w, int& h, int &d, float& vx, flo
 	vy = *ptr_float++;
 	vz = *ptr_float++;
 
-	return ptr;
-	// WARNING NO COPY: IL IMAGE HAS NOT BEEN FREED
-	// IMPORTANT ??? I DON'T THINK
+	unsigned char* ptr2 = new unsigned char[3*w*h*d];
+	memcpy (ptr2, ptr, 3*w*h*d); 
+	delete ptrImg;
+	return ptr2;
 }
 
 
-void saveVal(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveRGB(const std::string& filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
+
 	// init image2D
-	ILuint imgName;
-	ilGenImages(1,&imgName);
-	ilBindImage(imgName);
-	ilTexImage(w,(h*d)+1,1,1,IL_LUMINANCE,IL_UNSIGNED_BYTE,NULL);
-	// copy 3D image in 2D image
-	ilSetPixels(0,0,0,w,h*d,1,IL_LUMINANCE, IL_UNSIGNED_BYTE, data);
+	QImage img(w,(h*d)+1,QImage::Format_RGB888);
+	memcpy(img.bits(), data, 3*w*h*d);
 
-	// add 3D info
-	int *entete1=reinterpret_cast<int*>(ilGetData()+w*h*d); // get the end of 3D data
-	*entete1++ = VAL8; 
-	*entete1++ = tag;
-	*entete1++ = w;
-	*entete1++ = h;
-	*entete1++ = d;
-	float *entete2=reinterpret_cast<float*>(entete1);
-	*entete2++ = vx;
-	*entete2++ = vy;
-	*entete2++ = vz;
-
-	// save image
-	ilEnable(IL_FILE_OVERWRITE);
-	ilSaveImage(filename);
-	ilDeleteImages(1,&imgName);
-}
-
-void saveRGB(ILstring filename, unsigned char* data, int w, int h, int d, float vx, float vy, float vz, int tag)
-{
-	// init image2D
-	ILuint imgName;
-	ilGenImages(1,&imgName);
-	ilBindImage(imgName);
-	ILuint hh = (h*d)+1; // height of 2d image 
-	ilTexImage(w,hh,1,3,IL_RGB,IL_UNSIGNED_BYTE,NULL);
-	// copy 3D image in 2D image
-	ilCopyPixels(0,0,0,w,hh,3,IL_RGB,IL_UNSIGNED_BYTE, data);
 	// add 3D info
 	
-	int *entete1=reinterpret_cast<int*>(ilGetData()+3*w*h*d); // get the end of 3D data
+	int *entete1=reinterpret_cast<int*>(img.bits()+3*w*h*d); // get the end of 3D data
 	*entete1++ = RGB8;
 	*entete1++ = tag;
 	*entete1++ = w;
@@ -326,14 +297,14 @@ void saveRGB(ILstring filename, unsigned char* data, int w, int h, int d, float 
 	*entete2++ = vy;
 	*entete2++ = vz;
 
+
 	// save image
-	ilEnable(IL_FILE_OVERWRITE);
-	ilSaveImage(filename);
-	ilDeleteImages(1,&imgName);
+	img.save(QString(filename.c_str()));
 }
 
-
-unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+/*
+TODO continue porting to Qt ?
+unsigned short* loadVal_16(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilEnable(IL_ORIGIN_SET);
@@ -374,7 +345,7 @@ unsigned short* loadVal_16(ILstring filename, int& w, int& h, int &d, float& vx,
 
 
 
-void saveVal_16(ILstring filename, unsigned short* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveVal_16(const std::string& filename, unsigned short* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// init image2D
 	ILuint imgName;
@@ -403,7 +374,7 @@ void saveVal_16(ILstring filename, unsigned short* data, int w, int h, int d, fl
 }
 
 
-float* loadVal_float(ILstring filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
+float* loadVal_float(const std::string& filename, int& w, int& h, int &d, float& vx, float& vy, float& vz, int& tag)
 {
 	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 	ilEnable(IL_ORIGIN_SET);
@@ -441,7 +412,7 @@ float* loadVal_float(ILstring filename, int& w, int& h, int &d, float& vx, float
 }
 
 
-void saveVal_float(ILstring filename, float* data, int w, int h, int d, float vx, float vy, float vz, int tag)
+void saveVal_float(const std::string& filename, float* data, int w, int h, int d, float vx, float vy, float vz, int tag)
 {
 	// init image2D
 	ILuint imgName;
@@ -468,8 +439,11 @@ void saveVal_float(ILstring filename, float* data, int w, int h, int d, float vx
 	ilSaveImage(filename);
 	ilDeleteImages(1,&imgName);
 }
+*/
+
 
 } //namespace img3D_IO
+#endif
 
 } //namespace Utils
 

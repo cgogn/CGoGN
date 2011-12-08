@@ -114,7 +114,7 @@ PointSprite::PointSprite(float radius)
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP,4);
 
 	bind();
 	m_uniform_size = glGetUniformLocation(program_handler(),"size");

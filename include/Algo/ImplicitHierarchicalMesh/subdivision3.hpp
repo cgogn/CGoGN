@@ -206,9 +206,9 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 
 	mf.markOrbit(FACE, old) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			//add one old edge per vertex to the old edge list
@@ -230,7 +230,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 			}
 
 			e = map.phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	volCenter /= typename PFP::REAL(count) ;
@@ -306,7 +306,6 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 		newEdges.push_back(ne);
 		newEdges.push_back(map.phi1(ne));
 
-
 		Dart stop = map.phi2(map.phi1(ne));
 		ne = map.phi2(ne);
 		do
@@ -375,13 +374,13 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 //	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
 //	//id pour les aretes interieurs : (i.e. 6 pour un hexa)
 //	DartMarker mne(map);
-//	for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
+//	for(unsigned int i = 0; i < newEdges.size(); ++i)
 //	{
-//		if(!mne.isMarked(*it))
+//		if(!mne.isMarked(newEdges[i]))
 //		{
 //			unsigned int idedge = map.getNewEdgeId();
-//			map.setEdgeId(*it, idedge, EDGE);
-//			mne.markOrbit(EDGE,*it);
+//			map.setEdgeId(newEdges[i], idedge, EDGE);
+//			mne.markOrbit(EDGE, newEdges[i]);
 //		}
 //	}
 
@@ -425,9 +424,9 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 	mf.markOrbit(FACE, old) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			//add one old edge per vertex to the old edge list
@@ -449,7 +448,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			}
 
 			e = map.phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	volCenter /= typename PFP::REAL(count) ;
@@ -796,7 +795,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			{
 				unsigned int idedge = map.getNewEdgeId();
 				map.setEdgeId(*it, idedge, EDGE);
-				mne.markOrbit(EDGE,*it);
+				mne.markOrbit(EDGE, *it);
 			}
 		}
 	}
@@ -833,11 +832,10 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			{
 				unsigned int idedge = map.getNewEdgeId();
 				map.setEdgeId(*it, idedge, EDGE);
-				mne.markOrbit(EDGE,*it);
+				mne.markOrbit(EDGE, *it);
 			}
 		}
 	}
-
 
 	//cas tordu pour le prisme
 	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfacesT.begin(); it != subdividedfacesT.end(); ++it)
@@ -860,7 +858,6 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			}
 
 		}
-
 	}
 
 	map.setCurrentLevel(cur) ;
@@ -906,9 +903,9 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 
 	mf.markOrbit(FACE, old) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			//add one old edge per vertex to the old edge list
@@ -930,7 +927,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 			}
 
 			e = map.phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	volCenter /= typename PFP::REAL(count) ;
@@ -1155,7 +1152,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 		{
 			unsigned int idedge = map.getNewEdgeId();
 			map.setEdgeId(*it, idedge, EDGE);
-			mne.markOrbit(EDGE,*it);
+			mne.markOrbit(EDGE, *it);
 		}
 	}
 	}
@@ -1193,7 +1190,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 		{
 			unsigned int idedge = map.getNewEdgeId();
 			map.setEdgeId(*it, idedge, EDGE);
-			mne.markOrbit(EDGE,*it);
+			mne.markOrbit(EDGE, *it);
 		}
 	}
 	}
@@ -1302,9 +1299,9 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 	mf.markOrbit(FACE, d) ;
 
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 		do
 		{
 			// add all face neighbours to the table
@@ -1316,7 +1313,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			}
 
 			e = map.phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	/*

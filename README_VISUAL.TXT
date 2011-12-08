@@ -12,28 +12,41 @@ pour eviter les pb de compilation.
 
 Le plus sur mais plus long est de compiler soi-même Qt et Boost (bon courage)
 
-
-Lancer CMake
+Pour les "ThirdParty libs":
+Lancer CMake (gui)
 Mettre le chemin de la racine de CGoGN + /ThirdParty pour les sources
-Mettre le chemin de la racine de CGoGN + /ThirdParty/Visual (par exemple) pour le build
+Mettre le chemin de la racine de CGoGN + /ThirdParty/build pour le build en release
+Mettre le chemin de la racine de CGoGN + /ThirdParty/buildDebug pour le build en debug
+Sous windows les 2 versions sont nécessaires.
+La suite vaut pour les 2 répertoires:
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
+Modifier les variables en fonctions de ce que vous voulez compiler (README.TXT de ThirdParty)
+Modifier le CMAKE_PREFIX_PATH si nécessaire (cf remarque dépendances)
 Recliquer sur Configure
 Cliquer sur Generate
 Aller compiler sous visual(en release)
 
+Pour CGoGN:
 Relancer CMake
-Mettre le chemin de la racine de CGoGN + /build pour les sources
-Mettre le chemin de la racine de CGoGN + /Visual (par exemple) pour le build
+Mettre le chemin de la racine de CGoGN pour les sources
+Mettre le chemin de la racine de CGoGN + /build (par exemple) pour le build
 Cliquer sur Configure
 Choisir le bon compilateur (celui de votre version de Visual C++)
+Modifier les variables comme pour ThirdParty (et CMAKE_PREFIX_PATH si nécessaire)
 Recliquer sur Configure
 Cliquer sur Generate
 
 Aller dans Visual et double-cliquer sur CGoGN.sln !!
 
-Pour que les executables fonctionnent ajouter le chemin vers les dll dans la variable d'environnement path
-(ou copier les dll dans un répertoire déjà dans le path)
+Pour que les executables fonctionnent ajouter le chemin vers les dll des dépendances dans la variable
+d'environnement path (ou copier les dll dans un répertoire déjà dans le path)
+
+
+Remarque dépendances:
+Si vous voulez utiliser vos propre versions des dépendance (Zlib / glew / Boost / Qt)
+changer le CMAKE_PREFIX_PATH (voir ci dessous)
+Attention pour Boost le prefix path ne marche pas (utiliser BOOST_ROOT et d'autres si nécessaire)
 
 
 Compilation 64bits:
