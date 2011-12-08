@@ -31,6 +31,11 @@ class ParticleBase
 			m_position = position;
 		}
 
+		virtual unsigned int getState()
+		{
+			return 0;
+		}
+		
 		/**
 		* @param newPosition new position to reach
 		*/
