@@ -1,5 +1,5 @@
 #ifndef EXPORT_POV_H
-#define EXPORT_POV
+#define EXPORT_POV_H
 
 #include "Topology/generic/attributeHandler.h"
 #include "Utils/cgognStream.h"

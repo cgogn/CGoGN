@@ -34,10 +34,15 @@ class ParticleBase
 		/**
 		* @param newPosition new position to reach
 		*/
-		bool move(VEC3 position)
+		virtual bool move(VEC3 position)
 		{
 			m_position = position;
 			return true;
+		}
+
+		virtual unsigned int getState()
+		{
+			return 0;
 		}
 
 		VEC3 getPosition() { return m_position; }

@@ -23,6 +23,7 @@
  *******************************************************************************/
 
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 
 namespace CGoGN
 {
@@ -60,7 +61,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	if(map.isVolumeTetrahedron(d))
+	if(Modelisation::Tetrahedralization::isTetrahedron<PFP>(map,d))
 		return tetrahedronVolume<PFP>(map,d,position) ;
 	else
 	{
