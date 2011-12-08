@@ -124,9 +124,9 @@ public:
 
 	//@{
 	//! Delete the vertex of d
-	/*! All the faces around the vertex are merged into one face
+	/*! All the volumes around the vertex are merged into one volume
 	 *  @param d a dart of the vertex to delete
-	 *  @return true if the deletion has been executed, false otherwise
+	 *  @return a Dart of the resulting volume
 	 */
 	virtual Dart deleteVertex(Dart d);
 
@@ -141,8 +141,10 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
-	//! Delete an edge and all the faces aroud this edge
-	/*! @param d a dart of the edge to delete
+	//! Delete the edge of d
+	/*! All the volumes around the edge are merged into one volume
+	 *  @param d a dart of the edge to delete
+	 *  @return a Dart of the resulting volume
 	 */
 	virtual Dart deleteEdge(Dart d);
 

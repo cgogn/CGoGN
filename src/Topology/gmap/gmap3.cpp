@@ -129,12 +129,14 @@ Dart GMap3::deleteVertex(Dart d)
 			beta2sew(beta0(d2), d32) ;
 			beta2sew(fit, beta0(d3)) ;
 			beta2sew(beta0(fit), d3) ;
+
+			fit = phi1(fit) ;
 		}
 	}
+
 	GMap2::deleteCC(d) ;
 
 	return res ;
-	return NIL ;
 }
 
 Dart GMap3::cutEdge(Dart d)
@@ -180,6 +182,47 @@ bool GMap3::uncutEdge(Dart d)
 		return true;
 	}
 	return false;
+}
+
+Dart GMap3::deleteEdge(Dart d)
+{
+	if(isBoundaryEdge(d))
+		return NIL ;
+
+	Dart res = NIL ;
+	Dart dit = d ;
+	do
+	{
+		Dart fit = dit ;
+		Dart end = fit ;
+		fit = phi1(fit) ;
+		while(fit != end)
+		{
+			Dart d2 = phi2(fit) ;
+			Dart d3 = phi3(fit) ;
+			Dart d32 = phi2(d3) ;
+
+			if(res == NIL)
+				res = d2 ;
+
+			beta2unsew(d2) ;
+			beta2unsew(beta0(d2)) ;
+			beta2unsew(d32) ;
+			beta2unsew(beta0(d32)) ;
+
+			beta2sew(d2, beta0(d32)) ;
+			beta2sew(beta0(d2), d32) ;
+			beta2sew(fit, beta0(d3)) ;
+			beta2sew(beta0(fit), d3) ;
+
+			fit = phi1(fit) ;
+		}
+		dit = alpha2(dit) ;
+	} while(dit != d) ;
+
+	GMap2::deleteCC(d) ;
+
+	return res ;
 }
 
 void GMap3::splitFace(Dart d, Dart e)

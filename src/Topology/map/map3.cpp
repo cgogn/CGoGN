@@ -122,8 +122,11 @@ Dart Map3::deleteVertex(Dart d)
 			phi2unsew(d32) ;
 			phi2sew(d2, d32) ;
 			phi2sew(fit, d3) ;
+
+			fit = phi1(fit) ;
 		}
 	}
+
 	Map2::deleteCC(d) ;
 
 	return res ;
@@ -185,37 +188,32 @@ Dart Map3::deleteEdge(Dart d)
 	if(isBoundaryEdge(d))
 		return NIL ;
 
-	//Save the darts around the edge
-	//(one dart per face should be enough)
-	std::vector<Dart> fstore;
-	fstore.reserve(128);
-	Dart dit = d;
+	Dart res = NIL ;
+	Dart dit = d ;
 	do
 	{
-		fstore.push_back(dit);
-		dit = alpha2(dit);
-	}while(dit != d);
-
-
-	Dart res = NIL ;
-	for(std::vector<Dart>::iterator it = fstore.begin() ; it != fstore.end() ; ++it)
-	{
-		Dart fit = *it ;
-		Dart end = phi_1(fit) ;
+		Dart fit = dit ;
+		Dart end = fit ;
 		fit = phi1(fit) ;
 		while(fit != end)
 		{
 			Dart d2 = phi2(fit) ;
 			Dart d3 = phi3(fit) ;
 			Dart d32 = phi2(d3) ;
+
 			if(res == NIL)
 				res = d2 ;
+
 			phi2unsew(d2) ;
 			phi2unsew(d32) ;
 			phi2sew(d2, d32) ;
 			phi2sew(fit, d3) ;
+
+			fit = phi1(fit) ;
 		}
-	}
+		dit = alpha2(dit) ;
+	} while(dit != d) ;
+
 	Map2::deleteCC(d) ;
 
 	return res ;
@@ -241,7 +239,7 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 	{
 		//un brin d'une face adjacente a l'arrete contracte
 		Dart d = phi2(phi_1(*it));
-		Map2::collapseEdge(*it,false);
+		Map2::collapseEdge(*it, false);
 
 		//test de la degeneresence
 		//impossible d'avoir un volume de moins de 4 faces sans avoir de phi2 en points fixe donc on les vire
@@ -274,7 +272,6 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 			} while (e != d);
 		}
 	}
-
 
 	return resV;
 }
