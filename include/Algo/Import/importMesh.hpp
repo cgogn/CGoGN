@@ -80,10 +80,10 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 				FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, em);
 				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
 
+				m.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
 				d = map.phi1(d);
 			}
-			m.markOrbit(ORIENTED_FACE, d);	// mark on the fly to unmark on second loop
 		}
 	}
 
@@ -106,11 +106,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 			if (good_dart != NIL)
 			{
-				if (good_dart == map.phi2(good_dart))
-				{
-					map.sewFaces(d, good_dart, false);
-					m.unmarkOrbit(EDGE, d);
-				}
+				map.sewFaces(d, good_dart, false);
+				m.unmarkOrbit(EDGE, d);
 			}
 			else
 			{

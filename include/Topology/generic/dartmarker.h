@@ -28,6 +28,7 @@
 #include "Topology/generic/marker.h"
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/functor.h"
+#include "Utils/static_assert.h"
 
 namespace CGoGN
 {
@@ -169,6 +170,20 @@ public:
 	 * unmark all darts
 	 */
 	virtual void unmarkAll() = 0 ;
+
+	bool isAllUnmarked()
+	{
+		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
+
+		AttributeMultiVector<Mark>* mark_vect = m_map.getMarkVector(DART, m_thread);
+		assert(mark_vect != NULL);
+
+		AttributeContainer& cont = m_map.getAttributeContainer(DART) ;
+		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+			if(mark_vect->operator[](i).testMark(m_mark))
+				return false ;
+		return true ;
+	}
 };
 
 /**
@@ -223,6 +238,8 @@ public:
 	~DartMarkerStore()
 	{
 		unmarkAll() ;
+//		assert(isAllUnmarked) ;
+		CGoGN_ASSERT(isAllUnmarked())
 	}
 
 protected:
@@ -280,7 +297,10 @@ public:
 	{}
 
 	~DartMarkerNoUnmark()
-	{}
+	{
+//		assert(isAllUnmarked) ;
+		CGoGN_ASSERT(isAllUnmarked())
+	}
 
 protected:
 	DartMarkerNoUnmark(const DartMarkerNoUnmark& dm) : DartMarkerGen(dm)

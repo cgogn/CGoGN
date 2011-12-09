@@ -140,6 +140,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			Dart e = map.cutEdge(d);
 //			TODO trouver pourquoi lerp bug avec ECell
 //			attributs[m] = AttribOps::lerp<EMB,PFP>(attributs[d],attributs[f], 0.5);
+
 			attributs[e] = attributs[d];
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
@@ -194,17 +195,17 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 				m0.mark(d);
 				l_verts.push_back(d);
 			}
-			if (!m0.isMarked(map.phi2(d)))
+			Dart d2 = map.phi2(d);
+			if (!m0.isMarked(d2))
 			{
-				m0.mark(map.phi2(d));
-				l_verts.push_back(map.phi2(d));
+				m0.mark(d2);
+				l_verts.push_back(d2);
 			}
 
 			Dart f = map.phi1(d);
-			map.cutEdge(d);
-			Dart e = map.phi1(d) ;
+			Dart e = map.cutEdge(d);
 
-			attributs[e] =  attributs[d];
+			attributs[e] = attributs[d];
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
@@ -226,15 +227,16 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			// compute center skip darts of new vertices non embedded
 			EMB center = AttribOps::zero<EMB,PFP>();
 			unsigned int count = 0 ;
+			mf.unmarkOrbit(FACE, d) ;
 			Dart it = d;
 			do
 			{
-				mf.unmark(it);
-				me.unmark(it);
-				me.unmark(map.phi1(it));
 				center += attributs[it];
 				++count ;
-				it = map.template phi<11>(it) ;
+				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
+				it = map.phi1(it) ;
+				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
+				it = map.phi1(it) ;
 			} while(it != d) ;
 			center /= double(count);
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
@@ -247,13 +249,12 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	{
 		Dart x = *mid;
 		// other side of the edge
-		Dart y = map.phi2(x);
-		if (y != x)
+		if (!map.isBoundaryEdge(x))
 		{
 			Dart f1 = map.phi_1(x);
-			Dart f2 = map.phi2(map.phi1(y));
+			Dart f2 = map.phi2(map.phi1(map.phi2(x)));
 			EMB temp = AttribOps::zero<EMB,PFP>();
-			temp =  attributs[f1];
+			temp = attributs[f1];
 			temp += attributs[f2];			// E' = (V0+V1+F1+F2)/4
 			temp *= 0.25;
 			attributs[x] *= 0.5;
@@ -352,9 +353,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			}
 
 			Dart f = map.phi1(d);
-
-			map.cutEdge(d);
-			Dart e = map.phi1(d) ;
+			Dart e = map.cutEdge(d);
 
 			attributs[e] =  attributs[d];
 			attributs[e] += attributs[f];
@@ -382,7 +381,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			temp = attributs[e1];
 			e1 = map.phi_1(map.phi_1(dd));
 			temp += attributs[e1];
-			temp *= 1.0/8.0;
+			temp *= 1.0 / 8.0;
 			attributs[d] += temp;
 		}
 		// else nothing to do point already in the middle of segment
@@ -426,14 +425,8 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if (mv.isMarked(d))
 		{
 			// unmark the darts of the face
-			Dart fit = d ;
-			do
-			{
-				mv.unmark(fit) ;
-				me.unmark(fit) ;
-				me.unmark(map.phi_1(fit)) ;
-				fit = map.template phi<11>(fit) ;
-			} while(fit != d) ;
+			me.unmarkOrbit(FACE, d) ;
+			mv.unmarkOrbit(FACE, d) ;
 
 			Dart dd = d;
 			Dart e = map.template phi<11>(dd) ;

@@ -165,15 +165,11 @@ Dart GMap2::deleteVertex(Dart d)
 Dart GMap2::cutEdge(Dart d)
 {
 	Dart e = phi2(d) ;
-	beta2unsew(d) ;
-	beta2unsew(e) ;
 	Dart nd = GMap1::cutEdge(d) ;
 	Dart ne = GMap1::cutEdge(e) ;
 
-	beta2sew(d, beta0(ne)) ;
-	beta2sew(beta0(d), ne) ;
-	beta2sew(e, beta0(nd)) ;
-	beta2sew(beta0(e), nd) ;
+	beta2sew(nd, beta1(ne)) ;
+	beta2sew(ne, beta1(nd)) ;
 
 	return nd ;
 }
@@ -744,6 +740,8 @@ bool GMap2::check()
 			CGoGNout << "Check: beta2 is not an involution" << CGoGNendl;
 			return false;
 		}
+		if(dd == d)
+			CGoGNout << "Check (warning): beta2 has fix points" << CGoGNendl;
 	}
 
 	CGoGNout << "Check: topology ok" << CGoGNendl;
