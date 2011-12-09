@@ -182,7 +182,7 @@ void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 template<typename PFP>
 void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
-	/*
+/*
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 

@@ -370,13 +370,13 @@ void EmbeddedGMap2::splitFace(Dart d, Dart e)
 	if (isOrbitEmbedded(VERTEX))
 	{
 		unsigned int v1Emb = getEmbedding(VERTEX, d) ;
-		copyDartEmbedding(VERTEX, phi_1(e), v1Emb) ;
-		copyDartEmbedding(VERTEX, beta1(d), v1Emb) ;
-		copyDartEmbedding(VERTEX, beta1(phi_1(e)), v1Emb) ;
+		setDartEmbedding(VERTEX, phi_1(e), v1Emb) ;
+		setDartEmbedding(VERTEX, beta1(d), v1Emb) ;
+		setDartEmbedding(VERTEX, beta1(phi_1(e)), v1Emb) ;
 		unsigned int v2Emb = getEmbedding(VERTEX, e) ;
-		copyDartEmbedding(VERTEX, phi_1(d), v2Emb) ;
-		copyDartEmbedding(VERTEX, beta1(e), v2Emb) ;
-		copyDartEmbedding(VERTEX, beta1(phi_1(d)), v2Emb) ;
+		setDartEmbedding(VERTEX, phi_1(d), v2Emb) ;
+		setDartEmbedding(VERTEX, beta1(e), v2Emb) ;
+		setDartEmbedding(VERTEX, beta1(phi_1(d)), v2Emb) ;
 	}
 	if (isOrbitEmbedded(FACE))
 	{
@@ -508,7 +508,18 @@ bool EmbeddedGMap2::check()
 			}
 		}
 	}
+
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
+
+    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
+
 	return true ;
 }
 

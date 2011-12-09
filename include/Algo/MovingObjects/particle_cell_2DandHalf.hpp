@@ -221,6 +221,16 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
  	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
+	//project current within plane
+	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+	VEC3 n2 = current-m_position;
+	n1.normalize();
+	VEC3 n3 = n1^n2;
+	n3.normalize();
+	VEC3 n4 = n3^n1;
+	current = m_position+(n2*n4)*n4;
+
+	//track new position within map
 	Dart dd = d;
 	float wsoe = getOrientationFace(current, m_position, m.phi1(d));
 

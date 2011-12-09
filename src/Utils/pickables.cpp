@@ -134,7 +134,6 @@ glm::mat4&  Pickable::transfo()
 	return m_transfo;
 }
 
-
 void Pickable::rotate(float angle, const Geom::Vec3f& Axis)
 {
 	m_transfo = glm::rotate(m_transfo, angle, glm::vec3(Axis[0],Axis[1],Axis[2]));
@@ -472,7 +471,7 @@ unsigned int Sphere::pick(const Geom::Vec3f& P, const Geom::Vec3f& V, Geom::Vec3
 
 
 	I=P;
-	I.normalize();			// grossiere approximation TODO amelioerer approxim ?
+	I.normalize();			// grossiere approximation TODO ameliorer approxim ?
 
 	return 1;
 }

@@ -74,7 +74,7 @@ public:
  * a foreach_cell which adds darts in the list
  */
 template <typename MAP>
-class MapBrowserLinked: public MapBrowser, public FunctorType
+class MapBrowserLinked : public MapBrowser, public FunctorType
 {
 protected:
 	// The browsed map
@@ -181,6 +181,6 @@ public:
 	}
 } ;
 
-} // end namespace CGoGN
+} // namespace CGoGN
 
 #endif /* MAPBROWSER_H_ */

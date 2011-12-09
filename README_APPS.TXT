@@ -46,10 +46,18 @@ include_directories(
 	${CMAKE_CURRENT_BINARY_DIR}		# for qt (ui,moc,etc.) if necessary
 )
 
-add_executable( mon_exec ${CMAKE_SOURCE_DIR}/mon_source.cpp)
+# Pour une appli QT
+QT4_WRAP_UI( source_ui ../source.ui )
+QT4_WRAP_CPP( source_moc ../source.h )
+
+add_executable( mon_exec
+	${CMAKE_SOURCE_DIR}/mon_source.cpp
+# Pour une appli QT
+	${source_moc}
+	${source_ui}
+)
 
 target_link_libraries( mon_exec ${CGoGN_LIBS_R} ${COMMON_LIBS})
-
 
 Pour le compiler le plus propre est de faire un repertoire build,
 d'aller à l'interieur et de faire ccmake .. (j'ai bien ecrit "..")
@@ -58,6 +66,3 @@ ici WITH_QT, WITH_ASSIMP, WITH_NUMERICAL, WITH_ZINRI.
 Ceci ajoutera automatiquement tout ce qu'il faut aux variables COMMON_INCLUDES
 et COMMON_LIBS.
 On peut aussi utiliser cmake avec l'option -D (moins pratique).
-
-
-

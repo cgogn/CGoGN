@@ -394,8 +394,8 @@ bool EmbeddedGMap3::check()
 		if(isOrbitEmbedded(VERTEX))
 		{
 			if( getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta1(d)) ||
-					getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta2(d)) ||
-					getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta3(d)) )
+				getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta2(d)) ||
+				getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta3(d)) )
 			{
 				std::cout << "Embedding Check : different embeddings on vertex" << std::endl ;
 				return false ;
@@ -405,8 +405,8 @@ bool EmbeddedGMap3::check()
 		if(isOrbitEmbedded(EDGE))
 		{
 			if( getEmbedding(EDGE, d) != getEmbedding(EDGE, beta0(d)) ||
-					getEmbedding(EDGE, d) != getEmbedding(EDGE, beta2(d)) ||
-					getEmbedding(EDGE, d) != getEmbedding(EDGE, beta3(d)) )
+				getEmbedding(EDGE, d) != getEmbedding(EDGE, beta2(d)) ||
+				getEmbedding(EDGE, d) != getEmbedding(EDGE, beta3(d)) )
 			{
 				std::cout << "Embedding Check : different embeddings on edge" << std::endl ;
 				return false ;
@@ -416,8 +416,8 @@ bool EmbeddedGMap3::check()
 		if (isOrbitEmbedded(FACE))
 		{
 			if( getEmbedding(FACE, d) != getEmbedding(FACE, beta0(d)) ||
-					getEmbedding(FACE, d) != getEmbedding(FACE, beta1(d)) ||
-					getEmbedding(FACE, d) != getEmbedding(FACE, beta3(d)) )
+				getEmbedding(FACE, d) != getEmbedding(FACE, beta1(d)) ||
+				getEmbedding(FACE, d) != getEmbedding(FACE, beta3(d)) )
 			{
 				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
 				return false ;
@@ -427,8 +427,8 @@ bool EmbeddedGMap3::check()
 		if (isOrbitEmbedded(VOLUME))
 		{
 			if( getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta0(d)) ||
-					getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta1(d)) ||
-					getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta2(d)) )
+				getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta1(d)) ||
+				getEmbedding(VOLUME, d) != getEmbedding(VOLUME, beta2(d)) )
 			{
 				CGoGNout << "Check: different embeddings on volume" << CGoGNendl ;
 				return false ;
@@ -437,6 +437,19 @@ bool EmbeddedGMap3::check()
 	}
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
+
+    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
+
+    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
+    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
+
 	return true ;
 }
 

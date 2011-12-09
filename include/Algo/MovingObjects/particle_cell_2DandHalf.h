@@ -70,6 +70,11 @@ public :
 
 	void faceState(VEC3 current);
 
+	virtual unsigned int getState()
+	{
+		return state;
+	}
+
 	void move(const VEC3& newCurrent)
 	{
 		crossCell = NO_CROSS ;

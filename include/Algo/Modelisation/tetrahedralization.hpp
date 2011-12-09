@@ -22,8 +22,6 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <list>
-
 namespace CGoGN
 {
 
@@ -57,60 +55,47 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 {
-	DartMarkerStore mark(*the_map);			// Lock a marker
-	bool isTetrahedron = true;				// Last return value
+	DartMarkerStore mark(the_map);			// Lock a marker
 
-	std::list<Dart> visitedFaces;			// Faces that are traversed
+	std::vector<Dart> visitedFaces;			// Faces that are traversed
+	visitedFaces.reserve(64) ;
 	visitedFaces.push_back(d);
-	std::list<Dart>::iterator faces;
 
-	int nbFaces = 0;						// Count the faces
+	unsigned int nbFaces = 0;				// Count the faces
 
 	//Test the number of faces end its valency
-	for(faces = visitedFaces.begin() ; isTetrahedron && faces != visitedFaces.end() ; ++faces)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart dc = *faces;
+		Dart dc = visitedFaces[i];
 
 		//if this dart is not marked
 		if(!mark.isMarked(dc))
 		{
+			//increase the number of faces
+			nbFaces++;
+			if(nbFaces > 4)	//too much faces
+				return false;
+
 			//test the valency of this face
 			if(dc != the_map.phi1(the_map.phi1(the_map.phi1(dc))))
-				isTetrahedron = false;
-			else
+				return false;
+
+			//mark the face and push adjacent faces
+			Dart d1 = dc;
+			for(unsigned int i = 0; i <3 ; ++i)
 			{
-				//mark them
-				mark.markOrbit(DART,dc);
+				mark.mark(d1);
 				//if phi2 not marked
-				if(!mark.markOrbit(DART, the_map.phi2(dc)))
-					visitedFaces.push_back(the_map.phi2(dc));
+				Dart d2 = the_map.phi2(d1);
+				if(!mark.isMarked(d2))
+					visitedFaces.push_back(d2);
 
-				//increase the number of faces
-				nbFaces++;
-
-				//too much faces
-				if(nbFaces > 4)
-					isTetrahedron = false;
-				// or count the size of the face
-				else
-				{
-					mark.markOrbit(DART, the_map.phi1(dc));
-					//if phi12 not marked
-					if(!mark.markOrbit(DART, the_map.phi2(the_map.phi1(dc))))
-						visitedFaces.push_back(the_map.phi2(the_map.phi1(dc)));
-					mark.markOrbit(DART, the_map.phi_1(dc));
-					//if phi_12 not marked
-					if(!mark.markOrbit(DART, the_map.phi2(the_map.phi_1(dc))))
-						visitedFaces.push_back(the_map.phi2(the_map.phi_1(dc)));
-				}
+				d1 = the_map.phi1(dc);
 			}
 		}
 	}
 
-	//nettoyage
-	mark.unmarkAll();
-
-	return isTetrahedron;
+	return true;
 }
 
 /************************************************************************************************
@@ -214,6 +199,7 @@ void insertFace(typename PFP::MAP& map, Dart d, Dart nF)
 /***********************************************************************************************
  * 										swap functions										   *
  ***********************************************************************************************/
+
 //ok
 template <typename PFP>
 void swap2To2(typename PFP::MAP& map, Dart d)
@@ -272,8 +258,8 @@ void swap4To4(typename PFP::MAP& map, Dart d)
 	map.unsewVolumes(d);
 	map.unsewVolumes(map.phi2(map.phi3(dd)));
 
-	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(map, dd);
-	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(map, e);
+	Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, dd);
+	Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, e);
 
 	//sew middle darts so that they do not cross
 	map.sewVolumes(d,map.phi2(map.phi3(e)));
@@ -348,8 +334,6 @@ void swap3To2(typename PFP::MAP& map, Dart d)
 
 }
 
-
-
 //[precond] le brin doit venir d'une face partagé par 2 tetraèdres
 // renvoie un brin de l'ancienne couture entre les 2 tetras qui est devenu une arête
 template <typename PFP>
@@ -416,7 +400,6 @@ void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
 /************************************************************************************************
  *																		Flip Functions 																	   *
  ************************************************************************************************/
-
 
 template <typename PFP>
 void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
@@ -501,8 +484,9 @@ void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 }
 
 /************************************************************************************************
- *																		Bisection Functions 															   *
+ *                 Bisection Functions                                                          *
  ************************************************************************************************/
+
 template <typename PFP>
 void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
@@ -570,7 +554,6 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		temp = map.alpha2(temp);
 	}
 	while(temp != d);
-
 
 //	if(map.phi3(d) == d)
 //	{
@@ -644,10 +627,9 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 //		temp = map.alpha2(temp);
 //	}
 //	while(temp != d);
-
 }
 
-//
+
 ///**
 // * create a tetra based on the two triangles that have a common dart and phi2(dart)
 // * return a new dart inside the tetra
@@ -687,8 +669,6 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 //	the_map.unsewFaces(the_map.phi1(e));
 //	the_map.sewFaces(the_map.phi1(e),the_map.phi1(dd));
 //	the_map.sewFaces(ss2e,the_map.phi3(the_map.phi1(dd)));
-//
-//
 //
 //	//embed the coords
 //	the_map.setVertexEmb(d,the_map.getVertexEmb(d));
@@ -889,10 +869,10 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 //	return ret;
 //}
 
+} // namespace Tetrahedralization
 
-}//end namespace Tetrahedralization
-}//end namespace Modelisation
-}//end namespace Algo
-}//end namespace CGoGN
+} // namespace Modelisation
 
+} // namespace Algo
 
+} // namespace CGoGN

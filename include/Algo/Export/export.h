@@ -90,12 +90,6 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good) ;
 
-/**
- *  export pout l'InESS
- */
-template <typename PFP>
-bool exportInESS(typename PFP::MAP& map, const char *filename, const typename PFP::TVEC3& position);
-
 } // namespace Export
 
 } // namespace Algo

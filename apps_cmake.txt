@@ -72,11 +72,8 @@ ENDIF (WITH_QT)
 
 IF (WITH_NUMERICAL)
 	add_definitions(-DWITH_NUMERICAL)
-#	SET (NUMERICAL_INCLUDES  ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
-#	SET (NUMERICAL_LIBS f2c  blas  numerical lapack)
-
 	SET (COMMON_INCLUDES ${COMMON_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
-	SET (COMMON_LIBS ${COMMON_LIBS} f2c  blas  numerical lapack)
+	SET (COMMON_LIBS ${COMMON_LIBS} numerical lapack blas f2c)
 ENDIF (WITH_NUMERICAL)
 
 
@@ -102,5 +99,3 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
 SET(CGoGN_LIBS_R topology algo container utils)
-
-

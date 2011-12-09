@@ -69,6 +69,9 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 	{
 		if(!map.isBoundaryVertex(d))
 		{
+			// get normal of vertex
+			const VEC3& normal_d = normal[d] ;
+
 			// traversal of incident edges
 			float sum = 0.0f, normalizer = 0.0f ;
 			Traversor2VE<typename PFP::MAP> te(map, d) ;
@@ -82,7 +85,7 @@ void filterBilateral(typename PFP::MAP& map, const typename PFP::TVEC3& position
 				normalizer += wcs ;
 			}
 
-			position2[d] = position[d] + ((sum / normalizer) * normal[d]) ;
+			position2[d] = position[d] + ((sum / normalizer) * normal_d) ;
 		}
 		else
 			position2[d] = position[d] ;
