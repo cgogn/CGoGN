@@ -194,7 +194,7 @@ void Viewer::importMesh(std::string& filename)
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES, false) ;
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;

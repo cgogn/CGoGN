@@ -18,47 +18,40 @@ typedef Geom::Vec3f VEC3;
 
 class ParticleBase
 {
-	public :
-		VEC3 m_position;
+public :
+	VEC3 m_position;
 
-		ParticleBase()
-		{
-			m_position.zero();
-		}
+	ParticleBase()
+	{
+		m_position.zero();
+	}
 
-		ParticleBase(VEC3 position)
-		{
-			m_position = position;
-		}
+	ParticleBase(VEC3 position)
+	{
+		m_position = position;
+	}
 
-		virtual unsigned int getState()
-		{
-			return 0;
-		}
-		
-		/**
-		* @param newPosition new position to reach
-		*/
-		virtual bool move(VEC3 position)
-		{
-			m_position = position;
-			return true;
-		}
+	virtual unsigned int getState()
+	{
+		return 0;
+	}
 
-		virtual unsigned int getState()
-		{
-			return 0;
-		}
+	/**
+	* @param newPosition new position to reach
+	*/
+	virtual bool move(VEC3 position)
+	{
+		m_position = position;
+		return true;
+	}
 
-		VEC3 getPosition() { return m_position; }
+	VEC3 getPosition() { return m_position; }
 };
 
-//namespace
-}
+} // namespace MovingObjects
 
-}
+} // namespace Algo
 
-}
-
+} // namespace CGoGN
 
 #endif
