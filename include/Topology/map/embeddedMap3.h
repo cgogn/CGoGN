@@ -61,6 +61,11 @@ public:
 	/*!
 	 *
 	 */
+	bool edgeCanCollapse(Dart d);
+
+	/*!
+	 *
+	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
 
 	/*!

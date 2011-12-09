@@ -120,6 +120,17 @@ Dart EmbeddedMap3::deleteEdge(Dart d)
 	return v;
 }
 
+bool EmbeddedMap3::edgeCanCollapse(Dart d)
+{
+	//Criteres sur le bord
+	if(isBoundaryEdge(d))
+	{
+		//fusion de deux bord
+
+		//deconnection du bord
+	}
+}
+
 Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 {
 	unsigned int vEmb = getEmbedding(VERTEX, d) ;
