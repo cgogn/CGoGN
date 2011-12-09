@@ -57,8 +57,7 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 {
-	DartMarkerStore mark(*the_map);			// Lock a marker
-	bool isTetrahedron = true;				// Last return value
+	DartMarkerStore mark(the_map);			// Lock a marker
 
 	std::list<Dart> visitedFaces;			// Faces that are traversed
 	visitedFaces.push_back(d);
@@ -67,50 +66,38 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 	int nbFaces = 0;						// Count the faces
 
 	//Test the number of faces end its valency
-	for(faces = visitedFaces.begin() ; isTetrahedron && faces != visitedFaces.end() ; ++faces)
+	for(faces = visitedFaces.begin() ; faces != visitedFaces.end() ; ++faces)
 	{
 		Dart dc = *faces;
 
 		//if this dart is not marked
 		if(!mark.isMarked(dc))
 		{
+			//increase the number of faces
+			nbFaces++;
+			if(nbFaces > 4)	//too much faces
+				return false;
+
 			//test the valency of this face
 			if(dc != the_map.phi1(the_map.phi1(the_map.phi1(dc))))
-				isTetrahedron = false;
-			else
+				return false;
+
+			//mark the face and push adjacent faces
+			Dart d1 = dc;
+			for(unsigned int i = 0; i <3 ; ++i)
 			{
-				//mark them
-				mark.markOrbit(DART,dc);
+				mark.mark(d1);
 				//if phi2 not marked
-				if(!mark.markOrbit(DART, the_map.phi2(dc)))
-					visitedFaces.push_back(the_map.phi2(dc));
+				Dart d2 = the_map.phi2(d1);
+				if(!mark.isMarked(d2))
+					visitedFaces.push_back(d2);
 
-				//increase the number of faces
-				nbFaces++;
-
-				//too much faces
-				if(nbFaces > 4)
-					isTetrahedron = false;
-				// or count the size of the face
-				else
-				{
-					mark.markOrbit(DART, the_map.phi1(dc));
-					//if phi12 not marked
-					if(!mark.markOrbit(DART, the_map.phi2(the_map.phi1(dc))))
-						visitedFaces.push_back(the_map.phi2(the_map.phi1(dc)));
-					mark.markOrbit(DART, the_map.phi_1(dc));
-					//if phi_12 not marked
-					if(!mark.markOrbit(DART, the_map.phi2(the_map.phi_1(dc))))
-						visitedFaces.push_back(the_map.phi2(the_map.phi_1(dc)));
-				}
+				d1 = the_map.phi1(dc);
 			}
 		}
 	}
 
-	//nettoyage
-	mark.unmarkAll();
-
-	return isTetrahedron;
+	return true;
 }
 
 /************************************************************************************************
@@ -272,8 +259,8 @@ void swap4To4(typename PFP::MAP& map, Dart d)
 	map.unsewVolumes(d);
 	map.unsewVolumes(map.phi2(map.phi3(dd)));
 
-	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(map, dd);
-	Algo::Modelisation::Tetrahedron::swap2To2<PFP>(map, e);
+	Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, dd);
+	Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, e);
 
 	//sew middle darts so that they do not cross
 	map.sewVolumes(d,map.phi2(map.phi3(e)));

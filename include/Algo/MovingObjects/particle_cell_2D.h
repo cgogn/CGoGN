@@ -80,7 +80,7 @@ public :
 	{
 		return state;
 	}
-	
+
 	void move(const VEC3& newCurrent)
 	{
 		crossCell = NO_CROSS ;
