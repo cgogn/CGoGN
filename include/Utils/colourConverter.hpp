@@ -36,30 +36,26 @@ ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 
 	switch(originalEnc) {
 		case(C_RGB):
-			assert (-0.001 < col[0] && col[0] < 1.001) ;
-			assert (-0.001 < col[1] && col[1] < 1.001) ;
-			assert (-0.001 < col[2] && col[2] < 1.001) ;
+			if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 &&  -0.001 < col[2] && col[2] < 1.001))
+				CGoGNerr << "Warning : an unvalid RGB color was entered in ColourConverter constructor" << CGoGNendl ;
 			RGB = new VEC3(col) ;
 			break ;
 
 		case (C_Luv) :
-			assert (-0.001 < col[0] && col[0] < 100.001) ;
-			assert (-83.001 < col[1] && col[1] < 175.001) ;
-			assert (-134.001 < col[2] && col[2] < 108.001) ;
+			if (!(-0.001 < col[0] && col[0] < 100.001 && -83.001 < col[1] && col[1] < 175.001 &&  -134.001 < col[2] && col[2] < 108.001))
+				CGoGNerr << "Warning : an unvalid Luv color was entered in ColourConverter constructor" << CGoGNendl ;
 			Luv = new VEC3(col) ;
 			break ;
 
 		case (C_XYZ) :
-			assert (-0.001 < col[0] && col[0] < 1.001) ;
-			assert (-0.001 < col[1] && col[1] < 1.001) ;
-			assert (-0.001 < col[2] && col[2] < 1.001) ;
+			if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 &&  -0.001 < col[2] && col[2] < 1.001))
+				CGoGNerr << "Warning : an unvalid XYZ color was entered in ColourConverter constructor" << CGoGNendl ;
 			XYZ = new VEC3(col) ;
 			break ;
 
 		case (C_Lab) :
-			assert (-0.001 < col[0] && col[0] < 100.001) ;
-			assert (-86.001 < col[1] && col[1] < 98.001) ;
-			assert (-108.001 < col[2] && col[2] < 95.001) ;
+			if (!(-0.001 < col[0] && col[0] < 100.001 && -86.001 < col[1] && col[1] < 98.001 && -108.001 < col[2] && col[2] < 95.001))
+				CGoGNerr << "Warning : an unvalid Lab color was entered in ColourConverter constructor" << CGoGNendl ;
 			Lab = new VEC3(col) ;
 			break ;
 	}

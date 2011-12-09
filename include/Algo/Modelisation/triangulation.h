@@ -25,18 +25,20 @@
 #ifndef _CGOGN_TRIANGULATION_H_
 #define _CGOGN_TRIANGULATION_H_
 
-
 #include <math.h>
 #include <vector>
 #include <list>
 #include <set>
 #include <utility>
 
+#include "Algo/Geometry/normal.h"
 
 namespace CGoGN
 {
+
 namespace Algo
 {
+
 namespace Modelisation
 {
 
@@ -44,7 +46,6 @@ template <typename PFP>
 class EarTriangulation
 {
 protected:
-
 	// forward declaration
 	class VertexPoly;
 
@@ -59,11 +60,16 @@ protected:
 		Dart dart;
 		float angle;
 		float length;
-		VertexPoly() {}
-		VertexPoly(Dart d, float v, float l): dart(d),angle(v),length(l) {}
+
+		VertexPoly()
+		{}
+
+		VertexPoly(Dart d, float v, float l) : dart(d), angle(v), length(l)
+		{}
+
 		bool operator()(const VertexPoly& vp1, const VertexPoly& vp2)
 		{
-			if (fabs(vp1.angle - vp2.angle)<0.2f)
+			if (fabs(vp1.angle - vp2.angle) < 0.2f)
 				return vp1.length < vp2.length;
 			return vp1.angle < vp2.angle;
 		}
@@ -86,24 +92,24 @@ protected:
 
 public:
 
-	EarTriangulation(typename PFP::MAP& map):
-		m_map(map), m_dartEars(map,VERTEX)
+	EarTriangulation(typename PFP::MAP& map) : m_map(map), m_dartEars(map, VERTEX)
 	{
 		m_position = map.template getAttribute<typename PFP::VEC3>(VERTEX,"position");
 	}
 
-//	void trianguleFace( Dart d, DartMarker& mark);
-	void trianguleFace( Dart d);
+//	void trianguleFace(Dart d, DartMarker& mark);
+	void trianguleFace(Dart d);
 
-	void triangule(const FunctorSelect& good = allDarts, unsigned int thread=0);
+	void triangule(const FunctorSelect& good = allDarts, unsigned int thread = 0);
 
 };
 
+} // namespace Modelisation
 
-}
-}
-}
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/Modelisation/triangulation.hpp"
 
-#endif /* _CGOGN_TRIANGULATION_H_ */
+#endif
