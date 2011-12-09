@@ -22,8 +22,6 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <list>
-
 namespace CGoGN
 {
 
@@ -59,16 +57,16 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 {
 	DartMarkerStore mark(the_map);			// Lock a marker
 
-	std::list<Dart> visitedFaces;			// Faces that are traversed
+	std::vector<Dart> visitedFaces;			// Faces that are traversed
+	visitedFaces.reserve(64) ;
 	visitedFaces.push_back(d);
-	std::list<Dart>::iterator faces;
 
-	int nbFaces = 0;						// Count the faces
+	unsigned int nbFaces = 0;				// Count the faces
 
 	//Test the number of faces end its valency
-	for(faces = visitedFaces.begin() ; faces != visitedFaces.end() ; ++faces)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart dc = *faces;
+		Dart dc = visitedFaces[i];
 
 		//if this dart is not marked
 		if(!mark.isMarked(dc))
@@ -201,6 +199,7 @@ void insertFace(typename PFP::MAP& map, Dart d, Dart nF)
 /***********************************************************************************************
  * 										swap functions										   *
  ***********************************************************************************************/
+
 //ok
 template <typename PFP>
 void swap2To2(typename PFP::MAP& map, Dart d)
@@ -335,8 +334,6 @@ void swap3To2(typename PFP::MAP& map, Dart d)
 
 }
 
-
-
 //[precond] le brin doit venir d'une face partagé par 2 tetraèdres
 // renvoie un brin de l'ancienne couture entre les 2 tetras qui est devenu une arête
 template <typename PFP>
@@ -403,7 +400,6 @@ void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
 /************************************************************************************************
  *																		Flip Functions 																	   *
  ************************************************************************************************/
-
 
 template <typename PFP>
 void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
@@ -488,8 +484,9 @@ void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 }
 
 /************************************************************************************************
- *																		Bisection Functions 															   *
+ *                 Bisection Functions                                                          *
  ************************************************************************************************/
+
 template <typename PFP>
 void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
@@ -557,7 +554,6 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		temp = map.alpha2(temp);
 	}
 	while(temp != d);
-
 
 //	if(map.phi3(d) == d)
 //	{
@@ -631,10 +627,9 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 //		temp = map.alpha2(temp);
 //	}
 //	while(temp != d);
-
 }
 
-//
+
 ///**
 // * create a tetra based on the two triangles that have a common dart and phi2(dart)
 // * return a new dart inside the tetra
@@ -674,8 +669,6 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 //	the_map.unsewFaces(the_map.phi1(e));
 //	the_map.sewFaces(the_map.phi1(e),the_map.phi1(dd));
 //	the_map.sewFaces(ss2e,the_map.phi3(the_map.phi1(dd)));
-//
-//
 //
 //	//embed the coords
 //	the_map.setVertexEmb(d,the_map.getVertexEmb(d));
@@ -876,10 +869,10 @@ void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 //	return ret;
 //}
 
+} // namespace Tetrahedralization
 
-}//end namespace Tetrahedralization
-}//end namespace Modelisation
-}//end namespace Algo
-}//end namespace CGoGN
+} // namespace Modelisation
 
+} // namespace Algo
 
+} // namespace CGoGN
