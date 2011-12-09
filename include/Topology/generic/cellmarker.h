@@ -27,7 +27,6 @@
 
 #include "Topology/generic/marker.h"
 #include "Topology/generic/genericmap.h"
-
 #include "Topology/generic/functor.h"
 #include "Utils/static_assert.h"
 
