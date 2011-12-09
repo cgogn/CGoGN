@@ -129,6 +129,8 @@ bool EmbeddedMap3::edgeCanCollapse(Dart d)
 
 		//deconnection du bord
 	}
+
+	return false;
 }
 
 Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)

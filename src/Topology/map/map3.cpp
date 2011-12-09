@@ -343,6 +343,8 @@ bool Map3::collapseDegeneretedVolume(Dart d)
 
 		//if(faceDegree(e1) < faceDegree)
 	}
+
+	return false;
 }
 
 void Map3::sewVolumes(Dart d, Dart e, bool withBoundary)
