@@ -52,6 +52,12 @@ inline void GMap3::clear(bool removeAttrib)
 		init() ;
 }
 
+inline void GMap3::update_topo_shortcuts()
+{
+	GMap2::update_topo_shortcuts();
+	m_beta3 = getRelation("beta3");
+}
+
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/

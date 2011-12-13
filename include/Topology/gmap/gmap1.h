@@ -51,6 +51,8 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
+	virtual void update_topo_shortcuts();
+
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/
