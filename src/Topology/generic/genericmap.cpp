@@ -305,202 +305,7 @@ void GenericMap::removeThreadMarker(unsigned int nb)
  *             SAVE & LOAD              *
  ****************************************/
 
-void GenericMap::update_m_emb_afterLoad()
-{
-	// get container of dart orbit
-	AttributeContainer& cont = m_attribs[DART] ;
 
-	// get the list of attributes
-	std::vector<std::string> listeNames;
-	cont.getAttributesNames(listeNames);
-
-	// check if there are EMB_X attributes
-	for (unsigned int i = 0;  i < listeNames.size(); ++i)
-	{
-		std::string sub = listeNames[i].substr(0,listeNames[i].size()-1);
-		if (sub == "EMB_")
-		{
-			unsigned int orb = listeNames[i][4]-'0'; // easy atoi computation for one char;
-
-			AttributeMultiVector<unsigned int>* amv = cont.getDataVector<unsigned int>(i);
-			m_embeddings[orb] = amv ;
-			CGoGNout << "Ajoute m_emb[" << orb << "] : " << i << CGoGNendl;
-		}
-	}
-}
-
-bool GenericMap::saveMapXml(const std::string& filename, bool compress)
-{
-	xmlTextWriterPtr writer = xmlNewTextWriterFilename(filename.c_str(), 0);
-	xmlTextWriterStartDocument(writer,NULL,NULL,NULL);
-
-	// Entete
-	int rc = xmlTextWriterStartElement(writer, BAD_CAST "CGoGN_Map");
-	rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "type", BAD_CAST this->mapTypeName().c_str());
-	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "nb_max_orbits","%u",NB_ORBITS);
-
-	// save m_attribs
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
-	{
-		m_attribs[i].saveXml(writer,i);
-	}
-
-	// save m_orbMarker
-	rc = xmlTextWriterStartElement(writer, BAD_CAST "Orbit_MarkerSet");
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
-	{
-		int rc = xmlTextWriterStartElement(writer, BAD_CAST "MarkerSet");
-		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "orbit", "%u", i);
-		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_marksets[i][0].getMarkVal());
-//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "bin", BAD_CAST m_marksets[i][0].getMarkerAsBinaryString().c_str());
-//		m_marksets[i] ;
-		rc = xmlTextWriterEndElement(writer);
-	}
-	rc = xmlTextWriterEndElement(writer);
-
-	// save m_BoundaryMarkerVal
-//	rc = xmlTextWriterStartElement(writer, BAD_CAST "Boundary_Marker");
-//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_BoundaryMarkerVal.getMarkVal());
-//	rc = xmlTextWriterEndElement(writer);
-
-	rc = xmlTextWriterEndElement(writer); // of map
-
-	xmlTextWriterEndDocument(writer);
-	xmlFreeTextWriter(writer);
-
-	return true;
-}
-
-
-bool GenericMap::loadMapXml(const std::string& filename, bool compress)
-{
-
-	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
-	xmlNodePtr map_node = xmlDocGetRootElement(doc);
-
-	// Check if it is a CGoGN_Map file
-//	if (strcmp((char*)(map_node->name),(char*)"CGoGN_Map")!=0)
-	if (!chechXmlNode(map_node,"CGoGN_Map"))
-	{
-		CGoGNerr << "Wrong xml format: Root node != CGoGN_Map"<< CGoGNendl;
-		return false;
-	}
-
-	// check the file type
-	xmlChar *prop = xmlGetProp(map_node, BAD_CAST "type");
-	CGoGNout << "Loading "<< prop <<" xml file"<< CGoGNendl;
-
-	// check the nb max orbits
-	prop = xmlGetProp(map_node, BAD_CAST "nb_max_orbits");
-	unsigned int nbo = atoi((char*)prop);
-	if (nbo != NB_ORBITS)
-	{
-		CGoGNerr << "Wrong nb max orbits in xml map"<< CGoGNendl;
-		return false;
-	}
-
-	/***********************************************
-	*	 			 load attributs
-	************************************************/
-	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
-	{
-		// for each attribute
-//		if (strcmp((char*)(cur_node->name),(char*)"Attributes_Container")==0)
-		if (chechXmlNode(cur_node, "Attributes_Container"))
-		{
-			CGoGNout << "LOAD ATTRIBUT"<< CGoGNendl;
-			// get the orbit id
-			unsigned int id = AttributeContainer::getIdXmlNode(cur_node);
-			// and load container
-			unsigned int nba = m_attribs[id].getNbAttributes();
-
-
-			CGoGNout << "attribut "<<id<<" size="<< m_attribs[id].size()<< "  nbatt="<< nba<< CGoGNendl;
-
-			m_attribs[id].loadXml(cur_node);
-		}
-	}
-
-	/***********************************************
-	*   creation of the m_embeddings pointers table
-	************************************************/
-//	// get attribute names of dart orbit
-//	AttributeContainer& contDart = m_attribs[DART] ;
-//	std::vector< std::string > tableNames;
-//	contDart.getAttributesStrings(tableNames);
-//
-//	// find orbit frome name and store pointer in right place
-//	for (unsigned int i = 0; i< tableNames.size(); ++i)
-//	{
-////		CGoGNout << i <<" : "<< tableNames[i]<<CGoGNendl;
-//
-//		std::string& name = tableNames[i];
-//		std::string is_an_emb = name.substr(0,4);
-//		if (is_an_emb == "EMB_")
-//		{
-//			AttributeMultiVector<unsigned int>& amv = contDart.getDataVector<unsigned int>(i) ;
-//
-//			std::string orbitname = name.substr(4, name.size()-4);
-//			std::istringstream iss(orbitname);
-//			unsigned int orbit;
-//			iss >> orbit;
-//
-//			m_embeddings[orbit] = &amv ;
-//		}
-//	}
-//
-//
-	update_m_emb_afterLoad();
-
-	/***********************************************
-	*	 load Orbit_MarkerSet & BoundaryMarker
-	************************************************/
-	xmlNode* cur_node = map_node->children;
-	bool read1=false;
-	bool read2=false;
-	while (!(read1 || read2) && cur_node)// scan nodes to find the one with right name
-	{
-//		if (strcmp((char*)(cur_node->name),(char*)"Orbit_MarkerSet") == 0)
-		if (chechXmlNode(cur_node, "Orbit_MarkerSet"))
-		{
-			for (xmlNode* mark_node = cur_node->children; mark_node; mark_node = mark_node->next)
-			{
-				xmlChar* prop = xmlGetProp(mark_node, BAD_CAST "orbit");
-				unsigned int orb = atoi((char*)prop);
-				prop = xmlGetProp(mark_node, BAD_CAST "val");
-				unsigned int val = atoi((char*)prop);
-				m_marksets[orb][0].setMarkVal(val);
-			}
-			read1 =true;
-		}
-		else
-		{
-//			if (strcmp((char*)(cur_node->name),(char*)"Boundary_Marker") == 0)
-			CGoGNout << "Orbit_MarkerSet"<<CGoGNendl;
-//			if (chechXmlNode(cur_node, "Boundary_Marker"))
-//			{
-//				xmlChar* prop = xmlGetProp(cur_node, BAD_CAST "val");
-//				unsigned int val = atoi((char*)prop);
-//				m_BoundaryMarkerVal.setMarkVal(val);
-//				read2 =true;
-//			}
-		}
-		// next node
-		cur_node = cur_node->next;
-	}
-
-	if (!(read1 && read2))
-	{
-		CGoGNerr <<"Error reading Marker in xml node"<<CGoGNendl;
-		return false;
-	}
-
-	xmlFreeDoc(doc);
-
-	update_m_emb_afterLoad();
-
-	return true ;
-}
 
 bool GenericMap::saveMapBin(const std::string& filename)
 {
@@ -523,31 +328,34 @@ bool GenericMap::saveMapBin(const std::string& filename)
 	unsigned int *buffi = reinterpret_cast<unsigned int*>(buff+64);
 	*buffi = NB_ORBITS;
 	fs.write(reinterpret_cast<const char*>(buff), 256);
-
 	delete buff;
 
-	// save m_attribs
+	// save all attribs
 	for (unsigned int i=0; i<NB_ORBITS; ++i)
 	{
 		m_attribs[i].saveBin(fs,i);
 	}
 
+	// save marksets and boundary marker
+//	std::vector<unsigned int> buffer;
+//	buffer.reserve(NB_ORBITS+1);
+//	for (unsigned int i=0; i<NB_ORBITS; ++i)
+//	{
+//		buffer.push_back(m_marksets[i][0].getMarkVal());
+//	}
+//	buffer.push_back(m_boundaryMarker.getMarkVal());	//	save m_boundaryMarker
+//	fs.write(reinterpret_cast<const char*>(&(buffer[0])), buffer.size()*sizeof(unsigned int));
 
-	std::vector<unsigned int> buffer;
-	buffer.reserve(NB_ORBITS+1);
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
-	{
-		buffer.push_back(m_marksets[i][0].getMarkVal());
-	}
-//	buffer.push_back(m_BoundaryMarkerVal.getMarkVal());
-
-	fs.write(reinterpret_cast<const char*>(&(buffer[0])), buffer.size()*sizeof(unsigned int));
+	unsigned int mv = m_boundaryMarker.getMarkVal();
+	fs.write(reinterpret_cast<const char*>(&mv), sizeof(unsigned int));
 
 	return true;
 }
 
+
 bool GenericMap::loadMapBin(const std::string& filename)
 {
+
 	CGoGNistream fs(filename.c_str(), std::ios::in|std::ios::binary);
 	if (!fs)
 	{
@@ -555,7 +363,9 @@ bool GenericMap::loadMapBin(const std::string& filename)
 		return false;
 	}
 
-	// entete
+	GenericMap::clear(true);
+
+	// read info
 	char* buff = new char[256];
 	fs.read(reinterpret_cast<char*>(buff), 256);
 
@@ -569,12 +379,14 @@ bool GenericMap::loadMapBin(const std::string& filename)
 
 	// Check map type
 	buff_str = std::string(buff+32);
-	CGoGNout << "Map type file = "<< buff_str<< CGoGNendl;
+//	CGoGNout << "Map type file = "<< buff_str<< CGoGNendl;
 
 	std::string localType = this->mapTypeName();
-	localType = localType.substr(0,localType.size()-1);
+//	localType = localType.substr(0,localType.size()-1);
 
-	std::string fileType = buff_str.substr(0,buff_str.size()-1);
+	std::string fileType = buff_str;
+
+	std::cout << "localType = "<< localType << " / fileType = " <<fileType<< std::endl;
 
 	if (fileType != localType)
 	{
@@ -598,19 +410,130 @@ bool GenericMap::loadMapBin(const std::string& filename)
 		m_attribs[id].loadBin(fs);
 	}
 
-	// load MarkerSet & boundary
-	std::vector<unsigned int> buffer;
-	buffer.resize(NB_ORBITS);
-	fs.read(reinterpret_cast<char*>(&(buffer[0])), (NB_ORBITS+1)*sizeof(unsigned int));
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
-	{
-		m_marksets[i][0].setMarkVal(buffer[i]);
-	}
-//	m_BoundaryMarkerVal.setMarkVal(buffer[NB_ORBITS]);
+	// load  boundary marker
 
+	unsigned int mv;
+	fs.read(reinterpret_cast<char*>(&mv), sizeof(unsigned int));
+	m_boundaryMarker.setMarkVal(mv);
+
+	// retrieve m_embeddings (from m_attribs[DART]
 	update_m_emb_afterLoad();
+	update_topo_shortcuts();	// recursive call from real type of map down to GenericMap
+
 
 	return true;
+}
+
+
+void GenericMap::update_m_emb_afterLoad()
+{
+	// get container of dart orbit
+	AttributeContainer& cont = m_attribs[DART] ;
+
+	// get the list of attributes
+	std::vector<std::string> listeNames;
+	cont.getAttributesNames(listeNames);
+
+	// check if there are EMB_X attributes
+	for (unsigned int i = 0;  i < listeNames.size(); ++i)
+	{
+		std::string sub = listeNames[i].substr(0,listeNames[i].size()-1);
+		if (sub == "EMB_")
+		{
+			unsigned int orb = listeNames[i][4]-'0'; // easy atoi computation for one char;
+
+			AttributeMultiVector<unsigned int>* amv = cont.getDataVector<unsigned int>(i);
+			m_embeddings[orb] = amv ;
+		}
+	}
+}
+
+
+void GenericMap::update_topo_shortcuts()
+{
+
+	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		AttributeContainer& cont = m_attribs[orbit];
+
+		// get the list of attributes of orbit container
+		std::vector<std::string> listeNames;
+		cont.getAttributesNames(listeNames);
+
+		for (unsigned int i = 0;  i < listeNames.size(); ++i)
+		{
+			std::string sub = listeNames[i].substr(0,5);
+			if (sub == "Mark_")
+			{
+				// get thread number
+				unsigned int thread = listeNames[i][5]-'0';
+				if (listeNames[i].size()>6) 					// thread number is >9
+					thread = 10*thread + listeNames[i][6]-'0';
+
+				AttributeMultiVector<Mark>* amvMark = cont.getDataVector<Mark>(i);
+				m_markTables[orbit][thread] = amvMark ;
+
+				if ((orbit == DART) && (thread==0))	// for Marker of dart of thread O keep the boundary marker
+				{
+					Mark m(m_boundaryMarker);
+					m.invert();
+					for (unsigned int i=cont.begin();i!= cont.end(); cont.next(i))
+					{
+						amvMark->operator[](i).unsetMark(m);
+					}
+				}
+				else								// for others clear all
+				{
+					for (unsigned int i=cont.begin();i!= cont.end(); cont.next(i))
+					{
+						amvMark->operator[](i).clear();
+					}
+				}
+			}
+		}
+	}
+}
+
+void GenericMap::dumpAttributesAndMarkers()
+{
+	for (unsigned int i = 0; i<NB_ORBITS; ++i)
+	{
+		std::vector<std::string> names;
+		names.reserve(32); 				//just tp limit reallocation
+		m_attribs[i].getAttributesNames(names);
+		unsigned int nb = names.size();
+		if (nb>0)
+		{
+			CGoGNout << "ORBIT "<< i<< CGoGNendl;
+			std::vector<std::string> types;
+			types.reserve(nb);
+			m_attribs[i].getAttributesTypes(types);
+			for (unsigned int j=0; j<nb; ++j)
+			{
+				CGoGNout << "    "<< j << " : "<< types[j] << " "<< names[j]<< CGoGNendl;
+			}
+		}
+	}
+	CGoGNout << "RESERVED MARKERS "<< CGoGNendl;
+	for (unsigned int i=0; i<NB_ORBITS; ++i)
+	{
+		for (unsigned int j=0; j<NB_THREAD; ++j)
+		{
+			MarkSet ms = m_marksets[i][j];
+			if (!ms.isClear())
+			{
+				CGoGNout << "Orbit " << i << "  thread "<<j<< " : ";
+				Mark m(1);
+				for (unsigned i = 0; i< Mark::getNbMarks(); ++i)
+				{
+					if (ms.testMark(m))
+						CGoGNout << m.getMarkVal()<< ", ";
+					m.setMarkVal(m.getMarkVal()<<1);
+				}
+				CGoGNout << CGoGNendl;
+			}
+		}
+	}
 }
 
 /****************************************
@@ -639,7 +562,8 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 		case FACE: return foreach_dart_of_face(d, f, thread);
 		case VOLUME: return foreach_dart_of_volume(d, f, thread);
 //		case -1: return foreach_dart_of_cc(d,f,thread);
-		default: assert(!"Cells of this dimension are not handled");
+		default: assert(!"Cells of this dimension are not handled");break;
+
 	}
 	return false;
 }
@@ -725,3 +649,179 @@ void GenericMap::boundaryUnmarkAll()
 }
 
 } // namespace CGoGN
+
+//
+//bool GenericMap::saveMapXml(const std::string& filename, bool compress)
+//{
+//	xmlTextWriterPtr writer = xmlNewTextWriterFilename(filename.c_str(), 0);
+//	xmlTextWriterStartDocument(writer,NULL,NULL,NULL);
+//
+//	// Entete
+//	int rc = xmlTextWriterStartElement(writer, BAD_CAST "CGoGN_Map");
+//	rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "type", BAD_CAST this->mapTypeName().c_str());
+//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "nb_max_orbits","%u",NB_ORBITS);
+//
+//	// save m_attribs
+//	for (unsigned int i=0; i<NB_ORBITS; ++i)
+//	{
+//		m_attribs[i].saveXml(writer,i);
+//	}
+//
+//	// save m_orbMarker
+//	rc = xmlTextWriterStartElement(writer, BAD_CAST "Orbit_MarkerSet");
+//	for (unsigned int i=0; i<NB_ORBITS; ++i)
+//	{
+//		int rc = xmlTextWriterStartElement(writer, BAD_CAST "MarkerSet");
+//		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "orbit", "%u", i);
+//		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_marksets[i][0].getMarkVal());
+////		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "bin", BAD_CAST m_marksets[i][0].getMarkerAsBinaryString().c_str());
+////		m_marksets[i] ;
+//		rc = xmlTextWriterEndElement(writer);
+//	}
+//	rc = xmlTextWriterEndElement(writer);
+//
+//	// save m_BoundaryMarkerVal
+////	rc = xmlTextWriterStartElement(writer, BAD_CAST "Boundary_Marker");
+////	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "val", "%u", m_BoundaryMarkerVal.getMarkVal());
+////	rc = xmlTextWriterEndElement(writer);
+//
+//	rc = xmlTextWriterEndElement(writer); // of map
+//
+//	xmlTextWriterEndDocument(writer);
+//	xmlFreeTextWriter(writer);
+//
+//	return true;
+//}
+//
+//
+//bool GenericMap::loadMapXml(const std::string& filename, bool compress)
+//{
+//
+//	xmlDocPtr doc = xmlReadFile(filename.c_str(), NULL, 0);
+//	xmlNodePtr map_node = xmlDocGetRootElement(doc);
+//
+//	// Check if it is a CGoGN_Map file
+////	if (strcmp((char*)(map_node->name),(char*)"CGoGN_Map")!=0)
+//	if (!chechXmlNode(map_node,"CGoGN_Map"))
+//	{
+//		CGoGNerr << "Wrong xml format: Root node != CGoGN_Map"<< CGoGNendl;
+//		return false;
+//	}
+//
+//	// check the file type
+//	xmlChar *prop = xmlGetProp(map_node, BAD_CAST "type");
+//	CGoGNout << "Loading "<< prop <<" xml file"<< CGoGNendl;
+//
+//	// check the nb max orbits
+//	prop = xmlGetProp(map_node, BAD_CAST "nb_max_orbits");
+//	unsigned int nbo = atoi((char*)prop);
+//	if (nbo != NB_ORBITS)
+//	{
+//		CGoGNerr << "Wrong nb max orbits in xml map"<< CGoGNendl;
+//		return false;
+//	}
+//
+//	/***********************************************
+//	*	 			 load attributs
+//	************************************************/
+//	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
+//	{
+//		// for each attribute
+////		if (strcmp((char*)(cur_node->name),(char*)"Attributes_Container")==0)
+//		if (chechXmlNode(cur_node, "Attributes_Container"))
+//		{
+//			CGoGNout << "LOAD ATTRIBUT"<< CGoGNendl;
+//			// get the orbit id
+//			unsigned int id = AttributeContainer::getIdXmlNode(cur_node);
+//			// and load container
+//			unsigned int nba = m_attribs[id].getNbAttributes();
+//
+//
+//			CGoGNout << "attribut "<<id<<" size="<< m_attribs[id].size()<< "  nbatt="<< nba<< CGoGNendl;
+//
+//			m_attribs[id].loadXml(cur_node);
+//		}
+//	}
+//
+//	/***********************************************
+//	*   creation of the m_embeddings pointers table
+//	************************************************/
+////	// get attribute names of dart orbit
+////	AttributeContainer& contDart = m_attribs[DART] ;
+////	std::vector< std::string > tableNames;
+////	contDart.getAttributesStrings(tableNames);
+////
+////	// find orbit frome name and store pointer in right place
+////	for (unsigned int i = 0; i< tableNames.size(); ++i)
+////	{
+//////		CGoGNout << i <<" : "<< tableNames[i]<<CGoGNendl;
+////
+////		std::string& name = tableNames[i];
+////		std::string is_an_emb = name.substr(0,4);
+////		if (is_an_emb == "EMB_")
+////		{
+////			AttributeMultiVector<unsigned int>& amv = contDart.getDataVector<unsigned int>(i) ;
+////
+////			std::string orbitname = name.substr(4, name.size()-4);
+////			std::istringstream iss(orbitname);
+////			unsigned int orbit;
+////			iss >> orbit;
+////
+////			m_embeddings[orbit] = &amv ;
+////		}
+////	}
+////
+////
+//	update_m_emb_afterLoad();
+//
+//	/***********************************************
+//	*	 load Orbit_MarkerSet & BoundaryMarker
+//	************************************************/
+//	xmlNode* cur_node = map_node->children;
+//	bool read1=false;
+//	bool read2=false;
+//	while (!(read1 || read2) && cur_node)// scan nodes to find the one with right name
+//	{
+////		if (strcmp((char*)(cur_node->name),(char*)"Orbit_MarkerSet") == 0)
+//		if (chechXmlNode(cur_node, "Orbit_MarkerSet"))
+//		{
+//			for (xmlNode* mark_node = cur_node->children; mark_node; mark_node = mark_node->next)
+//			{
+//				xmlChar* prop = xmlGetProp(mark_node, BAD_CAST "orbit");
+//				unsigned int orb = atoi((char*)prop);
+//				prop = xmlGetProp(mark_node, BAD_CAST "val");
+//				unsigned int val = atoi((char*)prop);
+//				m_marksets[orb][0].setMarkVal(val);
+//			}
+//			read1 =true;
+//		}
+//		else
+//		{
+////			if (strcmp((char*)(cur_node->name),(char*)"Boundary_Marker") == 0)
+//			CGoGNout << "Orbit_MarkerSet"<<CGoGNendl;
+////			if (chechXmlNode(cur_node, "Boundary_Marker"))
+////			{
+////				xmlChar* prop = xmlGetProp(cur_node, BAD_CAST "val");
+////				unsigned int val = atoi((char*)prop);
+////				m_BoundaryMarkerVal.setMarkVal(val);
+////				read2 =true;
+////			}
+//		}
+//		// next node
+//		cur_node = cur_node->next;
+//	}
+//
+//	if (!(read1 && read2))
+//	{
+//		CGoGNerr <<"Error reading Marker in xml node"<<CGoGNendl;
+//		return false;
+//	}
+//
+//	xmlFreeDoc(doc);
+//
+//	update_m_emb_afterLoad();
+//
+//	return true ;
+//}
+
+

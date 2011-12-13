@@ -211,5 +211,13 @@ inline AttributeMultiVector<Dart>* GenericMap::addRelation(const std::string& na
 	return amv ;
 }
 
+inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& name)
+{
+	AttributeContainer& cont = m_attribs[DART] ;
+	AttributeMultiVector<Dart>* amv = cont.getDataVector<Dart>(cont.getAttributeIndex(name)) ;
+	return amv ;
+}
+
+
 
 } //namespace CGoGN

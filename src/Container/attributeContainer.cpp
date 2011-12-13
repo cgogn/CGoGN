@@ -103,6 +103,20 @@ unsigned int AttributeContainer::getAttributesNames(std::vector<std::string>& na
 	return m_nbAttributes ;
 }
 
+unsigned int AttributeContainer::getAttributesTypes(std::vector<std::string>& types)
+{
+	types.clear() ;
+	types.reserve(m_nbAttributes) ;
+
+	for (unsigned int i = 0; i < m_tableAttribs.size(); ++i)
+	{
+		if(m_tableAttribs[i] != NULL)
+			types.push_back(m_tableAttribs[i]->getTypeName()) ;
+	}
+
+	return m_nbAttributes ;
+}
+
 /**************************************
  *        CONTAINER MANAGEMENT        *
  **************************************/
@@ -338,234 +352,234 @@ void AttributeContainer::removeLine(unsigned int index)
 /**************************************
  *            SAVE & LOAD             *
  **************************************/
-
-bool AttributeContainer::loadXmlBWF(xmlNodePtr node)
-{
-	xmlChar* prop = xmlGetProp(node, BAD_CAST "nb");
-	unsigned int nb = atoi((char*)prop);
-	m_tableBlocksWithFree.clear();
-
-	// charge et cree les  attributs
-	for (xmlNode* x_node = node->children; x_node != NULL; x_node = x_node->next)
-	{
-		unsigned int ind = atoi((char*)(xmlNodeGetContent(x_node)));
-		m_tableBlocksWithFree.push_back(ind);
-	}
-	if (m_tableBlocksWithFree.size() != nb)
-	{
-		CGoGNerr <<"Erreur lecture fichier XML incoherent"<< CGoGNendl;
-		return false;
-	}
-	return true;
-}
-
-bool AttributeContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
-{
-	xmlChar* prop = xmlGetProp(node, BAD_CAST "nb");
+//
+//bool AttributeContainer::loadXmlBWF(xmlNodePtr node)
+//{
+//	xmlChar* prop = xmlGetProp(node, BAD_CAST "nb");
 //	unsigned int nb = atoi((char*)prop);
-	prop = xmlGetProp(node, BAD_CAST "sv");
-//	unsigned int sv = atoi((char*)prop);
-
-	// Noooooooo!!!!
-//	m_tableAttribs.resize(sv);
-//	for (unsigned int i=0; i< sv; ++i)
-//			m_tableAttribs[i]=NULL;
-
-	// charge et cree les  attributs
-	for (xmlNode* x_node = node->children; x_node != NULL; x_node = x_node->next)
-	{
-		prop = xmlGetProp(x_node, BAD_CAST "id");
-//		unsigned int id = unsigned int(atoi((char*)prop);
-
-		prop = xmlGetProp(x_node, BAD_CAST "type");
-		// recupere l'attribut enregistrer par son type
-		if (m_attributes_registry_map !=NULL)
-		{
-			std::map<std::string, RegisteredBaseAttribute*>::iterator itAtt = m_attributes_registry_map->find(std::string((char*)prop));
-			if (itAtt == m_attributes_registry_map->end())
-			{
-				CGoGNout << "Skipping non registred attribute "<< std::string((char*)prop)<<CGoGNendl;
-			}
-			else
-			{
-				RegisteredBaseAttribute* ra = itAtt->second;
-				prop = xmlGetProp(x_node, BAD_CAST "name");
-//				ra->addAttribute(*this, std::string((char*)prop), id);
-				AttributeMultiVectorGen* amvg = ra->addAttribute(*this, std::string((char*)prop));
-				amvg->setNbBlocks(nbb);
-			}
-		}
-		else
-		{
-			CGoGNerr << "Attribute Registry non initialized"<< CGoGNendl;
-			return false;
-		}
-	}
-//	if (m_attribNameMap.size() != nb)
+//	m_tableBlocksWithFree.clear();
+//
+//	// charge et cree les  attributs
+//	for (xmlNode* x_node = node->children; x_node != NULL; x_node = x_node->next)
 //	{
-//		CGoGNerr << "Pb lecture attributs"<< CGoGNendl;
+//		unsigned int ind = atoi((char*)(xmlNodeGetContent(x_node)));
+//		m_tableBlocksWithFree.push_back(ind);
+//	}
+//	if (m_tableBlocksWithFree.size() != nb)
+//	{
+//		CGoGNerr <<"Erreur lecture fichier XML incoherent"<< CGoGNendl;
 //		return false;
 //	}
-	return true;
-}
-
-bool AttributeContainer::loadXmlDL(xmlNodePtr node)
-{
-	// charge et cree les  attributs
-	for (xmlNode* x_node = node->children; x_node != NULL; x_node = x_node->next)
-	{
-		// get index
-		xmlChar* prop = xmlGetProp(x_node, BAD_CAST "id");
-		unsigned int id = atoi((char*)prop);
-		// get & set nbref
-		prop = xmlGetProp(x_node, BAD_CAST "refs");
-		unsigned int nbr = atoi((char*)prop);
-		setNbRefs(id, nbr);
-
-		if (nbr > 0)
-		{
-//			for (MapNameId::iterator it = m_attribNameMap.begin(); it != m_attribNameMap.end(); ++it)
-//			{
-//				prop = xmlGetProp(x_node, BAD_CAST (it->first).c_str());
-//				// if name of data unkwown then error
-//				if (prop == NULL)
-//				{
-//					CGoGNerr << "inconsistent xml file"<<CGoGNendl;
-//					return false;
-//				}
-//				m_tableAttribs[it->second]->input(id, std::string((char*)prop));
-//			}
-		}
-	}
-	return true;
-}
-
-void AttributeContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
-{
-	if (m_nbAttributes == 0)
-		return;
-
-	// noeud du container
-	int rc = xmlTextWriterStartElement(writer, BAD_CAST "Attributes_Container");
-	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "id","%u",id);
-	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "BlockSize","%u",_BLOCKSIZE_);
-	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "size","%u",m_maxSize);
-
-	// recuperer le nombre d'attributs
-	unsigned int nbAtt = m_nbAttributes;
-	unsigned int sizeVectAtt = m_tableAttribs.size();
-
-	// noeud avec la liste de attributs
-	rc = xmlTextWriterStartElement(writer, BAD_CAST "Attributes_Names");
-	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "nb","%u",nbAtt);
-	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "sv","%u",sizeVectAtt);
-
-	// recuperer les attributs dans la map et les sauver
-//	for (std::map<std::string, unsigned int>::iterator it = m_attribNameMap.begin(); it!= m_attribNameMap.end(); ++it)
+//	return true;
+//}
+//
+//bool AttributeContainer::loadXmlAN(xmlNodePtr node, unsigned int nbb)
+//{
+//	xmlChar* prop = xmlGetProp(node, BAD_CAST "nb");
+////	unsigned int nb = atoi((char*)prop);
+//	prop = xmlGetProp(node, BAD_CAST "sv");
+////	unsigned int sv = atoi((char*)prop);
+//
+//	// Noooooooo!!!!
+////	m_tableAttribs.resize(sv);
+////	for (unsigned int i=0; i< sv; ++i)
+////			m_tableAttribs[i]=NULL;
+//
+//	// charge et cree les  attributs
+//	for (xmlNode* x_node = node->children; x_node != NULL; x_node = x_node->next)
 //	{
-//		int rc = xmlTextWriterStartElement(writer, BAD_CAST "Attribute");
-//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "name",BAD_CAST (it->first).c_str());
-//		const std::string& str_type = m_tableAttribs[it->second]->getTypeName();
-//		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "type",BAD_CAST str_type.c_str());
-//		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "id","%u",it->second);
+//		prop = xmlGetProp(x_node, BAD_CAST "id");
+////		unsigned int id = unsigned int(atoi((char*)prop);
+//
+//		prop = xmlGetProp(x_node, BAD_CAST "type");
+//		// recupere l'attribut enregistrer par son type
+//		if (m_attributes_registry_map !=NULL)
+//		{
+//			std::map<std::string, RegisteredBaseAttribute*>::iterator itAtt = m_attributes_registry_map->find(std::string((char*)prop));
+//			if (itAtt == m_attributes_registry_map->end())
+//			{
+//				CGoGNout << "Skipping non registred attribute "<< std::string((char*)prop)<<CGoGNendl;
+//			}
+//			else
+//			{
+//				RegisteredBaseAttribute* ra = itAtt->second;
+//				prop = xmlGetProp(x_node, BAD_CAST "name");
+////				ra->addAttribute(*this, std::string((char*)prop), id);
+//				AttributeMultiVectorGen* amvg = ra->addAttribute(*this, std::string((char*)prop));
+//				amvg->setNbBlocks(nbb);
+//			}
+//		}
+//		else
+//		{
+//			CGoGNerr << "Attribute Registry non initialized"<< CGoGNendl;
+//			return false;
+//		}
+//	}
+////	if (m_attribNameMap.size() != nb)
+////	{
+////		CGoGNerr << "Pb lecture attributs"<< CGoGNendl;
+////		return false;
+////	}
+//	return true;
+//}
+//
+//bool AttributeContainer::loadXmlDL(xmlNodePtr node)
+//{
+//	// charge et cree les  attributs
+//	for (xmlNode* x_node = node->children; x_node != NULL; x_node = x_node->next)
+//	{
+//		// get index
+//		xmlChar* prop = xmlGetProp(x_node, BAD_CAST "id");
+//		unsigned int id = atoi((char*)prop);
+//		// get & set nbref
+//		prop = xmlGetProp(x_node, BAD_CAST "refs");
+//		unsigned int nbr = atoi((char*)prop);
+//		setNbRefs(id, nbr);
+//
+//		if (nbr > 0)
+//		{
+////			for (MapNameId::iterator it = m_attribNameMap.begin(); it != m_attribNameMap.end(); ++it)
+////			{
+////				prop = xmlGetProp(x_node, BAD_CAST (it->first).c_str());
+////				// if name of data unkwown then error
+////				if (prop == NULL)
+////				{
+////					CGoGNerr << "inconsistent xml file"<<CGoGNendl;
+////					return false;
+////				}
+////				m_tableAttribs[it->second]->input(id, std::string((char*)prop));
+////			}
+//		}
+//	}
+//	return true;
+//}
+//
+//void AttributeContainer::saveXml(xmlTextWriterPtr writer, unsigned int id)
+//{
+//	if (m_nbAttributes == 0)
+//		return;
+//
+//	// noeud du container
+//	int rc = xmlTextWriterStartElement(writer, BAD_CAST "Attributes_Container");
+//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "id","%u",id);
+//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "BlockSize","%u",_BLOCKSIZE_);
+//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "size","%u",m_maxSize);
+//
+//	// recuperer le nombre d'attributs
+//	unsigned int nbAtt = m_nbAttributes;
+//	unsigned int sizeVectAtt = m_tableAttribs.size();
+//
+//	// noeud avec la liste de attributs
+//	rc = xmlTextWriterStartElement(writer, BAD_CAST "Attributes_Names");
+//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "nb","%u",nbAtt);
+//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "sv","%u",sizeVectAtt);
+//
+//	// recuperer les attributs dans la map et les sauver
+////	for (std::map<std::string, unsigned int>::iterator it = m_attribNameMap.begin(); it!= m_attribNameMap.end(); ++it)
+////	{
+////		int rc = xmlTextWriterStartElement(writer, BAD_CAST "Attribute");
+////		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "name",BAD_CAST (it->first).c_str());
+////		const std::string& str_type = m_tableAttribs[it->second]->getTypeName();
+////		rc = xmlTextWriterWriteAttribute(writer,  BAD_CAST "type",BAD_CAST str_type.c_str());
+////		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "id","%u",it->second);
+////		rc = xmlTextWriterEndElement(writer);
+////	}
+//	// fin du noeud
+//	rc = xmlTextWriterEndElement(writer);
+//
+//	// parcourir le container et sauver les lignes
+//	rc = xmlTextWriterStartElement(writer, BAD_CAST "Data_Lines");
+////	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "size","%u",m_maxSize);
+//	for (unsigned int i = 0; i != m_maxSize; ++i)
+//	{
+//		unsigned int nbr = getNbRefs(i);
+//		rc = xmlTextWriterStartElement(writer, BAD_CAST "Line");
+//		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "id","%u",i);
+//		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "refs","%u",nbr);
+//		if (nbr > 0)
+//		{
+//			// tous les attributs de la ligne
+////			for (MapNameId::iterator it = m_attribNameMap.begin(); it!= m_attribNameMap.end(); ++it)
+////			{
+////				std::string st_att = m_tableAttribs[it->second]->output(i);
+////				rc = xmlTextWriterWriteAttribute(writer,(xmlChar*)( (it->first).c_str()), (xmlChar*)( st_att.c_str()));
+////			}
+//		}
+//		// fin du noeud Line
 //		rc = xmlTextWriterEndElement(writer);
 //	}
-	// fin du noeud
-	rc = xmlTextWriterEndElement(writer);
-
-	// parcourir le container et sauver les lignes
-	rc = xmlTextWriterStartElement(writer, BAD_CAST "Data_Lines");
-//	rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "size","%u",m_maxSize);
-	for (unsigned int i = 0; i != m_maxSize; ++i)
-	{
-		unsigned int nbr = getNbRefs(i);
-		rc = xmlTextWriterStartElement(writer, BAD_CAST "Line");
-		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "id","%u",i);
-		rc = xmlTextWriterWriteFormatAttribute(writer,  BAD_CAST "refs","%u",nbr);
-		if (nbr > 0)
-		{
-			// tous les attributs de la ligne
-//			for (MapNameId::iterator it = m_attribNameMap.begin(); it!= m_attribNameMap.end(); ++it)
-//			{
-//				std::string st_att = m_tableAttribs[it->second]->output(i);
-//				rc = xmlTextWriterWriteAttribute(writer,(xmlChar*)( (it->first).c_str()), (xmlChar*)( st_att.c_str()));
-//			}
-		}
-		// fin du noeud Line
-		rc = xmlTextWriterEndElement(writer);
-	}
-	// fin du noeud Data Lines
-	rc = xmlTextWriterEndElement(writer);
-
-	// fin du noeud Container
-	rc = xmlTextWriterEndElement(writer);
-}
-
-unsigned int AttributeContainer::getIdXmlNode(xmlNodePtr node)
-{
-	xmlChar *prop = xmlGetProp(node, BAD_CAST "id");
-	unsigned int id = atoi((char*)prop);
-	return id;
-}
-
-bool AttributeContainer::loadXml(xmlNodePtr node)
-{
-	xmlChar *prop = xmlGetProp(node, BAD_CAST "BlockSize");
-	unsigned int bs = atoi((char*)prop);
-
-	if (bs != _BLOCKSIZE_)
-	{
-		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
-		return false;
-	}
-
-//	prop = xmlGetProp(node, BAD_CAST "id");
+//	// fin du noeud Data Lines
+//	rc = xmlTextWriterEndElement(writer);
+//
+//	// fin du noeud Container
+//	rc = xmlTextWriterEndElement(writer);
+//}
+//
+//unsigned int AttributeContainer::getIdXmlNode(xmlNodePtr node)
+//{
+//	xmlChar *prop = xmlGetProp(node, BAD_CAST "id");
 //	unsigned int id = atoi((char*)prop);
-
-	prop = xmlGetProp(node, BAD_CAST "size");
-	m_maxSize = atoi((char*)prop);
-
-	char* ANnode = (char*)"Attributes_Names";
-	char* DLnode= (char*)"Data_Lines";
-
-	// calcul le nombre de block et les alloue
-	unsigned int nbb = m_maxSize/_BLOCKSIZE_;
-	if (m_maxSize%_BLOCKSIZE_)
-			nbb++;
-
-	m_holesBlocks.resize(nbb);
-	for (unsigned int i=0; i<nbb; ++i)
-		m_holesBlocks[i] = new HoleBlockRef;
-
-	//load Attributes
-	xmlNode* cur = node->children;
-	while ( strcmp((char*)(cur->name),ANnode))
-		cur = cur->next;
-	loadXmlAN(cur,nbb);
-
-	cur = node->children;
-	while ( strcmp((char*)(cur->name),DLnode))
-		cur = cur->next;
-	loadXmlDL(cur);
-
-	// recreate free holes in blocks
-	nbb--;
-	for (unsigned int i = 0; i < nbb; ++i)
-	{
-		if (m_holesBlocks[i]->updateHoles(_BLOCKSIZE_))
-			m_tableBlocksWithFree.push_back(i);
-	}
-	m_holesBlocks[nbb]->updateHoles(m_maxSize - nbb * _BLOCKSIZE_);
-
-	return true;
-}
+//	return id;
+//}
+//
+//bool AttributeContainer::loadXml(xmlNodePtr node)
+//{
+//	xmlChar *prop = xmlGetProp(node, BAD_CAST "BlockSize");
+//	unsigned int bs = atoi((char*)prop);
+//
+//	if (bs != _BLOCKSIZE_)
+//	{
+//		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
+//		return false;
+//	}
+//
+////	prop = xmlGetProp(node, BAD_CAST "id");
+////	unsigned int id = atoi((char*)prop);
+//
+//	prop = xmlGetProp(node, BAD_CAST "size");
+//	m_maxSize = atoi((char*)prop);
+//
+//	char* ANnode = (char*)"Attributes_Names";
+//	char* DLnode= (char*)"Data_Lines";
+//
+//	// calcul le nombre de block et les alloue
+//	unsigned int nbb = m_maxSize/_BLOCKSIZE_;
+//	if (m_maxSize%_BLOCKSIZE_)
+//			nbb++;
+//
+//	m_holesBlocks.resize(nbb);
+//	for (unsigned int i=0; i<nbb; ++i)
+//		m_holesBlocks[i] = new HoleBlockRef;
+//
+//	//load Attributes
+//	xmlNode* cur = node->children;
+//	while ( strcmp((char*)(cur->name),ANnode))
+//		cur = cur->next;
+//	loadXmlAN(cur,nbb);
+//
+//	cur = node->children;
+//	while ( strcmp((char*)(cur->name),DLnode))
+//		cur = cur->next;
+//	loadXmlDL(cur);
+//
+//	// recreate free holes in blocks
+//	nbb--;
+//	for (unsigned int i = 0; i < nbb; ++i)
+//	{
+//		if (m_holesBlocks[i]->updateHoles(_BLOCKSIZE_))
+//			m_tableBlocksWithFree.push_back(i);
+//	}
+//	m_holesBlocks[nbb]->updateHoles(m_maxSize - nbb * _BLOCKSIZE_);
+//
+//	return true;
+//}
 
 void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id)
 {
 	// en ascii id et taille les tailles
 
 	std::vector<unsigned int> bufferui;
-	bufferui.reserve(6);
+	bufferui.reserve(10);
 
 	bufferui.push_back(id);
 	bufferui.push_back(_BLOCKSIZE_);
@@ -574,16 +588,18 @@ void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id)
 	bufferui.push_back(m_nbAttributes);
 	bufferui.push_back(m_size);
 	bufferui.push_back(m_maxSize);
+	bufferui.push_back(m_orbit);
+	bufferui.push_back(m_nbUnknown);
 
-	CGoGNout << "Save Container: id:" <<id <<"  nbAtt:"<<m_nbAttributes << "  size:"<<m_size<<CGoGNendl;
-
-	fs.write(reinterpret_cast<const char*>(&bufferui[0]) ,bufferui.size()*sizeof(unsigned int));
+	fs.write(reinterpret_cast<const char*>(&bufferui[0]), bufferui.size()*sizeof(unsigned int));
 
 	unsigned int i = 0;
 	for(std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
 	{
 		if (*it != NULL)
 			(*it)->saveBin(fs, i++);
+		else
+			CGoGNerr << "PB saving, NULL ptr in m_tableAttribs" <<  CGoGNendl;
 	}
 
 	//en binaire les blocks de ref
@@ -612,7 +628,7 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 	std::vector<unsigned int> bufferui;
 	bufferui.resize(256);
 
-	fs.read(reinterpret_cast<char*>(&(bufferui[0])), 6*sizeof(unsigned int));
+	fs.read(reinterpret_cast<char*>(&(bufferui[0])), 8*sizeof(unsigned int));	//WARNING 9 hard coded
 
 	unsigned int bs, szHB, szBWF, nbAtt;
 	bs = bufferui[0];
@@ -621,12 +637,16 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 	nbAtt = bufferui[3];
 	m_size = bufferui[4];
 	m_maxSize = bufferui[5];
+	m_orbit = bufferui[6];
+	m_nbUnknown = bufferui[7];
+
 
 	if (bs != _BLOCKSIZE_)
 	{
 		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
 		return false;
 	}
+
 
 	for (unsigned int j = 0; j < nbAtt; ++j)
 	{
@@ -644,10 +664,8 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 		{
 			RegisteredBaseAttribute* ra = itAtt->second;
 			AttributeMultiVectorGen* amvg = ra->addAttribute(*this, nameAtt);
-			CGoGNout << "loading attribute " << nameAtt << " : " << typeAtt << CGoGNendl;
+//			CGoGNout << "loading attribute " << nameAtt << " : " << typeAtt << CGoGNendl;
 			amvg->loadBin(fs);
-			// no need the set the nb of block (done by binary read of attribmv)
-			m_nbAttributes++;
 		}
 	}
 

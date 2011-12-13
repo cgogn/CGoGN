@@ -55,6 +55,15 @@ inline void Map1::clear(bool removeAttrib)
 		init() ;
 }
 
+inline void Map1::update_topo_shortcuts()
+{
+	GenericMap::update_topo_shortcuts();
+	m_phi1 = getRelation("phi1");
+	m_phi_1 = getRelation("phi_1");
+}
+
+
+
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/
