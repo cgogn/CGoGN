@@ -336,19 +336,6 @@ bool GenericMap::saveMapBin(const std::string& filename)
 		m_attribs[i].saveBin(fs,i);
 	}
 
-	// save marksets and boundary marker
-//	std::vector<unsigned int> buffer;
-//	buffer.reserve(NB_ORBITS+1);
-//	for (unsigned int i=0; i<NB_ORBITS; ++i)
-//	{
-//		buffer.push_back(m_marksets[i][0].getMarkVal());
-//	}
-//	buffer.push_back(m_boundaryMarker.getMarkVal());	//	save m_boundaryMarker
-//	fs.write(reinterpret_cast<const char*>(&(buffer[0])), buffer.size()*sizeof(unsigned int));
-
-	unsigned int mv = m_boundaryMarker.getMarkVal();
-	fs.write(reinterpret_cast<const char*>(&mv), sizeof(unsigned int));
-
 	return true;
 }
 
@@ -379,14 +366,10 @@ bool GenericMap::loadMapBin(const std::string& filename)
 
 	// Check map type
 	buff_str = std::string(buff+32);
-//	CGoGNout << "Map type file = "<< buff_str<< CGoGNendl;
 
 	std::string localType = this->mapTypeName();
-//	localType = localType.substr(0,localType.size()-1);
 
 	std::string fileType = buff_str;
-
-	std::cout << "localType = "<< localType << " / fileType = " <<fileType<< std::endl;
 
 	if (fileType != localType)
 	{
@@ -410,15 +393,10 @@ bool GenericMap::loadMapBin(const std::string& filename)
 		m_attribs[id].loadBin(fs);
 	}
 
-	// load  boundary marker
-
-	unsigned int mv;
-	fs.read(reinterpret_cast<char*>(&mv), sizeof(unsigned int));
-	m_boundaryMarker.setMarkVal(mv);
-
 	// retrieve m_embeddings (from m_attribs[DART]
 	update_m_emb_afterLoad();
-	update_topo_shortcuts();	// recursive call from real type of map down to GenericMap
+	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap ( for Marker_cleaning & pointers)
+	update_topo_shortcuts();
 
 
 	return true;

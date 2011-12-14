@@ -594,12 +594,16 @@ void AttributeContainer::saveBin(CGoGNostream& fs, unsigned int id)
 	fs.write(reinterpret_cast<const char*>(&bufferui[0]), bufferui.size()*sizeof(unsigned int));
 
 	unsigned int i = 0;
+
 	for(std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
 	{
 		if (*it != NULL)
 			(*it)->saveBin(fs, i++);
 		else
+		{
 			CGoGNerr << "PB saving, NULL ptr in m_tableAttribs" <<  CGoGNendl;
+			i++;
+		}
 	}
 
 	//en binaire les blocks de ref

@@ -340,7 +340,7 @@ public:
 	 * @param name the name
 	 * @ return true if node has the good name
 	 */
-	bool chechXmlNode(xmlNodePtr node, const std::string& name) ;
+//	bool chechXmlNode(xmlNodePtr node, const std::string& name) ;
 
 	/**
 	 * update the pointer of embedding vector after loading

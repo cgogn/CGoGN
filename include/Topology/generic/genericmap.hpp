@@ -25,10 +25,10 @@
 namespace CGoGN
 {
 
-inline bool GenericMap::chechXmlNode(xmlNodePtr node, const std::string& name)
-{
-	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
-}
+//inline bool GenericMap::chechXmlNode(xmlNodePtr node, const std::string& name)
+//{
+//	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
+//}
 
 /****************************************
  *           DARTS MANAGEMENT           *
