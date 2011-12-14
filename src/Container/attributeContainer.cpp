@@ -203,6 +203,7 @@ void AttributeContainer::compact(std::vector<unsigned int>& mapOldNew)
 	}
 	++nbb;
 
+	mapOldNew.clear();
 	mapOldNew.reserve(nbe);
 
 	// now get the holes

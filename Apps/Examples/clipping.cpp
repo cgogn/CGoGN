@@ -793,11 +793,8 @@ void Clipping::importMesh(std::string& filename)
 {
 	std::vector<std::string> attrNames ;
 
-	std::string extension;
-	size_t pos;
-
-	pos = filename.rfind(".");    // position of "." in filename
-	 extension = filename.substr(pos);
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
 
 	if(extension == std::string(".tet"))
 	{

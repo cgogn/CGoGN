@@ -385,6 +385,16 @@ public:
 	 */
 	void dumpAttributesAndMarkers();
 
+	/**
+	 * update topo relation after compacting the container:
+	 */
+	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew)=0;
+
+	/**
+	 * compact the map
+	 */
+	void compact();
+
 	/****************************************
 	 *           DARTS TRAVERSALS           *
 	 ****************************************/

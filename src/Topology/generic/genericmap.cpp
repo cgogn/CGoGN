@@ -514,6 +514,37 @@ void GenericMap::dumpAttributesAndMarkers()
 	}
 }
 
+
+void GenericMap::compact()
+{
+	std::vector<unsigned int> oldnew;
+
+	// compacting the orbits attributes
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+	{
+		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
+		{
+			m_attribs[orbit].compact(oldnew);
+
+			for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
+			{
+				unsigned int& idx = m_embeddings[orbit]->operator [](i);
+				unsigned int jdx = oldnew[idx];
+				if ((jdx != 0xffffffff) && (jdx!=idx))
+					idx = jdx;
+			}
+		}
+	}
+
+	//compacting the topo
+	m_attribs[DART].compact(oldnew);
+
+	// update topo relations: recurvise call from real map down to generic
+	compactTopoRelations(oldnew);
+
+//	dumpAttributesAndMarkers();
+}
+
 /****************************************
  *           DARTS TRAVERSALS           *
  ****************************************/
