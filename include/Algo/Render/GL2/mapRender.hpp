@@ -71,7 +71,7 @@ bool MapRender::inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  c
 }
 
 template<typename PFP>
-void MapRender::recompute2Ears( AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex)
+void MapRender::recompute2Ears(const typename PFP::TVEC3& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex)
 {
 	VertexPoly* vprev = vp->prev;
 	VertexPoly* vp2 = vp->next;
@@ -151,7 +151,7 @@ float MapRender::computeEarAngle(const typename PFP::VEC3& P1, const typename PF
 }
 
 template<typename PFP>
-bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
+bool MapRender::computeEarIntersection(const typename PFP::TVEC3& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly)
 {
 
 	VertexPoly* endV = vp->prev;
@@ -175,20 +175,19 @@ bool MapRender::computeEarIntersection(AttributeHandler<typename PFP::VEC3>& pos
 }
 
 template<typename PFP>
-inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices)
+inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices, const typename PFP::TVEC3* pos)
 {
 	bool(*fn_pt1)(VertexPoly*,VertexPoly*) = &(MapRender::cmpVP);
 	VPMS ears(fn_pt1);
 
-
-	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX,"position");
+	const typename PFP::TVEC3& position = *pos ;
 
 	// compute normal to polygon
 	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(map, d, position);
 
 	// first pass create polygon in chained list witht angle computation
-	VertexPoly* vpp=NULL;
-	VertexPoly* prem=NULL;
+	VertexPoly* vpp = NULL;
+	VertexPoly* prem = NULL;
 	unsigned int nbv = 0;
 	unsigned int nbe = 0;
 	Dart a = d;
@@ -196,27 +195,27 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	Dart c = map.phi1(b);
 	do
 	{
-		typename PFP::VEC3 P1= position[map.getEmbedding(VERTEX,a)];
-		typename PFP::VEC3 P2= position[map.getEmbedding(VERTEX,b)];
-		typename PFP::VEC3 P3= position[map.getEmbedding(VERTEX,c)];
+		typename PFP::VEC3 P1 = position[map.getEmbedding(VERTEX, a)];
+		typename PFP::VEC3 P2 = position[map.getEmbedding(VERTEX, b)];
+		typename PFP::VEC3 P3 = position[map.getEmbedding(VERTEX, c)];
 
-		float val = computeEarAngle<PFP>(P1,P2,P3,normalPoly);
-		VertexPoly* vp = new VertexPoly(map.getEmbedding(VERTEX,b),val,(P3-P1).norm2(),vpp);
+		float val = computeEarAngle<PFP>(P1, P2, P3, normalPoly);
+		VertexPoly* vp = new VertexPoly(map.getEmbedding(VERTEX, b), val, (P3-P1).norm2(), vpp);
 
-		if (vp->value <5.0f)
+		if (vp->value < 5.0f)
 			nbe++;
-		if (vpp==NULL)
+		if (vpp == NULL)
 			prem = vp;
 		vpp = vp;
 		a = b;
 		b = c;
 		c = map.phi1(c);
 		nbv++;
-	}while (a!=d);
+	}while (a != d);
 
-	VertexPoly::close(prem,vpp);
+	VertexPoly::close(prem, vpp);
 
-	bool convex = nbe==nbv;
+	bool convex = nbe == nbv;
 	if (convex)
 	{
 		// second pass with no test of intersections with polygons
@@ -234,7 +233,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 		for (unsigned int i=0; i< nbv; ++i)
 		{
 			if (vpp->value <5.0f)
-				computeEarIntersection<PFP>(position,vpp,normalPoly);
+				computeEarIntersection<PFP>(position, vpp, normalPoly);
 			vpp->ear = ears.insert(vpp);
 			vpp = vpp->next;
 		}
@@ -286,40 +285,43 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 	Dart b = map.phi1(a);
 	Dart c = map.phi1(b);
 
-	if (map.phi1(c) != a)
-	{
-		addEarTri<PFP>(map, d, tableIndices);
-		return;
-	}
-
-	tableIndices.push_back(map.getEmbedding(VERTEX, d));
-	tableIndices.push_back(map.getEmbedding(VERTEX, b));
-	tableIndices.push_back(map.getEmbedding(VERTEX, c));
-
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
-//	do
-//	{
-//		tableIndices.push_back(map.getEmbedding(VERTEX, d));
-//		tableIndices.push_back(map.getEmbedding(VERTEX, b));
-//		tableIndices.push_back(map.getEmbedding(VERTEX, c));
-//		b = c;
-//		c = map.phi1(b);
-//	} while (c != d);
-
+	do
+	{
+		tableIndices.push_back(map.getEmbedding(VERTEX, d));
+		tableIndices.push_back(map.getEmbedding(VERTEX, b));
+		tableIndices.push_back(map.getEmbedding(VERTEX, c));
+		b = c;
+		c = map.phi1(b);
+	} while (c != d);
 }
 
 template<typename PFP>
-void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const typename PFP::TVEC3* position, unsigned int thread)
 {
 	tableIndices.reserve(4 * map.getNbDarts() / 3);
 
 	TraversorF<typename PFP::MAP> trav(map, good, thread);
-	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		addTri<PFP>(map, d, tableIndices);
+
+	if(position == NULL)
+	{
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+			addTri<PFP>(map, d, tableIndices);
+	}
+	else
+	{
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			if(map.faceDegree(d) == 3)
+				addTri<PFP>(map, d, tableIndices);
+			else
+				addEarTri<PFP>(map, d, tableIndices, position);
+		}
+	}
 }
 
 template<typename PFP>
-void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread)
+void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const typename PFP::TVEC3* position, unsigned int thread)
 {
 #define LIST_SIZE 20
 	DartMarker m(map, thread);
@@ -335,7 +337,17 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 			std::list<Dart> bound;
 
 			if (good(dd) && !map.isBoundaryMarked(dd))
-				addTri<PFP>(map, dd, tableIndices);
+			{
+				if(position == NULL)
+					addTri<PFP>(map, dd, tableIndices);
+				else
+				{
+					if(map.faceDegree(dd) == 3)
+						addTri<PFP>(map, dd, tableIndices);
+					else
+						addEarTri<PFP>(map, dd, tableIndices, position);
+				}
+			}
 			m.markOrbit(FACE, dd);
 			bound.push_back(dd);
 			int nb = 1;
@@ -351,7 +363,17 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 						if (!m.isMarked(f))
 						{
 							if (good(f) && !map.isBoundaryMarked(f))
-								addTri<PFP>(map, f, tableIndices);
+							{
+								if(position == NULL)
+									addTri<PFP>(map, f, tableIndices);
+								else
+								{
+									if(map.faceDegree(f) == 3)
+										addTri<PFP>(map, f, tableIndices);
+									else
+										addEarTri<PFP>(map, f, tableIndices, position);
+								}
+							}
 							m.markOrbit(FACE, f);
 							bound.push_back(map.phi1(f));
 							++nb;
@@ -465,6 +487,12 @@ void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, st
 template<typename PFP>
 void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized, unsigned int thread)
 {
+	initPrimitives<PFP>(map, good, prim, NULL, optimized, thread) ;
+}
+
+template <typename PFP>
+void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, const typename PFP::TVEC3* position, bool optimized, unsigned int thread)
+{
 	std::vector<GLuint> tableIndices;
 
 	// indice du VBO a utiliser
@@ -487,9 +515,9 @@ void MapRender::initPrimitives(typename PFP::MAP& map, const FunctorSelect& good
 			break;
 		case TRIANGLES:
 			if(optimized)
-				initTrianglesOptimized<PFP>(map, good, tableIndices, thread);
+				initTrianglesOptimized<PFP>(map, good, tableIndices, position, thread);
 			else
-				initTriangles<PFP>(map, good, tableIndices, thread) ;
+				initTriangles<PFP>(map, good, tableIndices, position, thread) ;
 			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
 			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
 			break;
