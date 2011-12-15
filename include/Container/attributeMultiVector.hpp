@@ -407,7 +407,6 @@ void AttributeMultiVector<T>::saveBin(CGoGNostream& fs, unsigned int id)
 	memcpy(buffer+len1,s2,len2);
 	fs.write(reinterpret_cast<const char*>(buffer),(len1+len2)*sizeof(char));
 
-
 	nbs[0] = m_tableData.size();
 	nbs[1] = nbs[0] * _BLOCKSIZE_* sizeof(T);
 	fs.write(reinterpret_cast<const char*>(nbs),2*sizeof(unsigned int));

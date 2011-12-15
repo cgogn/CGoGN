@@ -82,6 +82,11 @@ public:
 		return (m_bits == 0);
 	}
 
+	inline void invert()
+	{
+		m_bits = ~m_bits;
+	}
+
 	//! Set given marks to YES
 	/*! @param m the marks to set
 	 */

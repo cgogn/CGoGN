@@ -300,6 +300,13 @@ protected:
 	 */
 	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
 
+	/**
+	 * Get attributeMultivector pointer of a relation attribute
+	 * @param anem name of relation
+	 * @return the attribute multi-vector pointer
+	 */
+	AttributeMultiVector<Dart>* getRelation(const std::string& name);
+
 	/****************************************
 	 *          THREAD MANAGEMENT           *
 	 ****************************************/
@@ -333,7 +340,7 @@ public:
 	 * @param name the name
 	 * @ return true if node has the good name
 	 */
-	bool chechXmlNode(xmlNodePtr node, const std::string& name) ;
+//	bool chechXmlNode(xmlNodePtr node, const std::string& name) ;
 
 	/**
 	 * update the pointer of embedding vector after loading
@@ -341,18 +348,23 @@ public:
 	void update_m_emb_afterLoad();
 
 	/**
+	 * update the markTables and recursively from real type the topo shortcut pointers
+	 */
+	virtual void update_topo_shortcuts();
+
+	/**
 	 * Save map in a XML file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool saveMapXml(const std::string& filename, bool compress = false) ;
+//	bool saveMapXml(const std::string& filename, bool compress = false) ;
 
 	 /**
 	 * Load map from a XML file
 	 * @param filename the file name
 	 * @return true if OK
 	 */
-	bool loadMapXml(const std::string& filename, bool compress = false) ;
+//	bool loadMapXml(const std::string& filename, bool compress = false) ;
 
 	/**
 	 * Save map in a binary file
@@ -367,6 +379,21 @@ public:
 	 * @return true if OK
 	 */
 	bool loadMapBin(const std::string& filename) ;
+
+	/**
+	 * Dump attributes types and names per orbit
+	 */
+	void dumpAttributesAndMarkers();
+
+	/**
+	 * update topo relation after compacting the container:
+	 */
+	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew)=0;
+
+	/**
+	 * compact the map
+	 */
+	void compact();
 
 	/****************************************
 	 *           DARTS TRAVERSALS           *

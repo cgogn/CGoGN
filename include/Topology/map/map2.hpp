@@ -54,6 +54,13 @@ inline void Map2::clear(bool removeAttrib)
 		init() ;
 }
 
+
+inline void Map2::update_topo_shortcuts()
+{
+	Map1::update_topo_shortcuts();
+	m_phi2 = getRelation("phi2");
+}
+
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/

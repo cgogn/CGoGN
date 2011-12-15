@@ -25,10 +25,10 @@
 namespace CGoGN
 {
 
-inline bool GenericMap::chechXmlNode(xmlNodePtr node, const std::string& name)
-{
-	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
-}
+//inline bool GenericMap::chechXmlNode(xmlNodePtr node, const std::string& name)
+//{
+//	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
+//}
 
 /****************************************
  *           DARTS MANAGEMENT           *
@@ -210,6 +210,14 @@ inline AttributeMultiVector<Dart>* GenericMap::addRelation(const std::string& na
 
 	return amv ;
 }
+
+inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& name)
+{
+	AttributeContainer& cont = m_attribs[DART] ;
+	AttributeMultiVector<Dart>* amv = cont.getDataVector<Dart>(cont.getAttributeIndex(name)) ;
+	return amv ;
+}
+
 
 
 } //namespace CGoGN

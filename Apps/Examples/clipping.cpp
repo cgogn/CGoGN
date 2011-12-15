@@ -793,11 +793,8 @@ void Clipping::importMesh(std::string& filename)
 {
 	std::vector<std::string> attrNames ;
 
-	std::string extension;
-	size_t pos;
-
-	pos = filename.rfind(".");    // position of "." in filename
-	 extension = filename.substr(pos);
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
 
 	if(extension == std::string(".tet"))
 	{
@@ -819,6 +816,17 @@ void Clipping::importMesh(std::string& filename)
 		else
 			position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
 	}
+	if(extension == std::string(".map"))
+	{
+		if(!myMap.loadMapBin(filename))
+		{
+			CGoGNerr << "could not import " << filename << CGoGNendl ;
+			return;
+		}
+		else
+			position = myMap.getAttribute<PFP::VEC3>(VERTEX , "position") ;
+	}
+
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 

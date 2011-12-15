@@ -251,11 +251,18 @@ public:
 	unsigned int getAttributeBlocksPointers(unsigned int attrIndex, std::vector<T*>& vect_ptr, unsigned int& byteBlockSize);
 
 	/**
-	 * fill a vector with attributes' names
-	 * @param vector of names
-	 * @return number of attribute
+	 * fill a vector with attributes names
+	 * @param names vector of names
+	 * @return number of attributes
 	 */
 	unsigned int getAttributesNames(std::vector<std::string>& names);
+
+	/**
+	 * fill a vector with attribute type names
+	 * @param types vector of type names
+	 * @return number of attributes
+	 */
+	unsigned int getAttributesTypes(std::vector<std::string>& types);
 
 	/**************************************
 	 *        CONTAINER MANAGEMENT        *
@@ -470,17 +477,17 @@ protected:
 	/**
 	 * load xmlpart of container
 	 */
-	bool loadXmlBWF(xmlNodePtr node);
+//	bool loadXmlBWF(xmlNodePtr node);
 
 	/**
 	 * load xmlpart of container
 	 */
-	bool loadXmlAN(xmlNodePtr node, unsigned int nbb);
+//	bool loadXmlAN(xmlNodePtr node, unsigned int nbb);
 
 	/**
 	 * load xmlpart of container
 	 */
-	bool loadXmlDL(xmlNodePtr node);
+//	bool loadXmlDL(xmlNodePtr node);
 
 public:
 	/**
@@ -488,20 +495,20 @@ public:
 	* @param writer a xmlTextWriterPtr obj
 	* @param id the id to save
 	*/
-	void saveXml(xmlTextWriterPtr writer, unsigned int id);
+//	void saveXml(xmlTextWriterPtr writer, unsigned int id);
 
 	/**
 	* get id from xml node
 	* @param node the node of container node of xml tree
 	* @return the value of id of the node
 	*/
-	static unsigned int getIdXmlNode(xmlNodePtr node);
+//	static unsigned int getIdXmlNode(xmlNodePtr node);
 
 	/**
 	* load from xml node
 	* @param node the node of container node of xml tree
 	*/
-	bool loadXml(xmlNodePtr node);
+//	bool loadXml(xmlNodePtr node);
 
 	/**
 	* save binary file

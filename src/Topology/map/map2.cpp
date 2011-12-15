@@ -776,4 +776,30 @@ void Map2::closeMap()
 	}
 }
 
+
+void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		{
+			Dart& d = m_phi1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d!=e)
+				d = e;
+		}
+		{
+			Dart& d = m_phi_1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d!=e)
+				d = e;
+		}
+		{
+			Dart& d = m_phi2->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d!=e)
+				d = e;
+		}
+	}
+}
+
 } // namespace CGoGN

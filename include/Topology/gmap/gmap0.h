@@ -52,6 +52,10 @@ public:
 
 	virtual void clear(bool removeAttrib);
 
+	virtual void update_topo_shortcuts();
+
+	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
+
 	/*! @name Basic Topological Operators
 	 * Access and Modification
 	 *************************************************************************/

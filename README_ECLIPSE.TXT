@@ -1,4 +1,5 @@
 Pour utiliser Eclipse (testé avec la version Helios, Galileo & Indigo)
+English version bellow
 
  * Configurer un projet dans Eclipse :
  - Faire un nouveau projet C++
@@ -57,3 +58,67 @@ Dans Preferences -> Shaders Preferences, on peut désormais configurer certaines
  - Installer CMakeEditor pour Eclipse en ajoutant l'URL dans Help -> Install New Software ... : http://cmakeed.sourceforge.net/eclipse/
  - Installer et redémarrer
  - Dans Preferences -> General -> Editors -> File Associations il est possible d'associer les CMakeLists.txt à ce logiciel d'édition
+ 
+=========================================================================================
+                                ENGLISH VERSION
+=========================================================================================
+
+To use Eclipse (tested with version Helios, Galileo & Indigo)
+
+ * Setting up a project in Eclipse:
+ - Make a new C + + project
+ - Select Makefile project -> Empty Project
+ - Choose As "Location": root CGoGN
+ - Select Toolchain: GCC Linux
+
+ * Compilation with the small hammer (icon)
+In the project properties:
+	-> C / C + + Build:
+	In the configuration Default | Active:
+	add to Build Directory path /build
+
+	you can then add configurations to compile what we want by just changing the Build directory:
+	CGoGNRelease: build / Release (compile the lib release)
+	CGoGNDebug: build / Debug (compiles in debug lib)
+	Apps: build / Apps (compile the examples and tutorials)
+	Tutorial: Build / Apps / Tutorial (compiles tutorials)
+	etc. ..
+
+This added to the directory of CGoGN a .project. and .cproject files.
+
+ * Inter-dependencies projects and autocompletion
+If the project X depends on another project, then:
+Project X -> Properties -> Project references: check the project which it depends.
+
+ * Qt dependencies:
+To avoid Eclipse rejects the Qt syntax (the Qt includes the Q_OBJECT, callbacks):
+ - Download the Qt plugin "eclipse-integration" http://qt.nokia.com/developer/eclipse-integration/
+ - Unzip the archive and copy its contents into the installation directory of Eclipse (plugins and features)
+ - Restart Eclipse at least once with the - clean (proofreading local directories)
+Normally in Window-> Preferences of Eclipse, Qt appears in the menu.
+ - Add the Qt directory (/ usr / bin on Debian / Ubuntu) and the directory include (/ usr/include/qt4).
+Then, for each project, add the following includes in Properties -> C / C + + general -> Paths and Symbols
+among the C + + includes:
+ - / Usr/include/qt4
+ - / Usr/include/qt4/Qt
+ - / Usr/include/qt4/QtCore
+ - / Usr/include/qt4/QtGui
+ - / Usr/include/qt4/QtOpenGL
+NOTE: at the bottom of this window, the button "Export Settings" allows you to export the configuration to XML
+import it into other projects.
+ - Finally, a small right-click the project -> Index -> Freshen all files and go.
+
+ * Syntax of shaders
+ - Download and unzip EclipseShaders: http://sourceforge.net/projects/glshaders/
+ - Copy the directories features and plugins in the eclipse installation directory
+ - Restart Eclipse at least once with the - clean (proofreading local directories)
+Eclipse will now recognize the files. And frag. Green.
+To assign other files in the program GLSLeditor:
+ - Preferences -> General -> Editors -> File Associations
+In Preferences -> Shaders Preferences, you can now configure some options related to the shader.
+
+ * Syntax highlighting for CMake files
+ - Install CMakeEditor for Eclipse by adding the URL in Help -> Install New Software ... : Http://cmakeed.sourceforge.net/eclipse/
+ - Install and restart
+ - In Preferences -> General -> Editors -> File Associations You can associate the CMakeLists.txt to editing software
+ 

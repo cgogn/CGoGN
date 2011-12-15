@@ -52,8 +52,12 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 
 	if (m_attIndex.map() != &map)
 	{
-		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+		if (!m_attIndex.isValid())
+			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
+
+
 
 	m_nbDarts = 0;
 
@@ -320,7 +324,9 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 
 	if (m_attIndex.map() != &map)
 	{
-		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+		if (!m_attIndex.isValid())
+			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
 
 	m_nbDarts = 0;

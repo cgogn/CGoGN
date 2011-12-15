@@ -45,6 +45,7 @@ public:
 
 	virtual void clear(bool removeAttrib) ;
 
+
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
 	 ****************************************/
