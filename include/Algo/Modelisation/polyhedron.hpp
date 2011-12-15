@@ -707,7 +707,7 @@ Dart Polyhedron<PFP>::tore_topo(unsigned int m, unsigned int n)
 		Dart d = m_tableVertDarts[i];
 		Dart e = m_tableVertDarts[(m*n)+i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d, e, false);
+		m_map.sewFaces(d, e, true);
 	}
 
 	// remove the last n vertex darts that are no more necessary (sewed with n first)
