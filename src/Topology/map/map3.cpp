@@ -90,7 +90,7 @@ Dart Map3::deleteVertex(Dart d)
 	FunctorStore fs(fstoretmp);
 	foreach_dart_of_vertex(d, fs);
 
-	// just one dart per face
+	 // just one dart per face
 	std::vector<Dart> fstore;
 	fstore.reserve(128);
 	DartMarker mf(*this);
@@ -237,7 +237,7 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 		if(delDegenerateVolumes)
 		{
 			Map2::collapseEdge(e, true);
-			//collapseDegeneretedVolume(e);
+			collapseDegeneretedVolume(e);
 		}
 		else
 			Map2::collapseEdge(e, false);
@@ -247,10 +247,10 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 
 		}
 
-
 	}while(d != dit);
 
-
+	return resV;
+}
 
 
 
@@ -304,8 +304,7 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 //		}
 //	}
 
-	return resV;
-}
+
 
 void Map3::splitFace(Dart d, Dart e)
 {
@@ -326,22 +325,18 @@ bool Map3::collapseDegeneretedVolume(Dart d)
 	Dart e1 = phi2(d);
 	Dart e2 = phi2(phi1(d));
 
-	//Si l'une des faces est du bord
-	if(isBoundaryFace(e1) || isBoundaryFace(e2))
+	//Si les deux faces ne sont pas du bord
+	if(!isBoundaryFace(e1) && !isBoundaryFace(e2))
 	{
-		//alors simple suppression du volume degenere
+		sewVolumes(phi3(e1),phi3(e2));
+		deleteVolume(d);
+		return true;
 	}
 	else
 	{
-		Dart e13 = e1;
-		Dart e23 = e2;
-		if(!isBoundaryFace(e1))
-			e13 = phi3(e1);
-
-		if(!isBoundaryFace(e2))
-			e23 = phi3(e2);
-
-		//if(faceDegree(e1) < faceDegree)
+		//alors simple suppression du volume degenere
+		deleteVolume(d);
+		return true;
 	}
 
 	return false;

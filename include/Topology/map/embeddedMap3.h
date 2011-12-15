@@ -37,69 +37,69 @@ class EmbeddedMap3 : public Map3
 public:
 	typedef Map3 TOPO_MAP;
 
+	//!
 	/*!
-	 *
 	 */
 	virtual Dart deleteVertex(Dart d);
 
-	/*! No attribute is attached to the new vertex
-	 *  The attributes attached to the old edge are duplicated on both resulting edges
+	//! No attribute is attached to the new vertex
+	/*! The attributes attached to the old edge are duplicated on both resulting edges
 	 *  @param d a dart
 	 */
 	virtual Dart cutEdge(Dart d);
 
-	/*! The attributes attached to the edge of d are kept on the resulting edge
-	 *  @param d a dart of the edge to cut
+	//! The attributes attached to the edge of d are kept on the resulting edge
+	/*!  @param d a dart of the edge to cut
 	 */
 	virtual bool uncutEdge(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual Dart deleteEdge(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	bool edgeCanCollapse(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual void unsewVolumes(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual bool mergeVolumes(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
 
-	/**
-	 * No attribute is attached to the new volume
+	//!
+	/*! No attribute is attached to the new volume
 	 */
 	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual bool check();
 } ;

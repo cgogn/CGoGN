@@ -108,6 +108,19 @@ bool EmbeddedGMap3::uncutEdge(Dart d)
 	return false ;
 }
 
+Dart EmbeddedGMap3::deleteEdge(Dart d)
+{
+	Dart v = GMap3::deleteEdge(d) ;
+	if(v != NIL)
+	{
+		if (isOrbitEmbedded(VOLUME))
+		{
+			embedOrbit(VOLUME, v, getEmbedding(VOLUME, v)) ;
+		}
+	}
+	return v ;
+}
+
 void EmbeddedGMap3::splitFace(Dart d, Dart e)
 {
 	Dart dd = beta1(beta3(d));

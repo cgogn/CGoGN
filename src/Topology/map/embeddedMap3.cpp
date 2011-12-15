@@ -109,7 +109,7 @@ bool EmbeddedMap3::uncutEdge(Dart d)
 
 Dart EmbeddedMap3::deleteEdge(Dart d)
 {
-	Dart v = Map3::deleteVertex(d) ;
+	Dart v = Map3::deleteEdge(d) ;
 	if(v != NIL)
 	{
 		if(isOrbitEmbedded(VOLUME))
@@ -125,7 +125,7 @@ bool EmbeddedMap3::edgeCanCollapse(Dart d)
 	//Criteres sur le bord
 	if(isBoundaryEdge(d))
 	{
-		//fusion de deux bord
+		//fusion de deux bords
 
 		//deconnection du bord
 	}
