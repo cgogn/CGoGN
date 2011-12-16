@@ -24,7 +24,40 @@ Les applications (Examples et Tutos) sont dans le répertoire Apps
 Les binaires sont générés dans le repertoire bin
 
 Des exemples de données:
-- fichiers trianbgz
-- fichiers png (contenant des images voxel 3D)
+- fichiers trianbgz, off, etc
 sont accessible à l'adresse suivante: 
+https://iggservis.u-strasbg.fr/Data/data.zip
+
+=========================================================================================
+                                ENGLISH VERSION
+=========================================================================================
+
+Linux dependencies:
+install the following packages:
+ccmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev
+
+To compile CGoGN:
+- Go ThirdParty, cd build, type "cmake .." and then make (with -j x if you have x core on your machine)
+We can set some option to not compile everything (see the README.TXT in ThirdParty)
+You can also compile debug by creating a directory that ended Debug build instead
+
+- Go to build and type "cmake .." and then make
+	Options (Boolean) are also available here:
+	BUILD_SHARED_LIBS (F) experimental!
+	WITH_ASSIMP (T)
+	WITH_NUMERICAL (T)
+	WITH_ZINRI (T)
+	WITH_QT (T)
+	to minimize dependencies and compilation time /
+
+
+- the compilation of each sub-parts is done by going in the subdirectories of build
+
+Applications (examples and tutorials) are in the Apps directory
+
+The binaries are generated in the bin directory
+
+Examples of data:
+- Trianbgz files, off, etc.
+are accessible at the following address:
 https://iggservis.u-strasbg.fr/Data/data.zip

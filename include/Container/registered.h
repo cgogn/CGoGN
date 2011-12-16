@@ -66,7 +66,12 @@ public:
 
 	AttributeMultiVectorGen* addAttribute(AttributeContainer& container, const std::string& attribName)
 	{
-		return container.addAttribute<T>(attribName);
+		unsigned int id = container.getAttributeIndex(attribName);
+		// new attribute
+		if (id == AttributeContainer::UNKNOWN)
+			return container.addAttribute<T>(attribName);
+		// or existing one
+		return container.getDataVector<T>(id);
 	}
 };
 

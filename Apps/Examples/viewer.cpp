@@ -184,13 +184,25 @@ void Viewer::importMesh(std::string& filename)
 {
 	myMap.clear(true) ;
 
-	std::vector<std::string> attrNames ;
-	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
+
+	if (extension == std::string(".map"))
 	{
-		CGoGNerr << "could not import " << filename << CGoGNendl ;
-		return;
+		myMap.loadMapBin(filename);
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
 	}
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	else
+	{
+		std::vector<std::string> attrNames ;
+		if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		{
+			CGoGNerr << "could not import " << filename << CGoGNendl ;
+			return;
+		}
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	}
+
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
