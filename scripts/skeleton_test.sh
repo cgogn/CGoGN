@@ -27,7 +27,7 @@ mkdir build
 echo "cmake_minimum_required(VERSION 2.8)" > CMakeLists.txt
 echo project\( $apps \)   >> CMakeLists.txt
 echo ""  >> CMakeLists.txt
-echo SET\(CGoGN_ROOT_DIR \$\{CMAKE_SOURCE_DIR\}/../../CGoGN\)   >> CMakeLists.txt
+echo SET\(CGoGN_ROOT_DIR \$\{CMAKE_SOURCE_DIR\}/../../CGoGN CACHE STRING \"CGoGN root dir\"\)   >> CMakeLists.txt
 echo ""  >> CMakeLists.txt
 echo include\(\$\{CGoGN_ROOT_DIR\}/apps_cmake.txt\)   >> CMakeLists.txt
 echo ""  >> CMakeLists.txt
