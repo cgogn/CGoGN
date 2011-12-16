@@ -5,11 +5,7 @@ if test $# -lt 1; then
 	exit 2
 fi
 
-APPS_ROOT=`basename $PWD`
-if test $APPS_ROOT != CGoGN_Apps; then
-	echo "You are not in the CGoGN_Apps directory"
-	exit 2
-fi
+echo "Warning do not forget to check the CGoGN_ROOT_DIR variable (ccmake)"
 
 if test -d $PWD/$1; then
 	echo Repertory $1 already exist
@@ -80,6 +76,3 @@ echo "{" >> ${apps}.cpp
 echo "	CGoGNout << \"Hello CGoGN\"<<CGoGNendl;" >> ${apps}.cpp
 echo "}" >> ${apps}.cpp
 
-
-
-echo Generation ok

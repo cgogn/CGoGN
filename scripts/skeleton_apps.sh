@@ -5,16 +5,12 @@ if test $# -lt 1; then
 	exit 2
 fi
 
-APPS_ROOT=`basename $PWD`
-if test $APPS_ROOT != CGoGN_Apps; then
-	echo "You are not in the CGoGN_Apps directory"
-	exit 2
-fi
-
 if test -d $PWD/$1; then
 	echo Repertory $1 already exist
 	exit 3
 fi
+
+echo "Warning do not forget to check the CGoGN_ROOT_DIR variable (ccmake)"
 
 apps=$1
 
@@ -132,12 +128,12 @@ echo \#include \"Utils/Qt/qtui.h\" >> ${apps}.h
 echo "" >> ${apps}.h
 echo "using namespace CGoGN;" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "class Interface: public Utils::QT::SimpleQT" >> ${apps}.h
+echo "class ${apps}: public Utils::QT::SimpleQT" >> ${apps}.h
 echo "{" >> ${apps}.h
 echo "	Q_OBJECT" >> ${apps}.h
 echo "public:" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "	Interface() {}" >> ${apps}.h
+echo "	${apps}() {}" >> ${apps}.h
 echo "" >> ${apps}.h
 echo "	void cb_redraw();" >> ${apps}.h
 echo "" >> ${apps}.h
@@ -201,7 +197,7 @@ echo "int main(int argc, char **argv)" >> ${apps}.cpp
 echo "{" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 echo "	QApplication app(argc, argv);" >> ${apps}.cpp
-echo "	Interface sqt;" >> ${apps}.cpp
+echo "	${apps} sqt;" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 echo "	Utils::QT::uiDockInterface dock;" >> ${apps}.cpp
 echo "	sqt.setDock(&dock);" >> ${apps}.cpp
