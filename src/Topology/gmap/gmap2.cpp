@@ -28,6 +28,31 @@
 namespace CGoGN
 {
 
+void GMap2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		{
+			Dart& d = m_beta0->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_beta1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_beta2->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+	}
+}
+
 /*! @name Generator and Deletor
  *  To generate or delete faces in a 2-G-map
  *************************************************************************/
@@ -894,33 +919,5 @@ void GMap2::closeMap()
 			closeHole(d);
 	}
 }
-
-
-
-void GMap2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
-{
-	for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		{
-			Dart& d = m_beta0->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_beta1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_beta2->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-	}
-}
-
 
 } // namespace CGoGN

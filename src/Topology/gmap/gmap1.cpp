@@ -27,6 +27,25 @@
 namespace CGoGN
 {
 
+void GMap1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		{
+			Dart& d = m_beta0->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_beta1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+	}
+}
+
 /*! @name Constructors and Destructors
  *  To generate or delete faces in a 1-G-map
  *************************************************************************/
@@ -75,24 +94,4 @@ void GMap1::deleteFace(Dart d)
 	deleteEdge(d);
 }
 
-void GMap1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
-{
-	for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		{
-			Dart& d = m_beta0->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_beta1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-	}
-}
-
 } // namespace CGoGN
-

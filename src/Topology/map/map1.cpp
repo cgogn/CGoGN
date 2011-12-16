@@ -27,6 +27,25 @@
 namespace CGoGN
 {
 
+void Map1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		{
+			Dart& d = m_phi1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_phi_1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+	}
+}
+
 /*! @name Generator and Deletor
  *  To generate or delete faces in a 1-map
  *************************************************************************/
@@ -83,26 +102,5 @@ void Map1::reverseCycle(Dart d)
 	}
 	phi1sew(e, d) ;				// Sew the last edge
 }
-
-
-void Map1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
-{
-	for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		{
-			Dart& d = m_phi1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi_1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-	}
-}
-
 
 } // namespace CGoGN

@@ -305,8 +305,6 @@ void GenericMap::removeThreadMarker(unsigned int nb)
  *             SAVE & LOAD              *
  ****************************************/
 
-
-
 bool GenericMap::saveMapBin(const std::string& filename)
 {
 	CGoGNostream fs(filename.c_str(), std::ios::out|std::ios::binary);
@@ -318,27 +316,24 @@ bool GenericMap::saveMapBin(const std::string& filename)
 
 	// Entete
 	char* buff = new char[256];
-	for (int i=0; i< 256; ++i)
+	for (int i = 0; i < 256; ++i)
 		buff[i] = char(255);
 	const char* cgogn = "CGoGN_Map";
-	memcpy(buff,cgogn,10);
+	memcpy(buff, cgogn, 10);
 	std::string mt = mapTypeName();
 	const char* mtc = mt.c_str();
-	memcpy(buff+32,mtc,mt.size()+1);
-	unsigned int *buffi = reinterpret_cast<unsigned int*>(buff+64);
+	memcpy(buff+32, mtc, mt.size()+1);
+	unsigned int *buffi = reinterpret_cast<unsigned int*>(buff + 64);
 	*buffi = NB_ORBITS;
 	fs.write(reinterpret_cast<const char*>(buff), 256);
 	delete buff;
 
 	// save all attribs
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
-	{
-		m_attribs[i].saveBin(fs,i);
-	}
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		m_attribs[i].saveBin(fs, i);
 
 	return true;
 }
-
 
 bool GenericMap::loadMapBin(const std::string& filename)
 {
@@ -365,7 +360,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	}
 
 	// Check map type
-	buff_str = std::string(buff+32);
+	buff_str = std::string(buff + 32);
 
 	std::string localType = this->mapTypeName();
 
@@ -373,12 +368,12 @@ bool GenericMap::loadMapBin(const std::string& filename)
 
 	if (fileType != localType)
 	{
-		CGoGNerr << "Not possible to load "<< fileType<< " into "<< localType << " object"<<CGoGNendl;
+		CGoGNerr << "Not possible to load "<< fileType << " into " << localType << " object" << CGoGNendl;
 		return false;
 	}
 
 	// Check max nb orbit
-	unsigned int *ptr_nbo = reinterpret_cast<unsigned int*>(buff+64);
+	unsigned int *ptr_nbo = reinterpret_cast<unsigned int*>(buff + 64);
 	unsigned int nbo = *ptr_nbo;
 	if (nbo != NB_ORBITS)
 	{
@@ -387,7 +382,7 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	}
 
 	// load attrib container
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		unsigned int id = AttributeContainer::loadBinId(fs);
 		m_attribs[id].loadBin(fs);
@@ -395,13 +390,11 @@ bool GenericMap::loadMapBin(const std::string& filename)
 
 	// retrieve m_embeddings (from m_attribs[DART]
 	update_m_emb_afterLoad();
-	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap ( for Marker_cleaning & pointers)
+	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
 	update_topo_shortcuts();
-
 
 	return true;
 }
-
 
 void GenericMap::update_m_emb_afterLoad()
 {
@@ -415,21 +408,18 @@ void GenericMap::update_m_emb_afterLoad()
 	// check if there are EMB_X attributes
 	for (unsigned int i = 0;  i < listeNames.size(); ++i)
 	{
-		std::string sub = listeNames[i].substr(0,listeNames[i].size()-1);
+		std::string sub = listeNames[i].substr(0, listeNames[i].size() - 1);
 		if (sub == "EMB_")
 		{
 			unsigned int orb = listeNames[i][4]-'0'; // easy atoi computation for one char;
-
 			AttributeMultiVector<unsigned int>* amv = cont.getDataVector<unsigned int>(i);
 			m_embeddings[orb] = amv ;
 		}
 	}
 }
 
-
 void GenericMap::update_topo_shortcuts()
 {
-
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		AttributeContainer& cont = m_attribs[orbit];
@@ -440,32 +430,28 @@ void GenericMap::update_topo_shortcuts()
 
 		for (unsigned int i = 0;  i < listeNames.size(); ++i)
 		{
-			std::string sub = listeNames[i].substr(0,5);
+			std::string sub = listeNames[i].substr(0, 5);
 			if (sub == "Mark_")
 			{
 				// get thread number
 				unsigned int thread = listeNames[i][5]-'0';
-				if (listeNames[i].size()>6) 					// thread number is >9
+				if (listeNames[i].size() > 6) 					// thread number is >9
 					thread = 10*thread + listeNames[i][6]-'0';
 
 				AttributeMultiVector<Mark>* amvMark = cont.getDataVector<Mark>(i);
 				m_markTables[orbit][thread] = amvMark ;
 
-				if ((orbit == DART) && (thread==0))	// for Marker of dart of thread O keep the boundary marker
+				if ((orbit == DART) && (thread == 0))	// for Marker of dart of thread O keep the boundary marker
 				{
 					Mark m(m_boundaryMarker);
 					m.invert();
-					for (unsigned int i=cont.begin();i!= cont.end(); cont.next(i))
-					{
+					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).unsetMark(m);
-					}
 				}
 				else								// for others clear all
 				{
-					for (unsigned int i=cont.begin();i!= cont.end(); cont.next(i))
-					{
+					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).clear();
-					}
 				}
 			}
 		}
@@ -474,38 +460,36 @@ void GenericMap::update_topo_shortcuts()
 
 void GenericMap::dumpAttributesAndMarkers()
 {
-	for (unsigned int i = 0; i<NB_ORBITS; ++i)
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
 		std::vector<std::string> names;
-		names.reserve(32); 				//just tp limit reallocation
+		names.reserve(32); 				//just to limit reallocation
 		m_attribs[i].getAttributesNames(names);
 		unsigned int nb = names.size();
-		if (nb>0)
+		if (nb > 0)
 		{
-			CGoGNout << "ORBIT "<< i<< CGoGNendl;
+			CGoGNout << "ORBIT "<< i << CGoGNendl;
 			std::vector<std::string> types;
 			types.reserve(nb);
 			m_attribs[i].getAttributesTypes(types);
-			for (unsigned int j=0; j<nb; ++j)
-			{
-				CGoGNout << "    "<< j << " : "<< types[j] << " "<< names[j]<< CGoGNendl;
-			}
+			for (unsigned int j = 0; j < nb; ++j)
+				CGoGNout << "    " << j << " : " << types[j] << " " << names[j] << CGoGNendl;
 		}
 	}
 	CGoGNout << "RESERVED MARKERS "<< CGoGNendl;
-	for (unsigned int i=0; i<NB_ORBITS; ++i)
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
-		for (unsigned int j=0; j<NB_THREAD; ++j)
+		for (unsigned int j = 0; j < NB_THREAD; ++j)
 		{
 			MarkSet ms = m_marksets[i][j];
 			if (!ms.isClear())
 			{
-				CGoGNout << "Orbit " << i << "  thread "<<j<< " : ";
+				CGoGNout << "Orbit " << i << "  thread " << j << " : ";
 				Mark m(1);
-				for (unsigned i = 0; i< Mark::getNbMarks(); ++i)
+				for (unsigned i = 0; i < Mark::getNbMarks(); ++i)
 				{
 					if (ms.testMark(m))
-						CGoGNout << m.getMarkVal()<< ", ";
+						CGoGNout << m.getMarkVal() << ", ";
 					m.setMarkVal(m.getMarkVal()<<1);
 				}
 				CGoGNout << CGoGNendl;
@@ -513,7 +497,6 @@ void GenericMap::dumpAttributesAndMarkers()
 		}
 	}
 }
-
 
 void GenericMap::compact()
 {
@@ -526,11 +509,11 @@ void GenericMap::compact()
 		{
 			m_attribs[orbit].compact(oldnew);
 
-			for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
+			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
 			{
 				unsigned int& idx = m_embeddings[orbit]->operator [](i);
 				unsigned int jdx = oldnew[idx];
-				if ((jdx != 0xffffffff) && (jdx!=idx))
+				if ((jdx != 0xffffffff) && (jdx != idx))
 					idx = jdx;
 			}
 		}
@@ -832,5 +815,3 @@ void GenericMap::boundaryUnmarkAll()
 //
 //	return true ;
 //}
-
-
