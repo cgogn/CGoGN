@@ -62,8 +62,6 @@ inline void Map1::update_topo_shortcuts()
 	m_phi_1 = getRelation("phi_1");
 }
 
-
-
 /*! @name Basic Topological Operators
  * Access and Modification
  *************************************************************************/

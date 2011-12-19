@@ -62,6 +62,15 @@ ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 }
 
 template<typename REAL>
+ColourConverter<REAL>::~ColourConverter()
+{
+	delete RGB ;
+	delete Luv ;
+	delete XYZ ;
+	delete Lab ;
+}
+
+template<typename REAL>
 Geom::Vector<3,REAL> ColourConverter<REAL>::getColour(enum ColourEncoding enc) {
 	switch (enc) {
 	case (C_RGB) :

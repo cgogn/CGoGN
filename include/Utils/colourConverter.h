@@ -70,7 +70,7 @@ public: // methods
 	/**
 	 * Destructor
 	 */
-	~ColourConverter() {} ;
+	~ColourConverter() ;
 
 	/**
 	 * getR
