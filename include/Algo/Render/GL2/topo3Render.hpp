@@ -236,7 +236,7 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 				m_nbRel2++;
 			}
 			e = map.phi3(d);
-			if (d < e)
+			if (!map.isBoundaryFace(d) && (d < e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
