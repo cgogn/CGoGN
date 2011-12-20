@@ -26,43 +26,66 @@
 #define _TUTO3_H_
 
 #include "Utils/Qt/qtSimple.h"
+#include "Utils/cgognStream.h"
 
-// forward definition (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
-namespace CGoGN { namespace Utils { class VBO; } }
-namespace CGoGN { namespace Utils { class ShaderSimpleColor; class ShaderColorPerVertex; } }
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Algo/Render/GL2/topoRender.h"
+
+
 
 using namespace CGoGN ;
 
 /**
- * A class for a little interface and rendering
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
  */
+struct PFP: public PFP_STANDARD
+{
+	// definition of the type of the map
+	typedef EmbeddedMap2 MAP;
+};
+
+
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	// render
-	Algo::Render::GL2::MapRender* m_render;
+	MyQT():m_render_topo(NULL),dart_selected(NIL){}
 
-	// VBO
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_colorVBO;
-
-	// shader basic
-	Utils::ShaderSimpleColor* m_shader;
-	Utils::ShaderColorPerVertex* m_shader2;
-
-	bool m_sync;
-
-	MyQT() : m_render(NULL), m_positionVBO(NULL), m_shader(NULL), m_sync(false)
-	{}
-
-	// callbacks of simpleQT to overdefine:
 	void cb_redraw();
-
 	void cb_initGL();
+	void cb_mouseClick(int button, int x, int y);
 
-	void cb_keyPress(int code);
+protected:
+	// declaration of the map
+	PFP::MAP myMap;
+
+	// attribute handler on position;
+	PFP::TVEC3 position;
+
+	// render (for the topo)
+	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
+
+	// selected dart (mouse click)
+	Dart dart_selected;
+
+	// just for more compact writing
+	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
+	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
+	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
+	template<int X>
+	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+
+public:
+
+	// create the map (here tetrahedron
+	void createMap();
+
+	// traverse the map using markers
+	void traverseMap();
 };
+
+
 
 #endif

@@ -22,219 +22,164 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
-
-#include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/generic/cellmarker.h"
-
-#include "Geometry/vector_gen.h"
-#include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/Shaders/shaderColorPerVertex.h"
-
-
 #include "tuto3.h"
-
-MyQT* sqt1_ptr;
-MyQT* sqt2_ptr;
+#include "Algo/Geometry/boundingbox.h"
+#include "Algo/Selection/raySelector.h"
+#include "Algo/Modelisation/polyhedron.h"
 
 using namespace CGoGN ;
 
-struct PFP: public PFP_STANDARD
-{
-	// definition de la carte
-	typedef Map2 MAP;
-};
-
-void MyQT::cb_initGL()
-{
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
-	// create the render
-	m_render = new Algo::Render::GL2::MapRender();
-
-	// create VBO for position
-	m_positionVBO = new Utils::VBO();
-	m_colorVBO = new Utils::VBO();
-
-	// using simple shader with color
-	m_shader = new Utils::ShaderSimpleColor();
-	m_shader->setAttributePosition(m_positionVBO);
-
-
-	m_shader2 = new Utils::ShaderColorPerVertex();
-	m_shader2->setAttributePosition(m_positionVBO);
-	m_shader2->setAttributeColor(m_colorVBO);
-
-	registerShader(m_shader);
-	registerShader(m_shader2);
-}
-
-void MyQT::cb_redraw()
-{
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	glLineWidth(2.0f);
-	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
-	m_render->draw(m_shader, Algo::Render::GL2::LINES);
-
-	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(1.0f, 1.0f);
-	m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
-	glDisable(GL_POLYGON_OFFSET_FILL);
-}
-
-void MyQT::cb_keyPress(int code)
-{
-	switch(code)
-	{
-	case 's':
-		if (this == sqt2_ptr)
-			sqt1_ptr->synchronize(sqt2_ptr);
-		if (this == sqt1_ptr)
-			sqt2_ptr->synchronize(sqt1_ptr);
-		break;
-	}
-}
 
 int main(int argc, char **argv)
 {
-	PFP::MAP myMap;
+	//	// interface
+	QApplication app(argc, argv);
+	MyQT sqt;
+	// copy output tout Qt console of application (shift enter)
+	CGoGNout.toConsole(&sqt);
 
-	PFP::TVEC3 position ;
-	PFP::TVEC3 normal ;
-	AttributeHandler<Geom::Vec3f> color ;
+	// example code itself
+	sqt.createMap();
 
-	Dart d2 = myMap.newFace(3);
-	Dart d3 = myMap.newFace(4);
-	myMap.sewFaces(d2,d3);
+	sqt.traverseMap();
 
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-	color = myMap.addAttribute<PFP::VEC3>(VERTEX, "couleur");
+	// set help message in menu
+	sqt.setHelpMsg("Tuto 3: \nUsage of DartMarker and CellMarker\nPick of dart with mouse");
+	// final show for redraw
+	sqt.show();
 
-	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
-	color[d2] = PFP::VEC3(1.0f, 0.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	position[d2] = PFP::VEC3(2.0f, 0.0f, 0.0f);
-	color[d2] = PFP::VEC3(0.0f, 1.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	position[d2] = PFP::VEC3(1.0f, 3.0f, 0.0f);
-	color[d2] = PFP::VEC3(0.0f, 0.0f, 1.0f);
-	d2 = myMap.phi1(d2);
-	d3 = myMap.phi<11>(d3);
-	position[d3] = PFP::VEC3(0.0f, -2.0f, 0.0f);
-	color[d3] = PFP::VEC3(1.0f, 0.0f, 1.0f);
-	d3 = myMap.phi1(d3);
-	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
-	color[d3] = PFP::VEC3(0.0f, 1.0f, 1.0f);
-	d3 = myMap.phi1(d3);
 
-	//MARK !!!
+	CGoGNout << "You can pick darts dans see it's id with left mouse button"<< CGoGNendl;
 
-	// on reserve des marqueur de brins
-	DartMarkerStore mf(myMap);
-	DartMarkerStore me(myMap);
+	// and wait for the end
+	return app.exec();
+}
 
-	// avec lesquels on peut marquer des orbits
-	mf.markOrbit(FACE, d2);
-	me.markOrbit(EDGE, d2);
 
-	// les sommet sont plonges, on peut utiliser un marqueur de cellule sommet
-	CellMarker cm(myMap, VERTEX);
-	cm.mark(d3);
+void MyQT::traverseMap()
+{
 
-	for (Dart d = myMap.begin(); d!= myMap.end(); myMap.next(d))
+	//traverse cells of map using topological markers on darts
+
+	CGoGNout << "Traverse with DartMarkers:"<< CGoGNendl;
+	DartMarker dmV(myMap);
+	DartMarker dmE(myMap);
+	DartMarker dmF(myMap);
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
-		if (me.isMarked(d))
-			CGoGNout << "Dart "<< d.label() << " marque par me"<< CGoGNendl;
-		if (mf.isMarked(d))
-			CGoGNout << "Dart "<< d.label() << " marque par mf"<< CGoGNendl;
-		if (cm.isMarked(d))
-			CGoGNout << "Sommet de dart "<< d.label() << " marque par mcv"<< CGoGNendl;
+		if (!dmV.isMarked(d))
+		{
+			CGoGNout << "Vertex of dart "<<d<<CGoGNendl;
+			dmV.markOrbit(VERTEX,d);
+		}
+		if (!dmE.isMarked(d))
+		{
+			CGoGNout << "Edgee of dart "<<d<<CGoGNendl;
+			dmE.markOrbit(EDGE,d);
+		}
+		if (!dmF.isMarked(d))
+		{
+			CGoGNout << "Face of dart "<<d<<CGoGNendl;
+			dmF.markOrbit(FACE,d);
+		}
 	}
 
-	//nettoyage
-	cm.unmarkAll();
 
-	// interface:
-	QApplication app(argc, argv);
+	// traverses cells of map with markers on embedded cells.
+	// More efficients but more memory costly if cells are not already embedded.
+	// Avoid using construction of objects not ell embedded
 
-	MyQT sqt;
-	sqt1_ptr = &sqt;
+	CGoGNout << "========================="<< CGoGNendl;
+	CGoGNout << "Traverse with CellMarkers:"<< CGoGNendl;
+	CellMarker cmV(myMap,VERTEX);
+	CellMarker cmE(myMap,EDGE);
+	CellMarker cmF(myMap,FACE);
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+	{
+		if (!cmV.isMarked(d))
+		{
+			CGoGNout << "Vertex of dart "<<d<<CGoGNendl;
+			cmV.mark(d);
+		}
+		if (!cmE.isMarked(d))
+		{
+			CGoGNout << "Edgee of dart "<<d<<CGoGNendl;
+			cmE.mark(d);
+		}
+		if (!cmF.isMarked(d))
+		{
+			CGoGNout << "Face of dart "<<d<<CGoGNendl;
+			cmF.mark(d);
+		}
+	}
 
-	MyQT sqt2;
-	sqt2_ptr = &sqt2;
+	// markers are cleaned and released at destruction of DartMarkers & CellMarkers
+	// DartMarkerStore should be used if few darts are traversed
+	// DartMarkerNoUnmark can be use if you want to manage unmarking yourself
 
-	// message d'aide
-	sqt.setHelpMsg("Tuto3:\n"
-			"marker tuto\n"
-			"using two VBO & two shader");
+}
 
-    //  bounding box
+
+void MyQT::createMap()
+{
+
+	Dart d1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
+
+	Dart d2 = d1;
+
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+
+	position[d2] = PFP::VEC3(1, 0, 0);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(-1, 0, 0);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(0, 2, 0);
+	d2 = PHI<211>(d2);
+	position[d2] = PFP::VEC3(0, 1, 2);
+
+    //  bounding box of scene
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-    // envoit info BB a l'interface
-	sqt.setParamObject(lWidthObj, lPosObj.data());
+    // send BB info to interface for centering on GL screen
+	setParamObject(lWidthObj, lPosObj.data());
 
-	// show 1 pour GL context
-	sqt.show();
+	// first show for be sure that GL context is binded
+	show();
 
-	// update du VBO position (context GL necessaire)
-	sqt.m_positionVBO->updateData(position);
-	// update du VBO color
-	sqt.m_colorVBO->updateData(color);
+	// render the topo of the map without boundary darts
+	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+}
 
-	// update des primitives du renderer
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
-	// show final pour premier redraw
-	sqt.show();
+// initialization GL callback
+void MyQT::cb_initGL()
+{
+	m_render_topo = new Algo::Render::GL2::TopoRenderMapD() ;
+}
 
-	// et pour le fun une deuxieme carte et une deuxieme interface:
+// redraw GL callback (clear and swap already done)
+void MyQT::cb_redraw()
+{
+	if (dart_selected != NIL)
+		m_render_topo->overdrawDart(dart_selected, 5, 1.0f,0.0f,0.0f);
+	m_render_topo->drawTopo();
 
-	PFP::MAP myMap2;
-	PFP::TVEC3 position2 ;
-	AttributeHandler<Geom::Vec3f> color2 ;
+}
 
-	Dart dx = myMap2.newFace(4);
+// mouse picking
+void MyQT::cb_mouseClick(int button, int x, int y)
+{
+	if (button == Qt::LeftButton)
+	{
+		Dart  d = m_render_topo->picking<PFP>(myMap,allDarts,x,y);
+		if (d != NIL)
 
-	position2 = myMap2.addAttribute<PFP::VEC3>(VERTEX, "position");
-	color2 = myMap2.addAttribute<PFP::VEC3>(VERTEX, "couleur");
+			CGoGNout << "Dart "<< d <<  CGoGNendl;
+		dart_selected=d;
+		updateGL();
+	}
 
-	position2[dx] = PFP::VEC3(0.0f, 0.0f, 0.0f);
-	color2[dx] = PFP::VEC3(1.0f, 1.0f, 0.0f);
-	dx = myMap.phi1(dx);
-	position2[dx] = PFP::VEC3(2.0f, 0.0f, 0.0f);
-	color2[dx] = PFP::VEC3(0.0f, 1.0f, 0.0f);
-	dx = myMap.phi1(dx);
-	position2[dx] = PFP::VEC3(2.0f, 2.0f, 0.0f);
-	color2[dx] = PFP::VEC3(1.0f, 0.0f, 1.0f);
-	dx = myMap.phi1(dx);
-	position2[dx] = PFP::VEC3(0.0f, 2.0f, 0.0f);
-	color2[dx] = PFP::VEC3(0.0f, 1.0f, 1.0f);
-
-	sqt2.setHelpMsg("Fenetre 2!!");
-
-	sqt2.setParamObject(lWidthObj,lPosObj.data());
-
-	// show 1 pour GL context
-	sqt2.show();
-
-	// update du VBO position (context GL necessaire)
-	sqt2.m_positionVBO->updateData(position2);
-	// update du VBO color
-	sqt2.m_colorVBO->updateData(color2);
-
-	// update des primitives du renderer
-	sqt2.m_render->initPrimitives<PFP>(myMap2, allDarts, Algo::Render::GL2::TRIANGLES);
-	sqt2.m_render->initPrimitives<PFP>(myMap2, allDarts, Algo::Render::GL2::LINES);
-
-	// et on attend la fin.
-	return app.exec();
 }

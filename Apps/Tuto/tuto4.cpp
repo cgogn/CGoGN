@@ -22,215 +22,165 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
-
 #include "tuto4.h"
-
-#include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-
-#include "Geometry/matrix.h"
-#include "Geometry/vector_gen.h"
-#include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Topology/generic/cellmarker.h"
-
-#include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Render/GL2/topoRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/Shaders/shaderFlat.h"
-
-#include "Utils/cgognStream.h"
+#include "Algo/Modelisation/polyhedron.h"
 
 using namespace CGoGN ;
 
-struct PFP: public PFP_STANDARD
-{
-	// definition de la carte
-	typedef Map2 MAP;
-};
-
-PFP::MAP myMap;
-
-PFP::TVEC3 position ;
-PFP::TVEC3 normal ;
-AttributeHandler<Geom::Vec4f> color ;
-
-void MyQT::cb_initGL()
-{
-	// choose to use GL version 2
-	Utils::GLSLShader::setCurrentOGLVersion(2);
-
-	// create the render
-	m_render = new Algo::Render::GL2::MapRender();
-
-	m_render_topo = new Algo::Render::GL2::TopoRenderMapD();
-
-	// create VBO for position
-	m_positionVBO = new Utils::VBO();
-
-	// using simple shader with color
-	m_shader = new Utils::ShaderSimpleColor();
-	m_shader->setAttributePosition(m_positionVBO);
-	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
-
-	m_shader2 = new Utils::ShaderFlat();
-	m_shader2->setAttributePosition(m_positionVBO);
-
-	registerShader(m_shader);
-	registerShader(m_shader2);
-}
-
-void MyQT::cb_redraw()
-{
-	if(render_topo)
-	{
-		m_render_topo->drawTopo();
-	}
-
-	if(render_obj)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		glEnable( GL_POLYGON_OFFSET_FILL );
-		glPolygonOffset( 1.0f, 1.0f );
-		m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
-}
-
-
-void MyQT::cb_keyPress(int code)
-{
-	switch(code)
-	{
-	case 'o':
-		render_obj = !render_obj;
-		updateGL();
-		break;
-
-	case 't':
-		render_topo = !render_topo;
-		updateGL();
-		break;
-	}
-}
-
-void MyQT::button_compile()
-{
-	QString st1 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->vertexEdit->toPlainText();
-	QString st2 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->fragmentEdit->toPlainText();
-	QString st3 = dynamic_cast<Utils::QT::uiDockInterface*>(dockWidget())->geometryEdit->toPlainText();
-
-	m_shader2->reloadVertexShaderFromMemory(st1.toStdString().c_str());
-	m_shader2->reloadFragmentShaderFromMemory(st2.toStdString().c_str());
-	m_shader2->reloadGeometryShaderFromMemory(st3.toStdString().c_str());
-
-	m_shader2->recompile();
-	updateGLMatrices();
-}
-
-void MyQT::slider_explode(int x)
-{
-	m_shader2->setExplode(0.01*x);
-	updateGL();
-}
 
 int main(int argc, char **argv)
 {
-	/// Utilisation des Marker
-	position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");
-
-	Algo::Modelisation::Polyhedron<PFP> prim3(myMap, position);
-	Dart d2 = prim3.tore_topo(16, 24);
-	prim3.embedTore(1.0f,0.3f);
-
-//	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
-//	d2 = myMap.phi1(d2);
-//	position[d2] = PFP::VEC3(2.0f, 0.0f, 0.0f);
-//	d2 = myMap.phi1(d2);
-//	position[d2] = PFP::VEC3(1.0f, 3.0f, 0.0f);
-//	d2 = myMap.phi1(d2);
-//	d3 = myMap.phi<11>(d3);
-//	position[d3] = PFP::VEC3(0.0f, -2.0f, 0.0f);
-//	d3 = myMap.phi1(d3);
-//	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
-//	d3 = myMap.phi1(d3);
-
-//	unsigned int idAttV2 = myMap.addAttribute<float>(VERTEX,"reel");
-//	PFP::AttributeHandler<float> tableReels(idAttV2,VERTEX,myMap);
-//
-//	tableReels[d2] = 3.5f;
-//	tableReels[myMap.phi1(d2)] = 3.7f;
-//
-//	// Attention ici on cree un attribut de FACE donc les face sont maintenant plangees
-//	// l'attribut cree se detruira a la fin de la portee de l'objet
-//	PFP::MAP::AutoAttributeHandler<Geom::Vec3f> tableRGB(myMap, FACE, "RGB"); // "RGB" optionnel
-//
-//	tableRGB[d3] = Geom::Vec3f(1.0f,2.0f,3.0f);
-//
-//	// acces par les brins
-//	for (Dart d = myMap.begin(); d!= myMap.end(); myMap.next(d))
-//	{
-//		CGoGNout << "Brin "<<d.label()<< " reel="<<tableReels[d]<< "  RGB="<<tableRGB[d]<<CGoGNendl;
-//	}
-//
-//	//acces direct par balayge du tableau
-//	for (unsigned int id = tableRGB.begin(); id != tableRGB.end(); tableRGB.next(id))
-//	{
-//		CGoGNout << "RGB["<<id<<"] = "<<tableRGB.at(id)<<CGoGNendl;
-//	}
-
-	CellMarkerStore cm(myMap, VERTEX);
-
-	Dart d3 = myMap.phi1(d2);
-	cm.mark(d2);
-	cm.mark(d3);
-	cm.unmarkAll();
-
-	// interface:
+	//	// interface
 	QApplication app(argc, argv);
 	MyQT sqt;
+	// copy output tout Qt console of application (shift enter)
+	CGoGNout.toConsole(&sqt);
 
-	// interface de tuto5.ui
-    Utils::QT::uiDockInterface dock;
-    sqt.setDock(&dock);
+	// example code itself
+	sqt.createMap();
 
-	// message d'aide
-	sqt.setHelpMsg("Tuto4");
+	sqt.traverseMap();
 
-    //  bounding box
+	// set help message in menu
+	sqt.setHelpMsg("Tuto 3: \nUsage of DartMarker and CellMarker\nPick of dart with mouse");
+	// final show for redraw
+	sqt.show();
+
+
+	CGoGNout << "You can pick darts dans see incident/dajacent cells (one dart) with click/shift click/ctrl click"<< CGoGNendl;
+
+	// and wait for the end
+	return app.exec();
+}
+
+
+// example of usage of traversor for local traverse
+void MyQT::cb_mouseClick(int button, int x, int y)
+{
+
+	if (button == Qt::LeftButton)
+	{
+		Dart  d = m_render_topo->picking<PFP>(myMap,allDarts,x,y);
+		if (d != NIL)
+		{
+			dart_selected.clear();
+			// EDGES INCIDENT TO VERTEX
+			if (Shift())
+			{
+				Traversor2VE<PFP::MAP> tra(myMap,d);
+				for (Dart e=tra.begin(); e!=tra.end(); e=tra.next())
+					dart_selected.push_back(e);
+				CGoGNout << "traverse edges incident to a vertex" << CGoGNendl;
+				color = Geom::Vec3f(1,0,0);
+			}
+			// EDGES INCIDENT TO FACES
+			else if (Control())
+			{
+				Traversor2FE<PFP::MAP> tra(myMap,d);
+				for (Dart e=tra.begin(); e!=tra.end(); e=tra.next())
+					dart_selected.push_back(e);
+				CGoGNout << "traverse edges incident to a face (its boundary)" << CGoGNendl;
+				color = Geom::Vec3f(0,1,0);
+			}
+			// VERTICES ADJACENT TO VERTEX BY A FACE
+			else
+			{
+				Traversor2VVaF<PFP::MAP> tra(myMap,d);
+				for (Dart e=tra.begin(); e!=tra.end(); e=tra.next())
+					dart_selected.push_back(e);
+				CGoGNout << "traverse vertices adjacent to vertex by a face " << CGoGNendl;
+				color = Geom::Vec3f(1,1,0);
+
+			}
+		}
+		updateGL();
+	}
+}
+
+
+void MyQT::traverseMap()
+{
+	//traverse cells with traversor
+
+	CGoGNout << "Traverse with Vertex Traversor:  "<< CGoGNendl;
+	TraversorV<PFP::MAP> traV(myMap);
+	for (Dart d=traV.begin(); d!=traV.end(); d=traV.next())
+		CGoGNout << "Vertex of dart "<<d<< CGoGNendl;
+
+	CGoGNout << "Traverse with Edge Traversor:  "<< CGoGNendl;
+	TraversorE<PFP::MAP> traE(myMap);
+	for (Dart d=traE.begin(); d!=traE.end(); d=traE.next())
+		CGoGNout << "Edge of dart "<<d<< CGoGNendl;
+
+	CGoGNout << "Traverse with Face Traversor:  "<< CGoGNendl;
+	TraversorF<PFP::MAP> traF(myMap);
+	for (Dart d=traF.begin(); d!=traF.end(); d=traF.next())
+		CGoGNout << "Face of dart "<<d<< CGoGNendl;
+
+}
+
+
+
+
+void MyQT::createMap()
+{
+
+	Dart d1 = Algo::Modelisation::Polyhedron<PFP>::createHexa(myMap);
+
+	Dart d2 = d1;
+
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+
+	position[d2] = PFP::VEC3(1, 0, 0);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(0, 0, 0);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(0, 1, 0);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(1, 1, 0);
+	d2 = PHI<2112>(d2);
+	position[d2] = PFP::VEC3(1, 0, 1);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(1, 1, 1);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(0, 1, 1);
+	d2 = PHI1(d2);
+	position[d2] = PFP::VEC3(0, 0, 1);
+
+    //  bounding box of scene
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-    // envoit info BB a l'interface
-	sqt.setParamObject(lWidthObj,lPosObj.data());
+    // send BB info to interface for centering on GL screen
+	setParamObject(lWidthObj, lPosObj.data());
 
-	sqt.setCallBack( dock.compileButton, SIGNAL(clicked()), SLOT(button_compile()) );
-	sqt.setCallBack( dock.explodeSlider, SIGNAL(valueChanged(int)), SLOT(slider_explode(int)) );
-
-	// show 1 pour GL context
-	sqt.show();
-
-	// update du VBO position (context GL necessaire)
-	sqt.m_positionVBO->updateData(position);
-
-	// update des primitives du renderer
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-
-	sqt.m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
-
-	dock.vertexEdit->setPlainText(QString(sqt.m_shader2->getVertexShaderSrc()));
-	dock.fragmentEdit->setPlainText(QString(sqt.m_shader2->getFragmentShaderSrc()));
-	dock.geometryEdit->setPlainText(QString(sqt.m_shader2->getGeometryShaderSrc()));
-	// show final pour premier redraw
-	sqt.show();
-
-	CGoGNout.toConsole(&sqt);
-	CGoGNerr.toConsole(&sqt);
-
-	// et on attend la fin.
-	return app.exec();
+	// first show for be sure that GL context is binded
+	show();
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
 }
+
+
+// initialization GL callback
+void MyQT::cb_initGL()
+{
+	m_render_topo = new Algo::Render::GL2::TopoRenderMapD() ;
+}
+
+// redraw GL callback (clear and swap already done)
+void MyQT::cb_redraw()
+{
+	if (!dart_selected.empty())
+	for (std::vector<Dart>::iterator it = dart_selected.begin(); it != dart_selected.end(); ++it)
+	{
+		m_render_topo->overdrawDart(*it, 5, color[0],color[1],color[2]);
+	}
+	m_render_topo->drawTopo();
+
+}
+
+
+
+
+
