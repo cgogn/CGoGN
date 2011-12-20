@@ -1,14 +1,14 @@
 #!/bin/bash
 
 if test $# -lt 1; then
-	echo $0 application_repertory
+	echo $0 application_directory
 	exit 2
 fi
 
 echo "Warning do not forget to check the CGoGN_ROOT_DIR variable (ccmake)"
 
 if test -d $PWD/$1; then
-	echo Repertory $1 already exist
+	echo Directory $1 already exist
 	exit 3
 fi
 

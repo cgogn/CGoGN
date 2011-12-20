@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if test $# -lt 1; then
-	echo $0 application_repertory [src_files]
+	echo $0 application_directory [src_files]
 	exit 2
 fi
 
 if test -d $PWD/$1; then
-	echo Repertory $1 already exist
+	echo Directory $1 already exist
 	exit 3
 fi
 
@@ -64,7 +64,7 @@ echo link_directories\( \$\{CGoGN_ROOT_DIR\}/lib/Debug/ \$\{CGoGN_ROOT_DIR\}/lib
 echo ""  >> CMakeLists.txt
 echo QT4_WRAP_UI\( ${apps}_ui \$\{CMAKE_SOURCE_DIR\}/${apps}.ui \)  >> CMakeLists.txt
 echo QT4_WRAP_CPP\( ${apps}_moc \$\{CMAKE_SOURCE_DIR\}/${apps}.h \)  >> CMakeLists.txt
-echo ""  >> CMakeLists.tx
+echo ""  >> CMakeLists.txt
 echo add_executable\( ${apps}D $sources >> CMakeLists.txt
 echo "	" \$\{${apps}_moc\}  >> CMakeLists.txt
 echo "	" \$\{${apps}_ui\} \)  >> CMakeLists.txt
@@ -88,7 +88,7 @@ echo link_directories\( \$\{CGoGN_ROOT_DIR\}/lib/Release \$\{Boost_LIBRARY_DIRS\
 echo ""  >> CMakeLists.txt
 echo QT4_WRAP_UI\( ${apps}_ui \$\{CMAKE_SOURCE_DIR\}/${apps}.ui \)  >> CMakeLists.txt
 echo QT4_WRAP_CPP\( ${apps}_moc \$\{CMAKE_SOURCE_DIR\}/${apps}.h \)  >> CMakeLists.txt
-echo ""  >> CMakeLists.tx
+echo ""  >> CMakeLists.txt
 echo add_executable\( ${apps} $sources >> CMakeLists.txt
 echo "	" \$\{${apps}_moc\}  >> CMakeLists.txt
 echo "	" \$\{${apps}_ui\} \)  >> CMakeLists.txt
@@ -128,12 +128,14 @@ echo \#include \"Utils/Qt/qtui.h\" >> ${apps}.h
 echo "" >> ${apps}.h
 echo "using namespace CGoGN;" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "class ${apps}: public Utils::QT::SimpleQT" >> ${apps}.h
+echo "class ${apps^}: public Utils::QT::SimpleQT" >> ${apps}.h
 echo "{" >> ${apps}.h
 echo "	Q_OBJECT" >> ${apps}.h
 echo "public:" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "	${apps}() {}" >> ${apps}.h
+echo "	${apps^}() {}" >> ${apps}.h
+echo "" >> ${apps}.h
+echo "	~${apps^}() {}" >> ${apps}.h
 echo "" >> ${apps}.h
 echo "	void cb_redraw();" >> ${apps}.h
 echo "" >> ${apps}.h
@@ -186,10 +188,10 @@ echo "**************************************************************************
 echo "" >> ${apps}.cpp
 echo \#include \"${apps}.h\" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
-echo "void Interface::cb_initGL()" >> ${apps}.cpp
+echo "void ${apps^}::cb_initGL()" >> ${apps}.cpp
 echo "{}" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
-echo "void Interface::cb_redraw()" >> ${apps}.cpp
+echo "void ${apps^}::cb_redraw()" >> ${apps}.cpp
 echo "{}" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 
@@ -197,7 +199,8 @@ echo "int main(int argc, char **argv)" >> ${apps}.cpp
 echo "{" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 echo "	QApplication app(argc, argv);" >> ${apps}.cpp
-echo "	${apps} sqt;" >> ${apps}.cpp
+echo "	${apps^} sqt;" >> ${apps}.cpp
+echo "	"sqt.setWindowTitle\(\"${apps^}\"\)\; >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 echo "	Utils::QT::uiDockInterface dock;" >> ${apps}.cpp
 echo "	sqt.setDock(&dock);" >> ${apps}.cpp
@@ -238,7 +241,7 @@ echo "  <property name=\"features\">" >> ${apps}.ui
 echo "   <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>" >> ${apps}.ui
 echo "  </property>" >> ${apps}.ui
 echo "  <property name=\"allowedAreas\">" >> ${apps}.ui
-echo "   <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>" >> ${apps}.uit
+echo "   <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>" >> ${apps}.ui
 echo "  </property>" >> ${apps}.ui
 echo "  <property name=\"windowTitle\">" >> ${apps}.ui
 echo "   <string>Control</string>" >> ${apps}.ui
