@@ -27,6 +27,17 @@
 namespace CGoGN
 {
 
+void GMap0::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		Dart& d = m_beta0->operator [](i);
+		Dart e = Dart(oldnew[d.index]);
+		if (d != e)
+			d = e;
+	}
+}
+
 /*! @name Constructors and Destructors
  *  To generate or delete edges in a 0-G-map
  *************************************************************************/
@@ -43,17 +54,6 @@ void GMap0::deleteEdge(Dart d)
 {
 	deleteDart(beta0(d));
 	deleteDart(d);
-}
-
-void GMap0::compactTopoRelations(const std::vector<unsigned int>& oldnew)
-{
-	for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		Dart& d = m_beta0->operator [](i);
-		Dart e = Dart(oldnew[d.index]);
-		if (d!=e)
-			d = e;
-	}
 }
 
 } // namespace CGoGN

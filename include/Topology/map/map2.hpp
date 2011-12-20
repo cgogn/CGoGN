@@ -54,7 +54,6 @@ inline void Map2::clear(bool removeAttrib)
 		init() ;
 }
 
-
 inline void Map2::update_topo_shortcuts()
 {
 	Map1::update_topo_shortcuts();

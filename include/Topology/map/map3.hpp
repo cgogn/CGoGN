@@ -22,11 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <list>
-#include <set>
-#include <map>
-#include <vector>
-
 namespace CGoGN
 {
 
@@ -56,7 +51,6 @@ inline void Map3::clear(bool removeAttrib)
 	if (removeAttrib)
 		init() ;
 }
-
 
 inline void Map3::update_topo_shortcuts()
 {

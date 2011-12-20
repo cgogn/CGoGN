@@ -27,6 +27,37 @@
 namespace CGoGN
 {
 
+void Map3::compactTopoRelations(const std::vector<unsigned int>& oldnew)
+{
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		{
+			Dart& d = m_phi1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_phi_1->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_phi2->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+		{
+			Dart& d = m_phi3->operator [](i);
+			Dart e = Dart(oldnew[d.index]);
+			if (d != e)
+				d = e;
+		}
+	}
+}
+
 /*! @name Generator and Deletor
  *  To generate or delete volumes in a 3-map
  *************************************************************************/
@@ -223,55 +254,86 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 {
 	Dart resV = NIL;
 
-	Dart e = d;
+	Dart dit = d;
 
-	//stocke un brin par volume autour de l'arete
-	std::vector<Dart> tmp;
-	tmp.reserve(32);
 	do
 	{
-		tmp.push_back(e);
-		e = alpha2(e);
-	} while (e != d);
+		Dart e = dit;
+		dit = alpha2(dit);
 
-	//contraction de la 2 carte de chaque 2-arete
-	for (std::vector<Dart>::iterator it = tmp.begin(); it != tmp.end(); ++it)
-	{
-		//un brin d'une face adjacente a l'arrete contracte
-		Dart d = phi2(phi_1(*it));
-		Map2::collapseEdge(*it, false);
+		//test si un seul polyedre autour de l'arete
+		if(e == dit)
+			resV == phi3(phi2(phi1(e)));
 
-		//test de la degeneresence
-		//impossible d'avoir un volume de moins de 4 faces sans avoir de phi2 en points fixe donc on les vire
-		if(delDegenerateVolumes && Map2::volumeDegree(d) < 4)
+		if(delDegenerateVolumes)
 		{
-			Dart e = d;
-			//pour tous les brins de la face adjacente
-
-			do
-			{
-				Dart ee = phi3(e);
-				Dart ff = phi3(phi2(e));
-
-				//si les brins ont un voisin par phi3
-				if(ee != e)
-					phi3unsew(ee);
-
-				if(ff != phi2(e))
-					phi3unsew(ff);
-
-				//si les deux en ont un, il faut les coudres ensemble
-				if(ee != e && ff != phi2(e))
-					phi3sew(ee, ff);
-
-				//on peut supprimer les brins de cette arete
-				deleteDart(e);
-				deleteDart(phi2(e));
-				e = phi1(e);
-
-			} while (e != d);
+			Map2::collapseEdge(e, true);
+			//collapseDegeneretedVolume(e);
 		}
-	}
+		else
+			Map2::collapseEdge(e, false);
+
+		if(resV == NIL)
+		{
+
+		}
+
+
+	}while(d != dit);
+
+
+
+
+
+//	Dart e = d;
+//
+//	// stocke un brin par volume autour de l'arete
+//	std::vector<Dart> tmp;
+//	tmp.reserve(32);
+//	do
+//	{
+//		tmp.push_back(e);
+//		e = alpha2(e);
+//	} while (e != d);
+//
+//	// contraction de la 2 carte de chaque 2-arete
+//	for (std::vector<Dart>::iterator it = tmp.begin(); it != tmp.end(); ++it)
+//	{
+//		// un brin d'une face adjacente a l'arrete contracte
+//		Dart d = phi2(phi_1(*it));
+//		Map2::collapseEdge(*it, true);
+//
+//		// test de la degeneresence
+//		// impossible d'avoir un volume de moins de 4 faces sans avoir de phi2 en points fixe donc on les vire
+//		if(delDegenerateVolumes && Map2::volumeDegree(d) < 4)
+//		{
+//			Dart e = d;
+//			// pour tous les brins de la face adjacente
+//
+//			do
+//			{
+//				Dart ee = phi3(e);
+//				Dart ff = phi3(phi2(e));
+//
+//				// si les brins ont un voisin par phi3
+//				if(ee != e)
+//
+//					phi3unsew(ee);
+//				if(ff != phi2(e))
+//					phi3unsew(ff);
+//
+//				// si les deux en ont un, il faut les coudres ensemble
+//				if(ee != e && ff != phi2(e))
+//					phi3sew(ee, ff);
+//
+//				// on peut supprimer les brins de cette arete
+//				deleteDart(e);
+//				deleteDart(phi2(e));
+//				e = phi1(e);
+//
+//			} while (e != d);
+//		}
+//	}
 
 	return resV;
 }
@@ -288,6 +350,32 @@ void Map3::splitFace(Dart d, Dart e)
 
 	phi3sew(phi_1(d), phi_1(ee));
 	phi3sew(phi_1(e), phi_1(dd));
+}
+
+bool Map3::collapseDegeneretedVolume(Dart d)
+{
+	Dart e1 = phi2(d);
+	Dart e2 = phi2(phi1(d));
+
+	//Si l'une des faces est du bord
+	if(isBoundaryFace(e1) || isBoundaryFace(e2))
+	{
+		//alors simple suppression du volume degenere
+	}
+	else
+	{
+		Dart e13 = e1;
+		Dart e23 = e2;
+		if(!isBoundaryFace(e1))
+			e13 = phi3(e1);
+
+		if(!isBoundaryFace(e2))
+			e23 = phi3(e2);
+
+		//if(faceDegree(e1) < faceDegree)
+	}
+
+	return false;
 }
 
 void Map3::sewVolumes(Dart d, Dart e, bool withBoundary)
@@ -818,38 +906,6 @@ void Map3::closeMap()
 	{
 		if (phi3(d) == d)
 			closeHole(d);
-	}
-}
-
-
-void Map3::compactTopoRelations(const std::vector<unsigned int>& oldnew)
-{
-	for (unsigned int i = m_attribs[DART].begin(); i!= m_attribs[DART].end(); m_attribs[DART].next(i))
-	{
-		{
-			Dart& d = m_phi1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi_1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi2->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi3->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d!=e)
-				d = e;
-		}
 	}
 }
 

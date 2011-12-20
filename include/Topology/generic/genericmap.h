@@ -301,8 +301,8 @@ protected:
 	AttributeMultiVector<Dart>* addRelation(const std::string& name) ;
 
 	/**
-	 * Get attributeMultivector pointer of a relation attribute
-	 * @param anem name of relation
+	 * Get AttributeMultivector pointer of a relation attribute
+	 * @param name name of the relation
 	 * @return the attribute multi-vector pointer
 	 */
 	AttributeMultiVector<Dart>* getRelation(const std::string& name);
@@ -388,7 +388,7 @@ public:
 	/**
 	 * update topo relation after compacting the container:
 	 */
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew)=0;
+	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew) = 0;
 
 	/**
 	 * compact the map

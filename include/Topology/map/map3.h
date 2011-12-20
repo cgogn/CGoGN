@@ -167,6 +167,14 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Delete a volume if and only if it has a face with degree < 3 or only 3 vertices
+	/*! If the volume is sewed to two distinct adjacent volumes and if the face degree
+	 *  of the two adjacent volumes is equal then those two volumes are sewed
+	 *  @param d a dart of the face
+	 *  @return true if the collapse has been executed, false otherwise
+	 */
+	virtual bool collapseDegeneretedVolume(Dart d);
+
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same degree
 	 *  @param d a dart of the first volume
