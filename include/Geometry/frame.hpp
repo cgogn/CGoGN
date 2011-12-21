@@ -197,6 +197,7 @@ Geom::Vector<3,REAL> sphericalToCart (const Geom::Vector<3,REAL>& sph)
 template <typename REAL>
 Geom::Vector<3,REAL> rotate (Geom::Vector<3,REAL> axis, REAL angle, Geom::Vector<3,REAL> vector)
 {
+	// Algorithm extracted from : http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/ section 5
 	axis.normalize() ;
 
 	const REAL& u = axis[0] ;
