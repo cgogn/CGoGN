@@ -113,11 +113,23 @@ public:
 	Dart alpha_2(Dart d);
 	//@}
 
-//	/*! @name Topological Operators with Cells id management
-//	 *  Topological operations on Hierarchical Implicit 3-maps
-//	 *************************************************************************/
-//
-//	//@{
+	/*! @name Topological Operators with Cells id management
+	 *  Topological operations on Hierarchical Implicit 3-maps
+	 *************************************************************************/
+
+	//@{
+	//!
+	/*!
+	 *
+	 */
+	Dart beginSplittingPath(Dart d, DartMarker& m);
+
+	//!
+	/*!
+	 *
+	 */
+	void constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m);
+
 //	//!
 //	/*!
 //	 *
@@ -147,7 +159,7 @@ public:
 //	 *
 //	 */
 //	virtual void splitVolume(std::vector<Dart>& vd);
-//	//@}
+	//@}
 
 	/*! @name Levels Management
 	 *  Operations to manage the levels of an Implicit Hierarchical 3-map

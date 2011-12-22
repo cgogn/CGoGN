@@ -123,7 +123,6 @@ inline Dart ImplicitHierarchicalMap3::phi_1(Dart d)
 	return it ;
 }
 
-//TODO A verifier si besoin d'assertion
 inline Dart ImplicitHierarchicalMap3::phi2bis(Dart d)
 {
 	unsigned int faceId = m_faceId[d];

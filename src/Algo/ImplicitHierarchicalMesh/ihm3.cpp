@@ -68,6 +68,93 @@ void ImplicitHierarchicalMap3::init()
 	}
 }
 
+
+Dart ImplicitHierarchicalMap3::beginSplittingPath(Dart d, DartMarker& m)
+{
+	Dart dres = NIL;
+	Dart dit = d;
+	bool found = false;
+
+	// Recherche d'un brin de depart du chemin d'arete
+	do
+	{
+		Dart eit = phi1(dit);
+
+		if(!m.isMarked(eit) && getDartLevel(eit) == getCurrentLevel())
+		{
+			found = true;
+			dres = eit;
+		}
+
+		dit = phi2(phi_1(dit));
+	}
+	while(!found && dit != d);
+
+	return dres;
+}
+
+void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m)
+{
+
+	//Construction du chemin d'arete
+	Dart cit = d;
+
+	v.push_back(cit);
+	m.markOrbit(EDGE, cit);
+
+	do
+	{
+
+		if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit))))  == getDartLevel(d))
+		{
+			if(m.isMarked(phi1(cit)))
+			{
+				cit = phi1(phi2(phi1(cit)));
+				std::cout << "1_1" << std::endl;
+			}
+		}
+		else if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit)))) < getDartLevel(d))
+		{
+			cit = phi1(phi2(phi1(cit)));
+			std::cout << "2" << std::endl;
+		}
+		else
+			cit = phi1(cit);
+
+		v.push_back(cit);
+		m.markOrbit(EDGE, cit);
+
+
+	}
+	while(cit != d);
+
+//	do
+//	{
+//		v.push_back(cit);
+//		m.markOrbit(EDGE, cit);
+//
+//		cit = phi1(cit);
+//
+//		//std::cout << "cit = " << cit << std::endl;
+//
+//		if(std::min(getDartLevel(cit), getDartLevel(phi2(cit))) == getDartLevel(d))
+//		{
+//			if(m.isMarked(cit))
+//			{
+//				cit = phi1(phi2(cit));
+//				//std::cout << "1_1" << std::endl;
+//			}
+//		}
+//		else if(std::min(getDartLevel(cit),getDartLevel(phi2(cit))) < getDartLevel(d))
+//		{
+//			cit = phi1(phi2(cit));
+//			//std::cout << "2" << std::endl;
+//		}
+//
+//	}while(cit != d);
+
+}
+
 //Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
 //{
 //        Dart resV = EmbeddedMap3::cutEdge(d);
