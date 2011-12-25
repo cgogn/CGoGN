@@ -65,7 +65,7 @@ protected:
 	PFP::TVEC3 position;
 
 	// render (for the topo)
-	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 
 	// selected dart (mouse click)
 	Dart dart_selected;

@@ -157,7 +157,7 @@ void MyQT::createMap()
 // initialization GL callback
 void MyQT::cb_initGL()
 {
-	m_render_topo = new Algo::Render::GL2::TopoRenderMapD() ;
+	m_render_topo = new Algo::Render::GL2::TopoRender();
 }
 
 // redraw GL callback (clear and swap already done)

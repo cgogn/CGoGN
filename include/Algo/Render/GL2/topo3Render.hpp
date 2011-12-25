@@ -42,10 +42,27 @@ namespace Render
 
 namespace GL2
 {
+template<typename PFP>
+void Topo3Render::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
+{
+	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
+	if (ptrMap3 != NULL)
+	{
+		updateDataMap3<PFP>(map,positions,ke,kf,kv,good);
+	}
+	GMap3* ptrGMap3 = dynamic_cast<GMap3*>(&map);
+	if (ptrGMap3 != NULL)
+	{
+		updateDataGMap3<PFP>(map,positions,ke,kf,kv,good);
+	}
+}
+
 
 template<typename PFP>
-void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv)
+void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
+	Map3& map = reinterpret_cast<Map3&>(mapx);
+
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
@@ -56,8 +73,6 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 		if (!m_attIndex.isValid())
 			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
 	}
-
-
 
 	m_nbDarts = 0;
 
@@ -236,7 +251,7 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 				m_nbRel2++;
 			}
 			e = map.phi3(d);
-			if (!map.isBoundaryFace(d) && (d < e))
+			if (!map.isBoundaryMarked(e) && (d < e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
@@ -268,7 +283,6 @@ void Topo3RenderMapD::updateData(typename PFP::MAP& map, const FunctorSelect& go
 template<typename PFP>
 void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
-
 	m_vbo4->bind();
 	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
@@ -312,8 +326,253 @@ Dart Topo3Render::picking(typename PFP::MAP& map, const FunctorSelect& good, int
 }
 
 template<typename PFP>
-void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float kd, float ke, float kf, float kv)
+void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
+	GMap3& map = reinterpret_cast<GMap3&>(mapx);
+
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+
+	if (m_attIndex.map() != &map)
+	{
+		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+		if (!m_attIndex.isValid())
+			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+	}
+
+	m_nbDarts = 0;
+
+	// table of center of volume
+	std::vector<VEC3> vecCenters;
+	vecCenters.reserve(1000);
+	// table of nbfaces per volume
+	std::vector<unsigned int> vecNbFaces;
+	vecNbFaces.reserve(1000);
+	// table of face (one dart of each)
+	std::vector<Dart> vecDartFaces;
+	vecDartFaces.reserve(map.getNbDarts()/4);
+
+	DartMarker mark(map);					// marker for darts
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (good(d))
+		{
+			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
+			VEC3 center(0, 0, 0);
+			unsigned int nbv = 0;
+			unsigned int nbf = 0;
+			std::list<Dart> visitedFaces;	// Faces that are traversed
+			visitedFaces.push_back(d);		// Start with the face of d
+
+			// For every face added to the list
+			for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+			{
+				if (!mark.isMarked(*face))		// Face has not been visited yet
+				{
+					// store a dart of face
+					vecDartFaces.push_back(*face);
+					nbf++;
+					Dart dNext = *face ;
+					do
+					{
+						if (!markVert.isMarked(dNext))
+						{
+							markVert.mark(dNext);
+							center += positions[dNext];
+							nbv++;
+						}
+						mark.mark(dNext);					// Mark
+						m_nbDarts++;
+						Dart adj = map.phi2(dNext);				// Get adjacent face
+						if (adj != dNext && !mark.isMarked(adj))
+							visitedFaces.push_back(adj);	// Add it
+						dNext = map.phi1(dNext);
+					} while(dNext != *face);
+				}
+			}
+			center /= typename PFP::REAL(nbv);
+			vecCenters.push_back(center);
+			vecNbFaces.push_back(nbf);
+		}
+	}
+
+	m_nbDarts *=2;
+
+	// beta1
+	AutoAttributeHandler<VEC3> fv1(map, DART);
+	// beta2/3
+	AutoAttributeHandler<VEC3> fv2(map, DART);
+	AutoAttributeHandler<VEC3> fv2x(map, DART);
+
+	m_vbo4->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
+
+	m_vbo0->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
+	unsigned int posDBI=0;
+
+	std::vector<Dart>::iterator face = vecDartFaces.begin();
+	for (unsigned int iVol=0; iVol<vecNbFaces.size(); ++iVol)
+	{
+		for (unsigned int iFace = 0; iFace < vecNbFaces[iVol]; ++iFace)
+		{
+			Dart d = *face++;
+
+			std::vector<VEC3> vecPos;
+			vecPos.reserve(16);
+
+			// store the face & center
+			VEC3 center(0, 0, 0);
+			Dart dd = d;
+			do
+			{
+				const VEC3& P = positions[d];
+				vecPos.push_back(P);
+				m_attIndex[d] = posDBI;
+				posDBI+=2;
+				center += P;
+				d = map.phi1(d);
+			} while (d != dd);
+			center /= REAL(vecPos.size());
+
+			//shrink the face
+			unsigned int nb = vecPos.size();
+			float okf = 1.0f - kf;
+			float okv = 1.0f - kv;
+			for (unsigned int i = 0; i < nb; ++i)
+			{
+				vecPos[i] = vecCenters[iVol]*okv + vecPos[i]*kv;
+				vecPos[i] = center*okf + vecPos[i]*kf;
+			}
+			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
+
+			// compute position of points to use for drawing topo
+			float oke = 1.0f - ke;
+			for (unsigned int i = 0; i < nb; ++i)
+			{
+				VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
+				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
+
+				VEC3 PP = 0.52f*P + 0.48f*Q;
+				VEC3 QQ = 0.52f*Q + 0.48f*P;
+
+				*positionDartBuf++ = P;
+				*positionDartBuf++ = PP;
+				*positionDartBuf++ = Q;
+				*positionDartBuf++ = QQ;
+				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = VEC3(1.,1.,1.);
+
+				fv1[d] = P*0.9f + PP*0.1f;
+				fv2x[d] = P*0.52f + PP*0.48f;
+				fv2[d] = P*0.48f + PP*0.52f;
+				Dart dx = map.beta0(d);
+				fv1[dx] = Q*0.9f + QQ*0.1f;
+				fv2[dx] = Q*0.52f + QQ*0.48f;
+				fv2x[dx] = Q*0.48f + QQ*0.52f;
+				d = map.phi1(d);
+			}
+
+		}
+	}
+
+	m_vbo0->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	// beta1
+	m_vbo1->bind();
+	glBufferData(GL_ARRAY_BUFFER, m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	// beta2
+	m_vbo2->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	// beta3
+	m_vbo3->bind();
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
+	GLvoid* PositionBuffer3 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
+	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
+	VEC3* positionF3 = reinterpret_cast<VEC3*>(PositionBuffer3);
+
+	m_nbRel2=0;
+	m_nbRel3=0;
+
+	for(std::vector<Dart>::iterator face = vecDartFaces.begin(); face != vecDartFaces.end(); ++face)
+	{
+		Dart d = *face;
+		do
+		{
+			Dart e = map.beta2(d);
+			if (d < e)
+			{
+				*positionF2++ = fv2[d];
+				*positionF2++ = fv2x[e];
+				*positionF2++ = fv2[e];
+				*positionF2++ = fv2x[d];
+				m_nbRel2++;
+			}
+			e = map.beta3(d);
+			if (!map.isBoundaryMarked(e) && (d < e))
+			{
+				*positionF3++ = fv2[d];
+				*positionF3++ = fv2x[e];
+				*positionF3++ = fv2[e];
+				*positionF3++ = fv2x[d];
+				m_nbRel3++;
+			}
+			d = map.beta0(d);
+			e = map.beta2(d);
+			if (d < e)
+			{
+				*positionF2++ = fv2[d];
+				*positionF2++ = fv2x[e];
+				*positionF2++ = fv2[e];
+				*positionF2++ = fv2x[d];
+				m_nbRel2++;
+			}
+			e = map.beta3(d);
+			if (!map.sBoundaryMarked(e) && (d < e))
+			{
+				*positionF3++ = fv2[d];
+				*positionF3++ = fv2x[e];
+				*positionF3++ = fv2[e];
+				*positionF3++ = fv2x[d];
+				m_nbRel3++;
+			}
+			*positionF1++ = fv1[d];
+			d = map.beta1(d);
+			*positionF1++ = fv1[d];
+		} while (d != *face );
+	}
+
+	m_vbo3->bind();
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
+
+	m_vbo2->bind();
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
+
+	m_vbo1->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	m_vbo4->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+/*{
+	GMap3& map = reinterpret_cast<GMap3&>(mapx);
+
+	float kd=0.95f;
+
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
@@ -347,48 +606,51 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	CellMarker mVol(map, VOLUME);
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if(!mVol.isMarked(d))
+		if (good(d))
 		{
-			mVol.mark(d);
-			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
-			VEC3 center(0);
-			unsigned int nbVertices = 0;
-			unsigned int nbFace = 0;
-			std::list<Dart> visitedFaces;	// Faces that are traversed
-			visitedFaces.push_back(d);		// Start with the face of d
-
-			// For every face added to the list
-			for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+			if(!mVol.isMarked(d))
 			{
-				if (!mark.isMarked(*face))		// Face has not been visited yet
+				mVol.mark(d);
+				CellMarkerStore markVert(map, VERTEX);		//marker for vertices
+				VEC3 center(0);
+				unsigned int nbVertices = 0;
+				unsigned int nbFace = 0;
+				std::list<Dart> visitedFaces;	// Faces that are traversed
+				visitedFaces.push_back(d);		// Start with the face of d
+	
+				// For every face added to the list
+				for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 				{
-					// store a dart of face
-					vecDartFaces.push_back(*face);
-					nbFace++;
-					Dart dNext = *face ;
-					do
+					if (!mark.isMarked(*face))		// Face has not been visited yet
 					{
-						mark.mark(dNext); // Mark
-						m_nbDarts++;
-
-						if (!markVert.isMarked(dNext))
+						// store a dart of face
+						vecDartFaces.push_back(*face);
+						nbFace++;
+						Dart dNext = *face ;
+						do
 						{
-							markVert.mark(dNext);
-							center += positions[dNext];
-							nbVertices++;
-						}
+							mark.mark(dNext); // Mark
+							m_nbDarts++;
+	
+							if (!markVert.isMarked(dNext))
+							{
+								markVert.mark(dNext);
+								center += positions[dNext];
+								nbVertices++;
+							}
 
-						Dart adj = map.phi2(dNext); // add adjacent face if not done already
-						if (adj != dNext && !mark.isMarked(adj))
-							visitedFaces.push_back(adj);
+							Dart adj = map.phi2(dNext); // add adjacent face if not done already
+							if (adj != dNext && !mark.isMarked(adj))
+								visitedFaces.push_back(adj);
 
-						dNext = map.phi1(dNext);
-					} while(dNext != *face);
+							dNext = map.phi1(dNext);
+						} while(dNext != *face);
+					}
 				}
+				center /= typename PFP::REAL(nbVertices);
+				vecVolCenters.push_back(center);
+				vecNbFaces.push_back(nbFace);
 			}
-			center /= typename PFP::REAL(nbVertices);
-			vecVolCenters.push_back(center);
-			vecNbFaces.push_back(nbFace);
 		}
 	}
 
@@ -558,6 +820,7 @@ void Topo3RenderGMap::updateData(typename PFP::MAP& map, const FunctorSelect& go
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 }
+*/
 
 
 

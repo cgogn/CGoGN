@@ -60,9 +60,9 @@ protected:
 	/**
 	* vbo buffers
 	* 0: vertices darts
-	* 1: vertices phi1
-	* 2: vertices phi2
-	* 3: vertices phi3
+	* 1: vertices phi1 / beta1
+	* 2: vertices phi2 / beta2
+	* 3: vertices phi3 / beta3
 	* 4: colors
 	*/
 	Utils::VBO* m_vbo0;
@@ -238,8 +238,6 @@ public:
 	 */
 	void overdrawDart(Dart d, float width, float r, float g, float b);
 
-
-
 	/*
 	 * store darts in color for picking
 	 * @param map the map (must be the same than during updating data)
@@ -247,8 +245,6 @@ public:
 	 */
 	template<typename PFP>
 	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
-
-
 
 	/**
 	 * pick dart with color set bey setDartsIdColor
@@ -262,13 +258,6 @@ public:
 	template<typename PFP>
 	Dart picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y);
 
-};
-
-
-
-class Topo3RenderMapD: public Topo3Render
-{
-public:
 	/**
 	* update all drawing buffers to render a dual map
 	* @param map the map
@@ -279,27 +268,37 @@ public:
  	* @param kv exploding coef for face
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
-};
+	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
 
-
-class Topo3RenderGMap: public Topo3Render
-{
-public:
+protected:
 	/**
-	* update all drawing buffers to render a gmap
+	* update all drawing buffers to render a dual map
 	* @param map the map
-	* @param good selector
 	* @param positions  attribute of position vertices
 	* @param ke exploding coef for edge
 	* @param kf exploding coef for face
  	* @param kv exploding coef for face
+	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float kd, float ke, float kf, float kv);
+	void updateDataMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+
+	/**
+	* update all drawing buffers to render a gmap
+	* @param map the map
+	* @param positions  attribute of position vertices
+	* @param ke exploding coef for edge
+	* @param kf exploding coef for face
+ 	* @param kv exploding coef for face
+	* @param good selector
+	*/
+	template<typename PFP>
+	void updateDataGMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+
 };
 
-}//end namespace VBO
+
+}//end namespace GL2
 
 }//end namespace Algo
 

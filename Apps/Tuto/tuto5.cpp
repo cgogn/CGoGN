@@ -22,13 +22,18 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "tuto5.h"
+#define WITH_GMAP 1
 
+
+#include "tuto5.h"
 #include <iostream>
 
 #include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap3.h"
-
+#ifdef WITH_GMAP
+	#include "Topology/gmap/embeddedGMap3.h"
+#else
+	#include "Topology/map/embeddedMap3.h"
+#endif
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -55,7 +60,11 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
+#ifdef WITH_GMAP
+	typedef EmbeddedGMap3 MAP;
+#else
 	typedef EmbeddedMap3 MAP;
+#endif
 };
 
 PFP::MAP myMap;
@@ -143,7 +152,7 @@ void MyQT::cb_initGL()
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
 
-    m_render_topo = new Algo::Render::GL2::Topo3RenderMapD();
+    m_render_topo = new Algo::Render::GL2::Topo3Render();
 
  	// create VBO for position
 	m_positionVBO = new Utils::VBO();
@@ -190,7 +199,7 @@ void MyQT::cb_initGL()
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, nb, position,  0.9f, 0.9f, 0.9f);
+	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
 
 
 	// timer example for animation

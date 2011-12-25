@@ -36,7 +36,7 @@
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3RenderMapD; } } } }
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3Render; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
 namespace CGoGN { namespace Utils { class Strings3D; } }
@@ -63,7 +63,7 @@ class MyQT: public Utils::QT::SimpleQT
     bool render_topo;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
+	Algo::Render::GL2::Topo3Render* m_render_topo;
 
 	Utils::VBO* m_positionVBO;
 	Utils::VBO* m_dataVBO;

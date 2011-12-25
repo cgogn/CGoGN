@@ -62,7 +62,7 @@ Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 	Dart d = GMap1::newFace(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = GMap1::newFace(nbEdges);
+		Dart e = GMap1::newBoundaryFace(nbEdges);
 
 		Dart it = d;
 		do
