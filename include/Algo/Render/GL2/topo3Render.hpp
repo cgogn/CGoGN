@@ -542,7 +542,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 				m_nbRel2++;
 			}
 			e = map.beta3(d);
-			if (!map.sBoundaryMarked(e) && (d < e))
+			if (!map.isBoundaryMarked(e) && (d < e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
