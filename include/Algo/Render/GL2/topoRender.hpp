@@ -343,7 +343,6 @@ void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 template<typename PFP>
 void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
-
 	m_vbo3->bind();
 	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
@@ -370,7 +369,8 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 		else
 		{
 			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
-			d = map.end();
+			//d = map.end();
+			break;
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
