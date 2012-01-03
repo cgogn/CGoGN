@@ -211,8 +211,8 @@ public:
 };
 
 // just for compatibility with old code
-typedef TopoRender TopoMapRenderMapD;
-typedef TopoRender TopoMapRenderGMap;
+typedef TopoRender TopoRenderMapD;
+typedef TopoRender TopoRenderGMap;
 
 
 } // namespace GL2
