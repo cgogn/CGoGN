@@ -719,7 +719,7 @@ template< typename  DataType >
 Image<DataType>* Image<DataType>::cropz(unsigned int zmin, unsigned int nb)
 {
 
-	unsigned int zmax = zmin+nb;
+	int zmax = zmin+nb;
 	if (zmax> m_WZ)
 	{
 		zmax = m_WZ;
