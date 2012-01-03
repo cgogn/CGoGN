@@ -89,6 +89,9 @@ void rotateX(T angle, Matrix<4,4,T>& mat);
 template <typename T>
 void rotate(T axis_x, T axis_y, T axis_z, T angle, Matrix<4,4,T>& mat);
 
+template <typename T>
+void rotate(Vector<3,T>& axis, T angle, Matrix<4,4,T>& mat);
+
 /**
  * Apply a transformation (stored in matrix) to a 3D point
  * @param P the point to transfo

@@ -431,7 +431,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 	if (top_closed)
 	{
 		Dart d =  m_map.phi_1(m_tableVertDarts[n*z]);
-		if(m_map.closeHole(d, true))
+		if(m_map.closeHole(d, false))
 		{
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
