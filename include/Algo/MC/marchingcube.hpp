@@ -1240,9 +1240,8 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 			else
 				mf.markOrbit(FACE,dd);
 		}
+		else m_map->next(d);
 	}
-
-
 
 }
 
