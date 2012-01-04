@@ -98,7 +98,7 @@ void rotate(Vector<3,T>& axis, T angle, Matrix<4,4,T>& mat);
  * @param mat the transformation matrix
  */
 template <typename T>
-Vector<3,T> transform(const Vector<3,T>& P,const Matrix<4,4,T>& mat);
+Vector<3,T> transform(const Vector<3,T>& P, const Matrix<4,4,T>& mat);
 
 } // namespace Geom
 

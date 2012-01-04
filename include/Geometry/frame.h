@@ -22,14 +22,16 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef LOCALFRAME_H_
-#define LOCALFRAME_H_
+#ifndef _FRAME_H_
+#define _FRAME_H_
 
 #include <cmath>
 
-namespace CGoGN {
+namespace CGoGN
+{
 
-namespace Geom {
+namespace Geom
+{
 
 /**
  * Util for rotation of a 3D point (or vector) around a given line (going through the origin) and of a given angle
@@ -213,10 +215,10 @@ private : // private constants
 
 } ;
 
-} // Geom
+} // namespace Geom
 
-} // CGoGN
+} // namespace CGoGN
 
-#include "frame.hpp"
+#include "Geometry/frame.hpp"
 
-#endif /* LOCALFRAME_H_ */
+#endif /* _FRAME_H_ */
