@@ -1,5 +1,14 @@
 //#define DEBUG
 
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace MovingObjects
+{
+
 template <typename PFP>
 void ParticleCell2DAndHalf<PFP>::display()
 {
@@ -11,23 +20,23 @@ void ParticleCell2DAndHalf<PFP>::display()
 template <typename PFP>
 typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::pointInFace(Dart d)
 {
-	const VEC3& p1(m_positions[d]);
-	Dart dd=m.phi1(d);
-	const VEC3& p2(m_positions[dd]);
-	dd=m.phi1(dd);
-	VEC3& p3(m_positions[dd]);
+	const VEC3& p1(m_positions[d]) ;
+	Dart dd = m.phi1(d) ;
+	const VEC3& p2(m_positions[dd]) ;
+	dd = m.phi1(dd) ;
+	VEC3& p3(m_positions[dd]) ;
 
-	VEC3 v1(p2-p1);
+	VEC3 v1(p2 - p1) ;
 
-	while((v1^VEC3(p3-p1)).norm2()==0.0f)
+	while ((v1 ^ VEC3(p3 - p1)).norm2() == 0.0f)
 	{
-		dd = m.phi1(dd);
-		p3 = m_positions[dd];
+		dd = m.phi1(dd) ;
+		p3 = m_positions[dd] ;
 	}
 
-	CGoGNout << "pointInFace " << (p1+p3)*0.5f << CGoGNendl;
+	CGoGNout << "pointInFace " << (p1 + p3) * 0.5f << CGoGNendl ;
 
-	return (p1+p3)*0.5f;
+	return (p1 + p3) * 0.5f ;
 }
 
 template <typename PFP>
@@ -36,10 +45,10 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationEdge(const VEC3& p
 	const VEC3& endPoint = m_positions[m.phi2(d)];
 	const VEC3& vertexPoint = m_positions[d];
 
-	const VEC3& n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+	const VEC3& n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
 
 	//orientation relative to the plane orthogonal to the face going through the edge
-	return Geom::testOrientation3D(point,vertexPoint, endPoint, vertexPoint+n1);
+	return Geom::testOrientation3D(point, vertexPoint, endPoint, vertexPoint+n1);
 }
 
 template <typename PFP>
@@ -50,9 +59,9 @@ typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::intersectLineEdge(const VEC3& pA,
 	VEC3 Inter;
 
 	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
-	VEC3 n = (q2-q1) ^ n1 ;
+	VEC3 n = (q2 - q1) ^ n1 ;
 
-	Geom::intersectionLinePlane(pA,pB-pA,q1,n,Inter);
+	Geom::intersectionLinePlane(pA, pB - pA, q1, n, Inter) ;
 
 	Geom::Plane3D<float> pl = Algo::Geometry::facePlane<PFP>(m,d,m_positions);
 	pl.project(Inter);
@@ -65,7 +74,7 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationFace(VEC3 point, V
 {
 	const VEC3& dPoint = m_positions[d];
 
-	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
 
 	return Geom::testOrientation3D(point, sourcePoint, dPoint+n1, dPoint);
 }
@@ -221,14 +230,14 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
  	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
-	//project current within plane
+	//project current within face plane
 	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
-	VEC3 n2 = current-m_position;
-	n1.normalize();
-	VEC3 n3 = n1^n2;
+	VEC3 n2 = current - m_position;
+//	n1.normalize();
+	VEC3 n3 = n1 ^ n2;
 	n3.normalize();
-	VEC3 n4 = n3^n1;
-	current = m_position+(n2*n4)*n4;
+	VEC3 n4 = n3 ^ n1;
+	current = m_position + (n2 * n4) * n4;
 
 	//track new position within map
 	Dart dd = d;
@@ -327,7 +336,7 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
 	{
 	case Geom::UNDER :
 		m_position = current;
-		state = FACE;;
+		state = FACE;
 		break;
 	default :
 		if(wsoe == Geom::ON)
@@ -349,3 +358,9 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
 		}
 	}
 }
+
+} // namespace MovingObjects
+
+} // namespace Algo
+
+} // namespace CGoGN
