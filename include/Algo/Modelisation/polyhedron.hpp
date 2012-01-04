@@ -597,7 +597,7 @@ Dart Polyhedron<PFP>::cube_topo(unsigned int x, unsigned int y, unsigned int z)
 {
 	if (m_kind != NONE) return m_dart;
 
-	m_dart = cylinder_topo(2*(x+y),z, false,false);
+	m_dart = cylinder_topo(2*(x+y), z, false, false);
 	m_kind = CUBE;
 	m_nx = x;
 	m_ny = y;
@@ -697,17 +697,17 @@ Dart Polyhedron<PFP>::tore_topo(unsigned int m, unsigned int n)
 	if (m_kind != NONE) return m_dart;
 
 	m_dart = cylinder_topo(n, m, false, false);
-	m_nx=n;
-	m_ny=m;
+	m_nx = n;
+	m_ny = m;
 	m_kind = TORE;
 
-	// juste finish to sew
+	// just finish to sew
 	for(unsigned int i = 0; i < n; ++i)
 	{
 		Dart d = m_tableVertDarts[i];
 		Dart e = m_tableVertDarts[(m*n)+i];
 		e = m_map.phi_1(e);
-		m_map.sewFaces(d, e, true);
+		m_map.sewFaces(d, e);
 	}
 
 	// remove the last n vertex darts that are no more necessary (sewed with n first)
@@ -722,7 +722,8 @@ void Polyhedron<PFP>::embedGrid(float x, float y, float z)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	if (m_kind != GRID) {
+	if (m_kind != GRID)
+	{
 		CGoGNerr << "Warning try to embedGrid something that is not a grid"<<CGoGNendl;
 		return;
 	}
