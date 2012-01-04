@@ -146,6 +146,32 @@ public:
 	FunctorSelect* copy() const { return new SelectorEdgeNoBoundary(m_map);}
 };
 
+template <typename MAP>
+class SelectorDartBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorDartBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return m_map.isBoundaryMarked(d); }
+	FunctorSelect* copy() const { return new SelectorDartBoundary(m_map);}
+};
+
+
+template <typename MAP>
+class SelectorDartNoBoundary : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+public:
+	SelectorDartNoBoundary(MAP& m): m_map(m) {}
+	bool operator()(Dart d) const { return !m_map.isBoundaryMarked(d); }
+	FunctorSelect* copy() const { return new SelectorDartNoBoundary(m_map);}
+};
+
+
 //
 //class SelectorDartMarked : public FunctorSelect
 //{

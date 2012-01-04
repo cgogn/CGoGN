@@ -158,7 +158,8 @@ void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC
 		Dart d = *id;
 
 		Dart e = map.phi2(d);
-		if (e.index > d.index)
+
+		if (good(e) && (e.index > d.index))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
