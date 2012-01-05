@@ -24,6 +24,7 @@
 
 #include "Algo/MC/windowing.h"
 #include "Topology/generic/dartmarker.h"
+#include <vector>
 
 namespace CGoGN
 {
@@ -1221,11 +1222,11 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 			boundVertices[it] = 0;
 	}
 
-	// traverse face and check if all vertices are bound
+//	 traverse face and check if all vertices are bound
 	DartMarker mf(*m_map);
-	for (Dart d = m_map->begin(); d != m_map->end();)
+	for (Dart d = m_map->begin(); d != m_map->end();)	// next done inside loop because of deleteFace
 	{
-		if (!mf.isMarked(d))
+		if (!mf.isMarked(d) && !m_map->isBoundaryMarked(d))
 		{
 			Dart dd = d;
 			Dart e = m_map->phi1(d);
@@ -1236,12 +1237,32 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 				m_map->next(d);
 			}
 			if ((boundVertices[dd]!=0) && (boundVertices[e]!=0) && (boundVertices[f]!=0))
-				m_map->deleteFace(dd);
+				m_map->deleteFace(dd,false);
 			else
 				mf.markOrbit(FACE,dd);
 		}
 		else m_map->next(d);
 	}
+	m_map->closeMap();
+
+////	 VERSION USING DELETE FACE WITH BOUNDARY
+//	DartMarker mf(*m_map);
+//	std::vector<Dart> vecF;
+//	vecF.reserve(8192);
+//	for (Dart d = m_map->begin(); d != m_map->end();m_map->next(d))	// next done inside loop because of deleteFace
+//	{
+//		if ((!mf.isMarked(d)) && (!m_map->isBoundaryMarked(d)) )
+//		{
+//			Dart dd = d;
+//			Dart e = m_map->phi1(d);
+//			Dart f = m_map->phi1(e);
+//			if ((boundVertices[dd]!=0) && (boundVertices[e]!=0) && (boundVertices[f]!=0))
+//				vecF.push_back(d);
+//			mf.markOrbit(FACE,dd);
+//		}
+//	}
+//	for (std::vector<Dart>::iterator it = vecF.begin(); it != vecF.end(); ++it)
+//		m_map->deleteFace(*it);
 
 }
 
