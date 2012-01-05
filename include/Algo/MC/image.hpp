@@ -719,7 +719,7 @@ template< typename  DataType >
 Image<DataType>* Image<DataType>::cropz(unsigned int zmin, unsigned int nb)
 {
 
-	unsigned int zmax = zmin+nb;
+	int zmax = zmin+nb;
 	if (zmax> m_WZ)
 	{
 		zmax = m_WZ;
@@ -731,7 +731,7 @@ Image<DataType>* Image<DataType>::cropz(unsigned int zmin, unsigned int nb)
 	newImg->m_Alloc=true;
 	// set origin of real data in image ??
 
-	for(unsigned int z=zmin; z< zmax; ++z)
+	for(int z=zmin; z< zmax; ++z)
 	{
 		for(int y=0; y<m_WY; ++y)
 		{

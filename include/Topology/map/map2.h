@@ -100,6 +100,7 @@ protected:
 	void phi2unsew(Dart d);
 
 public:
+
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
 	 *************************************************************************/
@@ -114,8 +115,9 @@ public:
 
 	//! Delete the face of d
 	/*! @param d a dart of the face
+	 *  @param withBoudary  create or extend boundary face instead of fixed points (default true)
 	 */
-	virtual void deleteFace(Dart d) ;
+	virtual void deleteFace(Dart d, bool withBoundary = true) ;
 
 	//! Delete a connected component of the map
 	/*! @param d a dart of the connected component

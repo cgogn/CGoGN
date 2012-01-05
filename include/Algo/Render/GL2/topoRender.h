@@ -198,40 +198,24 @@ public:
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y);
-};
+	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
-class TopoRenderMapD : public TopoRender
-{
-public:
-	/**
-	* update all drawing buffers to render a dual map
-	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
-	* @param good selector
-	*/
 	template <typename PFP>
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
-};
 
-class TopoRenderGMap : public TopoRender
-{
-public:
-	/**
-	* update all drawing buffers to render a gmap
-	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
-	* @param good selector
-	*/
 	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateDataMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+
+	template <typename PFP>
+	void updateDataGMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 };
 
-} // namespace VBO
+// just for compatibility with old code
+typedef TopoRender TopoRenderMapD;
+typedef TopoRender TopoRenderGMap;
+
+
+} // namespace GL2
 
 } // namespace Render
 

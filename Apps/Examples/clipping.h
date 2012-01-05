@@ -91,7 +91,7 @@ public:
 	bool m_drawTopo;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
+	Algo::Render::GL2::Topo3Render* m_render_topo;
 
 	Geom::BoundingBox<PFP::VEC3> m_bb;
 

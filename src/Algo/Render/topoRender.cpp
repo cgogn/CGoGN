@@ -40,7 +40,8 @@ namespace GL2
 {
 
 TopoRender::TopoRender():
-m_topo_dart_width(2.0f), m_topo_relation_width(3.0f)
+m_nbDarts(0),m_nbRel2(0),
+m_topo_dart_width(2.0f),m_topo_relation_width(3.0f)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -121,6 +122,9 @@ void TopoRender::setAllDartsColor(float r, float g, float b)
 
 void TopoRender::drawDarts()
 {
+	if (m_nbDarts==0)
+		return;
+
 	m_shader2->enableVertexAttribs();
 
 	glLineWidth(m_topo_dart_width);
@@ -137,6 +141,9 @@ void TopoRender::drawDarts()
 
 void TopoRender::drawRelation1()
 {
+	if (m_nbDarts==0)
+		return;
+
 	glLineWidth(m_topo_relation_width);
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo1);
@@ -150,6 +157,9 @@ void TopoRender::drawRelation1()
 
 void TopoRender::drawRelation2()
 {
+	if (m_nbRel2==0)
+		return;
+
 	glLineWidth(m_topo_relation_width);
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo2);

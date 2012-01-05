@@ -43,6 +43,7 @@ namespace GL2
 {
 
 Topo3Render::Topo3Render():
+m_nbDarts(0),m_nbRel2(0),m_nbRel3(0),
 m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
 {
 	m_vbo0 = new Utils::VBO();
@@ -132,6 +133,9 @@ void Topo3Render::setAllDartsColor(float r, float g, float b)
 
 void Topo3Render::drawDarts()
 {
+	if (m_nbDarts==0)
+		return;
+
 	m_shader2->enableVertexAttribs();
 
 	glLineWidth(m_topo_dart_width);
@@ -174,6 +178,9 @@ void Topo3Render::drawDarts()
 
 void Topo3Render::drawRelation1()
 {
+	if (m_nbDarts==0)
+		return;
+
 	glLineWidth(m_topo_relation_width);
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo1);
@@ -197,6 +204,9 @@ void Topo3Render::drawRelation1()
 
 void Topo3Render::drawRelation2()
 {
+	if (m_nbRel2==0)
+		return;
+
 	m_shader1->changeVA_VBO(m_vaId, m_vbo2);
 	m_shader1->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 	m_shader1->enableVertexAttribs();
@@ -218,6 +228,9 @@ void Topo3Render::drawRelation2()
 
 void Topo3Render::drawRelation3()
 {
+	if (m_nbRel3==0)
+		return;
+
 	m_shader1->changeVA_VBO(m_vaId, m_vbo3);
 	m_shader1->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 	m_shader1->enableVertexAttribs();
@@ -342,7 +355,9 @@ Dart Topo3Render::pickColor(unsigned int x, unsigned int y)
 	glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,color);
 
 	glClearColor(cc[0], cc[1], cc[2], cc[3]);
-
+	
+	
+	std::cout << color[0] << ", "<<color[1] << ", "<<color[2] <<std::endl;
 	return colToDart(color);
 }
 
