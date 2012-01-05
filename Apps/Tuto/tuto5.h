@@ -27,6 +27,30 @@
 
 #include <iostream>
 
+#define WITH_GMAP 1
+
+#include "Topology/generic/parameters.h"
+#ifdef WITH_GMAP
+	#include "Topology/gmap/embeddedGMap3.h"
+#else
+	#include "Topology/map/embeddedMap3.h"
+#endif
+
+#include "Geometry/vector_gen.h"
+#include "Algo/Geometry/boundingbox.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+
+#include "Algo/Render/GL2/topo3Render.h"
+
+#include "Topology/generic/cellmarker.h"
+#include "Utils/text3d.h"
+
+#include "Utils/pointSprite.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
+#include "Utils/cgognStream.h"
+
+
 
 #include "Utils/Qt/qtSimple.h"
 
@@ -34,14 +58,19 @@
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/Qt/qtui.h"
 
-// forward definitions (minimize includes)
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class Topo3Render; } } } }
-namespace CGoGN { namespace Utils { class VBO; } }
-namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
-namespace CGoGN { namespace Utils { class Strings3D; } }
-namespace CGoGN { namespace Utils { class PointSprite; } }
-namespace CGoGN { namespace Utils { class ShaderVectorPerVertex; } }
+
+using namespace CGoGN ;
+
+struct PFP: public PFP_STANDARD
+{
+	// definition de la carte
+#ifdef WITH_GMAP
+	typedef EmbeddedGMap3 MAP;
+#else
+	typedef EmbeddedMap3 MAP;
+#endif
+};
+
 
 using namespace CGoGN ;
 
@@ -74,7 +103,7 @@ class MyQT: public Utils::QT::SimpleQT
 	Utils::PointSprite* m_sprite;
 
 	QTimer *m_timer;
-
+	
 public:
 	MyQT():
 		render_text(true),
@@ -92,6 +121,7 @@ public:
 		m_timer(NULL)
 	{}
 
+	Dart m_selected;
 protected:
     void storeVerticesInfo();
 

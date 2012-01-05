@@ -256,7 +256,7 @@ public:
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y);
+	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
 	/**
 	* update all drawing buffers to render a dual map

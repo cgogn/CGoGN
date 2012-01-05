@@ -355,7 +355,9 @@ Dart Topo3Render::pickColor(unsigned int x, unsigned int y)
 	glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,color);
 
 	glClearColor(cc[0], cc[1], cc[2], cc[3]);
-
+	
+	
+	std::cout << color[0] << ", "<<color[1] << ", "<<color[2] <<std::endl;
 	return colToDart(color);
 }
 

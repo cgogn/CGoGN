@@ -28,8 +28,14 @@
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/cgognStream.h"
 
+//#define USE_GMAP
+
 #include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
+#ifdef USE_GMAP
+	#include "Topology/gmap/embeddedGMap2.h"
+#else
+	#include "Topology/map/embeddedMap2.h"
+#endif
 #include "Algo/Render/GL2/topoRender.h"
 
 
@@ -43,7 +49,11 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition of the type of the map
+#ifdef USE_GMAP
+	typedef EmbeddedGMap2 MAP;
+#else
 	typedef EmbeddedMap2 MAP;
+#endif
 };
 
 

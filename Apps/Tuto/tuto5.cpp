@@ -22,50 +22,18 @@
 *                                                                              *
 *******************************************************************************/
 
-#define WITH_GMAP 1
-
 
 #include "tuto5.h"
 #include <iostream>
 
-#include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
-	#include "Topology/map/embeddedMap3.h"
-#endif
-
-#include "Geometry/vector_gen.h"
-#include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
 
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
 
 #include "Algo/Render/GL2/topo3Render.h"
-
-#include "Topology/generic/cellmarker.h"
-#include "Utils/text3d.h"
-
-#include "Utils/pointSprite.h"
-#include "Utils/Shaders/shaderVectorPerVertex.h"
-#include "Utils/cgognStream.h"
-
 #include "Algo/Render/SVG/mapSVGRender.h"
 
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
-{
-	// definition de la carte
-#ifdef WITH_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
-	typedef EmbeddedMap3 MAP;
-#endif
-};
 
 PFP::MAP myMap;
 PFP::TVEC3 position ;
@@ -224,10 +192,13 @@ void MyQT::cb_redraw()
 	if (render_topo)
 		m_render_topo->drawTopo();
 
-	Dart d = myMap.phi2(myMap.begin());
+/*	Dart d = myMap.phi2(myMap.begin());
 	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
 	 d = myMap.phi1(myMap.begin());
 	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
+*/	
+	m_render_topo->overdrawDart(m_selected, 5, 1.0f, 0.0f, 1.0f);
+	
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -252,15 +223,18 @@ void MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (Shift())
 	{
-		Dart d = m_render_topo->picking<PFP>(myMap, allDarts, x,y);
+		SelectorDartNoBoundary<PFP::MAP> nb(myMap);	
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
 		if (d != Dart::nil())
 		{
 			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
+			m_selected = d;
 		}
 		else
 		{
 			statusMsg("");
 		}
+		updateGL();
 	}
 }
 
@@ -338,6 +312,9 @@ int main(int argc, char **argv)
 	sqt.setCallBack( dock.slider_balls, SIGNAL(valueChanged(int)), SLOT(slider_balls(int)) );
 	sqt.setCallBack( dock.slider_vectors, SIGNAL(valueChanged(int)), SLOT(slider_vectors(int)) );
 	sqt.setCallBack( dock.slider_text, SIGNAL(valueChanged(int)), SLOT(slider_text(int)) );
+
+
+	sqt.m_selected = myMap.begin();
 
 	sqt.show();
 

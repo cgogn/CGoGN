@@ -198,7 +198,7 @@ public:
 	 * @return the dart or NIL
 	 */
 	template<typename PFP>
-	Dart picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y);
+	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
 	template <typename PFP>
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);

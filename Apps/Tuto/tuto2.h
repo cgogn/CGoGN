@@ -25,7 +25,7 @@
 #ifndef _TUTO2_
 #define _TUTO2_
 
-#define USE_GMAP
+//#define USE_GMAP
 
 
 #include "Utils/Qt/qtSimple.h"

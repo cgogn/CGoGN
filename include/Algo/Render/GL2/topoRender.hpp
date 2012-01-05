@@ -28,7 +28,7 @@
 #include "Topology/generic/parameters.h"
 
 #include "Topology/map/embeddedMap2.h"
-#include "Topology/gmap/embeddedGmap2.h"
+#include "Topology/gmap/embeddedGMap2.h"
 
 namespace CGoGN
 {
@@ -77,6 +77,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 		if (good(d))
 		{
 			vecDarts.push_back(d);
+			m_attIndex[d] = (vecDarts.size()-1)*2;
 		}
 	}
 	m_nbDarts = vecDarts.size();
@@ -97,7 +98,6 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
-	unsigned int posDBI = 0;
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
@@ -117,8 +117,6 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 			{
 				const VEC3& P = positions[d];
 				vecPos.push_back(P);
-				m_attIndex[d] = posDBI;
-				posDBI+=2;
 				center += P;
 				d = map.phi1(d);
 			} while (d != dd);
@@ -224,6 +222,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 		if (good(d))
 		{
 			vecDarts.push_back(d);
+			m_attIndex[d] = (vecDarts.size()-1)*2;
 		}
 	}
 	m_nbDarts = vecDarts.size();
@@ -244,7 +243,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
-	unsigned int posDBI = 0;
+
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
@@ -253,6 +252,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
 	{
 		Dart d = *id;
+
 		if (!mf.isMarked(d))
 		{
 			vecPos.clear();
@@ -263,8 +263,6 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 			{
 				const VEC3& P = positions[d];
 				vecPos.push_back(P);
-				m_attIndex[d] = posDBI;
-				posDBI+=2;
 				center += P;
 				d = map.phi1(d);
 			} while (d != dd);
@@ -396,7 +394,7 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 }
 
 template<typename PFP>
-Dart TopoRender::picking(typename PFP::MAP& map, const FunctorSelect& good, int x, int y)
+Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelect& good)
 {
 	pushColors();
 	setDartsIdColor<PFP>(map,good);

@@ -174,7 +174,7 @@ void MyQT::cb_mouseClick(int button, int x, int y)
 {
 	if (button == Qt::LeftButton)
 	{
-		Dart  d = m_render_topo->picking<PFP>(myMap,allDarts,x,y);
+		Dart  d = m_render_topo->picking<PFP>(myMap,x,y);
 		if (d != NIL)
 
 			CGoGNout << "Dart "<< d <<  CGoGNendl;

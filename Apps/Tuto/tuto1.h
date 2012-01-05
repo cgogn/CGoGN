@@ -25,7 +25,7 @@
 #ifndef _TUTO1_
 #define _TUTO1_
 
-#define USE_GMAP
+//#define USE_GMAP
 
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/cgognStream.h"
