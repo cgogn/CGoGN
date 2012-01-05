@@ -1,9 +1,10 @@
 #ifndef PARTCELL_H
 #define PARTCELL_H
 
-#include "particle_base.h"
+#include "Algo/MovingObjects/particle_base.h"
 
 #include "Algo/Geometry/inclusion.h"
+#include "Algo/Geometry/plane.h"
 #include "Geometry/intersection.h"
 #include "Geometry/orientation.h"
 #include <iostream>
@@ -20,7 +21,8 @@ namespace Algo
 namespace MovingObjects
 {
 
-enum {
+enum
+{
 	NO_CROSS,
 	CROSS_EDGE,
 	CROSS_OTHER
@@ -45,14 +47,18 @@ public :
 
 	unsigned int crossCell ;
 
+	float distance;
+
 	ParticleCell2DAndHalf(Map& map) : m(map)
 	{}
 
 	ParticleCell2DAndHalf(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(FACE), crossCell(NO_CROSS)
+		ParticleBase(pos), m(map), m_positions(tabPos), d(belonging_cell), lastCrossed(belonging_cell), state(FACE), crossCell(NO_CROSS), distance(0)
 	{}
 
 	Dart getCell() { return d; }
+
+	float getDistance() { return distance; }
 
 	Geom::Orientation3D getOrientationEdge(const VEC3& point, Dart d);
 
@@ -77,28 +83,29 @@ public :
 
 	void move(const VEC3& newCurrent)
 	{
+		distance = 0 ;
 		crossCell = NO_CROSS ;
 		if(!Geom::arePointsEquals(newCurrent, m_position))
 		{
 			switch(state) {
-			case VERTEX : 	vertexState(newCurrent); break;
-			case EDGE : 	edgeState(newCurrent);   break;
-			case FACE : 	faceState(newCurrent);   break;
+				case VERTEX : 	vertexState(newCurrent); break;
+				case EDGE : 	edgeState(newCurrent);   break;
+				case FACE : 	faceState(newCurrent);   break;
 			}
 
-			display();
+//			display();
 		}
 		else
 			m_position = newCurrent;
 	}
 };
 
-#include "particle_cell_2DandHalf.hpp"
+} // namespace MovingObjects
 
-}
+} // namespace Algo
 
-}
+} // namespace CGoGN
 
-}
+#include "Algo/MovingObjects/particle_cell_2DandHalf.hpp"
 
 #endif

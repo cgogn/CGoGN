@@ -1,5 +1,16 @@
 //#define DEBUG
 
+#include "Geometry/frame.h"
+
+namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace MovingObjects
+{
+
 template <typename PFP>
 void ParticleCell2DAndHalf<PFP>::display()
 {
@@ -11,50 +22,50 @@ void ParticleCell2DAndHalf<PFP>::display()
 template <typename PFP>
 typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::pointInFace(Dart d)
 {
-	const VEC3& p1(m_positions[d]);
-	Dart dd=m.phi1(d);
-	const VEC3& p2(m_positions[dd]);
-	dd=m.phi1(dd);
-	VEC3& p3(m_positions[dd]);
+	const VEC3& p1(m_positions[d]) ;
+	Dart dd = m.phi1(d) ;
+	const VEC3& p2(m_positions[dd]) ;
+	dd = m.phi1(dd) ;
+	VEC3& p3(m_positions[dd]) ;
 
-	VEC3 v1(p2-p1);
+	VEC3 v1(p2 - p1) ;
 
-	while((v1^VEC3(p3-p1)).norm2()==0.0f)
+	while ((v1 ^ VEC3(p3 - p1)).norm2() == 0.0f)
 	{
-		dd = m.phi1(dd);
-		p3 = m_positions[dd];
+		dd = m.phi1(dd) ;
+		p3 = m_positions[dd] ;
 	}
 
-	CGoGNout << "pointInFace " << (p1+p3)*0.5f << CGoGNendl;
+	CGoGNout << "pointInFace " << (p1 + p3) * 0.5f << CGoGNendl ;
 
-	return (p1+p3)*0.5f;
+	return (p1 + p3) * 0.5f ;
 }
 
 template <typename PFP>
 Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationEdge(const VEC3& point, Dart d)
 {
-	const VEC3& endPoint = m_positions[m.phi2(d)];
+	const VEC3& endPoint = m_positions[m.phi1(d)];
 	const VEC3& vertexPoint = m_positions[d];
 
-	const VEC3& n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+	const VEC3& n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
 
 	//orientation relative to the plane orthogonal to the face going through the edge
-	return Geom::testOrientation3D(point,vertexPoint, endPoint, vertexPoint+n1);
+	return Geom::testOrientation3D(point, vertexPoint, endPoint, vertexPoint+n1);
 }
 
 template <typename PFP>
 typename PFP::VEC3 ParticleCell2DAndHalf<PFP>::intersectLineEdge(const VEC3& pA, const VEC3& pB, Dart d)
 {
 	const VEC3& q1 = m_positions[d];
-	const VEC3& q2 = m_positions[m.phi2(d)];
+	const VEC3& q2 = m_positions[m.phi1(d)];
 	VEC3 Inter;
 
-	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
-	VEC3 n = (q2-q1) ^ n1 ;
+	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
+	VEC3 n = (q2 - q1) ^ n1 ;
 
-	Geom::intersectionLinePlane(pA,pB-pA,q1,n,Inter);
+	Geom::intersectionLinePlane(pA, pB - pA, q1, n, Inter) ;
 
-	Geom::Plane3D<float> pl = Algo::Geometry::facePlane<PFP>(m,d,m_positions);
+	Geom::Plane3D<float> pl = Algo::Geometry::facePlane<PFP>(m, d, m_positions);
 	pl.project(Inter);
 
 	return Inter;
@@ -65,7 +76,7 @@ Geom::Orientation3D ParticleCell2DAndHalf<PFP>::getOrientationFace(VEC3 point, V
 {
 	const VEC3& dPoint = m_positions[d];
 
-	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
+	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
 
 	return Geom::testOrientation3D(point, sourcePoint, dPoint+n1, dPoint);
 }
@@ -163,32 +174,31 @@ void ParticleCell2DAndHalf<PFP>::edgeState(VEC3 current, Geom::Orientation3D sid
 	switch(sideOfEdge)
 	{
 		case Geom::UNDER :
+		{
 			d = m.phi1(d);
 			faceState(current);
 			return;
+		}
+
 		case Geom::OVER:
 		{
 			//transform the displacement into the new entered face
-			VEC3 displ = current-m_position;
-			VEC3 edge = Algo::Geometry::vectorOutOfDart<PFP>(m,m.phi2(d),m_positions);
+			VEC3 displ = current - m_position;
 
-			VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
-			VEC3 n2 = Algo::Geometry::faceNormal<PFP>(m,m.phi2(d),m_positions);
+			VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m, d, m_positions);
+			VEC3 n2 = Algo::Geometry::faceNormal<PFP>(m, m.phi2(d), m_positions);
+			VEC3 axis = n1 ^ n2 ;
 
-			float angle = acos(n1*n2);
+			float angle = Geom::angle(n1, n2) ;
 
-			Geom::Matrix<4,4,float> mRot;
-			mRot.identity();
-
-			Geom::rotate(edge[0],edge[1],edge[2],angle,mRot);
-
-			displ = Geom::transform(displ,mRot);
-			current = m_position+displ;
+			displ = Geom::rotate(axis, angle, displ) ;
+			current = m_position + displ;
 
 			d = m.phi1(m.phi2(d));
 			faceState(current);
 			return;
 		}
+
 		default :
 			state = EDGE;
 	}
@@ -221,14 +231,14 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
  	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
-	//project current within plane
+	//project current within face plane
 	VEC3 n1 = Algo::Geometry::faceNormal<PFP>(m,d,m_positions);
-	VEC3 n2 = current-m_position;
-	n1.normalize();
-	VEC3 n3 = n1^n2;
+	VEC3 n2 = current - m_position;
+//	n1.normalize();
+	VEC3 n3 = n1 ^ n2;
 	n3.normalize();
-	VEC3 n4 = n3^n1;
-	current = m_position+(n2*n4)*n4;
+	VEC3 n4 = n3 ^ n1;
+	current = m_position + (n2 * n4) * n4;
 
 	//track new position within map
 	Dart dd = d;
@@ -326,8 +336,9 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
 	switch (getOrientationEdge(current, d))
 	{
 	case Geom::UNDER :
+		distance += (current - m_position).norm();
 		m_position = current;
-		state = FACE;;
+		state = FACE;
 		break;
 	default :
 		if(wsoe == Geom::ON)
@@ -338,14 +349,22 @@ void ParticleCell2DAndHalf<PFP>::faceState(VEC3 current)
 //
 //			vertexState(current);
 		}
-//		else
+		else
 		{
 // 			CGoGNout << "wsoe : " << wsoe << CGoGNendl;
 // 			CGoGNout << "current " << current << " " << m_position << CGoGNendl;
 // 			CGoGNout << "d " << d << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi2(d)] << CGoGNendl;
-			m_position = intersectLineEdge(current, m_position, d);
+			VEC3 isect = intersectLineEdge(current, m_position, d);
+			distance += (isect - m_position).norm();
+			m_position = isect;
 // 			CGoGNout << " inter : " << m_position << CGoGNendl;
 			edgeState(current, Geom::OVER);
 		}
 	}
 }
+
+} // namespace MovingObjects
+
+} // namespace Algo
+
+} // namespace CGoGN

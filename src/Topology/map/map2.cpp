@@ -369,10 +369,10 @@ bool Map2::collapseDegeneratedFace(Dart d)
 void Map2::splitFace(Dart d, Dart e)
 {
 	assert(d != e && sameFace(d, e)) ;
-	Map1::cutEdge(phi_1(d)) ;
-	Map1::cutEdge(phi_1(e)) ;
-	Map1::splitCycle(phi_1(d), phi_1(e)) ;
-	phi2sew(phi_1(d), phi_1(e));
+	Dart dd = Map1::cutEdge(phi_1(d)) ;
+	Dart ee = Map1::cutEdge(phi_1(e)) ;
+	Map1::splitCycle(dd, ee) ;
+	phi2sew(dd, ee);
 }
 
 bool Map2::mergeFaces(Dart d)
