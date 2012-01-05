@@ -75,19 +75,31 @@ Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 	return d;
 }
 
-void Map2::deleteFace(Dart d)
+void Map2::deleteFace(Dart d, bool withBoundary)
 {
 	assert(!isBoundaryMarked(d)) ;
+	if (withBoundary)
+	{
+		Dart it = d ;
+		do
+		{
+			if(!isBoundaryEdge(it))
+				unsewFaces(it) ;
+			it = phi1(it) ;
+		} while(it != d) ;
+		Dart dd = phi2(d) ;
+		Map1::deleteCycle(d) ;
+		Map1::deleteCycle(dd) ;
+		return;
+	}
+	//else with remove the face and create fixed points
 	Dart it = d ;
 	do
 	{
-		if(!isBoundaryEdge(it))
-			unsewFaces(it) ;
+		phi2unsew(it);
 		it = phi1(it) ;
 	} while(it != d) ;
-	Dart dd = phi2(d) ;
-	Map1::deleteCycle(d) ;
-	Map1::deleteCycle(dd) ;
+	Map1::deleteCycle(d);
 }
 
 void Map2::deleteCC(Dart d)
@@ -316,12 +328,13 @@ void Map2::unsewFaces(Dart d)
 	Dart ee = phi1(e) ;
 
 	Dart f = findBoundaryEdgeOfVertex(d) ;
+	Dart ff = findBoundaryEdgeOfVertex(dd) ;
+
 	if(f != NIL)
 		phi1sew(e, phi_1(f)) ;
 
-	f = findBoundaryEdgeOfVertex(dd) ;
-	if(f != NIL)
-		phi1sew(ee, phi_1(f)) ;
+	if(ff != NIL)
+		phi1sew(ee, phi_1(ff)) ;
 
 	phi2unsew(d) ;
 
