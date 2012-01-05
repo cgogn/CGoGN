@@ -369,7 +369,7 @@ void MyQT::cb_initGL()
 
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
-	m_render_topo = new Algo::Render::GL2::TopoRenderMapD() ;
+	m_render_topo = new Algo::Render::GL2::TopoRender() ;
 
 	m_ds = new Utils::Drawer();
 

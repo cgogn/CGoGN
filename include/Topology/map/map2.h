@@ -101,11 +101,6 @@ protected:
 
 public:
 
-	/**
-	 * FOR TEST
-	 */
-	void forceFixedPoint(Dart d) { (*m_phi2)[d.index] = d ;}
-
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
 	 *************************************************************************/
