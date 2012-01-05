@@ -36,11 +36,11 @@ namespace Algo
 namespace IHM
 {
 
-//template<typename T> class AttributeHandler_IHM ;
+template<typename T> class AttributeHandler_IHM ;
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
-	//template<typename T> friend class AttributeHandler_IHM ;
+	template<typename T> friend class AttributeHandler_IHM ;
 
 public:
 	unsigned int m_curLevel ;
@@ -59,23 +59,37 @@ public:
 
 	~ImplicitHierarchicalMap3() ;
 
+	//!
+	/*!
+	 *
+	 */
 	void init() ;
 
-	/***************************************************
-	 *             ATTRIBUTES MANAGEMENT               *
-	 ***************************************************/
+	/*! @name Attributes Management
+	 *  To handles Attributes for each level of an implicit 3-map
+	 *************************************************************************/
 
-	//template <typename T>
-	//AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	//@{
+	//!
+	/*!
+	 *
+	 */
+	template <typename T>
+	AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
 
-	//template <typename T>
-	//AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	//!
+	/*!
+	 *
+	 */
+	template <typename T>
+	AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	//@}
 
+	/*! @name Basic Topological Operators
+	 *  Redefinition of the basic topological operators
+	 *************************************************************************/
 
-	/***************************************************
-	 *                 MAP TRAVERSAL                   *
-	 ***************************************************/
-
+	//@{
 	virtual Dart newDart() ;
 
 	Dart phi1(Dart d) ;
@@ -97,7 +111,232 @@ public:
 	Dart alpha2(Dart d);
 
 	Dart alpha_2(Dart d);
+	//@}
 
+	/*! @name Topological Operators with Cells id management
+	 *  Topological operations on Hierarchical Implicit 3-maps
+	 *************************************************************************/
+
+	//@{
+	//!
+	/*!
+	 *
+	 */
+	Dart beginSplittingPath(Dart d, DartMarker& m);
+
+	//!
+	/*!
+	 *
+	 */
+	void constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m);
+
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual Dart cutEdge(Dart d);
+//
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual bool uncutEdge(Dart d);
+//
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual void splitFace(Dart d, Dart e);
+//
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
+//
+//	//!
+//	/*!
+//	 *
+//	 */
+//	virtual void splitVolume(std::vector<Dart>& vd);
+	//@}
+
+	/*! @name Levels Management
+	 *  Operations to manage the levels of an Implicit Hierarchical 3-map
+	 *************************************************************************/
+
+	//@{
+	//!
+	/*!
+	 *
+	 */
+	unsigned int getCurrentLevel() ;
+
+	//!
+	/*!
+	 *
+	 */
+	void setCurrentLevel(unsigned int l) ;
+
+	//!
+	/*!
+	 *
+	 */
+	unsigned int getMaxLevel() ;
+
+	//!
+	/*!
+	 *
+	 */
+	unsigned int getDartLevel(Dart d) ;
+
+	//!
+	/*!
+	 *
+	 */
+	void setDartLevel(Dart d, unsigned int i) ;
+	//@}
+
+	/*! @name Id Management
+	 * Operations to manage the ids of edges and faces
+	 *************************************************************************/
+
+	//@{
+	//! Give a new unique id to all the edges of the map
+	/*!
+	 */
+	void initEdgeId() ;
+
+	//! Return the next available edge id
+	/*!
+	 */
+	unsigned int getNewEdgeId() ;
+
+	//! Return the id of the edge of d
+	/*!
+	 */
+	unsigned int getEdgeId(Dart d) ;
+
+	//! Set an edge id to all darts from an orbit of d
+	/*!
+	 */
+	void setEdgeId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
+	void setEdgeId(Dart d, unsigned int i);
+
+	//! Give a new unique id to all the faces of the map
+	/*!
+	 */
+	void initFaceId() ;
+
+	//! Return the next available face id
+	/*!
+	 */
+	unsigned int getNewFaceId() ;
+
+	//! Return the id of the face of d
+	/*!
+	 */
+	unsigned int getFaceId(Dart d) ;
+
+	//! Set a face id to all darts from an orbit of d
+	/*!
+	 */
+	void setFaceId(Dart d, unsigned int i, unsigned int orbit); //TODO a virer
+	void setFaceId(unsigned int orbit, Dart d);
+	//@}
+
+	/*! @name Cells Information
+	 * Operations to manage the cells informations :
+	 *************************************************************************/
+
+	//@{
+	//! Return the level of insertion of the vertex of d
+	/*!
+	 */
+	unsigned int vertexInsertionLevel(Dart d) ;
+
+	//! Return the level of the edge of d in the current level map
+	/*!
+	 */
+	unsigned int edgeLevel(Dart d) ;
+
+	//! Return the level of the face of d in the current level map
+	/*!
+	 */
+	unsigned int faceLevel(Dart d);
+
+	//! Return the level of the volume of d in the current level map
+	/*!
+	 */
+	unsigned int volumeLevel(Dart d);
+
+	//! Return the oldest dart of the face of d in the current level map
+	/*!
+	 */
+	Dart faceOldestDart(Dart d);
+
+	//! Return the oldest dart of the volume of d in the current level map
+	/*!
+	 */
+	Dart volumeOldestDart(Dart d);
+
+	//! Return true if the edge of d in the current level map
+	//! has already been subdivided to the next level
+	/*!
+	 */
+	bool edgeIsSubdivided(Dart d) ;
+
+	//! Return true if the face of d in the current level map
+	//! has already been subdivided to the next level
+	/*!
+	 */
+	bool faceIsSubdivided(Dart d) ;
+
+	//! Return true if the volume of d in the current level map
+	//! has already been subdivided to the next level
+	/*!
+	 */
+	bool volumeIsSubdivided(Dart d);
+
+	//! Return true if the edge of d in the current level map
+	//! is subdivided to the next level,
+	//! none of its resulting edges is in turn subdivided to the next level
+	//! and the middle vertex is of degree 2
+	/*!
+	 */
+	bool edgeCanBeCoarsened(Dart d);
+
+	//!
+	/*!
+	 */
+	bool faceCanBeCoarsened(Dart d);
+
+	//!
+	/*!
+	 */
+	bool faceIsSubdividedOnce(Dart d);
+
+	//!
+	/*!
+	 */
+	bool volumeIsSubdividedOnce(Dart d);
+
+	//!
+	/*!
+	 */
+	bool neighborhoodLevelDiffersByOne(Dart d);
+
+	//! wired !!!
+	/*!
+	 */
+	bool coarsenNeighborhoodLevelDiffersByOne(Dart d);
+	//@}
+
+	/*! @name Cell Functors
+	 * Redefition of the 3-maps map traversor
+	 *************************************************************************/
+
+	//@{
 	virtual Dart begin() ;
 
 	virtual Dart end() ;
@@ -115,196 +354,47 @@ public:
 	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
 	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) ;
+	//@}
 
 
-	/***************************************************
-	 *              LEVELS MANAGEMENT                  *
-	 ***************************************************/
-
-	unsigned int getCurrentLevel() ;
-
-	void setCurrentLevel(unsigned int l) ;
-
-	unsigned int getMaxLevel() ;
-
-	unsigned int getDartLevel(Dart d) ;
-
-	void setDartLevel(Dart d, unsigned int i) ;
-
-	/***************************************************
-	 *             EDGE ID MANAGEMENT                  *
-	 ***************************************************/
-
-	/**
-	 * Give a new unique id to all the edges of the map
-	 */
-	void initEdgeId() ;
-
-	/**
-	 * Return the next available edge id
-	 */
-	unsigned int getNewEdgeId() ;
-
-	/**
-	 * Return the id of the edge of d
-	 */
-	unsigned int getEdgeId(Dart d) ;
-
-	/**
-	 * Set an edge id to all darts from an orbit of d
-	 */
-	//TODO changer l'ordre des parametres
-	void setEdgeId(Dart d, unsigned int i, unsigned int orbit);
-
-	/***************************************************
-	 *             FACE ID MANAGEMENT                  *
-	 ***************************************************/
-
-	/**
-	 * Give a new unique id to all the faces of the map
-	 */
-	void initFaceId() ;
-
-	/**
-	 * Return the next available face id
-	 */
-	unsigned int getNewFaceId() ;
-
-	/**
-	 * Return the id of the face of d
-	 */
-	unsigned int getFaceId(Dart d) ;
-
-	/**
-	 * Set a face id to all darts from an orbit of d
-	 */
-	//TODO changer l'ordre des parametres
-	void setFaceId(Dart d, unsigned int i, unsigned int orbit);
-
-	void setFaceId(unsigned int orbit, Dart d);
-
-	/***************************************************
-	 *               CELLS INFORMATION                 *
-	 ***************************************************/
-
-	/**
-	 * Return the level of insertion of the vertex of d
-	 */
-	unsigned int vertexInsertionLevel(Dart d) ;
-
-	/**
-	 * Return the level of the edge of d in the current level map
-	 */
-	unsigned int edgeLevel(Dart d) ;
-
-	/**
-	 * Return the level of the face of d in the current level map
-	 */
-	unsigned int faceLevel(Dart d);
-
-	/**
-	 * Return the level of the volume of d in the current level map
-	 */
-	unsigned int volumeLevel(Dart d);
-
-	/**
-	 * Return the oldest dart of the face of d in the current level map
-	 */
-	Dart faceOldestDart(Dart d);
-
-	/**
-	 * Return the oldest dart of the volume of d in the current level map
-	 */
-	Dart volumeOldestDart(Dart d);
-
-	/**
-	 * Return true if the edge of d in the current level map
-	 * has already been subdivided to the next level
-	 */
-	bool edgeIsSubdivided(Dart d) ;
-
-	/**
-	 * Return true if the face of d in the current level map
-	 * has already been subdivided to the next level
-	 */
-	bool faceIsSubdivided(Dart d) ;
-
-	/**
-	 * Return true if the volume of d in the current level map
-	 * has already been subdivided to the next level
-	 */
-	bool volumeIsSubdivided(Dart d);
-
-	/**
-	 * Return true if the edge of d in the current level map
-	 * is subdivided to the next level,
-	 * none of its resulting edges is in turn subdivided to the next level
-	 * and the middle vertex is of degree 2
-	 */
-	bool edgeCanBeCoarsened(Dart d);
-
-	/**
-	 *
-	 */
-	bool faceCanBeCoarsened(Dart d);
-
-	/**
-	 *
-	 */
-	bool faceIsSubdividedOnce(Dart d);
-
-	/**
-	 *
-	 */
-	bool volumeIsSubdividedOnce(Dart d);
-
-	/**
-	 *
-	 */
-	bool neighborhoodLevelDiffersByOne(Dart d);
-
-	/**
-	 * wired !!!
-	 */
-	bool coarsenNeighborhoodLevelDiffersByOne(Dart d);
 } ;
 
-//template <typename T>
-//class AttributeHandler_IHM : public AttributeHandler<T>
-//{
-//public:
-//	typedef T DATA_TYPE ;
-//
-//	AttributeHandler_IHM() : AttributeHandler<T>()
-//	{}
-//
-//	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
-//	{}
-//
-//	AttributeMultiVector<T>* getDataVector() const
-//	{
-//		return AttributeHandler<T>::getDataVector() ;
-//	}
-//
-//	bool isValid() const
-//	{
-//		return AttributeHandler<T>::isValid() ;
-//	}
-//
-//	T& operator[](Dart d) ;
-//
-//	const T& operator[](Dart d) const ;
-//
-//	T& operator[](unsigned int a)
-//	{
-//		return AttributeHandler<T>::operator[](a) ;
-//	}
-//
-//	const T& operator[](unsigned int a) const
-//	{
-//		return AttributeHandler<T>::operator[](a) ;
-//	}
-//} ;
+template <typename T>
+class AttributeHandler_IHM : public AttributeHandler<T>
+{
+public:
+	typedef T DATA_TYPE ;
+
+	AttributeHandler_IHM() : AttributeHandler<T>()
+	{}
+
+	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
+	{}
+
+	AttributeMultiVector<T>* getDataVector() const
+	{
+		return AttributeHandler<T>::getDataVector() ;
+	}
+
+	bool isValid() const
+	{
+		return AttributeHandler<T>::isValid() ;
+	}
+
+	T& operator[](Dart d) ;
+
+	const T& operator[](Dart d) const ;
+
+	T& operator[](unsigned int a)
+	{
+		return AttributeHandler<T>::operator[](a) ;
+	}
+
+	const T& operator[](unsigned int a) const
+	{
+		return AttributeHandler<T>::operator[](a) ;
+	}
+} ;
 
 } //namespace IHM
 

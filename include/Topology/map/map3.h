@@ -173,7 +173,7 @@ public:
 	 *  @param d a dart of the face
 	 *  @return true if the collapse has been executed, false otherwise
 	 */
-	virtual bool collapseDegeneretedVolume(Dart d);
+	bool collapseDegeneretedVolume(Dart d);
 
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same degree

@@ -54,6 +54,11 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
+	//!
+	/*!
+	 */
+	virtual Dart deleteEdge(Dart d);
+
 	/*!
 	 *
 	 */

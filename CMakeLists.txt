@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(CGoGN)
 
+#SET( CMAKE_VERBOSE_MAKEFILE 1 )
+
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR})
 
 # for GLEW

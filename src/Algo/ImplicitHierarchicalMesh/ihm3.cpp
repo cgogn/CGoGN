@@ -68,6 +68,191 @@ void ImplicitHierarchicalMap3::init()
 	}
 }
 
+
+Dart ImplicitHierarchicalMap3::beginSplittingPath(Dart d, DartMarker& m)
+{
+	Dart dres = NIL;
+	Dart dit = d;
+	bool found = false;
+
+	// Recherche d'un brin de depart du chemin d'arete
+	do
+	{
+		Dart eit = phi1(dit);
+
+		if(!m.isMarked(eit) && getDartLevel(eit) == getCurrentLevel())
+		{
+			found = true;
+			dres = eit;
+		}
+
+		dit = phi2(phi_1(dit));
+	}
+	while(!found && dit != d);
+
+	return dres;
+}
+
+void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m)
+{
+
+	//Construction du chemin d'arete
+	Dart cit = d;
+
+	v.push_back(cit);
+	m.markOrbit(EDGE, cit);
+
+	do
+	{
+
+		if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit))))  == getDartLevel(d))
+		{
+			if(m.isMarked(phi1(cit)))
+			{
+				cit = phi1(phi2(phi1(cit)));
+				std::cout << "1_1" << std::endl;
+			}
+		}
+		else if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit)))) < getDartLevel(d))
+		{
+			cit = phi1(phi2(phi1(cit)));
+			std::cout << "2" << std::endl;
+		}
+		else
+			cit = phi1(cit);
+
+		v.push_back(cit);
+		m.markOrbit(EDGE, cit);
+
+
+	}
+	while(cit != d);
+
+//	do
+//	{
+//		v.push_back(cit);
+//		m.markOrbit(EDGE, cit);
+//
+//		cit = phi1(cit);
+//
+//		//std::cout << "cit = " << cit << std::endl;
+//
+//		if(std::min(getDartLevel(cit), getDartLevel(phi2(cit))) == getDartLevel(d))
+//		{
+//			if(m.isMarked(cit))
+//			{
+//				cit = phi1(phi2(cit));
+//				//std::cout << "1_1" << std::endl;
+//			}
+//		}
+//		else if(std::min(getDartLevel(cit),getDartLevel(phi2(cit))) < getDartLevel(d))
+//		{
+//			cit = phi1(phi2(cit));
+//			//std::cout << "2" << std::endl;
+//		}
+//
+//	}while(cit != d);
+
+}
+
+//Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
+//{
+//        Dart resV = EmbeddedMap3::cutEdge(d);
+//
+//        unsigned int eId = getEdgeId(d);
+//        Dart dit = d;
+//        do
+//        {
+//        	//EdgeId
+//        	m_edgeId[phi1(dit)] = eId;
+//        	m_edgeId[phi3(dit)] = eId;
+//
+//        	//FaceId
+//        	unsigned int fId = getFaceId(dit);
+//        	m_faceId[phi1(dit)] = fId;
+//        	m_edgeId[phi3(dit)] = fId;
+//
+//            dit = alpha2(dit);
+//        }
+//        while(dit != d);
+//
+//        return resV;
+//}
+//
+//bool ImplicitHierarchicalMap3::uncutEdge(Dart d)
+//{
+//       return EmbeddedMap3::uncutEdge(d);
+//}
+//
+//void ImplicitHierarchicalMap3::splitFace(Dart d, Dart e)
+//{
+//        EmbeddedMap3::splitFace(d,e);
+//
+//        unsigned int eId = getNewEdgeId();
+//        unsigned int fId = getFaceId(d);
+//
+//        Dart ne = phi_1(d);
+//        Dart ne3 = phi3(ne);
+//
+//        m_edgeId[ne] = eId;
+//        m_edgeId[phi2(ne)] = eId;
+//        m_edgeId[ne3] = eId;
+//        m_edgeId[phi2(ne3)] = eId;
+//
+//        m_faceId[ne] = fId;
+//        m_faceId[phi2(ne)] = fId;
+//        m_faceId[ne3] = fId;
+//        m_faceId[phi2(ne3)] = fId;
+//}
+//
+//void ImplicitHierarchicalMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
+//{
+//        EmbeddedMap3::sewVolumes(d,e);
+//
+//        unsigned int fId;
+//
+//        if(m_faceId[d] < m_faceId[phi3(d)])
+//        	fId = m_faceId[d] ;
+//        else
+//        	fId = m_edgeId[phi3(d)];
+//
+//        Dart dit = d;
+//        do
+//        {
+//                //EdgeId
+////                if(m_edgeId[dit] < m_edgeId[phi3(dit)])
+////                	m_edgeId[phi3(dit)] = m_edgeId[dit] ;
+////                else
+////                	m_edgeId[dit] = m_edgeId[phi3(dit)];
+//
+//                //FaceId
+//                m_faceId[dit] = fId;
+//                m_faceId[phi3(dit)] = fId;
+//
+//                dit = phi1(dit);
+//        }
+//        while(dit != d);
+//}
+//
+//void ImplicitHierarchicalMap3::splitVolume(std::vector<Dart>& vd)
+//{
+//        EmbeddedMap3::splitVolume(vd);
+//
+//        unsigned int fId = getNewFaceId();
+//
+//        for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//        {
+//                Dart dit = *it;
+//
+//                //Edge Id
+//                m_edgeId[phi2(dit)] = m_edgeId[dit];
+//
+//                //Face Id
+//                m_faceId[phi2(dit)] = fId;
+//        }
+//}
+
+
 void ImplicitHierarchicalMap3::initEdgeId()
 {
 	DartMarker edgeMark(*this) ;
@@ -106,11 +291,8 @@ void ImplicitHierarchicalMap3::initFaceId()
 				faceMark.mark(e);
 
 				Dart e3 = Map3::phi3(e);
-				if(e3 != e)
-				{
-					m_faceId[e3] = m_faceIdCount ;
-					faceMark.mark(e3);
-				}
+				m_faceId[e3] = m_faceIdCount ;
+				faceMark.mark(e3);
 
 				e = Map3::phi1(e);
 			} while(e != d);
@@ -402,7 +584,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 	std::vector<Dart>::iterator face;
 
 
-	Dart old = d ;
+//	Dart old = d ;
 	bool facesAreSubdivided = faceIsSubdivided(d) ;
 
 	//parcours les faces du volume au niveau courant
