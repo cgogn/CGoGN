@@ -475,7 +475,7 @@ bool Map3::mergeVolumes(Dart d)
 
 void Map3::splitVolume(std::vector<Dart>& vd)
 {
-	assert(checkSimpleOrientedPath(vd)) ;
+	//assert(checkSimpleOrientedPath(vd)) ;
 
 	Dart e = vd.front();
 	Dart e2 = phi2(e);

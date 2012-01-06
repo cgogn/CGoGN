@@ -369,8 +369,7 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 		else
 		{
 			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
-			//d = map.end();
-			break;
+			d = map.end();
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);

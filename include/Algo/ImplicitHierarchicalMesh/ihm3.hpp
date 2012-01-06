@@ -210,41 +210,34 @@ inline void ImplicitHierarchicalMap3::next(Dart& d)
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this,thread);			// Lock a marker
+	DartMarkerStore mv(*this, thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
-	std::vector<Dart> darts;			//Darts that are traversed
-	darts.reserve(512);
-	darts.push_back(d);			//Start with the dart d
+	std::vector<Dart> darts;	// Darts that are traversed
+	darts.reserve(256);
+	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
 	for(unsigned int i = 0; !found && i < darts.size(); ++i)
 	{
-		Dart dc = darts[i];
+		// add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(darts[i]);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
 
-		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(dc);
-		if(d2 != dc)
+		if(!mv.isMarked(d21))
 		{
-			Dart d21 = phi1(d2); // turn in volume
-			Dart d23 = phi3(d2); // change volume
-
-			if(!mv.isMarked(d21))
-			{
-				darts.push_back(d21);
-				mv.mark(d21);
-			}
-
-			if((d23 != d2) && !mv.isMarked(d23))
-			{
-				darts.push_back(d23);
-				mv.mark(d23);
-			}
+			darts.push_back(d21);
+			mv.mark(d21);
+		}
+		if(!mv.isMarked(d23))
+		{
+			darts.push_back(d23);
+			mv.mark(d23);
 		}
 
-		found = f(dc);
+		found = f(darts[i]);
 	}
-
 	return found;
 }
 
@@ -278,26 +271,22 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_face(Dart d, Func
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	if (foreach_dart_of_oriented_face(d,f)) return true;
-
-	Dart d3 = phi3(d);
-	if (d3 != d) return foreach_dart_of_oriented_face(d3,f);
-	return false;
+	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(phi3(d), f, thread);
 }
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
+	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
-	visitedFaces.reserve(512) ;
+	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
 
 	// For every face added to the list
 	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
-		if (!mark.isMarked(visitedFaces[i]))		// Face has not been visited yet
+		if (!mark.isMarked(visitedFaces[i]))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
 			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
@@ -306,15 +295,15 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, Fu
 			// and add non visited adjacent faces to the list of face
 			if (!found)
 			{
-				Dart dNext = visitedFaces[i] ;
+				Dart e = visitedFaces[i] ;
 				do
 				{
-					mark.mark(dNext);					// Mark
-					Dart adj = phi2(dNext);				// Get adjacent face
-					if (adj != dNext && !mark.isMarked(adj))
+					mark.mark(e);				// Mark
+					Dart adj = phi2(e);			// Get adjacent face
+					if (!mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
-					dNext = phi1(dNext);
-				} while(dNext != visitedFaces[i]);
+					e = phi1(e);
+				} while(e != visitedFaces[i]);
 			}
 		}
 	}
@@ -328,7 +317,41 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_volume(Dart d, FunctorType
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f) ;
+	//return foreach_dart_of_oriented_volume(d, f) ;
+	DartMarkerStore mv(*this,thread);	// Lock a marker
+	bool found = false;					// Last functor return value
+
+	std::vector<Dart> darts;	// Darts that are traversed
+	darts.reserve(1024);
+	darts.push_back(d);			// Start with the dart d
+	mv.mark(d);
+
+	for(unsigned int i = 0; !found && i < darts.size(); ++i)
+	{
+		// add all successors if they are not marked yet
+		Dart d2 = phi1(darts[i]); // turn in face
+		Dart d3 = phi2(darts[i]); // change face
+		Dart d4 = phi3(darts[i]); // change volume
+
+		if (!mv.isMarked(d2))
+		{
+			darts.push_back(d2);
+			mv.mark(d2);
+		}
+		if (!mv.isMarked(d3))
+		{
+			darts.push_back(d2);
+			mv.mark(d2);
+		}
+		if (!mv.isMarked(d4))
+		{
+			darts.push_back(d4);
+			mv.mark(d4);
+		}
+
+		found = f(darts[i]);
+	}
+	return found;
 }
 
 

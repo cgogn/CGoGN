@@ -374,9 +374,9 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 	//on cherche le brin de niveau le plus bas de la hierarchie
 	//on note le niveau le plus bas de la hierarchie
 	mark.markOrbit(FACE, d) ;
-	for(face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 
 		// in a first time, the level of a face
 		//the level of the volume is the minimum of the
@@ -446,10 +446,10 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit(ORIENTED_FACE, ee) ;
 			}
 			e = phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 
@@ -506,17 +506,18 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 	Dart oldest = d;
 	DartMarkerStore mark(*this);	// Lock a marker
 
-	std::list<Dart> visitedFaces;	// Faces that are traversed
+	std::vector<Dart> visitedFaces;	// Faces that are traversed
+	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);		// Start with the face of d
-	std::list<Dart>::iterator face;
+	std::vector<Dart>::iterator face;
 
 	// For every face added to the list
 	//the oldest dart from a volume is the oldest dart from all faces of this volume
 	mark.markOrbit(FACE, d) ;
 
-	for(face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 
 		//for every dart in this face
 		Dart old = faceOldestDart(e);
@@ -529,10 +530,10 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit(ORIENTED_FACE, ee) ;
 			}
 			e = phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	return oldest;
@@ -591,9 +592,9 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 	//on cherche le brin de niveau le plus bas de la hierarchie
 	//on note le niveau le plus bas de la hierarchie
 	mark.markOrbit(FACE, d) ;
-	for(face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		Dart e = *face ;
+		Dart e = visitedFaces[i] ;
 
 		// in a first time, the level of a face
 		//the level of the volume is the minimum of the
@@ -607,10 +608,10 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit(ORIENTED_FACE, ee) ;
 			}
 			e = phi1(e) ;
-		} while(e != *face) ;
+		} while(e != visitedFaces[i]) ;
 	}
 
 	//mais pas le volume lui-meme
@@ -781,7 +782,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit(ORIENTED_FACE, ee) ;
 			}
 
 			e = phi1(e) ;
