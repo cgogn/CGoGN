@@ -14,7 +14,7 @@ SET ( BUILD_SHARED_LIBS OFF CACHE BOOL "if used all library are build as shared 
 SET ( WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp ")
 SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib  ")
 SET ( WITH_QT ON CACHE BOOL "build CGoGN with Qt lib  ")
-#SET ( WITH_NUMERICAL OFF CACHE BOOL "build CGoGN with Numerical libs support ")
+SET ( WITH_NUMERICAL ON CACHE BOOL "build CGoGN with Numerical libs support ")
 
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
@@ -59,12 +59,14 @@ IF (WITH_ASSIMP)
 	add_definitions(-DWITH_ASSIMP)	
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} ${CGoGN_ROOT_DIR}/ThirdParty/Assimp/include)	
 	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} assimp)
+	INSTALL (DIRECTORY ThirdParty/Assimp/include  DESTINATION .)
 ENDIF (WITH_ASSIMP)
 
 IF (WITH_ZINRI)
 	add_definitions(-DWITH_ZINRI)
 	SET (CGoGN_EXT_INCLUDES ${CGoGN_EXT_INCLUDES} 	${CGoGN_ROOT_DIR}/ThirdParty/Zinri)
 	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} Zinri)
+	INSTALL (DIRECTORY ThirdParty/Zinri/ DESTINATION include FILES_MATCHING PATTERN "*.h")
 ENDIF (WITH_ZINRI)
 
 IF (WITH_QT)
@@ -82,6 +84,12 @@ ENDIF (WITH_QT)
 #	SET (CGoGN_NUMERICAL_INCLUDES  ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
 #	SET (CGoGN_NUMERICAL_LIBS f2c  blas  numerical lapack)
 #ENDIF (WITH_NUMERICAL)
+
+IF (WITH_NUMERICAL)
+	INSTALL(FILES ThirdParty/Numerical/UFconfig/UFconfig.h DESTINATION include )
+	INSTALL(DIRECTORY ThirdParty/Numerical/ DESTINATION include FILES_MATCHING PATTERN "*.h")
+	INSTALL(DIRECTORY ThirdParty/Numerical/ DESTINATION include FILES_MATCHING PATTERN "*.hpp")
+ENDIF (WITH_NUMERICAL)
 
 # qq definition specifiques pour mac
 IF(APPLE)
@@ -104,4 +112,9 @@ ELSE(WIN32)
 	add_subdirectory(Debug)
 	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)
 ENDIF(WIN32)
+
+INSTALL (DIRECTORY ${CGoGN_ROOT_DIR}/include ${CGoGN_ROOT_DIR}/lib ${CGoGN_ROOT_DIR}/bin DESTINATION .)
+INSTALL (DIRECTORY ThirdParty/glm/glm  DESTINATION include)
+INSTALL (DIRECTORY cmake_modules  DESTINATION .)
+INSTALL (FILES apps_cmake.txt  DESTINATION .)
 
