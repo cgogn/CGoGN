@@ -84,7 +84,7 @@ GLSLShader::GLSLShader() :
 	m_geom_shader_source(NULL)
 {
 	if (DEFINES_GL == NULL)
-		DEFINES_GL = &DEFINES_GL3;
+		DEFINES_GL = &DEFINES_GL2;
 }
 
 void GLSLShader::registerShader(void* ptr, GLSLShader* shader)

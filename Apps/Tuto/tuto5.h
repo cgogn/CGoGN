@@ -24,45 +24,56 @@
 #ifndef __TUTO5_
 #define __TUTO5_
 
+
 #include <iostream>
 
+#define WITH_GMAP 1
+
 #include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap3.h"
+#ifdef WITH_GMAP
+	#include "Topology/gmap/embeddedGMap3.h"
+#else
+	#include "Topology/map/embeddedMap3.h"
+#endif
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Algo/Render/GL2/topo3Render.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 
-#include "Algo/Render/SVG/mapSVGRender.h"
-
-#include "Algo/Modelisation/primitives3d.h"
-#include "Algo/Modelisation/polyhedron.h"
-#include "Algo/Modelisation/subdivision.h"
+#include "Algo/Render/GL2/topo3Render.h"
 
 #include "Topology/generic/cellmarker.h"
-
-#include "Algo/Render/GL1/map_glRender.h"
-#include "Algo/Render/GL1/topo_render.h"
-
 #include "Utils/text3d.h"
+
 #include "Utils/pointSprite.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
+
+
+
 #include "Utils/Qt/qtSimple.h"
 
 #include "ui_tuto5.h"
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/Qt/qtui.h"
 
+
 using namespace CGoGN ;
 
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
+#ifdef WITH_GMAP
+	typedef EmbeddedGMap3 MAP;
+#else
 	typedef EmbeddedMap3 MAP;
+#endif
 };
+
+
+using namespace CGoGN ;
+
 
 /**
  * Utilisation de designer-qt4:
@@ -71,7 +82,7 @@ struct PFP: public PFP_STANDARD
  * Ajouter les widgets necessaires, mettre des noms clairs pour
  * les utiliser dans le .cpp (pour les call back principalement)
  */
-class Tuto5: public Utils::QT::SimpleQT
+class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
@@ -80,42 +91,39 @@ class Tuto5: public Utils::QT::SimpleQT
 	bool render_vectors;
     bool render_topo;
 
-//	Algo::Render::GL2::MapRender* m_render;
-//	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
-//
-//	Utils::VBO* m_positionVBO;
-//	Utils::VBO* m_dataVBO;
+	Algo::Render::GL2::MapRender* m_render;
+	Algo::Render::GL2::Topo3Render* m_render_topo;
 
-//	Utils::ShaderSimpleColor* m_shader;
-//	Utils::ShaderVectorPerVertex* m_lines;
-//	Utils::Strings3D* m_strings;
-//	Utils::PointSprite* m_sprite;
+	Utils::VBO* m_positionVBO;
+	Utils::VBO* m_dataVBO;
+
+	Utils::ShaderSimpleColor* m_shader;
+	Utils::ShaderVectorPerVertex* m_lines;
+	Utils::Strings3D* m_strings;
+	Utils::PointSprite* m_sprite;
 
 	QTimer *m_timer;
-
+	
 public:
-	PFP::MAP m;
-	PFP::TVEC3 position ;
-	Dart dglobal;
-
-	Tuto5():
-		render_text(false),
-		render_balls(false),
-		render_vectors(false),
+	MyQT():
+		render_text(true),
+		render_balls(true),
+		render_vectors(true),
 		render_topo(true),
-//		m_render(NULL),
-//		m_render_topo(NULL),
-//		m_positionVBO(NULL),
-//		m_dataVBO(NULL),
-//		m_shader(NULL),
-//		m_lines(NULL),
-//		m_strings(NULL),
-//		m_sprite(NULL),
+		m_render(NULL),
+		m_render_topo(NULL),
+		m_positionVBO(NULL),
+		m_dataVBO(NULL),
+		m_shader(NULL),
+		m_lines(NULL),
+		m_strings(NULL),
+		m_sprite(NULL),
 		m_timer(NULL)
 	{}
 
+	Dart m_selected;
 protected:
-	void storeVerticesInfo();
+    void storeVerticesInfo();
 
 	void cb_redraw();
 
@@ -127,21 +135,16 @@ protected:
 
 // slots locaux
 public slots:
-//	void balls_onoff(bool x);
-//	void vectors_onoff(bool x);
-//	void text_onoff(bool x);
+	void balls_onoff(bool x);
+	void vectors_onoff(bool x);
+	void text_onoff(bool x);
 	void topo_onoff(bool x);
 
-//	void slider_balls(int x);
-//	void slider_vectors(int x);
-//	void slider_text(int x);
+	void slider_balls(int x);
+	void slider_vectors(int x);
+	void slider_text(int x);
 
 	void animate();
-
-	Dart embedCube1();
-	Dart embedCube2();
-	Dart embedMapCollapse();
-
 };
 
 #endif

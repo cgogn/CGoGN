@@ -21,57 +21,70 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
 #ifndef _TUTO4_H_
 #define _TUTO4_H_
 
 #include "Utils/Qt/qtSimple.h"
+#include "Utils/cgognStream.h"
 
-#include "ui_tuto4.h"
-// inclure qtui.h juste après le ui_xxx.h
-#include "Utils/Qt/qtui.h"
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Algo/Render/GL2/topoRender.h"
 
-// forward definitions (minimize includes) syntax a little bit tricky !!
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; class TopoRenderMapD; } } } }
-namespace CGoGN { namespace Utils { class VBO; } }
-namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
-namespace CGoGN { namespace Utils { class ShaderFlat; } }
 
 using namespace CGoGN ;
+
 /**
- * A class for a little interface and rendering
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
  */
+struct PFP: public PFP_STANDARD
+{
+	// definition of the type of the map
+	typedef EmbeddedMap2 MAP;
+};
+
 
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
-
 public:
-	// render
-	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
-
-	// VBO
-	Utils::VBO* m_positionVBO;
-
-	// shader basic
-	Utils::ShaderSimpleColor* m_shader;
-	Utils::ShaderFlat* m_shader2;
-
-	bool render_obj;
-	bool render_topo;
-
-	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL), render_obj(true), render_topo(false) {}
+	MyQT():m_render_topo(NULL){}
 
 	void cb_redraw();
-
 	void cb_initGL();
+	void cb_mouseClick(int button, int x, int y);
 
-	void cb_keyPress(int code);
+protected:
+	// declaration of the map
+	PFP::MAP myMap;
 
-public slots:
-	void button_compile();
-	void slider_explode(int x);
+	// attribute handler on position;
+	PFP::TVEC3 position;
+
+	// render (for the topo)
+	Algo::Render::GL2::TopoRender* m_render_topo;
+
+	// selected dart (mouse click)
+	std::vector<Dart> dart_selected;
+	//
+	Geom::Vec3f color;
+
+	// just for more compact writing
+	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
+	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
+	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
+	template<int X>
+	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+
+public:
+
+	// create the map (here tetrahedron
+	void createMap();
+
+	// traverse the map using markers
+	void traverseMap();
 };
+
 
 #endif

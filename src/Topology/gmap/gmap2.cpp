@@ -62,7 +62,7 @@ Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 	Dart d = GMap1::newFace(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = GMap1::newFace(nbEdges);
+		Dart e = GMap1::newBoundaryFace(nbEdges);
 
 		Dart it = d;
 		do
@@ -457,11 +457,11 @@ void GMap2::splitFace(Dart d, Dart e)
 	beta2unsew(beta1(d)) ;
 	beta2unsew(beta1(e)) ;
 
-	GMap1::cutEdge(phi_1(d)) ;
-	GMap1::cutEdge(phi_1(e)) ;
-	GMap1::splitFace(phi_1(d), phi_1(e)) ;
-	beta2sew(phi_1(d), beta1(e)) ;
-	beta2sew(phi_1(e), beta1(d)) ;
+	Dart dd = GMap1::cutEdge(phi_1(d)) ;
+	Dart ee = GMap1::cutEdge(phi_1(e)) ;
+	GMap1::splitFace(dd, ee) ;
+	beta2sew(dd, beta1(e)) ;
+	beta2sew(ee, beta1(d)) ;
 
 	beta2sew(beta0(dprev), beta0(beta2(dprev))) ;
 	beta2sew(beta0(eprev), beta0(beta2(eprev))) ;

@@ -43,7 +43,6 @@ enum Intersection
 	FACE_INTERSECTION = 3
 } ;
 
-
 /**
  * test the intersection between a line and a triangle
  * @param P a point on the line
@@ -54,9 +53,7 @@ enum Intersection
  * @return the intersection ( FACE_INTERSECTION = OK, EDGE_INTERSECTION = line inside of plane)
  */
 template <typename VEC3>
-Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP,  const VEC3& NormP, VEC3& Inter) ;
-
-
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP, const VEC3& NormP, VEC3& Inter) ;
 
 /**
  * test the intersection between a ray and a triangle (optimized version with triple product
@@ -84,8 +81,6 @@ Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3&
 template <typename VEC3>
 Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter);
 
-
-
 /**
  * test the intersection between a ray and a triangle (optimized version with triple product
  * @param P a point on the line
@@ -97,7 +92,6 @@ Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VE
  */
 template <typename VEC3>
 Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
-
 
 /**
  * test the intersection between a ray and a triangle, but test only face intersection and

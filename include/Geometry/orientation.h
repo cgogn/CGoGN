@@ -72,7 +72,7 @@ template <typename VEC3>
 Orientation3D testOrientation3D(const VEC3& P, const VEC3& A, const VEC3& B, const VEC3& C)
 {
 	typedef typename VEC3::DATA_TYPE T ;
-	Geom::Plane3D<T> plane(A,B,C) ;
+	Geom::Plane3D<T> plane(A, B, C) ;
 	return plane.orient(P) ;
 }
 
@@ -87,7 +87,7 @@ template <typename VEC3>
 Orientation3D testOrientation3D(const VEC3& P, const VEC3& N, const VEC3& PP)
 {
 	typedef typename VEC3::DATA_TYPE T ;
-	Geom::Plane3D<T> plane(N,PP) ;
+	Geom::Plane3D<T> plane(N, PP) ;
 	return plane.orient(P) ;
 }
 

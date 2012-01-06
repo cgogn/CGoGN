@@ -22,34 +22,120 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <iostream>
-
-#include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/generic/mapBrowser.h"
-
-#include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-
-#include "Utils/drawer.h"
-
 #include "tuto2.h"
+#include "Algo/Geometry/boundingbox.h"
 
 using namespace CGoGN ;
 
-struct PFP: public PFP_STANDARD
+
+int main(int argc, char **argv)
 {
-	// definition de la carte
-	typedef Map2 MAP;
-};
+	//	// interface
+	QApplication app(argc, argv);
+	MyQT sqt;
+	// copy output tout Qt console of application (shift enter)
+	CGoGNout.toConsole(&sqt);
 
-PFP::MAP myMap;
+	// example code itself
+	sqt.createMap();
+	// set help message in menu
+	sqt.setHelpMsg("Tuto 2: \nCreate and use multiple attributes\nrender with multiple shaders");
 
-PFP::TVEC3 position ;
-PFP::TVEC3 normal ;
-AttributeHandler<Geom::Vec4f> color ;
+	// final show for redraw
+	sqt.show();
+	// and wait for the end
+	return app.exec();
+}
 
+
+
+void MyQT::createMap()
+{
+
+	// creation of 2 new faces: 1 triangle and 1 square, sew and embed (see tuto1 for details)
+	Dart d1 = myMap.newFace(3);
+	Dart d2 = myMap.newFace(4);
+	myMap.sewFaces(d1, d2);
+	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	position[d1] = PFP::VEC3(0, 0, 0);
+	position[PHI1(d1)] = PFP::VEC3(2, 0, 0);
+	position[PHI_1(d1)] = PFP::VEC3(1, 2, 0);
+	position[PHI<11>(d2)] = PFP::VEC3(0, -2, 0);
+	position[PHI_1(d2)] = PFP::VEC3(2, -2, 0);
+
+
+	// create another attribute on vertices (for faces drawing)
+	AttributeHandler<Geom::Vec3f> colorF = myMap.addAttribute<PFP::VEC3>(VERTEX, "colorF");
+
+	colorF[d1] = Geom::Vec3f(1.0f,0.0f,0.0f);
+	colorF[PHI1(d1)] = Geom::Vec3f(0.0f,1.0f,0.0f);
+	colorF[PHI_1(d1)] = Geom::Vec3f(0.0f,0.0f,1.0f);
+	colorF[PHI<11>(d2)] = Geom::Vec3f(1.0f,0.0f,1.0f);
+	colorF[PHI_1(d2)] = Geom::Vec3f(0.0f,1.0f,1.0f);
+
+
+	// create another attribute on vertices (for edges drawing)
+	AttributeHandler<Geom::Vec3f> colorE = myMap.addAttribute<PFP::VEC3>(VERTEX, "colorE");
+
+	colorE[d1] = Geom::Vec3f(0.0f,0.5f,0.5f);
+	colorE[PHI1(d1)] = Geom::Vec3f(0.5f,0.0f,0.5f);
+	colorE[PHI_1(d1)] = Geom::Vec3f(0.5f,0.5f,0.0f);
+	colorE[PHI<11>(d2)] = Geom::Vec3f(0.0f,0.5f,0.0f);
+	colorE[PHI_1(d2)] = Geom::Vec3f(0.5f,0.0f,0.0f);
+
+
+	// example of attribute on face
+	// here for example we store the number of edges of faces at construction
+	AttributeHandler<int> side  = myMap.addAttribute<int>(FACE, "nb_sides");
+	side[d1]=3;
+	side[d2]=4;
+
+
+    //  bounding box of scene
+    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+
+    // send BB info to interface for centering on GL screen
+	setParamObject(lWidthObj, lPosObj.data());
+
+	// first show for be sure that GL context is binded
+	show();
+
+
+	// update of position VBO (context GL necessary)
+	m_positionVBO->updateData(position);
+	m_colorVBO1->updateData(colorF);
+	m_colorVBO2->updateData(colorE);
+
+	// construct rendering primities
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);	// special primitive for boundary edges
+
+
+	// traverse of all dart of the map:
+	// and write informations
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+	{
+		CGoGNout << "Dart "<< d;
+		if (myMap.isBoundaryMarked(d))
+			CGoGNout << " is a boundary dart (implicitly added)"<< CGoGNendl;
+		else
+		{
+			CGoGNout <<":  position= "<< position[d];
+			CGoGNout <<" / color1= "<< colorF[d];
+			CGoGNout <<" / color2= "<< colorE[d];
+			CGoGNout << " / numer of side of face "<< side[d] << CGoGNendl;
+		}
+	}
+
+
+}
+
+
+
+// initialization GL callback
 void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
@@ -60,201 +146,52 @@ void MyQT::cb_initGL()
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();
+	// and color
+	m_colorVBO1 = new Utils::VBO();
+	m_colorVBO2 = new Utils::VBO();
+
 
 	// using simple shader with color
 	m_shader = new Utils::ShaderSimpleColor();
 	m_shader->setAttributePosition(m_positionVBO);
-
-	m_color = Geom::Vec4f(0.,1.,0.,0.);
-	m_shader->setColor(m_color);
-
+	m_shader->setColor(Geom::Vec4f(0.0f, 1.0f, 0.0f, 0.0f));
+	// each shader must be registred to allow Qt interface to update matrices uniforms
 	registerShader(m_shader);
 
-	m_with_lines = true;
-	m_line_width = 4.0;
+	m_shader2 = new Utils::ShaderColorPerVertex();
+	m_shader2->setAttributePosition(m_positionVBO);
+//	m_shader2->setAttributeColor(m_colorVBO1);
+	// each shader must be registred to allow Qt interface to update matrices uniforms
+	registerShader(m_shader2);
+
+
 }
 
+// redraw GL callback (clear and swap already done)
 void MyQT::cb_redraw()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glEnable(GL_LIGHTING);
-	if (m_shader)
-	{
-		if (m_with_lines)
-		{
-			glLineWidth(m_line_width);
-			m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
-			m_render->draw(m_shader, Algo::Render::GL2::LINES);
-		}
+	glEnable(GL_CULL_FACE);
 
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0f, 1.0f);
+	// draw yellow points
+	glLineWidth(2.0f);
+	m_shader2->setAttributeColor(m_colorVBO1);
+	m_render->draw(m_shader2, Algo::Render::GL2::LINES);
 
-		m_shader->setColor(m_color);
-		m_render->draw(m_shader, Algo::Render::GL2::TRIANGLES);
+	// draw white points
+	glPointSize(7.0f);
+	m_shader->setColor(Geom::Vec4f(1.,1.,1.,0.));
+	m_render->draw(m_shader, Algo::Render::GL2::POINTS);
 
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
+	// use offset for nice drawing
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(1.0f, 1.0f);
+
+	// draw faces with pervertex color rendering
+	m_shader2->setAttributeColor(m_colorVBO2);
+	m_render->draw(m_shader2, Algo::Render::GL2::TRIANGLES);
+
+	glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
-void MyQT::lines_slot(bool x)
-{
-	m_with_lines = x;
-	updateGL();
-}
 
-void MyQT::line_width_slot(int x)
-{
-
-	m_line_width=x;
-	updateGL();
-}
-
-void MyQT::color_slot()
-{
-	QColor col = QColorDialog::getColor ();
-	if (col.isValid())
-	{
-
-		m_color = Geom::Vec4f(float(col.red())/255.0f,float(col.green())/255.0f,float(col.blue())/255.0f,0.0f);
-		updateGL();
-	}
-	else
-	{
-		CGoGNout << "Cancel Color" << CGoGNendl;
-	}
-}
-
-// Algorithme qui parcours une carte et affiche l'attribut position de chaque brin
-template<typename PFP>
-void TestDeParcoursAFF(typename PFP::MAP& m, MapBrowser& mb, const typename PFP::TVEC3& pos)
-{
-	for (Dart d = mb.begin(); d != mb.end(); mb.next(d))
-	{
-		typename PFP::VEC3 P = pos[d];
-		CGoGNout << "P "<< P << CGoGNendl;
-	}
-}
-
-int main(int argc, char **argv)
-{
-	/// Utilisation des MapBrowsers
-
-	/// on reprend la carte de tuto1
-
-	Dart d2 = myMap.newFace(3);
-	Dart d3 = myMap.newFace(4);
-	myMap.sewFaces(d2, d3);
-
-	position = myMap.addAttribute<Geom::Vec3f>(VERTEX, "position");
-
-	position[d2] = PFP::VEC3(0.0f, 0.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	position[d2] = PFP::VEC3(2.0f, 0.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	position[d2] = PFP::VEC3(1.0f, 3.0f, 0.0f);
-	d2 = myMap.phi1(d2);
-	d3 = myMap.phi<11>(d3);
-	position[d3] = PFP::VEC3(0.0f, -2.0f, 0.0f);
-	d3 = myMap.phi1(d3);
-	position[d3] = PFP::VEC3(2.0f, -2.0f, 0.0f);
-	d3 = myMap.phi1(d3);
-
-
-	// MapBrowser: la carte elle meme
-	CGoGNout << "Parcours avec la carte" << CGoGNendl;
-	TestDeParcoursAFF<PFP>(myMap, myMap, position);
-
-	// MapBrowserLinkedAuto
-	// sous-carte dans une liste avec attribut gere par le browser
-	CGoGNout << "Parcours avec le browser (les sommets)"<<CGoGNendl;
-
-	// creation d'un browser avec attribut cree a la volee
-	MapBrowserLinked<PFP::MAP>mbl(myMap);
-
-	// on ajoute un brin par sommet dans le browser
-	myMap.foreach_orbit(VERTEX, mbl);
-
-	// et on parcours la sous-carte avec ce browser
-	TestDeParcoursAFF<PFP>(myMap, mbl, position);
-
-
-	// MapBrowserLinkedAttr
-	// sous-carte dans une liste avec attribut gere par l'appelant
-	CGoGNout << "Parcours avec le browser (le triangle)"<<CGoGNendl;
-
-	// on cree un attribut Dart pour la liste
-	AutoAttributeHandler<Dart> tableLink(myMap, DART);
-	// le browser
-	MapBrowserLinked<PFP::MAP>mbl2(myMap,tableLink);
-	// que l'on remplit a la main
-	Dart d = d2;
-	mbl2.pushBack(d);
-	d =  myMap.phi1(d);
-	mbl2.pushBack(d);
-	d =  myMap.phi1(d);
-	mbl2.pushFront(d);
-
-	// et on parcours la sous-carte avec ce browser
-	TestDeParcoursAFF<PFP>(myMap, mbl2, position);
-
-
-	// MapBrowserSelector
-	// sous-carte  avec des brins marques (equivalent de l'utilisation de good dans les algos)
-	CGoGNout << "Parcours avec le browser selector"<<CGoGNendl;
-
-	// on marque 2 brins pour le test
-	DartMarker mk(myMap);
-	mk.mark(d2);
-	mk.mark(d3);
-
-	// le selector qui selectionne les "bons" brins (les autres sont reconduits a la frontiere ;)
-	SelectorMarked selector(mk);
-
-//	// le browser
-//	MapBrowserSelector<PFP::MAP>mbsel(myMap,selector);
-
-//	// et on parcours la sous-carte avec ce browser
-//	TestDeParcoursAFF<PFP>(myMap,mbsel,position);
-
-
-	// interface:
-	QApplication app(argc, argv);
-	MyQT sqt;
-
-    Utils::QT::uiDockInterface dock;
-    sqt.setDock(&dock);
-
-	sqt.setCallBack( dock.checkLines, SIGNAL(toggled(bool)), SLOT(lines_slot(bool)) );
-	sqt.setCallBack( dock.color_button , SIGNAL(pressed()), SLOT(color_slot()) );
-	sqt.setCallBack( dock.dial_line_width , SIGNAL(valueChanged(int)), SLOT(line_width_slot(int)) );
-
-	// message d'aide
-	sqt.setHelpMsg("Second Tuto");
-
-	dock.number_of_darts->display(int(myMap.getNbDarts()));
-
-    //  bounding box
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-
-    // envoit info BB a l'interface
-	sqt.setParamObject(lWidthObj,lPosObj.data());
-
-	// show 1 pour GL context
-	sqt.show();
-
-	// update du VBO position (context GL necessaire)
-	sqt.m_positionVBO->updateData(position);
-
-	// update des primitives du renderer
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
-
-	// show final pour premier redraw
-	sqt.show();
-
-	// et on attend la fin.
-	return app.exec();
-}

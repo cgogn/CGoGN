@@ -31,7 +31,7 @@
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class MapRender; } } } }
-namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class TopoRenderMapD; } } } }
+namespace CGoGN { namespace Algo { namespace Render { namespace GL2 { class TopoRender; } } } }
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderPhong; } }
 namespace CGoGN { namespace Utils { class ShaderSimpleColor; } }
@@ -53,7 +53,7 @@ protected:
 public:
 	// render
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
+	Algo::Render::GL2::TopoRender* m_render_topo;
 
 	// VBO
 	Utils::VBO* m_positionVBO;
