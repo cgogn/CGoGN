@@ -75,10 +75,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
 		if (good(d))
-		{
 			vecDarts.push_back(d);
-			m_attIndex[d] = (vecDarts.size()-1)*2;
-		}
 	}
 	m_nbDarts = vecDarts.size();
 
@@ -101,6 +98,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
+
+	unsigned int indexDC=0;
 
 	DartMarker mf(map);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
@@ -137,11 +136,12 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 				VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
 				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
 
+				m_attIndex[d] = indexDC;
+				indexDC+=2;
 				*positionDartBuf++ = P;
+				*colorDartBuf++ = VEC3(1.,0.,0.);
 				*positionDartBuf++ = Q;
 				*colorDartBuf++ = VEC3(1.,1.,1.);
-				*colorDartBuf++ = VEC3(1.,1.,1.);
-
 				VEC3 f = P*0.5f + Q*0.5f;
 				fv2[d] = f;
 				f = P*0.1f + Q*0.9f;
@@ -220,10 +220,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
 		if (good(d))
-		{
 			vecDarts.push_back(d);
-			m_attIndex[d] = (vecDarts.size()-1)*2;
-		}
 	}
 	m_nbDarts = vecDarts.size();
 
@@ -247,6 +244,8 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
+
+	unsigned int indexDC=0;
 
 	DartMarker mf(map);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
@@ -285,6 +284,8 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 				VEC3 PP = REAL(0.52)*P + REAL(0.48)*Q;
 				VEC3 QQ = REAL(0.52)*Q + REAL(0.48)*P;
 
+				m_attIndex[d] = indexDC;
+				indexDC+=2;
 				*positionDartBuf++ = P;
 				*colorDartBuf++ = VEC3(1.,1.,1.);
 				*positionDartBuf++ = PP;
@@ -304,6 +305,9 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 				fv2[dd] = f;
 				f = Q*0.9f + QQ*0.1f;
 				fv1[dd] = f;
+				m_attIndex[dd] = indexDC;
+				indexDC+=2;
+
 
 				d = map.phi1(d);
 			}
@@ -367,9 +371,9 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (nb < m_nbDarts)
+		if (good(d))
 		{
-			if (good(d))
+			if (nb < m_nbDarts)
 			{
 				float r,g,b;
 				dartToCol(d, r,g,b);
@@ -380,7 +384,6 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 				*local++ = r;
 				*local++ = g;
 				*local++ = b;
-
 				nb++;
 			}
 			else
@@ -389,7 +392,6 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 				break;
 			}
 		}
-
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }

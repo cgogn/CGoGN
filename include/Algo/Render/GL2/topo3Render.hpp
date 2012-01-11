@@ -93,9 +93,6 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	{
 		if (good(d))
 		{
-			m_attIndex[d] = posDBI;
-			posDBI+=2;
-			
 			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 			VEC3 center(0, 0, 0);
 			unsigned int nbv = 0;
@@ -195,6 +192,9 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 			{
 				VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
 				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
+
+				m_attIndex[d] = posDBI;
+				posDBI+=2;
 
 				*positionDartBuf++ = P;
 				*positionDartBuf++ = Q;
@@ -364,9 +364,6 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	{
 		if (good(d))
 		{
-			m_attIndex[d] = posDBI;
-			posDBI+=2;
-			
 			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
 			VEC3 center(0, 0, 0);
 			unsigned int nbv = 0;
@@ -477,6 +474,10 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 				*colorDartBuf++ = VEC3(1.,1.,1.);
 				*colorDartBuf++ = VEC3(1.,1.,1.);
 
+				m_attIndex[d] = posDBI;
+				posDBI+=2;
+
+
 				fv1[d] = P*0.9f + PP*0.1f;
 				fv2x[d] = P*0.52f + PP*0.48f;
 				fv2[d] = P*0.48f + PP*0.52f;
@@ -484,6 +485,10 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 				fv1[dx] = Q*0.9f + QQ*0.1f;
 				fv2[dx] = Q*0.52f + QQ*0.48f;
 				fv2x[dx] = Q*0.48f + QQ*0.52f;
+
+				m_attIndex[dx] = posDBI;
+				posDBI+=2;
+
 				d = map.phi1(d);
 			}
 
