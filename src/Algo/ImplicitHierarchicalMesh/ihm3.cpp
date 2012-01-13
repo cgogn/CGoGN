@@ -509,11 +509,10 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);		// Start with the face of d
-	std::vector<Dart>::iterator face;
 
 	// For every face added to the list
 	//the oldest dart from a volume is the oldest dart from all faces of this volume
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit(ORIENTED_FACE, d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{

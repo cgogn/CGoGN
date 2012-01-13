@@ -99,9 +99,6 @@ public:
 
 	Utils::ShaderSimpleColor* m_shader;
 
-	Utils::Drawer* influence_area;
-	Utils::Drawer* chips_area;
-
 	Geom::Vec3f m_coeffTopoExplod;
 	Geom::Vec3f gPosObj ;
 	float gWidthObj ;

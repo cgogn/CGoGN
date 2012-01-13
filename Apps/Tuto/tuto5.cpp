@@ -93,6 +93,7 @@ void MyQT::animate()
 //	transfoMatrix() = glm::rotate(transfoMatrix(), 0.5f, glm::vec3(0.5773f,0.5773f,0.5773f));
 	transfoRotate( 0.5f, 0.5773f,0.5773f,0.5773f);
 	updateGLMatrices();
+	updateGL();
 }
 
 

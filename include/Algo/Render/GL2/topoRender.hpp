@@ -366,9 +366,9 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (nb < m_nbDarts)
+		if (good(d))
 		{
-			if (good(d))
+			if (nb < m_nbDarts)
 			{
 				float r,g,b;
 				dartToCol(d, r,g,b);
@@ -382,11 +382,11 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 
 				nb++;
 			}
-		}
-		else
-		{
-			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
-			d = map.end();
+			else
+			{
+				CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
+				d = map.end();
+			}
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);

@@ -354,8 +354,8 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 			dd = map.phi1(map.phi1(map.phi1(ne)));
 
 			map.splitFace(ne, dd) ;
-			//unsigned int idface = map.getNewFaceId();
-			//map.setFaceId(dd,idface, FACE);
+			unsigned int idface = map.getNewFaceId();
+			map.setFaceId(dd,idface, FACE);
 
 			newEdges.push_back(map.phi1(dd));
 

@@ -35,7 +35,8 @@ Viewer::Viewer() :
 	m_flatShader(NULL),
 	m_vectorShader(NULL),
 	m_simpleColorShader(NULL),
-	m_pointSprite(NULL)
+	m_pointSprite(NULL),
+	m_strings(NULL)
 {
 	normalScaleFactor = 1.0f ;
 	vertexScaleFactor = 0.1f ;
@@ -110,15 +111,21 @@ void Viewer::cb_initGL()
 	m_pointSprite = new Utils::PointSprite() ;
 	m_pointSprite->setAttributePosition(m_positionVBO) ;
 
+    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
+    storeVerticesInfo();
+    m_strings->sendToVBO();
+
 	registerShader(m_phongShader) ;
 	registerShader(m_flatShader) ;
 	registerShader(m_vectorShader) ;
 	registerShader(m_simpleColorShader) ;
 	registerShader(m_pointSprite) ;
+	registerShader(m_strings);
 }
 
 void Viewer::cb_redraw()
 {
+	glClearColor(1,1,1,0);
 	if(m_drawVertices)
 	{
 		float size = vertexScaleFactor ;
@@ -126,6 +133,7 @@ void Viewer::cb_redraw()
 		m_pointSprite->predraw(Geom::Vec3f(0.0f, 0.0f, 1.0f)) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
 		m_pointSprite->postdraw() ;
+		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
 	}
 
 	if(m_drawEdges)
@@ -175,9 +183,10 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("off (*.off)") ;
+	std::string filters("off (*.off);; map (*.map)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
-	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+
+	exportMesh(filename);
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -220,9 +229,40 @@ void Viewer::importMesh(std::string& filename)
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
 
+	storeVerticesInfo();
+	m_strings->sendToVBO();
+
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
 }
+
+void Viewer::exportMesh(std::string& filename)
+{
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
+
+	if (extension == std::string(".map"))
+		myMap.saveMapBin(filename);
+	else
+		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+}
+
+
+void Viewer::storeVerticesInfo()
+{
+	CellMarker mv(myMap,VERTEX);
+	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	{
+		if (!mv.isMarked(d))
+		{
+			mv.mark(d);
+			std::stringstream ss;
+			ss << d << " : "<< position[d];
+			m_strings->addString(ss.str(),position[d]);
+		}
+	}
+}
+
 
 void Viewer::slot_drawVertices(bool b)
 {
@@ -233,6 +273,7 @@ void Viewer::slot_drawVertices(bool b)
 void Viewer::slot_verticesSize(int i)
 {
 	vertexScaleFactor = i / 500.0f ;
+	m_strings->setScale(0.02f*i);
 	updateGL() ;
 }
 

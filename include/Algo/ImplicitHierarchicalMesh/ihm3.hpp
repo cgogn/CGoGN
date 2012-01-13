@@ -514,6 +514,7 @@ inline unsigned int ImplicitHierarchicalMap3::edgeLevel(Dart d)
 	return r;
 }
 
+
 /***************************************************
  *               ATTRIBUTE HANDLER                 *
  ***************************************************/

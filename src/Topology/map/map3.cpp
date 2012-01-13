@@ -656,13 +656,13 @@ bool Map3::isBoundaryVolume(Dart d)
 	DartMarkerStore mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces ;
-	visitedFaces.reserve(128) ;
+	visitedFaces.reserve(512) ;
 	visitedFaces.push_back(d) ;
 	mark.markOrbit(ORIENTED_FACE, d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		if (isBoundaryMarked(phi3(visitedFaces[i])))
+		if(isBoundaryMarked(phi3(visitedFaces[i])))
 			return true ;
 
 		Dart e = visitedFaces[i] ;

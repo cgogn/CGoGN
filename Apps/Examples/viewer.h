@@ -44,6 +44,7 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
+#include "Utils/text3d.h"
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Geometry/normal.h"
@@ -102,6 +103,7 @@ public:
 	Utils::ShaderVectorPerVertex* m_vectorShader ;
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
 	Utils::PointSprite* m_pointSprite ;
+	Utils::Strings3D* m_strings;
 
 	Viewer() ;
 
@@ -113,6 +115,11 @@ public:
 	void cb_Save() ;
 
 	void importMesh(std::string& filename) ;
+	void exportMesh(std::string& filename);
+
+protected:
+	void storeVerticesInfo();
+
 
 public slots:
 	void slot_drawVertices(bool b) ;

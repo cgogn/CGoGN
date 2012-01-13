@@ -39,7 +39,7 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
+
 
 #include "Algo/Render/GL2/topo3Render.h"
 
@@ -47,6 +47,7 @@
 #include "Utils/text3d.h"
 
 #include "Utils/pointSprite.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
 
