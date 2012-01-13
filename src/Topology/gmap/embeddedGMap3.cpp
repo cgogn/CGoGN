@@ -83,10 +83,10 @@ Dart EmbeddedGMap3::cutEdge(Dart d)
 		do
 		{
 			unsigned int vEmb = getEmbedding(VOLUME, f) ;
-			setDartEmbedding(FACE, beta0(f), vEmb);
-			setDartEmbedding(FACE, phi1(f), vEmb);
-			setDartEmbedding(FACE, phi2(f), vEmb);
-			setDartEmbedding(FACE, beta1(phi2(f)), vEmb);
+			setDartEmbedding(VOLUME, beta0(f), vEmb);
+			setDartEmbedding(VOLUME, phi1(f), vEmb);
+			setDartEmbedding(VOLUME, phi2(f), vEmb);
+			setDartEmbedding(VOLUME, beta1(phi2(f)), vEmb);
 			f = alpha2(f);
 		} while(f != d);
 	}
