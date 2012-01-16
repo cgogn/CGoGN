@@ -32,6 +32,32 @@ cd ..
 
 app1=`basename $1`
 app2=`basename $2`
+
+
+
+app1_maj=`echo $app1 | awk '
+BEGIN { upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        lower = "abcdefghijklmnopqrstuvwxyz"
+}
+{
+	FIRSTCHAR = substr($1, 1, 1)
+	if (CHAR = index(lower, FIRSTCHAR))
+		$1 = substr(upper, CHAR, 1) substr($1, 2)
+	print $0
+}' `
+
+
+app2_maj=`echo $app2 | awk '
+BEGIN { upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        lower = "abcdefghijklmnopqrstuvwxyz"
+}
+{
+	FIRSTCHAR = substr($1, 1, 1)
+	if (CHAR = index(lower, FIRSTCHAR))
+		$1 = substr(upper, CHAR, 1) substr($1, 2)
+	print $0
+}' `
+
 echo remplace $app1 by $app2 in CMakeLists.txt ...
 find . -name "CMakeLists.txt" -exec sed -i s/$app1/$app2/g {} \;
 
@@ -55,9 +81,9 @@ for f in $list_of_files; do
 done
 
 echo Modify contents ...
-find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -exec sed -i s/${app1^}/${app2^}/g {} \;
-find . -name "*.cpp" -exec sed -i s/${app1^}/${app2^}/g {} \;
-find . -name "*.h" -exec sed -i s/${app1^}/${app2^}/g {} \;
+find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -exec sed -i s/${app1_maj}/${app2_maj}/g {} \;
+find . -name "*.cpp" -exec sed -i s/${app1_maj}/${app2_maj}/g {} \;
+find . -name "*.h" -exec sed -i s/${app1_maj}/${app2_maj}/g {} \;
 
 	
 echo finished
