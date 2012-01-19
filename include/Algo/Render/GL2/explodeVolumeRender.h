@@ -33,6 +33,9 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+#include "Utils/vbo.h"
+#include "Utils/Shaders/shaderExplodeVolumes.h"
+#include "Utils/Shaders/shaderExplodeVolumesLines.h"
 
 namespace CGoGN
 {
@@ -47,22 +50,26 @@ namespace GL2
 {
 
 
-class explodeVolume_VBORender
+class ExplodeVolumeRender
 {
 protected:
 
+	Utils::ShaderExplodeVolumes* m_shader;
 
-	/**
-	* vbo buffers
-	* 0: vertices
-	* 1: normals
-	*/
-	GLuint m_VBOBuffers[2];
+	Utils::ShaderExplodeVolumesLines* m_shaderL;
+
+	Utils::VBO* m_vboPos;
+
+	Utils::VBO* m_vboPosLine;
 
 	/**
 	*number of triangles to draw
 	*/
 	GLuint m_nbTris;
+
+	GLuint m_nbLines;
+
+
 
 public:
 	/**
@@ -71,28 +78,49 @@ public:
 	* @param good functor that return true for darts of part to draw
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/
-	explodeVolume_VBORender();
+	ExplodeVolumeRender();
 
 	/**
 	* Destructor
 	*/
-	~explodeVolume_VBORender();
+	~ExplodeVolumeRender();
+
+
+	/**
+	 * return a ptr on used shader do not forgot to register
+	 */
+	Utils::GLSLShader* shaderFaces() { return m_shader;}
+
+	/**
+	 * return a ptr on used shader do not forgot to register
+	 */
+	Utils::GLSLShader* shaderLines() { return m_shaderL;}
+
 
 	/**
 	* update all drawing buffers
 	* @param map the map
-	* @param good selector
 	* @param positions  attribute of position vertices
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
+	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float kf, float kv);
+	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts);
 
 	/**
-	 * draw all topo
+	 * draw
 	 */
+	void drawEdges();
+
 	void drawFaces();
+
+
+	void setExplodeVolumes(float explode) { m_shader->setExplodeVolumes(explode);m_shaderL->setExplodeVolumes(explode);}
+
+	void setAmbiant(const Geom::Vec4f& ambiant) { m_shader->setAmbiant(ambiant);}
+
+	void setDiffuse(const Geom::Vec4f& diffuse) { m_shader->setDiffuse(diffuse);}
+
+	void setLightPosition(const Geom::Vec3f& lp) { m_shader->setLightPosition(lp);}
 };
 
 }//end namespace GL2

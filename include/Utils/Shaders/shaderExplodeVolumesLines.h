@@ -22,14 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGoGN_GLSL_VBO__
-#define __CGoGN_GLSL_VBO__
+#ifndef __CGOGN_SHADER_EXPLODE_VOLUMES_LINES__
+#define __CGOGN_SHADER_EXPLODE_VOLUMES_LINES__
 
-#include <vector>
-#include <GL/glew.h>
-
-#include "Topology/generic/attributeHandler.h"
-#include "Container/convert.h"
+#include "Utils/GLSLShader.h"
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -37,100 +34,41 @@ namespace CGoGN
 namespace Utils
 {
 
-class GLSLShader;
-
-/**
- * Encapsulation of OpenGL Vertex Buffer Object
- * Manage
- * - alloc /release of GL buffer
- * - ref by Shaders
- * - size of data (invidual cells)
- */
-class VBO
+class ShaderExplodeVolumesLines : public GLSLShader
 {
 protected:
-	// VBO id
-	GLuint m_id;
-	// size of data (in floats)
-	unsigned int m_data_size;
-	// shaders that ref this vbo
-	std::vector<GLSLShader*> m_refs;
-	unsigned int m_nbElts;
-	mutable bool m_lock;
+	// shader sources
+    static std::string vertexShaderText;
+    static std::string fragmentShaderText;
+    static std::string geometryShaderText;
+
+    // uniform locations
+	GLuint m_unif_color;
+	GLuint m_unif_explodeV;
+
+	float m_explodeV;
+	Geom::Vec4f m_color;
+
+	VBO* m_vboPos;
+
+	void getLocations();
+
+	void restoreUniformsAttribs();
 
 public:
-	/**
-	 * constructor: allocate the OGL VBO
-	 */
-	VBO();
+	ShaderExplodeVolumesLines();
 
-	/**
-	 * copy constructor, new VBO copy content
-	 */
-	VBO(const VBO& vbo);
+	void setExplodeVolumes(float explode);
 
-	/**
-	 * destructor: release the OGL VBO and clean references between VBO/Shaders
-	 */
-	~VBO();
+	void setColor(const Geom::Vec4f& color);
 
-	/**
-	 * get id of vbo
-	 */
-	unsigned int id() const { return m_id; }
+	void setParams(float explodeV, const Geom::Vec4f& color);
 
-	/**
-	 * get dataSize
-	 */
-	unsigned int dataSize() const { return m_data_size; }
-
-	/**
-	 * set the data size (in number of float)
-	 */
-	void setDataSize(unsigned int ds) { m_data_size = ds; }
-
-	/**
-	 * bind array vbo
-	 */
-	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER,m_id); }
-
-	/**
-	 * alloc buffer of same size than parameter
-	 */
-	void sameAllocSameBufferSize(const VBO& vbo);
-
-	/**
-	 * update data from attribute handler to the vbo
-	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib);
-
-	/**
-	 * update data from attribute handler to the vbo, with conversion
-	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv);
-
-	void* lockPtr();
-
-	const void* lockPtr() const;
-
-	void releasePtr() const;
-
-	unsigned int nbElts() {return m_nbElts;}
-
-	void allocate(unsigned int nbElts)
-	{
-		m_nbElts = nbElts;
-		glBindBuffer(GL_ARRAY_BUFFER, m_id);
-		glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size*sizeof(float), 0, GL_STREAM_DRAW);
-	}
+	void setAttributePosition(VBO* vbo);
 };
 
 } // namespace Utils
 
 } // namespace CGoGN
-
-#include "Utils/vbo.hpp"
 
 #endif
