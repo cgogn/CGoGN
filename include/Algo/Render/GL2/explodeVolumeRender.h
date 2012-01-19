@@ -107,14 +107,20 @@ public:
 	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts);
 
 	/**
-	 * draw
+	 * draw edges
 	 */
 	void drawEdges();
 
+	/**
+	 * draw edges
+	 */
 	void drawFaces();
 
-
 	void setExplodeVolumes(float explode) { m_shader->setExplodeVolumes(explode);m_shaderL->setExplodeVolumes(explode);}
+
+	void setClippingPlane(const Geom::Vec4f& p) {m_shader->setClippingPlane(p); m_shaderL->setClippingPlane(p);}
+
+	void setNoClippingPlane() { Geom::Vec4f p(0.0f,0.0f,10000.0f,100000000000000000000000000.0f); m_shader->setClippingPlane(p); m_shaderL->setClippingPlane(p);}
 
 	void setAmbiant(const Geom::Vec4f& ambiant) { m_shader->setAmbiant(ambiant);}
 

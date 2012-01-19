@@ -45,9 +45,11 @@ protected:
     // uniform locations
 	GLuint m_unif_color;
 	GLuint m_unif_explodeV;
+	GLuint m_unif_plane;
 
 	float m_explodeV;
 	Geom::Vec4f m_color;
+	Geom::Vec4f m_plane;
 
 	VBO* m_vboPos;
 
@@ -62,7 +64,9 @@ public:
 
 	void setColor(const Geom::Vec4f& color);
 
-	void setParams(float explodeV, const Geom::Vec4f& color);
+	void setClippingPlane(const Geom::Vec4f& plane);
+
+	void setParams(float explodeV, const Geom::Vec4f& color, const Geom::Vec4f& plane);
 
 	void setAttributePosition(VBO* vbo);
 };
