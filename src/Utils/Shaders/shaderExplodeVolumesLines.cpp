@@ -58,13 +58,15 @@ ShaderExplodeVolumesLines::ShaderExplodeVolumesLines()
 	//Default values
 	m_explodeV = 0.9f;
 	m_color = Geom::Vec4f(0.05f, 0.05f, 0.05f, 0.0f);
-	setParams(m_explodeV, m_color);
+	m_plane   = Geom::Vec4f(0.0f, 0.0f, 1000.f, 1000000000000000000000000000.0f);
+	setParams(m_explodeV, m_color, m_plane);
 }
 
 void ShaderExplodeVolumesLines::getLocations()
 {
 	m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
 	m_unif_color  = glGetUniformLocation(program_handler(),"color");
+	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 }
 
 void ShaderExplodeVolumesLines::setAttributePosition(VBO* vbo)
@@ -73,15 +75,17 @@ void ShaderExplodeVolumesLines::setAttributePosition(VBO* vbo)
 	bindVA_VBO("VertexPosition", vbo);
 }
 
-void ShaderExplodeVolumesLines::setParams(float explV, const Geom::Vec4f& color)
+void ShaderExplodeVolumesLines::setParams(float explV, const Geom::Vec4f& color, const Geom::Vec4f& plane)
 {
 	m_explodeV = explV;
 	m_color = color;
+	m_plane = plane;
 
 	bind();
 
 	glUniform1f(m_unif_explodeV, explV);
 	glUniform4fv(m_unif_color, 1, color.data());
+	glUniform4fv(m_unif_plane,    1, m_plane.data());
 	unbind(); // ??
 }
 
@@ -100,15 +104,23 @@ void ShaderExplodeVolumesLines::setColor(const Geom::Vec4f& color)
 	glUniform4fv(m_unif_color,1, color.data());
 }
 
+void ShaderExplodeVolumesLines::setClippingPlane(const Geom::Vec4f& plane)
+{
+	m_plane = plane;
+	bind();
+	glUniform4fv(m_unif_plane,1, plane.data());
+}
 
 void ShaderExplodeVolumesLines::restoreUniformsAttribs()
 {
 	m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
 	m_unif_color   = glGetUniformLocation(program_handler(),"color");
+	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 
 	bind();
 	glUniform1f (m_unif_explodeV, m_explodeV);
 	glUniform4fv(m_unif_color,  1, m_color.data());
+	glUniform4fv(m_unif_plane,    1, m_plane.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	unbind();

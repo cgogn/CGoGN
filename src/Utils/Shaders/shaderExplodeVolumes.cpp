@@ -51,14 +51,6 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-//	std::cout << "----------------------------------------------------------" << std::endl;
-//	std::cout << glxvert << std::endl;
-//	std::cout << "----------------------------------------------------------" << std::endl;
-//	std::cout << glxfrag << std::endl;
-//	std::cout << "----------------------------------------------------------" << std::endl;
-//	std::cout << glxgeom << std::endl;
-//	std::cout << "----------------------------------------------------------" << std::endl;
-
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
 
 	getLocations();
@@ -68,8 +60,9 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 	m_ambiant = Geom::Vec4f(0.05f, 0.05f, 0.1f, 0.0f);
 	m_diffuse = Geom::Vec4f(0.1f, 1.0f, 0.1f, 0.0f);
 	m_light_pos = Geom::Vec3f(10.0f, 10.0f, 1000.0f);
+	m_plane   = Geom::Vec4f(0.0f, 0.0f, 1000.f, 1000000000000000000000000000.0f);
 
-	setParams(m_explodeV, m_ambiant, m_diffuse, m_light_pos);
+	setParams(m_explodeV, m_ambiant, m_diffuse, m_light_pos, m_plane);
 }
 
 void ShaderExplodeVolumes::getLocations()
@@ -78,6 +71,7 @@ void ShaderExplodeVolumes::getLocations()
 	m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
 	m_unif_diffuse  = glGetUniformLocation(program_handler(),"diffuse");
 	m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
+	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 }
 
 void ShaderExplodeVolumes::setAttributePosition(VBO* vbo)
@@ -86,12 +80,13 @@ void ShaderExplodeVolumes::setAttributePosition(VBO* vbo)
 	bindVA_VBO("VertexPosition", vbo);
 }
 
-void ShaderExplodeVolumes::setParams(float explV, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos)
+void ShaderExplodeVolumes::setParams(float explV, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane)
 {
 	m_explodeV = explV;
 	m_ambiant = ambiant;
 	m_diffuse = diffuse;
 	m_light_pos = lightPos;
+	m_plane = plane;
 
 	bind();
 
@@ -99,6 +94,7 @@ void ShaderExplodeVolumes::setParams(float explV, const Geom::Vec4f& ambiant, co
 	glUniform4fv(m_unif_ambiant, 1, ambiant.data());
 	glUniform4fv(m_unif_diffuse, 1, diffuse.data());
 	glUniform3fv(m_unif_lightPos, 1, lightPos.data());
+	glUniform4fv(m_unif_plane,    1, m_plane.data());
 
 	unbind(); // ??
 }
@@ -132,18 +128,29 @@ void ShaderExplodeVolumes::setLightPosition(const Geom::Vec3f& lp)
 	glUniform3fv(m_unif_lightPos,1,lp.data());
 }
 
+
+void ShaderExplodeVolumes::setClippingPlane(const Geom::Vec4f& plane)
+{
+	m_plane = plane;
+	bind();
+	glUniform4fv(m_unif_plane,1, plane.data());
+}
+
+
 void ShaderExplodeVolumes::restoreUniformsAttribs()
 {
 	m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
 	m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
 	m_unif_diffuse   = glGetUniformLocation(program_handler(),"diffuse");
 	m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
+	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 
 	bind();
 	glUniform1f (m_unif_explodeV, m_explodeV);
 	glUniform4fv(m_unif_ambiant,  1, m_ambiant.data());
 	glUniform4fv(m_unif_diffuse,  1, m_diffuse.data());
 	glUniform3fv(m_unif_lightPos, 1, m_light_pos.data());
+	glUniform4fv(m_unif_plane,    1, m_plane.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	unbind();

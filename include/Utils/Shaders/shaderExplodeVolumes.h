@@ -47,11 +47,13 @@ protected:
 	GLuint m_unif_diffuse;
 	GLuint m_unif_lightPos;
 	GLuint m_unif_explodeV;
+	GLuint m_unif_plane;
 
 	float m_explodeV;
 	Geom::Vec4f m_ambiant;
 	Geom::Vec4f m_diffuse;
 	Geom::Vec3f m_light_pos;
+	Geom::Vec4f m_plane;
 
 	VBO* m_vboPos;
 
@@ -70,7 +72,9 @@ public:
 
 	void setLightPosition(const Geom::Vec3f& lp);
 
-	void setParams(float explodeV, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos);
+	void setClippingPlane(const Geom::Vec4f& plane);
+
+	void setParams(float explodeV, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane);
 
 	void setAttributePosition(VBO* vbo);
 };
