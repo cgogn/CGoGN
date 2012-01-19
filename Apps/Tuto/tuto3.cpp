@@ -123,7 +123,7 @@ void MyQT::traverseMap()
 void MyQT::createMap()
 {
 
-	Dart d1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
+	Dart d1 = Algo::Modelisation::createTetrahedron<PFP>(myMap);
 
 	Dart d2 = d1;
 

@@ -63,6 +63,16 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap3::getAttribute(unsigned int orbi
 	return AttributeHandler_IHM<T>(this, h.getDataVector()) ;
 }
 
+
+inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
+{
+	Map3::update_topo_shortcuts();
+	m_dartLevel = Map3::getAttribute<unsigned int>(DART, "dartLevel") ;
+	m_faceId = Map3::getAttribute<unsigned int>(DART, "faceId") ;
+	m_edgeId = Map3::getAttribute<unsigned int>(DART, "edgeId") ;
+}
+
+
 /***************************************************
  *          			 	    MAP TRAVERSAL         		  		         *
  ***************************************************/

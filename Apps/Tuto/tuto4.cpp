@@ -126,7 +126,7 @@ void MyQT::traverseMap()
 void MyQT::createMap()
 {
 
-	Dart d1 = Algo::Modelisation::Polyhedron<PFP>::createHexa(myMap);
+	Dart d1 = Algo::Modelisation::createHexahedron<PFP>(myMap);
 
 	Dart d2 = d1;
 

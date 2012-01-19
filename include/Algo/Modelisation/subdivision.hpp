@@ -46,6 +46,10 @@ Dart trianguleFace(typename PFP::MAP& map, Dart d)
 	if (map.phi1(d1) == d)
 		CGoGNout << "Warning: triangulation of a face with only two edges" << CGoGNendl;
 
+	std::cout << "d = " << d << std::endl;
+	std::cout << "map.phi1(d) = " << map.phi1(d) << std::endl;
+	std::cout << "map.phi_1(d) = " << map.phi_1(d) << std::endl;
+
 	map.splitFace(d, d1) ;
 	map.cutEdge(map.phi_1(d)) ;
 	Dart x = map.phi2(map.phi_1(d)) ;

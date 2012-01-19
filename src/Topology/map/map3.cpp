@@ -475,7 +475,7 @@ bool Map3::mergeVolumes(Dart d)
 
 void Map3::splitVolume(std::vector<Dart>& vd)
 {
-	//assert(checkSimpleOrientedPath(vd)) ;
+	assert(checkSimpleOrientedPath(vd)) ;
 
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
@@ -489,6 +489,7 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 
 	//sew the two connected components
 	Map3::sewVolumes(phi2(e), phi2(e2), false);
+	//Map3::sewVolumes(phi2(e), e2, false);
 }
 
 /*! @name Topological Queries

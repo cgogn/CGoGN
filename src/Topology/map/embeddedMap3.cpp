@@ -412,6 +412,19 @@ bool EmbeddedMap3::check()
 
 	std::cout << "Check: embedding begin" << std::endl ;
 
+    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
+
+    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
+    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
+
+
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		if(isOrbitEmbedded(VERTEX))
@@ -465,18 +478,6 @@ bool EmbeddedMap3::check()
 	}
 
 	std::cout << "Check: embedding ok" << std::endl ;
-
-    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
-    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
-
-    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
-    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
-
-    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
-    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
-
-    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
-    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
 
 	return true ;
 }

@@ -59,6 +59,8 @@ public:
 
 	~ImplicitHierarchicalMap3() ;
 
+	void update_topo_shortcuts();
+
 	//!
 	/*!
 	 *

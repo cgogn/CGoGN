@@ -57,7 +57,7 @@ namespace Import
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY };
+		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY ,OFF, OBJ };
 	}
 
 

@@ -31,7 +31,7 @@ SimpleGMap2::SimpleGMap2()
 {
 	 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
-     Dart d = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
+     Dart d = Algo::Modelisation::createTetrahedron<PFP>(myMap);
      position[d] = VEC3(0,0,0);
      position[myMap.phi1(d)] = VEC3(10,0,15);
      position[myMap.phi_1(d)] = VEC3(10,20,15);

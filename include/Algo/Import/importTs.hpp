@@ -132,7 +132,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 //		CGoGNout << "tetra number : " << nbe << CGoGNendl;
 
 		//Algo::Modelisation::Polyhedron<PFP>::createTetra(map);
-		Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(map,4);
+		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
