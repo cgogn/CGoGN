@@ -54,7 +54,7 @@ template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE, bool mergeCloseVertices=false);
 
 /**
- * import a volumic mesh
+ * import a volumetric mesh
  */
 //template <typename PFP>
 //bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME);
@@ -62,6 +62,9 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 //template <typename PFP>
 //bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
 //
+
+template <typename PFP>
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
 
 
 /*

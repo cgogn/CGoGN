@@ -38,6 +38,7 @@
 #include "Algo/Export/export.h"
 
 #include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topoRender.h"
 
 #include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderFlat.h"
@@ -85,6 +86,7 @@ public:
 	float faceShrinkage ;
 
 	int m_renderStyle ;
+	bool m_drawTopo;
 	bool m_drawVertices ;
 	bool m_drawEdges ;
 	bool m_drawFaces ;
@@ -94,6 +96,7 @@ public:
 	PFP::TVEC3 normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
+	Algo::Render::GL2::TopoRender* m_renderTopo ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO ;
@@ -113,6 +116,8 @@ public:
 	void cb_redraw() ;
 	void cb_Open() ;
 	void cb_Save() ;
+
+	void cb_mousePress(int button, int x, int y);
 
 	void importMesh(std::string& filename) ;
 	void exportMesh(std::string& filename);

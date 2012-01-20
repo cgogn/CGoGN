@@ -195,7 +195,7 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
-				d = map.phi1(d);
+				d = map.phi_1(d);
 			}
 
 		}
@@ -549,36 +549,15 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind)
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
 {
 	float dist = 5.0f;
+	MeshTablesSurface<PFP> mts(map);
 
-	if(kind == ImportVolumique::OBJ)
-	{
-		MeshTablesSurface<PFP> mts(map);
-
-
-		if(!mts.importMesh(filename, attrNames, ImportSurfacique::OBJ))
-			return false;
-
-		//if (mergeCloseVertices)
-		//	mts.mergeCloseVertices();
-
-		return importMeshSToV<PFP>(map, mts, dist);
-
-	}
-	else
+	if(!mts.importMesh(filename, attrNames, kind))
 		return false;
-//	else
-//	{
-//		MeshTablesVolume<PFP> mtv(map);
-//
-//
-//	if(!mtv.importMesh(filename, attrNames, kind))
-//		return false;
-//
-//	return importMesh<PFP>(map, mtv);
-//	}
+
+	return importMeshSToV<PFP>(map, mts, dist);
 }
 
 

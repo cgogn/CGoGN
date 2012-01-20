@@ -70,6 +70,9 @@ inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
 	m_dartLevel = Map3::getAttribute<unsigned int>(DART, "dartLevel") ;
 	m_faceId = Map3::getAttribute<unsigned int>(DART, "faceId") ;
 	m_edgeId = Map3::getAttribute<unsigned int>(DART, "edgeId") ;
+
+	//AttributeContainer& cont = m_attribs[DART] ;
+	//m_nextLevelCell = cont.getDataVector<unsigned int>(cont.getAttributeIndex("nextLevelCell")) ;
 }
 
 

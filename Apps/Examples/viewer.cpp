@@ -30,7 +30,9 @@ Viewer::Viewer() :
 	m_drawEdges(false),
 	m_drawFaces(true),
 	m_drawNormals(false),
+	m_drawTopo(false),
 	m_render(NULL),
+	m_renderTopo(NULL),
 	m_phongShader(NULL),
 	m_flatShader(NULL),
 	m_vectorShader(NULL),
@@ -80,6 +82,7 @@ void Viewer::cb_initGL()
 	setFocal(5.0f) ;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
+    m_renderTopo = new Algo::Render::GL2::TopoRender();
 
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
@@ -168,6 +171,9 @@ void Viewer::cb_redraw()
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
+
+	if(m_drawTopo)
+		m_renderTopo->drawTopo();
 }
 
 void Viewer::cb_Open()
@@ -188,6 +194,31 @@ void Viewer::cb_Save()
 
 	exportMesh(filename);
 }
+
+void Viewer::cb_mousePress(int button, int x, int y)
+{
+	if (Shift())
+	{
+		std::cout << "shift" << std::endl;
+
+		m_renderTopo->updateData<PFP>(myMap, position, 0.9, 0.9, allDarts);
+
+		Dart d = m_renderTopo->picking<PFP>(myMap, x,  y, allDarts);
+		if (d != Dart::nil())
+		{
+			statusMsg("dart picked");
+		}
+		else
+		{
+			statusMsg("No dart was picked");
+		}
+
+	}
+
+	updateGL();
+}
+
+
 
 void Viewer::importMesh(std::string& filename)
 {
@@ -216,6 +247,8 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
+
+	m_renderTopo->updateData<PFP>(myMap, position, 0.9, 0.9, allDarts);
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
