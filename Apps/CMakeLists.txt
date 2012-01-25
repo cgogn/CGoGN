@@ -5,12 +5,26 @@ SET(EXECUTABLE_OUTPUT_PATH ${CGoGN_ROOT_DIR}/bin)
 #INCLUDE(${QT_USE_FILE})
 #ADD_DEFINITIONS(${QT_DEFINITIONS})
 
-SET(CGoGN_LIBS_R topology algo container utils)
+IF (ONELIB)
+	SET(CGoGN_LIBS_R cgogn)
+ELSE (ONELIB)
+	SET(CGoGN_LIBS_R topology algo container utils)
+ENDIF (ONELIB)
 
 IF(WIN32)
-	SET(CGoGN_LIBS_D topology algo container utils) # libs have same name but in different place in Visual
+	# libs have same name but in different place in Visual
+	IF (ONELIB)
+		SET(CGoGN_LIBS_D cgogn)
+	ELSE (ONELIB)
+		SET(CGoGN_LIBS_D topology algo container utils)
+	ENDIF (ONELIB)
 ELSE(WIN32)
-	SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
+	IF (ONELIB)
+		SET(CGoGN_LIBS_D cgognD)
+	ELSE (ONELIB)
+		SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
+	ENDIF (ONELIB)
+
 	IF (WITH_QT)
 		add_subdirectory(Examples/Debug)
 	ENDIF (WITH_QT)
@@ -20,5 +34,6 @@ IF (WITH_QT)
 	add_subdirectory(Tuto)
 	add_subdirectory(Examples/Release)
 ENDIF (WITH_QT)
+
 add_subdirectory(Examples/Tests)
 

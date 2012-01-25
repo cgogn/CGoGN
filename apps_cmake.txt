@@ -11,27 +11,36 @@ SET ( WITH_QT ON CACHE BOOL "need Qt lib  ")
 
 # for CGoGN MR
 file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_mr.h FORCE_MR)
-#MESSAGE (STATUS "MR" ${FORCE_MR})
-
 IF (FORCE_MR EQUAL 1)
 	add_definitions(-DCGoGN_FORCE_MR=1)
 ENDIF (FORCE_MR EQUAL 1)
-
 IF (FORCE_MR EQUAL 2)
 	add_definitions(-DCGoGN_FORCE_MR=2)
 ENDIF (FORCE_MR EQUAL 2)
 
+
+# for CGoGN in one lib on not
+file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
+IF (ONELIB_STR EQUAL 1)
+	SET(CGoGN_LIBS_D cgognD)
+	SET(CGoGN_LIBS_R cgogn)
+ELSE (ONELIB_STR EQUAL 1)
+	SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
+	SET(CGoGN_LIBS_R topology algo container utils)
+ENDIF (ONELIB_STR EQUAL 1)
+
+
+
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
 ENDIF(WIN32)
+
 
 find_package(OpenGL REQUIRED)
 find_package(Boost COMPONENTS regex thread REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
-
-
 
 
 
@@ -112,5 +121,5 @@ ENDIF(WIN32)
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
-SET(CGoGN_LIBS_D topologyD algoD containerD utilsD)
-SET(CGoGN_LIBS_R topology algo container utils)
+
+
