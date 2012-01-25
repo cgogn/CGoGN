@@ -16,7 +16,7 @@ SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib  ")
 SET ( WITH_QT ON CACHE BOOL "build CGoGN with Qt lib  ")
 SET ( WITH_NUMERICAL ON CACHE BOOL "build CGoGN with Numerical libs support ")
 # for CGoGN MR
-SET ( FORCE_MR "0" CACHE STRING "0:none / 1 force multi / 2: force mono")
+SET ( FORCE_MR "2" CACHE STRING "0:none / 1 force multi / 2: force mono")
 
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
