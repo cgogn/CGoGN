@@ -39,6 +39,7 @@
 // forward
 namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
 namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
+namespace CGoGN { namespace Utils {  class ClippingShader; } }
 
 namespace CGoGN
 {
@@ -106,31 +107,6 @@ protected:
 
 	AttributeHandler<unsigned int> m_attIndex;
 
-	/**
-	* update all drawing buffers
-	* @param map the map
-	* @param good selector
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for volume
-	*/
-	template<typename PFP>
-	void updateMapD3(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
-
-
-	/**
-	* update all drawing buffers
-	* @param map the map
-	* @param good selector
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for volume
-	*/
-	template<typename PFP>
-	void updateGMap3(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
-
 
 	/**
 	 * save colors
@@ -153,10 +129,6 @@ protected:
 
 public:
 
-	Dart colToDart(float* color);
-
-	void dartToCol(Dart d, float& r, float& g, float& b);
-
 	/**
 	* Constructor
 	* @param map the map to draw
@@ -169,6 +141,10 @@ public:
 	* Destructor
 	*/
 	~Topo3Render();
+
+
+	Utils::ClippingShader* shader1() { return reinterpret_cast<Utils::ClippingShader*>(m_shader1);}
+	Utils::ClippingShader* shader2() { return reinterpret_cast<Utils::ClippingShader*>(m_shader2);}
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)
@@ -258,6 +234,16 @@ public:
 	template<typename PFP>
 	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
+
+
+	Dart colToDart(float* color);
+
+	template<typename PFP>
+	void dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b);
+
+
+
+
 	/**
 	* update all drawing buffers to render a dual map
 	* @param map the map
@@ -269,6 +255,16 @@ public:
 	*/
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+
+
+	/**
+	 * Get back middle position of drawed darts
+	 * @param map the map
+	 * @param posExpl the output positions
+	 * @param good the selector
+	 */
+	template<typename PFP>
+	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
 
 protected:
 	/**
