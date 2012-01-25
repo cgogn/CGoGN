@@ -25,6 +25,9 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor3.h"
+
 
 namespace CGoGN
 {
@@ -41,54 +44,11 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 	EMB center = AttribOps::zero<EMB,PFP>() ;
 	unsigned count = 0 ;
 
-//	CellMarkerStore marker(map, VERTEX) ;
-//
-//	std::vector<Dart> visitedVertices ;
-//	visitedVertices.reserve(100) ;
-//	visitedVertices.push_back(d) ;
-//	marker.mark(d) ;
-//
-//	for(typename std::vector<Dart>::iterator vert = visitedVertices.begin(); vert != visitedVertices.end(); ++vert)
-//	{
-//		Dart e = *vert;
-//		center += attributs[e];	// add to center and mark
-//		++count;
-//		do	// add all vertex neighbors to the table
-//		{
-//			Dart ee = map.phi2(e) ;
-//			if(!marker.isMarked(ee))
-//			{
-//				visitedVertices.push_back(ee) ;
-//				marker.mark(e) ;
-//			}
-//			e = map.phi1(ee) ;
-//		} while(e != *vert) ;
-//	}
-	DartMarkerStore mark(map);		// Lock a marker
-
-	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(128);
-	visitedFaces.push_back(d);			// Start with the face of d
-
-	mark.markOrbit(VERTEX, d) ;
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WV<typename PFP::MAP> tra(map,d);
+	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 	{
-		Dart e = visitedFaces[i] ;
-
-		center += attributs[e];	// add to center and mark
+		center += attributs[d];
 		++count;
-
-		do	// add all face neighbours to the table
-		{
-			Dart ee = map.phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit(VERTEX, ee) ;
-			}
-			e = map.phi1(e) ;
-		} while(e != visitedFaces[i]) ;
 	}
 
 	center /= double(count) ;
