@@ -162,7 +162,7 @@ Dart EmbeddedMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 	{
 		embedOrbit(VERTEX, dV, vEmb) ;
 	}
-
+	
 	return dV ;
 }
 
@@ -379,7 +379,7 @@ bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
 		{
 			eEmb.push_back(getEmbedding(EDGE, fit)) ;
 		}
-
+		
 		fit = phi1(fit) ;
 	} while (fit != d) ;
 
@@ -449,19 +449,19 @@ bool EmbeddedMap2::check()
 			}
 		}
 
-		if (isOrbitEmbedded(ORIENTED_FACE))
-		{
-			if (getEmbedding(ORIENTED_FACE, d) != getEmbedding(ORIENTED_FACE, phi1(d)))
-		{
-				CGoGNout << "Check: different embeddings on oriented face" << CGoGNendl ;
-				return false ;
-			}
-		}
+//		if (isOrbitEmbedded(ORIENTED_FACE))
+//		{
+//			if (getEmbedding(ORIENTED_FACE, d) != getEmbedding(ORIENTED_FACE, phi1(d)))
+//		{
+//				CGoGNout << "Check: different embeddings on oriented face" << CGoGNendl ;
+//				return false ;
+//			}
+//		}
 
 		if (isOrbitEmbedded(FACE))
 		{
 			if (getEmbedding(FACE, d) != getEmbedding(FACE, phi1(d)))
-		{
+			{
 				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
 				return false ;
 			}

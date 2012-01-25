@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-#define WITH_GMAP 1
+//#define WITH_GMAP 1
 
 #include "Topology/generic/parameters.h"
 #ifdef WITH_GMAP
@@ -38,24 +38,14 @@
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-
 #include "Algo/Render/GL2/topo3Render.h"
+#include "Algo/Render/GL2/explodeVolumeRender.h"
 
-#include "Topology/generic/cellmarker.h"
-#include "Utils/text3d.h"
-
-#include "Utils/pointSprite.h"
-#include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
-
-
-
 #include "Utils/Qt/qtSimple.h"
+#include "Utils/frameManipulator.h"
 
 #include "ui_tuto5.h"
-// inclure qtui.h juste après le ui_xxx.h
 #include "Utils/Qt/qtui.h"
 
 
@@ -86,65 +76,62 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 
-    bool render_text;
-	bool render_balls;
-	bool render_vectors;
+    bool render_volumes;
+	bool render_edges;
     bool render_topo;
+    bool render_topoTemp;
+    bool clip_volume;
+    bool hide_clipping;
 
-	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Algo::Render::GL2::Topo3Render* m_topo_render;
+	Algo::Render::GL2::ExplodeVolumeRender* m_explode_render;
 
-	Utils::VBO* m_positionVBO;
-	Utils::VBO* m_dataVBO;
+	float m_explode_factor;
 
-	Utils::ShaderSimpleColor* m_shader;
-	Utils::ShaderVectorPerVertex* m_lines;
-	Utils::Strings3D* m_strings;
-	Utils::PointSprite* m_sprite;
+	// for clipping plane manipulation
+	Utils::Pickable* m_PlanePick;
+	Utils::FrameManipulator* m_frame;
+	unsigned int m_pickedAxis;
+	int m_begX;
+	int m_begY;
+	int clip_id1;
+	int clip_id2;
+public:
+	float m_WidthObj;
+	Geom::Vec3f m_PosObj;
 
-	QTimer *m_timer;
-	
+
 public:
 	MyQT():
-		render_text(true),
-		render_balls(true),
-		render_vectors(true),
+		render_volumes(true),
+		render_edges(true),
 		render_topo(true),
-		m_render(NULL),
-		m_render_topo(NULL),
-		m_positionVBO(NULL),
-		m_dataVBO(NULL),
-		m_shader(NULL),
-		m_lines(NULL),
-		m_strings(NULL),
-		m_sprite(NULL),
-		m_timer(NULL)
+		render_topoTemp(true),
+		clip_volume(true),
+		hide_clipping(false),
+		m_topo_render(NULL),
+		m_explode_render(NULL),
+		m_explode_factor(0.8f)
 	{}
 
-	Dart m_selected;
 protected:
-    void storeVerticesInfo();
-
 	void cb_redraw();
-
 	void cb_initGL();
+	void  cb_mouseMove(int buttons, int x, int y);
+	void  cb_mousePress(int button, int x, int y);
+	void  cb_mouseRelease(int button, int x, int y);
 
-	void cb_mousePress(int button, int x, int y);
-
-	void cb_keyPress(int code);
 
 // slots locaux
 public slots:
-	void balls_onoff(bool x);
-	void vectors_onoff(bool x);
-	void text_onoff(bool x);
+	void volumes_onoff(bool x);
+	void edges_onoff(bool x);
 	void topo_onoff(bool x);
-
-	void slider_balls(int x);
-	void slider_vectors(int x);
-	void slider_text(int x);
-
-	void animate();
+	void clipping_onoff(bool x);
+	void hide_onoff(bool x);
+	void slider_explode(int x);
+	void slider_pressed();
+	void slider_released();
 };
 
 #endif

@@ -37,9 +37,9 @@ SimpleGMap3::SimpleGMap3()
 	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
 	Dart d = primCat.hexaGrid_topo(3,1,1);
 	primCat.embedHexaGrid(2,1,1);
-
+	std::cout << "AAA"<< std::endl;
 	myMap.check();
-
+	std::cout << "AAA"<< std::endl;
 	DartMarker markOrient(myMap);
 	std::vector<Dart> orient;
 	FunctorStore fs(orient);
@@ -47,11 +47,13 @@ SimpleGMap3::SimpleGMap3()
 	d = 49;
 	myMap.foreach_dart_of_oriented_volume(d, fs);
 
+	std::cout << "AAA"<< std::endl;
+
 	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
 		markOrient.mark(*it);
 
 	SelectorMarked sm(markOrient);
-
+	std::cout << "AAA"<< std::endl;
 	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
@@ -86,6 +88,7 @@ SimpleGMap3::SimpleGMap3()
 	myMap.unsewVolumes(d);
 
 	myMap.check();
+
 }
 
 void SimpleGMap3::initGUI()

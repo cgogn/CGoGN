@@ -112,7 +112,8 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if(selected(d) && !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
+//			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
+			mv.markOrbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX),d);
 		}
 
 		//cut edges

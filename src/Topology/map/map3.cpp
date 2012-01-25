@@ -70,7 +70,9 @@ void Map3::deleteVolume(Dart d)
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 
-	mark.markOrbit(ORIENTED_FACE, d) ;
+//	mark.markOrbit(ORIENTED_FACE, d) ;
+	mark.markOrbit(FACE2, d) ;
+
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -85,7 +87,8 @@ void Map3::deleteVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(ORIENTED_FACE, ee) ;
+//				mark.markOrbit(ORIENTED_FACE, ee) ;
+				mark.markOrbit(FACE2, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -658,7 +661,7 @@ bool Map3::isBoundaryVolume(Dart d)
 	std::vector<Dart> visitedFaces ;
 	visitedFaces.reserve(128) ;
 	visitedFaces.push_back(d) ;
-	mark.markOrbit(ORIENTED_FACE, d) ;
+	mark.markOrbit(FACE2, d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -672,7 +675,7 @@ bool Map3::isBoundaryVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(ORIENTED_FACE, ee) ;
+				mark.markOrbit(FACE2, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -846,7 +849,8 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	m.markOrbit(ORIENTED_FACE, d) ;
+//	m.markOrbit(ORIENTED_FACE, d) ;
+	m.markOrbit(FACE2, d) ;
 
 	unsigned int count = 0 ;
 
@@ -873,7 +877,7 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 					if(!m.isMarked(e))
 					{
 						visitedFaces.push_back(e) ;
-						m.markOrbit(ORIENTED_FACE, e) ;
+						m.markOrbit(FACE2, e) ;
 					}
 				}
 				else if(isBoundaryMarked(e))

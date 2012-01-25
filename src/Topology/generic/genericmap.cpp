@@ -86,6 +86,11 @@ GenericMap::GenericMap() : m_nbThreads(1)
 
 	// get & lock marker for boundary
 	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
+
+#ifndef CGoGN_FORCE_MR
+	m_isMultiRes = false;
+#endif
+
 }
 
 GenericMap::~GenericMap()
@@ -547,13 +552,23 @@ bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& 
 {
 	switch(orbit)
 	{
-		case DART: return f(d);
-		case VERTEX: return foreach_dart_of_vertex(d, f, thread);
-		case EDGE: return foreach_dart_of_edge(d, f, thread);
-		case ORIENTED_FACE: return foreach_dart_of_oriented_face(d, f, thread);
-		case FACE: return foreach_dart_of_face(d, f, thread);
-		case VOLUME: return foreach_dart_of_volume(d, f, thread);
-//		case -1: return foreach_dart_of_cc(d,f,thread);
+//		case DART: return f(d);
+//		case VERTEX: return foreach_dart_of_vertex(d, f, thread);
+//		case EDGE: return foreach_dart_of_edge(d, f, thread);
+//		case ORIENTED_FACE: return foreach_dart_of_oriented_face(d, f, thread);
+//		case FACE: return foreach_dart_of_face(d, f, thread);
+//		case VOLUME: return foreach_dart_of_volume(d, f, thread);
+
+		case DART:		return f(d);
+		case VERTEX: 	return foreach_dart_of_vertex(d, f, thread);
+		case EDGE: 		return foreach_dart_of_edge(d, f, thread);
+		case FACE: 		return foreach_dart_of_face(d, f, thread);
+		case VOLUME: 	return foreach_dart_of_volume(d, f, thread);
+		case VERTEX1: 	return foreach_dart_of_vertex1(d, f, thread);
+		case EDGE1: 	return foreach_dart_of_edge1(d, f, thread);
+		case VERTEX2: 	return foreach_dart_of_vertex2(d, f, thread);
+		case EDGE2:		return foreach_dart_of_edge2(d, f, thread);
+		case FACE2:		return foreach_dart_of_face2(d, f, thread);
 		default: assert(!"Cells of this dimension are not handled");break;
 
 	}
