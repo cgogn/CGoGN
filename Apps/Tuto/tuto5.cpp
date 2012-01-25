@@ -26,298 +26,256 @@
 #include "tuto5.h"
 #include <iostream>
 
+
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
-#include "Algo/Import/import.h"
+#include "Algo/Modelisation/subdivision.h"
+
+#include "Algo/Render/GL2/topo3Render.h"
+#include "Algo/Render/SVG/mapSVGRender.h"
 
 
 PFP::MAP myMap;
 PFP::TVEC3 position ;
+Dart dglobal;
 
-void MyQT::volumes_onoff(bool x)
+void MyQT::balls_onoff(bool x)
 {
-	render_volumes = !render_volumes;
+	render_balls = !render_balls;
 	updateGL();
+	CGoGNerr << " balls_onoff  "<< CGoGNendl;
 }
 
-void MyQT::edges_onoff(bool x)
+void MyQT::vectors_onoff(bool x)
 {
-	render_edges = !render_edges;
+	render_vectors = !render_vectors;
 	updateGL();
+	CGoGNerr << " vectors_onoff  "<< CGoGNflush;
 }
+
+void MyQT::text_onoff(bool x)
+{
+	render_text = !render_text;
+	updateGL();
+	CGoGNerr << " text_onoff  " << CGoGNflush;
+}
+
 
 void MyQT::topo_onoff(bool x)
 {
 	render_topo = !render_topo;
-	if (render_topo)
+	updateGL();
+	CGoGNerr << " topo_onoff  " << CGoGNflush;
+}
+
+void MyQT::slider_balls(int x)
+{
+	m_sprite->setSize(0.05f*x);
+	updateGL();
+}
+
+void MyQT::slider_vectors(int x)
+{
+	m_lines->setScale(0.02*x);
+	updateGL();
+}
+
+void MyQT::slider_text(int x)
+{
+	m_strings->setScale(0.02f*x);
+	updateGL();
+}
+
+
+
+void MyQT::animate()
+{
+//	transfoMatrix() = glm::rotate(transfoMatrix(), 0.5f, glm::vec3(0.5773f,0.5773f,0.5773f));
+	transfoRotate( 0.5f, 0.5773f,0.5773f,0.5773f);
+	updateGLMatrices();
+}
+
+
+void MyQT::storeVerticesInfo()
+{
+
+	CellMarker mv(myMap,VERTEX);
+	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, 0.8f, m_explode_factor, nb);
+		if (!mv.isMarked(d))
+		{
+			mv.mark(d);
+			std::stringstream ss;
+			ss << d << " : "<< position[d];
+			m_strings->addString(ss.str(),position[d]);
+		}
 	}
-
-	updateGL();
 }
-
-void MyQT::clipping_onoff(bool x)
-{
-	clip_volume = !clip_volume;
-
-	if (clip_volume)
-	{
-		Geom::Vec3f pos = m_PlanePick->getPosition();
-		float pipo;
-		Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
-		float d = -(pos*normal);
-		m_explode_render->setClippingPlane(Geom::Vec4f(normal[0],normal[1],normal[2],d));
-		m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
-		m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
-	}
-	else
-	{
-		m_explode_render->setNoClippingPlane();
-		m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-		m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
-		m_topo_render->shader1()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-		m_topo_render->shader2()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
-	}
-	updateGL();
-}
-
-void MyQT::hide_onoff(bool x)
-{
-	hide_clipping = !hide_clipping;
-	updateGL();
-}
-
-
-void MyQT::slider_explode(int x)
-{
-	m_explode_factor = 0.01f*x;
-	m_explode_render->setExplodeVolumes(m_explode_factor);
-	updateGL();
-}
-
-
-void MyQT::slider_pressed()
-{
-	render_topoTemp = render_topo;
-	render_topo = false;
-	updateGL();
-}
-
-
-void MyQT::slider_released()
-{
-
-	render_topo = render_topoTemp;
-	if (render_topo)
-	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, 0.8f, m_explode_factor, nb);
-	}
-	updateGL();
-}
-
 
 void MyQT::cb_initGL()
 {
 	// choose to use GL version 2
 	Utils::GLSLShader::setCurrentOGLVersion(2);
 
-	// create the renders
-    m_topo_render = new Algo::Render::GL2::Topo3Render();
-    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender();
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
+
+    m_render_topo = new Algo::Render::GL2::Topo3Render();
+
+ 	// create VBO for position
+	m_positionVBO = new Utils::VBO();
+	m_positionVBO->updateData(position);
+
+	// using simple shader with color
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(m_positionVBO);
+	m_shader->setColor(Geom::Vec4f(0.,1.,0.,0.));
+
+	m_sprite = new Utils::PointSprite();
+	m_sprite->setAttributePosition(m_positionVBO);
+
+    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
+    storeVerticesInfo();
+    m_strings->sendToVBO();
+
+    // copy de contenu de VBO a la creation
+	m_dataVBO = new Utils::VBO(*m_positionVBO);
+
+	m_lines = new Utils::ShaderVectorPerVertex();
+	m_lines->setAttributePosition(m_positionVBO);
+	m_lines->setAttributeVector(m_dataVBO);
+	m_lines->setScale(0.2f);
+	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
+
+	// accede au buffer du VBO pour modification
+	PFP::VEC3* data = static_cast<PFP::VEC3*>(m_dataVBO->lockPtr());
+	for (unsigned int i=0; i< m_dataVBO->nbElts(); ++i)
+	{
+		data[i].normalize();
+	}
+	m_dataVBO->releasePtr();
+
+	registerShader(m_shader);
+	registerShader(m_strings);
+	registerShader(m_sprite);
+	registerShader(m_lines);
+
+	SelectorTrue allDarts;
+
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);
-	m_explode_render->updateData<PFP>(myMap,position);
-	m_explode_render->setExplodeVolumes(0.8f);
-	m_explode_render->setColorLine(Geom::Vec4f(0.3f,0.3f,0.3f,1.0f));
-
-	registerShader(m_explode_render->shaderFaces());
-	registerShader(m_explode_render->shaderLines());
-
-    m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
-	m_frame = new Utils::FrameManipulator();
-	m_frame->setSize(m_WidthObj/2.0f);
+	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
 
 
-	m_topo_render->shader1()->insertClippingCode();
-	m_topo_render->shader2()->insertClippingCode();
-
-	clip_id1 = m_topo_render->shader1()->addClipPlane();
-	clip_id2 = m_topo_render->shader2()->addClipPlane();
-
-	m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), m_PosObj);
-	m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), m_PosObj);
-	m_explode_render->setClippingPlane(Geom::Vec4f(0,0,1,m_PosObj*Geom::Vec3f(0,0,-1)));
-
+	// timer example for animation
+	m_timer = new QTimer( this );
+	connect( m_timer, SIGNAL(timeout()), SLOT(animate()) );
 }
-
-
 
 void MyQT::cb_redraw()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_LIGHTING);
 
+	m_render->draw(m_shader, Algo::Render::GL2::POINTS);
+
+	glLineWidth(2.0f);
+	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+	m_render->draw(m_shader, Algo::Render::GL2::LINES);
+
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1.0f, 1.0f);
 
 	if (render_topo)
-		m_topo_render->drawTopo();
+		m_render_topo->drawTopo();
 
-	if (render_edges)
-	{
-		glLineWidth(1.0f);
-		m_explode_render->drawEdges();
-	}
+/*	Dart d = myMap.phi2(myMap.begin());
+	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
+	 d = myMap.phi1(myMap.begin());
+	m_render_topo->overdrawDart(d, 5, 1.0f, 0.0f, 1.0f);
+*/	
+	m_render_topo->overdrawDart(m_selected, 5, 1.0f, 0.0f, 1.0f);
+	
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-	if (render_volumes)
+	if (render_text)
+		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
+
+	if (render_balls)
 	{
-		m_explode_render->drawFaces();
+		m_sprite->predraw(Geom::Vec3f(1.0f, 0.0f ,0.0f));
+		m_render->draw(m_sprite, Algo::Render::GL2::POINTS);
+		m_sprite->postdraw();
 	}
 
-	if (clip_volume && !hide_clipping)
+	if (render_vectors)
 	{
-		m_frame->draw();
-		m_PlanePick->draw();
+		glLineWidth(1.0f);
+		m_render->draw(m_lines, Algo::Render::GL2::POINTS);
 	}
 }
 
-
-
-void  MyQT::cb_mousePress(int button, int x, int y)
+void MyQT::cb_mousePress(int button, int x, int y)
 {
-	if (!Shift())
-		return;
-
-	if (hide_clipping || !clip_volume)
-		return;
-
-	m_begX = x;
-	m_begY = y;
-
-	// get ray of selection
-	Geom::Vec3f rayA,rayB;
-	float dist = getOrthoScreenRay(x,y,rayA,rayB);
-	Geom::Vec3f AB = rayB-rayA;
-
-	unsigned int fr_picked =0;
-	// picking the frame -> axis
-	fr_picked = m_frame->pick(rayA,AB,dist);
-
-	if (fr_picked != 0)
+	if (Shift())
 	{
-		m_pickedAxis=fr_picked;
-		std::cout << "PICKED:"<< m_pickedAxis << std::endl;
-
-		m_frame->highlight(m_pickedAxis);
-		m_frame->storeProjection(m_pickedAxis);
+		SelectorDartNoBoundary<PFP::MAP> nb(myMap);	
+		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		if (d != Dart::nil())
+		{
+			CGoGNout << "Dart "<< d << " clicked" << CGoGNendl;
+			m_selected = d;
+		}
+		else
+		{
+			statusMsg("");
+		}
 		updateGL();
 	}
 }
 
-void  MyQT::cb_mouseRelease(int button, int x, int y)
+void MyQT::cb_keyPress(int code)
 {
-
-	if (hide_clipping || !clip_volume)
-		return;
-
-	m_pickedAxis=0;
-	m_frame->highlight(m_pickedAxis);
-	updateGL();
-
+	if (code  == 's')
+	{
+		std::string filename = selectFileSave("Export SVG file ");
+		CGoGNout << "Exporting "<<filename<<CGoGNendl;
+		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+//		svg.renderLinesToSVG<PFP>(myMap,position);
+		svg.setColor(Geom::Vec3f(1.,0.,0.));
+		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
+		//svg destruction close the file
+	}
+	if (code  == 't')
+	{
+		if (m_timer->isActive())
+			m_timer->stop();
+		else
+			m_timer->start(1000/30); // 30 fps
+	}
 }
 
-void  MyQT::cb_mouseMove(int buttons, int x, int y)
-{
-	if (!Shift())
-		return;
 
-	if (hide_clipping || !clip_volume)
-		return;
-
-	// rotation selected ?
-	if (Utils::FrameManipulator::rotationAxis(m_pickedAxis))
-	{
-		if (buttons&1)
-		{
-			float angle = m_frame->angleFromMouse(x,y,x-m_begX, y-m_begY);
-			m_frame->rotate(m_pickedAxis, angle);
-		}
-		else if (buttons&2)
-			m_frame->rotateInScreen(x-m_begX, y-m_begY);
-
-		m_PlanePick->transfo() = m_frame->transfo();
-	}
-	// translation selected
-	else if (Utils::FrameManipulator::translationAxis(m_pickedAxis))
-	{
-		if (buttons&1)
-		{
-			float dist =  m_frame->distanceFromMouse(x-m_begX, y-m_begY);
-			m_frame->translate(m_pickedAxis, dist);
-		}
-		else if (buttons&2)
-			m_frame->translateInScreen(x-m_begX, y-m_begY);
-
-		m_PlanePick->transfo() = m_frame->transfo();
-	}
-	// scale selected
-	else if (Utils::FrameManipulator::scaleAxis(m_pickedAxis) )
-	{
-		float scale = m_frame->scaleFromMouse(x-m_begX, y-m_begY);
-		m_frame->scale(m_pickedAxis, scale );
-		m_PlanePick->transfo() = m_frame->transfo();
-	}
-
-	Geom::Vec3f pos = m_PlanePick->getPosition();
-	float pipo;
-	Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
-	float d = -(pos*normal);
-	m_explode_render->setClippingPlane(Geom::Vec4f(normal[0],normal[1],normal[2],d));
-
-	m_topo_render->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
-	m_topo_render->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
-
-	m_begX = x;
-	m_begY = y;
-	updateGL();
-	return;
-
-}
 
 int main(int argc, char **argv)
 {
-	if (argc>1)
-	{
-		std::vector<std::string> attrNames ;
-		std::string filename(argv[1]);
-		size_t pos = filename.rfind(".");    // position of "." in filename
-		std::string extension = filename.substr(pos);
+	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
-		if(extension == std::string(".tet"))
-		{
-			if(!Algo::Import::importTet<PFP>(myMap,argv[1],attrNames))
-			{
-				CGoGNerr << "could not import " << argv[1] << CGoGNendl ;
-				return 1;
-			}
-			else
-				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
-		}
-	}
-	else
-	{
-		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-		Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
-		int nb = 10;
-		prim.hexaGrid_topo(nb,nb,nb);
-		prim.embedHexaGrid(1.0f,1.0f,1.0f);
-	}
+	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
+	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
+
+
+	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+	int nb=3;
+	if (argc>1)
+		nb = atoi(argv[1]);
+	dglobal = prim.hexaGrid_topo(nb,nb,nb);
+	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
     // un peu d'interface
 	QApplication app(argc, argv);
 	MyQT sqt;
@@ -326,31 +284,52 @@ int main(int argc, char **argv)
     Utils::QT::uiDockInterface dock;
     sqt.setDock(&dock);
 
+ 	// message d'aide
+	sqt.setHelpMsg("Enter pour dock on/off\nShift Enter pour console on/off\nShift Click gauche pour selectionner un brin");
+
+	CGoGNout.toStatusBar(&sqt);
+	CGoGNout << "CGoGNOut StatusBar" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
+
+	CGoGNout.toConsole(&sqt);
+
+	CGoGNout << "CGoGNOut dans la console" << Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
+
+	CGoGNout.toStatusBar(NULL);
 
 	//  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    sqt.m_WidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    sqt.m_PosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
     // envoit info BB a l'interface
-	sqt.setParamObject(sqt.m_WidthObj, sqt.m_PosObj.data());
+	sqt.setParamObject(lWidthObj, lPosObj.data());
 
-	sqt.setCallBack( dock.checkBox_volumes, SIGNAL(toggled(bool)), SLOT(volumes_onoff(bool)) );
-	sqt.setCallBack( dock.checkBox_edges, SIGNAL(toggled(bool)), SLOT(edges_onoff(bool)) );
+	sqt.setCallBack( dock.checkBox_balls, SIGNAL(toggled(bool)), SLOT(balls_onoff(bool)) );
+	sqt.setCallBack( dock.checkBox_vectors, SIGNAL(toggled(bool)), SLOT(vectors_onoff(bool)) );
+	sqt.setCallBack( dock.checkBox_text, SIGNAL(toggled(bool)), SLOT(text_onoff(bool)) );
 	sqt.setCallBack( dock.checkBox_topo, SIGNAL(toggled(bool)), SLOT(topo_onoff(bool)) );
 
-	sqt.setCallBack( dock.checkBox_hide, SIGNAL(toggled(bool)), SLOT(hide_onoff(bool)) );
+	sqt.setCallBack( dock.slider_balls, SIGNAL(valueChanged(int)), SLOT(slider_balls(int)) );
+	sqt.setCallBack( dock.slider_vectors, SIGNAL(valueChanged(int)), SLOT(slider_vectors(int)) );
+	sqt.setCallBack( dock.slider_text, SIGNAL(valueChanged(int)), SLOT(slider_text(int)) );
 
-	sqt.setCallBack( dock.checkBox_plane, SIGNAL(toggled(bool)), SLOT(clipping_onoff(bool)) );
 
-	sqt.setCallBack( dock.slider_explode, SIGNAL(valueChanged(int)), SLOT(slider_explode(int)) );
-
-	sqt.setCallBack( dock.slider_explode, SIGNAL(sliderPressed()), SLOT(slider_pressed()) );
-	sqt.setCallBack( dock.slider_explode, SIGNAL(sliderReleased()), SLOT(slider_released()) );
-
+	sqt.m_selected = myMap.begin();
 
 	sqt.show();
-	dock.slider_explode->setValue(80);
+
+	sqt.slider_balls(50);
+	sqt.slider_vectors(50);
+	sqt.slider_text(50);
+
+	GLint texSize;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+	CGoGNdbg.toConsole(&sqt);
+	CGoGNerr.toConsole(&sqt);
+	CGoGNdbg << " TextureSize " <<  texSize << CGoGNendl;
+	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
+
+
 
 	// et on attend la fin.
 	return app.exec();
