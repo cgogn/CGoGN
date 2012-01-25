@@ -12,7 +12,7 @@ void main(void)
 {
 	float d = dot(plane,POSITION_IN(0));
 	
-	if (d>=0.0)
+	if (d<=0.0)
 	{
 		vec3 v1 = POSITION_IN(2).xyz - POSITION_IN(1).xyz;
 		vec3 v2 = POSITION_IN(3).xyz - POSITION_IN(1).xyz;

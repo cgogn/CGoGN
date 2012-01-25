@@ -98,6 +98,11 @@ public:
 	unsigned int addString(const std::string& str, const Geom::Vec3f& pos);
 
 	/**
+	 * clear the string and position database
+	 */
+	void clear();
+
+	/**
 	 * once all string are stored, we must send it to the gracphic card
 	 */
 	void sendToVBO();
