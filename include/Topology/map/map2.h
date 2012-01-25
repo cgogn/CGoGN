@@ -55,6 +55,11 @@ protected:
 public:
 	typedef Map1 ParentMap;
 
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+5; }
+
+	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
+	static const unsigned int EDGE_OF_PARENT = EDGE+5;
+
 	Map2();
 
 	virtual std::string mapTypeName();
@@ -100,6 +105,8 @@ protected:
 	void phi2unsew(Dart d);
 
 public:
+
+	void rdfi(Dart t, DartMarker& m1, DartMarker& m2);
 
 	/*! @name Generator and Deletor
 	 *  To generate or delete faces in a 2-map
@@ -395,23 +402,30 @@ public:
 	 */
 	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of an oriented volume
+	//! Apply a functor on every dart of an face
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread = 0);
-
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
-	 *  @param f the functor to apply
-	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
+	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a connected component
 	/*! @param d a dart of the connected component
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on every dart of a vertex of map1 representing the face of d
+	/*! @param d a dart of the vertex
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on every dart of an edge of map1 representing the face of d
+	/*! @param d a dart of the edge
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread = 0);
+
 	//@}
 
 	/*! @name Close map after import or creation

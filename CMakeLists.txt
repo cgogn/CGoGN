@@ -15,6 +15,8 @@ SET ( WITH_ASSIMP ON CACHE BOOL "build CGoGN with Assimp ")
 SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib  ")
 SET ( WITH_QT ON CACHE BOOL "build CGoGN with Qt lib  ")
 SET ( WITH_NUMERICAL ON CACHE BOOL "build CGoGN with Numerical libs support ")
+# for CGoGN MR
+SET ( FORCE_MR "0" CACHE STRING "0:none / 1 force multi / 2: force mono")
 
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
@@ -32,6 +34,21 @@ IF (DEFINED ASSERTON)
 ELSE (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=false)
 ENDIF (DEFINED ASSERTON)
+
+
+IF (FORCE_MR EQUAL 0)
+	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "0" )
+ENDIF (FORCE_MR EQUAL 0)
+
+IF (FORCE_MR EQUAL 1)
+	add_definitions(-DCGoGN_FORCE_MR=1)
+	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "1" )
+ENDIF (FORCE_MR EQUAL 1)
+
+IF (FORCE_MR EQUAL 2)
+	add_definitions(-DCGoGN_FORCE_MR=2)
+	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "2" )
+ENDIF (FORCE_MR EQUAL 2)
 
 
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")

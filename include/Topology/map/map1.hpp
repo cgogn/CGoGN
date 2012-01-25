@@ -69,19 +69,22 @@ inline void Map1::update_topo_shortcuts()
 inline Dart Map1::newDart()
 {
 	Dart d = GenericMap::newDart() ;
-	(*m_phi1)[d.index] = d ;
-	(*m_phi_1)[d.index] = d ;
+	unsigned int d_index = dartIndex(d);
+	(*m_phi1)[d_index] = d ;
+	(*m_phi_1)[d_index] = d ;
 	return d ;
 }
 
 inline Dart Map1::phi1(Dart d)
 {
-	return (*m_phi1)[d.index] ;
+//	unsigned int d_index = dartIndex(d);
+	return (*m_phi1)[dartIndex(d)] ;
 }
 
 inline Dart Map1::phi_1(Dart d)
 {
-	return (*m_phi_1)[d.index] ;
+//	unsigned int d_index = dartIndex(d);
+	return (*m_phi_1)[dartIndex(d)] ;
 }
 
 template <int N>
@@ -115,22 +118,33 @@ inline Dart Map1::alpha_1(Dart d)
 
 inline void Map1::phi1sew(Dart d, Dart e)
 {
-	Dart f = (*m_phi1)[d.index] ;
-	Dart g = (*m_phi1)[e.index] ;
-	(*m_phi1)[d.index] = g ;
-	(*m_phi1)[e.index] = f ;
-	(*m_phi_1)[g.index] = d ;
-	(*m_phi_1)[f.index] = e ;
+	unsigned int d_index = dartIndex(d);
+	unsigned int e_index = dartIndex(e);
+	Dart f = (*m_phi1)[d_index] ;
+	Dart g = (*m_phi1)[e_index] ;
+	(*m_phi1)[d_index] = g ;
+	(*m_phi1)[e_index] = f ;
+//	unsigned int g_index = dartIndex(g);
+//	(*m_phi_1)[g_index] = d ;
+	(*m_phi_1)[dartIndex(g)] = d ;
+
+	//	unsigned int f_index = dartIndex(f);
+//	(*m_phi_1)[f_index] = e ;
+	(*m_phi_1)[dartIndex(f)] = e ;
+
 }
 
 inline void Map1::phi1unsew(Dart d)
 {
-	Dart e = (*m_phi1)[d.index] ;
-	Dart f = (*m_phi1)[e.index] ;
-	(*m_phi1)[d.index] = f ;
-	(*m_phi1)[e.index] = e ;
-	(*m_phi_1)[f.index] = d ;
-	(*m_phi_1)[e.index] = e ;
+	unsigned int d_index = dartIndex(d);
+	Dart e = (*m_phi1)[d_index] ;
+	unsigned int e_index = dartIndex(e);
+	Dart f = (*m_phi1)[e_index] ;
+	(*m_phi1)[d_index] = f ;
+	(*m_phi1)[e_index] = e ;
+//	unsigned int f_index = dartIndex(f);
+	(*m_phi_1)[dartIndex(f)] = d ;
+	(*m_phi_1)[e_index] = e ;
 }
 
 /*! @name Topological Operators
@@ -228,7 +242,7 @@ inline bool Map1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thre
 	return f(d) ;
 }
 
-inline bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool Map1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d ;
 	do
@@ -240,19 +254,5 @@ inline bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned
 	return false ;
 }
 
-inline bool Map1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) ;
-}
-
-inline bool Map1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) ;
-}
-
-inline bool Map1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) ;
-}
 
 } // namespace CGoGN

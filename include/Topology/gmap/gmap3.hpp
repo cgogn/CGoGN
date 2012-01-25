@@ -185,4 +185,29 @@ inline bool GMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thr
 	return GMap2::foreach_dart_of_face(d, f, thread) || GMap2::foreach_dart_of_face(beta3(d), f, thread);
 }
 
+inline bool GMap3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap2::foreach_dart_of_cc(d, f, thread);
+}
+
+inline bool GMap3::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap2::foreach_dart_of_oriented_cc(d, f, thread);
+}
+
+inline bool GMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap2::foreach_dart_of_vertex(d, f, thread);
+}
+
+inline bool GMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap2::foreach_dart_of_edge(d, f, thread);
+}
+
+inline bool GMap3::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap2::foreach_dart_of_face(d, f, thread);
+}
+
 } // namespace CGoGN

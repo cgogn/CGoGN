@@ -43,6 +43,11 @@ protected:
 public:
 	typedef GMap1 ParentMap;
 
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+5; }
+
+	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
+	static const unsigned int EDGE_OF_PARENT = EDGE+5;
+
 	GMap2();
 
 	virtual std::string mapTypeName();
@@ -364,22 +369,22 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a face
-	* @param d a dart of the face
+	* Apply a functor on each dart of a vertes
+	* @param d a dart of the vertes
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
-	* Apply a functor on each dart of a face
-	* @param d a dart of the face
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
 	* Apply a functor on each dart of an edge
-	* @param d a dart of the oriented face
+	* @param d a dart of the oriented edge
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread = 0);
@@ -388,19 +393,42 @@ public:
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
+	bool foreach_dart_of_oriented_face(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a volume
 	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
+	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a connected component
-	/*! @param d a dart of the connected component
+	//! Apply a functor on every dart of a volume
+	/*! @param d a dart of the volume
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	//! Apply a functor on every dart of a volume
+	/*! @param d a dart of the volume
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+
+	/**
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the vertex
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_vertex1(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	/**
+	* Apply a functor on each dart of an edge
+	* @param d a dart of the oriented edge
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_edge1(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+
 	//@}
 
 	/*! @name Close map after import or creation

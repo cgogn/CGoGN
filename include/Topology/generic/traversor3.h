@@ -100,7 +100,48 @@ public:
 /*******************************************************************************
 					VOLUME CENTERED TRAVERSALS
 *******************************************************************************/
+// Traverse the vertices incident to a given volume
+template <typename MAP, unsigned int ORBIT>
+class Traversor3WX
+{
+private:
+	MAP& m ;
+	Dart start ;
+	Dart current ;
+	DartMarkerStore* dmark ;
+	CellMarkerStore* cmark ;
+	TraversorDartsOfOrbit<MAP> m_tradoo;
 
+public:
+	Traversor3WX(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) ;
+	~Traversor3WX();
+
+	Dart begin() ;
+	Dart end() ;
+	Dart next() ;
+} ;
+
+
+template <typename MAP>
+class Traversor3WV: public Traversor3WX<MAP,VERTEX>
+{
+public:
+	Traversor3WV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3WX<MAP,VERTEX>(m, dart, forceDartMarker, thread)	{}
+};
+
+template <typename MAP>
+class Traversor3WE: public Traversor3WX<MAP,EDGE>
+{
+public:
+	Traversor3WE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3WX<MAP,EDGE>(m, dart, forceDartMarker, thread)	{}
+};
+
+template <typename MAP>
+class Traversor3WF: public Traversor3WX<MAP,FACE>
+{
+public:
+	Traversor3WF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3WX<MAP,FACE>(m, dart, forceDartMarker, thread) {}
+};
 
 
 } // namespace CGoGN

@@ -65,13 +65,15 @@ inline void Map3::update_topo_shortcuts()
 inline Dart Map3::newDart()
 {
 	Dart d = Map2::newDart() ;
-	(*m_phi3)[d.index] = d ;
+	unsigned int d_index = dartIndex(d);
+	(*m_phi3)[d_index] = d ;
 	return d ;
 }
 
 inline Dart Map3::phi3(Dart d)
 {
-	return (*m_phi3)[d.index] ;
+	unsigned int d_index = dartIndex(d);
+	return (*m_phi3)[d_index] ;
 }
 
 template <int N>
@@ -119,17 +121,21 @@ inline Dart Map3::alpha_2(Dart d)
 
 inline void Map3::phi3sew(Dart d, Dart e)
 {
-	assert((*m_phi3)[d.index] == d) ;
-	assert((*m_phi3)[e.index] == e) ;
-	(*m_phi3)[d.index] = e ;
-	(*m_phi3)[e.index] = d ;
+	unsigned int d_index = dartIndex(d);
+	unsigned int e_index = dartIndex(e);
+	assert((*m_phi3)[d_index] == d) ;
+	assert((*m_phi3)[e_index] == e) ;
+	(*m_phi3)[d_index] = e ;
+	(*m_phi3)[e_index] = d ;
 }
 
 inline void Map3::phi3unsew(Dart d)
 {
-	Dart e = (*m_phi3)[d.index] ;
-	(*m_phi3)[d.index] = d ;
-	(*m_phi3)[e.index] = e ;
+	unsigned int d_index = dartIndex(d);
+	Dart e = (*m_phi3)[d_index] ;
+	(*m_phi3)[d_index] = d ;
+	unsigned int e_index = dartIndex(e);
+	(*m_phi3)[e_index] = e ;
 }
 
 /*! @name Topological Queries
@@ -157,7 +163,27 @@ inline bool Map3::isBoundaryFace(Dart d)
 
 inline bool Map3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return Map2::foreach_dart_of_oriented_face(d, f, thread) || Map2::foreach_dart_of_oriented_face(phi3(d), f, thread);
+	return Map2::foreach_dart_of_face(d, f, thread) || Map2::foreach_dart_of_face(phi3(d), f, thread);
+}
+
+inline bool Map3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	return Map2::foreach_dart_of_cc(d, f, thread);
+}
+
+inline bool Map3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return Map2::foreach_dart_of_vertex(d, f, thread);
+}
+
+inline bool Map3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return Map2::foreach_dart_of_edge(d, f, thread);
+}
+
+inline bool Map3::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return Map2::foreach_dart_of_face(d, f, thread);
 }
 
 } // namespace CGoGN

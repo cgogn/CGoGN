@@ -319,6 +319,22 @@ public:
 };
 
 
+template <typename MAP>
+class FunctorStoreNotBoundary : public FunctorMap<MAP>
+{
+protected:
+	std::vector<Dart>& m_vec;
+public:
+	FunctorStoreNotBoundary(MAP& map, std::vector<Dart>& vec) : FunctorMap<MAP>(map), m_vec(vec) {}
+	bool operator()(Dart d)
+	{
+		if (!this->m_map.isBoundaryMarked(d))
+			m_vec.push_back(d);
+		return false;
+	}
+};
+
+
 // Multiple Functor: to apply several Functors in turn to a dart
 /********************************************************/
 
@@ -360,7 +376,8 @@ public:
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
+		unsigned int d_index = this->m_map.dartIndex(d);
+		this->m_markTable->operator[](d_index).setMark(this->m_mark) ;
 		return false ;
 	}
 } ;
@@ -377,8 +394,9 @@ public:
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
-		m_markedDarts.push_back(d.index) ;
+		unsigned int d_index = this->m_map.dartIndex(d);
+		this->m_markTable->operator[](d_index).setMark(this->m_mark) ;
+		m_markedDarts.push_back(d_index) ;
 		return false ;
 	}
 } ;
@@ -391,7 +409,8 @@ public:
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markTable->operator[](d.index).unsetMark(this->m_mark) ;
+		unsigned int d_index = this->m_map.dartIndex(d);
+		this->m_markTable->operator[](d_index).unsetMark(this->m_mark) ;
 		return false ;
 	}
 } ;

@@ -115,6 +115,28 @@ protected:
 	std::vector<DartMarkerGen*> dartMarkers ;
 	std::vector<CellMarkerGen*> cellMarkers ;
 
+
+	/**
+	 * is map a multiresolution map
+	 */
+#ifndef CGoGN_FORCE_MR
+	bool m_isMultiRes;
+#elif CGoGN_FORCE_MR == 1
+	static const bool m_isMultiRes=true;
+#else
+	static const bool m_isMultiRes=false;
+#endif
+
+	AttributeContainer m_mrattribs ;
+
+	std::vector< AttributeMultiVector<unsigned int> > m_mrDarts;
+	AttributeMultiVector<unsigned char> m_mrLevels;
+
+	unsigned int m_mrCurrentLevel;
+
+	std::vector<unsigned int> m_mrLevelStack;
+
+
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
@@ -152,6 +174,12 @@ protected:
 	void deleteDart(Dart d) ;
 
 public:
+
+	/**
+	 * get the index of dart in topological table
+	 */
+	unsigned int dartIndex(Dart d);
+
 	/**
 	 * return true if the dart d refers to a valid index
 	 */
@@ -433,10 +461,19 @@ public:
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+
+
+	virtual bool foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+
+	virtual bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+
+
 
 	/**
 	* execute functor for each orbit
@@ -495,38 +532,38 @@ protected:
 	void boundaryUnmarkAll();
 } ;
 
-
-template <typename MAP>
-bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
-{
-	switch(orbit)
-	{
-		case  DART: return f(d);
-		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread) ;
-		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread) ;
-		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
-		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread) ;
-		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread) ;
-		default: assert(!"Cells of this dimension are not handled") ;
-	}
-	return false ;
-}
-
-template <typename MAP>
-bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
-{
-	switch(orbit)
-	{
-		case  DART: return f(d);
-		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread) ;
-		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread) ;
-		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
-		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread) ;
-		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread) ;
-		default: assert(!"Cells of this dimension are not handled") ;
-	}
-	return false ;
-}
+//
+//template <typename MAP>
+//bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
+//{
+//	switch(orbit)
+//	{
+//		case  DART: return f(d);
+//		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread) ;
+//		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread) ;
+//		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
+//		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread) ;
+//		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread) ;
+//		default: assert(!"Cells of this dimension are not handled") ;
+//	}
+//	return false ;
+//}
+//
+//template <typename MAP>
+//bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
+//{
+//	switch(orbit)
+//	{
+//		case  DART: return f(d);
+//		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread) ;
+//		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread) ;
+//		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
+//		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread) ;
+//		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread) ;
+//		default: assert(!"Cells of this dimension are not handled") ;
+//	}
+//	return false ;
+//}
 
 } //namespace CGoGN
 

@@ -43,6 +43,16 @@ protected:
 public:
 	typedef GMap2 ParentMap;
 
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+7; }
+	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
+
+	static const unsigned int VERTEX_OF_PARENT = VERTEX+7;
+	static const unsigned int EDGE_OF_PARENT = EDGE+7;
+	static const unsigned int FACE_OF_PARENT = FACE+7;
+
+	static const unsigned int VERTEX_OF_PARENT2 = VERTEX+5;
+	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
+
 	GMap3();
 
 	virtual std::string mapTypeName();
@@ -276,12 +286,39 @@ public:
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
+	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+
 	/**
 	* Apply a functor on each dart of a cc
 	* @param d a dart of the cc
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+
+
+	/**
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the face
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_vertex2(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	/**
+	* Apply a functor on each dart of an edge
+	* @param d a dart of the oriented face
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_edge2(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	//! Apply a functor on every dart of a face
+	/*! @param d a dart of the volume
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_face2(Dart d, FunctorType& fonct, unsigned int thread = 0);
 	//@}
 
 	/*! @name Close map after import or creation

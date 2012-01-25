@@ -92,7 +92,10 @@ public:
 	virtual void mark(Dart d)
 	{
 		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-		m_map.getMarkVector(DART, m_thread)->operator[](d.index).setMark(m_mark);
+//		m_map.getMarkVector(DART, m_thread)->operator[](d.index).setMark(m_mark);
+		unsigned int d_index = m_map.dartIndex(d);
+		m_map.getMarkVector(DART, m_thread)->operator[](d_index).setMark(m_mark);
+
 	}
 
 	/**
@@ -101,7 +104,8 @@ public:
 	virtual void unmark(Dart d)
 	{
 		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-		m_map.getMarkVector(DART, m_thread)->operator[](d.index).unsetMark(m_mark);
+		unsigned int d_index = m_map.dartIndex(d);
+		m_map.getMarkVector(DART, m_thread)->operator[](d_index).unsetMark(m_mark);
 	}
 
 	/**
@@ -110,7 +114,8 @@ public:
 	virtual bool isMarked(Dart d) const
 	{
 		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-		return m_map.getMarkVector(DART, m_thread)->operator[](d.index).testMark(m_mark);
+		unsigned int d_index = m_map.dartIndex(d);
+		return m_map.getMarkVector(DART, m_thread)->operator[](d_index).testMark(m_mark);
 	}
 
 	/**
@@ -133,27 +138,27 @@ public:
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 
-	/**
-	 * mark the darts of the given orbit of d in the parent map
-	 */
-	template <typename MAP>
-	void markOrbitInParent(unsigned int orbit, Dart d)
-	{
-		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
-		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
-	}
-
-	/**
-	 * unmark the darts of the given orbit of d in the parent map
-	 */
-	template <typename MAP>
-	void unmarkOrbitInParent(unsigned int orbit, Dart d)
-	{
-		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
-		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
-	}
+//	/**
+//	 * mark the darts of the given orbit of d in the parent map
+//	 */
+//	template <typename MAP>
+//	void markOrbitInParent(unsigned int orbit, Dart d)
+//	{
+//		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
+//		FunctorMark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
+//		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
+//	}
+//
+//	/**
+//	 * unmark the darts of the given orbit of d in the parent map
+//	 */
+//	template <typename MAP>
+//	void unmarkOrbitInParent(unsigned int orbit, Dart d)
+//	{
+//		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
+//		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread)) ;
+//		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
+//	}
 
 	/**
 	 * mark all darts
@@ -250,7 +255,8 @@ public:
 	void mark(Dart d)
 	{
 		DartMarkerGen::mark(d) ;
-		m_markedDarts.push_back(d.index) ;
+		unsigned int d_index = m_map.dartIndex(d);
+		m_markedDarts.push_back(d_index) ;
 	}
 
 	void markOrbit(unsigned int orbit, Dart d)
@@ -260,13 +266,13 @@ public:
 		m_map.foreach_dart_of_orbit(orbit, d, fm, m_thread) ;
 	}
 
-	template <typename MAP>
-	void markOrbitInParent(unsigned int orbit, Dart d)
-	{
-		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
-		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
-		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
-	}
+//	template <typename MAP>
+//	void markOrbitInParent(unsigned int orbit, Dart d)
+//	{
+//		assert(m_map.getMarkerSet(DART, m_thread).testMark(m_mark));
+//		FunctorMarkStore<GenericMap> fm(m_map, m_mark, m_map.getMarkVector(DART, m_thread), m_markedDarts) ;
+//		foreach_dart_of_orbit_in_parent<MAP>(dynamic_cast<MAP*>(&m_map), orbit, d, fm, m_thread);
+//	}
 
 //	void mark(unsigned int d)
 //	{

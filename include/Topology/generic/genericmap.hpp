@@ -24,11 +24,32 @@
 
 namespace CGoGN
 {
-
-//inline bool GenericMap::chechXmlNode(xmlNodePtr node, const std::string& name)
+//#ifndef CGoGN_FORCE_MR
+inline unsigned int GenericMap::dartIndex(Dart d)
+{
+	if (m_isMultiRes)
+	{
+		std::cout << "Not implemented"<< std::endl;
+		return 0xffffffff;
+	}
+	return d.index;
+}
+//#elif CGoGN_FORCE_MR == 1
+//inline unsigned int GenericMap::dartIndex(Dart d)
 //{
-//	return (strcmp((char*)(node->name),(char*)(name.c_str())) == 0);
+//	std::cout << "Not implemented"<< std::endl;
+//	return 0xffffffff;
 //}
+//#else
+//inline unsigned int GenericMap::dartIndex(Dart d)
+//{
+//	return d.index;
+//}
+//#endif
+
+
+
+
 
 /****************************************
  *           DARTS MANAGEMENT           *
@@ -37,23 +58,28 @@ namespace CGoGN
 inline Dart GenericMap::newDart()
 {
 	Dart d = Dart::create(m_attribs[DART].insertLine());
+	unsigned int d_index = dartIndex(d);
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		if (m_embeddings[i])
-			(*m_embeddings[i])[d.index] = EMBNULL ;
+		{
+			(*m_embeddings[i])[d_index] = EMBNULL ;
+		}
+
 	return d ;
 }
 
 inline void GenericMap::deleteDart(Dart d)
 {
-	m_attribs[DART].removeLine(d.index) ;
+	unsigned int d_index = dartIndex(d);
+	m_attribs[DART].removeLine(d_index) ;
 	for (unsigned int t = 0; t < m_nbThreads; ++t)
-		m_markTables[DART][t]->operator[](d.index).clear() ;
+		m_markTables[DART][t]->operator[](d_index).clear() ;
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if (m_embeddings[orbit])
 		{
-			unsigned int emb = (*m_embeddings[orbit])[d.index] ;
+			unsigned int emb = (*m_embeddings[orbit])[d_index] ;
 			if(emb != EMBNULL)
 			{
 				if(m_attribs[orbit].unrefLine(emb))
@@ -68,7 +94,7 @@ inline void GenericMap::deleteDart(Dart d)
 
 inline bool GenericMap::isDartValid(Dart d)
 {
-	return !d.isNil() && m_attribs[DART].used(d.index) ;
+	return !d.isNil() && m_attribs[DART].used( dartIndex(d)) ;
 }
 
 inline unsigned int GenericMap::getNbDarts()
@@ -98,10 +124,12 @@ inline unsigned int GenericMap::getEmbedding(unsigned int orbit, Dart d)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
 
-	if (orbit == DART)
-		return d.index;
+	unsigned int d_index = dartIndex(d);
 
-	return (*m_embeddings[orbit])[d.index] ;
+	if (orbit == DART)
+		return d_index;
+
+	return (*m_embeddings[orbit])[d_index] ;
 }
 
 inline void GenericMap::copyDartEmbedding(unsigned int orbit, Dart d, Dart e)
@@ -192,7 +220,10 @@ inline Dart GenericMap::end()
 
 inline void GenericMap::next(Dart& d)
 {
-	m_attribs[DART].next(d.index) ;
+	unsigned int d_index = dartIndex(d);
+	m_attribs[DART].next(d_index) ;
+
+	d = Dart::create(d_index);
 }
 
 /****************************************

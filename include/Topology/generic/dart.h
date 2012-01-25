@@ -31,16 +31,36 @@ namespace CGoGN
 {
 
 const unsigned int EMBNULL = 0xffffffff;
-
-const unsigned int NB_ORBITS = 6;
 const unsigned int NB_THREAD = 16;
 
-const unsigned int VERTEX			= 0;
-const unsigned int EDGE				= 1;
-const unsigned int ORIENTED_FACE	= 2;
-const unsigned int FACE				= 3;
-const unsigned int VOLUME			= 4;
-const unsigned int DART				= 5;
+//const unsigned int NB_ORBITS = 6;
+
+//const unsigned int VERTEX			= 0;
+//const unsigned int EDGE				= 1;
+//const unsigned int ORIENTED_FACE	= 2;
+//const unsigned int FACE				= 3;
+//const unsigned int VOLUME			= 4;
+//const unsigned int DART				= 5;
+//
+
+
+const unsigned int NB_ORBITS	= 11;
+
+const unsigned int DART			= 0;
+const unsigned int VERTEX		= 1;
+const unsigned int EDGE			= 2;
+const unsigned int FACE			= 3;
+const unsigned int VOLUME		= 4;
+const unsigned int CC			= 5;
+
+const unsigned int VERTEX1		= 6;
+const unsigned int EDGE1		= 7;
+
+const unsigned int VERTEX2		= 8;
+const unsigned int EDGE2		= 9;
+const unsigned int FACE2		= 10;
+
+
 
 struct Dart
 {
