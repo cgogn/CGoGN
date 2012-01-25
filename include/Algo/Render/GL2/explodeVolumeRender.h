@@ -78,23 +78,23 @@ public:
 	* @param good functor that return true for darts of part to draw
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/
-	ExplodeVolumeRender();
+	ExplodeVolumeRender() ;
 
 	/**
 	* Destructor
 	*/
-	~ExplodeVolumeRender();
+	~ExplodeVolumeRender() ;
 
 
 	/**
 	 * return a ptr on used shader do not forgot to register
 	 */
-	Utils::GLSLShader* shaderFaces() { return m_shader;}
+	Utils::GLSLShader* shaderFaces() ;
 
 	/**
 	 * return a ptr on used shader do not forgot to register
 	 */
-	Utils::GLSLShader* shaderLines() { return m_shaderL;}
+	Utils::GLSLShader* shaderLines() ;
 
 
 	/**
@@ -104,29 +104,52 @@ public:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * draw edges
 	 */
-	void drawEdges();
+	void drawEdges() ;
 
 	/**
 	 * draw edges
 	 */
-	void drawFaces();
+	void drawFaces() ;
 
-	void setExplodeVolumes(float explode) { m_shader->setExplodeVolumes(explode);m_shaderL->setExplodeVolumes(explode);}
+	/**
+	 * set exploding volume coefficient parameter
+	 */
+	void setExplodeVolumes(float explode) ;
 
-	void setClippingPlane(const Geom::Vec4f& p) {m_shader->setClippingPlane(p); m_shaderL->setClippingPlane(p);}
+	/**
+	 * set clipping plane
+	 */
+	void setClippingPlane(const Geom::Vec4f& p) ;
 
-	void setNoClippingPlane() { Geom::Vec4f p(0.0f,0.0f,10000.0f,100000000000000000000000000.0f); m_shader->setClippingPlane(p); m_shaderL->setClippingPlane(p);}
+	/**
+	 * unset clipping plane
+	 */
+	void setNoClippingPlane() ;
 
-	void setAmbiant(const Geom::Vec4f& ambiant) { m_shader->setAmbiant(ambiant);}
+	/**
+	 * set ambiant color parameter
+	 */
+	void setAmbiant(const Geom::Vec4f& ambiant) ;
 
-	void setDiffuse(const Geom::Vec4f& diffuse) { m_shader->setDiffuse(diffuse);}
+	/**
+	 * set diffuse color parameter
+	 */
+	void setDiffuse(const Geom::Vec4f& diffuse) ;
 
-	void setLightPosition(const Geom::Vec3f& lp) { m_shader->setLightPosition(lp);}
+	/**
+	 * set light position parameter
+	 */
+	void setLightPosition(const Geom::Vec3f& lp) ;
+
+	/**
+	 * set color parameter for edge drawing
+	 */
+	void setColorLine(const Geom::Vec4f& col) ;
 };
 
 }//end namespace GL2

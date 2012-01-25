@@ -91,12 +91,14 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	// compute center of each volumes
 	CellMarker cmv(map,VOLUME);
 	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
-	TraversorW<Map3> traVol(map,good);
 
-	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
-	{
-		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(mapx, d, positions);
-	}
+//	TraversorW<Map3> traVol(map,good);
+//	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
+//	{
+//		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(mapx, d, positions);
+//	}
+	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
+
 
 	// debut phi1
 	AutoAttributeHandler<VEC3> fv1(map, DART);
@@ -347,11 +349,12 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 
 	// compute center of each volumes
 	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
-	TraversorW<GMap3> traVol(map,good);
-	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
-	{
-		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(mapx, d, positions);
-	}
+//	TraversorW<GMap3> traVol(map,good);
+//	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
+//	{
+//		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(mapx, d, positions);
+//	}
+	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
 
 
 	// beta1
