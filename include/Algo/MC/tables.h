@@ -69,7 +69,7 @@ static const short m_EdgeTable[256];
 * Maximum number of triangles is 5 : 15 indices -> 16 values with the final -1
 */
 //static const char m_TriTable[256][16];
-static const int8 m_TriTable[256][16];
+static const char m_TriTable[256][16];
 
 
 /**
@@ -77,7 +77,7 @@ static const int8 m_TriTable[256][16];
 * the cube configurations
 */
 //static const char m_NeighTable[256][16];
-static const int8 m_NeighTable[256][16];
+static const char m_NeighTable[256][16];
 
 };
 

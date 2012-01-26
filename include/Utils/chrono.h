@@ -63,7 +63,7 @@ public:
 };
 #else
 /**
- * class for each time mesuring
+ * class for each time measuring
  */
 class Chrono
 {

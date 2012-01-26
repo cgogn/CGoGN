@@ -53,7 +53,7 @@ Image<DataType>::Image():
 
 
 template< typename  DataType >
-Image<DataType>::Image(DataType *data, int32 wx, int32 wy, int32 wz, float sx, float sy, float sz, bool copy ):
+Image<DataType>::Image(DataType *data, int wx, int wy, int wz, float sx, float sy, float sz, bool copy ):
 	m_WX   (wx),
 	m_WY   (wy),
 	m_WZ   (wz),
@@ -92,13 +92,13 @@ void Image<DataType>::loadRaw(char *filename)
 	}
 
 	// read size
-	fp.read(reinterpret_cast<char*>(&m_WX),sizeof(int32));
-	fp.read(reinterpret_cast<char*>(&m_WY),sizeof(int32));
-	fp.read(reinterpret_cast<char*>(&m_WZ),sizeof(int32));
+	fp.read(reinterpret_cast<char*>(&m_WX),sizeof(int));
+	fp.read(reinterpret_cast<char*>(&m_WY),sizeof(int));
+	fp.read(reinterpret_cast<char*>(&m_WZ),sizeof(int));
 
 	m_WXY = m_WX * m_WY;
 
-	int32 total = m_WXY * m_WZ;
+	int total = m_WXY * m_WZ;
 
 	m_Data = new DataType[total];
 	// read data
@@ -160,7 +160,7 @@ void Image<DataType>::loadVox(char *filename)
 	}
 
 	m_WXY = m_WX * m_WY;
-	int32 total = m_WXY * m_WZ;
+	int total = m_WXY * m_WZ;
 
 	m_Data = new DataType[total];
 
@@ -299,20 +299,11 @@ DataType* Image<DataType>::getVoxelPtr(int lX, int lY, int  lZ)
 *  add a frame of Zero to the image
 */
 template< typename  DataType >
-Image<DataType>* Image<DataType>::addFrame(int frameMax)
+Image<DataType>* Image<DataType>::addFrame(int frameWidth) const
 {
-
-	float minVS = std::max(m_SX, std::max(m_SY, m_SZ));
-	float realFS = static_cast<float>(frameMax) * minVS;
-
-    // real frame size for anisotropic images
-    int32 lFX = static_cast<int32>( ceilf( realFS / m_SX) );
-	int32 lFY = static_cast<int32>( ceilf( realFS / m_SY) );
-	int32 lFZ = static_cast<int32>( ceilf( realFS / m_SZ) );
-
-	int lTx = m_WX+2*lFX;
-	int lTy = m_WY+2*lFY;
-	int lTz = m_WZ+2*lFZ;
+	int lTx = m_WX+2*frameWidth;
+	int lTy = m_WY+2*frameWidth;
+	int lTz = m_WZ+2*frameWidth;
 	int lTxy = lTx*lTy;
 
 	// define Zero
@@ -326,42 +317,42 @@ Image<DataType>* Image<DataType>::addFrame(int frameMax)
 
 
 	DataType *data = newData;
-	int32 sizeFrameZ = lTxy * lFZ;
+	int sizeFrameZ = lTxy * frameWidth;
 
 	// frame Z upper
-	for(int32 i=0; i<sizeFrameZ; i++)
+	for(int i=0; i<sizeFrameZ; i++)
 	{
 		*data++ = Zero;
 	}
 
-	int32 nbsl = lTz - 2*lFZ;
-	for(int32 i=0; i<nbsl; i++)
+	int nbsl = lTz - 2*frameWidth;
+	for(int i=0; i<nbsl; i++)
 	{
-		int32 sizeFrameY = lTx*lFY;
+		int sizeFrameY = lTx*frameWidth;
 		// frame Y upper
-		for(int32 j=0; j<sizeFrameY; j++)
+		for(int j=0; j<sizeFrameY; j++)
 		{
 			*data++ = Zero;
 		}
 
-		int32 nbrow = lTy - 2*lFY;
-		for(int32 k=0; k<nbrow; k++)
+		int nbrow = lTy - 2*frameWidth;
+		for(int k=0; k<nbrow; k++)
 		{
 			// frame X upper
-			for(int32 l=0; l<	lFX; l++)
+			for(int l=0; l< frameWidth; l++)
 			{
 				*data++ = Zero;
 			}
 
 			// copy original Data
-			int32 nbcol = lTx - 2*lFX;
-			for(int32 l=0; l<nbcol; l++)
+			int nbcol = lTx - 2*frameWidth;
+			for(int l=0; l<nbcol; l++)
 			{
 				*data++ = *original++;
 			}
 
 			// frame X lower
-			for(int32 l=0; l<	lFX; l++)
+			for(int l=0; l< frameWidth; l++)
 			{
 				*data++ = Zero;
 			}
@@ -369,14 +360,14 @@ Image<DataType>* Image<DataType>::addFrame(int frameMax)
 		}
 
 		// frame Y upper
-		for(int32 j=0; j<sizeFrameY; j++)
+		for(int j=0; j<sizeFrameY; j++)
 		{
 			*data++ = Zero;
 		}
 	}
 
 	// frame Z lower
-	for(int32 i=0; i<sizeFrameZ; i++)
+	for(int i=0; i<sizeFrameZ; i++)
 	{
 		*data++ = Zero;
 	}
@@ -384,9 +375,10 @@ Image<DataType>* Image<DataType>::addFrame(int frameMax)
 	Image<DataType>* newImg = new Image<DataType>(newData,lTx,lTy,lTz,getVoxSizeX(),getVoxSizeY(),getVoxSizeZ());
 
 	// set origin of real data in image
-	newImg->setOrigin(m_OX+lFX, m_OY+lFY, m_OZ+lFZ);
+	newImg->setOrigin(m_OX+frameWidth, m_OY+frameWidth, m_OZ+frameWidth);
 
 	return newImg;
+
 }
 
 
@@ -394,14 +386,14 @@ template< typename  DataType >
 template< typename Windowing >
 float Image<DataType>::computeVolume(const Windowing& wind) const
 {
-	int32 nbv = getWidthXY()*getWidthZ();
+	int nbv = getWidthXY()*getWidthZ();
 
 	const DataType *data = getData();
 
 	// volume in number of voxel
-	int32 vol=0;
+	int vol=0;
 
-	for(int32 i=0; i<nbv; i++)
+	for(int i=0; i<nbv; i++)
 	{
 		if (wind.inside(*data))
 		{
@@ -716,36 +708,46 @@ float Image<DataType>::computeCurvatureCount3(const DataType *ptrVox, const std:
 
 
 template< typename  DataType >
-Image<DataType>* Image<DataType>::cropz(unsigned int zmin, unsigned int nb)
+void Image<DataType>::addCross()
 {
+	int zm = m_WZ/2 - 10;
+	int ym = m_WY/2 - 10;
+	int xm = m_WX/2 - 10;
 
-	int zmax = zmin+nb;
-	if (zmax> m_WZ)
+	for (int z = zm; z < zm+20; z++)
 	{
-		zmax = m_WZ;
-		nb = zmax - zmin;
-	}
-
-	DataType* data2 = new DataType[150*m_WY*m_WZ];
-	Image<DataType>* newImg = new Image<DataType>(data2,150,m_WY,nb,getVoxSizeX(),getVoxSizeY(),getVoxSizeZ());
-	newImg->m_Alloc=true;
-	// set origin of real data in image ??
-
-	for(int z=zmin; z< zmax; ++z)
-	{
-		for(int y=0; y<m_WY; ++y)
+		for (int x = xm; x < xm+20; x++)
 		{
-			for(int x=0; x<150; ++x)
+			for (int y = 0 ; y < m_WY; y++)
 			{
-				DataType* ori = getVoxelPtr(x,y,z);
-				DataType* dest = newImg->getVoxelPtr(x,y,z-zmin);
-				*dest = *ori;
+				m_Data[x + m_WX*y + m_WXY*z]=DataType(255);
 			}
 		}
 	}
 
-	return newImg;
+	for (int z = zm; z < zm+20; z++)
+	{
+		for (int y = ym; y < ym+20; y++)
+		{
+			for (int x = 0 ; x < m_WX; x++)
+			{
+				m_Data[x + m_WX*y + m_WXY*z]=DataType(255);
+			}
+		}
+	}
+
+	for (int y = ym; y < ym+20; y++)
+	{
+		for (int x = xm; x < xm+20; x++)
+		{
+			for (int z = 0 ; z < m_WZ; z++)
+			{
+				m_Data[x + m_WX*y + m_WXY*z]=DataType(255);
+			}
+		}
+	}
 }
+
 
 
 

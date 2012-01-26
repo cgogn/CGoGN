@@ -27,7 +27,6 @@
 
 
 #include "Geometry/vector_gen.h"
-#include "Algo/MC/type.h"
 
 #include "Utils/img3D_IO.h"
 
@@ -76,23 +75,23 @@ protected:
 	/**
 	 * slice size
 	 */
-	int32 m_WXY;
+	int m_WXY;
 
 
 	/**
 	 * X origin
 	 */
-	int32 m_OX;
+	int m_OX;
 
 	/**
 	 * Y origin
 	 */
-	int32 m_OY;
+	int m_OY;
 
 	/**
 	 * Z origin
 	 */
-	int32 m_OZ;
+	int m_OZ;
 
 
 	/**
@@ -171,7 +170,7 @@ public:
 	* @param sz voxel size in Z
 	* @param copy	sets to true if data must be copying, false if data are used directly (and release by the destructor).
 	*/
-	Image(DataType *data, int32 wx, int32 wy, int32 wz, float sx, float sy, float sz, bool copy = false );
+	Image(DataType *data, int wx, int wy, int wz, float sx, float sy, float sz, bool copy = false );
 
 
 	/**
@@ -193,22 +192,22 @@ public:
     /**
 	* get the width along X axis
 	*/
-	int32 getWidthX() const { return m_WX;}
+	int getWidthX() const { return m_WX;}
 
 	/**
 	* get the width along Y axis
 	*/
-	int32 getWidthY() const { return m_WY;}
+	int getWidthY() const { return m_WY;}
 
 	/**
 	* get the width along Z axis
 	*/
-	int32 getWidthZ() const { return m_WZ;}
+	int getWidthZ() const { return m_WZ;}
 
 	/**
 	* get widthX*widthY (size of a slice)
 	*/
-	int32 getWidthXY() const { return m_WXY;}
+	int getWidthXY() const { return m_WXY;}
 
 	/** set the real size of voxel of image
 	 * @param vx x size
@@ -222,7 +221,7 @@ public:
 	 * @param oy y size
 	 * @param oz z size
 	 */
-	void setOrigin(int32 ox, int32 oy, int32 oz) {m_OX = ox; m_OY = oy; m_OZ = oz;}
+	void setOrigin(int ox, int oy, int oz) {m_OX = ox; m_OY = oy; m_OZ = oz;}
 
 	/**
 	 * get the origin
@@ -262,7 +261,7 @@ public:
 	* @param  _lX,_lY,_lZ position
 	* @return the value of the voxel
 	*/
-	DataType getVoxel(int32 _lX,int32 _lY, int32 _lZ);
+	DataType getVoxel(int _lX,int _lY, int _lZ);
 
 	/**
 	* get the voxel address (const ptr)
@@ -270,7 +269,7 @@ public:
 	* @param _lX,_lY,_lZ position
 	* @return the address of the voxel
 	*/
-	const DataType* getVoxelPtr(int32 _lX,int32 _lY, int32 _lZ) const;
+	const DataType* getVoxelPtr(int _lX,int _lY, int _lZ) const;
 
 	/**
 	* get the voxel address
@@ -278,7 +277,7 @@ public:
 	* @param  _lX,_lY,_lZ position
 	* @return the address of the voxel
 	*/
-	DataType* getVoxelPtr(int32 _lX,int32 _lY, int32 _lZ);
+	DataType* getVoxelPtr(int _lX,int _lY, int _lZ);
 
 
 	/**
@@ -295,14 +294,14 @@ public:
 	* @param   _lWidth width of filtering
 	* @return the new image
 	*/
-	Image<DataType>* filtering(int32 _lWidth);
+	Image<DataType>* filtering(int _lWidth);
 
 	/**
 	*  add Frame of zero around the image
 	* @param  _lWidth the width of frame to add
 	* @return the new image
 	*/
-	Image<DataType>* addFrame(int32 _lWidth);
+	Image<DataType>* addFrame(int _lWidth) const;
 
 	/**
 	 * Get the lower corner of bounding AABB
@@ -336,7 +335,7 @@ public:
 
 	void createMaskOffsetCylinders(std::vector<int>& tableX, std::vector<int>& tableY, std::vector<int>& tableZ, int _i32radius);
 
-	Image<DataType>* cropz(unsigned int zmin, unsigned int zmax);
+	void addCross();
 
 	void createNormalSphere(std::vector<Geom::Vec3f>& table, int _i32radius);
 

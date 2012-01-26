@@ -120,7 +120,7 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 
 	// compute value to transform points directly to final system coordinate
 
-/*	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));*/
+//	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));
 
 	m_fScal[0] = m_Image->getVoxSizeX();
 	m_fScal[1] = m_Image->getVoxSizeY();
@@ -222,8 +222,8 @@ unsigned char MarchingCube<DataType, Windowing, PFP>::computeIndex(const DataTyp
 	const DataType* ucDataLocal = _ucData;
 
 
-	int32 lTx = m_Image->getWidthX();
-	int32 lTxy = m_Image->getWidthXY();
+	int lTx = m_Image->getWidthX();
+	int lTxy = m_Image->getWidthXY();
 
 
 	if ( m_windowFunc.inside(*ucDataLocal) )
@@ -257,13 +257,11 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 typename PFP::VEC3 MarchingCube<DataType, Windowing, PFP>::recalPoint(const typename PFP::VEC3& _P, const typename PFP::VEC3& _dec ) const
 {
 	typename PFP::VEC3 point = _P + _dec ;
-
-	point -= m_fOrigin;
-
-	point[0] = point[0] * m_fScal[0];
-	point[1] = point[1] * m_fScal[1];
-	point[2] = point[2] * m_fScal[2];
-
+//	point[0] = point[0] * m_fScal[0];
+//	point[1] = point[1] * m_fScal[1];
+//	point[2] = point[2] * m_fScal[2];
+//
+//	point += m_fOrigin;
 	return 	point;
 }
 
@@ -477,7 +475,7 @@ void MarchingCube<DataType, Windowing, PFP>::createPointEdge11(const unsigned ch
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const int _lX,const int _lY,const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const int _lX,const int _lY,const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -540,7 +538,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -598,7 +596,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -654,7 +652,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -713,7 +711,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -770,7 +768,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -832,7 +830,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -894,7 +892,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const 
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -966,7 +964,7 @@ void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int  const *_lVertTable, const unsigned short _usMask, float curv, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int  const *_lVertTable, const unsigned short _usMask, float curv, unsigned char tag)
 {
 // TODO parametre _LZ not used => a supprimer ?
 // TODO parametre curv not used => a supprimer ?
@@ -982,8 +980,8 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 	L_DART *lFacesTab = m_Buffer->getFacesCubeTableAdr(_lX,_lY);
 
 // To speed access to data "precompute indirection"
-	const int8* cTriangle = accelMCTable::m_TriTable[_ucCubeIndex];
-	const int8* cNeighbour = accelMCTable::m_NeighTable[_ucCubeIndex];
+	const char* cTriangle = accelMCTable::m_TriTable[_ucCubeIndex];
+	const char* cNeighbour = accelMCTable::m_NeighTable[_ucCubeIndex];
 
 //	L_DART dartTriangles[5];
 
@@ -1158,29 +1156,6 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 	}
 
 
-// CGoGNout << "NB TRIS: "<< lNumFaces <<CGoGNendl;
-// for (int i=0; i< lNumFaces; ++i)
-// {
-// 	L_DART d = lFacesTab[i];
-// 	L_DART dd = L_MAP::phi2(d);
-// 	L_DART ddd = L_MAP::phi2(dd);
-// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
-//
-//
-// 	d =m_map->phi1(d);
-// 	dd = L_MAP::phi2(d);
-// 	ddd = L_MAP::phi2(dd);
-// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
-//
-// 	d =m_map->phi1(d);
-// 	dd = L_MAP::phi2(d);
-// 	ddd = L_MAP::phi2(dd);
-// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
-//
-// }
-
-
-
 // finish buffer table of faces with -1
 // PAS FORCEMENT UTILE A VERIFIER
 // 	for(int i=lNumFaces; i <5; i++)
@@ -1204,7 +1179,6 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 	float ymax = m_Image->getWidthY() - frameWidth;
 	float zmin = frameWidth;
 	float zmax = m_Image->getWidthZ() - frameWidth;
-
 
 
 	// traverse position and create bound attrib
@@ -1266,6 +1240,20 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 
 }
 
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+void MarchingCube<DataType, Windowing, PFP>::recalPoints()
+{
+
+	for(unsigned int i=m_positions.begin(); i != m_positions.end(); m_positions.next(i))
+	{
+		typename PFP::VEC3& P = m_positions[i];
+		P -= m_fOrigin;
+		P[0] = P[0] * m_fScal[0];
+		P[1] = P[1] * m_fScal[1];
+		P[2] = P[2] * m_fScal[2];
+
+	}
+}
 
 
 
