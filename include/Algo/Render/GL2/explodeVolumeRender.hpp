@@ -85,7 +85,8 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
 
-	TraversorOF<typename PFP::MAP> traFace(map,good);
+	TraversorCell<typename PFP::MAP> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
 		Dart a = d;
@@ -117,32 +118,14 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 
 
 	buffer.clear();
-//	TraversorE<typename PFP::MAP> traEdge(map,good);
-//	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
-//	{
-//		buffer.push_back(centerVolumes[d]);
-//		buffer.push_back(positions[d]);
-//		buffer.push_back(positions[ map.phi1(d)]);
-//	}
 
-	// TO A REFAIRE AVEC LE BON TRAVERSOR DE LA BONNE ORBITE QUAND ELLE EXISTERA
-
-	DartMarker dm(map);
-	for (Dart d=map.begin(); d!=map.end(); map.next(d))
+	TraversorCell<typename PFP::MAP> traEdge(map, PFP::MAP::ORBIT_IN_PARENT(EDGE),good);
+	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
 	{
-		if (good(d) && !dm.isMarked(d))
-		{
 			buffer.push_back(centerVolumes[d]);
 			buffer.push_back(positions[d]);
 			buffer.push_back(positions[ map.phi1(d)]);
-			dm.mark(d);
-			dm.mark(map.phi2(d));
-
-		}
-
 	}
-
-
 
 	m_nbLines = buffer.size()/3;
 
@@ -174,6 +157,55 @@ inline void ExplodeVolumeRender::drawEdges()
 }
 
 
+inline void ExplodeVolumeRender::setExplodeVolumes(float explode)
+{
+	m_shader->setExplodeVolumes(explode);
+	m_shaderL->setExplodeVolumes(explode);
+}
+
+inline void ExplodeVolumeRender::setClippingPlane(const Geom::Vec4f& p)
+{
+	m_shader->setClippingPlane(p);
+	m_shaderL->setClippingPlane(p);
+}
+
+inline void ExplodeVolumeRender::setNoClippingPlane()
+{
+	Geom::Vec4f p(1.0f,1.0f,1.0f,-99999999.9f);
+	m_shader->setClippingPlane(p);
+	m_shaderL->setClippingPlane(p);
+}
+
+inline void ExplodeVolumeRender::setAmbiant(const Geom::Vec4f& ambiant)
+{
+	m_shader->setAmbiant(ambiant);
+}
+
+inline void ExplodeVolumeRender::setDiffuse(const Geom::Vec4f& diffuse)
+{
+	m_shader->setDiffuse(diffuse);
+}
+
+inline void ExplodeVolumeRender::setLightPosition(const Geom::Vec3f& lp)
+{
+	m_shader->setLightPosition(lp);
+}
+
+inline void ExplodeVolumeRender::setColorLine(const Geom::Vec4f& col)
+{
+	m_shaderL->setColor(col);
+}
+
+
+inline Utils::GLSLShader* ExplodeVolumeRender::shaderFaces()
+{
+	return m_shader;
+}
+
+inline Utils::GLSLShader* ExplodeVolumeRender::shaderLines()
+{
+	return m_shaderL;
+}
 
 
 }//end namespace VBO

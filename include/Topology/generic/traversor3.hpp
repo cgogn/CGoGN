@@ -60,4 +60,63 @@ Dart Traversor3VE<MAP>::next()
 	return current ;
 }
 
+
+template <typename MAP, unsigned int ORBIT>
+Traversor3WX<MAP,ORBIT>::Traversor3WX(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread) :
+	m(map), start(dart),dmark(NULL), cmark(NULL), m_tradoo(map,VOLUME,dart,thread)
+{
+	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT))
+		cmark = new CellMarkerStore(map, ORBIT, thread) ;
+	else
+		dmark = new DartMarkerStore(map, thread) ;
+}
+
+template <typename MAP, unsigned int ORBIT>
+Traversor3WX<MAP,ORBIT>::~Traversor3WX()
+{
+	if (cmark)
+		delete cmark;
+	if (dmark)
+		delete dmark;
+
+}
+
+template <typename MAP, unsigned int ORBIT>
+Dart Traversor3WX<MAP,ORBIT>::begin()
+{
+	current = m_tradoo.begin() ;
+	return current;
+}
+
+template <typename MAP, unsigned int ORBIT>
+Dart Traversor3WX<MAP,ORBIT>::end()
+{
+	return NIL ;
+}
+
+template <typename MAP, unsigned int ORBIT>
+Dart Traversor3WX<MAP,ORBIT>::next()
+{
+	if(current != NIL)
+	{
+		if (cmark)
+		{
+			cmark->mark(current);
+			current = m_tradoo.next();
+			while ((current != NIL) && cmark->isMarked(current))
+				current = m_tradoo.next();
+		}
+		else
+		{
+			dmark->markOrbit(ORBIT, current);
+			current = m_tradoo.next();
+			while ((current != NIL) && dmark->isMarked(current))
+				current = m_tradoo.next();
+		}
+	}
+	return current ;
+}
+
+
+
 } // namespace CGoGN

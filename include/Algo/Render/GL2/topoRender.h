@@ -102,7 +102,8 @@ protected:
 
 	Dart colToDart(float* color);
 
-	void dartToCol(Dart d, float& r, float& g, float& b);
+	template<typename PFP>
+	void dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b);
 
 	Dart pickColor(unsigned int x, unsigned int y);
 

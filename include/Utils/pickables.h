@@ -138,17 +138,40 @@ protected:
 	/// id of pickable
 	unsigned int m_id;
 
+	bool m_allocated;
+
 	/**
 	 * comparison operator for depth ordered picking
 	 */
 	static bool distOrder(const std::pair<float, Pickable*>& e1, const std::pair<float, Pickable*>& e2);
 
 public:
+	enum {GRID, SPHERE,CONE,CYLINDER,CUBE,ICOSPHERE};
+
 	/**
 	 * constructor
 	 * @param ld LineDrawable to use for drawing & picking
+	 * @param id for picking
 	 */
 	Pickable(LineDrawable* ld, unsigned int id);
+
+	/**
+	 * constructor with internal drawable allocation
+	 * @param object GRID, SPHERE,CONE,CYLINDER,CUBE or ICOSPHERE
+	 * @param id for picking
+	 */
+	Pickable(int object, unsigned int id);
+
+	/**
+	 * destructor
+	 */
+	~Pickable();
+
+
+	/**
+	 * get drawable pointer (usefull for modifying rendering parameters)
+	 */
+	LineDrawable* drawable() { return m_drawable;}
 
 	/**
 	 * picking

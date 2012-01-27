@@ -128,17 +128,17 @@ protected:
 	/**
 	* position of the first slice in image
 	*/	
-	int32 m_lZpos;
+	int m_lZpos;
 
 	/**
 	* width of slice
 	*/	
-	int32 m_lWidth;
+	int m_lWidth;
 
 	/**
 	* heigth of slice
 	*/	
-	int32 m_lHeight;
+	int m_lHeight;
 	
 public:
 
@@ -149,7 +149,7 @@ public:
 	* @param   _lWidth the width of image to buffer
 	* @param   _lHeight the height of image to buffer
 	*/
-	BufferGen(int32 _lWidth, int32 _lHeight);
+	BufferGen(int _lWidth, int _lHeight);
 	
 	~BufferGen();
 
@@ -159,9 +159,9 @@ public:
 
 	/**
 	* @name Function to store the index of a point on edge O..11 of a cube
-	* @param  int32 _lX coordinate of the cube
-	* @param  int32 _lY coordinate of the cube
-	* @param  int32 _lPoint the index of the point
+	* @param  int _lX coordinate of the cube
+	* @param  int _lY coordinate of the cube
+	* @param  int _lPoint the index of the point
 	*/
 	//@{
 	/**
@@ -170,26 +170,26 @@ public:
 	* @param  _lY coordinate of the cube
 	* @param  _lPoint the embedding
 	*/
-	void setPointEdge0 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge1 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge2 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge3 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge4 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge5 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge6 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge7 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge8 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge9 (int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge10(int32 _lX,int32 _lY, unsigned int _lPoint);
-	void setPointEdge11(int32 _lX,int32 _lY, unsigned int _lPoint);
+	void setPointEdge0 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge1 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge2 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge3 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge4 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge5 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge6 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge7 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge8 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge9 (int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge10(int _lX,int _lY, unsigned int _lPoint);
+	void setPointEdge11(int _lX,int _lY, unsigned int _lPoint);
 	//@}
 
 	/**
 	* @name Function to get the index of point store on edge O..11 of a cube
 	****************************************************
-	* @param  int32 _lX coordinate of the cube
-	* @param  int32 _lY coordinate of the cube
-	* @param  int32 _lPoint the index of the point
+	* @param  int _lX coordinate of the cube
+	* @param  int _lY coordinate of the cube
+	* @param  int _lPoint the index of the point
 	*/
 	//@{
 	/**
@@ -199,18 +199,18 @@ public:
 	* @param  _lY coordinate of the cube
 	* @return   the index of the point
 	*/
-	unsigned int getPointEdge0 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge1 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge2 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge3 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge4 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge5 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge6 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge7 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge8 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge9 (int32 _lX,int32 _lY);
-	unsigned int getPointEdge10(int32 _lX,int32 _lY);
-	unsigned int getPointEdge11(int32 _lX,int32 _lY);
+	unsigned int getPointEdge0 (int _lX,int _lY);
+	unsigned int getPointEdge1 (int _lX,int _lY);
+	unsigned int getPointEdge2 (int _lX,int _lY);
+	unsigned int getPointEdge3 (int _lX,int _lY);
+	unsigned int getPointEdge4 (int _lX,int _lY);
+	unsigned int getPointEdge5 (int _lX,int _lY);
+	unsigned int getPointEdge6 (int _lX,int _lY);
+	unsigned int getPointEdge7 (int _lX,int _lY);
+	unsigned int getPointEdge8 (int _lX,int _lY);
+	unsigned int getPointEdge9 (int _lX,int _lY);
+	unsigned int getPointEdge10(int _lX,int _lY);
+	unsigned int getPointEdge11(int _lX,int _lY);
 	//@}
 	
 	/**
@@ -220,7 +220,7 @@ public:
 	* @param  _lY y coordinate of cube
 	* @return   table of faces
 	*/
-	DART* getFacesCubeTableAdr(int32 _lX,int32 _lY);
+	DART* getFacesCubeTableAdr(int _lX,int _lY);
 
 	/**
 	* get dart table of faces stored on edge O..11 of a cube
@@ -230,7 +230,7 @@ public:
 	* @param   _lZ z coordinate of the cube
 	* @return   table of faces
 	*/	
-	const DART* getFacesCube(int32 _lX,int32 _lY,int32 _lZ) const;
+	const DART* getFacesCube(int _lX,int _lY,int _lZ) const;
 		
 	
 	/**
@@ -240,7 +240,7 @@ public:
 	* @param   _lY y coordinate of the cube
 	* @param   _lFace table of faces index
 	*/	
-	void setFacesCube(int32 _lX,int32 _lY, const DART* const _lFace);
+	void setFacesCube(int _lX,int _lY, const DART* const _lFace);
 
 	
 	/**
@@ -257,7 +257,7 @@ public:
 	* @param   _lNeighbour neighbour to store
 	*/	
 
-	void setExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY, DART _lNeighbour);
+	void setExternalNeighbour(char _cEdge, int _lX, int _lY, DART _lNeighbour);
 
 	/**
 	* get neighbour stored on edge O..11 of a cube
@@ -267,16 +267,16 @@ public:
 	* @param   _lY y coordinate of the cube
 	* @return   the neighbour
 	*/	
-	DART getExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY) const ;
+	DART getExternalNeighbour(char _cEdge, int _lX, int _lY) const ;
 
 
-	void setData(int32 _lX, int32 _lY, DATATYPE data);
+	void setData(int _lX, int _lY, DATATYPE data);
 
-	DATATYPE getData(int32 _lX, int32 _lY);
+	DATATYPE getData(int _lX, int _lY);
 
-	void setData2(int32 _lX, int32 _lY, DATATYPE data);
+	void setData2(int _lX, int _lY, DATATYPE data);
 
-	DATATYPE getData2(int32 _lX, int32 _lY);
+	DATATYPE getData2(int _lX, int _lY);
 
 	DATATYPE* getDataPtr() { return m_dataSl0;}
 	DATATYPE* getData2Ptr() {return m_dataSl1;}

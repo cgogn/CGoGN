@@ -76,7 +76,7 @@ const short accelMCTable::m_EdgeTable[256]=
 
 
 //const char accelMCTable::m_TriTable[256][16] =
-const int8 accelMCTable::m_TriTable[256][16] =
+const char accelMCTable::m_TriTable[256][16] =
 {
 		{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 		{ 0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -595,7 +595,7 @@ const int8 accelMCTable::m_TriTable[256][16] =
   
 
 //const char accelMCTable::m_NeighTable[256][16] =
-const int8 accelMCTable::m_NeighTable[256][16] =
+const char accelMCTable::m_NeighTable[256][16] =
 {
 		{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 		{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },

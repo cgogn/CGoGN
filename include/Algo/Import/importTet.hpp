@@ -128,15 +128,17 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		// Embed three "base" vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[j]]);
-			foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[2-j]]);
+//			foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+			map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+
 
 			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
 			do
 			{
 				m.mark(dd) ;
-				vecDartsPerVertex[pt[j]].push_back(dd);
+				vecDartsPerVertex[pt[2-j]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
 			} while(dd != d);
 
@@ -147,7 +149,9 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[3]]);
-		foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+//		foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+		map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+
 
 		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
@@ -187,7 +191,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 			}
 			else
 			{
-				m.unmarkOrbit(ORIENTED_FACE, d);
+				m.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(FACE), d);
 				++nbBoundaryFaces;
 			}
 		}

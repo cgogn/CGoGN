@@ -108,6 +108,14 @@ Strings3D::~Strings3D()
 {
 }
 
+void Strings3D::clear()
+{
+	m_nbChars=0;
+	m_strings.clear();
+	m_strTranslate.clear();
+	m_strpos.clear();
+}
+
 unsigned int Strings3D::addString(const std::string& str)
 {
 	unsigned int id = m_strings.size();

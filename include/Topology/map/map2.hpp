@@ -67,13 +67,15 @@ inline void Map2::update_topo_shortcuts()
 inline Dart Map2::newDart()
 {
 	Dart d = Map1::newDart() ;
-	(*m_phi2)[d.index] = d ;
+//	unsigned int d_index = dartIndex(d);
+	(*m_phi2)[dartIndex(d)] = d ;
 	return d ;
 }
 
 inline Dart Map2::phi2(Dart d)
 {
-	return (*m_phi2)[d.index] ;
+//	unsigned int d_index = dartIndex(d);
+	return (*m_phi2)[dartIndex(d)] ;
 }
 
 template <int N>
@@ -114,17 +116,21 @@ inline Dart Map2::alpha_1(Dart d)
 
 inline void Map2::phi2sew(Dart d, Dart e)
 {
-	assert((*m_phi2)[d.index] == d) ;
-	assert((*m_phi2)[e.index] == e) ;
-	(*m_phi2)[d.index] = e ;
-	(*m_phi2)[e.index] = d ;
+	unsigned int d_index = dartIndex(d);
+	unsigned int e_index = dartIndex(e);
+	assert((*m_phi2)[d_index] == d) ;
+	assert((*m_phi2)[e_index] == e) ;
+	(*m_phi2)[d_index] = e ;
+	(*m_phi2)[e_index] = d ;
 }
 
 inline void Map2::phi2unsew(Dart d)
 {
-	Dart e = (*m_phi2)[d.index] ;
-	(*m_phi2)[d.index] = d ;
-	(*m_phi2)[e.index] = e ;
+	unsigned int d_index = dartIndex(d);
+	Dart e = (*m_phi2)[d_index] ;
+	(*m_phi2)[d_index] = d ;
+	unsigned int e_index = dartIndex(e);
+	(*m_phi2)[e_index] = e ;
 }
 
 /*! @name Topological Queries
@@ -170,14 +176,20 @@ inline bool Map2::sameVolume(Dart d, Dart e)
  *  Apply functors to all darts of a cell
  *************************************************************************/
 
-inline bool Map2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+inline bool Map2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f, thread);
+	return Map1::foreach_dart_of_cc(d, f, thread);
 }
 
-inline bool Map2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
+
+inline bool Map2::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f, thread);
+	return Map1::foreach_dart_of_vertex(d,f,thread);
+}
+
+inline bool Map2::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread)
+{
+	return Map1::foreach_dart_of_edge(d,f,thread);
 }
 
 } // namespace CGoGN

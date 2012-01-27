@@ -87,9 +87,44 @@ void LineDrawable::getPrecisionDrawing(unsigned int& sub, unsigned int& sub2)
 
 
 Pickable::Pickable(LineDrawable* ld, unsigned int id):
-	m_drawable(ld),m_transfo(1.0f), m_id(id)
+	m_drawable(ld),m_transfo(1.0f), m_id(id), m_allocated(false)
 {
 }
+
+Pickable::Pickable(int object, unsigned int id):
+	m_transfo(1.0f), m_id(id),  m_allocated(true)
+{
+	switch (object)
+	{
+		case GRID:
+			m_drawable = new Grid();
+			break;
+		case SPHERE:
+			m_drawable = new Sphere();
+			break;
+		case CONE:
+			m_drawable = new Sphere();
+			break;
+		case CYLINDER:
+			m_drawable = new Cylinder();
+			break;
+		case CUBE:
+			m_drawable = new Cube();
+			break;
+		case ICOSPHERE:
+			m_drawable = new IcoSphere();
+			break;
+		default:
+			break;
+	}
+}
+
+Pickable::~Pickable()
+{
+	if (m_allocated)
+		delete m_drawable;
+}
+
 
 void Pickable::invertPV(const Geom::Vec3f& P, const Geom::Vec3f& V, const glm::mat4& transfo, Geom::Vec3f& PP, Geom::Vec3f& VV)
 {

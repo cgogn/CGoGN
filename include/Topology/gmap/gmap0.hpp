@@ -107,24 +107,5 @@ inline bool GMap0::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thr
 	return false;
 }
 
-inline bool GMap0::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	return f(d) ;
-}
-
-inline bool GMap0::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_edge(d, f, thread) ;
-}
-
-inline bool GMap0::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f,thread) ;
-}
-
-inline bool GMap0::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_face(d, f, thread) ;
-}
 
 } // namespace CGoGN

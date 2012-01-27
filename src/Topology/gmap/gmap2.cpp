@@ -828,7 +828,7 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 	return false ;
 }
 
-bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+bool GMap2::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value

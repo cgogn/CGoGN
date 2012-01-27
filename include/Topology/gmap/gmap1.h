@@ -189,43 +189,30 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a face
-	* @param d a dart of the face
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of an edge
-	* @param d a dart of the oriented face
+	* @param d a dart of the edge
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
-	* Apply a functor on each dart of an oriented face
-	* @param d a dart of the oriented face
+	* Apply a functor on each dart of an oriented cc (face)
+	* @param d a dart of the oriented cc
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread=0);
 
-	//! Apply a functor on every dart of a face
-	/*! @param d a dart of the face
+	//! Apply a functor on every dart of a cc (face)
+	/*! @param d a dart of the cc
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread=0);
-
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
-	 *  @param f the functor to apply
-	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
-
-	/**
-	* Apply a functor on each dart of a cc
-	* @param d a dart of the cc
-	* @param fonct functor obj ref
-	*/
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0);
 	//@}
 };

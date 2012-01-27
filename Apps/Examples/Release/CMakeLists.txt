@@ -64,3 +64,10 @@ QT4_WRAP_CPP( clipping_moc ../clipping.h )
 add_executable( clipping ../clipping.cpp ${clipping_ui} ${clipping_moc})
 target_link_libraries( clipping
 	${CGoGN_LIBS_R}  ${CGoGN_EXT_LIBS}  )
+
+QT4_WRAP_UI( volumeExplorer_ui ../volumeExplorer.ui )
+QT4_WRAP_CPP( volumeExplorer_moc ../volumeExplorer.h )
+add_executable( volumeExplorer ../volumeExplorer.cpp ${volumeExplorer_ui} ${volumeExplorer_moc})
+target_link_libraries( volumeExplorer
+	${CGoGN_LIBS_R}  ${CGoGN_EXT_LIBS}  )	
+	

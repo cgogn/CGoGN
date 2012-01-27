@@ -209,16 +209,6 @@ Dart TopoRender::colToDart(float* color)
 
 }
 
-void TopoRender::dartToCol(Dart d, float& r, float& g, float& b)
-{
-	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
-
-	r = float(lab%255) / 255.0f; lab = lab/255;
-	g = float(lab%255) / 255.0f; lab = lab/255;
-	b = float(lab%255) / 255.0f; lab = lab/255;
-	if (lab!=0)
-		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
-}
 
 Dart TopoRender::pickColor(unsigned int x, unsigned int y)
 {

@@ -24,9 +24,48 @@
 
 #include "Topology/map/map2.h"
 #include "Topology/generic/traversorCell.h"
+#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {
+
+void Map2::rdfi(Dart t, DartMarker& m1, DartMarker& m2)
+{
+	Dart p = NIL;
+	while (!(p == NIL && (t == NIL || (m1.isMarked(t) || m2.isMarked(t)) ) ) )
+	{
+		if (t == NIL || (m1.isMarked(t) || m2.isMarked(t)))
+		{
+			if (m2.isMarked(p))			// pop
+			{
+				Dart q = phi2(p);		//	q = p->s1;
+				unsigned int pi=dartIndex(p);
+				(*m_phi2)[pi]=t;		//	p->s1 = t;
+				t = p;
+				p = q;
+	     	}
+			else						// swing
+	     	{
+				m2.mark(p);				//	p->val = 2;
+				Dart q = phi1(p);		//	q = p->s0;
+				unsigned int pi=dartIndex(p);
+				(*m_phi1)[pi]=t;		//	p->s0 = t;
+				t = phi2(p);			//	t = p->s1;
+				(*m_phi2)[pi]=q;		//	p->s1 = q;
+			}
+		}
+		else							 // push
+		{
+			m1.mark(t);					//	t->val = 1;
+			Dart q = phi1(t);			//	q = t->s0;
+			unsigned int ti=dartIndex(t);
+			(*m_phi1)[ti]=p;			//	t->s0 = p;
+			p = t;
+			t = q;
+		}
+	}
+}
+
 
 void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 {
@@ -730,7 +769,7 @@ bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
 	return fonct(phi2(d));
 }
 
-bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+bool Map2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
@@ -745,7 +784,7 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 		if (!mark.isMarked(visitedFaces[i]))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
+			found = Map2::foreach_dart_of_face(visitedFaces[i], f);
 
 			// If functor returns false then mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face

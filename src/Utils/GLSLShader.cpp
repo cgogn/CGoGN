@@ -122,8 +122,9 @@ std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std:
 	}
 	else
 	{
-		std::string str("#extension GL_EXT_geometry_shader4 : enable\n");
-		str.append("#define PRECISION\n");
+		std::string str("#version 110\n");
+		str.append("#extension GL_EXT_geometry_shader4 : enable\n");
+		str.append("#define PRECISON float pipo_PRECISION\n");
 		str.append("#define ATTRIBUTE attribute\n");
 		str.append("#define VARYING_IN varying in\n");
 		str.append("#define VARYING_OUT varying out\n");

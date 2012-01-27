@@ -11,7 +11,7 @@ void main(void)
 {
 	float d = dot(plane,POSITION_IN(0));
 	
-	if (d>=0.0)
+	if (d<=0.0)
 	{
 		ColorFS = color;
 	

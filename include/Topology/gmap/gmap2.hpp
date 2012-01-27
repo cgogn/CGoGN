@@ -198,17 +198,32 @@ inline bool GMap2::sameVolume(Dart d, Dart e)
 
 inline bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
-}
-
-inline bool GMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_volume(d, f, thread) || foreach_dart_of_oriented_volume(beta0(d), f, thread) ;
+	return GMap2::foreach_dart_of_oriented_vertex(d, f, thread) || GMap2::foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
 }
 
 inline bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_volume(d, f, thread);
+	return GMap2::foreach_dart_of_oriented_cc(d, f, thread) || GMap2::foreach_dart_of_oriented_cc(beta0(d), f, thread) ;
+}
+
+inline bool GMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_cc(d, f, thread);
+}
+
+inline bool GMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_oriented_cc(d, f, thread);
+}
+
+inline bool GMap2::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_vertex(d,f,thread);
+}
+
+inline bool GMap2::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_edge(d,f,thread);
 }
 
 } // namespace CGoGN

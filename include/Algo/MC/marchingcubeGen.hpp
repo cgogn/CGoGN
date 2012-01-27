@@ -214,8 +214,8 @@ template< typename  DataType, typename ImgT, template < typename D2 > class Wind
 unsigned char MarchingCubeGen<DataType, ImgT, Windowing, PFP>::computeIndex(int lX, int lY) const
 {
 	unsigned char ucCubeIndex = 0;
-	int32 bwidth = m_Buffer->getWidth();
-	int32 dec =  lX + lY*bwidth;
+	int bwidth = m_Buffer->getWidth();
+	int dec =  lX + lY*bwidth;
 
 	DataType* dat = m_Buffer->getDataPtr() + dec;
 
@@ -463,7 +463,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createPointEdge11(const un
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_1(const int _lX,const int _lY,const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_1(const int _lX,const int _lY,const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData(_lX, _lY,     m_Image->getVoxel(_lX, _lY,_lZ));
@@ -536,7 +536,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_1(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_2(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_2(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData(_lX+1, _lY,   m_Image->getVoxel(_lX+1, _lY,_lZ));
@@ -600,7 +600,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_2(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_3(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_3(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData(_lX+1, _lY+1, m_Image->getVoxel(_lX+1, _lY+1,_lZ));
@@ -662,7 +662,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_3(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_4(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_4(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData(_lX+1, _lY+1, m_Image->getVoxel(_lX+1, _lY+1,_lZ));
@@ -725,7 +725,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_4(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_5(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_5(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData2(_lX, _lY,     m_Image->getVoxel(_lX, _lY,_lZ+1));
@@ -788,7 +788,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_5(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_6(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_6(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData2(_lX+1, _lY,   m_Image->getVoxel(_lX+1, _lY,_lZ+1));
@@ -852,7 +852,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_6(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_7(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_7(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
 	m_Buffer->setData2(_lX+1, _lY+1, m_Image->getVoxel(_lX+1, _lY+1,_lZ+1));
@@ -916,7 +916,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_7(const int _l
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_8(const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createFaces_8(const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	// compute image value and store in buffer
  	m_Buffer->setData2(_lX+1, _lY+1, m_Image->getVoxel(_lX+1, _lY+1,_lZ+1));
@@ -1001,7 +1001,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::setNeighbour(L_DART d1, L_
 
 
 template< typename  DataType, typename ImgT, template < typename D2 > class Windowing, class PFP >
-void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int const *_lVertTable, const unsigned short _usMask, float curv, uint8 tag)
+void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int const *_lVertTable, const unsigned short _usMask, float curv, unsigned char tag)
 {
 // TODO parametre _LZ not used => a supprimer ?
 // TODO parametre curv not used => a supprimer ?
