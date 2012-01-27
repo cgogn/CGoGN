@@ -95,6 +95,9 @@ class BoundingBox
 		//return true if the bounding box belongs strictly to a bounding box
 		bool contains(const BoundingBox<VEC> & bb);
 
+		//resize a bounding box
+		void scale(float size);
+
 		/**********************************************/
 		/*             STREAM OPERATORS               */
 		/**********************************************/

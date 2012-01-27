@@ -220,6 +220,13 @@ bool BoundingBox<VEC>::contains(const BoundingBox<VEC>& bb)
 	return this->contains(bb.min()) && this->contains(bb.max());
 }
 
+template <typename VEC>
+void BoundingBox<VEC>::scale(float size)
+{
+	assert(m_initialized || !"Bounding box not initialized");
+	m_pMin *= size;
+	m_pMax *= size;
+}
 
 
 

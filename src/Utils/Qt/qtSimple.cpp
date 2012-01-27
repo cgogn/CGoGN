@@ -503,7 +503,7 @@ void SimpleQT::cb_about_cgogn()
 {
 	QString str("CGoGN:\nCombinatorial and Geometric modeling\n"
 				"with Generic N-dimensional Maps\n"
-				"Web site: https://cgogn.u-strasbg.fr \n"
+				"Web site: http://cgogn.unistra.fr \n"
 				"Contact information: cgogn@unistra.fr");
 	QMessageBox::about(this, tr("About CGoGN"), str);
 }

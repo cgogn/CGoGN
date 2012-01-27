@@ -53,7 +53,9 @@ inline ExplodeVolumeRender::ExplodeVolumeRender()
 
 //	m_shader->setAmbiant(Geom::Vec4f(0.1f,0.1f,0.1f,0.0f));
 //	m_shader->setDiffuse(Geom::Vec4f(1.0f,1.0f,0.1f,0.0f));
-	m_shaderL->setColor(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f));
+	//m_shaderL->setColor(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f));
+
+	m_shaderL->setColor(Geom::Vec4f(0.113f,0.337f,0.0f,0.113f));
 
 
 }
