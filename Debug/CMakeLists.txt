@@ -47,14 +47,15 @@ file(
 
 
 file(
-	GLOB_RECURSE
+#	GLOB_RECURSE
+	GLOB
 	shaders_srcD
 	${CGoGN_ROOT_DIR}/include/Utils/*.frag
 	${CGoGN_ROOT_DIR}/include/Utils/*.vert
 	${CGoGN_ROOT_DIR}/include/Utils/*.geom	
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.frag
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.vert
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.geom
 )
 
 IF(WIN32)
@@ -107,6 +108,7 @@ IF (ONELIB)
 	ELSE(WITH_QT)
 		add_library( cgognD ${files_topology} ${files_container} ${files_algo} ${files_utils} )
 	ENDIF (WITH_QT)
+	add_dependencies(cgognD shader_targetD )
 ELSE (ONELIB)
 	add_library( topologyD	${files_topology})
 	add_library( containerD	${files_container})
