@@ -43,7 +43,7 @@ public:
 	NoMathAttribute(int i) : T() {}
 
 	NoMathAttribute(const T& att): T(att) {}
-	NoMathAttribute<T>& operator = (const T& fa) { *this = NoMathAttribute<T>(fa); }
+	NoMathAttribute<T>& operator = (const T& fa) { return *this = NoMathAttribute<T>(fa); }
 
 	void operator += (const NoMathAttribute<T>& fa) {}
 	void operator -= (const NoMathAttribute<T>& fa) {}

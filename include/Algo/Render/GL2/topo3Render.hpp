@@ -305,8 +305,6 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-	
-	std::cout << "NB DARTS="<<m_nbDarts<< std::endl;
 }
 
 template<typename PFP>
