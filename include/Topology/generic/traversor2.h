@@ -201,22 +201,15 @@ public:
 	Dart next() ;
 } ;
 
-// Traverse the edges incident to a given face
+
+// Traverse the edges incident to a given face (equivalent to vertices)
 template <typename MAP>
-class Traversor2FE
+class Traversor2FE : public Traversor2FV<MAP>
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
 public:
-	Traversor2FE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	Traversor2FE(MAP& map, Dart dart):Traversor2FV<MAP>(map,dart){}
 } ;
+
 
 // Traverse the faces adjacent to a given face through sharing a common vertex
 template <typename MAP>
