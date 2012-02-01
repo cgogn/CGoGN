@@ -24,7 +24,7 @@ void main(void)
 	float lambertTerm = dot(N,L);
 		
 	int i;
-	vec averageColor(0.,0.,0.);
+	vec3 averageColor=vec3(0.,0.,0.);
 	for(i=0; i< NBVERTS_IN; i++)
 	{
 		averageColor +=colorVertex[i];

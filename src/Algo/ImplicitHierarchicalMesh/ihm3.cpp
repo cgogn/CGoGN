@@ -446,7 +446,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(ORIENTED_FACE, ee) ;
+				mark.markOrbit(FACE, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -512,7 +512,7 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 
 	// For every face added to the list
 	//the oldest dart from a volume is the oldest dart from all faces of this volume
-	mark.markOrbit(ORIENTED_FACE, d) ;
+	mark.markOrbit(FACE, d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -529,7 +529,7 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(ORIENTED_FACE, ee) ;
+				mark.markOrbit(FACE, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -607,7 +607,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(ORIENTED_FACE, ee) ;
+				mark.markOrbit(FACE, ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -781,7 +781,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(ORIENTED_FACE, ee) ;
+				mf.markOrbit(FACE, ee) ;
 			}
 
 			e = phi1(e) ;

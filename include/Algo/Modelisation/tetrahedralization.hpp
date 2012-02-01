@@ -37,15 +37,18 @@ namespace Tetrahedralization
 template <typename PFP>
 void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 {
-	Dart d1 = d;
-	Dart d2 = map.phi1(map.phi1(d));
-	Dart d3 = map.phi_1(map.phi2(d));
-	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
+	//Splitting Path
+	std::vector<Dart> sp;
+	sp.reserve(32);
 
-	cut3Ear<PFP>(map,d1);
-	cut3Ear<PFP>(map,d2);
-	cut3Ear<PFP>(map,d3);
-	cut3Ear<PFP>(map,d4);
+	Traversor3VE<typename PFP::MAP> tra(map, d);
+	for (Dart d = tra.begin() ; d != tra.end() ; d = tra.next())
+	{
+		map.splitFace(map.phi1(d), map.phi_1(d));
+		sp.push_back(map.phi1(d));
+	}
+
+	map.splitVolume(sp);
 }
 
 /************************************************************************************************

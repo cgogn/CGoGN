@@ -209,6 +209,9 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 
 	mf.markOrbit(FACE, old) ;
 
+//	TraversorW<typename PFP::MAP> tw(map);
+//	for(Dart d = tw.begin(); d != tw.end(); d = tw.next())
+
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
 		Dart e = visitedFaces[i] ;

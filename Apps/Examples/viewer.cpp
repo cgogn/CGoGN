@@ -26,11 +26,11 @@
 
 Viewer::Viewer() :
 	m_renderStyle(FLAT),
+	m_drawTopo(true),
 	m_drawVertices(false),
 	m_drawEdges(false),
 	m_drawFaces(true),
 	m_drawNormals(false),
-	m_drawTopo(false),
 	m_render(NULL),
 	m_renderTopo(NULL),
 	m_phongShader(NULL),
@@ -128,7 +128,7 @@ void Viewer::cb_initGL()
 
 void Viewer::cb_redraw()
 {
-	glClearColor(1,1,1,0);
+	//glClearColor(1,1,1,0);
 	if(m_drawVertices)
 	{
 		float size = vertexScaleFactor ;
@@ -206,7 +206,8 @@ void Viewer::cb_mousePress(int button, int x, int y)
 		Dart d = m_renderTopo->picking<PFP>(myMap, x,  y, allDarts);
 		if (d != Dart::nil())
 		{
-			statusMsg("dart picked");
+			//statusMsg("dart picked");
+			myMap.mergeFaces(d);
 		}
 		else
 		{

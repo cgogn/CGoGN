@@ -274,6 +274,11 @@ public:
 	 */
 	bool isBoundaryVolume(Dart d) ;
 
+	//! Tell if an edge of the volume is on the boundary
+	/*	@param d a dart
+	 */
+	bool hasBoundaryEdge(Dart d);
+
 	//! Check the map completeness
 	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation
 	 */

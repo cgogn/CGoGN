@@ -64,7 +64,8 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 			copyDartEmbedding(FACE2, f1, f);
 			Dart e = phi3(f1);
 //			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
-			copyDartEmbedding(FACE2, f1, f);
+//			copyDartEmbedding(FACE2, f1, f);
+			copyDartEmbedding(FACE2, phi1(e), e);
 			f = alpha2(f);
 		} while(f != d);
 	}

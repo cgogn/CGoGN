@@ -657,6 +657,15 @@ Dart Map3::findBoundaryFaceOfEdge(Dart d)
 
 bool Map3::isBoundaryVolume(Dart d)
 {
+	//TraversorCell<Map3, FACE2> (*this);
+//	Traversor3WF<Map3> tra(*this);
+//	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
+//	{
+//		if(isBoundaryMarked(phi3(dit)))
+//			return true ;
+//	}
+//	return false;
+
 	DartMarkerStore mark(*this);	// Lock a marker
 
 	std::vector<Dart> visitedFaces ;
@@ -680,6 +689,44 @@ bool Map3::isBoundaryVolume(Dart d)
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
+	}
+	return false;
+}
+
+bool Map3::hasBoundaryEdge(Dart d)
+{
+//	Traversor3WE<Map3> tra(*this);
+//	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
+//	{
+//		if(isBoundaryEdge(dit))
+//			return true;
+//	}
+//
+//	return false;
+
+	DartMarkerStore mark(*this);	// Lock a marker
+
+	std::vector<Dart> visitedEdges ;
+	visitedEdges.reserve(512) ;
+	visitedEdges.push_back(d) ;
+	mark.markOrbit(EDGE2, d) ;
+
+	for(unsigned int i = 0; i < visitedEdges.size(); ++i)
+	{
+		if(isBoundaryEdge(i))
+			return true ;
+
+		Dart e = visitedEdges[i] ;
+		do	// add all face neighbours to the table
+		{
+			//Dart ee = phi2(e) ;
+			if(!mark.isMarked(e)) // not already marked
+			{
+				visitedEdges.push_back(phi2(e)) ;
+				mark.markOrbit(EDGE2, e) ;
+			}
+			e = phi1(e) ;
+		} while(e != visitedEdges[i]) ;
 	}
 	return false;
 }

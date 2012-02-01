@@ -190,7 +190,6 @@ void MyQT::cb_redraw()
 }
 
 
-
 void  MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (!Shift())
@@ -310,6 +309,20 @@ int main(int argc, char **argv)
 			}
 			else
 				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+		}
+
+		if(extension == std::string(".off"))
+		{
+			if(!Algo::Import::importMeshToExtrude<PFP>(myMap, argv[1], attrNames))
+			{
+				std::cerr << "could not import "  << std::endl ;
+				return 1;
+			}
+			else
+			{
+				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+				myMap.closeMap();
+			}
 		}
 	}
 	else
