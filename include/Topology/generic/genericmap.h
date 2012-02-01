@@ -42,20 +42,6 @@
 namespace CGoGN
 {
 
-/*
-const unsigned int EMBNULL = 0xffffffff;
-
-const unsigned int NB_ORBITS = 6;
-const unsigned int NB_THREAD = 16;
-
-const unsigned int VERTEX	= 0;
-const unsigned int EDGE		= 1;
-const unsigned int ORIENTED_FACE= 2;
-const unsigned int FACE		= 3;
-const unsigned int VOLUME	= 4;
-const unsigned int DART		= 5;
-*/
-
 /**
  * Class that allows to browse a map
  * This is a pure virtual class that can be overloaded in:
@@ -129,8 +115,8 @@ protected:
 
 	AttributeContainer m_mrattribs ;
 
-	std::vector< AttributeMultiVector<unsigned int> > m_mrDarts;
-	AttributeMultiVector<unsigned char> m_mrLevels;
+	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts;
+	AttributeMultiVector<unsigned char>* m_mrLevels;
 
 	unsigned int m_mrCurrentLevel;
 

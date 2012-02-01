@@ -1,5 +1,4 @@
 // ShaderFlatColorPerFace::geometryShaderText
-
 uniform float explode;
 uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 NormalMatrix;

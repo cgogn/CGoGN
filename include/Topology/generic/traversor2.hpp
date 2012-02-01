@@ -355,37 +355,6 @@ Dart Traversor2FV<MAP>::next()
 	return current ;
 }
 
-// Traversor2FE
-
-template <typename MAP>
-Traversor2FE<MAP>::Traversor2FE(MAP& map, Dart dart) : m(map), start(dart)
-{}
-
-template <typename MAP>
-Dart Traversor2FE<MAP>::begin()
-{
-	current = start ;
-	return current ;
-}
-
-template <typename MAP>
-Dart Traversor2FE<MAP>::end()
-{
-	return NIL ;
-}
-
-template <typename MAP>
-Dart Traversor2FE<MAP>::next()
-{
-	if(current != NIL)
-	{
-		current = m.phi1(current) ;
-		if(current == start)
-			current = NIL ;
-	}
-	return current ;
-}
-
 // Traversor2FFaV
 
 template <typename MAP>

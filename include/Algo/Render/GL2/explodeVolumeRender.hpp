@@ -40,7 +40,8 @@ namespace Render
 namespace GL2
 {
 
-inline ExplodeVolumeRender::ExplodeVolumeRender()
+inline ExplodeVolumeRender::ExplodeVolumeRender(bool withColorPerFace):
+		m_cpf(withColorPerFace)
 {
 	m_vboPos = new Utils::VBO();
 	m_vboPos->setDataSize(3);
@@ -48,7 +49,7 @@ inline ExplodeVolumeRender::ExplodeVolumeRender()
 	m_vboPosLine = new Utils::VBO();
 	m_vboPosLine->setDataSize(3);
 
-	m_shader = new Utils::ShaderExplodeVolumes();
+	m_shader = new Utils::ShaderExplodeVolumes(withColorPerFace);
 	m_shaderL = new Utils::ShaderExplodeVolumesLines();
 
 //	m_shader->setAmbiant(Geom::Vec4f(0.1f,0.1f,0.1f,0.0f));
@@ -71,6 +72,12 @@ inline ExplodeVolumeRender::~ExplodeVolumeRender()
 template<typename PFP>
 void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good)
 {
+	if (m_cpf)
+	{
+		CGoGNerr<< "ExplodeVolumeRender: problem wrong update fonction use the other" << CGoGNendl;
+		return;
+	}
+
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
@@ -136,14 +143,97 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 
 	m_vboPosLine->releasePtr();
 	m_shaderL->setAttributePosition(m_vboPosLine);
+}
+
+
+template<typename PFP>
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, typename PFP::TVEC3& colorPerFace, const FunctorSelect& good)
+{
+	if (!m_cpf)
+	{
+		CGoGNerr<< "ExplodeVolumeRender: problem wrong update fonction use the other" << CGoGNendl;
+		return;
+	}
+
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	CellMarker cmv(map,VOLUME);
+	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
+	TraversorW<typename PFP::MAP> traVol(map,good);
+	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
+	{
+		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(map, d, positions);
+	}
+
+	std::vector<VEC3> buffer;
+	buffer.reserve(16384);
+
+	TraversorCell<typename PFP::MAP> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+
+	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	{
+		Dart a = d;
+		Dart b = map.phi1(a);
+		Dart c = map.phi1(b);
+
+		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+		do
+		{
+			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(positions[d]);
+			buffer.push_back(positions[b]);
+			buffer.push_back(positions[c]);
+			buffer.push_back(colorPerFace[d]);
+			buffer.push_back(VEC3(0.,0.,0.));	// TODO use this place for center of face
+			b = c;
+			c = map.phi1(b);
+
+		} while (c != d);
+	}
+
+	m_nbTris = buffer.size()/4;
+
+	m_vboPos->allocate(buffer.size());
+
+	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+
+	m_vboPos->releasePtr();
+	m_shader->setAttributePosition(m_vboPos);
+
+
+	buffer.clear();
+
+	TraversorCell<typename PFP::MAP> traEdge(map, PFP::MAP::ORBIT_IN_PARENT(EDGE),good);
+	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
+	{
+			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(positions[d]);
+			buffer.push_back(positions[ map.phi1(d)]);
+	}
+
+	m_nbLines = buffer.size()/3;
+
+	m_vboPosLine->allocate(buffer.size());
+
+	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+
+	m_vboPosLine->releasePtr();
+	m_shaderL->setAttributePosition(m_vboPosLine);
 
 }
+
 
 
 inline void ExplodeVolumeRender::drawFaces()
 {
 	m_shader->enableVertexAttribs();
-	glDrawArrays(GL_LINES_ADJACENCY_EXT , 0 , m_nbTris*4 );
+	if (m_cpf)
+		glDrawArrays(GL_TRIANGLES_ADJACENCY_EXT , 0 , m_nbTris*6 );
+	else
+		glDrawArrays(GL_LINES_ADJACENCY_EXT , 0 , m_nbTris*4 );
 	m_shader->disableVertexAttribs();
 }
 
