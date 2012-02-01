@@ -62,7 +62,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderExplodeVolumes();
+	ShaderExplodeVolumes(bool withColorPerFace=false);
 
 	void setExplodeVolumes(float explode);
 

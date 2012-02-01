@@ -36,7 +36,7 @@ namespace Utils
 #include "shaderExplodeVolumes.geom"
 
 
-ShaderExplodeVolumes::ShaderExplodeVolumes()
+ShaderExplodeVolumes::ShaderExplodeVolumes(bool withColorPerFace)
 {
 	m_nameVS = "ShaderExplodeVolumes_vs";
 	m_nameFS = "ShaderExplodeVolumes_fs";
@@ -46,12 +46,21 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 	glxvert.append(vertexShaderText);
 
 	std::string glxgeom(GLSLShader::defines_Geom("quads", "triangle_strip", 4));
+	if (withColorPerFace)
+		glxgeom.append("#define WITH_COLORPF 1\n");
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
+	if (withColorPerFace)
+	{
+		loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
+	}
+	else
+	{
+		loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
+	}
 
 	getLocations();
 

@@ -56,6 +56,8 @@ protected:
 
 	Utils::ShaderExplodeVolumes* m_shader;
 
+	bool m_cpf;
+
 	Utils::ShaderExplodeVolumesLines* m_shaderL;
 
 	Utils::VBO* m_vboPos;
@@ -78,7 +80,7 @@ public:
 	* @param good functor that return true for darts of part to draw
 	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
 	*/
-	ExplodeVolumeRender() ;
+	ExplodeVolumeRender(bool withColorPerFace=false) ;
 
 	/**
 	* Destructor
@@ -105,6 +107,16 @@ public:
 	*/
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
+
+	/**
+	* update all drawing buffers
+	* @param map the map
+	* @param positions  attribute of position vertices
+	* @param colorPerFace attribute of color (per face)
+	* @param good selector
+	*/
+	template<typename PFP>
+	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * draw edges

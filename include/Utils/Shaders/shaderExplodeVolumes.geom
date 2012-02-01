@@ -8,6 +8,7 @@ uniform vec4 diffuse;
 uniform vec4 ambient;
 uniform vec4 plane;
 VARYING_OUT vec4 ColorFS;
+
 void main(void)
 {
 	float d = dot(plane,POSITION_IN(0));
@@ -24,12 +25,16 @@ void main(void)
 		vec3 L =  normalize (lightPosition - newPos.xyz);
 		float lambertTerm = dot(N,L);
 		ColorFS = ambient;
+		
 		if (lambertTerm > 0.0)
-			ColorFS += diffuse * lambertTerm;
+#ifdef WITH_COLORPF	
+			ColorFS += vec4(POSITION_IN(4).xyz,1.0) * lambertTerm;
+#else
+			ColorFS += diffuse * lambertTerm;		
+#endif 
 		
 	// Explode in face 	
-	
-		for (int i=1; i<NBVERTS_IN; i++)
+		for (int i=1; i<=3; i++)
 		{
 			vec4 P = explodeV * POSITION_IN(i) + (1.0-explodeV)* POSITION_IN(0);
 			gl_Position = ModelViewProjectionMatrix *  P;
@@ -37,4 +42,6 @@ void main(void)
 		}
 		EndPrimitive();
 	}
+
+	
 }
