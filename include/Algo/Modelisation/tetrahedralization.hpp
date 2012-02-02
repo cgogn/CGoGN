@@ -34,19 +34,19 @@ namespace Modelisation
 namespace Tetrahedralization
 {
 
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
-{
-	Dart d1 = d;
-	Dart d2 = map.phi1(map.phi1(d));
-	Dart d3 = map.phi_1(map.phi2(d));
-	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
-
-	cut3Ear<PFP>(map,d1);
-	cut3Ear<PFP>(map,d2);
-	cut3Ear<PFP>(map,d3);
-	cut3Ear<PFP>(map,d4);
-}
+//template <typename PFP>
+//void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
+//{
+//	Dart d1 = d;
+//	Dart d2 = map.phi1(map.phi1(d));
+//	Dart d3 = map.phi_1(map.phi2(d));
+//	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
+//
+//	cut3Ear<PFP>(map,d1);
+//	cut3Ear<PFP>(map,d2);
+//	cut3Ear<PFP>(map,d3);
+//	cut3Ear<PFP>(map,d4);
+//}
 
 /************************************************************************************************
  * 																		Tetrahedron functions															   *

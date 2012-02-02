@@ -87,6 +87,7 @@ class MyQT: public Utils::QT::SimpleQT
 	Algo::Render::GL2::ExplodeVolumeRender* m_explode_render;
 
 	float m_explode_factor;
+	float m_explode_factorf;
 
 	// for clipping plane manipulation
 	Utils::Pickable* m_PlanePick;
@@ -132,6 +133,7 @@ public slots:
 	void slider_explode(int x);
 	void slider_pressed();
 	void slider_released();
+	void slider_explodeF(int x);
 };
 
 #endif

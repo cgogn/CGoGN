@@ -29,10 +29,12 @@
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Import/import.h"
+#include "Algo/Geometry/volume.h"
 
 
 PFP::MAP myMap;
 PFP::TVEC3 position ;
+PFP::TVEC3 color ;
 
 void MyQT::volumes_onoff(bool x)
 {
@@ -52,7 +54,7 @@ void MyQT::topo_onoff(bool x)
 	if (render_topo)
 	{
 		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, 0.8f, m_explode_factor, nb);
+		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor, nb);
 	}
 
 	updateGL();
@@ -92,8 +94,15 @@ void MyQT::hide_onoff(bool x)
 
 void MyQT::slider_explode(int x)
 {
-	m_explode_factor = 0.01f*(x+1);
+	m_explode_factor = 0.01f*(x+1)-0.0001f;
 	m_explode_render->setExplodeVolumes(m_explode_factor);
+	updateGL();
+}
+
+void MyQT::slider_explodeF(int x)
+{
+	m_explode_factorf = 0.01f*(x+1);
+	m_explode_render->setExplodeFaces(m_explode_factorf);
 	updateGL();
 }
 
@@ -113,7 +122,7 @@ void MyQT::slider_released()
 	if (render_topo)
 	{
 		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_topo_render->updateData<PFP>(myMap, position, 0.8f, 0.8f, m_explode_factor, nb);
+		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor, nb);
 	}
 	updateGL();
 }
@@ -126,14 +135,15 @@ void MyQT::cb_initGL()
 
 	// create the renders
     m_topo_render = new Algo::Render::GL2::Topo3Render();
-    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender();
+    m_explode_render = new Algo::Render::GL2::ExplodeVolumeRender(true,true);
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);
-	m_explode_render->updateData<PFP>(myMap,position);
+	m_explode_render->updateData<PFP>(myMap,position,color);
 	m_explode_render->setExplodeVolumes(0.8f);
+	m_explode_render->setExplodeFaces(0.9f);
 	m_explode_render->setAmbiant(Geom::Vec4f(0.2f,0.2f,0.2f,1.0f));
-	m_explode_render->setDiffuse(Geom::Vec4f(0.6f,0.6f,0.9f,1.0f));
+	m_explode_render->setBackColor(Geom::Vec4f(0.9f,0.9f,0.9f,1.0f));
 	m_explode_render->setColorLine(Geom::Vec4f(0.8f,0.2f,0.2f,1.0f));
 
 	registerShader(m_explode_render->shaderFaces());
@@ -214,8 +224,6 @@ void  MyQT::cb_mousePress(int button, int x, int y)
 	if (fr_picked != 0)
 	{
 		m_pickedAxis=fr_picked;
-		std::cout << "PICKED:"<< m_pickedAxis << std::endl;
-
 		m_frame->highlight(m_pickedAxis);
 		m_frame->storeProjection(m_pickedAxis);
 		updateGL();
@@ -311,14 +319,36 @@ int main(int argc, char **argv)
 			else
 				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
 		}
+
+		color = myMap.addAttribute<PFP::VEC3>(VOLUME, "color");
+
+		TraversorCell<PFP::MAP> tra(myMap,VOLUME);
+		float maxV=0.0f;
+		for (Dart d = tra.begin(); d != tra.end(); d=tra.next())
+		{
+			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap,d,position);
+			color[d] = PFP::VEC3(v,0,0);
+			if (v>maxV)
+				maxV=v;
+		}
+		for (unsigned int i = color.begin(); i!=color.end(); color.next(i))
+		{
+			color[i][0] /= maxV;
+			color[i][2] = 1.0f -color[i][0];
+		}
 	}
 	else
 	{
 		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 		Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
-		int nb = 10;
+		int nb = 32;
 		prim.hexaGrid_topo(nb,nb,nb);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
+		color = myMap.addAttribute<PFP::VEC3>(VOLUME, "color");
+		TraversorCell<PFP::MAP> tra(myMap,VOLUME);
+		for (Dart d = tra.begin(); d != tra.end(); d=tra.next())
+			color[d] = position[d] + PFP::VEC3(0.5,0.5,0.5);
 	}
     // un peu d'interface
 	QApplication app(argc, argv);
@@ -348,9 +378,16 @@ int main(int argc, char **argv)
 	sqt.setCallBack( dock.slider_explode, SIGNAL(sliderPressed()), SLOT(slider_pressed()) );
 	sqt.setCallBack( dock.slider_explode, SIGNAL(sliderReleased()), SLOT(slider_released()) );
 
+	sqt.setCallBack( dock.slider_explode_face, SIGNAL(valueChanged(int)), SLOT(slider_explodeF(int)) );
+
+	sqt.setCallBack( dock.slider_explode_face, SIGNAL(sliderPressed()), SLOT(slider_pressed()) );
+	sqt.setCallBack( dock.slider_explode_face, SIGNAL(sliderReleased()), SLOT(slider_released()) );
+
+
 
 	sqt.show();
 	dock.slider_explode->setValue(80);
+	dock.slider_explode_face->setValue(80);
 	sqt.clipping_onoff(true);
 
 	// et on attend la fin.

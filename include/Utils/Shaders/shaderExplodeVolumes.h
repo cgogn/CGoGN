@@ -44,39 +44,51 @@ protected:
 
     // uniform locations
 	GLuint m_unif_ambiant;
-	GLuint m_unif_diffuse;
+	GLuint m_unif_backColor;
 	GLuint m_unif_lightPos;
 	GLuint m_unif_explodeV;
+	GLuint m_unif_explodeF;
 	GLuint m_unif_plane;
 
+//	local storage for uniforms
 	float m_explodeV;
+	float m_explodeF;
 	Geom::Vec4f m_ambiant;
-	Geom::Vec4f m_diffuse;
+	Geom::Vec4f m_backColor;
 	Geom::Vec3f m_light_pos;
 	Geom::Vec4f m_plane;
 
+	// VBO
 	VBO* m_vboPos;
+	VBO* m_vboColors;
+
+	bool m_wcpf;
+	bool m_wef;
 
 	void getLocations();
 
 	void restoreUniformsAttribs();
 
 public:
-	ShaderExplodeVolumes(bool withColorPerFace=false);
+	ShaderExplodeVolumes(bool withColorPerFace=false, bool withExplodeFace=false);
 
 	void setExplodeVolumes(float explode);
 
+	void setExplodeFaces(float explode);
+
 	void setAmbiant(const Geom::Vec4f& ambiant);
 
-	void setDiffuse(const Geom::Vec4f& diffuse);
+	void setBackColor(const Geom::Vec4f& backColor);
 
 	void setLightPosition(const Geom::Vec3f& lp);
 
 	void setClippingPlane(const Geom::Vec4f& plane);
 
-	void setParams(float explodeV, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane);
+	void setParams(float explodeV, float explodeF, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane);
 
 	void setAttributePosition(VBO* vbo);
+
+	void setAttributeColor(VBO* vbo);
 };
 
 } // namespace Utils

@@ -36,7 +36,8 @@ namespace Utils
 #include "shaderExplodeVolumes.geom"
 
 
-ShaderExplodeVolumes::ShaderExplodeVolumes(bool withColorPerFace)
+ShaderExplodeVolumes::ShaderExplodeVolumes(bool withColorPerFace, bool withExplodeFace):
+m_wcpf(withColorPerFace), m_wef(withExplodeFace)
 {
 	m_nameVS = "ShaderExplodeVolumes_vs";
 	m_nameFS = "ShaderExplodeVolumes_fs";
@@ -45,40 +46,39 @@ ShaderExplodeVolumes::ShaderExplodeVolumes(bool withColorPerFace)
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom(GLSLShader::defines_Geom("quads", "triangle_strip", 4));
+	std::string glxgeom;
+	glxgeom.append(GLSLShader::defines_Geom("lines_witw_adjacency", "triangle_strip", 3));
+
 	if (withColorPerFace)
 		glxgeom.append("#define WITH_COLORPF 1\n");
+	if (withExplodeFace)
+		glxgeom.append("#define WITH_EXPLODE_FACE 1\n");
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-	if (withColorPerFace)
-	{
-		loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
-	}
-	else
-	{
-		loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
-	}
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_LINES_ADJACENCY_EXT , GL_TRIANGLE_STRIP,4);
 
 	getLocations();
 
 	//Default values
 	m_explodeV = 0.9f;
+	m_explodeF = 0.9f;
 	m_ambiant = Geom::Vec4f(0.05f, 0.05f, 0.1f, 0.0f);
-	m_diffuse = Geom::Vec4f(0.1f, 1.0f, 0.1f, 0.0f);
+	m_backColor = Geom::Vec4f(1.0f, 0.1f, 0.1f, 0.0f);
 	m_light_pos = Geom::Vec3f(10.0f, 10.0f, 1000.0f);
 	m_plane   = Geom::Vec4f(0.0f, 0.0f, 1000.f, 1000000000000000000000000000.0f);
 
-	setParams(m_explodeV, m_ambiant, m_diffuse, m_light_pos, m_plane);
+	setParams(m_explodeV, m_explodeF, m_ambiant, m_backColor, m_light_pos, m_plane);
 }
 
 void ShaderExplodeVolumes::getLocations()
 {
 	m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
+	m_unif_explodeF  = glGetUniformLocation(program_handler(),"explodeF");
 	m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
-	m_unif_diffuse  = glGetUniformLocation(program_handler(),"diffuse");
+	m_unif_backColor  = glGetUniformLocation(program_handler(),"backColor");
 	m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 }
@@ -89,30 +89,46 @@ void ShaderExplodeVolumes::setAttributePosition(VBO* vbo)
 	bindVA_VBO("VertexPosition", vbo);
 }
 
-void ShaderExplodeVolumes::setParams(float explV, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane)
+void ShaderExplodeVolumes::setAttributeColor(VBO* vbo)
 {
-	m_explodeV = explV;
-	m_ambiant = ambiant;
-	m_diffuse = diffuse;
-	m_light_pos = lightPos;
-	m_plane = plane;
+	m_vboColors = vbo;
+	bindVA_VBO("VertexColor", vbo);
+}
 
+void ShaderExplodeVolumes::setParams(float explV, float explF, const Geom::Vec4f& ambiant, const Geom::Vec4f& backColor, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane)
+{
 	bind();
-
+	m_explodeV = explV;
 	glUniform1f(m_unif_explodeV, explV);
+	m_explodeF = explF;
+	glUniform1f(m_unif_explodeF, explF);
+	m_ambiant = ambiant;
 	glUniform4fv(m_unif_ambiant, 1, ambiant.data());
-	glUniform4fv(m_unif_diffuse, 1, diffuse.data());
+	m_backColor = backColor;
+	glUniform4fv(m_unif_backColor, 1, backColor.data());
+
+	m_light_pos = lightPos;
 	glUniform3fv(m_unif_lightPos, 1, lightPos.data());
+
+	m_plane = plane;
 	glUniform4fv(m_unif_plane,    1, m_plane.data());
 
 	unbind(); // ??
 }
+
 
 void ShaderExplodeVolumes::setExplodeVolumes(float explode)
 {
 	m_explodeV = explode;
 	bind();
 	glUniform1f(m_unif_explodeV, explode);
+}
+
+void ShaderExplodeVolumes::setExplodeFaces(float explode)
+{
+	m_explodeF = explode;
+	bind();
+	glUniform1f(m_unif_explodeF, explode);
 }
 
 
@@ -123,11 +139,11 @@ void ShaderExplodeVolumes::setAmbiant(const Geom::Vec4f& ambiant)
 	glUniform4fv(m_unif_ambiant,1, ambiant.data());
 }
 
-void ShaderExplodeVolumes::setDiffuse(const Geom::Vec4f& diffuse)
+void ShaderExplodeVolumes::setBackColor(const Geom::Vec4f& backColor)
 {
-	m_diffuse = diffuse;
+	m_backColor = backColor;
 	bind();
-	glUniform4fv(m_unif_diffuse,1, diffuse.data());
+	glUniform4fv(m_unif_backColor, 1, backColor.data());
 }
 
 void ShaderExplodeVolumes::setLightPosition(const Geom::Vec3f& lp)
@@ -148,20 +164,28 @@ void ShaderExplodeVolumes::setClippingPlane(const Geom::Vec4f& plane)
 
 void ShaderExplodeVolumes::restoreUniformsAttribs()
 {
-	m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
-	m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
-	m_unif_diffuse   = glGetUniformLocation(program_handler(),"diffuse");
-	m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
-	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
-
 	bind();
+
+	m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
 	glUniform1f (m_unif_explodeV, m_explodeV);
+
+	m_unif_explodeF   = glGetUniformLocation(program_handler(),"explodeF");
+	glUniform1f (m_unif_explodeF, m_explodeF);
+
+	m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
 	glUniform4fv(m_unif_ambiant,  1, m_ambiant.data());
-	glUniform4fv(m_unif_diffuse,  1, m_diffuse.data());
+
+	m_unif_backColor = glGetUniformLocation(program_handler(),"backColor");
+	glUniform4fv(m_unif_backColor, 1, m_backColor.data());
+
+	m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
 	glUniform3fv(m_unif_lightPos, 1, m_light_pos.data());
+
+	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 	glUniform4fv(m_unif_plane,    1, m_plane.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
+	bindVA_VBO("VertexColor", m_vboColors);
 	unbind();
 }
 

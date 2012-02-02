@@ -132,7 +132,6 @@ TraversorDartsOfOrbit<MAP>::TraversorDartsOfOrbit(MAP& map, unsigned int orbit, 
 	FunctorStoreNotBoundary<MAP> fs(map,m_vd);
 	map.foreach_dart_of_orbit(orbit, d, fs, thread);
 	m_vd.push_back(NIL);
-	m_current=m_vd.begin();
 }
 
 template <typename MAP>
@@ -143,7 +142,10 @@ Dart TraversorDartsOfOrbit<MAP>::begin()
 }
 
 template <typename MAP>
-Dart TraversorDartsOfOrbit<MAP>::end(){ return NIL;}
+Dart TraversorDartsOfOrbit<MAP>::end()
+{
+	return NIL;
+}
 
 template <typename MAP>
 Dart TraversorDartsOfOrbit<MAP>::next()
