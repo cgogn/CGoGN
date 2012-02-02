@@ -105,7 +105,8 @@ Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::Traversor3XY(MAP& map, Dart dart, bool forceD
 	m_dmark(NULL),
 	m_cmark(NULL),
 	m_tradoo(map,ORBIT_X,dart,thread),
-	m_allocated(true)
+	m_allocated(true),
+	m_first(true)
 {
 	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT_Y))
 		m_cmark = new CellMarkerStore(map, ORBIT_Y, thread) ;
@@ -117,7 +118,8 @@ template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
 Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP,ORBIT_Y>& tmo, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
 	m_tradoo(map,ORBIT_X,dart,thread),
-	m_allocated(false)
+	m_allocated(false),
+	m_first(true)
 {
 	m_cmark = tmo.cmark();
 	m_dmark = tmo.dmark();
@@ -138,17 +140,29 @@ Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::~Traversor3XY()
 template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
 Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::begin()
 {
+	if (!m_first)
+	{
+		if (m_cmark)
+			m_cmark->unmarkAll();
+		else
+			m_dmark->unmarkAll();
+	}
+	m_first=false;
+
 	m_current = m_tradoo.begin() ;
 	// for the case of beginning with a given MarkerForTraversor
-	if (m_cmark)
+	if (!m_allocated)
 	{
-		while ((m_current != NIL) && m_cmark->isMarked(m_current))
-			m_current = m_tradoo.next();
-	}
-	else
-	{
-		while ((m_current != NIL) && m_dmark->isMarked(m_current))
-			m_current = m_tradoo.next();
+		if (m_cmark)
+		{
+			while ((m_current != NIL) && m_cmark->isMarked(m_current))
+				m_current = m_tradoo.next();
+		}
+		else
+		{
+			while ((m_current != NIL) && m_dmark->isMarked(m_current))
+				m_current = m_tradoo.next();
+		}
 	}
 	return m_current;
 }
