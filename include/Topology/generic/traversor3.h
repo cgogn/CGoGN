@@ -65,6 +65,7 @@ private:
 	Dart m_current ;
 	TraversorDartsOfOrbit<MAP> m_tradoo;
 	bool m_allocated;
+	bool m_first;
 public:
 	Traversor3XY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) ;
 	Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP,ORBIT_Y>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
