@@ -209,9 +209,6 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 
 	mf.markOrbit(FACE, old) ;
 
-//	TraversorW<typename PFP::MAP> tw(map);
-//	for(Dart d = tw.begin(); d != tw.end(); d = tw.next())
-
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
 		Dart e = visitedFaces[i] ;
@@ -378,6 +375,162 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 	map.setCurrentLevel(cur) ;
 
 	return subdividedfaces.begin()->first;
+}
+
+template <typename PFP>
+Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+{
+	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
+	assert(!map.isBoundaryMarked(d) || !"Trying to subdivide a dart marked boundary");
+
+	unsigned int vLevel = map.volumeLevel(d);
+	Dart old = map.volumeOldestDart(d);
+
+	unsigned int cur = map.getCurrentLevel();
+	map.setCurrentLevel(vLevel);
+
+	/*
+	 * Compute volume centroid
+	 */
+	typename PFP::VEC3 volCenter =  Algo::Geometry::volumeCentroid<PFP>(map, old, position);
+
+	/*
+	 * Subdivide Faces
+	 */
+	std::vector<std::pair<Dart,Dart> > subdividedfaces;
+	subdividedfaces.reserve(25);
+
+	Traversor3WF<typename PFP::MAP> traF(map, old);
+	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
+	{
+		//if needed subdivide face
+		if(!map.faceIsSubdivided(dit))
+			Algo::IHM::subdivideFace<PFP>(map, dit, position, Algo::IHM::S_QUAD);
+
+		//save a dart from the subdivided face
+		unsigned int cur = map.getCurrentLevel() ;
+
+		unsigned int fLevel = map.faceLevel(d) + 1; //puisque dans tous les cas, la face est subdivisee
+		map.setCurrentLevel(fLevel) ;
+
+		//le brin est forcement du niveau cur
+		Dart cf = map.phi1(d);
+		Dart e = cf;
+		do
+		{
+			subdividedfaces.push_back(std::pair<Dart,Dart>(e,map.phi2(e)));
+			e = map.phi2(map.phi1(e));
+		}while (e != cf);
+
+		map.setCurrentLevel(cur);
+	}
+
+	/*
+	 * Create inside volumes
+	 */
+	std::vector<Dart> newEdges;	//save darts from inner edges
+	newEdges.reserve(50);
+	Dart centralDart = NIL;
+	Traversor3WV<typename PFP::MAP> traV(map, old);
+	map.setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
+	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
+	{
+		Dart e = dit;
+		std::vector<Dart> v ;
+
+		do
+		{
+			v.push_back(map.phi1(map.phi1(e)));
+			v.push_back(map.phi1(e));
+
+			e = map.phi2(map.phi_1(e));
+		}
+		while(e != dit);
+
+		map.splitVolume(v) ;
+
+//		Dart old = map.phi2(map.phi1(dit));
+//		Dart dd = map.phi1(map.phi1(old)) ;
+//		map.splitFace(old,dd) ;
+//
+//		unsigned int idface = map.getNewFaceId();
+//		map.setFaceId(dd,idface, FACE);
+//
+//		Dart ne = map.phi1(map.phi1(old)) ;
+//
+//		map.cutEdge(ne);
+//		centralDart = map.phi1(ne);
+//		newEdges.push_back(ne);
+//		newEdges.push_back(map.phi1(ne));
+//
+//		unsigned int id = map.getNewEdgeId() ;
+//		map.setEdgeId(ne, id, EDGE) ;
+//
+//		Dart stop = map.phi2(map.phi1(ne));
+//		ne = map.phi2(ne);
+//		do
+//		{
+//			dd = map.phi1(map.phi1(map.phi1(ne)));
+//
+//			map.splitFace(ne, dd) ;
+//			unsigned int idface = map.getNewFaceId();
+//			map.setFaceId(dd,idface, FACE);
+//
+//			newEdges.push_back(map.phi1(dd));
+//
+//			ne = map.phi2(map.phi_1(ne));
+//			dd = map.phi1(map.phi1(dd));
+//		}
+//		while(dd != stop);
+
+	}
+
+//	map.deleteVolume(map.phi3(map.phi2(map.phi1(traV.begin()))));
+//
+//	//Third step : 3-sew internal faces
+//	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
+//	{
+//		Dart f1 = (*it).first;
+//		Dart f2 = (*it).second;
+//
+//		if(map.isBoundaryFace(map.phi2(f1)) && map.isBoundaryFace(map.phi2(f2)))
+//		{
+//			//id pour toutes les faces interieures
+//			map.sewVolumes(map.phi2(f1), map.phi2(f2));
+//
+//			//Fais a la couture !!!!!
+//			unsigned int idface = map.getNewFaceId();
+//			map.setFaceId(map.phi2(f1),idface, FACE);
+//		}
+//
+//		//FAIS a la couture !!!!!!!
+//		//id pour toutes les aretes exterieurs des faces quadrangulees
+//		unsigned int idedge = map.getEdgeId(f1);
+//		map.setEdgeId(map.phi2(f1), idedge, DART);
+//		map.setEdgeId( map.phi2(f2), idedge, DART);
+//	}
+//
+//	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
+//	//id pour les aretes interieurs : (i.e. 6 pour un hexa)
+//	DartMarker mne(map);
+//	for(unsigned int i = 0; i < newEdges.size(); ++i)
+//	{
+//		if(!mne.isMarked(newEdges[i]))
+//		{
+//			unsigned int idedge = map.getNewEdgeId();
+//			map.setEdgeId(newEdges[i], idedge, EDGE);
+//			mne.markOrbit(EDGE, newEdges[i]);
+//		}
+//	}
+//
+//
+//	position[centralDart] = volCenter; //plonger a la fin de la boucle ????
+
+	map.setCurrentLevel(cur) ;
+
+	return subdividedfaces.begin()->first;
+
 }
 
 template <typename PFP>

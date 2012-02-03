@@ -30,6 +30,7 @@
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
+#include "Algo/Modelisation/subdivision3.h"
 
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
@@ -257,6 +258,20 @@ void MyQT::cb_keyPress(int code)
 			m_timer->stop();
 		else
 			m_timer->start(1000/30); // 30 fps
+	}
+
+	if(code == 'c')
+	{
+		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		Algo::Modelisation::catmullClarkVol<PFP>(myMap, position, nb);
+
+		m_positionVBO->updateData(position);
+		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+
+
+		m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
 	}
 }
 

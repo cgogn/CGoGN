@@ -368,6 +368,30 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f,
 }
 
 
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart dNext = d;
+	do
+	{
+		if (f(dNext))
+			return true;
+		dNext = phi2(phi_1(dNext));
+ 	} while (dNext != d);
+ 	return false;
+}
+
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread)
+{
+	if (f(d))
+		return true;
+	return f(phi2(d));
+}
+
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_oriented_face(d,f,thread);
+}
+
 /***************************************************
  *              LEVELS MANAGEMENT                  *
  ***************************************************/

@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Topology/map/map3.h"
+#include "Topology/generic/traversor3.h"
 
 namespace CGoGN
 {
@@ -488,11 +489,12 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 		Map2::unsewFaces(*it);
 
 	Map2::fillHole(e) ;
-	Map2::fillHole(e2) ;
+
+//	if(isBoundaryMarked(e2))
+		Map2::fillHole(e2) ;
 
 	//sew the two connected components
 	Map3::sewVolumes(phi2(e), phi2(e2), false);
-	//Map3::sewVolumes(phi2(e), e2, false);
 }
 
 /*! @name Topological Queries
@@ -657,77 +659,24 @@ Dart Map3::findBoundaryFaceOfEdge(Dart d)
 
 bool Map3::isBoundaryVolume(Dart d)
 {
-	//TraversorCell<Map3, FACE2> (*this);
-//	Traversor3WF<Map3> tra(*this);
-//	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
-//	{
-//		if(isBoundaryMarked(phi3(dit)))
-//			return true ;
-//	}
-//	return false;
-
-	DartMarkerStore mark(*this);	// Lock a marker
-
-	std::vector<Dart> visitedFaces ;
-	visitedFaces.reserve(512) ;
-	visitedFaces.push_back(d) ;
-	mark.markOrbit(FACE2, d) ;
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WF<Map3> tra(*this, d);
+	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
-		if(isBoundaryMarked(phi3(visitedFaces[i])))
+		if(isBoundaryMarked(phi3(dit)))
 			return true ;
-
-		Dart e = visitedFaces[i] ;
-		do	// add all face neighbours to the table
-		{
-			Dart ee = phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE2, ee) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
 	}
 	return false;
 }
 
 bool Map3::hasBoundaryEdge(Dart d)
 {
-//	Traversor3WE<Map3> tra(*this);
-//	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
-//	{
-//		if(isBoundaryEdge(dit))
-//			return true;
-//	}
-//
-//	return false;
-
-	DartMarkerStore mark(*this);	// Lock a marker
-
-	std::vector<Dart> visitedEdges ;
-	visitedEdges.reserve(512) ;
-	visitedEdges.push_back(d) ;
-	mark.markOrbit(EDGE2, d) ;
-
-	for(unsigned int i = 0; i < visitedEdges.size(); ++i)
+	Traversor3WE<Map3> tra(*this, d);
+	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
-		if(isBoundaryEdge(i))
-			return true ;
-
-		Dart e = visitedEdges[i] ;
-		do	// add all face neighbours to the table
-		{
-			//Dart ee = phi2(e) ;
-			if(!mark.isMarked(e)) // not already marked
-			{
-				visitedEdges.push_back(phi2(e)) ;
-				mark.markOrbit(EDGE2, e) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedEdges[i]) ;
+		if(isBoundaryEdge(dit))
+			return true;
 	}
+
 	return false;
 }
 

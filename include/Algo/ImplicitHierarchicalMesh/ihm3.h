@@ -361,6 +361,13 @@ public:
 	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
 	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) ;
+
+
+	virtual bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	virtual bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0);
 	//@}
 
 

@@ -1,13 +1,18 @@
 // ShaderExplodeVolumes::geometryShaderText
 uniform float explodeV;
+uniform float explodeF;
 uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 NormalMatrix;
 uniform mat4 ModelViewMatrix;
 uniform vec3 lightPosition;
-uniform vec4 diffuse;
+
 uniform vec4 ambient;
+uniform vec4 backColor;
 uniform vec4 plane;
+
+VARYING_IN vec3 colorVertex[];
 VARYING_OUT vec4 ColorFS;
+
 
 void main(void)
 {
@@ -21,27 +26,24 @@ void main(void)
 		N  =  normalize (vec3(NormalMatrix*vec4(N,0.0))); 
 		
 	// compute face center & lighting informations
-		vec4 newPos =  ModelViewMatrix * POSITION_IN(1);
+		vec4 newPos =  ModelViewMatrix * vec4(colorVertex[0],1.0);
 		vec3 L =  normalize (lightPosition - newPos.xyz);
 		float lambertTerm = dot(N,L);
-		ColorFS = ambient;
-		
-		if (lambertTerm > 0.0)
-#ifdef WITH_COLORPF	
-			ColorFS += vec4(POSITION_IN(4).xyz,1.0) * lambertTerm;
-#else
-			ColorFS += diffuse * lambertTerm;		
-#endif 
-		
-	// Explode in face 	
+	
 		for (int i=1; i<=3; i++)
 		{
-			vec4 P = explodeV * POSITION_IN(i) + (1.0-explodeV)* POSITION_IN(0);
-			gl_Position = ModelViewProjectionMatrix *  P;
+			// explode in face
+			vec4 P = explodeF * POSITION_IN(i)  + (1.0-explodeF)* vec4(colorVertex[0],1.0);
+
+			// explode in volume
+			vec4 Q = explodeV *  P + (1.0-explodeV)* POSITION_IN(0);
+			gl_Position = ModelViewProjectionMatrix *  Q;
+			if (lambertTerm > 0.0)
+				ColorFS = ambient + vec4(colorVertex[i]*lambertTerm, 1.0);
+			else
+				ColorFS = ambient - backColor*lambertTerm;
 			EmitVertex();
 		}
 		EndPrimitive();
 	}
-
-	
 }

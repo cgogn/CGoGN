@@ -27,14 +27,14 @@
 
 #include <iostream>
 
-#define WITH_GMAP 1
+#define WITH_GMAP 0
 
 #include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
-	#include "Topology/gmap/embeddedGMap3.h"
-#else
+//#ifdef WITH_GMAP
+//	#include "Topology/gmap/embeddedGMap3.h"
+//#else
 	#include "Topology/map/embeddedMap3.h"
-#endif
+//#endif
 
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -65,11 +65,11 @@ using namespace CGoGN ;
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
-#ifdef WITH_GMAP
-	typedef EmbeddedGMap3 MAP;
-#else
+//#ifdef WITH_GMAP
+//	typedef EmbeddedGMap3 MAP;
+//#else
 	typedef EmbeddedMap3 MAP;
-#endif
+//#endif
 };
 
 

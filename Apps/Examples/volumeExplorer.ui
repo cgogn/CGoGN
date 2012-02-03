@@ -85,6 +85,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QSlider" name="slider_explode_face">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="Line" name="line_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -133,5 +140,22 @@
   </widget>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBox_plane</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>checkBox_hide</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>74</x>
+     <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

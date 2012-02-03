@@ -227,13 +227,12 @@ Traversor3XXaY<MAP,ORB_X,ORB_Y>::Traversor3XXaY(MAP& map, Dart dart, bool forceD
 			m_vecDarts.push_back(e);
 	}
 	m_vecDarts.push_back(NIL);
-	m_iter = m_vecDarts.begin();
-
 }
 
 template <typename MAP, unsigned int ORB_X, unsigned int ORB_Y>
 Dart Traversor3XXaY<MAP,ORB_X,ORB_Y>::begin()
 {
+	m_iter = m_vecDarts.begin();
 	return *m_iter;
 }
 

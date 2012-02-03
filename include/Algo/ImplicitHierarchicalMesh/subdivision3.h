@@ -60,6 +60,9 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 template <typename PFP>
 Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
+template <typename PFP>
+Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
 
 /***********************************************************************************
  *								 Simplification									   *

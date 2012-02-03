@@ -58,9 +58,13 @@ protected:
 
 	bool m_cpf;
 
+	bool m_ef;
+
 	Utils::ShaderExplodeVolumesLines* m_shaderL;
 
 	Utils::VBO* m_vboPos;
+
+	Utils::VBO* m_vboColors;
 
 	Utils::VBO* m_vboPosLine;
 
@@ -71,22 +75,22 @@ protected:
 
 	GLuint m_nbLines;
 
+	Geom::Vec3f m_globalColor;
+
 
 
 public:
 	/**
 	* Constructor
-	* @param map the map to draw
-	* @param good functor that return true for darts of part to draw
-	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
+	* @param withColorPerFace affect a color per face
+	* @param withExplodeFace shrinj each face
 	*/
-	ExplodeVolumeRender(bool withColorPerFace=false) ;
+	ExplodeVolumeRender(bool withColorPerFace=false, bool withExplodeFace=false) ;
 
 	/**
 	* Destructor
 	*/
 	~ExplodeVolumeRender() ;
-
 
 	/**
 	 * return a ptr on used shader do not forgot to register
@@ -98,15 +102,14 @@ public:
 	 */
 	Utils::GLSLShader* shaderLines() ;
 
-
 	/**
 	* update all drawing buffers
 	* @param map the map
 	* @param positions  attribute of position vertices
 	* @param good selector
 	*/
-	template<typename PFP>
-	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
+//	template<typename PFP>
+//	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
 	* update all drawing buffers
@@ -134,6 +137,11 @@ public:
 	void setExplodeVolumes(float explode) ;
 
 	/**
+	 * set exploding volume coefficient parameter
+	 */
+	void setExplodeFaces(float explode) ;
+
+	/**
 	 * set clipping plane
 	 */
 	void setClippingPlane(const Geom::Vec4f& p) ;
@@ -149,9 +157,9 @@ public:
 	void setAmbiant(const Geom::Vec4f& ambiant) ;
 
 	/**
-	 * set diffuse color parameter
+	 * set back color parameter
 	 */
-	void setDiffuse(const Geom::Vec4f& diffuse) ;
+	void setBackColor(const Geom::Vec4f& color) ;
 
 	/**
 	 * set light position parameter

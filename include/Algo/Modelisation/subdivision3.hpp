@@ -181,6 +181,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		Dart d = *it;
 		//unsew all around the vertex
 		//there are 2 links to unsew for each face around (-> quadrangulation)
+		std::vector<Dart> v;
 		do
 		{
 			Dart dN = map.phi1(map.phi2(d));
@@ -190,7 +191,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	 		if(map.phi2(dRing)!=dRing)
 	 		{
 	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
-	 			map.unsewFaces(dRing);
+	 			v.push_back(dRing);
 	 		}
 
 	 		dRing = map.phi1(dRing);
@@ -198,40 +199,61 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	 		if(map.phi2(dRing)!=dRing)
 	 		{
 	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
-	 			map.unsewFaces(dRing);
+	 			v.push_back(dRing);
 	 		}
 
 			d = dN;
-		} while (*it!=d);
+		} while (d != *it);
 
-		//close the generated hole and create the central vertex
-		unsigned int degree = map.closeHole(map.phi1(d));
+//		//close the generated hole and create the central vertex
+//		//unsigned int degree = map.closeHole(map.phi1(d));
 
-		Dart dd = map.phi1(map.phi2(map.phi1(d)));
-		map.splitFace(map.phi_1(dd),map.phi1(dd));
-		Dart dS = map.phi1(dd);
-		map.cutEdge(dS);
+		//TODO : pb de face en trop avec splitVolume
+		//map.splitVolume(v);
 
-		attributs[map.phi1(dS)] = attBary[d];
+		Dart e = v.front();
+		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+			if(map.Map2::isBoundaryEdge(*it))
+				map.unsewFaces(*it);
+
+		map.fillHole(e) ;
+
+//		Dart dd = map.phi1(map.phi2(map.phi1(d)));
+//		map.splitFace(map.phi_1(dd),map.phi1(dd));
+//		Dart dS = map.phi1(dd);
+//		map.cutEdge(dS);
+
+//		attributs[map.phi1(dS)] = attBary[d];
+
 
 		//TODO : test with vertices with degree higher than 3
-		for(unsigned int i=0; i < (degree/2)-2; ++i)
-		{
-			map.splitFace(map.phi2(dS),map.template phi<111>(map.phi2(dS)));
-			dS = map.template phi<111>(map.phi2(dS));
-		}
+//		for(unsigned int i=0; i < (degree/2)-2; ++i)
+//		{
+//			map.splitFace(map.phi2(dS),map.template phi<111>(map.phi2(dS)));
+//			dS = map.template phi<111>(map.phi2(dS));
+//		}
 	}
+
+//	map.deleteVolume(map.phi3(map.phi2(map.phi1(l_vertices.front()))));
 
 	map.check();
 
 	//sew all faces leading to the central vertex
 	for (std::map<Dart,Dart>::iterator it = toSew.begin(); it != toSew.end(); ++it)
 	{
-		Dart dT = map.phi2(it->first);
-		if(dT==map.phi3(dT))
-		{
-			map.sewVolumes(dT,map.phi2(it->second));
-		}
+
+//		Dart f1 = map.phi2((*it).first);
+//		Dart f2 = map.phi2((*it).second);
+//		if(map.isBoundaryFace(f1) && map.isBoundaryFace(f2))
+//		{
+//			map.sewVolumes(f1, f2);
+//		}
+
+		//Dart dT = map.phi2(it->first);
+//		if(dT==map.phi3(dT))
+//		{
+//			map.sewVolumes(dT,map.phi2(it->second));
+//		}
 	}
 }
 

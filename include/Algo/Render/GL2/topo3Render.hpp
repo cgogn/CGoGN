@@ -68,7 +68,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	Map3& map = reinterpret_cast<Map3&>(mapx);
+	Map3& map = dynamic_cast<Map3&>(mapx);
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -261,7 +261,8 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 template<typename PFP>
 void Topo3Render::dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b)
 {
-	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
+//	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
+	unsigned int lab =map.dartIndex(d) + 1; // add one to avoid picking the black of screen
 
 	r = float(lab%255) / 255.0f; lab = lab/255;
 	g = float(lab%255) / 255.0f; lab = lab/255;
@@ -325,7 +326,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	GMap3& map = reinterpret_cast<GMap3&>(mapx);
+	GMap3& map = dynamic_cast<GMap3&>(mapx);	// TODO reflechir comment virer ce warning quand on compile avec PFP::MAP=Map3
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;

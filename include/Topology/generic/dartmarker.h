@@ -201,7 +201,7 @@ public:
 	DartMarker(GenericMap& map) : DartMarkerGen(map)
 	{}
 
-	DartMarker(GenericMap& map, unsigned int th): DartMarkerGen(map, th)
+	DartMarker(GenericMap& map, unsigned int thread): DartMarkerGen(map, thread)
 	{}
 
 	virtual ~DartMarker()
