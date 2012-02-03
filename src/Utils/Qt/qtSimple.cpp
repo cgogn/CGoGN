@@ -30,6 +30,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <QtGui/QTextEdit>
+#include <QImage>
 
 namespace CGoGN
 {
@@ -511,6 +512,12 @@ void SimpleQT::cb_about_cgogn()
 void SimpleQT::cb_about()
 {
    QMessageBox::about(this, tr("About App"), m_helpString.c_str());
+}
+
+void SimpleQT::snapshot(const QString& filename)
+{
+	QImage im = m_glWidget->grabFrameBuffer(false);
+	im.save(filename);
 }
 
 } // namespace QT

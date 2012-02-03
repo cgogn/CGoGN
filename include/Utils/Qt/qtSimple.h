@@ -396,6 +396,8 @@ public:
 	 */
 	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
 
+	void snapshot(const QString& filename);
+
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }
 	virtual void cb_Open() { std::cerr << "callback not implemented" << std::endl; }
