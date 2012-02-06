@@ -101,27 +101,25 @@ protected:
 	std::vector<DartMarkerGen*> dartMarkers ;
 	std::vector<CellMarkerGen*> cellMarkers ;
 
-
 	/**
 	 * is map a multiresolution map
 	 */
 #ifndef CGoGN_FORCE_MR
 	bool m_isMultiRes;
 #elif CGoGN_FORCE_MR == 1
-	static const bool m_isMultiRes=true;
+	static const bool m_isMultiRes = true ;
 #else
-	static const bool m_isMultiRes=false;
+	static const bool m_isMultiRes = false ;
 #endif
 
 	AttributeContainer m_mrattribs ;
 
-	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts;
-	AttributeMultiVector<unsigned char>* m_mrLevels;
+	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
+	AttributeMultiVector<unsigned char>* m_mrLevels ;
 
-	unsigned int m_mrCurrentLevel;
+	unsigned int m_mrCurrentLevel ;
 
-	std::vector<unsigned int> m_mrLevelStack;
-
+	std::vector<unsigned int> m_mrLevelStack ;
 
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
@@ -144,6 +142,39 @@ public:
 	 * get the marker_set of an orbit and thread (used for Cell & Dart Marker)
 	 */
 	MarkSet& getMarkerSet(unsigned int orbit, unsigned int thread) { return m_marksets[orbit][thread]; }
+
+	/****************************************
+	 *           MULTIRES                   *
+	 ****************************************/
+
+	unsigned int getCurrentLevel() { return m_mrCurrentLevel ; }
+
+	void setCurrentLevel(unsigned int l)
+	{
+		if(l < m_mrDarts.size())
+			m_mrCurrentLevel = l ;
+		else
+			CGoGNout << "try to access inexisting resolution level" << CGoGNendl ;
+	}
+
+	void pushLevel() { m_mrLevelStack.push_back(m_mrCurrentLevel) ; }
+
+	void popLevel() { m_mrCurrentLevel = m_mrLevelStack.back() ; m_mrLevelStack.pop_back() ; }
+
+	unsigned int getMaxLevel() { return m_mrDarts.size() - 1 ; }
+
+	void addLevel()
+	{
+		unsigned int level = m_mrDarts.size() ;
+		std::stringstream ss ;
+		ss << "MRdart_"<< level ;
+		AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+		m_mrDarts.push_back(amvMR) ;
+		// copy the darts pointers of the previous level
+		if(m_mrDarts.size() > 1)
+			m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
+	}
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -458,8 +489,6 @@ public:
 	virtual bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
 	virtual bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
 	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
-
-
 
 	/**
 	* execute functor for each orbit
