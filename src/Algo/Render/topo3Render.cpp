@@ -126,9 +126,8 @@ void Topo3Render::setAllDartsColor(float r, float g, float b)
 		*colorDartBuf++ = g;
 		*colorDartBuf++ = b;
 	}
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
 
-	m_vbo4->bind();
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
 }
 
 void Topo3Render::drawDarts()
