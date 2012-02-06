@@ -28,7 +28,7 @@ namespace CGoGN
 inline unsigned int GenericMap::dartIndex(Dart d)
 {
 	if (m_isMultiRes)
-		return m_mrDarts[m_mrCurrentLevel][d.index] ;
+		return m_mrDarts[m_mrCurrentLevel]->operator[](d.index) ;
 	return d.index;
 }
 
@@ -47,11 +47,11 @@ inline Dart GenericMap::newDart()
 	if (m_isMultiRes)
 	{
 		unsigned int mrdi = m_mrattribs.insertLine() ;
-		m_mrLevels[mrdi] = m_mrCurrentLevel ;
+		m_mrLevels->operator[](mrdi) = m_mrCurrentLevel ;
 		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)
-			m_mrDarts[i][mrdi] = MRNULL ;
+			m_mrDarts[i]->operator[](mrdi) = MRNULL ;
 		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-			m_mrDarts[i][mrdi] = di ;
+			m_mrDarts[i]->operator[](mrdi) = di ;
 		return Dart::create(mrdi) ;
 	}
 	return Dart::create(di) ;
@@ -87,9 +87,9 @@ inline void GenericMap::deleteDart(Dart d)
 			m_mrattribs.removeLine(d.index) ;
 		else
 		{
-			unsigned int di = m_mrDarts[m_mrCurrentLevel - 1][d.index] ;
+			unsigned int di = m_mrDarts[m_mrCurrentLevel - 1]->operator[](d.index) ;
 			for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-				m_mrDarts[i][d.index] = di ;
+				m_mrDarts[i]->operator[](d.index) = di ;
 		}
 	}
 }
