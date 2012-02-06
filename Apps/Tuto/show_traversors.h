@@ -21,8 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef __TUTO5_
-#define __TUTO5_
+#ifndef __SHOW_TRAVERSORS_
+#define __SHOW_TRAVERSORS_
 
 
 #include <iostream>
@@ -54,7 +54,7 @@
 
 #include "Utils/Qt/qtSimple.h"
 
-#include "ui_tuto5.h"
+#include "ui_show_traversors.h"
 // inclure qtui.h juste après le ui_xxx.h
 #include "Utils/Qt/qtui.h"
 
