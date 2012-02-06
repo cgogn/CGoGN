@@ -68,46 +68,41 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	Map3& map = dynamic_cast<Map3&>(mapx);
+//	Map3& map = dynamic_cast<Map3&>(mapx);
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 
-	if (m_attIndex.map() != &map)
+	if (m_attIndex.map() != &mapx)
 	{
-		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int>(DART, "dart_index");
 		if (!m_attIndex.isValid())
-			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+			m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
 	}
 
 	m_nbDarts = 0;
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
 		if (good(d))
 			m_nbDarts++;
 	}
 
 	// compute center of each volumes
-	CellMarker cmv(map,VOLUME);
-	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
+	CellMarker cmv(mapx,VOLUME);
+	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
 
-//	TraversorW<Map3> traVol(map,good);
-//	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
-//	{
-//		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(mapx, d, positions);
-//	}
 	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
 
 
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(map, DART);
+	AutoAttributeHandler<VEC3> fv1(mapx, DART);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(map, DART);
+	AutoAttributeHandler<VEC3> fv11(mapx, DART);
 
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(map, DART);
-	AutoAttributeHandler<VEC3> fv2x(map, DART);
+	AutoAttributeHandler<VEC3> fv2(mapx, DART);
+	AutoAttributeHandler<VEC3> fv2x(mapx, DART);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -121,11 +116,11 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 
 
 	std::vector<Dart> vecDartFaces;
-	vecDartFaces.reserve(map.getNbDarts()/4);
+	vecDartFaces.reserve(m_nbDarts/3);
 	unsigned int posDBI=0;
 
 	// traverse each face of each volume
-	TraversorCell<Map3> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
 		vecDartFaces.push_back(d);
@@ -145,7 +140,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 			P  = vc*okv + P*kv;
 			vecPos.push_back(P);
 			centerFace += P;
-			dd = map.phi1(dd);
+			dd = mapx.phi1(dd);
 		} while (dd != d);
 		centerFace /= REAL(vecPos.size());
 
@@ -181,7 +176,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 			fv2[d] = P*0.52f + Q*0.48f;
 			fv2x[d] = P*0.48f + Q*0.52f;
 
-			d = map.phi1(d);
+			d = mapx.phi1(d);
 		}
 	}
 
@@ -218,7 +213,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 		Dart d = *face;
 		do
 		{
-			Dart e = map.phi2(d);
+			Dart e = mapx.phi2(d);
 			if (d < e)
 			{
 				*positionF2++ = fv2[d];
@@ -227,8 +222,8 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 				*positionF2++ = fv2x[d];
 				m_nbRel2++;
 			}
-			e = map.phi3(d);
-			if (!map.isBoundaryMarked(e) && (d < e))
+			e = mapx.phi3(d);
+			if (!mapx.isBoundaryMarked(e) && (d < e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
@@ -236,11 +231,11 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 				*positionF3++ = fv2x[d];
 				m_nbRel3++;
 			}
-			e = map.phi1(d);
+			e = mapx.phi1(d);
 			*positionF1++ = fv1[d];
 			*positionF1++ = fv11[e];
 
-			d = map.phi1(d);
+			d = mapx.phi1(d);
 		} while (d != *face );
 	}
 
@@ -332,35 +327,30 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	typedef typename PFP::REAL REAL;
 
 
-	if (m_attIndex.map() != &map)
+	if (m_attIndex.map() != &mapx)
 	{
-		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int>(DART, "dart_index");
 		if (!m_attIndex.isValid())
-			m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+			m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
 	}
 
 	m_nbDarts = 0;
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
 	{
 		if (good(d))
 			m_nbDarts++;
 	}
 
 	// compute center of each volumes
-	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
-//	TraversorW<GMap3> traVol(map,good);
-//	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
-//	{
-//		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(mapx, d, positions);
-//	}
+	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
 	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
 
 
 	// beta1
-	AutoAttributeHandler<VEC3> fv1(map, DART);
+	AutoAttributeHandler<VEC3> fv1(mapx, DART);
 	// beta2/3
-	AutoAttributeHandler<VEC3> fv2(map, DART);
-	AutoAttributeHandler<VEC3> fv2x(map, DART);
+	AutoAttributeHandler<VEC3> fv2(mapx, DART);
+	AutoAttributeHandler<VEC3> fv2x(mapx, DART);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -374,11 +364,11 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 
 
 	std::vector<Dart> vecDartFaces;
-	vecDartFaces.reserve(map.getNbDarts()/4);
+	vecDartFaces.reserve(m_nbDarts/6);
 	unsigned int posDBI=0;
 
 	//traverse each face of each volume
-	TraversorCell<GMap3> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
 		vecDartFaces.push_back(d);
@@ -398,7 +388,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 			P  = vc*okv + P*kv;
 			vecPos.push_back(P);
 			centerFace += P;
-			dd = map.phi1(dd);
+			dd = mapx.phi1(dd);
 		} while (dd != d);
 		centerFace /= REAL(vecPos.size());
 
@@ -447,7 +437,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 			m_attIndex[dx] = posDBI;
 			posDBI+=2;
 
-			d = map.phi1(d);		}
+			d = mapx.phi1(d);		}
 	}
 
 	m_vbo0->bind();
