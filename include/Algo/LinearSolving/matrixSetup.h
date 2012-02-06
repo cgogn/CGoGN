@@ -327,7 +327,7 @@ public:
 			REAL aij = edgeWeight[it] / vArea ;
 			aii += aij ;
 			solver->add_coefficient(indexTable[this->m_map.phi1(it)], aij) ;
-			it = this->m_map.alpha1(it) ;
+			it = this->m_map.phi2_1(it) ;
 		} while(it != d) ;
 		solver->add_coefficient(indexTable[d], -aii) ;
 		solver->normalize_row() ;

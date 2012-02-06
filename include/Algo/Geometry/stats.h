@@ -125,7 +125,7 @@ void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
 //			do
 //			{
 //				nbEdgePerVertex++ ;
-//				e = map.alpha1(e) ;
+//				e = map.phi2_1(e) ;
 //			}
 //			while (e != d) ;
 //		}

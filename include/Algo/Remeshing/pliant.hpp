@@ -99,7 +99,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 			{
 				if(featureEdge.isMarked(vit))
 					++nbFeatureEdges ;
-				vit = map.alpha1(vit) ;
+				vit = map.phi2_1(vit) ;
 			} while(vit != d) ;
 			if(nbFeatureEdges > 0)
 			{
@@ -126,13 +126,13 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 				{
 					bool collapse = true ;
 					VEC3 p = position[d1] ;
-					Dart vit = map.alpha1(d) ;
+					Dart vit = map.phi2_1(d) ;
 					do
 					{
 						VEC3 vec = position[d1] - position[map.phi1(vit)] ;
 						if(vec.norm() > edgeLengthSup)
 							collapse = false ;
-						vit = map.alpha1(vit) ;
+						vit = map.phi2_1(vit) ;
 					} while(vit != d && collapse) ;
 					if(collapse)
 					{

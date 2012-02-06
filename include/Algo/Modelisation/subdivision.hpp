@@ -73,7 +73,7 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 		do
 		{
 			t.mark(fit);
-			fit = map.alpha1(fit);
+			fit = map.phi2_1(fit);
 		} while(fit != cd);
 	}
 }
@@ -102,7 +102,7 @@ void trianguleFaces(
 		do
 		{
 			t.mark(fit);
-			fit = map.alpha1(fit);
+			fit = map.phi2_1(fit);
 		} while(fit != cd);
 	}
 }
@@ -163,7 +163,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			do
 			{
 				mf.markOrbit(FACE, e);
-				e = map.alpha1(e);
+				e = map.phi2_1(e);
 			} while (e != cf);
 		}
 	}
@@ -286,7 +286,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			temp2 += attributs[v];
 
 			++n;
-			x = map.alpha1(x);
+			x = map.phi2_1(x);
 		} while (x != *vert);
 
 		EMB emcp = attributs[*vert];
@@ -403,7 +403,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			Dart y = map.phi1(map.phi1(x));
 			temp += attributs[y];
 			++n;
-			x = map.alpha1(x);
+			x = map.phi2_1(x);
 		} while ((x != *vert));
 		EMB emcp = attributs[*vert];
 		if (n == 6)
@@ -548,7 +548,7 @@ void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		Dart dd = map.alpha_1(d) ;
+		Dart dd = map.phi12(d) ;
 		new_phi1[d] = dd ;
 		new_phi_1[dd] = d ;
 	}
@@ -621,7 +621,7 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 			{
 				newP += position[map.phi2(vit)] ;
 				++val ;
-				vit = map.alpha1(vit) ;
+				vit = map.phi2_1(vit) ;
 			} while(vit != d) ;
 			REAL K = sqrt3_K(val) ;
 			newP *= REAL(3) ;

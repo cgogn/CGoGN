@@ -51,7 +51,7 @@ void Predictor_HalfCollapse<PFP>::predict(Dart d2, Dart dd2)
 	Dart it = dd2 ;
 	do {
 		s2_1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++k2 ;
 	} while (m.phi2(it) != m.phi_1(d2)) ;
 
@@ -84,12 +84,12 @@ typename PFP::REAL Predictor_CornerCutting<PFP>::autoAlpha(Dart d2, Dart dd2)
 	do
 	{
 		++k1 ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while(it != dd2) ;
 	do
 	{
 		++k2 ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while(it != d2) ;
 	return (k1-1) * (k2-1) / (k1*k2-1) ;
 }
@@ -116,7 +116,7 @@ void Predictor_CornerCutting<PFP>::predict(Dart d2, Dart dd2)
 	Dart it = d2 ;
 	do {
 		m1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++count ;
 	} while (m.phi2(it) != m.phi_1(dd2)) ;
 	m1 /= REAL(count) ;
@@ -130,7 +130,7 @@ void Predictor_CornerCutting<PFP>::predict(Dart d2, Dart dd2)
 	it = dd2 ;
 	do {
 		m2 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++count ;
 	} while (m.phi2(it) != m.phi_1(d2)) ;
 	m2 /= REAL(count) ;
@@ -155,7 +155,7 @@ void Predictor_TangentPredict1<PFP>::predictedTangent(Dart d2, Dart dd2, VEC3& d
 	Dart it = d2 ;
 	do {
 		s1_1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++k1 ;
 	} while (m.phi2(it) != m.phi_1(dd2)) ;
 
@@ -163,7 +163,7 @@ void Predictor_TangentPredict1<PFP>::predictedTangent(Dart d2, Dart dd2, VEC3& d
 	it = dd2 ;
 	do {
 		s2_1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++k2 ;
 	} while (m.phi2(it) != m.phi_1(d2)) ;
 
@@ -210,7 +210,7 @@ void Predictor_TangentPredict2<PFP>::predictedTangent(Dart d2, Dart dd2, VEC3& d
 	Dart it = d2 ;
 	do {
 		s1_1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++k1 ;
 	} while (m.phi2(it) != m.phi_1(dd2)) ;
 
@@ -221,7 +221,7 @@ void Predictor_TangentPredict2<PFP>::predictedTangent(Dart d2, Dart dd2, VEC3& d
 		Dart p2 = m.phi2(p1) ;
 		if(p2 != p1)
 			s1_2 += this->m_attrV[m.phi_1(p2)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while (it != dd2) ;
 	s1_2 += this->m_attrV[m.phi_1(d1)] ;
 	s1_2 += this->m_attrV[m.phi_1(dd2)] ;
@@ -230,7 +230,7 @@ void Predictor_TangentPredict2<PFP>::predictedTangent(Dart d2, Dart dd2, VEC3& d
 	it = dd2 ;
 	do {
 		s2_1 += this->m_attrV[m.phi2(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++k2 ;
 	} while (m.phi2(it) != m.phi_1(d2)) ;
 
@@ -241,7 +241,7 @@ void Predictor_TangentPredict2<PFP>::predictedTangent(Dart d2, Dart dd2, VEC3& d
 		Dart p2 = m.phi2(p1) ;
 		if(p2 != p1)
 			s2_2 += this->m_attrV[m.phi_1(p2)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while (it != d2) ;
 	s2_2 += this->m_attrV[m.phi_1(dd1)] ;
 	s2_2 += this->m_attrV[m.phi_1(d2)] ;

@@ -26,12 +26,12 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 	}
 	else {
 		//orientation step
-		if(getOrientationEdge(current, this->m.alpha1(this->d))!=Geom::RIGHT) {
+		if(getOrientationEdge(current, this->m.phi2_1(this->d))!=Geom::RIGHT) {
 
 			Dart dd_vert = this->d;
 			do {
-				this->d = this->m.alpha1( this->d );
-			}while(getOrientationEdge(current, this->m.alpha1( this->d ))!=Geom::RIGHT && dd_vert!=this->d);
+				this->d = this->m.phi2_1( this->d );
+			}while(getOrientationEdge(current, this->m.phi2_1( this->d ))!=Geom::RIGHT && dd_vert!=this->d);
 
 			if(dd_vert==this->d) {
     			this->state = VERTEX;
@@ -40,7 +40,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 		}
 		else {
 			while(getOrientationEdge(current,this->d)==Geom::RIGHT) {
-				this->d = this->m.alpha_1( this->d );
+				this->d = this->m.phi12( this->d );
 			}
 		}
 

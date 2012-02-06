@@ -38,17 +38,17 @@ void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, D
 	Dart dd;
 	do
 	{
-		dd = map.alpha1(d);
+		dd = map.phi2_1(d);
 		map.removeEdgeFromVertex(dd);
 		Dart ee = e;
 		do
 		{
 			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
-					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.alpha1(ee))])==Geom::RIGHT)
+					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.phi2_1(ee))])==Geom::RIGHT)
 			{
 				break;
 			}
-			ee = map.alpha1(ee);
+			ee = map.phi2_1(ee);
 		} while(ee != e);
 		map.insertEdgeInVertex(ee,dd);
 	} while(dd!=d);

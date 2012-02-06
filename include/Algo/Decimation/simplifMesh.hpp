@@ -181,7 +181,7 @@ void SimplifTrian<PFP>::updateCriterias(Dart d)
 		m_protectMarker.mark(em) ;
 
 		// next edge
-		d = m_map.alpha1(d);
+		d = m_map.phi2_1(d);
 	} while (d!=dd);
 }
 
@@ -212,15 +212,15 @@ Dart SimplifTrian<PFP>::edgeCollapse(Dart d, typename PFP::VEC3& newPos)
 	{
 		CRIT* cr = getCrit(xd);
 		cr->tagDirty();
-		xd = m_map.alpha1(xd);
+		xd = m_map.phi2_1(xd);
 	} while (xd != d);
 
-	xd = m_map.alpha1(dd); // alpha1 pour ne pas repasser sur l'arete d/dd
+	xd = m_map.phi2_1(dd); // phi2_1 pour ne pas repasser sur l'arete d/dd
 	do
 	{
 		CRIT* cr = getCrit(xd);
 		cr->tagDirty();
-		xd = m_map.alpha1(xd);
+		xd = m_map.phi2_1(xd);
 	} while (xd != dd);
 
 	// store old valences
