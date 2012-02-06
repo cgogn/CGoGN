@@ -241,6 +241,67 @@ void MyQT::traverse2()
 		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
+	// 2XY adjacent
+	case 212:
+	{
+		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
+		m_drawer.color3f(1.0f,0.0f,0.0f);
+		Traversor2VVaE<PFP::MAP> tra(myMap,m_selected);
+		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
+			m_affDarts.push_back(d);
+		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
+		break;
+	}
+	case 213:
+	{
+		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
+		m_drawer.color3f(1.0f,0.0f,0.0f);
+		Traversor2VVaF<PFP::MAP> tra(myMap,m_selected);
+		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
+			m_affDarts.push_back(d);
+		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
+		break;
+	}
+	case 221:
+	{
+		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		m_drawer.color3f(1.0f,0.0f,0.0f);
+		Traversor2EEaV<PFP::MAP> tra(myMap,m_selected);
+		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
+			m_affDarts.push_back(d);
+		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
+		break;
+	}
+	case 223:
+	{
+		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		m_drawer.color3f(1.0f,0.0f,0.0f);
+		Traversor2EEaF<PFP::MAP> tra(myMap,m_selected);
+		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
+			m_affDarts.push_back(d);
+		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
+		break;
+	}
+	case 231:
+	{
+		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		m_drawer.color3f(1.0f,0.0f,0.0f);
+		Traversor2FFaV<PFP::MAP> tra(myMap,m_selected);
+		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
+			m_affDarts.push_back(d);
+		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
+		break;
+	}
+	case 232:
+	{
+		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		m_drawer.color3f(1.0f,0.0f,0.0f);
+		Traversor2FFaE<PFP::MAP> tra(myMap,m_selected);
+		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
+			m_affDarts.push_back(d);
+		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
+		break;
+	}
 
 	default:
 		CGoGNerr <<"Not implemented" << CGoGNendl;
@@ -398,9 +459,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3VVaE<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
 		break;
 	}
@@ -410,9 +469,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3VVaF<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
 		break;
 	}
@@ -423,9 +480,7 @@ void MyQT::traverse3()
 
 		Traversor3VVaW<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
 		break;
 	}
@@ -435,9 +490,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3EEaV<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -447,9 +500,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3EEaF<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -459,9 +510,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3EEaW<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -471,9 +520,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3FFaV<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -483,9 +530,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3FFaE<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -495,9 +540,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3FFaW<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -507,9 +550,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3WWaV<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -519,9 +560,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3WWaE<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -531,9 +570,7 @@ void MyQT::traverse3()
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3WWaF<PFP::MAP> tra(myMap,m_selected);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-		{
 			m_affDarts.push_back(d);
-		}
 		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
 		break;
 	}
@@ -565,7 +602,7 @@ int main(int argc, char **argv)
     sqt.setDock(&dock);
 
  	// message d'aide
-	sqt.setHelpMsg("shit click to select a dart\nand select a traversor");
+	sqt.setHelpMsg("shit click to select a dart\nand select a traversor\nif keyboard focus problem\nundock");
 
 
 
