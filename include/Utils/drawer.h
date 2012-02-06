@@ -63,6 +63,7 @@ protected:
 	std::vector<Geom::Vec3f> m_dataCol;
 	std::vector<PrimParam> m_begins;
 	float m_currentWidth;
+	float m_currentSize;
 	GLenum m_compile;
 	Utils::ShaderColorPerVertex* m_shader;
 

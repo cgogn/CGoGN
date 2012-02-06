@@ -69,12 +69,15 @@ void Drawer::lineWidth(float lw)
 
 void Drawer::pointSize(float ps)
 {
-	m_currentWidth = ps;
+	m_currentSize = ps;
 }
 
 void Drawer::begin(GLenum mode)
 {
-	m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentWidth));
+	if (mode == GL_POINTS)
+		m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentSize));
+	else
+		m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentWidth));
 }
 
 void Drawer::end()
