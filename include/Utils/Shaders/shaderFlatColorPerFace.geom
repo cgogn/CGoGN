@@ -7,7 +7,6 @@ uniform vec3 lightPosition;
 uniform vec4 ambient;
 
 VARYING_IN vec3 colorVertex[];
-
 VARYING_OUT vec4 ColorFS;
 
 void main(void)
