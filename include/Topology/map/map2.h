@@ -263,12 +263,6 @@ public:
 	 */
 	void insertTrianglePair(Dart d, Dart v1, Dart v2) ;
 
-	/**
-	 * Unsew the faces of the umbrella of the vertex of d
-	 * @param d a dart from the vertex
-	 */
-	void unsewAroundVertex(Dart d) ;
-
 	//! Merge two volumes along two faces.
 	/*! Works only if the two faces have the same number of edges.
 	 *  The faces adjacent to the two given faces are pairwise sewed

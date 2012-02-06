@@ -532,25 +532,6 @@ void GMap2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	beta2sew(beta0(phi1(e)), vv2) ;
 }
 
-void GMap2::unsewAroundVertex(Dart d)
-{
-	Dart it = d ;
-	do
-	{
-		Dart temp = phi1(it) ;
-		Dart e_1 = phi_1(it) ;
-
-		do
-		{
-			unsewFaces(temp) ;
-			temp = phi1(temp) ;
-		} while(temp != e_1);
-
-		it = alpha1(it);
-	}
-	while(it != d);
-}
-
 bool GMap2::mergeVolumes(Dart d, Dart e)
 {
 	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;

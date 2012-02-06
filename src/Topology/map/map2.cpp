@@ -466,25 +466,6 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(e), vv2) ;
 }
 
-void Map2::unsewAroundVertex(Dart d)
-{
-	Dart it = d ;
-	do
-	{
-		Dart temp = phi1(it) ;
-		Dart e_1 = phi_1(it) ;
-
-		do
-		{
-			unsewFaces(temp) ;
-			temp = phi1(temp) ;
-		} while(temp != e_1);
-
-		it = alpha1(it);
-	}
-	while(it != d);
-}
-
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
 	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
