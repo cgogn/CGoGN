@@ -30,21 +30,22 @@ namespace CGoGN
 // Marker for traversor
 //**********************
 
-template <typename MAP, unsigned int ORBIT>
-MarkerForTraversor<MAP,ORBIT>::MarkerForTraversor(MAP& map, bool forceDartMarker, unsigned int thread) :
+template <typename MAP>
+MarkerForTraversor<MAP>::MarkerForTraversor(MAP& map, unsigned int orbit, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
 	m_dmark(NULL),
-	m_cmark(NULL)
+	m_cmark(NULL),
+	m_orbit(orbit)
 {
-	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT))
-		m_cmark = new CellMarkerStore(map, ORBIT, thread) ;
+	if(!forceDartMarker && map.isOrbitEmbedded(m_orbit))
+		m_cmark = new CellMarkerStore(map, m_orbit, thread) ;
 	else
 		m_dmark = new DartMarkerStore(map, thread) ;
 }
 
 
-template <typename MAP, unsigned int ORBIT>
-MarkerForTraversor<MAP,ORBIT>::~MarkerForTraversor()
+template <typename MAP>
+MarkerForTraversor<MAP>::~MarkerForTraversor()
 {
 	if (m_cmark)
 		delete m_cmark;
@@ -52,41 +53,41 @@ MarkerForTraversor<MAP,ORBIT>::~MarkerForTraversor()
 		delete m_dmark;
 }
 
-template <typename MAP, unsigned int ORBIT>
-void MarkerForTraversor<MAP,ORBIT>::mark(Dart d)
+template <typename MAP>
+void MarkerForTraversor<MAP>::mark(Dart d)
 {
 	if (m_cmark)
 		m_cmark->mark(d);
 	else
-		m_dmark->markOrbit(ORBIT,d);
+		m_dmark->markOrbit(m_orbit,d);
 }
 
 
-template <typename MAP, unsigned int ORBIT>
-void MarkerForTraversor<MAP,ORBIT>::unmark(Dart d)
+template <typename MAP>
+void MarkerForTraversor<MAP>::unmark(Dart d)
 {
 	if (m_cmark)
 		m_cmark->unmark(d);
 	else
-		m_dmark->unmarkOrbit(ORBIT,d);
+		m_dmark->unmarkOrbit(m_orbit,d);
 }
 
-template <typename MAP, unsigned int ORBIT>
-bool MarkerForTraversor<MAP,ORBIT>::isMarked(Dart d)
+template <typename MAP>
+bool MarkerForTraversor<MAP>::isMarked(Dart d)
 {
 	if (m_cmark)
 		return m_cmark->isMarked(d);
 	return m_dmark->isMarked(d);
 }
 
-template <typename MAP, unsigned int ORBIT>
-CellMarkerStore* MarkerForTraversor<MAP,ORBIT>::cmark()
+template <typename MAP>
+CellMarkerStore* MarkerForTraversor<MAP>::cmark()
 {
 	return m_cmark;
 }
 
-template <typename MAP, unsigned int ORBIT>
-DartMarkerStore* MarkerForTraversor<MAP,ORBIT>::dmark()
+template <typename MAP>
+DartMarkerStore* MarkerForTraversor<MAP>::dmark()
 {
 	return m_dmark;
 }
@@ -98,26 +99,30 @@ DartMarkerStore* MarkerForTraversor<MAP,ORBIT>::dmark()
 //**************************************
 
 
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
-Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::Traversor3XY(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread) :
+template <typename MAP>
+Traversor3XY<MAP>::Traversor3XY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, bool forceDartMarker, unsigned int thread) :
 //	Traversor3MarkOnly<MAP,ORBIT_Y>(map, forceDartMarker, thread, true),
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL),
-	m_tradoo(map,ORBIT_X,dart,thread),
+	m_tradoo(map,orbX,dart,thread),
+	m_orbx(orbX),
+	m_orby(orbY),
 	m_allocated(true),
 	m_first(true)
 {
-	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT_Y))
-		m_cmark = new CellMarkerStore(map, ORBIT_Y, thread) ;
+	if(!forceDartMarker && map.isOrbitEmbedded(orbY))
+		m_cmark = new CellMarkerStore(map, orbY, thread) ;
 	else
 		m_dmark = new DartMarkerStore(map, thread) ;
 }
 
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
-Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP,ORBIT_Y>& tmo, bool forceDartMarker, unsigned int thread) :
+template <typename MAP>
+Traversor3XY<MAP>::Traversor3XY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, MarkerForTraversor<MAP>& tmo, bool forceDartMarker, unsigned int thread) :
 	m_map(map),
-	m_tradoo(map,ORBIT_X,dart,thread),
+	m_tradoo(map,orbX,dart,thread),
+	m_orbx(orbX),
+	m_orby(orbY),
 	m_allocated(false),
 	m_first(true)
 {
@@ -125,8 +130,8 @@ Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::Traversor3XY(MAP& map, Dart dart, MarkerForTr
 	m_dmark = tmo.dmark();
 }
 
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
-Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::~Traversor3XY()
+template <typename MAP>
+Traversor3XY<MAP>::~Traversor3XY()
 {
 	if (m_allocated)
 	{
@@ -137,8 +142,8 @@ Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::~Traversor3XY()
 	}
 }
 
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
-Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::begin()
+template <typename MAP>
+Dart Traversor3XY<MAP>::begin()
 {
 	if (!m_first)
 	{
@@ -167,14 +172,14 @@ Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::begin()
 	return m_current;
 }
 
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
-Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::end()
+template <typename MAP>
+Dart Traversor3XY<MAP>::end()
 {
 	return NIL ;
 }
 
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
-Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::next()
+template <typename MAP>
+Dart Traversor3XY<MAP>::next()
 {
 	if(m_current != NIL)
 	{
@@ -187,16 +192,16 @@ Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::next()
 		}
 		else
 		{
-			if (ORBIT_X==VOLUME)
+			if (m_orbx==VOLUME)
 			{
 				// if allocated we are in a local traversal of volume so we can mark only darts of volume
 				if (m_allocated)
-					m_dmark->markOrbit(MAP::ORBIT_IN_PARENT(ORBIT_Y), m_current);
+					m_dmark->markOrbit(MAP::ORBIT_IN_PARENT(m_orby), m_current);
 				else
-					m_dmark->markOrbit(ORBIT_Y, m_current); // here we need to mark all the darts
+					m_dmark->markOrbit(m_orby, m_current); // here we need to mark all the darts
 			}
 			else
-				m_dmark->markOrbit(ORBIT_Y, m_current);
+				m_dmark->markOrbit(m_orby, m_current);
 			m_current = m_tradoo.next();
 			while ((m_current != NIL) && m_dmark->isMarked(m_current))
 				m_current = m_tradoo.next();
@@ -212,39 +217,39 @@ Dart Traversor3XY<MAP,ORBIT_X,ORBIT_Y>::next()
 //*********************************************
 
 
-template <typename MAP, unsigned int ORB_X, unsigned int ORB_Y>
-Traversor3XXaY<MAP,ORB_X,ORB_Y>::Traversor3XXaY(MAP& map, Dart dart, bool forceDartMarker, unsigned int thread):
+template <typename MAP>
+Traversor3XXaY<MAP>::Traversor3XXaY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, bool forceDartMarker, unsigned int thread):
 	m_map(map)
 {
-	MarkerForTraversor<MAP,ORB_X> mk(map,forceDartMarker,thread);
+	MarkerForTraversor<MAP> mk(map,orbX,forceDartMarker,thread);
 	mk.mark(dart);
 
-	Traversor3XY<MAP,ORB_X,ORB_Y> traAdj(map, dart, forceDartMarker, thread);
+	Traversor3XY<MAP> traAdj(map, dart, orbX, orbY, forceDartMarker, thread);
 	for (Dart d = traAdj.begin(); d!=traAdj.end(); d=traAdj.next())
 	{
-		Traversor3XY<MAP,ORB_Y,ORB_X> traInci(map, d, mk, forceDartMarker, thread);
+		Traversor3XY<MAP> traInci(map, d, orbY, orbX, mk, forceDartMarker, thread);
 		for (Dart e = traInci.begin(); e!=traInci.end(); e=traInci.next())
 			m_vecDarts.push_back(e);
 	}
 	m_vecDarts.push_back(NIL);
 }
 
-template <typename MAP, unsigned int ORB_X, unsigned int ORB_Y>
-Dart Traversor3XXaY<MAP,ORB_X,ORB_Y>::begin()
+template <typename MAP>
+Dart Traversor3XXaY<MAP>::begin()
 {
 	m_iter = m_vecDarts.begin();
 	return *m_iter;
 }
 
-template <typename MAP, unsigned int ORB_X, unsigned int ORB_Y>
-Dart Traversor3XXaY<MAP,ORB_X,ORB_Y>::end()
+template <typename MAP>
+Dart Traversor3XXaY<MAP>::end()
 {
 	return NIL;
 }
 
 
-template <typename MAP, unsigned int ORB_X, unsigned int ORB_Y>
-Dart Traversor3XXaY<MAP,ORB_X,ORB_Y>::next()
+template <typename MAP>
+Dart Traversor3XXaY<MAP>::next()
 {
 	if (*m_iter != NIL)
 		m_iter++;

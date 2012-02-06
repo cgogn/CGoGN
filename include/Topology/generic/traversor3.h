@@ -34,15 +34,16 @@ namespace CGoGN
  * class Marker for Traversor usefull to combine
  * several TraversorXY
  */
-template <typename MAP, unsigned int ORBIT>
+template <typename MAP>
 class MarkerForTraversor
 {
 private:
 	MAP& m_map ;
 	DartMarkerStore* m_dmark ;
 	CellMarkerStore* m_cmark ;
+	unsigned int m_orbit;
 public:
-	MarkerForTraversor(MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
+	MarkerForTraversor(MAP& map, unsigned int orbit, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~MarkerForTraversor();
 	DartMarkerStore* dmark();
 	CellMarkerStore* cmark();
@@ -55,7 +56,7 @@ public:
  * Generic class Traversor (do not use directly)
  * Traverse all Y incident to X
  */
-template <typename MAP, unsigned int ORBIT_X, unsigned int ORBIT_Y>
+template <typename MAP>
 class Traversor3XY
 {
 private:
@@ -64,11 +65,13 @@ private:
 	CellMarkerStore* m_cmark ;
 	Dart m_current ;
 	TraversorDartsOfOrbit<MAP> m_tradoo;
+	unsigned int m_orbx;
+	unsigned int m_orby;
 	bool m_allocated;
 	bool m_first;
 public:
-	Traversor3XY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) ;
-	Traversor3XY(MAP& map, Dart dart, MarkerForTraversor<MAP,ORBIT_Y>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
+	Traversor3XY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, bool forceDartMarker = false, unsigned int thread = 0) ;
+	Traversor3XY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, MarkerForTraversor<MAP>& tmo, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~Traversor3XY();
 	Dart begin() ;
 	Dart end() ;
@@ -80,7 +83,7 @@ public:
  * Generic class Traversor (do not use directly)
  * Traverse all X adjacent to X by an Y
  */
-template <typename MAP, unsigned int ORB_X, unsigned int ORB_Y>
+template <typename MAP>
 class Traversor3XXaY
 {
 private:
@@ -88,7 +91,7 @@ private:
 	std::vector<Dart> m_vecDarts;
 	std::vector<Dart>::iterator m_iter;
 public:
-	Traversor3XXaY(MAP& map, Dart dart, bool forceDartMarker = false, unsigned int thread = 0);
+	Traversor3XXaY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, bool forceDartMarker = false, unsigned int thread = 0);
 
 	Dart begin();
 
@@ -104,30 +107,30 @@ public:
  * Traverse vertices incident to volume
  */
 template <typename MAP>
-class Traversor3WV: public Traversor3XY<MAP,VOLUME,VERTEX>
+class Traversor3WV: public Traversor3XY<MAP>
 {
 public:
-	Traversor3WV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,VOLUME,VERTEX>(m, dart, forceDartMarker, thread)	{}
+	Traversor3WV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,VOLUME,VERTEX,forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse edges incident to volume
  */
 template <typename MAP>
-class Traversor3WE: public Traversor3XY<MAP,VOLUME,EDGE>
+class Traversor3WE: public Traversor3XY<MAP>
 {
 public:
-	Traversor3WE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,VOLUME,EDGE>(m, dart, forceDartMarker, thread)	{}
+	Traversor3WE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,VOLUME,EDGE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse faces incident to volume
  */
 template <typename MAP>
-class Traversor3WF: public Traversor3XY<MAP,VOLUME,FACE>
+class Traversor3WF: public Traversor3XY<MAP>
 {
 public:
-	Traversor3WF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,VOLUME,FACE>(m, dart, forceDartMarker, thread) {}
+	Traversor3WF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,VOLUME,FACE, forceDartMarker, thread) {}
 };
 
 
@@ -135,30 +138,30 @@ public:
  * Traverse vertices incident to face
  */
 template <typename MAP>
-class Traversor3FV: public Traversor3XY<MAP,FACE,VERTEX>
+class Traversor3FV: public Traversor3XY<MAP>
 {
 public:
-	Traversor3FV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,FACE,VERTEX>(m, dart, forceDartMarker, thread)	{}
+	Traversor3FV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,FACE,VERTEX, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse edges incident to face
  */
 template <typename MAP>
-class Traversor3FE: public Traversor3XY<MAP,FACE,EDGE>
+class Traversor3FE: public Traversor3XY<MAP>
 {
 public:
-	Traversor3FE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,FACE,EDGE>(m, dart, forceDartMarker, thread)	{}
+	Traversor3FE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,FACE,EDGE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse volumes incident to face
  */
 template <typename MAP>
-class Traversor3FW: public Traversor3XY<MAP,FACE,VOLUME>
+class Traversor3FW: public Traversor3XY<MAP>
 {
 public:
-	Traversor3FW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,FACE,VOLUME>(m, dart, forceDartMarker, thread)	{}
+	Traversor3FW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,FACE,VOLUME, forceDartMarker, thread)	{}
 };
 
 
@@ -166,30 +169,30 @@ public:
  * Traverse vertices incident to edge
  */
 template <typename MAP>
-class Traversor3EV: public Traversor3XY<MAP,EDGE,VERTEX>
+class Traversor3EV: public Traversor3XY<MAP>
 {
 public:
-	Traversor3EV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,EDGE,VERTEX>(m, dart, forceDartMarker, thread)	{}
+	Traversor3EV(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,EDGE,VERTEX, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse faces incident to edge
  */
 template <typename MAP>
-class Traversor3EF: public Traversor3XY<MAP,EDGE,FACE>
+class Traversor3EF: public Traversor3XY<MAP>
 {
 public:
-	Traversor3EF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,EDGE,FACE>(m, dart, forceDartMarker, thread)	{}
+	Traversor3EF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,EDGE,FACE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse volumes incident to edge
  */
 template <typename MAP>
-class Traversor3EW: public Traversor3XY<MAP,EDGE,VOLUME>
+class Traversor3EW: public Traversor3XY<MAP>
 {
 public:
-	Traversor3EW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,EDGE,VOLUME>(m, dart, forceDartMarker, thread)	{}
+	Traversor3EW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,EDGE,VOLUME, forceDartMarker, thread)	{}
 };
 
 
@@ -198,30 +201,30 @@ public:
  * Traverse edges incident to vertex
  */
 template <typename MAP>
-class Traversor3VE: public Traversor3XY<MAP,VERTEX,EDGE>
+class Traversor3VE: public Traversor3XY<MAP>
 {
 public:
-	Traversor3VE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,VERTEX,EDGE>(m, dart, forceDartMarker, thread)	{}
+	Traversor3VE(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,VERTEX,EDGE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse faces incident to vertex
  */
 template <typename MAP>
-class Traversor3VF: public Traversor3XY<MAP,VERTEX,FACE>
+class Traversor3VF: public Traversor3XY<MAP>
 {
 public:
-	Traversor3VF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,VERTEX,FACE>(m, dart, forceDartMarker, thread)	{}
+	Traversor3VF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,VERTEX,FACE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse volumes incident to vertex
  */
 template <typename MAP>
-class Traversor3VW: public Traversor3XY<MAP,VERTEX,VOLUME>
+class Traversor3VW: public Traversor3XY<MAP>
 {
 public:
-	Traversor3VW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP,VERTEX,VOLUME>(m, dart, forceDartMarker, thread)	{}
+	Traversor3VW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP>(m, dart,VERTEX,VOLUME, forceDartMarker, thread)	{}
 };
 
 
@@ -230,30 +233,30 @@ public:
  * Traverse vertices adjacent to a vertex by an edge
  */
 template <typename MAP>
-class Traversor3VVaE: public Traversor3XXaY<MAP,VERTEX,EDGE>
+class Traversor3VVaE: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3VVaE(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,VERTEX,EDGE>(m, d, forceDartMarker, thread)	{}
+	Traversor3VVaE(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,VERTEX,EDGE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse vertices adjacent to a vertex by a face
  */
 template <typename MAP>
-class Traversor3VVaF: public Traversor3XXaY<MAP,VERTEX,FACE>
+class Traversor3VVaF: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3VVaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,VERTEX,FACE>(m, d, forceDartMarker, thread)	{}
+	Traversor3VVaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,VERTEX,FACE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse vertices adjacent to a vertex by a volume
  */
 template <typename MAP>
-class Traversor3VVaW: public Traversor3XXaY<MAP,VERTEX,VOLUME>
+class Traversor3VVaW: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3VVaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,VERTEX,VOLUME>(m, d, forceDartMarker, thread)	{}
+	Traversor3VVaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,VERTEX,VOLUME, forceDartMarker, thread)	{}
 };
 
 
@@ -261,30 +264,30 @@ public:
  * Traverse edges adjacent to an egde by a vertex
  */
 template <typename MAP>
-class Traversor3EEaV: public Traversor3XXaY<MAP,EDGE,VERTEX>
+class Traversor3EEaV: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3EEaV(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,EDGE,VERTEX>(m, d, forceDartMarker, thread)	{}
+	Traversor3EEaV(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,EDGE,VERTEX, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse edges adjacent to an egde by a face
  */
 template <typename MAP>
-class Traversor3EEaF: public Traversor3XXaY<MAP,EDGE,FACE>
+class Traversor3EEaF: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3EEaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,EDGE,FACE>(m, d, forceDartMarker, thread)	{}
+	Traversor3EEaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,EDGE,FACE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse edges adjacent to an egde by a volume
  */
 template <typename MAP>
-class Traversor3EEaW: public Traversor3XXaY<MAP,EDGE,VOLUME>
+class Traversor3EEaW: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3EEaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,EDGE,VOLUME>(m, d, forceDartMarker, thread)	{}
+	Traversor3EEaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,EDGE,VOLUME, forceDartMarker, thread)	{}
 };
 
 
@@ -292,30 +295,30 @@ public:
  * Traverse faces adjacent to a face by a vertex
  */
 template <typename MAP>
-class Traversor3FFaV: public Traversor3XXaY<MAP,FACE,VERTEX>
+class Traversor3FFaV: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3FFaV(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,FACE,VERTEX>(m, d, forceDartMarker, thread)	{}
+	Traversor3FFaV(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,FACE,VERTEX, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse faces adjacent to a face by an edge
  */
 template <typename MAP>
-class Traversor3FFaE: public Traversor3XXaY<MAP,FACE,EDGE>
+class Traversor3FFaE: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3FFaE(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,FACE,EDGE>(m, d, forceDartMarker, thread)	{}
+	Traversor3FFaE(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,FACE,EDGE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse faces adjacent to a face by a volume
  */
 template <typename MAP>
-class Traversor3FFaW: public Traversor3XXaY<MAP,FACE,VOLUME>
+class Traversor3FFaW: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3FFaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,FACE,VOLUME>(m, d, forceDartMarker, thread)	{}
+	Traversor3FFaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,FACE,VOLUME, forceDartMarker, thread)	{}
 };
 
 
@@ -323,30 +326,30 @@ public:
  * Traverse volumes adjacent to a volumee by a vertex
  */
 template <typename MAP>
-class Traversor3WWaV: public Traversor3XXaY<MAP,VOLUME,VERTEX>
+class Traversor3WWaV: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3WWaV(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,VOLUME,VERTEX>(m, d, forceDartMarker, thread)	{}
+	Traversor3WWaV(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,VOLUME,VERTEX, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse volumes adjacent to a volumee by an edge
  */
 template <typename MAP>
-class Traversor3WWaE: public Traversor3XXaY<MAP,VOLUME,EDGE>
+class Traversor3WWaE: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3WWaE(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,VOLUME,EDGE>(m, d, forceDartMarker, thread)	{}
+	Traversor3WWaE(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,VOLUME,EDGE, forceDartMarker, thread)	{}
 };
 
 /**
  * Traverse volumes adjacent to a volumee by a face
  */
 template <typename MAP>
-class Traversor3WWaF: public Traversor3XXaY<MAP,VOLUME,FACE>
+class Traversor3WWaF: public Traversor3XXaY<MAP>
 {
 public:
-	Traversor3WWaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP,VOLUME,FACE>(m, d, forceDartMarker, thread)	{}
+	Traversor3WWaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP>(m, d,VOLUME,FACE, forceDartMarker, thread)	{}
 };
 
 
