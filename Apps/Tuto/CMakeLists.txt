@@ -59,6 +59,11 @@ add_executable( tuto_orbits tuto_orbits.cpp ${tuto_orbits_ui} ${tuto_orbits_moc}
 target_link_libraries( tuto_orbits
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 
+QT4_WRAP_UI( show_traversors_ui show_traversors.ui )
+QT4_WRAP_CPP(show_traversors_moc show_traversors.h)
+add_executable( show_traversors show_traversors.cpp ${show_traversors_ui} ${show_traversors_moc})
+target_link_libraries( show_traversors
+	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 
 #add_executable( tuto_subdivision tuto_subdivision.cpp)
 #target_link_libraries( tuto_subdivision
