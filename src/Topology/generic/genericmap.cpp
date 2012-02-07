@@ -543,7 +543,7 @@ void GenericMap::update_topo_shortcuts()
 				for (unsigned int j=0; j < sub.length(); j++)
 					idx = 10*idx+(sub[j]-'0');
 				if (idx < names.size()-1)
-					m_mrDarts[idx] = m_mrattribs.getDataVector<unsigned char>(i);
+					m_mrDarts[idx] = m_mrattribs.getDataVector<unsigned int>(i);
 				else
 					CGoGNerr<<"Warning problem updating MR_DARTS" << CGoGNendl;
 			}
@@ -666,9 +666,9 @@ void GenericMap::compact()
 		{
 			for (unsigned int j=0; j<nbl; ++j)
 			{
-				unsigned int d_index = m_mrDarts[j][i];
+				unsigned int d_index = m_mrDarts[j]->operator[](i);
 				if (d_index != oldnew[d_index])
-					m_mrDarts[j][i] = Dart(oldnew[d_index]);
+					m_mrDarts[j]->operator[](i) = oldnew[d_index];
 			}
 		}
 	}

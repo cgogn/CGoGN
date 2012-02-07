@@ -264,7 +264,7 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
  *  TOPOLOGICAL MULTIRESOLUTION MANAGEMENT*
  ******************************************/
 
-unsigned int GenericMap::getCurrentLevel()
+inline unsigned int GenericMap::getCurrentLevel()
 {
 	return m_mrCurrentLevel ;
 }
