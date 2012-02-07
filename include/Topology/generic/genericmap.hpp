@@ -33,6 +33,57 @@ inline unsigned int GenericMap::dartIndex(Dart d)
 }
 
 /****************************************
+ *           MULTIRES                   *
+ ****************************************/
+
+inline unsigned int GenericMap::getCurrentLevel()
+{
+	return m_mrCurrentLevel ;
+}
+
+inline void GenericMap::setCurrentLevel(unsigned int l)
+{
+	if(l < m_mrDarts.size())
+		m_mrCurrentLevel = l ;
+	else
+		CGoGNout << "try to access inexisting resolution level" << CGoGNendl ;
+}
+
+inline void GenericMap::pushLevel()
+{
+	m_mrLevelStack.push_back(m_mrCurrentLevel) ;
+}
+
+inline void GenericMap::popLevel()
+{
+	m_mrCurrentLevel = m_mrLevelStack.back() ;
+	m_mrLevelStack.pop_back() ;
+}
+
+inline unsigned int GenericMap::getMaxLevel()
+{
+	return m_mrDarts.size() - 1 ;
+}
+
+inline void GenericMap::addLevel()
+{
+	unsigned int level = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< level ;
+	AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+	m_mrDarts.push_back(amvMR) ;
+	// copy the darts pointers of the previous level
+	if(m_mrDarts.size() > 1)
+		m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
+}
+
+inline unsigned int GenericMap::getDartLevel(Dart d)
+{
+	return m_mrLevels->operator [](d.index) ;
+}
+
+/****************************************
  *           DARTS MANAGEMENT           *
  ****************************************/
 

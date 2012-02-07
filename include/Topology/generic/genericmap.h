@@ -147,34 +147,19 @@ public:
 	 *           MULTIRES                   *
 	 ****************************************/
 
-	unsigned int getCurrentLevel() { return m_mrCurrentLevel ; }
+	unsigned int getCurrentLevel() ;
 
-	void setCurrentLevel(unsigned int l)
-	{
-		if(l < m_mrDarts.size())
-			m_mrCurrentLevel = l ;
-		else
-			CGoGNout << "try to access inexisting resolution level" << CGoGNendl ;
-	}
+	void setCurrentLevel(unsigned int l) ;
 
-	void pushLevel() { m_mrLevelStack.push_back(m_mrCurrentLevel) ; }
+	void pushLevel() ;
 
-	void popLevel() { m_mrCurrentLevel = m_mrLevelStack.back() ; m_mrLevelStack.pop_back() ; }
+	void popLevel() ;
 
-	unsigned int getMaxLevel() { return m_mrDarts.size() - 1 ; }
+	unsigned int getMaxLevel() ;
 
-	void addLevel()
-	{
-		unsigned int level = m_mrDarts.size() ;
-		std::stringstream ss ;
-		ss << "MRdart_"<< level ;
-		AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+	void addLevel() ;
 
-		m_mrDarts.push_back(amvMR) ;
-		// copy the darts pointers of the previous level
-		if(m_mrDarts.size() > 1)
-			m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
-	}
+	unsigned int getDartLevel(Dart d) ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
