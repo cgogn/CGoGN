@@ -101,7 +101,6 @@ DartMarkerStore* MarkerForTraversor<MAP>::dmark()
 
 template <typename MAP>
 Traversor3XY<MAP>::Traversor3XY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY, bool forceDartMarker, unsigned int thread) :
-//	Traversor3MarkOnly<MAP,ORBIT_Y>(map, forceDartMarker, thread, true),
 	m_map(map),
 	m_dmark(NULL),
 	m_cmark(NULL),

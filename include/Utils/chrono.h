@@ -73,7 +73,7 @@ public:
 	/// start the chrono
 	inline void start() { gettimeofday(&m_start, NULL) ; }
 
-	/// return elapsed time since start (cumulative if several calls)
+	/// return elapsed time since start in ms (cumulative if several calls)
 	inline int elapsed()
 	{
 		gettimeofday(&m_end, NULL) ;
