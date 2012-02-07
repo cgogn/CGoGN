@@ -258,20 +258,34 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVect
 
 inline Dart GenericMap::begin()
 {
-	return Dart::create(m_attribs[DART].begin());
+	if (m_isMultiRes)
+	{
+		unsigned int d = m_mrattribs.begin() ;
+		while (getDartLevel(d) > m_mrCurrentLevel)
+			m_mrattribs.next(d) ;
+		return Dart::create(d) ;
+	}
+
+	return Dart::create(m_attribs[DART].begin()) ;
 }
 
 inline Dart GenericMap::end()
 {
+	if (m_isMultiRes)
+		return Dart::create(m_mrattribs.end()) ;
+
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
 inline void GenericMap::next(Dart& d)
 {
-	unsigned int d_index = dartIndex(d);
-	m_attribs[DART].next(d_index) ;
-
-	d = Dart::create(d_index);
+	if (m_isMultiRes)
+	{
+		while ((d.index != m_mrattribs.end() ) && (getDartLevel(d.index) > m_mrCurrentLevel))
+			m_mrattribs.next(d.index) ;
+	}
+	else
+		m_attribs[DART].next(d.index) ;
 }
 
 /****************************************
