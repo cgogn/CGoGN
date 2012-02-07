@@ -259,4 +259,42 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
 	return amv ;
 }
 
+
+/******************************************
+ *  TOPOLOGICAL MULTIRESOLUTION MANAGEMENT*
+ ******************************************/
+
+unsigned int GenericMap::getCurrentLevel()
+{
+	return m_mrCurrentLevel ;
+}
+
+
+inline void GenericMap::setCurrentLevel(unsigned int l)
+{
+	if (l < m_mrDarts.size())
+		m_mrCurrentLevel = l ;
+	else
+		CGoGNout << "try to access inexisting resolution level" << CGoGNendl ;
+}
+
+inline void GenericMap::pushLevel()
+{
+	m_mrLevelStack.push_back(m_mrCurrentLevel) ;
+}
+
+
+inline void GenericMap::popLevel()
+{
+	m_mrCurrentLevel = m_mrLevelStack.back() ;
+	m_mrLevelStack.pop_back() ;
+}
+
+
+inline unsigned int GenericMap::getMaxLevel()
+{
+	return m_mrDarts.size() - 1 ;
+}
+
+
 } //namespace CGoGN

@@ -112,13 +112,29 @@ protected:
 	static const bool m_isMultiRes = false ;
 #endif
 
+	/**
+	 * container for mr-darts that store indices in attribs[DART] for each level
+	 */
 	AttributeContainer m_mrattribs ;
 
+	/**
+	 * pointer to indices mvectors (one for each level)
+	 */
 	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
+
+	/**
+	 * pointers to mvector of levels
+	 */
 	AttributeMultiVector<unsigned char>* m_mrLevels ;
 
+	/**
+	 * current level of multiresoltion
+	 */
 	unsigned int m_mrCurrentLevel ;
 
+	/**
+	 * stack for current level temporary storage
+	 */
 	std::vector<unsigned int> m_mrLevelStack ;
 
 public:
@@ -147,34 +163,34 @@ public:
 	 *           MULTIRES                   *
 	 ****************************************/
 
-	unsigned int getCurrentLevel() { return m_mrCurrentLevel ; }
+	/**
+	 * get the current level of multi-resolution (use only in MRMaps)
+	 */
+	unsigned int getCurrentLevel() ;
 
-	void setCurrentLevel(unsigned int l)
-	{
-		if(l < m_mrDarts.size())
-			m_mrCurrentLevel = l ;
-		else
-			CGoGNout << "try to access inexisting resolution level" << CGoGNendl ;
-	}
+	/**
+	 * set the current level of multi-resolution (use only in MRMaps)
+	 */
+	void setCurrentLevel(unsigned int l) ;
+	/**
+	 * store current level of multi-resolution on a stack (use only in MRMaps)
+	 */
+	void pushLevel() ;
 
-	void pushLevel() { m_mrLevelStack.push_back(m_mrCurrentLevel) ; }
+	/**
+	 * get back level of multi-resolution of the stack  in current (use only in MRMaps)
+	 */
+	void popLevel() ;
 
-	void popLevel() { m_mrCurrentLevel = m_mrLevelStack.back() ; m_mrLevelStack.pop_back() ; }
+	/**
+	 * get the max level of multi-resolution (use only in MRMaps)
+	 */
+	unsigned int getMaxLevel() ;
 
-	unsigned int getMaxLevel() { return m_mrDarts.size() - 1 ; }
-
-	void addLevel()
-	{
-		unsigned int level = m_mrDarts.size() ;
-		std::stringstream ss ;
-		ss << "MRdart_"<< level ;
-		AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
-
-		m_mrDarts.push_back(amvMR) ;
-		// copy the darts pointers of the previous level
-		if(m_mrDarts.size() > 1)
-			m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
-	}
+	/**
+	 * add a level of multi-resolution (use only in MRMaps)
+	 */
+	void addLevel() ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
