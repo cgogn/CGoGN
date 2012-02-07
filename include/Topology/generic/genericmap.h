@@ -112,13 +112,29 @@ protected:
 	static const bool m_isMultiRes = false ;
 #endif
 
+	/**
+	 * container for mr-darts that store indices in attribs[DART] for each level
+	 */
 	AttributeContainer m_mrattribs ;
 
+	/**
+	 * pointer to indices mvectors (one for each level)
+	 */
 	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
+
+	/**
+	 * pointers to mvector of levels
+	 */
 	AttributeMultiVector<unsigned char>* m_mrLevels ;
 
+	/**
+	 * current level of multiresoltion
+	 */
 	unsigned int m_mrCurrentLevel ;
 
+	/**
+	 * stack for current level temporary storage
+	 */
 	std::vector<unsigned int> m_mrLevelStack ;
 
 public:
@@ -147,18 +163,39 @@ public:
 	 *           MULTIRES                   *
 	 ****************************************/
 
+	/**
+	 * get the current level of multi-resolution (use only in MRMaps)
+	 */
 	unsigned int getCurrentLevel() ;
 
+	/**
+	 * set the current level of multi-resolution (use only in MRMaps)
+	 */
 	void setCurrentLevel(unsigned int l) ;
 
+	/**
+	 * store current level of multi-resolution on a stack (use only in MRMaps)
+	 */
 	void pushLevel() ;
 
+	/**
+	 * get back level of multi-resolution of the stack in current (use only in MRMaps)
+	 */
 	void popLevel() ;
 
+	/**
+	 * get the max level of multi-resolution (use only in MRMaps)
+	 */
 	unsigned int getMaxLevel() ;
 
+	/**
+	 * add a level of multi-resolution (use only in MRMaps)
+	 */
 	void addLevel() ;
 
+	/**
+	 * get the insertion level of a dart (use only in MRMaps)
+	 */
 	unsigned int getDartLevel(Dart d) ;
 
 	/****************************************

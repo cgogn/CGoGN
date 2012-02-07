@@ -33,6 +33,31 @@ namespace Algo
 {
 namespace Render
 {
+/**
+ * add a cell to a drawer
+ * @param the cell (VERTEX,EDGE,...)
+ *  * @param dr the drawer to use
+ * @param map the map
+ * @param d the dart
+ * @param positions attribute of positions
+ * @param k shrinking factor
+ */
+template<typename PFP>
+void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const typename PFP::TVEC3& positions);
+
+
+/**
+ * add a set of volumes to a drawer
+ * @param the cell (VERTEX,EDGE,...)
+ * @param dr the drawer to use
+ * @param map the map
+ * @param vd the darts
+ * @param positions attribute of positions
+ * @param k shrinking factor
+ */
+template<typename PFP>
+void drawerCell(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions);
+
 
 /**
  * add a set of vertices to a drawer
@@ -87,7 +112,6 @@ void drawerVolumes(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>&
  * @param map the map
  * @param d the dart
  * @param positions attribute of positions
- * @param k shrinking factor
  */
 template<typename PFP>
 void drawerVertex(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions);

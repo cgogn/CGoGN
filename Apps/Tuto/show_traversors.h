@@ -90,22 +90,22 @@ class MyQT: public Utils::QT::SimpleQT
 	bool m_showTopo;
 
 	
-	unsigned int m_val_combo1;
-	unsigned int m_val_combo2;
-	unsigned int m_val_combo3;
-	unsigned int m_val_combo4;
-	unsigned int m_val_combo5;
-	unsigned int m_val_combo6;
+	unsigned int m_first3;
+	unsigned int m_ajd_or_inci3;
+	unsigned int m_second3;
+	unsigned int m_first2;
+	unsigned int m_ajd_or_inci2;
+	unsigned int m_second2;
 public:
 	MyQT():
 		m_render_topo(NULL),
 		m_showTopo(true),
-		m_val_combo1(1),
-		m_val_combo2(1),
-		m_val_combo3(2),
-		m_val_combo4(1),
-		m_val_combo5(1),
-		m_val_combo6(2),
+		m_first3(0),
+		m_ajd_or_inci3(0),
+		m_second3(1),
+		m_first2(0),
+		m_ajd_or_inci2(0),
+		m_second2(1),
 		m_selected(NIL)
 
 	{}

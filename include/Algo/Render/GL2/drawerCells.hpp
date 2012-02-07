@@ -145,6 +145,51 @@ void drawerVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const typen
 	drawerAddVolume<PFP>(dr,map,d,positions,k);
 	dr.end();
 }
+template<typename PFP>
+void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const typename PFP::TVEC3& positions, float k)
+{
+	switch(cell)
+	{
+	case VERTEX:
+		drawerVertices<PFP>(dr, map, vd, positions);
+		break;
+	case EDGE:
+		drawerEdges<PFP>(dr, map, vd, positions,k);
+		break;
+	case FACE:
+		drawerFaces<PFP>(dr, map, vd, positions,k);
+		break;
+	case VOLUME:
+		drawerVolumes<PFP>(dr, map, vd, positions,k);
+		break;
+	default:
+		break;
+	}
+}
+
+
+template<typename PFP>
+void drawerCell(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, float k)
+{
+	switch(cell)
+	{
+	case VERTEX:
+		drawerVertex<PFP>(dr, map, d, positions);
+		break;
+	case EDGE:
+		drawerEdge<PFP>(dr, map, d, positions,k);
+		break;
+	case FACE:
+		drawerFace<PFP>(dr, map, d, positions,k);
+		break;
+	case VOLUME:
+		drawerVolume<PFP>(dr, map, d, positions,k);
+		break;
+	default:
+		break;
+	}
+}
+
 
 }
 }
