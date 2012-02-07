@@ -584,6 +584,11 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
+void GMap2::splitCC(std::vector<Dart>& vd)
+{
+	//assert(checkSimpleOrientedPath(vd)) ;
+}
+
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/

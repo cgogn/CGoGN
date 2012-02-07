@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-#define WITH_GMAP 0
+//#define WITH_GMAP 0
 
 #include "Topology/generic/parameters.h"
 #ifdef WITH_GMAP

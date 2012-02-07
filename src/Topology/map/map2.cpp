@@ -359,7 +359,7 @@ void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 
 void Map2::unsewFaces(Dart d)
 {
-	assert(!isBoundaryEdge(d)) ;
+	assert(!Map2::isBoundaryEdge(d)) ;
 
 	Dart dd = phi2(d) ;
 
@@ -407,7 +407,7 @@ bool Map2::collapseDegeneratedFace(Dart d)
 
 void Map2::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameFace(d, e)) ;
+	assert(d != e && Map2::sameFace(d, e)) ;
 	Dart dd = Map1::cutEdge(phi_1(d)) ;
 	Dart ee = Map1::cutEdge(phi_1(e)) ;
 	Map1::splitCycle(dd, ee) ;
@@ -513,6 +513,14 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	Map1::deleteCycle(e);
 
 	return true ;
+}
+
+void Map2::splitCC(std::vector<Dart>& vd)
+{
+	//assert(checkSimpleOrientedPath(vd)) ;
+
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		Map2::unsewFaces(*it);
 }
 
 /*! @name Topological Queries

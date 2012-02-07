@@ -450,67 +450,70 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 
 		map.splitVolume(v) ;
 
-//		Dart old = map.phi2(map.phi1(dit));
-//		Dart dd = map.phi1(map.phi1(old)) ;
-//		map.splitFace(old,dd) ;
-//
-//		unsigned int idface = map.getNewFaceId();
-//		map.setFaceId(dd,idface, FACE);
-//
-//		Dart ne = map.phi1(map.phi1(old)) ;
-//
-//		map.cutEdge(ne);
-//		centralDart = map.phi1(ne);
-//		newEdges.push_back(ne);
-//		newEdges.push_back(map.phi1(ne));
-//
-//		unsigned int id = map.getNewEdgeId() ;
-//		map.setEdgeId(ne, id, EDGE) ;
-//
-//		Dart stop = map.phi2(map.phi1(ne));
-//		ne = map.phi2(ne);
-//		do
-//		{
-//			dd = map.phi1(map.phi1(map.phi1(ne)));
-//
-//			map.splitFace(ne, dd) ;
-//			unsigned int idface = map.getNewFaceId();
-//			map.setFaceId(dd,idface, FACE);
-//
-//			newEdges.push_back(map.phi1(dd));
-//
-//			ne = map.phi2(map.phi_1(ne));
-//			dd = map.phi1(map.phi1(dd));
-//		}
-//		while(dd != stop);
+		Dart old = map.phi2(map.phi1(dit));
+		Dart dd = map.phi1(map.phi1(old)) ;
+		map.splitFace(old,dd) ;
+
+		unsigned int idface = map.getNewFaceId();
+		map.setFaceId(dd,idface, FACE);
+
+		Dart ne = map.phi1(map.phi1(old)) ;
+
+		map.cutEdge(ne);
+		centralDart = map.phi1(ne);
+		newEdges.push_back(ne);
+		newEdges.push_back(map.phi1(ne));
+		position[centralDart] = volCenter;
+
+		unsigned int id = map.getNewEdgeId() ;
+		map.setEdgeId(ne, id, EDGE) ;
+
+		Dart stop = map.phi2(map.phi1(ne));
+		ne = map.phi2(ne);
+		do
+		{
+			dd = map.phi1(map.phi1(map.phi1(ne)));
+
+			map.splitFace(ne, dd) ;
+			unsigned int idface = map.getNewFaceId();
+			map.setFaceId(dd,idface, FACE);
+
+			newEdges.push_back(map.phi1(dd));
+
+			ne = map.phi2(map.phi_1(ne));
+			dd = map.phi1(map.phi1(dd));
+		}
+		while(dd != stop);
 
 	}
 
-//	map.deleteVolume(map.phi3(map.phi2(map.phi1(traV.begin()))));
-//
+
 //	//Third step : 3-sew internal faces
 //	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
 //	{
 //		Dart f1 = (*it).first;
 //		Dart f2 = (*it).second;
 //
+//
 //		if(map.isBoundaryFace(map.phi2(f1)) && map.isBoundaryFace(map.phi2(f2)))
 //		{
+//			std::cout << "boundary" << std::endl;
 //			//id pour toutes les faces interieures
 //			map.sewVolumes(map.phi2(f1), map.phi2(f2));
-//
-//			//Fais a la couture !!!!!
-//			unsigned int idface = map.getNewFaceId();
-//			map.setFaceId(map.phi2(f1),idface, FACE);
+//			break;
+////
+////			//Fais a la couture !!!!!
+////			unsigned int idface = map.getNewFaceId();
+////			map.setFaceId(map.phi2(f1),idface, FACE);
 //		}
-//
-//		//FAIS a la couture !!!!!!!
-//		//id pour toutes les aretes exterieurs des faces quadrangulees
-//		unsigned int idedge = map.getEdgeId(f1);
-//		map.setEdgeId(map.phi2(f1), idedge, DART);
-//		map.setEdgeId( map.phi2(f2), idedge, DART);
+////
+////		//FAIS a la couture !!!!!!!
+////		//id pour toutes les aretes exterieurs des faces quadrangulees
+////		unsigned int idedge = map.getEdgeId(f1);
+////		map.setEdgeId(map.phi2(f1), idedge, DART);
+////		map.setEdgeId( map.phi2(f2), idedge, DART);
 //	}
-//
+
 //	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
 //	//id pour les aretes interieurs : (i.e. 6 pour un hexa)
 //	DartMarker mne(map);
@@ -523,9 +526,9 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 //			mne.markOrbit(EDGE, newEdges[i]);
 //		}
 //	}
-//
-//
-//	position[centralDart] = volCenter; //plonger a la fin de la boucle ????
+
+
+	//plonger a la fin de la boucle ????
 
 	map.setCurrentLevel(cur) ;
 

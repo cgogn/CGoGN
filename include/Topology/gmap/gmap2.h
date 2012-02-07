@@ -252,6 +252,13 @@ public:
 	 *  @return true if the merge has been executed, false otherwise
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e);
+
+	//!
+	/*!
+	 *
+	 */
+	virtual void splitCC(std::vector<Dart>& vd);
+
 	//@}
 
 	/*! @name Topological Queries

@@ -490,11 +490,25 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 
 	Map2::fillHole(e) ;
 
+	Dart b = Map1::newBoundaryCycle(vd.size());
+
+	Dart fit1 = phi2(e) ;
+	Dart fit2 = b ;
+	do
+	{
+		phi3sew(fit1, fit2) ;
+
+		fit1 = phi1(fit1) ;
+		fit2 = phi_1(fit2) ;
+	} while(fit2 != b) ;
+
+
+
 //	if(isBoundaryMarked(e2))
-		Map2::fillHole(e2) ;
+//		Map2::fillHole(e2) ;
 
 	//sew the two connected components
-	Map3::sewVolumes(phi2(e), phi2(e2), false);
+//	Map3::sewVolumes(phi2(e), phi2(e2), false);
 }
 
 /*! @name Topological Queries

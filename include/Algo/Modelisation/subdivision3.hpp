@@ -184,26 +184,38 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		std::vector<Dart> v;
 		do
 		{
-			Dart dN = map.phi1(map.phi2(d));
+			v.push_back(map.phi1(map.phi1(d)));
+			v.push_back(map.phi1(d));
 
-	 		Dart dRing = map.phi1(d);
+			d = map.phi2(map.phi_1(d));
+		}
+		while(d != *it);
 
-	 		if(map.phi2(dRing)!=dRing)
-	 		{
-	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
-	 			v.push_back(dRing);
-	 		}
+//		do
+//		{
+//			Dart dN = map.phi1(map.phi2(d));
+//
+//	 		Dart dRing = map.phi1(d);
+//
+//	 		if(map.phi2(dRing)!=dRing)
+//	 		{
+//	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
+//	 			v.push_back(dRing);
+//	 		}
+//
+//	 		dRing = map.phi1(dRing);
+//
+//	 		if(map.phi2(dRing)!=dRing)
+//	 		{
+//	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
+//	 			v.push_back(dRing);
+//	 		}
+//
+//			d = dN;
+//		} while (d != *it);
 
-	 		dRing = map.phi1(dRing);
-
-	 		if(map.phi2(dRing)!=dRing)
-	 		{
-	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
-	 			v.push_back(dRing);
-	 		}
-
-			d = dN;
-		} while (d != *it);
+		map.splitCC(v);
+		map.fillHole(v.front());
 
 //		//close the generated hole and create the central vertex
 //		//unsigned int degree = map.closeHole(map.phi1(d));
@@ -211,12 +223,12 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		//TODO : pb de face en trop avec splitVolume
 		//map.splitVolume(v);
 
-		Dart e = v.front();
-		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-			if(map.Map2::isBoundaryEdge(*it))
-				map.unsewFaces(*it);
+		//
 
-		map.fillHole(e) ;
+//		Dart e = v.front();
+//		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
+//			if(map.Map2::isBoundaryEdge(*it))
+//				map.unsewFaces(*it);
 
 //		Dart dd = map.phi1(map.phi2(map.phi1(d)));
 //		map.splitFace(map.phi_1(dd),map.phi1(dd));
