@@ -64,7 +64,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q1 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != d) ;
 
 		// compute the error quadric associated to v2
@@ -73,7 +73,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q2 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != dd) ;
 	}
 	else // if the selector is QEM, use the error quadrics computed by the selector
@@ -138,7 +138,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q1 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != d) ;
 
 		// compute the error quadric associated to v2
@@ -147,7 +147,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q2 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != dd) ;
 	}
 	else // if the selector is QEM, use the error quadrics computed by the selector
@@ -312,14 +312,14 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	do
 	{
 		++k1 ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while(it != d) ;
 	REAL k2 = 0 ;
 	it = dd ;
 	do
 	{
 		++k2 ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while(it != dd) ;
 	REAL alpha = (k1-1) * (k2-1) / (k1*k2-1) ;
 
@@ -330,7 +330,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	do
 	{
 		m1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != d) ;
 	m1 /= REAL(count) ;
@@ -342,7 +342,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	do
 	{
 		m2 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != dd) ;
 	m2 /= REAL(count) ;

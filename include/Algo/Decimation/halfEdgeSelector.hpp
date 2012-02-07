@@ -161,7 +161,7 @@ void HalfEdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool reco
    	do {
    		// Make step
    		dBack = this->m_map.phi1(dFront) ;
-       	dFront = this->m_map.alpha1(dFront) ;
+       	dFront = this->m_map.phi2_1(dFront) ;
 
        	if (this->m_map.phi2(dFront) != dFront) { // if dFront is no border
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[dBack],this->m_position[this->m_map.phi1(dFront)]) ;
@@ -195,7 +195,7 @@ void HalfEdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 
 		Dart stop = m.phi2(vit) ;
 		assert (stop != vit) ;
-		Dart vit2 = m.alpha_1(m.phi1(vit)) ;
+		Dart vit2 = m.phi12(m.phi1(vit)) ;
 		do {
 			updateHalfEdgeInfo(vit2, true) ;
 			d = m.phi2(vit2) ;
@@ -207,9 +207,9 @@ void HalfEdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 			if (d != m.phi1(vit2)) ;
 				updateHalfEdgeInfo(d, false) ;
 
-			vit2 = m.alpha_1(vit2) ;
+			vit2 = m.phi12(vit2) ;
 		} while (stop != vit2) ;
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = halfEdges.begin() ; // set the current edge to the first one
@@ -418,7 +418,7 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
    	do {
    		// Make step
    		dBack = this->m_map.phi1(dFront) ;
-       	dFront = this->m_map.alpha1(dFront) ;
+       	dFront = this->m_map.phi2_1(dFront) ;
 
        	if (dBack != dFront) { // if dFront is no border
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi1(dFront)],this->m_position[dBack]) ;
@@ -451,7 +451,7 @@ void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 
 		Dart stop = m.phi2(vit) ;
 		assert (stop != vit) ;
-		Dart vit2 = m.alpha_1(m.phi1(vit)) ;
+		Dart vit2 = m.phi12(m.phi1(vit)) ;
 		do {
 			updateHalfEdgeInfo(vit2, true) ;
 			d = m.phi2(vit2) ;
@@ -463,9 +463,9 @@ void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 			if (d != m.phi1(vit2)) ;
 				updateHalfEdgeInfo(d, false) ;
 
-			vit2 = m.alpha_1(vit2) ;
+			vit2 = m.phi12(vit2) ;
 		} while (stop != vit2) ;
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 
@@ -694,19 +694,19 @@ void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one

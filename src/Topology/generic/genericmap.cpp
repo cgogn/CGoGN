@@ -91,6 +91,15 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	m_isMultiRes = false;
 #endif
 
+	if(m_isMultiRes)
+	{
+		m_mrDarts.reserve(16) ;
+		m_mrLevelStack.reserve(16) ;
+
+		m_mrLevels = m_mrattribs.addAttribute<unsigned char>("MRLevel") ;
+		addLevel() ;
+		setCurrentLevel(0) ;
+	}
 }
 
 GenericMap::~GenericMap()

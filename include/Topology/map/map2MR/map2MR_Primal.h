@@ -22,61 +22,18 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef __MAP2MR_PRIMAL__
+#define __MAP2MR_PRIMAL__
+
+#include "Topology/map/map2.h"
+
 namespace CGoGN
 {
 
-namespace Algo
+class Map2MR_Primal : protected Map2
 {
+} ;
 
-namespace BooleanOperator
-{
+} // namespace CGoGN
 
-template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e)
-{
-	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
-	Dart dd;
-	do
-	{
-		dd = map.phi2_1(d);
-		map.removeEdgeFromVertex(dd);
-		Dart ee = e;
-		do
-		{
-			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
-					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.phi2_1(ee))])==Geom::RIGHT)
-			{
-				break;
-			}
-			ee = map.phi2_1(ee);
-		} while(ee != e);
-		map.insertEdgeInVertex(ee,dd);
-	} while(dd!=d);
-}
-
-template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions)
-{
-	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
-	{
-		CellMarker vM(map,VERTEX);
-		vM.mark(d);
-		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
-		{
-			if(!vM.isMarked(dd))
-			{
-				vM.mark(dd);
-				if(Geom::arePointsEquals(positions[d],positions[dd]))
-				{
-					mergeVertex<PFP>(map,positions,d,dd);
-				}
-			}
-		}
-	}
-}
-
-}
-
-}
-
-}
+#endif

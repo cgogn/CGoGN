@@ -287,7 +287,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions, Dar
 	do
 	{
 		the_map.cutEdge(cc);
-		cc = the_map.alpha1(cc);
+		cc = the_map.phi2_1(cc);
 	}while (cc != c);
 
 	// cut faces
@@ -296,7 +296,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions, Dar
 		Dart d1 = the_map.phi1(cc);
 		Dart d2 = the_map.phi_1(cc);
 		the_map.splitFace(d1,d2);
-		cc = the_map.alpha1(cc);
+		cc = the_map.phi2_1(cc);
 	}while (cc != c);
 
 	// delete the central vertex

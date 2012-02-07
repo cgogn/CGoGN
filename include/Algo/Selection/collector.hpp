@@ -195,7 +195,7 @@ void Collector_WithinSphere<PFP>::collectAll(Dart d)
 					}
 				}
 			}
-			e = this->map.alpha1(e);
+			e = this->map.phi2_1(e);
 		} while (e != end);
 		++i;
 	}
@@ -243,7 +243,7 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 				}
 				em.mark(e);
 			}
-			e = this->map.alpha1(e);
+			e = this->map.phi2_1(e);
 		} while (e != end);
 		++i;
 	}

@@ -24,32 +24,13 @@
 
 namespace CGoGN
 {
-//#ifndef CGoGN_FORCE_MR
+
 inline unsigned int GenericMap::dartIndex(Dart d)
 {
 	if (m_isMultiRes)
-	{
-		std::cout << "Not implemented"<< std::endl;
-		return 0xffffffff;
-	}
+		return m_mrDarts[m_mrCurrentLevel]->operator[](d.index) ;
 	return d.index;
 }
-//#elif CGoGN_FORCE_MR == 1
-//inline unsigned int GenericMap::dartIndex(Dart d)
-//{
-//	std::cout << "Not implemented"<< std::endl;
-//	return 0xffffffff;
-//}
-//#else
-//inline unsigned int GenericMap::dartIndex(Dart d)
-//{
-//	return d.index;
-//}
-//#endif
-
-
-
-
 
 /****************************************
  *           DARTS MANAGEMENT           *
@@ -57,15 +38,23 @@ inline unsigned int GenericMap::dartIndex(Dart d)
 
 inline Dart GenericMap::newDart()
 {
-	Dart d = Dart::create(m_attribs[DART].insertLine());
-	unsigned int d_index = dartIndex(d);
+	unsigned int di = m_attribs[DART].insertLine();
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
+	{
 		if (m_embeddings[i])
-		{
-			(*m_embeddings[i])[d_index] = EMBNULL ;
-		}
-
-	return d ;
+			(*m_embeddings[i])[di] = EMBNULL ;
+	}
+	if (m_isMultiRes)
+	{
+		unsigned int mrdi = m_mrattribs.insertLine() ;
+		m_mrLevels->operator[](mrdi) = m_mrCurrentLevel ;
+		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)
+			m_mrDarts[i]->operator[](mrdi) = MRNULL ;
+		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
+			m_mrDarts[i]->operator[](mrdi) = di ;
+		return Dart::create(mrdi) ;
+	}
+	return Dart::create(di) ;
 }
 
 inline void GenericMap::deleteDart(Dart d)
@@ -90,15 +79,36 @@ inline void GenericMap::deleteDart(Dart d)
 			}
 		}
 	}
+
+	// hypothese : le brin MR pointe vers le même brin pour tous les niveaux >= au courant
+	if(m_isMultiRes)
+	{
+		if(m_mrCurrentLevel == 0)
+			m_mrattribs.removeLine(d.index) ;
+		else
+		{
+			unsigned int di = m_mrDarts[m_mrCurrentLevel - 1]->operator[](d.index) ;
+			for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
+				m_mrDarts[i]->operator[](d.index) = di ;
+		}
+	}
 }
 
 inline bool GenericMap::isDartValid(Dart d)
 {
-	return !d.isNil() && m_attribs[DART].used( dartIndex(d)) ;
+	return !d.isNil() && m_attribs[DART].used(dartIndex(d)) ;
 }
 
 inline unsigned int GenericMap::getNbDarts()
 {
+	if(m_isMultiRes)
+	{
+		unsigned int nbDarts = 0 ;
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+			if(m_mrLevels->operator[](i) <= m_mrCurrentLevel)
+				++nbDarts ;
+		return nbDarts ;
+	}
 	return m_attribs[DART].size() ;
 }
 

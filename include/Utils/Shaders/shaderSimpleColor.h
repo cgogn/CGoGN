@@ -52,7 +52,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderSimpleColor();
+	ShaderSimpleColor(bool back_is_transparent = false);
 
 	void setColor(const Geom::Vec4f& color);
 

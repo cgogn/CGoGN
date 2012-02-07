@@ -56,18 +56,18 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d, AttributeHandler<unsigned i
 	unsigned int vu1[32]; // pas de vector mais un tableau (find a la main, mais pas d'allocation par reserve)
 	val_vd -= 3; // evite le -3 dans la boucle
 	val_vdd -= 3;
-	Dart vit1 = map.alpha1(map.alpha1(d));
+	Dart vit1 = map.phi2_1(map.phi2_1(d));
 
 	for (unsigned int i = 0; i< val_vd; ++i)
 	{
 		unsigned int ve = map.getEmbedding(map.phi2(vit1),VERTEX);
 		vu1[i] = ve;
-		vit1 = map.alpha1(vit1);
+		vit1 = map.phi2_1(vit1);
 	}
 
 	val_vd--; // pour le parcours avec while >=0
 
-	Dart vit2 = map.alpha1(map.alpha1(dd));
+	Dart vit2 = map.phi2_1(map.phi2_1(dd));
 	for (unsigned int i = 0; i< val_vdd; ++i)
 	{
 		unsigned int ve = map.getEmbedding(map.phi2(vit2),VERTEX);
@@ -79,7 +79,7 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d, AttributeHandler<unsigned i
 				return false;
 			--j;
 		}
-		vit2 = map.alpha1(vit2);
+		vit2 = map.phi2_1(vit2);
 	}
 
 	return true;
@@ -96,16 +96,16 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d)
 
 	int val_vd = 0 ;
 	Dart tmp = d ;
-	do { ++val_vd ;	tmp = map.alpha1(tmp) ; } while(tmp != d) ;
+	do { ++val_vd ;	tmp = map.phi2_1(tmp) ; } while(tmp != d) ;
 	int val_vdd = 0 ;
 	tmp = dd ;
-	do { ++val_vdd ; tmp = map.alpha1(tmp) ; } while(tmp != dd) ;
+	do { ++val_vdd ; tmp = map.phi2_1(tmp) ; } while(tmp != dd) ;
 	int val_vdp = 0 ;
 	tmp = dp ;
-	do { ++val_vdp ; tmp = map.alpha1(tmp) ; } while(tmp != dp) ;
+	do { ++val_vdp ; tmp = map.phi2_1(tmp) ; } while(tmp != dp) ;
 	int val_vddp = 0 ;
 	tmp = ddp ;
-	do { ++val_vddp ; tmp = map.alpha1(tmp) ; } while(tmp != ddp) ;
+	do { ++val_vddp ; tmp = map.phi2_1(tmp) ; } while(tmp != ddp) ;
 
 	if(val_vd + val_vdd < 8 || val_vd + val_vdd > 11 || val_vdp < 5 || val_vddp < 5)
 		return false;
@@ -115,18 +115,18 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d)
 	unsigned int vu1[32]; // pas de vector mais un tableau (find a la main, mais pas d'allocation par reserve)
 	val_vd -= 3; // evite le -3 dans la boucle
 	val_vdd -= 3;
-	Dart vit1 = map.alpha1(map.alpha1(d));
+	Dart vit1 = map.phi2_1(map.phi2_1(d));
 
 	for (int i = 0; i < val_vd; ++i)
 	{
 		unsigned int ve = map.getEmbedding(map.phi2(vit1),VERTEX);
 		vu1[i] = ve;
-		vit1 = map.alpha1(vit1);
+		vit1 = map.phi2_1(vit1);
 	}
 
 	val_vd--; // pour le parcours avec while >=0
 
-	Dart vit2 = map.alpha1(map.alpha1(dd));
+	Dart vit2 = map.phi2_1(map.phi2_1(dd));
 	for (int i = 0; i < val_vdd; ++i)
 	{
 		unsigned int ve = map.getEmbedding(map.phi2(vit2),VERTEX);
@@ -138,7 +138,7 @@ bool edgeCanCollapse(typename PFP::MAP& map, Dart d)
 				return false;
 			--j;
 		}
-		vit2 = map.alpha1(vit2);
+		vit2 = map.phi2_1(vit2);
 	}
 
 	return true;

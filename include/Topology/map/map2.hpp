@@ -114,6 +114,16 @@ inline Dart Map2::alpha_1(Dart d)
 	return phi1(phi2(d)) ;
 }
 
+inline Dart Map2::phi2_1(Dart d)
+{
+	return phi2(phi_1(d)) ;
+}
+
+inline Dart Map2::phi12(Dart d)
+{
+	return phi1(phi2(d)) ;
+}
+
 inline void Map2::phi2sew(Dart d, Dart e)
 {
 	unsigned int d_index = dartIndex(d);

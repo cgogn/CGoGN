@@ -61,6 +61,7 @@ void MyQT::orbit_list(int x)
 {
 	storeVerticesInfo<int>(m_att_orbits[x]);
 	current_orbit = x;
+	m_selected.clear();
 	updateGL();
 }
 
@@ -234,7 +235,7 @@ int main(int argc, char **argv)
     sqt.setDock(&dock);
 
  	// message d'aide
-	sqt.setHelpMsg("Enter pour dock on/off\nShift Enter pour console on/off\nShift Click gauche pour selectionner un brin");
+	sqt.setHelpMsg("Select an orbit then\nshift click left to select a dart");
 
 	sqt.initMap();
 

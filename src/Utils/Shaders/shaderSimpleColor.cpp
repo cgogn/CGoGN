@@ -54,7 +54,7 @@ namespace Utils
 //		"}";
 
 
-ShaderSimpleColor::ShaderSimpleColor()
+ShaderSimpleColor::ShaderSimpleColor(bool black_is_transparent)
 {
 	m_nameVS = "ShaderSimpleColor_vs";
 	m_nameFS = "ShaderSimpleColor_fs";
@@ -66,6 +66,8 @@ ShaderSimpleColor::ShaderSimpleColor()
 	glxvert.append(vertexShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	if (black_is_transparent)
+		glxfrag.append("#define BLACK_TRANSPARENCY 1\n");
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());

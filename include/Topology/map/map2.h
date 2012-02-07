@@ -89,6 +89,16 @@ public:
 
 	Dart alpha_1(Dart d);
 
+	/**
+	 * prefer phi2_1 to alpha1 in algo if your want it to work in Map2 of Map3
+	 */
+	Dart phi2_1(Dart d);
+
+	/**
+	 * prefer phi21 to alpha_1 in algo if your want it to work in Map2 of Map3
+	 */
+	Dart phi12(Dart d);
+
 protected:
 	//! Link dart d with dart e by an involution
 	/*  @param d,e the darts to link

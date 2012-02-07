@@ -48,7 +48,7 @@ protected:
     void restoreUniformsAttribs();
 
 public:
-    ShaderColorPerVertex();
+    ShaderColorPerVertex(bool black_is_transparent = false);
 
 	unsigned int setAttributePosition(VBO* vbo);
 
