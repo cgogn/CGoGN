@@ -214,9 +214,6 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //			d = dN;
 //		} while (d != *it);
 
-		map.splitCC(v);
-		map.fillHole(v.front());
-
 //		//close the generated hole and create the central vertex
 //		//unsigned int degree = map.closeHole(map.phi1(d));
 
