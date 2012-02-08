@@ -90,16 +90,6 @@ GenericMap::GenericMap() : m_nbThreads(1)
 #ifndef CGoGN_FORCE_MR
 	m_isMultiRes = false;
 #endif
-
-	if(m_isMultiRes)
-	{
-		m_mrDarts.reserve(16) ;
-		m_mrLevelStack.reserve(16) ;
-
-		m_mrLevels = m_mrattribs.addAttribute<unsigned char>("MRLevel") ;
-		addLevel() ;
-		setCurrentLevel(0) ;
-	}
 }
 
 GenericMap::~GenericMap()
@@ -132,6 +122,21 @@ GenericMap::~GenericMap()
 	}
 }
 
+void GenericMap::initMR()
+{
+	m_isMultiRes = true;
+
+	m_mrattribs.clear(true) ;
+	m_mrDarts.clear() ;
+	m_mrDarts.reserve(16) ;
+	m_mrLevelStack.clear() ;
+	m_mrLevelStack.reserve(16) ;
+
+	m_mrLevels = m_mrattribs.addAttribute<unsigned int>("MRLevel") ;
+	addLevel() ;
+	setCurrentLevel(0) ;
+}
+
 void GenericMap::clear(bool removeAttrib)
 {
 	if (removeAttrib)
@@ -154,15 +159,24 @@ void GenericMap::clear(bool removeAttrib)
 	}
 
 	if (m_isMultiRes)
-	{
-		m_mrattribs.clear(true);
-		m_mrLevels = NULL;
-		unsigned int nb = m_mrDarts.size();
-		for (unsigned int i = 0; i<nb; ++i)
-			m_mrDarts[i]=NULL;
-		m_mrCurrentLevel=0;
-		m_mrLevelStack.clear();
-	}
+		initMR() ;
+}
+
+/****************************************
+ *           MULTIRES                   *
+ ****************************************/
+
+void GenericMap::addLevel()
+{
+	unsigned int level = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< level ;
+	AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+	m_mrDarts.push_back(amvMR) ;
+	// copy the darts pointers of the previous level
+	if(m_mrDarts.size() > 1)
+		m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
 }
 
 /****************************************
@@ -534,7 +548,7 @@ void GenericMap::update_topo_shortcuts()
 			std::string sub = names[i].substr(0, 7);
 
 			if (sub=="MRLevel")
-				m_mrLevels = m_mrattribs.getDataVector<unsigned char>(i);
+				m_mrLevels = m_mrattribs.getDataVector<unsigned int>(i);
 
 			if (sub=="MRdart_")
 			{
@@ -800,30 +814,6 @@ void GenericMap::boundaryUnmarkAll()
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
 }
-
-
-
-
-
-
-
-void GenericMap::addLevel()
-{
-	unsigned int level = m_mrDarts.size() ;
-	std::stringstream ss ;
-	ss << "MRdart_"<< level ;
-	AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
-
-	m_mrDarts.push_back(amvMR) ;
-	// copy the darts pointers of the previous level
-	if(m_mrDarts.size() > 1)
-		m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
-}
-
-
-
-
-
 
 } // namespace CGoGN
 

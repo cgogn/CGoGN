@@ -113,22 +113,22 @@ protected:
 #endif
 
 	/**
-	 * container for mr-darts that store indices in attribs[DART] for each level
+	 * container for multiresolution darts
 	 */
 	AttributeContainer m_mrattribs ;
 
 	/**
-	 * pointer to indices mvectors (one for each level)
+	 * pointers to attributes that store indices in m_attribs[DART] (one for each level)
 	 */
 	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
 
 	/**
-	 * pointers to mvector of levels
+	 * pointer to attribute that stores darts insertion levels
 	 */
-	AttributeMultiVector<unsigned char>* m_mrLevels ;
+	AttributeMultiVector<unsigned int>* m_mrLevels ;
 
 	/**
-	 * current level of multiresoltion
+	 * current level in multiresolution map
 	 */
 	unsigned int m_mrCurrentLevel ;
 
@@ -145,6 +145,11 @@ public:
 	~GenericMap() ;
 
 	virtual std::string mapTypeName() = 0 ;
+
+	/**
+	 * initialize the multiresolution attribute container
+	 */
+	void initMR() ;
 
 	/**
 	 * Clear the map
@@ -164,33 +169,39 @@ public:
 	 ****************************************/
 
 	/**
-	 * get the current level of multi-resolution (use only in MRMaps)
+	 * get the current resolution level (use only in MRMaps)
 	 */
 	unsigned int getCurrentLevel() ;
 
 	/**
-	 * set the current level of multi-resolution (use only in MRMaps)
+	 * set the current resolution level (use only in MRMaps)
 	 */
 	void setCurrentLevel(unsigned int l) ;
+
 	/**
-	 * store current level of multi-resolution on a stack (use only in MRMaps)
+	 * store current resolution level on a stack (use only in MRMaps)
 	 */
 	void pushLevel() ;
 
 	/**
-	 * get back level of multi-resolution of the stack  in current (use only in MRMaps)
+	 * set as current the resolution level of the top of the stack (use only in MRMaps)
 	 */
 	void popLevel() ;
 
 	/**
-	 * get the max level of multi-resolution (use only in MRMaps)
+	 * get the maximum resolution level (use only in MRMaps)
 	 */
 	unsigned int getMaxLevel() ;
 
 	/**
-	 * add a level of multi-resolution (use only in MRMaps)
+	 * add a resolution level (use only in MRMaps)
 	 */
 	void addLevel() ;
+
+	/**
+	 * get the insertion level of a dart (use only in MRMaps)
+	 */
+	unsigned int getDartLevel(Dart d) ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -207,7 +218,6 @@ protected:
 	void deleteDart(Dart d) ;
 
 public:
-
 	/**
 	 * get the index of dart in topological table
 	 */
