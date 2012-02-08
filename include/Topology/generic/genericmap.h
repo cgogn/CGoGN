@@ -113,22 +113,22 @@ protected:
 #endif
 
 	/**
-	 * container for mr-darts that store indices in attribs[DART] for each level
+	 * container for multiresolution darts
 	 */
 	AttributeContainer m_mrattribs ;
 
 	/**
-	 * pointer to indices mvectors (one for each level)
+	 * pointers to attributes that store indices in m_attribs[DART] (one for each level)
 	 */
 	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
 
 	/**
-	 * pointers to mvector of levels
+	 * pointer to attribute that stores darts insertion levels
 	 */
-	AttributeMultiVector<unsigned char>* m_mrLevels ;
+	AttributeMultiVector<unsigned int>* m_mrLevels ;
 
 	/**
-	 * current level of multiresoltion
+	 * current level in multiresolution map
 	 */
 	unsigned int m_mrCurrentLevel ;
 
@@ -145,6 +145,11 @@ public:
 	~GenericMap() ;
 
 	virtual std::string mapTypeName() = 0 ;
+
+	/**
+	 * initialize the multiresolution attribute container
+	 */
+	void initMR() ;
 
 	/**
 	 * Clear the map

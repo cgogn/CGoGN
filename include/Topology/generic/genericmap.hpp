@@ -67,7 +67,7 @@ inline unsigned int GenericMap::getMaxLevel()
 
 inline unsigned int GenericMap::getDartLevel(Dart d)
 {
-	return m_mrLevels->operator [](d.index) ;
+	return m_mrLevels->operator[](d.index) ;
 }
 
 /****************************************

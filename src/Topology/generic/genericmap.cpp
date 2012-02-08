@@ -90,16 +90,6 @@ GenericMap::GenericMap() : m_nbThreads(1)
 #ifndef CGoGN_FORCE_MR
 	m_isMultiRes = false;
 #endif
-
-	if(m_isMultiRes)
-	{
-		m_mrDarts.reserve(16) ;
-		m_mrLevelStack.reserve(16) ;
-
-		m_mrLevels = m_mrattribs.addAttribute<unsigned char>("MRLevel") ;
-		addLevel() ;
-		setCurrentLevel(0) ;
-	}
 }
 
 GenericMap::~GenericMap()
@@ -132,6 +122,21 @@ GenericMap::~GenericMap()
 	}
 }
 
+void GenericMap::initMR()
+{
+	m_isMultiRes = true;
+
+	m_mrattribs.clear(true) ;
+	m_mrDarts.clear() ;
+	m_mrDarts.reserve(16) ;
+	m_mrLevelStack.clear() ;
+	m_mrLevelStack.reserve(16) ;
+
+	m_mrLevels = m_mrattribs.addAttribute<unsigned int>("MRLevel") ;
+	addLevel() ;
+	setCurrentLevel(0) ;
+}
+
 void GenericMap::clear(bool removeAttrib)
 {
 	if (removeAttrib)
@@ -154,15 +159,7 @@ void GenericMap::clear(bool removeAttrib)
 	}
 
 	if (m_isMultiRes)
-	{
-		m_mrattribs.clear(true) ;
-		m_mrDarts.clear() ;
-
-		m_mrLevels = m_mrattribs.addAttribute<unsigned char>("MRLevel") ;
-		addLevel() ;
-		setCurrentLevel(0) ;
-		m_mrLevelStack.clear() ;
-	}
+		initMR() ;
 }
 
 /****************************************
@@ -551,7 +548,7 @@ void GenericMap::update_topo_shortcuts()
 			std::string sub = names[i].substr(0, 7);
 
 			if (sub=="MRLevel")
-				m_mrLevels = m_mrattribs.getDataVector<unsigned char>(i);
+				m_mrLevels = m_mrattribs.getDataVector<unsigned int>(i);
 
 			if (sub=="MRdart_")
 			{
