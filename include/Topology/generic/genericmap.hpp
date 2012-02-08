@@ -46,7 +46,7 @@ inline void GenericMap::setCurrentLevel(unsigned int l)
 	if(l < m_mrDarts.size())
 		m_mrCurrentLevel = l ;
 	else
-		CGoGNout << "try to access inexisting resolution level" << CGoGNendl ;
+		CGoGNout << "setCurrentLevel : try to access inexisting resolution level" << CGoGNendl ;
 }
 
 inline void GenericMap::pushLevel()
@@ -281,8 +281,10 @@ inline void GenericMap::next(Dart& d)
 {
 	if (m_isMultiRes)
 	{
-		while ((d.index != m_mrattribs.end() ) && (getDartLevel(d.index) > m_mrCurrentLevel))
+		do
+		{
 			m_mrattribs.next(d.index) ;
+		} while ((d.index != m_mrattribs.end() ) && (getDartLevel(d.index) > m_mrCurrentLevel)) ;
 	}
 	else
 		m_attribs[DART].next(d.index) ;

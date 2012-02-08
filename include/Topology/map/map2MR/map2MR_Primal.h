@@ -25,12 +25,12 @@
 #ifndef __MAP2MR_PRIMAL__
 #define __MAP2MR_PRIMAL__
 
-#include "Topology/map/map2.h"
+#include "Topology/map/embeddedMap2.h"
 
 namespace CGoGN
 {
 
-class Map2MR_Primal : protected Map2
+class Map2MR_Primal : public EmbeddedMap2
 {
 public:
 	Map2MR_Primal() ;
@@ -96,12 +96,24 @@ public:
 	 *               SUBDIVISION                       *
 	 ***************************************************/
 
+	/**
+	 * subdivide the edge of d to the next level
+	 */
 	void subdivideEdge(Dart d) ;
 
+	/**
+	 * subdivide the face of d to the next level
+	 */
 	void subdivideFace(Dart d) ;
 
+	/**
+	 * coarsen the edge of d from the next level
+	 */
 	void coarsenEdge(Dart d) ;
 
+	/**
+	 * coarsen the face of d from the next level
+	 */
 	void coarsenFace(Dart d) ;
 } ;
 

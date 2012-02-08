@@ -155,13 +155,13 @@ void GenericMap::clear(bool removeAttrib)
 
 	if (m_isMultiRes)
 	{
-		m_mrattribs.clear(true);
-		m_mrLevels = NULL;
-		unsigned int nb = m_mrDarts.size();
-		for (unsigned int i = 0; i<nb; ++i)
-			m_mrDarts[i]=NULL;
-		m_mrCurrentLevel=0;
-		m_mrLevelStack.clear();
+		m_mrattribs.clear(true) ;
+		m_mrDarts.clear() ;
+
+		m_mrLevels = m_mrattribs.addAttribute<unsigned char>("MRLevel") ;
+		addLevel() ;
+		setCurrentLevel(0) ;
+		m_mrLevelStack.clear() ;
 	}
 }
 
