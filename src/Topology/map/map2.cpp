@@ -71,24 +71,36 @@ void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 {
 	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
 	{
-		{
-			Dart& d = m_phi1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d != e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi_1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d != e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi2->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d != e)
-				d = e;
-		}
+		unsigned int d_index = dartIndex(m_phi1->operator[](i));
+		if (d_index != oldnew[d_index])
+			m_phi1->operator[](i) = Dart(oldnew[d_index]);
+
+		d_index = dartIndex(m_phi_1->operator[](i));
+		if (d_index != oldnew[d_index])
+			m_phi_1->operator[](i) = Dart(oldnew[d_index]);
+
+		d_index = dartIndex(m_phi2->operator[](i));
+		if (d_index != oldnew[d_index])
+			m_phi2->operator[](i) = Dart(oldnew[d_index]);
+
+//		{
+//			Dart& d = m_phi1->operator [](i);
+//			Dart e = Dart(oldnew[d.index]);
+//			if (d != e)
+//				d = e;
+//		}
+//		{
+//			Dart& d = m_phi_1->operator [](i);
+//			Dart e = Dart(oldnew[d.index]);
+//			if (d != e)
+//				d = e;
+//		}
+//		{
+//			Dart& d = m_phi2->operator [](i);
+//			Dart e = Dart(oldnew[d.index]);
+//			if (d != e)
+//				d = e;
+//		}
 	}
 }
 

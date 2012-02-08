@@ -152,6 +152,17 @@ void GenericMap::clear(bool removeAttrib)
 			m_attribs[i].clear(false) ;
 		}
 	}
+
+	if (m_isMultiRes)
+	{
+		m_mrattribs.clear(true);
+		m_mrLevels = NULL;
+		unsigned int nb = m_mrDarts.size();
+		for (unsigned int i = 0; i<nb; ++i)
+			m_mrDarts[i]=NULL;
+		m_mrCurrentLevel=0;
+		m_mrLevelStack.clear();
+	}
 }
 
 /****************************************
@@ -332,8 +343,16 @@ bool GenericMap::saveMapBin(const std::string& filename)
 	char* buff = new char[256];
 	for (int i = 0; i < 256; ++i)
 		buff[i] = char(255);
-	const char* cgogn = "CGoGN_Map";
-	memcpy(buff, cgogn, 10);
+	if (m_isMultiRes)
+	{
+		const char* cgogn = "CGoGN_MRMap";
+		memcpy(buff, cgogn, 12);
+	}
+	else
+	{
+		const char* cgogn = "CGoGN_Map";
+		memcpy(buff, cgogn, 10);
+	}
 	std::string mt = mapTypeName();
 	const char* mtc = mt.c_str();
 	memcpy(buff+32, mtc, mt.size()+1);
@@ -345,6 +364,9 @@ bool GenericMap::saveMapBin(const std::string& filename)
 	// save all attribs
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_attribs[i].saveBin(fs, i);
+
+	if (m_isMultiRes)
+		m_mrattribs.saveBin(fs, 00);
 
 	return true;
 }
@@ -367,11 +389,33 @@ bool GenericMap::loadMapBin(const std::string& filename)
 
 	std::string buff_str(buff);
 	// Check file type
-	if (buff_str != "CGoGN_Map")
+	if (m_isMultiRes)
 	{
-		CGoGNerr<< "Wrong binary file format"<< CGoGNendl;
-		return false;
+		if (buff_str == "CGoGN_Map")
+		{
+			CGoGNerr<< "Wrong binary file format, file is not a MR-Map"<< CGoGNendl;
+			return false;
+		}
+		if (buff_str != "CGoGN_MRMap")
+		{
+			CGoGNerr<< "Wrong binary file format"<< CGoGNendl;
+			return false;
+		}
 	}
+	else
+	{
+		if (buff_str == "CGoGN_MRMap")
+		{
+			CGoGNerr<< "Wrong binary file format, file is a MR-Map"<< CGoGNendl;
+			return false;
+		}
+		if (buff_str != "CGoGN_Map")
+		{
+			CGoGNerr<< "Wrong binary file format"<< CGoGNendl;
+			return false;
+		}
+	}
+
 
 	// Check map type
 	buff_str = std::string(buff + 32);
@@ -402,10 +446,16 @@ bool GenericMap::loadMapBin(const std::string& filename)
 		m_attribs[id].loadBin(fs);
 	}
 
-	// retrieve m_embeddings (from m_attribs[DART]
+	if (m_isMultiRes)
+		m_mrattribs.loadBin(fs);
+
+	// retrieve m_embeddings (from m_attribs)
 	update_m_emb_afterLoad();
+
 	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
 	update_topo_shortcuts();
+
+
 
 	return true;
 }
@@ -470,6 +520,41 @@ void GenericMap::update_topo_shortcuts()
 			}
 		}
 	}
+
+	if (m_isMultiRes)
+	{
+		std::vector<std::string> names;
+		m_mrattribs.getAttributesNames(names);
+		m_mrDarts.resize(names.size()-1);
+		for (unsigned int i=0; i<m_mrDarts.size(); ++i)
+			m_mrDarts[i] = NULL;
+
+		for (unsigned int i = 0;  i < names.size(); ++i)
+		{
+			std::string sub = names[i].substr(0, 7);
+
+			if (sub=="MRLevel")
+				m_mrLevels = m_mrattribs.getDataVector<unsigned char>(i);
+
+			if (sub=="MRdart_")
+			{
+				sub = names[i].substr(7);	// compute number following MT_Dart_
+				unsigned int idx=0;
+				for (unsigned int j=0; j < sub.length(); j++)
+					idx = 10*idx+(sub[j]-'0');
+				if (idx < names.size()-1)
+					m_mrDarts[idx] = m_mrattribs.getDataVector<unsigned int>(i);
+				else
+					CGoGNerr<<"Warning problem updating MR_DARTS" << CGoGNendl;
+			}
+		}
+		// check if all pointers are != NULL
+		for (unsigned int i=0; i<m_mrDarts.size(); ++i)
+		{
+			if (m_mrDarts[i] == NULL)
+				CGoGNerr<<"Warning problem MR_DARTS = NULL" << CGoGNendl;
+		}
+	}
 }
 
 void GenericMap::dumpAttributesAndMarkers()
@@ -514,30 +599,82 @@ void GenericMap::dumpAttributesAndMarkers()
 
 void GenericMap::compact()
 {
-	std::vector<unsigned int> oldnew;
+	// if MR compact the MR attrib container
+	std::vector<unsigned int> oldnewMR;
+	if (m_isMultiRes)
+		m_mrattribs.compact(oldnewMR);
 
 	// compacting the orbits attributes
+//	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+//	{
+//		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
+//		{
+//			m_attribs[orbit].compact(oldnew);
+//
+//			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+//			{
+//				unsigned int& idx = m_embeddings[orbit]->operator [](i);
+//				unsigned int jdx = oldnew[idx];
+//				if ((jdx != 0xffffffff) && (jdx != idx))
+//					idx = jdx;
+//			}
+//		}
+//	}
+
+	// compact embedding attribs
+	std::vector< std::vector<unsigned int>* > oldnews;
+	oldnews.resize(NB_ORBITS);
 	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
 		{
-			m_attribs[orbit].compact(oldnew);
+			oldnews[orbit] = new std::vector<unsigned int>;
+			m_attribs[orbit].compact(*(oldnews[orbit]));
+		}
+	}
 
-			for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	// update embedding indices of topo
+	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
+	{
+		for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+		{
+			if ((orbit != DART) && (isOrbitEmbedded(orbit)))
 			{
-				unsigned int& idx = m_embeddings[orbit]->operator [](i);
-				unsigned int jdx = oldnew[idx];
+				unsigned int& idx = m_embeddings[orbit]->operator[](i);
+				unsigned int jdx = oldnews[orbit]->operator[](idx);
 				if ((jdx != 0xffffffff) && (jdx != idx))
 					idx = jdx;
 			}
 		}
 	}
+	// delete allocated vectors
+	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
+		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
+			delete[] oldnews[orbit];
+
 
 	//compacting the topo
+	std::vector<unsigned int> oldnew;
 	m_attribs[DART].compact(oldnew);
 
-	// update topo relations: recurvise call from real map down to generic
-	compactTopoRelations(oldnew);
+
+	// update MR indices to attribs[DART]
+	if (m_isMultiRes)
+	{
+		unsigned int nbl = m_mrDarts.size();
+		for (unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			for (unsigned int j=0; j<nbl; ++j)
+			{
+				unsigned int d_index = m_mrDarts[j]->operator[](i);
+				if (d_index != oldnew[d_index])
+					m_mrDarts[j]->operator[](i) = oldnew[d_index];
+			}
+		}
+	}
+
+		// update topo relations from real map
+	compactTopoRelations(oldnewMR);
 
 //	dumpAttributesAndMarkers();
 }
@@ -663,6 +800,30 @@ void GenericMap::boundaryUnmarkAll()
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
 }
+
+
+
+
+
+
+
+void GenericMap::addLevel()
+{
+	unsigned int level = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< level ;
+	AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+	m_mrDarts.push_back(amvMR) ;
+	// copy the darts pointers of the previous level
+	if(m_mrDarts.size() > 1)
+		m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
+}
+
+
+
+
+
 
 } // namespace CGoGN
 

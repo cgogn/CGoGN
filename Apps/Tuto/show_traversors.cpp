@@ -54,8 +54,8 @@ void MyQT::cb_checkTopo(bool b)
 
 void MyQT::cb_combo1(int x)
 {
-	m_val_combo1 = x+1;
-	if (m_val_combo1!=m_val_combo3)
+	m_first3 = x;
+	if (m_first3!=m_second3)
 		traverse3();
 	else
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
@@ -63,8 +63,8 @@ void MyQT::cb_combo1(int x)
 
 void MyQT::cb_combo2(int x)
 {
-	m_val_combo2 = x+1;
-	if (m_val_combo1!=m_val_combo3)
+	m_ajd_or_inci3 = x;
+	if (m_first3!=m_second3)
 		traverse3();
 	else
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
@@ -72,8 +72,8 @@ void MyQT::cb_combo2(int x)
 
 void MyQT::cb_combo3(int x)
 {
-	m_val_combo3 = x+1;
-	if (m_val_combo1!=m_val_combo3)
+	m_second3 = x;
+	if (m_first3!=m_second3)
 		traverse3();
 	else
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
@@ -81,8 +81,8 @@ void MyQT::cb_combo3(int x)
 
 void MyQT::cb_combo4(int x)
 {
-	m_val_combo4 = x+1;
-	if (m_val_combo4!=m_val_combo6)
+	m_first2 = x;
+	if (m_first2!=m_second2)
 		traverse2();
 	else
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
@@ -90,8 +90,8 @@ void MyQT::cb_combo4(int x)
 
 void MyQT::cb_combo5(int x)
 {
-	m_val_combo5 = x+1;
-	if (m_val_combo4!=m_val_combo6)
+	m_ajd_or_inci2 = x;
+	if (m_first2!=m_second2)
 		traverse2();
 	else
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
@@ -99,8 +99,8 @@ void MyQT::cb_combo5(int x)
 
 void MyQT::cb_combo6(int x)
 {
-	m_val_combo6 = x+1;
-	if (m_val_combo4!=m_val_combo6)
+	m_second2 = x;
+	if (m_first2!=m_second2)
 		traverse2();
 	else
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
@@ -167,8 +167,7 @@ void MyQT::traverse2()
 	if (m_selected == NIL)
 		return;
 
-	int code = (m_val_combo5)*100+m_val_combo4*10+m_val_combo6;
-
+//	int code = (m_ajd_or_inci2)*100+m_first2*10+m_second2;
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 
 	m_drawer.newList(GL_COMPILE);
@@ -177,136 +176,28 @@ void MyQT::traverse2()
 	m_drawer.color3f(1.0f,1.0f,0.0f);
 
 	m_affDarts.clear();
-	switch(code)
+
+	if (m_ajd_or_inci2 == 0) // incident
 	{
-	// 1YX incient
-	case 113:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer,myMap,m_selected,position,0.7f);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2FV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
+		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createIncident(myMap,m_selected,VERTEX+m_second2,VERTEX+m_first2);
+		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
+				m_affDarts.push_back(d);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap,m_affDarts,position,0.7f);
 	}
-	case 123:
+	else	// adjacent
 	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_first2, m_drawer,myMap,m_selected,position,0.7f);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2FE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
+		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createAdjacent(myMap,m_selected,VERTEX+m_first2,VERTEX+m_second2);
+
+
+		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
+				m_affDarts.push_back(d);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap,m_affDarts,position,0.7f);
 	}
 
-	case 112:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2EV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 132:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2EF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 121:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2VE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 131:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2VF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	// 2XY adjacent
-	case 212:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2VVaE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 213:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2VVaF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 221:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2EEaV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 223:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2EEaF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 231:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2FFaV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 232:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2FFaE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-
-	default:
-		CGoGNerr <<"Not implemented" << CGoGNendl;
-		break;
-	}
 	m_drawer.endList();
 	updateGL();
 }
@@ -315,7 +206,7 @@ void MyQT::traverse2()
 
 void MyQT::traverse3()
 {
-	int code = (m_val_combo2)*100+m_val_combo1*10+m_val_combo3;
+//	int code = (m_ajd_or_inci3)*100+m_first3*10+m_second3;
 //	std::cout << "CODE="<< code << std::endl;
 	if (m_selected == NIL)
 		return;
@@ -326,259 +217,26 @@ void MyQT::traverse3()
 	m_drawer.lineWidth(3.0f);
 	m_drawer.pointSize(7.0f);
 	m_drawer.color3f(1.0f,1.0f,0.0f);
-	switch(code)
-	{
-	// 1YX incient
-	case 114:
-	{
 
-		Algo::Render::drawerVolume<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-
-		Traversor3WV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 124:
+	if (m_ajd_or_inci3 == 0) // incident
 	{
-		Algo::Render::drawerVolume<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_second3, m_drawer,myMap,m_selected,position,0.7f);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3WE<PFP::MAP> tra(myMap,m_selected);
+		Traversor3XY<PFP::MAP> tra(myMap,m_selected,VERTEX+m_second3,VERTEX+m_first3);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
+				m_affDarts.push_back(d);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,0.7f);
 	}
-	case 134:
+	else	// adjacent
 	{
-		Algo::Render::drawerVolume<PFP>(m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_first3, m_drawer,myMap,m_selected,position,0.7f);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3WF<PFP::MAP> tra(myMap,m_selected);
+		Traversor3XXaY<PFP::MAP> tra(myMap,m_selected,VERTEX+m_first3,VERTEX+m_second3);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 113:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3FV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 123:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3FE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 143:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3FW<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
+				m_affDarts.push_back(d);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,0.7f);
 	}
 
-	case 112:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3EV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 132:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3EF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 142:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3EW<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-
-	case 121:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3VE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 131:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		Traversor3VF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 141:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		Traversor3VW<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-
-	// 2XY adjacent
-	case 212:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3VVaE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 213:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3VVaF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 214:
-	{
-		Algo::Render::drawerVertex<PFP>(m_drawer,myMap,m_selected,position);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-
-		Traversor3VVaW<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVertices<PFP>(m_drawer, myMap,m_affDarts,position);
-		break;
-	}
-	case 221:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3EEaV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 223:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3EEaF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 224:
-	{
-		Algo::Render::drawerEdge<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3EEaW<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerEdges<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 231:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3FFaV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 232:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3FFaE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 234:
-	{
-		Algo::Render::drawerFace<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3FFaW<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerFaces<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 241:
-	{
-		Algo::Render::drawerVolume<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3WWaV<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 242:
-	{
-		Algo::Render::drawerVolume<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3WWaE<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-	case 243:
-	{
-		Algo::Render::drawerVolume<PFP>(m_drawer,myMap,m_selected,position,0.7f);
-		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3WWaF<PFP::MAP> tra(myMap,m_selected);
-		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-			m_affDarts.push_back(d);
-		Algo::Render::drawerVolumes<PFP>(m_drawer, myMap,m_affDarts,position,0.7f);
-		break;
-	}
-
-	default:
-		CGoGNerr <<"Not implemented" << CGoGNendl;
-		break;
-	}
 	m_drawer.endList();
 	updateGL();
 }
