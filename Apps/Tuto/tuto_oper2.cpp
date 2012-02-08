@@ -77,9 +77,8 @@ void MyQT::operation(int x)
 		if (m_selected != NIL)
 		{
 			dm.markAll();
-			myMap.deleteVertex(m_selected);
+			m_selected=myMap.deleteVertex(m_selected);
 			updateMap();
-			m_selected=NIL;
 		}
 		break;
 	case 2:
@@ -106,10 +105,9 @@ void MyQT::operation(int x)
 		if (m_selected != NIL)
 		{
 			PFP::VEC3 M = (position[m_selected] + position[myMap.phi1(m_selected)])/2.0f;
-			Dart d = myMap.collapseEdge(m_selected,true);
-			position[d] = M;
+			m_selected = myMap.collapseEdge(m_selected,true);
+			position[m_selected] = M;
 			updateMap();
-			m_selected=NIL;
 		}
 		break;
 	case 5:
