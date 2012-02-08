@@ -53,6 +53,12 @@ add_executable( tuto5 tuto5.cpp ${tuto5_ui} ${tuto5_moc})
 target_link_libraries( tuto5
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 
+QT4_WRAP_UI( tuto_oper2_ui tuto_oper2.ui )
+QT4_WRAP_CPP(tuto_oper2_moc tuto_oper2.h)
+add_executable( tuto_oper2 tuto_oper2.cpp ${tuto_oper2_ui} ${tuto_oper2_moc})
+target_link_libraries( tuto_oper2
+	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
+
 QT4_WRAP_UI( tuto_orbits_ui tuto_orbits.ui )
 QT4_WRAP_CPP(tuto_orbits_moc tuto_orbits.h)
 add_executable( tuto_orbits tuto_orbits.cpp ${tuto_orbits_ui} ${tuto_orbits_moc})

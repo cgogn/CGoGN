@@ -33,6 +33,7 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+#include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
 
@@ -87,6 +88,11 @@ protected:
 	 * width of lines use to draw phi
 	 */
 	float m_topo_relation_width;
+
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsColor;
 
 
 	float *m_color_save;
@@ -177,6 +183,8 @@ public:
 	 * @param b blue !
 	 */
 	void setAllDartsColor(float r, float g, float b);
+
+	void setInitialDartsColor(float r, float g, float b);
 
 	/**
 	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
