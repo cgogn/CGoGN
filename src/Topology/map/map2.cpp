@@ -515,14 +515,6 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
-void Map2::splitCC(std::vector<Dart>& vd)
-{
-	//assert(checkSimpleOrientedPath(vd)) ;
-
-	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		Map2::unsewFaces(*it);
-}
-
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/

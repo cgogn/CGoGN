@@ -64,6 +64,10 @@ template <typename PFP>
 Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
 
 
+template <typename PFP>
+void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+
+
 /***********************************************************************************
  *								 Simplification									   *
  ***********************************************************************************/

@@ -343,7 +343,7 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 
 void Map3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && Map2::sameOrientedFace(d, e)) ;
+	assert(d != e && sameOrientedFace(d, e)) ;
 
 	Dart dd = phi1(phi3(d));
 	Dart ee = phi1(phi3(e));
@@ -489,26 +489,10 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 		Map2::unsewFaces(*it);
 
 	Map2::fillHole(e) ;
-
-	Dart b = Map1::newBoundaryCycle(vd.size());
-
-	Dart fit1 = phi2(e) ;
-	Dart fit2 = b ;
-	do
-	{
-		phi3sew(fit1, fit2) ;
-
-		fit1 = phi1(fit1) ;
-		fit2 = phi_1(fit2) ;
-	} while(fit2 != b) ;
-
-
-
-//	if(isBoundaryMarked(e2))
-//		Map2::fillHole(e2) ;
+	Map2::fillHole(e2) ;
 
 	//sew the two connected components
-//	Map3::sewVolumes(phi2(e), phi2(e2), false);
+	Map3::sewVolumes(phi2(e), phi2(e2), false);
 }
 
 /*! @name Topological Queries
