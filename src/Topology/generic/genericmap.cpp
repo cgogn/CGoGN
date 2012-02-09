@@ -124,7 +124,9 @@ GenericMap::~GenericMap()
 
 void GenericMap::initMR()
 {
+#ifndef CGoGN_FORCE_MR
 	m_isMultiRes = true;
+#endif
 
 	m_mrattribs.clear(true) ;
 	m_mrDarts.clear() ;

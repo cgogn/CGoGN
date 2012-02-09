@@ -44,7 +44,8 @@ namespace GL2
 
 Topo3Render::Topo3Render():
 m_nbDarts(0),m_nbRel2(0),m_nbRel3(0),
-m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
+m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL),
+m_dartsColor(1.0f,1.0f,1.0f)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -128,6 +129,11 @@ void Topo3Render::setAllDartsColor(float r, float g, float b)
 	}
 	glUnmapBufferARB(GL_ARRAY_BUFFER);
 
+}
+
+void Topo3Render::setInitialDartsColor(float r, float g, float b)
+{
+	m_dartsColor = Geom::Vec3f(r,g,b);
 }
 
 void Topo3Render::drawDarts()
