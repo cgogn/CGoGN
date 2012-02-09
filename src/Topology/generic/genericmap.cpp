@@ -170,15 +170,27 @@ void GenericMap::clear(bool removeAttrib)
 
 void GenericMap::addLevel()
 {
-	unsigned int level = m_mrDarts.size() ;
+	unsigned int newLevel = m_mrDarts.size() ;
 	std::stringstream ss ;
-	ss << "MRdart_"<< level ;
+	ss << "MRdart_"<< newLevel ;
 	AttributeMultiVector<unsigned int>* amvMR = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
 
 	m_mrDarts.push_back(amvMR) ;
+
 	// copy the darts pointers of the previous level
 	if(m_mrDarts.size() > 1)
-		m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[m_mrDarts.size() - 2]->getIndex()) ;
+		m_mrattribs.copyAttribute(amvMR->getIndex(), m_mrDarts[newLevel - 1]->getIndex()) ;
+
+	// duplicate all the darts in the new level
+	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	{
+		unsigned int oldi = amvMR->operator[](i) ;
+		unsigned int newi = m_attribs[DART].insertLine() ;
+		m_attribs[DART].copyLine(newi, oldi) ;
+		amvMR->operator[](i) = newi ;
+		for(unsigned int t = 0; t < m_nbThreads; ++t)
+			m_markTables[DART][t]->operator[](newi).clear() ;
+	}
 }
 
 /****************************************
@@ -206,7 +218,7 @@ void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 	if (emb != EMBNULL)
 		m_attribs[orbit].refLine(emb);
 	// affect the embedding to the dart
-	(*m_embeddings[orbit])[d.index] = emb ;
+	(*m_embeddings[orbit])[dartIndex(d)] = emb ;
 }
 
 /****************************************
@@ -785,17 +797,17 @@ void GenericMap::viewAttributesTables()
 
 void GenericMap::boundaryMark(Dart d)
 {
-	m_markTables[DART][0]->operator[](d.index).setMark(m_boundaryMarker);
+	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarker);
 }
 
 void GenericMap::boundaryUnmark(Dart d)
 {
-	m_markTables[DART][0]->operator[](d.index).unsetMark(m_boundaryMarker);
+	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarker);
 }
 
 bool GenericMap::isBoundaryMarked(Dart d)
 {
-	return m_markTables[DART][0]->operator[](d.index).testMark(m_boundaryMarker);
+	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarker);
 }
 
 void GenericMap::boundaryMarkOrbit(unsigned int orbit, Dart d)
