@@ -422,6 +422,81 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 
 }
 
+template<typename PFP>
+void TopoRender::svgout(typename PFP::MAP& map, const std::string& filename, const glm::mat4& model, const glm::mat4& proj, const FunctorSelect& good)
+{
+
+	Algo::Render::SVG::SVGOut svg(filename,model,proj);
+
+	svg.setWidth(3.0f);
+
+	// PHI2
+	m_vbo2->bind();
+	Geom::Vec3f* ptr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbRel2; ++i)
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(1.0f,0.0f,0.0f));
+	svg.endLines();
+
+	m_vbo2->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	//PHI1
+	m_vbo1->bind();
+	ptr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbDarts; ++i)
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,1.0f,1.0f));
+	svg.endLines();
+
+	m_vbo1->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+
+	m_vbo0->bind();
+	ptr= reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+	m_vbo3->bind();
+	Geom::Vec3f* colorsPtr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+
+	svg.setWidth(5.0f);
+
+	svg.beginLines();
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (good(d))
+		{
+			unsigned int id = m_attIndex[d];
+//			svg.addLine(ptr[id], ptr[id+1], colorsPtr[id]);
+			svg.addLine(ptr[id], ptr[id+1], Geom::Vec3f(0.0f,0.0f,0.0f));
+		}
+	}
+	svg.endLines();
+
+	svg.beginPoints();
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (good(d))
+		{
+			unsigned int id = m_attIndex[d];
+//			svg.addPoint(ptr[id], colorsPtr[id]);
+			svg.addPoint(ptr[id], Geom::Vec3f(0.0f,0.0f,0.0f));
+		}
+	}
+	svg.endPoints();
+
+
+
+	m_vbo0->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	m_vbo3->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	// relations:
+
+}
+
 
 }//end namespace GL2
 

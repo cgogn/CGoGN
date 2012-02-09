@@ -63,6 +63,7 @@ class SvgObj
 {
 protected:
 	std::vector<Geom::Vec3f> m_vertices;
+	std::vector<Geom::Vec3f> m_colors;
 	std::vector<Geom::Vec3f> m_vertices3D;
 	Geom::Vec3f m_color;
 	float m_width;
@@ -70,6 +71,13 @@ public:
 	void addVertex(const Geom::Vec3f& v);
 
 	void addVertex3D(const Geom::Vec3f& v);
+
+	void addVertex(const Geom::Vec3f& v, const Geom::Vec3f& C);
+
+	void addVertex3D(const Geom::Vec3f& v, const Geom::Vec3f& C);
+
+
+//	void addColor(const Geom::Vec3f& c);
 
 	void setColor(const Geom::Vec3f& c);
 
@@ -95,6 +103,12 @@ public:
 
 
 class SvgPolyline: public SvgObj
+{
+public:
+	void save(std::ofstream& out);
+};
+
+class SvgLines: public SvgObj
 {
 public:
 	void save(std::ofstream& out);
@@ -126,6 +140,8 @@ protected:
 	float global_width;
 
 	std::vector<SvgObj*> m_objs;
+
+	SvgObj* m_current;
 
 public:
 
@@ -160,6 +176,23 @@ public:
 
 
 	void orderPrimitives(std::list<SvgObj*>& primitives);
+
+
+	void beginPoints();
+
+	void endPoints();
+
+	void addPoint(const Geom::Vec3f& P);
+	void addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C);
+
+
+	void beginLines();
+
+	void endLines();
+
+	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2);
+	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C);
+
 };
 
 

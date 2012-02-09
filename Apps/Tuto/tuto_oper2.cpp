@@ -282,6 +282,10 @@ void MyQT::cb_keyPress(int keycode)
 			}
 		}
 		break;
+
+	case 's':
+		m_render_topo->svgout<PFP>(myMap, "/tmp/toto.svg", modelViewMatrix(),projectionMatrix(),nb);
+		break;
 	}
 
 	updateGL();

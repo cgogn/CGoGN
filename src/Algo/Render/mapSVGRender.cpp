@@ -43,14 +43,31 @@ namespace Render
 namespace SVG
 {
 
+
+
+
 void SvgObj::addVertex(const Geom::Vec3f& v)
 {
 	m_vertices.push_back(v);
+	m_colors.push_back(m_color);
 }
 
 void SvgObj::addVertex3D(const Geom::Vec3f& v)
 {
 	m_vertices3D.push_back(v);
+	m_colors.push_back(m_color);
+}
+
+void SvgObj::addVertex(const Geom::Vec3f& v, const Geom::Vec3f& c)
+{
+	m_vertices.push_back(v);
+	m_colors.push_back(c);
+}
+
+void SvgObj::addVertex3D(const Geom::Vec3f& v, const Geom::Vec3f& c)
+{
+	m_vertices3D.push_back(v);
+	m_colors.push_back(c);
 }
 
 
@@ -90,21 +107,23 @@ void SvgPoints::save(std::ofstream& out)
 {
 	std::stringstream ss;
 
-	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
+//	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
+	unsigned int nb = m_vertices.size();
+	for (unsigned int i=0; i<nb; ++i)
 	{
-		out << "<circle cx=\""<< (*it)[0];
-		out << "\" cy=\""<< (*it)[1];
+		out << "<circle cx=\""<< m_vertices[i][0];
+		out << "\" cy=\""<< m_vertices[i][1];
 		out << "\" r=\""<< m_width;
 		out << "\" style=\"stroke: none; fill: #";
 
 		out << std::hex;
 		unsigned int wp = out.width(2);
 		char prev = out.fill('0');
-		out << int(m_color[0]*255);
+		out << int(m_colors[i][0]*255);
 		out.width(2); out.fill('0');
-		out<< int(m_color[1]*255);
+		out<< int(m_colors[i][1]*255);
 		out.width(2); out.fill('0');
-		out << int(m_color[2]*255)<<std::dec;
+		out << int(m_colors[i][2]*255)<<std::dec;
 		out.fill(prev);
 		out.width(wp);
 
@@ -135,8 +154,35 @@ void SvgPolyline::save(std::ofstream& out)
 		out << (*it)[0] << ","<< (*it)[1]<< " ";
 	}
 	out <<"\"/>"<< std::endl;
-
 }
+
+void SvgLines::save(std::ofstream& out)
+{
+	std::stringstream ss;
+
+//	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
+	unsigned int nb = m_vertices.size();
+	for (unsigned int i=0; i<nb; ++i)
+	{
+		out << "<polyline fill=\"none\" stroke=\"#";
+		out << std::hex;
+		unsigned int wp = out.width(2);
+		char prev = out.fill('0');
+		out << int(m_colors[i][0]*255);
+		out.width(2); out.fill('0');
+		out<< int(m_colors[i][1]*255);
+		out.width(2); out.fill('0');
+		out << int(m_colors[i][2]*255)<<std::dec;
+		out <<"\" stroke-width=\""<<m_width<<"\" points=\"";
+		out.fill(prev);
+		out.width(wp);
+		out << m_vertices[i][0] << ","<< m_vertices[i][1]<< " ";
+		i++;
+		out << m_vertices[i][0] << ","<< m_vertices[i][1];
+		out <<"\"/>"<< std::endl;
+	}
+}
+
 
 void SvgPolygon::setColorFill(const Geom::Vec3f& c)
 {
@@ -366,6 +412,88 @@ bool compNormObj::operator() (SvgObj* a, SvgObj*b)
 
 	std::cout << "Cas non traite !!"<< std::endl;
 	return false;
+}
+
+
+
+void SVGOut::beginPoints()
+{
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	m_current = new SvgPoints();
+	m_current->setColor(global_color);
+	m_current->setWidth(global_width);
+}
+
+void SVGOut::endPoints()
+{
+	m_objs.push_back(m_current);
+}
+
+void SVGOut::addPoint(const Geom::Vec3f& P)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+	m_current->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
+	m_current->addVertex3D(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
+}
+
+void SVGOut::addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+	m_current->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]),C);
+	m_current->addVertex3D(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]),C);
+}
+
+
+void SVGOut::beginLines()
+{
+	glm::i32vec4 viewport;
+	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
+
+	m_current = new SvgLines();
+	m_current->setColor(global_color);
+	m_current->setWidth(global_width);
+}
+
+
+void SVGOut::endLines()
+{
+	m_objs.push_back(m_current);
+}
+
+void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
+	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	m_current->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
+	m_current->addVertex(Geom::Vec3f(Q2[0],float(m_viewport[3])-Q2[1],Q2[2]));
+
+	m_current->addVertex3D(Geom::Vec3f(R[0],float(m_viewport[3])-R[1],R[2]));
+	m_current->addVertex3D(Geom::Vec3f(R2[0],float(m_viewport[3])-R2[1],R2[2]));
+}
+
+
+
+void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C)
+{
+	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
+	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
+	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
+
+	m_current->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]),C);
+	m_current->addVertex(Geom::Vec3f(Q2[0],float(m_viewport[3])-Q2[1],Q2[2]),C);
+
+	m_current->addVertex3D(Geom::Vec3f(R[0],float(m_viewport[3])-R[1],R[2]),C);
+	m_current->addVertex3D(Geom::Vec3f(R2[0],float(m_viewport[3])-R2[1],R2[2]),C);
 }
 
 
