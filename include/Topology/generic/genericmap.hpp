@@ -86,10 +86,22 @@ inline Dart GenericMap::newDart()
 	{
 		unsigned int mrdi = m_mrattribs.insertLine() ;
 		m_mrLevels->operator[](mrdi) = m_mrCurrentLevel ;
+
 		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)
 			m_mrDarts[i]->operator[](mrdi) = MRNULL ;
-		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-			m_mrDarts[i]->operator[](mrdi) = di ;
+
+		m_mrDarts[m_mrCurrentLevel]->operator[](mrdi) = di ;
+
+		for(unsigned int i = m_mrCurrentLevel + 1; i < m_mrDarts.size(); ++i)
+		{
+			unsigned int dj = m_attribs[DART].insertLine();
+			for(unsigned int o = 0; o < NB_ORBITS; ++o)
+			{
+				if (m_embeddings[o])
+					(*m_embeddings[o])[dj] = EMBNULL ;
+			}
+			m_mrDarts[i]->operator[](mrdi) = dj ;
+		}
 		return Dart::create(mrdi) ;
 	}
 	return Dart::create(di) ;

@@ -68,6 +68,16 @@ inline Dart Map2::newDart()
 {
 	Dart d = Map1::newDart() ;
 	(*m_phi2)[dartIndex(d)] = d ;
+	if(m_isMultiRes)
+	{
+		pushLevel() ;
+		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
+		{
+			setCurrentLevel(i) ;
+			(*m_phi2)[dartIndex(d)] = d ;
+		}
+		popLevel() ;
+	}
 	return d ;
 }
 
