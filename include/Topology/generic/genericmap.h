@@ -199,6 +199,11 @@ public:
 	void addLevel() ;
 
 	/**
+	 * add a resolution level and duplicate all darts (use only in MRMaps)
+	 */
+	void addLevelDuplicate() ;
+
+	/**
 	 * get the insertion level of a dart (use only in MRMaps)
 	 */
 	unsigned int getDartLevel(Dart d) ;

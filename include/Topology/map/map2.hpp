@@ -67,14 +67,12 @@ inline void Map2::update_topo_shortcuts()
 inline Dart Map2::newDart()
 {
 	Dart d = Map1::newDart() ;
-//	unsigned int d_index = dartIndex(d);
 	(*m_phi2)[dartIndex(d)] = d ;
 	return d ;
 }
 
 inline Dart Map2::phi2(Dart d)
 {
-//	unsigned int d_index = dartIndex(d);
 	return (*m_phi2)[dartIndex(d)] ;
 }
 
@@ -139,8 +137,7 @@ inline void Map2::phi2unsew(Dart d)
 	unsigned int d_index = dartIndex(d);
 	Dart e = (*m_phi2)[d_index] ;
 	(*m_phi2)[d_index] = d ;
-	unsigned int e_index = dartIndex(e);
-	(*m_phi2)[e_index] = e ;
+	(*m_phi2)[dartIndex(e)] = e ;
 }
 
 /*! @name Topological Queries

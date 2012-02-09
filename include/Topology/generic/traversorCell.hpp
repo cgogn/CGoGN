@@ -27,7 +27,7 @@ namespace CGoGN
 
 template <typename MAP>
 TraversorCell<MAP>::TraversorCell(MAP& map, unsigned int orbit, const FunctorSelect& good, bool forceDartMarker, unsigned int thread) :
-m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
+	m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
 {
 	if(!forceDartMarker && map.isOrbitEmbedded(m_orbit))
 		cmark = new CellMarker(map, m_orbit, thread) ;
@@ -73,10 +73,11 @@ Dart TraversorCell<MAP>::begin()
 	return current ;
 }
 
-
 template <typename MAP>
-Dart TraversorCell<MAP>::end() { return NIL ; }
-
+Dart TraversorCell<MAP>::end()
+{
+	return NIL ;
+}
 
 template <typename MAP>
 Dart TraversorCell<MAP>::next()
@@ -124,12 +125,11 @@ void TraversorCell<MAP>::mark(Dart d)
 }
 
 
-
 template <typename MAP>
 TraversorDartsOfOrbit<MAP>::TraversorDartsOfOrbit(MAP& map, unsigned int orbit, Dart d, unsigned int thread)
 {
 	m_vd.reserve(16);
-	FunctorStoreNotBoundary<MAP> fs(map,m_vd);
+	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
 	map.foreach_dart_of_orbit(orbit, d, fs, thread);
 	m_vd.push_back(NIL);
 }
@@ -137,7 +137,7 @@ TraversorDartsOfOrbit<MAP>::TraversorDartsOfOrbit(MAP& map, unsigned int orbit, 
 template <typename MAP>
 Dart TraversorDartsOfOrbit<MAP>::begin()
 {
-	m_current=m_vd.begin();
+	m_current = m_vd.begin();
 	return *m_current;
 }
 
@@ -155,5 +155,4 @@ Dart TraversorDartsOfOrbit<MAP>::next()
 	return *m_current;
 }
 
-}
-
+} // namespace CGoGN
