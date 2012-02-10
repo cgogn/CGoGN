@@ -69,9 +69,21 @@ inline void Map1::update_topo_shortcuts()
 inline Dart Map1::newDart()
 {
 	Dart d = GenericMap::newDart() ;
-	unsigned int d_index = dartIndex(d);
+	unsigned int d_index = dartIndex(d) ;
 	(*m_phi1)[d_index] = d ;
 	(*m_phi_1)[d_index] = d ;
+	if(m_isMultiRes)
+	{
+		pushLevel() ;
+		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
+		{
+			setCurrentLevel(i) ;
+			unsigned int d_index = dartIndex(d) ;
+			(*m_phi1)[d_index] = d ;
+			(*m_phi_1)[d_index] = d ;
+		}
+		popLevel() ;
+	}
 	return d ;
 }
 
