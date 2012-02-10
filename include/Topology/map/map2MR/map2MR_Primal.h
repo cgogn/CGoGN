@@ -32,22 +32,11 @@ namespace CGoGN
 
 class Map2MR_Primal : public EmbeddedMap2
 {
+protected:
+	bool shareVertexEmbeddings ;
+
 public:
 	Map2MR_Primal() ;
-
-	void copyVertexEmbeddings()
-	{
-		unsigned int maxL = getMaxLevel() ;
-		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-		{
-			unsigned int previdx = (*m_mrDarts[maxL - 1])[i] ;
-			unsigned int newidx = (*m_mrDarts[maxL])[i] ;
-			unsigned int emb = (*m_embeddings[VERTEX])[previdx] ;
-			(*m_embeddings[VERTEX])[newidx] = emb ;
-			if(emb != EMBNULL)
-				m_attribs[VERTEX].refLine(emb);
-		}
-	}
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
@@ -107,8 +96,19 @@ public:
 	bool faceIsSubdividedOnce(Dart d) ;
 
 	/***************************************************
+	 *           EMBEDDINGS MANAGEMENT                 *
+	 ***************************************************/
+
+	void copyVertexEmbeddings() ;
+
+	/***************************************************
 	 *               SUBDIVISION                       *
 	 ***************************************************/
+
+	/**
+	 * add a new resolution level
+	 */
+	void addNewLevel() ;
 
 	/**
 	 * subdivide the edge of d to the next level

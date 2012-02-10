@@ -27,7 +27,7 @@
 namespace CGoGN
 {
 
-Map2MR_Primal::Map2MR_Primal()
+Map2MR_Primal::Map2MR_Primal() : shareVertexEmbeddings(true)
 {
 	initMR() ;
 }
@@ -249,8 +249,33 @@ bool Map2MR_Primal::faceIsSubdividedOnce(Dart d)
 }
 
 /***************************************************
+ *           EMBEDDINGS MANAGEMENT                 *
+ ***************************************************/
+
+void Map2MR_Primal::copyVertexEmbeddings()
+{
+	unsigned int maxL = getMaxLevel() ;
+	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	{
+		unsigned int previdx = (*m_mrDarts[maxL - 1])[i] ;
+		unsigned int newidx = (*m_mrDarts[maxL])[i] ;
+		unsigned int emb = (*m_embeddings[VERTEX])[previdx] ;
+		(*m_embeddings[VERTEX])[newidx] = emb ;
+		if(emb != EMBNULL)
+			m_attribs[VERTEX].refLine(emb);
+	}
+}
+
+/***************************************************
  *               SUBDIVISION                       *
  ***************************************************/
+
+void Map2MR_Primal::addNewLevel()
+{
+	addLevel() ;
+	if(shareVertexEmbeddings)
+		copyVertexEmbeddings() ;
+}
 
 void Map2MR_Primal::subdivideEdge(Dart d)
 {
@@ -262,10 +287,7 @@ void Map2MR_Primal::subdivideEdge(Dart d)
 	pushLevel() ;
 
 	if(eLevel == getMaxLevel())
-	{
-		addLevel() ;
-		copyVertexEmbeddings() ;
-	}
+		addNewLevel() ;
 
 	setCurrentLevel(eLevel + 1) ;
 	cutEdge(d) ;
