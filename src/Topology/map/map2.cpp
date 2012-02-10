@@ -66,7 +66,6 @@ void Map2::rdfi(Dart t, DartMarker& m1, DartMarker& m2)
 	}
 }
 
-
 void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 {
 	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
@@ -229,10 +228,10 @@ Dart Map2::deleteVertex(Dart d)
 Dart Map2::cutEdge(Dart d)
 {
 	Dart e = phi2(d);
-	phi2unsew(d);			// remove old phi2 links
+	phi2unsew(d);					// remove old phi2 links
 	Dart nd = Map1::cutEdge(d);		// Cut the 1-edge of d
 	Dart ne = Map1::cutEdge(e);		// Cut the 1-edge of phi2(d)
-	phi2sew(d, ne);	// Correct the phi2 links
+	phi2sew(d, ne);					// Correct the phi2 links
 	phi2sew(e, nd);
 	return nd;
 }

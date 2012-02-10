@@ -33,6 +33,7 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+#include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
 
@@ -102,9 +103,19 @@ protected:
 	 */
 	float m_topo_relation_width;
 
-
+	/**
+	 * pointer for saved colorvbo (in picking)
+	 */
 	float *m_color_save;
 
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsColor;
+
+	/**
+	 * attribute index to get easy correspdance dart/color
+	 */
 	AttributeHandler<unsigned int> m_attIndex;
 
 
@@ -203,6 +214,15 @@ public:
 	 * @param b blue !
 	 */
 	void setAllDartsColor(float r, float g, float b);
+
+	/**
+	 * change dart initial color (used when calling updateData)
+	 * @param d the dart
+	 * @param r red !
+	 * @param g green !
+	 * @param b blue !
+	 */
+	void setInitialDartsColor(float r, float g, float b);
 
 	/**
 	 * overdraw a dart with given width and color

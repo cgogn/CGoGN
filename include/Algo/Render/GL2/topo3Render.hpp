@@ -167,8 +167,8 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 
 			*positionDartBuf++ = P;
 			*positionDartBuf++ = Q;
-			*colorDartBuf++ = VEC3(1.,1.,1.0);
-			*colorDartBuf++ = VEC3(1.,1.,1.0);
+			*colorDartBuf++ = m_dartsColor;
+			*colorDartBuf++ = m_dartsColor;
 
 			fv1[d] = P*0.1f + Q*0.9f;
 			fv11[d] = P*0.9f + Q*0.1f;
@@ -417,10 +417,10 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 			*positionDartBuf++ = PP;
 			*positionDartBuf++ = Q;
 			*positionDartBuf++ = QQ;
-			*colorDartBuf++ = VEC3(1.,1.,1.);
-			*colorDartBuf++ = VEC3(1.,1.,1.);
-			*colorDartBuf++ = VEC3(1.,1.,1.);
-			*colorDartBuf++ = VEC3(1.,1.,1.);
+			*colorDartBuf++ = m_dartsColor;
+			*colorDartBuf++ = m_dartsColor;
+			*colorDartBuf++ = m_dartsColor;
+			*colorDartBuf++ = m_dartsColor;
 
 			m_attIndex[d] = posDBI;
 			posDBI+=2;

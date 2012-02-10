@@ -124,14 +124,8 @@ inline void Map1::phi1sew(Dart d, Dart e)
 	Dart g = (*m_phi1)[e_index] ;
 	(*m_phi1)[d_index] = g ;
 	(*m_phi1)[e_index] = f ;
-//	unsigned int g_index = dartIndex(g);
-//	(*m_phi_1)[g_index] = d ;
 	(*m_phi_1)[dartIndex(g)] = d ;
-
-	//	unsigned int f_index = dartIndex(f);
-//	(*m_phi_1)[f_index] = e ;
 	(*m_phi_1)[dartIndex(f)] = e ;
-
 }
 
 inline void Map1::phi1unsew(Dart d)
@@ -142,7 +136,6 @@ inline void Map1::phi1unsew(Dart d)
 	Dart f = (*m_phi1)[e_index] ;
 	(*m_phi1)[d_index] = f ;
 	(*m_phi1)[e_index] = e ;
-//	unsigned int f_index = dartIndex(f);
 	(*m_phi_1)[dartIndex(f)] = d ;
 	(*m_phi_1)[e_index] = e ;
 }
