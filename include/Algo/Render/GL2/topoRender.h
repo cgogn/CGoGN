@@ -37,6 +37,8 @@
 
 #include "Utils/vbo.h"
 
+#include "Utils/svg.h"
+
 // forward
 namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
 namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
@@ -76,9 +78,16 @@ protected:
 	GLuint m_nbDarts;
 
 	/**
+	* number of relations 1 to draw
+	*/
+	GLuint m_nbRel1;
+
+	/**
 	* number of relations 2 to draw
 	*/
 	GLuint m_nbRel2;
+
+
 	/**
 	 * width of lines use to draw darts
 	 */
@@ -217,6 +226,9 @@ public:
 
 	template <typename PFP>
 	void updateDataGMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+
+
+	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
 };
 
 // just for compatibility with old code

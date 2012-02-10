@@ -38,13 +38,16 @@ int main(int argc, char **argv)
 
     sqt.setDock(& sqt.dock);
     sqt.setCallBack( sqt.dock.listOper, SIGNAL(currentRowChanged(int)), SLOT(operation(int)) );
-
+    sqt.setCallBack( sqt.dock.svg, SIGNAL(clicked()), SLOT(svg()) );
+    sqt.setCallBack( sqt.dock.widthSlider, SIGNAL(valueChanged(int)), SLOT(width(int)) );
 	int n=3;
 	if (argc==2)
 		n = atoi(argv[1]);
 
 	// example code itself
 	sqt.createMap(n);
+
+	sqt.width(5);
 
 	// set help message in menu
 	sqt.setHelpMsg("First Tuto: \nCreate two faces\nsew them\nand affect positions");
@@ -282,8 +285,31 @@ void MyQT::cb_keyPress(int keycode)
 			}
 		}
 		break;
-	}
 
+	case 'b':
+		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+		{
+			if (!myMap.isBoundaryMarked(d))
+			{
+				colorDarts[d] =  Geom::Vec3f(0.0f,0.0f,0.0f);
+				m_render_topo->setDartColor(d,0.0f,0.0f,0.0f);
+			}
+		}
+		break;
+	}
+	updateGL();
+}
+
+void MyQT::svg()
+{
+	std::string filename = selectFileSave("snapshot file", ".", "(*.svg)");
+	m_render_topo->svgout2D(filename, modelViewMatrix(),projectionMatrix());
+}
+
+void MyQT::width(int w)
+{
+	m_render_topo->setDartWidth(w);
+	m_render_topo->setRelationWidth(w);
 	updateGL();
 }
 

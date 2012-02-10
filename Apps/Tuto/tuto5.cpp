@@ -244,12 +244,13 @@ void MyQT::cb_keyPress(int code)
 {
 	if (code  == 's')
 	{
-		std::string filename = selectFileSave("Export SVG file ");
-		CGoGNout << "Exporting "<<filename<<CGoGNendl;
-		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
-//		svg.renderLinesToSVG<PFP>(myMap,position);
-		svg.setColor(Geom::Vec3f(1.,0.,0.));
-		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
+		std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
+		Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+		svg.setWidth(1.0f);
+		svg.setColor(Geom::Vec3f(0.0f,0.0f,0.5f));
+		Algo::Render::SVG::renderEdges<PFP>(svg,myMap,position);
+		svg.setWidth(5.0f);
+		Algo::Render::SVG::renderVertices<PFP>(svg,myMap,position);
 		//svg destruction close the file
 	}
 	if (code  == 't')

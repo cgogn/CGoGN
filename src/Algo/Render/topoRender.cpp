@@ -268,6 +268,54 @@ void TopoRender::popColors()
 	m_color_save=NULL;
 }
 
+void TopoRender::svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj)
+{
+	Utils::SVG::SVGOut svg(filename,model,proj);
+
+	svg.setWidth(m_topo_relation_width);
+
+	// PHI2 / beta2
+
+	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbRel2; ++i)
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(1.0f,0.0f,0.0f));
+	svg.endLines();
+
+	m_vbo2->releasePtr();
+
+	//PHI1 /beta1
+	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbRel1; ++i)
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,1.0f,1.0f));
+	svg.endLines();
+
+	m_vbo1->releasePtr();
+
+
+	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo3->lockPtr());
+	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
+
+	svg.setWidth(m_topo_dart_width);
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbDarts; ++i)
+		svg.addLine(ptr[2*i], ptr[2*i+1], colorsPtr[2*i]);
+	svg.endLines();
+
+	svg.beginPoints();
+	for (unsigned int i=0; i<m_nbDarts; ++i)
+			svg.addPoint(ptr[2*i], colorsPtr[2*i]);
+	svg.endPoints();
+
+	m_vbo0->releasePtr();
+	m_vbo3->releasePtr();
+}
+
+
 }//end namespace GL2
 
 }//end namespace Render

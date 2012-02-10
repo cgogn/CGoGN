@@ -139,8 +139,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 				m_attIndex[d] = indexDC;
 				indexDC+=2;
 				*positionDartBuf++ = P;
-				*colorDartBuf++ = m_dartsColor;
 				*positionDartBuf++ = Q;
+				*colorDartBuf++ = m_dartsColor;
 				*colorDartBuf++ = m_dartsColor;
 				VEC3 f = P*0.5f + Q*0.5f;
 				fv2[d] = f;
@@ -172,7 +172,6 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
 
 	m_nbRel2 =0;
-
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
 	{
 		Dart d = *id;
@@ -191,6 +190,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 		*positionF1++ = fv1[d];
 		*positionF1++ = fv11[e];
 	}
+	m_nbRel1 = vecDarts.size()/2;
 
 	m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -224,6 +224,8 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 			vecDarts.push_back(d);
 	}
 	m_nbDarts = vecDarts.size();
+
+
 
 	// debut phi1
 	AutoAttributeHandler<VEC3> fv1(map, DART);
@@ -333,15 +335,11 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
 	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
 
-	m_nbRel2 =0;
-
+	m_nbRel2 = 0;
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
 	{
 		Dart d = *id;
-
 		Dart e = map.beta2(d);
-
-//		if (good(e) && (e.index > d.index))
 		if (good(e) && (d < e ))
 		{
 			*positionF2++ = fv2[d];
@@ -353,6 +351,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 		*positionF1++ = fv1[d];
 		*positionF1++ = fv1[e];
 	}
+	m_nbRel1 = vecDarts.size()/2;
 
 	m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -420,6 +419,7 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 	return d;
 
 }
+
 
 
 }//end namespace GL2
