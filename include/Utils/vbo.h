@@ -90,6 +90,11 @@ public:
 	void setDataSize(unsigned int ds) { m_data_size = ds; }
 
 	/**
+	 * get nb element in vbo (vertices, colors ...)
+	 */
+	unsigned int nbElts() {return m_nbElts;}
+
+	/**
 	 * bind array vbo
 	 */
 	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER,m_id); }
@@ -117,14 +122,11 @@ public:
 
 	void releasePtr() const;
 
-	unsigned int nbElts() {return m_nbElts;}
+	void copyData(void *ptr) const;
 
-	void allocate(unsigned int nbElts)
-	{
-		m_nbElts = nbElts;
-		glBindBuffer(GL_ARRAY_BUFFER, m_id);
-		glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size*sizeof(float), 0, GL_STREAM_DRAW);
-	}
+
+
+	void allocate(unsigned int nbElts);
 };
 
 } // namespace Utils

@@ -23,123 +23,60 @@
 *******************************************************************************/
 
 
-#include "GL/glew.h"
-#include "Algo/Geometry/centroid.h"
-
 namespace CGoGN
 {
-
 namespace Algo
 {
-
 namespace Render
 {
-
 namespace SVG
 {
 
-
 template <typename PFP>
-void SVGOut::renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
 {
-	SvgPoints* points = new SvgPoints();
-	points->setColor(global_color);
-	points->setWidth(global_width);
-
-	TraversorV<typename PFP::MAP> trav(map,good,thread);
-
-	for(Dart d = trav.begin(); d != trav.end(); d=trav.next())
-	{
-		const Geom::Vec3f& P = position[d];
-		glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-		glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-		points->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
-	}
-	m_objs.push_back(points);
+	TraversorCell<typename PFP::MAP> trac(map,VERTEX,good);
+	svg.beginPoints();
+	for (Dart d=trac.begin(); d!=trac.end(); d=trac.next())
+		svg.addPoint(position[d]);
+	svg.endPoints();
 }
 
-
-
-
-
 template <typename PFP>
-void SVGOut::renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& color, const FunctorSelect& good, unsigned int thread)
 {
-	TraversorE<typename PFP::MAP> trav(map,good,thread);
-
-	for(Dart d = trav.begin(); d != trav.end(); d=trav.next())
-	{
-		const Geom::Vec3f& P = position[d];
-		glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-		glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-
-		const Geom::Vec3f& P2 = position[map.phi1(d)];
-		glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
-		glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
-
-		SvgPolyline* pol = new SvgPolyline();
-		pol->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
-		pol->addVertex(Geom::Vec3f(Q2[0],float(m_viewport[3])-Q2[1],Q2[2]));
-
-		pol->addVertex3D(Geom::Vec3f(R[0],float(m_viewport[3])-R[1],R[2]));
-		pol->addVertex3D(Geom::Vec3f(R2[0],float(m_viewport[3])-R2[1],R2[2]));
-
-		pol->setColor(global_color);
-		pol->setWidth(global_width);
-		m_objs.push_back(pol);
-	}
+	TraversorCell<typename PFP::MAP> trac(map,VERTEX,good);
+	svg.beginPoints();
+	for (Dart d=trac.begin(); d!=trac.end(); d=trac.next())
+		svg.addPoint(position[d],color[d]);
+	svg.endPoints();
 }
 
 
 template <typename PFP>
-void SVGOut::renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, bool cull, const FunctorSelect& good, unsigned int thread)
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good, unsigned int thread)
 {
-	TraversorF<typename PFP::MAP> trav(map,good,thread);
+	TraversorCell<typename PFP::MAP> trac(map,EDGE,good);
+	svg.beginLines();
+	for (Dart d=trac.begin(); d!=trac.end(); d=trac.next())
+		svg.addLine(position[d],position[map.phi1(d)]);
+	svg.endLines();
+}
 
-	for(Dart d = trav.begin(); d != trav.end(); d=trav.next())
-	{
-		bool cullFace=false;
-		if (cull)
-		{
-			const Geom::Vec3f& P = position[d];
-
-			glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-			const Geom::Vec3f& P2 = position[map.phi1(d)];
-			glm::vec3 R = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
-			const Geom::Vec3f& P3 = position[map.phi1(map.phi1(d))];
-			glm::vec3 S = glm::project(glm::vec3(P3[0],P3[1],P3[2]),m_model,m_proj,m_viewport);
-			glm::vec3 N = glm::cross(S-R,Q-R);
-			if (N[2]<0.0f)
-				cullFace=true;
-		}
-
-		if (!cullFace)
-		{
-			typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,d,position);
-			SvgPolygon* pol = new SvgPolygon();
-			Dart dd = d;
-			do
-			{
-				Geom::Vec3f P = position[d];
-				P = P*shrink + center*(1.0f-shrink);
-				glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-				glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-				pol->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
-				pol->addVertex3D(Geom::Vec3f(R[0],R[1],R[2]));
-				d = map.phi1(d);
-			}while (d!=dd);
-
-			pol->close();
-			pol->setColor(global_color);
-			pol->setWidth(global_width);
-			m_objs.push_back(pol);
-		}
-	}
-
+template <typename PFP>
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& color, const FunctorSelect& good, unsigned int thread)
+{
+	TraversorCell<typename PFP::MAP> trac(map,EDGE,good);
+	svg.beginLines();
+	for (Dart d=trac.begin(); d!=trac.end(); d=trac.next())
+		svg.addLine(position[d],position[map.phi1(d)],color[d]);
+	svg.endLines();
 }
 
 
-} // namespace SVG
-} // namespace Render
-} // namespace Algo
-} // namespace CGoGN
+
+}
+}
+}
+}
+

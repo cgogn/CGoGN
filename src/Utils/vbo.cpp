@@ -109,6 +109,20 @@ void VBO::releasePtr() const
 	m_lock = false;
 }
 
+void VBO::copyData(void *ptr) const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glGetBufferSubData(GL_ARRAY_BUFFER,0,m_nbElts*m_data_size*sizeof(float), ptr);
+}
+
+void VBO::allocate(unsigned int nbElts)
+{
+	m_nbElts = nbElts;
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size*sizeof(float), 0, GL_STREAM_DRAW);
+}
+
+
 } // namespace Utils
 
 } // namespace CGoGN

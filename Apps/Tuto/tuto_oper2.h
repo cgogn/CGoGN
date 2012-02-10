@@ -105,6 +105,8 @@ public:
 
 public slots:
 	void operation(int x);
+	void svg();
+	void width(int w);
 };
 
 

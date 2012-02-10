@@ -22,211 +22,60 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _MAP_SVG_RENDER
-#define _MAP_SVG_RENDER
+#ifndef _MAP_SVG_RENDER_
+#define _MAP_SVG_RENDER_
 
 #include <vector>
 #include <fstream>
 #include <sstream>
 
-#include "Geometry/vector_gen.h"
-#include "Topology/generic/functor.h"
-#include "Topology/generic/dartmarker.h"
+#include "Utils/svg.h"
+#include "Topology/generic/traversorCell.h"
 
+namespace CGoGN
+{
+namespace Algo
+{
+namespace Render
+{
+namespace SVG
+{
+/**
+ * render vertices in a SVGOut
+ * @warning no depth ordering
+ */
+template <typename PFP>
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good=allDarts, unsigned int thread=0);
 
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_precision.hpp"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_projection.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+/**
+ * render colored vertices in a SVGOut
+ * @warning no depth ordering
+ */
+template <typename PFP>
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& color, const FunctorSelect& good=allDarts, unsigned int thread=0);
 
 
 /**
-* A set of functions that allow the creation of rendering
-* object using Vertex-Buffer-Object.
-* Function are made for dual-2-map and can be used on
-* any subset of a dual-N-map which is a 2-map
-*/
-namespace CGoGN
-{
-
-namespace Algo
-{
-
-namespace Render
-{
-
-namespace SVG
-{
-
-class SvgObj
-{
-protected:
-	std::vector<Geom::Vec3f> m_vertices;
-	std::vector<Geom::Vec3f> m_colors;
-	std::vector<Geom::Vec3f> m_vertices3D;
-	Geom::Vec3f m_color;
-	float m_width;
-public:
-	void addVertex(const Geom::Vec3f& v);
-
-	void addVertex3D(const Geom::Vec3f& v);
-
-	void addVertex(const Geom::Vec3f& v, const Geom::Vec3f& C);
-
-	void addVertex3D(const Geom::Vec3f& v, const Geom::Vec3f& C);
+ * render edges in a SVGOut
+ * @warning no depth ordering
+ */
+template <typename PFP>
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good=allDarts, unsigned int thread=0);
 
 
-//	void addColor(const Geom::Vec3f& c);
-
-	void setColor(const Geom::Vec3f& c);
-
-	void setWidth(float w) { m_width=w;}
-
-	void close();
-
-	virtual void save(std::ofstream& out)=0;
-
-	unsigned int nbv() const { return m_vertices3D.size();}
-
-	const Geom::Vec3f& P(unsigned int i) const  { return m_vertices3D[i];}
-
-	Geom::Vec3f normal();
-
-};
-
-class SvgPoints: public SvgObj
-{
-public:
-	void save(std::ofstream& out);
-};
-
-
-class SvgPolyline: public SvgObj
-{
-public:
-	void save(std::ofstream& out);
-};
-
-class SvgLines: public SvgObj
-{
-public:
-	void save(std::ofstream& out);
-};
-
-
-class SvgPolygon: public SvgObj
-{
-protected:
-	Geom::Vec3f m_colorFill;
-public:
-
-	void setColorFill(const Geom::Vec3f& c);
-
-	void save(std::ofstream& out);
-};
-
-
-class SVGOut
-{
-protected:
-	std::ofstream* m_out;
-
-	const glm::mat4& m_model;
-	const glm::mat4& m_proj;
-	glm::i32vec4 m_viewport;
-
-	Geom::Vec3f global_color;
-	float global_width;
-
-	std::vector<SvgObj*> m_objs;
-
-	SvgObj* m_current;
-
-public:
-
-	/**
-	 * Object that allow the rendering/exporting in svg file
-	 * @param filename file name ended by .svg
-	 * @param model the modelview matrix
-	 * @param proj the projection matrix
-	 */
-	SVGOut(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
-
-	/**
-	 * destructor
-	 * flush and close the file
-	 */
-	~SVGOut();
-
-	void setColor(const Geom::Vec3f& col);
-
-	void setWidth(float w);
-
-	void closeFile();
-
-	template <typename PFP>
-	void renderLinesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts, unsigned int thread=0);
-
-	template <typename PFP>
-	void renderFacesToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, float shrink, bool cull = false, const FunctorSelect& good = allDarts, unsigned int thread=0);
-
-	template <typename PFP>
-	void renderPointsToSVG(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts, unsigned int thread=0);
-
-
-	void orderPrimitives(std::list<SvgObj*>& primitives);
-
-
-	void beginPoints();
-
-	void endPoints();
-
-	void addPoint(const Geom::Vec3f& P);
-	void addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C);
-
-
-	void beginLines();
-
-	void endLines();
-
-	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2);
-	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C);
-
-};
-
-
-struct compSvgObj
-{
-	int points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane, float& averageZ);
-	bool operator() (SvgObj* a, SvgObj*b);
-};
-
-struct compNormObj
-{
-//	int points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane);
-	bool operator() (SvgObj* a, SvgObj*b);
-};
-
-//
-//class BSP_SVG
-//{
-//protected:
-//	std::list<BSP_SVG*> m_front;
-//	std::list<BSP_SVG*> m_back;
-//	std::list<BSP_SVG*> m_intersect;
-//	SvgObj* m_obj;
-//
-//public:
-//	void insert(SvgObj*)
-//};
+/**
+ * render colored edges in a SVGOut
+ * @warning no depth ordering
+ */
+template <typename PFP>
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& color, const FunctorSelect& good=allDarts, unsigned int thread=0);
 
 
 
-} // namespace SVG
-} // namespace Render
-} // namespace Algo
-} // namespace CGoGN
+}
+}
+}
+}
 
 #include "Algo/Render/SVG/mapSVGRender.hpp"
 
