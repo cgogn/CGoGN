@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -158,8 +158,12 @@ void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>&
 
 void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 {
+	if(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e))
+	{
 	Dart d2 = phi2(d);
 	Dart e2 = phi2(e);
+
+
 
 	Map2::unsewFaces(d);
 	Map2::unsewFaces(e);
@@ -172,7 +176,7 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 		copyDartEmbedding(VERTEX, d, phi2(phi_1(d)));
 		copyDartEmbedding(VERTEX, e, phi2(phi_1(e)));
 		copyDartEmbedding(VERTEX, d2, phi2(phi_1(d2)));
-		copyDartEmbedding(VERTEX, e2, phi2(phi_1(d2)));
+		copyDartEmbedding(VERTEX, e2, phi2(phi_1(e2)));
 	}
 
 	if(isOrbitEmbedded(EDGE))
@@ -182,6 +186,7 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 
 	if(isOrbitEmbedded(VOLUME))
 		embedNewCell(VOLUME, d);
+	}
 }
 
 
