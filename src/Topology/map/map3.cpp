@@ -355,7 +355,18 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 //		}
 //	}
 
+bool Map3::collapseDegeneratedFace(Dart d)
+{
+	Dart d3 = phi3(d);
 
+	Map3::unsewVolumes(d);
+
+	std::cout << Map2::collapseDegeneratedFace(d) << std::endl;
+	std::cout << Map2::collapseDegeneratedFace(d3) << std::endl;
+	std::cout << std::endl;
+
+	return true;
+}
 
 void Map3::splitFace(Dart d, Dart e)
 {

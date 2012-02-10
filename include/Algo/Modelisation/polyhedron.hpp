@@ -139,7 +139,7 @@ Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
 	res = map.phi2(firstP);
 
 	map.sewVolumes(firstP, secondP);
-	map.mergeVolumes(firstP);
+	//map.mergeVolumes(firstP);
 
 	return res;
 }

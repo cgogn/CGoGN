@@ -155,6 +155,36 @@ void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>&
 
 }
 
+
+void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
+{
+	Dart d2 = phi2(d);
+	Dart e2 = phi2(e);
+
+	Map2::unsewFaces(d);
+	Map2::unsewFaces(e);
+
+	Map2::sewFaces(d, e);
+	Map2::sewFaces(d2, e2);
+
+	if(isOrbitEmbedded(VERTEX))
+	{
+		copyDartEmbedding(VERTEX, d, phi2(phi_1(d)));
+		copyDartEmbedding(VERTEX, e, phi2(phi_1(e)));
+		copyDartEmbedding(VERTEX, d2, phi2(phi_1(d2)));
+		copyDartEmbedding(VERTEX, e2, phi2(phi_1(d2)));
+	}
+
+	if(isOrbitEmbedded(EDGE))
+	{
+
+	}
+
+	if(isOrbitEmbedded(VOLUME))
+		embedNewCell(VOLUME, d);
+}
+
+
 //Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
 //{
 //        Dart resV = EmbeddedMap3::cutEdge(d);

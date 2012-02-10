@@ -108,8 +108,8 @@ public:
 	* @param positions  attribute of position vertices
 	* @param good selector
 	*/
-//	template<typename PFP>
-//	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
+	template<typename PFP>
+	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
 	* update all drawing buffers

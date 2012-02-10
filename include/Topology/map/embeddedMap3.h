@@ -71,6 +71,11 @@ public:
 	//!
 	/*!
 	 */
+	virtual bool collapseDegeneratedFace(Dart d);
+
+	//!
+	/*!
+	 */
 	virtual void splitFace(Dart d, Dart e);
 
 	//!

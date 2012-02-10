@@ -137,6 +137,12 @@ public:
 	 */
 	void constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m);
 
+	//!
+	/*!
+	 *
+	 */
+	void swapEdges(Dart d, Dart e);
+
 //	//!
 //	/*!
 //	 *

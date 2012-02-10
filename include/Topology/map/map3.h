@@ -170,6 +170,14 @@ public:
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes = true);
 
+	//! Delete a face if and only if it has one or two edges
+	/*! If the face is sewed to two distinct adjacent faces,
+	 *  then those two faces are sewed
+	 *  @param d a dart of the face
+	 *  @return true if the collapse has been executed, false otherwise
+	 */
+	virtual bool collapseDegeneratedFace(Dart d);
+
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
 	 *  @param d dart of first vertex

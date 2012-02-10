@@ -639,7 +639,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	{
 		//volCenter += position[d];
 		//++degree;
-
+		Dart f1 = map.phi1(dit);
 		Dart e = dit;
 		std::vector<Dart> v ;
 
@@ -684,17 +684,17 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			}
 			while(dd != stop);
 		}
-//		else
-//		{
-//			unsigned int idface = map.getNewFaceId();
-//			map.setFaceId(map.phi2(f1),idface, FACE);
-//		}
+		else
+		{
+			unsigned int idface = map.getNewFaceId();
+			map.setFaceId(map.phi2(v.front()),idface, FACE);
+		}
 	}
 
 	//switch inner faces
 	if(isNotTet)
 	{
-		unsigned int i = 0;
+		DartMarker me(map);
 
 		for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
 		{
@@ -704,58 +704,56 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			do
 			{
 				Dart f3 = map.phi3(f);
-				Dart tmp =  map.phi_1(map.phi2(map.phi_1(map.phi2(map.phi_1(f3))))); //future voisin par phi2
 
-				map.unsewFaces(f3);
-				map.unsewFaces(tmp);
-				map.sewFaces(f3, tmp, false);
+				if(!me.isMarked(f3))
+				{
+					Dart tmp =  map.phi_1(map.phi2(map.phi_1(map.phi2(map.phi_1(f3))))); //future voisin par phi2
 
-				map.copyDartEmbedding(VERTEX, map.phi2(f3), tmp);
-				map.copyDartEmbedding(VERTEX, map.phi2(tmp), f3);
+					Dart f32 = map.phi2(f3);
+					map.swapEdges(f3, tmp);
 
-//				map.embedOrbit(VERTEX, f3, map.getEmbedding(VERTEX, f3)) ;
-//				map.embedOrbit(VERTEX, tmp, map.getEmbedding(VERTEX, tmp)) ;
+					unsigned int idface = map.getNewFaceId();
+					map.setFaceId(map.phi2(f3),idface, FACE);
 
-//				unsigned int idface = map.getNewFaceId();
-//				map.setFaceId(map.phi2(f3),idface, FACE);
+					me.markOrbit(EDGE, f3);
+					me.markOrbit(EDGE, f32);
+				}
+
 				f = map.phi2(map.phi_1(f));
 			}while(f != x);
+		}
 
+	}
+
+	//Third step : 3-sew internal faces
+	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
+	{
+		Dart f1 = (*it).first;
+		Dart f2 = (*it).second;
+
+		//FAIS a la couture !!!!!!!
+		//id pour toutes les aretes exterieurs des faces quadrangulees
+		unsigned int idedge = map.getEdgeId(f1);
+		map.setEdgeId(map.phi2(f1), idedge, DART);
+		map.setEdgeId( map.phi2(f2), idedge, DART);
+
+	}
+
+	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
+	//id pour les aretes interieurs : (i.e. 16 pour un octa)
+	DartMarker mne(map);
+	for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
+	{
+		if(!mne.isMarked(*it))
+		{
+			unsigned int idedge = map.getNewEdgeId();
+			map.setEdgeId(*it, idedge, EDGE);
+			mne.markOrbit(EDGE,*it);
 		}
 	}
 
-	position[centralDart] = volCenter;
 
-
-//		//Third step : 3-sew internal faces
-//		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
-//		{
-//			Dart f1 = (*it).first;
-//			Dart f2 = (*it).second;
-//
-//			//FAIS a la couture !!!!!!!
-//			//id pour toutes les aretes exterieurs des faces quadrangulees
-//			unsigned int idedge = map.getEdgeId(f1);
-//			map.setEdgeId(map.phi2(f1), idedge, DART);
-//			map.setEdgeId( map.phi2(f2), idedge, DART);
-//
-//		}
-//
-//		//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
-//		//id pour les aretes interieurs : (i.e. 16 pour un octa)
-//		DartMarker mne(map);
-//		for(std::vector<Dart>::iterator it = newEdges.begin() ; it != newEdges.end() ; ++it)
-//		{
-//			if(!mne.isMarked(*it))
-//			{
-//				unsigned int idedge = map.getNewEdgeId();
-//				map.setEdgeId(*it, idedge, EDGE);
-//				mne.markOrbit(EDGE,*it);
-//			}
-//		}
-//
-//
-//		map.setCurrentLevel(cur) ;
+		map.setCurrentLevel(cur) ;
 }
 
 
