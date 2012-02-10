@@ -21,29 +21,20 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#include "Algo/Render/SVG/mapSVGRender.h"
+#include "Utils/svg.h"
+#include "Utils/cgognStream.h"
 #include <algorithm>
 #include <typeinfo>
+#include <GL/glew.h>
 
-/**
-* A set of functions that allow the creation of rendering
-* object using Vertex-Buffer-Object.
-* Function are made for dual-2-map and can be used on
-* any subset of a dual-N-map which is a 2-map
-*/
 namespace CGoGN
 {
 
-namespace Algo
-{
-
-namespace Render
+namespace Utils
 {
 
 namespace SVG
 {
-
-
 
 
 void SvgObj::addVertex(const Geom::Vec3f& v)
@@ -61,15 +52,22 @@ void SvgObj::addVertex3D(const Geom::Vec3f& v)
 void SvgObj::addVertex(const Geom::Vec3f& v, const Geom::Vec3f& c)
 {
 	m_vertices.push_back(v);
-	m_colors.push_back(c);
+	if (m_colors.size() < m_vertices.size())
+		m_colors.push_back(c);
 }
 
 void SvgObj::addVertex3D(const Geom::Vec3f& v, const Geom::Vec3f& c)
 {
 	m_vertices3D.push_back(v);
-	m_colors.push_back(c);
+	if (m_colors.size() < m_vertices.size())
+		m_colors.push_back(c);
 }
 
+
+void SvgObj::setWidth(float w)
+{
+	m_width=w;
+}
 
 
 void SvgObj::setColor(const Geom::Vec3f& c)
@@ -81,6 +79,16 @@ void SvgObj::setColor(const Geom::Vec3f& c)
 void SvgObj::close()
 {
 	m_vertices.push_back(m_vertices.front());
+}
+
+unsigned int SvgObj::nbv() const
+{
+	return m_vertices3D.size();
+}
+
+const Geom::Vec3f& SvgObj::P(unsigned int i) const
+{
+	return m_vertices3D[i];
 }
 
 
@@ -107,7 +115,6 @@ void SvgPoints::save(std::ofstream& out)
 {
 	std::stringstream ss;
 
-//	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
 	unsigned int nb = m_vertices.size();
 	for (unsigned int i=0; i<nb; ++i)
 	{
@@ -160,10 +167,10 @@ void SvgLines::save(std::ofstream& out)
 {
 	std::stringstream ss;
 
-//	for (std::vector<Geom::Vec3f>::iterator it =m_vertices.begin(); it != m_vertices.end(); ++it)
 	unsigned int nb = m_vertices.size();
 	for (unsigned int i=0; i<nb; ++i)
 	{
+
 		out << "<polyline fill=\"none\" stroke=\"#";
 		out << std::hex;
 		unsigned int wp = out.width(2);
@@ -281,11 +288,6 @@ void SVGOut::setWidth(float w)
 void SVGOut::closeFile()
 {
 	// here do the sort in necessary
-//	compNormObj cmp;
-//	std::sort(m_objs.begin(),m_objs.end(),cmp);
-
-	std::cout << "CLOSE"<< std::endl;
-//	std::list<SvgObj*> primitives;
 
 	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
 	{
@@ -295,123 +297,6 @@ void SVGOut::closeFile()
 	*m_out << "</g>" << std::endl;
 	*m_out << "</svg>" << std::endl;
 	m_out->close();
-}
-
-
-
-// all points behind the plane +1
-// all points before the plane -1
-// all points colinear to the plane 0
-// undefined 999
-int compSvgObj::points_plane (SvgPolygon* pol_points, SvgPolygon* pol_plane, float& averageZ)
-{
-	Geom::Vec3f N = pol_plane->normal();
-
-	if (N[2] > 0.0f)
-		N = -1.0f*N;
-
-	unsigned int nb = pol_points->nbv();
-	unsigned int nbback=0;
-	unsigned int nbfront=0;
-	unsigned int nb_col=0;
-	averageZ=0.0f;
-	for (unsigned int i=0; i< nb; ++i)
-	{
-		const Geom::Vec3f& Q = pol_points->P(i);
-		averageZ += Q[2];
-		Geom::Vec3f U = Q - pol_plane->P(0);
-
-		float ps = U*N;
-
-		if (fabs(ps) < 0.0001f)
-			nb_col++;
-		else
-		{
-			if (ps <0)
-				nbback++;
-			else
-				nbfront++;
-		}
-	}
-
-	averageZ /= float(nb);
-
-	if (nbfront==0)
-		return 1;
-
-	if (nbback==0)
-		return -1;
-
-	if (nb_col==nb)
-		return 0;
-
-	return 999;
-}
-
-
-bool compSvgObj::operator() (SvgObj* a, SvgObj*b)
-{
-	SvgPolygon* p_a = dynamic_cast<SvgPolygon*>(a);
-	SvgPolygon* p_b = dynamic_cast<SvgPolygon*>(b);
-
-	if ((p_a!= NULL) && (p_b!=NULL)) // first case polygon/polygon
-	{
-		float avz_a;
-		int  t1 = points_plane(p_a,p_b,avz_a);
-
-		if (t1==0) // colinear choose farthest
-		{
-			float za = p_a->P(0)[2];
-			float zb = p_b->P(0)[2];
-			return za > zb;
-		}
-
-		float avz_b;
-		int  t2 = points_plane(p_b,p_a,avz_b);
-
-		// all point of a behind b
-		if ((t1 == 1)&&(t2==999))
-			return true;
-
-		// all point of b infront of a
-		if ((t2 == -1) && (t1==999))
-			return true;
-
-		if ((t1 == t2 )&& (t2!=999))
-		{
-			return avz_a > avz_b;
-		}
-
-		// all other cases ??
-		return false;
-	}
-
-	std::cout << "Cas non traite !!"<< std::endl;
-	return false;
-}
-
-
-
-bool compNormObj::operator() (SvgObj* a, SvgObj*b)
-{
-	SvgPolygon* p_a = dynamic_cast<SvgPolygon*>(a);
-	SvgPolygon* p_b = dynamic_cast<SvgPolygon*>(b);
-
-
-	if ((p_a!= NULL) && (p_b!=NULL)) // first case polygon/polygon
-	{
-		Geom::Vec3f Na = p_a->normal();
-		Geom::Vec3f Nb = p_b->normal();
-		return fabs(Na[2]) > fabs(Nb[2]);
-	}
-
-	if ((p_a!= NULL)) // second case polygon/other
-	{
-		return true;	// all polygon before segments.
-	}
-
-	std::cout << "Cas non traite !!"<< std::endl;
-	return false;
 }
 
 
@@ -429,6 +314,7 @@ void SVGOut::beginPoints()
 void SVGOut::endPoints()
 {
 	m_objs.push_back(m_current);
+	m_current = NULL;
 }
 
 void SVGOut::addPoint(const Geom::Vec3f& P)
@@ -462,6 +348,7 @@ void SVGOut::beginLines()
 void SVGOut::endLines()
 {
 	m_objs.push_back(m_current);
+	m_current = NULL;
 }
 
 void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
@@ -500,8 +387,7 @@ void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Ve
 
 
 } // namespace SVG
-} // namespace Render
-} // namespace Algo
+} // namespace Utils
 } // namespace CGoGN
 
 
