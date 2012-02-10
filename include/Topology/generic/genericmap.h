@@ -239,7 +239,6 @@ private:
 	 * internal functions
 	 */
 	void deleteDartLine(unsigned int index) ;
-	void copyDartLine(unsigned int dest, unsigned int src) ;
 	unsigned int newCopyOfDartLine(unsigned int index) ;
 
 public:

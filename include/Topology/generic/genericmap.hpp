@@ -109,28 +109,17 @@ inline Dart GenericMap::newDart()
 
 inline void GenericMap::deleteDart(Dart d)
 {
-	// hypothese : lors d'une suppression de brin, les attributs du brin supprimé
-	// sont identiques à tous les niveaux > au niveau où a lieu la suppression
 	if(m_isMultiRes)
 	{
-		// if a dart is deleted on its insertion level
+		// a MRdart can only be deleted on its insertion level
+		assert(getDartLevel(d) == m_mrCurrentLevel || !"deleteDart : try to delete a dart on a level greater than its insertion level") ;
+
 		// all the darts pointed in greater levels are deleted
 		// and then the MRdart is deleted
-		if((*m_mrLevels)[d.index] == m_mrCurrentLevel)
-		{
-			for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-				deleteDartLine((*m_mrDarts[i])[d.index]) ;
-			m_mrattribs.removeLine(d.index) ;
-			m_mrNbDarts[m_mrCurrentLevel]-- ;
-		}
-		// if a dart is deleted after its insertion level
-		// the dart of previous level is copied in the greater levels
-		else
-		{
-			unsigned int dprev = (*m_mrDarts[m_mrCurrentLevel - 1])[d.index] ;
-			for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-				copyDartLine((*m_mrDarts[i])[d.index], dprev) ;
-		}
+		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
+			deleteDartLine((*m_mrDarts[i])[d.index]) ;
+		m_mrattribs.removeLine(d.index) ;
+		m_mrNbDarts[m_mrCurrentLevel]-- ;
 	}
 	else
 		deleteDartLine(dartIndex(d)) ;
@@ -160,49 +149,14 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 	}
 }
 
-inline void GenericMap::copyDartLine(unsigned int dest, unsigned int src)
-{
-	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-	{
-		if (m_embeddings[orbit])									// for each embedded orbit
-		{
-			unsigned int emb = (*m_embeddings[orbit])[dest] ;		// get the embedding of the destination dart
-			if(emb != EMBNULL)
-			{
-				if(m_attribs[orbit].unrefLine(emb))					// unref the pointed embedding line
-				{
-					for (unsigned int t = 0; t < m_nbThreads; ++t)	// and clear its markers if it was
-						(*m_markTables[orbit][t])[emb].clear() ;	// its last unref (and was thus freed)
-				}
-			}
-		}
-	}
-
-	m_attribs[DART].copyLine(dest, src) ;
-
-	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
-	{
-		if (m_embeddings[orbit])									// for each embedded orbit
-		{
-			unsigned int emb = (*m_embeddings[orbit])[src] ;		// add a ref to the pointed attributes
-			if(emb != EMBNULL)
-				m_attribs[orbit].refLine(emb) ;
-		}
-	}
-}
-
 inline unsigned int GenericMap::newCopyOfDartLine(unsigned int index)
 {
-	unsigned int newindex = m_attribs[DART].insertLine() ;
-	m_attribs[DART].copyLine(newindex, index) ;
+	unsigned int newindex = m_attribs[DART].insertLine() ;	// create a new dart line
+	m_attribs[DART].copyLine(newindex, index) ;				// copy the given dart line
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
-		if (m_embeddings[orbit])
-		{
-			unsigned int emb = (*m_embeddings[orbit])[newindex] ;	// add a ref to the pointed attributes
-			if(emb != EMBNULL)
-				m_attribs[orbit].refLine(emb) ;
-		}
+		if (m_embeddings[orbit])							// put the embeddings of the
+			(*m_embeddings[orbit])[newindex] = EMBNULL ;	// new line to EMBNULL
 	}
 	return newindex ;
 }

@@ -262,7 +262,10 @@ void Map2MR_Primal::subdivideEdge(Dart d)
 	pushLevel() ;
 
 	if(eLevel == getMaxLevel())
+	{
 		addLevel() ;
+		copyVertexEmbeddings() ;
+	}
 
 	setCurrentLevel(eLevel + 1) ;
 	cutEdge(d) ;
