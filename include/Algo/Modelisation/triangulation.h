@@ -86,7 +86,7 @@ protected:
 
 	bool inTriangle(const typename PFP::VEC3& P, const typename PFP::VEC3& normal, const typename PFP::VEC3& Ta,  const typename PFP::VEC3& Tb, const typename PFP::VEC3& Tc);
 
-	void recompute2Ears( Dart d, const typename PFP::VEC3& normalPoly,  bool convex);
+	void recompute2Ears( Dart d, const typename PFP::VEC3& normalPoly, bool convex);
 
 	float computeEarInit(Dart d, const typename PFP::VEC3& normalPoly, float& val);
 
@@ -101,7 +101,6 @@ public:
 	void trianguleFace(Dart d);
 
 	void triangule(const FunctorSelect& good = allDarts, unsigned int thread = 0);
-
 };
 
 } // namespace Modelisation

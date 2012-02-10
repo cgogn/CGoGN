@@ -128,6 +128,11 @@ protected:
 	AttributeMultiVector<unsigned int>* m_mrLevels ;
 
 	/**
+	 * vector that stores the number of darts inserted on each resolution level
+	 */
+	std::vector<unsigned int> m_mrNbDarts ;
+
+	/**
 	 * current level in multiresolution map
 	 */
 	unsigned int m_mrCurrentLevel ;
@@ -147,11 +152,6 @@ public:
 	virtual std::string mapTypeName() = 0 ;
 
 	/**
-	 * initialize the multiresolution attribute container
-	 */
-	void initMR() ;
-
-	/**
 	 * Clear the map
 	 * @param removeAttrib
 	 *   if false -> data is deleted but all attributes remain (all AttributeHandlers are still valid)
@@ -168,6 +168,13 @@ public:
 	 *           MULTIRES                   *
 	 ****************************************/
 
+	void printMR() ;
+
+	/**
+	 * initialize the multiresolution attribute container
+	 */
+	void initMR() ;
+
 	/**
 	 * get the current resolution level (use only in MRMaps)
 	 */
@@ -177,6 +184,16 @@ public:
 	 * set the current resolution level (use only in MRMaps)
 	 */
 	void setCurrentLevel(unsigned int l) ;
+
+	/**
+	 * increment the current resolution level (use only in MRMaps)
+	 */
+	void incCurrentLevel() ;
+
+	/**
+	 * decrement the current resolution level (use only in MRMaps)
+	 */
+	void decCurrentLevel() ;
 
 	/**
 	 * store current resolution level on a stack (use only in MRMaps)
@@ -199,14 +216,9 @@ public:
 	void addLevel() ;
 
 	/**
-	 * add a resolution level and duplicate all darts (use only in MRMaps)
+	 * remove last resolution level (use only in MRMaps)
 	 */
-	void addLevelDuplicate() ;
-
-	/**
-	 * get the insertion level of a dart (use only in MRMaps)
-	 */
-	unsigned int getDartLevel(Dart d) ;
+	void removeLevel() ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -222,6 +234,14 @@ protected:
 	 */
 	void deleteDart(Dart d) ;
 
+private:
+	/**
+	 * internal functions
+	 */
+	void deleteDartLine(unsigned int index) ;
+	void copyDartLine(unsigned int dest, unsigned int src) ;
+	unsigned int newCopyOfDartLine(unsigned int index) ;
+
 public:
 	/**
 	 * get the index of dart in topological table
@@ -229,14 +249,29 @@ public:
 	unsigned int dartIndex(Dart d);
 
 	/**
-	 * return true if the dart d refers to a valid index
+	 * get the insertion level of a dart (use only in MRMaps)
 	 */
-	bool isDartValid(Dart d) ;
+	unsigned int getDartLevel(Dart d) ;
+
+	/**
+	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
+	 */
+	unsigned int getNbInsertedDarts(unsigned int level) ;
+
+	/**
+	 * get the number of darts that define the map of the given leveldart (use only in MRMaps)
+	 */
+	unsigned int getNbDarts(unsigned int level) ;
 
 	/**
 	 * @return the number of darts in the map
 	 */
 	unsigned int getNbDarts() ;
+
+	/**
+	 * return true if the dart d refers to a valid index
+	 */
+	bool isDartValid(Dart d) ;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -266,11 +301,11 @@ public:
 
 	/**
 	 * Copy the index of the cell associated to a dart over an other dart
-	 * @param d the dart to overwrite (dest)
-	 * @param e the dart to copy (src)
 	 * @param orbit the id of orbit embedding
+	 * @param dest the dart to overwrite
+	 * @param src the dart to copy
 	 */
-	void copyDartEmbedding(unsigned int orbit, Dart d, Dart e) ;
+	void copyDartEmbedding(unsigned int orbit, Dart dest, Dart src) ;
 
 	/**
 	 * Allocation of some place in attrib table
@@ -356,6 +391,11 @@ public:
 	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
 	 */
 	void initOrbitEmbedding(unsigned int orbit, bool realloc = false) ;
+
+	/**
+	 * print attributes name of map in std::cout (for debugging)
+	 */
+	void viewAttributesTables() ;
 
 protected:
 	/****************************************
@@ -535,11 +575,6 @@ public:
 	 * 	@return the number of orbits
 	 */
 	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = allDarts) ;
-
-	/**
-	 * print attributes name of map in std::cout (for debugging)
-	 */
-	void viewAttributesTables();
 
 protected:
 	/// boundary marker
