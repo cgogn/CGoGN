@@ -26,6 +26,7 @@
 #define __GENERIC_MAP__
 
 #include <iostream>
+#include <string>
 #include <sstream>
 #include <fstream>
 #include <iomanip>

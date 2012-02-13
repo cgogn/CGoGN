@@ -173,6 +173,8 @@ void GenericMap::initMR()
 #endif
 
 	m_mrattribs.clear(true) ;
+	m_mrattribs.setRegistry(m_attributes_registry_map) ;
+
 	m_mrDarts.clear() ;
 	m_mrDarts.reserve(16) ;
 	m_mrNbDarts.clear();
@@ -457,7 +459,15 @@ bool GenericMap::saveMapBin(const std::string& filename)
 		m_attribs[i].saveBin(fs, i);
 
 	if (m_isMultiRes)
+	{
 		m_mrattribs.saveBin(fs, 00);
+
+		fs.write(reinterpret_cast<const char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+
+		unsigned int nb = m_mrNbDarts.size();
+		fs.write(reinterpret_cast<const char*>(&nb), sizeof(unsigned int));
+		fs.write(reinterpret_cast<const char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
+	}
 
 	return true;
 }
@@ -538,15 +548,23 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	}
 
 	if (m_isMultiRes)
+	{
+		AttributeContainer::loadBinId(fs); // not used but need to read to skip
 		m_mrattribs.loadBin(fs);
+
+		fs.read(reinterpret_cast<char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+		unsigned int nb;
+		fs.read(reinterpret_cast<char*>(&nb), sizeof(unsigned int));
+		m_mrNbDarts.resize(nb);
+		fs.read(reinterpret_cast<char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
+	}
+
 
 	// retrieve m_embeddings (from m_attribs)
 	update_m_emb_afterLoad();
 
 	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
 	update_topo_shortcuts();
-
-
 
 	return true;
 }
