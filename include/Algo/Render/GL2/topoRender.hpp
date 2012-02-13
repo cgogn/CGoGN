@@ -361,18 +361,6 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 
 }
 
-template<typename PFP>
-void TopoRender::dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b)
-{
-	unsigned int lab = map.dartIndex(d) + 1; // add one to avoid picking the black of screen
-
-	r = float(lab%255) / 255.0f; lab = lab/255;
-	g = float(lab%255) / 255.0f; lab = lab/255;
-	b = float(lab%255) / 255.0f; lab = lab/255;
-	if (lab!=0)
-		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
-}
-
 
 
 template<typename PFP>
@@ -389,7 +377,7 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 			if (nb < m_nbDarts)
 			{
 				float r,g,b;
-				dartToCol<PFP>(map,d, r,g,b);
+				dartToCol(d, r,g,b);
 				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
 				*local++ = r;
 				*local++ = g;
