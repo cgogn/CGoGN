@@ -249,35 +249,48 @@ bool Map2MR_Primal::faceIsSubdividedOnce(Dart d)
 }
 
 /***************************************************
- *           EMBEDDINGS MANAGEMENT                 *
- ***************************************************/
-
-void Map2MR_Primal::copyVertexEmbeddings()
-{
-	unsigned int maxL = getMaxLevel() ;
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-	{
-		unsigned int previdx = (*m_mrDarts[maxL - 1])[i] ;
-		unsigned int newidx = (*m_mrDarts[maxL])[i] ;
-		unsigned int emb = (*m_embeddings[VERTEX])[previdx] ;
-		(*m_embeddings[VERTEX])[newidx] = emb ;
-		if(emb != EMBNULL)
-			m_attribs[VERTEX].refLine(emb);
-	}
-}
-
-/***************************************************
  *               SUBDIVISION                       *
  ***************************************************/
+
+void Map2MR_Primal::duplicateDart(Dart d)
+{
+	if(getDartLevel(d) < getCurrentLevel())
+	{
+		unsigned int oldindex = dartIndex(d) ;
+		unsigned int newindex = newCopyOfDartLine(oldindex) ;
+		for(unsigned int i = getCurrentLevel(); i <= getMaxLevel(); ++i)
+		{
+			(*m_mrDarts[i])[d.index] = newindex ;
+			if(shareVertexEmbeddings)
+			{
+				unsigned int emb = (*m_embeddings[VERTEX])[oldindex] ;
+				(*m_embeddings[VERTEX])[newindex] = emb ;
+				if(emb != EMBNULL)
+					m_attribs[VERTEX].refLine(emb);
+			}
+		}
+	}
+}
 
 void Map2MR_Primal::addNewLevel()
 {
 	addLevel() ;
 	if(shareVertexEmbeddings)
-		copyVertexEmbeddings() ;
+	{
+		unsigned int maxL = getMaxLevel() ;
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int previdx = (*m_mrDarts[maxL - 1])[i] ;
+			unsigned int newidx = (*m_mrDarts[maxL])[i] ;
+			unsigned int emb = (*m_embeddings[VERTEX])[previdx] ;
+			(*m_embeddings[VERTEX])[newidx] = emb ;
+			if(emb != EMBNULL)
+				m_attribs[VERTEX].refLine(emb);
+		}
+	}
 }
 
-void Map2MR_Primal::subdivideEdge(Dart d)
+unsigned int Map2MR_Primal::subdivideEdge(Dart d)
 {
 	assert(getDartLevel(d) <= getCurrentLevel() || !"subdivideEdge : called with a dart introduced after current level") ;
 	assert(!edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
@@ -290,12 +303,19 @@ void Map2MR_Primal::subdivideEdge(Dart d)
 		addNewLevel() ;
 
 	setCurrentLevel(eLevel + 1) ;
+	Dart dd = phi2(d) ;
+	duplicateDart(d) ;
+	duplicateDart(phi1(d)) ;
+	duplicateDart(dd) ;
+	duplicateDart(phi1(dd)) ;
 	cutEdge(d) ;
 
 	popLevel() ;
+
+	return eLevel ;
 }
 
-void Map2MR_Primal::subdivideFace(Dart d)
+unsigned int Map2MR_Primal::subdivideFace(Dart d)
 {
 	assert(getDartLevel(d) <= getCurrentLevel() || !"subdivideFace : called with a dart introduced after current level") ;
 	assert(!faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
@@ -350,6 +370,8 @@ void Map2MR_Primal::subdivideFace(Dart d)
 	}
 
 	popLevel() ;
+
+	return fLevel ;
 }
 
 void Map2MR_Primal::coarsenEdge(Dart d)

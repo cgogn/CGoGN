@@ -235,12 +235,15 @@ protected:
 	 */
 	void deleteDart(Dart d) ;
 
-private:
+	/**
+	 * create a copy of a dart (based on its index in m_attribs[DART]) and returns its index
+	 */
+	unsigned int newCopyOfDartLine(unsigned int index) ;
+
 	/**
 	 * internal functions
 	 */
 	void deleteDartLine(unsigned int index) ;
-	unsigned int newCopyOfDartLine(unsigned int index) ;
 
 public:
 	/**

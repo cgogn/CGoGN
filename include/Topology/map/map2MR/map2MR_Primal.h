@@ -35,14 +35,14 @@ class Map2MR_Primal : public EmbeddedMap2
 protected:
 	bool shareVertexEmbeddings ;
 
-	FunctorType& vertexVertexFunctor ;
-	FunctorType& edgeVertexFunctor ;
-	FunctorType& faceVertexFunctor ;
+//	FunctorType& vertexVertexFunctor ;
+//	FunctorType& edgeVertexFunctor ;
+//	FunctorType& faceVertexFunctor ;
 
 public:
 	Map2MR_Primal() ;
 
-	std::string mapTypeName() { return "Map2MR_Primal";}
+	std::string mapTypeName() { return "Map2MR_Primal" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
@@ -101,16 +101,12 @@ public:
 	 */
 	bool faceIsSubdividedOnce(Dart d) ;
 
-protected:
-	/***************************************************
-	 *           EMBEDDINGS MANAGEMENT                 *
-	 ***************************************************/
-
-	void copyVertexEmbeddings() ;
-
 	/***************************************************
 	 *               SUBDIVISION                       *
 	 ***************************************************/
+
+protected:
+	void duplicateDart(Dart d) ;
 
 	/**
 	 * add a new resolution level
@@ -121,12 +117,12 @@ public:
 	/**
 	 * subdivide the edge of d to the next level
 	 */
-	void subdivideEdge(Dart d) ;
+	unsigned int subdivideEdge(Dart d) ;
 
 	/**
 	 * subdivide the face of d to the next level
 	 */
-	void subdivideFace(Dart d) ;
+	unsigned int subdivideFace(Dart d) ;
 
 	/**
 	 * coarsen the edge of d from the next level
@@ -138,17 +134,17 @@ public:
 	 */
 	void coarsenFace(Dart d) ;
 
-	/**
-	 * vertices attributes management
-	 */
-	void setVertexVertexFunctor(FunctorType& f) { vertexVertexFunctor = f ; }
-	void computeVertexVertex(Dart d) { vertexVertexFunctor(d) ; }
-
-	void setEdgeVertexFunctor(FunctorType& f) { edgeVertexFunctor = f ; }
-	void computeEdgeVertex(Dart d) { edgeVertexFunctor(d) ; }
-
-	void setFaceVertexFunctor(FunctorType& f) { faceVertexFunctor = f ; }
-	void computeFaceVertex(Dart d) { faceVertexFunctor(d) ; }
+//	/**
+//	 * vertices attributes management
+//	 */
+//	void setVertexVertexFunctor(FunctorType& f) { vertexVertexFunctor = f ; }
+//	void computeVertexVertex(Dart d) { vertexVertexFunctor(d) ; }
+//
+//	void setEdgeVertexFunctor(FunctorType& f) { edgeVertexFunctor = f ; }
+//	void computeEdgeVertex(Dart d) { edgeVertexFunctor(d) ; }
+//
+//	void setFaceVertexFunctor(FunctorType& f) { faceVertexFunctor = f ; }
+//	void computeFaceVertex(Dart d) { faceVertexFunctor(d) ; }
 } ;
 
 } // namespace CGoGN

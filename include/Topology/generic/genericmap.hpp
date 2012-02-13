@@ -44,7 +44,7 @@ inline void GenericMap::setCurrentLevel(unsigned int l)
 
 inline void GenericMap::incCurrentLevel()
 {
-	if(m_mrCurrentLevel < m_mrDarts.size())
+	if(m_mrCurrentLevel < m_mrDarts.size() - 1)
 		++m_mrCurrentLevel ;
 	else
 		CGoGNout << "incCurrentLevel : already at maximum resolution level" << CGoGNendl ;
@@ -99,7 +99,7 @@ inline Dart GenericMap::newDart()
 		(*m_mrDarts[m_mrCurrentLevel])[mrdi] = di ;
 
 		for(unsigned int i = m_mrCurrentLevel + 1; i < m_mrDarts.size(); ++i)
-			(*m_mrDarts[i])[mrdi] = newCopyOfDartLine(di) ;
+			(*m_mrDarts[i])[mrdi] = di ; // newCopyOfDartLine(di) ;
 
 		return Dart::create(mrdi) ;
 	}
@@ -114,10 +114,12 @@ inline void GenericMap::deleteDart(Dart d)
 		// a MRdart can only be deleted on its insertion level
 		assert(getDartLevel(d) == m_mrCurrentLevel || !"deleteDart : try to delete a dart on a level greater than its insertion level") ;
 
-		// all the darts pointed in greater levels are deleted
-		// and then the MRdart is deleted
 		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-			deleteDartLine((*m_mrDarts[i])[d.index]) ;
+		{
+			unsigned int index = (*m_mrDarts[i])[d.index] ;
+			if(isDartValid(index))
+				deleteDartLine(index) ;
+		}
 		m_mrattribs.removeLine(d.index) ;
 		m_mrNbDarts[m_mrCurrentLevel]-- ;
 	}
@@ -157,6 +159,11 @@ inline unsigned int GenericMap::newCopyOfDartLine(unsigned int index)
 	{
 		if (m_embeddings[orbit])							// put the embeddings of the
 			(*m_embeddings[orbit])[newindex] = EMBNULL ;	// new line to EMBNULL
+//		{
+//		unsigned int emb = (*m_embeddings[orbit])[newindex] ;
+//		if(emb != EMBNULL)
+//			m_attribs[orbit].refLine(emb) ;
+//		}
 	}
 	return newindex ;
 }
