@@ -35,6 +35,10 @@ class Map2MR_Primal : public EmbeddedMap2
 protected:
 	bool shareVertexEmbeddings ;
 
+	FunctorType& vertexVertexFunctor ;
+	FunctorType& edgeVertexFunctor ;
+	FunctorType& faceVertexFunctor ;
+
 public:
 	Map2MR_Primal() ;
 
@@ -95,6 +99,7 @@ public:
 	 */
 	bool faceIsSubdividedOnce(Dart d) ;
 
+protected:
 	/***************************************************
 	 *           EMBEDDINGS MANAGEMENT                 *
 	 ***************************************************/
@@ -110,6 +115,7 @@ public:
 	 */
 	void addNewLevel() ;
 
+public:
 	/**
 	 * subdivide the edge of d to the next level
 	 */
@@ -129,6 +135,18 @@ public:
 	 * coarsen the face of d from the next level
 	 */
 	void coarsenFace(Dart d) ;
+
+	/**
+	 * vertices attributes management
+	 */
+	void setVertexVertexFunctor(FunctorType& f) { vertexVertexFunctor = f ; }
+	void computeVertexVertex(Dart d) { vertexVertexFunctor(d) ; }
+
+	void setEdgeVertexFunctor(FunctorType& f) { edgeVertexFunctor = f ; }
+	void computeEdgeVertex(Dart d) { edgeVertexFunctor(d) ; }
+
+	void setFaceVertexFunctor(FunctorType& f) { faceVertexFunctor = f ; }
+	void computeFaceVertex(Dart d) { faceVertexFunctor(d) ; }
 } ;
 
 } // namespace CGoGN
