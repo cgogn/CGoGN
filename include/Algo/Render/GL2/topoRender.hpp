@@ -67,10 +67,9 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-	{
+	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
-	}
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
@@ -213,10 +212,10 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-	{
+	m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
-	}
+
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
@@ -369,6 +368,13 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 	m_vbo3->bind();
 	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
+
+	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
+	{
+		CGoGNerr << "Error attribute_dartIndex does not exist during TopoRender::picking" << CGoGNendl;
+		return;
+	}
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{

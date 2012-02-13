@@ -38,6 +38,8 @@ protected:
 public:
 	Map2MR_Primal() ;
 
+	std::string mapTypeName() { return "Map2MR_Primal";}
+
 	/***************************************************
 	 *               CELLS INFORMATION                 *
 	 ***************************************************/
