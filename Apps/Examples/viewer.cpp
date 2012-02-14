@@ -230,7 +230,6 @@ void Viewer::exportMesh(std::string& filename)
 	size_t pos = filename.rfind(".") ;    // position of "." in filename
 	std::string extension = filename.substr(pos) ;
 
-
 	if (extension == std::string(".off"))
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
