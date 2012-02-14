@@ -175,9 +175,10 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("off (*.off)") ;
+	std::string filters("all (*.*);; off (*.off);; ply (*.ply);; plygen (*.plygen)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
-	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+
+	exportMesh(filename) ;
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -222,6 +223,20 @@ void Viewer::importMesh(std::string& filename)
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
+}
+
+void Viewer::exportMesh(std::string& filename)
+{
+	size_t pos = filename.rfind(".") ;    // position of "." in filename
+	std::string extension = filename.substr(pos) ;
+
+
+	if (extension.compare(std::string(".off")) == 0)
+		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension.compare(0, 4, std::string(".ply")) == 0)
+		Algo::Export::exportPLY<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else
+		std::cerr << "Cannot save file " << filename << " : unknown or unhandled extension" << std::endl ;
 }
 
 void Viewer::slot_drawVertices(bool b)
@@ -278,10 +293,19 @@ int main(int argc, char **argv)
 	sqt.setGeometry(0, 0, 1000, 800) ;
  	sqt.show() ;
 
-	if(argc == 2)
+	if(argc >= 2)
 	{
 		std::string filename(argv[1]) ;
 		sqt.importMesh(filename) ;
+		if(argc >= 3)
+		{
+			std::string filenameExp(argv[2]) ;
+			std::cout << "Exporting " << filename << " as " << filenameExp << " ... "<< std::flush ;
+			sqt.exportMesh(filenameExp) ;
+			std::cout << "done!" << std::endl ;
+
+			return (0) ;
+		}
 	}
 
 	sqt.initGUI() ;
