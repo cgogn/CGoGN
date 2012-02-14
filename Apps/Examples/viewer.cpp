@@ -175,7 +175,7 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("all (*.*);; off (*.off);; ply (*.ply);; plygen (*.plygen)") ;
+	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply);; plygen (*.plygen)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
 
 	exportMesh(filename) ;
@@ -231,10 +231,12 @@ void Viewer::exportMesh(std::string& filename)
 	std::string extension = filename.substr(pos) ;
 
 
-	if (extension.compare(std::string(".off")) == 0)
+	if (extension == std::string(".off"))
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 		Algo::Export::exportPLY<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension == std::string(".map"))
+		myMap.saveMapBin(filename) ;
 	else
 		std::cerr << "Cannot save file " << filename << " : unknown or unhandled extension" << std::endl ;
 }
