@@ -112,6 +112,7 @@ public:
 	void cb_Open() ;
 	void cb_Save() ;
 
+	void exportMesh(std::string& filename) ;
 	void importMesh(std::string& filename) ;
 
 public slots:
