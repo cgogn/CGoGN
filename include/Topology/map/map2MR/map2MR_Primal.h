@@ -33,7 +33,7 @@
 namespace CGoGN
 {
 
-class Map2MR_Primal : public EmbeddedMap2
+class Map2MR_PrimalAdapt : public EmbeddedMap2
 {
 protected:
 	bool shareVertexEmbeddings ;
@@ -43,18 +43,13 @@ protected:
 	FunctorType* faceVertexFunctor ;
 
 public:
-	Map2MR_Primal() ;
+	Map2MR_PrimalAdapt() ;
 
-	std::string mapTypeName() { return "Map2MR_Primal" ; }
+	std::string mapTypeName() { return "Map2MR_PrimalAdapt" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
 	 ***************************************************/
-
-	/**
-	 * Return the level of insertion of the vertex of d
-	 */
-	unsigned int vertexInsertionLevel(Dart d) ;
 
 	/**
 	 * Return the level of the edge of d in the current level map
@@ -109,8 +104,6 @@ public:
 	 ***************************************************/
 
 protected:
-	bool dartIsDuplicated(Dart d) ;
-	void duplicateDart(Dart d) ;
 //	void propagatePhi1(Dart d) ;
 //	void propagatePhi_1(Dart d) ;
 
@@ -151,6 +144,18 @@ public:
 } ;
 
 
+class Map2MR_PrimalRegular : public EmbeddedMap2
+{
+protected:
+	bool shareVertexEmbeddings ;
+
+public:
+	Map2MR_PrimalRegular() ;
+
+	std::string mapTypeName() { return "Map2MR_PrimalRegular" ; }
+
+	void addNewLevel() ;
+} ;
 
 
 

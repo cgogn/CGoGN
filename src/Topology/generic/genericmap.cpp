@@ -199,32 +199,40 @@ void GenericMap::addLevel()
 
 	if(m_mrDarts.size() > 1)
 	{
-		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1] ;
-		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
+		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1] ;	// copy the indices of
+		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
 
-//		// duplicate all the darts in the new level
 //		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 //		{
-//			unsigned int oldi = (*prevAttrib)[i] ;		// get the index of the dart in previous level
-//			(*newAttrib)[i] = newCopyOfDartLine(oldi) ;	// copy the dart and affect it to the new level
+//			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+//			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 //		}
 	}
 }
 
 void GenericMap::removeLevel()
 {
-	if(!m_mrDarts.empty())
+	unsigned int maxL = getMaxLevel() ;
+	if(maxL > 0)
 	{
-		unsigned int maxL = getMaxLevel() ;
-		AttributeMultiVector<unsigned int>* amvMR = m_mrDarts[maxL] ;
+		AttributeMultiVector<unsigned int>* maxMR = m_mrDarts[maxL] ;
+		AttributeMultiVector<unsigned int>* prevMR = m_mrDarts[maxL - 1] ;
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
-			deleteDartLine((*amvMR)[i]) ;
-			if((*m_mrLevels)[i] == maxL)
-				m_mrattribs.removeLine(i) ;
+			unsigned int idx = (*maxMR)[i] ;
+			if((*m_mrLevels)[i] == maxL)	// if the MRdart was introduced on the level we're removing
+			{
+				deleteDartLine(idx) ;		// delete the pointed dart line
+				m_mrattribs.removeLine(i) ;	// delete the MRdart line
+			}
+			else							// if the dart was introduced on a previous level
+			{
+				if(idx != (*prevMR)[i])		// delete the pointed dart line only if
+					deleteDartLine(idx) ;	// it is not shared with previous level
+			}
 		}
 
-		m_mrattribs.removeAttribute<unsigned int>(m_mrDarts[maxL]->getIndex()) ;
+		m_mrattribs.removeAttribute<unsigned int>(maxMR->getIndex()) ;
 		m_mrDarts.pop_back() ;
 		m_mrNbDarts.pop_back() ;
 
@@ -240,25 +248,25 @@ void GenericMap::removeLevel()
 void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
+
 	unsigned int old = getEmbedding(orbit, d);
 
-	// if same emb nothing to do
-	if (old == emb)
-		return;
-	// if different then unref the old emb
-	if (old != EMBNULL)
+	if (old == emb)	// if same emb
+		return;		// nothing to do
+
+	if (old != EMBNULL)	// if different
 	{
-		if(m_attribs[orbit].unrefLine(old))
+		if(m_attribs[orbit].unrefLine(old))	// then unref the old emb
 		{
 			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
 				(*m_markTables[orbit][t])[old].clear();		// last unref of the line
 		}
 	}
-	// ref the new emb
+
 	if (emb != EMBNULL)
-		m_attribs[orbit].refLine(emb);
-	// affect the embedding to the dart
-	(*m_embeddings[orbit])[dartIndex(d)] = emb ;
+		m_attribs[orbit].refLine(emb);	// ref the new emb
+
+	(*m_embeddings[orbit])[dartIndex(d)] = emb ;	// finally affect the embedding to the dart
 }
 
 /****************************************

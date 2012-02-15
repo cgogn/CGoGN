@@ -166,7 +166,7 @@ public:
 	MarkSet& getMarkerSet(unsigned int orbit, unsigned int thread) { return m_marksets[orbit][thread]; }
 
 	/****************************************
-	 *           MULTIRES                   *
+	 *     RESOLUTION LEVELS MANAGEMENT     *
 	 ****************************************/
 
 	void printMR() ;
@@ -238,10 +238,15 @@ protected:
 	/**
 	 * create a copy of a dart (based on its index in m_attribs[DART]) and returns its index
 	 */
-	unsigned int newCopyOfDartLine(unsigned int index) ;
+	unsigned int copyDartLine(unsigned int index) ;
 
 	/**
-	 * internal functions
+	 * duplicate a dart starting from current level
+	 */
+	void duplicateDart(Dart d) ;
+
+	/**
+	 * Properly deletes a dart in m_attribs[DART]
 	 */
 	void deleteDartLine(unsigned int index) ;
 
