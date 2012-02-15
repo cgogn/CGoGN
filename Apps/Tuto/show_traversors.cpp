@@ -181,6 +181,9 @@ void MyQT::traverse2()
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer,myMap,m_selected,position,0.7f);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
+
+		std::cout << "X="<<VERTEX+m_second2 << "  / Y="<<VERTEX+m_first2 << std::endl;
+
 		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createIncident(myMap,m_selected,VERTEX+m_second2,VERTEX+m_first2);
 		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
 				m_affDarts.push_back(d);
