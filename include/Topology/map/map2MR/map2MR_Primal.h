@@ -26,12 +26,17 @@
 #define __MAP2MR_PRIMAL__
 
 #include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
 #include <cmath>
 
 namespace CGoGN
 {
+
+/*********************************************************************************
+ *                           MAP2 MR PRIMAL ADAPTIVE
+ *********************************************************************************/
 
 class Map2MR_PrimalAdapt : public EmbeddedMap2
 {
@@ -144,6 +149,12 @@ public:
 } ;
 
 
+
+
+/*********************************************************************************
+ *                           MAP2 MR PRIMAL REGULAR
+ *********************************************************************************/
+
 class Map2MR_PrimalRegular : public EmbeddedMap2
 {
 protected:
@@ -154,16 +165,125 @@ public:
 
 	std::string mapTypeName() { return "Map2MR_PrimalRegular" ; }
 
+	bool isOddVertex(Dart d) ;
+
 	void addNewLevel() ;
+
+	void analysis(FunctorType* f) ;
+	void synthesis(FunctorType* odd, FunctorType* even) ;
 } ;
 
+
+
+template <typename PFP>
+class PipoAnalysisFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	PipoAnalysisFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() (Dart d)
+	{
+		return false ;
+	}
+} ;
+
+template <typename PFP>
+class PipoOddSynthesisFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	PipoOddSynthesisFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() (Dart d)
+	{
+		Dart it = d ;
+		Dart d1 = m_map.phi2(it) ;
+		bool centerV = false ;
+		while(m_map.getDartLevel(d1) == m_map.getCurrentLevel())
+		{
+			it = m_map.phi1(d1) ;
+			if(it == d)
+			{
+				centerV = true ;
+				d1 = m_map.phi1(m_map.phi1(it)) ;
+				break ;
+			}
+			d1 = m_map.phi2(it) ;
+		}
+
+		m_map.decCurrentLevel() ;
+
+		typename PFP::VEC3 p ;
+		if(centerV)
+		{
+			unsigned int degree = 0 ;
+			Traversor2FV<typename PFP::MAP> trav(m_map, d1) ;
+			for(Dart fit = trav.begin(); fit != trav.end(); fit = trav.next())
+			{
+				++degree ;
+				p += m_position[fit] ;
+			}
+			p /= degree ;
+		}
+		else
+		{
+			Dart d2 = m_map.phi2(d1) ;
+			p = (m_position[d1] + m_position[d2]) / 2.0 ;
+		}
+
+		m_map.incCurrentLevel() ;
+
+		m_position[d] = p ;
+
+		return false ;
+	}
+} ;
+
+template <typename PFP>
+class PipoEvenSynthesisFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	PipoEvenSynthesisFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() (Dart d)
+	{
+		typename PFP::VEC3 p(0) ;
+		unsigned int degree = 0 ;
+		Traversor2VVaE<typename PFP::MAP> trav(m_map, d) ;
+		for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+		{
+			++degree ;
+			p += m_position[it] ;
+		}
+		p /= degree ;
+		p *= 0.5 ;
+		p += m_position[d] * 0.5 ;
+
+		m_position[d] = p ;
+
+		return false ;
+	}
+} ;
 
 
 
 /*********************************************************************************
  *                           VERTEX FUNCTORS
  *********************************************************************************/
-
 
 template <typename PFP>
 class PipoVertexVertexFunctor : public FunctorType
