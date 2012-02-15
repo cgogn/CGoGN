@@ -472,6 +472,7 @@ Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned i
 		return new Traversor2EV<MAP>(map,dart);
 		break;
 	case 0x0102:
+		return new Traversor2EF<MAP>(map,dart);
 		break;
 	case 0x0200:
 		return new Traversor2FV<MAP>(map,dart);
