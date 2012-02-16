@@ -206,8 +206,7 @@ void Viewer::cb_mousePress(int button, int x, int y)
 		Dart d = m_renderTopo->picking<PFP>(myMap, x,  y, allDarts);
 		if (d != Dart::nil())
 		{
-			//statusMsg("dart picked");
-			myMap.mergeFaces(d);
+			statusMsg("dart picked");
 		}
 		else
 		{

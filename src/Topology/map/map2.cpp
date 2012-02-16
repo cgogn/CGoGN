@@ -526,6 +526,24 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
+void Map2::splitSurface(std::vector<Dart>& vd, bool FirstSideClosed, bool SecondSideClosed)
+{
+	//assert(checkSimpleOrientedPath(vd));
+
+	Dart e = vd.front();
+	Dart e2 = phi2(e);
+
+	//unsew the edge path
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		unsewFaces(*it);
+
+	if(FirstSideClosed)
+		fillHole(e) ;
+
+	if(SecondSideClosed)
+		fillHole(e2) ;
+}
+
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/

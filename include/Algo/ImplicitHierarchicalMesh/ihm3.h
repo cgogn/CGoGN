@@ -143,6 +143,16 @@ public:
 	 */
 	void swapEdges(Dart d, Dart e);
 
+	//!
+	/*!
+	 *
+	 */
+	void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
+
+	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
+
+	Dart quadranguleFace(Dart d);
+
 //	//!
 //	/*!
 //	 *

@@ -189,6 +189,105 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 	}
 }
 
+void ImplicitHierarchicalMap3::saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+
+	//le brin est forcement du niveau cur
+	Dart dit = d;
+
+	do
+	{
+		vd.push_back(std::pair<Dart,Dart>(dit,phi2(dit)));
+
+		dit = phi2(phi_1(dit));
+
+	}while(dit != d);
+}
+
+void ImplicitHierarchicalMap3::unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd)
+{
+	//unsew the edge path
+	for(std::vector<std::pair<Dart, Dart> >::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		Dart dit = (*it).first;
+		Dart dit2 = (*it).second;
+
+		Map2::unsewFaces(dit);
+
+		if(isOrbitEmbedded(VERTEX))
+		{
+			copyDartEmbedding(VERTEX, phi2(dit2), dit);
+			copyDartEmbedding(VERTEX, phi2(dit), dit2);
+		}
+
+		if(isOrbitEmbedded(EDGE))
+		{
+
+		}
+	}
+}
+
+Dart ImplicitHierarchicalMap3::quadranguleFace(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+
+	Dart centralDart = NIL;
+	Map2::fillHole(phi1(d));
+
+	Dart old = phi2(phi1(d));
+	Dart bc = newBoundaryCycle(faceDegree(old));
+	sewVolumes(old, bc, false);
+
+	if (isOrbitEmbedded(VERTEX))
+	{
+		Dart it = bc;
+		do
+		{
+			//copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
+			embedOrbit(VERTEX, it, getEmbedding(VERTEX, phi1(phi3(it))));
+			it = phi1(it) ;
+		} while(it != bc) ;
+	}
+
+
+	Dart dd = phi1(phi1(old)) ;
+	splitFace(old,dd) ;
+
+	unsigned int idface = getNewFaceId();
+	setFaceId(dd,idface, FACE);
+
+	Dart ne = phi1(phi1(old)) ;
+
+	cutEdge(ne);
+	centralDart = phi1(ne);
+
+	//newEdges.push_back(ne);
+	//newEdges.push_back(map.phi1(ne));
+
+	unsigned int id = getNewEdgeId() ;
+	setEdgeId(ne, id, EDGE) ;
+
+	Dart stop = phi2(phi1(ne));
+	ne = phi2(ne);
+	do
+	{
+		dd = phi1(phi1(phi1(ne)));
+
+		splitFace(ne, dd) ;
+
+		unsigned int idface = getNewFaceId();
+		setFaceId(dd,idface, FACE);
+
+		//newEdges.push_back(map.phi1(dd));
+
+		ne = phi2(phi_1(ne));
+		dd = phi1(phi1(dd));
+	}
+	while(dd != stop);
+
+	return centralDart;
+}
 
 //Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
 //{
