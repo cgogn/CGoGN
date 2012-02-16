@@ -86,7 +86,7 @@ public:
 	float faceShrinkage ;
 
 	int m_renderStyle ;
-	bool m_drawTopo;
+//	bool m_drawTopo;
 	bool m_drawVertices ;
 	bool m_drawEdges ;
 	bool m_drawFaces ;
@@ -96,7 +96,6 @@ public:
 	PFP::TVEC3 normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
-	Algo::Render::GL2::TopoRender* m_renderTopo ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO ;
@@ -106,7 +105,6 @@ public:
 	Utils::ShaderVectorPerVertex* m_vectorShader ;
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
 	Utils::PointSprite* m_pointSprite ;
-	Utils::Strings3D* m_strings;
 
 	Viewer() ;
 
@@ -117,13 +115,8 @@ public:
 	void cb_Open() ;
 	void cb_Save() ;
 
-	void cb_mousePress(int button, int x, int y);
-
 	void importMesh(std::string& filename) ;
 	void exportMesh(std::string& filename);
-
-protected:
-	void storeVerticesInfo();
 
 
 public slots:

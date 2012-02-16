@@ -26,19 +26,16 @@
 
 Viewer::Viewer() :
 	m_renderStyle(FLAT),
-	m_drawTopo(true),
 	m_drawVertices(false),
 	m_drawEdges(false),
 	m_drawFaces(true),
 	m_drawNormals(false),
 	m_render(NULL),
-	m_renderTopo(NULL),
 	m_phongShader(NULL),
 	m_flatShader(NULL),
 	m_vectorShader(NULL),
 	m_simpleColorShader(NULL),
-	m_pointSprite(NULL),
-	m_strings(NULL)
+	m_pointSprite(NULL)
 {
 	normalScaleFactor = 1.0f ;
 	vertexScaleFactor = 0.1f ;
@@ -82,7 +79,6 @@ void Viewer::cb_initGL()
 	setFocal(5.0f) ;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
-    m_renderTopo = new Algo::Render::GL2::TopoRender();
 
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
@@ -114,16 +110,11 @@ void Viewer::cb_initGL()
 	m_pointSprite = new Utils::PointSprite() ;
 	m_pointSprite->setAttributePosition(m_positionVBO) ;
 
-    m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
-    storeVerticesInfo();
-    m_strings->sendToVBO();
-
 	registerShader(m_phongShader) ;
 	registerShader(m_flatShader) ;
 	registerShader(m_vectorShader) ;
 	registerShader(m_simpleColorShader) ;
 	registerShader(m_pointSprite) ;
-	registerShader(m_strings);
 }
 
 void Viewer::cb_redraw()
@@ -136,7 +127,6 @@ void Viewer::cb_redraw()
 		m_pointSprite->predraw(Geom::Vec3f(0.0f, 0.0f, 1.0f)) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
 		m_pointSprite->postdraw() ;
-		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
 	}
 
 	if(m_drawEdges)
@@ -172,8 +162,6 @@ void Viewer::cb_redraw()
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
 
-	if(m_drawTopo)
-		m_renderTopo->drawTopo();
 }
 
 void Viewer::cb_Open()
@@ -189,10 +177,10 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("off (*.off);; map (*.map)") ;
+	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply);; plygen (*.plygen)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
 
-	exportMesh(filename);
+	exportMesh(filename) ;
 }
 
 void Viewer::cb_mousePress(int button, int x, int y)
@@ -217,8 +205,6 @@ void Viewer::cb_mousePress(int button, int x, int y)
 
 	updateGL();
 }
-
-
 
 void Viewer::importMesh(std::string& filename)
 {
@@ -248,12 +234,11 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
-	m_renderTopo->updateData<PFP>(myMap, position, 0.9, 0.9, allDarts);
-
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize /5.0f ;
 
+	normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
 	if(!normal.isValid())
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 
@@ -262,40 +247,24 @@ void Viewer::importMesh(std::string& filename)
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
 
-	storeVerticesInfo();
-	m_strings->sendToVBO();
-
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
 }
 
 void Viewer::exportMesh(std::string& filename)
 {
-	size_t pos = filename.rfind(".");    // position of "." in filename
-	std::string extension = filename.substr(pos);
+	size_t pos = filename.rfind(".") ;    // position of "." in filename
+	std::string extension = filename.substr(pos) ;
 
-	if (extension == std::string(".map"))
-		myMap.saveMapBin(filename);
-	else
+	if (extension == std::string(".off"))
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension.compare(0, 4, std::string(".ply")) == 0)
+		Algo::Export::exportPLY<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension == std::string(".map"))
+		myMap.saveMapBin(filename) ;
+	else
+		std::cerr << "Cannot save file " << filename << " : unknown or unhandled extension" << std::endl ;
 }
-
-
-void Viewer::storeVerticesInfo()
-{
-	CellMarker mv(myMap,VERTEX);
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
-	{
-		if (!mv.isMarked(d))
-		{
-			mv.mark(d);
-			std::stringstream ss;
-			ss << d << " : "<< position[d];
-			m_strings->addString(ss.str(),position[d]);
-		}
-	}
-}
-
 
 void Viewer::slot_drawVertices(bool b)
 {
@@ -306,7 +275,6 @@ void Viewer::slot_drawVertices(bool b)
 void Viewer::slot_verticesSize(int i)
 {
 	vertexScaleFactor = i / 500.0f ;
-	m_strings->setScale(0.02f*i);
 	updateGL() ;
 }
 
@@ -352,10 +320,19 @@ int main(int argc, char **argv)
 	sqt.setGeometry(0, 0, 1000, 800) ;
  	sqt.show() ;
 
-	if(argc == 2)
+	if(argc >= 2)
 	{
 		std::string filename(argv[1]) ;
 		sqt.importMesh(filename) ;
+		if(argc >= 3)
+		{
+			std::string filenameExp(argv[2]) ;
+			std::cout << "Exporting " << filename << " as " << filenameExp << " ... "<< std::flush ;
+			sqt.exportMesh(filenameExp) ;
+			std::cout << "done!" << std::endl ;
+
+			return (0) ;
+		}
 	}
 
 	sqt.initGUI() ;

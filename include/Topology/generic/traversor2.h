@@ -29,6 +29,7 @@
 
 namespace CGoGN
 {
+
 /*******************************************************************************
 					GENERIC TRAVERSALS FACTORY
 *******************************************************************************/
@@ -38,19 +39,17 @@ class Traversor2
 {
 public:
 	virtual ~Traversor2() {}
-	virtual Dart begin() =0;
-	virtual Dart end() =0;
-	virtual Dart next() =0;
+	virtual Dart begin() = 0;
+	virtual Dart end() = 0;
+	virtual Dart next() = 0;
 
 	static Traversor2<MAP>* createIncident(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY);
 	static Traversor2<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY);
 };
 
-
 /*******************************************************************************
 					VERTEX CENTERED TRAVERSALS
 *******************************************************************************/
-
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
@@ -227,7 +226,6 @@ class Traversor2FE: public Traversor2FV<MAP>
 public:
 	Traversor2FE(MAP& map, Dart dart):Traversor2FV<MAP>(map,dart){}
 } ;
-
 
 // Traverse the faces adjacent to a given face through sharing a common vertex
 template <typename MAP>

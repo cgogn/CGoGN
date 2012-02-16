@@ -23,10 +23,11 @@
 *******************************************************************************/
 
 namespace CGoGN {
+
 namespace Utils {
 
 template<typename REAL>
-ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
+ColourConverter<REAL>::ColourConverter(const VEC3& col, const enum ColourEncoding& enc) :
 	RGB(NULL),
 	Luv(NULL),
 	Lab(NULL),
@@ -36,26 +37,34 @@ ColourConverter<REAL>::ColourConverter(VEC3 col, enum ColourEncoding enc) :
 
 	switch(originalEnc) {
 		case(C_RGB):
-			if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 &&  -0.001 < col[2] && col[2] < 1.001))
-				CGoGNerr << "Warning : an unvalid RGB color was entered in ColourConverter constructor" << CGoGNendl ;
+			#ifdef DEBUG
+				if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 &&  -0.001 < col[2] && col[2] < 1.001))
+					std::cerr << "Warning : an unvalid RGB color was entered in ColourConverter constructor" << std::endl ;
+			#endif
 			RGB = new VEC3(col) ;
 			break ;
 
 		case (C_Luv) :
-			if (!(-0.001 < col[0] && col[0] < 100.001 && -83.001 < col[1] && col[1] < 175.001 &&  -134.001 < col[2] && col[2] < 108.001))
-				CGoGNerr << "Warning : an unvalid Luv color was entered in ColourConverter constructor" << CGoGNendl ;
+			#ifdef DEBUG
+				if (!(-0.001 < col[0] && col[0] < 100.001 && -83.001 < col[1] && col[1] < 175.001 &&  -134.001 < col[2] && col[2] < 108.001))
+					std::cerr << "Warning : an unvalid Luv color was entered in ColourConverter constructor" << std::endl ;
+			#endif
 			Luv = new VEC3(col) ;
 			break ;
 
 		case (C_XYZ) :
-			if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 &&  -0.001 < col[2] && col[2] < 1.001))
-				CGoGNerr << "Warning : an unvalid XYZ color was entered in ColourConverter constructor" << CGoGNendl ;
+			#ifdef DEBUG
+				if (!(-0.001 < col[0] && col[0] < 1.001 && -0.001 < col[1] && col[1] < 1.001 &&  -0.001 < col[2] && col[2] < 1.001))
+					std::cerr << "Warning : an unvalid XYZ color was entered in ColourConverter constructor" << std::endl ;
+			#endif
 			XYZ = new VEC3(col) ;
 			break ;
 
 		case (C_Lab) :
-			if (!(-0.001 < col[0] && col[0] < 100.001 && -86.001 < col[1] && col[1] < 98.001 && -108.001 < col[2] && col[2] < 95.001))
-				CGoGNerr << "Warning : an unvalid Lab color was entered in ColourConverter constructor" << CGoGNendl ;
+			#ifdef DEBUG
+				if (!(-0.001 < col[0] && col[0] < 100.001 && -86.001 < col[1] && col[1] < 98.001 && -108.001 < col[2] && col[2] < 95.001))
+						std::cerr << "Warning : an unvalid Lab color was entered in ColourConverter constructor" << std::endl ;
+			#endif
 			Lab = new VEC3(col) ;
 			break ;
 	}
@@ -281,8 +290,10 @@ void ColourConverter<REAL>::convertLabToXYZ() {
 template<typename REAL>
 bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncoding to) {
 	if (to == from) {
-		CGoGNerr << "ColourConverter::convert(from,to) : conversion into same colour space" << CGoGNendl ;
-		return false ;
+		#ifdef DEBUG
+			std::cout << "WARNING ColourConverter::convert(from,to) : conversion into same colour space" << std::endl ;
+		#endif
+		return true ;
 	}
 
 	switch(from) {
@@ -305,7 +316,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertXYZtoLab() ;
 					break ;
 				default :
-					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
+					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
 			}
 			break ;
@@ -333,7 +344,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					}
 					break ;
 				default :
-					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
+					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
 			}
 			break ;
@@ -353,7 +364,7 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 						convertXYZtoLab() ;
 					break ;
 				default :
-					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
+					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
 			}
 			break ;
@@ -381,22 +392,21 @@ bool ColourConverter<REAL>::convert(enum ColourEncoding from, enum ColourEncodin
 					}
 					break ;
 				default :
-					CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
+					std::cerr << "Colour conversion not supported" << std::endl ;
 					return false ;
 			}
 			break ;
 
 		default :
-			CGoGNerr << "Colour conversion not supported" << CGoGNendl ;
+			std::cerr << "Colour conversion not supported" << std::endl ;
 			return false ;
 	}
 
 	return true ;
 }
 
-
-
 } // namespace Utils
+
 } // namespace CGoGN
 
 

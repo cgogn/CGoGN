@@ -173,6 +173,8 @@ void GenericMap::initMR()
 #endif
 
 	m_mrattribs.clear(true) ;
+	m_mrattribs.setRegistry(m_attributes_registry_map) ;
+
 	m_mrDarts.clear() ;
 	m_mrDarts.reserve(16) ;
 	m_mrNbDarts.clear();
@@ -197,31 +199,40 @@ void GenericMap::addLevel()
 
 	if(m_mrDarts.size() > 1)
 	{
-		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1] ;
+		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1] ;	// copy the indices of
+		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
 
-		// duplicate all the darts in the new level
-		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-		{
-			unsigned int oldi = (*prevAttrib)[i] ;		// get the index of the dart in previous level
-			(*newAttrib)[i] = newCopyOfDartLine(oldi) ;	// copy the dart and affect it to the new level
-		}
+//		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+//		{
+//			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+//			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+//		}
 	}
 }
 
 void GenericMap::removeLevel()
 {
-	if(!m_mrDarts.empty())
+	unsigned int maxL = getMaxLevel() ;
+	if(maxL > 0)
 	{
-		unsigned int maxL = getMaxLevel() ;
-		AttributeMultiVector<unsigned int>* amvMR = m_mrDarts[maxL] ;
+		AttributeMultiVector<unsigned int>* maxMR = m_mrDarts[maxL] ;
+		AttributeMultiVector<unsigned int>* prevMR = m_mrDarts[maxL - 1] ;
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
-			deleteDartLine((*amvMR)[i]) ;
-			if((*m_mrLevels)[i] == maxL)
-				m_mrattribs.removeLine(i) ;
+			unsigned int idx = (*maxMR)[i] ;
+			if((*m_mrLevels)[i] == maxL)	// if the MRdart was introduced on the level we're removing
+			{
+				deleteDartLine(idx) ;		// delete the pointed dart line
+				m_mrattribs.removeLine(i) ;	// delete the MRdart line
+			}
+			else							// if the dart was introduced on a previous level
+			{
+				if(idx != (*prevMR)[i])		// delete the pointed dart line only if
+					deleteDartLine(idx) ;	// it is not shared with previous level
+			}
 		}
 
-		m_mrattribs.removeAttribute<unsigned int>(m_mrDarts[maxL]->getIndex()) ;
+		m_mrattribs.removeAttribute<unsigned int>(maxMR->getIndex()) ;
 		m_mrDarts.pop_back() ;
 		m_mrNbDarts.pop_back() ;
 
@@ -237,25 +248,25 @@ void GenericMap::removeLevel()
 void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
 {
 	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
+
 	unsigned int old = getEmbedding(orbit, d);
 
-	// if same emb nothing to do
-	if (old == emb)
-		return;
-	// if different then unref the old emb
-	if (old != EMBNULL)
+	if (old == emb)	// if same emb
+		return;		// nothing to do
+
+	if (old != EMBNULL)	// if different
 	{
-		if(m_attribs[orbit].unrefLine(old))
+		if(m_attribs[orbit].unrefLine(old))	// then unref the old emb
 		{
 			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
 				(*m_markTables[orbit][t])[old].clear();		// last unref of the line
 		}
 	}
-	// ref the new emb
+
 	if (emb != EMBNULL)
-		m_attribs[orbit].refLine(emb);
-	// affect the embedding to the dart
-	(*m_embeddings[orbit])[dartIndex(d)] = emb ;
+		m_attribs[orbit].refLine(emb);	// ref the new emb
+
+	(*m_embeddings[orbit])[dartIndex(d)] = emb ;	// finally affect the embedding to the dart
 }
 
 /****************************************
@@ -457,7 +468,15 @@ bool GenericMap::saveMapBin(const std::string& filename)
 		m_attribs[i].saveBin(fs, i);
 
 	if (m_isMultiRes)
+	{
 		m_mrattribs.saveBin(fs, 00);
+
+		fs.write(reinterpret_cast<const char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+
+		unsigned int nb = m_mrNbDarts.size();
+		fs.write(reinterpret_cast<const char*>(&nb), sizeof(unsigned int));
+		fs.write(reinterpret_cast<const char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
+	}
 
 	return true;
 }
@@ -538,15 +557,23 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	}
 
 	if (m_isMultiRes)
+	{
+		AttributeContainer::loadBinId(fs); // not used but need to read to skip
 		m_mrattribs.loadBin(fs);
+
+		fs.read(reinterpret_cast<char*>(&m_mrCurrentLevel), sizeof(unsigned int));
+		unsigned int nb;
+		fs.read(reinterpret_cast<char*>(&nb), sizeof(unsigned int));
+		m_mrNbDarts.resize(nb);
+		fs.read(reinterpret_cast<char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
+	}
+
 
 	// retrieve m_embeddings (from m_attribs)
 	update_m_emb_afterLoad();
 
 	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
 	update_topo_shortcuts();
-
-
 
 	return true;
 }

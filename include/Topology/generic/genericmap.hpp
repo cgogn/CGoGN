@@ -44,7 +44,7 @@ inline void GenericMap::setCurrentLevel(unsigned int l)
 
 inline void GenericMap::incCurrentLevel()
 {
-	if(m_mrCurrentLevel < m_mrDarts.size())
+	if(m_mrCurrentLevel < m_mrDarts.size() - 1)
 		++m_mrCurrentLevel ;
 	else
 		CGoGNout << "incCurrentLevel : already at maximum resolution level" << CGoGNendl ;
@@ -80,26 +80,24 @@ inline unsigned int GenericMap::getMaxLevel()
 
 inline Dart GenericMap::newDart()
 {
-	unsigned int di = m_attribs[DART].insertLine();
+	unsigned int di = m_attribs[DART].insertLine();			// insert a new dart line
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
-		if (m_embeddings[i])
-			(*m_embeddings[i])[di] = EMBNULL ;
+		if (m_embeddings[i])								// set all its embeddings
+			(*m_embeddings[i])[di] = EMBNULL ;				// to EMBNULL
 	}
 
 	if (m_isMultiRes)
 	{
-		unsigned int mrdi = m_mrattribs.insertLine() ;
-		(*m_mrLevels)[mrdi] = m_mrCurrentLevel ;
+		unsigned int mrdi = m_mrattribs.insertLine() ;		// insert a new MRdart line
+		(*m_mrLevels)[mrdi] = m_mrCurrentLevel ;			// set the introduction level of the dart
 		m_mrNbDarts[m_mrCurrentLevel]++ ;
 
-		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)
-			(*m_mrDarts[i])[mrdi] = MRNULL ;
+		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)	// for all previous levels
+			(*m_mrDarts[i])[mrdi] = MRNULL ;				// this MRdart does not exist
 
-		(*m_mrDarts[m_mrCurrentLevel])[mrdi] = di ;
-
-		for(unsigned int i = m_mrCurrentLevel + 1; i < m_mrDarts.size(); ++i)
-			(*m_mrDarts[i])[mrdi] = newCopyOfDartLine(di) ;
+		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)	// for all levels from current to max
+			(*m_mrDarts[i])[mrdi] = di ;									// make this MRdart points to the new dart line
 
 		return Dart::create(mrdi) ;
 	}
@@ -114,10 +112,12 @@ inline void GenericMap::deleteDart(Dart d)
 		// a MRdart can only be deleted on its insertion level
 		assert(getDartLevel(d) == m_mrCurrentLevel || !"deleteDart : try to delete a dart on a level greater than its insertion level") ;
 
-		// all the darts pointed in greater levels are deleted
-		// and then the MRdart is deleted
 		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
-			deleteDartLine((*m_mrDarts[i])[d.index]) ;
+		{
+			unsigned int index = (*m_mrDarts[i])[d.index] ;
+			if(isDartValid(index))
+				deleteDartLine(index) ;
+		}
 		m_mrattribs.removeLine(d.index) ;
 		m_mrNbDarts[m_mrCurrentLevel]-- ;
 	}
@@ -149,16 +149,42 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 	}
 }
 
-inline unsigned int GenericMap::newCopyOfDartLine(unsigned int index)
+inline unsigned int GenericMap::copyDartLine(unsigned int index)
 {
 	unsigned int newindex = m_attribs[DART].insertLine() ;	// create a new dart line
 	m_attribs[DART].copyLine(newindex, index) ;				// copy the given dart line
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
-		if (m_embeddings[orbit])							// put the embeddings of the
-			(*m_embeddings[orbit])[newindex] = EMBNULL ;	// new line to EMBNULL
+		if (m_embeddings[orbit])
+//			(*m_embeddings[orbit])[newindex] = EMBNULL ;
+		{
+			unsigned int emb = (*m_embeddings[orbit])[newindex] ;	// add a ref to the cells pointed
+			if(emb != EMBNULL)										// by the new dart line
+				m_attribs[orbit].refLine(emb) ;
+		}
 	}
 	return newindex ;
+}
+
+inline void GenericMap::duplicateDart(Dart d)
+{
+	assert(getDartLevel(d) <= getCurrentLevel() || !"duplicateDart : called with a dart inserted after current level") ;
+
+	if(getDartLevel(d) == getCurrentLevel())	// no need to duplicate
+		return ;								// a dart from its insertion level
+
+	unsigned int oldindex = dartIndex(d) ;
+
+	if((*m_mrDarts[m_mrCurrentLevel - 1])[d.index] != oldindex)	// no need to duplicate if the dart is already
+		return ;												// duplicated with respect to previous level
+
+	unsigned int newindex = copyDartLine(oldindex) ;
+
+	for(unsigned int i = getCurrentLevel(); i <= getMaxLevel(); ++i) // for all levels from current to max
+	{
+		assert((*m_mrDarts[i])[d.index] == oldindex || !"duplicateDart : dart was already duplicated on a greater level") ;
+		(*m_mrDarts[i])[d.index] = newindex ;						// make this MRdart points to the new dart line
+	}
 }
 
 inline unsigned int GenericMap::dartIndex(Dart d)

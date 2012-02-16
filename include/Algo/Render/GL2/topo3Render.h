@@ -255,11 +255,15 @@ public:
 	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
 
-
+	/**
+	 * compute dart from color (for picking)
+	 */
 	Dart colToDart(float* color);
 
-	template<typename PFP>
-	void dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b);
+	/**
+	 * compute color from dart (for picking)
+	 */
+	void dartToCol(Dart d, float& r, float& g, float& b);
 
 
 

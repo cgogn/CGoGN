@@ -115,18 +115,35 @@ protected:
 	Utils::ShaderColorPerVertex* m_shader2;
 
 
+	/**
+	 * compute color from dart index (for color picking)
+	 */
 	Dart colToDart(float* color);
 
-	template<typename PFP>
-	void dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b);
+	/**
+	 * compute dart  from color (for color picking)
+	 */
+	void dartToCol(Dart d, float& r, float& g, float& b);
 
+	/**
+	 * pick the color in the rendered image
+	 */
 	Dart pickColor(unsigned int x, unsigned int y);
 
+	/**
+	 * affect a color to each dart
+	 */
 	template<typename PFP>
 	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
 
+	/**
+	 * save colors before picking
+	 */
 	void pushColors();
 
+	/**
+	 * restore colors after picking
+	 */
 	void popColors();
 
 public:
