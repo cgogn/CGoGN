@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __IMPORTSVG_H__
-#define __IMPORTSVG_H__
+#ifndef __IMPORT_MR_DAT__
+#define __IMPORT_MR_DAT__
 
 namespace CGoGN
 {
@@ -34,30 +34,49 @@ namespace Algo
 namespace Import
 {
 
-/**
- * check if an xml node has a given name
- * @param node the xml node
- * @param name the name
- * @ return true if node has the good name
- */
-bool checkXmlNode(xmlNodePtr node, const std::string& name);
-
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons);
+bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position) ;
 
+class QuadTreeNode
+{
+public:
+	QuadTreeNode()
+	{
+		for(unsigned int i = 0; i < 3; ++i)
+			indices[i] = -1 ;
+		for(unsigned int i = 0; i < 4; ++i)
+			children[i] = NULL ;
+	}
 
-/**
- *
- */
+	~QuadTreeNode()
+	{
+		for(unsigned int i = 0; i < 4; ++i)
+			if(children[i] != NULL)
+				delete children[i] ;
+	}
 
-template <typename PFP>
-bool readSVG(const std::string& filename, std::vector<std::vector<typename PFP::VEC3 > > &allPoly);
+	void subdivide()
+	{
+		assert(children[0] == NULL) ;
+		for(unsigned int i = 0; i < 4; ++i)
+			children[i] = new QuadTreeNode() ;
+	}
 
-template <typename PFP>
-bool importBB(const std::string& filename, std::vector<Geom::BoundingBox<typename PFP::VEC3> > &bb);
+	unsigned int indices[3] ;
+	QuadTreeNode* children[4] ;
+} ;
 
-template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+class QuadTree
+{
+public:
+	std::vector<QuadTreeNode*> roots ;
+
+	~QuadTree()
+	{
+		for(unsigned int i = 0; i < roots.size(); ++i)
+			delete roots[i] ;
+	}
+} ;
 
 } // namespace Import
 
@@ -65,6 +84,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 } // namespace CGoGN
 
-#include "Algo/Import/importSvg.hpp"
+#include "Algo/Import/importMRDAT.hpp"
 
 #endif
