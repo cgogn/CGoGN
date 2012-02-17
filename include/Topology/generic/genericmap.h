@@ -297,7 +297,6 @@ public:
 
 	/**
 	 * get the cell index of the given dimension associated to dart d
-	 * (can go through the whole orbit due to lazy embedding)
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
 	unsigned int getEmbedding(unsigned int orbit, Dart d) ;

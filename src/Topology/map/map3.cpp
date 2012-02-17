@@ -511,12 +511,14 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 
-	//unsew the edge path
-	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		Map2::unsewFaces(*it);
+//	//unsew the edge path
+//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//		Map2::unsewFaces(*it);
+//
+//	Map2::fillHole(e) ;
+//	Map2::fillHole(e2) ;
 
-	Map2::fillHole(e) ;
-	Map2::fillHole(e2) ;
+	Map2::splitSurface(vd,true,true);
 
 	//sew the two connected components
 	Map3::sewVolumes(phi2(e), phi2(e2), false);

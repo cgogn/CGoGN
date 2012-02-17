@@ -487,7 +487,6 @@ Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned i
 	return NULL;
 }
 
-
 template<typename MAP>
 Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
 {
@@ -518,11 +517,5 @@ Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned i
 	}
 	return NULL;
 }
-
-
-
-
-
-
 
 } // namespace CGoGN

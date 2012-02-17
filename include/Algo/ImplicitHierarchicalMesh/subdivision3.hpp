@@ -403,8 +403,8 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 	/*
 	 * Subdivide Faces
 	 */
-	std::vector<std::pair<Dart,Dart> > subdividedfaces;
-	subdividedfaces.reserve(25);
+	std::vector<std::pair<Dart,Dart> > subdividedFaces;
+	subdividedFaces.reserve(128);
 
 	Traversor3WF<typename PFP::MAP> traF(map, old);
 	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
@@ -413,43 +413,18 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 		if(!map.faceIsSubdivided(dit))
 			Algo::IHM::subdivideFace<PFP>(map, dit, position, Algo::IHM::S_QUAD);
 
-		//save a dart from the subdivided face
+		//save darts from the central vertex of each subdivided face
 		unsigned int cur = map.getCurrentLevel() ;
-
-		unsigned int fLevel = map.faceLevel(dit) + 1; //puisque dans tous les cas, la face est subdivisee
-		map.setCurrentLevel(fLevel) ;
-
-		//le brin est forcement du niveau cur
-		Dart cf = map.phi2(map.phi1(dit));
-		Dart e = cf;
-
-		do
-		{
-			subdividedfaces.push_back(std::pair<Dart,Dart>(e,map.phi2(e)));
-			e = map.phi2(map.phi_1(e));
-		}while (e != cf);
-
+		unsigned int fLevel = map.faceLevel(dit);
+		map.setCurrentLevel(fLevel + 1) ;
+		map.saveRelationsAroundVertex(map.phi2(map.phi1(dit)), subdividedFaces);
 		map.setCurrentLevel(cur);
 	}
 
-	unsigned int fLevel = map.faceLevel(old) + 1; //puisque dans tous les cas, la face est subdivisee
-	map.setCurrentLevel(fLevel) ;
-
-	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
-	{
-		Dart f1 = (*it).first;
-
-		if(!map.Map2::isBoundaryEdge(f1))
-		{
-			Dart f2 = map.phi2(f1);
-
-			map.unsewFaces(f1);
-
-			map.copyDartEmbedding(VERTEX, map.phi2(f2), f1);
-			map.copyDartEmbedding(VERTEX, map.phi2(f1), f2);
-
-		}
-	}
+	cur = map.getCurrentLevel() ;
+	unsigned int fLevel = map.faceLevel(old);
+	map.setCurrentLevel(fLevel + 1) ;
+	map.unsewAroundVertex(subdividedFaces);
 	map.setCurrentLevel(cur);
 
 	/*
@@ -469,58 +444,26 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 		//volCenter += position[d];
 		//++degree;
 
-		Dart old = map.phi2(map.phi1(dit));
-		map.Map2::fillHole(old);
-
-		Dart dd = map.phi1(map.phi1(old)) ;
-		map.splitFace(old,dd) ;
-
-		unsigned int idface = map.getNewFaceId();
-		map.setFaceId(dd,idface, FACE);
-
-		Dart ne = map.phi1(map.phi1(old)) ;
-
-		map.cutEdge(ne);
-		centralDart = map.phi1(ne);
+		centralDart = map.quadranguleFace(dit);
 		position[centralDart] = volCenter;
-		newEdges.push_back(ne);
-		newEdges.push_back(map.phi1(ne));
-
-		unsigned int id = map.getNewEdgeId() ;
-		map.setEdgeId(ne, id, EDGE) ;
-
-		Dart stop = map.phi2(map.phi1(ne));
-		ne = map.phi2(ne);
-		do
-		{
-			dd = map.phi1(map.phi1(map.phi1(ne)));
-
-			map.splitFace(ne, dd) ;
-			unsigned int idface = map.getNewFaceId();
-			map.setFaceId(dd,idface, FACE);
-
-			newEdges.push_back(map.phi1(dd));
-
-			ne = map.phi2(map.phi_1(ne));
-			dd = map.phi1(map.phi1(dd));
-		}
-		while(dd != stop);
-
 	}
-
-
-	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
-	{
-		Dart f1 = (*it).first;
-		Dart f2 = (*it).second;
-
-		if(map.isBoundaryFace(map.phi2(f1)) && map.isBoundaryFace(map.phi2(f2)))
-		{
-			map.sewVolumes(map.phi2(f1), map.phi2(f2));
-		}
-	}
-
 	//volCenter /= double(degree);
+
+	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+	{
+		Dart f1 = map.phi2((*it).first);
+		Dart f2 = map.phi2((*it).second);
+
+		if(map.isBoundaryFace(f1) && map.isBoundaryFace(f2))
+		{
+			std::cout << "plop" << std::endl;
+			map.sewVolumes(f1, f2, false);
+		}
+	}
+
+	//position[centralDart] = volCenter;
+
+
 
 
 //	//Third step : 3-sew internal faces
@@ -567,7 +510,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 
 	map.setCurrentLevel(cur) ;
 
-	return subdividedfaces.begin()->first;
+	return subdividedFaces.front().first;
 
 }
 
@@ -658,8 +601,6 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 		}
 
 		//if is not a tetrahedron
-//		unsigned int vdeg = map.vertexDegree(dit);
-//		if(vdeg > 3)
 		unsigned int fdeg = map.faceDegree(map.phi2(f1));
 		if(fdeg > 3)
 		{
