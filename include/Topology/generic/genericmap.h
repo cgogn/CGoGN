@@ -55,7 +55,7 @@ class MapBrowser
 public:
 	virtual Dart begin() = 0;
 	virtual Dart end() = 0;
-	virtual void next(Dart& d) = 0;
+	virtual Dart next(Dart& d) = 0;
 };
 
 class AttributeHandlerGen ;
@@ -540,7 +540,7 @@ public:
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	void next(Dart& d) ;
+	Dart next(Dart& d) ;
 
 	/**
 	 * Apply a functor on each dart of the map

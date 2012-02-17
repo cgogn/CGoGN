@@ -41,13 +41,9 @@ namespace GL2
 {
 
 
-//inline ColorPerFaceRender::ColorPerFaceRender(Utils::VBO& vboPosition, Utils::VBO& vboColor):
-//		m_vboPos(vboPosition), m_vboColors(vboColor), m_nbTris(0)
-//{
-//}
 
 inline ColorPerFaceRender::ColorPerFaceRender():
-		m_nbTris(0)
+m_nbTris(0)
 {
 }
 

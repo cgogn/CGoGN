@@ -360,7 +360,7 @@ inline Dart GenericMap::end()
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
-inline void GenericMap::next(Dart& d)
+inline Dart GenericMap::next(Dart& d)
 {
 	if (m_isMultiRes)
 	{
@@ -371,6 +371,7 @@ inline void GenericMap::next(Dart& d)
 	}
 	else
 		m_attribs[DART].next(d.index) ;
+	return d;
 }
 
 /****************************************

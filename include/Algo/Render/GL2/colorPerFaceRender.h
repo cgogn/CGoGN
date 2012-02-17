@@ -47,7 +47,8 @@ namespace GL2
 {
 
 /**
- * Class that allors
+ * Class that update VBO to allow the rendering of per face color rendering
+ * Warning: do not use same position & color VBO than with pervertex rendering !
  */
 class ColorPerFaceRender
 {

@@ -213,12 +213,13 @@ inline Dart ImplicitHierarchicalMap3::end()
 	return Map3::end() ;
 }
 
-inline void ImplicitHierarchicalMap3::next(Dart& d)
+inline Dart ImplicitHierarchicalMap3::next(Dart& d)
 {
 	do
 	{
 		Map3::next(d) ;
 	} while(d != Map3::end() && m_dartLevel[d] > m_curLevel) ;
+	return d;
 }
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
