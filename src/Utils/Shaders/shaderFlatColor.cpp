@@ -22,30 +22,32 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <string.h>
+#include <string>
 #include <GL/glew.h>
-#include "Utils/Shaders/shaderFlatColorPerFace.h"
+#include "Utils/Shaders/shaderFlatColor.h"
 
 namespace CGoGN
 {
 
 namespace Utils
 {
-#include "shaderFlatColorPerFace.vert"
-#include "shaderFlatColorPerFace.frag"
-#include "shaderFlatColorPerFace.geom"
+#include "shaderFlatColor.vert"
+#include "shaderFlatColor.frag"
+#include "shaderFlatColor.geom"
 
 
-ShaderFlatColorPerFace::ShaderFlatColorPerFace()
+ShaderFlatColor::ShaderFlatColor(bool averageColor)
 {
-	m_nameVS = "shaderFlatColorPerFace_vs";
-	m_nameFS = "shaderFlatColorPerFace_fs";
-	m_nameGS = "shaderFlatColorPerFace_gs";
+	m_nameVS = "shaderFlatColor_vs";
+	m_nameFS = "shaderFlatColor_fs";
+	m_nameGS = "shaderFlatColor_gs";
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
 	std::string glxgeom = GLSLShader::defines_Geom("triangles", "triangle_strip", 3);
+	if (averageColor)
+		glxgeom.append("#define AVERAGE_COLOR 1\n");
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
@@ -63,19 +65,19 @@ ShaderFlatColorPerFace::ShaderFlatColorPerFace()
 	setParams(m_explode, m_ambiant, m_light_pos);
 }
 
-void ShaderFlatColorPerFace::getLocations()
+void ShaderFlatColor::getLocations()
 {
 	m_unif_explode  = glGetUniformLocation(program_handler(),"explode");
 	m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
 	m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 }
 
-void ShaderFlatColorPerFace::setAttributePosition(VBO* vbo)
+void ShaderFlatColor::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
 	bindVA_VBO("VertexPosition", vbo);
 }
-void ShaderFlatColorPerFace::setAttributeColor(VBO* vbo)
+void ShaderFlatColor::setAttributeColor(VBO* vbo)
 {
 	m_vboColor = vbo;
 	bindVA_VBO("VertexColor", vbo);
@@ -83,7 +85,7 @@ void ShaderFlatColorPerFace::setAttributeColor(VBO* vbo)
 
 
 
-void ShaderFlatColorPerFace::setParams(float expl, const Geom::Vec4f& ambiant, const Geom::Vec3f& lightPos)
+void ShaderFlatColor::setParams(float expl, const Geom::Vec4f& ambiant, const Geom::Vec3f& lightPos)
 {
 	m_explode = expl;
 	m_ambiant = ambiant;
@@ -98,14 +100,14 @@ void ShaderFlatColorPerFace::setParams(float expl, const Geom::Vec4f& ambiant, c
 	unbind(); // ??
 }
 
-void ShaderFlatColorPerFace::setExplode(float explode)
+void ShaderFlatColor::setExplode(float explode)
 {
 	m_explode = explode;
 	bind();
 	glUniform1f(m_unif_explode, explode);
 }
 
-void ShaderFlatColorPerFace::setAmbiant(const Geom::Vec4f& ambiant)
+void ShaderFlatColor::setAmbiant(const Geom::Vec4f& ambiant)
 {
 	m_ambiant = ambiant;
 	bind();
@@ -113,14 +115,14 @@ void ShaderFlatColorPerFace::setAmbiant(const Geom::Vec4f& ambiant)
 }
 
 
-void ShaderFlatColorPerFace::setLightPosition(const Geom::Vec3f& lp)
+void ShaderFlatColor::setLightPosition(const Geom::Vec3f& lp)
 {
 	m_light_pos = lp;
 	bind();
 	glUniform3fv(m_unif_lightPos,1,lp.data());
 }
 
-void ShaderFlatColorPerFace::restoreUniformsAttribs()
+void ShaderFlatColor::restoreUniformsAttribs()
 {
 	m_unif_explode   = glGetUniformLocation(program_handler(),"explode");
 	m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");

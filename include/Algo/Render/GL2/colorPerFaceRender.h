@@ -52,12 +52,7 @@ namespace GL2
 class ColorPerFaceRender
 {
 protected:
-	Utils::VBO& m_vboPos;
-
-	Utils::VBO& m_vboColors;
-
 	GLuint m_nbTris;
-
 
 public:
 	/**
@@ -73,7 +68,11 @@ public:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map, const typename PFP::TVEC3& positions, const typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
+
+	template<typename PFP>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map, const typename PFP::TVEC3& positions, const typename PFP::TVEC3& normals, const typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
+
 
 	/**
 	 * draw

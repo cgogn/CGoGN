@@ -254,7 +254,7 @@ public:
 	/**
 	 * get the index of dart in topological table
 	 */
-	unsigned int dartIndex(Dart d);
+	unsigned int dartIndex(Dart d) const;
 
 	/**
 	 * get the insertion level of a dart (use only in MRMaps)
@@ -602,7 +602,7 @@ public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
-	bool isBoundaryMarked(Dart d);
+	bool isBoundaryMarked(Dart d) const;
 
 protected:
 	/**

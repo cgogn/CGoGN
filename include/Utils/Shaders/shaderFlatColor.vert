@@ -1,4 +1,4 @@
-// ShaderFlatColorPerFace::vertexShaderText
+// ShaderFlatColor::vertexShaderText
 ATTRIBUTE vec3 VertexPosition;
 ATTRIBUTE vec3 VertexColor;
 VARYING_VERT vec3 colorVertex;

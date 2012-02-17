@@ -1,4 +1,4 @@
-// ShaderFlatColorPerFace::geometryShaderText
+// ShaderFlatColor::geometryShaderText
 uniform float explode;
 uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 NormalMatrix;
@@ -21,7 +21,7 @@ void main(void)
 	vec3 L =  normalize (lightPosition - newPos.xyz);
 	float lambertTerm = dot(N,L);
 
-#ifdef AVERGAGE_COLOR		
+#ifdef AVERAGE_COLOR		
 	int i;
 	vec3 averageColor=vec3(0.,0.,0.);
 	for(i=0; i< 3; i++)
