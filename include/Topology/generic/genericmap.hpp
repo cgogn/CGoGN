@@ -187,7 +187,7 @@ inline void GenericMap::duplicateDart(Dart d)
 	}
 }
 
-inline unsigned int GenericMap::dartIndex(Dart d)
+inline unsigned int GenericMap::dartIndex(Dart d) const
 {
 	if (m_isMultiRes)
 		return (*m_mrDarts[m_mrCurrentLevel])[d.index] ;
@@ -360,7 +360,7 @@ inline Dart GenericMap::end()
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
-inline void GenericMap::next(Dart& d)
+inline Dart GenericMap::next(Dart& d)
 {
 	if (m_isMultiRes)
 	{
@@ -371,6 +371,7 @@ inline void GenericMap::next(Dart& d)
 	}
 	else
 		m_attribs[DART].next(d.index) ;
+	return d;
 }
 
 /****************************************
@@ -395,5 +396,26 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
 	AttributeMultiVector<Dart>* amv = cont.getDataVector<Dart>(cont.getAttributeIndex(name)) ;
 	return amv ;
 }
+
+
+/**************************
+ *  BOUNDARY MANAGEMENT   *
+ **************************/
+
+inline void GenericMap::boundaryMark(Dart d)
+{
+	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarker);
+}
+
+inline void GenericMap::boundaryUnmark(Dart d)
+{
+	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarker);
+}
+
+inline bool GenericMap::isBoundaryMarked(Dart d) const
+{
+	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarker);
+}
+
 
 } //namespace CGoGN

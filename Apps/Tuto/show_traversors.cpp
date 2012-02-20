@@ -106,6 +106,15 @@ void MyQT::cb_combo6(int x)
 		CGoGNerr <<"undefined traversor" << CGoGNendl;
 }
 
+void MyQT::cb_explode(int x)
+{
+	m_expl = float (x) /100.0f;
+	if (m_last==2)
+		traverse2();
+	if (m_last==3)
+		traverse3();
+}
+
 
 void MyQT::cb_initGL()
 {
@@ -154,6 +163,13 @@ void MyQT::cb_mousePress(int button, int x, int y)
 }
 
 
+void  MyQT::cb_Save()
+{
+	std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
+	Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+	m_drawer.toSVG(svg);
+}
+
 void MyQT::colorizeCell(Dart d, unsigned int orbit, float r,float g, float b)
 {
 	TraversorDartsOfOrbit<PFP::MAP>doo (myMap,orbit,d);
@@ -166,37 +182,37 @@ void MyQT::traverse2()
 {
 	if (m_selected == NIL)
 		return;
-
+	m_last=2;
 //	int code = (m_ajd_or_inci2)*100+m_first2*10+m_second2;
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 
 	m_drawer.newList(GL_COMPILE);
 	m_drawer.lineWidth(3.0f);
 	m_drawer.pointSize(7.0f);
-	m_drawer.color3f(1.0f,1.0f,0.0f);
+	m_drawer.color3f(0.0f,0.7f,0.0f);
 
 	m_affDarts.clear();
 
 	if (m_ajd_or_inci2 == 0) // incident
 	{
-		Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer,myMap,m_selected,position,m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 
 		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createIncident(myMap,m_selected,VERTEX+m_second2,VERTEX+m_first2);
 		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
 				m_affDarts.push_back(d);
-		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap,m_affDarts,position,0.7f);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap,m_affDarts,position,m_expl);
 	}
 	else	// adjacent
 	{
-		Algo::Render::drawerCell<PFP>(VERTEX+m_first2, m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_first2, m_drawer,myMap,m_selected,position,m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createAdjacent(myMap,m_selected,VERTEX+m_first2,VERTEX+m_second2);
 
 
 		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
 				m_affDarts.push_back(d);
-		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap,m_affDarts,position,0.7f);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap,m_affDarts,position,m_expl);
 	}
 
 	m_drawer.endList();
@@ -207,35 +223,36 @@ void MyQT::traverse2()
 
 void MyQT::traverse3()
 {
-//	int code = (m_ajd_or_inci3)*100+m_first3*10+m_second3;
-//	std::cout << "CODE="<< code << std::endl;
 	if (m_selected == NIL)
 		return;
+
+	m_last=3;
+
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 
 	m_affDarts.clear();
 	m_drawer.newList(GL_COMPILE);
 	m_drawer.lineWidth(3.0f);
 	m_drawer.pointSize(7.0f);
-	m_drawer.color3f(1.0f,1.0f,0.0f);
+	m_drawer.color3f(0.0f,0.7f,0.0f);
 
 	if (m_ajd_or_inci3 == 0) // incident
 	{
-		Algo::Render::drawerCell<PFP>(VERTEX+m_second3, m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_second3, m_drawer,myMap,m_selected,position,m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3XY<PFP::MAP> tra(myMap,m_selected,VERTEX+m_second3,VERTEX+m_first3);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
 				m_affDarts.push_back(d);
-		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,0.7f);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
 	}
 	else	// adjacent
 	{
-		Algo::Render::drawerCell<PFP>(VERTEX+m_first3, m_drawer,myMap,m_selected,position,0.7f);
+		Algo::Render::drawerCell<PFP>(VERTEX+m_first3, m_drawer,myMap,m_selected,position,m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3XXaY<PFP::MAP> tra(myMap,m_selected,VERTEX+m_first3,VERTEX+m_second3);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
 				m_affDarts.push_back(d);
-		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,0.7f);
+		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
 	}
 
 	m_drawer.endList();
@@ -280,6 +297,7 @@ int main(int argc, char **argv)
 	sqt.setCallBack( dock.combo4, SIGNAL(	activated(int)), SLOT(cb_combo4(int)) );
 	sqt.setCallBack( dock.combo5, SIGNAL(	activated(int)), SLOT(cb_combo5(int)) );
 	sqt.setCallBack( dock.combo6, SIGNAL(	activated(int)), SLOT(cb_combo6(int)) );
+	sqt.setCallBack( dock.explodeSlider, SIGNAL(valueChanged(int)), SLOT(cb_explode(int)) );
 
 	sqt.setCallBack( dock.checkTopo, SIGNAL(	clicked(bool)), SLOT(cb_checkTopo(bool)) );
 

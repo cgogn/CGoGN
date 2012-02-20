@@ -91,7 +91,7 @@ public:
 
 	virtual Dart end() ;
 
-	virtual void next(Dart& d) ;
+	virtual Dart next(Dart& d) ;
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
