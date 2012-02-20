@@ -86,7 +86,6 @@ public:
 	float faceShrinkage ;
 
 	int m_renderStyle ;
-//	bool m_drawTopo;
 	bool m_drawVertices ;
 	bool m_drawEdges ;
 	bool m_drawFaces ;
@@ -118,7 +117,6 @@ public:
 	void importMesh(std::string& filename) ;
 	void exportMesh(std::string& filename);
 
-
 public slots:
 	void slot_drawVertices(bool b) ;
 	void slot_verticesSize(int i) ;
@@ -128,4 +126,3 @@ public slots:
 	void slot_drawNormals(bool b) ;
 	void slot_normalsSize(int i) ;
 };
-

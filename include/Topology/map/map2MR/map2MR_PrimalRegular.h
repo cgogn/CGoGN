@@ -22,49 +22,45 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __IMPORTSVG_H__
-#define __IMPORTSVG_H__
+#ifndef __MAP2MR_PRIMAL_REGULAR__
+#define __MAP2MR_PRIMAL_REGULAR__
+
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
+
+#include "Topology/map/map2MR/filters_Primal.h"
 
 namespace CGoGN
 {
 
-namespace Algo
+class Map2MR_PrimalRegular : public EmbeddedMap2
 {
+protected:
+	bool shareVertexEmbeddings ;
 
-namespace Import
-{
+	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
+	std::vector<Multiresolution::MRFilter*> analysisFilters ;
 
-/**
- * check if an xml node has a given name
- * @param node the xml node
- * @param name the name
- * @ return true if node has the good name
- */
-bool checkXmlNode(xmlNodePtr node, const std::string& name);
+public:
+	Map2MR_PrimalRegular() ;
 
-template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons);
+	std::string mapTypeName() { return "Map2MR_PrimalRegular" ; }
 
+	bool isOddVertex(Dart d) ;
 
-/**
- *
- */
+	void addNewLevel() ;
 
-template <typename PFP>
-bool readSVG(const std::string& filename, std::vector<std::vector<typename PFP::VEC3 > > &allPoly);
+	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
 
-template <typename PFP>
-bool importBB(const std::string& filename, std::vector<Geom::BoundingBox<typename PFP::VEC3> > &bb);
+	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+	void clearAnalysisFilters() { analysisFilters.clear() ; }
 
-template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
-
-} // namespace Import
-
-} // namespace Algo
+	void analysis() ;
+	void synthesis() ;
+} ;
 
 } // namespace CGoGN
-
-#include "Algo/Import/importSvg.hpp"
 
 #endif

@@ -161,7 +161,6 @@ void Viewer::cb_redraw()
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
-
 }
 
 void Viewer::cb_Open()
@@ -206,14 +205,13 @@ void Viewer::importMesh(std::string& filename)
 		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 	}
 
-
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
-//	vertexBaseSize = normalBaseSize /5.0f ;
+//	vertexBaseSize = normalBaseSize / 5.0f ;
 
 	normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
 	if(!normal.isValid())
@@ -316,4 +314,3 @@ int main(int argc, char **argv)
 
 	return app.exec() ;
 }
-

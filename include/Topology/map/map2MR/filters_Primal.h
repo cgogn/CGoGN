@@ -22,267 +22,236 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL__
-#define __MAP2MR_PRIMAL__
-
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#ifndef __MR_FILTERS_PRIMAL__
+#define __MR_FILTERS_PRIMAL__
 
 #include <cmath>
 
 namespace CGoGN
 {
 
+namespace Multiresolution
+{
+
+class MRFilter
+{
+public:
+	MRFilter() {}
+	virtual ~MRFilter() {}
+	virtual void operator() () = 0 ;
+} ;
+
+
 /*********************************************************************************
- *                           MAP2 MR PRIMAL ADAPTIVE
+ *                           LOOP BASIC FUNCTIONS
  *********************************************************************************/
 
-class Map2MR_PrimalAdapt : public EmbeddedMap2
+template <typename PFP>
+typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d1)
 {
-protected:
-	bool shareVertexEmbeddings ;
+	Dart d2 = map.phi2(d1) ;
+	Dart d3 = map.phi_1(d1) ;
+	Dart d4 = map.phi_1(d2) ;
 
-	FunctorType* vertexVertexFunctor ;
-	FunctorType* edgeVertexFunctor ;
-	FunctorType* faceVertexFunctor ;
+	typename PFP::VEC3 p1 = position[d1] ;
+	typename PFP::VEC3 p2 = position[d2] ;
+	typename PFP::VEC3 p3 = position[d3] ;
+	typename PFP::VEC3 p4 = position[d4] ;
 
-public:
-	Map2MR_PrimalAdapt() ;
+	p1 *= 3.0 / 8.0 ;
+	p2 *= 3.0 / 8.0 ;
+	p3 *= 1.0 / 8.0 ;
+	p4 *= 1.0 / 8.0 ;
 
-	std::string mapTypeName() { return "Map2MR_PrimalAdapt" ; }
+	return p1 + p2 + p3 + p4 ;
+}
 
-	/***************************************************
-	 *               CELLS INFORMATION                 *
-	 ***************************************************/
+template <typename PFP>
+typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+{
+	map.incCurrentLevel() ;
 
-	/**
-	 * Return the level of the edge of d in the current level map
-	 */
-	unsigned int edgeLevel(Dart d) ;
+	typename PFP::VEC3 np(0) ;
+	unsigned int degree = 0 ;
+	Traversor2VVaE<typename PFP::MAP> trav(map, d) ;
+	for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+	{
+		++degree ;
+		np += position[it] ;
+	}
 
-	/**
-	 * Return the level of the face of d in the current level map
-	 */
-	unsigned int faceLevel(Dart d) ;
+	map.decCurrentLevel() ;
 
-	/**
-	 * Given the face of d in the current level map,
-	 * return a level 0 dart of its origin face
-	 */
-	Dart faceOrigin(Dart d) ;
+	float mu = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+	mu = (5.0/8.0 - (mu * mu)) / degree ;
+	np *= 8.0/5.0 * mu ;
 
-	/**
-	 * Return the oldest dart of the face of d in the current level map
-	 */
-	Dart faceOldestDart(Dart d) ;
-
-	/**
-	 * Return true if the edge of d in the current level map
-	 * has already been subdivided to the next level
-	 */
-	bool edgeIsSubdivided(Dart d) ;
-
-	/**
-	 * Return true if the edge of d in the current level map
-	 * is subdivided to the next level,
-	 * none of its resulting edges is in turn subdivided to the next level
-	 * and the middle vertex is of degree 2
-	 */
-	bool edgeCanBeCoarsened(Dart d) ;
-
-	/**
-	 * Return true if the face of d in the current level map
-	 * has already been subdivided to the next level
-	 */
-	bool faceIsSubdivided(Dart d) ;
-
-	/**
-	 * Return true if the face of d in the current level map
-	 * is subdivided to the next level
-	 * and none of its resulting faces is in turn subdivided to the next level
-	 */
-	bool faceIsSubdividedOnce(Dart d) ;
-
-	/***************************************************
-	 *               SUBDIVISION                       *
-	 ***************************************************/
-
-protected:
-//	void propagatePhi1(Dart d) ;
-//	void propagatePhi_1(Dart d) ;
-
-	/**
-	 * add a new resolution level
-	 */
-	void addNewLevel() ;
-
-	/**
-	 * subdivide the edge of d to the next level
-	 */
-	void subdivideEdge(Dart d) ;
-
-	/**
-	 * coarsen the edge of d from the next level
-	 */
-	void coarsenEdge(Dart d) ;
-
-public:
-	/**
-	 * subdivide the face of d to the next level
-	 */
-	unsigned int subdivideFace(Dart d) ;
-
-	/**
-	 * coarsen the face of d from the next level
-	 */
-	void coarsenFace(Dart d) ;
-
-	/**
-	 * vertices attributes management
-	 */
-	void setVertexVertexFunctor(FunctorType* f) { vertexVertexFunctor = f ; }
-
-	void setEdgeVertexFunctor(FunctorType* f) { edgeVertexFunctor = f ; }
-
-	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
-} ;
-
-
-
+	return np ;
+}
 
 /*********************************************************************************
- *                           MAP2 MR PRIMAL REGULAR
+ *                           ANALYSIS FILTERS
  *********************************************************************************/
 
-class Map2MR_PrimalRegular : public EmbeddedMap2
-{
-protected:
-	bool shareVertexEmbeddings ;
-
-public:
-	Map2MR_PrimalRegular() ;
-
-	std::string mapTypeName() { return "Map2MR_PrimalRegular" ; }
-
-	bool isOddVertex(Dart d) ;
-
-	void addNewLevel() ;
-
-	void analysis(FunctorType* f) ;
-	void synthesis(FunctorType* odd, FunctorType* even) ;
-} ;
-
-
-
 template <typename PFP>
-class PipoAnalysisFunctor : public FunctorType
+class LoopOddAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoAnalysisFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
-	bool operator() (Dart d)
+	void operator() ()
 	{
-		return false ;
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = loopOddVertex<PFP>(m_map, m_position, d) ;
+
+			m_map.incCurrentLevel() ;
+
+			Dart oddV = m_map.phi2(d) ;
+			m_position[oddV] -= p ;
+
+			m_map.decCurrentLevel() ;
+		}
 	}
 } ;
 
 template <typename PFP>
-class PipoOddSynthesisFunctor : public FunctorType
+class LoopEvenAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoOddSynthesisFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
-	bool operator() (Dart d)
+	void operator() ()
 	{
-		Dart it = d ;
-		Dart d1 = m_map.phi2(it) ;
-		bool centerV = false ;
-		while(m_map.getDartLevel(d1) == m_map.getCurrentLevel())
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			it = m_map.phi1(d1) ;
-			if(it == d)
-			{
-				centerV = true ;
-				d1 = m_map.phi1(m_map.phi1(it)) ;
-				break ;
-			}
-			d1 = m_map.phi2(it) ;
+			typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, d) ;
+			m_position[d] -= p ;
 		}
-
-		m_map.decCurrentLevel() ;
-
-		typename PFP::VEC3 p ;
-		if(centerV)
-		{
-			unsigned int degree = 0 ;
-			Traversor2FV<typename PFP::MAP> trav(m_map, d1) ;
-			for(Dart fit = trav.begin(); fit != trav.end(); fit = trav.next())
-			{
-				++degree ;
-				p += m_position[fit] ;
-			}
-			p /= degree ;
-		}
-		else
-		{
-			Dart d2 = m_map.phi2(d1) ;
-			p = (m_position[d1] + m_position[d2]) / 2.0 ;
-		}
-
-		m_map.incCurrentLevel() ;
-
-		m_position[d] = p ;
-
-		return false ;
 	}
 } ;
 
 template <typename PFP>
-class PipoEvenSynthesisFunctor : public FunctorType
+class LoopNormalisationAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoEvenSynthesisFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopNormalisationAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
-	bool operator() (Dart d)
+	void operator() ()
 	{
-		typename PFP::VEC3 p(0) ;
-		unsigned int degree = 0 ;
-		Traversor2VVaE<typename PFP::MAP> trav(m_map, d) ;
-		for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			++degree ;
-			p += m_position[it] ;
+			unsigned int degree = m_map.vertexDegree(d) ;
+			float n = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+			n = 8.0/5.0 * (n * n) ;
+
+			m_position[d] /= n ;
 		}
-		p /= degree ;
-		p *= 0.5 ;
-		p += m_position[d] * 0.5 ;
-
-		m_position[d] = p ;
-
-		return false ;
 	}
 } ;
+
+/*********************************************************************************
+ *                           SYNTHESIS FILTERS
+ *********************************************************************************/
+
+template <typename PFP>
+class LoopOddSynthesisFilter : public MRFilter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	LoopOddSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = loopOddVertex<PFP>(m_map, m_position, d) ;
+
+			m_map.incCurrentLevel() ;
+
+			Dart oddV = m_map.phi2(d) ;
+			m_position[oddV] += p ;
+
+			m_map.decCurrentLevel() ;
+		}
+	}
+} ;
+
+template <typename PFP>
+class LoopEvenSynthesisFilter : public MRFilter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	LoopEvenSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, d) ;
+			m_position[d] += p ;
+		}
+	}
+} ;
+
+template <typename PFP>
+class LoopNormalisationSynthesisFilter : public MRFilter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			unsigned int degree = m_map.vertexDegree(d) ;
+			float n = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+			n = 8.0/5.0 * (n * n) ;
+
+			m_position[d] *= n ;
+		}
+	}
+} ;
+
 
 
 
 /*********************************************************************************
- *                           VERTEX FUNCTORS
+ *                           SUBDIVISION FUNCTORS
  *********************************************************************************/
 
 template <typename PFP>
@@ -578,6 +547,9 @@ public:
 	}
 } ;
 
+} // namespace Multiresolution
+
 } // namespace CGoGN
 
 #endif
+

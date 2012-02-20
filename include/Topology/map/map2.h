@@ -287,10 +287,10 @@ public:
 
 	//! Split a surface into two disconnected surfaces along a edge path
 	/*! @param vd a vector of darts
-	 *  @param FirstSideOpen : if false, one of the 2 sides of the surface remains closed (no hole)
-	 *  @param SecondSideOpen : if false, the other side of the surface remains closed (no hole)
+	 *  @param firstSideOpen : if false, one of the 2 sides of the surface remains closed (no hole)
+	 *  @param secondSideOpen : if false, the other side of the surface remains closed (no hole)
 	 */
-	virtual void splitSurface(std::vector<Dart>& vd, bool FirstSideClosed = true, bool SecondSideClosed = true);
+	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 	//@}
 
 	/*! @name Topological Queries

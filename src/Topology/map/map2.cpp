@@ -526,21 +526,21 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
-void Map2::splitSurface(std::vector<Dart>& vd, bool FirstSideClosed, bool SecondSideClosed)
+void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
 {
-	//assert(checkSimpleOrientedPath(vd));
+//	assert(checkSimpleOrientedPath(vd)) ;
 
-	Dart e = vd.front();
-	Dart e2 = phi2(e);
+	Dart e = vd.front() ;
+	Dart e2 = phi2(e) ;
 
 	//unsew the edge path
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		unsewFaces(*it);
+		unsewFaces(*it) ;
 
-	if(FirstSideClosed)
+	if(firstSideClosed)
 		fillHole(e) ;
 
-	if(SecondSideClosed)
+	if(secondSideClosed)
 		fillHole(e2) ;
 }
 
