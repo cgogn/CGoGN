@@ -28,10 +28,10 @@
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
+namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
 
 namespace CGoGN
 {
-
 namespace Utils
 {
 
@@ -66,6 +66,8 @@ protected:
     std::vector< Geom::Vec3f > m_strTranslate;
 
     Utils::VBO* m_vbo1;
+
+    float m_scale;
 
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
 
@@ -137,6 +139,8 @@ public:
 	 */
 	void setScale(float scale);
 
+
+	void toSVG(Utils::SVG::SVGOut& svg);
 };
 
 } // namespace Utils
