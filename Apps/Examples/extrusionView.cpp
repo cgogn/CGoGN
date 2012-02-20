@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 	}
 
 	// extrusion
-	Dart d = Algo::Modelisation::extrusion_scale<PFP>(myMap, position, objV, PFP::VEC3(0.0,0.0,0.0), PFP::VEC3(0.0,1.0,0.0),true, pathV, false, pathRadius);
+	Algo::Modelisation::extrusion_scale<PFP>(myMap, position, objV, PFP::VEC3(0.0,0.0,0.0), PFP::VEC3(0.0,1.0,0.0),true, pathV, false, pathRadius);
 
     //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

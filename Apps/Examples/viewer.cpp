@@ -183,29 +183,6 @@ void Viewer::cb_Save()
 	exportMesh(filename) ;
 }
 
-void Viewer::cb_mousePress(int button, int x, int y)
-{
-	if (Shift())
-	{
-		std::cout << "shift" << std::endl;
-
-		m_renderTopo->updateData<PFP>(myMap, position, 0.9, 0.9, allDarts);
-
-		Dart d = m_renderTopo->picking<PFP>(myMap, x,  y, allDarts);
-		if (d != Dart::nil())
-		{
-			statusMsg("dart picked");
-		}
-		else
-		{
-			statusMsg("No dart was picked");
-		}
-
-	}
-
-	updateGL();
-}
-
 void Viewer::importMesh(std::string& filename)
 {
 	myMap.clear(true) ;
