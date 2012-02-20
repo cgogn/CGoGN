@@ -35,8 +35,9 @@ namespace Import
 {
 
 template <typename PFP>
-bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position) ;
+bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames) ;
 
+template <typename PFP>
 class QuadTreeNode
 {
 public:
@@ -46,6 +47,7 @@ public:
 			indices[i] = -1 ;
 		for(unsigned int i = 0; i < 4; ++i)
 			children[i] = NULL ;
+		parent = NULL ;
 	}
 
 	~QuadTreeNode()
@@ -59,22 +61,111 @@ public:
 	{
 		assert(children[0] == NULL) ;
 		for(unsigned int i = 0; i < 4; ++i)
+		{
 			children[i] = new QuadTreeNode() ;
+			children[i]->parent = this ;
+		}
+	}
+
+	bool isSubdivided()
+	{
+		return children[0] != NULL ;
+	}
+
+	void embed(typename PFP::MAP& map, Dart d, std::vector<unsigned int>& vID, CellMarker& cm, bool CCW)
+	{
+		if(isSubdivided())
+		{
+			unsigned int emb0 = vID[children[0]->indices[0]] ;
+			unsigned int emb1 = vID[children[0]->indices[1]] ;
+			unsigned int emb2 = vID[children[0]->indices[2]] ;
+
+			Dart d0 = map.phi1(d) ;
+			Dart d1, d2 ;
+			if(CCW)
+			{
+				d1 = map.phi_1(d) ;
+				d2 = d ;
+			}
+			else
+			{
+				d1 = d ;
+				d2 = map.phi_1(d) ;
+			}
+			map.incCurrentLevel() ;
+			map.embedOrbit(VERTEX, map.phi1(d0), emb0) ;
+			map.embedOrbit(VERTEX, map.phi1(d1), emb1) ;
+			map.embedOrbit(VERTEX, map.phi1(d2), emb2) ;
+			map.decCurrentLevel() ;
+
+			Dart t0 = map.phi_1(d) ;
+			map.incCurrentLevel() ;
+			t0 = map.phi2(map.phi1(t0)) ;
+			children[0]->embed(map, t0, vID, cm, CCW) ;
+			map.decCurrentLevel() ;
+
+			Dart t1 = d ;
+			map.incCurrentLevel() ;
+			children[1]->embed(map, t1, vID, cm, !CCW) ;
+			map.decCurrentLevel() ;
+
+			Dart t2 = map.phi1(d) ;
+			map.incCurrentLevel() ;
+			t2 = map.phi1(t2) ;
+			children[2]->embed(map, t2, vID, cm, !CCW) ;
+			map.decCurrentLevel() ;
+
+			Dart t3 = map.phi_1(d) ;
+			map.incCurrentLevel() ;
+			t3 = map.phi_1(t3) ;
+			children[3]->embed(map, t3, vID, cm, !CCW) ;
+			map.decCurrentLevel() ;
+		}
+	}
+
+	void print()
+	{
+		std::cout << indices[0] << " " << indices[1] << " " << indices[2] << std::endl ;
+		if(isSubdivided())
+		{
+			for(unsigned int i = 0; i < 4; ++i)
+				children[i]->print() ;
+		}
 	}
 
 	unsigned int indices[3] ;
 	QuadTreeNode* children[4] ;
+	QuadTreeNode* parent ;
 } ;
 
+template <typename PFP>
 class QuadTree
 {
 public:
-	std::vector<QuadTreeNode*> roots ;
+	std::vector<QuadTreeNode<PFP>*> roots ;
+	std::vector<Dart> darts ;
 
 	~QuadTree()
 	{
 		for(unsigned int i = 0; i < roots.size(); ++i)
 			delete roots[i] ;
+	}
+
+	void embed(typename PFP::MAP& map, std::vector<unsigned int>& vID)
+	{
+		CellMarker cm(map, VERTEX) ;
+		for(unsigned int i = 0; i < roots.size(); ++i)
+			roots[i]->embed(map, darts[i], vID, cm, true) ;
+	}
+
+	void print()
+	{
+		std::cout << "printing quadtree (" << roots.size() << " roots)" << std::endl ;
+		for(unsigned int i = 0; i < roots.size(); ++i)
+		{
+			std::cout << "root " << i << std::endl ;
+			roots[i]->print() ;
+		}
 	}
 } ;
 
