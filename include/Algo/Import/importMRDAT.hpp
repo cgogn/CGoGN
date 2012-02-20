@@ -39,8 +39,15 @@ inline void nextNonEmptyLine(std::ifstream& fp, std::string& line)
 }
 
 template <typename PFP>
-bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position)
+bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
 {
+	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+
+	if (!position.isValid())
+		position = map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+
+	attrNames.push_back(position.name()) ;
+
 	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
 
 	// open file
@@ -66,8 +73,11 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename P
 	{
 		nextNonEmptyLine(fp, line) ;
 		std::stringstream oss(line) ;
+		std::string s ;
+		oss >> s ;
 		oss >> depth ;
 	}
+	std::cout << "MR depth -> " << depth << std::endl ;
 
 	// read vertices
 	nextNonEmptyLine(fp, line) ;
@@ -78,35 +88,35 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename P
 		return false ;
 	}
 
-	std::vector<typename PFP::VEC3> positions ;
-	std::vector<unsigned int> nbVerticesPerLevel ;
-	nbVerticesPerLevel.resize(depth + 1) ;
+	std::vector<unsigned int> verticesID ;
 
 	nextNonEmptyLine(fp, line) ;
-	while(line.rfind("Triangles") != std::string::npos)
+	while(line.rfind("Triangles") == std::string::npos)
 	{
 		std::stringstream oss(line) ;
 
 		unsigned int level ;
 		oss >> level ;
-		++nbVerticesPerLevel[level - (depth + 1)] ;
 
 		float x, y, z ;
 		oss >> x ;
 		oss >> y ;
 		oss >> z ;
-		positions.push_back(typename PFP::VEC3(x, y, z)) ;
+		typename PFP::VEC3 pos(x, y, z) ;
+
+		unsigned int id = container.insertLine() ;
+		position[id] = pos ;
+		verticesID.push_back(id) ;
 
 		nextNonEmptyLine(fp, line) ;
 	}
 
-	QuadTree qt ;
-	QuadTreeNode* current = NULL ;
-
+	QuadTree<PFP> qt ;
+	QuadTreeNode<PFP>* current = NULL ;
 	unsigned int prevNum = -1 ;
 
 	nextNonEmptyLine(fp, line) ;
-	while(line.rfind("end") != std::string::npos)
+	while(line.rfind("end") == std::string::npos)
 	{
 		std::stringstream oss(line) ;
 
@@ -123,7 +133,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename P
 		if(root == 1)
 		{
 			assert(num == 0) ;
-			QuadTreeNode* n = new QuadTreeNode() ;
+			QuadTreeNode<PFP>* n = new QuadTreeNode<PFP>() ;
 			n->indices[0] = idx0 ;
 			n->indices[1] = idx1 ;
 			n->indices[2] = idx2 ;
@@ -133,28 +143,109 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, typename P
 		}
 		else
 		{
-			if(num > prevNum) // on lit un autre triangle du même niveau
+			if(num == prevNum + 1) // on lit un autre triangle du même niveau
 			{
-
+				current = current->parent->children[num] ;
 			}
-			else // on subdivise le triangle courant
+			else // on monte ou on descend d'un niveau
 			{
-				if(num == 0)
+				if(num == 0) // on subdivise le triangle courant
 				{
 					current->subdivide() ;
+					current = current->children[0] ;
 				}
-				else
+				else // on remonte d'un niveau
 				{
-
+					assert(prevNum == 3) ;
+					assert(current->parent->parent != NULL) ;
+					current = current->parent->parent->children[num] ;
 				}
 			}
+			current->indices[0] = idx0 ;
+			current->indices[1] = idx1 ;
+			current->indices[2] = idx2 ;
+			prevNum = num ;
 		}
 
 		nextNonEmptyLine(fp, line) ;
 	}
 
-	fp.close();
-	return true;
+	fp.close() ;
+
+	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents") ;
+	DartMarkerNoUnmark m(map) ;
+
+	unsigned nbf = qt.roots.size() ;
+
+	// for each root face
+	for(unsigned int i = 0; i < nbf; ++i)
+	{
+		Dart d = map.newFace(3, false) ;
+		qt.darts.push_back(d) ;
+		for (unsigned int j = 0; j < 3; ++j)
+		{
+			unsigned int idx = qt.roots[i]->indices[j] ;
+			unsigned int emb = verticesID[idx] ;
+
+			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, emb) ;
+			map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb) ;
+
+			m.mark(d) ;								// mark on the fly to unmark on second loop
+			vecDartsPerVertex[emb].push_back(d) ;	// store incident darts for fast adjacency reconstruction
+			d = map.phi1(d) ;
+		}
+	}
+
+	// reconstruct neighbourhood between root faces
+	unsigned int nbBoundaryEdges = 0 ;
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (m.isMarked(d))
+		{
+			// darts incident to end vertex of edge
+			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)] ;
+
+			unsigned int embd = map.getEmbedding(VERTEX, d) ;
+			Dart good_dart = NIL ;
+			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+			{
+				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
+					good_dart = *it ;
+			}
+
+			if (good_dart != NIL)
+			{
+				map.sewFaces(d, good_dart, false) ;
+				m.unmarkOrbit(EDGE, d) ;
+			}
+			else
+			{
+				m.unmark(d) ;
+				++nbBoundaryEdges ;
+			}
+		}
+	}
+
+	if (nbBoundaryEdges > 0)
+	{
+//		map.closeMap() ;
+		CGoGNout << "Open mesh.. not managed for now.." << CGoGNendl ;
+		return false ;
+	}
+
+	for(unsigned int i = 0; i < depth; ++i)
+		map.addNewLevel(false) ;
+	map.setCurrentLevel(0) ;
+
+	qt.embed(map, verticesID) ;
+
+	for(unsigned int l = 0; l <= map.getMaxLevel(); ++l)
+	{
+		map.setCurrentLevel(l) ;
+		map.check() ;
+	}
+
+	return true ;
 }
 
 } // namespace Import

@@ -49,7 +49,7 @@ public:
 
 	bool isOddVertex(Dart d) ;
 
-	void addNewLevel() ;
+	void addNewLevel(bool embedNewVertices) ;
 
 	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
 	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
