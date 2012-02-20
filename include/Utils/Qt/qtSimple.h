@@ -200,6 +200,12 @@ public:
 	 */
 	void setFocal(float f) { m_glWidget->setFocal(f); }
 
+
+	/**
+	 * set geometry (override buggy Qt function)
+	 */
+	void setGeometry(int x, int y, int w, int h);
+
 	/**
 	 * get the mouse position in GL widget
 	 */
