@@ -200,7 +200,7 @@ inline Dart ImplicitHierarchicalMap3::alpha_2(Dart d)
 	return phi2(phi3(d));
 }
 
-inline Dart ImplicitHierarchicalMap3::begin()
+inline Dart ImplicitHierarchicalMap3::begin() const
 {
 	Dart d = Map3::begin() ;
 	while(m_dartLevel[d] > m_curLevel)
@@ -208,18 +208,17 @@ inline Dart ImplicitHierarchicalMap3::begin()
 	return d ;
 }
 
-inline Dart ImplicitHierarchicalMap3::end()
+inline Dart ImplicitHierarchicalMap3::end() const
 {
 	return Map3::end() ;
 }
 
-inline Dart ImplicitHierarchicalMap3::next(Dart& d)
+inline void ImplicitHierarchicalMap3::next(Dart& d) const
 {
 	do
 	{
 		Map3::next(d) ;
 	} while(d != Map3::end() && m_dartLevel[d] > m_curLevel) ;
-	return d;
 }
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)

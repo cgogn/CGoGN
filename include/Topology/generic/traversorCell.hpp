@@ -57,7 +57,7 @@ Dart TraversorCell<MAP>::begin()
 
 	current = m.begin() ;
 	while(current != m.end() && (m.isBoundaryMarked(current) || !m_good(current)))
-		current = m.next(current) ;
+		m.next(current) ;
 
 	if(current == m.end())
 		current = NIL ;
@@ -92,7 +92,7 @@ Dart TraversorCell<MAP>::next()
 
 		while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
 		{
-			current = m.next(current) ;
+			m.next(current) ;
 			if(current == m.end())
 				current = NIL ;
 			else
