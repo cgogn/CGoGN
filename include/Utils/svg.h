@@ -48,6 +48,18 @@ namespace SVG
 {
 
 
+struct DepthSort
+{
+	unsigned int obj;
+	unsigned int id;
+	float depth;
+	DepthSort(unsigned int o, unsigned int i, float d):
+		obj(o),id(i),depth(d) {}
+	bool operator<(const DepthSort& ds) const { return depth > ds.depth; /* inverse depth sortin*/}
+
+};
+
+
 class SvgObj
 {
 protected:
@@ -73,9 +85,15 @@ public:
 
 	void close();
 
-	virtual void save(std::ofstream& out)=0;
+	virtual void save(std::ofstream& out) const = 0;
+
+	virtual void saveOne(std::ofstream& out, unsigned int i) const = 0;
 
 	unsigned int nbv() const;
+
+	virtual unsigned int nbPrimtives() const = 0;
+
+	virtual void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const = 0;
 
 	const Geom::Vec3f& P(unsigned int i) const;
 
@@ -88,29 +106,36 @@ public:
 class SvgPoints: public SvgObj
 {
 public:
-	void save(std::ofstream& out);
+	void save(std::ofstream& out) const;
+	void saveOne(std::ofstream& out, unsigned int i) const;
+	unsigned int nbPrimtives() const;
+	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
 
 class SvgLines: public SvgObj
 {
 public:
-	void save(std::ofstream& out);
+	void save(std::ofstream& out) const;
+	void saveOne(std::ofstream& out, unsigned int i) const;
+	unsigned int nbPrimtives() const;
+	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
 
-class SvgPolyline: public SvgObj
-{
-public:
-	void save(std::ofstream& out);
-};
+//class SvgPolyline: public SvgObj
+//{
+//public:
+//	void save(std::ofstream& out);
+//};
+//
+//class SvgPolygon: public SvgObj
+//{
+//protected:
+//	Geom::Vec3f m_colorFill;
+//public:
+//	void setColorFill(const Geom::Vec3f& c);
+//	void save(std::ofstream& out);
+//};
 
-class SvgPolygon: public SvgObj
-{
-protected:
-	Geom::Vec3f m_colorFill;
-public:
-	void setColorFill(const Geom::Vec3f& c);
-	void save(std::ofstream& out);
-};
 
 
 
@@ -164,6 +189,8 @@ public:
 	void endLines();
 	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2);
 	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C);
+
+	void sortSimpleDepth( std::vector<DepthSort>& vds);
 
 };
 
