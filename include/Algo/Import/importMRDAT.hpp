@@ -77,7 +77,8 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		oss >> s ;
 		oss >> depth ;
 	}
-	std::cout << "MR depth -> " << depth << std::endl ;
+
+	std::cout << "  MR depth -> " << depth << std::endl ;
 
 	// read vertices
 	nextNonEmptyLine(fp, line) ;
@@ -87,6 +88,8 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		CGoGNerr << line << CGoGNendl ;
 		return false ;
 	}
+
+	std::cout << "  Read vertices.." << std::flush ;
 
 	std::vector<unsigned int> verticesID ;
 
@@ -110,6 +113,9 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 		nextNonEmptyLine(fp, line) ;
 	}
+
+	std::cout << "..done" << std::endl ;
+	std::cout << "  Read triangles (build quadtree).." << std::flush ;
 
 	QuadTree<PFP> qt ;
 	QuadTreeNode<PFP>* current = NULL ;
@@ -170,7 +176,11 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		nextNonEmptyLine(fp, line) ;
 	}
 
+	std::cout << "..done" << std::endl ;
+
 	fp.close() ;
+
+	std::cout << "  Create base level mesh.." << std::flush ;
 
 	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents") ;
 	DartMarkerNoUnmark m(map) ;
@@ -233,8 +243,14 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		return false ;
 	}
 
+	std::cout << "..done" << std::endl ;
+	std::cout << "  Create finer resolution levels.." << std::flush ;
+
 	for(unsigned int i = 0; i < depth; ++i)
 		map.addNewLevel(false) ;
+
+	std::cout << "..done" << std::endl ;
+	std::cout << "  Embed finer resolution levels.." << std::flush ;
 
 	map.setCurrentLevel(0) ;
 	qt.embed(map, verticesID) ;
@@ -257,6 +273,8 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			map.popLevel() ;
 		}
 	}
+
+	std::cout << "..done" << std::endl ;
 
 	return true ;
 }
