@@ -37,6 +37,11 @@ namespace SVG
 {
 
 
+const std::vector<Geom::Vec3f>& SvgObj::vertices() const
+{
+	return  m_vertices;
+}
+
 void SvgObj::addVertex(const Geom::Vec3f& v)
 {
 	m_vertices.push_back(v);
@@ -248,19 +253,19 @@ SVGOut::SVGOut(const std::string& filename, const glm::mat4& model, const glm::m
 	}
 
 	glGetIntegerv(GL_VIEWPORT, &(m_viewport[0]));
-
-	*m_out << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
-	*m_out << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
-	*m_out << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
-	*m_out << " width=\""<<m_viewport[2]<<"px\" height=\""<<m_viewport[3]<<"px\" viewBox=\"0 0 "<<m_viewport[2]<<" "<<m_viewport[3]<<"\">"<< std::endl;
-	*m_out << "<title>test</title>"<< std::endl;
-	*m_out << "<desc>"<< std::endl;
-	*m_out << "Rendered from CGoGN"<< std::endl;
-
-	*m_out << "</desc>"<< std::endl;
-	*m_out << "<defs>"<< std::endl;
-	*m_out << "</defs>"<< std::endl;
-	*m_out << "<g shape-rendering=\"crispEdges\">" << std::endl;
+//
+//	*m_out << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
+//	*m_out << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
+//	*m_out << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
+//	*m_out << " width=\""<<m_viewport[2]<<"px\" height=\""<<m_viewport[3]<<"px\" viewBox=\"0 0 "<<m_viewport[2]<<" "<<m_viewport[3]<<"\">"<< std::endl;
+//	*m_out << "<title>test</title>"<< std::endl;
+//	*m_out << "<desc>"<< std::endl;
+//	*m_out << "Rendered from CGoGN"<< std::endl;
+//
+//	*m_out << "</desc>"<< std::endl;
+//	*m_out << "<defs>"<< std::endl;
+//	*m_out << "</defs>"<< std::endl;
+//	*m_out << "<g shape-rendering=\"crispEdges\">" << std::endl;
 }
 
 SVGOut::~SVGOut()
@@ -287,6 +292,26 @@ void SVGOut::setWidth(float w)
 
 void SVGOut::closeFile()
 {
+	unsigned int a = 0;
+	unsigned int b = 0;
+	unsigned int c = 1024;
+	unsigned int d = 1024;
+	computeBB(a,b,c,d);
+
+	*m_out << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"<< std::endl;
+	*m_out << "<svg xmlns=\"http://www.w3.org/2000/svg\""<< std::endl;
+	*m_out << " xmlns:xlink=\"http://www.w3.org/1999/xlink\""<< std::endl;
+//	*m_out << " width=\""<<m_viewport[2]<<"px\" height=\""<<m_viewport[3]<<"px\" viewBox=\"0 0 "<<m_viewport[2]<<" "<<m_viewport[3]<<"\">"<< std::endl;
+	*m_out << "viewBox=\""<< a <<" "<< b <<" "<< c-a << " " << d-b <<"\">"<< std::endl;
+	*m_out << "<title>test</title>"<< std::endl;
+	*m_out << "<desc>"<< std::endl;
+	*m_out << "Rendered from CGoGN"<< std::endl;
+
+	*m_out << "</desc>"<< std::endl;
+	*m_out << "<defs>"<< std::endl;
+	*m_out << "</defs>"<< std::endl;
+	*m_out << "<g shape-rendering=\"crispEdges\">" << std::endl;
+
 	// here do the sort in necessary
 
 	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
@@ -297,6 +322,40 @@ void SVGOut::closeFile()
 	*m_out << "</g>" << std::endl;
 	*m_out << "</svg>" << std::endl;
 	m_out->close();
+}
+
+
+void SVGOut::computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d)
+{
+	// here do the sort in necessary
+	a = 100000;
+	b = 100000;
+	c = 0;
+	d = 0;
+
+	for (std::vector<SvgObj*>::iterator it = m_objs.begin(); it != m_objs.end(); ++it)
+	{
+		const std::vector<Geom::Vec3f>& vert = (*it)->vertices();
+		for (std::vector<Geom::Vec3f>::const_iterator j = vert.begin(); j != vert.end(); ++j)
+		{
+			const Geom::Vec3f& P = *j;
+			if (P[0]<a)
+				a = (unsigned int)(P[0]);
+			if (P[1]<b)
+				b = (unsigned int)(P[1]);
+			if (P[0]>c)
+				c = (unsigned int)(P[0]);
+			if (P[1]>d)
+				d = (unsigned int)(P[1]);
+		}
+
+		if (a>10)
+			a-=10;
+		if (b>10)
+			b-=10;
+		c+=10;
+		d+=10;
+	}
 }
 
 

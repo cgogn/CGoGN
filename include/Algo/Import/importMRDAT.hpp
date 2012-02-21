@@ -235,14 +235,27 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	for(unsigned int i = 0; i < depth; ++i)
 		map.addNewLevel(false) ;
+
 	map.setCurrentLevel(0) ;
-
 	qt.embed(map, verticesID) ;
+	map.setCurrentLevel(map.getMaxLevel()) ;
 
-	for(unsigned int l = 0; l <= map.getMaxLevel(); ++l)
+	TraversorV<typename PFP::MAP> tv(map, allDarts, true) ;
+	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
 	{
-		map.setCurrentLevel(l) ;
-		map.check() ;
+		unsigned int vertexLevel = map.getDartLevel(d) ;
+		if(vertexLevel > 0 && vertexLevel < map.getMaxLevel())
+		{
+			map.pushLevel() ;
+			map.setCurrentLevel(vertexLevel) ;
+			unsigned int emb = map.getEmbedding(VERTEX, d) ;
+			for(unsigned int i = vertexLevel + 1; i <= map.getMaxLevel(); ++i)
+			{
+				map.setCurrentLevel(i) ;
+				map.embedOrbit(VERTEX, d, emb) ;
+			}
+			map.popLevel() ;
+		}
 	}
 
 	return true ;

@@ -55,7 +55,7 @@ class MapBrowser
 public:
 	virtual Dart begin() = 0;
 	virtual Dart end() = 0;
-	virtual void next(Dart& d) = 0;
+	virtual Dart next(Dart& d) = 0;
 };
 
 class AttributeHandlerGen ;
@@ -254,7 +254,7 @@ public:
 	/**
 	 * get the index of dart in topological table
 	 */
-	unsigned int dartIndex(Dart d);
+	unsigned int dartIndex(Dart d) const;
 
 	/**
 	 * get the insertion level of a dart (use only in MRMaps)
@@ -539,7 +539,7 @@ public:
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	void next(Dart& d) ;
+	Dart next(Dart& d) ;
 
 	/**
 	 * Apply a functor on each dart of the map
@@ -601,7 +601,7 @@ public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
-	bool isBoundaryMarked(Dart d);
+	bool isBoundaryMarked(Dart d) const;
 
 protected:
 	/**

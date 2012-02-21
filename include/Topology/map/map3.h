@@ -366,8 +366,9 @@ public:
 	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
 	/*! Add volumes to the map that close every existing hole.
 	 *  These faces are marked as boundary.
+	 *  @return the number of closed holes
 	 */
-	void closeMap();
+	unsigned int closeMap();
 	//@}
 };
 

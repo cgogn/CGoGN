@@ -859,21 +859,6 @@ unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& go
 	return fcount.getNb();
 }
 
-void GenericMap::boundaryMark(Dart d)
-{
-	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarker);
-}
-
-void GenericMap::boundaryUnmark(Dart d)
-{
-	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarker);
-}
-
-bool GenericMap::isBoundaryMarked(Dart d)
-{
-	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarker);
-}
-
 void GenericMap::boundaryMarkOrbit(unsigned int orbit, Dart d)
 {
 	FunctorMark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;

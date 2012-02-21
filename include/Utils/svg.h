@@ -81,6 +81,8 @@ public:
 
 	Geom::Vec3f normal();
 
+	const std::vector<Geom::Vec3f>& vertices() const;
+
 };
 
 class SvgPoints: public SvgObj
@@ -126,6 +128,9 @@ protected:
 
 	std::vector<SvgObj*> m_objs;
 	SvgObj* m_current;
+
+protected:
+	void computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d);
 
 public:
 
