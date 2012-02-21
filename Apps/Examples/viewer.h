@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -38,12 +38,14 @@
 #include "Algo/Export/export.h"
 
 #include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topoRender.h"
 
 #include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
+#include "Utils/text3d.h"
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Geometry/normal.h"
@@ -113,6 +115,7 @@ public:
 	void cb_Save() ;
 
 	void importMesh(std::string& filename) ;
+	void exportMesh(std::string& filename);
 
 public slots:
 	void slot_drawVertices(bool b) ;
@@ -123,4 +126,3 @@ public slots:
 	void slot_drawNormals(bool b) ;
 	void slot_normalsSize(int i) ;
 };
-

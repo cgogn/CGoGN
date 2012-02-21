@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,12 +17,13 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 #include "Topology/map/map3.h"
+#include "Topology/generic/traversor3.h"
 
 namespace CGoGN
 {
@@ -354,11 +355,22 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 //		}
 //	}
 
+bool Map3::collapseDegeneratedFace(Dart d)
+{
+	Dart d3 = phi3(d);
 
+	Map3::unsewVolumes(d);
+
+	std::cout << Map2::collapseDegeneratedFace(d) << std::endl;
+	std::cout << Map2::collapseDegeneratedFace(d3) << std::endl;
+	std::cout << std::endl;
+
+	return true;
+}
 
 void Map3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && Map2::sameOrientedFace(d, e)) ;
+	assert(d != e && sameOrientedFace(d, e)) ;
 
 	Dart dd = phi1(phi3(d));
 	Dart ee = phi1(phi3(e));
@@ -494,17 +506,19 @@ bool Map3::mergeVolumes(Dart d)
 
 void Map3::splitVolume(std::vector<Dart>& vd)
 {
-	assert(checkSimpleOrientedPath(vd)) ;
+	//assert(checkSimpleOrientedPath(vd)) ;
 
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 
-	//unsew the edge path
-	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		Map2::unsewFaces(*it);
+//	//unsew the edge path
+//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//		Map2::unsewFaces(*it);
+//
+//	Map2::fillHole(e) ;
+//	Map2::fillHole(e2) ;
 
-	Map2::fillHole(e) ;
-	Map2::fillHole(e2) ;
+	Map2::splitSurface(vd,true,true);
 
 	//sew the two connected components
 	Map3::sewVolumes(phi2(e), phi2(e2), false);
@@ -672,30 +686,24 @@ Dart Map3::findBoundaryFaceOfEdge(Dart d)
 
 bool Map3::isBoundaryVolume(Dart d)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
-
-	std::vector<Dart> visitedFaces ;
-	visitedFaces.reserve(128) ;
-	visitedFaces.push_back(d) ;
-	mark.markOrbit(FACE2, d) ;
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WF<Map3> tra(*this, d);
+	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
-		if (isBoundaryMarked(phi3(visitedFaces[i])))
+		if(isBoundaryMarked(phi3(dit)))
 			return true ;
-
-		Dart e = visitedFaces[i] ;
-		do	// add all face neighbours to the table
-		{
-			Dart ee = phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE2, ee) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
 	}
+	return false;
+}
+
+bool Map3::hasBoundaryEdge(Dart d)
+{
+	Traversor3WE<Map3> tra(*this, d);
+	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
+	{
+		if(isBoundaryEdge(dit))
+			return true;
+	}
+
 	return false;
 }
 

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -62,7 +62,7 @@ template <typename MAP>
 class TraversorV : public TraversorCell<MAP>
 {
 public:
-	TraversorV(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, good, thread)
+	TraversorV(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, good, forceDartMarker, thread)
 	{}
 };
 
@@ -70,7 +70,7 @@ template <typename MAP>
 class TraversorE : public TraversorCell<MAP>
 {
 public:
-	TraversorE(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, good, thread)
+	TraversorE(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, good, forceDartMarker, thread)
 	{}
 };
 
@@ -79,7 +79,7 @@ template <typename MAP>
 class TraversorF : public TraversorCell<MAP>
 {
 public:
-	TraversorF(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, good, thread)
+	TraversorF(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, good, forceDartMarker, thread)
 	{}
 };
 
@@ -87,7 +87,7 @@ template <typename MAP>
 class TraversorW : public TraversorCell<MAP>
 {
 public:
-	TraversorW(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, good, thread)
+	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, good, forceDartMarker, thread)
 	{}
 };
 

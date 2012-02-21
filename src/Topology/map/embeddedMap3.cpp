@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -64,7 +64,8 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 			copyDartEmbedding(FACE2, f1, f);
 			Dart e = phi3(f1);
 //			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
-			copyDartEmbedding(FACE2, f1, f);
+//			copyDartEmbedding(FACE2, f1, f);
+			copyDartEmbedding(FACE2, phi1(e), e);
 			f = alpha2(f);
 		} while(f != d);
 	}
@@ -151,6 +152,11 @@ Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 	}
 
 	return resV;
+}
+
+bool EmbeddedMap3::collapseDegeneratedFace(Dart d)
+{
+	return Map3::collapseDegeneratedFace(d);
 }
 
 void EmbeddedMap3::splitFace(Dart d, Dart e)
@@ -415,6 +421,19 @@ bool EmbeddedMap3::check()
 
 	std::cout << "Check: embedding begin" << std::endl ;
 
+    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
+
+    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
+    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
+
+
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		if(isOrbitEmbedded(VERTEX))
@@ -468,18 +487,6 @@ bool EmbeddedMap3::check()
 	}
 
 	std::cout << "Check: embedding ok" << std::endl ;
-
-    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
-    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
-
-    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
-    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
-
-    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
-    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
-
-    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
-    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
 
 	return true ;
 }

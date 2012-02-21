@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,32 +17,40 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL__
-#define __MAP2MR_PRIMAL__
+#ifndef __MAP2MR_PRIMAL_ADAPT__
+#define __MAP2MR_PRIMAL_ADAPT__
 
 #include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
+
+#include <cmath>
 
 namespace CGoGN
 {
 
-class Map2MR_Primal : public EmbeddedMap2
+class Map2MR_PrimalAdapt : public EmbeddedMap2
 {
+protected:
+	bool shareVertexEmbeddings ;
+
+	FunctorType* vertexVertexFunctor ;
+	FunctorType* edgeVertexFunctor ;
+	FunctorType* faceVertexFunctor ;
+
 public:
-	Map2MR_Primal() ;
+	Map2MR_PrimalAdapt() ;
+
+	std::string mapTypeName() { return "Map2MR_PrimalAdapt" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
 	 ***************************************************/
-
-	/**
-	 * Return the level of insertion of the vertex of d
-	 */
-	unsigned int vertexInsertionLevel(Dart d) ;
 
 	/**
 	 * Return the level of the edge of d in the current level map
@@ -96,25 +104,44 @@ public:
 	 *               SUBDIVISION                       *
 	 ***************************************************/
 
+protected:
+//	void propagatePhi1(Dart d) ;
+//	void propagatePhi_1(Dart d) ;
+
+	/**
+	 * add a new resolution level
+	 */
+	void addNewLevel() ;
+
 	/**
 	 * subdivide the edge of d to the next level
 	 */
 	void subdivideEdge(Dart d) ;
 
 	/**
-	 * subdivide the face of d to the next level
-	 */
-	void subdivideFace(Dart d) ;
-
-	/**
 	 * coarsen the edge of d from the next level
 	 */
 	void coarsenEdge(Dart d) ;
+
+public:
+	/**
+	 * subdivide the face of d to the next level
+	 */
+	unsigned int subdivideFace(Dart d) ;
 
 	/**
 	 * coarsen the face of d from the next level
 	 */
 	void coarsenFace(Dart d) ;
+
+	/**
+	 * vertices attributes management
+	 */
+	void setVertexVertexFunctor(FunctorType* f) { vertexVertexFunctor = f ; }
+
+	void setEdgeVertexFunctor(FunctorType* f) { edgeVertexFunctor = f ; }
+
+	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
 } ;
 
 } // namespace CGoGN

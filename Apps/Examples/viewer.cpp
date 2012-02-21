@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -119,6 +119,7 @@ void Viewer::cb_initGL()
 
 void Viewer::cb_redraw()
 {
+	//glClearColor(1,1,1,0);
 	if(m_drawVertices)
 	{
 		float size = vertexScaleFactor ;
@@ -175,9 +176,10 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("off (*.off)") ;
+	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply);; plygen (*.plygen)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
-	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+
+	exportMesh(filename) ;
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -203,15 +205,15 @@ void Viewer::importMesh(std::string& filename)
 		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
 	}
 
-
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
-//	vertexBaseSize = normalBaseSize /5.0f ;
+//	vertexBaseSize = normalBaseSize / 5.0f ;
 
+	normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
 	if(!normal.isValid())
 		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
 
@@ -222,6 +224,21 @@ void Viewer::importMesh(std::string& filename)
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
+}
+
+void Viewer::exportMesh(std::string& filename)
+{
+	size_t pos = filename.rfind(".") ;    // position of "." in filename
+	std::string extension = filename.substr(pos) ;
+
+	if (extension == std::string(".off"))
+		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension.compare(0, 4, std::string(".ply")) == 0)
+		Algo::Export::exportPLY<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension == std::string(".map"))
+		myMap.saveMapBin(filename) ;
+	else
+		std::cerr << "Cannot save file " << filename << " : unknown or unhandled extension" << std::endl ;
 }
 
 void Viewer::slot_drawVertices(bool b)
@@ -278,14 +295,22 @@ int main(int argc, char **argv)
 	sqt.setGeometry(0, 0, 1000, 800) ;
  	sqt.show() ;
 
-	if(argc == 2)
+	if(argc >= 2)
 	{
 		std::string filename(argv[1]) ;
 		sqt.importMesh(filename) ;
+		if(argc >= 3)
+		{
+			std::string filenameExp(argv[2]) ;
+			std::cout << "Exporting " << filename << " as " << filenameExp << " ... "<< std::flush ;
+			sqt.exportMesh(filenameExp) ;
+			std::cout << "done!" << std::endl ;
+
+			return (0) ;
+		}
 	}
 
 	sqt.initGUI() ;
 
 	return app.exec() ;
 }
-

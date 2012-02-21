@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -42,7 +42,7 @@ namespace Algo
 namespace Modelisation
 {
 
-enum { NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
+enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
 /**
 * sudivide the all quads of primtive into 2 triangles
@@ -70,6 +70,64 @@ enum { NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 template <typename PFP>
 void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position);
 
+
+
+
+
+
+/**
+ * create a n-sided pyramid
+ */
+template <typename PFP>
+Dart createPyramid(typename PFP::MAP& map, unsigned int nbSides);
+
+/**
+ * create a n-sided prism
+ */
+template <typename PFP>
+Dart createPrism(typename PFP::MAP& map, unsigned int nbSides);
+
+/**
+ * create a n-sided diamond
+ */
+template <typename PFP>
+Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides);
+
+
+
+
+/**
+ * create a tetrahedron
+ */
+template <typename PFP>
+Dart createTetrahedron(typename PFP::MAP& map);
+
+/**
+ * create a hexahedron
+ */
+template <typename PFP>
+Dart createHexahedron(typename PFP::MAP& map);
+
+/**
+ * create a 3-sided prism
+ */
+template <typename PFP>
+Dart createTriangularPrism(typename PFP::MAP& map);
+
+/**
+ * create a 3-sided pyramid
+ */
+template <typename PFP>
+Dart createQuadrangularPyramid(typename PFP::MAP& map);
+
+/**
+ * create 4-sided diamond (i.e. an octahedron)
+ */
+template <typename PFP>
+Dart createOctahedron(typename PFP::MAP& map);
+
+
+
 /**
 * class of geometric Polyhedron
 * It alloaw the creation of:
@@ -82,7 +140,6 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 positi
 *
 * Topological creation methods are separated from embedding to
 * easily allow specific embedding.
-
 */
 template <typename PFP>
 class Polyhedron
@@ -166,31 +223,6 @@ public:
 	* @param p1 second Polyhedron
 	*/
 	Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2);
-
-	/**
-	 * create simple simple polyhedron (not handled by Polyhedron object)
-	 */
-	static Dart createPolyhedron(typename PFP::MAP& the_map, unsigned int nbFaces);
-
-	/**
-	 * create simple simple tetrahedron (not handled by Polyhedron object)
-	 */
-	static Dart createTetra(typename PFP::MAP& the_map);
-
-	/**
-	 * create simple simple pyramid (not handled by Polyhedron object)
-	 */
-	static Dart createPyra(typename PFP::MAP& the_map);
-
-	/**
-	 * create simple simple hexaedron (not handled by Polyhedron object)
-	 */
-	static Dart createHexa(typename PFP::MAP& the_map);
-
-	/**
-	 * create simple n-sided prism (not handled by Polyhedron object)
-	 */
-	static Dart createPrism(typename PFP::MAP& the_map, unsigned int nbSides);
 
 	/*
 	* get the reference dart

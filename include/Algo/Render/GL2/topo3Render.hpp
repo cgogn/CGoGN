@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -253,19 +253,6 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 }
 
 
-template<typename PFP>
-void Topo3Render::dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b)
-{
-//	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
-	unsigned int lab =map.dartIndex(d) + 1; // add one to avoid picking the black of screen
-
-	r = float(lab%255) / 255.0f; lab = lab/255;
-	g = float(lab%255) / 255.0f; lab = lab/255;
-	b = float(lab%255) / 255.0f; lab = lab/255;
-	if (lab!=0)
-		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
-}
-
 
 template<typename PFP>
 void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
@@ -281,7 +268,7 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 			if (nb < m_nbDarts)
 			{
 				float r,g,b;
-				dartToCol<PFP>(map, d, r,g,b);
+				dartToCol(d, r,g,b);
 				
 				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
 				*local++ = r;

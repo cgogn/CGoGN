@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -472,6 +472,7 @@ Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned i
 		return new Traversor2EV<MAP>(map,dart);
 		break;
 	case 0x0102:
+		return new Traversor2EF<MAP>(map,dart);
 		break;
 	case 0x0200:
 		return new Traversor2FV<MAP>(map,dart);
@@ -485,7 +486,6 @@ Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned i
 	}
 	return NULL;
 }
-
 
 template<typename MAP>
 Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
@@ -517,11 +517,5 @@ Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned i
 	}
 	return NULL;
 }
-
-
-
-
-
-
 
 } // namespace CGoGN

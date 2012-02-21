@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -170,6 +170,14 @@ public:
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes = true);
 
+	//! Delete a face if and only if it has one or two edges
+	/*! If the face is sewed to two distinct adjacent faces,
+	 *  then those two faces are sewed
+	 *  @param d a dart of the face
+	 *  @return true if the collapse has been executed, false otherwise
+	 */
+	virtual bool collapseDegeneratedFace(Dart d);
+
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
 	 *  @param d dart of first vertex
@@ -273,6 +281,11 @@ public:
 	/*  @param d a dart
 	 */
 	bool isBoundaryVolume(Dart d) ;
+
+	//! Tell if an edge of the volume is on the boundary
+	/*	@param d a dart
+	 */
+	bool hasBoundaryEdge(Dart d);
 
 	//! Check the map completeness
 	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation

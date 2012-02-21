@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -200,7 +200,6 @@ void MyQT::cb_redraw()
 }
 
 
-
 void  MyQT::cb_mousePress(int button, int x, int y)
 {
 	if (!Shift())
@@ -318,6 +317,20 @@ int main(int argc, char **argv)
 			}
 			else
 				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+		}
+
+		if(extension == std::string(".off"))
+		{
+			if(!Algo::Import::importMeshToExtrude<PFP>(myMap, argv[1], attrNames))
+			{
+				std::cerr << "could not import "  << std::endl ;
+				return 1;
+			}
+			else
+			{
+				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+				myMap.closeMap();
+			}
 		}
 
 		color = myMap.addAttribute<PFP::VEC3>(VOLUME, "color");

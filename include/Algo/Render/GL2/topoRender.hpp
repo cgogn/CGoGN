@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -67,10 +67,9 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-	{
+	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
-	}
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
@@ -213,10 +212,10 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-	{
+	m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
-	}
+
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
@@ -361,27 +360,21 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 
 }
 
-template<typename PFP>
-void TopoRender::dartToCol(typename PFP::MAP& map, Dart d, float& r, float& g, float& b)
-{
-	unsigned int lab = map.dartIndex(d) + 1; // add one to avoid picking the black of screen
-
-	r = float(lab%255) / 255.0f; lab = lab/255;
-	g = float(lab%255) / 255.0f; lab = lab/255;
-	b = float(lab%255) / 255.0f; lab = lab/255;
-	if (lab!=0)
-		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
-}
-
 
 
 template<typename PFP>
 void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
-
 	m_vbo3->bind();
 	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
+
+	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
+	{
+		CGoGNerr << "Error attribute_dartIndex does not exist during TopoRender::picking" << CGoGNendl;
+		return;
+	}
 
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -390,7 +383,7 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 			if (nb < m_nbDarts)
 			{
 				float r,g,b;
-				dartToCol<PFP>(map,d, r,g,b);
+				dartToCol(d, r,g,b);
 				float* local = colorBuffer+3*m_attIndex[d]; // get the right position in VBO
 				*local++ = r;
 				*local++ = g;

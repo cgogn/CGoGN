@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -25,26 +25,21 @@
 #ifndef __COLOURCONVERTER_H__
 #define __COLOURCONVERTER_H__
 
+#include <iostream>
+
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
-#include "Utils/cgognStream.h"
+
+// #define DISPLAY
 
 namespace CGoGN {
 
 namespace Utils {
 
-/**
- * Supported colour spaces
- */
-enum ColourEncoding
-{
-	C_RGB = 0,
-	C_XYZ = 1,
-	C_Luv = 2,
-	C_Lab = 3
-} ;
-
-/**
+/*!
+ * \class ColourConverter
+ * \brief Class for switching between different tri-channel color-spaces
+ *
  * Class for colour conversions between the enumerated colour spaces.
  * Usage :
  *  VEC3 colRGB ; 								// current colour in RGB for example
@@ -56,34 +51,45 @@ enum ColourEncoding
 template <typename REAL>
 class ColourConverter
 {
-
 public: // types
-	typedef Geom::Vector<3,REAL> VEC3 ;
+	/**
+	 * \enum ColourEncoding
+	 * Supported colour spaces
+	 */
+	enum ColourEncoding
+	{
+		C_RGB = 0,
+		C_XYZ = 1,
+		C_Luv = 2,
+		C_Lab = 3
+	} ;
+
+	typedef Geom::Vector<3,REAL> VEC3 ; /*!< Triplet for color encoding */
 
 public: // methods
 	/**
-	 * Constructor
+	 * \brief Constructor
 	 * @param col a VEC3 colour
 	 * @param enc the colour space of provided colour
 	 */
-	ColourConverter(VEC3 col, enum ColourEncoding enc) ;
+	ColourConverter(const VEC3& col, const enum ColourEncoding& enc) ;
 	/**
-	 * Destructor
+	 * \brief Destructor
 	 */
 	~ColourConverter() ;
 
 	/**
-	 * getR
+	 * \brief getR
 	 * @return original value (in its original space)
 	 */
 	VEC3 getOriginal() ;
 	/**
-	 * getR
-	 * @return enc value of provided colour
+	 * \brief getR
+	 * @return value of provided colour
 	 */
 	VEC3 getColour(enum ColourEncoding enc) ;
 	/**
-	 * getR
+	 * \brief getR
 	 * @return RGB value of provided colour
 	 */
 	VEC3 getRGB() ;
@@ -104,10 +110,7 @@ public: // methods
 	VEC3 getXYZ() ;
 
 public: // members
-	/**
-	 * Colour space of original (unaltered) data
-	 */
-	enum ColourEncoding originalEnc ;
+	enum ColourEncoding originalEnc ;  /*!< Colour space of original (unaltered) data */
 
 private: // private members
 	VEC3 *RGB ;
@@ -126,7 +129,6 @@ private: // private members
 	void convertLabToXYZ() ;
 
 private: // private constants
-
 	// D65 reference white
 	static const REAL Xn = 0.950456 ;
 	static const REAL Yn = 1.0 ;

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -370,7 +370,7 @@ void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 
 void Map2::unsewFaces(Dart d)
 {
-	assert(!isBoundaryEdge(d)) ;
+	assert(!Map2::isBoundaryEdge(d)) ;
 
 	Dart dd = phi2(d) ;
 
@@ -418,7 +418,7 @@ bool Map2::collapseDegeneratedFace(Dart d)
 
 void Map2::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameFace(d, e)) ;
+	assert(d != e && Map2::sameFace(d, e)) ;
 	Dart dd = Map1::cutEdge(phi_1(d)) ;
 	Dart ee = Map1::cutEdge(phi_1(e)) ;
 	Map1::splitCycle(dd, ee) ;
@@ -477,25 +477,6 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(e), vv2) ;
 }
 
-void Map2::unsewAroundVertex(Dart d)
-{
-	Dart it = d ;
-	do
-	{
-		Dart temp = phi1(it) ;
-		Dart e_1 = phi_1(it) ;
-
-		do
-		{
-			unsewFaces(temp) ;
-			temp = phi1(temp) ;
-		} while(temp != e_1);
-
-		it = alpha1(it);
-	}
-	while(it != d);
-}
-
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
 	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
@@ -543,6 +524,24 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	Map1::deleteCycle(e);
 
 	return true ;
+}
+
+void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
+{
+//	assert(checkSimpleOrientedPath(vd)) ;
+
+	Dart e = vd.front() ;
+	Dart e2 = phi2(e) ;
+
+	//unsew the edge path
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		unsewFaces(*it) ;
+
+	if(firstSideClosed)
+		fillHole(e) ;
+
+	if(secondSideClosed)
+		fillHole(e2) ;
 }
 
 /*! @name Topological Queries

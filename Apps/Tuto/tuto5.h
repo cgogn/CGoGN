@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-#define WITH_GMAP 1
+//#define WITH_GMAP 0
 
 #include "Topology/generic/parameters.h"
 #ifdef WITH_GMAP
@@ -39,7 +39,7 @@
 #include "Geometry/vector_gen.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
+
 
 #include "Algo/Render/GL2/topo3Render.h"
 
@@ -47,6 +47,7 @@
 #include "Utils/text3d.h"
 
 #include "Utils/pointSprite.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
 
