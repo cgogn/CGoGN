@@ -937,14 +937,19 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 	return count ;
 }
 
-void GMap3::closeMap()
+unsigned int GMap3::closeMap()
 {
 	// Search the map for topological holes (fix points of beta3)
+	unsigned int nb = 0 ;
 	for (Dart d = begin(); d != end(); next(d))
 	{
 		if (beta3(d) == d)
+		{
+			++nb ;
 			closeHole(d);
+		}
 	}
+	return nb ;
 }
 
 } // namespace CGoGN
