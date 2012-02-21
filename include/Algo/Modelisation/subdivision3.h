@@ -27,6 +27,7 @@
 
 #include <math.h>
 #include <vector>
+#include "Geometry/plane_3d.h"
 
 namespace CGoGN
 {
@@ -45,6 +46,13 @@ namespace Modelisation
 template <typename PFP>
 Dart cut3Ear(typename PFP::MAP& map, Dart d);
 
+/**
+* Cut a volume considering a plane
+* @param d dart of the volume
+* @return a dart from the face in the midle
+*/
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl);
 
 
 /**

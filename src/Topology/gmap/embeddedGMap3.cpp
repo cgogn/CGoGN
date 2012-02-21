@@ -219,8 +219,6 @@ void EmbeddedGMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 
 void EmbeddedGMap3::unsewVolumes(Dart d)
 {
-	std::cout << "unsew volumes" << std::endl ;
-
 	Dart dd = alpha1(d);
 
 	unsigned int fEmb = EMBNULL ;
@@ -240,7 +238,6 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 				embedOrbit(VERTEX, dit, getEmbedding(VERTEX, dit)) ;
 				embedNewCell(VERTEX, dd);
 				copyCell(VERTEX, dd, dit);
-				std::cout << "different vertices.." << std::endl ;
 			}
 			else
 			{

@@ -33,21 +33,29 @@ Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& P
 {
 	float b = NormP * Dir ;
 
-#define PRECISION 1e-20
+#define PRECISION 1e-6
 	if (fabs(b) < PRECISION)		//ray parallel to triangle
 	{
-		VEC3 v = PlaneP - P ;
-		float c = NormP * v ;
+		VEC3 v = PlaneP - P;
+		float c = NormP * v;
 		if (fabs(c) < PRECISION )
-		return EDGE_INTERSECTION ;
-		return NO_INTERSECTION ;
+			return EDGE_INTERSECTION;
+
+		return NO_INTERSECTION;
 	}
 #undef PRECISION
 
-	float a = NormP * (PlaneP - P) ;
+	float a = NormP * (PlaneP - P);
 
-	Inter = P + (a / b) * Dir ;
-	return FACE_INTERSECTION ;
+	Inter = P + (a / b) * Dir;
+
+	return FACE_INTERSECTION;
+}
+
+template <typename VEC3, typename PLANE>
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const PLANE& Plane, VEC3& Inter)
+{
+	return intersectionLinePlane(P, Dir, Plane.normal()*Plane.d(), Plane.normal(), Inter);
 }
 
 template <typename VEC3>

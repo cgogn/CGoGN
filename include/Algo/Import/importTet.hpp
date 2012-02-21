@@ -111,8 +111,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		} while(ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-		oss >> nbe; //number of vertices = 4
-		assert(nbe == 4);
+		oss >> nbe; //number of vertices = 4 or used for region mark
 
 		Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(map, 4);
 

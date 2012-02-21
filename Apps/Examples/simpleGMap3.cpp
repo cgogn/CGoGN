@@ -37,24 +37,24 @@ SimpleGMap3::SimpleGMap3()
 	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
 	Dart d = primCat.hexaGrid_topo(3,1,1);
 	primCat.embedHexaGrid(2,1,1);
-	std::cout << "AAA"<< std::endl;
 	myMap.check();
-	std::cout << "AAA"<< std::endl;
-	DartMarker markOrient(myMap);
-	std::vector<Dart> orient;
-	FunctorStore fs(orient);
+//	DartMarker markOrient(myMap);
+//	std::vector<Dart> orient;
+//	FunctorStore fs(orient);
 	
-	d = 49;
-	myMap.foreach_dart_of_oriented_volume(d, fs);
+//	d = 49;
+//	myMap.foreach_dart_of_oriented_volume(d, fs);
 
-	std::cout << "AAA"<< std::endl;
+//	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
+//		markOrient.mark(*it);
 
-	for(std::vector<Dart>::iterator it = orient.begin() ; it != orient.end() ; ++it)
-		markOrient.mark(*it);
+//	SelectorMarked sm(markOrient);
+//	std::cout << "AAA"<< std::endl;
+//	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
 
-	SelectorMarked sm(markOrient);
-	std::cout << "AAA"<< std::endl;
-	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
+//	Geom::Plane3D<PFP::REAL> pl(VEC3(0.5,0.14,0.5),VEC3(1.5,0.45,0.5),VEC3(0.5,0.15,1.5));
+	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
+	Algo::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);
@@ -114,6 +114,7 @@ void SimpleGMap3::cb_redraw()
 	glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
 	Algo::Render::GL1::renderTopoGMD3<PFP>(myMap, position, true, true, true, true, 0.9f, 0.9f, 0.9f, 0.9f);
+//	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 
 	glDisable(GL_LIGHTING);
 	glColor3f(1.0f, 1.0f, 1.0f);

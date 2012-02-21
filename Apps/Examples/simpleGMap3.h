@@ -28,6 +28,7 @@
 
 #include "Topology/generic/parameters.h"
 #include "Topology/gmap/embeddedGMap3.h"
+//#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 
@@ -40,6 +41,7 @@ struct PFP: public PFP_STANDARD
 {
 	// definition of the map
 	typedef EmbeddedGMap3 MAP ;
+//	typedef EmbeddedMap3 MAP ;
 };
 
 typedef PFP::MAP MAP ;

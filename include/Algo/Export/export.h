@@ -55,6 +55,15 @@ template <typename PFP>
 bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
+* export the map into a OBJ file
+* @param the_map map to be exported
+* @param filename filename of obj file
+* @return true
+*/
+template <typename PFP>
+bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+
+/**
 * export the map into a Trian file
 * @param the_map map to be exported
 * @param filename filename of trian file

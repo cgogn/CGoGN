@@ -180,6 +180,72 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
+bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	unsigned int nbDarts = map.getNbDarts() ;
+	std::vector<unsigned int> facesSize ;
+	std::vector<std::vector<unsigned int> > facesIdx ;
+	facesSize.reserve(nbDarts/3) ;
+	facesIdx.reserve(nbDarts/3) ;
+	std::map<unsigned int, unsigned int> vIndex ;
+	unsigned int vCpt = 0 ;
+	std::vector<unsigned int> vertices ;
+	vertices.reserve(nbDarts/6) ;
+
+	CellMarker markV(map, VERTEX) ;
+	TraversorF<MAP> t(map, good) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		std::vector<unsigned int> fidx ;
+		fidx.reserve(8) ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
+		{
+			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			if(!markV.isMarked(it))
+			{
+				markV.mark(it) ;
+				vIndex[vNum] = vCpt++ ;
+				vertices.push_back(vNum) ;
+			}
+			fidx.push_back(vIndex[vNum]+1) ;
+		}
+		facesIdx.push_back(fidx) ;
+	}
+
+	out << "#OBJ - Export from CGoGN" << std::endl ;
+
+	for(unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		const VEC3& v = position[vertices[i]] ;
+		out << "v " << v[0] << " " << v[1] << " " << v[2] << std::endl ;
+	}
+
+	out << std::endl;
+
+	for(unsigned int i = 0; i < facesIdx.size(); ++i)
+	{
+		out << "f ";
+		for(unsigned int j = 0; j < facesIdx[i].size(); ++j)
+			out << " " << facesIdx[i][j] ;
+		out << std::endl ;
+	}
+
+	out.close() ;
+	return true ;
+}
+
+template <typename PFP>
 bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;

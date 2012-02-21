@@ -25,6 +25,7 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
 #include "Container/fakeAttribute.h"
+#include "Algo/Modelisation/polyhedron.h"
 
 namespace CGoGN
 {
@@ -125,6 +126,114 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 		// ensure bijection between topo and embedding
 		map.bijectiveOrbitEmbedding(VERTEX);
 	}
+
+	return true ;
+}
+
+template <typename PFP>
+bool importMeshSurfToVol(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float dist)
+{
+	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
+	unsigned nbf = mts.getNbFaces();
+	int index = 0;
+	// buffer for tempo faces (used to remove degenerated edges)
+	std::vector<unsigned int> edgesBuffer;
+	edgesBuffer.reserve(16);
+
+	DartMarkerNoUnmark m(map) ;
+
+	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX, "position");
+	std::vector<unsigned int > backEdgesBuffer(mts.getNbVertices(), EMBNULL);
+
+	// for each face of table -> create a prism
+	for(unsigned int i = 0; i < nbf; ++i)
+	{
+		// store face in buffer, removing degenerated edges
+		unsigned int nbe = mts.getNbEdgesFace(i);
+		edgesBuffer.clear();
+		unsigned int prec = EMBNULL;
+		for (unsigned int j = 0; j < nbe; ++j)
+		{
+			unsigned int em = mts.getEmbIdx(index++);
+			if (em != prec)
+			{
+				prec = em;
+				edgesBuffer.push_back(em);
+			}
+		}
+		// check first/last vertices
+		if (edgesBuffer.front() == edgesBuffer.back())
+			edgesBuffer.pop_back();
+
+		// create only non degenerated faces
+		nbe = edgesBuffer.size();
+		if (nbe > 2)
+		{
+			Dart d = Algo::Modelisation::createPrism<PFP>(map, nbe);
+
+			//Embed the base faces
+			for (unsigned int j = 0; j < nbe; ++j)
+			{
+				unsigned int em = edgesBuffer[j];		// get embedding
+
+				if(backEdgesBuffer[em] == EMBNULL)
+				{
+					unsigned int emn = map.newCell(VERTEX);
+					map.copyCell(VERTEX, emn, em);
+					backEdgesBuffer[em] = emn;
+					position[emn] += typename PFP::VEC3(0,0,dist);
+				}
+
+				FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, em);
+				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+				map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+
+				//Embed the other base face
+				Dart d2 = map.phi1(map.phi1(map.phi2(d)));
+				unsigned int em2 = backEdgesBuffer[em];
+				FunctorSetEmb<typename PFP::MAP> fsetemb2(map, VERTEX, em2);
+				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d2, fsetemb2) ;
+				map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d2, fsetemb2);
+
+				m.mark(d) ;								// mark on the fly to unmark on second loop
+				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
+				d = map.phi_1(d);
+			}
+
+		}
+	}
+
+	// reconstruct neighbourhood
+	unsigned int nbBoundaryEdges = 0;
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (m.isMarked(d))
+		{
+			// darts incident to end vertex of edge
+			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+
+			unsigned int embd = map.getEmbedding(VERTEX, d);
+			Dart good_dart = NIL;
+			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+			{
+				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
+					good_dart = *it;
+			}
+
+			if (good_dart != NIL)
+			{
+				map.sewVolumes(map.phi2(d), map.phi2(good_dart), false);
+				m.unmarkOrbit(EDGE, d);
+			}
+			else
+			{
+				m.unmark(d);
+				++nbBoundaryEdges;
+			}
+		}
+	}
+
+	map.closeMap();
 
 	return true ;
 }
@@ -440,6 +549,18 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 		mts.mergeCloseVertices();
 
 	return importMesh<PFP>(map, mts);
+}
+
+template <typename PFP>
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
+{
+	float dist = 1.0f;
+	MeshTablesSurface<PFP> mts(map);
+
+	if(!mts.importMesh(filename, attrNames, kind))
+		return false;
+
+	return importMeshSurfToVol<PFP>(map, mts, dist);
 }
 
 /*

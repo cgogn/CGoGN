@@ -188,9 +188,9 @@ public:
 	static Dart createHexa(typename PFP::MAP& the_map);
 
 	/**
-	 * create simple simple prism (not handled by Polyhedron object)
+	 * create simple n-sided prism (not handled by Polyhedron object)
 	 */
-	static Dart createPrism(typename PFP::MAP& the_map);
+	static Dart createPrism(typename PFP::MAP& the_map, unsigned int nbSides);
 
 	/*
 	* get the reference dart

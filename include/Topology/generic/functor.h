@@ -171,7 +171,6 @@ public:
 	FunctorSelect* copy() const { return new SelectorDartNoBoundary(m_map);}
 };
 
-
 //
 //class SelectorDartMarked : public FunctorSelect
 //{

@@ -237,30 +237,82 @@ Dart Polyhedron<PFP>::createHexa(typename PFP::MAP& the_map)
 	return base;
 }
 
+//template <typename PFP>
+//Dart  Polyhedron<PFP>::createPrism(typename PFP::MAP& the_map)
+//{
+//	Dart base = the_map.newFace(3, false);
+//
+//	Dart side1 = the_map.newFace(4, false);
+//	the_map.sewFaces(base, side1, false);
+//
+//	Dart side2 = the_map.newFace(4, false);
+//	the_map.sewFaces(the_map.phi1(base), side2, false);
+//	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2), false);
+//
+//	Dart side3 = the_map.newFace(4, false);
+//	the_map.sewFaces(the_map.phi1(the_map.phi1(base)), side3, false);
+//	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3), false);
+//
+//	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1), false);
+//
+//	Dart top = the_map.newFace(3, false);
+//	the_map.sewFaces(top, the_map.phi1(the_map.phi1(side1)), false);
+//	the_map.sewFaces(the_map.phi_1(top), the_map.phi1(the_map.phi1(side2)), false);
+//	the_map.sewFaces(the_map.phi1(top), the_map.phi1(the_map.phi1(side3)), false);
+//
+//	return base;
+//}
+
+/**
+ * create a n-sided prism
+ */
 template <typename PFP>
-Dart  Polyhedron<PFP>::createPrism(typename PFP::MAP& the_map)
+Dart createPrism(typename PFP::MAP& map, unsigned int n)
 {
-	Dart base = the_map.newFace(3, false);
+	Dart dres = Dart::nil();
+	unsigned int nb = n*2;
+	std::vector<Dart> m_tableVertDarts;
+	m_tableVertDarts.reserve(nb);
 
-	Dart side1 = the_map.newFace(4, false);
-	the_map.sewFaces(base, side1, false);
+	// creation of quads around circunference and storing vertices
+	for (unsigned int i = 0; i < n; ++i)
+	{
+		Dart d = map.newFace(4, false);
+		m_tableVertDarts.push_back(d);
+	}
 
-	Dart side2 = the_map.newFace(4, false);
-	the_map.sewFaces(the_map.phi1(base), side2, false);
-	the_map.sewFaces(the_map.phi_1(side1), the_map.phi1(side2), false);
+	// storing a dart from the vertex pointed by phi1(phi1(d))
+	for (unsigned int i = 0; i < n; ++i)
+	{
+		m_tableVertDarts.push_back(map.phi1(map.phi1(m_tableVertDarts[i])));
+	}
 
-	Dart side3 = the_map.newFace(4, false);
-	the_map.sewFaces(the_map.phi1(the_map.phi1(base)), side3, false);
-	the_map.sewFaces(the_map.phi_1(side2), the_map.phi1(side3), false);
+	// sewing the quads
+	for (unsigned int i = 0; i < n-1; ++i)
+	{
+		Dart d = m_tableVertDarts[i];
+		d = map.phi_1(d);
+		Dart e = m_tableVertDarts[i+1];
+		e = map.phi1(e);
+		map.sewFaces(d, e, false);
+	}
+	//sewing the last with the first
+	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[n-1]), false);
 
-	the_map.sewFaces(the_map.phi_1(side3), the_map.phi1(side1), false);
+	//sewing the top & bottom faces
+	Dart d1 = map.newFace(n, false);
+	Dart d2 = map.newFace(n, false);
+	dres = d1;
+	for(unsigned int i = 0; i < n ; ++i)
+	{
+		map.sewFaces(m_tableVertDarts[i], d1, false);
+		map.sewFaces(m_tableVertDarts[n+i], d2, false);
+		d1 = map.phi1(d1);
+		d2 = map.phi_1(d2);
+	}
 
-	Dart top = the_map.newFace(3, false);
-	the_map.sewFaces(top, the_map.phi1(the_map.phi1(side1)), false);
-	the_map.sewFaces(the_map.phi_1(top), the_map.phi1(the_map.phi1(side2)), false);
-	the_map.sewFaces(the_map.phi1(top), the_map.phi1(the_map.phi1(side3)), false);
-
-	return base;
+	//return a dart from the base
+	return dres;
 }
 
 template <typename PFP>

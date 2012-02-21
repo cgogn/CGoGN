@@ -25,6 +25,7 @@
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Modelisation/subdivision.h"
 #include "Algo/Modelisation/extrusion.h"
+#include "Geometry/intersection.h"
 
 namespace CGoGN
 {
@@ -80,6 +81,128 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
 	}
 
 	return map.phi2(dRing);
+}
+
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl)
+{
+	Dart dRes=NIL;
+	unsigned int nbInter = 0;
+	unsigned int nbVertices = 0;
+	CellMarkerStore vs(map, VERTEX);			//marker for new vertices from edge cut
+	CellMarkerStore cf(map, FACE);
+	Dart dPath;
+
+	MarkerForTraversor<typename PFP::MAP::ParentMap > mte(map,EDGE);
+	MarkerForTraversor<typename PFP::MAP::ParentMap > mtf(map,FACE);
+
+	//search edges and vertices crossing the plane
+	Traversor3WE<typename PFP::MAP::ParentMap > te(map,d);
+	for(Dart dd = te.begin() ;dd != te.end() ; dd = te.next())
+	{
+		if(!mte.isMarked(dd))
+		{
+			if(fabs(pl.distance(position[dd]))<0.000001f)
+			{
+				nbVertices++;
+				vs.mark(dd); //mark vertex on slicing path
+				mte.mark(dd);
+			}
+			else
+			{
+				typename PFP::VEC3 interP;
+				typename PFP::VEC3 vec(Algo::Geometry::vectorOutOfDart<PFP>(map,dd,position));
+				Geom::Intersection inter = Geom::intersectionLinePlane<typename PFP::VEC3, typename Geom::Plane3D<typename PFP::REAL > >(position[dd],vec,pl,interP);
+
+				if(inter==Geom::FACE_INTERSECTION)
+				{
+					Dart dOp = map.phi1(dd);
+					typename PFP::VEC3 v2(interP-position[dd]);
+					typename PFP::VEC3 v3(interP-position[dOp]);
+					if(vec.norm2()>v2.norm2() && vec.norm2()>v3.norm2())
+					{
+						nbInter++;
+
+						cf.mark(dd);			//mark face and opposite face to split
+						cf.mark(map.phi2(dd));
+
+						map.cutEdge(dd);
+						Dart dN = map.phi1(dd);
+
+						mte.mark(dN);
+
+						vs.mark(dN);			//mark vertex for split
+						position[dN] = interP; 	//place
+					}
+				}
+			}
+		}
+	}
+
+//	std::cout << "edges cut: " << nbInter << std::endl;
+	unsigned int nbSplit=0;
+
+	//slice when at least two edges are concerned
+	if(nbInter>1)
+	{
+		Traversor3WF<typename PFP::MAP::ParentMap > tf(map,d);
+		for(Dart dd = tf.begin() ; dd != tf.end() ; dd = tf.next())
+		{
+			//for faces with a new vertex
+			if(cf.isMarked(dd))
+			{
+				cf.unmark(dd);
+
+				Dart dS = dd;
+				bool split=false;
+
+				do {
+					//find the new vertex
+					if(vs.isMarked(dS))
+					{
+						Dart dSS = map.phi1(dS);
+						//search an other new vertex (or an existing vertex intersected with the plane) in order to split the face
+						do {
+							if(vs.isMarked(dSS))
+							{
+								nbSplit++;
+								map.splitFace(dS,dSS);
+								dPath=map.phi_1(dS);
+								split=true;
+							}
+							dSS = map.phi1(dSS);
+						} while(!split && dSS!=dS);
+					}
+					dS = map.phi1(dS);
+				} while(!split && dS!=dd);
+			}
+		}
+
+//		std::cout << "face split " << nbSplit << std::endl;
+
+		//define the path to split
+		std::vector<Dart> vPath;
+		vPath.reserve((nbSplit+nbVertices)+1);
+		vPath.push_back(dPath);
+		for(std::vector<Dart>::iterator it = vPath.begin() ;it != vPath.end() ; ++it)
+		{
+			Dart dd = map.phi1(*it);
+
+			Dart ddd = map.phi1(map.phi2(dd));
+
+			while(!vs.isMarked(map.phi1(ddd)) && ddd!=dd)
+				ddd = map.phi1(map.phi2(ddd));
+
+			if(vs.isMarked(map.phi1(ddd)) && !map.sameVertex(ddd,*vPath.begin()))
+				vPath.push_back(ddd);
+		}
+
+		assert(vPath.size()>2);
+		map.splitVolume(vPath);
+		dRes = map.phi2(*vPath.begin());
+	}
+
+	return dRes;
 }
 
 template <typename PFP, typename EMBV, typename EMB>

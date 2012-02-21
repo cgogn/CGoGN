@@ -56,7 +56,18 @@ template <typename VEC3>
 Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP, const VEC3& NormP, VEC3& Inter) ;
 
 /**
- * test the intersection between a ray and a triangle (optimized version with triple product
+ * test the intersection between a line and a triangle
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param Plane plane
+ * @param Inter store the intersection point
+ * @return the intersection ( FACE_INTERSECTION = OK, EDGE_INTERSECTION = line inside of plane)
+ */
+template <typename VEC3, typename PLANE>
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const PLANE& Plane, VEC3& Inter) ;
+
+/**
+ * test the intersection between a ray and a triangle (optimized version with triple product)
  * @param P a point on the line
  * @param Dir line direction
  * @param Ta triangle point 1
@@ -69,7 +80,7 @@ template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 /**
- * test the intersection between a ray and a triangle (optimized version with triple product
+ * test the intersection between a ray and a triangle (optimized version with triple product)
  * @param P a point on the line
  * @param Dir line direction
  * @param Ta triangle point 1
@@ -82,7 +93,7 @@ template <typename VEC3>
 Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter);
 
 /**
- * test the intersection between a ray and a triangle (optimized version with triple product
+ * test the intersection between a ray and a triangle (optimized version with triple product)
  * @param P a point on the line
  * @param Dir line direction
  * @param Ta triangle point 1

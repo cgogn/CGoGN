@@ -163,7 +163,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			do
 			{
 				mf.markOrbit(FACE, e);
-				e = map.phi2_1(e);
+				e = map.phi2(map.phi_1(e));
 			} while (e != cf);
 		}
 	}
