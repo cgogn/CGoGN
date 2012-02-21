@@ -336,6 +336,7 @@ int main(int argc, char **argv)
 
 	sqt.m_selected = myMap.begin();
 
+	sqt.setGeometry(100,100,1024,1024);
 	sqt.show();
 
 	sqt.slider_balls(50);

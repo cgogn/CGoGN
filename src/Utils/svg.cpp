@@ -206,25 +206,7 @@ void SvgLines::save(std::ofstream& out) const
 
 	unsigned int nb = m_vertices.size()/2;
 	for (unsigned int i=0; i<nb; ++i)
-	{
 		saveOne(out,i);
-//		out << "<polyline fill=\"none\" stroke=\"#";
-//		out << std::hex;
-//		unsigned int wp = out.width(2);
-//		char prev = out.fill('0');
-//		out << int(m_colors[i][0]*255);
-//		out.width(2); out.fill('0');
-//		out<< int(m_colors[i][1]*255);
-//		out.width(2); out.fill('0');
-//		out << int(m_colors[i][2]*255)<<std::dec;
-//		out <<"\" stroke-width=\""<<m_width<<"\" points=\"";
-//		out.fill(prev);
-//		out.width(wp);
-//		out << m_vertices[i][0] << ","<< m_vertices[i][1]<< " ";
-//		i++;
-//		out << m_vertices[i][0] << ","<< m_vertices[i][1];
-//		out <<"\"/>"<< std::endl;
-	}
 }
 
 void SvgLines::saveOne(std::ofstream& out, unsigned int i, unsigned int bbl) const
@@ -235,11 +217,11 @@ void SvgLines::saveOne(std::ofstream& out, unsigned int i, unsigned int bbl) con
 	out << std::hex;
 	unsigned int wp = out.width(2);
 	char prev = out.fill('0');
-	out << int(m_colors[i][0]*255);
+	out << int(m_colors[2*i][0]*255);
 	out.width(2); out.fill('0');
-	out<< int(m_colors[i][1]*255);
+	out<< int(m_colors[2*i][1]*255);
 	out.width(2); out.fill('0');
-	out << int(m_colors[i][2]*255)<<std::dec;
+	out << int(m_colors[2*i][2]*255)<<std::dec;
 	out <<"\" stroke-width=\""<<m_width<<"\" points=\"";
 	out.fill(prev);
 	out.width(wp);
@@ -525,24 +507,18 @@ void SVGOut::addPoint(const Geom::Vec3f& P)
 	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
 	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
-//	m_current->addVertex3D(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]));
 }
 
 void SVGOut::addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C)
 {
 	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
 	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
-//	m_current->addVertex(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]),C);
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
-//	m_current->addVertex3D(Geom::Vec3f(Q[0],float(m_viewport[3])-Q[1],Q[2]),C);
 }
 
 
 void SVGOut::beginLines()
 {
-//	glm::i32vec4 viewport;
-//	glGetIntegerv(GL_VIEWPORT, &(viewport[0]));
-
 	m_current = new SvgLines();
 	m_current->setColor(global_color);
 	m_current->setWidth(global_width);
@@ -565,9 +541,6 @@ void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
 
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
 	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])));
-
-//	m_current->addVertex3D(Geom::Vec3f(R[0],float(m_viewport[3])-R[1],R[2]));
-//	m_current->addVertex3D(Geom::Vec3f(R2[0],float(m_viewport[3])-R2[1],R2[2]));
 }
 
 
@@ -582,9 +555,6 @@ void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Ve
 
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
 	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])),C);
-
-//	m_current->addVertex3D(Geom::Vec3f(R[0],float(m_viewport[3])-R[1],R[2]),C);
-//	m_current->addVertex3D(Geom::Vec3f(R2[0],float(m_viewport[3])-R2[1],R2[2]),C);
 }
 
 

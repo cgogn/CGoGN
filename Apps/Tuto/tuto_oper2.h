@@ -67,12 +67,14 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap) {}
+	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
 
 	void cb_redraw();
 	void cb_initGL();
 	void cb_mousePress(int button, int x, int y);
 	void cb_keyPress(int code);
+	void cb_Open();
+	void cb_Save();
 
 	Utils::QT::uiDockInterface dock;
 
@@ -90,6 +92,7 @@ protected:
 	Dart m_selected;
 	Dart m_selected2;
 	DartMarker dm;
+	float m_shift;
 
 	// just for more compact writing
 	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
@@ -102,6 +105,7 @@ public:
 	// example of simple map creation
 	void createMap(int n);
 	void updateMap();
+	void importMesh(std::string& filename);
 
 public slots:
 	void operation(int x);

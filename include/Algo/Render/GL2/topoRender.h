@@ -245,6 +245,14 @@ public:
 	void updateDataGMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 
+	/**
+	 * render to svg struct
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
+
+	/**
+	 * render svg into svg file
+	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
 };
 

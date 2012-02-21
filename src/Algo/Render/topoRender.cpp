@@ -284,7 +284,11 @@ void TopoRender::popColors()
 void TopoRender::svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj)
 {
 	Utils::SVG::SVGOut svg(filename,model,proj);
+	toSVG(svg);
+}
 
+void TopoRender::toSVG(Utils::SVG::SVGOut& svg)
+{
 	svg.setWidth(m_topo_relation_width);
 
 	// PHI2 / beta2
@@ -293,7 +297,7 @@ void TopoRender::svgout2D(const std::string& filename, const glm::mat4& model, c
 
 	svg.beginLines();
 	for (unsigned int i=0; i<m_nbRel2; ++i)
-		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(1.0f,0.0f,0.0f));
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.8f,0.0f,0.0f));
 	svg.endLines();
 
 	m_vbo2->releasePtr();
@@ -303,7 +307,7 @@ void TopoRender::svgout2D(const std::string& filename, const glm::mat4& model, c
 
 	svg.beginLines();
 	for (unsigned int i=0; i<m_nbRel1; ++i)
-		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,1.0f,1.0f));
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
 	svg.endLines();
 
 	m_vbo1->releasePtr();
@@ -327,6 +331,7 @@ void TopoRender::svgout2D(const std::string& filename, const glm::mat4& model, c
 	m_vbo0->releasePtr();
 	m_vbo3->releasePtr();
 }
+
 
 
 }//end namespace GL2

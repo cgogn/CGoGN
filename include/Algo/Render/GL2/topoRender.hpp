@@ -189,7 +189,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 		*positionF1++ = fv1[d];
 		*positionF1++ = fv11[e];
 	}
-	m_nbRel1 = vecDarts.size()/2;
+	m_nbRel1 = vecDarts.size();
 
 	m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -204,7 +204,7 @@ template<typename PFP>
 //void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
-	GMap2& map = reinterpret_cast<GMap2&>(mapx);
+	GMap2& map = dynamic_cast<GMap2&>(mapx);
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
