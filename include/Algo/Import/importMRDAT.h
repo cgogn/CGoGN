@@ -34,13 +34,14 @@ namespace Algo
 namespace Import
 {
 
-template <typename PFP>
-bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames) ;
-
-template <typename PFP>
 class QuadTreeNode
 {
-public:
+public:	
+	unsigned int indices[3] ;
+	QuadTreeNode* children[4] ;
+	QuadTreeNode* parent ;
+	unsigned int level ;
+	
 	QuadTreeNode()
 	{
 		for(unsigned int i = 0; i < 3; ++i)
@@ -48,6 +49,7 @@ public:
 		for(unsigned int i = 0; i < 4; ++i)
 			children[i] = NULL ;
 		parent = NULL ;
+		level = 0 ;
 	}
 
 	~QuadTreeNode()
@@ -59,11 +61,12 @@ public:
 
 	void subdivide()
 	{
-		assert(children[0] == NULL) ;
+		assert(!isSubdivided()) ;
 		for(unsigned int i = 0; i < 4; ++i)
 		{
 			children[i] = new QuadTreeNode() ;
 			children[i]->parent = this ;
+			children[i]->level = level + 1 ;
 		}
 	}
 
@@ -72,8 +75,11 @@ public:
 		return children[0] != NULL ;
 	}
 
+	template <typename PFP>
 	void embed(typename PFP::MAP& map, Dart d, std::vector<unsigned int>& vID, std::vector<unsigned int>& vLev, bool CCW)
 	{
+		assert(map.getCurrentLevel() == level) ;
+		
 		if(isSubdivided())
 		{
 			std::cout << "embed subdivided edge vertices / current level -> " << map.getCurrentLevel() << std::endl ;
@@ -103,9 +109,9 @@ public:
 			unsigned int e1L = vLev[children[0]->indices[1]] ;
 			unsigned int e2L = vLev[children[0]->indices[2]] ;
 
-			assert(map.getMaxLevel() + 1 - e0L == map.getCurrentLevel() + 1) ;
-			assert(map.getMaxLevel() + 1 - e1L == map.getCurrentLevel() + 1) ;
-			assert(map.getMaxLevel() + 1 - e2L == map.getCurrentLevel() + 1) ;
+//			assert(map.getMaxLevel() + 1 - e0L == map.getCurrentLevel() + 1) ;
+//			assert(map.getMaxLevel() + 1 - e1L == map.getCurrentLevel() + 1) ;
+//			assert(map.getMaxLevel() + 1 - e2L == map.getCurrentLevel() + 1) ;
 //			assert(e0L == map.getCurrentLevel() + 1 + 1) ;
 //			assert(e1L == map.getCurrentLevel() + 1 + 1) ;
 //			assert(e2L == map.getCurrentLevel() + 1 + 1) ;
@@ -192,24 +198,24 @@ public:
 			Dart t0 = map.phi_1(d) ;
 			map.incCurrentLevel() ;
 			t0 = map.phi2(map.phi1(t0)) ;
-			children[0]->embed(map, t0, vID, vLev, CCW) ;
+			children[0]->embed<PFP>(map, t0, vID, vLev, CCW) ;
 			map.decCurrentLevel() ;
 
 			Dart t1 = d ;
 			map.incCurrentLevel() ;
-			children[1]->embed(map, t1, vID, vLev, !CCW) ;
+			children[1]->embed<PFP>(map, t1, vID, vLev, !CCW) ;
 			map.decCurrentLevel() ;
 
 			Dart t2 = map.phi1(d) ;
 			map.incCurrentLevel() ;
 			t2 = map.phi1(t2) ;
-			children[2]->embed(map, t2, vID, vLev, !CCW) ;
+			children[2]->embed<PFP>(map, t2, vID, vLev, !CCW) ;
 			map.decCurrentLevel() ;
 
 			Dart t3 = map.phi_1(d) ;
 			map.incCurrentLevel() ;
 			t3 = map.phi_1(t3) ;
-			children[3]->embed(map, t3, vID, vLev, !CCW) ;
+			children[3]->embed<PFP>(map, t3, vID, vLev, !CCW) ;
 			map.decCurrentLevel() ;
 		}
 		else
@@ -228,17 +234,12 @@ public:
 				children[i]->print() ;
 		}
 	}
-
-	unsigned int indices[3] ;
-	QuadTreeNode* children[4] ;
-	QuadTreeNode* parent ;
 } ;
 
-template <typename PFP>
 class QuadTree
 {
 public:
-	std::vector<QuadTreeNode<PFP>*> roots ;
+	std::vector<QuadTreeNode*> roots ;
 	std::vector<Dart> darts ;
 
 	~QuadTree()
@@ -247,10 +248,11 @@ public:
 			delete roots[i] ;
 	}
 
+	template <typename PFP>
 	void embed(typename PFP::MAP& map, std::vector<unsigned int>& vID, std::vector<unsigned int>& vLev)
 	{
 		for(unsigned int i = 0; i < roots.size(); ++i)
-			roots[i]->embed(map, darts[i], vID, vLev, true) ;
+			roots[i]->embed<PFP>(map, darts[i], vID, vLev, true) ;
 	}
 
 	void print()
@@ -263,6 +265,9 @@ public:
 		}
 	}
 } ;
+
+template <typename PFP>
+bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt) ;
 
 } // namespace Import
 
