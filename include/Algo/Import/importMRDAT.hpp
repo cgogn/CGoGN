@@ -122,7 +122,9 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 	QuadTree<PFP> qt ;
 	QuadTreeNode<PFP>* current = NULL ;
 	unsigned int currentLevel = -1 ;
-	unsigned int prevNum = -1 ;
+
+	std::vector<unsigned int> lastNum ;
+	lastNum.resize(depth + 1) ;
 
 	nextNonEmptyLine(fp, line) ;
 	while(line.rfind("end") == std::string::npos)
@@ -139,29 +141,27 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		oss >> idx1 ;
 		oss >> idx2 ;
 
-		std::cout << num << " (" << currentLevel << ")" ;
-		if(root == 1)
-			std::cout << " / root" ;
-		std::cout << std::endl ;
-
 		if(root == 1)
 		{
 			assert(num == 0) ;
 			QuadTreeNode<PFP>* n = new QuadTreeNode<PFP>() ;
-			assert(depth + 1 - verticesLevel[idx0] == 0) ;
-			assert(depth + 1 - verticesLevel[idx1] == 0) ;
-			assert(depth + 1 - verticesLevel[idx2] == 0) ;
+//			assert(depth + 1 - verticesLevel[idx0] == 0) ;
+//			assert(depth + 1 - verticesLevel[idx1] == 0) ;
+//			assert(depth + 1 - verticesLevel[idx2] == 0) ;
+//			assert(verticesLevel[idx0] == 1) ;
+//			assert(verticesLevel[idx1] == 1) ;	// pour les exports de triReme
+//			assert(verticesLevel[idx2] == 1) ;
 			n->indices[0] = idx0 ;
 			n->indices[1] = idx1 ;
 			n->indices[2] = idx2 ;
 			qt.roots.push_back(n) ;
 			current = n ;
 			currentLevel = 0 ;
-			prevNum = 0 ;
+			lastNum[0] = 0 ;
 		}
 		else
 		{
-			if(num == prevNum + 1) // on lit un autre triangle du même niveau
+			if(num == lastNum[currentLevel] + 1) // on lit un autre triangle du même niveau
 			{
 				current = current->parent->children[num] ;
 			}
@@ -175,19 +175,24 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 				}
 				else // on remonte d'un niveau
 				{
-					assert(prevNum == 3) ;
-					assert(current->parent->parent != NULL) ;
-					current = current->parent->parent->children[num] ;
-					--currentLevel ;
+					assert(lastNum[currentLevel] == 3) ;
+					do
+					{
+						current = current->parent->parent->children[num] ;
+						--currentLevel ;
+					} while(lastNum[currentLevel] == 3) ;
 				}
 			}
-			assert(depth + 1 - verticesLevel[idx0] <= currentLevel) ;
-			assert(depth + 1 - verticesLevel[idx1] <= currentLevel) ;
-			assert(depth + 1 - verticesLevel[idx2] <= currentLevel) ;
+//			assert(depth + 1 - verticesLevel[idx0] <= currentLevel) ;
+//			assert(depth + 1 - verticesLevel[idx1] <= currentLevel) ;
+//			assert(depth + 1 - verticesLevel[idx2] <= currentLevel) ;
+//			assert(verticesLevel[idx0] <= currentLevel + 1) ;
+//			assert(verticesLevel[idx1] <= currentLevel + 1) ;	// pour les exports de triReme
+//			assert(verticesLevel[idx2] <= currentLevel + 1) ;
 			current->indices[0] = idx0 ;
 			current->indices[1] = idx1 ;
 			current->indices[2] = idx2 ;
-			prevNum = num ;
+			lastNum[currentLevel] = num ;
 		}
 
 		nextNonEmptyLine(fp, line) ;

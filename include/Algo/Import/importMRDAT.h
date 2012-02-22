@@ -91,34 +91,37 @@ public:
 			map.incCurrentLevel() ;
 
 			unsigned int emb0 = vID[children[0]->indices[0]] ;
-			unsigned int e0 = map.getEmbedding(VERTEX, map.phi2(d0)) ;
-			if(!cm.isMarked(map.phi2(d0)))
+			Dart dd0 = map.phi1(d0) ;
+			unsigned int e0 = map.getEmbedding(VERTEX, dd0) ;
+			if(!cm.isMarked(dd0))
 			{
 				assert(e0 == EMBNULL) ;
-				map.embedOrbit(VERTEX, map.phi2(d0), emb0) ;
-				cm.mark(map.phi2(d0)) ;
+				map.embedOrbit(VERTEX, dd0, emb0) ;
+				cm.mark(dd0) ;
 			}
 			else
 				assert(e0 == emb0) ;
 
 			unsigned int emb1 = vID[children[0]->indices[1]] ;
-			unsigned int e1 = map.getEmbedding(VERTEX, map.phi2(d1)) ;
-			if(!cm.isMarked(map.phi2(d1)))
+			Dart dd1 = map.phi1(d1) ;
+			unsigned int e1 = map.getEmbedding(VERTEX, dd1) ;
+			if(!cm.isMarked(dd1))
 			{
 				assert(e1 == EMBNULL) ;
-				map.embedOrbit(VERTEX, map.phi2(d1), emb1) ;
-				cm.mark(map.phi2(d1)) ;
+				map.embedOrbit(VERTEX, dd1, emb1) ;
+				cm.mark(dd1) ;
 			}
 			else
 				assert(e1 == emb1) ;
 
 			unsigned int emb2 = vID[children[0]->indices[2]] ;
-			unsigned int e2 = map.getEmbedding(VERTEX, map.phi2(d2)) ;
-			if(!cm.isMarked(map.phi2(d2)))
+			Dart dd2 = map.phi1(d2) ;
+			unsigned int e2 = map.getEmbedding(VERTEX, dd2) ;
+			if(!cm.isMarked(dd2))
 			{
 				assert(e2 == EMBNULL) ;
-				map.embedOrbit(VERTEX, map.phi2(d2), emb2) ;
-				cm.mark(map.phi2(d2)) ;
+				map.embedOrbit(VERTEX, dd2, emb2) ;
+				cm.mark(dd2) ;
 			}
 			else
 				assert(e2 == emb2) ;
