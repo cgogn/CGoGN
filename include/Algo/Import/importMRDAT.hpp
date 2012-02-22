@@ -145,9 +145,9 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		{
 			assert(num == 0) ;
 			QuadTreeNode<PFP>* n = new QuadTreeNode<PFP>() ;
-//			assert(depth + 1 - verticesLevel[idx0] == 0) ;
-//			assert(depth + 1 - verticesLevel[idx1] == 0) ;
-//			assert(depth + 1 - verticesLevel[idx2] == 0) ;
+			assert(depth + 1 - verticesLevel[idx0] == 0) ;
+			assert(depth + 1 - verticesLevel[idx1] == 0) ;
+			assert(depth + 1 - verticesLevel[idx2] == 0) ;
 //			assert(verticesLevel[idx0] == 1) ;
 //			assert(verticesLevel[idx1] == 1) ;	// pour les exports de triReme
 //			assert(verticesLevel[idx2] == 1) ;
@@ -183,9 +183,9 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 					} while(lastNum[currentLevel] == 3) ;
 				}
 			}
-//			assert(depth + 1 - verticesLevel[idx0] <= currentLevel) ;
-//			assert(depth + 1 - verticesLevel[idx1] <= currentLevel) ;
-//			assert(depth + 1 - verticesLevel[idx2] <= currentLevel) ;
+			assert(depth + 1 - verticesLevel[idx0] <= currentLevel) ;
+			assert(depth + 1 - verticesLevel[idx1] <= currentLevel) ;
+			assert(depth + 1 - verticesLevel[idx2] <= currentLevel) ;
 //			assert(verticesLevel[idx0] <= currentLevel + 1) ;
 //			assert(verticesLevel[idx1] <= currentLevel + 1) ;	// pour les exports de triReme
 //			assert(verticesLevel[idx2] <= currentLevel + 1) ;
@@ -261,7 +261,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 	if (nbBoundaryEdges > 0)
 	{
 //		map.closeMap() ;
-		CGoGNout << "Open mesh.. not managed for now.." << CGoGNendl ;
+		CGoGNout << "Open mesh.. not managed yet.." << CGoGNendl ;
 		return false ;
 	}
 
@@ -275,26 +275,26 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 	std::cout << "  Embed finer resolution levels.." << std::flush ;
 
 	map.setCurrentLevel(0) ;
-	qt.embed(map, verticesID) ;
+	qt.embed(map, verticesID, verticesLevel) ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 
-	TraversorV<typename PFP::MAP> tv(map, allDarts, true) ;
-	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
-	{
-		unsigned int vertexLevel = map.getDartLevel(d) ;
-		if(vertexLevel > 0 && vertexLevel < map.getMaxLevel())
-		{
-			map.pushLevel() ;
-			map.setCurrentLevel(vertexLevel) ;
-			unsigned int emb = map.getEmbedding(VERTEX, d) ;
-			for(unsigned int i = vertexLevel + 1; i <= map.getMaxLevel(); ++i)
-			{
-				map.setCurrentLevel(i) ;
-				map.embedOrbit(VERTEX, d, emb) ;
-			}
-			map.popLevel() ;
-		}
-	}
+//	TraversorV<typename PFP::MAP> tv(map, allDarts, true) ;
+//	for(Dart d = tv.begin(); d != tv.end(); d = tv.next())
+//	{
+//		unsigned int vertexLevel = map.getDartLevel(d) ;
+//		if(vertexLevel > 0 && vertexLevel < map.getMaxLevel())
+//		{
+//			map.pushLevel() ;
+//			map.setCurrentLevel(vertexLevel) ;
+//			unsigned int emb = map.getEmbedding(VERTEX, d) ;
+//			for(unsigned int i = vertexLevel + 1; i <= map.getMaxLevel(); ++i)
+//			{
+//				map.setCurrentLevel(i) ;
+//				map.embedOrbit(VERTEX, d, emb) ;
+//			}
+//			map.popLevel() ;
+//		}
+//	}
 
 	std::cout << "..done" << std::endl ;
 
