@@ -92,6 +92,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 	std::cout << "  Read vertices.." << std::flush ;
 
 	std::vector<unsigned int> verticesID ;
+	std::vector<unsigned int> verticesLevel ;
 
 	nextNonEmptyLine(fp, line) ;
 	while(line.rfind("Triangles") == std::string::npos)
@@ -110,6 +111,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		unsigned int id = container.insertLine() ;
 		position[id] = pos ;
 		verticesID.push_back(id) ;
+		verticesLevel.push_back(level) ;
 
 		nextNonEmptyLine(fp, line) ;
 	}
@@ -119,6 +121,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	QuadTree<PFP> qt ;
 	QuadTreeNode<PFP>* current = NULL ;
+	unsigned int currentLevel = -1 ;
 	unsigned int prevNum = -1 ;
 
 	nextNonEmptyLine(fp, line) ;
@@ -136,15 +139,24 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		oss >> idx1 ;
 		oss >> idx2 ;
 
+		std::cout << num << " (" << currentLevel << ")" ;
+		if(root == 1)
+			std::cout << " / root" ;
+		std::cout << std::endl ;
+
 		if(root == 1)
 		{
 			assert(num == 0) ;
 			QuadTreeNode<PFP>* n = new QuadTreeNode<PFP>() ;
+			assert(depth + 1 - verticesLevel[idx0] == 0) ;
+			assert(depth + 1 - verticesLevel[idx1] == 0) ;
+			assert(depth + 1 - verticesLevel[idx2] == 0) ;
 			n->indices[0] = idx0 ;
 			n->indices[1] = idx1 ;
 			n->indices[2] = idx2 ;
 			qt.roots.push_back(n) ;
 			current = n ;
+			currentLevel = 0 ;
 			prevNum = 0 ;
 		}
 		else
@@ -159,14 +171,19 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 				{
 					current->subdivide() ;
 					current = current->children[0] ;
+					++currentLevel ;
 				}
 				else // on remonte d'un niveau
 				{
 					assert(prevNum == 3) ;
 					assert(current->parent->parent != NULL) ;
 					current = current->parent->parent->children[num] ;
+					--currentLevel ;
 				}
 			}
+			assert(depth + 1 - verticesLevel[idx0] <= currentLevel) ;
+			assert(depth + 1 - verticesLevel[idx1] <= currentLevel) ;
+			assert(depth + 1 - verticesLevel[idx2] <= currentLevel) ;
 			current->indices[0] = idx0 ;
 			current->indices[1] = idx1 ;
 			current->indices[2] = idx2 ;
