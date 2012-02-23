@@ -91,8 +91,9 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	std::cout << "  Read vertices.." << std::flush ;
 
-	std::vector<unsigned int> verticesID ;
-	std::vector<unsigned int> verticesLevel ;
+	qt.roots.clear() ;
+	qt.darts.clear() ;
+	qt.verticesID.clear() ;
 
 	nextNonEmptyLine(fp, line) ;
 	while(line.rfind("Triangles") == std::string::npos)
@@ -110,19 +111,16 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 		unsigned int id = container.insertLine() ;
 		position[id] = pos ;
-		verticesID.push_back(id) ;
-		verticesLevel.push_back(level) ;
+		qt.verticesID.push_back(id) ;
 
 		nextNonEmptyLine(fp, line) ;
 	}
 
-	std::cout << "..done (nb vertices -> " << verticesID.size() << ")" << std::endl ;
+	std::cout << "..done (nb vertices -> " << qt.verticesID.size() << ")" << std::endl ;
 	std::cout << "  Read triangles (build quadtree).." << std::flush ;
 
-//	QuadTree qt ;
 	QuadTreeNode* current = NULL ;
 	unsigned int currentLevel = -1 ;
-
 	std::vector<unsigned int> lastNum ;
 	lastNum.resize(depth + 1) ;
 
@@ -145,12 +143,6 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		{
 			assert(num == 0) ;
 			QuadTreeNode* n = new QuadTreeNode() ;
-//			assert(depth + 1 - verticesLevel[idx0] == 0) ;
-//			assert(depth + 1 - verticesLevel[idx1] == 0) ;
-//			assert(depth + 1 - verticesLevel[idx2] == 0) ;
-//			assert(verticesLevel[idx0] == 1) ;
-//			assert(verticesLevel[idx1] == 1) ;	// pour les exports de triReme
-//			assert(verticesLevel[idx2] == 1) ;
 			n->indices[0] = idx0 ;
 			n->indices[1] = idx1 ;
 			n->indices[2] = idx2 ;
@@ -183,12 +175,6 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 					} while(lastNum[currentLevel] == 3) ;
 				}
 			}
-//			assert(depth + 1 - verticesLevel[idx0] <= currentLevel) ;
-//			assert(depth + 1 - verticesLevel[idx1] <= currentLevel) ;
-//			assert(depth + 1 - verticesLevel[idx2] <= currentLevel) ;
-//			assert(verticesLevel[idx0] <= currentLevel + 1) ;
-//			assert(verticesLevel[idx1] <= currentLevel + 1) ;	// pour les exports de triReme
-//			assert(verticesLevel[idx2] <= currentLevel + 1) ;
 			current->indices[0] = idx0 ;
 			current->indices[1] = idx1 ;
 			current->indices[2] = idx2 ;
@@ -217,7 +203,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 		for (unsigned int j = 0; j < 3; ++j)
 		{
 			unsigned int idx = qt.roots[i]->indices[j] ;
-			unsigned int emb = verticesID[idx] ;
+			unsigned int emb = qt.verticesID[idx] ;
 
 			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, emb) ;
 			map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb) ;
@@ -275,7 +261,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 	std::cout << "  Embed finer resolution levels.." << std::flush ;
 
 	map.setCurrentLevel(0) ;
-	qt.embed<PFP>(map, verticesID, verticesLevel) ;
+	qt.embed<PFP>(map) ;
 	map.setCurrentLevel(map.getMaxLevel()) ;
 
 	std::cout << "..done" << std::endl ;

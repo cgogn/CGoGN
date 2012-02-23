@@ -76,147 +76,57 @@ public:
 	}
 
 	template <typename PFP>
-	void embed(typename PFP::MAP& map, Dart d, std::vector<unsigned int>& vID, std::vector<unsigned int>& vLev, bool CCW)
+	void embed(typename PFP::MAP& map, Dart d, std::vector<unsigned int>& vID)
 	{
 		assert(map.getCurrentLevel() == level) ;
-		
+
 		if(isSubdivided())
 		{
-			std::cout << "embed subdivided edge vertices / current level -> " << map.getCurrentLevel() << std::endl ;
+			unsigned int v0 = vID[indices[0]] ;
+			unsigned int v1 = vID[indices[1]] ;
+			unsigned int v2 = vID[indices[2]] ;
 
-			unsigned int emb0 = vID[children[0]->indices[0]] ;
-			unsigned int emb1 = vID[children[0]->indices[1]] ;
-			unsigned int emb2 = vID[children[0]->indices[2]] ;
-
-			unsigned int v10 = vID[children[1]->indices[0]] ;
-			unsigned int v11 = vID[children[1]->indices[1]] ;
-			unsigned int v12 = vID[children[1]->indices[2]] ;
-			unsigned int v20 = vID[children[2]->indices[0]] ;
-			unsigned int v21 = vID[children[2]->indices[1]] ;
-			unsigned int v22 = vID[children[2]->indices[2]] ;
-			unsigned int v30 = vID[children[3]->indices[0]] ;
-			unsigned int v31 = vID[children[3]->indices[1]] ;
-			unsigned int v32 = vID[children[3]->indices[2]] ;
-
-			assert(v11 == emb1) ;
-			assert(v12 == emb2) ;
-			assert(v20 == emb0) ;
-			assert(v22 == emb2) ;
-			assert(v30 == emb0) ;
-			assert(v31 == emb1) ;
-
-			unsigned int e0L = vLev[children[0]->indices[0]] ;
-			unsigned int e1L = vLev[children[0]->indices[1]] ;
-			unsigned int e2L = vLev[children[0]->indices[2]] ;
-
-//			assert(map.getMaxLevel() + 1 - e0L == map.getCurrentLevel() + 1) ;
-//			assert(map.getMaxLevel() + 1 - e1L == map.getCurrentLevel() + 1) ;
-//			assert(map.getMaxLevel() + 1 - e2L == map.getCurrentLevel() + 1) ;
-//			assert(e0L == map.getCurrentLevel() + 1 + 1) ;
-//			assert(e1L == map.getCurrentLevel() + 1 + 1) ;
-//			assert(e2L == map.getCurrentLevel() + 1 + 1) ;
-
-			Dart d0 = map.phi1(d) ;
-			Dart d1, d2 ;
-			if(CCW)
+			Dart it = d ;
+			do
 			{
-				d1 = map.phi_1(d) ;
-				d2 = d ;
-			}
-			else
-			{
-				d1 = d ;
-				d2 = map.phi_1(d) ;
-			}
-
-			map.incCurrentLevel() ;
-
-			Dart dd0 = map.phi2(d0) ;
-			Dart dd1 = map.phi2(d1) ;
-			Dart dd2 = map.phi2(d2) ;
-
-			unsigned int e0 = map.getEmbedding(VERTEX, dd0) ;
-			unsigned int e1 = map.getEmbedding(VERTEX, dd1) ;
-			unsigned int e2 = map.getEmbedding(VERTEX, dd2) ;
-
-			if(e0 == EMBNULL)
-			{
-				std::cout << "  not visited" << std::endl ;
-				map.embedOrbit(VERTEX, dd0, emb0) ;
-				map.pushLevel() ;
-				for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
+				Dart next = map.phi1(it) ;
+				unsigned int emb = map.getEmbedding(VERTEX, it) ;
+				unsigned int idx = emb == v0 ? 0 : emb == v1 ? 1 : 2 ;
+				map.incCurrentLevel() ;
+				Dart dd = map.phi1(next) ;
+				unsigned int oldEmb = map.getEmbedding(VERTEX, dd) ;
+				unsigned int newEmb = vID[children[0]->indices[idx]] ;
+				if(oldEmb == EMBNULL)
 				{
-					map.setCurrentLevel(i) ;
-					map.embedOrbit(VERTEX, dd0, emb0) ;
+					map.embedOrbit(VERTEX, dd, newEmb) ;
+					map.pushLevel() ;
+					for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
+					{
+						map.setCurrentLevel(i) ;
+						map.embedOrbit(VERTEX, dd, newEmb) ;
+					}
+					map.popLevel() ;
 				}
-				map.popLevel() ;
-			}
-			else
-			{
-				std::cout << "  already visited (" << e0 << "," << emb0 << " / " << e1 << "," << emb1 << " / " << e2 << "," << emb2 << ")" << std::endl ;
-				assert(e0 == emb0) ;
-			}
+				else
+					assert(oldEmb == newEmb) ;
+				map.decCurrentLevel() ;
+				it = next ;
+			} while(it != d) ;
 
-			if(e1 == EMBNULL)
-			{
-				std::cout << "  not visited" << std::endl ;
-				map.embedOrbit(VERTEX, dd1, emb1) ;
-				map.pushLevel() ;
-				for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
-				{
-					map.setCurrentLevel(i) ;
-					map.embedOrbit(VERTEX, dd1, emb1) ;
-				}
-				map.popLevel() ;
-			}
-			else
-			{
-				std::cout << "  already visited (" << e0 << "," << emb0 << " / " << e1 << "," << emb1 << " / " << e2 << "," << emb2 << ")" << std::endl ;
-				assert(e1 == emb1) ;
-			}
-
-			if(e2 == EMBNULL)
-			{
-				std::cout << "  not visited" << std::endl ;
-				map.embedOrbit(VERTEX, dd2, emb2) ;
-				map.pushLevel() ;
-				for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
-				{
-					map.setCurrentLevel(i) ;
-					map.embedOrbit(VERTEX, dd2, emb2) ;
-				}
-				map.popLevel() ;
-			}
-			else
-			{
-				std::cout << "  already visited (" << e0 << "," << emb0 << " / " << e1 << "," << emb1 << " / " << e2 << "," << emb2 << ")" << std::endl ;
-				assert(e2 == emb2) ;
-			}
-
-			map.decCurrentLevel() ;
-
-			Dart t0 = map.phi_1(d) ;
 			map.incCurrentLevel() ;
-			t0 = map.phi2(map.phi1(t0)) ;
-			children[0]->embed<PFP>(map, t0, vID, vLev, CCW) ;
+			Dart d0 = map.phi2(map.phi1(d)) ;
+			children[0]->embed<PFP>(map, d0, vID) ;
 			map.decCurrentLevel() ;
 
-			Dart t1 = d ;
-			map.incCurrentLevel() ;
-			children[1]->embed<PFP>(map, t1, vID, vLev, !CCW) ;
-			map.decCurrentLevel() ;
-
-			Dart t2 = map.phi1(d) ;
-			map.incCurrentLevel() ;
-			t2 = map.phi1(t2) ;
-			children[2]->embed<PFP>(map, t2, vID, vLev, !CCW) ;
-			map.decCurrentLevel() ;
-
-			Dart t3 = map.phi_1(d) ;
-			map.incCurrentLevel() ;
-			t3 = map.phi_1(t3) ;
-			children[3]->embed<PFP>(map, t3, vID, vLev, !CCW) ;
-			map.decCurrentLevel() ;
+			do
+			{
+				unsigned int emb = map.getEmbedding(VERTEX, it) ;
+				unsigned int idx = emb == v0 ? 0 : emb == v1 ? 1 : 2 ;
+				map.incCurrentLevel() ;
+				children[idx+1]->embed<PFP>(map, it, vID) ;
+				map.decCurrentLevel() ;
+				it = map.phi1(it) ;
+			} while(it != d) ;
 		}
 		else
 		{
@@ -241,6 +151,7 @@ class QuadTree
 public:
 	std::vector<QuadTreeNode*> roots ;
 	std::vector<Dart> darts ;
+	std::vector<unsigned int> verticesID ;
 
 	~QuadTree()
 	{
@@ -249,10 +160,10 @@ public:
 	}
 
 	template <typename PFP>
-	void embed(typename PFP::MAP& map, std::vector<unsigned int>& vID, std::vector<unsigned int>& vLev)
+	void embed(typename PFP::MAP& map)
 	{
 		for(unsigned int i = 0; i < roots.size(); ++i)
-			roots[i]->embed<PFP>(map, darts[i], vID, vLev, true) ;
+			roots[i]->embed<PFP>(map, darts[i], verticesID) ;
 	}
 
 	void print()
