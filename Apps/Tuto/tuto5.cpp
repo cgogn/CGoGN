@@ -249,8 +249,11 @@ void MyQT::cb_keyPress(int code)
 		svg.setWidth(1.0f);
 		svg.setColor(Geom::Vec3f(0.0f,0.0f,0.5f));
 		Algo::Render::SVG::renderEdges<PFP>(svg,myMap,position);
+		svg.setColor(Geom::Vec3f(0.0f,0.8f,0.0f));
 		svg.setWidth(5.0f);
 		Algo::Render::SVG::renderVertices<PFP>(svg,myMap,position);
+		svg.setColor(Geom::Vec3f(1.0f,0.0f,0.0f));
+		m_strings->toSVG(svg);
 		//svg destruction close the file
 	}
 	if (code  == 't')
@@ -333,6 +336,7 @@ int main(int argc, char **argv)
 
 	sqt.m_selected = myMap.begin();
 
+	sqt.setGeometry(100,100,1024,1024);
 	sqt.show();
 
 	sqt.slider_balls(50);

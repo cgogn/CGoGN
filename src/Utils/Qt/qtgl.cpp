@@ -211,6 +211,7 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 
 	if (m_cbs)
 		m_cbs->cb_mousePress(event->button(), event->x(), getHeight() - event->y());
+	setFocus(Qt::MouseFocusReason);
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent* event)
@@ -330,7 +331,10 @@ void GLWidget::closeEvent(QCloseEvent *event)
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
 	if (event->key() == Qt::Key_Escape)
+	{
 		close();
+		m_cbs->close();
+	}
 
 	m_state_modifier = event->modifiers();
 

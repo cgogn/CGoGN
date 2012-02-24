@@ -47,17 +47,17 @@ public:
 		m_map(m), m_selector(fs)
 	{}
 
-	Dart begin()
+	Dart begin() const
 	{
 		return m_map.begin() ;
 	}
 
-	Dart end()
+	Dart end() const
 	{
 		return m_map.end() ;
 	}
 
-	void next(Dart& d)
+	void next(Dart& d) const
 	{
 		do
 		{
@@ -112,17 +112,17 @@ public:
 		m_end = NIL ;
 	}
 
-	Dart begin()
+	Dart begin() const
 	{
 		return m_first ;
 	}
 
-	Dart end()
+	Dart end() const
 	{
 		return NIL ;
 	}
 
-	void next(Dart& d)
+	void next(Dart& d) const
 	{
 		assert(d != NIL) ;
 		d = m_links[d] ;

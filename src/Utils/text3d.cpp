@@ -23,8 +23,8 @@
 *******************************************************************************/
 
 #include "Utils/text3d.h"
-
 #include "Utils/vbo.h"
+#include "Utils/svg.h"
 
 namespace CGoGN
 {
@@ -43,7 +43,7 @@ std::string Strings3D::fragmentShaderText2 =
 GLuint Strings3D::m_idTexture = 0xffffffff;
 
 
-Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
+Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0),m_scale(1.0f)
 {
 	if (m_idTexture == 0xffffffff)
 	{
@@ -101,6 +101,7 @@ void Strings3D::setScale(float scale)
 {
 	bind();
 	glUniform1f(m_uniform_scale, scale);
+	m_scale = scale;
 	unbind();
 }
 
@@ -244,6 +245,15 @@ void Strings3D::drawAll(const Geom::Vec3f& color)
 		glDrawArrays(GL_QUADS, m_strpos[idSt].first , m_strpos[idSt].second );
 	}
 	postdraw();
+}
+
+void Strings3D::toSVG(Utils::SVG::SVGOut& svg)
+{
+	svg.beginStrings(m_scale);
+	unsigned int nb = m_strings.size();
+	for(unsigned int i=0; i<nb; ++i)
+		svg.addString(m_strTranslate[i],m_strings[i]);
+	svg.endStrings();
 }
 
 } // namespace Utils

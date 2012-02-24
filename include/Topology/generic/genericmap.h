@@ -53,9 +53,9 @@ namespace CGoGN
 class MapBrowser
 {
 public:
-	virtual Dart begin() = 0;
-	virtual Dart end() = 0;
-	virtual Dart next(Dart& d) = 0;
+	virtual Dart begin() const = 0;
+	virtual Dart end() const = 0;
+	virtual void next(Dart& d) const = 0;
 };
 
 class AttributeHandlerGen ;
@@ -259,7 +259,7 @@ public:
 	/**
 	 * get the insertion level of a dart (use only in MRMaps)
 	 */
-	unsigned int getDartLevel(Dart d) ;
+	unsigned int getDartLevel(Dart d) const ;
 
 	/**
 	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
@@ -526,20 +526,20 @@ public:
 	 * Begin of map
 	 * @return the first dart of the map
 	 */
-	Dart begin() ;
+	Dart begin() const;
 
 	/**
 	 * End of map
 	 * @return the end iterator (next of last) of the map
 	 */
-	Dart end() ;
+	Dart end() const;
 
 	/**
 	 * allow to go from a dart to the next
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	Dart next(Dart& d) ;
+	void  next(Dart& d) const ;
 
 	/**
 	 * Apply a functor on each dart of the map

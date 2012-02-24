@@ -28,6 +28,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 #include "Geometry/vector_gen.h"
 
@@ -48,11 +49,24 @@ namespace SVG
 {
 
 
+struct DepthSort
+{
+	unsigned int obj;
+	unsigned int id;
+	float depth;
+	DepthSort(unsigned int o, unsigned int i, float d):
+		obj(o),id(i),depth(d) {}
+	bool operator<(const DepthSort& ds) const { return depth > ds.depth; /* inverse depth sortin*/}
+
+};
+
+
 class SvgObj
 {
 protected:
 	std::vector<Geom::Vec3f> m_vertices;
 	std::vector<Geom::Vec3f> m_colors;
+	std::vector<std::string> m_strings;
 	std::vector<Geom::Vec3f> m_vertices3D;
 	Geom::Vec3f m_color;
 	float m_width;
@@ -67,15 +81,25 @@ public:
 
 	void addVertex3D(const Geom::Vec3f& v, const Geom::Vec3f& C);
 
+	void addString(const Geom::Vec3f& v, const std::string& str);
+
+	void addString(const Geom::Vec3f& v, const std::string& str, const Geom::Vec3f& C);
+
 	void setColor(const Geom::Vec3f& c);
 
 	void setWidth(float w);
 
 	void close();
 
-	virtual void save(std::ofstream& out)=0;
+	virtual void save(std::ofstream& out) const = 0;
+
+	virtual void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const = 0;
 
 	unsigned int nbv() const;
+
+	virtual unsigned int nbPrimtives() const = 0;
+
+	virtual void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const = 0;
 
 	const Geom::Vec3f& P(unsigned int i) const;
 
@@ -88,29 +112,49 @@ public:
 class SvgPoints: public SvgObj
 {
 public:
-	void save(std::ofstream& out);
+	void save(std::ofstream& out) const;
+	void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const;
+	unsigned int nbPrimtives() const;
+	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
 
 class SvgLines: public SvgObj
 {
 public:
-	void save(std::ofstream& out);
+	void save(std::ofstream& out) const;
+	void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const;
+	unsigned int nbPrimtives() const;
+	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
 
-class SvgPolyline: public SvgObj
-{
-public:
-	void save(std::ofstream& out);
-};
 
-class SvgPolygon: public SvgObj
+class SvgStrings: public SvgObj
 {
 protected:
-	Geom::Vec3f m_colorFill;
+	float m_sf;
 public:
-	void setColorFill(const Geom::Vec3f& c);
-	void save(std::ofstream& out);
+	SvgStrings(float scalefactor = 1.0f) : m_sf(scalefactor) {}
+	void save(std::ofstream& out) const;
+	void saveOne(std::ofstream& out, unsigned int i, unsigned int bbl = 0) const;
+	unsigned int nbPrimtives() const;
+	void fillDS(std::vector<DepthSort>& vds, unsigned int idObj) const;
 };
+
+//class SvgPolyline: public SvgObj
+//{
+//public:
+//	void save(std::ofstream& out);
+//};
+//
+//class SvgPolygon: public SvgObj
+//{
+//protected:
+//	Geom::Vec3f m_colorFill;
+//public:
+//	void setColorFill(const Geom::Vec3f& c);
+//	void save(std::ofstream& out);
+//};
+
 
 
 
@@ -128,6 +172,14 @@ protected:
 
 	std::vector<SvgObj*> m_objs;
 	SvgObj* m_current;
+
+
+	unsigned int m_bbX0;
+	unsigned int m_bbY0;
+	unsigned int m_bbX1;
+	unsigned int m_bbY1;
+
+
 
 protected:
 	void computeBB(unsigned int& a, unsigned int& b, unsigned int& c, unsigned& d);
@@ -164,6 +216,15 @@ public:
 	void endLines();
 	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2);
 	void addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C);
+
+
+	void beginStrings(float scalefactor = 1.0f);
+	void endStrings();
+	void addString(const Geom::Vec3f& P, const std::string& str);
+	void addString(const Geom::Vec3f& P, const Geom::Vec3f& Q, const std::string& str);
+	void addString(const Geom::Vec3f& P, const std::string& str, const Geom::Vec3f& C);
+
+	void sortSimpleDepth( std::vector<DepthSort>& vds);
 
 };
 
