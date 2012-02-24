@@ -10,7 +10,7 @@ uniform vec4 ambient;
 uniform vec4 backColor;
 uniform vec4 plane;
 
-VARYING_IN vec3 colorVertex[3];
+VARYING_IN vec3 colorVertex[4];
 VARYING_OUT vec4 ColorFS;
 
 
