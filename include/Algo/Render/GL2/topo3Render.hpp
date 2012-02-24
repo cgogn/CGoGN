@@ -33,8 +33,6 @@
 #include "Topology/generic/traversorCell.h"
 #include "Algo/Geometry/centroid.h"
 
-#include <sys/time.h>
-
 namespace CGoGN
 {
 
