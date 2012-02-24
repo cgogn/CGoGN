@@ -179,6 +179,7 @@ protected:
 	template<typename VEC3>
 	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
 
+public:
 	/**
 	 * creation of indices table of triangles (optimized order)
 	 * @param tableIndices the table where indices are stored
@@ -210,8 +211,6 @@ protected:
 	 */
 	template <typename PFP>
 	void initBoundaries(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
-
-public:
 	/**
 	 * initialization of the VBO indices primitives
 	 * computed by a traversal of the map

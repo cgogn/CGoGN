@@ -55,7 +55,7 @@ public:
 
 	Dart next() ;
 
-	void mark(Dart d);
+	void skip(Dart d);
 } ;
 
 template <typename MAP>
