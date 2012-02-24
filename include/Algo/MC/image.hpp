@@ -29,9 +29,6 @@
 #include <math.h>
 #include <typeinfo>
 
-#include "Utils/img3D_IO.h"
-#include "Zinrimage.h"
-
 namespace CGoGN
 {
 
@@ -177,6 +174,7 @@ void Image<DataType>::loadVox(char *filename)
 	m_Alloc=true;
 }
 
+#ifdef WITH_QT
 template< typename  DataType >
 bool Image<DataType>::loadPNG3D(const char* filename)
 {
@@ -199,8 +197,9 @@ bool Image<DataType>::loadPNG3D(const char* filename)
 
 	return true;
 }
+#endif
 
-
+#ifdef WITH_ZINRI
 template< typename  DataType >
 bool Image<DataType>::loadInrgz(const char* filename)
 {
@@ -230,7 +229,7 @@ bool Image<DataType>::loadInrgz(const char* filename)
 
 		return true;
 }
-
+#endif
 
 
 
@@ -472,9 +471,52 @@ Image<DataType>* Image<DataType>::Blur3()
 	return newImg;
 }
 
+//template<typename DataType>
+//void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32radius)
+//{
+//	// compute the width of the sphere for memory allocation
+//	int i32Width = 2*_i32radius + 1;
+//	// squared radius
+//    float fRad2 = (float)(_i32radius*_i32radius);
+//
+//	// memory allocation
+//	// difficult to know how many voxels before computing,
+//	// so the reserve for the BB
+//	table.reserve(i32Width*i32Width*i32Width);
+//	table.clear();
+//
+//	// scan all the BB of the sphere
+//	for (int z = -_i32radius;  z<=_i32radius; z++)
+//	{
+//		for (int y = -_i32radius;  y<=_i32radius; y++)
+//		{
+//			for (int x = -_i32radius;  x<=_i32radius; x++)
+//			{
+//				Geom::Vec3f v((float)x,(float)y,(float)z);
+//				float fLength =  v.norm2();
+//				// if inside the sphere
+//				if (fLength<=fRad2)
+//				{
+//					// the the index of the voxel
+//					int index = z * m_WXY + y * m_WX + x;
+//					table.push_back(index);
+//				}
+//			}
+//		}
+//	}
+//}
+
+
 template<typename DataType>
 void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32radius)
 {
+	float smin = std::min(m_SX, std::min(m_SY,m_SZ));
+
+	float xs = m_SX/smin;
+	float ys = m_SY/smin;
+	float zs = m_SZ/smin;
+
+
 	// compute the width of the sphere for memory allocation
 	int i32Width = 2*_i32radius + 1;
 	// squared radius
@@ -493,7 +535,7 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 		{
 			for (int x = -_i32radius;  x<=_i32radius; x++)
 			{
-				Geom::Vec3f v((float)x,(float)y,(float)z);
+				Geom::Vec3f v(float(x)*xs,float(y)*ys,float(z)*zs);
 				float fLength =  v.norm2();
 				// if inside the sphere
 				if (fLength<=fRad2)
@@ -506,6 +548,7 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 		}
 	}
 }
+
 
 template<typename DataType>
 float Image<DataType>::computeCurvatureCount(const DataType *ptrVox, const std::vector<int>& sphere, DataType val)

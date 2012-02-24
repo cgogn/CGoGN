@@ -261,7 +261,7 @@ public:
 
 	void removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth);
 
-	void recalPoints();
+	void recalPoints(const Geom::Vec3f& origin);
 };
 
 

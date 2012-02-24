@@ -120,7 +120,7 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 
 	// compute value to transform points directly to final system coordinate
 
-//	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));
+	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));
 
 	m_fScal[0] = m_Image->getVoxSizeX();
 	m_fScal[1] = m_Image->getVoxSizeY();
@@ -483,7 +483,9 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const 
 
 	unsigned int  lVertTable[12];
 
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+//	typename PFP::VEC3 vPos(float(_lX) , float(_lY) , float(_lZ) );
+//	typename PFP::VEC3 vPos(float(_lX) + 0.5f, float(_lY) + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 
@@ -545,8 +547,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -603,8 +604,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -659,8 +659,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -718,8 +717,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -775,8 +773,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -837,8 +834,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -899,8 +895,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -1241,7 +1236,7 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::recalPoints()
+void MarchingCube<DataType, Windowing, PFP>::recalPoints(const Geom::Vec3f& origin)
 {
 
 	for(unsigned int i=m_positions.begin(); i != m_positions.end(); m_positions.next(i))
@@ -1251,7 +1246,7 @@ void MarchingCube<DataType, Windowing, PFP>::recalPoints()
 		P[0] = P[0] * m_fScal[0];
 		P[1] = P[1] * m_fScal[1];
 		P[2] = P[2] * m_fScal[2];
-
+		P+=origin;
 	}
 }
 
