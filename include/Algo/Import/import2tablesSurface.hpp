@@ -298,7 +298,7 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
     	do
     	{
     		std::getline (fp, ligne);
-    	} while (ligne.size()==0);
+    	} while (ligne.size() == 0);
 
 	    std::stringstream oss(ligne);
 		oss >> m_nbVertices;
@@ -344,10 +344,10 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
     	} while (ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-		int n;
+		unsigned int n;
 		oss >> n;
 		m_nbEdges.push_back(n);
-		for (int j=0;j<n; ++j)
+		for (unsigned int j = 0; j < n; ++j)
 		{
 			int index; // index du plongement
 			oss >> index;
@@ -455,7 +455,7 @@ bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<
 
     			unsigned int ind = 0;
 
-    			while ( (ind<str.length()) &&  (str[ind]!='/'))
+    			while ((ind<str.length()) && (str[ind]!='/'))
     				ind++;
 
 				if (ind > 0)

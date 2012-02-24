@@ -116,7 +116,7 @@ Dart TraversorCell<MAP>::next()
 }
 
 template <typename MAP>
-void TraversorCell<MAP>::mark(Dart d)
+void TraversorCell<MAP>::skip(Dart d)
 {
 	if(dmark)
 		dmark->markOrbit(m_orbit, d) ;
