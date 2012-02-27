@@ -636,6 +636,39 @@ bool Map3::isBoundaryVertex(Dart d)
 	return false ;
 }
 
+Dart Map3::findBoundaryFaceOfVertex(Dart d)
+{
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::vector<Dart> darts;	// Darts that are traversed
+	darts.reserve(256);
+	darts.push_back(d);			// Start with the dart d
+	mv.mark(d);
+
+	for(unsigned int i = 0; i < darts.size(); ++i)
+	{
+		if(isBoundaryMarked(darts[i]))
+			return darts[i];
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(darts[i]);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts.push_back(d21);
+			mv.mark(d21);
+		}
+		if(!mv.isMarked(d23))
+		{
+			darts.push_back(d23);
+			mv.mark(d23);
+		}
+	}
+	return NIL ;
+}
+
 bool Map3::sameOrientedEdge(Dart d, Dart e)
 {
 	Dart it = d;

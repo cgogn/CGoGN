@@ -208,6 +208,29 @@ bool EmbeddedMap2::flipBackEdge(Dart d)
 	return false ;
 }
 
+void EmbeddedMap2::swapEdges(Dart d, Dart e)
+{
+	Dart d2 = phi2(d);
+	Dart e2 = phi2(e);
+	Map2::swapEdges(d,e);
+
+	if(isOrbitEmbedded(VERTEX))
+	{
+		copyDartEmbedding(VERTEX, d, phi2(phi_1(d)));
+		copyDartEmbedding(VERTEX, e, phi2(phi_1(e)));
+		copyDartEmbedding(VERTEX, d2, phi2(phi_1(d2)));
+		copyDartEmbedding(VERTEX, e2, phi2(phi_1(e2)));
+	}
+
+	if(isOrbitEmbedded(EDGE))
+	{
+
+	}
+
+	if(isOrbitEmbedded(VOLUME))
+		embedNewCell(VOLUME, d);
+}
+
 //void EmbeddedMap2::insertEdgeInVertex(Dart d, Dart e)
 //{
 //	Map2::insertEdgeInVertex(d, e);

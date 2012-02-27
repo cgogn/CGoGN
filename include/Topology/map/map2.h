@@ -208,6 +208,12 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d);
 
+	//!
+	/*!
+	 *
+	 */
+	void swapEdges(Dart d, Dart e);
+
 //	//! Insert an edge after a dart in the vertex orbit
 //	/*! \pre Dart d and e MUST be different and belong to distinct face
 //	 *  \pre Dart e must be phi2-linked with its phi_1 dart

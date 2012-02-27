@@ -115,6 +115,7 @@ inline void GenericMap::deleteDart(Dart d)
 		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)
 		{
 			unsigned int index = (*m_mrDarts[i])[d.index] ;
+			std::cout << "deleteDart index = " << index << std::endl << std::endl;
 			if(isDartValid(index))
 				deleteDartLine(index) ;
 		}

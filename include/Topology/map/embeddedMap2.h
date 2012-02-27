@@ -85,6 +85,10 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d) ;
 
+	/*
+	 *
+	 */
+	virtual void swapEdges(Dart d, Dart e);
 //	/**
 //	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
 //	 * The attributes attached to the face of dart d are overwritten on the face of dart e

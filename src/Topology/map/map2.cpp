@@ -325,6 +325,20 @@ bool Map2::flipBackEdge(Dart d)
 	return false ; // cannot flip a border edge
 }
 
+void Map2::swapEdges(Dart d, Dart e)
+{
+	assert(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e));
+
+	Dart d2 = phi2(d);
+	Dart e2 = phi2(e);
+
+	phi2unsew(d);
+	phi2unsew(e) ;
+
+	phi2sew(d, e);
+	//phi2sew(d2, e2);
+}
+
 //void Map2::insertEdgeInVertex(Dart d, Dart e)
 //{
 //	assert(!sameVertex(d,e) && phi2(e) == phi_1(e));
@@ -538,10 +552,10 @@ void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool second
 		unsewFaces(*it) ;
 
 	if(firstSideClosed)
-		fillHole(e) ;
+		Map2::fillHole(e) ;
 
 	if(secondSideClosed)
-		fillHole(e2) ;
+		Map2::fillHole(e2) ;
 }
 
 /*! @name Topological Queries

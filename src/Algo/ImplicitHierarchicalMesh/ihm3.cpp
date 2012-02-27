@@ -570,7 +570,6 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 		if(m_dartLevel[old] < m_dartLevel[oldest])
 				oldest = old ;
 
-
 		//
 		// add all face neighbours to the table
 		//

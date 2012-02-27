@@ -1154,7 +1154,7 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 	}
 	d /= double(nbf);
 	
-	typename PFP::REAL EPSILON = d/10000.0;
+	typename PFP::REAL epsilon = d/10000.0;
 	
 
 	// traverse vertices
@@ -1176,7 +1176,7 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 							typename PFP::VEC3 Q = positions[*v];
 							Q -= P;
 							typename PFP::REAL d2 = Q*Q;
-							if (d2 < EPSILON*EPSILON)
+							if (d2 < epsilon*epsilon)
 							{
 								newIndices[*v] = i;
 								*v = 0xffffffff;
