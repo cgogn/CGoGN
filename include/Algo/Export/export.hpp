@@ -263,11 +263,11 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 	out << "property float ny" << std::endl ;
 	out << "property float nz" << std::endl ;
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-		out << "property float L1_a" << coefI << std::endl ;
+		out << "property float C0_a" << coefI << std::endl ;
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-		out << "property float L2_a" << coefI << std::endl ;
+		out << "property float C1_a" << coefI << std::endl ;
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-		out << "property float L3_a" << coefI << std::endl ;
+		out << "property float C2_a" << coefI << std::endl ;
 
 	TREAL errL2 = map.template getAttribute<REAL>(VERTEX,"errL2") ;
 	TREAL errLmax = map.template getAttribute<REAL>(VERTEX,"errLmax") ;

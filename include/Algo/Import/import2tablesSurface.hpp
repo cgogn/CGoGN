@@ -52,6 +52,9 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 	if ((filename.rfind(".trian")!=std::string::npos) || (filename.rfind(".TRIAN")!=std::string::npos))
 		return ImportSurfacique::TRIAN;
 
+	if ((filename.rfind(".meshbin")!=std::string::npos) || (filename.rfind(".MESHBIN")!=std::string::npos))
+		return ImportSurfacique::MESHBIN;
+
 	if ((filename.rfind(".plyptm")!=std::string::npos) || (filename.rfind(".PLYGEN")!=std::string::npos))
 		return ImportSurfacique::PLYPTM;
 
@@ -91,6 +94,10 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 	case ImportSurfacique::OFF:
 		CGoGNout << "TYPE: OFF" << CGoGNendl;
 		return importOff(filename, attrNames);
+		break;
+	case ImportSurfacique::MESHBIN:
+		CGoGNout << "TYPE: MESHBIN" << CGoGNendl;
+		return importMeshBin(filename, attrNames);
 		break;
 	case ImportSurfacique::PLY:
 		CGoGNout << "TYPE: PLY" << CGoGNendl;
@@ -359,6 +366,75 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
 	fp.close();
 	return true;
 }
+
+template<typename PFP>
+bool MeshTablesSurface<PFP>::importMeshBin(const std::string& filename, std::vector<std::string>& attrNames)
+{
+	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+
+	if (!positions.isValid())
+		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+
+	attrNames.push_back(positions.name()) ;
+
+	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
+
+	// open file
+	std::ifstream fp(filename.c_str(), std::ios::in | std::ios::binary);
+	if (!fp.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
+
+	// Read header
+    unsigned int Fmin, Fmax ;
+    fp.read((char*)&m_nbVertices, sizeof(unsigned int)) ;
+    fp.read((char*)&m_nbFaces, sizeof(unsigned int)) ;
+    fp.read((char*)&Fmin, sizeof(unsigned int)) ;
+    fp.read((char*)&Fmax, sizeof(unsigned int)) ;
+
+    assert((Fmin == 3 && Fmax == 3) || !"Only triangular faces are handled yet") ;
+
+    // Read foreach vertex
+	std::vector<unsigned int> verticesID ;
+	verticesID.reserve(m_nbVertices) ;
+
+    for (unsigned int vxNum = 0 ; vxNum < m_nbVertices ; ++vxNum)
+    {
+    	VEC3 pos ;
+    	fp.read((char*) &pos[0], sizeof(float)) ;
+    	fp.read((char*) &pos[1], sizeof(float)) ;
+    	fp.read((char*) &pos[2], sizeof(float)) ;
+
+		unsigned int id = container.insertLine() ;
+		positions[id] = pos ;
+
+		verticesID.push_back(id) ;
+    }
+
+    // Read foreach face
+	m_nbEdges.reserve(m_nbFaces) ;
+	m_emb.reserve(m_nbVertices * 8) ;
+
+	for (unsigned int fNum = 0; fNum < m_nbFaces; ++fNum)
+	{
+		const unsigned int faceSize = 3 ;
+		fp.read((char*) &faceSize, sizeof(float)) ;
+		m_nbEdges.push_back(faceSize) ;
+
+		for (unsigned int i = 0 ; i < faceSize; ++i)
+		{
+			unsigned int index ; // index of embedding
+			fp.read((char*) &index, sizeof(unsigned int)) ;
+			m_emb.push_back(verticesID[index]) ;
+		}
+	}
+
+	fp.close() ;
+	return true ;
+}
+
 
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importObj(const std::string& filename, std::vector<std::string>& attrNames)
