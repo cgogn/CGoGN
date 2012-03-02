@@ -180,7 +180,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good)
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -322,7 +322,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 }
 
 template <typename PFP>
-bool exportPlySLFgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good)
+bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -375,21 +375,25 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const char* filename, const typ
 	}
 
 	TVEC3 frame[3] ;
-	TVEC3 coefs[nbCoefs] ;
+	std::vector<TVEC3> coefs ;
 
 	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
 	frame[1] = map.template getAttribute<VEC3>(VERTEX, "frame_B") ;
 	frame[2] = map.template getAttribute<VEC3>(VERTEX, "frame_N") ;
-	for (unsigned i = 0 ; i < nbCoefs ; ++i)
-	{
+
+	unsigned int i = 0 ;
+	do {
 		std::stringstream name ;
-		name << "SLFcoefs_" << i ;
-		coefs[i] = map.template getAttribute<VEC3>(VERTEX,name.str()) ;
-	}
+		name << "SLFcoefs_" << i++ ;
+		coefs.push_back(map.template getAttribute<VEC3>(VERTEX, name.str())) ;
+	} while (coefs[i-1].isValid()) ;
+	const unsigned int nbCoefs = i - 1 ; // last valid one is i-2
+
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		assert(coefs[coefI].isValid()) ;
 
 	std::string file(filename) ;
 	size_t pos = file.rfind(".") ; // position of "." in filename
-	std::cout << file << " ; " << pos << std::endl ;
 	std::string extension = file.substr(pos) ;
 
 	out << "ply" << std::endl ;
