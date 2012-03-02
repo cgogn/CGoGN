@@ -91,7 +91,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 * @return true
 */
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const unsigned int& nbCoefs, const FunctorSelect& good = allDarts) ;
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)
