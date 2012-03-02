@@ -76,7 +76,22 @@ bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, ch
 * @return true
 */
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts) ;
+bool exportPlySLF(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good = allDarts) ;
+
+/**
+* export the map into a PLYSLF file (K. Vanhoey generic format).
+*
+* exports position + any attribute named : "frame_T" (frame tangent : VEC3), "frame_B" (frame binormal : VEC3), "frame_N" (frame normal : VEC3),
+* "SLF_<i> : VEC3" (coefficient number i of the 3   - one per channel - ; the max i is nbCoefs),
+*
+* @param map map to be exported
+* @param filename filename of ply file
+* @param position the position container
+* @param nbCoefs the number of coefficients of the representation
+* @return true
+*/
+template <typename PFP>
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)

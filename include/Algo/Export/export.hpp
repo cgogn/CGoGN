@@ -322,6 +322,132 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 }
 
 template <typename PFP>
+bool exportPlySLF(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::TVEC3 TVEC3;
+	typedef typename PFP::REAL REAL;
+	typedef typename PFP::TREAL TREAL;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
+
+
+	unsigned int nbDarts = map.getNbDarts() ;
+
+	std::vector<unsigned int> vertices;
+	std::vector<unsigned int> faces;
+
+	vertices.reserve(nbDarts/5);	// TODO non optimal reservation
+	faces.reserve(nbDarts/3);
+
+	CellMarker markV(map, VERTEX);
+	TraversorF<MAP> t(map, good) ;
+	unsigned int lab = 0;
+	unsigned int nbf = 0;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		std::vector<unsigned int> face ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
+		{
+			if (!markV.isMarked(it))
+			{
+				markV.mark(it);
+				tableVertLab[it] = lab++;
+				vertices.push_back(map.getEmbedding(VERTEX, it));
+			}
+			face.push_back(tableVertLab[it]);
+		}
+
+		faces.push_back(face.size()) ;
+		for (unsigned int i = 0 ; i < face.size() ; ++i)
+			faces.push_back(face.at(i)) ;
+
+		++nbf;
+	}
+
+	TVEC3 frame[3] ;
+	TVEC3 coefs[nbCoefs] ;
+
+	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
+	frame[1] = map.template getAttribute<VEC3>(VERTEX, "frame_B") ;
+	frame[2] = map.template getAttribute<VEC3>(VERTEX, "frame_N") ;
+	for (unsigned i = 0 ; i < nbCoefs ; ++i)
+	{
+		std::stringstream name ;
+		name << "SLFcoefs_" << i ;
+		coefs[i] = map.template getAttribute<VEC3>(VERTEX,name.str()) ;
+	}
+
+	out << "ply" << std::endl ;
+	out << "format ascii 1.0" << std::endl ;
+	out << "comment ply PTM (K. Vanhoey generic format)" << std::endl ;
+	out << "element vertex " << vertices.size() << std::endl ;
+	out << "property float x" << std::endl ;
+	out << "property float y" << std::endl ;
+	out << "property float z" << std::endl ;
+	out << "property float tx" << std::endl ;
+	out << "property float ty" << std::endl ;
+	out << "property float tz" << std::endl ;
+	out << "property float bx" << std::endl ;
+	out << "property float by" << std::endl ;
+	out << "property float bz" << std::endl ;
+	out << "property float nx" << std::endl ;
+	out << "property float ny" << std::endl ;
+	out << "property float nz" << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		out << "property float C0_" << coefI << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		out << "property float C1_" << coefI << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		out << "property float C2_" << coefI << std::endl ;
+
+	out << "element face " << nbf << std::endl ;
+	out << "property list uchar int vertex_indices" << std::endl ;
+	out << "end_header" << std::endl ;
+
+	for(unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		unsigned int vi = vertices[i];
+		 // position
+		for(unsigned int coord = 0 ; coord < 3 ; ++coord)
+			out << position[vi][coord] << " " ;
+		 // frame
+		for(unsigned int axis = 0 ; axis < 3 ; ++axis)
+			for (unsigned int coord = 0 ; coord < 3 ; ++coord)
+				out << frame[axis][vi][coord] << " " ;
+		 // coefficients
+		for (unsigned int channel = 0 ; channel < 3 ; ++channel)
+			for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+				out << coefs[coefI][vi][channel] << " "  ;
+
+		out << std::endl ;
+	}
+
+	std::vector<unsigned int>::iterator it = faces.begin();
+	while (it != faces.end())
+	{
+		unsigned int nbe = *it++;
+		out << nbe ;
+		for(unsigned int j = 0; j < nbe; ++j)
+			out << " " << *it++;
+		out << std::endl ;
+	}
+
+	out.close() ;
+	return true ;
+}
+
+
+template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
