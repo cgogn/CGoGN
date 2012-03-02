@@ -107,9 +107,9 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 		CGoGNout << "TYPE: PLYPTM" << CGoGNendl;
 		return importPlyPTM(filename, attrNames);
 		break;
-	case ImportSurfacique::PLYPTMgeneric:
-		CGoGNout << "TYPE: PLYPTMgeneric" << CGoGNendl;
-		return importPlyPTMgeneric(filename, attrNames);
+	case ImportSurfacique::PLYSLFgeneric:
+		CGoGNout << "TYPE: PLYSLFgeneric" << CGoGNendl;
+		return importPlySLFgeneric(filename, attrNames);
 		break;
 	case ImportSurfacique::OBJ:
 		CGoGNout << "TYPE: OBJ" << CGoGNendl;
@@ -616,26 +616,28 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 }
 
 /**
- * Import plyPTM (K Vanhoey generic format).
- * It can handle bivariable polynomials of any degree and returns the appropriate attrNames
+ * Import plySLF (K Vanhoey generic format).
+ * It can handle bivariable polynomials and spherical harmonics of any degree and returns the appropriate attrNames
  * @param filename the file to import;
  * @param attrNames reference that will be filled with the attribute names
- * the number of attrNames returned depends on the degree of the polynomials :
+ * the number of attrNames returned depends on the degree of the polynomials / level of the SH :
  *  - 1 attrName for geometric position (VEC3) : name = "position" ;
  *  - 3 attrNames for local frame (3xVEC3) : names are "Frame_T" (Tangent), "Frame_B" (Binormal) and "Frame_N" (Normal) ;
  *  - N attrNames for the function coefficients (NxVEC3) : N RGB coefficients being successively the constants, the linears (v then u), the quadratics, etc. :  : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
- *  Their names are : "colorPTM_a<i>" (where <i> is a number from 0 to N-1).
+ *  Their names are : "SLFcoefs_<i>" (where <i> is a number from 0 to N-1).
  * N = 1 for constant polynomial,
  * N = 3 for linear polynomial,
  * N = 6 for quadratic polynomial,
  * N = 10 for cubic degree polynomial,
  * N = 15 for 4th degree polynomial,
+ *
+ * N = l*l for SH of level l,
  * ...
  *  - K remaining attrNames named "remainderNo<k>" where k is an integer from 0 to K-1.
  * @return bool : success.
  */
 template <typename PFP>
-bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames)
+bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames)
 {
 	// Open file
 	std::ifstream fp(filename.c_str(), std::ios::in) ;
@@ -710,13 +712,13 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
 
-	AttributeHandler<typename PFP::VEC3> *colorPTM = new AttributeHandler<typename PFP::VEC3>[nbCoefsPerPol] ;
+	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefsPerPol] ;
 	for (unsigned int i = 0 ; i < nbCoefsPerPol ; ++i)
 	{
 		std::stringstream name ;
-		name << "colorPTM_a" << i ;
-		colorPTM[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
-		attrNames.push_back(colorPTM[i].name()) ;
+		name << "SLFcoefs_" << i ;
+		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
+		attrNames.push_back(SLFcoefs[i].name()) ;
 	}
 
 	AttributeHandler<typename PFP::REAL> *remainders = new AttributeHandler<typename PFP::REAL>[nbRemainders] ;
@@ -748,7 +750,7 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
 				frame[k][id][l] = properties[3+(3*k+l)] ;
 		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
 			for (unsigned int l = 0 ; l < nbCoefsPerPol ; ++l)
-				colorPTM[l][id][k] = properties[12+(nbCoefsPerPol*k+l)] ;
+				SLFcoefs[l][id][k] = properties[12+(nbCoefsPerPol*k+l)] ;
 		unsigned int cur = 12+3*nbCoefsPerPol ;
 		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
 			remainders[k][id] = properties[cur + k] ;

@@ -322,7 +322,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 }
 
 template <typename PFP>
-bool exportPlySLF(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good)
+bool exportPlySLFgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;

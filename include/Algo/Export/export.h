@@ -76,7 +76,7 @@ bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, ch
 * @return true
 */
 template <typename PFP>
-bool exportPlySLF(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good = allDarts) ;
+bool exportPlySLFgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const unsigned int& nbCoefs, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYSLF file (K. Vanhoey generic format).
