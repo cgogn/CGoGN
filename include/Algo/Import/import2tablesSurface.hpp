@@ -682,7 +682,7 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
 			binormal = true ;
 		else if (tag == std::string("nx") || tag == std::string("ny") || tag == std::string("nz"))
 			normal = true ;
-		else if (tag.substr(2,2) == std::string("_a"))
+		if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
 			++nbCoefsPerPol ;
 	} while (tag != std::string("face")) ;
 	unsigned int nbRemainders = nbProps ;		// # remaining properties
@@ -758,7 +758,7 @@ bool MeshTablesSurface<PFP>::importPlyPTMgeneric(const std::string& filename, st
 
 	// Read faces index
 	m_nbEdges.reserve(m_nbFaces) ;
-	m_emb.reserve(3*m_nbFaces) ;
+	m_emb.reserve(3 * m_nbFaces) ;
 	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
 	{
 		// read the indices of vertices for current face

@@ -387,9 +387,14 @@ bool exportPlySLF(typename PFP::MAP& map, const char* filename, const typename P
 		coefs[i] = map.template getAttribute<VEC3>(VERTEX,name.str()) ;
 	}
 
+	std::string file(filename) ;
+	size_t pos = file.rfind(".") ; // position of "." in filename
+	std::cout << file << " ; " << pos << std::endl ;
+	std::string extension = file.substr(pos) ;
+
 	out << "ply" << std::endl ;
 	out << "format ascii 1.0" << std::endl ;
-	out << "comment ply SLF (K. Vanhoey generic format)" << std::endl ;
+	out << "comment ply SLF (K. Vanhoey generic format): SLF_" << ((extension == ".plyPTMext") ? "PTMext" : "SHreal") << std::endl ;
 	out << "element vertex " << vertices.size() << std::endl ;
 	out << "property float x" << std::endl ;
 	out << "property float y" << std::endl ;
