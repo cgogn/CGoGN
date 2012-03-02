@@ -389,7 +389,7 @@ bool exportPlySLF(typename PFP::MAP& map, const char* filename, const typename P
 
 	out << "ply" << std::endl ;
 	out << "format ascii 1.0" << std::endl ;
-	out << "comment ply PTM (K. Vanhoey generic format)" << std::endl ;
+	out << "comment ply SLF (K. Vanhoey generic format)" << std::endl ;
 	out << "element vertex " << vertices.size() << std::endl ;
 	out << "property float x" << std::endl ;
 	out << "property float y" << std::endl ;
