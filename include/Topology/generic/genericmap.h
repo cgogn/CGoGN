@@ -119,12 +119,12 @@ protected:
 	AttributeContainer m_mrattribs ;
 
 	/**
-	 * pointers to attributes that store indices in m_attribs[DART] (one for each level)
+	 * pointers to attributes of m_mrattribs that store indices in m_attribs[DART] (one for each level)
 	 */
 	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
 
 	/**
-	 * pointer to attribute that stores darts insertion levels
+	 * pointer to attribute of m_mrattribs that stores darts insertion levels
 	 */
 	AttributeMultiVector<unsigned int>* m_mrLevels ;
 

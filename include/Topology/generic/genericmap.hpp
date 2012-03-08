@@ -96,8 +96,13 @@ inline Dart GenericMap::newDart()
 		for(unsigned int i = 0; i < m_mrCurrentLevel; ++i)	// for all previous levels
 			(*m_mrDarts[i])[mrdi] = MRNULL ;				// this MRdart does not exist
 
-		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)	// for all levels from current to max
-			(*m_mrDarts[i])[mrdi] = di ;									// make this MRdart points to the new dart line
+//		for(unsigned int i = m_mrCurrentLevel; i < m_mrDarts.size(); ++i)	// for all levels from current to max
+//			(*m_mrDarts[i])[mrdi] = di ;									// make this MRdart point to the new dart line
+
+		(*m_mrDarts[m_mrCurrentLevel])[mrdi] = di ;		// for the current level, this MRdart points to the new dart line
+
+		for(unsigned int i = m_mrCurrentLevel + 1; i < m_mrDarts.size(); ++i)	// for all levels from current + 1 to max
+			(*m_mrDarts[i])[mrdi] = copyDartLine(di) ;							// make this MRdart point to a copy of the new dart line
 
 		return Dart::create(mrdi) ;
 	}
@@ -156,7 +161,6 @@ inline unsigned int GenericMap::copyDartLine(unsigned int index)
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
 		if (m_embeddings[orbit])
-//			(*m_embeddings[orbit])[newindex] = EMBNULL ;
 		{
 			unsigned int emb = (*m_embeddings[orbit])[newindex] ;	// add a ref to the cells pointed
 			if(emb != EMBNULL)										// by the new dart line
