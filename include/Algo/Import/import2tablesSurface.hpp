@@ -816,6 +816,16 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		return false ;
 	}
 
+	buff = new char[31] ;
+	fp.read(buff, 31) ;
+	std::string tag(buff) ;
+	delete[] buff ;
+	if (tag != std::string("format binary_little_endian 1.0")) // verify file type
+	{
+		CGoGNerr << filename << " is not a little endian file !" <<  CGoGNout ;
+		return false ;
+	}
+
 	// read CHNum
 	unsigned int CHNum ;
 	fp.read((char*)&CHNum, sizeof(unsigned int)) ;
