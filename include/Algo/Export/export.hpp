@@ -559,7 +559,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 	header << "end_header" << std::endl ;
 
 	size_t nbCharsOfHeader = header.str().size() ;
-	out.write((char*)nbCharsOfHeader, sizeof(size_t)) ;
+	out.write((char*)&nbCharsOfHeader, sizeof(size_t)) ;
 	out.write((char*)(header.str().c_str()), nbCharsOfHeader*sizeof(char)) ;
 
 	for(unsigned int i = 0; i < vertices.size(); ++i)
