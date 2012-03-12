@@ -810,7 +810,6 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	fp.read(buff, 3) ;
 	std::string tag(buff) ;
 	delete[] buff ;
-	std::cout << tag << std::endl ;
 	if (tag != std::string("ply")) // verify file type
 	{
 		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
