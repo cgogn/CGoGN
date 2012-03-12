@@ -584,7 +584,10 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 		unsigned int nbe = *it++;
 		out.write((char*)&nbe, sizeof(unsigned int)) ;
 		for(unsigned int j = 0; j < nbe; ++j)
-			out.write((char*)(&(*it++)), sizeof(unsigned int)) ;
+		{
+			unsigned int index = *it++ ;
+			out.write((char*)(&index), sizeof(unsigned int)) ;
+		}
 	}
 
 	out.close() ;
