@@ -233,6 +233,11 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
+	//! Compute the number of edges of the vertex of d on the boundary
+	/*!	@param d a dart
+	 */
+	unsigned int vertexDegreeOnBoundary(Dart d);
+
 	//! Tell if the vertex of d is on the boundary
 	/*! @param d a dart
 	 */

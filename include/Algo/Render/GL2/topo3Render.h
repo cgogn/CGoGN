@@ -290,6 +290,9 @@ public:
 	template<typename PFP>
 	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
 
+	template<typename PFP>
+	void updateDataMap3OldFashioned(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
+
 protected:
 	/**
 	* update all drawing buffers to render a dual map

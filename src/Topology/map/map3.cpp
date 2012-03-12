@@ -511,13 +511,6 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 
-//	//unsew the edge path
-//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-//		Map2::unsewFaces(*it);
-//
-//	Map2::fillHole(e) ;
-//	Map2::fillHole(e2) ;
-
 	Map2::splitSurface(vd,true,true);
 
 	//sew the two connected components
@@ -601,6 +594,13 @@ unsigned int Map3::vertexDegree(Dart d)
 	}
 
 	return count;
+}
+
+unsigned int Map3::vertexDegreeOnBoundary(Dart d)
+{
+	assert(Map3::isBoundaryVertex(d));
+
+	return Map2::vertexDegree(d);
 }
 
 bool Map3::isBoundaryVertex(Dart d)
@@ -756,7 +756,7 @@ bool Map3::check()
 		if(phi1(d3) != phi3(phi_1(d)))
 		{
 			std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
-			return false;
+			//return false;
 		}
 
         Dart d2 = phi2(d);

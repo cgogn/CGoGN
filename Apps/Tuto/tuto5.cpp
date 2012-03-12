@@ -263,8 +263,8 @@ void MyQT::cb_keyPress(int code)
 
 	if(code == 'c')
 	{
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		Algo::Modelisation::catmullClarkVol<PFP>(myMap, position, nb);
+		//SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		Algo::Modelisation::catmullClarkVol<PFP>(myMap, position);
 
 		m_positionVBO->updateData(position);
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
@@ -272,7 +272,7 @@ void MyQT::cb_keyPress(int code)
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
 
-		m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
+		m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, allDarts);
 	}
 }
 

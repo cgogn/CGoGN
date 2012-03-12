@@ -466,31 +466,31 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 
 
 
-	//Third step : 3-sew internal faces
-	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
-	{
-		Dart f1 = (*it).first;
-		Dart f2 = (*it).second;
-
-
-		if(map.isBoundaryFace(map.phi2(f1)) && map.isBoundaryFace(map.phi2(f2)))
-		{
-			std::cout << "boundary" << std::endl;
-			//id pour toutes les faces interieures
-			map.sewVolumes(map.phi2(f1), map.phi2(f2));
-
+//	//Third step : 3-sew internal faces
+//	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
+//	{
+//		Dart f1 = (*it).first;
+//		Dart f2 = (*it).second;
 //
-//			//Fais a la couture !!!!!
-//			unsigned int idface = map.getNewFaceId();
-//			map.setFaceId(map.phi2(f1),idface, FACE);
-		}
 //
-//		//FAIS a la couture !!!!!!!
-//		//id pour toutes les aretes exterieurs des faces quadrangulees
-//		unsigned int idedge = map.getEdgeId(f1);
-//		map.setEdgeId(map.phi2(f1), idedge, DART);
-//		map.setEdgeId( map.phi2(f2), idedge, DART);
-	}
+//		if(map.isBoundaryFace(map.phi2(f1)) && map.isBoundaryFace(map.phi2(f2)))
+//		{
+//			std::cout << "boundary" << std::endl;
+//			//id pour toutes les faces interieures
+//			map.sewVolumes(map.phi2(f1), map.phi2(f2));
+//
+////
+////			//Fais a la couture !!!!!
+////			unsigned int idface = map.getNewFaceId();
+////			map.setFaceId(map.phi2(f1),idface, FACE);
+//		}
+////
+////		//FAIS a la couture !!!!!!!
+////		//id pour toutes les aretes exterieurs des faces quadrangulees
+////		unsigned int idedge = map.getEdgeId(f1);
+////		map.setEdgeId(map.phi2(f1), idedge, DART);
+////		map.setEdgeId( map.phi2(f2), idedge, DART);
+//	}
 
 	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
 	//id pour les aretes interieurs : (i.e. 6 pour un hexa)

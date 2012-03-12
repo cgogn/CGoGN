@@ -425,6 +425,51 @@ bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
 	return false ;
 }
 
+void EmbeddedMap2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
+{
+	std::vector<Dart> darts ;
+	darts.reserve(vd.size());
+
+	// save the edge neighbors darts
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		darts.push_back(phi2(*it));
+	}
+
+	assert(darts.size() == vd.size());
+
+	Map2::splitSurface(vd, firstSideClosed, secondSideClosed);
+
+	// follow the edge path a second time to embed the vertex, edge and volume orbits
+	for(unsigned int i = 0; i < vd.size(); ++i)
+	{
+		Dart dit = vd[i];
+		Dart dit2 = darts[i];
+
+		// embed the vertex embedded from the origin volume to the new darts
+		if(isOrbitEmbedded(VERTEX))
+		{
+			copyDartEmbedding(VERTEX, phi2(dit), phi1(dit));
+			copyDartEmbedding(VERTEX, phi2(dit2), phi1(dit2));
+		}
+
+		// embed the edge embedded from the origin volume to the new darts
+		if(isOrbitEmbedded(EDGE))
+		{
+			unsigned int eEmb = getEmbedding(EDGE, dit) ;
+			setDartEmbedding(EDGE, phi2(dit), eEmb);
+			setDartEmbedding(EDGE, phi2(dit2), eEmb);
+		}
+
+		// embed the volume embedded from the origin volume to the new darts
+		if(isOrbitEmbedded(VOLUME))
+		{
+			copyDartEmbedding(VOLUME, phi2(dit), dit);
+			copyDartEmbedding(VOLUME, phi2(dit2), dit2);
+		}
+	}
+}
+
 unsigned int EmbeddedMap2::closeHole(Dart d, bool forboundary)
 {
 	unsigned int nbE = Map2::closeHole(d, forboundary) ;
@@ -434,7 +479,7 @@ unsigned int EmbeddedMap2::closeHole(Dart d, bool forboundary)
 	{
 		if (isOrbitEmbedded(VERTEX))
 		{
-			copyDartEmbedding(VERTEX, f, alpha1(f)) ;
+			copyDartEmbedding(VERTEX, f, phi2(phi_1(f))) ;
 		}
 		if (isOrbitEmbedded(EDGE))
 		{

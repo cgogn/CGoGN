@@ -257,7 +257,7 @@ public:
 	/*!
 	 *
 	 */
-	virtual void splitCC(std::vector<Dart>& vd);
+	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 
 	//@}
 

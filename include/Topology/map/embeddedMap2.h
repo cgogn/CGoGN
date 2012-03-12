@@ -136,6 +136,11 @@ public:
 	virtual bool mergeVolumes(Dart d, Dart e) ;
 
 	/**
+	 *
+	 */
+	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
+
+	/**
 	 * No attribute is attached to the new face
 	 */
 	virtual unsigned int closeHole(Dart d, bool forboundary = true);
