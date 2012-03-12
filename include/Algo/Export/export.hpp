@@ -532,6 +532,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 
 	std::string tmp ;
 	tmp = std::string("ply") ;
+	std::cout << tmp.length() << std::endl ;
 	out.write(tmp.c_str(),tmp.length()*sizeof(char)) ;
 	tmp = std::string("format binary_little_endian 1.0") ;
 	out.write(tmp.c_str(),tmp.length()*sizeof(char)) ;
