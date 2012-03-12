@@ -805,25 +805,28 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		return false ;
 	}
 
-	// read CHNum
-	unsigned int CHNum ;
-	fp.read((char*)&CHNum, sizeof(unsigned int)) ;
-
-	char* headerTab = new char[CHNum] ;
-	std::cout << fp.read(headerTab, CHNum) << std::endl ;
-
-	std::stringstream header(headerTab) ;
-	std::cout << std::string(headerTab) << std::endl ;
-
-	// Read quantities : #vertices, #faces, #properties, degree of polynomials
-    std::string tag ;
-
-    header >> tag ;
+	// read "ply"
+	char* buff = new char[3] ;
+	fp.read(buff, 3) ;
+	std::string tag(buff) ;
+	delete[] buff ;
 	if (tag != std::string("ply")) // verify file type
 	{
 		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
 		return false ;
 	}
+
+	// read CHNum
+	unsigned int CHNum ;
+	fp.read((char*)&CHNum, sizeof(unsigned int)) ;
+
+	char* headerTab = new char[CHNum] ;
+	fp.read(headerTab, CHNum) ;
+
+	std::stringstream header(headerTab) ;
+	std::cout << std::string(headerTab) << std::endl ;
+
+	// Read quantities : #vertices, #faces, #properties, degree of polynomials
 
 	do // go to #vertices
 	{

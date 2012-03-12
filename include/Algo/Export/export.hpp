@@ -530,9 +530,13 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 	size_t pos = file.rfind(".") ; // position of "." in filename
 	std::string extension = file.substr(pos) ;
 
+	std::string tmp ;
+	tmp = std::string("ply") ;
+	out.write(tmp,tmp.length()*sizeof(char)) ;
+	tmp = std::string("format binary_little_endian 1.0") ;
+	out.write(tmp,tmp.length()*sizeof(char)) ;
+
 	std::stringstream header ;
-	header << "ply" << std::endl ;
-	header << "format binary_little_endian 1.0" << std::endl ;
 	header << "comment ply SLF (K. Vanhoey generic format): SLF_" << ((extension == ".plyPTMext") ? "PTMext" : "SHreal") << std::endl ;
 	header << "element vertex " << vertices.size() << std::endl ;
 	header << "property float x" << std::endl ;
