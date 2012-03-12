@@ -62,7 +62,7 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 		return ImportSurfacique::PLYSLFgeneric;
 
 	if ((filename.rfind(".plyPTMextBin")!=std::string::npos) || (filename.rfind(".plySHrealBin")!=std::string::npos))
-		return ImportSurfacique::PLYSLFgeneric;
+		return ImportSurfacique::PLYSLFgenericBin;
 
 	if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
 		return ImportSurfacique::PLY;
