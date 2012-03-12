@@ -57,7 +57,7 @@ Dart TraversorCell<MAP>::begin()
 
 	current = m.begin() ;
 	while(current != m.end() && (m.isBoundaryMarked(current) || !m_good(current)))
-		current = m.next(current) ;
+		m.next(current) ;
 
 	if(current == m.end())
 		current = NIL ;
@@ -92,7 +92,7 @@ Dart TraversorCell<MAP>::next()
 
 		while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
 		{
-			current = m.next(current) ;
+			m.next(current) ;
 			if(current == m.end())
 				current = NIL ;
 			else
@@ -116,7 +116,7 @@ Dart TraversorCell<MAP>::next()
 }
 
 template <typename MAP>
-void TraversorCell<MAP>::mark(Dart d)
+void TraversorCell<MAP>::skip(Dart d)
 {
 	if(dmark)
 		dmark->markOrbit(m_orbit, d) ;

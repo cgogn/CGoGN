@@ -520,6 +520,12 @@ void SimpleQT::snapshot(const QString& filename)
 	im.save(filename);
 }
 
+void SimpleQT::setGeometry(int x, int y, int w, int h)
+{
+	move(x,y);
+	resize(w,h);
+}
+
 } // namespace QT
 
 } // namespace Utils

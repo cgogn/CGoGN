@@ -202,11 +202,11 @@ void GenericMap::addLevel()
 		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1] ;	// copy the indices of
 		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
 
-//		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//		{
-//			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
-//			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
-//		}
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+		}
 	}
 }
 

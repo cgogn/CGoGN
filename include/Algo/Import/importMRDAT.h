@@ -34,13 +34,14 @@ namespace Algo
 namespace Import
 {
 
-template <typename PFP>
-bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames) ;
-
-template <typename PFP>
 class QuadTreeNode
 {
-public:
+public:	
+	unsigned int indices[3] ;
+	QuadTreeNode* children[4] ;
+	QuadTreeNode* parent ;
+	unsigned int level ;
+	
 	QuadTreeNode()
 	{
 		for(unsigned int i = 0; i < 3; ++i)
@@ -48,6 +49,7 @@ public:
 		for(unsigned int i = 0; i < 4; ++i)
 			children[i] = NULL ;
 		parent = NULL ;
+		level = 0 ;
 	}
 
 	~QuadTreeNode()
@@ -59,11 +61,12 @@ public:
 
 	void subdivide()
 	{
-		assert(children[0] == NULL) ;
+		assert(!isSubdivided()) ;
 		for(unsigned int i = 0; i < 4; ++i)
 		{
 			children[i] = new QuadTreeNode() ;
 			children[i]->parent = this ;
+			children[i]->level = level + 1 ;
 		}
 	}
 
@@ -72,86 +75,63 @@ public:
 		return children[0] != NULL ;
 	}
 
-	void embed(typename PFP::MAP& map, Dart d, std::vector<unsigned int>& vID, CellMarker& cm, bool CCW)
+	template <typename PFP>
+	void embed(typename PFP::MAP& map, Dart d, std::vector<unsigned int>& vID)
 	{
+		assert(map.getCurrentLevel() == level) ;
+
 		if(isSubdivided())
 		{
-			Dart d0 = map.phi1(d) ;
-			Dart d1, d2 ;
-			if(CCW)
+			unsigned int v0 = vID[indices[0]] ;
+			unsigned int v1 = vID[indices[1]] ;
+//			unsigned int v2 = vID[indices[2]] ;
+
+			Dart it = d ;
+			do
 			{
-				d1 = map.phi_1(d) ;
-				d2 = d ;
-			}
-			else
-			{
-				d1 = d ;
-				d2 = map.phi_1(d) ;
-			}
+				Dart next = map.phi1(it) ;
+				unsigned int emb = map.getEmbedding(VERTEX, it) ;
+				unsigned int idx = emb == v0 ? 0 : emb == v1 ? 1 : 2 ;
+				map.incCurrentLevel() ;
+				Dart dd = map.phi1(next) ;
+				unsigned int oldEmb = map.getEmbedding(VERTEX, dd) ;
+				unsigned int newEmb = vID[children[0]->indices[idx]] ;
+				if(oldEmb == EMBNULL)
+				{
+					map.embedOrbit(VERTEX, dd, newEmb) ;
+					map.pushLevel() ;
+					for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
+					{
+						map.setCurrentLevel(i) ;
+						map.embedOrbit(VERTEX, dd, newEmb) ;
+					}
+					map.popLevel() ;
+				}
+				else
+					assert(oldEmb == newEmb) ;
+				map.decCurrentLevel() ;
+				it = next ;
+			} while(it != d) ;
+
 			map.incCurrentLevel() ;
-
-			unsigned int emb0 = vID[children[0]->indices[0]] ;
-			unsigned int e0 = map.getEmbedding(VERTEX, map.phi2(d0)) ;
-			if(!cm.isMarked(map.phi2(d0)))
-			{
-				assert(e0 == EMBNULL) ;
-				map.embedOrbit(VERTEX, map.phi2(d0), emb0) ;
-				cm.mark(map.phi2(d0)) ;
-			}
-			else
-				assert(e0 == emb0) ;
-
-			unsigned int emb1 = vID[children[0]->indices[1]] ;
-			unsigned int e1 = map.getEmbedding(VERTEX, map.phi2(d1)) ;
-			if(!cm.isMarked(map.phi2(d1)))
-			{
-				assert(e1 == EMBNULL) ;
-				map.embedOrbit(VERTEX, map.phi2(d1), emb1) ;
-				cm.mark(map.phi2(d1)) ;
-			}
-			else
-				assert(e1 == emb1) ;
-
-			unsigned int emb2 = vID[children[0]->indices[2]] ;
-			unsigned int e2 = map.getEmbedding(VERTEX, map.phi2(d2)) ;
-			if(!cm.isMarked(map.phi2(d2)))
-			{
-				assert(e2 == EMBNULL) ;
-				map.embedOrbit(VERTEX, map.phi2(d2), emb2) ;
-				cm.mark(map.phi2(d2)) ;
-			}
-			else
-				assert(e2 == emb2) ;
-
+			Dart d0 = map.phi2(map.phi1(d)) ;
+			children[0]->embed<PFP>(map, d0, vID) ;
 			map.decCurrentLevel() ;
 
-			Dart t0 = map.phi_1(d) ;
-			map.incCurrentLevel() ;
-			t0 = map.phi2(map.phi1(t0)) ;
-			children[0]->embed(map, t0, vID, cm, CCW) ;
-			map.decCurrentLevel() ;
-
-			Dart t1 = d ;
-			map.incCurrentLevel() ;
-			children[1]->embed(map, t1, vID, cm, !CCW) ;
-			map.decCurrentLevel() ;
-
-			Dart t2 = map.phi1(d) ;
-			map.incCurrentLevel() ;
-			t2 = map.phi1(t2) ;
-			children[2]->embed(map, t2, vID, cm, !CCW) ;
-			map.decCurrentLevel() ;
-
-			Dart t3 = map.phi_1(d) ;
-			map.incCurrentLevel() ;
-			t3 = map.phi_1(t3) ;
-			children[3]->embed(map, t3, vID, cm, !CCW) ;
-			map.decCurrentLevel() ;
+			do
+			{
+				unsigned int emb = map.getEmbedding(VERTEX, it) ;
+				unsigned int idx = emb == v0 ? 0 : emb == v1 ? 1 : 2 ;
+				map.incCurrentLevel() ;
+				children[idx+1]->embed<PFP>(map, it, vID) ;
+				map.decCurrentLevel() ;
+				it = map.phi1(it) ;
+			} while(it != d) ;
 		}
 		else
 		{
 			if(map.getCurrentLevel() < map.getMaxLevel())
-				std::cout << "adaptive !!!!!!!" << std::endl ;
+				std::cout << "adaptive subdivision not managed yet" << std::endl ;
 		}
 	}
 
@@ -164,18 +144,14 @@ public:
 				children[i]->print() ;
 		}
 	}
-
-	unsigned int indices[3] ;
-	QuadTreeNode* children[4] ;
-	QuadTreeNode* parent ;
 } ;
 
-template <typename PFP>
 class QuadTree
 {
 public:
-	std::vector<QuadTreeNode<PFP>*> roots ;
+	std::vector<QuadTreeNode*> roots ;
 	std::vector<Dart> darts ;
+	std::vector<unsigned int> verticesID ;
 
 	~QuadTree()
 	{
@@ -183,11 +159,11 @@ public:
 			delete roots[i] ;
 	}
 
-	void embed(typename PFP::MAP& map, std::vector<unsigned int>& vID)
+	template <typename PFP>
+	void embed(typename PFP::MAP& map)
 	{
-		CellMarker cm(map, VERTEX) ;
 		for(unsigned int i = 0; i < roots.size(); ++i)
-			roots[i]->embed(map, darts[i], vID, cm, true) ;
+			roots[i]->embed<PFP>(map, darts[i], verticesID) ;
 	}
 
 	void print()
@@ -200,6 +176,9 @@ public:
 		}
 	}
 } ;
+
+template <typename PFP>
+bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt) ;
 
 } // namespace Import
 

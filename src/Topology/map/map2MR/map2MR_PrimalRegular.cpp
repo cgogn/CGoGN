@@ -33,12 +33,6 @@ Map2MR_PrimalRegular::Map2MR_PrimalRegular() :
 	initMR() ;
 }
 
-bool Map2MR_PrimalRegular::isOddVertex(Dart d)
-{
-	assert(getDartLevel(d) <= getCurrentLevel() || !"isOddVertex : called with a dart inserted after current level") ;
-	return getDartLevel(d) == getCurrentLevel() ;
-}
-
 void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 {
 	pushLevel() ;
@@ -46,19 +40,19 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	addLevel() ;
 	setCurrentLevel(getMaxLevel()) ;
 
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-	{
-		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
-		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
-		if(!shareVertexEmbeddings)
-			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
-	}
+//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+//	{
+//		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
+//		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
+//		if(!shareVertexEmbeddings)
+//			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
+//	}
 
 	// cut edges
 	TraversorE<Map2MR_PrimalRegular> travE(*this) ;
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-		if(!shareVertexEmbeddings)
+		if(!shareVertexEmbeddings && embedNewVertices)
 		{
 			if(getEmbedding(VERTEX, d) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
@@ -67,8 +61,8 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		}
 
 		cutEdge(d) ;
-		travE.mark(d) ;
-		travE.mark(phi1(d)) ;
+		travE.skip(d) ;
+		travE.skip(phi1(d)) ;
 
 		if(embedNewVertices)
 			embedNewCell(VERTEX, phi1(d)) ;
@@ -91,19 +85,19 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 			Dart dd = phi1(old) ;
 			Dart e = phi1(phi1(dd)) ;
 			splitFace(dd, e) ;
-			travF.mark(dd) ;
+			travF.skip(dd) ;
 
 			dd = e ;
 			e = phi1(phi1(dd)) ;
 			splitFace(dd, e) ;
-			travF.mark(dd) ;
+			travF.skip(dd) ;
 
 			dd = e ;
 			e = phi1(phi1(dd)) ;
 			splitFace(dd, e) ;
-			travF.mark(dd) ;
+			travF.skip(dd) ;
 
-			travF.mark(e) ;
+			travF.skip(e) ;
 		}
 		else							// if subdividing a polygonal face
 		{
@@ -113,7 +107,7 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 
 			Dart ne = alpha1(dd) ;
 			cutEdge(ne) ;				// cut the new edge to insert the central vertex
-			travF.mark(dd) ;
+			travF.skip(dd) ;
 
 			if(embedNewVertices)
 				embedNewCell(VERTEX, phi1(ne)) ;
@@ -123,10 +117,10 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 			{							// linked to the central vertex
 				Dart tmp = phi1(ne) ;
 				splitFace(tmp, dd) ;
-				travF.mark(tmp) ;
+				travF.skip(tmp) ;
 				dd = phi1(phi1(dd)) ;
 			}
-			travF.mark(ne) ;
+			travF.skip(ne) ;
 		}
 	}
 
