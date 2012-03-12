@@ -818,7 +818,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 
 	buff = new char[31] ;
 	fp.read(buff, 31) ;
-	std::string tag(buff) ;
+	tag = std::string (buff) ;
 	delete[] buff ;
 	if (tag != std::string("format binary_little_endian 1.0")) // verify file type
 	{
