@@ -813,7 +813,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	fp.read(headerTab, CHNum) ;
 
 	std::stringstream header(headerTab) ;
-	std::cout << header.str() << std::endl ;
+	std::cout << std::string(headerTab) << std::endl ;
 
 	// Read quantities : #vertices, #faces, #properties, degree of polynomials
     std::string tag ;
