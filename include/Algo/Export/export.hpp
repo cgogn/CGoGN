@@ -575,7 +575,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 		 // coefficients
 		for (unsigned int channel = 0 ; channel < 3 ; ++channel)
 			for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-				out.write((char*)(&(coefs[vi][coefI])), sizeof(float)) ;
+				out.write((char*)(&(coefs[coefI][vi][channel])), sizeof(float)) ;
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();
