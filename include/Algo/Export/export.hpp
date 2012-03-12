@@ -455,6 +455,142 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 	return true ;
 }
 
+template <typename PFP>
+bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::TVEC3 TVEC3;
+	typedef typename PFP::REAL REAL;
+	typedef typename PFP::TREAL TREAL;
+
+	std::ofstream out(filename, std::ios::out | std::ios::binary) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+		return false ;
+	}
+
+	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
+
+
+	unsigned int nbDarts = map.getNbDarts() ;
+
+	std::vector<unsigned int> vertices;
+	std::vector<unsigned int> faces;
+
+	vertices.reserve(nbDarts/5);	// TODO non optimal reservation
+	faces.reserve(nbDarts/3);
+
+	CellMarker markV(map, VERTEX);
+	TraversorF<MAP> t(map, good) ;
+	unsigned int lab = 0;
+	unsigned int nbf = 0;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		std::vector<unsigned int> face ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
+		{
+			if (!markV.isMarked(it))
+			{
+				markV.mark(it);
+				tableVertLab[it] = lab++;
+				vertices.push_back(map.getEmbedding(VERTEX, it));
+			}
+			face.push_back(tableVertLab[it]);
+		}
+
+		faces.push_back(face.size()) ;
+		for (unsigned int i = 0 ; i < face.size() ; ++i)
+			faces.push_back(face.at(i)) ;
+
+		++nbf;
+	}
+
+	TVEC3 frame[3] ;
+	std::vector<TVEC3> coefs ;
+
+	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
+	frame[1] = map.template getAttribute<VEC3>(VERTEX, "frame_B") ;
+	frame[2] = map.template getAttribute<VEC3>(VERTEX, "frame_N") ;
+
+	unsigned int i = 0 ;
+	do {
+		std::stringstream name ;
+		name << "SLFcoefs_" << i++ ;
+		coefs.push_back(map.template getAttribute<VEC3>(VERTEX, name.str())) ;
+	} while (coefs[i-1].isValid()) ;
+	const unsigned int nbCoefs = i - 1 ; // last valid one is i-2
+
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		assert(coefs[coefI].isValid()) ;
+
+	std::string file(filename) ;
+	size_t pos = file.rfind(".") ; // position of "." in filename
+	std::string extension = file.substr(pos) ;
+
+	std::stringstream header ;
+	header << "ply" << std::endl ;
+	header << "format binary_little_endian 1.0" << std::endl ;
+	header << "comment ply SLF (K. Vanhoey generic format): SLF_" << ((extension == ".plyPTMext") ? "PTMext" : "SHreal") << std::endl ;
+	header << "element vertex " << vertices.size() << std::endl ;
+	header << "property float x" << std::endl ;
+	header << "property float y" << std::endl ;
+	header << "property float z" << std::endl ;
+	header << "property float tx" << std::endl ;
+	header << "property float ty" << std::endl ;
+	header << "property float tz" << std::endl ;
+	header << "property float bx" << std::endl ;
+	header << "property float by" << std::endl ;
+	header << "property float bz" << std::endl ;
+	header << "property float nx" << std::endl ;
+	header << "property float ny" << std::endl ;
+	header << "property float nz" << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		header << "property float C0_" << coefI << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		header << "property float C1_" << coefI << std::endl ;
+	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+		header << "property float C2_" << coefI << std::endl ;
+
+	header << "element face " << nbf << std::endl ;
+	header << "property list uchar int vertex_indices" << std::endl ;
+	header << "end_header" << std::endl ;
+
+	size_t nbCharsOfHeader = header.str().size() ;
+	out.write((char*)nbCharsOfHeader, sizeof(size_t)) ;
+	out.write((char*)(header.str().c_str()), nbCharsOfHeader*sizeof(char)) ;
+
+	for(unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		unsigned int vi = vertices[i];
+		 // position
+		for(unsigned int coord = 0 ; coord < 3 ; ++coord)
+			out.write((char*)(&(position[vi][coord])), sizeof(float)) ;
+		 // frame
+		for(unsigned int axis = 0 ; axis < 3 ; ++axis)
+			for (unsigned int coord = 0 ; coord < 3 ; ++coord)
+				out.write((char*)(&(frame[axis][vi][coord])), sizeof(float)) ;
+		 // coefficients
+		for (unsigned int channel = 0 ; channel < 3 ; ++channel)
+			for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
+				out.write((char*)(&(coefs[vi][coefI])), sizeof(float)) ;
+	}
+
+	std::vector<unsigned int>::iterator it = faces.begin();
+	while (it != faces.end())
+	{
+		unsigned int nbe = *it++;
+		out.write((char*)nbe, sizeof(unsigned int)) ;
+		for(unsigned int j = 0; j < nbe; ++j)
+			out.write((char*)(*it++), sizeof(unsigned int)) ;
+	}
+
+	out.close() ;
+	return true ;
+}
+
 
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good)
