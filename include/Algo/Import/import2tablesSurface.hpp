@@ -810,8 +810,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	fp.read((char*)&CHNum, sizeof(unsigned int)) ;
 
 	char* headerTab = new char[CHNum] ;
-	fp.read(headerTab, CHNum) ;
-	std::cout << headerTab[0] << std::endl ;
+	std::cout << fp.read(headerTab, CHNum) << std::endl ;
 
 	std::stringstream header(headerTab) ;
 	std::cout << std::string(headerTab) << std::endl ;
