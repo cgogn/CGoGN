@@ -514,10 +514,10 @@ void SimpleQT::cb_about()
    QMessageBox::about(this, tr("About App"), m_helpString.c_str());
 }
 
-void SimpleQT::snapshot(const QString& filename)
+void SimpleQT::snapshot(const QString& filename, const char* format, const int& quality)
 {
 	QImage im = m_glWidget->grabFrameBuffer(false);
-	im.save(filename);
+	im.save(filename, format, quality);
 }
 
 void SimpleQT::setGeometry(int x, int y, int w, int h)
