@@ -650,6 +650,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames)
 {
+	std::cout << "Import PlySLFASCII" << std::endl ;
 	// Open file
 	std::ifstream fp(filename.c_str(), std::ios::in) ;
 	if (!fp.good())
@@ -680,7 +681,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 	bool binormal = false ;
 	bool normal = false ;
 	unsigned int nbProps = 0 ;			// # properties
-	unsigned int nbCoefsPerPol = 0 ; 	// # coefficients per polynomial
+	unsigned int nbCoefs = 0 ; 	// # coefficients per polynomial
 	do // go to #faces and count #properties
 	{
 		fp >> tag ;
@@ -696,11 +697,11 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 		else if (tag == std::string("nx") || tag == std::string("ny") || tag == std::string("nz"))
 			normal = true ;
 		if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
-			++nbCoefsPerPol ;
+			++nbCoefs ;
 	} while (tag != std::string("face")) ;
 	unsigned int nbRemainders = nbProps ;		// # remaining properties
-	nbRemainders -= nbCoefsPerPol + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
-	nbCoefsPerPol /= 3 ;
+	nbRemainders -= nbCoefs + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
+	nbCoefs /= 3 ;
 
 	fp >> m_nbFaces ; // Read #vertices
 
@@ -723,8 +724,8 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
 
-	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefsPerPol] ;
-	for (unsigned int i = 0 ; i < nbCoefsPerPol ; ++i)
+	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefs] ;
+	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
 	{
 		std::stringstream name ;
 		name << "SLFcoefs_" << i ;
@@ -760,9 +761,9 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 			for (unsigned int l = 0 ; l < 3 ; ++l)
 				frame[k][id][l] = properties[3+(3*k+l)] ;
 		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
-			for (unsigned int l = 0 ; l < nbCoefsPerPol ; ++l)
-				SLFcoefs[l][id][k] = properties[12+(nbCoefsPerPol*k+l)] ;
-		unsigned int cur = 12+3*nbCoefsPerPol ;
+			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
+				SLFcoefs[l][id][k] = properties[12+(nbCoefs*k+l)] ;
+		unsigned int cur = 12+3*nbCoefs ;
 		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
 			remainders[k][id] = properties[cur + k] ;
 	}
@@ -826,7 +827,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	bool binormal = false ;
 	bool normal = false ;
 	unsigned int nbProps = 0 ;			// # properties
-	unsigned int nbCoefsPerPol = 0 ; 	// # coefficients per polynomial
+	unsigned int nbCoefs = 0 ; 	// # coefficients per polynomial
 	do // go to #faces and count #properties
 	{
 		fp >> tag ;
@@ -842,11 +843,11 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		else if (tag == std::string("nx") || tag == std::string("ny") || tag == std::string("nz"))
 			normal = true ;
 		if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
-			++nbCoefsPerPol ;
+			++nbCoefs ;
 	} while (tag != std::string("face")) ;
 	unsigned int nbRemainders = nbProps ;		// # remaining properties
-	nbRemainders -= nbCoefsPerPol + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
-	nbCoefsPerPol /= 3 ;
+	nbRemainders -= nbCoefs + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
+	nbCoefs /= 3 ;
 
 	fp >> m_nbFaces ; // Read #vertices
 
@@ -876,8 +877,8 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
 
-	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefsPerPol] ;
-	for (unsigned int i = 0 ; i < nbCoefsPerPol ; ++i)
+	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefs] ;
+	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
 	{
 		std::stringstream name ;
 		name << "SLFcoefs_" << i ;
@@ -905,17 +906,17 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		unsigned int id = container.insertLine() ;
 		verticesID.push_back(id) ;
 
-		for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
-			fp.read((char*)&(properties[j]),sizeof(float)) ;
+		// for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
+		fp.read((char*)properties,nbProps * sizeof(float)) ;
 
 		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
 		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
 			for (unsigned int l = 0 ; l < 3 ; ++l)
 				frame[k][id][l] = properties[3+(3*k+l)] ;
 		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
-			for (unsigned int l = 0 ; l < nbCoefsPerPol ; ++l)
-				SLFcoefs[l][id][k] = properties[12+(nbCoefsPerPol*k+l)] ;
-		unsigned int cur = 12+3*nbCoefsPerPol ;
+			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
+				SLFcoefs[l][id][k] = properties[12+(nbCoefs*k+l)] ;
+		unsigned int cur = 12+3*nbCoefs ;
 		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
 			remainders[k][id] = properties[cur + k] ;
 	}

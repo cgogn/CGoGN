@@ -473,7 +473,6 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 
 	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
 
-
 	unsigned int nbDarts = map.getNbDarts() ;
 
 	std::vector<unsigned int> vertices;
@@ -562,15 +561,24 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 		unsigned int vi = vertices[i];
 		 // position
 		for(unsigned int coord = 0 ; coord < 3 ; ++coord)
-			out.write((char*)(&(position[vi][coord])), sizeof(float)) ;
+		{
+			const float& floatofdouble = position[vi][coord] ;
+			out.write((char*)(&floatofdouble), sizeof(float)) ;
+		}
 		 // frame
 		for(unsigned int axis = 0 ; axis < 3 ; ++axis)
 			for (unsigned int coord = 0 ; coord < 3 ; ++coord)
-				out.write((char*)(&(frame[axis][vi][coord])), sizeof(float)) ;
+			{
+				const float& floatofdouble = frame[axis][vi][coord] ;
+				out.write((char*)(&floatofdouble), sizeof(float)) ;
+			}
 		 // coefficients
 		for (unsigned int channel = 0 ; channel < 3 ; ++channel)
 			for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-				out.write((char*)(&(coefs[coefI][vi][channel])), sizeof(float)) ;
+			{
+				const float& floatofdouble = coefs[coefI][vi][channel] ;
+				out.write((char*)(&floatofdouble), sizeof(float)) ;
+			}
 	}
 
 	std::vector<unsigned int>::iterator it = faces.begin();
