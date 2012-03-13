@@ -464,7 +464,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 	typedef typename PFP::REAL REAL;
 	typedef typename PFP::TREAL TREAL;
 
-	std::ofstream out(filename, std::ios::out | std::ios::binary) ;
+	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
 	{
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
@@ -530,41 +530,32 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 	size_t pos = file.rfind(".") ; // position of "." in filename
 	std::string extension = file.substr(pos) ;
 
-	std::string tmp ;
-	tmp = std::string("ply") ;
-	out.write(tmp.c_str(),tmp.length()*sizeof(char)) ;
-	tmp = std::string("format binary_little_endian 1.0") ;
-	out.write(tmp.c_str(),tmp.length()*sizeof(char)) ;
-
-	std::stringstream header ;
-	header << "comment ply SLF (K. Vanhoey generic format): SLF_" << ((extension == ".plyPTMext") ? "PTMext" : "SHreal") << std::endl ;
-	header << "element vertex " << vertices.size() << std::endl ;
-	header << "property float x" << std::endl ;
-	header << "property float y" << std::endl ;
-	header << "property float z" << std::endl ;
-	header << "property float tx" << std::endl ;
-	header << "property float ty" << std::endl ;
-	header << "property float tz" << std::endl ;
-	header << "property float bx" << std::endl ;
-	header << "property float by" << std::endl ;
-	header << "property float bz" << std::endl ;
-	header << "property float nx" << std::endl ;
-	header << "property float ny" << std::endl ;
-	header << "property float nz" << std::endl ;
+	out << "ply" << std::endl ;
+	out << "format ascii 1.0" << std::endl ;
+	out << "comment ply SLF (K. Vanhoey generic format): SLF_" << ((extension == ".plyPTMext") ? "PTMext" : "SHreal") << std::endl ;
+	out << "element vertex " << vertices.size() << std::endl ;
+	out << "property float x" << std::endl ;
+	out << "property float y" << std::endl ;
+	out << "property float z" << std::endl ;
+	out << "property float tx" << std::endl ;
+	out << "property float ty" << std::endl ;
+	out << "property float tz" << std::endl ;
+	out << "property float bx" << std::endl ;
+	out << "property float by" << std::endl ;
+	out << "property float bz" << std::endl ;
+	out << "property float nx" << std::endl ;
+	out << "property float ny" << std::endl ;
+	out << "property float nz" << std::endl ;
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-		header << "property float C0_" << coefI << std::endl ;
+		out << "property float C0_" << coefI << std::endl ;
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-		header << "property float C1_" << coefI << std::endl ;
+		out << "property float C1_" << coefI << std::endl ;
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
-		header << "property float C2_" << coefI << std::endl ;
+		out << "property float C2_" << coefI << std::endl ;
 
-	header << "element face " << nbf << std::endl ;
-	header << "property list uchar int vertex_indices" << std::endl ;
-	header << "end_header" << std::endl ;
-
-	size_t nbCharsOfHeader = header.str().size() ;
-	out.write((char*)&nbCharsOfHeader, sizeof(size_t)) ;
-	out.write((char*)(header.str().c_str()), nbCharsOfHeader*sizeof(char)) ;
+	out << "element face " << nbf << std::endl ;
+	out << "property list uchar int vertex_indices" << std::endl ;
+	out << "end_header" << std::endl ;
 
 	for(unsigned int i = 0; i < vertices.size(); ++i)
 	{

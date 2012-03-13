@@ -58,7 +58,6 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 	if ((filename.rfind(".plyptm")!=std::string::npos) || (filename.rfind(".PLYGEN")!=std::string::npos))
 		return ImportSurfacique::PLYPTM;
 
-
 	if ((filename.rfind(".plyPTMextBin")!=std::string::npos) || (filename.rfind(".plySHrealBin")!=std::string::npos))
 		return ImportSurfacique::PLYSLFgenericBin;
 
@@ -776,12 +775,12 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
 	{
 		// read the indices of vertices for current face
-		int nbEdgesForFace ;
+		unsigned int nbEdgesForFace ;
 		fp >> nbEdgesForFace ;
 		m_nbEdges.push_back(nbEdgesForFace);
 
-		int vertexID ;
-		for (int j=0 ; j < nbEdgesForFace ; ++j)
+		unsigned int vertexID ;
+		for (unsigned int j=0 ; j < nbEdgesForFace ; ++j)
 		{
 			fp >> vertexID ;
 			m_emb.push_back(verticesID[vertexID]);
@@ -805,45 +804,22 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		return false ;
 	}
 
-	// read "ply"
-	char* buff = new char[3] ;
-	fp.read(buff, 3) ;
-	std::string tag(buff) ;
-	delete[] buff ;
+	// Read quantities : #vertices, #faces, #properties, degree of polynomials
+    std::string tag ;
+
+    fp >> tag;
 	if (tag != std::string("ply")) // verify file type
 	{
 		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
 		return false ;
 	}
 
-	buff = new char[31] ;
-	fp.read(buff, 31) ;
-	tag = std::string (buff) ;
-	delete[] buff ;
-	if (tag != std::string("format binary_little_endian 1.0")) // verify file type
-	{
-		CGoGNerr << filename << " is not a little endian file !" <<  CGoGNout ;
-		return false ;
-	}
-
-	// read CHNum
-	unsigned int CHNum ;
-	fp.read((char*)&CHNum, sizeof(unsigned int)) ;
-
-	char* headerTab = new char[CHNum] ;
-	fp.read(headerTab, CHNum) ;
-
-	std::stringstream header(headerTab) ;
-	std::cout << std::string(headerTab) << std::endl ;
-
-	// Read quantities : #vertices, #faces, #properties, degree of polynomials
-
 	do // go to #vertices
 	{
-		header >> tag ;
+		fp >> tag ;
 	} while (tag != std::string("vertex")) ;
 	unsigned int nbVertices ;
-	header >> nbVertices ; // Read #vertices
+	fp >> nbVertices ; // Read #vertices
 
 	bool position = false ;
 	bool tangent = false ;
@@ -853,7 +829,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	unsigned int nbCoefsPerPol = 0 ; 	// # coefficients per polynomial
 	do // go to #faces and count #properties
 	{
-		header >> tag ;
+		fp >> tag ;
 		if (tag == std::string("property"))
 			++nbProps ;
 
@@ -872,14 +848,20 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	nbRemainders -= nbCoefsPerPol + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
 	nbCoefsPerPol /= 3 ;
 
-	header >> m_nbFaces ; // Read #vertices
+	fp >> m_nbFaces ; // Read #vertices
 
 	do // go to end of header
 	{
-		header >> tag ;
+		fp >> tag ;
 	} while (tag != std::string("end_header")) ;
 
-/*
+	char* endline = new char[1] ;
+	fp.read(endline, sizeof(char)) ;
+	if (*endline == '\r') // for windows
+		fp.read(endline, sizeof(char)) ;
+	assert(*endline == '\n') ;
+	delete endline ;
+
 	// Define containers
 	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 	if (!positions.isValid())
@@ -924,7 +906,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		verticesID.push_back(id) ;
 
 		for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
-			fp >> properties[j] ;
+			fp.read((char*)&(properties[j]),sizeof(float)) ;
 
 		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
 		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
@@ -946,21 +928,21 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
 	{
 		// read the indices of vertices for current face
-		int nbEdgesForFace ;
-		fp >> nbEdgesForFace ;
+		unsigned int nbEdgesForFace ;
+		fp.read((char*)&(nbEdgesForFace), sizeof(unsigned int)) ;
 		m_nbEdges.push_back(nbEdgesForFace);
 
-		int vertexID ;
-		for (int j=0 ; j < nbEdgesForFace ; ++j)
+		unsigned int vertexID ;
+		for (unsigned int j=0 ; j < nbEdgesForFace ; ++j)
 		{
-			fp >> vertexID ;
+			fp.read((char*)&vertexID, sizeof(unsigned int)) ;
 			m_emb.push_back(verticesID[vertexID]);
 		}
 	}
 
 	// Close file
 	fp.close() ;
-*/
+
 	return true ;
 }
 
