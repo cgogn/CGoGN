@@ -126,6 +126,8 @@ public:
 	*/
 	virtual void setNbBlocks(unsigned int nbb) = 0;
 
+	virtual unsigned int getNbBlocks() const = 0;
+
 	virtual void addBlocksBefore(unsigned int nbb) = 0;
 
 	virtual bool copy(const AttributeMultiVectorGen* atmvg) = 0;
@@ -243,6 +245,8 @@ public:
 	void addBlock();
 
 	void setNbBlocks(unsigned int nbb);
+
+	unsigned int getNbBlocks() const;
 
 	void addBlocksBefore(unsigned int nbb);
 
