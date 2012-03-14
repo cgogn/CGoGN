@@ -63,10 +63,6 @@ void Topo3Render::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& 
 template<typename PFP>
 void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
-//	Map3& map = dynamic_cast<Map3&>(mapx);
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -90,8 +86,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	CellMarker cmv(mapx,VOLUME);
 	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
 
-	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
-
+	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes, allDarts);
 
 	// debut phi1
 	AutoAttributeHandler<VEC3> fv1(mapx, DART);
@@ -118,7 +113,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	unsigned int posDBI=0;
 
 	// traverse each face of each volume
-	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),allDarts);
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
 		vecDartFaces.push_back(d);
@@ -157,22 +152,25 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 		float oke = 1.0f - ke;
 		for (unsigned int i = 0; i < nb; ++i)
 		{
-			VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
-			VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
+			if (good(d))
+			{
+				VEC3 P = vecPos[i]*ke + vecPos[i+1]*oke;
+				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*oke;
 
-			m_attIndex[d] = posDBI;
-			posDBI+=2;
+				m_attIndex[d] = posDBI;
+				posDBI+=2;
 
-			*positionDartBuf++ = P;
-			*positionDartBuf++ = Q;
-			*colorDartBuf++ = m_dartsColor;
-			*colorDartBuf++ = m_dartsColor;
+				*positionDartBuf++ = P;
+				*positionDartBuf++ = Q;
+				*colorDartBuf++ = m_dartsColor;
+				*colorDartBuf++ = m_dartsColor;
 
-			fv1[d] = P*0.1f + Q*0.9f;
-			fv11[d] = P*0.9f + Q*0.1f;
+				fv1[d] = P*0.1f + Q*0.9f;
+				fv11[d] = P*0.9f + Q*0.1f;
 
-			fv2[d] = P*0.52f + Q*0.48f;
-			fv2x[d] = P*0.48f + Q*0.52f;
+				fv2[d] = P*0.52f + Q*0.48f;
+				fv2x[d] = P*0.48f + Q*0.52f;
+			}
 
 			d = mapx.phi1(d);
 		}
@@ -184,25 +182,16 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	m_vbo4->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	// phi1
-	m_vbo1->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer1 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-	//phi2
-	m_vbo2->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer2 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	VEC3* positioniF1 = new VEC3[ 2*m_nbDarts];
+	VEC3* positioniF2 = new VEC3[ 2*m_nbDarts];
+	VEC3* positioniF3 = new VEC3[ 2*m_nbDarts];
 
-	//phi3
-	m_vbo3->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(typename PFP::VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer3 = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	VEC3* positionF1 = positioniF1;
+	VEC3* positionF2 = positioniF2;
+	VEC3* positionF3 = positioniF3;
 
-	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
-	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
-	VEC3* positionF3 = reinterpret_cast<VEC3*>(PositionBuffer3);
-
+	m_nbRel1=0;
 	m_nbRel2=0;
 	m_nbRel3=0;
 
@@ -212,7 +201,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 		do
 		{
 			Dart e = mapx.phi2(d);
-			if (d < e)
+			if ((d < e) && good(d) && good(e))
 			{
 				*positionF2++ = fv2[d];
 				*positionF2++ = fv2x[e];
@@ -221,7 +210,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 				m_nbRel2++;
 			}
 			e = mapx.phi3(d);
-			if (!mapx.isBoundaryMarked(e) && (d < e))
+			if (!mapx.isBoundaryMarked(e) && (d < e) && good(d) && good(e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
@@ -230,24 +219,28 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 				m_nbRel3++;
 			}
 			e = mapx.phi1(d);
-			*positionF1++ = fv1[d];
-			*positionF1++ = fv11[e];
-
+			if (good(d) && good(e))
+			{
+				*positionF1++ = fv1[d];
+				*positionF1++ = fv11[e];
+				m_nbRel1++;
+			}
 			d = mapx.phi1(d);
 		} while (d != *face );
 	}
 
 	m_vbo3->bind();
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, 4*m_nbRel3*sizeof(typename PFP::VEC3), positioniF3, GL_STREAM_DRAW);
 
 	m_vbo2->bind();
-	glUnmapBufferARB(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, 4*m_nbRel2*sizeof(typename PFP::VEC3), positioniF2, GL_STREAM_DRAW);
 
 	m_vbo1->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbRel1*sizeof(typename PFP::VEC3), positioniF1, GL_STREAM_DRAW);
 
-	m_vbo4->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	delete[] positioniF1;
+	delete[] positioniF2;
+	delete[] positioniF3;
 }
 
 
@@ -280,13 +273,41 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 			}
 			else
 			{
-				CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
+				CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
 				break;
 			}
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
+
+
+template<typename PFP>
+void Topo3Render::updateColors(typename PFP::MAP& map, const typename PFP::TVEC3& colors, const FunctorSelect& good)
+{
+	m_vbo4->bind();
+	Geom::Vec3f* colorBuffer =  reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	unsigned int nb=0;
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (good(d))
+		{
+			if (nb < m_nbDarts)
+			{
+				colorBuffer[m_attIndex[d]] = colors[d];
+				nb++;
+			}
+			else
+			{
+				CGoGNerr << "Error buffer too small for color picking (change the selector parameter ?)" << CGoGNendl;
+				break;
+			}
+		}
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
 
 template<typename PFP>
 Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good)
