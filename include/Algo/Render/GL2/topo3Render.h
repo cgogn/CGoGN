@@ -36,6 +36,7 @@
 #include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
+#include "Utils/svg.h"
 
 // forward
 namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
@@ -82,6 +83,11 @@ protected:
 	*number of darts to draw
 	*/
 	GLuint m_nbDarts;
+
+	/**
+	* number of relations 2 to draw
+	*/
+	GLuint m_nbRel1;
 
 	/**
 	* number of relations 2 to draw
@@ -266,8 +272,6 @@ public:
 	void dartToCol(Dart d, float& r, float& g, float& b);
 
 
-
-
 	/**
 	* update all drawing buffers to render a dual map
 	* @param map the map
@@ -280,6 +284,14 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
 
+	/**
+	* update color buffer with color attributte handler
+	* @param map the map
+	* @param good selector
+	* @param colors  attribute of dart's colors
+	*/
+	template<typename PFP>
+	void updateColors(typename PFP::MAP& map, const typename PFP::TVEC3& colors, const FunctorSelect& good = allDarts);
 
 	/**
 	 * Get back middle position of drawed darts
@@ -289,6 +301,17 @@ public:
 	 */
 	template<typename PFP>
 	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
+
+
+	/**
+	 * render to svg struct
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
+
+	/**
+	 * render svg into svg file
+	 */
+	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
 
 protected:
 	/**
@@ -301,7 +324,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateDataMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -313,7 +336,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataGMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateDataGMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
 
 };
 

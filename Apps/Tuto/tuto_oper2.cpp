@@ -149,6 +149,17 @@ void MyQT::operation(int x)
 			m_selected=NIL;
 		}
 		break;
+	case 9:
+		CGoGNout <<"delete face"<<CGoGNendl;
+		if (m_selected != NIL)
+		{
+			myMap.deleteFace(m_selected);
+			updateMap();
+			m_selected=NIL;
+			m_selected2=NIL;
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -325,6 +336,11 @@ void MyQT::cb_keyPress(int keycode)
 
 void MyQT::svg()
 {
+	if (m_selected!=NIL)
+		m_render_topo->setDartColor(m_selected,0.8f,0.0f,0.0f);
+	if (m_selected2!=NIL)
+		m_render_topo->setDartColor(m_selected2,0.0f,0.8f,0.0f);
+
 	std::string filename = selectFileSave("snapshot file", ".", "(*.svg)");
 	m_render_topo->svgout2D(filename, modelViewMatrix(),projectionMatrix());
 }

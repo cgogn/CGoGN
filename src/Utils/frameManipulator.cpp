@@ -865,7 +865,7 @@ float FrameManipulator::distanceFromMouse(int dx, int dy)
 float FrameManipulator::scaleFromMouse(int dx, int dy)
 {
 
-	if (fabs(dx) > fabs(dy))
+	if (abs(dx) > abs(dy))
 	{
 		if (dx>0)
 			return 1.01;

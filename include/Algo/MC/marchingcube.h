@@ -189,14 +189,7 @@ protected:
 
 	void setNeighbour(L_DART d1, L_DART d2);
 
-	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3) {
-		L_DART d = m_map->newFace(3);
-		//TODO change this which work only with 2-maps
-		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
-		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
-		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
-		return d;
-	}
+	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3);
 
 public:
 	/**
@@ -261,7 +254,7 @@ public:
 
 	void removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth);
 
-	void recalPoints();
+	void recalPoints(const Geom::Vec3f& origin);
 };
 
 
