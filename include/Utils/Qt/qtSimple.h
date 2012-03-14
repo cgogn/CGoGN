@@ -402,7 +402,7 @@ public:
 	 */
 	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
 
-	void snapshot(const QString& filename);
+	void snapshot(const QString& filename, const char* format = 0, const int& quality = -1);
 
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }
