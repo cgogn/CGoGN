@@ -146,8 +146,8 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 		}
 
 		cutEdge(d) ;
-		travE.mark(d) ;
-		travE.mark(phi1(d)) ;
+		travE.skip(d) ;
+		travE.skip(phi1(d)) ;
 
 // When importing MR files
 //		if(embedNewVertices)
@@ -165,19 +165,19 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 		Dart dd = phi1(old) ;
 		Dart e = phi1(phi1(dd)) ;
 		splitFace(dd, e) ;
-		travF.mark(dd) ;
+		travF.skip(dd) ;
 
 		dd = e ;
 		e = phi1(phi1(dd)) ;
 		splitFace(dd, e) ;
-		travF.mark(dd) ;
+		travF.skip(dd) ;
 
 		dd = e ;
 		e = phi1(phi1(dd)) ;
 		splitFace(dd, e) ;
-		travF.mark(dd) ;
+		travF.skip(dd) ;
 
-		travF.mark(e) ;
+		travF.skip(e) ;
 	}
 
 	//3. create inside volumes
@@ -308,8 +308,8 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		}
 
 		cutEdge(d) ;
-		travE.mark(d) ;
-		travE.mark(phi1(d)) ;
+		travE.skip(d) ;
+		travE.skip(phi1(d)) ;
 
 // When importing MR files  : activated for DEBUG
 		if(embedNewVertices)
@@ -330,7 +330,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 
 		Dart ne = phi2(phi_1(dd)) ;
 		cutEdge(ne) ;				// cut the new edge to insert the central vertex
-		travF.mark(dd) ;
+		travF.skip(dd) ;
 
 // When importing MR files : activated for DEBUG
 		if(embedNewVertices)
@@ -341,10 +341,10 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		{							// linked to the central vertex
 			Dart tmp = phi1(ne) ;
 			splitFace(tmp, dd) ;
-			travF.mark(tmp) ;
+			travF.skip(tmp) ;
 			dd = phi1(phi1(dd)) ;
 		}
-		travF.mark(ne) ;
+		travF.skip(ne) ;
 	}
 
 	//3. create inside volumes
@@ -359,7 +359,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		Traversor3WV<Map3MR_PrimalRegular> traWV(*this, dit);
 		for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 		{
-			setCurrentLevel(getMaxLevel()) ;
+			setCurrentLevel(getMaxLevel()) ;	//Utile ?
 
 			Dart e = ditWV;
 			std::vector<Dart> v ;
@@ -397,7 +397,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 				dd = phi1(phi1(dd)) ;
 			}
 
-			setCurrentLevel(getMaxLevel() - 1) ;
+			setCurrentLevel(getMaxLevel() - 1) ; //Utile ?
 		}
 
 		setCurrentLevel(getMaxLevel()) ;

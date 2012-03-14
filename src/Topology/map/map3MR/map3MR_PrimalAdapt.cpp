@@ -28,7 +28,7 @@ namespace CGoGN
 {
 
 Map3MR_PrimalAdapt::Map3MR_PrimalAdapt() :
-		shareVertexEmbeddings(false),
+		shareVertexEmbeddings(true),
 		vertexVertexFunctor(NULL),
 		edgeVertexFunctor(NULL),
 		faceVertexFunctor(NULL),
@@ -46,13 +46,13 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 		Dart d2 = phi2(d);
 		Dart e2 = phi2(e);
 
-		Map2::swapEdges(d,e);
+//		Map2::swapEdges(d,e);
 
-//		Map2::unsewFaces(d);
-//		Map2::unsewFaces(e);
-//
-//		Map2::sewFaces(d, e);
-//		Map2::sewFaces(d2, e2);
+		Map2::unsewFaces(d);
+		Map2::unsewFaces(e);
+
+		Map2::sewFaces(d, e);
+		Map2::sewFaces(d2, e2);
 
 		if(isOrbitEmbedded(VERTEX))
 		{
@@ -69,7 +69,108 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 
 		if(isOrbitEmbedded(VOLUME))
 			embedNewCell(VOLUME, d);
+
+
+		propagateDartRelation(d, m_phi2) ;
+		propagateDartRelation(d, m_phi3) ;
+		//propagateDartRelation(d2, m_phi2) ;
+		//propagateDartRelation(d2, m_phi3) ;
+		propagateDartRelation(e, m_phi2) ;
+		propagateDartRelation(e, m_phi3) ;
+		//propagateDartRelation(e2, m_phi2) ;
+		//propagateDartRelation(e2, m_phi3) ;
+
+		//propagateDartEmbedding(d, VERTEX);
+		//propagateDartEmbedding(d2, VERTEX);
+		//propagateDartEmbedding(e, VERTEX);
+		//propagateDartEmbedding(e2, VERTEX);
 	}
+}
+
+void Map3MR_PrimalAdapt::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
+{
+	std::vector<Dart> vd2 ;
+	vd2.reserve(vd.size());
+
+	// save the edge neighbors darts
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		vd2.push_back(phi2(*it));
+	}
+
+	assert(vd2.size() == vd.size());
+
+	Map2::splitSurface(vd, firstSideClosed, secondSideClosed);
+
+	// follow the edge path a second time to embed the vertex, edge and volume orbits
+	for(unsigned int i = 0; i < vd.size(); ++i)
+	{
+		Dart dit = vd[i];
+		Dart dit2 = vd2[i];
+
+//		propagateDartRelation(dit, m_phi1) ;
+//		propagateDartRelation(dit, m_phi_1) ;
+//		propagateDartRelation(dit, m_phi2) ;
+//
+//		propagateDartRelation(dit2, m_phi1) ;
+//		propagateDartRelation(dit2, m_phi_1) ;
+//		propagateDartRelation(dit2, m_phi2) ;
+
+		// embed the vertex embedded from the origin volume to the new darts
+		if(isOrbitEmbedded(VERTEX))
+		{
+			copyDartEmbedding(VERTEX, phi2(dit), phi1(dit));
+			copyDartEmbedding(VERTEX, phi2(dit2), phi1(dit2));
+		}
+	}
+
+}
+
+void Map3MR_PrimalAdapt::splitFaceInVolume(Dart d, Dart e)
+{
+	Dart dprev = phi_1(d) ;
+	Dart eprev = phi_1(e) ;
+	Map2::splitFace(d, e) ;
+	Dart dd = phi1(dprev) ;
+	Dart ee = phi1(eprev) ;
+
+	propagateDartRelation(d, m_phi_1) ;
+	propagateDartRelation(e, m_phi_1) ;
+	propagateDartRelation(dd, m_phi1) ;
+	propagateDartRelation(dd, m_phi_1) ;
+	propagateDartRelation(dd, m_phi2) ;
+	propagateDartRelation(ee, m_phi1) ;
+	propagateDartRelation(ee, m_phi_1) ;
+	propagateDartRelation(ee, m_phi2) ;
+	propagateDartRelation(dprev, m_phi1) ;
+	propagateDartRelation(eprev, m_phi1) ;
+
+	propagateDartEmbedding(dd, VERTEX) ;
+	propagateDartEmbedding(ee, VERTEX) ;
+}
+
+Dart Map3MR_PrimalAdapt::cutEdgeInVolume(Dart d)
+{
+	Dart dd = phi2(d) ;
+	Dart d1 = Map2::cutEdge(d) ;
+	Dart dd1 = phi1(dd) ;
+	Dart d11 = phi1(d1) ;
+	Dart dd11 = phi1(dd1) ;
+
+	propagateDartRelation(d, m_phi1) ;
+	propagateDartRelation(d, m_phi2) ;
+	propagateDartRelation(dd, m_phi1) ;
+	propagateDartRelation(dd, m_phi2) ;
+	propagateDartRelation(d1, m_phi1) ;
+	propagateDartRelation(d1, m_phi_1) ;
+	propagateDartRelation(d1, m_phi2) ;
+	propagateDartRelation(dd1, m_phi1) ;
+	propagateDartRelation(dd1, m_phi_1) ;
+	propagateDartRelation(dd1, m_phi2) ;
+	propagateDartRelation(d11, m_phi_1) ;
+	propagateDartRelation(dd11, m_phi_1) ;
+
+	return d1 ;
 }
 
 bool Map3MR_PrimalAdapt::isTetrahedron(Dart d)
@@ -93,43 +194,106 @@ bool Map3MR_PrimalAdapt::isTetrahedron(Dart d)
 	return true;
 }
 
-void Map3MR_PrimalAdapt::saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd)
+Dart Map3MR_PrimalAdapt::cutEdge(Dart d)
 {
-	assert(getDartLevel(d) <= getCurrentLevel() || !"saveRelationsAroundVertex : called with a dart inserted after current level") ;
+	Dart nd = EmbeddedMap3::cutEdge(d);
 
-	//le brin est forcement du niveau cur
-	Dart dit = d;
-
+	Dart it = d;
 	do
 	{
-		vd.push_back(std::pair<Dart,Dart>(dit,phi2(dit)));
+		Dart d1 = phi1(it);
+		Dart dd = phi2(d1) ;
+		Dart dd1 = phi1(dd) ;
+		Dart d11 = phi1(d1) ;
+		Dart dd11 = phi1(dd1) ;
 
-		dit = phi2(phi_1(dit));
+		propagateDartRelation(d, m_phi1) ;
+		propagateDartRelation(d, m_phi2) ;
+		propagateDartRelation(d, m_phi3) ;
+		propagateDartRelation(dd, m_phi1) ;
+		propagateDartRelation(dd, m_phi2) ;
+		propagateDartRelation(dd, m_phi3) ;
+		propagateDartRelation(d1, m_phi1) ;
+		propagateDartRelation(d1, m_phi_1) ;
+		propagateDartRelation(d1, m_phi2) ;
+		propagateDartRelation(d1, m_phi3) ;
+		propagateDartRelation(dd1, m_phi1) ;
+		propagateDartRelation(dd1, m_phi_1) ;
+		propagateDartRelation(dd1, m_phi2) ;
+		propagateDartRelation(dd1, m_phi3) ;
+		propagateDartRelation(d11, m_phi_1) ;
+		propagateDartRelation(dd11, m_phi_1) ;
 
-	}while(dit != d);
+		it = alpha2(it);
+	}while(it != d);
+
+	return nd;
 }
 
-void Map3MR_PrimalAdapt::unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd)
+void Map3MR_PrimalAdapt::splitFace(Dart d, Dart e)
 {
-	//unsew the edge path
-	for(std::vector<std::pair<Dart, Dart> >::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	Dart dprev = phi_1(d) ;
+	Dart eprev = phi_1(e) ;
+	EmbeddedMap3::splitFace(d,e);
+	Dart dd = phi1(dprev) ;
+	Dart ee = phi1(eprev) ;
+
+	propagateDartRelation(d, m_phi_1) ;
+	propagateDartRelation(e, m_phi_1) ;
+	propagateDartRelation(dd, m_phi1) ;
+	propagateDartRelation(dd, m_phi_1) ;
+	propagateDartRelation(dd, m_phi2) ;
+	propagateDartRelation(ee, m_phi1) ;
+	propagateDartRelation(ee, m_phi_1) ;
+	propagateDartRelation(ee, m_phi2) ;
+	propagateDartRelation(dprev, m_phi1) ;
+	propagateDartRelation(eprev, m_phi1) ;
+
+	propagateDartRelation(phi3(dprev), m_phi_1) ;
+	propagateDartRelation(phi3(eprev), m_phi_1) ;
+	propagateDartRelation(phi3(dd), m_phi1) ;
+	propagateDartRelation(phi3(dd), m_phi_1) ;
+	propagateDartRelation(phi3(dd), m_phi2) ;
+	propagateDartRelation(phi3(ee), m_phi1) ;
+	propagateDartRelation(phi3(ee), m_phi_1) ;
+	propagateDartRelation(phi3(ee), m_phi2) ;
+	propagateDartRelation(phi3(d), m_phi1) ;
+	propagateDartRelation(phi3(e), m_phi1) ;
+
+	propagateDartEmbedding(dd, VERTEX) ;
+	propagateDartEmbedding(ee, VERTEX) ;
+	propagateDartEmbedding(phi3(dd), VERTEX) ;
+	propagateDartEmbedding(phi3(ee), VERTEX) ;
+}
+
+void Map3MR_PrimalAdapt::splitVolume(std::vector<Dart>& vd)
+{
+	EmbeddedMap3::splitVolume(vd);
+
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
-		Dart dit = (*it).first;
-		Dart dit2 = (*it).second;
+		Dart dit = *it;
+		propagateDartRelation(dit, m_phi2) ;
 
-		Map2::unsewFaces(dit);
+		Dart dit2 = phi2(dit);
+		propagateDartRelation(dit2, m_phi1) ;
+		propagateDartRelation(dit2, m_phi_1) ;
+		propagateDartRelation(dit2, m_phi2) ;
+		propagateDartRelation(dit2, m_phi3) ;
 
-		if(isOrbitEmbedded(VERTEX))
-		{
-			copyDartEmbedding(VERTEX, phi2(dit2), dit);
-			copyDartEmbedding(VERTEX, phi2(dit), dit2);
-		}
+		Dart dit23 = phi3(dit2);
+		propagateDartRelation(dit23, m_phi1) ;
+		propagateDartRelation(dit23, m_phi_1) ;
+		propagateDartRelation(dit23, m_phi2) ;
+		propagateDartRelation(dit23, m_phi3) ;
 
-		if(isOrbitEmbedded(EDGE))
-		{
+		Dart dit232 = phi2(dit23);
+		propagateDartRelation(dit232, m_phi2) ;
 
-		}
+		propagateDartEmbedding(dit2, VERTEX) ;
+		propagateDartEmbedding(dit23, VERTEX) ;
 	}
+
 }
 
 /*! @name Cells informations
@@ -223,13 +387,29 @@ Dart Map3MR_PrimalAdapt::faceOldestDart(Dart d)
 {
 	assert(getDartLevel(d) <= getCurrentLevel() || !"faceOldestDart : called with a dart inserted after current level") ;
 
+//	Dart it = d ;
+//	Dart oldest = it ;
+//	unsigned int l_old = getDartLevel(oldest) ;
+//	do
+//	{
+//		unsigned int l = getDartLevel(it) ;
+//		if(l < l_old || (l == l_old && it < oldest))
+//		{
+//			oldest = it ;
+//			l_old = l ;
+//		}
+//		it = phi1(it) ;
+//	} while(it != d) ;
+//	return oldest ;
 	Dart it = d ;
 	Dart oldest = it ;
 	unsigned int l_old = getDartLevel(oldest) ;
 	do
 	{
 		unsigned int l = getDartLevel(it) ;
-		if(l < l_old || (l == l_old && it < oldest))
+		if(l == 0)
+			return it ;
+		if(l < l_old)
 		{
 			oldest = it ;
 			l_old = l ;
@@ -281,16 +461,31 @@ bool Map3MR_PrimalAdapt::faceIsSubdivided(Dart d)
 		return false ;
 
 	// a face whose level in the current level map is lower than
-	// the current level can not be subdivided to higher levels
+	// the current level can be subdivided to higher levels
 	unsigned int fLevel = faceLevel(d) ;
 	if(fLevel < getCurrentLevel())
 		return false ;
 
 	bool subd = false ;
-	incCurrentLevel() ;
-	if(getDartLevel(phi1(phi1(d))) == getCurrentLevel())
-		subd = true ;
-	decCurrentLevel() ;
+
+	//Une face dont toute les aretes sont subdivise mais pas la face elle meme renvoie false .. sinon c'est true
+	Dart dit = d;
+	bool edgesAreSubdivided = true;
+	do
+	{
+		edgesAreSubdivided &= edgeIsSubdivided(dit);
+		dit = phi1(dit);
+	}while(dit != d);
+
+	if(edgesAreSubdivided)
+	{
+		incCurrentLevel() ;
+		if(getDartLevel(phi1(phi1(d))) == getCurrentLevel())
+			subd = true ;
+		decCurrentLevel() ;
+	}
+	else
+		return false;
 
 	return subd ;
 }
@@ -324,8 +519,50 @@ bool Map3MR_PrimalAdapt::volumeIsSubdivided(Dart d)
  *************************************************************************/
 void Map3MR_PrimalAdapt::addNewLevel()
 {
-	addLevel();
+	//pushLevel() ;
+
+	addLevel() ;
+	//setCurrentLevel(getMaxLevel()) ;
+
+	//popLevel() ;
 }
+
+void Map3MR_PrimalAdapt::propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel)
+{
+	Dart dd = (*rel)[dartIndex(d)] ;
+	pushLevel() ;
+	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	{
+		setCurrentLevel(i) ;
+		(*rel)[dartIndex(d)] = dd ;
+	}
+	popLevel() ;
+}
+
+void Map3MR_PrimalAdapt::propagateDartEmbedding(Dart d, unsigned int orbit)
+{
+	unsigned int emb = getEmbedding(orbit, d) ;
+	pushLevel() ;
+	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	{
+		setCurrentLevel(i) ;
+		setDartEmbedding(orbit, d, emb) ;
+	}
+	popLevel() ;
+}
+
+void Map3MR_PrimalAdapt::propagateOrbitEmbedding(Dart d, unsigned int orbit)
+{
+	unsigned int emb = getEmbedding(orbit, d) ;
+	pushLevel() ;
+	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
+	{
+		setCurrentLevel(i) ;
+		embedOrbit(orbit, d, emb) ;
+	}
+	popLevel() ;
+}
+
 
 
 void Map3MR_PrimalAdapt::subdivideEdge(Dart d)
@@ -333,30 +570,40 @@ void Map3MR_PrimalAdapt::subdivideEdge(Dart d)
 	assert(getDartLevel(d) <= getCurrentLevel() || !"subdivideEdge : called with a dart inserted after current level") ;
 	assert(!edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
 
-	incCurrentLevel() ;
+	incCurrentLevel();
 
-	//Duplicate all darts around the edge
-	Dart dit = d;
-	do
-	{
-		duplicateDart(dit);
+	Dart d1 = cutEdge(d);
 
-		Dart dd = phi2(dit) ;
-		duplicateDart(dd) ;
-
-		Dart d1 = phi1(dit) ;
-		duplicateDart(d1) ;
-
-		Dart dd1 = phi1(dd) ;
-		duplicateDart(dd1) ;
-
-		dit = alpha2(dit);
-	}while(dit != d);
-
-	cutEdge(d) ;
-	(*edgeVertexFunctor)(phi1(d));
+	(*edgeVertexFunctor)(d1) ;
+	propagateOrbitEmbedding(d1, VERTEX);
 
 	decCurrentLevel() ;
+
+
+//	incCurrentLevel() ;
+//
+//	//Duplicate all darts around the edge
+//	Dart dit = d;
+//	do
+//	{
+//		duplicateDart(dit);
+//
+//		Dart dd = phi2(dit) ;
+//		duplicateDart(dd) ;
+//
+//		Dart d1 = phi1(dit) ;
+//		duplicateDart(d1) ;
+//
+//		Dart dd1 = phi1(dd) ;
+//		duplicateDart(dd1) ;
+//
+//		dit = alpha2(dit);
+//	}while(dit != d);
+//
+//	cutEdge(d) ;
+//	(*edgeVertexFunctor)(phi1(d));
+//
+//	decCurrentLevel() ;
 }
 
 void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
@@ -388,18 +635,21 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 		Dart dd = phi1(old) ;
 		Dart e = phi1(dd) ;
 		(*vertexVertexFunctor)(e) ;
+		propagateOrbitEmbedding(e, VERTEX) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
 		(*vertexVertexFunctor)(e) ;
+		propagateOrbitEmbedding(e, VERTEX) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
 		(*vertexVertexFunctor)(e) ;
+		propagateOrbitEmbedding(e, VERTEX) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 	}
@@ -408,6 +658,7 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 		Dart dd = phi1(old) ;
 		Dart next = phi1(dd) ;
 		(*vertexVertexFunctor)(next) ;
+		propagateOrbitEmbedding(next, VERTEX) ;
 		next = phi1(next) ;
 		splitFace(dd, next) ;			// insert a first edge
 		Dart ne = phi2(phi_1(dd));
@@ -416,16 +667,19 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 
 		dd = phi1(next) ;
 		(*vertexVertexFunctor)(dd) ;
+		propagateOrbitEmbedding(dd, VERTEX) ;
 		dd = phi1(dd) ;
 		while(dd != ne)					// turn around the face and insert new edges
 		{								// linked to the central vertex
 			splitFace(phi1(ne), dd) ;
 			dd = phi1(dd) ;
 			(*vertexVertexFunctor)(dd) ;
+			propagateOrbitEmbedding(dd, VERTEX) ;
 			dd = phi1(dd) ;
 		}
 
 		(*faceVertexFunctor)(phi2(ne)) ;
+		propagateOrbitEmbedding(phi2(ne), VERTEX) ;
 	}
 
 	popLevel() ;
@@ -439,99 +693,146 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 	unsigned int vLevel = volumeLevel(d);
 	Dart old = volumeOldestDart(d);
 
-	Traversor3WV<Map3MR_PrimalAdapt> traV(*this, old);
-
 	pushLevel() ;
-	setCurrentLevel(vLevel) ;		// go to the level of the face to subdivide its edges
+	setCurrentLevel(vLevel) ;		// go to the level of the volume to subdivide its faces
 
 	if(getCurrentLevel() == getMaxLevel())
 		addNewLevel() ;
 
 	//
-	// Subdivide Faces
+	// Subdivide Faces and Edges
 	//
-	std::vector<std::pair<Dart,Dart> > subdividedFaces;
-	subdividedFaces.reserve(128);
-
+	unsigned int j = 0;
 	Traversor3WF<Map3MR_PrimalAdapt> traF(*this, old);
 	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
 	{
+		std::cout << "CurrentLevel = " << getCurrentLevel() << std::endl;
+		std::cout << "d = " << dit << " is Subdivided ? " << faceIsSubdivided(dit) << std::endl;
+
 		//if needed subdivide face
 		if(!faceIsSubdivided(dit))
+		{
+			std::cout << "subdivide face = " << dit << std::endl;
 			subdivideFace(dit);
-
-		//save darts from the central vertex of each subdivided face
-		incCurrentLevel() ;
-		saveRelationsAroundVertex(phi2(phi1(dit)), subdividedFaces);
-		decCurrentLevel() ;
+			++j;
+		}
 	}
-
-	incCurrentLevel() ;
-	unsewAroundVertex(subdividedFaces);
-	decCurrentLevel() ;
+	std::cout << "nb subd faces = " << j << std::endl;
 
 	//
 	// Create inside volumes
 	//
 	Dart centralDart = NIL;
-	setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
-	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
+	std::vector<std::pair<Dart, Dart> > subdividedFaces;
+	subdividedFaces.reserve(128);
+	unsigned int i = 0;
+	Traversor3WV<Map3MR_PrimalAdapt> traWV(*this, old);
+	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 	{
-		Map2::fillHole(phi1(dit));
+		++i;
 
-		Dart old = phi2(phi1(dit));
-		Dart bc = newBoundaryCycle(faceDegree(old));
-		sewVolumes(old, bc, false);
+		std::cout << "get max Level then creating new volumes = " << getMaxLevel() << std::endl;
 
-		if (isOrbitEmbedded(VERTEX))
-		{
-			Dart it = bc;
-			do
-			{
-				copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
-				it = phi1(it) ;
-			} while(it != bc) ;
-		}
+		setCurrentLevel(getMaxLevel()) ;
+		Dart e = ditWV;
+		std::vector<Dart> v ;
 
-		Dart dd = phi1(phi1(old)) ;
-		splitFace(old,dd) ;
-
-		Dart ne = phi1(phi1(old)) ;
-
-		cutEdge(ne);
-		centralDart = phi1(ne);
-
-		Dart stop = phi2(phi1(ne));
-		ne = phi2(ne);
 		do
 		{
-			dd = phi1(phi1(phi1(ne)));
+			v.push_back(phi1(e));
+			v.push_back(phi1(phi1(e)));
 
-			splitFace(ne, dd) ;
+			if(!Map2::isBoundaryEdge(phi1(e)))
+				subdividedFaces.push_back(std::pair<Dart,Dart>(phi1(e),phi2(phi1(e))));
 
-			ne = phi2(phi_1(ne));
-			dd = phi1(phi1(dd));
+			if(!Map2::isBoundaryEdge(phi1(phi1(e))))
+				subdividedFaces.push_back(std::pair<Dart,Dart>(phi1(phi1(e)),phi2(phi1(phi1(e)))));
+
+			e = phi2(phi_1(e));
 		}
-		while(dd != stop);
+		while(e != ditWV);
+
+		splitSurfaceInVolume(v);
+
+		Dart dd = phi2(phi1(ditWV));
+		Dart next = phi1(phi1(dd)) ;
+		//Map2::splitFace(dd, next) ;
+		splitFaceInVolume(dd, next);
+
+		Dart ne = phi2(phi_1(dd));
+		//Map2::cutEdge(ne) ;
+		cutEdgeInVolume(ne);
+		centralDart = phi1(ne);
+
+		dd = phi1(phi1(next)) ;
+		while(dd != ne)
+		{
+			Dart tmp = phi1(ne) ;
+			//Map2::splitFace(tmp, dd) ;
+			splitFaceInVolume(tmp, dd);
+			dd = phi1(phi1(dd)) ;
+		}
+
+		setCurrentLevel(getMaxLevel() - 1) ;
 	}
 
-	//
-	// Sew inside volumes
-	//
+	std::cout << "nb Vertices incident to volume : " << i << std::endl;
+
+	setCurrentLevel(getMaxLevel()) ;
+	DartMarkerNoUnmark mf(*this);
+
+	std::cout << "subdFaces size = " << subdividedFaces.size() << std::endl;
 	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
 	{
 		Dart f1 = phi2((*it).first);
 		Dart f2 = phi2((*it).second);
 
-		if(isBoundaryFace(f1) && isBoundaryFace(f2))
+		//if(isBoundaryFace(f1) && isBoundaryFace(f2))
+		if(phi3(f1) == f1 && phi3(f2) == f2)
+		//if(!mf.isMarked(phi3(f1)) && !mf.isMarked(phi3(f2)))
 		{
-			std::cout << "plop" << std::endl;
 			sewVolumes(f1, f2, false);
+			mf.markOrbit(FACE, f1);
+
+			Dart temp = f1;
+			do
+			{
+				propagateDartRelation(temp, m_phi3) ;
+				propagateDartRelation(phi3(temp), m_phi3) ;
+				temp = phi1(temp);
+			}while(temp != f1);
 		}
 	}
 
 	(*volumeVertexFunctor)(centralDart) ;
-	popLevel() ;
+	embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+	propagateOrbitEmbedding(centralDart, VERTEX) ;
+
+
+	//A optimiser
+	setCurrentLevel(getMaxLevel()-1) ;
+	TraversorE<Map3MR_PrimalAdapt> travE2(*this);
+	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
+	{
+		setCurrentLevel(getMaxLevel()) ;
+		setCurrentLevel(getMaxLevel()-1) ;
+		embedOrbit(VERTEX, phi1(d), getEmbedding(VERTEX, phi1(d)));
+	}
+	setCurrentLevel(getMaxLevel()) ;
+
+	setCurrentLevel(getMaxLevel()-1) ;
+	TraversorF<Map3MR_PrimalAdapt> travF2(*this) ;
+	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
+	{
+		setCurrentLevel(getMaxLevel()) ;
+		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding(VERTEX, phi2(phi1(d))));
+		setCurrentLevel(getMaxLevel()-1) ;
+	}
+	setCurrentLevel(getMaxLevel()) ;
+
+	std::cout << std::endl;
+
+	popLevel();
 }
 
 void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
@@ -548,38 +849,36 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 	if(getCurrentLevel() == getMaxLevel())
 		addNewLevel() ;
 
-	//
-	// Subdivide Faces
-	//
-	std::vector<std::pair<Dart,Dart> > subdividedFaces;
-	subdividedFaces.reserve(128);
+	unsigned int j = 0;
 
+	//
+	// Subdivide Faces and Edges
+	//
 	Traversor3WF<Map3MR_PrimalAdapt> traF(*this, old);
 	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
 	{
+		std::cout << "CurrentLevel = " << getCurrentLevel() << std::endl;
+		std::cout << "face level = " << faceLevel(dit) << std::endl;
+		//std::cout << "d = " << dit << " is Subdivided ? " << faceIsSubdivided(dit) << std::endl;
+
 		//if needed subdivide face
 		if(!faceIsSubdivided(dit))
+		{
+			std::cout << "subdivide face = " << dit << std::endl;
 			subdivideFace(dit, S_TRI);
+			++j;
+		}
 	}
 
 	//
 	// Create inside volumes
 	//
 	Dart centralDart = NIL;
-
 	bool isNotTet = false;
 	Traversor3WV<Map3MR_PrimalAdapt> traV(*this, old);
-	setCurrentLevel(getMaxLevel()) ;
+	setCurrentLevel(vLevel + 1) ;
 	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
 	{
-//		//check if neighboring volumes have to be subdivided
-//		Traversor3VW<Map3MR_PrimalAdapt> traVN(*this, dit);
-//		for(Dart ditN = traVN.begin(); ditN != traVN.end(); ditN = traVN.next())
-//		{
-//			if(volumeLevel(ditN) == vLevel -1)
-//				std::cout << "to subdivide" << std::endl;//subdivideVolumeTetOcta(ditN);
-//		}
-
 		Dart f1 = phi1(dit);
 		Dart e = dit;
 		std::vector<Dart> v ;
@@ -590,6 +889,8 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 			e = phi2(phi_1(e));
 		}
 		while(e != dit);
+
+		std::cout << "v size = " << v.size() << std::endl;
 
 		splitVolume(v) ;
 
@@ -606,7 +907,8 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 
 			cutEdge(ne);
 			centralDart = phi1(ne);
-			(*volumeVertexFunctor)(centralDart) ;
+			//(*volumeVertexFunctor)(centralDart) ;
+			//propagateOrbitEmbedding(centralDart, VERTEX) ;
 
 			Dart stop = phi2(phi1(ne));
 			ne = phi2(ne);
@@ -626,13 +928,12 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 	//switch inner faces
 	if(isNotTet)
 	{
+		DartMarkerStore me(*this);
 
 		for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
 		{
 			Dart x = phi_1(phi2(phi1(dit)));
 			Dart f = x;
-
-			DartMarkerStore me(*this);
 
 			do
 			{
@@ -641,7 +942,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 				if(!me.isMarked(f3))
 				{
 					Dart tmp =  phi_1(phi2(phi_1(phi2(phi_1(f3))))); //future voisin par phi2
-					centralDart = tmp;
+					//centralDart = tmp;
 
 					Dart f32 = phi2(f3);
 					swapEdges(f3, tmp);
@@ -655,11 +956,211 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 		}
 
 		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
-
-		//(*volumeVertexFunctor)(centralDart) ;
+		(*volumeVertexFunctor)(centralDart) ;
+		propagateOrbitEmbedding(centralDart, VERTEX) ;
 	}
 
 	popLevel();
 }
 
+//void Map3MR_PrimalAdapt::subdivideVolumeTetOctaTemp(Dart d)
+//{
+//	assert(getDartLevel(d) <= getCurrentLevel() || !"subdivideVolumeTetOcta : called with a dart inserted after current level") ;
+//	assert(!volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
+//
+//	unsigned int vLevel = volumeLevel(d);
+//	Dart old = volumeOldestDart(d);
+//
+//	pushLevel() ;
+//	setCurrentLevel(vLevel) ;		// go to the level of the face to subdivide its edges
+//
+//	if(getCurrentLevel() == getMaxLevel())
+//		addNewLevel() ;
+//
+//	unsigned int j = 0;
+//
+//	//
+//	// Subdivide Faces and Edges
+//	//
+//	Traversor3WF<Map3MR_PrimalAdapt> traF(*this, old);
+//	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
+//	{
+//		std::cout << "CurrentLevel = " << getCurrentLevel() << std::endl;
+//		std::cout << "face level = " << faceLevel(dit) << std::endl;
+//
+//		//if needed subdivide face
+//		if(!faceIsSubdivided(dit))
+//		{
+//			std::cout << "subdivide face = " << dit << std::endl;
+//			subdivideFace(dit, S_TRI);
+//			++j;
+//		}
+//	}
+//
+//	//
+//	// Create inside volumes
+//	//
+//	Dart centralDart = NIL;
+//	bool isNotTet = false;
+//	Traversor3WV<Map3MR_PrimalAdapt> traV(*this, old);
+//	setCurrentLevel(vLevel + 1) ;
+//	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
+//	{
+//		Dart f1 = phi1(dit);
+//		Dart e = dit;
+//		std::vector<Dart> v ;
+//
+//		do
+//		{
+//			v.push_back(phi1(e));
+//			e = phi2(phi_1(e));
+//		}
+//		while(e != dit);
+//
+//		std::cout << "v size = " << v.size() << std::endl;
+//
+//	}
+//
+//
+//	popLevel();
+//}
+
 } //end namespace CGoGN
+
+
+//void Map3MR_PrimalAdapt::saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd)
+//{
+//	assert(getDartLevel(d) <= getCurrentLevel() || !"saveRelationsAroundVertex : called with a dart inserted after current level") ;
+//
+//	//le brin est forcement du niveau cur
+//	Dart dit = d;
+//
+//	do
+//	{
+//		vd.push_back(std::pair<Dart,Dart>(dit,phi2(dit)));
+//
+//		dit = phi2(phi_1(dit));
+//
+//	}while(dit != d);
+//}
+//
+//void Map3MR_PrimalAdapt::unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd)
+//{
+//	//unsew the edge path
+//	for(std::vector<std::pair<Dart, Dart> >::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//	{
+//		Dart dit = (*it).first;
+//		Dart dit2 = (*it).second;
+//
+//		Map2::unsewFaces(dit);
+//
+//		if(isOrbitEmbedded(VERTEX))
+//		{
+//			copyDartEmbedding(VERTEX, phi2(dit2), dit);
+//			copyDartEmbedding(VERTEX, phi2(dit), dit2);
+//		}
+//
+//		if(isOrbitEmbedded(EDGE))
+//		{
+//
+//		}
+//	}
+//}
+//	unsigned int vLevel = volumeLevel(d);
+//	Dart old = volumeOldestDart(d);
+//
+//	Traversor3WV<Map3MR_PrimalAdapt> traV(*this, old);
+//
+//	pushLevel() ;
+//	setCurrentLevel(vLevel) ;		// go to the level of the face to subdivide its edges
+//
+//	if(getCurrentLevel() == getMaxLevel())
+//		addNewLevel() ;
+//
+//	//
+//	// Subdivide Faces
+//	//
+//	std::vector<std::pair<Dart,Dart> > subdividedFaces;
+//	subdividedFaces.reserve(128);
+//
+//	Traversor3WF<Map3MR_PrimalAdapt> traF(*this, old);
+//	for(Dart dit = traF.begin(); dit != traF.end(); dit = traF.next())
+//	{
+//		//if needed subdivide face
+//		if(!faceIsSubdivided(dit))
+//			subdivideFace(dit);
+//
+//		//save darts from the central vertex of each subdivided face
+//		incCurrentLevel() ;
+//		saveRelationsAroundVertex(phi2(phi1(dit)), subdividedFaces);
+//		decCurrentLevel() ;
+//	}
+//
+//	incCurrentLevel() ;
+//	unsewAroundVertex(subdividedFaces);
+//	decCurrentLevel() ;
+//
+//	//
+//	// Create inside volumes
+//	//
+//	Dart centralDart = NIL;
+//	setCurrentLevel(vLevel + 1) ; // go to the next level to perform volume subdivision
+//	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
+//	{
+//		Map2::fillHole(phi1(dit));
+//
+//		Dart old = phi2(phi1(dit));
+//		Dart bc = newBoundaryCycle(faceDegree(old));
+//		sewVolumes(old, bc, false);
+//
+//		if (isOrbitEmbedded(VERTEX))
+//		{
+//			Dart it = bc;
+//			do
+//			{
+//				copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
+//				it = phi1(it) ;
+//			} while(it != bc) ;
+//		}
+//
+//		Dart dd = phi1(phi1(old)) ;
+//		splitFace(old,dd) ;
+//
+//		Dart ne = phi1(phi1(old)) ;
+//
+//		cutEdge(ne);
+//		centralDart = phi1(ne);
+//
+//		Dart stop = phi2(phi1(ne));
+//		ne = phi2(ne);
+//		do
+//		{
+//			dd = phi1(phi1(phi1(ne)));
+//
+//			splitFace(ne, dd) ;
+//
+//			ne = phi2(phi_1(ne));
+//			dd = phi1(phi1(dd));
+//		}
+//		while(dd != stop);
+//	}
+//
+//	//
+//	// Sew inside volumes
+//	//
+//	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+//	{
+//		Dart f1 = phi2((*it).first);
+//		Dart f2 = phi2((*it).second);
+//
+//		if(isBoundaryFace(f1) && isBoundaryFace(f2))
+//		{
+//			std::cout << "plop" << std::endl;
+//			sewVolumes(f1, f2, false);
+//		}
+//	}
+//
+//	(*volumeVertexFunctor)(centralDart) ;
+//	popLevel() ;
+
+

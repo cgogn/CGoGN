@@ -302,8 +302,8 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		attributs[e] += attributs[f];
 		attributs[e] *= 0.5;
 
-		travE.mark(d) ;
-		travE.mark(e) ;
+		travE.skip(d) ;
+		travE.skip(e) ;
 	}
 
 	//2. split faces - quadrangule faces
@@ -318,7 +318,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 
 		Dart ne = map.phi2(map.phi_1(dd)) ;
 		map.cutEdge(ne) ;
-		travF.mark(dd) ;
+		travF.skip(dd) ;
 
 		attributs[map.phi1(ne)] = center;
 
@@ -327,11 +327,11 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		{
 			Dart tmp = map.phi1(ne) ;
 			map.splitFace(tmp, dd) ;
-			travF.mark(tmp) ;
+			travF.skip(tmp) ;
 			dd = map.phi1(map.phi1(dd)) ;
 		}
 
-		travF.mark(ne) ;
+		travF.skip(ne) ;
 	}
 
 	//3. create inside volumes

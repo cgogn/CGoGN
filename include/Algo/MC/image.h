@@ -30,7 +30,9 @@
 
 #include "Utils/img3D_IO.h"
 
+#ifdef WITH_ZINRI
 #include "Zinrimage.h"
+#endif
 
 namespace CGoGN
 {
@@ -121,11 +123,12 @@ protected:
 	*/
 	//bool correct(const gmtl::Vec3i& _V);
 
+#ifdef WITH_ZINRI
 	/**
 	 * internal inrimage prt
 	 */
 	PTRINRIMAGE mImage;
-
+#endif
 
 public:
 

@@ -35,7 +35,7 @@ inline GMap1::GMap1() : GMap0()
 	init() ;
 }
 
-inline std::string GMap1::mapTypeName()
+inline std::string GMap1::mapTypeName() const
 {
 	return "GMap1";
 }

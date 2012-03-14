@@ -38,7 +38,7 @@ inline Map1::Map1() : AttribMap()
 	init() ;
 }
 
-inline std::string Map1::mapTypeName()
+inline std::string Map1::mapTypeName() const
 {
 	return "Map1" ;
 }

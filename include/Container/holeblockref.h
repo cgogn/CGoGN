@@ -27,6 +27,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <assert.h>
 
 #include "Container/sizeblock.h"
 
@@ -49,7 +50,7 @@ protected:
 	unsigned int m_nbref;
 
 	/**
-	* nb element in block
+	* nb elements in block
 	*/
 	unsigned int m_nb;
 
@@ -58,6 +59,11 @@ public:
 	* constructor
 	*/
 	HoleBlockRef();
+
+	/**
+	 * copy constructor
+	 */
+	HoleBlockRef(const HoleBlockRef& hb);
 
 	/**
 	* destructor
@@ -149,6 +155,7 @@ public:
 	*/
 	inline bool unref(unsigned int i)
 	{
+//		assert(m_refCount[i] > 1);
 		m_refCount[i]--;
 		if (m_refCount[i] == 1)
 		{
@@ -165,7 +172,7 @@ public:
 
 	/**
 	* number of references of element i
-	* @return the number of references (0 = no elements)
+	* @return the number of references +1 (stored as n+1, 0 = not used, 1 used but not refs, ...)
 	*/
 	inline unsigned int nbRefs(unsigned int i) { return m_refCount[i]; }
 

@@ -69,7 +69,7 @@ public:
 
 	Map3();
 
-	virtual std::string mapTypeName();
+	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension();
 

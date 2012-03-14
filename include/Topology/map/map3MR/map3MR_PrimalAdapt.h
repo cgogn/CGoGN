@@ -72,6 +72,12 @@ public:
 	 */
 	bool isTetrahedron(Dart d);
 
+	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
+	Dart cutEdgeInVolume(Dart d);
+	void splitFaceInVolume(Dart d, Dart e);
+
+	void splitVolume(std::vector<Dart>& vd);
+
 	//!
 	/*!
 	 */
@@ -81,6 +87,9 @@ public:
 	/*!
 	 */
 	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
+
+	Dart cutEdge(Dart d) ;
+	void splitFace(Dart d, Dart e) ;
 	//@}
 
 	/*! @name Cells informations
@@ -141,6 +150,10 @@ protected:
 	 */
 	void addNewLevel() ;
 
+	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
+	void propagateDartEmbedding(Dart d, unsigned int orbit) ;
+	void propagateOrbitEmbedding(Dart d, unsigned int orbit) ;
+
 	//! Subdivide the edge of d to the next level
 	/*! @param d Dart from the edge
 	 */
@@ -161,6 +174,8 @@ public:
 	/*! @param d Dart from the volume
 	 */
 	void subdivideVolumeTetOcta(Dart d) ;
+
+	void subdivideVolumeTetOctaTemp(Dart d);
 	//@}
 
 	/*! @name Vertices Attributes management
