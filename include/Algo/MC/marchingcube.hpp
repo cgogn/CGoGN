@@ -100,6 +100,29 @@ void MarchingCube<DataType, Windowing, PFP>::deleteMesh()
 	}
 }
 
+
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3)
+{
+	L_DART d = m_map->newFace(3,false);
+	//TODO change this which work only with 2-maps
+//		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
+//		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
+//		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
+		
+		FunctorSetEmb<GenericMap> fsetemb(*m_map, VERTEX, e1);
+		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		d = m_map->phi1(d);
+		fsetemb.changeEmb(e2);
+		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		d = m_map->phi1(d);
+		fsetemb.changeEmb(e3);
+		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		d = m_map->phi1(d);
+
+	return d;
+}
+
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 {
@@ -948,14 +971,14 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 void MarchingCube<DataType, Windowing, PFP>::setNeighbourSimple(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
-		m_map->sewFaces(d1,d2);
+		m_map->sewFaces(d1,d2,false);
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
-		m_map->sewFaces(d1,d2);
+		m_map->sewFaces(d1,d2,false);
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
