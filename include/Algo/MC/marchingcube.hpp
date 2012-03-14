@@ -100,6 +100,29 @@ void MarchingCube<DataType, Windowing, PFP>::deleteMesh()
 	}
 }
 
+
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3)
+{
+	L_DART d = m_map->newFace(3,false);
+	//TODO change this which work only with 2-maps
+//		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
+//		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
+//		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
+		
+		FunctorSetEmb<GenericMap> fsetemb(*m_map, VERTEX, e1);
+		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		d = m_map->phi1(d);
+		fsetemb.changeEmb(e2);
+		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		d = m_map->phi1(d);
+		fsetemb.changeEmb(e3);
+		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		d = m_map->phi1(d);
+
+	return d;
+}
+
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 {
@@ -120,7 +143,7 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 
 	// compute value to transform points directly to final system coordinate
 
-//	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));
+	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));
 
 	m_fScal[0] = m_Image->getVoxSizeX();
 	m_fScal[1] = m_Image->getVoxSizeY();
@@ -483,7 +506,9 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const 
 
 	unsigned int  lVertTable[12];
 
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+//	typename PFP::VEC3 vPos(float(_lX) , float(_lY) , float(_lZ) );
+//	typename PFP::VEC3 vPos(float(_lX) + 0.5f, float(_lY) + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 
@@ -545,8 +570,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -603,8 +627,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -659,8 +682,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -718,8 +740,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -775,8 +796,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -837,8 +857,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -899,8 +918,7 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const 
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -953,14 +971,14 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 void MarchingCube<DataType, Windowing, PFP>::setNeighbourSimple(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
-		m_map->sewFaces(d1,d2);
+		m_map->sewFaces(d1,d2,false);
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
-		m_map->sewFaces(d1,d2);
+		m_map->sewFaces(d1,d2,false);
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
@@ -1241,7 +1259,7 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::recalPoints()
+void MarchingCube<DataType, Windowing, PFP>::recalPoints(const Geom::Vec3f& origin)
 {
 
 	for(unsigned int i=m_positions.begin(); i != m_positions.end(); m_positions.next(i))
@@ -1251,7 +1269,7 @@ void MarchingCube<DataType, Windowing, PFP>::recalPoints()
 		P[0] = P[0] * m_fScal[0];
 		P[1] = P[1] * m_fScal[1];
 		P[2] = P[2] * m_fScal[2];
-
+		P+=origin;
 	}
 }
 

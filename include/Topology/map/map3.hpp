@@ -35,7 +35,7 @@ inline Map3::Map3() : Map2()
 	init() ;
 }
 
-inline std::string Map3::mapTypeName()
+inline std::string Map3::mapTypeName() const
 {
 	return "Map3";
 }

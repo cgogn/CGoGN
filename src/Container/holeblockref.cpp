@@ -43,8 +43,22 @@ namespace CGoGN
 HoleBlockRef::HoleBlockRef():
 m_nbfree(0),m_nbref(0),m_nb(0)
 {
-	m_tableFree = new unsigned int[_BLOCKSIZE_];
+	m_tableFree = new unsigned int[_BLOCKSIZE_ + 10];
 	m_refCount = new unsigned int[_BLOCKSIZE_];
+}
+
+HoleBlockRef::HoleBlockRef(const HoleBlockRef& hb)
+{
+	m_nbfree = hb.m_nbfree;
+	m_nbref = hb.m_nbref;
+	m_nb = hb.m_nb;
+
+	m_tableFree = new unsigned int[_BLOCKSIZE_ +10];
+	memcpy(m_tableFree, hb.m_tableFree, (_BLOCKSIZE_+ 10) * sizeof(unsigned int));
+
+	m_refCount = new unsigned int[_BLOCKSIZE_];
+	memcpy(m_refCount, hb.m_refCount, _BLOCKSIZE_ * sizeof(unsigned int));
+
 }
 
 HoleBlockRef::~HoleBlockRef()

@@ -156,10 +156,12 @@ public:
 //};
 
 
-
+class AnimatedSVGOut;
 
 class SVGOut
 {
+	friend class AnimatedSVGOut;
+
 protected:
 	std::ofstream* m_out;
 
@@ -173,6 +175,7 @@ protected:
 	std::vector<SvgObj*> m_objs;
 	SvgObj* m_current;
 
+	std::vector<float> m_opacities_animations;
 
 	unsigned int m_bbX0;
 	unsigned int m_bbY0;
@@ -193,6 +196,14 @@ public:
 	 * @param proj the projection matrix
 	 */
 	SVGOut(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
+	/**
+	 * Object that allow the rendering/exporting in svg file
+	 * no file parameter for use in animateSVG
+	 * @param model the modelview matrix
+	 * @param proj the projection matrix
+	 */
+	SVGOut(const glm::mat4& model, const glm::mat4& proj);
 
 	/**
 	 * destructor
@@ -226,9 +237,25 @@ public:
 
 	void sortSimpleDepth( std::vector<DepthSort>& vds);
 
+	void addOpacityAnimation(float val) { m_opacities_animations.push_back(val);}
+	void clearpacityAnimation()  { m_opacities_animations.clear();}
+
+	static void animateSVG(const std::string& filename, const std::vector<SVGOut*>& outs, float timestep);
+
 };
 
+class AnimatedSVGOut
+{
+protected:
+	std::vector<SVGOut*> m_svgs;
 
+public:
+
+	void write(const std::string& filename, float timeStep);
+
+	void add(SVGOut* svg);
+
+};
 
 
 } // namespace SVG

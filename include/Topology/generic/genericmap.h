@@ -150,7 +150,7 @@ public:
 
 	~GenericMap() ;
 
-	virtual std::string mapTypeName() = 0 ;
+	virtual std::string mapTypeName() const = 0 ;
 
 	/**
 	 * Clear the map
@@ -502,6 +502,11 @@ public:
 	 * @return true if OK
 	 */
 	bool loadMapBin(const std::string& filename) ;
+
+	/**
+	 * copy from another map (of same type)
+	 */
+	bool copyFrom(const GenericMap& map);
 
 	/**
 	 * Dump attributes types and names per orbit

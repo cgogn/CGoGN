@@ -578,6 +578,45 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	return true;
 }
 
+
+
+bool GenericMap::copyFrom(const GenericMap& map)
+{
+	if (mapTypeName() != map.mapTypeName())
+	{
+		CGoGNerr <<"try to copy from incompatible type map" << CGoGNendl;
+		return false;
+	}
+
+	GenericMap::clear(true);
+
+
+
+	// load attrib container
+	for (unsigned int i = 0; i < NB_ORBITS; ++i)
+		m_attribs[i].copyFrom(map.m_attribs[i]);
+
+	if (m_isMultiRes)
+	{
+		m_mrattribs.copyFrom(map.m_mrattribs);
+		m_mrCurrentLevel = map.m_mrCurrentLevel;
+
+		unsigned int nb= map.m_mrNbDarts.size();
+		m_mrNbDarts.resize(nb);
+		for (unsigned int i=0; i<nb; ++i)
+			m_mrNbDarts[i] = map.m_mrNbDarts[i];
+	}
+
+
+	// retrieve m_embeddings (from m_attribs)
+	update_m_emb_afterLoad();
+
+	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
+	update_topo_shortcuts();
+
+	return true;
+}
+
 void GenericMap::update_m_emb_afterLoad()
 {
 	// get container of dart orbit
