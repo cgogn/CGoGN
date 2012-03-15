@@ -38,7 +38,38 @@ template <typename PFP>
 void featureEdgeDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& featureEdge) ;
 
 template <typename PFP>
+void computeArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& area, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
+void computeFaceGradient(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_gradient, const typename PFP::TVEC3& face_normal, const typename PFP::TREAL& kmax, const typename PFP::TREAL& area, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
+void computeGradient(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& gradient, typename PFP::TVEC3& face_gradient, const typename PFP::TREAL& area, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
+void computeTriangleType(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
+void computeCurvatureSign(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, typename PFP::TVEC3& k, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
 std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
+
+template <typename PFP>
+typename PFP::TREAL faceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+
+template <typename PFP>
+typename PFP::VEC3 faceGradient(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::TVEC3& face_normal, const typename PFP::TREAL& kmax, const typename PFP::TREAL& area) ;
+
+template <typename PFP>
+typename PFP::VEC3 triangleType(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+
+bool isInSameOctant(const typename PFP::TVEC3& pos1, const typename PFP::TVEC3& pos2) ;
+
+void curvatureSign(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, typename PFP::TVEC3& k) ;
+
+template <typename PFP>
+typename PFP::TVEC3 vertexGradient(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::TVEC3& face_gradient, const typename PFP::TREAL& area) ;
 
 } // namespace Geometry
 
