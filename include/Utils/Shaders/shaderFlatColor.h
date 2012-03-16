@@ -34,7 +34,7 @@ namespace CGoGN
 namespace Utils
 {
 
-class ShaderFlatColorPerFace : public GLSLShader
+class ShaderFlatColor : public GLSLShader
 {
 protected:
 	// shader sources
@@ -59,7 +59,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderFlatColorPerFace();
+	ShaderFlatColor(bool averageColor=false);
 
 	void setExplode(float explode);
 

@@ -690,4 +690,57 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 	return true;
 }
 
+
+void  AttributeContainer::copyFrom(const AttributeContainer& cont)
+{
+// 	clear is done from the map
+
+	m_size = cont.m_size;
+	m_maxSize = cont.m_maxSize;
+	m_orbit = cont.m_orbit;
+	m_nbUnknown = cont.m_nbUnknown;
+	m_nbAttributes = cont.m_nbAttributes;
+	m_lineCost = cont.m_lineCost;
+
+	// blocks
+	unsigned int sz = cont.m_holesBlocks.size();
+	m_holesBlocks.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_holesBlocks[i] = new HoleBlockRef(*(cont.m_holesBlocks[i]));
+
+	// blocks with free
+	sz = cont.m_tableBlocksWithFree.size();
+	m_tableBlocksWithFree.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_tableBlocksWithFree[i] = cont.m_tableBlocksWithFree[i];
+
+	// empty blocks
+	sz = cont.m_tableBlocksEmpty.size();
+	m_tableBlocksEmpty.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_tableBlocksEmpty[i] = cont.m_tableBlocksEmpty[i];
+
+	//attributes (warning attribute can have different numbers than in original)
+	m_tableAttribs.reserve(m_nbAttributes);
+	sz = cont.m_tableAttribs.size();
+	for (unsigned int i = 0; i < sz; ++i)
+	{
+		if (cont.m_tableAttribs[i] != NULL)
+		{
+			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
+			ptr->setName(cont.m_tableAttribs[i]->getName());
+			ptr->setOrbit(cont.m_tableAttribs[i]->getIndex());
+			ptr->setIndex(m_tableAttribs.size());
+			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+			ptr->copy(cont.m_tableAttribs[i]);
+			if (cont.m_tableAttribs[i]->toProcess())
+				ptr->toggleProcess();
+			else
+				ptr->toggleNoProcess();
+			m_tableAttribs.push_back(ptr);
+		}
+	}
+}
+
+
 }

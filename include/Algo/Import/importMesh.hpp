@@ -121,15 +121,14 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 	if (nbBoundaryEdges > 0)
 	{
-		map.closeMap();
-		CGoGNout << "Map closed (" << nbBoundaryEdges << " boundary edges)" << CGoGNendl;
+		unsigned int nbH = map.closeMap();
+		CGoGNout << "Map closed (" << nbBoundaryEdges << " boundary edges / " << nbH << " holes)" << CGoGNendl;
 		// ensure bijection between topo and embedding
 		map.bijectiveOrbitEmbedding(VERTEX);
 	}
 
 	return true ;
 }
-
 
 template <typename PFP>
 bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float dist)

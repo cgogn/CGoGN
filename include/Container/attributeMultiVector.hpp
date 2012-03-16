@@ -132,7 +132,9 @@ AttributeMultiVector<T>::~AttributeMultiVector()
 template <typename T>
 inline AttributeMultiVectorGen* AttributeMultiVector<T>::new_obj()
 {
-	return new AttributeMultiVector<T>;
+	AttributeMultiVectorGen* ptr = new AttributeMultiVector<T>;
+	ptr->setTypeName(m_typeName);
+	return ptr;
 }
 
 /**************************************
@@ -164,6 +166,12 @@ void AttributeMultiVector<T>::setNbBlocks(unsigned int nbb)
 			delete[] m_tableData[i];
 		m_tableData.resize(nbb);
 	}
+}
+
+template <typename T>
+unsigned int AttributeMultiVector<T>::getNbBlocks() const
+{
+	return m_tableData.size();
 }
 
 template <typename T>

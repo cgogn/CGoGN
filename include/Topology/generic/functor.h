@@ -252,6 +252,7 @@ public:
 		this->m_map.setDartEmbedding(orbit, d, emb);
 		return false;
 	}
+	void changeEmb(unsigned int e) { emb = e;}
 };
 
 // Functor Check Embedding : to check the embeddings of the given map

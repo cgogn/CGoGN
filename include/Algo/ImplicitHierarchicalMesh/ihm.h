@@ -87,11 +87,11 @@ public:
 
 	Dart alpha_1(Dart d) ;
 
-	virtual Dart begin() ;
+	virtual Dart begin() const ;
 
-	virtual Dart end() ;
+	virtual Dart end() const ;
 
-	virtual void next(Dart& d) ;
+	virtual void next(Dart& d) const ;
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) ;
 

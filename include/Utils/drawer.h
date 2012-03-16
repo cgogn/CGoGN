@@ -31,6 +31,7 @@
 
 namespace CGoGN { namespace Utils { class VBO; } }
 namespace CGoGN { namespace Utils { class ShaderColorPerVertex; } }
+namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
 
 namespace CGoGN
 {
@@ -137,6 +138,11 @@ public:
 	 * usr as glPointSize
 	 */
 	void pointSize(float ps);
+
+	/**
+	 * rendering in svg struct
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
 };
 
 } // namespace Utils

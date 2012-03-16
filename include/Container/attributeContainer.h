@@ -530,6 +530,13 @@ public:
 	* @param id  ??
 	*/
 	bool loadBin(CGoGNistream& fs);
+
+	/**
+	 * copy container
+	 * TODO a version that compact on the fly ?
+	 */
+	void copyFrom(const AttributeContainer& cont);
+
 };
 
 } // namespace CGoGN

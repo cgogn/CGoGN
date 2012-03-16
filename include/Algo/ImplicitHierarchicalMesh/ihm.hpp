@@ -139,7 +139,7 @@ inline Dart ImplicitHierarchicalMap::alpha_1(Dart d)
 	return Map2::alpha_1(d) ;
 }
 
-inline Dart ImplicitHierarchicalMap::begin()
+inline Dart ImplicitHierarchicalMap::begin() const
 {
 	Dart d = Map2::begin() ;
 	while(d != Map2::end() && m_dartLevel[d] > m_curLevel)
@@ -147,12 +147,12 @@ inline Dart ImplicitHierarchicalMap::begin()
 	return d ;
 }
 
-inline Dart ImplicitHierarchicalMap::end()
+inline Dart ImplicitHierarchicalMap::end() const
 {
 	return Map2::end() ;
 }
 
-inline void ImplicitHierarchicalMap::next(Dart& d)
+inline void ImplicitHierarchicalMap::next(Dart& d) const
 {
 	do
 	{

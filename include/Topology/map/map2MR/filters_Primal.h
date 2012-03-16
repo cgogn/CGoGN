@@ -41,19 +41,67 @@ public:
 	virtual void operator() () = 0 ;
 } ;
 
+
+/*********************************************************************************
+ *                           LOOP BASIC FUNCTIONS
+ *********************************************************************************/
+
+template <typename PFP>
+typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d1)
+{
+	Dart d2 = map.phi2(d1) ;
+	Dart d3 = map.phi_1(d1) ;
+	Dart d4 = map.phi_1(d2) ;
+
+	typename PFP::VEC3 p1 = position[d1] ;
+	typename PFP::VEC3 p2 = position[d2] ;
+	typename PFP::VEC3 p3 = position[d3] ;
+	typename PFP::VEC3 p4 = position[d4] ;
+
+	p1 *= 3.0 / 8.0 ;
+	p2 *= 3.0 / 8.0 ;
+	p3 *= 1.0 / 8.0 ;
+	p4 *= 1.0 / 8.0 ;
+
+	return p1 + p2 + p3 + p4 ;
+}
+
+template <typename PFP>
+typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+{
+	map.incCurrentLevel() ;
+
+	typename PFP::VEC3 np(0) ;
+	unsigned int degree = 0 ;
+	Traversor2VVaE<typename PFP::MAP> trav(map, d) ;
+	for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+	{
+		++degree ;
+		np += position[it] ;
+	}
+
+	map.decCurrentLevel() ;
+
+	float mu = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+	mu = (5.0/8.0 - (mu * mu)) / degree ;
+	np *= 8.0/5.0 * mu ;
+
+	return np ;
+}
+
 /*********************************************************************************
  *                           ANALYSIS FILTERS
  *********************************************************************************/
 
 template <typename PFP>
-class PipoOddAnalysisFilter : public MRFilter
+class LoopOddAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoOddAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -61,10 +109,12 @@ public:
 		TraversorE<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
+			typename PFP::VEC3 p = loopOddVertex<PFP>(m_map, m_position, d) ;
+
 			m_map.incCurrentLevel() ;
 
 			Dart oddV = m_map.phi2(d) ;
-			m_position[oddV] = typename PFP::VEC3(0) ;
+			m_position[oddV] -= p ;
 
 			m_map.decCurrentLevel() ;
 		}
@@ -72,22 +122,49 @@ public:
 } ;
 
 template <typename PFP>
-class PipoEvenAnalysisFilter : public MRFilter
+class LoopEvenAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoEvenAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-//		TraversorV<typename PFP::MAP> trav(m_map) ;
-//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-//		{
-//		}
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, d) ;
+			m_position[d] -= p ;
+		}
+	}
+} ;
+
+template <typename PFP>
+class LoopNormalisationAnalysisFilter : public MRFilter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	LoopNormalisationAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			unsigned int degree = m_map.vertexDegree(d) ;
+			float n = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+			n = 8.0/5.0 * (n * n) ;
+
+			m_position[d] /= n ;
+		}
 	}
 } ;
 
@@ -96,14 +173,14 @@ public:
  *********************************************************************************/
 
 template <typename PFP>
-class PipoOddSynthesisFilter : public MRFilter
+class LoopOddSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoOddSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -111,7 +188,7 @@ public:
 		TraversorE<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi2(d)]) / 2.0 ;
+			typename PFP::VEC3 p = loopOddVertex<PFP>(m_map, m_position, d) ;
 
 			m_map.incCurrentLevel() ;
 
@@ -124,24 +201,52 @@ public:
 } ;
 
 template <typename PFP>
-class PipoEvenSynthesisFilter : public MRFilter
+class LoopEvenSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	PipoEvenSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-//		TraversorV<typename PFP::MAP> trav(m_map) ;
-//		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-//		{
-//		}
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, d) ;
+			m_position[d] += p ;
+		}
 	}
 } ;
+
+template <typename PFP>
+class LoopNormalisationSynthesisFilter : public MRFilter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			unsigned int degree = m_map.vertexDegree(d) ;
+			float n = 3.0/8.0 + 1.0/4.0 * cos(2.0 * M_PI / degree) ;
+			n = 8.0/5.0 * (n * n) ;
+
+			m_position[d] *= n ;
+		}
+	}
+} ;
+
 
 
 

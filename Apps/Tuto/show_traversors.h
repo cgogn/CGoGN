@@ -96,6 +96,8 @@ class MyQT: public Utils::QT::SimpleQT
 	unsigned int m_first2;
 	unsigned int m_ajd_or_inci2;
 	unsigned int m_second2;
+	float m_expl;
+	unsigned int m_last;
 public:
 	MyQT():
 		m_render_topo(NULL),
@@ -106,6 +108,8 @@ public:
 		m_first2(0),
 		m_ajd_or_inci2(0),
 		m_second2(1),
+		m_expl(0.8f),
+		m_last(2),
 		m_selected(NIL)
 
 	{}
@@ -121,6 +125,8 @@ protected:
 	void cb_redraw();
 
 	void cb_initGL();
+
+	void cb_Save();
 
 	void cb_mousePress(int button, int x, int y);
 
@@ -139,6 +145,8 @@ public slots:
 	void cb_combo5(int x);
 	void cb_combo6(int x);
 	void cb_checkTopo(bool b);
+	void cb_explode(int x);
+
 };
 
 #endif

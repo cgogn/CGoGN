@@ -53,9 +53,9 @@ namespace CGoGN
 class MapBrowser
 {
 public:
-	virtual Dart begin() = 0;
-	virtual Dart end() = 0;
-	virtual void next(Dart& d) = 0;
+	virtual Dart begin() const = 0;
+	virtual Dart end() const = 0;
+	virtual void next(Dart& d) const = 0;
 };
 
 class AttributeHandlerGen ;
@@ -150,7 +150,7 @@ public:
 
 	~GenericMap() ;
 
-	virtual std::string mapTypeName() = 0 ;
+	virtual std::string mapTypeName() const = 0 ;
 
 	/**
 	 * Clear the map
@@ -254,12 +254,12 @@ public:
 	/**
 	 * get the index of dart in topological table
 	 */
-	unsigned int dartIndex(Dart d);
+	unsigned int dartIndex(Dart d) const;
 
 	/**
 	 * get the insertion level of a dart (use only in MRMaps)
 	 */
-	unsigned int getDartLevel(Dart d) ;
+	unsigned int getDartLevel(Dart d) const ;
 
 	/**
 	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
@@ -504,6 +504,11 @@ public:
 	bool loadMapBin(const std::string& filename) ;
 
 	/**
+	 * copy from another map (of same type)
+	 */
+	bool copyFrom(const GenericMap& map);
+
+	/**
 	 * Dump attributes types and names per orbit
 	 */
 	void dumpAttributesAndMarkers();
@@ -526,20 +531,20 @@ public:
 	 * Begin of map
 	 * @return the first dart of the map
 	 */
-	Dart begin() ;
+	Dart begin() const;
 
 	/**
 	 * End of map
 	 * @return the end iterator (next of last) of the map
 	 */
-	Dart end() ;
+	Dart end() const;
 
 	/**
 	 * allow to go from a dart to the next
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	void next(Dart& d) ;
+	void  next(Dart& d) const ;
 
 	/**
 	 * Apply a functor on each dart of the map
@@ -601,7 +606,7 @@ public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
-	bool isBoundaryMarked(Dart d);
+	bool isBoundaryMarked(Dart d) const;
 
 protected:
 	/**

@@ -26,6 +26,9 @@
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Import/import.h"
+#include "Algo/Export/export.h"
+
 using namespace CGoGN ;
 
 
@@ -146,6 +149,17 @@ void MyQT::operation(int x)
 			m_selected=NIL;
 		}
 		break;
+	case 9:
+		CGoGNout <<"delete face"<<CGoGNendl;
+		if (m_selected != NIL)
+		{
+			myMap.deleteFace(m_selected);
+			updateMap();
+			m_selected=NIL;
+			m_selected2=NIL;
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -164,14 +178,10 @@ void MyQT::createMap(int n)
 	grid.grid_topo(n,n);
 	grid.embedGrid(1.,1.,0.);
 
-
     //  bounding box of scene
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-
-    // send BB info to interface for centering on GL screen
-	setParamObject(lWidthObj, lPosObj.data());
+	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	setParamObject(bb.maxSize(), bb.center().data()) ;
+	m_shift = bb.maxSize()/200.0f;
 
 	// first show for be sure that GL context is binded
 	show();
@@ -296,15 +306,112 @@ void MyQT::cb_keyPress(int keycode)
 			}
 		}
 		break;
+	case Qt::Key_Up:
+		if (m_selected!=NIL)
+			position[m_selected][1] +=m_shift;
+		updateMap();
+		updateGL();
+		break;
+	case Qt::Key_Down:
+		if (m_selected!=NIL)
+			position[m_selected][1] -= m_shift;
+		updateMap();
+		updateGL();
+		break;
+	case Qt::Key_Left:
+		if (m_selected!=NIL)
+			position[m_selected][0] -= m_shift;
+		updateMap();
+		updateGL();
+		break;
+	case Qt::Key_Right:
+		if (m_selected!=NIL)
+			position[m_selected][0] += m_shift;
+		updateMap();
+		updateGL();
+		break;
 	}
 	updateGL();
 }
 
 void MyQT::svg()
 {
+	if (m_selected!=NIL)
+		m_render_topo->setDartColor(m_selected,0.8f,0.0f,0.0f);
+	if (m_selected2!=NIL)
+		m_render_topo->setDartColor(m_selected2,0.0f,0.8f,0.0f);
+
 	std::string filename = selectFileSave("snapshot file", ".", "(*.svg)");
 	m_render_topo->svgout2D(filename, modelViewMatrix(),projectionMatrix());
 }
+
+void MyQT::cb_Open()
+{
+	std::string filters("all (*.*);; trian (*.trian);; off (*.off);; ply (*.ply);; map (*.map)") ;
+	std::string filename = selectFile("Open Mesh", "", filters) ;
+	if (!filename.empty())
+		importMesh(filename);
+	updateGL();
+}
+
+void MyQT::cb_Save()
+{
+	std::string filename = selectFileSave("Export SVG file ",".","(*.off)");
+	Algo::Export::exportOFF<PFP>(myMap,position,filename.c_str());
+}
+
+void MyQT::importMesh(std::string& filename)
+{
+	myMap.clear(true) ;
+
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
+
+	if (extension == std::string(".map"))
+	{
+		myMap.loadMapBin(filename);
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
+	}
+	else
+	{
+		std::vector<std::string> attrNames ;
+		if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		{
+			CGoGNerr << "could not import " << filename << CGoGNendl ;
+			return;
+		}
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	}
+
+	colorDarts = myMap.getAttribute<PFP::VEC3>(DART, "color");
+	if (!colorDarts.isValid())
+	{
+		colorDarts = myMap.addAttribute<PFP::VEC3>(DART, "color");
+		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+		{
+			if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+			{
+				int n = random();
+				float r = float(n&0x7f)/255.0f + 0.25f;
+				float g = float((n>>8)&0x7f)/255.0f + 0.25f;
+				float b = float((n>>16)&0x7f)/255.0 + 0.25f;
+				colorDarts[d] =  Geom::Vec3f(r,g,b);
+				m_render_topo->setDartColor(d,r,g,b);
+			}
+		}
+	}
+
+	m_selected  = NIL;
+	m_selected2 = NIL;
+
+	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	setParamObject(bb.maxSize(), bb.center().data()) ;
+	m_shift = bb.maxSize()/200.0f;
+
+	updateMap();
+	updateGLMatrices() ;
+}
+
 
 void MyQT::width(int w)
 {

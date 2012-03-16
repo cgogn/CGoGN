@@ -22,92 +22,74 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __GMAP0_H__
-#define __GMAP0_H__
+#ifndef _COLOR_PER_FACE_RENDER
+#define _COLOR_PER_FACE_RENDER
 
-#include "Topology/generic/attribmap.h"
-#include "Topology/generic/dartmarker.h"
-#include "Topology/generic/cellmarker.h"
+#include <GL/glew.h>
+
+#include "Topology/generic/dart.h"
+#include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/functor.h"
+#include "Utils/vbo.h"
+#include "Utils/GLSLShader.h"
+
 
 namespace CGoGN
 {
 
+namespace Algo
+{
+
+namespace Render
+{
+
+namespace GL2
+{
+
 /**
-* The class of 0-GMap
-* Warning here we use beta instead of classic alpha
-*/
-class GMap0 : public AttribMap
+ * Class that update VBO to allow the rendering of per face color rendering
+ * Warning: do not use same position & color VBO than with pervertex rendering !
+ */
+class ColorPerFaceRender
 {
 protected:
-	AttributeMultiVector<Dart>* m_beta0 ;
-
-	void init() ;
+	GLuint m_nbTris;
 
 public:
-	GMap0();
-
-	virtual std::string mapTypeName() const;
-
-	virtual unsigned int dimension();
-
-	virtual void clear(bool removeAttrib);
-
-	virtual void update_topo_shortcuts();
-
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew);
-
-	/*! @name Basic Topological Operators
-	 * Access and Modification
-	 *************************************************************************/
-
-	virtual Dart newDart();
-
-	Dart beta0(const Dart d);
-
-	void beta0sew(Dart d, Dart e);
-
-	void beta0unsew(Dart d);
-
-	/*! @name Constructors and Destructors
-	 *  To generate or delete cells in a 0-G-map
-	 *************************************************************************/
-
-	//@{
 	/**
-	* create an edge
-	* @return a dart of the edge
+	* Constructor
 	*/
-	Dart newEdge();
+	ColorPerFaceRender() ;
 
 	/**
-	* delete an edge
-	* @param d a dart of the edge
+	* update drawing buffers
+	* @param map the map
+	* @param positions  attribute of position vertices
+	* @param colorPerFace attribute of color (per face, or per vertex per face)
+	* @param good selector
 	*/
-	void deleteEdge(Dart d);
-	//@}
+	template<typename PFP>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map, const typename PFP::TVEC3& positions, const typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
 
-	/*! @name Cell Functors
-	 *  Apply functors to all darts of a cell
-	 *************************************************************************/
+	template<typename PFP>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map, const typename PFP::TVEC3& positions, const typename PFP::TVEC3& normals, const typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
 
-	//@{
-	//! Apply a functor on every dart of a vertex
-	/*! @param d a dart of the vertex
-	 *  @param f the functor to apply
+
+	/**
+	 * draw
 	 */
-	bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0);
+	void draw(Utils::GLSLShader* sh) ;
 
-	//! Apply a functor on every dart of an edge
-	/*! @param d a dart of the edge
-	 *  @param f the functor to apply
-	 */
-	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
-//	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
-	//@}
 };
 
-} // namespace CGoGN
+}//end namespace GL2
 
-#include "Topology/gmap/gmap0.hpp"
+}//end namespace Algo
+
+}//end namespace Render
+
+}//end namespace CGoGN
+
+#include "Algo/Render/GL2/colorPerFaceRender.hpp"
 
 #endif

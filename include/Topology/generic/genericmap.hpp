@@ -187,14 +187,14 @@ inline void GenericMap::duplicateDart(Dart d)
 	}
 }
 
-inline unsigned int GenericMap::dartIndex(Dart d)
+inline unsigned int GenericMap::dartIndex(Dart d) const
 {
 	if (m_isMultiRes)
 		return (*m_mrDarts[m_mrCurrentLevel])[d.index] ;
 	return d.index;
 }
 
-inline unsigned int GenericMap::getDartLevel(Dart d)
+inline unsigned int GenericMap::getDartLevel(Dart d) const
 {
 	return (*m_mrLevels)[d.index] ;
 }
@@ -339,7 +339,7 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getEmbeddingAttributeVect
  *           DARTS TRAVERSALS           *
  ****************************************/
 
-inline Dart GenericMap::begin()
+inline Dart GenericMap::begin() const
 {
 	if (m_isMultiRes)
 	{
@@ -352,7 +352,7 @@ inline Dart GenericMap::begin()
 	return Dart::create(m_attribs[DART].begin()) ;
 }
 
-inline Dart GenericMap::end()
+inline Dart GenericMap::end() const
 {
 	if (m_isMultiRes)
 		return Dart::create(m_mrattribs.end()) ;
@@ -360,7 +360,7 @@ inline Dart GenericMap::end()
 	return Dart::create(m_attribs[DART].end()) ;
 }
 
-inline void GenericMap::next(Dart& d)
+inline void GenericMap::next(Dart& d) const
 {
 	if (m_isMultiRes)
 	{
@@ -395,5 +395,26 @@ inline AttributeMultiVector<Dart>* GenericMap::getRelation(const std::string& na
 	AttributeMultiVector<Dart>* amv = cont.getDataVector<Dart>(cont.getAttributeIndex(name)) ;
 	return amv ;
 }
+
+
+/**************************
+ *  BOUNDARY MANAGEMENT   *
+ **************************/
+
+inline void GenericMap::boundaryMark(Dart d)
+{
+	m_markTables[DART][0]->operator[](dartIndex(d)).setMark(m_boundaryMarker);
+}
+
+inline void GenericMap::boundaryUnmark(Dart d)
+{
+	m_markTables[DART][0]->operator[](dartIndex(d)).unsetMark(m_boundaryMarker);
+}
+
+inline bool GenericMap::isBoundaryMarked(Dart d) const
+{
+	return m_markTables[DART][0]->operator[](dartIndex(d)).testMark(m_boundaryMarker);
+}
+
 
 } //namespace CGoGN

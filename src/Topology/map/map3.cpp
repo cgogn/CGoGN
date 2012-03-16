@@ -922,14 +922,19 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 	return count ;
 }
 
-void Map3::closeMap()
+unsigned int Map3::closeMap()
 {
 	// Search the map for topological holes (fix points of phi3)
+	unsigned int nb = 0 ;
 	for (Dart d = begin(); d != end(); next(d))
 	{
 		if (phi3(d) == d)
+		{
+			++nb ;
 			closeHole(d);
+		}
 	}
+	return nb ;
 }
 
 } // namespace CGoGN
