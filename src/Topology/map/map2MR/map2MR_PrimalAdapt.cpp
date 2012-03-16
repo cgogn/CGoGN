@@ -252,20 +252,7 @@ bool Map2MR_PrimalAdapt::faceIsSubdividedOnce(Dart d)
 
 void Map2MR_PrimalAdapt::addNewLevel(bool embedNewVertices)
 {
-	pushLevel() ;
-
 	addLevel() ;
-	setCurrentLevel(getMaxLevel()) ;
-
-//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//	{
-//		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
-//		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
-//		if(!shareVertexEmbeddings)
-//			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
-//	}
-
-	popLevel() ;
 }
 
 void Map2MR_PrimalAdapt::propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel)
