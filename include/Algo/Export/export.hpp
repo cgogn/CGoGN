@@ -398,7 +398,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 
 	out << "ply" << std::endl ;
 	out << "format ascii 1.0" << std::endl ;
-	out << "comment ply SLF (K. Vanhoey generic format): SLF_" << ((extension == ".plyPTMext") ? "PTMext" : "SHreal") << std::endl ;
+	out << "comment ply SLF (K. Vanhoey generic format): SLF_" << (((extension == ".plyPTMext") || extension == ".plyPTMextBin" ) ? "PTMext" : "SHreal") << std::endl ;
 	out << "element vertex " << vertices.size() << std::endl ;
 	out << "property float x" << std::endl ;
 	out << "property float y" << std::endl ;
