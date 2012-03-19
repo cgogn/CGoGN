@@ -1192,11 +1192,11 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 {
 
 	float xmin = frameWidth;
-	float xmax = m_Image->getWidthX() - frameWidth;
+	float xmax = m_Image->getWidthX() - frameWidth -1;
 	float ymin = frameWidth;
-	float ymax = m_Image->getWidthY() - frameWidth;
+	float ymax = m_Image->getWidthY() - frameWidth -1;
 	float zmin = frameWidth;
-	float zmax = m_Image->getWidthZ() - frameWidth;
+	float zmax = m_Image->getWidthZ() - frameWidth -1;
 
 
 	// traverse position and create bound attrib
