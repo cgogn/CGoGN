@@ -110,7 +110,8 @@ public:
 		m_second2(1),
 		m_expl(0.8f),
 		m_last(2),
-		m_selected(NIL)
+		m_selected(NIL),
+		m_dm_topo(NULL)
 
 	{}
 
@@ -118,6 +119,8 @@ public:
 	std::vector<Dart> m_affDarts;
 
 	Utils::Drawer m_drawer;
+
+	DartMarker* m_dm_topo;
 
 protected:
     void storeVerticesInfo();

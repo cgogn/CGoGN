@@ -354,7 +354,7 @@ int main(int argc, char **argv)
 	{
 		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 		Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
-		int nb = 32;
+		int nb = 8;
 		prim.hexaGrid_topo(nb,nb,nb);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
