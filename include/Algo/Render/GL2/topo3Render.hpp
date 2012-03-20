@@ -515,6 +515,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 			*positionF1++ = fv1[d];
 			d = map.beta1(d);
 			*positionF1++ = fv1[d];
+			m_nbRel1++;
 		} while (d != *face );
 	}
 
