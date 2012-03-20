@@ -591,6 +591,14 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 		return false;
 	}
 	
+	AttributeHandler<typename PFP::VEC3> colors = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "color") ;
+	if (pid.hasColors())
+	{
+		if(!colors.isValid())
+			colors = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "color") ;
+		attrNames.push_back(colors.name()) ;
+	}
+
     // lecture des nombres de sommets/aretes/faces
 	m_nbVertices = pid.nbVertices();
 	m_nbFaces = pid.nbFaces();
@@ -605,6 +613,16 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 
 		unsigned int id = container.insertLine();
 		positions[id] = pos;
+
+		if (pid.hasColors())
+		{
+			Geom::Vector<3, unsigned char> col ;
+			pid.vertexColorUint8(i, col) ;
+			colors[id][0] = col[0] ;
+			colors[id][1] = col[1] ;
+			colors[id][2] = col[2] ;
+			colors[id] /= 255.0 ;
+		}
 
 		verticesID.push_back(id);
 	}
@@ -650,7 +668,6 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	std::cout << "Import PlySLFASCII" << std::endl ;
 	// Open file
 	std::ifstream fp(filename.c_str(), std::ios::in) ;
 	if (!fp.good())
@@ -912,13 +929,13 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
 		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
 			for (unsigned int l = 0 ; l < 3 ; ++l)
-				frame[k][id][l] = properties[3+(3*k+l)] ;
+				frame[k][id][l] = (typename PFP::REAL)(properties[3+(3*k+l)]) ;
 		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
 			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
-				SLFcoefs[l][id][k] = properties[12+(nbCoefs*k+l)] ;
+				SLFcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(nbCoefs*k+l)]) ;
 		unsigned int cur = 12+3*nbCoefs ;
 		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
-			remainders[k][id] = properties[cur + k] ;
+			remainders[k][id] = (typename PFP::REAL)(properties[cur + k]) ;
 	}
 	m_nbVertices = verticesID.size() ;
 	delete[] properties ;
