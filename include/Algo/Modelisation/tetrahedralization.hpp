@@ -22,6 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
+#include "Algo/Modelisation/subdivision3.h"
+
 namespace CGoGN
 {
 
@@ -37,18 +39,54 @@ namespace Tetrahedralization
 template <typename PFP>
 void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 {
-	//Splitting Path
-	std::vector<Dart> sp;
-	sp.reserve(32);
+	Dart d1 = d;
+	Dart d2 = map.phi1(map.phi1(d));
+	Dart d3 = map.phi_1(map.phi2(d));
+	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
 
-	Traversor3VE<typename PFP::MAP> tra(map, d);
-	for (Dart d = tra.begin() ; d != tra.end() ; d = tra.next())
+	cut3Ear<PFP>(map,d1);
+	cut3Ear<PFP>(map,d2);
+	cut3Ear<PFP>(map,d3);
+	cut3Ear<PFP>(map,d4);
+}
+
+template <typename PFP>
+void hexahedronsToTetrahedrons(typename PFP::MAP& map)
+{
+	TraversorV<typename PFP::MAP> tv(map);
+	for(Dart s=tv.begin() ; s!=tv.end() ; s=tv.next() )
 	{
-		map.splitFace(map.phi1(d), map.phi_1(d));
-		sp.push_back(map.phi1(d));
-	}
+		bool allDegreesAroundEqual3=true;
 
-	map.splitVolume(sp);
+		std::vector<Dart> dov;
+
+		FunctorStore fs(dov);
+		map.foreach_dart_of_vertex(s,fs);
+
+		CellMarkerStore cmv(map,VOLUME);
+
+		for(std::vector<Dart>::iterator it=dov.begin();allDegreesAroundEqual3 && it!=dov.end();++it)
+		{
+			if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
+			{
+				cmv.mark(*it);
+				allDegreesAroundEqual3 = (map.phi1(map.phi2(map.phi1(map.phi2(map.phi1(map.phi2(*it))))))==*it);
+			}
+		}
+
+		if( allDegreesAroundEqual3)
+		{
+			CellMarkerStore cmv(map,VOLUME);
+			for(std::vector<Dart>::iterator it=dov.begin();it!=dov.end();++it)
+			{
+				if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
+				{
+					cmv.mark(*it);
+					cut3Ear<PFP>(map,*it);
+				}
+			}
+		}
+	}
 }
 
 

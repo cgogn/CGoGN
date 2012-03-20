@@ -34,6 +34,8 @@ SimpleGMap3::SimpleGMap3()
 	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
 	volume = myMap.addAttribute<PFP::VEC3>(VOLUME, "volume");
 
+	CellMarker mE(myMap,EDGE);
+
 	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
 	Dart d = primCat.hexaGrid_topo(3,1,1);
 	primCat.embedHexaGrid(2,1,1);
@@ -56,6 +58,9 @@ SimpleGMap3::SimpleGMap3()
 	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
 	Algo::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
+//	for(Dart d = myMap.begin() ; d != myMap.end() ; myMap.next(d))
+//		mE.mark(d);
+
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);
 
@@ -76,6 +81,12 @@ SimpleGMap3::SimpleGMap3()
 	VEC3 mid = (position[d] + position[myMap.phi1(d)]) / 2.0f;
 	myMap.cutEdge(d);
 	position[myMap.phi1(d)] = mid;
+
+	myMap.check();
+//
+	myMap.splitFace(d,myMap.phi1(myMap.phi1(myMap.phi1(d))));
+
+	myMap.check();
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(0,2,0);

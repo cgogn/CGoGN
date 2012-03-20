@@ -60,6 +60,8 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
 	}
 	else
 	{
+		std::vector<Dart> vPath;
+
 		//triangulate around the vertex
 		do
 		{
@@ -67,17 +69,14 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
 			if(map.template phi<111>(e) != e)
 				map.splitFace(map.phi_1(e), map.phi1(e));
 
-			dRing = map.phi1(e);
-			dRing2 = map.phi2(dRing);
+			dRing = map.phi2(map.phi1(e));
 
-			map.unsewFaces(dRing);
+			vPath.push_back(dRing); //remember all darts from the ring
 
 			e = dN;
 		} while (e != d);
 
-		map.closeHole(dRing);
-		map.closeHole(dRing2);
-		map.sewVolumes(map.phi2(dRing), map.phi2(dRing2));
+		map.splitVolume(vPath);
 	}
 
 	return map.phi2(dRing);
@@ -156,13 +155,15 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 				Dart dS = dd;
 				bool split=false;
 
-				do {
+				do
+				{
 					//find the new vertex
 					if(vs.isMarked(dS))
 					{
 						Dart dSS = map.phi1(dS);
 						//search an other new vertex (or an existing vertex intersected with the plane) in order to split the face
-						do {
+						do
+						{
 							if(vs.isMarked(dSS))
 							{
 								nbSplit++;
@@ -203,6 +204,223 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 	}
 
 	return dRes;
+}
+
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, CellMarker& edgesToCut, CellMarker& verticesToSplit)
+{
+	typedef typename PFP::VEC3 VEC3;
+
+	Dart dRes;
+	unsigned int nbInter = 0;
+	unsigned int nbVertices = 0;
+	CellMarkerStore vs(map, VERTEX);			//marker for new vertices from edge cut
+	CellMarkerStore cf(map, FACE);
+	Dart dPath;
+
+	MarkerForTraversor<typename PFP::MAP::ParentMap > mte(map,EDGE);
+	MarkerForTraversor<typename PFP::MAP::ParentMap > mtf(map,FACE);
+
+	//search edges and vertices crossing the plane
+	Traversor3WE<typename PFP::MAP::ParentMap > te(map,d);
+	for(Dart dd = te.begin() ;dd != te.end() ; dd = te.next())
+	{
+		if(!mte.isMarked(dd) && edgesToCut.isMarked(dd))
+		{
+			nbInter++;
+			VEC3 p = (position[dd]+position[map.phi1(dd)])*0.5f;
+			cf.mark(dd);			//mark face and opposite face to split
+			cf.mark(map.phi2(dd));
+
+			map.cutEdge(dd);
+			Dart dN = map.phi1(dd);
+
+			mte.mark(dN);
+
+			vs.mark(dN);		//mark vertex for split
+			position[dN] = p;
+		}
+	}
+
+//	std::cout << "edges cut: " << nbInter << std::endl;
+	unsigned int nbSplit=0;
+
+	//at least two edges are concerned
+	assert(nbInter>1);
+
+	Traversor3WF<typename PFP::MAP::ParentMap > tf(map,d);
+	for(Dart dd = tf.begin() ; dd != tf.end() ; dd = tf.next())
+	{
+		//for faces with a new vertex
+		if(cf.isMarked(dd))
+		{
+			cf.unmark(dd);
+
+			Dart dS = dd;
+			bool split=false;
+
+			do {
+				//find the new vertex
+				if(vs.isMarked(dS) || verticesToSplit.isMarked(dS))
+				{
+					Dart dSS = map.phi1(dS);
+					//search an other new vertex (or an existing vertex intersected with the plane) in order to split the face
+					do {
+						if(vs.isMarked(dSS) || verticesToSplit.isMarked(dSS))
+						{
+							nbSplit++;
+							map.splitFace(dS,dSS);
+							dPath=map.phi_1(dS);
+							split=true;
+						}
+						dSS = map.phi1(dSS);
+					} while(!split && dSS!=dS);
+				}
+				dS = map.phi1(dS);
+			} while(!split && dS!=dd);
+		}
+
+		//define the path to split
+		std::vector<Dart> vPath;
+		vPath.reserve((nbSplit+nbVertices)+1);
+		vPath.push_back(dPath);
+		for(std::vector<Dart>::iterator it = vPath.begin() ;it != vPath.end() ; ++it)
+		{
+			Dart dd = map.phi1(*it);
+
+			Dart ddd = map.phi1(map.phi2(dd));
+
+			while(!vs.isMarked(map.phi1(ddd)) && ddd!=dd)
+				ddd = map.phi1(map.phi2(ddd));
+
+			if(vs.isMarked(map.phi1(ddd)) && !map.sameVertex(ddd,*vPath.begin()))
+				vPath.push_back(ddd);
+		}
+
+		assert(vPath.size()>2);
+		map.splitVolume(vPath);
+		dRes = map.phi2(*vPath.begin());
+	}
+
+	return dRes;
+}
+
+template <typename PFP>
+Dart sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,CellMarker& volumesToCut, CellMarker& edgesToCut, CellMarker& verticesToSplit)
+{
+	Dart dRes=NIL;
+
+    typedef typename PFP::VEC3 VEC3;
+    CellMarkerStore localVerticesToSplit(map, VERTEX); //marker for new vertices from edge cut
+
+    //Step 1: Cut the edges and mark the resulting vertices as vertices to be face-split
+    TraversorE<typename PFP::MAP> te(map);
+    CellMarkerStore cf(map, FACE);
+
+    for(Dart d = te.begin(); d != te.end(); d=te.next()) //cut all edges
+    {
+        if(edgesToCut.isMarked(d))
+        {
+            VEC3 p = (position[d]+position[map.phi1(d)])*0.5f;
+            cf.mark(d);			//mark face and opposite face to split
+            cf.mark(map.phi2(d));
+
+            map.cutEdge(d);
+            Dart dN = map.phi1(d);
+
+            localVerticesToSplit.mark(dN);		//mark vertex for split
+            position[dN] = p;
+        }
+    }
+
+    //Step 2: Split faces with cut edges
+    TraversorF<typename PFP::MAP> tf(map);
+    for(Dart d = tf.begin(); d != tf.end(); d=tf.next())
+    {
+        if(cf.isMarked(d))
+        {
+            cf.unmark(d);
+            Dart dS = d;
+            bool split=false;
+            do
+            {
+                //find the new vertex
+                if(localVerticesToSplit.isMarked(dS))
+                {
+                    Dart dSS = map.phi1(dS);
+                    //search an other new vertex (or an existing vertex to split) in order to split the face
+                    do
+                    {
+                        if(localVerticesToSplit.isMarked(dSS) || verticesToSplit.isMarked(dSS))
+                        {
+                            map.splitFace(dS,dSS);
+                            split=true;
+                        }
+                        dSS = map.phi1(dSS);
+                    } while(!split && dSS!=dS);
+                }
+                dS = map.phi1(dS);
+            } while(!split && dS!=d);
+        }
+    }
+
+    //Step 3 : Find path and split volumes
+    TraversorW<typename PFP::MAP> tw(map);
+    for(Dart d = tw.begin(); d != tw.end(); d=tw.next()) //Parcours des volumes
+    {
+        if(volumesToCut.isMarked(d)){
+
+            Traversor3WV<typename PFP::MAP> t3wv(map,d);
+            int nbVInPath=1;
+            Dart dPath;
+            bool found=false;
+
+            //find a vertex of the volume to start the path to split
+            for(Dart dd = t3wv.begin(); dd != t3wv.end() && !found; dd=t3wv.next())
+            {
+                if(localVerticesToSplit.isMarked(dd) || verticesToSplit.isMarked(dd))
+                {
+                    Dart ddd = map.phi1(map.phi2(dd));
+                    while(!localVerticesToSplit.isMarked(map.phi1(ddd))
+                    		&& !verticesToSplit.isMarked(map.phi1(ddd))
+                    		&& ddd!=dd)
+                        ddd = map.phi1(map.phi2(ddd));
+                    found=true;
+                    nbVInPath++;
+                    dPath=ddd;
+                }
+            }
+            //define the path to split
+            std::vector<Dart> vPath;
+            vPath.reserve(nbVInPath);
+            vPath.push_back(dPath);
+            CellMarker cmf(map,FACE);
+            int nbFacesVisited=0;
+
+            //define the path to split for the whole volume
+            for(std::vector<Dart>::iterator it = vPath.begin() ;it != vPath.end(); ++it)
+            {
+                Dart dd = map.phi1(*it);
+                Dart ddd = map.phi1(map.phi2(dd));
+                while(!localVerticesToSplit.isMarked(map.phi1(ddd))
+                		&& !verticesToSplit.isMarked(map.phi1(ddd))
+                		&& ddd!=dd)
+                    ddd = map.phi1(map.phi2(ddd));
+
+                if( !map.sameVertex(ddd,*vPath.begin()) )
+                {
+                    vPath.push_back(map.phi1(ddd));
+                    localVerticesToSplit.unmark(map.phi1(ddd));
+                }
+            }
+
+            assert(vPath.size()>2);
+            map.splitVolume(vPath);
+            dRes = map.phi2(*vPath.begin());
+        }
+    }
+
+    return dRes;
 }
 
 template <typename PFP, typename EMBV, typename EMB>

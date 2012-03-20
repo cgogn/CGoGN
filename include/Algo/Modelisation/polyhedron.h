@@ -115,7 +115,7 @@ template <typename PFP>
 Dart createTriangularPrism(typename PFP::MAP& map);
 
 /**
- * create a 3-sided pyramid
+ * create a 4-sided pyramid
  */
 template <typename PFP>
 Dart createQuadrangularPyramid(typename PFP::MAP& map);

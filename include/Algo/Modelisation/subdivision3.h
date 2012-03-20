@@ -49,10 +49,24 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d);
 /**
 * Cut a volume considering a plane
 * @param d dart of the volume
-* @return a dart from the face in the midle
+* @return a dart from the created face
+* * TODO (optimization) change to build path while splitting faces
 */
 template <typename PFP>
 Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl);
+
+/**
+* Cut a volume considering a set of marked edges and vertices
+* marked edges and vertices must form a simple path
+* @param d dart of the volume
+* @param edgesToCut marker to identify edges along the slice
+* @param verticesToSplit marker to identify edges on the slice
+* @return a dart from the created face
+* TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, CellMarker& edgesToCut, CellMarker& verticesToSplit);
+
 
 
 /**
