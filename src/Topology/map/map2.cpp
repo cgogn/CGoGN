@@ -538,10 +538,10 @@ void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool second
 		unsewFaces(*it) ;
 
 	if(firstSideClosed)
-		fillHole(e) ;
+		Map2::fillHole(e) ;
 
 	if(secondSideClosed)
-		fillHole(e2) ;
+		Map2::fillHole(e2) ;
 }
 
 /*! @name Topological Queries

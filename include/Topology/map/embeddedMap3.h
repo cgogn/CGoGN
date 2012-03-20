@@ -71,7 +71,7 @@ public:
 	//!
 	/*!
 	 */
-	virtual bool collapseDegeneratedFace(Dart d);
+//	virtual bool collapseDegeneratedFace(Dart d);
 
 	//!
 	/*!
