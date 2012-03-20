@@ -381,10 +381,14 @@ bool MeshTablesSurface<PFP>::importOff(const std::string& filename, std::vector<
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importMeshBin(const std::string& filename, std::vector<std::string>& attrNames)
 {
+	std::cout << filename << std::endl ;
 	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	if (!positions.isValid())
+	{
+		std::cout << "Not valid" << std::endl ;
 		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+	}
 
 	attrNames.push_back(positions.name()) ;
 
@@ -413,7 +417,7 @@ bool MeshTablesSurface<PFP>::importMeshBin(const std::string& filename, std::vec
 
     for (unsigned int vxNum = 0 ; vxNum < m_nbVertices ; ++vxNum)
     {
-    	VEC3 pos ;
+    	Geom::Vec3f pos ;
     	fp.read((char*) &pos[0], sizeof(float)) ;
     	fp.read((char*) &pos[1], sizeof(float)) ;
     	fp.read((char*) &pos[2], sizeof(float)) ;
@@ -423,6 +427,7 @@ bool MeshTablesSurface<PFP>::importMeshBin(const std::string& filename, std::vec
 
 		verticesID.push_back(id) ;
     }
+    std::cout << positions[0] << std::endl ;
 
     // Read foreach face
 	m_nbEdges.reserve(m_nbFaces) ;
