@@ -69,11 +69,10 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 
 
 	if (m_attIndex.map() != &mapx)
-	{
 		m_attIndex  = mapx.template getAttribute<unsigned int>(DART, "dart_index");
-		if (!m_attIndex.isValid())
-			m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
-	}
+
+	if (!m_attIndex.isValid())
+		m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -332,13 +331,10 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-
 	if (m_attIndex.map() != &mapx)
-	{
 		m_attIndex  = mapx.template getAttribute<unsigned int>(DART, "dart_index");
-		if (!m_attIndex.isValid())
+	if (!m_attIndex.isValid())
 			m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
-	}
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))

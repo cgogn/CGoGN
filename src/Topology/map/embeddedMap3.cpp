@@ -154,10 +154,10 @@ Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 	return resV;
 }
 
-bool EmbeddedMap3::collapseDegeneratedFace(Dart d)
-{
-	return Map3::collapseDegeneratedFace(d);
-}
+//bool EmbeddedMap3::collapseDegeneratedFace(Dart d)
+//{
+//	return Map3::collapseDegeneratedFace(d);
+//}
 
 void EmbeddedMap3::splitFace(Dart d, Dart e)
 {
