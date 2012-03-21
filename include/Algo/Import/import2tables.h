@@ -52,7 +52,7 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, PLYPTMgeneric, OFF, OBJ, VRML, AHEM };
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, PLYPTM, PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
 	}
 
 	namespace ImportVolumique
@@ -109,12 +109,16 @@ public:
 
 	bool importOff(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importMeshBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 	bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
-	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
