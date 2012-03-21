@@ -22,6 +22,8 @@
  *                                                                              *
  *******************************************************************************/
 
+#include "Topology/generic/traversor3.h"
+
 namespace CGoGN
 {
 
@@ -59,44 +61,20 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 {
-	DartMarkerStore mark(the_map);			// Lock a marker
-
-	std::vector<Dart> visitedFaces;			// Faces that are traversed
-	visitedFaces.reserve(64) ;
-	visitedFaces.push_back(d);
-
-	unsigned int nbFaces = 0;				// Count the faces
+	unsigned int nbFaces = 0;
 
 	//Test the number of faces end its valency
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WF<typename PFP::MAP> travWF(the_map, d);
+	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
 	{
-		Dart dc = visitedFaces[i];
+		//increase the number of faces
+		nbFaces++;
+		if(nbFaces > 4)	//too much faces
+			return false;
 
-		//if this dart is not marked
-		if(!mark.isMarked(dc))
-		{
-			//increase the number of faces
-			nbFaces++;
-			if(nbFaces > 4)	//too much faces
-				return false;
-
-			//test the valency of this face
-			if(dc != the_map.phi1(the_map.phi1(the_map.phi1(dc))))
-				return false;
-
-			//mark the face and push adjacent faces
-			Dart d1 = dc;
-			for(unsigned int i = 0; i <3 ; ++i)
-			{
-				mark.mark(d1);
-				//if phi2 not marked
-				Dart d2 = the_map.phi2(d1);
-				if(!mark.isMarked(d2))
-					visitedFaces.push_back(d2);
-
-				d1 = the_map.phi1(dc);
-			}
-		}
+		//test the valency of this face
+		if(the_map.faceDegree(dit) != 3)
+			return false;
 	}
 
 	return true;
@@ -408,83 +386,83 @@ void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
 template <typename PFP>
 void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 {
-	typedef typename PFP::TVEC3 TVEC3;
-	typedef typename PFP::VEC3 VEC3;
-
-
-	//parcourir le tetra est sauvegarder un brin de chaque face + calcul du centroid
-	VEC3 volCenter;
-	unsigned count = 0 ;
-
-	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	DartMarkerStore mv(map);		// Lock a vertex marker to compute volume center
-
-	std::vector<Dart> visitedFaces;
-	visitedFaces.reserve(4);
-	visitedFaces.push_back(d);
-
-	mf.markOrbit(FACE, d) ;
-
-	//TODO diminuer complexite avec boucle specifique aux tetras
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-	{
-		Dart e = visitedFaces[i] ;
-		do
-		{
-			//compute volume centroid
-			if(!mv.isMarked(e))
-			{
-				volCenter += position[e];
-				++count;
-				mv.markOrbit(VERTEX, e);
-			}
-
-			// add all face neighbours to the table
-			Dart ee = map.phi2(e) ;
-			if(!mf.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
-			}
-
-			e = map.phi1(e) ;
-		} while(e != visitedFaces[i]) ;
-	}
-
-	volCenter /= typename PFP::REAL(count) ;
-
-	//store the new faces to 3-sew
-	std::vector<std::pair<Dart,Dart> > nFaces;
-	nFaces.reserve(6);
-
-	//triangule chaque face avec plongement au centroid
-	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-	{
-		// on decoud et on ferme le trou
-		Dart temp = *face;
-		do
-		{
-			nFaces.push_back(std::pair<Dart,Dart>(temp, map.phi2(temp)));
-			map.unsewFaces(temp);
-			temp = map.phi1(temp);
-		}
-		while(temp != *face);
-
-		map.closeHole(*face);
-
-		Dart fi = map.phi2(*face);
-
-		Dart cd = Algo::Modelisation::trianguleFace<PFP>(map, fi);
-		position[cd] = volCenter;
-	}
-
-	//coudre les nouveaux brins entre eux par phi3
-	for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
-	{
-
-		if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
-			map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
-	}
+//	typedef typename PFP::TVEC3 TVEC3;
+//	typedef typename PFP::VEC3 VEC3;
+//
+//
+//	//parcourir le tetra est sauvegarder un brin de chaque face + calcul du centroid
+//	VEC3 volCenter;
+//	unsigned count = 0 ;
+//
+//	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
+//	DartMarkerStore mv(map);		// Lock a vertex marker to compute volume center
+//
+//	std::vector<Dart> visitedFaces;
+//	visitedFaces.reserve(4);
+//	visitedFaces.push_back(d);
+//
+//	mf.markOrbit(FACE, d) ;
+//
+//	//TODO diminuer complexite avec boucle specifique aux tetras
+//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+//	{
+//		Dart e = visitedFaces[i] ;
+//		do
+//		{
+//			//compute volume centroid
+//			if(!mv.isMarked(e))
+//			{
+//				volCenter += position[e];
+//				++count;
+//				mv.markOrbit(VERTEX, e);
+//			}
+//
+//			// add all face neighbours to the table
+//			Dart ee = map.phi2(e) ;
+//			if(!mf.isMarked(ee)) // not already marked
+//			{
+//				visitedFaces.push_back(ee) ;
+//				mf.markOrbit(FACE, ee) ;
+//			}
+//
+//			e = map.phi1(e) ;
+//		} while(e != visitedFaces[i]) ;
+//	}
+//
+//	volCenter /= typename PFP::REAL(count) ;
+//
+//	//store the new faces to 3-sew
+//	std::vector<std::pair<Dart,Dart> > nFaces;
+//	nFaces.reserve(6);
+//
+//	//triangule chaque face avec plongement au centroid
+//	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+//	{
+//		// on decoud et on ferme le trou
+//		Dart temp = *face;
+//		do
+//		{
+//			nFaces.push_back(std::pair<Dart,Dart>(temp, map.phi2(temp)));
+//			map.unsewFaces(temp);
+//			temp = map.phi1(temp);
+//		}
+//		while(temp != *face);
+//
+//		map.closeHole(*face);
+//
+//		Dart fi = map.phi2(*face);
+//
+//		Dart cd = Algo::Modelisation::trianguleFace<PFP>(map, fi);
+//		position[cd] = volCenter;
+//	}
+//
+//	//coudre les nouveaux brins entre eux par phi3
+//	for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
+//	{
+//
+//		if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
+//			map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
+//	}
 }
 
 /************************************************************************************************

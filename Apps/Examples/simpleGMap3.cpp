@@ -54,7 +54,7 @@ SimpleGMap3::SimpleGMap3()
 
 	SelectorMarked sm(markOrient);
 	std::cout << "AAA"<< std::endl;
-	Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
+	//Algo::Modelisation::catmullClarkVol<PFP,PFP::TVEC3,PFP::VEC3>(myMap, position, sm);
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);

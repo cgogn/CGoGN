@@ -410,15 +410,23 @@ void GMap3::splitVolume(std::vector<Dart>& vd)
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 
-	//unsew the edge path
-	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		GMap2::unsewFaces(*it);
-
-	GMap2::fillHole(e) ;
-	GMap2::fillHole(e2) ;
+	GMap2::splitSurface(vd,true,true);
 
 	//sew the two connected components
-	GMap3::sewVolumes(beta2(e), beta2(e2), false);
+	GMap3::sewVolumes(phi2(e), phi2(e2), false);
+
+//	Dart e = vd.front();
+//	Dart e2 = phi2(e);
+//
+//	//unsew the edge path
+//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//		GMap2::unsewFaces(*it);
+//
+//	GMap2::fillHole(e) ;
+//	GMap2::fillHole(e2) ;
+//
+//	//sew the two connected components
+//	GMap3::sewVolumes(beta2(e), beta2(e2), false);
 }
 
 /*! @name Topological Queries

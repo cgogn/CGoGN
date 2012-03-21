@@ -130,7 +130,7 @@ echo "* You should have received a copy of the GNU Lesser General Public License
 echo "* along with this library; if not, write to the Free Software Foundation,      *" >> ${apps}.h
 echo "* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *" >> ${apps}.h
 echo "*                                                                              *" >> ${apps}.h
-echo "* Web site: http://cgogn.u-strasbg.fr/                                         *" >> ${apps}.h
+echo "* Web site: http://cgogn.unistra.fr/                                           *" >> ${apps}.h
 echo "* Contact information: cgogn@unistra.fr                                        *" >> ${apps}.h
 echo "*                                                                              *" >> ${apps}.h
 echo "*******************************************************************************/" >> ${apps}.h

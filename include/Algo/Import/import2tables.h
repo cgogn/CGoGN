@@ -57,7 +57,7 @@ namespace Import
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY ,OFF, OBJ };
+		enum ImportType { UNKNOWNVOLUME , TET, ELE, TS };
 	}
 
 
@@ -188,9 +188,6 @@ public:
 
 	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
 
-	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames);
 
 	MeshTablesVolume(typename PFP::MAP& map):
 		m_map(map)
