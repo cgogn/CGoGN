@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -253,6 +253,7 @@ public:
 		this->m_map.setDartEmbedding(orbit, d, emb);
 		return false;
 	}
+	void changeEmb(unsigned int e) { emb = e;}
 };
 
 // Functor Check Embedding : to check the embeddings of the given map
@@ -319,6 +320,22 @@ public:
 };
 
 
+template <typename MAP>
+class FunctorStoreNotBoundary : public FunctorMap<MAP>
+{
+protected:
+	std::vector<Dart>& m_vec;
+public:
+	FunctorStoreNotBoundary(MAP& map, std::vector<Dart>& vec) : FunctorMap<MAP>(map), m_vec(vec) {}
+	bool operator()(Dart d)
+	{
+		if (!this->m_map.isBoundaryMarked(d))
+			m_vec.push_back(d);
+		return false;
+	}
+};
+
+
 // Multiple Functor: to apply several Functors in turn to a dart
 /********************************************************/
 
@@ -360,7 +377,8 @@ public:
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
+		unsigned int d_index = this->m_map.dartIndex(d);
+		this->m_markTable->operator[](d_index).setMark(this->m_mark) ;
 		return false ;
 	}
 } ;
@@ -377,8 +395,9 @@ public:
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markTable->operator[](d.index).setMark(this->m_mark) ;
-		m_markedDarts.push_back(d.index) ;
+		unsigned int d_index = this->m_map.dartIndex(d);
+		this->m_markTable->operator[](d_index).setMark(this->m_mark) ;
+		m_markedDarts.push_back(d_index) ;
 		return false ;
 	}
 } ;
@@ -391,7 +410,8 @@ public:
 	{}
 	bool operator()(Dart d)
 	{
-		this->m_markTable->operator[](d.index).unsetMark(this->m_mark) ;
+		unsigned int d_index = this->m_map.dartIndex(d);
+		this->m_markTable->operator[](d_index).unsetMark(this->m_mark) ;
 		return false ;
 	}
 } ;

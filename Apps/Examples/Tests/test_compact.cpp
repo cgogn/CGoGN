@@ -103,7 +103,7 @@ void test_compact_map(const std::string& name)
 			do						// mark all edges incident to vertex;
 			{
 				dm.markOrbit( EDGE, e);
-				e = myMap.alpha1(e);
+				e = myMap.phi2_1(e);
 			}while (e!=d);
 		}
 		i++;

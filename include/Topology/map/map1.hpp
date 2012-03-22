@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -38,7 +38,7 @@ inline Map1::Map1() : AttribMap()
 	init() ;
 }
 
-inline std::string Map1::mapTypeName()
+inline std::string Map1::mapTypeName() const
 {
 	return "Map1" ;
 }
@@ -69,19 +69,34 @@ inline void Map1::update_topo_shortcuts()
 inline Dart Map1::newDart()
 {
 	Dart d = GenericMap::newDart() ;
-	(*m_phi1)[d.index] = d ;
-	(*m_phi_1)[d.index] = d ;
+	unsigned int d_index = dartIndex(d) ;
+	(*m_phi1)[d_index] = d ;
+	(*m_phi_1)[d_index] = d ;
+	if(m_isMultiRes)
+	{
+		pushLevel() ;
+		for(unsigned int i = m_mrCurrentLevel + 1;  i < m_mrDarts.size(); ++i)
+		{
+			setCurrentLevel(i) ;
+			unsigned int d_index = dartIndex(d) ;
+			(*m_phi1)[d_index] = d ;
+			(*m_phi_1)[d_index] = d ;
+		}
+		popLevel() ;
+	}
 	return d ;
 }
 
 inline Dart Map1::phi1(Dart d)
 {
-	return (*m_phi1)[d.index] ;
+//	unsigned int d_index = dartIndex(d);
+	return (*m_phi1)[dartIndex(d)] ;
 }
 
 inline Dart Map1::phi_1(Dart d)
 {
-	return (*m_phi_1)[d.index] ;
+//	unsigned int d_index = dartIndex(d);
+	return (*m_phi_1)[dartIndex(d)] ;
 }
 
 template <int N>
@@ -115,22 +130,26 @@ inline Dart Map1::alpha_1(Dart d)
 
 inline void Map1::phi1sew(Dart d, Dart e)
 {
-	Dart f = (*m_phi1)[d.index] ;
-	Dart g = (*m_phi1)[e.index] ;
-	(*m_phi1)[d.index] = g ;
-	(*m_phi1)[e.index] = f ;
-	(*m_phi_1)[g.index] = d ;
-	(*m_phi_1)[f.index] = e ;
+	unsigned int d_index = dartIndex(d);
+	unsigned int e_index = dartIndex(e);
+	Dart f = (*m_phi1)[d_index] ;
+	Dart g = (*m_phi1)[e_index] ;
+	(*m_phi1)[d_index] = g ;
+	(*m_phi1)[e_index] = f ;
+	(*m_phi_1)[dartIndex(g)] = d ;
+	(*m_phi_1)[dartIndex(f)] = e ;
 }
 
 inline void Map1::phi1unsew(Dart d)
 {
-	Dart e = (*m_phi1)[d.index] ;
-	Dart f = (*m_phi1)[e.index] ;
-	(*m_phi1)[d.index] = f ;
-	(*m_phi1)[e.index] = e ;
-	(*m_phi_1)[f.index] = d ;
-	(*m_phi_1)[e.index] = e ;
+	unsigned int d_index = dartIndex(d);
+	Dart e = (*m_phi1)[d_index] ;
+	unsigned int e_index = dartIndex(e);
+	Dart f = (*m_phi1)[e_index] ;
+	(*m_phi1)[d_index] = f ;
+	(*m_phi1)[e_index] = e ;
+	(*m_phi_1)[dartIndex(f)] = d ;
+	(*m_phi_1)[e_index] = e ;
 }
 
 /*! @name Topological Operators
@@ -228,7 +247,7 @@ inline bool Map1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thre
 	return f(d) ;
 }
 
-inline bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool Map1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d ;
 	do
@@ -240,19 +259,5 @@ inline bool Map1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned
 	return false ;
 }
 
-inline bool Map1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) ;
-}
-
-inline bool Map1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) ;
-}
-
-inline bool Map1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) ;
-}
 
 } // namespace CGoGN

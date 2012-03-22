@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -25,6 +25,7 @@
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/autoAttributeHandler.h"
 #include "Container/fakeAttribute.h"
+#include "Algo/Modelisation/polyhedron.h"
 
 namespace CGoGN
 {
@@ -78,7 +79,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 				unsigned int em = edgesBuffer[j];		// get embedding
 
 				FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, em);
-				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+//				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+				map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
@@ -119,10 +121,116 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 	if (nbBoundaryEdges > 0)
 	{
-		map.closeMap();
-		CGoGNout << "Map closed (" << nbBoundaryEdges << " boundary edges)" << CGoGNendl;
+		unsigned int nbH = map.closeMap();
+		CGoGNout << "Map closed (" << nbBoundaryEdges << " boundary edges / " << nbH << " holes)" << CGoGNendl;
 		// ensure bijection between topo and embedding
 		map.bijectiveOrbitEmbedding(VERTEX);
+	}
+
+	return true ;
+}
+
+template <typename PFP>
+bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float dist)
+{
+	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
+	unsigned nbf = mts.getNbFaces();
+	int index = 0;
+	// buffer for tempo faces (used to remove degenerated edges)
+	std::vector<unsigned int> edgesBuffer;
+	edgesBuffer.reserve(16);
+
+	DartMarkerNoUnmark m(map) ;
+
+	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX, "position");
+	std::vector<unsigned int > backEdgesBuffer(mts.getNbVertices(), EMBNULL);
+
+	// for each face of table -> create a prism
+	for(unsigned int i = 0; i < nbf; ++i)
+	{
+		// store face in buffer, removing degenerated edges
+		unsigned int nbe = mts.getNbEdgesFace(i);
+		edgesBuffer.clear();
+		unsigned int prec = EMBNULL;
+		for (unsigned int j = 0; j < nbe; ++j)
+		{
+			unsigned int em = mts.getEmbIdx(index++);
+			if (em != prec)
+			{
+				prec = em;
+				edgesBuffer.push_back(em);
+			}
+		}
+		// check first/last vertices
+		if (edgesBuffer.front() == edgesBuffer.back())
+			edgesBuffer.pop_back();
+
+		// create only non degenerated faces
+		nbe = edgesBuffer.size();
+		if (nbe > 2)
+		{
+			Dart d = Algo::Modelisation::createPrism<PFP>(map, nbe);
+
+			//Embed the base faces
+			for (unsigned int j = 0; j < nbe; ++j)
+			{
+				unsigned int em = edgesBuffer[j];		// get embedding
+
+				if(backEdgesBuffer[em] == EMBNULL)
+				{
+					unsigned int emn = map.newCell(VERTEX);
+					map.copyCell(VERTEX, emn, em);
+					backEdgesBuffer[em] = emn;
+					position[emn] += typename PFP::VEC3(0,0,dist);
+				}
+
+				FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, em);
+				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+				map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+
+				//Embed the other base face
+				Dart d2 = map.phi1(map.phi1(map.phi2(d)));
+				unsigned int em2 = backEdgesBuffer[em];
+				FunctorSetEmb<typename PFP::MAP> fsetemb2(map, VERTEX, em2);
+				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d2, fsetemb2) ;
+				map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d2, fsetemb2);
+
+				m.mark(d) ;								// mark on the fly to unmark on second loop
+				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
+				d = map.phi_1(d);
+			}
+
+		}
+	}
+
+	// reconstruct neighbourhood
+	unsigned int nbBoundaryEdges = 0;
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (m.isMarked(d))
+		{
+			// darts incident to end vertex of edge
+			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+
+			unsigned int embd = map.getEmbedding(VERTEX, d);
+			Dart good_dart = NIL;
+			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+			{
+				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
+					good_dart = *it;
+			}
+
+			if (good_dart != NIL)
+			{
+				map.sewVolumes(map.phi2(d), map.phi2(good_dart), false);
+				m.unmarkOrbit(EDGE, d);
+			}
+			else
+			{
+				m.unmark(d);
+				++nbBoundaryEdges;
+			}
+		}
 	}
 
 	return true ;
@@ -441,179 +549,19 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 	return importMesh<PFP>(map, mts);
 }
 
-/*
-template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind)
-{
-	MeshTablesVolume<PFP> mtv(map);
 
-	if(!mtv.importMesh(filename, attrNames, kind))
+template <typename PFP>
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
+{
+	float dist = 5.0f;
+	MeshTablesSurface<PFP> mts(map);
+
+	if(!mts.importMesh(filename, attrNames, kind))
 		return false;
 
-	return importMesh<PFP>(map, mtv);
+	return importMeshSToV<PFP>(map, mts, dist);
 }
-*/
 
-//
-//
-//
-//	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
-//
-//
-//	// Attributes container for vertex orbit
-//	AttributeContainer& vertexContainer = map.getAttributeContainer(VERTEX);
-//
-//	AttributeHandler<VEC3> positions(idPositions,map);
-//
-//	MeshTablesSurface<VEC3> mts(vertexContainer, positions);
-//
-//	if (!mts.importMesh(filename,kind))
-//		return false;
-//
-//	// marker for phi2 reconstruction
-//	m = map.getNewMarker();
-//
-//	unsigned nbf = mts.getNbFaces();
-//	int index = 0;
-//	// buffer for tempo faces (used to remove degenerated edges)
-//	std::vector<unsigned int> edgesBuffer;
-//	edgesBuffer.reserve(8);
-//
-//	// for each face of table
-//	for(unsigned int i = 0; i < nbf; ++i)
-//	{
-//		// store face in buffer, removing degenerated edges
-//		unsigned int nbe = mts.getNbEdgesFace(i);
-//		edgesBuffer.clear();
-//		unsigned int prec=EMBNULL;
-//		for (unsigned int j=0; j<nbe; ++j)
-//		{
-//			unsigned int em = mts.getEmbIdx(index++);
-//			if (em!=prec)
-//			{
-//				prec = em;
-//				edgesBuffer.push_back(em);
-//			}
-//		}
-//		// check first/last vertices
-//		if (edgesBuffer.front() == edgesBuffer.back())
-//			edgesBuffer.pop_back();
-//
-//		// create only non degenerated faces
-//		nbe = edgesBuffer.size();
-//		if (nbe >2)
-//		{
-//			Dart d = map.newFace(nbe);
-//			for (unsigned int j=0; j<nbe; ++j)
-//			{
-//				unsigned int em = edgesBuffer[j];		// get embedding
-//				map.setDartEmbedding(VERTEX, d, em);	// associate to dart
-//				vecDartsPerVertex[em].push_back(d);	// store incident darts for fast phi2 reconstruction
-//				d = map.phi1(d);
-//			}
-//			map.markOrbit(FACE,d,m);// mark on the fly to unmark on second loop
-//		}
-//	}
-//
-//	unsigned nbnm=0;
-//	// reconstruct neighbourhood
-//
-//	for (Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if (map.isMarkedDart(d, m))
-//		{
-//			// darts incident to end vertex of edge
-//			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
-//
-//			unsigned int embd = map.getEmbedding(VERTEX, d);
-//			unsigned int nbf=0;
-//			Dart good_dart;
-//			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
-//			{
-//				if ( map.getEmbedding(VERTEX,map.phi1(*it))==embd)
-//				{
-//					good_dart = *it;
-//					nbf++;
-//				}
-//			}
-//
-//			if (nbf==1)
-//			{
-//				if (good_dart == map.phi2(good_dart))
-//				{
-//					map.sewFaces(d, good_dart);
-//					map.unmarkOrbit(EDGE, d, m);
-//				}
-//			}
-//			else
-//			{
-//				++nbnm;
-//			}
-//		}
-//	}
-//
-//
-////	return true;
-//
-//	if (nbnm > 0)
-//	{
-//		if (closeObject)
-//		{
-//			Marker mb = map.closeMap(true);
-////			// for all vertices
-////			for (unsigned int index = 0; index < vecDartsEmb.size(); ++index)
-////			{
-////				// if vertex is on boundary
-////				if (vecEmbNbFp[index] > 0)
-////				{
-////					// find first dart that is sewed to boundary
-////					std::vector<Dart>& vd = vecDartsEmb[index];
-////					typename std::vector<Dart>::iterator jt = vd.begin();
-////					while (!map.isMarkedDart(*jt, m))
-////						jt++;
-////					unsigned int P = map.getEmbedding(VERTEX, *jt);
-////					// while vertex if a "non manifold point"
-////					while (vecEmbNbFp[index] > 1)
-////					{
-////						Dart e = map.phi2(*jt);
-////						// turn in boundary until we find same embedding
-////						do
-////						{
-////							e = map.phi1(e);
-////							// embedding of boundary darts on the fly
-////							unsigned int emb = map.getEmbedding(VERTEX, map.phi1(map.phi2(e)));
-////							map.setDartEmbedding(VERTEX, e, emb);
-////						} while (map.getEmbedding(VERTEX, map.phi2(e)) != P);
-////						// separate the face
-////						map.phi1sew(map.phi2(*jt), e);
-////						vecEmbNbFp[index]--;
-////					}
-////					// copy embedding of vertex of boundary of last face
-////					Dart e = map.phi2(*jt);
-////					Dart d = e;
-////					if (map.getEmbedding(VERTEX, d) == EMBNULL)
-////					{
-////						do
-////						{
-////							unsigned int emb = map.getEmbedding(VERTEX, map.phi1(map.phi2(d)));
-////							map.setDartEmbedding(VERTEX, d, emb);
-////							d = map.phi1(d);
-////						} while (d != e);
-////					}
-////				}
-////			}
-//			map.unmarkAll(m);
-//			map.releaseMarker(m);
-//			m = mb;
-//		}
-//		else
-//		{
-//			CGoGNout << "Warning " << nbnm << " darts with phi2 fix points" << CGoGNendl;
-//		}
-//	}
-//
-//	return true;
-//}
 
 } // namespace Import
 

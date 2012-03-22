@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -31,12 +31,29 @@ namespace CGoGN
 {
 
 /*******************************************************************************
+					GENERIC TRAVERSALS FACTORY
+*******************************************************************************/
+
+template <typename MAP>
+class Traversor2
+{
+public:
+	virtual ~Traversor2() {}
+	virtual Dart begin() = 0;
+	virtual Dart end() = 0;
+	virtual Dart next() = 0;
+
+	static Traversor2<MAP>* createIncident(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY);
+	static Traversor2<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY);
+};
+
+/*******************************************************************************
 					VERTEX CENTERED TRAVERSALS
 *******************************************************************************/
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor2VE
+class Traversor2VE : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -53,7 +70,7 @@ public:
 
 // Traverse the faces incident to a given vertex
 template <typename MAP>
-class Traversor2VF
+class Traversor2VF : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -70,7 +87,7 @@ public:
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
 template <typename MAP>
-class Traversor2VVaE
+class Traversor2VVaE : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -87,7 +104,7 @@ public:
 
 // Traverse the vertices adjacent to a given vertex through sharing a common face
 template <typename MAP>
-class Traversor2VVaF
+class Traversor2VVaF : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -110,7 +127,7 @@ public:
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor2EV
+class Traversor2EV : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -127,7 +144,7 @@ public:
 
 // Traverse the faces incident to a given edge
 template <typename MAP>
-class Traversor2EF
+class Traversor2EF : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -144,7 +161,7 @@ public:
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
 template <typename MAP>
-class Traversor2EEaV
+class Traversor2EEaV : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -163,7 +180,7 @@ public:
 
 // Traverse the edges adjacent to a given edge through sharing a common face
 template <typename MAP>
-class Traversor2EEaF
+class Traversor2EEaF : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -186,7 +203,7 @@ public:
 
 // Traverse the vertices incident to a given face
 template <typename MAP>
-class Traversor2FV
+class Traversor2FV : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -201,26 +218,18 @@ public:
 	Dart next() ;
 } ;
 
-// Traverse the edges incident to a given face
+
+// Traverse the edges incident to a given face (equivalent to vertices)
 template <typename MAP>
-class Traversor2FE
+class Traversor2FE: public Traversor2FV<MAP>
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
 public:
-	Traversor2FE(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
+	Traversor2FE(MAP& map, Dart dart):Traversor2FV<MAP>(map,dart){}
 } ;
 
 // Traverse the faces adjacent to a given face through sharing a common vertex
 template <typename MAP>
-class Traversor2FFaV
+class Traversor2FFaV : public Traversor2<MAP>
 {
 private:
 	MAP& m ;
@@ -239,7 +248,7 @@ public:
 
 // Traverse the faces adjacent to a given face through sharing a common edge
 template <typename MAP>
-class Traversor2FFaE
+class Traversor2FFaE : public Traversor2<MAP>
 {
 private:
 	MAP& m ;

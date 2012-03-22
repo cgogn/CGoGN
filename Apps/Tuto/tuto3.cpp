@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -55,67 +55,94 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
+Dart xd1;
+
 
 void MyQT::traverseMap()
 {
+	DartMarker m1(myMap);
+	DartMarker m2(myMap);
+	myMap.rdfi(myMap.begin(),m1,m2);
 
-	//traverse cells of map using topological markers on darts
+	m1.unmarkAll();
 
-	CGoGNout << "Traverse with DartMarkers:"<< CGoGNendl;
-	DartMarker dmV(myMap);
-	DartMarker dmE(myMap);
-	DartMarker dmF(myMap);
+	m1.markOrbit(VOLUME,xd1);
+
+	// render the topo of the map without boundary darts
+	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
-		if (!dmV.isMarked(d))
+		if (m2.isMarked(d))
 		{
-			CGoGNout << "Vertex of dart "<<d<<CGoGNendl;
-			dmV.markOrbit(VERTEX,d);
+			m_render_topo->setDartColor(d,1.0f,0.0f,0.0f);
 		}
-		if (!dmE.isMarked(d))
+		if (m1.isMarked(d))
 		{
-			CGoGNout << "Edgee of dart "<<d<<CGoGNendl;
-			dmE.markOrbit(EDGE,d);
-		}
-		if (!dmF.isMarked(d))
-		{
-			CGoGNout << "Face of dart "<<d<<CGoGNendl;
-			dmF.markOrbit(FACE,d);
+			m_render_topo->setDartColor(d,0.0f,1.0f,0.0f);
 		}
 	}
 
-
-	// traverses cells of map with markers on embedded cells.
-	// More efficients but more memory costly if cells are not already embedded.
-	// Avoid using construction of objects not ell embedded
-
-	CGoGNout << "========================="<< CGoGNendl;
-	CGoGNout << "Traverse with CellMarkers:"<< CGoGNendl;
-	CellMarker cmV(myMap,VERTEX);
-	CellMarker cmE(myMap,EDGE);
-	CellMarker cmF(myMap,FACE);
-	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
-	{
-		if (!cmV.isMarked(d))
-		{
-			CGoGNout << "Vertex of dart "<<d<<CGoGNendl;
-			cmV.mark(d);
-		}
-		if (!cmE.isMarked(d))
-		{
-			CGoGNout << "Edgee of dart "<<d<<CGoGNendl;
-			cmE.mark(d);
-		}
-		if (!cmF.isMarked(d))
-		{
-			CGoGNout << "Face of dart "<<d<<CGoGNendl;
-			cmF.mark(d);
-		}
-	}
-
-	// markers are cleaned and released at destruction of DartMarkers & CellMarkers
-	// DartMarkerStore should be used if few darts are traversed
-	// DartMarkerNoUnmark can be use if you want to manage unmarking yourself
+//
+//
+//	//traverse cells of map using topological markers on darts
+//
+//	CGoGNout << "Traverse with DartMarkers:"<< CGoGNendl;
+//	DartMarker dmV(myMap);
+//	DartMarker dmE(myMap);
+//	DartMarker dmF(myMap);
+//	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+//	{
+//		if (!dmV.isMarked(d))
+//		{
+//			CGoGNout << "Vertex of dart "<<d<<CGoGNendl;
+//			dmV.markOrbit(VERTEX,d);
+//		}
+//		if (!dmE.isMarked(d))
+//		{
+//			CGoGNout << "Edgee of dart "<<d<<CGoGNendl;
+//			dmE.markOrbit(EDGE,d);
+//		}
+//		if (!dmF.isMarked(d))
+//		{
+//			CGoGNout << "Face of dart "<<d<<CGoGNendl;
+//			dmF.markOrbit(FACE,d);
+//		}
+//	}
+//
+//
+//	// traverses cells of map with markers on embedded cells.
+//	// More efficients but more memory costly if cells are not already embedded.
+//	// Avoid using construction of objects not ell embedded
+//
+//	CGoGNout << "========================="<< CGoGNendl;
+//	CGoGNout << "Traverse with CellMarkers:"<< CGoGNendl;
+//	CellMarker cmV(myMap,VERTEX);
+//	CellMarker cmE(myMap,EDGE);
+//	CellMarker cmF(myMap,FACE);
+//	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
+//	{
+//		if (!cmV.isMarked(d))
+//		{
+//			CGoGNout << "Vertex of dart "<<d<<CGoGNendl;
+//			cmV.mark(d);
+//		}
+//		if (!cmE.isMarked(d))
+//		{
+//			CGoGNout << "Edgee of dart "<<d<<CGoGNendl;
+//			cmE.mark(d);
+//		}
+//		if (!cmF.isMarked(d))
+//		{
+//			CGoGNout << "Face of dart "<<d<<CGoGNendl;
+//			cmF.mark(d);
+//		}
+//	}
+//
+//	// markers are cleaned and released at destruction of DartMarkers & CellMarkers
+//	// DartMarkerStore should be used if few darts are traversed
+//	// DartMarkerNoUnmark can be use if you want to manage unmarking yourself
 
 }
 
@@ -123,19 +150,50 @@ void MyQT::traverseMap()
 void MyQT::createMap()
 {
 
-	Dart d1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
+
+	Dart d1 = Algo::Modelisation::createTetrahedron<PFP>(myMap);
 
 	Dart d2 = d1;
 
+
 	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
 
-	position[d2] = PFP::VEC3(1, 0, 0);
-	d2 = PHI1(d2);
-	position[d2] = PFP::VEC3(-1, 0, 0);
-	d2 = PHI1(d2);
-	position[d2] = PFP::VEC3(0, 2, 0);
-	d2 = PHI<211>(d2);
-	position[d2] = PFP::VEC3(0, 1, 2);
+	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, position);
+	prim1.cylinder_topo(256,256, true, true); // topo of sphere is a closed cylinder
+	prim1.embedSphere(2.0f);
+
+//	Dart d2 = d1;
+//	position[d2] = PFP::VEC3(1, 0, 0);
+//	d2 = PHI1(d2);
+//	position[d2] = PFP::VEC3(-1, 0, 0);
+//	d2 = PHI1(d2);
+//	position[d2] = PFP::VEC3(0, 2, 0);
+//	d2 = PHI<211>(d2);
+//	position[d2] = PFP::VEC3(0, 1, 2);
+
+
+	Algo::Modelisation::Polyhedron<PFP> prim2(myMap, position);
+	prim2.cylinder_topo(256,256, true, true); // topo of sphere is a closed cylinder
+	prim2.embedSphere(2.0f);
+
+	Geom::Matrix44f trf;
+	trf.identity();
+	Geom::translate<float>(5.0f,0.0,0.0,trf);
+	prim2.transform(trf);
+
+	xd1 = prim2.getDart();
+
+
+//	xd1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
+//	Dart xd2 = xd1;
+//
+//	position[xd2] = PFP::VEC3(5, 0, 0);
+//	xd2 = PHI1(xd2);
+//	position[xd2] = PFP::VEC3(3, 0, 0);
+//	xd2 = PHI1(xd2);
+//	position[xd2] = PFP::VEC3(4, 2, 0);
+//	xd2 = PHI<211>(xd2);
+//	position[xd2] = PFP::VEC3(4, 1, 2);
 
     //  bounding box of scene
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

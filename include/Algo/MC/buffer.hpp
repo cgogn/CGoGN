@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,7 +35,7 @@ namespace MC
 * constructor
 */
 template<typename DART>
-Buffer<DART>::Buffer(int32 _lWidth, int32 _lHeight)
+Buffer<DART>::Buffer(int _lWidth, int _lHeight)
 {
 	m_lWidth = _lWidth+1;
 	m_lHeight = _lHeight+1;
@@ -62,7 +62,7 @@ Buffer<DART>::~Buffer()
 * get the face inside a cube of the buffer
 */	
 // template <typename DART>
-// const DART* Buffer<DART>::getFacesCube(int32 _lX, int32 _lY, int32 _lZ) const
+// const DART* Buffer<DART>::getFacesCube(int _lX, int _lY, int _lZ) const
 // {
 // 
 // 	if (_lZ == m_lZpos)				// if current slice ..
@@ -83,7 +83,7 @@ Buffer<DART>::~Buffer()
 * set the face inside a cube of the buffer
 */
 template <typename DART>
-void Buffer<DART>::setFacesCube(int32 _lX,int32 _lY, const DART* const _lFace)
+void Buffer<DART>::setFacesCube(int _lX,int _lY, const DART* const _lFace)
 {
 	// get the address of cube's table
 	DART* lLocFaces  = m_hcSlice1[_lX + _lY*m_lWidth].m_lFaceEdges;
@@ -114,7 +114,7 @@ void Buffer<DART>::nextSlice()
 *  get address of face table for direct access
 */
 template <typename DART>
-DART* Buffer<DART>::getFacesCubeTableAdr(int32 _lX,int32 _lY)
+DART* Buffer<DART>::getFacesCubeTableAdr(int _lX,int _lY)
 {
 	return  m_hcSlice0[_lX + _lY*m_lWidth].m_lFaceEdges;
 }
@@ -125,84 +125,84 @@ DART* Buffer<DART>::getFacesCubeTableAdr(int32 _lX,int32 _lY)
 */
 
 template <typename DART>
-void Buffer<DART>::setPointEdge0(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge0(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX + _lY*m_lWidth].m_lX = _lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge3(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge3(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +(_lY-1)*m_lWidth].m_lY = _lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge8(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge8(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX + _lY*m_lWidth].m_lZ = _lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge2(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge2(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[(_lX-1) +_lY*m_lWidth].m_lX =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge11(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge11(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX + _lY*m_lWidth].m_lZ = _lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge1(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge1(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +_lY*m_lWidth].m_lY =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge9(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge9(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +_lY*m_lWidth].m_lZ =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge10(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge10(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +_lY*m_lWidth].m_lZ =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge7(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge7(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[_lX +(_lY-1)*m_lWidth].m_lY =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge4(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge4(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[_lX +_lY*m_lWidth].m_lX =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge6(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge6(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[(_lX-1) + _lY*m_lWidth].m_lX =_lPoint;
 }
 
 
 template <typename DART>
-void Buffer<DART>::setPointEdge5(int32 _lX,int32 _lY, unsigned int _lPoint)
+void Buffer<DART>::setPointEdge5(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[_lX +_lY*m_lWidth].m_lY =_lPoint;
 }
@@ -213,91 +213,91 @@ void Buffer<DART>::setPointEdge5(int32 _lX,int32 _lY, unsigned int _lPoint)
 */
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge0(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge0(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX + _lY*m_lWidth].m_lX;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge3(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge3(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge8(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge8(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX + _lY*m_lWidth].m_lZ;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge2(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge2(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX +(_lY+1)*m_lWidth].m_lX;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge11(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge11(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX + (_lY+1)*m_lWidth].m_lZ;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge1(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge1(int _lX,int _lY)
 {
 	return m_hcSlice0[(_lX+1) +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge9(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge9(int _lX,int _lY)
 {
 	return m_hcSlice0[(_lX+1) +_lY*m_lWidth].m_lZ;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge10(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge10(int _lX,int _lY)
 {
 	return m_hcSlice0[(_lX+1) +(_lY+1)*m_lWidth].m_lZ;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge7(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge7(int _lX,int _lY)
 {
 	return m_hcSlice1[_lX +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge4(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge4(int _lX,int _lY)
 {
 	return m_hcSlice1[_lX +_lY*m_lWidth].m_lX;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge6(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge6(int _lX,int _lY)
 {
 	return m_hcSlice1[_lX +(_lY+1)*m_lWidth].m_lX;
 }
 
 
 template <typename DART>
-unsigned int Buffer<DART>::getPointEdge5(int32 _lX,int32 _lY)
+unsigned int Buffer<DART>::getPointEdge5(int _lX,int _lY)
 {
 	return m_hcSlice1[(_lX+1) +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART>
-DART Buffer<DART>::getExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY) const
+DART Buffer<DART>::getExternalNeighbour(char _cEdge, int _lX, int _lY) const
 {
 
 	switch(_cEdge)
@@ -362,7 +362,7 @@ CGoGNerr << "ERROR"<<CGoGNendl;
 
 
 template <typename DART>
-void Buffer<DART>::setExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY, DART _lNeighbour)
+void Buffer<DART>::setExternalNeighbour(char _cEdge, int _lX, int _lY, DART _lNeighbour)
 {
 	switch(_cEdge)
 	{

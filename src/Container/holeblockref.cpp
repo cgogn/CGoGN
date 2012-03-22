@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -43,8 +43,22 @@ namespace CGoGN
 HoleBlockRef::HoleBlockRef():
 m_nbfree(0),m_nbref(0),m_nb(0)
 {
-	m_tableFree = new unsigned int[_BLOCKSIZE_];
+	m_tableFree = new unsigned int[_BLOCKSIZE_ + 10];
 	m_refCount = new unsigned int[_BLOCKSIZE_];
+}
+
+HoleBlockRef::HoleBlockRef(const HoleBlockRef& hb)
+{
+	m_nbfree = hb.m_nbfree;
+	m_nbref = hb.m_nbref;
+	m_nb = hb.m_nb;
+
+	m_tableFree = new unsigned int[_BLOCKSIZE_ +10];
+	memcpy(m_tableFree, hb.m_tableFree, (_BLOCKSIZE_+ 10) * sizeof(unsigned int));
+
+	m_refCount = new unsigned int[_BLOCKSIZE_];
+	memcpy(m_refCount, hb.m_refCount, _BLOCKSIZE_ * sizeof(unsigned int));
+
 }
 
 HoleBlockRef::~HoleBlockRef()

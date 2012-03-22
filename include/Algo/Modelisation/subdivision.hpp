@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -72,8 +72,8 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 		Dart fit = cd ;
 		do
 		{
-			t.mark(fit);
-			fit = map.alpha1(fit);
+			t.skip(fit);
+			fit = map.phi2_1(fit);
 		} while(fit != cd);
 	}
 }
@@ -101,8 +101,8 @@ void trianguleFaces(
 		Dart fit = cd ;
 		do
 		{
-			t.mark(fit);
-			fit = map.alpha1(fit);
+			t.skip(fit);
+			fit = map.phi2_1(fit);
 		} while(fit != cd);
 	}
 }
@@ -163,7 +163,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			do
 			{
 				mf.markOrbit(FACE, e);
-				e = map.alpha1(e);
+				e = map.phi2_1(e);
 			} while (e != cf);
 		}
 	}
@@ -233,9 +233,12 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			{
 				center += attributs[it];
 				++count ;
-				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
+//				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
+				me.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(EDGE), it);
+
 				it = map.phi1(it) ;
-				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
+//				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
+				me.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(EDGE), it);
 				it = map.phi1(it) ;
 			} while(it != d) ;
 			center /= double(count);
@@ -283,7 +286,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			temp2 += attributs[v];
 
 			++n;
-			x = map.alpha1(x);
+			x = map.phi2_1(x);
 		} while (x != *vert);
 
 		EMB emcp = attributs[*vert];
@@ -400,7 +403,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			Dart y = map.phi1(map.phi1(x));
 			temp += attributs[y];
 			++n;
-			x = map.alpha1(x);
+			x = map.phi2_1(x);
 		} while ((x != *vert));
 		EMB emcp = attributs[*vert];
 		if (n == 6)
@@ -545,7 +548,7 @@ void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		Dart dd = map.alpha_1(d) ;
+		Dart dd = map.phi12(d) ;
 		new_phi1[d] = dd ;
 		new_phi_1[dd] = d ;
 	}
@@ -618,7 +621,7 @@ void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, con
 			{
 				newP += position[map.phi2(vit)] ;
 				++val ;
-				vit = map.alpha1(vit) ;
+				vit = map.phi2_1(vit) ;
 			} while(vit != d) ;
 			REAL K = sqrt3_K(val) ;
 			newP *= REAL(3) ;

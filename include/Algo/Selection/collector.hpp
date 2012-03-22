@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -195,7 +195,7 @@ void Collector_WithinSphere<PFP>::collectAll(Dart d)
 					}
 				}
 			}
-			e = this->map.alpha1(e);
+			e = this->map.phi2_1(e);
 		} while (e != end);
 		++i;
 	}
@@ -243,7 +243,7 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 				}
 				em.mark(e);
 			}
-			e = this->map.alpha1(e);
+			e = this->map.phi2_1(e);
 		} while (e != end);
 		++i;
 	}

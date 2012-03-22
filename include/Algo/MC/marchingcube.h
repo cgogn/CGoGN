@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -25,7 +25,6 @@
 #ifndef MARCHINGCUBE_H
 #define MARCHINGCUBE_H
 
-#include "Algo/MC/type.h"
 #include "Algo/MC/image.h"
 #include "Algo/MC/buffer.h"
 #include "Algo/MC/tables.h"
@@ -89,7 +88,7 @@ protected:
 	* The index is a eight bit index, one bit for each vertex of the cube.\n
 	* If the vertex is inside the objet (val < isovalue) the bit is set to 1, else to 0
 	*/
-	uint8 computeIndex(const DataType* const _ucData) const;
+	unsigned char computeIndex(const DataType* const _ucData) const;
 
 	/**
 	 * tag boundary to b removed or not
@@ -122,14 +121,14 @@ protected:
 	* @param   _lZ  coordinate Z of the cube
 	* @param   tag  the boundary tag (NOT USE FOR THE MOMENT)
 	*/
-	void createFaces_1(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_2(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_3(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_4(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_5(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_6(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_7(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_8(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
+	void createFaces_1(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_2(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_3(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_4(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_5(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_6(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_7(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_8(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
 //@}
 
 	/**
@@ -146,7 +145,7 @@ protected:
 	*
 	* @todo use the member (of struct HalfCube) number of faces instead of fill with -1
 	*/
-	void createLocalFaces(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int const *_lVertTable, const unsigned short _ucMask, float curv, uint8 tag);
+	void createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int const *_lVertTable, const unsigned short _ucMask, float curv, unsigned char tag);
 
 	/**
 	* @name create vertices on edges of cube
@@ -164,18 +163,18 @@ protected:
 	* @param   vPos the position in "real world"
 	*
 	*/
-	void createPointEdge0(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge1(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge2(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge3(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge4(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge5(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge6(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge7(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge8(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge9(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge10(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge11(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge0(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge1(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge2(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge3(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge4(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge5(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge6(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge7(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge8(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge9(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge10(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge11(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
 //@}
 
 	/**
@@ -190,14 +189,7 @@ protected:
 
 	void setNeighbour(L_DART d1, L_DART d2);
 
-	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3) {
-		L_DART d = m_map->newFace(3);
-		//TODO change this which work only with 2-maps
-		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
-		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
-		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
-		return d;
-	}
+	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3);
 
 public:
 	/**
@@ -262,6 +254,7 @@ public:
 
 	void removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth);
 
+	void recalPoints(const Geom::Vec3f& origin);
 };
 
 

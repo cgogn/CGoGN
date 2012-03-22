@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -108,6 +108,20 @@ void VBO::releasePtr() const
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	m_lock = false;
 }
+
+void VBO::copyData(void *ptr) const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glGetBufferSubData(GL_ARRAY_BUFFER,0,m_nbElts*m_data_size*sizeof(float), ptr);
+}
+
+void VBO::allocate(unsigned int nbElts)
+{
+	m_nbElts = nbElts;
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size*sizeof(float), 0, GL_STREAM_DRAW);
+}
+
 
 } // namespace Utils
 

@@ -25,10 +25,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Topology/*.hpp
 	${CGoGN_ROOT_DIR}/include/Topology/*.h
 )
-add_library(
-	topologyD
-	${files_topology}
-)
+
 
 file(
 	GLOB_RECURSE
@@ -37,10 +34,7 @@ file(
 	${CGoGN_ROOT_DIR}/include/Container/*.hpp
 	${CGoGN_ROOT_DIR}/include/Container/*.h
 )
-add_library(
-	containerD
-	${files_container}
-)
+
 
 file(
 	GLOB_RECURSE
@@ -50,21 +44,18 @@ file(
 	${CGoGN_ROOT_DIR}/include/Algo/*.hpp
 	${CGoGN_ROOT_DIR}/include/Algo/*.h
 )
-add_library(
-	algoD
-	${files_algo}
-)
 
 
 file(
-	GLOB_RECURSE
+#	GLOB_RECURSE
+	GLOB
 	shaders_srcD
 	${CGoGN_ROOT_DIR}/include/Utils/*.frag
 	${CGoGN_ROOT_DIR}/include/Utils/*.vert
 	${CGoGN_ROOT_DIR}/include/Utils/*.geom	
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.frag
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.vert
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.geom
 )
 
 IF(WIN32)
@@ -106,11 +97,26 @@ IF(WITH_QT)
 		
 	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
-	add_library( utilsD ${files_utils_withQt} )
-ELSE(WITH_QT)
-	add_library( utilsD ${files_utils} )
 ENDIF (WITH_QT)
 
 
-add_dependencies(utilsD shader_targetD )
 
+
+IF (ONELIB)
+	IF(WITH_QT)
+		add_library( cgognD ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
+	ELSE(WITH_QT)
+		add_library( cgognD ${files_topology} ${files_container} ${files_algo} ${files_utils} )
+	ENDIF (WITH_QT)
+	add_dependencies(cgognD shader_targetD )
+ELSE (ONELIB)
+	add_library( topologyD	${files_topology})
+	add_library( containerD	${files_container})
+	add_library( algoD		${files_algo})
+	IF(WITH_QT)
+		add_library( utilsD ${files_utils_withQt} )
+	ELSE(WITH_QT)
+		add_library( utilsD ${files_utils} )
+	ENDIF (WITH_QT)
+	add_dependencies(utilsD shader_targetD )
+ENDIF (ONELIB)

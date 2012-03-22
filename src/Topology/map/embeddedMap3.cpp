@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -53,15 +53,19 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 		copyCell(EDGE, nd, d) ;
 	}
 
-	if(isOrbitEmbedded(ORIENTED_FACE))
+//	if(isOrbitEmbedded(ORIENTED_FACE))
+	if(isOrbitEmbedded(FACE2))
 	{
 		Dart f = d;
 		do
 		{
 			Dart f1 = phi1(f) ;
-			copyDartEmbedding(ORIENTED_FACE, f1, f);
+//			copyDartEmbedding(ORIENTED_FACE, f1, f);
+			copyDartEmbedding(FACE2, f1, f);
 			Dart e = phi3(f1);
-			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
+//			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
+//			copyDartEmbedding(FACE2, f1, f);
+			copyDartEmbedding(FACE2, phi1(e), e);
 			f = alpha2(f);
 		} while(f != d);
 	}
@@ -150,6 +154,11 @@ Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 	return resV;
 }
 
+bool EmbeddedMap3::collapseDegeneratedFace(Dart d)
+{
+	return Map3::collapseDegeneratedFace(d);
+}
+
 void EmbeddedMap3::splitFace(Dart d, Dart e)
 {
 	Dart dd = phi1(phi3(d));
@@ -167,15 +176,15 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding(VERTEX, phi_1(dd), vEmb2);
 	}
 
-	if(isOrbitEmbedded(ORIENTED_FACE))
+	if(isOrbitEmbedded(FACE2))
 	{
-		copyDartEmbedding(ORIENTED_FACE, phi_1(d), d) ;
-		embedNewCell(ORIENTED_FACE, e) ;
-		copyCell(ORIENTED_FACE, e, d) ;
+		copyDartEmbedding(FACE2, phi_1(d), d) ;
+		embedNewCell(FACE2, e) ;
+		copyCell(FACE2, e, d) ;
 
-		copyDartEmbedding(ORIENTED_FACE, phi_1(dd), dd) ;
-		embedNewCell(ORIENTED_FACE, ee) ;
-		copyCell(ORIENTED_FACE, ee, dd) ;
+		copyDartEmbedding(FACE2, phi_1(dd), dd) ;
+		embedNewCell(FACE2, ee) ;
+		copyCell(FACE2, ee, dd) ;
 	}
 
 	if(isOrbitEmbedded(FACE))
@@ -368,7 +377,7 @@ unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(phi3(d));// Start with the face of d
-	mark.markOrbit(ORIENTED_FACE, phi3(d)) ;
+	mark.markOrbit(FACE2, phi3(d)) ;
 
 	// For every face added to the list
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
@@ -394,7 +403,7 @@ unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 			if (!mark.isMarked(adj))
 			{
 				visitedFaces.push_back(adj);	// Add it
-				mark.markOrbit(ORIENTED_FACE, adj) ;
+				mark.markOrbit(FACE2, adj) ;
 			}
 
 			f = phi1(f) ;
@@ -411,6 +420,19 @@ bool EmbeddedMap3::check()
 		return false ;
 
 	std::cout << "Check: embedding begin" << std::endl ;
+
+    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
+
+    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
+
+    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
+
+    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
+    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
+
 
 	for(Dart d = begin(); d != end(); next(d))
 	{
@@ -434,9 +456,9 @@ bool EmbeddedMap3::check()
 			}
 		}
 
-		if (isOrbitEmbedded(ORIENTED_FACE))
+		if (isOrbitEmbedded(FACE2))
 		{
-			if (getEmbedding(ORIENTED_FACE, d) != getEmbedding(ORIENTED_FACE, phi1(d)))
+			if (getEmbedding(FACE2, d) != getEmbedding(FACE2, phi1(d)))
 			{
 				CGoGNout << "Check: different embeddings on oriented face" << CGoGNendl ;
 				return false ;
@@ -465,18 +487,6 @@ bool EmbeddedMap3::check()
 	}
 
 	std::cout << "Check: embedding ok" << std::endl ;
-
-    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
-    std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
-
-    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
-    std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
-
-    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
-    std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
-
-    std::cout << "nb volume orbits : " << getNbOrbits(VOLUME) << std::endl ;
-    std::cout << "nb volume cells : " << m_attribs[VOLUME].size() << std::endl ;
 
 	return true ;
 }

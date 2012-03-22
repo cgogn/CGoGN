@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -122,8 +122,9 @@ std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std:
 	}
 	else
 	{
-		std::string str("#extension GL_EXT_geometry_shader4 : enable\n");
-		str.append("#define PRECISION\n");
+		std::string str("#version 110\n");
+		str.append("#extension GL_EXT_geometry_shader4 : enable\n");
+		str.append("#define PRECISON float pipo_PRECISION\n");
 		str.append("#define ATTRIBUTE attribute\n");
 		str.append("#define VARYING_IN varying in\n");
 		str.append("#define VARYING_OUT varying out\n");

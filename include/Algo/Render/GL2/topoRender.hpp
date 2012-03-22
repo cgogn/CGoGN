@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -67,18 +67,14 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-	{
+	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
-	}
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
 		if (good(d))
-		{
 			vecDarts.push_back(d);
-			m_attIndex[d] = (vecDarts.size()-1)*2;
-		}
 	}
 	m_nbDarts = vecDarts.size();
 
@@ -101,6 +97,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
+
+	unsigned int indexDC=0;
 
 	DartMarker mf(map);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
@@ -137,11 +135,12 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 				VEC3 P = vecPos[i]*ke + vecPos[i+1]*k;
 				VEC3 Q = vecPos[i+1]*ke + vecPos[i]*k;
 
+				m_attIndex[d] = indexDC;
+				indexDC+=2;
 				*positionDartBuf++ = P;
 				*positionDartBuf++ = Q;
-				*colorDartBuf++ = VEC3(1.,1.,1.);
-				*colorDartBuf++ = VEC3(1.,1.,1.);
-
+				*colorDartBuf++ = m_dartsColor;
+				*colorDartBuf++ = m_dartsColor;
 				VEC3 f = P*0.5f + Q*0.5f;
 				fv2[d] = f;
 				f = P*0.1f + Q*0.9f;
@@ -172,14 +171,14 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
 
 	m_nbRel2 =0;
-
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
 	{
 		Dart d = *id;
 
 		Dart e = map.phi2(d);
 
-		if (good(e) && (e.index > d.index))
+//		if (good(e) && (e.index > d.index))
+		if (good(e) && (d < e ))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -190,6 +189,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 		*positionF1++ = fv1[d];
 		*positionF1++ = fv11[e];
 	}
+	m_nbRel1 = vecDarts.size();
 
 	m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -204,7 +204,7 @@ template<typename PFP>
 //void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
 {
-	GMap2& map = reinterpret_cast<GMap2&>(mapx);
+	GMap2& map = dynamic_cast<GMap2&>(mapx);
 
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -212,20 +212,19 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-	{
+	m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
-	}
+
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
 		if (good(d))
-		{
 			vecDarts.push_back(d);
-			m_attIndex[d] = (vecDarts.size()-1)*2;
-		}
 	}
 	m_nbDarts = vecDarts.size();
+
+
 
 	// debut phi1
 	AutoAttributeHandler<VEC3> fv1(map, DART);
@@ -247,6 +246,8 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
+
+	unsigned int indexDC=0;
 
 	DartMarker mf(map);
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
@@ -285,14 +286,16 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 				VEC3 PP = REAL(0.52)*P + REAL(0.48)*Q;
 				VEC3 QQ = REAL(0.52)*Q + REAL(0.48)*P;
 
+				m_attIndex[d] = indexDC;
+				indexDC+=2;
 				*positionDartBuf++ = P;
-				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = m_dartsColor;
 				*positionDartBuf++ = PP;
-				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = m_dartsColor;
 				*positionDartBuf++ = Q;
-				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = m_dartsColor;
 				*positionDartBuf++ = QQ;
-				*colorDartBuf++ = VEC3(1.,1.,1.);
+				*colorDartBuf++ = m_dartsColor;
 
 				VEC3 f = P*0.5f + PP*0.5f;
 				fv2[d] = f;
@@ -304,6 +307,9 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 				fv2[dd] = f;
 				f = Q*0.9f + QQ*0.1f;
 				fv1[dd] = f;
+				m_attIndex[dd] = indexDC;
+				indexDC+=2;
+
 
 				d = map.phi1(d);
 			}
@@ -328,15 +334,12 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	VEC3* positionF1 = reinterpret_cast<VEC3*>(PositionBuffer1);
 	VEC3* positionF2 = reinterpret_cast<VEC3*>(PositionBuffer2);
 
-	m_nbRel2 =0;
-
+	m_nbRel2 = 0;
 	for(std::vector<Dart>::iterator id = vecDarts.begin(); id!= vecDarts.end(); id++)
 	{
 		Dart d = *id;
-
 		Dart e = map.beta2(d);
-
-		if (good(e) && (e.index > d.index))
+		if (good(e) && (d < e ))
 		{
 			*positionF2++ = fv2[d];
 			*positionF2++ = fv2[e];
@@ -347,6 +350,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 		*positionF1++ = fv1[d];
 		*positionF1++ = fv1[e];
 	}
+	m_nbRel1 = vecDarts.size()/2;
 
 	m_vbo1->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -357,19 +361,26 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 }
 
 
+
 template<typename PFP>
 void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
-
 	m_vbo3->bind();
 	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
 	unsigned int nb=0;
 
+	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	if (!m_attIndex.isValid())
+	{
+		CGoGNerr << "Error attribute_dartIndex does not exist during TopoRender::picking" << CGoGNendl;
+		return;
+	}
+
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (nb < m_nbDarts)
+		if (good(d))
 		{
-			if (good(d))
+			if (nb < m_nbDarts)
 			{
 				float r,g,b;
 				dartToCol(d, r,g,b);
@@ -380,14 +391,13 @@ void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& go
 				*local++ = r;
 				*local++ = g;
 				*local++ = b;
-
 				nb++;
 			}
-		}
-		else
-		{
-			CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
-			d = map.end();
+			else
+			{
+				CGoGNerr << "Error buffer too small for color picking (change the good parameter ?)" << CGoGNendl;
+				break;
+			}
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -403,6 +413,7 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 	return d;
 
 }
+
 
 
 }//end namespace GL2

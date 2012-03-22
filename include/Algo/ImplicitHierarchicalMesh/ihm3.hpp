@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -62,6 +62,19 @@ AttributeHandler_IHM<T> ImplicitHierarchicalMap3::getAttribute(unsigned int orbi
 	AttributeHandler<T> h = Map3::getAttribute<T>(orbit, nameAttr) ;
 	return AttributeHandler_IHM<T>(this, h.getDataVector()) ;
 }
+
+
+inline void ImplicitHierarchicalMap3::update_topo_shortcuts()
+{
+	Map3::update_topo_shortcuts();
+	m_dartLevel = Map3::getAttribute<unsigned int>(DART, "dartLevel") ;
+	m_faceId = Map3::getAttribute<unsigned int>(DART, "faceId") ;
+	m_edgeId = Map3::getAttribute<unsigned int>(DART, "edgeId") ;
+
+	//AttributeContainer& cont = m_attribs[DART] ;
+	//m_nextLevelCell = cont.getDataVector<unsigned int>(cont.getAttributeIndex("nextLevelCell")) ;
+}
+
 
 /***************************************************
  *          			 	    MAP TRAVERSAL         		  		         *
@@ -187,7 +200,7 @@ inline Dart ImplicitHierarchicalMap3::alpha_2(Dart d)
 	return phi2(phi3(d));
 }
 
-inline Dart ImplicitHierarchicalMap3::begin()
+inline Dart ImplicitHierarchicalMap3::begin() const
 {
 	Dart d = Map3::begin() ;
 	while(m_dartLevel[d] > m_curLevel)
@@ -195,12 +208,12 @@ inline Dart ImplicitHierarchicalMap3::begin()
 	return d ;
 }
 
-inline Dart ImplicitHierarchicalMap3::end()
+inline Dart ImplicitHierarchicalMap3::end() const
 {
 	return Map3::end() ;
 }
 
-inline void ImplicitHierarchicalMap3::next(Dart& d)
+inline void ImplicitHierarchicalMap3::next(Dart& d) const
 {
 	do
 	{
@@ -210,41 +223,34 @@ inline void ImplicitHierarchicalMap3::next(Dart& d)
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mv(*this,thread);			// Lock a marker
+	DartMarkerStore mv(*this, thread);	// Lock a marker
 	bool found = false;					// Last functor return value
 
-	std::vector<Dart> darts;			//Darts that are traversed
-	darts.reserve(512);
-	darts.push_back(d);			//Start with the dart d
+	std::vector<Dart> darts;	// Darts that are traversed
+	darts.reserve(256);
+	darts.push_back(d);			// Start with the dart d
 	mv.mark(d);
 
 	for(unsigned int i = 0; !found && i < darts.size(); ++i)
 	{
-		Dart dc = darts[i];
+		// add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(darts[i]);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
 
-		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(dc);
-		if(d2 != dc)
+		if(!mv.isMarked(d21))
 		{
-			Dart d21 = phi1(d2); // turn in volume
-			Dart d23 = phi3(d2); // change volume
-
-			if(!mv.isMarked(d21))
-			{
-				darts.push_back(d21);
-				mv.mark(d21);
-			}
-
-			if((d23 != d2) && !mv.isMarked(d23))
-			{
-				darts.push_back(d23);
-				mv.mark(d23);
-			}
+			darts.push_back(d21);
+			mv.mark(d21);
+		}
+		if(!mv.isMarked(d23))
+		{
+			darts.push_back(d23);
+			mv.mark(d23);
 		}
 
-		found = f(dc);
+		found = f(darts[i]);
 	}
-
 	return found;
 }
 
@@ -278,26 +284,22 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_face(Dart d, Func
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
 {
-	if (foreach_dart_of_oriented_face(d,f)) return true;
-
-	Dart d3 = phi3(d);
-	if (d3 != d) return foreach_dart_of_oriented_face(d3,f);
-	return false;
+	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(phi3(d), f, thread);
 }
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
 {
-	DartMarkerStore mark(*this);	// Lock a marker
+	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
 
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
-	visitedFaces.reserve(512) ;
+	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
 
 	// For every face added to the list
 	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
-		if (!mark.isMarked(visitedFaces[i]))		// Face has not been visited yet
+		if (!mark.isMarked(visitedFaces[i]))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
 			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
@@ -306,15 +308,15 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, Fu
 			// and add non visited adjacent faces to the list of face
 			if (!found)
 			{
-				Dart dNext = visitedFaces[i] ;
+				Dart e = visitedFaces[i] ;
 				do
 				{
-					mark.mark(dNext);					// Mark
-					Dart adj = phi2(dNext);				// Get adjacent face
-					if (adj != dNext && !mark.isMarked(adj))
+					mark.mark(e);				// Mark
+					Dart adj = phi2(e);			// Get adjacent face
+					if (!mark.isMarked(adj))
 						visitedFaces.push_back(adj);	// Add it
-					dNext = phi1(dNext);
-				} while(dNext != visitedFaces[i]);
+					e = phi1(e);
+				} while(e != visitedFaces[i]);
 			}
 		}
 	}
@@ -328,9 +330,67 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_volume(Dart d, FunctorType
 
 inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_volume(d, f) ;
+	//return foreach_dart_of_oriented_volume(d, f) ;
+	DartMarkerStore mv(*this,thread);	// Lock a marker
+	bool found = false;					// Last functor return value
+
+	std::vector<Dart> darts;	// Darts that are traversed
+	darts.reserve(1024);
+	darts.push_back(d);			// Start with the dart d
+	mv.mark(d);
+
+	for(unsigned int i = 0; !found && i < darts.size(); ++i)
+	{
+		// add all successors if they are not marked yet
+		Dart d2 = phi1(darts[i]); // turn in face
+		Dart d3 = phi2(darts[i]); // change face
+		Dart d4 = phi3(darts[i]); // change volume
+
+		if (!mv.isMarked(d2))
+		{
+			darts.push_back(d2);
+			mv.mark(d2);
+		}
+		if (!mv.isMarked(d3))
+		{
+			darts.push_back(d2);
+			mv.mark(d2);
+		}
+		if (!mv.isMarked(d4))
+		{
+			darts.push_back(d4);
+			mv.mark(d4);
+		}
+
+		found = f(darts[i]);
+	}
+	return found;
 }
 
+
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart dNext = d;
+	do
+	{
+		if (f(dNext))
+			return true;
+		dNext = phi2(phi_1(dNext));
+ 	} while (dNext != d);
+ 	return false;
+}
+
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread)
+{
+	if (f(d))
+		return true;
+	return f(phi2(d));
+}
+
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_oriented_face(d,f,thread);
+}
 
 /***************************************************
  *              LEVELS MANAGEMENT                  *
@@ -490,6 +550,7 @@ inline unsigned int ImplicitHierarchicalMap3::edgeLevel(Dart d)
 
 	return r;
 }
+
 
 /***************************************************
  *               ATTRIBUTE HANDLER                 *

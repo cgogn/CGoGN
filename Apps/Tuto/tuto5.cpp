@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -30,6 +30,7 @@
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/subdivision.h"
+#include "Algo/Modelisation/subdivision3.h"
 
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
@@ -93,6 +94,7 @@ void MyQT::animate()
 //	transfoMatrix() = glm::rotate(transfoMatrix(), 0.5f, glm::vec3(0.5773f,0.5773f,0.5773f));
 	transfoRotate( 0.5f, 0.5773f,0.5773f,0.5773f);
 	updateGLMatrices();
+	updateGL();
 }
 
 
@@ -242,12 +244,16 @@ void MyQT::cb_keyPress(int code)
 {
 	if (code  == 's')
 	{
-		std::string filename = selectFileSave("Export SVG file ");
-		CGoGNout << "Exporting "<<filename<<CGoGNendl;
-		Algo::Render::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
-//		svg.renderLinesToSVG<PFP>(myMap,position);
-		svg.setColor(Geom::Vec3f(1.,0.,0.));
-		svg.renderFacesToSVG<PFP>(myMap,position,0.8f);
+		std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
+		Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+		svg.setWidth(1.0f);
+		svg.setColor(Geom::Vec3f(0.0f,0.0f,0.5f));
+		Algo::Render::SVG::renderEdges<PFP>(svg,myMap,position);
+		svg.setColor(Geom::Vec3f(0.0f,0.8f,0.0f));
+		svg.setWidth(5.0f);
+		Algo::Render::SVG::renderVertices<PFP>(svg,myMap,position);
+		svg.setColor(Geom::Vec3f(1.0f,0.0f,0.0f));
+		m_strings->toSVG(svg);
 		//svg destruction close the file
 	}
 	if (code  == 't')
@@ -256,6 +262,20 @@ void MyQT::cb_keyPress(int code)
 			m_timer->stop();
 		else
 			m_timer->start(1000/30); // 30 fps
+	}
+
+	if(code == 'c')
+	{
+		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+		Algo::Modelisation::catmullClarkVol<PFP>(myMap, position, nb);
+
+		m_positionVBO->updateData(position);
+		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
+		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+
+
+		m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
 	}
 }
 
@@ -316,6 +336,7 @@ int main(int argc, char **argv)
 
 	sqt.m_selected = myMap.begin();
 
+	sqt.setGeometry(100,100,1024,1024);
 	sqt.show();
 
 	sqt.slider_balls(50);

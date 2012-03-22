@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -181,7 +181,7 @@ void SimplifTrian<PFP>::updateCriterias(Dart d)
 		m_protectMarker.mark(em) ;
 
 		// next edge
-		d = m_map.alpha1(d);
+		d = m_map.phi2_1(d);
 	} while (d!=dd);
 }
 
@@ -212,15 +212,15 @@ Dart SimplifTrian<PFP>::edgeCollapse(Dart d, typename PFP::VEC3& newPos)
 	{
 		CRIT* cr = getCrit(xd);
 		cr->tagDirty();
-		xd = m_map.alpha1(xd);
+		xd = m_map.phi2_1(xd);
 	} while (xd != d);
 
-	xd = m_map.alpha1(dd); // alpha1 pour ne pas repasser sur l'arete d/dd
+	xd = m_map.phi2_1(dd); // phi2_1 pour ne pas repasser sur l'arete d/dd
 	do
 	{
 		CRIT* cr = getCrit(xd);
 		cr->tagDirty();
-		xd = m_map.alpha1(xd);
+		xd = m_map.phi2_1(xd);
 	} while (xd != dd);
 
 	// store old valences

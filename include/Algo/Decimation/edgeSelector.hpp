@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -204,19 +204,19 @@ void EdgeSelector_Length<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -399,19 +399,19 @@ void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -604,7 +604,7 @@ void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomput
    	do {
    		// Make step
    		dBack = this->m_map.phi2(dFront) ;
-       	dFront = this->m_map.alpha1(dFront) ;
+       	dFront = this->m_map.phi2_1(dFront) ;
 
        	if (dBack != dFront) { // if dFront is no border
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
@@ -633,16 +633,16 @@ void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		else										// treating differently :
 			updateEdgeInfo(vit, true) ;
 
-		Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+		Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 		Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 		do											// - edges for which only the collapsibility must be re-tested
 		{
 			updateEdgeInfo(vit2, true) ;
 			updateEdgeInfo(m.phi1(vit2), false) ;
-			vit2 = m.alpha_1(vit2) ;
+			vit2 = m.phi12(vit2) ;
 		} while(vit2 != stop) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -809,19 +809,19 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -1013,19 +1013,19 @@ void EdgeSelector_MinDetail<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one

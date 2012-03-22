@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,7 +35,7 @@ namespace MC
 * constructor
 */
 template<typename DART, typename DATATYPE>
-BufferGen<DART,DATATYPE>::BufferGen(int32 _lWidth, int32 _lHeight)
+BufferGen<DART,DATATYPE>::BufferGen(int _lWidth, int _lHeight)
 {
 	m_lWidth = _lWidth+1;
 	m_lHeight = _lHeight+1;
@@ -69,7 +69,7 @@ BufferGen<DART,DATATYPE>::~BufferGen()
 * get the face inside a cube of the buffer
 */	
 // template <typename DART, typename DATATYPE>
-// const DART* BufferGen<DART,DATATYPE>::getFacesCube(int32 _lX, int32 _lY, int32 _lZ) const
+// const DART* BufferGen<DART,DATATYPE>::getFacesCube(int _lX, int _lY, int _lZ) const
 // {
 // 
 // 	if (_lZ == m_lZpos)				// if current slice ..
@@ -90,7 +90,7 @@ BufferGen<DART,DATATYPE>::~BufferGen()
 * set the face inside a cube of the buffer
 */
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setFacesCube(int32 _lX,int32 _lY, const DART* const _lFace)
+void BufferGen<DART,DATATYPE>::setFacesCube(int _lX,int _lY, const DART* const _lFace)
 {
 	// get the address of cube's table
 	DART* lLocFaces  = m_hcSlice1[_lX + _lY*m_lWidth].m_lFaceEdges;
@@ -125,7 +125,7 @@ void BufferGen<DART,DATATYPE>::nextSlice()
 *  get address of face table for direct access
 */
 template <typename DART, typename DATATYPE>
-DART* BufferGen<DART,DATATYPE>::getFacesCubeTableAdr(int32 _lX,int32 _lY)
+DART* BufferGen<DART,DATATYPE>::getFacesCubeTableAdr(int _lX,int _lY)
 {
 	return  m_hcSlice0[_lX + _lY*m_lWidth].m_lFaceEdges;
 }
@@ -136,84 +136,84 @@ DART* BufferGen<DART,DATATYPE>::getFacesCubeTableAdr(int32 _lX,int32 _lY)
 */
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge0(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge0(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX + _lY*m_lWidth].m_lX = _lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge3(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge3(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +(_lY-1)*m_lWidth].m_lY = _lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge8(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge8(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX + _lY*m_lWidth].m_lZ = _lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge2(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge2(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[(_lX-1) +_lY*m_lWidth].m_lX =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge11(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge11(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX + _lY*m_lWidth].m_lZ = _lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge1(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge1(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +_lY*m_lWidth].m_lY =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge9(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge9(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +_lY*m_lWidth].m_lZ =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge10(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge10(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice0[_lX +_lY*m_lWidth].m_lZ =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge7(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge7(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[_lX +(_lY-1)*m_lWidth].m_lY =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge4(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge4(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[_lX +_lY*m_lWidth].m_lX =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge6(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge6(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[(_lX-1) + _lY*m_lWidth].m_lX =_lPoint;
 }
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setPointEdge5(int32 _lX,int32 _lY, unsigned int _lPoint)
+void BufferGen<DART,DATATYPE>::setPointEdge5(int _lX,int _lY, unsigned int _lPoint)
 {
 	m_hcSlice1[_lX +_lY*m_lWidth].m_lY =_lPoint;
 }
@@ -224,91 +224,91 @@ void BufferGen<DART,DATATYPE>::setPointEdge5(int32 _lX,int32 _lY, unsigned int _
 */
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge0(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge0(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX + _lY*m_lWidth].m_lX;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge3(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge3(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge8(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge8(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX + _lY*m_lWidth].m_lZ;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge2(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge2(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX +(_lY+1)*m_lWidth].m_lX;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge11(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge11(int _lX,int _lY)
 {
 	return m_hcSlice0[_lX + (_lY+1)*m_lWidth].m_lZ;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge1(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge1(int _lX,int _lY)
 {
 	return m_hcSlice0[(_lX+1) +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge9(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge9(int _lX,int _lY)
 {
 	return m_hcSlice0[(_lX+1) +_lY*m_lWidth].m_lZ;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge10(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge10(int _lX,int _lY)
 {
 	return m_hcSlice0[(_lX+1) +(_lY+1)*m_lWidth].m_lZ;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge7(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge7(int _lX,int _lY)
 {
 	return m_hcSlice1[_lX +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge4(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge4(int _lX,int _lY)
 {
 	return m_hcSlice1[_lX +_lY*m_lWidth].m_lX;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge6(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge6(int _lX,int _lY)
 {
 	return m_hcSlice1[_lX +(_lY+1)*m_lWidth].m_lX;
 }
 
 
 template <typename DART, typename DATATYPE>
-unsigned int BufferGen<DART,DATATYPE>::getPointEdge5(int32 _lX,int32 _lY)
+unsigned int BufferGen<DART,DATATYPE>::getPointEdge5(int _lX,int _lY)
 {
 	return m_hcSlice1[(_lX+1) +_lY*m_lWidth].m_lY;
 }
 
 
 template <typename DART, typename DATATYPE>
-DART BufferGen<DART,DATATYPE>::getExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY) const
+DART BufferGen<DART,DATATYPE>::getExternalNeighbour(char _cEdge, int _lX, int _lY) const
 {
 
 	switch(_cEdge)
@@ -373,7 +373,7 @@ CGoGNerr << "ERROR"<<CGoGNendl;
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setExternalNeighbour(int8 _cEdge, int32 _lX, int32 _lY, DART _lNeighbour)
+void BufferGen<DART,DATATYPE>::setExternalNeighbour(char _cEdge, int _lX, int _lY, DART _lNeighbour)
 {
 	switch(_cEdge)
 	{
@@ -431,34 +431,34 @@ void BufferGen<DART,DATATYPE>::setExternalNeighbour(int8 _cEdge, int32 _lX, int3
 }
 
 /*template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setData(int32 _lX, int32 _lY, DATATYPE data)
+void BufferGen<DART,DATATYPE>::setData(int _lX, int _lY, DATATYPE data)
 {
 	m_dataSl0[_lX +_lY*m_lWidth] = data;
 }
 
 
 template <typename DART, typename DATATYPE>
-DATATYPE BufferGen<DART,DATATYPE>::getData(int32 _lX, int32 _lY)
+DATATYPE BufferGen<DART,DATATYPE>::getData(int _lX, int _lY)
 {
 	return m_dataSl0[_lX +_lY*m_lWidth];
 }
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setData2(int32 _lX, int32 _lY, DATATYPE data)
+void BufferGen<DART,DATATYPE>::setData2(int _lX, int _lY, DATATYPE data)
 {
 		m_dataSl1[_lX +_lY*m_lWidth] = data;
 }
 
 
 template <typename DART, typename DATATYPE>
-DATATYPE BufferGen<DART,DATATYPE>::getData2(int32 _lX, int32 _lY)
+DATATYPE BufferGen<DART,DATATYPE>::getData2(int _lX, int _lY)
 {
 	return m_dataSl1[_lX +_lY*m_lWidth];
 }*/
 
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setData(int32 _lX, int32 _lY, DATATYPE data)
+void BufferGen<DART,DATATYPE>::setData(int _lX, int _lY, DATATYPE data)
 {
 //	m_hcSlice0[_lX +_lY*m_lWidth].m_data = data;
 	m_dataSl0[_lX +_lY*m_lWidth] = data;
@@ -466,7 +466,7 @@ void BufferGen<DART,DATATYPE>::setData(int32 _lX, int32 _lY, DATATYPE data)
 
 
 template <typename DART, typename DATATYPE>
-DATATYPE BufferGen<DART,DATATYPE>::getData(int32 _lX, int32 _lY)
+DATATYPE BufferGen<DART,DATATYPE>::getData(int _lX, int _lY)
 {
 // 	if (m_dataSl0[_lX +_lY*m_lWidth] != m_hcSlice0[_lX +_lY*m_lWidth].m_data)
 // 		CGoGNout << "ERRORRRRR !! "<<CGoGNendl;
@@ -476,7 +476,7 @@ DATATYPE BufferGen<DART,DATATYPE>::getData(int32 _lX, int32 _lY)
 }
 
 template <typename DART, typename DATATYPE>
-void BufferGen<DART,DATATYPE>::setData2(int32 _lX, int32 _lY, DATATYPE data)
+void BufferGen<DART,DATATYPE>::setData2(int _lX, int _lY, DATATYPE data)
 {
 		//m_hcSlice1[_lX +_lY*m_lWidth].m_data = data;
 		m_dataSl1[_lX +_lY*m_lWidth] = data;
@@ -484,7 +484,7 @@ void BufferGen<DART,DATATYPE>::setData2(int32 _lX, int32 _lY, DATATYPE data)
 
 
 template <typename DART, typename DATATYPE>
-DATATYPE BufferGen<DART,DATATYPE>::getData2(int32 _lX, int32 _lY)
+DATATYPE BufferGen<DART,DATATYPE>::getData2(int _lX, int _lY)
 {
 // 	if (m_dataSl1[_lX +_lY*m_lWidth] != m_hcSlice1[_lX +_lY*m_lWidth].m_data)
 // 		CGoGNout << "ERRORRRRR !! "<<CGoGNendl;

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -33,8 +33,11 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+#include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
+
+#include "Utils/svg.h"
 
 // forward
 namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
@@ -75,9 +78,16 @@ protected:
 	GLuint m_nbDarts;
 
 	/**
+	* number of relations 1 to draw
+	*/
+	GLuint m_nbRel1;
+
+	/**
 	* number of relations 2 to draw
 	*/
 	GLuint m_nbRel2;
+
+
 	/**
 	 * width of lines use to draw darts
 	 */
@@ -87,6 +97,11 @@ protected:
 	 * width of lines use to draw phi
 	 */
 	float m_topo_relation_width;
+
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsColor;
 
 
 	float *m_color_save;
@@ -100,17 +115,35 @@ protected:
 	Utils::ShaderColorPerVertex* m_shader2;
 
 
+	/**
+	 * compute color from dart index (for color picking)
+	 */
 	Dart colToDart(float* color);
 
+	/**
+	 * compute dart  from color (for color picking)
+	 */
 	void dartToCol(Dart d, float& r, float& g, float& b);
 
+	/**
+	 * pick the color in the rendered image
+	 */
 	Dart pickColor(unsigned int x, unsigned int y);
 
+	/**
+	 * affect a color to each dart
+	 */
 	template<typename PFP>
 	void setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good);
 
+	/**
+	 * save colors before picking
+	 */
 	void pushColors();
 
+	/**
+	 * restore colors after picking
+	 */
 	void popColors();
 
 public:
@@ -177,6 +210,8 @@ public:
 	 */
 	void setAllDartsColor(float r, float g, float b);
 
+	void setInitialDartsColor(float r, float g, float b);
+
 	/**
 	 * redraw one dart with specific width and color (not efficient use only for debug with small amount of call)
 	 * @param d the dart
@@ -208,6 +243,17 @@ public:
 
 	template <typename PFP>
 	void updateDataGMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+
+
+	/**
+	 * render to svg struct
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
+
+	/**
+	 * render svg into svg file
+	 */
+	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
 };
 
 // just for compatibility with old code

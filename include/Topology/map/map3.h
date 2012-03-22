@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -57,9 +57,19 @@ protected:
 public:
 	typedef Map2 ParentMap;
 
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+7; }
+	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
+
+	static const unsigned int VERTEX_OF_PARENT = VERTEX+7;
+	static const unsigned int EDGE_OF_PARENT = EDGE+7;
+	static const unsigned int FACE_OF_PARENT = FACE+7;
+
+	static const unsigned int VERTEX_OF_PARENT2 = VERTEX+5;
+	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
+
 	Map3();
 
-	virtual std::string mapTypeName();
+	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension();
 
@@ -159,6 +169,14 @@ public:
 	 *  @return a dart of the resulting vertex
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes = true);
+
+	//! Delete a face if and only if it has one or two edges
+	/*! If the face is sewed to two distinct adjacent faces,
+	 *  then those two faces are sewed
+	 *  @param d a dart of the face
+	 *  @return true if the collapse has been executed, false otherwise
+	 */
+	virtual bool collapseDegeneratedFace(Dart d);
 
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
@@ -264,6 +282,11 @@ public:
 	 */
 	bool isBoundaryVolume(Dart d) ;
 
+	//! Tell if an edge of the volume is on the boundary
+	/*	@param d a dart
+	 */
+	bool hasBoundaryEdge(Dart d);
+
 	//! Check the map completeness
 	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation
 	 */
@@ -287,17 +310,43 @@ public:
 	 */
 	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
 
-	//! Apply a functor on each dart of an oriented face
+	//! Apply a functor on each dart of a face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on each dart of a face
+	/*! @param d a dart of the oriented face
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread);
 
 	//! Apply a functor on each dart of a cc
 	/*! @param d a dart of the cc
 	 *  @param fonct the functor
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
+
+
+	//! Apply a functor on each dart of a vertex
+	/*! @param d a dart of the vertex
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on each dart of an edge
+	/*! @param d a dart of the oriented edge
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on each dart of an oriented face
+	/*! @param d a dart of the oriented face
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0);
+
 	//@}
 
 	/*! @name Close map after import or creation
@@ -317,8 +366,9 @@ public:
 	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
 	/*! Add volumes to the map that close every existing hole.
 	 *  These faces are marked as boundary.
+	 *  @return the number of closed holes
 	 */
-	void closeMap();
+	unsigned int closeMap();
 	//@}
 };
 

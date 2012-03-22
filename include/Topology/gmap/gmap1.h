@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -45,7 +45,7 @@ public:
 
 	GMap1();
 
-	virtual std::string mapTypeName();
+	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension();
 
@@ -189,43 +189,30 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a face
-	* @param d a dart of the face
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of an edge
-	* @param d a dart of the oriented face
+	* @param d a dart of the edge
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
-	* Apply a functor on each dart of an oriented face
-	* @param d a dart of the oriented face
+	* Apply a functor on each dart of an oriented cc (face)
+	* @param d a dart of the oriented cc
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread=0);
 
-	//! Apply a functor on every dart of a face
-	/*! @param d a dart of the face
+	//! Apply a functor on every dart of a cc (face)
+	/*! @param d a dart of the cc
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread=0);
-
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
-	 *  @param f the functor to apply
-	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
-
-	/**
-	* Apply a functor on each dart of a cc
-	* @param d a dart of the cc
-	* @param fonct functor obj ref
-	*/
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0);
 	//@}
 };

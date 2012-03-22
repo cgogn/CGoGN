@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -26,6 +26,7 @@
 #define __GENERIC_MAP__
 
 #include <iostream>
+#include <string>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
@@ -42,20 +43,6 @@
 namespace CGoGN
 {
 
-/*
-const unsigned int EMBNULL = 0xffffffff;
-
-const unsigned int NB_ORBITS = 6;
-const unsigned int NB_THREAD = 16;
-
-const unsigned int VERTEX	= 0;
-const unsigned int EDGE		= 1;
-const unsigned int ORIENTED_FACE= 2;
-const unsigned int FACE		= 3;
-const unsigned int VOLUME	= 4;
-const unsigned int DART		= 5;
-*/
-
 /**
  * Class that allows to browse a map
  * This is a pure virtual class that can be overloaded in:
@@ -66,9 +53,9 @@ const unsigned int DART		= 5;
 class MapBrowser
 {
 public:
-	virtual Dart begin() = 0;
-	virtual Dart end() = 0;
-	virtual void next(Dart& d) = 0;
+	virtual Dart begin() const = 0;
+	virtual Dart end() const = 0;
+	virtual void next(Dart& d) const = 0;
 };
 
 class AttributeHandlerGen ;
@@ -115,6 +102,47 @@ protected:
 	std::vector<DartMarkerGen*> dartMarkers ;
 	std::vector<CellMarkerGen*> cellMarkers ;
 
+	/**
+	 * is map a multiresolution map
+	 */
+#ifndef CGoGN_FORCE_MR
+	bool m_isMultiRes;
+#elif CGoGN_FORCE_MR == 1
+	static const bool m_isMultiRes = true ;
+#else
+	static const bool m_isMultiRes = false ;
+#endif
+
+	/**
+	 * container for multiresolution darts
+	 */
+	AttributeContainer m_mrattribs ;
+
+	/**
+	 * pointers to attributes of m_mrattribs that store indices in m_attribs[DART] (one for each level)
+	 */
+	std::vector< AttributeMultiVector<unsigned int>* > m_mrDarts ;
+
+	/**
+	 * pointer to attribute of m_mrattribs that stores darts insertion levels
+	 */
+	AttributeMultiVector<unsigned int>* m_mrLevels ;
+
+	/**
+	 * vector that stores the number of darts inserted on each resolution level
+	 */
+	std::vector<unsigned int> m_mrNbDarts ;
+
+	/**
+	 * current level in multiresolution map
+	 */
+	unsigned int m_mrCurrentLevel ;
+
+	/**
+	 * stack for current level temporary storage
+	 */
+	std::vector<unsigned int> m_mrLevelStack ;
+
 public:
 	static const unsigned int UNKNOWN_ATTRIB = AttributeContainer::UNKNOWN ;
 
@@ -122,7 +150,7 @@ public:
 
 	~GenericMap() ;
 
-	virtual std::string mapTypeName() = 0 ;
+	virtual std::string mapTypeName() const = 0 ;
 
 	/**
 	 * Clear the map
@@ -138,6 +166,62 @@ public:
 	MarkSet& getMarkerSet(unsigned int orbit, unsigned int thread) { return m_marksets[orbit][thread]; }
 
 	/****************************************
+	 *     RESOLUTION LEVELS MANAGEMENT     *
+	 ****************************************/
+
+	void printMR() ;
+
+	/**
+	 * initialize the multiresolution attribute container
+	 */
+	void initMR() ;
+
+	/**
+	 * get the current resolution level (use only in MRMaps)
+	 */
+	unsigned int getCurrentLevel() ;
+
+	/**
+	 * set the current resolution level (use only in MRMaps)
+	 */
+	void setCurrentLevel(unsigned int l) ;
+
+	/**
+	 * increment the current resolution level (use only in MRMaps)
+	 */
+	void incCurrentLevel() ;
+
+	/**
+	 * decrement the current resolution level (use only in MRMaps)
+	 */
+	void decCurrentLevel() ;
+
+	/**
+	 * store current resolution level on a stack (use only in MRMaps)
+	 */
+	void pushLevel() ;
+
+	/**
+	 * set as current the resolution level of the top of the stack (use only in MRMaps)
+	 */
+	void popLevel() ;
+
+	/**
+	 * get the maximum resolution level (use only in MRMaps)
+	 */
+	unsigned int getMaxLevel() ;
+
+	/**
+	 * add a resolution level (use only in MRMaps)
+	 */
+	void addLevel() ;
+
+	/**
+	 * remove last resolution level (use only in MRMaps)
+	 */
+	void removeLevel() ;
+
+	/****************************************
 	 *           DARTS MANAGEMENT           *
 	 ****************************************/
 protected:
@@ -151,16 +235,51 @@ protected:
 	 */
 	void deleteDart(Dart d) ;
 
+	/**
+	 * create a copy of a dart (based on its index in m_attribs[DART]) and returns its index
+	 */
+	unsigned int copyDartLine(unsigned int index) ;
+
+	/**
+	 * duplicate a dart starting from current level
+	 */
+	void duplicateDart(Dart d) ;
+
+	/**
+	 * Properly deletes a dart in m_attribs[DART]
+	 */
+	void deleteDartLine(unsigned int index) ;
+
 public:
 	/**
-	 * return true if the dart d refers to a valid index
+	 * get the index of dart in topological table
 	 */
-	bool isDartValid(Dart d) ;
+	unsigned int dartIndex(Dart d) const;
+
+	/**
+	 * get the insertion level of a dart (use only in MRMaps)
+	 */
+	unsigned int getDartLevel(Dart d) const ;
+
+	/**
+	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
+	 */
+	unsigned int getNbInsertedDarts(unsigned int level) ;
+
+	/**
+	 * get the number of darts that define the map of the given leveldart (use only in MRMaps)
+	 */
+	unsigned int getNbDarts(unsigned int level) ;
 
 	/**
 	 * @return the number of darts in the map
 	 */
 	unsigned int getNbDarts() ;
+
+	/**
+	 * return true if the dart d refers to a valid index
+	 */
+	bool isDartValid(Dart d) ;
 
 	/****************************************
 	 *         EMBEDDING MANAGEMENT         *
@@ -178,7 +297,6 @@ public:
 
 	/**
 	 * get the cell index of the given dimension associated to dart d
-	 * (can go through the whole orbit due to lazy embedding)
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
 	unsigned int getEmbedding(unsigned int orbit, Dart d) ;
@@ -190,11 +308,11 @@ public:
 
 	/**
 	 * Copy the index of the cell associated to a dart over an other dart
-	 * @param d the dart to overwrite (dest)
-	 * @param e the dart to copy (src)
 	 * @param orbit the id of orbit embedding
+	 * @param dest the dart to overwrite
+	 * @param src the dart to copy
 	 */
-	void copyDartEmbedding(unsigned int orbit, Dart d, Dart e) ;
+	void copyDartEmbedding(unsigned int orbit, Dart dest, Dart src) ;
 
 	/**
 	 * Allocation of some place in attrib table
@@ -280,6 +398,11 @@ public:
 	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
 	 */
 	void initOrbitEmbedding(unsigned int orbit, bool realloc = false) ;
+
+	/**
+	 * print attributes name of map in std::cout (for debugging)
+	 */
+	void viewAttributesTables() ;
 
 protected:
 	/****************************************
@@ -381,6 +504,11 @@ public:
 	bool loadMapBin(const std::string& filename) ;
 
 	/**
+	 * copy from another map (of same type)
+	 */
+	bool copyFrom(const GenericMap& map);
+
+	/**
 	 * Dump attributes types and names per orbit
 	 */
 	void dumpAttributesAndMarkers();
@@ -403,20 +531,20 @@ public:
 	 * Begin of map
 	 * @return the first dart of the map
 	 */
-	Dart begin() ;
+	Dart begin() const;
 
 	/**
 	 * End of map
 	 * @return the end iterator (next of last) of the map
 	 */
-	Dart end() ;
+	Dart end() const;
 
 	/**
 	 * allow to go from a dart to the next
 	 * in the order of storage
 	 * @param d reference to the dart to be modified
 	 */
-	void next(Dart& d) ;
+	void  next(Dart& d) const ;
 
 	/**
 	 * Apply a functor on each dart of the map
@@ -433,10 +561,17 @@ public:
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
-	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
+	virtual bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+
+
+	virtual bool foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+
+	virtual bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
+	virtual bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0) { std::cerr<< "Not implemented"<< std::endl; return false;}
 
 	/**
 	* execute functor for each orbit
@@ -452,11 +587,6 @@ public:
 	 * 	@return the number of orbits
 	 */
 	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = allDarts) ;
-
-	/**
-	 * print attributes name of map in std::cout (for debugging)
-	 */
-	void viewAttributesTables();
 
 protected:
 	/// boundary marker
@@ -476,7 +606,7 @@ public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
-	bool isBoundaryMarked(Dart d);
+	bool isBoundaryMarked(Dart d) const;
 
 protected:
 	/**
@@ -495,38 +625,38 @@ protected:
 	void boundaryUnmarkAll();
 } ;
 
-
-template <typename MAP>
-bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
-{
-	switch(orbit)
-	{
-		case  DART: return f(d);
-		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread) ;
-		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread) ;
-		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
-		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread) ;
-		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread) ;
-		default: assert(!"Cells of this dimension are not handled") ;
-	}
-	return false ;
-}
-
-template <typename MAP>
-bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
-{
-	switch(orbit)
-	{
-		case  DART: return f(d);
-		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread) ;
-		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread) ;
-		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
-		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread) ;
-		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread) ;
-		default: assert(!"Cells of this dimension are not handled") ;
-	}
-	return false ;
-}
+//
+//template <typename MAP>
+//bool foreach_dart_of_orbit_in_parent(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
+//{
+//	switch(orbit)
+//	{
+//		case  DART: return f(d);
+//		case  VERTEX: return ptrMap->MAP::ParentMap::foreach_dart_of_vertex(d, f, thread) ;
+//		case  EDGE: return ptrMap->MAP::ParentMap::foreach_dart_of_edge(d, f, thread) ;
+//		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
+//		case  FACE: return ptrMap->MAP::ParentMap::foreach_dart_of_face(d, f, thread) ;
+//		case  VOLUME: return ptrMap->MAP::ParentMap::foreach_dart_of_volume(d, f, thread) ;
+//		default: assert(!"Cells of this dimension are not handled") ;
+//	}
+//	return false ;
+//}
+//
+//template <typename MAP>
+//bool foreach_dart_of_orbit_in_parent2(MAP* ptrMap, unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0)
+//{
+//	switch(orbit)
+//	{
+//		case  DART: return f(d);
+//		case  VERTEX: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_vertex(d, f,thread) ;
+//		case  EDGE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_edge(d, f, thread) ;
+//		case  ORIENTED_FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_oriented_face(d, f, thread) ;
+//		case  FACE: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_face(d, f, thread) ;
+//		case  VOLUME: return ptrMap->MAP::ParentMap::ParentMap::foreach_dart_of_volume(d, f, thread) ;
+//		default: assert(!"Cells of this dimension are not handled") ;
+//	}
+//	return false ;
+//}
 
 } //namespace CGoGN
 

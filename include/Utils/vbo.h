@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -90,6 +90,11 @@ public:
 	void setDataSize(unsigned int ds) { m_data_size = ds; }
 
 	/**
+	 * get nb element in vbo (vertices, colors ...)
+	 */
+	unsigned int nbElts() {return m_nbElts;}
+
+	/**
 	 * bind array vbo
 	 */
 	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER,m_id); }
@@ -117,7 +122,11 @@ public:
 
 	void releasePtr() const;
 
-	unsigned int nbElts() {return m_nbElts;}
+	void copyData(void *ptr) const;
+
+
+
+	void allocate(unsigned int nbElts);
 };
 
 } // namespace Utils

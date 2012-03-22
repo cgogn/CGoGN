@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -33,12 +33,15 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+#include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
+#include "Utils/svg.h"
 
 // forward
 namespace CGoGN { namespace Utils {  class ShaderSimpleColor; } }
 namespace CGoGN { namespace Utils {  class ShaderColorPerVertex; } }
+namespace CGoGN { namespace Utils {  class ClippingShader; } }
 
 namespace CGoGN
 {
@@ -84,6 +87,11 @@ protected:
 	/**
 	* number of relations 2 to draw
 	*/
+	GLuint m_nbRel1;
+
+	/**
+	* number of relations 2 to draw
+	*/
 	GLuint m_nbRel2;
 
 	/**
@@ -101,35 +109,20 @@ protected:
 	 */
 	float m_topo_relation_width;
 
-
+	/**
+	 * pointer for saved colorvbo (in picking)
+	 */
 	float *m_color_save;
 
+	/**
+	 * initial darts color (set in update)
+	 */
+	Geom::Vec3f m_dartsColor;
+
+	/**
+	 * attribute index to get easy correspdance dart/color
+	 */
 	AttributeHandler<unsigned int> m_attIndex;
-
-	/**
-	* update all drawing buffers
-	* @param map the map
-	* @param good selector
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for volume
-	*/
-	template<typename PFP>
-	void updateMapD3(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
-
-
-	/**
-	* update all drawing buffers
-	* @param map the map
-	* @param good selector
-	* @param positions  attribute of position vertices
-	* @param ke exploding coef for edge
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for volume
-	*/
-	template<typename PFP>
-	void updateGMap3(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float ke, float kf, float kv);
 
 
 	/**
@@ -153,10 +146,6 @@ protected:
 
 public:
 
-	Dart colToDart(float* color);
-
-	void dartToCol(Dart d, float& r, float& g, float& b);
-
 	/**
 	* Constructor
 	* @param map the map to draw
@@ -169,6 +158,10 @@ public:
 	* Destructor
 	*/
 	~Topo3Render();
+
+
+	Utils::ClippingShader* shader1() { return reinterpret_cast<Utils::ClippingShader*>(m_shader1);}
+	Utils::ClippingShader* shader2() { return reinterpret_cast<Utils::ClippingShader*>(m_shader2);}
 
 	/**
 	 * set the with of line use to draw darts (default val is 2)
@@ -229,6 +222,15 @@ public:
 	void setAllDartsColor(float r, float g, float b);
 
 	/**
+	 * change dart initial color (used when calling updateData)
+	 * @param d the dart
+	 * @param r red !
+	 * @param g green !
+	 * @param b blue !
+	 */
+	void setInitialDartsColor(float r, float g, float b);
+
+	/**
 	 * overdraw a dart with given width and color
 	 * @param d the dart
 	 * @param width drawing width
@@ -258,6 +260,18 @@ public:
 	template<typename PFP>
 	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
+
+	/**
+	 * compute dart from color (for picking)
+	 */
+	Dart colToDart(float* color);
+
+	/**
+	 * compute color from dart (for picking)
+	 */
+	void dartToCol(Dart d, float& r, float& g, float& b);
+
+
 	/**
 	* update all drawing buffers to render a dual map
 	* @param map the map
@@ -270,6 +284,35 @@ public:
 	template<typename PFP>
 	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
 
+	/**
+	* update color buffer with color attributte handler
+	* @param map the map
+	* @param good selector
+	* @param colors  attribute of dart's colors
+	*/
+	template<typename PFP>
+	void updateColors(typename PFP::MAP& map, const typename PFP::TVEC3& colors, const FunctorSelect& good = allDarts);
+
+	/**
+	 * Get back middle position of drawed darts
+	 * @param map the map
+	 * @param posExpl the output positions
+	 * @param good the selector
+	 */
+	template<typename PFP>
+	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
+
+
+	/**
+	 * render to svg struct
+	 */
+	void toSVG(Utils::SVG::SVGOut& svg);
+
+	/**
+	 * render svg into svg file
+	 */
+	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
 protected:
 	/**
 	* update all drawing buffers to render a dual map
@@ -281,7 +324,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateDataMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -293,7 +336,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataGMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateDataGMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
 
 };
 

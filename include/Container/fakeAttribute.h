@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -43,7 +43,7 @@ public:
 	NoMathAttribute(int i) : T() {}
 
 	NoMathAttribute(const T& att): T(att) {}
-	NoMathAttribute<T>& operator = (const T& fa) { *this = NoMathAttribute<T>(fa); }
+	NoMathAttribute<T>& operator = (const T& fa) { return *this = NoMathAttribute<T>(fa); }
 
 	void operator += (const NoMathAttribute<T>& fa) {}
 	void operator -= (const NoMathAttribute<T>& fa) {}

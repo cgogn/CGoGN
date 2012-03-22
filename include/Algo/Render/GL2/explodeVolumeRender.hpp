@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -26,6 +26,7 @@
 #include "Geometry/vector_gen.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
@@ -39,175 +40,322 @@ namespace Render
 namespace GL2
 {
 
-inline explodeVolume_VBORender::explodeVolume_VBORender()
+inline ExplodeVolumeRender::ExplodeVolumeRender(bool withColorPerFace, bool withExplodeFace):
+		m_cpf(withColorPerFace),m_ef(withExplodeFace),m_globalColor(0.7f,0.7f,0.7f)
 {
-	glGenBuffersARB(2, m_VBOBuffers);
+	m_vboPos = new Utils::VBO();
+	m_vboPos->setDataSize(3);
+
+	m_vboColors = new Utils::VBO();
+	m_vboColors->setDataSize(3);
+
+
+	m_vboPosLine = new Utils::VBO();
+	m_vboPosLine->setDataSize(3);
+
+	m_shader = new Utils::ShaderExplodeVolumes(withColorPerFace,withExplodeFace);
+	m_shaderL = new Utils::ShaderExplodeVolumesLines();
+
+//	m_shader->setAmbiant(Geom::Vec4f(0.1f,0.1f,0.1f,0.0f));
+//	m_shader->setDiffuse(Geom::Vec4f(1.0f,1.0f,0.1f,0.0f));
+	//m_shaderL->setColor(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f));
+
+	//m_shaderL->setColor(Geom::Vec4f(0.113f,0.337f,0.0f,0.113f));
+
+	m_shaderL->setColor(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f));
+
 }
 
-
-explodeVolume_VBORender::~explodeVolume_VBORender()
+inline ExplodeVolumeRender::~ExplodeVolumeRender()
 {
-	glDeleteBuffersARB(2, m_VBOBuffers);
+	delete m_vboPos;
+	delete m_vboColors;
+	delete m_vboPosLine;
+	delete m_shader;
+	delete m_shaderL;
 }
 
 template<typename PFP>
-void explodeVolume_VBORender::updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions,float kf, float kv)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good)
 {
+	if (m_cpf)
+	{
+		CGoGNerr<< "ExplodeVolumeRender: problem wrong update fonction use the other" << CGoGNendl;
+		return;
+	}
+
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	m_nbTris = 0;
-
-	// table of center of volume
-	std::vector<VEC3> vecCenters;
-	vecCenters.reserve(1000);
-	// table of nbfaces per volume
-	std::vector<unsigned int> vecNbFaces;
-	vecNbFaces.reserve(1000);
-	// table of face (one dart of each)
-	std::vector<Dart> vecDartFaces;
-	vecDartFaces.reserve(map.getNbDarts()/4);
-
-	DartMarker mark(map);					// marker for darts
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	CellMarker cmv(map,VOLUME);
+	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
+	TraversorW<typename PFP::MAP> traVol(map,good);
+	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
 	{
-		if (good(d))
-		{
-			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
-			VEC3 center(0, 0, 0);
-			unsigned int nbv = 0;
-			unsigned int nbf = 0;
-			std::list<Dart> visitedFaces;	// Faces that are traversed
-			visitedFaces.push_back(d);		// Start with the face of d
-
-			// For every face added to the list
-			for (std::list<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-			{
-				if (!mark.isMarked(*face))		// Face has not been visited yet
-				{
-					// store a dart of face
-					vecDartFaces.push_back(*face);
-					nbf++;
-					Dart dNext = *face ;
-					unsigned int nbe=0;
-					do
-					{
-						if (!markVert.isMarked(dNext))
-						{
-							markVert.mark(dNext);
-							center += positions[dNext];
-							nbv++;
-						}
-						mark.mark(dNext);					// Mark
-						nbe++;
-						Dart adj = map.phi2(dNext);				// Get adjacent face
-						if (adj != dNext && !mark.isMarked(adj))
-							visitedFaces.push_back(adj);	// Add it
-						dNext = map.phi1(dNext);
-					} while(dNext != *face);
-					m_nbTris += nbe-2;
-				}
-			}
-			center /= typename PFP::REAL(nbv);
-			vecCenters.push_back(center);
-			vecNbFaces.push_back(nbf);
-		}
+		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(map, d, positions);
 	}
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glBufferDataARB(GL_ARRAY_BUFFER, m_nbTris*3*3*sizeof(GLfloat), 0, GL_STREAM_DRAW);
-	GLvoid* PositionBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3* positionBuf = reinterpret_cast<VEC3*>(PositionBuffer);
-
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glBufferDataARB(GL_ARRAY_BUFFER, m_nbTris*3*3*sizeof(GLfloat), 0, GL_STREAM_DRAW);
-	GLvoid* NormalBuffer = glMapBufferARB(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3* normalBuf = reinterpret_cast<VEC3*>(NormalBuffer);
+	std::vector<VEC3> buffer;
+	buffer.reserve(16384);
 
 
-	std::vector<Dart>::iterator face = vecDartFaces.begin();
-	for (unsigned int iVol=0; iVol<vecNbFaces.size(); ++iVol)
+	TraversorCell<typename PFP::MAP> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+
+	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
-		for (unsigned int iFace = 0; iFace < vecNbFaces[iVol]; ++iFace)
+		if (m_ef)
 		{
-			Dart d = *face++;
+			VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map,d,positions);
+			Dart a = d;
+			Dart b = map.phi1(a);
+			Dart c = map.phi1(b);
 
-			std::vector<VEC3> vecPos;
-			vecPos.reserve(16);
-
-			// store the face & center
-			VEC3 center(0, 0, 0);
-			Dart dd = d;
+			// loop to cut a polygon in triangle on the fly (works only with convex faces)
 			do
 			{
-				const VEC3& P = positions[d];
-				vecPos.push_back(P);
-				center += P;
-				d = map.phi1(d);
-			} while (d != dd);
-			center /= REAL(vecPos.size());
+				buffer.push_back(centerVolumes[d]);
+				buffer.push_back(positions[d]);
+				buffer.push_back(positions[b]);
+				buffer.push_back(positions[c]);
+				buffer.push_back(centerFace); // not used
+				buffer.push_back(centerFace);
+				b = c;
+				c = map.phi1(b);
 
-			//shrink the face
-			unsigned int nb = vecPos.size();
-			float okf = 1.0f - kf;
-			float okv = 1.0f - kv;
-			for (unsigned int i = 0; i < nb; ++i)
+			} while (c != d);
+		}
+		else
+		{
+			Dart a = d;
+			Dart b = map.phi1(a);
+			Dart c = map.phi1(b);
+
+			// loop to cut a polygon in triangle on the fly (works only with convex faces)
+			do
 			{
-				vecPos[i] = vecCenters[iVol]*okv + vecPos[i]*kv;
-				vecPos[i] = center*okf + vecPos[i]*kf;
-			}
-			vecPos.push_back(vecPos.front()); // copy the first for easy computation on next loop
+				buffer.push_back(centerVolumes[d]);
+				buffer.push_back(positions[d]);
+				buffer.push_back(positions[b]);
+				buffer.push_back(positions[c]);
+				b = c;
+				c = map.phi1(b);
 
-			// compute Normal
-			unsigned int angle = 1;
-			VEC3 N;
-			do{
-				VEC3 V =  vecPos[angle+1] -  vecPos[angle];
-				VEC3 U =  vecPos[angle] -  vecPos[angle-1];
-				N = U^V;
-				angle++;
-			}while (std::isnan(N[0]) && (angle < nb));
-
-			N.normalize();
-
-			// compute position of points to use for drawing topo
-			for (unsigned int i = 2; i < nb; ++i)
-			{
-				*positionBuf++ =  vecPos[0];
-				*normalBuf++ = N;
-				*positionBuf++ =  vecPos[i-1];
-				*normalBuf++ = N;
-				*positionBuf++ =  vecPos[i];
-				*normalBuf++ = N;
-				d = map.phi1(d);
-			}
-
+			} while (c != d);
 		}
 	}
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_nbTris = buffer.size()/4;
 
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+	m_vboPos->allocate(buffer.size());
+	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	m_vboPos->releasePtr();
+	m_shader->setAttributePosition(m_vboPos);
+
+	buffer.clear();
+
+	TraversorCell<typename PFP::MAP> traEdge(map, PFP::MAP::ORBIT_IN_PARENT(EDGE),good);
+	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
+	{
+			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(positions[d]);
+			buffer.push_back(positions[ map.phi1(d)]);
+	}
+
+	m_nbLines = buffer.size()/3;
+
+	m_vboPosLine->allocate(buffer.size());
+
+	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+
+	m_vboPosLine->releasePtr();
+	m_shaderL->setAttributePosition(m_vboPosLine);
+}
+
+
+template<typename PFP>
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, typename PFP::TVEC3& colorPerXXX, const FunctorSelect& good)
+{
+	if (!m_cpf)
+	{
+		CGoGNerr<< "ExplodeVolumeRender: problem wrong update fonction use the other" << CGoGNendl;
+		return;
+	}
+
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	CellMarker cmv(map,VOLUME);
+	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
+	TraversorW<typename PFP::MAP> traVol(map,good);
+	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
+	{
+		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(map, d, positions);
+	}
+
+	std::vector<VEC3> buffer;
+	buffer.reserve(16384);
+
+	std::vector<VEC3> bufferColors;
+
+//	bool withColors = (positions == colorPerXXX);
+	bool withColors = true;
+	if (withColors)
+		bufferColors.reserve(16384);
+
+
+	TraversorCell<typename PFP::MAP> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
+
+	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	{
+		VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map,d,positions);
+
+		Dart a = d;
+		Dart b = map.phi1(a);
+		Dart c = map.phi1(b);
+		// loop to cut a polygon in triangle on the fly (works only with convex faces)
+		do
+		{
+			buffer.push_back(centerVolumes[d]);
+			bufferColors.push_back(centerFace);
+			buffer.push_back(positions[d]);
+			if (m_cpf)
+				bufferColors.push_back(colorPerXXX[d]);
+			else
+				bufferColors.push_back(m_globalColor);
+			buffer.push_back(positions[b]);
+			if (m_cpf)
+				bufferColors.push_back(colorPerXXX[b]);
+			else
+				bufferColors.push_back(m_globalColor);
+			buffer.push_back(positions[c]);
+			if (m_cpf)
+				bufferColors.push_back(colorPerXXX[c]);
+			else
+				bufferColors.push_back(m_globalColor);
+			b = c;
+			c = map.phi1(b);
+
+		} while (c != d);
+	}
+
+	m_nbTris = buffer.size()/4;
+
+	m_vboPos->allocate(buffer.size());
+	VEC3* ptrPos = reinterpret_cast<VEC3*>(m_vboPos->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	m_vboPos->releasePtr();
+	m_shader->setAttributePosition(m_vboPos);
+
+	if (withColors)
+	{
+		m_vboColors->allocate(bufferColors.size());
+		VEC3* ptrCol = reinterpret_cast<VEC3*>(m_vboColors->lockPtr());
+		memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+		m_vboColors->releasePtr();
+		m_shader->setAttributeColor(m_vboColors);
+	}
+
+
+	buffer.clear();
+
+	TraversorCell<typename PFP::MAP> traEdge(map, PFP::MAP::ORBIT_IN_PARENT(EDGE),good);
+	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
+	{
+			buffer.push_back(centerVolumes[d]);
+			buffer.push_back(positions[d]);
+			buffer.push_back(positions[ map.phi1(d)]);
+	}
+
+	m_nbLines = buffer.size()/3;
+
+	m_vboPosLine->allocate(buffer.size());
+
+	ptrPos = reinterpret_cast<VEC3*>(m_vboPosLine->lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+
+	m_vboPosLine->releasePtr();
+	m_shaderL->setAttributePosition(m_vboPosLine);
 
 }
 
 
-inline void explodeVolume_VBORender::drawFaces()
+
+inline void ExplodeVolumeRender::drawFaces()
 {
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[0]);
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glEnableClientState(GL_VERTEX_ARRAY);
+	m_shader->enableVertexAttribs();
+//	if (m_cpf)
+//		glDrawArrays(GL_TRIANGLES_ADJACENCY_EXT , 0 , m_nbTris*6 );
+//	else
+		glDrawArrays(GL_LINES_ADJACENCY_EXT , 0 , m_nbTris*4 );
+	m_shader->disableVertexAttribs();
+}
 
-	glBindBufferARB(GL_ARRAY_BUFFER, m_VBOBuffers[1]);
-	glNormalPointer(GL_FLOAT, 0, 0);
-	glEnableClientState(GL_NORMAL_ARRAY);
 
-	glDrawArrays(GL_TRIANGLES, 0, m_nbTris*3);
+inline void ExplodeVolumeRender::drawEdges()
+{
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
+	m_shaderL->enableVertexAttribs();
+	glDrawArrays(GL_TRIANGLES , 0 , m_nbLines*3 );
+	m_shaderL->disableVertexAttribs();
+}
+
+
+inline void ExplodeVolumeRender::setExplodeVolumes(float explode)
+{
+	m_shader->setExplodeVolumes(explode);
+	m_shaderL->setExplodeVolumes(explode);
+}
+
+inline void ExplodeVolumeRender::setExplodeFaces(float explode)
+{
+	m_shader->setExplodeFaces(explode);
+}
+
+
+inline void ExplodeVolumeRender::setClippingPlane(const Geom::Vec4f& p)
+{
+	m_shader->setClippingPlane(p);
+	m_shaderL->setClippingPlane(p);
+}
+
+inline void ExplodeVolumeRender::setNoClippingPlane()
+{
+	Geom::Vec4f p(1.0f,1.0f,1.0f,-99999999.9f);
+	m_shader->setClippingPlane(p);
+	m_shaderL->setClippingPlane(p);
+}
+
+inline void ExplodeVolumeRender::setAmbiant(const Geom::Vec4f& ambiant)
+{
+	m_shader->setAmbiant(ambiant);
+}
+
+inline void ExplodeVolumeRender::setBackColor(const Geom::Vec4f& color)
+{
+	m_shader->setBackColor(color);
+}
+
+inline void ExplodeVolumeRender::setLightPosition(const Geom::Vec3f& lp)
+{
+	m_shader->setLightPosition(lp);
+}
+
+inline void ExplodeVolumeRender::setColorLine(const Geom::Vec4f& col)
+{
+	m_shaderL->setColor(col);
+}
+
+
+inline Utils::GLSLShader* ExplodeVolumeRender::shaderFaces()
+{
+	return m_shader;
+}
+
+inline Utils::GLSLShader* ExplodeVolumeRender::shaderLines()
+{
+	return m_shaderL;
 }
 
 
