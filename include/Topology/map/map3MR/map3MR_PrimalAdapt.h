@@ -55,7 +55,7 @@ protected:
 public:
 	Map3MR_PrimalAdapt();
 
-	std::string mapTypeName() { return "Map3MR_PrimalAdapt"; }
+	virtual std::string mapTypeName() const { return "Map3MR_PrimalAdapt"; }
 
 	/*! @name Topological helping functions
 	 *

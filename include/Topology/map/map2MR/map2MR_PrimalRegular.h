@@ -45,7 +45,7 @@ protected:
 public:
 	Map2MR_PrimalRegular() ;
 
-	std::string mapTypeName() { return "Map2MR_PrimalRegular" ; }
+	virtual std::string mapTypeName() const { return "Map2MR_PrimalRegular" ; }
 
 	void addNewLevel(bool embedNewVertices = true) ;
 
