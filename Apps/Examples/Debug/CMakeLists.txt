@@ -78,3 +78,10 @@ QT4_WRAP_CPP( volumeExplorer_moc ../volumeExplorer.h )
 add_executable( volumeExplorerD ../volumeExplorer.cpp ${volumeExplorer_ui} ${volumeExplorer_moc})
 target_link_libraries( volumeExplorerD
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )	
+	
+QT4_WRAP_UI( mcmesh_ui ../mcmesh.ui )
+QT4_WRAP_CPP( mcmesh_moc ../mcmesh.h )
+add_executable( mcmeshD ../mcmesh.cpp 
+	${mcmesh_moc}
+	${mcmesh_ui} )
+target_link_libraries( mcmeshD ${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
