@@ -47,7 +47,10 @@ public:
 	void vertexNormal(int i, VEC& N) { N[0] = vlist[i]->nx; N[1] = vlist[i]->ny; N[2] = vlist[i]->nz;}
 	
 	template <typename VEC>
-	void vertexColor(int i, VEC& C) { C[0] = vlist[i]->r; C[1] = vlist[i]->g; C[2] = vlist[i]->b;}
+	void vertexColorUint8(int i, VEC& C) { C[0] = vlist[i]->red; C[1] = vlist[i]->green; C[2] = vlist[i]->blue;}
+
+	template <typename VEC>
+	void vertexColorFloat32(int i, VEC& C) { C[0] = vlist[i]->r; C[1] = vlist[i]->g; C[2] = vlist[i]->b;}
 
 
 	int nbVertices() { return nverts;}
@@ -62,7 +65,9 @@ public:
 	/**
 	* each vertex has a color vector
 	*/
-	bool hasColors() { return per_vertex_color!=0;}
+	bool hasColors() { return hasColorsUint8() || hasColorsFloat32() ;}
+	bool hasColorsUint8() { return per_vertex_color_uint8 != 0 ;}
+	bool hasColorsFloat32() { return per_vertex_color_float32 != 0 ;}
 
 	/**
 	* get the number of edges of a face
@@ -88,6 +93,7 @@ protected:
 	typedef struct Vertex {
 	float x,y,z;
 	float r,g,b;
+	unsigned char red,green,blue;
 	float nx,ny,nz;
 	void *other_props;       /* other properties */
 	} Vertex;
@@ -113,7 +119,7 @@ protected:
 	
 	PlyOtherProp *vert_other,*face_other;
 	
-	int per_vertex_color;
+	int per_vertex_color_float32, per_vertex_color_uint8 ;
 	int has_normals;
 };
 

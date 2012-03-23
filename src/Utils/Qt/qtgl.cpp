@@ -117,7 +117,7 @@ void GLWidget::recalcModelView()
 	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
 
 	// ajout transformation
-//	m_cbs->modelViewMatrix() *=m_cbs->transfoMatrix();
+	// m_cbs->modelViewMatrix() *= m_cbs->transfoMatrix();
 
 	newModel = 0;
 
@@ -487,6 +487,7 @@ float GLWidget::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& cen
 void GLWidget::transfoRotate(float angle, float x, float y, float z)
 {
 	m_cbs->transfoMatrix() = glm::rotate( m_cbs->transfoMatrix(), angle, glm::vec3(x,y,z));
+	recalcModelView() ;
 }
 
 void GLWidget::transfoTranslate(float tx, float ty, float tz)

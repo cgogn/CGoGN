@@ -584,9 +584,24 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
-void GMap2::splitCC(std::vector<Dart>& vd)
+void GMap2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
 {
 	//assert(checkSimpleOrientedPath(vd)) ;
+	Dart e = vd.front() ;
+	Dart e2 = phi2(e) ;
+
+	//unsew the edge path
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		if(!GMap2::isBoundaryEdge(*it))
+			unsewFaces(*it) ;
+	}
+
+	if(firstSideClosed)
+		GMap2::fillHole(e) ;
+
+	if(secondSideClosed)
+		GMap2::fillHole(e2) ;
 }
 
 /*! @name Topological Queries

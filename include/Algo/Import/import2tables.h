@@ -52,12 +52,12 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, PLYPTMgeneric, OFF, OBJ, VRML, AHEM };
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, PLYPTM, PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
 	}
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY ,OFF, OBJ };
+		enum ImportType { UNKNOWNVOLUME , TET, ELE, TS };
 	}
 
 
@@ -109,12 +109,16 @@ public:
 
 	bool importOff(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importMeshBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 	bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
-	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
@@ -184,9 +188,6 @@ public:
 
 	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
 
-	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames);
 
 	MeshTablesVolume(typename PFP::MAP& map):
 		m_map(map)
