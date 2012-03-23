@@ -84,7 +84,7 @@ public:
 		{
 			unsigned int v0 = vID[indices[0]] ;
 			unsigned int v1 = vID[indices[1]] ;
-			unsigned int v2 = vID[indices[2]] ;
+//			unsigned int v2 = vID[indices[2]] ;
 
 			Dart it = d ;
 			do

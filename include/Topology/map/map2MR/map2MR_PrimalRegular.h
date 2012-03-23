@@ -47,7 +47,7 @@ public:
 
 	std::string mapTypeName() { return "Map2MR_PrimalRegular" ; }
 
-	void addNewLevel(bool embedNewVertices) ;
+	void addNewLevel(bool embedNewVertices = true) ;
 
 	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
 	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
