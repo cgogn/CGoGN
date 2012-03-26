@@ -131,6 +131,7 @@ public:
 	{}
 
 	std::vector<Dart> m_selected;
+	Dart m_clicked;
 
 	void initMap();
 
