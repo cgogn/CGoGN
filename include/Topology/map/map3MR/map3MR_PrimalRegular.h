@@ -49,7 +49,7 @@ protected:
 public:
 	Map3MR_PrimalRegular();
 
-	std::string mapTypeName() { return "Map3MR_PrimalRegular"; }
+	virtual std::string mapTypeName() const { return "Map3MR_PrimalRegular"; }
 
 	/*! @name Topological helping functions
 	 *
