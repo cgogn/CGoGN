@@ -112,7 +112,6 @@ SimpleQT::SimpleQT() :
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
 	m_dock(NULL),
-	m_mat(m_mat),
 	m_projection_matrix(m_mat.m_matrices[0]),
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])

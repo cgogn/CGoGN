@@ -60,8 +60,8 @@ PlyImportData::PlyImportData():
 	flist(NULL),
 	vert_other(NULL),
 	face_other(NULL),
-	per_vertex_color_uint8(0),
 	per_vertex_color_float32(0),
+	per_vertex_color_uint8(0),
 	has_normals(0)	
 {
 }
