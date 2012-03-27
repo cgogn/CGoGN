@@ -105,20 +105,16 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3)
 {
 	L_DART d = m_map->newFace(3,false);
-	//TODO change this which work only with 2-maps
-//		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
-//		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
-//		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
 		
-		FunctorSetEmb<GenericMap> fsetemb(*m_map, VERTEX, e1);
-		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
-		d = m_map->phi1(d);
-		fsetemb.changeEmb(e2);
-		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
-		d = m_map->phi1(d);
-		fsetemb.changeEmb(e3);
-		m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
-		d = m_map->phi1(d);
+	FunctorSetEmb<GenericMap> fsetemb(*m_map, VERTEX, e1);
+	m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+	d = m_map->phi1(d);
+	fsetemb.changeEmb(e2);
+	m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+	d = m_map->phi1(d);
+	fsetemb.changeEmb(e3);
+	m_map->foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+	d = m_map->phi1(d);
 
 	return d;
 }
@@ -220,11 +216,11 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 			ucData = m_Image->getVoxelPtr(lX,lY,lZ);
 
 			createFaces_7(ucData++,lX++,lY,lZ,16); // TAG
-			while (lX < lTxm)
+			while (lX < lTxm-1)
 			{
 				createFaces_8(ucData++,lX++,lY,lZ,0);
 			}
-			createFaces_8(ucData++,lX++,lY,lZ,32);   //TAG
+			createFaces_8(ucData++,lX,lY,lZ,32);   //TAG
 			lY++;
 		}
 

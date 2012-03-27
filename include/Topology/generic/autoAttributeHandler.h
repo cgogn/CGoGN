@@ -61,7 +61,8 @@ public:
 
 	~AutoAttributeHandler()
 	{
-		reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+		if (this->valid)
+			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
 	}
 } ;
 

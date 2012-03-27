@@ -155,6 +155,12 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
+
+	/**
+	 * Precondition for deleting edge
+	 */
+	bool deleteEdgePreCond(Dart d);
+
 	//! Delete the edge of d
 	/*! All the volumes around the edge are merged into one volume
 	 *  @param d a dart of the edge to delete
@@ -176,7 +182,14 @@ public:
 	 *  @param d a dart of the face
 	 *  @return true if the collapse has been executed, false otherwise
 	 */
-	virtual bool collapseDegeneratedFace(Dart d);
+//	virtual bool collapseDegeneratedFace(Dart d);
+
+	//! Split Face Pre-condition
+	/*!
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 */
+	bool splitFacePreCond(Dart d, Dart e);
 
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
@@ -193,6 +206,10 @@ public:
 	 */
 	bool collapseDegeneretedVolume(Dart d);
 
+	//!! sewVolumes Pre-condition
+	bool sewVolumesPreCond(Dart d, Dart e);
+
+
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same degree
 	 *  @param d a dart of the first volume
@@ -200,6 +217,9 @@ public:
 	 *  @param withBoundary: if false, volumes must have phi3 fixed points (only for construction: import/primitives)
 	 */
 	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
+
+	//! Unsew volumes pre-condition
+	bool unsewVolumesPreCond(Dart d);
 
 	//! Unsew two oriented volumes along their faces.
 	/*! @param d a dart of one volume

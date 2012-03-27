@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,98 +17,93 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
+* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#include <iostream>
 
-#include "Topology/map/map3.h"
+#include "Utils/Qt/qtSimple.h"
+#include "ui_mcmesh.h"
+#include "Utils/Qt/qtui.h"
 
-namespace CGoGN
+#include "Topology/generic/parameters.h"
+#include "Topology/map/map2.h"
+#include "Topology/map/embeddedMap2.h"
+
+#include "Geometry/vector_gen.h"
+#include "Geometry/matrix.h"
+
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/Shaders/shaderFlat.h"
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Algo/Geometry/boundingbox.h"
+
+#include "Algo/MC/marchingcube.h"
+
+
+using namespace CGoGN ;
+
+struct PFP: public PFP_STANDARD
 {
+	// definition of the map
+	typedef EmbeddedMap2 MAP ;
+};
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+typedef PFP::MAP MAP ;
+
+typedef unsigned char DATATYPE;
+
+
+
+class MCMesh : public Utils::QT::SimpleQT
 {
+	Q_OBJECT
+
 public:
-	typedef Map3 TOPO_MAP;
+	MAP myMap ;
+	SelectorTrue allDarts ;
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+    Utils::QT::uiDockInterface dock ;
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+	float shininess ;
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
+	Geom::BoundingBox<PFP::VEC3> bb ;
 
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
+	bool m_drawEdges ;
+	bool m_drawFaces ;
 
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
+	PFP::TVEC3 position ;
 
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
+	Algo::Render::GL2::MapRender* m_render ;
 
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
+	Utils::VBO* m_positionVBO ;
+	Utils::ShaderFlat* m_flatShader ;
+	Utils::ShaderSimpleColor* m_simpleColorShader ;
 
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
+	DATATYPE valLabel;
+	Algo::MC::Image<DATATYPE>* myImg;
 
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
+	MCMesh() ;
 
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
+	void initGUI();
+	void updateRender();
+	void MC();
 
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
+	void cb_initGL() ;
+	void cb_redraw() ;
+	void cb_Open() ;
+	
+	void fromFile(char* fname);
+	void sphere();
 
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
 
-} // namespace CGoGN
+public slots:
+	void slot_drawEdges(bool b) ;
+	void slot_drawFaces(bool b) ;
 
-#endif
+};
+

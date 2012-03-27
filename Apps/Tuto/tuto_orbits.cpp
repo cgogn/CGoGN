@@ -61,7 +61,19 @@ void MyQT::orbit_list(int x)
 {
 	storeVerticesInfo<int>(m_att_orbits[x]);
 	current_orbit = x;
-	m_selected.clear();
+
+	if (m_clicked != Dart::nil())
+	{
+		unsigned int orbs[9] ={VERTEX,EDGE,FACE,VOLUME,PFP::MAP::ORBIT_IN_PARENT(VERTEX),PFP::MAP::ORBIT_IN_PARENT(EDGE),PFP::MAP::ORBIT_IN_PARENT(FACE),PFP::MAP::ORBIT_IN_PARENT2(VERTEX),PFP::MAP::ORBIT_IN_PARENT2(EDGE)};
+		m_selected.clear();
+
+		// easy way to traverse darts of orbit
+		TraversorDartsOfOrbit<PFP::MAP> tra(myMap,orbs[current_orbit],m_clicked);
+		for (Dart e = tra.begin(); e != tra.end(); e = tra.next())
+			m_selected.push_back(e);
+	}
+
+	//	m_selected.clear();
 	updateGL();
 }
 
@@ -108,7 +120,7 @@ void MyQT::cb_redraw()
 	m_render_topo->drawTopo();
 
 	for (unsigned int i=0; i< m_selected.size(); ++i)
-		m_render_topo->overdrawDart(m_selected[i], 5, 1.0f, 0.0f, 1.0f);
+		m_render_topo->overdrawDart(m_selected[i], 7, 1.0f, 0.0f, 1.0f);
 
 	if (render_text)
 		m_strings->drawAll(Geom::Vec3f(0.0f, 1.0f, 1.0f));
@@ -120,14 +132,14 @@ void MyQT::cb_mousePress(int button, int x, int y)
 	if (Shift())
 	{
 		SelectorDartNoBoundary<PFP::MAP> nb(myMap);	
-		Dart d = m_render_topo->picking<PFP>(myMap, x,y, nb);
-		if (d != Dart::nil())
+		m_clicked = m_render_topo->picking<PFP>(myMap, x,y, nb);
+		if (m_clicked != Dart::nil())
 		{
 			unsigned int orbs[9] ={VERTEX,EDGE,FACE,VOLUME,PFP::MAP::ORBIT_IN_PARENT(VERTEX),PFP::MAP::ORBIT_IN_PARENT(EDGE),PFP::MAP::ORBIT_IN_PARENT(FACE),PFP::MAP::ORBIT_IN_PARENT2(VERTEX),PFP::MAP::ORBIT_IN_PARENT2(EDGE)};
 			m_selected.clear();
 
 			// easy way to traverse darts of orbit
-			TraversorDartsOfOrbit<PFP::MAP> tra(myMap,orbs[current_orbit],d);
+			TraversorDartsOfOrbit<PFP::MAP> tra(myMap,orbs[current_orbit],m_clicked);
 			for (Dart e = tra.begin(); e != tra.end(); e = tra.next())
 				m_selected.push_back(e);
 		}
