@@ -21,50 +21,40 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#ifndef __SHOW_TRAVERSORS_
-#define __SHOW_TRAVERSORS_
 
+#ifndef _TUTO_OPER3_
+#define _TUTO_OPER3_
 
-#include <iostream>
+//#define USE_GMAP
 
-//#define WITH_GMAP 1
 
 #include "Topology/generic/parameters.h"
-#ifdef WITH_GMAP
+
+#ifdef USE_GMAP
 	#include "Topology/gmap/embeddedGMap3.h"
 #else
 	#include "Topology/map/embeddedMap3.h"
 #endif
 
-#include "Geometry/vector_gen.h"
-#include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-
 #include "Algo/Render/GL2/topo3Render.h"
 
-#include "Topology/generic/cellmarker.h"
-#include "Utils/text3d.h"
 
-#include "Utils/pointSprite.h"
-#include "Utils/Shaders/shaderVectorPerVertex.h"
-#include "Utils/cgognStream.h"
-#include "Utils/drawer.h"
-
-
-#include "Utils/Qt/qtSimple.h"
-
-#include "ui_show_traversors.h"
-// inclure qtui.h juste après le ui_xxx.h
+#include "ui_tuto_oper3.h"
 #include "Utils/Qt/qtui.h"
+#include "Utils/Qt/qtSimple.h"
+#include "Utils/cgognStream.h"
 
 
 using namespace CGoGN ;
 
+/**
+ * Struct that contains some informations about the types of the manipulated objects
+ * Mainly here to be used by the algorithms that are parameterized by it
+ */
 struct PFP: public PFP_STANDARD
 {
-	// definition de la carte
-#ifdef WITH_GMAP
+	// definition of the type of the map
+#ifdef USE_GMAP
 	typedef EmbeddedGMap3 MAP;
 #else
 	typedef EmbeddedMap3 MAP;
@@ -72,84 +62,61 @@ struct PFP: public PFP_STANDARD
 };
 
 
-using namespace CGoGN ;
 
-
-/**
- * Utilisation de designer-qt4:
- * Faire un DockWiget (laisser le nom par defaut
- * dans le Contents ajouter le layout choisi (vertical classiquement)
- * Ajouter les widgets necessaires, mettre des noms clairs pour
- * les utiliser dans le .cpp (pour les call back principalement)
- */
 class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
-
-	Algo::Render::GL2::Topo3Render* m_render_topo;
-	bool m_showTopo;
-
-	
-	unsigned int m_first3;
-	unsigned int m_ajd_or_inci3;
-	unsigned int m_second3;
-	unsigned int m_first2;
-	unsigned int m_ajd_or_inci2;
-	unsigned int m_second2;
-	float m_expl;
-	unsigned int m_last;
 public:
-	MyQT():
-		m_render_topo(NULL),
-		m_showTopo(true),
-		m_first3(0),
-		m_ajd_or_inci3(0),
-		m_second3(1),
-		m_first2(0),
-		m_ajd_or_inci2(0),
-		m_second2(1),
-		m_expl(0.8f),
-		m_last(2),
-		m_selected(NIL),
-		m_dm_topo(NULL)
-
-	{}
-
-	Dart m_selected;
-	std::vector<Dart> m_affDarts;
-
-	Utils::Drawer m_drawer;
-
-	DartMarker* m_dm_topo;
-
-protected:
-    void storeVerticesInfo();
+	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f) {}
 
 	void cb_redraw();
-
 	void cb_initGL();
-
+	void cb_mousePress(int button, int x, int y);
+	void cb_keyPress(int code);
+	void cb_Open();
 	void cb_Save();
 
-	void cb_mousePress(int button, int x, int y);
+	Utils::QT::uiDockInterface dock;
 
-	void colorizeCell(Dart d, unsigned int orbit, float r,float g, float b);
+protected:
+	// declaration of the map
+	PFP::MAP myMap;
 
-	void traverse2();
-	void traverse3();
+	PFP::TVEC3 position;
+//	AttributeHandler<Geom::Vec3f> colorDarts;
 
-// slots locaux
+	SelectorDartNoBoundary<PFP::MAP> nb;
+
+	// render (for the topo)
+	Algo::Render::GL2::Topo3Render* m_render_topo;
+	Dart m_selected;
+	Dart m_selected2;
+	std::vector<Dart> m_selecteds;
+	DartMarker dm;
+	float m_shift;
+
+	float m_ex1,m_ex2,m_ex3;
+
+	// just for more compact writing
+	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
+	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
+	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
+	inline Dart PHI3(Dart d)	{return myMap.phi3(d);}
+	template<int X>
+	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+
+public:
+	// example of simple map creation
+	void createMap(int n);
+	void updateMap();
+	void importMesh(std::string& filename);
+
 public slots:
-	void cb_combo1(int x);
-	void cb_combo2(int x);
-	void cb_combo3(int x);
-
-	void cb_combo4(int x);
-	void cb_combo5(int x);
-	void cb_combo6(int x);
-	void cb_checkTopo(bool b);
-	void cb_explode(int x);
-
+	void operation(int x);
+	void svg();
+	void width(int w);
 };
+
+
 
 #endif

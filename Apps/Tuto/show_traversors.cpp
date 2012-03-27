@@ -125,6 +125,7 @@ void MyQT::cb_initGL()
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f, nb);
+	m_dm_topo = new DartMarker(myMap);
 
 }
 
@@ -135,8 +136,8 @@ void MyQT::cb_redraw()
 		m_render_topo->drawTopo();
 
 		if (m_selected != NIL)
-			m_render_topo->overdrawDart(m_selected, 6, 1.0f, 0.0f, 1.0f);
-	
+			m_render_topo->overdrawDart(m_selected, 7, 1.0f, 0.0f, 1.0f);
+
 		for (std::vector<Dart>::iterator it=m_affDarts.begin(); it!=m_affDarts.end(); ++it)
 		{
 			m_render_topo->overdrawDart(*it, 6, 1.0f, 1.0f, 1.0f);
@@ -165,9 +166,33 @@ void MyQT::cb_mousePress(int button, int x, int y)
 
 void  MyQT::cb_Save()
 {
+//	std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
+//	Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+//	m_drawer.toSVG(svg);
+//	m_render_topo->toSVG(svg);
+
+	Utils::SVG::SVGOut svg1(modelViewMatrix(),projectionMatrix());
+	m_drawer.toSVG(svg1);
+	svg1.addOpacityAnimation(1.0f);
+	svg1.addOpacityAnimation(1.0f);
+	svg1.addOpacityAnimation(0.0f);
+
+	Utils::SVG::SVGOut svg2(modelViewMatrix(),projectionMatrix());
+	m_render_topo->toSVG(svg2);
+	svg2.addOpacityAnimation(1.0f);
+	svg2.addOpacityAnimation(0.0f);
+	svg2.addOpacityAnimation(1.0f);
+
+	Utils::SVG::AnimatedSVGOut anim;
+
+	anim.add(&svg1);
+	anim.add(&svg2);
+
 	std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
-	Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
-	m_drawer.toSVG(svg);
+
+	anim.write(filename, 2.0f);
+
+
 }
 
 void MyQT::colorizeCell(Dart d, unsigned int orbit, float r,float g, float b)
@@ -187,8 +212,8 @@ void MyQT::traverse2()
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 
 	m_drawer.newList(GL_COMPILE);
-	m_drawer.lineWidth(3.0f);
-	m_drawer.pointSize(7.0f);
+	m_drawer.lineWidth(7.0f);
+	m_drawer.pointSize(9.0f);
 	m_drawer.color3f(0.0f,0.7f,0.0f);
 
 	m_affDarts.clear();
@@ -216,6 +241,10 @@ void MyQT::traverse2()
 	}
 
 	m_drawer.endList();
+
+	SelectorMarked sm(*m_dm_topo);
+	m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f, sm );
+
 	updateGL();
 }
 
@@ -232,30 +261,55 @@ void MyQT::traverse3()
 
 	m_affDarts.clear();
 	m_drawer.newList(GL_COMPILE);
-	m_drawer.lineWidth(3.0f);
-	m_drawer.pointSize(7.0f);
+	m_drawer.lineWidth(7.0f);
+	m_drawer.pointSize(9.0f);
 	m_drawer.color3f(0.0f,0.7f,0.0f);
+
+	m_dm_topo->unmarkAll();
+	SelectorMarked sm(*m_dm_topo);
+
 
 	if (m_ajd_or_inci3 == 0) // incident
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_second3, m_drawer,myMap,m_selected,position,m_expl);
+		m_dm_topo->markOrbit(VERTEX+m_second3,m_selected);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3XY<PFP::MAP> tra(myMap,m_selected,VERTEX+m_second3,VERTEX+m_first3);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-				m_affDarts.push_back(d);
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit(VERTEX+m_first3,d);
+		}
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
+
+		m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f, sm);
+		for (std::vector<Dart>::iterator id=m_affDarts.begin(); id != m_affDarts.end(); ++id)
+			m_render_topo->setDartColor(*id,0.7f,0.0f,0.0f);
+		m_render_topo->setDartColor(m_selected,0.0f,0.7f,0.0f);
 	}
 	else	// adjacent
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_first3, m_drawer,myMap,m_selected,position,m_expl);
+		m_dm_topo->markOrbit(VERTEX+m_first3,m_selected);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 		Traversor3XXaY<PFP::MAP> tra(myMap,m_selected,VERTEX+m_first3,VERTEX+m_second3);
 		for (Dart d=tra.begin(); d != tra.end(); d= tra.next())
-				m_affDarts.push_back(d);
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit(VERTEX+m_first3,d);
+		}
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
+
+		m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f, sm);
+		for (std::vector<Dart>::iterator id=m_affDarts.begin(); id != m_affDarts.end(); ++id)
+			m_render_topo->setDartColor(*id,0.7f,0.0f,0.0f);
+		m_render_topo->setDartColor(m_selected,0.0f,0.7f,0.0f);
 	}
 
 	m_drawer.endList();
+
+
+
 	updateGL();
 }
 

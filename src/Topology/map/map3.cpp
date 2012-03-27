@@ -234,8 +234,17 @@ bool Map3::uncutEdge(Dart d)
 	return false;
 }
 
+bool Map3::deleteEdgePreCond(Dart d)
+{
+	unsigned int nb1 = vertexDegree(d);
+	unsigned int nb2 = vertexDegree(phi1(d));
+	return (nb1!=2) && (nb2!=2);
+}
+
 Dart Map3::deleteEdge(Dart d)
 {
+	assert(deleteEdgePreCond(d));
+
 	if(isBoundaryEdge(d))
 		return NIL ;
 
@@ -270,38 +279,62 @@ Dart Map3::deleteEdge(Dart d)
 	return res ;
 }
 
+//Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
+//{
+//	Dart resV = NIL;
+//
+//	Dart dit = d;
+//
+//	do
+//	{
+//		Dart e = dit;
+//		dit = alpha2(dit);
+//
+//		//test si un seul polyedre autour de l'arete
+//		if(e == dit)
+//			resV == phi3(phi2(phi1(e)));
+//
+//		if(delDegenerateVolumes)
+//		{
+//			Map2::collapseEdge(e, true);
+//			collapseDegeneretedVolume(e);
+//		}
+//		else
+//			Map2::collapseEdge(e, false);
+//
+//		if(resV == NIL)
+//		{
+//
+//		}
+//
+//	}while(d != dit);
+//
+//	return resV;
+//}
+
 Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 {
 	Dart resV = NIL;
-
 	Dart dit = d;
 
+	std::vector<Dart> darts;
 	do
 	{
-		Dart e = dit;
+		darts.push_back(dit);
 		dit = alpha2(dit);
+	}while(dit != d);
 
-		//test si un seul polyedre autour de l'arete
-		if(e == dit)
-			resV == phi3(phi2(phi1(e)));
-
-		if(delDegenerateVolumes)
-		{
-			Map2::collapseEdge(e, true);
-			collapseDegeneretedVolume(e);
-		}
-		else
-			Map2::collapseEdge(e, false);
-
-		if(resV == NIL)
-		{
-
-		}
-
-	}while(d != dit);
+	for (std::vector<Dart>::iterator it = darts.begin(); it != darts.end(); ++it)
+	{
+		Dart x = phi2(phi_1(*it));
+		resV = Map2::collapseEdge(*it, true);
+		if (delDegenerateVolumes)
+			collapseDegeneretedVolume(x);
+	}
 
 	return resV;
 }
+
 
 
 
@@ -355,22 +388,44 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 //		}
 //	}
 
-bool Map3::collapseDegeneratedFace(Dart d)
+//bool Map3::collapseDegeneratedFace(Dart d)
+//{
+//	Dart d3 = phi3(d);
+//
+//	std::cout << "Map3::collapseDegeneratedFace"<< std::endl;
+//
+//	if (!isDartValid(d))
+//		Map2::collapseDegeneratedFace(d);
+//	else
+//		std::cout << "Warning Coll1 invalid"<< std::endl;
+//
+//
+//	if (isDartValid(d3))
+//		Map2::collapseDegeneratedFace(d3);
+//	else
+//		std::cout << "Warning coll2 invalid"<< std::endl;
+//
+//
+//
+///*
+//	Map3::unsewVolumes(d);
+//
+//	std::cout << Map2::collapseDegeneratedFace(d) << std::endl;
+//	std::cout << Map2::collapseDegeneratedFace(d3) << std::endl;
+//	std::cout << std::endl;
+//*/
+//	return true;
+//}
+
+bool Map3::splitFacePreCond(Dart d, Dart e)
 {
-	Dart d3 = phi3(d);
-
-	Map3::unsewVolumes(d);
-
-	std::cout << Map2::collapseDegeneratedFace(d) << std::endl;
-	std::cout << Map2::collapseDegeneratedFace(d3) << std::endl;
-	std::cout << std::endl;
-
-	return true;
+	return (d != e && sameOrientedFace(d, e)) ;
 }
 
 void Map3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameOrientedFace(d, e)) ;
+//	assert(d != e && sameOrientedFace(d, e)) ;
+	assert(splitFacePreCond(d,e));
 
 	Dart dd = phi1(phi3(d));
 	Dart ee = phi1(phi3(e));
@@ -382,31 +437,69 @@ void Map3::splitFace(Dart d, Dart e)
 	phi3sew(phi_1(e), phi_1(dd));
 }
 
+//bool Map3::collapseDegeneretedVolume(Dart d)
+//{
+//	Dart e1 = phi2(d);
+//	Dart e2 = phi2(phi1(d));
+//
+//	//Si les deux faces ne sont pas du bord
+//	if(!isBoundaryFace(e1) && !isBoundaryFace(e2))
+//	{
+//		sewVolumes(phi3(e1),phi3(e2));
+//		deleteVolume(d);
+//		return true;
+//	}
+//	else
+//	{
+//		//alors simple suppression du volume degenere
+//		deleteVolume(d);
+//		return true;
+//	}
+//
+//	return false;
+//}
+
 bool Map3::collapseDegeneretedVolume(Dart d)
 {
-	Dart e1 = phi2(d);
-	Dart e2 = phi2(phi1(d));
+	Dart e1 = d;
+	Dart e2 = phi2(d);
 
-	//Si les deux faces ne sont pas du bord
-	if(!isBoundaryFace(e1) && !isBoundaryFace(e2))
+	do
 	{
-		sewVolumes(phi3(e1),phi3(e2));
-		deleteVolume(d);
-		return true;
-	}
-	else
-	{
-		//alors simple suppression du volume degenere
-		deleteVolume(d);
-		return true;
-	}
+		if (e1 != phi2(e2))
+			return false;
+		e1 = phi1(e1);
+		e2 = phi_1(e2);
+	}while (e1 != d);
 
-	return false;
+	if (e2 != phi2(d))
+		return false;
+
+	// degenerated:
+	do
+	{
+		Dart f1 = phi3(e1);
+		Dart f2 = phi3(e2);
+		phi3unsew(e1);
+		phi3unsew(e2);
+		phi3sew(f1,f2);
+		e1 = phi1(e1);
+		e2 = phi_1(e2);
+	}while (e1 != d);
+
+	Map2::deleteCC(d) ;
+	return true;
+}
+
+
+bool Map3::sewVolumesPreCond(Dart d, Dart e)
+{
+	return (faceDegree(d) == faceDegree(e));
 }
 
 void Map3::sewVolumes(Dart d, Dart e, bool withBoundary)
 {
-	assert(faceDegree(d) == faceDegree(e));
+	assert(sewVolumesPreCond(d,e));
 
 	// if sewing with fixed points
 	if (!withBoundary)
@@ -456,9 +549,15 @@ void Map3::sewVolumes(Dart d, Dart e, bool withBoundary)
 	} while(fitD != d) ;
 }
 
+bool Map3::unsewVolumesPreCond(Dart d)
+{
+	return (!isBoundaryFace(d)) ;
+}
+
+
 void Map3::unsewVolumes(Dart d)
 {
-	assert(!isBoundaryFace(d)) ;
+	assert(unsewVolumesPreCond(d)) ;
 
 	unsigned int nbE = faceDegree(d) ;
 	Dart d3 = phi3(d);
