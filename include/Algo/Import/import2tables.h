@@ -57,7 +57,7 @@ namespace Import
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY ,OFF, OBJ };
+		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY ,OFF, OBJ, MOKA };
 	}
 
 
@@ -183,6 +183,8 @@ public:
 	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor);
 
 	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
+
+	bool importMoka(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 

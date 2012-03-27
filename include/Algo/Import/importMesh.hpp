@@ -353,7 +353,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
 	//ALGO
 	// précondition
-	// indexer le tableau du nombre d'arrete par faces par le nombre de faces par volume
+	// indexer le tableau du nombre d'arête par faces par le nombre de faces par volume
 	//
 	//creation d'une sous-carte (2-carte) pour les faces d'un volume en fonction du nombre d'arete grace a un meshtableSurface
 	//avoir un tableau_de_sommets[nbsommets] indexe par les sommets dans lequel on comptera le nombre de fois qu'on a croisé un sommet
@@ -378,8 +378,6 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 			//reconstructing the faces for this volume
 
 			unsigned int nbEdges = mtv.getNbEdgesFace(j);
-
-
 
 //			std::vector<unsigned int> edgesBuffer;
 //			edgesBuffer.reserve(8);
@@ -418,13 +416,6 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 
 		indexNbFaces++;
 	}
-
-
-
-
-
-
-
 
 
 	int index = 0;

@@ -15,13 +15,13 @@ namespace ExportPov
 {
 
 template <typename PFP>
-void exportTriangleWire(std::ofstream& out,typename PFP::VEC3& p1,typename PFP::VEC3& p2,typename PFP::VEC3& p3)
+void exportTriangleWire(std::ofstream& out,typename PFP::VEC3& p1,typename PFP::VEC3& p2,typename PFP::VEC3& p3, float width)
 {
-		out << "cylinder { <" << p1[0] << "," << p1[2] << "," << p1[1] << ">, <" << p2[0] << "," << p2[2] << "," << p2[1] << ">, 0.5 }" << std::endl;
+		out << "cylinder { <" << p1[0] << "," << p1[1] << "," << p1[2] << ">, <" << p2[0] << "," << p2[1] << "," << p2[2] << ">, " << width << "}" << std::endl;
 
-		out << "cylinder { <" << p1[0] << "," << p1[2] << "," << p1[1] << ">, <" << p3[0] << "," << p3[2] << "," << p3[1] << ">, 0.5 }" << std::endl;
+		out << "cylinder { <" << p1[0] << "," << p1[1] << "," << p1[2] << ">, <" << p3[0] << "," << p3[1] << "," << p3[2] << ">, " << width << "}" << std::endl;
 
-		out << "cylinder { <" << p3[0] << "," << p3[2] << "," << p3[1] << ">, <" << p2[0] << "," << p2[2] << "," << p2[1] << ">, 0.5 }" << std::endl;
+		out << "cylinder { <" << p3[0] << "," << p3[1] << "," << p3[2] << ">, <" << p2[0] << "," << p2[1] << "," << p2[2] << ">, " << width << "}" << std::endl;
 }
 
 template <typename PFP>
@@ -173,42 +173,22 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, typename
 }
 
 template <typename PFP>
-void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, float width=0.5f, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
-	DartMarkerStore traite(map);
+	TraversorE<typename PFP::MAP > travE(map);
 
-	for(Dart d = map.begin() ; d!= map.end() ; map.next(d))
+	for(Dart d = travE.begin() ; d!= travE.end() ; d = travE.next())
 	{
-		if(good(d) && !traite.isMarked(d))
+		if(good(d))
 		{
-			unsigned int nb = 0;
-			Dart dd = d;
-			do
-			{
-				traite.markOrbit(DART, dd);
-				dd = map.phi1(dd);
-				nb++;
-			} while(dd != d);
+			Dart dd = map.phi2(d);
 
-			if(nb == 3)
-				Algo::ExportPov::exportTriangleWire<PFP>(out,position[dd],position[map.phi1(dd)],position[map.phi1(map.phi1(dd))]);
-			else
-			{
-					dd = d;
-					do
-					{
-						if(position[dd][0]!=position[map.phi1(dd)][0] || position[dd][1]!=position[map.phi1(dd)][1] || position[dd][2]!=position[map.phi1(dd)][2])
-						{
-							out << "cylinder{ " << std::endl;
-							out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
-							out << "<" << position[map.phi1(dd)][0] << "," << position[map.phi1(dd)][2] << "," << position[map.phi1(dd)][1] << ">, 0.5" << std::endl;
-							out << "}" << std::endl;
-						}
-						dd = map.phi1(dd);
-					} while(dd != d);
-			}
+			out << "cylinder{ " << std::endl;
+			out << "<" << position[d][0] << "," << position[d][1] << "," << position[d][2] << ">," << std::endl;
+			out << "<" << position[dd][0] << "," << position[dd][1] << "," << position[dd][2] << ">," << width << std::endl;
+			out << "}" << std::endl;
 		}
 	}
 

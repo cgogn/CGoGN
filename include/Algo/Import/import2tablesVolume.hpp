@@ -43,6 +43,9 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 	if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
 		return ImportVolumique::PLY;
 
+	if ((filename.rfind(".moka")!=std::string::npos) || (filename.rfind(".MOKA")!=std::string::npos))
+		return ImportVolumique::MOKA;
+
 	return ImportVolumique::UNKNOWNVOLUME;
 }
 
@@ -63,6 +66,9 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 	case ImportVolumique::TRIANBGZ:
 		return importTrianBinGz(filename, attrNames);
 		break;
+//	case ImportVolumique::MOKA:
+//		return importMoka(filename,attrNames);
+//		break;
 	default:
 		CGoGNerr << "Not yet supported" << CGoGNendl;
 		break;
@@ -193,6 +199,83 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 	return true;
 }
 
+//template <typename PFP>
+//bool MeshTablesVolume<PFP>::importMoka(const std::string& filename, std::vector<std::string>& attrNames)
+//{
+//	// open file
+//	igzstream fp(filename.c_str(), std::ios::in|std::ios::binary);
+//
+//	if (!fp.good())
+//	{
+//		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+//		return false;
+//	}
+//
+//	AttributeContainer& container = m_map.getAttributeContainer(VERTEX);
+//
+//	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position");
+//	if (!positions.isValid())
+//		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position");
+//
+//	attrNames.push_back(positions.name());
+//
+//	std::string ligne;
+//	int nbv,nbt;
+//	std::getline (fp, ligne);
+//
+//	//check if the file format is in ascii
+//	if(ligne.compare("Moka file [ascii]")!=0)
+//	{
+//		CGoGNerr << "Unable to load this moka file " << filename << CGoGNendl;
+//		return false;
+//	}
+//
+//	std::getline (fp, ligne);
+//	std::cout << "line 2 : " << ligne << std::endl;
+//
+//	unsigned int dartNb=0;
+//	while(!std::getline(fp, ligne).eof())
+//	{
+//		dartNb++;
+//
+//		std::stringstream oss(ligne);
+//		unsigned int beta0,beta1,beta2,beta3;
+//
+//		//read involutions
+//		oss >> beta0;
+//		oss >> beta1;
+//		oss >> beta2;
+//		oss >> beta3;
+//
+//		std::cout << "dart : " << dartNb << std::endl;
+//		std::cout<< "beta0 : " << beta0 << std::endl;
+//		std::cout << "beta1 : " << beta1 << std::endl;
+//		std::cout<< "beta2 : " << beta2 << std::endl;
+//		std::cout<< "beta3 : " << beta3 << std::endl;
+//
+//		//ignore markers
+//		unsigned int tmp;
+//		oss >> tmp;
+//		oss >> tmp;
+//		oss >> tmp;
+//
+//		//check if contains embedding
+//		unsigned int emb;
+//		oss >> emb;
+//
+//		if(emb==1)
+//		{
+//			typename PFP::VEC3 pos;
+//			oss >> pos[0];
+//			oss >> pos[1];
+//			oss >> pos[2];
+//		}
+//	}
+//
+//	fp.close();
+//	return true;
+//}
+
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames)
 {
@@ -202,7 +285,7 @@ bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename, std::v
 //	if (!fs.good())
 //	{
 //		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
-//		return false;
+		return false;
 //	}
 //	// read nb of points
 //	int nbp;
@@ -253,7 +336,7 @@ bool MeshTablesVolume<PFP>::importTrianBinGz(const std::string& filename, std::v
 //	}
 //
 //	fs.close();
-	return true;
+//	return true;
 }
 
 template<typename PFP>
