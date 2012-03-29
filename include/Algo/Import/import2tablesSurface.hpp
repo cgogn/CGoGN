@@ -80,10 +80,9 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 }
 
 template<typename PFP>
-bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
+bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	if (kind == ImportSurfacique::UNKNOWNSURFACE)
-		kind = getFileType(filename);
+	ImportSurfacique::ImportType kind = getFileType(filename);
 
 	attrNames.clear() ;
 

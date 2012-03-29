@@ -241,18 +241,17 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
-
+	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
 
 	return false;
 }
 
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind, bool mergeCloseVertices)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
 	MeshTablesSurface<PFP> mts(map);
 
-	if(!mts.importMesh(filename, attrNames, kind))
+	if(!mts.importMesh(filename, attrNames))
 		return false;
 
 	if (mergeCloseVertices)
@@ -262,8 +261,19 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
 }
 
 template <typename PFP>
-bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, bool mergeCloseVertices)
+bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
+	ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME;
+
+	if ((filename.rfind(".tet") != std::string::npos) || (filename.rfind(".TET") != std::string::npos))
+		kind = ImportVolumique::TET;
+
+	if ((filename.rfind(".ele") != std::string::npos) || (filename.rfind(".ELE") != std::string::npos))
+		kind = ImportVolumique::ELE;
+
+	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
+		kind = ImportVolumique::TS;
+
 	switch (kind)
 	{
 		case ImportVolumique::TET:
@@ -288,19 +298,17 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
 	return false;
 }
 
-
 template <typename PFP>
-bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind)
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
 {
 	float dist = 5.0f;
 	MeshTablesSurface<PFP> mts(map);
 
-	if(!mts.importMesh(filename, attrNames, kind))
+	if(!mts.importMesh(filename, attrNames))
 		return false;
 
 	return importMeshSToV<PFP>(map, mts, dist);
 }
-
 
 } // namespace Import
 

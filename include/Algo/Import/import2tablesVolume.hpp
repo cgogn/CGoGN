@@ -47,10 +47,9 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 }
 
 template <typename PFP>
-bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor=1.0f)
+bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f)
 {
-	if (kind == ImportVolumique::UNKNOWNVOLUME)
-		kind = getFileType(filename);
+	ImportVolumique::ImportType kind = getFileType(filename);
 
 	switch (kind)
 	{
