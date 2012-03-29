@@ -47,7 +47,7 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 }
 
 template <typename PFP>
-bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f)
+bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f)
 {
 	ImportVolumique::ImportType kind = getFileType(filename);
 
@@ -68,7 +68,7 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 }
 
 template <typename PFP>
-bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor=1.0f)
+bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
 	AttributeHandler<VEC3> positions =  m_map.template getAttribute<VEC3>(VERTEX, "position") ;
 
