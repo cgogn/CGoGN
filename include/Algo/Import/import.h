@@ -43,38 +43,44 @@ namespace Import
 /**
 * import a mesh
 * @param map the map in which the function imports the mesh
-* @param filename (*.{trian,trianbgz,off,obj,ply})
+* @param filename
 * @param attrNames attribute names
-* @param kind what kind of mesh is the file (if none (-1) determined by filename extension) (cf enum in Mesh2Tables for other kind values)
-* @param mergeColseVertces a boolean indicating if the imported mesh should be closed
+* @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
 * @return a boolean indicating if import was successfull
 */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE, bool mergeCloseVertices=false);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
 /**
  * import a volumetric mesh
  * @param map the map in which the function imports the mesh
- * @param filename (*.{tet,off,ts})
+ * @param filename
  * @param attrNames attribute names
- * @param kind what kind of mesh is the file (if none (-1) determined by filename extension) (cf enum in Mesh2Tables for other kind values)
- * @param mergeColseVertces a boolean indicating if the imported mesh should be closed
+ * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
  * @return a boolean indicating if import was successfull
  */
 template <typename PFP>
-bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME, bool mergeCloseVertices=false);
+bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
 /**
  * import a mesh and extrud it
  * @param map the map in which the function imports the mesh
- * @param filename (*.{trian,trianbgz,off,obj,ply})
+ * @param filename
  * @param attrNames attribute names
- * @param kind what kind of mesh is the file (if none (-1) determined by filename extension) (cf enum in Mesh2Tables for other kind values)
- * @param mergeColseVertces a boolean indicating if the imported mesh should be closed
+ * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
  * @return a boolean indicating if import was successfull
  */
 template <typename PFP>
-bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+
+/**
+ * import a MOKA file
+ * @param gmap the gmap in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ */
+template <typename PFP>
+bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
 
 /*
@@ -104,6 +110,7 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 } // namespace CGoGN
 
 #include "Algo/Import/importMesh.hpp"
+#include "Algo/Import/importMoka.hpp"
 //#include "Algo/Import/importObjTex.hpp"
 #include "Algo/Import/importObjEle.hpp"
 #include "Algo/Import/importTet.hpp"

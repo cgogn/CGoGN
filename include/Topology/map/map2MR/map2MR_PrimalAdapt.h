@@ -46,7 +46,7 @@ protected:
 public:
 	Map2MR_PrimalAdapt() ;
 
-	std::string mapTypeName() { return "Map2MR_PrimalAdapt" ; }
+	virtual std::string mapTypeName() const { return "Map2MR_PrimalAdapt" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *

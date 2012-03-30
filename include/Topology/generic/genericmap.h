@@ -428,7 +428,7 @@ protected:
 	 * @param name name of the relation
 	 * @return the attribute multi-vector pointer
 	 */
-	AttributeMultiVector<Dart>* getRelation(const std::string& name);
+	AttributeMultiVector<Dart>* getRelation(const std::string& name) ;
 
 	/****************************************
 	 *          THREAD MANAGEMENT           *
@@ -506,22 +506,22 @@ public:
 	/**
 	 * copy from another map (of same type)
 	 */
-	bool copyFrom(const GenericMap& map);
+	bool copyFrom(const GenericMap& map) ;
 
 	/**
 	 * Dump attributes types and names per orbit
 	 */
-	void dumpAttributesAndMarkers();
+	void dumpAttributesAndMarkers() ;
 
 	/**
 	 * update topo relation after compacting the container:
 	 */
-	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew) = 0;
+	virtual void compactTopoRelations(const std::vector<unsigned int>& oldnew) = 0 ;
 
 	/**
 	 * compact the map
 	 */
-	void compact();
+	void compact() ;
 
 	/****************************************
 	 *           DARTS TRAVERSALS           *
@@ -531,13 +531,13 @@ public:
 	 * Begin of map
 	 * @return the first dart of the map
 	 */
-	Dart begin() const;
+	Dart begin() const ;
 
 	/**
 	 * End of map
 	 * @return the end iterator (next of last) of the map
 	 */
-	Dart end() const;
+	Dart end() const ;
 
 	/**
 	 * allow to go from a dart to the next
@@ -590,39 +590,39 @@ public:
 
 protected:
 	/// boundary marker
-	Mark m_boundaryMarker;
+	Mark m_boundaryMarker ;
 
 	/**
 	 * mark a dart as  belonging to boundary
 	 */
-	void boundaryMark(Dart d);
+	void boundaryMark(Dart d) ;
 
 	/**
 	 * unmark a dart from the boundary
 	 */
-	void boundaryUnmark(Dart d);
+	void boundaryUnmark(Dart d) ;
 
 public:
 	/**
 	 * test if a dart belong to the boundary
 	 */
-	bool isBoundaryMarked(Dart d) const;
+	bool isBoundaryMarked(Dart d) const ;
 
 protected:
 	/**
 	 * mark an orbit of dart as belonging to boundary
 	 */
-	void boundaryMarkOrbit(unsigned int orbit, Dart d);
+	void boundaryMarkOrbit(unsigned int orbit, Dart d) ;
 
 	/**
 	 * unmark an orbit of dart from the boundary
 	 */
-	void boundaryUnmarkOrbit(unsigned int orbit, Dart d);
+	void boundaryUnmarkOrbit(unsigned int orbit, Dart d) ;
 
 	/**
 	 * clear all boundary markers
 	 */
-	void boundaryUnmarkAll();
+	void boundaryUnmarkAll() ;
 } ;
 
 //

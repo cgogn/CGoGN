@@ -44,8 +44,7 @@ std::string Plane3D<T>::CGoGNnameOfType()
 /**********************************************/
 
 template <typename T>
-Plane3D<T>::Plane3D(int d) :
-m_normal(0), m_d(d)
+Plane3D<T>::Plane3D(int d) : m_normal(0), m_d(d)
 { }
 
 template <typename T>
@@ -56,15 +55,13 @@ Plane3D<T>::Plane3D(const Plane3D<T>& p)
 }
 
 template <typename T>
-Plane3D<T>::Plane3D(const Vector<3,T>& n, T d) :
-m_normal(n), m_d(d)
+Plane3D<T>::Plane3D(const Vector<3,T>& n, T d) : m_normal(n), m_d(d)
 {
 	m_normal.normalize();
 }
 
 template <typename T>
-Plane3D<T>::Plane3D(const Vector<3,T>& n, const Vector<3,T>& p) :
-m_normal(n), m_d(-(p*n))
+Plane3D<T>::Plane3D(const Vector<3,T>& n, const Vector<3,T>& p) : m_normal(n), m_d(-(p*n))
 {
 	m_normal.normalize();
 }
@@ -118,7 +115,7 @@ T Plane3D<T>::distance(const Vector<3,T>& p) const
 template <typename T>
 void Plane3D<T>::project(Vector<3,T>& p) const
 {
-#define PRECISION 1e-5
+#define PRECISION 1e-10
 	T d = -distance(p) ;
 	if(abs(d) > PRECISION)
 	{
@@ -131,7 +128,7 @@ void Plane3D<T>::project(Vector<3,T>& p) const
 template <typename T>
 Orientation3D Plane3D<T>::orient(const Vector<3,T>& p) const
 {
-#define PRECISION 1e-5
+#define PRECISION 1e-10
 	T dist = distance(p) ;
 	if(dist < -PRECISION)
 		return UNDER ;

@@ -78,9 +78,9 @@ add_executable( show_traversors show_traversors.cpp ${show_traversors_ui} ${show
 target_link_libraries( show_traversors
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 
-#add_executable( tuto_subdivision tuto_subdivision.cpp)
-#target_link_libraries( tuto_subdivision
-#	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
+add_executable( tuto_subdivision tuto_subdivision.cpp)
+target_link_libraries( tuto_subdivision
+	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
 
 QT4_WRAP_CPP(tp_master_moc tp_master.h)
 add_executable( tp_master tp_master.cpp ${tp_master_moc})
@@ -93,20 +93,8 @@ target_link_libraries( tp_master
 # exemple: BOOST_LIBS(boost_lib_lists "boost_thread-mt;boost_iostreams-mt")
 #BOOST_LIBS(boost_lib_lists "boost_thread-mt")
 
-
 QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
 add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
 target_link_libraries( tuto_mt
 	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} ${Boost_THREAD_LIBRARY})
 
-
-QT4_WRAP_CPP(tuto_ogl3_moc tuto_ogl3.h)
-add_executable( tuto_ogl3 tuto_ogl3.cpp ${tuto_ogl3_moc})
-target_link_libraries( tuto_ogl3
-	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS})
-
-
-
-#add_executable( tuto_ogl2 tuto_ogl2.cpp)
-#target_link_libraries( tuto_ogl2
-#	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )

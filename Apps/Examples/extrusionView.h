@@ -22,11 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef EXTRUSIONVIEW_H_
-#define EXTRUSIONVIEW_H_
+#ifndef _EXTRUSIONVIEW_H_
+#define _EXTRUSIONVIEW_H_
 
 #include <iostream>
-
 
 #include "Utils/Qt/qtSimple.h"
 
@@ -56,7 +55,8 @@ public:
 	Utils::ShaderFlat* m_shader;
 	Utils::ShaderSimpleColor* m_shader2;
 
-	MyQT():m_render(NULL), m_positionVBO(NULL), m_shader(NULL), m_shader2(NULL){}
+	MyQT() : m_render(NULL), m_positionVBO(NULL), m_shader(NULL), m_shader2(NULL)
+	{}
 
 	// callbacks of simpleQT to overdefine:
 	void cb_redraw();
@@ -65,4 +65,3 @@ public:
 };
 
 #endif
-

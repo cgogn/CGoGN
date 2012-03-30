@@ -89,22 +89,21 @@ class BoundingBox
 		// fusion with the given bounding box
 		void fusion(const BoundingBox<VEC>& bb) ;
 
-		//return true if the vector belongs strictly to a bounding box
+		// return true if the vector belongs strictly to a bounding box
 		bool contains(const VEC& p);
 
-		//return true if the bounding box belongs strictly to a bounding box
+		// return true if the bounding box belongs strictly to a bounding box
 		bool contains(const BoundingBox<VEC> & bb);
 
-		//resize a bounding box
-		void scale(float size);
+		// scale the bounding box
+		void scale(typename VEC::DATA_TYPE size);
+
+		// 0-centered scale of the bounding box
+		void centeredScale(typename VEC::DATA_TYPE size);
 
 		/**********************************************/
 		/*             STREAM OPERATORS               */
 		/**********************************************/
-
-//		friend std::ostream& operator<<(std::ostream& out, const BoundingBox<VEC>& bb);
-//
-//		friend std::istream& operator>>(std::istream& in, BoundingBox<VEC>& bb);
 
 		friend std::ostream& operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
 		{

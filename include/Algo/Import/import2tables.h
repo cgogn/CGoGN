@@ -101,7 +101,7 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importTrian(const std::string& filename, std::vector<std::string>& attrNames);
 
@@ -184,10 +184,9 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
-	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
-
+	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 	MeshTablesVolume(typename PFP::MAP& map):
 		m_map(map)
