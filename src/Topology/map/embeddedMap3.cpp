@@ -205,6 +205,27 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 	}
 }
 
+//!
+/*!
+ *
+ */
+Dart EmbeddedMap3::collapseFace(Dart d, bool delDegenerateVolumes)
+{
+	unsigned int vEmb = getEmbedding(VERTEX, d) ;
+
+	Dart resV = Map3::collapseFace(d, delDegenerateVolumes);
+
+	if(resV != NIL)
+	{
+		if(isOrbitEmbedded(VERTEX))
+		{
+			embedOrbit(VERTEX,resV,vEmb);
+		}
+	}
+
+	return resV;
+}
+
 void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 {
 	if (!withBoundary)
@@ -363,6 +384,23 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 		embedNewCell(VOLUME, v23) ;
 		copyCell(VOLUME, v23, v) ;
 	}
+}
+
+Dart EmbeddedMap3::collapseVolume(Dart d, bool delDegenerateVolumes)
+{
+	unsigned int vEmb = getEmbedding(VERTEX, d) ;
+
+	Dart resV = Map3::collapseVolume(d, delDegenerateVolumes);
+
+	if(resV != NIL)
+	{
+		if(isOrbitEmbedded(VERTEX))
+		{
+			embedOrbit(VERTEX,resV,vEmb);
+		}
+	}
+
+	return resV;
 }
 
 unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)

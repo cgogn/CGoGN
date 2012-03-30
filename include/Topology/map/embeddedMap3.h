@@ -80,6 +80,12 @@ public:
 
 	//!
 	/*!
+	 *
+	 */
+	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+
+	//!
+	/*!
 	 */
 	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
@@ -97,6 +103,11 @@ public:
 	/*!
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
+
+	//!
+	/*!
+	 */
+	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
 
 	//!
 	/*! No attribute is attached to the new volume

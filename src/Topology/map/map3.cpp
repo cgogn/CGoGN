@@ -327,9 +327,18 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 	for (std::vector<Dart>::iterator it = darts.begin(); it != darts.end(); ++it)
 	{
 		Dart x = phi2(phi_1(*it));
+
+		Dart resCV = NIL;
+
+		if(!isBoundaryFace(phi2(phi1(*it))))
+			resCV = phi3(phi2(phi1(*it)));
+		else if(!isBoundaryFace(phi2(phi_1(*it))))
+			resCV = phi3(phi2(phi_1(*it)));
+
 		resV = Map2::collapseEdge(*it, true);
 		if (delDegenerateVolumes)
-			collapseDegeneretedVolume(x);
+			if(collapseDegeneretedVolume(x) && resCV != NIL)
+				resV = resCV;
 	}
 
 	return resV;
@@ -435,6 +444,27 @@ void Map3::splitFace(Dart d, Dart e)
 
 	phi3sew(phi_1(d), phi_1(ee));
 	phi3sew(phi_1(e), phi_1(dd));
+}
+
+Dart Map3::collapseFace(Dart d, bool delDegenerateVolumes)
+{
+	Dart resV = NIL;
+	Dart stop = phi_1(d);
+	Dart dit = d;
+	std::vector<Dart> vd;
+	vd.reserve(32);
+
+	do
+	{
+		vd.push_back(alpha2(dit));
+		dit = phi1(dit);
+	}
+	while(dit != stop);
+
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		resV = Map3::collapseEdge(*it, delDegenerateVolumes);
+
+	return resV;
 }
 
 //bool Map3::collapseDegeneretedVolume(Dart d)
@@ -614,6 +644,29 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 
 	//sew the two connected components
 	Map3::sewVolumes(phi2(e), phi2(e2), false);
+}
+
+Dart Map3::collapseVolume(Dart d, bool delDegenerateVolumes)
+{
+	Dart resV = NIL;
+	std::vector<Dart> vd;
+	vd.reserve(32);
+
+	vd.push_back(d);
+	vd.push_back(alpha2(phi1(d)));
+	vd.push_back(alpha2(phi_1(phi2(phi1(d)))));
+
+//	Traversor3WF<Map3> tra(*this, phi1(d));
+//	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
+//	{
+//		vd.push_back(alpha2(dit));
+//	}
+//	vd.pop_back();
+
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		resV = Map3::collapseEdge(*it, delDegenerateVolumes);
+
+	return resV;
 }
 
 /*! @name Topological Queries

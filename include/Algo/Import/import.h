@@ -84,6 +84,9 @@ template <typename PFP>
 bool importOFFWithELERegions(typename PFP::MAP& the_map, const std::string& filenameOFF, const std::string& filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
+bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenameNode, const std::string& filenameELE, std::vector<std::string>& attrNames);
+
+template <typename PFP>
 bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 template <typename PFP>
@@ -105,5 +108,6 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 #include "Algo/Import/importObjEle.hpp"
 #include "Algo/Import/importTet.hpp"
 #include "Algo/Import/importTs.hpp"
+#include "Algo/Import/importNodeEle.hpp"
 
 #endif

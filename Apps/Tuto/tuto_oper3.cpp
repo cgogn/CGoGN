@@ -92,7 +92,6 @@ void MyQT::operation(int x)
 		if (m_selected != NIL)
 		{
 			dm.markAll();
-			PFP::VEC3 Q = position[myMap.phi1(m_selected)];
 			myMap.uncutEdge(m_selected);
 			updateMap();
 		}
@@ -104,7 +103,6 @@ void MyQT::operation(int x)
 			if (myMap.deleteEdgePreCond(m_selected))
 			{
 				dm.markAll();
-				PFP::VEC3 Q = position[myMap.phi1(m_selected)];
 				myMap.deleteEdge(m_selected);
 				m_selected = NIL;
 				updateMap();
@@ -155,7 +153,30 @@ void MyQT::operation(int x)
 			updateMap();
 		}
 		break;
-
+	case 8:
+		CGoGNout <<"collapse face"<<CGoGNendl;
+		if (m_selected != NIL)
+		{
+			PFP::VEC3 Q = Algo::Geometry::faceCentroid<PFP>(myMap,m_selected,position);
+			Dart x = myMap.collapseFace(m_selected);
+			dm.markAll();
+			position[x]= Q;
+			m_selected = NIL;
+			updateMap();
+		}
+		break;
+	case 9:
+		CGoGNout <<"collapse volume"<<CGoGNendl;
+		if (m_selected != NIL)
+		{
+			PFP::VEC3 Q = Algo::Geometry::volumeCentroid<PFP>(myMap,m_selected,position);
+			Dart x = myMap.collapseVolume(m_selected);
+			dm.markAll();
+			position[x]= Q;
+			m_selected = NIL;
+			updateMap();
+		}
+		break;
 	default:
 		break;
 	}
@@ -284,8 +305,9 @@ void MyQT::cb_keyPress(int keycode)
 		updateMap();
 		updateGL();
 		break;
-
-
+	case 'c':
+		myMap.check();
+		break;
 	case 'a':
 		m_selected = myMap.phi1(m_selected);
 		updateGL();
@@ -409,7 +431,7 @@ void MyQT::svg()
 
 void MyQT::cb_Open()
 {
-	std::string filters("all (*.*);; trian (*.trian);; off (*.off);; ply (*.ply);; map (*.map)") ;
+	std::string filters("all (*.*);; map (*.map)") ;
 	std::string filename = selectFile("Open Mesh", "", filters) ;
 	if (!filename.empty())
 		importMesh(filename);
@@ -434,15 +456,39 @@ void MyQT::importMesh(std::string& filename)
 		myMap.loadMapBin(filename);
 		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
 	}
-	else
+	else if (extension == std::string(".node"))
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::NODE))
 		{
-			CGoGNerr << "could not import " << filename << CGoGNendl ;
-			return;
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
 		}
 		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	}
+	else if(extension == std::string(".tet"))
+	{
+		std::vector<std::string> attrNames ;
+		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::TET))
+		{
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
+		}
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	}
+	else if(extension == std::string(".off"))
+	{
+		std::vector<std::string> attrNames ;
+		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::OFF))
+		{
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
+		}
+		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	}
+	else
+	{
+		std::cerr << "could not import " << filename << std::endl ;
 	}
 
 	m_selected  = NIL;

@@ -309,11 +309,13 @@ public:
 			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
 
 			m_map.incCurrentLevel() ;
-
-			Dart midF = m_map.phi2(m_map.phi1(d));
-			m_position[midF] = p ;
-
+			if(m_map.faceDegree(d) != 3)
+			{
+				Dart midF = m_map.phi2(m_map.phi1(d));
+				m_position[midF] = p ;
+			}
 			m_map.decCurrentLevel() ;
+
 		}
 	}
 } ;
@@ -338,15 +340,19 @@ public:
 
 			m_map.incCurrentLevel() ;
 
-			Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-			m_position[midV] = p ;
+			if(!m_map.isTetrahedron(d))
+			{
 
+				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+				m_position[midV] = p ;
+			}
 			m_map.decCurrentLevel() ;
+
 		}
 	}
 } ;
 
-/* Loop on Boundary Vertices
+/* Loop on Boundary Vertices and SHW04 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
 class LoopEvenSynthesisFilter : public MRFilter
@@ -513,233 +519,6 @@ public:
 			}
 		}
 		m_map.decCurrentLevel() ;
-	}
-} ;
-
-/*********************************************************************************
- *                           FUNCTORS
- *********************************************************************************/
-
-/* Linear Interpolation
- *********************************************************************************/
-template <typename PFP>
-class LerpVertexVertexFunctor : public FunctorType
-{
-protected:
-	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
-
-public:
-	LerpVertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
-
-	bool operator() (Dart d)
-	{
-		m_map.decCurrentLevel() ;
-		typename PFP::VEC3 p = m_position[d] ;
-		m_map.incCurrentLevel() ;
-
-		m_position[d] = p ;
-
-		return false ;
-	}
-};
-
-template <typename PFP>
-class LerpEdgeVertexFunctor : public FunctorType
-{
-protected:
-	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
-
-public:
-	LerpEdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
-
-	bool operator() (Dart d)
-	{
-		Dart d1 = m_map.phi2(d);
-
-		m_map.decCurrentLevel();
-		Dart d2 = m_map.phi2(d1);
-		typename PFP::VEC3 p = (m_position[d1] + m_position[d2]) * typename PFP::REAL(0.5);
-		m_map.incCurrentLevel();
-
-		m_position[d] = p;
-
-		return false;
-	}
-} ;
-
-template <typename PFP>
-class LerpFaceVertexFunctor : public FunctorType
-{
-protected:
-	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
-
-public:
-	LerpFaceVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
-
-	bool operator() (Dart d)
-	{
-		Dart df = m_map.phi1(m_map.phi1(d)) ;
-
-		m_map.decCurrentLevel() ;
-		typename PFP::VEC3 p =  Algo::Geometry::faceCentroid<PFP>(m_map, df, m_position);
-		m_map.incCurrentLevel() ;
-
-		m_position[d] = p ;
-
-		return false ;
-	}
-} ;
-
-template <typename PFP>
-class LerpVolumeVertexFunctor : public FunctorType
-{
-protected:
-	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
-
-public:
-	LerpVolumeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
-
-	bool operator() (Dart d)
-	{
-		Dart df = m_map.phi_1(m_map.phi2(m_map.phi1(d))) ;
-
-		m_map.decCurrentLevel() ;
-		typename PFP::VEC3 p =  Algo::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
-		m_map.incCurrentLevel() ;
-
-		m_position[d] = p ;
-
-		return false ;
-	}
-} ;
-
-
-/* SHW04 basic functions : tetrahedral/octahedral meshes
- *********************************************************************************/
-template <typename PFP>
-class SHW04VertexVertexFunctor : public FunctorType
-{
-protected:
-	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
-
-public:
-	SHW04VertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
-
-	bool operator() (Dart d)
-	{
-		if(m_map.isBoundaryVertex(d))
-		{
-			Dart db = m_map.findBoundaryFaceOfVertex(d);
-
-			m_map.decCurrentLevel() ;
-
-			typename PFP::VEC3 np(0) ;
-			unsigned int degree = 0 ;
-			Traversor2VVaE<typename PFP::MAP> trav(m_map, db) ;
-			for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
-			{
-				++degree ;
-				np += m_position[it] ;
-			}
-			float tmp = 3.0 + 2.0 * cos(2.0 * M_PI / degree) ;
-			float beta = (5.0 / 8.0) - ( tmp * tmp / 64.0 ) ;
-			np *= beta / degree ;
-
-			typename PFP::VEC3 vp = m_position[db] ;
-			vp *= 1.0 - beta ;
-
-			m_map.incCurrentLevel() ;
-
-			m_position[d] = np + vp ;
-		}
-		else
-		{
-			std::cout << "not a boundary vertex vertex" << std::endl;
-//			typename PFP::VEC3 p = typename PFP::VEC3(0);
-//			unsigned int degree = 0;
-//
-//			Traversor3VW<typename PFP::MAP> travVW(m_map, d);
-//			for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
-//			{
-//				p += SHW04Vertex<PFP>(m_map, m_position, dit);
-//				++degree;
-//			}
-//
-//			p /= degree;
-//
-//			m_position[d] = p ;
-		}
-		return false ;
-	}
-} ;
-
-template <typename PFP>
-class SHW04EdgeVertexFunctor : public FunctorType
-{
-protected:
-	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
-
-public:
-	SHW04EdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
-
-	bool operator() (Dart d)
-	{
-		if(m_map.isBoundaryVertex(d))
-		{
-			Dart dd = m_map.phi2(d) ;
-			m_map.decCurrentLevel() ;
-
-			Dart d1 = m_map.findBoundaryFaceOfEdge(dd);
-
-			Dart d2 = m_map.phi2(d1) ;
-			Dart d3 = m_map.phi_1(d1) ;
-			Dart d4 = m_map.phi_1(d2) ;
-
-			typename PFP::VEC3 p1 = m_position[d1] ;
-			typename PFP::VEC3 p2 = m_position[d2] ;
-			typename PFP::VEC3 p3 = m_position[d3] ;
-			typename PFP::VEC3 p4 = m_position[d4] ;
-
-			p1 *= 3.0 / 8.0 ;
-			p2 *= 3.0 / 8.0 ;
-			p3 *= 1.0 / 8.0 ;
-			p4 *= 1.0 / 8.0 ;
-
-			m_map.incCurrentLevel() ;
-
-			m_position[d] = p1 + p2 + p3 + p4 ;
-		}
-		else
-		{
-			std::cout << "not a boundary edge vertex" << std::endl;
-//			typename PFP::VEC3 p = typename PFP::VEC3(0);
-//			unsigned int degree = 0;
-//
-//			Traversor3VW<typename PFP::MAP> travVW(m_map, d);
-//			for(Dart dit = travVW.begin() ; dit != travVW.end() ; dit = travVW.next())
-//			{
-//				p += SHW04Vertex<PFP>(m_map, m_position, dit);
-//				++degree;
-//			}
-//
-//			p /= degree;
-//
-//			m_position[d] = p ;
-		}
-
-		return false ;
 	}
 } ;
 

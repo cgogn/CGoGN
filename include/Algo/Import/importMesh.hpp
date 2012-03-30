@@ -269,13 +269,22 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
 		case ImportVolumique::TET:
 			return Algo::Import::importTet<PFP>(map, filename, attrNames, 1.0f);
 			break;
-		case ImportVolumique::ELE:
+		case ImportVolumique::OFF:
 		{
 			size_t pos = filename.rfind(".");
-			std::string fileOFF = filename;
-			fileOFF.erase(pos);
-			fileOFF.append(".off");
-			return Algo::Import::importOFFWithELERegions<PFP>(map, fileOFF, filename, attrNames);
+			std::string fileEle = filename;
+			fileEle.erase(pos);
+			fileEle.append(".ele");
+			return Algo::Import::importOFFWithELERegions<PFP>(map, filename, fileEle, attrNames);
+			break;
+		}
+		case ImportVolumique::NODE:
+		{
+			size_t pos = filename.rfind(".");
+			std::string fileEle = filename;
+			fileEle.erase(pos);
+			fileEle.append(".ele");
+			return Algo::Import::importNodeWithELERegions<PFP>(map, filename, fileEle, attrNames);
 			break;
 		}
 		case ImportVolumique::TS:
