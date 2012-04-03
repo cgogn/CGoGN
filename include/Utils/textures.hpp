@@ -587,7 +587,7 @@ template <typename TYPEDOUBLE>
 void Image<DIM,TYPE>::subSample2()
 {
 	Image<DIM,TYPE>* newImg = subSampleToNewImage2<TYPEDOUBLE>();
-	swap(*newImg);
+	this->swap(*newImg);
 	delete newImg;
 }
 
@@ -720,7 +720,7 @@ template < unsigned int DIM, typename TYPE >
 void Image<DIM,TYPE>::rotate90(int axis)
 {
 	Image<DIM,TYPE>* newImg = rotate90ToNewImage(axis);
-	swap(*newImg);
+	this->swap(*newImg);
 	delete newImg;
 }
 
