@@ -306,9 +306,9 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 }
 
 template <typename PFP>
-Dart sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,CellMarker& volumesToCut, CellMarker& edgesToCut, CellMarker& verticesToSplit)
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,CellMarker& volumesToCut, CellMarker& edgesToCut, CellMarker& verticesToSplit)
 {
-	Dart dRes=NIL;
+	std::vector<Dart> vRes;
 
     typedef typename PFP::VEC3 VEC3;
     CellMarkerStore localVerticesToSplit(map, VERTEX); //marker for new vertices from edge cut
@@ -395,7 +395,6 @@ Dart sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,Ce
             vPath.reserve(nbVInPath);
             vPath.push_back(dPath);
             CellMarker cmf(map,FACE);
-            int nbFacesVisited=0;
 
             //define the path to split for the whole volume
             for(std::vector<Dart>::iterator it = vPath.begin() ;it != vPath.end(); ++it)
@@ -416,11 +415,11 @@ Dart sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,Ce
 
             assert(vPath.size()>2);
             map.splitVolume(vPath);
-            dRes = map.phi2(*vPath.begin());
+            vRes.push_back(map.phi2(*vPath.begin()));
         }
     }
 
-    return dRes;
+    return vRes;
 }
 
 template <typename PFP, typename EMBV, typename EMB>
