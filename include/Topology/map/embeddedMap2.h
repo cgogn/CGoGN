@@ -85,6 +85,10 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d) ;
 
+	/*
+	 *
+	 */
+	virtual void swapEdges(Dart d, Dart e);
 //	/**
 //	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
 //	 * The attributes attached to the face of dart d are overwritten on the face of dart e
@@ -130,6 +134,11 @@ public:
 	 * The attributes attached to the edges of the face of d are kept on the resulting edges
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e) ;
+
+	/**
+	 *
+	 */
+	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 
 	/**
 	 * No attribute is attached to the new face

@@ -22,43 +22,138 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL_REGULAR__
-#define __MAP2MR_PRIMAL_REGULAR__
+#ifndef __MAP3MR_PRIMAL__
+#define __MAP3MR_PRIMAL__
 
-#include "Topology/map/embeddedMap2.h"
+#include "Topology/map/embeddedMap3.h"
 #include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
+#include "Topology/generic/traversor3.h"
 
-#include "Topology/map/map2MR/filters_Primal.h"
+#include "Topology/map/map3MR/filters_Primal.h"
 
 namespace CGoGN
 {
 
-class Map2MR_PrimalRegular : public EmbeddedMap2
+/*! \brief The class of regular 3-map MR
+ */
+
+class Map3MR_PrimalRegular : public EmbeddedMap3
 {
 protected:
-	bool shareVertexEmbeddings ;
+	bool shareVertexEmbeddings;
 
 	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
 	std::vector<Multiresolution::MRFilter*> analysisFilters ;
 
+
 public:
-	Map2MR_PrimalRegular() ;
+	Map3MR_PrimalRegular();
 
-	virtual std::string mapTypeName() const { return "Map2MR_PrimalRegular" ; }
+	virtual std::string mapTypeName() const { return "Map3MR_PrimalRegular"; }
 
-	void addNewLevel(bool embedNewVertices = true) ;
+	/*! @name Topological helping functions
+	 *
+	 *************************************************************************/
+	//@{
+	//!
+	/*
+	 *
+	 */
+	void swapEdges(Dart d, Dart e);
 
+	//!
+	/*!
+	 *
+	 */
+	bool isTetrahedron(Dart d);
+
+	void splitFaceInSurface(Dart d, Dart e);
+
+	Dart cutEdgeInSurface(Dart d);
+
+	//!
+	/*!
+	 *
+	 */
+	void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
+
+	//!
+	/*!
+	 *
+	 */
+	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
+
+	Dart quadranguleFace(Dart d);
+
+	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
+
+	//@}
+
+	/*! @name Level creation
+	 *
+	 *************************************************************************/
+	//@{
+	//!
+	/*
+	 *
+	 */
+	void addNewLevelTetraOcta(bool embedNewVertices);
+
+	//!
+	/*
+	 *
+	 */
+	void addNewLevel(bool embedNewVertices);
+
+	//@}
+
+	/*! @name Geometry modification
+	 *
+	 *************************************************************************/
+	//@{
+	//!
+	/*
+	 *
+	 */
 	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
+
+	//!
+	/*
+	 *
+	 */
 	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
 
+	//!
+	/*
+	 *
+	 */
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+
+	//!
+	/*
+	 *
+	 */
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
+	//@}
 
+	/*! @name
+	 *
+	 *************************************************************************/
+	//@{
+	//!
+	/*
+	 *
+	 */
 	void analysis() ;
+
+	//!
+	/*
+	 *
+	 */
 	void synthesis() ;
-} ;
+	//@}
+};
 
-} // namespace CGoGN
+} //end namespace CGoGN
 
-#endif
+#endif /* __MAP3MR_PRIMAL__ */

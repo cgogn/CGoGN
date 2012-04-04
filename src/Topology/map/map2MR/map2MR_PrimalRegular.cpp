@@ -40,13 +40,13 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	addLevel() ;
 	setCurrentLevel(getMaxLevel()) ;
 
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-	{
-		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
-		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
-		if(!shareVertexEmbeddings)
-			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
-	}
+//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+//	{
+//		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
+//		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
+//		if(!shareVertexEmbeddings)
+//			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
+//	}
 
 	// cut edges
 	TraversorE<Map2MR_PrimalRegular> travE(*this) ;

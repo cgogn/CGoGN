@@ -325,6 +325,20 @@ bool Map2::flipBackEdge(Dart d)
 	return false ; // cannot flip a border edge
 }
 
+void Map2::swapEdges(Dart d, Dart e)
+{
+	assert(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e));
+
+	//Dart d2 = phi2(d);
+	//Dart e2 = phi2(e);
+
+	phi2unsew(d);
+	phi2unsew(e) ;
+
+	phi2sew(d, e);
+	//phi2sew(d2, e2);
+}
+
 //void Map2::insertEdgeInVertex(Dart d, Dart e)
 //{
 //	assert(!sameVertex(d,e) && phi2(e) == phi_1(e));
@@ -535,7 +549,10 @@ void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool second
 
 	//unsew the edge path
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		unsewFaces(*it) ;
+	{
+		if(!Map2::isBoundaryEdge(*it))
+			unsewFaces(*it) ;
+	}
 
 	if(firstSideClosed)
 		Map2::fillHole(e) ;
@@ -555,7 +572,7 @@ bool Map2::sameOrientedVertex(Dart d, Dart e)
 	{
 		if (it == e)			// Test equality with e
 			return true;
-		it = alpha1(it);
+		it = phi2(phi_1(it));
 	} while (it != d);
 	return false;				// None is equal to e => vertices are distinct
 }
@@ -567,7 +584,7 @@ unsigned int Map2::vertexDegree(Dart d)
 	do
 	{
 		++count ;
-		it = alpha1(it) ;
+		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
 	return count ;
 }
@@ -579,7 +596,7 @@ bool Map2::isBoundaryVertex(Dart d)
 	{
 		if (isBoundaryMarked(it))
 			return true ;
-		it = alpha1(it) ;
+		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
 	return false ;
 }
@@ -591,7 +608,7 @@ Dart Map2::findBoundaryEdgeOfVertex(Dart d)
 	{
 		if (isBoundaryMarked(it))
 			return it ;
-		it = alpha1(it) ;
+		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
 	return NIL ;
 }
@@ -767,7 +784,7 @@ bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	{
 		if (f(dNext))
 			return true;
-		dNext = alpha1(dNext);
+		dNext = phi2(phi_1(dNext));
  	} while (dNext != d);
  	return false;
 }

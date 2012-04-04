@@ -42,7 +42,7 @@ template <typename PFP, typename EMBV, typename EMB>
 EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
 {
 	EMB center = AttribOps::zero<EMB,PFP>() ;
-	unsigned count = 0 ;
+	unsigned int count = 0 ;
 
 	Traversor3WV<typename PFP::MAP> tra(map,d);
 	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())

@@ -37,7 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace MC {
+namespace MC
+{
+
 /**
  * Marching Cube
  *
@@ -257,10 +259,11 @@ public:
 	void recalPoints(const Geom::Vec3f& origin);
 };
 
+} // namespace MC
 
-} // end namespace
-} // end namespace
-} // end namespace
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/MC/marchingcube.hpp"
 #endif

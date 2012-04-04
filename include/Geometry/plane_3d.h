@@ -109,6 +109,6 @@ class Plane3D
 
 } // namespace CGoGN
 
-#include "plane_3d.hpp"
+#include "Geometry/plane_3d.hpp"
 
 #endif

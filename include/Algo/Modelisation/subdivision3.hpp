@@ -426,185 +426,206 @@ Dart sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,Ce
 template <typename PFP, typename EMBV, typename EMB>
 void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-	std::vector<Dart> l_centers;
+	//std::vector<Dart> l_centers;
 	std::vector<Dart> l_vertices;
 
-	DartMarkerNoUnmark mv(map);
-	CellMarkerNoUnmark me(map, EDGE);
-	CellMarker mf(map, FACE);
-
-	AutoAttributeHandler< EMB > attBary(map, VOLUME);
-	CellMarker vol(map, VOLUME);
-
 	//pre-computation : compute the centroid of all volume
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(selected(d) && !vol.isMarked(d))
-		{
-			vol.mark(d);
-			attBary[d] = Algo::Geometry::volumeCentroidGen<PFP,EMBV,EMB>(map, d, attributs);
-		}
-	}
+	AutoAttributeHandler< EMB > attBary(map, VOLUME);
+	TraversorW<typename PFP::MAP> traW(map, selected);
 
-	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
+		attBary[d] = Algo::Geometry::volumeCentroidGen<PFP,EMBV,EMB>(map, d, attributs);
+
+	//subdivision
+	//1. cut edges
+	DartMarkerNoUnmark mv(map);
+	TraversorE<typename PFP::MAP> travE(map);
+	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
 		//memorize each vertices per volumes
 		if(selected(d) && !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-//			mv.markOrbitInParent<typename PFP::MAP>(VERTEX,d);
 			mv.markOrbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX),d);
 		}
 
-		//cut edges
-		if (selected(d) && !me.isMarked(d))
-		{
-			Dart f = map.phi1(d);
-			map.cutEdge(d);
-			Dart e = map.phi1(d) ;
+		Dart f = map.phi1(d);
+		map.cutEdge(d) ;
+		Dart e = map.phi1(d) ;
 
-			attributs[e] =  attributs[d];
-			attributs[e] += attributs[f];
-			attributs[e] *= 0.5;
+		attributs[e] =  attributs[d];
+		attributs[e] += attributs[f];
+		attributs[e] *= 0.5;
 
-			me.mark(d);
-			me.mark(e);
-
-			//mark new vertices
-			mv.markOrbit(VERTEX, e);
-
-			Dart dd = d;
-			do
-			{
-				mf.mark(dd) ;
-				mf.mark(map.phi2(dd));
-				dd = map.alpha2(dd);
-			} while(dd != d);
-		}
+		travE.skip(d) ;
+		travE.skip(e) ;
 	}
 
-	// second pass: quandrangule faces
-	std::map<Dart,Dart> toSew;
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	//2. split faces - quadrangule faces
+	TraversorF<typename PFP::MAP> travF(map) ;
+	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 	{
-		mv.unmark(d);
+		EMB center = Algo::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map,d,attributs);
 
-		if (selected(d) && mf.isMarked(d)) // for each face not subdivided
+		Dart dd = map.phi1(d) ;
+		Dart next = map.phi1(map.phi1(dd)) ;
+		map.splitFace(dd, next) ;
+
+		Dart ne = map.phi2(map.phi_1(dd)) ;
+		map.cutEdge(ne) ;
+		travF.skip(dd) ;
+
+		attributs[map.phi1(ne)] = center;
+
+		dd = map.phi1(map.phi1(next)) ;
+		while(dd != ne)
 		{
-			mf.unmark(d);
-			// compute center skip darts of new vertices non embedded
-			EMB center = AttribOps::zero<EMB,PFP>();
-			unsigned int count = 0 ;
-			Dart it = d;
-
-			do
-			{
-				me.unmark(it);
-				me.unmark(map.phi1(it));
-
-				center += attributs[it];
-				++count ;
-
-				it = map.template phi<11>(it) ;
-			} while(it != d) ;
-
-			center /= double(count);
-
-			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
-			attributs[cf] = center;					// affect the data to the central vertex
+			Dart tmp = map.phi1(ne) ;
+			map.splitFace(tmp, dd) ;
+			travF.skip(tmp) ;
+			dd = map.phi1(map.phi1(dd)) ;
 		}
+
+		travF.skip(ne) ;
 	}
 
-	//third pass : create the inner faces
+	//3. create inside volumes
+
+	std::vector<std::pair<Dart, Dart> > subdividedFaces;
+	subdividedFaces.reserve(2048);
 	for (std::vector<Dart>::iterator it = l_vertices.begin(); it != l_vertices.end(); ++it)
 	{
-		Dart d = *it;
-		//unsew all around the vertex
-		//there are 2 links to unsew for each face around (-> quadrangulation)
-		std::vector<Dart> v;
+		Dart e = *it;
+		std::vector<Dart> v ;
+
 		do
 		{
-			v.push_back(map.phi1(map.phi1(d)));
-			v.push_back(map.phi1(d));
+			v.push_back(map.phi1(e));
+			v.push_back(map.phi1(map.phi1(e)));
 
-			d = map.phi2(map.phi_1(d));
+			if(!map.PFP::MAP::ParentMap::isBoundaryEdge(map.phi1(e)))
+				subdividedFaces.push_back(std::pair<Dart,Dart>(map.phi1(e),map.phi2(map.phi1(e))));
+
+			if(!map.PFP::MAP::ParentMap::isBoundaryEdge(map.phi1(map.phi1(e))))
+				subdividedFaces.push_back(std::pair<Dart,Dart>(map.phi1(map.phi1(e)),map.phi2(map.phi1(map.phi1(e)))));
+
+			e = map.phi2(map.phi_1(e));
 		}
-		while(d != *it);
-
-//		do
-//		{
-//			Dart dN = map.phi1(map.phi2(d));
-//
-//	 		Dart dRing = map.phi1(d);
-//
-//	 		if(map.phi2(dRing)!=dRing)
-//	 		{
-//	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
-//	 			v.push_back(dRing);
-//	 		}
-//
-//	 		dRing = map.phi1(dRing);
-//
-//	 		if(map.phi2(dRing)!=dRing)
-//	 		{
-//	 			toSew.insert(std::pair<Dart,Dart>(dRing,map.phi2(dRing)));
-//	 			v.push_back(dRing);
-//	 		}
-//
-//			d = dN;
-//		} while (d != *it);
-
-//		//close the generated hole and create the central vertex
-//		//unsigned int degree = map.closeHole(map.phi1(d));
-
-		//TODO : pb de face en trop avec splitVolume
-		//map.splitVolume(v);
+		while(e != *it);
 
 		//
+		// SplitSurfaceInVolume
+		//
 
-//		Dart e = v.front();
-//		for(std::vector<Dart>::iterator it = v.begin() ; it != v.end() ; ++it)
-//			if(map.Map2::isBoundaryEdge(*it))
-//				map.unsewFaces(*it);
+		std::vector<Dart> vd2 ;
+		vd2.reserve(v.size());
 
-//		Dart dd = map.phi1(map.phi2(map.phi1(d)));
-//		map.splitFace(map.phi_1(dd),map.phi1(dd));
-//		Dart dS = map.phi1(dd);
-//		map.cutEdge(dS);
+		// save the edge neighbors darts
+		for(std::vector<Dart>::iterator it2 = v.begin() ; it2 != v.end() ; ++it2)
+		{
+			vd2.push_back(map.phi2(*it2));
+		}
 
-//		attributs[map.phi1(dS)] = attBary[d];
+		assert(vd2.size() == v.size());
+
+		map.PFP::MAP::ParentMap::splitSurface(v, true, false);
+
+		// follow the edge path a second time to embed the vertex, edge and volume orbits
+		for(unsigned int i = 0; i < v.size(); ++i)
+		{
+			Dart dit = v[i];
+			Dart dit2 = vd2[i];
+
+			// embed the vertex embedded from the origin volume to the new darts
+			if(map.isOrbitEmbedded(VERTEX))
+			{
+				map.copyDartEmbedding(VERTEX, map.phi2(dit), map.phi1(dit));
+				map.copyDartEmbedding(VERTEX, map.phi2(dit2), map.phi1(dit2));
+			}
+
+			// embed the edge embedded from the origin volume to the new darts
+			if(map.isOrbitEmbedded(EDGE))
+			{
+				unsigned int eEmb = map.getEmbedding(EDGE, dit) ;
+				map.setDartEmbedding(EDGE, map.phi2(dit), eEmb);
+				map.setDartEmbedding(EDGE, map.phi2(dit2), eEmb);
+			}
+
+			// embed the volume embedded from the origin volume to the new darts
+			if(map.isOrbitEmbedded(VOLUME))
+			{
+				map.copyDartEmbedding(VOLUME, map.phi2(dit), dit);
+				map.copyDartEmbedding(VOLUME, map.phi2(dit2), dit2);
+			}
+		}
+
+		//
+		//
+		//
+
+		Dart dd = map.phi2(map.phi1(*it));
+		Dart next = map.phi1(map.phi1(dd)) ;
+		map.PFP::MAP::ParentMap::splitFace(dd, next);
+
+		if (map.isOrbitEmbedded(VERTEX))
+		{
+			map.copyDartEmbedding(VERTEX, map.phi_1(next), dd) ;
+			map.copyDartEmbedding(VERTEX, map.phi_1(dd), next) ;
+		}
+
+		Dart ne = map.phi2(map.phi_1(dd));
+		map.PFP::MAP::ParentMap::cutEdge(ne);
 
 
-		//TODO : test with vertices with degree higher than 3
-//		for(unsigned int i=0; i < (degree/2)-2; ++i)
+//		dd = map.phi1(map.phi1(next)) ;
+//		while(dd != ne)
 //		{
-//			map.splitFace(map.phi2(dS),map.template phi<111>(map.phi2(dS)));
-//			dS = map.template phi<111>(map.phi2(dS));
+//			Dart tmp = map.phi1(ne) ;
+//			map.PFP::MAP::ParentMap::splitFace(tmp, dd);
+//
+//			if (map.isOrbitEmbedded(VERTEX))
+//			{
+//				map.copyDartEmbedding(VERTEX, map.phi_1(dd), tmp) ;
+//				map.copyDartEmbedding(VERTEX, map.phi_1(tmp), dd) ;
+//			}
+//
+//			dd = map.phi1(map.phi1(dd)) ;
 //		}
+//
 	}
 
-//	map.deleteVolume(map.phi3(map.phi2(map.phi1(l_vertices.front()))));
-
-	map.check();
-
-	//sew all faces leading to the central vertex
-	for (std::map<Dart,Dart>::iterator it = toSew.begin(); it != toSew.end(); ++it)
-	{
-
-//		Dart f1 = map.phi2((*it).first);
-//		Dart f2 = map.phi2((*it).second);
-//		if(map.isBoundaryFace(f1) && map.isBoundaryFace(f2))
+//		setCurrentLevel(getMaxLevel()) ;
+//		//4 couture des relations precedemment sauvegarde
+//		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
 //		{
-//			map.sewVolumes(f1, f2);
+//			Dart f1 = phi2((*it).first);
+//			Dart f2 = phi2((*it).second);
+//
+//			//if(isBoundaryFace(f1) && isBoundaryFace(f2))
+//			if(phi3(f1) == f1 && phi3(f2) == f2)
+//				sewVolumes(f1, f2, false);
 //		}
+//		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+		//attributs[map.phi1(ne)] = attBary[*it];
+//
+//		setCurrentLevel(getMaxLevel() - 1) ;
+//	}
+//
+//	//A optimiser
+//
+//	TraversorE<typename PFP::MAP> travE2(map);
+//	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
+//	{
+//		map.embedOrbit(VERTEX, map.phi1(d), map.getEmbedding(VERTEX, map.phi1(d)));
+//	}
+//
+//	TraversorF<typename PFP::MAP> travF2(map) ;
+//	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
+//	{
+//		map.embedOrbit(VERTEX, map.phi2(map.phi1(d)), map.getEmbedding(VERTEX, map.phi2(map.phi1(d))));
+//	}
 
-		//Dart dT = map.phi2(it->first);
-//		if(dT==map.phi3(dT))
-//		{
-//			map.sewVolumes(dT,map.phi2(it->second));
-//		}
-	}
+
 }
 
 } //namespace Modelisation

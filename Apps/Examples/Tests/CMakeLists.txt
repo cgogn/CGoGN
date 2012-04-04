@@ -34,15 +34,4 @@ target_link_libraries( Geom_inclusionD
 add_executable( Geom_intersectionD ./Geom_intersection.cpp)
 target_link_libraries( Geom_intersectionD
 	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
-	
-add_executable( test_compactD ./test_compact.cpp)
-target_link_libraries( test_compactD
-	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS})
-	
-	
-IF (WITH_QT)
-	QT4_WRAP_CPP(concave_rendering_moc concave_rendering.h)
-	add_executable( concave_renderingD concave_rendering.cpp ${concave_rendering_moc})
-	target_link_libraries( concave_renderingD
-		${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
-ENDIF (WITH_QT)
+

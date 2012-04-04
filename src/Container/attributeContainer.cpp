@@ -690,7 +690,6 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 	return true;
 }
 
-
 void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 {
 // 	clear is done from the map
@@ -741,6 +740,5 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 		}
 	}
 }
-
 
 }

@@ -46,7 +46,7 @@ protected:
 public:
 	Map2MR_PrimalAdapt() ;
 
-	std::string mapTypeName() { return "Map2MR_PrimalAdapt" ; }
+	virtual std::string mapTypeName() const { return "Map2MR_PrimalAdapt" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
@@ -104,15 +104,18 @@ public:
 	 *               SUBDIVISION                       *
 	 ***************************************************/
 
-protected:
-//	void propagatePhi1(Dart d) ;
-//	void propagatePhi_1(Dart d) ;
-
 	/**
 	 * add a new resolution level
 	 */
-	void addNewLevel() ;
+	void addNewLevel(bool embedNewVertices = true) ;
 
+	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
+	void propagateDartEmbedding(Dart d, unsigned int orbit) ;
+	void propagateOrbitEmbedding(Dart d, unsigned int orbit) ;
+	Dart cutEdge(Dart d) ;
+	void splitFace(Dart d, Dart e) ;
+
+protected:
 	/**
 	 * subdivide the edge of d to the next level
 	 */
@@ -138,9 +141,7 @@ public:
 	 * vertices attributes management
 	 */
 	void setVertexVertexFunctor(FunctorType* f) { vertexVertexFunctor = f ; }
-
 	void setEdgeVertexFunctor(FunctorType* f) { edgeVertexFunctor = f ; }
-
 	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
 } ;
 

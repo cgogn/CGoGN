@@ -1262,9 +1262,9 @@ void MarchingCube<DataType, Windowing, PFP>::recalPoints(const Geom::Vec3f& orig
 	{
 		typename PFP::VEC3& P = m_positions[i];
 		P -= m_fOrigin;
-		P[0] = P[0] * m_fScal[0];
-		P[1] = P[1] * m_fScal[1];
-		P[2] = P[2] * m_fScal[2];
+		P[0] = (P[0]+0.5f) * m_fScal[0];
+		P[1] = (P[1]+0.5f) * m_fScal[1];
+		P[2] = (P[2]+0.5f) * m_fScal[2];
 		P+=origin;
 	}
 }

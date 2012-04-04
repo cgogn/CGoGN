@@ -105,7 +105,7 @@ public:
 	void clear();
 
 	/**
-	 * once all string are stored, we must send it to the gracphic card
+	 * once all string are stored, we must send it to the graphic card
 	 */
 	void sendToVBO();
 

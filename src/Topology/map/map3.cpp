@@ -610,13 +610,6 @@ void Map3::splitVolume(std::vector<Dart>& vd)
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 
-//	//unsew the edge path
-//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-//		Map2::unsewFaces(*it);
-//
-//	Map2::fillHole(e) ;
-//	Map2::fillHole(e2) ;
-
 	Map2::splitSurface(vd,true,true);
 
 	//sew the two connected components
@@ -702,6 +695,13 @@ unsigned int Map3::vertexDegree(Dart d)
 	return count;
 }
 
+unsigned int Map3::vertexDegreeOnBoundary(Dart d)
+{
+	assert(Map3::isBoundaryVertex(d));
+
+	return Map2::vertexDegree(d);
+}
+
 bool Map3::isBoundaryVertex(Dart d)
 {
 	DartMarkerStore mv(*this);	// Lock a marker
@@ -733,6 +733,39 @@ bool Map3::isBoundaryVertex(Dart d)
 		}
 	}
 	return false ;
+}
+
+Dart Map3::findBoundaryFaceOfVertex(Dart d)
+{
+	DartMarkerStore mv(*this);	// Lock a marker
+
+	std::vector<Dart> darts;	// Darts that are traversed
+	darts.reserve(256);
+	darts.push_back(d);			// Start with the dart d
+	mv.mark(d);
+
+	for(unsigned int i = 0; i < darts.size(); ++i)
+	{
+		if(isBoundaryMarked(darts[i]))
+			return darts[i];
+
+		//add phi21 and phi23 successor if they are not marked yet
+		Dart d2 = phi2(darts[i]);
+		Dart d21 = phi1(d2); // turn in volume
+		Dart d23 = phi3(d2); // change volume
+
+		if(!mv.isMarked(d21))
+		{
+			darts.push_back(d21);
+			mv.mark(d21);
+		}
+		if(!mv.isMarked(d23))
+		{
+			darts.push_back(d23);
+			mv.mark(d23);
+		}
+	}
+	return NIL ;
 }
 
 bool Map3::sameOrientedEdge(Dart d, Dart e)
@@ -822,7 +855,7 @@ bool Map3::check()
 		if(phi1(d3) != phi3(phi_1(d)))
 		{
 			std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
-			return false;
+			//return false;
 		}
 
         Dart d2 = phi2(d);

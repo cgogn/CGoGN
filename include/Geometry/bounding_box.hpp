@@ -142,7 +142,7 @@ bool BoundingBox<VEC>::isInitialized() const
 template <typename VEC>
 void BoundingBox<VEC>::reset()
 {
-	m_initialized=false;
+	m_initialized = false;
 }
 
 template <typename VEC>
@@ -197,7 +197,6 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 	}
 }
 
-
 template <typename VEC>
 bool BoundingBox<VEC>::contains(const VEC& p)
 {
@@ -221,28 +220,20 @@ bool BoundingBox<VEC>::contains(const BoundingBox<VEC>& bb)
 }
 
 template <typename VEC>
-void BoundingBox<VEC>::scale(float size)
+void BoundingBox<VEC>::scale(typename VEC::DATA_TYPE size)
 {
 	assert(m_initialized || !"Bounding box not initialized");
-	m_pMin *= size;
-	m_pMax *= size;
+	m_pMin *= size ;
+	m_pMax *= size ;
 }
 
-
-
-//template <typename VEC>
-//friend std::ostream& BoundingBox<VEC>::operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
-//{
-//	out << bb.min() << " " << bb.max() ;
-//	return out ;
-//}
-//
-//template <typename VEC>
-//friend std::istream& BoundingBox<VEC>::operator>>(std::istream& in, BoundingBox<VEC>& bb)
-//{
-//	in >> bb.min() >> bb.max() ;
-//	return in ;
-//}
+template <typename VEC>
+void BoundingBox<VEC>::centeredScale(typename VEC::DATA_TYPE size)
+{
+	VEC center = (m_pMin + m_pMax) / typename VEC::DATA_TYPE(2) ;
+	m_pMin = ((m_pMin - center) * size) + center ;
+	m_pMax = ((m_pMax - center) * size) + center ;
+}
 
 } // namespace Geom
 

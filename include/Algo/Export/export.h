@@ -85,7 +85,37 @@ bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, ch
 * @return true
 */
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const FunctorSelect& good = allDarts) ;
+bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+
+/**
+* export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
+*
+* exports position + any attribute named : "frame_T" (frame tangent : VEC3), "frame_B" (frame binormal : VEC3), "frame_N" (frame normal : VEC3),
+* "colorPTM_a<i> : VEC3" (coefficient number i of the 3 polynomials - one per channel - ; the max i depends on the degree of the PTM polynomial),
+* "errL2 : REAL" (L2 fitting error), "errLmax : REAL" (maximal fitting error), "stdDev : REAL" (standard deviation of the L2 fitting errors).
+*
+* @param map map to be exported
+* @param filename filename of ply file
+* @param position the position container
+* @return true
+*/
+template <typename PFP>
+bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+
+/**
+* export the map into a PLYSLF file (K. Vanhoey generic format).
+*
+* exports position + any attribute named : "frame_T" (frame tangent : VEC3), "frame_B" (frame binormal : VEC3), "frame_N" (frame normal : VEC3),
+* "SLF_<i> : VEC3" (coefficient number i of the 3   - one per channel - ; the max i is nbCoefs),
+*
+* @param map map to be exported
+* @param filename filename of ply file
+* @param position the position container
+* @param nbCoefs the number of coefficients of the representation
+* @return true
+*/
+template <typename PFP>
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)
@@ -97,7 +127,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const char* filename, const typ
 * @return true
 */
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good) ;
+bool exportPLYPTM(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good = allDarts) ;
 
 } // namespace Export
 

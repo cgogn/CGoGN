@@ -58,8 +58,6 @@ SimpleGMap3::SimpleGMap3()
 	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
 	Algo::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
-//	for(Dart d = myMap.begin() ; d != myMap.end() ; myMap.next(d))
-//		mE.mark(d);
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);

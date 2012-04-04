@@ -202,11 +202,11 @@ void GenericMap::addLevel()
 		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1] ;	// copy the indices of
 		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
 
-//		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//		{
-//			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
-//			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
-//		}
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+		}
 	}
 }
 
@@ -578,19 +578,15 @@ bool GenericMap::loadMapBin(const std::string& filename)
 	return true;
 }
 
-
-
 bool GenericMap::copyFrom(const GenericMap& map)
 {
 	if (mapTypeName() != map.mapTypeName())
 	{
-		CGoGNerr <<"try to copy from incompatible type map" << CGoGNendl;
+		CGoGNerr << "try to copy from incompatible type map" << CGoGNendl;
 		return false;
 	}
 
 	GenericMap::clear(true);
-
-
 
 	// load attrib container
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
@@ -601,12 +597,11 @@ bool GenericMap::copyFrom(const GenericMap& map)
 		m_mrattribs.copyFrom(map.m_mrattribs);
 		m_mrCurrentLevel = map.m_mrCurrentLevel;
 
-		unsigned int nb= map.m_mrNbDarts.size();
+		unsigned int nb = map.m_mrNbDarts.size();
 		m_mrNbDarts.resize(nb);
-		for (unsigned int i=0; i<nb; ++i)
+		for (unsigned int i = 0; i < nb; ++i)
 			m_mrNbDarts[i] = map.m_mrNbDarts[i];
 	}
-
 
 	// retrieve m_embeddings (from m_attribs)
 	update_m_emb_afterLoad();
@@ -657,7 +652,7 @@ void GenericMap::update_topo_shortcuts()
 				// get thread number
 				unsigned int thread = listeNames[i][5]-'0';
 				if (listeNames[i].size() > 6) 					// thread number is >9
-					thread = 10*thread + listeNames[i][6]-'0';
+					thread = 10*thread + (listeNames[i][6]-'0');
 
 				AttributeMultiVector<Mark>* amvMark = cont.getDataVector<Mark>(i);
 				m_markTables[orbit][thread] = amvMark ;
@@ -682,34 +677,34 @@ void GenericMap::update_topo_shortcuts()
 	{
 		std::vector<std::string> names;
 		m_mrattribs.getAttributesNames(names);
-		m_mrDarts.resize(names.size()-1);
-		for (unsigned int i=0; i<m_mrDarts.size(); ++i)
+		m_mrDarts.resize(names.size() - 1);
+		for (unsigned int i = 0; i < m_mrDarts.size(); ++i)
 			m_mrDarts[i] = NULL;
 
 		for (unsigned int i = 0;  i < names.size(); ++i)
 		{
 			std::string sub = names[i].substr(0, 7);
 
-			if (sub=="MRLevel")
+			if (sub == "MRLevel")
 				m_mrLevels = m_mrattribs.getDataVector<unsigned int>(i);
 
-			if (sub=="MRdart_")
+			if (sub == "MRdart_")
 			{
 				sub = names[i].substr(7);	// compute number following MT_Dart_
-				unsigned int idx=0;
-				for (unsigned int j=0; j < sub.length(); j++)
-					idx = 10*idx+(sub[j]-'0');
-				if (idx < names.size()-1)
+				unsigned int idx = 0;
+				for (unsigned int j = 0; j < sub.length(); j++)
+					idx = 10*idx + (sub[j]-'0');
+				if (idx < names.size() - 1)
 					m_mrDarts[idx] = m_mrattribs.getDataVector<unsigned int>(i);
 				else
-					CGoGNerr<<"Warning problem updating MR_DARTS" << CGoGNendl;
+					CGoGNerr << "Warning problem updating MR_DARTS" << CGoGNendl;
 			}
 		}
 		// check if all pointers are != NULL
-		for (unsigned int i=0; i<m_mrDarts.size(); ++i)
+		for (unsigned int i = 0; i < m_mrDarts.size(); ++i)
 		{
 			if (m_mrDarts[i] == NULL)
-				CGoGNerr<<"Warning problem MR_DARTS = NULL" << CGoGNendl;
+				CGoGNerr << "Warning problem MR_DARTS = NULL" << CGoGNendl;
 		}
 	}
 }
@@ -804,16 +799,15 @@ void GenericMap::compact()
 			}
 		}
 	}
+
 	// delete allocated vectors
 	for (unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 		if ((orbit != DART) && (isOrbitEmbedded(orbit)))
 			delete[] oldnews[orbit];
 
-
 	//compacting the topo
 	std::vector<unsigned int> oldnew;
 	m_attribs[DART].compact(oldnew);
-
 
 	// update MR indices to attribs[DART]
 	if (m_isMultiRes)
@@ -830,7 +824,7 @@ void GenericMap::compact()
 		}
 	}
 
-		// update topo relations from real map
+	// update topo relations from real map
 	compactTopoRelations(oldnewMR);
 
 //	dumpAttributesAndMarkers();

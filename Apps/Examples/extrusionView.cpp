@@ -45,17 +45,13 @@
 
 using namespace CGoGN;
 
-
-
 struct PFP: public PFP_STANDARD
 {
 	// definition de la carte
 	typedef EmbeddedMap2 MAP;
 };
 
-
 PFP::MAP myMap;
-
 
 void MyQT::cb_initGL()
 {
@@ -67,7 +63,6 @@ void MyQT::cb_initGL()
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();
-
 
 	m_shader = new Utils::ShaderFlat();
 	m_shader->setAttributePosition(m_positionVBO);
@@ -83,7 +78,6 @@ void MyQT::cb_initGL()
 	registerShader(m_shader2);
 }
 
-
 void MyQT::cb_redraw()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -98,9 +92,6 @@ void MyQT::cb_redraw()
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 }
-
-
-
 
 int main(int argc, char **argv)
 {
@@ -138,30 +129,26 @@ int main(int argc, char **argv)
 	}
 
 	// extrusion
-	Dart d = Algo::Modelisation::extrusion_scale<PFP>(myMap, position, objV, PFP::VEC3(0.0,0.0,0.0), PFP::VEC3(0.0,1.0,0.0),true, pathV, false, pathRadius);
+	Algo::Modelisation::extrusion_scale<PFP>(myMap, position, objV, PFP::VEC3(0.0,0.0,0.0), PFP::VEC3(0.0,1.0,0.0),true, pathV, false, pathRadius);
 
     //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
     float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
     Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
 
-    // envoit info BB a l'interface
+    // send the BB to the interface
 	sqt.setParamObject(lWidthObj,lPosObj.data());
 
-	// show 1 pour GL context
+	// first show creates GL context
 	sqt.show();
 
-	// update du VBO position (context GL necessaire)
+	// update position VBO
 	sqt.m_positionVBO->updateData(position);
 
-	// update des primitives du renderer
+	// update render primitives
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	sqt.m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 
-	// show final pour premier redraw
 	sqt.show();
-
-	// et on attend la fin.
 	return app.exec();
-
 }

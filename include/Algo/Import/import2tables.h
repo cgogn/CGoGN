@@ -30,7 +30,6 @@
 #include <vector>
 #include <string>
 
-//#include "Topology/generic/attributeHandler.h"
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
@@ -52,12 +51,12 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, PLYPTMgeneric, OFF, OBJ, VRML, AHEM };
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, PLYPTM, PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
 	}
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY ,OFF, OBJ, MOKA };
+		enum ImportType { UNKNOWNVOLUME , TET, ELE, TS, MOKA };
 	}
 
 
@@ -101,7 +100,7 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importTrian(const std::string& filename, std::vector<std::string>& attrNames);
 
@@ -109,12 +108,16 @@ public:
 
 	bool importOff(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importMeshBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 	bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
-	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
@@ -180,15 +183,9 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
-	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
-
-	bool importMoka(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 	MeshTablesVolume(typename PFP::MAP& map):
 		m_map(map)
