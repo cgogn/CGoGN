@@ -25,6 +25,8 @@
 #ifndef __ALGO_GEOMETRY_FEATURE_H__
 #define __ALGO_GEOMETRY_FEATURE_H__
 
+
+
 namespace CGoGN
 {
 
@@ -33,6 +35,14 @@ namespace Algo
 
 namespace Geometry
 {
+
+#define EMPTY 0
+#define SEGMENT 1
+#define BARY 2
+
+typedef struct { Dart d ; float w ; } e0point ;
+typedef struct { e0point p1 ; e0point p2 ; int valid ; } e0segment ;
+typedef NoMathIONameAttribute<e0segment> ridgeSegment ;
 
 template <typename PFP>
 void featureEdgeDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& featureEdge) ;
@@ -50,7 +60,13 @@ template <typename PFP>
 void computeTriangleType(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeCurvatureSign(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, typename PFP::TVEC3& k, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeRidgeLines(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area, typename PFP::TVEC3& k, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
+void initRidgeSegments(typename PFP::MAP& map, const typename PFP::TVEC3& position, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+template <typename PFP>
+void computeSingularTriangle(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, typename PFP::TVEC3& k, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
 std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
@@ -68,10 +84,19 @@ template <typename PFP>
 bool isInSameOctant(const typename PFP::VEC3& pos1, const typename PFP::VEC3& pos2) ;
 
 template <typename PFP>
-void curvatureSign(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, typename PFP::TVEC3& k) ;
+void ridgeLines(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, CellMarker& regularMarker, typename PFP::TVEC3& k, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area, AttributeHandler<ridgeSegment>& ridge_segments) ;
+
+template <typename PFP>
+typename PFP::REAL extremality(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::TVEC3& k, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area) ;
 
 template <typename PFP>
 typename PFP::TVEC3 vertexGradient(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::TVEC3& face_gradient, const typename PFP::TREAL& area) ;
+
+template <typename PFP>
+void singularTriangle(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, CellMarker& regularMarker, AttributeHandler<ridgeSegment>& ridge_segments) ;
+
+template <typename PFP>
+bool isEdgeInTriangle(typename PFP::MAP& map, Dart edge, Dart triangle) ;
 
 } // namespace Geometry
 

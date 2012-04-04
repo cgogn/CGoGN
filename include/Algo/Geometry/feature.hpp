@@ -92,15 +92,37 @@ void computeTriangleType(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 }
 
 template <typename PFP>
-void computeCurvatureSign(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, typename PFP::TVEC3& k, const FunctorSelect& select = allDarts, unsigned int thread = 0)
+void computeRidgeLines(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area, typename PFP::TVEC3& k, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0)
 {
-	CellMarker mv(map, VERTEX, thread);
-	TraversorV<typename PFP::MAP> trav(map, select, thread);
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
-		if (!mv.isMarked(d))
+		if (regularMarker.isMarked(d))
 		{
-			curvatureSign<PFP>(map, d, position, triangle_type, k) ;
+			ridgeLines<PFP>(map, d, position, regularMarker, k, faceGradient, area, ridge_segments) ;
+		}
+	}
+}
+
+template <typename PFP>
+void initRidgeSegments(typename PFP::MAP& map, const typename PFP::TVEC3& position, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		ridge_segments[d].valid = EMPTY ;
+	}
+}
+
+template <typename PFP>
+void computeSingularTriangle(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		if (! regularMarker.isMarked(d))
+		{
+			singularTriangle<PFP>(map, d, position, regularMarker, ridge_segments) ;
 		}
 	}
 }
@@ -297,25 +319,127 @@ bool isInSameOctant(const typename PFP::VEC3& pos1, const typename PFP::VEC3& po
 }
 
 template <typename PFP>
-void curvatureSign(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::TVEC3& triangle_type, typename PFP::TVEC3& k)
+void ridgeLines(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, CellMarker& regularMarker, typename PFP::TVEC3& k, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area, AttributeHandler<ridgeSegment>& ridge_segments)
 {
-	/*sommetTraité = true ;*/
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
 
-	Traversor2VE<typename PFP::MAP> trav2(map, d) ;
-	for (Dart d2 = trav2.begin(); d2 != trav2.end(); d2 = trav2.next())
+	Traversor2FV<typename PFP::MAP> t(map, d) ;
+	Dart v1 = t.begin() ;
+	Dart v2 = t.next() ;
+	Dart v3 = t.next() ;
+
+	if((k[v1] * k[v2]) <= 0)
 	{
-		if (/*arrete non traité*/ true)
-		{
-			if((k[d] * k[d2]) <= 0)
-			{
-				k[d2] *= -1 ;
-			}
-			/*arreteTraité = true ;*/
+		k[v2] *= -1 ;
+	}
 
-			/*meme chose avec sommet le long de l'arrete*/
-			/*curvatureSign(sommet le long del'arrete) ;*/
+	if((k[v1] * k[v3]) <= 0)
+	{
+		k[v3] *= -1 ;
+	}
+
+	/* Calcul coefficient extremalite */
+
+	REAL e1, e2, e3 ;
+
+	e1 = extremality<PFP>(map, v1, position, k, faceGradient, area) ;
+	e2 = extremality<PFP>(map, v2, position, k, faceGradient, area) ;
+	e3 = extremality<PFP>(map, v3, position, k, faceGradient, area) ;
+
+	/* Stockage des zeros */
+
+	if( (e1 < 0 and e2 > 0) or (e1 > 0 and e2 < 0) )
+	{
+		REAL alpha = abs(e1) / ( abs(e1) + abs(e2) ) ;
+		ridge_segments[d].valid = SEGMENT ;
+		ridge_segments[d].p1.d = v1 ;
+		ridge_segments[d].p1.w = alpha ;
+	}
+	if( (e1 < 0 and e3 > 0) or (e1 > 0 and e3 < 0) )
+	{
+		REAL alpha = abs(e1) / ( abs(e1) + abs(e2) ) ;
+		if(ridge_segments[d].valid == EMPTY)
+		{
+			ridge_segments[d].valid = SEGMENT ;
+			ridge_segments[d].p1.d = v2 ;
+			ridge_segments[d].p1.w = alpha ;
+		}
+		else
+		{
+			ridge_segments[d].p2.d = v2 ;
+			ridge_segments[d].p2.w = alpha ;
 		}
 	}
+	if( (e2 < 0 and e3 > 0) or (e2 > 0 and e3 < 0) )
+	{
+		REAL alpha = abs(e1) / ( abs(e1) + abs(e2) ) ;
+		ridge_segments[d].p2.d = v3 ;
+		ridge_segments[d].p2.w = alpha ;
+	}
+
+	//stockage des zeros avec une autre methode pour le calcul du coefficient alpha
+	/*if( (e1 < 0 and e3 > 0) )
+		{
+			REAL alpha = -e1 / ( e3 - e1 ) ;
+			if(ridge_segments[d].valid == false)
+			{
+				ridge_segments[d].valid = true ;
+				ridge_segments[d].p1.d = v2 ;
+				ridge_segments[d].p1.w = alpha ;
+			}
+			else
+			{
+				ridge_segments[d].p2.d = v2 ;
+				ridge_segments[d].p2.w = alpha ;
+			}
+		}
+		else if(e1 > 0 and e3 < 0)
+		{
+			REAL alpha = -e3 / ( e1 - e3 ) ;
+			if(ridge_segments[d].valid == false)
+			{
+				ridge_segments[d].valid = true ;
+				ridge_segments[d].p1.d = v2 ;
+				ridge_segments[d].p1.w = alpha ;
+			}
+			else
+			{
+				ridge_segments[d].p2.d = v2 ;
+				ridge_segments[d].p2.w = alpha ;
+			}
+		}
+
+		if( (e2 < 0 and e3 > 0) )
+		{
+			REAL alpha = -e2 / ( e3 - e2 ) ;
+			ridge_segments[d].p2.d = v3 ;
+			ridge_segments[d].p2.w = alpha ;
+		}
+		else if(e2 > 0 and e3 < 0)
+		{
+			REAL alpha = -e3 / ( e2 - e3 ) ;
+			ridge_segments[d].p2.d = v3 ;
+			ridge_segments[d].p2.w = alpha ;
+		}*/
+}
+
+template <typename PFP>
+typename PFP::REAL extremality(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::TVEC3& k, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area)
+{
+	typedef typename PFP::REAL REAL ;
+
+	REAL a = 0 ;
+	REAL e = 0 ;
+
+	Traversor2VF<typename PFP::MAP> trav(map, d) ;
+	for (Dart d2 = trav.begin(); d2 != trav.end(); d2 = trav.next())
+	{
+		a += area[d2] ;
+		e += area[d2] * ( faceGradient[d2] * k[d] ) ;
+	}
+
+	return (e / a) ;
 }
 
 template <typename PFP>
@@ -339,6 +463,67 @@ typename PFP::TVEC3 vertexGradient(typename PFP::MAP& map, Dart d, const typenam
 
 	G.normalize() ;
 	return G ;
+}
+
+template <typename PFP>
+void singularTriangle(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, CellMarker& regularMarker, AttributeHandler<ridgeSegment>& ridge_segments)
+{
+	int nbPoint = 0 ;
+
+	Traversor2FFaE<typename PFP::MAP> f(map, d) ;
+	for (Dart d2 = f.begin(); d2 != f.end(); d2 = f.next())
+	{
+		if(regularMarker.isMarked(d2) and ridge_segments[d2].valid == SEGMENT)
+		{
+			if(isEdgeInTriangle<PFP>(map, ridge_segments[d2].p1.d, d))
+			{
+				if(nbPoint == 0)
+				{
+					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p1.d) ;
+					ridge_segments[d].p1.w = 1 - ridge_segments[d2].p1.w ;
+				}
+				else
+				{
+					ridge_segments[d].valid ++ ;
+					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p1.d) ;
+					ridge_segments[d].p2.w = 1 - ridge_segments[d2].p1.w ;
+				}
+				nbPoint ++ ;
+			}
+			else if(isEdgeInTriangle<PFP>(map, ridge_segments[d2].p1.d, d))
+			{
+				if(nbPoint == 0)
+				{
+					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p2.d) ;
+					ridge_segments[d].p1.w = 1 - ridge_segments[d2].p2.w ;
+				}
+				else
+				{
+					ridge_segments[d].valid ++ ;
+					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p2.d) ;
+					ridge_segments[d].p2.w = 1 - ridge_segments[d2].p2.w ;
+				}
+				nbPoint ++ ;
+			}
+		}
+	}
+}
+
+template <typename PFP>
+bool isEdgeInTriangle(typename PFP::MAP& map, Dart edge, Dart triangle)
+{
+	bool inTriangle = false ;
+
+	Traversor2FE<typename PFP::MAP> t(map, triangle) ;
+	for (Dart e = t.begin(); e != t.end(); e = t.next())
+	{
+		if(map.phi2(e) == edge)
+		{
+			inTriangle = true ;
+		}
+	}
+
+	return inTriangle ;
 }
 
 } // namespace Geometry
