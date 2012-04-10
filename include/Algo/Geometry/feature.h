@@ -36,64 +36,141 @@ namespace Algo
 namespace Geometry
 {
 
-#define EMPTY 0
-#define SEGMENT 1
-#define BARY 2
+enum
+{
+	EMPTY,
+	SEGMENT,
+	BARY
+};
+
+//#define EMPTY 0
+//#define SEGMENT 1
+//#define BARY 2
 
 typedef struct { Dart d ; float w ; } e0point ;
-typedef struct { e0point p1 ; e0point p2 ; int valid ; } e0segment ;
+typedef struct { e0point p1 ; e0point p2 ; unsigned char type ; } e0segment ;
 typedef NoMathIONameAttribute<e0segment> ridgeSegment ;
 
 template <typename PFP>
-void featureEdgeDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& featureEdge) ;
+void featureEdgeDetection(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& position,
+	CellMarker& featureEdge) ;
 
 template <typename PFP>
-void computeArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& area, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeFaceGradient(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& position,
+	typename PFP::TVEC3& face_gradient,
+	const typename PFP::TVEC3& face_normal,
+	const typename PFP::TREAL& kmax,
+	const typename PFP::TREAL& area,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+//template <typename PFP>
+//void computeVertexGradient(
+//	typename PFP::MAP& map,
+//	const typename PFP::TVEC3& position,
+//	typename PFP::TVEC3& gradient,
+//	typename PFP::TVEC3& face_gradient,
+//	const typename PFP::TREAL& area,
+//	const FunctorSelect& select = allDarts,
+//	unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeFaceGradient(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_gradient, const typename PFP::TVEC3& face_normal, const typename PFP::TREAL& kmax, const typename PFP::TREAL& area, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeTriangleType(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& Kmax,
+	CellMarker& regularMarker,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeGradient(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& gradient, typename PFP::TVEC3& face_gradient, const typename PFP::TREAL& area, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeRidgeLines(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& position,
+	CellMarker& regularMarker,
+	const typename PFP::TVEC3& faceGradient,
+	const typename PFP::TREAL& area,
+	const typename PFP::TVEC3& K,
+	AttributeHandler<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeTriangleType(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void initRidgeSegments(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& position,
+	AttributeHandler<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeRidgeLines(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area, typename PFP::TVEC3& k, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeSingularTriangle(
+	typename PFP::MAP& map,
+	const typename PFP::TVEC3& position,
+	CellMarker& regularMarker,
+	typename PFP::TVEC3& k,
+	AttributeHandler<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
 
 template <typename PFP>
-void initRidgeSegments(typename PFP::MAP& map, const typename PFP::TVEC3& position, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+std::vector<typename PFP::VEC3> occludingContoursDetection(
+	typename PFP::MAP& map,
+	const typename PFP::VEC3& cameraPosition,
+	const typename PFP::TVEC3& position,
+	const typename PFP::TVEC3& normal) ;
 
 template <typename PFP>
-void computeSingularTriangle(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& regularMarker, typename PFP::TVEC3& k, AttributeHandler<ridgeSegment>& ridge_segments, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+typename PFP::VEC3 faceGradient(
+	typename PFP::MAP& map,
+	Dart d,
+	const typename PFP::TVEC3& position,
+	const typename PFP::TVEC3& face_normal,
+	const typename PFP::TREAL& kmax,
+	const typename PFP::TREAL& area) ;
 
 template <typename PFP>
-std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& Kmax) ;
+
+//template <typename PFP>
+//bool isInSameOctant(const typename PFP::VEC3& pos1, const typename PFP::VEC3& pos2) ;
 
 template <typename PFP>
-typename PFP::TREAL faceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+void ridgeLines(
+	typename PFP::MAP& map,
+	Dart d,
+	const typename PFP::TVEC3& position,
+	const typename PFP::TVEC3& K,
+	const typename PFP::TVEC3& faceGradient,
+	const typename PFP::TREAL& area,
+	AttributeHandler<ridgeSegment>& ridge_segments) ;
 
 template <typename PFP>
-typename PFP::VEC3 faceGradient(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::TVEC3& face_normal, const typename PFP::TREAL& kmax, const typename PFP::TREAL& area) ;
+typename PFP::REAL extremality(
+	typename PFP::MAP& map,
+	Dart d,
+	const typename PFP::VEC3& K,
+	const typename PFP::TVEC3& faceGradient,
+	const typename PFP::TREAL& area) ;
+
+//template <typename PFP>
+//typename PFP::TVEC3 vertexGradient(
+//	typename PFP::MAP& map,
+//	Dart d,
+//	const typename PFP::TVEC3& position,
+//	const typename PFP::TVEC3& face_gradient,
+//	const typename PFP::TREAL& area) ;
 
 template <typename PFP>
-bool triangleType(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
-
-template <typename PFP>
-bool isInSameOctant(const typename PFP::VEC3& pos1, const typename PFP::VEC3& pos2) ;
-
-template <typename PFP>
-void ridgeLines(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, CellMarker& regularMarker, typename PFP::TVEC3& k, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area, AttributeHandler<ridgeSegment>& ridge_segments) ;
-
-template <typename PFP>
-typename PFP::REAL extremality(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::TVEC3& k, const typename PFP::TVEC3& faceGradient, const typename PFP::TREAL& area) ;
-
-template <typename PFP>
-typename PFP::TVEC3 vertexGradient(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::TVEC3& face_gradient, const typename PFP::TREAL& area) ;
-
-template <typename PFP>
-void singularTriangle(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, CellMarker& regularMarker, AttributeHandler<ridgeSegment>& ridge_segments) ;
+void singularTriangle(
+	typename PFP::MAP& map,
+	Dart d,
+	const typename PFP::TVEC3& position,
+	CellMarker& regularMarker,
+	AttributeHandler<ridgeSegment>& ridge_segments) ;
 
 template <typename PFP>
 bool isEdgeInTriangle(typename PFP::MAP& map, Dart edge, Dart triangle) ;
