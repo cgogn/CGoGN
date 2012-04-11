@@ -54,40 +54,41 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 template <typename PFP>
 void hexahedronsToTetrahedrons(typename PFP::MAP& map)
 {
-	TraversorV<typename PFP::MAP> tv(map);
-	for(Dart s=tv.begin() ; s!=tv.end() ; s=tv.next() )
-	{
-		bool allDegreesAroundEqual3=true;
+    TraversorV<typename PFP::MAP> tv(map);
 
-		std::vector<Dart> dov;
+    //for each vertex
+    for(Dart d = tv.begin() ; d != tv.end() ; d = tv.next())
+    {
+        bool vertToTet=true;
+        std::vector<Dart> dov;
+        dov.reserve(32);
+        FunctorStore fs(dov);
+        map.foreach_dart_of_vertex(d,fs);
+        CellMarkerStore cmv(map,VOLUME);
 
-		FunctorStore fs(dov);
-		map.foreach_dart_of_vertex(s,fs);
+        //check if all vertices degree is equal to 3 (= no direct adjacent vertex has been split)
+        for(std::vector<Dart>::iterator it=dov.begin();vertToTet && it!=dov.end();++it)
+        {
+            if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
+            {
+                cmv.mark(*it);
+                vertToTet = (map.phi1(map.phi2(map.phi1(map.phi2(map.phi1(map.phi2(*it))))))==*it); //degree = 3
+            }
+        }
 
-		CellMarkerStore cmv(map,VOLUME);
-
-		for(std::vector<Dart>::iterator it=dov.begin();allDegreesAroundEqual3 && it!=dov.end();++it)
-		{
-			if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
-			{
-				cmv.mark(*it);
-				allDegreesAroundEqual3 = (map.phi1(map.phi2(map.phi1(map.phi2(map.phi1(map.phi2(*it))))))==*it);
-			}
-		}
-
-		if( allDegreesAroundEqual3)
-		{
-			CellMarkerStore cmv(map,VOLUME);
-			for(std::vector<Dart>::iterator it=dov.begin();it!=dov.end();++it)
-			{
-				if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
-				{
-					cmv.mark(*it);
-					cut3Ear<PFP>(map,*it);
-				}
-			}
-		}
-	}
+        //if ok : create tetrahedrons around the vertex
+        if(vertToTet)
+        {
+            for(std::vector<Dart>::iterator it=dov.begin();it!=dov.end();++it)
+            {
+                if(cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
+                {
+                    cmv.unmark(*it);
+                    cut3Ear<PFP>(map,*it);
+                }
+            }
+        }
+    }
 }
 
 

@@ -67,7 +67,17 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 template <typename PFP>
 Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, CellMarker& edgesToCut, CellMarker& verticesToSplit);
 
-
+/**
+* Cut a set of volumes considering a set of marked edges and vertices
+* marked edges and vertices must form a simple path
+* @param d dart of the volume
+* @param edgesToCut marker to identify edges along the slice
+* @param verticesToSplit marker to identify edges on the slice
+* @return a dart from the created face
+* TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,CellMarker& volumesToCut, CellMarker& edgesToCut, CellMarker& verticesToSplit);
 
 /**
 * catmull clark volumic : do not move the original vertices

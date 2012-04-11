@@ -311,7 +311,7 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
 	std::vector<Dart> vRes;
 
     typedef typename PFP::VEC3 VEC3;
-    CellMarkerStore localVerticesToSplit(map, VERTEX); //marker for new vertices from edge cut
+    CellMarker localVerticesToSplit(map, VERTEX); //marker for new vertices from edge cut
 
     //Step 1: Cut the edges and mark the resulting vertices as vertices to be face-split
     TraversorE<typename PFP::MAP> te(map);
@@ -368,10 +368,9 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
     TraversorW<typename PFP::MAP> tw(map);
     for(Dart d = tw.begin(); d != tw.end(); d=tw.next()) //Parcours des volumes
     {
-        if(volumesToCut.isMarked(d)){
-
+        if(volumesToCut.isMarked(d))
+        {
             Traversor3WV<typename PFP::MAP> t3wv(map,d);
-            int nbVInPath=1;
             Dart dPath;
             bool found=false;
 
@@ -380,36 +379,37 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             {
                 if(localVerticesToSplit.isMarked(dd) || verticesToSplit.isMarked(dd))
                 {
-                    Dart ddd = map.phi1(map.phi2(dd));
+                    Dart ddd = dd;
                     while(!localVerticesToSplit.isMarked(map.phi1(ddd))
-                    		&& !verticesToSplit.isMarked(map.phi1(ddd))
-                    		&& ddd!=dd)
+                    		&& !verticesToSplit.isMarked(map.phi1(ddd)))
                         ddd = map.phi1(map.phi2(ddd));
                     found=true;
-                    nbVInPath++;
                     dPath=ddd;
                 }
             }
             //define the path to split
             std::vector<Dart> vPath;
-            vPath.reserve(nbVInPath);
+            vPath.reserve(32);
             vPath.push_back(dPath);
             CellMarker cmf(map,FACE);
 
+
             //define the path to split for the whole volume
-            for(std::vector<Dart>::iterator it = vPath.begin() ;it != vPath.end(); ++it)
+            bool pathFound=false;
+            for(std::vector<Dart>::iterator it = vPath.begin() ; !pathFound && it != vPath.end(); ++it)
             {
                 Dart dd = map.phi1(*it);
-                Dart ddd = map.phi1(map.phi2(dd));
-                while(!localVerticesToSplit.isMarked(map.phi1(ddd))
-                		&& !verticesToSplit.isMarked(map.phi1(ddd))
-                		&& ddd!=dd)
-                    ddd = map.phi1(map.phi2(ddd));
 
-                if( !map.sameVertex(ddd,*vPath.begin()) )
+                if(map.sameVertex(dd,*vPath.begin()))
+                	pathFound=true;
+                else
                 {
-                    vPath.push_back(map.phi1(ddd));
-                    localVerticesToSplit.unmark(map.phi1(ddd));
+                	Dart ddd = map.phi1(map.phi2(dd));
+
+                	while(!localVerticesToSplit.isMarked(map.phi1(ddd)) && !verticesToSplit.isMarked(map.phi1(ddd)))
+                		ddd = map.phi1(map.phi2(ddd));
+
+                	vPath.push_back(ddd);
                 }
             }
 

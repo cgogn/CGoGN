@@ -782,6 +782,7 @@ bool GMap2::checkSimpleOrientedPath(std::vector<Dart>& vd)
 	{
 		if(dm.isMarked(*it))
 			return false ;
+
 		dm.markOrbit(VERTEX, *it) ;
 
 		std::vector<Dart>::iterator prev ;
