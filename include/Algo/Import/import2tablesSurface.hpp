@@ -120,7 +120,6 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 		CGoGNout << "TYPE: PLYSLFgenericBin" << CGoGNendl;
 		return importPlySLFgenericBin(filename, attrNames);
 		break;
-
 	case ImportSurfacique::OBJ:
 		CGoGNout << "TYPE: OBJ" << CGoGNendl;
 		return importObj(filename, attrNames);
@@ -591,7 +590,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
-	
+
 	AttributeHandler<typename PFP::VEC3> colors = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "color") ;
 	if (pid.hasColors())
 	{

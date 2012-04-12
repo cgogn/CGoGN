@@ -609,137 +609,499 @@ public:
 	}
 };
 
-/* BSXW02 on Boundary Vertices and on Insides Vertices
+/* Lerp on Boundary Vertices and on Insides Vertices and BSXW02 Averaging
  *********************************************************************************/
 
 template <typename PFP>
-class BSXW02VertexSubdivision : public MRScheme
+class BSXW02AveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	BSXW02VertexSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02AveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-		TraversorW<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		m_map.incCurrentLevel() ;
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart ditE = trav.begin(); ditE != trav.end(); ditE = trav.next())
 		{
-			//cell points : these points are the average of the
-			//vertices of the lattice that bound the cell
-			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
-
-			m_map.incCurrentLevel() ;
-
-			if(!m_map.isTetrahedron(d))
+			if(m_map.isBoundaryVertex(ditE))
 			{
-				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-				m_position[midV] = p ;
-			}
+				Dart db = m_map.findBoundaryFaceOfVertex(ditE);
 
-			m_map.decCurrentLevel() ;
+				typename PFP::VEC3 P(0);
+				unsigned int count = 0;
+				Traversor2VF<typename PFP::MAP> travVF(m_map, db);
+				for (Dart ditVF = travVF.begin(); ditVF != travVF.end(); ditVF = travVF.next())
+				{
+					P += Algo::Geometry::faceCentroid<PFP>(m_map, ditVF, m_position);
+					++count;
+				}
+
+				P /= count;
+
+				m_position[db] = P;
+			}
+			else if(m_map.isBoundaryEdge(ditE))
+			{
+				Dart db = m_map.findBoundaryEdgeOfVertex(ditE);
+
+				typename PFP::VEC3 P(0);
+				unsigned int count = 0;
+				Traversor2VF<typename PFP::MAP> travVF(m_map, db);
+				for (Dart ditVF = travVF.begin(); ditVF != travVF.end(); ditVF = travVF.next())
+				{
+					P += Algo::Geometry::faceCentroid<PFP>(m_map, ditVF, m_position);
+					++count;
+				}
+
+				P /= count;
+
+				m_position[db] = P;
+			}
+			else
+			{
+				typename PFP::VEC3 P(0);
+				unsigned int count = 0;
+				Traversor3VW<typename PFP::MAP> travVF(m_map, ditE);
+				for (Dart ditVF = travVF.begin(); ditVF != travVF.end(); ditVF = travVF.next())
+				{
+					P += Algo::Geometry::volumeCentroid<PFP>(m_map, ditVF, m_position);
+					++count;
+				}
+
+				P /= count;
+
+				m_position[ditE] = P;
+			}
+		}
+		m_map.decCurrentLevel() ;
+	}
+};
+
+template <typename PFP>
+class BSXW02EdgeAveragingSubdivision : public MRScheme
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	BSXW02EdgeAveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart ditE = trav.begin(); ditE != trav.end(); ditE = trav.next())
+		{
+			if(m_map.isBoundaryEdge(ditE))
+			{
+				Dart db = m_map.findBoundaryFaceOfEdge(ditE);
+
+				m_map.incCurrentLevel() ;
+
+				db = m_map.phi1(db);
+
+				typename PFP::VEC3 P(0);
+				unsigned int count = 0;
+				Traversor2VF<typename PFP::MAP> travVF(m_map, db);
+				for (Dart ditVF = travVF.begin(); ditVF != travVF.end(); ditVF = travVF.next())
+				{
+					P += Algo::Geometry::faceCentroid<PFP>(m_map, ditVF, m_position);
+					++count;
+				}
+
+				P /= count;
+
+				m_position[db] = P;
+
+				m_map.decCurrentLevel() ;
+			}
 		}
 	}
 };
 
 template <typename PFP>
-class BSXW02EdgeSubdivision : public MRScheme
+class BSXW02FaceAveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	BSXW02EdgeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02FaceAveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-		TraversorW<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart ditE = trav.begin(); ditE != trav.end(); ditE = trav.next())
 		{
-			//cell points : these points are the average of the
-			//vertices of the lattice that bound the cell
-			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
-
-			m_map.incCurrentLevel() ;
-
-			if(!m_map.isTetrahedron(d))
+			if(m_map.isBoundaryFace(ditE))
 			{
-				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-				m_position[midV] = p ;
-			}
+				Dart db = m_map.phi3(ditE);
 
-			m_map.decCurrentLevel() ;
+				m_map.incCurrentLevel() ;
+
+				if(m_map.faceDegree(db) != 3)
+				{
+					db = m_map.phi2(m_map.phi1(db));
+
+					typename PFP::VEC3 P(0);
+					unsigned int count = 0;
+					Traversor2VF<typename PFP::MAP> travVF(m_map, db);
+					for (Dart ditVF = travVF.begin(); ditVF != travVF.end(); ditVF = travVF.next())
+					{
+						P += Algo::Geometry::faceCentroid<PFP>(m_map, ditVF, m_position);
+						++count;
+					}
+
+					P /= count;
+
+					m_position[db] = P;
+
+				}
+
+				m_map.decCurrentLevel() ;
+			}
 		}
 	}
 };
 
 template <typename PFP>
-class BSXW02FaceSubdivision : public MRScheme
+class BSXW02VolumeAveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	BSXW02FaceSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02VolumeAveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
 		TraversorW<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		for (Dart ditE = trav.begin(); ditE != trav.end(); ditE = trav.next())
 		{
-			//cell points : these points are the average of the
-			//vertices of the lattice that bound the cell
-			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
-
 			m_map.incCurrentLevel() ;
-
-			if(!m_map.isTetrahedron(d))
+			if(!m_map.isTetrahedron(ditE))
 			{
-				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-				m_position[midV] = p ;
-			}
+				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(ditE)));
 
+				typename PFP::VEC3 P(0);
+				unsigned int count = 0;
+				Traversor3VW<typename PFP::MAP> travVF(m_map, midV);
+				for (Dart ditVF = travVF.begin(); ditVF != travVF.end(); ditVF = travVF.next())
+				{
+					P += Algo::Geometry::volumeCentroid<PFP>(m_map, ditVF, m_position);
+					++count;
+				}
+
+				P /= count;
+
+				m_position[midV] = P;
+			}
 			m_map.decCurrentLevel() ;
 		}
 	}
 };
 
+/* DHL93 on Boundary Vertices and MCQ04 on Insides Vertices
+ *********************************************************************************/
 template <typename PFP>
-class BSXW02VolumeSubdivision : public MRScheme
+class  MCQ04VertexSubdivision: public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
 	typename PFP::TVEC3& m_position ;
 
 public:
-	BSXW02VolumeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MCQ04VertexSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
-		TraversorW<typename PFP::MAP> trav(m_map) ;
+		TraversorV<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			//cell points : these points are the average of the
-			//vertices of the lattice that bound the cell
-			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+			typename PFP::VEC3 p = m_position[d];
 
 			m_map.incCurrentLevel() ;
-
-			if(!m_map.isTetrahedron(d))
-			{
-				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
-				m_position[midV] = p ;
-			}
-
+			m_position[d] = p ;
 			m_map.decCurrentLevel() ;
+		}
+	}
+} ;
+
+template <typename PFP>
+class MCQ04EdgeSubdivision : public MRScheme
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	MCQ04EdgeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		typename PFP::REAL omega = 1.0/16.0;
+
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart ditE = trav.begin(); ditE != trav.end(); ditE = trav.next())
+		{
+			if(m_map.isBoundaryEdge(ditE))
+			{
+				Dart db = m_map.findBoundaryFaceOfEdge(ditE);
+
+
+				typename PFP::VEC3 p = (m_position[db] + m_position[m_map.phi2(db)]) * typename PFP::REAL(0.5);
+
+				m_map.incCurrentLevel() ;
+
+				Dart midV = m_map.phi2(db) ;
+				m_position[midV] = p ;
+
+				m_map.decCurrentLevel() ;
+
+			}
+			else
+			{
+				typename PFP::VEC3 P = ( m_position[ditE] + m_position[m_map.phi2(ditE)] ) * typename PFP::REAL(0.5);
+
+				typename PFP::VEC3 Q(0);
+				typename PFP::VEC3 R(0);
+				unsigned int count = 0;
+				Dart dit = ditE;
+				do
+				{
+					Dart d_1 = m_map.phi_1(dit);
+					Dart d11 = m_map.phi1(m_map.phi1(dit));
+
+					Q += m_position[d_1];
+					Q += m_position[d11];
+					++count;
+
+					Dart dr1 = m_map.phi1(m_map.phi1(m_map.alpha2(d_1)));
+					R += m_position[dr1];
+
+					Dart dr2 = m_map.phi1(m_map.phi1(m_map.alpha2(m_map.phi1(dit))));
+					R += m_position[dr2];
+
+
+					dit = m_map.alpha2(dit);
+				}while(dit != ditE);
+
+				Q *= (omega / count);
+
+				R *= (omega / count);
+
+				m_map.incCurrentLevel() ;
+
+				Dart midV = m_map.phi2(ditE);
+
+				m_position[midV] = P + Q - R;
+
+				m_map.decCurrentLevel() ;
+
+
+			}
+		}
+	}
+};
+
+template <typename PFP>
+class MCQ04FaceSubdivision : public MRScheme
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	MCQ04FaceSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		typename PFP::REAL omega = 1.0/16.0;
+
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart ditF = trav.begin(); ditF != trav.end(); ditF = trav.next())
+		{
+			if(m_map.isBoundaryFace(ditF))
+			{
+				typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, ditF, m_position);
+
+				m_map.incCurrentLevel() ;
+				if(m_map.faceDegree(ditF) != 3)
+				{
+					Dart midF = m_map.phi2(m_map.phi1(ditF));
+					m_position[midF] = p ;
+				}
+				m_map.decCurrentLevel() ;
+
+			}
+			else
+			{
+				//Calcul des Pi
+				typename PFP::VEC3 P(0);
+				CellMarker mv(m_map, VERTEX);
+				Traversor3FV<typename PFP::MAP> travFV(m_map, ditF);
+				for (Dart ditFV = travFV.begin(); ditFV != travFV.end(); ditFV = travFV.next())
+				{
+					P += m_position[ditFV];
+					mv.mark(ditFV);
+				}
+
+				P *= (2.0 * omega + 1) / 4.0;
+
+				//Calcul des Qi
+				typename PFP::VEC3 Q(0);
+				Traversor3FW<typename PFP::MAP> travFW(m_map, ditF);
+				for (Dart ditFW = travFW.begin(); ditFW != travFW.end(); ditFW = travFW.next())
+				{
+					Traversor3WV<typename PFP::MAP> travWV(m_map, ditFW);
+					for(Dart ditFV = travWV.begin() ; ditFV != travWV.end() ; ditFV = travWV.next())
+					{
+						if(!mv.isMarked(ditFV))
+						{
+							Q += m_position[ditFV];
+							mv.mark(ditFV);
+						}
+					}
+				}
+
+				Q *= omega / 4.0;
+
+				//Calcul des Ri
+				typename PFP::VEC3 R(0);
+				Traversor3FFaE<typename PFP::MAP> travFFaE(m_map, ditF);
+				for (Dart ditFFaE = travFFaE.begin(); ditFFaE != travFFaE.end(); ditFFaE = travFFaE.next())
+				{
+					Traversor3FV<typename PFP::MAP> travFV(m_map, ditFFaE);
+					for (Dart ditFV = travFV.begin(); ditFV != travFV.end(); ditFV = travFV.next())
+					{
+						if(!mv.isMarked(ditFV))
+						{
+							R += m_position[ditFV];
+							mv.mark(ditFV);
+						}
+					}
+				}
+
+				R *= omega / 4.0;
+
+				//Calcul des Si
+				typename PFP::VEC3 S(0);
+				Traversor3FFaV<typename PFP::MAP> travFFaV(m_map, ditF);
+				for (Dart ditFFaV = travFFaV.begin(); ditFFaV != travFFaV.end(); ditFFaV = travFFaV.next())
+				{
+					Traversor3FV<typename PFP::MAP> travFV(m_map, ditFFaV);
+					for (Dart ditFV = travFV.begin(); ditFV != travFV.end(); ditFV = travFV.next())
+					{
+						if(!mv.isMarked(ditFV))
+						{
+							S += m_position[ditFV];
+							mv.mark(ditFV);
+						}
+					}
+				}
+
+				S *= omega / 8.0;
+
+				m_map.incCurrentLevel() ;
+				if(m_map.faceDegree(ditF) != 3)
+				{
+					Dart midF = m_map.phi2(m_map.phi1(ditF));
+					m_position[midF] = P + Q - R - S ;
+				}
+				m_map.decCurrentLevel() ;
+			}
+		}
+	}
+};
+
+template <typename PFP>
+class MCQ04VolumeSubdivision : public MRScheme
+{
+protected:
+	typename PFP::MAP& m_map ;
+	typename PFP::TVEC3& m_position ;
+
+public:
+	MCQ04VolumeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		typename PFP::REAL omega = 1.0/16.0;
+
+		TraversorW<typename PFP::MAP> trav(m_map) ;
+		for (Dart ditW = trav.begin(); ditW != trav.end(); ditW = trav.next())
+		{
+
+			if(m_map.isBoundaryVolume(ditW))
+			{
+				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, ditW, m_position);
+
+				m_map.incCurrentLevel() ;
+
+				if(!m_map.isTetrahedron(ditW))
+				{
+					Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(ditW)));
+					m_position[midV] = p ;
+				}
+
+				m_map.decCurrentLevel() ;
+			}
+			else
+			{
+				CellMarker mv(m_map, VERTEX);
+
+				typename PFP::VEC3 P(0);
+				Traversor3WV<typename PFP::MAP> travWV(m_map, ditW);
+				for(Dart ditWV = travWV.begin() ; ditWV != travWV.end() ; ditWV = travWV.next())
+				{
+					P += m_position[ditWV];
+					mv.mark(ditWV);
+				}
+
+				P *= ((6.0 * omega + 1.0) / 8.0);
+
+				typename PFP::VEC3 Q(0);
+				Traversor3WWaF<typename PFP::MAP> travWWaF(m_map, ditW);
+				for(Dart ditWWaF = travWV.begin() ; ditWWaF != travWV.end() ; ditWWaF = travWV.next())
+				{
+					Traversor3WV<typename PFP::MAP> travWV(m_map, ditWWaF);
+					for(Dart ditWV = travWV.begin() ; ditWV != travWV.end() ; ditWV = travWV.next())
+					{
+						if(!mv.isMarked(ditWV))
+						{
+							Q += m_position[ditWV];
+						}
+					}
+				}
+
+				Q *= omega / 4.0;
+
+
+				m_map.incCurrentLevel() ;
+
+				if(!m_map.isTetrahedron(ditW))
+				{
+					Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(ditW)));
+					m_position[midV] = P - Q;
+				}
+
+				m_map.decCurrentLevel() ;
+			}
 		}
 	}
 };

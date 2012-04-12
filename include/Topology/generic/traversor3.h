@@ -323,7 +323,7 @@ public:
 
 
 /**
- * Traverse volumes adjacent to a volumee by a vertex
+ * Traverse volumes adjacent to a volume by a vertex
  */
 template <typename MAP>
 class Traversor3WWaV: public Traversor3XXaY<MAP>
@@ -333,7 +333,7 @@ public:
 };
 
 /**
- * Traverse volumes adjacent to a volumee by an edge
+ * Traverse volumes adjacent to a volume by an edge
  */
 template <typename MAP>
 class Traversor3WWaE: public Traversor3XXaY<MAP>
@@ -343,7 +343,7 @@ public:
 };
 
 /**
- * Traverse volumes adjacent to a volumee by a face
+ * Traverse volumes adjacent to a volume by a face
  */
 template <typename MAP>
 class Traversor3WWaF: public Traversor3XXaY<MAP>
