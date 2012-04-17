@@ -40,6 +40,7 @@ namespace Export
 * export the map into a PLY file
 * @param the_map map to be exported
 * @param filename filename of ply file
+* @param binary write in binary mode
 * @return true
 */
 template <typename PFP>
