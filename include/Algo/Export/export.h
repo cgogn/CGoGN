@@ -43,7 +43,7 @@ namespace Export
 * @return true
 */
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a OFF file
