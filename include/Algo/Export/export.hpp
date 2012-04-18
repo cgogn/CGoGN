@@ -117,13 +117,13 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	// Position property
 	if (position.isValid())
 	{
-		out << "property float32 x" << std::endl ;
-		out << "property float32 y" << std::endl ;
-		out << "property float32 z" << std::endl ;
+		out << "property " << nameOfTypePly(position[0][0]) << 8 * sizeof(position[0][0]) <<" x" << std::endl ;
+		out << "property " << nameOfTypePly(position[0][1]) << 8 * sizeof(position[0][1]) <<" y" << std::endl ;
+		out << "property " << nameOfTypePly(position[0][2]) << 8 * sizeof(position[0][2]) <<" z" << std::endl ;
 	}
 	// Face element
 	out << "element face " << facesSize.size() << std::endl ;
-	out << "property list uint8 uint32 vertex_indices" << std::endl ;
+	out << "property list uint8 uint" << 8 * sizeof(facesIdx[0][0]) << " vertex_indices" << std::endl ;
 	out << "end_header" << std::endl ;
 
 	if (!binary)	// ascii
@@ -147,7 +147,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		for(unsigned int i = 0; i < vertices.size(); ++i)
 		{
 			Geom::Vec3f v = position[vertices[i]] ;
-			out.write((char*)(&(v[0])), 3 * sizeof(float)) ;
+			out.write((char*)(&(v[0])), sizeof(v)) ;
 		}
 
 		// binary faces
@@ -155,7 +155,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		{
 			unsigned char nbe = facesSize[i] ;
 			out.write((char*)(&nbe), sizeof(unsigned char)) ;
-			out.write((char*)(&(facesIdx[i][0])), facesSize[i] * sizeof(float)) ;
+			out.write((char*)(&(facesIdx[i][0])), facesSize[i] * sizeof(facesIdx[i][0])) ;
 		}
 	}
 
