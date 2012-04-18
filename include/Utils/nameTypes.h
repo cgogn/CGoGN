@@ -77,7 +77,7 @@ template <> inline std::string nameOfTypePly(const long int& v) { return "invali
 
 template <> inline std::string nameOfTypePly(const unsigned char& v) { return "uint8"; }
 
-template <> inline std::string nameOfType(const unsigned short int& v) { return "uint16"; }
+template <> inline std::string nameOfTypePly(const unsigned short int& v) { return "uint16"; }
 
 template <> inline std::string nameOfTypePly(const unsigned int& v) { return "uint32"; }
 
