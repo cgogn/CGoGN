@@ -50,17 +50,19 @@ Dart EmbeddedGMap3::cutEdge(Dart d)
 	if(isOrbitEmbedded(EDGE))
 	{
 		// embed the new darts created in the cut edge
-		unsigned int eEmb = getEmbedding(EDGE, d) ;
-		Dart e = d ;
-		do
-		{
-			setDartEmbedding(EDGE, beta0(e), eEmb) ;
-			e = alpha2(e) ;
-		} while(e != d) ;
+		embedOrbit(EDGE, d, getEmbedding(EDGE, d)) ;
+//		unsigned int eEmb = getEmbedding(EDGE, d) ;
+//		Dart e = d ;
+//		do
+//		{
+//			setDartEmbedding(EDGE, beta0(e), eEmb) ;
+//			e = alpha2(e) ;
+//		} while(e != d) ;
 
 		// embed a new cell for the new edge and copy the attributes' line (c) Lionel
-		embedNewCell(EDGE, phi1(d)) ;
-		copyCell(EDGE, phi1(d), d) ;
+		embedNewCell(EDGE, nd) ;
+		copyCell(EDGE, nd, d) ;
+		embedOrbit(EDGE, nd, getEmbedding(EDGE, nd)) ;
 	}
 
 	if(isOrbitEmbedded(FACE))
@@ -146,6 +148,17 @@ void EmbeddedGMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding(VERTEX, beta1(ee), vEmb2);
 		setDartEmbedding(VERTEX, beta2(beta1(ee)), vEmb2);
 		setDartEmbedding(VERTEX, beta1(beta2(beta1(ee))), vEmb2);
+	}
+
+	if(isOrbitEmbedded(EDGE))
+	{
+		embedOrbit(EDGE, beta1(d), getEmbedding(EDGE, beta1(d))) ;
+		embedOrbit(EDGE, beta1(e), getEmbedding(EDGE, beta1(e))) ;
+
+		embedOrbit(EDGE, d, getEmbedding(EDGE, d)) ;
+		embedOrbit(EDGE, e, getEmbedding(EDGE, e)) ;
+		embedOrbit(EDGE, beta1(beta2(beta1(d))), getEmbedding(EDGE, beta1(beta2(beta1(d))))) ;
+		embedOrbit(EDGE, beta1(beta2(beta1(e))), getEmbedding(EDGE, beta1(beta2(beta1(e))))) ;
 	}
 
 	if(isOrbitEmbedded(FACE))

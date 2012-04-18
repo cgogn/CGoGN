@@ -58,6 +58,7 @@ SimpleGMap3::SimpleGMap3()
 	Geom::Plane3D<PFP::REAL> pl(VEC3(-1,-0.5,-0.5),VEC3(-1,-0.5,0.5),VEC3(1,0.5,0.5));
 	Algo::Modelisation::sliceConvexVolume<PFP>(myMap, position, d, pl);
 
+	myMap.check();
 
 	for(unsigned int i = position.begin() ; i != position.end() ; position.next(i))
 		position[i] += VEC3(2,0,0);
@@ -80,8 +81,6 @@ SimpleGMap3::SimpleGMap3()
 	myMap.cutEdge(d);
 	position[myMap.phi1(d)] = mid;
 
-	myMap.check();
-//
 	myMap.splitFace(d,myMap.phi1(myMap.phi1(myMap.phi1(d))));
 
 	myMap.check();
@@ -125,11 +124,11 @@ void SimpleGMap3::cb_redraw()
 	Algo::Render::GL1::renderTopoGMD3<PFP>(myMap, position, true, true, true, true, 0.9f, 0.9f, 0.9f, 0.9f);
 //	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 
-	glDisable(GL_LIGHTING);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glLineWidth(1.0f);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap, Algo::Render::GL1::LINE, 1.0,position, normal);
+//	glDisable(GL_LIGHTING);
+//	glColor3f(1.0f, 1.0f, 1.0f);
+//	glLineWidth(1.0f);
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap, Algo::Render::GL1::LINE, 1.0,position, normal);
 }
 
 

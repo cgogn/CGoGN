@@ -136,12 +136,22 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
+	/**
+	 * Precondition for deleting edge
+	 */
+	bool deleteEdgePreCond(Dart d);
+
 	//! Delete the edge of d
 	/*! All the volumes around the edge are merged into one volume
 	 *  @param d a dart of the edge to delete
 	 *  @return a Dart of the resulting volume
 	 */
 	virtual Dart deleteEdge(Dart d);
+
+	/**
+	 * Precondition for splitting face
+	 */
+	bool splitFacePreCond(Dart d, Dart e);
 
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
