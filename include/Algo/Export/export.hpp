@@ -274,7 +274,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3>
 
 	// Face element
 	out << "element face " << facesSize.size() << std::endl ;
-	out << "property list uint8 uint" << 8 * sizeof(facesIdx[0][0]) << " vertex_indices" << std::endl ;
+	out << "property list uint8 " << nameOfTypePly(facesIdx[0][0]) << " vertex_indices" << std::endl ;
 	out << "end_header" << std::endl ;
 
 	if (!binary)	// ascii
