@@ -56,7 +56,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 * @return true
 */
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3 >& attributeHandlers, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3* >& attributeHandlers, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a OFF file

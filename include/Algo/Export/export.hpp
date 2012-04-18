@@ -165,7 +165,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -241,33 +241,33 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3>
 	out << "comment or contact : cgogn@unistra.fr" << std::endl ;
 	// Vertex elements
 	out << "element vertex " << vertices.size() << std::endl ;
-	for (typename std::vector<typename PFP::TVEC3 >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+	for (typename std::vector<typename PFP::TVEC3* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 	{
-		if (attrHandler->isValid() && (attrHandler->getOrbit() == VERTEX) )
+		if ((*attrHandler)->isValid() && ((*attrHandler)->getOrbit() == VERTEX) )
 		{
-			if (attrHandler->name().compare("position") == 0)  // Vertex position property
+			if ((*attrHandler)->name().compare("position") == 0)  // Vertex position property
 			{
-				out << "property " << nameOfTypePly((*attrHandler)[0][0]) << " x" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][1]) << " y" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][2]) << " z" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][0]) << " x" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][1]) << " y" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][2]) << " z" << std::endl ;
 			}
-			else if (attrHandler->name().compare("normal") == 0)	// normal property
+			else if ((*attrHandler)->name().compare("normal") == 0)	// normal property
 			{
-				out << "property " << nameOfTypePly((*attrHandler)[0][0]) << " nx" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][1]) << " ny" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][2]) << " nz" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][0]) << " nx" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][1]) << " ny" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][2]) << " nz" << std::endl ;
 			}
-			else if (attrHandler->name().compare("color") == 0)	// vertex color property
+			else if ((*attrHandler)->name().compare("color") == 0)	// vertex color property
 			{
-				out << "property " << nameOfTypePly((*attrHandler)[0][0]) << " red" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][1]) << " green" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][2]) << " blue" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][0]) << " red" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][1]) << " green" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][2]) << " blue" << std::endl ;
 			}
 			else // other vertex properties
 			{
-				out << "property " << nameOfTypePly((*attrHandler)[0][0]) << " " << attrHandler->name() << "_0" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][1]) << " " << attrHandler->name() << "_1" << std::endl ;
-				out << "property " << nameOfTypePly((*attrHandler)[0][2]) << " " << attrHandler->name() << "_2" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][0]) << " " << (*attrHandler)->name() << "_0" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][1]) << " " << (*attrHandler)->name() << "_1" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][2]) << " " << (*attrHandler)->name() << "_2" << std::endl ;
 			}
 		}
 	}
@@ -281,9 +281,9 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3>
 	{
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<typename PFP::TVEC3 >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
-				if (attrHandler->isValid() && attrHandler->getOrbit() == VERTEX)
-					out << (*attrHandler)[vertices[i]] << std::endl ;
+			for (typename std::vector<typename PFP::TVEC3* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
+					out << (*(*attrHandler))[vertices[i]] << std::endl ;
 
 		// ascii faces
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
@@ -298,10 +298,10 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3>
 	{
 		// binary vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<typename PFP::TVEC3>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
-				if (attrHandler->isValid() && attrHandler->getOrbit() == VERTEX)
+			for (typename std::vector<typename PFP::TVEC3*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 				{
-					const typename PFP::VEC3& v = (*attrHandler)[vertices[i]] ;
+					const typename PFP::VEC3& v = (*(*attrHandler))[vertices[i]] ;
 					out.write((char*)(&(v[0])), sizeof(v)) ;
 				}
 
