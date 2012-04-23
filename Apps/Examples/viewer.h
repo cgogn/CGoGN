@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.unistra.fr/                                  *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -26,7 +26,7 @@
 
 #include "Utils/Qt/qtSimple.h"
 #include "ui_viewer.h"
-#include "Utils/Qt/qtui.h"
+#include "Utils/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
