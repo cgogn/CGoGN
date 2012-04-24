@@ -2075,12 +2075,6 @@ void get_binary_item(
   char *byte = (char *) &word ;
   int my_endianness = byte[0] ? PLY_BINARY_LE : PLY_BINARY_BE ;
 
-  if (my_endianness == PLY_BINARY_BE)
-	  printf("Big endian \n") ;
-  else
-	  printf("Little endian\n") ;
-
-
   switch (type) {
     case PLY_Int8:
     	fread (ptr, 1, 1, fp);
