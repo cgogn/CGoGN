@@ -308,7 +308,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 		// binary faces
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
 		{
-			unsigned char nbe = facesSize[i] ;
+			uint8_t nbe = facesSize[i] ;
 			out.write((char*)(&nbe), sizeof(unsigned char)) ;
 			out.write((char*)(&(facesIdx[i][0])), facesSize[i] * sizeof(facesIdx[i][0])) ;
 		}
@@ -527,7 +527,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 	out.close() ;
 	return true ;
 }
-
+/*
 template <typename PFP>
 bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
 {
@@ -803,7 +803,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 	out.close() ;
 	return true ;
 }
-
+*/
 
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good)

@@ -26,6 +26,7 @@
 #define __EXPORT_H__
 
 #include "Topology/generic/attributeHandler.h"
+#include <stdint.h>
 
 namespace CGoGN
 {
@@ -87,7 +88,7 @@ bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, ch
 * @param filename filename of ply file
 * @param position the position container
 * @return true
-*/
+*
 template <typename PFP>
 bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
@@ -102,7 +103,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 * @param filename filename of ply file
 * @param position the position container
 * @return true
-*/
+*
 template <typename PFP>
 bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
