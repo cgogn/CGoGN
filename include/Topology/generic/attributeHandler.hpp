@@ -58,7 +58,7 @@ template <typename T>
 AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
 	AttributeHandlerGen(m, false), m_attrib(amv)
 {
-	if(amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
+	if(m != NULL && amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
 	{
 		valid = true ;
 		registerInMap() ;

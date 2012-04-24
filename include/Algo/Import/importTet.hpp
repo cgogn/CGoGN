@@ -91,8 +91,8 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 		verticesID.push_back(id);
 	}
-	m_nbVertices = nbv;
 
+	m_nbVertices = nbv;
 	m_nbVolumes = nbt;
 
 	CGoGNout << "nb points = " << m_nbVertices  << " / nb tet = " << m_nbVolumes << CGoGNendl;
@@ -129,7 +129,6 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
 			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[2-j]]);
-//			foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
 			map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
 
 
@@ -149,7 +148,6 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[3]]);
-//		foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
 		map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
 
 

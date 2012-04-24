@@ -53,18 +53,15 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 		copyCell(EDGE, nd, d) ;
 	}
 
-//	if(isOrbitEmbedded(ORIENTED_FACE))
 	if(isOrbitEmbedded(FACE2))
 	{
 		Dart f = d;
 		do
 		{
 			Dart f1 = phi1(f) ;
-//			copyDartEmbedding(ORIENTED_FACE, f1, f);
+
 			copyDartEmbedding(FACE2, f1, f);
 			Dart e = phi3(f1);
-//			copyDartEmbedding(ORIENTED_FACE, phi1(e), e);
-//			copyDartEmbedding(FACE2, f1, f);
 			copyDartEmbedding(FACE2, phi1(e), e);
 			f = alpha2(f);
 		} while(f != d);
@@ -438,10 +435,14 @@ bool EmbeddedMap3::check()
 	{
 		if(isOrbitEmbedded(VERTEX))
 		{
-			if( getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha1(d)) ||
-					getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha2(d)) )
+			if( getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha1(d)))
 			{
-				std::cout << "Embedding Check : different embeddings on vertex" << std::endl ;
+				std::cout << "Embedding Check : different embeddings on vertex (alpha1(d) != d)" << std::endl ;
+				return false ;
+			}
+			if(getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha2(d)) )
+			{
+				std::cout << "Embedding Check : different embeddings on vertex (alpha2(d) != d)" << std::endl ;
 				return false ;
 			}
 		}

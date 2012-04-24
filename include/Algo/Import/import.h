@@ -43,28 +43,44 @@ namespace Import
 /**
 * import a mesh
 * @param map the map in which the function imports the mesh
-* @param filename (*.{trian,trianbgz,off,obj,ply})
-* @param positions table of vertices positions attribute
-* @param m a marker that will be set by the function. If closeObject=false the phi2 that have fixed point are marked, else the created darts of the boundary are marked.
-* @param kind what kind of mesh is the file (if none (-1) determined by filename extension) (cf enum in Mesh2Tables for other kind values)
-* @param closeObject a boolean indicating if the imported mesh should be closed
+* @param filename
+* @param attrNames attribute names
+* @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
 * @return a boolean indicating if import was successfull
 */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE, bool mergeCloseVertices=false);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
 /**
  * import a volumetric mesh
+ * @param map the map in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
+ * @return a boolean indicating if import was successfull
  */
-//template <typename PFP>
-//bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME);
-
-//template <typename PFP>
-//bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
-//
-
 template <typename PFP>
-bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE);
+bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
+
+/**
+ * import a mesh and extrud it
+ * @param map the map in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
+ * @return a boolean indicating if import was successfull
+ */
+template <typename PFP>
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+
+/**
+ * import a MOKA file
+ * @param gmap the gmap in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ */
+template <typename PFP>
+bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
 
 /*
@@ -80,6 +96,10 @@ template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 
+//template <typename PFP>
+//bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
+//
+
 } // namespace Import
 
 } // namespace Algo
@@ -87,6 +107,7 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 } // namespace CGoGN
 
 #include "Algo/Import/importMesh.hpp"
+#include "Algo/Import/importMoka.hpp"
 //#include "Algo/Import/importObjTex.hpp"
 #include "Algo/Import/importObjEle.hpp"
 #include "Algo/Import/importTet.hpp"

@@ -863,7 +863,7 @@ Filter<DIM>* Filter<DIM>::createGaussian(int radius, double sigma)
 		break;
 	case 2:
 		{
-			double tot=0.0;
+//			double tot=0.0;
 			double coef = 1.0/(sig2*M_PI);
 			for (int j=0; j< sz; ++j)
 				for (int i=0; i< sz; ++i)

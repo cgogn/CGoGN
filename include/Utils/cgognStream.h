@@ -188,7 +188,7 @@ Out&  Out::operator<< (const T& val)
 	if (m_out_mode & STDERR)
 		std::cerr << val;
 
-	if (m_out_mode && (FILEOUT|QTSTATUSBAR|QTCONSOLE|SSBUFFER))
+	if (m_out_mode & (FILEOUT|QTSTATUSBAR|QTCONSOLE|SSBUFFER))
 		m_buffer << val;
 
 	return *this;

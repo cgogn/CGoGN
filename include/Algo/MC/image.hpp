@@ -430,7 +430,8 @@ Image<DataType>* Image<DataType>::Blur3()
 		for(int y=1; y<tym; ++y)
 		{
 			*(newImg->getVoxelPtr(0,y,z)) = *(getVoxelPtr(0,y,z));
-			#pragma omp parallel for // OpenMP
+
+//			#pragma omp parallel for // OpenMP
 			for(int x=1; x<txm; ++x)
 			{
 				DataType* ori = getVoxelPtr(x,y,z);

@@ -253,10 +253,21 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
+	//! Compute the number of edges of the vertex of d on the boundary
+	/*!	@param d a dart
+	 */
+	unsigned int vertexDegreeOnBoundary(Dart d);
+
 	//! Tell if the vertex of d is on the boundary
 	/*! @param d a dart
 	 */
 	bool isBoundaryVertex(Dart d) ;
+
+	//! Find the dart of vertex that belong to the boundary
+	/*! return NIL if the vertex is not on the boundary
+	 *  @param d a dart
+	 */
+	Dart findBoundaryFaceOfVertex(Dart d) ;
 
 	//! Test if dart d and e belong to the same oriented edge
 	/*! @param d a dart
@@ -275,14 +286,14 @@ public:
 	 */
 	unsigned int edgeDegree(Dart d) ;
 
-	/**
-	 * tell if the edge of d is on the boundary of the map
+	//! Tell if the edge of d is on the boundary of the map
+	/*! @param d a dart
 	 */
 	bool isBoundaryEdge(Dart d) ;
 
-	/**
-	 * find the dart of edge that belong to the boundary
-	 * return NIL if the edge is not on the boundary
+	//! Find the dart of edge that belong to the boundary
+	/*! return NIL if the edge is not on the boundary
+	 *  @param d a dart
 	 */
 	Dart findBoundaryFaceOfEdge(Dart d) ;
 

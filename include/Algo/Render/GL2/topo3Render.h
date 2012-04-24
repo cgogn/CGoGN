@@ -302,7 +302,6 @@ public:
 	template<typename PFP>
 	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
 
-
 	/**
 	 * render to svg struct
 	 */

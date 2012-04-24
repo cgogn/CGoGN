@@ -47,9 +47,9 @@ ImplicitHierarchicalMap3::ImplicitHierarchicalMap3() : m_curLevel(0), m_maxLevel
 
 ImplicitHierarchicalMap3::~ImplicitHierarchicalMap3()
 {
-	Map3::removeAttribute(m_edgeId) ;
-	Map3::removeAttribute(m_faceId) ;
-	Map3::removeAttribute(m_dartLevel) ;
+	removeAttribute(m_edgeId) ;
+	removeAttribute(m_faceId) ;
+	removeAttribute(m_dartLevel) ;
 }
 
 void ImplicitHierarchicalMap3::init()
@@ -569,7 +569,6 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 		//
 		if(m_dartLevel[old] < m_dartLevel[oldest])
 				oldest = old ;
-
 
 		//
 		// add all face neighbours to the table
