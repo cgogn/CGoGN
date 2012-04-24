@@ -1642,9 +1642,11 @@ void binary_get_element(PlyFile *plyfile, char *elem_ptr)
     else if (prop->is_list == PLY_STRING) {     /* string */
       int len;
       char *str;
-      fread (&len, sizeof(int), 1, fp);
+      if (fread (&len, sizeof(int), 1, fp) != sizeof(int))
+    		  fprintf (stderr, "binary_get_element: problem occured in fread\n");
       str = (char *) myalloc (len);
-      fread (str, len, 1, fp);
+      if (fread (str, len, 1, fp) != len)
+    		  fprintf (stderr, "binary_get_element: problem occured in fread\n");
       if (store_it) {
 	char **str_ptr;
         item = elem_data + prop->offset;
@@ -2077,13 +2079,15 @@ void get_binary_item(
 
   switch (type) {
     case PLY_Int8:
-    	fread (ptr, 1, 1, fp);
+    	if (fread (ptr, 1, 1, fp) != 1)
+    		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	*int_val = *((char *) ptr);
     	*uint_val = *int_val;
     	*double_val = *int_val;
     	break;
     case PLY_Uint8:
-    	fread (ptr, 1, 1, fp);
+    	if (fread (ptr, 1, 1, fp) != 1)
+    		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	*uint_val = *((unsigned char *) ptr);
     	*int_val = *uint_val;
       	*double_val = *uint_val;
@@ -2091,11 +2095,14 @@ void get_binary_item(
     case PLY_Int16:
     	if (my_endianness != file_type)
     	{
-    		fread (ptr+1, 1, 1, fp);
-    		fread (ptr+0, 1, 1, fp);
+        	if (fread (ptr+1, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	}
     	else
-    		fread (ptr, 2, 1, fp);
+        	if (fread (ptr, 2, 1, fp) != 2)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	*int_val = *((short*) ptr) ;
     	*uint_val = *int_val;
     	*double_val = *int_val;
@@ -2103,11 +2110,14 @@ void get_binary_item(
     case PLY_Uint16:
     	if (my_endianness != file_type)
     	{
-    		fread (ptr+1, 1, 1, fp);
-    		fread (ptr+0, 1, 1, fp);
+        	if (fread (ptr+1, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	}
     	else
-    		fread (ptr, 2, 1, fp);
+        	if (fread (ptr, 2, 1, fp) != 2)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	*uint_val = *((unsigned short*) ptr) ;
     	*int_val = *uint_val;
     	*double_val = *uint_val;
@@ -2115,13 +2125,18 @@ void get_binary_item(
     case PLY_Int32:
         if (my_endianness != file_type)
         {
-            fread (ptr+3, 1, 1, fp);
-            fread (ptr+2, 1, 1, fp);
-            fread (ptr+1, 1, 1, fp);
-            fread (ptr+0, 1, 1, fp);
+        	if (fread (ptr+3, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+2, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+1, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-      	  fread (ptr, 4, 1, fp);
+        	if (fread (ptr, 4, 1, fp) != 4)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *int_val = *((int*) ptr) ;
         *uint_val = *int_val;
         *double_val = *int_val;
@@ -2129,13 +2144,18 @@ void get_binary_item(
     case PLY_Uint32:
         if (my_endianness != file_type)
         {
-            fread (ptr+3, 1, 1, fp);
-            fread (ptr+2, 1, 1, fp);
-            fread (ptr+1, 1, 1, fp);
-            fread (ptr+0, 1, 1, fp);
+        	if (fread (ptr+3, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+2, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+1, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-      	  fread (ptr, 4, 1, fp);
+        	if (fread (ptr, 4, 1, fp) != 4)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *uint_val = *((unsigned int*) ptr) ;
         *int_val = *uint_val;
         *double_val = *uint_val;
@@ -2143,13 +2163,18 @@ void get_binary_item(
     case PLY_Float32:
         if (my_endianness != file_type)
         {
-            fread (ptr+3, 1, 1, fp);
-            fread (ptr+2, 1, 1, fp);
-            fread (ptr+1, 1, 1, fp);
-            fread (ptr+0, 1, 1, fp);
+        	if (fread (ptr+3, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+2, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+1, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-        	fread (ptr, 4, 1, fp);
+        	if (fread (ptr, 4, 1, fp) != 4)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *double_val = *((float*) ptr) ;
         *int_val = *double_val;
         *uint_val = *double_val;
@@ -2157,17 +2182,26 @@ void get_binary_item(
     case PLY_Float64:
     	if (my_endianness != file_type)
         {
-    		fread (ptr+7, 1, 1, fp);
-    		fread (ptr+6, 1, 1, fp);
-    		fread (ptr+5, 1, 1, fp);
-    	    fread (ptr+4, 1, 1, fp);
-    	    fread (ptr+3, 1, 1, fp);
-    	    fread (ptr+2, 1, 1, fp);
-    	    fread (ptr+1, 1, 1, fp);
-    	    fread (ptr+0, 1, 1, fp);
+        	if (fread (ptr+7, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+6, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+5, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+4, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+3, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+2, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr+1, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
+        	if (fread (ptr, 1, 1, fp) != 1)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-        	fread (ptr, 8, 1, fp);
+        	if (fread (ptr, 8, 1, fp) != 8)
+        		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
       *double_val = *((double*) ptr) ;
       *int_val = *double_val;
       *uint_val = *double_val;
