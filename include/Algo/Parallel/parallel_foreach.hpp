@@ -326,8 +326,8 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<
 template <typename PFP>
 void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
 {
-	std::vector<Dart> vd[nbth];
-	boost::thread* threads[nbth];
+	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
+	boost::thread** threads = new boost::thread*[nbth];
 
 	Dart d=map.begin();
 
@@ -370,7 +370,7 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,0));
 	}
 	// and continue to traverse the map
-	std::vector<Dart> tempo[nbth];
+	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
 	for (unsigned int i=0; i<nbth; ++i)
 		tempo[i].reserve(szbuff);
 
@@ -406,6 +406,10 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
 		threads[i]->join();
 		delete threads[i];
 	}
+	
+	delete vd;
+	delete threads;
+	delete tempo;
 }
 
 

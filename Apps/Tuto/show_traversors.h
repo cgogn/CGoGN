@@ -56,7 +56,7 @@
 
 #include "ui_show_traversors.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/Qt/qtui.h"
+#include "Utils/qtui.h"
 
 
 using namespace CGoGN ;

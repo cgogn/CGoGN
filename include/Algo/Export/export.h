@@ -26,6 +26,7 @@
 #define __EXPORT_H__
 
 #include "Topology/generic/attributeHandler.h"
+#include <stdint.h>
 
 namespace CGoGN
 {
@@ -39,11 +40,24 @@ namespace Export
 /**
 * export the map into a PLY file
 * @param the_map map to be exported
+* @param position the position container
 * @param filename filename of ply file
+* @param binary write in binary mode
 * @return true
 */
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
+
+/**
+* export the map into a PLY file
+* @param the_map map to be exported
+* @param vertexAttrNames the vertex attribute names
+* @param filename filename of ply file
+* @param binary write in binary mode
+* @return true
+*/
+template <typename PFP>
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3* >& attributeHandlers, const char* filename, const bool binary, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a OFF file
@@ -74,7 +88,7 @@ bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, ch
 * @param filename filename of ply file
 * @param position the position container
 * @return true
-*/
+*
 template <typename PFP>
 bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
@@ -89,7 +103,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 * @param filename filename of ply file
 * @param position the position container
 * @return true
-*/
+*
 template <typename PFP>
 bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 

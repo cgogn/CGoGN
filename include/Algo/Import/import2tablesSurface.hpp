@@ -55,7 +55,7 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 	if ((filename.rfind(".meshbin")!=std::string::npos) || (filename.rfind(".MESHBIN")!=std::string::npos))
 		return ImportSurfacique::MESHBIN;
 
-	if ((filename.rfind(".plyptm")!=std::string::npos) || (filename.rfind(".PLYGEN")!=std::string::npos))
+/*	if ((filename.rfind(".plyptm")!=std::string::npos) || (filename.rfind(".PLYGEN")!=std::string::npos))
 		return ImportSurfacique::PLYPTM;
 
 	if ((filename.rfind(".plyPTMextBin")!=std::string::npos) || (filename.rfind(".plySHrealBin")!=std::string::npos))
@@ -63,7 +63,7 @@ ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::stri
 
 	if ((filename.rfind(".plyPTMext")!=std::string::npos) || (filename.rfind(".plySHreal")!=std::string::npos))
 		return ImportSurfacique::PLYSLFgeneric;
-
+*/
 	if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
 		return ImportSurfacique::PLY;
 
@@ -108,7 +108,7 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 		CGoGNout << "TYPE: PLY" << CGoGNendl;
 		return importPly(filename, attrNames);
 		break;
-	case ImportSurfacique::PLYPTM:
+/*	case ImportSurfacique::PLYPTM:
 		CGoGNout << "TYPE: PLYPTM" << CGoGNendl;
 		return importPlyPTM(filename, attrNames);
 		break;
@@ -120,6 +120,7 @@ bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector
 		CGoGNout << "TYPE: PLYSLFgenericBin" << CGoGNendl;
 		return importPlySLFgenericBin(filename, attrNames);
 		break;
+*/
 	case ImportSurfacique::OBJ:
 		CGoGNout << "TYPE: OBJ" << CGoGNendl;
 		return importObj(filename, attrNames);
@@ -651,9 +652,9 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
  * @param attrNames reference that will be filled with the attribute names
  * the number of attrNames returned depends on the degree of the polynomials / level of the SH :
  *  - 1 attrName for geometric position (VEC3) : name = "position" ;
- *  - 3 attrNames for local frame (3xVEC3) : names are "Frame_T" (Tangent), "Frame_B" (Binormal) and "Frame_N" (Normal) ;
+ *  - 3 attrNames for local frame (3xVEC3) : names are "frameT" (Tangent), "frameB" (Binormal) and "frameN" (Normal) ;
  *  - N attrNames for the function coefficients (NxVEC3) : N RGB coefficients being successively the constants, the linears (v then u), the quadratics, etc. :  : a0 + a1*v + a2*u + a3*u*v + a4*v^2 + a5*u^2.
- *  Their names are : "SLFcoefs_<i>" (where <i> is a number from 0 to N-1).
+ *  Their names are : "SLFcoefs<i>" (where <i> is a number from 0 to N-1).
  * N = 1 for constant polynomial,
  * N = 3 for linear polynomial,
  * N = 6 for quadratic polynomial,
@@ -664,7 +665,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
  * ...
  *  - K remaining attrNames named "remainderNo<k>" where k is an integer from 0 to K-1.
  * @return bool : success.
- */
+ *
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames)
 {
@@ -707,13 +708,13 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 
 		if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
 			position = true ;
-		else if (tag == std::string("tx") || tag == std::string("ty") || tag == std::string("tz"))
+		else if (tag == std::string("FrameT_0") || tag == std::string("FrameT_1") || tag == std::string("FrameT_2"))
 			tangent = true ;
-		else if (tag == std::string("bx") || tag == std::string("by") || tag == std::string("bz"))
+		else if (tag == std::string("FrameB_0") || tag == std::string("FrameB_1") || tag == std::string("FrameB_2"))
 			binormal = true ;
-		else if (tag == std::string("nx") || tag == std::string("ny") || tag == std::string("nz"))
+		else if (tag == std::string("FrameN_0") || tag == std::string("FrameN_1") || tag == std::string("FrameN_2"))
 			normal = true ;
-		if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
+		if ((tag.substr(3,5) == std::string("coefs") && tag.substr(8,1) == std::string("_")) || (tag.substr(2,5) == std::string("coefs") && tag.substr(7,1) == std::string("_")))
 			++nbCoefs ;
 	} while (tag != std::string("face")) ;
 	unsigned int nbRemainders = nbProps ;		// # remaining properties
@@ -734,9 +735,9 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 	attrNames.push_back(positions.name()) ;
 
 	AttributeHandler<typename PFP::VEC3> *frame = new AttributeHandler<typename PFP::VEC3>[3] ;
-	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_T") ; // Tangent
-	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_B") ; // Bitangent
-	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_N") ; // Normal
+	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameT") ; // Tangent
+	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameB") ; // Bitangent
+	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameN") ; // Normal
 	attrNames.push_back(frame[0].name()) ;
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
@@ -745,7 +746,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
 	{
 		std::stringstream name ;
-		name << "SLFcoefs_" << i ;
+		name << "SLFcoefs" << i ;
 		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
 		attrNames.push_back(SLFcoefs[i].name()) ;
 	}
@@ -853,13 +854,13 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 
 		if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
 			position = true ;
-		else if (tag == std::string("tx") || tag == std::string("ty") || tag == std::string("tz"))
+		else if (tag == std::string("FrameT_0") || tag == std::string("FrameT_1") || tag == std::string("FrameT_2"))
 			tangent = true ;
-		else if (tag == std::string("bx") || tag == std::string("by") || tag == std::string("bz"))
+		else if (tag == std::string("FrameB_0") || tag == std::string("FrameB_1") || tag == std::string("FrameB_2"))
 			binormal = true ;
-		else if (tag == std::string("nx") || tag == std::string("ny") || tag == std::string("nz"))
+		else if (tag == std::string("FrameN_0") || tag == std::string("FrameN_1") || tag == std::string("FrameN_2"))
 			normal = true ;
-		if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
+		if ((tag.substr(3,5) == std::string("coefs") && tag.substr(8,1) == std::string("_")) || (tag.substr(2,5) == std::string("coefs") && tag.substr(7,1) == std::string("_")))
 			++nbCoefs ;
 	} while (tag != std::string("face")) ;
 	unsigned int nbRemainders = nbProps ;		// # remaining properties
@@ -887,9 +888,9 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	attrNames.push_back(positions.name()) ;
 
 	AttributeHandler<typename PFP::VEC3> *frame = new AttributeHandler<typename PFP::VEC3>[3] ;
-	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_T") ; // Tangent
-	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_B") ; // Bitangent
-	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_N") ; // Normal
+	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameT") ; // Tangent
+	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameB") ; // Bitangent
+	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameN") ; // Normal
 	attrNames.push_back(frame[0].name()) ;
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
@@ -898,7 +899,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
 	{
 		std::stringstream name ;
-		name << "SLFcoefs_" << i ;
+		name << "SLFcoefs" << i ;
 		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
 		attrNames.push_back(SLFcoefs[i].name()) ;
 	}
@@ -973,7 +974,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
  *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
  *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the quadratic members, the linears and the constants (u then v) : a*u^2 + b*v^2 + c*uv + d*u + e*v +f.
   * @return bool : success.
- */
+ *
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames)
 {
@@ -1099,7 +1100,7 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 	fp.close();
 	return true;
 }
-
+*/
 
 
 template <typename PFP>

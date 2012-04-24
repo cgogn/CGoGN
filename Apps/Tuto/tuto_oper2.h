@@ -40,7 +40,7 @@
 
 
 #include "ui_tuto_oper2.h"
-#include "Utils/Qt/qtui.h"
+#include "Utils/qtui.h"
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/cgognStream.h"
 

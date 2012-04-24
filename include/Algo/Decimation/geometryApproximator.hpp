@@ -207,7 +207,7 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 		Dart d2 = m.phi2(m.phi_1(d)) ;
 		Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
-		VEC3 v2 = this->m_attrV[dd] ;
+		// VEC3 v2 = this->m_attrV[dd] ;
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
@@ -297,9 +297,9 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 
 	// get some darts
 	Dart dd = m.phi2(d) ;
-	Dart d1 = m.phi2(m.phi1(d)) ;
+	// Dart d1 = m.phi2(m.phi1(d)) ;
 	Dart d2 = m.phi2(m.phi_1(d)) ;
-	Dart dd1 = m.phi2(m.phi1(dd)) ;
+	// Dart dd1 = m.phi2(m.phi1(dd)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
 	// get the contracted edge vertices positions

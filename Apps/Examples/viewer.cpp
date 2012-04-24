@@ -234,7 +234,11 @@ void Viewer::exportMesh(std::string& filename)
 	if (extension == std::string(".off"))
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
-		Algo::Export::exportPLY<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	{
+		std::vector<typename PFP::TVEC3* > attributes ;
+		attributes.push_back(&position) ;
+		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), true, allDarts) ;
+	}
 	else if (extension == std::string(".map"))
 		myMap.saveMapBin(filename) ;
 	else
