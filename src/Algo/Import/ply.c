@@ -2101,7 +2101,7 @@ void get_binary_item(
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	}
     	else
-        	if (fread (ptr, 2, 1, fp) != 2)
+        	if (fread (ptr, 1, 2, fp) != 2)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	*int_val = *((short*) ptr) ;
     	*uint_val = *int_val;
@@ -2116,7 +2116,7 @@ void get_binary_item(
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	}
     	else
-        	if (fread (ptr, 2, 1, fp) != 2)
+        	if (fread (ptr, 1, 2, fp) != 2)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
     	*uint_val = *((unsigned short*) ptr) ;
     	*int_val = *uint_val;
@@ -2135,7 +2135,7 @@ void get_binary_item(
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-        	if (fread (ptr, 4, 1, fp) != 4)
+        	if (fread (ptr, 1, 4, fp) != 4)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *int_val = *((int*) ptr) ;
         *uint_val = *int_val;
@@ -2154,7 +2154,7 @@ void get_binary_item(
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-        	if (fread (ptr, 4, 1, fp) != 4)
+        	if (fread (ptr, 1, 4, fp) != 4)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *uint_val = *((unsigned int*) ptr) ;
         *int_val = *uint_val;
@@ -2173,7 +2173,7 @@ void get_binary_item(
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-        	if (fread (ptr, 4, 1, fp) != 4)
+        	if (fread (ptr, 1, 4, fp) != 4)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         *double_val = *((float*) ptr) ;
         *int_val = *double_val;
@@ -2200,7 +2200,7 @@ void get_binary_item(
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
         }
         else
-        	if (fread (ptr, 8, 1, fp) != 8)
+        	if (fread (ptr, 1, 8, fp) != 8)
         		fprintf (stderr, "get_binary_item: problem occured in fread in switch(%d)\n", type);
       *double_val = *((double*) ptr) ;
       *int_val = *double_val;
