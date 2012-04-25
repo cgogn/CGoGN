@@ -665,305 +665,305 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
  * ...
  *  - K remaining attrNames named "remainderNo<k>" where k is an integer from 0 to K-1.
  * @return bool : success.
- *
-template <typename PFP>
-bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames)
-{
-	// Open file
-	std::ifstream fp(filename.c_str(), std::ios::in) ;
-	if (!fp.good())
-	{
-		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
-		return false ;
-	}
+ */
+//template <typename PFP>
+//bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames)
+//{
+//	// Open file
+//	std::ifstream fp(filename.c_str(), std::ios::in) ;
+//	if (!fp.good())
+//	{
+//		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+//		return false ;
+//	}
+//
+//	// Read quantities : #vertices, #faces, #properties, degree of polynomials
+//    std::string tag ;
+//
+//    fp >> tag;
+//	if (tag != std::string("ply")) // verify file type
+//	{
+//		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
+//		return false ;
+//	}
+//
+//	do // go to #vertices
+//	{
+//		fp >> tag ;
+//	} while (tag != std::string("vertex")) ;
+//	unsigned int nbVertices ;
+//	fp >> nbVertices ; // Read #vertices
+//
+//	bool position = false ;
+//	bool tangent = false ;
+//	bool binormal = false ;
+//	bool normal = false ;
+//	unsigned int nbProps = 0 ;			// # properties
+//	unsigned int nbCoefs = 0 ; 	// # coefficients per polynomial
+//	do // go to #faces and count #properties
+//	{
+//		fp >> tag ;
+//		if (tag == std::string("property"))
+//			++nbProps ;
+//
+//		if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
+//			position = true ;
+//		else if (tag == std::string("FrameT_0") || tag == std::string("FrameT_1") || tag == std::string("FrameT_2"))
+//			tangent = true ;
+//		else if (tag == std::string("FrameB_0") || tag == std::string("FrameB_1") || tag == std::string("FrameB_2"))
+//			binormal = true ;
+//		else if (tag == std::string("FrameN_0") || tag == std::string("FrameN_1") || tag == std::string("FrameN_2"))
+//			normal = true ;
+//		if ((tag.substr(3,5) == std::string("coefs") && tag.substr(8,1) == std::string("_")) || (tag.substr(2,5) == std::string("coefs") && tag.substr(7,1) == std::string("_")))
+//			++nbCoefs ;
+//	} while (tag != std::string("face")) ;
+//	unsigned int nbRemainders = nbProps ;		// # remaining properties
+//	nbRemainders -= nbCoefs + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
+//	nbCoefs /= 3 ;
+//
+//	fp >> m_nbFaces ; // Read #vertices
+//
+//	do // go to end of header
+//	{
+//		fp >> tag ;
+//	} while (tag != std::string("end_header")) ;
+//
+//	// Define containers
+//	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+//	if (!positions.isValid())
+//		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+//	attrNames.push_back(positions.name()) ;
+//
+//	AttributeHandler<typename PFP::VEC3> *frame = new AttributeHandler<typename PFP::VEC3>[3] ;
+//	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameT") ; // Tangent
+//	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameB") ; // Bitangent
+//	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameN") ; // Normal
+//	attrNames.push_back(frame[0].name()) ;
+//	attrNames.push_back(frame[1].name()) ;
+//	attrNames.push_back(frame[2].name()) ;
+//
+//	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefs] ;
+//	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
+//	{
+//		std::stringstream name ;
+//		name << "SLFcoefs" << i ;
+//		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
+//		attrNames.push_back(SLFcoefs[i].name()) ;
+//	}
+//
+//	AttributeHandler<typename PFP::REAL> *remainders = new AttributeHandler<typename PFP::REAL>[nbRemainders] ;
+//	for (unsigned int i = 0 ; i < nbRemainders ; ++i)
+//	{
+//		std::stringstream name ;
+//		name << "remainderNo" << i ;
+//		remainders[i] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, name.str()) ;
+//		attrNames.push_back(remainders[i].name()) ;
+//	}
+//
+//	// Read vertices
+//	std::vector<unsigned int> verticesID ;
+//	verticesID.reserve(nbVertices) ;
+//
+//	float* properties = new float[nbProps] ;
+//	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
+//	for (unsigned int i = 0 ; i < nbVertices ; ++i) // Read and store properties for current vertex
+//	{
+//		unsigned int id = container.insertLine() ;
+//		verticesID.push_back(id) ;
+//
+//		for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
+//			fp >> properties[j] ;
+//
+//		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
+//		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
+//			for (unsigned int l = 0 ; l < 3 ; ++l)
+//				frame[k][id][l] = properties[3+(3*k+l)] ;
+//		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
+//			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
+//				SLFcoefs[l][id][k] = properties[12+(nbCoefs*k+l)] ;
+//		unsigned int cur = 12+3*nbCoefs ;
+//		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
+//			remainders[k][id] = properties[cur + k] ;
+//	}
+//	m_nbVertices = verticesID.size() ;
+//	delete[] properties ;
+//
+//	// Read faces index
+//	m_nbEdges.reserve(m_nbFaces) ;
+//	m_emb.reserve(3 * m_nbFaces) ;
+//	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
+//	{
+//		// read the indices of vertices for current face
+//		unsigned int nbEdgesForFace ;
+//		fp >> nbEdgesForFace ;
+//		m_nbEdges.push_back(nbEdgesForFace);
+//
+//		unsigned int vertexID ;
+//		for (unsigned int j=0 ; j < nbEdgesForFace ; ++j)
+//		{
+//			fp >> vertexID ;
+//			m_emb.push_back(verticesID[vertexID]);
+//		}
+//	}
+//
+//	// Close file
+//	fp.close() ;
+//
+//	return true ;
+//}
 
-	// Read quantities : #vertices, #faces, #properties, degree of polynomials
-    std::string tag ;
-
-    fp >> tag;
-	if (tag != std::string("ply")) // verify file type
-	{
-		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
-		return false ;
-	}
-
-	do // go to #vertices
-	{
-		fp >> tag ;
-	} while (tag != std::string("vertex")) ;
-	unsigned int nbVertices ;
-	fp >> nbVertices ; // Read #vertices
-
-	bool position = false ;
-	bool tangent = false ;
-	bool binormal = false ;
-	bool normal = false ;
-	unsigned int nbProps = 0 ;			// # properties
-	unsigned int nbCoefs = 0 ; 	// # coefficients per polynomial
-	do // go to #faces and count #properties
-	{
-		fp >> tag ;
-		if (tag == std::string("property"))
-			++nbProps ;
-
-		if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
-			position = true ;
-		else if (tag == std::string("FrameT_0") || tag == std::string("FrameT_1") || tag == std::string("FrameT_2"))
-			tangent = true ;
-		else if (tag == std::string("FrameB_0") || tag == std::string("FrameB_1") || tag == std::string("FrameB_2"))
-			binormal = true ;
-		else if (tag == std::string("FrameN_0") || tag == std::string("FrameN_1") || tag == std::string("FrameN_2"))
-			normal = true ;
-		if ((tag.substr(3,5) == std::string("coefs") && tag.substr(8,1) == std::string("_")) || (tag.substr(2,5) == std::string("coefs") && tag.substr(7,1) == std::string("_")))
-			++nbCoefs ;
-	} while (tag != std::string("face")) ;
-	unsigned int nbRemainders = nbProps ;		// # remaining properties
-	nbRemainders -= nbCoefs + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
-	nbCoefs /= 3 ;
-
-	fp >> m_nbFaces ; // Read #vertices
-
-	do // go to end of header
-	{
-		fp >> tag ;
-	} while (tag != std::string("end_header")) ;
-
-	// Define containers
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-	if (!positions.isValid())
-		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-	attrNames.push_back(positions.name()) ;
-
-	AttributeHandler<typename PFP::VEC3> *frame = new AttributeHandler<typename PFP::VEC3>[3] ;
-	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameT") ; // Tangent
-	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameB") ; // Bitangent
-	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameN") ; // Normal
-	attrNames.push_back(frame[0].name()) ;
-	attrNames.push_back(frame[1].name()) ;
-	attrNames.push_back(frame[2].name()) ;
-
-	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefs] ;
-	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
-	{
-		std::stringstream name ;
-		name << "SLFcoefs" << i ;
-		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
-		attrNames.push_back(SLFcoefs[i].name()) ;
-	}
-
-	AttributeHandler<typename PFP::REAL> *remainders = new AttributeHandler<typename PFP::REAL>[nbRemainders] ;
-	for (unsigned int i = 0 ; i < nbRemainders ; ++i)
-	{
-		std::stringstream name ;
-		name << "remainderNo" << i ;
-		remainders[i] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, name.str()) ;
-		attrNames.push_back(remainders[i].name()) ;
-	}
-
-	// Read vertices
-	std::vector<unsigned int> verticesID ;
-	verticesID.reserve(nbVertices) ;
-
-	float* properties = new float[nbProps] ;
-	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
-	for (unsigned int i = 0 ; i < nbVertices ; ++i) // Read and store properties for current vertex
-	{
-		unsigned int id = container.insertLine() ;
-		verticesID.push_back(id) ;
-
-		for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
-			fp >> properties[j] ;
-
-		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
-		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
-			for (unsigned int l = 0 ; l < 3 ; ++l)
-				frame[k][id][l] = properties[3+(3*k+l)] ;
-		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
-			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
-				SLFcoefs[l][id][k] = properties[12+(nbCoefs*k+l)] ;
-		unsigned int cur = 12+3*nbCoefs ;
-		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
-			remainders[k][id] = properties[cur + k] ;
-	}
-	m_nbVertices = verticesID.size() ;
-	delete[] properties ;
-
-	// Read faces index
-	m_nbEdges.reserve(m_nbFaces) ;
-	m_emb.reserve(3 * m_nbFaces) ;
-	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
-	{
-		// read the indices of vertices for current face
-		unsigned int nbEdgesForFace ;
-		fp >> nbEdgesForFace ;
-		m_nbEdges.push_back(nbEdgesForFace);
-
-		unsigned int vertexID ;
-		for (unsigned int j=0 ; j < nbEdgesForFace ; ++j)
-		{
-			fp >> vertexID ;
-			m_emb.push_back(verticesID[vertexID]);
-		}
-	}
-
-	// Close file
-	fp.close() ;
-
-	return true ;
-}
-
-template <typename PFP>
-bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames)
-{
-	// Open file
-	std::ifstream fp(filename.c_str(), std::ios::in | std::ios::binary) ;
-	if (!fp.good())
-	{
-		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
-		return false ;
-	}
-
-	// Read quantities : #vertices, #faces, #properties, degree of polynomials
-    std::string tag ;
-
-    fp >> tag;
-	if (tag != std::string("ply")) // verify file type
-	{
-		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
-		return false ;
-	}
-
-	do // go to #vertices
-	{
-		fp >> tag ;
-	} while (tag != std::string("vertex")) ;
-	unsigned int nbVertices ;
-	fp >> nbVertices ; // Read #vertices
-
-	bool position = false ;
-	bool tangent = false ;
-	bool binormal = false ;
-	bool normal = false ;
-	unsigned int nbProps = 0 ;			// # properties
-	unsigned int nbCoefs = 0 ; 	// # coefficients per polynomial
-	do // go to #faces and count #properties
-	{
-		fp >> tag ;
-		if (tag == std::string("property"))
-			++nbProps ;
-
-		if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
-			position = true ;
-		else if (tag == std::string("FrameT_0") || tag == std::string("FrameT_1") || tag == std::string("FrameT_2"))
-			tangent = true ;
-		else if (tag == std::string("FrameB_0") || tag == std::string("FrameB_1") || tag == std::string("FrameB_2"))
-			binormal = true ;
-		else if (tag == std::string("FrameN_0") || tag == std::string("FrameN_1") || tag == std::string("FrameN_2"))
-			normal = true ;
-		if ((tag.substr(3,5) == std::string("coefs") && tag.substr(8,1) == std::string("_")) || (tag.substr(2,5) == std::string("coefs") && tag.substr(7,1) == std::string("_")))
-			++nbCoefs ;
-	} while (tag != std::string("face")) ;
-	unsigned int nbRemainders = nbProps ;		// # remaining properties
-	nbRemainders -= nbCoefs + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
-	nbCoefs /= 3 ;
-
-	fp >> m_nbFaces ; // Read #vertices
-
-	do // go to end of header
-	{
-		fp >> tag ;
-	} while (tag != std::string("end_header")) ;
-
-	char* endline = new char[1] ;
-	fp.read(endline, sizeof(char)) ;
-	if (*endline == '\r') // for windows
-		fp.read(endline, sizeof(char)) ;
-	assert(*endline == '\n') ;
-	delete endline ;
-
-	// Define containers
-	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-	if (!positions.isValid())
-		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-	attrNames.push_back(positions.name()) ;
-
-	AttributeHandler<typename PFP::VEC3> *frame = new AttributeHandler<typename PFP::VEC3>[3] ;
-	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameT") ; // Tangent
-	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameB") ; // Bitangent
-	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameN") ; // Normal
-	attrNames.push_back(frame[0].name()) ;
-	attrNames.push_back(frame[1].name()) ;
-	attrNames.push_back(frame[2].name()) ;
-
-	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefs] ;
-	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
-	{
-		std::stringstream name ;
-		name << "SLFcoefs" << i ;
-		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
-		attrNames.push_back(SLFcoefs[i].name()) ;
-	}
-
-	AttributeHandler<typename PFP::REAL> *remainders = new AttributeHandler<typename PFP::REAL>[nbRemainders] ;
-	for (unsigned int i = 0 ; i < nbRemainders ; ++i)
-	{
-		std::stringstream name ;
-		name << "remainderNo" << i ;
-		remainders[i] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, name.str()) ;
-		attrNames.push_back(remainders[i].name()) ;
-	}
-
-	// Read vertices
-	std::vector<unsigned int> verticesID ;
-	verticesID.reserve(nbVertices) ;
-
-	float* properties = new float[nbProps] ;
-	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
-	for (unsigned int i = 0 ; i < nbVertices ; ++i) // Read and store properties for current vertex
-	{
-		unsigned int id = container.insertLine() ;
-		verticesID.push_back(id) ;
-
-		// for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
-		fp.read((char*)properties,nbProps * sizeof(float)) ;
-
-		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
-		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
-			for (unsigned int l = 0 ; l < 3 ; ++l)
-				frame[k][id][l] = (typename PFP::REAL)(properties[3+(3*k+l)]) ;
-		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
-			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
-				SLFcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(nbCoefs*k+l)]) ;
-		unsigned int cur = 12+3*nbCoefs ;
-		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
-			remainders[k][id] = (typename PFP::REAL)(properties[cur + k]) ;
-	}
-	m_nbVertices = verticesID.size() ;
-	delete[] properties ;
-
-	// Read faces index
-	m_nbEdges.reserve(m_nbFaces) ;
-	m_emb.reserve(3 * m_nbFaces) ;
-	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
-	{
-		// read the indices of vertices for current face
-		unsigned int nbEdgesForFace ;
-		fp.read((char*)&(nbEdgesForFace), sizeof(unsigned int)) ;
-		m_nbEdges.push_back(nbEdgesForFace);
-
-		unsigned int vertexID ;
-		for (unsigned int j=0 ; j < nbEdgesForFace ; ++j)
-		{
-			fp.read((char*)&vertexID, sizeof(unsigned int)) ;
-			m_emb.push_back(verticesID[vertexID]);
-		}
-	}
-
-	// Close file
-	fp.close() ;
-
-	return true ;
-}
+//template <typename PFP>
+//bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames)
+//{
+//	// Open file
+//	std::ifstream fp(filename.c_str(), std::ios::in | std::ios::binary) ;
+//	if (!fp.good())
+//	{
+//		CGoGNerr << "Unable to open file " << filename << CGoGNendl ;
+//		return false ;
+//	}
+//
+//	// Read quantities : #vertices, #faces, #properties, degree of polynomials
+//    std::string tag ;
+//
+//    fp >> tag;
+//	if (tag != std::string("ply")) // verify file type
+//	{
+//		CGoGNerr << filename << " is not a ply file !" <<  CGoGNout ;
+//		return false ;
+//	}
+//
+//	do // go to #vertices
+//	{
+//		fp >> tag ;
+//	} while (tag != std::string("vertex")) ;
+//	unsigned int nbVertices ;
+//	fp >> nbVertices ; // Read #vertices
+//
+//	bool position = false ;
+//	bool tangent = false ;
+//	bool binormal = false ;
+//	bool normal = false ;
+//	unsigned int nbProps = 0 ;			// # properties
+//	unsigned int nbCoefs = 0 ; 	// # coefficients per polynomial
+//	do // go to #faces and count #properties
+//	{
+//		fp >> tag ;
+//		if (tag == std::string("property"))
+//			++nbProps ;
+//
+//		if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
+//			position = true ;
+//		else if (tag == std::string("FrameT_0") || tag == std::string("FrameT_1") || tag == std::string("FrameT_2"))
+//			tangent = true ;
+//		else if (tag == std::string("FrameB_0") || tag == std::string("FrameB_1") || tag == std::string("FrameB_2"))
+//			binormal = true ;
+//		else if (tag == std::string("FrameN_0") || tag == std::string("FrameN_1") || tag == std::string("FrameN_2"))
+//			normal = true ;
+//		if ((tag.substr(3,5) == std::string("coefs") && tag.substr(8,1) == std::string("_")) || (tag.substr(2,5) == std::string("coefs") && tag.substr(7,1) == std::string("_")))
+//			++nbCoefs ;
+//	} while (tag != std::string("face")) ;
+//	unsigned int nbRemainders = nbProps ;		// # remaining properties
+//	nbRemainders -= nbCoefs + 3*(position==true) + 3*(tangent==true) + 3*(binormal==true) + 3*(normal==true) ;
+//	nbCoefs /= 3 ;
+//
+//	fp >> m_nbFaces ; // Read #vertices
+//
+//	do // go to end of header
+//	{
+//		fp >> tag ;
+//	} while (tag != std::string("end_header")) ;
+//
+//	char* endline = new char[1] ;
+//	fp.read(endline, sizeof(char)) ;
+//	if (*endline == '\r') // for windows
+//		fp.read(endline, sizeof(char)) ;
+//	assert(*endline == '\n') ;
+//	delete endline ;
+//
+//	// Define containers
+//	AttributeHandler<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+//	if (!positions.isValid())
+//		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+//	attrNames.push_back(positions.name()) ;
+//
+//	AttributeHandler<typename PFP::VEC3> *frame = new AttributeHandler<typename PFP::VEC3>[3] ;
+//	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameT") ; // Tangent
+//	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameB") ; // Bitangent
+//	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frameN") ; // Normal
+//	attrNames.push_back(frame[0].name()) ;
+//	attrNames.push_back(frame[1].name()) ;
+//	attrNames.push_back(frame[2].name()) ;
+//
+//	AttributeHandler<typename PFP::VEC3> *SLFcoefs = new AttributeHandler<typename PFP::VEC3>[nbCoefs] ;
+//	for (unsigned int i = 0 ; i < nbCoefs ; ++i)
+//	{
+//		std::stringstream name ;
+//		name << "SLFcoefs" << i ;
+//		SLFcoefs[i] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, name.str()) ;
+//		attrNames.push_back(SLFcoefs[i].name()) ;
+//	}
+//
+//	AttributeHandler<typename PFP::REAL> *remainders = new AttributeHandler<typename PFP::REAL>[nbRemainders] ;
+//	for (unsigned int i = 0 ; i < nbRemainders ; ++i)
+//	{
+//		std::stringstream name ;
+//		name << "remainderNo" << i ;
+//		remainders[i] = m_map.template addAttribute<typename PFP::REAL>(VERTEX, name.str()) ;
+//		attrNames.push_back(remainders[i].name()) ;
+//	}
+//
+//	// Read vertices
+//	std::vector<unsigned int> verticesID ;
+//	verticesID.reserve(nbVertices) ;
+//
+//	float* properties = new float[nbProps] ;
+//	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
+//	for (unsigned int i = 0 ; i < nbVertices ; ++i) // Read and store properties for current vertex
+//	{
+//		unsigned int id = container.insertLine() ;
+//		verticesID.push_back(id) ;
+//
+//		// for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
+//		fp.read((char*)properties,nbProps * sizeof(float)) ;
+//
+//		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
+//		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
+//			for (unsigned int l = 0 ; l < 3 ; ++l)
+//				frame[k][id][l] = (typename PFP::REAL)(properties[3+(3*k+l)]) ;
+//		for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
+//			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
+//				SLFcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(nbCoefs*k+l)]) ;
+//		unsigned int cur = 12+3*nbCoefs ;
+//		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
+//			remainders[k][id] = (typename PFP::REAL)(properties[cur + k]) ;
+//	}
+//	m_nbVertices = verticesID.size() ;
+//	delete[] properties ;
+//
+//	// Read faces index
+//	m_nbEdges.reserve(m_nbFaces) ;
+//	m_emb.reserve(3 * m_nbFaces) ;
+//	for (unsigned int i = 0 ; i < m_nbFaces ; ++i)
+//	{
+//		// read the indices of vertices for current face
+//		unsigned int nbEdgesForFace ;
+//		fp.read((char*)&(nbEdgesForFace), sizeof(unsigned int)) ;
+//		m_nbEdges.push_back(nbEdgesForFace);
+//
+//		unsigned int vertexID ;
+//		for (unsigned int j=0 ; j < nbEdgesForFace ; ++j)
+//		{
+//			fp.read((char*)&vertexID, sizeof(unsigned int)) ;
+//			m_emb.push_back(verticesID[vertexID]);
+//		}
+//	}
+//
+//	// Close file
+//	fp.close() ;
+//
+//	return true ;
+//}
 
 /**
  * Import plyPTM (F Larue format).
@@ -974,133 +974,132 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
  *  - 3 attrNames for local frame (3xVEC3) : Tangent, Bitangent and Normal vector
  *  - 6 attrNames for the function coefficients (6xVEC3) : 6 RGB coefficients being successively the quadratic members, the linears and the constants (u then v) : a*u^2 + b*v^2 + c*uv + d*u + e*v +f.
   * @return bool : success.
- *
-template <typename PFP>
-bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames)
-{
-	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
-	if (!positions.isValid())
-		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
-	attrNames.push_back(positions.name()) ;
-
-	AttributeHandler<typename PFP::VEC3> frame[3] ;
-	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_T") ; // Tangent
-	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_B") ; // Bitangent
-	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_N") ; // Normal
-	for (unsigned int i = 0 ; i < 3 ; ++i)
-		attrNames.push_back(frame[i].name()) ;
-
-	AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
-	colorPTM[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_a") ;
-	colorPTM[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_b") ;
-	colorPTM[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_c") ;
-	colorPTM[3] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_d") ;
-	colorPTM[4] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_e") ;
-	colorPTM[5] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_f") ;
-
-	for (unsigned int i = 0 ; i < 6 ; ++i)
-		attrNames.push_back(colorPTM[i].name()) ;
-
-	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
-
-	std::ifstream fp(filename.c_str(), std::ios::binary);
-	if (!fp.good())
-	{
-		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
-		return false;
-	}
-
-    std::string ligne;
-    std::string tag;
-
-	fp >> tag;
-	if (tag != std::string("ply"))
-	{
-		CGoGNerr <<filename<< " is not a ply file !" <<  CGoGNendl;
-		return false;
-	}
-
-	// va au nombre de sommets
-	do
-	{
-		fp >> tag;
-	} while (tag != std::string("vertex"));
-
-	unsigned int nbp;
-	fp >> nbp;
-	// read points
-	std::vector<unsigned int> verticesID;
-	verticesID.reserve(nbp);
-
-	// va au nombre de faces en comptant le nombre de "property"
-	unsigned int nb_props = 0;
-	do
-	{
-		fp >> tag;
-		if (tag == std::string("property"))
-			nb_props++;
-	} while (tag != std::string("face"));
-
-	fp >> m_nbFaces;
- 	m_nbEdges.reserve(m_nbFaces);
-	m_emb.reserve(3*m_nbFaces);
-
-	// lecture des sommets
-
-	// saute à la fin du header
-	do
-	{
-		fp >> tag;
-	} while (tag != std::string("end_header"));
-
-	float* properties = new float[nb_props];
-
-	for (unsigned int i = 0; i < nbp; ++i)
-	{
-		unsigned int id = container.insertLine();
-		verticesID.push_back(id);
-
-		for (unsigned int j = 0; j < nb_props; ++j)
-		{
-			fp >> properties[j];
-		}
-
-		positions[id] = VEC3(properties[0],properties[1],properties[2]);
-
-		for (unsigned int k = 0 ; k < 3 ; ++k)
-			for (unsigned int l = 0 ; l < 3 ; ++l)
-				frame[k][id][l] = properties[3+(3*k+l)] ;
-
-		for (unsigned int k = 0 ; k < 3 ; ++k)
-			for (unsigned int l = 0 ; l < 6 ; ++l)
-				colorPTM[l][id][k] = properties[12+(6*k+l)];
-	}
-
-	m_nbVertices = verticesID.size();
-	delete[] properties;
-
-// read indices of faces
-	for (unsigned int i = 0; i < m_nbFaces; i++)
-	{
-		// read the indices vertices of face
-		int nbe;
-		fp >> nbe;
-		m_nbEdges.push_back(nbe);
-
-		int pt;
-		for (int j=0; j<nbe; ++j)
-		{
-			fp >> pt;
-			m_emb.push_back(verticesID[pt]);
-		}
-	}
-
-	fp.close();
-	return true;
-}
-*/
+ */
+//template <typename PFP>
+//bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames)
+//{
+//	AttributeHandler<typename PFP::VEC3> positions =  m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+//
+//	if (!positions.isValid())
+//		positions = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+//
+//	attrNames.push_back(positions.name()) ;
+//
+//	AttributeHandler<typename PFP::VEC3> frame[3] ;
+//	frame[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_T") ; // Tangent
+//	frame[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_B") ; // Bitangent
+//	frame[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "frame_N") ; // Normal
+//	for (unsigned int i = 0 ; i < 3 ; ++i)
+//		attrNames.push_back(frame[i].name()) ;
+//
+//	AttributeHandler<typename PFP::VEC3> colorPTM[6] ;
+//	colorPTM[0] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_a") ;
+//	colorPTM[1] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_b") ;
+//	colorPTM[2] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_c") ;
+//	colorPTM[3] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_d") ;
+//	colorPTM[4] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_e") ;
+//	colorPTM[5] = m_map.template addAttribute<typename PFP::VEC3>(VERTEX, "colorPTM_f") ;
+//
+//	for (unsigned int i = 0 ; i < 6 ; ++i)
+//		attrNames.push_back(colorPTM[i].name()) ;
+//
+//	AttributeContainer& container = m_map.getAttributeContainer(VERTEX) ;
+//
+//	std::ifstream fp(filename.c_str(), std::ios::binary);
+//	if (!fp.good())
+//	{
+//		CGoGNerr << "Unable to open file " << filename<< CGoGNendl;
+//		return false;
+//	}
+//
+//    std::string ligne;
+//    std::string tag;
+//
+//	fp >> tag;
+//	if (tag != std::string("ply"))
+//	{
+//		CGoGNerr <<filename<< " is not a ply file !" <<  CGoGNendl;
+//		return false;
+//	}
+//
+//	// va au nombre de sommets
+//	do
+//	{
+//		fp >> tag;
+//	} while (tag != std::string("vertex"));
+//
+//	unsigned int nbp;
+//	fp >> nbp;
+//	// read points
+//	std::vector<unsigned int> verticesID;
+//	verticesID.reserve(nbp);
+//
+//	// va au nombre de faces en comptant le nombre de "property"
+//	unsigned int nb_props = 0;
+//	do
+//	{
+//		fp >> tag;
+//		if (tag == std::string("property"))
+//			nb_props++;
+//	} while (tag != std::string("face"));
+//
+//	fp >> m_nbFaces;
+// 	m_nbEdges.reserve(m_nbFaces);
+//	m_emb.reserve(3*m_nbFaces);
+//
+//	// lecture des sommets
+//
+//	// saute à la fin du header
+//	do
+//	{
+//		fp >> tag;
+//	} while (tag != std::string("end_header"));
+//
+//	float* properties = new float[nb_props];
+//
+//	for (unsigned int i = 0; i < nbp; ++i)
+//	{
+//		unsigned int id = container.insertLine();
+//		verticesID.push_back(id);
+//
+//		for (unsigned int j = 0; j < nb_props; ++j)
+//		{
+//			fp >> properties[j];
+//		}
+//
+//		positions[id] = VEC3(properties[0],properties[1],properties[2]);
+//
+//		for (unsigned int k = 0 ; k < 3 ; ++k)
+//			for (unsigned int l = 0 ; l < 3 ; ++l)
+//				frame[k][id][l] = properties[3+(3*k+l)] ;
+//
+//		for (unsigned int k = 0 ; k < 3 ; ++k)
+//			for (unsigned int l = 0 ; l < 6 ; ++l)
+//				colorPTM[l][id][k] = properties[12+(6*k+l)];
+//	}
+//
+//	m_nbVertices = verticesID.size();
+//	delete[] properties;
+//
+//// read indices of faces
+//	for (unsigned int i = 0; i < m_nbFaces; i++)
+//	{
+//		// read the indices vertices of face
+//		int nbe;
+//		fp >> nbe;
+//		m_nbEdges.push_back(nbe);
+//
+//		int pt;
+//		for (int j=0; j<nbe; ++j)
+//		{
+//			fp >> pt;
+//			m_emb.push_back(verticesID[pt]);
+//		}
+//	}
+//
+//	fp.close();
+//	return true;
+//}
 
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector<std::string>& attrNames)
