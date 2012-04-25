@@ -54,9 +54,9 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	{
 		if(!shareVertexEmbeddings && embedNewVertices)
 		{
-			if(getEmbedding(VERTEX, d) == EMBNULL)
+			if(getEmbedding<VERTEX>(d) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
-			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
+			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
 		}
 

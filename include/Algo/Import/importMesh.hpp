@@ -98,11 +98,11 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			// darts incident to end vertex of edge
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
-			unsigned int embd = map.getEmbedding(VERTEX, d);
+			unsigned int embd = map.getEmbedding<VERTEX>(d);
 			Dart good_dart = NIL;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
+				if (map.getEmbedding<VERTEX>(map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 
@@ -212,11 +212,11 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 			// darts incident to end vertex of edge
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
-			unsigned int embd = map.getEmbedding(VERTEX, d);
+			unsigned int embd = map.getEmbedding<VERTEX>(d);
 			Dart good_dart = NIL;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
+				if (map.getEmbedding<VERTEX>(map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 

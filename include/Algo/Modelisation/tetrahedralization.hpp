@@ -98,8 +98,8 @@ Dart linkIntoEdge(typename PFP::MAP& map, Dart d, Dart e)
 	map.sewFaces(e2,d3);
 	map.sewFaces(e,d);
 
-	map.setDartEmbedding(VERTEX, d, map.getEmbedding(VERTEX, e2)) ;
-	map.setDartEmbedding(VERTEX, d3, map.getEmbedding(VERTEX, e)) ;
+	map.setDartEmbedding(VERTEX, d, map.getEmbedding<VERTEX>(e2)) ;
+	map.setDartEmbedding(VERTEX, d3, map.getEmbedding<VERTEX>(e)) ;
 
 	return e2;
 }
@@ -115,14 +115,14 @@ void unlinkFromEdge(typename PFP::MAP& map, Dart d)
 //		//Si la face n'est pas libre en phi2
 //		if(map.phi2(d) != d && map.phi2(d3) != d3)
 //		{
-//			unsigned int dVEmb = map.getEmbedding(VERTEX, d) ;
+//			unsigned int dVEmb = map.getEmbedding<VERTEX>(d) ;
 //			if(dVEmb != EMBNULL)
 //			{
 //				map.embedOrbit(VERTEX, d, dVEmb) ;
 //				map.setDartEmbedding(VERTEX, d, EMBNULL) ;
 //			}
 //
-//			unsigned int d3VEmb = map.getEmbedding(VERTEX, d3) ;
+//			unsigned int d3VEmb = map.getEmbedding<VERTEX>(d3) ;
 //			if(d3VEmb != EMBNULL)
 //			{
 //				map.embedOrbit(VERTEX, d3, d3VEmb) ;
@@ -169,8 +169,8 @@ void insertFace(typename PFP::MAP& map, Dart d, Dart nF)
 		map.sewFaces(dd,nFd);
 		map.sewFaces(d2,map.phi3(nFd));
 
-		map.setDartEmbedding(VERTEX, nFd, map.getEmbedding(VERTEX, d2)) ;
-		map.setDartEmbedding(VERTEX, map.phi3(nFd), map.getEmbedding(VERTEX, dd)) ;
+		map.setDartEmbedding(VERTEX, nFd, map.getEmbedding<VERTEX>(d2)) ;
+		map.setDartEmbedding(VERTEX, map.phi3(nFd), map.getEmbedding<VERTEX>(dd)) ;
 
 		dd = map.phi_1(map.phi2(map.phi_1(dd)));
 		nFd = map.phi1(nFd);
@@ -196,14 +196,14 @@ void swap2To2(typename PFP::MAP& map, Dart d)
 	map.flipEdge(r);
 	Dart e = map.phi2(r);
 
-	unsigned int dVEmb = map.getEmbedding(VERTEX, r) ;
+	unsigned int dVEmb = map.getEmbedding<VERTEX>(r) ;
 	if(dVEmb != EMBNULL)
 	{
 		map.setDartEmbedding(VERTEX, map.phi_1(r), dVEmb) ;
 		map.setDartEmbedding(VERTEX, r, EMBNULL) ;
 	}
 
-	unsigned int eVEmb = map.getEmbedding(VERTEX, e) ;
+	unsigned int eVEmb = map.getEmbedding<VERTEX>(e) ;
 	if(eVEmb != EMBNULL)
 	{
 		map.setDartEmbedding(VERTEX, map.phi_1(e), eVEmb) ;
@@ -218,8 +218,8 @@ void swap2To2(typename PFP::MAP& map, Dart d)
 		Dart e = map.phi2(dd);
 		Dart e2= map.phi2(map.phi3(dd));
 
-		map.setDartEmbedding(VERTEX, dd, map.getEmbedding(VERTEX, e2)) ;
-		map.setDartEmbedding(VERTEX, map.phi3(dd), map.getEmbedding(VERTEX, e)) ;
+		map.setDartEmbedding(VERTEX, dd, map.getEmbedding<VERTEX>(e2)) ;
+		map.setDartEmbedding(VERTEX, map.phi3(dd), map.getEmbedding<VERTEX>(e)) ;
 
 
 		dd = map.phi1(dd);
@@ -305,8 +305,8 @@ void swap3To2(typename PFP::MAP& map, Dart d)
 		do {
 			Dart e = map.phi2(map.phi3(map.phi2(dd)));
 
-			unsigned int eVEmb = map.getEmbedding(VERTEX, e) ;
-			unsigned int ddVEmb = map.getEmbedding(VERTEX, dd) ;
+			unsigned int eVEmb = map.getEmbedding<VERTEX>(e) ;
+			unsigned int ddVEmb = map.getEmbedding<VERTEX>(dd) ;
 
 			map.setDartEmbedding(VERTEX, map.phi2(dd), eVEmb) ;
 			map.setDartEmbedding(VERTEX, map.phi2(e), ddVEmb) ;
@@ -323,8 +323,8 @@ Dart swap2To3(typename PFP::MAP& map, Dart d)
 {
 	Dart e = map.phi1(map.phi2(map.phi3(d)));
 
-	unsigned int p1 = map.getEmbedding(VERTEX, map.phi_1(map.phi2(d))) ;
-	unsigned int p2 = map.getEmbedding(VERTEX, map.phi2(map.phi1(map.phi2(map.phi3(d))))) ;
+	unsigned int p1 = map.getEmbedding<VERTEX>(map.phi_1(map.phi2(d))) ;
+	unsigned int p2 = map.getEmbedding<VERTEX>(map.phi2(map.phi1(map.phi2(map.phi3(d))))) ;
 
 	//détachement des demi-faces du milieu
 	//garde la relation volumique qui les lies

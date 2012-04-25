@@ -61,13 +61,15 @@ public:
 class AttributeHandlerGen ;
 class DartMarkerGen ;
 class CellMarkerGen ;
+template<unsigned int CELL> class CellMarkerBase ;
 
 class GenericMap : public MapBrowser
 {
-	template<typename T> friend class AttributeHandler ;
-	template<typename T> friend class AutoAttributeHandler ;
+	template<typename T, unsigned int ORBIT> friend class AttributeHandler ;
+	template<typename T, unsigned int ORBIT> friend class AutoAttributeHandler ;
 	friend class DartMarkerGen ;
 	friend class CellMarkerGen ;
+	template<unsigned int CELL> friend class CellMarkerBase ;
 
 protected:
 	/**
@@ -163,7 +165,8 @@ public:
 	/**
 	 * get the marker_set of an orbit and thread (used for Cell & Dart Marker)
 	 */
-	MarkSet& getMarkerSet(unsigned int orbit, unsigned int thread) { return m_marksets[orbit][thread]; }
+	template <unsigned int ORBIT>
+	MarkSet& getMarkerSet(unsigned int thread = 0) { return m_marksets[ORBIT][thread]; }
 
 	/****************************************
 	 *     RESOLUTION LEVELS MANAGEMENT     *
@@ -299,12 +302,14 @@ public:
 	 * get the cell index of the given dimension associated to dart d
 	 * @return EMBNULL if the orbit of d is not attached to any cell
 	 */
-	unsigned int getEmbedding(unsigned int orbit, Dart d) ;
+	template<unsigned int ORBIT>
+	unsigned int getEmbedding(Dart d) ;
 
 	/**
 	 * Set the cell index of the given dimension associated to dart d
 	 */
-	void setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb) ;
+	template <unsigned int ORBIT>
+	void setDartEmbedding(Dart d, unsigned int emb) ;
 
 	/**
 	 * Copy the index of the cell associated to a dart over an other dart
@@ -312,14 +317,16 @@ public:
 	 * @param dest the dart to overwrite
 	 * @param src the dart to copy
 	 */
-	void copyDartEmbedding(unsigned int orbit, Dart dest, Dart src) ;
+	template <unsigned int ORBIT>
+	void copyDartEmbedding(Dart dest, Dart src) ;
 
 	/**
 	 * Allocation of some place in attrib table
 	 * @param orbit the orbit of embedding
 	 * @return the index to use as embedding
 	 */
-	unsigned int newCell(unsigned int orbit) ;
+	template <unsigned int ORBIT>
+	unsigned int newCell() ;
 
 	/**
 	* Set the index of the associated cell to all the darts of an orbit
@@ -327,7 +334,8 @@ public:
 	* @param d a dart of the topological vertex
 	* @param em index of attribute to store as embedding
 	*/
-	void embedOrbit(unsigned int orbit, Dart d, unsigned int em) ;
+	template <unsigned int ORBIT>
+	void embedOrbit(Dart d, unsigned int em) ;
 
 	/**
 	* Associate an new embedding to all darts of an orbit
@@ -335,7 +343,8 @@ public:
 	* @param d a dart of the topological cell
 	* @return index of the attribute in table
 	*/
-	unsigned int embedNewCell(unsigned int orbit, Dart d) ;
+	template <unsigned int ORBIT>
+	unsigned int embedNewCell(Dart d) ;
 
 	/**
 	 * Copy the cell associated to a dart over an other dart
@@ -343,7 +352,8 @@ public:
 	 * @param d the dart to overwrite (dest)
 	 * @param e the dart to copy (src)
 	 */
-	void copyCell(unsigned int orbit, Dart d, Dart e) ;
+	template <unsigned int ORBIT>
+	void copyCell(Dart d, Dart e) ;
 
 	/**
 	 * Line of attributes i is overwritten with line j
@@ -351,14 +361,16 @@ public:
 	 * @param i line destination of copy
 	 * @param j line source of copy
 	 */
-	void copyCell(unsigned int orbit, unsigned int i, unsigned int j) ;
+	template <unsigned int ORBIT>
+	void copyCell(unsigned int i, unsigned int j) ;
 
 	/**
 	 * Line of attributes i is initialized
 	 * @param orbit attribute orbit to use
 	 * @param i line to init
 	 */
-	void initCell(unsigned int orbit, unsigned int i) ;
+	template <unsigned int ORBIT>
+	void initCell(unsigned int i) ;
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *
@@ -368,24 +380,26 @@ public:
 	 * get the attrib container of a given orbit
 	 * @param orbit the orbit !!! (bilbo the orbit !)
 	 */
-	AttributeContainer& getAttributeContainer(unsigned int orbit) ;
+	template <unsigned int ORBIT>
+	AttributeContainer& getAttributeContainer() ;
 
 	/**
 	 * get a multi vector of mark attribute (direct access with [i])
-	 * @param orbit code
 	 */
-	AttributeMultiVector<Mark>* getMarkVector(unsigned int orbit, unsigned int thread = 0) ;
+	template <unsigned int ORBIT>
+	AttributeMultiVector<Mark>* getMarkVector(unsigned int thread = 0) ;
 
 	/**
 	 * return a pointer to the Dart attribute vector that store the embedding of the given orbit
 	 * (may be NULL if the orbit is not embedded)
 	 */
-	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector(unsigned int orbit) ;
+	template <unsigned int ORBIT>
+	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector() ;
 
-	/**
-	 * swap two attribute containers
-	 */
-	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2) ;
+//	/**
+//	 * swap two attribute containers
+//	 */
+//	void swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2) ;
 
 	/**
 	 * static function for type registration
@@ -397,7 +411,8 @@ public:
 	 * Traverse the map and embed all orbits of the given dimension with a new cell
 	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
 	 */
-	void initOrbitEmbedding(unsigned int orbit, bool realloc = false) ;
+	template <unsigned int ORBIT>
+	void initOrbitEmbedding(bool realloc = false) ;
 
 	/**
 	 * print attributes name of map in std::cout (for debugging)
@@ -557,7 +572,8 @@ public:
 	 *  @param d a dart of the orbit
 	 *  @param f a functor obj
 	 */
-	bool foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread = 0) ;
+	template <unsigned int ORBIT>
+	bool foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
 	virtual bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0) = 0 ;
@@ -579,14 +595,16 @@ public:
 	* @param f the functor
 	* @param good the selector of darts
 	*/
-	bool foreach_orbit(unsigned int orbit, FunctorType& f, const FunctorSelect& good = allDarts, unsigned int thread = 0) ;
+	template <unsigned int ORBIT>
+	bool foreach_orbit(FunctorType& f, const FunctorSelect& good = allDarts, unsigned int thread = 0) ;
 
 	//! Count the number of orbits of dimension dim in the map
 	/*! @param dim the dimension of the orbit
 	 *	@param good the selector of darts
 	 * 	@return the number of orbits
 	 */
-	unsigned int getNbOrbits(unsigned int orbit, const FunctorSelect& good = allDarts) ;
+	template <unsigned int ORBIT>
+	unsigned int getNbOrbits(const FunctorSelect& good = allDarts) ;
 
 protected:
 	/// boundary marker
@@ -612,12 +630,14 @@ protected:
 	/**
 	 * mark an orbit of dart as belonging to boundary
 	 */
-	void boundaryMarkOrbit(unsigned int orbit, Dart d) ;
+	template <unsigned int ORBIT>
+	void boundaryMarkOrbit(Dart d) ;
 
 	/**
 	 * unmark an orbit of dart from the boundary
 	 */
-	void boundaryUnmarkOrbit(unsigned int orbit, Dart d) ;
+	template <unsigned int ORBIT>
+	void boundaryUnmarkOrbit(Dart d) ;
 
 	/**
 	 * clear all boundary markers

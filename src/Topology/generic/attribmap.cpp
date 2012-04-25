@@ -62,20 +62,22 @@ void AttribMap::clear(bool removeAttrib)
  *               UTILITIES              *
  ****************************************/
 
-unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int>& idx)
+template <unsigned int ORBIT>
+unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int, ORBIT>& idx)
 {
-	AttributeContainer& cont = m_attribs[idx.getOrbit()] ;
+	AttributeContainer& cont = m_attribs[ORBIT] ;
 	unsigned int cpt = 0 ;
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 		idx[i] = cpt++ ;
 	return cpt ;
 }
 
-void AttribMap::bijectiveOrbitEmbedding(unsigned int orbit)
+template <unsigned int ORBIT>
+void AttribMap::bijectiveOrbitEmbedding()
 {
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded") ;
+	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded") ;
 
-	AutoAttributeHandler<int> counter(*this, orbit) ;
+	AutoAttributeHandler<int, ORBIT> counter(*this) ;
 	counter.setAllValues(int(0)) ;
 
 	DartMarker mark(*this) ;
@@ -83,14 +85,14 @@ void AttribMap::bijectiveOrbitEmbedding(unsigned int orbit)
 	{
 		if(!mark.isMarked(d))
 		{
-			mark.markOrbit(orbit, d) ;
-			unsigned int emb = getEmbedding(orbit, d) ;
+			mark.markOrbit<ORBIT>(d) ;
+			unsigned int emb = getEmbedding<ORBIT>(d) ;
 			if (emb != EMBNULL)
 			{
 				if (counter[d] > 0)
 				{
-					unsigned int newEmb = embedNewCell(orbit, d) ;
-					copyCell(orbit, newEmb, emb) ;
+					unsigned int newEmb = embedNewCell<ORBIT>(d) ;
+					copyCell<ORBIT>(newEmb, emb) ;
 				}
 				counter[d]++ ;
 			}

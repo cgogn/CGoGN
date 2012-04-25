@@ -174,9 +174,9 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 			Dart good_dart = NIL;
 			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if(map.getEmbedding(VERTEX, map.phi1(*it)) == map.getEmbedding(VERTEX, d) &&
-				   map.getEmbedding(VERTEX, map.phi_1(*it)) == map.getEmbedding(VERTEX, map.phi_1(d)) /*&&
-				   map.getEmbedding(VERTEX, *it) == map.getEmbedding(VERTEX, map.phi1(d)) */)
+				if(map.getEmbedding<VERTEX>(map.phi1(*it)) == map.getEmbedding<VERTEX>(d) &&
+				   map.getEmbedding<VERTEX>(map.phi_1(*it)) == map.getEmbedding<VERTEX>(map.phi_1(d)) /*&&
+				   map.getEmbedding<VERTEX>(*it) == map.getEmbedding<VERTEX>(map.phi1(d)) */)
 				{
 					good_dart = *it ;
 				}

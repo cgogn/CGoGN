@@ -690,7 +690,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			}while(f != x);
 		}
 
-		map.embedOrbit(VERTEX, centralDart, map.getEmbedding(VERTEX, centralDart));
+		map.embedOrbit(VERTEX, centralDart, map.getEmbedding<VERTEX>(centralDart));
 
 		//Third step : 3-sew internal faces
 		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
@@ -1435,7 +1435,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 //
 //			if(map.phi3(map.phi2(f1)) == map.phi2(f1) && map.phi3(map.phi2(f2)) == map.phi2(f2))
 //			{
-//				if(map.getEmbedding(VERTEX, map.phi_1(map.phi2(f2))) == map.getEmbedding(VERTEX, map.phi_1(map.phi2(f1))))
+//				if(map.getEmbedding<VERTEX>(map.phi_1(map.phi2(f2))) == map.getEmbedding<VERTEX>(map.phi_1(map.phi2(f1))))
 //				{
 //					map.Map3::sewVolumes(map.phi2(f2), map.phi2(f1));
 //				}

@@ -450,7 +450,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //			if(phi3(f1) == f1 && phi3(f2) == f2)
 //				sewVolumes(f1, f2, false);
 //		}
-//		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+//		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
 		//attributs[map.phi1(ne)] = attBary[*it];
 //
 //		setCurrentLevel(getMaxLevel() - 1) ;
@@ -461,13 +461,13 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //	TraversorE<typename PFP::MAP> travE2(map);
 //	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 //	{
-//		map.embedOrbit(VERTEX, map.phi1(d), map.getEmbedding(VERTEX, map.phi1(d)));
+//		map.embedOrbit(VERTEX, map.phi1(d), map.getEmbedding<VERTEX>(map.phi1(d)));
 //	}
 //
 //	TraversorF<typename PFP::MAP> travF2(map) ;
 //	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 //	{
-//		map.embedOrbit(VERTEX, map.phi2(map.phi1(d)), map.getEmbedding(VERTEX, map.phi2(map.phi1(d))));
+//		map.embedOrbit(VERTEX, map.phi2(map.phi1(d)), map.getEmbedding<VERTEX>(map.phi2(map.phi1(d))));
 //	}
 
 

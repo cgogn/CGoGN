@@ -136,7 +136,7 @@ bool EmbeddedMap3::edgeCanCollapse(Dart d)
 
 Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 {
-	unsigned int vEmb = getEmbedding(VERTEX, d) ;
+	unsigned int vEmb = getEmbedding<VERTEX>(d) ;
 
 	Dart resV = Map3::collapseEdge(d, delDegenerateVolumes);
 
@@ -165,8 +165,8 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 
 	if(isOrbitEmbedded(VERTEX))
 	{
-		unsigned int vEmb1 = getEmbedding(VERTEX, d) ;
-		unsigned int vEmb2 = getEmbedding(VERTEX, e) ;
+		unsigned int vEmb1 = getEmbedding<VERTEX>(d) ;
+		unsigned int vEmb2 = getEmbedding<VERTEX>(e) ;
 		setDartEmbedding(VERTEX, phi_1(e), vEmb1);
 		setDartEmbedding(VERTEX, phi_1(ee), vEmb1);
 		setDartEmbedding(VERTEX, phi_1(d), vEmb2);
@@ -211,7 +211,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
  */
 Dart EmbeddedMap3::collapseFace(Dart d, bool delDegenerateVolumes)
 {
-	unsigned int vEmb = getEmbedding(VERTEX, d) ;
+	unsigned int vEmb = getEmbedding<VERTEX>(d) ;
 
 	Dart resV = Map3::collapseFace(d, delDegenerateVolumes);
 
@@ -243,7 +243,7 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 		Dart it = d ;
 		do
 		{
-			embedOrbit(VERTEX, it, getEmbedding(VERTEX, it)) ;
+			embedOrbit(VERTEX, it, getEmbedding<VERTEX>(it)) ;
 			it = phi1(it) ;
 		} while(it != d) ;
 	}
@@ -285,13 +285,13 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 		{
 			if(!sameVertex(dit, dd))
 			{
-				embedOrbit(VERTEX, dit, getEmbedding(VERTEX, dit)) ;
+				embedOrbit(VERTEX, dit, getEmbedding<VERTEX>(dit)) ;
 				embedNewCell(VERTEX, dd);
 				copyCell(VERTEX, dd, dit);
 			}
 			else
 			{
-				embedOrbit(VERTEX, dit, getEmbedding(VERTEX, dit)) ;
+				embedOrbit(VERTEX, dit, getEmbedding<VERTEX>(dit)) ;
 			}
 		}
 
@@ -388,7 +388,7 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 
 Dart EmbeddedMap3::collapseVolume(Dart d, bool delDegenerateVolumes)
 {
-	unsigned int vEmb = getEmbedding(VERTEX, d) ;
+	unsigned int vEmb = getEmbedding<VERTEX>(d) ;
 
 	Dart resV = Map3::collapseVolume(d, delDegenerateVolumes);
 
@@ -473,12 +473,12 @@ bool EmbeddedMap3::check()
 	{
 		if(isOrbitEmbedded(VERTEX))
 		{
-			if( getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha1(d)))
+			if( getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(alpha1(d)))
 			{
 				std::cout << "Embedding Check : different embeddings on vertex (alpha1(d) != d)" << std::endl ;
 				return false ;
 			}
-			if(getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha2(d)) )
+			if(getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(alpha2(d)) )
 			{
 				std::cout << "Embedding Check : different embeddings on vertex (alpha2(d) != d)" << std::endl ;
 				return false ;

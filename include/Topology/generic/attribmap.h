@@ -34,7 +34,7 @@ namespace CGoGN
 class AttribMap : public GenericMap
 {
 private:
-	template<typename T> friend class AutoAttributeHandler ;
+	template<typename T, unsigned int ORBIT> friend class AutoAttributeHandler ;
 
 	void init() ;
 
@@ -52,41 +52,39 @@ public:
 
 	/**
 	* Create an attribute for a given orbit
-	* @param orbit
 	* @param nameAttr attribute name
 	* @return an AttributeHandler
 	*/
-	template <typename T>
-	AttributeHandler<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> addAttribute(const std::string& nameAttr) ;
 
 	/**
 	 * remove an attribute
 	 * @param attr a handler to the attribute to remove
 	 * @return true if remove succeed else false
 	 */
-	template <typename T>
-	bool removeAttribute(AttributeHandler<T>& attr) ;
+	template <typename T, unsigned int ORBIT>
+	bool removeAttribute(AttributeHandler<T, ORBIT>& attr) ;
 
 	/**
 	* search an attribute for a given orbit
-	* @param orbit
 	* @param nameAttr attribute name
 	* @return an AttributeHandler
 	*/
-	template <typename T>
-	AttributeHandler<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler<T, ORBIT> getAttribute(const std::string& nameAttr) ;
 
 	/**
 	 * swap the content of two attributes (efficient, only swap pointers)
 	 */
-	template <typename T>
-	bool swapAttributes(AttributeHandler<T>& attr1, AttributeHandler<T>& attr2) ;
+	template <typename T, unsigned int ORBIT>
+	bool swapAttributes(AttributeHandler<T, ORBIT>& attr1, AttributeHandler<T, ORBIT>& attr2) ;
 
 	/**
 	 * copy the content of src attribute to dst attribute
 	 */
-	template <typename T>
-	bool copyAttribute(AttributeHandler<T>& dst, AttributeHandler<T>& src) ;
+	template <typename T, unsigned int ORBIT>
+	bool copyAttribute(AttributeHandler<T, ORBIT>& dst, AttributeHandler<T, ORBIT>& src) ;
 
 	/**
 	 * get the number of cell in the attribute container of an orbit
@@ -104,12 +102,14 @@ public:
 	 * use the given attribute to store the indices of the cells of the corresponding orbit
 	 * @return the number of cells of the orbit
 	 */
-	unsigned int computeIndexCells(AttributeHandler<unsigned int>& idx) ;
+	template <unsigned int ORBIT>
+	unsigned int computeIndexCells(AttributeHandler<unsigned int, ORBIT>& idx) ;
 
 	/**
 	 * ensure that each orbit as one embedding and that each embedding is handle by only one orbit
 	 */
-	void bijectiveOrbitEmbedding(unsigned int orbit);
+	template <unsigned int ORBIT>
+	void bijectiveOrbitEmbedding();
 
 } ;
 

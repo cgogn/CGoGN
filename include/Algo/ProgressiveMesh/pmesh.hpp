@@ -258,8 +258,8 @@ void ProgressiveMesh<PFP>::refine()
 	Dart d1 = m_map.phi2(d2) ;
 	Dart dd1 = m_map.phi2(dd2) ;
 
-	unsigned int v1 = m_map.getEmbedding(VERTEX, d) ;				// get the embedding
-	unsigned int v2 = m_map.getEmbedding(VERTEX, dd) ;			// of the new vertices
+	unsigned int v1 = m_map.getEmbedding<VERTEX>(d) ;				// get the embedding
+	unsigned int v2 = m_map.getEmbedding<VERTEX>(dd) ;			// of the new vertices
 	unsigned int e1 = m_map.getEmbedding(EDGE, m_map.phi1(d)) ;
 	unsigned int e2 = m_map.getEmbedding(EDGE, m_map.phi_1(d)) ;	// and new edges
 	unsigned int e3 = m_map.getEmbedding(EDGE, m_map.phi1(dd)) ;

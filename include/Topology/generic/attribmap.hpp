@@ -25,17 +25,17 @@
 namespace CGoGN
 {
 
-template <typename T>
-inline AttributeHandler<T> AttribMap::addAttribute(unsigned int orbit, const std::string& nameAttr)
+template <typename T, unsigned int ORBIT>
+inline AttributeHandler<T, ORBIT> AttribMap::addAttribute(const std::string& nameAttr)
 {
-	if(!isOrbitEmbedded(orbit))
-		addEmbedding(orbit) ;
-	AttributeMultiVector<T>* amv = m_attribs[orbit].addAttribute<T>(nameAttr) ;
-	return AttributeHandler<T>(this, amv) ;
+	if(!isOrbitEmbedded(ORBIT))
+		addEmbedding(ORBIT) ;
+	AttributeMultiVector<T>* amv = m_attribs[ORBIT].addAttribute<T>(nameAttr) ;
+	return AttributeHandler<T, ORBIT>(this, amv) ;
 }
 
-template <typename T>
-inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
+template <typename T, unsigned int ORBIT>
+inline bool AttribMap::removeAttribute(AttributeHandler<T, ORBIT>& attr)
 {
 	assert(attr.isValid() || !"Invalid attribute handler") ;
 	if(m_attribs[attr.getOrbit()].removeAttribute<T>(attr.getIndex()))
@@ -50,36 +50,36 @@ inline bool AttribMap::removeAttribute(AttributeHandler<T>& attr)
 	return false ;
 }
 
-template <typename T>
-inline AttributeHandler<T> AttribMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
+template <typename T, unsigned int ORBIT>
+inline AttributeHandler<T ,ORBIT> AttribMap::getAttribute(const std::string& nameAttr)
 {
-	AttributeMultiVector<T>* amv = m_attribs[orbit].getDataVector<T>(nameAttr) ;
-	return AttributeHandler<T>(this, amv) ;
+	AttributeMultiVector<T>* amv = m_attribs[ORBIT].getDataVector<T>(nameAttr) ;
+	return AttributeHandler<T, ORBIT>(this, amv) ;
 }
 
-template <typename T>
-inline bool AttribMap::swapAttributes(AttributeHandler<T>& attr1, AttributeHandler<T>& attr2)
+template <typename T, unsigned int ORBIT>
+inline bool AttribMap::swapAttributes(AttributeHandler<T, ORBIT>& attr1, AttributeHandler<T, ORBIT>& attr2)
 {
 	assert((attr1.isValid() && attr2.isValid()) || !"Invalid attribute handler") ;
-	assert(attr1.getOrbit() == attr2.getOrbit() || !"Cannot swap attributes of different orbits") ;
-	unsigned int orbit = attr1.getOrbit() ;
+//	assert(attr1.getOrbit() == attr2.getOrbit() || !"Cannot swap attributes of different orbits") ;
+//	unsigned int orbit = attr1.getOrbit() ;
 	unsigned int index1 = attr1.getIndex() ;
 	unsigned int index2 = attr2.getIndex() ;
 	if(index1 != index2)
-		return m_attribs[orbit].swapAttributes(index1, index2) ;
+		return m_attribs[ORBIT].swapAttributes(index1, index2) ;
 	return false ;
 }
 
-template <typename T>
-inline bool AttribMap::copyAttribute(AttributeHandler<T>& dst, AttributeHandler<T>& src)
+template <typename T, unsigned int ORBIT>
+inline bool AttribMap::copyAttribute(AttributeHandler<T, ORBIT>& dst, AttributeHandler<T, ORBIT>& src)
 {
 	assert((dst.isValid() && src.isValid()) || !"Invalid attribute handler") ;
-	unsigned int orbit = dst.getOrbit() ;
-	assert(orbit == src.getOrbit() || !"Cannot copy attributes of different orbits") ;
+//	unsigned int orbit = dst.getOrbit() ;
+//	assert(orbit == src.getOrbit() || !"Cannot copy attributes of different orbits") ;
 	unsigned int index_dst = dst.getIndex() ;
 	unsigned int index_src = src.getIndex() ;
 	if(index_dst != index_src)
-		return m_attribs[orbit].copyAttribute(index_dst, index_src) ;
+		return m_attribs[ORBIT].copyAttribute(index_dst, index_src) ;
 	return false ;
 }
 

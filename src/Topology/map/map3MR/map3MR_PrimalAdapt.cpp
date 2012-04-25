@@ -818,7 +818,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 
 	embedOrbit(VERTEX, centralDart, EMBNULL);
 	(*volumeVertexFunctor)(centralDart) ;
-	embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+	embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
 	propagateOrbitEmbedding(centralDart, VERTEX) ;
 
 
@@ -829,7 +829,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 	{
 		setCurrentLevel(getMaxLevel()) ;
 		setCurrentLevel(getMaxLevel()-1) ;
-		embedOrbit(VERTEX, phi1(d), getEmbedding(VERTEX, phi1(d)));
+		embedOrbit(VERTEX, phi1(d), getEmbedding<VERTEX>(phi1(d)));
 	}
 	setCurrentLevel(getMaxLevel()) ;
 
@@ -838,7 +838,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding(VERTEX, phi2(phi1(d))));
+		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	setCurrentLevel(getMaxLevel()) ;
@@ -972,7 +972,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 		}
 
 		embedOrbit(VERTEX, centralDart, EMBNULL);
-		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
 		(*volumeVertexFunctor)(centralDart) ;
 		propagateOrbitEmbedding(centralDart, VERTEX) ;
 	}

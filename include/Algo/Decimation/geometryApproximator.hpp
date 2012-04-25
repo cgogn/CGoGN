@@ -220,8 +220,8 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.embedOrbit(VERTEX, d, m.getEmbedding(VERTEX, d)) ;
-		m.embedOrbit(VERTEX, dd, m.getEmbedding(VERTEX, dd)) ;
+		m.embedOrbit(VERTEX, d, m.getEmbedding<VERTEX>(d)) ;
+		m.embedOrbit(VERTEX, dd, m.getEmbedding<VERTEX>(dd)) ;
 	}
 }
 
@@ -268,8 +268,8 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.embedOrbit(VERTEX, d, m.getEmbedding(VERTEX, d)) ;
-		m.embedOrbit(VERTEX, dd, m.getEmbedding(VERTEX, dd)) ;
+		m.embedOrbit(VERTEX, d, m.getEmbedding<VERTEX>(d)) ;
+		m.embedOrbit(VERTEX, dd, m.getEmbedding<VERTEX>(dd)) ;
 	}
 }
 

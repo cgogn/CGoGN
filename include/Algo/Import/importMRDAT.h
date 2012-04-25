@@ -90,11 +90,11 @@ public:
 			do
 			{
 				Dart next = map.phi1(it) ;
-				unsigned int emb = map.getEmbedding(VERTEX, it) ;
+				unsigned int emb = map.getEmbedding<VERTEX>(it) ;
 				unsigned int idx = emb == v0 ? 0 : emb == v1 ? 1 : 2 ;
 				map.incCurrentLevel() ;
 				Dart dd = map.phi1(next) ;
-				unsigned int oldEmb = map.getEmbedding(VERTEX, dd) ;
+				unsigned int oldEmb = map.getEmbedding<VERTEX>(dd) ;
 				unsigned int newEmb = vID[children[0]->indices[idx]] ;
 				if(oldEmb == EMBNULL)
 				{
@@ -120,7 +120,7 @@ public:
 
 			do
 			{
-				unsigned int emb = map.getEmbedding(VERTEX, it) ;
+				unsigned int emb = map.getEmbedding<VERTEX>(it) ;
 				unsigned int idx = emb == v0 ? 0 : emb == v1 ? 1 : 2 ;
 				map.incCurrentLevel() ;
 				children[idx+1]->embed<PFP>(map, it, vID) ;

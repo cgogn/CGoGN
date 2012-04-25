@@ -78,7 +78,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map.getEmbedding<VERTEX>(it) ;
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -205,7 +205,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map.getEmbedding<VERTEX>(it) ;
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -353,7 +353,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map.getEmbedding<VERTEX>(it) ;
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -427,7 +427,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -569,7 +569,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -702,7 +702,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -842,7 +842,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}

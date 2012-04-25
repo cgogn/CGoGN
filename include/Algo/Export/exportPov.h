@@ -115,7 +115,7 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, typename
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding(VERTEX, dd) ;
+				unsigned int vNum = map.getEmbedding<VERTEX>(dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;

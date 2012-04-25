@@ -140,9 +140,9 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 	{
 //		if(!shareVertexEmbeddings)
 //		{
-//			if(getEmbedding(VERTEX, d) == EMBNULL)
+//			if(getEmbedding<VERTEX>(d) == EMBNULL)
 //				embedNewCell(VERTEX, d) ;
-//			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
+//			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
 //				embedNewCell(VERTEX, d) ;
 //		}
 
@@ -303,9 +303,9 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 	{
 		if(!shareVertexEmbeddings)
 		{
-			if(getEmbedding(VERTEX, d) == EMBNULL)
+			if(getEmbedding<VERTEX>(d) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
-			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
+			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
 				embedNewCell(VERTEX, phi1(d)) ;
 		}
 
@@ -413,7 +413,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 			if(phi3(f1) == f1 && phi3(f2) == f2)
 				sewVolumes(f1, f2, false);
 		}
-		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
 
 		setCurrentLevel(getMaxLevel() - 1) ;
 	}
@@ -424,7 +424,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi1(d), getEmbedding(VERTEX, phi1(d)));
+		embedOrbit(VERTEX, phi1(d), getEmbedding<VERTEX>(phi1(d)));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	//setCurrentLevel(getMaxLevel()) ;
@@ -434,7 +434,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding(VERTEX, phi2(phi1(d))));
+		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	//setCurrentLevel(getMaxLevel()) ;
@@ -465,9 +465,9 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	{
 		if(!shareVertexEmbeddings)
 		{
-			if(getEmbedding(VERTEX, d) == EMBNULL)
+			if(getEmbedding<VERTEX>(d) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
-			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
+			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
 		}
 
@@ -617,7 +617,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 //			if(phi3(f1) == f1 && phi3(f2) == f2)
 //				sewVolumes(f1, f2, false);
 //		}
-//		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+//		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
 //
 //		setCurrentLevel(getMaxLevel() - 1) ;
 	}
@@ -628,7 +628,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi1(d), getEmbedding(VERTEX, phi1(d)));
+		embedOrbit(VERTEX, phi1(d), getEmbedding<VERTEX>(phi1(d)));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	setCurrentLevel(getMaxLevel()) ;
@@ -640,7 +640,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 //		if(!faceDegree(d) != 3)
 //		{
 //			setCurrentLevel(getMaxLevel()) ;
-//			embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding(VERTEX, phi2(phi1(d))));
+//			embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
 //			setCurrentLevel(getMaxLevel()-1) ;
 //		}
 //	}
@@ -857,7 +857,7 @@ void Map3MR_PrimalRegular::subdivision()
 //		do
 //		{
 //			//copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
-//			embedOrbit(VERTEX, it, getEmbedding(VERTEX, phi1(phi3(it))));
+//			embedOrbit(VERTEX, it, getEmbedding<VERTEX>(phi1(phi3(it))));
 //			it = phi1(it) ;
 //		} while(it != bc) ;
 //	}

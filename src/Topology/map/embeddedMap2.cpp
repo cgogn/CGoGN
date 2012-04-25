@@ -130,7 +130,7 @@ bool EmbeddedMap2::edgeCanCollapse(Dart d)
 	Dart end = phi1(dd) ;
 	do
 	{
-		unsigned int ve = getEmbedding(VERTEX, phi2(vit1)) ;
+		unsigned int ve = getEmbedding<VERTEX>(phi2(vit1)) ;
 		vu1.push_back(ve) ;
 		vit1 = alpha1(vit1) ;
 	} while(vit1 != end) ;
@@ -138,7 +138,7 @@ bool EmbeddedMap2::edgeCanCollapse(Dart d)
 	Dart vit2 = alpha1(alpha1(dd)) ;
 	do
 	{
-		unsigned int ve = getEmbedding(VERTEX, phi2(vit2)) ;
+		unsigned int ve = getEmbedding<VERTEX>(phi2(vit2)) ;
 		std::vector<unsigned int>::iterator it = std::find(vu1.begin(), vu1.end(), ve) ;
 		if(it != vu1.end())
 			return false ;
@@ -153,7 +153,7 @@ Dart EmbeddedMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 	unsigned int vEmb = EMBNULL ;
 	if (isOrbitEmbedded(VERTEX))
 	{
-		vEmb = getEmbedding(VERTEX, d) ;
+		vEmb = getEmbedding<VERTEX>(d) ;
 	}
 
 	Dart dV = Map2::collapseEdge(d, delDegenerateFaces);
@@ -292,8 +292,8 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 
 	if (isOrbitEmbedded(VERTEX))
 	{
-		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d)) ;
-		embedOrbit(VERTEX, e, getEmbedding(VERTEX, phi1(d))) ;
+		embedOrbit(VERTEX, d, getEmbedding<VERTEX>(d)) ;
+		embedOrbit(VERTEX, e, getEmbedding<VERTEX>(phi1(d))) ;
 	}
 
 	if (isOrbitEmbedded(EDGE))
@@ -395,7 +395,7 @@ bool EmbeddedMap2::mergeVolumes(Dart d, Dart e)
 
 		if (isOrbitEmbedded(VERTEX))
 		{
-			vEmb.push_back(getEmbedding(VERTEX, phi2(fit))) ;
+			vEmb.push_back(getEmbedding<VERTEX>(phi2(fit))) ;
 		}
 
 		if (isOrbitEmbedded(EDGE))
@@ -501,7 +501,7 @@ bool EmbeddedMap2::check()
 	{
 		if (isOrbitEmbedded(VERTEX))
 		{
-			if (getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha1(d)))
+			if (getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(alpha1(d)))
 			{
 				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl ;
 				return false ;

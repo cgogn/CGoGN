@@ -130,8 +130,8 @@ void EmbeddedGMap3::splitFace(Dart d, Dart e)
 
 	if(isOrbitEmbedded(VERTEX))
 	{
-		unsigned int vEmb1 = getEmbedding(VERTEX, d) ;
-		unsigned int vEmb2 = getEmbedding(VERTEX, e) ;
+		unsigned int vEmb1 = getEmbedding<VERTEX>(d) ;
+		unsigned int vEmb2 = getEmbedding<VERTEX>(e) ;
 
 		setDartEmbedding(VERTEX, beta1(d), vEmb1);
 		setDartEmbedding(VERTEX, beta2(beta1(d)), vEmb1);
@@ -193,7 +193,7 @@ void EmbeddedGMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 		Dart it = d ;
 		do
 		{
-			embedOrbit(VERTEX, it, getEmbedding(VERTEX, it)) ;
+			embedOrbit(VERTEX, it, getEmbedding<VERTEX>(it)) ;
 			it = phi1(it) ;
 		} while(it != d) ;
 	}
@@ -237,14 +237,14 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 		{
 			if(!sameVertex(dit, dd))
 			{
-				embedOrbit(VERTEX, dit, getEmbedding(VERTEX, dit)) ;
+				embedOrbit(VERTEX, dit, getEmbedding<VERTEX>(dit)) ;
 				embedNewCell(VERTEX, dd);
 				copyCell(VERTEX, dd, dit);
 				std::cout << "different vertices.." << std::endl ;
 			}
 			else
 			{
-				embedOrbit(VERTEX, dit, getEmbedding(VERTEX, dit)) ;
+				embedOrbit(VERTEX, dit, getEmbedding<VERTEX>(dit)) ;
 			}
 		}
 
@@ -309,7 +309,7 @@ void EmbeddedGMap3::splitVolume(std::vector<Dart>& vd)
 		// embed the vertex embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(VERTEX))
 		{
-			unsigned int vEmb = getEmbedding(VERTEX, dit) ;
+			unsigned int vEmb = getEmbedding<VERTEX>(dit) ;
 			setDartEmbedding(VERTEX, beta2(dit), vEmb);
 			setDartEmbedding(VERTEX, beta3(beta2(dit)), vEmb);
 			setDartEmbedding(VERTEX, beta1(beta2(dit)), vEmb);
@@ -363,7 +363,7 @@ unsigned int EmbeddedGMap3::closeHole(Dart d, bool forboundary)
 		{
 			if(isOrbitEmbedded(VERTEX))
 			{
-				unsigned int vEmb = getEmbedding(VERTEX, beta3(f)) ;
+				unsigned int vEmb = getEmbedding<VERTEX>(beta3(f)) ;
 				setDartEmbedding(VERTEX, f, vEmb) ;
 				setDartEmbedding(VERTEX, beta1(f), vEmb) ;
 			}
@@ -406,9 +406,9 @@ bool EmbeddedGMap3::check()
 	{
 		if(isOrbitEmbedded(VERTEX))
 		{
-			if( getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta1(d)) ||
-				getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta2(d)) ||
-				getEmbedding(VERTEX, d) != getEmbedding(VERTEX, beta3(d)) )
+			if( getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(beta1(d)) ||
+				getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(beta2(d)) ||
+				getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(beta3(d)) )
 			{
 				std::cout << "Embedding Check : different embeddings on vertex" << std::endl ;
 				return false ;

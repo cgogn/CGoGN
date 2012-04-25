@@ -195,12 +195,12 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	Dart c = map.phi1(b);
 	do
 	{
-		typename PFP::VEC3 P1 = position[map.getEmbedding(VERTEX, a)];
-		typename PFP::VEC3 P2 = position[map.getEmbedding(VERTEX, b)];
-		typename PFP::VEC3 P3 = position[map.getEmbedding(VERTEX, c)];
+		typename PFP::VEC3 P1 = position[map.getEmbedding<VERTEX>(a)];
+		typename PFP::VEC3 P2 = position[map.getEmbedding<VERTEX>(b)];
+		typename PFP::VEC3 P3 = position[map.getEmbedding<VERTEX>(c)];
 
 		float val = computeEarAngle<PFP>(P1, P2, P3, normalPoly);
-		VertexPoly* vp = new VertexPoly(map.getEmbedding(VERTEX, b), val, (P3-P1).norm2(), vpp);
+		VertexPoly* vp = new VertexPoly(map.getEmbedding<VERTEX>(b), val, (P3-P1).norm2(), vpp);
 
 		if (vp->value < 5.0f)
 			nbe++;
@@ -288,9 +288,9 @@ inline void MapRender::addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint
 	// loop to cut a polygon in triangle on the fly (works only with convex faces)
 	do
 	{
-		tableIndices.push_back(map.getEmbedding(VERTEX, d));
-		tableIndices.push_back(map.getEmbedding(VERTEX, b));
-		tableIndices.push_back(map.getEmbedding(VERTEX, c));
+		tableIndices.push_back(map.getEmbedding<VERTEX>(d));
+		tableIndices.push_back(map.getEmbedding<VERTEX>(b));
+		tableIndices.push_back(map.getEmbedding<VERTEX>(c));
 		b = c;
 		c = map.phi1(b);
 	} while (c != d);
@@ -404,8 +404,8 @@ void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std
 	TraversorE<typename PFP::MAP> trav(map, good, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
-		tableIndices.push_back(map.getEmbedding(VERTEX, d));
-		tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
+		tableIndices.push_back(map.getEmbedding<VERTEX>(d));
+		tableIndices.push_back(map.getEmbedding<VERTEX>(map.phi1(d)));
 	}
 }
 
@@ -419,8 +419,8 @@ void MapRender::initBoundaries(typename PFP::MAP& map, const FunctorSelect& good
 	{
 		if (map.isBoundaryEdge(d))
 		{
-			tableIndices.push_back(map.getEmbedding(VERTEX, d));
-			tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(d)));
+			tableIndices.push_back(map.getEmbedding<VERTEX>(d));
+			tableIndices.push_back(map.getEmbedding<VERTEX>(map.phi1(d)));
 		}
 	}
 }
@@ -451,9 +451,9 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 					if (!m.isMarked(ee))
 					{
 						if(good(ee))
-							tableIndices.push_back(map.getEmbedding(VERTEX, ee));
+							tableIndices.push_back(map.getEmbedding<VERTEX>(ee));
 						if(good(f))
-							tableIndices.push_back(map.getEmbedding(VERTEX, map.phi1(ee)));
+							tableIndices.push_back(map.getEmbedding<VERTEX>(map.phi1(ee)));
 						m.markOrbit(EDGE, f);
 
 						bound.push_back(f);
@@ -481,7 +481,7 @@ void MapRender::initPoints(typename PFP::MAP& map, const FunctorSelect& good, st
 
 	TraversorV<typename PFP::MAP> trav(map, good, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		tableIndices.push_back(map.getEmbedding(VERTEX, d));
+		tableIndices.push_back(map.getEmbedding<VERTEX>(d));
 }
 
 template<typename PFP>
