@@ -237,7 +237,7 @@ void Viewer::importMesh(std::string& filename)
 	updateGLMatrices() ;
 }
 
-void Viewer::exportMesh(std::string& filename)
+void Viewer::exportMesh(std::string& filename, bool askExportMode)
 {
 	size_t pos = filename.rfind(".") ;    // position of "." in filename
 	std::string extension = filename.substr(pos) ;
@@ -247,7 +247,9 @@ void Viewer::exportMesh(std::string& filename)
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
 		int ascii = 0 ;
-		Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
+		if (askExportMode)
+			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
+
 		std::vector<PFP::TVEC3*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
@@ -327,7 +329,7 @@ int main(int argc, char **argv)
 		{
 			std::string filenameExp(argv[2]) ;
 			std::cout << "Exporting " << filename << " as " << filenameExp << " ... "<< std::flush ;
-			sqt.exportMesh(filenameExp) ;
+			sqt.exportMesh(filenameExp, false) ;
 			std::cout << "done!" << std::endl ;
 
 			return (0) ;

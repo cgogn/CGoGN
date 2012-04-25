@@ -118,7 +118,7 @@ public:
 	void cb_Save() ;
 
 	void importMesh(std::string& filename) ;
-	void exportMesh(std::string& filename);
+	void exportMesh(std::string& filename, bool askExportMode = true);
 
 public slots:
 	void slot_drawVertices(bool b) ;
