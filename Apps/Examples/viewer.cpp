@@ -185,7 +185,7 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply);; plygen (*.plygen)") ;
+	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
 
 	exportMesh(filename) ;
@@ -246,9 +246,11 @@ void Viewer::exportMesh(std::string& filename)
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
+		int ascii = 0 ;
+		Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
 		std::vector<PFP::TVEC3*> attributes ;
 		attributes.push_back(&position) ;
-		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), true, allDarts) ;
+		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
 	}
 	else if (extension == std::string(".map"))
 		myMap.saveMapBin(filename) ;
