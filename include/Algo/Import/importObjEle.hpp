@@ -216,7 +216,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 			if (good_dart != NIL)
 			{
 				map.sewVolumes(d, good_dart, false);
-				m.unmarkOrbit(FACE, d);
+				m.unmarkOrbit<FACE>(d);
 			}
 			else
 			{

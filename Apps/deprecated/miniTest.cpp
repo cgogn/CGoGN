@@ -558,7 +558,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
 
 		case 's':
 		{
-			unsigned int nbVertices = myMap.getNbOrbits(VERTEX) ;
+			unsigned int nbVertices = myMap.getNbOrbits<VERTEX>() ;
 
 			GLint t1 = glutGet(GLUT_ELAPSED_TIME) ;
 
@@ -818,9 +818,9 @@ int main(int argc, char** argv)
 //		myMap.closeMap(m) ;
 	}
 
-	CGoGNout << myMap.getNbOrbits(VERTEX) << CGoGNendl ;
-	CGoGNout << myMap.getNbOrbits(EDGE) << CGoGNendl ;
-	CGoGNout << myMap.getNbOrbits(FACE) << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits<VERTEX>() << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits<EDGE>() << CGoGNendl ;
+	CGoGNout << myMap.getNbOrbits<FACE>() << CGoGNendl ;
 
 	// compute width and position of object for centering
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, mgw->position) ;

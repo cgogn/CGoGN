@@ -280,7 +280,7 @@ public:
 	void mark(Dart d)
 	{
 		CellMarkerBase<CELL>::mark(d) ;
-		m_markedCells.push_back(this->m_map.getEmbedding<CELL>(d)) ;
+		m_markedCells.push_back(this->m_map.template getEmbedding<CELL>(d)) ;
 	}
 
 	void mark(unsigned int em)

@@ -952,7 +952,7 @@ public:
 			{
 				//Calcul des Pi
 				typename PFP::VEC3 P(0);
-				CellMarker mv(m_map, VERTEX);
+				CellMarker<VERTEX> mv(m_map);
 				Traversor3FV<typename PFP::MAP> travFV(m_map, ditF);
 				for (Dart ditFV = travFV.begin(); ditFV != travFV.end(); ditFV = travFV.next())
 				{
@@ -1063,7 +1063,7 @@ public:
 			}
 			else
 			{
-				CellMarker mv(m_map, VERTEX);
+				CellMarker<VERTEX> mv(m_map);
 
 				typename PFP::VEC3 P(0);
 				Traversor3WV<typename PFP::MAP> travWV(m_map, ditW);

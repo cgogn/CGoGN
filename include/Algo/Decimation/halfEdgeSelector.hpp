@@ -81,7 +81,7 @@ bool HalfEdgeSelector_QEMml<PFP>::init()
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 
@@ -339,7 +339,7 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 			quadric[d] += q ;						// and add the contribution of
 			quadric[d1] += q ;						// this quadric to the ones
 			quadric[d_1] += q ;						// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 
@@ -617,7 +617,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 			quadric[d] += q ;						// and add the contribution of
 			quadric[d1] += q ;						// this quadric to the ones
 			quadric[d_1] += q ;						// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 

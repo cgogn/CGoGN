@@ -122,7 +122,7 @@ typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const type
 
 	VEC3 N(0) ;
 	std::vector<Dart> faces;
-	CellMarker f(map,FACE);
+	CellMarker<FACE> f(map);
 
 	FunctorStore fs(faces);
 	map.foreach_dart_of_oriented_vertex(d,fs);

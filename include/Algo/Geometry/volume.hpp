@@ -74,7 +74,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 		std::vector<Dart> visitedFaces ;
 		visitedFaces.reserve(100) ;
 		visitedFaces.push_back(d) ;
-		mark.markOrbit(FACE, d) ;
+		mark.markOrbit<FACE>(d) ;
 
 		for(typename std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 		{
@@ -104,7 +104,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 				if(!mark.isMarked(ee)) // not already marked
 				{
 					visitedFaces.push_back(ee) ;
-					mark.markOrbit(FACE, e) ;
+					mark.markOrbit<FACE>(e) ;
 				}
 				e = map.phi1(e) ;
 			} while(e != *face) ;

@@ -272,7 +272,7 @@ void AHEMImporter<PFP>::LoadTopology()
 				addedHE[heId].vxIdFrom = prevVx;
 				addedHE[heId].vxIdTo = verticesId[*ix];
 
-				map->setDartEmbedding(VERTEX, d, prevVx);
+				map->setDartEmbedding<VERTEX>(d, prevVx);
 				d = map->phi1(d);
 
 				prevVx = *ix++;
@@ -286,7 +286,7 @@ void AHEMImporter<PFP>::LoadTopology()
 			addedHE[heId].vxIdFrom = prevVx;
 			addedHE[heId].vxIdTo = firstVx;
 
-			map->setDartEmbedding(VERTEX, d, prevVx);
+			map->setDartEmbedding<VERTEX>(d, prevVx);
 			heId++;
 		}
 

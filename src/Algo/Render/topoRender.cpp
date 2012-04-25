@@ -26,7 +26,6 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
-
 namespace CGoGN
 {
 
@@ -40,9 +39,11 @@ namespace GL2
 {
 
 TopoRender::TopoRender():
-m_nbDarts(0),m_nbRel2(0),
-m_topo_dart_width(2.0f),m_topo_relation_width(3.0f),
-m_dartsColor(1.0f,1.0f,1.0f)
+	m_nbDarts(0),
+	m_nbRel2(0),
+	m_topo_dart_width(2.0f),
+	m_topo_relation_width(3.0f),
+	m_dartsColor(1.0f,1.0f,1.0f)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -56,7 +57,6 @@ m_dartsColor(1.0f,1.0f,1.0f)
 
 	m_shader1 = new Utils::ShaderSimpleColor();
 	m_shader2 = new Utils::ShaderColorPerVertex();
-
 
 	// binding VBO - VA
 	m_vaId = m_shader1->setAttributePosition(m_vbo1);
@@ -83,7 +83,6 @@ TopoRender::~TopoRender()
 
 	if (m_attIndex.map() != NULL)
 		static_cast<AttribMap*>(m_attIndex.map())->removeAttribute(m_attIndex);
-
 }
 
 void TopoRender::setDartWidth(float dw)

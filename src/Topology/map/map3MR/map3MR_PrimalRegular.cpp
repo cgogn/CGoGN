@@ -46,10 +46,10 @@ void Map3MR_PrimalRegular::swapEdges(Dart d, Dart e)
 
 		if(isOrbitEmbedded(VERTEX))
 		{
-			copyDartEmbedding(VERTEX, d, phi2(phi_1(d)));
-			copyDartEmbedding(VERTEX, e, phi2(phi_1(e)));
-			copyDartEmbedding(VERTEX, d2, phi2(phi_1(d2)));
-			copyDartEmbedding(VERTEX, e2, phi2(phi_1(e2)));
+			copyDartEmbedding<VERTEX>(d, phi2(phi_1(d)));
+			copyDartEmbedding<VERTEX>(e, phi2(phi_1(e)));
+			copyDartEmbedding<VERTEX>(d2, phi2(phi_1(d2)));
+			copyDartEmbedding<VERTEX>(e2, phi2(phi_1(e2)));
 		}
 
 		if(isOrbitEmbedded(EDGE))
@@ -58,7 +58,7 @@ void Map3MR_PrimalRegular::swapEdges(Dart d, Dart e)
 		}
 
 		if(isOrbitEmbedded(VOLUME))
-			embedNewCell(VOLUME, d);
+			embedNewCell<VOLUME>(d);
 	}
 }
 
@@ -109,8 +109,8 @@ void Map3MR_PrimalRegular::splitSurfaceInVolume(std::vector<Dart>& vd, bool firs
 		// embed the vertex embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(VERTEX))
 		{
-			copyDartEmbedding(VERTEX, phi2(dit), phi1(dit));
-			copyDartEmbedding(VERTEX, phi2(dit2), phi1(dit2));
+			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
+			copyDartEmbedding<VERTEX>(phi2(dit2), phi1(dit2));
 		}
 	}
 
@@ -141,9 +141,9 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 //		if(!shareVertexEmbeddings)
 //		{
 //			if(getEmbedding<VERTEX>(d) == EMBNULL)
-//				embedNewCell(VERTEX, d) ;
+//				embedNewCell<VERTEX>(d) ;
 //			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-//				embedNewCell(VERTEX, d) ;
+//				embedNewCell<VERTEX>(d) ;
 //		}
 
 		cutEdge(d) ;
@@ -152,7 +152,7 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 
 // When importing MR files
 //		if(embedNewVertices)
-//			embedNewCell(VERTEX, phi1(d)) ;
+//			embedNewCell<VERTEX>(phi1(d)) ;
 	}
 
 	//2. split faces - triangular faces
@@ -261,8 +261,8 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 						Dart f32 = phi2(f3);
 						swapEdges(f3, tmp);
 
-						me.markOrbit(EDGE, f3);
-						me.markOrbit(EDGE, f32);
+						me.markOrbit<EDGE>(f3);
+						me.markOrbit<EDGE>(f32);
 					}
 
 					f = phi2(phi_1(f));
@@ -270,7 +270,7 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 
 				// When importing MR files
 				//if(embedNewVertices)
-				//	embedNewCell(VERTEX, x) ;
+				//	embedNewCell<VERTEX>(x) ;
 			}
 			setCurrentLevel(getMaxLevel() - 1) ;
 		}
@@ -304,9 +304,9 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 		if(!shareVertexEmbeddings)
 		{
 			if(getEmbedding<VERTEX>(d) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
+				embedNewCell<VERTEX>(d) ;
 			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-				embedNewCell(VERTEX, phi1(d)) ;
+				embedNewCell<VERTEX>(phi1(d)) ;
 		}
 
 		cutEdge(d) ;
@@ -315,7 +315,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 
 // When importing MR files  : activated for DEBUG
 		if(embedNewVertices)
-			embedNewCell(VERTEX, phi1(d)) ;
+			embedNewCell<VERTEX>(phi1(d)) ;
 	}
 
 	//2. split faces - quadrangule faces
@@ -336,7 +336,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 
 // When importing MR files : activated for DEBUG
 		if(embedNewVertices)
-			embedNewCell(VERTEX, phi1(ne)) ;
+			embedNewCell<VERTEX>(phi1(ne)) ;
 
 		dd = phi1(phi1(next)) ;
 		while(dd != ne)				// turn around the face and insert new edges
@@ -413,7 +413,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 			if(phi3(f1) == f1 && phi3(f2) == f2)
 				sewVolumes(f1, f2, false);
 		}
-		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
+		embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
 
 		setCurrentLevel(getMaxLevel() - 1) ;
 	}
@@ -424,7 +424,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi1(d), getEmbedding<VERTEX>(phi1(d)));
+		embedOrbit<VERTEX>(phi1(d), getEmbedding<VERTEX>(phi1(d)));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	//setCurrentLevel(getMaxLevel()) ;
@@ -434,7 +434,7 @@ void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
+		embedOrbit<VERTEX>(phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	//setCurrentLevel(getMaxLevel()) ;
@@ -466,9 +466,9 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		if(!shareVertexEmbeddings)
 		{
 			if(getEmbedding<VERTEX>(d) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
+				embedNewCell<VERTEX>(d) ;
 			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
+				embedNewCell<VERTEX>(d) ;
 		}
 
 		cutEdge(d) ;
@@ -477,7 +477,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 
 // When importing MR files  : activated for DEBUG
 		if(embedNewVertices)
-			embedNewCell(VERTEX, phi1(d)) ;
+			embedNewCell<VERTEX>(phi1(d)) ;
 	}
 
 	//2. split faces - quadrangule faces
@@ -523,7 +523,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 
 			// When importing MR files : activated for DEBUG
 			if(embedNewVertices)
-				embedNewCell(VERTEX, phi1(ne)) ;
+				embedNewCell<VERTEX>(phi1(ne)) ;
 
 			dd = phi1(phi1(next)) ;
 			while(dd != ne)				// turn around the face and insert new edges
@@ -617,7 +617,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 //			if(phi3(f1) == f1 && phi3(f2) == f2)
 //				sewVolumes(f1, f2, false);
 //		}
-//		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
+//		embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
 //
 //		setCurrentLevel(getMaxLevel() - 1) ;
 	}
@@ -628,7 +628,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi1(d), getEmbedding<VERTEX>(phi1(d)));
+		embedOrbit<VERTEX>(phi1(d), getEmbedding<VERTEX>(phi1(d)));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	setCurrentLevel(getMaxLevel()) ;
@@ -640,7 +640,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 //		if(!faceDegree(d) != 3)
 //		{
 //			setCurrentLevel(getMaxLevel()) ;
-//			embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
+//			embedOrbit<VERTEX>(phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
 //			setCurrentLevel(getMaxLevel()-1) ;
 //		}
 //	}
@@ -716,7 +716,7 @@ void Map3MR_PrimalRegular::subdivision()
 //			Dart it = bc;
 //			do
 //			{
-//				copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
+//				copyDartEmbedding<VERTEX>(it, phi1(phi3(it)));
 //				it = phi1(it) ;
 //			} while(it != bc) ;
 //		}
@@ -729,7 +729,7 @@ void Map3MR_PrimalRegular::subdivision()
 //		cutEdge(ne);
 //
 //		if(embedNewVertices)
-//			embedNewCell(VERTEX, phi1(ne)) ;
+//			embedNewCell<VERTEX>(phi1(ne)) ;
 //
 //		Dart stop = phi2(phi1(ne));
 //		ne = phi2(ne);
@@ -769,14 +769,14 @@ void Map3MR_PrimalRegular::subdivision()
 //
 //	if (isOrbitEmbedded(VERTEX))
 //	{
-//		copyDartEmbedding(VERTEX, phi_1(e), d) ;
-//		copyDartEmbedding(VERTEX, phi_1(d), e) ;
+//		copyDartEmbedding<VERTEX>(phi_1(e), d) ;
+//		copyDartEmbedding<VERTEX>(phi_1(d), e) ;
 //	}
 //	if (isOrbitEmbedded(FACE))
 //	{
-//		copyDartEmbedding(FACE, phi_1(d), d) ;
-//		embedNewCell(FACE, e) ;
-//		copyCell(FACE, e, d) ;
+//		copyDartEmbedding<FACE>(phi_1(d), d) ;
+//		embedNewCell<FACE>(e) ;
+//		copyCell<FACE>(e, d) ;
 //	}
 //}
 //
@@ -786,16 +786,16 @@ void Map3MR_PrimalRegular::subdivision()
 //
 //	if (isOrbitEmbedded(EDGE))
 //	{
-//		copyDartEmbedding(EDGE, phi2(d), d) ;
-//		embedNewCell(EDGE, nd) ;
-//		copyCell(EDGE, nd, d) ;
+//		copyDartEmbedding<EDGE>(phi2(d), d) ;
+//		embedNewCell<EDGE>(nd) ;
+//		copyCell<EDGE>(nd, d) ;
 //	}
 //
 //	if(isOrbitEmbedded(FACE))
 //	{
-//		copyDartEmbedding(FACE, nd, d) ;
+//		copyDartEmbedding<FACE>(nd, d) ;
 //		Dart e = phi2(nd) ;
-//		copyDartEmbedding(FACE, phi1(e), e) ;
+//		copyDartEmbedding<FACE>(phi1(e), e) ;
 //	}
 //
 //	return nd;
@@ -829,8 +829,8 @@ void Map3MR_PrimalRegular::subdivision()
 //
 //			if(isOrbitEmbedded(VERTEX))
 //			{
-//				copyDartEmbedding(VERTEX, phi2(dit2), dit);
-//				copyDartEmbedding(VERTEX, phi2(dit), dit2);
+//				copyDartEmbedding<VERTEX>(phi2(dit2), dit);
+//				copyDartEmbedding<VERTEX>(phi2(dit), dit2);
 //			}
 //
 //			if(isOrbitEmbedded(EDGE))
@@ -856,8 +856,8 @@ void Map3MR_PrimalRegular::subdivision()
 //		Dart it = bc;
 //		do
 //		{
-//			//copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
-//			embedOrbit(VERTEX, it, getEmbedding<VERTEX>(phi1(phi3(it))));
+//			//copyDartEmbedding<VERTEX>(it, phi1(phi3(it)));
+//			embedOrbit<VERTEX>(it, getEmbedding<VERTEX>(phi1(phi3(it))));
 //			it = phi1(it) ;
 //		} while(it != bc) ;
 //	}

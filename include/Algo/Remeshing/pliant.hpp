@@ -48,7 +48,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	{
 		if(!m1.isMarked(d))
 		{
-			m1.markOrbit(EDGE, d) ;
+			m1.markOrbit<EDGE>(d) ;
 			meanEdgeLength += Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			++nbEdges ;
 		}
@@ -65,7 +65,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	{
 		if(!m2.isMarked(d))
 		{
-			m2.markOrbit(EDGE, d) ;
+			m2.markOrbit<EDGE>(d) ;
 			REAL length = Algo::Geometry::edgeLength<PFP>(map, d, position) ;
 			if(length > edgeLengthSup)
 			{
@@ -92,7 +92,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	{
 		if(!m3.isMarked(d))
 		{
-			m3.markOrbit(VERTEX, d) ;
+			m3.markOrbit<VERTEX>(d) ;
 			unsigned int nbFeatureEdges = 0 ;
 			Dart vit = d ;
 			do
@@ -116,7 +116,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	{
 		if(m3.isMarked(d))
 		{
-			m3.unmarkOrbit(EDGE, d) ;
+			m3.unmarkOrbit<EDGE>(d) ;
 			Dart d1 = map.phi1(d) ;
 			if(!cornerVertex.isMarked(d) && !cornerVertex.isMarked(d1) &&
 				( (featureVertex.isMarked(d) && featureVertex.isMarked(d1)) || (!featureVertex.isMarked(d) && !featureVertex.isMarked(d1)) ))
@@ -149,7 +149,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	{
 		if(!m3.isMarked(d))
 		{
-			m3.markOrbit(EDGE, d) ;
+			m3.markOrbit<EDGE>(d) ;
 			Dart e = map.phi2(d) ;
 			if(!featureEdge.isMarked(d) && e != d)
 			{
@@ -165,10 +165,10 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 				if(flip > 1)
 				{
 					map.flipEdge(d) ;
-					m3.markOrbit(EDGE, map.phi1(d)) ;
-					m3.markOrbit(EDGE, map.phi_1(d)) ;
-					m3.markOrbit(EDGE, map.phi1(e)) ;
-					m3.markOrbit(EDGE, map.phi_1(e)) ;
+					m3.markOrbit<EDGE>(map.phi1(d)) ;
+					m3.markOrbit<EDGE>(map.phi_1(d)) ;
+					m3.markOrbit<EDGE>(map.phi1(e)) ;
+					m3.markOrbit<EDGE>(map.phi_1(e)) ;
 				}
 			}
 		}

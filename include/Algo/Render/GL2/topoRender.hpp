@@ -68,9 +68,9 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
 
 	if (m_attIndex.map() != &map)
-		m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index");
 	if (!m_attIndex.isValid())
-		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index");
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
 	{
@@ -80,11 +80,11 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv1(map);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv11(map);
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv2(map);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -150,7 +150,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 				fv11[d] = f;
 				d = map.phi1(d);
 			}
-			mf.markOrbit(FACE, d);
+			mf.markOrbit<FACE>(d);
 		}
 	}
 
@@ -197,9 +197,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 
 	m_vbo2->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-
 }
-
 
 template<typename PFP>
 //void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
@@ -214,10 +212,10 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	vecDarts.reserve(map.getNbDarts()); // no problem dart is int: no problem of memory
 
 	if (m_attIndex.map() != &map)
-		m_attIndex  = map.template getAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = map.template getAttribute<unsigned int, DART>("dart_index");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = map.template addAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index");
 
 
 	for(Dart d = map.begin(); d!= map.end(); map.next(d))
@@ -227,14 +225,12 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	}
 	m_nbDarts = vecDarts.size();
 
-
-
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv1(map);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv11(map);
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv2(map);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -245,7 +241,6 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
-
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
@@ -316,7 +311,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 
 				d = map.phi1(d);
 			}
-			mf.markOrbit(FACE, d);
+			mf.markOrbit<FACE>(d);
 		}
 	}
 
@@ -360,10 +355,7 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVE
 
 	m_vbo2->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-
 }
-
-
 
 template<typename PFP>
 void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
@@ -416,8 +408,6 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 	return d;
 
 }
-
-
 
 }//end namespace GL2
 

@@ -209,7 +209,7 @@ void MapRender::initTriangles(typename PFP::MAP& map, const FunctorSelect& good,
 		if(!m.isMarked(dd) && good(dd))
 		{
 			addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 		}
 	}
 }
@@ -232,7 +232,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 
 			if(good(dd))
 				addTri<PFP>(map,dd,tableIndices);
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 			bound.push_back(dd);
 			int nb = 1;
 			do
@@ -248,7 +248,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 						{
 							if(good(f))
 								addTri<PFP>(map, f, tableIndices);
-							m.markOrbit(FACE, f);
+							m.markOrbit<FACE>(f);
 							bound.push_back(map.phi1(f));
 							++nb;
 							if (nb > LIST_SIZE)
@@ -282,7 +282,7 @@ void MapRender::initLines(typename PFP::MAP& map, const FunctorSelect& good, std
 		{
 			tableIndices.push_back(map.getEmbedding(d, VERTEX));
 			tableIndices.push_back(map.getEmbedding(map.phi2(d), VERTEX));
-			m.markOrbit(EDGE, d);
+			m.markOrbit<EDGE>(d);
 		}
 	}
 }
@@ -317,7 +317,7 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 							tableIndices.push_back(map.getEmbedding(ee, VERTEX));
 						if(good(f))
 							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX));
-						m.markOrbit(EDGE, f);
+						m.markOrbit<EDGE>(f);
 
 						bound.push_back(f);
 						++nb;
@@ -443,7 +443,7 @@ void MapRender::initFlatTriangles( typename PFP::MAP& map, unsigned int vertex_a
 				b = c;
 				c = map.phi1(b);
 			} while (c != dd);
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);

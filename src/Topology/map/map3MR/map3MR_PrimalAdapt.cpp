@@ -56,10 +56,10 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 
 		if(isOrbitEmbedded(VERTEX))
 		{
-			copyDartEmbedding(VERTEX, d, phi2(phi_1(d)));
-			copyDartEmbedding(VERTEX, e, phi2(phi_1(e)));
-			copyDartEmbedding(VERTEX, d2, phi2(phi_1(d2)));
-			copyDartEmbedding(VERTEX, e2, phi2(phi_1(e2)));
+			copyDartEmbedding<VERTEX>(d, phi2(phi_1(d)));
+			copyDartEmbedding<VERTEX>(e, phi2(phi_1(e)));
+			copyDartEmbedding<VERTEX>(d2, phi2(phi_1(d2)));
+			copyDartEmbedding<VERTEX>(e2, phi2(phi_1(e2)));
 		}
 
 		if(isOrbitEmbedded(EDGE))
@@ -68,7 +68,7 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 		}
 
 		if(isOrbitEmbedded(VOLUME))
-			embedNewCell(VOLUME, d);
+			embedNewCell<VOLUME>(d);
 
 
 		propagateDartRelation(d, m_phi2) ;
@@ -80,10 +80,10 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 		//propagateDartRelation(e2, m_phi2) ;
 		//propagateDartRelation(e2, m_phi3) ;
 
-		//propagateDartEmbedding(d, VERTEX);
-		//propagateDartEmbedding(d2, VERTEX);
-		//propagateDartEmbedding(e, VERTEX);
-		//propagateDartEmbedding(e2, VERTEX);
+		//propagateDartEmbedding<VERTEX>(d);
+		//propagateDartEmbedding<VERTEX>(d2);
+		//propagateDartEmbedding<VERTEX>(e);
+		//propagateDartEmbedding<VERTEX>(e2);
 	}
 }
 
@@ -119,8 +119,8 @@ void Map3MR_PrimalAdapt::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstS
 		// embed the vertex embedded from the origin volume to the new darts
 		if(isOrbitEmbedded(VERTEX))
 		{
-			copyDartEmbedding(VERTEX, phi2(dit), phi1(dit));
-			copyDartEmbedding(VERTEX, phi2(dit2), phi1(dit2));
+			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
+			copyDartEmbedding<VERTEX>(phi2(dit2), phi1(dit2));
 		}
 	}
 
@@ -145,8 +145,8 @@ void Map3MR_PrimalAdapt::splitFaceInVolume(Dart d, Dart e)
 	propagateDartRelation(dprev, m_phi1) ;
 	propagateDartRelation(eprev, m_phi1) ;
 
-	propagateDartEmbedding(dd, VERTEX) ;
-	propagateDartEmbedding(ee, VERTEX) ;
+	propagateDartEmbedding<VERTEX>(dd) ;
+	propagateDartEmbedding<VERTEX>(ee) ;
 }
 
 Dart Map3MR_PrimalAdapt::cutEdgeInVolume(Dart d)
@@ -260,10 +260,10 @@ void Map3MR_PrimalAdapt::splitFace(Dart d, Dart e)
 	propagateDartRelation(phi3(d), m_phi1) ;
 	propagateDartRelation(phi3(e), m_phi1) ;
 
-	propagateDartEmbedding(dd, VERTEX) ;
-	propagateDartEmbedding(ee, VERTEX) ;
-	propagateDartEmbedding(phi3(dd), VERTEX) ;
-	propagateDartEmbedding(phi3(ee), VERTEX) ;
+	propagateDartEmbedding<VERTEX>(dd) ;
+	propagateDartEmbedding<VERTEX>(ee) ;
+	propagateDartEmbedding<VERTEX>(phi3(dd)) ;
+	propagateDartEmbedding<VERTEX>(phi3(ee)) ;
 }
 
 void Map3MR_PrimalAdapt::splitVolume(std::vector<Dart>& vd)
@@ -290,8 +290,8 @@ void Map3MR_PrimalAdapt::splitVolume(std::vector<Dart>& vd)
 		Dart dit232 = phi2(dit23);
 		propagateDartRelation(dit232, m_phi2) ;
 
-		propagateDartEmbedding(dit2, VERTEX) ;
-		propagateDartEmbedding(dit23, VERTEX) ;
+		propagateDartEmbedding<VERTEX>(dit2) ;
+		propagateDartEmbedding<VERTEX>(dit23) ;
 	}
 
 }
@@ -545,26 +545,28 @@ void Map3MR_PrimalAdapt::propagateDartRelation(Dart d, AttributeMultiVector<Dart
 	popLevel() ;
 }
 
-void Map3MR_PrimalAdapt::propagateDartEmbedding(Dart d, unsigned int orbit)
+template <unsigned int ORBIT>
+void Map3MR_PrimalAdapt::propagateDartEmbedding(Dart d)
 {
-	unsigned int emb = getEmbedding(orbit, d) ;
+	unsigned int emb = getEmbedding<ORBIT>(d) ;
 	pushLevel() ;
 	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
 	{
 		setCurrentLevel(i) ;
-		setDartEmbedding(orbit, d, emb) ;
+		setDartEmbedding<ORBIT>(d, emb) ;
 	}
 	popLevel() ;
 }
 
-void Map3MR_PrimalAdapt::propagateOrbitEmbedding(Dart d, unsigned int orbit)
+template <unsigned int ORBIT>
+void Map3MR_PrimalAdapt::propagateOrbitEmbedding(Dart d)
 {
-	unsigned int emb = getEmbedding(orbit, d) ;
+	unsigned int emb = getEmbedding<ORBIT>(d) ;
 	pushLevel() ;
 	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
 	{
 		setCurrentLevel(i) ;
-		embedOrbit(orbit, d, emb) ;
+		embedOrbit<ORBIT>(d, emb) ;
 	}
 	popLevel() ;
 }
@@ -580,9 +582,9 @@ void Map3MR_PrimalAdapt::subdivideEdge(Dart d)
 
 	Dart d1 = cutEdge(d);
 
-	embedOrbit(VERTEX, d1, EMBNULL);
+	embedOrbit<VERTEX>(d1, EMBNULL);
 	(*edgeVertexFunctor)(d1) ;
-	propagateOrbitEmbedding(d1, VERTEX);
+	propagateOrbitEmbedding<VERTEX>(d1);
 
 	decCurrentLevel() ;
 
@@ -642,21 +644,21 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 		Dart dd = phi1(old) ;
 		Dart e = phi1(dd) ;
 		//(*vertexVertexFunctor)(e) ;
-		propagateOrbitEmbedding(e, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(e) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
 		//(*vertexVertexFunctor)(e) ;
-		propagateOrbitEmbedding(e, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(e) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
 		//(*vertexVertexFunctor)(e) ;
-		propagateOrbitEmbedding(e, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(e) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 	}
@@ -665,7 +667,7 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 		Dart dd = phi1(old) ;
 		Dart next = phi1(dd) ;
 		//(*vertexVertexFunctor)(next) ;
-		propagateOrbitEmbedding(next, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(next) ;
 		next = phi1(next) ;
 		splitFace(dd, next) ;			// insert a first edge
 		Dart ne = phi2(phi_1(dd));
@@ -674,20 +676,20 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 
 		dd = phi1(next) ;
 		//(*vertexVertexFunctor)(dd) ;
-		propagateOrbitEmbedding(dd, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(dd) ;
 		dd = phi1(dd) ;
 		while(dd != ne)					// turn around the face and insert new edges
 		{								// linked to the central vertex
 			splitFace(phi1(ne), dd) ;
 			dd = phi1(dd) ;
 			//(*vertexVertexFunctor)(dd) ;
-			propagateOrbitEmbedding(dd, VERTEX) ;
+			propagateOrbitEmbedding<VERTEX>(dd) ;
 			dd = phi1(dd) ;
 		}
 
-		embedOrbit(VERTEX, phi2(ne), EMBNULL);
+		embedOrbit<VERTEX>(phi2(ne), EMBNULL);
 		(*faceVertexFunctor)(phi2(ne)) ;
-		propagateOrbitEmbedding(phi2(ne), VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(phi2(ne)) ;
 	}
 
 	popLevel() ;
@@ -743,7 +745,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 		setCurrentLevel(getMaxLevel()) ;
 		std::cout << "getDartLevel ditWV = " << getDartLevel(ditWV) << std::endl;
 		std::cout << "currentLevel = " << getCurrentLevel() << std::endl;
-		embedOrbit(VERTEX, ditWV, EMBNULL);
+		embedOrbit<VERTEX>(ditWV, EMBNULL);
 		(*vertexVertexFunctor)(ditWV) ;
 
 		Dart e = ditWV;
@@ -804,7 +806,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 		//if(!mf.isMarked(phi3(f1)) && !mf.isMarked(phi3(f2)))
 		{
 			sewVolumes(f1, f2, false);
-			mf.markOrbit(FACE, f1);
+			mf.markOrbit<FACE>(f1);
 
 			Dart temp = f1;
 			do
@@ -816,10 +818,10 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 		}
 	}
 
-	embedOrbit(VERTEX, centralDart, EMBNULL);
+	embedOrbit<VERTEX>(centralDart, EMBNULL);
 	(*volumeVertexFunctor)(centralDart) ;
-	embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
-	propagateOrbitEmbedding(centralDart, VERTEX) ;
+	embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
+	propagateOrbitEmbedding<VERTEX>(centralDart) ;
 
 
 	//A optimiser
@@ -829,7 +831,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 	{
 		setCurrentLevel(getMaxLevel()) ;
 		setCurrentLevel(getMaxLevel()-1) ;
-		embedOrbit(VERTEX, phi1(d), getEmbedding<VERTEX>(phi1(d)));
+		embedOrbit<VERTEX>(phi1(d), getEmbedding<VERTEX>(phi1(d)));
 	}
 	setCurrentLevel(getMaxLevel()) ;
 
@@ -838,7 +840,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
+		embedOrbit<VERTEX>(phi2(phi1(d)), getEmbedding<VERTEX>(phi2(phi1(d))));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
 	setCurrentLevel(getMaxLevel()) ;
@@ -892,7 +894,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 	setCurrentLevel(vLevel + 1) ;
 	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
 	{
-		embedOrbit(VERTEX, dit, EMBNULL);
+		embedOrbit<VERTEX>(dit, EMBNULL);
 		(*vertexVertexFunctor)(dit) ;
 
 		Dart f1 = phi1(dit);
@@ -924,7 +926,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 			cutEdge(ne);
 			centralDart = phi1(ne);
 			//(*volumeVertexFunctor)(centralDart) ;
-			//propagateOrbitEmbedding(centralDart, VERTEX) ;
+			//propagateOrbitEmbedding<VERTEX>(centralDart) ;
 
 			Dart stop = phi2(phi1(ne));
 			ne = phi2(ne);
@@ -963,18 +965,18 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 					Dart f32 = phi2(f3);
 					swapEdges(f3, tmp);
 
-					me.markOrbit(EDGE, f3);
-					me.markOrbit(EDGE, f32);
+					me.markOrbit<EDGE>(f3);
+					me.markOrbit<EDGE>(f32);
 				}
 
 				f = phi2(phi_1(f));
 			}while(f != x);
 		}
 
-		embedOrbit(VERTEX, centralDart, EMBNULL);
-		embedOrbit(VERTEX, centralDart, getEmbedding<VERTEX>(centralDart));
+		embedOrbit<VERTEX>(centralDart, EMBNULL);
+		embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
 		(*volumeVertexFunctor)(centralDart) ;
-		propagateOrbitEmbedding(centralDart, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(centralDart) ;
 	}
 
 	popLevel();
@@ -1073,8 +1075,8 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 //
 //		if(isOrbitEmbedded(VERTEX))
 //		{
-//			copyDartEmbedding(VERTEX, phi2(dit2), dit);
-//			copyDartEmbedding(VERTEX, phi2(dit), dit2);
+//			copyDartEmbedding<VERTEX>(phi2(dit2), dit);
+//			copyDartEmbedding<VERTEX>(phi2(dit), dit2);
 //		}
 //
 //		if(isOrbitEmbedded(EDGE))
@@ -1135,7 +1137,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 //			Dart it = bc;
 //			do
 //			{
-//				copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
+//				copyDartEmbedding<VERTEX>(it, phi1(phi3(it)));
 //				it = phi1(it) ;
 //			} while(it != bc) ;
 //		}

@@ -55,9 +55,9 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		if(!shareVertexEmbeddings && embedNewVertices)
 		{
 			if(getEmbedding<VERTEX>(d) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
+				embedNewCell<VERTEX>(d) ;
 			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
+				embedNewCell<VERTEX>(d) ;
 		}
 
 		cutEdge(d) ;
@@ -65,7 +65,7 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		travE.skip(phi1(d)) ;
 
 		if(embedNewVertices)
-			embedNewCell(VERTEX, phi1(d)) ;
+			embedNewCell<VERTEX>(phi1(d)) ;
 	}
 
 	// split faces
@@ -110,7 +110,7 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 			travF.skip(dd) ;
 
 			if(embedNewVertices)
-				embedNewCell(VERTEX, phi1(ne)) ;
+				embedNewCell<VERTEX>(phi1(ne)) ;
 
 			dd = phi1(phi1(next)) ;
 			while(dd != ne)				// turn around the face and insert new edges

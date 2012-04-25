@@ -109,7 +109,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			if (good_dart != NIL)
 			{
 				map.sewFaces(d, good_dart, false);
-				m.unmarkOrbit(EDGE, d);
+				m.unmarkOrbit<EDGE>(d);
 			}
 			else
 			{
@@ -179,7 +179,7 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 				if(backEdgesBuffer[em] == EMBNULL)
 				{
 					unsigned int emn = map.newCell(VERTEX);
-					map.copyCell(VERTEX, emn, em);
+					map.copyCell<VERTEX>(emn, em);
 					backEdgesBuffer[em] = emn;
 					position[emn] += typename PFP::VEC3(0,0,dist);
 				}
@@ -223,7 +223,7 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 			if (good_dart != NIL)
 			{
 				map.sewVolumes(map.phi2(d), map.phi2(good_dart), false);
-				m.unmarkOrbit(EDGE, d);
+				m.unmarkOrbit<EDGE>(d);
 			}
 			else
 			{

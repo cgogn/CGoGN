@@ -145,9 +145,9 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit(EDGE, d);
-			me.markOrbit(EDGE, e);
-			mf.markOrbit(VERTEX, e);
+			me.markOrbit<EDGE>(d);
+			me.markOrbit<EDGE>(e);
+			mf.markOrbit<VERTEX>(e);
 		}
 	}
 
@@ -162,7 +162,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 			Dart e = cf;
 			do
 			{
-				mf.markOrbit(FACE, e);
+				mf.markOrbit<FACE>(e);
 				e = map.phi2_1(e);
 			} while (e != cf);
 		}
@@ -181,7 +181,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
-	CellMarkerNoUnmark m0(map, VERTEX);
+	CellMarkerNoUnmark<VERTEX> m0(map);
 	DartMarkerNoUnmark mf(map);
 	DartMarkerNoUnmark me(map);
 
@@ -209,8 +209,8 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit(EDGE, d);
-			me.markOrbit(EDGE, e);
+			me.markOrbit<EDGE>(d);
+			me.markOrbit<EDGE>(e);
 
 			mf.mark(d) ;
 			mf.mark(map.phi2(e)) ;
@@ -227,18 +227,18 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			// compute center skip darts of new vertices non embedded
 			EMB center = AttribOps::zero<EMB,PFP>();
 			unsigned int count = 0 ;
-			mf.unmarkOrbit(FACE, d) ;
+			mf.unmarkOrbit<FACE>(d) ;
 			Dart it = d;
 			do
 			{
 				center += attributs[it];
 				++count ;
 //				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
-				me.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(EDGE), it);
+				me.unmarkOrbit<EDGE + PFP::MAP::IN_PARENT>(it);
 
 				it = map.phi1(it) ;
 //				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
-				me.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(EDGE), it);
+				me.unmarkOrbit<EDGE + PFP::MAP::IN_PARENT>(it);
 				it = map.phi1(it) ;
 			} while(it != d) ;
 			center /= double(count);
@@ -335,7 +335,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	std::vector<Dart> l_middles;
 	std::vector<Dart> l_verts;
 
-	CellMarkerNoUnmark m0(map, VERTEX);
+	CellMarkerNoUnmark<VERTEX> m0(map);
 	DartMarkerNoUnmark mv(map);
 	DartMarkerNoUnmark me(map);
 
@@ -362,10 +362,10 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			attributs[e] += attributs[f];
 			attributs[e] *= 0.5;
 
-			me.markOrbit(EDGE, d);
-			me.markOrbit(EDGE, e);
+			me.markOrbit<EDGE>(d);
+			me.markOrbit<EDGE>(e);
 
-			mv.markOrbit(VERTEX, e);
+			mv.markOrbit<VERTEX>(e);
 
 			l_middles.push_back(e);
 		}
@@ -428,8 +428,8 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if (mv.isMarked(d))
 		{
 			// unmark the darts of the face
-			me.unmarkOrbit(FACE, d) ;
-			mv.unmarkOrbit(FACE, d) ;
+			me.unmarkOrbit<FACE>(d) ;
+			mv.unmarkOrbit<FACE>(d) ;
 
 			Dart dd = d;
 			Dart e = map.template phi<11>(dd) ;
@@ -455,8 +455,8 @@ void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, cons
 template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-	AutoAttributeHandler< Dart > tablePred(map,EDGE);
-	CellMarker m0(map, EDGE);
+	AutoAttributeHandler<Dart, EDGE> tablePred(map);
+	CellMarker<EDGE> m0(map);
 
 	std::vector<Dart> dOrig;
 	std::vector<EMB> cOrig;
@@ -523,46 +523,46 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 template <typename PFP>
 void reverseOrientation(typename PFP::MAP& map)
 {
-	AttributeHandler<unsigned int> emb0(&map, map.getEmbeddingAttributeVector(VERTEX)) ;
+	AttributeHandler<unsigned int, DART> emb0(&map, map.template getEmbeddingAttributeVector<VERTEX>()) ;
 	if(emb0.isValid())
 	{
-		AttributeHandler<unsigned int> new_emb0 = map.template addAttribute<unsigned int>(DART, "new_EMB_0") ;
+		AttributeHandler<unsigned int, DART> new_emb0 = map.template addAttribute<unsigned int, DART>("new_EMB_0") ;
 		for(Dart d = map.begin(); d != map.end(); map.next(d))
 			new_emb0[d] = emb0[map.phi1(d)] ;
 		map.template swapAttributes<unsigned int>(emb0, new_emb0) ;
 		map.template removeAttribute<unsigned int>(new_emb0) ;
 	}
 
-	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART, "phi1") ;
-	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART, "phi_1") ;
+	AttributeHandler<Dart, DART> phi1 = map.template getAttribute<Dart, DART>("phi1") ;
+	AttributeHandler<Dart, DART> phi_1 = map.template getAttribute<Dart, DART>("phi_1") ;
 	map.template swapAttributes<Dart>(phi1, phi_1) ;
 }
 
-template <typename PFP>
-void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
-{
-	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART, "phi1") ;
-	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART, "phi_1") ;
-	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART, "new_phi1") ;
-	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART, "new_phi_1") ;
-
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		Dart dd = map.phi12(d) ;
-		new_phi1[d] = dd ;
-		new_phi_1[dd] = d ;
-	}
-
-	map.template swapAttributes<Dart>(phi1, new_phi1) ;
-	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
-
-	map.template removeAttribute<Dart>(new_phi1) ;
-	map.template removeAttribute<Dart>(new_phi_1) ;
-
-	map.swapEmbeddingContainers(VERTEX, FACE) ;
-
-	reverseOrientation<PFP>(map) ;
-}
+//template <typename PFP>
+//void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
+//{
+//	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART, "phi1") ;
+//	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART, "phi_1") ;
+//	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART, "new_phi1") ;
+//	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART, "new_phi_1") ;
+//
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		Dart dd = map.phi12(d) ;
+//		new_phi1[d] = dd ;
+//		new_phi_1[dd] = d ;
+//	}
+//
+//	map.template swapAttributes<Dart>(phi1, new_phi1) ;
+//	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
+//
+//	map.template removeAttribute<Dart>(new_phi1) ;
+//	map.template removeAttribute<Dart>(new_phi_1) ;
+//
+//	map.swapEmbeddingContainers(VERTEX, FACE) ;
+//
+//	reverseOrientation<PFP>(map) ;
+//}
 
 inline double sqrt3_K(unsigned int n)
 {
@@ -586,52 +586,52 @@ inline double sqrt3_K(unsigned int n)
 	}
 }
 
-template <typename PFP>
-void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
-{
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-	AttributeHandler<VEC3> positionF = map.template getAttribute<VEC3>(FACE, "position") ;
-	if(!positionF.isValid())
-		positionF = map.template addAttribute<VEC3>(FACE, "position") ;
-	Algo::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
-
-	computeDual<PFP>(map, selected);
-
-	AttributeHandler<VEC3> tmp = position ;
-	position = positionF ;
-	positionF = tmp ;
-
-	CellMarker m(map, VERTEX) ;
-	m.markAll() ;
-
-	trianguleFaces<PFP>(map, position, positionF, selected);
-
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(!m.isMarked(d))
-		{
-			m.mark(d) ;
-			VEC3 P = position[d] ;
-			VEC3 newP(0) ;
-			unsigned int val = 0 ;
-			Dart vit = d ;
-			do
-			{
-				newP += position[map.phi2(vit)] ;
-				++val ;
-				vit = map.phi2_1(vit) ;
-			} while(vit != d) ;
-			REAL K = sqrt3_K(val) ;
-			newP *= REAL(3) ;
-			newP -= REAL(val) * P ;
-			newP *= K / REAL(2 * val) ;
-			newP += (REAL(1) - K) * P ;
-			position[d] = newP ;
-		}
-	}
-}
+//template <typename PFP>
+//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+//{
+//	typedef typename PFP::VEC3 VEC3 ;
+//	typedef typename PFP::REAL REAL ;
+//
+//	AttributeHandler<VEC3> positionF = map.template getAttribute<VEC3>(FACE, "position") ;
+//	if(!positionF.isValid())
+//		positionF = map.template addAttribute<VEC3>(FACE, "position") ;
+//	Algo::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
+//
+//	computeDual<PFP>(map, selected);
+//
+//	AttributeHandler<VEC3> tmp = position ;
+//	position = positionF ;
+//	positionF = tmp ;
+//
+//	CellMarker m(map, VERTEX) ;
+//	m.markAll() ;
+//
+//	trianguleFaces<PFP>(map, position, positionF, selected);
+//
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		if(!m.isMarked(d))
+//		{
+//			m.mark(d) ;
+//			VEC3 P = position[d] ;
+//			VEC3 newP(0) ;
+//			unsigned int val = 0 ;
+//			Dart vit = d ;
+//			do
+//			{
+//				newP += position[map.phi2(vit)] ;
+//				++val ;
+//				vit = map.phi2_1(vit) ;
+//			} while(vit != d) ;
+//			REAL K = sqrt3_K(val) ;
+//			newP *= REAL(3) ;
+//			newP -= REAL(val) * P ;
+//			newP *= K / REAL(2 * val) ;
+//			newP += (REAL(1) - K) * P ;
+//			position[d] = newP ;
+//		}
+//	}
+//}
 
 } // namespace Modelisation
 

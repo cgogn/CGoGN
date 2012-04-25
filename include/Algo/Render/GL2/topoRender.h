@@ -36,7 +36,6 @@
 #include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
-
 #include "Utils/svg.h"
 
 // forward
@@ -109,7 +108,7 @@ protected:
 	/**
 	 * attribut d'index dans le VBO
 	 */
-	AttributeHandler<unsigned int> m_attIndex;
+	AttributeHandler<unsigned int, DART> m_attIndex;
 
 	Utils::ShaderSimpleColor* m_shader1;
 	Utils::ShaderColorPerVertex* m_shader2;

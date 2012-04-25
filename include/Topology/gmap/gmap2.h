@@ -45,6 +45,8 @@ public:
 
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+5; }
 
+	static const unsigned int IN_PARENT = 5 ;
+
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+5;
 	static const unsigned int EDGE_OF_PARENT = EDGE+5;
 

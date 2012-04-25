@@ -234,7 +234,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			if (good_dart != NIL)
 			{
 				map.sewFaces(d, good_dart, false) ;
-				m.unmarkOrbit(EDGE, d) ;
+				m.unmarkOrbit<EDGE>(d) ;
 			}
 			else
 			{

@@ -102,7 +102,7 @@ void renderTopoMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions,
 				fv11[d] = f;
 				d = map.phi1(d);
 			}
-			mf.markOrbit(FACE, d);
+			mf.markOrbit<FACE>(d);
 		}
 	}
 
@@ -377,7 +377,7 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 				posBeta1[map.beta0(d)] = Q*0.9f + Q_mid*0.1f;
 				d = map.phi1(d);
 			}
-			mf.markOrbit(FACE, d);
+			mf.markOrbit<FACE>(d);
 		}
 	}
 

@@ -142,7 +142,7 @@ void decimate(
 	if(!selector->init())
 		return ;
 
-	unsigned int nbVertices = map.getNbOrbits(VERTEX) ;
+	unsigned int nbVertices = map.getNbOrbits<VERTEX>() ;
 	bool finished = false ;
 	Dart d ;
 

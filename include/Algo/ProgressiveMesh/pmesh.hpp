@@ -143,7 +143,7 @@ ProgressiveMesh<PFP>::~ProgressiveMesh()
 template <typename PFP>
 void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 {
-	unsigned int nbVertices = m_map.getNbOrbits(VERTEX) ;
+	unsigned int nbVertices = m_map.getNbOrbits<VERTEX>() ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
 	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
 
@@ -171,9 +171,9 @@ void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 
 		edgeCollapse(vs) ;							// collapse edge
 
-		unsigned int newV = m_map.embedNewCell(VERTEX, d2) ;
-		unsigned int newE1 = m_map.embedNewCell(EDGE, d2) ;
-		unsigned int newE2 = m_map.embedNewCell(EDGE, dd2) ;
+		unsigned int newV = m_map.embedNewCell<VERTEX>(d2) ;
+		unsigned int newE1 = m_map.embedNewCell<EDGE>(d2) ;
+		unsigned int newE2 = m_map.embedNewCell<EDGE>(dd2) ;
 		vs->setApproxV(newV) ;
 		vs->setApproxE1(newE1) ;
 		vs->setApproxE2(newE2) ;
@@ -201,8 +201,8 @@ void ProgressiveMesh<PFP>::edgeCollapse(VSplit<PFP>* vs)
 	Dart d = vs->getEdge() ;
 	Dart dd = m_map.phi2(d) ;
 
-	inactiveMarker.markOrbit(FACE, d) ;
-	inactiveMarker.markOrbit(FACE, dd) ;
+	inactiveMarker.markOrbit<FACE>(d) ;
+	inactiveMarker.markOrbit<FACE>(dd) ;
 
 	m_map.extractTrianglePair(d) ;
 }
@@ -217,8 +217,8 @@ void ProgressiveMesh<PFP>::vertexSplit(VSplit<PFP>* vs)
 
 	m_map.insertTrianglePair(d, d2, dd2) ;
 
-	inactiveMarker.unmarkOrbit(FACE, d) ;
-	inactiveMarker.unmarkOrbit(FACE, dd) ;
+	inactiveMarker.unmarkOrbit<FACE>(d) ;
+	inactiveMarker.unmarkOrbit<FACE>(dd) ;
 }
 
 template <typename PFP>
@@ -237,9 +237,9 @@ void ProgressiveMesh<PFP>::coarsen()
 
 	edgeCollapse(vs) ;	// collapse edge
 
-	m_map.embedOrbit(VERTEX, d2, vs->getApproxV()) ;
-	m_map.embedOrbit(EDGE, d2, vs->getApproxE1()) ;
-	m_map.embedOrbit(EDGE, dd2, vs->getApproxE2()) ;
+	m_map.embedOrbit<VERTEX>(d2, vs->getApproxV()) ;
+	m_map.embedOrbit<EDGE>(d2, vs->getApproxE1()) ;
+	m_map.embedOrbit<EDGE>(dd2, vs->getApproxE2()) ;
 }
 
 template <typename PFP>
@@ -260,10 +260,10 @@ void ProgressiveMesh<PFP>::refine()
 
 	unsigned int v1 = m_map.getEmbedding<VERTEX>(d) ;				// get the embedding
 	unsigned int v2 = m_map.getEmbedding<VERTEX>(dd) ;			// of the new vertices
-	unsigned int e1 = m_map.getEmbedding(EDGE, m_map.phi1(d)) ;
-	unsigned int e2 = m_map.getEmbedding(EDGE, m_map.phi_1(d)) ;	// and new edges
-	unsigned int e3 = m_map.getEmbedding(EDGE, m_map.phi1(dd)) ;
-	unsigned int e4 = m_map.getEmbedding(EDGE, m_map.phi_1(dd)) ;
+	unsigned int e1 = m_map.getEmbedding<EDGE>(m_map.phi1(d)) ;
+	unsigned int e2 = m_map.getEmbedding<EDGE>(m_map.phi_1(d)) ;	// and new edges
+	unsigned int e3 = m_map.getEmbedding<EDGE>(m_map.phi1(dd)) ;
+	unsigned int e4 = m_map.getEmbedding<EDGE>(m_map.phi_1(dd)) ;
 
 	if(!m_predictors.empty())
 	{
@@ -284,12 +284,12 @@ void ProgressiveMesh<PFP>::refine()
 
 	vertexSplit(vs) ; // split vertex
 
-	m_map.embedOrbit(VERTEX, d, v1) ;		// embed the
-	m_map.embedOrbit(VERTEX, dd, v2) ;	// new vertices
-	m_map.embedOrbit(EDGE, d1, e1) ;
-	m_map.embedOrbit(EDGE, d2, e2) ;		// and new edges
-	m_map.embedOrbit(EDGE, dd1, e3) ;
-	m_map.embedOrbit(EDGE, dd2, e4) ;
+	m_map.embedOrbit<VERTEX>(d, v1) ;		// embed the
+	m_map.embedOrbit<VERTEX>(dd, v2) ;	// new vertices
+	m_map.embedOrbit<EDGE>(d1, e1) ;
+	m_map.embedOrbit<EDGE>(d2, e2) ;		// and new edges
+	m_map.embedOrbit<EDGE>(dd1, e3) ;
+	m_map.embedOrbit<EDGE>(dd2, e4) ;
 
 	if(!m_predictors.empty())
 	{
@@ -504,7 +504,7 @@ float ProgressiveMesh<PFP>::computeDistance2()
 	{
 		if(!mUpdate.isMarked(d))
 		{
-			mUpdate.markOrbit(VERTEX, d) ;
+			mUpdate.markOrbit<VERTEX>(d) ;
 			EMB* dEmb = reinterpret_cast<EMB*>(m_map.getVertexEmb(d)) ;
 			// computes the 2-distance between original vertex and new vertex
 			dEmb->updateDistance2() ;

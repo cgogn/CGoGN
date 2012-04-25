@@ -81,7 +81,7 @@ void Map2MR_PM::addNewLevel(bool embedNewVertices)
 					do
 					{
 						if(!selectedEdges->isMarked(ditV))
-							selectedEdges->markOrbit(EDGE, ditV);
+							selectedEdges->markOrbit<EDGE>(ditV);
 
 						ditV = phi2(phi_1(ditV));
 					} while(ditV != dit);
@@ -95,7 +95,7 @@ void Map2MR_PM::addNewLevel(bool embedNewVertices)
 					do
 					{
 						if(!selectedEdges->isMarked(ditV))
-							selectedEdges->markOrbit(EDGE, ditV);
+							selectedEdges->markOrbit<EDGE>(ditV);
 
 						ditV = phi2(phi_1(ditV));
 					} while(ditV != dit);

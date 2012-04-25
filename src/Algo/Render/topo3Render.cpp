@@ -43,9 +43,14 @@ namespace GL2
 {
 
 Topo3Render::Topo3Render():
-m_nbDarts(0),m_nbRel1(0),m_nbRel2(0),m_nbRel3(0),
-m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL),
-m_dartsColor(1.0f,1.0f,1.0f)
+	m_nbDarts(0),
+	m_nbRel1(0),
+	m_nbRel2(0),
+	m_nbRel3(0),
+	m_topo_dart_width(2.0f),
+	m_topo_relation_width(3.0f),
+	m_color_save(NULL),
+	m_dartsColor(1.0f,1.0f,1.0f)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -62,7 +67,6 @@ m_dartsColor(1.0f,1.0f,1.0f)
 	m_shader1 = new Utils::ShaderSimpleColor();
 	m_shader2 = new Utils::ShaderColorPerVertex();
 
-
 	// binding VBO - VA
 	m_vaId = m_shader1->setAttributePosition(m_vbo1);
 
@@ -72,7 +76,6 @@ m_dartsColor(1.0f,1.0f,1.0f)
 	// registering for auto matrices update
 	Utils::GLSLShader::registerShader(NULL, m_shader1);
 	Utils::GLSLShader::registerShader(NULL, m_shader2);
-
 }
 
 Topo3Render::~Topo3Render()

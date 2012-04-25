@@ -235,7 +235,7 @@ void MyGlutWin::myKeyboard(unsigned char keycode, int x, int y)
                 /** affichage **/
         		case 'd' :
         		{
-        				int nbVertices = myMap.getNbOrbits(VERTEX) ;
+        				int nbVertices = myMap.getNbOrbits<VERTEX>() ;
 
         				CGoGNout << "nb darts = " << myMap.getNbOrbits(DART) << CGoGNendl;
 
@@ -399,9 +399,9 @@ int main(int argc, char **argv)
 		maillageTest();
 	}
 
-	//CGoGNout << "Nb Tetrahedron = " << myMap.getNbOrbits(VOLUME) << CGoGNendl;
-	//		" / Nb Edges = " << myMap.getNbOrbits(EDGE) <<
-	//		" / Nb Vertices = " << myMap.getNbOrbits(VERTEX) << CGoGNendl;
+	//CGoGNout << "Nb Tetrahedron = " << myMap.getNbOrbits<VOLUME>() << CGoGNendl;
+	//		" / Nb Edges = " << myMap.getNbOrbits<EDGE>() <<
+	//		" / Nb Vertices = " << myMap.getNbOrbits<VERTEX>() << CGoGNendl;
 
     // un peu d'interface
 	MyGlutWin* mgw = new MyGlutWin(&argc,argv,1200,800);

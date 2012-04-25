@@ -120,9 +120,9 @@ protected:
 	Geom::Vec3f m_dartsColor;
 
 	/**
-	 * attribute index to get easy correspdance dart/color
+	 * attribute index to get easy correspondence dart/color
 	 */
-	AttributeHandler<unsigned int> m_attIndex;
+	AttributeHandler<unsigned int, DART> m_attIndex;
 
 
 	/**

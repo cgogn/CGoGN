@@ -322,7 +322,7 @@ bool EdgeSelector_QEM<PFP>::init()
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 
@@ -527,7 +527,7 @@ bool EdgeSelector_QEMml<PFP>::init()
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 
@@ -886,7 +886,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.embedNewCell(VERTEX, d2) ;
+	unsigned int newV = m.embedNewCell<VERTEX>(d2) ;
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -899,8 +899,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.embedOrbit(VERTEX, d, v1) ;
-	m.embedOrbit(VERTEX, dd, v2) ;
+	m.embedOrbit<VERTEX>(d, v1) ;
+	m.embedOrbit<VERTEX>(dd, v2) ;
 
 	REAL err = 0 ;
 

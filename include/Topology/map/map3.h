@@ -60,6 +60,9 @@ public:
 	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
 
+	static const unsigned int IN_PARENT = 7 ;
+	static const unsigned int IN_PARENT2 = 5 ;
+
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+7;
 	static const unsigned int EDGE_OF_PARENT = EDGE+7;
 	static const unsigned int FACE_OF_PARENT = FACE+7;

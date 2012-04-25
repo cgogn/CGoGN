@@ -348,7 +348,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 						addEarTri<PFP>(map, dd, tableIndices, position);
 				}
 			}
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 			bound.push_back(dd);
 			int nb = 1;
 			do
@@ -374,7 +374,7 @@ void MapRender::initTrianglesOptimized(typename PFP::MAP& map, const FunctorSele
 										addEarTri<PFP>(map, f, tableIndices, position);
 								}
 							}
-							m.markOrbit(FACE, f);
+							m.markOrbit<FACE>(f);
 							bound.push_back(map.phi1(f));
 							++nb;
 							if (nb > LIST_SIZE)
@@ -454,7 +454,7 @@ void MapRender::initLinesOptimized(typename PFP::MAP& map, const FunctorSelect& 
 							tableIndices.push_back(map.getEmbedding<VERTEX>(ee));
 						if(good(f))
 							tableIndices.push_back(map.getEmbedding<VERTEX>(map.phi1(ee)));
-						m.markOrbit(EDGE, f);
+						m.markOrbit<EDGE>(f);
 
 						bound.push_back(f);
 						++nb;

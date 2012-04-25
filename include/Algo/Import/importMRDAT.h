@@ -98,12 +98,12 @@ public:
 				unsigned int newEmb = vID[children[0]->indices[idx]] ;
 				if(oldEmb == EMBNULL)
 				{
-					map.embedOrbit(VERTEX, dd, newEmb) ;
+					map.embedOrbit<VERTEX>(dd, newEmb) ;
 					map.pushLevel() ;
 					for(unsigned int i = map.getCurrentLevel() + 1; i <= map.getMaxLevel(); ++i)
 					{
 						map.setCurrentLevel(i) ;
-						map.embedOrbit(VERTEX, dd, newEmb) ;
+						map.embedOrbit<VERTEX>(dd, newEmb) ;
 					}
 					map.popLevel() ;
 				}

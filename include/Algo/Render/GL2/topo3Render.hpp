@@ -82,19 +82,19 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	}
 
 	// compute center of each volumes
-	CellMarker cmv(mapx,VOLUME);
-	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
+	CellMarker<VOLUME> cmv(mapx);
+	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(mapx, "centerVolumes");
 
 	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes, allDarts);
 
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(mapx, DART);
+	AutoAttributeHandler<VEC3, DART> fv1(mapx);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(mapx, DART);
+	AutoAttributeHandler<VEC3, DART> fv11(mapx);
 
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(mapx, DART);
-	AutoAttributeHandler<VEC3> fv2x(mapx, DART);
+	AutoAttributeHandler<VEC3, DART> fv2(mapx);
+	AutoAttributeHandler<VEC3, DART> fv2x(mapx);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -112,8 +112,8 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	unsigned int posDBI=0;
 
 	// traverse each face of each volume
-	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),allDarts);
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(mapx, allDarts);
+	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		vecDartFaces.push_back(d);
 
@@ -344,15 +344,15 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	}
 
 	// compute center of each volumes
-	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
+	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(mapx, "centerVolumes");
 	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
 
 
 	// beta1
-	AutoAttributeHandler<VEC3> fv1(mapx, DART);
+	AutoAttributeHandler<VEC3, DART> fv1(mapx);
 	// beta2/3
-	AutoAttributeHandler<VEC3> fv2(mapx, DART);
-	AutoAttributeHandler<VEC3> fv2x(mapx, DART);
+	AutoAttributeHandler<VEC3, DART> fv2(mapx);
+	AutoAttributeHandler<VEC3, DART> fv2x(mapx);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -370,8 +370,8 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	unsigned int posDBI=0;
 
 	//traverse each face of each volume
-	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(mapx, good);
+	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		vecDartFaces.push_back(d);
 

@@ -87,8 +87,7 @@ void Map3::deleteVolume(Dart d)
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
 
-//	mark.markOrbit(ORIENTED_FACE, d) ;
-	mark.markOrbit(FACE2, d) ;
+	mark.markOrbit<FACE2>(d) ;
 
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
@@ -104,8 +103,7 @@ void Map3::deleteVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-//				mark.markOrbit(ORIENTED_FACE, ee) ;
-				mark.markOrbit(FACE2, ee) ;
+				mark.markOrbit<FACE2>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -122,7 +120,7 @@ void Map3::fillHole(Dart d)
 	Dart dd = d ;
 	if(!isBoundaryMarked(dd))
 		dd = phi3(dd) ;
-	boundaryUnmarkOrbit(VOLUME, dd) ;
+	boundaryUnmarkOrbit<VOLUME>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -149,7 +147,7 @@ Dart Map3::deleteVertex(Dart d)
 	{
 		if(!mf.isMarked(fstoretmp[i]))
 		{
-			mf.markOrbit(FACE, fstoretmp[i]);
+			mf.markOrbit<FACE>(fstoretmp[i]);
 			fstore.push_back(fstoretmp[i]);
 		}
 	}
@@ -741,7 +739,7 @@ unsigned int Map3::vertexDegree(Dart d)
 		if(!me.isMarked(*it))
 		{
 			++count;
-			me.markOrbit(EDGE, *it);
+			me.markOrbit<EDGE>(*it);
 		}
 	}
 
@@ -1058,8 +1056,7 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-//	m.markOrbit(ORIENTED_FACE, d) ;
-	m.markOrbit(FACE2, d) ;
+	m.markOrbit<FACE2>(d) ;
 
 	unsigned int count = 0 ;
 
@@ -1086,7 +1083,7 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 					if(!m.isMarked(e))
 					{
 						visitedFaces.push_back(e) ;
-						m.markOrbit(FACE2, e) ;
+						m.markOrbit<FACE2>(e) ;
 					}
 				}
 				else if(isBoundaryMarked(e))

@@ -111,17 +111,17 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 template <typename PFP>
 void reverseOrientation(typename PFP::MAP& map) ;
 
-/**
- * Dual mesh computation
- */
-template <typename PFP>
-void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
+///**
+// * Dual mesh computation
+// */
+//template <typename PFP>
+//void computeDual(typename PFP::MAP& map, const FunctorSelect& selected = allDarts) ;
 
-/**
- * Sqrt(3) subdivision scheme
- */
-template <typename PFP>
-void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+///**
+// * Sqrt(3) subdivision scheme
+// */
+//template <typename PFP>
+//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
 
 
 } // namespace Modelisation

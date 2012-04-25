@@ -151,8 +151,12 @@ protected:
 	void addNewLevel() ;
 
 	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
-	void propagateDartEmbedding(Dart d, unsigned int orbit) ;
-	void propagateOrbitEmbedding(Dart d, unsigned int orbit) ;
+
+	template <unsigned int ORBIT>
+	void propagateDartEmbedding(Dart d) ;
+
+	template <unsigned int ORBIT>
+	void propagateOrbitEmbedding(Dart d) ;
 
 	//! Subdivide the edge of d to the next level
 	/*! @param d Dart from the edge

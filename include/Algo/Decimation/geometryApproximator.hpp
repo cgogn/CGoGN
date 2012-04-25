@@ -211,7 +211,7 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.embedNewCell(VERTEX, d2) ;
+		unsigned int newV = m.embedNewCell<VERTEX>(d2) ;
 		this->m_attrV[newV] = this->m_approx[d] ;
 
 		// compute the detail vector
@@ -220,8 +220,8 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.embedOrbit(VERTEX, d, m.getEmbedding<VERTEX>(d)) ;
-		m.embedOrbit(VERTEX, dd, m.getEmbedding<VERTEX>(dd)) ;
+		m.embedOrbit<VERTEX>(d, m.getEmbedding<VERTEX>(d)) ;
+		m.embedOrbit<VERTEX>(dd, m.getEmbedding<VERTEX>(dd)) ;
 	}
 }
 
@@ -259,7 +259,7 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.embedNewCell(VERTEX, d2) ;
+		unsigned int newV = m.embedNewCell<VERTEX>(d2) ;
 		this->m_attrV[newV] = this->m_approx[d] ;
 
 		// compute the detail vector
@@ -268,8 +268,8 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.embedOrbit(VERTEX, d, m.getEmbedding<VERTEX>(d)) ;
-		m.embedOrbit(VERTEX, dd, m.getEmbedding<VERTEX>(dd)) ;
+		m.embedOrbit<VERTEX>(d, m.getEmbedding<VERTEX>(d)) ;
+		m.embedOrbit<VERTEX>(dd, m.getEmbedding<VERTEX>(dd)) ;
 	}
 }
 

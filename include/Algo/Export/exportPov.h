@@ -109,7 +109,7 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, typename
 
 		if(good(d) && !markF.isMarked(d) && map.phi3(d)==d)
 		{
-			markF.markOrbit(FACE, d) ;
+			markF.markOrbit<FACE>(d) ;
 			std::vector<unsigned int> fidx ;
 			fidx.reserve(4) ;
 			Dart dd = d ;

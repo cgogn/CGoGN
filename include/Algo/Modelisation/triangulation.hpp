@@ -169,7 +169,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 
 	if (m_map.template phi<111>(d) ==d)
 	{
-//		mark.markOrbit(FACE, d);	// mark the face
+//		mark.markOrbit<FACE>(d);	// mark the face
 		return;
 	}
 
@@ -198,7 +198,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 		Dart e2 = m_map.phi_1(d_e);
 
 		m_map.splitFace(e1,e2);
-//		mark.markOrbit(FACE, d_e);
+//		mark.markOrbit<FACE>(d_e);
 		nbv--;
 
 		if (nbv>3)	// do not recompute if only one triangle left
@@ -214,7 +214,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 			convex = (m_ears.rbegin()->angle) < 5.0f;
 		}
 //		else
-//			mark.markOrbit(FACE, e1);	// mark last face
+//			mark.markOrbit<FACE>(e1);	// mark last face
 	}
 	m_ears.clear();
 

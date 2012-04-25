@@ -134,7 +134,7 @@ public:
 	 * unmark the darts of the given orbit of d
 	 */
 	template <unsigned int ORBIT>
-	void unmarkOrbit(unsigned int orbit, Dart d)
+	void unmarkOrbit(Dart d)
 	{
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		FunctorUnmark<GenericMap> fm(m_map, m_mark, m_markVector) ;
