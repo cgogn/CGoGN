@@ -72,7 +72,7 @@ public:
 	void analysis() ;
 	void synthesis() ;
 } ;
-} ;
+
 
 } // namespace CGoGN
 

@@ -271,6 +271,9 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
 	if ((filename.rfind(".off") != std::string::npos) || (filename.rfind(".OFF") != std::string::npos))
 		kind = ImportVolumique::OFF;
 
+	if ((filename.rfind(".node") != std::string::npos) || (filename.rfind(".NODE") != std::string::npos))
+		kind = ImportVolumique::NODE;
+
 	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
 		kind = ImportVolumique::TS;
 
