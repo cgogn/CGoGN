@@ -591,7 +591,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
 		return false;
 	}
-	
+
 	AttributeHandler<typename PFP::VEC3> colors = m_map.template getAttribute<typename PFP::VEC3>(VERTEX, "color") ;
 	if (pid.hasColors())
 	{
@@ -1102,7 +1102,6 @@ bool MeshTablesSurface<PFP>::importPlyPTM(const std::string& filename, std::vect
 }
 */
 
-
 template <typename PFP>
 bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector<std::string>& attrNames)
 {
@@ -1116,7 +1115,6 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 		return false;
 	}
 
-
 	// Read header
 
 	AHEMHeader hdr;
@@ -1126,10 +1124,8 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 	if(hdr.magic != AHEM_MAGIC)
 		CGoGNerr << "Warning: " << filename << " invalid magic" << CGoGNendl;
 
-
 	m_nbVertices = hdr.meshHdr.vxCount;
 	m_nbFaces = hdr.meshHdr.faceCount;
-
 
 	// Read attributes
 
@@ -1144,7 +1140,6 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 		fp.read(ahemAttrNames[i], ahemAttrDesc[i].nameSize);
 		ahemAttrNames[i][ahemAttrDesc[i].nameSize] = '\0';
 	}
-	
 
 	// Compute buffer size for largest chunk and allocate
 
@@ -1154,22 +1149,17 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 		if(ahemAttrDesc[i].attributeChunkSize > bufferSize)
 			bufferSize = ahemAttrDesc[i].attributeChunkSize;
 
-
 	char* buffer = new char[bufferSize];
-
 
     // Allocate vertices
 
 	AttributeContainer& vxContainer = m_map.getAttributeContainer(VERTEX);
-
 
 	std::vector<unsigned int> verticesId;
 	verticesId.resize(hdr.meshHdr.vxCount);
 
 	for(unsigned int i = 0 ; i < hdr.meshHdr.vxCount ; i++)
 		verticesId[i] = vxContainer.insertLine();
-
-
 
 	// Read faces stream
 
@@ -1200,8 +1190,6 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 		fCount += fbd->batchLength;
 		batch = (char*)ix;
 	}
-	
-
 
 	// Read positions
 
@@ -1215,11 +1203,13 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 	AHEMAttributeDescriptor* posDesc = NULL;
 	
 	for(unsigned int i = 0 ; i < hdr.attributesChunkNumber ; i++)
+	{
 		if(IsEqualGUID(ahemAttrDesc[i].semantic, AHEMATTRIBUTE_POSITION))
 		{
 			posDesc = ahemAttrDesc + i;
 			break;
 		}
+	}
 
 	fp.seekg(posDesc->fileStartOffset, std::ios_base::beg);
 	fp.read(buffer, posDesc->attributeChunkSize);
@@ -1231,9 +1221,6 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 		position[verticesId[i]] = VEC3(q[0], q[1], q[2]);
 		q += 3;
 	}
-
-	
-
 
 	// Close file and release allocated stuff
 
@@ -1248,7 +1235,6 @@ bool MeshTablesSurface<PFP>::importAHEM(const std::string& filename, std::vector
 
 	return true;
 }
-
 
 #ifdef WITH_ASSIMP
 template<typename PFP>
@@ -1332,9 +1318,9 @@ bool MeshTablesSurface<PFP>::importASSIMP(const std::string& filename, std::vect
 template<typename PFP>
 bool MeshTablesSurface<PFP>::mergeCloseVertices()
 {
-	const int NBV=64; // seems to be good
+	const int NBV = 64; // seems to be good
 
-	const int NEIGH[27]={
+	const int NEIGH[27] = {
 	-NBV*NBV - NBV - 1, 	-NBV*NBV - NBV, 	-NBV*NBV - NBV + 1,
 	-NBV*NBV - 1, 	-NBV*NBV, 	-NBV*NBV + 1,
 	-NBV*NBV + NBV - 1,	-NBV*NBV + NBV,	- NBV*NBV + NBV + 1,
@@ -1368,11 +1354,9 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 	bb.addPoint( bb.min() - one);
 	bb.addPoint( bb.max() + one);
 	bbsize = (bb.max() - bb.min());
-	
 
 	AutoAttributeHandler<unsigned int> gridIndex(m_map,VERTEX, "gridIndex");
 	AutoAttributeHandler<unsigned int> newIndices(m_map,VERTEX, "newIndices");
-	
 	
 	// Store each vertex in the grid and store voxel index in vertex attribute
 	for (unsigned int i = positions.begin(); i != positions.end(); positions.next(i))
@@ -1478,8 +1462,6 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 
 	return true;
 }
-
-
 
 } // namespace Import
 
