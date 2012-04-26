@@ -39,14 +39,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX, "position") ;
+	AttributeHandler<VEC3, VERTEX> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
+	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
+	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
 
 	// open files
 	std::ifstream foff(filenameOFF.c_str(), std::ios::in);
@@ -158,8 +158,8 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		// Embed three vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[2-j]]);
-			map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
+			map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
@@ -177,8 +177,8 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		//Embed the last vertex
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[3]]);
-		map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+		map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
@@ -220,7 +220,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 			}
 			else
 			{
-				m.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(FACE), d);
+				m.unmarkOrbit<FACE + PFP::MAP::IN_PARENT>(d);
 				++nbBoundaryFaces;
 			}
 		}

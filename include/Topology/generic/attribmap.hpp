@@ -88,5 +88,48 @@ inline unsigned int AttribMap::getNbCells(unsigned int orbit)
 	return this->m_attribs[orbit].size() ;
 }
 
+/****************************************
+ *               UTILITIES              *
+ ****************************************/
+
+template <unsigned int ORBIT>
+unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int, ORBIT>& idx)
+{
+	AttributeContainer& cont = m_attribs[ORBIT] ;
+	unsigned int cpt = 0 ;
+	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
+		idx[i] = cpt++ ;
+	return cpt ;
+}
+
+template <unsigned int ORBIT>
+void AttribMap::bijectiveOrbitEmbedding()
+{
+	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded") ;
+
+	AttributeHandler<int, ORBIT> counter = addAttribute<int, ORBIT>("tmpCounter") ;
+	counter.setAllValues(int(0)) ;
+
+	DartMarker mark(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!mark.isMarked(d))
+		{
+			mark.markOrbit<ORBIT>(d) ;
+			unsigned int emb = getEmbedding<ORBIT>(d) ;
+			if (emb != EMBNULL)
+			{
+				if (counter[d] > 0)
+				{
+					unsigned int newEmb = embedNewCell<ORBIT>(d) ;
+					copyCell<ORBIT>(newEmb, emb) ;
+				}
+				counter[d]++ ;
+			}
+		}
+	}
+
+	removeAttribute(counter) ;
+}
 
 } // namespace CGoGN

@@ -32,16 +32,18 @@
 
 namespace CGoGN
 {
+
 namespace Algo
 {
+
 namespace Render
 {
+
 namespace GL2
 {
 
-
 template<typename PFP>
-void TopoRender::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good)
 {
 	Map2* ptrMap2 = dynamic_cast<Map2*>(&map);
 	if (ptrMap2 != NULL)
@@ -56,8 +58,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& p
 }
 
 template<typename PFP>
-//void TopoRenderMapD::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
-void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataMap(typename PFP::MAP& mapx, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good)
 {
 	Map2& map = reinterpret_cast<Map2&>(mapx);
 
@@ -200,8 +201,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const typename PFP::TVEC
 }
 
 template<typename PFP>
-//void TopoRenderGMap::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
-void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good)
 {
 	GMap2& map = dynamic_cast<GMap2&>(mapx);
 

@@ -201,7 +201,7 @@ void Viewer::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
+		position = myMap.getAttribute<PFP::VEC3, VERTEX>("position") ;
 	}
 	else
 	{
@@ -211,7 +211,7 @@ void Viewer::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 	}
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
@@ -224,9 +224,9 @@ void Viewer::importMesh(std::string& filename)
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize / 5.0f ;
 
-	normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
+	normal = myMap.getAttribute<PFP::VEC3, VERTEX>("normal") ;
 	if(!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal") ;
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -246,7 +246,7 @@ void Viewer::exportMesh(std::string& filename)
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
-		std::vector<PFP::TVEC3*> attributes ;
+		std::vector<AttributeHandler<VEC3, VERTEX>*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), true, allDarts) ;
 	}

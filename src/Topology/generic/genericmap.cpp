@@ -24,7 +24,6 @@
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/dartmarker.h"
 #include "Topology/generic/traversorCell.h"
 
 #include "Geometry/vector_gen.h"
@@ -242,35 +241,6 @@ void GenericMap::removeLevel()
 }
 
 /****************************************
- *         EMBEDDING MANAGEMENT         *
- ****************************************/
-
-template <unsigned int ORBIT>
-void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
-{
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
-
-	unsigned int old = getEmbedding<ORBIT>(d);
-
-	if (old == emb)	// if same emb
-		return;		// nothing to do
-
-	if (old != EMBNULL)	// if different
-	{
-		if(m_attribs[ORBIT].unrefLine(old))	// then unref the old emb
-		{
-			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
-				(*m_markTables[ORBIT][t])[old].clear();		// last unref of the line
-		}
-	}
-
-	if (emb != EMBNULL)
-		m_attribs[ORBIT].refLine(emb);	// ref the new emb
-
-	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ;	// finally affect the embedding to the dart
-}
-
-/****************************************
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
@@ -304,38 +274,6 @@ void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
 //			(*it)->m_cell = orbit1 ;
 //	}
 //}
-
-template <typename R>
-bool GenericMap::registerAttribute(const std::string &nameType)
-{
-	RegisteredBaseAttribute* ra = new RegisteredAttribute<R>;
-	if (ra == NULL)
-	{
-		CGoGNerr << "Erreur enregistrement attribut" << CGoGNendl;
-		return false;
-	}
-
-	ra->setTypeName(nameType);
-
-	m_attributes_registry_map->insert(std::pair<std::string, RegisteredBaseAttribute*>(nameType,ra));
-	return true;
-}
-
-template <unsigned int ORBIT>
-void GenericMap::initOrbitEmbedding(bool realloc)
-{
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded") ;
-	DartMarker mark(*this) ;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.markOrbit<ORBIT>(d) ;
-			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
-				embedNewCell<ORBIT>(d) ;
-		}
-	}
-}
 
 void GenericMap::viewAttributesTables()
 {
@@ -845,70 +783,6 @@ bool GenericMap::foreach_dart(FunctorType& f, const FunctorSelect& good)
 				return true;
 	}
 	return false;
-}
-
-template <unsigned int ORBIT>
-bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thread)
-{
-	switch(ORBIT)
-	{
-//		case DART: return f(d);
-//		case VERTEX: return foreach_dart_of_vertex(d, f, thread);
-//		case EDGE: return foreach_dart_of_edge(d, f, thread);
-//		case ORIENTED_FACE: return foreach_dart_of_oriented_face(d, f, thread);
-//		case FACE: return foreach_dart_of_face(d, f, thread);
-//		case VOLUME: return foreach_dart_of_volume(d, f, thread);
-
-		case DART:		return f(d);
-		case VERTEX: 	return foreach_dart_of_vertex(d, f, thread);
-		case EDGE: 		return foreach_dart_of_edge(d, f, thread);
-		case FACE: 		return foreach_dart_of_face(d, f, thread);
-		case VOLUME: 	return foreach_dart_of_volume(d, f, thread);
-		case VERTEX1: 	return foreach_dart_of_vertex1(d, f, thread);
-		case EDGE1: 	return foreach_dart_of_edge1(d, f, thread);
-		case VERTEX2: 	return foreach_dart_of_vertex2(d, f, thread);
-		case EDGE2:		return foreach_dart_of_edge2(d, f, thread);
-		case FACE2:		return foreach_dart_of_face2(d, f, thread);
-		default: assert(!"Cells of this dimension are not handled");break;
-
-	}
-	return false;
-}
-
-template <unsigned int ORBIT>
-bool GenericMap::foreach_orbit(FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
-{
-	TraversorCell<GenericMap, ORBIT> trav(*this, good, true, thread);
-	bool found = false;
-
-	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
-	{
-		if ((fonct)(d))
-			found = true;
-	}
-	return found;
-}
-
-template <unsigned int ORBIT>
-unsigned int GenericMap::getNbOrbits(const FunctorSelect& good)
-{
-	FunctorCount fcount;
-	foreach_orbit<ORBIT>(fcount, good);
-	return fcount.getNb();
-}
-
-template <unsigned int ORBIT>
-void GenericMap::boundaryMarkOrbit(Dart d)
-{
-	FunctorMark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
-	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
-}
-
-template <unsigned int ORBIT>
-void GenericMap::boundaryUnmarkOrbit(Dart d)
-{
-	FunctorUnmark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
-	foreach_dart_of_orbit<ORBIT>(d, fm, 0) ;
 }
 
 void GenericMap::boundaryUnmarkAll()
