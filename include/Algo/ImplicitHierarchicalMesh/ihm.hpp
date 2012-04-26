@@ -39,7 +39,7 @@ template <typename T, unsigned int ORBIT>
 AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap::addAttribute(const std::string& nameAttr)
 {
 	bool addNextLevelCell = false ;
-	if(!isOrbitEmbedded(ORBIT))
+	if(!isOrbitEmbedded<ORBIT>())
 		addNextLevelCell = true ;
 
 	AttributeHandler<T, ORBIT> h = Map2::addAttribute<T, ORBIT>(nameAttr) ;
@@ -254,7 +254,7 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f, 
 inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
 {
 	EmbeddedMap2::splitFace(d, e) ;
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 	{
 		unsigned int cur = m_curLevel ;
 		m_curLevel = m_maxLevel ;

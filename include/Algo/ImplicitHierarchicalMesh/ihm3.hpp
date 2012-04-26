@@ -32,14 +32,14 @@ namespace IHM
 {
 
 /***************************************************
- *  		       	    ATTRIBUTES MANAGEMENT    	           	 *
+ *  	   ATTRIBUTES MANAGEMENT    	           	 *
  ***************************************************/
 
 template <typename T, unsigned int ORBIT>
 AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap3::addAttribute(const std::string& nameAttr)
 {
 	bool addNextLevelCell = false ;
-	if(!isOrbitEmbedded(ORBIT))
+	if(!isOrbitEmbedded<ORBIT>())
 		addNextLevelCell = true ;
 
 	AttributeHandler<T, ORBIT> h = Map3::addAttribute<T, ORBIT>(nameAttr) ;

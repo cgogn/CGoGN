@@ -110,7 +110,7 @@ void unlinkFromEdge(typename PFP::MAP& map, Dart d)
 {
 	Dart d3 = map.phi3(d);
 
-//	if(map.isOrbitEmbedded(VERTEX))
+//	if(map.isOrbitEmbedded<VERTEX>())
 //	{
 //		//Si la face n'est pas libre en phi2
 //		if(map.phi2(d) != d && map.phi2(d3) != d3)

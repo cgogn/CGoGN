@@ -171,7 +171,7 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 	Map2::sewFaces(d, e);
 	Map2::sewFaces(d2, e2);
 
-	if(isOrbitEmbedded(VERTEX))
+	if(isOrbitEmbedded<VERTEX>())
 	{
 		copyDartEmbedding<VERTEX>(d, phi2(phi_1(d)));
 		copyDartEmbedding<VERTEX>(e, phi2(phi_1(e)));
@@ -179,12 +179,12 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 		copyDartEmbedding<VERTEX>(e2, phi2(phi_1(e2)));
 	}
 
-	if(isOrbitEmbedded(EDGE))
+	if(isOrbitEmbedded<EDGE>())
 	{
 
 	}
 
-	if(isOrbitEmbedded(VOLUME))
+	if(isOrbitEmbedded<VOLUME>())
 		embedNewCell<VOLUME>(d);
 	}
 }
@@ -215,13 +215,13 @@ void ImplicitHierarchicalMap3::unsewAroundVertex(std::vector<std::pair<Dart, Dar
 
 		Map2::unsewFaces(dit);
 
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			copyDartEmbedding<VERTEX>(phi2(dit2), dit);
 			copyDartEmbedding<VERTEX>(phi2(dit), dit2);
 		}
 
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 
 		}
@@ -239,7 +239,7 @@ Dart ImplicitHierarchicalMap3::quadranguleFace(Dart d)
 	Dart bc = newBoundaryCycle(faceDegree(old));
 	sewVolumes(old, bc, false);
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
 		Dart it = bc;
 		do

@@ -44,7 +44,7 @@ void Map3MR_PrimalRegular::swapEdges(Dart d, Dart e)
 
 		Map2::swapEdges(d,e);
 
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			copyDartEmbedding<VERTEX>(d, phi2(phi_1(d)));
 			copyDartEmbedding<VERTEX>(e, phi2(phi_1(e)));
@@ -52,12 +52,12 @@ void Map3MR_PrimalRegular::swapEdges(Dart d, Dart e)
 			copyDartEmbedding<VERTEX>(e2, phi2(phi_1(e2)));
 		}
 
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 
 		}
 
-		if(isOrbitEmbedded(VOLUME))
+		if(isOrbitEmbedded<VOLUME>())
 			embedNewCell<VOLUME>(d);
 	}
 }
@@ -107,7 +107,7 @@ void Map3MR_PrimalRegular::splitSurfaceInVolume(std::vector<Dart>& vd, bool firs
 		Dart dit2 = vd2[i];
 
 		// embed the vertex embedded from the origin volume to the new darts
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
 			copyDartEmbedding<VERTEX>(phi2(dit2), phi1(dit2));
@@ -711,7 +711,7 @@ void Map3MR_PrimalRegular::subdivision()
 //		Dart bc = newBoundaryCycle(faceDegree(old));
 //		sewVolumes(old, bc, false);
 //
-//		if (isOrbitEmbedded(VERTEX))
+//		if (isOrbitEmbedded<VERTEX>())
 //		{
 //			Dart it = bc;
 //			do
@@ -767,12 +767,12 @@ void Map3MR_PrimalRegular::subdivision()
 //{
 //	Map2::splitFace(d, e) ;
 //
-//	if (isOrbitEmbedded(VERTEX))
+//	if (isOrbitEmbedded<VERTEX>())
 //	{
 //		copyDartEmbedding<VERTEX>(phi_1(e), d) ;
 //		copyDartEmbedding<VERTEX>(phi_1(d), e) ;
 //	}
-//	if (isOrbitEmbedded(FACE))
+//	if (isOrbitEmbedded<FACE>())
 //	{
 //		copyDartEmbedding<FACE>(phi_1(d), d) ;
 //		embedNewCell<FACE>(e) ;
@@ -784,14 +784,14 @@ void Map3MR_PrimalRegular::subdivision()
 //{
 //	Dart nd = Map2::cutEdge(d) ;
 //
-//	if (isOrbitEmbedded(EDGE))
+//	if (isOrbitEmbedded<EDGE>())
 //	{
 //		copyDartEmbedding<EDGE>(phi2(d), d) ;
 //		embedNewCell<EDGE>(nd) ;
 //		copyCell<EDGE>(nd, d) ;
 //	}
 //
-//	if(isOrbitEmbedded(FACE))
+//	if(isOrbitEmbedded<FACE>())
 //	{
 //		copyDartEmbedding<FACE>(nd, d) ;
 //		Dart e = phi2(nd) ;
@@ -827,13 +827,13 @@ void Map3MR_PrimalRegular::subdivision()
 //		//{
 //			Map2::unsewFaces(dit);
 //
-//			if(isOrbitEmbedded(VERTEX))
+//			if(isOrbitEmbedded<VERTEX>())
 //			{
 //				copyDartEmbedding<VERTEX>(phi2(dit2), dit);
 //				copyDartEmbedding<VERTEX>(phi2(dit), dit2);
 //			}
 //
-//			if(isOrbitEmbedded(EDGE))
+//			if(isOrbitEmbedded<EDGE>())
 //			{
 //
 //			}
@@ -851,7 +851,7 @@ void Map3MR_PrimalRegular::subdivision()
 //	Dart bc = newBoundaryCycle(faceDegree(old));
 //	sewVolumes(old, bc, false);
 //
-//	if (isOrbitEmbedded(VERTEX))
+//	if (isOrbitEmbedded<VERTEX>())
 //	{
 //		Dart it = bc;
 //		do

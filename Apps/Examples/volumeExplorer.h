@@ -97,10 +97,10 @@ class MyQT: public Utils::QT::SimpleQT
 	int m_begY;
 	int clip_id1;
 	int clip_id2;
+
 public:
 	float m_WidthObj;
 	Geom::Vec3f m_PosObj;
-
 
 public:
 	MyQT():

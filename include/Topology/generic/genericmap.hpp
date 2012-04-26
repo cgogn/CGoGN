@@ -244,24 +244,21 @@ inline bool GenericMap::isDartValid(Dart d)
  *         EMBEDDING MANAGEMENT         *
  ****************************************/
 
+template <unsigned int ORBIT>
+inline bool GenericMap::isOrbitEmbedded() const
+{
+	return (ORBIT == DART) || (m_embeddings[ORBIT] != NULL) ;
+}
+
 inline bool GenericMap::isOrbitEmbedded(unsigned int orbit) const
 {
 	return (orbit == DART) || (m_embeddings[orbit] != NULL) ;
 }
 
-inline unsigned int GenericMap::nbEmbeddings() const
-{
-	unsigned int nb = 0;
-	for(unsigned int i = 0; i < NB_ORBITS; ++i)
-		if (isOrbitEmbedded(i))
-			++nb;
-	return nb ;
-}
-
 template <unsigned int ORBIT>
 inline unsigned int GenericMap::getEmbedding(Dart d)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
 	unsigned int d_index = dartIndex(d);
 
@@ -274,7 +271,7 @@ inline unsigned int GenericMap::getEmbedding(Dart d)
 template <unsigned int ORBIT>
 void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 
 	unsigned int old = getEmbedding<ORBIT>(d);
 
@@ -299,21 +296,21 @@ void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
 template <unsigned int ORBIT>
 inline void GenericMap::copyDartEmbedding(Dart dest, Dart src)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	setDartEmbedding<ORBIT>(dest, getEmbedding<ORBIT>(src));
 }
 
 template <unsigned int ORBIT>
 inline unsigned int GenericMap::newCell()
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	return m_attribs[ORBIT].insertLine();
 }
 
 template <unsigned int ORBIT>
 inline void GenericMap::embedOrbit(Dart d, unsigned int em)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	FunctorSetEmb<GenericMap, ORBIT> fsetemb(*this, em);
 	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
 }
@@ -321,7 +318,7 @@ inline void GenericMap::embedOrbit(Dart d, unsigned int em)
 template <unsigned int ORBIT>
 inline unsigned int GenericMap::embedNewCell(Dart d)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int em = newCell<ORBIT>();
 	embedOrbit<ORBIT>(d, em);
 	return em;
@@ -330,7 +327,7 @@ inline unsigned int GenericMap::embedNewCell(Dart d)
 template <unsigned int ORBIT>
 inline void GenericMap::copyCell(Dart d, Dart e)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int dE = getEmbedding<ORBIT>(d) ;
 	unsigned int eE = getEmbedding<ORBIT>(e) ;
 	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
@@ -344,14 +341,14 @@ inline void GenericMap::copyCell(Dart d, Dart e)
 template <unsigned int ORBIT>
 inline void GenericMap::copyCell(unsigned int i, unsigned int j)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	m_attribs[ORBIT].copyLine(i, j) ;
 }
 
 template <unsigned int ORBIT>
 inline void GenericMap::initCell(unsigned int i)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded");
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	m_attribs[ORBIT].initLine(i) ;
 }
 
@@ -368,7 +365,7 @@ inline AttributeContainer& GenericMap::getAttributeContainer()
 template <unsigned int ORBIT>
 inline AttributeMultiVector<Mark>* GenericMap::getMarkVector(unsigned int thread)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded") ;
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 	return m_markTables[ORBIT][thread] ;
 }
 
@@ -397,7 +394,7 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 template <unsigned int ORBIT>
 void GenericMap::initOrbitEmbedding(bool realloc)
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded") ;
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 	DartMarker mark(*this) ;
 	for(Dart d = begin(); d != end(); next(d))
 	{
@@ -408,6 +405,27 @@ void GenericMap::initOrbitEmbedding(bool realloc)
 				embedNewCell<ORBIT>(d) ;
 		}
 	}
+}
+
+/****************************************
+ *   EMBEDDING ATTRIBUTES MANAGEMENT    *
+ ****************************************/
+
+template <unsigned int ORBIT>
+void GenericMap::addEmbedding()
+{
+	assert(!isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit already embedded") ;
+
+	std::ostringstream oss;
+	oss << "EMB_" << ORBIT;
+
+	AttributeContainer& dartCont = m_attribs[DART] ;
+	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
+	m_embeddings[ORBIT] = amv ;
+
+	// set new embedding to EMBNULL for all the darts of the map
+	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
+		(*amv)[i] = EMBNULL ;
 }
 
 /****************************************

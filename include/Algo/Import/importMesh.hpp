@@ -179,21 +179,21 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 				if(backEdgesBuffer[em] == EMBNULL)
 				{
 					unsigned int emn = map.template newCell<VERTEX>();
-					map.copyCell<VERTEX>(emn, em);
+					map.template copyCell<VERTEX>(emn, em);
 					backEdgesBuffer[em] = emn;
 					position[emn] += typename PFP::VEC3(0,0,dist);
 				}
 
 				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
 				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
-				map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+				map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 				//Embed the other base face
 				Dart d2 = map.phi1(map.phi1(map.phi2(d)));
 				unsigned int em2 = backEdgesBuffer[em];
 				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb2(map, em2);
 				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d2, fsetemb2) ;
-				map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d2, fsetemb2);
+				map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d2, fsetemb2);
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
@@ -212,11 +212,11 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 			// darts incident to end vertex of edge
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
 
-			unsigned int embd = map.getEmbedding<VERTEX>(d);
+			unsigned int embd = map.template getEmbedding<VERTEX>(d);
 			Dart good_dart = NIL;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if (map.getEmbedding<VERTEX>(map.phi1(*it)) == embd)
+				if (map.template getEmbedding<VERTEX>(map.phi1(*it)) == embd)
 					good_dart = *it;
 			}
 

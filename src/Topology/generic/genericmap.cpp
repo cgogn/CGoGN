@@ -302,26 +302,6 @@ void GenericMap::viewAttributesTables()
 }
 
 /****************************************
- *   EMBEDDING ATTRIBUTES MANAGEMENT    *
- ****************************************/
-
-void GenericMap::addEmbedding(unsigned int orbit)
-{
-	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
-
-	std::ostringstream oss;
-	oss << "EMB_" << orbit;
-
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[orbit] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		(*amv)[i] = EMBNULL ;
-}
-
-/****************************************
  *          THREAD MANAGEMENT           *
  ****************************************/
 

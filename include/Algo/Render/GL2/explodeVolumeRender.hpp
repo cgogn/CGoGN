@@ -76,7 +76,7 @@ inline ExplodeVolumeRender::~ExplodeVolumeRender()
 }
 
 template<typename PFP>
-void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const FunctorSelect& good)
 {
 	if (m_cpf)
 	{
@@ -87,25 +87,19 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	CellMarker cmv(map,VOLUME);
-	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
-	TraversorW<typename PFP::MAP> traVol(map,good);
-	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
-	{
-		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(map, d, positions);
-	}
+	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(map, "centerVolumes");
+	Algo::Geometry::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
 
+	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(map, good);
 
-	TraversorCell<typename PFP::MAP> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
-
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		if (m_ef)
 		{
-			VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map,d,positions);
+			VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map, d, positions);
 			Dart a = d;
 			Dart b = map.phi1(a);
 			Dart c = map.phi1(b);
@@ -154,12 +148,12 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP> traEdge(map, PFP::MAP::ORBIT_IN_PARENT(EDGE),good);
-	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
+	TraversorCell<typename PFP::MAP, EDGE + PFP::MAP::IN_PARENT> traEdge(map, good);
+	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
-			buffer.push_back(centerVolumes[d]);
-			buffer.push_back(positions[d]);
-			buffer.push_back(positions[ map.phi1(d)]);
+		buffer.push_back(centerVolumes[d]);
+		buffer.push_back(positions[d]);
+		buffer.push_back(positions[map.phi1(d)]);
 	}
 
 	m_nbLines = buffer.size()/3;
@@ -173,9 +167,8 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 	m_shaderL->setAttributePosition(m_vboPosLine);
 }
 
-
 template<typename PFP>
-void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, typename PFP::TVEC3& colorPerXXX, const FunctorSelect& good)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const AttributeHandler<typename PFP::VEC3, VOLUME>& colorPerXXX, const FunctorSelect& good)
 {
 	if (!m_cpf)
 	{
@@ -186,13 +179,8 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	CellMarker cmv(map,VOLUME);
-	AutoAttributeHandler<VEC3> centerVolumes(map,VOLUME,"centerVolumes");
-	TraversorW<typename PFP::MAP> traVol(map,good);
-	for (Dart d=traVol.begin(); d!=traVol.end(); d=traVol.next())
-	{
-		centerVolumes[d] = Algo::Geometry::volumeCentroid<PFP>(map, d, positions);
-	}
+	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(map, "centerVolumes");
+	Algo::Geometry::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -204,12 +192,11 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 	if (withColors)
 		bufferColors.reserve(16384);
 
+	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(map, good);
 
-	TraversorCell<typename PFP::MAP> traFace(map, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
-
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map,d,positions);
+		VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map, d, positions);
 
 		Dart a = d;
 		Dart b = map.phi1(a);
@@ -260,12 +247,12 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP> traEdge(map, PFP::MAP::ORBIT_IN_PARENT(EDGE),good);
-	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
+	TraversorCell<typename PFP::MAP, EDGE + PFP::MAP::IN_PARENT> traEdge(map, good);
+	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 			buffer.push_back(centerVolumes[d]);
 			buffer.push_back(positions[d]);
-			buffer.push_back(positions[ map.phi1(d)]);
+			buffer.push_back(positions[map.phi1(d)]);
 	}
 
 	m_nbLines = buffer.size()/3;
@@ -277,10 +264,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, typename PFP::TVEC3
 
 	m_vboPosLine->releasePtr();
 	m_shaderL->setAttributePosition(m_vboPosLine);
-
 }
-
-
 
 inline void ExplodeVolumeRender::drawFaces()
 {
@@ -292,7 +276,6 @@ inline void ExplodeVolumeRender::drawFaces()
 	m_shader->disableVertexAttribs();
 }
 
-
 inline void ExplodeVolumeRender::drawEdges()
 {
 
@@ -300,7 +283,6 @@ inline void ExplodeVolumeRender::drawEdges()
 	glDrawArrays(GL_TRIANGLES , 0 , m_nbLines*3 );
 	m_shaderL->disableVertexAttribs();
 }
-
 
 inline void ExplodeVolumeRender::setExplodeVolumes(float explode)
 {
@@ -312,7 +294,6 @@ inline void ExplodeVolumeRender::setExplodeFaces(float explode)
 {
 	m_shader->setExplodeFaces(explode);
 }
-
 
 inline void ExplodeVolumeRender::setClippingPlane(const Geom::Vec4f& p)
 {
@@ -347,7 +328,6 @@ inline void ExplodeVolumeRender::setColorLine(const Geom::Vec4f& col)
 	m_shaderL->setColor(col);
 }
 
-
 inline Utils::GLSLShader* ExplodeVolumeRender::shaderFaces()
 {
 	return m_shader;
@@ -357,7 +337,6 @@ inline Utils::GLSLShader* ExplodeVolumeRender::shaderLines()
 {
 	return m_shaderL;
 }
-
 
 }//end namespace VBO
 

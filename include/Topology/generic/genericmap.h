@@ -291,12 +291,10 @@ public:
 	/**
 	 * tell if an orbit is embedded or not
 	 */
-	bool isOrbitEmbedded(unsigned int orbit) const ;
+	template <unsigned int ORBIT>
+	bool isOrbitEmbedded() const ;
 
-	/**
-	 * return the number of embedded orbits (including DART)
-	 */
-	unsigned int nbEmbeddings() const ;
+	bool isOrbitEmbedded(unsigned int orbit) const ;
 
 	/**
 	 * get the cell index of the given dimension associated to dart d
@@ -426,7 +424,8 @@ protected:
 	/**
 	 * Create the dart attribute to store the embedding of this orbit (for internal use only)
 	 */
-	void addEmbedding(unsigned int orbit) ;
+	template <unsigned int ORBIT>
+	void addEmbedding() ;
 
 	/****************************************
 	 *  TOPOLOGICAL ATTRIBUTES MANAGEMENT   *

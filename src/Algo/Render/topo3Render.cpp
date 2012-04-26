@@ -27,7 +27,6 @@
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
-
 #include <string.h>
 
 namespace CGoGN

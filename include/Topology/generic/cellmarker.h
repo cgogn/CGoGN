@@ -83,8 +83,8 @@ public:
 	 */
 	CellMarkerBase(GenericMap& map, unsigned int thread = 0) : CellMarkerGen(map, thread)
 	{
-		if(!map.isOrbitEmbedded(CELL))
-			map.addEmbedding(CELL) ;
+		if(!map.isOrbitEmbedded<CELL>())
+			map.addEmbedding<CELL>() ;
 		m_mark = m_map.getMarkerSet<CELL>(m_thread).getNewMark() ;
 		m_markVector = m_map.getMarkVector<CELL>(m_thread) ;
 		m_map.cellMarkers.push_back(this) ;

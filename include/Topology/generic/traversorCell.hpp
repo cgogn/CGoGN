@@ -29,7 +29,7 @@ template <typename MAP, unsigned int ORBIT>
 TraversorCell<MAP, ORBIT>::TraversorCell(MAP& map, const FunctorSelect& good, bool forceDartMarker, unsigned int thread) :
 	m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
 {
-	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT))
+	if(!forceDartMarker && map.template isOrbitEmbedded<ORBIT>())
 		cmark = new CellMarker<ORBIT>(map, thread) ;
 	else
 		dmark = new DartMarker(map, thread) ;

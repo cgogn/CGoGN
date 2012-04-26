@@ -50,8 +50,8 @@ public:
 	AutoAttributeHandler(AttribMap& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
-		if(!m.isOrbitEmbedded(ORBIT))
-			m.addEmbedding(ORBIT) ;
+		if(!m.isOrbitEmbedded<ORBIT>())
+			m.addEmbedding<ORBIT>() ;
 		AttributeMultiVector<T>* amv = this->m_map->m_attribs[ORBIT].template addAttribute<T>(nameAttr) ;
 		this->m_attrib = amv ;
 		this->valid = true ;

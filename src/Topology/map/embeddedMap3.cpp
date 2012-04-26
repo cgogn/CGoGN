@@ -32,7 +32,7 @@ Dart EmbeddedMap3::deleteVertex(Dart d)
 	Dart v = Map3::deleteVertex(d) ;
 	if(v != NIL)
 	{
-		if (isOrbitEmbedded(VOLUME))
+		if (isOrbitEmbedded<VOLUME>())
 		{
 			embedOrbit<VOLUME>(v, getEmbedding<VOLUME>(v)) ;
 		}
@@ -44,7 +44,7 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 {
 	Dart nd = Map3::cutEdge(d);
 
-	if(isOrbitEmbedded(EDGE))
+	if(isOrbitEmbedded<EDGE>())
 	{
 		// embed the new darts created in the cut edge
 		embedOrbit<EDGE>(d, getEmbedding<EDGE>(d)) ;
@@ -53,7 +53,7 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 		copyCell<EDGE>(nd, d) ;
 	}
 
-	if(isOrbitEmbedded(FACE2))
+	if(isOrbitEmbedded<FACE2>())
 	{
 		Dart f = d;
 		do
@@ -67,7 +67,7 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 		} while(f != d);
 	}
 
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 	{
 		Dart f = d;
 		do
@@ -79,7 +79,7 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 		} while(f != d);
 	}
 
-	if(isOrbitEmbedded(VOLUME))
+	if(isOrbitEmbedded<VOLUME>())
 	{
 		Dart f = d;
 		do
@@ -99,7 +99,7 @@ bool EmbeddedMap3::uncutEdge(Dart d)
 	if(Map3::uncutEdge(d))
 	{
 		//embed all darts from the old two edges to one of the two edge embedding
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 			embedOrbit<EDGE>(d, getEmbedding<EDGE>(d)) ;
 		}
@@ -113,7 +113,7 @@ Dart EmbeddedMap3::deleteEdge(Dart d)
 	Dart v = Map3::deleteEdge(d) ;
 	if(v != NIL)
 	{
-		if(isOrbitEmbedded(VOLUME))
+		if(isOrbitEmbedded<VOLUME>())
 		{
 			embedOrbit<VOLUME>(v, getEmbedding<VOLUME>(v)) ;
 		}
@@ -142,7 +142,7 @@ Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 
 	if(resV != NIL)
 	{
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			embedOrbit<VERTEX>(resV, vEmb);
 		}
@@ -163,7 +163,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 
 	Map3::splitFace(d, e);
 
-	if(isOrbitEmbedded(VERTEX))
+	if(isOrbitEmbedded<VERTEX>())
 	{
 		unsigned int vEmb1 = getEmbedding<VERTEX>(d) ;
 		unsigned int vEmb2 = getEmbedding<VERTEX>(e) ;
@@ -173,7 +173,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(phi_1(dd), vEmb2);
 	}
 
-	if(isOrbitEmbedded(FACE2))
+	if(isOrbitEmbedded<FACE2>())
 	{
 		copyDartEmbedding<FACE2>(phi_1(d), d) ;
 		embedNewCell<FACE2>(e) ;
@@ -184,7 +184,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		copyCell<FACE2>(ee, dd) ;
 	}
 
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 	{
 		unsigned int fEmb = getEmbedding<FACE>(d) ;
 		setDartEmbedding<FACE>(phi_1(d), fEmb) ;
@@ -193,7 +193,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		copyCell<FACE>(e, d);
 	}
 
-	if(isOrbitEmbedded(VOLUME))
+	if(isOrbitEmbedded<VOLUME>())
 	{
 		unsigned int vEmb1 = getEmbedding<VOLUME>(d) ;
 		setDartEmbedding<VOLUME>(phi_1(d),  vEmb1);
@@ -217,7 +217,7 @@ Dart EmbeddedMap3::collapseFace(Dart d, bool delDegenerateVolumes)
 
 	if(resV != NIL)
 	{
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			embedOrbit<VERTEX>(resV, vEmb);
 		}
@@ -238,7 +238,7 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 
 	// embed the vertex orbits from the oriented face with dart e
 	// with vertex orbits value from oriented face with dart d
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
 		Dart it = d ;
 		do
@@ -250,7 +250,7 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 
 	// embed the new edge orbit with the old edge orbit value
 	// for all the face
-	if (isOrbitEmbedded(EDGE))
+	if (isOrbitEmbedded<EDGE>())
 	{
 		Dart it = d ;
 		do
@@ -261,7 +261,7 @@ void EmbeddedMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 	}
 
 	// embed the face orbit from the volume sewn
-	if (isOrbitEmbedded(FACE))
+	if (isOrbitEmbedded<FACE>())
 	{
 		embedOrbit<FACE>(e, getEmbedding<FACE>(d)) ;
 	}
@@ -272,7 +272,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 	Dart dd = alpha1(d);
 
 	unsigned int fEmb = EMBNULL ;
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 		fEmb = getEmbedding<FACE>(d) ;
 
 	Map3::unsewVolumes(d);
@@ -281,7 +281,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 	do
 	{
 		// embed the unsewn vertex orbit with the vertex embedding if it is deconnected
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			if(!sameVertex(dit, dd))
 			{
@@ -298,7 +298,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 		dd = phi_1(dd);
 
 		// embed the unsewn edge with the edge embedding if it is deconnected
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 			if(!sameEdge(dit, dd))
 			{
@@ -314,7 +314,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 			}
 		}
 
-		if(isOrbitEmbedded(FACE))
+		if(isOrbitEmbedded<FACE>())
 		{
 			setDartEmbedding<FACE>(phi3(dit), fEmb) ;
 		}
@@ -323,7 +323,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 	} while(dit != d);
 
 	// embed the unsewn face with the face embedding
-	if (isOrbitEmbedded(FACE))
+	if (isOrbitEmbedded<FACE>())
 	{
 		embedNewCell<FACE>(dd);
 		copyCell<FACE>(dd, d);
@@ -336,7 +336,7 @@ bool EmbeddedMap3::mergeVolumes(Dart d)
 
 	if(Map3::mergeVolumes(d))
 	{
-		if (isOrbitEmbedded(VOLUME))
+		if (isOrbitEmbedded<VOLUME>())
 		{
 			embedOrbit<VOLUME>(d2, getEmbedding<VOLUME>(d2)) ;
 		}
@@ -356,14 +356,14 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 		Dart dit23 = alpha2(dit);
 
 		// embed the vertex embedded from the origin volume to the new darts
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			copyDartEmbedding<VERTEX>(dit23, dit);
 			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
 		}
 
 		// embed the edge embedded from the origin volume to the new darts
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 			unsigned int eEmb = getEmbedding<EDGE>(dit) ;
 			setDartEmbedding<EDGE>(dit23, eEmb);
@@ -371,13 +371,13 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 		}
 
 		// embed the volume embedded from the origin volume to the new darts
-		if(isOrbitEmbedded(VOLUME))
+		if(isOrbitEmbedded<VOLUME>())
 		{
 			copyDartEmbedding<VOLUME>(phi2(dit), dit);
 		}
 	}
 
-	if(isOrbitEmbedded(VOLUME))
+	if(isOrbitEmbedded<VOLUME>())
 	{
 		Dart v = vd.front() ;
 		Dart v23 = alpha2(v) ;
@@ -394,7 +394,7 @@ Dart EmbeddedMap3::collapseVolume(Dart d, bool delDegenerateVolumes)
 
 	if(resV != NIL)
 	{
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			embedOrbit<VERTEX>(resV, vEmb);
 		}
@@ -421,15 +421,15 @@ unsigned int EmbeddedMap3::closeHole(Dart d, bool forboundary)
 		Dart f = it ;
 		do
 		{
-			if(isOrbitEmbedded(VERTEX))
+			if(isOrbitEmbedded<VERTEX>())
 			{
 				copyDartEmbedding<VERTEX>(f, alpha1(f)) ;
 			}
-			if(isOrbitEmbedded(EDGE))
+			if(isOrbitEmbedded<EDGE>())
 			{
 				copyDartEmbedding<EDGE>(f, phi3(f)) ;
 			}
-			if(isOrbitEmbedded(FACE))
+			if(isOrbitEmbedded<FACE>())
 			{
 				copyDartEmbedding<FACE>(f, phi3(f)) ;
 			}
@@ -471,7 +471,7 @@ bool EmbeddedMap3::check()
 
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			if( getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(alpha1(d)))
 			{
@@ -485,7 +485,7 @@ bool EmbeddedMap3::check()
 			}
 		}
 
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 			if( getEmbedding<EDGE>(d) != getEmbedding<EDGE>(phi2(d)) ||
 					getEmbedding<EDGE>(d) != getEmbedding<EDGE>(phi3(d)) )
@@ -495,7 +495,7 @@ bool EmbeddedMap3::check()
 			}
 		}
 
-		if (isOrbitEmbedded(FACE2))
+		if (isOrbitEmbedded<FACE2>())
 		{
 			if (getEmbedding<FACE2>(d) != getEmbedding<FACE2>(phi1(d)))
 			{
@@ -504,7 +504,7 @@ bool EmbeddedMap3::check()
 			}
 		}
 
-		if (isOrbitEmbedded(FACE))
+		if (isOrbitEmbedded<FACE>())
 		{
 			if( getEmbedding<FACE>(d) != getEmbedding<FACE>(phi1(d)) ||
 					getEmbedding<FACE>(d) != getEmbedding<FACE>(phi3(d)) )
@@ -514,7 +514,7 @@ bool EmbeddedMap3::check()
 			}
 		}
 
-		if (isOrbitEmbedded(VOLUME))
+		if (isOrbitEmbedded<VOLUME>())
 		{
 			if( getEmbedding<VOLUME>(d) != getEmbedding<VOLUME>(phi1(d)) ||
 					getEmbedding<VOLUME>(d) != getEmbedding<VOLUME>(phi2(d)) )

@@ -37,16 +37,16 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = allDarts) ;
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& select = allDarts) ;
 
 } // namespace Geometry
 

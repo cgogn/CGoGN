@@ -28,8 +28,8 @@ namespace CGoGN
 template <typename T, unsigned int ORBIT>
 inline AttributeHandler<T, ORBIT> AttribMap::addAttribute(const std::string& nameAttr)
 {
-	if(!isOrbitEmbedded(ORBIT))
-		addEmbedding(ORBIT) ;
+	if(!isOrbitEmbedded<ORBIT>())
+		addEmbedding<ORBIT>() ;
 	AttributeMultiVector<T>* amv = m_attribs[ORBIT].addAttribute<T>(nameAttr) ;
 	return AttributeHandler<T, ORBIT>(this, amv) ;
 }
@@ -105,7 +105,7 @@ unsigned int AttribMap::computeIndexCells(AttributeHandler<unsigned int, ORBIT>&
 template <unsigned int ORBIT>
 void AttribMap::bijectiveOrbitEmbedding()
 {
-	assert(isOrbitEmbedded(ORBIT) || !"Invalid parameter: orbit not embedded") ;
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
 
 	AttributeHandler<int, ORBIT> counter = addAttribute<int, ORBIT>("tmpCounter") ;
 	counter.setAllValues(int(0)) ;

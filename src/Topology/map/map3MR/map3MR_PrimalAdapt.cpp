@@ -54,7 +54,7 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 		Map2::sewFaces(d, e);
 		Map2::sewFaces(d2, e2);
 
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			copyDartEmbedding<VERTEX>(d, phi2(phi_1(d)));
 			copyDartEmbedding<VERTEX>(e, phi2(phi_1(e)));
@@ -62,12 +62,12 @@ void Map3MR_PrimalAdapt::swapEdges(Dart d, Dart e)
 			copyDartEmbedding<VERTEX>(e2, phi2(phi_1(e2)));
 		}
 
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 
 		}
 
-		if(isOrbitEmbedded(VOLUME))
+		if(isOrbitEmbedded<VOLUME>())
 			embedNewCell<VOLUME>(d);
 
 
@@ -117,7 +117,7 @@ void Map3MR_PrimalAdapt::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstS
 //		propagateDartRelation(dit2, m_phi2) ;
 
 		// embed the vertex embedded from the origin volume to the new darts
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
 			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
 			copyDartEmbedding<VERTEX>(phi2(dit2), phi1(dit2));
@@ -1073,13 +1073,13 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 //
 //		Map2::unsewFaces(dit);
 //
-//		if(isOrbitEmbedded(VERTEX))
+//		if(isOrbitEmbedded<VERTEX>())
 //		{
 //			copyDartEmbedding<VERTEX>(phi2(dit2), dit);
 //			copyDartEmbedding<VERTEX>(phi2(dit), dit2);
 //		}
 //
-//		if(isOrbitEmbedded(EDGE))
+//		if(isOrbitEmbedded<EDGE>())
 //		{
 //
 //		}
@@ -1132,7 +1132,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 //		Dart bc = newBoundaryCycle(faceDegree(old));
 //		sewVolumes(old, bc, false);
 //
-//		if (isOrbitEmbedded(VERTEX))
+//		if (isOrbitEmbedded<VERTEX>())
 //		{
 //			Dart it = bc;
 //			do
