@@ -61,6 +61,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 class MyQT: public Utils::QT::SimpleQT
@@ -80,10 +82,10 @@ public:
 
 protected:
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
-	PFP::TVEC3 position;
-	AttributeHandler<Geom::Vec3f> colorDarts;
+	AttributeHandler<VEC3, VERTEX> position;
+	AttributeHandler<VEC3, DART> colorDarts;
 
 	SelectorDartNoBoundary<PFP::MAP> nb;
 
@@ -112,7 +114,5 @@ public slots:
 	void svg();
 	void width(int w);
 };
-
-
 
 #endif

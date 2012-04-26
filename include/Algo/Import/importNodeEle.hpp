@@ -164,7 +164,7 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
 			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
-			map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+			map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
@@ -183,7 +183,7 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
-		map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+		map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
@@ -210,9 +210,9 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 			Dart good_dart = NIL;
 			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if(map.getEmbedding<VERTEX>(map.phi1(*it)) == map.getEmbedding<VERTEX>(d) &&
-				   map.getEmbedding<VERTEX>(map.phi_1(*it)) == map.getEmbedding<VERTEX>(map.phi_1(d)) /*&&
-				   map.getEmbedding<VERTEX>(*it) == map.getEmbedding<VERTEX>(map.phi1(d)) */)
+				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
+				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)) /*&&
+				   map.template getEmbedding<VERTEX>(*it) == map.template getEmbedding<VERTEX>(map.phi1(d)) */)
 				{
 					good_dart = *it ;
 				}
@@ -221,7 +221,7 @@ bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenam
 			if (good_dart != NIL)
 			{
 				map.sewVolumes(d, good_dart, false);
-				m.unmarkOrbit<FACE>(d);
+				m.template unmarkOrbit<FACE>(d);
 			}
 			else
 			{
