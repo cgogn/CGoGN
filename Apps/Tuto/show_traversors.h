@@ -71,8 +71,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
-
-using namespace CGoGN ;
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 /**
@@ -89,7 +89,6 @@ class MyQT: public Utils::QT::SimpleQT
 	Algo::Render::GL2::Topo3Render* m_render_topo;
 	bool m_showTopo;
 
-	
 	unsigned int m_first3;
 	unsigned int m_ajd_or_inci3;
 	unsigned int m_second3;
@@ -112,7 +111,6 @@ public:
 		m_last(2),
 		m_selected(NIL),
 		m_dm_topo(NULL)
-
 	{}
 
 	Dart m_selected;
@@ -133,7 +131,8 @@ protected:
 
 	void cb_mousePress(int button, int x, int y);
 
-	void colorizeCell(Dart d, unsigned int orbit, float r,float g, float b);
+	template <unsigned int ORBIT>
+	void colorizeCell(Dart d, float r,float g, float b);
 
 	void traverse2();
 	void traverse3();
@@ -149,7 +148,6 @@ public slots:
 	void cb_combo6(int x);
 	void cb_checkTopo(bool b);
 	void cb_explode(int x);
-
 };
 
 #endif

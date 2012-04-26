@@ -72,8 +72,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
-
-using namespace CGoGN ;
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 /**
@@ -136,8 +136,8 @@ public:
 	void initMap();
 
 protected:
-	template <typename T>
-	void storeVerticesInfo(const AttributeHandler<T>& attrib);
+	template <typename T, unsigned int ORBIT>
+	void storeVerticesInfo(const AttributeHandler<T, ORBIT>& attrib);
 
 	void cb_redraw();
 	void cb_initGL();

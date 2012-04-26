@@ -292,14 +292,14 @@ public:
 	template<typename PFP>
 	void updateColors(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& colors, const FunctorSelect& good = allDarts);
 
-//	/**
-//	 * Get back middle position of drawn darts
-//	 * @param map the map
-//	 * @param posExpl the output positions
-//	 * @param good the selector
-//	 */
-//	template<typename PFP>
-//	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
+	/**
+	 * Get back middle position of drawn darts
+	 * @param map the map
+	 * @param posExpl the output positions
+	 * @param good the selector
+	 */
+	template<typename PFP>
+	void computeDartMiddlePositions(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, DART>& posExpl, const FunctorSelect& good = allDarts);
 
 	/**
 	 * render to svg struct

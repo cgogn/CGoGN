@@ -52,7 +52,7 @@ template <typename PFP, typename EMBV, typename EMB>
 void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+void trianguleFaces(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Triangule all the faces of the mesh
@@ -61,7 +61,7 @@ void trianguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const
 template <typename PFP>
 void trianguleFaces(
 	typename PFP::MAP& map,
-	typename PFP::TVEC3& position, const typename PFP::TVEC3& positionF,
+	AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, FACE>& positionF,
 	const FunctorSelect& selected = allDarts) ;
 
 /**
@@ -81,7 +81,7 @@ template <typename PFP, typename EMBV, typename EMB>
 void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+void quadranguleFaces(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Catmull-Clark subdivision scheme
@@ -90,7 +90,7 @@ template <typename PFP, typename EMBV, typename EMB>
 void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+void CatmullClarkSubdivision(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected = allDarts) ;
 
 /**
  * Loop subdivision scheme
@@ -99,7 +99,7 @@ template <typename PFP, typename EMBV, typename EMB>
 void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts) ;
 
 template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+void LoopSubdivision(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected = allDarts) ;
 
 
 template <typename PFP, typename EMBV, typename EMB>

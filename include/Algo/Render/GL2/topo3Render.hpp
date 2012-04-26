@@ -524,23 +524,23 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const AttributeHandle
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-//template<typename PFP>
-//void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good)
-//{
-//	m_vbo0->bind();
-//	typename PFP::VEC3* positionsPtr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
-//
-//	for (Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if (good(d))
-//		{
-//			posExpl[d] = (positionsPtr[m_attIndex[d]] + positionsPtr[m_attIndex[d]+1])*0.5f;
-//		}
-//	}
-//
-//	m_vbo0->bind();
-//	glUnmapBuffer(GL_ARRAY_BUFFER);
-//}
+template<typename PFP>
+void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, DART>& posExpl, const FunctorSelect& good)
+{
+	m_vbo0->bind();
+	typename PFP::VEC3* positionsPtr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
+
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (good(d))
+		{
+			posExpl[d] = (positionsPtr[m_attIndex[d]] + positionsPtr[m_attIndex[d]+1])*0.5f;
+		}
+	}
+
+	m_vbo0->bind();
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
 
 //template<typename PFP>
 //void Topo3Render::updateDataMap3OldFashioned(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
