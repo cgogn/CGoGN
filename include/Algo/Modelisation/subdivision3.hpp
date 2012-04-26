@@ -274,7 +274,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	std::vector<Dart> l_vertices;
 
 	//pre-computation : compute the centroid of all volume
-	AutoAttributeHandler< EMB > attBary(map, VOLUME);
+	AutoAttributeHandler<EMB, VOLUME> attBary(map);
 	TraversorW<typename PFP::MAP> traW(map, selected);
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -291,7 +291,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if(selected(d) && !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-			mv.markOrbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX),d);
+			mv.markOrbit<VERTEX + PFP::MAP::IN_PARENT>(d);
 		}
 
 		Dart f = map.phi1(d);
@@ -382,25 +382,25 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			Dart dit2 = vd2[i];
 
 			// embed the vertex embedded from the origin volume to the new darts
-			if(map.isOrbitEmbedded<VERTEX>())
+			if(map.template isOrbitEmbedded<VERTEX>())
 			{
-				map.copyDartEmbedding<VERTEX>(map.phi2(dit), map.phi1(dit));
-				map.copyDartEmbedding<VERTEX>(map.phi2(dit2), map.phi1(dit2));
+				map.template copyDartEmbedding<VERTEX>(map.phi2(dit), map.phi1(dit));
+				map.template copyDartEmbedding<VERTEX>(map.phi2(dit2), map.phi1(dit2));
 			}
 
 			// embed the edge embedded from the origin volume to the new darts
-			if(map.isOrbitEmbedded<EDGE>())
+			if(map.template isOrbitEmbedded<EDGE>())
 			{
-				unsigned int eEmb = map.getEmbedding<EDGE>(dit) ;
-				map.setDartEmbedding<EDGE>(map.phi2(dit), eEmb);
-				map.setDartEmbedding<EDGE>(map.phi2(dit2), eEmb);
+				unsigned int eEmb = map.template getEmbedding<EDGE>(dit) ;
+				map.template setDartEmbedding<EDGE>(map.phi2(dit), eEmb);
+				map.template setDartEmbedding<EDGE>(map.phi2(dit2), eEmb);
 			}
 
 			// embed the volume embedded from the origin volume to the new darts
-			if(map.isOrbitEmbedded<VOLUME>())
+			if(map.template isOrbitEmbedded<VOLUME>())
 			{
-				map.copyDartEmbedding<VOLUME>(map.phi2(dit), dit);
-				map.copyDartEmbedding<VOLUME>(map.phi2(dit2), dit2);
+				map.template copyDartEmbedding<VOLUME>(map.phi2(dit), dit);
+				map.template copyDartEmbedding<VOLUME>(map.phi2(dit2), dit2);
 			}
 		}
 
@@ -412,15 +412,14 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		Dart next = map.phi1(map.phi1(dd)) ;
 		map.PFP::MAP::ParentMap::splitFace(dd, next);
 
-		if (map.isOrbitEmbedded<VERTEX>())
+		if (map.template isOrbitEmbedded<VERTEX>())
 		{
-			map.copyDartEmbedding<VERTEX>(map.phi_1(next), dd) ;
-			map.copyDartEmbedding<VERTEX>(map.phi_1(dd), next) ;
+			map.template copyDartEmbedding<VERTEX>(map.phi_1(next), dd) ;
+			map.template copyDartEmbedding<VERTEX>(map.phi_1(dd), next) ;
 		}
 
 		Dart ne = map.phi2(map.phi_1(dd));
 		map.PFP::MAP::ParentMap::cutEdge(ne);
-
 
 //		dd = map.phi1(map.phi1(next)) ;
 //		while(dd != ne)

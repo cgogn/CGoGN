@@ -54,7 +54,6 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
-
 // example of usage of traversor for local traverse
 void MyQT::cb_mouseClick(int button, int x, int y)
 {
@@ -91,13 +90,11 @@ void MyQT::cb_mouseClick(int button, int x, int y)
 					dart_selected.push_back(e);
 				CGoGNout << "traverse vertices adjacent to vertex by a face " << CGoGNendl;
 				color = Geom::Vec3f(1,1,0);
-
 			}
 		}
 		updateGL();
 	}
 }
-
 
 void MyQT::traverseMap()
 {
@@ -117,11 +114,7 @@ void MyQT::traverseMap()
 	TraversorF<PFP::MAP> traF(myMap);
 	for (Dart d=traF.begin(); d!=traF.end(); d=traF.next())
 		CGoGNout << "Face of dart "<<d<< CGoGNendl;
-
 }
-
-
-
 
 void MyQT::createMap()
 {
@@ -130,7 +123,7 @@ void MyQT::createMap()
 
 	Dart d2 = d1;
 
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
 	position[d2] = PFP::VEC3(1, 0, 0);
 	d2 = PHI1(d2);
@@ -161,7 +154,6 @@ void MyQT::createMap()
 	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
 }
 
-
 // initialization GL callback
 void MyQT::cb_initGL()
 {
@@ -177,10 +169,4 @@ void MyQT::cb_redraw()
 		m_render_topo->overdrawDart(*it, 5, color[0],color[1],color[2]);
 	}
 	m_render_topo->drawTopo();
-
 }
-
-
-
-
-

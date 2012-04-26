@@ -72,8 +72,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
-
-using namespace CGoGN ;
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 /**

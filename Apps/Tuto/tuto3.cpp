@@ -66,11 +66,11 @@ void MyQT::traverseMap()
 
 	m1.unmarkAll();
 
-	m1.markOrbit(VOLUME,xd1);
+	m1.markOrbit<VOLUME>(xd1);
 
 	// render the topo of the map without boundary darts
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, nb);
 
 	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
@@ -143,23 +143,19 @@ void MyQT::traverseMap()
 //	// markers are cleaned and released at destruction of DartMarkers & CellMarkers
 //	// DartMarkerStore should be used if few darts are traversed
 //	// DartMarkerNoUnmark can be use if you want to manage unmarking yourself
-
 }
 
 
 void MyQT::createMap()
 {
+//	Dart d1 = Algo::Modelisation::createTetrahedron<PFP>(myMap);
 
+//	Dart d2 = d1;
 
-	Dart d1 = Algo::Modelisation::createTetrahedron<PFP>(myMap);
-
-	Dart d2 = d1;
-
-
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
 	Algo::Modelisation::Polyhedron<PFP> prim1(myMap, position);
-	prim1.cylinder_topo(256,256, true, true); // topo of sphere is a closed cylinder
+	prim1.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
 	prim1.embedSphere(2.0f);
 
 //	Dart d2 = d1;
@@ -171,18 +167,16 @@ void MyQT::createMap()
 //	d2 = PHI<211>(d2);
 //	position[d2] = PFP::VEC3(0, 1, 2);
 
-
 	Algo::Modelisation::Polyhedron<PFP> prim2(myMap, position);
-	prim2.cylinder_topo(256,256, true, true); // topo of sphere is a closed cylinder
+	prim2.cylinder_topo(256, 256, true, true); // topo of sphere is a closed cylinder
 	prim2.embedSphere(2.0f);
 
 	Geom::Matrix44f trf;
 	trf.identity();
-	Geom::translate<float>(5.0f,0.0,0.0,trf);
+	Geom::translate<float>(5.0f, 0.0, 0.0, trf);
 	prim2.transform(trf);
 
 	xd1 = prim2.getDart();
-
 
 //	xd1 = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
 //	Dart xd2 = xd1;
@@ -211,7 +205,6 @@ void MyQT::createMap()
 	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
 }
 
-
 // initialization GL callback
 void MyQT::cb_initGL()
 {
@@ -224,7 +217,6 @@ void MyQT::cb_redraw()
 	if (dart_selected != NIL)
 		m_render_topo->overdrawDart(dart_selected, 5, 1.0f,0.0f,0.0f);
 	m_render_topo->drawTopo();
-
 }
 
 // mouse picking
@@ -232,12 +224,11 @@ void MyQT::cb_mouseClick(int button, int x, int y)
 {
 	if (button == Qt::LeftButton)
 	{
-		Dart  d = m_render_topo->picking<PFP>(myMap,x,y);
+		Dart  d = m_render_topo->picking<PFP>(myMap, x, y);
 		if (d != NIL)
 
 			CGoGNout << "Dart "<< d <<  CGoGNendl;
 		dart_selected=d;
 		updateGL();
 	}
-
 }

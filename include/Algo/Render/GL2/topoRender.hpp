@@ -363,10 +363,10 @@ template<typename PFP>
 void TopoRender::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
 	m_vbo3->bind();
-	float* colorBuffer =  reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
-	unsigned int nb=0;
+	float* colorBuffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+	unsigned int nb = 0;
 
-	m_attIndex = map.template getAttribute<unsigned int>(DART, "dart_index");
+	m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index");
 	if (!m_attIndex.isValid())
 	{
 		CGoGNerr << "Error attribute_dartIndex does not exist during TopoRender::picking" << CGoGNendl;
