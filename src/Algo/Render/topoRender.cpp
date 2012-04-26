@@ -185,7 +185,7 @@ void TopoRender::drawTopo()
 
 void TopoRender::overdrawDart(Dart d, float width, float r, float g, float b)
 {
-	unsigned int indexDart =  m_attIndex[d];
+	unsigned int indexDart = m_attIndex[d];
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo0);
 	m_shader1->setColor(Geom::Vec4f(r,g,b,0.0f));

@@ -240,8 +240,8 @@ protected:
 public:
 	virtual void unmarkAll()
 	{
-		assert(m_map.getMarkerSet(CELL, this->m_thread).testMark(this->m_mark));
-		assert(m_markVector != NULL);
+		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_markVector != NULL);
 
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
@@ -269,7 +269,7 @@ public:
 	{
 		unmarkAll() ;
 //		assert(isAllUnmarked);
-		CGoGN_ASSERT(isAllUnmarked())
+		CGoGN_ASSERT(this->isAllUnmarked())
 	}
 
 protected:
@@ -291,8 +291,8 @@ public:
 
 	void unmarkAll()
 	{
-		assert(m_map.getMarkerSet(CELL, this->m_thread).testMark(this->m_mark));
-		assert(m_markVector != NULL);
+		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_markVector != NULL);
 
 		for (std::vector<unsigned int>::iterator it = m_markedCells.begin(); it != m_markedCells.end(); ++it)
 			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
@@ -314,7 +314,7 @@ public:
 	virtual ~CellMarkerNoUnmark()
 	{
 //		assert(isAllUnmarked()) ;
-		CGoGN_ASSERT(isAllUnmarked())
+		CGoGN_ASSERT(this->isAllUnmarked())
 	}
 
 protected:
@@ -324,8 +324,8 @@ protected:
 public:
 	void unmarkAll()
 	{
-		assert(m_map.getMarkerSet(CELL, this->m_thread).testMark(this->m_mark));
-		assert(m_markVector != NULL);
+		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_markVector != NULL);
 
 		AttributeContainer& cont = this->m_map.template getAttributeContainer<CELL>() ;
 		for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))

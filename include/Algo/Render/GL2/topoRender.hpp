@@ -48,12 +48,14 @@ void TopoRender::updateData(typename PFP::MAP& map, const AttributeHandler<typen
 	Map2* ptrMap2 = dynamic_cast<Map2*>(&map);
 	if (ptrMap2 != NULL)
 	{
-		updateDataMap<PFP>(map,positions,ke,kf,good);
+		updateDataMap<PFP>(map, positions, ke, kf, good);
+		return;
 	}
 	GMap2* ptrGMap2 = dynamic_cast<GMap2*>(&map);
 	if (ptrGMap2 != NULL)
 	{
-		updateDataGMap<PFP>(map,positions,ke,kf,good);
+		updateDataGMap<PFP>(map, positions, ke, kf, good);
+		return;
 	}
 }
 

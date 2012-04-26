@@ -86,7 +86,6 @@ protected:
 	*/
 	GLuint m_nbRel2;
 
-
 	/**
 	 * width of lines use to draw darts
 	 */
@@ -102,7 +101,6 @@ protected:
 	 */
 	Geom::Vec3f m_dartsColor;
 
-
 	float *m_color_save;
 
 	/**
@@ -112,7 +110,6 @@ protected:
 
 	Utils::ShaderSimpleColor* m_shader1;
 	Utils::ShaderColorPerVertex* m_shader2;
-
 
 	/**
 	 * compute color from dart index (for color picking)
@@ -257,7 +254,6 @@ public:
 // just for compatibility with old code
 typedef TopoRender TopoRenderMapD;
 typedef TopoRender TopoRenderGMap;
-
 
 } // namespace GL2
 

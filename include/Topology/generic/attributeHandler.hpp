@@ -58,10 +58,9 @@ template <typename T, unsigned int ORBIT>
 AttributeHandler<T, ORBIT>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
 	AttributeHandlerGen(m, false), m_attrib(amv)
 {
-	assert(ORBIT == amv->getOrbit() || !"AttributeHandler: orbit incompatibility") ;
-
 	if(m != NULL && amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
 	{
+		assert(ORBIT == amv->getOrbit() || !"AttributeHandler: orbit incompatibility") ;
 		valid = true ;
 		registerInMap() ;
 	}
