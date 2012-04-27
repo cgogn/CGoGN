@@ -36,7 +36,6 @@
 namespace CGoGN
 {
 
-
 class SelectorCollapsingEdges : public FunctorSelect
 {
 protected:
@@ -72,7 +71,6 @@ public:
 	void analysis() ;
 	void synthesis() ;
 } ;
-
 
 } // namespace CGoGN
 

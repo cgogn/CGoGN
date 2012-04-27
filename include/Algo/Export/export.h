@@ -88,9 +88,9 @@ bool exportTrian(typename PFP::MAP& map, const typename PFP::TVEC3& position, ch
 * @param filename filename of ply file
 * @param position the position container
 * @return true
-*
-template <typename PFP>
-bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+*/
+//template <typename PFP>
+//bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format).
@@ -103,9 +103,9 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 * @param filename filename of ply file
 * @param position the position container
 * @return true
-*
-template <typename PFP>
-bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+*/
+//template <typename PFP>
+//bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
 * export the map into a PLYSLF file (K. Vanhoey generic format).

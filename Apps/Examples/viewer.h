@@ -90,11 +90,13 @@ public:
 	bool m_drawEdges ;
 	bool m_drawFaces ;
 	bool m_drawNormals ;
+	bool m_drawTopo ;
 
 	PFP::TVEC3 position ;
 	PFP::TVEC3 normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
+	Algo::Render::GL2::TopoRender* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO ;
@@ -123,6 +125,7 @@ public slots:
 	void slot_drawEdges(bool b) ;
 	void slot_drawFaces(bool b) ;
 	void slot_faceLighting(int i) ;
+	void slot_drawTopo(bool b) ;
 	void slot_drawNormals(bool b) ;
 	void slot_normalsSize(int i) ;
 };

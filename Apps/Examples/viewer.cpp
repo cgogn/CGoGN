@@ -30,6 +30,7 @@ Viewer::Viewer() :
 	m_drawEdges(false),
 	m_drawFaces(true),
 	m_drawNormals(false),
+	m_drawTopo(false),
 	m_render(NULL),
 	m_phongShader(NULL),
 	m_flatShader(NULL),
@@ -68,6 +69,7 @@ void Viewer::initGUI()
 	setCallBack( dock.check_drawEdges, SIGNAL(toggled(bool)), SLOT(slot_drawEdges(bool)) ) ;
 	setCallBack( dock.check_drawFaces, SIGNAL(toggled(bool)), SLOT(slot_drawFaces(bool)) ) ;
 	setCallBack( dock.combo_faceLighting, SIGNAL(currentIndexChanged(int)), SLOT(slot_faceLighting(int)) ) ;
+	setCallBack( dock.check_drawTopo, SIGNAL(toggled(bool)), SLOT(slot_drawTopo(bool)) ) ;
 	setCallBack( dock.check_drawNormals, SIGNAL(toggled(bool)), SLOT(slot_drawNormals(bool)) ) ;
 	setCallBack( dock.slider_normalsSize, SIGNAL(valueChanged(int)), SLOT(slot_normalsSize(int)) ) ;
 }
@@ -79,6 +81,9 @@ void Viewer::cb_initGL()
 	setFocal(5.0f) ;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
+	m_topoRender = new Algo::Render::GL2::TopoRender() ;
+
+	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
@@ -119,7 +124,6 @@ void Viewer::cb_initGL()
 
 void Viewer::cb_redraw()
 {
-	//glClearColor(1,1,1,0);
 	if(m_drawVertices)
 	{
 		float size = vertexScaleFactor ;
@@ -133,14 +137,6 @@ void Viewer::cb_redraw()
 	{
 		glLineWidth(1.0f) ;
 		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES) ;
-	}
-
-	if(m_drawNormals)
-	{
-		float size = normalBaseSize * normalScaleFactor ;
-		m_vectorShader->setScale(size) ;
-		glLineWidth(1.0f) ;
-		m_render->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
 	}
 
 	if(m_drawFaces)
@@ -160,6 +156,19 @@ void Viewer::cb_redraw()
 				break ;
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
+	}
+
+	if(m_drawTopo)
+	{
+		m_topoRender->drawTopo() ;
+	}
+
+	if(m_drawNormals)
+	{
+		float size = normalBaseSize * normalScaleFactor ;
+		m_vectorShader->setScale(size) ;
+		glLineWidth(1.0f) ;
+		m_render->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
 	}
 }
 
@@ -209,6 +218,8 @@ void Viewer::importMesh(std::string& filename)
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
+	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f) ;
+
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize / 5.0f ;
@@ -235,7 +246,7 @@ void Viewer::exportMesh(std::string& filename)
 		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
-		std::vector<typename PFP::TVEC3* > attributes ;
+		std::vector<PFP::TVEC3*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), true, allDarts) ;
 	}
@@ -275,6 +286,12 @@ void Viewer::slot_faceLighting(int i)
 	updateGL() ;
 }
 
+void Viewer::slot_drawTopo(bool b)
+{
+	m_drawTopo = b ;
+	updateGL() ;
+}
+
 void Viewer::slot_drawNormals(bool b)
 {
 	m_drawNormals = b ;
@@ -284,6 +301,7 @@ void Viewer::slot_drawNormals(bool b)
 void Viewer::slot_normalsSize(int i)
 {
 	normalScaleFactor = i / 50.0f ;
+	m_topoRender->updateData<PFP>(myMap, position, i / 100.0f, i / 100.0f) ;
 	updateGL() ;
 }
 
