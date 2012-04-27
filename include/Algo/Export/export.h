@@ -134,6 +134,9 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good = allDarts) ;
 
+template <typename PFP>
+bool exportChoupi<typename PFP::MAP& map, const typename PFP::TVEC3& position  const FunctorSelect& good = allDarts) ;
+
 } // namespace Export
 
 } // namespace Algo
