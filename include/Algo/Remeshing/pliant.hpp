@@ -35,7 +35,7 @@ namespace Remeshing
 {
 
 template <typename PFP>
-void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& normal)
+void pliantRemeshing(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VERTEX>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -81,12 +81,12 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	}
 
 	// compute feature edges
-	CellMarker featureEdge(map, EDGE) ;
+	CellMarker<EDGE> featureEdge(map) ;
 	Algo::Geometry::featureEdgeDetection<PFP>(map, position, featureEdge) ;
 
 	// compute feature vertices
-	CellMarker featureVertex(map, VERTEX) ;
-	CellMarker cornerVertex(map, VERTEX) ;
+	CellMarker<VERTEX> featureVertex(map) ;
+	CellMarker<VERTEX> cornerVertex(map) ;
 	DartMarker m3(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -178,10 +178,10 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 	Algo::Geometry::computeNormalVertices<PFP>(map, position, normal) ;
 
 	// tangential relaxation
-	AttributeHandler<VEC3> centroid = map.template addAttribute<VEC3>(VERTEX, "centroid") ;
+	AttributeHandler<VEC3, VERTEX> centroid = map.template addAttribute<VEC3, VERTEX>("centroid") ;
 	Algo::Geometry::computeNeighborhoodCentroidVertices<PFP>(map, position, centroid) ;
 
-	CellMarker vm(map, VERTEX) ;
+	CellMarker<VERTEX> vm(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(!vm.isMarked(d))
@@ -197,7 +197,7 @@ void pliantRemeshing(typename PFP::MAP& map, typename PFP::TVEC3& position, type
 		}
 	}
 
-	map.template removeAttribute<VEC3>(centroid) ;
+	map.removeAttribute(centroid) ;
 }
 
 } // namespace Remeshing

@@ -128,8 +128,8 @@ void Approximator_RGBfunctionsHalf<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_Frame<PFP>::init()
 {
-	m_position = this->m_map.template getAttribute<VEC3>(VERTEX, "position") ;
-	m_approxPosition = this->m_map.template getAttribute<VEC3>(EDGE, "approx_position") ;
+	m_position = this->m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	m_approxPosition = this->m_map.template getAttribute<VEC3, EDGE>("approx_position") ;
 
 	if (!m_position.isValid() || !m_approxPosition.isValid())
 	{
