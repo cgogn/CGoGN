@@ -40,12 +40,12 @@ enum neighborhood { INSIDE = 1, BORDER = 2 };
 template <typename PFP, typename T>
 void filterAverageAttribute_OneRing(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const AttributeHandler<T, VERTEX>& attIn,
+	AttributeHandler<T, VERTEX>& attOut,
 	int neigh,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> fa(attIn) ;
+	FunctorAverage<T, VERTEX> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
 
 	TraversorV<typename PFP::MAP> t(map, select) ;
@@ -86,14 +86,14 @@ void filterAverageAttribute_OneRing(
 template <typename PFP, typename T>
 void filterAverageVertexAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const AttributeHandler<T, VERTEX>& attIn,
+	AttributeHandler<T, VERTEX>& attOut,
 	int neigh,
-	typename PFP::TVEC3 & position,
+	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> faInside(attIn) ;
+	FunctorAverage<T, VERTEX> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
@@ -128,14 +128,14 @@ void filterAverageVertexAttribute_WithinSphere(
 template <typename PFP, typename T>
 void filterAverageEdgeAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const AttributeHandler<T, EDGE>& attIn,
+	AttributeHandler<T, EDGE>& attOut,
 	int neigh,
-	typename PFP::TVEC3 & position,
+	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> fa(attIn) ;
+	FunctorAverage<T, EDGE> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorE<typename PFP::MAP> t(map, select) ;
@@ -156,14 +156,14 @@ void filterAverageEdgeAttribute_WithinSphere(
 template <typename PFP, typename T>
 void filterAverageFaceAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const AttributeHandler<T, FACE>& attIn,
+	AttributeHandler<T, FACE>& attOut,
 	int neigh,
-	typename PFP::TVEC3 & position,
+	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> fa(attIn) ;
+	FunctorAverage<T, FACE> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorF<typename PFP::MAP> t(map, select) ;
