@@ -69,7 +69,7 @@ template <typename PFP>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, EDGE>& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 } // namespace Geometry
 

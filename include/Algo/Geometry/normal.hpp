@@ -195,7 +195,7 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 }
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& angles, const FunctorSelect& select, unsigned int thread)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, EDGE>& angles, const FunctorSelect& select, unsigned int thread)
 {
 	TraversorE<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
