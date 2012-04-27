@@ -77,11 +77,11 @@ class Clipping: public Utils::QT::SimpleQT
 
 public:
 	typedef PFP::MAP MAP;
-	typedef PFP::TVEC3 TVEC3;
+	typedef PFP::VEC3 VEC3;
 
 	//Manip Carte
 	MAP myMap ;
-	TVEC3 position;
+	AttributeHandler<VEC3, VERTEX> position;
 	Dart dglobal;
 
 	//Render

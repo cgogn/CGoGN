@@ -726,8 +726,6 @@ void Clipping::initGUI()
 	m_planeDrawable->getPrecisionDrawing(planesPrecision1, planesPrecision2);
 	dock.spinBox_GridResolution->setValue(planesPrecision1);
 
-
-
 	setCallBack(dock.pushButton_addSphere, SIGNAL(clicked()), SLOT(slot_pushButton_addSphere()));
 
 	setCallBack(dock.spinBox_SphereResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereResolution(int)));
@@ -736,8 +734,6 @@ void Clipping::initGUI()
 	unsigned int spheresPrecision1, spheresPrecision2;
 	m_sphereDrawable->getPrecisionDrawing(spheresPrecision1, spheresPrecision2);
 	dock.spinBox_SphereResolution->setValue(spheresPrecision1);
-
-
 
 	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
 	setCallBack(dock.radioButton_ClippingModeAnd, SIGNAL(toggled(bool)), SLOT(slot_radioButton_ClippingMode(bool)));
@@ -755,14 +751,12 @@ void Clipping::initGUI()
 	else if (colorAttMode == Utils::ClippingShader::COLOR_ATTENUATION_MODE_QUADRATIC)
 		dock.radioButton_ColorAttenuationModeQuadratic->setChecked(true);
 
-
 	setCallBack(dock.PushButton_ApplyStaticClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyStaticClippingPreset()));
 
 	dock.comboBox_StaticClippingPresets->addItem("Dual Planes");
 	dock.comboBox_StaticClippingPresets->addItem("Cube");
 	dock.comboBox_StaticClippingPresets->addItem("Tube");
 	dock.comboBox_StaticClippingPresets->addItem("Molecule");
-
 
 	setCallBack(dock.PushButton_ApplyAnimatedClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyAnimatedClippingPreset()));
 
@@ -777,7 +771,6 @@ void Clipping::initGUI()
 	// timer used for animation
 	m_timer = new QTimer( this );
 	setCallBack( m_timer, SIGNAL(timeout()), SLOT(slot_animationTimer()) );
-
 }
 
 void Clipping::cb_Open()
@@ -804,7 +797,7 @@ void Clipping::importMesh(std::string& filename)
 			return;
 		}
 		else
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+			position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	else if(extension == std::string(".ts"))
 	{
@@ -814,7 +807,7 @@ void Clipping::importMesh(std::string& filename)
 			return;
 		}
 		else
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+			position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	if(extension == std::string(".map"))
 	{
@@ -824,9 +817,8 @@ void Clipping::importMesh(std::string& filename)
 			return;
 		}
 		else
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX , "position") ;
+			position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
-
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
@@ -1125,12 +1117,12 @@ int main(int argc, char** argv)
 
 	if(argc == 2)
     {
-            std::string filename(argv[1]);
-            sqt.importMesh(filename);
+		std::string filename(argv[1]);
+		sqt.importMesh(filename);
     }
 	else
 	{
-		sqt.position = sqt.myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		sqt.position = sqt.myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 		Algo::Modelisation::Primitive3D<PFP> prim(sqt.myMap, sqt.position);
 		prim.hexaGrid_topo(10,10,10);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);

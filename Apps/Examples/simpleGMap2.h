@@ -51,7 +51,7 @@ class SimpleGMap2 : public Utils::QT::SimpleQT
 public:
 	MAP myMap ;
 
-	PFP::TVEC3 position ;
+	AttributeHandler<VEC3, VERTEX> position ;
 
 	SimpleGMap2() ;
 

@@ -51,7 +51,10 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
-PFP::MAP myMap;
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+
+MAP myMap;
 
 void MyQT::cb_initGL()
 {
@@ -99,7 +102,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position") ;
+	AttributeHandler<VEC3, VERTEX> position = myMap.addAttribute<VEC3, VERTEX>("position") ;
 
 	// define the face extruded (here a cross)
 	std::vector<PFP::VEC3> objV;

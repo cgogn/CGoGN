@@ -52,10 +52,9 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 typedef unsigned char DATATYPE;
-
-
 
 class MCMesh : public Utils::QT::SimpleQT
 {
@@ -67,7 +66,6 @@ public:
 
     Utils::QT::uiDockInterface dock ;
 
-
 	float shininess ;
 
 	Geom::BoundingBox<PFP::VEC3> bb ;
@@ -75,14 +73,13 @@ public:
 	bool m_drawEdges ;
 	bool m_drawFaces ;
 
-	PFP::TVEC3 position ;
+	AttributeHandler<VEC3, VERTEX> position ;
 
 	Algo::Render::GL2::MapRender* m_render ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::ShaderFlat* m_flatShader ;
 	Utils::ShaderSimpleColor* m_simpleColorShader ;
-
 
 	DATATYPE valLabel;
 	Algo::MC::Image<DATATYPE>* myImg;
@@ -100,10 +97,7 @@ public:
 	void fromFile(char* fname);
 	void sphere();
 
-
 public slots:
 	void slot_drawEdges(bool b) ;
 	void slot_drawFaces(bool b) ;
-
 };
-

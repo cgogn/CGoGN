@@ -50,7 +50,6 @@ using namespace CGoGN ;
 float Ifont[74*2]={
 0.145434f,0.126469f, 0.141475f,0.096252f, 0.133621f,0.0730446f, 0.120846f,0.0558913f,
 0.0764256f,0.0359233f,  0.0f,0.028701f, 0.0f,0.0215257f, 0.0f,0.0143506f, 0.0f,0.00717529f, 0.0f,0.0f,
-
 0.0560801f, 0.0f, 0.11216f,0.0f, 0.16824f,0.0f,  0.22432f,0.0f, 0.2804f,0.0f,  0.33648f,0.0f, 0.39256f,0.0f,
 0.448641f,0.0f, 0.448641f,0.00717529f, 0.448641f,0.0143506f, 0.448641f,0.0215257f, 0.448641f,0.028701f,
 0.406716f,0.0313208f, 0.373254f,0.0363483f, 0.347367f,0.0446329f, 0.328172f,0.0570242f,
@@ -127,10 +126,13 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+
 // declaration of the map
-PFP::MAP myMap;
+MAP myMap;
 // and attribute of position
-AttributeHandler<PFP::VEC3> position;
+AttributeHandler<VEC3, VERTEX> position;
 
 unsigned int nb_ears;
 
@@ -241,8 +243,7 @@ void MyQT::cb_keyPress(int code)
 
 int main(int argc, char **argv)
 {
-
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	Dart d0 = myMap.newFace(12);
 	position[d0] = PFP::VEC3(0, 20, 0);
@@ -267,8 +268,6 @@ int main(int argc, char **argv)
 	d0 = myMap.phi1(d0);
 	position[d0] = PFP::VEC3(0, 30, 0);
 
-
-
 	d0 = myMap.newFace(4);
 	position[d0] = PFP::VEC3(-5, 14, -5);
 	d0 = myMap.phi1(d0);
@@ -278,8 +277,6 @@ int main(int argc, char **argv)
 	d0 = myMap.phi1(d0);
 	position[d0] = PFP::VEC3(0, 20, -5);
 	d0 = myMap.phi1(d0);
-
-
 
 	Dart d1 = myMap.newFace(10);
 
@@ -306,7 +303,6 @@ int main(int argc, char **argv)
 	position[d1] = PFP::VEC3(4, 4, 0);
 	d1 = myMap.phi1(d1);
 	position[d1] = PFP::VEC3(0, 8, 0);
-
 
 	Dart d2 = myMap.newFace(12);
 
@@ -335,8 +331,6 @@ int main(int argc, char **argv)
 	position[d2] = PFP::VEC3(0, -16, 0);
 	d2 = myMap.phi1(d2);
 
-
-
 #define NB 32
 
 	//SPIRAL
@@ -360,7 +354,6 @@ int main(int argc, char **argv)
 		position[d3] = PFP::VEC3(radius*cos(alpha) -  2*NB+8, radius*sin(alpha), z);
 		d3 = myMap.phi1(d3);
 	}
-
 
 	//CIRCLE
 
@@ -410,7 +403,6 @@ int main(int argc, char **argv)
 		position[d9] = PFP::VEC3(60.0,60.0,0.0f) + Gfont[2*i] * V1 + Gfont[2*i+1]*V2 + a*V3;
 		d9 = myMap.phi1(d9);
 	}
-
 
 	// interface:
 	QApplication app(argc, argv);

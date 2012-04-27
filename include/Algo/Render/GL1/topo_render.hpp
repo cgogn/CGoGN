@@ -40,15 +40,15 @@ namespace GL1
 {
 
 template <typename PFP>
-void renderTopoMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, float ke, float kf)
+void renderTopoMD2(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawPhi1, bool drawPhi2, float ke, float kf)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 	
-	AutoAttributeHandler<Geom::Vec3f> fv1(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv11(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv2(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv1(map);
+	AutoAttributeHandler<VEC3, DART> fv11(map);
+	AutoAttributeHandler<VEC3, DART> fv2(map);
+	AutoAttributeHandler<VEC3, DART> vert(map);
 
 	glLineWidth(2.0f);
 	glColor3f(0.9f,0.9f,0.9f);
@@ -138,16 +138,16 @@ void renderTopoMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions,
 }
 
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv)
+void renderTopoMD3(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AutoAttributeHandler<Geom::Vec3f> fv1(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv11(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv2(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> fv2x(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
+	AutoAttributeHandler<VEC3, DART> fv1(map);
+	AutoAttributeHandler<VEC3, DART> fv11(map);
+	AutoAttributeHandler<VEC3, DART> fv2(map);
+	AutoAttributeHandler<VEC3, DART> fv2x(map);
+	AutoAttributeHandler<VEC3, DART> vert(map);
 
 	int m_nbDarts = 0;
 
@@ -164,7 +164,7 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
 	DartMarker mark(map);					// marker for darts
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
+			CellMarkerStore<VERTEX> markVert(map);		//marker for vertices
 			VEC3 center(0, 0, 0);
 			unsigned int nbv = 0;
 			unsigned int nbf = 0;
@@ -264,7 +264,6 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
 		}
 	}
 
-
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		Dart e = map.phi2(d);
@@ -305,14 +304,14 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
 }
 
 template <typename PFP>
-void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float kd, float ke, float kf)
+void renderTopoGMD2(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float kd, float ke, float kf)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AutoAttributeHandler<Geom::Vec3f> posBeta1(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> posBeta2(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
+	AutoAttributeHandler<VEC3, DART> posBeta1(map);
+	AutoAttributeHandler<VEC3, DART> posBeta2(map);
+	AutoAttributeHandler<VEC3, DART> vert(map);
 
 	glLineWidth(2.0f);
 	glColor3f(0.9f,0.9f,0.9f);
@@ -414,14 +413,14 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 }
 
 template <typename PFP>
-void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv)
+void renderTopoGMD3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AutoAttributeHandler<Geom::Vec3f> posBeta1(map, DART);
-	AutoAttributeHandler<Geom::Vec3f> posBeta2(map, DART); //beta 3 link is represented at the same location as beta2
-	AutoAttributeHandler<Geom::Vec3f> vert(map, DART);
+	AutoAttributeHandler<VEC3, DART> posBeta1(map);
+	AutoAttributeHandler<VEC3, DART> posBeta2(map); //beta 3 link is represented at the same location as beta2
+	AutoAttributeHandler<VEC3, DART> vert(map);
 
 	// table of face (one dart of each)
 	std::vector<Dart> vecDartFaces;
@@ -436,7 +435,7 @@ void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 	vecVolCenters.reserve(vecDartFaces.size()/4); // = nb of volumes for a tetra mesh
 
 	DartMarker mark(map);					// marker for darts
-	CellMarker mVol(map, VOLUME);
+	CellMarker<VOLUME> mVol(map);
 //	DartMarker mVol(map);
 
 	//compute barycenter and get a dart by face
@@ -447,7 +446,7 @@ void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 			mVol.mark(d);
 //			mVol.markOrbit(VOLUME,d);
 
-			CellMarkerStore markVert(map, VERTEX);		//marker for vertices
+			CellMarkerStore<VERTEX> markVert(map);		//marker for vertices
 			VEC3 center(0);
 			unsigned int nbVertices = 0;
 			unsigned int nbf = 0;
@@ -565,7 +564,6 @@ void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 		}
 	}
 
-
 	//draw beta1, beta2, beta3 if required
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -606,7 +604,6 @@ void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions
 		glVertex3fv(vert[d].data());
 	}
 	glEnd();
-
 }
 
 } // namespace GL1
