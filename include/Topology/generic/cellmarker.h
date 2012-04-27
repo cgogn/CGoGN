@@ -40,15 +40,26 @@ class CellMarkerGen
 protected:
 	GenericMap& m_map ;
 	Mark m_mark ;
+	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
+	unsigned int m_cell ;
 	bool releaseOnDestruct ;
 
 public:
-	CellMarkerGen(GenericMap& map, unsigned int thread = 0) : m_map(map), m_thread(thread), releaseOnDestruct(true)
+	CellMarkerGen(GenericMap& map, unsigned int cell, unsigned int thread = 0) :
+		m_map(map),
+		m_thread(thread),
+		m_cell(cell),
+		releaseOnDestruct(true)
 	{}
 
 	virtual ~CellMarkerGen()
 	{}
+
+	unsigned int getThread() { return m_thread ; }
+	unsigned int getCell() { return m_cell ; }
+
+	void updateMarkVector(AttributeMultiVector<Mark>* amv) { m_markVector = amv ; }
 
 	/**
 	 * set if the mark has to be release on destruction or not
@@ -73,15 +84,12 @@ public:
 template <unsigned int CELL>
 class CellMarkerBase : public CellMarkerGen
 {
-protected:
-	AttributeMultiVector<Mark>* m_markVector ;
-
 public:
 	/**
 	 * constructor
 	 * @param map the map on which we work
 	 */
-	CellMarkerBase(GenericMap& map, unsigned int thread = 0) : CellMarkerGen(map, thread)
+	CellMarkerBase(GenericMap& map, unsigned int thread = 0) : CellMarkerGen(map, CELL, thread)
 	{
 		if(!map.isOrbitEmbedded<CELL>())
 			map.addEmbedding<CELL>() ;
@@ -264,7 +272,6 @@ public:
 	CellMarkerStore(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
 	{}
 
-
 	virtual ~CellMarkerStore()
 	{
 		unmarkAll() ;
@@ -350,7 +357,7 @@ public:
 			return true ;
 		return false ;
 	}
-	FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker);}
+	FunctorSelect* copy() const { return new SelectorCellMarked(m_cmarker); }
 };
 
 template <unsigned int CELL>
@@ -366,7 +373,7 @@ public:
 			return true ;
 		return false ;
 	}
-	FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker);}
+	FunctorSelect* copy() const { return new SelectorCellUnmarked(m_cmarker); }
 };
 
 // Functor version (needed for use with foreach_xxx)

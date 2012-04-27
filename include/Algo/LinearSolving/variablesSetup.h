@@ -36,17 +36,17 @@ class FunctorMeshToSolver_Scalar : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	CellMarker& lockingMarker ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
+	CellMarker<VERTEX>& lockingMarker ;
+	const AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		CellMarker& lm,
-		const AttributeHandler<ATTR_TYPE>& attr
+		const AttributeHandler<unsigned int, VERTEX>& index,
+		CellMarker<VERTEX>& lm,
+		const AttributeHandler<ATTR_TYPE, VERTEX>& attr
 	) :	solver(s), indexTable(index), lockingMarker(lm), attrTable(attr), lockedVertices(false)
 	{}
 
@@ -68,18 +68,18 @@ class FunctorMeshToSolver_Vector : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	CellMarker& lockingMarker ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
+	CellMarker<VERTEX>& lockingMarker ;
+	const AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
 	unsigned int coord ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Vector(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		CellMarker& lm,
-		const AttributeHandler<ATTR_TYPE>& attr,
+		const AttributeHandler<unsigned int, VERTEX>& index,
+		CellMarker<VERTEX>& lm,
+		const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
 		unsigned int c
 	) :	solver(s), indexTable(index), lockingMarker(lm), attrTable(attr), coord(c), lockedVertices(false)
 	{}
@@ -102,14 +102,14 @@ class FunctorSolverToMesh_Scalar : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	AttributeHandler<ATTR_TYPE>& attrTable ;
+	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
+	AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
 
 public:
 	FunctorSolverToMesh_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		AttributeHandler<ATTR_TYPE>& attr
+		const AttributeHandler<unsigned int, VERTEX>& index,
+		AttributeHandler<ATTR_TYPE, VERTEX>& attr
 	) :	solver(s), indexTable(index), attrTable(attr)
 	{}
 
@@ -125,15 +125,15 @@ class FunctorSolverToMesh_Vector : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	AttributeHandler<ATTR_TYPE>& attrTable ;
+	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
+	AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
 	unsigned int coord ;
 
 public:
 	FunctorSolverToMesh_Vector(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		AttributeHandler<ATTR_TYPE>& attr,
+		const AttributeHandler<unsigned int, VERTEX>& index,
+		AttributeHandler<ATTR_TYPE, VERTEX>& attr,
 		unsigned int c
 	) :	solver(s), indexTable(index), attrTable(attr), coord(c)
 	{}

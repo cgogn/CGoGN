@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include "Topology/generic/attribmap.h"
-#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {
@@ -43,6 +42,12 @@ void AttribMap::init()
 			m_markTables[orbit][t] = amvMark ;
 		}
 	}
+
+	for(unsigned int i = 0; i < cellMarkers.size(); ++i)
+	{
+		CellMarkerGen* cm = cellMarkers[i] ;
+		cm->updateMarkVector(m_markTables[cm->getCell()][cm->getThread()]) ;
+	}
 }
 
 AttribMap::AttribMap() : GenericMap()
@@ -58,4 +63,3 @@ void AttribMap::clear(bool removeAttrib)
 }
 
 } // namespace CGoGN
-

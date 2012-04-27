@@ -40,43 +40,43 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<ATTR_TYPE>& attr) ;
+	const AttributeHandler<ATTR_TYPE, VERTEX>& attr) ;
 
 template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea,
-	const AttributeHandler<ATTR_TYPE>& attr) ;
+	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
+	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea,
+	const AttributeHandler<ATTR_TYPE, VERTEX>& attr) ;
 
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
-	const AttributeHandler<ATTR_TYPE>& attr,
-	AttributeHandler<ATTR_TYPE>& laplacian,
+	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
+	AttributeHandler<ATTR_TYPE, VERTEX>& laplacian,
 	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
 	typename PFP::MAP& map,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea,
-	const AttributeHandler<ATTR_TYPE>& attr,
-	AttributeHandler<ATTR_TYPE>& laplacian,
+	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
+	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea,
+	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
+	AttributeHandler<ATTR_TYPE, VERTEX>& laplacian,
 	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
 typename PFP::REAL computeCotanWeightEdge(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position) ;
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
 void computeCotanWeightEdges(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
-	typename PFP::TREAL& edgeWeight,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
 	const FunctorSelect& select = allDarts) ;
 
 } // namespace Geoemtry
