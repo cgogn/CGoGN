@@ -77,6 +77,10 @@ public:
 		}
 	}
 
+	unsigned int getThread() { return m_thread ; }
+
+	void updateMarkVector(AttributeMultiVector<Mark>* amv) { m_markVector = amv ; }
+
 protected:
 	// protected copy constructor to forbid its usage
 	DartMarkerGen(const DartMarkerGen& dm) : m_map(dm.m_map)

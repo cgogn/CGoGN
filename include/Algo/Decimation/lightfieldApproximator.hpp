@@ -49,12 +49,12 @@ template <typename PFP>
 bool Approximator_RGBfunctionsHalf<PFP>::init()
 {
 	// get actual frames and hypothetical approximated frames
-	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX, "frame") ;
-	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
+	m_frame = this->m_map.template getAttribute<MATRIX33, VERTEX>("frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33, EDGE>("approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 
 	MapBrowserLinked<typename PFP::MAP> mb(this->m_map) ;
-	this->m_map.foreach_orbit(EDGE, mb) ;
+	this->m_map.template foreach_orbit<EDGE>(mb) ;
 
 	// create quadric embedding for computing and set them to 0
 	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))
@@ -192,12 +192,12 @@ template <typename PFP>
 bool Approximator_RGBfunctions<PFP>::init()
 {
 	// get actual frames and hypothetical approximated frames
-	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX, "frame") ;
-	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
+	m_frame = this->m_map.template getAttribute<MATRIX33, VERTEX>("frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33, EDGE>("approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 
 	MapBrowserLinked<typename PFP::MAP> mb(this->m_map) ;
-	this->m_map.foreach_orbit(EDGE, mb) ;
+	this->m_map.template foreach_orbit<EDGE>(mb) ;
 
 	// create quadric embedding for computing and set them to 0
 	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))

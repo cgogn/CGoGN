@@ -49,8 +49,8 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 public:
-	Approximator_FrameHalf(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
-		Approximator<PFP, MATRIX33>(m, frame, EDGE, pred)
+	Approximator_FrameHalf(MAP& m, AttributeHandler<MATRIX33, VERTEX>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
+		Approximator<PFP, MATRIX33>(m, frame, pred)
 	{}
 	~Approximator_FrameHalf()
 	{}
@@ -71,13 +71,13 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<MATRIX33> m_frame ;
-	AttributeHandler<MATRIX33> m_approxFrame ;
-	AttributeHandler<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
+	AttributeHandler<MATRIX33, VERTEX> m_frame ;
+	AttributeHandler<MATRIX33, EDGE> m_approxFrame ;
+	AttributeHandler<QuadricRGBfunctions<REAL>, EDGE> m_quadricRGBfunctions ;
 
 public:
-	Approximator_RGBfunctionsHalf(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
-		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE, pred)
+	Approximator_RGBfunctionsHalf(MAP& m, AttributeHandler<MATRIX36, VERTEX>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, pred)
 	{ }
 	~Approximator_RGBfunctionsHalf	()
 	{}
@@ -98,12 +98,12 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<VEC3> m_position ;
-	AttributeHandler<VEC3> m_approxPosition ;
+	AttributeHandler<VEC3, VERTEX> m_position ;
+	AttributeHandler<VEC3, VERTEX> m_approxPosition ;
 
 public:
-	Approximator_Frame(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
-		Approximator<PFP, MATRIX33>(m, frame, EDGE, pred)
+	Approximator_Frame(MAP& m, AttributeHandler<MATRIX33, VERTEX>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
+		Approximator<PFP, MATRIX33>(m, frame, pred)
 	{}
 	~Approximator_Frame()
 	{}
@@ -124,13 +124,13 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<MATRIX33> m_frame ;
-	AttributeHandler<MATRIX33> m_approxFrame ;
-	AttributeHandler<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
+	AttributeHandler<MATRIX33, VERTEX> m_frame ;
+	AttributeHandler<MATRIX33, EDGE> m_approxFrame ;
+	AttributeHandler<QuadricRGBfunctions<REAL>, EDGE> m_quadricRGBfunctions ;
 
 public:
-	Approximator_RGBfunctions(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
-		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE, pred)
+	Approximator_RGBfunctions(MAP& m, AttributeHandler<MATRIX36, VERTEX>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, pred)
 	{ }
 	~Approximator_RGBfunctions()
 	{}

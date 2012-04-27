@@ -55,7 +55,7 @@ public:
 	{}
 	~VSplit()
 	{
-		AttributeContainer& cont = map.getAttributeContainer(VERTEX) ;
+		AttributeContainer& cont = map.template getAttributeContainer<VERTEX>() ;
 		if(approxVertexId != EMBNULL) cont.unrefLine(approxVertexId) ;
 	}
 
@@ -67,7 +67,7 @@ public:
 	void setApproxV(unsigned int id)
 	{
 		if(approxVertexId == id) return ;
-		AttributeContainer& cont = map.getAttributeContainer(VERTEX) ;
+		AttributeContainer& cont = map.template getAttributeContainer<VERTEX>() ;
 		if(approxVertexId != EMBNULL)
 			cont.unrefLine(approxVertexId) ;
 		if(id != EMBNULL) cont.refLine(id) ;
@@ -78,7 +78,7 @@ public:
 	void setApproxE1(unsigned int id)
 	{
 		if(approxEdgeId1 == id) return ;
-		AttributeContainer& cont = map.getAttributeContainer(EDGE) ;
+		AttributeContainer& cont = map.template getAttributeContainer<EDGE>() ;
 		if(approxEdgeId1 != EMBNULL)
 			cont.unrefLine(approxEdgeId1) ;
 		if(id != EMBNULL) cont.refLine(id) ;
@@ -89,7 +89,7 @@ public:
 	void setApproxE2(unsigned int id)
 	{
 		if(approxEdgeId2 == id) return ;
-		AttributeContainer& cont = map.getAttributeContainer(EDGE) ;
+		AttributeContainer& cont = map.template getAttributeContainer<EDGE>() ;
 		if(approxEdgeId2 != EMBNULL)
 			cont.unrefLine(approxEdgeId2) ;
 		if(id != EMBNULL) cont.refLine(id) ;

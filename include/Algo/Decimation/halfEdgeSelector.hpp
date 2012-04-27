@@ -59,7 +59,7 @@ bool HalfEdgeSelector_QEMml<PFP>::init()
 	if(!ok)
 		return false ;
 
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -315,7 +315,7 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 		return false ;
 
 	// Set quadric per vertex
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -594,7 +594,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -621,7 +621,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 		}
 	}
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))

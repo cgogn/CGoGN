@@ -137,7 +137,7 @@ bool EdgeSelector_Length<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -300,7 +300,7 @@ bool EdgeSelector_QEM<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -326,7 +326,7 @@ bool EdgeSelector_QEM<PFP>::init()
 		}
 	}
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -505,7 +505,7 @@ bool EdgeSelector_QEMml<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -531,7 +531,7 @@ bool EdgeSelector_QEMml<PFP>::init()
 		}
 	}
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -735,7 +735,7 @@ bool EdgeSelector_Curvature<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -877,8 +877,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	unsigned int v1 = m.getEmbedding<VERTEX>(d) ;
-	unsigned int v2 = m.getEmbedding<VERTEX>(dd) ;
+	unsigned int v1 = m.template getEmbedding<VERTEX>(d) ;
+	unsigned int v2 = m.template getEmbedding<VERTEX>(dd) ;
 
 	m_positionApproximator->approximate(d) ;
 
@@ -886,7 +886,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.embedNewCell<VERTEX>(d2) ;
+	unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -899,8 +899,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.embedOrbit<VERTEX>(d, v1) ;
-	m.embedOrbit<VERTEX>(dd, v2) ;
+	m.template embedOrbit<VERTEX>(d, v1) ;
+	m.template embedOrbit<VERTEX>(dd, v2) ;
 
 	REAL err = 0 ;
 
@@ -946,7 +946,7 @@ bool EdgeSelector_MinDetail<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))

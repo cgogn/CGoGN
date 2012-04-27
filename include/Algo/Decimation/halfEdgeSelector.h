@@ -53,8 +53,8 @@ private:
 	} QEMhalfEdgeInfo ;
 	typedef NoMathIOAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
 
-	AttributeHandler<HalfEdgeInfo> halfEdgeInfo ;
-	AttributeHandler<Quadric<REAL> > quadric ;
+	AttributeHandler<HalfEdgeInfo, DART> halfEdgeInfo ;
+	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -67,11 +67,11 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	HalfEdgeSelector_QEMml(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+	HalfEdgeSelector_QEMml(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo>(DART, "halfEdgeInfo") ;
-		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
 	}
 	~HalfEdgeSelector_QEMml()
 	{
@@ -105,11 +105,11 @@ private:
 	} LightfieldHalfEdgeInfo ;
 	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
 
-	AttributeHandler<MATRIX33 > m_frame ;
+	AttributeHandler<MATRIX33, VERTEX> m_frame ;
 
-	AttributeHandler<HalfEdgeInfo> halfEdgeInfo ;
-	AttributeHandler<Quadric<REAL> > quadric ;
-	AttributeHandler<QuadricRGBfunctions<REAL> > quadricRGBfunctions ;
+	AttributeHandler<HalfEdgeInfo, DART> halfEdgeInfo ;
+	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
+	AttributeHandler<QuadricRGBfunctions<REAL>, EDGE> quadricRGBfunctions ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -124,14 +124,14 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors) ;
 
 public:
-	HalfEdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+	HalfEdgeSelector_Lightfield(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		m_frame = m.template getAttribute<MATRIX33>(VERTEX, "frame") ;
+		m_frame = m.template getAttribute<MATRIX33, VERTEX>("frame") ;
 
-		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo>(DART, "halfEdgeInfo") ;
-		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
-		quadricRGBfunctions = m.template addAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+		quadricRGBfunctions = m.template addAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 	}
 	~HalfEdgeSelector_Lightfield()
 	{
@@ -171,9 +171,9 @@ private:
 
 	AttributeHandler<FRAME > m_frame ;
 
-	AttributeHandler<EdgeInfo> edgeInfo ;
-	AttributeHandler<Quadric<REAL> > quadric ;
-	AttributeHandler<QuadricRGBfunctions<REAL> > quadricRGBfunctions ;
+	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
+	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
+	AttributeHandler<QuadricRGBfunctions<REAL>, EDGE> quadricRGBfunctions ;
 	Quadric<REAL> tmpQ ;
 
 	std::multimap<float,Dart> edges ;
@@ -188,14 +188,14 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Lightfield(MAP& m, typename PFP::TVEC3& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+	EdgeSelector_Lightfield(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
-		m_frame = m.template getAttribute<FRAME>(VERTEX, "frame") ;
+		m_frame = m.template getAttribute<FRAME, VERTEX>("frame") ;
 
-		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
-		quadric = m.template addAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
-		quadricRGBfunctions = m.template addAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+		quadricRGBfunctions = m.template addAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 	}
 	~EdgeSelector_Lightfield()
 	{

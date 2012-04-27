@@ -34,7 +34,7 @@ namespace Decimation
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	typename PFP::TVEC3& position, unsigned int nbWantedVertices, const FunctorSelect& selected
+	AttributeHandler<typename PFP::VEC3, VERTEX>& position, unsigned int nbWantedVertices, const FunctorSelect& selected
 )
 {
 	std::vector<ApproximatorGen<PFP>*> approximators ;
@@ -88,8 +88,8 @@ void decimate(
 					CGoGNerr << "In function decimate : colorPTM[" << i << "] is not valid" << CGoGNendl ;
 				}
 			*/
-			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX, "frame") ;
-			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX, "colorPTM") ;
+			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL>, VERTEX> frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL>, VERTEX>("frame") ;
+			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL>, VERTEX> RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL>, VERTEX>("colorPTM") ;
 			approximators.push_back(new Approximator_Frame<PFP>(map, frame)) ;
 			approximators.push_back(new Approximator_RGBfunctions<PFP>(map, RGBfunctions)) ;
 			break ;
@@ -97,8 +97,8 @@ void decimate(
 		case A_LightfieldHalf :
 		{
 			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, position)) ;
-			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL> >(VERTEX, "frame") ;
-			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL> >(VERTEX, "colorPTM") ;
+			AttributeHandler<Geom::Matrix<3,3,typename PFP::REAL>, VERTEX> frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL>, VERTEX>("frame") ;
+			AttributeHandler<Geom::Matrix<3,6,typename PFP::REAL>, VERTEX> RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL>, VERTEX>("colorPTM") ;
 			approximators.push_back(new Approximator_FrameHalf<PFP>(map, frame)) ;
 			approximators.push_back(new Approximator_RGBfunctionsHalf<PFP>(map, RGBfunctions)) ;
 			break ;
@@ -142,7 +142,7 @@ void decimate(
 	if(!selector->init())
 		return ;
 
-	unsigned int nbVertices = map.getNbOrbits<VERTEX>() ;
+	unsigned int nbVertices = map.template getNbOrbits<VERTEX>() ;
 	bool finished = false ;
 	Dart d ;
 

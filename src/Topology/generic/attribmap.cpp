@@ -48,6 +48,12 @@ void AttribMap::init()
 		CellMarkerGen* cm = cellMarkers[i] ;
 		cm->updateMarkVector(m_markTables[cm->getCell()][cm->getThread()]) ;
 	}
+
+	for(unsigned int i = 0; i < dartMarkers.size(); ++i)
+	{
+		DartMarkerGen* cm = dartMarkers[i] ;
+		cm->updateMarkVector(m_markTables[DART][cm->getThread()]) ;
+	}
 }
 
 AttribMap::AttribMap() : GenericMap()
