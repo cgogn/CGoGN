@@ -121,26 +121,26 @@ public:
 
 
 
-template <typename PFP>
-void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
+template <typename PFP, unsigned int ORBIT>
+void foreach_orbit(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func, unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
 {
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
 	boost::thread** threads = new boost::thread*[nbth];
 
 	DartMarker dm(map);
-	Dart d=map.begin();
+	Dart d = map.begin();
 
 	// nbth new functions, new thread (with good darts !)
 	for (unsigned int i=0; i<nbth; ++i)
 		vd[i].reserve(szbuff);
 
 	// fill each vd buffers with 4096 darts
-	unsigned int nb =0;
-	while (( d != map.end()) && (nb < nbth*szbuff) )
+	unsigned int nb = 0;
+	while ((d != map.end()) && (nb < nbth*szbuff) )
 	{
 		if (good(d) && (!dm.isMarked(d)))
 		{
-			dm.markOrbit(orbit,d);
+			dm.markOrbit<ORBIT>(d);
 			vd[nb%nbth].push_back(d);
 			nb++;
 		}
@@ -157,36 +157,36 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
 
 	boost::barrier sync1(nbth+1);
 	boost::barrier sync2(nbth+1);
-	bool finished=false;
+	bool finished = false;
 	// lauch threads
 	if (needMarkers)
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,1+i));
 	}
 	else
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,0));
 	}
 
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
 
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(szbuff);
 
-	while ( d != map.end())
+	while (d != map.end())
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			tempo[i].clear();
 
-		unsigned int nb =0;
-		while (( d != map.end()) && (nb < nbth*szbuff) )
+		unsigned int nb = 0;
+		while ((d != map.end()) && (nb < nbth*szbuff) )
 		{
 			if (good(d) && (!dm.isMarked(d)))
 			{
-				dm.markOrbit(orbit,d);
+				dm.markOrbit<ORBIT>(d);
 				tempo[nb%nbth].push_back(d);
 				nb++;
 			}
@@ -195,7 +195,7 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
 
 		// sync and swap the two vectors
 		sync1.wait();
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			vd[i].swap(tempo[i]);
 		sync2.wait();
 	}
@@ -205,7 +205,7 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
 	sync2.wait();
 
 	//wait for all theads to be finished
-	for (unsigned int i=0; i< nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
@@ -217,34 +217,31 @@ void foreach_orbit(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThread
 	delete[] tempo;
 }
 
-
-
 /**
  * Traverse cells of a map in parallel. Use embedding marker
  * Functor application must be independant
  * @param map the map
- * @param orbit the cell (VERTEX/EDGE/FACE/..
  * @param func the functor to apply
  * @param nbth number of thread to use (use twice as threads of processor)
  * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
  * @param good a selector
  */
-template <typename PFP>
-void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
+template <typename PFP, unsigned int CELL>
+void foreach_cell(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func, unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
 {
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
 	boost::thread** threads = new boost::thread*[nbth];
 
-	CellMarker cm(map,cell);
-	Dart d=map.begin();
+	CellMarker<CELL> cm(map);
+	Dart d = map.begin();
 
 	// nbth new functions, new thread (with good darts !)
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		vd[i].reserve(szbuff);
 
 	// fill each vd buffers with 4096 darts
-	unsigned int nb =0;
-	while (( d != map.end()) && (nb < nbth*szbuff) )
+	unsigned int nb = 0;
+	while ((d != map.end()) && (nb < nbth*szbuff) )
 	{
 		if (good(d) && (!cm.isMarked(d)))
 		{
@@ -269,27 +266,27 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<
 	// lauch threads
 	if (needMarkers)
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,1+i));
 	}
 	else
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,0));
 	}
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
 
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(szbuff);
 
-	while ( d != map.end())
+	while (d != map.end())
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			tempo[i].clear();
 
-		unsigned int nb =0;
-		while (( d != map.end()) && (nb < nbth*szbuff) )
+		unsigned int nb = 0;
+		while ((d != map.end()) && (nb < nbth*szbuff) )
 		{
 			if (good(d) && (!cm.isMarked(d)))
 			{
@@ -301,7 +298,7 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<
 		}
 
 		sync1.wait();
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			vd[i].swap(tempo[i]);
 		sync2.wait();
 	}
@@ -311,7 +308,7 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<
 	sync2.wait();
 
 	//wait for all theads to be finished
-	for (unsigned int i=0; i< nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
@@ -321,23 +318,21 @@ void foreach_cell(typename PFP::MAP& map, unsigned int cell, FunctorMapThreaded<
 	delete[] tempo;
 }
 
-
-
 template <typename PFP>
-void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func,  unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
+void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func, unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
 {
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
 	boost::thread** threads = new boost::thread*[nbth];
 
-	Dart d=map.begin();
+	Dart d = map.begin();
 
 	// nbth new functions, new thread (with good darts !)
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		vd[i].reserve(szbuff);
 
 	// fill each vd buffers with 4096 darts
-	unsigned int nb =0;
-	while (( d != map.end()) && (nb < nbth*szbuff) )
+	unsigned int nb = 0;
+	while ((d != map.end()) && (nb < nbth*szbuff) )
 	{
 		if (good(d))
 		{
@@ -357,30 +352,30 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
 
 	boost::barrier sync1(nbth+1);
 	boost::barrier sync2(nbth+1);
-	bool finished=false;
+	bool finished = false;
 	// lauch threads
 	if (needMarkers)
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,1+i));
 	}
 	else
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			threads[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(func, vd[i],sync1,sync2, finished,0));
 	}
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(szbuff);
 
-	while ( d != map.end())
+	while (d != map.end())
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			tempo[i].clear();
 
 		unsigned int nb =0;
-		while (( d != map.end()) && (nb < nbth*szbuff) )
+		while ((d != map.end()) && (nb < nbth*szbuff) )
 		{
 			if (good(d))
 			{
@@ -391,7 +386,7 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
 		}
 
 		sync1.wait();
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			vd[i].swap(tempo[i]);
 		sync2.wait();
 	}
@@ -401,7 +396,7 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
 	sync2.wait();
 
 	//wait for all theads to be finished
-	for (unsigned int i=0; i< nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
@@ -412,28 +407,27 @@ void foreach_dart(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>&
 	delete tempo;
 }
 
-
-template <typename PFP, typename T>
-void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers, const FunctorSelect& good)
+template <typename PFP, unsigned int ORBIT, typename T>
+void foreach_orbit_res(typename PFP::MAP& map, FunctorMapThreadedResult<typename PFP::MAP, T>& func, unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers, const FunctorSelect& good)
 {
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
 	boost::thread** threads = new boost::thread*[nbth];
-	ThreadFunctionResult<typename PFP::MAP,T>**  th_funcs= new ThreadFunctionResult<typename PFP::MAP,T>*[nbth];
+	ThreadFunctionResult<typename PFP::MAP,T>** th_funcs= new ThreadFunctionResult<typename PFP::MAP,T>*[nbth];
 
 	DartMarker dm(map);
-	Dart d=map.begin();
+	Dart d = map.begin();
 
 	// nbth new functions, new thread (with good darts !)
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		vd[i].reserve(szbuff);
 
 	// fill each vd buffers with 4096 darts
-	unsigned int nb =0;
-	while (( d != map.end()) && (nb < nbth*szbuff) )
+	unsigned int nb = 0;
+	while ((d != map.end()) && (nb < nbth*szbuff) )
 	{
 		if (good(d) && (!dm.isMarked(d)))
 		{
-			dm.markOrbit(orbit,d);
+			dm.markOrbit<ORBIT>(d);
 			vd[nb%nbth].push_back(d);
 			nb++;
 		}
@@ -448,7 +442,6 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
 			map.addThreadMarker(nbth+1-nbth_prec);
 	}
 
-
 	// prepare some space pour results
 	results.resize(nbth);
 
@@ -458,7 +451,7 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
 	// lauch threads
 	if (needMarkers)
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 		{
 			// here dynamic allocation to allow the freeing of m_functor (clean) at the end
 			th_funcs[i] = new ThreadFunctionResult<typename PFP::MAP,T>(func, vd[i],sync1,sync2, finished,1+i,results[i]);
@@ -467,7 +460,7 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
 	}
 	else
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 		{
 			th_funcs[i] = new ThreadFunctionResult<typename PFP::MAP,T>(func, vd[i],sync1,sync2, finished,0,results[i]);
 			threads[i] = new boost::thread(*(th_funcs[i]));
@@ -477,20 +470,20 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
 
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(szbuff);
 
-	while ( d != map.end())
+	while (d != map.end())
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			tempo[i].clear();
 
-		unsigned int nb =0;
-		while (( d != map.end()) && (nb < nbth*szbuff) )
+		unsigned int nb = 0;
+		while ((d != map.end()) && (nb < nbth*szbuff) )
 		{
 			if (good(d) && (!dm.isMarked(d)))
 			{
-				dm.markOrbit(orbit,d);
+				dm.markOrbit<ORBIT>(d);
 				tempo[nb%nbth].push_back(d);
 				nb++;
 			}
@@ -510,7 +503,7 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
 
 	std::vector<T> res;
 	//wait for all theads to be finished and get results
-	for (unsigned int i=0; i< nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
@@ -524,25 +517,23 @@ void foreach_orbit_res(typename PFP::MAP& map,  unsigned int orbit, FunctorMapTh
 	delete[] tempo;
 }
 
-
-
-template <typename PFP, typename T>
-void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers, const FunctorSelect& good)
+template <typename PFP, unsigned int CELL, typename T>
+void foreach_cell_res(typename PFP::MAP& map, FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers, const FunctorSelect& good)
 {
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
 	boost::thread** threads = new boost::thread*[nbth];
 	ThreadFunctionResult<typename PFP::MAP,T>**  th_funcs= new ThreadFunctionResult<typename PFP::MAP,T>*[nbth];
 
-	CellMarker cm(map,cell);
-	Dart d=map.begin();
+	CellMarker<CELL> cm(map);
+	Dart d = map.begin();
 
 	// nbth new functions, new thread (with good darts !)
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		vd[i].reserve(szbuff);
 
 	// fill each vd buffers with 4096 darts
-	unsigned int nb =0;
-	while (( d != map.end()) && (nb < nbth*szbuff) )
+	unsigned int nb = 0;
+	while ((d != map.end()) && (nb < nbth*szbuff) )
 	{
 		if (good(d) && (!cm.isMarked(d)))
 		{
@@ -561,7 +552,6 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
 			map.addThreadMarker(nbth+1-nbth_prec);
 	}
 
-
 	// prepare some space pour results
 	results.resize(nbth);
 
@@ -571,7 +561,7 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
 	// lauch threads
 	if (needMarkers)
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 		{
 			th_funcs[i] = new ThreadFunctionResult<typename PFP::MAP,T>(func, vd[i],sync1,sync2, finished,1+i,results[i]);
 			threads[i] = new boost::thread(*(th_funcs[i]));
@@ -579,7 +569,7 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
 	}
 	else
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 		{
 			th_funcs[i] = new ThreadFunctionResult<typename PFP::MAP,T>(func, vd[i],sync1,sync2, finished,0,results[i]);
 			threads[i] = new boost::thread(*(th_funcs[i]));
@@ -589,16 +579,16 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
 
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(szbuff);
 
 	while ( d != map.end())
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			tempo[i].clear();
 
-		unsigned int nb =0;
-		while (( d != map.end()) && (nb < nbth*szbuff) )
+		unsigned int nb = 0;
+		while ((d != map.end()) && (nb < nbth*szbuff) )
 		{
 			if (good(d) && (!cm.isMarked(d)))
 			{
@@ -621,7 +611,7 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
 
 	std::vector<T> res;
 	//wait for all theads to be finished and get results
-	for (unsigned int i=0; i< nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
@@ -634,25 +624,22 @@ void foreach_cell_res(typename PFP::MAP& map,  unsigned int cell, FunctorMapThre
 	delete[] tempo;
 }
 
-
-
-
 template <typename PFP, typename T>
-void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename PFP::MAP, T>& func,  unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers, const FunctorSelect& good)
+void foreach_dart_res(typename PFP::MAP& map, FunctorMapThreadedResult<typename PFP::MAP, T>& func, unsigned int nbth, unsigned int szbuff, std::vector<T>& results, bool needMarkers, const FunctorSelect& good)
 {
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
 	boost::thread** threads = new boost::thread*[nbth];
-	ThreadFunctionResult<typename PFP::MAP,T>**  th_funcs= new ThreadFunctionResult<typename PFP::MAP,T>*[nbth];
+	ThreadFunctionResult<typename PFP::MAP,T>** th_funcs= new ThreadFunctionResult<typename PFP::MAP,T>*[nbth];
 
-	Dart d=map.begin();
+	Dart d = map.begin();
 
 	// nbth new functions, new thread (with good darts !)
 	for (unsigned int i=0; i<nbth; ++i)
 		vd[i].reserve(szbuff);
 
 	// fill each vd buffers with szbuff darts
-	unsigned int nb =0;
-	while (( d != map.end()) && (nb < nbth*szbuff) )
+	unsigned int nb = 0;
+	while ((d != map.end()) && (nb < nbth*szbuff) )
 	{
 		if (good(d))
 		{
@@ -670,17 +657,16 @@ void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename
 			map.addThreadMarker(nbth+1-nbth_prec);
 	}
 
-
 	// prepare some space pour results
 	results.resize(nbth);
 
 	boost::barrier sync1(nbth+1);
 	boost::barrier sync2(nbth+1);
-	bool finished=false;
+	bool finished = false;
 	// lauch threads
 	if (needMarkers)
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 		{
 			th_funcs[i] = new ThreadFunctionResult<typename PFP::MAP,T>(func, vd[i],sync1,sync2, finished,1+i,results[i]);
 			threads[i] = new boost::thread(*(th_funcs[i]));
@@ -688,7 +674,7 @@ void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename
 	}
 	else
 	{
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 		{
 			th_funcs[i] = new ThreadFunctionResult<typename PFP::MAP,T>(func, vd[i],sync1,sync2, finished,0,results[i]);
 			threads[i] = new boost::thread(*(th_funcs[i]));
@@ -698,16 +684,16 @@ void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
 
-	for (unsigned int i=0; i<nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 		tempo[i].reserve(szbuff);
 
-	while ( d != map.end())
+	while (d != map.end())
 	{
 		for (unsigned int i=0; i<nbth; ++i)
 			tempo[i].clear();
 
-		unsigned int nb =0;
-		while (( d != map.end()) && (nb < nbth*szbuff) )
+		unsigned int nb = 0;
+		while ((d != map.end()) && (nb < nbth*szbuff) )
 		{
 			if (good(d))
 			{
@@ -718,7 +704,7 @@ void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename
 		}
 
 		sync1.wait();
-		for (unsigned int i=0; i<nbth; ++i)
+		for (unsigned int i = 0; i < nbth; ++i)
 			vd[i].swap(tempo[i]);
 		sync2.wait();
 	}
@@ -729,7 +715,7 @@ void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename
 
 	std::vector<T> res;
 	//wait for all theads to be finished and get results
-	for (unsigned int i=0; i< nbth; ++i)
+	for (unsigned int i = 0; i < nbth; ++i)
 	{
 		threads[i]->join();
 		delete threads[i];
@@ -742,16 +728,11 @@ void foreach_dart_res(typename PFP::MAP& map,  FunctorMapThreadedResult<typename
 	delete[] tempo;
 }
 
-
-
-
-
 template <typename T>
 T sumResult(const std::vector<T>& res)
 {
-
 	T sum(res.front());
-	typename std::vector<T>::const_iterator it=res.begin();
+	typename std::vector<T>::const_iterator it = res.begin();
 	it++;
 	while (it != res.end())
 	{
@@ -761,13 +742,12 @@ T sumResult(const std::vector<T>& res)
 	return sum;
 }
 
-
 template <typename T1, typename T2>
 std::pair<T1,T2> sumPairResult(const std::vector< std::pair<T1,T2> >& res)
 {
 	T1 sum1(res.front().first);
 	T2 sum2(res.front().second);
-	typename std::vector< std::pair<T1,T2> >::const_iterator it=res.begin();
+	typename std::vector< std::pair<T1,T2> >::const_iterator it = res.begin();
 	it++;
 	while (it != res.end())
 	{
@@ -781,9 +761,8 @@ std::pair<T1,T2> sumPairResult(const std::vector< std::pair<T1,T2> >& res)
 template <typename T>
 T maxResult(const std::vector<T>& res)
 {
-
 	T maxr(res.front());
-	typename std::vector<T>::const_iterator it=res.begin();
+	typename std::vector<T>::const_iterator it = res.begin();
 	it++;
 	while (it != res.end())
 	{
@@ -797,9 +776,8 @@ T maxResult(const std::vector<T>& res)
 template <typename T>
 T minResult(const std::vector<T>& res)
 {
-
 	T minr(res.front());
-	typename std::vector<T>::const_iterator it=res.begin();
+	typename std::vector<T>::const_iterator it = res.begin();
 	it++;
 	while (it != res.end())
 	{
@@ -810,11 +788,8 @@ T minResult(const std::vector<T>& res)
 	return minr;
 }
 
+} // namespace Parallel
 
+} // namespace Algo
 
-}
-}	// end namespace
-}
-
-
-
+} // namespace CGoGN

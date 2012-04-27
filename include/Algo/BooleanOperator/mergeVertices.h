@@ -39,10 +39,10 @@ namespace BooleanOperator
 {
 
 template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e);
+void mergeVertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, Dart d, Dart e);
 
 template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions);
+void mergeVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions);
 
 }
 
