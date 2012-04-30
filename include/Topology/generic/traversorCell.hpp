@@ -60,7 +60,8 @@ Dart TraversorCell<MAP, ORBIT>::begin()
 {
 	if(quickTraversal != NULL)
 	{
-		current = (*quickTraversal)[cont->begin()] ;
+		qCurrent = cont->begin() ;
+		current = (*quickTraversal)[qCurrent] ;
 	}
 	else
 	{
@@ -103,32 +104,40 @@ Dart TraversorCell<MAP, ORBIT>::next()
 {
 	if(current != NIL)
 	{
-		bool ismarked ;
-		if(dmark)
-			ismarked = dmark->isMarked(current) ;
-		else
-			ismarked = cmark->isMarked(current) ;
-
-		while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
+		if(quickTraversal != NULL)
 		{
-			m.next(current) ;
-			if(current == m.end())
-				current = NIL ;
+			cont->next(qCurrent) ;
+			current = (*quickTraversal)[qCurrent] ;
+		}
+		else
+		{
+			bool ismarked ;
+			if(dmark)
+				ismarked = dmark->isMarked(current) ;
 			else
+				ismarked = cmark->isMarked(current) ;
+
+			while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
+			{
+				m.next(current) ;
+				if(current == m.end())
+					current = NIL ;
+				else
+				{
+					if(dmark)
+						ismarked = dmark->isMarked(current) ;
+					else
+						ismarked = cmark->isMarked(current) ;
+				}
+			}
+
+			if(current != NIL)
 			{
 				if(dmark)
-					ismarked = dmark->isMarked(current) ;
+					dmark->markOrbit<ORBIT>(current) ;
 				else
-					ismarked = cmark->isMarked(current) ;
+					cmark->mark(current) ;
 			}
-		}
-
-		if(current != NIL)
-		{
-			if(dmark)
-				dmark->markOrbit<ORBIT>(current) ;
-			else
-				cmark->mark(current) ;
 		}
 	}
 	return current ;

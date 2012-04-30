@@ -371,13 +371,15 @@ inline void GenericMap::enableQuickTraversal()
 template <unsigned int ORBIT>
 inline void GenericMap::updateQuickTraversal()
 {
-	CellMarker<ORBIT> cm ;
+	assert(m_quickTraversal[ORBIT] != NULL || !"updateQuickTraversal on a disabled orbit") ;
+
+	CellMarker<ORBIT> cm(*this) ;
 	for(Dart d = begin(); d != end(); next(d))
 	{
 		if(!cm.isMarked(d))
 		{
 			cm.mark(d) ;
-			(*m_quickTraversal[ORBIT])[d.index] = d ;
+			(*m_quickTraversal[ORBIT])[getEmbedding<ORBIT>(d)] = d ;
 		}
 	}
 }

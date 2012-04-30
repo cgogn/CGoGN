@@ -37,7 +37,9 @@ class TraversorCell
 {
 private:
 	MAP& m ;
+
 	AttributeContainer* cont ;
+	unsigned int qCurrent ;
 
 	DartMarker* dmark ;
 	CellMarker<ORBIT>* cmark ;
