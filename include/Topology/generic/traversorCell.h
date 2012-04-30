@@ -37,8 +37,12 @@ class TraversorCell
 {
 private:
 	MAP& m ;
+	AttributeContainer* cont ;
+
 	DartMarker* dmark ;
 	CellMarker<ORBIT>* cmark ;
+	AttributeMultiVector<Dart>* quickTraversal ;
+
 	Dart current ;
 	bool firstTraversal ;
 	const FunctorSelect& m_good ;

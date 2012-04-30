@@ -353,6 +353,52 @@ inline void GenericMap::initCell(unsigned int i)
 }
 
 /****************************************
+ *     QUICK TRAVERSAL MANAGEMENT       *
+ ****************************************/
+
+template <unsigned int ORBIT>
+inline void GenericMap::enableQuickTraversal()
+{
+	if(m_quickTraversal[ORBIT] == NULL)
+	{
+		if(!isOrbitEmbedded<ORBIT>())
+			addEmbedding<ORBIT>() ;
+		m_quickTraversal[ORBIT] = m_attribs[ORBIT].addAttribute<Dart>("quick_traversal") ;
+	}
+	updateQuickTraversal<ORBIT>() ;
+}
+
+template <unsigned int ORBIT>
+inline void GenericMap::updateQuickTraversal()
+{
+	CellMarker<ORBIT> cm ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!cm.isMarked(d))
+		{
+			cm.mark(d) ;
+			(*m_quickTraversal[ORBIT])[d.index] = d ;
+		}
+	}
+}
+
+template <unsigned int ORBIT>
+inline AttributeMultiVector<Dart>* GenericMap::getQuickTraversal()
+{
+	return m_quickTraversal[ORBIT] ;
+}
+
+template <unsigned int ORBIT>
+inline void GenericMap::disableQuickTraversal()
+{
+	if(m_quickTraversal[ORBIT] != NULL)
+	{
+		m_attribs[ORBIT].removeAttribute<Dart>(m_quickTraversal[ORBIT]->getIndex()) ;
+		m_quickTraversal[ORBIT] = NULL ;
+	}
+}
+
+/****************************************
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
