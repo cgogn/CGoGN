@@ -36,7 +36,6 @@ namespace Algo
 namespace Decimation
 {
 
-
 /**
  * Example of Edge_Critera class parameter
  * Will be used as edge embedding 
