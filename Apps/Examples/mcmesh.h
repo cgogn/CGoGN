@@ -26,7 +26,7 @@
 
 #include "Utils/Qt/qtSimple.h"
 #include "ui_mcmesh.h"
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/map2.h"

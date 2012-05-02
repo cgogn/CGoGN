@@ -46,7 +46,7 @@
 #include "Utils/frameManipulator.h"
 
 #include "ui_volumeExplorer.h"
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 
 using namespace CGoGN ;

@@ -189,6 +189,49 @@ public:
 	void next(unsigned int& iter) const;
 } ;
 
+/**
+ *  shortcut class for Vertex Attribute (Handler)
+ */
+template <typename T>
+class VertexAttribute : public AttributeHandler<T,VERTEX>
+{
+public:
+	void operator=(const AttributeHandler<T,VERTEX>& ta)  { this->AttributeHandler<T,VERTEX>::operator=(ta);}
+};
+
+/**
+ *  shortcut class for Edge Attribute (Handler)
+ */
+template <typename T>
+class EdgeAttribute : public AttributeHandler<T,EDGE>
+{
+public:
+	void operator=(const AttributeHandler<T,EDGE>& ta)  { this->AttributeHandler<T,EDGE>::operator=(ta);}
+};
+
+/**
+ *  shortcut class for Face Attribute (Handler)
+ */
+template <typename T>
+class FaceAttribute : public AttributeHandler<T,FACE>
+{
+public:
+	void operator=(const AttributeHandler<T,FACE>& ta)  { this->AttributeHandler<T,FACE>::operator=(ta);}
+};
+
+/**
+ *  shortcut class for Volume Attribute (Handler)
+ */
+template <typename T>
+class VolumeAttribute : public AttributeHandler<T,VOLUME>
+{
+public:
+	void operator=(const AttributeHandler<T,VOLUME>& ta)  { this->AttributeHandler<T,VOLUME>::operator=(ta);}
+};
+
+
+
+
 } // namespace CGoGN
 
 #include "Topology/generic/attributeHandler.hpp"
