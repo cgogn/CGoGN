@@ -86,6 +86,12 @@ protected:
 	AttributeMultiVector<unsigned int>* m_embeddings[NB_ORBITS] ;
 
 	/**
+	 * Direct access to quick traversal attributes
+	 * (initialized by enableQuickTraversal function)
+	 */
+	AttributeMultiVector<Dart>* m_quickTraversal[NB_ORBITS] ;
+
+	/**
 	 * Marks manager
 	 */
 	MarkSet m_marksets[NB_ORBITS][NB_THREAD] ;
@@ -369,6 +375,22 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	void initCell(unsigned int i) ;
+
+	/****************************************
+	 *     QUICK TRAVERSAL MANAGEMENT       *
+	 ****************************************/
+
+	template <unsigned int ORBIT>
+	void enableQuickTraversal() ;
+
+	template <unsigned int ORBIT>
+	void updateQuickTraversal() ;
+
+	template <unsigned int ORBIT>
+	AttributeMultiVector<Dart>* getQuickTraversal() ;
+
+	template <unsigned int ORBIT>
+	void disableQuickTraversal() ;
 
 	/****************************************
 	 *        ATTRIBUTES MANAGEMENT         *

@@ -729,7 +729,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	CellMarker mv(map, VERTEX);
+	CellMarker<VERTEX> mv(map);
 
 	typename PFP::VEC3 volCenter;
 	unsigned count = 0 ;
@@ -1102,7 +1102,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	CellMarker mv(map, VERTEX);
+	CellMarker<VERTEX> mv(map);
 
 	typename PFP::VEC3 volCenter;
 	unsigned count = 0 ;
@@ -1344,7 +1344,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 	//std::cout << "1ere etape finished" << std::endl;
 
-	CellMarker mtf(map, FACE);
+	CellMarker<FACE> mtf(map);
 
 	//Etape 2
 	for (std::vector<std::pair<Dart,Dart> >::iterator edges = subdividedfacesT.begin(); edges != subdividedfacesT.end(); ++edges)

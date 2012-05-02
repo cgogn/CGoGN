@@ -73,6 +73,7 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
+		m_quickTraversal[i] = NULL ;
 		for(unsigned int j = 0; j < NB_THREAD; ++j)
 		{
 			m_marksets[i][j].clear() ;
