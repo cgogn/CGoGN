@@ -22,104 +22,70 @@
 *                                                                              *
 *******************************************************************************/
 
-
-#include "Topology/generic/traversorGen.h"
-
-#ifndef __TRAVERSOR1_H__
-#define __TRAVERSOR1_H__
+#ifndef __TRAVERSORGEN_H__
+#define __TRAVERSORGEN_H__
 
 #include "Topology/generic/dart.h"
-
 
 namespace CGoGN
 {
 
-/*******************************************************************************
-					VERTEX CENTERED TRAVERSALS
-*******************************************************************************/
-
-// Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor1VE: public Traversor<MAP>
+class Traversor
 {
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
 public:
-	Traversor1VE(MAP& map, Dart dart) ;
+	virtual ~Traversor() {}
+	virtual Dart begin() = 0;
+	virtual Dart end() = 0;
+	virtual Dart next() = 0;
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
 
-// Traverse the vertices adjacent to a given vertex through sharing a common edge
-template <typename MAP>
-class Traversor1VVaE: public Traversor<MAP>
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
+	/**
+	 * Factory of adjacent traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
 
-	Dart d2 ;
+	/**
+	 * Factory of darts of orbit traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param orb the orbit
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb);
 
-public:
-	Traversor1VVaE(MAP& map, Dart dart) ;
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param good the selector (default value allDarts)
+	 * @param forceDartMarker (default value false)
+	 * @param thread (default value 0)
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createCell(MAP& map, unsigned int orb, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0);
 
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-/*******************************************************************************
-					EDGE CENTERED TRAVERSALS
-*******************************************************************************/
-
-// Traverse the vertices incident to a given edge
-template <typename MAP>
-class Traversor1EV: public Traversor<MAP>
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
-public:
-	Traversor1EV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
-
-// Traverse the edges adjacent to a given edge through sharing a common vertex
-template <typename MAP>
-class Traversor1EEaV: public Traversor<MAP>
-{
-private:
-	MAP& m ;
-	Dart start ;
-	Dart current ;
-
-	Dart d2 ;
-
-public:
-	Traversor1EEaV(MAP& map, Dart dart) ;
-
-	Dart begin() ;
-	Dart end() ;
-	Dart next() ;
-} ;
+};
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversor1.hpp"
+
+#include "Topology/generic/traversorGen.hpp"
 
 #endif
+

@@ -244,4 +244,118 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
 	return *m_iter ;
 }
 
+
+
+//template<typename MAP>
+//Traversor3<MAP>* Traversor3<MAP>::createXY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//{
+//	int code = 0x10*(orbX-VERTEX) + orbY-VERTEX;
+//
+//	switch(code)
+//	{
+//	case 0x01:
+//		return new Traversor3XY<MAP, VERTEX, EDGE>(map,dart);
+//		break;
+//	case 0x02:
+//		return new Traversor3XY<MAP, VERTEX, FACE>(map,dart);
+//		break;
+//	case 0x03:
+//		return new Traversor3XY<MAP, VERTEX, VOLUME>(map,dart);
+//		break;
+//
+//	case 0x10:
+//		return new Traversor3XY<MAP, EDGE, VERTEX>(map,dart);
+//		break;
+//	case 0x12:
+//		return new Traversor3XY<MAP, EDGE, FACE>(map,dart);
+//		break;
+//	case 0x13:
+//		return new Traversor3XY<MAP, EDGE, VOLUME>(map,dart);
+//		break;
+//
+//	case 0x20:
+//		return new Traversor3XY<MAP, FACE, VERTEX>(map,dart);
+//		break;
+//	case 0x21:
+//		return new Traversor3XY<MAP, FACE, EDGE>(map,dart);
+//		break;
+//	case 0x23:
+//		return new Traversor3XY<MAP, FACE, VOLUME>(map,dart);
+//		break;
+//
+//	case 0x30:
+//		return new Traversor3XY<MAP, VOLUME, VERTEX>(map,dart);
+//		break;
+//	case 0x31:
+//		return new Traversor3XY<MAP, VOLUME, EDGE>(map,dart);
+//		break;
+//	case 0x32:
+//		return new Traversor3XY<MAP, VOLUME, FACE>(map,dart);
+//		break;
+//
+//	default:
+//		return NULL;
+//		break;
+//	}
+//	return NULL;
+//}
+//
+//
+//template<typename MAP>
+//Traversor3<MAP>* Traversor3<MAP>::createXXaY(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//{
+//	int code = 0x10*(orbX-VERTEX) + orbY-VERTEX;
+//
+//	switch(code)
+//	{
+//	case 0x01:
+//		return new Traversor3XXaY<MAP, VERTEX, EDGE>(map,dart);
+//		break;
+//	case 0x02:
+//		return new Traversor3XXaY<MAP, VERTEX, FACE>(map,dart);
+//		break;
+//	case 0x03:
+//		return new Traversor3XXaY<MAP, VERTEX, VOLUME>(map,dart);
+//		break;
+//
+//	case 0x10:
+//		return new Traversor3XXaY<MAP, EDGE, VERTEX>(map,dart);
+//		break;
+//	case 0x12:
+//		return new Traversor3XXaY<MAP, EDGE, FACE>(map,dart);
+//		break;
+//	case 0x13:
+//		return new Traversor3XXaY<MAP, EDGE, VOLUME>(map,dart);
+//		break;
+//
+//	case 0x20:
+//		return new Traversor3XXaY<MAP, FACE, VERTEX>(map,dart);
+//		break;
+//	case 0x21:
+//		return new Traversor3XXaY<MAP, FACE, EDGE>(map,dart);
+//		break;
+//	case 0x23:
+//		return new Traversor3XXaY<MAP, FACE, VOLUME>(map,dart);
+//		break;
+//
+//	case 0x30:
+//		return new Traversor3XXaY<MAP, VOLUME, VERTEX>(map,dart);
+//		break;
+//	case 0x31:
+//		return new Traversor3XXaY<MAP, VOLUME, EDGE>(map,dart);
+//		break;
+//	case 0x32:
+//		return new Traversor3XXaY<MAP, VOLUME, FACE>(map,dart);
+//		break;
+//
+//	default:
+//		return NULL;
+//		break;
+//	}
+//	return NULL;
+//}
+
+
+
+
 } // namespace CGoGN

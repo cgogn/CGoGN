@@ -56,17 +56,18 @@ void MyQT::slider_text(int x)
 
 void MyQT::orbit_list(int x)
 {
-	storeVerticesInfo<int>(m_att_orbits[x]);
 	current_orbit = x;
+	unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,PFP::MAP::ORBIT_IN_PARENT(VERTEX),PFP::MAP::ORBIT_IN_PARENT(EDGE),PFP::MAP::ORBIT_IN_PARENT(FACE),PFP::MAP::ORBIT_IN_PARENT2(VERTEX),PFP::MAP::ORBIT_IN_PARENT2(EDGE)};
+	storeVerticesInfoGen(orbs[current_orbit], m_att_orbits[x]);
 
 	if (m_clicked != Dart::nil())
 	{
-		unsigned int orbs[9] = {VERTEX,EDGE,FACE,VOLUME,PFP::MAP::ORBIT_IN_PARENT(VERTEX),PFP::MAP::ORBIT_IN_PARENT(EDGE),PFP::MAP::ORBIT_IN_PARENT(FACE),PFP::MAP::ORBIT_IN_PARENT2(VERTEX),PFP::MAP::ORBIT_IN_PARENT2(EDGE)};
+
 		m_selected.clear();
 
 		// easy way to traverse darts of orbit
-		TraversorDartsOfOrbit<MAP> tra(myMap, orbs[current_orbit], m_clicked);
-		for (Dart e = tra.begin(); e != tra.end(); e = tra.next())
+		Traversor<MAP>* tra = Traversor<MAP>::createDartsOfOrbits(myMap,m_clicked,orbs[current_orbit]);
+		for (Dart e = tra->begin(); e != tra->end(); e = tra->next())
 			m_selected.push_back(e);
 	}
 
@@ -74,8 +75,8 @@ void MyQT::orbit_list(int x)
 	updateGL();
 }
 
-template<typename T, unsigned int ORBIT>
-void MyQT::storeVerticesInfo(const AttributeHandler<T, ORBIT>& attrib)
+template< unsigned int ORBIT>
+void MyQT::storeVerticesInfo(const AttributeHandler<int, ORBIT>* attrib)
 {
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_render_topo->computeDartMiddlePositions<PFP>(myMap, middleDarts, nb);
@@ -86,12 +87,53 @@ void MyQT::storeVerticesInfo(const AttributeHandler<T, ORBIT>& attrib)
 		if (nb(d))
 		{
 			std::stringstream ss;
-			ss << attrib[d];
+			ss << (*attrib)[d];
 			m_strings->addString(ss.str(), middleDarts[d]);
 		}
 	}
     m_strings->sendToVBO();
 }
+
+
+
+
+
+
+void MyQT::storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* attrib)
+{
+	switch(orb)
+	{
+	case VERTEX:
+		storeVerticesInfo<VERTEX>(static_cast< const AttributeHandler<int, VERTEX>* >(attrib));
+		break;
+	case EDGE:
+		storeVerticesInfo<EDGE>(static_cast< const AttributeHandler<int, EDGE>* >(attrib));
+		break;
+	case FACE:
+		storeVerticesInfo<FACE>(static_cast< const AttributeHandler<int, FACE>* >(attrib));
+		break;
+	case VOLUME:
+		storeVerticesInfo<VOLUME>(static_cast< const AttributeHandler<int, VOLUME>* >(attrib));
+		break;
+	case PFP::MAP::VERTEX_OF_PARENT:
+		storeVerticesInfo<PFP::MAP::VERTEX_OF_PARENT>(static_cast< const AttributeHandler<int, PFP::MAP::VERTEX_OF_PARENT>* >(attrib));
+		break;
+	case PFP::MAP::EDGE_OF_PARENT:
+		storeVerticesInfo<PFP::MAP::EDGE_OF_PARENT>(static_cast< const AttributeHandler<int, PFP::MAP::EDGE_OF_PARENT>* >(attrib));
+		break;
+	case PFP::MAP::FACE_OF_PARENT:
+		storeVerticesInfo<PFP::MAP::FACE_OF_PARENT>(static_cast< const AttributeHandler<int, PFP::MAP::FACE_OF_PARENT>* >(attrib));
+		break;
+	case PFP::MAP::VERTEX_OF_PARENT2:
+		storeVerticesInfo<PFP::MAP::VERTEX_OF_PARENT2>(static_cast< const AttributeHandler<int, PFP::MAP::VERTEX_OF_PARENT2>* >(attrib));
+		break;
+	case PFP::MAP::EDGE_OF_PARENT2:
+		storeVerticesInfo<PFP::MAP::EDGE_OF_PARENT2>(static_cast< const AttributeHandler<int, PFP::MAP::EDGE_OF_PARENT2>* >(attrib));
+		break;
+	}
+}
+
+
 
 void MyQT::cb_initGL()
 {
@@ -105,7 +147,7 @@ void MyQT::cb_initGL()
     m_strings = new Utils::Strings3D(true, Geom::Vec3f(0.1f,0.0f,0.3f));
 	registerShader(m_strings);
 
-    storeVerticesInfo<int>(m_att_orbits[0]);
+    storeVerticesInfoGen(VERTEX, m_att_orbits[0]);
 }
 
 void MyQT::cb_redraw()
@@ -132,11 +174,27 @@ void MyQT::cb_mousePress(int button, int x, int y)
 			m_selected.clear();
 
 			// easy way to traverse darts of orbit
-			TraversorDartsOfOrbit<PFP::MAP> tra(myMap, orbs[current_orbit], m_clicked);
-			for (Dart e = tra.begin(); e != tra.end(); e = tra.next())
+			Traversor<MAP>* tra = Traversor<MAP>::createDartsOfOrbits(myMap,m_clicked,orbs[current_orbit]);
+			for (Dart e = tra->begin(); e != tra->end(); e = tra->next())
 				m_selected.push_back(e);
 		}
 		updateGL();
+	}
+}
+
+
+template <unsigned int ORB>
+void MyQT::init_att_orb(AttributeHandlerGen* attg)
+{
+	int i=0;
+	TraversorCell<MAP,ORB> tra(myMap);
+
+//	AttributeHandler<int,ORB>* attx = reinterpret_cast< AttributeHandler<int,ORB>* >(attg);
+	AttributeHandler<int,ORB>* att = static_cast< AttributeHandler<int,ORB>* >(attg);
+
+	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+	{
+		(*att)[d] = i++;
 	}
 }
 
@@ -150,78 +208,36 @@ void MyQT::initMap()
 	prim.hexaGrid_topo(nb,nb,nb);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
-	m_att_orbits[0] = myMap.addAttribute<int, VERTEX>("vertex");
-	m_att_orbits[1] = myMap.addAttribute<int, EDGE>("edge");
-	m_att_orbits[2] = myMap.addAttribute<int, FACE>("face");
-	m_att_orbits[3] = myMap.addAttribute<int, VOLUME>("volume");
-	m_att_orbits[4] = myMap.addAttribute<int, VERTEX + PFP::MAP::IN_PARENT>("vertex2");
-	m_att_orbits[5] = myMap.addAttribute<int, EDGE + PFP::MAP::IN_PARENT>("edge2");
-	m_att_orbits[6] = myMap.addAttribute<int, FACE + PFP::MAP::IN_PARENT>("face2");
-	m_att_orbits[7] = myMap.addAttribute<int, VERTEX + PFP::MAP::IN_PARENT2>("vertex1");
-	m_att_orbits[8] = myMap.addAttribute<int, EDGE + PFP::MAP::IN_PARENT2>("face1");
+	AttributeHandler<int, VERTEX> att0  = myMap.addAttribute<int, VERTEX>("vertex");
+	m_att_orbits[0] = new AttributeHandler<int, VERTEX>(att0);
+	init_att_orb<VERTEX>(m_att_orbits[0]);
 
-	int i=0;
-	TraversorV<MAP> tra0(myMap);
-	for (Dart d = tra0.begin(); d != tra0.end(); d = tra0.next())
-	{
-		m_att_orbits[0][d] = i++;
-	}
+	m_att_orbits[1] = new AttributeHandler<int, EDGE>(myMap.addAttribute<int, EDGE>("edge"));
+	m_att_orbits[2] = new AttributeHandler<int, FACE>(myMap.addAttribute<int, FACE>("face"));
+	m_att_orbits[3] = new AttributeHandler<int, VOLUME>(myMap.addAttribute<int, VOLUME>("volume"));
+	m_att_orbits[4] = new AttributeHandler<int, VERTEX + PFP::MAP::IN_PARENT>(myMap.addAttribute<int, VERTEX + PFP::MAP::IN_PARENT>("vertex2"));
+	m_att_orbits[5] = new AttributeHandler<int, EDGE + PFP::MAP::IN_PARENT>(myMap.addAttribute<int, EDGE + PFP::MAP::IN_PARENT>("edge2"));
+	m_att_orbits[6] = new AttributeHandler<int, FACE + PFP::MAP::IN_PARENT>(myMap.addAttribute<int, FACE + PFP::MAP::IN_PARENT>("face2"));
+	m_att_orbits[7] = new AttributeHandler<int, VERTEX + PFP::MAP::IN_PARENT2>(myMap.addAttribute<int, VERTEX + PFP::MAP::IN_PARENT2>("vertex1"));
+	m_att_orbits[8] = new AttributeHandler<int, EDGE + PFP::MAP::IN_PARENT2>(myMap.addAttribute<int, EDGE + PFP::MAP::IN_PARENT2>("face1"));
 
-	i=0;
-	TraversorE<MAP> tra1(myMap);
-	for (Dart d = tra1.begin(); d != tra1.end(); d = tra1.next())
-	{
-		m_att_orbits[1][d] = i++;
-	}
 
-	i=0;
-	TraversorF<MAP> tra2(myMap);
-	for (Dart d = tra2.begin(); d != tra2.end(); d = tra2.next())
-	{
-		m_att_orbits[2][d] = i++;
-	}
 
-	i=0;
-	TraversorW<PFP::MAP> tra3(myMap);
-	for (Dart d = tra3.begin(); d != tra3.end(); d = tra3.next())
-	{
-		m_att_orbits[3][d] = i++;
-	}
+	init_att_orb<EDGE>(m_att_orbits[1]);
 
-	i=0;
-	TraversorCell<MAP, VERTEX + PFP::MAP::IN_PARENT> tra02(myMap);
-	for (Dart d = tra02.begin(); d != tra02.end(); d = tra02.next())
-	{
-		m_att_orbits[4][d] = i++;
-	}
+	init_att_orb<FACE>(m_att_orbits[2]);
 
-	i=0;
-	TraversorCell<MAP, EDGE + PFP::MAP::IN_PARENT> tra12(myMap);
-	for (Dart d = tra12.begin(); d != tra12.end(); d = tra12.next())
-	{
-		m_att_orbits[5][d] = i++;
-	}
+	init_att_orb<VOLUME>(m_att_orbits[3]);
 
-	i=0;
-	TraversorCell<MAP, FACE + PFP::MAP::IN_PARENT> tra22(myMap);
-	for (Dart d = tra22.begin(); d != tra22.end(); d = tra22.next())
-	{
-		m_att_orbits[6][d] = i++;
-	}
+	init_att_orb<PFP::MAP::VERTEX_OF_PARENT>(m_att_orbits[4]);
 
-	i=0;
-	TraversorCell<MAP, VERTEX + PFP::MAP::IN_PARENT2> tra01(myMap);
-	for (Dart d = tra01.begin(); d != tra01.end(); d = tra01.next())
-	{
-		m_att_orbits[7][d] = i++;
-	}
+	init_att_orb<PFP::MAP::EDGE_OF_PARENT>(m_att_orbits[5]);
 
-	i=0;
-	TraversorCell<MAP, EDGE + PFP::MAP::IN_PARENT2> tra11(myMap);
-	for (Dart d = tra11.begin(); d != tra11.end(); d = tra11.next())
-	{
-		m_att_orbits[8][d] = i++;
-	}
+	init_att_orb<PFP::MAP::FACE_OF_PARENT>(m_att_orbits[6]);
+
+	init_att_orb<PFP::MAP::VERTEX_OF_PARENT2>(m_att_orbits[7]);
+
+	init_att_orb<PFP::MAP::EDGE_OF_PARENT2>(m_att_orbits[8]);
 
 	middleDarts = myMap.addAttribute<VEC3, DART>("middle");
 }

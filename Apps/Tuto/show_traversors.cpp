@@ -32,8 +32,9 @@
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
 
-#include "Topology/generic/traversor3.h"
-#include "Topology/generic/traversor2.h"
+//#include "Topology/generic/traversor3.h"
+//#include "Topology/generic/traversor3.h"
+#include "Topology/generic/traversorGen.h"
 
 #include "Algo/Render/GL2/drawerCells.h"
 
@@ -213,8 +214,7 @@ void MyQT::traverse2()
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer, myMap, m_selected, position, m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-
-		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createIncident(myMap, m_selected, VERTEX+m_second2, VERTEX+m_first2);
+		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createIncident(myMap, m_selected, 2, VERTEX+m_second2, VERTEX+m_first2);
 		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
 				m_affDarts.push_back(d);
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap, m_affDarts, position, m_expl);
@@ -223,8 +223,7 @@ void MyQT::traverse2()
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_first2, m_drawer, myMap, m_selected, position, m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor2<PFP::MAP>* tra = Traversor2<PFP::MAP>::createAdjacent(myMap, m_selected, VERTEX+m_first2, VERTEX+m_second2);
-
+		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createAdjacent(myMap, m_selected, 2, VERTEX+m_first2, VERTEX+m_second2);
 		for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
 			m_affDarts.push_back(d);
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap, m_affDarts, position, m_expl);
@@ -238,6 +237,30 @@ void MyQT::traverse2()
 	updateGL();
 }
 
+
+
+void MyQT::dynamicMarkOrbit(unsigned int orb)
+{
+	switch(orb)
+	{
+	case VERTEX:
+		m_dm_topo->markOrbit<VERTEX>(m_selected);
+		break;
+	case EDGE:
+		m_dm_topo->markOrbit<EDGE>(m_selected);
+		break;
+	case FACE:
+		m_dm_topo->markOrbit<FACE>(m_selected);
+		break;
+	case VOLUME:
+		m_dm_topo->markOrbit<VOLUME>(m_selected);
+		break;
+	default:
+		break;
+	}
+}
+
+
 void MyQT::traverse3()
 {
 	if (m_selected == NIL)
@@ -246,6 +269,7 @@ void MyQT::traverse3()
 	m_last=3;
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+
 
 	m_affDarts.clear();
 	m_drawer.newList(GL_COMPILE);
@@ -259,14 +283,16 @@ void MyQT::traverse3()
 	if (m_ajd_or_inci3 == 0) // incident
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_second3, m_drawer,myMap,m_selected,position,m_expl);
-		m_dm_topo->markOrbit<VERTEX+m_second3>(m_selected);
+		dynamicMarkOrbit(VERTEX+m_second3);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3XY<PFP::MAP, VERTEX+m_second3, VERTEX+m_first3> tra(myMap, m_selected);
-		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+
+		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createIncident(myMap,m_selected, 3, VERTEX+m_second3, VERTEX+m_first3);
+		for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
 		{
 			m_affDarts.push_back(d);
-			m_dm_topo->markOrbit<VERTEX+m_first3>(d);
+			dynamicMarkOrbit(VERTEX+m_first3);
 		}
+
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap, m_affDarts, position, m_expl);
 
 		m_render_topo->updateData<PFP>(myMap, position, 0.95f, 0.9f, 0.8f, sm);
@@ -277,14 +303,16 @@ void MyQT::traverse3()
 	else	// adjacent
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_first3, m_drawer, myMap, m_selected, position, m_expl);
-		m_dm_topo->markOrbit<VERTEX+m_first3>(m_selected);
+		dynamicMarkOrbit(VERTEX+m_first3);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor3XXaY<PFP::MAP, VERTEX+m_first3, VERTEX+m_second3> tra(myMap,m_selected);
-		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+
+		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createAdjacent(myMap,m_selected, 3, VERTEX+m_first3, VERTEX+m_second3);
+		for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
 		{
 			m_affDarts.push_back(d);
-			m_dm_topo->markOrbit<VERTEX+m_first3>(d);
+			dynamicMarkOrbit(VERTEX+m_first3);
 		}
+
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first3, m_drawer, myMap,m_affDarts,position,m_expl);
 
 		m_render_topo->updateData<PFP>(myMap, position,  0.95f, 0.9f, 0.8f, sm);
@@ -297,6 +325,281 @@ void MyQT::traverse3()
 
 	updateGL();
 }
+
+/*
+void MyQT::dyn_trav3XXaY(unsigned int first, unsigned int second)
+{
+	unsigned int val = first *16 + second;
+	switch(val)
+	{
+	case 0x00:
+		break;
+	case 0x10:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+1, VERTEX+0> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+1>(d);
+		}
+	}
+		break;
+	case 0x20:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+2, VERTEX+0> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+2>(d);
+		}
+	}
+	break;
+	case 0x30:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+3, VERTEX+0> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+3>(d);
+		}
+	}
+	break;
+
+	case 0x01:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX, VERTEX+1> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX>(d);
+		}
+	}
+		break;
+	case 0x21:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+2, VERTEX+1> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+2>(d);
+		}
+	}
+	break;
+	case 0x31:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+3, VERTEX+1> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+3>(d);
+		}
+	}
+	break;
+
+
+	case 0x02:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX, VERTEX+2> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX>(d);
+		}
+	}
+		break;
+	case 0x12:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+1, VERTEX+2> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+1>(d);
+		}
+	}
+	break;
+	case 0x32:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+3, VERTEX+2> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+3>(d);
+		}
+	}
+	break;
+
+	case 0x03:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX, VERTEX+3> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX>(d);
+		}
+	}
+	break;
+	case 0x13:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+1, VERTEX+3> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+1>(d);
+		}
+	}
+	break;
+	case 0x23:
+	{
+		Traversor3XXaY<PFP::MAP, VERTEX+2, VERTEX+3> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+2>(d);
+		}
+	}
+	break;
+
+	}
+}
+
+void MyQT::dyn_trav3XY(unsigned int first, unsigned int second)
+{
+	unsigned int val = second *16 + first;
+	switch(val)
+	{
+	case 0x00:
+		break;
+	case 0x10:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+1, VERTEX+0> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+0>(d);
+		}
+	}
+		break;
+	case 0x20:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+2, VERTEX+0> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+0>(d);
+		}
+	}
+	break;
+	case 0x30:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+3, VERTEX+0> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+0>(d);
+		}
+	}
+	break;
+
+	case 0x01:
+	{
+		Traversor3XY<PFP::MAP, VERTEX, VERTEX+1> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+1>(d);
+		}
+	}
+		break;
+	case 0x21:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+2, VERTEX+1> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+1>(d);
+		}
+	}
+	break;
+	case 0x31:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+3, VERTEX+1> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+1>(d);
+		}
+	}
+	break;
+
+
+	case 0x02:
+	{
+		Traversor3XY<PFP::MAP, VERTEX, VERTEX+2> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+2>(d);
+		}
+	}
+		break;
+	case 0x12:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+1, VERTEX+2> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+2>(d);
+		}
+	}
+	break;
+	case 0x32:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+3, VERTEX+2> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+2>(d);
+		}
+	}
+	break;
+
+	case 0x03:
+	{
+		Traversor3XY<PFP::MAP, VERTEX, VERTEX+3> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+3>(d);
+		}
+	}
+	break;
+	case 0x13:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+1, VERTEX+3> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+3>(d);
+		}
+	}
+	break;
+	case 0x23:
+	{
+		Traversor3XY<PFP::MAP, VERTEX+2, VERTEX+3> tra(myMap,m_selected);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+		{
+			m_affDarts.push_back(d);
+			m_dm_topo->markOrbit<VERTEX+3>(d);
+		}
+	}
+	break;
+
+	}
+}
+*/
+
+
+
 
 int main(int argc, char **argv)
 {

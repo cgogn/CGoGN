@@ -21,12 +21,14 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#include "Topology/generic/traversorGen.h"
 
 #ifndef __TRAVERSOR3_H__
 #define __TRAVERSOR3_H__
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/traversorCell.h"
+
 
 namespace CGoGN
 {
@@ -53,12 +55,13 @@ public:
 	bool isMarked(Dart d);
 } ;
 
+
 /**
  * Generic class Traversor (do not use directly)
  * Traverse all Y incident to X
  */
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-class Traversor3XY
+class Traversor3XY: public Traversor<MAP>
 {
 private:
 	MAP& m_map ;
@@ -84,7 +87,7 @@ public:
  * Traverse all X adjacent to X by an Y
  */
 template <typename MAP, unsigned int ORBX, unsigned int ORBY>
-class Traversor3XXaY
+class Traversor3XXaY: public Traversor<MAP>
 {
 private:
 	MAP& m_map ;

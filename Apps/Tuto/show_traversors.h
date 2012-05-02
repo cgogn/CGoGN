@@ -137,6 +137,9 @@ protected:
 	void traverse2();
 	void traverse3();
 
+	void dynamicMarkOrbit(unsigned int orb);
+//	void dyn_trav3XXaY(unsigned int first, unsigned int second);
+
 // slots locaux
 public slots:
 	void cb_combo1(int x);

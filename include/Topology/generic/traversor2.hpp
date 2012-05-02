@@ -454,68 +454,68 @@ Dart Traversor2FFaE<MAP>::next()
 }
 
 
-
-template<typename MAP>
-Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
-{
-	int code = 0x100*(orbX-VERTEX) + orbY-VERTEX;
-
-	switch(code)
-	{
-	case 0x0001:
-		return new Traversor2VE<MAP>(map,dart);
-		break;
-	case 0x0002:
-		return new Traversor2VF<MAP>(map,dart);
-		break;
-	case 0x0100:
-		return new Traversor2EV<MAP>(map,dart);
-		break;
-	case 0x0102:
-		return new Traversor2EF<MAP>(map,dart);
-		break;
-	case 0x0200:
-		return new Traversor2FV<MAP>(map,dart);
-		break;
-	case 0x0201:
-		return new Traversor2FE<MAP>(map,dart);
-		break;
-	default:
-		return NULL;
-		break;
-	}
-	return NULL;
-}
-
-template<typename MAP>
-Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
-{
-	int code = 0x100*(orbX-VERTEX) + orbY-VERTEX;
-	switch(code)
-	{
-	case 0x0001:
-		return new Traversor2VVaE<MAP>(map,dart);
-		break;
-	case 0x0002:
-		return new Traversor2VVaF<MAP>(map,dart);
-		break;
-	case 0x0100:
-		return new Traversor2EEaV<MAP>(map,dart);
-		break;
-	case 0x0102:
-		return new Traversor2EEaF<MAP>(map,dart);
-		break;
-	case 0x0200:
-		return new Traversor2FFaV<MAP>(map,dart);
-		break;
-	case 0x0201:
-		return new Traversor2FFaE<MAP>(map,dart);
-		break;
-	default:
-		return NULL;
-		break;
-	}
-	return NULL;
-}
+//
+//template<typename MAP>
+//Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//{
+//	int code = 0x100*(orbX-VERTEX) + orbY-VERTEX;
+//
+//	switch(code)
+//	{
+//	case 0x0001:
+//		return new Traversor2VE<MAP>(map,dart);
+//		break;
+//	case 0x0002:
+//		return new Traversor2VF<MAP>(map,dart);
+//		break;
+//	case 0x0100:
+//		return new Traversor2EV<MAP>(map,dart);
+//		break;
+//	case 0x0102:
+//		return new Traversor2EF<MAP>(map,dart);
+//		break;
+//	case 0x0200:
+//		return new Traversor2FV<MAP>(map,dart);
+//		break;
+//	case 0x0201:
+//		return new Traversor2FE<MAP>(map,dart);
+//		break;
+//	default:
+//		return NULL;
+//		break;
+//	}
+//	return NULL;
+//}
+//
+//template<typename MAP>
+//Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//{
+//	int code = 0x100*(orbX-VERTEX) + orbY-VERTEX;
+//	switch(code)
+//	{
+//	case 0x0001:
+//		return new Traversor2VVaE<MAP>(map,dart);
+//		break;
+//	case 0x0002:
+//		return new Traversor2VVaF<MAP>(map,dart);
+//		break;
+//	case 0x0100:
+//		return new Traversor2EEaV<MAP>(map,dart);
+//		break;
+//	case 0x0102:
+//		return new Traversor2EEaF<MAP>(map,dart);
+//		break;
+//	case 0x0200:
+//		return new Traversor2FFaV<MAP>(map,dart);
+//		break;
+//	case 0x0201:
+//		return new Traversor2FFaE<MAP>(map,dart);
+//		break;
+//	default:
+//		return NULL;
+//		break;
+//	}
+//	return NULL;
+//}
 
 } // namespace CGoGN
