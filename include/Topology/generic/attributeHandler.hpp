@@ -86,7 +86,7 @@ inline AttributeHandler<T, ORBIT>& AttributeHandler<T, ORBIT>::operator=(const A
 	valid = ta.valid ;
 	if(valid)
 		registerInMap() ;
-	return *this;
+	return *this ;
 }
 
 template <typename T, unsigned int ORBIT>

@@ -193,10 +193,10 @@ public:
  *  shortcut class for Vertex Attribute (Handler)
  */
 template <typename T>
-class VertexAttribute : public AttributeHandler<T,VERTEX>
+class VertexAttribute : public AttributeHandler<T, VERTEX>
 {
 public:
-	VertexAttribute<T>& operator=(const AttributeHandler<T,VERTEX>& ta)  { this->AttributeHandler<T,VERTEX>::operator=(ta); return *this;}
+	VertexAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ta)  { this->AttributeHandler<T, VERTEX>::operator=(ta); return *this; }
 };
 
 /**
@@ -206,7 +206,7 @@ template <typename T>
 class EdgeAttribute : public AttributeHandler<T,EDGE>
 {
 public:
-	EdgeAttribute<T>& operator=(const AttributeHandler<T,EDGE>& ta)  { this->AttributeHandler<T,EDGE>::operator=(ta); return *this;}
+	EdgeAttribute<T>& operator=(const AttributeHandler<T, EDGE>& ta)  { this->AttributeHandler<T, EDGE>::operator=(ta); return *this; }
 };
 
 /**
@@ -216,7 +216,7 @@ template <typename T>
 class FaceAttribute : public AttributeHandler<T,FACE>
 {
 public:
-	FaceAttribute<T>& operator=(const AttributeHandler<T,FACE>& ta)  { this->AttributeHandler<T,FACE>::operator=(ta); return *this;}
+	FaceAttribute<T>& operator=(const AttributeHandler<T, FACE>& ta)  { this->AttributeHandler<T, FACE>::operator=(ta); return *this; }
 };
 
 /**
@@ -226,11 +226,8 @@ template <typename T>
 class VolumeAttribute : public AttributeHandler<T,VOLUME>
 {
 public:
-	VolumeAttribute<T>& operator=(const AttributeHandler<T,VOLUME>& ta)  { this->AttributeHandler<T,VOLUME>::operator=(ta); return *this;}
+	VolumeAttribute<T>& operator=(const AttributeHandler<T, VOLUME>& ta)  { this->AttributeHandler<T, VOLUME>::operator=(ta); return *this; }
 };
-
-
-
 
 } // namespace CGoGN
 
