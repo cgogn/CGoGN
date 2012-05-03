@@ -21,7 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-#include "Utils/Qt/qtInputs.h"
+
+#include "Utils/qtInputs.h"
 #include <iostream>
 
 namespace CGoGN

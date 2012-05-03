@@ -79,7 +79,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 		for(typename std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 		{
 			Dart e = *face ;
-			if(map.isFaceTriangle(e))
+			if(map.isCycleTriangle(e))
 			{
 				VEC3 p1 = position[e] ;
 				VEC3 p2 = position[map.phi1(e)] ;

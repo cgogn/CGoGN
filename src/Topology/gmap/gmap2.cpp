@@ -815,6 +815,17 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int
  	return false;
 }
 
+bool GMap2::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+{
+	if (f(d))
+		return true ;
+	Dart e = beta2(beta0(d)) ;
+	if (f(e))
+		return true ;
+
+	return false ;
+}
+
 bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d))

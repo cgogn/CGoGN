@@ -848,6 +848,18 @@ bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	return found;
 }
 
+bool GMap3::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart it = d;
+	do
+	{
+		if (GMap2::foreach_dart_of_oriented_edge(it, f, thread))
+			return true;
+		it = alpha2(it);
+	} while (it != d);
+	return false;
+}
+
 bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d;

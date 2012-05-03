@@ -22,97 +22,56 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef _TUTO_OPER2_
-#define _TUTO_OPER2_
+#ifndef __MAP2MR_PM__
+#define __MAP2MR_PM__
 
-//#define USE_GMAP
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
 
+#include "Topology/map/map2MR/filters_Primal.h"
 
-#include "Topology/generic/parameters.h"
+#include "Algo/Modelisation/subdivision.h"
 
-#ifdef USE_GMAP
-	#include "Topology/gmap/embeddedGMap2.h"
-#else
-	#include "Topology/map/embeddedMap2.h"
-#endif
-
-#include "Algo/Render/GL2/topoRender.h"
-
-
-#include "ui_tuto_oper2.h"
-#include "Utils/qtui.h"
-#include "Utils/Qt/qtSimple.h"
-#include "Utils/cgognStream.h"
-
-
-using namespace CGoGN ;
-
-/**
- * Struct that contains some informations about the types of the manipulated objects
- * Mainly here to be used by the algorithms that are parameterized by it
- */
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the type of the map
-#ifdef USE_GMAP
-	typedef EmbeddedGMap2 MAP;
-#else
-	typedef EmbeddedMap2 MAP;
-#endif
-};
 
-
-
-class MyQT: public Utils::QT::SimpleQT
+class SelectorCollapsingEdges : public FunctorSelect
 {
-	Q_OBJECT
-public:
-	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f) {}
-
-	void cb_redraw();
-	void cb_initGL();
-	void cb_mousePress(int button, int x, int y);
-	void cb_keyPress(int code);
-	void cb_Open();
-	void cb_Save();
-
-	Utils::QT::uiDockInterface dock;
-
 protected:
-	// declaration of the map
-	PFP::MAP myMap;
-
-	PFP::TVEC3 position;
-	AttributeHandler<Geom::Vec3f> colorDarts;
-
-	SelectorDartNoBoundary<PFP::MAP> nb;
-
-	// render (for the topo)
-	Algo::Render::GL2::TopoRender* m_render_topo;
-	Dart m_selected;
-	Dart m_selected2;
-	DartMarker dm;
-	float m_shift;
-
-	// just for more compact writing
-	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
-	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
-	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
-	template<int X>
-	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
-
+	const DartMarker& m_dm;
 public:
-	// example of simple map creation
-	void createMap(int n);
-	void updateMap();
-	void importMesh(std::string& filename);
-
-public slots:
-	void operation(int x);
-	void svg();
-	void width(int w);
+	SelectorCollapsingEdges(const DartMarker& dm): m_dm(dm) {}
+	bool operator()(Dart d) const { return m_dm.isMarked(d); }
+	FunctorSelect* copy() const { return new SelectorCollapsingEdges(m_dm);}
 };
 
+class Map2MR_PM : public EmbeddedMap2
+{
+protected:
+	bool shareVertexEmbeddings ;
 
+	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
+	std::vector<Multiresolution::MRFilter*> analysisFilters ;
+
+	DartMarkerStore* selectedEdges;
+
+public:
+	Map2MR_PM() ;
+
+	virtual std::string mapTypeName() const { return "Map2MR_PM" ; }
+	void addNewLevel(bool embedNewVertices = true) ;
+
+	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
+
+	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+	void clearAnalysisFilters() { analysisFilters.clear() ; }
+
+	void analysis() ;
+	void synthesis() ;
+} ;
+
+} // namespace CGoGN
 
 #endif

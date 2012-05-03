@@ -123,13 +123,14 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 	addLevel();
 	setCurrentLevel(getMaxLevel());
 
-	//create the new level with the old one
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	if(!shareVertexEmbeddings)
 	{
-		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
-		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
-		if(!shareVertexEmbeddings)
-			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
+		//create the new level with the old one
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int index = (*m_mrDarts[m_mrCurrentLevel])[i] ;
+			(*m_embeddings[VERTEX])[index] = EMBNULL ;		// set vertex embedding to EMBNULL if no sharing
+		}
 	}
 
 	//subdivision
@@ -137,13 +138,13 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 	TraversorE<Map3MR_PrimalRegular> travE(*this);
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-		if(!shareVertexEmbeddings)
-		{
-			if(getEmbedding(VERTEX, d) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
-			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
-		}
+//		if(!shareVertexEmbeddings)
+//		{
+//			if(getEmbedding(VERTEX, d) == EMBNULL)
+//				embedNewCell(VERTEX, d) ;
+//			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
+//				embedNewCell(VERTEX, d) ;
+//		}
 
 		cutEdge(d) ;
 		travE.skip(d) ;
@@ -278,20 +279,21 @@ void Map3MR_PrimalRegular::addNewLevelTetraOcta(bool embedNewVertices)
 	popLevel() ;
 }
 
-void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
+void Map3MR_PrimalRegular::addNewLevelHexa(bool embedNewVertices)
 {
 	pushLevel();
 
 	addLevel();
 	setCurrentLevel(getMaxLevel());
 
-	//create the new level with the old one
-	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	if(!shareVertexEmbeddings)
 	{
-		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
-		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
-		if(!shareVertexEmbeddings)
-			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
+		//create the new level with the old one
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int index = (*m_mrDarts[m_mrCurrentLevel])[i] ;
+			(*m_embeddings[VERTEX])[index] = EMBNULL ;		// set vertex embedding to EMBNULL if no sharing
+		}
 	}
 
 	//subdivision
@@ -304,7 +306,7 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 			if(getEmbedding(VERTEX, d) == EMBNULL)
 				embedNewCell(VERTEX, d) ;
 			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
-				embedNewCell(VERTEX, d) ;
+				embedNewCell(VERTEX, phi1(d)) ;
 		}
 
 		cutEdge(d) ;
@@ -417,17 +419,17 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 	}
 
 	//A optimiser
-	setCurrentLevel(getMaxLevel()-1) ;
+	//setCurrentLevel(getMaxLevel()-1) ;
 	TraversorE<Map3MR_PrimalRegular> travE2(*this);
 	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 	{
 		setCurrentLevel(getMaxLevel()) ;
-		setCurrentLevel(getMaxLevel()-1) ;
 		embedOrbit(VERTEX, phi1(d), getEmbedding(VERTEX, phi1(d)));
+		setCurrentLevel(getMaxLevel()-1) ;
 	}
-	setCurrentLevel(getMaxLevel()) ;
+	//setCurrentLevel(getMaxLevel()) ;
 
-	setCurrentLevel(getMaxLevel()-1) ;
+	//setCurrentLevel(getMaxLevel()-1) ;
 	TraversorF<Map3MR_PrimalRegular> travF2(*this) ;
 	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 	{
@@ -435,8 +437,214 @@ void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 		embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding(VERTEX, phi2(phi1(d))));
 		setCurrentLevel(getMaxLevel()-1) ;
 	}
+	//setCurrentLevel(getMaxLevel()) ;
+
+	popLevel() ;
+}
+
+void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
+{
+	pushLevel();
+
+	addLevel();
+	setCurrentLevel(getMaxLevel());
+
+	//create the new level with the old one
+	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+	{
+		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
+		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
+		if(!shareVertexEmbeddings)
+			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
+	}
+
+	//subdivision
+	//1. cut edges
+	TraversorE<Map3MR_PrimalRegular> travE(*this);
+	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
+	{
+		if(!shareVertexEmbeddings)
+		{
+			if(getEmbedding(VERTEX, d) == EMBNULL)
+				embedNewCell(VERTEX, d) ;
+			if(getEmbedding(VERTEX, phi1(d)) == EMBNULL)
+				embedNewCell(VERTEX, d) ;
+		}
+
+		cutEdge(d) ;
+		travE.skip(d) ;
+		travE.skip(phi1(d)) ;
+
+// When importing MR files  : activated for DEBUG
+		if(embedNewVertices)
+			embedNewCell(VERTEX, phi1(d)) ;
+	}
+
+	//2. split faces - quadrangule faces
+	TraversorF<Map3MR_PrimalRegular> travF(*this) ;
+	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
+	{
+		Dart old = d;
+		if(getDartLevel(old) == getMaxLevel())
+			old = phi1(old) ;
+
+		decCurrentLevel() ;
+		unsigned int degree = faceDegree(old) ;
+		incCurrentLevel() ;
+
+		if(degree == 3)					// if subdividing a triangle
+		{
+			Dart dd = phi1(old) ;
+			Dart e = phi1(phi1(dd)) ;
+			splitFace(dd, e) ;
+			travF.skip(dd) ;
+
+			dd = e ;
+			e = phi1(phi1(dd)) ;
+			splitFace(dd, e) ;
+			travF.skip(dd) ;
+
+			dd = e ;
+			e = phi1(phi1(dd)) ;
+			splitFace(dd, e) ;
+			travF.skip(dd) ;
+
+			travF.skip(e) ;
+		}
+		else							// if subdividing a polygonal face
+		{
+			Dart dd = phi1(old) ;
+			Dart next = phi1(phi1(dd)) ;
+			splitFace(dd, next) ;		// insert a first edge
+
+			Dart ne = phi2(phi_1(dd)) ;
+			cutEdge(ne) ;				// cut the new edge to insert the central vertex
+			travF.skip(dd) ;
+
+			// When importing MR files : activated for DEBUG
+			if(embedNewVertices)
+				embedNewCell(VERTEX, phi1(ne)) ;
+
+			dd = phi1(phi1(next)) ;
+			while(dd != ne)				// turn around the face and insert new edges
+			{							// linked to the central vertex
+				Dart tmp = phi1(ne) ;
+				splitFace(tmp, dd) ;
+				travF.skip(tmp) ;
+				dd = phi1(phi1(dd)) ;
+			}
+			travF.skip(ne) ;
+		}
+	}
+
+	//3. create inside volumes
+	setCurrentLevel(getMaxLevel() - 1) ;
+	TraversorW<Map3MR_PrimalRegular> traW(*this);
+	for(Dart dit = traW.begin(); dit != traW.end(); dit = traW.next())
+	{
+		std::vector<std::pair<Dart, Dart> > subdividedFaces;
+		subdividedFaces.reserve(64);
+		Dart centralDart = NIL;
+
+		Traversor3WV<Map3MR_PrimalRegular> traWV(*this, dit);
+		for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+		{
+			setCurrentLevel(getMaxLevel()) ;	//Utile ?
+
+			Dart e = ditWV;
+			std::vector<Dart> v ;
+
+			do
+			{
+				if(phi1(phi1(phi1(e))) != e)
+				{
+					v.push_back(phi1(phi1(e)));
+
+					if(!Map2::isBoundaryEdge(phi1(phi1(e))))
+						subdividedFaces.push_back(std::pair<Dart,Dart>(phi1(phi1(e)),phi2(phi1(phi1(e)))));
+				}
+
+				v.push_back(phi1(e));
+
+				if(!Map2::isBoundaryEdge(phi1(e)))
+					subdividedFaces.push_back(std::pair<Dart,Dart>(phi1(e),phi2(phi1(e))));
+
+
+				e = phi2(phi_1(e));
+			}
+			while(e != ditWV);
+
+			splitSurfaceInVolume(v,true,true);
+
+//			Dart dd = phi2(phi1(ditWV));
+//			Dart next = phi1(phi1(dd)) ;
+//			Map2::splitFace(dd, next) ;
+//
+//			Dart ne = phi2(phi_1(dd));
+//			Map2::cutEdge(ne) ;
+//			centralDart = phi1(ne);
+//
+//			dd = phi1(phi1(next)) ;
+//			while(dd != ne)
+//			{
+//				Dart tmp = phi1(ne) ;
+//				Map2::splitFace(tmp, dd) ;
+//				dd = phi1(phi1(dd)) ;
+//			}
+
+			setCurrentLevel(getMaxLevel() - 1) ; //Utile ?
+		}
+
+		setCurrentLevel(getMaxLevel()) ;
+		//4 couture des relations precedemment sauvegarde
+		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+		{
+			Dart f1 = phi2((*it).first);
+			Dart f2 = phi2((*it).second);
+
+			//closeHole(f1);
+		}
+		setCurrentLevel(getMaxLevel() - 1) ;
+
+//		setCurrentLevel(getMaxLevel()) ;
+//		//4 couture des relations precedemment sauvegarde
+//		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+//		{
+//			Dart f1 = phi2((*it).first);
+//			Dart f2 = phi2((*it).second);
+//
+//			//if(isBoundaryFace(f1) && isBoundaryFace(f2))
+//			if(phi3(f1) == f1 && phi3(f2) == f2)
+//				sewVolumes(f1, f2, false);
+//		}
+//		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+//
+//		setCurrentLevel(getMaxLevel() - 1) ;
+	}
+
+	//A optimiser
+	setCurrentLevel(getMaxLevel()-1) ;
+	TraversorE<Map3MR_PrimalRegular> travE2(*this);
+	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
+	{
+		setCurrentLevel(getMaxLevel()) ;
+		embedOrbit(VERTEX, phi1(d), getEmbedding(VERTEX, phi1(d)));
+		setCurrentLevel(getMaxLevel()-1) ;
+	}
 	setCurrentLevel(getMaxLevel()) ;
 
+//	setCurrentLevel(getMaxLevel()-1) ;
+//	TraversorF<Map3MR_PrimalRegular> travF2(*this) ;
+//	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
+//	{
+//		if(!faceDegree(d) != 3)
+//		{
+//			setCurrentLevel(getMaxLevel()) ;
+//			embedOrbit(VERTEX, phi2(phi1(d)), getEmbedding(VERTEX, phi2(phi1(d))));
+//			setCurrentLevel(getMaxLevel()-1) ;
+//		}
+//	}
+//	setCurrentLevel(getMaxLevel()) ;
 
 	popLevel() ;
 }
@@ -457,6 +665,17 @@ void Map3MR_PrimalRegular::synthesis()
 
 	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
 		(*synthesisFilters[i])() ;
+
+	incCurrentLevel() ;
+}
+
+
+void Map3MR_PrimalRegular::subdivision()
+{
+	assert(getCurrentLevel() < getMaxLevel() || !"subdivision: called on max level") ;
+
+	for(unsigned int i = 0; i < subdivisionSchemes.size(); ++i)
+		(*subdivisionSchemes[i])() ;
 
 	incCurrentLevel() ;
 }

@@ -322,8 +322,11 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
         if(edgesToCut.isMarked(d))
         {
             VEC3 p = (position[d]+position[map.phi1(d)])*0.5f;
-            cf.mark(d);			//mark face and opposite face to split
-            cf.mark(map.phi2(d));
+
+            //turn around the edge and mark for future split face
+            Traversor3EF<typename PFP::MAP> t3ef(map,d);
+            for(Dart dd = t3ef.begin() ; dd != t3ef.end() ; dd = t3ef.next())
+            	cf.mark(dd);			//mark face to split
 
             map.cutEdge(d);
             Dart dN = map.phi1(d);
@@ -332,6 +335,9 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             position[dN] = p;
         }
     }
+
+    map.check();
+    std::cout << "tip " << std::endl;
 
     //Step 2: Split faces with cut edges
     TraversorF<typename PFP::MAP> tf(map);
@@ -345,24 +351,31 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             do
             {
                 //find the new vertex
-                if(localVerticesToSplit.isMarked(dS))
+                if(localVerticesToSplit.isMarked(dS) || verticesToSplit.isMarked(dS))
                 {
-                    Dart dSS = map.phi1(dS);
+                	//start from phi1(phi1()) to avoid the creation of faces of degree 2
+                    Dart dSS = map.phi1(map.phi1(dS));
                     //search an other new vertex (or an existing vertex to split) in order to split the face
+
                     do
                     {
-                        if(localVerticesToSplit.isMarked(dSS) || verticesToSplit.isMarked(dSS))
+                        if((localVerticesToSplit.isMarked(dSS) || verticesToSplit.isMarked(dSS))
+                        		&& !map.sameVertex(dS,dSS))
                         {
                             map.splitFace(dS,dSS);
                             split=true;
                         }
                         dSS = map.phi1(dSS);
                     } while(!split && dSS!=dS);
+                    split=true; //go out of the first loop if no split case has been found
                 }
                 dS = map.phi1(dS);
             } while(!split && dS!=d);
         }
     }
+
+    map.check();
+    std::cout << "top " << std::endl;
 
     //Step 3 : Find path and split volumes
     TraversorW<typename PFP::MAP> tw(map);
@@ -416,8 +429,13 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             assert(vPath.size()>2);
             map.splitVolume(vPath);
             vRes.push_back(map.phi2(*vPath.begin()));
+
+            map.check();
+            std::cout << "tup " << std::endl;
         }
     }
+
+
 
     return vRes;
 }

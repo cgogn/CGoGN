@@ -37,8 +37,11 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 	if ((filename.rfind(".tet")!=std::string::npos) || (filename.rfind(".TET")!=std::string::npos))
 		return ImportVolumique::TET;
 
-	if ((filename.rfind(".ele")!=std::string::npos) || (filename.rfind(".ELE")!=std::string::npos))
-		return ImportVolumique::ELE;
+	if ((filename.rfind(".node")!=std::string::npos) || (filename.rfind(".NODE")!=std::string::npos))
+		return ImportVolumique::NODE;
+
+	if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
+		return ImportVolumique::OFF;
 
 	if ((filename.rfind(".ts")!=std::string::npos) || (filename.rfind(".TS")!=std::string::npos))
 		return ImportVolumique::TS;
@@ -59,7 +62,7 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 	case ImportVolumique::TET:
 		return importTet(filename, attrNames, scaleFactor);
 		break;
-	case ImportVolumique::ELE:
+	case ImportVolumique::NODE:
 		break;
 	case ImportVolumique::TS:
 		break;
