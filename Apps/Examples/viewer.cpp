@@ -201,7 +201,7 @@ void Viewer::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<PFP::VEC3, VERTEX>("position") ;
+		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
 	else
 	{
@@ -226,9 +226,9 @@ void Viewer::importMesh(std::string& filename)
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize / 5.0f ;
 
-	normal = myMap.getAttribute<PFP::VEC3, VERTEX>("normal") ;
+	normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
 	if(!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal") ;
+		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
