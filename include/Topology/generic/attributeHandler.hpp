@@ -77,7 +77,7 @@ AttributeHandler<T, ORBIT>::AttributeHandler(const AttributeHandler<T, ORBIT>& t
 }
 
 template <typename T, unsigned int ORBIT>
-inline void AttributeHandler<T, ORBIT>::operator=(const AttributeHandler<T, ORBIT>& ta)
+inline AttributeHandler<T, ORBIT>& AttributeHandler<T, ORBIT>::operator=(const AttributeHandler<T, ORBIT>& ta)
 {
 	if(valid)
 		unregisterFromMap() ;
@@ -86,6 +86,7 @@ inline void AttributeHandler<T, ORBIT>::operator=(const AttributeHandler<T, ORBI
 	valid = ta.valid ;
 	if(valid)
 		registerInMap() ;
+	return *this;
 }
 
 template <typename T, unsigned int ORBIT>
