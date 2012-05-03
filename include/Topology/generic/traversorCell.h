@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include "Topology/generic/traversorGen.h"
 
 #ifndef __TRAVERSOR_CELL_H__
@@ -34,7 +35,7 @@ namespace CGoGN
 {
 
 template <typename MAP, unsigned int ORBIT>
-class TraversorCell: public Traversor<MAP>
+class TraversorCell : public Traversor<MAP>
 {
 private:
 	MAP& m ;
@@ -99,7 +100,7 @@ public:
 
 
 template <typename MAP, unsigned int ORBIT>
-class TraversorDartsOfOrbit: public Traversor<MAP>
+class TraversorDartsOfOrbit : public Traversor<MAP>
 {
 private:
 	std::vector<Dart>::iterator m_current ;

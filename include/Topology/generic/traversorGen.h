@@ -79,7 +79,6 @@ public:
 	 * @return a ptr on Generic Traversor
 	 */
 	static Traversor<MAP>* createCell(MAP& map, unsigned int orb, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0);
-
 };
 
 } // namespace CGoGN

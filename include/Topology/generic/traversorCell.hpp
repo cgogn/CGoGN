@@ -111,31 +111,32 @@ Dart TraversorCell<MAP, ORBIT>::next()
 		}
 		else
 		{
-			bool ismarked ;
 			if(dmark)
-				ismarked = dmark->isMarked(current) ;
-			else
-				ismarked = cmark->isMarked(current) ;
-
-			while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
 			{
-				m.next(current) ;
-				if(current == m.end())
-					current = NIL ;
-				else
+				bool ismarked = dmark->isMarked(current) ;
+				while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
 				{
-					if(dmark)
+					m.next(current) ;
+					if(current == m.end())
+						current = NIL ;
+					else
 						ismarked = dmark->isMarked(current) ;
+				}
+				if(current != NIL)
+					dmark->markOrbit<ORBIT>(current) ;
+			}
+			else
+			{
+				bool ismarked = cmark->isMarked(current) ;
+				while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
+				{
+					m.next(current) ;
+					if(current == m.end())
+						current = NIL ;
 					else
 						ismarked = cmark->isMarked(current) ;
 				}
-			}
-
-			if(current != NIL)
-			{
-				if(dmark)
-					dmark->markOrbit<ORBIT>(current) ;
-				else
+				if(current != NIL)
 					cmark->mark(current) ;
 			}
 		}
