@@ -106,7 +106,7 @@ void addRowsRHS_Equality(
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int, VERTEX>& index,
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& weight)
+	const VertexAttribute<typename PFP::REAL>& weight)
 {
 	FunctorEquality_PerVertexWeight_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight) ;
 	m.template foreach_orbit<VERTEX>(ec) ;
@@ -130,7 +130,7 @@ void addRowsRHS_Equality(
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int, VERTEX>& index,
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& weight,
+	const VertexAttribute<typename PFP::REAL>& weight,
 	unsigned int coord)
 {
 	FunctorEquality_PerVertexWeight_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight, coord) ;
@@ -196,8 +196,8 @@ void addRows_Laplacian_Cotan(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int, VERTEX> index,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea)
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea)
 {
 	FunctorLaplacianCotan<PFP, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea) ;
 	m.template foreach_orbit<VERTEX>(flc) ;
@@ -208,8 +208,8 @@ void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int, VERTEX> index,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attr)
 {
 	FunctorLaplacianCotanRHS_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea, attr) ;
@@ -221,8 +221,8 @@ void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
 	const AttributeHandler<unsigned int, VERTEX> index,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
 	unsigned int coord)
 {

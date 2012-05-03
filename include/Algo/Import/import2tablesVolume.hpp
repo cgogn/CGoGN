@@ -70,7 +70,7 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
-	AttributeHandler<VEC3, VERTEX> positions =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3> positions =  m_map.template getAttribute<VEC3, VERTEX>("position") ;
 
 	if (!positions.isValid())
 		positions = m_map.template addAttribute<VEC3, VERTEX>("position") ;

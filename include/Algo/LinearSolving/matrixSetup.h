@@ -42,14 +42,14 @@ protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
 	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
-	const AttributeHandler<typename PFP::REAL, VERTEX>& weightTable ;
+	const VertexAttribute<typename PFP::REAL>& weightTable ;
 
 public:
 	FunctorEquality_PerVertexWeight_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int, VERTEX>& index,
 		const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
-		const AttributeHandler<typename PFP::REAL, VERTEX>& weight
+		const VertexAttribute<typename PFP::REAL>& weight
 	) :	solver(s), indexTable(index), attrTable(attr), weightTable(weight)
 	{}
 
@@ -104,7 +104,7 @@ protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
 	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
-	const AttributeHandler<typename PFP::REAL, VERTEX>& weightTable ;
+	const VertexAttribute<typename PFP::REAL>& weightTable ;
 	unsigned int coord ;
 
 public:
@@ -112,7 +112,7 @@ public:
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int, VERTEX>& index,
 		const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
-		const AttributeHandler<typename PFP::REAL, VERTEX>& weight,
+		const VertexAttribute<typename PFP::REAL>& weight,
 		unsigned int c
 	) :	solver(s), indexTable(index), attrTable(attr), weightTable(weight), coord(c)
 	{}
@@ -298,8 +298,8 @@ class FunctorLaplacianCotan : public FunctorMap<typename PFP::MAP>
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
 	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight ;
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea ;
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
+	const VertexAttribute<typename PFP::REAL>& vertexArea ;
 
 public:
 	typedef typename PFP::MAP MAP ;
@@ -309,8 +309,8 @@ public:
 		MAP& m,
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int, VERTEX>& index,
-		const AttributeHandler<typename PFP::REAL, EDGE>& eWeight,
-		const AttributeHandler<typename PFP::REAL, VERTEX>& vArea
+		const EdgeAttribute<typename PFP::REAL>& eWeight,
+		const VertexAttribute<typename PFP::REAL>& vArea
 	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea)
 	{}
 
@@ -347,8 +347,8 @@ class FunctorLaplacianCotanRHS_Scalar : public FunctorMap<typename PFP::MAP>
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
 	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight ;
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea ;
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
+	const VertexAttribute<typename PFP::REAL>& vertexArea ;
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
 
 public:
@@ -359,8 +359,8 @@ public:
 		MAP& m,
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int, VERTEX>& index,
-		const AttributeHandler<typename PFP::REAL, EDGE>& eWeight,
-		const AttributeHandler<typename PFP::REAL, VERTEX>& vArea,
+		const EdgeAttribute<typename PFP::REAL>& eWeight,
+		const VertexAttribute<typename PFP::REAL>& vArea,
 		const AttributeHandler<ATTR_TYPE, VERTEX>& attr
 	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr)
 	{}
@@ -395,8 +395,8 @@ class FunctorLaplacianCotanRHS_Vector : public FunctorMap<typename PFP::MAP>
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
 	const AttributeHandler<unsigned int, VERTEX>& indexTable ;
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight ;
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea ;
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight ;
+	const VertexAttribute<typename PFP::REAL>& vertexArea ;
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attrTable ;
 	unsigned int coord ;
 
@@ -408,8 +408,8 @@ public:
 		MAP& m,
 		LinearSolver<SOLVER_TRAITS>* s,
 		const AttributeHandler<unsigned int, VERTEX>& index,
-		const AttributeHandler<typename PFP::REAL, EDGE>& eWeight,
-		const AttributeHandler<typename PFP::REAL, VERTEX>& vArea,
+		const EdgeAttribute<typename PFP::REAL>& eWeight,
+		const VertexAttribute<typename PFP::REAL>& vArea,
 		const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
 		unsigned int c
 	) :	FunctorMap<MAP>(m), solver(s), indexTable(index), edgeWeight(eWeight), vertexArea(vArea), attrTable(attr), coord(c)

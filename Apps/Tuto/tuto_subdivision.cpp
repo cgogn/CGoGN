@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 	Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames);
 
 	// get a handler to the 3D vector attribute created by the import
-	AttributeHandler<PFP::VEC3, VERTEX> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
+	VertexAttribute<PFP::VEC3> position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]);
 
 	for(unsigned int i = 0; i < nbSteps; ++i)
 		Algo::Modelisation::LoopSubdivision<PFP>(myMap, position);

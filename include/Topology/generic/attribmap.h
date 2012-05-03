@@ -34,8 +34,6 @@ namespace CGoGN
 class AttribMap : public GenericMap
 {
 private:
-	template<typename T, unsigned int ORBIT> friend class AutoAttributeHandler ;
-
 	void init() ;
 
 public:
@@ -93,7 +91,6 @@ public:
 	unsigned int getNbCells(unsigned int orbit);
 
 
-public:
 	/****************************************
 	 *               UTILITIES              *
 	 ****************************************/

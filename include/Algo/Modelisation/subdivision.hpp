@@ -79,15 +79,15 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 }
 
 template <typename PFP>
-void trianguleFaces(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected)
+void trianguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
 {
-	trianguleFaces<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, position, selected) ;
+	trianguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
 }
 
 template <typename PFP>
 void trianguleFaces(
 		typename PFP::MAP& map,
-		AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, FACE>& positionF,
+		VertexAttribute<typename PFP::VEC3>& position, const FaceAttribute<typename PFP::VEC3>& positionF,
 		const FunctorSelect& selected)
 {
 	TraversorF<typename PFP::MAP> t(map, selected) ;
@@ -167,9 +167,9 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 }
 
 template <typename PFP>
-void quadranguleFaces(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected)
+void quadranguleFaces(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
 {
-	quadranguleFaces<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, position, selected) ;
+	quadranguleFaces<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
 }
 
 template <typename PFP, typename EMBV, typename EMB>
@@ -297,9 +297,9 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 }
 
 template <typename PFP>
-void CatmullClarkSubdivision(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected)
+void CatmullClarkSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
 {
-	CatmullClarkSubdivision<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, position, selected) ;
+	CatmullClarkSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
 }
 
 inline double betaF(unsigned int n)
@@ -444,15 +444,15 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 }
 
 template <typename PFP>
-void LoopSubdivision(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected)
+void LoopSubdivision(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
 {
-	LoopSubdivision<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, position, selected) ;
+	LoopSubdivision<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected) ;
 }
 
 template <typename PFP, typename EMBV, typename EMB>
 void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected)
 {
-	AutoAttributeHandler<Dart, EDGE> tablePred(map);
+	EdgeAutoAttribute<Dart> tablePred(map);
 	CellMarker<EDGE> m0(map);
 
 	std::vector<Dart> dOrig;

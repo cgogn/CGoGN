@@ -98,8 +98,8 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<VEC3, VERTEX> m_position ;
-	AttributeHandler<VEC3, EDGE> m_approxPosition ;
+	VertexAttribute<VEC3> m_position ;
+	EdgeAttribute<VEC3> m_approxPosition ;
 
 public:
 	Approximator_Frame(MAP& m, AttributeHandler<MATRIX33, VERTEX>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :

@@ -193,6 +193,18 @@ public:
  *  shortcut class for Vertex Attribute (Handler)
  */
 template <typename T>
+class DartAttribute : public AttributeHandler<T, DART>
+{
+public:
+	DartAttribute() : AttributeHandler<T, DART>() {}
+	DartAttribute(const AttributeHandler<T, DART>& ah) : AttributeHandler<T, DART>(ah) {}
+	DartAttribute<T>& operator=(const AttributeHandler<T, DART>& ah) { this->AttributeHandler<T, DART>::operator=(ah); return *this; }
+};
+
+/**
+ *  shortcut class for Vertex Attribute (Handler)
+ */
+template <typename T>
 class VertexAttribute : public AttributeHandler<T, VERTEX>
 {
 public:

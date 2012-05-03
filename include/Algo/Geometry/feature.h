@@ -48,17 +48,17 @@ typedef NoMathIONameAttribute<e0segment> ridgeSegment ;
 template <typename PFP>
 void featureEdgeDetection(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	const VertexAttribute<typename PFP::VEC3>& position,
 	CellMarker<EDGE>& featureEdge) ;
 
 template <typename PFP>
 void computeFaceGradient(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, FACE>& face_normal,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
-	const AttributeHandler<typename PFP::REAL, FACE>& face_area,
-	AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_normal,
+	const VertexAttribute<typename PFP::REAL>& kmax,
+	const FaceAttribute<typename PFP::REAL>& face_area,
+	FaceAttribute<typename PFP::VEC3>& face_gradient,
 	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
@@ -66,17 +66,17 @@ template <typename PFP>
 typename PFP::VEC3 faceGradient(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, FACE>& face_normal,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
-	const AttributeHandler<typename PFP::REAL, FACE>& area) ;
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_normal,
+	const VertexAttribute<typename PFP::REAL>& kmax,
+	const FaceAttribute<typename PFP::REAL>& area) ;
 
 template <typename PFP>
 void computeVertexGradient(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
-	const AttributeHandler<typename PFP::REAL, FACE>& face_area,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_gradient,
+	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FaceAttribute<typename PFP::REAL>& face_area,
+	VertexAttribute<typename PFP::VEC3>& vertex_gradient,
 	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
@@ -84,27 +84,27 @@ template <typename PFP>
 typename PFP::VEC3 vertexGradient(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
-	const AttributeHandler<typename PFP::REAL, FACE>& area) ;
+	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FaceAttribute<typename PFP::REAL>& area) ;
 
 //template <typename PFP>
 //typename PFP::REAL extremality(
 //	typename PFP::MAP& map,
 //	Dart d,
 //	const typename PFP::VEC3& K,
-//	const AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
-//	const AttributeHandler<typename PFP::REAL, FACE>& face_area) ;
+//	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+//	const FaceAttribute<typename PFP::REAL>& face_area) ;
 
 template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax,
+	const VertexAttribute<typename PFP::VEC3>& Kmax,
 	CellMarker<FACE>& regularMarker,
 	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
-bool isTriangleRegular(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax) ;
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& Kmax) ;
 
 template <typename PFP>
 void initRidgeSegments(
@@ -117,8 +117,8 @@ template <typename PFP>
 void computeRidgeLines(
 	typename PFP::MAP& map,
 	CellMarker<FACE>& regularMarker,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_gradient,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& K,
 	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
 	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
@@ -127,8 +127,8 @@ template <typename PFP>
 void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& K,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
 	AttributeHandler<ridgeSegment, FACE>& ridge_segments) ;
 
 template <typename PFP>
@@ -156,8 +156,8 @@ template <typename PFP>
 std::vector<typename PFP::VEC3> occludingContoursDetection(
 	typename PFP::MAP& map,
 	const typename PFP::VEC3& cameraPosition,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal) ;
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal) ;
 
 } // namespace Geometry
 

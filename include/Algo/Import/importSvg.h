@@ -43,7 +43,7 @@ namespace Import
 bool checkXmlNode(xmlNodePtr node, const std::string& name);
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, AttributeHandler<typename PFP::VEC3, VERTEX>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces);
+bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces);
 
 /**
  *

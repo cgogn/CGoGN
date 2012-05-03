@@ -74,7 +74,7 @@ protected:
 	*/
 	L_MAP* m_map;
 
-	AttributeHandler<VEC3, VERTEX>& m_positions;
+	VertexAttribute<VEC3>& m_positions;
 
 	/**
 	* Origin of image
@@ -217,7 +217,7 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCube(Image<DataType>* img, L_MAP* map, AttributeHandler<VEC3, VERTEX>& position, Windowing<DataType> wind, bool boundRemoved);
+	MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3>& position, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* destructor

@@ -40,7 +40,7 @@
 
 
 MAP myMap;
-AttributeHandler<VEC3, VERTEX> position ;
+VertexAttribute<VEC3> position ;
 Dart dglobal;
 
 void MyQT::cb_checkTopo(bool b)

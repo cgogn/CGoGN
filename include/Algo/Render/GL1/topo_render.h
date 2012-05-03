@@ -62,7 +62,7 @@ namespace GL1
 * @param kf exploding coefficient for face (1.0 normal draw)
 */
 template <typename PFP>
-void renderTopoMD2(typename PFP::MAP& the_map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawPhi1, bool drawPhi2, float ke, float kf);
+void renderTopoMD2(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, float ke, float kf);
 
 
 /**
@@ -77,10 +77,10 @@ void renderTopoMD2(typename PFP::MAP& the_map, const AttributeHandler<typename P
  * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+void renderTopoMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
 
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
+void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
 
 
 /**
@@ -93,7 +93,7 @@ void renderTopoMD3(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, 
  * @param kf exploding coefficient for face (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoGMD2(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float ke, float kf);
+void renderTopoGMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float ke, float kf);
 
 /**
  * Render darts of g-map
@@ -107,7 +107,7 @@ void renderTopoGMD2(typename PFP::MAP& map, const AttributeHandler<typename PFP:
  * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoGMD3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv);
+void renderTopoGMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv);
 
 
 } // namespace GL1

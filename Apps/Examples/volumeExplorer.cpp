@@ -33,8 +33,8 @@
 
 
 PFP::MAP myMap;
-AttributeHandler<PFP::VEC3, VERTEX> position ;
-AttributeHandler<PFP::VEC3, VOLUME> color ;
+VertexAttribute<PFP::VEC3> position ;
+VolumeAttribute<PFP::VEC3> color ;
 
 void MyQT::volumes_onoff(bool x)
 {

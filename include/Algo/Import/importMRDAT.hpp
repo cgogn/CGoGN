@@ -41,7 +41,7 @@ inline void nextNonEmptyLine(std::ifstream& fp, std::string& line)
 template <typename PFP>
 bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt)
 {
-	AttributeHandler<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+	VertexAttribute<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
 
 	if (!position.isValid())
 		position = map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
@@ -190,7 +190,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 
 	std::cout << "  Create base level mesh.." << std::flush ;
 
-	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents") ;
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents") ;
 	DartMarkerNoUnmark m(map) ;
 
 	unsigned nbf = qt.roots.size() ;
@@ -205,8 +205,8 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			unsigned int idx = qt.roots[i]->indices[j] ;
 			unsigned int emb = qt.verticesID[idx] ;
 
-			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, emb) ;
-			map.foreach_dart_of_orbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb) ;
+			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, emb) ;
+			map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb) ;
 
 			m.mark(d) ;								// mark on the fly to unmark on second loop
 			vecDartsPerVertex[emb].push_back(d) ;	// store incident darts for fast adjacency reconstruction

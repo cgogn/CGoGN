@@ -32,7 +32,7 @@ namespace IHM
 {
 
 template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
@@ -58,7 +58,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 }
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
@@ -141,7 +141,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 }
 
 template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void coarsenEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
@@ -157,7 +157,7 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 }
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+void coarsenFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;

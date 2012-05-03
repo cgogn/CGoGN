@@ -47,7 +47,7 @@ namespace Selection
  * @param vecFaces (out) vector to store the darts of intersected faces
  */
 template<typename PFP>
-void facesRaySelection(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces)
+void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces)
 {
 	std::vector<typename PFP::VEC3> iPoints;
 
@@ -87,7 +87,7 @@ void facesRaySelection(typename PFP::MAP& map, const AttributeHandler<typename P
  * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
-void edgesRaySelection(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist)
+void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist)
 {
 	typename PFP::REAL dist2 = dist * dist;
 	typename PFP::REAL AB2 = rayAB * rayAB;
@@ -131,7 +131,7 @@ void edgesRaySelection(typename PFP::MAP& map, const AttributeHandler<typename P
  * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
-void verticesRaySelection(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good= allDarts)
+void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good= allDarts)
 {
 	typename PFP::REAL dist2 = dist * dist;
 	typename PFP::REAL AB2 = rayAB * rayAB;
@@ -173,7 +173,7 @@ void verticesRaySelection(typename PFP::MAP& map, const AttributeHandler<typenam
  * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
  */
 template<typename PFP>
-void vertexRaySelection(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = allDarts)
+void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = allDarts)
 {
 	std::vector<Dart> vecFaces;
 	std::vector<typename PFP::VEC3> iPoints;
@@ -232,7 +232,7 @@ void vertexRaySelection(typename PFP::MAP& map, const AttributeHandler<typename 
  * @param vecDarts (out) vector to store dart of intersected darts
  */
 template<typename PFP>
-void dartsRaySelection(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts, const FunctorSelect& good = allDarts)
+void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts, const FunctorSelect& good = allDarts)
 {
 	// recuperation des brins intersectes
 	vecDarts.clear();

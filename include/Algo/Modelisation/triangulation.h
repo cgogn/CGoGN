@@ -81,9 +81,9 @@ protected:
 protected:
 	typename PFP::MAP& m_map;
 
-	AutoAttributeHandler<EarAttr, VERTEX> m_dartEars;
+	VertexAutoAttribute<EarAttr> m_dartEars;
 
-	AttributeHandler<VEC3, VERTEX> m_position;
+	VertexAttribute<VEC3> m_position;
 
 	VPMS m_ears;
 

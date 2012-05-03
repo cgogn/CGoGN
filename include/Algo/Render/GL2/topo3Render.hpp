@@ -45,7 +45,7 @@ namespace Render
 namespace GL2
 {
 template<typename PFP>
-void Topo3Render::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good)
+void Topo3Render::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
 	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
 	if (ptrMap3 != NULL)
@@ -60,12 +60,10 @@ void Topo3Render::updateData(typename PFP::MAP& map, const AttributeHandler<type
 }
 
 template<typename PFP>
-void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good)
+void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
-
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
-
 
 	if (m_attIndex.map() != &mapx)
 		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
@@ -82,18 +80,18 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const AttributeHandler
 
 	// compute center of each volumes
 	CellMarker<VOLUME> cmv(mapx);
-	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(mapx, "centerVolumes");
+	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 
 	Algo::Geometry::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, allDarts);
 
 	// debut phi1
-	AutoAttributeHandler<VEC3, DART> fv1(mapx);
+	DartAutoAttribute<VEC3> fv1(mapx);
 	// fin phi1
-	AutoAttributeHandler<VEC3, DART> fv11(mapx);
+	DartAutoAttribute<VEC3> fv11(mapx);
 
 	// phi2
-	AutoAttributeHandler<VEC3, DART> fv2(mapx);
-	AutoAttributeHandler<VEC3, DART> fv2x(mapx);
+	DartAutoAttribute<VEC3> fv2(mapx);
+	DartAutoAttribute<VEC3> fv2x(mapx);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -278,7 +276,7 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 }
 
 template<typename PFP>
-void Topo3Render::updateColors(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& colors, const FunctorSelect& good)
+void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors, const FunctorSelect& good)
 {
 	m_vbo4->bind();
 	Geom::Vec3f* colorBuffer =  reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -314,7 +312,7 @@ Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y, const FunctorSel
 }
 
 template<typename PFP>
-void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good)
+void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -337,14 +335,14 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const AttributeHandle
 	}
 
 	// compute center of each volumes
-	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(mapx, "centerVolumes");
+	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 	Algo::Geometry::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, good);
 
 	// beta1
-	AutoAttributeHandler<VEC3, DART> fv1(mapx);
+	DartAutoAttribute<VEC3> fv1(mapx);
 	// beta2/3
-	AutoAttributeHandler<VEC3, DART> fv2(mapx);
-	AutoAttributeHandler<VEC3, DART> fv2x(mapx);
+	DartAutoAttribute<VEC3> fv2(mapx);
+	DartAutoAttribute<VEC3> fv2x(mapx);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);

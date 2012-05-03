@@ -35,7 +35,7 @@ namespace SVG
 {
 
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& good, unsigned int thread)
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> trac(map, good);
 	svg.beginPoints();
@@ -45,7 +45,7 @@ void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const Attri
 }
 
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::TVEC3& color, const FunctorSelect& good, unsigned int thread)
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::TVEC3& color, const FunctorSelect& good, unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> trac(map, good);
 	svg.beginPoints();
@@ -55,7 +55,7 @@ void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const Attri
 }
 
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& good, unsigned int thread)
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, unsigned int thread)
 {
 	TraversorE<typename PFP::MAP> trac(map, good);
 	svg.beginLines();
@@ -65,7 +65,7 @@ void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const Attribut
 }
 
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::TVEC3& color, const FunctorSelect& good, unsigned int thread)
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::TVEC3& color, const FunctorSelect& good, unsigned int thread)
 {
 	TraversorE<typename PFP::MAP> trac(map, good);
 	svg.beginLines();

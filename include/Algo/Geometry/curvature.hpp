@@ -48,12 +48,12 @@ namespace Geometry
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmin,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmin,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
 	const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
@@ -65,12 +65,12 @@ template <typename PFP>
 void computeCurvatureVertex_QuadraticFitting(
 	typename PFP::MAP& map,
 	Dart dart,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmin,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmin)
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -115,8 +115,8 @@ void vertexQuadraticFitting(
 	typename PFP::MAP& map,
 	Dart dart,
 	typename PFP::MATRIX33& localFrame,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
 	float& a, float& b, float& c, float& d, float& e)
 {
 	typename PFP::VEC3 p = position[dart] ;
@@ -281,14 +281,14 @@ template <typename PFP>
 void computeCurvatureVertices_NormalCycles(
 	typename PFP::MAP& map,
 	typename PFP::REAL radius,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeangle,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmin,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmin,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Knormal,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal,
 	const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
@@ -301,14 +301,14 @@ void computeCurvatureVertex_NormalCycles(
 	typename PFP::MAP& map,
 	Dart dart,
 	typename PFP::REAL radius,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeangle,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
-	AttributeHandler<typename PFP::REAL, VERTEX>& kmin,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Kmin,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& Knormal)
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;

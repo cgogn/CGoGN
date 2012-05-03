@@ -40,7 +40,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 N = Geom::triangleNormal(position[d], position[map.phi1(d)], position[map.phi_1(d)]) ;
 	N.normalize() ;
@@ -48,7 +48,7 @@ typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const Attribut
 }
 
 template<typename PFP>
-typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 N(0);
 
@@ -67,7 +67,7 @@ typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const AttributeH
 }
 
 template <typename PFP>
-typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	if(map.faceDegree(d) == 3)
 		return triangleNormal<PFP>(map, d, position) ;
@@ -90,7 +90,7 @@ typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const AttributeHan
 }
 
 template <typename PFP>
-typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -114,7 +114,7 @@ typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const AttributeH
 }
 
 template <typename PFP>
-typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	assert(map.dimension() == 3);
 
@@ -148,7 +148,7 @@ typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const Attr
 }
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, FACE>& face_normal, const FunctorSelect& select, unsigned int thread)
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, const FunctorSelect& select, unsigned int thread)
 {
 	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -156,7 +156,7 @@ void computeNormalFaces(typename PFP::MAP& map, const AttributeHandler<typename 
 }
 
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VERTEX>& normal, const FunctorSelect& select, unsigned int thread)
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
@@ -164,7 +164,7 @@ void computeNormalVertices(typename PFP::MAP& map, const AttributeHandler<typena
 }
 
 template <typename PFP>
-typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -195,7 +195,7 @@ typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart
 }
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, EDGE>& angles, const FunctorSelect& select, unsigned int thread)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select, unsigned int thread)
 {
 	TraversorE<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())

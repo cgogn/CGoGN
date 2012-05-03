@@ -89,7 +89,7 @@ void filterAverageVertexAttribute_WithinSphere(
 	const AttributeHandler<T, VERTEX>& attIn,
 	AttributeHandler<T, VERTEX>& attOut,
 	int neigh,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
@@ -131,7 +131,7 @@ void filterAverageEdgeAttribute_WithinSphere(
 	const AttributeHandler<T, EDGE>& attIn,
 	AttributeHandler<T, EDGE>& attOut,
 	int neigh,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
@@ -159,7 +159,7 @@ void filterAverageFaceAttribute_WithinSphere(
 	const AttributeHandler<T, FACE>& attIn,
 	AttributeHandler<T, FACE>& attOut,
 	int neigh,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {

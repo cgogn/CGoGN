@@ -63,7 +63,7 @@ protected:
 	MAP myMap;
 
 	// attribute handler on position;
-	AttributeHandler<VEC3, VERTEX> position;
+	VertexAttribute<VEC3> position;
 
 	// render (for the topo)
 	Algo::Render::GL2::TopoRender* m_render_topo;

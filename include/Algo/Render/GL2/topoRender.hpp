@@ -43,7 +43,7 @@ namespace GL2
 {
 
 template<typename PFP>
-void TopoRender::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
 {
 	Map2* ptrMap2 = dynamic_cast<Map2*>(&map);
 	if (ptrMap2 != NULL)
@@ -60,7 +60,7 @@ void TopoRender::updateData(typename PFP::MAP& map, const AttributeHandler<typen
 }
 
 template<typename PFP>
-void TopoRender::updateDataMap(typename PFP::MAP& mapx, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
 {
 	Map2& map = reinterpret_cast<Map2&>(mapx);
 
@@ -83,11 +83,11 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const AttributeHandler<t
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	AutoAttributeHandler<VEC3, DART> fv1(map);
+	DartAutoAttribute<VEC3> fv1(map);
 	// fin phi1
-	AutoAttributeHandler<VEC3, DART> fv11(map);
+	DartAutoAttribute<VEC3> fv11(map);
 	// phi2
-	AutoAttributeHandler<VEC3, DART> fv2(map);
+	DartAutoAttribute<VEC3> fv2(map);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -203,7 +203,7 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const AttributeHandler<t
 }
 
 template<typename PFP>
-void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good)
+void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good)
 {
 	GMap2& map = dynamic_cast<GMap2&>(mapx);
 
@@ -228,11 +228,11 @@ void TopoRender::updateDataGMap(typename PFP::MAP& mapx, const AttributeHandler<
 	m_nbDarts = vecDarts.size();
 
 	// debut phi1
-	AutoAttributeHandler<VEC3, DART> fv1(map);
+	DartAutoAttribute<VEC3> fv1(map);
 	// fin phi1
-	AutoAttributeHandler<VEC3, DART> fv11(map);
+	DartAutoAttribute<VEC3> fv11(map);
 	// phi2
-	AutoAttributeHandler<VEC3, DART> fv2(map);
+	DartAutoAttribute<VEC3> fv2(map);
 
 	m_vbo3->bind();
 	glBufferData(GL_ARRAY_BUFFER, 4*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);

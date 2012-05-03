@@ -35,7 +35,7 @@
 
 
 MAP myMap;
-AttributeHandler<VEC3, VERTEX> position ;
+VertexAttribute<VEC3> position ;
 Dart dglobal;
 
 void MyQT::balls_onoff(bool x)

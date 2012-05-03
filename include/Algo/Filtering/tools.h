@@ -38,7 +38,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-float computeHaussdorf(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& originalPosition, const AttributeHandler<typename PFP::VEC3, VERTEX>& position2, const FunctorSelect& select = allDarts)
+float computeHaussdorf(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& originalPosition, const VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -85,7 +85,7 @@ float computeHaussdorf(typename PFP::MAP& map, const AttributeHandler<typename P
 }
 
 template <typename PFP>
-void computeNoise(typename PFP::MAP& map, long amount, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VERTEX>& position2, const AttributeHandler<typename PFP::VEC3, VERTEX>& normal, const FunctorSelect& select = allDarts)
+void computeNoise(typename PFP::MAP& map, long amount, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

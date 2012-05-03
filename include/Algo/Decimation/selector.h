@@ -60,12 +60,12 @@ public:
 
 protected:
 	MAP& m_map ;
-	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
 	const FunctorSelect& m_select ;
 
 public:
-	EdgeSelector(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		m_map(m), m_position(pos), m_approximators(approx), m_select(select)
 	{}
 	virtual ~EdgeSelector()

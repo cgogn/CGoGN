@@ -39,21 +39,21 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::Plane3D<typename PFP::REAL> trianglePlane(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Geom::Plane3D<typename PFP::REAL> trianglePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 n = triangleNormal<PFP>(map, d, position) ;
 	return Geom::Plane3D<typename PFP::REAL>(n, position[d]) ;
 }
 
 template <typename PFP>
-Geom::Plane3D<typename PFP::REAL> facePlane(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Geom::Plane3D<typename PFP::REAL> facePlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 n = faceNormal<PFP>(map, d, position) ;
 	return Geom::Plane3D<typename PFP::REAL>(n, position[d]) ;
 }
 
 template <typename PFP>
-Geom::Plane3D<typename PFP::REAL> vertexTangentPlane(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+Geom::Plane3D<typename PFP::REAL> vertexTangentPlane(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 n = vertexNormal<PFP>(map, d, position) ;
 	return Geom::Plane3D<typename PFP::REAL>(n, position[d]) ;

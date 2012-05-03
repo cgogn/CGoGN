@@ -37,7 +37,7 @@ template <typename PFP>
 ProgressiveMesh<PFP>::ProgressiveMesh(
 		MAP& map, DartMarker& inactive,
 		Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a,
-		AttributeHandler<typename PFP::VEC3, VERTEX>& position
+		VertexAttribute<typename PFP::VEC3>& position
 	) :
 	m_map(map), positionsTable(position), inactiveMarker(inactive), dartSelect(inactiveMarker)
 {

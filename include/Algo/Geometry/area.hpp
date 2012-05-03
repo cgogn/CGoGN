@@ -37,7 +37,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 p1 = position[d] ;
 	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
@@ -47,7 +47,7 @@ typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const AttributeH
 }
 
 template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -69,7 +69,7 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const Attribut
 }
 
 template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& select, unsigned int thread)
+typename PFP::REAL totalArea(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int thread)
 {
 	typename PFP::REAL area(0) ;
 	TraversorF<typename PFP::MAP> t(map, select) ;
@@ -79,7 +79,7 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const AttributeHandler<type
 }
 
 template <typename PFP>
-typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::REAL area(0) ;
 	Traversor2VF<typename PFP::MAP> t(map, d) ;
@@ -89,7 +89,7 @@ typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const Attri
 }
 
 template <typename PFP>
-typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::REAL area(0) ;
 	Traversor2VF<typename PFP::MAP> t(map, d) ;
@@ -99,7 +99,7 @@ typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const A
 }
 
 template <typename PFP>
-typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::REAL area(0) ;
 	Traversor2VF<typename PFP::MAP> t(map, d) ;
@@ -127,7 +127,7 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const Attri
 }
 
 template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, FACE>& face_area, const FunctorSelect& select)
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& face_area, const FunctorSelect& select)
 {
 	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -135,7 +135,7 @@ void computeAreaFaces(typename PFP::MAP& map, const AttributeHandler<typename PF
 }
 
 template <typename PFP>
-void computeOneRingAreaVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& vertex_area, const FunctorSelect& select)
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -143,7 +143,7 @@ void computeOneRingAreaVertices(typename PFP::MAP& map, const AttributeHandler<t
 }
 
 template <typename PFP>
-void computeBarycentricAreaVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& vertex_area, const FunctorSelect& select)
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -151,7 +151,7 @@ void computeBarycentricAreaVertices(typename PFP::MAP& map, const AttributeHandl
 }
 
 template <typename PFP>
-void computeVoronoiAreaVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& vertex_area, const FunctorSelect& select)
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())

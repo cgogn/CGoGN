@@ -84,7 +84,7 @@ protected:
 	// declaration of the map
 	MAP myMap;
 
-	AttributeHandler<VEC3, VERTEX> position;
+	VertexAttribute<VEC3> position;
 	AttributeHandler<VEC3, DART> colorDarts;
 
 	SelectorDartNoBoundary<PFP::MAP> nb;

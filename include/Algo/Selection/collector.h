@@ -142,12 +142,12 @@ template <typename PFP>
 class Collector_WithinSphere : public Collector<PFP>
 {
 protected:
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position;
+	const VertexAttribute<typename PFP::VEC3>& position;
 	typename PFP::REAL radius;
 	typename PFP::REAL area;
 
 public:
-	Collector_WithinSphere(typename PFP::MAP& m, const AttributeHandler<typename PFP::VEC3, VERTEX>& p, typename PFP::REAL r = 0) :
+	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL r = 0) :
 		Collector<PFP>(m),
 		position(p),
 		radius(r),
@@ -155,7 +155,7 @@ public:
 	{}
 	inline void setRadius(typename PFP::REAL r) { radius = r; }
 	inline typename PFP::REAL getRadius() const { return radius; }
-	inline const AttributeHandler<typename PFP::VEC3, VERTEX>& getPosition() const { return position; }
+	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position; }
 
 	void collectAll(Dart d);
 	void collectBorder(Dart d);

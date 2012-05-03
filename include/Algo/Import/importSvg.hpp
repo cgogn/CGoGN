@@ -211,7 +211,7 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 }
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, AttributeHandler<typename PFP::VEC3, VERTEX>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces)
+bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef std::vector<VEC3 > POLYGON;

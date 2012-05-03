@@ -52,9 +52,9 @@ class SimpleGMap3 : public Utils::QT::SimpleQT
 public:
 	MAP myMap ;
 
-	AttributeHandler<VEC3, VERTEX> position ;
-	AttributeHandler<VEC3, VERTEX> normal ;
-	AttributeHandler<VEC3, VOLUME> volume ;
+	VertexAttribute<VEC3> position ;
+	VertexAttribute<VEC3> normal ;
+	VolumeAttribute<VEC3> volume ;
 
 	SimpleGMap3() ;
 

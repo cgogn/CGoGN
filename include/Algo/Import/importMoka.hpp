@@ -49,7 +49,7 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 		return false;
 	}
 
-	AttributeHandler<typename PFP::VEC3, VERTEX> position =  gmap.template getAttribute<typename PFP::VEC3, VERTEX>("position");
+	VertexAttribute<typename PFP::VEC3> position =  gmap.template getAttribute<typename PFP::VEC3, VERTEX>("position");
 	if (!position.isValid())
 		position = gmap.template addAttribute<typename PFP::VEC3, VERTEX>("position");
 

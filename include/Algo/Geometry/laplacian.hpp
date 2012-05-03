@@ -60,8 +60,8 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attr)
 {
 	ATTR_TYPE l(0) ;
@@ -96,8 +96,8 @@ void computeLaplacianTopoVertices(
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
-	const AttributeHandler<typename PFP::REAL, VERTEX>& vertexArea,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
 	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
 	AttributeHandler<ATTR_TYPE, VERTEX>& laplacian,
 	const FunctorSelect& select)
@@ -111,7 +111,7 @@ template <typename PFP>
 typename PFP::REAL computeCotanWeightEdge(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+	const VertexAttribute<typename PFP::VEC3>& position)
 {
 	if(map.isBoundaryEdge(d))
 	{
@@ -138,8 +138,8 @@ typename PFP::REAL computeCotanWeightEdge(
 template <typename PFP>
 void computeCotanWeightEdges(
 	typename PFP::MAP& map,
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
-	AttributeHandler<typename PFP::REAL, EDGE>& edgeWeight,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	EdgeAttribute<typename PFP::REAL>& edgeWeight,
 	const FunctorSelect& select)
 {
 	TraversorE<typename PFP::MAP> t(map, select) ;

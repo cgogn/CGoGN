@@ -73,12 +73,12 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * normals of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_normals;
+	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
 	/**
 	* vector of darts (one for each polygon)
@@ -102,7 +102,7 @@ public:
 	* @param good dart selector
 	*/
 	FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX>& normals , const FunctorSelect& good);
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const FunctorSelect& good);
 
 	/**
 	* get back the vector of darts of faces that have not been treated
@@ -167,17 +167,17 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * normals of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_normals;
+	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
 	/**
 	 * colors of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_colors;
+	const VertexAttribute<typename PFP::VEC3>& m_colors;
 
 	/**
 	* vector of darts (one for each polygon)
@@ -193,7 +193,7 @@ protected:
 public:
 
 	FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX>& normals , const AttributeHandler<typename PFP::VEC3, VERTEX>& colors ,const FunctorSelect& good);
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const VertexAttribute<typename PFP::VEC3>& colors ,const FunctorSelect& good);
 
 	std::vector<Dart>& getPolyDarts();
 
@@ -214,12 +214,12 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * normals of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_normals;
+	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
 	/**
 	* Dart selector to restrict the rendering
@@ -233,7 +233,7 @@ public:
 
 	* @param good dart selector
 	*/
-	FunctorGLNormal(MAP& map, const FunctorSelect& good, const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX>& normals, float scale);
+	FunctorGLNormal(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale);
 
 	bool operator() (Dart d);
 };
@@ -248,12 +248,12 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * frame of vertices
 	 */
-	const AttributeHandler<typename PFP::VEC3, VERTEX> *m_frames;
+	const VertexAttribute<typename PFP::VEC3> *m_frames;
 
 	/**
 	* Dart selector to restrict the rendering
@@ -267,7 +267,7 @@ public:
 
 	* @param good dart selector
 	*/
-	FunctorGLFrame (MAP& map, const FunctorSelect& good, const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX> frames[3], float scale);
+	FunctorGLFrame (MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale);
 
 	bool operator() (Dart d);
 };

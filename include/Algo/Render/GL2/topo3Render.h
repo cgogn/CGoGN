@@ -281,7 +281,7 @@ public:
  	* @param kv exploding coef for face
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
 
 	/**
 	* update color buffer with color attribute handler
@@ -290,7 +290,7 @@ public:
 	* @param colors  attribute of dart's colors
 	*/
 	template<typename PFP>
-	void updateColors(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& colors, const FunctorSelect& good = allDarts);
+	void updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors, const FunctorSelect& good = allDarts);
 
 	/**
 	 * Get back middle position of drawn darts
@@ -322,7 +322,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataMap3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good);
+	void updateDataMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -334,7 +334,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataGMap3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good);
+	void updateDataGMap3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good);
 };
 
 

@@ -54,7 +54,7 @@ private:
 	Dart cur ;
 
 public:
-	EdgeSelector_MapOrder(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{}
 	~EdgeSelector_MapOrder()
@@ -81,7 +81,7 @@ private:
 	bool allSkipped ;
 
 public:
-	EdgeSelector_Random(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{}
 	~EdgeSelector_Random()
@@ -121,7 +121,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Length(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -168,7 +168,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_QEM(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_QEM(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -217,7 +217,7 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
-	EdgeSelector_QEMml(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_QEMml(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
@@ -255,14 +255,14 @@ private:
 	Geom::BoundingBox<VEC3> bb ;
 	REAL radius ;
 
-	AttributeHandler<VEC3, VERTEX> normal ;
+	VertexAttribute<VEC3> normal ;
 	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
-	AttributeHandler<REAL, EDGE> edgeangle ;
-	AttributeHandler<REAL, VERTEX> kmax ;
-	AttributeHandler<REAL, VERTEX> kmin ;
-	AttributeHandler<VEC3, VERTEX> Kmax ;
-	AttributeHandler<VEC3, VERTEX> Kmin ;
-	AttributeHandler<VEC3, VERTEX> Knormal ;
+	EdgeAttribute<REAL> edgeangle ;
+	VertexAttribute<REAL> kmax ;
+	VertexAttribute<REAL> kmin ;
+	VertexAttribute<VEC3> Kmax ;
+	VertexAttribute<VEC3> Kmin ;
+	VertexAttribute<VEC3> Knormal ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -274,7 +274,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_Curvature(MAP& m, AttributeHandler<VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_Curvature(MAP& m, VertexAttribute<VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
@@ -359,7 +359,7 @@ private:
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_MinDetail(MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_MinDetail(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;

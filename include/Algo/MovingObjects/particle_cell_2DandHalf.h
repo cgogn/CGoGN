@@ -34,7 +34,7 @@ class ParticleCell2DAndHalf : public ParticleBase
 public :
 	typedef typename PFP::MAP Map;
 	typedef typename PFP::VEC3 VEC3;
-	typedef AttributeHandler<typename PFP::VEC3, VERTEX> TAB_POS;
+	typedef VertexAttribute<typename PFP::VEC3> TAB_POS;
 
 	Map& m;
 

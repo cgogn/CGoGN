@@ -53,7 +53,7 @@ void MyQT::createMap()
 	Dart d1 = myMap.newFace(3);
 	Dart d2 = myMap.newFace(4);
 	myMap.sewFaces(d1, d2);
-	AttributeHandler<VEC3, VERTEX> position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
+	VertexAttribute<VEC3> position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 	position[d1] = PFP::VEC3(0, 0, 0);
 	position[PHI1(d1)] = PFP::VEC3(2, 0, 0);
 	position[PHI_1(d1)] = PFP::VEC3(1, 2, 0);
@@ -61,7 +61,7 @@ void MyQT::createMap()
 	position[PHI_1(d2)] = PFP::VEC3(2, -2, 0);
 
 	// create another attribute on vertices (for faces drawing)
-	AttributeHandler<VEC3, VERTEX> colorF = myMap.addAttribute<PFP::VEC3, VERTEX>("colorF");
+	VertexAttribute<VEC3> colorF = myMap.addAttribute<PFP::VEC3, VERTEX>("colorF");
 
 	colorF[d1] = Geom::Vec3f(1.0f,0.0f,0.0f);
 	colorF[PHI1(d1)] = Geom::Vec3f(0.0f,1.0f,0.0f);
@@ -70,7 +70,7 @@ void MyQT::createMap()
 	colorF[PHI_1(d2)] = Geom::Vec3f(0.0f,1.0f,1.0f);
 
 	// create another attribute on vertices (for edges drawing)
-	AttributeHandler<VEC3, VERTEX> colorE = myMap.addAttribute<PFP::VEC3, VERTEX>("colorE");
+	VertexAttribute<VEC3> colorE = myMap.addAttribute<PFP::VEC3, VERTEX>("colorE");
 
 	colorE[d1] = Geom::Vec3f(0.0f,0.5f,0.5f);
 	colorE[PHI1(d1)] = Geom::Vec3f(0.5f,0.0f,0.5f);

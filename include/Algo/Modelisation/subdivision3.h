@@ -55,12 +55,12 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d);
 * TODO : test if it works for the functorselect
 */
 template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= allDarts);
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts);
 
 template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& selected= allDarts)
+void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts)
 {
-	catmullClarkVol<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, position, selected);
+	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected);
 }
 
 } // namespace Modelisation

@@ -44,7 +44,7 @@ void decimate(
 	typename PFP::MAP& map,
 	SelectorType s,
 	ApproximatorType a,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	unsigned int nbWantedVertices,
 	const FunctorSelect& selected = allDarts
 ) ;

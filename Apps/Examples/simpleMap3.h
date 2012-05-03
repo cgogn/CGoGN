@@ -52,7 +52,7 @@ public:
 	MAP myMap ;
 	SelectorTrue allDarts ;
 
-	AttributeHandler<VEC3, VERTEX> position ;
+	VertexAttribute<VEC3> position ;
 
 	SimpleMap3() ;
 

@@ -76,7 +76,7 @@ inline ExplodeVolumeRender::~ExplodeVolumeRender()
 }
 
 template<typename PFP>
-void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const FunctorSelect& good)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good)
 {
 	if (m_cpf)
 	{
@@ -87,7 +87,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHand
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
 	Algo::Geometry::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
@@ -168,7 +168,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHand
 }
 
 template<typename PFP>
-void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const AttributeHandler<typename PFP::VEC3, VOLUME>& colorPerXXX, const FunctorSelect& good)
+void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerXXX, const FunctorSelect& good)
 {
 	if (!m_cpf)
 	{
@@ -179,7 +179,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const AttributeHand
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AutoAttributeHandler<VEC3, VOLUME> centerVolumes(map, "centerVolumes");
+	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
 	Algo::Geometry::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;

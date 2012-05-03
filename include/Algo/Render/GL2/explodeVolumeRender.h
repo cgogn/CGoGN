@@ -107,7 +107,7 @@ public:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const FunctorSelect& good = allDarts) ;
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
 	* update all drawing buffers
@@ -117,7 +117,7 @@ public:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const AttributeHandler<typename PFP::VEC3, VOLUME>& colorPerFace, const FunctorSelect& good = allDarts) ;
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * draw edges

@@ -48,7 +48,7 @@ protected:
 	AttributeHandler<Quadric<REAL>, VERTEX> m_quadric ;
 
 public:
-	Approximator_QEM(MAP& m, AttributeHandler<VEC3, VERTEX>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEM(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_QEM()
@@ -70,7 +70,7 @@ protected:
 	AttributeHandler<Quadric<REAL>, VERTEX> m_quadric ;
 
 public:
-	Approximator_QEMhalfEdge(MAP& m, AttributeHandler<VEC3, VERTEX>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEMhalfEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_QEMhalfEdge()
@@ -88,7 +88,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_MidEdge(MAP& m, AttributeHandler<VEC3, VERTEX>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_MidEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_MidEdge()
@@ -106,7 +106,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_HalfCollapse(MAP& m, AttributeHandler<VEC3, VERTEX>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_HalfCollapse(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_HalfCollapse()
@@ -124,7 +124,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_CornerCutting(MAP& m, AttributeHandler<VEC3, VERTEX>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_CornerCutting(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_CornerCutting()

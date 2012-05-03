@@ -73,7 +73,7 @@ public:
 	bool m_drawEdges ;
 	bool m_drawFaces ;
 
-	AttributeHandler<VEC3, VERTEX> position ;
+	VertexAttribute<VEC3> position ;
 
 	Algo::Render::GL2::MapRender* m_render ;
 

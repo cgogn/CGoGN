@@ -32,7 +32,7 @@ namespace Render
 {
 
 template<typename PFP>
-void drawerAddEdge(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float k)
+void drawerAddEdge(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
 	const typename PFP::VEC3& P = positions[d];
 	Dart e = map.phi1(d);
@@ -45,7 +45,7 @@ void drawerAddEdge(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Attr
 }
 
 template<typename PFP>
-void drawerAddEdgeShrink(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const typename PFP::VEC3& C, float k)
+void drawerAddEdgeShrink(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, const typename PFP::VEC3& C, float k)
 {
 	const typename  PFP::VEC3& P = positions[d];
 	Dart e = map.phi1(d);
@@ -56,7 +56,7 @@ void drawerAddEdgeShrink(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, cons
 }
 
 template<typename PFP>
-void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float k)
+void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
 	typename PFP::VEC3 C = Algo::Geometry::faceCentroid<PFP>(map,d,positions);
 
@@ -68,7 +68,7 @@ void drawerAddFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Attr
 }
 
 template<typename PFP>
-void drawerAddVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerAddVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	typename PFP::VEC3 C = Algo::Geometry::volumeCentroid<PFP>(map,d,positions);
 
@@ -78,7 +78,7 @@ void drawerAddVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const At
 }
 
 template<typename PFP>
-void drawerVertices(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions)
+void drawerVertices(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	dr.begin(GL_POINTS);
 	for (std::vector<Dart>::iterator it = vd.begin(); it !=vd.end(); ++it)
@@ -87,7 +87,7 @@ void drawerVertices(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>
 }
 
 template<typename PFP>
-void drawerEdges(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerEdges(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	dr.begin(GL_LINES);
 	for (std::vector<Dart>::iterator it = vd.begin(); it !=vd.end(); ++it)
@@ -96,7 +96,7 @@ void drawerEdges(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& v
 }
 
 template<typename PFP>
-void drawerFaces(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerFaces(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	dr.begin(GL_LINES);
 	for (std::vector<Dart>::iterator it = vd.begin(); it !=vd.end(); ++it)
@@ -104,7 +104,7 @@ void drawerFaces(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& v
 	dr.end();
 }
 template<typename PFP>
-void drawerVolumes(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerVolumes(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	dr.begin(GL_LINES);
 	for (std::vector<Dart>::iterator it = vd.begin(); it !=vd.end(); ++it)
@@ -113,7 +113,7 @@ void drawerVolumes(Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>&
 }
 
 template<typename PFP>
-void drawerVertex(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions)
+void drawerVertex(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	dr.begin(GL_POINTS);
 	dr.vertex(positions[d]);
@@ -121,7 +121,7 @@ void drawerVertex(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Attri
 }
 
 template<typename PFP>
-void drawerEdge(Utils::Drawer& dr, typename PFP::MAP& map,  Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerEdge(Utils::Drawer& dr, typename PFP::MAP& map,  Dart d, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	dr.begin(GL_LINES);
 	drawerAddEdge<PFP>(dr,map,d,positions,k);
@@ -129,7 +129,7 @@ void drawerEdge(Utils::Drawer& dr, typename PFP::MAP& map,  Dart d, const Attrib
 }
 
 template<typename PFP>
-void drawerFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	dr.begin(GL_LINES);
 	drawerAddFace<PFP>(dr,map,d,positions,k);
@@ -137,7 +137,7 @@ void drawerFace(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Attribu
 }
 
 template<typename PFP>
-void drawerVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions,float k)
+void drawerVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions,float k)
 {
 	dr.begin(GL_LINES);
 	drawerAddVolume<PFP>(dr,map,d,positions,k);
@@ -145,7 +145,7 @@ void drawerVolume(Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const Attri
 }
 
 template<typename PFP>
-void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float k)
+void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, std::vector<Dart>& vd, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
 	switch(cell)
 	{
@@ -167,7 +167,7 @@ void drawerCells(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, s
 }
 
 template<typename PFP>
-void drawerCell(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float k)
+void drawerCell(unsigned int cell, Utils::Drawer& dr, typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& positions, float k)
 {
 	switch(cell)
 	{

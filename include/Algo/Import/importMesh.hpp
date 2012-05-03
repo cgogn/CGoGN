@@ -39,7 +39,7 @@ namespace Import
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 {
-	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
@@ -133,7 +133,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 template <typename PFP>
 bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float dist)
 {
-	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	unsigned nbf = mts.getNbFaces();
 	int index = 0;
 	// buffer for tempo faces (used to remove degenerated edges)
@@ -142,7 +142,7 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 
 	DartMarkerNoUnmark m(map) ;
 
-	AttributeHandler<typename PFP::VEC3, VERTEX> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position");
+	VertexAttribute<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position");
 	std::vector<unsigned int > backEdgesBuffer(mts.getNbVertices(), EMBNULL);
 
 	// for each face of table -> create a prism
@@ -239,10 +239,7 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 {
-	typedef typename PFP::VEC3 VEC3 ;
-
-	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
-
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	return false;
 }
 

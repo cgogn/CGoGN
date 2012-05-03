@@ -32,7 +32,7 @@ namespace BooleanOperator
 {
 
 template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, Dart d, Dart e)
+void mergeVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e)
 {
 	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
 	Dart dd;
@@ -55,7 +55,7 @@ void mergeVertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VE
 }
 
 template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions)
+void mergeVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{

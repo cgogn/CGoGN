@@ -204,7 +204,7 @@ int main(int argc, char**argv)
 
 	PFP::MAP& m = tv.myMap;
 
-	AttributeHandler<VEC3, VERTEX> position = m.addAttribute<VEC3, VERTEX>("position");
+	VertexAttribute<VEC3> position = m.addAttribute<VEC3, VERTEX>("position");
 	AttributeHandler<Geom::Vec2f, VERTEX> texcoord = m.addAttribute<Geom::Vec2f, VERTEX>("texcoord");
 
 #define NB 96

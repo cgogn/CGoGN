@@ -35,7 +35,7 @@ namespace Remeshing
 {
 
 template <typename PFP>
-void pliantRemeshing(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VERTEX>& normal) ;
+void pliantRemeshing(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal) ;
 
 } // namespace Remeshing
 

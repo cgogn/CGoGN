@@ -179,7 +179,7 @@ protected:
 
 	bool m_bottom_closed;
 
-	AttributeHandler<VEC3, VERTEX>& m_positions;
+	VertexAttribute<VEC3>& m_positions;
 
 	VEC3 m_center;
 
@@ -202,7 +202,7 @@ public:
 	* @param map the map in which we want to work
 	* @param idPositions id of attribute position
 	*/
-	Polyhedron(MAP& map, AttributeHandler<VEC3, VERTEX>& position):
+	Polyhedron(MAP& map, VertexAttribute<VEC3>& position):
 		m_map(map),
 		m_kind(NONE),
 		m_nx(-1), m_ny(-1), m_nz(-1),

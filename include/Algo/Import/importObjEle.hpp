@@ -39,14 +39,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttributeHandler<VEC3, VERTEX> position = map.template addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	// open files
 	std::ifstream foff(filenameOFF.c_str(), std::ios::in);

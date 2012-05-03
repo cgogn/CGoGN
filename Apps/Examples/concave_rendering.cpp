@@ -132,7 +132,7 @@ typedef PFP::VEC3 VEC3 ;
 // declaration of the map
 MAP myMap;
 // and attribute of position
-AttributeHandler<VEC3, VERTEX> position;
+VertexAttribute<VEC3> position;
 
 unsigned int nb_ears;
 

@@ -37,7 +37,7 @@
 #include "Algo/Import/import.h"
 
 MAP myMap;
-AttributeHandler<VEC3, VERTEX> position ;
+VertexAttribute<VEC3> position ;
 AttributeHandler<VEC3, DART> middleDarts;
 
 

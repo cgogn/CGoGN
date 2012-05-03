@@ -35,7 +35,7 @@ void exportTrianglePlain(std::ofstream& out,typename PFP::VEC3& p1,typename PFP:
 }
 
 template <typename PFP>
-void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
@@ -75,7 +75,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, AttributeHandle
 }
 
 template <typename PFP>
-void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -173,7 +173,7 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, Attribut
 }
 
 template <typename PFP>
-void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
@@ -216,7 +216,7 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, AttributeHandler
 }
 
 template <typename PFP>
-bool exportScenePov(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
+bool exportScenePov(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
 {
 	std::ofstream out(filename.c_str(), std::ios::out);
 	if (!out.good())
@@ -258,7 +258,7 @@ bool exportScenePov(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3,
 }
 
 template <typename PFP>
-bool exportScenePovSmooth(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, VERTEX>& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
+bool exportScenePovSmooth(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
 {
 	std::ofstream out(filename.c_str(), std::ios::out);
 	if (!out.good()) {

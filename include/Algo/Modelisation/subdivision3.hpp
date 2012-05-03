@@ -274,12 +274,8 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	std::vector<Dart> l_vertices;
 
 	//pre-computation : compute the centroid of all volume
-	AutoAttributeHandler<EMB, VOLUME> attBary(map);
-	TraversorW<typename PFP::MAP> traW(map, selected);
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		attBary[d] = Algo::Geometry::volumeCentroidGen<PFP,EMBV,EMB>(map, d, attributs);
-	}
+	VolumeAutoAttribute<EMB> attBary(map);
+	Algo::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
 
 	//subdivision
 	//1. cut edges

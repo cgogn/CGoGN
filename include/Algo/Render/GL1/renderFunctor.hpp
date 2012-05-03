@@ -49,7 +49,7 @@ namespace GL1
 */
 template <typename PFP>
 FunctorGLFace<PFP>::FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX>& normals , const FunctorSelect& good):
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const FunctorSelect& good):
 	FunctorMap<MAP>(map),
 	m_smooth(smooth),
 	m_lighted(lighted),
@@ -338,7 +338,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 }
 
 template<typename PFP>
-FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const FunctorSelect& good, const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX>& normals, float scale):
+FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale):
 	FunctorMap<MAP>(map),
 	m_positions(posi),
 	m_normals(normals),
@@ -361,7 +361,7 @@ bool FunctorGLNormal<PFP>::operator() (Dart d)
 }
 
 template<typename PFP>
-FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX> frames[3], float scale):
+FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale):
 	FunctorMap<MAP>(map),
 	m_positions(posi),
 	m_frames(frames),
@@ -389,7 +389,7 @@ bool FunctorGLFrame<PFP>::operator() (Dart d)
 
 template <typename PFP>
 FunctorGLFaceColor<PFP>::FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const AttributeHandler<typename PFP::VEC3, VERTEX>& posi, const AttributeHandler<typename PFP::VEC3, VERTEX>& normals, const AttributeHandler<typename PFP::VEC3, VERTEX>& colors , const FunctorSelect& good):
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, const VertexAttribute<typename PFP::VEC3>& colors , const FunctorSelect& good):
 	FunctorMap<MAP>(map),
 	m_smooth(smooth),
 	m_lighted(lighted),

@@ -59,9 +59,9 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs);
  * @param position the vector of attribute
  */
 template <typename PFP>
-typename PFP::VEC3 volumeCentroid(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 volumeCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
-	return volumeCentroidGen<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, d, position);
+	return volumeCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position);
 }
 
 /**
@@ -85,9 +85,9 @@ EMB faceCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs);
  * @param position the vector of attribute
  */
 template <typename PFP>
-typename PFP::VEC3 faceCentroid(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 faceCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
-	return faceCentroidGen<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, d, position);
+	return faceCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position);
 }
 
 /**
@@ -110,19 +110,19 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
  * @param position the vector of attribute
  */
 template <typename PFP>
-typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
-	return vertexNeighborhoodCentroidGen<PFP, AttributeHandler<typename PFP::VEC3, VERTEX>, typename PFP::VEC3>(map, d, position);
+	return vertexNeighborhoodCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position);
 }
 
 template <typename PFP>
-void computeCentroidVolumes(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VOLUME>& vol_centroid, const FunctorSelect& select = allDarts) ;
+void computeCentroidVolumes(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeCentroidFaces(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, FACE>& face_centroid, const FunctorSelect& select = allDarts) ;
+void computeCentroidFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_centroid, const FunctorSelect& select = allDarts) ;
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid, const FunctorSelect& select = allDarts) ;
 
 } // namespace Geometry
 

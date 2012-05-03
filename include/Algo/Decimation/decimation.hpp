@@ -34,7 +34,7 @@ namespace Decimation
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	AttributeHandler<typename PFP::VEC3, VERTEX>& position, unsigned int nbWantedVertices, const FunctorSelect& selected
+	VertexAttribute<typename PFP::VEC3>& position, unsigned int nbWantedVertices, const FunctorSelect& selected
 )
 {
 	std::vector<ApproximatorGen<PFP>*> approximators ;

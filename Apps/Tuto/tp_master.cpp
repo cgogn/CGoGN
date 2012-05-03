@@ -64,7 +64,7 @@ typedef PFP::VEC3 Point3D;
 //		handler d'attribut de position par sommet
 AttributeHandler<Point3D, VERTEX> position;
 //		handler d'attribut de normale par sommet
-AttributeHandler<PFP::VEC3, VERTEX> normal;
+VertexAttribute<PFP::VEC3> normal;
 
 
 /// Fonctions a connaitre:

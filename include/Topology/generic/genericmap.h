@@ -66,7 +66,11 @@ template<unsigned int CELL> class CellMarkerBase ;
 class GenericMap : public MapBrowser
 {
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler ;
-	template<typename T, unsigned int ORBIT> friend class AutoAttributeHandler ;
+	template<typename T> friend class DartAutoAttribute ;
+	template<typename T> friend class VertexAutoAttribute ;
+	template<typename T> friend class EdgeAutoAttribute ;
+	template<typename T> friend class FaceAutoAttribute ;
+	template<typename T> friend class VolumeAutoAttribute ;
 	friend class DartMarkerGen ;
 	friend class CellMarkerGen ;
 	template<unsigned int CELL> friend class CellMarkerBase ;

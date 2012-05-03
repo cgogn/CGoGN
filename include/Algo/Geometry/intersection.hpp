@@ -41,7 +41,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
+bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -87,7 +87,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const AttributeH
 }
 
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter)
 {
 	typename PFP::VEC3 dir = PB - PA;
 	if (intersectionLineConvexFace(map, d, position, PA, dir, Inter))
@@ -102,7 +102,7 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const Attribu
 }
 
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -228,7 +228,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
 }
 
 template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, typename PFP::REAL& alpha)
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::REAL& alpha)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;

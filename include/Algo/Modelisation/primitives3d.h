@@ -62,7 +62,7 @@ protected:
 	*/
 	MAP& m_map;
 
-	AttributeHandler<VEC3, VERTEX>& m_positions;
+	VertexAttribute<VEC3>& m_positions;
 
 	/**
 	* Reference dart of primitive
@@ -110,7 +110,7 @@ public:
 	* Constructor
 	* @param map the map in which we want to work
 	*/
-	Primitive3D(MAP& map, AttributeHandler<VEC3, VERTEX>& position):
+	Primitive3D(MAP& map, VertexAttribute<VEC3>& position):
 		m_map(map),
 		m_positions(position),
 		m_kind(NONE),

@@ -35,16 +35,16 @@ namespace IHM
 {
 
 template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
+void subdivideEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
+void subdivideFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
+void coarsenEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
+void coarsenFace(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
 
 } //namespace IHM
 

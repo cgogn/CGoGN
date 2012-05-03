@@ -43,16 +43,16 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AttributeHandler<VEC3, VERTEX> position = map.template addAttribute<VEC3, VERTEX>("position") ;
+	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeHandler<REAL, VERTEX> scalaire = map.template addAttribute<REAL, VERTEX>("scalar");
+	VertexAttribute<REAL> scalaire = map.template addAttribute<REAL, VERTEX>("scalar");
 	attrNames.push_back(scalaire.name()) ;
 
 	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
-	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	// open file
 	std::ifstream fp(filename.c_str(), std::ios::in);

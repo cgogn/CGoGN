@@ -49,7 +49,7 @@ protected:
 	std::vector<typename PFP::VEC3>& m_Ipoints ;
 	const typename PFP::VEC3& m_A;
 	const typename PFP::VEC3& m_AB;
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 public:
 	/**
@@ -58,7 +58,7 @@ public:
 	* @param A first point of ray
 	* @param AB direction of ray
 	*/
-	FuncFaceInter(MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, std::vector<Dart>& f, std::vector<typename PFP::VEC3>& ip, const typename PFP::VEC3& A, const typename PFP::VEC3& AB):
+	FuncFaceInter(MAP& map, const VertexAttribute<typename PFP::VEC3>& position, std::vector<Dart>& f, std::vector<typename PFP::VEC3>& ip, const typename PFP::VEC3& A, const typename PFP::VEC3& AB):
 		FunctorMap<typename PFP::MAP>(map), m_faces(f), m_Ipoints(ip), m_A(A), m_AB(AB), m_positions(position)
 	{}
 
@@ -102,7 +102,7 @@ protected:
 	const typename PFP::VEC3& m_AB;
 	float m_AB2;
 	float m_distMax;
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 public:
 	/**
@@ -113,7 +113,7 @@ public:
 	* @param AB2 squared length of direction
 	* @param dm2 max distance from ray squared
 	*/
-	FuncEdgeInter(MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, std::vector<Dart>& e, const typename PFP::VEC3& A, const typename PFP::VEC3& AB, typename PFP::REAL AB2, typename PFP::REAL dm2):
+	FuncEdgeInter(MAP& map, const VertexAttribute<typename PFP::VEC3>& position, std::vector<Dart>& e, const typename PFP::VEC3& A, const typename PFP::VEC3& AB, typename PFP::REAL AB2, typename PFP::REAL dm2):
 		FunctorMap<typename PFP::MAP>(map), m_edges(e), m_A(A), m_AB(AB), m_AB2(AB2), m_distMax(dm2), m_positions(position)
 	{}
 
@@ -146,7 +146,7 @@ protected:
 	const typename PFP::VEC3& m_AB;
 	float m_AB2;
 	float m_distMax;
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 public:
 	/**
  	* @param map the map
@@ -156,7 +156,7 @@ public:
 	* @param AB2 squared length of direction
 	* @param dm2 max distance from ray squared
 	*/
-	FuncVertexInter(MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, std::vector<Dart>& v, const typename PFP::VEC3& A, const typename PFP::VEC3& AB, typename PFP::REAL AB2, typename PFP::REAL dm2):
+	FuncVertexInter(MAP& map, const VertexAttribute<typename PFP::VEC3>& position, std::vector<Dart>& v, const typename PFP::VEC3& A, const typename PFP::VEC3& AB, typename PFP::REAL AB2, typename PFP::REAL dm2):
 		FunctorMap<typename PFP::MAP>(map), m_vertices(v), m_A(A), m_AB(AB), m_AB2(AB2), m_distMax(dm2), m_positions(position)
 	{}
 
@@ -186,7 +186,7 @@ protected:
 	std::vector<Dart>& m_darts ;
 	const typename PFP::VEC3& m_A ;
 	const typename PFP::VEC3& m_AB ;
-	const AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 public:
 	/**
  	* @param map the map
@@ -194,7 +194,7 @@ public:
 	* @param A first point of ray
 	* @param AB direction of ray
 	*/
-	FuncDartMapD2Inter(MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, std::vector<Dart>& f, const typename PFP::VEC3& A, const typename PFP::VEC3& AB):
+	FuncDartMapD2Inter(MAP& map, const VertexAttribute<typename PFP::VEC3>& position, std::vector<Dart>& f, const typename PFP::VEC3& A, const typename PFP::VEC3& AB):
 		FunctorMap<typename PFP::MAP>(map), m_darts(f), m_A(A), m_AB(AB), m_positions(position)
 	{}
 
@@ -237,7 +237,7 @@ public:
 //protected:
 //	MAP& m_map;
 //	const typename PFP::VEC3& m_A;
-//	AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+//	VertexAttribute<typename PFP::VEC3>& m_positions;
 //public:
 //	DartDepthOrdering(MAP& map, unsigned int idPos, const typename PFP::VEC3& A):
 //			m_map(map), m_A(A), m_positions(idPos,map) {}
@@ -276,7 +276,7 @@ public:
 //	const typename PFP::VEC3& m_A ;
 //	const typename PFP::VEC3& m_AB ;
 //	float m_AB2 ;
-//	AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+//	VertexAttribute<typename PFP::VEC3>& m_positions;
 //
 //public:
 //	DartRayDistanceOrdering(MAP& map, unsigned int idPos, const typename PFP::VEC3& A, const typename PFP::VEC3& AB) :
@@ -314,7 +314,7 @@ public:
 //protected:
 //	MAP& m_map ;
 //	const typename PFP::VEC3& m_A ;
-//	AttributeHandler<typename PFP::VEC3, VERTEX>& m_positions;
+//	VertexAttribute<typename PFP::VEC3>& m_positions;
 //	std::vector<Dart>& m_faces;
 //
 //public:

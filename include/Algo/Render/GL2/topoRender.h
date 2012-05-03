@@ -232,13 +232,13 @@ public:
 	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
 	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 	template <typename PFP>
-	void updateDataMap(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 	template <typename PFP>
-	void updateDataGMap(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 	/**
 	 * render to svg struct

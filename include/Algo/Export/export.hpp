@@ -38,7 +38,7 @@ namespace Export
 {
 
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, bool binary, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -165,7 +165,7 @@ bool exportPLY(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3
 }
 
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<AttributeHandler<typename PFP::VEC3, VERTEX>*>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>*>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -241,7 +241,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<AttributeHandler<typ
 	out << "comment or contact : cgogn@unistra.fr" << std::endl ;
 	// Vertex elements
 	out << "element vertex " << vertices.size() << std::endl ;
-	for (typename std::vector<AttributeHandler<typename PFP::VEC3, VERTEX>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+	for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 	{
 		if ((*attrHandler)->isValid() && ((*attrHandler)->getOrbit() == VERTEX) )
 		{
@@ -281,7 +281,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<AttributeHandler<typ
 	{
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<AttributeHandler<typename PFP::VEC3, VERTEX>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 					out << (*(*attrHandler))[vertices[i]] << std::endl ;
 
@@ -298,7 +298,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<AttributeHandler<typ
 	{
 		// binary vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<AttributeHandler<typename PFP::VEC3, VERTEX>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<typename PFP::VEC3>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 				{
 					const typename PFP::VEC3& v = (*(*attrHandler))[vertices[i]] ;
@@ -320,7 +320,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<AttributeHandler<typ
 }
 
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -387,7 +387,7 @@ bool exportOFF(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3
 }
 
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -400,7 +400,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const AttributeHandler<typename
 		return false ;
 	}
 
-	AutoAttributeHandler<unsigned int, VERTEX> tableVertLab(map);
+	VertexAutoAttribute<unsigned int> tableVertLab(map);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -436,8 +436,8 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const AttributeHandler<typename
 		++nbf;
 	}
 
-	AttributeHandler<VEC3, VERTEX> frame[3] ;
-	AttributeHandler<VEC3, VERTEX> colorPTM[15] ;
+	VertexAttribute<VEC3> frame[3] ;
+	VertexAttribute<VEC3> colorPTM[15] ;
 
 	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
 	frame[1] = map.template getAttribute<VEC3>(VERTEX, "frame_B") ;
@@ -473,9 +473,9 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const AttributeHandler<typename
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
 		out << "property float C2_a" << coefI << std::endl ;
 
-	AttributeHandler<REAL, VERTEX> errL2 = map.template getAttribute<REAL>(VERTEX, "errL2") ;
-	AttributeHandler<REAL, VERTEX> errLmax = map.template getAttribute<REAL>(VERTEX, "errLmax") ;
-	AttributeHandler<REAL, VERTEX> stdDev = map.template getAttribute<REAL>(VERTEX, "stdDev") ;
+	VertexAttribute<REAL> errL2 = map.template getAttribute<REAL>(VERTEX, "errL2") ;
+	VertexAttribute<REAL> errLmax = map.template getAttribute<REAL>(VERTEX, "errLmax") ;
+	VertexAttribute<REAL> stdDev = map.template getAttribute<REAL>(VERTEX, "stdDev") ;
 	if (errL2.isValid())
 		out << "property float errL2" << std::endl ;
 	if (errLmax.isValid())
@@ -526,7 +526,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const AttributeHandler<typename
 }
 /*
 template <typename PFP>
-bool exportPlySLFgeneric(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -575,7 +575,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const AttributeHandler<typename
 		++nbf;
 	}
 
-	AttributeHandler<typename PFP::VEC3, VERTEX> frame[3] ;
+	VertexAttribute<typename PFP::VEC3> frame[3] ;
 	std::vector<TVEC3> coefs ;
 
 	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
@@ -657,7 +657,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const AttributeHandler<typename
 }
 
 template <typename PFP>
-bool exportPlySLFgenericBin(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -798,7 +798,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const AttributeHandler<typen
 */
 
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, VERTEX> frame[3], const AttributeHandler<typename PFP::VEC3, VERTEX> colorPTM[6], const FunctorSelect& good)
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -810,7 +810,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const AttributeH
 		return false ;
 	}
 
-	AutoAttributeHandler<unsigned int, VERTEX> tableVertLab(map);
+	VertexAutoAttribute<unsigned int> tableVertLab(map);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 

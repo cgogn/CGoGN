@@ -42,7 +42,7 @@ namespace GL1
 {
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, VERTEX>& normal, const FunctorSelect& good)
+void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& good)
 {
 	// RenderType => lighted & smooth ??
 	bool lighted = (rt != NO_LIGHT) && (rt!= LINE);
@@ -107,7 +107,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, VERTEX>& normal, const AttributeHandler<typename PFP::VEC3, VERTEX>& color, const FunctorSelect& good)
+void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good)
 {
 	// RenderType => lighted & smooth ??
 	bool lighted = (rt != NO_LIGHT) && (rt!= LINE);
@@ -172,7 +172,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 template <typename PFP>
-void renderNormalVertices(typename PFP::MAP& the_map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, VERTEX>& normal, float scale, const FunctorSelect& good)
+void renderNormalVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float scale, const FunctorSelect& good)
 {
 	FunctorGLNormal<PFP> fgl_norm(the_map, good, position, normal, scale);
 
@@ -182,7 +182,7 @@ void renderNormalVertices(typename PFP::MAP& the_map, const AttributeHandler<typ
 }
 
 template <typename PFP>
-void renderFrameVertices(typename PFP::MAP& the_map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const AttributeHandler<typename PFP::VEC3, VERTEX> frame[3], float scale, const FunctorSelect& good)
+void renderFrameVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], float scale, const FunctorSelect& good)
 {
 	FunctorGLFrame<PFP> fgl_frame(the_map, good, position, frame, scale) ;
 
