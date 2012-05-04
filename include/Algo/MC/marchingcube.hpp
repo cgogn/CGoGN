@@ -104,13 +104,13 @@ Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsi
 	L_DART d = m_map->newFace(3,false);
 		
 	FunctorSetEmb<GenericMap, VERTEX> fsetemb(*m_map, e1);
-	m_map->template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 	d = m_map->phi1(d);
 	fsetemb.changeEmb(e2);
-	m_map->template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 	d = m_map->phi1(d);
 	fsetemb.changeEmb(e3);
-	m_map->template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 	d = m_map->phi1(d);
 
 	return d;

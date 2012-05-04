@@ -42,7 +42,6 @@ MarkerForTraversor<MAP, ORBIT>::MarkerForTraversor(MAP& map, bool forceDartMarke
 		m_dmark = new DartMarkerStore(map, thread) ;
 }
 
-
 template <typename MAP, unsigned int ORBIT>
 MarkerForTraversor<MAP, ORBIT>::~MarkerForTraversor()
 {
@@ -200,8 +199,6 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 	return m_current ;
 }
 
-
-
 //*********************************************
 // Traversor cellX to cellX adjacent by cell Y
 //*********************************************
@@ -214,10 +211,10 @@ Traversor3XXaY<MAP, ORBX, ORBY>::Traversor3XXaY(MAP& map, Dart dart, bool forceD
 	mk.mark(dart);
 
 	Traversor3XY<MAP, ORBX, ORBY> traAdj(map, dart, forceDartMarker, thread);
-	for (Dart d = traAdj.begin(); d!=traAdj.end(); d=traAdj.next())
+	for (Dart d = traAdj.begin(); d != traAdj.end(); d = traAdj.next())
 	{
 		Traversor3XY<MAP, ORBY, ORBX> traInci(map, d, mk, forceDartMarker, thread);
-		for (Dart e = traInci.begin(); e!=traInci.end(); e=traInci.next())
+		for (Dart e = traInci.begin(); e != traInci.end(); e = traInci.next())
 			m_vecDarts.push_back(e);
 	}
 	m_vecDarts.push_back(NIL);
@@ -243,7 +240,6 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
 		m_iter++;
 	return *m_iter ;
 }
-
 
 
 //template<typename MAP>
@@ -354,8 +350,5 @@ Dart Traversor3XXaY<MAP, ORBX, ORBY>::next()
 //	}
 //	return NULL;
 //}
-
-
-
 
 } // namespace CGoGN

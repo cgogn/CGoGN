@@ -230,12 +230,10 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 			{
 				center += attributs[it];
 				++count ;
-//				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
-				me.unmarkOrbit<EDGE + PFP::MAP::IN_PARENT>(it);
+				me.unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
 
 				it = map.phi1(it) ;
-//				me.unmarkOrbitInParent<typename PFP::MAP>(EDGE, it);
-				me.unmarkOrbit<EDGE + PFP::MAP::IN_PARENT>(it);
+				me.unmarkOrbit<PFP::MAP::EDGE_OF_PARENT>(it);
 				it = map.phi1(it) ;
 			} while(it != d) ;
 			center /= double(count);

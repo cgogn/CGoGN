@@ -253,7 +253,7 @@ public:
 	}
 
 protected:
-	DartMarkerStore(const DartMarkerStore& dm) : DartMarkerGen(dm),m_markedDarts(dm.m_markedDarts)
+	DartMarkerStore(const DartMarkerStore& dm) : DartMarkerGen(dm), m_markedDarts(dm.m_markedDarts)
 	{}
 
 public:
@@ -341,7 +341,7 @@ public:
 	{
 		return m_marker.isMarked(d);
 	}
-	FunctorSelect* copy() const { return new SelectorMarked(m_marker);}
+	FunctorSelect* copy() const { return new SelectorMarked(m_marker); }
 };
 
 class SelectorUnmarked : public FunctorSelect
@@ -354,7 +354,7 @@ public:
 	{
 		return !m_marker.isMarked(d);
 	}
-	FunctorSelect* copy() const { return new SelectorUnmarked(m_marker);}
+	FunctorSelect* copy() const { return new SelectorUnmarked(m_marker); }
 };
 
 // Functor version (needed for use with foreach_xxx)

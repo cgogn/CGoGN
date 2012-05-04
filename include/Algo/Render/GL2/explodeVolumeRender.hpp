@@ -93,7 +93,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -148,7 +148,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP, EDGE + PFP::MAP::IN_PARENT> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map, good);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 		buffer.push_back(centerVolumes[d]);
@@ -192,7 +192,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	if (withColors)
 		bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(map, good);
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
@@ -247,7 +247,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	buffer.clear();
 
-	TraversorCell<typename PFP::MAP, EDGE + PFP::MAP::IN_PARENT> traEdge(map, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::EDGE_OF_PARENT> traEdge(map, good);
 	for (Dart d = traEdge.begin(); d != traEdge.end(); d = traEdge.next())
 	{
 			buffer.push_back(centerVolumes[d]);

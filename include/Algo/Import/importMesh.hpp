@@ -80,7 +80,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
 //				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
-				map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
@@ -186,14 +186,14 @@ bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float d
 
 				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
 				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
-				map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 				//Embed the other base face
 				Dart d2 = map.phi1(map.phi1(map.phi2(d)));
 				unsigned int em2 = backEdgesBuffer[em];
 				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb2(map, em2);
 				//foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d2, fsetemb2) ;
-				map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d2, fsetemb2);
+				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d2, fsetemb2);
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop
 				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction

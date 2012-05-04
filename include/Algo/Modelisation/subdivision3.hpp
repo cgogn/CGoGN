@@ -287,7 +287,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if(selected(d) && !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-			mv.markOrbit<VERTEX + PFP::MAP::IN_PARENT>(d);
+			mv.markOrbit<PFP::MAP::VERTEX_OF_PARENT>(d);
 		}
 
 		Dart f = map.phi1(d);

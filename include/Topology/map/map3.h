@@ -57,7 +57,7 @@ protected:
 public:
 	typedef Map2 ParentMap;
 
-	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+7; }
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o){ return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
 
 	static const unsigned int IN_PARENT = 7 ;

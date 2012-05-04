@@ -109,7 +109,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<
 	unsigned int posDBI=0;
 
 	// traverse each face of each volume
-	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(mapx, allDarts);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(mapx, allDarts);
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		vecDartFaces.push_back(d);
@@ -359,7 +359,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 	unsigned int posDBI=0;
 
 	//traverse each face of each volume
-	TraversorCell<typename PFP::MAP, FACE + PFP::MAP::IN_PARENT> traFace(mapx, good);
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(mapx, good);
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		vecDartFaces.push_back(d);

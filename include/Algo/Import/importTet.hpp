@@ -129,7 +129,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
 			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
-			map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
@@ -147,7 +147,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
-		map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+		map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
@@ -187,7 +187,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 			}
 			else
 			{
-				m.unmarkOrbit<FACE + PFP::MAP::IN_PARENT>(d);
+				m.unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
 				++nbBoundaryFaces;
 			}
 		}

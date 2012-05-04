@@ -159,7 +159,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
 			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
-			map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
@@ -178,7 +178,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		d = map.phi_1(map.phi2(d));
 
 		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
-		map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
+		map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
@@ -220,7 +220,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 			}
 			else
 			{
-				m.template unmarkOrbit<FACE + PFP::MAP::IN_PARENT>(d);
+				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
 				++nbBoundaryFaces;
 			}
 		}

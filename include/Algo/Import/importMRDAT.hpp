@@ -206,7 +206,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			unsigned int emb = qt.verticesID[idx] ;
 
 			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, emb) ;
-			map.foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb) ;
+			map.foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb) ;
 
 			m.mark(d) ;								// mark on the fly to unmark on second loop
 			vecDartsPerVertex[emb].push_back(d) ;	// store incident darts for fast adjacency reconstruction

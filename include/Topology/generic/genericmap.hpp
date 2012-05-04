@@ -290,7 +290,7 @@ void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
 	if (emb != EMBNULL)
 		m_attribs[ORBIT].refLine(emb);	// ref the new emb
 
-	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ;	// finally affect the embedding to the dart
+	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // finally affect the embedding to the dart
 }
 
 template <unsigned int ORBIT>
@@ -519,13 +519,6 @@ bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thre
 {
 	switch(ORBIT)
 	{
-//		case DART: return f(d);
-//		case VERTEX: return foreach_dart_of_vertex(d, f, thread);
-//		case EDGE: return foreach_dart_of_edge(d, f, thread);
-//		case ORIENTED_FACE: return foreach_dart_of_oriented_face(d, f, thread);
-//		case FACE: return foreach_dart_of_face(d, f, thread);
-//		case VOLUME: return foreach_dart_of_volume(d, f, thread);
-
 		case DART:		return f(d);
 		case VERTEX: 	return foreach_dart_of_vertex(d, f, thread);
 		case EDGE: 		return foreach_dart_of_edge(d, f, thread);
@@ -536,7 +529,7 @@ bool GenericMap::foreach_dart_of_orbit(Dart d, FunctorType& f, unsigned int thre
 		case VERTEX2: 	return foreach_dart_of_vertex2(d, f, thread);
 		case EDGE2:		return foreach_dart_of_edge2(d, f, thread);
 		case FACE2:		return foreach_dart_of_face2(d, f, thread);
-		default: assert(!"Cells of this dimension are not handled");break;
+		default: 		assert(!"Cells of this dimension are not handled"); break;
 	}
 	return false;
 }
