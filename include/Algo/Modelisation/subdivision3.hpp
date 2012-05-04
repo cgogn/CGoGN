@@ -336,9 +336,6 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
         }
     }
 
-    map.check();
-    std::cout << "tip " << std::endl;
-
     //Step 2: Split faces with cut edges
     TraversorF<typename PFP::MAP> tf(map);
     for(Dart d = tf.begin(); d != tf.end(); d=tf.next())
@@ -373,9 +370,6 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             } while(!split && dS!=d);
         }
     }
-
-    map.check();
-    std::cout << "top " << std::endl;
 
     //Step 3 : Find path and split volumes
     TraversorW<typename PFP::MAP> tw(map);
@@ -429,13 +423,8 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             assert(vPath.size()>2);
             map.splitVolume(vPath);
             vRes.push_back(map.phi2(*vPath.begin()));
-
-            map.check();
-            std::cout << "tup " << std::endl;
         }
     }
-
-
 
     return vRes;
 }
