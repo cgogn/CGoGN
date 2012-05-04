@@ -85,7 +85,7 @@ protected:
 	MAP myMap;
 
 	VertexAttribute<VEC3> position;
-	AttributeHandler<VEC3, DART> colorDarts;
+	DartAttribute<VEC3> colorDarts;
 
 	SelectorDartNoBoundary<PFP::MAP> nb;
 

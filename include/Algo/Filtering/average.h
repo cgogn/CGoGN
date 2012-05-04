@@ -40,8 +40,8 @@ enum neighborhood { INSIDE = 1, BORDER = 2 };
 template <typename PFP, typename T>
 void filterAverageAttribute_OneRing(
 	typename PFP::MAP& map,
-	const AttributeHandler<T, VERTEX>& attIn,
-	AttributeHandler<T, VERTEX>& attOut,
+	const VertexAttribute<T>& attIn,
+	VertexAttribute<T>& attOut,
 	int neigh,
 	const FunctorSelect& select = allDarts)
 {
@@ -86,8 +86,8 @@ void filterAverageAttribute_OneRing(
 template <typename PFP, typename T>
 void filterAverageVertexAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T, VERTEX>& attIn,
-	AttributeHandler<T, VERTEX>& attOut,
+	const VertexAttribute<T>& attIn,
+	VertexAttribute<T>& attOut,
 	int neigh,
 	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
@@ -128,8 +128,8 @@ void filterAverageVertexAttribute_WithinSphere(
 template <typename PFP, typename T>
 void filterAverageEdgeAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T, EDGE>& attIn,
-	AttributeHandler<T, EDGE>& attOut,
+	const EdgeAttribute<T>& attIn,
+	EdgeAttribute<T>& attOut,
 	int neigh,
 	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
@@ -156,8 +156,8 @@ void filterAverageEdgeAttribute_WithinSphere(
 template <typename PFP, typename T>
 void filterAverageFaceAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T, FACE>& attIn,
-	AttributeHandler<T, FACE>& attOut,
+	const FaceAttribute<T>& attIn,
+	FaceAttribute<T>& attOut,
 	int neigh,
 	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,

@@ -106,7 +106,7 @@ protected:
 	/**
 	 * attribut d'index dans le VBO
 	 */
-	AttributeHandler<unsigned int, DART> m_attIndex;
+	DartAttribute<unsigned int> m_attIndex;
 
 	Utils::ShaderSimpleColor* m_shader1;
 	Utils::ShaderColorPerVertex* m_shader2;

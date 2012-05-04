@@ -523,7 +523,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 }
 
 template<typename PFP>
-void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, DART>& posExpl, const FunctorSelect& good)
+void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl, const FunctorSelect& good)
 {
 	m_vbo0->bind();
 	typename PFP::VEC3* positionsPtr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
@@ -615,13 +615,13 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, AttributeHa
 //	}
 //
 //	// debut phi1
-//	AutoAttributeHandler<VEC3> fv1(map, DART);
+//	DartAutoAttribute<VEC3> fv1(map);
 //	// fin phi1
-//	AutoAttributeHandler<VEC3> fv11(map, DART);
+//	DartAutoAttribute<VEC3> fv11(map);
 //
 //	// phi2
-//	AutoAttributeHandler<VEC3> fv2(map, DART);
-//	AutoAttributeHandler<VEC3> fv2x(map, DART);
+//	DartAutoAttribute<VEC3> fv2(map);
+//	DartAutoAttribute<VEC3> fv2x(map);
 //
 //	m_vbo4->bind();
 //	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);

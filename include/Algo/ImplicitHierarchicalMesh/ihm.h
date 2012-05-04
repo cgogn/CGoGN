@@ -47,8 +47,8 @@ private:
 	unsigned int m_maxLevel ;
 	unsigned int m_idCount ;
 
-	AttributeHandler<unsigned int, DART> m_dartLevel ;
-	AttributeHandler<unsigned int, DART> m_edgeId ;
+	DartAttribute<unsigned int> m_dartLevel ;
+	DartAttribute<unsigned int> m_edgeId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 

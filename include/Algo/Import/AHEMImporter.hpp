@@ -216,30 +216,24 @@ void AHEMImporter<PFP>::LoadMesh()
 		}
 }
 
-
 template<typename PFP>
 void AHEMImporter<PFP>::LoadTopology()
 {
     // Allocate vertices
 
-	AttributeContainer& vxContainer = map->getAttributeContainer(VERTEX);
-
+	AttributeContainer& vxContainer = map->template getAttributeContainer<VERTEX>();
 
 	verticesId = new unsigned int[hdr.meshHdr.vxCount];
 
 	for(unsigned int i = 0 ; i < hdr.meshHdr.vxCount ; i++)
 		verticesId[i] = vxContainer.insertLine();
 
-
-
 	// Ensure vertices are created by querying the position attribute
 
-	AttributeHandler<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+	VertexAttribute<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
 
 	if (!position.isValid())
-		position = map->template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
-
+		position = map->template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
 
 	// Read faces stream and create faces [only intra-face links]
 	
@@ -279,7 +273,6 @@ void AHEMImporter<PFP>::LoadTopology()
 				heId++;
 			}
 
-
 			// last HE
 
 			addedHE[heId].d = d;
@@ -292,12 +285,10 @@ void AHEMImporter<PFP>::LoadTopology()
 
 		batch = (char*)ix;
 	}
-	
 
 	// Sort the HE for fast retrieval
 
 	std::sort(addedHE, addedHE + hdr.meshHdr.heCount);
-
 
 	// Sew faces [inter-face links]
 
@@ -310,16 +301,13 @@ void AHEMImporter<PFP>::LoadTopology()
 	}
 }
 
-
-
 template <typename PFP>
 void AHEMImporter<PFP>::LoadPosition(AHEMAttributeDescriptor* posDescr)
 {
-	AttributeHandler<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+	VertexAttribute<typename PFP::VEC3> position =  map->template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
 
 	if (!position.isValid())
-		position = map->template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
+		position = map->template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
 
 	f.seekg(posDescr->fileStartOffset, std::ios_base::beg);
 	f.read(buffer, posDescr->attributeChunkSize);
@@ -333,8 +321,6 @@ void AHEMImporter<PFP>::LoadPosition(AHEMAttributeDescriptor* posDescr)
 	}
 }
 
-
-
 template<typename PFP>
 bool AHEMImporter<PFP>::LoadAttribute(unsigned int attrIx, const char* attrName, const AttributeImporter<typename PFP::MAP>* imp)
 {
@@ -343,12 +329,10 @@ bool AHEMImporter<PFP>::LoadAttribute(unsigned int attrIx, const char* attrName,
 
 	AHEMAttributeDescriptor* ad = attrDesc + attrIx;
 
-
 	// Fill buffer from file data
 
 	f.seekg(ad->fileStartOffset, std::ios_base::beg);
 	f.read(buffer, ad->attributeChunkSize);
-
 
 	// Import attribute
 
@@ -356,8 +340,6 @@ bool AHEMImporter<PFP>::LoadAttribute(unsigned int attrIx, const char* attrName,
 
 	return true;
 }
-
-
 
 template<typename PFP>
 bool AHEMImporter<PFP>::LoadAttribute(const GUID& semantic, const char* attrName)
@@ -381,12 +363,10 @@ bool AHEMImporter<PFP>::LoadAttribute(const GUID& semantic, const char* attrName
 
 	AttributeImporter<typename PFP::MAP>* imp = impList[0];
 
-
 	// Fill buffer from file data
 
 	f.seekg(ad->fileStartOffset, std::ios_base::beg);
 	f.read(buffer, ad->attributeChunkSize);
-
 
 	// Import attribute
 
@@ -394,7 +374,6 @@ bool AHEMImporter<PFP>::LoadAttribute(const GUID& semantic, const char* attrName
 
 	return true;
 }
-
 
 template<typename PFP>
 void AHEMImporter<PFP>::LoadAllAttributes(bool* status)
@@ -411,13 +390,11 @@ void AHEMImporter<PFP>::LoadAllAttributes(bool* status)
 	}
 }
 
-
 template<typename PFP>
 unsigned int AHEMImporter<PFP>::GetAttributesNum()
 {
 	return hdr.attributesChunkNumber;
 }
-
 
 template<typename PFP>
 void AHEMImporter<PFP>::GetAttribute(AHEMAttributeDescriptor** ad, char** attrName, unsigned int ix)
@@ -434,7 +411,6 @@ void AHEMImporter<PFP>::GetAttribute(AHEMAttributeDescriptor** ad, char** attrNa
 	}
 }
 
-
 template<typename PFP>
 unsigned int AHEMImporter<PFP>::FindAttribute(const GUID& semantic)
 {
@@ -444,8 +420,6 @@ unsigned int AHEMImporter<PFP>::FindAttribute(const GUID& semantic)
 
 	return ATTRIBUTE_NOTFOUND;
 }
-
-
 
 template<typename PFP>
 std::vector<AttributeImporter<typename PFP::MAP>*> AHEMImporter<PFP>::FindImporters(const GUID& attrSemanticId)
@@ -457,11 +431,8 @@ std::vector<AttributeImporter<typename PFP::MAP>*> AHEMImporter<PFP>::FindImport
 	if(ix == ATTRIBUTE_NOTFOUND)
 		return ret;
 
-
 	return FindImporters(attrDesc + ix);
 }
-
-
 
 template<typename PFP>
 std::vector<AttributeImporter<typename PFP::MAP>*> AHEMImporter<PFP>::FindImporters(const AHEMAttributeDescriptor* ad)
@@ -475,12 +446,10 @@ std::vector<AttributeImporter<typename PFP::MAP>*> AHEMImporter<PFP>::FindImport
 	return ret;
 }
 
-
 } // namespace Import
 
 } // namespace Algo
 
 } // namespace CGoGN
-
 
 #include "Algo/Import/AHEMImporterDefAttr.hpp"

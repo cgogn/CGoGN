@@ -48,9 +48,9 @@ public:
 	unsigned int m_edgeIdCount ;
 	unsigned int m_faceIdCount;
 
-	AttributeHandler<unsigned int, DART> m_dartLevel ;
-	AttributeHandler<unsigned int, DART> m_edgeId ;
-	AttributeHandler<unsigned int, DART> m_faceId ;
+	DartAttribute<unsigned int> m_dartLevel ;
+	DartAttribute<unsigned int> m_edgeId ;
+	DartAttribute<unsigned int> m_faceId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 

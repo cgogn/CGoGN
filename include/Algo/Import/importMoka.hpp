@@ -70,10 +70,10 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 	// ignore 2nd line
 	std::getline (fp, ligne);
 
-	AttributeHandler<Dart, DART> att_beta0 = gmap.template getAttribute<Dart, DART>("beta0");
-	AttributeHandler<Dart, DART> att_beta1 = gmap.template getAttribute<Dart, DART>("beta1");
-	AttributeHandler<Dart, DART> att_beta2 = gmap.template getAttribute<Dart, DART>("beta2");
-	AttributeHandler<Dart, DART> att_beta3 = gmap.template getAttribute<Dart, DART>("beta3");
+	DartAttribute<Dart> att_beta0 = gmap.template getAttribute<Dart, DART>("beta0");
+	DartAttribute<Dart> att_beta1 = gmap.template getAttribute<Dart, DART>("beta1");
+	DartAttribute<Dart> att_beta2 = gmap.template getAttribute<Dart, DART>("beta2");
+	DartAttribute<Dart> att_beta3 = gmap.template getAttribute<Dart, DART>("beta3");
 
 	std::map<Dart, unsigned int> map_dart_emb;
 

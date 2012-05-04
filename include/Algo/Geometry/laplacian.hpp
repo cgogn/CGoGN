@@ -39,7 +39,7 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<ATTR_TYPE, VERTEX>& attr)
+	const VertexAttribute<ATTR_TYPE>& attr)
 {
 	ATTR_TYPE l(0) ;
 	ATTR_TYPE value = attr[d] ;
@@ -62,7 +62,7 @@ ATTR_TYPE computeLaplacianCotanVertex(
 	Dart d,
 	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
 	const VertexAttribute<typename PFP::REAL>& vertexArea,
-	const AttributeHandler<ATTR_TYPE, VERTEX>& attr)
+	const VertexAttribute<ATTR_TYPE>& attr)
 {
 	ATTR_TYPE l(0) ;
 	typename PFP::REAL vArea = vertexArea[d] ;
@@ -84,8 +84,8 @@ ATTR_TYPE computeLaplacianCotanVertex(
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
-	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
-	AttributeHandler<ATTR_TYPE, VERTEX>& laplacian,
+	const VertexAttribute<ATTR_TYPE>& attr,
+	VertexAttribute<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
@@ -98,8 +98,8 @@ void computeLaplacianCotanVertices(
 	typename PFP::MAP& map,
 	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
 	const VertexAttribute<typename PFP::REAL>& vertexArea,
-	const AttributeHandler<ATTR_TYPE, VERTEX>& attr,
-	AttributeHandler<ATTR_TYPE, VERTEX>& laplacian,
+	const VertexAttribute<ATTR_TYPE>& attr,
+	VertexAttribute<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;

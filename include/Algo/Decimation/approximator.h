@@ -87,13 +87,13 @@ public:
 protected:
 	Predictor<PFP, T>* m_predictor ;
 
-	AttributeHandler<T, VERTEX>& m_attrV ;	// vertex attribute to be approximated
-	AttributeHandler<T, EDGE> m_approx ;	// attribute to store approximation result
-	AttributeHandler<T, EDGE> m_detail ;	// attribute to store detail information for reconstruction
+	VertexAttribute<T>& m_attrV ;	// vertex attribute to be approximated
+	EdgeAttribute<T> m_approx ;	// attribute to store approximation result
+	EdgeAttribute<T> m_detail ;	// attribute to store detail information for reconstruction
 	T m_app ;
 
 public:
-	Approximator(MAP& m, AttributeHandler<T, VERTEX>& a, Predictor<PFP, T>* predictor) :
+	Approximator(MAP& m, VertexAttribute<T>& a, Predictor<PFP, T>* predictor) :
 		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(a)
 	{
 		std::stringstream aname ;

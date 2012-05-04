@@ -122,13 +122,12 @@ protected:
 	/**
 	 * attribute index to get easy correspondence dart/color
 	 */
-	AttributeHandler<unsigned int, DART> m_attIndex;
+	DartAttribute<unsigned int> m_attIndex;
 
 	/**
 	 * save colors
 	 */
 	void pushColors();
-
 
 	/**
 	 * restore colors
@@ -299,7 +298,7 @@ public:
 	 * @param good the selector
 	 */
 	template<typename PFP>
-	void computeDartMiddlePositions(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, DART>& posExpl, const FunctorSelect& good = allDarts);
+	void computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl, const FunctorSelect& good = allDarts);
 
 	/**
 	 * render to svg struct

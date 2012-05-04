@@ -66,7 +66,7 @@ class FunctorAverageOnSphereBorder : public FunctorMap<typename PFP::MAP>
 	typedef typename PFP::VEC3 VEC3;
 
 protected:
-	const AttributeHandler<T, VERTEX>& attr ;
+	const VertexAttribute<T>& attr ;
 	const VertexAttribute<VEC3>& position ;
 	VEC3 center;
 	typename PFP::REAL radius;

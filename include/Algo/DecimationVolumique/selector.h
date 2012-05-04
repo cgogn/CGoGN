@@ -259,7 +259,7 @@ private:
 
 	typedef NoMathIOAttribute<LengthEdgeInfo> EdgeInfo ;
 
-	AttributeHandler<EdgeInfo> edgeInfo ;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;

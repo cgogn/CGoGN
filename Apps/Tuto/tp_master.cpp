@@ -62,9 +62,9 @@ typedef PFP::VEC3 Point3D;
 
 // Variables pour la gestion des plongements
 //		handler d'attribut de position par sommet
-AttributeHandler<Point3D, VERTEX> position;
+VertexAttribute<Point3D> position;
 //		handler d'attribut de normale par sommet
-VertexAttribute<PFP::VEC3> normal;
+VertexAttribute<Point3D> normal;
 
 
 /// Fonctions a connaitre:

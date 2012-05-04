@@ -30,13 +30,13 @@ public:
 
 protected:
 	MAP& m_map ;
-	typename PFP::TVEC3& m_position;
+	VertexAttribute<VEC3>& m_position;
 	CGoGN::Algo::DecimationVolumique::Selector<PFP>* m_selector;
 	//
 	VEC3 m_approx;
 
 public:
-	Approximator(MAP& m, typename PFP::TVEC3& pos):
+	Approximator(MAP& m, VertexAttribute<VEC3>& pos):
 		m_map(m), m_position(pos)
 	{}
 
@@ -48,7 +48,6 @@ public:
 	virtual void approximate(CGoGN::Algo::DecimationVolumique::Operator<PFP> *op) = 0;
 };
 
-
 template <typename PFP>
 class Approximator_Centroid : public Approximator<PFP>
 {
@@ -57,8 +56,8 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
 
-	Approximator_Centroid(MAP& m, AttributeHandler<VEC3>& pos):
-		Approximator<PFP>(m,pos)
+	Approximator_Centroid(MAP& m, VertexAttribute<VEC3>& pos):
+		Approximator<PFP>(m, pos)
 	{}
 
 	ApproximatorType getType() { return A_Centroid; }
@@ -67,9 +66,11 @@ public:
 
 } ;
 
-} //end namespace DecimationVolumique
-} //end namespace Algo
-} //end namespace CGoGN
+} // namespace DecimationVolumique
+
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/DecimationVolumique/approximator.hpp"
 

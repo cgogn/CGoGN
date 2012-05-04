@@ -1109,7 +1109,7 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHandler<unsigned char, VERTEX>& boundVertices, unsigned int frameWidth)
+void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribute<unsigned char>& boundVertices, unsigned int frameWidth)
 {
 	float xmin = frameWidth;
 	float xmax = m_Image->getWidthX() - frameWidth -1;

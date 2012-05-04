@@ -344,8 +344,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	}
 
 	CellMarker<EDGE> brokenMark(map);
-	AttributeHandler<float, EDGE> edgeWidth = map.template addAttribute<float, EDGE>("width");
-	AttributeHandler<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE> edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
+	EdgeAttribute<float> edgeWidth = map.template addAttribute<float, EDGE>("width");
+	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create broken lines

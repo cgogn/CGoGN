@@ -111,7 +111,7 @@ private:
 	} LengthEdgeInfo ;
 	typedef NoMathIOAttribute<LengthEdgeInfo> EdgeInfo ;
 
-	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -154,8 +154,8 @@ private:
 	} QEMedgeInfo ;
 	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo ;
 
-	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
-	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	VertexAttribute<Quadric<REAL> > quadric ;
 	Quadric<REAL> tmpQ ;
 
 	std::multimap<float,Dart> edges ;
@@ -203,8 +203,8 @@ private:
 	} QEMedgeInfo ;
 	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo ;
 
-	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
-	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	VertexAttribute<Quadric<REAL> > quadric ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -256,7 +256,7 @@ private:
 	REAL radius ;
 
 	VertexAttribute<VEC3> normal ;
-	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
 	EdgeAttribute<REAL> edgeangle ;
 	VertexAttribute<REAL> kmax ;
 	VertexAttribute<REAL> kmin ;
@@ -347,7 +347,7 @@ private:
 	} MinDetailEdgeInfo ;
 	typedef NoMathIOAttribute<MinDetailEdgeInfo> EdgeInfo ;
 
-	AttributeHandler<EdgeInfo, EDGE> edgeInfo ;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;

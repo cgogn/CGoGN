@@ -520,28 +520,28 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 template <typename PFP>
 void reverseOrientation(typename PFP::MAP& map)
 {
-	AttributeHandler<unsigned int, DART> emb0(&map, map.template getEmbeddingAttributeVector<VERTEX>()) ;
+	DartAttribute<unsigned int> emb0(&map, map.template getEmbeddingAttributeVector<VERTEX>()) ;
 	if(emb0.isValid())
 	{
-		AttributeHandler<unsigned int, DART> new_emb0 = map.template addAttribute<unsigned int, DART>("new_EMB_0") ;
+		DartAttribute<unsigned int> new_emb0 = map.template addAttribute<unsigned int, DART>("new_EMB_0") ;
 		for(Dart d = map.begin(); d != map.end(); map.next(d))
 			new_emb0[d] = emb0[map.phi1(d)] ;
 		map.template swapAttributes<unsigned int>(emb0, new_emb0) ;
-		map.template removeAttribute<unsigned int>(new_emb0) ;
+		map.removeAttribute(new_emb0) ;
 	}
 
-	AttributeHandler<Dart, DART> phi1 = map.template getAttribute<Dart, DART>("phi1") ;
-	AttributeHandler<Dart, DART> phi_1 = map.template getAttribute<Dart, DART>("phi_1") ;
+	DartAttribute<Dart> phi1 = map.template getAttribute<Dart, DART>("phi1") ;
+	DartAttribute<Dart> phi_1 = map.template getAttribute<Dart, DART>("phi_1") ;
 	map.template swapAttributes<Dart>(phi1, phi_1) ;
 }
 
 //template <typename PFP>
 //void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 //{
-//	AttributeHandler<Dart> phi1 = map.template getAttribute<Dart>(DART, "phi1") ;
-//	AttributeHandler<Dart> phi_1 = map.template getAttribute<Dart>(DART, "phi_1") ;
-//	AttributeHandler<Dart> new_phi1 = map.template addAttribute<Dart>(DART, "new_phi1") ;
-//	AttributeHandler<Dart> new_phi_1 = map.template addAttribute<Dart>(DART, "new_phi_1") ;
+//	DartAttribute<Dart> phi1 = map.template getAttribute<Dart, DART>("phi1") ;
+//	DartAttribute<Dart> phi_1 = map.template getAttribute<Dart, DART>("phi_1") ;
+//	DartAttribute<Dart> new_phi1 = map.template addAttribute<Dart, DART>("new_phi1") ;
+//	DartAttribute<Dart> new_phi_1 = map.template addAttribute<Dart, DART>("new_phi_1") ;
 //
 //	for(Dart d = map.begin(); d != map.end(); map.next(d))
 //	{
@@ -553,8 +553,8 @@ void reverseOrientation(typename PFP::MAP& map)
 //	map.template swapAttributes<Dart>(phi1, new_phi1) ;
 //	map.template swapAttributes<Dart>(phi_1, new_phi_1) ;
 //
-//	map.template removeAttribute<Dart>(new_phi1) ;
-//	map.template removeAttribute<Dart>(new_phi_1) ;
+//	map.removeAttribute(new_phi1) ;
+//	map.removeAttribute(new_phi_1) ;
 //
 //	map.swapEmbeddingContainers(VERTEX, FACE) ;
 //
@@ -584,19 +584,19 @@ inline double sqrt3_K(unsigned int n)
 }
 
 //template <typename PFP>
-//void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected)
+//void Sqrt3Subdivision(typename PFP::MAP& map, VertexAttribute<VEC3>& position, const FunctorSelect& selected)
 //{
 //	typedef typename PFP::VEC3 VEC3 ;
 //	typedef typename PFP::REAL REAL ;
 //
-//	AttributeHandler<VEC3> positionF = map.template getAttribute<VEC3>(FACE, "position") ;
+//	FaceAttribute<VEC3> positionF = map.template getAttribute<VEC3, FACE>("position") ;
 //	if(!positionF.isValid())
-//		positionF = map.template addAttribute<VEC3>(FACE, "position") ;
+//		positionF = map.template addAttribute<VEC3, FACE>("position") ;
 //	Algo::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
 //
 //	computeDual<PFP>(map, selected);
 //
-//	AttributeHandler<VEC3> tmp = position ;
+//	VertexAttribute<VEC3> tmp = position ;
 //	position = positionF ;
 //	positionF = tmp ;
 //

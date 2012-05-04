@@ -58,7 +58,7 @@ void featureEdgeDetection(
 			featureEdge.mark(d) ;
 	}
 
-//	map.template removeAttribute<VEC3>(fNormal) ;
+//	map.removeAttribute(fNormal) ;
 }
 
 template <typename PFP>
@@ -238,7 +238,7 @@ bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
+	FaceAttribute<ridgeSegment>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -253,7 +253,7 @@ void computeRidgeLines(
 	CellMarker<FACE>& regularMarker,
 	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
 	const VertexAttribute<typename PFP::VEC3>& K,
-	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
+	FaceAttribute<ridgeSegment>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -271,7 +271,7 @@ void ridgeLines(
 	Dart d,
 	const VertexAttribute<typename PFP::VEC3>& K,
 	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
-	AttributeHandler<ridgeSegment, FACE>& ridge_segments)
+	FaceAttribute<ridgeSegment>& ridge_segments)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -349,7 +349,7 @@ template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
 	CellMarker<FACE>& regularMarker,
-	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
+	FaceAttribute<ridgeSegment>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -366,7 +366,7 @@ void singularTriangle(
 	typename PFP::MAP& map,
 	Dart d,
 	CellMarker<FACE>& regularMarker,
-	AttributeHandler<ridgeSegment, FACE>& ridge_segments)
+	FaceAttribute<ridgeSegment>& ridge_segments)
 {
 	int nbPoint = 0 ;
 

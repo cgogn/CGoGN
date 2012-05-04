@@ -53,8 +53,8 @@ private:
 	} QEMhalfEdgeInfo ;
 	typedef NoMathIOAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
 
-	AttributeHandler<HalfEdgeInfo, DART> halfEdgeInfo ;
-	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+	VertexAttribute<Quadric<REAL> > quadric ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
@@ -105,11 +105,11 @@ private:
 	} LightfieldHalfEdgeInfo ;
 	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
 
-	AttributeHandler<MATRIX33, VERTEX> m_frame ;
+	VertexAttribute<MATRIX33> m_frame ;
 
-	AttributeHandler<HalfEdgeInfo, DART> halfEdgeInfo ;
-	AttributeHandler<Quadric<REAL>, VERTEX> quadric ;
-	AttributeHandler<QuadricRGBfunctions<REAL>, EDGE> quadricRGBfunctions ;
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+	VertexAttribute<Quadric<REAL> > quadric ;
+	EdgeAttribute<QuadricRGBfunctions<REAL> > quadricRGBfunctions ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;

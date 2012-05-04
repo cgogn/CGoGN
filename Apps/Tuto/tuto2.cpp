@@ -80,7 +80,7 @@ void MyQT::createMap()
 
 	// example of attribute on face
 	// here for example we store the number of edges of faces at construction
-	AttributeHandler<int, FACE> side  = myMap.addAttribute<int, FACE>("nb_sides");
+	FaceAttribute<int> side  = myMap.addAttribute<int, FACE>("nb_sides");
 	side[d1] = 3;
 	side[d2] = 4;
 

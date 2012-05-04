@@ -45,7 +45,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	AttributeHandler<Quadric<REAL>, VERTEX> m_quadric ;
+	VertexAttribute<Quadric<REAL> > m_quadric ;
 
 public:
 	Approximator_QEM(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
@@ -67,7 +67,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	AttributeHandler<Quadric<REAL>, VERTEX> m_quadric ;
+	VertexAttribute<Quadric<REAL> > m_quadric ;
 
 public:
 	Approximator_QEMhalfEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
