@@ -77,7 +77,7 @@ public:
 	FunctorEquality_UniformWeight_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
 		const VertexAttribute<unsigned int>& index,
-		const VertexAttribute<ATTR_TYPE,>& attr,
+		const VertexAttribute<ATTR_TYPE>& attr,
 		float w
 	) :	solver(s), indexTable(index), attrTable(attr), weight(w)
 	{}

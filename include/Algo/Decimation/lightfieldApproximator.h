@@ -73,7 +73,7 @@ public:
 protected:
 	VertexAttribute<MATRIX33> m_frame ;
 	EdgeAttribute<MATRIX33> m_approxFrame ;
-	EdgeAttribute<QuadricRGBfunctions<REAL>> m_quadricRGBfunctions ;
+	EdgeAttribute<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
 
 public:
 	Approximator_RGBfunctionsHalf(MAP& m, VertexAttribute<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
@@ -126,7 +126,7 @@ public:
 protected:
 	VertexAttribute<MATRIX33> m_frame ;
 	EdgeAttribute<MATRIX33> m_approxFrame ;
-	EdgeAttribute<QuadricRGBfunctions<REAL>> m_quadricRGBfunctions ;
+	EdgeAttribute<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
 
 public:
 	Approximator_RGBfunctions(MAP& m, VertexAttribute<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
