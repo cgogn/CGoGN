@@ -46,6 +46,7 @@
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
 #include "Utils/text3d.h"
+#include "Utils/qtInputs.h"
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Geometry/normal.h"
@@ -117,7 +118,7 @@ public:
 	void cb_Save() ;
 
 	void importMesh(std::string& filename) ;
-	void exportMesh(std::string& filename);
+	void exportMesh(std::string& filename, bool askExportMode = true);
 
 public slots:
 	void slot_drawVertices(bool b) ;
