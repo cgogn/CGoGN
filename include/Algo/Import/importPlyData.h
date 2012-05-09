@@ -115,6 +115,8 @@ protected:
 	
 	int per_vertex_color;
 	int has_normals;
+	
+	char *old_locale;
 };
 
 } // namespace CGoGN

@@ -25,6 +25,7 @@
 #include "Utils/os_spec.h"
 #include "Algo/Import/importPlyData.h"
 #include <stdlib.h>
+#include <locale.h>
 
 namespace CGoGN
 {
@@ -60,6 +61,8 @@ PlyImportData::PlyImportData():
 	per_vertex_color(0),
 	has_normals(0)	
 {
+	old_locale = setlocale(LC_NUMERIC, NULL);
+	setlocale(LC_NUMERIC, "C");
 }
 
 PlyImportData::~PlyImportData()
@@ -85,6 +88,7 @@ PlyImportData::~PlyImportData()
 // 	}
 		
 // need to free *vert_other,*face_other ????
+	setlocale(LC_NUMERIC, old_locale);
 }
 	
 	
