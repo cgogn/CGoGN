@@ -236,7 +236,7 @@ public:
 	 */
 	virtual void unsewVolumes(Dart d);
 
-	//! Merge to volume along their common oriented face
+	//! Merge two volumes along their common oriented face
 	/*! @param d a dart of common face
 	 */
 	virtual bool mergeVolumes(Dart d);
