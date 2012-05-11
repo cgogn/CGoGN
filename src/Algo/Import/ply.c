@@ -2068,12 +2068,14 @@ void get_binary_item(
 {
   char c[8];
   void *ptr;
+  short word;
+  char *byte;
+  int my_endianness;
 
-  ptr = (void *) c;
-
-  short int word = 1 ;
-  char *byte = (char *) &word ;
-  int my_endianness = byte[0] ? PLY_BINARY_LE : PLY_BINARY_BE ;
+  ptr = c;
+  word = 1 ;
+  byte = (char *) &word ;
+  my_endianness = byte[0] ? PLY_BINARY_LE : PLY_BINARY_BE ;
 
   switch (type) {
     case PLY_Int8:
@@ -2091,8 +2093,10 @@ void get_binary_item(
     case PLY_Int16:
     	if (my_endianness != file_type)
     	{
-    		fread (ptr+1, 1, 1, fp);
-    		fread (ptr+0, 1, 1, fp);
+			unsigned char *cptr;
+			cptr = (unsigned char*) ptr;
+    		fread (cptr+1, 1, 1, fp);
+    		fread (cptr+0, 1, 1, fp);
     	}
     	else
     		fread (ptr, 2, 1, fp);
@@ -2103,8 +2107,10 @@ void get_binary_item(
     case PLY_Uint16:
     	if (my_endianness != file_type)
     	{
-    		fread (ptr+1, 1, 1, fp);
-    		fread (ptr+0, 1, 1, fp);
+			unsigned char *cptr;
+			cptr = (unsigned char*) ptr;
+    		fread (cptr+1, 1, 1, fp);
+    		fread (cptr+0, 1, 1, fp);
     	}
     	else
     		fread (ptr, 2, 1, fp);
@@ -2115,10 +2121,12 @@ void get_binary_item(
     case PLY_Int32:
         if (my_endianness != file_type)
         {
-            fread (ptr+3, 1, 1, fp);
-            fread (ptr+2, 1, 1, fp);
-            fread (ptr+1, 1, 1, fp);
-            fread (ptr+0, 1, 1, fp);
+			unsigned char *cptr;
+			cptr = (unsigned char*) ptr;
+            fread (cptr+3, 1, 1, fp);
+            fread (cptr+2, 1, 1, fp);
+            fread (cptr+1, 1, 1, fp);
+            fread (cptr+0, 1, 1, fp);
         }
         else
       	  fread (ptr, 4, 1, fp);
@@ -2129,10 +2137,12 @@ void get_binary_item(
     case PLY_Uint32:
         if (my_endianness != file_type)
         {
-            fread (ptr+3, 1, 1, fp);
-            fread (ptr+2, 1, 1, fp);
-            fread (ptr+1, 1, 1, fp);
-            fread (ptr+0, 1, 1, fp);
+			unsigned char *cptr;
+			cptr = (unsigned char*) ptr;
+            fread (cptr+3, 1, 1, fp);
+            fread (cptr+2, 1, 1, fp);
+            fread (cptr+1, 1, 1, fp);
+            fread (cptr+0, 1, 1, fp);
         }
         else
       	  fread (ptr, 4, 1, fp);
@@ -2143,10 +2153,12 @@ void get_binary_item(
     case PLY_Float32:
         if (my_endianness != file_type)
         {
-            fread (ptr+3, 1, 1, fp);
-            fread (ptr+2, 1, 1, fp);
-            fread (ptr+1, 1, 1, fp);
-            fread (ptr+0, 1, 1, fp);
+			unsigned char *cptr;
+			cptr = (unsigned char*) ptr;
+            fread (cptr+3, 1, 1, fp);
+            fread (cptr+2, 1, 1, fp);
+            fread (cptr+1, 1, 1, fp);
+            fread (cptr+0, 1, 1, fp);
         }
         else
         	fread (ptr, 4, 1, fp);
@@ -2157,14 +2169,16 @@ void get_binary_item(
     case PLY_Float64:
     	if (my_endianness != file_type)
         {
-    		fread (ptr+7, 1, 1, fp);
-    		fread (ptr+6, 1, 1, fp);
-    		fread (ptr+5, 1, 1, fp);
-    	    fread (ptr+4, 1, 1, fp);
-    	    fread (ptr+3, 1, 1, fp);
-    	    fread (ptr+2, 1, 1, fp);
-    	    fread (ptr+1, 1, 1, fp);
-    	    fread (ptr+0, 1, 1, fp);
+			unsigned char *cptr;
+			cptr = (unsigned char*) ptr;
+    		fread (cptr+7, 1, 1, fp);
+    		fread (cptr+6, 1, 1, fp);
+    		fread (cptr+5, 1, 1, fp);
+    	    fread (cptr+4, 1, 1, fp);
+    	    fread (cptr+3, 1, 1, fp);
+    	    fread (cptr+2, 1, 1, fp);
+    	    fread (cptr+1, 1, 1, fp);
+    	    fread (cptr+0, 1, 1, fp);
         }
         else
         	fread (ptr, 8, 1, fp);
