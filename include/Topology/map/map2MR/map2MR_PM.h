@@ -60,6 +60,8 @@ public:
 	Map2MR_PM() ;
 
 	virtual std::string mapTypeName() const { return "Map2MR_PM" ; }
+
+	//add a coarse level
 	void addNewLevel(bool embedNewVertices = true) ;
 
 	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }

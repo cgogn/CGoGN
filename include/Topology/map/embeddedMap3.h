@@ -39,6 +39,12 @@ public:
 
 	//!
 	/*!
+	 *
+	 */
+	virtual void splitVertex(Dart d, Dart e);
+
+	//!
+	/*!
 	 */
 	virtual Dart deleteVertex(Dart d);
 

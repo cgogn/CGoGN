@@ -117,6 +117,8 @@ public:
 	void cb_Open() ;
 	void cb_Save() ;
 
+	void cb_keyPress(int keycode);
+
 	void importMesh(std::string& filename) ;
 	void exportMesh(std::string& filename, bool askExportMode = true);
 

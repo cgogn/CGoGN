@@ -137,6 +137,15 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Split the vertex
+	/*! \per Darts d & e MUST belong to the same vertex
+	 * 	\per Darts d & e MUST belong to different volumes
+	 *  \per Works only on the boundary
+	 *  @param d first dart in vertex v
+	 *	@param e second dart in vertex v
+	 */
+	virtual void splitVertex(Dart d, Dart e);
+
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume
 	 *  @param d a dart of the vertex to delete

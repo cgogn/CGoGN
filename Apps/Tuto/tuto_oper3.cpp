@@ -27,6 +27,7 @@
 #include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Geometry/normal.h"
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
@@ -174,6 +175,18 @@ void MyQT::operation(int x)
 			dm.markAll();
 			position[x]= Q;
 			m_selected = NIL;
+			updateMap();
+		}
+		break;
+	case 10:
+		CGoGNout <<"split vertex"<<CGoGNendl;
+		if(m_selected != NIL && m_selected2 != NIL)
+		{
+			PFP::VEC3 c1 = Algo::Geometry::faceCentroid<PFP>(myMap, myMap.findBoundaryFaceOfEdge(m_selected), position);
+			PFP::VEC3 c2 = Algo::Geometry::faceCentroid<PFP>(myMap, myMap.findBoundaryFaceOfEdge(m_selected2), position);
+			myMap.splitVertex(m_selected, m_selected2);
+			position[m_selected] = position[m_selected] * 0.7f + c1*0.3f;
+			position[m_selected2] = position[m_selected2] * 0.7f + c2*0.3f;
 			updateMap();
 		}
 		break;

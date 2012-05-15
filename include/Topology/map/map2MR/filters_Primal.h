@@ -546,6 +546,31 @@ public:
 	}
 } ;
 
+/*********************************************************************************
+ *                           PROGRESSIVE MESHES FUNCTORS
+ *********************************************************************************/
+template <typename PFP>
+class pipoPMAnalysisFilter
+{
+protected:
+	typename PFP::MAP& m_map;
+	typename PFP::TVEC3& m_position;
+	//Algo::PMesh::ProgressiveMesh<PFP> *m_pmesh;
+
+public:
+	pipoPMAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() ()
+	{
+		for(Dart dit = m_map.begin() ; dit != m_map.end() ; dit = m_map.next())
+		{
+			return false;
+		}
+	}
+};
+
+
 } // namespace Multiresolution
 
 } // namespace CGoGN

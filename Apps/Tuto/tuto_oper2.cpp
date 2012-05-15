@@ -74,7 +74,7 @@ void MyQT::operation(int x)
 			PFP::VEC3 c1 = Algo::Geometry::faceCentroid<PFP>(myMap, m_selected, position);
 			PFP::VEC3 c2 = Algo::Geometry::faceCentroid<PFP>(myMap, m_selected2, position);
 			position[m_selected] = position[m_selected] * 0.7f + c1*0.3f;
-			position[m_selected2] = position[m_selected2] * 0.7f + c2*0.3f;
+			position[m_selected2] = position[m_sel	ected2] * 0.7f + c2*0.3f;
 			updateMap();
 		}
 		break;

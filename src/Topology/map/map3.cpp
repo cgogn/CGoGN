@@ -129,6 +129,30 @@ void Map3::fillHole(Dart d)
  *  Topological operations on 3-maps
  *************************************************************************/
 
+void Map3::splitVertex(Dart d, Dart e)
+{
+	assert(sameVertex(d,e));
+	assert(!sameVolume(d,e));
+
+	if(isBoundaryVertex(d))
+	{
+		unsewVolumes(d);
+		unsewVolumes(e);
+
+		Dart dc = phi1(phi2(d));
+
+		//unsewVolumes(phi2(dc));
+		Map2::splitVertex(d, phi1(phi2(dc)));
+
+
+//		Map2::splitFace(d, phi2(dc));
+
+//		Dart ec = phi_1(phi2(e));
+//		Map2::splitVertex(e, ec);
+//		//Map2::splitFace(e, phi2(ec));
+	}
+}
+
 Dart Map3::deleteVertex(Dart d)
 {
 	if(isBoundaryVertex(d))

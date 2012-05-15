@@ -27,6 +27,30 @@
 namespace CGoGN
 {
 
+void EmbeddedMap3::splitVertex(Dart d, Dart e)
+{
+
+	Map3::splitVertex(d, e);
+
+	if(isOrbitEmbedded(VERTEX))
+	{
+		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d));
+		embedNewCell(VERTEX, phi2(phi1(phi2(d))));
+		copyCell(VERTEX, phi2(phi1(phi2(d))), d);
+	}
+
+	if(isOrbitEmbedded(EDGE))
+	{
+
+	}
+
+	if(isOrbitEmbedded(VOLUME))
+	{
+		embedOrbit(VOLUME, d, getEmbedding(VOLUME, d)) ;
+		embedOrbit(VOLUME, e, getEmbedding(VOLUME, e)) ;
+	}
+}
+
 Dart EmbeddedMap3::deleteVertex(Dart d)
 {
 	Dart v = Map3::deleteVertex(d) ;

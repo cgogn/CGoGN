@@ -99,6 +99,11 @@
           <string>collapseVolume</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>splitVertex</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>

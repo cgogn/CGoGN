@@ -309,6 +309,21 @@ void Viewer::slot_normalsSize(int i)
 	updateGL() ;
 }
 
+void Viewer::cb_keyPress(int keycode)
+{
+    switch(keycode)
+    {
+    	case 'c' :
+    		myMap.check();
+    		break;
+    	default:
+    		break;
+    }
+
+    updateGLMatrices() ;
+    updateGL();
+}
+
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
