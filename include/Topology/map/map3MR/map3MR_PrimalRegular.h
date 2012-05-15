@@ -30,6 +30,7 @@
 #include "Topology/generic/traversor3.h"
 
 #include "Topology/map/map3MR/filters_Primal.h"
+#include "Topology/map/map3MR/schemes_Primal.h"
 
 namespace CGoGN
 {
@@ -45,6 +46,7 @@ protected:
 	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
 	std::vector<Multiresolution::MRFilter*> analysisFilters ;
 
+	std::vector<Multiresolution::MRScheme*> subdivisionSchemes;
 
 public:
 	Map3MR_PrimalRegular();
@@ -55,39 +57,14 @@ public:
 	 *
 	 *************************************************************************/
 	//@{
-	//!
-	/*
-	 *
-	 */
 	void swapEdges(Dart d, Dart e);
 
-	//!
-	/*!
-	 *
-	 */
 	bool isTetrahedron(Dart d);
 
-	void splitFaceInSurface(Dart d, Dart e);
-
-	Dart cutEdgeInSurface(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
-
-	//!
-	/*!
-	 *
-	 */
-	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
-
-	Dart quadranguleFace(Dart d);
-
 	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
-
 	//@}
+
+	void setSharingVertexEmbeddings(bool b) { shareVertexEmbeddings = b; }
 
 	/*! @name Level creation
 	 *
@@ -103,25 +80,30 @@ public:
 	/*
 	 *
 	 */
-	void addNewLevel(bool embedNewVertices);
+	void addNewLevelHexa(bool embedNewVertices);
 
+	//!
+	/*
+	 *
+	 */
+	void addNewLevel(bool embedNewVertices);
 	//@}
 
 	/*! @name Geometry modification
-	 *
+	 *  Analysis / Synthesis
 	 *************************************************************************/
 	//@{
 	//!
 	/*
 	 *
 	 */
-	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
+	void addSynthesisFilter(Multiresolution::MRFilter* f) { assert(shareVertexEmbeddings); synthesisFilters.push_back(f) ; }
 
 	//!
 	/*
 	 *
 	 */
-	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
+	void addAnalysisFilter(Multiresolution::MRFilter* f) { assert(shareVertexEmbeddings); analysisFilters.push_back(f) ; }
 
 	//!
 	/*
@@ -134,12 +116,7 @@ public:
 	 *
 	 */
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
-	//@}
 
-	/*! @name
-	 *
-	 *************************************************************************/
-	//@{
 	//!
 	/*
 	 *
@@ -152,8 +129,43 @@ public:
 	 */
 	void synthesis() ;
 	//@}
+
+
+	/*! @name Geometry modification
+	 *  Subdivision Schemes
+	 *************************************************************************/
+	//@{
+
+	//!
+	/*!
+	 *
+	 */
+	void addSubdivisionScheme(Multiresolution::MRScheme* f) {  assert(!shareVertexEmbeddings); subdivisionSchemes.push_back(f); }
+
+	//!
+	/*
+	 *
+	 */
+	void clearSubdivisionSchemes() { subdivisionSchemes.clear() ; }
+
+	//!
+	/*
+	 *
+	 */
+	void subdivision() ;
+	//@}
 };
 
 } //end namespace CGoGN
 
 #endif /* __MAP3MR_PRIMAL__ */
+
+//void splitFaceInSurface(Dart d, Dart e);
+
+//Dart cutEdgeInSurface(Dart d);
+
+//void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
+
+//void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
+
+//Dart quadranguleFace(Dart d);

@@ -42,7 +42,7 @@
 #include "Algo/Parallel/parallel_foreach.h"
 
 // for file input
- #include "Utils/Qt/qtInputs.h"
+#include "Utils/qtInputs.h"
 
 using namespace CGoGN ;
 

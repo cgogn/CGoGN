@@ -89,6 +89,16 @@
           <string>splitVolume</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>collapseFace</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>collapseVolume</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>

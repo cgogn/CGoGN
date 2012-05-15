@@ -28,7 +28,7 @@ namespace CGoGN
 {
 
 Map3MR_PrimalAdapt::Map3MR_PrimalAdapt() :
-		shareVertexEmbeddings(true),
+		shareVertexEmbeddings(false),
 		vertexVertexFunctor(NULL),
 		edgeVertexFunctor(NULL),
 		faceVertexFunctor(NULL),
@@ -522,8 +522,14 @@ void Map3MR_PrimalAdapt::addNewLevel()
 	//pushLevel() ;
 
 	addLevel() ;
-	//setCurrentLevel(getMaxLevel()) ;
-
+//	unsigned int cur = getCurrentLevel();
+//	setCurrentLevel(getMaxLevel()) ;
+//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+//	{
+//		if(!shareVertexEmbeddings)
+//			(*m_embeddings[VERTEX])[(*m_mrDarts[m_mrCurrentLevel])[i]] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
+//	}
+//	setCurrentLevel(cur);
 	//popLevel() ;
 }
 
@@ -574,6 +580,7 @@ void Map3MR_PrimalAdapt::subdivideEdge(Dart d)
 
 	Dart d1 = cutEdge(d);
 
+	embedOrbit(VERTEX, d1, EMBNULL);
 	(*edgeVertexFunctor)(d1) ;
 	propagateOrbitEmbedding(d1, VERTEX);
 
@@ -634,21 +641,21 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 	{
 		Dart dd = phi1(old) ;
 		Dart e = phi1(dd) ;
-		(*vertexVertexFunctor)(e) ;
+		//(*vertexVertexFunctor)(e) ;
 		propagateOrbitEmbedding(e, VERTEX) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
-		(*vertexVertexFunctor)(e) ;
+		//(*vertexVertexFunctor)(e) ;
 		propagateOrbitEmbedding(e, VERTEX) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
-		(*vertexVertexFunctor)(e) ;
+		//(*vertexVertexFunctor)(e) ;
 		propagateOrbitEmbedding(e, VERTEX) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
@@ -657,7 +664,7 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 	{
 		Dart dd = phi1(old) ;
 		Dart next = phi1(dd) ;
-		(*vertexVertexFunctor)(next) ;
+		//(*vertexVertexFunctor)(next) ;
 		propagateOrbitEmbedding(next, VERTEX) ;
 		next = phi1(next) ;
 		splitFace(dd, next) ;			// insert a first edge
@@ -666,18 +673,19 @@ void Map3MR_PrimalAdapt::subdivideFace(Dart d, SubdivideType sType)
 		cutEdge(ne) ;					// cut the new edge to insert the central vertex
 
 		dd = phi1(next) ;
-		(*vertexVertexFunctor)(dd) ;
+		//(*vertexVertexFunctor)(dd) ;
 		propagateOrbitEmbedding(dd, VERTEX) ;
 		dd = phi1(dd) ;
 		while(dd != ne)					// turn around the face and insert new edges
 		{								// linked to the central vertex
 			splitFace(phi1(ne), dd) ;
 			dd = phi1(dd) ;
-			(*vertexVertexFunctor)(dd) ;
+			//(*vertexVertexFunctor)(dd) ;
 			propagateOrbitEmbedding(dd, VERTEX) ;
 			dd = phi1(dd) ;
 		}
 
+		embedOrbit(VERTEX, phi2(ne), EMBNULL);
 		(*faceVertexFunctor)(phi2(ne)) ;
 		propagateOrbitEmbedding(phi2(ne), VERTEX) ;
 	}
@@ -730,10 +738,14 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 	{
 		++i;
-
 		std::cout << "get max Level then creating new volumes = " << getMaxLevel() << std::endl;
 
 		setCurrentLevel(getMaxLevel()) ;
+		std::cout << "getDartLevel ditWV = " << getDartLevel(ditWV) << std::endl;
+		std::cout << "currentLevel = " << getCurrentLevel() << std::endl;
+		embedOrbit(VERTEX, ditWV, EMBNULL);
+		(*vertexVertexFunctor)(ditWV) ;
+
 		Dart e = ditWV;
 		std::vector<Dart> v ;
 
@@ -804,6 +816,7 @@ void Map3MR_PrimalAdapt::subdivideVolume(Dart d)
 		}
 	}
 
+	embedOrbit(VERTEX, centralDart, EMBNULL);
 	(*volumeVertexFunctor)(centralDart) ;
 	embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
 	propagateOrbitEmbedding(centralDart, VERTEX) ;
@@ -879,6 +892,9 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 	setCurrentLevel(vLevel + 1) ;
 	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
 	{
+		embedOrbit(VERTEX, dit, EMBNULL);
+		(*vertexVertexFunctor)(dit) ;
+
 		Dart f1 = phi1(dit);
 		Dart e = dit;
 		std::vector<Dart> v ;
@@ -955,6 +971,7 @@ void Map3MR_PrimalAdapt::subdivideVolumeTetOcta(Dart d)
 			}while(f != x);
 		}
 
+		embedOrbit(VERTEX, centralDart, EMBNULL);
 		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
 		(*volumeVertexFunctor)(centralDart) ;
 		propagateOrbitEmbedding(centralDart, VERTEX) ;

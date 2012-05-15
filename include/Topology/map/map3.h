@@ -198,6 +198,13 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Collapse a face (that is deleted) possibly merging its vertices
+	/*! \warning
+	 *  @param d a dart in the deleted face
+	 *  @return a dart of the resulting vertex
+	 */
+	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+
 	//! Delete a volume if and only if it has a face with degree < 3 or only 3 vertices
 	/*! If the volume is sewed to two distinct adjacent volumes and if the face degree
 	 *  of the two adjacent volumes is equal then those two volumes are sewed
@@ -235,6 +242,13 @@ public:
 	/*! @param vd a vector of darts
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
+
+	//! Collapse a volume (that is deleted) possibly merging its vertices
+	/*! \warning
+	 *  @param d a dart in the deleted volume
+	 *  @return a dart of the resulting vertex
+	 */
+	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
 	//@}
 
 	/*! @name Topological Queries
