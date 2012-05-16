@@ -137,14 +137,13 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Split the vertex
+	//! Split the vertex along a permutation of faces
 	/*! \per Darts d & e MUST belong to the same vertex
 	 * 	\per Darts d & e MUST belong to different volumes
 	 *  \per Works only on the boundary
-	 *  @param d first dart in vertex v
-	 *	@param e second dart in vertex v
+	 *  @param vd a vector of darts
 	 */
-	virtual void splitVertex(Dart d, Dart e);
+	virtual void splitVertex(std::vector<Dart>& vd);
 
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume

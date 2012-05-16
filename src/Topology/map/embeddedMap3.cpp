@@ -27,16 +27,18 @@
 namespace CGoGN
 {
 
-void EmbeddedMap3::splitVertex(Dart d, Dart e)
+void EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 {
+	Dart d = vd.front();
+	Dart d3 = phi2(phi3(d));
 
-	Map3::splitVertex(d, e);
+	Map3::splitVertex(vd);
 
 	if(isOrbitEmbedded(VERTEX))
 	{
 		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d));
-		embedNewCell(VERTEX, phi2(phi1(phi2(d))));
-		copyCell(VERTEX, phi2(phi1(phi2(d))), d);
+		embedNewCell(VERTEX, d3);
+		copyCell(VERTEX, d3, d);
 	}
 
 	if(isOrbitEmbedded(EDGE))
@@ -46,8 +48,10 @@ void EmbeddedMap3::splitVertex(Dart d, Dart e)
 
 	if(isOrbitEmbedded(VOLUME))
 	{
-		embedOrbit(VOLUME, d, getEmbedding(VOLUME, d)) ;
-		embedOrbit(VOLUME, e, getEmbedding(VOLUME, e)) ;
+		for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		{
+			embedOrbit(VOLUME, *it, getEmbedding(VOLUME, *it)) ;
+		}
 	}
 }
 
