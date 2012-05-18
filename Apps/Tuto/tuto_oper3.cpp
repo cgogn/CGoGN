@@ -150,6 +150,7 @@ void MyQT::operation(int x)
 		if (!m_selecteds.empty())
 		{
 			myMap.splitVolume(m_selecteds);
+			m_selecteds.clear();
 			dm.markAll();
 			updateMap();
 		}
@@ -182,11 +183,15 @@ void MyQT::operation(int x)
 		CGoGNout <<"split vertex"<<CGoGNendl;
 		if (!m_selecteds.empty())
 		{
+			std::cout << "nb darts before = " << myMap.getNbDarts() << std::endl;
 			Dart dit = m_selecteds.front();
-			PFP::VEC3 c1 = Algo::Geometry::faceCentroid<PFP>(myMap, dit, position);
-			myMap.splitVertex(m_selecteds);
-			position[dit] = position[dit] * 0.7f + c1*0.3f;
+			PFP::VEC3 c1 = Algo::Geometry::volumeCentroid<PFP>(myMap, dit, position);
+			Dart dres = myMap.splitVertex(m_selecteds);
+			position[dres] = position[dit]*0.5f - c1*0.5f;
+			m_selecteds.clear();
+			dm.markAll();
 			updateMap();
+			std::cout << "nb darts after = " << myMap.getNbDarts() << std::endl;
 		}
 		break;
 	default:

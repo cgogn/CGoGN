@@ -26,6 +26,7 @@
 #define __MR_FILTERS_PRIMAL__
 
 #include <cmath>
+//#include "Algo/Decimation/decimation.h"
 
 namespace CGoGN
 {
@@ -547,28 +548,43 @@ public:
 } ;
 
 /*********************************************************************************
- *                           PROGRESSIVE MESHES FUNCTORS
+ *                           MR PROGRESSIVE MESHES FUNCTOR
  *********************************************************************************/
-template <typename PFP>
-class pipoPMAnalysisFilter
-{
-protected:
-	typename PFP::MAP& m_map;
-	typename PFP::TVEC3& m_position;
-	//Algo::PMesh::ProgressiveMesh<PFP> *m_pmesh;
 
-public:
-	pipoPMAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
-	{}
+//template <typename PFP>
+//class DecimateFilter
+//{
+//protected:
+//	typename PFP::MAP& m_map;
+//	typename PFP::TVEC3& m_position;
+//	//Algo::Decimation::SelectorType m_s;
+//	//Algo::Decimation::ApproximatorType m_a;
+//	unsigned int m_nbWantedVertices;
+//	FunctorSelect& m_selected;
+//
+//
+//public:
+//	DecimateFilter(typename PFP::MAP& m, typename PFP::TVEC3& p,
+//		//Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a,
+//		unsigned int nbWantedVertices, const FunctorSelect& selected) :
+//			m_map(m), m_position(p), m_s(s), m_a(a), m_nbWantedVertices(nbWantedVertices), m_selected(selected) {}
+//
+//	void decimate ()
+//	{
+//	//	Algo::Decimation::decimate<PFP>(m_map, m_s, m_a, m_position, m_nbWantedVertices, m_selected);
+//	}
+//
+//	void coarsen()
+//	{
+//
+//	}
+//
+//	void refine()
+//	{
+//
+//	}
+//} ;
 
-	bool operator() ()
-	{
-		for(Dart dit = m_map.begin() ; dit != m_map.end() ; dit = m_map.next())
-		{
-			return false;
-		}
-	}
-};
 
 
 } // namespace Multiresolution

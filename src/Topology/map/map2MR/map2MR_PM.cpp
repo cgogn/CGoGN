@@ -60,7 +60,6 @@ void Map2MR_PM::addNewLevel(bool embedNewVertices)
 
 	setCurrentLevel(0);
 
-	//DartMarker me(*this);
 	selectedEdges = new DartMarkerStore(*this);
 
 	TraversorE<Map2MR_PM> travE(*this);
@@ -103,6 +102,8 @@ void Map2MR_PM::addNewLevel(bool embedNewVertices)
 			}
 		}
 	}
+
+	//(*filter).decimate() ;
 }
 
 void Map2MR_PM::analysis()
@@ -111,16 +112,14 @@ void Map2MR_PM::analysis()
 
 	decCurrentLevel() ;
 
-	for(unsigned int i = 0; i < analysisFilters.size(); ++i)
-		(*analysisFilters[i])() ;
+	//(*filter).coarsen() ;
 }
 
 void Map2MR_PM::synthesis()
 {
 	assert(getCurrentLevel() < getMaxLevel() || !"synthesis : called on max level") ;
 
-	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
-		(*synthesisFilters[i])() ;
+	//(*filter).refine() ;
 
 	incCurrentLevel() ;
 }

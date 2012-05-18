@@ -31,7 +31,6 @@
 
 #include "Topology/map/map2MR/filters_Primal.h"
 
-#include "Algo/Modelisation/subdivision.h"
 
 namespace CGoGN
 {
@@ -51,8 +50,7 @@ class Map2MR_PM : public EmbeddedMap2
 protected:
 	bool shareVertexEmbeddings ;
 
-	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
-	std::vector<Multiresolution::MRFilter*> analysisFilters ;
+	//Multiresolution::DecimateFilter* filter ;
 
 	DartMarkerStore* selectedEdges;
 
@@ -64,11 +62,7 @@ public:
 	//add a coarse level
 	void addNewLevel(bool embedNewVertices = true) ;
 
-	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
-
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
+	//void addDecimationFilter(Multiresolution::DecimateFilter *f) { filter = f; }
 
 	void analysis() ;
 	void synthesis() ;

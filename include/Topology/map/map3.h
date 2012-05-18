@@ -143,7 +143,7 @@ public:
 	 *  \per Works only on the boundary
 	 *  @param vd a vector of darts
 	 */
-	virtual void splitVertex(std::vector<Dart>& vd);
+	virtual Dart splitVertex(std::vector<Dart>& vd);
 
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume

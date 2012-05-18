@@ -41,7 +41,7 @@ public:
 	/*!
 	 *
 	 */
-	virtual void splitVertex(std::vector<Dart>& vd);
+	virtual Dart splitVertex(std::vector<Dart>& vd);
 
 	//!
 	/*!
