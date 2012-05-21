@@ -148,6 +148,7 @@ public:
 	 * if false : mouseMove events are only generated when a button is pressed
 	 */
 	void setGLWidgetMouseTracking(bool b);
+	
 
 protected:
 	GLWidget* m_glWidget;
@@ -189,7 +190,7 @@ protected:
 	void keyPressEvent(QKeyEvent *event);
 
 	void keyReleaseEvent(QKeyEvent *e);
-
+	
 public:
 	/**
 	 * set width and pos center of object to draw
