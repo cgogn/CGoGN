@@ -34,23 +34,23 @@ Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 
 	Dart dres = Map3::splitVertex(vd);
 
-	if(isOrbitEmbedded(VERTEX))
+	if(isOrbitEmbedded<VERTEX>())
 	{
-		embedNewCell(VERTEX, d2);
-		copyCell(VERTEX, d2, d);
-		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d));
+		embedNewCell<VERTEX>(d2);
+		copyCell<VERTEX>(d2, d);
+		embedOrbit<VERTEX>( d, getEmbedding<VERTEX>(d));
 	}
 
-	if(isOrbitEmbedded(EDGE))
+	if(isOrbitEmbedded<EDGE>())
 	{
 
 	}
 
-	if(isOrbitEmbedded(VOLUME))
+	if(isOrbitEmbedded<VOLUME>())
 	{
 		for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 		{
-			embedOrbit(VOLUME, *it, getEmbedding(VOLUME, *it)) ;
+			embedOrbit<VOLUME>( *it, getEmbedding<VOLUME>(*it)) ;
 		}
 	}
 

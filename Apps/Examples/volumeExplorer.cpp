@@ -327,7 +327,7 @@ int main(int argc, char **argv)
 				return 1;
 			}
 			else
-				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+				position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
 		}
 
 

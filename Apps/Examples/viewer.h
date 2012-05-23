@@ -46,7 +46,7 @@
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
 #include "Utils/text3d.h"
-#include "Utils/qtInputs.h"
+#include "Utils/Qt/qtInputs.h"
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Geometry/normal.h"
