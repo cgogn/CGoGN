@@ -120,10 +120,9 @@ protected:
 	Geom::Vec3f m_dartsColor;
 
 	/**
-	 * attribute index to get easy correspdance dart/color
+	 * attribute index to get easy correspondence dart/color
 	 */
-	AttributeHandler<unsigned int> m_attIndex;
-
+	AttributeHandler<unsigned int, DART> m_attIndex;
 
 	/**
 	 * save colors
@@ -282,25 +281,25 @@ public:
  	* @param kv exploding coef for face
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good = allDarts);
 
 	/**
-	* update color buffer with color attributte handler
+	* update color buffer with color attribute handler
 	* @param map the map
 	* @param good selector
 	* @param colors  attribute of dart's colors
 	*/
 	template<typename PFP>
-	void updateColors(typename PFP::MAP& map, const typename PFP::TVEC3& colors, const FunctorSelect& good = allDarts);
+	void updateColors(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& colors, const FunctorSelect& good = allDarts);
 
 	/**
-	 * Get back middle position of drawed darts
+	 * Get back middle position of drawn darts
 	 * @param map the map
 	 * @param posExpl the output positions
 	 * @param good the selector
 	 */
 	template<typename PFP>
-	void computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good = allDarts);
+	void computeDartMiddlePositions(typename PFP::MAP& map, AttributeHandler<typename PFP::VEC3, DART>& posExpl, const FunctorSelect& good = allDarts);
 
 	/**
 	 * render to svg struct
@@ -323,7 +322,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
+	void updateDataMap3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good);
 
 	/**
 	* update all drawing buffers to render a gmap
@@ -335,8 +334,7 @@ protected:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateDataGMap3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good);
-
+	void updateDataGMap3(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, float ke, float kf, float kv, const FunctorSelect& good);
 };
 
 

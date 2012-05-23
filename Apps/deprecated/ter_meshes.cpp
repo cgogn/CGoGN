@@ -143,7 +143,7 @@ int main(int argc, char **argv)
 		{
 			fonction_exemple<PFP>(myMap, position, d);
 			// marque tous les brins de la face de d
-			mf.markOrbit(FACE, d);
+			mf.markOrbit<FACE>(d);
 		}
 	}
 

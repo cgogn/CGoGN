@@ -42,7 +42,7 @@ namespace Geometry
 // compute a local frame on the vertex of dart d
 
 template <typename PFP>
-void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
+void vertexLocalFrame(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
 	Z = vertexNormal<PFP>(map, d, position) ;
 	X = vectorOutOfDart<PFP>(map, d, position) ;
@@ -53,7 +53,7 @@ void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3&
 }
 
 template <typename PFP>
-typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	typename PFP::VEC3 X, Y, Z ;
 	vertexLocalFrame<PFP>(map, d, position, X, Y, Z) ;
@@ -67,7 +67,7 @@ typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const ty
 // compute a local frame on the vertex of dart d with a prescribed normal vector
 
 template <typename PFP>
-void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& normal, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
+void vertexLocalFrame(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, typename PFP::VEC3& normal, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
 	Z = normal ;
 	X = vectorOutOfDart<PFP>(map, d, position) ;
@@ -78,7 +78,7 @@ void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3&
 }
 
 template <typename PFP>
-typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& normal)
+typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, typename PFP::VEC3& normal)
 {
 	typename PFP::VEC3 X, Y, Z ;
 	vertexLocalFrame<PFP>(map, d, position, normal, X, Y, Z) ;

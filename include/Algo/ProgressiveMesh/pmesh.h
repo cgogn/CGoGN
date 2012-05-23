@@ -54,7 +54,7 @@ public:
 
 private:
 	MAP& m_map ;
-	typename PFP::TVEC3& positionsTable ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& positionsTable ;
 
 	DartMarker& inactiveMarker ;
 	SelectorUnmarked dartSelect ;
@@ -80,7 +80,7 @@ public:
 	ProgressiveMesh(
 		MAP& map, DartMarker& inactive,
 		Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a,
-		typename PFP::TVEC3& position
+		AttributeHandler<typename PFP::VEC3, VERTEX>& position
 	) ;
 	~ProgressiveMesh() ;
 

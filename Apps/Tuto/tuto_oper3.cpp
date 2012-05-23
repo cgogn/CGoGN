@@ -41,7 +41,6 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-
     sqt.setDock(& sqt.dock);
     sqt.setCallBack( sqt.dock.listOper, SIGNAL(currentRowChanged(int)), SLOT(operation(int)) );
     sqt.setCallBack( sqt.dock.svg, SIGNAL(clicked()), SLOT(svg()) );
@@ -62,7 +61,6 @@ int main(int argc, char **argv)
 	// and wait for the end
 	return app.exec();
 }
-
 
 void MyQT::operation(int x)
 {
@@ -215,9 +213,9 @@ void MyQT::operation(int x)
 void MyQT::createMap(int n)
 {
 	myMap.clear(true);
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.getAttribute<VEC3, VERTEX>("position");
 	if (!position.isValid())
-		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		position = myMap.addAttribute<VEC3, VERTEX>("position");
 	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	prim.hexaGrid_topo(n,n,n);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
@@ -244,11 +242,7 @@ void MyQT::createMap(int n)
 	m_render_topo->setDartWidth(3.0f);
 	m_render_topo->setInitialDartsColor(0.0f,0.0f,0.0f);
 	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
-
-
 }
-
-
 
 void MyQT::updateMap()
 {
@@ -312,7 +306,6 @@ void MyQT::cb_mousePress(int button, int x, int y)
 		}
 		updateGL();
 	}
-
 }
 
 void MyQT::cb_keyPress(int keycode)
@@ -360,7 +353,6 @@ void MyQT::cb_keyPress(int keycode)
 		m_selected = myMap.phi3(m_selected);
 		updateGL();
 		break;
-
 	case 'q':
 		m_selected2 = myMap.phi1(m_selected2);
 		updateGL();
@@ -377,7 +369,6 @@ void MyQT::cb_keyPress(int keycode)
 		m_selected2 = myMap.phi3(m_selected2);
 		updateGL();
 		break;
-
 	case 'w':
 		m_ex1 = 0.99f;
 		m_ex2 = 0.99f;
@@ -428,7 +419,7 @@ void MyQT::cb_keyPress(int keycode)
 //		break;
 	case Qt::Key_Up:
 		if (m_selected!=NIL)
-			position[m_selected][1] +=m_shift;
+			position[m_selected][1] += m_shift;
 		updateMap();
 		updateGL();
 		break;
@@ -456,13 +447,13 @@ void MyQT::cb_keyPress(int keycode)
 
 void MyQT::svg()
 {
-	if (m_selected!=NIL)
-		m_render_topo->setDartColor(m_selected,0.8f,0.0f,0.0f);
-	if (m_selected2!=NIL)
-		m_render_topo->setDartColor(m_selected2,0.0f,0.8f,0.0f);
+	if (m_selected != NIL)
+		m_render_topo->setDartColor(m_selected, 0.8f, 0.0f, 0.0f);
+	if (m_selected2 != NIL)
+		m_render_topo->setDartColor(m_selected2, 0.0f, 0.8f, 0.0f);
 
 	std::string filename = selectFileSave("snapshot file", ".", "(*.svg)");
-	m_render_topo->svgout2D(filename, modelViewMatrix(),projectionMatrix());
+	m_render_topo->svgout2D(filename, modelViewMatrix(), projectionMatrix());
 }
 
 void MyQT::cb_Open()
@@ -477,7 +468,7 @@ void MyQT::cb_Open()
 void MyQT::cb_Save()
 {
 	std::string filename = selectFileSave("Export SVG file ",".","(*.off)");
-	Algo::Export::exportOFF<PFP>(myMap,position,filename.c_str());
+	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str());
 }
 
 void MyQT::importMesh(std::string& filename)
@@ -490,7 +481,7 @@ void MyQT::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
+		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
 	else if (extension == std::string(".node"))
 	{
@@ -500,7 +491,7 @@ void MyQT::importMesh(std::string& filename)
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	else if(extension == std::string(".tet"))
 	{
@@ -510,7 +501,7 @@ void MyQT::importMesh(std::string& filename)
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	else if(extension == std::string(".off"))
 	{
@@ -520,7 +511,7 @@ void MyQT::importMesh(std::string& filename)
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	else
 	{
@@ -538,11 +529,9 @@ void MyQT::importMesh(std::string& filename)
 	updateGLMatrices() ;
 }
 
-
 void MyQT::width(int w)
 {
 	m_ex3 = 0.9f - 0.025f*w;
 	m_render_topo->updateData<PFP>(myMap, position, m_ex1,m_ex2,m_ex3, nb);
 	updateGL();
 }
-

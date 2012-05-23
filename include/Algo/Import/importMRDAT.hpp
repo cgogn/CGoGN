@@ -223,18 +223,18 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			// darts incident to end vertex of edge
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)] ;
 
-			unsigned int embd = map.getEmbedding(VERTEX, d) ;
+			unsigned int embd = map.getEmbedding<VERTEX>(d) ;
 			Dart good_dart = NIL ;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if (map.getEmbedding(VERTEX, map.phi1(*it)) == embd)
+				if (map.getEmbedding<VERTEX>(map.phi1(*it)) == embd)
 					good_dart = *it ;
 			}
 
 			if (good_dart != NIL)
 			{
 				map.sewFaces(d, good_dart, false) ;
-				m.unmarkOrbit(EDGE, d) ;
+				m.unmarkOrbit<EDGE>(d) ;
 			}
 			else
 			{

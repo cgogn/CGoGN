@@ -40,7 +40,7 @@ void statModele(typename PFP::MAP& map, const typename PFP::TVEC3& position)
 	int nbFaces = 0;
 	int nbVertex = 0;
 
-	CellMarker mVertex(map, VERTEX);
+	CellMarker<VERTEX> mVertex(map);
 
 	float ratioMinMax = 0;
 	int nbEdgePerVertex = 0;

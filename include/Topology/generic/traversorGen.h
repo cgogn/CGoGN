@@ -22,34 +22,70 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __ALGO_BOOLEANOPERATOR_VERTICES_H__
-#define __ALGO_BOOLEANOPERATOR_VERTICES_H__
+#ifndef __TRAVERSORGEN_H__
+#define __TRAVERSORGEN_H__
 
-#include "Geometry/basic.h"
-#include "Geometry/inclusion.h"
-#include "Geometry/orientation.h"
+#include "Topology/generic/dart.h"
 
 namespace CGoGN
 {
 
-namespace Algo
+template <typename MAP>
+class Traversor
 {
+public:
+	virtual ~Traversor() {}
+	virtual Dart begin() = 0;
+	virtual Dart end() = 0;
+	virtual Dart next() = 0;
 
-namespace BooleanOperator
-{
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
 
-template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, Dart d, Dart e);
+	/**
+	 * Factory of adjacent traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
 
-template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions);
+	/**
+	 * Factory of darts of orbit traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param orb the orbit
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb);
 
-}
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param good the selector (default value allDarts)
+	 * @param forceDartMarker (default value false)
+	 * @param thread (default value 0)
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createCell(MAP& map, unsigned int orb, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0);
 
-}
+};
 
-}
+} // namespace CGoGN
 
-#include "mergeVertices.hpp"
+
+#include "Topology/generic/traversorGen.hpp"
 
 #endif
+

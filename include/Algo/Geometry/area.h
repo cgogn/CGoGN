@@ -35,34 +35,34 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+typename PFP::REAL totalArea(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
-typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = allDarts) ;
+void computeAreaFaces(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, FACE>& face_area, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = allDarts) ;
+void computeOneRingAreaVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = allDarts) ;
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = allDarts) ;
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, VERTEX>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 } // namespace Geometry
 

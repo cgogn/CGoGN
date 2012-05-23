@@ -43,16 +43,16 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX, "position") ;
+	AttributeHandler<VEC3, VERTEX> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeHandler<REAL> scalaire = map.template addAttribute<REAL>(VERTEX, "scalar");
+	AttributeHandler<REAL, VERTEX> scalaire = map.template addAttribute<REAL, VERTEX>("scalar");
 	attrNames.push_back(scalaire.name()) ;
 
-	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
+	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbVolumes = 0;
-	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
+	AutoAttributeHandler< NoMathIONameAttribute< std::vector<Dart> >, VERTEX > vecDartsPerVertex(map, "incidents");
 
 	// open file
 	std::ifstream fp(filename.c_str(), std::ios::in);
@@ -75,7 +75,6 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 	verticesID.reserve(nbv);
 	for(unsigned int i = 0; i < nbv;++i)
 	{
-
 		do
 		{
 			std::getline (fp, ligne);
@@ -136,9 +135,8 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		// Embed three "base" vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-			FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[2-j]]);
-			map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
-
+			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
+			map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
@@ -155,8 +153,8 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		//Embed the last "top" vertex
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> fsetemb(map, VERTEX, verticesID[pt[3]]);
-		map.foreach_dart_of_orbit( PFP::MAP::ORBIT_IN_PARENT(VERTEX), d, fsetemb);
+		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+		map.template foreach_dart_of_orbit<VERTEX + PFP::MAP::IN_PARENT>(d, fsetemb);
 
 		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
@@ -181,9 +179,9 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 			Dart good_dart = NIL;
 			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if(map.getEmbedding(VERTEX, map.phi1(*it)) == map.getEmbedding(VERTEX, d) &&
-				   map.getEmbedding(VERTEX, map.phi_1(*it)) == map.getEmbedding(VERTEX, map.phi_1(d)) /*&&
-				   map.getEmbedding(VERTEX, *it) == map.getEmbedding(VERTEX, map.phi1(d)) */)
+				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
+				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)) /*&&
+				   map.template getEmbedding<VERTEX>(*it) == map.template getEmbedding<VERTEX>(map.phi1(d)) */)
 				{
 					good_dart = *it ;
 				}
@@ -192,11 +190,11 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 			if (good_dart != NIL)
 			{
 				map.sewVolumes(d, good_dart, false);
-				m.unmarkOrbit(FACE, d);
+				m.template unmarkOrbit<FACE>(d);
 			}
 			else
 			{
-				m.unmarkOrbit(PFP::MAP::ORBIT_IN_PARENT(FACE), d);
+				m.unmarkOrbit<FACE + PFP::MAP::IN_PARENT>(d);
 				++nbBoundaryFaces;
 			}
 		}

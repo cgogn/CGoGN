@@ -22,10 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-
 #include "tuto5.h"
 #include <iostream>
-
 
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/polyhedron.h"
@@ -36,8 +34,8 @@
 #include "Algo/Render/SVG/mapSVGRender.h"
 
 
-PFP::MAP myMap;
-PFP::TVEC3 position ;
+MAP myMap;
+AttributeHandler<VEC3, VERTEX> position ;
 Dart dglobal;
 
 void MyQT::balls_onoff(bool x)
@@ -87,8 +85,6 @@ void MyQT::slider_text(int x)
 	updateGL();
 }
 
-
-
 void MyQT::animate()
 {
 //	transfoMatrix() = glm::rotate(transfoMatrix(), 0.5f, glm::vec3(0.5773f,0.5773f,0.5773f));
@@ -97,19 +93,17 @@ void MyQT::animate()
 	updateGL();
 }
 
-
 void MyQT::storeVerticesInfo()
 {
-
-	CellMarker mv(myMap,VERTEX);
-	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+	CellMarker<VERTEX> mv(myMap);
+	for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 	{
 		if (!mv.isMarked(d))
 		{
 			mv.mark(d);
 			std::stringstream ss;
 			ss << d << " : "<< position[d];
-			m_strings->addString(ss.str(),position[d]);
+			m_strings->addString(ss.str(), position[d]);
 		}
 	}
 }
@@ -171,7 +165,6 @@ void MyQT::cb_initGL()
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, nb);
 
-
 	// timer example for animation
 	m_timer = new QTimer( this );
 	connect( m_timer, SIGNAL(timeout()), SLOT(animate()) );
@@ -201,7 +194,6 @@ void MyQT::cb_redraw()
 */	
 	m_render_topo->overdrawDart(m_selected, 5, 1.0f, 0.0f, 1.0f);
 	
-
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	if (render_text)
@@ -245,13 +237,13 @@ void MyQT::cb_keyPress(int code)
 	if (code  == 's')
 	{
 		std::string filename = selectFileSave("Export SVG file ",".","(*.svg)");
-		Utils::SVG::SVGOut svg(filename,modelViewMatrix(),projectionMatrix());
+		Utils::SVG::SVGOut svg(filename, modelViewMatrix(), projectionMatrix());
 		svg.setWidth(1.0f);
 		svg.setColor(Geom::Vec3f(0.0f,0.0f,0.5f));
-		Algo::Render::SVG::renderEdges<PFP>(svg,myMap,position);
+		Algo::Render::SVG::renderEdges<PFP>(svg, myMap, position);
 		svg.setColor(Geom::Vec3f(0.0f,0.8f,0.0f));
 		svg.setWidth(5.0f);
-		Algo::Render::SVG::renderVertices<PFP>(svg,myMap,position);
+		Algo::Render::SVG::renderVertices<PFP>(svg, myMap, position);
 		svg.setColor(Geom::Vec3f(1.0f,0.0f,0.0f));
 		m_strings->toSVG(svg);
 		//svg destruction close the file
@@ -274,20 +266,16 @@ void MyQT::cb_keyPress(int code)
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
 
-
-		m_render_topo->updateData<PFP>(myMap, position,  0.9f, 0.9f, 0.9f, allDarts);
+		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, 0.9f, allDarts);
 	}
 }
 
-
-
 int main(int argc, char **argv)
 {
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
 	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
-	CGoGNout << 3 << " tutu "<< 4 <<CGoGNendl;
-
+	CGoGNout << 3 << " tutu "<< 4 << CGoGNendl;
 
 	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	int nb=3;
@@ -333,7 +321,6 @@ int main(int argc, char **argv)
 	sqt.setCallBack( dock.slider_vectors, SIGNAL(valueChanged(int)), SLOT(slider_vectors(int)) );
 	sqt.setCallBack( dock.slider_text, SIGNAL(valueChanged(int)), SLOT(slider_text(int)) );
 
-
 	sqt.m_selected = myMap.begin();
 
 	sqt.setGeometry(100,100,1024,1024);
@@ -349,8 +336,6 @@ int main(int argc, char **argv)
 	CGoGNerr.toConsole(&sqt);
 	CGoGNdbg << " TextureSize " <<  texSize << CGoGNendl;
 	CGoGNerr << " test ERROR  " <<  5*7 << CGoGNflush;
-
-
 
 	// et on attend la fin.
 	return app.exec();

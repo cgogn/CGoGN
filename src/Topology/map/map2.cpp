@@ -187,7 +187,7 @@ void Map2::fillHole(Dart d)
 	Dart dd = d ;
 	if(!isBoundaryMarked(dd))
 		dd = phi2(dd) ;
-	boundaryUnmarkOrbit(FACE, dd) ;
+	boundaryUnmarkOrbit<FACE>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -759,7 +759,7 @@ bool Map2::checkSimpleOrientedPath(std::vector<Dart>& vd)
 	{
 		if(dm.isMarked(*it))
 			return false ;
-		dm.markOrbit(VERTEX, *it) ;
+		dm.markOrbit<VERTEX>(*it) ;
 
 		std::vector<Dart>::iterator prev ;
 		if(it == vd.begin())
@@ -865,7 +865,7 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 	} while (dPhi1 != d);
 
 	if(forboundary)
-		boundaryMarkOrbit(FACE, phi2(d));
+		boundaryMarkOrbit<FACE>(phi2(d));
 
 	return countEdges ;
 }

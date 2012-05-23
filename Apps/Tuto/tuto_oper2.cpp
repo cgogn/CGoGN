@@ -172,9 +172,8 @@ void MyQT::operation(int x)
 
 void MyQT::createMap(int n)
 {
-
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-	colorDarts = myMap.addAttribute<PFP::VEC3>(DART, "color");
+	position = myMap.addAttribute<VEC3, VERTEX>("position");
+	colorDarts = myMap.addAttribute<VEC3, DART>("color");
 
 	Algo::Modelisation::Polyhedron<PFP> grid(myMap,position);
 	grid.grid_topo(n,n);
@@ -209,8 +208,6 @@ void MyQT::createMap(int n)
 		}
 	}
 }
-
-
 
 void MyQT::updateMap()
 {
@@ -274,7 +271,7 @@ void MyQT::cb_keyPress(int keycode)
 	switch(keycode)
 	{
 	case 'c':
-		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
 			if (!myMap.isBoundaryMarked(d))
 			{
@@ -288,7 +285,7 @@ void MyQT::cb_keyPress(int keycode)
 		}
 		break;
 	case 'g':
-		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
 			if (!myMap.isBoundaryMarked(d))
 			{
@@ -299,7 +296,7 @@ void MyQT::cb_keyPress(int keycode)
 		break;
 
 	case 'b':
-		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
+		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
 			if (!myMap.isBoundaryMarked(d))
 			{
@@ -310,7 +307,7 @@ void MyQT::cb_keyPress(int keycode)
 		break;
 	case Qt::Key_Up:
 		if (m_selected!=NIL)
-			position[m_selected][1] +=m_shift;
+			position[m_selected][1] += m_shift;
 		updateMap();
 		updateGL();
 		break;
@@ -372,7 +369,7 @@ void MyQT::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
+		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
 	else
 	{
@@ -382,13 +379,13 @@ void MyQT::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 
-	colorDarts = myMap.getAttribute<PFP::VEC3>(DART, "color");
+	colorDarts = myMap.getAttribute<VEC3, DART>("color");
 	if (!colorDarts.isValid())
 	{
-		colorDarts = myMap.addAttribute<PFP::VEC3>(DART, "color");
+		colorDarts = myMap.addAttribute<VEC3, DART>("color");
 		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 		{
 			if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))

@@ -38,7 +38,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isTetrahedronWellOriented(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positions, bool CCW)
+bool isTetrahedronWellOriented(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, bool CCW)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

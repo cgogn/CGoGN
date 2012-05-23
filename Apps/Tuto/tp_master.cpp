@@ -62,9 +62,9 @@ typedef PFP::VEC3 Point3D;
 
 // Variables pour la gestion des plongements
 //		handler d'attribut de position par sommet
-AttributeHandler<Point3D> position;
+AttributeHandler<Point3D, VERTEX> position;
 //		handler d'attribut de normale par sommet
-AttributeHandler<PFP::VEC3> normal;
+AttributeHandler<PFP::VEC3, VERTEX> normal;
 
 
 /// Fonctions a connaitre:
@@ -92,7 +92,7 @@ private:
 
 	// Assigne un nouveau plongement au sommet. Les anciens plongements sont libérés.
 	void newVertex(Dart d) {
-		embedNewCell(VERTEX,d);
+		embedNewCell<VERTEX>(d);
 	}
 
 public:
@@ -522,7 +522,7 @@ void MyQT::cb_keyPress(int keycode)
 		if (!d_vertices.empty())
 		{
 			std::stringstream ss;
-			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]]<< "( id emb:"<< myMap.getEmbedding(VERTEX,d_vertices[0])<<")"<< std::endl; ;
+			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]]<< "( id emb:"<< myMap.getEmbedding<VERTEX>(d_vertices[0])<<")"<< std::endl;
 			statusMsg(ss.str().c_str());
 		}
 		break;
@@ -600,13 +600,13 @@ int main(int argc, char **argv)
 	if (argc == 2) {
 		std::vector<std::string> attrNames ;
 		Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames) ;
-		position = myMap.getAttribute<Point3D>(VERTEX, attrNames[0]) ;
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
+		position = myMap.getAttribute<Point3D, VERTEX>(attrNames[0]) ;
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
 		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 	}
 	else {
-		position = myMap.addAttribute<Point3D>(VERTEX, "position");
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
+		position = myMap.addAttribute<Point3D, VERTEX>("position");
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
 		myMap.createMap();
 		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 	}

@@ -57,7 +57,7 @@
 
 #include "ui_tuto5.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 
 using namespace CGoGN ;
@@ -72,8 +72,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
-
-using namespace CGoGN ;
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 /**

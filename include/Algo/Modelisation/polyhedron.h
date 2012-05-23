@@ -61,16 +61,13 @@ enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 // Dart triangleFan_topo(typename PFP::MAP& the_map, int n);
 
 
-
 /**
- * Unsex the Umbrella aroud a vertex, close the hole and then
+ * Unsew the Umbrella aroud a vertex, close the hole and then
  * create a symetric to construct a polyedron
  * @param d a dart from the vertex
  */
 template <typename PFP>
 void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position);
-
-
 
 
 
@@ -92,9 +89,6 @@ Dart createPrism(typename PFP::MAP& map, unsigned int nbSides);
  */
 template <typename PFP>
 Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides);
-
-
-
 
 /**
  * create a tetrahedron
@@ -145,6 +139,7 @@ template <typename PFP>
 class Polyhedron
 {
 	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
 
 public:
 	enum {NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED};
@@ -184,9 +179,9 @@ protected:
 
 	bool m_bottom_closed;
 
-	typename PFP::TVEC3& m_positions;
+	AttributeHandler<VEC3, VERTEX>& m_positions;
 
-	typename PFP::VEC3 m_center;
+	VEC3 m_center;
 
 	/**
 	* return the dart of next vertex when traversing the boundary of a quad or trifan grid
@@ -207,7 +202,7 @@ public:
 	* @param map the map in which we want to work
 	* @param idPositions id of attribute position
 	*/
-	Polyhedron(MAP& map, typename PFP::TVEC3& position):
+	Polyhedron(MAP& map, AttributeHandler<VEC3, VERTEX>& position):
 		m_map(map),
 		m_kind(NONE),
 		m_nx(-1), m_ny(-1), m_nz(-1),
@@ -228,17 +223,17 @@ public:
 	/*
 	* get the reference dart
 	*/
-	Dart getDart() { return m_dart;}
+	Dart getDart() { return m_dart; }
 
 	/*
 	* get the center of Polyhedron
 	*/
-	const typename PFP::VEC3&  getCenter() { return m_center;}
+	const typename PFP::VEC3&  getCenter() { return m_center; }
 
 	/**
 	* get the table of darts (one per vertex)
 	*/
-	std::vector<Dart>& getVertexDarts() { return m_tableVertDarts;}
+	std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
 
 	/**
 	* Create a 2D grid
@@ -350,7 +345,7 @@ public:
 	* @param maxHeight height to reach
 	* @param turns number of turn
 	*/
-	void embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
+	void embedHelicoid(float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
 
 	/**
 	* transform the Polyhedron with transformation matrice
@@ -362,7 +357,7 @@ public:
 	* mark all darts of the Polyhedron
 	* @param m the CellMarker(VERTEX) to use
 	*/
-	void mark(CellMarker& m);
+	void mark(CellMarker<VERTEX>& m);
 
 	/**
 	* mark all embedded vertices of the Polyhedron

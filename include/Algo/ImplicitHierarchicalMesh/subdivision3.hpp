@@ -210,7 +210,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 	std::vector<Dart> oldEdges;
 	oldEdges.reserve(20);
 
-	mf.markOrbit(FACE, old) ;
+	mf.markOrbit<FACE>(old) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -221,7 +221,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 			//compute volume centroid
 			if(!mv.isMarked(e))
 			{
-				mv.markOrbit(VERTEX, e);
+				mv.markOrbit<VERTEX>(e);
 				volCenter += position[e];
 				++count;
 				oldEdges.push_back(e);
@@ -232,7 +232,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit<FACE>(ee) ;
 			}
 
 			e = map.phi1(e) ;
@@ -371,7 +371,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 		{
 			unsigned int idedge = map.getNewEdgeId();
 			map.setEdgeId(newEdges[i], idedge, EDGE);
-			mne.markOrbit(EDGE, newEdges[i]);
+			mne.markOrbit<EDGE>(newEdges[i]);
 		}
 	}
 
@@ -501,7 +501,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 		{
 			unsigned int idedge = map.getNewEdgeId();
 			map.setEdgeId(newEdges[i], idedge, EDGE);
-			mne.markOrbit(EDGE, newEdges[i]);
+			mne.markOrbit<EDGE>(newEdges[i]);
 		}
 	}
 
@@ -682,15 +682,15 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 					map.setEdgeId(f3,map.getEdgeId(f3), EDGE);
 					map.setEdgeId(f32,map.getEdgeId(f32), EDGE);
 
-					me.markOrbit(EDGE, f3);
-					me.markOrbit(EDGE, f32);
+					me.markOrbit<EDGE>(f3);
+					me.markOrbit<EDGE>(f32);
 				}
 
 				f = map.phi2(map.phi_1(f));
 			}while(f != x);
 		}
 
-		map.embedOrbit(VERTEX, centralDart, map.getEmbedding(VERTEX, centralDart));
+		map.embedOrbit<VERTEX>(centralDart, map.getEmbedding<VERTEX>(centralDart));
 
 		//Third step : 3-sew internal faces
 		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
@@ -729,7 +729,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	CellMarker mv(map, VERTEX);
+	CellMarker<VERTEX> mv(map);
 
 	typename PFP::VEC3 volCenter;
 	unsigned count = 0 ;
@@ -743,7 +743,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 	std::vector<Dart> oldEdges;
 	oldEdges.reserve(20);
 
-	mf.markOrbit(FACE, old) ;
+	mf.markOrbit<FACE>(old) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -765,7 +765,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit<FACE>(ee) ;
 			}
 
 			e = map.phi1(e) ;
@@ -970,7 +970,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 //			{
 //				unsigned int idedge = map.getNewEdgeId();
 //				map.setEdgeId(*it, idedge, EDGE);
-//				mne.markOrbit(EDGE, *it);
+//				mne.markOrbit<EDGE>(*it);
 //			}
 //		}
 
@@ -1033,7 +1033,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 //		{
 //			unsigned int idedge = map.getNewEdgeId();
 //			map.setEdgeId(*it, idedge, EDGE);
-//			mne.markOrbit(EDGE, *it);
+//			mne.markOrbit<EDGE>(*it);
 //		}
 //	}
 //	}
@@ -1071,7 +1071,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 //		{
 //			unsigned int idedge = map.getNewEdgeId();
 //			map.setEdgeId(*it, idedge, EDGE);
-//			mne.markOrbit(EDGE, *it);
+//			mne.markOrbit<EDGE>(*it);
 //		}
 //	}
 //	}
@@ -1102,7 +1102,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 	 */
 
 	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-	CellMarker mv(map, VERTEX);
+	CellMarker<VERTEX> mv(map);
 
 	typename PFP::VEC3 volCenter;
 	unsigned count = 0 ;
@@ -1116,7 +1116,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 	std::vector<Dart> oldEdges;
 	oldEdges.reserve(512);
 
-	mf.markOrbit(FACE, old) ;
+	mf.markOrbit<FACE>(old) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -1138,7 +1138,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit<FACE>(ee) ;
 			}
 
 			e = map.phi1(e) ;
@@ -1344,7 +1344,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 	//std::cout << "1ere etape finished" << std::endl;
 
-	CellMarker mtf(map, FACE);
+	CellMarker<FACE> mtf(map);
 
 	//Etape 2
 	for (std::vector<std::pair<Dart,Dart> >::iterator edges = subdividedfacesT.begin(); edges != subdividedfacesT.end(); ++edges)
@@ -1435,7 +1435,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 //
 //			if(map.phi3(map.phi2(f1)) == map.phi2(f1) && map.phi3(map.phi2(f2)) == map.phi2(f2))
 //			{
-//				if(map.getEmbedding(VERTEX, map.phi_1(map.phi2(f2))) == map.getEmbedding(VERTEX, map.phi_1(map.phi2(f1))))
+//				if(map.getEmbedding<VERTEX>(map.phi_1(map.phi2(f2))) == map.getEmbedding<VERTEX>(map.phi_1(map.phi2(f1))))
 //				{
 //					map.Map3::sewVolumes(map.phi2(f2), map.phi2(f1));
 //				}
@@ -1471,7 +1471,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 //			{
 //				unsigned int idedge = map.getNewEdgeId();
 //				map.setEdgeId(*it, idedge, EDGE);
-//				mne.markOrbit(EDGE, *it);
+//				mne.markOrbit<EDGE>(*it);
 //			}
 //		}
 //	}
@@ -1508,7 +1508,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 //			{
 //				unsigned int idedge = map.getNewEdgeId();
 //				map.setEdgeId(*it, idedge, EDGE);
-//				mne.markOrbit(EDGE, *it);
+//				mne.markOrbit<EDGE>(*it);
 //			}
 //		}
 //	}
@@ -1635,7 +1635,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);
 
-	mf.markOrbit(FACE, d) ;
+	mf.markOrbit<FACE>(d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -1647,7 +1647,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit<FACE>(ee) ;
 			}
 
 			e = map.phi1(e) ;

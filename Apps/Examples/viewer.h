@@ -26,7 +26,7 @@
 
 #include "Utils/Qt/qtSimple.h"
 #include "ui_viewer.h"
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
@@ -60,6 +60,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 class Viewer : public Utils::QT::SimpleQT
 {
@@ -93,8 +94,8 @@ public:
 	bool m_drawNormals ;
 	bool m_drawTopo ;
 
-	PFP::TVEC3 position ;
-	PFP::TVEC3 normal ;
+	AttributeHandler<VEC3, VERTEX> position ;
+	AttributeHandler<VEC3, VERTEX> normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
 	Algo::Render::GL2::TopoRender* m_topoRender ;

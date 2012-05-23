@@ -37,22 +37,22 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::VEC3 triangleNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position);
+typename PFP::VEC3 newellNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 template <typename PFP>
-typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::VEC3 faceNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::VEC3 vertexNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeNormalFaces(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, FACE>& face_normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 /**
  * compute normals of  vertices
@@ -63,13 +63,13 @@ void computeNormalFaces(typename PFP::MAP& map, const typename PFP::TVEC3& posit
  * @ param th the thread number
  */
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeNormalVertices(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::VEC3, VERTEX>& normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
-typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position) ;
+typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, AttributeHandler<typename PFP::REAL, EDGE>& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 } // namespace Geometry
 

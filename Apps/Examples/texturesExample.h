@@ -50,6 +50,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 /**
  * A class for a little interface and rendering
  */
@@ -70,7 +71,6 @@ public:
 	// VBO
 	Utils::VBO* m_positionVBO;
 	Utils::VBO* m_texcoordVBO;
-
 
 	Utils::Texture<2,Geom::Vec3uc>* m_texture;
 	Utils::Texture<2,float>* m_mask;
@@ -97,9 +97,6 @@ public:
 	void cb_keyPress(int code);
 
 	void cb_Open();
-
-
 };
 
 #endif
-

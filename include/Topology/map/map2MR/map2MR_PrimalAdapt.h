@@ -110,8 +110,13 @@ public:
 	void addNewLevel(bool embedNewVertices = true) ;
 
 	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
-	void propagateDartEmbedding(Dart d, unsigned int orbit) ;
-	void propagateOrbitEmbedding(Dart d, unsigned int orbit) ;
+
+	template <unsigned int ORBIT>
+	void propagateDartEmbedding(Dart d) ;
+
+	template <unsigned int ORBIT>
+	void propagateOrbitEmbedding(Dart d) ;
+
 	Dart cutEdge(Dart d) ;
 	void splitFace(Dart d, Dart e) ;
 

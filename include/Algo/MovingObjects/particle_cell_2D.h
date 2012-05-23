@@ -1,7 +1,7 @@
 #ifndef PARTCELL_H
 #define PARTCELL_H
 
-#include "particle_base.h"
+#include "Algo/MovingObjects/particle_base.h"
 
 #include "Algo/Geometry/inclusion.h"
 #include "Geometry/intersection.h"
@@ -32,7 +32,7 @@ class ParticleCell2D : public ParticleBase
 public :
 	typedef typename PFP::MAP Map;
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::TVEC3 TAB_POS;
+	typedef AttributeHandler<typename PFP::VEC3, VERTEX> TAB_POS;
 
 	Map& m;
 

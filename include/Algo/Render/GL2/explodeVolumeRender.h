@@ -77,15 +77,13 @@ protected:
 
 	Geom::Vec3f m_globalColor;
 
-
-
 public:
 	/**
 	* Constructor
 	* @param withColorPerFace affect a color per face
 	* @param withExplodeFace shrinj each face
 	*/
-	ExplodeVolumeRender(bool withColorPerFace=false, bool withExplodeFace=false) ;
+	ExplodeVolumeRender(bool withColorPerFace = false, bool withExplodeFace = false) ;
 
 	/**
 	* Destructor
@@ -109,17 +107,17 @@ public:
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, const FunctorSelect& good = allDarts) ;
+	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
 	* update all drawing buffers
 	* @param map the map
-	* @param positions  attribute of position vertices
+	* @param positions attribute of position vertices
 	* @param colorPerFace attribute of color (per face)
 	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, typename PFP::TVEC3& positions, typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
+	void updateData(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& positions, const AttributeHandler<typename PFP::VEC3, VOLUME>& colorPerFace, const FunctorSelect& good = allDarts) ;
 
 	/**
 	 * draw edges

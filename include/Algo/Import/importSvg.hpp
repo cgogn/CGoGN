@@ -211,7 +211,7 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 }
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons, CellMarker& polygonsFaces)
+bool importSVG(typename PFP::MAP& map, const std::string& filename, AttributeHandler<typename PFP::VEC3, VERTEX>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef std::vector<VEC3 > POLYGON;
@@ -343,9 +343,9 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 		return false;
 	}
 
-	CellMarker brokenMark(map,EDGE);
-	AttributeHandler<float> edgeWidth = map.template addAttribute<float>(EDGE, "width");
-	AttributeHandler<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > >(EDGE, "planes");
+	CellMarker<EDGE> brokenMark(map);
+	AttributeHandler<float, EDGE> edgeWidth = map.template addAttribute<float, EDGE>("width");
+	AttributeHandler<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE> edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create broken lines
@@ -453,7 +453,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//add bounding box
 
-	CellMarker boundingBox(map,VERTEX);
+	CellMarker<VERTEX> boundingBox(map);
 //	Dart dBorder = map.newFace(4);
 //
 //	VEC3 bbCenter = bb->center();
@@ -512,7 +512,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//process broken lines
-	CellMarker eMTreated(map,EDGE);
+	CellMarker<EDGE> eMTreated(map);
 	for(Dart d = map.begin();d != map.end(); map.next(d))
 	{
 		if(brokenL.isMarked(d) && !eMTreated.isMarked(d))

@@ -33,8 +33,8 @@
 
 
 PFP::MAP myMap;
-PFP::TVEC3 position ;
-PFP::TVEC3 color ;
+AttributeHandler<PFP::VEC3, VERTEX> position ;
+AttributeHandler<PFP::VEC3, VOLUME> color ;
 
 void MyQT::volumes_onoff(bool x)
 {
@@ -139,7 +139,7 @@ void MyQT::cb_initGL()
 
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);
-	m_explode_render->updateData<PFP>(myMap,position,color);
+	m_explode_render->updateData<PFP>(myMap, position, color);
 	m_explode_render->setExplodeVolumes(0.8f);
 	m_explode_render->setExplodeFaces(0.9f);
 	m_explode_render->setAmbiant(Geom::Vec4f(0.2f,0.2f,0.2f,1.0f));
@@ -316,7 +316,7 @@ int main(int argc, char **argv)
 				return 1;
 			}
 			else
-				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+				position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 		}
 
 		if(extension == std::string(".node"))
@@ -340,39 +340,39 @@ int main(int argc, char **argv)
 			}
 			else
 			{
-				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+				position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 				myMap.closeMap();
 			}
 		}
 
-		color = myMap.addAttribute<PFP::VEC3>(VOLUME, "color");
+		color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
 
-		TraversorCell<PFP::MAP> tra(myMap,VOLUME);
-		float maxV=0.0f;
-		for (Dart d = tra.begin(); d != tra.end(); d=tra.next())
+		TraversorCell<PFP::MAP, VOLUME> tra(myMap);
+		float maxV = 0.0f;
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 		{
-			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap,d,position);
+			float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
 			color[d] = PFP::VEC3(v,0,0);
 			if (v>maxV)
 				maxV=v;
 		}
-		for (unsigned int i = color.begin(); i!=color.end(); color.next(i))
+		for (unsigned int i = color.begin(); i != color.end(); color.next(i))
 		{
 			color[i][0] /= maxV;
-			color[i][2] = 1.0f -color[i][0];
+			color[i][2] = 1.0f - color[i][0];
 		}
 	}
 	else
 	{
-		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 		Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 		int nb = 8;
 		prim.hexaGrid_topo(nb,nb,nb);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
-		color = myMap.addAttribute<PFP::VEC3>(VOLUME, "color");
-		TraversorCell<PFP::MAP> tra(myMap,VOLUME);
-		for (Dart d = tra.begin(); d != tra.end(); d=tra.next())
+		color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
+		TraversorW<PFP::MAP> tra(myMap);
+		for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
 			color[d] = position[d] + PFP::VEC3(0.5,0.5,0.5);
 	}
     // un peu d'interface

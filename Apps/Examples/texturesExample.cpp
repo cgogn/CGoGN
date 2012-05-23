@@ -5,7 +5,6 @@
  *      Author: thery
  */
 
-
 #include "texturesExample.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
@@ -45,7 +44,6 @@ void TexView::cb_initGL()
 	createMask(8);
 	m_mask->update();
 
-
 	m_shader = new Utils::ShaderSimpleTexture();
 	m_shader->setAttributePosition(m_positionVBO);
 	m_shader->setAttributeTexCoord(m_texcoordVBO);
@@ -60,9 +58,7 @@ void TexView::cb_initGL()
 	m_shader2->setTextures(m_texture,m_mask);
 	registerShader(m_shader2);
 
-
 	glEnable(GL_TEXTURE_2D);
-
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 }
@@ -73,7 +69,6 @@ void TexView::cb_redraw()
 	glEnable(GL_LIGHTING);
 	if (m_shader)
 	{
-
 		if (m_modeMask)
 		{
 			m_shader2->activeTextures();
@@ -84,14 +79,11 @@ void TexView::cb_redraw()
 			m_shader->activeTexture();
 			m_render->draw(m_shader, Algo::Render::GL2::TRIANGLES);
 		}
-
 	}
 }
 
-
 void TexView::cb_keyPress(int code)
 {
-
 	switch(code)
 	{
 	case 'l':
@@ -156,8 +148,6 @@ void TexView::cb_Open()
 	}
 }
 
-
-
 void TexView::createMask(unsigned int nb)
 {
 	if (nb ==0)
@@ -167,6 +157,7 @@ void TexView::createMask(unsigned int nb)
 	unsigned int sz1 = m_mask->size()[1]/nb;
 
 	for (unsigned int j=0; j<m_mask->size()[1]; ++j)
+	{
 		for (unsigned int i=0; i<m_mask->size()[0]; ++i)
 		{
 			bool b1 = (i/sz0)%2 ==0;
@@ -176,9 +167,8 @@ void TexView::createMask(unsigned int nb)
 			else
 				(*m_mask)(i,j)= 0.0f;
 		}
+	}
 }
-
-
 
 void TexView::computeImage()
 {
@@ -206,8 +196,6 @@ void TexView::computeImage()
 #undef WIDTHCHECKER
 }
 
-
-
 int main(int argc, char**argv)
 {
 	// interface:
@@ -216,8 +204,8 @@ int main(int argc, char**argv)
 
 	PFP::MAP& m = tv.myMap;
 
-	AttributeHandler<PFP::VEC3> position = m.addAttribute<PFP::VEC3>(VERTEX, "position");
-	AttributeHandler<Geom::Vec2f> texcoord = m.addAttribute<Geom::Vec2f>(VERTEX, "texcoord");
+	AttributeHandler<VEC3, VERTEX> position = m.addAttribute<VEC3, VERTEX>("position");
+	AttributeHandler<Geom::Vec2f, VERTEX> texcoord = m.addAttribute<Geom::Vec2f, VERTEX>("texcoord");
 
 #define NB 96
 

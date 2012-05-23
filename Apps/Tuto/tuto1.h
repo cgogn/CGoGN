@@ -56,9 +56,10 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
+typedef PFP::MAP MAP;
+typedef PFP::VEC3 VEC3;
 
-
-class MyQT: public Utils::QT::SimpleQT
+class MyQT : public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
@@ -69,23 +70,24 @@ public:
 
 protected:
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
+
+	// attribute for vertices positions
+	AttributeHandler<VEC3, VERTEX> position;
 
 	// render (for the topo)
 	Algo::Render::GL2::TopoRender* m_render_topo;
 
 	// just for more compact writing
-	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
-	inline Dart PHI_1(Dart d)	{return myMap.phi_1(d);}
-	inline Dart PHI2(Dart d)	{return myMap.phi2(d);}
+	inline Dart PHI1(Dart d) { return myMap.phi1(d); }
+	inline Dart PHI_1(Dart d) { return myMap.phi_1(d); }
+	inline Dart PHI2(Dart d) { return myMap.phi2(d); }
 	template<int X>
-	Dart PHI(Dart d)	{return myMap.phi<X>(d);}
+	Dart PHI(Dart d) { return myMap.phi<X>(d); }
 
 public:
 	// example of simple map creation
 	void createMap();
 };
-
-
 
 #endif

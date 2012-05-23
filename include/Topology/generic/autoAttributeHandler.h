@@ -36,8 +36,8 @@ namespace CGoGN
  * that is added especially. The attribute is removed when
  * the AutoAttributeHandler object is destroyed
  */
-template <typename T>
-class AutoAttributeHandler : public AttributeHandler<T>
+template <typename T, unsigned int ORBIT>
+class AutoAttributeHandler : public AttributeHandler<T, ORBIT>
 {
 public:
 	/**
@@ -47,13 +47,12 @@ public:
 	 * @param nameAttr the name of attribute
 	 * @param nameType the name of type of attribute
 	 */
-	AutoAttributeHandler(AttribMap& m, unsigned int orbit, const std::string& nameAttr = "")
+	AutoAttributeHandler(AttribMap& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
-		if(!m.isOrbitEmbedded(orbit))
-			m.addEmbedding(orbit) ;
-		AttributeContainer& cellCont = this->m_map->m_attribs[orbit] ;
-		AttributeMultiVector<T>* amv = cellCont.addAttribute<T>(nameAttr) ;
+		if(!m.isOrbitEmbedded<ORBIT>())
+			m.addEmbedding<ORBIT>() ;
+		AttributeMultiVector<T>* amv = this->m_map->m_attribs[ORBIT].template addAttribute<T>(nameAttr) ;
 		this->m_attrib = amv ;
 		this->valid = true ;
 		this->registerInMap() ;
@@ -65,6 +64,48 @@ public:
 			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
 	}
 } ;
+
+
+/**
+ *  shortcut class for Vertex AutoAttribute (Handler)
+ */
+template <typename T>
+class VertexAutoAttribute : public AutoAttributeHandler<T,VERTEX>
+{
+public:
+	VertexAutoAttribute(AttribMap& m, const std::string& nameAttr = ""):AutoAttributeHandler<T,VERTEX>(m,nameAttr) {}
+};
+
+/**
+ *  shortcut class for Edge AutoAttribute (Handler)
+ */
+template <typename T>
+class EdgeAutoAttribute : public AutoAttributeHandler<T,EDGE>
+{
+public:
+	EdgeAutoAttribute(AttribMap& m, const std::string& nameAttr = ""):AutoAttributeHandler<T,EDGE>(m,nameAttr) {}
+};
+
+/**
+ *  shortcut class for Face AutoAttribute (Handler)
+ */
+template <typename T>
+class FaceAutoAttribute : public AutoAttributeHandler<T,FACE>
+{
+public:
+	FaceAutoAttribute(AttribMap& m, const std::string& nameAttr = ""):AutoAttributeHandler<T,FACE>(m,nameAttr) {}
+};
+
+/**
+ *  shortcut class for Volume AutoAttribute (Handler)
+ */
+template <typename T>
+class VolumeAutoAttribute : public AutoAttributeHandler<T,VOLUME>
+{
+public:
+	VolumeAutoAttribute(AttribMap& m, const std::string& nameAttr = ""):AutoAttributeHandler<T,VOLUME>(m,nameAttr) {}
+};
+
 
 } // namespace CGoGN
 

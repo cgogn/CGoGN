@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#include "Topology/generic/traversorGen.h"
 
 #ifndef __TRAVERSOR_CELL_H__
 #define __TRAVERSOR_CELL_H__
@@ -32,20 +33,25 @@
 namespace CGoGN
 {
 
-template <typename MAP>
-class TraversorCell
+template <typename MAP, unsigned int ORBIT>
+class TraversorCell: public Traversor<MAP>
 {
 private:
 	MAP& m ;
-	unsigned int m_orbit ;
+
+	AttributeContainer* cont ;
+	unsigned int qCurrent ;
+
 	DartMarker* dmark ;
-	CellMarker* cmark ;
+	CellMarker<ORBIT>* cmark ;
+	AttributeMultiVector<Dart>* quickTraversal ;
+
 	Dart current ;
 	bool firstTraversal ;
 	const FunctorSelect& m_good ;
 
 public:
-	TraversorCell(MAP& map, unsigned int orbit, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
+	TraversorCell(MAP& map, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
 
 	~TraversorCell() ;
 
@@ -59,48 +65,48 @@ public:
 } ;
 
 template <typename MAP>
-class TraversorV : public TraversorCell<MAP>
+class TraversorV : public TraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, good, forceDartMarker, thread)
+	TraversorV(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, good, forceDartMarker, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorE : public TraversorCell<MAP>
+class TraversorE : public TraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, good, forceDartMarker, thread)
-	{}
-};
-
-
-template <typename MAP>
-class TraversorF : public TraversorCell<MAP>
-{
-public:
-	TraversorF(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, good, forceDartMarker, thread)
-	{}
-};
-
-template <typename MAP>
-class TraversorW : public TraversorCell<MAP>
-{
-public:
-	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, good, forceDartMarker, thread)
+	TraversorE(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, good, forceDartMarker, thread)
 	{}
 };
 
 
 template <typename MAP>
-class TraversorDartsOfOrbit
+class TraversorF : public TraversorCell<MAP, FACE>
+{
+public:
+	TraversorF(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, good, forceDartMarker, thread)
+	{}
+};
+
+template <typename MAP>
+class TraversorW : public TraversorCell<MAP, VOLUME>
+{
+public:
+	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, good, forceDartMarker, thread)
+	{}
+};
+
+
+template <typename MAP, unsigned int ORBIT>
+class TraversorDartsOfOrbit: public Traversor<MAP>
 {
 private:
 	std::vector<Dart>::iterator m_current ;
 	std::vector<Dart> m_vd ;
 
 public:
-	TraversorDartsOfOrbit(MAP& map, unsigned int orbit, Dart d, unsigned int thread = 0) ;
+	TraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread = 0) ;
 
 	Dart begin() ;
 

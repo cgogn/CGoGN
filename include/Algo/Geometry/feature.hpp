@@ -38,17 +38,17 @@ namespace Geometry
 template <typename PFP>
 void featureEdgeDetection(
 	typename PFP::MAP& map,
-	typename PFP::TVEC3& position,
-	CellMarker& featureEdge)
+	AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	CellMarker<EDGE>& featureEdge)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 	featureEdge.unmarkAll() ;
 
-	AttributeHandler<VEC3> fNormal = map.template getAttribute<VEC3>(FACE, "normal") ;
+	AttributeHandler<VEC3, FACE> fNormal = map.template getAttribute<VEC3, FACE>("normal") ;
 	if(!fNormal.isValid())
-		fNormal = map.template addAttribute<VEC3>(FACE, "normal") ;
+		fNormal = map.template addAttribute<VEC3, FACE>("normal") ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
 	TraversorE<typename PFP::MAP> t(map) ;
@@ -64,11 +64,11 @@ void featureEdgeDetection(
 template <typename PFP>
 void computeFaceGradient(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& face_normal,
-	const typename PFP::TREAL& kmax,
-	const typename PFP::TREAL& area,
-	typename PFP::TVEC3& face_gradient,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	const AttributeHandler<typename PFP::VEC3, FACE>& face_normal,
+	const AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
+	const AttributeHandler<typename PFP::REAL, FACE>& area,
+	AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -81,10 +81,10 @@ template <typename PFP>
 typename PFP::VEC3 faceGradient(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& face_normal,
-	const typename PFP::TREAL& kmax,
-	const typename PFP::TREAL& face_area)
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	const AttributeHandler<typename PFP::VEC3, FACE>& face_normal,
+	const AttributeHandler<typename PFP::REAL, VERTEX>& kmax,
+	const AttributeHandler<typename PFP::REAL, FACE>& face_area)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -116,9 +116,9 @@ typename PFP::VEC3 faceGradient(
 template <typename PFP>
 void computeVertexGradient(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& face_gradient,
-	const typename PFP::TREAL& face_area,
-	typename PFP::TVEC3& vertex_gradient,
+	const AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
+	const AttributeHandler<typename PFP::REAL, FACE>& face_area,
+	AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_gradient,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -131,8 +131,8 @@ template <typename PFP>
 typename PFP::VEC3 vertexGradient(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& face_gradient,
-	const typename PFP::TREAL& face_area)
+	const AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
+	const AttributeHandler<typename PFP::REAL, FACE>& face_area)
 {
 	typename PFP::VEC3 G(0) ;
 	typename PFP::REAL A(0) ;
@@ -153,8 +153,8 @@ typename PFP::VEC3 vertexGradient(
 //	typename PFP::MAP& map,
 //	Dart d,
 //	const typename PFP::VEC3& K,
-//	const typename PFP::TVEC3& face_gradient,
-//	const typename PFP::TREAL& face_area)
+//	const AttributeHandler<typename PFP::VEC3, FACE>& face_gradient,
+//	const AttributeHandler<typename PFP::REAL, FACE>& face_area)
 //{
 //	typedef typename PFP::REAL REAL ;
 //
@@ -174,8 +174,8 @@ typename PFP::VEC3 vertexGradient(
 template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& Kmax,
-	CellMarker& regularMarker,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax,
+	CellMarker<FACE>& regularMarker,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -197,7 +197,7 @@ bool mutuallyPositive(typename PFP::VEC3& v1, typename PFP::VEC3& v2, typename P
 }
 
 template <typename PFP>
-bool isTriangleRegular(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& Kmax)
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const AttributeHandler<typename PFP::VEC3, VERTEX>& Kmax)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -238,7 +238,7 @@ bool isTriangleRegular(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3
 template <typename PFP>
 void initRidgeSegments(
 	typename PFP::MAP& map,
-	AttributeHandler<ridgeSegment>& ridge_segments,
+	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -250,10 +250,10 @@ void initRidgeSegments(
 template <typename PFP>
 void computeRidgeLines(
 	typename PFP::MAP& map,
-	CellMarker& regularMarker,
-	const typename PFP::TVEC3& vertex_gradient,
-	const typename PFP::TVEC3& K,
-	AttributeHandler<ridgeSegment>& ridge_segments,
+	CellMarker<FACE>& regularMarker,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_gradient,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& K,
+	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -269,9 +269,9 @@ template <typename PFP>
 void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& K,
-	const typename PFP::TVEC3& vertex_gradient,
-	AttributeHandler<ridgeSegment>& ridge_segments)
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& K,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& vertex_gradient,
+	AttributeHandler<ridgeSegment, FACE>& ridge_segments)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -348,8 +348,8 @@ void ridgeLines(
 template <typename PFP>
 void computeSingularTriangle(
 	typename PFP::MAP& map,
-	CellMarker& regularMarker,
-	AttributeHandler<ridgeSegment>& ridge_segments,
+	CellMarker<FACE>& regularMarker,
+	AttributeHandler<ridgeSegment, FACE>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
@@ -365,8 +365,8 @@ template <typename PFP>
 void singularTriangle(
 	typename PFP::MAP& map,
 	Dart d,
-	CellMarker& regularMarker,
-	AttributeHandler<ridgeSegment>& ridge_segments)
+	CellMarker<FACE>& regularMarker,
+	AttributeHandler<ridgeSegment, FACE>& ridge_segments)
 {
 	int nbPoint = 0 ;
 
@@ -428,8 +428,8 @@ template <typename PFP>
 std::vector<typename PFP::VEC3> occludingContoursDetection(
 	typename PFP::MAP& map,
 	const typename PFP::VEC3& cameraPosition,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& normal)
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& position,
+	const AttributeHandler<typename PFP::VEC3, VERTEX>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;

@@ -59,6 +59,9 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+
 
 class MyQT: public Utils::QT::SimpleQT
 {
@@ -71,7 +74,7 @@ public:
 
 protected:
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
 	// render (for the topo)
 //	Algo::Render::GL2::TopoRenderMapD* m_render_topo;
@@ -99,7 +102,5 @@ public:
 	// example of simple map creation
 	void createMap();
 };
-
-
 
 #endif

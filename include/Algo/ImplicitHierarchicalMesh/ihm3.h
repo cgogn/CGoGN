@@ -36,11 +36,11 @@ namespace Algo
 namespace IHM
 {
 
-template<typename T> class AttributeHandler_IHM ;
+template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
 {
-	template<typename T> friend class AttributeHandler_IHM ;
+	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 
 public:
 	unsigned int m_curLevel ;
@@ -48,9 +48,9 @@ public:
 	unsigned int m_edgeIdCount ;
 	unsigned int m_faceIdCount;
 
-	AttributeHandler<unsigned int> m_dartLevel ;
-	AttributeHandler<unsigned int> m_edgeId ;
-	AttributeHandler<unsigned int> m_faceId ;
+	AttributeHandler<unsigned int, DART> m_dartLevel ;
+	AttributeHandler<unsigned int, DART> m_edgeId ;
+	AttributeHandler<unsigned int, DART> m_faceId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -81,15 +81,15 @@ public:
 	/*!
 	 *
 	 */
-	template <typename T>
-	AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
 
 	//!
 	/*!
 	 *
 	 */
-	template <typename T>
-	AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
 	//@}
 
 	/*! @name Basic Topological Operators
@@ -389,26 +389,26 @@ public:
 
 } ;
 
-template <typename T>
-class AttributeHandler_IHM : public AttributeHandler<T>
+template <typename T, unsigned int ORBIT>
+class AttributeHandler_IHM : public AttributeHandler<T, ORBIT>
 {
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler_IHM() : AttributeHandler<T>()
+	AttributeHandler_IHM() : AttributeHandler<T, ORBIT>()
 	{}
 
-	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
+	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT>(m, amv)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const
 	{
-		return AttributeHandler<T>::getDataVector() ;
+		return AttributeHandler<T, ORBIT>::getDataVector() ;
 	}
 
 	bool isValid() const
 	{
-		return AttributeHandler<T>::isValid() ;
+		return AttributeHandler<T, ORBIT>::isValid() ;
 	}
 
 	T& operator[](Dart d) ;
@@ -417,12 +417,12 @@ public:
 
 	T& operator[](unsigned int a)
 	{
-		return AttributeHandler<T>::operator[](a) ;
+		return AttributeHandler<T, ORBIT>::operator[](a) ;
 	}
 
 	const T& operator[](unsigned int a) const
 	{
-		return AttributeHandler<T>::operator[](a) ;
+		return AttributeHandler<T, ORBIT>::operator[](a) ;
 	}
 } ;
 

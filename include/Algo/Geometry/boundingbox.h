@@ -39,7 +39,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = allDarts)
+Geom::BoundingBox<typename PFP::VEC3> computeBoundingBox(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const FunctorSelect& select = allDarts)
 {
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
 	TraversorV<typename PFP::MAP> t(map, select) ;

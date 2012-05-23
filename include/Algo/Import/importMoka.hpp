@@ -49,13 +49,13 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 		return false;
 	}
 
-	AttributeHandler<typename PFP::VEC3> position =  gmap.template getAttribute<typename PFP::VEC3>(VERTEX, "position");
+	AttributeHandler<typename PFP::VEC3, VERTEX> position =  gmap.template getAttribute<typename PFP::VEC3, VERTEX>("position");
 	if (!position.isValid())
-		position = gmap.template addAttribute<typename PFP::VEC3>(VERTEX, "position");
+		position = gmap.template addAttribute<typename PFP::VEC3, VERTEX>("position");
 
 	attrNames.push_back(position.name());
 
-	AttributeContainer& vertexContainer = gmap.getAttributeContainer(VERTEX) ;
+	AttributeContainer& vertexContainer = gmap.template getAttributeContainer<VERTEX>() ;
 
 	std::string ligne;
 	std::getline (fp, ligne);
@@ -70,10 +70,10 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 	// ignore 2nd line
 	std::getline (fp, ligne);
 
-	AttributeHandler<Dart> att_beta0 = gmap.template getAttribute<Dart>(DART, "beta0");
-	AttributeHandler<Dart> att_beta1 = gmap.template getAttribute<Dart>(DART, "beta1");
-	AttributeHandler<Dart> att_beta2 = gmap.template getAttribute<Dart>(DART, "beta2");
-	AttributeHandler<Dart> att_beta3 = gmap.template getAttribute<Dart>(DART, "beta3");
+	AttributeHandler<Dart, DART> att_beta0 = gmap.template getAttribute<Dart, DART>("beta0");
+	AttributeHandler<Dart, DART> att_beta1 = gmap.template getAttribute<Dart, DART>("beta1");
+	AttributeHandler<Dart, DART> att_beta2 = gmap.template getAttribute<Dart, DART>("beta2");
+	AttributeHandler<Dart, DART> att_beta3 = gmap.template getAttribute<Dart, DART>("beta3");
 
 	std::map<Dart, unsigned int> map_dart_emb;
 
@@ -118,7 +118,7 @@ bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vecto
 	}
 
 	for(typename std::map<Dart, unsigned int>::iterator it = map_dart_emb.begin() ; it != map_dart_emb.end() ; ++it)
-		gmap.embedOrbit(VERTEX, it->first, it->second);
+		gmap.embedOrbit<VERTEX>(it->first, it->second);
 
 	gmap.closeMap();
 

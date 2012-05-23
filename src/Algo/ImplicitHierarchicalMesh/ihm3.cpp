@@ -37,9 +37,9 @@ namespace IHM
 
 ImplicitHierarchicalMap3::ImplicitHierarchicalMap3() : m_curLevel(0), m_maxLevel(0), m_edgeIdCount(0), m_faceIdCount(0)
 {
-	m_dartLevel = Map3::addAttribute<unsigned int>(DART, "dartLevel") ;
-	m_faceId = Map3::addAttribute<unsigned int>(DART, "faceId") ;
-	m_edgeId = Map3::addAttribute<unsigned int>(DART, "edgeId") ;
+	m_dartLevel = Map3::addAttribute<unsigned int, DART>("dartLevel") ;
+	m_faceId = Map3::addAttribute<unsigned int, DART>("faceId") ;
+	m_edgeId = Map3::addAttribute<unsigned int, DART>("edgeId") ;
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
@@ -100,7 +100,7 @@ void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>&
 	Dart cit = d;
 
 	v.push_back(cit);
-	m.markOrbit(EDGE, cit);
+	m.markOrbit<EDGE>(cit);
 
 	do
 	{
@@ -122,7 +122,7 @@ void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>&
 			cit = phi1(cit);
 
 		v.push_back(cit);
-		m.markOrbit(EDGE, cit);
+		m.markOrbit<EDGE>(cit);
 
 
 	}
@@ -131,7 +131,7 @@ void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>&
 //	do
 //	{
 //		v.push_back(cit);
-//		m.markOrbit(EDGE, cit);
+//		m.markOrbit<EDGE>(cit);
 //
 //		cit = phi1(cit);
 //
@@ -171,21 +171,21 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 	Map2::sewFaces(d, e);
 	Map2::sewFaces(d2, e2);
 
-	if(isOrbitEmbedded(VERTEX))
+	if(isOrbitEmbedded<VERTEX>())
 	{
-		copyDartEmbedding(VERTEX, d, phi2(phi_1(d)));
-		copyDartEmbedding(VERTEX, e, phi2(phi_1(e)));
-		copyDartEmbedding(VERTEX, d2, phi2(phi_1(d2)));
-		copyDartEmbedding(VERTEX, e2, phi2(phi_1(e2)));
+		copyDartEmbedding<VERTEX>(d, phi2(phi_1(d)));
+		copyDartEmbedding<VERTEX>(e, phi2(phi_1(e)));
+		copyDartEmbedding<VERTEX>(d2, phi2(phi_1(d2)));
+		copyDartEmbedding<VERTEX>(e2, phi2(phi_1(e2)));
 	}
 
-	if(isOrbitEmbedded(EDGE))
+	if(isOrbitEmbedded<EDGE>())
 	{
 
 	}
 
-	if(isOrbitEmbedded(VOLUME))
-		embedNewCell(VOLUME, d);
+	if(isOrbitEmbedded<VOLUME>())
+		embedNewCell<VOLUME>(d);
 	}
 }
 
@@ -215,13 +215,13 @@ void ImplicitHierarchicalMap3::unsewAroundVertex(std::vector<std::pair<Dart, Dar
 
 		Map2::unsewFaces(dit);
 
-		if(isOrbitEmbedded(VERTEX))
+		if(isOrbitEmbedded<VERTEX>())
 		{
-			copyDartEmbedding(VERTEX, phi2(dit2), dit);
-			copyDartEmbedding(VERTEX, phi2(dit), dit2);
+			copyDartEmbedding<VERTEX>(phi2(dit2), dit);
+			copyDartEmbedding<VERTEX>(phi2(dit), dit2);
 		}
 
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
 
 		}
@@ -239,13 +239,13 @@ Dart ImplicitHierarchicalMap3::quadranguleFace(Dart d)
 	Dart bc = newBoundaryCycle(faceDegree(old));
 	sewVolumes(old, bc, false);
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
 		Dart it = bc;
 		do
 		{
-			//copyDartEmbedding(VERTEX, it, phi1(phi3(it)));
-			embedOrbit(VERTEX, it, getEmbedding(VERTEX, phi1(phi3(it))));
+			//copyDartEmbedding<VERTEX>(it, phi1(phi3(it)));
+			embedOrbit<VERTEX>(it, getEmbedding<VERTEX>(phi1(phi3(it))));
 			it = phi1(it) ;
 		} while(it != bc) ;
 	}
@@ -507,7 +507,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 	//parcours les faces du volume au niveau courant
 	//on cherche le brin de niveau le plus bas de la hierarchie
 	//on note le niveau le plus bas de la hierarchie
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
 		Dart e = visitedFaces[i] ;
@@ -579,7 +579,7 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -645,7 +645,7 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 
 	// For every face added to the list
 	//the oldest dart from a volume is the oldest dart from all faces of this volume
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -662,7 +662,7 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -723,7 +723,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 	//parcours les faces du volume au niveau courant
 	//on cherche le brin de niveau le plus bas de la hierarchie
 	//on note le niveau le plus bas de la hierarchie
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
 		Dart e = visitedFaces[i] ;
@@ -740,7 +740,7 @@ bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -893,7 +893,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(old);
 
-	mf.markOrbit(FACE, old) ;
+	mf.markOrbit<FACE>(old) ;
 
 	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
@@ -914,7 +914,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit<FACE>(ee) ;
 			}
 
 			e = phi1(e) ;
@@ -941,7 +941,7 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersByOne(Dart d)
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(old);
 
-	mf.markOrbit(FACE, old) ;
+	mf.markOrbit<FACE>(old) ;
 
 	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
 	{
@@ -963,7 +963,7 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersByOne(Dart d)
 			if(!mf.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mf.markOrbit(FACE, ee) ;
+				mf.markOrbit<FACE>(ee) ;
 			}
 
 			e = phi1(e) ;
