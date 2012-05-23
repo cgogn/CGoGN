@@ -129,6 +129,119 @@ void Map3::fillHole(Dart d)
  *  Topological operations on 3-maps
  *************************************************************************/
 
+Dart Map3::splitVertex(std::vector<Dart>& vd)
+{
+	//assert(checkPathAroundVertex(vd)) ;
+
+	bool boundE = false;
+
+	Dart prev = vd.front();	//elt 0
+
+	Dart db1 = NIL;
+	if(isBoundaryFace(phi1(phi2(prev))))
+	{
+		db1 = phi2(phi3(phi1(phi2(prev))));
+	}
+	else if(isBoundaryEdge(prev))
+	{
+		boundE = true;
+	}
+
+	Dart fs = phi_1(phi2(phi_1(prev)));	//first side
+	//Dart ss = phi2(prev);	//second side
+
+	Map2::splitVertex(prev, phi2(fs));
+
+
+	for(unsigned int i = 1; i < vd.size(); ++i)
+	{
+		//Dart d3 = phi1(ss);
+		prev = vd[i];
+
+		Dart fs = phi_1(phi2(phi_1(prev)));	//first side
+		//Dart ss = phi2(prev);	//second side
+
+		Map2::splitVertex(prev, phi2(fs));
+
+		Dart d1 = phi_1(phi2(phi_1(vd[i-1])));
+		Dart d2 = phi1(phi2(vd[i]));
+
+		phi3sew(d1, d2);
+	}
+
+	Dart db2 = NIL;
+	if(isBoundaryFace(phi2(phi_1(prev))))
+	{
+		db2 = phi2(phi3(phi2(phi_1(prev))));
+	}
+
+	if(db1 != NIL && db2 != NIL)
+	{
+		Map2::splitVertex(db1, db2);
+		phi3sew(phi1(phi2(db2)), phi_1(phi3(phi2(db2))));
+		phi3sew(phi1(phi2(db1)), phi_1(phi3(phi2(db1))));
+	}
+	else if(!boundE)
+	{
+		Dart dbegin = phi1(phi2(vd.front()));
+		Dart dend = phi_1(phi2(phi_1(vd.back())));
+		phi3sew(dbegin, dend);
+	}
+
+	return phi_1(phi2(phi_1(prev)));
+}
+
+//	//unsew the face path
+//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//	{
+//		Dart dit = *it;
+//
+//		Map1::cutEdge(phi_1(phi2(phi_1(dit)))); //comme un vertexSplit
+//		Map1::cutEdge(phi2(phi1(phi2(dit))));
+//		Map2::sewFaces(phi1(phi2(phi1(phi2(dit)))), phi_1(phi2(phi_1(dit))), false);
+//
+//
+//
+//		Dart dit3 = phi3(dit);
+//		unsewVolumes(dit);
+
+//		Dart f1 = newFace(3,false);
+//		Dart f2 = newFace(3,false);
+//		Dart f3 = newFace(3,false);
+//		Dart f4 = newFace(3,false);
+//
+//		sewFaces(f1,f2,false);
+//		sewFaces(phi_1(f1), f3, false);
+//		sewFaces(phi1(f1), f4, false);
+//		sewFaces(phi_1(f2), phi1(f4), false);
+//		sewFaces(phi_1(f3), phi1(f2), false);
+//		sewFaces(phi1(f3), phi_1(f4), false);
+//
+//		sewVolumes(dit,f3);
+//		sewVolumes(dit3,f4);
+//	}
+
+/*
+	if(isBoundaryVertex(d))
+	{
+		unsewVolumes(d);
+		unsewVolumes(e);
+
+		Dart dc = phi1(phi2(d));
+
+		//unsewVolumes(phi2(dc));
+		Map2::splitVertex(d, phi1(phi2(dc)));
+
+
+//		Map2::splitFace(d, phi2(dc));
+
+//		Dart ec = phi_1(phi2(e));
+//		Map2::splitVertex(e, ec);
+//		//Map2::splitFace(e, phi2(ec));
+	}
+*/
+
+
 Dart Map3::deleteVertex(Dart d)
 {
 	if(isBoundaryVertex(d))

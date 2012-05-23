@@ -319,6 +319,18 @@ int main(int argc, char **argv)
 				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
 		}
 
+		if(extension == std::string(".node"))
+		{
+			if(!Algo::Import::importMeshV<PFP>(myMap, argv[1], attrNames, Algo::Import::ImportVolumique::NODE))
+			{
+				std::cerr << "could not import " << argv[1] << std::endl ;
+				return 1;
+			}
+			else
+				position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+		}
+
+
 		if(extension == std::string(".off"))
 		{
 			if(!Algo::Import::importMeshToExtrude<PFP>(myMap, argv[1], attrNames))

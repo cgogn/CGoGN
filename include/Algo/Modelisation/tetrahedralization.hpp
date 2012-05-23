@@ -55,7 +55,44 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
 
 
 /************************************************************************************************
- * 																		Tetrahedron functions															   *
+ * 									Collapse / Split Operators
+ ************************************************************************************************/
+template <typename PFP>
+Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
+{
+	//split the vertex
+	Dart dres = map.splitVertex(vd);
+
+	//split the faces incident to the new vertex
+	Dart dbegin = map.phi1(map.phi2(vd.front()));
+	Dart dit = dbegin;
+	do
+	{
+		map.splitFace(map.phi1(dit),map.phi_1(dit));
+		dit = map.alpha2(dit);
+	}
+	while(dbegin != dit);
+
+	//split the volumes incident to the new vertex
+	for(unsigned int i = 0; i < vd.size(); ++i)
+	{
+		Dart dit = vd[i];
+
+		std::vector<Dart> v;
+		v.push_back(map.phi1(map.phi1(map.phi2(dit))));
+		std::cout << "[" << v.back();
+		v.push_back(map.phi1(dit));
+		std::cout << " - " << v.back();
+		v.push_back(map.phi1(map.phi2(map.phi_1(dit))));
+		std::cout << " - " << v.back() << "]" << std::endl;
+		//map.splitVolume(v);
+	}
+
+	return dres;
+}
+
+/************************************************************************************************
+ * 								Tetrahedron functions															   *
  ************************************************************************************************/
 
 template <typename PFP>
@@ -80,8 +117,21 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
 	return true;
 }
 
+template <typename PFP>
+bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected)
+{
+	TraversorV<typename PFP::MAP> travV(map, selected);
+	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	{
+		if(!isTetrahedron<PFP>(map, dit))
+			return false;
+	}
+
+	return true;
+}
+
 /************************************************************************************************
- * 																		Topological functions															   *
+ * 									Topological functions															   *
  ************************************************************************************************/
 
 //sew a face into the edge
@@ -380,7 +430,7 @@ void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
 }
 
 /************************************************************************************************
- *																		Flip Functions 																	   *
+ *							Flip Functions 																	   *
  ************************************************************************************************/
 
 template <typename PFP>

@@ -25,8 +25,10 @@
 #include "tuto_oper3.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Geometry/normal.h"
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
@@ -148,7 +150,14 @@ void MyQT::operation(int x)
 		CGoGNout <<"split volume"<<CGoGNendl;
 		if (!m_selecteds.empty())
 		{
+			std::cout << "start" << std::endl;
+			for(std::vector<Dart>::iterator it = m_selecteds.begin() ; it != m_selecteds.end() ; ++it)
+				std::cout << *it << " et phi2() = " << myMap.phi2(*it) <<  std::endl;
+			std::cout << "end" << std::endl;
+
 			myMap.splitVolume(m_selecteds);
+			m_selecteds.clear();
+
 			dm.markAll();
 			updateMap();
 		}
@@ -177,6 +186,24 @@ void MyQT::operation(int x)
 			updateMap();
 		}
 		break;
+	case 10:
+		CGoGNout <<"split vertex"<<CGoGNendl;
+		if (!m_selecteds.empty() && m_selected != NIL)
+		{
+			Dart dit = m_selecteds.front();
+			PFP::VEC3 Q = (position[myMap.phi1(m_selected)] + position[m_selected])/2.0f;
+			//PFP::VEC3 c1 = Algo::Geometry::volumeCentroid<PFP>(myMap, dit, position);
+			//Dart dres = myMap.splitVertex(m_selecteds);
+			Dart dres = Algo::Modelisation::Tetrahedralization::splitVertex<PFP>(myMap, m_selecteds);
+			position[dres] = position[dit] + Q*0.25f;
+			//position[dit] = position[dit] - c1*0.5f;
+			m_selecteds.clear();
+			m_selected = NIL;
+			dm.markAll();
+			updateMap();
+			std::cout << "nb darts after = " << myMap.getNbDarts() << std::endl;
+		}
+		break;
 	default:
 		break;
 	}
@@ -194,6 +221,15 @@ void MyQT::createMap(int n)
 	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	prim.hexaGrid_topo(n,n,n);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
+
+//	Dart d = Algo::Modelisation::createTetrahedron<PFP>(myMap);
+//	myMap.closeMap();
+//
+//	position[d] = typename PFP::VEC3(0.0f, 0.0f, 0.0f);
+//	position[myMap.phi1(d)] = typename PFP::VEC3(0.0f, 1.0f, 0.0f);
+//	position[myMap.phi1(myMap.phi1(d))] = typename PFP::VEC3(1.0f, 0.5f, 0.0f);
+//	position[myMap.phi_1(myMap.phi2(d))] = typename PFP::VEC3(0.5f, 0.5f, 1.0f);
+
 
     //  bounding box of scene
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;

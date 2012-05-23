@@ -71,7 +71,7 @@
         </item>
         <item>
          <property name="text">
-          <string>collapsedge</string>
+          <string>collapseEdge</string>
          </property>
         </item>
         <item>
@@ -97,6 +97,11 @@
         <item>
          <property name="text">
           <string>collapseVolume</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>splitVertex</string>
          </property>
         </item>
        </widget>

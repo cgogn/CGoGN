@@ -918,6 +918,39 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	return true ;
 }
 
+template <typename PFP>
+bool exportChoupi(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	out << map.getNbOrbits(VERTEX) << " " << map.getNbOrbits(EDGE) << std::endl;
+
+	TraversorV<typename PFP::MAP> travV(map);
+	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	{
+		out << map.getEmbedding(VERTEX, dit) << " " << position[dit] << std::endl;
+	}
+
+	TraversorE<typename PFP::MAP> travE(map);
+	unsigned int indexE = 0;
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		out << indexE << "  " << map.getEmbedding(VERTEX, dit) << " " << map.getEmbedding(VERTEX, map.phi2(dit)) << std::endl;
+		++indexE;
+	}
+
+	out.close() ;
+	return true ;
+}
+
 } // namespace Export
 
 } // namespace Algo
