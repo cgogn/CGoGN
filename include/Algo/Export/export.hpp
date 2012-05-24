@@ -911,7 +911,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 }
 
 template <typename PFP>
-bool exportChoupi(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -923,19 +923,19 @@ bool exportChoupi(typename PFP::MAP& map, const typename PFP::TVEC3& position, c
 		return false ;
 	}
 
-	out << map.getNbOrbits(VERTEX) << " " << map.getNbOrbits(EDGE) << std::endl;
+	out << map.template getNbOrbits<VERTEX>() << " " << map.template getNbOrbits<EDGE>() << std::endl;
 
 	TraversorV<typename PFP::MAP> travV(map);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
 	{
-		out << map.getEmbedding(VERTEX, dit) << " " << position[dit] << std::endl;
+		out << map.template getEmbedding<VERTEX>(dit) << " " << position[dit] << std::endl;
 	}
 
 	TraversorE<typename PFP::MAP> travE(map);
 	unsigned int indexE = 0;
 	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
 	{
-		out << indexE << "  " << map.getEmbedding(VERTEX, dit) << " " << map.getEmbedding(VERTEX, map.phi2(dit)) << std::endl;
+		out << indexE << "  " << map.template getEmbedding<VERTEX>(dit) << " " << map.template getEmbedding<VERTEX>(map.phi2(dit)) << std::endl;
 		++indexE;
 	}
 
