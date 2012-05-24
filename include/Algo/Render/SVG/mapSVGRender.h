@@ -56,7 +56,7 @@ void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const Verte
  * @warning no depth ordering
  */
 template <typename PFP>
-void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::TVEC3& color, const FunctorSelect& good=allDarts, unsigned int thread=0);
+void renderVertices(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good=allDarts, unsigned int thread=0);
 
 /**
  * render edges in a SVGOut
@@ -70,7 +70,7 @@ void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAt
  * @warning no depth ordering
  */
 template <typename PFP>
-void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::TVEC3& color, const FunctorSelect& good=allDarts, unsigned int thread=0);
+void renderEdges(Utils::SVG::SVGOut& svg, typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good=allDarts, unsigned int thread=0);
 
 } // namespace SVG
 

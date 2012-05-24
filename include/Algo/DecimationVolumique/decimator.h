@@ -20,7 +20,7 @@ void decimate(
 	typename PFP::MAP& the_map,
 	SelectorType s,
 	ApproximatorType a,
-	typename PFP::TVEC3& position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	double nbWanted
 );
 //	const FunctorSelect& selected = allDarts

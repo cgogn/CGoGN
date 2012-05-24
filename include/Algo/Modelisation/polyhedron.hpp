@@ -196,7 +196,7 @@ Dart createOctahedron(typename PFP::MAP& map)
 
 
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position)
+void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3>& position)
 {
 	map.unsewVertexUmbrella(d);
 	unsigned int newFaceDegree = map.closeHole(map.phi1(d));

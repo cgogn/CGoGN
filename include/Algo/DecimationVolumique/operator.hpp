@@ -11,7 +11,7 @@ namespace DecimationVolumique
  *							Collapse Edge Operator	                                *
  ************************************************************************************/
 template <typename PFP>
-unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, typename PFP::TVEC3& position)
+unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position)
 {
 	unsigned int nbCell = 0;
 
@@ -23,7 +23,7 @@ unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, typename PFP::TVEC3& pos
 }
 
 template <typename PFP>
-bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, typename PFP::TVEC3& position)
+bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	bool canCollapse = true;
 

@@ -55,8 +55,8 @@ public:
 	void setEdge(Dart d) { m_edge = d; }
 	OperatorType getType() {return O_CVolume;};
 
-	virtual unsigned int perform(MAP& m, typename PFP::TVEC3& position) = 0;
-	virtual bool canPerform(MAP &m ,Dart d, typename PFP::TVEC3& position) = 0;
+	virtual unsigned int perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
+	virtual bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
 };
 
 template <typename PFP>
@@ -100,8 +100,8 @@ public:
 	{ }
 
 	OperatorType getType() { return O_CEdge; }
-	unsigned int perform(MAP &m, typename PFP::TVEC3& position);
-	bool canPerform(MAP &m ,Dart d, typename PFP::TVEC3& position);
+	unsigned int perform(MAP &m, VertexAttribute<typename PFP::VEC3>& position);
+	bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
 };
 
 

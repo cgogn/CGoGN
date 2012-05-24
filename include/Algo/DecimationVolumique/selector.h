@@ -44,7 +44,7 @@ protected:
 	/**
 	 *
 	 */
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 	/**
 	 *
 	 */
@@ -56,7 +56,7 @@ protected:
 	Algo::DecimationVolumique::Approximator<PFP>* m_approximator ;
 
 public:
-	Selector(MAP& m, typename PFP::TVEC3& pos) :
+	Selector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos) :
 		m_map(m), m_position(pos)
 	{}
 
@@ -123,7 +123,7 @@ protected:
 
 
 public:
-	EdgeSelector(MAP& m, typename PFP::TVEC3&  pos) :
+	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>&  pos) :
 		Selector<PFP>(m, pos)
 	{}
 
@@ -168,7 +168,7 @@ private:
 	Dart cur;
 
 public:
-	EdgeSelector_MapOrder(MAP& m, typename PFP::TVEC3&  pos) :
+	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>&  pos) :
 		EdgeSelector<PFP>(m, pos)
 	{}
 
@@ -205,7 +205,7 @@ private:
 	bool allSkipped ;
 
 public:
-	EdgeSelector_Random(MAP& m, typename PFP::TVEC3& pos) :
+	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos) :
 		EdgeSelector<PFP>(m, pos)
 	{}
 
@@ -266,7 +266,7 @@ private:
 
 
 public:
-	EdgeSelector_Length(MAP& m, typename PFP::TVEC3&  pos) :
+	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>&  pos) :
 		EdgeSelector<PFP>(m, pos)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;

@@ -9,7 +9,7 @@ namespace DecimationVolumique
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	typename PFP::TVEC3& position, double nbWanted//, const FunctorSelect& selected
+	VertexAttribute<typename PFP::VEC3>& position, double nbWanted//, const FunctorSelect& selected
 )
 {
 	Approximator<PFP>* approximator = NULL ;

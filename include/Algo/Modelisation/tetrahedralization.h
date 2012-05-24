@@ -112,7 +112,7 @@ Dart swap2To3(typename PFP::MAP& map, Dart d);
  *
  */
 template <typename PFP>
-void swap5To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
+void swap5To4(typename PFP::MAP& the_map, Dart d, VertexAttribute<typename PFP::VEC3>& positions);
 
 /************************************************************************************************
  *																		Flip Functions 																	   *
@@ -122,13 +122,13 @@ void swap5To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions
  *
  */
 template <typename PFP>
-void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
 /**
  *
  */
 template <typename PFP>
-void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
 } // namespace Tetrahedralization
 

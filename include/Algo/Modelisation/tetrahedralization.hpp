@@ -423,7 +423,7 @@ Dart swap2To3(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP>
-void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
+void swap5To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& positions)
 {
 
 
@@ -434,7 +434,7 @@ void swap5To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positions)
  ************************************************************************************************/
 
 template <typename PFP>
-void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 //	typedef typename PFP::TVEC3 TVEC3;
 //	typedef typename PFP::VEC3 VEC3;
@@ -520,7 +520,7 @@ void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
  ************************************************************************************************/
 
 template <typename PFP>
-void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	//coupe l'arete en 2
 	Dart f = map.phi1(d);

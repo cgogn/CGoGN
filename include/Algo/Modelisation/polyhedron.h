@@ -67,7 +67,7 @@ enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
  * @param d a dart from the vertex
  */
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position);
+void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
 
 
