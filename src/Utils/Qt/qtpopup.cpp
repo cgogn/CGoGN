@@ -21,111 +21,42 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
-
-#include "Topology/map/map3.h"
+#include "Utils/Qt/qtpopup.h"
 
 namespace CGoGN
 {
-
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Utils
 {
-public:
-	typedef Map3 TOPO_MAP;
+namespace QT
+{
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+QtPopUp::QtPopUp()
+{
+	m_layout = new QGridLayout(this);
+	setLayout(m_layout);
+}
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+QtPopUp::QtPopUp(QWidget* wid)
+{
+	m_layout = new QGridLayout(this);
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
+	m_layout->addWidget(wid);
 
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
+	setLayout(m_layout);
+}
 
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
 
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
+void QtPopUp::addWidget(QWidget* wid, int col, int row)
+{
+	m_layout->addWidget(wid,col,row);
+}
 
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
+void QtPopUp::keyPressEvent ( QKeyEvent * e )
+{}
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
-
-#endif
+}
+}
+}
+	

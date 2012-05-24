@@ -29,7 +29,9 @@
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
+
 using namespace CGoGN ;
+
 
 
 int main(int argc, char **argv)
@@ -197,7 +199,7 @@ void MyQT::createMap(int n)
 	{
 		if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
 		{
-			int n = random();
+			int n = rand();
 			float r = float(n&0x7f)/255.0f + 0.25f;
 			float g = float((n>>8)&0x7f)/255.0f + 0.25f;
 			float b = float((n>>16)&0x7f)/255.0 + 0.25f;
@@ -273,7 +275,7 @@ void MyQT::cb_keyPress(int keycode)
 		{
 			if (!myMap.isBoundaryMarked(d))
 			{
-				int n = random();
+				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
 				float g = float((n>>8)&0x7f)/255.0f + 0.25f;
 				float b = float((n>>16)&0x7f)/255.0 + 0.25f;
@@ -388,7 +390,7 @@ void MyQT::importMesh(std::string& filename)
 		{
 			if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
 			{
-				int n = random();
+				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
 				float g = float((n>>8)&0x7f)/255.0f + 0.25f;
 				float b = float((n>>16)&0x7f)/255.0 + 0.25f;

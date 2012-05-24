@@ -273,8 +273,8 @@ void SimpleQT::setGLWidgetMouseTracking(bool b)
 
 void SimpleQT::closeEvent(QCloseEvent *event)
 {
-	m_glWidget->closeEvent(event) ;
 	QWidget::closeEvent(event) ;
+	cb_exit();
 }
 
 void SimpleQT::keyPressEvent(QKeyEvent *e)

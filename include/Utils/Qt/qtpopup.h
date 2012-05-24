@@ -22,110 +22,60 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __QT_POP_UP__
+#define __QT_POP_UP__
 
-#include "Topology/map/map3.h"
+#include <QGridLayout>
+#include <QDialog>
+
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Utils
 {
+
+namespace QT
+{
+
+/**
+*	Easy popup window creation
+*   Can contain one a more widgets in a grid
+*	Use show/hide to show/hide !
+*/
+class QtPopUp : public QDialog
+{
+	Q_OBJECT
+	QGridLayout* m_layout;
 public:
-	typedef Map3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+	/**
+	* create an empty popup
+	*/
+	QtPopUp();
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+	/**
+	* create a popup with one widget
+	*/	
+	QtPopUp(QWidget* wid);
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+	/**
+	* add a widget in the grid layout
+	* @param wid the widget to use
+	* @param row the row in which to insert
+	* @param col the column in which to insert
+	*/	
+	void addWidget(QWidget* wid, int row, int col);
+	
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+protected:
+	/// overload keypress event to avoid ESC out
+	virtual void keyPressEvent ( QKeyEvent * e );
+};
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
-
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
-
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
+}
+}
+}
 
 #endif
+

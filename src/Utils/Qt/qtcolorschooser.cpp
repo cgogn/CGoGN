@@ -22,110 +22,63 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
-
-#include "Topology/map/map3.h"
+#include "Utils/Qt/qtcolorschooser.h"
+#include "Utils/Qt/qtSimple.h"
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Utils
 {
-public:
-	typedef Map3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+namespace QT
+{
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+ColorsChooser::ColorsChooser(SimpleQT *interf):
+m_interf(interf)
+{
+	m_list = new QListWidget();
+	m_diag = new QColorDialog();
+	m_diag->setOption(QColorDialog::NoButtons);
+	addWidget(m_list,0,0);
+	addWidget(m_diag,0,1);
+	connect(m_list,  SIGNAL(currentRowChanged(int)), this, SLOT(select_color(int)));
+	connect(m_diag, SIGNAL(	currentColorChanged(const QColor&)), this, SLOT(change_color(const QColor&)));
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+}
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
+unsigned int ColorsChooser::addColor(Geom::Vec3f* ptr, const std::string& name)
+{
+	m_colors.push_back(ptr);
+	m_list->addItem(QString(name.c_str()));
+	return m_colors.size()-1;
+}
 
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
 
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
+void ColorsChooser::select_color(int x)
+{
+	m_current = x;
+	const Geom::Vec3f& col = *m_colors[x];
+	m_diag->show();
+	m_diag->setCurrentColor(QColor(int(255.0f*col[0]), int(255.0f*col[1]), int(255.0f*col[2])) );
+}
 
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
+void ColorsChooser::change_color(const QColor& col)
+{
+	Geom::Vec3f& out = *m_colors[m_current];
+	out[0] = float(col.redF());
+	out[1] = float(col.greenF());
+	out[2] = float(col.blueF());
 
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+	if (m_interf)
+	{
+		updateCallBack(m_interf);
+		m_interf->updateGL();
+	}
+}
 
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
-
-#endif
+}
+}
+}

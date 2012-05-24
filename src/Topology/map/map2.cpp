@@ -196,7 +196,7 @@ void Map2::fillHole(Dart d)
 
 void Map2::splitVertex(Dart d, Dart e)
 {
-	assert(sameOrientedVertex(d, e)) ;
+	assert(sameVertex(d, e)) ;
 	Dart d2 = phi2(d) ; assert(d != d2) ;
 	Dart e2 = phi2(e) ; assert(e != e2) ;
 	Dart nd = Map1::cutEdge(d2) ;	// Cut the edge of dd (make a new half edge)

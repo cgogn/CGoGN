@@ -22,56 +22,96 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
-
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-#include "Topology/map/map2MR/filters_Primal.h"
-
-#include "Algo/Modelisation/subdivision.h"
 
 namespace CGoGN
 {
 
-class SelectorCollapsingEdges : public FunctorSelect
+namespace Algo
 {
-protected:
-	const DartMarker& m_dm;
-public:
-	SelectorCollapsingEdges(const DartMarker& dm): m_dm(dm) {}
-	bool operator()(Dart d) const { return m_dm.isMarked(d); }
-	FunctorSelect* copy() const { return new SelectorCollapsingEdges(m_dm);}
-};
 
-class Map2MR_PM : public EmbeddedMap2
+namespace Import
 {
-protected:
-	bool shareVertexEmbeddings ;
 
-	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
-	std::vector<Multiresolution::MRFilter*> analysisFilters ;
+template <typename PFP>
+bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& tabV, std::vector<unsigned int>& tabE)
+{
+	typedef typename PFP::VEC3 VEC3;
 
-	DartMarkerStore* selectedEdges;
+	//open file
+	std::ifstream fp(filename.c_str(), std::ios::in);
+	if (!fp.good())
+	{
+		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
+		return false;
+	}
 
-public:
-	Map2MR_PM() ;
+	std::string ligne;
+	unsigned int nbv, nbe;
+	std::getline(fp, ligne);
 
-	virtual std::string mapTypeName() const { return "Map2MR_PM" ; }
-	void addNewLevel(bool embedNewVertices = true) ;
+	std::stringstream oss(ligne);
+	oss >> nbv;
+	oss >> nbe;
 
-	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
+	std::vector<unsigned int> index;
+	index.reserve(1024);
 
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
+	//read vertices
+	unsigned int id = 0;
+	for(unsigned int j=0 ; j < nbv ; ++j)
+	{
+		do
+		{
+			std::getline(fp, ligne);
+		} while(ligne.size() == 0);
 
-	void analysis() ;
-	void synthesis() ;
-} ;
+		std::stringstream oss(ligne);
+
+		float i, x, y, z;
+		oss >> i;
+		oss >> x;
+		oss >> y;
+		oss >> z;
+
+		VEC3 pos(x,y,z);
+
+		index[i] = id;
+		tabV.push_back(pos);
+		++id;
+	}
+
+	std::stringstream oss2(ligne);
+
+	for(unsigned int i=0 ; i < nbe ; ++i)
+	{
+		do
+		{
+			std::getline(fp, ligne);
+		}while(ligne.size() == 0);
+
+		std::stringstream oss(ligne);
+
+		unsigned int x, y;
+		oss >> x;
+		oss >> x;
+		oss >> y;
+
+		tabE.push_back(index[x]);
+		tabE.push_back(index[y]);
+	}
+
+	//for(typename std::vector<VEC3>::iterator it = tabV.begin() ; it < tabV.end() ; ++it)
+	//	std::cout << *it << std::endl;
+
+	//for(std::vector<unsigned int>::iterator it = tabE.begin() ; it < tabE.end() ; it = it + 2)
+	//	std::cout << *it << " " << *(it + 1) << std::endl;
+
+	return true;
+}
+
+} // namespace Import
+
+} // namespace Algo
 
 } // namespace CGoGN
 
-#endif

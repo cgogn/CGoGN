@@ -22,110 +22,81 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __QT_COLORS_CHOOSER_
+#define __QT_COLORS_CHOOSER_
 
-#include "Topology/map/map3.h"
+
+#include "Utils/Qt/qtSimple.h"
+
+#include <QColorDialog>
+#include <QListWidget>
+#include "Utils/Qt/qtpopup.h"
+
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Utils
 {
+
+namespace QT
+{
+
+//forward definition
+class SimpleQT;
+
+/**
+ * Class that allow to interactively & easily modify application color:
+ *  Example of use
+ * 	cc = new Utils::QT::ColorsChooser(&sqt)
+ * 	cc->addColor(backgroundColor);
+ *  cc->addColor(lineColor);
+ *  cc->show();
+ *  Colors are automatically updated and
+ *
+ *  Closing the window make a hide() (no destruction)
+ *  To destroy: call delete in exit_cb
+ */
+class ColorsChooser: public QtPopUp
+{
+	Q_OBJECT
+protected:
+	std::vector<Geom::Vec3f*> m_colors;
+	std::vector<std::string> m_names;
+	int m_current;
+	QListWidget *m_list;
+	QColorDialog* m_diag;
+	SimpleQT *m_interf;
+
+	/**
+	 *  Update callback, on color has changed (optional)
+	 *  overload with what you want (glClearColor, setColor of shader ...)
+	 *  Called only if interface ptr has been given
+	 *  Do not forget to cast interf in the type of your interface !!
+	 */
+	virtual void updateCallBack(SimpleQT *interf) {}
+
 public:
-	typedef Map3 TOPO_MAP;
-
-	//!
-	/*!
-	 *
+	/**
+	 * constructor
+	 * @param interf a ptr to the SimpltQT interf (if given the updateCallback and updateGL() are called
 	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+	ColorsChooser(SimpleQT *interf=NULL);
 
-	//!
-	/*!
+	/**
+	 * add a color ptr the color chooser
+	 * @param ptr the ptr to the color
+	 * @param name display name in interface
 	 */
-	virtual Dart deleteVertex(Dart d);
+	unsigned int addColor(Geom::Vec3f* ptr, const std::string& name);
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+protected slots:
+	void select_color(int x);
+	void change_color(const QColor& col);
+};
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
-
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
-
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
+}
+}
+}
 
 #endif

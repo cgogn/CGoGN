@@ -71,7 +71,7 @@
         </item>
         <item>
          <property name="text">
-          <string>collapsedge</string>
+          <string>collapseEdge</string>
          </property>
         </item>
         <item>
@@ -99,6 +99,11 @@
           <string>collapseVolume</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>splitVertex</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -110,7 +115,7 @@
          <number>10</number>
         </property>
         <property name="singleStep">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="value">
          <number>1</number>
