@@ -252,7 +252,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 		if (askExportMode)
 			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
 
-		std::vector<AttributeHandler<VEC3, VERTEX>*> attributes ;
+		std::vector<VertexAttribute<VEC3>*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
 	}
