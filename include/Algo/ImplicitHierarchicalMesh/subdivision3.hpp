@@ -37,7 +37,7 @@ namespace IHM
 
 
 template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
@@ -70,7 +70,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 }
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType)
+void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
@@ -176,7 +176,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 }
 
 template <typename PFP>
-Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -381,7 +381,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
 }
 
 template <typename PFP>
-Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -515,7 +515,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, typename PFP::TVEC3
 }
 
 template <typename PFP>
-void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -690,7 +690,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 			}while(f != x);
 		}
 
-		map.embedOrbit<VERTEX>(centralDart, map.getEmbedding<VERTEX>(centralDart));
+		map.template embedOrbit<VERTEX>(centralDart, map.template getEmbedding<VERTEX>(centralDart));
 
 		//Third step : 3-sew internal faces
 		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
@@ -710,7 +710,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
 
 
 template <typename PFP>
-Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -1084,7 +1084,7 @@ Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& positi
 
 
 template <typename PFP>
-Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
@@ -1547,7 +1547,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& pos
 
 
 template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
@@ -1559,7 +1559,7 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
 }
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType)
+void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
@@ -1614,7 +1614,7 @@ void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, 
 }
 
 template <typename PFP>
-void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	//assert(map.volumeIsSubdivdedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
@@ -1714,7 +1714,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
  *												Raffinement
  ***********************************************************************************/
 template <typename PFP>
-void splitVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position)
+void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;

@@ -142,7 +142,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const AttributeH
  * @return
  */
 template <typename PFP>
-bool exportChoupi(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 } // namespace Export
 
