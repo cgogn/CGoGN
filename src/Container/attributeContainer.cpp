@@ -728,7 +728,7 @@ void  AttributeContainer::copyFrom(const AttributeContainer& cont)
 		{
 			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
 			ptr->setName(cont.m_tableAttribs[i]->getName());
-			ptr->setOrbit(cont.m_tableAttribs[i]->getIndex());
+			ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
 			ptr->setIndex(m_tableAttribs.size());
 			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
 			ptr->copy(cont.m_tableAttribs[i]);
