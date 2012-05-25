@@ -34,13 +34,11 @@ namespace Algo
 namespace Import
 {
 
-
 template<typename MapType, typename AttrTypeLoader>
 bool UniversalLoader<MapType, AttrTypeLoader>::Handleable(const AHEMAttributeDescriptor* ad) const
 {
 	return AttrTypeLoader::Handleable(ad);
 }
-
 
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>::ImportAttribute(	MapType& map,
@@ -74,15 +72,13 @@ void UniversalLoader<MapType, AttrTypeLoader>::ImportAttribute(	MapType& map,
 	}
 }
 
-
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>::UnpackOnVertex(MapType& map, const unsigned int* verticesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	AttributeHandler<typename AttrTypeLoader::ATTR_TYPE> attr =  map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE>(VERTEX, attrName);
+	VertexAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, VERTEX>(attrName);
 
 	if (!attr.isValid())
-		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE>(VERTEX, attrName);
-
+		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, VERTEX>(attrName);
 
 	char* p = (char*)buffer;
 
@@ -93,16 +89,13 @@ void UniversalLoader<MapType, AttrTypeLoader>::UnpackOnVertex(MapType& map, cons
 	}
 }
 
-
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnFace(MapType& map, const Dart* facesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	AttributeHandler<typename AttrTypeLoader::ATTR_TYPE> attr =  map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE>(FACE, attrName);
+	FaceAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE>, FACE(attrName);
 
 	if (!attr.isValid())
 		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE>(FACE, attrName);
-
-
 
 	char* p = (char*)buffer;
 
@@ -113,16 +106,13 @@ void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnFace(MapType& map, const
 	}
 }
 
-
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHE(MapType& map, const Dart* facesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	AttributeHandler<typename AttrTypeLoader::ATTR_TYPE> attr =  map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE>(DART, attrName);
+	DartAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
 
 	if (!attr.isValid())
-		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE>(DART, attrName);
-
-
+		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
 
 	char* p = (char*)buffer;
 
@@ -141,15 +131,13 @@ void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHE(MapType& map, const D
 	}
 }
 
-
 template<typename MapType, typename AttrTypeLoader>
 void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHEFC(MapType& map, const Dart* facesId, const AHEMHeader* hdr, const char* attrName, const void* buffer) const
 {
-	AttributeHandler<typename AttrTypeLoader::ATTR_TYPE> attr =  map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE>(DART, attrName);
+	DartAttribute<typename AttrTypeLoader::ATTR_TYPE> attr = map.template getAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
 
 	if (!attr.isValid())
-		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE>(DART, attrName);
-
+		attr = map.template addAttribute<typename AttrTypeLoader::ATTR_TYPE, DART>(attrName);
 
 	char* p = (char*)buffer;
 
@@ -167,9 +155,6 @@ void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHEFC(MapType& map, const
 	}
 }
 
-
-
-
 /*
  *	Final-glue code for universal parsing of 
  *	[float, float, float] -> Geom::Vector<3, float>
@@ -177,8 +162,6 @@ void UniversalLoader<MapType, AttrTypeLoader>:: UnpackOnHEFC(MapType& map, const
  *
  *	Works with UniversalLoader
  */
-
-
 class Vec3FloatLoader
 {
 public:
@@ -198,9 +181,6 @@ public:
 };
 
 
-
-
-
 /*
  *	Final-glue code for universal parsing of 
  *	[float]^16 -> Geom::Matrix<4, 4, float> (column-major order / OpenGL-style)
@@ -208,8 +188,6 @@ public:
  *
  *	Works with UniversalLoader
  */
-
-
 class Mat44FloatLoader
 {
 public:
@@ -250,8 +228,6 @@ public:
 		*(ATTR_TYPE*)val = m;
 	}	
 };
-
-
 
 } // namespace Import
 

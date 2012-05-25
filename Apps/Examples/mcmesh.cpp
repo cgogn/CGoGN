@@ -30,8 +30,7 @@ MCMesh::MCMesh() :
 	m_render(NULL),
 	m_flatShader(NULL),
 	m_simpleColorShader(NULL)
-{
-}
+{}
 
 void MCMesh::initGUI()
 {
@@ -130,24 +129,18 @@ void MCMesh::slot_drawFaces(bool b)
 	updateGL();
 }
 
-
-
-
-
-
 void MCMesh::MC()
 {
 	myMap.clear(false);
 	// elargir l'image pour le calcul de la courbure
 	Algo::MC::Image<DATATYPE>* myImgFr = myImg->addFrame(1);
 
-
 	Algo::MC::WindowingGreater<DATATYPE> myWindFunc;
 	myWindFunc.setIsoValue(DATATYPE(127));
 
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.getAttribute<VEC3, VERTEX>("position");
 	if (!position.isValid())
-		position	= myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	// instanciation du mc
 	Algo::MC::MarchingCube<DATATYPE, Algo::MC::WindowingGreater,PFP> mc(myImgFr, &myMap, position, myWindFunc, false);
@@ -159,12 +152,8 @@ void MCMesh::MC()
 	updateGL();
 }
 
-
-
-
 void MCMesh::updateRender()
 {
-
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
 	m_render->initPrimitives<PFP>(myMap, nb, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, nb, Algo::Render::GL2::TRIANGLES);
@@ -190,7 +179,9 @@ void MCMesh::sphere()
 	DATATYPE *img = new DATATYPE[128*128*128];
 	DATATYPE *ptr = img;
 	for (int x=0; x<128; ++x)
+	{
 		for (int y=0; y<128; ++y)
+		{
 			for (int z=0; z<128; ++z)
 			{
 				Geom::Vec3f V(x-64, y-64, z-64);
@@ -199,6 +190,8 @@ void MCMesh::sphere()
 				else
 					*ptr++ = 0;
 			}
+		}
+	}
 	
 	myImg = new Algo::MC::Image<DATATYPE>(img,128,128,128,1.0f,1.0f,1.0f,false);
 }
@@ -235,4 +228,3 @@ int main(int argc, char **argv)
 
 	return app.exec();
 }
-

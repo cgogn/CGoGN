@@ -65,7 +65,6 @@ add_executable( tuto_oper3 tuto_oper3.cpp ${tuto_oper3_ui} ${tuto_oper3_moc})
 target_link_libraries( tuto_oper3
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 	
-
 QT4_WRAP_UI( tuto_orbits_ui tuto_orbits.ui )
 QT4_WRAP_CPP(tuto_orbits_moc tuto_orbits.h)
 add_executable( tuto_orbits tuto_orbits.cpp ${tuto_orbits_ui} ${tuto_orbits_moc})
@@ -93,8 +92,8 @@ target_link_libraries( tp_master
 # exemple: BOOST_LIBS(boost_lib_lists "boost_thread-mt;boost_iostreams-mt")
 #BOOST_LIBS(boost_lib_lists "boost_thread-mt")
 
-QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
-add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
-target_link_libraries( tuto_mt
-	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} ${Boost_THREAD_LIBRARY})
+#QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
+#add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
+#target_link_libraries( tuto_mt
+#	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} ${Boost_THREAD_LIBRARY})
 

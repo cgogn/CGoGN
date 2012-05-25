@@ -82,6 +82,15 @@ bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, st
 template <typename PFP>
 bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
+/**
+ * import a Choupi file
+ * @param map
+ * @param filename
+ * @return
+ */
+template <typename PFP>
+bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
+
 /*
  * TODO a transformer en utilisant un MeshTableVolume.
  */
@@ -113,5 +122,7 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 #include "Algo/Import/importMoka.hpp"
 #include "Algo/Import/importTs.hpp"
 #include "Algo/Import/importNodeEle.hpp"
+
+#include "Algo/Import/importChoupi.hpp"
 
 #endif

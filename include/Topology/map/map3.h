@@ -57,8 +57,11 @@ protected:
 public:
 	typedef Map2 ParentMap;
 
-	inline static unsigned int ORBIT_IN_PARENT(unsigned int o)	{ return o+7; }
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o){ return o+7; }
 	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
+
+	static const unsigned int IN_PARENT = 7 ;
+	static const unsigned int IN_PARENT2 = 5 ;
 
 	static const unsigned int VERTEX_OF_PARENT = VERTEX+7;
 	static const unsigned int EDGE_OF_PARENT = EDGE+7;
@@ -137,6 +140,14 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Split the vertex along a permutation of faces
+	/*! \per Darts d & e MUST belong to the same vertex
+	 * 	\per Darts d & e MUST belong to different volumes
+	 *  \per Works only on the boundary
+	 *  @param vd a vector of darts
+	 */
+	virtual Dart splitVertex(std::vector<Dart>& vd);
+
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume
 	 *  @param d a dart of the vertex to delete

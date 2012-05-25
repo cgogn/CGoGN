@@ -127,8 +127,6 @@ public:
 
 	void mouseMoveEvent(QMouseEvent* event);
 
-	void closeEvent(QCloseEvent *event);
-
 	void keyPressEvent(QKeyEvent* event);
 
 	void keyReleaseEvent(QKeyEvent* event);

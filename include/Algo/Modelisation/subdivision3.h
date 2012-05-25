@@ -53,7 +53,7 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d);
 * * TODO (optimization) change to build path while splitting faces
 */
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl);
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl);
 
 /**
 * Cut a volume considering a set of marked edges and vertices
@@ -65,7 +65,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 * TODO (optimization) change to build path while splitting faces
 */
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, CellMarker& edgesToCut, CellMarker& verticesToSplit);
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit);
 
 /**
 * Cut a set of volumes considering a set of marked edges and vertices
@@ -77,7 +77,7 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 * TODO (optimization) change to build path while splitting faces
 */
 template <typename PFP>
-std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,CellMarker& volumesToCut, CellMarker& edgesToCut, CellMarker& verticesToSplit);
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position,CellMarker<VOLUME>& volumesToCut, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit);
 
 /**
 * catmull clark volumic : do not move the original vertices
@@ -87,12 +87,12 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
 * TODO : test if it works for the functorselect
 */
 template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= allDarts);
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts);
 
 template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= allDarts)
+void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts)
 {
-	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
+	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected);
 }
 
 } // namespace Modelisation

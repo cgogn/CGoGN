@@ -267,26 +267,28 @@ void Map2MR_PrimalAdapt::propagateDartRelation(Dart d, AttributeMultiVector<Dart
 	popLevel() ;
 }
 
-void Map2MR_PrimalAdapt::propagateDartEmbedding(Dart d, unsigned int orbit)
+template <unsigned int ORBIT>
+void Map2MR_PrimalAdapt::propagateDartEmbedding(Dart d)
 {
-	unsigned int emb = getEmbedding(orbit, d) ;
+	unsigned int emb = getEmbedding<ORBIT>(d) ;
 	pushLevel() ;
 	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
 	{
 		setCurrentLevel(i) ;
-		setDartEmbedding(orbit, d, emb) ;
+		setDartEmbedding<ORBIT>( d, emb) ;
 	}
 	popLevel() ;
 }
 
-void Map2MR_PrimalAdapt::propagateOrbitEmbedding(Dart d, unsigned int orbit)
+template <unsigned int ORBIT>
+void Map2MR_PrimalAdapt::propagateOrbitEmbedding(Dart d)
 {
-	unsigned int emb = getEmbedding(orbit, d) ;
+	unsigned int emb = getEmbedding<ORBIT>(d) ;
 	pushLevel() ;
 	for(unsigned int i = getCurrentLevel() + 1; i <= getMaxLevel(); ++i)
 	{
 		setCurrentLevel(i) ;
-		embedOrbit(orbit, d, emb) ;
+		embedOrbit<ORBIT>(d, emb) ;
 	}
 	popLevel() ;
 }
@@ -370,8 +372,8 @@ Dart Map2MR_PrimalAdapt::cutEdge(Dart d)
 //
 //		phi2sew(dd, ee) ;
 //
-//		copyDartEmbedding(VERTEX, ee, d) ;
-//		copyDartEmbedding(VERTEX, dd, e) ;
+//		copyDartEmbedding<VERTEX>(ee, d) ;
+//		copyDartEmbedding<VERTEX>(dd, e) ;
 //	}
 //	popLevel() ;
 //}
@@ -395,8 +397,8 @@ void Map2MR_PrimalAdapt::splitFace(Dart d, Dart e)
 	propagateDartRelation(dprev, m_phi1) ;
 	propagateDartRelation(eprev, m_phi1) ;
 
-	propagateDartEmbedding(dd, VERTEX) ;
-	propagateDartEmbedding(ee, VERTEX) ;
+	propagateDartEmbedding<VERTEX>(dd) ;
+	propagateDartEmbedding<VERTEX>(ee) ;
 }
 
 void Map2MR_PrimalAdapt::subdivideEdge(Dart d)
@@ -412,8 +414,8 @@ void Map2MR_PrimalAdapt::subdivideEdge(Dart d)
 	Dart dd1 = phi2(d) ;
 
 	(*edgeVertexFunctor)(d1) ;
-	propagateDartEmbedding(d1, VERTEX) ;
-	propagateDartEmbedding(dd1, VERTEX) ;
+	propagateDartEmbedding<VERTEX>(d1) ;
+	propagateDartEmbedding<VERTEX>(dd1) ;
 
 	decCurrentLevel() ;
 }
@@ -466,21 +468,21 @@ unsigned int Map2MR_PrimalAdapt::subdivideFace(Dart d)
 		Dart dd = phi1(old) ;
 		Dart e = phi1(dd) ;
 		(*vertexVertexFunctor)(e) ;
-		propagateOrbitEmbedding(e, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(e) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
 		(*vertexVertexFunctor)(e) ;
-		propagateOrbitEmbedding(e, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(e) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 
 		dd = e ;
 		e = phi1(dd) ;
 		(*vertexVertexFunctor)(e) ;
-		propagateOrbitEmbedding(e, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(e) ;
 		e = phi1(e) ;
 		splitFace(dd, e) ;
 	}
@@ -489,7 +491,7 @@ unsigned int Map2MR_PrimalAdapt::subdivideFace(Dart d)
 		Dart dd = phi1(old) ;
 		Dart next = phi1(dd) ;
 		(*vertexVertexFunctor)(next) ;
-		propagateOrbitEmbedding(next, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(next) ;
 		next = phi1(next) ;
 		splitFace(dd, next) ;			// insert a first edge
 		Dart ne = alpha1(dd) ;
@@ -498,19 +500,19 @@ unsigned int Map2MR_PrimalAdapt::subdivideFace(Dart d)
 
 		dd = phi1(next) ;
 		(*vertexVertexFunctor)(dd) ;
-		propagateOrbitEmbedding(dd, VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(dd) ;
 		dd = phi1(dd) ;
 		while(dd != ne)					// turn around the face and insert new edges
 		{								// linked to the central vertex
 			splitFace(phi1(ne), dd) ;
 			dd = phi1(dd) ;
 			(*vertexVertexFunctor)(dd) ;
-			propagateOrbitEmbedding(dd, VERTEX) ;
+			propagateOrbitEmbedding<VERTEX>(dd) ;
 			dd = phi1(dd) ;
 		}
 
 		(*faceVertexFunctor)(phi2(ne)) ;
-		propagateOrbitEmbedding(phi2(ne), VERTEX) ;
+		propagateOrbitEmbedding<VERTEX>(phi2(ne)) ;
 	}
 
 	popLevel() ;

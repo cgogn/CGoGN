@@ -47,25 +47,21 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
-
-
 void MyQT::createMap()
 {
-
 	// creation of 2 new faces: 1 triangle and 1 square, sew and embed (see tuto1 for details)
 	Dart d1 = myMap.newFace(3);
 	Dart d2 = myMap.newFace(4);
 	myMap.sewFaces(d1, d2);
-	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	VertexAttribute<VEC3> position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 	position[d1] = PFP::VEC3(0, 0, 0);
 	position[PHI1(d1)] = PFP::VEC3(2, 0, 0);
 	position[PHI_1(d1)] = PFP::VEC3(1, 2, 0);
 	position[PHI<11>(d2)] = PFP::VEC3(0, -2, 0);
 	position[PHI_1(d2)] = PFP::VEC3(2, -2, 0);
 
-
 	// create another attribute on vertices (for faces drawing)
-	AttributeHandler<Geom::Vec3f> colorF = myMap.addAttribute<PFP::VEC3>(VERTEX, "colorF");
+	VertexAttribute<VEC3> colorF = myMap.addAttribute<PFP::VEC3, VERTEX>("colorF");
 
 	colorF[d1] = Geom::Vec3f(1.0f,0.0f,0.0f);
 	colorF[PHI1(d1)] = Geom::Vec3f(0.0f,1.0f,0.0f);
@@ -73,9 +69,8 @@ void MyQT::createMap()
 	colorF[PHI<11>(d2)] = Geom::Vec3f(1.0f,0.0f,1.0f);
 	colorF[PHI_1(d2)] = Geom::Vec3f(0.0f,1.0f,1.0f);
 
-
 	// create another attribute on vertices (for edges drawing)
-	AttributeHandler<Geom::Vec3f> colorE = myMap.addAttribute<PFP::VEC3>(VERTEX, "colorE");
+	VertexAttribute<VEC3> colorE = myMap.addAttribute<PFP::VEC3, VERTEX>("colorE");
 
 	colorE[d1] = Geom::Vec3f(0.0f,0.5f,0.5f);
 	colorE[PHI1(d1)] = Geom::Vec3f(0.5f,0.0f,0.5f);
@@ -83,13 +78,11 @@ void MyQT::createMap()
 	colorE[PHI<11>(d2)] = Geom::Vec3f(0.0f,0.5f,0.0f);
 	colorE[PHI_1(d2)] = Geom::Vec3f(0.5f,0.0f,0.0f);
 
-
 	// example of attribute on face
 	// here for example we store the number of edges of faces at construction
-	AttributeHandler<int> side  = myMap.addAttribute<int>(FACE, "nb_sides");
-	side[d1]=3;
-	side[d2]=4;
-
+	FaceAttribute<int> side  = myMap.addAttribute<int, FACE>("nb_sides");
+	side[d1] = 3;
+	side[d2] = 4;
 
     //  bounding box of scene
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
@@ -102,7 +95,6 @@ void MyQT::createMap()
 	// first show for be sure that GL context is binded
 	show();
 
-
 	// update of position VBO (context GL necessary)
 	m_positionVBO->updateData(position);
 	m_colorVBO1->updateData(colorF);
@@ -112,7 +104,6 @@ void MyQT::createMap()
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);	// special primitive for boundary edges
-
 
 	// traverse of all dart of the map:
 	// and write informations
@@ -129,11 +120,7 @@ void MyQT::createMap()
 			CGoGNout << " / numer of side of face "<< side[d] << CGoGNendl;
 		}
 	}
-
-
 }
-
-
 
 // initialization GL callback
 void MyQT::cb_initGL()
@@ -150,7 +137,6 @@ void MyQT::cb_initGL()
 	m_colorVBO1 = new Utils::VBO();
 	m_colorVBO2 = new Utils::VBO();
 
-
 	// using simple shader with color
 	m_shader = new Utils::ShaderSimpleColor();
 	m_shader->setAttributePosition(m_positionVBO);
@@ -163,8 +149,6 @@ void MyQT::cb_initGL()
 //	m_shader2->setAttributeColor(m_colorVBO1);
 	// each shader must be registred to allow Qt interface to update matrices uniforms
 	registerShader(m_shader2);
-
-
 }
 
 // redraw GL callback (clear and swap already done)
@@ -193,5 +177,3 @@ void MyQT::cb_redraw()
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 }
-
-

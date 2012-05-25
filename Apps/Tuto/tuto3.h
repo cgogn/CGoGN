@@ -56,6 +56,9 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
+
 
 class MyQT: public Utils::QT::SimpleQT
 {
@@ -69,10 +72,10 @@ public:
 
 protected:
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
 	// attribute handler on position;
-	PFP::TVEC3 position;
+	VertexAttribute<VEC3> position;
 
 	// render (for the topo)
 	Algo::Render::GL2::TopoRender* m_render_topo;
@@ -95,7 +98,5 @@ public:
 	// traverse the map using markers
 	void traverseMap();
 };
-
-
 
 #endif

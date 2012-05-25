@@ -57,7 +57,7 @@
 
 #include "ui_tuto_orbits.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 
 using namespace CGoGN ;
@@ -72,8 +72,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
-
-using namespace CGoGN ;
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 /**
@@ -105,8 +105,7 @@ class MyQT: public Utils::QT::SimpleQT
 
 	Algo::Render::GL2::ExplodeVolumeRender* m_explodeRender;
 
-//	AttributeHandler<int> attv2;
-	AttributeHandler<int> m_att_orbits[9];
+	AttributeHandlerGen* m_att_orbits[9];
 
 	QTimer *m_timer;
 	unsigned int current_orbit;
@@ -136,8 +135,13 @@ public:
 	void initMap();
 
 protected:
-	template <typename T>
-	void storeVerticesInfo(const AttributeHandler<T>& attrib);
+	template <unsigned int ORBIT>
+	void storeVerticesInfo(const AttributeHandler<int, ORBIT>* attrib);
+
+	void storeVerticesInfoGen(unsigned int orb, const AttributeHandlerGen* attrib);
+
+	template <unsigned int ORB>
+	void init_att_orb(AttributeHandlerGen* attg);
 
 	void cb_redraw();
 	void cb_initGL();

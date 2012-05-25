@@ -27,7 +27,6 @@
 
 using namespace CGoGN ;
 
-
 int main(int argc, char **argv)
 {
 	//	// interface
@@ -45,8 +44,6 @@ int main(int argc, char **argv)
 	return app.exec();
 }
 
-
-
 void MyQT::createMap()
 {
 	// creation of 2 new faces: 1 triangle and 1 square
@@ -57,16 +54,15 @@ void MyQT::createMap()
 	myMap.sewFaces(d1, d2);
 
 	// creation of a new attribute on vertices of type 3D vector for position.
-	// a handler to this attribute is returned (TVEC3 is a typdef of AttributeHandler<PFP::VEC3>)
-	PFP::TVEC3 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-	//warning: at the end of scope of variable position, handler is destroyed but attribute stay
+	// a handler to this attribute is returned
+	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	// affect position by moving in the map
-	position[d1] = PFP::VEC3(0, 0, 0);
-	position[PHI1(d1)] = PFP::VEC3(2, 0, 0);
-	position[PHI_1(d1)] = PFP::VEC3(1, 2, 0);
-	position[PHI<11>(d2)] = PFP::VEC3(0, -2, 0);
-	position[PHI_1(d2)] = PFP::VEC3(2, -2, 0);
+	position[d1] = VEC3(0, 0, 0);
+	position[PHI1(d1)] = VEC3(2, 0, 0);
+	position[PHI_1(d1)] = VEC3(1, 2, 0);
+	position[PHI<11>(d2)] = VEC3(0, -2, 0);
+	position[PHI_1(d2)] = VEC3(2, -2, 0);
 
     //  bounding box of scene
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
@@ -81,9 +77,8 @@ void MyQT::createMap()
 
 	// render the topo of the map without boundary darts
 	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
+	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, nb);
 }
-
 
 // initialization GL callback
 void MyQT::cb_initGL()
@@ -96,5 +91,3 @@ void MyQT::cb_redraw()
 {
 	m_render_topo->drawTopo();
 }
-
-

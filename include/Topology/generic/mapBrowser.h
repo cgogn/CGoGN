@@ -81,9 +81,9 @@ protected:
 	MAP& m_map ;
 
 	// The table attributes of links storing the linking
-	// The boolean autoAttribute is set if this attribut is managed by the browser
+	// The boolean autoAttribute is set if this attribute is managed by the browser
 	bool autoAttribute ;
-	AttributeHandler<Dart> m_links ;
+	DartAttribute<Dart> m_links ;
 
 	Dart m_first ;
 	Dart m_end ;
@@ -92,10 +92,10 @@ public:
 	MapBrowserLinked(MAP& m) :
 		m_map(m), autoAttribute(true), m_first(NIL), m_end(NIL)
 	{
-		m_links = m.template addAttribute<Dart>(DART,"") ;
+		m_links = m.template addAttribute<Dart, DART>("") ;
 	}
 
-	MapBrowserLinked(MAP& m, AttributeHandler<Dart>& links) :
+	MapBrowserLinked(MAP& m, DartAttribute<Dart>& links) :
 		m_map(m), autoAttribute(false), m_links(links), m_first(NIL), m_end(NIL)
 	{
 	}
@@ -103,7 +103,7 @@ public:
 	~MapBrowserLinked()
 	{
 		if (autoAttribute)
-			m_map.template removeAttribute<Dart>(m_links) ;
+			m_map.removeAttribute(m_links) ;
 	}
 
 	void clear()

@@ -75,11 +75,11 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	AttributeHandler<T>& m_attrV ;	// vertex attribute to be predicted
+	VertexAttribute<T>& m_attrV ;	// vertex attribute to be predicted
 	std::vector<T> m_predict ;		// prediction results
 
 public:
-	Predictor(MAP& m, AttributeHandler<T>& p) :
+	Predictor(MAP& m, VertexAttribute<T>& p) :
 		PredictorGen<PFP>(m), m_attrV(p)
 	{}
 

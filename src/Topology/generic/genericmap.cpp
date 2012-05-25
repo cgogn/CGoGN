@@ -24,7 +24,6 @@
 
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/attributeHandler.h"
-#include "Topology/generic/dartmarker.h"
 #include "Topology/generic/traversorCell.h"
 
 #include "Geometry/vector_gen.h"
@@ -74,6 +73,7 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		m_attribs[i].setOrbit(i) ;
 		m_attribs[i].setRegistry(m_attributes_registry_map) ;
 		m_embeddings[i] = NULL ;
+		m_quickTraversal[i] = NULL ;
 		for(unsigned int j = 0; j < NB_THREAD; ++j)
 		{
 			m_marksets[i][j].clear() ;
@@ -242,98 +242,39 @@ void GenericMap::removeLevel()
 }
 
 /****************************************
- *         EMBEDDING MANAGEMENT         *
- ****************************************/
-
-void GenericMap::setDartEmbedding(unsigned int orbit, Dart d, unsigned int emb)
-{
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded");
-
-	unsigned int old = getEmbedding(orbit, d);
-
-	if (old == emb)	// if same emb
-		return;		// nothing to do
-
-	if (old != EMBNULL)	// if different
-	{
-		if(m_attribs[orbit].unrefLine(old))	// then unref the old emb
-		{
-			for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear the markers if it was the
-				(*m_markTables[orbit][t])[old].clear();		// last unref of the line
-		}
-	}
-
-	if (emb != EMBNULL)
-		m_attribs[orbit].refLine(emb);	// ref the new emb
-
-	(*m_embeddings[orbit])[dartIndex(d)] = emb ;	// finally affect the embedding to the dart
-}
-
-/****************************************
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
-void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
-{
-	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
-	assert((orbit1 != DART && orbit2 != DART) || !"Cannot swap the darts container") ;
-
-	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
-	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
-	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
-
-	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
-
-	for(unsigned int t = 0; t < m_nbThreads; ++t)
-	{
-		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
-		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
-		m_markTables[orbit2][t] = m ;
-
-		MarkSet ms = m_marksets[orbit1][t] ;
-		m_marksets[orbit1][t] = m_marksets[orbit2][t] ;
-		m_marksets[orbit2][t] = ms ;
-	}
-
-	for(std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
-	{
-		if((*it)->m_cell == orbit1)
-			(*it)->m_cell = orbit2 ;
-		else if((*it)->m_cell == orbit2)
-			(*it)->m_cell = orbit1 ;
-	}
-}
-
-template <typename R>
-bool GenericMap::registerAttribute(const std::string &nameType)
-{
-	RegisteredBaseAttribute* ra = new RegisteredAttribute<R>;
-	if (ra == NULL)
-	{
-		CGoGNerr << "Erreur enregistrement attribut" << CGoGNendl;
-		return false;
-	}
-
-	ra->setTypeName(nameType);
-
-	m_attributes_registry_map->insert(std::pair<std::string, RegisteredBaseAttribute*>(nameType,ra));
-	return true;
-}
-
-void GenericMap::initOrbitEmbedding(unsigned int orbit, bool realloc)
-{
-	assert(isOrbitEmbedded(orbit) || !"Invalid parameter: orbit not embedded") ;
-	DartMarker mark(*this) ;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.markOrbit(orbit, d) ;
-			if(realloc || getEmbedding(orbit, d) == EMBNULL)
-				embedNewCell(orbit, d) ;
-		}
-	}
-}
+//void GenericMap::swapEmbeddingContainers(unsigned int orbit1, unsigned int orbit2)
+//{
+//	assert(orbit1 != orbit2 || !"Cannot swap a container with itself") ;
+//	assert((orbit1 != DART && orbit2 != DART) || !"Cannot swap the darts container") ;
+//
+//	m_attribs[orbit1].swap(m_attribs[orbit2]) ;
+//	m_attribs[orbit1].setOrbit(orbit1) ;	// to update the orbit information
+//	m_attribs[orbit2].setOrbit(orbit2) ;	// in the contained AttributeMultiVectors
+//
+//	m_embeddings[orbit1]->swap(m_embeddings[orbit2]) ;
+//
+//	for(unsigned int t = 0; t < m_nbThreads; ++t)
+//	{
+//		AttributeMultiVector<Mark>* m = m_markTables[orbit1][t] ;
+//		m_markTables[orbit1][t] = m_markTables[orbit2][t] ;
+//		m_markTables[orbit2][t] = m ;
+//
+//		MarkSet ms = m_marksets[orbit1][t] ;
+//		m_marksets[orbit1][t] = m_marksets[orbit2][t] ;
+//		m_marksets[orbit2][t] = ms ;
+//	}
+//
+//	for(std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
+//	{
+//		if((*it)->m_cell == orbit1)
+//			(*it)->m_cell = orbit2 ;
+//		else if((*it)->m_cell == orbit2)
+//			(*it)->m_cell = orbit1 ;
+//	}
+//}
 
 void GenericMap::viewAttributesTables()
 {
@@ -359,26 +300,6 @@ void GenericMap::viewAttributesTables()
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		std::cout << (long)(m_markTables[i][0]) << " / " ;
 	std::cout << std::endl << "-------------------------" << std::endl << std::dec ;
-}
-
-/****************************************
- *   EMBEDDING ATTRIBUTES MANAGEMENT    *
- ****************************************/
-
-void GenericMap::addEmbedding(unsigned int orbit)
-{
-	assert(!isOrbitEmbedded(orbit) || !"Invalid parameter: orbit already embedded") ;
-
-	std::ostringstream oss;
-	oss << "EMB_" << orbit;
-
-	AttributeContainer& dartCont = m_attribs[DART] ;
-	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
-	m_embeddings[orbit] = amv ;
-
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		(*amv)[i] = EMBNULL ;
 }
 
 /****************************************
@@ -845,68 +766,9 @@ bool GenericMap::foreach_dart(FunctorType& f, const FunctorSelect& good)
 	return false;
 }
 
-bool GenericMap::foreach_dart_of_orbit(unsigned int orbit, Dart d, FunctorType& f, unsigned int thread)
-{
-	switch(orbit)
-	{
-//		case DART: return f(d);
-//		case VERTEX: return foreach_dart_of_vertex(d, f, thread);
-//		case EDGE: return foreach_dart_of_edge(d, f, thread);
-//		case ORIENTED_FACE: return foreach_dart_of_oriented_face(d, f, thread);
-//		case FACE: return foreach_dart_of_face(d, f, thread);
-//		case VOLUME: return foreach_dart_of_volume(d, f, thread);
-
-		case DART:		return f(d);
-		case VERTEX: 	return foreach_dart_of_vertex(d, f, thread);
-		case EDGE: 		return foreach_dart_of_edge(d, f, thread);
-		case FACE: 		return foreach_dart_of_face(d, f, thread);
-		case VOLUME: 	return foreach_dart_of_volume(d, f, thread);
-		case VERTEX1: 	return foreach_dart_of_vertex1(d, f, thread);
-		case EDGE1: 	return foreach_dart_of_edge1(d, f, thread);
-		case VERTEX2: 	return foreach_dart_of_vertex2(d, f, thread);
-		case EDGE2:		return foreach_dart_of_edge2(d, f, thread);
-		case FACE2:		return foreach_dart_of_face2(d, f, thread);
-		default: assert(!"Cells of this dimension are not handled");break;
-
-	}
-	return false;
-}
-
-bool GenericMap::foreach_orbit(unsigned int orbit, FunctorType& fonct, const FunctorSelect& good, unsigned int thread)
-{
-	TraversorCell<GenericMap> trav(*this, orbit, good, true, thread);
-	bool found = false;
-
-	for (Dart d = trav.begin(); !found && d != trav.end(); d = trav.next())
-	{
-		if ((fonct)(d))
-			found = true;
-	}
-	return found;
-}
-
-unsigned int GenericMap::getNbOrbits(unsigned int orbit, const FunctorSelect& good)
-{
-	FunctorCount fcount;
-	foreach_orbit(orbit, fcount, good);
-	return fcount.getNb();
-}
-
-void GenericMap::boundaryMarkOrbit(unsigned int orbit, Dart d)
-{
-	FunctorMark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
-	foreach_dart_of_orbit(orbit, d, fm, 0) ;
-}
-
-void GenericMap::boundaryUnmarkOrbit(unsigned int orbit, Dart d)
-{
-	FunctorUnmark<GenericMap> fm(*this, m_boundaryMarker, m_markTables[DART][0]) ;
-	foreach_dart_of_orbit(orbit, d, fm, 0) ;
-}
-
 void GenericMap::boundaryUnmarkAll()
 {
-	AttributeContainer& cont = getAttributeContainer(DART) ;
+	AttributeContainer& cont = getAttributeContainer<DART>() ;
 	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
 }

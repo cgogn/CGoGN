@@ -38,7 +38,7 @@ namespace Export
 {
 
 template <typename PFP>
-bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLY(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, bool binary, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -67,7 +67,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	vertices.reserve(nbDarts/6) ;
 
 	// Go over all faces
-	CellMarker markV(map, VERTEX) ;
+	CellMarker<VERTEX> markV(map) ;
 	TraversorF<MAP> t(map, good) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -78,7 +78,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map.template getEmbedding<VERTEX>(it) ;
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -165,7 +165,7 @@ bool exportPLY(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
+bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<typename PFP::VEC3>*>& attributeHandlers, const char* filename, bool binary, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -194,7 +194,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 	vertices.reserve(nbDarts/6) ;
 
 	// Go over all faces
-	CellMarker markV(map, VERTEX) ;
+	CellMarker<VERTEX> markV(map) ;
 	TraversorF<MAP> t(map, good) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -205,7 +205,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map.template getEmbedding<VERTEX>(it) ;
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -241,7 +241,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 	out << "comment or contact : cgogn@unistra.fr" << std::endl ;
 	// Vertex elements
 	out << "element vertex " << vertices.size() << std::endl ;
-	for (typename std::vector<typename PFP::TVEC3* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+	for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 	{
 		if ((*attrHandler)->isValid() && ((*attrHandler)->getOrbit() == VERTEX) )
 		{
@@ -281,7 +281,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 	{
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<typename PFP::TVEC3* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 					out << (*(*attrHandler))[vertices[i]] << std::endl ;
 
@@ -298,7 +298,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 	{
 		// binary vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
-			for (typename std::vector<typename PFP::TVEC3*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			for (typename std::vector<VertexAttribute<typename PFP::VEC3>*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 				{
 					const typename PFP::VEC3& v = (*(*attrHandler))[vertices[i]] ;
@@ -320,7 +320,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 }
 
 template <typename PFP>
-bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -342,7 +342,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	std::vector<unsigned int> vertices ;
 	vertices.reserve(nbDarts/6) ;
 
-	CellMarker markV(map, VERTEX) ;
+	CellMarker<VERTEX> markV(map) ;
 	TraversorF<MAP> t(map, good) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -353,7 +353,7 @@ bool exportOFF(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
 		{
 			++degree ;
-			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			unsigned int vNum = map.template getEmbedding<VERTEX>(it) ;
 			if(!markV.isMarked(it))
 			{
 				markV.mark(it) ;
@@ -409,7 +409,7 @@ bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 	std::vector<unsigned int> vertices ;
 	vertices.reserve(nbDarts/6) ;
 
-	CellMarker markV(map, VERTEX) ;
+	CellMarker<VERTEX> markV(map) ;
 	TraversorF<MAP> t(map, good) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 	{
@@ -453,13 +453,11 @@ bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, cons
 }
 
 template <typename PFP>
-bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::TVEC3 TVEC3;
 	typedef typename PFP::REAL REAL;
-	typedef typename PFP::TREAL TREAL;
 
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
@@ -468,8 +466,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 		return false ;
 	}
 
-	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
-
+	VertexAutoAttribute<unsigned int> tableVertLab(map);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -479,7 +476,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 	vertices.reserve(nbDarts/5);	// TODO non optimal reservation
 	faces.reserve(nbDarts/3);
 
-	CellMarker markV(map, VERTEX);
+	CellMarker<VERTEX> markV(map);
 	TraversorF<MAP> t(map, good) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
@@ -493,7 +490,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.template getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -505,13 +502,13 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 		++nbf;
 	}
 
-	TVEC3 frame[3] ;
-	TVEC3 colorPTM[15] ;
+	VertexAttribute<VEC3> frame[3] ;
+	VertexAttribute<VEC3> colorPTM[15] ;
 
 	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
 	frame[1] = map.template getAttribute<VEC3>(VERTEX, "frame_B") ;
 	frame[2] = map.template getAttribute<VEC3>(VERTEX, "frame_N") ;
-	for (unsigned i = 0 ; i < 15 ; ++i)
+	for (unsigned int i = 0 ; i < 15 ; ++i)
 	{
 		std::stringstream name ;
 		name << "colorPTM_a" << i ;
@@ -542,9 +539,9 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 	for(unsigned int coefI = 0 ; coefI < nbCoefs ; ++coefI)
 		out << "property float C2_a" << coefI << std::endl ;
 
-	TREAL errL2 = map.template getAttribute<REAL>(VERTEX,"errL2") ;
-	TREAL errLmax = map.template getAttribute<REAL>(VERTEX,"errLmax") ;
-	TREAL stdDev = map.template getAttribute<REAL>(VERTEX,"stdDev") ;
+	VertexAttribute<REAL> errL2 = map.template getAttribute<REAL>(VERTEX, "errL2") ;
+	VertexAttribute<REAL> errLmax = map.template getAttribute<REAL>(VERTEX, "errLmax") ;
+	VertexAttribute<REAL> stdDev = map.template getAttribute<REAL>(VERTEX, "stdDev") ;
 	if (errL2.isValid())
 		out << "property float errL2" << std::endl ;
 	if (errLmax.isValid())
@@ -595,13 +592,11 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 }
 /*
 template <typename PFP>
-bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::TVEC3 TVEC3;
 	typedef typename PFP::REAL REAL;
-	typedef typename PFP::TREAL TREAL;
 
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
@@ -611,7 +606,6 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 	}
 
 	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
-
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -635,7 +629,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -647,7 +641,7 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 		++nbf;
 	}
 
-	TVEC3 frame[3] ;
+	VertexAttribute<typename PFP::VEC3> frame[3] ;
 	std::vector<TVEC3> coefs ;
 
 	frame[0] = map.template getAttribute<VEC3>(VERTEX, "frame_T") ;
@@ -729,13 +723,11 @@ bool exportPlySLFgeneric(typename PFP::MAP& map, const typename PFP::TVEC3& posi
 }
 
 template <typename PFP>
-bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::TVEC3 TVEC3;
 	typedef typename PFP::REAL REAL;
-	typedef typename PFP::TREAL TREAL;
 
 	std::ofstream out(filename, std::ios::out) ;
 	if (!out.good())
@@ -768,7 +760,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -872,7 +864,7 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const typename PFP::TVEC3& p
 */
 
 template <typename PFP>
-bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], const typename PFP::TVEC3 colorPTM[6], const FunctorSelect& good)
+bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good)
 {
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -884,7 +876,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		return false ;
 	}
 
-	AutoAttributeHandler<unsigned int> tableVertLab(map, VERTEX);
+	VertexAutoAttribute<unsigned int> tableVertLab(map);
 
 	unsigned int nbDarts = map.getNbDarts() ;
 
@@ -894,7 +886,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 	vertices.reserve(nbDarts/5);	// TODO non optimal reservation
 	faces.reserve(nbDarts/3);
 
-	CellMarker markV(map, VERTEX);
+	CellMarker<VERTEX> markV(map);
 	TraversorF<MAP> t(map, good) ;
 	unsigned int lab = 0;
 	unsigned int nbf = 0;
@@ -908,7 +900,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 			{
 				markV.mark(it);
 				tableVertLab[it] = lab++;
-				vertices.push_back(map.getEmbedding(VERTEX, it));
+				vertices.push_back(map.template getEmbedding<VERTEX>(it));
 			}
 			face.push_back(tableVertLab[it]);
 		}
@@ -978,6 +970,39 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const typename P
 		for(unsigned int j = 0; j < nbe; ++j)
 			out << " " << *it++;
 		out << std::endl ;
+	}
+
+	out.close() ;
+	return true ;
+}
+
+template <typename PFP>
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	out << map.template getNbOrbits<VERTEX>() << " " << map.template getNbOrbits<EDGE>() << std::endl;
+
+	TraversorV<typename PFP::MAP> travV(map);
+	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	{
+		out << map.template getEmbedding<VERTEX>(dit) << " " << position[dit] << std::endl;
+	}
+
+	TraversorE<typename PFP::MAP> travE(map);
+	unsigned int indexE = 0;
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		out << indexE << "  " << map.template getEmbedding<VERTEX>(dit) << " " << map.template getEmbedding<VERTEX>(map.phi2(dit)) << std::endl;
+		++indexE;
 	}
 
 	out.close() ;

@@ -83,17 +83,17 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d)
 }
 
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl)
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl)
 {
 	Dart dRes=NIL;
 	unsigned int nbInter = 0;
 	unsigned int nbVertices = 0;
-	CellMarkerStore vs(map, VERTEX);			//marker for new vertices from edge cut
-	CellMarkerStore cf(map, FACE);
+	CellMarkerStore<VERTEX> vs(map);			//marker for new vertices from edge cut
+	CellMarkerStore<FACE> cf(map);
 	Dart dPath;
 
-	MarkerForTraversor<typename PFP::MAP::ParentMap > mte(map,EDGE);
-	MarkerForTraversor<typename PFP::MAP::ParentMap > mtf(map,FACE);
+	MarkerForTraversor<typename PFP::MAP::ParentMap, EDGE > mte(map);
+	MarkerForTraversor<typename PFP::MAP::ParentMap, FACE > mtf(map);
 
 	//search edges and vertices crossing the plane
 	Traversor3WE<typename PFP::MAP::ParentMap > te(map,d);
@@ -207,19 +207,19 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 }
 
 template <typename PFP>
-Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Dart d, CellMarker& edgesToCut, CellMarker& verticesToSplit)
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit)
 {
 	typedef typename PFP::VEC3 VEC3;
 
 	Dart dRes;
 	unsigned int nbInter = 0;
 	unsigned int nbVertices = 0;
-	CellMarkerStore vs(map, VERTEX);			//marker for new vertices from edge cut
-	CellMarkerStore cf(map, FACE);
+	CellMarkerStore<VERTEX> vs(map);			//marker for new vertices from edge cut
+	CellMarkerStore<FACE> cf(map);
 	Dart dPath;
 
-	MarkerForTraversor<typename PFP::MAP::ParentMap > mte(map,EDGE);
-	MarkerForTraversor<typename PFP::MAP::ParentMap > mtf(map,FACE);
+	MarkerForTraversor<typename PFP::MAP::ParentMap, EDGE > mte(map);
+	MarkerForTraversor<typename PFP::MAP::ParentMap, FACE > mtf(map);
 
 	//search edges and vertices crossing the plane
 	Traversor3WE<typename PFP::MAP::ParentMap > te(map,d);
@@ -306,16 +306,16 @@ Dart sliceConvexVolume(typename PFP::MAP& map, typename PFP::TVEC3& position, Da
 }
 
 template <typename PFP>
-std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3& position,CellMarker& volumesToCut, CellMarker& edgesToCut, CellMarker& verticesToSplit)
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position,CellMarker<VOLUME>& volumesToCut, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit)
 {
-	std::vector<Dart> vRes;
+    std::vector<Dart> vRes;
 
     typedef typename PFP::VEC3 VEC3;
-    CellMarker localVerticesToSplit(map, VERTEX); //marker for new vertices from edge cut
+    CellMarker<VERTEX> localVerticesToSplit(map); //marker for new vertices from edge cut
 
     //Step 1: Cut the edges and mark the resulting vertices as vertices to be face-split
     TraversorE<typename PFP::MAP> te(map);
-    CellMarkerStore cf(map, FACE);
+    CellMarkerStore<FACE> cf(map);
 
     for(Dart d = te.begin(); d != te.end(); d=te.next()) //cut all edges
     {
@@ -398,7 +398,7 @@ std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, typename PFP::TVEC3
             std::vector<Dart> vPath;
             vPath.reserve(32);
             vPath.push_back(dPath);
-            CellMarker cmf(map,FACE);
+            CellMarker<FACE> cmf(map);
 
 
             //define the path to split for the whole volume
@@ -436,11 +436,8 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	std::vector<Dart> l_vertices;
 
 	//pre-computation : compute the centroid of all volume
-	AutoAttributeHandler< EMB > attBary(map, VOLUME);
-	TraversorW<typename PFP::MAP> traW(map, selected);
-
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-		attBary[d] = Algo::Geometry::volumeCentroidGen<PFP,EMBV,EMB>(map, d, attributs);
+	VolumeAutoAttribute<EMB> attBary(map);
+	Algo::Geometry::computeCentroidVolumes<PFP>(map, const_cast<const EMBV&>(attributs), attBary, selected);
 
 	//subdivision
 	//1. cut edges
@@ -452,7 +449,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		if(selected(d) && !mv.isMarked(d))
 		{
 			l_vertices.push_back(d);
-			mv.markOrbit(PFP::MAP::ORBIT_IN_PARENT(VERTEX),d);
+			mv.markOrbit<PFP::MAP::VERTEX_OF_PARENT>(d);
 		}
 
 		Dart f = map.phi1(d);
@@ -543,25 +540,25 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 			Dart dit2 = vd2[i];
 
 			// embed the vertex embedded from the origin volume to the new darts
-			if(map.isOrbitEmbedded(VERTEX))
+			if(map.template isOrbitEmbedded<VERTEX>())
 			{
-				map.copyDartEmbedding(VERTEX, map.phi2(dit), map.phi1(dit));
-				map.copyDartEmbedding(VERTEX, map.phi2(dit2), map.phi1(dit2));
+				map.template copyDartEmbedding<VERTEX>(map.phi2(dit), map.phi1(dit));
+				map.template copyDartEmbedding<VERTEX>(map.phi2(dit2), map.phi1(dit2));
 			}
 
 			// embed the edge embedded from the origin volume to the new darts
-			if(map.isOrbitEmbedded(EDGE))
+			if(map.template isOrbitEmbedded<EDGE>())
 			{
-				unsigned int eEmb = map.getEmbedding(EDGE, dit) ;
-				map.setDartEmbedding(EDGE, map.phi2(dit), eEmb);
-				map.setDartEmbedding(EDGE, map.phi2(dit2), eEmb);
+				unsigned int eEmb = map.template getEmbedding<EDGE>(dit) ;
+				map.template setDartEmbedding<EDGE>(map.phi2(dit), eEmb);
+				map.template setDartEmbedding<EDGE>(map.phi2(dit2), eEmb);
 			}
 
 			// embed the volume embedded from the origin volume to the new darts
-			if(map.isOrbitEmbedded(VOLUME))
+			if(map.template isOrbitEmbedded<VOLUME>())
 			{
-				map.copyDartEmbedding(VOLUME, map.phi2(dit), dit);
-				map.copyDartEmbedding(VOLUME, map.phi2(dit2), dit2);
+				map.template copyDartEmbedding<VOLUME>(map.phi2(dit), dit);
+				map.template copyDartEmbedding<VOLUME>(map.phi2(dit2), dit2);
 			}
 		}
 
@@ -573,15 +570,14 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 		Dart next = map.phi1(map.phi1(dd)) ;
 		map.PFP::MAP::ParentMap::splitFace(dd, next);
 
-		if (map.isOrbitEmbedded(VERTEX))
+		if (map.template isOrbitEmbedded<VERTEX>())
 		{
-			map.copyDartEmbedding(VERTEX, map.phi_1(next), dd) ;
-			map.copyDartEmbedding(VERTEX, map.phi_1(dd), next) ;
+			map.template copyDartEmbedding<VERTEX>(map.phi_1(next), dd) ;
+			map.template copyDartEmbedding<VERTEX>(map.phi_1(dd), next) ;
 		}
 
 		Dart ne = map.phi2(map.phi_1(dd));
 		map.PFP::MAP::ParentMap::cutEdge(ne);
-
 
 //		dd = map.phi1(map.phi1(next)) ;
 //		while(dd != ne)
@@ -589,10 +585,10 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //			Dart tmp = map.phi1(ne) ;
 //			map.PFP::MAP::ParentMap::splitFace(tmp, dd);
 //
-//			if (map.isOrbitEmbedded(VERTEX))
+//			if (map.isOrbitEmbedded<VERTEX>())
 //			{
-//				map.copyDartEmbedding(VERTEX, map.phi_1(dd), tmp) ;
-//				map.copyDartEmbedding(VERTEX, map.phi_1(tmp), dd) ;
+//				map.copyDartEmbedding<VERTEX>(map.phi_1(dd), tmp) ;
+//				map.copyDartEmbedding<VERTEX>(map.phi_1(tmp), dd) ;
 //			}
 //
 //			dd = map.phi1(map.phi1(dd)) ;
@@ -611,7 +607,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //			if(phi3(f1) == f1 && phi3(f2) == f2)
 //				sewVolumes(f1, f2, false);
 //		}
-//		embedOrbit(VERTEX, centralDart, getEmbedding(VERTEX, centralDart));
+//		embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
 		//attributs[map.phi1(ne)] = attBary[*it];
 //
 //		setCurrentLevel(getMaxLevel() - 1) ;
@@ -622,13 +618,13 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //	TraversorE<typename PFP::MAP> travE2(map);
 //	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 //	{
-//		map.embedOrbit(VERTEX, map.phi1(d), map.getEmbedding(VERTEX, map.phi1(d)));
+//		map.embedOrbit<VERTEX>(map.phi1(d), map.getEmbedding<VERTEX>(map.phi1(d)));
 //	}
 //
 //	TraversorF<typename PFP::MAP> travF2(map) ;
 //	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 //	{
-//		map.embedOrbit(VERTEX, map.phi2(map.phi1(d)), map.getEmbedding(VERTEX, map.phi2(map.phi1(d))));
+//		map.embedOrbit<VERTEX>(map.phi2(map.phi1(d)), map.getEmbedding<VERTEX>(map.phi2(map.phi1(d))));
 //	}
 
 

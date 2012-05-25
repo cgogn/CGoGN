@@ -41,12 +41,12 @@ namespace Filtering
 template <typename PFP>
 void computeNewPositionsFromFaceNormals(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
-	typename PFP::TVEC3& position2,
-	const typename PFP::TREAL& faceArea,
-	const typename PFP::TVEC3& faceCentroid,
-	const typename PFP::TVEC3& faceNormal,
-	const typename PFP::TVEC3& faceNewNormal,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	VertexAttribute<typename PFP::VEC3>& position2,
+	const FaceAttribute<typename PFP::REAL>& faceArea,
+	const FaceAttribute<typename PFP::VEC3>& faceCentroid,
+	const FaceAttribute<typename PFP::VEC3>& faceNormal,
+	const FaceAttribute<typename PFP::VEC3>& faceNewNormal,
 	const FunctorSelect& select)
 {
 	typedef typename PFP::VEC3 VEC3 ;
@@ -75,20 +75,20 @@ void computeNewPositionsFromFaceNormals(
 }
 
 template <typename PFP>
-void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
+void filterAverageNormals(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
+	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
+	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
 	TraversorF<typename PFP::MAP> tf(map, select) ;
@@ -119,20 +119,20 @@ void filterAverageNormals(typename PFP::MAP& map, const typename PFP::TVEC3& pos
 }
 
 template <typename PFP>
-void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
+void filterMMSE(typename PFP::MAP& map, float sigmaN2, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
+	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
+	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
 	TraversorF<typename PFP::MAP> tf(map, select) ;
@@ -204,20 +204,20 @@ void filterMMSE(typename PFP::MAP& map, float sigmaN2, const typename PFP::TVEC3
 }
 
 template <typename PFP>
-void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
+void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
+	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
+	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
 
 	// Compute new normals
 	long nbTot = 0 ;
@@ -323,22 +323,22 @@ void filterTNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, con
 }
 
 template <typename PFP>
-void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const typename PFP::TVEC3& normal, const FunctorSelect& select = allDarts)
+void filterVNBA(typename PFP::MAP& map, float sigmaN2, float SUSANthreshold, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	AutoAttributeHandler<REAL> faceArea(map, FACE, "faceArea") ;
-	AutoAttributeHandler<VEC3> faceNormal(map, FACE, "faceNormal") ;
-	AutoAttributeHandler<VEC3> faceCentroid(map, FACE, "faceCentroid") ;
+	FaceAutoAttribute<REAL> faceArea(map, "faceArea") ;
+	FaceAutoAttribute<VEC3> faceNormal(map, "faceNormal") ;
+	FaceAutoAttribute<VEC3> faceCentroid(map, "faceCentroid") ;
 
 	Algo::Geometry::computeAreaFaces<PFP>(map, position, faceArea, select) ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, faceNormal, select) ;
 	Algo::Geometry::computeCentroidFaces<PFP>(map, position, faceCentroid, select) ;
 
-	AutoAttributeHandler<REAL> vertexArea(map, VERTEX, "vertexArea") ;
-	AutoAttributeHandler<VEC3> faceNewNormal(map, FACE, "faceNewNormal") ;
-	AutoAttributeHandler<VEC3> vertexNewNormal(map, VERTEX, "vertexNewNormal") ;
+	VertexAutoAttribute<REAL> vertexArea(map, "vertexArea") ;
+	FaceAutoAttribute<VEC3> faceNewNormal(map, "faceNewNormal") ;
+	VertexAutoAttribute<VEC3> vertexNewNormal(map, "vertexNewNormal") ;
 
 	long nbTot = 0 ;
 	long nbAdapt = 0 ;

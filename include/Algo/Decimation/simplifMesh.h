@@ -36,7 +36,6 @@ namespace Algo
 namespace Decimation
 {
 
-
 /**
  * Example of Edge_Critera class parameter
  * Will be used as edge embedding 
@@ -66,7 +65,7 @@ public:
 	 */
 	EdgeCrit(): m_dirty(false) {}
 
-	virtual float computeKey(typename PFP::MAP& map, typename PFP::TVEC3& posi) const = 0;
+	virtual float computeKey(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi) const = 0;
 
 	/**
 	 * MUST BE IMPLEMENTED
@@ -84,7 +83,7 @@ public:
 	 * MUST BE IMPLEMENTED
 	 * compute new vertex position: here middle of edge
 	 */
-	virtual typename PFP::VEC3 newPosition(typename PFP::MAP& map, typename PFP::TVEC3& posi) const = 0;
+	virtual typename PFP::VEC3 newPosition(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi) const = 0;
 
 
 	/**
@@ -136,7 +135,7 @@ public:
 		this->m_dart = d;
 	}
 
-	float computeKey(typename PFP::MAP& map, typename PFP::TVEC3& posi) const
+	float computeKey(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi) const
 	{
 		typename PFP::VEC3 PQ = Algo::Geometry::vectorOutOfDart<PFP>(map, this->m_dart, posi);
 		return PQ.norm2();
@@ -158,7 +157,7 @@ public:
 	 * MUST BE IMPLEMENTED
 	 * compute new vertex position: here middle of edge
 	 */
-	typename PFP::VEC3 newPosition(typename PFP::MAP& map, typename PFP::TVEC3& posi) const
+	typename PFP::VEC3 newPosition(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi) const
 	{
 		const typename PFP::VEC3& p1 = posi[this->m_dart];
 		const typename PFP::VEC3& p2 = posi[map.phi1(this->m_dart)];
@@ -219,7 +218,7 @@ public:
 	EdgeCrit_LengthFirst(Dart d) :
 		EdgeCrit<PFP>() {this->m_dart = d;}
 
-	float computeKey(typename PFP::MAP& map, typename PFP::TVEC3& posi) const
+	float computeKey(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi) const
 	{
 		typename PFP::VEC3 PQ = Algo::Geometry::vectorOutOfDart<PFP>(map, this->m_dart, posi);
 		return PQ.norm2();
@@ -241,7 +240,7 @@ public:
 	 * MUST BE IMPLEMENTED
 	 * compute new vertex position: here middle of edge
 	 */
-	typename PFP::VEC3 newPosition(typename PFP::MAP& map, typename PFP::TVEC3& posi) const
+	typename PFP::VEC3 newPosition(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posi) const
 	{
 		const typename PFP::VEC3& p1 = posi[this->m_dart];
 		const typename PFP::VEC3& p2 = posi[map.phi1(this->m_dart)];
@@ -289,7 +288,7 @@ private:
 
 	CRIT* m_crit;
 
-	typename PFP::TVEC3 m_positions;
+	VertexAttribute<typename PFP::VEC3> m_positions;
 
 	// map des critères (donc trié)
 	std::multimap<float, CRIT*> m_edgeCrit;

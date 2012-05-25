@@ -54,9 +54,9 @@ class SimpleGMap3 : public Utils::QT::SimpleQT
 public:
 	MAP myMap ;
 
-	PFP::TVEC3 position ;
-	PFP::TVEC3 normal ;
-	PFP::TVEC3 volume ;
+	VertexAttribute<VEC3> position ;
+	VertexAttribute<VEC3> normal ;
+	VolumeAttribute<VEC3> volume ;
 
 	SimpleGMap3() ;
 
@@ -65,4 +65,3 @@ public:
 	void cb_initGL() ;
 	void cb_redraw() ;
 };
-

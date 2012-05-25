@@ -36,7 +36,6 @@
 #include "Geometry/vector_gen.h"
 
 #include "Utils/vbo.h"
-
 #include "Utils/svg.h"
 
 // forward
@@ -87,7 +86,6 @@ protected:
 	*/
 	GLuint m_nbRel2;
 
-
 	/**
 	 * width of lines use to draw darts
 	 */
@@ -103,17 +101,15 @@ protected:
 	 */
 	Geom::Vec3f m_dartsColor;
 
-
 	float *m_color_save;
 
 	/**
 	 * attribut d'index dans le VBO
 	 */
-	AttributeHandler<unsigned int> m_attIndex;
+	DartAttribute<unsigned int> m_attIndex;
 
 	Utils::ShaderSimpleColor* m_shader1;
 	Utils::ShaderColorPerVertex* m_shader2;
-
 
 	/**
 	 * compute color from dart index (for color picking)
@@ -236,14 +232,13 @@ public:
 	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
 
 	template <typename PFP>
-	void updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 	template <typename PFP>
-	void updateDataMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
+	void updateDataMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 	template <typename PFP>
-	void updateDataGMap(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, const FunctorSelect& good = allDarts);
-
+	void updateDataGMap(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
 
 	/**
 	 * render to svg struct
@@ -259,7 +254,6 @@ public:
 // just for compatibility with old code
 typedef TopoRender TopoRenderMapD;
 typedef TopoRender TopoRenderGMap;
-
 
 } // namespace GL2
 

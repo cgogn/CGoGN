@@ -68,11 +68,13 @@ public:
 	* @param colorPerFace attribute of color (per face, or per vertex per face)
 	* @param good selector
 	*/
-	template<typename PFP>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map, const typename PFP::TVEC3& positions, const typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
+	template<typename PFP, unsigned int ORBIT>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3, ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
-	template<typename PFP>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map, const typename PFP::TVEC3& positions, const typename PFP::TVEC3& normals, const typename PFP::TVEC3& colorPerFace, const FunctorSelect& good = allDarts) ;
+	template<typename PFP, unsigned int ORBIT>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map,
+			constVertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3, ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
 
 	/**

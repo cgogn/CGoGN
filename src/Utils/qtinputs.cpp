@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/qtInputs.h"
+#include "Utils/Qt/qtInputs.h"
 #include <iostream>
 
 namespace CGoGN

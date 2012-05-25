@@ -176,7 +176,7 @@ void Primitive3D<PFP>::embedHexaGrid(float x, float y, float z)
 				typename PFP::VEC3 pos(-x/2.0f + dx*float(k), -y/2.0f + dy*float(j), -z/2.0f + dz*float(i));
 				Dart d = m_tableVertDarts[ i*nbs+j*(m_nx+1)+k ];
 
-				m_map.embedNewCell(VERTEX, d);
+				m_map.template embedNewCell<VERTEX>(d);
 				m_positions[d] = pos;
 			}
 		}

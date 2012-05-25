@@ -70,7 +70,7 @@ void GMap3::deleteVolume(Dart d)
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 
 	// For every face added to the list
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
@@ -86,7 +86,7 @@ void GMap3::deleteVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -103,7 +103,7 @@ void GMap3::fillHole(Dart d)
 	Dart dd = d ;
 	if(!isBoundaryMarked(dd))
 		dd = phi3(dd) ;
-	boundaryUnmarkOrbit(VOLUME, dd) ;
+	boundaryUnmarkOrbit<VOLUME>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -130,7 +130,7 @@ Dart GMap3::deleteVertex(Dart d)
 	{
 		if(!mf.isMarked(fstoretmp[i]))
 		{
-			mf.markOrbit(FACE, fstoretmp[i]);
+			mf.markOrbit<FACE>(fstoretmp[i]);
 			fstore.push_back(fstoretmp[i]);
 		}
 	}
@@ -554,7 +554,7 @@ unsigned int GMap3::vertexDegree(Dart d)
 		if(!me.isMarked(*it))
 		{
 			++count;
-			me.markOrbit(EDGE, *it);
+			me.markOrbit<EDGE>(*it);
 		}
 	}
 
@@ -674,7 +674,7 @@ bool GMap3::isBoundaryVolume(Dart d)
 	std::vector<Dart> visitedFaces ;
 	visitedFaces.reserve(128) ;
 	visitedFaces.push_back(d) ;
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -688,7 +688,7 @@ bool GMap3::isBoundaryVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -926,7 +926,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	m.markOrbit(FACE, d) ;
+	m.markOrbit<FACE>(d) ;
 
 	unsigned int count = 0 ;
 
@@ -951,7 +951,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 					if(!m.isMarked(e))
 					{
 						visitedFaces.push_back(e) ;
-						m.markOrbit(FACE, e) ;
+						m.markOrbit<FACE>(e) ;
 					}
 				}
 				else if(isBoundaryMarked(e))
