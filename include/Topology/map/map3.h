@@ -365,7 +365,7 @@ public:
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread);
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on each dart of a cc
 	/*! @param d a dart of the cc

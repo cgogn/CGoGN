@@ -22,6 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Algo/Modelisation/polyhedron.h"
+
 namespace CGoGN
 {
 
@@ -31,50 +33,18 @@ namespace Algo
 namespace Modelisation
 {
 
-//TEMPORAIRE
-template <typename PFP>
-Dart Primitive3D<PFP>::createHexa()
-{
-	Dart base = m_map.newFace(4, false);
-
-	Dart side1 = m_map.newFace(4, false);
-	m_map.sewFaces(base, side1, false);
-
-	Dart side2 = m_map.newFace(4, false);
-	m_map.sewFaces(m_map.phi1(base), side2, false);
-	m_map.sewFaces(m_map.phi_1(side1), m_map.phi1(side2), false);
-
-	Dart side3 = m_map.newFace(4, false);
-	m_map.sewFaces(m_map.phi1(m_map.phi1(base)), side3, false);
-	m_map.sewFaces(m_map.phi_1(side2), m_map.phi1(side3), false);
-
-	Dart side4 = m_map.newFace(4, false);
-	m_map.sewFaces(m_map.phi_1(base), side4, false);
-	m_map.sewFaces(m_map.phi_1(side3), m_map.phi1(side4), false);
-
-	m_map.sewFaces(m_map.phi_1(side4), m_map.phi1(side1), false);
-
-	Dart top = m_map.newFace(4, false);
-	m_map.sewFaces(top, m_map.phi1(m_map.phi1(side1)), false);
-	m_map.sewFaces(m_map.phi_1(top), m_map.phi1(m_map.phi1(side2)), false);
-	m_map.sewFaces(m_map.phi1(m_map.phi1(top)), m_map.phi1(m_map.phi1(side3)), false);
-	m_map.sewFaces(m_map.phi1(top), m_map.phi1(m_map.phi1(side4)), false);
-
-	return base;
-}
-
 template <typename PFP>
 Dart Primitive3D<PFP>::HexaGrid1Topo(unsigned int nx)
 {
 	// first cube
-	Dart d0 = createHexa();
+	Dart d0 = createHexahedron<PFP>(m_map);
 	m_tableVertDarts.push_back(d0);
 
 	Dart d1 = m_map.template phi<2112>(d0);
 
 	for (unsigned int i = 1; i < nx; ++i)
 	{
-		Dart d2 = createHexa();
+		Dart d2 = createHexahedron<PFP>(m_map);
 		m_tableVertDarts.push_back(d2);
 		m_map.sewVolumes(d1, d2, false);
 		d1 = m_map.template phi<2112>(d2);

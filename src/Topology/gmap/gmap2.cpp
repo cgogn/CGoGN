@@ -477,7 +477,7 @@ bool GMap2::mergeFaces(Dart d)
 		beta2unsew(d) ;
 		beta2unsew(e) ;
 		GMap1::mergeCycles(d, phi1(e)) ;
-		GMap1::mergeCycles(e, phi1(d)) ;
+		GMap1::splitCycle(e, phi1(d)) ;
 		GMap1::deleteCycle(d) ;
 		return true ;
 	}

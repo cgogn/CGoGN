@@ -63,7 +63,7 @@ enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
 
 /**
- * Unsex the Umbrella aroud a vertex, close the hole and then
+ * Unsex the Umbrella around a vertex, close the hole and then
  * create a symetric to construct a polyedron
  * @param d a dart from the vertex
  */

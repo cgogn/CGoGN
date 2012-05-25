@@ -35,7 +35,7 @@ namespace Import
 {
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
+bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor, bool invertTetra)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -117,8 +117,8 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 
 		Geom::Vec4ui pt;
 		oss >> pt[0];
-		oss >> pt[1];
-		oss >> pt[2];
+		oss >> pt[1+invertTetra];
+		oss >> pt[2-invertTetra];
 		oss >> pt[3];
 
 		//if regions are defined use this number

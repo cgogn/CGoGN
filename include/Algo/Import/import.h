@@ -92,7 +92,7 @@ template <typename PFP>
 bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenameNode, const std::string& filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f, bool invertTetra=false);
 
 template <typename PFP>
 bool importMoka(typename PFP::MAP& the_gmap, const std::string& filename, std::vector<std::string>& attrNames);
