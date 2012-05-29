@@ -46,18 +46,21 @@ namespace QT
 class QtPopUp : public QDialog
 {
 	Q_OBJECT
+
 	QGridLayout* m_layout;
+
 public:
 
 	/**
 	* create an empty popup
+	* @param withButtons  add OK/CANCEL to the popup (exec launch blocking popup & return 1/0)
 	*/
-	QtPopUp();
+	QtPopUp(bool withButtons=false);
 
 	/**
-	* create a popup with one widget
-	*/	
-	QtPopUp(QWidget* wid);
+	 *
+	 */
+	virtual ~QtPopUp();
 
 	/**
 	* add a widget in the grid layout
