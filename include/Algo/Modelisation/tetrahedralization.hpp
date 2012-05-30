@@ -85,7 +85,7 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
 		std::cout << " - " << v.back();
 		v.push_back(map.phi1(map.phi2(map.phi_1(dit))));
 		std::cout << " - " << v.back() << "]" << std::endl;
-		//map.splitVolume(v);
+		map.splitVolume(v);
 	}
 
 	return dres;
