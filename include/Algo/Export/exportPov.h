@@ -180,7 +180,7 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<
 
 			out << "cylinder{ " << std::endl;
 			out << "<" << position[d][0] << "," << position[d][1] << "," << position[d][2] << ">," << std::endl;
-			out << "<" << position[dd][0] << "," << position[dd][1] << "," << position[dd][2] << ">," << width << std::endl;
+			out << "<" << position[dd][0] << "," << position[dd][1] << "," << position[dd][2] << ">," << 0.5 << std::endl;
 			out << "}" << std::endl;
 		}
 	}
