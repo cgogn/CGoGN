@@ -209,6 +209,14 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Merge the two faces incident to the edge of d.
+	/*! Works only for edges of degree 2.
+	 *  \warning Darts of the edge of d no longer exist after the call
+	 *  @param d a dart in the first face
+	 *  @return true if the merge has been executed, false otherwise
+	 */
+	virtual bool mergeFaces(Dart d);
+
 	//! Collapse a face (that is deleted) possibly merging its vertices
 	/*! \warning
 	 *  @param d a dart in the deleted face
