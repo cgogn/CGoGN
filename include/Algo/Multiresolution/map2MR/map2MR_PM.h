@@ -75,14 +75,19 @@ public:
 
 	~Map2MR_PM();
 
-	//add a coarse level
-	void addNewLevel() ;
+	//add a coarser level
+	void addNewLevel(unsigned int percentWantedVertices);
+
+	//create the progressive meshes
+	void createPM(unsigned int percentWantedVertices);
 
 	//coarsen the mesh -> analysis
 	void coarsen() ;
 
 	//refine the mesh -> synthesis
 	void refine() ;
+
+	bool initOk() { return m_initOk; }
 } ;
 
 } // namespace Multiresolution

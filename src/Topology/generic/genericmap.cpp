@@ -210,6 +210,29 @@ void GenericMap::addLevel()
 	}
 }
 
+void GenericMap::addFrontLevel()
+{
+	unsigned int newLevel = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< newLevel ;
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+	m_mrDarts.insert(m_mrDarts.begin(), newAttrib) ;
+	m_mrNbDarts.insert(m_mrNbDarts.begin(), 0) ;
+
+	if(m_mrDarts.size() > 1)
+	{
+		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[1] ;	// copy the indices of
+		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
+
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+		}
+	}
+}
+
 void GenericMap::removeLevel()
 {
 	unsigned int maxL = getMaxLevel() ;
