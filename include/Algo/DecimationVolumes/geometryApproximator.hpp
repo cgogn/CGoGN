@@ -22,20 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
-
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-
-#include "Algo/Decimation/selector.h"
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/geometryPredictor.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
-
+#include "Algo/DecimationVolumes/selector.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
@@ -43,59 +31,59 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace DecimationVolumes
 {
+
+/************************************************************************************
+ *							      Centroid		                                    *
+ ************************************************************************************/
+template <typename PFP>
+void Approximator_Centroid<PFP>::init()
+{
+
+}
 
 template <typename PFP>
-class Map2MR_PM
+void Approximator_Centroid<PFP>::approximate(Operator<PFP> *op)
 {
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
+	Dart d = op->getEdge();
+	VEC3 a = this->m_attrV[d];
 
-private:
-	MAP& m_map ;
-	VertexAttribute<VEC3>& m_position;
-	bool shareVertexEmbeddings ;
+	CGoGNout << "d=" << d << " a=" << a << CGoGNendl;
 
-	//SelectorUnmarked dartSelect ;
+	// get some darts
+	Dart dd = this->m_map.phi2(d) ;
 
-	bool m_initOk ;
+	switch(op->getType())
+	{
+		case O_CVolume : {
+			a = Algo::Geometry::volumeCentroid<PFP>(this->m_map, d, this->m_attrV);
+			break;
+		}
+		case O_CFace : {
+			a = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, this->m_attrV);
+			break;
+		}
+		case O_CEdge : {
+			// get the contracted edge vertices positions
+			VEC3 v2 = this->m_attrV[dd] ;
 
-	DartMarker& inactiveMarker;
+			// Compute the approximated position
+			a =  (a + v2) / REAL(2) ;
+			break;
+		}
+		default : {
+			CGoGNerr << "Approximate : reducer does not exist" << CGoGNendl;
+			break;
+		}
+	}
 
-	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
-
-	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
-
-public:
-	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
-			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
-
-	~Map2MR_PM();
-
-	//create a progressive mesh (a coarser level)
-	void createPM(unsigned int percentWantedVertices);
-
-	//coarsen the mesh -> analysis
-	void coarsen() ;
-
-	//refine the mesh -> synthesis
-	void refine() ;
-
-	bool initOk() { return m_initOk; }
-} ;
-
-} // namespace Multiresolution
-
-} // namespace Algo
-
-} // namespace CGoGN
+	this->m_app = a;
+}
 
 
-#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
+} //end namespace DecimationVolumes
 
-#endif
+} //end namespace Algo
+
+} //end namespace CGoGN

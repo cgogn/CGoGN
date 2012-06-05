@@ -33,10 +33,10 @@ namespace Multiresolution
 {
 
 template <typename PFP>
-Map2MR_PM<PFP>::Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position,
+Map2MR_PM<PFP>::Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
 		Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a
 		) :
-		m_map(map), m_position(position)
+		m_map(map), m_position(position), inactiveMarker(inactive)
 {
 
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
@@ -112,10 +112,6 @@ Map2MR_PM<PFP>::Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position,
 		if(! (*it)->init())
 			m_initOk = false ;
 	CGoGNout << "..done" << CGoGNendl ;
-
-	CGoGNout << "  initializing selector.." << CGoGNflush ;
-	m_initOk = m_selector->init() ;
-	CGoGNout << "..done" << CGoGNendl ;
 }
 
 template <typename PFP>
@@ -129,99 +125,67 @@ Map2MR_PM<PFP>::~Map2MR_PM()
 		delete (*it) ;
 }
 
-
-
-template <typename PFP>
-void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
-{
-
-	m_map.pushLevel() ;
-
-	m_map.addFrontLevel();
-	m_map.setCurrentLevel(0);
-//	//Add the current level higher
-//
-//	unsigned int newLevel = m_map.getMaxLevel() + 1 ;
-//	std::stringstream ss ;
-//	ss << "MRdart_"<< newLevel ;
-//
-//	AttributeMultiVector<unsigned int>* newAttrib = m_map.addMRRelation(ss.str());
-//	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
-//	m_mrDarts.push_back(newAttrib) ;
-//	m_mrNbDarts.push_back(0) ;
-//
-//	//m_map.push_front(newAttrib);
-//	if(m_mrDarts.size() > 1)
-//	{
-//		for(unsigned int i = newLevel; i > 0 ; --i)
-//		{
-//			AttributeMultiVector<unsigned int>* currentAttrib = m_mrDarts[i] ;
-//			AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[i - 1] ;	// copy the indices of
-//			//m_mrattribs.copyAttribute(currentAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
-//			m_mrattribs.swapAttributes(currentAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
-//		}
-//	}
-//
-//	m_map.popLevel() ;
-//
-//	m_map.setCurrentLevel(0);
-}
-
 template <typename PFP>
 void Map2MR_PM<PFP>::createPM(unsigned int percentWantedVertices)
 {
-	//addNewLevel();
+	// level handling
 	m_map.pushLevel() ;
+	m_map.addLevel();
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
-	m_map.addFrontLevel();
-	m_map.setCurrentLevel(0) ;
-//	std::cout << "level : " << m_map.getMaxLevel() << std::endl;
-//
-//	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
-//	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
-//	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
-//
-//	bool finished = false ;
-//	Dart d ;
-//	while(!finished)
-//	{
-//		if(!m_selector->nextEdge(d))
-//			break ;
-//
-//		--nbVertices ;
-//		Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
-//		Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
-//
-//		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
-//		{
-//			(*it)->approximate(d) ;					// compute approximated attributes with its associated detail
-//			(*it)->saveApprox(d) ;
-//		}
-//
-//		m_selector->updateBeforeCollapse(d) ;		// update selector
-//
-//		m_map.collapseEdge(d);
-//
-//		unsigned int newV = m_map.template embedNewCell<VERTEX>(d2) ;
-//		unsigned int newE1 = m_map.template embedNewCell<EDGE>(d2) ;
-//		unsigned int newE2 = m_map.template embedNewCell<EDGE>(dd2) ;
-////		vs->setApproxV(newV) ;
-////		vs->setApproxE1(newE1) ;
-////		vs->setApproxE2(newE2) ;
-//
-//		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
-//			(*it)->affectApprox(d2);				// affect data to the resulting vertex
-//
-//		m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
-//
-//		if(nbVertices <= nbWantedVertices)
-//			finished = true ;
-//	}
-//	delete m_selector ;
-//	m_selector = NULL ;
-//
-//	m_map.popLevel() ;
-//	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
+	// PM creation
+	CGoGNout << "  initializing selector.." << CGoGNflush ;
+	m_initOk = m_selector->init() ;
+	CGoGNout << "..done" << CGoGNendl ;
+
+	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
+	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
+	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
+
+	bool finished = false ;
+	Dart d ;
+	while(!finished)
+	{
+		if(!m_selector->nextEdge(d))
+			break ;
+
+		--nbVertices ;
+		Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
+		Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
+
+		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+		{
+			(*it)->approximate(d) ;					// compute approximated attributes with its associated detail
+			(*it)->saveApprox(d) ;
+		}
+
+		m_selector->updateBeforeCollapse(d) ;		// update selector
+
+		//m_map.collapseEdge(d);
+
+		inactiveMarker.markOrbit<FACE>(d) ;
+		inactiveMarker.markOrbit<FACE>(m_map.phi2(d)) ;
+		m_map.extractTrianglePair(d);
+
+		unsigned int newV = m_map.template embedNewCell<VERTEX>(d2) ;
+		unsigned int newE1 = m_map.template embedNewCell<EDGE>(d2) ;
+		unsigned int newE2 = m_map.template embedNewCell<EDGE>(dd2) ;
+//		vs->setApproxV(newV) ;
+//		vs->setApproxE1(newE1) ;
+//		vs->setApproxE2(newE2) ;
+
+		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+			(*it)->affectApprox(d2);				// affect data to the resulting vertex
+
+		m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
+
+		if(nbVertices <= nbWantedVertices)
+			finished = true ;
+	}
+
+	m_map.popLevel();
+
+	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
 }
 
 template <typename PFP>

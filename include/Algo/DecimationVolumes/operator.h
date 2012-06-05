@@ -22,19 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
+#ifndef __OPERATOR_VOLUMES_H__
+#define __OPERATOR_VOLUMES_H__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-
-#include "Algo/Decimation/selector.h"
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/geometryPredictor.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
+#include "Algo/Geometry/volume.h"
 
 
 namespace CGoGN
@@ -43,59 +34,107 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace DecimationVolumes
 {
 
-template <typename PFP>
-class Map2MR_PM
+enum OperatorType
 {
+	O_CEdge,
+	O_CFace,
+	O_CVolume
+} ;
+
+
+template <typename PFP> class Approximator ;
+
+template <typename PFP>
+class Operator
+{
+
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::REAL REAL;
 
-private:
-	MAP& m_map ;
-	VertexAttribute<VEC3>& m_position;
-	bool shareVertexEmbeddings ;
+protected:
+	//
+	Dart m_edge;
 
-	//SelectorUnmarked dartSelect ;
-
-	bool m_initOk ;
-
-	DartMarker& inactiveMarker;
-
-	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
-
-	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
+	/**
+	 * need a pointer to the current approximator if the current selector needs
+	 * the future result of a collapse to estimate its cost
+	 */
+	Algo::DecimationVolumique::Approximator<PFP>* m_approximator ;
 
 public:
-	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
-			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
+	Operator(Dart d, Algo::DecimationVolumique::Approximator<PFP>* approx) :
+		m_edge(d), m_approximator(approx)
+	{}
 
-	~Map2MR_PM();
+	Operator() {}
 
-	//create a progressive mesh (a coarser level)
-	void createPM(unsigned int percentWantedVertices);
+	~Operator() {};
 
-	//coarsen the mesh -> analysis
-	void coarsen() ;
+	Dart getEdge() {return m_edge;}
+	void setEdge(Dart d) { m_edge = d; }
+	OperatorType getType() {return O_CVolume;};
 
-	//refine the mesh -> synthesis
-	void refine() ;
+	virtual unsigned int perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
+	virtual bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
+};
 
-	bool initOk() { return m_initOk; }
-} ;
+template <typename PFP>
+class CollapseOperator : public Operator<PFP>
+{
 
-} // namespace Multiresolution
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
+protected:
 
-} // namespace Algo
 
-} // namespace CGoGN
+public:
+	CollapseOperator(Dart d, Algo::DecimationVolumique::Approximator<PFP>* approx) :
+		Operator<PFP>(d, approx)
+	{}
+
+	~CollapseOperator() {};
+
+};
+
+template <typename PFP>
+class CollapseEdgeOperator : public CollapseOperator<PFP>
+{
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
+
+protected:
 
 
-#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
+public:
+	CollapseEdgeOperator(Dart d, Algo::DecimationVolumique::Approximator<PFP>* approx) :
+		CollapseOperator<PFP>(d, approx)
+	{}
+
+	~CollapseEdgeOperator()
+	{ }
+
+	OperatorType getType() { return O_CEdge; }
+	unsigned int perform(MAP &m, VertexAttribute<typename PFP::VEC3>& position);
+	bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
+};
+
+
+} //end namespace DecimationVolumes
+
+} //end namespace Algo
+
+} //end namespace CGoGN
+
+#include "Algo/DecimationVolumes/operator.hpp"
 
 #endif

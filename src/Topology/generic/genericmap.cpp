@@ -187,6 +187,7 @@ void GenericMap::initMR()
 	setCurrentLevel(0) ;
 }
 
+//TODO rename to addBackLevel() ?
 void GenericMap::addLevel()
 {
 	unsigned int newLevel = m_mrDarts.size() ;
@@ -204,6 +205,7 @@ void GenericMap::addLevel()
 
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
+			++(*m_mrLevels)[i]; // increase the insertion level of the darts
 			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
 			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 		}
@@ -233,6 +235,7 @@ void GenericMap::addFrontLevel()
 	}
 }
 
+//TODO rename to removeBackLevel() ?
 void GenericMap::removeLevel()
 {
 	unsigned int maxL = getMaxLevel() ;
@@ -262,6 +265,11 @@ void GenericMap::removeLevel()
 		if(m_mrCurrentLevel == maxL)
 			--m_mrCurrentLevel ;
 	}
+}
+
+void GenericMap::removeFrontLevel()
+{
+	std::cout << "TO DO" << std::endl;
 }
 
 /****************************************

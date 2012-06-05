@@ -22,20 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
+#ifndef __GEOMETRY_APPROXIMATOR_VOLUMES_H__
+#define __GEOMETRY_APPROXIMATOR_VOLUMES_H__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-
-#include "Algo/Decimation/selector.h"
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/geometryPredictor.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
-
+#include "Algo/DecimationVolumes/approximator.h"
 
 namespace CGoGN
 {
@@ -43,59 +33,37 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace DecimationVolumes
 {
 
 template <typename PFP>
-class Map2MR_PM
+class Approximator_Centroid : public Approximator<PFP, typename PFP::VEC3>
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::REAL REAL;
 
-private:
-	MAP& m_map ;
-	VertexAttribute<VEC3>& m_position;
-	bool shareVertexEmbeddings ;
+	Approximator_Centroid(MAP& m, VertexAttribute<VEC3>& pos):
+		Approximator<PFP, VEC3>(m, pos)
+	{}
 
-	//SelectorUnmarked dartSelect ;
+	~Approximator_Centroid()
+	{}
 
-	bool m_initOk ;
+	ApproximatorType getType() { return A_Centroid; }
 
-	DartMarker& inactiveMarker;
+	void init();
+	void approximate(Operator<PFP> *op);
 
-	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
-
-	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
-
-public:
-	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
-			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
-
-	~Map2MR_PM();
-
-	//create a progressive mesh (a coarser level)
-	void createPM(unsigned int percentWantedVertices);
-
-	//coarsen the mesh -> analysis
-	void coarsen() ;
-
-	//refine the mesh -> synthesis
-	void refine() ;
-
-	bool initOk() { return m_initOk; }
 } ;
 
-} // namespace Multiresolution
+} //namespace DecimationVolumes
 
-} // namespace Algo
+} //namespace Algo
 
-} // namespace CGoGN
+} //namespace CGoGN
 
-
-#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
+#include "Algo/DecimationVolumes/geometryApproximator.hpp"
 
 #endif
