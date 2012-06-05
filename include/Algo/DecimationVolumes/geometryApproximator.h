@@ -51,9 +51,8 @@ public:
 	~Approximator_Centroid()
 	{}
 
-	ApproximatorType getType() { return A_Centroid; }
-
-	void init();
+	ApproximatorType getType() const { return A_Centroid; }
+	bool init();
 	void approximate(Operator<PFP> *op);
 
 } ;

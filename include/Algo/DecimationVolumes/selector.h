@@ -63,7 +63,7 @@ public:
 		m_map(m), m_position(pos), m_approximators(approx), m_select(select)
 	{}
 
-	virtual ~EdgeSelector()
+	virtual ~Selector()
 	{}
 
 	/**
@@ -80,22 +80,22 @@ public:
 	/**
 	 *
 	 */
-	virtual void init() = 0 ;
+	virtual bool init() = 0 ;
 
 	/**
 	 *
 	 */
-	virtual bool nextOperator(Operator<PFP>* op) = 0 ;
+	virtual bool nextOperator(Operator<PFP>** op) = 0 ;
 
 	/**
 	 *
 	 */
-	virtual void updateBeforeOperation(Operator<PFP>* op) = 0 ;
+	virtual void updateBeforeOperation(Operator<PFP>** op) = 0 ;
 
 	/**
 	 *
 	 */
-	virtual void updateAfterOperation(Operator<PFP>* op) = 0 ;
+	virtual void updateAfterOperation(Operator<PFP>** op) = 0 ;
 
 	/**
 	 *

@@ -40,8 +40,10 @@ unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, VertexAttribute<typename
 	unsigned int nbCell = 0;
 
 	//calcul du nombre de cellule supprime
-	position[this->m_edge] = this->m_approximator->getApproximation();
-	nbCell = m.collapseEdge(this->m_edge,true,true);
+	//position[this->m_edge] = this->m_approximator->getApproximation();
+	m.collapseEdge(this->m_edge);
+
+	++nbCell;
 
 	return nbCell;
 }
@@ -83,7 +85,7 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typen
 				Dart b = m.phi1(m.phi3(m.phi2(m.phi_1(e))));
 
 				//tetrahedre du haut
-				typename PFP::VEC3 p1 = this->m_approximator->getApproximation();
+				typename PFP::VEC3 p1 = position[a];//this->m_approximator->getApproximation();
 				typename PFP::VEC3 p2, p3, p4;
 
 				typename PFP::VEC3::DATA_TYPE v1;

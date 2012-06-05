@@ -38,9 +38,9 @@ namespace DecimationVolumes
  *							      Centroid		                                    *
  ************************************************************************************/
 template <typename PFP>
-void Approximator_Centroid<PFP>::init()
+bool Approximator_Centroid<PFP>::init()
 {
-
+	return true;
 }
 
 template <typename PFP>
@@ -49,7 +49,7 @@ void Approximator_Centroid<PFP>::approximate(Operator<PFP> *op)
 	Dart d = op->getEdge();
 	VEC3 a = this->m_attrV[d];
 
-	CGoGNout << "d=" << d << " a=" << a << CGoGNendl;
+	//CGoGNout << "d=" << d << " a=" << a << CGoGNendl;
 
 	// get some darts
 	Dart dd = this->m_map.phi2(d) ;

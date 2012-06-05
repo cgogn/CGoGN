@@ -45,7 +45,8 @@ enum OperatorType
 } ;
 
 
-template <typename PFP> class Approximator ;
+//template <typename PFP, typename T> class Approximator ;
+//template <typename PFP> class ApproximatorGen ;
 
 template <typename PFP>
 class Operator
@@ -64,11 +65,11 @@ protected:
 	 * need a pointer to the current approximator if the current selector needs
 	 * the future result of a collapse to estimate its cost
 	 */
-	Algo::DecimationVolumique::Approximator<PFP>* m_approximator ;
+	//ApproximatorGen<PFP>* m_approximator ;
 
 public:
-	Operator(Dart d, Algo::DecimationVolumique::Approximator<PFP>* approx) :
-		m_edge(d), m_approximator(approx)
+	Operator(Dart d) ://, ApproximatorGen<PFP>* approx) :
+		m_edge(d)//, m_approximator(approx)
 	{}
 
 	Operator() {}
@@ -77,7 +78,7 @@ public:
 
 	Dart getEdge() {return m_edge;}
 	void setEdge(Dart d) { m_edge = d; }
-	OperatorType getType() {return O_CVolume;};
+	virtual OperatorType getType() = 0;
 
 	virtual unsigned int perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
 	virtual bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
@@ -95,8 +96,8 @@ protected:
 
 
 public:
-	CollapseOperator(Dart d, Algo::DecimationVolumique::Approximator<PFP>* approx) :
-		Operator<PFP>(d, approx)
+	CollapseOperator(Dart d) : //, ApproximatorGen<PFP>* approx) :
+		Operator<PFP>(d)//, approx)
 	{}
 
 	~CollapseOperator() {};
@@ -116,8 +117,8 @@ protected:
 
 
 public:
-	CollapseEdgeOperator(Dart d, Algo::DecimationVolumique::Approximator<PFP>* approx) :
-		CollapseOperator<PFP>(d, approx)
+	CollapseEdgeOperator(Dart d) ://,  ApproximatorGen<PFP>* approx) :
+		CollapseOperator<PFP>(d)//, approx)
 	{}
 
 	~CollapseEdgeOperator()

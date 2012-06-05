@@ -89,16 +89,23 @@ public:
 		ApproximatorGen<PFP>(m), m_attrV(a)
 	{}
 
-	virtual ~Approximator();
+	//virtual ~Approximator();
 
 	const std::string& getApproximatedAttributeName() const
 	{
 		return m_attrV.name() ;
 	}
 
+	void saveApprox(Operator<PFP>* op)
+	{
+		Dart d = op->getEdge();
+		//m_app = m_approx[d] ;
+	}
+
 	void affectApprox(Operator<PFP>* op)
 	{
-		//m_attrV[d] = m_app ;
+		Dart d = op->getEdge();
+		m_attrV[d] = m_app ;
 	}
 };
 

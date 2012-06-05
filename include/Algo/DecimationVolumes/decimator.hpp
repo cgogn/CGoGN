@@ -34,7 +34,7 @@ namespace DecimationVolumes
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	VertexAttribute<typename PFP::VEC3>& position, unsigned int nbWantedVertices, const FunctorSelect& selected
+	VertexAttribute<typename PFP::VEC3>& position, unsigned int percentWantedVertices, const FunctorSelect& selected
 )
 {
 	std::vector<ApproximatorGen<PFP>*> approximators ;
@@ -58,7 +58,7 @@ void decimate(
 			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators, selected);
 			break ;
 		case S_Random :
-			selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected);
+			//selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected);
 			break ;
 		default:
 			CGoGNout << "not yet implemented" << CGoGNendl;
@@ -73,6 +73,8 @@ void decimate(
 
 
 	unsigned int nbVertices = map.template getNbOrbits<VERTEX>() ;
+	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
+	CGoGNout << " decimate (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
 	bool finished = false ;
 
 	while(!finished)
@@ -80,27 +82,17 @@ void decimate(
 		//Next Operator to perform
 		Operator<PFP> *op;
 
-		if(!selector->nextOperator(op)) //a changer de nom
+		if(!selector->nextOperator(&op))
 			break;
 
-//		 switch(selector->nextOperatorType())
-//		 {
-//		  	 case O_CEdge :
-//		  	 	 op = new CollapseEdgeOperator<PFP>(selector->nextCell(), approximators);
-//		  	 	 break;
-//		  	 case O_CFace :
-//		  	 	 break;
-//		  	 case O_CVolume:
-//		  		 break;
-//		 }
-
+		// compute approximated attributes
 		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
 		{
-			(*it)->approximate(op) ;				// compute approximated attributes
+			(*it)->approximate(op) ;
 		}
 
 		//Update the selector before performing operation
-		selector->updateBeforeOperation(op);
+		selector->updateBeforeOperation(&op);
 
 		//Perform the topological operation and
 		//compute the number of resulting cells
@@ -111,7 +103,7 @@ void decimate(
 
 		//Update the embedded position and
 		//search the next operation to perform
-		selector->updateAfterOperation(op);
+		selector->updateAfterOperation(&op);
 
 		if(nbVertices <= nbWantedVertices)
 			finished = true ;
@@ -120,6 +112,8 @@ void decimate(
 	}
 
 	selector->finish() ;
+
+	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
 
 	delete selector ;
 

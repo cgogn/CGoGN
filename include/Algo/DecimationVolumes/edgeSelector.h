@@ -29,8 +29,8 @@ protected:
 
 
 public:
-	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>&  pos) :
-		Selector<PFP>(m, pos)
+	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		Selector<PFP>(m, pos, approx, select)
 	{}
 
 };
@@ -50,8 +50,8 @@ private:
 	Dart cur;
 
 public:
-	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>&  pos) :
-		EdgeSelector<PFP>(m, pos)
+	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		EdgeSelector<PFP>(m, pos, approx, select)
 	{}
 
 	~EdgeSelector_MapOrder()
@@ -60,11 +60,11 @@ public:
 	SelectorType getType() { return S_MapOrder; }
 	Dart nextCell() { return cur; }
 
-	void init();
-	bool nextOperator(Operator<PFP>* op);
-	void updateBeforeOperation(Operator<PFP>* op)
+	bool init();
+	bool nextOperator(Operator<PFP>** op);
+	void updateBeforeOperation(Operator<PFP>** op)
 	{ }
-	void updateAfterOperation(Operator<PFP>* op);
+	void updateAfterOperation(Operator<PFP>** op);
 	void finish()
 	{ }
 
@@ -73,39 +73,39 @@ public:
 /********************************************************************************
  *				 				Random Selector									*
  ********************************************************************************/
-template <typename PFP>
-class EdgeSelector_Random : public EdgeSelector<PFP>
-{
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-private:
-	std::vector<Dart> darts ;
-	unsigned int cur ;
-	bool allSkipped ;
-
-public:
-	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos) :
-		EdgeSelector<PFP>(m, pos)
-	{}
-
-	~EdgeSelector_Random()
-	{}
-
-	SelectorType getType() { return S_Random; }
-//	Dart nextCell() { return darts[cur]; }
-
-	void init();
-	bool nextOperator(Operator<PFP>* op);
-	void updateBeforeOperation(Operator<PFP>* op)
-	{ }
-	void updateAfterOperation(Operator<PFP>* op);
-	void finish()
-	{ }
-
-} ;
+//template <typename PFP>
+//class EdgeSelector_Random : public EdgeSelector<PFP>
+//{
+//public:
+//	typedef typename PFP::MAP MAP ;
+//	typedef typename PFP::VEC3 VEC3 ;
+//	typedef typename PFP::REAL REAL ;
+//
+//private:
+//	std::vector<Dart> darts ;
+//	unsigned int cur ;
+//	bool allSkipped ;
+//
+//public:
+//	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+//		EdgeSelector<PFP>(m, pos, approx, select)
+//	{}
+//
+//	~EdgeSelector_Random()
+//	{}
+//
+//	SelectorType getType() { return S_Random; }
+////	Dart nextCell() { return darts[cur]; }
+//
+//	bool init();
+//	bool nextOperator(Operator<PFP>** op);
+//	void updateBeforeOperation(Operator<PFP>* op)
+//	{ }
+//	void updateAfterOperation(Operator<PFP>* op);
+//	void finish()
+//	{ }
+//
+//} ;
 
 ///********************************************************************************
 // *			 				Length Edge Selector								*
@@ -177,6 +177,6 @@ public:
 } //end namespace CGoGN
 
 
-#include "Algo/DecimationVolumes/selector.hpp"
+#include "Algo/DecimationVolumes/edgeSelector.hpp"
 
 #endif

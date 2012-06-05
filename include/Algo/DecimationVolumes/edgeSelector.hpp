@@ -39,43 +39,42 @@ namespace DecimationVolumes
  ************************************************************************************/
 
 template <typename PFP>
-void EdgeSelector_MapOrder<PFP>::init()
+bool EdgeSelector_MapOrder<PFP>::init()
 {
 	cur = this->m_map.begin() ;
 
 	//TODO Choix de nextOperator
 	//this->nextOp = Algo::DecimationVolumique::O_CEdge;
+
+	return true;
 }
 
 template <typename PFP>
-bool EdgeSelector_MapOrder<PFP>::nextOperator(Operator<PFP>* op)
+bool EdgeSelector_MapOrder<PFP>::nextOperator(Operator<PFP>** op)
 {
 	if(cur == this->m_map.end())
 		return false ;
+
+	*op = new CollapseEdgeOperator<PFP>(cur);
 
 	return true ;
 }
 
 template <typename PFP>
-void EdgeSelector_MapOrder<PFP>::updateAfterOperation(Operator<PFP>* op)
+void EdgeSelector_MapOrder<PFP>::updateAfterOperation(Operator<PFP>** op)
 {
 	MAP& m = this->m_map ;
 
 	//Mise à jour de nextOperator
 
+	cur = m.begin() ;
 
-	//Update the current dart
-	if(this->nextOp == Algo::DecimationVolumique::O_CEdge)
+	while(!(*op)->canPerform(m,cur,this->m_position))
 	{
-		cur = m.begin() ;
-
-		while(!op->canPerform(m,cur,this->m_position))
-		{
-			//CGoGNout << "update " << cur << CGoGNendl;
-			m.next(cur) ;
-			if(cur == m.end())
-				break ;
-		}
+		//CGoGNout << "update " << cur << CGoGNendl;
+		m.next(cur) ;
+		if(cur == m.end())
+			break ;
 	}
 }
 
@@ -83,67 +82,69 @@ void EdgeSelector_MapOrder<PFP>::updateAfterOperation(Operator<PFP>* op)
  *							Random Edge Selector	                                *
  ************************************************************************************/
 
-template <typename PFP>
-void EdgeSelector_Random<PFP>::init()
-{
-	MAP& m = this->m_map ;
-
-	darts.reserve(m.getNbDarts()) ;
-	darts.clear() ;
-
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
-		darts.push_back(d) ;
-
-	srand(time(NULL)) ;
-	int remains = darts.size() ;
-	for(unsigned int i = 0; i < darts.size()-1; ++i) // generate the random permutation
-	{
-		int r = (rand() % remains) + i ;
-		// swap ith and rth elements
-		Dart tmp = darts[i] ;
-		darts[i] = darts[r] ;
-		darts[r] = tmp ;
-		--remains ;
-	}
-	cur = 0 ;
-	allSkipped = true ;
-
-	//TODO Choix de nextOperator
-	this->nextOp = Algo::DecimationVolumique::O_CEdge;
-}
-
-template <typename PFP>
-bool EdgeSelector_Random<PFP>::nextOperator(Operator<PFP>* op)
-{
-	if(cur == darts.size() && allSkipped)
-		return false ;
-
-	return true ;
-}
-
-
-template <typename PFP>
-void EdgeSelector_Random<PFP>::updateAfterOperation(Operator<PFP>* op)
-{
-	MAP& m = this->m_map ;
-	allSkipped = false ;
-
-	if(this->nextOp == Algo::DecimationVolumique::O_CEdge)
-	{
-//		for(typename std::vector<Dart>::iterator it = darts.begin() ; it != darts.end() ; ++it)
-//			CGoGNout << *it << CGoGNendl;
-
-		do
-		{
-			++cur ;
-			if(cur == darts.size())
-			{
-				//cur = 0 ;
-				allSkipped = true ;
-			}
-		} while(!allSkipped && !op->canPerform(m,darts[cur],this->m_position)) ;
-	}
-}
+//template <typename PFP>
+//bool EdgeSelector_Random<PFP>::init()
+//{
+//	MAP& m = this->m_map ;
+//
+//	darts.reserve(m.getNbDarts()) ;
+//	darts.clear() ;
+//
+//	for(Dart d = m.begin(); d != m.end(); m.next(d))
+//		darts.push_back(d) ;
+//
+//	srand(time(NULL)) ;
+//	int remains = darts.size() ;
+//	for(unsigned int i = 0; i < darts.size()-1; ++i) // generate the random permutation
+//	{
+//		int r = (rand() % remains) + i ;
+//		// swap ith and rth elements
+//		Dart tmp = darts[i] ;
+//		darts[i] = darts[r] ;
+//		darts[r] = tmp ;
+//		--remains ;
+//	}
+//	cur = 0 ;
+//	allSkipped = true ;
+//
+//	//TODO Choix de nextOperator
+//	//this->nextOp = O_CEdge;
+//
+//	return true;
+//}
+//
+//template <typename PFP>
+//bool EdgeSelector_Random<PFP>::nextOperator(Operator<PFP>** op)
+//{
+//	if(cur == darts.size() && allSkipped)
+//		return false ;
+//
+//	return true ;
+//}
+//
+//
+//template <typename PFP>
+//void EdgeSelector_Random<PFP>::updateAfterOperation(Operator<PFP>* op)
+//{
+//	MAP& m = this->m_map ;
+//	allSkipped = false ;
+//
+//	//if(this->nextOp ==  O_CEdge)
+//	//{
+////		for(typename std::vector<Dart>::iterator it = darts.begin() ; it != darts.end() ; ++it)
+////			CGoGNout << *it << CGoGNendl;
+//
+//		do
+//		{
+//			++cur ;
+//			if(cur == darts.size())
+//			{
+//				//cur = 0 ;
+//				allSkipped = true ;
+//			}
+//		} while(!allSkipped && !op->canPerform(m,darts[cur],this->m_position)) ;
+//	//}
+//}
 
 ///************************************************************************************
 // *							Edge Length Selector	                                *

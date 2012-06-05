@@ -25,7 +25,7 @@
 #ifndef __DECIMATOR_VOLUMES_H__
 #define __DECIMATOR_VOLUMES_H__
 
-#include "Algo/DecimationVolumes/selector.h"
+#include "Algo/DecimationVolumes/edgeSelector.h"
 #include "Algo/DecimationVolumes/geometryApproximator.h"
 #include "Algo/DecimationVolumes/operator.h"
 
@@ -45,7 +45,7 @@ void decimate(
 	SelectorType s,
 	ApproximatorType a,
 	VertexAttribute<typename PFP::VEC3>& position,
-	unsigned int nbWantedVertices,
+	unsigned int percentWantedVertices,
 	const FunctorSelect& selected = allDarts
 );
 
