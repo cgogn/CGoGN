@@ -36,7 +36,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 p1 = position[d] ;
 	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
@@ -47,7 +47,7 @@ typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const
 }
 
 template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 p1 = position[d] ;
 	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
@@ -58,7 +58,7 @@ typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const typen
 }
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -74,7 +74,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 		std::vector<Dart> visitedFaces ;
 		visitedFaces.reserve(100) ;
 		visitedFaces.push_back(d) ;
-		mark.markOrbit(FACE, d) ;
+		mark.markOrbit<FACE>(d) ;
 
 		for(typename std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 		{
@@ -104,7 +104,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 				if(!mark.isMarked(ee)) // not already marked
 				{
 					visitedFaces.push_back(ee) ;
-					mark.markOrbit(FACE, e) ;
+					mark.markOrbit<FACE>(e) ;
 				}
 				e = map.phi1(e) ;
 			} while(e != *face) ;
@@ -115,7 +115,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 }
 
 template <typename PFP>
-float totalVolume(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select)
+float totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select)
 {
 	typename PFP::REAL vol = 0 ;
 	TraversorW<typename PFP::MAP> t(map, select) ;

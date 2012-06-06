@@ -44,7 +44,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Predictor_HalfCollapse(MAP& m, AttributeHandler<VEC3>& pos) :
+	Predictor_HalfCollapse(MAP& m, VertexAttribute<VEC3>& pos) :
 		Predictor<PFP, VEC3>(m, pos)
 	{}
 	PredictorType getType() { return P_HalfCollapse ; }
@@ -60,7 +60,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Predictor_CornerCutting(MAP& m, AttributeHandler<VEC3>& pos) :
+	Predictor_CornerCutting(MAP& m, VertexAttribute<VEC3>& pos) :
 		Predictor<PFP, VEC3>(m, pos)
 	{}
 	PredictorType getType() { return P_CornerCutting ; }
@@ -77,7 +77,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Predictor_TangentPredict1(MAP& m, AttributeHandler<VEC3>& pos) :
+	Predictor_TangentPredict1(MAP& m, VertexAttribute<VEC3>& pos) :
 		Predictor<PFP, VEC3>(m, pos)
 	{}
 	PredictorType getType() { return P_TangentPredict1 ; }
@@ -94,7 +94,7 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Predictor_TangentPredict2(MAP& m, AttributeHandler<VEC3>& pos) :
+	Predictor_TangentPredict2(MAP& m, VertexAttribute<VEC3>& pos) :
 		Predictor<PFP, VEC3>(m, pos)
 	{}
 	PredictorType getType() { return P_TangentPredict2 ; }

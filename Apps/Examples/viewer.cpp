@@ -201,7 +201,7 @@ void Viewer::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
+		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
 	else
 	{
@@ -211,8 +211,10 @@ void Viewer::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 	}
+
+	myMap.enableQuickTraversal<VERTEX>() ;
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
@@ -224,9 +226,9 @@ void Viewer::importMesh(std::string& filename)
 	normalBaseSize = bb.diagSize() / 100.0f ;
 //	vertexBaseSize = normalBaseSize / 5.0f ;
 
-	normal = myMap.getAttribute<PFP::VEC3>(VERTEX, "normal") ;
+	normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
 	if(!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
+		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -250,7 +252,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 		if (askExportMode)
 			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
 
-		std::vector<PFP::TVEC3*> attributes ;
+		std::vector<VertexAttribute<VEC3>*> attributes ;
 		attributes.push_back(&position) ;
 		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
 	}
@@ -307,6 +309,21 @@ void Viewer::slot_normalsSize(int i)
 	normalScaleFactor = i / 50.0f ;
 	m_topoRender->updateData<PFP>(myMap, position, i / 100.0f, i / 100.0f) ;
 	updateGL() ;
+}
+
+void Viewer::cb_keyPress(int keycode)
+{
+    switch(keycode)
+    {
+    	case 'c' :
+    		myMap.check();
+    		break;
+    	default:
+    		break;
+    }
+
+    updateGLMatrices() ;
+    updateGL();
 }
 
 /**********************************************************************************************

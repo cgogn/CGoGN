@@ -86,7 +86,7 @@ protected:
 	static ImportSurfacique::ImportType getFileType(const std::string& filename);
 
 #ifdef WITH_ASSIMP
-	void extractMeshRec(AttributeContainer& container, AttributeHandler<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
+	void extractMeshRec(AttributeContainer& container, VertexAttribute<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
 #endif
 
 public:

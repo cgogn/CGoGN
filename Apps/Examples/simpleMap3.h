@@ -52,7 +52,7 @@ public:
 	MAP myMap ;
 	SelectorTrue allDarts ;
 
-	PFP::TVEC3 position ;
+	VertexAttribute<VEC3> position ;
 
 	SimpleMap3() ;
 

@@ -60,8 +60,8 @@ struct PFP: public PFP_STANDARD
 PFP::MAP myMap;
 
 // attribute handlers
-AttributeHandler<PFP::VEC3> position;
-AttributeHandler<PFP::VEC3> normal;
+VertexAttribute<PFP::VEC3> position;
+VertexAttribute<PFP::VEC3> normal;
 
 // open file
 void MyQT::cb_Open()
@@ -86,10 +86,10 @@ void MyQT::cb_Open()
 	}
 
 	// recuper l'attribut pour la position des points (créé lors de l'import)
-	position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+	position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 
 	if (!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -107,7 +107,7 @@ void MyQT::cb_Open()
 void MyQT::cb_New()
 {
 	if (!position.isValid())
-		position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
 	// create a sphere
 	Algo::Modelisation::Polyhedron<PFP> prim(myMap, position);
@@ -115,7 +115,7 @@ void MyQT::cb_New()
 	prim.embedSphere(10.0f);
 
 	if (!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
+		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -332,7 +332,7 @@ public:
 void MyQT::menu_slot1()
 {
 	// cree un handler pour les normales aux sommets
-	AttributeHandler<PFP::VEC3> normal2 = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal2");
+	VertexAttribute<PFP::VEC3> normal2 = myMap.addAttribute<PFP::VEC3, VERTEX>("normal2");
 
 	// ajout de 4 threads pour les markers
 	myMap.addThreadMarker(4);
@@ -346,7 +346,7 @@ void MyQT::menu_slot1()
 
 	// parallelisation de boucle sans resultat
 	calculFunctor1<PFP> tf1(myMap,position,normal);
-	Algo::Parallel::foreach_orbit<PFP>(myMap,VERTEX, tf1,4);
+	Algo::Parallel::foreach_orbit<PFP>(myMap, VERTEX, tf1,4);
 	CGoGNout << "ok:"<< CGoGNendl;
 
 	// parallelisation de boucle avec resultats stockes
@@ -355,7 +355,7 @@ void MyQT::menu_slot1()
 	std::vector<std::pair<double,unsigned int> > lengthp;
 	LengthEdgeFunctor <PFP> tflef(myMap,position);			// le foncteur
 	// on lance l'algo parallelise (4 threads, buffer de 16384 brins par thread)
-	Algo::Parallel::foreach_orbit_res< PFP,std::pair<double,unsigned int> >(myMap,EDGE, tflef, 4 , 16384,lengthp);
+	Algo::Parallel::foreach_orbit_res< PFP,std::pair<double,unsigned int> >(myMap, EDGE, tflef, 4 , 16384,lengthp);
 	// on calcule la somme des resultats
 	std::pair<double,unsigned int> le = Algo::Parallel::sumPairResult<double,unsigned int>(lengthp);
 	CGoGNout << "length :" <<le.first/le.second<< CGoGNendl;

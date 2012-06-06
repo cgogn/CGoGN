@@ -35,7 +35,7 @@ namespace Modelisation
 {
 
 template<typename PFP>
-Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& center,
+Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& center,
 				const typename PFP::VEC3& axis, bool profile_closed, int nbSides)
 {
 	typedef typename PFP::VEC3 VEC3 ;
@@ -64,7 +64,7 @@ Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, typename PFP::TVEC3
 }
 
 template<typename PFP>
-Dart revolution(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& center,
+Dart revolution(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& center,
 				const typename PFP::VEC3& axis, bool profile_closed, int nbSides)
 {
 	Polyhedron<PFP> *prim = revolution_prim<PFP>(the_map, position, profile, center, axis, profile_closed, nbSides);
@@ -75,7 +75,7 @@ Dart revolution(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const
 
 
 template<typename PFP>
-Dart extrusion_scale(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normalProfile, bool profile_closed,
+Dart extrusion_scale(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normalProfile, bool profile_closed,
 			   const std::vector<typename PFP::VEC3>& path, bool path_closed, const std::vector<float>& scalePath)
 {
 	Polyhedron<PFP> *prim = extrusion_scale_prim<PFP>(the_map, position, profile, centerProfile, normalProfile, profile_closed, path, path_closed,scalePath);
@@ -85,7 +85,7 @@ Dart extrusion_scale(typename PFP::MAP& the_map, typename PFP::TVEC3& position, 
 }
 
 template<typename PFP>
-Dart extrusion(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normalProfile, bool profile_closed,
+Dart extrusion(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normalProfile, bool profile_closed,
 				const std::vector<typename PFP::VEC3>& path, bool path_closed)
 {
 	std::vector<float> scalePath;
@@ -95,10 +95,8 @@ Dart extrusion(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const 
 	return d;
 }
 
-
-
 template<typename PFP>
-Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normalProfile, bool profile_closed,
+Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normalProfile, bool profile_closed,
 			   const std::vector<typename PFP::VEC3>& path, bool path_closed)
 {
 	std::vector<float> scalePath;
@@ -106,7 +104,7 @@ Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, typename PFP::TVEC3&
 }
 
 template<typename PFP>
-Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::TVEC3& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normal, bool profile_closed, const std::vector<typename PFP::VEC3>& path, bool path_closed, const std::vector<float>& scalePath)
+Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, const std::vector<typename PFP::VEC3>& profile, const typename PFP::VEC3& centerProfile, const typename PFP::VEC3& normal, bool profile_closed, const std::vector<typename PFP::VEC3>& path, bool path_closed, const std::vector<float>& scalePath)
 {
 	// topological creation
 	Polyhedron<PFP> *prim = new Polyhedron<PFP>(the_map, position);
@@ -228,7 +226,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 
 	CGoGNout << "PATH: "<< i<< CGoGNendl;
 		// apply transfo on object to embed Polyhedron.
-		for(typename std::vector<typename PFP::VEC3>::iterator ip=localObj.begin(); ip!=localObj.end(); ++ip)
+		for(typename std::vector<typename PFP::VEC3>::iterator ip = localObj.begin(); ip != localObj.end(); ++ip)
 		{
 			if (i!=0) //exept for first point of path
 			{
@@ -237,7 +235,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 
 			(*ip)= Geom::transform((*ip), transf);
 
-			unsigned int em = the_map.newCell(VERTEX);
+			unsigned int em = the_map.template newCell<VERTEX>();
 //			positions[em] = (*ip);
 			typename PFP::VEC3 P = (*ip); //positions.at(em);
 
@@ -259,7 +257,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 			else position[em] = P;
 
 			Dart d = vertD[index++];
-			the_map.embedOrbit(VERTEX,d,em);
+			the_map.template embedOrbit<VERTEX>(d, em);
 
 			// rotate again to put profile in the good position along the path
 //			pos4=Geom::Vec4f ((*ip)[0],(*ip)[1],(*ip)[2], 1.0f);
@@ -275,7 +273,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 }
 
 template <typename PFP>
-Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions, Dart d, const typename PFP::VEC3& N)
+Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions, Dart d, const typename PFP::VEC3& N)
 {
 	typedef typename PFP::MAP MAP;
 
@@ -316,7 +314,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions, Dar
 }
 
 template <typename PFP>
-Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& position, Dart d, float dist)
+Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& position, Dart d, float dist)
 {
 	typedef typename PFP::MAP MAP;
 
@@ -327,6 +325,8 @@ Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& position, Dart
 	return extrudeFace<PFP>(the_map, position, d, normal);
 }
 
-}//end namespace
-}//end namespace
-}//end namespace
+} // namespace Modelisation
+
+} // namespace Algo
+
+} // namespace CGoGN

@@ -26,6 +26,7 @@
 #define __MR_FILTERS_PRIMAL__
 
 #include <cmath>
+//#include "Algo/Decimation/decimation.h"
 
 namespace CGoGN
 {
@@ -545,6 +546,7 @@ public:
 		return false ;
 	}
 } ;
+
 
 } // namespace Multiresolution
 

@@ -72,7 +72,7 @@ protected:
  * - [ dart ]
  * - begin / end / next to manage indexing
  */
-template <typename T>
+template <typename T, unsigned int ORBIT>
 class AttributeHandler : public AttributeHandlerGen
 {
 protected:
@@ -102,13 +102,13 @@ public:
 	 * Copy constructor
 	 * @param ta the table attribute
 	 */
-	AttributeHandler(const AttributeHandler<T>& ta) ;
+	AttributeHandler(const AttributeHandler<T, ORBIT>& ta) ;
 
 	/**
 	 * affectation operator
 	 * @param ta the table attribute to affect to this
 	 */
-	void operator=(const AttributeHandler<T>& ta) ;
+	AttributeHandler<T, ORBIT>& operator=(const AttributeHandler<T, ORBIT>& ta) ;
 
 	/**
 	 * Destructor (empty & virtual)
@@ -188,6 +188,66 @@ public:
 	 */
 	void next(unsigned int& iter) const;
 } ;
+
+/**
+ *  shortcut class for Vertex Attribute (Handler)
+ */
+template <typename T>
+class DartAttribute : public AttributeHandler<T, DART>
+{
+public:
+	DartAttribute() : AttributeHandler<T, DART>() {}
+	DartAttribute(const AttributeHandler<T, DART>& ah) : AttributeHandler<T, DART>(ah) {}
+	DartAttribute<T>& operator=(const AttributeHandler<T, DART>& ah) { this->AttributeHandler<T, DART>::operator=(ah); return *this; }
+};
+
+/**
+ *  shortcut class for Vertex Attribute (Handler)
+ */
+template <typename T>
+class VertexAttribute : public AttributeHandler<T, VERTEX>
+{
+public:
+	VertexAttribute() : AttributeHandler<T, VERTEX>() {}
+	VertexAttribute(const AttributeHandler<T, VERTEX>& ah) : AttributeHandler<T, VERTEX>(ah) {}
+	VertexAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T, VERTEX>::operator=(ah); return *this; }
+};
+
+/**
+ *  shortcut class for Edge Attribute (Handler)
+ */
+template <typename T>
+class EdgeAttribute : public AttributeHandler<T, EDGE>
+{
+public:
+	EdgeAttribute() : AttributeHandler<T, EDGE>() {}
+	EdgeAttribute(const AttributeHandler<T, EDGE>& ah) : AttributeHandler<T, EDGE>(ah) {}
+	EdgeAttribute<T>& operator=(const AttributeHandler<T, EDGE>& ah) { this->AttributeHandler<T, EDGE>::operator=(ah); return *this; }
+};
+
+/**
+ *  shortcut class for Face Attribute (Handler)
+ */
+template <typename T>
+class FaceAttribute : public AttributeHandler<T, FACE>
+{
+public:
+	FaceAttribute() : AttributeHandler<T, FACE>() {}
+	FaceAttribute(const AttributeHandler<T, FACE>& ah) : AttributeHandler<T, FACE>(ah) {}
+	FaceAttribute<T>& operator=(const AttributeHandler<T, FACE>& ah) { this->AttributeHandler<T, FACE>::operator=(ah); return *this; }
+};
+
+/**
+ *  shortcut class for Volume Attribute (Handler)
+ */
+template <typename T>
+class VolumeAttribute : public AttributeHandler<T, VOLUME>
+{
+public:
+	VolumeAttribute() : AttributeHandler<T, VOLUME>() {}
+	VolumeAttribute(const AttributeHandler<T, VOLUME>& ah) : AttributeHandler<T, VOLUME>(ah) {}
+	VolumeAttribute<T>& operator=(const AttributeHandler<T, VOLUME>& ah) { this->AttributeHandler<T, VOLUME>::operator=(ah); return *this; }
+};
 
 } // namespace CGoGN
 

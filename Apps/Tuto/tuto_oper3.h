@@ -40,7 +40,7 @@
 
 
 #include "ui_tuto_oper3.h"
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/cgognStream.h"
 
@@ -61,6 +61,8 @@ struct PFP: public PFP_STANDARD
 #endif
 };
 
+typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 
 class MyQT: public Utils::QT::SimpleQT
@@ -80,10 +82,9 @@ public:
 
 protected:
 	// declaration of the map
-	PFP::MAP myMap;
+	MAP myMap;
 
-	PFP::TVEC3 position;
-//	AttributeHandler<Geom::Vec3f> colorDarts;
+	VertexAttribute<VEC3> position;
 
 	SelectorDartNoBoundary<PFP::MAP> nb;
 
@@ -95,7 +96,7 @@ protected:
 	DartMarker dm;
 	float m_shift;
 
-	float m_ex1,m_ex2,m_ex3;
+	float m_ex1, m_ex2, m_ex3;
 
 	// just for more compact writing
 	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
@@ -116,7 +117,5 @@ public slots:
 	void svg();
 	void width(int w);
 };
-
-
 
 #endif

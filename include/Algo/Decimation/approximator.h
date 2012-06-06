@@ -87,32 +87,32 @@ public:
 protected:
 	Predictor<PFP, T>* m_predictor ;
 
-	AttributeHandler<T>& m_attrV ;	// vertex attribute to be approximated
-	AttributeHandler<T> m_approx ;	// attribute to store approximation result
-	AttributeHandler<T> m_detail ;	// attribute to store detail information for reconstruction
+	VertexAttribute<T>& m_attrV ;	// vertex attribute to be approximated
+	EdgeAttribute<T> m_approx ;	// attribute to store approximation result
+	EdgeAttribute<T> m_detail ;	// attribute to store detail information for reconstruction
 	T m_app ;
 
 public:
-	Approximator(MAP& m, AttributeHandler<T>& a, unsigned int orbit, Predictor<PFP, T>* predictor) :
+	Approximator(MAP& m, VertexAttribute<T>& a, Predictor<PFP, T>* predictor) :
 		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(a)
 	{
 		std::stringstream aname ;
 		aname << "approx_" << m_attrV.name() ;
-		m_approx = this->m_map.template addAttribute<T>(orbit, aname.str()) ;
+		m_approx = this->m_map.template addAttribute<T, EDGE>(aname.str()) ;
 
 		if(m_predictor)	// if a predictor is associated to the approximator
 		{				// create an attribute to store the detail needed for reconstruction
 			std::stringstream dname ;
 			dname << "detail_" << m_attrV.name() ;
-			m_detail = this->m_map.template addAttribute<T>(orbit, dname.str()) ;
+			m_detail = this->m_map.template addAttribute<T, EDGE>(dname.str()) ;
 		}
 	}
 
 	virtual ~Approximator()
 	{
-		this->m_map.template removeAttribute<T>(m_approx) ;
+		this->m_map.template removeAttribute(m_approx) ;
 		if(m_predictor)
-			this->m_map.template removeAttribute<T>(m_detail) ;
+			this->m_map.template removeAttribute(m_detail) ;
 	}
 
 	const std::string& getApproximatedAttributeName() const

@@ -9,7 +9,7 @@ namespace DecimationVolumique
 template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
-	typename PFP::TVEC3& position, double nbWanted//, const FunctorSelect& selected
+	VertexAttribute<typename PFP::VEC3>& position, double nbWanted//, const FunctorSelect& selected
 )
 {
 	Approximator<PFP>* approximator = NULL ;
@@ -47,7 +47,7 @@ void decimate(
 	selector->init(approximator);
 
 	//Init nbCell in the mesh
-	unsigned int nbCell = map.getNbOrbits(VOLUME);
+	unsigned int nbCell = map.getNbOrbits<VOLUME>();
 
 	CGoGNout << "nbCell = " << nbCell << CGoGNendl;
 

@@ -50,8 +50,9 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 class MarchingCube
 {
 protected:
-	typedef typename PFP::MAP L_MAP;
-	typedef Dart L_DART;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::MAP L_MAP ;
+	typedef Dart L_DART ;
 
 	/**
 	* voxel image
@@ -73,17 +74,17 @@ protected:
 	*/
 	L_MAP* m_map;
 
-	typename PFP::TVEC3 m_positions;
+	VertexAttribute<VEC3>& m_positions;
 
 	/**
 	* Origin of image
 	*/
-	typename PFP::VEC3 m_fOrigin;
+	VEC3 m_fOrigin;
 
 	/**
 	* scale of image
 	*/
-	typename PFP::VEC3 m_fScal;
+	VEC3 m_fScal;
 
 	/**
 	* compute the index of a cube:\n
@@ -185,7 +186,7 @@ protected:
 	 * @param _dec shifting due to interpolation in the cube
 	 * @return new position
 	 */
-	typename PFP::VEC3 recalPoint( const typename PFP::VEC3& _P,  const typename PFP::VEC3& _dec ) const;
+	typename PFP::VEC3 recalPoint(const VEC3& _P, const VEC3& _dec ) const;
 
 	void setNeighbourSimple(L_DART d1, L_DART d2);
 
@@ -216,7 +217,7 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCube(Image<DataType>* img, L_MAP* map, const typename PFP::TVEC3& position,  Windowing<DataType> wind, bool boundRemoved);
+	MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3>& position, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* destructor
@@ -237,24 +238,24 @@ public:
 	 * get pointer on result mesh after processing
 	 * @return the mesh
 	 */
-	L_MAP* getMesh() const { return m_map;}
+	L_MAP* getMesh() const { return m_map; }
 
 	/**
 	 * get the image
 	 */
-	Image<DataType>* getImg() {return m_Image;}
+	Image<DataType>* getImg() { return m_Image; }
 
 	/**
 	 * Get the lower corner of bounding AABB
 	 */
-	Geom::Vec3f boundMin() const {return m_Image->boundMin();}
+	Geom::Vec3f boundMin() const { return m_Image->boundMin(); }
 
 	/**
 	 * Get the upper corner of bounding AABB
 	 */
-	Geom::Vec3f boundMax() const {return m_Image->boundMax();}
+	Geom::Vec3f boundMax() const { return m_Image->boundMax(); }
 
-	void removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth);
+	void removeFacesOfBoundary(VertexAttribute<unsigned char>& boundVertices, unsigned int frameWidth);
 
 	void recalPoints(const Geom::Vec3f& origin);
 };

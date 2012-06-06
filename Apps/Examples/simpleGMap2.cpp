@@ -29,7 +29,7 @@
 
 SimpleGMap2::SimpleGMap2()
 {
-	 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	 position = myMap.addAttribute<VEC3, VERTEX>("position");
 
      Dart d = Algo::Modelisation::createTetrahedron<PFP>(myMap);
      position[d] = VEC3(0,0,0);
@@ -57,7 +57,6 @@ SimpleGMap2::SimpleGMap2()
 
 void SimpleGMap2::initGUI()
 {
-
 }
 
 void SimpleGMap2::cb_initGL()
@@ -80,7 +79,6 @@ void SimpleGMap2::cb_redraw()
 	Algo::Render::GL1::renderTopoGMD2<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 }
 
-
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
@@ -97,4 +95,3 @@ int main(int argc, char **argv)
 
 	return app.exec() ;
 }
-

@@ -30,9 +30,9 @@
 
 SimpleGMap3::SimpleGMap3()
 {
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
-	normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
-	volume = myMap.addAttribute<PFP::VEC3>(VOLUME, "volume");
+	position = myMap.addAttribute<VEC3, VERTEX>("position");
+	normal = myMap.addAttribute<VEC3, VERTEX>("normal");
+	volume = myMap.addAttribute<VEC3, VOLUME>("volume");
 
 	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
 	Dart d = primCat.hexaGrid_topo(3,1,1);
@@ -88,12 +88,10 @@ SimpleGMap3::SimpleGMap3()
 	myMap.unsewVolumes(d);
 
 	myMap.check();
-
 }
 
 void SimpleGMap3::initGUI()
 {
-
 }
 
 void SimpleGMap3::cb_initGL()
@@ -122,7 +120,6 @@ void SimpleGMap3::cb_redraw()
 	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap, Algo::Render::GL1::LINE, 1.0,position, normal);
 }
 
-
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
@@ -139,4 +136,3 @@ int main(int argc, char **argv)
 
 	return app.exec() ;
 }
-

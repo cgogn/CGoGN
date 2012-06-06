@@ -59,19 +59,19 @@ enum RenderPrimitives { NONE=0, TRIANGLES=3, QUADS=4, POLYGONS=5, TRIFAN=6 };
 */
 template <typename PFP>
 void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const FunctorSelect& good = allDarts);
+		const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& good = allDarts);
 
 template <typename PFP>
 void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const typename PFP::TVEC3& color, const FunctorSelect& good = allDarts);
+		const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good = allDarts);
 
 template <typename PFP>
 void renderNormalVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, float scale, const FunctorSelect& good = allDarts);
+		const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float scale, const FunctorSelect& good = allDarts);
 
 template <typename PFP>
 void renderFrameVertices(typename PFP::MAP& the_map,
-		const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good = allDarts);
+		const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], float scale, const FunctorSelect& good = allDarts);
 
 } // namespace Direct
 

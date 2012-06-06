@@ -45,6 +45,9 @@ namespace Modelisation
 template <typename PFP>
 class EarTriangulation
 {
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+
 protected:
 	// forward declaration
 	class VertexPoly;
@@ -78,23 +81,23 @@ protected:
 protected:
 	typename PFP::MAP& m_map;
 
-	AutoAttributeHandler<EarAttr> m_dartEars;
+	VertexAutoAttribute<EarAttr> m_dartEars;
 
-	AttributeHandler<typename PFP::VEC3> m_position;
+	VertexAttribute<VEC3> m_position;
 
 	VPMS m_ears;
 
-	bool inTriangle(const typename PFP::VEC3& P, const typename PFP::VEC3& normal, const typename PFP::VEC3& Ta,  const typename PFP::VEC3& Tb, const typename PFP::VEC3& Tc);
+	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc);
 
-	void recompute2Ears( Dart d, const typename PFP::VEC3& normalPoly, bool convex);
+	void recompute2Ears(Dart d, const VEC3& normalPoly, bool convex);
 
-	float computeEarInit(Dart d, const typename PFP::VEC3& normalPoly, float& val);
+	float computeEarInit(Dart d, const VEC3& normalPoly, float& val);
 
 public:
 
-	EarTriangulation(typename PFP::MAP& map) : m_map(map), m_dartEars(map, VERTEX)
+	EarTriangulation(MAP& map) : m_map(map), m_dartEars(map)
 	{
-		m_position = map.template getAttribute<typename PFP::VEC3>(VERTEX,"position");
+		m_position = map.template getAttribute<VEC3, VERTEX>("position");
 	}
 
 //	void trianguleFace(Dart d, DartMarker& mark);

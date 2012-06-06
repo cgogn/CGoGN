@@ -39,7 +39,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-bool isConvex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, bool CCW, unsigned int thread)
+bool isConvex(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, bool CCW, unsigned int thread)
 {
 	//get all the dart of the volume
 	std::vector<Dart> vStore;
@@ -54,7 +54,7 @@ bool isConvex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positio
 		Dart e = *it;
 		if (!m.isMarked(e))
 		{
-			m.markOrbit(EDGE, e) ;
+			m.markOrbit<EDGE>(e) ;
 			convex = isTetrahedronWellOriented<PFP>(map, e, position, CCW) ;
 		}
 	}
@@ -63,7 +63,7 @@ bool isConvex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& positio
 }
 
 template <typename PFP>
-bool isPointInVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point)
+bool isPointInVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -125,7 +125,7 @@ bool isPointInVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& 
 }
 
 template <typename PFP>
-bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point, bool CCW)
+bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point, bool CCW)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
@@ -168,7 +168,7 @@ bool isPointInConvexVolume(typename PFP::MAP& map, Dart d, const typename PFP::T
 }
 
 template <typename PFP>
-bool isPointInConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point, bool CCW)
+bool isPointInConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point, bool CCW)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
@@ -202,7 +202,7 @@ bool isPointInConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVE
 }
 
 template <typename PFP>
-bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point, bool CCW )
+bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point, bool CCW )
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
@@ -229,7 +229,7 @@ bool isPointInConvexFace2D(typename PFP::MAP& map, Dart d, const typename PFP::T
 }
 
 template <typename PFP>
-bool isPointOnEdge(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point)
+bool isPointOnEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point)
 {
 // 	typedef typename PFP::REAL REAL;
 // 	typedef typename PFP::VEC3 VEC3 ;
@@ -257,7 +257,7 @@ bool isPointOnEdge(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& po
 }
 
 template <typename PFP>
-bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point)
+bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point)
 {
 	typedef typename PFP::REAL REAL;
 	typedef typename PFP::VEC3 VEC3;
@@ -272,13 +272,13 @@ bool isPointOnHalfEdge(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3
 }
 
 template <typename PFP>
-bool isPointOnVertex(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& point)
+bool isPointOnVertex(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point)
 {
 	return Geom::arePointsEquals(point, position[d]);
 }
 
 template <typename PFP>
-bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3 points[4], bool CCW)
+bool isConvexFaceInOrIntersectingTetrahedron(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3 points[4], bool CCW)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 

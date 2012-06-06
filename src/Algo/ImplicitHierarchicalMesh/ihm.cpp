@@ -36,8 +36,8 @@ namespace IHM
 
 ImplicitHierarchicalMap::ImplicitHierarchicalMap() : m_curLevel(0), m_maxLevel(0), m_idCount(0)
 {
-	m_dartLevel = addAttribute<unsigned int>(DART, "dartLevel") ;
-	m_edgeId = addAttribute<unsigned int>(DART, "edgeId") ;
+	m_dartLevel = addAttribute<unsigned int, DART>("dartLevel") ;
+	m_edgeId = addAttribute<unsigned int, DART>("edgeId") ;
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
 }
@@ -71,7 +71,7 @@ void ImplicitHierarchicalMap::initEdgeId()
 	{
 		if(!edgeMark.isMarked(d))
 		{
-			edgeMark.markOrbit(EDGE, d) ;
+			edgeMark.markOrbit<EDGE>(d) ;
 			m_edgeId[d] = m_idCount ;
 			m_edgeId[Map2::phi2(d)] = m_idCount++ ;
 		}

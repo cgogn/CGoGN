@@ -42,8 +42,6 @@ struct PFP_STANDARD
 	typedef Geom::Matrix<3,3,REAL> MATRIX33;
 	typedef Geom::Matrix<4,4,REAL> MATRIX44;
 	typedef Geom::Matrix<3,6,REAL> MATRIX36;
-	typedef AttributeHandler<VEC3> TVEC3;
-	typedef AttributeHandler<REAL> TREAL;
 };
 
 }

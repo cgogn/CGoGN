@@ -45,32 +45,32 @@ typedef CPULinearSolverTraits< SparseMatrix<double>, FullVector<double> > CPUSol
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& normal,
-	typename PFP::TREAL& kmax,
-	typename PFP::TREAL& kmin,
-	typename PFP::TVEC3& Kmax,
-	typename PFP::TVEC3& Kmin,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
 	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
 void computeCurvatureVertex_QuadraticFitting(
 	typename PFP::MAP& map,
 	Dart dart,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& normal,
-	typename PFP::TREAL& kmax,
-	typename PFP::TREAL& kmin,
-	typename PFP::TVEC3& Kmax,
-	typename PFP::TVEC3& Kmin) ;
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin) ;
 
 template <typename PFP>
 void vertexQuadraticFitting(
 	typename PFP::MAP& map,
 	Dart dart,
 	typename PFP::MATRIX33& localFrame,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& normal,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
 	float& a, float& b, float& c, float& d, float& e) ;
 
 template <typename PFP>
@@ -93,14 +93,14 @@ template <typename PFP>
 void computeCurvatureVertices_NormalCycles(
 	typename PFP::MAP& map,
 	typename PFP::REAL radius,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& normal,
-	const typename PFP::TREAL& edgeangle,
-	typename PFP::TREAL& kmax,
-	typename PFP::TREAL& kmin,
-	typename PFP::TVEC3& Kmax,
-	typename PFP::TVEC3& Kmin,
-	typename PFP::TVEC3& Knormal,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal,
 	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
@@ -108,14 +108,14 @@ void computeCurvatureVertex_NormalCycles(
 	typename PFP::MAP& map,
 	Dart dart,
 	typename PFP::REAL radius,
-	const typename PFP::TVEC3& position,
-	const typename PFP::TVEC3& normal,
-	const typename PFP::TREAL& edgeangle,
-	typename PFP::TREAL& kmax,
-	typename PFP::TREAL& kmin,
-	typename PFP::TVEC3& Kmax,
-	typename PFP::TVEC3& Kmin,
-	typename PFP::TVEC3& Knormal) ;
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal) ;
 
 } // namespace Geometry
 

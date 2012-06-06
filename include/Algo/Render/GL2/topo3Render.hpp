@@ -45,7 +45,7 @@ namespace Render
 namespace GL2
 {
 template<typename PFP>
-void Topo3Render::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
+void Topo3Render::updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
 	Map3* ptrMap3 = dynamic_cast<Map3*>(&map);
 	if (ptrMap3 != NULL)
@@ -59,20 +59,17 @@ void Topo3Render::updateData(typename PFP::MAP& map, const typename PFP::TVEC3& 
 	}
 }
 
-
 template<typename PFP>
-void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
+void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
-
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-
 	if (m_attIndex.map() != &mapx)
-		m_attIndex  = mapx.template getAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
 
 	if (!m_attIndex.isValid())
-		m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -82,19 +79,19 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	}
 
 	// compute center of each volumes
-	CellMarker cmv(mapx,VOLUME);
-	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
+	CellMarker<VOLUME> cmv(mapx);
+	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 
-	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes, allDarts);
+	Algo::Geometry::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, allDarts);
 
 	// debut phi1
-	AutoAttributeHandler<VEC3> fv1(mapx, DART);
+	DartAutoAttribute<VEC3> fv1(mapx);
 	// fin phi1
-	AutoAttributeHandler<VEC3> fv11(mapx, DART);
+	DartAutoAttribute<VEC3> fv11(mapx);
 
 	// phi2
-	AutoAttributeHandler<VEC3> fv2(mapx, DART);
-	AutoAttributeHandler<VEC3> fv2x(mapx, DART);
+	DartAutoAttribute<VEC3> fv2(mapx);
+	DartAutoAttribute<VEC3> fv2x(mapx);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -112,8 +109,8 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	unsigned int posDBI=0;
 
 	// traverse each face of each volume
-	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),allDarts);
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(mapx, allDarts);
+	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		vecDartFaces.push_back(d);
 
@@ -242,8 +239,6 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const typename PFP::TV
 	delete[] positioniF3;
 }
 
-
-
 template<typename PFP>
 void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& good)
 {
@@ -280,9 +275,8 @@ void Topo3Render::setDartsIdColor(typename PFP::MAP& map, const FunctorSelect& g
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-
 template<typename PFP>
-void Topo3Render::updateColors(typename PFP::MAP& map, const typename PFP::TVEC3& colors, const FunctorSelect& good)
+void Topo3Render::updateColors(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& colors, const FunctorSelect& good)
 {
 	m_vbo4->bind();
 	Geom::Vec3f* colorBuffer =  reinterpret_cast<Geom::Vec3f*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
@@ -307,7 +301,6 @@ void Topo3Render::updateColors(typename PFP::MAP& map, const typename PFP::TVEC3
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-
 template<typename PFP>
 Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good)
 {
@@ -318,10 +311,8 @@ Dart Topo3Render::picking(typename PFP::MAP& map, int x, int y, const FunctorSel
 	return d;
 }
 
-
-
 template<typename PFP>
-void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
+void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, float kv, const FunctorSelect& good)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
@@ -332,9 +323,9 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	typedef typename PFP::REAL REAL;
 
 	if (m_attIndex.map() != &mapx)
-		m_attIndex  = mapx.template getAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
 	if (!m_attIndex.isValid())
-			m_attIndex  = mapx.template addAttribute<unsigned int>(DART, "dart_index");
+		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");
 
 	m_nbDarts = 0;
 	for (Dart d = mapx.begin(); d != mapx.end(); mapx.next(d))
@@ -344,15 +335,14 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	}
 
 	// compute center of each volumes
-	AutoAttributeHandler<VEC3> centerVolumes(mapx,VOLUME,"centerVolumes");
-	Algo::Geometry::computeCentroidVolumes<PFP>(mapx,positions,centerVolumes,good);
-
+	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
+	Algo::Geometry::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, good);
 
 	// beta1
-	AutoAttributeHandler<VEC3> fv1(mapx, DART);
+	DartAutoAttribute<VEC3> fv1(mapx);
 	// beta2/3
-	AutoAttributeHandler<VEC3> fv2(mapx, DART);
-	AutoAttributeHandler<VEC3> fv2x(mapx, DART);
+	DartAutoAttribute<VEC3> fv2(mapx);
+	DartAutoAttribute<VEC3> fv2x(mapx);
 
 	m_vbo4->bind();
 	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -364,14 +354,13 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
 
-
 	std::vector<Dart> vecDartFaces;
 	vecDartFaces.reserve(m_nbDarts/6);
 	unsigned int posDBI=0;
 
 	//traverse each face of each volume
-	TraversorCell<typename PFP::MAP> traFace(mapx, PFP::MAP::ORBIT_IN_PARENT(FACE),good);
-	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
+	TraversorCell<typename PFP::MAP, PFP::MAP::FACE_OF_PARENT> traFace(mapx, good);
+	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
 		vecDartFaces.push_back(d);
 
@@ -439,7 +428,8 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 			m_attIndex[dx] = posDBI;
 			posDBI+=2;
 
-			d = mapx.phi1(d);		}
+			d = mapx.phi1(d);
+		}
 	}
 
 	m_vbo0->bind();
@@ -532,10 +522,8 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const typename PFP::T
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-
-
 template<typename PFP>
-void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, typename PFP::TVEC3& posExpl, const FunctorSelect& good)
+void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribute<typename PFP::VEC3>& posExpl, const FunctorSelect& good)
 {
 	m_vbo0->bind();
 	typename PFP::VEC3* positionsPtr = reinterpret_cast<typename PFP::VEC3*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY));
@@ -551,7 +539,6 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, typename PF
 	m_vbo0->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
-
 
 //template<typename PFP>
 //void Topo3Render::updateDataMap3OldFashioned(typename PFP::MAP& mapx, const typename PFP::TVEC3& positions, float ke, float kf, float kv, const FunctorSelect& good)
@@ -628,13 +615,13 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, typename PF
 //	}
 //
 //	// debut phi1
-//	AutoAttributeHandler<VEC3> fv1(map, DART);
+//	DartAutoAttribute<VEC3> fv1(map);
 //	// fin phi1
-//	AutoAttributeHandler<VEC3> fv11(map, DART);
+//	DartAutoAttribute<VEC3> fv11(map);
 //
 //	// phi2
-//	AutoAttributeHandler<VEC3> fv2(map, DART);
-//	AutoAttributeHandler<VEC3> fv2x(map, DART);
+//	DartAutoAttribute<VEC3> fv2(map);
+//	DartAutoAttribute<VEC3> fv2x(map);
 //
 //	m_vbo4->bind();
 //	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
@@ -777,11 +764,10 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, typename PF
 //	glUnmapBuffer(GL_ARRAY_BUFFER);
 //}
 
+} //end namespace GL2
 
-}//end namespace VBO
+} //end namespace Render
 
-}//end namespace Algo
+} //end namespace Algo
 
-}//end namespace Render
-
-}//end namespace CGoGN
+} //end namespace CGoGN

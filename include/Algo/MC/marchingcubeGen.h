@@ -78,7 +78,7 @@ protected:
 	/**
 	 * position attribute table
 	 */
-	typename PFP::TVEC3 m_positions;
+	VertexAttribute<typename PFP::VEC3> m_positions;
 
 	/**
 	* Origin of image

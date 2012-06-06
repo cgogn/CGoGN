@@ -27,7 +27,7 @@ class ParticleCell2DMemo : public ParticleCell2D<PFP>
 	public :
 	typedef typename PFP::MAP Map;
 	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::TVEC3 TAB_POS;
+	typedef VertexAttribute<typename PFP::VEC3> TAB_POS;
 
 	std::list<Dart> memo_cross;
 

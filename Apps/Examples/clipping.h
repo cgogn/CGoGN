@@ -28,11 +28,11 @@
 #include <iostream>
 
 #include "Utils/Qt/qtSimple.h"
-#include "Utils/qtInputs.h"
+#include "Utils/Qt/qtInputs.h"
 
 #include "ui_clipping.h"
 // inclure qtui.h juste après le ui_xxx.h
-#include "Utils/qtui.h"
+#include "Utils/Qt/qtui.h"
 
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap3.h"
@@ -77,11 +77,11 @@ class Clipping: public Utils::QT::SimpleQT
 
 public:
 	typedef PFP::MAP MAP;
-	typedef PFP::TVEC3 TVEC3;
+	typedef PFP::VEC3 VEC3;
 
 	//Manip Carte
 	MAP myMap ;
-	TVEC3 position;
+	VertexAttribute<VEC3> position;
 	Dart dglobal;
 
 	//Render
