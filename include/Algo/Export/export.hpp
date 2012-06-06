@@ -281,9 +281,12 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 	{
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
+		{
 			for (typename std::vector<typename PFP::TVEC3* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
-					out << (*(*attrHandler))[vertices[i]] << std::endl ;
+					out << (*(*attrHandler))[vertices[i]] ;
+			out << std::endl ;
+		}
 
 		// ascii faces
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
@@ -299,17 +302,19 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<typename PFP::TVEC3*
 		// binary vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
 			for (typename std::vector<typename PFP::TVEC3*>::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
+			{
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
 				{
 					const typename PFP::VEC3& v = (*(*attrHandler))[vertices[i]] ;
 					out.write((char*)(&(v[0])), sizeof(v)) ;
 				}
+			}
 
 		// binary faces
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
 		{
 			uint8_t nbe = facesSize[i] ;
-			out.write((char*)(&nbe), sizeof(unsigned char)) ;
+			out.write((char*)(&nbe), sizeof(uint8_t)) ;
 			out.write((char*)(&(facesIdx[i][0])), facesSize[i] * sizeof(facesIdx[i][0])) ;
 		}
 	}
