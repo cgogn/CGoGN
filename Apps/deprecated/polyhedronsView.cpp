@@ -129,15 +129,15 @@ int main(int argc, char **argv)
 	prim3.transform(trf);
 
 	// create a subdivided cube
-	Algo::Modelisation::Polyhedron<PFP> prim4(myMap, position);
-	prim4.cube_topo(4, 5, 6);
-	prim4.embedCube(50.0f,50.0f, 50.0f);
+//	Algo::Modelisation::Polyhedron<PFP> prim4(myMap, position);
+//	prim4.cube_topo(4, 5, 6);
+//	prim4.embedCube(50.0f,50.0f, 50.0f);
 
 	//transform
 	trf.identity();
 	Geom::rotate<float>(1.0f,1.0f,1.0f,0.4f,trf);
 	Geom::translate<float>(270.0f,0.0,0.0,trf);
-	prim4.transform(trf);
+//	prim4.transform(trf);
 
     //  bounding box
     Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);

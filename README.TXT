@@ -3,7 +3,7 @@ installer les paquets suivants:
 cmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev
 
 Pour compiler CGoGN:
-- aller dans ThirdParty, cd build, taper "cmake ..", puis make ( avec -j x si vous avez x core sur votre machine)
+- aller dans ThirdParty, cd build, taper "cmake .", puis make ( avec -j x si vous avez x core sur votre machine)
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
 	On peut aussi compiler en debug en créant un répertoir qui fini par Debug à la place de build
 	

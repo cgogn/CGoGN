@@ -648,7 +648,7 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 
 	if (bs != _BLOCKSIZE_)
 	{
-		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
+		CGoGNerr << "Loading unavailable, different block sizes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
 		return false;
 	}
 

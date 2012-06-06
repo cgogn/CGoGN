@@ -549,6 +549,33 @@ void Map3::splitFace(Dart d, Dart e)
 	phi3sew(phi_1(e), phi_1(dd));
 }
 
+bool Map3::mergeFaces(Dart d)
+{
+	assert(edgeDegree(d)==2);
+
+	Dart dd = phi3(d);
+
+	phi3unsew(d);
+	phi3unsew(dd);
+
+	//use code of mergesFaces to override the if(isBoundaryEdge)
+	//we have to merge the faces if the face is linked to a border also
+//	Map2::mergeFaces(d);
+	Dart e = phi2(d) ;
+	phi2unsew(d) ;
+	Map1::mergeCycles(d, phi1(e)) ;
+	Map1::splitCycle(e, phi1(d)) ;
+	Map1::deleteCycle(d) ;
+//	Map2::mergeFaces(dd);
+	e = phi2(dd) ;
+	phi2unsew(dd) ;
+	Map1::mergeCycles(dd, phi1(e)) ;
+	Map1::splitCycle(e, phi1(dd)) ;
+	Map1::deleteCycle(dd);
+
+	return true;
+}
+
 Dart Map3::collapseFace(Dart d, bool delDegenerateVolumes)
 {
 	Dart resV = NIL;

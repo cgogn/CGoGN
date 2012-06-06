@@ -185,7 +185,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	// compute normal to polygon
 	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(map, d, position);
 
-	// first pass create polygon in chained list witht angle computation
+	// first pass create polygon in chained list with angle computation
 	VertexPoly* vpp = NULL;
 	VertexPoly* prem = NULL;
 	unsigned int nbv = 0;
@@ -239,7 +239,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 		}
 	}
 
-	// NO WE HAVE THE POLYGON AND EARS
+	// NOW WE HAVE THE POLYGON AND EARS
 	// LET'S REMOVE THEM
 	while (nbv>3)
 	{

@@ -59,10 +59,10 @@ void GMap2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 
 Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 {
-	Dart d = GMap1::newFace(nbEdges);
+	Dart d = GMap1::newCycle(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = GMap1::newBoundaryFace(nbEdges);
+		Dart e = GMap1::newBoundaryCycle(nbEdges);
 
 		Dart it = d;
 		do
@@ -87,8 +87,8 @@ void GMap2::deleteFace(Dart d)
 		it = phi1(it) ;
 	} while(it != d) ;
 	Dart dd = phi2(d) ;
-	GMap1::deleteFace(d) ;
-	GMap1::deleteFace(dd) ;
+	GMap1::deleteCycle(d) ;
+	GMap1::deleteCycle(dd) ;
 }
 
 void GMap2::deleteCC(Dart d)
@@ -183,7 +183,7 @@ Dart GMap2::deleteVertex(Dart d)
 
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
-	GMap1::deleteFace(d) ;
+	GMap1::deleteCycle(d) ;
 	return res ;
 }
 
@@ -366,7 +366,7 @@ void GMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 		beta1sew(beta0(dd), ee) ;
 		beta1sew(ddN, ee1) ;
 	}
-	GMap1::deleteFace(dd) ;
+	GMap1::deleteCycle(dd) ;
 
 	beta2sew(d, beta0(e)) ; // sew the faces
 	beta2sew(e, beta0(d)) ;
@@ -378,7 +378,7 @@ void GMap2::unsewFaces(Dart d)
 
 	Dart dd = phi2(d);
 
-	Dart e = newBoundaryFace(2);
+	Dart e = GMap1::newBoundaryCycle(2);
 	Dart ee = phi1(e) ;
 
 	Dart f = findBoundaryEdgeOfVertex(d) ;
@@ -436,9 +436,9 @@ bool GMap2::collapseDegeneratedFace(Dart d)
 			beta1unsew(d2N) ;
 			beta1sew(d21, d2N) ;
 			beta1sew(d2, beta0(d2)) ;
-			GMap1::deleteFace(d2) ;
+			GMap1::deleteCycle(d2) ;
 		}
-		GMap1::deleteFace(d) ;
+		GMap1::deleteCycle(d) ;
 		return true ;
 	}
 	return false ;
@@ -454,12 +454,14 @@ void GMap2::splitFace(Dart d, Dart e)
 	Dart dprev = phi_1(d) ;
 	Dart eprev = phi_1(e) ;
 
+	//required to unsew and resew because we use GMap1 cutEdge
+	//which insert new darts within the cut edge
 	beta2unsew(beta1(d)) ;
 	beta2unsew(beta1(e)) ;
 
 	Dart dd = GMap1::cutEdge(phi_1(d)) ;
 	Dart ee = GMap1::cutEdge(phi_1(e)) ;
-	GMap1::splitFace(dd, ee) ;
+	GMap1::splitCycle(dd, ee) ;
 	beta2sew(dd, beta1(e)) ;
 	beta2sew(ee, beta1(d)) ;
 
@@ -474,9 +476,9 @@ bool GMap2::mergeFaces(Dart d)
 		Dart e = phi2(d) ;
 		beta2unsew(d) ;
 		beta2unsew(e) ;
-		GMap1::mergeFaces(d, phi1(e)) ;
-		GMap1::mergeFaces(e, phi1(d)) ;
-		GMap1::deleteFace(d) ;
+		GMap1::mergeCycles(d, phi1(e)) ;
+		GMap1::splitCycle(e, phi1(d)) ;
+		GMap1::deleteCycle(d) ;
 		return true ;
 	}
 	return false ;
@@ -578,8 +580,8 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 		beta2sew(d2, beta0(e2));	// Link the two adjacent faces together
 		beta2sew(e2, beta0(d2));
 	}
-	GMap1::deleteFace(d);		// Delete the two alone faces
-	GMap1::deleteFace(e);
+	GMap1::deleteCycle(d);		// Delete the two alone faces
+	GMap1::deleteCycle(e);
 
 	return true ;
 }
@@ -782,6 +784,7 @@ bool GMap2::checkSimpleOrientedPath(std::vector<Dart>& vd)
 	{
 		if(dm.isMarked(*it))
 			return false ;
+		
 		dm.markOrbit<VERTEX>(*it) ;
 
 		std::vector<Dart>::iterator prev ;
@@ -810,6 +813,17 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int
 		it = alpha1(it);
  	} while (it != d);
  	return false;
+}
+
+bool GMap2::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+{
+	if (f(d))
+		return true ;
+	Dart e = beta2(beta0(d)) ;
+	if (f(e))
+		return true ;
+
+	return false ;
 }
 
 bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)

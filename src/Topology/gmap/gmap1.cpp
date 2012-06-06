@@ -50,8 +50,10 @@ void GMap1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete faces in a 1-G-map
  *************************************************************************/
 
-Dart GMap1::newFace(unsigned int nbEdges)
+Dart GMap1::newCycle(unsigned int nbEdges)
 {
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+
 	Dart d0 =  GMap0::newEdge();	// create the first edge
 	Dart dp = beta0(d0);			// store an extremity
 	for (unsigned int i = 1; i < nbEdges; ++i)
@@ -64,8 +66,10 @@ Dart GMap1::newFace(unsigned int nbEdges)
 	return d0;
 }
 
-Dart GMap1::newBoundaryFace(unsigned int nbEdges)
+Dart GMap1::newBoundaryCycle(unsigned int nbEdges)
 {
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+
 	Dart d0 =  GMap0::newEdge();	// create the first edge
 	boundaryMark(d0);
 	boundaryMark(beta0(d0));
@@ -82,7 +86,7 @@ Dart GMap1::newBoundaryFace(unsigned int nbEdges)
 	return d0;
 }
 
-void GMap1::deleteFace(Dart d)
+void GMap1::deleteCycle(Dart d)
 {
 	Dart e = phi1(d);
 	while (e != d)

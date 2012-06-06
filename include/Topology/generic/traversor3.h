@@ -44,7 +44,6 @@ private:
 	MAP& m_map ;
 	DartMarkerStore* m_dmark ;
 	CellMarkerStore<ORBIT>* m_cmark ;
-	unsigned int m_orbit;
 public:
 	MarkerForTraversor(MAP& map, bool forceDartMarker = false, unsigned int thread = 0) ;
 	~MarkerForTraversor();

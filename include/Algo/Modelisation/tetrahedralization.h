@@ -39,10 +39,16 @@ namespace Tetrahedralization
 
 /**
 * subdivide a hexahedron into 5 tetrahedron
-* @param d dart of the hexahedron
 */
 template <typename PFP>
 void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
+
+/**
+* WARNING : assume all volumes to be hexahedrons
+* subdivide a hexahedron mesh into a tetrahedron mesh
+*/
+template <typename PFP>
+void hexahedronsToTetrahedrons(typename PFP::MAP& map);
 
 /************************************************************************************************
  * 									Collapse / Split Operators

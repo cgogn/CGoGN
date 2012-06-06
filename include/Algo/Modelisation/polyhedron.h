@@ -62,7 +62,7 @@ enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
 
 /**
- * Unsew the Umbrella aroud a vertex, close the hole and then
+ * Unsex the Umbrella around a vertex, close the hole and then
  * create a symetric to construct a polyedron
  * @param d a dart from the vertex
  */
@@ -109,7 +109,7 @@ template <typename PFP>
 Dart createTriangularPrism(typename PFP::MAP& map);
 
 /**
- * create a 3-sided pyramid
+ * create a 4-sided pyramid
  */
 template <typename PFP>
 Dart createQuadrangularPyramid(typename PFP::MAP& map);
@@ -218,7 +218,6 @@ public:
 	* @param p1 second Polyhedron
 	*/
 	Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2);
-
 
 	/*
 	* get the reference dart
