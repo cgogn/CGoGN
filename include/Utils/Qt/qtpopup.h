@@ -27,6 +27,7 @@
 
 #include <QGridLayout>
 #include <QDialog>
+#include "Utils/Qt/qtSimple.h"
 
 
 namespace CGoGN
@@ -47,6 +48,8 @@ class QtPopUp : public QDialog
 {
 	Q_OBJECT
 
+	Utils::QT::SimpleQT * m_cbs;
+
 	QGridLayout* m_layout;
 
 public:
@@ -55,7 +58,7 @@ public:
 	* create an empty popup
 	* @param withButtons  add OK/CANCEL to the popup (exec launch blocking popup & return 1/0)
 	*/
-	QtPopUp(bool withButtons=false);
+	QtPopUp(Utils::QT::SimpleQT* sqt=NULL, bool withButtons=false);
 
 	/**
 	 *

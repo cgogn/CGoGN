@@ -25,7 +25,7 @@
  #include <QVBoxLayout>
  #include <QHBoxLayout>
  #include <QPushButton>
-
+ #include <QKeyEvent>
 namespace CGoGN
 {
 namespace Utils
@@ -34,9 +34,9 @@ namespace QT
 {
 
 
-QtPopUp::QtPopUp(bool withButtons)
+QtPopUp::QtPopUp(SimpleQT* sqt, bool withButtons):
+m_cbs(sqt)
 {
-
 	if (withButtons)
 	{
 		QVBoxLayout *vlayout = new QVBoxLayout(this);
@@ -75,8 +75,15 @@ void QtPopUp::addWidget(QWidget* wid, int col, int row)
 	m_layout->addWidget(wid,col,row);
 }
 
-void QtPopUp::keyPressEvent ( QKeyEvent * e )
-{}
+void QtPopUp::keyPressEvent ( QKeyEvent * event )
+{
+	int k = event->key();
+	if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
+		k += 32;
+
+	if (m_cbs)
+		m_cbs->cb_keyPress(k);
+}
 
 }
 }
