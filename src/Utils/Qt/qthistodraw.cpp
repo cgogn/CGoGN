@@ -288,7 +288,7 @@ void RenderHistogram::svgExport(const std::string& filename)
 
 void RenderHistogram::mousePressEvent(QMouseEvent* event)
 {
-	int x = -1;
+	int x = NONE;
 	int widthAxl = 8*m_axl_nbd;
 
 	const std::vector<unsigned int>& pop = m_histo.getPopulation();
@@ -307,7 +307,7 @@ void RenderHistogram::mousePressEvent(QMouseEvent* event)
 	}
 
 	const std::vector<double>& interv = m_histo.getQuantilesIntervals();
-	int xx = -1;
+	int xx = NONE;
 	if ( m_drawQuantiles && !interv.empty())
 	{
 		double lw = (m_histo.getMax() - m_histo.getMin()) / double(m_w);

@@ -26,6 +26,7 @@
 #define __HISTOGRAM__
 
 #include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/cellmarker.h"
 #include "Geometry/vector_gen.h"
 #include "Utils/colorMaps.h"
 #include "Utils/vbo.h"
@@ -311,23 +312,42 @@ public:
 		 * return cells of histogram's column
 		 * @param c column of histogram
 		 * @param vc vector of cells (indices)
-		 * @return true if not empty
+		 * @return number of cells
 		 */
-		bool cellsOfHistogramColumn( unsigned int c, std::vector<unsigned int> vc) const;
+		unsigned int cellsOfHistogramColumn( unsigned int c, std::vector<unsigned int>& vc) const;
 
 		/**
 		 * return cells of quantile's column
 		 * @param c column of quantile
 		 * @param vc vector of cells (indices)
-		 * @return true if not empty
+		 * @return number of cells
 		 */
-		bool cellsOfQuauntilesColumn( unsigned int c, std::vector<unsigned int> vc) const;
+		unsigned int cellsOfQuantilesColumn( unsigned int c, std::vector<unsigned int>& vc) const;
 
+
+		/**
+		 * mark cells of histogram's column
+		 * @param c column of quantile
+		 * @param cm marker
+		 * @return number of marked cells
+		 */
+		template <typename CELLMARKER>
+		unsigned int markCellsOfHistogramColumn(unsigned int c, CELLMARKER& cm) const;
+
+		/**
+		 * mark cells of quantile's column
+		 * @param c column of quantile
+		 * @param cm marker
+		 * @return number of marked cells
+		 */
+		template <typename CELLMARKER>
+		unsigned int markCellsOfQuantilesColumn(unsigned int c, CELLMARKER& cm) const;
 
 		/**
 		 * get the colorMap
 		 */
 		const HistoColorMap& colorMap() const;
+
 
 };
 

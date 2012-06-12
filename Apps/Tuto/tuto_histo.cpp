@@ -268,6 +268,30 @@ void MyQT::cb_redraw()
 void MyQT::clickHisto(unsigned int i,unsigned int j)
 {
 	std::cout << "CLICK on column Histo: "<< i << " / Quantiles: "<< j <<std::endl;
+
+	if (i != Utils::QT::RenderHistogram::NONE)
+	{
+		std::vector<unsigned int > vc;
+		l_histo->cellsOfHistogramColumn(i,vc);
+		std::cout << "Cells of histo: "<< std::endl;
+		for (unsigned int k=0; k <vc.size(); ++k)
+			std::cout << vc[k]<<"/";
+		std::cout << std::endl;
+
+		CellMarker<VERTEX> cm(myMap);
+		std::cout << l_histo->markCellsOfHistogramColumn(i,cm) << " marked cells"<< std::endl;
+	}
+
+	if (j != Utils::QT::RenderHistogram::NONE)
+	{
+		std::vector<unsigned int > vc;
+		l_histo->cellsOfHistogramColumn(j,vc);
+		std::cout << "Cells of quantile: "<< std::endl;
+		for (unsigned int k=0; k <vc.size(); ++k)
+			std::cout << vc[k]<<"/";
+		std::cout << std::endl;
+	}
+
 }
 
 

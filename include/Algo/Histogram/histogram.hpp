@@ -22,7 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-// forward
+#include <algorithm>
+
 namespace CGoGN
 {
 
@@ -222,6 +223,58 @@ inline bool Histogram::dataComp( const std::pair<double, unsigned int>& a, const
 {
 	return a.first < b.first;
 }
+
+
+template <typename CELLMARKER>
+unsigned int Histogram::markCellsOfHistogramColumn(unsigned int c, CELLMARKER& cm) const
+{
+	if (!m_sorted)
+	{
+		std::sort(m_dataIdx.begin(),m_dataIdx.end(),dataComp);
+		m_sorted = true;
+	}
+
+	double bi = (m_max-m_min)/m_nbclasses * c + m_min;
+	double bs = (m_max-m_min)/m_nbclasses * (c+1) + m_min;
+
+	unsigned int nb=m_dataIdx.size();
+	unsigned int i=0;
+
+	while ((i<nb) && (data(i)< bi))
+		++i;
+
+	unsigned int nbc=0;
+	while ((i<nb) && (data(i)< bs))
+	{
+		cm.mark(idx(i++));
+		++nbc;
+	}
+
+	return nbc;
+}
+
+template <typename CELLMARKER>
+unsigned int Histogram::markCellsOfQuantilesColumn(unsigned int c, CELLMARKER& cm) const
+{
+	double bi = m_interv[c];
+	double bs = m_interv[c+1];
+
+	unsigned int nb=m_dataIdx.size();
+	unsigned int i=0;
+
+	while ((i<nb) && (data(i)< bi))
+		++i;
+
+	unsigned int nbc=0;
+	while ((i<nb) && (data(i)< bs))
+	{
+		cm.mark(idx(i++));
+		++nbc;
+	}
+
+	return nbc;
+}
+
 
 
 

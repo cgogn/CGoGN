@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/Histogram/histogram.h"
-#include <algorithm>
+
 
 namespace CGoGN
 {
@@ -157,7 +157,7 @@ void Histogram::histoColorizeVBO(Utils::VBO& vbo)
 }
 
 
-bool Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsigned int> vc) const
+unsigned int Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsigned int>& vc) const
 {
 	if (!m_sorted)
 	{
@@ -167,8 +167,8 @@ bool Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsigned int>
 
 	vc.clear();
 
-	double bi = (m_min+m_max)/m_nbclasses * c + m_min;
-	double bs = (m_min+m_max)/m_nbclasses * (c+1) + m_min;
+	double bi = (m_max-m_min)/m_nbclasses * c + m_min;
+	double bs = (m_max-m_min)/m_nbclasses * (c+1) + m_min;
 
 	unsigned int nb=m_dataIdx.size();
 	unsigned int i=0;
@@ -177,14 +177,12 @@ bool Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsigned int>
 		++i;
 
 	while ((i<nb) && (data(i)< bs))
-	{
-		vc.push_back(idx(i));
-	}
+		vc.push_back(idx(i++));
 
-	return !vc.empty();
+	return vc.size();
 }
 
-bool Histogram::cellsOfQuauntilesColumn( unsigned int c, std::vector<unsigned int> vc) const
+unsigned int Histogram::cellsOfQuantilesColumn( unsigned int c, std::vector<unsigned int>& vc) const
 {
 	vc.clear();
 
@@ -198,12 +196,12 @@ bool Histogram::cellsOfQuauntilesColumn( unsigned int c, std::vector<unsigned in
 		++i;
 
 	while ((i<nb) && (data(i)< bs))
-	{
-		vc.push_back(idx(i));
-	}
+		vc.push_back(idx(i++));
 
-	return !vc.empty();
+	return vc.size();
 }
+
+
 
 
 }

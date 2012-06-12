@@ -74,6 +74,9 @@ class RenderHistogram : public QWidget
 	void axeVals();
 
 public:
+
+	static const unsigned int NONE = 0xffffffff;
+
 	/**
 	 * constructor
 	 * @param parent parent widget
@@ -143,8 +146,8 @@ public:
     signals:
     /**
      * emitted signal when a column of histogram is clicked
-     * @param i column of histo (0xffffffff if none)
-     * @param j column of quantileq (0xffffffff if none)
+     * @param i column of histo (NONE if none)
+     * @param j column of quantileq (NONE if none)
      */
     void clicked(unsigned int, unsigned int);
 
