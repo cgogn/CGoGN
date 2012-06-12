@@ -22,6 +22,20 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef __MAP2MR_PM__
+#define __MAP2MR_PM__
+
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
+
+
+#include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/edgeSelector.h"
+#include "Algo/Decimation/geometryApproximator.h"
+#include "Algo/Decimation/geometryPredictor.h"
+#include "Algo/Decimation/lightfieldApproximator.h"
+
 
 namespace CGoGN
 {
@@ -29,103 +43,59 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Import
+namespace Multiresolution
 {
 
 template <typename PFP>
-bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& tabV, std::vector<unsigned int>& tabE)
+class Map2MR_PM
 {
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-	std::cout << "immport choupiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" << std::endl;
-	typedef typename PFP::VEC3 VEC3;
+private:
+	MAP& m_map ;
+	VertexAttribute<VEC3>& m_position;
+	bool shareVertexEmbeddings ;
 
-	//open file
-	std::ifstream fp(filename.c_str(), std::ios::in);
-	if (!fp.good())
-	{
-		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
-		return false;
-	}
+	//SelectorUnmarked dartSelect ;
 
-	std::string ligne;
-	unsigned int nbv, nbe;
-	std::getline(fp, ligne);
+	bool m_initOk ;
 
-	std::stringstream oss(ligne);
-	oss >> nbv;
-	oss >> nbe;
+	DartMarker& inactiveMarker;
 
-	std::cout << "nb vertices = " << nbv << std::endl;
-	std::cout << "nb edges = " << nbe << std::endl;
+	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
+	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
+	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
 
-	std::vector<unsigned int> index;
-	index.reserve(2*nbv);
+	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
 
-	//read vertices
-	unsigned int id = 0;
-	for(unsigned int j=0 ; j < nbv ; ++j)
-	{
-		do
-		{
-			std::getline(fp, ligne);
-		} while(ligne.size() == 0);
+public:
+	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
+			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
 
-		std::stringstream oss(ligne);
+	~Map2MR_PM();
 
-		unsigned int i;
-		float x, y, z;
-		oss >> i;
-		oss >> x;
-		oss >> y;
-		oss >> z;
+	//create a progressive mesh (a coarser level)
+	void createPM(unsigned int percentWantedVertices);
 
-		VEC3 pos(x,y,z);
+	//coarsen the mesh -> analysis
+	void coarsen() ;
 
-		//std::cout << "vec[" << j << "] = " << pos << std::endl;
+	//refine the mesh -> synthesis
+	void refine() ;
 
-		index[i] = id;
-		tabV.push_back(pos);
-		//tabV[j] = pos;
+	bool initOk() { return m_initOk; }
+} ;
 
-		//std::cout << "vec[" << j << "] = " << tabV[j] << std::endl;
-
-		++id;
-	}
-
-	for(unsigned int i=0 ; i < nbe ; ++i)
-	{
-		do
-		{
-			std::getline(fp, ligne);
-		}while(ligne.size() == 0);
-
-		std::stringstream oss(ligne);
-
-		unsigned int x, y;
-		oss >> x;
-		oss >> x;
-		oss >> y;
-
-		tabE.push_back(index[x]);
-		tabE.push_back(index[y]);
-		//tabE[2*i] = index[x];
-		//tabE[2*i+1] = index[y];
-	}
-
-//	for(typename std::vector<VEC3>::iterator it = tabV.begin() ; it < tabV.end() ; ++it)
-//		std::cout << *it << std::endl;
-
-//	for(std::vector<unsigned int>::iterator it = tabE.begin() ; it < tabE.end() ; it = it + 2)
-//		std::cout << *it << " " << *(it + 1) << std::endl;
-
-	fp.close();
-
-	return true;
-}
-
-} // namespace Import
+} // namespace Multiresolution
 
 } // namespace Algo
 
 } // namespace CGoGN
 
+
+#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
+
+#endif

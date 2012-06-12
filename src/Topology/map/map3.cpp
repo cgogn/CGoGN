@@ -136,28 +136,20 @@ Dart Map3::splitVertex(std::vector<Dart>& vd)
 	Dart prev = vd.front();	//elt 0
 
 	Dart db1 = NIL;
-	if(isBoundaryFace(phi1(phi2(prev))))
+	if(isBoundaryFace(phi2(prev)))
 	{
 		db1 = phi2(phi3(phi1(phi2(prev))));
 	}
-	else if(isBoundaryEdge(prev))
-	{
-		boundE = true;
-	}
 
 	Dart fs = phi_1(phi2(phi_1(prev)));	//first side
-	//Dart ss = phi2(prev);	//second side
 
 	Map2::splitVertex(prev, phi2(fs));
 
-
 	for(unsigned int i = 1; i < vd.size(); ++i)
 	{
-		//Dart d3 = phi1(ss);
 		prev = vd[i];
 
 		Dart fs = phi_1(phi2(phi_1(prev)));	//first side
-		//Dart ss = phi2(prev);	//second side
 
 		Map2::splitVertex(prev, phi2(fs));
 
@@ -179,7 +171,7 @@ Dart Map3::splitVertex(std::vector<Dart>& vd)
 		phi3sew(phi1(phi2(db2)), phi_1(phi3(phi2(db2))));
 		phi3sew(phi1(phi2(db1)), phi_1(phi3(phi2(db1))));
 	}
-	else if(!boundE)
+	else
 	{
 		Dart dbegin = phi1(phi2(vd.front()));
 		Dart dend = phi_1(phi2(phi_1(vd.back())));

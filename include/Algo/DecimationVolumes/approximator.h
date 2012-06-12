@@ -22,6 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef __APPROXIMATOR_VOLUMES_H__
+#define __APPROXIMATOR_VOLUMES_H__
+
+#include "Algo/DecimationVolumes/operator.h"
 
 namespace CGoGN
 {
@@ -29,103 +33,87 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Import
+namespace DecimationVolumes
 {
+
+enum ApproximatorType
+{
+	A_Centroid //barycenter of the n-cells
+};
 
 template <typename PFP>
-bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& tabV, std::vector<unsigned int>& tabE)
+class ApproximatorGen
 {
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-	std::cout << "immport choupiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" << std::endl;
-	typedef typename PFP::VEC3 VEC3;
+protected:
+	MAP& m_map ;
 
-	//open file
-	std::ifstream fp(filename.c_str(), std::ios::in);
-	if (!fp.good())
+public:
+	ApproximatorGen(MAP& m) : m_map(m)
+	{}
+	virtual ~ApproximatorGen()
+	{}
+	virtual const std::string& getApproximatedAttributeName() const = 0 ;
+	virtual ApproximatorType getType() const = 0 ;
+	virtual bool init() = 0 ;
+	virtual void approximate(Operator<PFP>* op) = 0 ;
+	virtual void saveApprox(Operator<PFP>* op) = 0 ;
+	virtual void affectApprox(Operator<PFP>* op) = 0 ;
+} ;
+
+
+template <typename PFP, typename T>
+class Approximator :  public ApproximatorGen<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL;
+
+protected:
+
+	//TODO ajouter un predictor
+
+	VertexAttribute<T>& m_attrV; // vertex attribute to be approximated
+
+	//TODO Attribute to store approximation result
+	//TODO attribute to store detail information for reconstruction
+
+	T m_app;
+
+public:
+	Approximator(MAP& m, VertexAttribute<T>& a):
+		ApproximatorGen<PFP>(m), m_attrV(a)
+	{}
+
+	//virtual ~Approximator();
+
+	const std::string& getApproximatedAttributeName() const
 	{
-		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
-		return false;
+		return m_attrV.name() ;
 	}
 
-	std::string ligne;
-	unsigned int nbv, nbe;
-	std::getline(fp, ligne);
-
-	std::stringstream oss(ligne);
-	oss >> nbv;
-	oss >> nbe;
-
-	std::cout << "nb vertices = " << nbv << std::endl;
-	std::cout << "nb edges = " << nbe << std::endl;
-
-	std::vector<unsigned int> index;
-	index.reserve(2*nbv);
-
-	//read vertices
-	unsigned int id = 0;
-	for(unsigned int j=0 ; j < nbv ; ++j)
+	void saveApprox(Operator<PFP>* op)
 	{
-		do
-		{
-			std::getline(fp, ligne);
-		} while(ligne.size() == 0);
-
-		std::stringstream oss(ligne);
-
-		unsigned int i;
-		float x, y, z;
-		oss >> i;
-		oss >> x;
-		oss >> y;
-		oss >> z;
-
-		VEC3 pos(x,y,z);
-
-		//std::cout << "vec[" << j << "] = " << pos << std::endl;
-
-		index[i] = id;
-		tabV.push_back(pos);
-		//tabV[j] = pos;
-
-		//std::cout << "vec[" << j << "] = " << tabV[j] << std::endl;
-
-		++id;
+		Dart d = op->getEdge();
+		//m_app = m_approx[d] ;
 	}
 
-	for(unsigned int i=0 ; i < nbe ; ++i)
+	void affectApprox(Operator<PFP>* op)
 	{
-		do
-		{
-			std::getline(fp, ligne);
-		}while(ligne.size() == 0);
-
-		std::stringstream oss(ligne);
-
-		unsigned int x, y;
-		oss >> x;
-		oss >> x;
-		oss >> y;
-
-		tabE.push_back(index[x]);
-		tabE.push_back(index[y]);
-		//tabE[2*i] = index[x];
-		//tabE[2*i+1] = index[y];
+		Dart d = op->getEdge();
+		m_attrV[d] = m_app ;
 	}
+};
 
-//	for(typename std::vector<VEC3>::iterator it = tabV.begin() ; it < tabV.end() ; ++it)
-//		std::cout << *it << std::endl;
 
-//	for(std::vector<unsigned int>::iterator it = tabE.begin() ; it < tabE.end() ; it = it + 2)
-//		std::cout << *it << " " << *(it + 1) << std::endl;
-
-	fp.close();
-
-	return true;
-}
-
-} // namespace Import
+} // namespace DecimationVolumes
 
 } // namespace Algo
 
 } // namespace CGoGN
 
+#endif

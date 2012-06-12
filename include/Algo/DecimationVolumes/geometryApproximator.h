@@ -22,6 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
+#ifndef __GEOMETRY_APPROXIMATOR_VOLUMES_H__
+#define __GEOMETRY_APPROXIMATOR_VOLUMES_H__
+
+#include "Algo/DecimationVolumes/approximator.h"
 
 namespace CGoGN
 {
@@ -29,103 +33,36 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Import
+namespace DecimationVolumes
 {
 
 template <typename PFP>
-bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& tabV, std::vector<unsigned int>& tabE)
+class Approximator_Centroid : public Approximator<PFP, typename PFP::VEC3>
 {
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL;
 
-	std::cout << "immport choupiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" << std::endl;
-	typedef typename PFP::VEC3 VEC3;
+	Approximator_Centroid(MAP& m, VertexAttribute<VEC3>& pos):
+		Approximator<PFP, VEC3>(m, pos)
+	{}
 
-	//open file
-	std::ifstream fp(filename.c_str(), std::ios::in);
-	if (!fp.good())
-	{
-		CGoGNerr << "Unable to open file " << filename << CGoGNendl;
-		return false;
-	}
+	~Approximator_Centroid()
+	{}
 
-	std::string ligne;
-	unsigned int nbv, nbe;
-	std::getline(fp, ligne);
+	ApproximatorType getType() const { return A_Centroid; }
+	bool init();
+	void approximate(Operator<PFP> *op);
 
-	std::stringstream oss(ligne);
-	oss >> nbv;
-	oss >> nbe;
+} ;
 
-	std::cout << "nb vertices = " << nbv << std::endl;
-	std::cout << "nb edges = " << nbe << std::endl;
+} //namespace DecimationVolumes
 
-	std::vector<unsigned int> index;
-	index.reserve(2*nbv);
+} //namespace Algo
 
-	//read vertices
-	unsigned int id = 0;
-	for(unsigned int j=0 ; j < nbv ; ++j)
-	{
-		do
-		{
-			std::getline(fp, ligne);
-		} while(ligne.size() == 0);
+} //namespace CGoGN
 
-		std::stringstream oss(ligne);
+#include "Algo/DecimationVolumes/geometryApproximator.hpp"
 
-		unsigned int i;
-		float x, y, z;
-		oss >> i;
-		oss >> x;
-		oss >> y;
-		oss >> z;
-
-		VEC3 pos(x,y,z);
-
-		//std::cout << "vec[" << j << "] = " << pos << std::endl;
-
-		index[i] = id;
-		tabV.push_back(pos);
-		//tabV[j] = pos;
-
-		//std::cout << "vec[" << j << "] = " << tabV[j] << std::endl;
-
-		++id;
-	}
-
-	for(unsigned int i=0 ; i < nbe ; ++i)
-	{
-		do
-		{
-			std::getline(fp, ligne);
-		}while(ligne.size() == 0);
-
-		std::stringstream oss(ligne);
-
-		unsigned int x, y;
-		oss >> x;
-		oss >> x;
-		oss >> y;
-
-		tabE.push_back(index[x]);
-		tabE.push_back(index[y]);
-		//tabE[2*i] = index[x];
-		//tabE[2*i+1] = index[y];
-	}
-
-//	for(typename std::vector<VEC3>::iterator it = tabV.begin() ; it < tabV.end() ; ++it)
-//		std::cout << *it << std::endl;
-
-//	for(std::vector<unsigned int>::iterator it = tabE.begin() ; it < tabE.end() ; it = it + 2)
-//		std::cout << *it << " " << *(it + 1) << std::endl;
-
-	fp.close();
-
-	return true;
-}
-
-} // namespace Import
-
-} // namespace Algo
-
-} // namespace CGoGN
-
+#endif

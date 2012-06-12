@@ -47,7 +47,7 @@ public:
  *********************************************************************************/
 
 template <typename PFP>
-typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d1)
+typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, Dart d1)
 {
 	Dart d2 = map.phi2(d1) ;
 	Dart d3 = map.phi_1(d1) ;
@@ -67,7 +67,7 @@ typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVE
 }
 
 template <typename PFP>
-typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, Dart d)
 {
 	map.incCurrentLevel() ;
 
@@ -98,10 +98,10 @@ class LoopOddAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopOddAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -126,10 +126,10 @@ class LoopEvenAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position;
 
 public:
-	LoopEvenAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -148,10 +148,10 @@ class LoopNormalisationAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position;
 
 public:
-	LoopNormalisationAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopNormalisationAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -177,10 +177,10 @@ class LoopOddSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position;
 
 public:
-	LoopOddSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -205,10 +205,10 @@ class LoopEvenSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopEvenSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -227,10 +227,10 @@ class LoopNormalisationSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -259,10 +259,10 @@ class PipoVertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	PipoVertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	PipoVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -282,10 +282,10 @@ class PipoEdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	PipoEdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	PipoEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -308,10 +308,10 @@ class PipoFaceVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	PipoFaceVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	PipoFaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -343,10 +343,10 @@ class LoopVertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopVertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -381,10 +381,10 @@ class LoopEdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopEdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -420,10 +420,10 @@ class CCVertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	CCVertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	CCVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -472,10 +472,10 @@ class CCEdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	CCEdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	CCEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -517,10 +517,10 @@ class CCFaceVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	CCFaceVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	CCFaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)

@@ -230,9 +230,19 @@ public:
 	void addLevel() ;
 
 	/**
+	 * add a resolution level in the front of the level table (use only in MRMaps)
+	 */
+	void addFrontLevel();
+
+	/**
 	 * remove last resolution level (use only in MRMaps)
 	 */
 	void removeLevel() ;
+
+	/**
+	 * remove first resolution level (use only in MRMaps)
+	 */
+	void removeFrontLevel();
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
