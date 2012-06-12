@@ -46,13 +46,13 @@ inline const std::vector<unsigned int>& Histogram::getPopulation() const
 	return m_populations;
 }
 
-inline const std::vector<double>& Histogram::getQuantillesHeights() const
+inline const std::vector<double>& Histogram::getQuantilesHeights() const
 {
-	return m_pop_quantilles;
+	return m_pop_quantiles;
 }
 
 
-inline const std::vector<double>&  Histogram::getQuantillesIntervals() const
+inline const std::vector<double>&  Histogram::getQuantilesIntervals() const
 {
 	return m_interv;
 }
@@ -186,7 +186,7 @@ void Histogram::histoColorize(ATTC& colors)
 
 
 template<typename ATTC>
-void Histogram::quantillesColorize(ATTC& colors, const std::vector<Geom::Vec3f>& tc)
+void Histogram::quantilesColorize(ATTC& colors, const std::vector<Geom::Vec3f>& tc)
 {
 
 	unsigned int nb = m_dataIdx.size();

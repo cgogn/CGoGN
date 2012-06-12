@@ -62,7 +62,7 @@ class RenderHistogram : public QWidget
 
 	int m_axl_nbd;
 	bool m_drawHisto;
-	bool m_drawQuantilles;
+	bool m_drawQuantiles;
 	bool m_histoFront;
 	float m_opacity;
 	bool m_drawAxis;
@@ -88,10 +88,10 @@ public:
     virtual QSize sizeHint() const;
 
     /**
-     * set color table for quantilles drawing
+     * set color table for quantiles drawing
      * @param colors vector of colors
      */
-    void setQuantillesColors(const std::vector<Geom::Vec3f>& colors);
+    void setQuantilesColors(const std::vector<Geom::Vec3f>& colors);
 
    /***
     * svg export
@@ -113,7 +113,7 @@ public:
     /**
      * define if quantille is drawn
      */
-    void setQuantillesDraw(bool d);
+    void setQuantilesDraw(bool d);
 
     /**
 	 * get bool value that indicate drawing of histogram
@@ -123,7 +123,7 @@ public:
     /**
 	 * get bool value that indicate drawing of quantille
 	 */
-    bool getQuantillesDraw();
+    bool getQuantilesDraw();
 
     /**
 	 * get opacity value
@@ -143,6 +143,8 @@ public:
     signals:
     /**
      * emitted signal when a column of histogram is clicked
+     * @param i column of histo (0xffffffff if none)
+     * @param j column of quantileq (0xffffffff if none)
      */
     void clicked(unsigned int, unsigned int);
 
@@ -154,7 +156,7 @@ protected:
     void drawHisto(QPainter& painter);
 
     /// draw the quatilles in painter widget
-    void drawQuantilles(QPainter& painter);
+    void drawQuantiles(QPainter& painter);
 
     /// functinn calles when widget need to be redraw
    void paintEvent(QPaintEvent *event);

@@ -38,7 +38,7 @@ namespace QT
 
 
 RenderHistogram::RenderHistogram(QWidget* parent, Algo::Histogram::Histogram& histo, bool drawAxis )
-:QWidget(parent),m_histo(histo), m_drawHisto(true), m_drawQuantilles(false), m_histoFront(true),m_opacity(0.5f),m_drawAxis(drawAxis)
+:QWidget(parent),m_histo(histo), m_drawHisto(true), m_drawQuantiles(false), m_histoFront(true),m_opacity(0.5f),m_drawAxis(drawAxis)
 {
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -120,9 +120,9 @@ void RenderHistogram::draw(QPainter& painter)
 	if (m_histoFront)
 	{
 		painter.setOpacity(1.0);
-		if (m_drawQuantilles)
+		if (m_drawQuantiles)
 		{
-			drawQuantilles(painter);
+			drawQuantiles(painter);
 			painter.setOpacity(m_opacity);
 		}
 		if (m_drawHisto)
@@ -136,8 +136,8 @@ void RenderHistogram::draw(QPainter& painter)
 			drawHisto(painter);
 			painter.setOpacity(m_opacity);
 		}
-		if (m_drawQuantilles)
-			drawQuantilles(painter);
+		if (m_drawQuantiles)
+			drawQuantiles(painter);
 	}
 
 }
@@ -145,8 +145,6 @@ void RenderHistogram::draw(QPainter& painter)
 void RenderHistogram::drawHisto(QPainter& painter)
 {
 	unsigned int nbmax = m_histo.getMaxBar();
-
-
 
 	int widthAxl = 8*m_axl_nbd;
 	const std::vector<unsigned int>& pop = m_histo.getPopulation();
@@ -217,11 +215,11 @@ void RenderHistogram::drawHisto(QPainter& painter)
 	}
 }
 
-void RenderHistogram::drawQuantilles(QPainter& painter)
+void RenderHistogram::drawQuantiles(QPainter& painter)
 {
 	/// vector of intervals
-	const std::vector<double>& interv = m_histo.getQuantillesIntervals();
-	const std::vector<double>& pop = m_histo.getQuantillesHeights();
+	const std::vector<double>& interv = m_histo.getQuantilesIntervals();
+	const std::vector<double>& pop = m_histo.getQuantilesHeights();
 
 	if (interv.empty())
 		return;
@@ -231,12 +229,21 @@ void RenderHistogram::drawQuantilles(QPainter& painter)
 	painter.setPen(QColor(0,0,0));
 	double nbmax = m_histo.getMaxQBar();
 
-	double lw = (interv.back() - interv.front()) / double(m_w);
+	double lw = (m_histo.getMax() - m_histo.getMin()) / double(m_w);
 	painter.setBrush(QBrush(QColor(0,0,0)));
 	for (unsigned int i = 0; i< pop.size(); ++i)
 	{
-		double x0 =	(interv[i] - interv.front()) / lw;
-		double xw =	(interv[i+1] - interv[i]) / lw;
+		double i0 = interv[i];
+		if (i0 < m_histo.getMin())
+			i0 = m_histo.getMin();
+		double i1 = interv[i+1];
+		if (i1 < m_histo.getMin())
+			i1 = m_histo.getMin();
+		if (i1 > m_histo.getMax())
+			i1 = m_histo.getMax();
+
+		double x0 =	(i0 - m_histo.getMin()) / lw;
+		double xw =	(i1 - i0) / lw;
 		int v = (pop[i]*m_h)/nbmax;
 		QRect rect(widthAxl+m_frameWidth+int(x0), m_h+m_frameWidth-v, int(xw), v);
 
@@ -299,25 +306,33 @@ void RenderHistogram::mousePressEvent(QMouseEvent* event)
 		}
 	}
 
-	const std::vector<double>& interv = m_histo.getQuantillesIntervals();
+	const std::vector<double>& interv = m_histo.getQuantilesIntervals();
 	int xx = -1;
-	if ( m_drawQuantilles && !interv.empty())
+	if ( m_drawQuantiles && !interv.empty())
 	{
-		double lw = (interv.back() - interv.front()) / double(m_w);
-		double xd = double(event->x()- widthAxl - m_frameWidth -2) * lw;
+		double lw = (m_histo.getMax() - m_histo.getMin()) / double(m_w);
+		double xd = m_histo.getMin() + double(event->x()- widthAxl - m_frameWidth -2) * lw;
 
 		xx = 0;
-		while (xd > interv[xx])
+		while (xx<int(interv.size()) && (xd > interv[xx]))
 			xx++;
-		xx--; // back from [1,n] to [0,n-1]
 
-		const std::vector<double>& popq = m_histo.getQuantillesHeights();
-		if ((xx>=0) && (xx<int(popq.size())))
+		if (xx < int(interv.size()))
 		{
-			double v = (popq[xx]*m_h)/m_histo.getMaxQBar();
-			int y = event->y();
-			if ((y<(m_h+m_frameWidth-v)) || (y>m_h+(2*m_frameWidth)))
-				xx=-1;
+			xx--; // back from [1,n] to [0,n-1]
+
+			const std::vector<double>& popq = m_histo.getQuantilesHeights();
+			if ((xx>=0) && (xx<int(popq.size())))
+			{
+				double v = (popq[xx]*m_h)/m_histo.getMaxQBar();
+				int y = event->y();
+				if ((y<(m_h+m_frameWidth-v)) || (y>m_h+(2*m_frameWidth)))
+					xx=-1;
+			}
+		}
+		else
+		{
+			xx = -1;
 		}
 	}
 
@@ -338,9 +353,9 @@ void RenderHistogram::setHistoDraw(bool d)
 	m_drawHisto=d;
 }
 
-void RenderHistogram::setQuantillesDraw(bool d)
+void RenderHistogram::setQuantilesDraw(bool d)
 {
-	m_drawQuantilles=d;
+	m_drawQuantiles=d;
 }
 
 void RenderHistogram::setOpacity(float op)
@@ -354,9 +369,9 @@ bool RenderHistogram::getHistoDraw()
 	return m_drawHisto;
 }
 
-bool RenderHistogram::getQuantillesDraw()
+bool RenderHistogram::getQuantilesDraw()
 {
-	return m_drawQuantilles;
+	return m_drawQuantiles;
 }
 
 float RenderHistogram::getOpacity()
@@ -366,7 +381,7 @@ float RenderHistogram::getOpacity()
 
 
 
-void RenderHistogram::setQuantillesColors(const std::vector<Geom::Vec3f>& colors)
+void RenderHistogram::setQuantilesColors(const std::vector<Geom::Vec3f>& colors)
 {
 	m_qcolors.assign(colors.begin(), colors.end());
 }

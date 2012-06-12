@@ -89,7 +89,7 @@ void Histogram::populateHisto(unsigned int nbclasses)
     }
 }
 
-void Histogram::populateQuantilles(unsigned int nbquantilles)
+void Histogram::populateQuantiles(unsigned int nbquantiles)
 {
 	if (!m_sorted)
 	{
@@ -99,20 +99,20 @@ void Histogram::populateQuantilles(unsigned int nbquantilles)
 
 	// compute exact populations
 	unsigned int nb = m_dataIdx.size();
-	double pop = double(nb)/nbquantilles;
-	m_pop_quantilles.resize(nbquantilles);
+	double pop = double(nb)/nbquantiles;
+	m_pop_quantiles.resize(nbquantiles);
 
-	for (unsigned int i = 0; i < nbquantilles; ++i)
-		m_pop_quantilles[i]=pop;
+	for (unsigned int i = 0; i < nbquantiles; ++i)
+		m_pop_quantiles[i]=pop;
 
 	m_interv.clear();
-	m_interv.reserve(nbquantilles+1);
-	// quantilles computation
+	m_interv.reserve(nbquantiles+1);
+	// quantiles computation
 	m_interv.push_back(m_dataIdx.front().first);
 	double cumul = 0.0;
-	for (unsigned int i = 0; i < nbquantilles; ++i)
+	for (unsigned int i = 0; i < nbquantiles; ++i)
 	{
-		cumul += m_pop_quantilles[i];
+		cumul += m_pop_quantiles[i];
 		unsigned int icum = floor(cumul);
 		double val = 0.0;
 		if (icum < m_dataIdx.size()-1)
@@ -130,12 +130,12 @@ void Histogram::populateQuantilles(unsigned int nbquantilles)
 	if (m_nbclasses != 0) //for histo superposition
 		lc = double(m_dataIdx.back().first - m_dataIdx.front().first )/double(m_nbclasses);
 
-	for (unsigned int i = 0; i < nbquantilles; ++i)
+	for (unsigned int i = 0; i < nbquantiles; ++i)
 	{
 		double lq = m_interv[i+1] - m_interv[i];
-		m_pop_quantilles[i] = m_pop_quantilles[i]*lc/lq;
-		if (m_pop_quantilles[i] > m_maxQBar)
-			m_maxQBar = m_pop_quantilles[i];
+		m_pop_quantiles[i] = m_pop_quantiles[i]*lc/lq;
+		if (m_pop_quantiles[i] > m_maxQBar)
+			m_maxQBar = m_pop_quantiles[i];
 	}
 }
 
@@ -155,6 +155,57 @@ void Histogram::histoColorizeVBO(Utils::VBO& vbo)
 	}
 	vbo.releasePtr();
 }
+
+
+bool Histogram::cellsOfHistogramColumn(unsigned int c, std::vector<unsigned int> vc) const
+{
+	if (!m_sorted)
+	{
+		std::sort(m_dataIdx.begin(),m_dataIdx.end(),dataComp);
+		m_sorted = true;
+	}
+
+	vc.clear();
+
+	double bi = (m_min+m_max)/m_nbclasses * c + m_min;
+	double bs = (m_min+m_max)/m_nbclasses * (c+1) + m_min;
+
+	unsigned int nb=m_dataIdx.size();
+	unsigned int i=0;
+
+	while ((i<nb) && (data(i)< bi))
+		++i;
+
+	while ((i<nb) && (data(i)< bs))
+	{
+		vc.push_back(idx(i));
+	}
+
+	return !vc.empty();
+}
+
+bool Histogram::cellsOfQuauntilesColumn( unsigned int c, std::vector<unsigned int> vc) const
+{
+	vc.clear();
+
+	double bi = m_interv[c];
+	double bs = m_interv[c+1];
+
+	unsigned int nb=m_dataIdx.size();
+	unsigned int i=0;
+
+	while ((i<nb) && (data(i)< bi))
+		++i;
+
+	while ((i<nb) && (data(i)< bs))
+	{
+		vc.push_back(idx(i));
+	}
+
+	return !vc.empty();
+}
+
+
 }
 }
 }

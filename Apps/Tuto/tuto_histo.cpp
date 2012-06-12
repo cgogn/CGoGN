@@ -49,9 +49,10 @@ int main(int argc, char **argv)
 	// example code itself
 	sqt.createMap(std::string(argv[1]));
 	// set help message in menu
-	sqt.setHelpMsg("Tuto Histogram: \nLoad mesh & compute histogram & quantilles\n+/- increase/decrease \
-number of classes\no/p increase/decrease number of quantilles\nw/x change \
-min/max\nc center the histogram on 0\nh show/hide histogram\nq show/hide quantilles ");
+	sqt.setHelpMsg("Tuto Histogram: \nLoad mesh & compute histogram & quantiles\n+/- increase/decrease \
+number of classes\no/p increase/decrease number of quantiles\nw/x change \
+min/max\nc center the histogram on 0\nh show/hide histogram\nq show/hide quantiles\
+File/Save for exporting histogram in svg format");
 
 	// final show for redraw
 	sqt.show();
@@ -106,9 +107,9 @@ void MyQT::createMap(const std::string& filename)
 	l_nbc = 20;
 	l_histo->populateHisto(l_nbc);
 
-	//compute the quantilles
+	//compute the quantiles
 	l_nbq = 10;
-	l_histo->populateQuantilles(l_nbq);
+	l_histo->populateQuantiles(l_nbq);
 
 	// compute color attribute from histogram (histogram can alsdo directly update a VBO see below)
 //	l_histo->histoColorize(colorF);
@@ -121,7 +122,7 @@ void MyQT::createMap(const std::string& filename)
 	l_histodraw = new Utils::QT::RenderHistogram(l_popup, *l_histo);
 
 	// some simple parameters
-	l_histodraw->setQuantillesDraw(true);
+	l_histodraw->setQuantilesDraw(true);
 	l_histodraw->setHistoPosition(true);
 	l_histodraw->setOpacity(0.6f);
 
@@ -129,8 +130,8 @@ void MyQT::createMap(const std::string& filename)
 	std::vector<Geom::Vec3f> colors;
 	Utils::createTableColor01(colors,10,Utils::color_map_blue_green_red);
 
-	// and us it to color the quantilles
-	l_histodraw->setQuantillesColors(colors);
+	// and us it to color the quantiles
+	l_histodraw->setQuantilesColors(colors);
 
 	// add the widget to the popup
 	l_popup->addWidget(l_histodraw,0,0);
@@ -182,17 +183,17 @@ void MyQT::cb_keyPress(int keycode)
 
        	case 'p' :
        		l_nbq++;
-			l_histo->populateQuantilles(l_nbq);
+			l_histo->populateQuantiles(l_nbq);
 			l_histodraw->repaint();
 			break;
 		case 'o' :
 			if (l_nbq>0)
 				l_nbq--;
-			l_histo->populateQuantilles(l_nbq);
+			l_histo->populateQuantiles(l_nbq);
 			l_histodraw->repaint();
 		break;
 		case 'q':
-			l_histodraw->setQuantillesDraw(!l_histodraw->getQuantillesDraw());
+			l_histodraw->setQuantilesDraw(!l_histodraw->getQuantilesDraw());
 			l_histodraw->repaint();
 			break;
 		case 'h':
@@ -266,7 +267,7 @@ void MyQT::cb_redraw()
 
 void MyQT::clickHisto(unsigned int i,unsigned int j)
 {
-	std::cout << "CLICK on column Histo: "<< i << " / Quantilles: "<< j <<std::endl;
+	std::cout << "CLICK on column Histo: "<< i << " / Quantiles: "<< j <<std::endl;
 }
 
 
