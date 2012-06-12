@@ -30,7 +30,6 @@
 #include <vector>
 #include <string>
 
-//#include "Topology/generic/attributeHandler.h"
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
@@ -57,7 +56,7 @@ namespace Import
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, NODE};
+		enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
 	}
 
 

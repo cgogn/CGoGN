@@ -174,17 +174,17 @@ inline bool GMap2::isBoundaryEdge(Dart d)
 
 inline bool GMap2::sameOrientedFace(Dart d, Dart e)
 {
-	return GMap1::sameOrientedFace(d, e) ;
+	return GMap1::sameOrientedCycle(d, e) ;
 }
 
 inline bool GMap2::sameFace(Dart d, Dart e)
 {
-	return GMap1::sameFace(d, e) ;
+	return GMap1::sameCycle(d, e) ;
 }
 
 inline unsigned int GMap2::faceDegree(Dart d)
 {
-	return GMap1::faceDegree(d) ;
+	return GMap1::cycleDegree(d) ;
 }
 
 inline bool GMap2::sameVolume(Dart d, Dart e)

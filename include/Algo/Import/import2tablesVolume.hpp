@@ -40,8 +40,14 @@ ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string
 	if ((filename.rfind(".node")!=std::string::npos) || (filename.rfind(".NODE")!=std::string::npos))
 		return ImportVolumique::NODE;
 
+	if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
+		return ImportVolumique::OFF;
+
 	if ((filename.rfind(".ts")!=std::string::npos) || (filename.rfind(".TS")!=std::string::npos))
 		return ImportVolumique::TS;
+
+	if ((filename.rfind(".moka")!=std::string::npos) || (filename.rfind(".MOKA")!=std::string::npos))
+		return ImportVolumique::MOKA;
 
 	return ImportVolumique::UNKNOWNVOLUME;
 }
@@ -60,6 +66,9 @@ bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<
 		break;
 	case ImportVolumique::TS:
 		break;
+//	case ImportVolumique::MOKA:
+//		return importMoka(filename,attrNames);
+//		break;
 	default:
 		CGoGNerr << "Not yet supported" << CGoGNendl;
 		break;
@@ -177,7 +186,6 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 	fp.close();
 	return true;
 }
-
 
 } // namespace Import
 

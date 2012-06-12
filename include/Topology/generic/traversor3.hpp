@@ -36,7 +36,7 @@ MarkerForTraversor<MAP, ORBIT>::MarkerForTraversor(MAP& map, bool forceDartMarke
 	m_dmark(NULL),
 	m_cmark(NULL)
 {
-	if(!forceDartMarker && map.isOrbitEmbedded(m_orbit))
+	if(!forceDartMarker && map.isOrbitEmbedded(ORBIT))
 		m_cmark = new CellMarkerStore<ORBIT>(map, thread) ;
 	else
 		m_dmark = new DartMarkerStore(map, thread) ;

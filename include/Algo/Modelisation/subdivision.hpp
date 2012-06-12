@@ -73,7 +73,7 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 		do
 		{
 			t.skip(fit);
-			fit = map.phi2_1(fit);
+			fit = map.phi2(map.phi_1(fit));
 		} while(fit != cd);
 	}
 }
