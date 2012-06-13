@@ -61,6 +61,9 @@ protected:
 	//
 	Dart m_edge;
 
+	Dart d2;
+	Dart dd2;
+
 	/**
 	 * need a pointer to the current approximator if the current selector needs
 	 * the future result of a collapse to estimate its cost
@@ -82,6 +85,14 @@ public:
 
 	virtual unsigned int perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
 	virtual bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
+
+
+
+	void setFirstIncidentEdge(Dart d) { d2 = d; }
+	void setSecondIncidentEdge(Dart d) { dd2 = d; }
+
+	Dart getFirstIncidentEdge() { return d2; }
+	Dart getSecondIncidentEdge() { return dd2; }
 };
 
 template <typename PFP>
@@ -113,13 +124,12 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
 
-protected:
-
-
 public:
 	CollapseEdgeOperator(Dart d) ://,  ApproximatorGen<PFP>* approx) :
 		CollapseOperator<PFP>(d)//, approx)
-	{}
+	{
+
+	}
 
 	~CollapseEdgeOperator()
 	{ }
@@ -127,6 +137,7 @@ public:
 	OperatorType getType() { return O_CEdge; }
 	unsigned int perform(MAP &m, VertexAttribute<typename PFP::VEC3>& position);
 	bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
+
 };
 
 

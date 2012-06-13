@@ -38,13 +38,13 @@ void decimate(
 )
 {
 	std::vector<ApproximatorGen<PFP>*> approximators ;
-	Selector<PFP>* selector = NULL ;
+	EdgeSelector<PFP>* selector = NULL ;
 
 	//choose the Approximator
 	switch(a)
 	{
-		case A_Centroid :
-			approximators.push_back(new Approximator_Centroid<PFP>(map, position)) ;
+		case A_QEM :
+			approximators.push_back(new Approximator_QEM<PFP>(map, position)) ;
 			break ;
 		default :
 			CGoGNout << "not yet implemented" << CGoGNendl;
@@ -54,11 +54,8 @@ void decimate(
 	//choose the Selector
 	switch(s)
 	{
-		case S_MapOrder :
-			selector = new EdgeSelector_MapOrder<PFP>(map, position, approximators, selected);
-			break ;
-		case S_Random :
-			//selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected);
+		case S_QEM :
+			selector = new EdgeSelector_QEM<PFP>(map, position, approximators, selected) ;
 			break ;
 		default:
 			CGoGNout << "not yet implemented" << CGoGNendl;
@@ -77,33 +74,38 @@ void decimate(
 	CGoGNout << " decimate (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
 	bool finished = false ;
 
+	Dart d;
+
 	while(!finished)
 	{
 		//Next Operator to perform
 		Operator<PFP> *op;
 
-		if(!selector->nextOperator(&op))
+		//if(!selector->nextOperator(&op))
+		if((op = selector->nextOperator()) == NULL)
 			break;
 
 		// compute approximated attributes
 		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
 		{
 			(*it)->approximate(op) ;
+			(*it)->saveApprox(op) ;
 		}
 
 		//Update the selector before performing operation
-		selector->updateBeforeOperation(&op);
+		if(!selector->updateBeforeOperation(op))
+			break;
 
 		//Perform the topological operation and
 		//compute the number of resulting cells
 		nbVertices -= op->perform(map, position);
 
-		//for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
-		//	(*it)->affectApprox(op);			// affect data to the resulting vertex
+		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
+			(*it)->affectApprox(op);			// affect data to the resulting vertex
 
 		//Update the embedded position and
 		//search the next operation to perform
-		selector->updateAfterOperation(&op);
+		selector->updateAfterOperation(op);
 
 		if(nbVertices <= nbWantedVertices)
 			finished = true ;
@@ -126,3 +128,35 @@ void decimate(
 } //namespace Algo
 
 } //namespace CGoGN
+
+//		if(!selector->nextEdge(d))
+//			break ;
+//
+//
+//		Dart d2 = map.phi2(map.phi_1(d)) ;
+//		Dart dd2 = map.phi2(map.phi_1(map.phi2(d))) ;
+//
+//		std::cout << "bin a contracter : " << d << std::endl;
+//		std::cout << "voisin d2 : " << d2 << std::endl;
+//		std::cout << "voisin dd2 : " << dd2 << std::endl;
+//
+//		--nbVertices ;
+//
+//		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
+//		{
+//			(*it)->approximate(d) ;				// compute approximated attributes
+//			(*it)->saveApprox(d) ;
+//		}
+//
+//		selector->updateBeforeCollapse(d) ;		// update selector
+//
+//		map.collapseEdge(d) ;					// collapse edge
+//
+//		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
+//			(*it)->affectApprox(d2);			// affect data to the resulting vertex
+//
+//		selector->updateAfterCollapse(d2, dd2) ;// update selector
+//
+//		if(nbVertices <= nbWantedVertices)
+//			finished = true ;
+

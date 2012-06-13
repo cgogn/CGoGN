@@ -91,6 +91,85 @@ void hexahedronsToTetrahedrons(typename PFP::MAP& map)
     }
 }
 
+template <typename PFP>
+void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	//mark bad edges
+	DartMarker me(map);
+
+	int i = 0;
+
+	TraversorE<typename PFP::MAP> travE(map);
+
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		//check if this edge is an "ear-edge"
+		if(!me.isMarked(dit))
+		{
+			//search three positions
+			typename PFP::VEC3 tris1[3];
+			tris1[0] = position[dit];
+			tris1[1] = position[map.phi_1(dit)];
+			tris1[2] = position[map.phi_1(map.phi2(dit))];
+
+			//search if the triangle formed by these three points intersect the rest of the mesh (intersection triangle/triangle)
+			TraversorF<typename PFP::MAP> travF(map);
+			for(Dart ditF = travF.begin() ; ditF != travF.end() ; ditF = travF.next())
+			{
+				//get vertices position
+				typename PFP::VEC3 tris2[3];
+				tris2[0] = position[ditF];
+				tris2[1] = position[map.phi1(ditF)];
+				tris2[2] = position[map.phi_1(ditF)];
+
+				bool intersection = false;
+
+				for (unsigned int i = 0; i < 3 && !intersection; ++i)
+				{
+					typename PFP::VEC3 inter;
+					intersection = Geom::intersectionSegmentTriangle(tris1[i], tris1[(i+1)%3], tris2[0], tris2[1], tris2[2], inter);
+				}
+
+				if(!intersection)
+				{
+					for (unsigned int i = 0; i < 3 && !intersection; ++i)
+					{
+						typename PFP::VEC3 inter;
+						intersection = Geom::intersectionSegmentTriangle(tris2[i], tris2[(i+1)%3], tris1[0], tris1[1], tris1[2], inter);
+					}
+				}
+
+				std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
+
+				if(intersection)
+				{
+					me.markOrbit<EDGE>(dit);
+				}
+				else //cut a tetrahedron
+				{
+					Dart dring = map.phi_1(dit);
+					std::vector<Dart> vPath;
+
+					vPath.push_back(map.phi_1(dring));
+					vPath.push_back(map.phi1(map.phi2(dring)));
+					vPath.push_back(map.phi_1(map.phi2(dring)));
+					vPath.push_back(map.phi1(dring));
+
+					map.splitVolume(vPath);
+
+					//map.splitFace(map.phi2(map.phi1(dit)), map.phi2(map.phi1(map.phi2(dit))));
+				}
+
+				++i;
+
+				if(i == 16)
+					return;
+			}
+		}
+	}
+
+}
+
 
 /************************************************************************************************
  * 									Collapse / Split Operators

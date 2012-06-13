@@ -126,7 +126,7 @@ void decimate(
 			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_MinDetail :
-			selector = new EdgeSelector_Random<PFP>(map, position, approximators, selected) ;
+			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_hLightfield :
 			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;

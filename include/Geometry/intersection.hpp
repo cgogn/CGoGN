@@ -475,6 +475,88 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 	return EDGE_INTERSECTION;
 }
 
+template <typename VEC3>
+Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3& PlaneP, const VEC3& NormP)//, VEC3& Inter)
+{
+	typename VEC3::DATA_TYPE panp = NormP * PA;
+	typename VEC3::DATA_TYPE pbnp = NormP * PB;
+
+	if(panp == 0 || pbnp == 0)
+		return VERTEX_INTERSECTION;
+	else if((panp < 0 && pbnp > 0) || (panp > 0 && pbnp < 0))
+		return EDGE_INTERSECTION;
+	else
+		return NO_INTERSECTION;
+
+}
+
+
+template <typename VEC3>
+Intersection intersectionTrianglePlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& PlaneP, const VEC3& NormP) //, VEC3& Inter) ;
+{
+	if((intersectionSegmentPlan<VEC3>(Ta,Tb,PlaneP, NormP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Ta,Tc,PlaneP, NormP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Tb,Tc,PlaneP, NormP)  == EDGE_INTERSECTION))
+	{
+		return FACE_INTERSECTION;
+	}
+	else if((intersectionSegmentPlan<VEC3>(Ta,Tb,PlaneP, NormP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Ta,Tc,PlaneP, NormP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Tb,Tc,PlaneP, NormP)  == VERTEX_INTERSECTION))
+	{
+		return VERTEX_INTERSECTION;
+	}
+	else
+	{
+		return NO_INTERSECTION;
+	}
+}
+
+template <typename VEC3>
+Intersection intersectionSegmentHalfPlan(const VEC3& PA, const VEC3& PB,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP)//, VEC3& Inter)
+{
+	VEC3 NormP = (DirP-P) ^ (OrientP-P) ;
+	NormP.normalize() ;
+
+	//intersection SegmentPlan
+	Intersection inter = intersectionSegmentPlan(PA,PB,P,NormP);
+	if(inter == EDGE_INTERSECTION)
+	{
+		//and one of the two points must be in the right side of the line
+		return intersectionSegmentPlan(PA,PB, P, OrientP);
+	}
+	else
+	{
+		return inter;
+	}
+
+
+
+}
+
+template <typename VEC3>
+Intersection intersectionTriangleHalfPlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP) //, VEC3& Inter)
+{
+	if((intersectionSegmentHalfPlan<VEC3>(Ta,Tb,P, DirP, OrientP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Ta,Tc,P, DirP, OrientP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Tb,Tc,P, DirP, OrientP)  == EDGE_INTERSECTION))
+	{
+		return FACE_INTERSECTION;
+	}
+	else if((intersectionSegmentHalfPlan<VEC3>(Ta,Tb,P, DirP, OrientP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Ta,Tc,P, DirP, OrientP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Tb,Tb,P, DirP, OrientP)  == VERTEX_INTERSECTION))
+	{
+		return FACE_INTERSECTION;
+	}
+	else
+	{
+		return NO_INTERSECTION;
+	}
+}
+
 }
 
 }

@@ -37,24 +37,26 @@ namespace DecimationVolumes
 {
 
 template <typename PFP>
-class Approximator_Centroid : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_QEM : public Approximator<PFP, typename PFP::VEC3>
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL;
+	typedef typename PFP::REAL REAL ;
 
-	Approximator_Centroid(MAP& m, VertexAttribute<VEC3>& pos):
-		Approximator<PFP, VEC3>(m, pos)
+protected:
+	VertexAttribute<Quadric<REAL> > m_quadric ;
+
+public:
+	Approximator_QEM(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
-
-	~Approximator_Centroid()
+	~Approximator_QEM()
 	{}
-
-	ApproximatorType getType() const { return A_Centroid; }
-	bool init();
+	ApproximatorType getType() const { return A_QEM ; }
+	bool init() ;
 	void approximate(Operator<PFP> *op);
-
+	void approximate(Dart d);
 } ;
 
 } //namespace DecimationVolumes

@@ -23,6 +23,8 @@
 *******************************************************************************/
 
 #include "Topology/map/embeddedMap3.h"
+#include <vector>
+#include <algorithm>
 
 namespace CGoGN
 {
@@ -153,20 +155,70 @@ Dart EmbeddedMap3::deleteEdge(Dart d)
 
 bool EmbeddedMap3::edgeCanCollapse(Dart d)
 {
-	//Criteres sur le bord
-	if(isBoundaryEdge(d))
-	{
-		//fusion de deux bords
+//	//Criteres sur le bord
+//	if(isBoundaryEdge(d))
+//	{
+//		//fusion de deux bords
+//
+//		//deconnection du bord
+//	}
+//
+//	return true;
 
-		//deconnection du bord
+
+//	if(Map2::isBoundaryVertex(d) || Map2::isBoundaryVertex(phi1(d)))
+//		return false ;
+
+	unsigned int val_v1 = Map2::vertexDegree(d) ;
+	unsigned int val_v2 = Map2::vertexDegree(phi1(d)) ;
+
+	if(val_v1 + val_v2 < 8 || val_v1 + val_v2 > 14)
+		return false ;
+
+	if(Map2::faceDegree(d) == 3)
+	{
+		if(Map2::vertexDegree(phi_1(d)) < 4)
+			return false ;
 	}
 
-	return false;
+	Dart dd = phi2(d) ;
+	if(Map2::faceDegree(dd) == 3)
+	{
+		if(Map2::vertexDegree(phi_1(dd)) < 4)
+			return false ;
+	}
+
+	// Check vertex sharing condition
+	std::vector<unsigned int> vu1 ;
+	vu1.reserve(256) ;
+	Dart vit1 = phi2(phi_1(phi2(phi_1(d)))) ;
+	Dart end = phi1(dd) ;
+	do
+	{
+		unsigned int ve = getEmbedding<VERTEX>(phi2(vit1)) ;
+		vu1.push_back(ve) ;
+		vit1 = phi2(phi_1(vit1)) ;
+	} while(vit1 != end) ;
+	end = phi1(d) ;
+	Dart vit2 = phi2(phi_1(phi2(phi_1(dd)))) ;
+	do
+	{
+		unsigned int ve = getEmbedding<VERTEX>(phi2(vit2)) ;
+		std::vector<unsigned int>::iterator it = std::find(vu1.begin(), vu1.end(), ve) ;
+		if(it != vu1.end())
+			return false ;
+		vit2 = phi2(phi_1(vit2)) ;
+	} while(vit2 != end) ;
+
+	return true ;
 }
 
 Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 {
 	unsigned int vEmb = getEmbedding<VERTEX>(d) ;
+
+	Dart d2 = phi2(phi_1(d)) ;
+	Dart dd2 = phi2(phi_1(phi2(d))) ;
 
 	Dart resV = Map3::collapseEdge(d, delDegenerateVolumes);
 
@@ -176,15 +228,16 @@ Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)
 		{
 			embedOrbit<VERTEX>(resV, vEmb);
 		}
+
+		if(isOrbitEmbedded<EDGE>())
+		{
+			embedOrbit<EDGE>(d2, getEmbedding<EDGE>(d2));
+			embedOrbit<EDGE>(dd2, getEmbedding<EDGE>(dd2));
+		}
 	}
 
 	return resV;
 }
-
-//bool EmbeddedMap3::collapseDegeneratedFace(Dart d)
-//{
-//	return Map3::collapseDegeneratedFace(d);
-//}
 
 void EmbeddedMap3::splitFace(Dart d, Dart e)
 {
