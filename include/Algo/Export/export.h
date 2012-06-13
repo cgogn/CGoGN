@@ -128,9 +128,9 @@ bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 * @param nbCoefs the number of coefficients of the representation
 * @return true
 */
-template <typename PFP>
+/*template <typename PFP>
 bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
-
+*/
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)
 * @param map map to be exported
@@ -140,9 +140,10 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 * @param colorPTM the 6 coefficients (x3 channels) of the PTM functions
 * @return true
 */
+/*
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good = allDarts) ;
-
+*/
 /**
  * export meshes used at the workbench
  * export just a list of vertices and edges connectivity

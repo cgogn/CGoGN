@@ -65,8 +65,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<
 	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
-	if (m_attIndex.map() != &mapx)
-		m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex  = mapx.template getAttribute<unsigned int, DART>("dart_index");
 
 	if (!m_attIndex.isValid())
 		m_attIndex  = mapx.template addAttribute<unsigned int, DART>("dart_index");

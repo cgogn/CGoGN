@@ -281,9 +281,12 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	{
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
+		{
 			for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
-					out << (*(*attrHandler))[vertices[i]] << std::endl ;
+					out << (*(*attrHandler))[vertices[i]] ;
+			out << std::endl ;
+		}
 
 		// ascii faces
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
@@ -309,7 +312,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
 		{
 			uint8_t nbe = facesSize[i] ;
-			out.write((char*)(&nbe), sizeof(unsigned char)) ;
+			out.write((char*)(&nbe), sizeof(uint8_t)) ;
 			out.write((char*)(&(facesIdx[i][0])), facesSize[i] * sizeof(facesIdx[i][0])) ;
 		}
 	}
@@ -385,7 +388,7 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	out.close() ;
 	return true ;
 }
-
+/*
 template <typename PFP>
 bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
 {
@@ -590,6 +593,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 	out.close() ;
 	return true ;
 }
+*/
 /*
 template <typename PFP>
 bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
@@ -861,7 +865,6 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typena
 	out.close() ;
 	return true ;
 }
-*/
 
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good)
@@ -975,6 +978,7 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 	out.close() ;
 	return true ;
 }
+*/
 
 template <typename PFP>
 bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)

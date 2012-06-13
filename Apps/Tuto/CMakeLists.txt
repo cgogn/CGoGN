@@ -34,7 +34,7 @@ QT4_WRAP_UI( tuto2_ui tuto2.ui )
 QT4_WRAP_CPP(tuto2_moc tuto2.h)
 add_executable( tuto2 tuto2.cpp tuto2.h ${tuto2_ui}  ${tuto2_moc})
 target_link_libraries( tuto2
-	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} )
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} QtSvg)
 
 QT4_WRAP_CPP(tuto3_moc tuto3.h)
 add_executable( tuto3 tuto3.cpp ${tuto3_moc})
@@ -85,6 +85,12 @@ QT4_WRAP_CPP(tp_master_moc tp_master.h)
 add_executable( tp_master tp_master.cpp ${tp_master_moc})
 target_link_libraries( tp_master
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
+
+QT4_WRAP_CPP(tuto_histo_moc tuto_histo.h)
+add_executable( tuto_histo tuto_histo.cpp tuto_histo.h ${tuto_histo_ui}  ${tuto_histo_moc})
+target_link_libraries( tuto_histo
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} QtSvg)
+
 
 #BOOST_LIBS macro: allow using compiled boost in windows (see readme)
 # -first argument variable that will contain the libs

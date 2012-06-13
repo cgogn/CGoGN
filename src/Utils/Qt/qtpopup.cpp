@@ -22,7 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 #include "Utils/Qt/qtpopup.h"
-
+ #include <QVBoxLayout>
+ #include <QHBoxLayout>
+ #include <QPushButton>
+ #include <QKeyEvent>
 namespace CGoGN
 {
 namespace Utils
@@ -31,21 +34,40 @@ namespace QT
 {
 
 
-QtPopUp::QtPopUp()
+QtPopUp::QtPopUp(SimpleQT* sqt, bool withButtons):
+m_cbs(sqt)
 {
-	m_layout = new QGridLayout(this);
-	setLayout(m_layout);
+	if (withButtons)
+	{
+		QVBoxLayout *vlayout = new QVBoxLayout(this);
+		m_layout = new QGridLayout(NULL);
+		vlayout->addLayout(m_layout);
+
+		QHBoxLayout *layButtons = new QHBoxLayout();
+		QPushButton* okbutton = new QPushButton( "OK", this );
+		QObject::connect( okbutton, SIGNAL( clicked() ), this, SLOT( accept() ) );
+		QPushButton* cancelbutton = new QPushButton( "Cancel", this );
+		QObject::connect( cancelbutton, SIGNAL( clicked() ), 	this, SLOT( reject() ) );
+		// TO LAYOUT
+		layButtons->addWidget(okbutton);
+		layButtons->addWidget(cancelbutton);
+		vlayout->addLayout(layButtons);
+
+		setLayout(vlayout);
+
+	}
+	else
+	{
+		m_layout = new QGridLayout(this);
+		setLayout(m_layout);
+	}
 }
 
 
-QtPopUp::QtPopUp(QWidget* wid)
+QtPopUp::~QtPopUp()
 {
-	m_layout = new QGridLayout(this);
-
-	m_layout->addWidget(wid);
-
-	setLayout(m_layout);
 }
+
 
 
 void QtPopUp::addWidget(QWidget* wid, int col, int row)
@@ -53,8 +75,15 @@ void QtPopUp::addWidget(QWidget* wid, int col, int row)
 	m_layout->addWidget(wid,col,row);
 }
 
-void QtPopUp::keyPressEvent ( QKeyEvent * e )
-{}
+void QtPopUp::keyPressEvent ( QKeyEvent * event )
+{
+	int k = event->key();
+	if ( (k >= 65) && (k <= 91) && !(event->modifiers() & Qt::ShiftModifier) )
+		k += 32;
+
+	if (m_cbs)
+		m_cbs->cb_keyPress(k);
+}
 
 }
 }

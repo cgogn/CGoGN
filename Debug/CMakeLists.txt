@@ -91,10 +91,13 @@ IF(WITH_QT)
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.hpp
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.h )
 	file(
-		GLOB_RECURSE
+		GLOB
 		utils_qt_headers
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtgl.h
-		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtSimple.h )
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtSimple.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtpopup.h 
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qthistodraw.h 
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtcolorschooser.h )
 		
 	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})

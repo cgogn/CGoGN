@@ -319,7 +319,11 @@ void GenericMap::viewAttributesTables()
 		std::vector<std::string> listeNames ;
 		cont.getAttributesNames(listeNames) ;
 		for (std::vector<std::string>::iterator it = listeNames.begin(); it != listeNames.end(); ++it)
-			std::cout << "    " << *it << std::endl ;
+		{
+			unsigned int id = cont.getAttributeIndex(*it);
+			std::cout << "    " << *it << " ("<<id<<")"<<std::endl ;
+		}
+
 		std::cout << "-------------------------" << std::endl ;
 	}
 	std::cout << "m_embeddings: " << std::hex ;
