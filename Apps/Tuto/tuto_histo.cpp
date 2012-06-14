@@ -173,12 +173,16 @@ void MyQT::cb_keyPress(int keycode)
     		l_nbc++;
     		l_histo->populateHisto(l_nbc);
     		l_histodraw->repaint();
+			l_histo->histoColorizeVBO(*m_colorVBO2);
+			updateGL();
        		break;
        	case '-' :
        		if (l_nbc>0)
        			l_nbc--;
     		l_histo->populateHisto(l_nbc);
     		l_histodraw->repaint();
+			l_histo->histoColorizeVBO(*m_colorVBO2);
+			updateGL();
     		break;
 
        	case 'p' :
@@ -205,6 +209,8 @@ void MyQT::cb_keyPress(int keycode)
 			l_histo->centerOnZero();
 			l_histo->populateHisto(l_nbc);
 			l_histodraw->repaint();
+			l_histo->histoColorizeVBO(*m_colorVBO2);
+			updateGL();
 			break;
 
        	case 'w' :
@@ -214,6 +220,8 @@ void MyQT::cb_keyPress(int keycode)
        		l_histo->setMax(av*0.1 + l_histo->getMax()*0.9);
 			l_histo->populateHisto(l_nbc);
 			l_histodraw->repaint();
+			l_histo->histoColorizeVBO(*m_colorVBO2);
+			updateGL();
        	}
 			break;
        	case 'x' :
@@ -223,6 +231,8 @@ void MyQT::cb_keyPress(int keycode)
        		l_histo->setMax(-0.1*av + l_histo->getMax()*1.1);
 			l_histo->populateHisto(l_nbc);
 			l_histodraw->repaint();
+			l_histo->histoColorizeVBO(*m_colorVBO2);
+			updateGL();
        	}
 			break;
 
