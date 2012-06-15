@@ -95,16 +95,16 @@ template <typename PFP>
 void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
 	//mark bad edges
-	DartMarker me(map);
+	DartMarker mBadEdge(map);
 
-	int i = 0;
+//	unsignzed int i = 0;
 
-	TraversorE<typename PFP::MAP> travE(map);
+	DartMarkerStore mEdge(map);
 
-	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
 		//check if this edge is an "ear-edge"
-		if(!me.isMarked(dit))
+		if(!mBadEdge.isMarked(dit))
 		{
 			//search three positions
 			typename PFP::VEC3 tris1[3];
@@ -143,10 +143,11 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 
 				if(intersection)
 				{
-					me.markOrbit<EDGE>(dit);
+					mBadEdge.markOrbit<EDGE>(dit);
 				}
 				else //cut a tetrahedron
 				{
+					std::cout << "cut cut " << std::endl;
 					Dart dring = map.phi_1(dit);
 					std::vector<Dart> vPath;
 
@@ -157,13 +158,15 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 
 					map.splitVolume(vPath);
 
-					//map.splitFace(map.phi2(map.phi1(dit)), map.phi2(map.phi1(map.phi2(dit))));
+					map.splitFace(map.phi2(map.phi1(dring)), map.phi2(map.phi1(map.phi2(dring))));
+
+					return;
 				}
 
-				++i;
-
-				if(i == 16)
-					return;
+//				++i;
+//
+//				if(i == 16)
+//					return;
 			}
 		}
 	}

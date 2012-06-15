@@ -77,15 +77,17 @@ public:
 
 	Operator() {}
 
-	~Operator() {};
+	~Operator() {}
 
 	Dart getEdge() {return m_edge;}
 	void setEdge(Dart d) { m_edge = d; }
 	virtual OperatorType getType() = 0;
 
-	virtual unsigned int perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
-	virtual bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
 
+	virtual unsigned int collapse(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
+	virtual bool canCollapse(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
+
+	virtual void split(MAP&  m, VertexAttribute<typename PFP::VEC3>& position) = 0;
 
 
 	void setFirstIncidentEdge(Dart d) { d2 = d; }
@@ -111,7 +113,7 @@ public:
 		Operator<PFP>(d)//, approx)
 	{}
 
-	~CollapseOperator() {};
+	~CollapseOperator() {}
 
 };
 
@@ -135,9 +137,42 @@ public:
 	{ }
 
 	OperatorType getType() { return O_CEdge; }
-	unsigned int perform(MAP &m, VertexAttribute<typename PFP::VEC3>& position);
-	bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
+	//collapse
+	unsigned int collapse(MAP& m, VertexAttribute<typename PFP::VEC3>& position);
+	bool canCollapse(MAP& m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
+
+	//split
+	void split(MAP& m, VertexAttribute<typename PFP::VEC3>& position);
+
+};
+
+template <typename PFP>
+class OperatorList
+{
+public:
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+protected:
+	MAP& m_map;
+	//list of operations made on the mesh
+	typename std::vector<Operator<PFP>* > m_ops;
+	//iterator to save the position in the operations list
+	typename std::vector<Operator<PFP>* >::iterator m_cur;
+
+public:
+	OperatorList(MAP& m) : m_map(m) {}
+
+	~OperatorList();
+
+	void coarsen(VertexAttribute<typename PFP::VEC3>& position);
+	void refine(VertexAttribute<typename PFP::VEC3>& position);
+
+    void initIndex() { m_cur = m_ops.end(); }
+    unsigned int size() { return m_ops.size(); }
+
+    void add(Operator<PFP> *o) { m_ops.push_back(o); }
 };
 
 

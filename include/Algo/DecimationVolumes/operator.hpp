@@ -35,7 +35,7 @@ namespace DecimationVolumes
  *							Collapse Edge Operator	                                *
  ************************************************************************************/
 template <typename PFP>
-unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position)
+unsigned int CollapseEdgeOperator<PFP>::collapse(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& position)
 {
 	unsigned int nbCell = 0;
 
@@ -46,7 +46,7 @@ unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, VertexAttribute<typename
 }
 
 template <typename PFP>
-bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position)
+bool CollapseEdgeOperator<PFP>::canCollapse(typename PFP::MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	bool canCollapse = true;
 
@@ -99,6 +99,62 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typen
 //	}while ( e != d && canCollapse);
 
 	return canCollapse;
+}
+
+
+template <typename PFP>
+void CollapseEdgeOperator<PFP>::split(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& position)
+{
+//	Dart d = vs->getEdge() ;
+//	Dart dd = m_map.phi2(d) ; 		// get some darts
+//	Dart dd2 = vs->getRightEdge() ;
+//	Dart d2 = vs->getLeftEdge() ;
+//	Dart d1 = m_map.phi2(d2) ;
+//	Dart dd1 = m_map.phi2(dd2) ;
+//
+//	unsigned int v1 = m_map.template getEmbedding<VERTEX>(d) ;				// get the embedding
+//	unsigned int v2 = m_map.template getEmbedding<VERTEX>(dd) ;			// of the new vertices
+//	unsigned int e1 = m_map.template getEmbedding<EDGE>(m_map.phi1(d)) ;
+//	unsigned int e2 = m_map.template getEmbedding<EDGE>(m_map.phi_1(d)) ;	// and new edges
+//	unsigned int e3 = m_map.template getEmbedding<EDGE>(m_map.phi1(dd)) ;
+//	unsigned int e4 = m_map.template getEmbedding<EDGE>(m_map.phi_1(dd)) ;
+//
+//	//vertexSplit(vs) ; // split vertex
+//	//map.vertexSplit()
+//
+//	m_map.template embedOrbit<VERTEX>(d, v1) ;		// embed the
+//	m_map.template embedOrbit<VERTEX>(dd, v2) ;	// new vertices
+//	m_map.template embedOrbit<EDGE>(d1, e1) ;
+//	m_map.template embedOrbit<EDGE>(d2, e2) ;		// and new edges
+//	m_map.template embedOrbit<EDGE>(dd1, e3) ;
+//	m_map.template embedOrbit<EDGE>(dd2, e4) ;
+}
+
+/****************************************************************************************************
+ *									Operator List									*
+ ****************************************************************************************************/
+
+template <typename PFP>
+OperatorList<PFP>::~OperatorList()
+{
+//	for(typename std::list<CollapseSplitOperator<PFP>*>::iterator it= m_ops.begin() ; it != m_ops.end() ; ++it)
+//	{
+//		delete *it;
+//	}
+}
+
+template <typename PFP>
+void OperatorList<PFP>::coarsen(VertexAttribute<typename PFP::VEC3>& position)
+{
+	(*m_cur)->collapse(m_map, position);
+	++m_cur; // ou ++ ça dépend dans quel sens c'est stocké
+}
+
+template <typename PFP>
+void OperatorList<PFP>::refine(VertexAttribute<typename PFP::VEC3>& position)
+{
+	--m_cur; // ou -- ça dépend dans quel sens c'est stocké
+	(*m_cur)->split(m_map, position);
 }
 
 

@@ -81,7 +81,6 @@ void decimate(
 		//Next Operator to perform
 		Operator<PFP> *op;
 
-		//if(!selector->nextOperator(&op))
 		if((op = selector->nextOperator()) == NULL)
 			break;
 
@@ -98,7 +97,7 @@ void decimate(
 
 		//Perform the topological operation and
 		//compute the number of resulting cells
-		nbVertices -= op->perform(map, position);
+		nbVertices -= op->collapse(map, position);
 
 		for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
 			(*it)->affectApprox(op);			// affect data to the resulting vertex
