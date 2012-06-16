@@ -61,12 +61,12 @@ class ColorsChooser: public QtPopUp
 {
 	Q_OBJECT
 protected:
-	std::vector<Geom::Vec3f*> m_colors;
-	std::vector<std::string> m_names;
-	int m_current;
 	QListWidget *m_list;
 	QColorDialog* m_diag;
 	SimpleQT *m_interf;
+	std::vector<Geom::Vec3f*> m_colors;
+	std::vector<std::string> m_names;
+	int m_current;
 
 	/**
 	 *  Update callback, on color has changed (optional)

@@ -235,6 +235,28 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 	}
 }
 
+bool EmbeddedMap3::mergeFaces(Dart d)
+{
+	Dart d1 = phi1(d);
+
+	if(Map3::mergeFaces(d))
+	{
+		if(isOrbitEmbedded<FACE2>())
+		{
+			embedOrbit<FACE2>(d1, getEmbedding<FACE2>(d1)) ;
+		}
+
+		if(isOrbitEmbedded<FACE>())
+		{
+			embedOrbit<FACE>(d1, getEmbedding<FACE>(d1)) ;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 //!
 /*!
  *

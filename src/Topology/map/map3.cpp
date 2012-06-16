@@ -136,28 +136,20 @@ Dart Map3::splitVertex(std::vector<Dart>& vd)
 	Dart prev = vd.front();	//elt 0
 
 	Dart db1 = NIL;
-	if(isBoundaryFace(phi1(phi2(prev))))
+	if(isBoundaryFace(phi2(prev)))
 	{
 		db1 = phi2(phi3(phi1(phi2(prev))));
 	}
-	else if(isBoundaryEdge(prev))
-	{
-		boundE = true;
-	}
 
 	Dart fs = phi_1(phi2(phi_1(prev)));	//first side
-	//Dart ss = phi2(prev);	//second side
 
 	Map2::splitVertex(prev, phi2(fs));
 
-
 	for(unsigned int i = 1; i < vd.size(); ++i)
 	{
-		//Dart d3 = phi1(ss);
 		prev = vd[i];
 
 		Dart fs = phi_1(phi2(phi_1(prev)));	//first side
-		//Dart ss = phi2(prev);	//second side
 
 		Map2::splitVertex(prev, phi2(fs));
 
@@ -179,7 +171,7 @@ Dart Map3::splitVertex(std::vector<Dart>& vd)
 		phi3sew(phi1(phi2(db2)), phi_1(phi3(phi2(db2))));
 		phi3sew(phi1(phi2(db1)), phi_1(phi3(phi2(db1))));
 	}
-	else if(!boundE)
+	else
 	{
 		Dart dbegin = phi1(phi2(vd.front()));
 		Dart dend = phi_1(phi2(phi_1(vd.back())));
@@ -555,6 +547,33 @@ void Map3::splitFace(Dart d, Dart e)
 
 	phi3sew(phi_1(d), phi_1(ee));
 	phi3sew(phi_1(e), phi_1(dd));
+}
+
+bool Map3::mergeFaces(Dart d)
+{
+	assert(edgeDegree(d)==2);
+
+	Dart dd = phi3(d);
+
+	phi3unsew(d);
+	phi3unsew(dd);
+
+	//use code of mergesFaces to override the if(isBoundaryEdge)
+	//we have to merge the faces if the face is linked to a border also
+//	Map2::mergeFaces(d);
+	Dart e = phi2(d) ;
+	phi2unsew(d) ;
+	Map1::mergeCycles(d, phi1(e)) ;
+	Map1::splitCycle(e, phi1(d)) ;
+	Map1::deleteCycle(d) ;
+//	Map2::mergeFaces(dd);
+	e = phi2(dd) ;
+	phi2unsew(dd) ;
+	Map1::mergeCycles(dd, phi1(e)) ;
+	Map1::splitCycle(e, phi1(dd)) ;
+	Map1::deleteCycle(dd);
+
+	return true;
 }
 
 Dart Map3::collapseFace(Dart d, bool delDegenerateVolumes)

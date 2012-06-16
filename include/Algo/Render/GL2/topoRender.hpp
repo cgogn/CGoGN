@@ -70,8 +70,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 	std::vector<Dart> vecDarts;
 	vecDarts.reserve(map.getNbDarts());  // no problem dart is int: no problem of memory
 
-	if (m_attIndex.map() != &map)
-		m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index");
+	m_attIndex = map.template getAttribute<unsigned int, DART>("dart_index");
+
 	if (!m_attIndex.isValid())
 		m_attIndex  = map.template addAttribute<unsigned int, DART>("dart_index");
 

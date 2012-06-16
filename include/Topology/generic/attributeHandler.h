@@ -136,6 +136,11 @@ public:
 	const std::string& name() const ;
 
 	/**
+	 * give the number of elements of the attribute container
+	 */
+	unsigned int nbElements() const;
+
+	/**
 	 * [] operator with dart parameter
 	 */
 	T& operator[](Dart d) ;

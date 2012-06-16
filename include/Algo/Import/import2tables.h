@@ -30,7 +30,6 @@
 #include <vector>
 #include <string>
 
-//#include "Topology/generic/attributeHandler.h"
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
@@ -52,12 +51,12 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, PLYSLFgeneric, PLYSLFgenericBin, */OFF, OBJ, VRML, AHEM };
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
 	}
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, NODE};
+		enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
 	}
 
 
@@ -115,10 +114,10 @@ public:
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
-/*	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
+	// bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
 	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
 	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
-*/
+
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	

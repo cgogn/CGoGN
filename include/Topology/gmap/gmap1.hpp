@@ -195,11 +195,11 @@ inline void GMap1::collapseEdge(Dart d)
 	deleteEdge(d) ;
 }
 
-inline void GMap1::splitFace(Dart d, Dart e)
+inline void GMap1::splitCycle(Dart d, Dart e)
 {
-	assert(d != e && sameFace(d, e)) ;
+	assert(d != e && sameCycle(d, e)) ;
 
-	if(!sameOrientedFace(d, e))
+	if(!sameOrientedCycle(d, e))
 		e = beta1(e) ;
 
 	Dart d1 = beta1(d) ;
@@ -210,9 +210,9 @@ inline void GMap1::splitFace(Dart d, Dart e)
 	beta1sew(e, d1) ;
 }
 
-inline void GMap1::mergeFaces(Dart d, Dart e)
+inline void GMap1::mergeCycles(Dart d, Dart e)
 {
-	assert(!sameFace(d, e)) ;
+	assert(!sameCycle(d, e)) ;
 
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
@@ -222,9 +222,9 @@ inline void GMap1::mergeFaces(Dart d, Dart e)
 	beta1sew(e, d1) ;
 }
 
-inline void GMap1::linkFaces(Dart d, Dart e)
+inline void GMap1::linkCycles(Dart d, Dart e)
 {
-	assert(d != e && !sameFace(d, e)) ;
+	assert(d != e && !sameCycle(d, e)) ;
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
 	Dart dd = newEdge() ;
@@ -241,7 +241,7 @@ inline void GMap1::linkFaces(Dart d, Dart e)
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool GMap1::sameOrientedFace(Dart d, Dart e)
+inline bool GMap1::sameOrientedCycle(Dart d, Dart e)
 {
 	Dart it = d ;
 	do
@@ -253,7 +253,7 @@ inline bool GMap1::sameOrientedFace(Dart d, Dart e)
 	return false ;
 }
 
-inline bool GMap1::sameFace(Dart d, Dart e)
+inline bool GMap1::sameCycle(Dart d, Dart e)
 {
 	Dart it = d ;
 	do
@@ -268,7 +268,7 @@ inline bool GMap1::sameFace(Dart d, Dart e)
 	return false ;
 }
 
-inline unsigned int GMap1::faceDegree(Dart d)
+inline unsigned int GMap1::cycleDegree(Dart d)
 {
 	unsigned int count = 0 ;
 	Dart it = d ;
@@ -280,7 +280,7 @@ inline unsigned int GMap1::faceDegree(Dart d)
 	return count ;
 }
 
-inline bool GMap1::isFaceTriangle(Dart d)
+inline bool GMap1::isCycleTriangle(Dart d)
 {
 	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }

@@ -372,8 +372,8 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a vertes
-	* @param d a dart of the vertes
+	* Apply a functor on each dart of an oriented vertex
+	* @param d a dart of the oriented vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
@@ -386,32 +386,39 @@ public:
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
+	* Apply a functor on each dart of an oriented edge
+	* @param d a dart of the oriented edge
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_oriented_edge(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	/**
 	* Apply a functor on each dart of an edge
 	* @param d a dart of the oriented edge
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
+	//! Apply a functor on every dart of an oriented face
+	/*! @param d a dart of the oriented face
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_oriented_face(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
+	//! Apply a functor on every dart of a face
+	/*! @param d a dart of the face
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
+	//! Apply a functor on every dart of an oriented convex component
+	/*! @param d a dart of the oriented convex component
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
+	//! Apply a functor on every dart of a convex component
+	/*! @param d a dart of the convex component
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread = 0);

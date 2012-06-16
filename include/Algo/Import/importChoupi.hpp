@@ -35,6 +35,8 @@ namespace Import
 template <typename PFP>
 bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& tabV, std::vector<unsigned int>& tabE)
 {
+
+	std::cout << "immport choupiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" << std::endl;
 	typedef typename PFP::VEC3 VEC3;
 
 	//open file
@@ -53,8 +55,11 @@ bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& 
 	oss >> nbv;
 	oss >> nbe;
 
+	std::cout << "nb vertices = " << nbv << std::endl;
+	std::cout << "nb edges = " << nbe << std::endl;
+
 	std::vector<unsigned int> index;
-	index.reserve(1024);
+	index.reserve(2*nbv);
 
 	//read vertices
 	unsigned int id = 0;
@@ -67,7 +72,8 @@ bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& 
 
 		std::stringstream oss(ligne);
 
-		float i, x, y, z;
+		unsigned int i;
+		float x, y, z;
 		oss >> i;
 		oss >> x;
 		oss >> y;
@@ -75,12 +81,16 @@ bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& 
 
 		VEC3 pos(x,y,z);
 
+		//std::cout << "vec[" << j << "] = " << pos << std::endl;
+
 		index[i] = id;
 		tabV.push_back(pos);
+		//tabV[j] = pos;
+
+		//std::cout << "vec[" << j << "] = " << tabV[j] << std::endl;
+
 		++id;
 	}
-
-	std::stringstream oss2(ligne);
 
 	for(unsigned int i=0 ; i < nbe ; ++i)
 	{
@@ -98,13 +108,17 @@ bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& 
 
 		tabE.push_back(index[x]);
 		tabE.push_back(index[y]);
+		//tabE[2*i] = index[x];
+		//tabE[2*i+1] = index[y];
 	}
 
-	//for(typename std::vector<VEC3>::iterator it = tabV.begin() ; it < tabV.end() ; ++it)
-	//	std::cout << *it << std::endl;
+//	for(typename std::vector<VEC3>::iterator it = tabV.begin() ; it < tabV.end() ; ++it)
+//		std::cout << *it << std::endl;
 
-	//for(std::vector<unsigned int>::iterator it = tabE.begin() ; it < tabE.end() ; it = it + 2)
-	//	std::cout << *it << " " << *(it + 1) << std::endl;
+//	for(std::vector<unsigned int>::iterator it = tabE.begin() ; it < tabE.end() ; it = it + 2)
+//		std::cout << *it << " " << *(it + 1) << std::endl;
+
+	fp.close();
 
 	return true;
 }
