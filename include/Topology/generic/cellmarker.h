@@ -117,7 +117,7 @@ public:
 
 protected:
 	// protected copy constructor to forbid its usage
-	CellMarkerBase(const CellMarkerGen& cm) : CellMarkerGen(cm.m_map)
+	CellMarkerBase(const CellMarkerGen& cm) : CellMarkerGen(cm.m_map, CELL)
 	{}
 
 public:
