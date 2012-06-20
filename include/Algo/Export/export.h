@@ -69,6 +69,15 @@ template <typename PFP>
 bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 /**
+* export the map into a OBJ file
+* @param the_map map to be exported
+* @param filename filename of obj file
+* @return true
+*/
+template <typename PFP>
+bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good = allDarts) ;
+
+/**
 * export the map into a Trian file
 * @param the_map map to be exported
 * @param filename filename of trian file
@@ -119,9 +128,9 @@ bool exportTrian(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 * @param nbCoefs the number of coefficients of the representation
 * @return true
 */
-template <typename PFP>
+/*template <typename PFP>
 bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good = allDarts) ;
-
+*/
 /**
 * export the map into a PLYPTMgeneric file (K. Vanhoey generic format)
 * @param map map to be exported
@@ -131,8 +140,19 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 * @param colorPTM the 6 coefficients (x3 channels) of the PTM functions
 * @return true
 */
+/*
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good = allDarts) ;
+*/
+/**
+ * export meshes used at the workbench
+ * export just a list of vertices and edges connectivity
+ * @param map
+ * @param position
+ * @return
+ */
+template <typename PFP>
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good = allDarts) ;
 
 } // namespace Export
 

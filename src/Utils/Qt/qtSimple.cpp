@@ -108,6 +108,7 @@ SimpleQT::SimpleQT() :
 	m_transfo_matrix = glm::mat4(1.0f);
 
 	resize(1200,800);
+	m_glWidget->setFocus(Qt::MouseFocusReason);
 }
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
@@ -133,6 +134,8 @@ SimpleQT::SimpleQT(const SimpleQT& sqt):
 	m_trans_x = sqt.m_trans_x ;
 	m_trans_y = sqt.m_trans_y ;
 	m_trans_z = sqt.m_trans_z ;
+
+	m_glWidget->setFocus(Qt::MouseFocusReason);
 }
 
 SimpleQT::~SimpleQT()
@@ -273,8 +276,8 @@ void SimpleQT::setGLWidgetMouseTracking(bool b)
 
 void SimpleQT::closeEvent(QCloseEvent *event)
 {
-	m_glWidget->closeEvent(event) ;
 	QWidget::closeEvent(event) ;
+	cb_exit();
 }
 
 void SimpleQT::keyPressEvent(QKeyEvent *e)

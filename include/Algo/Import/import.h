@@ -46,7 +46,7 @@ namespace Import
 * @param filename
 * @param attrNames attribute names
 * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
-* @return a boolean indicating if import was successfull
+* @return a boolean indicating if import was successful
 */
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
@@ -57,23 +57,23 @@ bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector
  * @param filename
  * @param attrNames attribute names
  * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
- * @return a boolean indicating if import was successfull
+ * @return a boolean indicating if import was successful
  */
 template <typename PFP>
 bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
 /**
- * import a mesh and extrud it
+ * import a mesh and extrude it
  * @param map the map in which the function imports the mesh
  * @param filename
  * @param attrNames attribute names
  * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
- * @return a boolean indicating if import was successfull
+ * @return a boolean indicating if import was successful
  */
 template <typename PFP>
 bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
 
-/**
+/*
  * import a MOKA file
  * @param gmap the gmap in which the function imports the mesh
  * @param filename
@@ -82,6 +82,14 @@ bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, st
 template <typename PFP>
 bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
+/**
+ * import a Choupi file
+ * @param map
+ * @param filename
+ * @return
+ */
+template <typename PFP>
+bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
 
 /*
  * TODO a transformer en utilisant un MeshTableVolume.
@@ -93,15 +101,13 @@ template <typename PFP>
 bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenameNode, const std::string& filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f, bool invertTetra=false);
+
+template <typename PFP>
+bool importMoka(typename PFP::MAP& the_gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
 template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
-
-
-//template <typename PFP>
-//bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
-//
 
 } // namespace Import
 
@@ -110,11 +116,13 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 } // namespace CGoGN
 
 #include "Algo/Import/importMesh.hpp"
-#include "Algo/Import/importMoka.hpp"
 //#include "Algo/Import/importObjTex.hpp"
 #include "Algo/Import/importObjEle.hpp"
 #include "Algo/Import/importTet.hpp"
+#include "Algo/Import/importMoka.hpp"
 #include "Algo/Import/importTs.hpp"
 #include "Algo/Import/importNodeEle.hpp"
+
+#include "Algo/Import/importChoupi.hpp"
 
 #endif

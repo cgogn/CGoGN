@@ -39,6 +39,12 @@ public:
 
 	//!
 	/*!
+	 *
+	 */
+	virtual Dart splitVertex(std::vector<Dart>& vd);
+
+	//!
+	/*!
 	 */
 	virtual Dart deleteVertex(Dart d);
 
@@ -77,6 +83,11 @@ public:
 	/*!
 	 */
 	virtual void splitFace(Dart d, Dart e);
+
+	/**
+	 * The attributes attached to the face of dart d are kept on the resulting face
+	 */
+	virtual bool mergeFaces(Dart d);
 
 	//!
 	/*!

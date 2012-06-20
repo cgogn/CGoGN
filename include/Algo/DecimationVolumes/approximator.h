@@ -22,55 +22,97 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
+#ifndef __APPROXIMATOR_VOLUMES_H__
+#define __APPROXIMATOR_VOLUMES_H__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-#include "Topology/map/map2MR/filters_Primal.h"
-
-#include "Algo/Modelisation/subdivision.h"
+#include "Algo/DecimationVolumes/operator.h"
 
 namespace CGoGN
 {
 
-class SelectorCollapsingEdges : public FunctorSelect
+namespace Algo
 {
-protected:
-	const DartMarker& m_dm;
-public:
-	SelectorCollapsingEdges(const DartMarker& dm): m_dm(dm) {}
-	bool operator()(Dart d) const { return m_dm.isMarked(d); }
-	FunctorSelect* copy() const { return new SelectorCollapsingEdges(m_dm);}
+
+namespace DecimationVolumes
+{
+
+enum ApproximatorType
+{
+	A_Centroid //barycenter of the n-cells
 };
 
-class Map2MR_PM : public EmbeddedMap2
+template <typename PFP>
+class ApproximatorGen
 {
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 protected:
-	bool shareVertexEmbeddings ;
-
-	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
-	std::vector<Multiresolution::MRFilter*> analysisFilters ;
-
-	DartMarkerStore* selectedEdges;
+	MAP& m_map ;
 
 public:
-	Map2MR_PM() ;
-
-	virtual std::string mapTypeName() const { return "Map2MR_PM" ; }
-	void addNewLevel(bool embedNewVertices = true) ;
-
-	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
-
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
-
-	void analysis() ;
-	void synthesis() ;
+	ApproximatorGen(MAP& m) : m_map(m)
+	{}
+	virtual ~ApproximatorGen()
+	{}
+	virtual const std::string& getApproximatedAttributeName() const = 0 ;
+	virtual ApproximatorType getType() const = 0 ;
+	virtual bool init() = 0 ;
+	virtual void approximate(Operator<PFP>* op) = 0 ;
+	virtual void saveApprox(Operator<PFP>* op) = 0 ;
+	virtual void affectApprox(Operator<PFP>* op) = 0 ;
 } ;
+
+
+template <typename PFP, typename T>
+class Approximator :  public ApproximatorGen<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL;
+
+protected:
+
+	//TODO ajouter un predictor
+
+	VertexAttribute<T>& m_attrV; // vertex attribute to be approximated
+
+	//TODO Attribute to store approximation result
+	//TODO attribute to store detail information for reconstruction
+
+	T m_app;
+
+public:
+	Approximator(MAP& m, VertexAttribute<T>& a):
+		ApproximatorGen<PFP>(m), m_attrV(a)
+	{}
+
+	//virtual ~Approximator();
+
+	const std::string& getApproximatedAttributeName() const
+	{
+		return m_attrV.name() ;
+	}
+
+	void saveApprox(Operator<PFP>* op)
+	{
+		Dart d = op->getEdge();
+		//m_app = m_approx[d] ;
+	}
+
+	void affectApprox(Operator<PFP>* op)
+	{
+		Dart d = op->getEdge();
+		m_attrV[d] = m_app ;
+	}
+};
+
+
+} // namespace DecimationVolumes
+
+} // namespace Algo
 
 } // namespace CGoGN
 

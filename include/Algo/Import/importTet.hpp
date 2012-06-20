@@ -35,7 +35,7 @@ namespace Import
 {
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
+bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor, bool invertTetra)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -111,15 +111,14 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		} while(ligne.size() == 0);
 
 		std::stringstream oss(ligne);
-		oss >> nbe; //number of vertices = 4
-		assert(nbe == 4);
+		oss >> nbe; //number of vertices = 4 or used for region mark
 
 		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
 
 		Geom::Vec4ui pt;
 		oss >> pt[0];
-		oss >> pt[1];
-		oss >> pt[2];
+		oss >> pt[1+invertTetra];
+		oss >> pt[2-invertTetra];
 		oss >> pt[3];
 
 		//if regions are defined use this number

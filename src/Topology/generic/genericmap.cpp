@@ -187,6 +187,7 @@ void GenericMap::initMR()
 	setCurrentLevel(0) ;
 }
 
+//TODO rename to addBackLevel() ?
 void GenericMap::addLevel()
 {
 	unsigned int newLevel = m_mrDarts.size() ;
@@ -204,12 +205,37 @@ void GenericMap::addLevel()
 
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
+			++(*m_mrLevels)[i]; // increase the insertion level of the darts
 			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
 			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 		}
 	}
 }
 
+void GenericMap::addFrontLevel()
+{
+	unsigned int newLevel = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< newLevel ;
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+
+	m_mrDarts.insert(m_mrDarts.begin(), newAttrib) ;
+	m_mrNbDarts.insert(m_mrNbDarts.begin(), 0) ;
+
+	if(m_mrDarts.size() > 1)
+	{
+		AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[1] ;	// copy the indices of
+		m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;	// previous level into new level
+
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
+			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+		}
+	}
+}
+
+//TODO rename to removeBackLevel() ?
 void GenericMap::removeLevel()
 {
 	unsigned int maxL = getMaxLevel() ;
@@ -239,6 +265,11 @@ void GenericMap::removeLevel()
 		if(m_mrCurrentLevel == maxL)
 			--m_mrCurrentLevel ;
 	}
+}
+
+void GenericMap::removeFrontLevel()
+{
+	std::cout << "TO DO" << std::endl;
 }
 
 /****************************************
@@ -288,7 +319,11 @@ void GenericMap::viewAttributesTables()
 		std::vector<std::string> listeNames ;
 		cont.getAttributesNames(listeNames) ;
 		for (std::vector<std::string>::iterator it = listeNames.begin(); it != listeNames.end(); ++it)
-			std::cout << "    " << *it << std::endl ;
+		{
+			unsigned int id = cont.getAttributeIndex(*it);
+			std::cout << "    " << *it << " ("<<id<<")"<<std::endl ;
+		}
+
 		std::cout << "-------------------------" << std::endl ;
 	}
 	std::cout << "m_embeddings: " << std::hex ;

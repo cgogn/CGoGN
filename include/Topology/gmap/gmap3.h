@@ -139,12 +139,22 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
+	/**
+	 * Precondition for deleting edge
+	 */
+	bool deleteEdgePreCond(Dart d);
+
 	//! Delete the edge of d
 	/*! All the volumes around the edge are merged into one volume
 	 *  @param d a dart of the edge to delete
 	 *  @return a Dart of the resulting volume
 	 */
 	virtual Dart deleteEdge(Dart d);
+
+	/**
+	 * Precondition for splitting face
+	 */
+	bool splitFacePreCond(Dart d, Dart e);
 
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
@@ -263,36 +273,50 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a vertex
-	* @param d a dart of the face
+	* Apply a functor on each dart of an oriented vertex
+	* @param d a dart of the oriented vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_oriented_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
 	* Apply a functor on each dart of a vertex
-	* @param d a dart of the face
+	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
+	* Apply a functor on each dart of an oriented edge
+	* @param d a dart of the oriented edge
+	* @param fonct functor obj ref
+	*/
+	bool foreach_dart_of_oriented_edge(Dart d, FunctorType& fonct, unsigned int thread = 0);
+
+	/**
 	* Apply a functor on each dart of an edge
-	* @param d a dart of the oriented face
+	* @param d a dart of the edge
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	//! Apply a functor on every dart of a face
-	/*! @param d a dart of the volume
+	/*! @param d a dart of the face
 	 *  @param f the functor to apply
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
-
+	//! Apply a functor on every dart of an oriented volume
+	/*! @param d a dart of the oriented volume
+	 *  @param f the functor to apply
+	 */
 	bool foreach_dart_of_oriented_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
+	//! Apply a functor on every dart of a volume
+	/*! @param d a dart of the volume
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread = 0);
 
 	/**
 	* Apply a functor on each dart of a cc

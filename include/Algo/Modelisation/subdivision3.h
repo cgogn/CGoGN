@@ -27,6 +27,7 @@
 
 #include <math.h>
 #include <vector>
+#include "Geometry/plane_3d.h"
 
 namespace CGoGN
 {
@@ -45,7 +46,38 @@ namespace Modelisation
 template <typename PFP>
 Dart cut3Ear(typename PFP::MAP& map, Dart d);
 
+/**
+* Cut a volume considering a plane
+* @param d dart of the volume
+* @return a dart from the created face
+* * TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl);
 
+/**
+* Cut a volume considering a set of marked edges and vertices
+* marked edges and vertices must form a simple path
+* @param d dart of the volume
+* @param edgesToCut marker to identify edges along the slice
+* @param verticesToSplit marker to identify edges on the slice
+* @return a dart from the created face
+* TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit);
+
+/**
+* Cut a set of volumes considering a set of marked edges and vertices
+* marked edges and vertices must form a simple path
+* @param d dart of the volume
+* @param edgesToCut marker to identify edges along the slice
+* @param verticesToSplit marker to identify edges on the slice
+* @return a dart from the created face
+* TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position,CellMarker<VOLUME>& volumesToCut, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit);
 
 /**
 * catmull clark volumic : do not move the original vertices

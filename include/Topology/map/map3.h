@@ -140,6 +140,14 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Split the vertex along a permutation of faces
+	/*! \per Darts d & e MUST belong to the same vertex
+	 * 	\per Darts d & e MUST belong to different volumes
+	 *  \per Works only on the boundary
+	 *  @param vd a vector of darts
+	 */
+	virtual Dart splitVertex(std::vector<Dart>& vd);
+
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume
 	 *  @param d a dart of the vertex to delete
@@ -200,6 +208,14 @@ public:
 	 *  @param e dart of second vertex
 	 */
 	virtual void splitFace(Dart d, Dart e);
+
+	//! Merge the two faces incident to the edge of d.
+	/*! Works only for edges of degree 2.
+	 *  \warning Darts of the edge of d no longer exist after the call
+	 *  @param d a dart in the first face
+	 *  @return true if the merge has been executed, false otherwise
+	 */
+	virtual bool mergeFaces(Dart d);
 
 	//! Collapse a face (that is deleted) possibly merging its vertices
 	/*! \warning
@@ -368,7 +384,7 @@ public:
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread);
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on each dart of a cc
 	/*! @param d a dart of the cc

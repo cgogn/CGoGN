@@ -148,6 +148,18 @@ void EmbeddedGMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(beta1(beta2(beta1(ee))), vEmb2);
 	}
 
+	if(isOrbitEmbedded<EDGE>())
+	{
+		embedOrbit<EDGE>(beta1(d), getEmbedding<EDGE>(beta1(d))) ;
+		embedOrbit<EDGE>(beta1(e), getEmbedding<EDGE>(beta1(e))) ;
+
+		embedOrbit<EDGE>(d, getEmbedding<EDGE>(d)) ;
+		embedOrbit<EDGE>(e, getEmbedding<EDGE>(e)) ;
+		embedOrbit<EDGE>(beta1(beta2(beta1(d))), getEmbedding<EDGE>(beta1(beta2(beta1(d))))) ;
+		embedOrbit<EDGE>(beta1(beta2(beta1(e))), getEmbedding<EDGE>(beta1(beta2(beta1(e))))) ;
+	}
+
+
 	if(isOrbitEmbedded<FACE>())
 	{
 		unsigned int fEmb = getEmbedding<FACE>(d) ;
@@ -219,8 +231,6 @@ void EmbeddedGMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
 
 void EmbeddedGMap3::unsewVolumes(Dart d)
 {
-	std::cout << "unsew volumes" << std::endl ;
-
 	Dart dd = alpha1(d);
 
 	unsigned int fEmb = EMBNULL ;
@@ -240,7 +250,6 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 				embedOrbit<VERTEX>(dit, getEmbedding<VERTEX>(dit)) ;
 				embedNewCell<VERTEX>(dd);
 				copyCell<VERTEX>(dd, dit);
-				std::cout << "different vertices.." << std::endl ;
 			}
 			else
 			{

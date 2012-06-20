@@ -281,9 +281,12 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 	{
 		// ascii vertices
 		for(unsigned int i = 0; i < vertices.size(); ++i)
+		{
 			for (typename std::vector<VertexAttribute<typename PFP::VEC3>* >::const_iterator attrHandler = attributeHandlers.begin() ; attrHandler != attributeHandlers.end() ; ++attrHandler)
 				if ((*attrHandler)->isValid() && (*attrHandler)->getOrbit() == VERTEX)
-					out << (*(*attrHandler))[vertices[i]] << std::endl ;
+					out << (*(*attrHandler))[vertices[i]] ;
+			out << std::endl ;
+		}
 
 		// ascii faces
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
@@ -309,7 +312,7 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 		for(unsigned int i = 0; i < facesSize.size(); ++i)
 		{
 			uint8_t nbe = facesSize[i] ;
-			out.write((char*)(&nbe), sizeof(unsigned char)) ;
+			out.write((char*)(&nbe), sizeof(uint8_t)) ;
 			out.write((char*)(&(facesIdx[i][0])), facesSize[i] * sizeof(facesIdx[i][0])) ;
 		}
 	}
@@ -377,6 +380,72 @@ bool exportOFF(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 	for(unsigned int i = 0; i < facesSize.size(); ++i)
 	{
 		out << facesSize[i] ;
+		for(unsigned int j = 0; j < facesIdx[i].size(); ++j)
+			out << " " << facesIdx[i][j] ;
+		out << std::endl ;
+	}
+
+	out.close() ;
+	return true ;
+}
+/*
+template <typename PFP>
+bool exportOBJ(typename PFP::MAP& map, const typename PFP::TVEC3& position, const char* filename, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	unsigned int nbDarts = map.getNbDarts() ;
+	std::vector<unsigned int> facesSize ;
+	std::vector<std::vector<unsigned int> > facesIdx ;
+	facesSize.reserve(nbDarts/3) ;
+	facesIdx.reserve(nbDarts/3) ;
+	std::map<unsigned int, unsigned int> vIndex ;
+	unsigned int vCpt = 0 ;
+	std::vector<unsigned int> vertices ;
+	vertices.reserve(nbDarts/6) ;
+
+	CellMarker<VERTEX> markV(map) ;
+	TraversorF<MAP> t(map, good) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		std::vector<unsigned int> fidx ;
+		fidx.reserve(8) ;
+		Traversor2FV<typename PFP::MAP> tfv(map, d) ;
+		for(Dart it = tfv.begin(); it != tfv.end(); it = tfv.next())
+		{
+			unsigned int vNum = map.getEmbedding(VERTEX, it) ;
+			if(!markV.isMarked(it))
+			{
+				markV.mark(it) ;
+				vIndex[vNum] = vCpt++ ;
+				vertices.push_back(vNum) ;
+			}
+			fidx.push_back(vIndex[vNum]+1) ;
+		}
+		facesIdx.push_back(fidx) ;
+	}
+
+	out << "#OBJ - Export from CGoGN" << std::endl ;
+
+	for(unsigned int i = 0; i < vertices.size(); ++i)
+	{
+		const VEC3& v = position[vertices[i]] ;
+		out << "v " << v[0] << " " << v[1] << " " << v[2] << std::endl ;
+	}
+
+	out << std::endl;
+
+	for(unsigned int i = 0; i < facesIdx.size(); ++i)
+	{
+		out << "f ";
 		for(unsigned int j = 0; j < facesIdx[i].size(); ++j)
 			out << " " << facesIdx[i][j] ;
 		out << std::endl ;
@@ -524,6 +593,7 @@ bool exportPlyPTMgeneric(typename PFP::MAP& map, const VertexAttribute<typename 
 	out.close() ;
 	return true ;
 }
+*/
 /*
 template <typename PFP>
 bool exportPlySLFgeneric(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const char* filename, const FunctorSelect& good)
@@ -795,7 +865,6 @@ bool exportPlySLFgenericBin(typename PFP::MAP& map, const VertexAttribute<typena
 	out.close() ;
 	return true ;
 }
-*/
 
 template <typename PFP>
 bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], const VertexAttribute<typename PFP::VEC3> colorPTM[6], const FunctorSelect& good)
@@ -904,6 +973,40 @@ bool exportPLYPTM(typename PFP::MAP& map, const char* filename, const VertexAttr
 		for(unsigned int j = 0; j < nbe; ++j)
 			out << " " << *it++;
 		out << std::endl ;
+	}
+
+	out.close() ;
+	return true ;
+}
+*/
+
+template <typename PFP>
+bool exportChoupi(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, const char* filename, const FunctorSelect& good)
+{
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+	std::ofstream out(filename, std::ios::out) ;
+	if (!out.good())
+	{
+		CGoGNerr << "Unable to open file " << CGoGNendl ;
+		return false ;
+	}
+
+	out << map.template getNbOrbits<VERTEX>() << " " << map.template getNbOrbits<EDGE>() << std::endl;
+
+	TraversorV<typename PFP::MAP> travV(map);
+	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	{
+		out << map.template getEmbedding<VERTEX>(dit) << " " << position[dit] << std::endl;
+	}
+
+	TraversorE<typename PFP::MAP> travE(map);
+	unsigned int indexE = 0;
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		out << indexE << "  " << map.template getEmbedding<VERTEX>(dit) << " " << map.template getEmbedding<VERTEX>(map.phi2(dit)) << std::endl;
+		++indexE;
 	}
 
 	out.close() ;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>227</width>
-    <height>369</height>
+    <width>215</width>
+    <height>481</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -36,111 +36,129 @@
     </size>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <property name="margin">
-     <number>2</number>
-    </property>
-    <property name="spacing">
-     <number>4</number>
-    </property>
+    <item row="1" column="0">
+     <widget class="QSlider" name="widthSlider">
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>10</number>
+      </property>
+      <property name="singleStep">
+       <number>0</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="0">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>113</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="0">
+     <widget class="QPushButton" name="svg">
+      <property name="text">
+       <string>SnapshotSVG</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QCheckBox" name="checkBox_hide">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>hide clipping plane</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <widget class="QListWidget" name="listOper">
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <item>
-       <widget class="QListWidget" name="listOper">
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>deleteVertex</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>cutEdge</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>uncutEdge</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>deleteEdge</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>collapsedge</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>splitFace</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>mergeVolume</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>splitVolume</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>collapseFace</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>collapseVolume</string>
-         </property>
-        </item>
-       </widget>
+       <property name="text">
+        <string>deleteVertex</string>
+       </property>
       </item>
       <item>
-       <widget class="QSlider" name="widthSlider">
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>10</number>
-        </property>
-        <property name="singleStep">
-         <number>2</number>
-        </property>
-        <property name="value">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
+       <property name="text">
+        <string>cutEdge</string>
+       </property>
       </item>
       <item>
-       <widget class="QPushButton" name="svg">
-        <property name="text">
-         <string>SnapshotSVG</string>
-        </property>
-       </widget>
+       <property name="text">
+        <string>uncutEdge</string>
+       </property>
       </item>
       <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
+       <property name="text">
+        <string>deleteEdge</string>
+       </property>
       </item>
-     </layout>
+      <item>
+       <property name="text">
+        <string>collapseEdge</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>splitFace</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mergeVolume</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>splitVolume</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>collapseFace</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>collapseVolume</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>splitVertex</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QCheckBox" name="checkBox_plane">
+      <property name="text">
+       <string>clipping</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

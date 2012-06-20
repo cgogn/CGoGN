@@ -148,6 +148,7 @@ public:
 	 * if false : mouseMove events are only generated when a button is pressed
 	 */
 	void setGLWidgetMouseTracking(bool b);
+	
 
 protected:
 	GLWidget* m_glWidget;
@@ -189,7 +190,7 @@ protected:
 	void keyPressEvent(QKeyEvent *event);
 
 	void keyReleaseEvent(QKeyEvent *e);
-
+	
 public:
 	/**
 	 * set width and pos center of object to draw
@@ -401,7 +402,7 @@ public:
 	 * @param dir base directory
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
-	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
+	std::string selectFileSave(const std::string& title = "save file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
 
 	void snapshot(const QString& filename, const char* format = 0, const int& quality = -1);
 

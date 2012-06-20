@@ -25,8 +25,10 @@
 #include "tuto_oper3.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Geometry/normal.h"
 #include "Algo/Import/import.h"
 #include "Algo/Export/export.h"
 
@@ -43,6 +45,8 @@ int main(int argc, char **argv)
     sqt.setCallBack( sqt.dock.listOper, SIGNAL(currentRowChanged(int)), SLOT(operation(int)) );
     sqt.setCallBack( sqt.dock.svg, SIGNAL(clicked()), SLOT(svg()) );
     sqt.setCallBack( sqt.dock.widthSlider, SIGNAL(valueChanged(int)), SLOT(width(int)) );
+	sqt.setCallBack( sqt.dock.checkBox_hide, SIGNAL(toggled(bool)), SLOT(hide_onoff(bool)) );
+	sqt.setCallBack( sqt.dock.checkBox_plane, SIGNAL(toggled(bool)), SLOT(clipping_onoff(bool)) );
 	int n=3;
 	if (argc==2)
 		n = atoi(argv[1]);
@@ -58,6 +62,36 @@ int main(int argc, char **argv)
 	sqt.show();
 	// and wait for the end
 	return app.exec();
+}
+
+void MyQT::clipping_onoff(bool x)
+{
+	clip_volume = x;
+
+	if (clip_volume)
+	{
+		Geom::Vec3f pos = m_PlanePick->getPosition();
+		float pipo;
+		Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
+		m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
+		m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
+	}
+	else
+	{
+		m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
+		m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), Geom::Vec3f(0,0,999999.9f));
+		m_render_topo->shader1()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
+		m_render_topo->shader2()->setClipColorAttenuationFactorRelative(0.0f,0.0f);
+	}
+	updateMap();
+	updateGL();
+}
+
+void MyQT::hide_onoff(bool x)
+{
+	hide_clipping = !hide_clipping;
+	updateMap();
+	updateGL();
 }
 
 void MyQT::operation(int x)
@@ -146,7 +180,14 @@ void MyQT::operation(int x)
 		CGoGNout <<"split volume"<<CGoGNendl;
 		if (!m_selecteds.empty())
 		{
+			std::cout << "start" << std::endl;
+			for(std::vector<Dart>::iterator it = m_selecteds.begin() ; it != m_selecteds.end() ; ++it)
+				std::cout << *it << " et phi2() = " << myMap.phi2(*it) <<  std::endl;
+			std::cout << "end" << std::endl;
+
 			myMap.splitVolume(m_selecteds);
+			m_selecteds.clear();
+
 			dm.markAll();
 			updateMap();
 		}
@@ -175,6 +216,24 @@ void MyQT::operation(int x)
 			updateMap();
 		}
 		break;
+	case 10:
+		CGoGNout <<"split vertex"<<CGoGNendl;
+		if (!m_selecteds.empty() && m_selected != NIL)
+		{
+			Dart dit = m_selecteds.front();
+			PFP::VEC3 Q = (position[myMap.phi1(m_selected)] + position[m_selected])/2.0f;
+			//PFP::VEC3 c1 = Algo::Geometry::volumeCentroid<PFP>(myMap, dit, position);
+			Dart dres = myMap.splitVertex(m_selecteds);
+			//Dart dres = Algo::Modelisation::Tetrahedralization::splitVertex<PFP>(myMap, m_selecteds);
+			position[dres] = position[dit] + Q*0.25f;
+			//position[dit] = position[dit] - c1*0.5f;
+			m_selecteds.clear();
+			m_selected = NIL;
+			dm.markAll();
+			updateMap();
+			std::cout << "nb darts after = " << myMap.getNbDarts() << std::endl;
+		}
+		break;
 	default:
 		break;
 	}
@@ -194,7 +253,7 @@ void MyQT::createMap(int n)
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
     //  bounding box of scene
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	m_shift = bb.maxSize()/200.0f;
 
@@ -218,6 +277,20 @@ void MyQT::cb_initGL()
 {
 	glClearColor(1.0f,1.0f,1.0f,1.0f);
 	m_render_topo = new Algo::Render::GL2::Topo3Render() ;
+
+    m_PlanePick = new Utils::Pickable(Utils::Pickable::GRID,1);
+	m_frame = new Utils::FrameManipulator();
+	m_frame->setSize(bb.maxSize());
+
+	m_render_topo->shader1()->insertClippingCode();
+	m_render_topo->shader2()->insertClippingCode();
+
+	clip_id1 = m_render_topo->shader1()->addClipPlane();
+	clip_id2 = m_render_topo->shader2()->addClipPlane();
+
+	m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, Geom::Vec3f(0,0,1), bb.center());
+	m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, Geom::Vec3f(0,0,1), bb.center());
+
 }
 
 // redraw GL callback (clear and swap already done)
@@ -240,6 +313,12 @@ void MyQT::cb_redraw()
 	{
 		m_render_topo->overdrawDart(*it, 11, 0.0f, 0.0f, 1.0f);
 	}
+
+	if (clip_volume && !hide_clipping)
+	{
+		m_frame->draw();
+		m_PlanePick->draw();
+	}
 }
 
 void MyQT::cb_mousePress(int button, int x, int y)
@@ -258,6 +337,29 @@ void MyQT::cb_mousePress(int button, int x, int y)
 				m_selected2 = d;
 		}
 		updateGL();
+
+		if (hide_clipping || !clip_volume)
+			return;
+
+		m_begX = x;
+		m_begY = y;
+
+		// get ray of selection
+		Geom::Vec3f rayA,rayB;
+		float dist = getOrthoScreenRay(x,y,rayA,rayB);
+		Geom::Vec3f AB = rayB-rayA;
+
+		unsigned int fr_picked =0;
+		// picking the frame -> axis
+		fr_picked = m_frame->pick(rayA,AB,dist);
+
+		if (fr_picked != 0)
+		{
+			m_pickedAxis=fr_picked;
+			m_frame->highlight(m_pickedAxis);
+			m_frame->storeProjection(m_pickedAxis);
+			updateGL();
+		}
 	}
 
 	if (Control())
@@ -270,6 +372,74 @@ void MyQT::cb_mousePress(int button, int x, int y)
 		}
 		updateGL();
 	}
+}
+
+void  MyQT::cb_mouseRelease(int button, int x, int y)
+{
+
+	if (hide_clipping || !clip_volume)
+		return;
+
+	m_pickedAxis=0;
+	m_frame->highlight(m_pickedAxis);
+	updateGL();
+
+}
+
+void  MyQT::cb_mouseMove(int buttons, int x, int y)
+{
+	if (!Shift())
+		return;
+
+	if (hide_clipping || !clip_volume)
+		return;
+
+	// rotation selected ?
+	if (Utils::FrameManipulator::rotationAxis(m_pickedAxis))
+	{
+		if (buttons&1)
+		{
+			float angle = m_frame->angleFromMouse(x,y,x-m_begX, y-m_begY);
+			m_frame->rotate(m_pickedAxis, angle);
+		}
+		else if (buttons&2)
+			m_frame->rotateInScreen(x-m_begX, y-m_begY);
+
+		m_PlanePick->transfo() = m_frame->transfo();
+	}
+	// translation selected
+	else if (Utils::FrameManipulator::translationAxis(m_pickedAxis))
+	{
+		if (buttons&1)
+		{
+			float dist =  m_frame->distanceFromMouse(x-m_begX, y-m_begY);
+			m_frame->translate(m_pickedAxis, dist);
+		}
+		else if (buttons&2)
+			m_frame->translateInScreen(x-m_begX, y-m_begY);
+
+		m_PlanePick->transfo() = m_frame->transfo();
+	}
+	// scale selected
+	else if (Utils::FrameManipulator::scaleAxis(m_pickedAxis) )
+	{
+		float scale = m_frame->scaleFromMouse(x-m_begX, y-m_begY);
+		m_frame->scale(m_pickedAxis, scale );
+		m_PlanePick->transfo() = m_frame->transfo();
+	}
+
+	Geom::Vec3f pos = m_PlanePick->getPosition();
+	float pipo;
+	Geom::Vec3f normal = m_PlanePick->getAxisScale(2, pipo); // 2 = Z axis = plane normal
+
+	m_render_topo->shader1()->setClipPlaneParamsAll(clip_id1, normal, pos);
+	m_render_topo->shader2()->setClipPlaneParamsAll(clip_id2, normal, pos);
+
+	m_begX = x;
+	m_begY = y;
+	updateGL();
+	return;
+
 }
 
 void MyQT::cb_keyPress(int keycode)
@@ -485,9 +655,11 @@ void MyQT::importMesh(std::string& filename)
 	m_selected  = NIL;
 	m_selected2 = NIL;
 
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	m_shift = bb.maxSize()/200.0f;
+
+	m_frame->setSize(bb.maxSize());
 
 	updateMap();
 	updateGLMatrices() ;

@@ -54,6 +54,7 @@ AttributeHandler<T, ORBIT>::AttributeHandler() :
 	AttributeHandlerGen(NULL, false), m_attrib(NULL)
 {}
 
+
 template <typename T, unsigned int ORBIT>
 AttributeHandler<T, ORBIT>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
 	AttributeHandlerGen(m, false), m_attrib(amv)
@@ -118,6 +119,13 @@ template <typename T, unsigned int ORBIT>
 inline const std::string& AttributeHandler<T, ORBIT>::name() const
 {
 	return m_attrib->getName() ;
+}
+
+
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::nbElements() const
+{
+	return m_map->getAttributeContainer<ORBIT>().size() ;
 }
 
 template <typename T, unsigned int ORBIT>

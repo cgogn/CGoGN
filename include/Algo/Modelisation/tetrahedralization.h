@@ -39,10 +39,23 @@ namespace Tetrahedralization
 
 /**
 * subdivide a hexahedron into 5 tetrahedron
-* @param d dart of the hexahedron
 */
 template <typename PFP>
 void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
+
+/**
+* WARNING : assume all volumes to be hexahedrons
+* subdivide a hexahedron mesh into a tetrahedron mesh
+*/
+template <typename PFP>
+void hexahedronsToTetrahedrons(typename PFP::MAP& map);
+
+/************************************************************************************************
+ * 									Collapse / Split Operators
+ ************************************************************************************************/
+template <typename PFP>
+Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd);
+
 
 /************************************************************************************************
  * 																Tetrahedron functions																	   *
@@ -55,6 +68,14 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
  */
 template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d);
+
+/**
+ * test if a mesh (or submesh) is a tetrahedral mesh
+ * @param map
+ * @param selected
+ */
+template <typename PFP>
+bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected = allDarts);
 
 /************************************************************************************************
  *																		Swap Functions 																	   *
@@ -97,7 +118,7 @@ Dart swap2To3(typename PFP::MAP& map, Dart d);
  *
  */
 template <typename PFP>
-void swap5To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions);
+void swap5To4(typename PFP::MAP& the_map, Dart d, VertexAttribute<typename PFP::VEC3>& positions);
 
 /************************************************************************************************
  *																		Flip Functions 																	   *
@@ -107,13 +128,13 @@ void swap5To4(typename PFP::MAP& the_map, Dart d, typename PFP::TVEC3& positions
  *
  */
 template <typename PFP>
-void flip1To4(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
 /**
  *
  */
 template <typename PFP>
-void edgeBisection(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
 } // namespace Tetrahedralization
 

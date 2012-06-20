@@ -27,6 +27,36 @@
 namespace CGoGN
 {
 
+Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
+{
+	Dart d = vd.front();
+	Dart d2 = phi1(phi2(d));
+
+	Dart dres = Map3::splitVertex(vd);
+
+	if(isOrbitEmbedded<VERTEX>())
+	{
+		embedNewCell<VERTEX>(d2);
+		copyCell<VERTEX>(d2, d);
+		embedOrbit<VERTEX>( d, getEmbedding<VERTEX>(d));
+	}
+
+	if(isOrbitEmbedded<EDGE>())
+	{
+
+	}
+
+	if(isOrbitEmbedded<VOLUME>())
+	{
+		for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+		{
+			embedOrbit<VOLUME>( *it, getEmbedding<VOLUME>(*it)) ;
+		}
+	}
+
+	return dres;
+}
+
 Dart EmbeddedMap3::deleteVertex(Dart d)
 {
 	Dart v = Map3::deleteVertex(d) ;
@@ -203,6 +233,28 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<VOLUME>(phi_1(dd),  vEmb2);
 		setDartEmbedding<VOLUME>(phi_1(ee),  vEmb2);
 	}
+}
+
+bool EmbeddedMap3::mergeFaces(Dart d)
+{
+	Dart d1 = phi1(d);
+
+	if(Map3::mergeFaces(d))
+	{
+		if(isOrbitEmbedded<FACE2>())
+		{
+			embedOrbit<FACE2>(d1, getEmbedding<FACE2>(d1)) ;
+		}
+
+		if(isOrbitEmbedded<FACE>())
+		{
+			embedOrbit<FACE>(d1, getEmbedding<FACE>(d1)) ;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 //!
