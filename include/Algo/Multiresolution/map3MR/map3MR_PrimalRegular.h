@@ -29,29 +29,40 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor3.h"
 
-#include "Topology/map/map3MR/filters_Primal.h"
-#include "Topology/map/map3MR/schemes_Primal.h"
+#include "Algo/Multiresolution/map3MR/filters_Primal.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 
 namespace CGoGN
+{
+
+namespace Algo
+{
+
+namespace Multiresolution
 {
 
 /*! \brief The class of regular 3-map MR
  */
 
-class Map3MR_PrimalRegular : public EmbeddedMap3
+template <typename PFP>
+class Map3MR_PrimalRegular
 {
+public:
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
 protected:
+	MAP& m_map;
 	bool shareVertexEmbeddings;
 
-	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
-	std::vector<Multiresolution::MRFilter*> analysisFilters ;
-
-	std::vector<Multiresolution::MRScheme*> subdivisionSchemes;
+	std::vector<Algo::Multiresolution::MRFilter*> synthesisFilters ;
+	std::vector<Algo::Multiresolution::MRFilter*> analysisFilters ;
 
 public:
-	Map3MR_PrimalRegular();
+	Map3MR_PrimalRegular(MAP& map);
 
-	virtual std::string mapTypeName() const { return "Map3MR_PrimalRegular"; }
+	std::string mapTypeName() const { return "Map3MR_PrimalRegular"; }
 
 	/*! @name Topological helping functions
 	 *
@@ -59,12 +70,8 @@ public:
 	//@{
 	void swapEdges(Dart d, Dart e);
 
-	bool isTetrahedron(Dart d);
-
 	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
 	//@}
-
-	void setSharingVertexEmbeddings(bool b) { shareVertexEmbeddings = b; }
 
 	/*! @name Level creation
 	 *
@@ -72,100 +79,69 @@ public:
 	//@{
 	//!
 	/*
-	 *
 	 */
 	void addNewLevelTetraOcta(bool embedNewVertices);
 
 	//!
 	/*
-	 *
 	 */
-	void addNewLevelHexa(bool embedNewVertices);
+	//void addNewLevelHexa(bool embedNewVertices);
 
 	//!
 	/*
-	 *
 	 */
-	void addNewLevel(bool embedNewVertices);
+	//void addNewLevel(bool embedNewVertices);
 	//@}
 
 	/*! @name Geometry modification
 	 *  Analysis / Synthesis
 	 *************************************************************************/
 	//@{
-	//!
-	/*
-	 *
-	 */
-	void addSynthesisFilter(Multiresolution::MRFilter* f) { assert(shareVertexEmbeddings); synthesisFilters.push_back(f) ; }
 
 	//!
 	/*
-	 *
 	 */
-	void addAnalysisFilter(Multiresolution::MRFilter* f) { assert(shareVertexEmbeddings); analysisFilters.push_back(f) ; }
+	void setSharingVertexEmbeddings(bool b) { shareVertexEmbeddings = b; }
 
 	//!
 	/*
-	 *
+	 */
+	void addSynthesisFilter(Algo::Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
+
+	//!
+	/*
+	 */
+	void addAnalysisFilter(Algo::Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
+
+	//!
+	/*
 	 */
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 
 	//!
 	/*
-	 *
 	 */
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
 
 	//!
 	/*
-	 *
 	 */
 	void analysis() ;
 
 	//!
 	/*
-	 *
 	 */
 	void synthesis() ;
 	//@}
-
-
-	/*! @name Geometry modification
-	 *  Subdivision Schemes
-	 *************************************************************************/
-	//@{
-
-	//!
-	/*!
-	 *
-	 */
-	void addSubdivisionScheme(Multiresolution::MRScheme* f) {  assert(!shareVertexEmbeddings); subdivisionSchemes.push_back(f); }
-
-	//!
-	/*
-	 *
-	 */
-	void clearSubdivisionSchemes() { subdivisionSchemes.clear() ; }
-
-	//!
-	/*
-	 *
-	 */
-	void subdivision() ;
-	//@}
 };
 
-} //end namespace CGoGN
+} // namespace Multiresolution
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+
+#include "Algo/Multiresolution/map3MR/map3MR_PrimalRegular.hpp"
 
 #endif /* __MAP3MR_PRIMAL__ */
-
-//void splitFaceInSurface(Dart d, Dart e);
-
-//Dart cutEdgeInSurface(Dart d);
-
-//void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
-
-//void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
-
-//Dart quadranguleFace(Dart d);

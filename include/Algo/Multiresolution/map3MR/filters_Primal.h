@@ -27,8 +27,12 @@
 
 #include <cmath>
 #include "Algo/Geometry/centroid.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 
 namespace CGoGN
+{
+
+namespace Algo
 {
 
 namespace Multiresolution
@@ -47,7 +51,7 @@ public:
  *                           LOOP BASIC FUNCTIONS
  *********************************************************************************/
 template <typename PFP>
-typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d1)
+typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, Dart d1)
 {
 	Dart d2 = map.phi2(d1) ;
 	Dart d3 = map.phi_1(d1) ;
@@ -67,7 +71,7 @@ typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVE
 }
 
 template <typename PFP>
-typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, Dart d)
 {
 	map.incCurrentLevel() ;
 
@@ -93,11 +97,11 @@ typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TV
  *          SHW04 BASIC FUNCTIONS : tetrahedral/octahedral meshes
  *********************************************************************************/
 template <typename PFP>
-typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, Dart d)
 {
 	typename PFP::VEC3 res(0);
 
-	if(map.isTetrahedron(d))
+	if(Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(map, d))
 	{
 		Dart d1 = map.phi1(d) ;
 		Dart d2 = map.phi_1(d);
@@ -162,10 +166,10 @@ class LoopEvenAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopEvenAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -188,10 +192,10 @@ class LoopNormalisationAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopNormalisationAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopNormalisationAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -218,10 +222,10 @@ class LoopOddAnalysisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopOddAnalysisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddAnalysisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -267,17 +271,28 @@ class LerpEdgeSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpEdgeSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpEdgeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
+		std::cout << "lerp edges" << std::endl;
 		TraversorE<typename PFP::MAP> trav(m_map) ;
+
+		std::cout << "begin = " << m_map.begin() << std::endl;
+		std::cout << "end = " << m_map.end() << std::endl;
+
+
+		std::cout << "begin = " << trav.begin() << std::endl;
+		std::cout << "end = " << trav.end() << std::endl;
+		std::cout << "next = " << trav.next() << std::endl;
+
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
+			std::cout << "edges" << std::endl;
 			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi2(d)]) * typename PFP::REAL(0.5);
 
 			m_map.incCurrentLevel() ;
@@ -295,14 +310,15 @@ class LerpFaceSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpFaceSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpFaceSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
+		std::cout << "lerp faces" << std::endl;
 		TraversorF<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
@@ -325,14 +341,15 @@ class LerpVolumeSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpVolumeSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpVolumeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
 	{
+		std::cout << "lerp volumes" << std::endl;
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
@@ -340,7 +357,7 @@ public:
 
 			m_map.incCurrentLevel() ;
 
-			if(!m_map.isTetrahedron(d))
+			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
 			{
 
 				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
@@ -361,10 +378,10 @@ class Ber02OddSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Ber02OddSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	Ber02OddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -450,10 +467,10 @@ class Ber02EvenSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Ber02EvenSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	Ber02EvenSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -639,10 +656,10 @@ class Ber02ScaleSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Ber02ScaleSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	Ber02ScaleSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -705,10 +722,10 @@ class LoopOddSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopOddSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -748,10 +765,10 @@ class LoopNormalisationSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopNormalisationSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -778,10 +795,10 @@ class LoopEvenSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopEvenSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -804,10 +821,10 @@ class LoopVolumeSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopVolumeSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopVolumeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -815,7 +832,7 @@ public:
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			if(!m_map.isTetrahedron(d))
+			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
 			{
 				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
@@ -835,10 +852,10 @@ class SHW04VolumeNormalisationSynthesisFilter : public MRFilter
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	SHW04VolumeNormalisationSynthesisFilter(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	SHW04VolumeNormalisationSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -870,6 +887,8 @@ public:
 
 
 } // namespace Multiresolution
+
+} // namespace Algo
 
 } // namespace CGoGN
 
