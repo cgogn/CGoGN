@@ -279,20 +279,9 @@ public:
 
 	void operator() ()
 	{
-		std::cout << "lerp edges" << std::endl;
 		TraversorE<typename PFP::MAP> trav(m_map) ;
-
-		std::cout << "begin = " << m_map.begin() << std::endl;
-		std::cout << "end = " << m_map.end() << std::endl;
-
-
-		std::cout << "begin = " << trav.begin() << std::endl;
-		std::cout << "end = " << trav.end() << std::endl;
-		std::cout << "next = " << trav.next() << std::endl;
-
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			std::cout << "edges" << std::endl;
 			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi2(d)]) * typename PFP::REAL(0.5);
 
 			m_map.incCurrentLevel() ;
@@ -318,7 +307,6 @@ public:
 
 	void operator() ()
 	{
-		std::cout << "lerp faces" << std::endl;
 		TraversorF<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
@@ -349,7 +337,6 @@ public:
 
 	void operator() ()
 	{
-		std::cout << "lerp volumes" << std::endl;
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{

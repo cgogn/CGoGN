@@ -85,7 +85,7 @@ public:
 	//!
 	/*
 	 */
-	//void addNewLevelHexa(bool embedNewVertices);
+	void addNewLevelHexa(bool embedNewVertices);
 
 	//!
 	/*
