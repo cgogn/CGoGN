@@ -43,6 +43,12 @@ class ImplicitHierarchicalMap3 : public EmbeddedMap3
 	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 
 public:
+
+	FunctorType* vertexVertexFunctor ;
+	FunctorType* edgeVertexFunctor ;
+	FunctorType* faceVertexFunctor ;
+	FunctorType* volumeVertexFunctor ;
+
 	unsigned int m_curLevel ;
 	unsigned int m_maxLevel ;
 	unsigned int m_edgeIdCount ;
@@ -153,6 +159,8 @@ public:
 
 	Dart quadranguleFace(Dart d);
 
+	void deleteVertexSubdividedFace(Dart d);
+
 //	//!
 //	/*!
 //	 *
@@ -183,6 +191,11 @@ public:
 //	 */
 //	virtual void splitVolume(std::vector<Dart>& vd);
 	//@}
+
+	void computeVertexVertexFunctor(Dart d) { (*vertexVertexFunctor)(d); }
+	void computeEdgeVertexFunctor(Dart d) { (*edgeVertexFunctor)(d); }
+	void computeFaceVertexFunctor(Dart d) { (*faceVertexFunctor)(d); }
+	void computerVolumeVertexFunctor(Dart d) { (*volumeVertexFunctor)(d); }
 
 	/*! @name Levels Management
 	 *  Operations to manage the levels of an Implicit Hierarchical 3-map

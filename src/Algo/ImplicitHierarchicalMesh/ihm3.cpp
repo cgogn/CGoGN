@@ -289,6 +289,41 @@ Dart ImplicitHierarchicalMap3::quadranguleFace(Dart d)
 	return centralDart;
 }
 
+
+void ImplicitHierarchicalMap3::deleteVertexSubdividedFace(Dart d)
+{
+	Dart centralV = phi1(phi1(d));
+	Dart res = NIL;
+	Dart vit = centralV ;
+	do
+	{
+		if(res == NIL && phi1(phi1(centralV)) != centralV)
+			res = phi1(centralV) ;
+
+		Dart f = phi_1(phi2(vit)) ;
+		phi1sew(vit, f) ;
+
+		vit = phi2(phi_1(vit)) ;
+	} while(vit != centralV) ;
+	Map1::deleteCycle(centralV) ;
+
+	Dart d3 = phi1(phi3(centralV));
+	res = NIL;
+	vit = d3 ;
+	do
+	{
+		if(res == NIL && phi1(phi1(d3)) != d3)
+			res = phi1(d3) ;
+
+		Dart f = phi_1(phi2(vit)) ;
+		phi1sew(vit, f) ;
+
+		vit = phi2(phi_1(vit)) ;
+	} while(vit != d3) ;
+	Map1::deleteCycle(d3) ;
+
+}
+
 //Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
 //{
 //        Dart resV = EmbeddedMap3::cutEdge(d);
@@ -770,7 +805,8 @@ bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		Dart d2 = phi2(d) ;
 		++m_curLevel ;
 
-		std::cout << "vertex degree = " << vertexDegree(phi1(d)) << std::endl;
+		std::cout << "vertex degree(phi1(d)) = " << vertexDegree(phi1(d)) << std::endl;
+		std::cout << "vertex degree(d) = " << vertexDegree(d) << std::endl;
 
 		if(vertexDegree(phi1(d)) == 2)
 		{
@@ -796,11 +832,6 @@ bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
 		subd = true;
 		Dart d3 = phi3(d);
 
-//		std::cout << "d3 = " << d3 << std::endl;
-//		std::cout << "d = " << d << std::endl;
-//		std::cout << "curLevel = " << m_curLevel << std::endl;
-//		std::cout << "volSubd(d3) = " << volumeIsSubdivided(d3) << std::endl;
-
 		//tester si le volume voisin est subdivise
 		if(d3 != d && volumeIsSubdivided(d3))
 			subdNeighborhood = true;
@@ -820,9 +851,6 @@ bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
 
 		--m_curLevel;
 	}
-
-//	std::cout << "subdNeighborhood = " << subdNeighborhood << std::endl;
-// 	std::cout << "faceCanBeCoarsened ? " << (subd && !subdNeighborhood && subdOnce) << std::endl;
 
 	return subd && !subdNeighborhood && subdOnce;
 }
@@ -869,56 +897,46 @@ bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
 	return subd && subdOnce ;
 }
 
-bool ImplicitHierarchicalMap3:: volumeIsSubdividedOnce(Dart d)
+bool ImplicitHierarchicalMap3::volumeIsSubdividedOnce(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+	unsigned int vLevel = volumeLevel(d);
+	if(vLevel < m_curLevel)
+		return false;
 
-	return true;
+//	//si le volume est subdivise au niveau i+1, il faut tester si chacun des volumes du niveau i+1 est subdivise a son tour ou non
+	bool subd = false ;
+	bool subdOnce = true ;
+//
+//	//mais pas le volume lui-meme
+//	bool subd = false;
+//	++m_curLevel;
+//	if(facesAreSubdivided && m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
+//		subd = true;
+//	--m_curLevel;
+//	return subd;
+
+	return subd;
 }
 
 bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-	bool found = false;
+	bool found = true;
 
 	unsigned int vLevel = volumeLevel(d);// + 1;
 
 	Dart old = volumeOldestDart(d);
 
-	DartMarkerStore mf(*this);		// Lock a face marker to save one dart per face
+	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old);
 
-	//Store faces that are traversed and start with the face of d
-	std::vector<Dart> visitedFaces;
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(old);
-
-	mf.markOrbit<FACE>(old) ;
-
-	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
+	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
 	{
-		Dart e = visitedFaces[i] ;
-		do
-		{
-			// add all face neighbours to the table
-
-			if(phi3(e) != e)
-			{
-				Dart old = volumeOldestDart(phi3(e));
-				//if((abs(volumeLevel(old) - vLevel) > 1))
-				if(volumeLevel(old) < vLevel)
-					found = true;
-			}
-
-			Dart ee = phi2(e) ;
-			if(!mf.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mf.markOrbit<FACE>(ee) ;
-			}
-
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
+		Dart oldit = volumeOldestDart(dit);
+		//if((abs(volumeLevel(old) - vLevel) > 1))
+		if((volumeLevel(oldit) - vLevel) > 1)
+			found = false;
 	}
 
 	return found;

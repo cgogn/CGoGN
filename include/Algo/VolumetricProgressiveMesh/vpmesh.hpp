@@ -140,7 +140,7 @@ void VolumetricProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices
 
 		m_selector->updateAfterOperation(op) ;	// update selector
 
-		if(nbVertices <= nbWantedVertices)
+		if(nbVertices <= 3) //<= nbWantedVertices)
 			finished = true ;
 	}
 

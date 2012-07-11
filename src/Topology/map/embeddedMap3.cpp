@@ -165,7 +165,6 @@ bool EmbeddedMap3::edgeCanCollapse(Dart d)
 //
 //	return true;
 
-
 //	if(Map2::isBoundaryVertex(d) || Map2::isBoundaryVertex(phi1(d)))
 //		return false ;
 

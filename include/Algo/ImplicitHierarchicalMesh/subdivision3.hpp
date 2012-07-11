@@ -59,12 +59,11 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	map.setEdgeId(map.phi1(d), eId, EDGE) ; //mise a jour de l'id d'arrete sur chaque moitie d'arete
 	map.setEdgeId(map.phi1(dd), eId, EDGE) ;
 
-
 	map.setFaceId(EDGE, d) ; //mise a jour de l'id de face sur chaque brin de chaque moitie d'arete
 	map.setFaceId(EDGE, dd) ;
 
 	position[map.phi1(d)] = (p1 + p2) * typename PFP::REAL(0.5) ;
-
+	//map.computeEdgeVertexFunctor(map.phi1(d));
 
 	map.setCurrentLevel(cur) ;
 }
@@ -147,6 +146,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 		map.setEdgeId(ne2, id, EDGE) ;
 
 		position[map.phi1(ne)] = p ;
+		//map.computeFaceVertexFunctor(map.phi1(ne));
 
 		dd = map.phi1(map.phi1(map.phi1(map.phi1(ne)))) ;
 		while(dd != ne)
@@ -188,6 +188,14 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	unsigned int cur = map.getCurrentLevel();
 	map.setCurrentLevel(vLevel);
 
+	//one level of subdivision in the neighbordhood
+	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
+	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
+	{
+		Dart oldit = map.volumeOldestDart(dit);
+		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
+			Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
+	}
 
 	/*
 	 * au niveau du volume courant i
@@ -379,6 +387,122 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 	return subdividedfaces.begin()->first;
 }
+
+
+/************************************************************************************************
+ * 									Simplification												*
+ ************************************************************************************************/
+
+
+template <typename PFP>
+void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+{
+	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
+
+	std::cout << "coarsenEdge" << std::endl;
+
+	unsigned int cur = map.getCurrentLevel() ;
+	map.setCurrentLevel(cur + 1) ;
+	map.uncutEdge(d) ;
+	map.setCurrentLevel(cur) ;
+}
+
+template <typename PFP>
+void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
+{
+	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
+
+	unsigned int cur = map.getCurrentLevel() ;
+
+	unsigned int degree = 0 ;
+	Dart fit = d ;
+	do
+	{
+		++degree ;
+		fit = map.phi1(fit) ;
+	} while(fit != d) ;
+
+//	Dart d3 = map.phi3(d);
+
+	if(degree == 3)
+	{
+
+	}
+	else
+	{
+		map.setCurrentLevel(cur + 1) ;
+		map.deleteVertexSubdividedFace(d);
+		map.setCurrentLevel(cur) ;
+
+//		Dart centralV = map.phi1(map.phi1(d));
+//		map.Map2::deleteVertex(centralV);
+//
+//		//demarking faces from border to delete .... fucking shit
+//		Dart it = d ;
+//		do
+//		{
+//			if (map.boundaryUnmark(it))
+//				return true ;
+//			it = map.phi2(map.phi_1(it)) ;
+//		} while (it != d) ;
+//
+//		map.Map2::deleteVertex(map.phi1(map.phi1(d3)));
+
+	}
+
+	fit = d ;
+	do
+	{
+		if(map.edgeCanBeCoarsened(fit))
+			Algo::IHM::coarsenEdge<PFP>(map, fit, position) ;
+		fit = map.phi1(fit) ;
+	} while(fit != d) ;
+}
+
+template <typename PFP>
+void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
+{
+	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
+	assert(map.volumeIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
+
+	unsigned int cur = map.getCurrentLevel() ;
+
+	/*
+	 * Deconnecter toutes les faces interieurs
+	 */
+	map.setCurrentLevel(cur + 1) ;
+	Dart nf = map.phi_1(map.phi2(map.phi1(d)));
+	map.deleteVertex(nf);
+	map.setCurrentLevel(cur) ;
+
+	/*
+	 * simplifier les faces
+	 */
+	Traversor3WF<typename PFP::MAP> trav3WF(map, d);
+	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
+	{
+		if(map.faceCanBeCoarsened(dit))
+			Algo::IHM::coarsenFace<PFP>(map, dit, position, Algo::IHM::S_QUAD);
+	}
+}
+
+
+
+
+/* **************************************************************************************
+ *    							USE WITH CAUTION										*
+ ****************************************************************************************/
+
+
+
+
+
+
+
+
+
 
 template <typename PFP>
 Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
@@ -1541,174 +1665,7 @@ Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typenam
 	return subdividedfacesQ.begin()->first;
 }
 
-/************************************************************************************************
- * 									Simplification												*
- ************************************************************************************************/
 
-
-template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
-{
-	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
-
-	unsigned int cur = map.getCurrentLevel() ;
-	map.setCurrentLevel(cur + 1) ;
-	map.uncutEdge(d) ;
-	map.setCurrentLevel(cur) ;
-}
-
-template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType)
-{
-	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-	assert(map.faceIsSubdividedOnce(d) || !"Trying to coarsen a non-subdivided face or a more than once subdivided face") ;
-
-	unsigned int cur = map.getCurrentLevel() ;
-
-	unsigned int degree = 0 ;
-	Dart fit = d ;
-	do
-	{
-		++degree ;
-		fit = map.phi1(fit) ;
-	} while(fit != d) ;
-
-	// boucler sur d avec phi2(phi_1()) et faire des unsewvolumes
-	// delete le vertex sur d
-	// si le volume d'a cote n'est pas subdiv
-	// alors delete le vertex aussi
-	// recouture du tout
-
-	Dart d3 = map.phi3(d);
-
-	map.setCurrentLevel(cur + 1) ;
-
-	Dart centralV = map.phi1(map.phi1(d));
-	//Tester si il y a un volume voisin
-	if(d != d3)
-	{
-		//on decoud
-		Dart it = centralV;
-
-		do
-		{
-			map.unsewVolumes(it);
-			it = map.phi2(map.phi_1(it));
-		}while(it != centralV);
-
-		//Si ce volume voisin n'est pas subdivise
-		if(!map.volumeIsSubdivided(d3))
-			//alors on supprime le sommet en face
-			map.Map2::deleteVertex(map.phi1(map.phi1(d3)));
-
-	}
-
-	//On supprime le sommet sur la face du volume courant
-	map.Map2::deleteVertex(centralV);
-
-	if(d != d3)
-		map.sewVolumes(d,map.phi1(d3));
-
-	map.setCurrentLevel(cur) ;
-}
-
-template <typename PFP>
-void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position)
-{
-	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
-	//assert(map.volumeIsSubdivdedOnce(d) || !"Trying to coarsen a non-subdivided volume or a more than once subdivided volume") ;
-
-	unsigned int cur = map.getCurrentLevel() ;
-
-	std::cout << "cur = " << cur << std::endl;
-
-	/*
-	 * au niveau du volume courant i
-	 * stockage d'un brin de chaque face de celui-ci
-	 */
-
-	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-
-	//Store faces that are traversed and start with the face of d
-	std::vector<Dart> visitedFaces;
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(d);
-
-	mf.markOrbit<FACE>(d) ;
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-	{
-		Dart e = visitedFaces[i] ;
-		do
-		{
-			// add all face neighbours to the table
-			Dart ee = map.phi2(e) ;
-			if(!mf.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mf.markOrbit<FACE>(ee) ;
-			}
-
-			e = map.phi1(e) ;
-		} while(e != visitedFaces[i]) ;
-	}
-
-	/*
-	 * Deconnecter toutes les faces interieurs
-	 */
-	map.setCurrentLevel(cur + 1) ;
-	Dart nf = map.phi_1(map.phi2(map.phi1(d)));
-	map.deleteVertex(nf);
-	map.setCurrentLevel(cur) ;
-
-//	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-//	{
-//		Dart fit = *face;
-//
-//		do
-//		{
-//			map.setCurrentLevel(cur + 1) ;
-//
-//			Dart nf = map.phi2(map.phi1(fit));
-//			if(map.getDartLevel(map.faceOldestDart(nf)) != cur)
-//				map.mergeVolumes(nf);
-//
-//			map.setCurrentLevel(cur) ;
-//			fit = map.phi1(fit);
-//		}while(fit != *face);
-//	}
-
-	/*
-	 * simplifier les faces
-	 */
-	//std::vector<Dart>::iterator face = visitedFaces.begin();
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-	{
-		Dart fit = *face;
-		if(map.faceCanBeCoarsened(fit))
-		{
-			Algo::IHM::coarsenFace<PFP>(map, fit, position, Algo::IHM::S_QUAD);
-		}
-	}
-
-	/*
-	 * simplifier les aretes
-	 */
-	for(std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-	{
-		Dart fit = *face ;
-		do
-		{
-			if(map.edgeCanBeCoarsened(fit))
-				Algo::IHM::coarsenEdge<PFP>(map, fit, position) ;
-
-			fit = map.phi1(fit) ;
-		} while(fit != *face) ;
-	}
-
-	map.setCurrentLevel(cur) ;
-}
 
 /***********************************************************************************
  *												Raffinement
