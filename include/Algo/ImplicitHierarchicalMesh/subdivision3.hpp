@@ -290,6 +290,8 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	std::vector<Dart> newEdges;	//save darts from inner edges
 	newEdges.reserve(50);
 
+	Dart centralDart = NIL;
+
 
 	//Second step : deconnect each corner, close each hole, subdivide each new face into 3
 	for (std::vector<Dart>::iterator edge = oldEdges.begin(); edge != oldEdges.end(); ++edge)
@@ -320,6 +322,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 		map.cutEdge(ne);
 		position[map.phi1(ne)] = volCenter; //plonger a la fin de la boucle ????
+		centralDart = map.phi1(ne);
 		newEdges.push_back(ne);
 		newEdges.push_back(map.phi1(ne));
 
@@ -385,7 +388,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 	map.setCurrentLevel(cur) ;
 
-	return subdividedfaces.begin()->first;
+	return centralDart; //subdividedfaces.begin()->first;
 }
 
 
