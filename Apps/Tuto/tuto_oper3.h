@@ -37,12 +37,13 @@
 #endif
 
 #include "Algo/Render/GL2/topo3Render.h"
-
+#include "Algo/Geometry/boundingbox.h"
 
 #include "ui_tuto_oper3.h"
 #include "Utils/Qt/qtui.h"
 #include "Utils/Qt/qtSimple.h"
 #include "Utils/cgognStream.h"
+#include "Utils/frameManipulator.h"
 
 
 using namespace CGoGN ;
@@ -69,11 +70,13 @@ class MyQT: public Utils::QT::SimpleQT
 {
 	Q_OBJECT
 public:
-	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f) {}
+	MyQT():nb(myMap),m_render_topo(NULL),m_selected(NIL),m_selected2(NIL),dm(myMap),m_shift(0.01f),m_ex1(0.9f),m_ex2(0.9f),m_ex3(0.9f), clip_volume(true) , hide_clipping(false) {}
 
 	void cb_redraw();
 	void cb_initGL();
 	void cb_mousePress(int button, int x, int y);
+	void cb_mouseRelease(int button, int x, int y);
+	void cb_mouseMove(int button, int x, int y);
 	void cb_keyPress(int code);
 	void cb_Open();
 	void cb_Save();
@@ -88,6 +91,8 @@ protected:
 
 	SelectorDartNoBoundary<PFP::MAP> nb;
 
+	Geom::BoundingBox<PFP::VEC3> bb;
+
 	// render (for the topo)
 	Algo::Render::GL2::Topo3Render* m_render_topo;
 	Dart m_selected;
@@ -97,6 +102,17 @@ protected:
 	float m_shift;
 
 	float m_ex1, m_ex2, m_ex3;
+
+	// for clipping plane manipulation
+    bool clip_volume;
+    bool hide_clipping;
+	Utils::Pickable* m_PlanePick;
+	Utils::FrameManipulator* m_frame;
+	unsigned int m_pickedAxis;
+	int m_begX;
+	int m_begY;
+	int clip_id1;
+	int clip_id2;
 
 	// just for more compact writing
 	inline Dart PHI1(Dart d)	{return myMap.phi1(d);}
@@ -116,6 +132,9 @@ public slots:
 	void operation(int x);
 	void svg();
 	void width(int w);
+
+	void clipping_onoff(bool x);
+	void hide_onoff(bool x);
 };
 
 #endif

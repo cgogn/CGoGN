@@ -153,7 +153,6 @@ float EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& no
 template<typename PFP>
 //void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
 void EarTriangulation<PFP>::trianguleFace(Dart d)
-
 {
 	// compute normal to polygon
 	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(m_map, d, m_position);

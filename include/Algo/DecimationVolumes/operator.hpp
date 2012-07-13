@@ -1,10 +1,34 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
 namespace CGoGN
 {
 
 namespace Algo
 {
 
-namespace DecimationVolumique
+namespace DecimationVolumes
 {
 
 /************************************************************************************
@@ -16,8 +40,10 @@ unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, VertexAttribute<typename
 	unsigned int nbCell = 0;
 
 	//calcul du nombre de cellule supprime
-	position[this->m_edge] = this->m_approximator->getApproximation();
-	nbCell = m.collapseEdge(this->m_edge,true,true);
+	//position[this->m_edge] = this->m_approximator->getApproximation();
+	m.collapseEdge(this->m_edge);
+
+	++nbCell;
 
 	return nbCell;
 }
@@ -59,7 +85,7 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typen
 				Dart b = m.phi1(m.phi3(m.phi2(m.phi_1(e))));
 
 				//tetrahedre du haut
-				typename PFP::VEC3 p1 = this->m_approximator->getApproximation();
+				typename PFP::VEC3 p1 = position[a];//this->m_approximator->getApproximation();
 				typename PFP::VEC3 p2, p3, p4;
 
 				typename PFP::VEC3::DATA_TYPE v1;
@@ -103,6 +129,8 @@ bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typen
 }
 
 
-} //end namespace DecimationVolumique
+} //end namespace DecimationVolumes
+
 } //end namespace Algo
+
 } //end namespace CGoGN

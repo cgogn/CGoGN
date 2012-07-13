@@ -26,6 +26,7 @@
 #define __QEM__
 
 #include "Utils/os_spec.h" // allow compilation under windows
+#include <cmath>
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
@@ -155,7 +156,7 @@ private:
 
 	bool optimize(VEC4& v) const
 	{
-		if (isnan(A(0,0)))
+		if (std::isnan(A(0,0)))
 			return false ;
 
 		MATRIX44 A2(A) ;

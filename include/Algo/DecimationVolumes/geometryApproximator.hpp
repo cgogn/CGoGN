@@ -22,115 +22,68 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
-
-#include "Topology/map/map3.h"
+#include "Algo/DecimationVolumes/selector.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Algo
 {
-public:
-	typedef Map3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+namespace DecimationVolumes
+{
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+/************************************************************************************
+ *							      Centroid		                                    *
+ ************************************************************************************/
+template <typename PFP>
+bool Approximator_Centroid<PFP>::init()
+{
+	return true;
+}
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+template <typename PFP>
+void Approximator_Centroid<PFP>::approximate(Operator<PFP> *op)
+{
+	Dart d = op->getEdge();
+	VEC3 a = this->m_attrV[d];
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+	//CGoGNout << "d=" << d << " a=" << a << CGoGNendl;
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
+	// get some darts
+	Dart dd = this->m_map.phi2(d) ;
 
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
+	switch(op->getType())
+	{
+		case O_CVolume : {
+			a = Algo::Geometry::volumeCentroid<PFP>(this->m_map, d, this->m_attrV);
+			break;
+		}
+		case O_CFace : {
+			a = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, this->m_attrV);
+			break;
+		}
+		case O_CEdge : {
+			// get the contracted edge vertices positions
+			VEC3 v2 = this->m_attrV[dd] ;
 
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
+			// Compute the approximated position
+			a =  (a + v2) / REAL(2) ;
+			break;
+		}
+		default : {
+			CGoGNerr << "Approximate : reducer does not exist" << CGoGNendl;
+			break;
+		}
+	}
 
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
+	this->m_app = a;
+}
 
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
 
-	/**
-	 * The attributes attached to the face of dart d are kept on the resulting face
-	 */
-	virtual bool mergeFaces(Dart d);
+} //end namespace DecimationVolumes
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+} //end namespace Algo
 
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
-
-#endif
+} //end namespace CGoGN

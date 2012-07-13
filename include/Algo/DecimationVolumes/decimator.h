@@ -22,115 +22,39 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __DECIMATOR_VOLUMES_H__
+#define __DECIMATOR_VOLUMES_H__
 
-#include "Topology/map/map3.h"
+#include "Algo/DecimationVolumes/edgeSelector.h"
+#include "Algo/DecimationVolumes/geometryApproximator.h"
+#include "Algo/DecimationVolumes/operator.h"
+
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Algo
 {
-public:
-	typedef Map3 TOPO_MAP;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+namespace DecimationVolumes
+{
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+template <typename PFP>
+void decimate(
+	typename PFP::MAP& map,
+	SelectorType s,
+	ApproximatorType a,
+	VertexAttribute<typename PFP::VEC3>& position,
+	unsigned int percentWantedVertices,
+	const FunctorSelect& selected = allDarts
+);
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+} //namespace DecimationVolumes
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+} //namespace Algo
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
+} //namespace CGoGN
 
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
-
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
-
-	/**
-	 * The attributes attached to the face of dart d are kept on the resulting face
-	 */
-	virtual bool mergeFaces(Dart d);
-
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
-} ;
-
-} // namespace CGoGN
+#include "Algo/DecimationVolumes/decimator.hpp"
 
 #endif

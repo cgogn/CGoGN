@@ -22,115 +22,80 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __EMBEDDED_MAP3_H__
-#define __EMBEDDED_MAP3_H__
+#ifndef __MAP2MR_PM__
+#define __MAP2MR_PM__
 
-#include "Topology/map/map3.h"
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
+
+
+#include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/edgeSelector.h"
+#include "Algo/Decimation/geometryApproximator.h"
+#include "Algo/Decimation/geometryPredictor.h"
+#include "Algo/Decimation/lightfieldApproximator.h"
+
 
 namespace CGoGN
 {
 
-/*! Class of 3-dimensional maps with managed embeddings
- */
-class EmbeddedMap3 : public Map3
+namespace Algo
+{
+
+namespace Multiresolution
+{
+
+template <typename PFP>
+class Map2MR_PM
 {
 public:
-	typedef Map3 TOPO_MAP;
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart splitVertex(std::vector<Dart>& vd);
+private:
+	MAP& m_map ;
+	VertexAttribute<VEC3>& m_position;
+	bool shareVertexEmbeddings ;
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteVertex(Dart d);
+	//SelectorUnmarked dartSelect ;
 
-	//! No attribute is attached to the new vertex
-	/*! The attributes attached to the old edge are duplicated on both resulting edges
-	 *  @param d a dart
-	 */
-	virtual Dart cutEdge(Dart d);
+	bool m_initOk ;
 
-	//! The attributes attached to the edge of d are kept on the resulting edge
-	/*!  @param d a dart of the edge to cut
-	 */
-	virtual bool uncutEdge(Dart d);
+	DartMarker& inactiveMarker;
 
-	//!
-	/*!
-	 */
-	virtual Dart deleteEdge(Dart d);
+	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
+	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
+	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
 
-	//!
-	/*!
-	 */
-	bool edgeCanCollapse(Dart d);
+	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
 
-	//!
-	/*!
-	 */
-	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
+public:
+	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
+			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
 
-	//!
-	/*!
-	 */
-//	virtual bool collapseDegeneratedFace(Dart d);
+	~Map2MR_PM();
 
-	//!
-	/*!
-	 */
-	virtual void splitFace(Dart d, Dart e);
+	//create a progressive mesh (a coarser level)
+	void createPM(unsigned int percentWantedVertices);
 
-	/**
-	 * The attributes attached to the face of dart d are kept on the resulting face
-	 */
-	virtual bool mergeFaces(Dart d);
+	//coarsen the mesh -> analysis
+	void coarsen() ;
 
-	//!
-	/*!
-	 *
-	 */
-	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+	//refine the mesh -> synthesis
+	void refine() ;
 
-	//!
-	/*!
-	 */
-	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-
-	//!
-	/*!
-	 */
-	virtual void unsewVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual bool mergeVolumes(Dart d);
-
-	//!
-	/*!
-	 */
-	virtual void splitVolume(std::vector<Dart>& vd);
-
-	//!
-	/*!
-	 */
-	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
-
-	//!
-	/*! No attribute is attached to the new volume
-	 */
-	virtual unsigned int closeHole(Dart d, bool forboundary = true);
-
-	//!
-	/*!
-	 */
-	virtual bool check();
+	bool initOk() { return m_initOk; }
 } ;
 
+} // namespace Multiresolution
+
+} // namespace Algo
+
 } // namespace CGoGN
+
+
+#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
 
 #endif

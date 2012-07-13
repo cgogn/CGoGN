@@ -215,8 +215,17 @@ bool GMap3::uncutEdge(Dart d)
 	return false;
 }
 
+bool GMap3::deleteEdgePreCond(Dart d)
+{
+	unsigned int nb1 = vertexDegree(d);
+	unsigned int nb2 = vertexDegree(phi1(d));
+	return (nb1!=2) && (nb2!=2);
+}
+
 Dart GMap3::deleteEdge(Dart d)
 {
+	assert(deleteEdgePreCond(d));
+
 	if(isBoundaryEdge(d))
 		return NIL ;
 
@@ -256,9 +265,17 @@ Dart GMap3::deleteEdge(Dart d)
 	return res ;
 }
 
+bool GMap3::splitFacePreCond(Dart d, Dart e)
+{
+	return (d != e && GMap2::sameFace(d, e)) ;
+}
+
 void GMap3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && GMap2::sameOrientedFace(d, e)) ;
+	assert(splitFacePreCond(d, e));
+
+	if(!sameOrientedFace(d, e))
+		e = beta1(e) ;
 
 	Dart dd = beta1(beta3(d));
 	Dart ee = beta1(beta3(e));
@@ -353,8 +370,8 @@ void GMap3::unsewVolumes(Dart d)
 	unsigned int nbE = faceDegree(d) ;
 	Dart d3 = phi3(d);
 
-	Dart b1 = newBoundaryFace(nbE) ;
-	Dart b2 = newBoundaryFace(nbE) ;
+	Dart b1 = newBoundaryCycle(nbE) ;
+	Dart b2 = newBoundaryCycle(nbE) ;
 
 	Dart fit1 = d ;
 	Dart fit2 = d3 ;
@@ -831,6 +848,18 @@ bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	return found;
 }
 
+bool GMap3::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart it = d;
+	do
+	{
+		if (GMap2::foreach_dart_of_oriented_edge(it, f, thread))
+			return true;
+		it = alpha2(it);
+	} while (it != d);
+	return false;
+}
+
 bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d;
@@ -906,7 +935,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 	{
 		Dart f = visitedFaces[i] ;
 		unsigned int degree = faceDegree(f) ;
-		Dart b = newBoundaryFace(degree) ;
+		Dart b = newBoundaryCycle(degree) ;
 		++count ;
 
 		Dart bit = b ;
