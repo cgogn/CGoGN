@@ -258,13 +258,8 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_edge(Dart d, FunctorType& 
 {
 	Dart dNext = d;
 	do {
-
-		if (f(dNext))
+		if (foreach_dart_of_edge2(dNext, f, thread))
 			return true;
-
-		if (f(phi2(dNext)))
-			return true;
-
 		dNext = alpha2(dNext);
 	} while (dNext != d);
 	return false;
@@ -287,7 +282,48 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_face(Dart d, FunctorType& 
 	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(phi3(d), f, thread);
 }
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+//inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+//{
+//	DartMarkerStore mark(*this, thread);	// Lock a marker
+//	bool found = false;				// Last functor return value
+//
+//	std::vector<Dart> visitedFaces;	// Faces that are traversed
+//	visitedFaces.reserve(1024) ;
+//	visitedFaces.push_back(d);		// Start with the face of d
+//
+//	// For every face added to the list
+//	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
+//	{
+//		if (!mark.isMarked(visitedFaces[i]))	// Face has not been visited yet
+//		{
+//			// Apply functor to the darts of the face
+//			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
+//
+//			// If functor returns false then mark visited darts (current face)
+//			// and add non visited adjacent faces to the list of face
+//			if (!found)
+//			{
+//				Dart e = visitedFaces[i] ;
+//				do
+//				{
+//					mark.mark(e);				// Mark
+//					Dart adj = phi2(e);			// Get adjacent face
+//					if (!mark.isMarked(adj))
+//						visitedFaces.push_back(adj);	// Add it
+//					e = phi1(e);
+//				} while(e != visitedFaces[i]);
+//			}
+//		}
+//	}
+//	return found;
+//}
+//
+//inline bool ImplicitHierarchicalMap3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+//{
+//	return foreach_dart_of_oriented_volume(d, f) ;
+//}
+
+inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
@@ -302,7 +338,7 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, Fu
 		if (!mark.isMarked(visitedFaces[i]))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
+			found = foreach_dart_of_face(visitedFaces[i], f);
 
 			// If functor returns false then mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
@@ -321,50 +357,43 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_oriented_volume(Dart d, Fu
 		}
 	}
 	return found;
-}
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_volume(d, f) ;
-}
 
-inline bool ImplicitHierarchicalMap3::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
-{
-	//return foreach_dart_of_oriented_volume(d, f) ;
-	DartMarkerStore mv(*this,thread);	// Lock a marker
-	bool found = false;					// Last functor return value
-
-	std::vector<Dart> darts;	// Darts that are traversed
-	darts.reserve(1024);
-	darts.push_back(d);			// Start with the dart d
-	mv.mark(d);
-
-	for(unsigned int i = 0; !found && i < darts.size(); ++i)
-	{
-		// add all successors if they are not marked yet
-		Dart d2 = phi1(darts[i]); // turn in face
-		Dart d3 = phi2(darts[i]); // change face
-		Dart d4 = phi3(darts[i]); // change volume
-
-		if (!mv.isMarked(d2))
-		{
-			darts.push_back(d2);
-			mv.mark(d2);
-		}
-		if (!mv.isMarked(d3))
-		{
-			darts.push_back(d2);
-			mv.mark(d2);
-		}
-		if (!mv.isMarked(d4))
-		{
-			darts.push_back(d4);
-			mv.mark(d4);
-		}
-
-		found = f(darts[i]);
-	}
-	return found;
+//	//return foreach_dart_of_oriented_volume(d, f) ;
+//	DartMarkerStore mv(*this,thread);	// Lock a marker
+//	bool found = false;					// Last functor return value
+//
+//	std::vector<Dart> darts;	// Darts that are traversed
+//	darts.reserve(1024);
+//	darts.push_back(d);			// Start with the dart d
+//	mv.mark(d);
+//
+//	for(unsigned int i = 0; !found && i < darts.size(); ++i)
+//	{
+//		// add all successors if they are not marked yet
+//		Dart d2 = phi1(darts[i]); // turn in face
+//		Dart d3 = phi2(darts[i]); // change face
+//		Dart d4 = phi3(darts[i]); // change volume
+//
+//		if (!mv.isMarked(d2))
+//		{
+//			darts.push_back(d2);
+//			mv.mark(d2);
+//		}
+//		if (!mv.isMarked(d3))
+//		{
+//			darts.push_back(d2);
+//			mv.mark(d2);
+//		}
+//		if (!mv.isMarked(d4))
+//		{
+//			darts.push_back(d4);
+//			mv.mark(d4);
+//		}
+//
+//		found = f(darts[i]);
+//	}
+//	return found;
 }
 
 

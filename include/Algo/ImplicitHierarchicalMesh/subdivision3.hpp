@@ -189,13 +189,13 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	map.setCurrentLevel(vLevel);
 
 	//one level of subdivision in the neighbordhood
-	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
-	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
-	{
-		Dart oldit = map.volumeOldestDart(dit);
-		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
-			Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
-	}
+//	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
+//	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
+//	{
+//		Dart oldit = map.volumeOldestDart(dit);
+//		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
+//			Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
+//	}
 
 	/*
 	 * au niveau du volume courant i
@@ -375,7 +375,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 	//LA copie de L'id est a gerer avec le sewVolumes normalement !!!!!!
 	//id pour les aretes interieurs : (i.e. 6 pour un hexa)
-	DartMarker mne(map);
+	DartMarkerStore mne(map);
 	for(unsigned int i = 0; i < newEdges.size(); ++i)
 	{
 		if(!mne.isMarked(newEdges[i]))

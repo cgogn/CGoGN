@@ -424,7 +424,7 @@ void ImplicitHierarchicalMap3::deleteVertexSubdividedFace(Dart d)
 
 void ImplicitHierarchicalMap3::initEdgeId()
 {
-	DartMarker edgeMark(*this) ;
+	DartMarkerStore edgeMark(*this) ;
 	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
 	{
 		if(!edgeMark.isMarked(d))
@@ -448,7 +448,7 @@ void ImplicitHierarchicalMap3::initEdgeId()
 
 void ImplicitHierarchicalMap3::initFaceId()
 {
-	DartMarker faceMark(*this) ;
+	DartMarkerStore faceMark(*this) ;
 	for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
 	{
 		if(!faceMark.isMarked(d))
@@ -929,7 +929,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
 
 	Dart old = volumeOldestDart(d);
 
-	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old);
+	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old, true);
 
 	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
 	{
