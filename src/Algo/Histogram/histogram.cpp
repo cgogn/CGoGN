@@ -128,7 +128,7 @@ void Histogram::populateQuantiles(unsigned int nbquantiles)
 	double lc = 1.0f;
 
 	if (m_nbclasses != 0) //for histo superposition
-		lc = double(m_dataIdx.back().first - m_dataIdx.front().first )/double(m_nbclasses);
+		lc = double(getMax() - getMin() )/double(m_nbclasses);
 
 	for (unsigned int i = 0; i < nbquantiles; ++i)
 	{
