@@ -113,7 +113,9 @@ float scale_to_0_1_around_one_half(float x, float min, float max);
 
 } // namespace CGoGN
 
+#include "Utils/colorMaps.hpp"
+
 #endif
 
-#include "Utils/colorMaps.hpp"
+
 
