@@ -62,7 +62,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP> traFace(map, FACE,good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{
@@ -115,7 +115,7 @@ void ColorPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNorma
 	std::vector<VEC3> bufferColors;
 	bufferColors.reserve(16384);
 
-	TraversorCell<typename PFP::MAP> traFace(map, FACE,good);
+	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
 
 	for (Dart d=traFace.begin(); d!=traFace.end(); d=traFace.next())
 	{

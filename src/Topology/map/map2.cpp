@@ -206,6 +206,7 @@ void Map2::splitVertex(Dart d, Dart e)
 
 Dart Map2::deleteVertex(Dart d)
 {
+	//TODO utile ?
 	if(isBoundaryVertex(d))
 		return NIL ;
 
@@ -219,7 +220,7 @@ Dart Map2::deleteVertex(Dart d)
 		Dart f = phi_1(phi2(vit)) ;
 		phi1sew(vit, f) ;
 
-		vit = alpha1(vit) ;
+		vit = phi2(phi_1(vit)) ;
 	} while(vit != d) ;
 	Map1::deleteCycle(d) ;
 	return res ;

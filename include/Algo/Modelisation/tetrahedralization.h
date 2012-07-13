@@ -50,6 +50,9 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
 template <typename PFP>
 void hexahedronsToTetrahedrons(typename PFP::MAP& map);
 
+template <typename PFP>
+void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
 /************************************************************************************************
  * 									Collapse / Split Operators
  ************************************************************************************************/
@@ -76,6 +79,8 @@ bool isTetrahedron(typename PFP::MAP& the_map, Dart d);
  */
 template <typename PFP>
 bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected = allDarts);
+
+
 
 /************************************************************************************************
  *																		Swap Functions 																	   *

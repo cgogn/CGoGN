@@ -61,6 +61,9 @@ protected:
 	//
 	Dart m_edge;
 
+	Dart d2;
+	Dart dd2;
+
 	/**
 	 * need a pointer to the current approximator if the current selector needs
 	 * the future result of a collapse to estimate its cost
@@ -74,14 +77,24 @@ public:
 
 	Operator() {}
 
-	~Operator() {};
+	~Operator() {}
 
 	Dart getEdge() {return m_edge;}
 	void setEdge(Dart d) { m_edge = d; }
 	virtual OperatorType getType() = 0;
 
-	virtual unsigned int perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
-	virtual bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
+
+	virtual unsigned int collapse(MAP& m, VertexAttribute<typename PFP::VEC3>& position) = 0;
+	virtual bool canCollapse(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position) = 0;
+
+	virtual void split(MAP&  m, VertexAttribute<typename PFP::VEC3>& position) = 0;
+
+
+	void setFirstIncidentEdge(Dart d) { d2 = d; }
+	void setSecondIncidentEdge(Dart d) { dd2 = d; }
+
+	Dart getFirstIncidentEdge() { return d2; }
+	Dart getSecondIncidentEdge() { return dd2; }
 };
 
 template <typename PFP>
@@ -100,7 +113,7 @@ public:
 		Operator<PFP>(d)//, approx)
 	{}
 
-	~CollapseOperator() {};
+	~CollapseOperator() {}
 
 };
 
@@ -113,20 +126,53 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL;
 
-protected:
-
-
 public:
 	CollapseEdgeOperator(Dart d) ://,  ApproximatorGen<PFP>* approx) :
 		CollapseOperator<PFP>(d)//, approx)
-	{}
+	{
+
+	}
 
 	~CollapseEdgeOperator()
 	{ }
 
 	OperatorType getType() { return O_CEdge; }
-	unsigned int perform(MAP &m, VertexAttribute<typename PFP::VEC3>& position);
-	bool canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
+
+	//collapse
+	unsigned int collapse(MAP& m, VertexAttribute<typename PFP::VEC3>& position);
+	bool canCollapse(MAP& m ,Dart d, VertexAttribute<typename PFP::VEC3>& position);
+
+	//split
+	void split(MAP& m, VertexAttribute<typename PFP::VEC3>& position);
+
+};
+
+template <typename PFP>
+class OperatorList
+{
+public:
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
+
+protected:
+	MAP& m_map;
+	//list of operations made on the mesh
+	typename std::vector<Operator<PFP>* > m_ops;
+	//iterator to save the position in the operations list
+	typename std::vector<Operator<PFP>* >::iterator m_cur;
+
+public:
+	OperatorList(MAP& m) : m_map(m) {}
+
+	~OperatorList();
+
+	void coarsen(VertexAttribute<typename PFP::VEC3>& position);
+	void refine(VertexAttribute<typename PFP::VEC3>& position);
+
+    void initIndex() { m_cur = m_ops.end(); }
+    unsigned int size() { return m_ops.size(); }
+
+    void add(Operator<PFP> *o) { m_ops.push_back(o); }
 };
 
 

@@ -62,10 +62,10 @@ class LerpVertexSubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpVertexSubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpVertexSubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -87,10 +87,10 @@ class LerpEdgeSubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpEdgeSubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpEdgeSubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -115,10 +115,10 @@ class LerpFaceSubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpFaceSubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpFaceSubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -145,10 +145,10 @@ class LerpVolumeSubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LerpVolumeSubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpVolumeSubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -180,10 +180,10 @@ class LoopEvenSubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopEvenSubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopEvenSubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -225,10 +225,10 @@ class LoopOddSubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	LoopOddSubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LoopOddSubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -268,10 +268,10 @@ class SHW04SubdivisionScheme : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	SHW04SubdivisionScheme(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	SHW04SubdivisionScheme(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -325,10 +325,10 @@ class MJ96VertexSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96VertexSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96VertexSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -430,10 +430,10 @@ class MJ96EdgeSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96EdgeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96EdgeSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -520,10 +520,10 @@ class MJ96FaceSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96FaceSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96FaceSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -580,10 +580,10 @@ class MJ96VolumeSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MJ96VolumeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96VolumeSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -617,10 +617,10 @@ class BSXW02AveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	BSXW02AveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02AveragingSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -688,10 +688,10 @@ class BSXW02EdgeAveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	BSXW02EdgeAveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02EdgeAveragingSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -731,10 +731,10 @@ class BSXW02FaceAveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	BSXW02FaceAveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02FaceAveragingSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -778,10 +778,10 @@ class BSXW02VolumeAveragingSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	BSXW02VolumeAveragingSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	BSXW02VolumeAveragingSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -819,10 +819,10 @@ class  MCQ04VertexSubdivision: public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MCQ04VertexSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MCQ04VertexSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -844,10 +844,10 @@ class MCQ04EdgeSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MCQ04EdgeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MCQ04EdgeSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -922,10 +922,10 @@ class MCQ04FaceSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MCQ04FaceSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MCQ04FaceSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()
@@ -1033,10 +1033,10 @@ class MCQ04VolumeSubdivision : public MRScheme
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	MCQ04VolumeSubdivision(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MCQ04VolumeSubdivision(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
 
 	void operator() ()

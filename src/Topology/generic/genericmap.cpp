@@ -205,7 +205,7 @@ void GenericMap::addLevel()
 
 		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 		{
-			++(*m_mrLevels)[i]; // increase the insertion level of the darts
+			//++(*m_mrLevels)[i]; // increase the insertion level of the darts
 			unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
 			(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 		}

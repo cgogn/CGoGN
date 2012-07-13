@@ -15,9 +15,7 @@ namespace DecimationVolumes
 
 enum SelectorType
 {
-	S_MapOrder,
-	S_Random,
-	S_EdgeLength
+	S_QEM
 } ;
 
 template <typename PFP> class ApproximatorGen ;
@@ -85,23 +83,22 @@ public:
 	/**
 	 *
 	 */
-	virtual bool nextOperator(Operator<PFP>** op) = 0 ;
+	virtual Operator<PFP>* nextOperator() = 0 ;
 
 	/**
 	 *
 	 */
-	virtual void updateBeforeOperation(Operator<PFP>** op) = 0 ;
+	virtual bool updateBeforeOperation(Operator<PFP>* op) = 0 ;
 
 	/**
 	 *
 	 */
-	virtual void updateAfterOperation(Operator<PFP>** op) = 0 ;
+	virtual void updateAfterOperation(Operator<PFP>* op) = 0 ;
 
 	/**
 	 *
 	 */
 	virtual void finish() = 0 ;
-
 
 //	/**
 //	 *

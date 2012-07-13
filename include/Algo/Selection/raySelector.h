@@ -264,6 +264,24 @@ void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
 		vecDarts[i] = distndart[i].second;
 }
 
+template<typename PFP>
+void facesPlanSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
+		const typename Geom::Plane3D<typename PFP::VEC3::DATA_TYPE>& plan, std::vector<Dart>& vecDarts,
+		const FunctorSelect& good = allDarts)
+{
+	TraversorF<typename PFP::MAP> travF(map);
+
+	for(Dart dit = travF.begin() ; dit != travF.end() ; dit = travF.next() )
+	{
+		if(Geom::intersectionTrianglePlan<typename PFP::VEC3>(position[dit], position[map.phi1(dit)], position[map.phi_1(dit)],plan.d(), plan.normal()) == Geom::FACE_INTERSECTION)
+		{
+			vecDarts.push_back(dit);
+		}
+	}
+
+	std::cout << "nb faces = " << vecDarts.size() << std::endl;
+}
+
 } //namespace Selection
 
 } //namespace Algo

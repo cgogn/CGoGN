@@ -946,14 +946,10 @@ bool EdgeSelector_MinDetail<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker<EDGE> eMark(m) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
+	TraversorE<MAP> travE(m);
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
 	{
-		if(!eMark.isMarked(d))
-		{
-			initEdgeInfo(d) ;	// init the edges with their optimal position
-			eMark.mark(d) ;		// and insert them in the multimap according to their error
-		}
+		initEdgeInfo(dit);
 	}
 
 	cur = edges.begin() ; // init the current edge to the first one

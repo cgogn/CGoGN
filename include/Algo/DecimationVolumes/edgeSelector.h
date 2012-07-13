@@ -4,6 +4,8 @@
 #include "Container/fakeAttribute.h"
 #include "Algo/DecimationVolumes/selector.h"
 #include "Algo/DecimationVolumes/operator.h"
+#include "Utils/qem.h"
+#include "Topology/generic/traversorCell.h"
 
 namespace CGoGN
 {
@@ -35,140 +37,62 @@ public:
 
 };
 
-/********************************************************************************
- *			 				Map Order Edge Selector								*
- ********************************************************************************/
 template <typename PFP>
-class EdgeSelector_MapOrder : public EdgeSelector<PFP>
+class EdgeSelector_QEM : public EdgeSelector<PFP>
 {
 public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
 	typedef typename PFP::REAL REAL;
 
 private:
-	Dart cur;
+	typedef struct
+	{
+		typename std::multimap<float, Dart>::iterator it;
+		bool valid;
+		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
+	} QEMedgeInfo;
+
+	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo;
+
+	EdgeAttribute<EdgeInfo> edgeInfo;
+	VertexAttribute<Quadric<REAL> > quadric;
+	Quadric<REAL> tmpQ;
+
+	std::multimap<float, Dart> edges;
+	typename std::multimap<float, Dart>::iterator cur;
+
+	Approximator<PFP, typename PFP::VEC3>* m_positionApproximator;
+
+	void initEdgeInfo(Dart d);
+	void updateEdgeInfo(Dart d, bool recompute);
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo);
 
 public:
-	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		EdgeSelector<PFP>(m, pos, approx, select)
-	{}
+	EdgeSelector_QEM(MAP& m, VertexAttribute<typename PFP::VEC3>& pos,
+			std::vector<ApproximatorGen<PFP>* >& approx, const FunctorSelect& select) :
+				EdgeSelector<PFP>(m, pos, approx, select)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo");
+		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric");
+	}
 
-	~EdgeSelector_MapOrder()
-	{}
+	~EdgeSelector_QEM()
+	{
+		this->m_map.removeAttribute(quadric);
+		this->m_map.removeAttribute(edgeInfo);
+	}
 
-	SelectorType getType() { return S_MapOrder; }
-	Dart nextCell() { return cur; }
-
+	SelectorType getType() { return S_QEM; }
 	bool init();
-	bool nextOperator(Operator<PFP>** op);
-	void updateBeforeOperation(Operator<PFP>** op)
-	{ }
-	void updateAfterOperation(Operator<PFP>** op);
-	void finish()
-	{ }
-
+	Operator<PFP>* nextOperator();
+	bool updateBeforeOperation(Operator<PFP>* op);
+	void updateAfterOperation(Operator<PFP>* op);
+	void finish() { }
 };
 
-/********************************************************************************
- *				 				Random Selector									*
- ********************************************************************************/
-//template <typename PFP>
-//class EdgeSelector_Random : public EdgeSelector<PFP>
-//{
-//public:
-//	typedef typename PFP::MAP MAP ;
-//	typedef typename PFP::VEC3 VEC3 ;
-//	typedef typename PFP::REAL REAL ;
-//
-//private:
-//	std::vector<Dart> darts ;
-//	unsigned int cur ;
-//	bool allSkipped ;
-//
-//public:
-//	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-//		EdgeSelector<PFP>(m, pos, approx, select)
-//	{}
-//
-//	~EdgeSelector_Random()
-//	{}
-//
-//	SelectorType getType() { return S_Random; }
-////	Dart nextCell() { return darts[cur]; }
-//
-//	bool init();
-//	bool nextOperator(Operator<PFP>** op);
-//	void updateBeforeOperation(Operator<PFP>* op)
-//	{ }
-//	void updateAfterOperation(Operator<PFP>* op);
-//	void finish()
-//	{ }
-//
-//} ;
 
-///********************************************************************************
-// *			 				Length Edge Selector								*
-// ********************************************************************************/
-//template <typename PFP>
-//class EdgeSelector_Length : public EdgeSelector<PFP>
-//{
-//public:
-//	typedef typename PFP::MAP MAP;
-//	typedef typename PFP::VEC3 VEC3;
-//	typedef typename PFP::REAL REAL;
-//
-//protected:
-//	/*
-//	 * Update the Edge Informations
-//	 */
-//	void updateEdgeInfo(Dart d, typename PFP::VEC3 e);
-//	/*
-//	 * Init the Edge informations
-//	 */
-//	void initEdgeInfo(Dart d);
-//	/*
-//	 * Erase The Edge informations
-//	 */
-//	void eraseEdgeInfo(Dart d);
-//
-//private:
-//	//New embedding type for storing informations
-//	typedef struct {
-//		typename std::multimap<float,Dart>::iterator it ;
-//		bool valid ;
-//	} LengthEdgeInfo ;
-//
-//	typedef NoMathIOAttribute<LengthEdgeInfo> EdgeInfo ;
-//
-//	EdgeAttribute<EdgeInfo> edgeInfo ;
-//
-//	std::multimap<float,Dart> edges ;
-//	typename std::multimap<float,Dart>::iterator cur ;
-//
-//
-//public:
-//	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>&  pos) :
-//		EdgeSelector<PFP>(m, pos)
-//	{
-//		edgeInfo = m.template addAttribute<EdgeInfo>(EDGE, "edgeInfo") ;
-//	}
-//
-//	~EdgeSelector_Length()
-//	{
-//		this->m_map.removeAttribute(edgeInfo) ;
-//	}
-//
-//	SelectorType getType() { return S_EdgeLength; }
-//	Dart nexCell() { return (*cur).second;  }
-//
-//	void init(Algo::DecimationVolumique::Approximator<PFP>* approx);
-//	bool nextOperator();
-//	void updateBeforeOperation(Algo::DecimationVolumique::Operator<PFP>* op);
-//	void updateAfterOperation(Algo::DecimationVolumique::Operator<PFP>* op);
-//	void finish()
-//	{ }
-//};
+
 
 } //end namespace DecimationVolumes
 
