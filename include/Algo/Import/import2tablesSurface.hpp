@@ -720,7 +720,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 		// else if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
 		else if ((tag.length() > 8) && tag.find("_") != std::string::npos)
 		{
-			if (tag.substr(0,8) == std::string("PTMcoefs"))
+			if (tag.substr(0,7) == std::string("PBcoefs"))
 			{
 				PTM = true ;
 				++nbCoefs ;
@@ -758,16 +758,16 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
 
-	VertexAttribute<typename PFP::VEC3> *PTMcoefs = NULL, *SHcoefs = NULL ;
+	VertexAttribute<typename PFP::VEC3> *PBcoefs = NULL, *SHcoefs = NULL ;
 	if (PTM)
 	{
-		PTMcoefs = new VertexAttribute<typename PFP::VEC3>[nbCoefs] ;
+		PBcoefs = new VertexAttribute<typename PFP::VEC3>[nbCoefs] ;
 		for (unsigned int i = 0 ; i < nbCoefs ; ++i)
 		{
 			std::stringstream name ;
-			name << "PTMcoefs" << i ;
-			PTMcoefs[i] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>(name.str()) ;
-			attrNames.push_back(PTMcoefs[i].name()) ;
+			name << "PBcoefs" << i ;
+			PBcoefs[i] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>(name.str()) ;
+			attrNames.push_back(PBcoefs[i].name()) ;
 		}
 	}
 
@@ -814,7 +814,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgeneric(const std::string& filename, st
 			for (unsigned int k = 0 ; k < 3 ; ++k)
 			{
 				if (PTM)
-					PTMcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
+					PBcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
 				else /* if SH */
 					SHcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
 			}
@@ -883,6 +883,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	bool normal = false ;
 	bool PTM = false ;
 	bool SH = false ;
+	unsigned int propSize = 0 ;
 	unsigned int nbProps = 0 ;		// # properties
 	unsigned int nbCoefs = 0 ; 	// # coefficients
 	do // go to #faces and count #properties
@@ -890,6 +891,60 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		fp >> tag ;
 		if (tag == std::string("property"))
 			++nbProps ;
+		else if (tag == std::string("int8") || tag == std::string("uint8"))
+		{
+			if (propSize < 2)
+			{
+				propSize = 1 ;
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: only float64 is yet handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: only float64 is yet handled") ;			}
+			else
+			{
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled") ;
+			}
+		}
+		else if (tag == std::string("int16") || tag == std::string("uint16"))
+		{
+			if (propSize == 0 || propSize == 2)
+			{
+				propSize = 2 ;
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: only float64 is yet handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: only float64 is yet handled") ;			}
+			else
+			{
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled") ;
+			}
+		}
+		else if (tag == std::string("int32") || tag == std::string("float32") || tag == std::string("uint32"))
+		{
+			if (propSize == 0 || propSize == 4)
+			{
+				propSize = 4 ;
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: only float64 is yet handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: only float64 is yet handled") ;
+			}
+			else
+			{
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled") ;
+			}
+		}
+		else if (tag == std::string("int64") || tag == std::string("float64"))
+		{
+			if (propSize == 0 || propSize == 8)
+			{
+				propSize = 8 ;
+				//std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: only float32 is yet handled" << std::endl ;
+				//assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: only float32 is yet handled") ;
+			}
+			else
+			{
+				std::cerr << "MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled" << std::endl ;
+				assert(!"MeshTablesSurface<PFP>::importPlySLFgenericBin: all properties should be same size: otherwise not handled") ;
+			}
+		}
 		else if (tag == std::string("x") || tag == std::string("y") || tag == std::string("z"))
 			position = true ;
 		//else if (tag == std::string("tx") || tag == std::string("ty") || tag == std::string("tz"))
@@ -904,7 +959,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		// else if (tag.substr(0,1) == std::string("C") && tag.substr(2,1) == std::string("_"))
 		else if ((tag.length() > 8) && tag.find("_") != std::string::npos)
 		{
-			if (tag.substr(0,8) == std::string("PTMcoefs"))
+			if (tag.substr(0,7) == std::string("PBcoefs"))
 			{
 				PTM = true ;
 				++nbCoefs ;
@@ -952,16 +1007,16 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	attrNames.push_back(frame[1].name()) ;
 	attrNames.push_back(frame[2].name()) ;
 
-	VertexAttribute<typename PFP::VEC3> *PTMcoefs = NULL, *SHcoefs = NULL ;
+	VertexAttribute<typename PFP::VEC3> *PBcoefs = NULL, *SHcoefs = NULL ;
 	if (PTM)
 	{
-		PTMcoefs = new VertexAttribute<typename PFP::VEC3>[nbCoefs] ;
+		PBcoefs = new VertexAttribute<typename PFP::VEC3>[nbCoefs] ;
 		for (unsigned int i = 0 ; i < nbCoefs ; ++i)
 		{
 			std::stringstream name ;
-			name << "PTMcoefs" << i ;
-			PTMcoefs[i] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>(name.str()) ;
-			attrNames.push_back(PTMcoefs[i].name()) ;
+			name << "PBcoefs" << i ;
+			PBcoefs[i] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>(name.str()) ;
+			attrNames.push_back(PBcoefs[i].name()) ;
 		}
 	}
 
@@ -990,15 +1045,14 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	std::vector<unsigned int> verticesID ;
 	verticesID.reserve(nbVertices) ;
 
-	float* properties = new float[nbProps] ;
+	double* properties = new double[nbProps] ;
 	AttributeContainer& container = m_map.template getAttributeContainer<VERTEX>() ;
 	for (unsigned int i = 0 ; i < nbVertices ; ++i) // Read and store properties for current vertex
 	{
 		unsigned int id = container.insertLine() ;
 		verticesID.push_back(id) ;
 
-		// for (unsigned int j = 0 ; j < nbProps ; ++j) // get all properties
-		fp.read((char*)properties,nbProps * sizeof(float)) ;
+		fp.read((char*)properties,nbProps * propSize) ;
 
 		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
 		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
@@ -1012,7 +1066,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 			for (unsigned int k = 0 ; k < 3 ; ++k)
 			{
 				if (PTM)
-					PTMcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
+					PBcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
 				else /* if SH */
 					SHcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
 			}
