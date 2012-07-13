@@ -168,16 +168,17 @@ class Histogram
 	/// get idx of data in attribute
 	unsigned int idx(unsigned int i) const;
 
-	// comparison function for sorting data
+	/// comparison function for sorting data
 	static bool dataComp( const std::pair<double, unsigned int>& a, const std::pair<double, unsigned int>& b);
 
+	/// update quantiles height from histo area for correct superposition
+	void quantilesAreaCorrection();
 
 public:
 		/**
 		* create an histogram from attribute handler
 		*/
 		Histogram(HistoColorMap& hcm);
-
 
 		/**
 		 * init data
@@ -347,7 +348,6 @@ public:
 		 * get the colorMap
 		 */
 		const HistoColorMap& colorMap() const;
-
 
 };
 
