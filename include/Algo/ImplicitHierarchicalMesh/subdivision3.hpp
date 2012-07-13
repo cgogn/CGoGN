@@ -188,7 +188,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 	unsigned int cur = map.getCurrentLevel();
 	map.setCurrentLevel(vLevel);
 
-	//one level of subdivision in the neighbordhood
+//	//one level of subdivision in the neighbordhood
 //	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
 //	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
 //	{
@@ -483,7 +483,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	/*
 	 * simplifier les faces
 	 */
-	Traversor3WF<typename PFP::MAP> trav3WF(map, d);
+	Traversor3WF<typename PFP::MAP> trav3WF(map, d, true);
 	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
 	{
 		if(map.faceCanBeCoarsened(dit))
