@@ -110,8 +110,8 @@ void Map3::deleteVolume(Dart d)
 	}
 
 	Dart dd = phi3(d) ;
-	Map2::deleteCC(d) ;
-	Map2::deleteCC(dd) ;
+	Map2::deleteCC(d) ; //deleting the volume
+	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
 }
 
 void Map3::fillHole(Dart d)
@@ -839,40 +839,11 @@ bool Map3::sameVertex(Dart d, Dart e)
 unsigned int Map3::vertexDegree(Dart d)
 {
 	unsigned int count = 0;
-	DartMarkerStore mv(*this);	// Lock a marker
 
-	std::vector<Dart> darts;	// Darts that are traversed
-	darts.reserve(256);
-	darts.push_back(d);			// Start with the dart d
-	mv.mark(d);
-
-	for(unsigned int i = 0; i < darts.size(); ++i)
+	Traversor3VE<Map3> trav3VE(*this, d);
+	for(Dart dit = trav3VE.begin() ; dit != trav3VE.end() ; dit = trav3VE.next())
 	{
-		//add phi21 and phi23 successor if they are not marked yet
-		Dart d2 = phi2(darts[i]);
-		Dart d21 = phi1(d2); // turn in volume
-		Dart d23 = phi3(d2); // change volume
-
-		if(!mv.isMarked(d21))
-		{
-			darts.push_back(d21);
-			mv.mark(d21);
-		}
-		if(!mv.isMarked(d23))
-		{
-			darts.push_back(d23);
-			mv.mark(d23);
-		}
-	}
-
-	DartMarkerStore me(*this);
-	for(std::vector<Dart>::iterator it = darts.begin(); it != darts.end() ; ++it)
-	{
-		if(!me.isMarked(*it))
-		{
-			++count;
-			me.markOrbit<EDGE>(*it);
-		}
+		++count;
 	}
 
 	return count;

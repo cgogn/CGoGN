@@ -71,7 +71,10 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
  * @return a boolean indicating if import was successful
  */
 template <typename PFP>
-bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scale = 5.0f, unsigned int nbStage = 1);
+
+template <typename PFP>
+bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
 
 /*
  * import a MOKA file

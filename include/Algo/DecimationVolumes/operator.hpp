@@ -35,97 +35,126 @@ namespace DecimationVolumes
  *							Collapse Edge Operator	                                *
  ************************************************************************************/
 template <typename PFP>
-unsigned int CollapseEdgeOperator<PFP>::perform(MAP& m, VertexAttribute<typename PFP::VEC3>& position)
+unsigned int CollapseEdgeOperator<PFP>::collapse(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& position)
 {
 	unsigned int nbCell = 0;
 
-	//calcul du nombre de cellule supprime
-	//position[this->m_edge] = this->m_approximator->getApproximation();
 	m.collapseEdge(this->m_edge);
-
 	++nbCell;
 
 	return nbCell;
 }
 
 template <typename PFP>
-bool CollapseEdgeOperator<PFP>::canPerform(MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position)
+bool CollapseEdgeOperator<PFP>::canCollapse(typename PFP::MAP &m ,Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
 	bool canCollapse = true;
 
-	Dart e = d;
-	do
-	{
-		//CGoGNout << "e=" << e ;
-		//at border
-		if(m.isBoundaryVolume(e))
-		{
-			canCollapse = false;
-			//CGoGNout << " at border";
-		}
-		//l'un de ces 2 voisins existe
-		else if(m.phi3(m.phi2(m.phi1(e))) != m.phi2(m.phi1(e)) && m.phi3(m.phi2(m.phi_1(e))) != m.phi2(m.phi_1(e)))
-		{
-			//l'un de ces 2 voisins est au bord
-			if(m.isBoundaryVolume(m.phi3(m.phi2(m.phi1(e)))) || m.isBoundaryVolume(m.phi3(m.phi2(m.phi_1(e)))))
-			{
-				canCollapse = false;
-				//CGoGNout << " neighboors  at border";
-			}
-		}
-		else
-		{
-			//Edge Criteria Valide
-			if(m.edgeDegree(m.phi1(m.phi2(m.phi_1(e)))) < 3)
-				canCollapse = false;
-			else
-			{
-				//Is inverted
-				Dart a = m.phi3(m.phi2(m.phi1(e)));
-				Dart b = m.phi1(m.phi3(m.phi2(m.phi_1(e))));
-
-				//tetrahedre du haut
-				typename PFP::VEC3 p1 = position[a];//this->m_approximator->getApproximation();
-				typename PFP::VEC3 p2, p3, p4;
-
-				typename PFP::VEC3::DATA_TYPE v1;
-				typename PFP::VEC3::DATA_TYPE v2;
-
-				p2 = position[m.phi1(a)];
-				p3 = position[m.phi_1(a)];
-				p4 = position[m.phi_1(m.phi2(a))];
-
-				v1 = Geom::tetraSignedVolume<typename PFP::VEC3>(p1, p2, p3, p4);
-				if (v1 < 0)
-					canCollapse = false;
-
-				//CGoGNout << " v1 = " << v1;
-
-				//tetrahedre du bas
-				p2 = position[m.phi1(b)];
-				p3 = position[m.phi_1(b)];
-				p4 = position[m.phi_1(m.phi2(b))];
-
-				v2 = Geom::tetraSignedVolume<typename PFP::VEC3>(p1, p2, p3, p4);
-
-				if (v2 < 0)
-					canCollapse = false;
-
-				//CGoGNout << " v2 = " << v2;
-			}
-		}
-
-		//CGoGNout << CGoGNendl;
-
-		e = m.alpha2(e);
-	}while ( e != d && canCollapse);
-
-	//CGoGNout << CGoGNendl << CGoGNendl;
-
-	//CGoGNout << "is collapsable ? " << canCollapse << CGoGNendl;
-
+//	Dart e = d;
+//	do
+//	{
+//		//isBoundaryVolume
+//		if(m.isBoundaryVolume(e))
+//		{
+//			canCollapse = false;
+//		}
+//		//l'un de ces 2 voisins existe
+//		else if(m.phi3(m.phi2(m.phi1(e))) != m.phi2(m.phi1(e)) && m.phi3(m.phi2(m.phi_1(e))) != m.phi2(m.phi_1(e)))
+//		{
+//			//l'un de ces 2 voisins est au bord
+//			if(m.isBoundaryVolume(m.phi3(m.phi2(m.phi1(e)))) || m.isBoundaryVolume(m.phi3(m.phi2(m.phi_1(e)))))
+//			{
+//				canCollapse = false;
+//
+//			}
+//		}
+//		else
+//		{
+//			//Edge Criteria Valide
+//			if(m.edgeDegree(m.phi1(m.phi2(m.phi_1(e)))) < 3)
+//				canCollapse = false;
+//			elseframe
+//			{
+//				//Is inverted
+//				Dart a = m.phi3(m.phi2(m.phi1(e)));
+//				Dart b = m.phi1(m.phi3(m.phi2(m.phi_1(e))));
+//
+//				typename PFP::VEC3::DATA_TYPE v1;
+//				typename PFP::VEC3::DATA_TYPE v2;
+//
+//				v1 = Algo::Geometry::tetrahedronSignedVolume<PFP>(m,a,position);
+//
+//				if (v1 < 0)
+//					canCollapse = false;
+//
+//				v2 = Algo::Geometry::tetrahedronSignedVolume<PFP>(m,b,position);
+//				if (v2 < 0)
+//					canCollapse = false;
+//
+//				//CGoGNout << " v2 = " << v2;
+//			}
+//		}
+//
+//		e = m.alpha2(e);
+//	}while ( e != d && canCollapse);
 
 	return canCollapse;
+}
+
+
+template <typename PFP>
+void CollapseEdgeOperator<PFP>::split(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& position)
+{
+//	Dart d = vs->getEdge() ;
+//	Dart dd = m_map.phi2(d) ; 		// get some darts
+//	Dart dd2 = vs->getRightEdge() ;
+//	Dart d2 = vs->getLeftEdge() ;
+//	Dart d1 = m_map.phi2(d2) ;
+//	Dart dd1 = m_map.phi2(dd2) ;
+//
+//	unsigned int v1 = m_map.template getEmbedding<VERTEX>(d) ;				// get the embedding
+//	unsigned int v2 = m_map.template getEmbedding<VERTEX>(dd) ;			// of the new vertices
+//	unsigned int e1 = m_map.template getEmbedding<EDGE>(m_map.phi1(d)) ;
+//	unsigned int e2 = m_map.template getEmbedding<EDGE>(m_map.phi_1(d)) ;	// and new edges
+//	unsigned int e3 = m_map.template getEmbedding<EDGE>(m_map.phi1(dd)) ;
+//	unsigned int e4 = m_map.template getEmbedding<EDGE>(m_map.phi_1(dd)) ;
+//
+//	//vertexSplit(vs) ; // split vertex
+//	//map.vertexSplit()
+//
+//	m_map.template embedOrbit<VERTEX>(d, v1) ;		// embed the
+//	m_map.template embedOrbit<VERTEX>(dd, v2) ;	// new vertices
+//	m_map.template embedOrbit<EDGE>(d1, e1) ;
+//	m_map.template embedOrbit<EDGE>(d2, e2) ;		// and new edges
+//	m_map.template embedOrbit<EDGE>(dd1, e3) ;
+//	m_map.template embedOrbit<EDGE>(dd2, e4) ;
+}
+
+/****************************************************************************************************
+ *									Operator List									*
+ ****************************************************************************************************/
+
+template <typename PFP>
+OperatorList<PFP>::~OperatorList()
+{
+//	for(typename std::list<CollapseSplitOperator<PFP>*>::iterator it= m_ops.begin() ; it != m_ops.end() ; ++it)
+//	{
+//		delete *it;
+//	}
+}
+
+template <typename PFP>
+void OperatorList<PFP>::coarsen(VertexAttribute<typename PFP::VEC3>& position)
+{
+	(*m_cur)->collapse(m_map, position);
+	++m_cur; // ou ++ ça dépend dans quel sens c'est stocké
+}
+
+template <typename PFP>
+void OperatorList<PFP>::refine(VertexAttribute<typename PFP::VEC3>& position)
+{
+	--m_cur; // ou -- ça dépend dans quel sens c'est stocké
+	(*m_cur)->split(m_map, position);
 }
 
 

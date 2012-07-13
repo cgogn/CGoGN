@@ -621,7 +621,7 @@ void MyQT::cb_keyPress(int keycode)
 	// Sélectionne des faces
 	case 'f':
 		d_faces.clear();
-		Algo::Selection:: facesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_faces);
+		Algo::Selection::facesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_faces);
 
 		if (!d_faces.empty())
 		{

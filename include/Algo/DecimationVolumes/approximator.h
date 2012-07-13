@@ -26,6 +26,7 @@
 #define __APPROXIMATOR_VOLUMES_H__
 
 #include "Algo/DecimationVolumes/operator.h"
+#include "Algo/DecimationVolumes/predictor.h"
 
 namespace CGoGN
 {
@@ -38,7 +39,7 @@ namespace DecimationVolumes
 
 enum ApproximatorType
 {
-	A_Centroid //barycenter of the n-cells
+	A_QEM
 };
 
 template <typename PFP>
@@ -60,9 +61,12 @@ public:
 	virtual const std::string& getApproximatedAttributeName() const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
 	virtual bool init() = 0 ;
+	virtual const PredictorGen<PFP>* getPredictor() const = 0 ;
 	virtual void approximate(Operator<PFP>* op) = 0 ;
 	virtual void saveApprox(Operator<PFP>* op) = 0 ;
 	virtual void affectApprox(Operator<PFP>* op) = 0 ;
+
+	virtual void approximate(Dart d) = 0;
 } ;
 
 
@@ -74,39 +78,91 @@ public:
 	typedef typename PFP::REAL REAL;
 
 protected:
+	Predictor<PFP, T>* m_predictor ;
 
-	//TODO ajouter un predictor
-
-	VertexAttribute<T>& m_attrV; // vertex attribute to be approximated
-
-	//TODO Attribute to store approximation result
-	//TODO attribute to store detail information for reconstruction
+	//Vertex attribute to be approximated
+	VertexAttribute<T>& m_attrV;
+	//Attribute to store approximation result
+	EdgeAttribute<T> m_approx;
+	// attribute to store detail information for reconstruction
+	EdgeAttribute<T> m_detail ;
 
 	T m_app;
 
 public:
-	Approximator(MAP& m, VertexAttribute<T>& a):
-		ApproximatorGen<PFP>(m), m_attrV(a)
-	{}
+	Approximator(MAP& m, VertexAttribute<T>& a, Predictor<PFP, T>* predictor) :
+		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(a)
+	{
+		std::stringstream aname ;
+		aname << "approx_" << m_attrV.name() ;
+		m_approx = this->m_map.template addAttribute<T, EDGE>(aname.str()) ;
 
-	//virtual ~Approximator();
+		if(m_predictor)	// if a predictor is associated to the approximator
+		{				// create an attribute to store the detail needed for reconstruction
+			std::stringstream dname ;
+			dname << "detail_" << m_attrV.name() ;
+			m_detail = this->m_map.template addAttribute<T, EDGE>(dname.str()) ;
+		}
+	}
+
+	virtual ~Approximator()
+	{
+		this->m_map.template removeAttribute(m_approx) ;
+
+		if(m_predictor)
+			this->m_map.template removeAttribute(m_detail) ;
+	}
 
 	const std::string& getApproximatedAttributeName() const
 	{
 		return m_attrV.name() ;
 	}
 
-	void saveApprox(Operator<PFP>* op)
+	const T& getApprox(Dart d) const
 	{
-		Dart d = op->getEdge();
-		//m_app = m_approx[d] ;
+		return m_approx[d] ;
 	}
 
-	void affectApprox(Operator<PFP>* op)
+	const Predictor<PFP, T>* getPredictor() const
+	{
+		return m_predictor ;
+	}
+
+	const T& getDetail(Dart d) const
+	{
+		assert(m_predictor || !"Trying to get detail on a non-predictive scheme") ;
+		return m_detail[d] ;
+	}
+
+	void setDetail(Dart d, T& val)
+	{
+		assert(m_predictor || !"Trying to set detail on a non-predictive scheme") ;
+		m_detail[d] = val ;
+	}
+
+	virtual void saveApprox(Operator<PFP>* op)
 	{
 		Dart d = op->getEdge();
-		m_attrV[d] = m_app ;
+		m_app = m_approx[d];
 	}
+	virtual void affectApprox(Operator<PFP>* op)
+	{
+		Dart d = op->getEdge();
+		m_attrV[d] = m_app;
+	}
+
+
+	//	void saveApprox(Dart d)
+	//	{
+	//		m_app = m_approx[d] ;
+	//	}
+	//
+	//	void affectApprox(Dart d)
+	//	{
+	//		m_attrV[d] = m_app ;
+	//	}
+
+
 };
 
 

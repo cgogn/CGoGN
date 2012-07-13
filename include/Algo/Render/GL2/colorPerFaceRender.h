@@ -74,7 +74,7 @@ public:
 
 	template<typename PFP, unsigned int ORBIT>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map,
-			constVertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3, ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3, ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
 
 	/**

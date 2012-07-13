@@ -163,6 +163,20 @@ Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& d
 template <typename VEC3>
 Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA, const VEC3& QB, VEC3& Inter) ;
 
+template <typename VEC3>
+Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3& PlaneP, const VEC3& NormP); //, VEC3& Inter) ;
+
+template <typename VEC3>
+Intersection intersectionTrianglePlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& PlaneP, const VEC3& NormP);//, VEC3& Inter) ;
+
+template <typename VEC3>
+Intersection intersectionSegmentHalfPlan(const VEC3& PA, const VEC3& PB,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP);//, VEC3& Inter)
+
+template <typename VEC3>
+Intersection intersectionTriangleHalfPlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP); //, VEC3& Inter) ;
+
 } // namespace Geom
 
 } // namespace CGoGN

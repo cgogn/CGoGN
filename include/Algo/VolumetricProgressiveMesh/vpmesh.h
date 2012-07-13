@@ -22,10 +22,16 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __GEOMETRY_APPROXIMATOR_VOLUMES_H__
-#define __GEOMETRY_APPROXIMATOR_VOLUMES_H__
+#ifndef __VPMESH__
+#define __VPMESH__
 
-#include "Algo/DecimationVolumes/approximator.h"
+#include "Algo/DecimationVolumes/operator.h"
+#include "Algo/DecimationVolumes/selector.h"
+#include "Algo/DecimationVolumes/edgeSelector.h"
+#include "Algo/DecimationVolumes/geometryApproximator.h"
+//#include "Algo/DecimationVolumes/geometryPredictor.h"
+
+#include "Utils/quantization.h"
 
 namespace CGoGN
 {
@@ -33,38 +39,59 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace DecimationVolumes
+namespace VPMesh
 {
 
 template <typename PFP>
-class Approximator_QEM : public Approximator<PFP, typename PFP::VEC3>
+class VolumetricProgressiveMesh
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-protected:
-	VertexAttribute<Quadric<REAL> > m_quadric ;
+private:
+	MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& positionsTable ;
+
+	DartMarker& inactiveMarker ;
+	SelectorUnmarked dartSelect ;
+
+	Algo::DecimationVolumes::EdgeSelector<PFP>* m_selector ;
+	std::vector<Algo::DecimationVolumes::ApproximatorGen<PFP>*> m_approximators ;
+	std::vector<Algo::DecimationVolumes::PredictorGen<PFP>*> m_predictors ;
+	Algo::DecimationVolumes::OperatorList<PFP>* m_nodes;
+	unsigned int m_level ;
+
+	Algo::DecimationVolumes::Approximator<PFP, VEC3>* m_positionApproximator ;
+
+	bool m_initOk ;
+
 
 public:
-	Approximator_QEM(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, pred)
-	{}
-	~Approximator_QEM()
-	{}
-	ApproximatorType getType() const { return A_QEM ; }
-	bool init() ;
-	void approximate(Operator<PFP> *op);
-	void approximate(Dart d);
+	VolumetricProgressiveMesh(
+		MAP& map, DartMarker& inactive,
+		Algo::DecimationVolumes::SelectorType s, Algo::DecimationVolumes::ApproximatorType a,
+		VertexAttribute<typename PFP::VEC3>& position
+	) ;
+
+	~VolumetricProgressiveMesh() ;
+
+	bool initOk() { return m_initOk ; }
+
+	void createPM(unsigned int percentWantedVertices) ;
+	void gotoLevel(unsigned int l) ;
+	unsigned int& currentLevel() { return m_level ; }
+	unsigned int nbSplits() { return m_nodes.size() ; }
+
 } ;
 
-} //namespace DecimationVolumes
+} //namespace PMesh
 
 } //namespace Algo
 
 } //namespace CGoGN
 
-#include "Algo/DecimationVolumes/geometryApproximator.hpp"
+#include "Algo/VolumetricProgressiveMesh/vpmesh.hpp"
 
 #endif
