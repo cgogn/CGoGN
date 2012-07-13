@@ -110,8 +110,8 @@ void Map3::deleteVolume(Dart d)
 	}
 
 	Dart dd = phi3(d) ;
-	Map2::deleteCC(d) ;
-	Map2::deleteCC(dd) ;
+	Map2::deleteCC(d) ; //deleting the volume
+	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
 }
 
 void Map3::fillHole(Dart d)

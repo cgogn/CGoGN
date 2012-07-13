@@ -170,7 +170,7 @@ void RenderHistogram::drawHisto(QPainter& painter)
 			const char* ptr =sv.c_str();
 			QString qsv(ptr);
 
-			painter.drawText (1,h-6,widthAxl,12,Qt::AlignRight,qsv);
+			painter.drawText (1,h-6,widthAxl,15,Qt::AlignRight,qsv);
 		}
 
 		painter.setPen(QColor(0,0,0));

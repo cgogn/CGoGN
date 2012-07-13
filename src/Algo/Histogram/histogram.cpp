@@ -60,7 +60,7 @@ void Histogram::populateHisto(unsigned int nbclasses)
 {
 	//compute nb classes if necesary
 	if (nbclasses == 0)
-		m_nbclasses = (unsigned int)(sqrt(m_dataIdx.size()));
+		m_nbclasses = (unsigned int)(sqrt(double(m_dataIdx.size())));
 	else
 		m_nbclasses = nbclasses;
 
