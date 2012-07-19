@@ -105,6 +105,11 @@ void foreach_orbit(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>
 template <typename PFP, unsigned int CELL>
 void foreach_cell(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& func, unsigned int nbth, unsigned int szbuff = 8192, bool needMarkers = false, const FunctorSelect& good = allDarts);
 
+
+
+template <typename PFP, unsigned int CELL>
+void foreach_cell2Pass(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& funcFront, FunctorMapThreaded<typename PFP::MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, unsigned int szbuff = 8192, bool needMarkers = false, const FunctorSelect& good = allDarts);
+
 /**
  * Traverse darts of a map in parallel
  * Functor application must be independant
@@ -186,6 +191,7 @@ T maxResult(const std::vector<T>& res);
  */
 template <typename T>
 T minResult(const std::vector<T>& res);
+
 
 /**
  * Class to encapsulate algorithm in a boost thread

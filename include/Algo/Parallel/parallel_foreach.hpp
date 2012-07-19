@@ -788,6 +788,199 @@ T minResult(const std::vector<T>& res)
 	return minr;
 }
 
+
+
+
+
+/**
+ * Traverse cells of a map in parallel. Use embedding marker
+ * Functor application must be independant
+ * @param map the map
+ * @param func the functor to apply
+ * @param nbth number of thread to use (use twice as threads of processor)
+ * @param szbuff size of buffers to store darts in each thread (default is 8192, use less for lower memory consumsion)
+ * @param good a selector
+ */
+template <typename PFP, unsigned int CELL>
+void foreach_cell2Pass(typename PFP::MAP& map, FunctorMapThreaded<typename PFP::MAP>& funcFront, FunctorMapThreaded<typename PFP::MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, unsigned int szbuff, bool needMarkers, const FunctorSelect& good)
+{
+	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
+	for (unsigned int i = 0; i < nbth; ++i)
+		vd[i].reserve(szbuff);
+
+	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
+	for (unsigned int i = 0; i < nbth; ++i)
+		tempo[i].reserve(szbuff);
+
+	boost::thread** threadsA = new boost::thread*[nbth];
+	boost::thread** threadsB = new boost::thread*[nbth];
+
+	if (needMarkers)
+	{
+		// ensure that there is enough threads
+		unsigned int nbth_prec = map.getNbThreadMarkers();
+		if (nbth_prec < nbth+1)
+			map.addThreadMarker(nbth+1-nbth_prec);
+	}
+
+	CellMarkerNoUnmark<CELL> cm(map);
+
+	for (unsigned int loop=0; loop< nbLoops; ++loop)
+	{
+		// PASS FRONT (A)
+		{
+			Dart d = map.begin();
+			// fill each vd buffers with szbuff darts
+			unsigned int nb = 0;
+			while ((d != map.end()) && (nb < nbth*szbuff) )
+			{
+				if (good(d) && (!cm.isMarked(d)))
+				{
+					cm.mark(d);
+					vd[nb%nbth].push_back(d);
+					nb++;
+				}
+				map.next(d);
+			}
+
+			boost::barrier sync1(nbth+1);
+			boost::barrier sync2(nbth+1);
+			bool finished=false;
+			// lauch threads
+			if (needMarkers)
+			{
+				for (unsigned int i = 0; i < nbth; ++i)
+					threadsA[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(funcFront, vd[i],sync1,sync2, finished,1+i));
+			}
+			else
+			{
+				for (unsigned int i = 0; i < nbth; ++i)
+					threadsA[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(funcFront, vd[i],sync1,sync2, finished,0));
+			}
+			// and continue to traverse the map
+
+			while (d != map.end())
+			{
+				for (unsigned int i = 0; i < nbth; ++i)
+					tempo[i].clear();
+
+				unsigned int nb = 0;
+				while ((d != map.end()) && (nb < nbth*szbuff) )
+				{
+					if (good(d) && (!cm.isMarked(d)))
+					{
+						cm.mark(d);
+						tempo[nb%nbth].push_back(d);
+						nb++;
+					}
+					map.next(d);
+				}
+
+				sync1.wait();
+				for (unsigned int i = 0; i < nbth; ++i)
+					vd[i].swap(tempo[i]);
+				sync2.wait();
+			}
+
+			sync1.wait();
+			finished = true;
+			sync2.wait();
+
+			//wait for all theads to be finished
+			for (unsigned int i = 0; i < nbth; ++i)
+				threadsA[i]->join();
+		}
+		// PASS BACK (B)
+		{
+			for (unsigned int i = 0; i < nbth; ++i)
+				vd[i].clear();
+			Dart d = map.begin();
+			// fill each vd buffers with szbuff darts
+			unsigned int nb = 0;
+			while ((d != map.end()) && (nb < nbth*szbuff) )
+			{
+				if (good(d) && (cm.isMarked(d)))
+				{
+					cm.unmark(d);
+					vd[nb%nbth].push_back(d);
+					nb++;
+				}
+				map.next(d);
+			}
+
+			boost::barrier sync1(nbth+1);
+			boost::barrier sync2(nbth+1);
+			bool finished=false;
+			// lauch threads
+			if (needMarkers)
+			{
+				for (unsigned int i = 0; i < nbth; ++i)
+					threadsB[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(funcBack, vd[i],sync1,sync2, finished,1+i));
+			}
+			else
+			{
+				for (unsigned int i = 0; i < nbth; ++i)
+					threadsB[i] = new boost::thread(ThreadFunction<typename PFP::MAP>(funcBack, vd[i],sync1,sync2, finished,0));
+			}
+			// and continue to traverse the map
+
+			while (d != map.end())
+			{
+				for (unsigned int i = 0; i < nbth; ++i)
+					tempo[i].clear();
+
+				unsigned int nb = 0;
+				while ((d != map.end()) && (nb < nbth*szbuff) )
+				{
+					if (good(d) && (cm.isMarked(d)))
+					{
+						cm.unmark(d);
+						tempo[nb%nbth].push_back(d);
+						nb++;
+					}
+					map.next(d);
+				}
+
+				sync1.wait();
+				for (unsigned int i = 0; i < nbth; ++i)
+					vd[i].swap(tempo[i]);
+				sync2.wait();
+			}
+
+			sync1.wait();
+			finished = true;
+			sync2.wait();
+
+			//wait for all theads to be finished
+			for (unsigned int i = 0; i < nbth; ++i)
+				threadsB[i]->join();
+		}
+	}
+
+	// free buffers and threads
+	for (unsigned int i = 0; i < nbth; ++i)
+	{
+		delete threadsA[i];
+		delete threadsB[i];
+	}
+	delete[] threadsA;
+	delete[] threadsB;
+	delete[] vd;
+	delete[] tempo;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 } // namespace Parallel
 
 } // namespace Algo
