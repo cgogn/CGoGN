@@ -95,17 +95,24 @@ template <typename PFP>
 void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
 	//mark bad edges
-	DartMarker mBadEdge(map);
+	DartMarkerStore mBadEdge(map);
+
+	std::vector<Dart> vEdge;
+	vEdge.reserve(1024);
 
 //	unsignzed int i = 0;
 
-	DartMarkerStore mEdge(map);
+	unsigned int nbEdges = map.template getNbOrbits<EDGE>();
+	unsigned int i = 0;
 
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
 		//check if this edge is an "ear-edge"
 		if(!mBadEdge.isMarked(dit))
 		{
+			++i;
+			std::cout << i << " / " << nbEdges << std::endl;
+
 			//search three positions
 			typename PFP::VEC3 tris1[3];
 			tris1[0] = position[dit];
@@ -139,7 +146,7 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 					}
 				}
 
-				std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
+				//std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
 
 				if(intersection)
 				{
@@ -147,23 +154,10 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 				}
 				else //cut a tetrahedron
 				{
-					std::cout << "cut cut " << std::endl;
-					Dart dring = map.phi_1(dit);
-					std::vector<Dart> vPath;
-
-					vPath.push_back(map.phi_1(dring));
-					vPath.push_back(map.phi1(map.phi2(dring)));
-					vPath.push_back(map.phi_1(map.phi2(dring)));
-					vPath.push_back(map.phi1(dring));
-
-					map.splitVolume(vPath);
-
-					map.splitFace(map.phi2(map.phi1(dring)), map.phi2(map.phi1(map.phi2(dring))));
-
-					return;
+					vEdge.push_back(dit);
 				}
 
-//				++i;
+
 //
 //				if(i == 16)
 //					return;
@@ -171,6 +165,28 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 		}
 	}
 
+	std::cout << "nb edges to split = " << vEdge.size() << std::endl;
+	i = 0;
+	for(std::vector<Dart>::iterator it = vEdge.begin() ; it != vEdge.end() ; ++it)
+	{
+		++i;
+		std::cout << i << " / " << vEdge.size() << std::endl;
+
+		Dart dit = *it;
+
+		//std::cout << "cut cut " << std::endl;
+		std::vector<Dart> vPath;
+
+		vPath.push_back(map.phi1(dit));
+		vPath.push_back(map.phi1(map.phi2(map.phi_1(dit))));
+		vPath.push_back(map.phi_1(map.phi2(dit)));
+
+		map.splitVolume(vPath);
+
+		map.splitFace(map.phi2(map.phi1(dit)), map.phi2(map.phi1(map.phi2(dit))));
+	}
+
+	std::cout << "finished " << std::endl;
 }
 
 

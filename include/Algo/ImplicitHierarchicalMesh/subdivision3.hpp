@@ -403,8 +403,6 @@ void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(map.edgeCanBeCoarsened(d) || !"Trying to coarsen an edge that can not be coarsened") ;
 
-	std::cout << "coarsenEdge" << std::endl;
-
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(cur + 1) ;
 	map.uncutEdge(d) ;

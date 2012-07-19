@@ -803,9 +803,6 @@ bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		Dart d2 = phi2(d) ;
 		++m_curLevel ;
 
-		std::cout << "vertex degree(phi1(d)) = " << vertexDegree(phi1(d)) << std::endl;
-		std::cout << "vertex degree(d) = " << vertexDegree(d) << std::endl;
-
 		if(vertexDegree(phi1(d)) == 2)
 		{
 			degree2 = true ;
