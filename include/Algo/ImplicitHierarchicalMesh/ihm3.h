@@ -360,12 +360,12 @@ public:
 	//!
 	/*!
 	 */
-	bool neighborhoodLevelDiffersByOne(Dart d);
+	bool neighborhoodLevelOverOne(Dart d);
 
 	//! wired !!!
 	/*!
 	 */
-	bool coarsenNeighborhoodLevelDiffersByOne(Dart d);
+	bool coarsenNeighborhoodLevelOverOne(Dart d);
 	//@}
 
 	/*! @name Cell Functors

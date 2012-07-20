@@ -657,7 +657,10 @@ Dart ImplicitHierarchicalMap3::faceOldestDart(Dart d)
 	do
 	{
 		unsigned int l = m_dartLevel[it] ;
-		if(l < l_old || (l == l_old && it < oldest))
+		if(l == 0)
+			return it ;
+		if(l < l_old)
+		//if(l < l_old || (l == l_old && it < oldest))
 		{
 			oldest = it ;
 			l_old = l ;
@@ -672,38 +675,49 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
 	Dart oldest = d;
-	DartMarkerStore mark(*this);	// Lock a marker
 
-	std::vector<Dart> visitedFaces;	// Faces that are traversed
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(d);		// Start with the face of d
-
-	// For every face added to the list
-	//the oldest dart from a volume is the oldest dart from all faces of this volume
-	mark.markOrbit<FACE>(d) ;
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WF<ImplicitHierarchicalMap3> trav3WF(*this, d);
+	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
 	{
-		Dart e = visitedFaces[i] ;
-
-		//for every dart in this face
-		Dart old = faceOldestDart(e);
+		Dart old = faceOldestDart(dit);
 		if(m_dartLevel[old] < m_dartLevel[oldest])
 			oldest = old;
-
-		do	// add all face neighbours to the table
-		{
-			Dart ee = phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit<FACE>(ee) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
 	}
 
 	return oldest;
+
+//	DartMarkerStore mark(*this);	// Lock a marker
+//
+//	std::vector<Dart> visitedFaces;	// Faces that are traversed
+//	visitedFaces.reserve(512);
+//	visitedFaces.push_back(d);		// Start with the face of d
+//
+//	// For every face added to the list
+//	//the oldest dart from a volume is the oldest dart from all faces of this volume
+//	mark.markOrbit<FACE>(d) ;
+//
+//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+//	{
+//		Dart e = visitedFaces[i] ;
+//
+//		//for every dart in this face
+//		Dart old = faceOldestDart(e);
+//		if(m_dartLevel[old] < m_dartLevel[oldest])
+//			oldest = old;
+//
+//		do	// add all face neighbours to the table
+//		{
+//			Dart ee = phi2(e) ;
+//			if(!mark.isMarked(ee)) // not already marked
+//			{
+//				visitedFaces.push_back(ee) ;
+//				mark.markOrbit<FACE>(ee) ;
+//			}
+//			e = phi1(e) ;
+//		} while(e != visitedFaces[i]) ;
+//	}
+//
+//	return oldest;
 }
 
 bool ImplicitHierarchicalMap3::edgeIsSubdivided(Dart d)
@@ -959,76 +973,99 @@ bool ImplicitHierarchicalMap3::volumeIsSubdividedOnce(Dart d)
 	return subd && subdOnce;
 }
 
-bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersByOne(Dart d)
+bool ImplicitHierarchicalMap3::neighborhoodLevelOverOne(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-	bool found = true;
+	bool overOne = false;
 
-	unsigned int vLevel = volumeLevel(d);// + 1;
+	//Dart old = volumeOldestDart(d);
+	unsigned int vLevel = volumeLevel(d);
 
-	Dart old = volumeOldestDart(d);
-
-	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old, true);
-
-	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
+	Traversor3WWaV<ImplicitHierarchicalMap3> trav3WWaV(*this, d);
+	for(Dart dit = trav3WWaV.begin() ; dit != trav3WWaV.end() ; dit = trav3WWaV.next())
 	{
-		Dart oldit = volumeOldestDart(dit);
-		//if((abs(volumeLevel(old) - vLevel) > 1))
-		if((volumeLevel(oldit) - vLevel) > 1)
-			found = false;
+		//Dart oldit = volumeOldestDart(dit);
+		if(abs((volumeLevel(dit) - vLevel)) > 1)
+			overOne = true;
 	}
 
-	return found;
+	return overOne;
+
+//	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old);
+//	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
+//	{
+//		Dart oldit = volumeOldestDart(dit);
+//		if((volumeLevel(oldit) - vLevel) > 1)
+//			overOne = false;
+//	}
+
 }
 
-bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersByOne(Dart d)
+bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelOverOne(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-	bool found = false;
+
+	bool overOne = false;
+	Dart old = volumeOldestDart(d);
+
+	if(m_curLevel != 0)
+		--m_curLevel;
+
+	overOne = neighborhoodLevelOverOne(old);
+
+	if(m_curLevel != 0)
+		++m_curLevel;
+
+	return overOne;
+
+//	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old);
+//	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
+//	{
+//		if(!faceIsSubdividedOnce(dit))
+//			OverOne = true;
+//	}
 
 	//unsigned int vLevel = volumeLevel(d);
 
-	Dart old = volumeOldestDart(d);
-
-	DartMarkerStore mf(*this);		// Lock a face marker to save one dart per face
-
-	//Store faces that are traversed and start with the face of d
-	std::vector<Dart> visitedFaces;
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(old);
-
-	mf.markOrbit<FACE>(old) ;
-
-	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
-	{
-		Dart e = visitedFaces[i] ;
-		do
-		{
-			// add all face neighbours to the table
-
-			if(faceIsSubdivided(e))
-			{
-				++m_curLevel;
-
-				if(faceIsSubdividedOnce(e))
-					found = true;
-
-				--m_curLevel;
-			}
-			Dart ee = phi2(e) ;
-			if(!mf.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mf.markOrbit<FACE>(ee) ;
-			}
-
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
-	}
-
-	return found;
+//	DartMarkerStore mf(*this);		// Lock a face marker to save one dart per face
+//
+//	//Store faces that are traversed and start with the face of d
+//	std::vector<Dart> visitedFaces;
+//	visitedFaces.reserve(512);
+//	visitedFaces.push_back(old);
+//
+//	mf.markOrbit<FACE>(old) ;
+//
+//	for(unsigned int i = 0; !found && i < visitedFaces.size(); ++i)
+//	{
+//		Dart e = visitedFaces[i] ;
+//		do
+//		{
+//			// add all face neighbours to the table
+//
+//			if(faceIsSubdivided(e))
+//			{
+//				++m_curLevel;
+//
+//				if(faceIsSubdividedOnce(e))
+//					found = true;
+//
+//				--m_curLevel;
+//			}
+//			Dart ee = phi2(e) ;
+//			if(!mf.isMarked(ee)) // not already marked
+//			{
+//				visitedFaces.push_back(ee) ;
+//				mf.markOrbit<FACE>(ee) ;
+//			}
+//
+//			e = phi1(e) ;
+//		} while(e != visitedFaces[i]) ;
+//	}
+//
+//	return found;
 }
 
 } //namespace IHM
