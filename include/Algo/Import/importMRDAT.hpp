@@ -41,14 +41,13 @@ inline void nextNonEmptyLine(std::ifstream& fp, std::string& line)
 template <typename PFP>
 bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt)
 {
-	VertexAttribute<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3>(VERTEX, "position") ;
-
+	VertexAttribute<typename PFP::VEC3> position = map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;
 	if (!position.isValid())
-		position = map.template addAttribute<typename PFP::VEC3>(VERTEX, "position") ;
+		position = map.template addAttribute<typename PFP::VEC3, VERTEX>("position") ;
 
 	attrNames.push_back(position.name()) ;
 
-	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
+	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	// open file
 	std::ifstream fp(filename.c_str(), std::ios::in) ;
@@ -206,7 +205,7 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			unsigned int emb = qt.verticesID[idx] ;
 
 			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, emb) ;
-			map.foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb) ;
+			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb) ;
 
 			m.mark(d) ;								// mark on the fly to unmark on second loop
 			vecDartsPerVertex[emb].push_back(d) ;	// store incident darts for fast adjacency reconstruction
@@ -223,11 +222,11 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 			// darts incident to end vertex of edge
 			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)] ;
 
-			unsigned int embd = map.getEmbedding<VERTEX>(d) ;
+			unsigned int embd = map.template getEmbedding<VERTEX>(d) ;
 			Dart good_dart = NIL ;
 			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				if (map.getEmbedding<VERTEX>(map.phi1(*it)) == embd)
+				if (map.template getEmbedding<VERTEX>(map.phi1(*it)) == embd)
 					good_dart = *it ;
 			}
 
