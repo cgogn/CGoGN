@@ -87,6 +87,11 @@ void Histogram::populateHisto(unsigned int nbclasses)
     	if (m_populations[i] > m_maxBar)
     		m_maxBar = m_populations[i];
     }
+
+    // apply area correction on quantile if necessary
+    if (m_pop_quantiles.size() != 0 )
+       	quantilesAreaCorrection();
+
 }
 
 void Histogram::populateQuantiles(unsigned int nbquantiles)
@@ -121,21 +126,30 @@ void Histogram::populateQuantiles(unsigned int nbquantiles)
 			val = m_dataIdx.back().first;
 		m_interv.push_back(val);
 	}
+	quantilesAreaCorrection();
+}
 
-	m_maxQBar = 0.0;
+
+void Histogram::quantilesAreaCorrection()
+{
+	unsigned int nbquantiles = m_pop_quantiles.size();
 
 	// constant area correction
-	double lc = 1.0f;
+	double areaQ1 = 100.0f;	// use 100 as area if no histogram
+	if (m_nbclasses!=0)
+	{
+		double areaH = (getMax()-getMin())/double(m_nbclasses) * double(m_dataIdx.size());
+		areaQ1 = areaH/nbquantiles; // area of one quantile
+	}
 
-	if (m_nbclasses != 0) //for histo superposition
-		lc = double(m_dataIdx.back().first - m_dataIdx.front().first )/double(m_nbclasses);
-
+	m_maxQBar = 0.0;
 	for (unsigned int i = 0; i < nbquantiles; ++i)
 	{
-		double lq = m_interv[i+1] - m_interv[i];
-		m_pop_quantiles[i] = m_pop_quantiles[i]*lc/lq;
+		// compute height instead of population
+		double lq = m_interv[i+1] - m_interv[i]; // width
+		m_pop_quantiles[i] = areaQ1/lq;			// height = area / width
 		if (m_pop_quantiles[i] > m_maxQBar)
-			m_maxQBar = m_pop_quantiles[i];
+			m_maxQBar = m_pop_quantiles[i];		// store max
 	}
 }
 
@@ -200,8 +214,6 @@ unsigned int Histogram::cellsOfQuantilesColumn( unsigned int c, std::vector<unsi
 
 	return vc.size();
 }
-
-
 
 
 }
