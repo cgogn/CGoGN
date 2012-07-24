@@ -32,6 +32,7 @@ namespace CGoGN { namespace Utils { class VBO; } }
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -63,7 +64,7 @@ public:
 	/**
 	 * init shaders, texture and variables
 	 */
-	PointSprite(float radius=1.0f);
+	PointSprite(float radius = 1.0f);
 
 	/**
 	 * clean shaders, texture and variables
@@ -90,9 +91,10 @@ public:
 	 * set position attribute
 	 */
 	unsigned int setAttributePosition(VBO* vbo);
-
-
 };
-}
-}
+
+} // namespace Utils
+
+} // namespace CGoGN
+
 #endif
