@@ -113,7 +113,6 @@ void Viewer::cb_initGL()
 	m_simpleColorShader->setColor(c) ;
 
 	m_pointSprite = new Utils::PointSprite() ;
-	m_pointSprite->setAttributePosition(m_positionVBO) ;
 
 	registerShader(m_phongShader) ;
 	registerShader(m_flatShader) ;
@@ -127,6 +126,7 @@ void Viewer::cb_redraw()
 	if(m_drawVertices)
 	{
 		float size = vertexScaleFactor ;
+		m_pointSprite->setAttributePosition(m_positionVBO) ;
 		m_pointSprite->setSize(size) ;
 		m_pointSprite->predraw(Geom::Vec3f(0.0f, 0.0f, 1.0f)) ;
 		m_render->draw(m_pointSprite, Algo::Render::GL2::POINTS) ;
@@ -189,6 +189,18 @@ void Viewer::cb_Save()
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
 
 	exportMesh(filename) ;
+}
+
+void Viewer::cb_keyPress(int keycode)
+{
+    switch(keycode)
+    {
+    	case 'c' :
+    		myMap.check();
+    		break;
+    	default:
+    		break;
+    }
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -311,21 +323,6 @@ void Viewer::slot_normalsSize(int i)
 	updateGL() ;
 }
 
-void Viewer::cb_keyPress(int keycode)
-{
-    switch(keycode)
-    {
-    	case 'c' :
-    		myMap.check();
-    		break;
-    	default:
-    		break;
-    }
-
-    updateGLMatrices() ;
-    updateGL();
-}
-
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
@@ -333,6 +330,8 @@ void Viewer::cb_keyPress(int keycode)
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv) ;
+
+	srand(123) ;
 
 	Viewer sqt ;
 	sqt.setGeometry(0, 0, 1000, 800) ;
