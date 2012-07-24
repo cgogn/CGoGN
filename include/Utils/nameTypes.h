@@ -46,6 +46,10 @@ template <> inline std::string nameOfType(const int& v) { return "int"; }
 
 template <> inline std::string nameOfType(const long int& v) { return "long int"; }
 
+template <> inline std::string nameOfType(const long long& v) { return "long long"; }
+
+template <> inline std::string nameOfType(const unsigned long long& v) { return "long long"; }
+
 template <> inline std::string nameOfType(const unsigned char& v) { return "unsigned char"; }
 
 template <> inline std::string nameOfType(const unsigned short int& v) { return "unsigned short int"; }
