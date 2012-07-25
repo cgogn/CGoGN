@@ -134,6 +134,7 @@ inline void Histogram::initData(const ATTR& attr)
 	m_max = m_min;
 
 	m_dataIdx.reserve(attr.nbElements());
+	m_dataIdx.clear();
 	for (unsigned int i = beg; i!= attr.end(); attr.next(i))
 	{
 		double val = attr[i];
