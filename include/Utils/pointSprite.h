@@ -62,7 +62,8 @@ protected:
 public:
 	/**
 	 * init shaders, texture and variables
-	 * @param withColorPerVertex if true use colorVBO else use predraw(color)
+	 * @param withColorPerVertex if true use setAttributeColor for per vertex color, else use predraw(color) for global color
+	 * @param radius of sphere
 	 */
 	PointSprite(bool withColorPerVertex=false, float radius=1.0f);
 
@@ -73,7 +74,7 @@ public:
 
 	/**
 	 * call once before sending points to gpu
-	 * @param color set global color of sprite
+	 * @param color set global color of sprites
 	 */
 	void predraw(const Geom::Vec3f& color);
 
@@ -99,7 +100,7 @@ public:
 	unsigned int setAttributePosition(VBO* vbo);
 
 	/**
-	 * set position attribute
+	 * set color attribute
 	 */
 	unsigned int setAttributeColor(VBO* vbo);
 
