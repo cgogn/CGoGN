@@ -147,6 +147,7 @@ inline void Histogram::initData(const ATTR& attr)
 	m_hcolmap.setMin(m_min);
 	m_hcolmap.setMax(m_max);
 
+	m_sorted = false;
 }
 
 
