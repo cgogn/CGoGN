@@ -191,7 +191,7 @@ public:
 	/**
 	* Drawing function for phi2 only
 	*/
-	void drawRelation3();
+	void drawRelation3(Geom::Vec4f c);
 
 	/**
 	 * draw all topo

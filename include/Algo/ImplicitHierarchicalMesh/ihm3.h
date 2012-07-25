@@ -131,17 +131,6 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//!
-	/*!
-	 *
-	 */
-	Dart beginSplittingPath(Dart d, DartMarker& m);
-
-	//!
-	/*!
-	 *
-	 */
-	void constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m);
 
 	//!
 	/*!
@@ -160,36 +149,6 @@ public:
 	Dart quadranguleFace(Dart d);
 
 	void deleteVertexSubdividedFace(Dart d);
-
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual Dart cutEdge(Dart d);
-//
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual bool uncutEdge(Dart d);
-//
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual void splitFace(Dart d, Dart e);
-//
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
-//
-//	//!
-//	/*!
-//	 *
-//	 */
-//	virtual void splitVolume(std::vector<Dart>& vd);
 	//@}
 
 	void computeVertexVertexFunctor(Dart d) { (*vertexVertexFunctor)(d); }
@@ -322,18 +281,6 @@ public:
 	 */
 	bool edgeIsSubdivided(Dart d) ;
 
-	//! Return true if the face of d in the current level map
-	//! has already been subdivided to the next level
-	/*!
-	 */
-	bool faceIsSubdivided(Dart d) ;
-
-	//! Return true if the volume of d in the current level map
-	//! has already been subdivided to the next level
-	/*!
-	 */
-	bool volumeIsSubdivided(Dart d);
-
 	//! Return true if the edge of d in the current level map
 	//! is subdivided to the next level,
 	//! none of its resulting edges is in turn subdivided to the next level
@@ -342,30 +289,41 @@ public:
 	 */
 	bool edgeCanBeCoarsened(Dart d);
 
+	//! Return true if the face of d in the current level map
+	//! has already been subdivided to the next level
+	/*!
+	 */
+	bool faceIsSubdivided(Dart d) ;
+
 	//!
 	/*!
 	 */
 	bool faceCanBeCoarsened(Dart d);
 
-	//!
+	//! Return true if the volume of d in the current level map
+	//! has already been subdivided to the next level
 	/*!
 	 */
-	bool faceIsSubdividedOnce(Dart d);
+	bool volumeIsSubdivided(Dart d);
 
 	//!
 	/*!
 	 */
 	bool volumeIsSubdividedOnce(Dart d);
 
+
+	/*! @name
+	 *************************************************************************/
+
 	//!
 	/*!
 	 */
-	bool neighborhoodLevelOverOne(Dart d);
+	bool neighborhoodLevelDiffersMoreThanOne(Dart d);
 
 	//! wired !!!
 	/*!
 	 */
-	bool coarsenNeighborhoodLevelOverOne(Dart d);
+	bool coarsenNeighborhoodLevelDiffersMoreThanOne(Dart d);
 	//@}
 
 	/*! @name Cell Functors
@@ -448,3 +406,9 @@ public:
 #include "Algo/ImplicitHierarchicalMesh/ihm3.hpp"
 
 #endif
+
+////!
+///*!
+// */
+//bool faceIsSubdividedOnce(Dart d);
+

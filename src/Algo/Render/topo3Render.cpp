@@ -233,13 +233,13 @@ void Topo3Render::drawRelation2()
 }
 
 
-void Topo3Render::drawRelation3()
+void Topo3Render::drawRelation3(Geom::Vec4f c)
 {
 	if (m_nbRel3==0)
 		return;
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo3);
-	m_shader1->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+	m_shader1->setColor(c);
 	m_shader1->enableVertexAttribs();
 
 	glDrawArrays(GL_QUADS, 0, m_nbRel3*4);
@@ -262,7 +262,7 @@ void Topo3Render::drawTopo()
 	drawDarts();
 	drawRelation1();
 	drawRelation2();
-	drawRelation3();
+	drawRelation3(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 }
 
 

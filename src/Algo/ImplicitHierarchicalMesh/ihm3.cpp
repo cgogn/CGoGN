@@ -69,101 +69,12 @@ void ImplicitHierarchicalMap3::init()
 }
 
 
-Dart ImplicitHierarchicalMap3::beginSplittingPath(Dart d, DartMarker& m)
-{
-	Dart dres = NIL;
-	Dart dit = d;
-	bool found = false;
-
-	// Recherche d'un brin de depart du chemin d'arete
-	do
-	{
-		Dart eit = phi1(dit);
-
-		if(!m.isMarked(eit) && getDartLevel(eit) == getCurrentLevel())
-		{
-			found = true;
-			dres = eit;
-		}
-
-		dit = phi2(phi_1(dit));
-	}
-	while(!found && dit != d);
-
-	return dres;
-}
-
-void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m)
-{
-
-	//Construction du chemin d'arete
-	Dart cit = d;
-
-	v.push_back(cit);
-	m.markOrbit<EDGE>(cit);
-
-	do
-	{
-
-		if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit))))  == getDartLevel(d))
-		{
-			if(m.isMarked(phi1(cit)))
-			{
-				cit = phi1(phi2(phi1(cit)));
-				std::cout << "1_1" << std::endl;
-			}
-		}
-		else if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit)))) < getDartLevel(d))
-		{
-			cit = phi1(phi2(phi1(cit)));
-			std::cout << "2" << std::endl;
-		}
-		else
-			cit = phi1(cit);
-
-		v.push_back(cit);
-		m.markOrbit<EDGE>(cit);
-
-
-	}
-	while(cit != d);
-
-//	do
-//	{
-//		v.push_back(cit);
-//		m.markOrbit<EDGE>(cit);
-//
-//		cit = phi1(cit);
-//
-//		//std::cout << "cit = " << cit << std::endl;
-//
-//		if(std::min(getDartLevel(cit), getDartLevel(phi2(cit))) == getDartLevel(d))
-//		{
-//			if(m.isMarked(cit))
-//			{
-//				cit = phi1(phi2(cit));
-//				//std::cout << "1_1" << std::endl;
-//			}
-//		}
-//		else if(std::min(getDartLevel(cit),getDartLevel(phi2(cit))) < getDartLevel(d))
-//		{
-//			cit = phi1(phi2(cit));
-//			//std::cout << "2" << std::endl;
-//		}
-//
-//	}while(cit != d);
-
-}
-
-
 void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 {
 	if(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e))
 	{
 	Dart d2 = phi2(d);
 	Dart e2 = phi2(e);
-
-
 
 	Map2::unsewFaces(d);
 	Map2::unsewFaces(e);
@@ -324,104 +235,6 @@ void ImplicitHierarchicalMap3::deleteVertexSubdividedFace(Dart d)
 
 }
 
-//Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
-//{
-//        Dart resV = EmbeddedMap3::cutEdge(d);
-//
-//        unsigned int eId = getEdgeId(d);
-//        Dart dit = d;
-//        do
-//        {
-//        	//EdgeId
-//        	m_edgeId[phi1(dit)] = eId;
-//        	m_edgeId[phi3(dit)] = eId;
-//
-//        	//FaceId
-//        	unsigned int fId = getFaceId(dit);
-//        	m_faceId[phi1(dit)] = fId;
-//        	m_edgeId[phi3(dit)] = fId;
-//
-//            dit = alpha2(dit);
-//        }
-//        while(dit != d);
-//
-//        return resV;
-//}
-//
-//bool ImplicitHierarchicalMap3::uncutEdge(Dart d)
-//{
-//       return EmbeddedMap3::uncutEdge(d);
-//}
-//
-//void ImplicitHierarchicalMap3::splitFace(Dart d, Dart e)
-//{
-//        EmbeddedMap3::splitFace(d,e);
-//
-//        unsigned int eId = getNewEdgeId();
-//        unsigned int fId = getFaceId(d);
-//
-//        Dart ne = phi_1(d);
-//        Dart ne3 = phi3(ne);
-//
-//        m_edgeId[ne] = eId;
-//        m_edgeId[phi2(ne)] = eId;
-//        m_edgeId[ne3] = eId;
-//        m_edgeId[phi2(ne3)] = eId;
-//
-//        m_faceId[ne] = fId;
-//        m_faceId[phi2(ne)] = fId;
-//        m_faceId[ne3] = fId;
-//        m_faceId[phi2(ne3)] = fId;
-//}
-//
-//void ImplicitHierarchicalMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
-//{
-//        EmbeddedMap3::sewVolumes(d,e);
-//
-//        unsigned int fId;
-//
-//        if(m_faceId[d] < m_faceId[phi3(d)])
-//        	fId = m_faceId[d] ;
-//        else
-//        	fId = m_edgeId[phi3(d)];
-//
-//        Dart dit = d;
-//        do
-//        {
-//                //EdgeId
-////                if(m_edgeId[dit] < m_edgeId[phi3(dit)])
-////                	m_edgeId[phi3(dit)] = m_edgeId[dit] ;
-////                else
-////                	m_edgeId[dit] = m_edgeId[phi3(dit)];
-//
-//                //FaceId
-//                m_faceId[dit] = fId;
-//                m_faceId[phi3(dit)] = fId;
-//
-//                dit = phi1(dit);
-//        }
-//        while(dit != d);
-//}
-//
-//void ImplicitHierarchicalMap3::splitVolume(std::vector<Dart>& vd)
-//{
-//        EmbeddedMap3::splitVolume(vd);
-//
-//        unsigned int fId = getNewFaceId();
-//
-//        for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-//        {
-//                Dart dit = *it;
-//
-//                //Edge Id
-//                m_edgeId[phi2(dit)] = m_edgeId[dit];
-//
-//                //Face Id
-//                m_faceId[phi2(dit)] = fId;
-//        }
-//}
-
-
 void ImplicitHierarchicalMap3::initEdgeId()
 {
 	DartMarkerStore edgeMark(*this) ;
@@ -494,7 +307,6 @@ unsigned int ImplicitHierarchicalMap3::faceLevel(Dart d)
 		unsigned int l = edgeLevel(it) ;		// is the minimum of the levels
 		fLevel = l < fLevel ? l : fLevel ;		// of its edges
 	} while(it != d) ;
-
 
 	unsigned int cur = m_curLevel ;
 	m_curLevel = fLevel ;
@@ -647,7 +459,6 @@ unsigned int ImplicitHierarchicalMap3::volumeLevel(Dart d)
 	return vLevel;
 }
 
-
 Dart ImplicitHierarchicalMap3::faceOldestDart(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
@@ -675,133 +486,39 @@ Dart ImplicitHierarchicalMap3::volumeOldestDart(Dart d)
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
 	Dart oldest = d;
+	unsigned int l_old = m_dartLevel[oldest];
 
-	Traversor3WF<ImplicitHierarchicalMap3> trav3WF(*this, d);
+	Traversor3WF<ImplicitHierarchicalMap3> trav3WF(*this, oldest);
 	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
 	{
 		Dart old = faceOldestDart(dit);
-		if(m_dartLevel[old] < m_dartLevel[oldest])
+		unsigned int l = m_dartLevel[old];
+		if(l < l_old)
+		{
 			oldest = old;
+			l_old = l;
+		}
 	}
 
 	return oldest;
-
-//	DartMarkerStore mark(*this);	// Lock a marker
-//
-//	std::vector<Dart> visitedFaces;	// Faces that are traversed
-//	visitedFaces.reserve(512);
-//	visitedFaces.push_back(d);		// Start with the face of d
-//
-//	// For every face added to the list
-//	//the oldest dart from a volume is the oldest dart from all faces of this volume
-//	mark.markOrbit<FACE>(d) ;
-//
-//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-//	{
-//		Dart e = visitedFaces[i] ;
-//
-//		//for every dart in this face
-//		Dart old = faceOldestDart(e);
-//		if(m_dartLevel[old] < m_dartLevel[oldest])
-//			oldest = old;
-//
-//		do	// add all face neighbours to the table
-//		{
-//			Dart ee = phi2(e) ;
-//			if(!mark.isMarked(ee)) // not already marked
-//			{
-//				visitedFaces.push_back(ee) ;
-//				mark.markOrbit<FACE>(ee) ;
-//			}
-//			e = phi1(e) ;
-//		} while(e != visitedFaces[i]) ;
-//	}
-//
-//	return oldest;
 }
 
 bool ImplicitHierarchicalMap3::edgeIsSubdivided(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-	Dart d2 = phi2(d) ;
+	//Dart d2 = phi2(d) ;
+	Dart d1 = phi1(d) ;
 	++m_curLevel ;
-	Dart d2_l = phi2(d) ;
+	//Dart d2_l = phi2(d) ;
+	Dart d1_l = phi1(d) ;
 	--m_curLevel ;
-	if(d2 != d2_l)
+	//if(d2 != d2_l)
+	if(d1 != d1_l)
 		return true ;
 	else
 		return false ;
 }
-
-bool ImplicitHierarchicalMap3::faceIsSubdivided(Dart d)
-{
-	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
-	unsigned int fLevel = faceLevel(d) ;
-	if(fLevel < m_curLevel)
-		return false ;
-
-	bool subd = false ;
-	++m_curLevel ;
-	if(m_dartLevel[phi1(d)] == m_curLevel && m_edgeId[phi1(d)] != m_edgeId[d])
-		subd = true ;
-	--m_curLevel ;
-
-	return subd ;
-}
-
-bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
-{
-	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
-	unsigned int vLevel = volumeLevel(d);
-	if(vLevel < m_curLevel)
-		return false;
-
-	//test si toutes les faces sont subdivisee
-	DartMarkerStore mark(*this);		// Lock a marker
-
-	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(d);			// Start with the face of d
-	std::vector<Dart>::iterator face;
-
-	bool facesAreSubdivided = faceIsSubdivided(d) ;
-
-	//parcours les faces du volume au niveau courant
-	//on cherche le brin de niveau le plus bas de la hierarchie
-	//on note le niveau le plus bas de la hierarchie
-	mark.markOrbit<FACE>(d) ;
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-	{
-		Dart e = visitedFaces[i] ;
-
-		// in a first time, the level of a face
-		//the level of the volume is the minimum of the
-		//levels of its faces
-
-		facesAreSubdivided &= faceIsSubdivided(e) ;
-
-		do	// add all face neighbours to the table
-		{
-			Dart ee = phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit<FACE>(ee) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
-	}
-
-	//mais pas le volume lui-meme
-	bool subd = false;
-	++m_curLevel;
-	if(facesAreSubdivided && m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
-		subd = true;
-	--m_curLevel;
-	return subd;
-}
-
 
 bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 {
@@ -826,6 +543,22 @@ bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 		--m_curLevel ;
 	}
 	return subd && degree2 && subdOnce ;
+}
+
+bool ImplicitHierarchicalMap3::faceIsSubdivided(Dart d)
+{
+	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+	unsigned int fLevel = faceLevel(d) ;
+	if(fLevel < m_curLevel)
+		return false ;
+
+	bool subd = false ;
+	++m_curLevel ;
+	if(m_dartLevel[phi1(d)] == m_curLevel && m_edgeId[phi1(d)] != m_edgeId[d])
+		subd = true ;
+	--m_curLevel ;
+
+	return subd ;
 }
 
 bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
@@ -864,47 +597,47 @@ bool ImplicitHierarchicalMap3::faceCanBeCoarsened(Dart d)
 	return subd && !subdNeighborhood && subdOnce;
 }
 
-bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
+
+
+bool ImplicitHierarchicalMap3::volumeIsSubdivided(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
-	unsigned int fLevel = faceLevel(d) ;
-	if(fLevel < m_curLevel)		// a face whose level in the current level map is lower than
-		return false ;			// the current level can not be subdivided to higher levels
+	unsigned int vLevel = volumeLevel(d);
+	if(vLevel < m_curLevel)
+		return false;
 
-	unsigned int degree = 0 ;
-	bool subd = false ;
-	bool subdOnce = true ;
-	Dart fit = d ;
-	do
-	{
-		++m_curLevel ;
-		if(m_dartLevel[phi1(fit)] == m_curLevel && m_edgeId[phi1(fit)] != m_edgeId[fit])
-		{
-			subd = true ;
-			++m_curLevel ;
-			if(m_dartLevel[phi1(fit)] == m_curLevel && m_edgeId[phi1(fit)] != m_edgeId[fit])
-				subdOnce = false ;
-			--m_curLevel ;
-		}
-		--m_curLevel ;
-		++degree ;
-		fit = phi1(fit) ;
+	bool subd = false;
 
-	} while(subd && subdOnce && fit != d) ;
+	++m_curLevel;
+	if(m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
+		subd = true;
+	--m_curLevel;
 
-	if(degree == 3 && subd)
-	{
-		++m_curLevel ;
-		Dart cf = phi2(phi1(d)) ;
-		++m_curLevel ;
-		if(m_dartLevel[phi1(cf)] == m_curLevel && m_edgeId[phi1(cf)] != m_edgeId[cf])
-			subdOnce = false ;
-		--m_curLevel ;
-		--m_curLevel ;
-	}
+	return subd;
 
-	return subd && subdOnce ;
+//	//bool facesAreSubdivided = faceIsSubdivided(d) ;
+//	bool facesAreSubdivided = true ;
+//
+//	Traversor3WF<ImplicitHierarchicalMap3> trav3WF(*this, d);
+//	for(Dart dit = trav3WF.begin() ; dit != trav3WF.end() ; dit = trav3WF.next())
+//	{
+//		// in a first time, the level of a face
+//		//the level of the volume is the minimum of the
+//		//levels of its faces
+//
+//		facesAreSubdivided &= faceIsSubdivided(dit) ;
+//	}
+//
+//	//but not the volume itself
+//	bool subd = false;
+//	++m_curLevel;
+//	if(facesAreSubdivided && m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
+//		subd = true;
+//	--m_curLevel;
+//
+//	return subd;
 }
+
 
 bool ImplicitHierarchicalMap3::volumeIsSubdividedOnce(Dart d)
 {
@@ -913,84 +646,87 @@ bool ImplicitHierarchicalMap3::volumeIsSubdividedOnce(Dart d)
 	if(vLevel < m_curLevel)
 		return false;
 
-//	//si le volume est subdivise au niveau i+1, il faut tester si chacun des volumes du niveau i+1 est subdivise a son tour ou non
 	bool subd = false ;
 	bool subdOnce = true ;
 
-	//si le volume est subdivise
-
-	//test si toutes les faces sont subdivisee
-	DartMarkerStore mark(*this);		// Lock a marker
-
-	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(d);			// Start with the face of d
-	std::vector<Dart>::iterator face;
-
-	bool facesAreSubdivided = faceIsSubdivided(d) ;
-
-	//parcours les faces du volume au niveau courant
-	//on cherche le brin de niveau le plus bas de la hierarchie
-	//on note le niveau le plus bas de la hierarchie
-	mark.markOrbit<FACE>(d) ;
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-	{
-		Dart e = visitedFaces[i] ;
-
-		// in a first time, the level of a face
-		//the level of the volume is the minimum of the
-		//levels of its faces
-
-		facesAreSubdivided &= faceIsSubdivided(e) ;
-
-		do	// add all face neighbours to the table
-		{
-			Dart ee = phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit<FACE>(ee) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
-	}
-
 	++m_curLevel;
-	if(facesAreSubdivided && m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
+	if(m_dartLevel[phi2(phi1(phi1(d)))] == m_curLevel && m_faceId[phi2(phi1(phi1(d)))] != m_faceId[d])
 	{
 		subd = true;
 		++m_curLevel;
 		Dart dcenter = phi_1(phi2(phi1(d)));
 		Traversor3VW<ImplicitHierarchicalMap3> trav3(*this, dcenter);
-		for(Dart dit = trav3.begin() ; dit != trav3.end() && subdOnce; dit = trav3.next())
+		for(Dart dit = trav3.begin() ; subdOnce && dit != trav3.end() && subdOnce; dit = trav3.next())
 		{
-			if(volumeIsSubdivided(dit))
+			if(m_dartLevel[phi2(phi1(phi1(dit)))] == m_curLevel && m_faceId[phi2(phi1(phi1(dit)))] != m_faceId[dit])
 				subdOnce = false;
 		}
 		--m_curLevel;
 	}
 	--m_curLevel;
 	return subd && subdOnce;
+
+//	//si le volume est subdivise
+//
+//	//test si toutes les faces sont subdivisee
+//	DartMarkerStore mark(*this);		// Lock a marker
+//
+//	std::vector<Dart> visitedFaces;		// Faces that are traversed
+//	visitedFaces.reserve(512);
+//	visitedFaces.push_back(d);			// Start with the face of d
+//	std::vector<Dart>::iterator face;
+//
+//	bool facesAreSubdivided = faceIsSubdivided(d) ;
+//
+//	//parcours les faces du volume au niveau courant
+//	//on cherche le brin de niveau le plus bas de la hierarchie
+//	//on note le niveau le plus bas de la hierarchie
+//	mark.markOrbit<FACE>(d) ;
+//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+//	{
+//		Dart e = visitedFaces[i] ;
+//
+//		// in a first time, the level of a face
+//		//the level of the volume is the minimum of the
+//		//levels of its faces
+//
+//		facesAreSubdivided &= faceIsSubdivided(e) ;
+//
+//		do	// add all face neighbours to the table
+//		{
+//			Dart ee = phi2(e) ;
+//			if(!mark.isMarked(ee)) // not already marked
+//			{
+//				visitedFaces.push_back(ee) ;
+//				mark.markOrbit<FACE>(ee) ;
+//			}
+//			e = phi1(e) ;
+//		} while(e != visitedFaces[i]) ;
+//	}
+
 }
 
-bool ImplicitHierarchicalMap3::neighborhoodLevelOverOne(Dart d)
+
+
+
+
+
+bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersMoreThanOne(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-	bool overOne = false;
-
-	//Dart old = volumeOldestDart(d);
 	unsigned int vLevel = volumeLevel(d);
+	bool isMoreThanOne = false;
 
 	Traversor3WWaV<ImplicitHierarchicalMap3> trav3WWaV(*this, d);
-	for(Dart dit = trav3WWaV.begin() ; dit != trav3WWaV.end() ; dit = trav3WWaV.next())
+	for(Dart dit = trav3WWaV.begin() ; !isMoreThanOne && dit != trav3WWaV.end() ; dit = trav3WWaV.next())
 	{
 		//Dart oldit = volumeOldestDart(dit);
 		if(abs((volumeLevel(dit) - vLevel)) > 1)
-			overOne = true;
+			isMoreThanOne = true;
 	}
 
-	return overOne;
+	return isMoreThanOne;
 
 //	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old);
 //	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
@@ -1002,23 +738,23 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelOverOne(Dart d)
 
 }
 
-bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelOverOne(Dart d)
+bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersMoreThanOne(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+	//assert(m_curLevel > 0 || !"Coarsen a volume at level 0");
 
-
-	bool overOne = false;
 	Dart old = volumeOldestDart(d);
+	bool isMoreThanOne = false;
 
-	if(m_curLevel != 0)
-		--m_curLevel;
+//	if(m_curLevel > 0)
+//		--m_curLevel;
 
-	overOne = neighborhoodLevelOverOne(old);
+	isMoreThanOne = neighborhoodLevelDiffersMoreThanOne(old);
 
-	if(m_curLevel != 0)
-		++m_curLevel;
+//	if(m_curLevel > 0)
+//		++m_curLevel;
 
-	return overOne;
+	return isMoreThanOne;
 
 //	Traversor3EW<ImplicitHierarchicalMap3> trav3EW(*this, old);
 //	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
@@ -1073,4 +809,238 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelOverOne(Dart d)
 } //namespace Algo
 
 } //namespace CGoGN
+
+
+
+
+
+
+
+//bool ImplicitHierarchicalMap3::faceIsSubdividedOnce(Dart d)
+//{
+//	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
+//	unsigned int fLevel = faceLevel(d) ;
+//	if(fLevel < m_curLevel)		// a face whose level in the current level map is lower than
+//		return false ;			// the current level can not be subdivided to higher levels
+//
+//	unsigned int degree = 0 ;
+//	bool subd = false ;
+//	bool subdOnce = true ;
+//	Dart fit = d ;
+//	do
+//	{
+//		++m_curLevel ;
+//		if(m_dartLevel[phi1(fit)] == m_curLevel && m_edgeId[phi1(fit)] != m_edgeId[fit])
+//		{
+//			subd = true ;
+//			++m_curLevel ;
+//			if(m_dartLevel[phi1(fit)] == m_curLevel && m_edgeId[phi1(fit)] != m_edgeId[fit])
+//				subdOnce = false ;
+//			--m_curLevel ;
+//		}
+//		--m_curLevel ;
+//		++degree ;
+//		fit = phi1(fit) ;
+//
+//	} while(subd && subdOnce && fit != d) ;
+//
+//	if(degree == 3 && subd)
+//	{
+//		++m_curLevel ;
+//		Dart cf = phi2(phi1(d)) ;
+//		++m_curLevel ;
+//		if(m_dartLevel[phi1(cf)] == m_curLevel && m_edgeId[phi1(cf)] != m_edgeId[cf])
+//			subdOnce = false ;
+//		--m_curLevel ;
+//		--m_curLevel ;
+//	}
+//
+//	return subd && subdOnce ;
+//}
+
+
+
+
+//Dart ImplicitHierarchicalMap3::cutEdge(Dart d)
+//{
+//        Dart resV = EmbeddedMap3::cutEdge(d);
+//
+//        unsigned int eId = getEdgeId(d);
+//        Dart dit = d;
+//        do
+//        {
+//        	//EdgeId
+//        	m_edgeId[phi1(dit)] = eId;
+//        	m_edgeId[phi3(dit)] = eId;
+//
+//        	//FaceId
+//        	unsigned int fId = getFaceId(dit);
+//        	m_faceId[phi1(dit)] = fId;
+//        	m_edgeId[phi3(dit)] = fId;
+//
+//            dit = alpha2(dit);
+//        }
+//        while(dit != d);
+//
+//        return resV;
+//}
+//
+//bool ImplicitHierarchicalMap3::uncutEdge(Dart d)
+//{
+//       return EmbeddedMap3::uncutEdge(d);
+//}
+//
+//void ImplicitHierarchicalMap3::splitFace(Dart d, Dart e)
+//{
+//        EmbeddedMap3::splitFace(d,e);
+//
+//        unsigned int eId = getNewEdgeId();
+//        unsigned int fId = getFaceId(d);
+//
+//        Dart ne = phi_1(d);
+//        Dart ne3 = phi3(ne);
+//
+//        m_edgeId[ne] = eId;
+//        m_edgeId[phi2(ne)] = eId;
+//        m_edgeId[ne3] = eId;
+//        m_edgeId[phi2(ne3)] = eId;
+//
+//        m_faceId[ne] = fId;
+//        m_faceId[phi2(ne)] = fId;
+//        m_faceId[ne3] = fId;
+//        m_faceId[phi2(ne3)] = fId;
+//}
+//
+//void ImplicitHierarchicalMap3::sewVolumes(Dart d, Dart e, bool withBoundary)
+//{
+//        EmbeddedMap3::sewVolumes(d,e);
+//
+//        unsigned int fId;
+//
+//        if(m_faceId[d] < m_faceId[phi3(d)])
+//        	fId = m_faceId[d] ;
+//        else
+//        	fId = m_edgeId[phi3(d)];
+//
+//        Dart dit = d;
+//        do
+//        {
+//                //EdgeId
+////                if(m_edgeId[dit] < m_edgeId[phi3(dit)])
+////                	m_edgeId[phi3(dit)] = m_edgeId[dit] ;
+////                else
+////                	m_edgeId[dit] = m_edgeId[phi3(dit)];
+//
+//                //FaceId
+//                m_faceId[dit] = fId;
+//                m_faceId[phi3(dit)] = fId;
+//
+//                dit = phi1(dit);
+//        }
+//        while(dit != d);
+//}
+//
+//void ImplicitHierarchicalMap3::splitVolume(std::vector<Dart>& vd)
+//{
+//        EmbeddedMap3::splitVolume(vd);
+//
+//        unsigned int fId = getNewFaceId();
+//
+//        for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//        {
+//                Dart dit = *it;
+//
+//                //Edge Id
+//                m_edgeId[phi2(dit)] = m_edgeId[dit];
+//
+//                //Face Id
+//                m_faceId[phi2(dit)] = fId;
+//        }
+//}
+//
+//Dart ImplicitHierarchicalMap3::beginSplittingPath(Dart d, DartMarker& m)
+//{
+//	Dart dres = NIL;
+//	Dart dit = d;
+//	bool found = false;
+//
+//	// Recherche d'un brin de depart du chemin d'arete
+//	do
+//	{
+//		Dart eit = phi1(dit);
+//
+//		if(!m.isMarked(eit) && getDartLevel(eit) == getCurrentLevel())
+//		{
+//			found = true;
+//			dres = eit;
+//		}
+//
+//		dit = phi2(phi_1(dit));
+//	}
+//	while(!found && dit != d);
+//
+//	return dres;
+//}
+//
+//void ImplicitHierarchicalMap3::constructSplittingPath(Dart d, std::vector<Dart>& v, DartMarker& m)
+//{
+//
+//	//Construction du chemin d'arete
+//	Dart cit = d;
+//
+//	v.push_back(cit);
+//	m.markOrbit<EDGE>(cit);
+//
+//	do
+//	{
+//
+//		if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit))))  == getDartLevel(d))
+//		{
+//			if(m.isMarked(phi1(cit)))
+//			{
+//				cit = phi1(phi2(phi1(cit)));
+//				std::cout << "1_1" << std::endl;
+//			}
+//		}
+//		else if(std::min(getDartLevel(phi1(cit)),getDartLevel(phi2(phi1(cit)))) < getDartLevel(d))
+//		{
+//			cit = phi1(phi2(phi1(cit)));
+//			std::cout << "2" << std::endl;
+//		}
+//		else
+//			cit = phi1(cit);
+//
+//		v.push_back(cit);
+//		m.markOrbit<EDGE>(cit);
+//
+//
+//	}
+//	while(cit != d);
+//
+////	do
+////	{
+////		v.push_back(cit);
+////		m.markOrbit<EDGE>(cit);
+////
+////		cit = phi1(cit);
+////
+////		//std::cout << "cit = " << cit << std::endl;
+////
+////		if(std::min(getDartLevel(cit), getDartLevel(phi2(cit))) == getDartLevel(d))
+////		{
+////			if(m.isMarked(cit))
+////			{
+////				cit = phi1(phi2(cit));
+////				//std::cout << "1_1" << std::endl;
+////			}
+////		}
+////		else if(std::min(getDartLevel(cit),getDartLevel(phi2(cit))) < getDartLevel(d))
+////		{
+////			cit = phi1(phi2(cit));
+////			//std::cout << "2" << std::endl;
+////		}
+////
+////	}while(cit != d);
+//
+//}
 
