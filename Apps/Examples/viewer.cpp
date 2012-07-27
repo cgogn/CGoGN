@@ -191,6 +191,18 @@ void Viewer::cb_Save()
 	exportMesh(filename) ;
 }
 
+void Viewer::cb_keyPress(int keycode)
+{
+    switch(keycode)
+    {
+    	case 'c' :
+    		myMap.check();
+    		break;
+    	default:
+    		break;
+    }
+}
+
 void Viewer::importMesh(std::string& filename)
 {
 	myMap.clear(true) ;
@@ -309,21 +321,6 @@ void Viewer::slot_normalsSize(int i)
 	normalScaleFactor = i / 50.0f ;
 	m_topoRender->updateData<PFP>(myMap, position, i / 100.0f, i / 100.0f) ;
 	updateGL() ;
-}
-
-void Viewer::cb_keyPress(int keycode)
-{
-    switch(keycode)
-    {
-    	case 'c' :
-    		myMap.check();
-    		break;
-    	default:
-    		break;
-    }
-
-    updateGLMatrices() ;
-    updateGL();
 }
 
 /**********************************************************************************************

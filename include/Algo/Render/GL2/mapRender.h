@@ -100,7 +100,7 @@ protected:
 	static bool cmpVP(VertexPoly* lhs, VertexPoly* rhs);
 
 	// multiset typedef for simple writing
-	typedef std::multiset< VertexPoly*,bool(*)(VertexPoly*,VertexPoly*)> VPMS;
+	typedef std::multiset<VertexPoly*, bool(*)(VertexPoly*,VertexPoly*)> VPMS;
 
 	class VertexPoly
 	{
@@ -112,9 +112,9 @@ protected:
 		VertexPoly* next;
 		VPMS::iterator ear;
 
-		VertexPoly(int i, float v, float l, VertexPoly* p=NULL): id(i),value(v), length(l), prev(p), next(NULL)
+		VertexPoly(int i, float v, float l, VertexPoly* p = NULL) : id(i), value(v), length(l), prev(p), next(NULL)
 		{
-			if (prev!=NULL)
+			if (prev != NULL)
 				prev->next = this;
 		}
 
@@ -132,7 +132,6 @@ protected:
 			delete vp;
 			return tmp;
 		}
-
 	};
 
 public:

@@ -22,14 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGoGN_GLSL_VBO__
-#define __CGoGN_GLSL_VBO__
+#ifndef _VBO_RENDER_
+#define _VBO_RENDER_
 
-#include <vector>
 #include <GL/glew.h>
-
-#include "Topology/generic/attributeHandler.h"
-#include "Container/convert.h"
 
 namespace CGoGN
 {
@@ -37,106 +33,35 @@ namespace CGoGN
 namespace Utils
 {
 
+// forward definition
 class GLSLShader;
 
-/**
- * Encapsulation of OpenGL Vertex Buffer Object
- * Manage
- * - alloc /release of GL buffer
- * - ref by Shaders
- * - size of data (invidual cells)
- */
-class VBO
+class VBORender
 {
 protected:
-	// VBO id
-	GLuint m_id;
-	// size of data (in floats)
-	unsigned int m_data_size;
-	// shaders that ref this vbo
-	std::vector<GLSLShader*> m_refs;
-	unsigned int m_nbElts;
-	mutable bool m_lock;
+	GLuint m_indexBuffer ;
+	GLuint m_nbIndices ;
+	int m_primitiveType ;
 
 public:
-	/**
-	 * constructor: allocate the OGL VBO
-	 */
-	VBO();
+	enum primitiveTypes
+	{
+		POINTS = 0,
+		LINES = 1,
+		TRIANGLES = 2
+	} ;
 
-	/**
-	 * copy constructor, new VBO copy content
-	 */
-	VBO(const VBO& vbo);
+	VBORender() ;
 
-	/**
-	 * destructor: release the OGL VBO and clean references between VBO/Shaders
-	 */
-	~VBO();
+	~VBORender() ;
 
-	/**
-	 * get id of vbo
-	 */
-	unsigned int id() const { return m_id; }
+	void setConnectivity(std::vector<GLuint>& tableIndices, int primitiveType) ;
 
-	/**
-	 * get dataSize
-	 */
-	unsigned int dataSize() const { return m_data_size; }
-
-	/**
-	 * set the data size (in number of float)
-	 */
-	void setDataSize(unsigned int ds) { m_data_size = ds; }
-
-	/**
-	 * get nb element in vbo (vertices, colors ...)
-	 */
-	unsigned int nbElts() { return m_nbElts; }
-
-	/**
-	 * bind array vbo
-	 */
-	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER, m_id); }
-
-	/**
-	 * alloc buffer of same size than parameter
-	 */
-	void sameAllocSameBufferSize(const VBO& vbo);
-
-	/**
-	 * update data from attribute handler to the vbo
-	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib);
-
-	/**
-	 * update data from attribute handler to the vbo, with conversion
-	 */
-	template <typename ATTR_HANDLER>
-	void updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv);
-
-	/**
-	 * update data from given data vector
-	 */
-	template <typename T>
-	void updateData(std::vector<T>& data);
-
-	void* lockPtr();
-
-	const void* lockPtr() const;
-
-	void releasePtr() const;
-
-	void copyData(void *ptr) const;
-
-	void allocate(unsigned int nbElts);
+	void draw(Utils::GLSLShader* sh) ;
 };
 
 } // namespace Utils
 
 } // namespace CGoGN
-
-#include "Utils/vbo.hpp"
 
 #endif
