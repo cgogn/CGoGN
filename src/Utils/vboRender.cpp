@@ -22,10 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/vbo.h"
+#include "vector"
+
+#include "Utils/vboRender.h"
 #include "Utils/GLSLShader.h"
-#include <stdio.h>
-#include <string.h>
 
 namespace CGoGN
 {
@@ -33,91 +33,47 @@ namespace CGoGN
 namespace Utils
 {
 
-VBO::VBO() : m_nbElts(0), m_lock(false)
+VBORender::VBORender()
 {
-	glGenBuffers(1, &m_id);
-	m_refs.reserve(4);
+	glGenBuffersARB(1, &m_indexBuffer) ;
+	m_nbIndices = 0 ;
+	m_primitiveType = POINTS;
 }
 
-VBO::VBO(const VBO& vbo) :
-	m_data_size(vbo.m_data_size),
-	m_nbElts(vbo.m_nbElts),
-	m_lock(false)
+VBORender::~VBORender()
 {
-	unsigned int nbbytes =  sizeof(float) * m_data_size * m_nbElts;
-
-	glGenBuffers(1, &m_id);
-
-	vbo.bind();
-	void* src = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-
-	bind();
-	glBufferData(GL_ARRAY_BUFFER, nbbytes, src, GL_STREAM_DRAW);
-
-	vbo.bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glDeleteBuffersARB(1, &m_indexBuffer) ;
 }
 
-VBO::~VBO()
+void VBORender::setConnectivity(std::vector<GLuint>& tableIndices, int primitiveType)
 {
-	if (m_lock)
-		releasePtr();
-	glDeleteBuffers(1, &m_id);
+	m_primitiveType = primitiveType ;
+	m_nbIndices = tableIndices.size() ;
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer) ;
+	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, m_nbIndices * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW) ;
 }
 
-void VBO::sameAllocSameBufferSize(const VBO& vbo)
+void VBORender::draw(Utils::GLSLShader* sh)
 {
-	m_data_size = vbo.m_data_size;
-	m_nbElts = vbo.m_nbElts;
-	unsigned int nbbytes =  sizeof(float) * m_data_size * m_nbElts;
-	bind();
-	glBufferData(GL_ARRAY_BUFFER, nbbytes, NULL, GL_STREAM_DRAW);
-}
+	sh->enableVertexAttribs() ;
 
-void* VBO::lockPtr()
-{
-	if (m_lock)
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer) ;
+	switch(m_primitiveType)
 	{
-		CGoGNerr << "Error already locked VBO" << CGoGNendl;
-		return NULL;
+		case POINTS:
+			glDrawElements(GL_POINTS, m_nbIndices, GL_UNSIGNED_INT, 0) ;
+			break;
+		case LINES:
+			glDrawElements(GL_LINES, m_nbIndices, GL_UNSIGNED_INT, 0);
+			break;
+		case TRIANGLES:
+			glDrawElements(GL_TRIANGLES, m_nbIndices, GL_UNSIGNED_INT, 0);
+			break;
+		default:
+			break;
 	}
 
-	m_lock = true;
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
-	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-}
-
-const void* VBO::lockPtr() const
-{
-	if (m_lock)
-	{
-		CGoGNerr << "Error already locked VBO" << CGoGNendl;
-		return NULL;
-	}
-
-	m_lock = true;
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
-	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-}
-
-void VBO::releasePtr() const
-{
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-	m_lock = false;
-}
-
-void VBO::copyData(void *ptr) const
-{
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
-	glGetBufferSubData(GL_ARRAY_BUFFER, 0, m_nbElts * m_data_size * sizeof(float), ptr);
-}
-
-void VBO::allocate(unsigned int nbElts)
-{
-	m_nbElts = nbElts;
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
-	glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size * sizeof(float), 0, GL_STREAM_DRAW);
+	sh->disableVertexAttribs() ;
 }
 
 } // namespace Utils

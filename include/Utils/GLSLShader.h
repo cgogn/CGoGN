@@ -288,7 +288,6 @@ public:
 
 	virtual void updateClippingUniforms() {CGoGNerr << "Warning updateClippingUniforms not implemented"<< CGoGNendl;}
 
-
 	/**
 	 *
 	 */
@@ -341,7 +340,6 @@ public:
 	 */
 	void addPathFileSeach(const std::string& path);
 
-
 	/**
 	 * remove VBO index from binding
 	 */
@@ -374,7 +372,7 @@ public:
 	 * bind, enable, and set all vertex attrib pointers
 	 * @param stride: the stride parameter, number osf byte between two consecutive attributes
 	 */
-	void enableVertexAttribs(unsigned int stride=0, unsigned int begin=0) const;
+	void enableVertexAttribs(unsigned int stride = 0, unsigned int begin = 0) const;
 
 	/**
 	 * disenable all vertex attribs
@@ -394,8 +392,6 @@ public:
 	static void pushTransfo() {s_current_matrices->pushTransfo();}
 	/// pop transformation matrix
 	static void popTransfo() {s_current_matrices->popTransfo();}
-
-
 };
 
 
