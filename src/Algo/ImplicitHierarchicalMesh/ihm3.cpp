@@ -531,13 +531,12 @@ bool ImplicitHierarchicalMap3::edgeCanBeCoarsened(Dart d)
 	if(edgeIsSubdivided(d))
 	{
 		subd = true ;
-		Dart d2 = phi2(d) ;
 		++m_curLevel ;
 
 		if(vertexDegree(phi1(d)) == 2)
 		{
 			degree2 = true ;
-			if(edgeIsSubdivided(d) || edgeIsSubdivided(d2))
+			if(edgeIsSubdivided(d))
 				subdOnce = false ;
 		}
 		--m_curLevel ;
@@ -705,10 +704,6 @@ bool ImplicitHierarchicalMap3::volumeIsSubdividedOnce(Dart d)
 //	}
 
 }
-
-
-
-
 
 
 bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersMoreThanOne(Dart d)
