@@ -414,6 +414,7 @@ void Collector_NormalAngle_Triangles<PFP>::collectAll(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
+	this->insideVertices.reserve(32);
 	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
@@ -497,7 +498,6 @@ void Collector_NormalAngle_Triangles<PFP>::collectBorder(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
-	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
@@ -552,6 +552,66 @@ void Collector_NormalAngle_Triangles<PFP>::collectBorder(Dart d)
 	this->insideFaces.clear();
 }
 
+/*********************************************************
+ * Collector Dijkstra
+ *********************************************************/
+
+template <typename PFP>
+void Collector_Dijkstra<PFP>::collectAll(Dart dinit){
+	init(dinit);
+
+	CellMarkerStore<VERTEX> vmReached (this->map);
+	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].valid = true;
+	vmReached.mark(this->centerDart);
+
+	while ( !front.empty() && front.begin()->first < this->maxDist)
+	{
+		Dart e = front.begin()->second;
+		float d = front.begin()->first;
+		front.erase(vertexInfo[e].it);
+		vertexInfo[e].valid=false;
+		this->insideVertices.push_back(e);
+
+		Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+		for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+		{
+			VertexInfo& vi (vertexInfo[f]);
+			if (vmReached.isMarked(f))
+			{
+				if (vi.valid) // probably useless but faster
+				{
+					float dist = d + edgeLength(f);
+					if (dist < vi.it->first)
+					{
+						front.erase(vi.it);
+						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+					}
+				}
+			}
+			else
+			{
+				vi.it = front.insert(std::pair<float,Dart>(d + edgeLength(f), f));
+				vi.valid=true;
+				vmReached.mark(f);
+			}
+
+		}
+
+	}
+
+}
+
+template <typename PFP>
+void Collector_Dijkstra<PFP>::collectBorder(Dart d){
+
+}
+
+template <typename PFP>
+inline float Collector_Dijkstra<PFP>::edgeLength (Dart d){
+	typename PFP::VEC3 v = Algo::Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
+	return v.norm();
+}
 
 
 } // namespace Selection

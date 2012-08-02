@@ -226,6 +226,54 @@ public:
 	void collectBorder(Dart d) ;
 };
 
+/*********************************************************
+ * Collector Dijkstra
+ *********************************************************/
+
+/*
+ * collect all primitives of the connected component containing "centerDart"
+ * within a distance < maxDist (the shortest path follows edges)
+ */
+template <typename PFP>
+class Collector_Dijkstra : public Collector<PFP>
+{
+protected:
+	const VertexAttribute<typename PFP::VEC3>& position;
+	typename PFP::REAL maxDist;
+
+	typedef struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
+	} DijkstraVertexInfo ;
+	typedef NoMathIOAttribute<DijkstraVertexInfo> VertexInfo ;
+
+	VertexAttribute<VertexInfo> vertexInfo ;
+
+	std::multimap<float,Dart> front ;
+
+public:
+	Collector_Dijkstra(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL d = 0) :
+		Collector<PFP>(m),
+		position(p),
+		maxDist(d)
+	{
+		vertexInfo = m.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+	}
+	~Collector_Dijkstra(){
+		this->map.removeAttribute(vertexInfo);
+	}
+	inline void init (Dart d) {Collector<PFP>::init(d); front.clear();}
+	inline void setMaxDistance(typename PFP::REAL d) { maxDist = d; }
+	inline typename PFP::REAL getMaxDist() const { return maxDist; }
+	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position; }
+
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
+private :
+	inline float edgeLength (Dart d);
+};
 
 
 } // namespace Selection
