@@ -36,6 +36,7 @@ namespace Algo
 namespace IHM
 {
 
+
 template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
 class ImplicitHierarchicalMap3 : public EmbeddedMap3
@@ -159,6 +160,11 @@ public:
 	/*! @name Levels Management
 	 *  Operations to manage the levels of an Implicit Hierarchical 3-map
 	 *************************************************************************/
+
+	void incCurrentLevel();
+
+	void decCurrentLevel();
+
 
 	//@{
 	//!
@@ -396,6 +402,15 @@ public:
 		return AttributeHandler<T, ORBIT>::operator[](a) ;
 	}
 } ;
+
+template <typename T>
+class VertexAttribute_IHM : public Algo::IHM::AttributeHandler_IHM<T, VERTEX>
+{
+public:
+	VertexAttribute_IHM() : Algo::IHM::AttributeHandler_IHM<T, VERTEX>() {}
+	VertexAttribute_IHM(const Algo::IHM::AttributeHandler_IHM<T, VERTEX>& ah) : Algo::IHM::AttributeHandler_IHM<T, VERTEX>(ah) {}
+	VertexAttribute_IHM<T>& operator=(const Algo::IHM::AttributeHandler_IHM<T, VERTEX>& ah) { this->Algo::IHM::AttributeHandler_IHM<T, VERTEX>::operator=(ah); return *this; }
+};
 
 } //namespace IHM
 

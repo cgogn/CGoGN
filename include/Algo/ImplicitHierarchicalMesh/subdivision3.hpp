@@ -368,6 +368,8 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 
 	map.deleteVolume(map.phi3(map.phi2(map.phi1(oldEdges.front()))));
 
+	//map.computerVolumeVertexFunctor(oldEdges.front());
+
 	//Third step : 3-sew internal faces
 	for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedfaces.begin(); it != subdividedfaces.end(); ++it)
 	{

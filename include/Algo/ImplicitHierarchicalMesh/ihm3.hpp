@@ -425,6 +425,24 @@ inline bool ImplicitHierarchicalMap3::foreach_dart_of_face2(Dart d, FunctorType&
  *              LEVELS MANAGEMENT                  *
  ***************************************************/
 
+inline void ImplicitHierarchicalMap3::incCurrentLevel()
+{
+	if(m_curLevel < m_maxLevel)
+		++m_curLevel ;
+	else
+		CGoGNout << "incCurrentLevel : already at maximum resolution level" << CGoGNendl ;
+}
+
+inline void ImplicitHierarchicalMap3::decCurrentLevel()
+{
+	if(m_curLevel > 0)
+		--m_curLevel ;
+	else
+		CGoGNout << "decCurrentLevel : already at minimum resolution level" << CGoGNendl ;
+}
+
+
+
 inline unsigned int ImplicitHierarchicalMap3::getCurrentLevel()
 {
 	return m_curLevel ;

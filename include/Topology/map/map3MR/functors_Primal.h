@@ -38,7 +38,7 @@ namespace Multiresolution
  *                           LOOP BASIC FUNCTIONS
  *********************************************************************************/
 template <typename PFP>
-typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d1)
+typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, Dart d1)
 {
 	Dart d2 = map.phi2(d1) ;
 	Dart d3 = map.phi_1(d1) ;
@@ -58,7 +58,7 @@ typename PFP::VEC3 loopOddVertex(typename PFP::MAP& map, const typename PFP::TVE
 }
 
 template <typename PFP>
-typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, Dart d)
 {
 	map.incCurrentLevel() ;
 
@@ -84,7 +84,7 @@ typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const typename PFP::TV
  *          SHW04 BASIC FUNCTIONS : tetrahedral/octahedral meshes
  *********************************************************************************/
 template <typename PFP>
-typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const typename PFP::TVEC3& position, Dart d)
+typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const AttributeHandler<typename PFP::VEC3, VERTEX>& position, Dart d)
 {
 	typename PFP::VEC3 res(0);
 
@@ -143,7 +143,7 @@ typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const typename PFP::TVEC3
 
 
 
-/*********************************************************************************
+/*******************************MJ96EdgeVertexFunctor**************************************************
  *                           FUNCTORS
  *********************************************************************************/
 
@@ -154,10 +154,10 @@ class LerpVertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	LerpVertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpVertexVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -177,10 +177,10 @@ class LerpEdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	LerpEdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpEdgeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -203,10 +203,10 @@ class LerpFaceVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	LerpFaceVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpFaceVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -228,10 +228,10 @@ class LerpVolumeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	LerpVolumeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	LerpVolumeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -256,10 +256,10 @@ class SHW04VertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	SHW04VertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	SHW04VertexVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -319,10 +319,10 @@ class SHW04EdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	SHW04EdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	SHW04EdgeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -387,10 +387,10 @@ class SHW04VolumeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position;
 
 public:
-	SHW04VolumeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	SHW04VolumeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -415,10 +415,10 @@ class MJ96VertexVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	MJ96VertexVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96VertexVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -517,10 +517,10 @@ class MJ96EdgeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	MJ96EdgeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96EdgeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -531,7 +531,7 @@ public:
 
 			Dart d1 = m_map.phi2(db) ;
 
-			m_map.decCurrentLevel() ;
+			//m_map.decCurrentLevel() ;
 
 			Dart d2 = m_map.phi2(d1) ;
 			Dart d3 = m_map.phi_1(d1) ;
@@ -553,7 +553,7 @@ public:
 			p5 *= 1.0 / 16.0 ;
 			p6 *= 1.0 / 16.0 ;
 
-			m_map.incCurrentLevel() ;
+			//m_map.incCurrentLevel() ;
 
 			m_position[d] = p1 + p2 + p3 + p4 + p5 + p6 ;
 		}
@@ -561,7 +561,7 @@ public:
 		{
 			Dart d2 = m_map.phi2(d);
 
-			m_map.decCurrentLevel() ;
+			//m_map.decCurrentLevel() ;
 			//edge points
 			typename PFP::VEC3 Cavg = typename PFP::VEC3(0);
 			unsigned int degree = 0;
@@ -589,7 +589,7 @@ public:
 			typename PFP::VEC3 ep = Cavg + Aavg * 2 + M * (degree - 3);
 			ep /= degree;
 
-			m_map.incCurrentLevel() ;
+			//m_map.incCurrentLevel() ;
 
 			m_position[d] = ep;
 		}
@@ -603,10 +603,10 @@ class MJ96FaceVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	MJ96FaceVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96FaceVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
@@ -617,7 +617,7 @@ public:
 
 			Dart df = m_map.phi1(m_map.phi1(db)) ;
 
-			m_map.decCurrentLevel() ;
+			//m_map.decCurrentLevel() ;
 
 			typename PFP::VEC3 p(0) ;
 			unsigned int degree = 0 ;
@@ -629,14 +629,14 @@ public:
 			}
 			p /= degree ;
 
-			m_map.incCurrentLevel() ;
+			//m_map.incCurrentLevel() ;
 
 			m_position[d] = p ;
 		}
 		else
 		{
 			Dart df = m_map.phi1(m_map.phi1(d)) ;
-			m_map.decCurrentLevel() ;
+			//m_map.decCurrentLevel() ;
 			//face points
 			typename PFP::VEC3 C0 = Algo::Geometry::volumeCentroid<PFP>(m_map, df, m_position);
 			typename PFP::VEC3 C1 = Algo::Geometry::volumeCentroid<PFP>(m_map, m_map.phi3(df), m_position);
@@ -646,7 +646,7 @@ public:
 			typename PFP::VEC3 fp = C0 + A * 2 + C1;
 			fp /= 4;
 
-			m_map.incCurrentLevel() ;
+			//m_map.incCurrentLevel() ;
 
 			m_position[d] = fp;
 		}
@@ -661,10 +661,10 @@ class MJ96VolumeVertexFunctor : public FunctorType
 {
 protected:
 	typename PFP::MAP& m_map ;
-	typename PFP::TVEC3& m_position ;
+	AttributeHandler<typename PFP::VEC3, VERTEX>& m_position ;
 
 public:
-	MJ96VolumeVertexFunctor(typename PFP::MAP& m, typename PFP::TVEC3& p) : m_map(m), m_position(p)
+	MJ96VolumeVertexFunctor(typename PFP::MAP& m, AttributeHandler<typename PFP::VEC3, VERTEX>& p) : m_map(m), m_position(p)
 	{}
 
 	bool operator() (Dart d)
