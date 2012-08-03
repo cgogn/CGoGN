@@ -273,6 +273,7 @@ public:
 	void collectBorder(Dart d);
 private :
 	inline float edgeLength (Dart d);
+//	inline Dart oppositeVertex (Dart d);
 };
 
 
