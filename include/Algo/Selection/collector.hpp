@@ -24,6 +24,7 @@
 
 #include "Topology/generic/traversor2.h"
 #include "Algo/Geometry/intersection.h"
+#include <queue>
 
 namespace CGoGN
 {
@@ -281,7 +282,7 @@ void Collector_WithinSphere<PFP>::computeArea()
 }
 
 /*********************************************************
- * Collector Normal Angle
+ * Collector Normal Angle (Vertices)
  *********************************************************/
 
 template <typename PFP>
@@ -400,6 +401,218 @@ void Collector_NormalAngle<PFP>::collectBorder(Dart d)
 	}
 	this->insideVertices.clear();
 }
+
+
+/*********************************************************
+ * Collector Normal Angle (Triangles)
+ *********************************************************/
+
+template <typename PFP>
+void Collector_NormalAngle_Triangles<PFP>::collectAll(Dart d)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	this->init(d);
+	this->insideVertices.reserve(32);
+	this->insideEdges.reserve(32);
+	this->insideFaces.reserve(32);
+	this->border.reserve(32);
+
+	CellMarkerStore<FACE> fm(this->map);	// mark the collected inside-faces + front-faces
+	CellMarkerStore<FACE> fminside(this->map);	// mark the collected inside-faces
+
+	std::queue<Dart> front;
+	front.push(this->centerDart);
+	fm.mark(this->centerDart);
+	VEC3 centerNormal = this->normal[this->centerDart];
+
+	while ( !front.empty() ) // collect inside faces
+	{
+		Dart f = front.front();
+		front.pop();
+		REAL a = Geom::angle(centerNormal, this->normal[f]);
+
+
+		if (a < angleThreshold )
+		{ // collect this face and add adjacent faces to the front
+			this->insideFaces.push_back(f);
+			fminside.mark(f);
+			Traversor2FFaE<typename PFP::MAP> t (this->map, f) ;
+			for (Dart it = t.begin(); it != t.end(); it=t.next())
+			{
+				if (!fm.isMarked(it))
+				{
+					front.push(it);
+					fm.mark(it);
+				}
+			}
+		}
+	}
+
+	CellMarkerStore<VERTEX> vm(this->map);	// mark inside-vertices and border-vertices
+	CellMarkerStore<EDGE> em(this->map);	// mark inside-edges and border-edges
+	std::vector<Dart>::iterator f_it;
+	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
+	{ // collect insideVertices, insideEdges, and border
+		Traversor2FE<typename PFP::MAP> te (this->map, *f_it) ;
+		for (Dart it = te.begin(); it != te.end(); it=te.next())
+		{ // collect insideEdges and border
+			if (!em.isMarked(it))
+			{
+				em.mark(it);
+				if (this->map.isBoundaryEdge(it))
+					this->border.push_back(it);
+				else if ( fminside.isMarked(it) && fminside.isMarked(this->map.phi2(it)) )
+					this->insideEdges.push_back(it);
+				else
+					this->border.push_back(it);
+			}
+		}
+
+		Traversor2FV<typename PFP::MAP> tv (this->map, *f_it) ;
+		for (Dart it = tv.begin(); it != tv.end(); it=tv.next())
+		{ // collect insideVertices
+			if (!vm.isMarked(it))
+			{
+				vm.mark(it);
+				if ( !this->map.isBoundaryVertex(it))
+				{
+					Traversor2VF<typename PFP::MAP> tf (this->map, it);
+					Dart it2 = tf.begin();
+					while ( (it2 != tf.end()) && fminside.isMarked(it2))
+						it2=tf.next();
+					if (it2 == tf.end())
+						this->insideVertices.push_back(it);
+				}
+			}
+		}
+	}
+
+}
+
+template <typename PFP>
+void Collector_NormalAngle_Triangles<PFP>::collectBorder(Dart d)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	this->init(d);
+	this->insideFaces.reserve(32);
+	this->border.reserve(32);
+
+	CellMarkerStore<FACE> fm(this->map);	// mark the collected inside-faces + front-faces
+	CellMarkerStore<FACE> fminside(this->map);	// mark the collected inside-faces
+
+	std::queue<Dart> front;
+	front.push(this->centerDart);
+	fm.mark(this->centerDart);
+	VEC3 centerNormal = this->normal[this->centerDart];
+
+	while ( !front.empty() ) // collect inside faces
+	{
+		Dart f = front.front();
+		front.pop();
+		REAL a = Geom::angle(centerNormal, this->normal[f]);
+
+
+		if (a < angleThreshold )
+		{ // collect this face and add adjacent faces to the front
+			this->insideFaces.push_back(f);
+			fminside.mark(f);
+			Traversor2FFaE<typename PFP::MAP> t (this->map, f) ;
+			for (Dart it = t.begin(); it != t.end(); it=t.next())
+			{
+				if (!fm.isMarked(it))
+				{
+					front.push(it);
+					fm.mark(it);
+				}
+			}
+		}
+	}
+
+	CellMarkerStore<EDGE> em(this->map);	// mark inside-edges and border-edges
+	std::vector<Dart>::iterator f_it;
+	for (f_it = this->insideFaces.begin(); f_it != this->insideFaces.end(); f_it++)
+	{ // collect border (edges)
+		Traversor2FE<typename PFP::MAP> te (this->map, *f_it) ;
+		for (Dart it = te.begin(); it != te.end(); it=te.next())
+		{
+			if (!em.isMarked(it))
+			{
+				em.mark(it);
+				if (this->map.isBoundaryEdge(it))
+					this->border.push_back(it);
+				else if ( !fminside.isMarked(it) || !fminside.isMarked(this->map.phi2(it)) )
+					this->border.push_back(it);
+			}
+		}
+	}
+	this->insideFaces.clear();
+}
+
+/*********************************************************
+ * Collector Dijkstra
+ *********************************************************/
+
+template <typename PFP>
+void Collector_Dijkstra<PFP>::collectAll(Dart dinit){
+	init(dinit);
+
+	CellMarkerStore<VERTEX> vmReached (this->map);
+	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].valid = true;
+	vmReached.mark(this->centerDart);
+
+	while ( !front.empty() && front.begin()->first < this->maxDist)
+	{
+		Dart e = front.begin()->second;
+		float d = front.begin()->first;
+		front.erase(vertexInfo[e].it);
+		vertexInfo[e].valid=false;
+		this->insideVertices.push_back(e);
+
+		Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+		for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+		{
+			VertexInfo& vi (vertexInfo[f]);
+			if (vmReached.isMarked(f))
+			{
+				if (vi.valid) // probably useless but faster
+				{
+					float dist = d + edgeLength(f);
+					if (dist < vi.it->first)
+					{
+						front.erase(vi.it);
+						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+					}
+				}
+			}
+			else
+			{
+				vi.it = front.insert(std::pair<float,Dart>(d + edgeLength(f), f));
+				vi.valid=true;
+				vmReached.mark(f);
+			}
+
+		}
+
+	}
+
+}
+
+template <typename PFP>
+void Collector_Dijkstra<PFP>::collectBorder(Dart d){
+
+}
+
+template <typename PFP>
+inline float Collector_Dijkstra<PFP>::edgeLength (Dart d){
+	typename PFP::VEC3 v = Algo::Geometry::vectorOutOfDart<PFP>(this->map, d, this->position);
+	return v.norm();
+}
+
 
 } // namespace Selection
 
