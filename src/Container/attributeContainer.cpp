@@ -48,6 +48,18 @@ AttributeContainer::AttributeContainer() :
 
 AttributeContainer::~AttributeContainer()
 {
+	for (unsigned int index = 0; index < m_tableAttribs.size(); ++index)
+	{
+		if (m_tableAttribs[index] != NULL)
+			delete m_tableAttribs[index];
+	}
+
+	for (unsigned int index = 0; index < m_holesBlocks.size(); ++index)
+	{
+		if (m_holesBlocks[index] != NULL)
+			delete m_holesBlocks[index];
+	}
+
 }
 
 /**************************************
