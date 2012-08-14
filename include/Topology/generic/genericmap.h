@@ -83,6 +83,8 @@ protected:
 
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map ;
 
+	static int m_nbInstances;
+
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
 	 * (only initialized when necessary)
