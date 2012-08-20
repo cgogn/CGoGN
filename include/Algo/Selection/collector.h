@@ -53,6 +53,7 @@ protected:
 	typedef typename PFP::REAL REAL;
 
 	typename PFP::MAP& map;
+	unsigned int m_thread;
 
 	Dart centerDart;
 
@@ -62,7 +63,7 @@ protected:
 	std::vector<Dart> border;
 
 public:
-	Collector(typename PFP::MAP& m);
+	Collector(typename PFP::MAP& m, unsigned int thread =0);
 
 	inline void init(Dart d)
 	{
@@ -122,9 +123,8 @@ template <typename PFP>
 class Collector_OneRing : public Collector<PFP>
 {
 public:
-	Collector_OneRing(typename PFP::MAP& m) :
-		Collector<PFP>(m)
-	{}
+	Collector_OneRing(typename PFP::MAP& m, unsigned int thread=0):
+		Collector<PFP>(m, thread) {}
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 };
@@ -145,11 +145,10 @@ protected:
 	const VertexAttribute<typename PFP::VEC3>& position;
 	typename PFP::REAL radius;
 	typename PFP::REAL area;
-	unsigned int m_thread;
 
 public:
 	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL r = 0, unsigned int thread=0) :
-		Collector<PFP>(m),
+		Collector<PFP>(m, thread),
 		position(p),
 		radius(r),
 		area(0),
@@ -188,8 +187,9 @@ public:
 		typename PFP::MAP& m,
 		const VertexAttribute<typename PFP::VEC3>& p,
 		const VertexAttribute<typename PFP::VEC3>& n,
-		typename PFP::REAL a
-	) :	Collector<PFP>(m), position(p), normal(n), angleThreshold(a)
+		typename PFP::REAL a,
+		unsigned int thread=0
+	) :	Collector<PFP>(m,thread), position(p), normal(n), angleThreshold(a)
 	{}
 	inline void setAngleThreshold(typename PFP::REAL a) { angleThreshold = a; }
 	inline typename PFP::REAL getAngleThreshold() const { return angleThreshold; }

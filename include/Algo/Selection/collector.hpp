@@ -39,7 +39,7 @@ namespace Selection
  *********************************************************/
 
 template <typename PFP>
-Collector<PFP>::Collector(typename PFP::MAP& m) : map(m)
+Collector<PFP>::Collector(typename PFP::MAP& m, unsigned int thread) : map(m), m_thread(thread)
 {}
 
 template <typename PFP>
@@ -295,9 +295,9 @@ void Collector_NormalAngle<PFP>::collectAll(Dart d)
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
 
-	CellMarkerStore<VERTEX> vm(this->map);	// mark the collected inside-vertices
-	CellMarkerStore<EDGE> em(this->map);	// mark the collected inside-edges + border-edges
-	CellMarkerStore<FACE> fm(this->map);	// mark the collected inside-faces + border-faces
+	CellMarkerStore<VERTEX> vm(this->map, m_thread);	// mark the collected inside-vertices
+	CellMarkerStore<EDGE> em(this->map, m_thread);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<FACE> fm(this->map, m_thread);	// mark the collected inside-faces + border-faces
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
@@ -360,8 +360,8 @@ void Collector_NormalAngle<PFP>::collectBorder(Dart d)
 	this->border.reserve(128);
 	this->insideVertices.reserve(128);
 
-	CellMarkerStore<VERTEX> vm(this->map);	// mark the collected inside-vertices
-	CellMarkerStore<EDGE> em(this->map);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<VERTEX> vm(this->map, m_thread);	// mark the collected inside-vertices
+	CellMarkerStore<EDGE> em(this->map, m_thread);	// mark the collected inside-edges + border-edges
 
 	this->insideVertices.push_back(this->centerDart);
 	vm.mark(this->centerDart);
