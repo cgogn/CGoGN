@@ -289,11 +289,11 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select)
+	const FunctorSelect& select, unsigned int thread)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
+		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
 }
 
 template <typename PFP>
@@ -308,12 +308,12 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	VertexAttribute<typename PFP::VEC3>& Knormal)
+	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius) ;
+	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
 	neigh.collectAll(dart) ;
 	neigh.computeArea() ;
 
@@ -378,6 +378,73 @@ void computeCurvatureVertex_NormalCycles(
 	if (dirNormal * normal[dart] < 0)
 		dirNormal *= -1; // change orientation
 }
+
+
+namespace Parallel
+{
+
+template <typename PFP>
+class FunctorComputeCurvatureVertices_NormalCycles: public FunctorMapThreaded<typename PFP::MAP >
+{
+	typename PFP::REAL m_radius;
+	const VertexAttribute<typename PFP::VEC3>& m_position;
+	const VertexAttribute<typename PFP::VEC3>& m_normal;
+	const EdgeAttribute<typename PFP::REAL>& m_edgeangle;
+	VertexAttribute<typename PFP::REAL>& m_kmax;
+	VertexAttribute<typename PFP::REAL>& m_kmin;
+	VertexAttribute<typename PFP::VEC3>& m_Kmax;
+	VertexAttribute<typename PFP::VEC3>& m_Kmin;
+	VertexAttribute<typename PFP::VEC3>& m_Knormal;
+public:
+	 FunctorComputeCurvatureVertices_NormalCycles( typename PFP::MAP& map,
+		typename PFP::REAL radius,
+		const VertexAttribute<typename PFP::VEC3>& position,
+		const VertexAttribute<typename PFP::VEC3>& normal,
+		const EdgeAttribute<typename PFP::REAL>& edgeangle,
+		VertexAttribute<typename PFP::REAL>& kmax,
+		VertexAttribute<typename PFP::REAL>& kmin,
+		VertexAttribute<typename PFP::VEC3>& Kmax,
+		VertexAttribute<typename PFP::VEC3>& Kmin,
+		VertexAttribute<typename PFP::VEC3>& Knormal):
+	  FunctorMapThreaded<typename PFP::MAP>(map),
+	  m_radius(radius),
+	  m_position(position),
+	  m_normal(normal),
+	  m_edgeangle(edgeangle),
+	  m_kmax(kmax),
+	  m_kmin(kmin),
+	  m_Kmax(Kmax),
+	  m_Kmin(Kmin),
+	  m_Knormal(normal)
+	 { }
+
+	void parallelDo(Dart d, unsigned int threadID)
+	{
+		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,threadID) ;
+	}
+};
+
+template <typename PFP>
+void computeCurvatureVertices_NormalCycles(
+	typename PFP::MAP& map,
+	typename PFP::REAL radius,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorComputeCurvatureVertices_NormalCycles<PFP> funct(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, true, nbth, true, select, current_thread);
+}
+
+}
+
+
 
 } // namespace Geometry
 

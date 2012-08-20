@@ -21,11 +21,8 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
-#ifndef __ALGO_GEOMETRY_VOLUME_H__
-#define __ALGO_GEOMETRY_VOLUME_H__
-
-#include "Geometry/basic.h"
+#ifndef __PARALLEL_THREAD__
+#define __PARALLEL_THREAD__
 
 namespace CGoGN
 {
@@ -33,35 +30,49 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Geometry
-{
-
-template <typename PFP>
-typename PFP::REAL tetrahedronSignedVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
-
-template <typename PFP>
-typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
-
-template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread=0) ;
-
-template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
-
-
 namespace Parallel
 {
-template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
 
-}
+/**
+ * Class to encapsulate algorithm in a boost thread
+ * Usage:
+ * - Define a class MyCGoGNThread that inherit from CGoGNThread
+ * - call with boost::thread cgt1(MyCGoGNThread(map,1, ...);
+ * - wait to finish: cgt1.join();
+ *
+ * TODO: write a CGoGNThread version of "all" algorithm
+ */
+template<typename MAP>
+class CGoGNThread
+{
+protected:
+	MAP& m_map;
+	unsigned int m_threadId;
 
-} // namespace Geometry
+	unsigned int tid()
+	{
+		return m_threadId;
+	}
+
+public:
+	CGoGNThread(MAP& map, unsigned int th):
+		m_map(map), m_threadId(th) {}
+
+	virtual ~CGoGNThread() {}
+
+	/**
+	 * to implement with algo to execute (use m_threadId)
+	 */
+	virtual void operator()()=0;
+
+
+};
+
+
+} // namespace Parallel
 
 } // namespace Algo
 
 } // namespace CGoGN
-
-#include "Algo/Geometry/volume.hpp"
 
 #endif

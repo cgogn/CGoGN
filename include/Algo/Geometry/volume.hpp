@@ -58,18 +58,18 @@ typename PFP::REAL tetrahedronVolume(typename PFP::MAP& map, Dart d, const Verte
 }
 
 template <typename PFP>
-typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
+typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread)
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	if(Modelisation::Tetrahedralization::isTetrahedron<PFP>(map,d))
+	if(Modelisation::Tetrahedralization::isTetrahedron<PFP>(map,d,thread))
 		return tetrahedronVolume<PFP>(map,d,position) ;
 	else
 	{
 		typename PFP::REAL vol = 0 ;
-		VEC3 vCentroid = Algo::Geometry::volumeCentroid<PFP>(map, d, position) ;
+		VEC3 vCentroid = Algo::Geometry::volumeCentroid<PFP>(map, d, position, thread) ;
 
-		DartMarkerStore mark(map);		// Lock a marker
+		DartMarkerStore mark(map,thread);		// Lock a marker
 
 		std::vector<Dart> visitedFaces ;
 		visitedFaces.reserve(100) ;
@@ -115,13 +115,67 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 }
 
 template <typename PFP>
-float totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select)
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int thread)
 {
 	typename PFP::REAL vol = 0 ;
-	TraversorW<typename PFP::MAP> t(map, select) ;
+	TraversorW<typename PFP::MAP> t(map, select, thread) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
-		vol += convexPolyhedronVolume<PFP>(map, d, position) ;
+		vol += convexPolyhedronVolume<PFP>(map, d, position,thread) ;
 	return vol ;
+}
+
+
+namespace Parallel
+{
+
+template <typename PFP>
+class FunctorTotalVolume: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 typename PFP::REAL m_vol;
+public:
+	 FunctorTotalVolume<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol(0.0)
+	 { }
+
+	void parallelDo(Dart d, unsigned int threadID)
+	{
+		m_vol += convexPolyhedronVolume<PFP>(this->m_map, d, m_position,threadID) ;
+	}
+
+	typename PFP::REAL getVol() const
+	{
+		return m_vol;
+	}
+};
+
+
+
+template <typename PFP>
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	if (nbth==0)
+		nbth = Algo::Parallel::optimalNbThreads();
+
+
+	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
+	for (unsigned int i=0; i < nbth; ++i)
+	{
+		functs.push_back(new FunctorTotalVolume<PFP>(map,position));
+	}
+
+	typename PFP::REAL total=0.0;
+
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, nbth, true, select, current_thread);
+
+	for (unsigned int i=0; i < nbth; ++i)
+	{
+		total += reinterpret_cast<FunctorTotalVolume<PFP>*>(functs[i])->getVol();
+		delete functs[i];
+	}
+	return total;
+}
+
 }
 
 } // namespace Geometry

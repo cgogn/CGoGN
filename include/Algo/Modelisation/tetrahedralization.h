@@ -70,7 +70,7 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd);
  * @param a dart from the volume
  */
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& the_map, Dart d);
+bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
 
 /**
  * test if a mesh (or submesh) is a tetrahedral mesh

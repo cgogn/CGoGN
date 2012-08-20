@@ -28,6 +28,8 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
+#include "Algo/Parallel/parallel_foreach.h"
+
 #include <cmath>
 
 namespace CGoGN
@@ -162,6 +164,62 @@ void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typenam
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		normal[d] = vertexNormal<PFP>(map, d, position) ;
 }
+
+
+
+namespace Parallel
+{
+
+template <typename PFP>
+class FunctorComputeNormalVertices: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VertexAttribute<typename PFP::VEC3>& m_normal;
+public:
+	 FunctorComputeNormalVertices<PFP>(	typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
+	 { }
+
+	void parallelDo(Dart d, unsigned int threadID)
+	{
+		m_normal[d] = vertexNormal<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorComputeNormalVertices<PFP> funct(map,position,normal);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, true, nbth, false, select, current_thread);
+}
+
+
+template <typename PFP>
+class FunctorComputeNormalFaces: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 FaceAttribute<typename PFP::VEC3>& m_normal;
+public:
+	 FunctorComputeNormalFaces<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
+	 { }
+
+	void parallelDo(Dart d, unsigned int threadID)
+	{
+		m_normal[d] = faceNormal<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorComputeNormalFaces<PFP> funct(map,position,normal);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, true, nbth, false, select, current_thread);
+}
+
+}
+
+
 
 template <typename PFP>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)

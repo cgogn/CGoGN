@@ -145,13 +145,15 @@ protected:
 	const VertexAttribute<typename PFP::VEC3>& position;
 	typename PFP::REAL radius;
 	typename PFP::REAL area;
+	unsigned int m_thread;
 
 public:
-	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL r = 0) :
+	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL r = 0, unsigned int thread=0) :
 		Collector<PFP>(m),
 		position(p),
 		radius(r),
-		area(0)
+		area(0),
+		m_thread(thread)
 	{}
 	inline void setRadius(typename PFP::REAL r) { radius = r; }
 	inline typename PFP::REAL getRadius() const { return radius; }

@@ -101,7 +101,7 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts) ;
+	const FunctorSelect& select = allDarts, unsigned int thread=0) ;
 
 template <typename PFP>
 void computeCurvatureVertex_NormalCycles(
@@ -115,9 +115,28 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	VertexAttribute<typename PFP::VEC3>& Knormal) ;
+	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread=0) ;
 
 } // namespace Geometry
+
+namespace Parallel
+{
+template <typename PFP>
+void computeCurvatureVertices_NormalCycles(
+	typename PFP::MAP& map,
+	typename PFP::REAL radius,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread=0) ;
+
+}
+
 
 } // namespace Algo
 
