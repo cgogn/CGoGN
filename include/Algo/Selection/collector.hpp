@@ -280,6 +280,127 @@ void Collector_WithinSphere<PFP>::computeArea()
 	}
 }
 
+/*********************************************************
+ * Collector Normal Angle
+ *********************************************************/
+
+template <typename PFP>
+void Collector_NormalAngle<PFP>::collectAll(Dart d)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	this->init(d);
+	this->insideEdges.reserve(32);
+	this->insideFaces.reserve(32);
+	this->border.reserve(32);
+
+	CellMarkerStore<VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<EDGE> em(this->map);	// mark the collected inside-edges + border-edges
+	CellMarkerStore<FACE> fm(this->map);	// mark the collected inside-faces + border-faces
+
+	this->insideVertices.push_back(this->centerDart);
+	vm.mark(this->centerDart);
+
+	VEC3 centerNormal = this->normal[d];
+	unsigned int i = 0;
+	while (i < this->insideVertices.size())
+	{
+		Dart end = this->insideVertices[i];
+		Dart e = end;
+		do
+		{
+			if (! em.isMarked(e) || ! fm.isMarked(e)) // are both tests useful ?
+			{
+				const Dart f = this->map.phi1(e);
+				const Dart g = this->map.phi1(f);
+
+				REAL a = Geom::angle(centerNormal, this->normal[f]);
+
+				if (a > angleThreshold)
+				{
+					this->border.push_back(e); // add to border
+					em.mark(e);
+					fm.mark(e); // is it useful ?
+				}
+				else
+				{
+					if (! vm.isMarked(f))
+					{
+						this->insideVertices.push_back(f);
+						vm.mark(f);
+					}
+					if (! em.isMarked(e))
+					{
+						this->insideEdges.push_back(e);
+						em.mark(e);
+					}
+
+					REAL b = Geom::angle(centerNormal, this->normal[g]);
+					if (! fm.isMarked(e) && b < angleThreshold)
+					{
+						this->insideFaces.push_back(e);
+						fm.mark(e);
+					}
+				}
+			}
+			e = this->map.phi2_1(e);
+		} while (e != end);
+		++i;
+	}
+}
+
+template <typename PFP>
+void Collector_NormalAngle<PFP>::collectBorder(Dart d)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	this->init(d);
+	this->border.reserve(128);
+	this->insideVertices.reserve(128);
+
+	CellMarkerStore<VERTEX> vm(this->map);	// mark the collected inside-vertices
+	CellMarkerStore<EDGE> em(this->map);	// mark the collected inside-edges + border-edges
+
+	this->insideVertices.push_back(this->centerDart);
+	vm.mark(this->centerDart);
+
+	VEC3 centerNormal = this->normal[d];
+	unsigned int i = 0;
+	while (i < this->insideVertices.size())
+	{
+		Dart end = this->insideVertices[i];
+		Dart e = end;
+		do
+		{
+			if ( ! em.isMarked(e) )
+			{
+				const Dart f = this->map.phi1(e);
+
+				REAL a = Geom::angle(centerNormal, this->normal[f]);
+
+				if (a > angleThreshold)
+				{
+					this->border.push_back(e); // add to border
+				}
+				else
+				{
+					if (! vm.isMarked(f))
+					{
+						this->insideVertices.push_back(f);
+						vm.mark(f);
+					}
+				}
+				em.mark(e);
+			}
+			e = this->map.phi2_1(e);
+		} while (e != end);
+		++i;
+	}
+	this->insideVertices.clear();
+}
+
 } // namespace Selection
 
 } // namespace Algo

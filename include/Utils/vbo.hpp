@@ -33,7 +33,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 {
 	if (m_lock)
 	{
-		CGoGNerr <<" Error locked VBO"<< CGoGNendl;
+		CGoGNerr << "Error locked VBO" << CGoGNendl;
 		return;
 	}
 	m_data_size = sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
@@ -62,7 +62,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 {
 	if (m_lock)
 	{
-		CGoGNerr <<" Error locked VBO"<< CGoGNendl;
+		CGoGNerr << "Error locked VBO" << CGoGNendl;
 		return;
 	}
 	m_data_size = conv->sizeElt();
@@ -95,6 +95,21 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 
 	// libere la memoire de la conversion
 	conv->release();
+}
+
+template <typename T>
+void VBO::updateData(std::vector<T>& data)
+{
+	if (m_lock)
+	{
+		CGoGNerr << "Error locked VBO" << CGoGNendl;
+		return;
+	}
+	m_data_size = sizeof(T) / sizeof(float);
+	m_nbElts = data.size();
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBufferData(GL_ARRAY_BUFFER, m_nbElts * sizeof(T), &(data[0]), GL_STREAM_DRAW);
 }
 
 } // namespace Utils

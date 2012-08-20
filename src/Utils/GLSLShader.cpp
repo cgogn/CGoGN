@@ -899,7 +899,7 @@ bool GLSLShader::checkShader(int shaderType)
 		id = m_geom_shader_object;
 		break;
 	default:
-		CGoGNerr << "Error unkown shader type"<< CGoGNendl;
+		CGoGNerr << "Error unkown shader type" << CGoGNendl;
 		return false;
 		break;
 	}
@@ -960,12 +960,12 @@ void GLSLShader::unbindVA(const std::string& name)
 	//valid ?
 	if (idVA < 0)
 	{
-		CGoGNerr << "GLSLShader: Attribute "<<name<< " does not exist in shader, not unbinded"<< CGoGNendl;
+		CGoGNerr << "GLSLShader: Attribute " << name << " does not exist in shader, not unbinded" << CGoGNendl;
 		return;
 	}
 	// search if name already exist
 	unsigned int nb = m_va_vbo_binding.size();
-	for (unsigned int i =0; i<nb; ++i)
+	for (unsigned int i = 0; i < nb; ++i)
 	{
 		if (m_va_vbo_binding[i].va_id == idVA)
 		{
@@ -1014,7 +1014,7 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) const
 {
 	this->bind();
-	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
+	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
@@ -1025,7 +1025,7 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 void GLSLShader::disableVertexAttribs() const
 {
 	this->bind();
-	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
+	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 		glDisableVertexAttribArray(it->va_id);
 	this->unbind();
 }
@@ -1035,8 +1035,8 @@ void GLSLShader::updateCurrentMatrices()
 	glm::mat4 model(currentModelView());
 	model *= currentTransfo();
 
-	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin();it != m_registeredShaders.end();++it)
-			it->second->updateMatrices(currentProjection(), model);
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+		it->second->updateMatrices(currentProjection(), model);
 }
 
 } // namespace Utils

@@ -166,6 +166,40 @@ public:
 	inline typename PFP::REAL getArea() const { return area; }
 };
 
+/*********************************************************
+ * Collector Normal Angle
+ *********************************************************/
+
+/*
+ * collect all primitives of the connected component containing "centerDart"
+ * the angle between the included vertices normal vectors and the central normal vector
+ * stays under a given threshold
+ */
+template <typename PFP>
+class Collector_NormalAngle : public Collector<PFP>
+{
+protected:
+	const VertexAttribute<typename PFP::VEC3>& position ;
+	const VertexAttribute<typename PFP::VEC3>& normal ;
+	typename PFP::REAL angleThreshold ;
+
+public:
+	Collector_NormalAngle(
+		typename PFP::MAP& m,
+		const VertexAttribute<typename PFP::VEC3>& p,
+		const VertexAttribute<typename PFP::VEC3>& n,
+		typename PFP::REAL a
+	) :	Collector<PFP>(m), position(p), normal(n), angleThreshold(a)
+	{}
+	inline void setAngleThreshold(typename PFP::REAL a) { angleThreshold = a; }
+	inline typename PFP::REAL getAngleThreshold() const { return angleThreshold; }
+	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position ; }
+	inline const VertexAttribute<typename PFP::VEC3>& getNormal() const { return normal ; }
+
+	void collectAll(Dart d) ;
+	void collectBorder(Dart d) ;
+};
+
 } // namespace Selection
 
 } // namespace Algo
