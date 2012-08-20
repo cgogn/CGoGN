@@ -432,6 +432,65 @@ public:
 } ;
 
 
+
+//
+// FOR PARALLEL TRAVERSALS
+//
+
+/**
+ * Functor class for parallel::foreach_orbit/cell/dart
+ * Overload bool parallelDo
+ * Overload duplicate if necessary (no sharing of functors)
+ */
+template<typename MAP>
+class FunctorMapThreaded
+{
+protected:
+	MAP& m_map ;
+
+public:
+	FunctorMapThreaded(MAP& m): m_map(m) {}
+
+	virtual ~FunctorMapThreaded() {}
+
+	/**
+	 * @return a pointer on a copy of the object.
+	 */
+	virtual FunctorMapThreaded<MAP>* duplicate() const { return NULL;}
+
+	/**
+	 * insert your code here:
+	 * @param d the dart on which apply functor
+	 * @param threadID the id of thread currently running your code
+	 */
+	virtual void parallelDo(Dart d, unsigned int threadID) = 0;
+};
+
+
+/**
+ * Functor class for parallel::foreach_attrib
+ * Overload parallelDo
+ * Overload duplicate if necessary (no sharing of functors)
+ */
+class FunctorAttribThreaded
+{
+public:
+	virtual ~FunctorAttribThreaded() {}
+
+	/**
+	 * @return a pointer on a copy of the object.
+	 */
+	virtual FunctorAttribThreaded* duplicate() const { return NULL;}
+
+	/**
+	 * insert your code here:
+	 * @param d the dart on which apply functor
+	 * @param threadID the id of thread currently running your code
+	 */
+	virtual void parallelDo(unsigned int i, unsigned int threadID) = 0;
+};
+
+
 } //namespace CGoGN
 
 #endif

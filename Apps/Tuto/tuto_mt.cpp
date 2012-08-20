@@ -33,16 +33,14 @@
 
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/boundingbox.h"
-#include "Algo/Render/GL1/map_glRender.h"
 #include "Utils/GLSLShader.h"
-#include "Algo/Geometry/area.h"
+//#include "Algo/Geometry/area.h"
 #include "Algo/Geometry/normal.h"
 #include "Algo/Modelisation/polyhedron.h"
 
 #include "Algo/Parallel/parallel_foreach.h"
-
-// for file input
-#include "Utils/qtInputs.h"
+#include "Algo/Parallel/cgogn_thread.h"
+#include "Utils/chrono.h"
 
 using namespace CGoGN ;
 
@@ -56,164 +54,23 @@ struct PFP: public PFP_STANDARD
 	typedef EmbeddedMap2 MAP;
 };
 
-// declaration of the map
-PFP::MAP myMap;
 
-// attribute handlers
+PFP::MAP myMap;
 VertexAttribute<PFP::VEC3> position;
+VertexAttribute<PFP::VEC3> position2;
 VertexAttribute<PFP::VEC3> normal;
 
-// open file
-void MyQT::cb_Open()
-{
-	// set some filters
-//	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)");
-//
-//	std::string filename = selectFile("OpenMesh","",filters);
-//
-//	std::vector<std::string> attrNames ;
-//	if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
-//	{
-//		CGoGNerr << "could not import " << filename << CGoGNendl ;
-//		return;
-//	}
 
-	std::vector<std::string> attrNames ;
-	if(!Algo::Import::importMesh<PFP>(myMap, "/home/thery/Data/liver.trian", attrNames))
-	{
-		CGoGNerr << "could not import xxx" << CGoGNendl ;
-		return;
-	}
-
-	// recuper l'attribut pour la position des points (créé lors de l'import)
-	position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
-
-	if (!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
-
-	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-
-    //  bounding box
-    Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-    float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-    Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-
-    // envoit info BB a l'interface
-	setParamObject(lWidthObj,lPosObj.data());
-	updateGLMatrices();
-}
-
-// new
-void MyQT::cb_New()
-{
-	if (!position.isValid())
-		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
-
-	// create a sphere
-	Algo::Modelisation::Polyhedron<PFP> prim(myMap, position);
-	prim.cylinder_topo(16,16, true, true); // topo of sphere is a closed cylinder
-	prim.embedSphere(10.0f);
-
-	if (!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
-
-	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
-
-   //  bounding box
-	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
-	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
-	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-
-	setParamObject(lWidthObj,lPosObj.data());
-
-	updateGLMatrices();
-}
-
-void MyQT::cb_initGL()
-{
-	// Old school openGL ;)
-	Utils::GLSLShader::setCurrentOGLVersion(1);
-
-	glewInit();
-
-	// init lighting parameters
-	float lightPosition[4]= {10.0f,10.0f,10000.0f,1.0f};
-	float lightColor[4]= {0.9f,0.9f,0.9f,1.0f};
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-	glEnable(GL_NORMALIZE);
-//	glDisable(GL_CULL_FACE);
-//	glFrontFace(GL_CCW);
-
-}
-
-void MyQT::cb_redraw()
-{
-    GLfloat diff[4]= {0.0f,1.0f,0.1f,1.0f};
-    GLfloat amb[4]= {0.1f,0.0f,0.1f,1.0f};
-    GLfloat spec[4]= {1.0f,1.0f,1.0f,1.0f};
-    float shininess=125.0f;
-
-	// draw the lines
-//	glDisable(GL_LIGHTING);
-//	glColor3f(0.0f, 0.0f, 0.3f);
-//	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-//	glDisable(GL_LIGHTING);
-//
-//	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::LINE, 1.0f,position, normal);
-
-	// draw the faces
-	glEnable(GL_POLYGON_OFFSET_FILL);
-	glPolygonOffset(1.0f, 1.0f);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_SMOOTH);
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, diff);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, amb);
-    glMaterialfv(GL_FRONT,GL_SPECULAR,spec);
-    glMaterialf( GL_FRONT, GL_SHININESS, shininess);
-	Algo::Render::GL1::renderTriQuadPoly<PFP>(myMap,Algo::Render::GL1::SMOOTH, 1.0f,position, normal);
-	glDisable(GL_POLYGON_OFFSET_FILL);
-}
-
-
-template <typename XXX>
-class ThreadArea: public Algo::Parallel::CGoGNThread<typename XXX::MAP>
-{
-protected:
-	const typename XXX::TVEC3& m_positions;
-	float area;
-public:
-	ThreadArea(typename XXX::MAP& map, const typename XXX::TVEC3& pos, unsigned int th) :
-		Algo::Parallel::CGoGNThread<typename XXX::MAP>(map,th),
-		m_positions(pos),
-		area(0.0f)
-	{}
-
-	void operator()()
-	{
-		// 3 times just for fun !!!
-		area += Algo::Geometry::totalArea<XXX>(this->m_map, m_positions, SelectorTrue(), this->m_threadId);
-		area += Algo::Geometry::totalArea<XXX>(this->m_map, m_positions, SelectorTrue(), this->m_threadId);
-		area += Algo::Geometry::totalArea<XXX>(this->m_map, m_positions, SelectorTrue(), this->m_threadId);
-	}
-
-	float getTripleValue() { return area; }
-};
 
 
 template <typename XXX>
 class ThreadNormals: public Algo::Parallel::CGoGNThread<typename XXX::MAP>
 {
 protected:
-	const typename XXX::TVEC3& m_positions;
-	typename XXX::TVEC3& m_normals;
+	VertexAttribute<typename XXX::VEC3>& m_positions;
+	VertexAttribute<typename XXX::VEC3>& m_normals;
 public:
-	ThreadNormals(typename XXX::MAP& map, const typename XXX::TVEC3& pos, typename XXX::TVEC3& norm, unsigned int th):
+	ThreadNormals(typename XXX::MAP& map, VertexAttribute<typename XXX::VEC3>& pos, VertexAttribute<typename XXX::VEC3>& norm, unsigned int th):
 		Algo::Parallel::CGoGNThread<typename XXX::MAP>(map,th),
 		m_positions(pos),
 		m_normals(norm)
@@ -221,148 +78,247 @@ public:
 
 	void operator()()
 	{
-		Algo::Geometry::computeNormalVertices<XXX>(this->m_map, m_positions, m_normals, SelectorTrue(), this->m_threadId);
+		Algo::Geometry::computeNormalVertices<XXX>(this->m_map, m_positions, m_normals, SelectorTrue(), this->tid());
 	}
-
 };
 
 
-//template<typename XXX>
-//class Thread0
-//{
-//protected:
-//	typename XXX::MAP& m_map;
-//	MyGlutWin& m_mgw;
-//	unsigned int m_th;
-//	SelectorTrue m_selt;
-//public:
-//	Thread0(typename XXX::MAP& map,MyGlutWin& mgw, unsigned int th):
-//		m_map(map), m_mgw(mgw), m_th(th) {}
-//
-//	void operator()()
-//	{
-//		CGoGNout << "Begin render init"<<CGoGNendl;
-//		m_mgw.useContext();
-//
-//		// instanciation of the renderer (here using VBOs)
-//		m_mgw.m_render = new Algo::Render::VBO::MapRender_VBO();
-//
-//	    // update the renderer (geometry and primitives)
-//	    m_mgw.m_render->updateData(Algo::Render::VBO::POSITIONS, position);
-//
-//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::VBO::TRIANGLES,m_th);
-//	    m_mgw.m_render->initPrimitives<PFP>(m_map, m_selt, Algo::Render::VBO::LINES,m_th);
-//
-//	    m_mgw.releaseContext();
-//	    CGoGNout<< "Render OK "<< CGoGNendl;
-//
-//	}
-//};
+
+void MyQT::cb_initGL()
+{
+	Utils::GLSLShader::setCurrentOGLVersion(2);
+
+	// create the render
+	m_render = new Algo::Render::GL2::MapRender();
+
+ 	// create VBO for position
+	m_positionVBO = new Utils::VBO();
+	m_positionVBO->updateData(position);
+
+	m_normalVBO =  new Utils::VBO();
+
+	m_shader = new Utils::ShaderSimpleColor();
+	m_shader->setAttributePosition(m_positionVBO);
+	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
+
+
+	m_lines = new Utils::ShaderVectorPerVertex();
+	m_lines->setAttributePosition(m_positionVBO);
+	m_lines->setAttributeVector(m_normalVBO);
+	m_lines->setScale(2.0f);
+	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
+
+	std::cout << "Je calcule les normales en meme temps que les primitives" << std::endl;
+	boost::thread thread1( ThreadNormals<PFP>(myMap,position,normal,1));
+
+
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
+
+	registerShader(m_shader);
+	registerShader(m_lines);
+
+	// on attend la fin du thread pour etre sur que normal est a jour
+	thread1.join();
+	m_normalVBO->updateData(normal);
+
+}
+
+void MyQT::cb_redraw()
+{
+	m_render->draw(m_shader, Algo::Render::GL2::LINES);
+	m_render->draw(m_lines, Algo::Render::GL2::POINTS);
+}
+
+
+void MyQT::cb_keyPress(int code)
+{
+	Utils::Chrono ch;
+	ch.start();
+
+	switch(code)
+	{
+	case 'a':
+		threadSimple();
+		break;
+	case 'z':
+		threadStorage();
+		break;
+	case 'q':
+		threadAttrib();
+		break;
+	default:
+		break;
+	}
+	std::cout << "time = "<< ch.elapsed() << std::endl;
+
+	updateGL();
+}
 
 
 
+//
+// Simple attribute parallel functor and traversor
+//
 template <typename XXX>
-class calculFunctor1 : public Algo::Parallel::FunctorMapThreaded<typename XXX::MAP>
+class UnshrinkFunctor : public FunctorAttribThreaded
 {
 protected:
-	typename XXX::TVEC3& m_positions;
-	typename XXX::TVEC3& m_normals;
+	VertexAttribute<typename XXX::VEC3>& m_positions;
+	VertexAttribute<typename XXX::VEC3>& m_positions2;
 public:
-	calculFunctor1( typename XXX::MAP& map, typename XXX::TVEC3& pos, typename XXX::TVEC3& norm, unsigned int id=0):
-		Algo::Parallel::FunctorMapThreaded<typename XXX::MAP>(map,id), m_positions(pos), m_normals(norm) {}
+	UnshrinkFunctor( VertexAttribute<typename XXX::VEC3>& pos, VertexAttribute<typename XXX::VEC3>& pos2):
+		FunctorAttribThreaded(),m_positions(pos),m_positions2(pos2)
+	{}
 
-	bool operator()(Dart d)
+	void parallelDo(unsigned int i, unsigned int threadID)
 	{
-		typename XXX::VEC3 n1 = Algo::Geometry::vertexNormal<XXX>(this->m_map, d, m_positions);
-		typename XXX::VEC3 n2 = Algo::Geometry::vertexNormal<XXX>(this->m_map, this->m_map.phi1(d), m_positions);
-		typename XXX::VEC3 n3 = Algo::Geometry::vertexNormal<XXX>(this->m_map, this->m_map.phi_1(d), m_positions);
-		typename XXX::VEC3 n = n1+n2+n3;
-		n1 = Algo::Geometry::vertexNormal<XXX>(this->m_map, d, m_positions);
-		n2 = Algo::Geometry::vertexNormal<XXX>(this->m_map, this->m_map.phi1(d), m_positions);
-		n3 = Algo::Geometry::vertexNormal<XXX>(this->m_map, this->m_map.phi_1(d), m_positions);
-		n += n1+n2+n3;
-		n.normalize();
-		m_normals[d] =  n;
-//		m_normals[d] = Algo::Geometry::vertexNormal<XXX>(this->m_map, d, m_positions);
-		return false;
+		m_positions2[i] = 1.1f * m_positions[i];
 	}
-
-	Algo::Parallel::FunctorMapThreaded<typename XXX::MAP>* duplicate(unsigned int id)
-	{
-		calculFunctor1<XXX>* copy = new calculFunctor1<XXX>(this->m_map,m_positions,m_normals,id);
-		return reinterpret_cast<Algo::Parallel::FunctorMapThreaded<typename XXX::MAP>*>(copy);
-	}
+	// no need to duplicate here functor can be shared (no data), call foreach with true parameter
 };
 
 
+void MyQT::threadAttrib()
+{
+	UnshrinkFunctor<PFP> funct(position,position2);
+	Algo::Parallel::foreach_attrib(myMap.getAttributeContainer<VERTEX>(), funct, true);
+
+	myMap.swapAttributes(position,position2);
+	m_positionVBO->updateData(position);
+	m_lines->setAttributePosition(m_positionVBO);
+	updateGL();
+}
+
+
+
+//
+// Simple thread that traverse a map
+//
 template <typename XXX>
-class LengthEdgeFunctor : public Algo::Parallel::FunctorMapThreadedResult<typename XXX::MAP, std::pair<double,unsigned int> >
+class ShrinkFunctor : public FunctorMapThreaded<typename XXX::MAP >
 {
 protected:
-	typename XXX::TVEC3& m_positions;
+	VertexAttribute<typename XXX::VEC3>& m_positions;
+	VertexAttribute<typename XXX::VEC3>& m_positions2;
+public:
+	ShrinkFunctor( typename XXX::MAP& map, VertexAttribute<typename XXX::VEC3>& pos, VertexAttribute<typename XXX::VEC3>& pos2):
+		FunctorMapThreaded< typename XXX::MAP>(map),
+		m_positions(pos),m_positions2(pos2)
+	{}
+
+	void parallelDo(Dart d, unsigned int threadID)
+	{
+		typename XXX::VEC3 Q(0,0,0);
+		int nb=0;
+		Traversor2VVaE<typename XXX::MAP> trav(this->m_map,d);
+		for (Dart e=trav.begin(); e!=trav.end(); e = trav.next())
+		{
+			Q += m_positions[e];
+			nb++;
+		}
+		m_positions2[d] = Q/nb;
+	}
+	// no need to duplicate here functor can be shared (no data), call foreach with true parameter
+};
+
+
+void MyQT::threadSimple()
+{
+	ShrinkFunctor<PFP> funct(myMap,position,position2);
+	Algo::Parallel::foreach_cell<PFP::MAP,VERTEX>(myMap, funct,true);
+
+	myMap.swapAttributes(position,position2);
+	m_positionVBO->updateData(position);
+	m_lines->setAttributePosition(m_positionVBO);
+	updateGL();
+}
+
+
+
+
+
+
+// Thread foreach with storage (computing average length of edges)
+
+template <typename XXX>
+class LengthEdgeFunctor : public FunctorMapThreaded<typename XXX::MAP >
+{
+protected:
+	VertexAttribute<typename XXX::VEC3>& m_positions;
 	double m_length;
 	unsigned int m_nb;
 public:
-	LengthEdgeFunctor( typename XXX::MAP& map, typename XXX::TVEC3& pos, unsigned int id=0):
-		Algo::Parallel::FunctorMapThreadedResult< typename XXX::MAP, std::pair<double,unsigned int> >(map,id),
-		m_positions(pos),
-		m_length(0.0),
-		m_nb(0) {}
+	LengthEdgeFunctor( typename XXX::MAP& map, VertexAttribute<typename XXX::VEC3>& pos):
+		FunctorMapThreaded< typename XXX::MAP>(map),
+		m_positions(pos), m_length(0.0), m_nb(0)
+	{}
 
-	bool operator()(Dart d)
+	double getLength() { return m_length;}
+
+	unsigned int getNb() { return m_nb;}
+
+	void parallelDo(Dart d, unsigned int threadID)
 	{
 		Dart dd = this->m_map.phi2(d);
 		typename XXX::VEC3 V = m_positions[dd] - m_positions[d];
 		m_length += V.norm();
 		m_nb++;
-		return false;
 	}
 
-	Algo::Parallel::FunctorMapThreaded<typename XXX::MAP>* duplicate(unsigned int id)
-	{
-		LengthEdgeFunctor<XXX>* copy = new LengthEdgeFunctor<XXX>(this->m_map,m_positions,id);
-		return reinterpret_cast<Algo::Parallel::FunctorMapThreaded<typename XXX::MAP>*>(copy);
-	}
-
-	std::pair<double,unsigned int> getResult() { return std::pair<double,unsigned int>(m_length,m_nb);}
-
+	// no need to duplicate here, we create 1 functor by thread (see bellow)
 };
 
-
-void MyQT::menu_slot1()
+void MyQT::threadStorage()
 {
-	// cree un handler pour les normales aux sommets
-	VertexAttribute<PFP::VEC3> normal2 = myMap.addAttribute<PFP::VEC3, VERTEX>("normal2");
+	// functor need storage so we need one per thread
+	std::vector<FunctorMapThreaded<PFP::MAP>*> functs;
+	unsigned int nbthreads = Algo::Parallel::optimalNbThreads();
 
-	// ajout de 4 threads pour les markers
-	myMap.addThreadMarker(4);
+	for (unsigned int i=0; i<nbthreads; ++i)
+	{
+		LengthEdgeFunctor<PFP>* lef = new LengthEdgeFunctor<PFP>(myMap,position);
+		functs.push_back(lef);
+	}
 
-	//Algorithmes en //
+//	LengthEdgeFunctor<PFP>* lef0 = new LengthEdgeFunctor<PFP>(myMap,position);
+//	LengthEdgeFunctor<PFP>* lef1 = new LengthEdgeFunctor<PFP>(myMap,position);
+//	LengthEdgeFunctor<PFP>* lef2 = new LengthEdgeFunctor<PFP>(myMap,position);
+//	LengthEdgeFunctor<PFP>* lef3 = new LengthEdgeFunctor<PFP>(myMap,position);
+//	functs.push_back(lef0);
+//	functs.push_back(lef1);
+//	functs.push_back(lef2);
+//	functs.push_back(lef3);
 
-	boost::thread thread1( ThreadArea<PFP>(myMap,position,1));
-	boost::thread thread2( ThreadNormals<PFP>(myMap,position,normal,2));
-	thread1.join();
-	thread2.join();
+	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs, 4);
 
-	// parallelisation de boucle sans resultat
-	calculFunctor1<PFP> tf1(myMap,position,normal);
-	Algo::Parallel::foreach_orbit<PFP>(myMap, VERTEX, tf1,4);
-	CGoGNout << "ok:"<< CGoGNendl;
 
-	// parallelisation de boucle avec resultats stockes
 
-	// vector pour le resultat (ici paire double/int pour faire la moyenne des longueurs des aretes)
-	std::vector<std::pair<double,unsigned int> > lengthp;
-	LengthEdgeFunctor <PFP> tflef(myMap,position);			// le foncteur
-	// on lance l'algo parallelise (4 threads, buffer de 16384 brins par thread)
-	Algo::Parallel::foreach_orbit_res< PFP,std::pair<double,unsigned int> >(myMap, EDGE, tflef, 4 , 16384,lengthp);
-	// on calcule la somme des resultats
-	std::pair<double,unsigned int> le = Algo::Parallel::sumPairResult<double,unsigned int>(lengthp);
-	CGoGNout << "length :" <<le.first/le.second<< CGoGNendl;
+	//compute average length from each thread result and delete functors
+	double average = 0;
+	unsigned int all = 0;
+	for (unsigned int i=0; i<nbthreads; ++i)
+	{
+		LengthEdgeFunctor<PFP>* lef = dynamic_cast<LengthEdgeFunctor<PFP>*>(functs[i]);
+		average += lef->getLength();
+		all += lef->getNb();
+		delete lef;
+	}
+	average /= all;
 
-	// on enleve les markers ajoutes
-	myMap.removeThreadMarker(4);
+//	double average = (lef0->getLength()+lef1->getLength()+lef2->getLength()+lef3->getLength()) / (lef0->getNb()+lef1->getNb()+lef2->getNb()+lef3->getNb());
+	std::cout << "AVERAGE LENGTH "<< average << std::endl;
+
+//	delete lef0;
+//	delete lef1;
+//	delete lef2;
+//	delete lef3;
 }
+
+
+
+
+
 
 
 int main(int argc, char **argv)
@@ -371,41 +327,39 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	MyQT sqt;
 
-	// ajout entree dans le menu application
-	sqt.add_menu_entry("test threads", SLOT(menu_slot1()));
-
-	// message d'aide
-	sqt.setHelpMsg("Tuto:\n"
-			"multi-threading \n"
-			"utilisation GL 1.1\n"
-			"file sector");
-
- 	sqt.show();
 
  	sqt.statusMsg("Neww to create a sphere or Load for a mesh file");
  	CGoGNStream::allToConsole(&sqt);
 
- 	sqt.cb_Open();
+ 	if (!position.isValid())
+ 		position = myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 
-// 	int xx = 3;
-// 	double yy = 2.5;
-// 	bool zz=true;
-// 	int kk=32;
-// 	int cc=2;
-//
-// 	{
-// 	using namespace CGoGN::Utils::QT;
-//
-// 	inputValues(	VarInteger(0,20,xx, "Entier",
-// 					VarBool(zz, "Bool",
-// 					VarDbl(0.314,3.14,yy,"Double",
-// 					VarSlider(10,100,kk,"Slider",
-// 					VarCombo("Riri;Fifi;Loulou;Donald",cc,"Combo") )))));
-// 	}
-//
-// 	std::cout << "Int:" << xx << "  Bool:"<<zz<< std::endl;
-// 	std::cout << "Dbl:" << yy << "  Slider:"<<kk<< std::endl;
-// 	std::cout << "Combo:" << cc << std::endl;
+	if (!position2.isValid())
+ 		position2 = myMap.addAttribute<PFP::VEC3, VERTEX>("position2");
+
+	if (!normal.isValid())
+ 		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
+
+ 		// create a sphere
+ 	Algo::Modelisation::Polyhedron<PFP> prim(myMap, position);
+// 	prim.cylinder_topo(2640,2640, true, true); // test for speed timing
+ 	prim.cylinder_topo(64,64, true, true); // topo of sphere is a closed cylinder
+ 	prim.embedSphere(20.0f);
+
+
+   //  bounding box
+	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
+	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
+	std::cout << "lPosObj=" << lPosObj << std::endl;
+	std::cout << "lWidthObj=" << lWidthObj << std::endl;
+	sqt.setParamObject(lWidthObj,lPosObj.data());
+
+//	myMap.enableQuickTraversal<EDGE>() ;
+//	myMap.enableQuickTraversal<VERTEX>() ;
+
+	sqt.show();
+
 
 	return app.exec();
 }

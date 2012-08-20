@@ -43,16 +43,22 @@ void AttribMap::init()
 		}
 	}
 
-	for(unsigned int i = 0; i < cellMarkers.size(); ++i)
+	for (unsigned int j=0; j<NB_THREAD; ++j)
 	{
-		CellMarkerGen* cm = cellMarkers[i] ;
-		cm->updateMarkVector(m_markTables[cm->getCell()][cm->getThread()]) ;
-	}
+		std::vector<CellMarkerGen*>& cmg = cellMarkers[j];
 
-	for(unsigned int i = 0; i < dartMarkers.size(); ++i)
-	{
-		DartMarkerGen* cm = dartMarkers[i] ;
-		cm->updateMarkVector(m_markTables[DART][cm->getThread()]) ;
+		for(unsigned int i = 0; i < cmg.size(); ++i)
+		{
+			CellMarkerGen* cm = cmg[i] ;
+			cm->updateMarkVector(m_markTables[cm->getCell()][cm->getThread()]) ;
+		}
+
+		std::vector<DartMarkerGen*>& dmg = dartMarkers[j];
+		for(unsigned int i = 0; i < dmg.size(); ++i)
+		{
+			DartMarkerGen* cm = dmg[i] ;
+			cm->updateMarkVector(m_markTables[DART][cm->getThread()]) ;
+		}
 	}
 }
 

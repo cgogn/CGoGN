@@ -84,8 +84,11 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		}
 	}
 
-	dartMarkers.reserve(16) ;
-	cellMarkers.reserve(16) ;
+	for (unsigned int i=0; i<NB_THREAD; ++i)
+	{
+		dartMarkers[i].reserve(16) ;
+		cellMarkers[i].reserve(16) ;
+	}
 
 	// get & lock marker for boundary
 	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
@@ -106,23 +109,21 @@ GenericMap::~GenericMap()
 			m_attribs[i].clear(true) ;
 	}
 
+
 	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
-	for(std::vector<DartMarkerGen*>::iterator it = dartMarkers.begin(); it != dartMarkers.end(); ++it)
-		(*it)->setReleaseOnDestruct(false) ;
-	dartMarkers.clear() ;
+	for (unsigned int i=0; i<NB_THREAD; ++i)
+	{
+		for(std::vector<DartMarkerGen*>::iterator it = dartMarkers[i].begin(); it != dartMarkers[i].end(); ++it)
+			(*it)->setReleaseOnDestruct(false) ;
+		dartMarkers[i].clear() ;
 
-	for(std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
-		(*it)->setReleaseOnDestruct(false) ;
-	cellMarkers.clear() ;
-
-//	if(m_attributes_registry_map)
-//	{
-//		delete m_attributes_registry_map;
-//		m_attributes_registry_map = NULL;
-//	}
+		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
+			(*it)->setReleaseOnDestruct(false) ;
+		cellMarkers[i].clear() ;
+	}
 
 	// clean type registry if necessary
 	m_nbInstances--;

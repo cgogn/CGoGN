@@ -112,9 +112,11 @@ protected:
 	/**
 	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
 	 */
-	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
-	std::vector<DartMarkerGen*> dartMarkers ;
-	std::vector<CellMarkerGen*> cellMarkers ;
+	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!
+	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
+	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
+
+
 
 	/**
 	 * is map a multiresolution map
