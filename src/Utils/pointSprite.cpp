@@ -63,7 +63,7 @@ PointSprite::PointSprite(bool withColorPervertex, float radius)
 
 	bind();
 	m_uniform_size = glGetUniformLocation(program_handler(),"size");
-	m_uniform_color = glGetUniformLocation(program_handler(),"color");
+	m_uniform_color = glGetUniformLocation(program_handler(),"colorsprite");
 	glUniform1f(m_uniform_size, radius);
 	unbind();
 
