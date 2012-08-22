@@ -174,7 +174,8 @@ template<typename PFP>
 void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces, unsigned int nbth=0, unsigned int current_thread=0)
 {
 	if (nbth==0)
-		nbth = Algo::Parallel::optimalNbThreads();
+//		nbth = Algo::Parallel::optimalNbThreads();
+		nbth =2;	// seems to be optimal ?
 
 	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
 	for (unsigned int i=0; i < nbth; ++i)
@@ -213,7 +214,8 @@ void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
 	typename PFP::REAL AB2 = rayAB * rayAB;
 
 	if (nbth==0)
-		nbth = Algo::Parallel::optimalNbThreads();
+//		nbth = Algo::Parallel::optimalNbThreads();
+		nbth =2;	// seems to be optimal ?
 
 	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
 	for (unsigned int i=0; i < nbth; ++i)
@@ -252,7 +254,8 @@ void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename
 	typename PFP::REAL AB2 = rayAB * rayAB;
 
 	if (nbth==0)
-		nbth = Algo::Parallel::optimalNbThreads();
+//		nbth = Algo::Parallel::optimalNbThreads();
+		nbth =2;	// seems to be optimal ?
 
 	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
 	for (unsigned int i=0; i < nbth; ++i)
@@ -283,15 +286,39 @@ void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename
 		vecVertices.push_back(distndart[i].second);
 
 
-
-
 }
 
+template<typename PFP>
+void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = allDarts, unsigned int nbth=0, unsigned int current_thread=0)
+{
+	std::vector<Dart> vecFaces;
+	vecFaces.reserve(100);
+	Parallel::facesRaySelection<PFP>(map, position, good, rayA, rayAB, vecFaces, nbth, current_thread);
 
-
-
+	if(vecFaces.size() > 0)
+	{
+		// recuperation du sommet le plus proche
+		Dart d = vecFaces.front();
+		Dart it = d;
+		typename PFP::REAL minDist = (rayA - position[it]).norm2();
+		vertex = it;
+		it = map.phi1(it);
+		while(it != d)
+		{
+			typename PFP::REAL dist = (rayA - position[it]).norm2();
+			if(dist < minDist)
+			{
+				minDist = dist;
+				vertex = it;
+			}
+			it = map.phi1(it);
+		}
+	}
+	else
+		vertex = NIL;
 }
 
+}
 
 /**
  * Function that does the selection of one vertex
