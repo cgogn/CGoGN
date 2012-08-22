@@ -180,7 +180,7 @@ public:
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		m_normal[d] = vertexNormal<PFP>(this->m_map, d, m_position) ;
 	}
@@ -204,7 +204,7 @@ public:
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_normal(normal)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		m_normal[d] = faceNormal<PFP>(this->m_map, d, m_position) ;
 	}

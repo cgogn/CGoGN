@@ -418,7 +418,7 @@ public:
 	  m_Knormal(normal)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		computeCurvatureVertex_NormalCycles<PFP>(map, d, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,threadID) ;
 	}

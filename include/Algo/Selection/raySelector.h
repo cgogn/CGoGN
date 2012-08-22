@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <vector>
 #include "Algo/Selection/raySelectFunctor.hpp"
+#include "Algo/Parallel/parallel_foreach.h"
 
 namespace CGoGN
 {
@@ -164,6 +165,133 @@ void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename
 	for (unsigned int i = 0; i < nbi; ++i)
 		vecVertices[i] = distndart[i].second;
 }
+
+
+namespace Parallel
+{
+
+template<typename PFP>
+void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces, unsigned int nbth=0, unsigned int current_thread=0)
+{
+	if (nbth==0)
+		nbth = Algo::Parallel::optimalNbThreads();
+
+	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
+	for (unsigned int i=0; i < nbth; ++i)
+		functs.push_back(new Parallel::FuncFaceInter<PFP>(map,position,rayA, rayAB));
+
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, functs, nbth, false, good, current_thread);
+
+
+	// compute total nb of intersection
+	unsigned int nbtot=0;
+	for (unsigned int i=0; i < nbth; ++i)
+		nbtot += static_cast<Parallel::FuncFaceInter<PFP>*>(functs[i])->getFaceDistances().size();
+
+	std::vector<std::pair<typename PFP::REAL, Dart> > distndart;
+	distndart.reserve(nbtot);
+	for (unsigned int i=0; i < nbth; ++i)
+	{
+		distndart.insert(distndart.end(),static_cast<Parallel::FuncFaceInter<PFP>*>(functs[i])->getFaceDistances().begin(), static_cast<Parallel::FuncFaceInter<PFP>*>(functs[i])->getFaceDistances().end() );
+		delete functs[i];
+	}
+
+	// sort the vector of pair dist/dart
+	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
+
+	vecFaces.clear();
+	vecFaces.reserve(nbtot);
+	// store sorted darts in returned vector
+	for (unsigned int i = 0; i < nbtot; ++i)
+		vecFaces.push_back(distndart[i].second);
+}
+
+template<typename PFP>
+void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float dist, unsigned int nbth=0, unsigned int current_thread=0)
+{
+	typename PFP::REAL dist2 = dist * dist;
+	typename PFP::REAL AB2 = rayAB * rayAB;
+
+	if (nbth==0)
+		nbth = Algo::Parallel::optimalNbThreads();
+
+	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
+	for (unsigned int i=0; i < nbth; ++i)
+		functs.push_back(new Parallel::FuncEdgeInter<PFP>(map,position,rayA, rayAB, AB2, dist2));
+
+	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, functs, nbth, false, good, current_thread);
+
+	// compute total nb of intersection
+	unsigned int nbtot=0;
+	for (unsigned int i=0; i < nbth; ++i)
+		nbtot += static_cast<Parallel::FuncEdgeInter<PFP>*>(functs[i])->getEdgeDistances().size();
+
+	std::vector<std::pair<typename PFP::REAL, Dart> > distndart;
+	distndart.reserve(nbtot);
+	for (unsigned int i=0; i < nbth; ++i)
+	{
+		distndart.insert(distndart.end(),static_cast<Parallel::FuncEdgeInter<PFP>*>(functs[i])->getEdgeDistances().begin(), static_cast<Parallel::FuncEdgeInter<PFP>*>(functs[i])->getEdgeDistances().end() );
+		delete functs[i];
+	}
+
+	// sort the vector of pair dist/dart
+	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
+
+	// store sorted darts in returned vector
+	vecEdges.clear();
+	vecEdges.reserve(nbtot);
+	for (unsigned int i = 0; i < nbtot; ++i)
+		vecEdges.push_back(distndart[i].second);
+}
+
+
+template<typename PFP>
+void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good= allDarts, unsigned int nbth=0, unsigned int current_thread=0)
+{
+	typename PFP::REAL dist2 = dist * dist;
+	typename PFP::REAL AB2 = rayAB * rayAB;
+
+	if (nbth==0)
+		nbth = Algo::Parallel::optimalNbThreads();
+
+	std::vector<FunctorMapThreaded<typename PFP::MAP>*> functs;
+	for (unsigned int i=0; i < nbth; ++i)
+		functs.push_back(new Parallel::FuncVertexInter<PFP>(map,position,rayA, rayAB, AB2, dist2));
+
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, functs, nbth, false, good, current_thread);
+
+	// compute total nb of intersection
+	unsigned int nbtot=0;
+	for (unsigned int i=0; i < nbth; ++i)
+		nbtot += static_cast<Parallel::FuncVertexInter<PFP>*>(functs[i])->getVertexDistances().size();
+
+	std::vector<std::pair<typename PFP::REAL, Dart> > distndart;
+	distndart.reserve(nbtot);
+	for (unsigned int i=0; i < nbth; ++i)
+	{
+		distndart.insert(distndart.end(),static_cast<Parallel::FuncVertexInter<PFP>*>(functs[i])->getVertexDistances().begin(), static_cast<Parallel::FuncVertexInter<PFP>*>(functs[i])->getVertexDistances().end() );
+		delete functs[i];
+	}
+
+	// sort the vector of pair dist/dart
+	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
+
+	// store sorted darts in returned vector
+	vecVertices.clear();
+	vecVertices.reserve(nbtot);
+	for (unsigned int i = 0; i < nbtot; ++i)
+		vecVertices.push_back(distndart[i].second);
+
+
+
+
+}
+
+
+
+
+}
+
 
 /**
  * Function that does the selection of one vertex

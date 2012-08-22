@@ -124,7 +124,7 @@ public:
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol_centroid(vol_centroid)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		m_vol_centroid[d] = volumeCentroid<PFP>(this->m_map, d, m_position,threadID) ;
 	}
@@ -151,7 +151,7 @@ public:
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_fcentroid(fcentroid)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		m_fcentroid[d] = faceCentroid<PFP>(this->m_map, d, m_position) ;
 	}
@@ -178,7 +178,7 @@ public:
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vcentroid(vcentroid)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		m_vcentroid[d] = vertexNeighborhoodCentroid<PFP>(this->m_map, d, m_position) ;
 	}

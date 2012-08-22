@@ -138,7 +138,7 @@ public:
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol(0.0)
 	 { }
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		m_vol += convexPolyhedronVolume<PFP>(this->m_map, d, m_position,threadID) ;
 	}

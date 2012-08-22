@@ -171,7 +171,7 @@ public:
 		FunctorAttribThreaded(),m_positions(pos),m_positions2(pos2)
 	{}
 
-	void parallelDo(unsigned int i, unsigned int threadID)
+	void run(unsigned int i, unsigned int threadID)
 	{
 		m_positions2[i] = 1.1f * m_positions[i];
 	}
@@ -207,7 +207,7 @@ public:
 		m_positions(pos),m_positions2(pos2)
 	{}
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		typename XXX::VEC3 Q(0,0,0);
 		int nb=0;
@@ -258,7 +258,7 @@ public:
 
 	unsigned int getNb() { return m_nb;}
 
-	void parallelDo(Dart d, unsigned int threadID)
+	void run(Dart d, unsigned int threadID)
 	{
 		Dart dd = this->m_map.phi2(d);
 		typename XXX::VEC3 V = m_positions[dd] - m_positions[d];
@@ -281,18 +281,8 @@ void MyQT::threadStorage()
 		functs.push_back(lef);
 	}
 
-//	LengthEdgeFunctor<PFP>* lef0 = new LengthEdgeFunctor<PFP>(myMap,position);
-//	LengthEdgeFunctor<PFP>* lef1 = new LengthEdgeFunctor<PFP>(myMap,position);
-//	LengthEdgeFunctor<PFP>* lef2 = new LengthEdgeFunctor<PFP>(myMap,position);
-//	LengthEdgeFunctor<PFP>* lef3 = new LengthEdgeFunctor<PFP>(myMap,position);
-//	functs.push_back(lef0);
-//	functs.push_back(lef1);
-//	functs.push_back(lef2);
-//	functs.push_back(lef3);
 
 	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs, 4);
-
-
 
 	//compute average length from each thread result and delete functors
 	double average = 0;
@@ -306,19 +296,9 @@ void MyQT::threadStorage()
 	}
 	average /= all;
 
-//	double average = (lef0->getLength()+lef1->getLength()+lef2->getLength()+lef3->getLength()) / (lef0->getNb()+lef1->getNb()+lef2->getNb()+lef3->getNb());
 	std::cout << "AVERAGE LENGTH "<< average << std::endl;
 
-//	delete lef0;
-//	delete lef1;
-//	delete lef2;
-//	delete lef3;
 }
-
-
-
-
-
 
 
 int main(int argc, char **argv)

@@ -439,7 +439,7 @@ public:
 
 /**
  * Functor class for parallel::foreach_orbit/cell/dart
- * Overload bool parallelDo
+ * Overload  run
  * Overload duplicate if necessary (no sharing of functors)
  */
 template<typename MAP>
@@ -463,13 +463,13 @@ public:
 	 * @param d the dart on which apply functor
 	 * @param threadID the id of thread currently running your code
 	 */
-	virtual void parallelDo(Dart d, unsigned int threadID) = 0;
+	virtual void run(Dart d, unsigned int threadID) = 0;
 };
 
 
 /**
  * Functor class for parallel::foreach_attrib
- * Overload parallelDo
+ * Overload run
  * Overload duplicate if necessary (no sharing of functors)
  */
 class FunctorAttribThreaded
@@ -487,7 +487,7 @@ public:
 	 * @param d the dart on which apply functor
 	 * @param threadID the id of thread currently running your code
 	 */
-	virtual void parallelDo(unsigned int i, unsigned int threadID) = 0;
+	virtual void run(unsigned int i, unsigned int threadID) = 0;
 };
 
 

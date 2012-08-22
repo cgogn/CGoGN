@@ -58,7 +58,7 @@ public:
 		while (!m_finished)
 		{
 			for (std::vector<unsigned int>::const_iterator it = m_ids.begin(); it != m_ids.end(); ++it)
-				m_functor->parallelDo(*it,m_id);
+				m_functor->run(*it,m_id);
 			m_sync1.wait();
 			m_sync2.wait();
 		}
@@ -95,7 +95,7 @@ public:
 		while (!m_finished)
 		{
 			for (std::vector<Dart>::const_iterator it = m_darts.begin(); it != m_darts.end(); ++it)
-				m_functor->parallelDo(*it,m_id);
+				m_functor->run(*it,m_id);
 			m_sync1.wait();
 			m_sync2.wait();
 		}
