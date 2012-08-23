@@ -182,7 +182,7 @@ public:
 void MyQT::threadAttrib()
 {
 	UnshrinkFunctor<PFP> funct(position,position2);
-	Algo::Parallel::foreach_attrib(myMap.getAttributeContainer<VERTEX>(), funct, true);
+	Algo::Parallel::foreach_attrib(myMap.getAttributeContainer<VERTEX>(), funct);
 
 	myMap.swapAttributes(position,position2);
 	m_positionVBO->updateData(position);
@@ -226,7 +226,7 @@ public:
 void MyQT::threadSimple()
 {
 	ShrinkFunctor<PFP> funct(myMap,position,position2);
-	Algo::Parallel::foreach_cell<PFP::MAP,VERTEX>(myMap, funct,true);
+	Algo::Parallel::foreach_cell<PFP::MAP,VERTEX>(myMap, funct);
 
 	myMap.swapAttributes(position,position2);
 	m_positionVBO->updateData(position);

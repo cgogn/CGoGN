@@ -137,7 +137,7 @@ void computeCentroidVolumes(typename PFP::MAP& map,
 		const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
 {
 	FunctorComputeCentroidVolumes<PFP> funct(map,position,vol_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, true, nbth, true, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true, select, current_thread);
 }
 
 
@@ -190,7 +190,7 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
 {
 	FunctorComputeNeighborhoodCentroidVertices<PFP> funct(map,position,vertex_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, true, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
 }
 
 }

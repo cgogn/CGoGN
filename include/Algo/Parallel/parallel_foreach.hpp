@@ -121,13 +121,16 @@ inline unsigned int optimalNbThreads()
 
 
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, bool shared, unsigned int nbth, bool needMarkers, const FunctorSelect& good, unsigned int currentThread)
+void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers, const FunctorSelect& good, unsigned int currentThread)
 {
 	if (nbth == 0)
 		nbth = optimalNbThreads();
 
 	std::vector<FunctorMapThreaded<MAP>*> funcs;
 	funcs.reserve(nbth);
+
+	FunctorMapThreaded<MAP>* ptr = func.duplicate();
+	bool shared = (ptr == NULL);
 
 	if (shared)
 	{
@@ -136,7 +139,8 @@ void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, bool shared, unsigned
 	}
 	else
 	{
-		for (unsigned int i = 0; i < nbth; ++i)
+		funcs.push_back(ptr);
+		for (unsigned int i = 1; i < nbth; ++i)
 			funcs.push_back(func.duplicate());
 	}
 
@@ -339,13 +343,16 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, unsign
 
 
 template <typename MAP>
-void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, bool shared, unsigned int nbth, bool needMarkers, const FunctorSelect& good)
+void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers, const FunctorSelect& good)
 {
 	if (nbth == 0)
 		nbth = optimalNbThreads();
 
 	std::vector<FunctorMapThreaded<MAP>*> funcs;
 	funcs.reserve(nbth);
+
+	FunctorMapThreaded<MAP>* ptr = func.duplicate();
+	bool shared = (ptr == NULL);
 
 	if (shared)
 	{
@@ -354,7 +361,8 @@ void foreach_dart(MAP& map, FunctorMapThreaded<MAP>& func, bool shared, unsigned
 	}
 	else
 	{
-		for (unsigned int i = 0; i < nbth; ++i)
+		funcs.push_back(ptr);
+		for (unsigned int i = 1; i < nbth; ++i)
 			funcs.push_back(func.duplicate());
 	}
 
@@ -454,13 +462,16 @@ void foreach_dart(MAP& map, std::vector<FunctorMapThreaded<MAP>*> funcs, unsigne
 
 
 
-inline void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded& func, bool shared, unsigned int nbth)
+inline void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded& func, unsigned int nbth)
 {
 	if (nbth == 0)
 		nbth = optimalNbThreads();
 
 	std::vector<FunctorAttribThreaded*> funcs;
 	funcs.reserve(nbth);
+
+	FunctorAttribThreaded* ptr = func.duplicate();
+	bool shared = (ptr == NULL);
 
 	if (shared)
 	{
@@ -469,7 +480,8 @@ inline void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded&
 	}
 	else
 	{
-		for (unsigned int i = 0; i < nbth; ++i)
+		funcs.push_back(ptr);
+		for (unsigned int i = 1; i < nbth; ++i)
 			funcs.push_back(func.duplicate());
 	}
 
@@ -696,13 +708,16 @@ void foreach_cell2Pass(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcsFro
 
 
 template <typename MAP, unsigned int CELL>
-void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, bool shared, unsigned int nbLoops, unsigned int nbth, bool needMarkers, const FunctorSelect& good)
+void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapThreaded<MAP>& funcBack, unsigned int nbLoops, unsigned int nbth, bool needMarkers, const FunctorSelect& good)
 {
 	if (nbth == 0)
 		nbth = optimalNbThreads();
 
 	std::vector<FunctorMapThreaded<MAP>*> funcs;
 	funcs.reserve(nbth);
+
+	FunctorMapThreaded<MAP>* ptr = funcFront.duplicate();
+	bool shared = (ptr == NULL);
 
 	if (shared)
 	{
@@ -713,19 +728,19 @@ void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapT
 	}
 	else
 	{
-		for (unsigned int i = 0; i < nbth; ++i)
+		funcs.push_back(ptr);
+		for (unsigned int i = 1; i < nbth; ++i)
 			funcs.push_back(funcFront.duplicate());
 		for (unsigned int i = 0; i < nbth; ++i)
 			funcs.push_back(funcBack.duplicate());
-	}
 
+	}
 
 	foreach_cell2Pass<MAP,CELL>(map,funcs,nbLoops,nbth,needMarkers,good);
 
 	if (!shared)
-		for (unsigned int i = 0; i < nbth; ++i)
+		for (unsigned int i = 0; i < 2*nbth; ++i)
 			delete funcs[i];
-
 }
 
 

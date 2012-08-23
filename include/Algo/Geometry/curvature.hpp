@@ -439,7 +439,7 @@ void computeCurvatureVertices_NormalCycles(
 	const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
 {
 	FunctorComputeCurvatureVertices_NormalCycles<PFP> funct(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, true, nbth, true, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select, current_thread);
 }
 
 }

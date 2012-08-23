@@ -190,7 +190,7 @@ template <typename PFP>
 void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
 {
 	FunctorComputeNormalVertices<PFP> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, true, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
 }
 
 
@@ -214,10 +214,35 @@ template <typename PFP>
 void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
 {
 	FunctorComputeNormalFaces<PFP> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, true, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select, current_thread);
 }
 
+
+template <typename PFP>
+class FunctorComputeAngleBetweenNormalsOnEdge: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 FaceAttribute<typename PFP::VEC3>& m_angles;
+public:
+	 FunctorComputeAngleBetweenNormalsOnEdge<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::VEC3>& angles):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_angles(angles)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_angles[d] = computeAngleBetweenNormalsOnEdge<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+
+template <typename PFP>
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorComputeAngleBetweenNormalsOnEdge<PFP> funct(map,position,angles);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false, select, current_thread);
 }
+
+} // endnamespace Parallel
 
 
 
