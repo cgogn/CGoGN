@@ -22,83 +22,65 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __TRAVERSOR_CELL_H__
-#define __TRAVERSOR_CELL_H__
+#ifndef __TRAVERSORFACTORY_H__
+#define __TRAVERSORGEN_H__
 
-#include "Topology/generic/dart.h"
-#include "Topology/generic/dartmarker.h"
-#include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversorGen.h"
 
 namespace CGoGN
 {
 
-template <typename MAP, unsigned int ORBIT>
-class TraversorCell : public Traversor<MAP>
-{
-private:
-	MAP& m ;
-
-	AttributeContainer* cont ;
-	unsigned int qCurrent ;
-
-	DartMarker* dmark ;
-	CellMarker<ORBIT>* cmark ;
-	AttributeMultiVector<Dart>* quickTraversal ;
-
-	Dart current ;
-	bool firstTraversal ;
-	const FunctorSelect& m_good ;
-
-public:
-	TraversorCell(MAP& map, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
-
-	~TraversorCell() ;
-
-	Dart begin() ;
-
-	Dart end() ;
-
-	Dart next() ;
-
-	void skip(Dart d);
-} ;
-
 template <typename MAP>
-class TraversorV : public TraversorCell<MAP, VERTEX>
+class TraversorFactory
 {
 public:
-	TraversorV(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, good, forceDartMarker, thread)
-	{}
-};
 
-template <typename MAP>
-class TraversorE : public TraversorCell<MAP, EDGE>
-{
-public:
-	TraversorE(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, good, forceDartMarker, thread)
-	{}
-};
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
 
+	/**
+	 * Factory of adjacent traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
 
-template <typename MAP>
-class TraversorF : public TraversorCell<MAP, FACE>
-{
-public:
-	TraversorF(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, good, forceDartMarker, thread)
-	{}
-};
+	/**
+	 * Factory of darts of orbit traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param orb the orbit
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb);
 
-template <typename MAP>
-class TraversorW : public TraversorCell<MAP, VOLUME>
-{
-public:
-	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, good, forceDartMarker, thread)
-	{}
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param good the selector (default value allDarts)
+	 * @param forceDartMarker (default value false)
+	 * @param thread (default value 0)
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createCell(MAP& map, unsigned int orb, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0);
 };
 
 } // namespace CGoGN
 
-#include "Topology/generic/traversorCell.hpp"
+
+#include "Topology/generic/traversorFactory.hpp"
 
 #endif
+

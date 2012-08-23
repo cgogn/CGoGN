@@ -22,10 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/functor.h"
 
 #ifndef __PARALLEL_FOREACH__
 #define __PARALLEL_FOREACH__
+
+#include "Topology/generic/functor.h"
 
 namespace CGoGN
 {
@@ -36,6 +37,11 @@ namespace Algo
 namespace Parallel
 {
 
+static unsigned int NBCORES=0;
+
+/// enum for optimalNbThreads parameter
+enum NbParam {NB_HIGHMEMORY, NB_HIGHCOMPUTE, NB_VERYHIGHMEMORY};
+
 /// size of buffers to store darts or indexes in each threads
 const unsigned int SIZE_BUFFER_THREAD = 8192;	// seems to be the best compromise
 
@@ -45,9 +51,15 @@ const unsigned int SIZE_BUFFER_THREAD = 8192;	// seems to be the best compromise
 inline unsigned int nbThreads();
 
 /**
+ * @param p can be NB_HIGHMEMORY (default) or NB_HIGHCOMPUTE or NB_VERYHIGHMEMORY
  * @return Number of core in fact (work only with quad core with/without hyper threading)
  */
-inline unsigned int optimalNbThreads();
+unsigned int optimalNbThreads( NbParam p=NB_HIGHMEMORY);
+
+/**
+ * impossible to automatically determine the number of cores so ...
+ */
+void setNbCore(unsigned int nb);
 
 
 /**
