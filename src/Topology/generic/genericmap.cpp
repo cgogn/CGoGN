@@ -145,6 +145,7 @@ void GenericMap::clear(bool removeAttrib)
 		{
 			m_attribs[i].clear(true) ;
 			m_embeddings[i] = NULL ;
+			m_quickTraversal[i] = NULL;
 		}
 		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 			(*it).second->setInvalid() ;
