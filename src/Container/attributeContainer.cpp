@@ -169,14 +169,14 @@ void AttributeContainer::clear(bool removeAttrib)
 	m_size = 0;
  	m_maxSize = 0;
 
-	std::vector<HoleBlockRef*> bf;
-	std::vector<unsigned int> bwf;
-
-	// raz des cases libres
+		// raz des cases libres
 	for (std::vector<HoleBlockRef*>::iterator it = m_holesBlocks.begin(); it != m_holesBlocks.end(); ++it)
 		delete (*it);
 
+	std::vector<HoleBlockRef*> bf;
 	m_holesBlocks.swap(bf);
+
+	std::vector<unsigned int> bwf;
 	m_tableBlocksWithFree.swap(bwf);
 
 	// detruit les données
@@ -193,13 +193,17 @@ void AttributeContainer::clear(bool removeAttrib)
 		m_nbAttributes = 0;
 
 		// detruit tous les attributs
-		std::vector<AttributeMultiVectorGen*> amg;
 		for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
 		{
 			if ((*it) != NULL)
 				delete (*it);
 		}
+
+		std::vector<AttributeMultiVectorGen*> amg;
 		m_tableAttribs.swap(amg);
+
+		std::vector<unsigned int> fi;
+		m_freeIndices.swap(fi);
 	}
 }
 
