@@ -40,6 +40,7 @@
 
 #include "Algo/Parallel/parallel_foreach.h"
 #include "Algo/Parallel/cgogn_thread.h"
+#include "Utils/cgognStream.h"
 #include "Utils/chrono.h"
 
 using namespace CGoGN ;
@@ -108,7 +109,7 @@ void MyQT::cb_initGL()
 	m_lines->setScale(2.0f);
 	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
 
-	std::cout << "Je calcule les normales en meme temps que les primitives" << std::endl;
+	CGoGNout << "Je calcule les normales en meme temps que les primitives" << CGoGNendl;
 	boost::thread thread1( ThreadNormals<PFP>(myMap,position,normal,1));
 
 
@@ -150,7 +151,7 @@ void MyQT::cb_keyPress(int code)
 	default:
 		break;
 	}
-	std::cout << "time = "<< ch.elapsed() << std::endl;
+	CGoGNout << "time = "<< ch.elapsed() << CGoGNendl;
 
 	updateGL();
 }
@@ -281,8 +282,8 @@ void MyQT::threadStorage()
 		functs.push_back(lef);
 	}
 
-
-	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs, 4);
+	CGoGNout << "using "<< nbthreads << " threads"<< CGoGNendl;
+	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs, nbthreads);
 
 	//compute average length from each thread result and delete functors
 	double average = 0;
@@ -296,7 +297,7 @@ void MyQT::threadStorage()
 	}
 	average /= all;
 
-	std::cout << "AVERAGE LENGTH "<< average << std::endl;
+	CGoGNout << "AVERAGE LENGTH "<< average << CGoGNendl;
 
 }
 
@@ -320,10 +321,12 @@ int main(int argc, char **argv)
 	if (!normal.isValid())
  		normal = myMap.addAttribute<PFP::VEC3, VERTEX>("normal");
 
+	unsigned int nbt = 64;
+	if (argc==2)
+		nbt = atoi(argv[1]);
  		// create a sphere
  	Algo::Modelisation::Polyhedron<PFP> prim(myMap, position);
-// 	prim.cylinder_topo(2640,2640, true, true); // test for speed timing
- 	prim.cylinder_topo(64,64, true, true); // topo of sphere is a closed cylinder
+ 	prim.cylinder_topo(nbt,nbt, true, true);
  	prim.embedSphere(20.0f);
 
 
@@ -331,8 +334,8 @@ int main(int argc, char **argv)
 	Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 	float lWidthObj = std::max<PFP::REAL>(std::max<PFP::REAL>(bb.size(0), bb.size(1)), bb.size(2));
 	Geom::Vec3f lPosObj = (bb.min() +  bb.max()) / PFP::REAL(2);
-	std::cout << "lPosObj=" << lPosObj << std::endl;
-	std::cout << "lWidthObj=" << lWidthObj << std::endl;
+	CGoGNout << "lPosObj=" << lPosObj << CGoGNendl;
+	CGoGNout << "lWidthObj=" << lWidthObj << CGoGNendl;
 	sqt.setParamObject(lWidthObj,lPosObj.data());
 
 //	myMap.enableQuickTraversal<EDGE>() ;
