@@ -73,6 +73,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 
 		std::vector<Dart> visitedFaces ;
 		visitedFaces.reserve(100) ;
+
 		visitedFaces.push_back(d) ;
 		mark.markOrbit<FACE>(d) ;
 
@@ -104,7 +105,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 				if(!mark.isMarked(ee)) // not already marked
 				{
 					visitedFaces.push_back(ee) ;
-					mark.markOrbit<FACE>(e) ;
+					mark.markOrbit<FACE>(ee) ;
 				}
 				e = map.phi1(e) ;
 			} while(e != *face) ;
@@ -117,11 +118,13 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 template <typename PFP>
 typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int thread)
 {
-	typename PFP::REAL vol = 0 ;
+//	typename PFP::REAL vol = 0 ;
+	double vol = 0 ;
+
 	TraversorW<typename PFP::MAP> t(map, select, thread) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		vol += convexPolyhedronVolume<PFP>(map, d, position,thread) ;
-	return vol ;
+	return typename PFP::REAL(vol) ;
 }
 
 
@@ -132,7 +135,8 @@ template <typename PFP>
 class FunctorTotalVolume: public FunctorMapThreaded<typename PFP::MAP >
 {
 	 const VertexAttribute<typename PFP::VEC3>& m_position;
-	 typename PFP::REAL m_vol;
+//	 typename PFP::REAL m_vol;
+	 double m_vol;
 public:
 	 FunctorTotalVolume<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position):
 	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_vol(0.0)
@@ -143,7 +147,8 @@ public:
 		m_vol += convexPolyhedronVolume<PFP>(this->m_map, d, m_position,threadID) ;
 	}
 
-	typename PFP::REAL getVol() const
+//	typename PFP::REAL getVol() const
+	double getVol() const
 	{
 		return m_vol;
 	}
@@ -164,7 +169,7 @@ typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typ
 		functs.push_back(new FunctorTotalVolume<PFP>(map,position));
 	}
 
-	typename PFP::REAL total=0.0;
+	double total=0.0;
 
 	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, nbth, true, select, current_thread);
 
@@ -173,7 +178,7 @@ typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typ
 		total += reinterpret_cast<FunctorTotalVolume<PFP>*>(functs[i])->getVol();
 		delete functs[i];
 	}
-	return total;
+	return typename PFP::REAL(total);
 }
 
 }
