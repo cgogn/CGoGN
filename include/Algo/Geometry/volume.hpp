@@ -77,9 +77,9 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 		visitedFaces.push_back(d) ;
 		mark.markOrbit<FACE>(d) ;
 
-		for(typename std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+		for(unsigned int  iface = 0; iface != visitedFaces.size(); ++iface)
 		{
-			Dart e = *face ;
+			Dart e = visitedFaces[iface] ;
 			if(map.isCycleTriangle(e))
 			{
 				VEC3 p1 = position[e] ;
@@ -99,6 +99,7 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 					f = map.phi1(f) ;
 				} while(f != e) ;
 			}
+			Dart currentFace = e;
 			do	// add all face neighbours to the table
 			{
 				Dart ee = map.phi2(e) ;
@@ -108,18 +109,18 @@ typename PFP::REAL convexPolyhedronVolume(typename PFP::MAP& map, Dart d, const 
 					mark.markOrbit<FACE>(ee) ;
 				}
 				e = map.phi1(e) ;
-			} while(e != *face) ;
+			} while(e != currentFace) ;
 		}
 
 		return vol ;
 	}
 }
 
+
 template <typename PFP>
 typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int thread)
 {
-//	typename PFP::REAL vol = 0 ;
-	double vol = 0 ;
+	double vol = 0.0 ;
 
 	TraversorW<typename PFP::MAP> t(map, select, thread) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -135,7 +136,6 @@ template <typename PFP>
 class FunctorTotalVolume: public FunctorMapThreaded<typename PFP::MAP >
 {
 	 const VertexAttribute<typename PFP::VEC3>& m_position;
-//	 typename PFP::REAL m_vol;
 	 double m_vol;
 public:
 	 FunctorTotalVolume<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position):
@@ -147,7 +147,6 @@ public:
 		m_vol += convexPolyhedronVolume<PFP>(this->m_map, d, m_position,threadID) ;
 	}
 
-//	typename PFP::REAL getVol() const
 	double getVol() const
 	{
 		return m_vol;
