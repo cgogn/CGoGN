@@ -164,7 +164,7 @@ void computeCentroidFaces(typename PFP::MAP& map,
 		const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
 {
 	FunctorComputeCentroidFaces<PFP> funct(map,position,face_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, true, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select, current_thread);
 }
 
 

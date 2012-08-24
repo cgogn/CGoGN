@@ -205,7 +205,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, unsign
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!cmark->isMarked(d)))
+				if (good(d) && (!map.isBoundaryMarked(d)) && (!cmark->isMarked(d)))
 				{
 					cmark->mark(d);
 					vd[nb%nbth].push_back(d);
@@ -221,7 +221,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, unsign
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!dmark->isMarked(d)))
+				if (good(d) && (!map.isBoundaryMarked(d)) && (!dmark->isMarked(d)))
 				{
 					dmark->markOrbit<ORBIT>(d);
 					vd[nb%nbth].push_back(d);
@@ -285,7 +285,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, unsign
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!cmark->isMarked(d)))
+				if (good(d) && (!map.isBoundaryMarked(d)) && (!cmark->isMarked(d)))
 				{
 					cmark->mark(d);
 					tempo[nb%nbth].push_back(d);
@@ -308,7 +308,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, unsign
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
 			{
-				if (good(d) && (!dmark->isMarked(d)))
+				if (good(d) && (!map.isBoundaryMarked(d)) && (!dmark->isMarked(d)))
 				{
 					dmark->markOrbit<ORBIT>(d);
 					tempo[nb%nbth].push_back(d);
