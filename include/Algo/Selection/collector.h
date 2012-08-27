@@ -25,6 +25,8 @@
 #ifndef __COLLECTOR_H__
 #define __COLLECTOR_H__
 
+#include "Container/fakeAttribute.h"
+
 /*****************************************
  * Class hierarchy :
  * Collector (virtual)
