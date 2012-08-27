@@ -181,7 +181,7 @@ void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
 	for (unsigned int i=0; i < nbth; ++i)
 		functs.push_back(new Parallel::FuncFaceInter<PFP>(map,position,rayA, rayAB));
 
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, functs, nbth, false, good, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, functs, false, good, current_thread);
 
 
 	// compute total nb of intersection
@@ -221,7 +221,7 @@ void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
 	for (unsigned int i=0; i < nbth; ++i)
 		functs.push_back(new Parallel::FuncEdgeInter<PFP>(map,position,rayA, rayAB, AB2, dist2));
 
-	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, functs, nbth, false, good, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, functs, false, good, current_thread);
 
 	// compute total nb of intersection
 	unsigned int nbtot=0;
@@ -261,7 +261,7 @@ void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename
 	for (unsigned int i=0; i < nbth; ++i)
 		functs.push_back(new Parallel::FuncVertexInter<PFP>(map,position,rayA, rayAB, AB2, dist2));
 
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, functs, nbth, false, good, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, functs, false, good, current_thread);
 
 	// compute total nb of intersection
 	unsigned int nbtot=0;

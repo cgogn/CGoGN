@@ -64,7 +64,7 @@ void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded& func, 
 			funcs.push_back(func.duplicate());
 	}
 
-	foreach_attrib(attr_cont,funcs,nbth);
+	foreach_attrib(attr_cont,funcs);
 
 	if (!shared)
 		for (unsigned int i = 0; i < nbth; ++i)
@@ -72,9 +72,9 @@ void foreach_attrib(AttributeContainer& attr_cont, FunctorAttribThreaded& func, 
 
 }
 
-void foreach_attrib(AttributeContainer& attr_cont, std::vector<FunctorAttribThreaded*> funcs, unsigned int nbth)
+void foreach_attrib(AttributeContainer& attr_cont, std::vector<FunctorAttribThreaded*> funcs)
 {
-	assert(funcs.size() ==  nbth);
+	unsigned int nbth = funcs.size();
 
 	std::vector<unsigned int >* vid = new std::vector<unsigned int>[2*nbth];
 	boost::thread** threads = new boost::thread*[nbth];

@@ -170,7 +170,7 @@ typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typ
 
 	double total=0.0;
 
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, nbth, true, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, functs, true, select, current_thread);
 
 	for (unsigned int i=0; i < nbth; ++i)
 	{
