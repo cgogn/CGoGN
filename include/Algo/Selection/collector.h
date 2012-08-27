@@ -151,8 +151,7 @@ public:
 		Collector<PFP>(m, thread),
 		position(p),
 		radius(r),
-		area(0),
-		m_thread(thread)
+		area(0)
 	{}
 	inline void setRadius(typename PFP::REAL r) { radius = r; }
 	inline typename PFP::REAL getRadius() const { return radius; }
@@ -166,7 +165,7 @@ public:
 };
 
 /*********************************************************
- * Collector Normal Angle
+ * Collector Normal Angle (Vertices)
  *********************************************************/
 
 /*
@@ -178,27 +177,107 @@ template <typename PFP>
 class Collector_NormalAngle : public Collector<PFP>
 {
 protected:
-	const VertexAttribute<typename PFP::VEC3>& position ;
 	const VertexAttribute<typename PFP::VEC3>& normal ;
 	typename PFP::REAL angleThreshold ;
 
 public:
 	Collector_NormalAngle(
 		typename PFP::MAP& m,
-		const VertexAttribute<typename PFP::VEC3>& p,
 		const VertexAttribute<typename PFP::VEC3>& n,
 		typename PFP::REAL a,
 		unsigned int thread=0
-	) :	Collector<PFP>(m,thread), position(p), normal(n), angleThreshold(a)
+	) :	Collector<PFP>(m,thread), normal(n), angleThreshold(a)
 	{}
 	inline void setAngleThreshold(typename PFP::REAL a) { angleThreshold = a; }
 	inline typename PFP::REAL getAngleThreshold() const { return angleThreshold; }
-	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position ; }
 	inline const VertexAttribute<typename PFP::VEC3>& getNormal() const { return normal ; }
 
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
 };
+
+/*********************************************************
+ * Collector Normal Angle (Triangles)
+ *********************************************************/
+
+/*
+ * collect all primitives of the connected component containing "centerDart"
+ * the angle between the included triangles normal vectors and the central normal vector
+ * stays under a given threshold
+ */
+template <typename PFP>
+class Collector_NormalAngle_Triangles : public Collector<PFP>
+{
+protected:
+	const FaceAttribute<typename PFP::VEC3>& normal ;
+	typename PFP::REAL angleThreshold ;
+
+public:
+	Collector_NormalAngle_Triangles(
+		typename PFP::MAP& m,
+		const FaceAttribute<typename PFP::VEC3>& n,
+		typename PFP::REAL a,
+		unsigned int thread=0
+	) :	Collector<PFP>(m,thread), normal(n), angleThreshold(a)
+	{}
+	inline void setAngleThreshold(typename PFP::REAL a) { angleThreshold = a; }
+	inline typename PFP::REAL getAngleThreshold() const { return angleThreshold; }
+	inline const VertexAttribute<typename PFP::VEC3>& getNormal() const { return normal ; }
+
+	void collectAll(Dart d) ;
+	void collectBorder(Dart d) ;
+};
+
+/*********************************************************
+ * Collector Dijkstra
+ *********************************************************/
+
+/*
+ * collect all primitives of the connected component containing "centerDart"
+ * within a distance < maxDist (the shortest path follows edges)
+ */
+template <typename PFP>
+class Collector_Dijkstra : public Collector<PFP>
+{
+protected:
+	const VertexAttribute<typename PFP::VEC3>& position;
+	typename PFP::REAL maxDist;
+
+	typedef struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "DijkstraVertexInfo" ; }
+	} DijkstraVertexInfo ;
+	typedef NoMathIOAttribute<DijkstraVertexInfo> VertexInfo ;
+
+	VertexAttribute<VertexInfo> vertexInfo ;
+
+	std::multimap<float,Dart> front ;
+
+public:
+	Collector_Dijkstra(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL d = 0, unsigned int thread=0) :
+		Collector<PFP>(m,thread),
+		position(p),
+		maxDist(d)
+	{
+		vertexInfo = m.template addAttribute<VertexInfo, VERTEX>("vertexInfo");
+	}
+	~Collector_Dijkstra(){
+		this->map.removeAttribute(vertexInfo);
+	}
+	inline void init (Dart d) {Collector<PFP>::init(d); front.clear();}
+	inline void setMaxDistance(typename PFP::REAL d) { maxDist = d; }
+	inline typename PFP::REAL getMaxDist() const { return maxDist; }
+	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position; }
+
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
+private :
+	inline float edgeLength (Dart d);
+//	inline Dart oppositeVertex (Dart d);
+};
+
 
 } // namespace Selection
 
