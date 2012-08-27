@@ -48,7 +48,7 @@ namespace GL2
 
 /**
  * Class that update VBO to allow the rendering of per face color rendering
- * Warning: do not use same position & color VBO than with pervertex rendering !
+ * Use with ColorPerVertexShader
  */
 class ColorPerFaceRender
 {
@@ -63,22 +63,36 @@ public:
 
 	/**
 	* update drawing buffers
+	* @param vboPosition vbo of positions to update
+	* @param vboColor vbo of colors to update
 	* @param map the map
-	* @param positions  attribute of position vertices
-	* @param colorPerFace attribute of color (per face, or per vertex per face)
+	* @param positions attribute of position vertices
+	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
 	* @param good selector
 	*/
-	template<typename PFP, unsigned int ORBIT>
+	template<typename PFP, typename ATTRIB>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3, ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
-	template<typename PFP, unsigned int ORBIT>
+	/**
+	* update drawing buffers
+	* @param vboPosition vbo of positions to update
+	* @param vboNormals vbo of positions to update
+	* @param vboColor vbo of colors to update
+	* @param map the map
+	* @param positions attribute of position vertices
+	* @param normals attribute of normal vertices
+	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
+	* @param good selector
+	*/
+	template<typename PFP, typename ATTRIB>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3, ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const ATTRIB& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
 
 	/**
 	 * draw
+	 * @param sh shader use to draw (here only ColorPerVertex)
 	 */
 	void draw(Utils::GLSLShader* sh) ;
 
