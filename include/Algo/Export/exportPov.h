@@ -41,7 +41,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, VertexAttribute
 
 	TraversorF<typename PFP::MAP > travF(map);
 
-	for(Dart d = travF.begin() ; d!= travF.end() ; travF.next(d))
+	for(Dart d = travF.begin() ; d!= travF.end() ; d = travF.next())
 	{
 		if(good(d))
 		{

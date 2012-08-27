@@ -166,8 +166,12 @@ Dart Traversor2VVaF<MAP>::next()
 		{
 			Dart d = m.phi2(m.phi_1(current)) ;
 			if(m.isBoundaryMarked(d)) // jump over a boundary face
+			{
 				d = m.phi2(m.phi_1(d)) ;
-			current = m.phi1(m.phi1(d)) ;
+				current = m.phi1(d);
+			}
+			else
+				current = m.phi1(m.phi1(d)) ;
 			if(current == d)
 				current = m.phi1(d) ;
 			stop = d ;
