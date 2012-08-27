@@ -176,7 +176,6 @@ public:
 	{
 		m_positions2[i] = 1.1f * m_positions[i];
 	}
-	// no need to duplicate here functor can be shared (no data), call foreach with true parameter
 };
 
 
@@ -283,7 +282,7 @@ void MyQT::threadStorage()
 	}
 
 	CGoGNout << "using "<< nbthreads << " threads"<< CGoGNendl;
-	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs, nbthreads);
+	Algo::Parallel::foreach_cell<PFP::MAP,EDGE>(myMap, functs);
 
 	//compute average length from each thread result and delete functors
 	double average = 0;

@@ -28,6 +28,7 @@ namespace CGoGN
 template <typename T, unsigned int ORBIT>
 inline void AttributeHandler<T, ORBIT>::registerInMap()
 {
+	boost::mutex::scoped_lock lockAH(m_map->attributeHandlersMutex);
 	m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
 }
 
@@ -35,6 +36,8 @@ template <typename T, unsigned int ORBIT>
 inline void AttributeHandler<T, ORBIT>::unregisterFromMap()
 {
 	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
+
+	boost::mutex::scoped_lock lockAH(m_map->attributeHandlersMutex);
 	std::pair<IT, IT> bounds = m_map->attributeHandlers.equal_range(m_attrib) ;
 	for(IT i = bounds.first; i != bounds.second; ++i)
 	{
