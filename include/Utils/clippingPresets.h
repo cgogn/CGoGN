@@ -48,6 +48,8 @@ class ClippingPreset
 
 public :
 
+	virtual ~ClippingPreset() {}
+
 	/// public static constructor
 	static ClippingPreset* CreateEmptyPreset();
 
@@ -91,7 +93,6 @@ protected :
 
 	/// protected constructor (used by public static constructors or child class)
 	ClippingPreset();
-
 
 	/***********************************************
 	 *

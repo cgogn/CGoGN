@@ -45,6 +45,7 @@ namespace Utils
 class GTexture
 {
 public:
+	virtual ~GTexture() {}
 	virtual void bind() {}
 };
 

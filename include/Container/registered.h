@@ -37,6 +37,8 @@ protected:
 	std::string m_name; // TODO inutile ??
 
 public:
+
+	virtual ~RegisteredBaseAttribute() {}
 	/**
 	 * affecte un nom de type a l'attribut
 	 */
