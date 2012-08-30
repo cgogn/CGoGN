@@ -77,7 +77,7 @@ public:
 	/*!
 	 *
 	 */
-	void init() ;
+	void initImplicitProperties() ;
 
 	/**
 	 * clear the map

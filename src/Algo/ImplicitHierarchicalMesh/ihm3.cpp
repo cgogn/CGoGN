@@ -67,7 +67,7 @@ void ImplicitHierarchicalMap3::clear(bool removeAttrib)
 	}
 }
 
-void ImplicitHierarchicalMap3::init()
+void ImplicitHierarchicalMap3::initImplicitProperties()
 {
 	initEdgeId() ;
 	initFaceId();
