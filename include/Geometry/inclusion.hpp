@@ -169,7 +169,7 @@ bool arePointsEquals(const VEC& point1, const VEC& point2)
 {
 	VEC v(point1 - point2);
 
-#define PRECISION 1e-3
+#define PRECISION 1e-10
 	return v.norm2() <= PRECISION ;
 #undef PRECISION
 }

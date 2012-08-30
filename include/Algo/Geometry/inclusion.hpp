@@ -62,6 +62,7 @@ bool isConvex(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP
 	return convex;
 }
 
+// TODO add thread Pameter
 template <typename PFP>
 bool isPointInVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& point)
 {
@@ -69,59 +70,58 @@ bool isPointInVolume(typename PFP::MAP& map, Dart d, const VertexAttribute<typen
 
 	//number of intersection between a ray and the volume must be odd
 	int countInter = 0;
+	int countInter2 = 0;
 
-// 	if(isConvex<PFP>(map,d)) {
-// 		CGoGNout << "optimize point in volume" << CGoGNendl;
-// 	}
-
-	std::list<Dart> visitedFaces;			// Faces that are traversed
-	visitedFaces.push_back(d);				// Start with the face of d
-	std::list<Dart>::iterator face;
-	VEC3 dir(0.5f,0.5f,0.5f);
-	VEC3 inter;
+	VEC3 dir(0.9f,1.1f,1.3f);
 	std::vector<VEC3> interPrec;
-
-	DartMarkerStore mark(map);					// Lock a marker
-	// For every face added to the list
-	// search the number of faces intersected by a ray whose origin is the tested point
-	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	interPrec.reserve(16);
+	std::vector<Dart> visitedFaces;			// Faces that are traversed
+	visitedFaces.reserve(64);
+	visitedFaces.push_back(d);				// Start with the face of d
+	DartMarkerStore mark(map);
+	mark.markOrbit<FACE>(d) ;
+	for(unsigned int  iface = 0; iface != visitedFaces.size(); ++iface)
 	{
-		if (!mark.isMarked(*face))			// Face has not been visited yet
+		Dart e = visitedFaces[iface];
+		VEC3 inter;
+		bool interRes = Algo::Geometry::intersectionLineConvexFace<PFP>(map, e, position, point, dir, inter);
+		if (interRes)
 		{
+			// check if already intersect on same point (a vertex certainly)
 			bool alreadyfound = false;
-			bool interRes = Algo::Geometry::intersectionLineConvexFace<PFP>(map, *face, position, point, dir, inter);
-			if(interRes && (dir * (inter-point)) >= 0.0f)
+			for(typename std::vector<VEC3>::iterator it = interPrec.begin(); !alreadyfound && it != interPrec.end(); ++it)
 			{
-				if(interPrec.size() > 0)
-				{
-					for(typename std::vector<VEC3>::iterator it = interPrec.begin(); !alreadyfound && it != interPrec.end(); ++it)
-					{
-						if((*it)[0] == inter[0])
-							alreadyfound = true;
-					}
-				}
-				if(!alreadyfound)
-				{
-					++countInter;
-					interPrec.push_back(inter);
-				}
+				if (Geom::arePointsEquals(*it,inter))
+						alreadyfound = true;
+			}
 
-				// add non visited adjacent faces to the list of face
-				Dart dNext = *face ;
-				do
-				{
-					mark.mark(dNext);					// Mark
-					Dart adj = map.phi2(dNext);			// Get adjacent face
-					if (adj != dNext && !mark.isMarked(adj))
-						visitedFaces.push_back(adj);	// Add it
-					dNext = map.phi1(dNext) ;
-				} while(dNext != *face) ;
+			if (!alreadyfound)
+			{
+				float v = dir * (inter-point);
+				if (v>0)
+					++countInter;
+				if (v<0)
+					++countInter2;
+				interPrec.push_back(inter);
 			}
 		}
+		// add all face neighbours to the table
+		Dart currentFace = e;
+		do
+		{
+			Dart ee = map.phi2(e) ;
+			if(!mark.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mark.markOrbit<FACE>(ee) ;
+			}
+			e = map.phi1(e) ;
+		} while(e != currentFace) ;
 	}
 
 	//if the point is in the volume there is an odd number of intersection with all faces with any direction
-	return (countInter % 2) == 1;
+	return ((countInter % 2) != 0) && ((countInter2 % 2) != 0); //	return (countInter % 2) == 1;
+
 }
 
 template <typename PFP>

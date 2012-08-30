@@ -118,9 +118,10 @@ public:
 protected:
 	void cb_redraw();
 	void cb_initGL();
-	void  cb_mouseMove(int buttons, int x, int y);
-	void  cb_mousePress(int button, int x, int y);
-	void  cb_mouseRelease(int button, int x, int y);
+	void cb_mouseMove(int buttons, int x, int y);
+	void cb_mousePress(int button, int x, int y);
+	void cb_mouseRelease(int button, int x, int y);
+	void cb_Open();
 
 
 // slots locaux

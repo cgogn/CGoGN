@@ -27,8 +27,20 @@
 
 #include <iostream>
 
-#include "Utils/Qt/qtSimple.h"
+
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap3.h"
+
+#include "Geometry/vector_gen.h"
+#include "Algo/Geometry/boundingbox.h"
+#include "Algo/Render/GL2/mapRender.h"
+
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
+#include "Utils/Qt/qtSimple.h"
+
+
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; } } } }
@@ -45,21 +57,67 @@ class MyQT: public Utils::QT::SimpleQT
 	Q_OBJECT
 
 public:
-	MyQT()
+	Algo::Render::GL2::MapRender* m_render;
+
+	Utils::VBO* m_positionVBO;
+	Utils::VBO* m_normalVBO;
+
+	Utils::ShaderSimpleColor* m_shader;
+	Utils::ShaderVectorPerVertex* m_lines;
+
+
+
+	MyQT():
+		m_render(NULL),
+		m_positionVBO(NULL),
+		m_normalVBO(NULL),
+		m_shader(NULL),
+		m_lines(NULL)
 	{}
 
-	// callbacks of simpleQT to overdefine:
+protected:
+
 	void cb_redraw();
 
 	void cb_initGL();
 
-	void cb_Open();
+	void threadSimple();
 
-	void cb_New();
+	void threadAttrib();
 
-// callbacks (slots) locally defined
-public slots:
-	void menu_slot1();
+	void threadStorage();
+
+	void cb_keyPress(int code);
+
 };
+
+
+
+
+
+
+
+
+//class MyQT: public Utils::QT::SimpleQT
+//{
+//	Q_OBJECT
+//
+//public:
+//	MyQT()
+//	{}
+//
+//	// callbacks of simpleQT to overdefine:
+//	void cb_redraw();
+//
+//	void cb_initGL();
+//
+//	void cb_Open();
+//
+//	void cb_New();
+//
+//// callbacks (slots) locally defined
+//public slots:
+//	void menu_slot1();
+//};
 
 #endif

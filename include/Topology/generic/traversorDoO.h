@@ -22,63 +22,36 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/Qt/qtcolorschooser.h"
-#include "Utils/Qt/qtSimple.h"
+#ifndef __TRAVERSOR_DOO_H__
+#define __TRAVERSOR_DOO_H__
+
+#include "Topology/generic/traversorGen.h"
+
+#include "Topology/generic/dart.h"
+
 
 namespace CGoGN
 {
 
-namespace Utils
+template <typename MAP, unsigned int ORBIT>
+class TraversorDartsOfOrbit : public Traversor<MAP>
 {
+private:
+	std::vector<Dart>::iterator m_current ;
+	std::vector<Dart> m_vd ;
 
-namespace QT
-{
+public:
+	TraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread = 0) ;
 
+	Dart begin() ;
 
-ColorsChooser::ColorsChooser(SimpleQT *interf):
-		QtPopUp(NULL,false),m_interf(interf),m_current(0)
-{
-	m_list = new QListWidget();
-	m_diag = new QColorDialog();
-	m_diag->setOption(QColorDialog::NoButtons);
-	addWidget(m_list,0,0);
-	addWidget(m_diag,0,1);
-	connect(m_list,  SIGNAL(currentRowChanged(int)), this, SLOT(select_color(int)));
-	connect(m_diag, SIGNAL(	currentColorChanged(const QColor&)), this, SLOT(change_color(const QColor&)));
+	Dart end() ;
 
-}
+	Dart next() ;
+} ;
 
-unsigned int ColorsChooser::addColor(Geom::Vec3f* ptr, const std::string& name)
-{
-	m_colors.push_back(ptr);
-	m_list->addItem(QString(name.c_str()));
-	return m_colors.size()-1;
-}
+} // namespace CGoGN
 
+#include "Topology/generic/traversorDoO.hpp"
 
-void ColorsChooser::select_color(int x)
-{
-	m_current = x;
-	const Geom::Vec3f& col = *m_colors[x];
-	m_diag->show();
-	m_diag->setCurrentColor(QColor(int(255.0f*col[0]), int(255.0f*col[1]), int(255.0f*col[2])) );
-}
-
-void ColorsChooser::change_color(const QColor& col)
-{
-	Geom::Vec3f& out = *m_colors[m_current];
-	out[0] = float(col.redF());
-	out[1] = float(col.greenF());
-	out[2] = float(col.blueF());
-
-
-	if (m_interf)
-	{
-		updateCallBack(m_interf);
-		m_interf->updateGL();
-	}
-}
-
-}
-}
-}
+#endif

@@ -498,14 +498,14 @@ void SVGOut::endPoints()
 void SVGOut::addPoint(const Geom::Vec3f& P)
 {
 	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
 }
 
 void SVGOut::addPoint(const Geom::Vec3f& P, const Geom::Vec3f& C)
 {
 	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
 }
 
@@ -527,10 +527,10 @@ void SVGOut::endLines()
 void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
 {
 	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
 
 	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
-	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
+//	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
 
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])));
 	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])));
@@ -541,10 +541,10 @@ void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2)
 void SVGOut::addLine(const Geom::Vec3f& P, const Geom::Vec3f& P2, const Geom::Vec3f& C)
 {
 	glm::vec3 Q = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,m_proj,m_viewport);
-	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
+//	glm::vec3 R = glm::project(glm::vec3(P[0],P[1],P[2]),m_model,glm::mat4(1.0),m_viewport);
 
 	glm::vec3 Q2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,m_proj,m_viewport);
-	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
+//	glm::vec3 R2 = glm::project(glm::vec3(P2[0],P2[1],P2[2]),m_model,glm::mat4(1.0),m_viewport);
 
 	m_current->addVertex(Geom::Vec3f(float(Q[0]),float(m_viewport[3])-float(Q[1]),float(Q[2])),C);
 	m_current->addVertex(Geom::Vec3f(float(Q2[0]),float(m_viewport[3])-float(Q2[1]),float(Q2[2])),C);

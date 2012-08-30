@@ -22,63 +22,65 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/Qt/qtcolorschooser.h"
-#include "Utils/Qt/qtSimple.h"
+#ifndef __TRAVERSORFACTORY_H__
+#define __TRAVERSORGEN_H__
+
+#include "Topology/generic/traversorGen.h"
 
 namespace CGoGN
 {
 
-namespace Utils
+template <typename MAP>
+class TraversorFactory
 {
+public:
 
-namespace QT
-{
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
+
+	/**
+	 * Factory of adjacent traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param dim the dimension of traversal (2 or 3)
+	 * @param orbX incident from cell
+	 * @param orbY incident to cell
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY);
+
+	/**
+	 * Factory of darts of orbit traversors creation
+	 * @param map the map in which we work
+	 * @param dart the initial dart of traversal
+	 * @param orb the orbit
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb);
+
+	/**
+	 * Factory of incident traversors creation
+	 * @param map the map in which we work
+	 * @param good the selector (default value allDarts)
+	 * @param forceDartMarker (default value false)
+	 * @param thread (default value 0)
+	 * @return a ptr on Generic Traversor
+	 */
+	static Traversor<MAP>* createCell(MAP& map, unsigned int orb, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0);
+};
+
+} // namespace CGoGN
 
 
-ColorsChooser::ColorsChooser(SimpleQT *interf):
-		QtPopUp(NULL,false),m_interf(interf),m_current(0)
-{
-	m_list = new QListWidget();
-	m_diag = new QColorDialog();
-	m_diag->setOption(QColorDialog::NoButtons);
-	addWidget(m_list,0,0);
-	addWidget(m_diag,0,1);
-	connect(m_list,  SIGNAL(currentRowChanged(int)), this, SLOT(select_color(int)));
-	connect(m_diag, SIGNAL(	currentColorChanged(const QColor&)), this, SLOT(change_color(const QColor&)));
+#include "Topology/generic/traversorFactory.hpp"
 
-}
+#endif
 
-unsigned int ColorsChooser::addColor(Geom::Vec3f* ptr, const std::string& name)
-{
-	m_colors.push_back(ptr);
-	m_list->addItem(QString(name.c_str()));
-	return m_colors.size()-1;
-}
-
-
-void ColorsChooser::select_color(int x)
-{
-	m_current = x;
-	const Geom::Vec3f& col = *m_colors[x];
-	m_diag->show();
-	m_diag->setCurrentColor(QColor(int(255.0f*col[0]), int(255.0f*col[1]), int(255.0f*col[2])) );
-}
-
-void ColorsChooser::change_color(const QColor& col)
-{
-	Geom::Vec3f& out = *m_colors[m_current];
-	out[0] = float(col.redF());
-	out[1] = float(col.greenF());
-	out[2] = float(col.blueF());
-
-
-	if (m_interf)
-	{
-		updateCallBack(m_interf);
-		m_interf->updateGL();
-	}
-}
-
-}
-}
-}

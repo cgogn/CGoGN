@@ -329,6 +329,7 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
 	{
 		close();
 		m_cbs->close();
+		return;
 	}
 
 	m_state_modifier = event->modifiers();
