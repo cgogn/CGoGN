@@ -163,7 +163,6 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	unsigned int nbth = funcs.size();
 
 	std::vector<Dart>* vd = new std::vector<Dart>[nbth];
-	boost::thread** threads = new boost::thread*[nbth];
 
 	// nbth new functions, new thread (with good darts !)
 	for (unsigned int i = 0; i < nbth; ++i)
@@ -243,8 +242,16 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 			map.addThreadMarker(nbth+1-nbth_prec);
 	}
 
+	boost::thread** threads = new boost::thread*[nbth];
+	ThreadFunction<MAP>** tfs = new ThreadFunction<MAP>*[nbth];
+
 	for (unsigned int i = 0; i < nbth; ++i)
-		threads[i] = new boost::thread(ThreadFunction<MAP>(funcs[i], vd[i],sync1,sync2, finished,1+i));
+	{
+		tfs[i] = new ThreadFunction<MAP>(funcs[i], vd[i],sync1,sync2, finished,1+i);
+		threads[i] = new boost::thread( boost::ref( *(tfs[i]) ) );
+	}
+//		threads[i] = new boost::thread(ThreadFunction<MAP>(funcs[i], vd[i],sync1,sync2, finished,1+i));
+
 
 	// and continue to traverse the map
 	std::vector<Dart>* tempo = new std::vector<Dart>[nbth];
@@ -332,7 +339,9 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	{
 		threads[i]->join();
 		delete threads[i];
+		delete tfs[i];
 	}
+	delete[] tfs;
 	delete[] threads;
 	delete[] vd;
 	delete[] tempo;

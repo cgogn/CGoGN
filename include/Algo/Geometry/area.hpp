@@ -158,6 +158,90 @@ void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<ty
 		vertex_area[d] = vertexVoronoiArea<PFP>(map, d, position) ;
 }
 
+
+namespace Parallel
+{
+template <typename PFP>
+class FunctorConvexFaceArea: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 FaceAttribute<typename PFP::REAL>& m_area;
+public:
+	 FunctorConvexFaceArea<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& area):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_area(area)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_area[d] = convexFaceArea<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorConvexFaceArea<PFP> funct(map,position,area);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select, current_thread);
+}
+
+
+template <typename PFP>
+class FunctorVertexOneRingArea: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VertexAttribute<typename PFP::REAL>& m_area;
+public:
+	 FunctorVertexOneRingArea<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_area(area)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_area[d] = vertexOneRingArea<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorConvexFaceArea<PFP> funct(map,position,area);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+}
+
+
+
+template <typename PFP>
+class FunctorVertexVoronoiArea: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VertexAttribute<typename PFP::REAL>& m_area;
+public:
+	 FunctorVertexVoronoiArea<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_area(area)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_area[d] = vertexVoronoiArea<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorConvexFaceArea<PFP> funct(map,position,area);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+}
+
+
+}
+
+
+
+
+
+
+
 } // namespace Geometry
 
 } // namespace Algo
