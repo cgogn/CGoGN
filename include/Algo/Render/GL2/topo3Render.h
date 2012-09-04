@@ -212,7 +212,6 @@ public:
 
 	/**
 	 * change all darts drawing color
-	 * @param d the dart
 	 * @param r red !
 	 * @param g green !
 	 * @param b blue !
@@ -221,7 +220,6 @@ public:
 
 	/**
 	 * change dart initial color (used when calling updateData)
-	 * @param d the dart
 	 * @param r red !
 	 * @param g green !
 	 * @param b blue !
