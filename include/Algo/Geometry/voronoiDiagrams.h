@@ -25,14 +25,14 @@ private :
 	{
 		typename std::multimap<float,Dart>::iterator it ;
 		bool valid ;
-		unsigned int region;
+//		unsigned int region;
+		Dart pathOrigin;
 		static std::string CGoGNnameOfType() { return "VoronoiVertexInfo" ; }
 	} VoronoiVertexInfo ;
 	typedef NoMathIOAttribute<VoronoiVertexInfo> VertexInfo ;
 
 	typename PFP::MAP& map;
 	const EdgeAttribute<REAL>& edgeCost; // weights on the graph edges
-//	const VertexAttribute<VEC3>& position; // positions
 	VertexAttribute<unsigned int>& regions; // region labels
 	std::vector<Dart> border;
 	std::vector<Dart> seeds;
@@ -56,6 +56,9 @@ public :
 private :
 	void clear ();
 	void initFrontWithSeeds();
+	void collectVertexFromFront(Dart e);
+	void addVertexToFront(Dart f, float d);
+	void updateVertexInFront(Dart f, float d);
 };
 
 }// end namespace Geometry

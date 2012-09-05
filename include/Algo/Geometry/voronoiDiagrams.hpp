@@ -66,7 +66,9 @@ void VoronoiDiagram<PFP>::initFrontWithSeeds ()
 		vmReached.mark(d);
 		vertexInfo[d].it = front.insert(std::pair<float,Dart>(0.0, d));
 		vertexInfo[d].valid = true;
-		vertexInfo[d].region = i;
+//		vertexInfo[d].region = i;
+		regions[d] = i;
+		vertexInfo[d].pathOrigin = d;
 	}
 }
 
@@ -75,6 +77,36 @@ void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL>& c){
 	edgeCost = c;
 }
 
+template <typename PFP>
+void VoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
+	front.erase(vertexInfo[e].it);
+	vertexInfo[e].valid=false;
+//	regions[e] = vertexInfo[e].region;
+	regions[e] = regions[vertexInfo[e].pathOrigin];
+}
+
+template <typename PFP>
+void VoronoiDiagram<PFP>::addVertexToFront(Dart f, float d){
+	VertexInfo& vi (vertexInfo[f]);
+	vi.it = front.insert(std::pair<float,Dart>(d + edgeCost[f], f));
+	vi.valid=true;
+//	vi.region = regions[map.phi2(f)];
+	vi.pathOrigin = map.phi2(f);
+	vmReached.mark(f);
+}
+
+template <typename PFP>
+void VoronoiDiagram<PFP>::updateVertexInFront(Dart f, float d){
+	VertexInfo& vi (vertexInfo[f]);
+	float dist = d + edgeCost[f];
+	if (dist < vi.it->first)
+	{
+		front.erase(vi.it);
+		vi.it = front.insert(std::pair<float,Dart>(dist, f));
+//		vi.region = regions[map.phi2(f)];
+		vi.pathOrigin = map.phi2(f);
+	}
+}
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::computeDiagram ()
@@ -85,40 +117,22 @@ void VoronoiDiagram<PFP>::computeDiagram ()
 	{
 		Dart e = front.begin()->second;
 		float d = front.begin()->first;
-		front.erase(vertexInfo[e].it);
-		vertexInfo[e].valid=false;
-		regions[e] = vertexInfo[e].region;
+
+		collectVertexFromFront(e);
 
 		Traversor2VVaE<typename PFP::MAP> tv (map, e);
 		for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
 		{
-			VertexInfo& vi (vertexInfo[f]);
 			if (vmReached.isMarked(f))
-			{
-				if (vi.valid) // probably useless (because of distance test) but faster
-				{
-//					float dist = d + Algo::Geometry::edgeLength<PFP>(map,f,position);
-					float dist = d + edgeCost[f];
-					if (dist < vi.it->first)
-					{
-						front.erase(vi.it);
-						vi.it = front.insert(std::pair<float,Dart>(dist, f));
-						vi.region = regions[e];
-					}
-				}
-				else
-				{
-					if ( regions[f] != regions[e] )
-						border.push_back(f);
-				}
+			{ // f has been reached
+				if (vertexInfo[f].valid) // f is in the front : update
+					updateVertexInFront(f,d);
+				else // f is not in the front any more (already collected) : detect a border edge
+					if ( regions[f] != regions[e] ) border.push_back(f);
 			}
 			else
-			{
-//				vi.it = front.insert(std::pair<float,Dart>(d + Algo::Geometry::edgeLength<PFP>(map,f,position), f));
-				vi.it = front.insert(std::pair<float,Dart>(d + edgeCost[f], f));
-				vi.valid=true;
-				vi.region = regions[e];
-				vmReached.mark(f);
+			{ // f has not been reached : add it to the front
+				addVertexToFront(f,d);
 			}
 		}
 	}
