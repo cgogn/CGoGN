@@ -73,9 +73,12 @@ public :
 	CentroidalVoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r, VertexAttribute<REAL>& d, VertexAttribute<Dart>& o);
 	~CentroidalVoronoiDiagram ();
 
+	void cumulateDistancesOnPaths();
+
 protected :
 	void clear();
 	void collectVertexFromFront(Dart e);
+	void cumulateDistancesFromSeed(Dart e);
 };
 
 

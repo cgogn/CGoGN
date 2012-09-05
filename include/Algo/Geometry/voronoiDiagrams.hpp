@@ -168,6 +168,26 @@ void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
 	VoronoiDiagram<PFP>::collectVertexFromFront(e);
 }
 
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::cumulateDistancesOnPaths(){
+	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	{
+		cumulateDistancesFromSeed(this->seeds[i]);
+	}
+}
+
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::cumulateDistancesFromSeed(Dart e){
+	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+	{
+		if ( pathOrigins[f] == this->map.phi2(f))
+		{
+			cumulateDistancesFromSeed(f);
+			distances[e] += distances[f];
+		}
+	}
+}
 
 }// end namespace Geometry
 }// end namespace Algo
