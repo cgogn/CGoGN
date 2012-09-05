@@ -70,7 +70,6 @@ void VoronoiDiagram<PFP>::initFrontWithSeeds ()
 		vmReached.mark(d);
 		vertexInfo[d].it = front.insert(std::pair<float,Dart>(0.0, d));
 		vertexInfo[d].valid = true;
-//		vertexInfo[d].region = i;
 		regions[d] = i;
 		vertexInfo[d].pathOrigin = d;
 	}
@@ -83,7 +82,6 @@ void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL>& c){
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
-//	regions[e] = vertexInfo[e].region;
 	regions[e] = regions[vertexInfo[e].pathOrigin];
 	front.erase(vertexInfo[e].it);
 	vertexInfo[e].valid=false;
@@ -94,7 +92,6 @@ void VoronoiDiagram<PFP>::addVertexToFront(Dart f, float d){
 	VertexInfo& vi (vertexInfo[f]);
 	vi.it = front.insert(std::pair<float,Dart>(d + edgeCost[f], f));
 	vi.valid=true;
-//	vi.region = regions[map.phi2(f)];
 	vi.pathOrigin = map.phi2(f);
 	vmReached.mark(f);
 }
@@ -107,7 +104,6 @@ void VoronoiDiagram<PFP>::updateVertexInFront(Dart f, float d){
 	{
 		front.erase(vi.it);
 		vi.it = front.insert(std::pair<float,Dart>(dist, f));
-//		vi.region = regions[map.phi2(f)];
 		vi.pathOrigin = map.phi2(f);
 	}
 }
@@ -166,7 +162,7 @@ void CentroidalVoronoiDiagram<PFP>::clear ()
 
 template <typename PFP>
 void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
-	distances[e] = this->vertexInfo[e].it->first();
+	distances[e] = this->vertexInfo[e].it->first;
 	pathOrigins[e] = this->vertexInfo[e].pathOrigin;
 
 	VoronoiDiagram<PFP>::collectVertexFromFront(e);

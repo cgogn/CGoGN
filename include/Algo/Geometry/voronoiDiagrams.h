@@ -53,9 +53,9 @@ public :
 	void computeDiagram ();
 
 protected :
-	void clear ();
+	virtual void clear ();
 	void initFrontWithSeeds();
-	void collectVertexFromFront(Dart e);
+	virtual void collectVertexFromFront(Dart e);
 	void addVertexToFront(Dart f, float d);
 	void updateVertexInFront(Dart f, float d);
 };
