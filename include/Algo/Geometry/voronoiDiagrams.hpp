@@ -7,6 +7,10 @@ namespace Algo
 namespace Geometry
 {
 
+/***********************************************************
+ * class VoronoiDiagram
+ ***********************************************************/
+
 template <typename PFP>
 VoronoiDiagram<PFP>::VoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& p, VertexAttribute<unsigned int>& r) : map(m), edgeCost (p), regions (r), vmReached(m)
 {
@@ -79,10 +83,10 @@ void VoronoiDiagram<PFP>::setCost (const EdgeAttribute<typename PFP::REAL>& c){
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
-	front.erase(vertexInfo[e].it);
-	vertexInfo[e].valid=false;
 //	regions[e] = vertexInfo[e].region;
 	regions[e] = regions[vertexInfo[e].pathOrigin];
+	front.erase(vertexInfo[e].it);
+	vertexInfo[e].valid=false;
 }
 
 template <typename PFP>
@@ -137,6 +141,37 @@ void VoronoiDiagram<PFP>::computeDiagram ()
 		}
 	}
 }
+
+/***********************************************************
+ * class CentroidalVoronoiDiagram
+ ***********************************************************/
+
+template <typename PFP>
+CentroidalVoronoiDiagram<PFP>::CentroidalVoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r, VertexAttribute<REAL>& d, VertexAttribute<Dart>& o) :
+	VoronoiDiagram<PFP>(m,c,r), distances(d), pathOrigins(o)
+{
+}
+
+template <typename PFP>
+CentroidalVoronoiDiagram<PFP>::~CentroidalVoronoiDiagram ()
+{
+}
+
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::clear ()
+{
+	VoronoiDiagram<PFP>::clear();
+	distances.setAllValues(0.0);
+}
+
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
+	distances[e] = this->vertexInfo[e].it->first();
+	pathOrigins[e] = this->vertexInfo[e].pathOrigin;
+
+	VoronoiDiagram<PFP>::collectVertexFromFront(e);
+}
+
 
 }// end namespace Geometry
 }// end namespace Algo

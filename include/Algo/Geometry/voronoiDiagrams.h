@@ -17,9 +17,8 @@ namespace Geometry
 
 template <typename PFP>
 class VoronoiDiagram {
-private :
+protected :
 	typedef typename PFP::REAL REAL;
-	typedef typename PFP::VEC3 VEC3;
 
 	typedef struct
 	{
@@ -53,13 +52,32 @@ public :
 
 	void computeDiagram ();
 
-private :
+protected :
 	void clear ();
 	void initFrontWithSeeds();
 	void collectVertexFromFront(Dart e);
 	void addVertexToFront(Dart f, float d);
 	void updateVertexInFront(Dart f, float d);
 };
+
+
+template <typename PFP>
+class CentroidalVoronoiDiagram : public VoronoiDiagram<PFP> {
+private :
+	typedef typename PFP::REAL REAL;
+
+	VertexAttribute<REAL>& distances; // distances from the seed
+	VertexAttribute<Dart>& pathOrigins; // previous vertex on the shortest path from origin
+
+public :
+	CentroidalVoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r, VertexAttribute<REAL>& d, VertexAttribute<Dart>& o);
+	~CentroidalVoronoiDiagram ();
+
+protected :
+	void clear();
+	void collectVertexFromFront(Dart e);
+};
+
 
 }// end namespace Geometry
 }// end namespace Algo
