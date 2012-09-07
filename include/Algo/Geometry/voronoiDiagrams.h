@@ -65,6 +65,7 @@ template <typename PFP>
 class CentroidalVoronoiDiagram : public VoronoiDiagram<PFP> {
 private :
 	typedef typename PFP::REAL REAL;
+	typedef typename PFP::VEC3 VEC3;
 
 	VertexAttribute<REAL>& distances; // distances from the seed
 	VertexAttribute<Dart>& pathOrigins; // previous vertex on the shortest path from origin
@@ -86,7 +87,7 @@ protected :
 	void clear();
 	void collectVertexFromFront(Dart e);
 	REAL cumulateDistancesFromRoot(Dart e);
-	unsigned int moveSeed(unsigned int i);
+	unsigned int moveSeed(unsigned int numSeed);
 };
 
 

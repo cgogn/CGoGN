@@ -29,7 +29,6 @@ void VoronoiDiagram<PFP>::clear ()
 	border.clear();
 	regions.setAllValues(0);
 	border.clear();
-	seeds.clear();
 	front.clear();
 	vmReached.unmarkAll();
 }
@@ -37,14 +36,17 @@ void VoronoiDiagram<PFP>::clear ()
 template <typename PFP>
 void VoronoiDiagram<PFP>::setSeeds (const std::vector<Dart>& s)
 {
-	clear();
+	seeds.clear();
+//	clear();
 	seeds = s;
 }
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
 {
-	clear();
+	seeds.clear();
+//	clear();
+	vmReached.unmarkAll();
 
 	srand ( time(NULL) );
 	unsigned int n = nseeds;
@@ -63,7 +65,8 @@ void VoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
 template <typename PFP>
 void VoronoiDiagram<PFP>::initFrontWithSeeds ()
 {
-	vmReached.unmarkAll();
+//	vmReached.unmarkAll();
+	clear();
 	for (unsigned int i = 0; i < seeds.size(); i++)
 	{
 		Dart d = seeds[i];
@@ -205,9 +208,9 @@ typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateDistancesFromRoot(Dart
 }
 
 template <typename PFP>
-unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int i){
-	Dart e = this->seeds[i];
-	unsigned int res = 0;
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
+	Dart e = this->seeds[numSeed];
+	unsigned int seedMoved = 0;
 
 	std::vector<Dart> v;
 	v.reserve(8);
@@ -231,6 +234,39 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int i){
 		}
 	}
 
+	/* second attempt */
+	VEC3 grad (0.0);
+	const VertexAttribute<VEC3>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
+
+	for (unsigned int j = 0; j<v.size(); ++j)
+	{
+		Dart f = v[j];
+//		VEC3 edgeV = Algo::Geometry::vectorOutOfDart<PFP>(this->map,this->map.phi2(f),pos);
+		VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
+		edgeV.normalize();
+		grad += distances[f] * edgeV;
+	}
+
+	float maxProj = 0.0;
+	for (unsigned int j = 0; j<v.size(); ++j)
+	{
+		Dart f = v[j];
+//		VEC3 edgeV = Algo::Geometry::vectorOutOfDart<PFP>(this->map,this->map.phi2(f),pos);
+		VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
+//		edgeV.normalize();
+		float proj = edgeV * grad;
+		proj -= areaElts[e] * this->edgeCost[f] * this->edgeCost[f];
+		if (proj > maxProj)
+		{
+			if (numSeed==1 && j==0) CGoGNout << edgeV * grad << "\t - \t" << areaElts[e] * this->edgeCost[f] * this->edgeCost[f] << CGoGNendl;
+			maxProj = proj;
+			seedMoved = 1;
+			this->seeds[numSeed] = v[j];
+		}
+	}
+	/* end second attempt */
+
+/* first attempt by approximating the energy change
 	float minDE = 0.0;
 	for (unsigned int j = 0; j<v.size(); ++j)
 	{
@@ -240,12 +276,12 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int i){
 		if (de < minDE)
 		{
 			minDE = de;
-			res = 1;
-			this->seeds[i] = v[j];
+			seedMoved = 1;
+			this->seeds[numSeed] = v[j];
 		}
 	}
-
-	return res;
+*/
+	return seedMoved;
 }
 
 }// end namespace Geometry
