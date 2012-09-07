@@ -68,17 +68,25 @@ private :
 
 	VertexAttribute<REAL>& distances; // distances from the seed
 	VertexAttribute<Dart>& pathOrigins; // previous vertex on the shortest path from origin
+	VertexAttribute<REAL>& areaElts; // area element attached to each vertex
 
 public :
-	CentroidalVoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r, VertexAttribute<REAL>& d, VertexAttribute<Dart>& o);
+	CentroidalVoronoiDiagram (typename PFP::MAP& m,
+			const EdgeAttribute<REAL>& c,
+			VertexAttribute<unsigned int>& r,
+			VertexAttribute<REAL>& d,
+			VertexAttribute<Dart>& o,
+			VertexAttribute<REAL>& a);
 	~CentroidalVoronoiDiagram ();
 
 	void cumulateDistancesOnPaths();
+	unsigned int moveSeeds(); // returns the number of seeds that did move
 
 protected :
 	void clear();
 	void collectVertexFromFront(Dart e);
-	void cumulateDistancesFromSeed(Dart e);
+	REAL cumulateDistancesFromRoot(Dart e);
+	unsigned int moveSeed(unsigned int i);
 };
 
 

@@ -143,8 +143,8 @@ void VoronoiDiagram<PFP>::computeDiagram ()
  ***********************************************************/
 
 template <typename PFP>
-CentroidalVoronoiDiagram<PFP>::CentroidalVoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r, VertexAttribute<REAL>& d, VertexAttribute<Dart>& o) :
-	VoronoiDiagram<PFP>(m,c,r), distances(d), pathOrigins(o)
+CentroidalVoronoiDiagram<PFP>::CentroidalVoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r, VertexAttribute<REAL>& d, VertexAttribute<Dart>& o, VertexAttribute<REAL>& a) :
+	VoronoiDiagram<PFP>(m,c,r), distances(d), pathOrigins(o), areaElts(a)
 {
 }
 
@@ -172,21 +172,80 @@ template <typename PFP>
 void CentroidalVoronoiDiagram<PFP>::cumulateDistancesOnPaths(){
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
-		cumulateDistancesFromSeed(this->seeds[i]);
+		cumulateDistancesFromRoot(this->seeds[i]);
 	}
 }
 
 template <typename PFP>
-void CentroidalVoronoiDiagram<PFP>::cumulateDistancesFromSeed(Dart e){
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds(){
+	unsigned int m = 0;
+	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	{
+		m += moveSeed(i);
+	}
+	return m;
+}
+
+
+template <typename PFP>
+typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateDistancesFromRoot(Dart e){
+	REAL area = areaElts[e];
+	distances[e] *= areaElts[e];
+
 	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
 	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
 	{
 		if ( pathOrigins[f] == this->map.phi2(f))
 		{
-			cumulateDistancesFromSeed(f);
+			area += cumulateDistancesFromRoot(f);
 			distances[e] += distances[f];
 		}
 	}
+	return area;
+}
+
+template <typename PFP>
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int i){
+	Dart e = this->seeds[i];
+	unsigned int res = 0;
+
+	std::vector<Dart> v;
+	v.reserve(8);
+
+	std::vector<float> a;
+	a.reserve(8);
+
+	float regionArea = areaElts[e];
+	distances[e] = 0.0;
+
+	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+	{
+		if ( pathOrigins[f] == this->map.phi2(f))
+		{
+			float area = cumulateDistancesFromRoot(f);
+			distances[e] += distances[f];
+			v.push_back(f);
+			a.push_back(area);
+			regionArea += area;
+		}
+	}
+
+	float minDE = 0.0;
+	for (unsigned int j = 0; j<v.size(); ++j)
+	{
+		float c = this->edgeCost[v[j]];
+		float de = regionArea * c * c;
+		de += 2 * c *( distances[e] - 2*distances[v[j]] );
+		if (de < minDE)
+		{
+			minDE = de;
+			res = 1;
+			this->seeds[i] = v[j];
+		}
+	}
+
+	return res;
 }
 
 }// end namespace Geometry
