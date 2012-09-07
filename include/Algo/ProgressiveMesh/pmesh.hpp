@@ -42,33 +42,36 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 	m_map(map), positionsTable(position), inactiveMarker(inactive), dartSelect(inactiveMarker)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
+
+	std::vector<VertexAttribute< typename PFP::VEC3>* > pos_v ;
+	pos_v.push_back(&positionsTable) ;
 	switch(a)
 	{
 		case Algo::Decimation::A_QEM : {
-			m_approximators.push_back(new Algo::Decimation::Approximator_QEM<PFP>(m_map, positionsTable)) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_QEM<PFP>(m_map, pos_v)) ;
 			break ; }
 		case Algo::Decimation::A_MidEdge : {
-			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, positionsTable)) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v)) ;
 			break ; }
 		case Algo::Decimation::A_HalfCollapse : {
 			Algo::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Decimation::Predictor_HalfCollapse<PFP>(m_map, positionsTable) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_HalfCollapse<PFP>(m_map, positionsTable, pred)) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_HalfCollapse<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 		case Algo::Decimation::A_CornerCutting : {
 			Algo::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Decimation::Predictor_CornerCutting<PFP>(m_map, positionsTable) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_CornerCutting<PFP>(m_map, positionsTable, pred)) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_CornerCutting<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 		case Algo::Decimation::A_TangentPredict1 : {
 			Algo::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict1<PFP>(m_map, positionsTable) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, positionsTable, pred)) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 		case Algo::Decimation::A_TangentPredict2 : {
 			Algo::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict2<PFP>(m_map, positionsTable) ;
 			m_predictors.push_back(pred) ;
-			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, positionsTable, pred)) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
 			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
@@ -230,8 +233,8 @@ void ProgressiveMesh<PFP>::coarsen()
 	VSplit<PFP>* vs = m_splits[m_cur] ; // get the split node
 	++m_cur ;
 
-	Dart d = vs->getEdge() ;
-	Dart dd = m_map.phi2(d) ;		// get some darts
+	// Dart d = vs->getEdge() ;
+	// Dart dd = m_map.phi2(d) ;		// get some darts
 	Dart d2 = vs->getLeftEdge() ;
 	Dart dd2 = vs->getRightEdge() ;
 
@@ -429,7 +432,7 @@ void ProgressiveMesh<PFP>::initQuantization()
 		gotoLevel(nbSplits()) ;
 		originalDetailVectors.resize(m_splits.size()) ;
 		for(unsigned int i = 0; i < m_splits.size(); ++i)
-			originalDetailVectors[i] = m_positionApproximator->getDetail(m_splits[i]->getEdge()) ;
+			originalDetailVectors[i] = m_positionApproximator->getDetail(m_splits[i]->getEdge(),0) ;
 		q = new Quantization<VEC3>(originalDetailVectors) ;
 		quantizationInitialized = true ;
 		CGoGNout << "  Differential Entropy -> " << q->getDifferentialEntropy() << CGoGNendl ;
@@ -446,7 +449,7 @@ void ProgressiveMesh<PFP>::quantizeDetailVectors(unsigned int nbClasses)
 		std::vector<VEC3> resultat;
 		q->vectorQuantizationNbRegions(nbClasses, resultat) ;
 		for(unsigned int i = 0; i < m_splits.size(); ++i)
-			m_positionApproximator->setDetail(m_splits[i]->getEdge(), resultat[i]) ;
+			m_positionApproximator->setDetail(m_splits[i]->getEdge(), 0, resultat[i]) ;
 		quantizationApplied = true ;
 		gotoLevel(0) ;
 		CGoGNout << "Discrete Entropy -> " << q->getDiscreteEntropy() << " (codebook size : " << q->getNbCodeVectors() << ")" << CGoGNendl ;

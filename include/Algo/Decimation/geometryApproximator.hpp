@@ -62,7 +62,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		Dart it = d ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
+			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -71,7 +71,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
+			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -90,19 +90,19 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
 	if(!opt)
 	{
-		VEC3 p1 = this->m_attrV[d] ;	// let the new vertex lie
-		VEC3 p2 = this->m_attrV[dd] ;	// on either one of the two endpoints
+		VEC3 p1 = this->m_attrV[0]->operator[](d) ;	// let the new vertex lie
+		VEC3 p2 = this->m_attrV[0]->operator[](dd) ;	// on either one of the two endpoints
 		VEC3 p12 = (p1 + p2) / 2.0f ;	// or the middle of the edge
 		REAL e1 = quad(p1) ;
 		REAL e2 = quad(p2) ;
 		REAL e12 = quad(p12) ;
 		REAL minerr = std::min(std::min(e1, e2), e12) ;	// consider only the one for
-		if(minerr == e12) this->m_approx[d] = p12 ;		// which the error is minimal
-		else if(minerr == e1) this->m_approx[d] = p1 ;
-		else this->m_approx[d] = p2 ;
+		if(minerr == e12) this->m_approx[0][d] = p12 ;		// which the error is minimal
+		else if(minerr == e1) this->m_approx[0][d] = p1 ;
+		else this->m_approx[0][d] = p2 ;
 	}
 	else
-		this->m_approx[d] = res ;
+		this->m_approx[0][d] = res ;
 }
 
 /************************************************************************************
@@ -136,7 +136,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		Dart it = d ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
+			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -145,7 +145,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		it = dd ;
 		do
 		{
-			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
+			Quadric<REAL> q(this->m_attrV[0]->operator[](it), this->m_attrV[0]->operator[](m.phi1(it)), this->m_attrV[0]->operator[](m.phi_1(it))) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -163,9 +163,9 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 	VEC3 res ;
 	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
 	if(!opt)
-		this->m_approx[d] = this->m_attrV[d] ;
+		this->m_approx[0][d] = this->m_attrV[0]->operator[](d) ;
 	else
-		this->m_approx[d] = res ;
+		this->m_approx[0][d] = res ;
 }
 
 /************************************************************************************
@@ -195,11 +195,11 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 	Dart dd = m.phi2(d) ;
 
 	// get the contracted edge vertices positions
-	VEC3 v1 = this->m_attrV[d] ;
-	VEC3 v2 = this->m_attrV[dd] ;
+	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
+	VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
 
 	// Compute the approximated position
-	this->m_approx[d] = (v1 + v2) / REAL(2) ;
+	this->m_approx[0][d] = (v1 + v2) / REAL(2) ;
 
 	if(this->m_predictor)
 	{
@@ -207,16 +207,16 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 		Dart d2 = m.phi2(m.phi_1(d)) ;
 		Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
-		// VEC3 v2 = this->m_attrV[dd] ;
+		// VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
 		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
-		this->m_attrV[newV] = this->m_approx[d] ;
+		this->m_attrV[0]->operator[](newV) = this->m_approx[0][d] ;
 
 		// compute the detail vector
 		this->m_predictor->predict(d2, dd2) ;
-		this->m_detail[d] = v1 - this->m_predictor->getPredict(0) ;
+		this->m_detail[0][d] = v1 - this->m_predictor->getPredict(0) ;
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
@@ -247,7 +247,7 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	this->m_approx[d] = this->m_attrV[d] ;
+	this->m_approx[0][d] = this->m_attrV[0]->operator[](d) ;
 
 	if(this->m_predictor)
 	{
@@ -255,16 +255,16 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 		Dart d2 = m.phi2(m.phi_1(d)) ;
 		Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
-		VEC3 v2 = this->m_attrV[dd] ;
+		VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
 		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
-		this->m_attrV[newV] = this->m_approx[d] ;
+		this->m_attrV[0]->operator[](newV) = this->m_approx[0][d] ;
 
 		// compute the detail vector
 		this->m_predictor->predict(d2, dd2) ;
-		this->m_detail[d] = v2 - this->m_predictor->getPredict(1) ;
+		this->m_detail[0][d] = v2 - this->m_predictor->getPredict(1) ;
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
@@ -303,8 +303,8 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
 	// get the contracted edge vertices positions
-	VEC3 v1 = this->m_attrV[d] ;
-	VEC3 v2 = this->m_attrV[dd] ;
+	VEC3 v1 = this->m_attrV[0]->operator[](d) ;
+	VEC3 v2 = this->m_attrV[0]->operator[](dd) ;
 
 	// compute the alpha value according to vertices valences
 	REAL k1 = 0 ;
@@ -329,7 +329,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	it = d2 ;
 	do
 	{
-		m1 += this->m_attrV[m.phi1(it)] ;
+		m1 += this->m_attrV[0]->operator[](m.phi1(it));
 		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != d) ;
@@ -341,7 +341,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	it = dd2 ;
 	do
 	{
-		m2 += this->m_attrV[m.phi1(it)] ;
+		m2 += this->m_attrV[0]->operator[](m.phi1(it));
 		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != dd) ;
@@ -353,11 +353,11 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	VEC3 a2 = ( REAL(1) / (REAL(1) - alpha) ) * ( v2 - (alpha * m2) ) ;
 
 	// Compute the final approximated position
-	this->m_approx[d] = (a1 + a2) / REAL(2) ;
+	this->m_approx[0][d] = (a1 + a2) / REAL(2) ;
 
 	if(this->m_predictor)
 	{
-		this->m_detail[d] = (REAL(1) - alpha) * ( (a1 - a2) / REAL(2) ) ;
+		this->m_detail[0][d] = (REAL(1) - alpha) * ( (a1 - a2) / REAL(2) ) ;
 	}
 }
 

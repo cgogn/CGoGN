@@ -48,9 +48,11 @@ protected:
 	VertexAttribute<Quadric<REAL> > m_quadric ;
 
 public:
-	Approximator_QEM(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEM(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
-	{}
+	{
+		assert(pos.size() > 0 || !"Approximator_QEM: attribute vector is empty") ;
+	}
 	~Approximator_QEM()
 	{}
 	ApproximatorType getType() const { return A_QEM ; }
@@ -70,9 +72,11 @@ protected:
 	VertexAttribute<Quadric<REAL> > m_quadric ;
 
 public:
-	Approximator_QEMhalfEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_QEMhalfEdge(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
-	{}
+	{
+		assert(pos.size() > 0 || !"Approximator_QEMhalfEdge: attribute vector is empty") ;
+	}
 	~Approximator_QEMhalfEdge()
 	{}
 	ApproximatorType getType() const { return A_QEMhalfEdge ; }
@@ -88,9 +92,11 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_MidEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_MidEdge(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
-	{}
+	{
+		assert(pos.size() > 0 || !"Approximator_MidEdge: attribute vector is empty") ;
+	}
 	~Approximator_MidEdge()
 	{}
 	ApproximatorType getType() const { return A_MidEdge ; }
@@ -106,9 +112,11 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_HalfCollapse(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_HalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
-	{}
+	{
+		assert(pos.size() > 0 || !"Approximator_HalfCollapse: attribute vector is empty") ;
+	}
 	~Approximator_HalfCollapse()
 	{}
 	ApproximatorType getType() const { return A_HalfCollapse ; }
@@ -124,9 +132,11 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_CornerCutting(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_CornerCutting(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, pos, pred)
-	{}
+	{
+		assert(pos.size() > 0 || !"Approximator_CornerCutting: attribute vector is empty") ;
+	}
 	~Approximator_CornerCutting()
 	{}
 	ApproximatorType getType() const { return A_CornerCutting ; }
