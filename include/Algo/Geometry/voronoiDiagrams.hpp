@@ -258,7 +258,9 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 		proj -= areaElts[e] * this->edgeCost[f] * this->edgeCost[f];
 		if (proj > maxProj)
 		{
-			if (numSeed==1 && j==0) CGoGNout << edgeV * grad << "\t - \t" << areaElts[e] * this->edgeCost[f] * this->edgeCost[f] << CGoGNendl;
+			if (numSeed==1 && j==0)
+				CGoGNout << (edgeV * grad) / (areaElts[e] * this->edgeCost[f] * this->edgeCost[f]) * this->seeds.size() << CGoGNendl;
+//				CGoGNout << edgeV * grad << "\t - \t" << areaElts[e] * this->edgeCost[f] * this->edgeCost[f] << CGoGNendl;
 			maxProj = proj;
 			seedMoved = 1;
 			this->seeds[numSeed] = v[j];
