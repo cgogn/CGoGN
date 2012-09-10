@@ -475,6 +475,8 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	REAL err = std::max(REAL(0),REAL(quad(m_positionApproximator->getApprox(d)))) ;
 
+	std::cout << quad(m_positionApproximator->getApprox(d)) << std::endl ;
+
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
@@ -1074,7 +1076,7 @@ void EdgeSelector_MinDetail<PFP>::updateEdgeInfo(Dart d, bool recompute)
 template <typename PFP>
 void EdgeSelector_MinDetail<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
-	Dart dd = this->m_map.phi2(d) ;
+	// Dart dd = this->m_map.phi2(d) ;
 	REAL err = REAL(0) ;
 
 //	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();

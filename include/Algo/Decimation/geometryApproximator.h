@@ -79,7 +79,7 @@ public:
 	}
 	~Approximator_QEMhalfEdge()
 	{}
-	ApproximatorType getType() const { return A_QEMhalfEdge ; }
+	ApproximatorType getType() const { return A_hQEM ; }
 	bool init() ;
 	void approximate(Dart d) ;
 } ;

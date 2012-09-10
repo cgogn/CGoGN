@@ -86,7 +86,61 @@ public:
 } ;
 
 template <typename PFP>
-class HalfEdgeSelector_Lightfield : public EdgeSelector<PFP>
+class HalfEdgeSelector_Color : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "ColorHalfEdgeInfo" ; }
+	} QEMhalfEdgeInfo ;
+	typedef NoMathIOAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
+
+	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
+	VertexAttribute<VEC3> m_color ;
+	VertexAttribute<Quadric<REAL> > m_quadric ;
+
+	std::multimap<float,Dart> halfEdges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, typename PFP::VEC3>* m_positionApproximator ;
+	Approximator<PFP, typename PFP::VEC3>* m_colorApproximator ;
+
+	void initHalfEdgeInfo(Dart d) ;
+	void updateHalfEdgeInfo(Dart d, bool recompute) ;
+	void computeHalfEdgeInfo(Dart d, HalfEdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	HalfEdgeSelector_Color(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select)
+	{
+		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
+		m_quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+
+		m_color = m.template getAttribute<VEC3, VERTEX>("color") ;
+		assert(m_color.isValid() || !"HalfEdgeSelector_Color: Color atrribute to select is not valid") ;
+	}
+	~HalfEdgeSelector_Color()
+	{
+		this->m_map.removeAttribute(halfEdgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
+	}
+	SelectorType getType() { return S_hColor ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
+
+/*template <typename PFP>
+class HalfEdgeSelector_Lightfield_deprecated : public EdgeSelector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -101,7 +155,7 @@ private:
 	{
 		typename std::multimap<float,Dart>::iterator it ;
 		bool valid ;
-		static std::string CGoGNnameOfType() { return "LightfieldHalfEdgeInfo" ; }
+		static std::string CGoGNnameOfType() { return "LightfieldHalfEdgeInfo_deprecated" ; }
 	} LightfieldHalfEdgeInfo ;
 	typedef NoMathIOAttribute<LightfieldHalfEdgeInfo> HalfEdgeInfo ;
 
@@ -124,7 +178,7 @@ private:
 	void recomputeQuadric(const Dart d, const bool recomputeNeighbors) ;
 
 public:
-	HalfEdgeSelector_Lightfield(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+	HalfEdgeSelector_Lightfield_deprecated(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select)
 	{
 		m_frame = m.template getAttribute<MATRIX33, VERTEX>("frame") ;
@@ -133,20 +187,20 @@ public:
 		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
 		quadricRGBfunctions = m.template addAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 	}
-	~HalfEdgeSelector_Lightfield()
+	~HalfEdgeSelector_Lightfield_deprecated()
 	{
 		this->m_map.removeAttribute(quadric) ;
 		this->m_map.removeAttribute(quadricRGBfunctions) ;
 		this->m_map.removeAttribute(halfEdgeInfo) ;
 	}
-	SelectorType getType() { return S_hLightfield ; }
+	SelectorType getType() { return S_hLightfield_deprecated ; }
 	bool init() ;
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 } ;
 
-/*
+/ *
 template <typename PFP>
 class EdgeSelector_Lightfield : public EdgeSelector<PFP>
 {

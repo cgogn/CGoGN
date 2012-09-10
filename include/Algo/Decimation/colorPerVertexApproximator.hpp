@@ -22,9 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SELECTOR_H__
-#define __SELECTOR_H__
-
 namespace CGoGN
 {
 
@@ -34,55 +31,22 @@ namespace Algo
 namespace Decimation
 {
 
-enum SelectorType
-{
-	S_MapOrder,
-	S_Random,
-	S_EdgeLength,
-	S_QEM,
-	S_QEMml,
-	S_MinDetail,
-	S_Curvature,
-	S_hQEMml,
-	S_hColor,
-	//S_hLightfield_cst,
-	//S_hLightfield_deprecated
-} ;
-
-template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
+/************************************************************************************
+ *                      COLOR METRIC                                                *
+ ************************************************************************************/
 
 template <typename PFP>
-class EdgeSelector
+void Approximator_Color<PFP>::approximate(Dart d)
 {
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
+	Dart dd = this->m_map.phi1(d) ;
 
-protected:
-	MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
-	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
-	const FunctorSelect& m_select ;
+	this->m_approx[0][d] = m_color->operator[](d) ;
+	this->m_approx[0][d] += m_color->operator[](dd) ;
+	this->m_approx[0][d] /= 2 ;
+}
 
-public:
-	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		m_map(m), m_position(pos), m_approximators(approx), m_select(select)
-	{}
-	virtual ~EdgeSelector()
-	{}
-	virtual SelectorType getType() = 0 ;
-	virtual bool init() = 0 ;
-	virtual bool nextEdge(Dart& d) = 0 ;
-	virtual void updateBeforeCollapse(Dart d) = 0 ;
-	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
-} ;
+} //namespace Decimation
 
-} // namespace Decimation
+} //namespace Algo
 
-} // namespace Algo
-
-} // namespace CGoGN
-
-#endif
+} //namespace CGoGN

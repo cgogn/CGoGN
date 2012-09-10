@@ -39,15 +39,16 @@ namespace Decimation
 enum ApproximatorType
 {
 	A_QEM,
-	A_QEMhalfEdge,
+	A_hQEM,
 	A_MidEdge,
 	A_HalfCollapse,
 	A_CornerCutting,
 	A_TangentPredict1,
 	A_TangentPredict2,
-	A_LightfieldHalf,
+	A_hColor
+	/*A_LightfieldHalf,
 	A_LightfieldHalf_deprecated,
-	A_LightfieldFull_deprecated
+	A_LightfieldFull_deprecated*/
 } ;
 
 template <typename PFP>
@@ -101,6 +102,9 @@ public:
 		m_approx.resize(m_attrV.size()) ;
 		m_detail.resize(m_attrV.size()) ;
 		m_app.resize(m_attrV.size()) ;
+
+		if (m_attrV.size() < 1)
+			std::cerr << "Approximator: no attributes provided" << std::endl ;
 
 		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 		{
