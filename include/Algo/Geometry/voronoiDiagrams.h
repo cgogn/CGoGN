@@ -67,6 +67,8 @@ private :
 	typedef typename PFP::REAL REAL;
 	typedef typename PFP::VEC3 VEC3;
 
+	double globalEnergy;
+
 	VertexAttribute<REAL>& distances; // distances from the seed
 	VertexAttribute<Dart>& pathOrigins; // previous vertex on the shortest path from origin
 	VertexAttribute<REAL>& areaElts; // area element attached to each vertex
@@ -80,13 +82,14 @@ public :
 			VertexAttribute<REAL>& a);
 	~CentroidalVoronoiDiagram ();
 
-	void cumulateDistancesOnPaths();
+	void cumulateEnergyOnPaths();
 	unsigned int moveSeeds(); // returns the number of seeds that did move
+	REAL getGlobalEnergy() {return globalEnergy;}
 
 protected :
 	void clear();
 	void collectVertexFromFront(Dart e);
-	REAL cumulateDistancesFromRoot(Dart e);
+	REAL cumulateEnergyFromRoot(Dart e);
 	unsigned int moveSeed(unsigned int numSeed);
 };
 

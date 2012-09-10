@@ -172,39 +172,43 @@ void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
 }
 
 template <typename PFP>
-void CentroidalVoronoiDiagram<PFP>::cumulateDistancesOnPaths(){
+void CentroidalVoronoiDiagram<PFP>::cumulateEnergyOnPaths(){
+	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
-		cumulateDistancesFromRoot(this->seeds[i]);
+		cumulateEnergyFromRoot(this->seeds[i]);
+		globalEnergy += distances[this->seeds[i]];
 	}
 }
 
 template <typename PFP>
 unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds(){
 	unsigned int m = 0;
+	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
 		m += moveSeed(i);
+		globalEnergy += distances[this->seeds[i]];
 	}
 	return m;
 }
 
 
 template <typename PFP>
-typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateDistancesFromRoot(Dart e){
-	REAL area = areaElts[e];
-	distances[e] *= areaElts[e];
+typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateEnergyFromRoot(Dart e){
+	REAL distArea = areaElts[e] * distances[e];
+	distances[e] = areaElts[e] * distances[e] * distances[e];
 
 	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
 	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
 	{
 		if ( pathOrigins[f] == this->map.phi2(f))
 		{
-			area += cumulateDistancesFromRoot(f);
+			distArea += cumulateEnergyFromRoot(f);
 			distances[e] += distances[f];
 		}
 	}
-	return area;
+	return distArea;
 }
 
 template <typename PFP>
@@ -215,10 +219,9 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 	std::vector<Dart> v;
 	v.reserve(8);
 
-	std::vector<float> a;
-	a.reserve(8);
+	std::vector<float> da;
+	da.reserve(8);
 
-	float regionArea = areaElts[e];
 	distances[e] = 0.0;
 
 	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
@@ -226,46 +229,51 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 	{
 		if ( pathOrigins[f] == this->map.phi2(f))
 		{
-			float area = cumulateDistancesFromRoot(f);
+			float distArea = cumulateEnergyFromRoot(f);
+			da.push_back(distArea);
 			distances[e] += distances[f];
 			v.push_back(f);
-			a.push_back(area);
-			regionArea += area;
 		}
 	}
 
 	/* second attempt */
+	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
 	VEC3 grad (0.0);
 	const VertexAttribute<VEC3>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
 
+	// compute the gradient
 	for (unsigned int j = 0; j<v.size(); ++j)
 	{
 		Dart f = v[j];
-//		VEC3 edgeV = Algo::Geometry::vectorOutOfDart<PFP>(this->map,this->map.phi2(f),pos);
 		VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
 		edgeV.normalize();
-		grad += distances[f] * edgeV;
+		grad += da[j] * edgeV;
 	}
+	grad /= 2.0;
 
 	float maxProj = 0.0;
+//	float memoForTest = 0.0;
 	for (unsigned int j = 0; j<v.size(); ++j)
 	{
 		Dart f = v[j];
-//		VEC3 edgeV = Algo::Geometry::vectorOutOfDart<PFP>(this->map,this->map.phi2(f),pos);
 		VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
 //		edgeV.normalize();
 		float proj = edgeV * grad;
-		proj -= areaElts[e] * this->edgeCost[f] * this->edgeCost[f];
+//		proj -= areaElts[e] * this->edgeCost[f] * this->edgeCost[f];
 		if (proj > maxProj)
 		{
-			if (numSeed==1 && j==0)
-				CGoGNout << (edgeV * grad) / (areaElts[e] * this->edgeCost[f] * this->edgeCost[f]) * this->seeds.size() << CGoGNendl;
+//			if (numSeed==1) memoForTest = (edgeV * grad) / (areaElts[e] * this->edgeCost[f] * this->edgeCost[f]);
+//				CGoGNout << (edgeV * grad) / (areaElts[e] * this->edgeCost[f] * this->edgeCost[f]) * this->seeds.size() << CGoGNendl;
 //				CGoGNout << edgeV * grad << "\t - \t" << areaElts[e] * this->edgeCost[f] * this->edgeCost[f] << CGoGNendl;
 			maxProj = proj;
 			seedMoved = 1;
 			this->seeds[numSeed] = v[j];
 		}
 	}
+
+//	if (numSeed==1 && seedMoved==1)
+//		CGoGNout << memoForTest * this->seeds.size() << CGoGNendl;
+
 	/* end second attempt */
 
 /* first attempt by approximating the energy change
