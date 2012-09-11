@@ -26,7 +26,6 @@ VoronoiDiagram<PFP>::~VoronoiDiagram ()
 template <typename PFP>
 void VoronoiDiagram<PFP>::clear ()
 {
-	border.clear();
 	regions.setAllValues(0);
 	border.clear();
 	front.clear();
@@ -141,6 +140,41 @@ void VoronoiDiagram<PFP>::computeDiagram ()
 	}
 }
 
+template <typename PFP>
+void VoronoiDiagram<PFP>::computeDistancesWithinRegion (Dart seed)
+{ // TODO : this algo has not yet been tested
+	// init
+	front.clear();
+	vmReached.unmarkAll();
+
+	vmReached.mark(seed);
+	vertexInfo[seed].it = front.insert(std::pair<float,Dart>(0.0, seed));
+	vertexInfo[seed].valid = true;
+	vertexInfo[seed].pathOrigin = seed;
+
+	//compute
+	while ( !front.empty() )
+	{
+		Dart e = front.begin()->second;
+		float d = front.begin()->first;
+
+		collectVertexFromFront(e);
+
+		Traversor2VVaE<typename PFP::MAP> tv (map, e);
+		for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+		{
+			if (vmReached.isMarked(f))
+			{ // f has been reached
+				if (vertexInfo[f].valid) updateVertexInFront(f,d); // f is in the front : update
+			}
+			else
+			{ // f has not been reached : add it to the front
+				if ( regions[f] == regions[e] ) addVertexToFront(f,d);
+			}
+		}
+	}
+}
+
 /***********************************************************
  * class CentroidalVoronoiDiagram
  ***********************************************************/
@@ -171,6 +205,8 @@ void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
 	VoronoiDiagram<PFP>::collectVertexFromFront(e);
 }
 
+
+
 template <typename PFP>
 void CentroidalVoronoiDiagram<PFP>::cumulateEnergyOnPaths(){
 	globalEnergy = 0.0;
@@ -183,16 +219,17 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyOnPaths(){
 
 template <typename PFP>
 unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds(){
+	// TODO : je pense qu'il y a un bug : ça devrait convergerger bien mieux en n'utilisant que l'energie globale comme critere d'arret
 	unsigned int m = 0;
 	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
+		Dart oldSeed = this->seeds[i];
 		m += moveSeed(i);
-		globalEnergy += distances[this->seeds[i]];
+		globalEnergy += distances[oldSeed];
 	}
 	return m;
 }
-
 
 template <typename PFP>
 typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateEnergyFromRoot(Dart e){

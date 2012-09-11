@@ -51,6 +51,7 @@ public :
 	void setCost (const EdgeAttribute<REAL>& c);
 
 	void computeDiagram ();
+	void computeDistancesWithinRegion (Dart seed);
 
 protected :
 	virtual void clear ();
@@ -84,6 +85,7 @@ public :
 
 	void cumulateEnergyOnPaths();
 	unsigned int moveSeeds(); // returns the number of seeds that did move
+	unsigned int moveSeeds2(); // returns the number of seeds that did move
 	REAL getGlobalEnergy() {return globalEnergy;}
 
 protected :
