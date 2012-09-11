@@ -473,9 +473,7 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	m_positionApproximator->approximate(d) ;
 
-	REAL err = std::max(REAL(0),REAL(quad(m_positionApproximator->getApprox(d)))) ;
-
-	std::cout << quad(m_positionApproximator->getApprox(d)) << std::endl ;
+	REAL err = quad(m_positionApproximator->getApprox(d)) ;
 
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;

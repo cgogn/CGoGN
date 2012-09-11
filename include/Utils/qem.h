@@ -32,15 +32,19 @@
 #include "Geometry/matrix.h"
 #include "Geometry/plane_3d.h"
 
+namespace CGoGN {
+
+//namespace Utils {
+
 template <typename REAL>
 class Quadric
 {
 public:
 	static std::string CGoGNnameOfType() { return "Quadric" ; }
 
-	typedef CGoGN::Geom::Vector<3,REAL> VEC3 ;
-	typedef CGoGN::Geom::Vector<4,REAL> VEC4 ;
-	typedef CGoGN::Geom::Matrix<4,4,REAL> MATRIX44 ;
+	typedef Geom::Vector<3,REAL> VEC3 ;
+	typedef Geom::Vector<4,REAL> VEC4 ;
+	typedef Geom::Matrix<4,4,double> MATRIX44 ; // double is crucial here !
 
 	Quadric()
 	{
@@ -55,28 +59,11 @@ public:
 	Quadric(VEC3& p1, VEC3& p2, VEC3& p3)
 	{
 		// compute the equation of the plane of the 3 points
-		CGoGN::Geom::Plane3D<REAL> p(p1, p2, p3) ;
-		VEC3& n = p.normal() ;
-		float a = n[0] ;
-		float b = n[1] ;
-		float c = n[2] ;
-		float d = p.d() ;
-		// set the matrix associated with this plane
-		A.set(1) ;
-		for(int i = 0; i < 4; ++i)
-		{
-			for(int j = 0; j < 4; ++j)
-			{
-				if(i==0) A(i,j) *= a ;
-				if(j==0) A(i,j) *= a ;
-				if(i==1) A(i,j) *= b ;
-				if(j==1) A(i,j) *= b ;
-				if(i==2) A(i,j) *= c ;
-				if(j==2) A(i,j) *= c ;
-				if(i==3) A(i,j) *= d ;
-				if(j==3) A(i,j) *= d ;
-			}
-		}
+		Geom::Plane3D<REAL> plane(p1, p2, p3) ;
+		const VEC3& n = plane.normal() ;
+
+		Geom::Vector<4,double> p = Geom::Vector<4,double>(n[0],n[1],n[2],plane.d()) ;
+		A = Geom::transposed_vectors_mult(p,p) ;
 	}
 
 	void zero()
@@ -148,9 +135,10 @@ public:
 private:
 	MATRIX44 A ;
 
-	float evaluate(const VEC4& v) const
+	REAL evaluate(const VEC4& v) const
 	{
-		VEC4 Av = A * v ;
+		// Double computation is crucial for stability
+		Geom::Vector<4, double> Av = A * v ;
 		return v * Av ;
 	}
 
@@ -176,5 +164,10 @@ private:
 		return true;
 	}
 } ;
+
+
+//} // Utils
+
+} // CGOGN
 
 #endif
