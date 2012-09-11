@@ -219,7 +219,6 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyOnPaths(){
 
 template <typename PFP>
 unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds(){
-	// TODO : je pense qu'il y a un bug : ça devrait convergerger bien mieux en n'utilisant que l'energie globale comme critere d'arret
 	unsigned int m = 0;
 	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
@@ -227,6 +226,30 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds(){
 		Dart oldSeed = this->seeds[i];
 		m += moveSeed(i);
 		globalEnergy += distances[oldSeed];
+	}
+	return m;
+}
+
+template <typename PFP>
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds2(){
+	unsigned int m = 0;
+	globalEnergy = 0.0;
+	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	{
+		Dart oldSeed = this->seeds[i];
+		int r = moveSeed(i);
+		Dart newSeed = this->seeds[i];
+		globalEnergy += distances[oldSeed];
+		REAL regionEnergy = distances[oldSeed];
+		if (r==1)
+		{
+			this->computeDistancesWithinRegion(newSeed);
+			cumulateEnergyFromRoot(newSeed);
+			if (distances[newSeed] < regionEnergy)
+				m+=1;
+			else
+				this->seeds[i] = oldSeed;
+		}
 	}
 	return m;
 }
