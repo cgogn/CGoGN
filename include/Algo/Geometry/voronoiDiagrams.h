@@ -45,8 +45,8 @@ public :
 	~VoronoiDiagram ();
 
 	const std::vector<Dart>& getSeeds (){return seeds;}
-	void setSeeds (const std::vector<Dart>&);
-	void setRandomSeeds (unsigned int nbseeds);
+	virtual void setSeeds (const std::vector<Dart>&);
+	virtual void setRandomSeeds (unsigned int nbseeds);
 	const std::vector<Dart>& getBorder (){return border;}
 	void setCost (const EdgeAttribute<REAL>& c);
 
@@ -69,6 +69,7 @@ private :
 	typedef typename PFP::VEC3 VEC3;
 
 	double globalEnergy;
+	std::vector<VEC3> energyGrad; // gradient of the region energy at seed
 
 	VertexAttribute<REAL>& distances; // distances from the seed
 	VertexAttribute<Dart>& pathOrigins; // previous vertex on the shortest path from origin
@@ -83,16 +84,25 @@ public :
 			VertexAttribute<REAL>& a);
 	~CentroidalVoronoiDiagram ();
 
-	void cumulateEnergyOnPaths();
-	unsigned int moveSeeds(); // returns the number of seeds that did move
-	unsigned int moveSeeds2(); // returns the number of seeds that did move
+	void setSeeds (const std::vector<Dart>&);
+	void setRandomSeeds (unsigned int nbseeds);
+	void cumulateEnergy();
+	void cumulateEnergyAndGradients();
+	unsigned int moveSeedsOneEdgeNoCheck(); // returns the number of seeds that did move
+	// move each seed along one edge according to the energy gradient
+	unsigned int moveSeedsOneEdgeCheck(); // returns the number of seeds that did move
+	// move each seed along one edge according to the energy gradient + check that the energy decreases
+	unsigned int moveSeedsToMedioid(); // returns the number of seeds that did move
+	// move each seed to the medioid of its region
 	REAL getGlobalEnergy() {return globalEnergy;}
 
 protected :
 	void clear();
 	void collectVertexFromFront(Dart e);
 	REAL cumulateEnergyFromRoot(Dart e);
-	unsigned int moveSeed(unsigned int numSeed);
+	void cumulateEnergyAndGradientFromSeed(unsigned int numSeed);
+	Dart selectBestNeighborFromSeed(unsigned int numSeed);
+//	unsigned int moveSeed(unsigned int numSeed);
 };
 
 

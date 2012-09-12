@@ -36,7 +36,6 @@ template <typename PFP>
 void VoronoiDiagram<PFP>::setSeeds (const std::vector<Dart>& s)
 {
 	seeds.clear();
-//	clear();
 	seeds = s;
 }
 
@@ -44,7 +43,6 @@ template <typename PFP>
 void VoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
 {
 	seeds.clear();
-//	clear();
 	vmReached.unmarkAll();
 
 	srand ( time(NULL) );
@@ -206,9 +204,23 @@ void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
 }
 
 
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::setSeeds (const std::vector<Dart>& s)
+{
+	VoronoiDiagram<PFP>::setSeeds (s);
+	energyGrad.resize(this->seeds.size());
+}
 
 template <typename PFP>
-void CentroidalVoronoiDiagram<PFP>::cumulateEnergyOnPaths(){
+void CentroidalVoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
+{
+	VoronoiDiagram<PFP>::setRandomSeeds (nseeds);
+	energyGrad.resize(this->seeds.size());
+}
+
+
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::cumulateEnergy(){
 	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
@@ -218,39 +230,105 @@ void CentroidalVoronoiDiagram<PFP>::cumulateEnergyOnPaths(){
 }
 
 template <typename PFP>
-unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds(){
-	unsigned int m = 0;
+void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradients(){
 	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
+		cumulateEnergyAndGradientFromSeed(i);
+		globalEnergy += distances[this->seeds[i]];
+	}
+}
+
+template <typename PFP>
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeNoCheck(){
+	unsigned int m = 0;
+	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	{
 		Dart oldSeed = this->seeds[i];
-		m += moveSeed(i);
-		globalEnergy += distances[oldSeed];
+		Dart newSeed = selectBestNeighborFromSeed(i);
+
+		// move the seed
+		if (newSeed != oldSeed)
+		{
+			this->seeds[i] = newSeed;
+			m++;
+		}
 	}
 	return m;
 }
 
 template <typename PFP>
-unsigned int CentroidalVoronoiDiagram<PFP>::moveSeeds2(){
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeCheck(){
+	// TODO : probable bug (memoire ?) car les iterations ralentissent inexplicablement
 	unsigned int m = 0;
-	globalEnergy = 0.0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
 		Dart oldSeed = this->seeds[i];
-		int r = moveSeed(i);
-		Dart newSeed = this->seeds[i];
-		globalEnergy += distances[oldSeed];
-		REAL regionEnergy = distances[oldSeed];
-		if (r==1)
+		Dart newSeed = selectBestNeighborFromSeed(i);
+
+		// move the seed
+		if (newSeed != oldSeed)
 		{
+			REAL regionEnergy = distances[oldSeed];
 			this->computeDistancesWithinRegion(newSeed);
 			cumulateEnergyFromRoot(newSeed);
 			if (distances[newSeed] < regionEnergy)
-				m+=1;
-			else
-				this->seeds[i] = oldSeed;
+			{
+				this->seeds[i] = newSeed;
+				m++;
+			}
 		}
 	}
+	return m;
+}
+/*
+template <typename PFP>
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeCheck(){
+	// TODO : probable bug (memoire ?) car les iterations ralentissent inexplicablement
+	unsigned int m = 0;
+	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	{
+		Dart oldSeed = this->seeds[i];
+		Dart newSeed = selectBestNeighborFromSeed(i);
+
+		// move the seed
+		if (newSeed != oldSeed)
+		{
+			REAL regionEnergy = distances[oldSeed];
+			this->seeds[i] = newSeed;
+			this->computeDistancesWithinRegion(newSeed);
+			cumulateEnergyAndGradientFromSeed(i);
+			if (distances[newSeed] < regionEnergy)
+				m++;
+			else
+				this->seeds[i] = newSeed;
+		}
+	}
+	return m;
+}
+*/
+template <typename PFP>
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsToMedioid(){
+	unsigned int m = 0;
+/*	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	{
+		Dart oldSeed = this->seeds[i];
+		Dart newSeed = selectBestNeighborFromSeed(i);
+		unsigned int seedMoved = 0;
+		REAL regionEnergy = distances[oldSeed];
+
+		// move the seed
+		while (newSeed != oldSeed)
+		{
+			this->cumulateEnergyAndGradientFromSeed(numSeed);
+			cumulateEnergyFromRoot(newSeed);
+			if (distances[newSeed] < regionEnergy)
+			{
+				this->seeds[i] = newSeed;
+				m++;
+			}
+		}
+	} */
 	return m;
 }
 
@@ -271,6 +349,98 @@ typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateEnergyFromRoot(Dart e)
 	return distArea;
 }
 
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned int numSeed){
+	Dart e = this->seeds[numSeed];
+
+	std::vector<Dart> v;
+	v.reserve(8);
+
+	std::vector<float> da;
+	da.reserve(8);
+
+	distances[e] = 0.0;
+
+	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+	{
+		if ( pathOrigins[f] == this->map.phi2(f))
+		{
+			float distArea = cumulateEnergyFromRoot(f);
+			da.push_back(distArea);
+			distances[e] += distances[f];
+			v.push_back(f);
+		}
+	}
+
+	// compute the gradient
+	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
+	VEC3 grad (0.0);
+	const VertexAttribute<VEC3>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
+
+	for (unsigned int j = 0; j<v.size(); ++j)
+	{
+		Dart f = v[j];
+		VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
+		edgeV.normalize();
+		grad += da[j] * edgeV;
+	}
+	grad /= 2.0;
+	energyGrad[numSeed] = grad;
+}
+
+
+template <typename PFP>
+Dart CentroidalVoronoiDiagram<PFP>::selectBestNeighborFromSeed(unsigned int numSeed)
+{
+	Dart e = this->seeds[numSeed];
+	Dart newSeed = e;
+	const VertexAttribute<VEC3>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
+
+	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
+	float maxProj = 0.0;
+	Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+	for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+	{
+		if ( pathOrigins[f] == this->map.phi2(f))
+		{
+			VEC3 edgeV = pos[f] - pos[this->map.phi2(f)];
+	//		edgeV.normalize();
+			float proj = edgeV * energyGrad[numSeed];
+			if (proj > maxProj)
+			{
+				maxProj = proj;
+				newSeed = f;
+			}
+		}
+	}
+	return newSeed;
+}
+
+/*
+template <typename PFP>
+unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
+
+	// collect energy and compute the gradient
+//	cumulateEnergyAndGradientFromSeed(numSeed);
+
+	// select the new seed
+	Dart newSeed = selectBestNeighborFromSeed(numSeed);
+
+	// move the seed
+	Dart oldSeed = this->seeds[numSeed];
+	unsigned int seedMoved = 0;
+	if (newSeed != oldSeed)
+	{
+		this->seeds[numSeed] = newSeed;
+		seedMoved = 1;
+	}
+
+	return seedMoved;
+}
+*/
+
+/*
 template <typename PFP>
 unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 	Dart e = this->seeds[numSeed];
@@ -296,7 +466,6 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 		}
 	}
 
-	/* second attempt */
 	// TODO : check if the computation of grad and proj is still valid for other edgeCost than geodesic distances
 	VEC3 grad (0.0);
 	const VertexAttribute<VEC3>& pos = this->map.template getAttribute<VEC3,VERTEX>("position");
@@ -331,29 +500,9 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeed(unsigned int numSeed){
 		}
 	}
 
-//	if (numSeed==1 && seedMoved==1)
-//		CGoGNout << memoForTest * this->seeds.size() << CGoGNendl;
-
-	/* end second attempt */
-
-/* first attempt by approximating the energy change
-	float minDE = 0.0;
-	for (unsigned int j = 0; j<v.size(); ++j)
-	{
-		float c = this->edgeCost[v[j]];
-		float de = regionArea * c * c;
-		de += 2 * c *( distances[e] - 2*distances[v[j]] );
-		if (de < minDE)
-		{
-			minDE = de;
-			seedMoved = 1;
-			this->seeds[numSeed] = v[j];
-		}
-	}
-*/
 	return seedMoved;
 }
-
+*/
 }// end namespace Geometry
 }// end namespace Algo
 }// end namespace CGoGN
