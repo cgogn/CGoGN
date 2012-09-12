@@ -95,7 +95,7 @@ public:
 			map.addEmbedding<CELL>() ;
 		m_mark = m_map.getMarkerSet<CELL>(m_thread).getNewMark() ;
 		m_markVector = m_map.getMarkVector<CELL>(m_thread) ;
-		m_map.cellMarkers.push_back(this) ;
+		m_map.cellMarkers[m_thread].push_back(this) ;
 	}
 
 	virtual ~CellMarkerBase()
@@ -103,12 +103,14 @@ public:
 		if(releaseOnDestruct)
 		{
 			m_map.getMarkerSet<CELL>(m_thread).releaseMark(m_mark) ;
-			for(std::vector<CellMarkerGen*>::iterator it = m_map.cellMarkers.begin(); it != m_map.cellMarkers.end(); ++it)
+
+			std::vector<CellMarkerGen*>& cmg = m_map.cellMarkers[m_thread];
+			for(std::vector<CellMarkerGen*>::iterator it = cmg.begin(); it != cmg.end(); ++it)
 			{
 				if(*it == this)
 				{
-					*it = m_map.cellMarkers.back();
-					m_map.cellMarkers.pop_back();
+					*it = cmg.back();
+					cmg.pop_back();
 					return;
 				}
 			}

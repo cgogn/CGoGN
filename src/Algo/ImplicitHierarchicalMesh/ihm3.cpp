@@ -23,6 +23,7 @@
 *******************************************************************************/
 
 #include "Algo/ImplicitHierarchicalMesh/ihm3.h"
+#include "Topology/generic/traversor3.h"
 #include <math.h>
 #include <limits>
 
@@ -50,6 +51,20 @@ ImplicitHierarchicalMap3::~ImplicitHierarchicalMap3()
 	removeAttribute(m_edgeId) ;
 	removeAttribute(m_faceId) ;
 	removeAttribute(m_dartLevel) ;
+}
+
+void ImplicitHierarchicalMap3::clear(bool removeAttrib)
+{
+	Map3::clear(removeAttrib) ;
+	if (removeAttrib)
+	{
+		m_dartLevel = Map3::addAttribute<unsigned int, DART>("dartLevel") ;
+		m_faceId = Map3::addAttribute<unsigned int, DART>("faceId") ;
+		m_edgeId = Map3::addAttribute<unsigned int, DART>("edgeId") ;
+
+		for(unsigned int i = 0; i < NB_ORBITS; ++i)
+			m_nextLevelCell[i] = NULL ;
+	}
 }
 
 void ImplicitHierarchicalMap3::init()

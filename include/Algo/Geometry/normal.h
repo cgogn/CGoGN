@@ -27,6 +27,7 @@
 
 #include "Geometry/basic.h"
 
+
 namespace CGoGN
 {
 
@@ -54,6 +55,7 @@ typename PFP::VEC3 vertexBorderNormal(typename PFP::MAP& map, Dart d, const Vert
 template <typename PFP>
 void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
+
 /**
  * compute normals of  vertices
  * @param map the map on which we work
@@ -65,11 +67,25 @@ void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename P
 template <typename PFP>
 void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
+
+namespace Parallel
+{
+template <typename PFP>
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+
+
+template <typename PFP>
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int thread = 0) ;
+
+}
+
+
 template <typename PFP>
 typename PFP::REAL computeAngleBetweenNormalsOnEdge(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
 void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
 
 } // namespace Geometry
 

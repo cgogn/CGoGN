@@ -46,6 +46,7 @@ protected:
 	Mark m_mark ;
 	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
+	unsigned int m_idReg ;
 	bool releaseOnDestruct ;
 
 public:
@@ -57,7 +58,7 @@ public:
 	{
 		m_mark = m_map.getMarkerSet<DART>(m_thread).getNewMark() ;
 		m_markVector = m_map.getMarkVector<DART>(m_thread) ;
-		m_map.dartMarkers.push_back(this) ;
+		m_map.dartMarkers[m_thread].push_back(this) ;
 	}
 
 	virtual ~DartMarkerGen()
@@ -65,12 +66,13 @@ public:
 		if(releaseOnDestruct)
 		{
 			m_map.getMarkerSet<DART>(m_thread).releaseMark(m_mark) ;
-			for(std::vector<DartMarkerGen*>::iterator it = m_map.dartMarkers.begin(); it != m_map.dartMarkers.end(); ++it)
+			std::vector<DartMarkerGen*>& dmg =  m_map.dartMarkers[m_thread];
+			for(std::vector<DartMarkerGen*>::iterator it = dmg.begin(); it != dmg.end(); ++it)
 			{
 				if(*it == this)
 				{
-					*it = m_map.dartMarkers.back();
-					m_map.dartMarkers.pop_back();
+					*it = dmg.back();
+					dmg.pop_back();
 					return;
 				}
 			}

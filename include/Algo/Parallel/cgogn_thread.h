@@ -21,64 +21,58 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
-
-#include "Utils/Qt/qtcolorschooser.h"
-#include "Utils/Qt/qtSimple.h"
+#ifndef __PARALLEL_THREAD__
+#define __PARALLEL_THREAD__
 
 namespace CGoGN
 {
 
-namespace Utils
+namespace Algo
 {
 
-namespace QT
+namespace Parallel
 {
 
-
-ColorsChooser::ColorsChooser(SimpleQT *interf):
-		QtPopUp(NULL,false),m_interf(interf),m_current(0)
+/**
+ * Class to encapsulate algorithm in a boost thread
+ * Usage:
+ * - Define a class MyCGoGNThread that inherit from CGoGNThread
+ * - call with boost::thread cgt1(MyCGoGNThread(map,1, ...);
+ * - wait to finish: cgt1.join();
+ *
+ * TODO: write a CGoGNThread version of "all" algorithm
+ */
+template<typename MAP>
+class CGoGNThread
 {
-	m_list = new QListWidget();
-	m_diag = new QColorDialog();
-	m_diag->setOption(QColorDialog::NoButtons);
-	addWidget(m_list,0,0);
-	addWidget(m_diag,0,1);
-	connect(m_list,  SIGNAL(currentRowChanged(int)), this, SLOT(select_color(int)));
-	connect(m_diag, SIGNAL(	currentColorChanged(const QColor&)), this, SLOT(change_color(const QColor&)));
+protected:
+	MAP& m_map;
+	unsigned int m_threadId;
 
-}
-
-unsigned int ColorsChooser::addColor(Geom::Vec3f* ptr, const std::string& name)
-{
-	m_colors.push_back(ptr);
-	m_list->addItem(QString(name.c_str()));
-	return m_colors.size()-1;
-}
-
-
-void ColorsChooser::select_color(int x)
-{
-	m_current = x;
-	const Geom::Vec3f& col = *m_colors[x];
-	m_diag->show();
-	m_diag->setCurrentColor(QColor(int(255.0f*col[0]), int(255.0f*col[1]), int(255.0f*col[2])) );
-}
-
-void ColorsChooser::change_color(const QColor& col)
-{
-	Geom::Vec3f& out = *m_colors[m_current];
-	out[0] = float(col.redF());
-	out[1] = float(col.greenF());
-	out[2] = float(col.blueF());
-
-
-	if (m_interf)
+	unsigned int tid()
 	{
-		updateCallBack(m_interf);
-		m_interf->updateGL();
+		return m_threadId;
 	}
-}
 
-}
-}
-}
+public:
+	CGoGNThread(MAP& map, unsigned int th):
+		m_map(map), m_threadId(th) {}
+
+	virtual ~CGoGNThread() {}
+
+	/**
+	 * to implement with algo to execute (use m_threadId)
+	 */
+	virtual void operator()()=0;
+
+
+};
+
+
+} // namespace Parallel
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#endif

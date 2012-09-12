@@ -34,12 +34,15 @@ namespace CGoGN
 {
 
 std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL ;
+int GenericMap::m_nbInstances = 0;
 
 GenericMap::GenericMap() : m_nbThreads(1)
 {
 	if(m_attributes_registry_map == NULL)
 		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*> ;
 
+
+	m_nbInstances++;
 	// register all known types
 	registerAttribute<Dart>("Dart");
 	registerAttribute<Mark>("Mark");
@@ -81,8 +84,11 @@ GenericMap::GenericMap() : m_nbThreads(1)
 		}
 	}
 
-	dartMarkers.reserve(16) ;
-	cellMarkers.reserve(16) ;
+	for (unsigned int i=0; i<NB_THREAD; ++i)
+	{
+		dartMarkers[i].reserve(16) ;
+		cellMarkers[i].reserve(16) ;
+	}
 
 	// get & lock marker for boundary
 	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
@@ -103,20 +109,29 @@ GenericMap::~GenericMap()
 			m_attribs[i].clear(true) ;
 	}
 
+
 	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
 
-	for(std::vector<DartMarkerGen*>::iterator it = dartMarkers.begin(); it != dartMarkers.end(); ++it)
-		(*it)->setReleaseOnDestruct(false) ;
-	dartMarkers.clear() ;
-
-	for(std::vector<CellMarkerGen*>::iterator it = cellMarkers.begin(); it != cellMarkers.end(); ++it)
-		(*it)->setReleaseOnDestruct(false) ;
-	cellMarkers.clear() ;
-
-	if(m_attributes_registry_map)
+	for (unsigned int i=0; i<NB_THREAD; ++i)
 	{
+		for(std::vector<DartMarkerGen*>::iterator it = dartMarkers[i].begin(); it != dartMarkers[i].end(); ++it)
+			(*it)->setReleaseOnDestruct(false) ;
+		dartMarkers[i].clear() ;
+
+		for(std::vector<CellMarkerGen*>::iterator it = cellMarkers[i].begin(); it != cellMarkers[i].end(); ++it)
+			(*it)->setReleaseOnDestruct(false) ;
+		cellMarkers[i].clear() ;
+	}
+
+	// clean type registry if necessary
+	m_nbInstances--;
+	if (m_nbInstances<=0)
+	{
+		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
+			delete it->second;
+
 		delete m_attributes_registry_map;
 		m_attributes_registry_map = NULL;
 	}
@@ -130,6 +145,7 @@ void GenericMap::clear(bool removeAttrib)
 		{
 			m_attribs[i].clear(true) ;
 			m_embeddings[i] = NULL ;
+			m_quickTraversal[i] = NULL;
 		}
 		for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 			(*it).second->setInvalid() ;

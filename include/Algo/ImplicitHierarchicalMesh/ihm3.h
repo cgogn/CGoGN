@@ -78,6 +78,12 @@ public:
 	 */
 	void init() ;
 
+	/**
+	 * clear the map
+	 * @param remove attrib remove attribute (not only clear the content)
+	 */
+	void clear(bool removeAttrib);
+
 	/*! @name Attributes Management
 	 *  To handles Attributes for each level of an implicit 3-map
 	 *************************************************************************/
