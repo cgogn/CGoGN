@@ -140,7 +140,7 @@ void VoronoiDiagram<PFP>::computeDiagram ()
 
 template <typename PFP>
 void VoronoiDiagram<PFP>::computeDistancesWithinRegion (Dart seed)
-{ // TODO : this algo has not yet been tested
+{
 	// init
 	front.clear();
 	vmReached.unmarkAll();
@@ -270,65 +270,48 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeCheck(){
 		if (newSeed != oldSeed)
 		{
 			REAL regionEnergy = distances[oldSeed];
-			this->computeDistancesWithinRegion(newSeed);
-			cumulateEnergyFromRoot(newSeed);
-			if (distances[newSeed] < regionEnergy)
-			{
-				this->seeds[i] = newSeed;
-				m++;
-			}
-		}
-	}
-	return m;
-}
-/*
-template <typename PFP>
-unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeCheck(){
-	// TODO : probable bug (memoire ?) car les iterations ralentissent inexplicablement
-	unsigned int m = 0;
-	for (unsigned int i = 0; i < this->seeds.size(); i++)
-	{
-		Dart oldSeed = this->seeds[i];
-		Dart newSeed = selectBestNeighborFromSeed(i);
-
-		// move the seed
-		if (newSeed != oldSeed)
-		{
-			REAL regionEnergy = distances[oldSeed];
 			this->seeds[i] = newSeed;
 			this->computeDistancesWithinRegion(newSeed);
 			cumulateEnergyAndGradientFromSeed(i);
 			if (distances[newSeed] < regionEnergy)
 				m++;
 			else
-				this->seeds[i] = newSeed;
+				this->seeds[i] = oldSeed;
 		}
 	}
 	return m;
 }
-*/
+
 template <typename PFP>
 unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsToMedioid(){
 	unsigned int m = 0;
-/*	for (unsigned int i = 0; i < this->seeds.size(); i++)
+	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
-		Dart oldSeed = this->seeds[i];
-		Dart newSeed = selectBestNeighborFromSeed(i);
+		Dart oldSeed, newSeed;
 		unsigned int seedMoved = 0;
-		REAL regionEnergy = distances[oldSeed];
+		REAL regionEnergy;
 
-		// move the seed
-		while (newSeed != oldSeed)
+		do
 		{
-			this->cumulateEnergyAndGradientFromSeed(numSeed);
-			cumulateEnergyFromRoot(newSeed);
+			oldSeed = this->seeds[i];
+			regionEnergy = distances[oldSeed];
+
+			newSeed = selectBestNeighborFromSeed(i);
+			this->seeds[i] = newSeed;
+			this->computeDistancesWithinRegion(newSeed);
+			cumulateEnergyAndGradientFromSeed(i);
 			if (distances[newSeed] < regionEnergy)
+				seedMoved = 1;
+			else
 			{
-				this->seeds[i] = newSeed;
-				m++;
+				this->seeds[i] = oldSeed;
+				newSeed = oldSeed;
 			}
-		}
-	} */
+
+		} while (newSeed != oldSeed);
+
+		m += seedMoved;
+	}
 	return m;
 }
 
