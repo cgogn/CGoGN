@@ -104,6 +104,69 @@ void Map3MR_PrimalRegular<PFP>::splitSurfaceInVolume(std::vector<Dart>& vd, bool
  * 							Level creation								*
  ************************************************************************/
 template <typename PFP>
+void Map3MR_PrimalRegular<PFP>::addNewLevelSqrt3(bool embedNewVertices)
+{
+	m_map.pushLevel();
+
+	m_map.addLevel();
+	//m_map.setCurrentLevel(m_map.getMaxLevel());
+	unsigned int cur = m_map.getCurrentLevel();
+
+	//
+	TraversorW<typename PFP::MAP> travW(m_map);
+	for(Dart dit = travW.begin() ; dit != travW.end() ; dit = travW.next())
+	{
+		m_map.setCurrentLevel(cur+1);
+
+		//store the new faces to 3-sew
+		std::vector<std::pair<Dart,Dart> > nFaces;
+		nFaces.reserve(6);
+
+		Traversor3WF<typename PFP::MAP> travWF(m_map, dit);
+		for(Dart ditWF = travWF.begin() ; ditWF != travWF.end() ; ditWF = travWF.next())
+		{
+
+
+
+//			Dart temp = ditWF;
+//			do
+//			{
+//				nFaces.push_back(std::pair<Dart,Dart>(temp, m_map.phi2(temp)));
+//				m_map.unsewFaces(temp);
+//				temp = m_map.phi1(temp);
+//			}
+//			while(temp != ditWF);
+//
+//			m_map.PFP::MAP::ParentMap::closeHole(ditWF, false);
+
+			//Dart fi = map.phi2(*face);
+
+
+//			std::vector<Dart> split;
+//			split.push_back(ditWF);
+//			split.push_back(m_map.phi1(ditWF));
+//			split.push_back(m_map.phi_1(ditWF));
+//
+//			splitSurfaceInVolume(split,true,false);
+		}
+
+		//Dart fi = map.phi2(*face);
+
+//		//coudre les nouveaux brins entre eux par phi3
+//		for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
+//		{
+//
+//			if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
+//				map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
+//		}
+//
+		m_map.setCurrentLevel(cur);
+	}
+
+	m_map.setCurrentLevel(m_map.getMaxLevel());
+}
+
+template <typename PFP>
 void Map3MR_PrimalRegular<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 {
 	m_map.pushLevel();

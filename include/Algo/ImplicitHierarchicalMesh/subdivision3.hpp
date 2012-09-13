@@ -81,23 +81,17 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 	unsigned int cur = map.getCurrentLevel() ;
 	map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
 
-//	unsigned int vLevel = map.volumeLevel(old);
-//	//one level of subdivision in the neighbordhood
+	unsigned int vLevel = map.volumeLevel(old);
+	//one level of subdivision in the neighbordhood
 //	Traversor3VW<typename PFP::MAP> trav3EW(map, old);
 //	for(Dart dit = trav3EW.begin() ; dit != trav3EW.end() ; dit = trav3EW.next())
 //	{
 //		Dart oldit = map.volumeOldestDart(dit);
-//		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
-//			Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
 //
-////		Dart oldNeighbor = map.volumeOldestDart(map.phi3(old));
-////		unsigned int vLevel = map.volumeLevel(oldNeighbor);
-////
-////		std::cout << "vLevel courant = " << map.volumeLevel(old) << std::endl;
-////		std::cout << "vLevel voisin = " << vLevel << std::endl;
-////
-////		if((map.volumeLevel(old)+1) - (vLevel) > 1)
-////			Algo::IHM::subdivideVolumeClassic<PFP>(map, oldNeighbor, position);
+//		//std::cout << "vLevel courant = " << map.volumeLevel(oldit) << std::endl;
+//
+//		if(((vLevel+1) - map.volumeLevel(oldit)) > 1)
+//				Algo::IHM::subdivideVolumeClassic<PFP>(map, oldit, position);
 //	}
 
 	unsigned int degree = 0 ;

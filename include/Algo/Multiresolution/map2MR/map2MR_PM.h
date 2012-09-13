@@ -57,13 +57,8 @@ public:
 private:
 	MAP& m_map ;
 	VertexAttribute<VEC3>& m_position;
-	bool shareVertexEmbeddings ;
-
-	//SelectorUnmarked dartSelect ;
 
 	bool m_initOk ;
-
-	DartMarker& inactiveMarker;
 
 	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
 	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
@@ -72,13 +67,14 @@ private:
 	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
 
 public:
-	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
-			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a) ;
+	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position);
 
 	~Map2MR_PM();
 
 	//create a progressive mesh (a coarser level)
-	void createPM(unsigned int percentWantedVertices);
+	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts) ;
+
+	void addNewLevel(unsigned int percentWantedVertices);
 
 	//coarsen the mesh -> analysis
 	void coarsen() ;
