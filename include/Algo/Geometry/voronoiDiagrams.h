@@ -38,7 +38,7 @@ protected :
 
 	VertexAttribute<VertexInfo> vertexInfo;
 	std::multimap<float,Dart> front ;
-	CellMarkerStore<VERTEX> vmReached;
+	CellMarker<VERTEX> vmReached;
 
 public :
 	VoronoiDiagram (typename PFP::MAP& m, const EdgeAttribute<REAL>& c, VertexAttribute<unsigned int>& r);
