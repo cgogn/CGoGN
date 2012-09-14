@@ -93,9 +93,6 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	// get & lock marker for boundary
 	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
 
-#ifndef CGoGN_FORCE_MR
-	m_isMultiRes = false;
-#endif
 }
 
 GenericMap::~GenericMap()
@@ -184,10 +181,6 @@ void GenericMap::printMR()
 
 void GenericMap::initMR()
 {
-#ifndef CGoGN_FORCE_MR
-	m_isMultiRes = true;
-#endif
-
 	m_mrattribs.clear(true) ;
 	m_mrattribs.setRegistry(m_attributes_registry_map) ;
 
