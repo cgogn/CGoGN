@@ -36,17 +36,17 @@ namespace Decimation
 
 enum SelectorType
 {
-	S_MapOrder,
+	S_MapOrder = 0,
 	S_Random,
 	S_EdgeLength,
 	S_QEM,
 	S_QEMml,
 	S_MinDetail,
 	S_Curvature,
+	S_ColorNaive,
+	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	S_hQEMml,
-	S_hColor,
-	//S_hLightfield_cst,
-	//S_hLightfield_deprecated
+	S_hLightfield
 } ;
 
 template <typename PFP> class ApproximatorGen ;

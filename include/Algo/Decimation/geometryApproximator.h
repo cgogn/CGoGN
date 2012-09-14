@@ -119,7 +119,7 @@ public:
 	}
 	~Approximator_HalfCollapse()
 	{}
-	ApproximatorType getType() const { return A_HalfCollapse ; }
+	ApproximatorType getType() const { return A_hHalfCollapse ; }
 	bool init() ;
 	void approximate(Dart d) ;
 } ;

@@ -53,7 +53,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		case Algo::Decimation::A_MidEdge : {
 			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v)) ;
 			break ; }
-		case Algo::Decimation::A_HalfCollapse : {
+		case Algo::Decimation::A_hHalfCollapse : {
 			Algo::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Decimation::Predictor_HalfCollapse<PFP>(m_map, positionsTable) ;
 			m_predictors.push_back(pred) ;
 			m_approximators.push_back(new Algo::Decimation::Approximator_HalfCollapse<PFP>(m_map, pos_v, pred)) ;
@@ -307,7 +307,7 @@ void ProgressiveMesh<PFP>::refine()
 				detailTransform = &invLocalFrame ;
 
 			(*pit)->affectPredict(d) ;
-			if((*ait)->getType() == Algo::Decimation::A_HalfCollapse)
+			if((*ait)->getType() == Algo::Decimation::A_hHalfCollapse)
 			{
 				(*ait)->addDetail(dd, m_detailAmount, true, detailTransform) ;
 			}

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __COLOR_APPROXIMATOR_H__
-#define __COLOR_APPROXIMATOR_H__
+#ifndef __LIGHTFIELD_APPROXIMATOR_H__
+#define __LIGHTFIELD_APPROXIMATOR_H__
 
 #include "Algo/Decimation/approximator.h"
 #include "Topology/generic/mapBrowser.h"
@@ -38,7 +38,7 @@ namespace Decimation
 {
 
 template <typename PFP>
-class Approximator_ColorNaive : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_FrameHalf : public Approximator<PFP, typename PFP::VEC3>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -46,29 +46,30 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<VEC3> m_position ;
-	EdgeAttribute<VEC3> m_approxposition ;
-	VertexAttribute<VEC3> *m_color ;
+	VertexAttribute<VEC3> *m_frameT ;
+	VertexAttribute<VEC3> *m_frameB ;
+	VertexAttribute<VEC3> *m_frameN ;
 
 public:
-	Approximator_ColorNaive(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_FrameHalf(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, attr, pred)
 	{
-		m_color = this->m_attrV[0] ;
-		assert(m_color->isValid() || !"Approximator_ColorNaive: the approximated attribute is not valid") ;
+		if (this->m_attrV.size() < 1)
+			std::cerr << "Approximator_Frame: not enough attributes provided (only " << this->m_attrV.size() << " instead of 3)" << std::endl ;
 
-		m_position = this->m_map.template getAttribute<VEC3, VERTEX>("position") ;
-		assert(m_position.isValid() || !"Approximator_ColorNaive: the position attribute is not valid") ;
-
-		m_approxposition = this->m_map.template getAttribute<VEC3, EDGE>("approx_position") ;
-		assert(m_approxposition.isValid() || !"Approximator_ColorNaive: the approx_position attribute is not valid") ;
+		m_frameT = this->m_attrV[0] ;
+		m_frameB = this->m_attrV[1] ;
+		m_frameN = this->m_attrV[2] ;
+		assert(m_frameT->isValid() || !"Approximator_FrameHalf: the first approximated attribute is not valid") ;
+		assert(m_frameB->isValid() || !"Approximator_FrameHalf: the second approximated attribute is not valid") ;
+		assert(m_frameN->isValid() || !"Approximator_FrameHalf: the third approximated attribute is not valid") ;
 	}
-	~Approximator_ColorNaive()
+	~Approximator_FrameHalf()
 	{}
 
 	ApproximatorType getType() const
 	{
-		return A_ColorNaive ;
+		return A_hLightfieldHalf ;
 	}
 
 	bool init()
@@ -78,49 +79,41 @@ public:
 
 	void approximate(Dart d) ;
 } ;
-
+/*
 template <typename PFP>
-class Approximator_ColorQEMext : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_LightfieldCoefsHalf : public Approximator<PFP, typename PFP::VEC3>
 {
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef Geom::Vector<6,REAL> VEC6 ;
-
-protected:
-	VertexAttribute<QuadricNd<REAL,6> > m_quadric ;
-	VertexAttribute<VEC3> *m_position ;
-	VertexAttribute<VEC3> *m_color ;
+	typedef typename PFP::REAL REAL ;
 
 public:
-	Approximator_ColorQEMext(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+	Approximator_LightfieldCoefsHalf(MAP& m, std::vector<VertexAttribute<VEC3> >& attr, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, attr, pred)
-	{
-		assert(attr.size() > 1 || !"Approximator_ColorQEMext: there are not sufficient attributes provided") ;
-
-		m_position = this->m_attrV[0] ;
-		m_color = this->m_attrV[1] ;
-	}
-	~Approximator_ColorQEMext()
+	{}
+	~Approximator_LightfieldCoefsHalf()
 	{}
 
 	ApproximatorType getType() const
 	{
-		return A_ColorQEMext ;
+		return A_LightfieldHalf ;
 	}
 
-	bool init() ;
+	bool init()
+	{
+		return true ;
+	}
 
 	void approximate(Dart d) ;
 } ;
-
+*/
 } //namespace Decimation
 
 } //namespace Algo
 
 } //namespace CGoGN
 
-#include "Algo/Decimation/colorPerVertexApproximator.hpp"
+#include "Algo/Decimation/lightfieldApproximator.hpp"
 
 #endif

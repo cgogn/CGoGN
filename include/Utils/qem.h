@@ -165,6 +165,160 @@ private:
 	}
 } ;
 
+template <typename REAL, unsigned int N>
+class QuadricNd
+{
+public:
+	static std::string CGoGNnameOfType() { return "QuadricNd" ; }
+
+	typedef Geom::Vector<N,REAL> VECN ;
+	typedef Geom::Vector<N+1,REAL> VECNp ;
+	typedef Geom::Matrix<N,N,double> MATRIXNN ; // double is crucial here !
+	typedef Geom::Matrix<N+1,N+1,double> MATRIXNpNp ; // double is crucial here !
+
+	QuadricNd()
+	{
+		Q.zero() ;
+	}
+
+	QuadricNd(int i)
+	{
+		Q.zero() ;
+	}
+
+	QuadricNd(const VECN& p1_r, const VECN& p2_r, const VECN& p3_r)
+	{
+		const Geom::Vector<N,double>& p1 = p1_r ;
+		const Geom::Vector<N,double>& p2 = p2_r ;
+		const Geom::Vector<N,double>& p3 = p3_r ;
+
+		Geom::Vector<N,double> e1 = p2 - p1 ; 						e1.normalize() ;
+		Geom::Vector<N,double> e2 = p3 - p1 - (e1*(p3-p1))*e1 ; 	e2.normalize() ;
+
+		MATRIXNN A ;
+		A.identity() ;
+		A -= (Geom::transposed_vectors_mult(e1,e1) + Geom::transposed_vectors_mult(e2,e2)) ;
+
+		const Geom::Vector<N,double>& b = (p1*e1)*e1 + (p1*e2)*e2 - p1 ;
+
+		const REAL& c = p1*p1 - pow((p1*e1),2) - pow((p1*e2),2) ;
+
+		/*
+		 * Build Q
+		 *     |-----------|
+		 * Q = |-  A  - b -|
+		 *     |-----------|
+		 *     |- b^T - c -|
+		 */
+		Q.setSubMatrix(0,0,A) ;
+		Q.setSubVectorH(N,0,b) ;
+		Q.setSubVectorV(N,0,b) ;
+		Q(N,N) = c ;
+	}
+
+	void zero()
+	{
+		Q.zero() ;
+	}
+
+	void operator= (const QuadricNd<REAL,N>& q)
+	{
+		Q = q.Q ;
+	}
+	QuadricNd& operator+= (const QuadricNd<REAL,N>& q)
+	{
+		Q += q.Q ;
+		return *this ;
+	}
+	QuadricNd& operator -= (const QuadricNd<REAL,N>& q)
+	{
+		Q -= q.Q ;
+		return *this ;
+	}
+	QuadricNd& operator *= (REAL v)
+	{
+		Q *= v ;
+		return *this ;
+	}
+	QuadricNd& operator /= (REAL v)
+	{
+		Q /= v ;
+		return *this ;
+	}
+
+	REAL operator() (const VECNp& v) const
+	{
+		return evaluate(v) ;
+	}
+
+	REAL operator() (const VECN& v) const
+	{
+		VECNp hv ;
+		for (unsigned int i = 0 ; i < N ; ++i)
+			hv[i] = v[i] ;
+		hv[N] = 1.0f ;
+
+		return evaluate(hv) ;
+	}
+
+	friend std::ostream& operator<<(std::ostream& out, const QuadricNd<REAL,N>& q)
+	{
+		out << q.Q ;
+		return out ;
+	}
+
+	friend std::istream& operator>>(std::istream& in, QuadricNd<REAL,N>& q)
+	{
+		in >> q.Q ;
+		return in ;
+	}
+
+	bool findOptimizedPos(VECN& v)
+	{
+		VECNp hv ;
+		bool b = optimize(hv) ;
+		if(b)
+		{
+			for (unsigned int i = 0 ; i < N ; ++i)
+				v[i] = hv[i] ;
+		}
+		return b ;
+	}
+
+private:
+	MATRIXNpNp Q ;
+
+	REAL evaluate(const VECNp& v) const
+	{
+		// Double computation is crucial for stability
+		Geom::Vector<N+1, double> Qv = Q * v ;
+		return v * Qv ;
+	}
+
+	bool optimize(VECNp& v) const
+	{
+		if (std::isnan(Q(0,0)))
+			return false ;
+
+		MATRIXNpNp Q2(Q) ;
+		for(unsigned int i = 0; i < N; ++i)
+			Q2(N,i) = 0.0f ;
+		Q2(N,N) = 1.0f ;
+
+		MATRIXNpNp Qinv ;
+		REAL det = Q2.invert(Qinv) ;
+
+		if(det > -1e-6 && det < 1e-6)
+			return false ;
+
+		VECNp right(0) ;
+		right[N] = 1 ; // last element
+		v = Qinv * right ;
+
+		return true;
+	}
+} ;
+
 
 //} // Utils
 

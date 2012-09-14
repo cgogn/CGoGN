@@ -48,9 +48,6 @@ void decimate(
 		case A_QEM :
 			approximators.push_back(new Approximator_QEM<PFP>(map, v_pos)) ;
 			break ;
-		case A_hQEM :
-			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, v_pos)) ;
-			break ;
 		case A_MidEdge :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, v_pos)) ;
 			break ;
@@ -63,19 +60,57 @@ void decimate(
 		case A_TangentPredict2 :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, v_pos)) ;
 			break ;
-		case A_HalfCollapse :
+		case A_hHalfCollapse :
 			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_pos)) ;
 			break ;
-		case A_hColor :
+		case A_ColorNaive :
+		{
 			// pos
-			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_pos)) ;
+			approximators.push_back(new Approximator_QEM<PFP>(map, v_pos)) ;
 
 			// col
 			std::vector<VertexAttribute<typename PFP::VEC3>* > v_col ;
 			VertexAttribute<typename PFP::VEC3> colors = map.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
 			v_col.push_back(&colors) ;
-			approximators.push_back(new Approximator_Color<PFP>(map, v_col)) ;
-			break ;
+			approximators.push_back(new Approximator_ColorNaive<PFP>(map, v_col)) ;
+		}
+		break ;
+		case A_ColorQEMext :
+		{
+			// pos+col
+			std::vector<VertexAttribute<typename PFP::VEC3>* > v_poscol ;
+			v_poscol.push_back(&position) ; // pos
+			VertexAttribute<typename PFP::VEC3> colors = map.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+			v_poscol.push_back(&colors) ; // col
+			approximators.push_back(new Approximator_ColorQEMext<PFP>(map, v_poscol)) ;
+		}
+		break;
+		case A_hQEM :
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, v_pos)) ;
+		break ;
+		case A_hLightfieldHalf :
+		{
+			// pos
+			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_pos)) ;
+
+			// frame
+			std::vector<VertexAttribute<typename PFP::VEC3>* > v_frame ;
+			VertexAttribute<typename PFP::VEC3> FT = map.template getAttribute<typename PFP::VEC3, VERTEX>("frameT") ;
+			VertexAttribute<typename PFP::VEC3> FB = map.template getAttribute<typename PFP::VEC3, VERTEX>("frameB") ;
+			VertexAttribute<typename PFP::VEC3> FN = map.template getAttribute<typename PFP::VEC3, VERTEX>("frameN") ;
+			v_frame.push_back(&FT) ;
+			v_frame.push_back(&FB) ;
+			v_frame.push_back(&FN) ;
+			approximators.push_back(new Approximator_FrameHalf<PFP>(map, v_frame)) ;
+
+//			TODO
+//			// function coefs
+//			std::vector<VertexAttribute<typename PFP::VEC3>* > v_coefs ;
+//			VertexAttribute<typename PFP::VEC3> coefs = map.template getAttribute<typename PFP::VEC3, VERTEX>("SLFcoefs_0") ;
+//			v_frame.push_back(&coefs) ;
+//			approximators.push_back(new Approximator_LFcoefs<PFP>(map, v_coefs)) ;
+		}
+		break ;
 		/*case A_LightfieldHalf:
 			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, position)) ;
 
@@ -177,14 +212,14 @@ void decimate(
 		case S_MinDetail :
 			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators, selected) ;
 			break ;
-		/*case S_hLightfield_deprecated :
-			selector = new HalfEdgeSelector_Lightfield_deprecated<PFP>(map, position, approximators, selected) ;
-			break ;*/
+		case S_ColorNaive :
+			selector = new EdgeSelector_ColorNaive<PFP>(map, position, approximators, selected) ;
+			break ;
 		case S_hQEMml :
 			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
 			break ;
-		case S_hColor :
-			selector = new HalfEdgeSelector_Color<PFP>(map, position, approximators, selected) ;
+		case S_hLightfield :
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
 			break ;
 	}
 

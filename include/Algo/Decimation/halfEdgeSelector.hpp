@@ -278,12 +278,12 @@ void HalfEdgeSelector_QEMml<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 }
 
 /************************************************************************************
- *                         HALFEDGESELECTOR COLOR PER VERTEX                        *
+ *                         HALFEDGESELECTOR LIGHTFIELD                              *
  ************************************************************************************/
-
 template <typename PFP>
-bool HalfEdgeSelector_Color<PFP>::init()
+bool HalfEdgeSelector_Lightfield<PFP>::init()
 {
+	// TODO
 	MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
@@ -299,11 +299,14 @@ bool HalfEdgeSelector_Color<PFP>::init()
 			assert(m_positionApproximator->getType() != A_QEM) ; // A_QEM is not compatible for half-edge crit
 			++ok ;
 		}
-		else if( ok == 1 && (*it)->getApproximatedAttributeName(0) == "color")
-		{
-			m_colorApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // 2) color (needs position)
-			++ok ;
-		}
+		else
+			if( ok == 1 && (*it)->getApproximatedAttributeName(0) == "frameT")
+				if( ok == 1 && (*it)->getApproximatedAttributeName(1) == "frameB")
+					if( ok == 1 && (*it)->getApproximatedAttributeName(2) == "frameN")
+					{
+						m_frameApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // 2) frame (needs position)
+						++ok ;
+					}
 	}
 
 	if(ok != 2)
@@ -352,7 +355,7 @@ bool HalfEdgeSelector_Color<PFP>::init()
 }
 
 template <typename PFP>
-bool HalfEdgeSelector_Color<PFP>::nextEdge(Dart& d)
+bool HalfEdgeSelector_Lightfield<PFP>::nextEdge(Dart& d)
 {
 	if(cur == halfEdges.end() || halfEdges.empty())
 		return false ;
@@ -361,7 +364,7 @@ bool HalfEdgeSelector_Color<PFP>::nextEdge(Dart& d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Color<PFP>::updateBeforeCollapse(Dart d)
+void HalfEdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
@@ -401,8 +404,8 @@ void HalfEdgeSelector_Color<PFP>::updateBeforeCollapse(Dart d)
  * @param dart d
  */
 template <typename PFP>
-void HalfEdgeSelector_Color<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
-{
+void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
+{	// TODO
 	Dart dFront,dBack ;
 	Dart dInit = d ;
 
@@ -428,10 +431,11 @@ void HalfEdgeSelector_Color<PFP>::recomputeQuadric(const Dart d, const bool reco
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Color<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
 
+	// TODO
 	recomputeQuadric(d2, true) ;
 
 	Dart vit = d2 ;
@@ -466,12 +470,11 @@ void HalfEdgeSelector_Color<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
-
 	cur = halfEdges.begin() ; // set the current edge to the first one
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Color<PFP>::initHalfEdgeInfo(Dart d)
+void HalfEdgeSelector_Lightfield<PFP>::initHalfEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
 	HalfEdgeInfo heinfo ;
@@ -484,7 +487,7 @@ void HalfEdgeSelector_Color<PFP>::initHalfEdgeInfo(Dart d)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Color<PFP>::updateHalfEdgeInfo(Dart d, bool recompute)
+void HalfEdgeSelector_Lightfield<PFP>::updateHalfEdgeInfo(Dart d, bool recompute)
 {
 	MAP& m = this->m_map ;
 	HalfEdgeInfo& heinfo = halfEdgeInfo[d] ;
@@ -516,8 +519,8 @@ void HalfEdgeSelector_Color<PFP>::updateHalfEdgeInfo(Dart d, bool recompute)
 }
 
 template <typename PFP>
-void HalfEdgeSelector_Color<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
-{
+void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
+{	// TODO
 	MAP& m = this->m_map ;
 	Dart dd = m.phi1(d) ;
 
@@ -530,25 +533,33 @@ void HalfEdgeSelector_Color<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 	VEC3 newPos = this->m_positionApproximator->getApprox(d) ; // get newPos
 
 	// New Frame
-	this->m_colorApproximator->approximate(d) ; 		// sets new color
-	VEC3 newColor = this->m_colorApproximator->getApprox(d) ; // get new color
+	this->m_frameApproximator->approximate(d) ; 		// sets new color
+	const VEC3& newFN = this->m_frameApproximator->getApprox(d,2) ; // get new frameN
 
-	// Compute error
-	VEC3 colDiff1 = newColor ;
-	VEC3 colDiff2 = newColor ;
-	VEC3 oldCol1 = m_color[d] ;
-	VEC3 oldCol2 = m_color[dd] ;
-	colDiff1 -= oldCol1 ;
-	colDiff2 -= oldCol2 ;
+	// Compute hemisphere difference error
+	double scal1 = abs(double(m_frameN[d] * newFN)) ;
+	scal1 = std::min(scal1, double(1)) ; // for epsilon normalization of newFN errors
+	double alpha = acos(scal1) ;
 
-	// sum of QEM metric and squared difference between new color and old colors
-	REAL err = quad(newPos) + colDiff1.norm2() + colDiff2.norm2() ;
-	std::cout << quad(newPos) << " vs " << colDiff1.norm2() + colDiff2.norm2() << std::endl ;
+	double scal2 = abs(double(m_frameN[dd] * newFN)) ;
+	scal2 = std::min(scal2, double(1)) ;
+	alpha += acos(scal2) ;
+
+	// Sum of abs values works only if newFN is in-between the two old ones (interpolated).
+	// This avoids computation of the sign of alpha1 and alpha2.
+
+	std::cout << quad(newPos) << " vs " << ((alpha <= M_PI/2.) ? sin(alpha)/2. : 1 - sin(alpha)/2.) << std::endl ;
+
+	// sum of QEM metric and frame orientation difference
+	REAL err =
+			quad(newPos) // geom
+			+ ((alpha <= M_PI/2.) ? sin(alpha)/2. : 1 - sin(alpha)/2.) // frame
+			//TODO // function coefficients
+			 ;
 
 	heinfo.it = halfEdges.insert(std::make_pair(err, d)) ;
 	heinfo.valid = true ;
 }
-
 
 ///************************************************************************************
 // *                         HALFEDGESELECTOR LIGHTFIELD                              *

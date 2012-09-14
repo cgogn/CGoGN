@@ -39,14 +39,16 @@ namespace Decimation
 enum ApproximatorType
 {
 	A_QEM,
-	A_hQEM,
 	A_MidEdge,
-	A_HalfCollapse,
 	A_CornerCutting,
 	A_TangentPredict1,
 	A_TangentPredict2,
-	A_hColor
-	/*A_LightfieldHalf,
+	A_ColorNaive,
+	A_ColorQEMext,
+	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
+	A_hHalfCollapse,
+	A_hQEM,
+	A_hLightfieldHalf/*,
 	A_LightfieldHalf_deprecated,
 	A_LightfieldFull_deprecated*/
 } ;
@@ -99,15 +101,17 @@ public:
 	Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) :
 		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
 	{
+		assert(m_attrV.size() > 0 || !"Approximator: no attributes provided") ;
+
 		m_approx.resize(m_attrV.size()) ;
 		m_detail.resize(m_attrV.size()) ;
 		m_app.resize(m_attrV.size()) ;
 
-		if (m_attrV.size() < 1)
-			std::cerr << "Approximator: no attributes provided" << std::endl ;
-
 		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 		{
+			if (!m_attrV[i]->isValid())
+				std::cerr << "Approximator Warning: attribute number " << i << " is not valid" << std::endl ;
+
 			std::stringstream aname ;
 			aname << "approx_" << m_attrV[i]->name() ;
 			m_approx[i] = this->m_map.template addAttribute<T, EDGE>(aname.str()) ;

@@ -22,15 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __DECIMATION_H__
-#define __DECIMATION_H__
-
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/halfEdgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/colorPerVertexApproximator.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
-
 namespace CGoGN
 {
 
@@ -40,23 +31,20 @@ namespace Algo
 namespace Decimation
 {
 
+/************************************************************************************
+ *                      HALF-CONTRACTION FRAME APPROXIMATOR                         *
+ ************************************************************************************/
+
 template <typename PFP>
-void decimate(
-	typename PFP::MAP& map,
-	SelectorType s,
-	ApproximatorType a,
-	VertexAttribute<typename PFP::VEC3>& position,
-	unsigned int nbWantedVertices,
-	const FunctorSelect& selected = allDarts,
-	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
-) ;
+void Approximator_FrameHalf<PFP>::approximate(Dart d)
+{
+	this->m_approx[0][d] = m_frameT->operator[](d) ;
+	this->m_approx[1][d] = m_frameB->operator[](d) ;
+	this->m_approx[2][d] = m_frameN->operator[](d) ;
+}
 
 } //namespace Decimation
 
 } //namespace Algo
 
 } //namespace CGoGN
-
-#include "Algo/Decimation/decimation.hpp"
-
-#endif
