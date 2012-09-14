@@ -1361,9 +1361,9 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 		{
 			m_poscolApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // pos + col
 			// check incompatibilities
-			assert(m_positionApproximator->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-			assert(m_positionApproximator->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-			assert(m_positionApproximator->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (ColorNaive) are not compatible") ;
+			assert(m_poscolApproximator->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
+			assert(m_poscolApproximator->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
+			assert(m_poscolApproximator->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (ColorNaive) are not compatible") ;
 
 			ok = true ;
 		}
