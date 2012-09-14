@@ -16,7 +16,7 @@ SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib  ")
 SET ( WITH_QT ON CACHE BOOL "build CGoGN with Qt lib  ")
 SET ( WITH_NUMERICAL ON CACHE BOOL "build CGoGN with Numerical libs support ")
 # for CGoGN MR
-SET ( FORCE_MR "2" CACHE STRING "0:none / 1 force multi / 2: force mono")
+SET ( FORCE_MR "0" CACHE STRING "0: normal mode / 1 multires mode")
 #create one big lib
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib")
 
@@ -46,12 +46,6 @@ IF (FORCE_MR EQUAL 1)
 	add_definitions(-DCGoGN_FORCE_MR=1)
 	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "1" )
 ENDIF (FORCE_MR EQUAL 1)
-
-IF (FORCE_MR EQUAL 2)
-	add_definitions(-DCGoGN_FORCE_MR=2)
-	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "2" )
-ENDIF (FORCE_MR EQUAL 2)
-
 
 
 IF (ONELIB)

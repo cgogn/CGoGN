@@ -126,11 +126,9 @@ protected:
 	 * is map a multiresolution map
 	 */
 #ifndef CGoGN_FORCE_MR
-	bool m_isMultiRes;
-#elif CGoGN_FORCE_MR == 1
-	static const bool m_isMultiRes = true ;
-#else
 	static const bool m_isMultiRes = false ;
+#else
+	static const bool m_isMultiRes = true ;
 #endif
 
 	/**
