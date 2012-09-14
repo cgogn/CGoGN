@@ -1342,6 +1342,265 @@ void EdgeSelector_ColorNaive<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.valid = true ;
 }
 
+/************************************************************************************
+ *                         EDGESELECTOR QEMext for Color                            *
+ ************************************************************************************/
+template <typename PFP>
+bool EdgeSelector_QEMextColor<PFP>::init()
+{
+	MAP& m = this->m_map ;
+
+	// Verify availability of required approximators
+	bool ok = false ;
+	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
+		it != this->m_approximators.end();
+		++it)
+	{
+		// constraint : 2 approximators in specific order
+		if(ok == 0 && (*it)->getApproximatedAttributeName(0) == "position" && (*it)->getApproximatedAttributeName(1) == "color")
+		{
+			m_poscolApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // pos + col
+			// check incompatibilities
+			assert(m_positionApproximator->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
+			assert(m_positionApproximator->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
+			assert(m_positionApproximator->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (ColorNaive) are not compatible") ;
+
+			ok = true ;
+		}
+	}
+
+	if(!ok)
+		return false ;
+
+	TraversorV<MAP> travV(m);
+	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
+	{
+		QuadricNd<REAL,6> q ;		// create one quadric
+		m_quadric[dit] = q ;		// per vertex
+	}
+
+	// Compute quadric per vertex
+	TraversorF<MAP> travF(m) ;
+	for(Dart dit = travF.begin() ; dit != travF.end() ; dit = travF.next()) // init QEM quadrics
+	{
+		Dart d1 = m.phi1(dit) ;					// for each triangle,
+		Dart d_1 = m.phi_1(dit) ;					// initialize the quadric of the triangle
+
+   		VEC6 p0, p1, p2 ;
+   		for (unsigned int i = 0 ; i < 3 ; ++i)
+   		{
+   			p0[i] = this->m_position[dit][i] ;
+   			p0[i+3] = this->m_color[dit][i] ;
+   			p1[i] = this->m_position[d1][i] ;
+   			p1[i+3] = this->m_color[d1][i] ;
+   			p2[i] = this->m_position[d_1][i] ;
+   			p2[i+3] = this->m_color[d_1][i] ;
+   		}
+		QuadricNd<REAL,6> q(p0,p1,p2) ;
+		m_quadric[dit] += q ;						// and add the contribution of
+		m_quadric[d1] += q ;						// this quadric to the ones
+		m_quadric[d_1] += q ;						// of the 3 incident vertices
+	}
+
+	TraversorE<MAP> travE(m);
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	{
+		initEdgeInfo(dit) ; // init the edges with their optimal position
+							// and insert them in the multimap according to their error
+	}
+
+	cur = edges.begin() ; // init the current edge to the first one
+
+	return true ;
+}
+
+template <typename PFP>
+bool EdgeSelector_QEMextColor<PFP>::nextEdge(Dart& d)
+{
+	if(cur == edges.end() || edges.empty())
+		return false ;
+	d = (*cur).second ;
+	return true ;
+}
+
+template <typename PFP>
+void EdgeSelector_QEMextColor<PFP>::updateBeforeCollapse(Dart d)
+{
+	MAP& m = this->m_map ;
+
+	EdgeInfo& edgeE = edgeInfo[d] ;
+	if(edgeE.valid)
+		edges.erase(edgeE.it) ;
+
+	edgeE = edgeInfo[m.phi1(d)] ;
+	if(edgeE.valid)						// remove all
+		edges.erase(edgeE.it) ;
+
+	edgeE = edgeInfo[m.phi_1(d)] ;	// the edges that will disappear
+	if(edgeE.valid)
+		edges.erase(edgeE.it) ;
+										// from the multimap
+	Dart dd = m.phi2(d) ;
+	if(dd != d)
+	{
+		edgeE = edgeInfo[m.phi1(dd)] ;
+		if(edgeE.valid)
+			edges.erase(edgeE.it) ;
+
+		edgeE = edgeInfo[m.phi_1(dd)] ;
+		if(edgeE.valid)
+			edges.erase(edgeE.it) ;
+	}
+}
+
+/**
+ * Update quadric of a vertex
+ * Discards quadrics of d and assigns freshly calculated
+ * quadrics depending on the actual planes surrounding d
+ * @param dart d
+ */
+template <typename PFP>
+void EdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
+{
+	Dart dFront,dBack ;
+	Dart dInit = d ;
+
+	// Init Front
+	dFront = dInit ;
+
+	m_quadric[d].zero() ;
+
+   	do
+   	{
+   		// Make step
+   		dBack = this->m_map.phi2(dFront) ;
+       	dFront = this->m_map.phi2_1(dFront) ;
+
+       	if (dBack != dFront)
+       	{ // if dFront is no border
+       		VEC6 p0, p1, p2 ;
+       		for (unsigned int i = 0 ; i < 3 ; ++i)
+       		{
+       			Dart d2 = this->m_map.phi2(dFront) ;
+
+       			p0[i] = this->m_position[d][i] ;
+       			p0[i+3] = this->m_color[d][i] ;
+       			p1[i] = this->m_position[d2][i] ;
+       			p1[i+3] = this->m_color[d2][i] ;
+       			p2[i] = this->m_position[dBack][i] ;
+       			p2[i+3] = this->m_color[dBack][i] ;
+       		}
+       		m_quadric[d] += QuadricNd<REAL,6>(p0,p1,p2) ;
+       	}
+       	if (recomputeNeighbors)
+       		recomputeQuadric(dBack, false) ;
+
+    } while(dFront != dInit) ;
+}
+
+template <typename PFP>
+void EdgeSelector_QEMextColor<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+
+	recomputeQuadric(d2, true) ;
+
+	Dart vit = d2 ;
+	do
+	{
+		updateEdgeInfo(m.phi1(vit), true) ;			// must recompute some edge infos in the
+		if(vit == d2 || vit == dd2)					// neighborhood of the collapsed edge
+			initEdgeInfo(vit) ;						// various optimizations are applied here by
+		else										// treating differently :
+			updateEdgeInfo(vit, true) ;
+
+		Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+		Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
+		do											// - edges for which only the collapsibility must be re-tested
+		{
+			updateEdgeInfo(vit2, true) ;
+			updateEdgeInfo(m.phi1(vit2), false) ;
+			vit2 = m.phi12(vit2) ;
+		} while(vit2 != stop) ;
+
+		vit = m.phi2_1(vit) ;
+	} while(vit != d2) ;
+
+	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_QEMextColor<PFP>::initEdgeInfo(Dart d)
+{
+	MAP& m = this->m_map ;
+	EdgeInfo einfo ;
+	if(m.edgeCanCollapse(d))
+		computeEdgeInfo(d, einfo) ;
+	else
+		einfo.valid = false ;
+	edgeInfo[d] = einfo ;
+}
+
+template <typename PFP>
+void EdgeSelector_QEMextColor<PFP>::updateEdgeInfo(Dart d, bool recompute)
+{
+	MAP& m = this->m_map ;
+	EdgeInfo& einfo = edgeInfo[d] ;
+	if(recompute)
+	{
+		if(einfo.valid)
+			edges.erase(einfo.it) ;		// remove the edge from the multimap
+		if(m.edgeCanCollapse(d))
+			computeEdgeInfo(d, einfo) ;
+		else
+			einfo.valid = false ;
+	}
+	else
+	{
+		if(m.edgeCanCollapse(d))
+		{								 	// if the edge can be collapsed now
+			if(!einfo.valid)				// but it was not before
+				computeEdgeInfo(d, einfo) ;
+		}
+		else
+		{								 // if the edge cannot be collapsed now
+			if(einfo.valid)				 // and it was before
+			{
+				edges.erase(einfo.it) ;
+				einfo.valid = false ;
+			}
+		}
+	}
+}
+
+template <typename PFP>
+void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
+{
+	MAP& m = this->m_map ;
+	Dart dd = m.phi1(d) ;
+
+	// New position
+	QuadricNd<REAL,6> quad ;
+	quad += m_quadric[d] ;	// compute the sum of the
+	quad += m_quadric[dd] ;	// two vertices quadrics
+
+	this->m_poscolApproximator->approximate(d) ; 		// sets newPos
+	VEC3 newPos = this->m_poscolApproximator->getApprox(d,0) ; // get newPos
+	VEC3 newCol = this->m_poscolApproximator->getApprox(d,1) ; // get newCol
+	VEC6 newEmb ;
+	for (unsigned int i = 0 ; i < 3 ; ++i)
+	{
+		newEmb[i] = newPos[i] ;
+		newEmb[i+3] = newCol[i] ;
+	}
+
+	const REAL& err = quad(newEmb) ;
+
+	einfo.it = edges.insert(std::make_pair(err, d)) ;
+	einfo.valid = true ;
+}
+
+
 } // namespace Decimation
 
 } // namespace Algo

@@ -44,6 +44,7 @@ enum SelectorType
 	S_MinDetail,
 	S_Curvature,
 	S_ColorNaive,
+	S_QEMextColor,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	S_hQEMml,
 	S_hLightfield

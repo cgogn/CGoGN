@@ -215,6 +215,9 @@ void decimate(
 		case S_ColorNaive :
 			selector = new EdgeSelector_ColorNaive<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_QEMextColor :
+			selector = new EdgeSelector_QEMextColor<PFP>(map, position, approximators, selected) ;
+			break ;
 		case S_hQEMml :
 			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
 			break ;

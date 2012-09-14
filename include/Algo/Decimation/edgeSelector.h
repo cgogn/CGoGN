@@ -380,7 +380,7 @@ public:
 } ;
 
 /*****************************************************************************************************************
- *                                 HALF-EDGE NAIVE COLOR METRIC (using QEMml)                                    *
+ *                                      EDGE NAIVE COLOR METRIC (using QEMml)                                    *
  *****************************************************************************************************************/
 template <typename PFP>
 class EdgeSelector_ColorNaive : public EdgeSelector<PFP>
@@ -438,6 +438,63 @@ public:
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 } ;
 
+/*****************************************************************************************************************
+ *                                 QEM extended to color metric                                                  *
+ *****************************************************************************************************************/
+template <typename PFP>
+class EdgeSelector_QEMextColor : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<6,REAL> VEC6 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
+	} QEMextColorEdgeInfo ;
+	typedef NoMathIOAttribute<QEMextColorEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	VertexAttribute<VEC3> m_color ;
+	VertexAttribute<QuadricNd<REAL,6> > m_quadric ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, typename PFP::VEC3>* m_poscolApproximator ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	EdgeSelector_QEMextColor(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_poscolApproximator(NULL)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		m_quadric = m.template addAttribute<QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
+
+		m_color = m.template getAttribute<VEC3, VERTEX>("color") ;
+		assert(m_color.isValid() || !"EdgeSelector_ColorNaive: Color atrribute to select is not valid") ;
+	}
+	~EdgeSelector_QEMextColor()
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
+	}
+	SelectorType getType() { return S_QEMextColor ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
 
 } // namespace Decimation
 
