@@ -517,29 +517,29 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 	float ys = m_SY/smin;
 	float zs = m_SZ/smin;
 
+	int radX = ceil(float(_i32radius)/xs);
+	int radY = ceil(float(_i32radius)/ys);
+	int radZ = ceil(float(_i32radius)/zs);
 
-	// compute the width of the sphere for memory allocation
-	int i32Width = 2*_i32radius + 1;
-	// squared radius
-    float fRad2 = (float)(_i32radius*_i32radius);
+	float sRadius = sqrt( double(_i32radius)/xs*double(_i32radius)/xs +  double(_i32radius)/ys*double(_i32radius)/ys +  double(_i32radius)/zs*double(_i32radius)/zs);
 
 	// memory allocation
 	// difficult to know how many voxels before computing,
-	// so the reserve for the BB
-	table.reserve(i32Width*i32Width*i32Width);
+	// so the reserve for the BB (not really a pb)
+	table.reserve(radX*radY*radZ*8);
 	table.clear();
 
 	// scan all the BB of the sphere
-	for (int z = -_i32radius;  z<=_i32radius; z++)
+	for (int z = -radZ; z<radZ; z++)
 	{
-		for (int y = -_i32radius;  y<=_i32radius; y++)
+		for (int y = -radY; y<radY; y++)
 		{
-			for (int x = -_i32radius;  x<=_i32radius; x++)
+			for (int x = -radX; x<radX; x++)
 			{
 				Geom::Vec3f v(float(x)*xs,float(y)*ys,float(z)*zs);
-				float fLength =  v.norm2();
+				float fLength =  v.norm();
 				// if inside the sphere
-				if (fLength<=fRad2)
+				if (fLength<=sRadius)
 				{
 					// the the index of the voxel
 					int index = z * m_WXY + y * m_WX + x;
@@ -551,12 +551,17 @@ void Image<DataType>::createMaskOffsetSphere(std::vector<int>& table, int _i32ra
 }
 
 
+//template<typename DataType>
+//float Image<DataType>::computeCurvatureCount(const DataType *ptrVox, const std::vector<int>& sphere, DataType val)
+
 template<typename DataType>
-float Image<DataType>::computeCurvatureCount(const DataType *ptrVox, const std::vector<int>& sphere, DataType val)
+float Image<DataType>::computeCurvatureCount(float x, float y, float z, const std::vector<int>& sphere, DataType val)
 {
+//	std::cout << "XYZ"<< x << " , "<<y<<" , "<<z <<"   => "<< int(round(x/m_SX)) << " , "<<int(round(y/m_SY))<<" , "<<int(round(z/m_SZ)) << std::endl;
+
 	int noir = 0;
 	int blanc = 0;
-
+	const DataType *ptrVox = this->getVoxelPtr(int(ceil(x)), int(ceil(y)), int(ceil(z)));
 
 	for (std::vector<int>::const_iterator it=sphere.begin(); it!=sphere.end();it++)
 	{
