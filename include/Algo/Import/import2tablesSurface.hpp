@@ -614,7 +614,7 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 		unsigned int id = container.insertLine();
 		positions[id] = pos;
 
-		if (pid.hasColors())
+		if (pid.hasColorsUint8())
 		{
 			Geom::Vector<3, unsigned char> col ;
 			pid.vertexColorUint8(i, col) ;
@@ -623,6 +623,16 @@ bool MeshTablesSurface<PFP>::importPly(const std::string& filename, std::vector<
 			colors[id][2] = col[2] ;
 			colors[id] /= 255.0 ;
 		}
+
+		if (pid.hasColorsFloat32())
+		{
+			Geom::Vector<3, float> col ;
+			pid.vertexColorFloat32(i, col) ;
+			colors[id][0] = col[0] ;
+			colors[id][1] = col[1] ;
+			colors[id][2] = col[2] ;
+		}
+
 
 		verticesID.push_back(id);
 	}
