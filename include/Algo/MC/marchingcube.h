@@ -54,6 +54,13 @@ protected:
 	typedef typename PFP::MAP L_MAP ;
 	typedef Dart L_DART ;
 
+#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+	unsigned int m_zbound;
+	unsigned int m_sliceGroup;
+	EdgeAttribute<unsigned long long>* m_zslice;
+	unsigned int m_currentZSlice;
+#endif
+
 	/**
 	* voxel image
 	*/
@@ -258,6 +265,12 @@ public:
 	void removeFacesOfBoundary(VertexAttribute<unsigned char>& boundVertices, unsigned int frameWidth);
 
 	void recalPoints(const Geom::Vec3f& origin);
+
+
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+	void setZSliceAttrib(EdgeAttribute<unsigned long long>* zsatt, unsigned int zbound, unsigned int nbZone);
+	#endif
+
 };
 
 } // namespace MC

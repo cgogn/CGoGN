@@ -63,8 +63,11 @@ protected:
 public:
 	/**
 	 * init shaders, texture and variables
+	 * @param withColorPerVertex if true use setAttributeColor for per vertex color, else use predraw(color) for global color
+	 * @param radius of sphere
 	 */
-	PointSprite(float radius = 1.0f);
+
+	PointSprite(bool withColorPerVertex=false, float radius=1.0f);
 
 	/**
 	 * clean shaders, texture and variables
@@ -73,8 +76,14 @@ public:
 
 	/**
 	 * call once before sending points to gpu
+	 * @param color set global color of sprites
 	 */
 	void predraw(const Geom::Vec3f& color);
+
+	/**
+	 * call once before sending points to gpu
+	 */
+	void predraw();
 
 	/**
 	 * call once after sending points to gpu
@@ -91,10 +100,14 @@ public:
 	 * set position attribute
 	 */
 	unsigned int setAttributePosition(VBO* vbo);
+
+	/**
+	 * set color attribute
+	 */
+	unsigned int setAttributeColor(VBO* vbo);
 };
 
 } // namespace Utils
 
 } // namespace CGoGN
-
 #endif

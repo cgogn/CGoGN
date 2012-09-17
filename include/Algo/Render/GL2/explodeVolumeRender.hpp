@@ -88,7 +88,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Geometry::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -180,7 +180,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Geometry::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);

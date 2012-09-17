@@ -33,6 +33,8 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <boost/thread/mutex.hpp>
+
 
 #include "Container/attributeContainer.h"
 
@@ -83,6 +85,8 @@ protected:
 
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map ;
 
+	static int m_nbInstances;
+
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
 	 * (only initialized when necessary)
@@ -110,9 +114,13 @@ protected:
 	/**
 	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
 	 */
-	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ;
-	std::vector<DartMarkerGen*> dartMarkers ;
-	std::vector<CellMarkerGen*> cellMarkers ;
+	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!
+	boost::mutex attributeHandlersMutex;
+
+	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
+	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
+
+
 
 	/**
 	 * is map a multiresolution map

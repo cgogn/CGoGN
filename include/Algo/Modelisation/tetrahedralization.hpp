@@ -95,17 +95,24 @@ template <typename PFP>
 void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
 {
 	//mark bad edges
-	DartMarker mBadEdge(map);
+	DartMarkerStore mBadEdge(map);
+
+	std::vector<Dart> vEdge;
+	vEdge.reserve(1024);
 
 //	unsignzed int i = 0;
 
-	DartMarkerStore mEdge(map);
+	unsigned int nbEdges = map.template getNbOrbits<EDGE>();
+	unsigned int i = 0;
 
 	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
 	{
 		//check if this edge is an "ear-edge"
 		if(!mBadEdge.isMarked(dit))
 		{
+			++i;
+			std::cout << i << " / " << nbEdges << std::endl;
+
 			//search three positions
 			typename PFP::VEC3 tris1[3];
 			tris1[0] = position[dit];
@@ -139,7 +146,7 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 					}
 				}
 
-				std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
+				//std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
 
 				if(intersection)
 				{
@@ -147,23 +154,10 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 				}
 				else //cut a tetrahedron
 				{
-					std::cout << "cut cut " << std::endl;
-					Dart dring = map.phi_1(dit);
-					std::vector<Dart> vPath;
-
-					vPath.push_back(map.phi_1(dring));
-					vPath.push_back(map.phi1(map.phi2(dring)));
-					vPath.push_back(map.phi_1(map.phi2(dring)));
-					vPath.push_back(map.phi1(dring));
-
-					map.splitVolume(vPath);
-
-					map.splitFace(map.phi2(map.phi1(dring)), map.phi2(map.phi1(map.phi2(dring))));
-
-					return;
+					vEdge.push_back(dit);
 				}
 
-//				++i;
+
 //
 //				if(i == 16)
 //					return;
@@ -171,6 +165,28 @@ void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VE
 		}
 	}
 
+	std::cout << "nb edges to split = " << vEdge.size() << std::endl;
+	i = 0;
+	for(std::vector<Dart>::iterator it = vEdge.begin() ; it != vEdge.end() ; ++it)
+	{
+		++i;
+		std::cout << i << " / " << vEdge.size() << std::endl;
+
+		Dart dit = *it;
+
+		//std::cout << "cut cut " << std::endl;
+		std::vector<Dart> vPath;
+
+		vPath.push_back(map.phi1(dit));
+		vPath.push_back(map.phi1(map.phi2(map.phi_1(dit))));
+		vPath.push_back(map.phi_1(map.phi2(dit)));
+
+		map.splitVolume(vPath);
+
+		map.splitFace(map.phi2(map.phi1(dit)), map.phi2(map.phi1(map.phi2(dit))));
+	}
+
+	std::cout << "finished " << std::endl;
 }
 
 
@@ -216,12 +232,12 @@ Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd)
  ************************************************************************************************/
 
 template <typename PFP>
-bool isTetrahedron(typename PFP::MAP& the_map, Dart d)
+bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread)
 {
 	unsigned int nbFaces = 0;
 
 	//Test the number of faces end its valency
-	Traversor3WF<typename PFP::MAP> travWF(the_map, d);
+	Traversor3WF<typename PFP::MAP> travWF(the_map, d, false, thread);
 	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
 	{
 		//increase the number of faces
@@ -553,87 +569,91 @@ void swap5To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3
  *							Flip Functions 																	   *
  ************************************************************************************************/
 
+
+
 template <typename PFP>
 void flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
 {
-//	typedef typename PFP::TVEC3 TVEC3;
-//	typedef typename PFP::VEC3 VEC3;
-//
-//
-//	//parcourir le tetra est sauvegarder un brin de chaque face + calcul du centroid
-//	VEC3 volCenter;
-//	unsigned count = 0 ;
-//
-//	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
-//	DartMarkerStore mv(map);		// Lock a vertex marker to compute volume center
-//
-//	std::vector<Dart> visitedFaces;
-//	visitedFaces.reserve(4);
-//	visitedFaces.push_back(d);
-//
-//	mf.markOrbit<FACE>(d) ;
-//
-//	//TODO diminuer complexite avec boucle specifique aux tetras
-//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-//	{
-//		Dart e = visitedFaces[i] ;
-//		do
-//		{
-//			//compute volume centroid
-//			if(!mv.isMarked(e))
-//			{
-//				volCenter += position[e];
-//				++count;
-//				mv.markOrbit<VERTEX>(e);
-//			}
-//
-//			// add all face neighbours to the table
-//			Dart ee = map.phi2(e) ;
-//			if(!mf.isMarked(ee)) // not already marked
-//			{
-//				visitedFaces.push_back(ee) ;
-//				mf.markOrbit<FACE>(ee) ;
-//			}
-//
-//			e = map.phi1(e) ;
-//		} while(e != visitedFaces[i]) ;
-//	}
-//
-//	volCenter /= typename PFP::REAL(count) ;
-//
-//	//store the new faces to 3-sew
-//	std::vector<std::pair<Dart,Dart> > nFaces;
-//	nFaces.reserve(6);
-//
-//	//triangule chaque face avec plongement au centroid
-//	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
-//	{
-//		// on decoud et on ferme le trou
-//		Dart temp = *face;
-//		do
-//		{
-//			nFaces.push_back(std::pair<Dart,Dart>(temp, map.phi2(temp)));
-//			map.unsewFaces(temp);
-//			temp = map.phi1(temp);
-//		}
-//		while(temp != *face);
-//
-//		map.closeHole(*face);
-//
-//		Dart fi = map.phi2(*face);
-//
-//		Dart cd = Algo::Modelisation::trianguleFace<PFP>(map, fi);
-//		position[cd] = volCenter;
-//	}
-//
-//	//coudre les nouveaux brins entre eux par phi3
-//	for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
-//	{
-//
-//		if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
-//			map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
-//	}
+	typedef typename PFP::VEC3 VEC3;
+
+
+	//parcourir le tetra est sauvegarder un brin de chaque face + calcul du centroid
+	VEC3 volCenter;
+	unsigned count = 0 ;
+
+	DartMarkerStore mf(map);		// Lock a face marker to save one dart per face
+	DartMarkerStore mv(map);		// Lock a vertex marker to compute volume center
+
+	std::vector<Dart> visitedFaces;
+	visitedFaces.reserve(4);
+	visitedFaces.push_back(d);
+
+	mf.markOrbit<FACE>(d) ;
+
+	//TODO diminuer complexite avec boucle specifique aux tetras
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	{
+		Dart e = visitedFaces[i] ;
+		do
+		{
+			//compute volume centroid
+			if(!mv.isMarked(e))
+			{
+				volCenter += position[e];
+				++count;
+				mv.markOrbit<VERTEX>(e);
+			}
+
+			// add all face neighbours to the table
+			Dart ee = map.phi2(e) ;
+			if(!mf.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mf.markOrbit<FACE>(ee) ;
+			}
+
+			e = map.phi1(e) ;
+		} while(e != visitedFaces[i]) ;
+	}
+
+	volCenter /= typename PFP::REAL(count) ;
+
+	//store the new faces to 3-sew
+	std::vector<std::pair<Dart,Dart> > nFaces;
+	nFaces.reserve(6);
+
+	//triangule chaque face avec plongement au centroid
+	for (std::vector<Dart>::iterator face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
+	{
+		// on decoud et on ferme le trou
+		Dart temp = *face;
+		do
+		{
+			nFaces.push_back(std::pair<Dart,Dart>(temp, map.phi2(temp)));
+			map.unsewFaces(temp);
+			temp = map.phi1(temp);
+		}
+		while(temp != *face);
+
+		map.PFP::MAP::ParentMap::closeHole(*face);
+
+		Dart fi = map.phi2(*face);
+
+		Dart cd = Algo::Modelisation::trianguleFace<PFP>(map, fi);
+		position[cd] = volCenter;
+	}
+
+	//coudre les nouveaux brins entre eux par phi3
+	for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
+	{
+
+		if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
+			map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
+	}
+
 }
+
+
 
 /************************************************************************************************
  *                 Bisection Functions                                                          *

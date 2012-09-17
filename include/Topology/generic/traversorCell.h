@@ -22,14 +22,13 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversorGen.h"
-
 #ifndef __TRAVERSOR_CELL_H__
 #define __TRAVERSOR_CELL_H__
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorGen.h"
 
 namespace CGoGN
 {
@@ -97,24 +96,6 @@ public:
 	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, good, forceDartMarker, thread)
 	{}
 };
-
-
-template <typename MAP, unsigned int ORBIT>
-class TraversorDartsOfOrbit : public Traversor<MAP>
-{
-private:
-	std::vector<Dart>::iterator m_current ;
-	std::vector<Dart> m_vd ;
-
-public:
-	TraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread = 0) ;
-
-	Dart begin() ;
-
-	Dart end() ;
-
-	Dart next() ;
-} ;
 
 } // namespace CGoGN
 

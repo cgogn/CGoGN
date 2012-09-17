@@ -25,11 +25,12 @@
 #ifndef __VPMESH__
 #define __VPMESH__
 
-#include "Algo/DecimationVolumes/operator.h"
-#include "Algo/DecimationVolumes/selector.h"
-#include "Algo/DecimationVolumes/edgeSelector.h"
-#include "Algo/DecimationVolumes/geometryApproximator.h"
-//#include "Algo/DecimationVolumes/geometryPredictor.h"
+#include "Algo/VolumetricProgressiveMesh/vsplit.h"
+
+#include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/edgeSelector.h"
+#include "Algo/Decimation/geometryApproximator.h"
+#include "Algo/Decimation/geometryPredictor.h"
 
 #include "Utils/quantization.h"
 
@@ -56,23 +57,22 @@ private:
 
 	DartMarker& inactiveMarker ;
 	SelectorUnmarked dartSelect ;
+	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
+	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
+	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
+	std::vector<VSplit<PFP>*> m_splits ;
+	unsigned int m_cur ;
 
-	Algo::DecimationVolumes::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::DecimationVolumes::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::DecimationVolumes::PredictorGen<PFP>*> m_predictors ;
-	Algo::DecimationVolumes::OperatorList<PFP>* m_nodes;
-	unsigned int m_level ;
-
-	Algo::DecimationVolumes::Approximator<PFP, VEC3>* m_positionApproximator ;
+	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
 
 	bool m_initOk ;
 
 
 public:
 	VolumetricProgressiveMesh(
-		MAP& map, DartMarker& inactive,
-		Algo::DecimationVolumes::SelectorType s, Algo::DecimationVolumes::ApproximatorType a,
-		VertexAttribute<typename PFP::VEC3>& position
+			MAP& map, DartMarker& inactive,
+			Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a,
+			VertexAttribute<typename PFP::VEC3>& position
 	) ;
 
 	~VolumetricProgressiveMesh() ;
@@ -80,9 +80,21 @@ public:
 	bool initOk() { return m_initOk ; }
 
 	void createPM(unsigned int percentWantedVertices) ;
+
+	std::vector<VSplit<PFP>*>& splits() { return m_splits ; }
+	Algo::Decimation::EdgeSelector<PFP>* selector() { return m_selector ; }
+	std::vector<Algo::Decimation::ApproximatorGen<PFP>*>& approximators() { return m_approximators ; }
+	std::vector<Algo::Decimation::PredictorGen<PFP>*>& predictors() { return m_predictors ; }
+
+	void edgeCollapse(VSplit<PFP>* vs) ;
+	void vertexSplit(VSplit<PFP>* vs) ;
+
+	void coarsen() ;
+	void refine() ;
+
 	void gotoLevel(unsigned int l) ;
-	unsigned int& currentLevel() { return m_level ; }
-	unsigned int nbSplits() { return m_nodes.size() ; }
+	unsigned int& currentLevel() { return m_cur ; }
+	unsigned int nbSplits() { return m_splits.size() ; }
 
 } ;
 
