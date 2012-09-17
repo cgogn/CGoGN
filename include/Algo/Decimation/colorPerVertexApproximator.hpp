@@ -127,7 +127,7 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 	quad += q2 ;	// two vertices quadrics
 
 	VEC6 res ;
-	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
+	bool opt = quad.findOptimizedVec(res) ;	// try to compute an optimized position for the contraction of this edge
 	if(!opt)
 	{
 		VEC6 p1, p2 ;
@@ -155,8 +155,8 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 	// copy res into m_approx
 	for (unsigned int i = 0 ; i < 3 ; ++i)
 	{
-		this->m_approx[0][d] = res[i] ;
-		this->m_approx[1][d] = res[i+3] ;
+		this->m_approx[0][d][i] = res[i] ;
+		this->m_approx[1][d][i] = res[i+3] ;
 	}
 }
 

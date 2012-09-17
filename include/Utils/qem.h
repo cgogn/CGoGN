@@ -173,17 +173,19 @@ public:
 
 	typedef Geom::Vector<N,REAL> VECN ;
 	typedef Geom::Vector<N+1,REAL> VECNp ;
-	typedef Geom::Matrix<N,N,double> MATRIXNN ; // double is crucial here !
-	typedef Geom::Matrix<N+1,N+1,double> MATRIXNpNp ; // double is crucial here !
 
 	QuadricNd()
 	{
-		Q.zero() ;
+		A.zero() ;
+		b.zero() ;
+		c = 0 ;
 	}
 
 	QuadricNd(int i)
 	{
-		Q.zero() ;
+		A.zero() ;
+		b.zero() ;
+		c = 0 ;
 	}
 
 	QuadricNd(const VECN& p1_r, const VECN& p2_r, const VECN& p3_r)
@@ -193,132 +195,122 @@ public:
 		const Geom::Vector<N,double>& p3 = p3_r ;
 
 		Geom::Vector<N,double> e1 = p2 - p1 ; 						e1.normalize() ;
-		Geom::Vector<N,double> e2 = p3 - p1 - (e1*(p3-p1))*e1 ; 	e2.normalize() ;
+		Geom::Vector<N,double> e2 = (p3 - p1) - (e1*(p3-p1))*e1 ; 	e2.normalize() ;
 
-		MATRIXNN A ;
 		A.identity() ;
-		A -= (Geom::transposed_vectors_mult(e1,e1) + Geom::transposed_vectors_mult(e2,e2)) ;
+		A -= Geom::transposed_vectors_mult(e1,e1) + Geom::transposed_vectors_mult(e2,e2) ;
 
-		const Geom::Vector<N,double>& b = (p1*e1)*e1 + (p1*e2)*e2 - p1 ;
+		b = (p1*e1)*e1 + (p1*e2)*e2 - p1 ;
 
-		const REAL& c = p1*p1 - pow((p1*e1),2) - pow((p1*e2),2) ;
-
-		/*
-		 * Build Q
-		 *     |-----------|
-		 * Q = |-  A  - b -|
-		 *     |-----------|
-		 *     |- b^T - c -|
-		 */
-		Q.setSubMatrix(0,0,A) ;
-		Q.setSubVectorH(N,0,b) ;
-		Q.setSubVectorV(N,0,b) ;
-		Q(N,N) = c ;
+		c = p1*p1 - pow((p1*e1),2) - pow((p1*e2),2) ;
 	}
 
 	void zero()
 	{
-		Q.zero() ;
+		A.zero() ;
+		b.zero() ;
+		c = 0 ;
 	}
 
 	void operator= (const QuadricNd<REAL,N>& q)
 	{
-		Q = q.Q ;
+		A = q.A ;
+		b = q.b ;
+		c = q.c ;
 	}
 	QuadricNd& operator+= (const QuadricNd<REAL,N>& q)
 	{
-		Q += q.Q ;
+		A += q.A ;
+		b += q.b ;
+		c += q.c ;
 		return *this ;
 	}
+
 	QuadricNd& operator -= (const QuadricNd<REAL,N>& q)
 	{
-		Q -= q.Q ;
+		A -= q.A ;
+		b -= q.b ;
+		c -= q.c ;
 		return *this ;
 	}
+
 	QuadricNd& operator *= (REAL v)
 	{
-		Q *= v ;
+		A *= v ;
+		b *= v ;
+		c *= v ;
 		return *this ;
 	}
 	QuadricNd& operator /= (REAL v)
 	{
-		Q /= v ;
+		A /= v ;
+		b /= v ;
+		c /= v ;
 		return *this ;
 	}
 
 	REAL operator() (const VECNp& v) const
 	{
+		VECN hv ;
+		for (unsigned int i = 0 ; i < N ; ++i)
+			hv[i] = v[i] ;
+
 		return evaluate(v) ;
 	}
 
 	REAL operator() (const VECN& v) const
 	{
-		VECNp hv ;
-		for (unsigned int i = 0 ; i < N ; ++i)
-			hv[i] = v[i] ;
-		hv[N] = 1.0f ;
-
-		return evaluate(hv) ;
+		return evaluate(v) ;
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const QuadricNd<REAL,N>& q)
 	{
-		out << q.Q ;
+		out << "(" << q.A << ", " << q.b << ", " << q.c << ")" ;
 		return out ;
 	}
 
 	friend std::istream& operator>>(std::istream& in, QuadricNd<REAL,N>& q)
 	{
-		in >> q.Q ;
+		in >> q.A ;
+		in >> q.b ;
+		in >> q.c ;
 		return in ;
 	}
 
-	bool findOptimizedPos(VECN& v)
+	bool findOptimizedVec(VECN& v)
 	{
-		VECNp hv ;
-		bool b = optimize(hv) ;
-		if(b)
-		{
-			for (unsigned int i = 0 ; i < N ; ++i)
-				v[i] = hv[i] ;
-		}
-		return b ;
+		return optimize(v) ;
 	}
 
 private:
-	MATRIXNpNp Q ;
+	// Double computation is crucial for stability
+	Geom::Matrix<N,N,double> A ;
+	Geom::Vector<N,double> b ;
+	double c ;
 
-	REAL evaluate(const VECNp& v) const
+	REAL evaluate(const VECN& v) const
 	{
-		// Double computation is crucial for stability
-		Geom::Vector<N+1, double> Qv = Q * v ;
-		return v * Qv ;
+		Geom::Vector<N, double> v_d = v ;
+		return v_d*A*v_d + 2.*(b*v_d) + c ;
 	}
 
-	bool optimize(VECNp& v) const
+	bool optimize(VECN& v) const
 	{
-		if (std::isnan(Q(0,0)))
+		if (std::isnan(A(0,0)))
 			return false ;
 
-		MATRIXNpNp Q2(Q) ;
-		for(unsigned int i = 0; i < N; ++i)
-			Q2(N,i) = 0.0f ;
-		Q2(N,N) = 1.0f ;
-
-		MATRIXNpNp Qinv ;
-		REAL det = Q2.invert(Qinv) ;
+		Geom::Matrix<N,N,double> Ainv ;
+		double det = A.invert(Ainv) ;
 
 		if(det > -1e-6 && det < 1e-6)
 			return false ;
 
-		VECNp right(0) ;
-		right[N] = 1 ; // last element
-		v = Qinv * right ;
+		v.zero() ;
+		v -= Ainv * b ;
 
-		return true;
+		return true ;
 	}
 } ;
-
 
 //} // Utils
 

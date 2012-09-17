@@ -1357,7 +1357,7 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 		++it)
 	{
 		// constraint : 2 approximators in specific order
-		if(ok == 0 && (*it)->getApproximatedAttributeName(0) == "position" && (*it)->getApproximatedAttributeName(1) == "color")
+		if((*it)->getApproximatedAttributeName(0) == "position" && (*it)->getApproximatedAttributeName(1) == "color")
 		{
 			m_poscolApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // pos + col
 			// check incompatibilities
@@ -1478,10 +1478,11 @@ void EdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const bool re
 
        	if (dBack != dFront)
        	{ // if dFront is no border
+   			Dart d2 = this->m_map.phi2(dFront) ;
+
        		VEC6 p0, p1, p2 ;
        		for (unsigned int i = 0 ; i < 3 ; ++i)
        		{
-       			Dart d2 = this->m_map.phi2(dFront) ;
 
        			p0[i] = this->m_position[d][i] ;
        			p0[i+3] = this->m_color[d][i] ;
@@ -1596,8 +1597,14 @@ void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	const REAL& err = quad(newEmb) ;
 
-	einfo.it = edges.insert(std::make_pair(err, d)) ;
-	einfo.valid = true ;
+	// Check if errated values appear
+	if (err < -1e-6)
+		einfo.valid = false ;
+	else
+	{
+		einfo.it = edges.insert(std::make_pair(std::max(err,0.), d)) ;
+		einfo.valid = true ;
+	}
 }
 
 
