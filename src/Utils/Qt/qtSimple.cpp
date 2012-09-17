@@ -99,7 +99,7 @@ SimpleQT::SimpleQT() :
 	m_textConsole = new QTextEdit();
 	m_textConsole->setLineWrapMode(QTextEdit::NoWrap);
 	m_textConsole->setTabStopWidth(20);
-	m_textConsole->setReadOnly(true);
+//	m_textConsole->setReadOnly(true);
 
 	m_dockConsole->setWidget(m_textConsole);
 

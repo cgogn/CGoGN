@@ -207,6 +207,7 @@ bool GLSLShader::loadVertexShader(  const std::string& filename )
 
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	m_vertex_shader_source = loadSourceFile( filename );
 
@@ -230,6 +231,7 @@ bool GLSLShader::loadFragmentShader(const std::string& filename )
 
 	if (m_fragment_shader_source)
 		delete [] m_fragment_shader_source;
+	m_fragment_shader_source = NULL;
 
 	m_fragment_shader_source = loadSourceFile( filename );
 
@@ -586,6 +588,13 @@ GLSLShader::~GLSLShader()
 		glDeleteObjectARB( m_program_object );
 	}
 
+	if (m_vertex_shader_source != NULL)
+		delete[] m_vertex_shader_source;
+	if (m_fragment_shader_source != NULL)
+		delete[] m_fragment_shader_source;
+	if (m_geom_shader_source != NULL)
+		delete[] m_geom_shader_source;
+
 //	m_registeredShaders.erase(this);
 }
 
@@ -702,6 +711,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
@@ -730,9 +740,11 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
+
 	strcpy(m_vertex_shader_source,vs);
 
 	if (m_fragment_shader_source)
@@ -771,9 +783,11 @@ bool GLSLShader::reloadVertexShaderFromMemory(const char* vs)
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
+
 	strcpy(m_vertex_shader_source,vs);
 
 	return true;

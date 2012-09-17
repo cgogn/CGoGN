@@ -79,6 +79,12 @@ public:
 	//@{
 	//!
 	/*
+	 *
+	 */
+	void addNewLevelSqrt3(bool embedNewVertices);
+
+	//!
+	/*
 	 */
 	void addNewLevelTetraOcta(bool embedNewVertices);
 

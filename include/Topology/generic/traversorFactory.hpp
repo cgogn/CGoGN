@@ -25,12 +25,13 @@
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/traversor3.h"
 #include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversorDoO.h"
 
 namespace CGoGN
 {
 
 template<typename MAP>
-Traversor<MAP>* Traversor<MAP>::createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY)
+Traversor<MAP>* TraversorFactory<MAP>::createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY)
 {
 
 	int code = 0x100*dim + 0x10*(orbX-VERTEX) + orbY-VERTEX;
@@ -114,7 +115,7 @@ Traversor<MAP>* Traversor<MAP>::createIncident(MAP& map, Dart dart, unsigned int
 
 
 template<typename MAP>
-Traversor<MAP>* Traversor<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY)
+Traversor<MAP>* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY)
 {
 
 	int code = 0x100*dim + 0x10*(orbX-VERTEX) + orbY-VERTEX;
@@ -191,16 +192,14 @@ Traversor<MAP>* Traversor<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int
 		default:
 			return NULL;
 			break;
-
 	}
-
 
 	return NULL;
 }
 
 
 template<typename MAP>
-Traversor<MAP>* Traversor<MAP>::createCell(MAP& map, unsigned int orb, const FunctorSelect& good, bool forceDartMarker, unsigned int thread)
+Traversor<MAP>* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, const FunctorSelect& good, bool forceDartMarker, unsigned int thread)
 {
 	switch(orb)
 	{
@@ -241,7 +240,7 @@ Traversor<MAP>* Traversor<MAP>::createCell(MAP& map, unsigned int orb, const Fun
 }
 
 template<typename MAP>
-Traversor<MAP>* Traversor<MAP>::createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb)
+Traversor<MAP>* TraversorFactory<MAP>::createDartsOfOrbits(MAP& map, Dart dart, unsigned int orb)
 {
 	switch(orb)
 	{
@@ -280,10 +279,6 @@ Traversor<MAP>* Traversor<MAP>::createDartsOfOrbits(MAP& map, Dart dart, unsigne
 		break;
 	}
 }
-
-
-
-
 
 
 }

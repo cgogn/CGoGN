@@ -84,7 +84,7 @@ public:
 } // namespace CGoGN
 
 
-#include "Topology/generic/traversorGen.hpp"
+//#include "Topology/generic/traversorGen.hpp"
 
 #endif
 

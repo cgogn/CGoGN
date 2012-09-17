@@ -31,6 +31,8 @@
 #include "Algo/Import/import.h"
 #include "Algo/Geometry/volume.h"
 
+#include "Utils/chrono.h"
+
 
 PFP::MAP myMap;
 VertexAttribute<PFP::VEC3> position ;
@@ -125,6 +127,82 @@ void MyQT::slider_released()
 		m_topo_render->updateData<PFP>(myMap, position, 0.8f, m_explode_factorf-0.05f, m_explode_factor, nb);
 	}
 	updateGL();
+}
+
+
+void MyQT::cb_Open()
+{
+	std::string filters("all (*.*);; trian (*.trian);; ctm (*.ctm);; off (*.off);; ply (*.ply)") ;
+	std::string filename = selectFile("Open Mesh", "", filters) ;
+	if (filename.empty())
+		return ;
+
+	myMap.clear(true);
+
+	std::vector<std::string> attrNames ;
+
+	size_t pos = filename.rfind(".");    // position of "." in filename
+	std::string extension = filename.substr(pos);
+
+	if(extension == std::string(".tet"))
+	{
+		if(!Algo::Import::importTet<PFP>(myMap,filename,attrNames))
+		{
+			CGoGNerr << "could not import " << filename << CGoGNendl ;
+			return;
+		}
+		else
+			position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
+	}
+
+	if(extension == std::string(".node"))
+	{
+		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::NODE))
+		{
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
+		}
+		else
+			position = myMap.getAttribute<PFP::VEC3,VERTEX>(attrNames[0]) ;
+	}
+
+
+	if(extension == std::string(".off"))
+	{
+		if(!Algo::Import::importMeshToExtrude<PFP>(myMap, filename, attrNames))
+		{
+			std::cerr << "could not import " << filename << std::endl ;
+			return ;
+		}
+		else
+		{
+			position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
+			myMap.closeMap();
+		}
+	}
+
+	color = myMap.addAttribute<PFP::VEC3, VOLUME>("color");
+
+	TraversorCell<PFP::MAP, VOLUME> tra(myMap);
+	float maxV = 0.0f;
+	for (Dart d = tra.begin(); d != tra.end(); d = tra.next())
+	{
+		float v = Algo::Geometry::tetrahedronVolume<PFP>(myMap, d, position);
+		color[d] = PFP::VEC3(v,0,0);
+		if (v>maxV)
+			maxV=v;
+	}
+	for (unsigned int i = color.begin(); i != color.end(); color.next(i))
+	{
+		color[i][0] /= maxV;
+		color[i][2] = 1.0f - color[i][0];
+	}
+
+	SelectorDartNoBoundary<PFP::MAP> nb(myMap);
+	m_topo_render->updateData<PFP>(myMap, position,  0.8f, 0.8f, 0.8f, nb);
+	m_explode_render->updateData<PFP>(myMap, position, color);
+
+	updateGL() ;
 }
 
 
@@ -414,6 +492,24 @@ int main(int argc, char **argv)
 	dock.slider_explode->setValue(80);
 	dock.slider_explode_face->setValue(80);
 	sqt.clipping_onoff(true);
+
+	Utils::Chrono ch;
+
+	std::cout << "Compute Volume ->"<< std::endl;
+	ch.start();
+	float vol = Algo::Geometry::totalVolume<PFP>(myMap, position);
+	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	vol += Algo::Geometry::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms  val="<<vol<< std::endl;
+
+	ch.start();
+	vol = Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
+	vol += Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
+	vol += Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
+	vol += Algo::Geometry::Parallel::totalVolume<PFP>(myMap, position);
+	std::cout << ch.elapsed()<< " ms //  val="<<vol<< std::endl;
+
 
 	// et on attend la fin.
 	return app.exec();

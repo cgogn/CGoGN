@@ -33,10 +33,28 @@ namespace Multiresolution
 {
 
 template <typename PFP>
-Map2MR_PM<PFP>::Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker& inactive,
-		Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a
-		) :
-		m_map(map), m_position(position), inactiveMarker(inactive)
+Map2MR_PM<PFP>::Map2MR_PM(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) : m_map(map), m_position(position)
+{
+	//TODO
+	//map.enableMR();
+}
+
+template <typename PFP>
+Map2MR_PM<PFP>::~Map2MR_PM()
+{
+	if(m_selector)
+		delete m_selector ;
+	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+		delete (*it) ;
+	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
+		delete (*it) ;
+
+	//TODO
+	//map.disableMR()
+}
+
+template <typename PFP>
+void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts)
 {
 
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
@@ -75,22 +93,22 @@ Map2MR_PM<PFP>::Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker&
 	switch(s)
 	{
 	case Algo::Decimation::S_MapOrder : {
-		m_selector = new Algo::Decimation::EdgeSelector_MapOrder<PFP>(m_map, m_position, m_approximators, allDarts) ;
+		m_selector = new Algo::Decimation::EdgeSelector_MapOrder<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	case Algo::Decimation::S_Random : {
-		m_selector = new Algo::Decimation::EdgeSelector_Random<PFP>(m_map, m_position, m_approximators, allDarts) ;
+		m_selector = new Algo::Decimation::EdgeSelector_Random<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	case Algo::Decimation::S_EdgeLength : {
-		m_selector = new Algo::Decimation::EdgeSelector_Length<PFP>(m_map, m_position, m_approximators, allDarts) ;
+		m_selector = new Algo::Decimation::EdgeSelector_Length<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	case Algo::Decimation::S_QEM : {
-		m_selector = new Algo::Decimation::EdgeSelector_QEM<PFP>(m_map, m_position, m_approximators, allDarts) ;
+		m_selector = new Algo::Decimation::EdgeSelector_QEM<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	case Algo::Decimation::S_MinDetail : {
-		m_selector = new Algo::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators, allDarts) ;
+		m_selector = new Algo::Decimation::EdgeSelector_MinDetail<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	case Algo::Decimation::S_Curvature : {
-		m_selector = new Algo::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators, allDarts) ;
+		m_selector = new Algo::Decimation::EdgeSelector_Curvature<PFP>(m_map, m_position, m_approximators, select) ;
 		break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
@@ -112,31 +130,21 @@ Map2MR_PM<PFP>::Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position, DartMarker&
 		if(! (*it)->init())
 			m_initOk = false ;
 	CGoGNout << "..done" << CGoGNendl ;
+
+	CGoGNout << "  initializing selector.." << CGoGNflush ;
+	m_initOk = m_selector->init() ;
+	CGoGNout << "..done" << CGoGNendl ;
 }
 
-template <typename PFP>
-Map2MR_PM<PFP>::~Map2MR_PM()
-{
-	if(m_selector)
-		delete m_selector ;
-	for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
-		delete (*it) ;
-	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
-		delete (*it) ;
-}
+
 
 template <typename PFP>
-void Map2MR_PM<PFP>::createPM(unsigned int percentWantedVertices)
+void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 {
 	// level handling
 	m_map.pushLevel() ;
 	m_map.addLevel();
 	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-
-	// PM creation
-	CGoGNout << "  initializing selector.." << CGoGNflush ;
-	m_initOk = m_selector->init() ;
-	CGoGNout << "..done" << CGoGNendl ;
 
 	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
@@ -152,6 +160,8 @@ void Map2MR_PM<PFP>::createPM(unsigned int percentWantedVertices)
 		--nbVertices ;
 		Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
 		Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
+
+
 
 		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 		{

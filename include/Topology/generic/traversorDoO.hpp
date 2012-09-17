@@ -22,63 +22,42 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/Qt/qtcolorschooser.h"
-#include "Utils/Qt/qtSimple.h"
+#include "Topology/generic/genericmap.h"
+#include "Topology/generic/functor.h"
+
 
 namespace CGoGN
 {
 
-namespace Utils
+
+template <typename MAP, unsigned int ORBIT>
+TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread)
 {
+	m_vd.reserve(16);
+	FunctorStoreNotBoundary<MAP> fs(map, m_vd);
+	map.template foreach_dart_of_orbit<ORBIT>(d, fs, thread);
+	m_vd.push_back(NIL);
+}
 
-namespace QT
+template <typename MAP, unsigned int ORBIT>
+Dart TraversorDartsOfOrbit<MAP, ORBIT>::begin()
 {
+	m_current = m_vd.begin();
+	return *m_current;
+}
 
-
-ColorsChooser::ColorsChooser(SimpleQT *interf):
-		QtPopUp(NULL,false),m_interf(interf),m_current(0)
+template <typename MAP, unsigned int ORBIT>
+Dart TraversorDartsOfOrbit<MAP, ORBIT>::end()
 {
-	m_list = new QListWidget();
-	m_diag = new QColorDialog();
-	m_diag->setOption(QColorDialog::NoButtons);
-	addWidget(m_list,0,0);
-	addWidget(m_diag,0,1);
-	connect(m_list,  SIGNAL(currentRowChanged(int)), this, SLOT(select_color(int)));
-	connect(m_diag, SIGNAL(	currentColorChanged(const QColor&)), this, SLOT(change_color(const QColor&)));
-
+	return NIL;
 }
 
-unsigned int ColorsChooser::addColor(Geom::Vec3f* ptr, const std::string& name)
+template <typename MAP, unsigned int ORBIT>
+Dart TraversorDartsOfOrbit<MAP, ORBIT>::next()
 {
-	m_colors.push_back(ptr);
-	m_list->addItem(QString(name.c_str()));
-	return m_colors.size()-1;
+	if (*m_current != NIL)
+		m_current++;
+	return *m_current;
 }
 
-
-void ColorsChooser::select_color(int x)
-{
-	m_current = x;
-	const Geom::Vec3f& col = *m_colors[x];
-	m_diag->show();
-	m_diag->setCurrentColor(QColor(int(255.0f*col[0]), int(255.0f*col[1]), int(255.0f*col[2])) );
-}
-
-void ColorsChooser::change_color(const QColor& col)
-{
-	Geom::Vec3f& out = *m_colors[m_current];
-	out[0] = float(col.redF());
-	out[1] = float(col.greenF());
-	out[2] = float(col.blueF());
-
-
-	if (m_interf)
-	{
-		updateCallBack(m_interf);
-		m_interf->updateGL();
-	}
-}
-
-}
-}
-}
+} // namespace CGoGN

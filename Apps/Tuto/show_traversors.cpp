@@ -32,9 +32,7 @@
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Algo/Render/SVG/mapSVGRender.h"
 
-//#include "Topology/generic/traversor3.h"
-//#include "Topology/generic/traversor3.h"
-#include "Topology/generic/traversorGen.h"
+#include "Topology/generic/traversorFactory.h"
 
 #include "Algo/Render/GL2/drawerCells.h"
 
@@ -214,7 +212,7 @@ void MyQT::traverse2()
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_second2, m_drawer, myMap, m_selected, position, m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createIncident(myMap, m_selected, 2, VERTEX+m_second2, VERTEX+m_first2);
+		Traversor<PFP::MAP>* tra = TraversorFactory<PFP::MAP>::createIncident(myMap, m_selected, 2, VERTEX+m_second2, VERTEX+m_first2);
 		for (Dart d=tra->begin(); d != tra->end(); d= tra->next())
 				m_affDarts.push_back(d);
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap, m_affDarts, position, m_expl);
@@ -223,7 +221,7 @@ void MyQT::traverse2()
 	{
 		Algo::Render::drawerCell<PFP>(VERTEX+m_first2, m_drawer, myMap, m_selected, position, m_expl);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
-		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createAdjacent(myMap, m_selected, 2, VERTEX+m_first2, VERTEX+m_second2);
+		Traversor<PFP::MAP>* tra = TraversorFactory<PFP::MAP>::createAdjacent(myMap, m_selected, 2, VERTEX+m_first2, VERTEX+m_second2);
 		for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
 			m_affDarts.push_back(d);
 		Algo::Render::drawerCells<PFP>(VERTEX+m_first2, m_drawer, myMap, m_affDarts, position, m_expl);
@@ -286,7 +284,7 @@ void MyQT::traverse3()
 		dynamicMarkOrbit(VERTEX+m_second3);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 
-		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createIncident(myMap,m_selected, 3, VERTEX+m_second3, VERTEX+m_first3);
+		Traversor<PFP::MAP>* tra = TraversorFactory<PFP::MAP>::createIncident(myMap,m_selected, 3, VERTEX+m_second3, VERTEX+m_first3);
 		for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
 		{
 			m_affDarts.push_back(d);
@@ -306,7 +304,7 @@ void MyQT::traverse3()
 		dynamicMarkOrbit(VERTEX+m_first3);
 		m_drawer.color3f(1.0f,0.0f,0.0f);
 
-		Traversor<PFP::MAP>* tra = Traversor<PFP::MAP>::createAdjacent(myMap,m_selected, 3, VERTEX+m_first3, VERTEX+m_second3);
+		Traversor<PFP::MAP>* tra = TraversorFactory<PFP::MAP>::createAdjacent(myMap,m_selected, 3, VERTEX+m_first3, VERTEX+m_second3);
 		for (Dart d = tra->begin(); d != tra->end(); d = tra->next())
 		{
 			m_affDarts.push_back(d);

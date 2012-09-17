@@ -35,6 +35,7 @@
 #include "Algo/Render/SVG/mapSVGRender.h"
 
 #include "Algo/Import/import.h"
+#include "Topology/generic/traversorFactory.h"
 
 MAP myMap;
 VertexAttribute<VEC3> position ;
@@ -66,7 +67,7 @@ void MyQT::orbit_list(int x)
 		m_selected.clear();
 
 		// easy way to traverse darts of orbit
-		Traversor<MAP>* tra = Traversor<MAP>::createDartsOfOrbits(myMap,m_clicked,orbs[current_orbit]);
+		Traversor<MAP>* tra = TraversorFactory<MAP>::createDartsOfOrbits(myMap,m_clicked,orbs[current_orbit]);
 		for (Dart e = tra->begin(); e != tra->end(); e = tra->next())
 			m_selected.push_back(e);
 	}
@@ -174,7 +175,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 			m_selected.clear();
 
 			// easy way to traverse darts of orbit
-			Traversor<MAP>* tra = Traversor<MAP>::createDartsOfOrbits(myMap,m_clicked,orbs[current_orbit]);
+			Traversor<MAP>* tra = TraversorFactory<MAP>::createDartsOfOrbits(myMap,m_clicked,orbs[current_orbit]);
 			for (Dart e = tra->begin(); e != tra->end(); e = tra->next())
 				m_selected.push_back(e);
 		}

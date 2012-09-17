@@ -46,6 +46,11 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(const char* _cName)
 	m_fOrigin = typename PFP::VEC3(0.0,0.0,0.0);
 	m_fScal = typename PFP::VEC3(1.0,1.0,1.0);
 
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice = 0;
+		m_zslice = NULL;
+	#endif
+
 }
 
 
@@ -58,7 +63,13 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, Windo
 	m_fOrigin(typename PFP::VEC3(0.0,0.0,0.0)),
 	m_fScal(typename PFP::VEC3(1.0,1.0,1.0)),
 	m_brem(boundRemoved)
-{}
+{
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice = 0;
+		m_zslice = NULL;
+	#endif
+
+}
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3>& position, Windowing<DataType> wind, bool boundRemoved):
@@ -70,7 +81,12 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP
 	m_fOrigin(typename PFP::VEC3(0.0,0.0,0.0)),
 	m_fScal(typename PFP::VEC3(1.0,1.0,1.0)),
 	m_brem(boundRemoved)
-{}
+{
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice = 0;
+		m_zslice = NULL;
+	#endif
+}
 
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
@@ -185,6 +201,10 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 		lY++;
 	}
 	lZ++;
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice++;
+	#endif
+
 	m_Buffer->nextSlice();
 
 // middles slices
@@ -218,6 +238,9 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 		}
 
 		lZ++;
+		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+			m_currentZSlice++;
+		#endif
 		m_Buffer->nextSlice();
 	}
 
@@ -898,14 +921,34 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 void MarchingCube<DataType, Windowing, PFP>::setNeighbourSimple(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
+	{
 		m_map->sewFaces(d1,d2,false);
+		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		if (m_zslice!=NULL)
+		{
+			unsigned int val = (m_currentZSlice - m_zbound)/m_sliceGroup;
+			std::cout << "ZSLICE=" << val << std::endl;
+			m_zslice->operator[](d1) = val;
+		}
+		#endif
+	}
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
+	{
 		m_map->sewFaces(d1,d2,false);
+		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		if (m_zslice!=NULL)
+		{
+			unsigned int val = (m_currentZSlice - m_zbound)/m_sliceGroup;
+			std::cout << "ZSLICE=" << val << std::endl;
+			m_zslice->operator[](d1) = val;
+		}
+		#endif
+	}
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
@@ -1190,6 +1233,19 @@ void MarchingCube<DataType, Windowing, PFP>::recalPoints(const Geom::Vec3f& orig
 		P+=origin;
 	}
 }
+
+
+#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+void MarchingCube<DataType, Windowing, PFP>::setZSliceAttrib(EdgeAttribute<unsigned long long>* zsatt, unsigned int zbound, unsigned int nbZone)
+{
+	m_zslice = zsatt;
+	m_zbound = zbound;
+	m_sliceGroup = m_Image->getWidthZ()/nbZone;
+}
+#endif
+
+
 
 } // namespace MC
 

@@ -98,8 +98,8 @@ target_link_libraries( tuto_histo
 # exemple: BOOST_LIBS(boost_lib_lists "boost_thread-mt;boost_iostreams-mt")
 #BOOST_LIBS(boost_lib_lists "boost_thread-mt")
 
-#QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
-#add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
-#target_link_libraries( tuto_mt
-#	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} ${Boost_THREAD_LIBRARY})
+QT4_WRAP_CPP(tuto_mt_moc tuto_mt.h)
+add_executable( tuto_mt tuto_mt.cpp  ${tuto_mt_moc})
+target_link_libraries( tuto_mt
+	${CGoGN_LIBS_D} ${CGoGN_EXT_LIBS} ${Boost_THREAD_LIBRARY})
 
