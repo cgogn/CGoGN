@@ -1602,7 +1602,7 @@ void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 		einfo.valid = false ;
 	else
 	{
-		einfo.it = edges.insert(std::make_pair(std::max(err,0.), d)) ;
+		einfo.it = edges.insert(std::make_pair(std::max(err,REAL(0)), d)) ;
 		einfo.valid = true ;
 	}
 }
