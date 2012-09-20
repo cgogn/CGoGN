@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
+//#include "Topology/map/map2.h"
 #include "Topology/generic/traversor2.h"
 
 namespace CGoGN

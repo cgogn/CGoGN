@@ -43,19 +43,38 @@ template <typename PFP>
 void VoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
 {
 	seeds.clear();
-	vmReached.unmarkAll();
-
 	srand ( time(NULL) );
-	unsigned int n = nseeds;
-	while (n > 0)
-	{ // TODO : correct this random init which assumes contiguous Dart table
-		Dart d = rand() % map.getNbDarts() ;
-		if (! vmReached.isMarked(d))
+	const unsigned int nbv = map.getNbCells(VERTEX);
+
+	std::set<unsigned int> myVertices ;;
+	while (myVertices.size() < nseeds)
+	{
+		myVertices.insert(rand() % nbv);
+	}
+
+	std::set<unsigned int>::iterator it = myVertices.begin();
+	unsigned int n = 0;
+	TraversorV<typename PFP::MAP> tv (map);
+	Dart dit = tv.begin();
+
+	while (it != myVertices.end())
+	{
+		while(n<*it)
 		{
-			vmReached.mark(d);
-			seeds.push_back(d);
-			n--;
+			dit = tv.next();
+			++n;
 		}
+		seeds.push_back(dit);
+		it++;
+	}
+
+	// random permutation = un-sort the seeds
+	for (unsigned int i=0; i<nseeds; i++)
+	{
+		unsigned int j = i + rand() % (nseeds - i);
+		Dart d = seeds[i];
+		seeds[i] = seeds[j];
+		seeds[j] = d;
 	}
 }
 
