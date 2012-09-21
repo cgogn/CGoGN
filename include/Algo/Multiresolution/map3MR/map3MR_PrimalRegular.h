@@ -41,6 +41,12 @@ namespace Algo
 namespace Multiresolution
 {
 
+//Subdivision
+
+//namespace Primal
+
+//namespace Regular
+
 /*! \brief The class of regular 3-map MR
  */
 
@@ -58,6 +64,7 @@ protected:
 
 	std::vector<Algo::Multiresolution::MRFilter*> synthesisFilters ;
 	std::vector<Algo::Multiresolution::MRFilter*> analysisFilters ;
+
 
 public:
 	Map3MR_PrimalRegular(MAP& map);

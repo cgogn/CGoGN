@@ -34,7 +34,7 @@ namespace Multiresolution
 template <typename PFP>
 Map3MR_PrimalRegular<PFP>::Map3MR_PrimalRegular(typename PFP::MAP& map) : m_map(map), shareVertexEmbeddings(true)
 {
-//	m_map.initMR();
+
 }
 
 
@@ -108,8 +108,10 @@ void Map3MR_PrimalRegular<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 {
 	m_map.pushLevel();
 
-	m_map.addLevel();
-	//m_map.setCurrentLevel(m_map.getMaxLevel());
+	m_map.addLevelBack();
+	m_map.duplicateDarts(m_map.getMaxLevel());
+	m_map.setCurrentLevel(m_map.getMaxLevel());
+
 	unsigned int cur = m_map.getCurrentLevel();
 
 	//
@@ -171,7 +173,8 @@ void Map3MR_PrimalRegular<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 {
 	m_map.pushLevel();
 
-	m_map.addLevel();
+	m_map.addLevelBack();
+	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
 //	if(!shareVertexEmbeddings)
@@ -335,7 +338,8 @@ void Map3MR_PrimalRegular<PFP>::addNewLevelHexa(bool embedNewVertices)
 {
 	m_map.pushLevel();
 
-	m_map.addLevel();
+	m_map.addLevelBack();
+	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
 //	if(!shareVertexEmbeddings)

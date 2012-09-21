@@ -35,8 +35,7 @@ namespace Multiresolution
 template <typename PFP>
 Map2MR_PM<PFP>::Map2MR_PM(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position) : m_map(map), m_position(position)
 {
-	//TODO
-	//map.enableMR();
+
 }
 
 template <typename PFP>
@@ -48,15 +47,11 @@ Map2MR_PM<PFP>::~Map2MR_PM()
 		delete (*it) ;
 	for(typename std::vector<Algo::Decimation::PredictorGen<PFP>*>::iterator it = m_predictors.begin(); it != m_predictors.end(); ++it)
 		delete (*it) ;
-
-	//TODO
-	//map.disableMR()
 }
 
 template <typename PFP>
-void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts)
+void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select)
 {
-
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
 	switch(a)
 	{
@@ -143,8 +138,9 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 {
 	// level handling
 	m_map.pushLevel() ;
-	m_map.addLevel();
-	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+	m_map.addLevelBack();
+	m_map.duplicateDarts(m_map.getMaxLevel());
+	m_map.setCurrentLevel(m_map.getMaxLevel());
 
 	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
@@ -161,8 +157,6 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 		Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
 		Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
 
-
-
 		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
 		{
 			(*it)->approximate(d) ;					// compute approximated attributes with its associated detail
@@ -171,11 +165,7 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 
 		m_selector->updateBeforeCollapse(d) ;		// update selector
 
-		//m_map.collapseEdge(d);
-
-		inactiveMarker.markOrbit<FACE>(d) ;
-		inactiveMarker.markOrbit<FACE>(m_map.phi2(d)) ;
-		m_map.extractTrianglePair(d);
+		collapseEdge(d);
 
 		unsigned int newV = m_map.template embedNewCell<VERTEX>(d2) ;
 		unsigned int newE1 = m_map.template embedNewCell<EDGE>(d2) ;
@@ -197,6 +187,29 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 
 	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
 }
+
+
+template <typename PFP>
+void Map2MR_PM<PFP>::collapseEdge(Dart d)
+{
+	//duplication :
+	m_map.duplicateMRDart(m_map.phi2(m_map.phi1(d)));
+	m_map.duplicateMRDart(m_map.phi2(m_map.phi_1(d)));
+	m_map.duplicateMRDart(m_map.phi2(m_map.phi1(m_map.phi2(d))));
+	m_map.duplicateMRDart(m_map.phi2(m_map.phi_1(m_map.phi2(d))));
+
+	//effacer :
+//	m_map.unrefMRDart(m_map.phi1(m_map.phi2(d)));
+//	m_map.unrefMRDart(m_map.phi_1(m_map.phi2(d)));
+//	m_map.unrefMRDart(m_map.phi2(d));
+//
+//	m_map.unrefMRDart(m_map.phi1(d));
+//	m_map.unrefMRDart(m_map.phi_1(d));
+//	m_map.unrefMRDart(d);
+
+	m_map.collapseEdge(d);
+}
+
 
 template <typename PFP>
 void Map2MR_PM<PFP>::coarsen()

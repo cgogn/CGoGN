@@ -76,6 +76,8 @@ public:
 
 	void addNewLevel(unsigned int percentWantedVertices);
 
+	void collapseEdge(Dart d);
+
 	//coarsen the mesh -> analysis
 	void coarsen() ;
 

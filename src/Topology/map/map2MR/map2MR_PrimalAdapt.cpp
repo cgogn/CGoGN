@@ -252,7 +252,7 @@ bool Map2MR_PrimalAdapt::faceIsSubdividedOnce(Dart d)
 
 void Map2MR_PrimalAdapt::addNewLevel(bool embedNewVertices)
 {
-	addLevel() ;
+	addLevelBack() ;
 }
 
 void Map2MR_PrimalAdapt::propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel)
@@ -431,7 +431,7 @@ void Map2MR_PrimalAdapt::coarsenEdge(Dart d)
 
 	unsigned int maxL = getMaxLevel() ;
 	if(getCurrentLevel() == maxL - 1 && getNbInsertedDarts(maxL) == 0)
-		removeLevel() ;
+		removeLevelBack() ;
 }
 
 unsigned int Map2MR_PrimalAdapt::subdivideFace(Dart d)
@@ -565,7 +565,7 @@ void Map2MR_PrimalAdapt::coarsenFace(Dart d)
 
 	unsigned int maxL = getMaxLevel() ;
 	if(getCurrentLevel() == maxL - 1 && getNbInsertedDarts(maxL) == 0)
-		removeLevel() ;
+		removeLevelBack() ;
 }
 
 } // namespace CGoGN

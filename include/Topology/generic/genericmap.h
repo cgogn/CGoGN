@@ -230,25 +230,52 @@ public:
 	 */
 	unsigned int getMaxLevel() ;
 
-	/**
-	 * add a resolution level (use only in MRMaps)
+private:
+	/*
+	 * add a resolution level
 	 */
-	void addLevel() ;
+	AttributeMultiVector<unsigned int>* addLevel();
+
+public:
+	/**
+	 * add a resolution level in the back of the level table (use only in MRMaps)
+	 */
+	void addLevelBack() ;
 
 	/**
 	 * add a resolution level in the front of the level table (use only in MRMaps)
 	 */
-	void addFrontLevel();
+	void addLevelFront();
 
 	/**
 	 * remove last resolution level (use only in MRMaps)
 	 */
-	void removeLevel() ;
+	void removeLevelBack() ;
 
 	/**
 	 * remove first resolution level (use only in MRMaps)
 	 */
-	void removeFrontLevel();
+	void removeLevelFront();
+
+	/**
+	 * copy MRDarts from level-1 to level
+	 */
+	void copyLevel(unsigned int level);
+
+	/**
+	 * duplicate darts from level-1 to level
+	 */
+	void duplicateDarts(unsigned int level);
+
+	/**
+	 *
+	 */
+	void duplicateMRDart(Dart d);
+
+	/**
+	 *
+	 */
+	void unrefMRDart(Dart d);
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *

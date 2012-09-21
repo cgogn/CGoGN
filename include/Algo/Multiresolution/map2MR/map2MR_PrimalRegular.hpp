@@ -22,23 +22,37 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/map/map2MR/map2MR_PrimalRegular.h"
-
 namespace CGoGN
 {
 
-Map2MR_PrimalRegular::Map2MR_PrimalRegular() :
+namespace Algo
+{
+
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Regular
+{
+
+template <typename PFP>
+Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
+	m_map(map),
 	shareVertexEmbeddings(true)
 {
-	initMR() ;
+
 }
 
-void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
+template <typename PFP>
+void Map2MR<PFP>::addNewLevel(bool embedNewVertices)
 {
-	pushLevel() ;
+	m_map.pushLevel() ;
 
-	addLevel() ;
-	setCurrentLevel(getMaxLevel()) ;
+	m_map.addLevelBack() ;
+	m_map.duplicateDarts(m_map.getMaxLevel());
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
 //	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 //	{
@@ -49,102 +63,113 @@ void Map2MR_PrimalRegular::addNewLevel(bool embedNewVertices)
 //	}
 
 	// cut edges
-	TraversorE<Map2MR_PrimalRegular> travE(*this) ;
+	TraversorE<typename PFP::MAP> travE(m_map) ;
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
 		if(!shareVertexEmbeddings && embedNewVertices)
 		{
-			if(getEmbedding<VERTEX>(d) == EMBNULL)
-				embedNewCell<VERTEX>(d) ;
-			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-				embedNewCell<VERTEX>(d) ;
+			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+				m_map.template embedNewCell<VERTEX>(d) ;
+			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+				m_map.template embedNewCell<VERTEX>(d) ;
 		}
 
-		cutEdge(d) ;
+		m_map.cutEdge(d) ;
 		travE.skip(d) ;
-		travE.skip(phi1(d)) ;
+		travE.skip(m_map.phi1(d)) ;
 
 		if(embedNewVertices)
-			embedNewCell<VERTEX>(phi1(d)) ;
+			m_map.template embedNewCell<VERTEX>(m_map.phi1(d)) ;
 	}
 
 	// split faces
-	TraversorF<Map2MR_PrimalRegular> travF(*this) ;
+	TraversorF<typename PFP::MAP> travF(m_map) ;
 	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 	{
 		Dart old = d ;
-		if(getDartLevel(old) == getMaxLevel())
-			old = phi1(old) ;
+		if(m_map.getDartLevel(old) == m_map.getMaxLevel())
+			old = m_map.phi1(old) ;
 
-		decCurrentLevel() ;
-		unsigned int degree = faceDegree(old) ;
-		incCurrentLevel() ;
+		m_map.decCurrentLevel() ;
+		unsigned int degree = m_map.faceDegree(old) ;
+		m_map.incCurrentLevel() ;
 
 		if(degree == 3)					// if subdividing a triangle
 		{
-			Dart dd = phi1(old) ;
-			Dart e = phi1(phi1(dd)) ;
-			splitFace(dd, e) ;
+			Dart dd = m_map.phi1(old) ;
+			Dart e = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, e) ;
 			travF.skip(dd) ;
 
 			dd = e ;
-			e = phi1(phi1(dd)) ;
-			splitFace(dd, e) ;
+			e = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, e) ;
 			travF.skip(dd) ;
 
 			dd = e ;
-			e = phi1(phi1(dd)) ;
-			splitFace(dd, e) ;
+			e = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, e) ;
 			travF.skip(dd) ;
 
 			travF.skip(e) ;
 		}
 		else							// if subdividing a polygonal face
 		{
-			Dart dd = phi1(old) ;
-			Dart next = phi1(phi1(dd)) ;
-			splitFace(dd, next) ;		// insert a first edge
+			Dart dd = m_map.phi1(old) ;
+			Dart next = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, next) ;		// insert a first edge
 
-			Dart ne = alpha1(dd) ;
-			cutEdge(ne) ;				// cut the new edge to insert the central vertex
+			Dart ne = m_map.alpha1(dd) ;
+			m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 			travF.skip(dd) ;
 
 			if(embedNewVertices)
-				embedNewCell<VERTEX>(phi1(ne)) ;
+				m_map.template embedNewCell<VERTEX>(m_map.phi1(ne)) ;
 
-			dd = phi1(phi1(next)) ;
+			dd = m_map.phi1(m_map.phi1(next)) ;
 			while(dd != ne)				// turn around the face and insert new edges
 			{							// linked to the central vertex
-				Dart tmp = phi1(ne) ;
-				splitFace(tmp, dd) ;
+				Dart tmp = m_map.phi1(ne) ;
+				m_map.splitFace(tmp, dd) ;
 				travF.skip(tmp) ;
-				dd = phi1(phi1(dd)) ;
+				dd = m_map.phi1(m_map.phi1(dd)) ;
 			}
 			travF.skip(ne) ;
 		}
 	}
 
-	popLevel() ;
+	m_map.popLevel() ;
 }
 
-void Map2MR_PrimalRegular::analysis()
+template <typename PFP>
+void Map2MR<PFP>::analysis()
 {
-	assert(getCurrentLevel() > 0 || !"analysis : called on level 0") ;
+	assert(m_map.getCurrentLevel() > 0 || !"analysis : called on level 0") ;
 
-	decCurrentLevel() ;
+	m_map.decCurrentLevel() ;
 
 	for(unsigned int i = 0; i < analysisFilters.size(); ++i)
 		(*analysisFilters[i])() ;
 }
 
-void Map2MR_PrimalRegular::synthesis()
+template <typename PFP>
+void Map2MR<PFP>::synthesis()
 {
-	assert(getCurrentLevel() < getMaxLevel() || !"synthesis : called on max level") ;
+	assert(m_map.getCurrentLevel() < m_map.getMaxLevel() || !"synthesis : called on max level") ;
 
 	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
 		(*synthesisFilters[i])() ;
 
-	incCurrentLevel() ;
+	m_map.incCurrentLevel() ;
 }
+
+
+} // namespace Regular
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Algo
 
 } // namespace CGoGN

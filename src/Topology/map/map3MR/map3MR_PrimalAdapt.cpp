@@ -521,7 +521,7 @@ void Map3MR_PrimalAdapt::addNewLevel()
 {
 	//pushLevel() ;
 
-	addLevel() ;
+	addLevelBack() ;
 //	unsigned int cur = getCurrentLevel();
 //	setCurrentLevel(getMaxLevel()) ;
 //	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
