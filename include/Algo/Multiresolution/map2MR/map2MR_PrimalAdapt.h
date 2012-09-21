@@ -34,9 +34,30 @@
 namespace CGoGN
 {
 
-class Map2MR_PrimalAdapt : public EmbeddedMap2
+}
+namespace Algo
 {
+
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Adaptive
+{
+
+template <typename PFP>
+class Map2MR
+{
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 protected:
+	MAP& m_map;
 	bool shareVertexEmbeddings ;
 
 	FunctorType* vertexVertexFunctor ;
@@ -44,9 +65,8 @@ protected:
 	FunctorType* faceVertexFunctor ;
 
 public:
-	Map2MR_PrimalAdapt() ;
+	Map2MR(MAP& map) ;
 
-	virtual std::string mapTypeName() const { return "Map2MR_PrimalAdapt" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
@@ -150,6 +170,16 @@ public:
 	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
 } ;
 
+} // namespace Adaptive
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Algo
+
 } // namespace CGoGN
+
+#include "Algo/Multiresolution/map2MR/map2MR_PrimalAdapt.hpp"
 
 #endif

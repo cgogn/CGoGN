@@ -31,14 +31,17 @@
 namespace CGoGN
 {
 
-namespace Multiresolution
+namespace Algo
 {
 
-class MRFilter
+namespace MR
+{
+
+class Filter
 {
 public:
-	MRFilter() {}
-	virtual ~MRFilter() {}
+	Filter() {}
+	virtual ~Filter() {}
 	virtual void operator() () = 0 ;
 } ;
 
@@ -94,7 +97,7 @@ typename PFP::VEC3 loopEvenVertex(typename PFP::MAP& map, const VertexAttribute<
  *********************************************************************************/
 
 template <typename PFP>
-class LoopOddAnalysisFilter : public MRFilter
+class LoopOddAnalysisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -122,7 +125,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenAnalysisFilter : public MRFilter
+class LoopEvenAnalysisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -144,7 +147,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationAnalysisFilter : public MRFilter
+class LoopNormalisationAnalysisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -173,7 +176,7 @@ public:
  *********************************************************************************/
 
 template <typename PFP>
-class LoopOddSynthesisFilter : public MRFilter
+class LoopOddSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -201,7 +204,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenSynthesisFilter : public MRFilter
+class LoopEvenSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -223,7 +226,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationSynthesisFilter : public MRFilter
+class LoopNormalisationSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -549,6 +552,8 @@ public:
 
 
 } // namespace Multiresolution
+
+}
 
 } // namespace CGoGN
 
