@@ -259,9 +259,9 @@ bool exportPLYnew(typename PFP::MAP& map, const std::vector<VertexAttribute<type
 			}
 			else if ((*attrHandler)->name().compare("color") == 0)	// vertex color property
 			{
-				out << "property " << nameOfTypePly((*(*attrHandler))[0][0]) << " red" << std::endl ;
-				out << "property " << nameOfTypePly((*(*attrHandler))[0][1]) << " green" << std::endl ;
-				out << "property " << nameOfTypePly((*(*attrHandler))[0][2]) << " blue" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][0]) << " r" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][1]) << " g" << std::endl ;
+				out << "property " << nameOfTypePly((*(*attrHandler))[0][2]) << " b" << std::endl ;
 			}
 			else // other vertex properties
 			{

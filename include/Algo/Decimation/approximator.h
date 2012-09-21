@@ -70,8 +70,9 @@ public:
 	virtual ~ApproximatorGen()
 	{}
 	virtual const std::string& getApproximatedAttributeName(unsigned int index = 0) const = 0 ;
-	virtual std::vector<std::string> getApproximatedAttributeNames() const = 0 ;
+//	virtual std::vector<std::string> getApproximatedAttributeNames() const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
+	virtual unsigned int getNbApproximated() const = 0 ;
 	virtual bool init() = 0 ;
 	virtual void approximate(Dart d) = 0 ;
 	virtual void saveApprox(Dart d) = 0 ;
@@ -101,13 +102,14 @@ public:
 	Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) :
 		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
 	{
-		assert(m_attrV.size() > 0 || !"Approximator: no attributes provided") ;
+		const unsigned int& size = m_attrV.size() ;
+		assert(size > 0 || !"Approximator: no attributes provided") ;
 
-		m_approx.resize(m_attrV.size()) ;
-		m_detail.resize(m_attrV.size()) ;
-		m_app.resize(m_attrV.size()) ;
+		m_approx.resize(size) ;
+		m_detail.resize(size) ;
+		m_app.resize(size) ;
 
-		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+		for (unsigned int i = 0 ; i < size ; ++i)
 		{
 			if (!m_attrV[i]->isValid())
 				std::cerr << "Approximator Warning: attribute number " << i << " is not valid" << std::endl ;
@@ -129,6 +131,7 @@ public:
 	{
 		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 		{
+			std::cout << "delete " << m_approx[i].name() << std::endl ;
 			this->m_map.template removeAttribute(m_approx[i]) ;
 			if(m_predictor)
 				this->m_map.template removeAttribute(m_detail[i]) ;
@@ -140,14 +143,19 @@ public:
 		return m_attrV[index]->name() ;
 	}
 
-	std::vector<std::string> getApproximatedAttributeNames() const
-	{
-		std::vector<std::string> names ;
-		names.resize(m_attrV.size()) ;
-		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
-			names[i] = m_attrV[i]->name() ;
+//	std::vector<std::string> getApproximatedAttributeNames() const
+//	{
+//		std::vector<std::string> names ;
+//		names.resize(m_attrV.size()) ;
+//		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+//			names[i] = m_attrV[i]->name() ;
+//
+//		return names ;
+//	}
 
-		return names ;
+	unsigned int getNbApproximated() const
+	{
+		return m_attrV.size() ;
 	}
 
 	void saveApprox(Dart d)

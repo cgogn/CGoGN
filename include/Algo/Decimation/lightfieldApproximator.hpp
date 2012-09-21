@@ -33,7 +33,7 @@ namespace Decimation
 
 /************************************************************************************
  *                      HALF-CONTRACTION FRAME APPROXIMATOR                         *
- ************************************************************************************/
+ ************************************************************************************
 
 template <typename PFP>
 void Approximator_FrameHalf<PFP>::approximate(Dart d)
@@ -42,6 +42,19 @@ void Approximator_FrameHalf<PFP>::approximate(Dart d)
 	this->m_approx[1][d] = m_frameB->operator[](d) ;
 	this->m_approx[2][d] = m_frameN->operator[](d) ;
 }
+
+************************************************************************************
+ *                      HALF-CONTRACTION LF APPROXIMATOR                            *
+ ************************************************************************************
+
+template <typename PFP>
+void Approximator_LightfieldCoefsHalf<PFP>::approximate(Dart d)
+{
+	this->m_approx[0][d] = m_frameT->operator[](d) ;
+	this->m_approx[1][d] = m_frameB->operator[](d) ;
+	this->m_approx[2][d] = m_frameN->operator[](d) ;
+}
+*/
 
 } //namespace Decimation
 

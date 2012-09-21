@@ -37,6 +37,7 @@ namespace Algo
 namespace Decimation
 {
 
+/*
 template <typename PFP>
 class Approximator_FrameHalf : public Approximator<PFP, typename PFP::VEC3>
 {
@@ -54,7 +55,7 @@ public:
 	Approximator_FrameHalf(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
 		Approximator<PFP, VEC3>(m, attr, pred)
 	{
-		if (this->m_attrV.size() < 1)
+		if (this->m_attrV.size() < 3)
 			std::cerr << "Approximator_Frame: not enough attributes provided (only " << this->m_attrV.size() << " instead of 3)" << std::endl ;
 
 		m_frameT = this->m_attrV[0] ;
@@ -79,7 +80,7 @@ public:
 
 	void approximate(Dart d) ;
 } ;
-/*
+
 template <typename PFP>
 class Approximator_LightfieldCoefsHalf : public Approximator<PFP, typename PFP::VEC3>
 {
@@ -97,7 +98,7 @@ public:
 
 	ApproximatorType getType() const
 	{
-		return A_LightfieldHalf ;
+		return A_hLightfieldHalf ;
 	}
 
 	bool init()
@@ -106,8 +107,8 @@ public:
 	}
 
 	void approximate(Dart d) ;
-} ;
-*/
+} ;*/
+
 } //namespace Decimation
 
 } //namespace Algo

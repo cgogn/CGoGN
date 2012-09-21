@@ -460,13 +460,18 @@ private:
 	typedef NoMathIOAttribute<QEMextColorEdgeInfo> EdgeInfo ;
 
 	EdgeAttribute<EdgeInfo> edgeInfo ;
-	VertexAttribute<VEC3> m_color ;
 	VertexAttribute<QuadricNd<REAL,6> > m_quadric ;
+
+	VertexAttribute<VEC3> m_pos, m_color ;
+	//VertexAttribute<VEC3> *m_HF ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_color, m_attrindex_color ;
+
+	// Approximator<PFP, typename PFP::VEC3>* m_poscolApproximator ;
+	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
 
 	std::multimap<float,Dart> edges ;
 	typename std::multimap<float,Dart>::iterator cur ;
-
-	Approximator<PFP, typename PFP::VEC3>* m_poscolApproximator ;
 
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d, bool recompute) ;
@@ -476,13 +481,14 @@ private:
 public:
 	EdgeSelector_QEMextColor(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select),
-		m_poscolApproximator(NULL)
+//		m_poscolApproximator(NULL),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_color(-1),
+		m_attrindex_color(-1)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 		m_quadric = m.template addAttribute<QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
-
-		m_color = m.template getAttribute<VEC3, VERTEX>("color") ;
-		assert(m_color.isValid() || !"EdgeSelector_ColorNaive: Color atrribute to select is not valid") ;
 	}
 	~EdgeSelector_QEMextColor()
 	{

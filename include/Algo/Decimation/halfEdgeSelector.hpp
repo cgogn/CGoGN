@@ -287,29 +287,68 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 	MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
-	char ok = 0 ;
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
-		it != this->m_approximators.end();
-		++it)
+	unsigned int ok = 0 ;
+	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
-		// constraint : 2 approximators in specific order
-		if(ok == 0 && (*it)->getApproximatedAttributeName(0) == "position")
+		bool saved = false ;
+		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // 1) position
-			assert(m_positionApproximator->getType() != A_QEM) ; // A_QEM is not compatible for half-edge crit
-			++ok ;
+			// constraint : 2 approximators in specific order
+			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
+			{
+				++ok ;
+				m_approxindex_pos = approxindex ;
+				m_attrindex_pos = attrindex ;
+				m_pos = this->m_position ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
+			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameT")
+			{
+				++ok ;
+//				m_approxindex_FT = approxindex ;
+//				m_attrindex_FT = attrindex ;
+				m_frameT = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameT") ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					assert(m_frameT.isValid() || !"EdgeSelector_QEMextColor: frameT attribute is not valid") ;
+					saved = true ;
+				}
+			}
+			else if(ok == 2 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameB")
+			{
+				++ok ;
+//				m_approxindex_FB = approxindex ;
+//				m_attrindex_FB = attrindex ;
+				m_frameB = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameB") ;
+				assert(m_frameB.isValid() || !"EdgeSelector_QEMextColor: frameB attribute is not valid") ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
+			else if(ok == 3 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameN")
+			{
+				++ok ;
+				m_approxindex_FN = approxindex ;
+				m_attrindex_FN = attrindex ;
+				m_frameN = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameN") ;
+				assert(m_frameN.isValid() || !"EdgeSelector_QEMextColor: frameN attribute is not valid") ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
 		}
-		else
-			if( ok == 1 && (*it)->getApproximatedAttributeName(0) == "frameT")
-				if( ok == 1 && (*it)->getApproximatedAttributeName(1) == "frameB")
-					if( ok == 1 && (*it)->getApproximatedAttributeName(2) == "frameN")
-					{
-						m_frameApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // 2) frame (needs position)
-						++ok ;
-					}
 	}
 
-	if(ok != 2)
+	if(ok != 4)
 		return false ;
 
 	// Set quadric per vertex
@@ -319,7 +358,7 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 		if(!vMark.isMarked(d))
 		{
 			Quadric<REAL> q ;		// create one quadric
-			m_quadric[d] = q ;		// per vertex
+			m_quadricGeom[d] = q ;		// per vertex
 			vMark.mark(d) ;
 		}
 	}
@@ -334,9 +373,9 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 			Dart d1 = m.phi1(d) ;					// for each triangle,
 			Dart d_1 = m.phi_1(d) ;					// initialize the quadric of the triangle
 			Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
-			m_quadric[d] += q ;						// and add the contribution of
-			m_quadric[d1] += q ;						// this quadric to the ones
-			m_quadric[d_1] += q ;						// of the 3 incident vertices
+			m_quadricGeom[d] += q ;						// and add the contribution of
+			m_quadricGeom[d1] += q ;						// this quadric to the ones
+			m_quadricGeom[d_1] += q ;						// of the 3 incident vertices
 			mark.markOrbit<FACE>(d) ;
 		}
 	}
@@ -412,7 +451,7 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
 	// Init Front
 	dFront = dInit ;
 
-	m_quadric[d].zero() ;
+	m_quadricGeom[d].zero() ;
 
    	do
    	{
@@ -422,7 +461,7 @@ void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool
 
        	if (dBack != dFront)
        	{ // if dFront is no border
-       		m_quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi1(dFront)],this->m_position[dBack]) ;
+       		m_quadricGeom[d] += Quadric<REAL>(m_pos[d],m_pos[this->m_map.phi1(dFront)],m_pos[dBack]) ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -520,41 +559,53 @@ void HalfEdgeSelector_Lightfield<PFP>::updateHalfEdgeInfo(Dart d, bool recompute
 
 template <typename PFP>
 void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
-{	// TODO
+{
 	MAP& m = this->m_map ;
 	Dart dd = m.phi1(d) ;
 
+	// compute all approximated attributes
+	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
+			it != this->m_approximators.end() ;
+			++it)
+	{
+		(*it)->approximate(d) ;
+	}
+
+	// Get all approximated attributes
 	// New position
-	Quadric<REAL> quad ;
-	quad += m_quadric[d] ;	// compute the sum of the
-	quad += m_quadric[dd] ;	// two vertices quadrics
+	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
+	// New normal
+	const VEC3& newFN = this->m_approx[m_approxindex_FN]->getApprox(d,m_attrindex_FN) ; // get new frameN
 
-	this->m_positionApproximator->approximate(d) ; 		// sets newPos
-	VEC3 newPos = this->m_positionApproximator->getApprox(d) ; // get newPos
+	// New function
+	// todo const VEC3& hfcoefs0 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[0]) ; // get newHFcoefs0
+	// todo const VEC3& hfcoefs1 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[1]) ; // get newHFcoefs1
+	// todo const VEC3& hfcoefs2 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[2]) ; // get newHFcoefs2
+	// ...
+	// todo const VEC3& hfcoefsK = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[K]) ; // get newHFcoefsK
 
-	// New Frame
-	this->m_frameApproximator->approximate(d) ; 		// sets new color
-	const VEC3& newFN = this->m_frameApproximator->getApprox(d,2) ; // get new frameN
+	// Compute errors
+	// Position
+	Quadric<REAL> quadGeom ;
+	quadGeom += m_quadricGeom[d] ;	// compute the sum of the
+	quadGeom += m_quadricGeom[dd] ;	// two vertices quadrics
 
-	// Compute hemisphere difference error
+	// hemisphere difference error
 	double scal1 = abs(double(m_frameN[d] * newFN)) ;
 	scal1 = std::min(scal1, double(1)) ; // for epsilon normalization of newFN errors
-	double alpha = acos(scal1) ;
-
+	// angle 2
 	double scal2 = abs(double(m_frameN[dd] * newFN)) ;
 	scal2 = std::min(scal2, double(1)) ;
-	alpha += acos(scal2) ;
-
-	// Sum of abs values works only if newFN is in-between the two old ones (interpolated).
+	// Important: sum of abs values works only if newFN is in-between the two old ones (interpolated).
 	// This avoids computation of the sign of alpha1 and alpha2.
+	double alpha = acos(scal1 + scal2) ;
 
-	std::cout << quad(newPos) << " vs " << ((alpha <= M_PI/2.) ? sin(alpha)/2. : 1 - sin(alpha)/2.) << std::endl ;
-
+	std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << std::endl ;
 	// sum of QEM metric and frame orientation difference
 	REAL err =
-			quad(newPos) // geom
-			+ ((alpha <= M_PI/2.) ? sin(alpha)/2. : 1 - sin(alpha)/2.) // frame
-			//TODO // function coefficients
+			quadGeom(newPos) // geom
+			+ alpha / M_PI // frame
+			// todo+ quadHF(newHF) // function coefficients
 			 ;
 
 	heinfo.it = halfEdges.insert(std::make_pair(err, d)) ;

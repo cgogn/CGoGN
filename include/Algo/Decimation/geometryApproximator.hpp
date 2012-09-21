@@ -246,7 +246,8 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	this->m_approx[0][d] = this->m_attrV[0]->operator[](d) ;
+	for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
+		this->m_approx[i][d] = this->m_attrV[i]->operator[](d) ;
 
 	if(this->m_predictor)
 	{
@@ -259,11 +260,17 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
 		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
-		this->m_attrV[0]->operator[](newV) = this->m_approx[0][d] ;
+		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
+		{
+			this->m_attrV[i]->operator[](newV) = this->m_approx[i][d] ;
+		}
 
 		// compute the detail vector
 		this->m_predictor->predict(d2, dd2) ;
-		this->m_detail[0][d] = v2 - this->m_predictor->getPredict(1) ;
+		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
+		{
+			this->m_detail[i][d] = v2 - this->m_predictor->getPredict(1) ;
+		}
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;

@@ -110,15 +110,19 @@ private:
 	typedef NoMathIOAttribute<QEMhalfEdgeInfo> HalfEdgeInfo ;
 
 	DartAttribute<HalfEdgeInfo> halfEdgeInfo ;
-	VertexAttribute<VEC3> m_frameT, m_frameB, m_frameN ;
-	VertexAttribute<Quadric<REAL> > m_quadric ;
+
+	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN ;
+	//VertexAttribute<VEC3> *m_HF ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_FN, m_attrindex_FN ;
+
+	VertexAttribute<Quadric<REAL> > m_quadricGeom ;
+	VertexAttribute<QuadricHF<REAL> > m_quadricHF ;
 
 	std::multimap<float,Dart> halfEdges ;
 	typename std::multimap<float,Dart>::iterator cur ;
 
-	Approximator<PFP, typename PFP::VEC3>* m_positionApproximator ;
-	Approximator<PFP, typename PFP::VEC3>* m_frameApproximator ;
-	// Approximator<PFP, typename PFP::VEC3>* m_lfcoefsApproximator ;
+	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
 
 	void initHalfEdgeInfo(Dart d) ;
 	void updateHalfEdgeInfo(Dart d, bool recompute) ;
@@ -128,23 +132,27 @@ private:
 public:
 	HalfEdgeSelector_Lightfield(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
 		EdgeSelector<PFP>(m, pos, approx, select),
-		m_positionApproximator(NULL),
-		m_frameApproximator(NULL)
+//		m_positionApproximator(NULL),
+//		m_frameApproximator(NULL),
+//		m_hfcoefsApproximator(NULL),
+//		m_pos(NULL),
+//		m_frameB(NULL),
+//		m_frameN(NULL),
+//		m_frameT(NULL),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_FN(-1),
+		m_attrindex_FN(-1)
 	{
 		halfEdgeInfo = m.template addAttribute<HalfEdgeInfo, DART>("halfEdgeInfo") ;
-		m_quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
-
-		m_frameT = m.template getAttribute<VEC3, VERTEX>("frameT") ;
-		m_frameB = m.template getAttribute<VEC3, VERTEX>("frameB") ;
-		m_frameN = m.template getAttribute<VEC3, VERTEX>("frameN") ;
-		assert(m_frameT.isValid() || !"HalfEdgeSelector_Lightfield: frameT atrribute to select is not valid") ;
-		assert(m_frameB.isValid() || !"HalfEdgeSelector_Lightfield: frameT atrribute to select is not valid") ;
-		assert(m_frameN.isValid() || !"HalfEdgeSelector_Lightfield: frameT atrribute to select is not valid") ;
+		m_quadricGeom = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+		m_quadricHF = m.template addAttribute<QuadricHF<REAL>, VERTEX>("HFquadric") ;
 	}
 	~HalfEdgeSelector_Lightfield()
 	{
 		this->m_map.removeAttribute(halfEdgeInfo) ;
-		this->m_map.removeAttribute(m_quadric) ;
+		this->m_map.removeAttribute(m_quadricGeom) ;
+		this->m_map.removeAttribute(m_quadricHF) ;
 	}
 	SelectorType getType() { return S_hLightfield ; }
 	bool init() ;

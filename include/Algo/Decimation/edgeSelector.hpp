@@ -1351,25 +1351,42 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 	MAP& m = this->m_map ;
 
 	// Verify availability of required approximators
-	bool ok = false ;
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
-		it != this->m_approximators.end();
-		++it)
+	unsigned int ok = 0 ;
+	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
-		// constraint : 2 approximators in specific order
-		if((*it)->getApproximatedAttributeName(0) == "position" && (*it)->getApproximatedAttributeName(1) == "color")
+		bool saved = false ;
+		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
-			m_poscolApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ; // pos + col
-			// check incompatibilities
-			assert(m_poscolApproximator->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-			assert(m_poscolApproximator->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-			assert(m_poscolApproximator->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (ColorNaive) are not compatible") ;
-
-			ok = true ;
+			// constraint : 2 approximators in specific order
+			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
+			{
+				++ok ;
+				m_approxindex_pos = approxindex ;
+				m_attrindex_pos = attrindex ;
+				m_pos = this->m_position ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
+			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "color")
+			{
+				++ok ;
+				m_approxindex_color = approxindex ;
+				m_attrindex_color = attrindex ;
+				m_color = m.template getAttribute<typename PFP::VEC3, VERTEX>("color") ;
+				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
+				if (!saved)
+				{
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					saved = true ;
+				}
+			}
 		}
 	}
 
-	if(!ok)
+	if(ok != 2)
 		return false ;
 
 	TraversorV<MAP> travV(m);
@@ -1585,9 +1602,20 @@ void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	quad += m_quadric[d] ;	// compute the sum of the
 	quad += m_quadric[dd] ;	// two vertices quadrics
 
-	this->m_poscolApproximator->approximate(d) ; 		// sets newPos
-	VEC3 newPos = this->m_poscolApproximator->getApprox(d,0) ; // get newPos
-	VEC3 newCol = this->m_poscolApproximator->getApprox(d,1) ; // get newCol
+	// compute all approximated attributes
+	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
+			it != this->m_approximators.end() ;
+			++it)
+	{
+		(*it)->approximate(d) ;
+	}
+
+	// get pos
+	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
+	// get col
+	const VEC3& newCol = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get newPos
+
+	// compute error
 	VEC6 newEmb ;
 	for (unsigned int i = 0 ; i < 3 ; ++i)
 	{

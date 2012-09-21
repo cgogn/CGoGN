@@ -312,6 +312,154 @@ private:
 	}
 } ;
 
+template <typename REAL>
+class QuadricHF
+{
+	// TODO
+public:
+	static std::string CGoGNnameOfType() { return "QuadricHF" ; }
+
+	typedef Geom::Vector<3,REAL> VECN ;
+	typedef Geom::Vector<4,REAL> VECNp ;
+
+	QuadricHF()
+	{
+		A.zero() ;
+		b.zero() ;
+		c = 0 ;
+	}
+
+	QuadricHF(int i)
+	{
+		A.zero() ;
+		b.zero() ;
+		c = 0 ;
+	}
+
+	QuadricHF(const VECN& p1_r, const VECN& p2_r, const VECN& p3_r)
+	{
+		const Geom::Vector<3,double>& p1 = p1_r ;
+		const Geom::Vector<3,double>& p2 = p2_r ;
+		const Geom::Vector<3,double>& p3 = p3_r ;
+
+		Geom::Vector<3,double> e1 = p2 - p1 ; 						e1.normalize() ;
+		Geom::Vector<3,double> e2 = (p3 - p1) - (e1*(p3-p1))*e1 ; 	e2.normalize() ;
+
+		A.identity() ;
+		A -= Geom::transposed_vectors_mult(e1,e1) + Geom::transposed_vectors_mult(e2,e2) ;
+
+		b = (p1*e1)*e1 + (p1*e2)*e2 - p1 ;
+
+		c = p1*p1 - pow((p1*e1),2) - pow((p1*e2),2) ;
+	}
+
+	void zero()
+	{
+		A.zero() ;
+		b.zero() ;
+		c = 0 ;
+	}
+
+	void operator= (const QuadricHF<REAL>& q)
+	{
+		A = q.A ;
+		b = q.b ;
+		c = q.c ;
+	}
+	QuadricHF& operator+= (const QuadricHF<REAL>& q)
+	{
+		A += q.A ;
+		b += q.b ;
+		c += q.c ;
+		return *this ;
+	}
+
+	QuadricHF& operator -= (const QuadricHF<REAL>& q)
+	{
+		A -= q.A ;
+		b -= q.b ;
+		c -= q.c ;
+		return *this ;
+	}
+
+	QuadricHF& operator *= (REAL v)
+	{
+		A *= v ;
+		b *= v ;
+		c *= v ;
+		return *this ;
+	}
+	QuadricHF& operator /= (REAL v)
+	{
+		A /= v ;
+		b /= v ;
+		c /= v ;
+		return *this ;
+	}
+
+	REAL operator() (const VECNp& v) const
+	{
+		VECN hv ;
+		for (unsigned int i = 0 ; i < 3 ; ++i)
+			hv[i] = v[i] ;
+
+		return evaluate(v) ;
+	}
+
+	REAL operator() (const VECN& v) const
+	{
+		return evaluate(v) ;
+	}
+
+	friend std::ostream& operator<<(std::ostream& out, const QuadricHF<REAL>& q)
+	{
+		out << "(" << q.A << ", " << q.b << ", " << q.c << ")" ;
+		return out ;
+	}
+
+	friend std::istream& operator>>(std::istream& in, QuadricHF<REAL>& q)
+	{
+		in >> q.A ;
+		in >> q.b ;
+		in >> q.c ;
+		return in ;
+	}
+
+	bool findOptimizedVec(VECN& v)
+	{
+		return optimize(v) ;
+	}
+
+private:
+	// Double computation is crucial for stability
+	Geom::Matrix<3,3,double> A ;
+	Geom::Vector<3,double> b ;
+	double c ;
+
+	REAL evaluate(const VECN& v) const
+	{
+		Geom::Vector<3, double> v_d = v ;
+		return v_d*A*v_d + 2.*(b*v_d) + c ;
+	}
+
+	bool optimize(VECN& v) const
+	{
+		if (std::isnan(A(0,0)))
+			return false ;
+
+		Geom::Matrix<3,3,double> Ainv ;
+		double det = A.invert(Ainv) ;
+
+		if(det > -1e-6 && det < 1e-6)
+			return false ;
+
+		v.zero() ;
+		v -= Ainv * b ;
+
+		return true ;
+	}
+} ;
+
 //} // Utils
 
 } // CGOGN
