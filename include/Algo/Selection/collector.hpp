@@ -723,10 +723,168 @@ inline float Collector_Dijkstra<PFP>::edgeLength (Dart d)
 	return v.norm();
 }
 
-//template <typename PFP>
-//inline Dart Collector_Dijkstra<PFP>::oppositeVertex(Dart d){
-//	return this->map.ph1(d);
-//}
+/*********************************************************
+ * Collector Dijkstra_Vertices
+ *********************************************************/
+
+template <typename PFP>
+void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
+{
+	init(dinit);
+
+	CellMarkerStore<VERTEX> vmReached (this->map, this->m_thread);
+	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].valid = true;
+	vmReached.mark(this->centerDart);
+
+	while ( !front.empty() && front.begin()->first < this->maxDist)
+	{
+		Dart e = front.begin()->second;
+		float d = front.begin()->first;
+		front.erase(vertexInfo[e].it);
+		vertexInfo[e].valid=false;
+		this->insideVertices.push_back(e);
+
+		Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+		for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+		{
+			VertexInfo& vi (vertexInfo[f]);
+			if (vmReached.isMarked(f))
+			{
+				if (vi.valid) // probably useless (because of distance test) but faster
+				{
+					float dist = d + edge_cost[f];
+					if (dist < vi.it->first)
+					{
+						front.erase(vi.it);
+						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+					}
+				}
+			}
+			else
+			{
+				vi.it = front.insert(std::pair<float,Dart>(d + edge_cost[f], f));
+				vi.valid=true;
+				vmReached.mark(f);
+			}
+
+		}
+
+	}
+
+	while ( !front.empty())
+	{
+		vmReached.unmark(front.begin()->second);
+		front.erase(front.begin());
+	}
+
+
+	CellMarkerStore<EDGE> em (this->map, this->m_thread);
+	CellMarkerStore<FACE> fm (this->map, this->m_thread);
+	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
+	{
+		// collect insideEdges
+		Traversor2VE<typename PFP::MAP> te (this->map, *e_it);
+		for (Dart e = te.begin(); e != te.end(); e=te.next())
+		{
+			if ( !em.isMarked(e) && vmReached.isMarked(this->map.phi2(e)) )
+			{ // opposite vertex is inside -> inside edge
+				this->insideEdges.push_back(e);
+				em.mark(e);
+			}
+		}
+
+		// collect insideFaces and border
+		Traversor2VF<typename PFP::MAP> tf (this->map, *e_it);
+		for (Dart f = tf.begin(); f != tf.end(); f=tf.next())
+		{
+			if ( !fm.isMarked(f) )
+			{
+				fm.mark(f);
+				Traversor2FV<typename PFP::MAP> tv (this->map, f);
+				Dart v = tv.begin();
+				while ( v != tv.end() && vmReached.isMarked(v) ) {v=tv.next();}
+				if ( v == tv.end() )
+					this->insideFaces.push_back(f);
+				else
+					this->border.push_back(f);
+			}
+		}
+	}
+}
+
+template <typename PFP>
+void Collector_Dijkstra_Vertices<PFP>::collectBorder(Dart dinit)
+{
+	init(dinit);
+
+	CellMarkerStore<VERTEX> vmReached (this->map, this->m_thread);
+	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
+	vertexInfo[this->centerDart].valid = true;
+	vmReached.mark(this->centerDart);
+
+	while ( !front.empty() && front.begin()->first < this->maxDist)
+	{
+		Dart e = front.begin()->second;
+		float d = front.begin()->first;
+		front.erase(vertexInfo[e].it);
+		vertexInfo[e].valid=false;
+		this->insideVertices.push_back(e);
+
+		Traversor2VVaE<typename PFP::MAP> tv (this->map, e);
+		for (Dart f = tv.begin(); f != tv.end(); f=tv.next())
+		{
+			VertexInfo& vi (vertexInfo[f]);
+			if (vmReached.isMarked(f))
+			{
+				if (vi.valid) // probably useless (because of distance test) but faster
+				{
+					float dist = d + edge_cost[f];
+					if (dist < vi.it->first)
+					{
+						front.erase(vi.it);
+						vi.it = front.insert(std::pair<float,Dart>(dist, f));
+					}
+				}
+			}
+			else
+			{
+				vi.it = front.insert(std::pair<float,Dart>(d + edge_cost[f], f));
+				vi.valid=true;
+				vmReached.mark(f);
+			}
+
+		}
+
+	}
+
+	while ( !front.empty())
+	{
+		vmReached.unmark(front.begin()->second);
+		front.erase(front.begin());
+	}
+
+
+	CellMarkerStore<FACE> fm (this->map, this->m_thread);
+	for (std::vector<Dart>::iterator e_it = this->insideVertices.begin(); e_it != this->insideVertices.end() ; e_it++)
+	{
+		// collect border
+		Traversor2VF<typename PFP::MAP> tf (this->map, *e_it);
+		for (Dart f = tf.begin(); f != tf.end(); f=tf.next())
+		{
+			if ( !fm.isMarked(f) )
+			{
+				fm.mark(f);
+				Traversor2FV<typename PFP::MAP> tv (this->map, f);
+				Dart v = tv.begin();
+				while ( v != tv.end() && vmReached.isMarked(v) ) {v=tv.next();}
+				if ( v != tv.end() )
+					this->border.push_back(f);
+			}
+		}
+	}
+	this->insideVertices.clear();
+}
 
 } // namespace Selection
 
