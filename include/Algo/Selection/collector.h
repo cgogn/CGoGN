@@ -201,7 +201,7 @@ public:
 };
 
 /*********************************************************
- * Collector Vertices
+ * Collector Criterions
  *********************************************************/
 class CollectorCriterion
 {
@@ -211,31 +211,6 @@ public :
 	virtual bool isInside(Dart d) = 0;
 
 };
-
-/*
- * collect all vertices of the connected component containing "centerDart"
- * within a distance to centerDart defined by the CollectorCriterion
- * (hopefully) it defines a 2-manifold (if inserting border-vertices along the border-edges)
- */
-template <typename PFP>
-class Collector_Vertices : public Collector<PFP>
-{
-protected:
-	CollectorCriterion & crit;
-
-public:
-	Collector_Vertices(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread=0) :
-		Collector<PFP>(m, thread),
-		crit(c)
-	{}
-
-	void collectAll(Dart d);
-	void collectBorder(Dart d);
-};
-
-/*********************************************************
- * Collector Criterions
- *********************************************************/
 
 template <typename PFP>
 class CollectorCriterion_VertexNormalAngle : public CollectorCriterion
@@ -254,6 +229,26 @@ public :
 	void init (Dart center) {centerNormal = vertexNormals[center];}
 	bool isInside (Dart d) {
 		return ( Geom::angle(centerNormal, vertexNormals[d]) < threshold);
+	}
+};
+
+template <typename PFP>
+class CollectorCriterion_TriangleNormalAngle : public CollectorCriterion
+{ // tests if the angle between vertex normals is below some threshold
+private :
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
+
+	const FaceAttribute<VEC3> & faceNormals;
+	REAL threshold;
+	VEC3 centerNormal;
+public :
+	CollectorCriterion_TriangleNormalAngle(const FaceAttribute<VEC3> & n, REAL th) :
+		faceNormals(n), threshold(th), centerNormal(0) {}
+
+	void init (Dart center) {centerNormal = faceNormals[center];}
+	bool isInside (Dart d) {
+		return ( Geom::angle(centerNormal, faceNormals[d]) < threshold);
 	}
 };
 
@@ -279,6 +274,32 @@ public :
 
 
 /*********************************************************
+ * Collector Vertices
+ *********************************************************/
+
+/*
+ * collect all vertices of the connected component containing "centerDart"
+ * within a distance to centerDart defined by the CollectorCriterion
+ * (hopefully) it defines a 2-manifold (if inserting border-vertices along the border-edges)
+ */
+template <typename PFP>
+class Collector_Vertices : public Collector<PFP>
+{
+protected:
+	CollectorCriterion & crit;
+
+public:
+	Collector_Vertices(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread=0) :
+		Collector<PFP>(m, thread),
+		crit(c)
+	{}
+
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
+};
+
+
+/*********************************************************
  * Collector Normal Angle (Triangles)
  *********************************************************/
 
@@ -286,6 +307,7 @@ public :
  * collect all primitives of the connected component containing "centerDart"
  * the angle between the included triangles normal vectors and the central normal vector
  * stays under a given threshold
+ * NB : is equivalent to Collector_Triangles with CollectorCriterion_TriangleNormalAngle
  */
 template <typename PFP>
 class Collector_NormalAngle_Triangles : public Collector<PFP>
@@ -309,6 +331,30 @@ public:
 	void collectAll(Dart d) ;
 	void collectBorder(Dart d) ;
 };
+
+/*********************************************************
+ * Collector Triangles
+ *********************************************************/
+
+/*
+ * collect all triangles of the connected component containing "centerDart"
+ * within a distance to centerDart defined by the CollectorCriterion
+ */
+template <typename PFP>
+class Collector_Triangles : public Collector<PFP>
+{
+protected:
+	CollectorCriterion & crit;
+
+public:
+	Collector_Triangles(typename PFP::MAP& m, CollectorCriterion& c, unsigned int thread=0) :
+		Collector<PFP>(m,thread), crit(c)
+	{}
+
+	void collectAll(Dart d) ;
+	void collectBorder(Dart d) ;
+};
+
 
 /*********************************************************
  * Collector Dijkstra
