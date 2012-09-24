@@ -48,9 +48,9 @@ enum ApproximatorType
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	A_hHalfCollapse,
 	A_hQEM,
-	A_hLightfieldHalf/*,
-	A_LightfieldHalf_deprecated,
-	A_LightfieldFull_deprecated*/
+	A_hLightfieldHalf,
+	A_hLightfield
+
 } ;
 
 template <typename PFP>
@@ -131,7 +131,6 @@ public:
 	{
 		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
 		{
-			std::cout << "delete " << m_approx[i].name() << std::endl ;
 			this->m_map.template removeAttribute(m_approx[i]) ;
 			if(m_predictor)
 				this->m_map.template removeAttribute(m_detail[i]) ;

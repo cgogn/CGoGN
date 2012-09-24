@@ -45,7 +45,7 @@ void decimate(
 	typename PFP::MAP& map,
 	SelectorType s,
 	ApproximatorType a,
-	VertexAttribute<typename PFP::VEC3>& position,
+	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
 	unsigned int nbWantedVertices,
 	const FunctorSelect& selected = allDarts,
 	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
