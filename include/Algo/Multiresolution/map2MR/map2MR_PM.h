@@ -29,6 +29,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
+#include "Container/attributeContainer.h"
 
 #include "Algo/Decimation/selector.h"
 #include "Algo/Decimation/edgeSelector.h"

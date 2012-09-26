@@ -120,7 +120,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 				const VEC3& P = positions[d];
 				vecPos.push_back(P);
 				center += P;
-				d = map.phi1(d);
+				Dart e = map.phi1(d);
+				d = e;
 			} while (d != dd);
 			center /= REAL(vecPos.size());
 

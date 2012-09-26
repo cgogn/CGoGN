@@ -34,7 +34,6 @@
 namespace CGoGN
 {
 
-}
 namespace Algo
 {
 
@@ -124,19 +123,6 @@ public:
 	 *               SUBDIVISION                       *
 	 ***************************************************/
 
-	/**
-	 * add a new resolution level
-	 */
-	void addNewLevel(bool embedNewVertices = true) ;
-
-	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
-
-	template <unsigned int ORBIT>
-	void propagateDartEmbedding(Dart d) ;
-
-	template <unsigned int ORBIT>
-	void propagateOrbitEmbedding(Dart d) ;
-
 	Dart cutEdge(Dart d) ;
 	void splitFace(Dart d, Dart e) ;
 
@@ -155,7 +141,9 @@ public:
 	/**
 	 * subdivide the face of d to the next level
 	 */
-	unsigned int subdivideFace(Dart d) ;
+	unsigned int subdivideFace(Dart d, bool triQuad = true) ;
+
+	unsigned int subdivideFace2(Dart d) ;
 
 	/**
 	 * coarsen the face of d from the next level

@@ -230,11 +230,11 @@ public:
 	 */
 	unsigned int getMaxLevel() ;
 
-private:
-	/*
-	 * add a resolution level
-	 */
-	AttributeMultiVector<unsigned int>* addLevel();
+//private:
+//	/*
+//	 * add a resolution level
+//	 */
+//	AttributeMultiVector<unsigned int>* addLevel();
 
 public:
 	/**
@@ -268,14 +268,9 @@ public:
 	void duplicateDarts(unsigned int level);
 
 	/**
-	 *
+	 * duplicate a dart starting from current level
 	 */
-	void duplicateMRDart(Dart d);
-
-	/**
-	 *
-	 */
-	void unrefMRDart(Dart d);
+	void duplicateDart(Dart d) ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -297,11 +292,6 @@ protected:
 	unsigned int copyDartLine(unsigned int index) ;
 
 	/**
-	 * duplicate a dart starting from current level
-	 */
-	void duplicateDart(Dart d) ;
-
-	/**
 	 * Properly deletes a dart in m_attribs[DART]
 	 */
 	void deleteDartLine(unsigned int index) ;
@@ -316,6 +306,12 @@ public:
 	 * get the insertion level of a dart (use only in MRMaps)
 	 */
 	unsigned int getDartLevel(Dart d) const ;
+
+	/**
+	 *
+	 */
+	void incDartLevel(Dart d) const ;
+
 
 	/**
 	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
@@ -463,6 +459,16 @@ public:
 	template <unsigned int ORBIT>
 	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector() ;
 
+	/**
+	 * get the MR attribute container
+	 */
+	AttributeContainer& getMRAttributeContainer() ;
+
+	/**
+	 * get the MR attribute container
+	 */
+	AttributeMultiVector<unsigned int>* getMRDartAttributeVector(unsigned int level) ;
+
 //	/**
 //	 * swap two attribute containers
 //	 */
@@ -485,6 +491,8 @@ public:
 	 * print attributes name of map in std::cout (for debugging)
 	 */
 	void viewAttributesTables() ;
+
+	void printDartsTable();
 
 protected:
 	/****************************************

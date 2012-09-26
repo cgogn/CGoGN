@@ -174,7 +174,7 @@ void GenericMap::printMR()
 
 	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 	{
-		std::cout << (*m_mrLevels)[i] << " / " ;
+		std::cout << i << " : " << (*m_mrLevels)[i] << " / " ;
 		for(unsigned int j = 0; j < m_mrDarts.size(); ++j)
 			std::cout << (*m_mrDarts[j])[i] << " ; " ;
 		std::cout << std::endl ;
@@ -202,8 +202,24 @@ void GenericMap::initMR()
 	setCurrentLevel(0) ;
 }
 
-AttributeMultiVector<unsigned int>* GenericMap::addLevel()
+//AttributeMultiVector<unsigned int>* GenericMap::addLevel()
+//{
+//	unsigned int newLevel = m_mrDarts.size() ;
+//	std::stringstream ss ;
+//	ss << "MRdart_"<< newLevel ;
+//	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+//	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[newLevel - 1];
+//
+//	// copy the indices of previous level into new level
+//	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
+//
+//	return newAttrib;
+//}
+
+void GenericMap::addLevelBack()
 {
+	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
+
 	unsigned int newLevel = m_mrDarts.size() ;
 	std::stringstream ss ;
 	ss << "MRdart_"<< newLevel ;
@@ -213,19 +229,23 @@ AttributeMultiVector<unsigned int>* GenericMap::addLevel()
 	// copy the indices of previous level into new level
 	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
 
-	return newAttrib;
-}
-
-void GenericMap::addLevelBack()
-{
-	AttributeMultiVector<unsigned int>* newAttrib = addLevel();
 	m_mrDarts.push_back(newAttrib) ;
 	m_mrNbDarts.push_back(0) ;
 }
 
 void GenericMap::addLevelFront()
 {
-	AttributeMultiVector<unsigned int>* newAttrib = addLevel();
+	//AttributeMultiVector<unsigned int>* newAttrib = addLevel();
+
+	unsigned int newLevel = m_mrDarts.size() ;
+	std::stringstream ss ;
+	ss << "MRdart_"<< newLevel ;
+	AttributeMultiVector<unsigned int>* newAttrib = m_mrattribs.addAttribute<unsigned int>(ss.str()) ;
+	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[0];
+
+	// copy the indices of previous level into new level
+	m_mrattribs.copyAttribute(newAttrib->getIndex(), prevAttrib->getIndex()) ;
+
 	m_mrDarts.insert(m_mrDarts.begin(), newAttrib) ;
 	m_mrNbDarts.insert(m_mrNbDarts.begin(), 0) ;
 }
@@ -277,37 +297,13 @@ void GenericMap::copyLevel(unsigned int level)
 
 void GenericMap::duplicateDarts(unsigned int level)
 {
-	AttributeMultiVector<unsigned int>* newAttrib = m_mrDarts[level] ;
-	AttributeMultiVector<unsigned int>* prevAttrib = m_mrDarts[level - 1];
+	AttributeMultiVector<unsigned int>* attrib = m_mrDarts[level] ;
 
 	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
 	{
-		unsigned int oldi = (*prevAttrib)[i] ;	// get the index of the dart in previous level
-		(*newAttrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
+		unsigned int oldi = (*attrib)[i] ;	// get the index of the dart in previous level
+		(*attrib)[i] = copyDartLine(oldi) ;	// copy the dart and affect it to the new level
 	}
-}
-
-void GenericMap::duplicateMRDart(Dart d)
-{
-	assert(getDartLevel(d) <= getCurrentLevel() || !"duplicateDart : called with a dart inserted after current level") ;
-
-//	if(getDartLevel(d) == getCurrentLevel())	// no need to duplicate
-//		return ;								// a dart from its insertion level
-
-	unsigned int oldindex = dartIndex(d) ;
-
-//	if((*m_mrDarts[m_mrCurrentLevel - 1])[d.index] != oldindex)	// no need to duplicate if the dart is already
-//		return ;												// duplicated with respect to previous level
-
-	unsigned int newindex = copyDartLine(oldindex) ;
-
-	assert((*m_mrDarts[getCurrentLevel()])[d.index] == oldindex || !"duplicateDart : dart was already duplicated on a greater level") ;
-	(*m_mrDarts[getCurrentLevel()])[d.index] = newindex ;
-}
-
-void GenericMap::unrefMRDart(Dart d)
-{
-	m_mrDarts[m_mrCurrentLevel]->operator[](d.index) = MRNULL ;
 }
 
 /****************************************
@@ -373,6 +369,13 @@ void GenericMap::viewAttributesTables()
 	for (unsigned int i = 0; i < NB_ORBITS; ++i)
 		std::cout << (long)(m_markTables[i][0]) << " / " ;
 	std::cout << std::endl << "-------------------------" << std::endl << std::dec ;
+}
+
+void GenericMap::printDartsTable()
+{
+	std::cout << "======================="<< std::endl ;
+
+	//m_attribs[DART]
 }
 
 /****************************************

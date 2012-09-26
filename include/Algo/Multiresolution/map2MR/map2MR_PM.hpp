@@ -136,15 +136,20 @@ void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation
 template <typename PFP>
 void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 {
-	// level handling
-	m_map.pushLevel() ;
-	m_map.addLevelBack();
-	m_map.duplicateDarts(m_map.getMaxLevel());
-	m_map.setCurrentLevel(m_map.getMaxLevel());
-
 	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
-	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
+
+	unsigned int nbDeletedVertex=0;
+	unsigned int percentWantedPerLevel = 20;
+	unsigned int nbWantedPerLevel = nbWantedVertices * percentWantedPerLevel / 100 ;
+
+	//create the new level
+	m_map.addLevelFront();
+	m_map.setCurrentLevel(0);
+
+	m_map.printMR();
+
+	DartMarkerStore me(m_map); 	//mark edges not to collapse
 
 	bool finished = false ;
 	Dart d ;
@@ -153,39 +158,194 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 		if(!m_selector->nextEdge(d))
 			break ;
 
-		--nbVertices ;
-		Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
-		Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
-
-		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+		if(!me.isMarked(d))
 		{
-			(*it)->approximate(d) ;					// compute approximated attributes with its associated detail
-			(*it)->saveApprox(d) ;
+
+			//me.mark le 1 voisinage
+
+			Dart dt = d;
+			do
+			{
+				Dart dit = dt;
+				do
+				{
+					me.mark(m_map.phi1(dit));
+					me.mark(m_map.phi1(m_map.phi1(dit)));
+					dit = m_map.phi2(m_map.phi_1(dit));
+				}
+				while(dit != dt);
+
+				dt = m_map.phi1(dt);
+			}while(dt != d);
+
+			dt = m_map.phi2(d);
+			do
+			{
+				Dart dit = dt;
+				do
+				{
+					me.mark(m_map.phi1(dit));
+					me.mark(m_map.phi1(m_map.phi1(dit)));
+					dit = m_map.phi2(m_map.phi_1(dit));
+				}
+				while(dit != dt);
+
+				dt = m_map.phi1(dt);
+			}while(dt != m_map.phi2(d));
+
+
+			//incremente le dartLevel des brins des faces supprime
+			m_map.incDartLevel(d);
+			m_map.incDartLevel(m_map.phi1(d));
+			m_map.incDartLevel(m_map.phi_1(d));
+			m_map.incDartLevel(m_map.phi2(d));
+			m_map.incDartLevel(m_map.phi_1(m_map.phi2(d)));
+			m_map.incDartLevel(m_map.phi1(m_map.phi2(d)));
+
+			++nbDeletedVertex ;
+
+			Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
+			Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
+
+			m_selector->updateBeforeCollapse(d) ;		// update selector
+
+			collapseEdge(d);
+
+			m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
+
+			if(nbDeletedVertex <= nbWantedPerLevel)
+				finished = true ;
 		}
-
-		m_selector->updateBeforeCollapse(d) ;		// update selector
-
-		collapseEdge(d);
-
-		unsigned int newV = m_map.template embedNewCell<VERTEX>(d2) ;
-		unsigned int newE1 = m_map.template embedNewCell<EDGE>(d2) ;
-		unsigned int newE2 = m_map.template embedNewCell<EDGE>(dd2) ;
-//		vs->setApproxV(newV) ;
-//		vs->setApproxE1(newE1) ;
-//		vs->setApproxE2(newE2) ;
-
-		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
-			(*it)->affectApprox(d2);				// affect data to the resulting vertex
-
-		m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
-
-		if(nbVertices <= nbWantedVertices)
-			finished = true ;
 	}
 
-	m_map.popLevel();
 
-	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
+	CGoGNout << "..done (" << nbDeletedVertex << " vertices)" << CGoGNendl ;
+
+	m_map.printMR();
+
+
+//	DartMarkerStore me(m_map); 	//mark edges not to collapse
+//	DartMarkerStore mc(m_map); 	//mark darts to collapse
+//	std::vector<Dart> ec; 		//save a dart from edge to collapse
+//
+//	for(Dart d = m_map.begin() ; d != m_map.end() ; m_map.next(d))
+//	{
+//		if(!me.isMarked(d))
+//		{
+//			Dart dt = d;
+//			do
+//			{
+//				Dart dit = dt;
+//				do
+//				{
+//					me.mark(m_map.phi1(dit));
+//					me.mark(m_map.phi1(m_map.phi1(dit)));
+//					dit = m_map.phi2(m_map.phi_1(dit));
+//				}
+//				while(dit != dt);
+//
+//				dt = m_map.phi1(dt);
+//			}while(dt != d);
+//
+//			dt = m_map.phi2(d);
+//			do
+//			{
+//				Dart dit = dt;
+//				do
+//				{
+//					me.mark(m_map.phi1(dit));
+//					me.mark(m_map.phi1(m_map.phi1(dit)));
+//					dit = m_map.phi2(m_map.phi_1(dit));
+//				}
+//				while(dit != dt);
+//
+//				dt = m_map.phi1(dt);
+//			}while(dt != m_map.phi2(d));
+//
+//
+//			ec.push_back(d);
+//
+//			mc.mark(d);
+//			mc.mark(m_map.phi1(d));
+//			mc.mark(m_map.phi_1(d));
+//			mc.mark(m_map.phi2(d));
+//			mc.mark(m_map.phi_1(m_map.phi2(d)));
+//			mc.mark(m_map.phi1(m_map.phi2(d)));
+//		}
+//	}
+
+//	//create the new level
+//	m_map.addLevelFront();
+//
+//	AttributeContainer& cont = m_map.getMRAttributeContainer();
+//	AttributeMultiVector<unsigned int>* amv = m_map.getMRDartAttributeVector(m_map.getCurrentLevel());
+//	for(unsigned int i = cont.begin() ; i < cont.end() ; cont.next(i))
+//	{
+//		if(mc.isMarked((*amv)[i]) || (*amv)[i] == NULL)
+//		{
+//			//mrlevel++
+//		}
+//
+//
+//		//(*amv)[i] = MRNULL ;
+//	}
+//
+//
+//	for(std::vector<Dart>::iterator it = ec.begin() ; it != ec.end() ; ++it)
+//	{
+//
+//	}
+
+//	// level handling
+//	m_map.pushLevel() ;
+//	m_map.addLevelBack();
+//	m_map.duplicateDarts(m_map.getMaxLevel());
+//	m_map.setCurrentLevel(m_map.getMaxLevel());
+//
+//	unsigned int nbVertices = m_map.template getNbOrbits<VERTEX>() ;
+//	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
+//	CGoGNout << "  creating PM (" << nbVertices << " vertices).." << /* flush */ CGoGNendl ;
+//
+//	bool finished = false ;
+//	Dart d ;
+//	while(!finished)
+//	{
+//		if(!m_selector->nextEdge(d))
+//			break ;
+//
+//		--nbVertices ;
+//		Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
+//		Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
+//
+//		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+//		{
+//			(*it)->approximate(d) ;					// compute approximated attributes with its associated detail
+//			(*it)->saveApprox(d) ;
+//		}
+//
+//		m_selector->updateBeforeCollapse(d) ;		// update selector
+//
+//		collapseEdge(d);
+//
+//		unsigned int newV = m_map.template embedNewCell<VERTEX>(d2) ;
+//		unsigned int newE1 = m_map.template embedNewCell<EDGE>(d2) ;
+//		unsigned int newE2 = m_map.template embedNewCell<EDGE>(dd2) ;
+////		vs->setApproxV(newV) ;
+////		vs->setApproxE1(newE1) ;
+////		vs->setApproxE2(newE2) ;
+//
+//		for(typename std::vector<Algo::Decimation::ApproximatorGen<PFP>*>::iterator it = m_approximators.begin(); it != m_approximators.end(); ++it)
+//			(*it)->affectApprox(d2);				// affect data to the resulting vertex
+//
+//		m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
+//
+//		if(nbVertices <= nbWantedVertices)
+//			finished = true ;
+//	}
+//
+//	m_map.popLevel();
+//
+//	CGoGNout << "..done (" << nbVertices << " vertices)" << CGoGNendl ;
 }
 
 
@@ -193,21 +353,14 @@ template <typename PFP>
 void Map2MR_PM<PFP>::collapseEdge(Dart d)
 {
 	//duplication :
-	m_map.duplicateMRDart(m_map.phi2(m_map.phi1(d)));
-	m_map.duplicateMRDart(m_map.phi2(m_map.phi_1(d)));
-	m_map.duplicateMRDart(m_map.phi2(m_map.phi1(m_map.phi2(d))));
-	m_map.duplicateMRDart(m_map.phi2(m_map.phi_1(m_map.phi2(d))));
+	m_map.duplicateDart(m_map.phi2(m_map.phi1(d)));
+	m_map.duplicateDart(m_map.phi2(m_map.phi_1(d)));
+	m_map.duplicateDart(m_map.phi2(m_map.phi1(m_map.phi2(d))));
+	m_map.duplicateDart(m_map.phi2(m_map.phi_1(m_map.phi2(d))));
 
-	//effacer :
-//	m_map.unrefMRDart(m_map.phi1(m_map.phi2(d)));
-//	m_map.unrefMRDart(m_map.phi_1(m_map.phi2(d)));
-//	m_map.unrefMRDart(m_map.phi2(d));
-//
-//	m_map.unrefMRDart(m_map.phi1(d));
-//	m_map.unrefMRDart(m_map.phi_1(d));
-//	m_map.unrefMRDart(d);
+	//m_map.collapseEdge(d);
 
-	m_map.collapseEdge(d);
+	m_map.extractTrianglePair(d);
 }
 
 
