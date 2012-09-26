@@ -48,11 +48,11 @@ protected:
     static std::string fragmentShaderText;
 
     // uniform locations
-	GLuint m_unif_ambiant;
-	GLuint m_unif_diffuse;
-	GLuint m_unif_specular;
-	GLuint m_unif_shininess;
-	GLuint m_unif_lightPos;
+	CGoGNGLuint m_unif_ambiant;
+	CGoGNGLuint m_unif_diffuse;
+	CGoGNGLuint m_unif_specular;
+	CGoGNGLuint m_unif_shininess;
+	CGoGNGLuint m_unif_lightPos;
 
 	//values
 	Geom::Vec4f m_ambiant;

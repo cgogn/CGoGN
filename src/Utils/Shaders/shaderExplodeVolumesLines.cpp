@@ -64,9 +64,9 @@ ShaderExplodeVolumesLines::ShaderExplodeVolumesLines()
 
 void ShaderExplodeVolumesLines::getLocations()
 {
-	m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
-	m_unif_color  = glGetUniformLocation(program_handler(),"color");
-	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
+	*m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
+	*m_unif_color  = glGetUniformLocation(program_handler(),"color");
+	*m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 }
 
 void ShaderExplodeVolumesLines::setAttributePosition(VBO* vbo)
@@ -83,9 +83,9 @@ void ShaderExplodeVolumesLines::setParams(float explV, const Geom::Vec4f& color,
 
 	bind();
 
-	glUniform1f(m_unif_explodeV, explV);
-	glUniform4fv(m_unif_color, 1, color.data());
-	glUniform4fv(m_unif_plane,    1, m_plane.data());
+	glUniform1f(*m_unif_explodeV, explV);
+	glUniform4fv(*m_unif_color, 1, color.data());
+	glUniform4fv(*m_unif_plane,    1, m_plane.data());
 	unbind(); // ??
 }
 
@@ -93,7 +93,7 @@ void ShaderExplodeVolumesLines::setExplodeVolumes(float explode)
 {
 	m_explodeV = explode;
 	bind();
-	glUniform1f(m_unif_explodeV, explode);
+	glUniform1f(*m_unif_explodeV, explode);
 }
 
 
@@ -101,26 +101,26 @@ void ShaderExplodeVolumesLines::setColor(const Geom::Vec4f& color)
 {
 	m_color = color;
 	bind();
-	glUniform4fv(m_unif_color,1, color.data());
+	glUniform4fv(*m_unif_color,1, color.data());
 }
 
 void ShaderExplodeVolumesLines::setClippingPlane(const Geom::Vec4f& plane)
 {
 	m_plane = plane;
 	bind();
-	glUniform4fv(m_unif_plane,1, plane.data());
+	glUniform4fv(*m_unif_plane,1, plane.data());
 }
 
 void ShaderExplodeVolumesLines::restoreUniformsAttribs()
 {
-	m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
-	m_unif_color   = glGetUniformLocation(program_handler(),"color");
-	m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
+	*m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
+	*m_unif_color   = glGetUniformLocation(program_handler(),"color");
+	*m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
 
 	bind();
-	glUniform1f (m_unif_explodeV, m_explodeV);
-	glUniform4fv(m_unif_color,  1, m_color.data());
-	glUniform4fv(m_unif_plane,    1, m_plane.data());
+	glUniform1f (*m_unif_explodeV, m_explodeV);
+	glUniform4fv(*m_unif_color,  1, m_color.data());
+	glUniform4fv(*m_unif_plane,    1, m_plane.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	unbind();

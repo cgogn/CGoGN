@@ -39,14 +39,14 @@ namespace GL2
 
 MapRender::MapRender()
 {
-	glGenBuffersARB(SIZE_BUFFER, m_indexBuffers) ;
+	glGenBuffers(SIZE_BUFFER, m_indexBuffers) ;
 	for(unsigned int i = 0; i < SIZE_BUFFER; ++i)
 		m_nbIndices[i] = 0 ;
 }
 
 MapRender::~MapRender()
 {
-	glDeleteBuffersARB(4, m_indexBuffers);
+	glDeleteBuffers(4, m_indexBuffers);
 }
 
 void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
@@ -83,8 +83,8 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 	}
 
 	// setup du buffer d'indices
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
 void MapRender::draw(Utils::GLSLShader* sh, int prim)

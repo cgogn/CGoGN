@@ -34,10 +34,11 @@ namespace Utils
 #include "pointSprite.frag"
 #include "pointSprite.geom"
 
-GLuint PointSprite::m_idTexture = 0;
-GLuint PointSprite::m_uniform_texture = 0;
 
 unsigned char* PointSprite::m_ptrSphere = NULL;
+
+PointSprite* PointSprite::m_instance0 = NULL;
+
 
 
 PointSprite::PointSprite(bool withColorPervertex, float radius)
@@ -62,22 +63,28 @@ PointSprite::PointSprite(bool withColorPervertex, float radius)
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP,4);
 
 	bind();
-	m_uniform_size = glGetUniformLocation(program_handler(),"size");
-	m_uniform_color = glGetUniformLocation(program_handler(),"colorsprite");
-	glUniform1f(m_uniform_size, radius);
+	*m_uniform_size = glGetUniformLocation(program_handler(),"size");
+	*m_uniform_color = glGetUniformLocation(program_handler(),"colorsprite");
+	glUniform1f(*m_uniform_size, radius);
 	unbind();
 
 	// load texture
 	if (m_ptrSphere == NULL)
 	{
 		computeSphere();
-		glGenTextures(1, &m_idTexture);
-		glBindTexture(GL_TEXTURE_2D, m_idTexture);
+		m_instance0 = this;
+		glGenTextures(1, &(*m_idTexture));
+		glBindTexture(GL_TEXTURE_2D, *m_idTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, 1, WIDTHSPRITE, WIDTHSPRITE, 0, GL_LUMINANCE,  GL_UNSIGNED_BYTE, (GLvoid*)m_ptrSphere);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
-	m_uniform_texture = glGetUniformLocation(program_handler(),"SpriteTexture");
+	else
+	{
+		*m_idTexture = *(this->m_idTexture);
+	}
+
+	*m_uniform_texture = glGetUniformLocation(program_handler(),"SpriteTexture");
 }
 
 PointSprite::~PointSprite()
@@ -85,7 +92,7 @@ PointSprite::~PointSprite()
 	if (m_ptrSphere!=NULL)
 	{
 		delete[] m_ptrSphere;
-		glDeleteTextures(1, &m_idTexture);
+		glDeleteTextures(1, &(*m_idTexture));
 	}
 }
 
@@ -102,19 +109,19 @@ unsigned int PointSprite::setAttributeColor(VBO* vbo)
 void PointSprite::predraw(const Geom::Vec3f& color)
 {
 	bind();
-	glUniform1i(m_uniform_texture, 0);
-	glUniform3fv(m_uniform_color, 1, color.data());
+	glUniform1i(*m_uniform_texture, 0);
+	glUniform3fv(*m_uniform_color, 1, color.data());
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_idTexture);
+	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
 	glEnable(GL_TEXTURE_2D);
 }
 
 void PointSprite::predraw()
 {
 	bind();
-	glUniform1i(m_uniform_texture, 0);
+	glUniform1i(*m_uniform_texture, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_idTexture);
+	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
 	glEnable(GL_TEXTURE_2D);
 }
 
@@ -127,7 +134,7 @@ void PointSprite::postdraw()
 void PointSprite::setSize(float radius)
 {
 	bind();
-	glUniform1f(m_uniform_size, radius);
+	glUniform1f(*m_uniform_size, radius);
 	unbind();
 }
 

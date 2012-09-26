@@ -70,54 +70,54 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 
 void ShaderPhong::getLocations()
 {
-	m_unif_ambiant   = glGetUniformLocation(this->program_handler(), "materialAmbient");
-	m_unif_diffuse   = glGetUniformLocation(this->program_handler(), "materialDiffuse");
-	m_unif_specular  = glGetUniformLocation(this->program_handler(), "materialSpecular");
-	m_unif_shininess = glGetUniformLocation(this->program_handler(), "shininess");
-	m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
+	*m_unif_ambiant   = glGetUniformLocation(this->program_handler(), "materialAmbient");
+	*m_unif_diffuse   = glGetUniformLocation(this->program_handler(), "materialDiffuse");
+	*m_unif_specular  = glGetUniformLocation(this->program_handler(), "materialSpecular");
+	*m_unif_shininess = glGetUniformLocation(this->program_handler(), "shininess");
+	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
 }
 
 void ShaderPhong::sendParams()
 {
-	glUniform4fv(m_unif_ambiant,  1, m_ambiant.data());
-	glUniform4fv(m_unif_diffuse,  1, m_diffuse.data());
-	glUniform4fv(m_unif_specular, 1, m_specular.data());
-	glUniform1f(m_unif_shininess,    m_shininess);
-	glUniform3fv(m_unif_lightPos, 1, m_lightPos.data());
+	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
+	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
+	glUniform4fv(*m_unif_specular, 1, m_specular.data());
+	glUniform1f(*m_unif_shininess,    m_shininess);
+	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
 }
 
 void ShaderPhong::setAmbiant(const Geom::Vec4f& ambiant)
 {
 	this->bind();
-	glUniform4fv(m_unif_ambiant,1, ambiant.data());
+	glUniform4fv(*m_unif_ambiant,1, ambiant.data());
 	m_ambiant = ambiant;
 }
 
 void ShaderPhong::setDiffuse(const Geom::Vec4f& diffuse)
 {
 	this->bind();
-	glUniform4fv(m_unif_diffuse,1, diffuse.data());
+	glUniform4fv(*m_unif_diffuse,1, diffuse.data());
 	m_diffuse = diffuse;
 }
 
 void ShaderPhong::setSpecular(const Geom::Vec4f& specular)
 {
 	this->bind();
-	glUniform4fv(m_unif_specular,1,specular.data());
+	glUniform4fv(*m_unif_specular,1,specular.data());
 	m_specular = specular;
 }
 
 void ShaderPhong::setShininess(float shininess)
 {
 	this->bind();
-	glUniform1f (m_unif_shininess, shininess);
+	glUniform1f (*m_unif_shininess, shininess);
 	m_shininess = shininess;
 }
 
 void ShaderPhong::setLightPosition( Geom::Vec3f lightPos)
 {
 	this->bind();
-	glUniform3fv(m_unif_lightPos,1,lightPos.data());
+	glUniform3fv(*m_unif_lightPos,1,lightPos.data());
 	m_lightPos = lightPos;
 }
 

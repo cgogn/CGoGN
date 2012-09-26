@@ -43,10 +43,10 @@ protected:
     static std::string geometryShaderText;
 
     // uniform locations
-	GLuint m_unif_ambiant;
-	GLuint m_unif_diffuse;
-	GLuint m_unif_lightPos;
-	GLuint m_unif_explode;
+	CGoGNGLuint m_unif_ambiant;
+	CGoGNGLuint m_unif_diffuse;
+	CGoGNGLuint m_unif_lightPos;
+	CGoGNGLuint m_unif_explode;
 
 	float m_explode;
 	Geom::Vec4f m_ambiant;

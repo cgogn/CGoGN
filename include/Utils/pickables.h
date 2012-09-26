@@ -44,7 +44,7 @@ protected:
 	/**
 	 * id of indices VBO
 	 */
-	GLuint m_ind;
+	CGoGNGLuint m_ind;
 
 	/**
 	 * VBO for position

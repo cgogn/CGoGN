@@ -29,6 +29,7 @@
 #ifndef __CGoGN_GLSL_SHADER__
 #define __CGoGN_GLSL_SHADER__
 
+#include "Utils/gl_def.h"
 #include "Utils/os_spec.h"
 #include "Utils/vbo.h"
 #include "Utils/gl_matrices.h"
@@ -40,6 +41,7 @@
 #include <string>
 #include <vector>
 #include <set>
+
 
 namespace CGoGN
 {
@@ -80,17 +82,17 @@ protected:
 	/**
 	 * handle of vertex shader
 	 */
-	GLhandleARB	m_vertex_shader_object;
+	CGoGNGLhandleARB	m_vertex_shader_object;
 
 	/**
 	 * handle of fragment shader
 	 */
-	GLhandleARB	m_fragment_shader_object;
+	CGoGNGLhandleARB	m_fragment_shader_object;
 
 	/**
 	 * handle of geometry shader
 	 */
-	GLhandleARB	m_geom_shader_object;
+	CGoGNGLhandleARB	m_geom_shader_object;
 
 	std::string m_nameVS;
 	std::string m_nameFS;
@@ -99,12 +101,12 @@ protected:
 	/**
 	 * handle of program
 	 */
-	GLhandleARB m_program_object;
+	CGoGNGLhandleARB m_program_object;
 
-	GLint m_uniMat_Proj;
-	GLint m_uniMat_Model;
-	GLint m_uniMat_ModelProj;
-	GLint m_uniMat_Normal;
+	CGoGNGLint m_uniMat_Proj;
+	CGoGNGLint m_uniMat_Model;
+	CGoGNGLint m_uniMat_ModelProj;
+	CGoGNGLint m_uniMat_Normal;
 
 	char* m_vertex_shader_source;
 	char* m_fragment_shader_source;
@@ -296,7 +298,7 @@ public:
 	/**
 	 * get handler of program for external use og gl functions
 	 */
-	GLuint program_handler() { return m_program_object;}
+	GLhandleARB program_handler() { return *m_program_object;}
 
 	/**
 	 * check shader validity width official GLSL syntax
@@ -379,6 +381,9 @@ public:
 	 */
 	void disableVertexAttribs() const;
 
+	/// get back OpenGL standard matrices & send to all shaders
+	static void updateAllFromGLMatrices();
+
 	/// sent current matrices to all shaders
 	static void updateCurrentMatrices();
 	/// get current transformation matrix
@@ -400,13 +405,13 @@ public:
 
 inline bool GLSLShader::isCreated()
 {
-	return ( m_program_object != 0 );
+	return ( *m_program_object != 0 );
 }
 
 template<unsigned int NB>
 void GLSLShader::setuniformf( const char* name, const float* val)
 {
-	GLint uni = glGetUniformLocationARB(m_program_object,name);
+	GLint uni = glGetUniformLocationARB(*m_program_object,name);
 	if (uni >= 0)
 	{
 		switch(NB)
@@ -433,7 +438,7 @@ void GLSLShader::setuniformf( const char* name, const float* val)
 template<unsigned int NB>
 void GLSLShader::setuniformi( const char* name, const int* val)
 {
-	GLint uni = glGetUniformLocationARB(m_program_object,name);
+	GLint uni = glGetUniformLocationARB(*m_program_object,name);
 	if (uni>=0)
 	{
 		switch(NB)
