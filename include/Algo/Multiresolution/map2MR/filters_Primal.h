@@ -551,9 +551,9 @@ public:
 } ;
 
 
-} // namespace Multiresolution
+} // namespace MR
 
-}
+} // namespace Algo
 
 } // namespace CGoGN
 

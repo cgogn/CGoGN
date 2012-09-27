@@ -272,6 +272,8 @@ public:
 	 */
 	void duplicateDart(Dart d) ;
 
+	void duplicateDart2(Dart d) ;
+
 	/****************************************
 	 *           DARTS MANAGEMENT           *
 	 ****************************************/

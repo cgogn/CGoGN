@@ -117,10 +117,13 @@ inline void GenericMap::deleteDart(Dart d)
 
 		if(getDartLevel(d) > m_mrCurrentLevel)
 		{
+			if((*m_mrDarts[m_mrCurrentLevel + 1])[d.index] == index)
+			{
 			//for(unsigned int i = getDartLevel(d) - 1; i >= m_mrCurrentLevel; --i)
 			//{
 				(*m_mrDarts[m_mrCurrentLevel])[d.index] = MRNULL ;
 			//}
+			}
 		}
 
 		// a MRdart can only be deleted on its insertion level
@@ -201,8 +204,11 @@ inline void GenericMap::duplicateDart(Dart d)
 
 	unsigned int oldindex = dartIndex(d) ;
 
-	if((*m_mrDarts[m_mrCurrentLevel - 1])[d.index] != oldindex)	// no need to duplicate if the dart is already
-		return ;												// duplicated with respect to previous level
+	if(m_mrCurrentLevel > 0)
+	{
+		if((*m_mrDarts[m_mrCurrentLevel - 1])[d.index] != oldindex)	// no need to duplicate if the dart is already
+			return ;												// duplicated with respect to previous level
+	}
 
 	unsigned int newindex = copyDartLine(oldindex) ;
 
@@ -211,6 +217,20 @@ inline void GenericMap::duplicateDart(Dart d)
 		assert((*m_mrDarts[i])[d.index] == oldindex || !"duplicateDart : dart was already duplicated on a greater level") ;
 		(*m_mrDarts[i])[d.index] = newindex ;						// make this MRdart points to the new dart line
 	}
+}
+
+inline void GenericMap::duplicateDart2(Dart d)
+{
+
+	unsigned int oldindex = dartIndex(d) ;
+
+	unsigned int newindex = copyDartLine(oldindex) ;
+
+	std::cout << "plop" << std::endl;
+
+
+	(*m_mrDarts[m_mrCurrentLevel])[d.index] = newindex ;						// make this MRdart points to the new dart line
+
 }
 
 inline unsigned int GenericMap::dartIndex(Dart d) const
@@ -227,7 +247,7 @@ inline unsigned int GenericMap::getDartLevel(Dart d) const
 
 inline void GenericMap::incDartLevel(Dart d) const
 {
-	++(*m_mrLevels)[d.index] ;
+	++((*m_mrLevels)[d.index]) ;
 }
 
 

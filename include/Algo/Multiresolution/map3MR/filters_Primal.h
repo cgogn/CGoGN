@@ -35,14 +35,14 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
 {
 
-class MRFilter
+class Filter
 {
 public:
-	MRFilter() {}
-	virtual ~MRFilter() {}
+	Filter() {}
+	virtual ~Filter() {}
 	virtual void operator() () = 0 ;
 } ;
 
@@ -162,7 +162,7 @@ typename PFP::VEC3 SHW04Vertex(typename PFP::MAP& map, const VertexAttribute<typ
 /* Loop
  *********************************************************************************/
 template <typename PFP>
-class LoopEvenAnalysisFilter : public MRFilter
+class LoopEvenAnalysisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -188,7 +188,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationAnalysisFilter : public MRFilter
+class LoopNormalisationAnalysisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -218,7 +218,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopOddAnalysisFilter : public MRFilter
+class LoopOddAnalysisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -267,7 +267,7 @@ public:
 /* Linear Interpolation
  *********************************************************************************/
 template <typename PFP>
-class LerpEdgeSynthesisFilter : public MRFilter
+class LerpEdgeSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -295,7 +295,7 @@ public:
 } ;
 
 template <typename PFP>
-class LerpFaceSynthesisFilter : public MRFilter
+class LerpFaceSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -325,7 +325,7 @@ public:
 } ;
 
 template <typename PFP>
-class LerpVolumeSynthesisFilter : public MRFilter
+class LerpVolumeSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -361,7 +361,7 @@ public:
 
 //w-lift(a)
 template <typename PFP>
-class Ber02OddSynthesisFilter : public MRFilter
+class Ber02OddSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -450,7 +450,7 @@ public:
 
 // s-lift(a)
 template <typename PFP>
-class Ber02EvenSynthesisFilter : public MRFilter
+class Ber02EvenSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -639,7 +639,7 @@ public:
 
 // s-scale(a)
 template <typename PFP>
-class Ber02ScaleSynthesisFilter : public MRFilter
+class Ber02ScaleSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -705,7 +705,7 @@ public:
 /* Loop on Boundary Vertices and SHW04 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
-class LoopOddSynthesisFilter : public MRFilter
+class LoopOddSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -748,7 +748,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopNormalisationSynthesisFilter : public MRFilter
+class LoopNormalisationSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -778,7 +778,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopEvenSynthesisFilter : public MRFilter
+class LoopEvenSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -804,7 +804,7 @@ public:
 } ;
 
 template <typename PFP>
-class LoopVolumeSynthesisFilter : public MRFilter
+class LoopVolumeSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -835,7 +835,7 @@ public:
 } ;
 
 template <typename PFP>
-class SHW04VolumeNormalisationSynthesisFilter : public MRFilter
+class SHW04VolumeNormalisationSynthesisFilter : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -875,7 +875,7 @@ public:
 /* Catmull-clark on Boundary Vertices and MJ96 on Insides Vertices
  *********************************************************************************/
 template <typename PFP>
-class MJ96VertexSubdivision : public MRFilter
+class MJ96VertexSubdivision : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -980,7 +980,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96EdgeSubdivision : public MRFilter
+class MJ96EdgeSubdivision : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -1070,7 +1070,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96FaceSubdivision : public MRFilter
+class MJ96FaceSubdivision : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -1130,7 +1130,7 @@ public:
 };
 
 template <typename PFP>
-class MJ96VolumeSubdivision : public MRFilter
+class MJ96VolumeSubdivision : public Filter
 {
 protected:
 	typename PFP::MAP& m_map ;
@@ -1165,7 +1165,7 @@ public:
 
 
 
-} // namespace Multiresolution
+} // namespace MR
 
 } // namespace Algo
 

@@ -59,17 +59,19 @@ protected:
 	MAP& m_map;
 	bool shareVertexEmbeddings ;
 
-	std::vector<CGoGN::Algo::MR::Filter*> synthesisFilters ;
-	std::vector<CGoGN::Algo::MR::Filter*> analysisFilters ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
 	Map2MR(MAP& map) ;
 
 
-	void addNewLevel(bool embedNewVertices = true) ;
+	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
 
-	void addSynthesisFilter(CGoGN::Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(CGoGN::Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
+	void addNewLevelSqrt3(bool embedNewVertices = true);
+
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 	void clearAnalysisFilters() { analysisFilters.clear() ; }

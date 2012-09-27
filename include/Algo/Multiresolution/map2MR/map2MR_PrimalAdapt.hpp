@@ -335,7 +335,7 @@ void Map2MR<PFP>::coarsenEdge(Dart d)
 }
 
 template <typename PFP>
-unsigned int Map2MR<PFP>::subdivideFace(Dart d, bool triQuad)
+unsigned int Map2MR<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDifference)
 {
 	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"subdivideFace : called with a dart inserted after current level") ;
 	assert(!faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
@@ -354,9 +354,14 @@ unsigned int Map2MR<PFP>::subdivideFace(Dart d, bool triQuad)
 	do
 	{
 		++degree ;						// compute the degree of the face
-//		Dart nf = m_map.phi2(it) ;
-//		if(faceLevel(nf) == fLevel - 1)	// check if neighboring faces have to be subdivided first
-//			subdivideFace(nf) ;
+
+		if(OneLevelDifference)
+		{
+			Dart nf = m_map.phi2(it) ;
+			if(faceLevel(nf) == fLevel - 1)	// check if neighboring faces have to be subdivided first
+				subdivideFace(nf) ;
+		}
+
 		if(!edgeIsSubdivided(it))
 			subdivideEdge(it) ;			// and cut the edges (if they are not already)
 		it = m_map.phi1(it) ;
@@ -364,7 +369,7 @@ unsigned int Map2MR<PFP>::subdivideFace(Dart d, bool triQuad)
 
 	m_map.setCurrentLevel(fLevel + 1) ;	// go to the next level to perform face subdivision
 
-	if(degree == 3 && triQuad)					// if subdividing a triangle
+	if(triQuad & degree == 3)					// if subdividing a triangle
 	{
 		Dart dd = m_map.phi1(old) ;
 		Dart e = m_map.phi1(dd) ;

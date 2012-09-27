@@ -28,11 +28,19 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Regular
 {
 
 template <typename PFP>
-Map3MR_PrimalRegular<PFP>::Map3MR_PrimalRegular(typename PFP::MAP& map) : m_map(map), shareVertexEmbeddings(true)
+Map3MR<PFP>::Map3MR(typename PFP::MAP& map) :
+	m_map(map),
+	shareVertexEmbeddings(true)
 {
 
 }
@@ -42,7 +50,7 @@ Map3MR_PrimalRegular<PFP>::Map3MR_PrimalRegular(typename PFP::MAP& map) : m_map(
  *					Topological helping functions						*
  ************************************************************************/
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::swapEdges(Dart d, Dart e)
+void Map3MR<PFP>::swapEdges(Dart d, Dart e)
 {
 	if(!m_map.PFP::MAP::ParentMap::isBoundaryEdge(d) && !m_map.PFP::MAP::ParentMap::isBoundaryEdge(e))
 	{
@@ -70,7 +78,7 @@ void Map3MR_PrimalRegular<PFP>::swapEdges(Dart d, Dart e)
 }
 
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
+void Map3MR<PFP>::splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
 {
 	std::vector<Dart> vd2 ;
 	vd2.reserve(vd.size());
@@ -104,7 +112,7 @@ void Map3MR_PrimalRegular<PFP>::splitSurfaceInVolume(std::vector<Dart>& vd, bool
  * 							Level creation								*
  ************************************************************************/
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::addNewLevelSqrt3(bool embedNewVertices)
+void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 {
 	m_map.pushLevel();
 
@@ -169,7 +177,7 @@ void Map3MR_PrimalRegular<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 }
 
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
+void Map3MR<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 {
 	m_map.pushLevel();
 
@@ -334,7 +342,7 @@ void Map3MR_PrimalRegular<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 }
 
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::addNewLevelHexa(bool embedNewVertices)
+void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 {
 	m_map.pushLevel();
 
@@ -710,7 +718,7 @@ void Map3MR_PrimalRegular<PFP>::addNewLevelHexa(bool embedNewVertices)
  ************************************************************************/
 
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::analysis()
+void Map3MR<PFP>::analysis()
 {
 	assert(m_map.getCurrentLevel() > 0 || !"analysis : called on level 0") ;
 
@@ -721,7 +729,7 @@ void Map3MR_PrimalRegular<PFP>::analysis()
 }
 
 template <typename PFP>
-void Map3MR_PrimalRegular<PFP>::synthesis()
+void Map3MR<PFP>::synthesis()
 {
 	assert(m_map.getCurrentLevel() < m_map.getMaxLevel() || !"synthesis : called on max level") ;
 
@@ -731,7 +739,11 @@ void Map3MR_PrimalRegular<PFP>::synthesis()
 	m_map.incCurrentLevel() ;
 }
 
-} // namespace Multiresolution
+} // namespace Regular
+
+} // namespace Primal
+
+} // namespace MR
 
 } // namespace Algo
 
