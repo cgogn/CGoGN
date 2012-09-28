@@ -420,58 +420,6 @@ unsigned int Map2MR<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDiffe
 }
 
 template <typename PFP>
-unsigned int Map2MR<PFP>::subdivideFace2(Dart d)
-{
-	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"subdivideFace : called with a dart inserted after current level") ;
-	assert(!faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-
-	unsigned int fLevel = faceLevel(d) ;
-	Dart old = faceOldestDart(d) ;
-
-	std::cout << "face level " << fLevel << std::endl;
-	std::cout << "oldestDart " << old << std::endl;
-
-	m_map.pushLevel() ;
-	m_map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
-
-	if(m_map.getCurrentLevel() == m_map.getMaxLevel())
-	{
-		std::cout << "addLevelBack" << std::endl;
-		m_map.addLevelBack();
-	}
-
-	unsigned int degree = 3 ;
-	Dart it = old ;
-
-	if(!edgeIsSubdivided(it))
-	{
-		std::cout << "1" << std::endl;
-		subdivideEdge(it) ;
-	}
-	it = m_map.phi1(it) ;
-
-	if(!edgeIsSubdivided(it))
-	{
-		std::cout << "2" << std::endl;
-		subdivideEdge(it) ;
-	}
-	it = m_map.phi1(it) ;
-
-	if(!edgeIsSubdivided(it))
-	{
-		std::cout << "3" << std::endl;
-		subdivideEdge(it) ;
-	}
-	it = m_map.phi1(it) ;
-
-	std::cout << "degree = " << degree << std::endl;
-
-	m_map.popLevel() ;
-
-	return fLevel ;
-}
-
-template <typename PFP>
 void Map2MR<PFP>::coarsenFace(Dart d)
 {
 	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"coarsenFace : called with a dart inserted after current level") ;

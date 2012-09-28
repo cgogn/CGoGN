@@ -250,7 +250,104 @@ public:
 	}
 } ;
 
+/*********************************************************************************
+ *                           SYNTHESIS FILTERS
+ *********************************************************************************/
 
+/* Linear Interpolation
+ *********************************************************************************/
+template <typename PFP>
+class LerpEdgeSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpEdgeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
+
+			m_map.incCurrentLevel() ;
+
+			Dart midV = m_map.phi1(d) ;
+			m_position[midV] = p ;
+
+			m_map.decCurrentLevel() ;
+		}
+	}
+} ;
+
+template <typename PFP>
+class LerpFaceSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpFaceSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
+
+			m_map.incCurrentLevel() ;
+			if(m_map.faceDegree(d) != 3)
+			{
+				Dart midF = m_map.phi1(m_map.phi1(d));
+				m_position[midF] = p ;
+			}
+			m_map.decCurrentLevel() ;
+
+		}
+	}
+} ;
+
+/* SQRT(3)
+ *********************************************************************************/
+
+template <typename PFP>
+class Sqrt3OddSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map;
+	VertexAttribute<typename PFP::VEC3>& m_position;
+
+public:
+	Sqrt3OddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorF<typename PFP::MAP> trav(m_map);
+		for(Dart d = trav.begin() ; d != trav.end() ; d = trav.next())
+		{
+			typename PFP::VEC3 p(0.0);
+
+			p += m_position[d];
+			p += m_position[m_map.phi1(d)];
+			p += m_position[m_map.phi_1(d)];
+
+			p /= 3.0;
+
+			m_map.incCurrentLevel() ;
+			Dart midF = m_map.phi1(d);
+			m_position[midF] = p ;
+			m_map.decCurrentLevel() ;
+		}
+	}
+};
 
 
 /*********************************************************************************

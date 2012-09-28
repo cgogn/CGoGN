@@ -119,14 +119,22 @@ public:
 	 */
 	bool faceIsSubdividedOnce(Dart d) ;
 
+
+protected:
+	/**
+	 *
+	 */
+	Dart cutEdge(Dart d) ;
+
+	/**
+	 *
+	 */
+	void splitFace(Dart d, Dart e) ;
+
 	/***************************************************
 	 *               SUBDIVISION                       *
 	 ***************************************************/
 
-	Dart cutEdge(Dart d) ;
-	void splitFace(Dart d, Dart e) ;
-
-protected:
 	/**
 	 * subdivide the edge of d to the next level
 	 */
@@ -142,8 +150,6 @@ public:
 	 * subdivide the face of d to the next level
 	 */
 	unsigned int subdivideFace(Dart d, bool triQuad = true, bool OneLevelDifference = true);
-
-	unsigned int subdivideFace2(Dart d) ;
 
 	/**
 	 * coarsen the face of d from the next level

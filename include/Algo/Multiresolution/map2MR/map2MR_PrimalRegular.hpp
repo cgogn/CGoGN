@@ -46,7 +46,7 @@ Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
 }
 
 template <typename PFP>
-void Map2MR<PFP>::addNewLevel(bool triQuad = true, bool embedNewVertices = true)
+void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 {
 	m_map.pushLevel() ;
 
@@ -150,22 +150,19 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
-	DartMarkerStore m(map) ;
-
 	//split faces
-	TraversorF<typename PFP::MAP> t(map) ;
+	TraversorF<typename PFP::MAP> t(m_map) ;
 	for (Dart dit = t.begin(); dit != t.end(); dit = t.next())
 	{
-
 		Dart d1 = m_map.phi1(dit);
-		splitFace(dit, d1) ;
-		cutEdge(m_map.phi_1(dit)) ;
+		m_map.splitFace(dit, d1) ;
+		m_map.cutEdge(m_map.phi_1(dit)) ;
 		Dart x = m_map.phi2(m_map.phi_1(dit)) ;
-		Dart dd = map.template phi<111>(x) ;
+		Dart dd = m_map.phi1(m_map.phi1(m_map.phi1((x))));
 		while(dd != x)
 		{
 			Dart next = m_map.phi1(dd) ;
-			splitFace(dd, m_map.phi1(x)) ;
+			m_map.splitFace(dd, m_map.phi1(x)) ;
 			dd = next ;
 		}
 
@@ -177,21 +174,17 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		Dart fit = cd ;
 		do
 		{
-			m.markOrbit<EDGE>(fit);
 			t.skip(fit);
-			fit = map.phi2(map.phi_1(fit));
+			fit = m_map.phi2(m_map.phi_1(fit));
 		} while(fit != cd);
 	}
 
 	//swap edges
-	TraversorE<typename PFP::MAP> te(map) ;
+	TraversorE<typename PFP::MAP> te(m_map) ;
 	for (Dart dit = te.begin(); dit != te.end(); dit = te.next())
 	{
-		if(m.isMarked(dit))
-		{
-			m.unmarkOrbit<EDGE>(dit);
-
-		}
+		if(m_map.getDartLevel(dit) < m_map.getCurrentLevel())
+			m_map.flipEdge(dit);
 	}
 
 	m_map.popLevel() ;

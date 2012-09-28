@@ -143,13 +143,12 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 	unsigned int percentWantedPerLevel = 20;
 	unsigned int nbWantedPerLevel = nbWantedVertices * percentWantedPerLevel / 100 ;
 
-	//create the new level
-	m_map.addLevelFront();
-	m_map.setCurrentLevel(0);
-
-	m_map.printMR();
+	std::vector<Dart> edges;
+	edges.reserve(nbWantedPerLevel);
 
 	DartMarkerStore me(m_map); 	//mark edges not to collapse
+
+	std::cout << " nbWantedPerLevel : " << nbWantedPerLevel << std::endl;
 
 	bool finished = false ;
 	Dart d ;
@@ -179,27 +178,41 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 				me.markOrbit<FACE>(it);
 			}
 
-
 			++nbDeletedVertex ;
 
-			Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
-			Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
+			edges.push_back(d);
 
-			m_selector->updateBeforeCollapse(d) ;		// update selector
-
-			collapseEdge(d);
-
-			m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
-
-			if(nbDeletedVertex <= nbWantedPerLevel)
-				finished = true ;
+			std::cout << " nbDeletedVertex : " << nbDeletedVertex << std::endl;
 		}
+
+		if(nbDeletedVertex > nbWantedPerLevel)
+			finished = true ;
 	}
 
 
-	CGoGNout << "..done (" << nbDeletedVertex << " vertices)" << CGoGNendl ;
+	std::cout << " finished " << std::endl;
 
-	m_map.printMR();
+//	//create the new level
+//	m_map.addLevelFront();
+//	m_map.setCurrentLevel(0);
+//
+//
+//
+//
+//
+//	Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
+//	Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
+//
+//	m_selector->updateBeforeCollapse(d) ;		// update selector
+//
+//	collapseEdge(d);
+//
+//	m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
+//
+//
+//	CGoGNout << "..done (" << nbDeletedVertex << " vertices)" << CGoGNendl ;
+//
+//	m_map.printMR();
 }
 
 
