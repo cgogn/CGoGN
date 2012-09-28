@@ -43,7 +43,8 @@ TopoRender::TopoRender():
 	m_nbRel2(0),
 	m_topo_dart_width(2.0f),
 	m_topo_relation_width(3.0f),
-	m_dartsColor(1.0f,1.0f,1.0f)
+	m_dartsColor(1.0f,1.0f,1.0f),
+	m_bufferDartPosition(NULL)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -83,6 +84,9 @@ TopoRender::~TopoRender()
 
 	if (m_attIndex.map() != NULL)
 		static_cast<AttribMap*>(m_attIndex.map())->removeAttribute(m_attIndex);
+
+	if (m_bufferDartPosition!=NULL)
+		delete[] m_bufferDartPosition;
 }
 
 void TopoRender::setDartWidth(float dw)

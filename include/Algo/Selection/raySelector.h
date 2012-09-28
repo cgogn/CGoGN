@@ -149,7 +149,7 @@ void edgesConeSelection(typename PFP::MAP& map, const VertexAttribute<typename P
  */
 template<typename PFP>
 Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
-		const typename PFP::VEC3& cursor, PFP::REAL radiusMax,
+		const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax,
 		const FunctorSelect& good=allDarts);
 
 
@@ -163,7 +163,7 @@ Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typen
  */
 template<typename PFP>
 Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
-		const typename PFP::VEC3& cursor, PFP::REAL radiusMax,
+		const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax,
 		const FunctorSelect& good=allDarts);
 
 

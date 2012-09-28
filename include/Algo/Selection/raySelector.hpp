@@ -24,6 +24,9 @@
 
 #include <algorithm>
 #include <set>
+#include "Geometry/distances.h"
+#include "Geometry/intersection.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
@@ -43,7 +46,7 @@ namespace Selection
  * @param vecFaces (out) vector to store the darts of intersected faces
  */
 template<typename PFP>
-void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces)
+void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecFaces, const FunctorSelect& good)
 {
 	std::vector<typename PFP::VEC3> iPoints;
 
@@ -496,7 +499,7 @@ void edgesConeSelection(typename PFP::MAP& map, const VertexAttribute<typename P
 		const typename PFP::VEC3& Q = position[map.phi1(d)];
 		// the three distance to P, Q and (PQ) not used here
 		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
-		typename PFP::VEC3 V = P - rayA;
+		typename PFP::VEC3 V = (P+Q)/2.0f - rayA;
 		double s2 = double(ld2) / double(V*V);
 		if (s2 < sin2)
 			vecEdges.push_back(d);
@@ -530,7 +533,7 @@ void edgesConeSelection(typename PFP::MAP& map, const VertexAttribute<typename P
 
 
 template<typename PFP>
-Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, PFP::REAL radiusMax, const FunctorSelect& good=allDarts)
+Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax, const FunctorSelect& good=allDarts)
 {
 	typename PFP::REAL l2max = radiusMax*radiusMax;
 	typename PFP::REAL l2min(std::numeric_limits<float>::max());
@@ -552,7 +555,7 @@ Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typen
 
 
 template<typename PFP>
-Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, PFP::REAL radiusMax, const FunctorSelect& good=allDarts)
+Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax, const FunctorSelect& good=allDarts)
 {
 	typename PFP::REAL l2max = radiusMax*radiusMax;
 	typename PFP::REAL l2min(std::numeric_limits<float>::max());
