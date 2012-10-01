@@ -1020,8 +1020,31 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 		glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 	}
-
 }
+
+void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview, const glm::mat4& PMV, const glm::mat4& normalMatrix)
+{
+	this->bind();
+
+	if (*m_uniMat_Proj >= 0)
+		glUniformMatrix4fv(*m_uniMat_Proj, 1, false, &projection[0][0]);
+
+	if (*m_uniMat_Model >= 0)
+		glUniformMatrix4fv(*m_uniMat_Model,	1, false, &modelview[0][0]);
+
+	if (*m_uniMat_ModelProj >= 0)
+	{
+		glUniformMatrix4fv(*m_uniMat_ModelProj,	1 , false, &PMV[0][0]);
+	}
+
+	if (*m_uniMat_Normal >= 0)
+	{
+		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
+	}
+}
+
+
+
 
 void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) const
 {
@@ -1042,13 +1065,17 @@ void GLSLShader::disableVertexAttribs() const
 	this->unbind();
 }
 
+
 void GLSLShader::updateCurrentMatrices()
 {
 	glm::mat4 model(currentModelView());
 	model *= currentTransfo();
 
+	currentPMV() = currentProjection() * model;
+	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
+
 	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
-		it->second->updateMatrices(currentProjection(), model);
+		it->second->updateMatrices(currentProjection(), model, currentPMV(), currentNormalMatrix());
 }
 
 void GLSLShader::updateAllFromGLMatrices()
@@ -1062,14 +1089,20 @@ void GLSLShader::updateAllFromGLMatrices()
 	glm::mat4 proj;
 
 	for (unsigned int i=0; i< 4; ++i)
+	{
 		for (unsigned int j=0; j<4; ++j)
 		{
 			proj[i][j] = float(projection[4*i+j]);
 			model[i][j] = float(modelview[4*i+j]);
 		}
+	}
+	model *= currentTransfo();
+
+	currentPMV() = proj * model;
+	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
 
 	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
-		it->second->updateMatrices(proj, model);
+		it->second->updateMatrices(proj, model, currentPMV(), currentNormalMatrix());
 }
 
 

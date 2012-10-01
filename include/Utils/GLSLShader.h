@@ -371,6 +371,12 @@ public:
 	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview);
 
 	/**
+	 * update projection, modelview, ... matrices
+	 */
+	void updateMatrices(const glm::mat4& projection, const glm::mat4& modelview, const glm::mat4& PMV, const glm::mat4& normalMatrix);
+
+
+	/**
 	 * bind, enable, and set all vertex attrib pointers
 	 * @param stride: the stride parameter, number osf byte between two consecutive attributes
 	 */
@@ -386,6 +392,11 @@ public:
 
 	/// sent current matrices to all shaders
 	static void updateCurrentMatrices();
+
+
+	static glm::mat4& currentNormalMatrix() { return s_current_matrices->m_matrices[4];}
+	static glm::mat4& currentPMV() { return s_current_matrices->m_matrices[3];}
+
 	/// get current transformation matrix
 	static glm::mat4& currentTransfo() { return s_current_matrices->m_matrices[2];}
 	/// get current modelview matrix
