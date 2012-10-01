@@ -36,9 +36,10 @@ namespace Geometry
 
 enum
 {
-	EMPTY = 0,
-	SEGMENT = 1,
-	BARY = 2
+	EMPTY,
+	SEGMENT,
+	BARY,
+	FEATURE
 };
 
 typedef struct { Dart d ; float w ; } e0point ;
@@ -56,7 +57,7 @@ void computeFaceGradient(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const FaceAttribute<typename PFP::VEC3>& face_normal,
-	const VertexAttribute<typename PFP::REAL>& kmax,
+	const VertexAttribute<typename PFP::REAL>& scalar,
 	const FaceAttribute<typename PFP::REAL>& face_area,
 	FaceAttribute<typename PFP::VEC3>& face_gradient,
 	const FunctorSelect& select = allDarts,
@@ -68,8 +69,8 @@ typename PFP::VEC3 faceGradient(
 	Dart d,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const FaceAttribute<typename PFP::VEC3>& face_normal,
-	const VertexAttribute<typename PFP::REAL>& kmax,
-	const FaceAttribute<typename PFP::REAL>& area) ;
+	const VertexAttribute<typename PFP::REAL>& scalar,
+	const FaceAttribute<typename PFP::REAL>& face_area) ;
 
 template <typename PFP>
 void computeVertexGradient(
@@ -98,13 +99,13 @@ typename PFP::VEC3 vertexGradient(
 template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3>& Kmax,
+	const VertexAttribute<typename PFP::VEC3>& K,
 	CellMarker<FACE>& regularMarker,
 	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
 
 template <typename PFP>
-bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& Kmax) ;
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& K) ;
 
 template <typename PFP>
 void initRidgeSegments(
@@ -130,9 +131,6 @@ void ridgeLines(
 	const VertexAttribute<typename PFP::VEC3>& K,
 	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
 	FaceAttribute<ridgeSegment>& ridge_segments) ;
-
-template <typename PFP>
-void computeExtremalities() ;
 
 template <typename PFP>
 void computeSingularTriangle(

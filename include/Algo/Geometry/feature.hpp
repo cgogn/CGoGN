@@ -66,7 +66,7 @@ void computeFaceGradient(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const FaceAttribute<typename PFP::VEC3>& face_normal,
-	const VertexAttribute<typename PFP::REAL>& kmax,
+	const VertexAttribute<typename PFP::REAL>& scalar,
 	const FaceAttribute<typename PFP::REAL>& area,
 	FaceAttribute<typename PFP::VEC3>& face_gradient,
 	const FunctorSelect& select,
@@ -74,7 +74,7 @@ void computeFaceGradient(
 {
 	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		face_gradient[d] = faceGradient<PFP>(map, d, position, face_normal, kmax, area) ;
+		face_gradient[d] = faceGradient<PFP>(map, d, position, face_normal, scalar, area) ;
 }
 
 template <typename PFP>
@@ -83,7 +83,7 @@ typename PFP::VEC3 faceGradient(
 	Dart d,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const FaceAttribute<typename PFP::VEC3>& face_normal,
-	const VertexAttribute<typename PFP::REAL>& kmax,
+	const VertexAttribute<typename PFP::REAL>& scalar,
 	const FaceAttribute<typename PFP::REAL>& face_area)
 {
 	typedef typename PFP::REAL REAL ;
@@ -93,15 +93,15 @@ typename PFP::VEC3 faceGradient(
 
 	Dart it = t.begin() ;
 	VEC3 pos1 = position[it] ;
-	REAL k1 = kmax[it] ;
+	REAL k1 = scalar[it] ;
 
 	it = t.next() ;
 	VEC3 pos2 = position[it] ;
-	REAL k2 = kmax[it] ;
+	REAL k2 = scalar[it] ;
 
 	it = t.next() ;
 	VEC3 pos3 = position[it] ;
-	REAL k3 = kmax[it] ;
+	REAL k3 = scalar[it] ;
 
 	VEC3 n = face_normal[d] ;
 	REAL a = face_area[d] ;
@@ -174,15 +174,17 @@ typename PFP::VEC3 vertexGradient(
 template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3>& Kmax,
+	const VertexAttribute<typename PFP::VEC3>& K,
 	CellMarker<FACE>& regularMarker,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
 	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		if(isTriangleRegular<PFP>(map, d, Kmax))
+	{
+		if(isTriangleRegular<PFP>(map, d, K))
 			regularMarker.mark(d) ;
+	}
 }
 
 template <typename PFP>
@@ -197,7 +199,7 @@ bool mutuallyPositive(typename PFP::VEC3& v1, typename PFP::VEC3& v2, typename P
 }
 
 template <typename PFP>
-bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& Kmax)
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& K)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -206,9 +208,9 @@ bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 	Dart v2 = map.phi1(v1) ;
 	Dart v3 = map.phi1(v2) ;
 
-	VEC3 K1 = Kmax[v1] ;
-	VEC3 K2 = Kmax[v2] ;
-	VEC3 K3 = Kmax[v3] ;
+	VEC3 K1 = K[v1] ;
+	VEC3 K2 = K[v2] ;
+	VEC3 K3 = K[v3] ;
 
 //	VEC3 K1n = typename VEC3::DATA_TYPE(-1) * K1 ;
 	VEC3 K2n = typename VEC3::DATA_TYPE(-1) * K2 ;
