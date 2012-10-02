@@ -75,6 +75,8 @@ public:
 	virtual bool nextEdge(Dart& d) = 0 ;
 	virtual void updateBeforeCollapse(Dart d) = 0 ;
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
+
+	virtual bool nextEdgeWithoutUpdates(Dart& d) = 0;
 } ;
 
 } // namespace Decimation

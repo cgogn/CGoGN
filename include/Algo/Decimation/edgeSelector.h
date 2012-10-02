@@ -65,6 +65,8 @@ public:
 	void updateBeforeCollapse(Dart d)
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -92,6 +94,8 @@ public:
 	void updateBeforeCollapse(Dart d2)
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -135,6 +139,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -184,6 +190,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d);
 } ;
 
 template <typename PFP>
@@ -233,6 +241,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -328,6 +338,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -373,6 +385,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 } // namespace Decimation

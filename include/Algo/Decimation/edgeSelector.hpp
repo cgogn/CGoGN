@@ -479,6 +479,20 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.valid = true ;
 }
 
+template <typename PFP>
+bool EdgeSelector_QEM<PFP>::nextEdgeWithoutUpdates(Dart& d)
+{
+	if(cur == edges.end() || edges.empty())
+		return false ;
+
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+	cur = edges.begin();
+	d = (*cur).second ;
+	return true ;
+}
+
 /************************************************************************************
  *                            QUADRIC ERROR METRIC (Memoryless version)             *
  ************************************************************************************/

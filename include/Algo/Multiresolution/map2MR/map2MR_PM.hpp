@@ -157,7 +157,7 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 	Dart d ;
 	while(!finished)
 	{
-		if(!m_selector->nextEdge(d))
+		if(!m_selector->nextEdgeWithoutUpdates(d))
 			break ;
 
 		if(!me.isMarked(d))
@@ -186,11 +186,11 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 			edges.push_back(d);
 		}
 
-		//std::cout << "nbDeletedVertex  : " << nbDeletedVertex << std::endl;
-
 		if(nbDeletedVertex >= nbWantedPerLevel)
 			finished = true ;
 	}
+
+	std::cout << "nbDeletedVertices  : " << nbDeletedVertex << std::endl;
 
 
 	//create the new level
@@ -239,7 +239,7 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 	m_map.incDartLevel(m_map.phi_1(m_map.phi2(d)));
 	m_map.incDartLevel(m_map.phi1(m_map.phi2(d)));
 
-	m_map.printMR();
+	//m_map.printMR();
 
 	m_map.duplicateDartAtOneLevel(d, 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi1(d), 0);
@@ -255,7 +255,7 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 
 	m_map.collapseEdge(d);
 
-	m_map.printMR();
+	//m_map.printMR();
 }
 
 
