@@ -117,13 +117,8 @@ inline void GenericMap::deleteDart(Dart d)
 
 		if(getDartLevel(d) > m_mrCurrentLevel)
 		{
-			if((*m_mrDarts[m_mrCurrentLevel + 1])[d.index] == index)
-			{
-			//for(unsigned int i = getDartLevel(d) - 1; i >= m_mrCurrentLevel; --i)
-			//{
-				(*m_mrDarts[m_mrCurrentLevel])[d.index] = MRNULL ;
-			//}
-			}
+			(*m_mrDarts[m_mrCurrentLevel])[d.index] = MRNULL ;
+			return;
 		}
 
 		// a MRdart can only be deleted on its insertion level
@@ -219,18 +214,9 @@ inline void GenericMap::duplicateDart(Dart d)
 	}
 }
 
-inline void GenericMap::duplicateDart2(Dart d)
+inline void GenericMap::duplicateDartAtOneLevel(Dart d, unsigned int level)
 {
-
-	unsigned int oldindex = dartIndex(d) ;
-
-	unsigned int newindex = copyDartLine(oldindex) ;
-
-	std::cout << "plop" << std::endl;
-
-
-	(*m_mrDarts[m_mrCurrentLevel])[d.index] = newindex ;						// make this MRdart points to the new dart line
-
+	(*m_mrDarts[level])[d.index] = copyDartLine(dartIndex(d)) ;
 }
 
 inline unsigned int GenericMap::dartIndex(Dart d) const
@@ -477,6 +463,11 @@ inline AttributeMultiVector<unsigned int>* GenericMap::getMRDartAttributeVector(
 {
 	assert(level <= getMaxLevel() || !"Invalid parameter: level does not exist");
 	return m_mrDarts[level] ;
+}
+
+inline AttributeMultiVector<unsigned int>* GenericMap::getMRLevelAttributeVector()
+{
+	return m_mrLevels ;
 }
 
 template <typename R>

@@ -272,7 +272,7 @@ public:
 	 */
 	void duplicateDart(Dart d) ;
 
-	void duplicateDart2(Dart d) ;
+	void duplicateDartAtOneLevel(Dart d, unsigned int level) ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -470,6 +470,8 @@ public:
 	 * get the MR attribute container
 	 */
 	AttributeMultiVector<unsigned int>* getMRDartAttributeVector(unsigned int level) ;
+
+	AttributeMultiVector<unsigned int>* getMRLevelAttributeVector();
 
 //	/**
 //	 * swap two attribute containers

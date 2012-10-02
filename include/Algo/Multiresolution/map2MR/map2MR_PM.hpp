@@ -22,6 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
+#include "Container/attributeMultiVector.h"
 
 namespace CGoGN
 {
@@ -126,9 +127,7 @@ void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation
 			m_initOk = false ;
 	CGoGNout << "..done" << CGoGNendl ;
 
-	CGoGNout << "  initializing selector.." << CGoGNflush ;
-	m_initOk = m_selector->init() ;
-	CGoGNout << "..done" << CGoGNendl ;
+
 }
 
 
@@ -143,12 +142,16 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 	unsigned int percentWantedPerLevel = 20;
 	unsigned int nbWantedPerLevel = nbWantedVertices * percentWantedPerLevel / 100 ;
 
+	CGoGNout << "  initializing selector.." << CGoGNflush ;
+	m_initOk = m_selector->init() ;
+	CGoGNout << "..done" << CGoGNendl ;
+
 	std::vector<Dart> edges;
 	edges.reserve(nbWantedPerLevel);
 
-	DartMarkerStore me(m_map); 	//mark edges not to collapse
+	std::cout << "stops at  : " << nbWantedPerLevel << std::endl;
 
-	std::cout << " nbWantedPerLevel : " << nbWantedPerLevel << std::endl;
+	DartMarkerStore me(m_map); 	//mark edges not to collapse
 
 	bool finished = false ;
 	Dart d ;
@@ -181,25 +184,34 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 			++nbDeletedVertex ;
 
 			edges.push_back(d);
-
-			std::cout << " nbDeletedVertex : " << nbDeletedVertex << std::endl;
 		}
 
-		if(nbDeletedVertex > nbWantedPerLevel)
+		//std::cout << "nbDeletedVertex  : " << nbDeletedVertex << std::endl;
+
+		if(nbDeletedVertex >= nbWantedPerLevel)
 			finished = true ;
 	}
 
 
-	std::cout << " finished " << std::endl;
+	//create the new level
+	m_map.addLevelFront();
+	m_map.setCurrentLevel(0);
 
-//	//create the new level
-//	m_map.addLevelFront();
-//	m_map.setCurrentLevel(0);
-//
-//
-//
-//
-//
+	AttributeContainer& attribs = m_map.getMRAttributeContainer();
+	AttributeMultiVector<unsigned int>* attribLevel = m_map.getMRLevelAttributeVector();
+	AttributeMultiVector<unsigned int>* attribDarts = m_map.getMRDartAttributeVector(0);
+
+	for(unsigned int i = attribs.begin(); i != attribs.end(); attribs.next(i))
+	{
+		if((*attribDarts)[i] == MRNULL)
+			++(*attribLevel)[i];
+	}
+
+	for(std::vector<Dart>::iterator it = edges.begin() ; it != edges.end() ; ++it)
+	{
+		collapseEdge(*it);
+	}
+
 //	Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
 //	Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
 //
@@ -227,23 +239,23 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 	m_map.incDartLevel(m_map.phi_1(m_map.phi2(d)));
 	m_map.incDartLevel(m_map.phi1(m_map.phi2(d)));
 
-//	//duplication :
-	m_map.incDartLevel(m_map.phi2(m_map.phi1(d)));
-	m_map.incDartLevel(m_map.phi2(m_map.phi_1(d)));
-	m_map.incDartLevel(m_map.phi2(m_map.phi1(m_map.phi2(d))));
-	m_map.incDartLevel(m_map.phi2(m_map.phi_1(m_map.phi2(d))));
-
 	m_map.printMR();
 
-	m_map.duplicateDart2(m_map.phi2(m_map.phi1(d)));
-	m_map.duplicateDart2(m_map.phi2(m_map.phi_1(d)));
-	m_map.duplicateDart2(m_map.phi2(m_map.phi1(m_map.phi2(d))));
-	m_map.duplicateDart2(m_map.phi2(m_map.phi_1(m_map.phi2(d))));
+	m_map.duplicateDartAtOneLevel(d, 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi1(d), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi_1(d), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(d), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi_1(m_map.phi2(d)), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi1(m_map.phi2(d)), 0);
 
-	m_map.printMR();
-
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(d)), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(d)), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(m_map.phi2(d))), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(m_map.phi2(d))), 0);
 
 	m_map.collapseEdge(d);
+
+	m_map.printMR();
 }
 
 
@@ -253,6 +265,31 @@ void Map2MR_PM<PFP>::coarsen()
 	assert(m_map.getCurrentLevel() > 0 || !"coarsen : called on level 0") ;
 
 	m_map.decCurrentLevel() ;
+
+	TraversorV<typename PFP::MAP> tE(m_map);
+	for(Dart d = tE.begin() ; d != tE.end() ; d = tE.next())
+	{
+		Dart dit = d;
+		Dart dres = d;
+		bool found = false;
+		do
+		{
+			//std::cout << "emb["<<dit<<"] = " << m_map.template getEmbedding<VERTEX>(dit) << std::endl;
+
+			if(m_map.getDartLevel(dit) == m_map.getCurrentLevel())
+			{
+				dres = dit;
+				found = true;
+			}
+
+			dit = m_map.phi2(m_map.phi_1(dit));
+
+		}while(!found & dit!=d);
+
+		//std::cout << std::endl;
+
+		m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
+	}
 }
 
 template <typename PFP>
@@ -261,6 +298,31 @@ void Map2MR_PM<PFP>::refine()
 	assert(m_map.getCurrentLevel() < m_map.getMaxLevel() || !"refine: called on max level") ;
 
 	m_map.incCurrentLevel() ;
+
+	TraversorV<typename PFP::MAP> tE(m_map);
+	for(Dart d = tE.begin() ; d != tE.end() ; d = tE.next())
+	{
+		Dart dit = d;
+		Dart dres = d;
+		bool found = false;
+		do
+		{
+			//std::cout << "emb["<<dit<<"] = " << m_map.template getEmbedding<VERTEX>(dit) << std::endl;
+
+			if(m_map.getDartLevel(dit) == m_map.getCurrentLevel())
+			{
+				dres = dit;
+				found = true;
+			}
+
+			dit = m_map.phi2(m_map.phi_1(dit));
+
+		}while(!found & dit!=d);
+
+		//std::cout << std::endl;
+
+		m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
+	}
 }
 
 } // namespace Multiresolution
