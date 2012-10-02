@@ -27,7 +27,9 @@
 
 #include "Geometry/basic.h"
 #include "Geometry/bounding_box.h"
+#include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/traversorCell.h"
+
 
 namespace CGoGN
 {

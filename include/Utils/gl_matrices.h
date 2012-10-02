@@ -52,12 +52,18 @@ public:
 
 	void popTransfo()
 	{
-			if (m_stack.empty()) return;
+		if (m_stack.empty())
+			return;
 		m_matrices[2] = m_stack.top();
 		m_stack.pop();
 	}
 
-	glm::mat4 getTransfo() const
+	const glm::mat4&  getTransfo() const
+	{
+		return m_matrices[2];
+	}
+
+	glm::mat4& getTransfo()
 	{
 		return m_matrices[2];
 	}
@@ -80,6 +86,12 @@ public:
 	void scale(float s)
 	{
 		m_matrices[2] = glm::scale(m_matrices[2], glm::vec3(s,s,s));
+	}
+
+	void apply (const glm::mat4& m)
+	{
+		m_matrices[2] = m * m_matrices[2];
+
 	}
 
 };
