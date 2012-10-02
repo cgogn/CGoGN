@@ -38,6 +38,7 @@ template <typename PFP>
 bool Approximator_QEM<PFP>::init()
 {
 	m_quadric = this->m_map.template getAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+	// Does not require to be valid (if it is not, altenatives will be used).
 
 	if(this->m_predictor)
 	{

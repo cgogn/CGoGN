@@ -45,12 +45,11 @@ enum ApproximatorType
 	A_TangentPredict2,
 	A_ColorNaive,
 	A_ColorQEMext,
+	A_Lightfield,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
 	A_hHalfCollapse,
-	A_hQEM,
-	A_hLightfieldHalf,
-	A_hLightfield
-
+	A_hQEM
+	// A_hLightfieldHalf,
 } ;
 
 template <typename PFP>

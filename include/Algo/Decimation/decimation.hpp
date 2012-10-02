@@ -93,6 +93,7 @@ void decimate(
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs)) ;
 		break ;
 //		case A_hLightfieldHalf:
+//		{
 //			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
 //
 //			// pos
@@ -110,25 +111,29 @@ void decimate(
 //			for (unsigned int i = 0 ; i < attribs.size() - 4 ; ++i)
 //				v_approx[2].push_back(attribs[i+4]) ;
 //			approximators.push_back(new Approximator_LightfieldCoefsHalf<PFP>(map, v_approx[2])) ;
+//		}
 //		break ;
-		case A_hLightfield :
+		case A_Lightfield :
 		{
-			// pos + frame + hemifunction
-			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, attribs)) ;
+			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
+
+			// pos
+			v_approx[0].push_back(attribs[0]) ;
+			approximators.push_back(new Approximator_QEM<PFP>(map, v_approx[0])) ;
+
+			// frame
+			assert(attribs.size() >= 4 || !"Decimate: A_Lightfield --> not enough attribs provided") ;
+			for (unsigned int i = 0 ; i < 3 ; ++i)
+				v_approx[1].push_back(attribs[i+1]) ;
+			approximators.push_back(new Approximator_FrameInterpolation<PFP>(map, v_approx[1])) ;
+
+			// hemifunction
+			assert(attribs.size() >= 5 || !"Decimate: A_Lightfield --> not enough attribs provided") ;
+			for (unsigned int i = 0 ; i < attribs.size() - 4 ; ++i)
+				v_approx[2].push_back(attribs[i+4]) ;
+			approximators.push_back(new Approximator_HemiFuncCoefs<PFP>(map, v_approx[2])) ;
 		}
 		break ;
-		/*
-		case A_LightfieldFull_deprecated :
-		{
-			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, position)) ;
-
-			VertexAttribute<Geom::Matrix<3,3,typename PFP::REAL> > frame = map.template getAttribute<Geom::Matrix<3,3,typename PFP::REAL>, VERTEX>("frame") ;
-			VertexAttribute<Geom::Matrix<3,6,typename PFP::REAL> > RGBfunctions = map.template getAttribute<Geom::Matrix<3,6,typename PFP::REAL>, VERTEX>("colorPTM") ;
-			approximators.push_back(new Approximator_Frame_deprecated<PFP>(map, frame)) ;
-			approximators.push_back(new Approximator_RGBfunctions_deprecated<PFP>(map, RGBfunctions)) ;
-			break ;
-		}
-		*/
 	}
 
 	switch(s)
@@ -163,8 +168,8 @@ void decimate(
 		case S_hQEMml :
 			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
 			break ;
-		case S_hLightfield :
-			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
+		case S_Lightfield :
+			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
 			break ;
 	}
 

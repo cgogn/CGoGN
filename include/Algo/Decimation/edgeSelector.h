@@ -502,6 +502,72 @@ public:
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 } ;
 
+/*****************************************************************************************************************
+ *                                 LIGHTFIELD QUADRIC ERROR METRIC                                               *
+ *****************************************************************************************************************/
+template <typename PFP>
+class EdgeSelector_Lightfield : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<6,REAL> VEC6 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
+	} QEMextColorEdgeInfo ;
+	typedef NoMathIOAttribute<QEMextColorEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+
+	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN ;
+	//VertexAttribute<VEC3> *m_HF ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_FN, m_attrindex_FN ;
+
+	VertexAttribute<Quadric<REAL> > m_quadricGeom ;
+	VertexAttribute<QuadricHF<REAL> > m_quadricHF ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	EdgeSelector_Lightfield(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_FN(-1),
+		m_attrindex_FN(-1)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		m_quadricGeom = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+		m_quadricHF = m.template addAttribute<QuadricHF<REAL>, VERTEX>("HFquadric") ;
+	}
+	~EdgeSelector_Lightfield()
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+		this->m_map.removeAttribute(m_quadricGeom) ;
+		this->m_map.removeAttribute(m_quadricHF) ;
+	}
+	SelectorType getType() { return S_Lightfield ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
+
 } // namespace Decimation
 
 } // namespace Algo

@@ -57,12 +57,14 @@ template <typename PFP>
 bool Approximator_ColorQEMext<PFP>::init()
 {
 	m_quadric = this->m_map.template getAttribute<QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
+	// Does not require to be valid (if it is not, altenatives will be used).
 
 	if(this->m_predictor)
 	{
 		return false ;
 	}
-	return true ;
+
+	return m_position->isValid() && m_color->isValid() ;
 }
 
 template <typename PFP>

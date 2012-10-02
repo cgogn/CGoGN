@@ -277,340 +277,340 @@ void HalfEdgeSelector_QEMml<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& hein
 	heinfo.valid = true ;
 }
 
-/************************************************************************************
- *                         HALFEDGESELECTOR LIGHTFIELD                              *
- ************************************************************************************/
-template <typename PFP>
-bool HalfEdgeSelector_Lightfield<PFP>::init()
-{
-	// TODO
-	MAP& m = this->m_map ;
-
-	// Verify availability of required approximators
-	unsigned int ok = 0 ;
-	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
-	{
-		bool saved = false ;
-		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
-		{
-			// constraint : 2 approximators in specific order
-			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
-			{
-				++ok ;
-				m_approxindex_pos = approxindex ;
-				m_attrindex_pos = attrindex ;
-				m_pos = this->m_position ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameT")
-			{
-				++ok ;
-//				m_approxindex_FT = approxindex ;
-//				m_attrindex_FT = attrindex ;
-				m_frameT = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameT") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
-					assert(m_frameT.isValid() || !"EdgeSelector_QEMextColor: frameT attribute is not valid") ;
-					saved = true ;
-				}
-			}
-			else if(ok == 2 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameB")
-			{
-				++ok ;
-//				m_approxindex_FB = approxindex ;
-//				m_attrindex_FB = attrindex ;
-				m_frameB = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameB") ;
-				assert(m_frameB.isValid() || !"EdgeSelector_QEMextColor: frameB attribute is not valid") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-			else if(ok == 3 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameN")
-			{
-				++ok ;
-				m_approxindex_FN = approxindex ;
-				m_attrindex_FN = attrindex ;
-				m_frameN = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameN") ;
-				assert(m_frameN.isValid() || !"EdgeSelector_QEMextColor: frameN attribute is not valid") ;
-				if (!saved)
-				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
-					saved = true ;
-				}
-			}
-		}
-	}
-
-	if(ok != 4)
-		return false ;
-
-	// Set quadric per vertex
-	CellMarker<VERTEX> vMark(m) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
-	{
-		if(!vMark.isMarked(d))
-		{
-			Quadric<REAL> q ;		// create one quadric
-			m_quadricGeom[d] = q ;		// per vertex
-			vMark.mark(d) ;
-		}
-	}
-
-	// Compute quadric per vertex
-	DartMarker mark(m) ;
-
-	for(Dart d = m.begin(); d != m.end(); m.next(d)) // init QEM quadrics
-	{
-		if(!mark.isMarked(d))
-		{
-			Dart d1 = m.phi1(d) ;					// for each triangle,
-			Dart d_1 = m.phi_1(d) ;					// initialize the quadric of the triangle
-			Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
-			m_quadricGeom[d] += q ;						// and add the contribution of
-			m_quadricGeom[d1] += q ;						// this quadric to the ones
-			m_quadricGeom[d_1] += q ;						// of the 3 incident vertices
-			mark.markOrbit<FACE>(d) ;
-		}
-	}
-
-	// Init multimap for each Half-edge
-	halfEdges.clear() ;
-
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
-	{
-		initHalfEdgeInfo(d) ;	// init the edges with their optimal info
-	}							// and insert them in the multimap according to their error
-
-	cur = halfEdges.begin() ; 	// init the current edge to the first one
-
-	return true ;
-}
-
-template <typename PFP>
-bool HalfEdgeSelector_Lightfield<PFP>::nextEdge(Dart& d)
-{
-	if(cur == halfEdges.end() || halfEdges.empty())
-		return false ;
-	d = (*cur).second ;
-	return true ;
-}
-
-template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
-{
-	MAP& m = this->m_map ;
-
-	HalfEdgeInfo& edgeE = halfEdgeInfo[d] ;
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
-
-	edgeE = halfEdgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		halfEdges.erase(edgeE.it) ;
-
-	edgeE = halfEdgeInfo[m.phi_1(d)] ;	// the halfedges that will disappear
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
-										// from the multimap
-	Dart dd = m.phi2(d) ;
-	if(dd != d)
-	{
-		edgeE = halfEdgeInfo[dd] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
-
-		edgeE = halfEdgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
-
-		edgeE = halfEdgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
-	}
-}
-
-/**
- * Update quadric of a vertex
- * Discards quadrics of d and assigns freshly calculated
- * quadrics depending on the actual planes surrounding d
- * @param dart d
- */
-template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
-{	// TODO
-	Dart dFront,dBack ;
-	Dart dInit = d ;
-
-	// Init Front
-	dFront = dInit ;
-
-	m_quadricGeom[d].zero() ;
-
-   	do
-   	{
-   		// Make step
-   		dBack = this->m_map.phi1(dFront) ;
-       	dFront = this->m_map.phi2_1(dFront) ;
-
-       	if (dBack != dFront)
-       	{ // if dFront is no border
-       		m_quadricGeom[d] += Quadric<REAL>(m_pos[d],m_pos[this->m_map.phi1(dFront)],m_pos[dBack]) ;
-       	}
-       	if (recomputeNeighbors)
-       		recomputeQuadric(dBack, false) ;
-
-    } while(dFront != dInit) ;
-}
-
-template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
-{
-	MAP& m = this->m_map ;
-
-	// TODO
-	recomputeQuadric(d2, true) ;
-
-	Dart vit = d2 ;
-	do
-	{
-		updateHalfEdgeInfo(vit, true) ;
-		Dart d = m.phi2(vit) ;
-		if (d != vit) ;
-			updateHalfEdgeInfo(d, true) ;
-
-		updateHalfEdgeInfo(m.phi1(vit), true) ;
-		d = m.phi2(m.phi1(vit)) ;
-		if (d != m.phi1(vit)) ;
-			updateHalfEdgeInfo(d, true) ;
-
-		Dart stop = m.phi2(vit) ;
-		assert (stop != vit) ;
-		Dart vit2 = m.phi12(m.phi1(vit)) ;
-		do {
-			updateHalfEdgeInfo(vit2, true) ;
-			d = m.phi2(vit2) ;
-			if (d != vit2) ;
-				updateHalfEdgeInfo(d, true) ;
-
-			updateHalfEdgeInfo(m.phi1(vit2), false) ;
-			d = m.phi2(m.phi1(vit2)) ;
-			if (d != m.phi1(vit2)) ;
-				updateHalfEdgeInfo(d, false) ;
-
-			vit2 = m.phi12(vit2) ;
-		} while (stop != vit2) ;
-		vit = m.phi2_1(vit) ;
-	} while(vit != d2) ;
-
-	cur = halfEdges.begin() ; // set the current edge to the first one
-}
-
-template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::initHalfEdgeInfo(Dart d)
-{
-	MAP& m = this->m_map ;
-	HalfEdgeInfo heinfo ;
-	if(m.edgeCanCollapse(d))
-		computeHalfEdgeInfo(d, heinfo) ;
-	else
-		heinfo.valid = false ;
-
-	halfEdgeInfo[d] = heinfo ;
-}
-
-template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::updateHalfEdgeInfo(Dart d, bool recompute)
-{
-	MAP& m = this->m_map ;
-	HalfEdgeInfo& heinfo = halfEdgeInfo[d] ;
-	if(recompute)
-	{
-		if(heinfo.valid)
-			halfEdges.erase(heinfo.it) ;			// remove the edge from the multimap
-		if(m.edgeCanCollapse(d))
-			computeHalfEdgeInfo(d, heinfo) ;
-		else
-			heinfo.valid = false ;
-	}
-	else
-	{
-		if(m.edgeCanCollapse(d))
-		{								 	// if the edge can be collapsed now
-			if(!heinfo.valid)				 // but it was not before
-				computeHalfEdgeInfo(d, heinfo) ;
-		}
-		else
-		{								 // if the edge cannot be collapsed now
-			if(heinfo.valid)				 // and it was before
-			{
-				halfEdges.erase(heinfo.it) ;
-				heinfo.valid = false ;
-			}
-		}
-	}
-}
-
-template <typename PFP>
-void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
-{
-	MAP& m = this->m_map ;
-	Dart dd = m.phi1(d) ;
-
-	// compute all approximated attributes
-	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
-			it != this->m_approximators.end() ;
-			++it)
-	{
-		(*it)->approximate(d) ;
-	}
-
-	// Get all approximated attributes
-	// New position
-	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
-	// New normal
-	const VEC3& newFN = this->m_approx[m_approxindex_FN]->getApprox(d,m_attrindex_FN) ; // get new frameN
-
-	// New function
-	// todo const VEC3& hfcoefs0 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[0]) ; // get newHFcoefs0
-	// todo const VEC3& hfcoefs1 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[1]) ; // get newHFcoefs1
-	// todo const VEC3& hfcoefs2 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[2]) ; // get newHFcoefs2
-	// ...
-	// todo const VEC3& hfcoefsK = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[K]) ; // get newHFcoefsK
-
-	// Compute errors
-	// Position
-	Quadric<REAL> quadGeom ;
-	quadGeom += m_quadricGeom[d] ;	// compute the sum of the
-	quadGeom += m_quadricGeom[dd] ;	// two vertices quadrics
-
-	// hemisphere difference error
-	double scal1 = abs(double(m_frameN[d] * newFN)) ;
-	scal1 = std::min(scal1, double(1)) ; // for epsilon normalization of newFN errors
-	// angle 2
-	double scal2 = abs(double(m_frameN[dd] * newFN)) ;
-	scal2 = std::min(scal2, double(1)) ;
-	// Important: sum of abs values works only if newFN is in-between the two old ones (interpolated).
-	// This avoids computation of the sign of alpha1 and alpha2.
-	double alpha = acos(scal1 + scal2) ;
-
-	std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << std::endl ;
-	// sum of QEM metric and frame orientation difference
-	REAL err =
-			quadGeom(newPos) // geom
-			+ alpha / M_PI // frame
-			// todo+ quadHF(newHF) // function coefficients
-			 ;
-
-	heinfo.it = halfEdges.insert(std::make_pair(err, d)) ;
-	heinfo.valid = true ;
-}
+///************************************************************************************
+// *                         HALFEDGESELECTOR LIGHTFIELD                              *
+// ************************************************************************************/
+//template <typename PFP>
+//bool HalfEdgeSelector_Lightfield<PFP>::init()
+//{
+//	// TODO
+//	MAP& m = this->m_map ;
+//
+//	// Verify availability of required approximators
+//	unsigned int ok = 0 ;
+//	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
+//	{
+//		bool saved = false ;
+//		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
+//		{
+//			// constraint : 2 approximators in specific order
+//			if(ok == 0 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "position")
+//			{
+//				++ok ;
+//				m_approxindex_pos = approxindex ;
+//				m_attrindex_pos = attrindex ;
+//				m_pos = this->m_position ;
+//				if (!saved)
+//				{
+//					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+//					saved = true ;
+//				}
+//			}
+//			else if(ok == 1 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameT")
+//			{
+//				++ok ;
+////				m_approxindex_FT = approxindex ;
+////				m_attrindex_FT = attrindex ;
+//				m_frameT = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameT") ;
+//				if (!saved)
+//				{
+//					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+//					assert(m_frameT.isValid() || !"EdgeSelector_QEMextColor: frameT attribute is not valid") ;
+//					saved = true ;
+//				}
+//			}
+//			else if(ok == 2 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameB")
+//			{
+//				++ok ;
+////				m_approxindex_FB = approxindex ;
+////				m_attrindex_FB = attrindex ;
+//				m_frameB = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameB") ;
+//				assert(m_frameB.isValid() || !"EdgeSelector_QEMextColor: frameB attribute is not valid") ;
+//				if (!saved)
+//				{
+//					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+//					saved = true ;
+//				}
+//			}
+//			else if(ok == 3 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == "frameN")
+//			{
+//				++ok ;
+//				m_approxindex_FN = approxindex ;
+//				m_attrindex_FN = attrindex ;
+//				m_frameN = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameN") ;
+//				assert(m_frameN.isValid() || !"EdgeSelector_QEMextColor: frameN attribute is not valid") ;
+//				if (!saved)
+//				{
+//					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+//					saved = true ;
+//				}
+//			}
+//		}
+//	}
+//
+//	if(ok != 4)
+//		return false ;
+//
+//	// Set quadric per vertex
+//	CellMarker<VERTEX> vMark(m) ;
+//	for(Dart d = m.begin(); d != m.end(); m.next(d))
+//	{
+//		if(!vMark.isMarked(d))
+//		{
+//			Quadric<REAL> q ;		// create one quadric
+//			m_quadricGeom[d] = q ;		// per vertex
+//			vMark.mark(d) ;
+//		}
+//	}
+//
+//	// Compute quadric per vertex
+//	DartMarker mark(m) ;
+//
+//	for(Dart d = m.begin(); d != m.end(); m.next(d)) // init QEM quadrics
+//	{
+//		if(!mark.isMarked(d))
+//		{
+//			Dart d1 = m.phi1(d) ;					// for each triangle,
+//			Dart d_1 = m.phi_1(d) ;					// initialize the quadric of the triangle
+//			Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
+//			m_quadricGeom[d] += q ;						// and add the contribution of
+//			m_quadricGeom[d1] += q ;						// this quadric to the ones
+//			m_quadricGeom[d_1] += q ;						// of the 3 incident vertices
+//			mark.markOrbit<FACE>(d) ;
+//		}
+//	}
+//
+//	// Init multimap for each Half-edge
+//	halfEdges.clear() ;
+//
+//	for(Dart d = m.begin(); d != m.end(); m.next(d))
+//	{
+//		initHalfEdgeInfo(d) ;	// init the edges with their optimal info
+//	}							// and insert them in the multimap according to their error
+//
+//	cur = halfEdges.begin() ; 	// init the current edge to the first one
+//
+//	return true ;
+//}
+//
+//template <typename PFP>
+//bool HalfEdgeSelector_Lightfield<PFP>::nextEdge(Dart& d)
+//{
+//	if(cur == halfEdges.end() || halfEdges.empty())
+//		return false ;
+//	d = (*cur).second ;
+//	return true ;
+//}
+//
+//template <typename PFP>
+//void HalfEdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
+//{
+//	MAP& m = this->m_map ;
+//
+//	HalfEdgeInfo& edgeE = halfEdgeInfo[d] ;
+//	if(edgeE.valid)
+//		halfEdges.erase(edgeE.it) ;
+//
+//	edgeE = halfEdgeInfo[m.phi1(d)] ;
+//	if(edgeE.valid)						// remove all
+//		halfEdges.erase(edgeE.it) ;
+//
+//	edgeE = halfEdgeInfo[m.phi_1(d)] ;	// the halfedges that will disappear
+//	if(edgeE.valid)
+//		halfEdges.erase(edgeE.it) ;
+//										// from the multimap
+//	Dart dd = m.phi2(d) ;
+//	if(dd != d)
+//	{
+//		edgeE = halfEdgeInfo[dd] ;
+//		if(edgeE.valid)
+//			halfEdges.erase(edgeE.it) ;
+//
+//		edgeE = halfEdgeInfo[m.phi1(dd)] ;
+//		if(edgeE.valid)
+//			halfEdges.erase(edgeE.it) ;
+//
+//		edgeE = halfEdgeInfo[m.phi_1(dd)] ;
+//		if(edgeE.valid)
+//			halfEdges.erase(edgeE.it) ;
+//	}
+//}
+//
+///**
+// * Update quadric of a vertex
+// * Discards quadrics of d and assigns freshly calculated
+// * quadrics depending on the actual planes surrounding d
+// * @param dart d
+// */
+//template <typename PFP>
+//void HalfEdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool recomputeNeighbors)
+//{	// TODO
+//	Dart dFront,dBack ;
+//	Dart dInit = d ;
+//
+//	// Init Front
+//	dFront = dInit ;
+//
+//	m_quadricGeom[d].zero() ;
+//
+//   	do
+//   	{
+//   		// Make step
+//   		dBack = this->m_map.phi1(dFront) ;
+//       	dFront = this->m_map.phi2_1(dFront) ;
+//
+//       	if (dBack != dFront)
+//       	{ // if dFront is no border
+//       		m_quadricGeom[d] += Quadric<REAL>(m_pos[d],m_pos[this->m_map.phi1(dFront)],m_pos[dBack]) ;
+//       	}
+//       	if (recomputeNeighbors)
+//       		recomputeQuadric(dBack, false) ;
+//
+//    } while(dFront != dInit) ;
+//}
+//
+//template <typename PFP>
+//void HalfEdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+//{
+//	MAP& m = this->m_map ;
+//
+//	// TODO
+//	recomputeQuadric(d2, true) ;
+//
+//	Dart vit = d2 ;
+//	do
+//	{
+//		updateHalfEdgeInfo(vit, true) ;
+//		Dart d = m.phi2(vit) ;
+//		if (d != vit) ;
+//			updateHalfEdgeInfo(d, true) ;
+//
+//		updateHalfEdgeInfo(m.phi1(vit), true) ;
+//		d = m.phi2(m.phi1(vit)) ;
+//		if (d != m.phi1(vit)) ;
+//			updateHalfEdgeInfo(d, true) ;
+//
+//		Dart stop = m.phi2(vit) ;
+//		assert (stop != vit) ;
+//		Dart vit2 = m.phi12(m.phi1(vit)) ;
+//		do {
+//			updateHalfEdgeInfo(vit2, true) ;
+//			d = m.phi2(vit2) ;
+//			if (d != vit2) ;
+//				updateHalfEdgeInfo(d, true) ;
+//
+//			updateHalfEdgeInfo(m.phi1(vit2), false) ;
+//			d = m.phi2(m.phi1(vit2)) ;
+//			if (d != m.phi1(vit2)) ;
+//				updateHalfEdgeInfo(d, false) ;
+//
+//			vit2 = m.phi12(vit2) ;
+//		} while (stop != vit2) ;
+//		vit = m.phi2_1(vit) ;
+//	} while(vit != d2) ;
+//
+//	cur = halfEdges.begin() ; // set the current edge to the first one
+//}
+//
+//template <typename PFP>
+//void HalfEdgeSelector_Lightfield<PFP>::initHalfEdgeInfo(Dart d)
+//{
+//	MAP& m = this->m_map ;
+//	HalfEdgeInfo heinfo ;
+//	if(m.edgeCanCollapse(d))
+//		computeHalfEdgeInfo(d, heinfo) ;
+//	else
+//		heinfo.valid = false ;
+//
+//	halfEdgeInfo[d] = heinfo ;
+//}
+//
+//template <typename PFP>
+//void HalfEdgeSelector_Lightfield<PFP>::updateHalfEdgeInfo(Dart d, bool recompute)
+//{
+//	MAP& m = this->m_map ;
+//	HalfEdgeInfo& heinfo = halfEdgeInfo[d] ;
+//	if(recompute)
+//	{
+//		if(heinfo.valid)
+//			halfEdges.erase(heinfo.it) ;			// remove the edge from the multimap
+//		if(m.edgeCanCollapse(d))
+//			computeHalfEdgeInfo(d, heinfo) ;
+//		else
+//			heinfo.valid = false ;
+//	}
+//	else
+//	{
+//		if(m.edgeCanCollapse(d))
+//		{								 	// if the edge can be collapsed now
+//			if(!heinfo.valid)				 // but it was not before
+//				computeHalfEdgeInfo(d, heinfo) ;
+//		}
+//		else
+//		{								 // if the edge cannot be collapsed now
+//			if(heinfo.valid)				 // and it was before
+//			{
+//				halfEdges.erase(heinfo.it) ;
+//				heinfo.valid = false ;
+//			}
+//		}
+//	}
+//}
+//
+//template <typename PFP>
+//void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo& heinfo)
+//{
+//	MAP& m = this->m_map ;
+//	Dart dd = m.phi1(d) ;
+//
+//	// compute all approximated attributes
+//	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin() ;
+//			it != this->m_approximators.end() ;
+//			++it)
+//	{
+//		(*it)->approximate(d) ;
+//	}
+//
+//	// Get all approximated attributes
+//	// New position
+//	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
+//	// New normal
+//	const VEC3& newFN = this->m_approx[m_approxindex_FN]->getApprox(d,m_attrindex_FN) ; // get new frameN
+//
+//	// New function
+//	// todo const VEC3& hfcoefs0 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[0]) ; // get newHFcoefs0
+//	// todo const VEC3& hfcoefs1 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[1]) ; // get newHFcoefs1
+//	// todo const VEC3& hfcoefs2 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[2]) ; // get newHFcoefs2
+//	// ...
+//	// todo const VEC3& hfcoefsK = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[K]) ; // get newHFcoefsK
+//
+//	// Compute errors
+//	// Position
+//	Quadric<REAL> quadGeom ;
+//	quadGeom += m_quadricGeom[d] ;	// compute the sum of the
+//	quadGeom += m_quadricGeom[dd] ;	// two vertices quadrics
+//
+//	// hemisphere difference error
+//	double scal1 = abs(double(m_frameN[d] * newFN)) ;
+//	scal1 = std::min(scal1, double(1)) ; // for epsilon normalization of newFN errors
+//	// angle 2
+//	double scal2 = abs(double(m_frameN[dd] * newFN)) ;
+//	scal2 = std::min(scal2, double(1)) ;
+//	// Important: sum of abs values works only if newFN is in-between the two old ones (interpolated).
+//	// This avoids computation of the sign of alpha1 and alpha2.
+//	double alpha = acos(scal1 + scal2) ;
+//
+//	std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << std::endl ;
+//	// sum of QEM metric and frame orientation difference
+//	REAL err =
+//			quadGeom(newPos) // geom
+//			+ alpha / M_PI // frame
+//			// todo+ quadHF(newHF) // function coefficients
+//			 ;
+//
+//	heinfo.it = halfEdges.insert(std::make_pair(err, d)) ;
+//	heinfo.valid = true ;
+//}
 
 ///************************************************************************************
 // *                         HALFEDGESELECTOR LIGHTFIELD                              *

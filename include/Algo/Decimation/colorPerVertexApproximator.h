@@ -48,6 +48,7 @@ public:
 protected:
 	VertexAttribute<VEC3> m_position ;
 	EdgeAttribute<VEC3> m_approxposition ;
+
 	VertexAttribute<VEC3> *m_color ;
 
 public:
@@ -55,13 +56,6 @@ public:
 		Approximator<PFP, VEC3>(m, attr, pred)
 	{
 		m_color = this->m_attrV[0] ;
-		assert(m_color->isValid() || !"Approximator_ColorNaive: the approximated attribute is not valid") ;
-
-		m_position = this->m_map.template getAttribute<VEC3, VERTEX>("position") ;
-		assert(m_position.isValid() || !"Approximator_ColorNaive: the position attribute is not valid") ;
-
-		m_approxposition = this->m_map.template getAttribute<VEC3, EDGE>("approx_position") ;
-		assert(m_approxposition.isValid() || !"Approximator_ColorNaive: the approx_position attribute is not valid") ;
 	}
 	~Approximator_ColorNaive()
 	{}
@@ -73,7 +67,15 @@ public:
 
 	bool init()
 	{
-		return true ;
+		assert(m_color->isValid() || !"Approximator_ColorNaive: the approximated attribute is not valid") ;
+
+		m_position = this->m_map.template getAttribute<VEC3, VERTEX>("position") ;
+		assert(m_position.isValid() || !"Approximator_ColorNaive::init: the position attribute is not valid") ;
+
+		m_approxposition = this->m_map.template getAttribute<VEC3, EDGE>("approx_position") ;
+		assert(m_approxposition.isValid() || !"Approximator_ColorNaive::init: the approx_position attribute is not valid") ;
+
+		return m_color->isValid() && m_position.isValid() && m_approxposition.isValid() ;
 	}
 
 	void approximate(Dart d) ;
@@ -102,6 +104,7 @@ public:
 		m_position = this->m_attrV[0] ;
 		m_color = this->m_attrV[1] ;
 	}
+
 	~Approximator_ColorQEMext()
 	{}
 

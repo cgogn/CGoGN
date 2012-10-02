@@ -32,6 +32,10 @@
 #include "Geometry/matrix.h"
 #include "Geometry/plane_3d.h"
 
+// GSL includes
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+
 namespace CGoGN {
 
 //namespace Utils {
@@ -315,136 +319,159 @@ private:
 template <typename REAL>
 class QuadricHF
 {
-	// TODO
 public:
 	static std::string CGoGNnameOfType() { return "QuadricHF" ; }
 
-	typedef Geom::Vector<3,REAL> VECN ;
-	typedef Geom::Vector<4,REAL> VECNp ;
+	typedef Geom::Vector<3,REAL> VEC3 ;
 
 	QuadricHF()
 	{
-		A.zero() ;
-		b.zero() ;
-		c = 0 ;
+		m_A = gsl_matrix_alloc(0,0) ;
+		m_b = gsl_vector_alloc(0) ;
+		m_c = 0 ;
 	}
 
-	QuadricHF(int i)
+	QuadricHF(int i):
+		m_A(NULL),
+		m_b(NULL),
+		m_c(0)
 	{
-		A.zero() ;
-		b.zero() ;
-		c = 0 ;
+		m_A = gsl_matrix_calloc(i, i) ;
+		m_b = gsl_vector_calloc(i) ;
+		m_c = 0 ;
 	}
 
-	QuadricHF(const VECN& p1_r, const VECN& p2_r, const VECN& p3_r)
+	QuadricHF(const std::vector<VEC3>& coefs, const REAL& gamma, const REAL& alpha)
 	{
-		const Geom::Vector<3,double>& p1 = p1_r ;
-		const Geom::Vector<3,double>& p2 = p2_r ;
-		const Geom::Vector<3,double>& p3 = p3_r ;
+		m_A = gsl_matrix_calloc(coefs.size(), coefs.size()) ;
+		m_b = gsl_vector_calloc(coefs.size()) ;
+		m_c = 0 ;
+		// TODO : build A, b and c
+		assert(false || !"todo") ;
+	}
 
-		Geom::Vector<3,double> e1 = p2 - p1 ; 						e1.normalize() ;
-		Geom::Vector<3,double> e2 = (p3 - p1) - (e1*(p3-p1))*e1 ; 	e2.normalize() ;
-
-		A.identity() ;
-		A -= Geom::transposed_vectors_mult(e1,e1) + Geom::transposed_vectors_mult(e2,e2) ;
-
-		b = (p1*e1)*e1 + (p1*e2)*e2 - p1 ;
-
-		c = p1*p1 - pow((p1*e1),2) - pow((p1*e2),2) ;
+	~QuadricHF()
+	{
+		gsl_matrix_free(m_A) ;
+		gsl_vector_free(m_b) ;
 	}
 
 	void zero()
 	{
-		A.zero() ;
-		b.zero() ;
-		c = 0 ;
+		gsl_matrix_set_zero(m_A) ;
+		gsl_vector_set_zero(m_b) ;
+		m_c = 0 ;
 	}
 
-	void operator= (const QuadricHF<REAL>& q)
+	QuadricHF& operator= (const QuadricHF<REAL>& q)
 	{
-		A = q.A ;
-		b = q.b ;
-		c = q.c ;
+		m_A = gsl_matrix_alloc(q.m_A->size1,q.m_A->size1) ;
+		gsl_matrix_memcpy(m_A,q.m_A) ;
+
+		m_b = gsl_vector_alloc(m_b->size) ;
+		gsl_vector_memcpy(m_b,q.m_b) ;
+
+		m_c = q.m_c ;
+
+		return *this ;
 	}
+
 	QuadricHF& operator+= (const QuadricHF<REAL>& q)
 	{
-		A += q.A ;
-		b += q.b ;
-		c += q.c ;
+		assert(((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && m_b->size == q.m_b->size) || !"Incompatible add of matrices") ;
+		if ((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && (m_b->size == q.m_b->size))
+			return *this ;
+
+		gsl_matrix_add(m_A,q.m_A) ;
+		gsl_vector_add(m_b,q.m_b) ;
+		m_c += q.m_c ;
+
 		return *this ;
 	}
 
 	QuadricHF& operator -= (const QuadricHF<REAL>& q)
 	{
-		A -= q.A ;
-		b -= q.b ;
-		c -= q.c ;
+		assert(((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && m_b->size == q.m_b->size) || !"Incompatible add of matrices") ;
+		if ((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && (m_b->size == q.m_b->size))
+			return *this ;
+
+		gsl_matrix_sub(m_A,q.m_A) ;
+		gsl_vector_sub(m_b,q.m_b) ;
+		m_c -= q.m_c ;
+
 		return *this ;
 	}
 
-	QuadricHF& operator *= (REAL v)
+	QuadricHF& operator *= (const REAL& v)
 	{
-		A *= v ;
-		b *= v ;
-		c *= v ;
+		gsl_matrix_scale(m_A,v) ;
+		gsl_vector_scale(m_b,v) ;
+		m_c *= v ;
+
 		return *this ;
 	}
-	QuadricHF& operator /= (REAL v)
+	QuadricHF& operator /= (const REAL& v)
 	{
-		A /= v ;
-		b /= v ;
-		c /= v ;
+		const REAL& inv = 1. / v ;
+
+		(*this) *= inv ;
+
 		return *this ;
 	}
 
-	REAL operator() (const VECNp& v) const
-	{
-		VECN hv ;
-		for (unsigned int i = 0 ; i < 3 ; ++i)
-			hv[i] = v[i] ;
+//	REAL operator() (const VECNp& v) const
+//	{
+//		VECN hv ;
+//		for (unsigned int i = 0 ; i < 3 ; ++i)
+//			hv[i] = v[i] ;
+//
+//		return evaluate(v) ;
+//	}
 
-		return evaluate(v) ;
-	}
-
-	REAL operator() (const VECN& v) const
+	REAL operator() (const std::vector<VEC3>& coefs) const
 	{
-		return evaluate(v) ;
+		return evaluate(coefs) ;
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const QuadricHF<REAL>& q)
 	{
-		out << "(" << q.A << ", " << q.b << ", " << q.c << ")" ;
+		// TODO out << "(" << q.m_A << ", " << q.m_b << ", " << q.m_c << ")" ;
 		return out ;
 	}
 
 	friend std::istream& operator>>(std::istream& in, QuadricHF<REAL>& q)
 	{
-		in >> q.A ;
-		in >> q.b ;
-		in >> q.c ;
+		// TODO
+//		in >> q.A ;
+//		in >> q.b ;
+//		in >> q.c ;
 		return in ;
 	}
 
-	bool findOptimizedVec(VECN& v)
+	bool findOptimizedCoefs(std::vector<VEC3>& coefs)
 	{
-		return optimize(v) ;
+		return optimize(coefs) ;
 	}
 
 private:
 	// Double computation is crucial for stability
-	Geom::Matrix<3,3,double> A ;
-	Geom::Vector<3,double> b ;
-	double c ;
+	gsl_matrix *m_A ;
+	gsl_vector *m_b ;
+	double m_c ;
 
-	REAL evaluate(const VECN& v) const
+	REAL evaluate(const std::vector<VEC3>& coefs) const
 	{
-		Geom::Vector<3, double> v_d = v ;
-		return v_d*A*v_d + 2.*(b*v_d) + c ;
+		// TODO
+//		Geom::Vector<3, double> v_d = v ;
+//		return v_d*A*v_d + 2.*(b*v_d) + c ;
 	}
 
-	bool optimize(VECN& v) const
+	bool optimize(std::vector<VEC3>& coefs) const
 	{
-		if (std::isnan(A(0,0)))
+		coefs.reserve(m_b->size) ;
+
+		// TODO
+/*		if (std::isnan(A(0,0)))
 			return false ;
 
 		Geom::Matrix<3,3,double> Ainv ;
@@ -455,7 +482,7 @@ private:
 
 		v.zero() ;
 		v -= Ainv * b ;
-
+*/
 		return true ;
 	}
 } ;
