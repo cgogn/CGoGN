@@ -54,34 +54,37 @@ template <typename PFP>
 void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select)
 {
 	CGoGNout << "  creating approximator and predictor.." << CGoGNflush ;
+
+	std::vector<VertexAttribute< typename PFP::VEC3>* > pos_v ;
+	pos_v.push_back(&m_position) ;
 	switch(a)
 	{
-	case Algo::Decimation::A_QEM : {
-		m_approximators.push_back(new Algo::Decimation::Approximator_QEM<PFP>(m_map, m_position)) ;
-		break ; }
-	case Algo::Decimation::A_MidEdge : {
-		m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, m_position)) ;
-		break ; }
-	case Algo::Decimation::A_HalfCollapse : {
-		Algo::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Decimation::Predictor_HalfCollapse<PFP>(m_map, m_position) ;
-		m_predictors.push_back(pred) ;
-		m_approximators.push_back(new Algo::Decimation::Approximator_HalfCollapse<PFP>(m_map, m_position, pred)) ;
-		break ; }
-	case Algo::Decimation::A_CornerCutting : {
-		Algo::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Decimation::Predictor_CornerCutting<PFP>(m_map, m_position) ;
-		m_predictors.push_back(pred) ;
-		m_approximators.push_back(new Algo::Decimation::Approximator_CornerCutting<PFP>(m_map, m_position, pred)) ;
-		break ; }
-	case Algo::Decimation::A_TangentPredict1 : {
-		Algo::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict1<PFP>(m_map, m_position) ;
-		m_predictors.push_back(pred) ;
-		m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, m_position, pred)) ;
-		break ; }
-	case Algo::Decimation::A_TangentPredict2 : {
-		Algo::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict2<PFP>(m_map, m_position) ;
-		m_predictors.push_back(pred) ;
-		m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, m_position, pred)) ;
-		break ; }
+		case Algo::Decimation::A_QEM : {
+			m_approximators.push_back(new Algo::Decimation::Approximator_QEM<PFP>(m_map, pos_v)) ;
+			break ; }
+		case Algo::Decimation::A_MidEdge : {
+			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v)) ;
+			break ; }
+		case Algo::Decimation::A_hHalfCollapse : {
+			Algo::Decimation::Predictor_HalfCollapse<PFP>* pred = new Algo::Decimation::Predictor_HalfCollapse<PFP>(m_map, m_position) ;
+			m_predictors.push_back(pred) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_HalfCollapse<PFP>(m_map, pos_v, pred)) ;
+			break ; }
+		case Algo::Decimation::A_CornerCutting : {
+			Algo::Decimation::Predictor_CornerCutting<PFP>* pred = new Algo::Decimation::Predictor_CornerCutting<PFP>(m_map, m_position) ;
+			m_predictors.push_back(pred) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_CornerCutting<PFP>(m_map, pos_v, pred)) ;
+			break ; }
+		case Algo::Decimation::A_TangentPredict1 : {
+			Algo::Decimation::Predictor_TangentPredict1<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict1<PFP>(m_map, m_position) ;
+			m_predictors.push_back(pred) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
+			break ; }
+		case Algo::Decimation::A_TangentPredict2 : {
+			Algo::Decimation::Predictor_TangentPredict2<PFP>* pred = new Algo::Decimation::Predictor_TangentPredict2<PFP>(m_map, m_position) ;
+			m_predictors.push_back(pred) ;
+			m_approximators.push_back(new Algo::Decimation::Approximator_MidEdge<PFP>(m_map, pos_v, pred)) ;
+			break ; }
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 
