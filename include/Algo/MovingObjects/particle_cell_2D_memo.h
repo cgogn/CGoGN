@@ -33,7 +33,7 @@ class ParticleCell2DMemo : public ParticleCell2D<PFP>
 
 	ParticleCell2DMemo() {};
 
-	ParticleCell2DMemo(Map& map, Dart belonging_cell, VEC3 pos, TAB_POS tabPos, DartMarker& obst) : ParticleCell2D<PFP>(map,belonging_cell,pos,tabPos,obst)
+	ParticleCell2DMemo(Map& map, Dart belonging_cell, VEC3 pos,const TAB_POS& tabPos) : ParticleCell2D<PFP>(map,belonging_cell,pos,tabPos)
 	{};
 
 	void vertexState(const VEC3& current);
