@@ -194,6 +194,11 @@ public:
 	void draw();
 
 	/**
+	 * draw without applying transformation
+	 */
+	void drawNoTransfo();
+
+	/**
 	 * return a ref on the transformation matrix
 	 */
 	glm::mat4&  transfo();

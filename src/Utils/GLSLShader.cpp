@@ -1085,8 +1085,8 @@ void GLSLShader::updateAllFromGLMatrices()
 	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
 	glGetDoublev( GL_PROJECTION_MATRIX, projection );
 
-	glm::mat4 model;
-	glm::mat4 proj;
+	glm::mat4& model = currentModelView();
+	glm::mat4& proj = currentProjection();
 
 	for (unsigned int i=0; i< 4; ++i)
 	{

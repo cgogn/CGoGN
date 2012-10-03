@@ -408,6 +408,8 @@ public:
 	static void pushTransfo() {s_current_matrices->pushTransfo();}
 	/// pop transformation matrix
 	static void popTransfo() {s_current_matrices->popTransfo();}
+	// apply a transformation given by its matrix
+	static void applyTransfo(const glm::mat4& m) { s_current_matrices->apply(m);}
 };
 
 

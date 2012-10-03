@@ -163,6 +163,12 @@ void Pickable::draw()
 	Utils::GLSLShader::updateCurrentMatrices();
 }
 
+void Pickable::drawNoTransfo()
+{
+	m_drawable->draw();
+}
+
+
 
 glm::mat4&  Pickable::transfo()
 {
