@@ -22,6 +22,10 @@ ENDIF(WIN32)
 
 
 #define exec to compile
+QT4_WRAP_CPP(tutoriel_moc ../tutoriel.h)	
+add_executable( tutoriel ../tutoriel.cpp ${tutoriel_moc})
+target_link_libraries( tutoriel
+		${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
 
 QT4_WRAP_CPP(polyhedronsView_moc ../polyhedronsView.h)	
 add_executable( polyhedronsView ../polyhedronsView.cpp ${polyhedronsView_moc})

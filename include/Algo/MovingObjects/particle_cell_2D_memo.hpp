@@ -1,4 +1,3 @@
-// #define DEBUG
 
 template <typename PFP>
 void ParticleCell2DMemo<PFP>::move(const VEC3& newCurrent)
