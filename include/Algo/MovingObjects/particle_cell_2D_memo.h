@@ -30,11 +30,15 @@ class ParticleCell2DMemo : public ParticleCell2D<PFP>
 	typedef VertexAttribute<typename PFP::VEC3> TAB_POS;
 
 	std::list<Dart> memo_cross;
-
+	bool detect_vertex;
+	bool detect_edge;
+	bool detect_face;
 	ParticleCell2DMemo() {};
 
-	ParticleCell2DMemo(Map& map, Dart belonging_cell, VEC3 pos,const TAB_POS& tabPos) : ParticleCell2D<PFP>(map,belonging_cell,pos,tabPos)
-	{};
+	ParticleCell2DMemo(Map& map, Dart belonging_cell, VEC3 pos,const TAB_POS& tabPos) : ParticleCell2D<PFP>(map,belonging_cell,pos,tabPos),detect_vertex(false),detect_edge(false),detect_face(true)
+	{
+//	 memo_cross.push_back(this->d);
+	};
 
 	void vertexState(const VEC3& current);
 

@@ -78,7 +78,7 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 		}
 
 		//displacement step
-		memo_cross.push_back(this->d);
+		if (detect_vertex) memo_cross.push_back(this->d);
 		if(getOrientationEdge(current, this->d) == Geom::ALIGNED && Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->m_positions, current))
 			edgeState(current);
 		else
@@ -95,7 +95,7 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 	#ifdef DEBUG
 	CGoGNout << "edgeState" <<  d << CGoGNendl;
 	#endif
-	memo_cross.push_back(this->d);
+	if (detect_edge)memo_cross.push_back(this->d);
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 // 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
@@ -149,7 +149,7 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 	#ifdef DEBUG
 	CGoGNout << "faceState" <<  d << CGoGNendl;
 	#endif
-	memo_cross.push_back(this->d);
+	if (detect_face) memo_cross.push_back(this->d);
  	assert(std::isfinite(this->m_position[0]) && std::isfinite(this->m_position[1]) && std::isfinite(this->m_position[2]));
  	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2]));
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
@@ -246,7 +246,7 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 	}
 
 	//displacement step
-	memo_cross.push_back(this->d);
+
 	switch (getOrientationEdge(current, this->d))
 	{
 	case Geom::LEFT :
@@ -274,6 +274,7 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 		}
 		else
 		{
+
 // 			CGoGNout << "wsoe : " << wsoe << CGoGNendl;
 // 			CGoGNout << "current " << current << " " << m_position << CGoGNendl;
 // 			CGoGNout << "d " << d << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi2(d)] << CGoGNendl;
