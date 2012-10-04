@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -25,16 +25,19 @@
 namespace CGoGN
 {
 
-template <typename T>
-void AttributeHandler<T>::registerInMap()
+template <typename T, unsigned int ORBIT>
+inline void AttributeHandler<T, ORBIT>::registerInMap()
 {
+	boost::mutex::scoped_lock lockAH(m_map->attributeHandlersMutex);
 	m_map->attributeHandlers.insert(std::pair<AttributeMultiVectorGen*, AttributeHandlerGen*>(m_attrib, this)) ;
 }
 
-template <typename T>
-void AttributeHandler<T>::unregisterFromMap()
+template <typename T, unsigned int ORBIT>
+inline void AttributeHandler<T, ORBIT>::unregisterFromMap()
 {
 	typedef std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator IT ;
+
+	boost::mutex::scoped_lock lockAH(m_map->attributeHandlersMutex);
 	std::pair<IT, IT> bounds = m_map->attributeHandlers.equal_range(m_attrib) ;
 	for(IT i = bounds.first; i != bounds.second; ++i)
 	{
@@ -49,17 +52,19 @@ void AttributeHandler<T>::unregisterFromMap()
 
 // =================================================================
 
-template <typename T>
-AttributeHandler<T>::AttributeHandler() :
+template <typename T, unsigned int ORBIT>
+AttributeHandler<T, ORBIT>::AttributeHandler() :
 	AttributeHandlerGen(NULL, false), m_attrib(NULL)
 {}
 
-template <typename T>
-AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
+
+template <typename T, unsigned int ORBIT>
+AttributeHandler<T, ORBIT>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* amv) :
 	AttributeHandlerGen(m, false), m_attrib(amv)
 {
-	if(amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
+	if(m != NULL && amv != NULL && amv->getIndex() != AttributeContainer::UNKNOWN)
 	{
+		assert(ORBIT == amv->getOrbit() || !"AttributeHandler: orbit incompatibility") ;
 		valid = true ;
 		registerInMap() ;
 	}
@@ -67,16 +72,16 @@ AttributeHandler<T>::AttributeHandler(GenericMap* m, AttributeMultiVector<T>* am
 		valid = false ;
 }
 
-template <typename T>
-AttributeHandler<T>::AttributeHandler(const AttributeHandler<T>& ta) :
+template <typename T, unsigned int ORBIT>
+AttributeHandler<T, ORBIT>::AttributeHandler(const AttributeHandler<T, ORBIT>& ta) :
 	AttributeHandlerGen(ta.m_map, ta.valid), m_attrib(ta.m_attrib)
 {
 	if(valid)
 		registerInMap() ;
 }
 
-template <typename T>
-inline void AttributeHandler<T>::operator=(const AttributeHandler<T>& ta)
+template <typename T, unsigned int ORBIT>
+inline AttributeHandler<T, ORBIT>& AttributeHandler<T, ORBIT>::operator=(const AttributeHandler<T, ORBIT>& ta)
 {
 	if(valid)
 		unregisterFromMap() ;
@@ -85,117 +90,124 @@ inline void AttributeHandler<T>::operator=(const AttributeHandler<T>& ta)
 	valid = ta.valid ;
 	if(valid)
 		registerInMap() ;
+	return *this ;
 }
 
-template <typename T>
-AttributeHandler<T>::~AttributeHandler()
+template <typename T, unsigned int ORBIT>
+AttributeHandler<T, ORBIT>::~AttributeHandler()
 {
 	if(valid)
 		unregisterFromMap() ;
 }
 
-template <typename T>
-AttributeMultiVector<T>* AttributeHandler<T>::getDataVector() const
+template <typename T, unsigned int ORBIT>
+inline AttributeMultiVector<T>* AttributeHandler<T, ORBIT>::getDataVector() const
 {
 	return m_attrib ;
 }
 
-template <typename T>
-unsigned int AttributeHandler<T>::getOrbit() const
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::getOrbit() const
 {
-	return m_attrib->getOrbit() ;
+	return ORBIT ;
 }
 
-template <typename T>
-unsigned int AttributeHandler<T>::getIndex() const
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::getIndex() const
 {
 	return m_attrib->getIndex() ;
 }
 
-template <typename T>
-const std::string& AttributeHandler<T>::name() const
+template <typename T, unsigned int ORBIT>
+inline const std::string& AttributeHandler<T, ORBIT>::name() const
 {
 	return m_attrib->getName() ;
 }
 
-template <typename T>
-inline T& AttributeHandler<T>::operator[](Dart d)
+
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::nbElements() const
+{
+	return m_map->getAttributeContainer<ORBIT>().size() ;
+}
+
+template <typename T, unsigned int ORBIT>
+inline T& AttributeHandler<T, ORBIT>::operator[](Dart d)
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	unsigned int orbit = m_attrib->getOrbit() ;
-	unsigned int a = m_map->getEmbedding(orbit, d) ;
+	unsigned int a = m_map->getEmbedding<ORBIT>(d) ;
 
 	if (a == EMBNULL)
-		a = m_map->embedNewCell(orbit, d) ;
+		a = m_map->embedNewCell<ORBIT>(d) ;
 
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T>
-inline const T& AttributeHandler<T>::operator[](Dart d) const
+template <typename T, unsigned int ORBIT>
+inline const T& AttributeHandler<T, ORBIT>::operator[](Dart d) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	unsigned int a = m_map->getEmbedding(m_attrib->getOrbit(), d) ;
+	unsigned int a = m_map->getEmbedding<ORBIT>(d) ;
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T>
-inline T& AttributeHandler<T>::operator[](unsigned int a)
-{
-	assert(valid || !"Invalid AttributeHandler") ;
-	return m_attrib->operator[](a) ;
-}
-
-template <typename T>
-inline const T& AttributeHandler<T>::operator[](unsigned int a) const
+template <typename T, unsigned int ORBIT>
+inline T& AttributeHandler<T, ORBIT>::operator[](unsigned int a)
 {
 	assert(valid || !"Invalid AttributeHandler") ;
 	return m_attrib->operator[](a) ;
 }
 
-template <typename T>
-inline unsigned int AttributeHandler<T>::insert(const T& elt)
+template <typename T, unsigned int ORBIT>
+inline const T& AttributeHandler<T, ORBIT>::operator[](unsigned int a) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	unsigned int idx = m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine() ;
+	return m_attrib->operator[](a) ;
+}
+
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::insert(const T& elt)
+{
+	assert(valid || !"Invalid AttributeHandler") ;
+	unsigned int idx = m_map->getAttributeContainer<ORBIT>().insertLine() ;
 	m_attrib->operator[](idx) = elt ;
 	return idx ;
 }
 
-template <typename T>
-inline unsigned int AttributeHandler<T>::newElt()
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::newElt()
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	unsigned int idx = m_map->getAttributeContainer(m_attrib->getOrbit()).insertLine() ;
+	unsigned int idx = m_map->getAttributeContainer<ORBIT>().insertLine() ;
 	return idx ;
 }
 
-template <typename T>
-inline void AttributeHandler<T>::setAllValues(const T& v)
+template <typename T, unsigned int ORBIT>
+inline void AttributeHandler<T, ORBIT>::setAllValues(const T& v)
 {
 	for(unsigned int i = begin(); i != end(); next(i))
 		m_attrib->operator[](i) = v ;
 }
 
-template <typename T>
-inline unsigned int AttributeHandler<T>::begin() const
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::begin() const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	return m_map->getAttributeContainer(m_attrib->getOrbit()).begin() ;
+	return m_map->getAttributeContainer<ORBIT>().begin() ;
 }
 
-template <typename T>
-inline unsigned int AttributeHandler<T>::end() const
+template <typename T, unsigned int ORBIT>
+inline unsigned int AttributeHandler<T, ORBIT>::end() const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	return m_map->getAttributeContainer(m_attrib->getOrbit()).end() ;
+	return m_map->getAttributeContainer<ORBIT>().end() ;
 }
 
-template <typename T>
-inline void AttributeHandler<T>::next(unsigned int& iter) const
+template <typename T, unsigned int ORBIT>
+inline void AttributeHandler<T, ORBIT>::next(unsigned int& iter) const
 {
 	assert(valid || !"Invalid AttributeHandler") ;
-	m_map->getAttributeContainer(m_attrib->getOrbit()).next(iter) ;
+	m_map->getAttributeContainer<ORBIT>().next(iter) ;
 }
 
 } //namespace CGoGN

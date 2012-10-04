@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,7 +35,7 @@ namespace Filtering
 {
 
 template <typename PFP>
-void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, const FunctorSelect& select = allDarts)
+void filterTaubin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -44,9 +44,9 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;
 
-	CellMarkerNoUnmark mv(map, VERTEX) ;
+	CellMarkerNoUnmark<VERTEX> mv(map) ;
 
-	FunctorAverage<VEC3> fa1(position) ;
+	FunctorAverage<VEC3, VERTEX> fa1(position) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && !mv.isMarked(d))
@@ -69,7 +69,7 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
 	}
 
 	// unshrinking step
-	FunctorAverage<VEC3> fa2(position2) ;
+	FunctorAverage<VEC3, VERTEX> fa2(position2) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 		if(select(d) && mv.isMarked(d))
@@ -96,16 +96,16 @@ void filterTaubin(typename PFP::MAP& map, typename PFP::TVEC3& position, typenam
  * Taubin filter modified as proposed by [Lav09]
  */
 template <typename PFP>
-void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position, typename PFP::TVEC3& position2, typename PFP::REAL radius, const FunctorSelect& select = allDarts)
+void filterTaubin_modified(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& position2, typename PFP::REAL radius, const FunctorSelect& select = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
 	const float lambda = 0.6307 ;
 	const float mu = -0.6732 ;
 
-	CellMarkerNoUnmark mv(map, VERTEX) ;
+	CellMarkerNoUnmark<VERTEX> mv(map) ;
 
-	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa1(map, position, position) ;
+	FunctorAverageOnSphereBorder<PFP, VEC3> fa1(map, position, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> c1(map, position, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
@@ -129,7 +129,7 @@ void filterTaubin_modified(typename PFP::MAP& map, typename PFP::TVEC3& position
 	}
 
 	// unshrinking step
-	FunctorAverageOnSphereBorder<PFP, typename PFP::VEC3> fa2(map, position2, position2) ;
+	FunctorAverageOnSphereBorder<PFP, VEC3> fa2(map, position2, position2) ;
 	Algo::Selection::Collector_WithinSphere<PFP> c2(map, position2, radius) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -42,7 +42,7 @@ namespace GL1
 {
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const FunctorSelect& good)
+void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& good)
 {
 	// RenderType => lighted & smooth ??
 	bool lighted = (rt != NO_LIGHT) && (rt!= LINE);
@@ -51,9 +51,8 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 	// first pass render the triangles
 	FunctorGLFace<PFP> fgl_tri(the_map, lighted, smooth, 3, explode, true, position, normal, good);
 
-
 	glBegin(GL_TRIANGLES);
-	the_map.foreach_orbit(FACE, fgl_tri, good);
+	the_map.template foreach_orbit<FACE>(fgl_tri, good);
 	glEnd();
 
 	// get untreated quads & polygons
@@ -108,7 +107,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 template <typename PFP>
-void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, const typename PFP::TVEC3& color, const FunctorSelect& good)
+void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, const VertexAttribute<typename PFP::VEC3>& color, const FunctorSelect& good)
 {
 	// RenderType => lighted & smooth ??
 	bool lighted = (rt != NO_LIGHT) && (rt!= LINE);
@@ -119,7 +118,7 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 	glBegin(GL_TRIANGLES);
-	the_map.foreach_orbit(FACE, fgl_tri, good);
+	the_map.template foreach_orbit<FACE>(fgl_tri, good);
 	glEnd();
 
 	// get untreated quads & polygons
@@ -173,22 +172,22 @@ void renderTriQuadPoly(typename PFP::MAP& the_map, RenderType rt, float explode,
 
 
 template <typename PFP>
-void renderNormalVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal, float scale, const FunctorSelect& good)
+void renderNormalVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3>& normal, float scale, const FunctorSelect& good)
 {
 	FunctorGLNormal<PFP> fgl_norm(the_map, good, position, normal, scale);
 
 	glBegin(GL_LINES);
-	the_map.foreach_orbit(VERTEX, fgl_norm, good);
+	the_map.template foreach_orbit<VERTEX>(fgl_norm, good);
 	glEnd();
 }
 
 template <typename PFP>
-void renderFrameVertices(typename PFP::MAP& the_map, const typename PFP::TVEC3& position, const typename PFP::TVEC3 frame[3], float scale, const FunctorSelect& good)
+void renderFrameVertices(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& position, const VertexAttribute<typename PFP::VEC3> frame[3], float scale, const FunctorSelect& good)
 {
 	FunctorGLFrame<PFP> fgl_frame(the_map, good, position, frame, scale) ;
 
 	glBegin(GL_LINES) ;
-	the_map.foreach_orbit(VERTEX, fgl_frame, good) ;
+	the_map.template foreach_orbit<VERTEX>(fgl_frame, good) ;
 	glEnd();
 }
 

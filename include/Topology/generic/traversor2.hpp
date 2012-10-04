@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -53,7 +53,8 @@ Dart Traversor2VE<MAP>::next()
 {
 	if(current != NIL)
 	{
-		current = m.alpha1(current) ;
+//		current = m.alpha1(current) ;
+		current = m.phi2(m.phi_1(current)) ;
 		if(current == start)
 			current = NIL ;
 	}
@@ -66,7 +67,7 @@ template <typename MAP>
 Traversor2VF<MAP>::Traversor2VF(MAP& map, Dart dart) : m(map), start(dart)
 {
 	if(m.isBoundaryMarked(start)) // jump over a boundary face
-		start = m.alpha1(start) ;
+		start = m.phi2(m.phi_1(start)) ;
 }
 
 template <typename MAP>
@@ -87,9 +88,9 @@ Dart Traversor2VF<MAP>::next()
 {
 	if(current != NIL)
 	{
-		current = m.alpha1(current) ;
+		current = m.phi2(m.phi_1(current)) ;
 		if(m.isBoundaryMarked(current)) // jump over a boundary face
-			current = m.alpha1(current) ;
+			current = m.phi2(m.phi_1(current)) ;
 		if(current == start)
 			current = NIL ;
 	}
@@ -135,7 +136,7 @@ template <typename MAP>
 Traversor2VVaF<MAP>::Traversor2VVaF(MAP& map, Dart dart) : m(map)
 {
 	if(m.isBoundaryMarked(dart))
-		dart = m.alpha1(dart) ;
+		dart = m.phi2(m.phi_1(dart)) ;
 	start = m.phi1(m.phi1(dart)) ;
 	if(start == dart)
 		start = m.phi1(dart) ;
@@ -163,10 +164,14 @@ Dart Traversor2VVaF<MAP>::next()
 		current = m.phi1(current) ;
 		if(current == stop)
 		{
-			Dart d = m.alpha1(current) ;
+			Dart d = m.phi2(m.phi_1(current)) ;
 			if(m.isBoundaryMarked(d)) // jump over a boundary face
-				d = m.alpha1(d) ;
-			current = m.phi1(m.phi1(d)) ;
+			{
+				d = m.phi2(m.phi_1(d)) ;
+				current = m.phi1(d);
+			}
+			else
+				current = m.phi1(m.phi1(d)) ;
 			if(current == d)
 				current = m.phi1(d) ;
 			stop = d ;
@@ -251,7 +256,7 @@ Dart Traversor2EF<MAP>::next()
 template <typename MAP>
 Traversor2EEaV<MAP>::Traversor2EEaV(MAP& map, Dart dart) : m(map)
 {
-	start = m.alpha1(dart) ;
+	start = m.phi2(m.phi_1(dart)) ;
 	stop1 = dart ;
 	stop2 = m.phi2(dart) ;
 }
@@ -274,9 +279,9 @@ Dart Traversor2EEaV<MAP>::next()
 {
 	if(current != NIL)
 	{
-		current = m.alpha1(current) ;
+		current = m.phi2(m.phi_1(current)) ;
 		if(current == stop1)
-			current = m.alpha1(stop2) ;
+			current = m.phi2(m.phi_1(stop2)) ;
 		else if(current == stop2)
 			current = NIL ;
 	}
@@ -355,47 +360,16 @@ Dart Traversor2FV<MAP>::next()
 	return current ;
 }
 
-// Traversor2FE
-
-template <typename MAP>
-Traversor2FE<MAP>::Traversor2FE(MAP& map, Dart dart) : m(map), start(dart)
-{}
-
-template <typename MAP>
-Dart Traversor2FE<MAP>::begin()
-{
-	current = start ;
-	return current ;
-}
-
-template <typename MAP>
-Dart Traversor2FE<MAP>::end()
-{
-	return NIL ;
-}
-
-template <typename MAP>
-Dart Traversor2FE<MAP>::next()
-{
-	if(current != NIL)
-	{
-		current = m.phi1(current) ;
-		if(current == start)
-			current = NIL ;
-	}
-	return current ;
-}
-
 // Traversor2FFaV
 
 template <typename MAP>
 Traversor2FFaV<MAP>::Traversor2FFaV(MAP& map, Dart dart) : m(map)
 {
-	start = m.alpha1(m.alpha1(dart)) ;
+	start = m.phi2(m.phi_1(m.phi2(m.phi_1(dart)))) ;
 	current = start ;
 	if(start == dart)
 	{
-		stop = m.alpha1(dart) ;
+		stop = m.phi2(m.phi_1(dart)) ;
 		start = next() ;
 	}
 	stop = dart ;
@@ -421,14 +395,14 @@ Dart Traversor2FFaV<MAP>::next()
 {
 	if(current != NIL)
 	{
-		current = m.alpha1(current) ;
+		current = m.phi2(m.phi_1(current)) ;
 		if(current == stop)
 		{
 			Dart d = m.phi1(current) ;
-			current = m.alpha1(m.alpha1(d)) ;
+			current = m.phi2(m.phi_1(m.phi2(m.phi_1(d)))) ;
 			if(current == d)
 			{
-				stop = m.alpha1(d) ;
+				stop = m.phi2(m.phi_1(d)) ;
 				return next() ;
 			}
 			stop = d ;
@@ -482,5 +456,70 @@ Dart Traversor2FFaE<MAP>::next()
 	}
 	return current ;
 }
+
+
+//
+//template<typename MAP>
+//Traversor2<MAP>* Traversor2<MAP>::createIncident(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//{
+//	int code = 0x100*(orbX-VERTEX) + orbY-VERTEX;
+//
+//	switch(code)
+//	{
+//	case 0x0001:
+//		return new Traversor2VE<MAP>(map,dart);
+//		break;
+//	case 0x0002:
+//		return new Traversor2VF<MAP>(map,dart);
+//		break;
+//	case 0x0100:
+//		return new Traversor2EV<MAP>(map,dart);
+//		break;
+//	case 0x0102:
+//		return new Traversor2EF<MAP>(map,dart);
+//		break;
+//	case 0x0200:
+//		return new Traversor2FV<MAP>(map,dart);
+//		break;
+//	case 0x0201:
+//		return new Traversor2FE<MAP>(map,dart);
+//		break;
+//	default:
+//		return NULL;
+//		break;
+//	}
+//	return NULL;
+//}
+//
+//template<typename MAP>
+//Traversor2<MAP>* Traversor2<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int orbX, unsigned int orbY)
+//{
+//	int code = 0x100*(orbX-VERTEX) + orbY-VERTEX;
+//	switch(code)
+//	{
+//	case 0x0001:
+//		return new Traversor2VVaE<MAP>(map,dart);
+//		break;
+//	case 0x0002:
+//		return new Traversor2VVaF<MAP>(map,dart);
+//		break;
+//	case 0x0100:
+//		return new Traversor2EEaV<MAP>(map,dart);
+//		break;
+//	case 0x0102:
+//		return new Traversor2EEaF<MAP>(map,dart);
+//		break;
+//	case 0x0200:
+//		return new Traversor2FFaV<MAP>(map,dart);
+//		break;
+//	case 0x0201:
+//		return new Traversor2FFaE<MAP>(map,dart);
+//		break;
+//	default:
+//		return NULL;
+//		break;
+//	}
+//	return NULL;
+//}
 
 } // namespace CGoGN

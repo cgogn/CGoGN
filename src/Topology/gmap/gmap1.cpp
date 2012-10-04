@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -50,8 +50,10 @@ void GMap1::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete faces in a 1-G-map
  *************************************************************************/
 
-Dart GMap1::newFace(unsigned int nbEdges)
+Dart GMap1::newCycle(unsigned int nbEdges)
 {
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+
 	Dart d0 =  GMap0::newEdge();	// create the first edge
 	Dart dp = beta0(d0);			// store an extremity
 	for (unsigned int i = 1; i < nbEdges; ++i)
@@ -64,8 +66,10 @@ Dart GMap1::newFace(unsigned int nbEdges)
 	return d0;
 }
 
-Dart GMap1::newBoundaryFace(unsigned int nbEdges)
+Dart GMap1::newBoundaryCycle(unsigned int nbEdges)
 {
+	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
+
 	Dart d0 =  GMap0::newEdge();	// create the first edge
 	boundaryMark(d0);
 	boundaryMark(beta0(d0));
@@ -82,7 +86,7 @@ Dart GMap1::newBoundaryFace(unsigned int nbEdges)
 	return d0;
 }
 
-void GMap1::deleteFace(Dart d)
+void GMap1::deleteCycle(Dart d)
 {
 	Dart e = phi1(d);
 	while (e != d)

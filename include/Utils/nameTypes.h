@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -46,6 +46,10 @@ template <> inline std::string nameOfType(const int& v) { return "int"; }
 
 template <> inline std::string nameOfType(const long int& v) { return "long int"; }
 
+template <> inline std::string nameOfType(const long long& v) { return "long long"; }
+
+template <> inline std::string nameOfType(const unsigned long long& v) { return "long long"; }
+
 template <> inline std::string nameOfType(const unsigned char& v) { return "unsigned char"; }
 
 template <> inline std::string nameOfType(const unsigned short int& v) { return "unsigned short int"; }
@@ -59,6 +63,35 @@ template <> inline std::string nameOfType(const float& v) { return "float"; }
 template <> inline std::string nameOfType(const double& v) { return "double"; }
 
 template <> inline std::string nameOfType(const std::string& v) { return "std::string"; }
+
+// Ply compatibility
+template <typename T>
+std::string nameOfTypePly(const T& v)
+{
+	return v.CGoGNnameOfType();
+}
+
+template <> inline std::string nameOfTypePly(const char& v) { return "int8"; }
+
+template <> inline std::string nameOfTypePly(const short int& v) { return "int16"; }
+
+template <> inline std::string nameOfTypePly(const int& v) { return "int32"; }
+
+template <> inline std::string nameOfTypePly(const long int& v) { return "invalid"; }
+
+template <> inline std::string nameOfTypePly(const unsigned char& v) { return "uint8"; }
+
+template <> inline std::string nameOfTypePly(const unsigned short int& v) { return "uint16"; }
+
+template <> inline std::string nameOfTypePly(const unsigned int& v) { return "uint32"; }
+
+template <> inline std::string nameOfTypePly(const unsigned long int& v) { return "invalid"; }
+
+template <> inline std::string nameOfTypePly(const float& v) { return "float32"; }
+
+template <> inline std::string nameOfTypePly(const double& v) { return "float64"; }
+
+template <> inline std::string nameOfTypePly(const std::string& v) { return "invalid"; }
 
 }
 

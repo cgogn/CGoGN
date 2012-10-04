@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,7 +35,7 @@ inline GMap2::GMap2() : GMap1()
 	init() ;
 }
 
-inline std::string GMap2::mapTypeName()
+inline std::string GMap2::mapTypeName() const
 {
 	return "GMap2";
 }
@@ -174,17 +174,17 @@ inline bool GMap2::isBoundaryEdge(Dart d)
 
 inline bool GMap2::sameOrientedFace(Dart d, Dart e)
 {
-	return GMap1::sameOrientedFace(d, e) ;
+	return GMap1::sameOrientedCycle(d, e) ;
 }
 
 inline bool GMap2::sameFace(Dart d, Dart e)
 {
-	return GMap1::sameFace(d, e) ;
+	return GMap1::sameCycle(d, e) ;
 }
 
 inline unsigned int GMap2::faceDegree(Dart d)
 {
-	return GMap1::faceDegree(d) ;
+	return GMap1::cycleDegree(d) ;
 }
 
 inline bool GMap2::sameVolume(Dart d, Dart e)
@@ -198,17 +198,32 @@ inline bool GMap2::sameVolume(Dart d, Dart e)
 
 inline bool GMap2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_oriented_vertex(d, f, thread) || foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
-}
-
-inline bool GMap2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_volume(d, f, thread) || foreach_dart_of_oriented_volume(beta0(d), f, thread) ;
+	return GMap2::foreach_dart_of_oriented_vertex(d, f, thread) || GMap2::foreach_dart_of_oriented_vertex(beta1(d), f, thread) ;
 }
 
 inline bool GMap2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_volume(d, f, thread);
+	return GMap2::foreach_dart_of_oriented_cc(d, f, thread) || GMap2::foreach_dart_of_oriented_cc(beta0(d), f, thread) ;
+}
+
+inline bool GMap2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_cc(d, f, thread);
+}
+
+inline bool GMap2::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_oriented_cc(d, f, thread);
+}
+
+inline bool GMap2::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_vertex(d,f,thread);
+}
+
+inline bool GMap2::foreach_dart_of_edge1(Dart d, FunctorType& f, unsigned int thread)
+{
+	return GMap1::foreach_dart_of_edge(d,f,thread);
 }
 
 } // namespace CGoGN

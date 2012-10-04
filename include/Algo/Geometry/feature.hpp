@@ -36,16 +36,19 @@ namespace Geometry
 {
 
 template <typename PFP>
-void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position, CellMarker& featureEdge)
+void featureEdgeDetection(
+	typename PFP::MAP& map,
+	VertexAttribute<typename PFP::VEC3>& position,
+	CellMarker<EDGE>& featureEdge)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 	featureEdge.unmarkAll() ;
 
-	AttributeHandler<VEC3> fNormal = map.template getAttribute<VEC3>(FACE, "normal") ;
+	FaceAttribute<VEC3> fNormal = map.template getAttribute<VEC3, FACE>("normal") ;
 	if(!fNormal.isValid())
-		fNormal = map.template addAttribute<VEC3>(FACE, "normal") ;
+		fNormal = map.template addAttribute<VEC3, FACE>("normal") ;
 	Algo::Geometry::computeNormalFaces<PFP>(map, position, fNormal) ;
 
 	TraversorE<typename PFP::MAP> t(map) ;
@@ -55,11 +58,378 @@ void featureEdgeDetection(typename PFP::MAP& map, typename PFP::TVEC3& position,
 			featureEdge.mark(d) ;
 	}
 
-//	map.template removeAttribute<VEC3>(fNormal) ;
+//	map.removeAttribute(fNormal) ;
 }
 
 template <typename PFP>
-std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal)
+void computeFaceGradient(
+	typename PFP::MAP& map,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_normal,
+	const VertexAttribute<typename PFP::REAL>& kmax,
+	const FaceAttribute<typename PFP::REAL>& area,
+	FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FunctorSelect& select,
+	unsigned int thread)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		face_gradient[d] = faceGradient<PFP>(map, d, position, face_normal, kmax, area) ;
+}
+
+template <typename PFP>
+typename PFP::VEC3 faceGradient(
+	typename PFP::MAP& map,
+	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_normal,
+	const VertexAttribute<typename PFP::REAL>& kmax,
+	const FaceAttribute<typename PFP::REAL>& face_area)
+{
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
+	Traversor2FV<typename PFP::MAP> t(map, d) ;
+
+	Dart it = t.begin() ;
+	VEC3 pos1 = position[it] ;
+	REAL k1 = kmax[it] ;
+
+	it = t.next() ;
+	VEC3 pos2 = position[it] ;
+	REAL k2 = kmax[it] ;
+
+	it = t.next() ;
+	VEC3 pos3 = position[it] ;
+	REAL k3 = kmax[it] ;
+
+	VEC3 n = face_normal[d] ;
+	REAL a = face_area[d] ;
+	VEC3 G = k1 * ( ( n ^ ( pos3 - pos2 ) ) / ( 2 * a ) ) +
+			 k2 * ( ( n ^ ( pos1 - pos3 ) ) / ( 2 * a ) ) +
+			 k3 * ( ( n ^ ( pos2 - pos1 ) ) / ( 2 * a ) ) ;
+
+	G.normalize() ;
+	return G ;
+}
+
+template <typename PFP>
+void computeVertexGradient(
+	typename PFP::MAP& map,
+	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FaceAttribute<typename PFP::REAL>& face_area,
+	VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const FunctorSelect& select,
+	unsigned int thread)
+{
+	TraversorV<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		vertex_gradient[d] = vertexGradient<PFP>(map, d, face_gradient, face_area) ;
+}
+
+template <typename PFP>
+typename PFP::VEC3 vertexGradient(
+	typename PFP::MAP& map,
+	Dart d,
+	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FaceAttribute<typename PFP::REAL>& face_area)
+{
+	typename PFP::VEC3 G(0) ;
+	typename PFP::REAL A(0) ;
+	Traversor2VF<typename PFP::MAP> t(map, d) ;
+	for (Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		G += face_area[d] * face_gradient[d] ;
+		A += face_area[d] ;
+	}
+	G /= A ;
+
+	G.normalize() ;
+	return G ;
+}
+
+//template <typename PFP>
+//typename PFP::REAL extremality(
+//	typename PFP::MAP& map,
+//	Dart d,
+//	const typename PFP::VEC3& K,
+//	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+//	const FaceAttribute<typename PFP::REAL>& face_area)
+//{
+//	typedef typename PFP::REAL REAL ;
+//
+//	REAL a = 0 ;
+//	REAL e = 0 ;
+//
+//	Traversor2VF<typename PFP::MAP> trav(map, d) ;
+//	for (Dart d2 = trav.begin(); d2 != trav.end(); d2 = trav.next())
+//	{
+//		a += face_area[d2] ;
+//		e += face_area[d2] * ( face_gradient[d2] * K ) ;
+//	}
+//
+//	return (e / a) ;
+//}
+
+template <typename PFP>
+void computeTriangleType(
+	typename PFP::MAP& map,
+	const VertexAttribute<typename PFP::VEC3>& Kmax,
+	CellMarker<FACE>& regularMarker,
+	const FunctorSelect& select,
+	unsigned int thread)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		if(isTriangleRegular<PFP>(map, d, Kmax))
+			regularMarker.mark(d) ;
+}
+
+template <typename PFP>
+bool mutuallyPositive(typename PFP::VEC3& v1, typename PFP::VEC3& v2, typename PFP::VEC3& v3)
+{
+	typename PFP::REAL v1v2 = v1 * v2 ;
+	typename PFP::REAL v1v3 = v1 * v3 ;
+	typename PFP::REAL v2v3 = v2 * v3 ;
+	if(v1v2 > 0 && v1v3 > 0 && v2v3 > 0)
+		return true ;
+	return false ;
+}
+
+template <typename PFP>
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& Kmax)
+{
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
+	Dart v1 = d ;
+	Dart v2 = map.phi1(v1) ;
+	Dart v3 = map.phi1(v2) ;
+
+	VEC3 K1 = Kmax[v1] ;
+	VEC3 K2 = Kmax[v2] ;
+	VEC3 K3 = Kmax[v3] ;
+
+//	VEC3 K1n = typename VEC3::DATA_TYPE(-1) * K1 ;
+	VEC3 K2n = typename VEC3::DATA_TYPE(-1) * K2 ;
+	VEC3 K3n = typename VEC3::DATA_TYPE(-1) * K3 ;
+
+	if(mutuallyPositive<PFP>(K1, K2, K3))
+		return true ;
+	if(mutuallyPositive<PFP>(K1, K2, K3n))
+		return true ;
+	if(mutuallyPositive<PFP>(K1, K2n, K3))
+		return true ;
+	if(mutuallyPositive<PFP>(K1, K2n, K3n))
+		return true ;
+
+//	if(mutuallyPositive<PFP>(K1n, K2, K3))
+//		return true ;
+//	if(mutuallyPositive<PFP>(K1n, K2, K3n))
+//		return true ;
+//	if(mutuallyPositive<PFP>(K1n, K2n, K3))
+//		return true ;
+//	if(mutuallyPositive<PFP>(K1n, K2n, K3n))
+//		return true ;
+
+	return false ;
+}
+
+template <typename PFP>
+void initRidgeSegments(
+	typename PFP::MAP& map,
+	FaceAttribute<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select,
+	unsigned int thread)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		ridge_segments[d].type = EMPTY ;
+}
+
+template <typename PFP>
+void computeRidgeLines(
+	typename PFP::MAP& map,
+	CellMarker<FACE>& regularMarker,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& K,
+	FaceAttribute<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select,
+	unsigned int thread)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		if (regularMarker.isMarked(d))
+			ridgeLines<PFP>(map, d, K, vertex_gradient, ridge_segments) ;
+	}
+}
+
+template <typename PFP>
+void ridgeLines(
+	typename PFP::MAP& map,
+	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	FaceAttribute<ridgeSegment>& ridge_segments)
+{
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+
+	Dart v1 = d ;
+	Dart v2 = map.phi1(v1) ;
+	Dart v3 = map.phi1(v2) ;
+
+	typename PFP::VEC3 Kv1 = K[v1] ;
+	typename PFP::VEC3 Kv2 = K[v2] ;
+	typename PFP::VEC3 Kv3 = K[v3] ;
+
+	if((Kv1 * Kv2) < 0)
+		Kv2 *= -1 ;
+	if((Kv1 * Kv3) < 0)
+		Kv3 *= -1 ;
+
+	assert(mutuallyPositive<PFP>(Kv1, Kv2, Kv3)) ;
+
+	/* Calcul coefficient extremalite */
+
+//	REAL e1 = extremality<PFP>(map, v1, Kv1, face_gradient, face_area) ;
+//	REAL e2 = extremality<PFP>(map, v2, Kv2, face_gradient, face_area) ;
+//	REAL e3 = extremality<PFP>(map, v3, Kv3, face_gradient, face_area) ;
+
+	REAL e1 = vertex_gradient[v1] * Kv1 ;
+	REAL e2 = vertex_gradient[v2] * Kv2 ;
+	REAL e3 = vertex_gradient[v3] * Kv3 ;
+
+	/* Extraction des zeros */
+
+	bool p1set = false ;
+	bool p2set = false ;
+
+	assert(ridge_segments[d].type == EMPTY) ;
+
+	if( (e1 < 0 && e2 > 0) || (e1 > 0 && e2 < 0) )
+	{
+		REAL alpha = abs(e1) / ( abs(e1) + abs(e2) ) ;
+		ridge_segments[d].p1.d = v1 ;
+		ridge_segments[d].p1.w = alpha ;
+		p1set = true ;
+	}
+	if( (e2 < 0 && e3 > 0) || (e2 > 0 && e3 < 0) )
+	{
+		REAL alpha = abs(e2) / ( abs(e2) + abs(e3) ) ;
+		if(!p1set)
+		{
+			ridge_segments[d].p1.d = v2 ;
+			ridge_segments[d].p1.w = alpha ;
+			p1set = true ;
+		}
+		else
+		{
+			ridge_segments[d].p2.d = v2 ;
+			ridge_segments[d].p2.w = alpha ;
+			p2set = true ;
+			ridge_segments[d].type = SEGMENT ;
+		}
+	}
+	if( (e3 < 0 && e1 > 0) || (e3 > 0 && e1 < 0) )
+	{
+		REAL alpha = abs(e3) / ( abs(e1) + abs(e3) ) ;
+		if(p1set && !p2set)
+		{
+			ridge_segments[d].p2.d = v3 ;
+			ridge_segments[d].p2.w = alpha ;
+			p2set = true ;
+			ridge_segments[d].type = SEGMENT ;
+		}
+	}
+}
+
+template <typename PFP>
+void computeSingularTriangle(
+	typename PFP::MAP& map,
+	CellMarker<FACE>& regularMarker,
+	FaceAttribute<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select,
+	unsigned int thread)
+{
+	TraversorF<typename PFP::MAP> trav(map, select, thread);
+	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+	{
+		if (! regularMarker.isMarked(d))
+			singularTriangle<PFP>(map, d, regularMarker, ridge_segments) ;
+	}
+}
+
+template <typename PFP>
+void singularTriangle(
+	typename PFP::MAP& map,
+	Dart d,
+	CellMarker<FACE>& regularMarker,
+	FaceAttribute<ridgeSegment>& ridge_segments)
+{
+	int nbPoint = 0 ;
+
+	Traversor2FFaE<typename PFP::MAP> f(map, d) ;
+	for (Dart d2 = f.begin(); d2 != f.end(); d2 = f.next())
+	{
+		if(regularMarker.isMarked(d2) and ridge_segments[d2].type == SEGMENT)
+		{
+			if(isEdgeInTriangle<PFP>(map, ridge_segments[d2].p1.d, d))
+			{
+				if(nbPoint == 0)
+				{
+					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p1.d) ;
+					ridge_segments[d].p1.w = 1.0 - ridge_segments[d2].p1.w ;
+				}
+				else
+				{
+					ridge_segments[d].type ++ ;
+					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p1.d) ;
+					ridge_segments[d].p2.w = 1.0 - ridge_segments[d2].p1.w ;
+				}
+				nbPoint ++ ;
+			}
+			else if(isEdgeInTriangle<PFP>(map, ridge_segments[d2].p1.d, d))
+			{
+				if(nbPoint == 0)
+				{
+					ridge_segments[d].p1.d = map.phi2(ridge_segments[d2].p2.d) ;
+					ridge_segments[d].p1.w = 1.0 - ridge_segments[d2].p2.w ;
+				}
+				else
+				{
+					ridge_segments[d].type ++ ;
+					ridge_segments[d].p2.d = map.phi2(ridge_segments[d2].p2.d) ;
+					ridge_segments[d].p2.w = 1.0 - ridge_segments[d2].p2.w ;
+				}
+				nbPoint ++ ;
+			}
+		}
+	}
+}
+
+template <typename PFP>
+bool isEdgeInTriangle(typename PFP::MAP& map, Dart edge, Dart triangle)
+{
+	bool inTriangle = false ;
+
+	Traversor2FE<typename PFP::MAP> t(map, triangle) ;
+	for (Dart e = t.begin(); e != t.end(); e = t.next())
+	{
+		if(map.phi2(e) == edge)
+			inTriangle = true ;
+	}
+
+	return inTriangle ;
+}
+
+template <typename PFP>
+std::vector<typename PFP::VEC3> occludingContoursDetection(
+	typename PFP::MAP& map,
+	const typename PFP::VEC3& cameraPosition,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
@@ -110,91 +480,6 @@ std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& ma
 	}
 
 	return occludingContours ;
-}
-
-template <typename PFP>
-std::vector<typename PFP::VEC3> featureLinesDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal)
-{
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-	std::vector<VEC3> featureLines ;
-
-	Geom::BoundingBox<VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(map, position) ;
-
-	AttributeHandler<REAL> edgeangle = map.template getAttribute<REAL>(EDGE, "edgeangle") ;
-	if(!edgeangle.isValid())
-	{
-		edgeangle = map.template addAttribute<REAL>(EDGE, "edgeangle") ;
-		Algo::Geometry::computeAnglesBetweenNormalsOnEdges<PFP>(map, position, edgeangle) ;
-	}
-
-	AttributeHandler<REAL> kmax = map.template getAttribute<REAL>(VERTEX, "kmax") ;
-	AttributeHandler<REAL> kmin = map.template getAttribute<REAL>(VERTEX, "kmin") ;
-	AttributeHandler<VEC3> Kmax = map.template getAttribute<VEC3>(VERTEX, "Kmax") ;
-	AttributeHandler<VEC3> Kmin = map.template getAttribute<VEC3>(VERTEX, "Kmin") ;
-	AttributeHandler<VEC3> Knormal = map.template getAttribute<VEC3>(VERTEX, "Knormal") ;
-	// as all these attributes are computed simultaneously by computeCurvatureVertices
-	// one can assume that if one of them is not valid, the others must be created too
-	if(!kmax.isValid())
-	{
-		kmax = map.template addAttribute<REAL>(VERTEX, "kmax") ;
-		kmin = map.template addAttribute<REAL>(VERTEX, "kmin") ;
-		Kmax = map.template addAttribute<VEC3>(VERTEX, "Kmax") ;
-		Kmin = map.template addAttribute<VEC3>(VERTEX, "Kmin") ;
-		Knormal = map.template addAttribute<VEC3>(VERTEX, "Knormal") ;
-		Algo::Geometry::computeCurvatureVertices_NormalCycles<PFP>(map, 0.01f * bb.diagSize(), position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal) ;
-	}
-
-	AttributeHandler<VEC3> kmaxGrad = map.template addAttribute<VEC3>(FACE, "kmaxGrad") ;
-	AttributeHandler<VEC3> kminGrad = map.template addAttribute<VEC3>(FACE, "kminGrad") ;
-
-	CellMarker mf(map, FACE) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(!mf.isMarked(d))
-		{
-			mf.mark(d) ;
-			Dart v1 = d ;
-			Dart v2 = map.phi1(d) ;
-			Dart v3 = map.phi_1(d) ;
-			VEC3 v3v2 = position[v3] - position[v2] ;
-			VEC3 v1v3 = position[v1] - position[v3] ;
-			VEC3 v2v1 = position[v2] - position[v1] ;
-			VEC3 n = Geom::triangleNormal(position[v1], position[v2], position[v3]) ;
-			n.normalize() ;
-			VEC3 g1 = (n^v3v2 * kmax[v1]) + (n^v1v3 * kmax[v2]) + (n^v2v1 * kmax[v3]) ;
-			VEC3 g2 = (n^v3v2 * kmin[v1]) + (n^v1v3 * kmin[v2]) + (n^v2v1 * kmin[v3]) ;
-			g1.normalize() ;
-			kmaxGrad[d] = g1 ;
-			kminGrad[d] = g2 ;
-		}
-	}
-
-	AttributeHandler<VEC3> Ekmax = map.template addAttribute<VEC3>(VERTEX, "kmaxGradV") ;
-	AttributeHandler<VEC3> Ekmin = map.template addAttribute<VEC3>(VERTEX, "kminGradV") ;
-
-	CellMarker mv(map, VERTEX) ;
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if(!mv.isMarked(d))
-		{
-			mv.mark(d) ;
-			REAL res = 0 ;
-			REAL sumArea = 0 ;
-			Dart it = d ;
-			do
-			{
-				REAL area = Algo::Geometry::triangleArea<PFP>(map, it, position) ;
-				res += area * (kmaxGrad[it] * Kmax[d]) ;
-				sumArea += area ;
-				it = map.alpha1(it) ;
-			} while(it != d) ;
-			res /= sumArea ;
-		}
-	}
-
-	return featureLines ;
 }
 
 } // namespace Geometry

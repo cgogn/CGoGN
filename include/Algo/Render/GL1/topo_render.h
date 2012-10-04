@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -61,9 +61,8 @@ namespace GL1
 * @param ke exploding coefficient for edge (1.0 normal draw)
 * @param kf exploding coefficient for face (1.0 normal draw)
 */
-
 template <typename PFP>
-void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, float ke, float kf);
+void renderTopoMD2(typename PFP::MAP& the_map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, float ke, float kf);
 
 
 /**
@@ -78,10 +77,10 @@ void renderTopoMD2(typename PFP::MAP& the_map, const typename PFP::TVEC3& positi
  * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
+void renderTopoMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv, FunctorType& good);
 
 template <typename PFP>
-void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
+void renderTopoMD3(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, bool drawPhi1, bool drawPhi2, bool drawPhi3, float ke, float kf, float kv);
 
 
 /**
@@ -94,7 +93,7 @@ void renderTopoMD3(typename PFP::MAP& map, typename PFP::TVEC3& positions, bool 
  * @param kf exploding coefficient for face (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float ke, float kf);
+void renderTopoGMD2(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, float ke, float kf);
 
 /**
  * Render darts of g-map
@@ -108,7 +107,7 @@ void renderTopoGMD2(typename PFP::MAP& map, const typename PFP::TVEC3& positions
  * @param kv exploding coefficient for volumes (1.0 normal draw)
  */
 template <typename PFP>
-void renderTopoGMD3(typename PFP::MAP& map, const typename PFP::TVEC3& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv);
+void renderTopoGMD3(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, bool drawBeta0, bool drawBeta1, bool drawBeta2, bool drawBeta3, float kd, float ke, float kf, float kv);
 
 
 } // namespace GL1

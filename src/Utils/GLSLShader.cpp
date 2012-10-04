@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -84,7 +84,7 @@ GLSLShader::GLSLShader() :
 	m_geom_shader_source(NULL)
 {
 	if (DEFINES_GL == NULL)
-		DEFINES_GL = &DEFINES_GL3;
+		DEFINES_GL = &DEFINES_GL2;
 }
 
 void GLSLShader::registerShader(void* ptr, GLSLShader* shader)
@@ -122,8 +122,9 @@ std::string GLSLShader::defines_Geom(const std::string& primitivesIn, const std:
 	}
 	else
 	{
-		std::string str("#extension GL_EXT_geometry_shader4 : enable\n");
-		str.append("#define PRECISION\n");
+		std::string str("#version 110\n");
+		str.append("#extension GL_EXT_geometry_shader4 : enable\n");
+		str.append("#define PRECISON float pipo_PRECISION\n");
 		str.append("#define ATTRIBUTE attribute\n");
 		str.append("#define VARYING_IN varying in\n");
 		str.append("#define VARYING_OUT varying out\n");
@@ -206,6 +207,7 @@ bool GLSLShader::loadVertexShader(  const std::string& filename )
 
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	m_vertex_shader_source = loadSourceFile( filename );
 
@@ -229,6 +231,7 @@ bool GLSLShader::loadFragmentShader(const std::string& filename )
 
 	if (m_fragment_shader_source)
 		delete [] m_fragment_shader_source;
+	m_fragment_shader_source = NULL;
 
 	m_fragment_shader_source = loadSourceFile( filename );
 
@@ -585,6 +588,13 @@ GLSLShader::~GLSLShader()
 		glDeleteObjectARB( m_program_object );
 	}
 
+	if (m_vertex_shader_source != NULL)
+		delete[] m_vertex_shader_source;
+	if (m_fragment_shader_source != NULL)
+		delete[] m_fragment_shader_source;
+	if (m_geom_shader_source != NULL)
+		delete[] m_geom_shader_source;
+
 //	m_registeredShaders.erase(this);
 }
 
@@ -701,6 +711,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
@@ -729,9 +740,11 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
+
 	strcpy(m_vertex_shader_source,vs);
 
 	if (m_fragment_shader_source)
@@ -770,9 +783,11 @@ bool GLSLShader::reloadVertexShaderFromMemory(const char* vs)
 {
 	if (m_vertex_shader_source)
 		delete [] m_vertex_shader_source;
+	m_vertex_shader_source = NULL;
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
+
 	strcpy(m_vertex_shader_source,vs);
 
 	return true;
@@ -884,7 +899,7 @@ bool GLSLShader::checkShader(int shaderType)
 		id = m_geom_shader_object;
 		break;
 	default:
-		CGoGNerr << "Error unkown shader type"<< CGoGNendl;
+		CGoGNerr << "Error unkown shader type" << CGoGNendl;
 		return false;
 		break;
 	}
@@ -945,12 +960,12 @@ void GLSLShader::unbindVA(const std::string& name)
 	//valid ?
 	if (idVA < 0)
 	{
-		CGoGNerr << "GLSLShader: Attribute "<<name<< " does not exist in shader, not unbinded"<< CGoGNendl;
+		CGoGNerr << "GLSLShader: Attribute " << name << " does not exist in shader, not unbinded" << CGoGNendl;
 		return;
 	}
 	// search if name already exist
 	unsigned int nb = m_va_vbo_binding.size();
-	for (unsigned int i =0; i<nb; ++i)
+	for (unsigned int i = 0; i < nb; ++i)
 	{
 		if (m_va_vbo_binding[i].va_id == idVA)
 		{
@@ -999,7 +1014,7 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) const
 {
 	this->bind();
-	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
+	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, it->vbo_ptr->id());
 		glEnableVertexAttribArray(it->va_id);
@@ -1010,7 +1025,7 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 void GLSLShader::disableVertexAttribs() const
 {
 	this->bind();
-	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it= m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
+	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 		glDisableVertexAttribArray(it->va_id);
 	this->unbind();
 }
@@ -1020,8 +1035,8 @@ void GLSLShader::updateCurrentMatrices()
 	glm::mat4 model(currentModelView());
 	model *= currentTransfo();
 
-	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin();it != m_registeredShaders.end();++it)
-			it->second->updateMatrices(currentProjection(), model);
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+		it->second->updateMatrices(currentProjection(), model);
 }
 
 } // namespace Utils

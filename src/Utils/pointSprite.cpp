@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -40,85 +40,30 @@ GLuint PointSprite::m_uniform_texture = 0;
 unsigned char* PointSprite::m_ptrSphere = NULL;
 
 
-//std::string PointSprite::vertexShaderText =
-//"ATTRIBUTE vec3 VertexPosition;\n"
-//"void main ()\n"
-//"{\n"
-//"	gl_Position = vec4(VertexPosition,1.0);\n"
-//"}";
-
-
-//std::string PointSprite::geometryShaderText =
-//"uniform float size;\n"
-//"uniform mat4 ModelViewMatrix;\n"
-//"uniform mat4 ProjectionMatrix;\n"
-//"VARYING_OUT vec2 texCoord;\n"
-//"VARYING_OUT vec2 positionFragIn;\n"
-//"VARYING_OUT vec4 mvpFragIn;\n"
-//"void main()\n"
-//"{\n"
-//"	vec4 posCenter = ModelViewMatrix * POSITION_IN(0);\n"
-//"	vec4 pos = posCenter + vec4(-size, size, 0.0, 0.0);\n"
-//"	positionFragIn = posCenter.zw;\n"
-//"	mvpFragIn.x = ProjectionMatrix[2][2];\n"
-//"	mvpFragIn.y = ProjectionMatrix[3][2];\n"
-//"	mvpFragIn.z = ProjectionMatrix[2][3];\n"
-//"	mvpFragIn.w = ProjectionMatrix[3][3];\n"
-//"	texCoord = vec2(0.0,1.0);\n"
-//"	gl_Position = ProjectionMatrix *  pos;\n"
-//"	EmitVertex();\n"
-//"	pos = posCenter + vec4(-size, -size, 0.0, 0.0);\n"
-//"	texCoord = vec2(0.0,0.0);\n"
-//"	gl_Position = ProjectionMatrix *  pos;\n"
-//"	EmitVertex();\n"
-//"	pos = posCenter + vec4( size, size, 0.0, 0.0);\n"
-//"	texCoord = vec2(1.0,1.0);\n"
-//"	gl_Position = ProjectionMatrix *  pos;\n"
-//"	EmitVertex();\n"
-//"	pos = posCenter + vec4( size,-size, 0.0, 0.0);\n"
-//"	texCoord = vec2(1.0,0.0);\n"
-//"	gl_Position = ProjectionMatrix *  pos;\n"
-//"	EmitVertex();\n"
-//"	EndPrimitive();\n"
-//"}";
-
-
-//std::string PointSprite::fragmentShaderText =
-//"uniform sampler2D SpriteTexture;\n"
-//"uniform float size;\n"
-//"uniform vec3 color;\n"
-//"VARYING_FRAG vec2 texCoord;\n"
-//"VARYING_FRAG vec2 positionFragIn;\n"
-//"VARYING_FRAG vec4 mvpFragIn;\n"
-//"void main(void)\n"
-//"{\n"
-//"	float lum = texture2D(SpriteTexture, texCoord).s;\n"
-//"	if (lum==0.0)\n"
-//"		discard;\n"
-//"	vec2 v = texCoord-vec2(0.5,0.5);\n"
-//"	float z = size * sqrt(1.0-dot(v,v));\n"
-//"	vec2 zfrag = positionFragIn + vec2(z,0.0);\n"
-//"	gl_FragDepth = 0.5 + 0.5 * dot(zfrag, mvpFragIn.xy) / dot(zfrag, mvpFragIn.zw);\n"
-//"	gl_FragColor = vec4(color,0.0)*lum;\n"
-//"}";
-
-
-PointSprite::PointSprite(float radius)
+PointSprite::PointSprite(bool withColorPervertex, float radius)
 {
+	std::string defineColor("#define WITH_COLOR_PER_VERTEX 1\n");
+
 	std::string glxvert(*GLSLShader::DEFINES_GL);
+	if (withColorPervertex)
+		glxvert.append(defineColor);
 	glxvert.append(vertexShaderText);
 
 	std::string glxgeom = GLSLShader::defines_Geom("points","triangle_strip",4);
+	if (withColorPervertex)
+		glxgeom.append(defineColor);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
+	if (withColorPervertex)
+		glxfrag.append(defineColor);
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP,4);
 
 	bind();
 	m_uniform_size = glGetUniformLocation(program_handler(),"size");
-	m_uniform_color = glGetUniformLocation(program_handler(),"color");
+	m_uniform_color = glGetUniformLocation(program_handler(),"colorsprite");
 	glUniform1f(m_uniform_size, radius);
 	unbind();
 
@@ -149,11 +94,25 @@ unsigned int PointSprite::setAttributePosition(VBO* vbo)
 	return bindVA_VBO("VertexPosition", vbo);
 }
 
+unsigned int PointSprite::setAttributeColor(VBO* vbo)
+{
+	return bindVA_VBO("VertexColor", vbo);
+}
+
 void PointSprite::predraw(const Geom::Vec3f& color)
 {
 	bind();
 	glUniform1i(m_uniform_texture, 0);
 	glUniform3fv(m_uniform_color, 1, color.data());
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_idTexture);
+	glEnable(GL_TEXTURE_2D);
+}
+
+void PointSprite::predraw()
+{
+	bind();
+	glUniform1i(m_uniform_texture, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_idTexture);
 	glEnable(GL_TEXTURE_2D);

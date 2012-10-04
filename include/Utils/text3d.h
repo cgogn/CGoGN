@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -28,10 +28,10 @@
 #include "Utils/GLSLShader.h"
 #include "Geometry/vector_gen.h"
 
+namespace CGoGN { namespace Utils { namespace SVG { class SVGOut ; } } }
 
 namespace CGoGN
 {
-
 namespace Utils
 {
 
@@ -67,6 +67,8 @@ protected:
 
     Utils::VBO* m_vbo1;
 
+    float m_scale;
+
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
 
     GLuint m_uniform_texture;
@@ -98,7 +100,12 @@ public:
 	unsigned int addString(const std::string& str, const Geom::Vec3f& pos);
 
 	/**
-	 * once all string are stored, we must send it to the gracphic card
+	 * clear the string and position database
+	 */
+	void clear();
+
+	/**
+	 * once all string are stored, we must send it to the graphic card
 	 */
 	void sendToVBO();
 
@@ -132,6 +139,8 @@ public:
 	 */
 	void setScale(float scale);
 
+
+	void toSVG(Utils::SVG::SVGOut& svg);
 };
 
 } // namespace Utils

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -33,6 +33,9 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
+#include "Utils/vbo.h"
+#include "Utils/Shaders/shaderExplodeVolumes.h"
+#include "Utils/Shaders/shaderExplodeVolumesLines.h"
 
 namespace CGoGN
 {
@@ -47,52 +50,124 @@ namespace GL2
 {
 
 
-class explodeVolume_VBORender
+class ExplodeVolumeRender
 {
 protected:
 
+	Utils::ShaderExplodeVolumes* m_shader;
 
-	/**
-	* vbo buffers
-	* 0: vertices
-	* 1: normals
-	*/
-	GLuint m_VBOBuffers[2];
+	bool m_cpf;
+
+	bool m_ef;
+
+	Utils::ShaderExplodeVolumesLines* m_shaderL;
+
+	Utils::VBO* m_vboPos;
+
+	Utils::VBO* m_vboColors;
+
+	Utils::VBO* m_vboPosLine;
 
 	/**
 	*number of triangles to draw
 	*/
 	GLuint m_nbTris;
 
+	GLuint m_nbLines;
+
+	Geom::Vec3f m_globalColor;
+
 public:
 	/**
 	* Constructor
-	* @param map the map to draw
-	* @param good functor that return true for darts of part to draw
-	* @param type_vbo vbo to alloc ( VBO_P, VBO_PN, VBO_PNC, VBO_PC ..)
+	* @param withColorPerFace affect a color per face
+	* @param withExplodeFace shrinj each face
 	*/
-	explodeVolume_VBORender();
+	ExplodeVolumeRender(bool withColorPerFace = false, bool withExplodeFace = false) ;
 
 	/**
 	* Destructor
 	*/
-	~explodeVolume_VBORender();
+	~ExplodeVolumeRender() ;
+
+	/**
+	 * return a ptr on used shader do not forgot to register
+	 */
+	Utils::GLSLShader* shaderFaces() ;
+
+	/**
+	 * return a ptr on used shader do not forgot to register
+	 */
+	Utils::GLSLShader* shaderLines() ;
 
 	/**
 	* update all drawing buffers
 	* @param map the map
-	* @param good selector
 	* @param positions  attribute of position vertices
-	* @param kf exploding coef for face
- 	* @param kv exploding coef for face
+	* @param good selector
 	*/
 	template<typename PFP>
-	void updateData(typename PFP::MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& positions, float kf, float kv);
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const FunctorSelect& good = allDarts) ;
 
 	/**
-	 * draw all topo
+	* update all drawing buffers
+	* @param map the map
+	* @param positions attribute of position vertices
+	* @param colorPerFace attribute of color (per face)
+	* @param good selector
+	*/
+	template<typename PFP>
+	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, const VolumeAttribute<typename PFP::VEC3>& colorPerFace, const FunctorSelect& good = allDarts) ;
+
+	/**
+	 * draw edges
 	 */
-	void drawFaces();
+	void drawEdges() ;
+
+	/**
+	 * draw edges
+	 */
+	void drawFaces() ;
+
+	/**
+	 * set exploding volume coefficient parameter
+	 */
+	void setExplodeVolumes(float explode) ;
+
+	/**
+	 * set exploding volume coefficient parameter
+	 */
+	void setExplodeFaces(float explode) ;
+
+	/**
+	 * set clipping plane
+	 */
+	void setClippingPlane(const Geom::Vec4f& p) ;
+
+	/**
+	 * unset clipping plane
+	 */
+	void setNoClippingPlane() ;
+
+	/**
+	 * set ambiant color parameter
+	 */
+	void setAmbiant(const Geom::Vec4f& ambiant) ;
+
+	/**
+	 * set back color parameter
+	 */
+	void setBackColor(const Geom::Vec4f& color) ;
+
+	/**
+	 * set light position parameter
+	 */
+	void setLightPosition(const Geom::Vec3f& lp) ;
+
+	/**
+	 * set color parameter for edge drawing
+	 */
+	void setColorLine(const Geom::Vec4f& col) ;
 };
 
 }//end namespace GL2

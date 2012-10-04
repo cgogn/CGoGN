@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -36,17 +36,17 @@ class FunctorMeshToSolver_Scalar : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	CellMarker& lockingMarker ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int>& indexTable ;
+	CellMarker<VERTEX>& lockingMarker ;
+	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		CellMarker& lm,
-		const AttributeHandler<ATTR_TYPE>& attr
+		const VertexAttribute<unsigned int>& index,
+		CellMarker<VERTEX>& lm,
+		const VertexAttribute<ATTR_TYPE>& attr
 	) :	solver(s), indexTable(index), lockingMarker(lm), attrTable(attr), lockedVertices(false)
 	{}
 
@@ -68,18 +68,18 @@ class FunctorMeshToSolver_Vector : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	CellMarker& lockingMarker ;
-	const AttributeHandler<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int>& indexTable ;
+	CellMarker<VERTEX>& lockingMarker ;
+	const VertexAttribute<ATTR_TYPE>& attrTable ;
 	unsigned int coord ;
 	bool lockedVertices ;
 
 public:
 	FunctorMeshToSolver_Vector(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		CellMarker& lm,
-		const AttributeHandler<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int>& index,
+		CellMarker<VERTEX>& lm,
+		const VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
 	) :	solver(s), indexTable(index), lockingMarker(lm), attrTable(attr), coord(c), lockedVertices(false)
 	{}
@@ -102,14 +102,14 @@ class FunctorSolverToMesh_Scalar : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	AttributeHandler<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int>& indexTable ;
+	VertexAttribute<ATTR_TYPE>& attrTable ;
 
 public:
 	FunctorSolverToMesh_Scalar(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		AttributeHandler<ATTR_TYPE>& attr
+		const VertexAttribute<unsigned int>& index,
+		VertexAttribute<ATTR_TYPE>& attr
 	) :	solver(s), indexTable(index), attrTable(attr)
 	{}
 
@@ -125,15 +125,15 @@ class FunctorSolverToMesh_Vector : public FunctorType
 {
 protected:
 	LinearSolver<SOLVER_TRAITS>* solver ;
-	const AttributeHandler<unsigned int>& indexTable ;
-	AttributeHandler<ATTR_TYPE>& attrTable ;
+	const VertexAttribute<unsigned int>& indexTable ;
+	VertexAttribute<ATTR_TYPE>& attrTable ;
 	unsigned int coord ;
 
 public:
 	FunctorSolverToMesh_Vector(
 		LinearSolver<SOLVER_TRAITS>* s,
-		const AttributeHandler<unsigned int> index,
-		AttributeHandler<ATTR_TYPE>& attr,
+		const VertexAttribute<unsigned int>& index,
+		VertexAttribute<ATTR_TYPE>& attr,
 		unsigned int c
 	) :	solver(s), indexTable(index), attrTable(attr), coord(c)
 	{}

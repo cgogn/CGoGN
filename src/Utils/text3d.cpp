@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,14 +17,14 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 #include "Utils/text3d.h"
-
 #include "Utils/vbo.h"
+#include "Utils/svg.h"
 
 namespace CGoGN
 {
@@ -43,7 +43,7 @@ std::string Strings3D::fragmentShaderText2 =
 GLuint Strings3D::m_idTexture = 0xffffffff;
 
 
-Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
+Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0),m_scale(1.0f)
 {
 	if (m_idTexture == 0xffffffff)
 	{
@@ -101,11 +101,20 @@ void Strings3D::setScale(float scale)
 {
 	bind();
 	glUniform1f(m_uniform_scale, scale);
+	m_scale = scale;
 	unbind();
 }
 
 Strings3D::~Strings3D()
 {
+}
+
+void Strings3D::clear()
+{
+	m_nbChars=0;
+	m_strings.clear();
+	m_strTranslate.clear();
+	m_strpos.clear();
 }
 
 unsigned int Strings3D::addString(const std::string& str)
@@ -236,6 +245,15 @@ void Strings3D::drawAll(const Geom::Vec3f& color)
 		glDrawArrays(GL_QUADS, m_strpos[idSt].first , m_strpos[idSt].second );
 	}
 	postdraw();
+}
+
+void Strings3D::toSVG(Utils::SVG::SVGOut& svg)
+{
+	svg.beginStrings(m_scale);
+	unsigned int nb = m_strings.size();
+	for(unsigned int i=0; i<nb; ++i)
+		svg.addString(m_strTranslate[i],m_strings[i]);
+	svg.endStrings();
 }
 
 } // namespace Utils

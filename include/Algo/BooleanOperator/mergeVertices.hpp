@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -32,34 +32,34 @@ namespace BooleanOperator
 {
 
 template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, const typename PFP::TVEC3& positions, Dart d, Dart e)
+void mergeVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e)
 {
 	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
 	Dart dd;
 	do
 	{
-		dd = map.alpha1(d);
+		dd = map.phi2_1(d);
 		map.removeEdgeFromVertex(dd);
 		Dart ee = e;
 		do
 		{
 			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
-					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.alpha1(ee))])==Geom::RIGHT)
+					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.phi2_1(ee))])==Geom::RIGHT)
 			{
 				break;
 			}
-			ee = map.alpha1(ee);
+			ee = map.phi2_1(ee);
 		} while(ee != e);
 		map.insertEdgeInVertex(ee,dd);
 	} while(dd!=d);
 }
 
 template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, const typename PFP::TVEC3& positions)
+void mergeVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
 	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{
-		CellMarker vM(map,VERTEX);
+		CellMarker<VERTEX> vM(map);
 		vM.mark(d);
 		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
 		{

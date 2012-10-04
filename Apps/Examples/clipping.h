@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -77,11 +77,11 @@ class Clipping: public Utils::QT::SimpleQT
 
 public:
 	typedef PFP::MAP MAP;
-	typedef PFP::TVEC3 TVEC3;
+	typedef PFP::VEC3 VEC3;
 
 	//Manip Carte
 	MAP myMap ;
-	TVEC3 position;
+	VertexAttribute<VEC3> position;
 	Dart dglobal;
 
 	//Render
@@ -91,16 +91,13 @@ public:
 	bool m_drawTopo;
 
 	Algo::Render::GL2::MapRender* m_render;
-	Algo::Render::GL2::Topo3RenderMapD* m_render_topo;
+	Algo::Render::GL2::Topo3Render* m_render_topo;
 
 	Geom::BoundingBox<PFP::VEC3> m_bb;
 
 	Utils::VBO* m_positionVBO;
 
 	Utils::ShaderSimpleColor* m_shader;
-
-	Utils::Drawer* influence_area;
-	Utils::Drawer* chips_area;
 
 	Geom::Vec3f m_coeffTopoExplod;
 	Geom::Vec3f gPosObj ;

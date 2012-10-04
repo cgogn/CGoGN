@@ -14,6 +14,20 @@ echo "Warning do not forget to check the CGoGN_ROOT_DIR variable (ccmake)"
 
 apps=$1
 
+#create a string with first letter capitalize (${apps^} does not work on osX !
+apps_maj=`echo $1 | awk '
+BEGIN { upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        lower = "abcdefghijklmnopqrstuvwxyz"
+}
+{
+	FIRSTCHAR = substr($1, 1, 1)
+	if (CHAR = index(lower, FIRSTCHAR))
+		$1 = substr(upper, CHAR, 1) substr($1, 2)
+	print $0
+}' `
+
+
+
 mkdir $apps
 cd $apps
 
@@ -116,7 +130,7 @@ echo "* You should have received a copy of the GNU Lesser General Public License
 echo "* along with this library; if not, write to the Free Software Foundation,      *" >> ${apps}.h
 echo "* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *" >> ${apps}.h
 echo "*                                                                              *" >> ${apps}.h
-echo "* Web site: http://cgogn.u-strasbg.fr/                                         *" >> ${apps}.h
+echo "* Web site: http://cgogn.unistra.fr/                                           *" >> ${apps}.h
 echo "* Contact information: cgogn@unistra.fr                                        *" >> ${apps}.h
 echo "*                                                                              *" >> ${apps}.h
 echo "*******************************************************************************/" >> ${apps}.h
@@ -128,14 +142,14 @@ echo \#include \"Utils/Qt/qtui.h\" >> ${apps}.h
 echo "" >> ${apps}.h
 echo "using namespace CGoGN;" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "class ${apps^}: public Utils::QT::SimpleQT" >> ${apps}.h
+echo "class $apps_maj: public Utils::QT::SimpleQT" >> ${apps}.h
 echo "{" >> ${apps}.h
 echo "	Q_OBJECT" >> ${apps}.h
 echo "public:" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "	${apps^}() {}" >> ${apps}.h
+echo "	$apps_maj() {}" >> ${apps}.h
 echo "" >> ${apps}.h
-echo "	~${apps^}() {}" >> ${apps}.h
+echo "	~$apps_maj() {}" >> ${apps}.h
 echo "" >> ${apps}.h
 echo "	void cb_redraw();" >> ${apps}.h
 echo "" >> ${apps}.h
@@ -188,10 +202,10 @@ echo "**************************************************************************
 echo "" >> ${apps}.cpp
 echo \#include \"${apps}.h\" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
-echo "void ${apps^}::cb_initGL()" >> ${apps}.cpp
+echo "void $apps_maj::cb_initGL()" >> ${apps}.cpp
 echo "{}" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
-echo "void ${apps^}::cb_redraw()" >> ${apps}.cpp
+echo "void $apps_maj::cb_redraw()" >> ${apps}.cpp
 echo "{}" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 
@@ -199,8 +213,8 @@ echo "int main(int argc, char **argv)" >> ${apps}.cpp
 echo "{" >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 echo "	QApplication app(argc, argv);" >> ${apps}.cpp
-echo "	${apps^} sqt;" >> ${apps}.cpp
-echo "	"sqt.setWindowTitle\(\"${apps^}\"\)\; >> ${apps}.cpp
+echo "	$apps_maj sqt;" >> ${apps}.cpp
+echo "	"sqt.setWindowTitle\(\"$apps_maj\"\)\; >> ${apps}.cpp
 echo "" >> ${apps}.cpp
 echo "	Utils::QT::uiDockInterface dock;" >> ${apps}.cpp
 echo "	sqt.setDock(&dock);" >> ${apps}.cpp

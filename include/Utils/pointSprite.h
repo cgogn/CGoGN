@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: http://cgogn.u-strasbg.fr/                                         *
+ * Web site: http://cgogn.unistra.fr/                                           *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -32,6 +32,7 @@ namespace CGoGN { namespace Utils { class VBO; } }
 
 namespace CGoGN
 {
+
 namespace Utils
 {
 
@@ -62,8 +63,11 @@ protected:
 public:
 	/**
 	 * init shaders, texture and variables
+	 * @param withColorPerVertex if true use setAttributeColor for per vertex color, else use predraw(color) for global color
+	 * @param radius of sphere
 	 */
-	PointSprite(float radius=1.0f);
+
+	PointSprite(bool withColorPerVertex=false, float radius=1.0f);
 
 	/**
 	 * clean shaders, texture and variables
@@ -72,8 +76,14 @@ public:
 
 	/**
 	 * call once before sending points to gpu
+	 * @param color set global color of sprites
 	 */
 	void predraw(const Geom::Vec3f& color);
+
+	/**
+	 * call once before sending points to gpu
+	 */
+	void predraw();
 
 	/**
 	 * call once after sending points to gpu
@@ -91,8 +101,13 @@ public:
 	 */
 	unsigned int setAttributePosition(VBO* vbo);
 
-
+	/**
+	 * set color attribute
+	 */
+	unsigned int setAttributeColor(VBO* vbo);
 };
-}
-}
+
+} // namespace Utils
+
+} // namespace CGoGN
 #endif

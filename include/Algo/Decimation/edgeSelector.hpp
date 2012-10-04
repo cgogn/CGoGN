@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -137,7 +137,7 @@ bool EdgeSelector_Length<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -204,19 +204,19 @@ void EdgeSelector_Length<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -300,7 +300,7 @@ bool EdgeSelector_QEM<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -322,11 +322,11 @@ bool EdgeSelector_QEM<PFP>::init()
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -399,19 +399,19 @@ void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -505,7 +505,7 @@ bool EdgeSelector_QEMml<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker vMark(m, VERTEX) ;
+	CellMarker<VERTEX> vMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!vMark.isMarked(d))
@@ -527,11 +527,11 @@ bool EdgeSelector_QEMml<PFP>::init()
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
-			mark.markOrbit(FACE, d) ;
+			mark.markOrbit<FACE>(d) ;
 		}
 	}
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -604,7 +604,7 @@ void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomput
    	do {
    		// Make step
    		dBack = this->m_map.phi2(dFront) ;
-       	dFront = this->m_map.alpha1(dFront) ;
+       	dFront = this->m_map.phi2_1(dFront) ;
 
        	if (dBack != dFront) { // if dFront is no border
            	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
@@ -633,16 +633,16 @@ void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		else										// treating differently :
 			updateEdgeInfo(vit, true) ;
 
-		Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+		Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 		Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 		do											// - edges for which only the collapsibility must be re-tested
 		{
 			updateEdgeInfo(vit2, true) ;
 			updateEdgeInfo(m.phi1(vit2), false) ;
-			vit2 = m.alpha_1(vit2) ;
+			vit2 = m.phi12(vit2) ;
 		} while(vit2 != stop) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -735,7 +735,7 @@ bool EdgeSelector_Curvature<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE) ;
+	CellMarker<EDGE> eMark(m) ;
 	for(Dart d = m.begin(); d != m.end(); m.next(d))
 	{
 		if(!eMark.isMarked(d))
@@ -809,19 +809,19 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
@@ -877,8 +877,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	unsigned int v1 = m.getEmbedding(VERTEX, d) ;
-	unsigned int v2 = m.getEmbedding(VERTEX, dd) ;
+	unsigned int v1 = m.template getEmbedding<VERTEX>(d) ;
+	unsigned int v2 = m.template getEmbedding<VERTEX>(dd) ;
 
 	m_positionApproximator->approximate(d) ;
 
@@ -886,7 +886,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.embedNewCell(VERTEX, d2) ;
+	unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -899,8 +899,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.embedOrbit(VERTEX, d, v1) ;
-	m.embedOrbit(VERTEX, dd, v2) ;
+	m.template embedOrbit<VERTEX>(d, v1) ;
+	m.template embedOrbit<VERTEX>(dd, v2) ;
 
 	REAL err = 0 ;
 
@@ -946,14 +946,10 @@ bool EdgeSelector_MinDetail<PFP>::init()
 
 	edges.clear() ;
 
-	CellMarker eMark(m, EDGE) ;
-	for(Dart d = m.begin(); d != m.end(); m.next(d))
+	TraversorE<MAP> travE(m);
+	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
 	{
-		if(!eMark.isMarked(d))
-		{
-			initEdgeInfo(d) ;	// init the edges with their optimal position
-			eMark.mark(d) ;		// and insert them in the multimap according to their error
-		}
+		initEdgeInfo(dit);
 	}
 
 	cur = edges.begin() ; // init the current edge to the first one
@@ -1013,19 +1009,19 @@ void EdgeSelector_MinDetail<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 		{
 			initEdgeInfo(vit) ;							// various optimizations are applied here by
 														// treating differently :
-			Dart vit2 = m.alpha_1(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
+			Dart vit2 = m.phi12(m.phi1(vit)) ;		// - edges for which the criteria must be recomputed
 			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
 			do											// - edges for which only the collapsibility must be re-tested
 			{
 				updateEdgeInfo(vit2, false) ;
 				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.alpha_1(vit2) ;
+				vit2 = m.phi12(vit2) ;
 			} while(vit2 != stop) ;
 		}
 		else
 			updateEdgeInfo(vit, true) ;
 
-		vit = m.alpha1(vit) ;
+		vit = m.phi2_1(vit) ;
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: http://cgogn.u-strasbg.fr/                                         *
+ * Web site: http://cgogn.unistra.fr/                                           *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -33,21 +33,29 @@ Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& P
 {
 	float b = NormP * Dir ;
 
-#define PRECISION 1e-20
+#define PRECISION 1e-6
 	if (fabs(b) < PRECISION)		//ray parallel to triangle
 	{
-		VEC3 v = PlaneP - P ;
-		float c = NormP * v ;
+		VEC3 v = PlaneP - P;
+		float c = NormP * v;
 		if (fabs(c) < PRECISION )
-		return EDGE_INTERSECTION ;
-		return NO_INTERSECTION ;
+			return EDGE_INTERSECTION;
+
+		return NO_INTERSECTION;
 	}
 #undef PRECISION
 
-	float a = NormP * (PlaneP - P) ;
+	float a = NormP * (PlaneP - P);
 
-	Inter = P + (a / b) * Dir ;
-	return FACE_INTERSECTION ;
+	Inter = P + (a / b) * Dir;
+
+	return FACE_INTERSECTION;
+}
+
+template <typename VEC3, typename PLANE>
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const PLANE& Plane, VEC3& Inter)
+{
+	return intersectionLinePlane(P, Dir, Plane.normal()*Plane.d(), Plane.normal(), Inter);
 }
 
 template <typename VEC3>
@@ -465,6 +473,88 @@ Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const 
 		return VERTEX_INTERSECTION;
 
 	return EDGE_INTERSECTION;
+}
+
+template <typename VEC3>
+Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3& PlaneP, const VEC3& NormP)//, VEC3& Inter)
+{
+	typename VEC3::DATA_TYPE panp = NormP * PA;
+	typename VEC3::DATA_TYPE pbnp = NormP * PB;
+
+	if(panp == 0 || pbnp == 0)
+		return VERTEX_INTERSECTION;
+	else if((panp < 0 && pbnp > 0) || (panp > 0 && pbnp < 0))
+		return EDGE_INTERSECTION;
+	else
+		return NO_INTERSECTION;
+
+}
+
+
+template <typename VEC3>
+Intersection intersectionTrianglePlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& PlaneP, const VEC3& NormP) //, VEC3& Inter) ;
+{
+	if((intersectionSegmentPlan<VEC3>(Ta,Tb,PlaneP, NormP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Ta,Tc,PlaneP, NormP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Tb,Tc,PlaneP, NormP)  == EDGE_INTERSECTION))
+	{
+		return FACE_INTERSECTION;
+	}
+	else if((intersectionSegmentPlan<VEC3>(Ta,Tb,PlaneP, NormP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Ta,Tc,PlaneP, NormP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentPlan<VEC3>(Tb,Tc,PlaneP, NormP)  == VERTEX_INTERSECTION))
+	{
+		return VERTEX_INTERSECTION;
+	}
+	else
+	{
+		return NO_INTERSECTION;
+	}
+}
+
+template <typename VEC3>
+Intersection intersectionSegmentHalfPlan(const VEC3& PA, const VEC3& PB,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP)//, VEC3& Inter)
+{
+	VEC3 NormP = (DirP-P) ^ (OrientP-P) ;
+	NormP.normalize() ;
+
+	//intersection SegmentPlan
+	Intersection inter = intersectionSegmentPlan(PA,PB,P,NormP);
+	if(inter == EDGE_INTERSECTION)
+	{
+		//and one of the two points must be in the right side of the line
+		return intersectionSegmentPlan(PA,PB, P, OrientP);
+	}
+	else
+	{
+		return inter;
+	}
+
+
+
+}
+
+template <typename VEC3>
+Intersection intersectionTriangleHalfPlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP) //, VEC3& Inter)
+{
+	if((intersectionSegmentHalfPlan<VEC3>(Ta,Tb,P, DirP, OrientP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Ta,Tc,P, DirP, OrientP) == EDGE_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Tb,Tc,P, DirP, OrientP)  == EDGE_INTERSECTION))
+	{
+		return FACE_INTERSECTION;
+	}
+	else if((intersectionSegmentHalfPlan<VEC3>(Ta,Tb,P, DirP, OrientP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Ta,Tc,P, DirP, OrientP) == VERTEX_INTERSECTION)
+			|| (intersectionSegmentHalfPlan<VEC3>(Tb,Tb,P, DirP, OrientP)  == VERTEX_INTERSECTION))
+	{
+		return FACE_INTERSECTION;
+	}
+	else
+	{
+		return NO_INTERSECTION;
+	}
 }
 
 }

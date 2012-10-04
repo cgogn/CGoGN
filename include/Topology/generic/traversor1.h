@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,15 +17,19 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
+
+#include "Topology/generic/traversorGen.h"
 
 #ifndef __TRAVERSOR1_H__
 #define __TRAVERSOR1_H__
 
 #include "Topology/generic/dart.h"
+
 
 namespace CGoGN
 {
@@ -36,7 +40,7 @@ namespace CGoGN
 
 // Traverse the edges incident to a given vertex
 template <typename MAP>
-class Traversor1VE
+class Traversor1VE: public Traversor<MAP>
 {
 private:
 	MAP& m ;
@@ -54,7 +58,8 @@ public:
 } ;
 
 // Traverse the vertices adjacent to a given vertex through sharing a common edge
-class Traversor1VVaE
+template <typename MAP>
+class Traversor1VVaE: public Traversor<MAP>
 {
 private:
 	MAP& m ;
@@ -77,7 +82,7 @@ public:
 
 // Traverse the vertices incident to a given edge
 template <typename MAP>
-class Traversor1EV
+class Traversor1EV: public Traversor<MAP>
 {
 private:
 	MAP& m ;
@@ -95,7 +100,8 @@ public:
 } ;
 
 // Traverse the edges adjacent to a given edge through sharing a common vertex
-class Traversor1EEaV
+template <typename MAP>
+class Traversor1EEaV: public Traversor<MAP>
 {
 private:
 	MAP& m ;

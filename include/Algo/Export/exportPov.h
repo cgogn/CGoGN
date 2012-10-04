@@ -15,13 +15,13 @@ namespace ExportPov
 {
 
 template <typename PFP>
-void exportTriangleWire(std::ofstream& out,typename PFP::VEC3& p1,typename PFP::VEC3& p2,typename PFP::VEC3& p3)
+void exportTriangleWire(std::ofstream& out,typename PFP::VEC3& p1,typename PFP::VEC3& p2,typename PFP::VEC3& p3, float width)
 {
-		out << "cylinder { <" << p1[0] << "," << p1[2] << "," << p1[1] << ">, <" << p2[0] << "," << p2[2] << "," << p2[1] << ">, 0.5 }" << std::endl;
+		out << "cylinder { <" << p1[0] << "," << p1[1] << "," << p1[2] << ">, <" << p2[0] << "," << p2[1] << "," << p2[2] << ">, " << width << "}" << std::endl;
 
-		out << "cylinder { <" << p1[0] << "," << p1[2] << "," << p1[1] << ">, <" << p3[0] << "," << p3[2] << "," << p3[1] << ">, 0.5 }" << std::endl;
+		out << "cylinder { <" << p1[0] << "," << p1[1] << "," << p1[2] << ">, <" << p3[0] << "," << p3[1] << "," << p3[2] << ">, " << width << "}" << std::endl;
 
-		out << "cylinder { <" << p3[0] << "," << p3[2] << "," << p3[1] << ">, <" << p2[0] << "," << p2[2] << "," << p2[1] << ">, 0.5 }" << std::endl;
+		out << "cylinder { <" << p3[0] << "," << p3[1] << "," << p3[2] << ">, <" << p2[0] << "," << p2[1] << "," << p2[2] << ">, " << width << "}" << std::endl;
 }
 
 template <typename PFP>
@@ -35,37 +35,30 @@ void exportTrianglePlain(std::ofstream& out,typename PFP::VEC3& p1,typename PFP:
 }
 
 template <typename PFP>
-void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
-	DartMarkerStore traite(map);
+	TraversorF<typename PFP::MAP > travF(map);
 
-	for(Dart d = map.begin() ; d!= map.end() ; map.next(d))
+	for(Dart d = travF.begin() ; d!= travF.end() ; d = travF.next())
 	{
-		if(good(d) && !traite.isMarked(d))
+		if(good(d))
 		{
-			unsigned int nb = 0;
-			Dart dd = d;
-			do
-			{
-				traite.mark(dd);
-				dd = map.phi1(dd);
-				nb++;
-			} while(dd != d);
+			unsigned int nb = map.faceDegree(d);
 
 			if(nb == 3)
-				Algo::ExportPov::exportTrianglePlain<PFP>(out,position[dd],position[map.phi1(dd)],position[map.phi1(map.phi1(dd))]);
+				Algo::ExportPov::exportTrianglePlain<PFP>(out,position[d],position[map.phi1(d)],position[map.phi1(map.phi1(d))]);
 			else
 			{
 					out << "polygon{ " << nb+1 << std::endl;
-					dd = d;
+					Dart dd = d;
 					do
 					{
-						out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
+						out << "<" << position[dd][0] << "," << position[dd][1] << "," << position[dd][2] << ">," << std::endl;
 						dd = map.phi1(dd);
 					} while(dd!=d);
-					out << "<" << position[d][0] << "," << position[d][2] << "," << position[d][1] << ">" << std::endl;
+					out << "<" << position[d][0] << "," << position[d][1] << "," << position[d][2] << ">" << std::endl;
 					out << "}" << std::endl;
 			}
 		}
@@ -75,7 +68,7 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, typename PFP::T
 }
 
 template <typename PFP>
-void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	typedef typename PFP::VEC3 VEC3;
 
@@ -102,20 +95,20 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, typename
 	vertices.reserve(nbDarts/6) ;
 	normals.reserve(nbDarts/6) ;
 
-	CellMarker markV(map, VERTEX) ;
+	CellMarker<VERTEX> markV(map) ;
 	DartMarker markF(map) ;
 	for(Dart d = map.begin(); d != map.end(); map.next(d))
 	{
 
 		if(good(d) && !markF.isMarked(d) && map.phi3(d)==d)
 		{
-			markF.markOrbit(FACE, d) ;
+			markF.markOrbit<FACE>(d) ;
 			std::vector<unsigned int> fidx ;
 			fidx.reserve(4) ;
 			Dart dd = d ;
 			do
 			{
-				unsigned int vNum = map.getEmbedding(VERTEX, dd) ;
+				unsigned int vNum = map.getEmbedding<VERTEX>(dd) ;
 				if(!markV.isMarked(dd))
 				{
 					markV.mark(dd) ;
@@ -173,42 +166,22 @@ void export3MeshPlainSmooth(std::ofstream& out, typename PFP::MAP& map, typename
 }
 
 template <typename PFP>
-void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& meshName, const FunctorSelect& good = allDarts)
+void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& meshName, const FunctorSelect& good = allDarts)
 {
 	out << "#declare " << meshName << "= union {" << std::endl;
 
-	DartMarkerStore traite(map);
+	TraversorE<typename PFP::MAP > travE(map);
 
-	for(Dart d = map.begin() ; d!= map.end() ; map.next(d))
+	for(Dart d = travE.begin() ; d!= travE.end() ; d = travE.next())
 	{
-		if(good(d) && !traite.isMarked(d))
+		if(good(d))
 		{
-			unsigned int nb = 0;
-			Dart dd = d;
-			do
-			{
-				traite.markOrbit(DART, dd);
-				dd = map.phi1(dd);
-				nb++;
-			} while(dd != d);
+			Dart dd = map.phi2(d);
 
-			if(nb == 3)
-				Algo::ExportPov::exportTriangleWire<PFP>(out,position[dd],position[map.phi1(dd)],position[map.phi1(map.phi1(dd))]);
-			else
-			{
-					dd = d;
-					do
-					{
-						if(position[dd][0]!=position[map.phi1(dd)][0] || position[dd][1]!=position[map.phi1(dd)][1] || position[dd][2]!=position[map.phi1(dd)][2])
-						{
-							out << "cylinder{ " << std::endl;
-							out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
-							out << "<" << position[map.phi1(dd)][0] << "," << position[map.phi1(dd)][2] << "," << position[map.phi1(dd)][1] << ">, 0.5" << std::endl;
-							out << "}" << std::endl;
-						}
-						dd = map.phi1(dd);
-					} while(dd != d);
-			}
+			out << "cylinder{ " << std::endl;
+			out << "<" << position[d][0] << "," << position[d][1] << "," << position[d][2] << ">," << std::endl;
+			out << "<" << position[dd][0] << "," << position[dd][1] << "," << position[dd][2] << ">," << 0.5 << std::endl;
+			out << "}" << std::endl;
 		}
 	}
 
@@ -216,7 +189,7 @@ void exportMeshWire(std::ofstream& out, typename PFP::MAP& map, typename PFP::TV
 }
 
 template <typename PFP>
-bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
+bool exportScenePov(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
 {
 	std::ofstream out(filename.c_str(), std::ios::out);
 	if (!out.good())
@@ -258,7 +231,7 @@ bool exportScenePov(typename PFP::MAP& map, typename PFP::TVEC3& position, const
 }
 
 template <typename PFP>
-bool exportScenePovSmooth(typename PFP::MAP& map, typename PFP::TVEC3& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
+bool exportScenePovSmooth(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const std::string& filename, typename PFP::VEC3 cameraPos, typename PFP::VEC3 cameraLook, typename PFP::VEC3 translate, float angle_X, float angle_Y, float angle_Z,const FunctorSelect& good = allDarts)
 {
 	std::ofstream out(filename.c_str(), std::ios::out);
 	if (!out.good()) {

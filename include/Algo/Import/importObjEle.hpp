@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -39,14 +39,14 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 {
 	typedef typename PFP::VEC3 VEC3;
 
-	AttributeHandler<VEC3> position = map.template addAttribute<VEC3>(VERTEX, "position") ;
+	VertexAttribute<VEC3> position = map.template addAttribute<VEC3, VERTEX>("position") ;
 	attrNames.push_back(position.name()) ;
 
-	AttributeContainer& container = map.getAttributeContainer(VERTEX) ;
+	AttributeContainer& container = map.template getAttributeContainer<VERTEX>() ;
 
 	unsigned int m_nbVertices = 0, m_nbFaces = 0, m_nbEdges = 0, m_nbVolumes = 0;
 
-	AutoAttributeHandler<  NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, VERTEX, "incidents");
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 
 	// open files
 	std::ifstream foff(filenameOFF.c_str(), std::ios::in);
@@ -126,13 +126,13 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 
 		unsigned int id = container.insertLine();
 		position[id] = pos;
-
-//		CGoGNout << "emb : " << pos << " / id = " << id << CGoGNendl;
 		verticesID.push_back(id);
 	}
 
 	std::vector<std::vector<Dart> > vecDartPtrEmb;
 	vecDartPtrEmb.reserve(m_nbVertices);
+
+	DartMarkerNoUnmark m(map) ;
 
 	//Read and embed tetrahedra TODO
 	for(unsigned i = 0; i < m_nbVolumes ; ++i)
@@ -144,10 +144,8 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 
 		std::stringstream oss(line);
 		oss >> nbe;
-//		CGoGNout << "tetra number : " << nbe << CGoGNendl;
 
-		//Algo::Modelisation::Polyhedron<PFP>::createTetra(map);
-		Dart d = Algo::Modelisation::Polyhedron<PFP>::createPolyhedron(map, 4);
+		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];
@@ -157,74 +155,83 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		//regions ?
 		oss >> nbe;
 
-//		CGoGNout << "\t embedding number : " << pt[0] << " " << pt[1] << " " << pt[2] << " " << pt[3] << CGoGNendl;
-
 		// Embed three vertices
 		for(unsigned int j = 0 ; j < 3 ; ++j)
 		{
-//			CGoGNout << "\t embedding number : " << pt[j];
+			FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[2-j]]);
+			map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
-			FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX, verticesID[pt[j]]);
-
+			//store darts per vertices to optimize reconstruction
 			Dart dd = d;
-			do {
-				femb(dd);
-				//vecDartPtrEmb[pt[j]].push_back(dd);
-				vecDartsPerVertex[pt[j]].push_back(dd);
+			do
+			{
+				m.mark(dd) ;
+				vecDartsPerVertex[pt[2-j]].push_back(dd);
 				dd = map.phi1(map.phi2(dd));
-			} while(dd!=d);
+			} while(dd != d);
 
 			d = map.phi1(d);
 
-//			CGoGNout << " done" << CGoGNendl;
 		}
 
 		//Embed the last vertex
-//		CGoGNout << "\t embedding number : " << pt[3] << CGoGNendl;
 		d = map.phi_1(map.phi2(d));
 
-		FunctorSetEmb<typename PFP::MAP> femb(map, VERTEX, verticesID[pt[3]]);
+		FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, verticesID[pt[3]]);
+		map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+
+		//store darts per vertices to optimize reconstruction
 		Dart dd = d;
-		do {
-			femb(dd);
-//			CGoGNout << "embed" << CGoGNendl;
-			//vecDartPtrEmb[pt[3]].push_back(dd);
+		do
+		{
+			m.mark(dd) ;
 			vecDartsPerVertex[pt[3]].push_back(dd);
 			dd = map.phi1(map.phi2(dd));
 		} while(dd != d);
 
-//		CGoGNout << "end tetra" << CGoGNendl;
 	}
-
-//	CGoGNout << "end 1/2" << CGoGNendl;
 
 	foff.close();
 	fele.close();
 
 	//Association des phi3
+	unsigned int nbBoundaryFaces = 0 ;
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		std::vector<Dart>& vec = vecDartsPerVertex[d];
-
-		for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end(); ++it)
+		if (m.isMarked(d))
 		{
-			if(map.phi3(*it)==*it)
+			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+
+			Dart good_dart = NIL;
+			for(typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
 			{
-				bool sewn=false;
-				for(typename std::vector<Dart>::iterator itnext = it+1; itnext != vec.end() && !sewn; ++itnext)
+				if(map.template getEmbedding<VERTEX>(map.phi1(*it)) == map.template getEmbedding<VERTEX>(d) &&
+				   map.template getEmbedding<VERTEX>(map.phi_1(*it)) == map.template getEmbedding<VERTEX>(map.phi_1(d)) /*&&
+				   map.template getEmbedding<VERTEX>(*it) == map.template getEmbedding<VERTEX>(map.phi1(d)) */)
 				{
-					if(map.getDartEmbedding(VERTEX,map.phi1(*it))==map.getDartEmbedding(VERTEX,map.phi_1(*itnext))
-					&& map.getDartEmbedding(VERTEX,map.phi_1(*it))==map.getDartEmbedding(VERTEX,map.phi1(*itnext)))
-					{
-						map.sewVolumes(*it,map.phi_1(*itnext));
-						sewn = true;
-					}
+					good_dart = *it ;
 				}
+			}
+
+			if (good_dart != NIL)
+			{
+				map.sewVolumes(d, good_dart, false);
+				m.template unmarkOrbit<FACE>(d);
+			}
+			else
+			{
+				m.template unmarkOrbit<PFP::MAP::FACE_OF_PARENT>(d);
+				++nbBoundaryFaces;
 			}
 		}
 	}
 
-//	CGoGNout << "end 2/2" << CGoGNendl;
+	if (nbBoundaryFaces > 0)
+	{
+		std::cout << "closing" << std::endl ;
+		map.closeMap();
+		CGoGNout << "Map closed (" << nbBoundaryFaces << " boundary faces)" << CGoGNendl;
+	}
 
 	return true;
 }

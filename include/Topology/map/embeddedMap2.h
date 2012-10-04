@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -85,6 +85,10 @@ public:
 	 */
 	virtual bool flipBackEdge(Dart d) ;
 
+	/*
+	 *
+	 */
+	virtual void swapEdges(Dart d, Dart e);
 //	/**
 //	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
 //	 * The attributes attached to the face of dart d are overwritten on the face of dart e
@@ -130,6 +134,11 @@ public:
 	 * The attributes attached to the edges of the face of d are kept on the resulting edges
 	 */
 	virtual bool mergeVolumes(Dart d, Dart e) ;
+
+	/**
+	 *
+	 */
+	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 
 	/**
 	 * No attribute is attached to the new face

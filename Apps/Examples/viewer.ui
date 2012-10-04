@@ -74,6 +74,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="check_drawTopo">
+          <property name="text">
+           <string>draw topo</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QCheckBox" name="check_drawNormals">
           <property name="text">
            <string>draw normals</string>

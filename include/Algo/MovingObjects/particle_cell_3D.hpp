@@ -337,7 +337,7 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 
 	Dart dd=d;
 	Geom::Orientation3D wsof;
-	CellMarkerStore mark(m, FACE);
+	CellMarkerStore<FACE> mark(m);
 
 	do {
 		VEC3 dualsp = (som+ Algo::Geometry::vertexNormal<PFP>(m,d,position));
@@ -424,7 +424,7 @@ void ParticleCell3D<PFP>::vertexState(const VEC3& current)
 	}
 	else
 	{
-		Dart ddd=d;
+		//Dart ddd=d;
 
 		edgeState(current);
 	}
@@ -640,7 +640,7 @@ void ParticleCell3D<PFP>::volumeState(const VEC3& current)
 	std::cout << "volumeState " <<  d << std::endl;
 	#endif
 
-	CellMarkerStore mark(m,FACE);
+	CellMarkerStore<FACE> mark(m);
 	bool above;
 
 	Geom::Orientation3D testRight=Geom::OVER;
@@ -756,7 +756,7 @@ void ParticleCell3D<PFP>::volumeSpecialCase(const VEC3& current)
 	#endif
 
 	Dart dd;
-	CellMarkerStore mark(m,FACE);
+	CellMarkerStore<FACE> mark(m);
 
 	Dart d_min;
 

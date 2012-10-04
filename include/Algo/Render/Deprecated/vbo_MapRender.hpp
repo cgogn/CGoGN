@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -236,7 +236,7 @@ void MapRender_VBO::initTriangles(typename PFP::MAP& map, const FunctorSelect& g
 		if(!m.isMarked(dd) && good(dd))
 		{
 			addTri<PFP>(map, dd, tableIndices);
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 		}
 	}
 }
@@ -259,7 +259,7 @@ void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const Functor
 
 			if(good(dd))
 				addTri<PFP>(map,dd,tableIndices);
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 			bound.push_back(dd);
 			int nb = 1;
 			do
@@ -275,7 +275,7 @@ void MapRender_VBO::initTrianglesOptimized(typename PFP::MAP& map, const Functor
 						{
 							if(good(f))
 								addTri<PFP>(map, f, tableIndices);
-							m.markOrbit(FACE, f);
+							m.markOrbit<FACE>(f);
 							bound.push_back(map.phi1(f));
 							++nb;
 							if (nb > LIST_SIZE)
@@ -309,7 +309,7 @@ void MapRender_VBO::initLines(typename PFP::MAP& map, const FunctorSelect& good,
 		{
 			tableIndices.push_back(map.getEmbedding(d, VERTEX));
 			tableIndices.push_back(map.getEmbedding(map.phi1(d), VERTEX));
-			m.markOrbit(EDGE, d);
+			m.markOrbit<EDGE>(d);
 		}
 	}
 }
@@ -344,7 +344,7 @@ void MapRender_VBO::initLinesOptimized(typename PFP::MAP& map, const FunctorSele
 							tableIndices.push_back(map.getEmbedding(ee, VERTEX));
 						if(good(f))
 							tableIndices.push_back(map.getEmbedding(map.phi1(ee), VERTEX));
-						m.markOrbit(EDGE, f);
+						m.markOrbit<EDGE>(f);
 
 						bound.push_back(f);
 						++nb;
@@ -470,7 +470,7 @@ void MapRender_VBO::initFlatTriangles(typename PFP::MAP& map, const FunctorSelec
 				b = c;
 				c = map.phi1(b);
 			} while (c != dd);
-			m.markOrbit(FACE, dd);
+			m.markOrbit<FACE>(dd);
 		}
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);

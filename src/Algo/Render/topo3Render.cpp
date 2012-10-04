@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -26,7 +26,6 @@
 #include "Topology/generic/dart.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
-
 
 #include <string.h>
 
@@ -43,7 +42,14 @@ namespace GL2
 {
 
 Topo3Render::Topo3Render():
-m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
+	m_nbDarts(0),
+	m_nbRel1(0),
+	m_nbRel2(0),
+	m_nbRel3(0),
+	m_topo_dart_width(2.0f),
+	m_topo_relation_width(3.0f),
+	m_color_save(NULL),
+	m_dartsColor(1.0f,1.0f,1.0f)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -60,7 +66,6 @@ m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
 	m_shader1 = new Utils::ShaderSimpleColor();
 	m_shader2 = new Utils::ShaderColorPerVertex();
 
-
 	// binding VBO - VA
 	m_vaId = m_shader1->setAttributePosition(m_vbo1);
 
@@ -70,7 +75,6 @@ m_topo_dart_width(2.0f), m_topo_relation_width(3.0f),m_color_save(NULL)
 	// registering for auto matrices update
 	Utils::GLSLShader::registerShader(NULL, m_shader1);
 	Utils::GLSLShader::registerShader(NULL, m_shader2);
-
 }
 
 Topo3Render::~Topo3Render()
@@ -125,13 +129,20 @@ void Topo3Render::setAllDartsColor(float r, float g, float b)
 		*colorDartBuf++ = g;
 		*colorDartBuf++ = b;
 	}
+	glUnmapBufferARB(GL_ARRAY_BUFFER);
 
-	m_vbo4->bind();
-	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER);
+}
+
+void Topo3Render::setInitialDartsColor(float r, float g, float b)
+{
+	m_dartsColor = Geom::Vec3f(r,g,b);
 }
 
 void Topo3Render::drawDarts()
 {
+	if (m_nbDarts==0)
+		return;
+
 	m_shader2->enableVertexAttribs();
 
 	glLineWidth(m_topo_dart_width);
@@ -174,13 +185,16 @@ void Topo3Render::drawDarts()
 
 void Topo3Render::drawRelation1()
 {
+	if (m_nbDarts==0)
+		return;
+
 	glLineWidth(m_topo_relation_width);
 
 	m_shader1->changeVA_VBO(m_vaId, m_vbo1);
 	m_shader1->setColor(Geom::Vec4f(0.0f,1.0f,1.0f,0.0f));
 	m_shader1->enableVertexAttribs();
 
-	glDrawArrays(GL_LINES, 0, m_nbDarts*2);
+	glDrawArrays(GL_LINES, 0, m_nbRel1*2);
 
 	m_shader1->disableVertexAttribs();
 
@@ -197,6 +211,9 @@ void Topo3Render::drawRelation1()
 
 void Topo3Render::drawRelation2()
 {
+	if (m_nbRel2==0)
+		return;
+
 	m_shader1->changeVA_VBO(m_vaId, m_vbo2);
 	m_shader1->setColor(Geom::Vec4f(1.0f,0.0f,0.0f,0.0f));
 	m_shader1->enableVertexAttribs();
@@ -216,10 +233,13 @@ void Topo3Render::drawRelation2()
 }
 
 
-void Topo3Render::drawRelation3()
+void Topo3Render::drawRelation3(Geom::Vec4f c)
 {
+	if (m_nbRel3==0)
+		return;
+
 	m_shader1->changeVA_VBO(m_vaId, m_vbo3);
-	m_shader1->setColor(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
+	m_shader1->setColor(c);
 	m_shader1->enableVertexAttribs();
 
 	glDrawArrays(GL_QUADS, 0, m_nbRel3*4);
@@ -242,7 +262,7 @@ void Topo3Render::drawTopo()
 	drawDarts();
 	drawRelation1();
 	drawRelation2();
-	drawRelation3();
+	drawRelation3(Geom::Vec4f(1.0f,1.0f,0.0f,0.0f));
 }
 
 
@@ -303,8 +323,10 @@ Dart Topo3Render::colToDart(float* color)
 	return Dart(id-1);
 }
 
+
 void Topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
 {
+	// here use dart.index beacause it is what we want (and not map.dartIndex(d) !!)
 	unsigned int lab = d.index + 1; // add one to avoid picking the black of screen
 
 	r = float(lab%255) / 255.0f; lab = lab/255;
@@ -313,6 +335,8 @@ void Topo3Render::dartToCol(Dart d, float& r, float& g, float& b)
 	if (lab!=0)
 		CGoGNerr << "Error picking color, too many darts"<< CGoGNendl;
 }
+
+
 
 
 Dart Topo3Render::pickColor(unsigned int x, unsigned int y)
@@ -342,10 +366,89 @@ Dart Topo3Render::pickColor(unsigned int x, unsigned int y)
 	glReadPixels(x,y,1,1,GL_RGB,GL_FLOAT,color);
 
 	glClearColor(cc[0], cc[1], cc[2], cc[3]);
-
+	
+	
+	std::cout << color[0] << ", "<<color[1] << ", "<<color[2] <<std::endl;
 	return colToDart(color);
 }
 
+void Topo3Render::svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj)
+{
+	Utils::SVG::SVGOut svg(filename,model,proj);
+	toSVG(svg);
+}
+
+void Topo3Render::toSVG(Utils::SVG::SVGOut& svg)
+{
+	svg.setWidth(m_topo_relation_width);
+
+	// PHI3 / beta3
+
+	const Geom::Vec3f* ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo3->lockPtr());
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbRel3; ++i)
+	{
+		Geom::Vec3f P = (ptr[4*i]+ ptr[4*i+3])/2.0f;
+		Geom::Vec3f Q = (ptr[4*i+1]+ ptr[4*i+2])/2.0f;
+		svg.addLine(P, Q,Geom::Vec3f(0.8f,0.8f,0.0f));
+	}
+	svg.endLines();
+	m_vbo3->releasePtr();
+
+
+	// PHI2 / beta2
+
+	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo2->lockPtr());
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbRel2; ++i)
+	{
+		Geom::Vec3f P = (ptr[4*i]+ ptr[4*i+3])/2.0f;
+		Geom::Vec3f Q = (ptr[4*i+1]+ ptr[4*i+2])/2.0f;
+		svg.addLine(P, Q,Geom::Vec3f(0.8f,0.0f,0.0f));
+	}
+	svg.endLines();
+	m_vbo2->releasePtr();
+
+	//PHI1 /beta1
+	ptr = reinterpret_cast<Geom::Vec3f*>(m_vbo1->lockPtr());
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbRel1; ++i)
+		svg.addLine(ptr[2*i], ptr[2*i+1],Geom::Vec3f(0.0f,0.7f,0.7f));
+	svg.endLines();
+	m_vbo1->releasePtr();
+
+
+	const Geom::Vec3f* colorsPtr = reinterpret_cast<const Geom::Vec3f*>(m_vbo4->lockPtr());
+	ptr= reinterpret_cast<Geom::Vec3f*>(m_vbo0->lockPtr());
+
+	svg.setWidth(m_topo_dart_width);
+
+	svg.beginLines();
+	for (unsigned int i=0; i<m_nbDarts; ++i)
+	{
+		Geom::Vec3f col = colorsPtr[2*i];
+		if (col.norm2()>2.9f)
+			col = Geom::Vec3f(1.0f,1.0f,1.0f) - col;
+		svg.addLine(ptr[2*i], ptr[2*i+1], col);
+	}
+	svg.endLines();
+
+	svg.beginPoints();
+	for (unsigned int i=0; i<m_nbDarts; ++i)
+	{
+		Geom::Vec3f col = colorsPtr[2*i];
+		if (col.norm2()>2.9f)
+			col = Geom::Vec3f(1.0f,1.0f,1.0f) - col;
+		svg.addPoint(ptr[2*i], col);
+	}
+	svg.endPoints();
+
+	m_vbo0->releasePtr();
+	m_vbo4->releasePtr();
+}
 
 
 

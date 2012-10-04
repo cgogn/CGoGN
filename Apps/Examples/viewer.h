@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -38,12 +38,17 @@
 #include "Algo/Export/export.h"
 
 #include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Render/GL2/topoRender.h"
 
 #include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/pointSprite.h"
+#include "Utils/text3d.h"
+#include "Utils/vboRender.h"
+
+#include "Utils/Qt/qtInputs.h"
 
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Geometry/normal.h"
@@ -57,6 +62,7 @@ struct PFP: public PFP_STANDARD
 };
 
 typedef PFP::MAP MAP ;
+typedef PFP::VEC3 VEC3 ;
 
 class Viewer : public Utils::QT::SimpleQT
 {
@@ -88,11 +94,13 @@ public:
 	bool m_drawEdges ;
 	bool m_drawFaces ;
 	bool m_drawNormals ;
+	bool m_drawTopo ;
 
-	PFP::TVEC3 position ;
-	PFP::TVEC3 normal ;
+	VertexAttribute<VEC3> position ;
+	VertexAttribute<VEC3> normal ;
 
 	Algo::Render::GL2::MapRender* m_render ;
+	Algo::Render::GL2::TopoRender* m_topoRender ;
 
 	Utils::VBO* m_positionVBO ;
 	Utils::VBO* m_normalVBO ;
@@ -112,7 +120,10 @@ public:
 	void cb_Open() ;
 	void cb_Save() ;
 
+	void cb_keyPress(int keycode);
+
 	void importMesh(std::string& filename) ;
+	void exportMesh(std::string& filename, bool askExportMode = true);
 
 public slots:
 	void slot_drawVertices(bool b) ;
@@ -120,7 +131,7 @@ public slots:
 	void slot_drawEdges(bool b) ;
 	void slot_drawFaces(bool b) ;
 	void slot_faceLighting(int i) ;
+	void slot_drawTopo(bool b) ;
 	void slot_drawNormals(bool b) ;
 	void slot_normalsSize(int i) ;
 };
-

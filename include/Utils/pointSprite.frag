@@ -1,7 +1,15 @@
 // PointSprite::fragmentShaderText
+
 uniform sampler2D SpriteTexture;
 uniform float size;
-uniform vec3 color;
+
+#ifdef WITH_COLOR_PER_VERTEX 
+	VARYING_FRAG vec3 colorsprite;
+#else
+	uniform vec3 colorsprite;
+#endif
+
+
 VARYING_FRAG vec2 texCoord;
 VARYING_FRAG vec2 positionFragIn;
 VARYING_FRAG vec4 mvpFragIn;
@@ -14,5 +22,5 @@ void main(void)
 	float z = size * sqrt(1.0-dot(v,v));
 	vec2 zfrag = positionFragIn + vec2(z,0.0);
 	gl_FragDepth = 0.5 + 0.5 * dot(zfrag, mvpFragIn.xy) / dot(zfrag, mvpFragIn.zw);
-	gl_FragColor = vec4(color,0.0)*lum;
+	gl_FragColor = vec4(colorsprite,0.0)*lum;
 }

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -40,43 +40,43 @@ template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianTopoVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const AttributeHandler<ATTR_TYPE>& attr) ;
+	const VertexAttribute<ATTR_TYPE>& attr) ;
 
 template <typename PFP, typename ATTR_TYPE>
 ATTR_TYPE computeLaplacianCotanVertex(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea,
-	const AttributeHandler<ATTR_TYPE>& attr) ;
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE>& attr) ;
 
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianTopoVertices(
 	typename PFP::MAP& map,
-	const AttributeHandler<ATTR_TYPE>& attr,
-	AttributeHandler<ATTR_TYPE>& laplacian,
+	const VertexAttribute<ATTR_TYPE>& attr,
+	VertexAttribute<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP, typename ATTR_TYPE>
 void computeLaplacianCotanVertices(
 	typename PFP::MAP& map,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea,
-	const AttributeHandler<ATTR_TYPE>& attr,
-	AttributeHandler<ATTR_TYPE>& laplacian,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE>& attr,
+	VertexAttribute<ATTR_TYPE>& laplacian,
 	const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
 typename PFP::REAL computeCotanWeightEdge(
 	typename PFP::MAP& map,
 	Dart d,
-	const typename PFP::TVEC3& position) ;
+	const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
 void computeCotanWeightEdges(
 	typename PFP::MAP& map,
-	const typename PFP::TVEC3& position,
-	typename PFP::TREAL& edgeWeight,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	EdgeAttribute<typename PFP::REAL>& edgeWeight,
 	const FunctorSelect& select = allDarts) ;
 
 } // namespace Geoemtry

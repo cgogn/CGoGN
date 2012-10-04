@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -117,7 +117,7 @@ void GLWidget::recalcModelView()
 	oglTranslate(m_obj_pos[0], m_obj_pos[1], m_obj_pos[2]);
 
 	// ajout transformation
-//	m_cbs->modelViewMatrix() *=m_cbs->transfoMatrix();
+	// m_cbs->modelViewMatrix() *= m_cbs->transfoMatrix();
 
 	newModel = 0;
 
@@ -211,6 +211,7 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 
 	if (m_cbs)
 		m_cbs->cb_mousePress(event->button(), event->x(), getHeight() - event->y());
+	setFocus(Qt::MouseFocusReason);
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent* event)
@@ -321,16 +322,15 @@ void GLWidget::wheelEvent(QWheelEvent* event)
 		m_cbs->cb_wheelEvent(event->delta(), event->x(), getHeight() - event->y());
 }
 
-void GLWidget::closeEvent(QCloseEvent *event)
-{
-	if (m_cbs)
-		m_cbs->cb_exit() ;
-}
 
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
 	if (event->key() == Qt::Key_Escape)
+	{
 		close();
+		m_cbs->close();
+		return;
+	}
 
 	m_state_modifier = event->modifiers();
 
@@ -483,6 +483,7 @@ float GLWidget::getWidthInWorld(unsigned int pixel_width, const Geom::Vec3f& cen
 void GLWidget::transfoRotate(float angle, float x, float y, float z)
 {
 	m_cbs->transfoMatrix() = glm::rotate( m_cbs->transfoMatrix(), angle, glm::vec3(x,y,z));
+	recalcModelView() ;
 }
 
 void GLWidget::transfoTranslate(float tx, float ty, float tz)

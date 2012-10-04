@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,34 +35,34 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+typename PFP::REAL totalArea(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
-typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position) ;
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select = allDarts) ;
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& face_area, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = allDarts) ;
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = allDarts) ;
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 template <typename PFP>
-void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select = allDarts) ;
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select = allDarts) ;
 
 } // namespace Geometry
 

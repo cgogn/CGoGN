@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -45,11 +45,11 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	AttributeHandler<Quadric<REAL> > m_quadric ;
+	VertexAttribute<Quadric<REAL> > m_quadric ;
 
 public:
-	Approximator_QEM(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
+	Approximator_QEM(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_QEM()
 	{}
@@ -67,11 +67,11 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	AttributeHandler<Quadric<REAL> > m_quadric ;
+	VertexAttribute<Quadric<REAL> > m_quadric ;
 
 public:
-	Approximator_QEMhalfEdge(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
+	Approximator_QEMhalfEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_QEMhalfEdge()
 	{}
@@ -88,8 +88,8 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_MidEdge(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
+	Approximator_MidEdge(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_MidEdge()
 	{}
@@ -106,8 +106,8 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_HalfCollapse(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
+	Approximator_HalfCollapse(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_HalfCollapse()
 	{}
@@ -124,8 +124,8 @@ public:
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-	Approximator_CornerCutting(MAP& m, AttributeHandler<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, EDGE, pred)
+	Approximator_CornerCutting(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
 	{}
 	~Approximator_CornerCutting()
 	{}

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -46,19 +46,26 @@ enum SubdivideType
  ***********************************************************************************/
 
 template <typename PFP>
-void subdivideEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position) ;
+void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position) ;
 
 template <typename PFP>
-void subdivideFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_TRI);
+void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
-Dart subdivideVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+Dart subdivideVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 template <typename PFP>
-Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+Dart subdivideVolumeGen(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 template <typename PFP>
-Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+
+template <typename PFP>
+Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
+
+
+template <typename PFP>
+void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 
 /***********************************************************************************
@@ -66,13 +73,13 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, typename PFP::TVEC3&
  ***********************************************************************************/
 
 template <typename PFP>
-void coarsenEdge(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void coarsenEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 template <typename PFP>
-void coarsenFace(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position, SubdivideType sType = S_TRI);
+void coarsenFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position, SubdivideType sType = S_TRI);
 
 template <typename PFP>
-void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void coarsenVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 /***********************************************************************************
  *												Raffinement
@@ -81,7 +88,7 @@ void coarsenVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position
  * Un brin de la face oppose aux faces a spliter
  */
 template <typename PFP>
-void splitVolume(typename PFP::MAP& map, Dart d, typename PFP::TVEC3& position);
+void splitVolume(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP::VEC3, VERTEX>& position);
 
 
 

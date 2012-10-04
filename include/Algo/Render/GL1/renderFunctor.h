@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -38,7 +38,6 @@ namespace Render
 
 namespace GL1
 {
-
 
 template<typename PFP>
 class FunctorGLFace: public FunctorMap<typename PFP::MAP>
@@ -74,12 +73,12 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const typename PFP::TVEC3& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * normals of vertices
 	 */
-	const typename PFP::TVEC3& m_normals;
+	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
 	/**
 	* vector of darts (one for each polygon)
@@ -103,7 +102,7 @@ public:
 	* @param good dart selector
 	*/
 	FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const typename PFP::TVEC3& posi, const typename PFP::TVEC3& normals , const FunctorSelect& good);
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const FunctorSelect& good);
 
 	/**
 	* get back the vector of darts of faces that have not been treated
@@ -168,17 +167,17 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const typename PFP::TVEC3& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * normals of vertices
 	 */
-	const typename PFP::TVEC3& m_normals;
+	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
 	/**
 	 * colors of vertices
 	 */
-	const typename PFP::TVEC3& m_colors;
+	const VertexAttribute<typename PFP::VEC3>& m_colors;
 
 	/**
 	* vector of darts (one for each polygon)
@@ -194,7 +193,7 @@ protected:
 public:
 
 	FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const typename PFP::TVEC3& posi, const typename PFP::TVEC3& normals , const typename PFP::TVEC3& colors ,const FunctorSelect& good);
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const VertexAttribute<typename PFP::VEC3>& colors ,const FunctorSelect& good);
 
 	std::vector<Dart>& getPolyDarts();
 
@@ -215,12 +214,12 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const typename PFP::TVEC3& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * normals of vertices
 	 */
-	const typename PFP::TVEC3& m_normals;
+	const VertexAttribute<typename PFP::VEC3>& m_normals;
 
 	/**
 	* Dart selector to restrict the rendering
@@ -234,7 +233,7 @@ public:
 
 	* @param good dart selector
 	*/
-	FunctorGLNormal(MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3& normals, float scale);
+	FunctorGLNormal(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale);
 
 	bool operator() (Dart d);
 };
@@ -249,12 +248,12 @@ protected:
 	/**
 	 * positions of vertices
 	 */
-	const typename PFP::TVEC3& m_positions;
+	const VertexAttribute<typename PFP::VEC3>& m_positions;
 
 	/**
 	 * frame of vertices
 	 */
-	const typename PFP::TVEC3 *m_frames;
+	const VertexAttribute<typename PFP::VEC3> *m_frames;
 
 	/**
 	* Dart selector to restrict the rendering
@@ -268,7 +267,7 @@ public:
 
 	* @param good dart selector
 	*/
-	FunctorGLFrame (MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3 frames[3], float scale);
+	FunctorGLFrame (MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale);
 
 	bool operator() (Dart d);
 };

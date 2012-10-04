@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -36,8 +36,8 @@ namespace IHM
 
 ImplicitHierarchicalMap::ImplicitHierarchicalMap() : m_curLevel(0), m_maxLevel(0), m_idCount(0)
 {
-	m_dartLevel = addAttribute<unsigned int>(DART, "dartLevel") ;
-	m_edgeId = addAttribute<unsigned int>(DART, "edgeId") ;
+	m_dartLevel = addAttribute<unsigned int, DART>("dartLevel") ;
+	m_edgeId = addAttribute<unsigned int, DART>("edgeId") ;
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 		m_nextLevelCell[i] = NULL ;
 }
@@ -71,7 +71,7 @@ void ImplicitHierarchicalMap::initEdgeId()
 	{
 		if(!edgeMark.isMarked(d))
 		{
-			edgeMark.markOrbit(EDGE, d) ;
+			edgeMark.markOrbit<EDGE>(d) ;
 			m_edgeId[d] = m_idCount ;
 			m_edgeId[Map2::phi2(d)] = m_idCount++ ;
 		}

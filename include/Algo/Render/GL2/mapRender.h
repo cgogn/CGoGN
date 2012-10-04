@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -80,7 +80,6 @@ enum bufferIndex
 
 class MapRender
 {
-
 protected:
 	/**
 	 * vbo buffers
@@ -101,7 +100,7 @@ protected:
 	static bool cmpVP(VertexPoly* lhs, VertexPoly* rhs);
 
 	// multiset typedef for simple writing
-	typedef std::multiset< VertexPoly*,bool(*)(VertexPoly*,VertexPoly*)> VPMS;
+	typedef std::multiset<VertexPoly*, bool(*)(VertexPoly*,VertexPoly*)> VPMS;
 
 	class VertexPoly
 	{
@@ -113,9 +112,9 @@ protected:
 		VertexPoly* next;
 		VPMS::iterator ear;
 
-		VertexPoly(int i, float v, float l, VertexPoly* p=NULL): id(i),value(v), length(l), prev(p), next(NULL)
+		VertexPoly(int i, float v, float l, VertexPoly* p = NULL) : id(i), value(v), length(l), prev(p), next(NULL)
 		{
-			if (prev!=NULL)
+			if (prev != NULL)
 				prev->next = this;
 		}
 
@@ -133,7 +132,6 @@ protected:
 			delete vp;
 			return tmp;
 		}
-
 	};
 
 public:
@@ -165,28 +163,29 @@ protected:
 	void addTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices) ;
 
 	template<typename PFP>
-	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices, const typename PFP::TVEC3* position);
+	inline void addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position);
 
 	template<typename PFP>
 	float computeEarAngle(const typename PFP::VEC3& P1, const typename PFP::VEC3& P2, const typename PFP::VEC3& P3, const typename PFP::VEC3& normalPoly);
 
 	template<typename PFP>
-	bool computeEarIntersection(const typename PFP::TVEC3& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly);
+	bool computeEarIntersection(const VertexAttribute<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly);
 
 	template<typename PFP>
-	void recompute2Ears(const typename PFP::TVEC3& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
+	void recompute2Ears(const VertexAttribute<typename PFP::VEC3>& position, VertexPoly* vp, const typename PFP::VEC3& normalPoly, VPMS& ears, bool convex);
 
 	template<typename VEC3>
 	bool inTriangle(const VEC3& P, const VEC3& normal, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc);
 
+public:
 	/**
 	 * creation of indices table of triangles (optimized order)
 	 * @param tableIndices the table where indices are stored
 	 */
 	template <typename PFP>
-	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const typename PFP::TVEC3* position, unsigned int thread = 0) ;
+	void initTriangles(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position, unsigned int thread = 0) ;
 	template <typename PFP>
-	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const typename PFP::TVEC3* position, unsigned int thread = 0) ;
+	void initTrianglesOptimized(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, const VertexAttribute<typename PFP::VEC3>* position, unsigned int thread = 0) ;
 
 	/**
 	 * creation of indices table of lines (optimized order)
@@ -210,8 +209,6 @@ protected:
 	 */
 	template <typename PFP>
 	void initBoundaries(typename PFP::MAP& map, const FunctorSelect& good, std::vector<GLuint>& tableIndices, unsigned int thread = 0) ;
-
-public:
 	/**
 	 * initialization of the VBO indices primitives
 	 * computed by a traversal of the map
@@ -221,7 +218,7 @@ public:
 	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, bool optimized = true, unsigned int thread = 0) ;
 
 	template <typename PFP>
-	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, const typename PFP::TVEC3* position, bool optimized = true, unsigned int thread = 0) ;
+	void initPrimitives(typename PFP::MAP& map, const FunctorSelect& good, int prim, const VertexAttribute<typename PFP::VEC3>* position, bool optimized = true, unsigned int thread = 0) ;
 
 	/**
 	 * initialization of the VBO indices primitives

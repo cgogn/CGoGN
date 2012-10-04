@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -30,6 +30,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <QtGui/QTextEdit>
+#include <QImage>
 
 namespace CGoGN
 {
@@ -98,7 +99,7 @@ SimpleQT::SimpleQT() :
 	m_textConsole = new QTextEdit();
 	m_textConsole->setLineWrapMode(QTextEdit::NoWrap);
 	m_textConsole->setTabStopWidth(20);
-	m_textConsole->setReadOnly(true);
+//	m_textConsole->setReadOnly(true);
 
 	m_dockConsole->setWidget(m_textConsole);
 
@@ -107,11 +108,11 @@ SimpleQT::SimpleQT() :
 	m_transfo_matrix = glm::mat4(1.0f);
 
 	resize(1200,800);
+	m_glWidget->setFocus(Qt::MouseFocusReason);
 }
 
 SimpleQT::SimpleQT(const SimpleQT& sqt):
 	m_dock(NULL),
-	m_mat(m_mat),
 	m_projection_matrix(m_mat.m_matrices[0]),
 	m_modelView_matrix(m_mat.m_matrices[1]),
 	m_transfo_matrix(m_mat.m_matrices[2])
@@ -133,6 +134,8 @@ SimpleQT::SimpleQT(const SimpleQT& sqt):
 	m_trans_x = sqt.m_trans_x ;
 	m_trans_y = sqt.m_trans_y ;
 	m_trans_z = sqt.m_trans_z ;
+
+	m_glWidget->setFocus(Qt::MouseFocusReason);
 }
 
 SimpleQT::~SimpleQT()
@@ -273,8 +276,8 @@ void SimpleQT::setGLWidgetMouseTracking(bool b)
 
 void SimpleQT::closeEvent(QCloseEvent *event)
 {
-	m_glWidget->closeEvent(event) ;
 	QWidget::closeEvent(event) ;
+	cb_exit();
 }
 
 void SimpleQT::keyPressEvent(QKeyEvent *e)
@@ -503,7 +506,7 @@ void SimpleQT::cb_about_cgogn()
 {
 	QString str("CGoGN:\nCombinatorial and Geometric modeling\n"
 				"with Generic N-dimensional Maps\n"
-				"Web site: https://cgogn.u-strasbg.fr \n"
+				"Web site: http://cgogn.unistra.fr \n"
 				"Contact information: cgogn@unistra.fr");
 	QMessageBox::about(this, tr("About CGoGN"), str);
 }
@@ -511,6 +514,18 @@ void SimpleQT::cb_about_cgogn()
 void SimpleQT::cb_about()
 {
    QMessageBox::about(this, tr("About App"), m_helpString.c_str());
+}
+
+void SimpleQT::snapshot(const QString& filename, const char* format, const int& quality)
+{
+	QImage im = m_glWidget->grabFrameBuffer(false);
+	im.save(filename, format, quality);
+}
+
+void SimpleQT::setGeometry(int x, int y, int w, int h)
+{
+	move(x,y);
+	resize(w,h);
 }
 
 } // namespace QT

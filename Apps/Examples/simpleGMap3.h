@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -28,6 +28,7 @@
 
 #include "Topology/generic/parameters.h"
 #include "Topology/gmap/embeddedGMap3.h"
+//#include "Topology/map/embeddedMap3.h"
 
 #include "Geometry/vector_gen.h"
 
@@ -40,6 +41,7 @@ struct PFP: public PFP_STANDARD
 {
 	// definition of the map
 	typedef EmbeddedGMap3 MAP ;
+//	typedef EmbeddedMap3 MAP ;
 };
 
 typedef PFP::MAP MAP ;
@@ -52,9 +54,9 @@ class SimpleGMap3 : public Utils::QT::SimpleQT
 public:
 	MAP myMap ;
 
-	PFP::TVEC3 position ;
-	PFP::TVEC3 normal ;
-	PFP::TVEC3 volume ;
+	VertexAttribute<VEC3> position ;
+	VertexAttribute<VEC3> normal ;
+	VolumeAttribute<VEC3> volume ;
 
 	SimpleGMap3() ;
 
@@ -63,4 +65,3 @@ public:
 	void cb_initGL() ;
 	void cb_redraw() ;
 };
-

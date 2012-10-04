@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -49,8 +49,8 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 public:
-	Approximator_FrameHalf(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
-		Approximator<PFP, MATRIX33>(m, frame, EDGE, pred)
+	Approximator_FrameHalf(MAP& m, VertexAttribute<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
+		Approximator<PFP, MATRIX33>(m, frame, pred)
 	{}
 	~Approximator_FrameHalf()
 	{}
@@ -71,13 +71,13 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<MATRIX33> m_frame ;
-	AttributeHandler<MATRIX33> m_approxFrame ;
-	AttributeHandler<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
+	VertexAttribute<MATRIX33> m_frame ;
+	EdgeAttribute<MATRIX33> m_approxFrame ;
+	EdgeAttribute<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
 
 public:
-	Approximator_RGBfunctionsHalf(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
-		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE, pred)
+	Approximator_RGBfunctionsHalf(MAP& m, VertexAttribute<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, pred)
 	{ }
 	~Approximator_RGBfunctionsHalf	()
 	{}
@@ -98,12 +98,12 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<VEC3> m_position ;
-	AttributeHandler<VEC3> m_approxPosition ;
+	VertexAttribute<VEC3> m_position ;
+	EdgeAttribute<VEC3> m_approxPosition ;
 
 public:
-	Approximator_Frame(MAP& m, AttributeHandler<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
-		Approximator<PFP, MATRIX33>(m, frame, EDGE, pred)
+	Approximator_Frame(MAP& m, VertexAttribute<MATRIX33>& frame, Predictor<PFP, MATRIX33>* pred = NULL) :
+		Approximator<PFP, MATRIX33>(m, frame, pred)
 	{}
 	~Approximator_Frame()
 	{}
@@ -124,13 +124,13 @@ public:
 	typedef Geom::Matrix<3,6,REAL> MATRIX36 ;
 
 protected:
-	AttributeHandler<MATRIX33> m_frame ;
-	AttributeHandler<MATRIX33> m_approxFrame ;
-	AttributeHandler<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
+	VertexAttribute<MATRIX33> m_frame ;
+	EdgeAttribute<MATRIX33> m_approxFrame ;
+	EdgeAttribute<QuadricRGBfunctions<REAL> > m_quadricRGBfunctions ;
 
 public:
-	Approximator_RGBfunctions(MAP& m, AttributeHandler<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
-		Approximator<PFP, MATRIX36>(m, rgbfunctions, EDGE, pred)
+	Approximator_RGBfunctions(MAP& m, VertexAttribute<MATRIX36>& rgbfunctions, Predictor<PFP, MATRIX36>* pred = NULL) :
+		Approximator<PFP, MATRIX36>(m, rgbfunctions, pred)
 	{ }
 	~Approximator_RGBfunctions()
 	{}

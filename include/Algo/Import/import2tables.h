@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -30,7 +30,6 @@
 #include <vector>
 #include <string>
 
-//#include "Topology/generic/attributeHandler.h"
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
 
@@ -52,12 +51,12 @@ namespace Import
 
 	namespace ImportSurfacique
 	{
-		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, PLY, PLYPTM, PLYPTMgeneric, OFF, OBJ, VRML, AHEM };
+		enum ImportType { UNKNOWNSURFACE, TRIAN, TRIANBGZ, MESHBIN, PLY, /*PLYPTM, */PLYSLFgeneric, PLYSLFgenericBin, OFF, OBJ, VRML, AHEM };
 	}
 
 	namespace ImportVolumique
 	{
-		enum ImportType { UNKNOWNVOLUME ,TET ,TRIANBGZ ,PLY };
+		enum ImportType { UNKNOWNVOLUME , TET, OFF, TS, MOKA, NODE};
 	}
 
 
@@ -86,7 +85,7 @@ protected:
 	static ImportSurfacique::ImportType getFileType(const std::string& filename);
 
 #ifdef WITH_ASSIMP
-	void extractMeshRec(AttributeContainer& container, AttributeHandler<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
+	void extractMeshRec(AttributeContainer& container, VertexAttribute<typename PFP::VEC3>& positions, const struct aiScene* scene, const struct aiNode* nd, struct aiMatrix4x4* trafo);
 #endif
 
 public:
@@ -101,7 +100,7 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importTrian(const std::string& filename, std::vector<std::string>& attrNames);
 
@@ -109,12 +108,16 @@ public:
 
 	bool importOff(const std::string& filename, std::vector<std::string>& attrNames);
 
+	bool importMeshBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 	bool importObj(const std::string& filename, std::vector<std::string>& attrNames);
 
 	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
 
-	bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
-	bool importPlyPTMgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	// bool importPlyPTM(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgeneric(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importPlySLFgenericBin(const std::string& filename, std::vector<std::string>& attrNames);
+
 #ifdef WITH_ASSIMP
 	bool importASSIMP(const std::string& filename, std::vector<std::string>& attrNames);
 #endif	
@@ -180,13 +183,9 @@ public:
 
 	inline unsigned int getEmbIdx(int i) { return  m_emb[i]; }
 
-	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, ImportVolumique::ImportType kind, float scaleFactor);
+	bool importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
-	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor);
-
-	bool importPly(const std::string& filename, std::vector<std::string>& attrNames);
-
-	bool importTrianBinGz(const std::string& filename, std::vector<std::string>& attrNames);
+	bool importTet(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
 
 	MeshTablesVolume(typename PFP::MAP& map):
 		m_map(map)

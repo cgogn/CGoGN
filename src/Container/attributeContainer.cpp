@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -48,6 +48,18 @@ AttributeContainer::AttributeContainer() :
 
 AttributeContainer::~AttributeContainer()
 {
+	for (unsigned int index = 0; index < m_tableAttribs.size(); ++index)
+	{
+		if (m_tableAttribs[index] != NULL)
+			delete m_tableAttribs[index];
+	}
+
+	for (unsigned int index = 0; index < m_holesBlocks.size(); ++index)
+	{
+		if (m_holesBlocks[index] != NULL)
+			delete m_holesBlocks[index];
+	}
+
 }
 
 /**************************************
@@ -157,14 +169,14 @@ void AttributeContainer::clear(bool removeAttrib)
 	m_size = 0;
  	m_maxSize = 0;
 
-	std::vector<HoleBlockRef*> bf;
-	std::vector<unsigned int> bwf;
-
-	// raz des cases libres
+		// raz des cases libres
 	for (std::vector<HoleBlockRef*>::iterator it = m_holesBlocks.begin(); it != m_holesBlocks.end(); ++it)
 		delete (*it);
 
+	std::vector<HoleBlockRef*> bf;
 	m_holesBlocks.swap(bf);
+
+	std::vector<unsigned int> bwf;
 	m_tableBlocksWithFree.swap(bwf);
 
 	// detruit les données
@@ -181,13 +193,17 @@ void AttributeContainer::clear(bool removeAttrib)
 		m_nbAttributes = 0;
 
 		// detruit tous les attributs
-		std::vector<AttributeMultiVectorGen*> amg;
 		for (std::vector<AttributeMultiVectorGen*>::iterator it = m_tableAttribs.begin(); it != m_tableAttribs.end(); ++it)
 		{
 			if ((*it) != NULL)
 				delete (*it);
 		}
+
+		std::vector<AttributeMultiVectorGen*> amg;
 		m_tableAttribs.swap(amg);
+
+		std::vector<unsigned int> fi;
+		m_freeIndices.swap(fi);
 	}
 }
 
@@ -648,7 +664,7 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 
 	if (bs != _BLOCKSIZE_)
 	{
-		CGoGNerr << "Chargement impossible, tailles de block differentes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
+		CGoGNerr << "Loading unavailable, different block sizes: "<<_BLOCKSIZE_<<" / " << bs << CGoGNendl;
 		return false;
 	}
 
@@ -688,6 +704,57 @@ bool AttributeContainer::loadBin(CGoGNistream& fs)
 	fs.read(reinterpret_cast<char*>(&(m_tableBlocksWithFree[0])), szBWF*sizeof(unsigned int));
 
 	return true;
+}
+
+void  AttributeContainer::copyFrom(const AttributeContainer& cont)
+{
+// 	clear is done from the map
+
+	m_size = cont.m_size;
+	m_maxSize = cont.m_maxSize;
+	m_orbit = cont.m_orbit;
+	m_nbUnknown = cont.m_nbUnknown;
+	m_nbAttributes = cont.m_nbAttributes;
+	m_lineCost = cont.m_lineCost;
+
+	// blocks
+	unsigned int sz = cont.m_holesBlocks.size();
+	m_holesBlocks.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_holesBlocks[i] = new HoleBlockRef(*(cont.m_holesBlocks[i]));
+
+	// blocks with free
+	sz = cont.m_tableBlocksWithFree.size();
+	m_tableBlocksWithFree.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_tableBlocksWithFree[i] = cont.m_tableBlocksWithFree[i];
+
+	// empty blocks
+	sz = cont.m_tableBlocksEmpty.size();
+	m_tableBlocksEmpty.resize(sz);
+	for (unsigned int i = 0; i < sz; ++i)
+		m_tableBlocksEmpty[i] = cont.m_tableBlocksEmpty[i];
+
+	//attributes (warning attribute can have different numbers than in original)
+	m_tableAttribs.reserve(m_nbAttributes);
+	sz = cont.m_tableAttribs.size();
+	for (unsigned int i = 0; i < sz; ++i)
+	{
+		if (cont.m_tableAttribs[i] != NULL)
+		{
+			AttributeMultiVectorGen* ptr = cont.m_tableAttribs[i]->new_obj();
+			ptr->setName(cont.m_tableAttribs[i]->getName());
+			ptr->setOrbit(cont.m_tableAttribs[i]->getOrbit());
+			ptr->setIndex(m_tableAttribs.size());
+			ptr->setNbBlocks(cont.m_tableAttribs[i]->getNbBlocks());
+			ptr->copy(cont.m_tableAttribs[i]);
+			if (cont.m_tableAttribs[i]->toProcess())
+				ptr->toggleProcess();
+			else
+				ptr->toggleNoProcess();
+			m_tableAttribs.push_back(ptr);
+		}
+	}
 }
 
 }

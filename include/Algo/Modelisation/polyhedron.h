@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -42,7 +42,7 @@ namespace Algo
 namespace Modelisation
 {
 
-enum { NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
+enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
 /**
 * sudivide the all quads of primtive into 2 triangles
@@ -61,14 +61,66 @@ enum { NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 // Dart triangleFan_topo(typename PFP::MAP& the_map, int n);
 
 
-
 /**
- * Unsex the Umbrella aroud a vertex, close the hole and then
+ * Unsex the Umbrella around a vertex, close the hole and then
  * create a symetric to construct a polyedron
  * @param d a dart from the vertex
  */
 template <typename PFP>
-void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 position);
+void explodPolyhedron(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+
+
+
+
+/**
+ * create a n-sided pyramid
+ */
+template <typename PFP>
+Dart createPyramid(typename PFP::MAP& map, unsigned int nbSides);
+
+/**
+ * create a n-sided prism
+ */
+template <typename PFP>
+Dart createPrism(typename PFP::MAP& map, unsigned int nbSides);
+
+/**
+ * create a n-sided diamond
+ */
+template <typename PFP>
+Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides);
+
+/**
+ * create a tetrahedron
+ */
+template <typename PFP>
+Dart createTetrahedron(typename PFP::MAP& map);
+
+/**
+ * create a hexahedron
+ */
+template <typename PFP>
+Dart createHexahedron(typename PFP::MAP& map);
+
+/**
+ * create a 3-sided prism
+ */
+template <typename PFP>
+Dart createTriangularPrism(typename PFP::MAP& map);
+
+/**
+ * create a 4-sided pyramid
+ */
+template <typename PFP>
+Dart createQuadrangularPyramid(typename PFP::MAP& map);
+
+/**
+ * create 4-sided diamond (i.e. an octahedron)
+ */
+template <typename PFP>
+Dart createOctahedron(typename PFP::MAP& map);
+
+
 
 /**
 * class of geometric Polyhedron
@@ -82,12 +134,12 @@ void explodPolyhedron(typename PFP::MAP& map, Dart d, typename PFP::TVEC3 positi
 *
 * Topological creation methods are separated from embedding to
 * easily allow specific embedding.
-
 */
 template <typename PFP>
 class Polyhedron
 {
 	typedef typename PFP::MAP MAP;
+	typedef typename PFP::VEC3 VEC3;
 
 public:
 	enum {NONE,GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED};
@@ -127,9 +179,9 @@ protected:
 
 	bool m_bottom_closed;
 
-	typename PFP::TVEC3& m_positions;
+	VertexAttribute<VEC3>& m_positions;
 
-	typename PFP::VEC3 m_center;
+	VEC3 m_center;
 
 	/**
 	* return the dart of next vertex when traversing the boundary of a quad or trifan grid
@@ -150,7 +202,7 @@ public:
 	* @param map the map in which we want to work
 	* @param idPositions id of attribute position
 	*/
-	Polyhedron(MAP& map, typename PFP::TVEC3& position):
+	Polyhedron(MAP& map, VertexAttribute<VEC3>& position):
 		m_map(map),
 		m_kind(NONE),
 		m_nx(-1), m_ny(-1), m_nz(-1),
@@ -167,45 +219,20 @@ public:
 	*/
 	Polyhedron(const Polyhedron<PFP>& p1, const Polyhedron<PFP>& p2);
 
-	/**
-	 * create simple simple polyhedron (not handled by Polyhedron object)
-	 */
-	static Dart createPolyhedron(typename PFP::MAP& the_map, unsigned int nbFaces);
-
-	/**
-	 * create simple simple tetrahedron (not handled by Polyhedron object)
-	 */
-	static Dart createTetra(typename PFP::MAP& the_map);
-
-	/**
-	 * create simple simple pyramid (not handled by Polyhedron object)
-	 */
-	static Dart createPyra(typename PFP::MAP& the_map);
-
-	/**
-	 * create simple simple hexaedron (not handled by Polyhedron object)
-	 */
-	static Dart createHexa(typename PFP::MAP& the_map);
-
-	/**
-	 * create simple simple prism (not handled by Polyhedron object)
-	 */
-	static Dart createPrism(typename PFP::MAP& the_map);
-
 	/*
 	* get the reference dart
 	*/
-	Dart getDart() { return m_dart;}
+	Dart getDart() { return m_dart; }
 
 	/*
 	* get the center of Polyhedron
 	*/
-	const typename PFP::VEC3&  getCenter() { return m_center;}
+	const typename PFP::VEC3&  getCenter() { return m_center; }
 
 	/**
 	* get the table of darts (one per vertex)
 	*/
-	std::vector<Dart>& getVertexDarts() { return m_tableVertDarts;}
+	std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
 
 	/**
 	* Create a 2D grid
@@ -317,7 +344,7 @@ public:
 	* @param maxHeight height to reach
 	* @param turns number of turn
 	*/
-	void embedHelicoid( float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
+	void embedHelicoid(float radius_min,  float radius_max, float maxHeight, float nbTurn, int orient = 1);
 
 	/**
 	* transform the Polyhedron with transformation matrice
@@ -329,7 +356,7 @@ public:
 	* mark all darts of the Polyhedron
 	* @param m the CellMarker(VERTEX) to use
 	*/
-	void mark(CellMarker& m);
+	void mark(CellMarker<VERTEX>& m);
 
 	/**
 	* mark all embedded vertices of the Polyhedron

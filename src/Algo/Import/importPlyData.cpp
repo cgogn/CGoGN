@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -25,6 +25,7 @@
 #include "Utils/os_spec.h"
 #include "Algo/Import/importPlyData.h"
 #include <stdlib.h>
+#include <locale.h>
 
 namespace CGoGN
 {
@@ -37,6 +38,9 @@ PlyProperty PlyImportData::vert_props[] = { /* list of property information for 
 	{(char*) "x", PLY_Float32, PLY_Float32, offsetof(Vertex,x), 0, 0, 0, 0},
 	{(char*) "y", PLY_Float32, PLY_Float32, offsetof(Vertex,y), 0, 0, 0, 0},
 	{(char*) "z", PLY_Float32, PLY_Float32, offsetof(Vertex,z), 0, 0, 0, 0},
+	{(char*) "red", PLY_Uint8, PLY_Uint8, offsetof(Vertex,red), 0, 0, 0, 0},
+	{(char*) "green", PLY_Uint8, PLY_Uint8, offsetof(Vertex,green), 0, 0, 0, 0},
+	{(char*) "blue", PLY_Uint8, PLY_Uint8, offsetof(Vertex,blue), 0, 0, 0, 0},
 	{(char*) "r", PLY_Float32, PLY_Float32, offsetof(Vertex,r), 0, 0, 0, 0},
 	{(char*) "g", PLY_Float32, PLY_Float32, offsetof(Vertex,g), 0, 0, 0, 0},
 	{(char*) "b", PLY_Float32, PLY_Float32, offsetof(Vertex,b), 0, 0, 0, 0},
@@ -57,9 +61,12 @@ PlyImportData::PlyImportData():
 	flist(NULL),
 	vert_other(NULL),
 	face_other(NULL),
-	per_vertex_color(0),
+	per_vertex_color_float32(0),
+	per_vertex_color_uint8(0),
 	has_normals(0)	
 {
+	old_locale = setlocale(LC_NUMERIC, NULL);
+	setlocale(LC_NUMERIC, "C");
 }
 
 PlyImportData::~PlyImportData()
@@ -85,6 +92,7 @@ PlyImportData::~PlyImportData()
 // 	}
 		
 // need to free *vert_other,*face_other ????
+	setlocale(LC_NUMERIC, old_locale);
 }
 	
 	
@@ -126,28 +134,40 @@ bool PlyImportData::read_file(const std::string& filename)
 	  {
 		PlyProperty *prop;
 		prop = in_ply->elems[i]->props[j];
-		if (equal_strings ((char*) "r", prop->name)) {
+		if (equal_strings ((char*) "red", prop->name)) {
 		setup_property_ply (in_ply, &vert_props[3]);
-		per_vertex_color = 1;
+		per_vertex_color_uint8 = 1;
+		}
+		if (equal_strings ((char*) "green", prop->name)) {
+		setup_property_ply (in_ply, &vert_props[4]);
+		per_vertex_color_uint8 = 1;
+		}
+		if (equal_strings ((char*) "blue", prop->name)) {
+		setup_property_ply (in_ply, &vert_props[5]);
+		per_vertex_color_uint8 = 1;
+		}
+		if (equal_strings ((char*) "r", prop->name)) {
+		setup_property_ply (in_ply, &vert_props[6]);
+		per_vertex_color_float32 = 1;
 		}
 		if (equal_strings ((char*) "g", prop->name)) {
-		setup_property_ply (in_ply, &vert_props[4]);
-		per_vertex_color = 1;
+		setup_property_ply (in_ply, &vert_props[7]);
+		per_vertex_color_float32 = 1;
 		}
 		if (equal_strings ((char*) "b", prop->name)) {
-		setup_property_ply (in_ply, &vert_props[5]);
-		per_vertex_color = 1;
+		setup_property_ply (in_ply, &vert_props[8]);
+		per_vertex_color_float32 = 1;
 		}
 		if (equal_strings ((char*) "nx", prop->name)) {
-		setup_property_ply (in_ply, &vert_props[6]);
+		setup_property_ply (in_ply, &vert_props[9]);
 		has_normals = 1;
 		}
 		if (equal_strings ((char*) "ny", prop->name)) {
-		setup_property_ply (in_ply, &vert_props[7]);
+		setup_property_ply (in_ply, &vert_props[10]);
 		has_normals = 1;
 		}
 		if (equal_strings ((char*) "nz", prop->name)) {
-		setup_property_ply (in_ply, &vert_props[8]);
+		setup_property_ply (in_ply, &vert_props[11]);
 		has_normals = 1;
 		}
       }

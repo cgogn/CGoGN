@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -53,33 +53,38 @@ void MapRender::initPrimitives(int prim, std::vector<GLuint>& tableIndices)
 {
 	// indice du VBO a utiliser
 	int vbo_ind = 0;
+	int size = 0;
+
 	switch(prim)
 	{
 		case POINTS:
 			m_nbIndices[POINT_INDICES] = tableIndices.size();
 			vbo_ind = m_indexBuffers[POINT_INDICES];
+			size = m_nbIndices[POINT_INDICES];
 			break;
 		case LINES:
 			m_nbIndices[LINE_INDICES] = tableIndices.size();
 			vbo_ind = m_indexBuffers[LINE_INDICES];
+			size = m_nbIndices[LINE_INDICES];
 			break;
 		case TRIANGLES:
 			m_nbIndices[TRIANGLE_INDICES] = tableIndices.size();
 			vbo_ind = m_indexBuffers[TRIANGLE_INDICES];
+			size = m_nbIndices[TRIANGLE_INDICES];
 			break;
 		case BOUNDARY:
 			m_nbIndices[BOUNDARY_INDICES] = tableIndices.size();
 			vbo_ind = m_indexBuffers[BOUNDARY_INDICES];
+			size = m_nbIndices[BOUNDARY_INDICES];
 			break;
 		default:
 			CGoGNerr << "problem initializing VBO indices" << CGoGNendl;
 			break;
 	}
-	int size = tableIndices.size();
 
 	// setup du buffer d'indices
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, vbo_ind);
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
+	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
 void MapRender::draw(Utils::GLSLShader* sh, int prim)
@@ -112,10 +117,10 @@ void MapRender::draw(Utils::GLSLShader* sh, int prim)
 	sh->disableVertexAttribs();
 }
 
-
 unsigned int MapRender::drawSub(Utils::GLSLShader* sh, int prim, unsigned int nb_elm)
 {
 	sh->enableVertexAttribs();
+
 	switch(prim)
 	{
 		case POINTS:
@@ -144,7 +149,6 @@ unsigned int MapRender::drawSub(Utils::GLSLShader* sh, int prim, unsigned int nb
 	sh->disableVertexAttribs();
 	return nb_elm;
 }
-
 
 } // namespace GL2
 

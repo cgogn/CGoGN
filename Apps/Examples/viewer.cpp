@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -30,6 +30,7 @@ Viewer::Viewer() :
 	m_drawEdges(false),
 	m_drawFaces(true),
 	m_drawNormals(false),
+	m_drawTopo(false),
 	m_render(NULL),
 	m_phongShader(NULL),
 	m_flatShader(NULL),
@@ -68,6 +69,7 @@ void Viewer::initGUI()
 	setCallBack( dock.check_drawEdges, SIGNAL(toggled(bool)), SLOT(slot_drawEdges(bool)) ) ;
 	setCallBack( dock.check_drawFaces, SIGNAL(toggled(bool)), SLOT(slot_drawFaces(bool)) ) ;
 	setCallBack( dock.combo_faceLighting, SIGNAL(currentIndexChanged(int)), SLOT(slot_faceLighting(int)) ) ;
+	setCallBack( dock.check_drawTopo, SIGNAL(toggled(bool)), SLOT(slot_drawTopo(bool)) ) ;
 	setCallBack( dock.check_drawNormals, SIGNAL(toggled(bool)), SLOT(slot_drawNormals(bool)) ) ;
 	setCallBack( dock.slider_normalsSize, SIGNAL(valueChanged(int)), SLOT(slot_normalsSize(int)) ) ;
 }
@@ -79,6 +81,9 @@ void Viewer::cb_initGL()
 	setFocal(5.0f) ;
 
 	m_render = new Algo::Render::GL2::MapRender() ;
+	m_topoRender = new Algo::Render::GL2::TopoRender() ;
+
+	m_topoRender->setInitialDartsColor(0.25f, 0.25f, 0.25f) ;
 
 	m_positionVBO = new Utils::VBO() ;
 	m_normalVBO = new Utils::VBO() ;
@@ -134,14 +139,6 @@ void Viewer::cb_redraw()
 		m_render->draw(m_simpleColorShader, Algo::Render::GL2::LINES) ;
 	}
 
-	if(m_drawNormals)
-	{
-		float size = normalBaseSize * normalScaleFactor ;
-		m_vectorShader->setScale(size) ;
-		glLineWidth(1.0f) ;
-		m_render->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
-	}
-
 	if(m_drawFaces)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) ;
@@ -160,6 +157,19 @@ void Viewer::cb_redraw()
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL) ;
 	}
+
+	if(m_drawTopo)
+	{
+		m_topoRender->drawTopo() ;
+	}
+
+	if(m_drawNormals)
+	{
+		float size = normalBaseSize * normalScaleFactor ;
+		m_vectorShader->setScale(size) ;
+		glLineWidth(1.0f) ;
+		m_render->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+	}
 }
 
 void Viewer::cb_Open()
@@ -175,9 +185,22 @@ void Viewer::cb_Open()
 
 void Viewer::cb_Save()
 {
-	std::string filters("off (*.off)") ;
+	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
-	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+
+	exportMesh(filename) ;
+}
+
+void Viewer::cb_keyPress(int keycode)
+{
+    switch(keycode)
+    {
+    	case 'c' :
+    		myMap.check();
+    		break;
+    	default:
+    		break;
+    }
 }
 
 void Viewer::importMesh(std::string& filename)
@@ -190,7 +213,7 @@ void Viewer::importMesh(std::string& filename)
 	if (extension == std::string(".map"))
 	{
 		myMap.loadMapBin(filename);
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, "position") ;
+		position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
 	else
 	{
@@ -200,20 +223,24 @@ void Viewer::importMesh(std::string& filename)
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
 		}
-		position = myMap.getAttribute<PFP::VEC3>(VERTEX, attrNames[0]) ;
+		position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 	}
 
+	myMap.enableQuickTraversal<VERTEX>() ;
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES) ;
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES) ;
 
+	m_topoRender->updateData<PFP>(myMap, position, 0.85f, 0.85f) ;
+
 	bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	normalBaseSize = bb.diagSize() / 100.0f ;
-//	vertexBaseSize = normalBaseSize /5.0f ;
+//	vertexBaseSize = normalBaseSize / 5.0f ;
 
+	normal = myMap.getAttribute<VEC3, VERTEX>("normal") ;
 	if(!normal.isValid())
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal") ;
+		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
 
 	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
@@ -222,6 +249,29 @@ void Viewer::importMesh(std::string& filename)
 
 	setParamObject(bb.maxSize(), bb.center().data()) ;
 	updateGLMatrices() ;
+}
+
+void Viewer::exportMesh(std::string& filename, bool askExportMode)
+{
+	size_t pos = filename.rfind(".") ;    // position of "." in filename
+	std::string extension = filename.substr(pos) ;
+
+	if (extension == std::string(".off"))
+		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+	else if (extension.compare(0, 4, std::string(".ply")) == 0)
+	{
+		int ascii = 0 ;
+		if (askExportMode)
+			Utils::QT::inputValues(Utils::QT::VarCombo("binary mode;ascii mode",ascii,"Save in")) ;
+
+		std::vector<VertexAttribute<VEC3>*> attributes ;
+		attributes.push_back(&position) ;
+		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
+	}
+	else if (extension == std::string(".map"))
+		myMap.saveMapBin(filename) ;
+	else
+		std::cerr << "Cannot save file " << filename << " : unknown or unhandled extension" << std::endl ;
 }
 
 void Viewer::slot_drawVertices(bool b)
@@ -254,6 +304,12 @@ void Viewer::slot_faceLighting(int i)
 	updateGL() ;
 }
 
+void Viewer::slot_drawTopo(bool b)
+{
+	m_drawTopo = b ;
+	updateGL() ;
+}
+
 void Viewer::slot_drawNormals(bool b)
 {
 	m_drawNormals = b ;
@@ -263,6 +319,7 @@ void Viewer::slot_drawNormals(bool b)
 void Viewer::slot_normalsSize(int i)
 {
 	normalScaleFactor = i / 50.0f ;
+	m_topoRender->updateData<PFP>(myMap, position, i / 100.0f, i / 100.0f) ;
 	updateGL() ;
 }
 
@@ -278,14 +335,22 @@ int main(int argc, char **argv)
 	sqt.setGeometry(0, 0, 1000, 800) ;
  	sqt.show() ;
 
-	if(argc == 2)
+	if(argc >= 2)
 	{
 		std::string filename(argv[1]) ;
 		sqt.importMesh(filename) ;
+		if(argc >= 3)
+		{
+			std::string filenameExp(argv[2]) ;
+			std::cout << "Exporting " << filename << " as " << filenameExp << " ... "<< std::flush ;
+			sqt.exportMesh(filenameExp, false) ;
+			std::cout << "done!" << std::endl ;
+
+			return (0) ;
+		}
 	}
 
 	sqt.initGUI() ;
 
 	return app.exec() ;
 }
-

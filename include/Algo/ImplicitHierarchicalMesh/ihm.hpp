@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,32 +35,32 @@ namespace IHM
  *             ATTRIBUTES MANAGEMENT               *
  ***************************************************/
 
-template <typename T>
-AttributeHandler_IHM<T> ImplicitHierarchicalMap::addAttribute(unsigned int orbit, const std::string& nameAttr)
+template <typename T, unsigned int ORBIT>
+AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap::addAttribute(const std::string& nameAttr)
 {
 	bool addNextLevelCell = false ;
-	if(!isOrbitEmbedded(orbit))
+	if(!isOrbitEmbedded<ORBIT>())
 		addNextLevelCell = true ;
 
-	AttributeHandler<T> h = Map2::addAttribute<T>(orbit, nameAttr) ;
+	AttributeHandler<T, ORBIT> h = Map2::addAttribute<T, ORBIT>(nameAttr) ;
 
 	if(addNextLevelCell)
 	{
-		AttributeContainer& cellCont = m_attribs[orbit] ;
+		AttributeContainer& cellCont = m_attribs[ORBIT] ;
 		AttributeMultiVector<unsigned int>* amv = cellCont.addAttribute<unsigned int>("nextLevelCell") ;
-		m_nextLevelCell[orbit] = amv ;
+		m_nextLevelCell[ORBIT] = amv ;
 		for(unsigned int i = cellCont.begin(); i < cellCont.end(); cellCont.next(i))
 			amv->operator[](i) = EMBNULL ;
 	}
 
-	return AttributeHandler_IHM<T>(this, h.getDataVector()) ;
+	return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
 
-template <typename T>
-AttributeHandler_IHM<T> ImplicitHierarchicalMap::getAttribute(unsigned int orbit, const std::string& nameAttr)
+template <typename T, unsigned int ORBIT>
+AttributeHandler_IHM<T, ORBIT> ImplicitHierarchicalMap::getAttribute(const std::string& nameAttr)
 {
-	AttributeHandler<T> h = Map2::getAttribute<T>(orbit, nameAttr) ;
-	return AttributeHandler_IHM<T>(this, h.getDataVector()) ;
+	AttributeHandler<T, ORBIT> h = Map2::getAttribute<T, ORBIT>(nameAttr) ;
+	return AttributeHandler_IHM<T, ORBIT>(this, h.getDataVector()) ;
 }
 
 /***************************************************
@@ -139,7 +139,7 @@ inline Dart ImplicitHierarchicalMap::alpha_1(Dart d)
 	return Map2::alpha_1(d) ;
 }
 
-inline Dart ImplicitHierarchicalMap::begin()
+inline Dart ImplicitHierarchicalMap::begin() const
 {
 	Dart d = Map2::begin() ;
 	while(d != Map2::end() && m_dartLevel[d] > m_curLevel)
@@ -147,12 +147,12 @@ inline Dart ImplicitHierarchicalMap::begin()
 	return d ;
 }
 
-inline Dart ImplicitHierarchicalMap::end()
+inline Dart ImplicitHierarchicalMap::end() const
 {
 	return Map2::end() ;
 }
 
-inline void ImplicitHierarchicalMap::next(Dart& d)
+inline void ImplicitHierarchicalMap::next(Dart& d) const
 {
 	do
 	{
@@ -254,12 +254,12 @@ inline bool ImplicitHierarchicalMap::foreach_dart_of_cc(Dart d, FunctorType& f, 
 inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
 {
 	EmbeddedMap2::splitFace(d, e) ;
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 	{
 		unsigned int cur = m_curLevel ;
 		m_curLevel = m_maxLevel ;
-		this->embedOrbit(FACE, d, this->getEmbedding(FACE, d)) ;
-		this->embedOrbit(FACE, e, this->getEmbedding(FACE, e)) ;
+		this->embedOrbit<FACE>(d, this->getEmbedding<FACE>(d)) ;
+		this->embedOrbit<FACE>(e, this->getEmbedding<FACE>(e)) ;
 		m_curLevel = cur ;
 	}
 }
@@ -336,8 +336,8 @@ inline unsigned int ImplicitHierarchicalMap::edgeLevel(Dart d)
  *               ATTRIBUTE HANDLER                 *
  ***************************************************/
 
-template <typename T>
-T& AttributeHandler_IHM<T>::operator[](Dart d)
+template <typename T, unsigned int ORBIT>
+T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d)
 {
 	ImplicitHierarchicalMap* m = reinterpret_cast<ImplicitHierarchicalMap*>(this->m_map) ;
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
@@ -345,15 +345,15 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(orbit, d) ;
+	unsigned int index = m->getEmbedding<ORBIT>(d) ;
 
 	if(index == EMBNULL)
 	{
-		index = m->embedNewCell(orbit, d) ;
+		index = m->embedNewCell<ORBIT>(d) ;
 		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
 	}
 
-	AttributeContainer& cont = m->getAttributeContainer(orbit) ;
+	AttributeContainer& cont = m->getAttributeContainer<ORBIT>() ;
 	unsigned int step = 0 ;
 	while(step < nbSteps)
 	{
@@ -361,8 +361,8 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 		unsigned int nextIdx = m->m_nextLevelCell[orbit]->operator[](index) ;
 		if (nextIdx == EMBNULL)
 		{
-			nextIdx = m->newCell(orbit) ;
-			m->copyCell(orbit, nextIdx, index) ;
+			nextIdx = m->newCell<ORBIT>() ;
+			m->copyCell<ORBIT>(nextIdx, index) ;
 			m->m_nextLevelCell[orbit]->operator[](index) = nextIdx ;
 			m->m_nextLevelCell[orbit]->operator[](nextIdx) = EMBNULL ;
 			cont.refLine(index) ;
@@ -372,8 +372,8 @@ T& AttributeHandler_IHM<T>::operator[](Dart d)
 	return this->m_attrib->operator[](index);
 }
 
-template <typename T>
-const T& AttributeHandler_IHM<T>::operator[](Dart d) const
+template <typename T, unsigned int ORBIT>
+const T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d) const
 {
 	ImplicitHierarchicalMap* m = reinterpret_cast<ImplicitHierarchicalMap*>(this->m_map) ;
 	assert(m->m_dartLevel[d] <= m->m_curLevel || !"Access to a dart introduced after current level") ;
@@ -381,7 +381,7 @@ const T& AttributeHandler_IHM<T>::operator[](Dart d) const
 
 	unsigned int orbit = this->getOrbit() ;
 	unsigned int nbSteps = m->m_curLevel - m->vertexInsertionLevel(d) ;
-	unsigned int index = m->getEmbedding(orbit, d) ;
+	unsigned int index = m->getEmbedding<ORBIT>(d) ;
 
 	unsigned int step = 0 ;
 	while(step < nbSteps)

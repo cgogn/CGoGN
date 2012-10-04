@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -44,8 +44,7 @@ std::string Plane3D<T>::CGoGNnameOfType()
 /**********************************************/
 
 template <typename T>
-Plane3D<T>::Plane3D(int d) :
-m_normal(0), m_d(d)
+Plane3D<T>::Plane3D(int d) : m_normal(0), m_d(d)
 { }
 
 template <typename T>
@@ -56,15 +55,13 @@ Plane3D<T>::Plane3D(const Plane3D<T>& p)
 }
 
 template <typename T>
-Plane3D<T>::Plane3D(const Vector<3,T>& n, T d) :
-m_normal(n), m_d(d)
+Plane3D<T>::Plane3D(const Vector<3,T>& n, T d) : m_normal(n), m_d(d)
 {
 	m_normal.normalize();
 }
 
 template <typename T>
-Plane3D<T>::Plane3D(const Vector<3,T>& n, const Vector<3,T>& p) :
-m_normal(n), m_d(-(p*n))
+Plane3D<T>::Plane3D(const Vector<3,T>& n, const Vector<3,T>& p) : m_normal(n), m_d(-(p*n))
 {
 	m_normal.normalize();
 }
@@ -118,7 +115,7 @@ T Plane3D<T>::distance(const Vector<3,T>& p) const
 template <typename T>
 void Plane3D<T>::project(Vector<3,T>& p) const
 {
-#define PRECISION 1e-5
+#define PRECISION 1e-10
 	T d = -distance(p) ;
 	if(abs(d) > PRECISION)
 	{
@@ -131,7 +128,7 @@ void Plane3D<T>::project(Vector<3,T>& p) const
 template <typename T>
 Orientation3D Plane3D<T>::orient(const Vector<3,T>& p) const
 {
-#define PRECISION 1e-5
+#define PRECISION 1e-10
 	T dist = distance(p) ;
 	if(dist < -PRECISION)
 		return UNDER ;

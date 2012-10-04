@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -35,7 +35,7 @@ inline GMap1::GMap1() : GMap0()
 	init() ;
 }
 
-inline std::string GMap1::mapTypeName()
+inline std::string GMap1::mapTypeName() const
 {
 	return "GMap1";
 }
@@ -195,11 +195,11 @@ inline void GMap1::collapseEdge(Dart d)
 	deleteEdge(d) ;
 }
 
-inline void GMap1::splitFace(Dart d, Dart e)
+inline void GMap1::splitCycle(Dart d, Dart e)
 {
-	assert(d != e && sameFace(d, e)) ;
+	assert(d != e && sameCycle(d, e)) ;
 
-	if(!sameOrientedFace(d, e))
+	if(!sameOrientedCycle(d, e))
 		e = beta1(e) ;
 
 	Dart d1 = beta1(d) ;
@@ -210,9 +210,9 @@ inline void GMap1::splitFace(Dart d, Dart e)
 	beta1sew(e, d1) ;
 }
 
-inline void GMap1::mergeFaces(Dart d, Dart e)
+inline void GMap1::mergeCycles(Dart d, Dart e)
 {
-	assert(!sameFace(d, e)) ;
+	assert(!sameCycle(d, e)) ;
 
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
@@ -222,9 +222,9 @@ inline void GMap1::mergeFaces(Dart d, Dart e)
 	beta1sew(e, d1) ;
 }
 
-inline void GMap1::linkFaces(Dart d, Dart e)
+inline void GMap1::linkCycles(Dart d, Dart e)
 {
-	assert(d != e && !sameFace(d, e)) ;
+	assert(d != e && !sameCycle(d, e)) ;
 	Dart d1 = beta1(d) ;
 	Dart e1 = beta1(e) ;
 	Dart dd = newEdge() ;
@@ -241,7 +241,7 @@ inline void GMap1::linkFaces(Dart d, Dart e)
  *  Return or set various topological information
  *************************************************************************/
 
-inline bool GMap1::sameOrientedFace(Dart d, Dart e)
+inline bool GMap1::sameOrientedCycle(Dart d, Dart e)
 {
 	Dart it = d ;
 	do
@@ -253,7 +253,7 @@ inline bool GMap1::sameOrientedFace(Dart d, Dart e)
 	return false ;
 }
 
-inline bool GMap1::sameFace(Dart d, Dart e)
+inline bool GMap1::sameCycle(Dart d, Dart e)
 {
 	Dart it = d ;
 	do
@@ -268,7 +268,7 @@ inline bool GMap1::sameFace(Dart d, Dart e)
 	return false ;
 }
 
-inline unsigned int GMap1::faceDegree(Dart d)
+inline unsigned int GMap1::cycleDegree(Dart d)
 {
 	unsigned int count = 0 ;
 	Dart it = d ;
@@ -280,7 +280,7 @@ inline unsigned int GMap1::faceDegree(Dart d)
 	return count ;
 }
 
-inline bool GMap1::isFaceTriangle(Dart d)
+inline bool GMap1::isCycleTriangle(Dart d)
 {
 	return (phi1(d) != d) && (phi1(phi1(phi1(d))) == d) ;
 }
@@ -305,7 +305,7 @@ inline bool GMap1::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thr
 	return false;
 }
 
-inline bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread)
+inline bool GMap1::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d ;
 	do
@@ -317,19 +317,21 @@ inline bool GMap1::foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigne
 	return false ;
 }
 
-inline bool GMap1::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_oriented_face(d, f, thread) || foreach_dart_of_oriented_face(beta0(d), f, thread) ;
-}
-
-inline bool GMap1::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
-{
-	return foreach_dart_of_face(d, f, thread) ;
-}
-
 inline bool GMap1::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
-	return foreach_dart_of_face(d, f, thread) ;
+	return GMap1::foreach_dart_of_oriented_cc(d, f, thread) || GMap1::foreach_dart_of_oriented_cc(beta0(d), f, thread) ;
+
+//	Dart it = d ;
+//	do
+//	{
+//		if (f(it))
+//			return true ;
+//		it = beta0(it);
+//		if (f(it))
+//			return true ;
+//		it = beta1(it) ;
+//	} while (it != d) ;
+//	return false ;
 }
 
 } // namespace CGoGN

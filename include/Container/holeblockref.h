@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -27,6 +27,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <assert.h>
 
 #include "Container/sizeblock.h"
 
@@ -49,7 +50,7 @@ protected:
 	unsigned int m_nbref;
 
 	/**
-	* nb element in block
+	* nb elements in block
 	*/
 	unsigned int m_nb;
 
@@ -58,6 +59,11 @@ public:
 	* constructor
 	*/
 	HoleBlockRef();
+
+	/**
+	 * copy constructor
+	 */
+	HoleBlockRef(const HoleBlockRef& hb);
 
 	/**
 	* destructor
@@ -149,6 +155,7 @@ public:
 	*/
 	inline bool unref(unsigned int i)
 	{
+//		assert(m_refCount[i] > 1);
 		m_refCount[i]--;
 		if (m_refCount[i] == 1)
 		{
@@ -165,7 +172,7 @@ public:
 
 	/**
 	* number of references of element i
-	* @return the number of references (0 = no elements)
+	* @return the number of references +1 (stored as n+1, 0 = not used, 1 used but not refs, ...)
 	*/
 	inline unsigned int nbRefs(unsigned int i) { return m_refCount[i]; }
 

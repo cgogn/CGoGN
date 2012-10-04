@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: http://cgogn.u-strasbg.fr/                                         *
+ * Web site: http://cgogn.unistra.fr/                                           *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -131,6 +131,8 @@ FrameManipulator::FrameManipulator():
 
 	m_vboPos->bind();
 	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Geom::Vec3f), &(points[0]), GL_STREAM_DRAW);
+
+	setLengthAxes();
 }
 
 void FrameManipulator::setSize(float radius)
@@ -862,14 +864,19 @@ float FrameManipulator::distanceFromMouse(int dx, int dy)
 
 float FrameManipulator::scaleFromMouse(int dx, int dy)
 {
-	Geom::Vec3f dV(float(dx), float(dy), 0.0f);
-	float sc = dV*m_projectedSelectedAxis;
-	if (sc>0)
-		sc = dV.norm()/100.0f;
-	else
-		sc = dV.norm()/-100.0f;
 
-	return 1.0f + sc;
+	if (abs(dx) > abs(dy))
+	{
+		if (dx>0)
+			return 1.01;
+		return 0.99;
+	}
+	else
+	{
+		if (dy>0)
+			return 1.01;
+		return 0.99;
+	}
 }
 
 void FrameManipulator::translateInScreen(int dx, int dy)

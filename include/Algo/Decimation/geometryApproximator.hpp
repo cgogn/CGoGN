@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -38,7 +38,7 @@ namespace Decimation
 template <typename PFP>
 bool Approximator_QEM<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
+	m_quadric = this->m_map.template getAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
 
 	if(this->m_predictor)
 	{
@@ -64,7 +64,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q1 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != d) ;
 
 		// compute the error quadric associated to v2
@@ -73,7 +73,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q2 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != dd) ;
 	}
 	else // if the selector is QEM, use the error quadrics computed by the selector
@@ -112,7 +112,7 @@ void Approximator_QEM<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_QEMhalfEdge<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Quadric<REAL> >(VERTEX, "QEMquadric") ;
+	m_quadric = this->m_map.template getAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
 
 	if(this->m_predictor)
 	{
@@ -138,7 +138,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q1 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != d) ;
 
 		// compute the error quadric associated to v2
@@ -147,7 +147,7 @@ void Approximator_QEMhalfEdge<PFP>::approximate(Dart d)
 		{
 			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
 			q2 += q ;
-			it = m.alpha1(it) ;
+			it = m.phi2_1(it) ;
 		} while(it != dd) ;
 	}
 	else // if the selector is QEM, use the error quadrics computed by the selector
@@ -207,11 +207,11 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 		Dart d2 = m.phi2(m.phi_1(d)) ;
 		Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
-		VEC3 v2 = this->m_attrV[dd] ;
+		// VEC3 v2 = this->m_attrV[dd] ;
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.embedNewCell(VERTEX, d2) ;
+		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
 		this->m_attrV[newV] = this->m_approx[d] ;
 
 		// compute the detail vector
@@ -220,8 +220,8 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.embedOrbit(VERTEX, d, m.getEmbedding(VERTEX, d)) ;
-		m.embedOrbit(VERTEX, dd, m.getEmbedding(VERTEX, dd)) ;
+		m.template embedOrbit<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
+		m.template embedOrbit<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
 	}
 }
 
@@ -259,7 +259,7 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.embedNewCell(VERTEX, d2) ;
+		unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
 		this->m_attrV[newV] = this->m_approx[d] ;
 
 		// compute the detail vector
@@ -268,8 +268,8 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// vertex split to reset the initial connectivity and embeddings
 		m.insertTrianglePair(d, d2, dd2) ;
-		m.embedOrbit(VERTEX, d, m.getEmbedding(VERTEX, d)) ;
-		m.embedOrbit(VERTEX, dd, m.getEmbedding(VERTEX, dd)) ;
+		m.template embedOrbit<VERTEX>(d, m.template getEmbedding<VERTEX>(d)) ;
+		m.template embedOrbit<VERTEX>(dd, m.template getEmbedding<VERTEX>(dd)) ;
 	}
 }
 
@@ -297,9 +297,9 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 
 	// get some darts
 	Dart dd = m.phi2(d) ;
-	Dart d1 = m.phi2(m.phi1(d)) ;
+	// Dart d1 = m.phi2(m.phi1(d)) ;
 	Dart d2 = m.phi2(m.phi_1(d)) ;
-	Dart dd1 = m.phi2(m.phi1(dd)) ;
+	// Dart dd1 = m.phi2(m.phi1(dd)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 
 	// get the contracted edge vertices positions
@@ -312,14 +312,14 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	do
 	{
 		++k1 ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while(it != d) ;
 	REAL k2 = 0 ;
 	it = dd ;
 	do
 	{
 		++k2 ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 	} while(it != dd) ;
 	REAL alpha = (k1-1) * (k2-1) / (k1*k2-1) ;
 
@@ -330,7 +330,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	do
 	{
 		m1 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != d) ;
 	m1 /= REAL(count) ;
@@ -342,7 +342,7 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	do
 	{
 		m2 += this->m_attrV[m.phi1(it)] ;
-		it = m.alpha1(it) ;
+		it = m.phi2_1(it) ;
 		++count ;
 	} while (it != dd) ;
 	m2 /= REAL(count) ;

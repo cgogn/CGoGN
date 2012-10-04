@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -49,7 +49,7 @@ namespace Geometry
 * @param attributs the vector of attribute or cell
 */
 template <typename PFP, typename EMBV, typename EMB>
-EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs);
+EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs, unsigned int thread = 0);
 
 /**
 * Compute volume centroid
@@ -59,9 +59,9 @@ EMB volumeCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs);
  * @param position the vector of attribute
  */
 template <typename PFP>
-typename PFP::VEC3 volumeCentroid(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::VEC3 volumeCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, unsigned int thread = 0)
 {
-	return volumeCentroidGen<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, d, position);
+	return volumeCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position, thread);
 }
 
 /**
@@ -85,9 +85,9 @@ EMB faceCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs);
  * @param position the vector of attribute
  */
 template <typename PFP>
-typename PFP::VEC3 faceCentroid(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::VEC3 faceCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
-	return faceCentroidGen<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, d, position);
+	return faceCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position);
 }
 
 /**
@@ -110,19 +110,44 @@ EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& at
  * @param position the vector of attribute
  */
 template <typename PFP>
-typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
-	return vertexNeighborhoodCentroidGen<PFP, typename PFP::TVEC3, typename PFP::VEC3>(map, d, position);
+	return vertexNeighborhoodCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position);
 }
 
 template <typename PFP>
-void computeCentroidVolumes(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vol_centroid, const FunctorSelect& select = allDarts) ;
+void computeCentroidVolumes(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
+		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeCentroidFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& face_centroid, const FunctorSelect& select = allDarts) ;
+void computeCentroidFaces(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
+		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
 
 template <typename PFP>
-void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TVEC3& vertex_centroid, const FunctorSelect& select = allDarts) ;
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
+		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+
+namespace Parallel
+{
+template <typename PFP>
+void computeCentroidVolumes(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
+		const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+
+template <typename PFP>
+void computeCentroidFaces(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
+		const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+
+template <typename PFP>
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
+		const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+}
 
 } // namespace Geometry
 

@@ -3,7 +3,7 @@ installer les paquets suivants:
 cmake libXi-dev libXmu-dev libglew-dev libxml2-dev libboost-all-dev zlib1g-dev qt4-designer qt4-dev-tools uuid-dev
 
 Pour compiler CGoGN:
-- aller dans ThirdParty, cd build, taper "cmake ..", puis make ( avec -j x si vous avez x core sur votre machine)
+- aller dans ThirdParty, cd build, taper "cmake .", puis make ( avec -j x si vous avez x core sur votre machine)
 	On peut fixer certaines option pour ne pas tout compiler (cf le README.TXT dans ThirdParty)
 	On peut aussi compiler en debug en créant un répertoir qui fini par Debug à la place de build
 	
@@ -15,6 +15,13 @@ Pour compiler CGoGN:
 	WITH_ZINRI         (T)
 	WITH_QT	           (T)
 	afin de limiter les dépendances et le temps de compilation/
+	
+	FORCE_MR           (2)
+	permet de compiler dans 3 modes: mixte (0), multi-resolution(1), mono-resolution(2).
+	
+	ONELIB             (F)
+	permet de forcer la compilation en une seule lib (libcgogn.a) au lieu de quatre.
+	
 	
 
 - la compilation des sous-parties se fait en allant dans les sous-repertoires de build
@@ -49,6 +56,12 @@ You can also compile debug by creating a directory that ended Debug build instea
 	WITH_ZINRI (T)
 	WITH_QT (T)
 	to minimize dependencies and compilation time /
+	
+	FORCE_MR           (2)
+	allow the compilation in 3 mode: mixed(0), multi-resolution(1), mono-resolution(2).
+	
+	ONELIB             (F)
+	allow compilation in one lib (libcgogn.a) instead of four.
 
 
 - the compilation of each sub-parts is done by going in the subdirectories of build

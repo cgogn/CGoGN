@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -59,10 +59,10 @@ void GMap2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 
 Dart GMap2::newFace(unsigned int nbEdges, bool withBoundary)
 {
-	Dart d = GMap1::newFace(nbEdges);
+	Dart d = GMap1::newCycle(nbEdges);
 	if (withBoundary)
 	{
-		Dart e = GMap1::newFace(nbEdges);
+		Dart e = GMap1::newBoundaryCycle(nbEdges);
 
 		Dart it = d;
 		do
@@ -87,8 +87,8 @@ void GMap2::deleteFace(Dart d)
 		it = phi1(it) ;
 	} while(it != d) ;
 	Dart dd = phi2(d) ;
-	GMap1::deleteFace(d) ;
-	GMap1::deleteFace(dd) ;
+	GMap1::deleteCycle(d) ;
+	GMap1::deleteCycle(dd) ;
 }
 
 void GMap2::deleteCC(Dart d)
@@ -132,7 +132,7 @@ void GMap2::fillHole(Dart d)
 	Dart dd = d ;
 	if(!isBoundaryMarked(dd))
 		dd = phi2(dd) ;
-	boundaryUnmarkOrbit(FACE, dd) ;
+	boundaryUnmarkOrbit<FACE>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -183,7 +183,7 @@ Dart GMap2::deleteVertex(Dart d)
 
 		vit = alpha1(vit) ;
 	} while(vit != d) ;
-	GMap1::deleteFace(d) ;
+	GMap1::deleteCycle(d) ;
 	return res ;
 }
 
@@ -366,7 +366,7 @@ void GMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 		beta1sew(beta0(dd), ee) ;
 		beta1sew(ddN, ee1) ;
 	}
-	GMap1::deleteFace(dd) ;
+	GMap1::deleteCycle(dd) ;
 
 	beta2sew(d, beta0(e)) ; // sew the faces
 	beta2sew(e, beta0(d)) ;
@@ -378,7 +378,7 @@ void GMap2::unsewFaces(Dart d)
 
 	Dart dd = phi2(d);
 
-	Dart e = newBoundaryFace(2);
+	Dart e = GMap1::newBoundaryCycle(2);
 	Dart ee = phi1(e) ;
 
 	Dart f = findBoundaryEdgeOfVertex(d) ;
@@ -436,9 +436,9 @@ bool GMap2::collapseDegeneratedFace(Dart d)
 			beta1unsew(d2N) ;
 			beta1sew(d21, d2N) ;
 			beta1sew(d2, beta0(d2)) ;
-			GMap1::deleteFace(d2) ;
+			GMap1::deleteCycle(d2) ;
 		}
-		GMap1::deleteFace(d) ;
+		GMap1::deleteCycle(d) ;
 		return true ;
 	}
 	return false ;
@@ -454,14 +454,16 @@ void GMap2::splitFace(Dart d, Dart e)
 	Dart dprev = phi_1(d) ;
 	Dart eprev = phi_1(e) ;
 
+	//required to unsew and resew because we use GMap1 cutEdge
+	//which insert new darts within the cut edge
 	beta2unsew(beta1(d)) ;
 	beta2unsew(beta1(e)) ;
 
-	GMap1::cutEdge(phi_1(d)) ;
-	GMap1::cutEdge(phi_1(e)) ;
-	GMap1::splitFace(phi_1(d), phi_1(e)) ;
-	beta2sew(phi_1(d), beta1(e)) ;
-	beta2sew(phi_1(e), beta1(d)) ;
+	Dart dd = GMap1::cutEdge(phi_1(d)) ;
+	Dart ee = GMap1::cutEdge(phi_1(e)) ;
+	GMap1::splitCycle(dd, ee) ;
+	beta2sew(dd, beta1(e)) ;
+	beta2sew(ee, beta1(d)) ;
 
 	beta2sew(beta0(dprev), beta0(beta2(dprev))) ;
 	beta2sew(beta0(eprev), beta0(beta2(eprev))) ;
@@ -474,9 +476,9 @@ bool GMap2::mergeFaces(Dart d)
 		Dart e = phi2(d) ;
 		beta2unsew(d) ;
 		beta2unsew(e) ;
-		GMap1::mergeFaces(d, phi1(e)) ;
-		GMap1::mergeFaces(e, phi1(d)) ;
-		GMap1::deleteFace(d) ;
+		GMap1::mergeCycles(d, phi1(e)) ;
+		GMap1::splitCycle(e, phi1(d)) ;
+		GMap1::deleteCycle(d) ;
 		return true ;
 	}
 	return false ;
@@ -532,25 +534,6 @@ void GMap2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	beta2sew(beta0(phi1(e)), vv2) ;
 }
 
-void GMap2::unsewAroundVertex(Dart d)
-{
-	Dart it = d ;
-	do
-	{
-		Dart temp = phi1(it) ;
-		Dart e_1 = phi_1(it) ;
-
-		do
-		{
-			unsewFaces(temp) ;
-			temp = phi1(temp) ;
-		} while(temp != e_1);
-
-		it = alpha1(it);
-	}
-	while(it != d);
-}
-
 bool GMap2::mergeVolumes(Dart d, Dart e)
 {
 	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
@@ -597,10 +580,30 @@ bool GMap2::mergeVolumes(Dart d, Dart e)
 		beta2sew(d2, beta0(e2));	// Link the two adjacent faces together
 		beta2sew(e2, beta0(d2));
 	}
-	GMap1::deleteFace(d);		// Delete the two alone faces
-	GMap1::deleteFace(e);
+	GMap1::deleteCycle(d);		// Delete the two alone faces
+	GMap1::deleteCycle(e);
 
 	return true ;
+}
+
+void GMap2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
+{
+	//assert(checkSimpleOrientedPath(vd)) ;
+	Dart e = vd.front() ;
+	Dart e2 = phi2(e) ;
+
+	//unsew the edge path
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		if(!GMap2::isBoundaryEdge(*it))
+			unsewFaces(*it) ;
+	}
+
+	if(firstSideClosed)
+		GMap2::fillHole(e) ;
+
+	if(secondSideClosed)
+		GMap2::fillHole(e2) ;
 }
 
 /*! @name Topological Queries
@@ -781,7 +784,8 @@ bool GMap2::checkSimpleOrientedPath(std::vector<Dart>& vd)
 	{
 		if(dm.isMarked(*it))
 			return false ;
-		dm.markOrbit(VERTEX, *it) ;
+		
+		dm.markOrbit<VERTEX>(*it) ;
 
 		std::vector<Dart>::iterator prev ;
 		if(it == vd.begin())
@@ -811,6 +815,17 @@ bool GMap2::foreach_dart_of_oriented_vertex(Dart d, FunctorType& f, unsigned int
  	return false;
 }
 
+bool GMap2::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+{
+	if (f(d))
+		return true ;
+	Dart e = beta2(beta0(d)) ;
+	if (f(e))
+		return true ;
+
+	return false ;
+}
+
 bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	if (f(d))
@@ -828,7 +843,7 @@ bool GMap2::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 	return false ;
 }
 
-bool GMap2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+bool GMap2::foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
@@ -905,19 +920,24 @@ unsigned int GMap2::closeHole(Dart d, bool forboundary)
 	beta1sew(prev, beta0(first)) ;
 
 	if(forboundary)
-		boundaryMarkOrbit(FACE, phi2(d));
+		boundaryMarkOrbit<FACE>(phi2(d));
 
 	return countEdges ;
 }
 
-void GMap2::closeMap()
+unsigned int GMap2::closeMap()
 {
 	// Search the map for topological holes (fix points of phi2)
+	unsigned int nb = 0 ;
 	for (Dart d = begin(); d != end(); next(d))
 	{
 		if (beta2(d) == d)
+		{
+			++nb ;
 			closeHole(d);
+		}
 	}
+	return nb ;
 }
 
 } // namespace CGoGN

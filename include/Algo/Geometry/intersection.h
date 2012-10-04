@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -46,7 +46,7 @@ namespace Geometry
  * @return true if segment intersects the face
  */
 template <typename PFP>
-bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter) ;
+bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& P, const typename PFP::VEC3& Dir, typename PFP::VEC3& Inter) ;
 
 /**
  * test the intersection between a segment and a n-sided face (n>=3)
@@ -60,7 +60,7 @@ bool intersectionLineConvexFace(typename PFP::MAP& map, Dart d, const typename P
  * @return true if segment intersects the face
  */
 template <typename PFP>
-bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter) ;
+bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& PA, const typename PFP::VEC3& PB, typename PFP::VEC3& Inter) ;
 
 /**
  * test if two triangles intersect
@@ -70,7 +70,7 @@ bool intersectionSegmentConvexFace(typename PFP::MAP& map, Dart d, const typenam
  * @param a dart of the second triangle
  */
 template <typename PFP>
-bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const typename PFP::TVEC3& position) ;
+bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, const VertexAttribute<typename PFP::VEC3>& position) ;
 
 /**
  * alpha = coef d'interpolation dans [0 ,1] tel que v = (1-alpha)*pin + alpha*pout
@@ -79,7 +79,7 @@ bool areTrianglesInIntersection(typename PFP::MAP& map, Dart tri1, Dart tri2, co
  * avec pout = position[phi1(d)] à l'extérieur de la sphère
  */
 template <typename PFP>
-bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const typename PFP::TVEC3& position, typename PFP::REAL& alpha) ;
+bool intersectionSphereEdge(typename PFP::MAP& map, typename PFP::VEC3& center, typename PFP::REAL radius, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::REAL& alpha) ;
 
 } // namespace Geometry
 

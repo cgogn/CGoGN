@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -27,8 +27,20 @@
 
 #include <iostream>
 
-#include "Utils/Qt/qtSimple.h"
+
+#include "Topology/generic/parameters.h"
+#include "Topology/map/embeddedMap3.h"
+
+#include "Geometry/vector_gen.h"
+#include "Algo/Geometry/boundingbox.h"
+#include "Algo/Render/GL2/mapRender.h"
+
+#include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/Shaders/shaderVectorPerVertex.h"
 #include "Utils/cgognStream.h"
+#include "Utils/Qt/qtSimple.h"
+
+
 
 // forward definitions (minimize includes)
 namespace CGoGN { namespace Algo { namespace Render { namespace GL1 { class MapRender; } } } }
@@ -45,21 +57,67 @@ class MyQT: public Utils::QT::SimpleQT
 	Q_OBJECT
 
 public:
-	MyQT()
+	Algo::Render::GL2::MapRender* m_render;
+
+	Utils::VBO* m_positionVBO;
+	Utils::VBO* m_normalVBO;
+
+	Utils::ShaderSimpleColor* m_shader;
+	Utils::ShaderVectorPerVertex* m_lines;
+
+
+
+	MyQT():
+		m_render(NULL),
+		m_positionVBO(NULL),
+		m_normalVBO(NULL),
+		m_shader(NULL),
+		m_lines(NULL)
 	{}
 
-	// callbacks of simpleQT to overdefine:
+protected:
+
 	void cb_redraw();
 
 	void cb_initGL();
 
-	void cb_Open();
+	void threadSimple();
 
-	void cb_New();
+	void threadAttrib();
 
-// callbacks (slots) locally defined
-public slots:
-	void menu_slot1();
+	void threadStorage();
+
+	void cb_keyPress(int code);
+
 };
+
+
+
+
+
+
+
+
+//class MyQT: public Utils::QT::SimpleQT
+//{
+//	Q_OBJECT
+//
+//public:
+//	MyQT()
+//	{}
+//
+//	// callbacks of simpleQT to overdefine:
+//	void cb_redraw();
+//
+//	void cb_initGL();
+//
+//	void cb_Open();
+//
+//	void cb_New();
+//
+//// callbacks (slots) locally defined
+//public slots:
+//	void menu_slot1();
+//};
 
 #endif

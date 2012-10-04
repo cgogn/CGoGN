@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: http://cgogn.u-strasbg.fr/                                         *
+ * Web site: http://cgogn.unistra.fr/                                           *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -37,7 +37,7 @@ namespace Geometry
 {
 
 template <typename PFP>
-typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 p1 = position[d] ;
 	typename PFP::VEC3 p2 = position[map.phi1(d)] ;
@@ -47,7 +47,7 @@ typename PFP::REAL triangleArea(typename PFP::MAP& map, Dart d, const typename P
 }
 
 template <typename PFP>
-typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typedef typename PFP::VEC3 VEC3 ;
 
@@ -69,7 +69,7 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const typename
 }
 
 template <typename PFP>
-typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& position, const FunctorSelect& select, unsigned int thread)
+typename PFP::REAL totalArea(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select, unsigned int thread)
 {
 	typename PFP::REAL area(0) ;
 	TraversorF<typename PFP::MAP> t(map, select) ;
@@ -79,7 +79,7 @@ typename PFP::REAL totalArea(typename PFP::MAP& map, const typename PFP::TVEC3& 
 }
 
 template <typename PFP>
-typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::REAL area(0) ;
 	Traversor2VF<typename PFP::MAP> t(map, d) ;
@@ -89,7 +89,7 @@ typename PFP::REAL vertexOneRingArea(typename PFP::MAP& map, Dart d, const typen
 }
 
 template <typename PFP>
-typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::REAL area(0) ;
 	Traversor2VF<typename PFP::MAP> t(map, d) ;
@@ -99,7 +99,7 @@ typename PFP::REAL vertexBarycentricArea(typename PFP::MAP& map, Dart d, const t
 }
 
 template <typename PFP>
-typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::REAL area(0) ;
 	Traversor2VF<typename PFP::MAP> t(map, d) ;
@@ -127,7 +127,7 @@ typename PFP::REAL vertexVoronoiArea(typename PFP::MAP& map, Dart d, const typen
 }
 
 template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& face_area, const FunctorSelect& select)
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& face_area, const FunctorSelect& select)
 {
 	TraversorF<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -135,7 +135,7 @@ void computeAreaFaces(typename PFP::MAP& map, const typename PFP::TVEC3& positio
 }
 
 template <typename PFP>
-void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -143,7 +143,7 @@ void computeOneRingAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC
 }
 
 template <typename PFP>
-void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
+void computeBarycentricAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
@@ -151,12 +151,96 @@ void computeBarycentricAreaVertices(typename PFP::MAP& map, const typename PFP::
 }
 
 template <typename PFP>
-void computeVoronoiAreaVertices(typename PFP::MAP& map, const typename PFP::TVEC3& position, typename PFP::TREAL& vertex_area, const FunctorSelect& select)
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& vertex_area, const FunctorSelect& select)
 {
 	TraversorV<typename PFP::MAP> t(map, select) ;
 	for(Dart d = t.begin(); d != t.end(); d = t.next())
 		vertex_area[d] = vertexVoronoiArea<PFP>(map, d, position) ;
 }
+
+
+namespace Parallel
+{
+template <typename PFP>
+class FunctorConvexFaceArea: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 FaceAttribute<typename PFP::REAL>& m_area;
+public:
+	 FunctorConvexFaceArea<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& area):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_area(area)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_area[d] = convexFaceArea<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorConvexFaceArea<PFP> funct(map,position,area);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select, current_thread);
+}
+
+
+template <typename PFP>
+class FunctorVertexOneRingArea: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VertexAttribute<typename PFP::REAL>& m_area;
+public:
+	 FunctorVertexOneRingArea<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_area(area)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_area[d] = vertexOneRingArea<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorConvexFaceArea<PFP> funct(map,position,area);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+}
+
+
+
+template <typename PFP>
+class FunctorVertexVoronoiArea: public FunctorMapThreaded<typename PFP::MAP >
+{
+	 const VertexAttribute<typename PFP::VEC3>& m_position;
+	 VertexAttribute<typename PFP::REAL>& m_area;
+public:
+	 FunctorVertexVoronoiArea<PFP>( typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area):
+	 	 FunctorMapThreaded<typename PFP::MAP>(map), m_position(position), m_area(area)
+	 { }
+
+	void run(Dart d, unsigned int threadID)
+	{
+		m_area[d] = vertexVoronoiArea<PFP>(this->m_map, d, m_position) ;
+	}
+};
+
+template <typename PFP>
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+{
+	FunctorConvexFaceArea<PFP> funct(map,position,area);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+}
+
+
+}
+
+
+
+
+
+
 
 } // namespace Geometry
 

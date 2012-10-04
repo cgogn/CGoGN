@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -40,12 +40,12 @@ enum neighborhood { INSIDE = 1, BORDER = 2 };
 template <typename PFP, typename T>
 void filterAverageAttribute_OneRing(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const VertexAttribute<T>& attIn,
+	VertexAttribute<T>& attOut,
 	int neigh,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> fa(attIn) ;
+	FunctorAverage<T, VERTEX> fa(attIn) ;
 	Algo::Selection::Collector_OneRing<PFP> col(map) ;
 
 	TraversorV<typename PFP::MAP> t(map, select) ;
@@ -86,14 +86,14 @@ void filterAverageAttribute_OneRing(
 template <typename PFP, typename T>
 void filterAverageVertexAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const VertexAttribute<T>& attIn,
+	VertexAttribute<T>& attOut,
 	int neigh,
-	typename PFP::TVEC3 & position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> faInside(attIn) ;
+	FunctorAverage<T, VERTEX> faInside(attIn) ;
 	FunctorAverageOnSphereBorder<PFP, T> faBorder(map, attIn, position) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
@@ -128,14 +128,14 @@ void filterAverageVertexAttribute_WithinSphere(
 template <typename PFP, typename T>
 void filterAverageEdgeAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const EdgeAttribute<T>& attIn,
+	EdgeAttribute<T>& attOut,
 	int neigh,
-	typename PFP::TVEC3 & position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> fa(attIn) ;
+	FunctorAverage<T, EDGE> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorE<typename PFP::MAP> t(map, select) ;
@@ -156,14 +156,14 @@ void filterAverageEdgeAttribute_WithinSphere(
 template <typename PFP, typename T>
 void filterAverageFaceAttribute_WithinSphere(
 	typename PFP::MAP& map,
-	const AttributeHandler<T>& attIn,
-	AttributeHandler<T>& attOut,
+	const FaceAttribute<T>& attIn,
+	FaceAttribute<T>& attOut,
 	int neigh,
-	typename PFP::TVEC3 & position,
+	VertexAttribute<typename PFP::VEC3>& position,
 	typename PFP::REAL radius,
 	const FunctorSelect& select = allDarts)
 {
-	FunctorAverage<T> fa(attIn) ;
+	FunctorAverage<T, FACE> fa(attIn) ;
 	Algo::Selection::Collector_WithinSphere<PFP> col(map, position, radius) ;
 
 	TraversorF<typename PFP::MAP> t(map, select) ;

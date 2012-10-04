@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -55,7 +55,7 @@ namespace Modelisation
 * size of vector must be the same as path
 */
 template<typename PFP>
-Dart extrusion_scale(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Dart extrusion_scale(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normalProfile,
@@ -79,7 +79,7 @@ Dart extrusion_scale(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
 * size of vector must be the same as path
 */
 template<typename PFP>
-Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normalProfile,
@@ -103,7 +103,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, typename PFP::
 * size of vector must be the same as path
 */
 template<typename PFP>
-Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normalProfile,
@@ -124,7 +124,7 @@ Polyhedron<PFP>* extrusion_prim(typename PFP::MAP& the_map, typename PFP::TVEC3&
 * size of vector must be the same as path
 */
 template<typename PFP>
-Dart extrusion(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Dart extrusion(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& centerProfile,
 	const typename PFP::VEC3& normal,
@@ -143,7 +143,7 @@ Dart extrusion(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
 * @param nbSide number of steps around the revolution
 */
 template<typename PFP>
-Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& center,
 	const typename PFP::VEC3& axis,
@@ -161,7 +161,7 @@ Polyhedron<PFP>* revolution_prim(typename PFP::MAP& the_map, typename PFP::TVEC3
 * @param nbSide number of steps around the revolution
 */
 template<typename PFP>
-Dart revolution(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Dart revolution(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	const std::vector<typename PFP::VEC3>& profile,
 	const typename PFP::VEC3& center,
 	const typename PFP::VEC3& axis,
@@ -178,7 +178,7 @@ Dart revolution(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
 * @param nbSide number of steps around the revolution
 */
 template<typename PFP>
-Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	Dart d,	const typename PFP::VEC3& N);
 
 /**
@@ -191,7 +191,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
 * @param nbSide number of steps around the revolution
 */
 template<typename PFP>
-Dart extrudeFace(typename PFP::MAP& the_map, typename PFP::TVEC3& positions,
+Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>& positions,
 	Dart d,	float dist);
 
 } // namespace Modelisation

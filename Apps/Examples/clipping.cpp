@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -137,21 +137,21 @@ void Clipping::slot_drawFaces(bool b)
 void Clipping::slot_explodTopoPhi1(double c)
 {
 	m_coeffTopoExplod[0] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
 	updateGL();
 }
 
 void Clipping::slot_explodTopoPhi2(double c)
 {
 	m_coeffTopoExplod[1] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
 	updateGL();
 }
 
 void Clipping::slot_explodTopoPhi3(double c)
 {
 	m_coeffTopoExplod[2] = (float)c;
-	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
 	updateGL();
 }
 
@@ -726,8 +726,6 @@ void Clipping::initGUI()
 	m_planeDrawable->getPrecisionDrawing(planesPrecision1, planesPrecision2);
 	dock.spinBox_GridResolution->setValue(planesPrecision1);
 
-
-
 	setCallBack(dock.pushButton_addSphere, SIGNAL(clicked()), SLOT(slot_pushButton_addSphere()));
 
 	setCallBack(dock.spinBox_SphereResolution, SIGNAL(valueChanged(int)), SLOT(slot_spinBox_SphereResolution(int)));
@@ -736,8 +734,6 @@ void Clipping::initGUI()
 	unsigned int spheresPrecision1, spheresPrecision2;
 	m_sphereDrawable->getPrecisionDrawing(spheresPrecision1, spheresPrecision2);
 	dock.spinBox_SphereResolution->setValue(spheresPrecision1);
-
-
 
 	setCallBack(dock.doubleSpinBox_ColorAttenuationFactor, SIGNAL(valueChanged(double)), SLOT(slot_doubleSpinBox_ColorAttenuationFactor(double)));
 	setCallBack(dock.radioButton_ClippingModeAnd, SIGNAL(toggled(bool)), SLOT(slot_radioButton_ClippingMode(bool)));
@@ -755,14 +751,12 @@ void Clipping::initGUI()
 	else if (colorAttMode == Utils::ClippingShader::COLOR_ATTENUATION_MODE_QUADRATIC)
 		dock.radioButton_ColorAttenuationModeQuadratic->setChecked(true);
 
-
 	setCallBack(dock.PushButton_ApplyStaticClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyStaticClippingPreset()));
 
 	dock.comboBox_StaticClippingPresets->addItem("Dual Planes");
 	dock.comboBox_StaticClippingPresets->addItem("Cube");
 	dock.comboBox_StaticClippingPresets->addItem("Tube");
 	dock.comboBox_StaticClippingPresets->addItem("Molecule");
-
 
 	setCallBack(dock.PushButton_ApplyAnimatedClippingPreset, SIGNAL(clicked()), SLOT(slot_pushButton_applyAnimatedClippingPreset()));
 
@@ -777,7 +771,6 @@ void Clipping::initGUI()
 	// timer used for animation
 	m_timer = new QTimer( this );
 	setCallBack( m_timer, SIGNAL(timeout()), SLOT(slot_animationTimer()) );
-
 }
 
 void Clipping::cb_Open()
@@ -804,7 +797,7 @@ void Clipping::importMesh(std::string& filename)
 			return;
 		}
 		else
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+			position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	else if(extension == std::string(".ts"))
 	{
@@ -814,7 +807,7 @@ void Clipping::importMesh(std::string& filename)
 			return;
 		}
 		else
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX , attrNames[0]) ;
+			position = myMap.getAttribute<VEC3, VERTEX>(attrNames[0]) ;
 	}
 	if(extension == std::string(".map"))
 	{
@@ -824,13 +817,12 @@ void Clipping::importMesh(std::string& filename)
 			return;
 		}
 		else
-			position = myMap.getAttribute<PFP::VEC3>(VERTEX , "position") ;
+			position = myMap.getAttribute<VEC3, VERTEX>("position") ;
 	}
-
 
 	updateVBOprimitives(Algo::Render::GL2::TRIANGLES | Algo::Render::GL2::LINES | Algo::Render::GL2::POINTS) ;
 
-	m_render_topo->updateData<PFP>(myMap, allDarts, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2]);
+	m_render_topo->updateData<PFP>(myMap, position, m_coeffTopoExplod[0], m_coeffTopoExplod[1], m_coeffTopoExplod[2], allDarts);
 
 	m_bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
 	gPosObj = m_bb.center() ;
@@ -859,7 +851,7 @@ void Clipping::cb_initGL()
 
 	// create the render
 	m_render = new Algo::Render::GL2::MapRender();
-	m_render_topo = new Algo::Render::GL2::Topo3RenderMapD();
+	m_render_topo = new Algo::Render::GL2::Topo3Render();
 
 	// create VBO for position
 	m_positionVBO = new Utils::VBO();
@@ -1125,12 +1117,12 @@ int main(int argc, char** argv)
 
 	if(argc == 2)
     {
-            std::string filename(argv[1]);
-            sqt.importMesh(filename);
+		std::string filename(argv[1]);
+		sqt.importMesh(filename);
     }
 	else
 	{
-		sqt.position = sqt.myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+		sqt.position = sqt.myMap.addAttribute<PFP::VEC3, VERTEX>("position");
 		Algo::Modelisation::Primitive3D<PFP> prim(sqt.myMap, sqt.position);
 		prim.hexaGrid_topo(10,10,10);
 		prim.embedHexaGrid(1.0f,1.0f,1.0f);

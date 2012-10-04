@@ -24,10 +24,6 @@ file(
 	${CGoGN_ROOT_DIR}/include/Topology/*.hpp
 	${CGoGN_ROOT_DIR}/include/Topology/*.h
 )
-add_library(
-	topology
-	${files_topology}
-)
 
 file(
 	GLOB_RECURSE
@@ -35,10 +31,6 @@ file(
 	${CGoGN_ROOT_DIR}/src/Container/*.cpp
 	${CGoGN_ROOT_DIR}/include/Container/*.hpp
 	${CGoGN_ROOT_DIR}/include/Container/*.h
-)
-add_library(
-	container
-	${files_container}
 )
 
 file(
@@ -49,33 +41,18 @@ file(
 	${CGoGN_ROOT_DIR}/include/Algo/*.hpp
 	${CGoGN_ROOT_DIR}/include/Algo/*.h
 )
-add_library(
-	algo
-	${files_algo}
-)
-
-#file(
-#	GLOB_RECURSE
-#	files_geometry
-#	${CGoGN_ROOT_DIR}/src/Geometry/*.cpp
-#	${CGoGN_ROOT_DIR}/include/Geometry/*.hpp
-#	${CGoGN_ROOT_DIR}/include/Geometry/*.h
-#)
-#add_library(
-#	geometry
-#	${files_geometry}
-#)
 
 
 file(
-	GLOB_RECURSE
+#	GLOB_RECURSE
+	GLOB
 	shaders_src
 	${CGoGN_ROOT_DIR}/include/Utils/*.frag
 	${CGoGN_ROOT_DIR}/include/Utils/*.vert
 	${CGoGN_ROOT_DIR}/include/Utils/*.geom	
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.frag
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.vert
-	${CGoGN_ROOT_DIR}/include/Utils/Shaders*.geom
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.frag
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.vert
+	${CGoGN_ROOT_DIR}/include/Utils/Shaders/*.geom
 )
 
 
@@ -88,9 +65,6 @@ ELSE(WIN32)
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	SOURCES ${shaders_src} )
 ENDIF(WIN32)
-
-
-
 
 file(
 	GLOB		# WARNING NO MORE RECURSE TO AVOID TAKING QT FILES
@@ -105,28 +79,44 @@ file(
 )
 
 IF(WITH_QT)
+
 	file(
 		GLOB
 		files_utils_qt
 		${CGoGN_ROOT_DIR}/src/Utils/Qt/*.cpp
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.hpp
 		${CGoGN_ROOT_DIR}/include/Utils/Qt/*.h )
-
 	file(
-		GLOB_RECURSE
+		GLOB
 		utils_qt_headers
-		${CGoGN_ROOT_DIR}/include/Utils/Qt/qt*.h )
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtgl.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtSimple.h
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtpopup.h 
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qthistodraw.h 
+		${CGoGN_ROOT_DIR}/include/Utils/Qt/qtcolorschooser.h )	
 		
 	QT4_WRAP_CPP(UTILS_QT_HEADERS_MOC ${utils_qt_headers})
 	SET (files_utils_withQt ${files_utils} ${files_utils_qt} ${UTILS_QT_HEADERS_MOC})
-	add_library( utils ${files_utils_withQt} )
-ELSE(WITH_QT)
-	add_library( utils ${files_utils} )
 ENDIF (WITH_QT)
 
 
 
-add_dependencies(utils shader_target )
 
-
-
+IF (ONELIB)
+	IF(WITH_QT)
+		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils_withQt}) 
+	ELSE(WITH_QT)
+		add_library( cgogn ${files_topology} ${files_container} ${files_algo} ${files_utils} )
+	ENDIF (WITH_QT)
+	add_dependencies(cgogn shader_target )
+ELSE (ONELIB)
+	add_library( container	${files_container})
+	add_library( topology	${files_topology})
+	add_library( algo		${files_algo})
+	IF(WITH_QT)
+		add_library( utils ${files_utils_withQt} )
+	ELSE(WITH_QT)
+		add_library( utils ${files_utils} )
+	ENDIF (WITH_QT)
+	add_dependencies(utils shader_target )
+ENDIF (ONELIB)

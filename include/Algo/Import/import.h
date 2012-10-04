@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -43,26 +43,56 @@ namespace Import
 /**
 * import a mesh
 * @param map the map in which the function imports the mesh
-* @param filename (*.{trian,trianbgz,off,obj,ply})
-* @param positions table of vertices positions attribute
-* @param m a marker that will be set by the function. If closeObject=false the phi2 that have fixed point are marked, else the created darts of the boundary are marked.
-* @param kind what kind of mesh is the file (if none (-1) determined by filename extension) (cf enum in Mesh2Tables for other kind values)
-* @param closeObject a boolean indicating if the imported mesh should be closed
-* @return a boolean indicating if import was successfull
+* @param filename
+* @param attrNames attribute names
+* @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
+* @return a boolean indicating if import was successful
 */
 template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, ImportSurfacique::ImportType kind = ImportSurfacique::UNKNOWNSURFACE, bool mergeCloseVertices=false);
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
 /**
- * import a volumic mesh
+ * import a volumetric mesh
+ * @param map the map in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
+ * @return a boolean indicating if import was successful
  */
-//template <typename PFP>
-//bool importMesh(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& positions, ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME);
+template <typename PFP>
+bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices = false);
 
-//template <typename PFP>
-//bool importObjWithTex(typename PFP::MAP& map, const std::string& filename);
-//
+/**
+ * import a mesh and extrude it
+ * @param map the map in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ * @param mergeCloseVertices a boolean indicating if close vertices should be merged during import
+ * @return a boolean indicating if import was successful
+ */
+template <typename PFP>
+bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scale = 5.0f, unsigned int nbStage = 1);
 
+template <typename PFP>
+bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames);
+
+/*
+ * import a MOKA file
+ * @param gmap the gmap in which the function imports the mesh
+ * @param filename
+ * @param attrNames attribute names
+ */
+template <typename PFP>
+bool importMoka(typename PFP::MAP& gmap, const std::string& filename, std::vector<std::string>& attrNames);
+
+/**
+ * import a Choupi file
+ * @param map
+ * @param filename
+ * @return
+ */
+template <typename PFP>
+bool importChoupi(const std::string& filename, const std::vector<typename PFP::VEC3>& tabV, const std::vector<unsigned int>& tabE);
 
 /*
  * TODO a transformer en utilisant un MeshTableVolume.
@@ -71,11 +101,16 @@ template <typename PFP>
 bool importOFFWithELERegions(typename PFP::MAP& the_map, const std::string& filenameOFF, const std::string& filenameELE, std::vector<std::string>& attrNames);
 
 template <typename PFP>
-bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
+bool importNodeWithELERegions(typename PFP::MAP& map, const std::string& filenameNode, const std::string& filenameELE, std::vector<std::string>& attrNames);
+
+template <typename PFP>
+bool importTet(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f, bool invertTetra=false);
+
+template <typename PFP>
+bool importMoka(typename PFP::MAP& the_gmap, const std::string& filename, std::vector<std::string>& attrNames);
 
 template <typename PFP>
 bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor = 1.0f);
-
 
 } // namespace Import
 
@@ -87,6 +122,10 @@ bool importTs(typename PFP::MAP& the_map, const std::string& filename, std::vect
 //#include "Algo/Import/importObjTex.hpp"
 #include "Algo/Import/importObjEle.hpp"
 #include "Algo/Import/importTet.hpp"
+#include "Algo/Import/importMoka.hpp"
 #include "Algo/Import/importTs.hpp"
+#include "Algo/Import/importNodeEle.hpp"
+
+#include "Algo/Import/importChoupi.hpp"
 
 #endif

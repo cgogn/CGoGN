@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -31,39 +31,165 @@
 namespace CGoGN
 {
 
+///**
+// * Class that creates an access-table to an attribute
+// * that is added especially. The attribute is removed when
+// * the AutoAttributeHandler object is destroyed
+// */
+//template <typenaDartAutoAttributeRBIT>
+//class AutoAttributeHandler : public AttributeHandler<T, ORBIT>
+//{
+//public:
+//	/**
+//	 * constructor
+//	 * @param m the map
+//	 * @param orbit the orbit of map
+//	 * @param nameAttr the name of attribute
+//	 * @param nameType the name of type of attribute
+//	 */
+//	AutoAttributeHandler(AttribMap& m, const std::string& nameAttr = "")
+//	{
+//		this->m_map = &m ;
+//		if(!m.isOrbitEmbedded<ORBIT>())
+//			m.addEmbedding<ORBIT>() ;
+//		AttributeMultiVector<T>* amv = this->m_map->m_attribs[ORBIT].template addAttribute<T>(nameAttr) ;
+//		this->m_attrib = amv ;
+//		this->valid = true ;
+//		this->registerInMap() ;
+//	}
+//
+//	~AutoAttributeHandler()
+//	{
+//		if (this->valid)
+//			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+//	}
+//} ;
+
+
 /**
- * Class that creates an access-table to an attribute
- * that is added especially. The attribute is removed when
- * the AutoAttributeHandler object is destroyed
+ *  shortcut class for Dart AutoAttribute (Handler)
  */
 template <typename T>
-class AutoAttributeHandler : public AttributeHandler<T>
+class DartAutoAttribute : public DartAttribute<T>
 {
 public:
-	/**
-	 * constructor
-	 * @param m the map
-	 * @param orbit the orbit of map
-	 * @param nameAttr the name of attribute
-	 * @param nameType the name of type of attribute
-	 */
-	AutoAttributeHandler(AttribMap& m, unsigned int orbit, const std::string& nameAttr = "")
+	DartAutoAttribute(AttribMap& m, const std::string& nameAttr = "")
 	{
 		this->m_map = &m ;
-		if(!m.isOrbitEmbedded(orbit))
-			m.addEmbedding(orbit) ;
-		AttributeContainer& cellCont = this->m_map->m_attribs[orbit] ;
-		AttributeMultiVector<T>* amv = cellCont.addAttribute<T>(nameAttr) ;
+		if(!m.isOrbitEmbedded<DART>())
+			m.addEmbedding<DART>() ;
+		AttributeMultiVector<T>* amv = this->m_map->template getAttributeContainer<DART>().template addAttribute<T>(nameAttr) ;
 		this->m_attrib = amv ;
 		this->valid = true ;
 		this->registerInMap() ;
 	}
 
-	~AutoAttributeHandler()
+	~DartAutoAttribute()
 	{
-		reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+		if (this->valid)
+			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
 	}
-} ;
+};
+
+/**
+ *  shortcut class for Vertex AutoAttribute (Handler)
+ */
+template <typename T>
+class VertexAutoAttribute : public VertexAttribute<T>
+{
+public:
+	VertexAutoAttribute(AttribMap& m, const std::string& nameAttr = "")
+	{
+		this->m_map = &m ;
+		if(!m.isOrbitEmbedded<VERTEX>())
+			m.addEmbedding<VERTEX>() ;
+		AttributeMultiVector<T>* amv = this->m_map->template getAttributeContainer<VERTEX>().template addAttribute<T>(nameAttr) ;
+		this->m_attrib = amv ;
+		this->valid = true ;
+		this->registerInMap() ;
+	}
+
+	~VertexAutoAttribute()
+	{
+		if (this->valid)
+			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+	}
+};
+
+/**
+ *  shortcut class for Edge AutoAttribute (Handler)
+ */
+template <typename T>
+class EdgeAutoAttribute : public EdgeAttribute<T>
+{
+public:
+	EdgeAutoAttribute(AttribMap& m, const std::string& nameAttr = "")
+	{
+		this->m_map = &m ;
+		if(!m.isOrbitEmbedded<EDGE>())
+			m.addEmbedding<EDGE>() ;
+		AttributeMultiVector<T>* amv = this->m_map->template getAttributeContainer<EDGE>().template addAttribute<T>(nameAttr) ;
+		this->m_attrib = amv ;
+		this->valid = true ;
+		this->registerInMap() ;
+	}
+
+	~EdgeAutoAttribute()
+	{
+		if (this->valid)
+			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+	}
+};
+
+/**
+ *  shortcut class for Face AutoAttribute (Handler)
+ */
+template <typename T>
+class FaceAutoAttribute : public FaceAttribute<T>
+{
+public:
+	FaceAutoAttribute(AttribMap& m, const std::string& nameAttr = "")
+	{
+		this->m_map = &m ;
+		if(!m.isOrbitEmbedded<FACE>())
+			m.addEmbedding<FACE>() ;
+		AttributeMultiVector<T>* amv = this->m_map->template getAttributeContainer<FACE>().template addAttribute<T>(nameAttr) ;
+		this->m_attrib = amv ;
+		this->valid = true ;
+		this->registerInMap() ;
+	}
+
+	~FaceAutoAttribute()
+	{
+		if (this->valid)
+			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+	}
+};
+
+/**
+ *  shortcut class for Volume AutoAttribute (Handler)
+ */
+template <typename T>
+class VolumeAutoAttribute : public VolumeAttribute<T>
+{
+public:
+	VolumeAutoAttribute(AttribMap& m, const std::string& nameAttr = "")
+	{
+		this->m_map = &m ;
+		if(!m.isOrbitEmbedded<VOLUME>())
+			m.addEmbedding<VOLUME>() ;
+		AttributeMultiVector<T>* amv = this->m_map->template getAttributeContainer<VOLUME>().template addAttribute<T>(nameAttr) ;
+		this->m_attrib = amv ;
+		this->valid = true ;
+		this->registerInMap() ;
+	}
+
+	~VolumeAutoAttribute()
+	{
+		if (this->valid)
+			reinterpret_cast<AttribMap*>(this->m_map)->removeAttribute<T>(*this) ;
+	}
+};
 
 } // namespace CGoGN
 

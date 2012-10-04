@@ -101,24 +101,39 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 	{
 		//orientation step
 		if(m_positions[d][0] == m_positions[m.phi1(d)][0] && m_positions[d][1] == m_positions[m.phi1(d)][1])
+<<<<<<< HEAD
 			d = m.alpha1(d);
 		if(getOrientationEdge(goal,m.alpha1(d)) != Geom::UNDER)
+=======
+			d = m.phi2_1(d);
+		if(getOrientationEdge(current,m.phi2_1(d)) != Geom::UNDER)
+>>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e
 		{
 			Dart dd_vert = d;
 			do
 			{
-				d = m.alpha1(d);
+				d = m.phi2_1(d);
 				if(m_positions[d][0] == m_positions[m.phi1(d)][0] && m_positions[d][1] == m_positions[m.phi1(d)][1])
+<<<<<<< HEAD
 					d = m.alpha1(d);
 			} while(getOrientationEdge(goal, m.alpha1(d)) != Geom::UNDER && dd_vert != d);
+=======
+					d = m.phi2_1(d);
+			} while(getOrientationEdge(current, m.phi2_1(d)) != Geom::UNDER && dd_vert != d);
+>>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e
 
 			if(dd_vert == d)
 			{
 				//orbit with 2 edges : point on one edge
-				if(m.alpha1(m.alpha1(d)) == d)
+				if(m.phi2_1(m.phi2_1(d)) == d)
 				{
+<<<<<<< HEAD
 					if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,goal))
 						d = m.alpha1(d);
+=======
+					if(!Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,m_positions,current))
+						d = m.phi2_1(d);
+>>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e
 				}
 				else
 				{
@@ -130,12 +145,17 @@ void ParticleCell2DAndHalf<PFP>::vertexState(VEC3 goal)
 		}
 		else
 		{
+<<<<<<< HEAD
 			Dart dd_vert = m.alpha1(d);
 			while(getOrientationEdge(goal, d) == Geom::OVER && dd_vert != d)
+=======
+			Dart dd_vert = m.phi2_1(d);
+			while(getOrientationEdge(current, d) == Geom::OVER && dd_vert != d)
+>>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e
 			{
-				d = m.alpha_1(d);
+				d = m.phi12(d);
 				if(m_positions[d][0] == m_positions[m.phi1(d)][0] && m_positions[d][1] == m_positions[m.phi1(d)][1])
-					d = m.alpha_1(d);
+					d = m.phi12(d);
 			}
 		}
 

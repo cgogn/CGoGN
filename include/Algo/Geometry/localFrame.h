@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -42,7 +42,7 @@ namespace Geometry
 // compute a local frame on the vertex of dart d
 
 template <typename PFP>
-void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
+void vertexLocalFrame(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
 	Z = vertexNormal<PFP>(map, d, position) ;
 	X = vectorOutOfDart<PFP>(map, d, position) ;
@@ -53,7 +53,7 @@ void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3&
 }
 
 template <typename PFP>
-typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 X, Y, Z ;
 	vertexLocalFrame<PFP>(map, d, position, X, Y, Z) ;
@@ -67,7 +67,7 @@ typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const ty
 // compute a local frame on the vertex of dart d with a prescribed normal vector
 
 template <typename PFP>
-void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& normal, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
+void vertexLocalFrame(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::VEC3& normal, typename PFP::VEC3& X, typename PFP::VEC3& Y, typename PFP::VEC3& Z)
 {
 	Z = normal ;
 	X = vectorOutOfDart<PFP>(map, d, position) ;
@@ -78,7 +78,7 @@ void vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3&
 }
 
 template <typename PFP>
-typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position, typename PFP::VEC3& normal)
+typename PFP::MATRIX33 vertexLocalFrame(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position, typename PFP::VEC3& normal)
 {
 	typename PFP::VEC3 X, Y, Z ;
 	vertexLocalFrame<PFP>(map, d, position, normal, X, Y, Z) ;

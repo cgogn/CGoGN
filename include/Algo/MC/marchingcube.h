@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -25,7 +25,6 @@
 #ifndef MARCHINGCUBE_H
 #define MARCHINGCUBE_H
 
-#include "Algo/MC/type.h"
 #include "Algo/MC/image.h"
 #include "Algo/MC/buffer.h"
 #include "Algo/MC/tables.h"
@@ -38,7 +37,9 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace MC {
+namespace MC
+{
+
 /**
  * Marching Cube
  *
@@ -49,8 +50,16 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 class MarchingCube
 {
 protected:
-	typedef typename PFP::MAP L_MAP;
-	typedef Dart L_DART;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::MAP L_MAP ;
+	typedef Dart L_DART ;
+
+#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+	unsigned int m_zbound;
+	unsigned int m_sliceGroup;
+	EdgeAttribute<unsigned long long>* m_zslice;
+	unsigned int m_currentZSlice;
+#endif
 
 	/**
 	* voxel image
@@ -72,24 +81,24 @@ protected:
 	*/
 	L_MAP* m_map;
 
-	typename PFP::TVEC3 m_positions;
+	VertexAttribute<VEC3>& m_positions;
 
 	/**
 	* Origin of image
 	*/
-	typename PFP::VEC3 m_fOrigin;
+	VEC3 m_fOrigin;
 
 	/**
 	* scale of image
 	*/
-	typename PFP::VEC3 m_fScal;
+	VEC3 m_fScal;
 
 	/**
 	* compute the index of a cube:\n
 	* The index is a eight bit index, one bit for each vertex of the cube.\n
 	* If the vertex is inside the objet (val < isovalue) the bit is set to 1, else to 0
 	*/
-	uint8 computeIndex(const DataType* const _ucData) const;
+	unsigned char computeIndex(const DataType* const _ucData) const;
 
 	/**
 	 * tag boundary to b removed or not
@@ -122,14 +131,14 @@ protected:
 	* @param   _lZ  coordinate Z of the cube
 	* @param   tag  the boundary tag (NOT USE FOR THE MOMENT)
 	*/
-	void createFaces_1(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_2(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_3(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_4(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_5(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_6(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_7(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
-	void createFaces_8(DataType *vox, const int32 _lX, const int32 _lY, const int32 _lZ, uint8 tag);
+	void createFaces_1(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_2(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_3(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_4(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_5(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_6(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_7(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
+	void createFaces_8(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag);
 //@}
 
 	/**
@@ -146,7 +155,7 @@ protected:
 	*
 	* @todo use the member (of struct HalfCube) number of faces instead of fill with -1
 	*/
-	void createLocalFaces(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int const *_lVertTable, const unsigned short _ucMask, float curv, uint8 tag);
+	void createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int const *_lVertTable, const unsigned short _ucMask, float curv, unsigned char tag);
 
 	/**
 	* @name create vertices on edges of cube
@@ -164,18 +173,18 @@ protected:
 	* @param   vPos the position in "real world"
 	*
 	*/
-	void createPointEdge0(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge1(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge2(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge3(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge4(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge5(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge6(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge7(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge8(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge9(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge10(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
-	void createPointEdge11(const uint8 _ucCubeIndex, const int32 _lX, const int32 _lY, const int32 _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge0(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge1(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge2(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge3(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge4(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge5(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge6(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge7(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge8(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge9(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge10(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
+	void createPointEdge11(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int* const lVertTable, const typename PFP::VEC3& vPos);
 //@}
 
 	/**
@@ -184,20 +193,13 @@ protected:
 	 * @param _dec shifting due to interpolation in the cube
 	 * @return new position
 	 */
-	typename PFP::VEC3 recalPoint( const typename PFP::VEC3& _P,  const typename PFP::VEC3& _dec ) const;
+	typename PFP::VEC3 recalPoint(const VEC3& _P, const VEC3& _dec ) const;
 
 	void setNeighbourSimple(L_DART d1, L_DART d2);
 
 	void setNeighbour(L_DART d1, L_DART d2);
 
-	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3) {
-		L_DART d = m_map->newFace(3);
-		//TODO change this which work only with 2-maps
-		m_map->setDartEmbedding(VERTEX,d,e1); d = m_map->phi1(d);
-		m_map->setDartEmbedding(VERTEX,d,e2); d = m_map->phi1(d);
-		m_map->setDartEmbedding(VERTEX,d,e3); d = m_map->phi1(d);
-		return d;
-	}
+	L_DART createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3);
 
 public:
 	/**
@@ -222,7 +224,7 @@ public:
 	* @param wind the windowing class (for inside/outside distinguish)
 	* @param boundRemoved true is bound is going to be removed
 	*/
-	MarchingCube(Image<DataType>* img, L_MAP* map, const typename PFP::TVEC3& position,  Windowing<DataType> wind, bool boundRemoved);
+	MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3>& position, Windowing<DataType> wind, bool boundRemoved);
 
 	/**
 	* destructor
@@ -243,31 +245,39 @@ public:
 	 * get pointer on result mesh after processing
 	 * @return the mesh
 	 */
-	L_MAP* getMesh() const { return m_map;}
+	L_MAP* getMesh() const { return m_map; }
 
 	/**
 	 * get the image
 	 */
-	Image<DataType>* getImg() {return m_Image;}
+	Image<DataType>* getImg() { return m_Image; }
 
 	/**
 	 * Get the lower corner of bounding AABB
 	 */
-	Geom::Vec3f boundMin() const {return m_Image->boundMin();}
+	Geom::Vec3f boundMin() const { return m_Image->boundMin(); }
 
 	/**
 	 * Get the upper corner of bounding AABB
 	 */
-	Geom::Vec3f boundMax() const {return m_Image->boundMax();}
+	Geom::Vec3f boundMax() const { return m_Image->boundMax(); }
 
-	void removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth);
+	void removeFacesOfBoundary(VertexAttribute<unsigned char>& boundVertices, unsigned int frameWidth);
+
+	void recalPoints(const Geom::Vec3f& origin);
+
+
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+	void setZSliceAttrib(EdgeAttribute<unsigned long long>* zsatt, unsigned int zbound, unsigned int nbZone);
+	#endif
 
 };
 
+} // namespace MC
 
-} // end namespace
-} // end namespace
-} // end namespace
+} // namespace Algo
+
+} // namespace CGoGN
 
 #include "Algo/MC/marchingcube.hpp"
 #endif

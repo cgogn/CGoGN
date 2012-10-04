@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -37,69 +37,96 @@ class EmbeddedMap3 : public Map3
 public:
 	typedef Map3 TOPO_MAP;
 
+	//!
 	/*!
 	 *
 	 */
+	virtual Dart splitVertex(std::vector<Dart>& vd);
+
+	//!
+	/*!
+	 */
 	virtual Dart deleteVertex(Dart d);
 
-	/*! No attribute is attached to the new vertex
-	 *  The attributes attached to the old edge are duplicated on both resulting edges
+	//! No attribute is attached to the new vertex
+	/*! The attributes attached to the old edge are duplicated on both resulting edges
 	 *  @param d a dart
 	 */
 	virtual Dart cutEdge(Dart d);
 
-	/*! The attributes attached to the edge of d are kept on the resulting edge
-	 *  @param d a dart of the edge to cut
+	//! The attributes attached to the edge of d are kept on the resulting edge
+	/*!  @param d a dart of the edge to cut
 	 */
 	virtual bool uncutEdge(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual Dart deleteEdge(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	bool edgeCanCollapse(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes=true);
 
+	//!
 	/*!
-	 *
+	 */
+//	virtual bool collapseDegeneratedFace(Dart d);
+
+	//!
+	/*!
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	/**
+	 * The attributes attached to the face of dart d are kept on the resulting face
+	 */
+	virtual bool mergeFaces(Dart d);
+
+	//!
 	/*!
 	 *
+	 */
+	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+
+	//!
+	/*!
 	 */
 	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual void unsewVolumes(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual bool mergeVolumes(Dart d);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
 
-	/**
-	 * No attribute is attached to the new volume
+	//!
+	/*!
+	 */
+	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
+
+	//!
+	/*! No attribute is attached to the new volume
 	 */
 	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 
+	//!
 	/*!
-	 *
 	 */
 	virtual bool check();
 } ;

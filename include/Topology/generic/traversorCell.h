@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -28,154 +28,77 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
+#include "Topology/generic/traversorGen.h"
 
 namespace CGoGN
 {
 
-template <typename MAP>
-class TraversorCell
+template <typename MAP, unsigned int ORBIT>
+class TraversorCell : public Traversor<MAP>
 {
 private:
 	MAP& m ;
-	unsigned int m_orbit ;
+
+	AttributeContainer* cont ;
+	unsigned int qCurrent ;
+
 	DartMarker* dmark ;
-	CellMarker* cmark ;
+	CellMarker<ORBIT>* cmark ;
+	AttributeMultiVector<Dart>* quickTraversal ;
+
 	Dart current ;
 	bool firstTraversal ;
 	const FunctorSelect& m_good ;
 
 public:
-	TraversorCell(MAP& map, unsigned int orbit, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) :
-		m(map), m_orbit(orbit), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
-	{
-		if(!forceDartMarker && map.isOrbitEmbedded(m_orbit))
-			cmark = new CellMarker(map, m_orbit, thread) ;
-		else
-			dmark = new DartMarker(map, thread) ;
-	}
+	TraversorCell(MAP& map, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) ;
 
-	~TraversorCell()
-	{
-		if(dmark)
-			delete dmark ;
-		else
-			delete cmark ;
-	}
+	~TraversorCell() ;
 
-	Dart begin()
-	{
-		if(!firstTraversal)
-		{
-			if(dmark)
-				dmark->unmarkAll() ;
-			else
-				cmark->unmarkAll() ;
-		}
+	Dart begin() ;
 
-		current = m.begin() ;
-		while(current != m.end() && (m.isBoundaryMarked(current) || !m_good(current)))
-			m.next(current) ;
+	Dart end() ;
 
-		if(current == m.end())
-			current = NIL ;
-		else
-		{
-			if(dmark)
-				dmark->markOrbit(m_orbit, current) ;
-			else
-				cmark->mark(current) ;
-		}
+	Dart next() ;
 
-		firstTraversal = false ;
-		return current ;
-	}
-
-	Dart end() { return NIL ; }
-
-	Dart next()
-	{
-		if(current != NIL)
-		{
-			bool ismarked ;
-			if(dmark)
-				ismarked = dmark->isMarked(current) ;
-			else
-				ismarked = cmark->isMarked(current) ;
-
-			while(current != NIL && (ismarked || m.isBoundaryMarked(current) || !m_good(current)))
-			{
-				m.next(current) ;
-				if(current == m.end())
-					current = NIL ;
-				else
-				{
-					if(dmark)
-						ismarked = dmark->isMarked(current) ;
-					else
-						ismarked = cmark->isMarked(current) ;
-				}
-			}
-
-			if(current != NIL)
-			{
-				if(dmark)
-					dmark->markOrbit(m_orbit, current) ;
-				else
-					cmark->mark(current) ;
-			}
-		}
-		return current ;
-	}
-
-	void mark(Dart d)
-	{
-		if(dmark)
-			dmark->markOrbit(m_orbit, d) ;
-		else
-			cmark->mark(d) ;
-	}
+	void skip(Dart d);
 } ;
 
 template <typename MAP>
-class TraversorV : public TraversorCell<MAP>
+class TraversorV : public TraversorCell<MAP, VERTEX>
 {
 public:
-	TraversorV(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, VERTEX, good, thread)
+	TraversorV(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VERTEX>(m, good, forceDartMarker, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorE : public TraversorCell<MAP>
+class TraversorE : public TraversorCell<MAP, EDGE>
 {
 public:
-	TraversorE(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, EDGE, good, thread)
+	TraversorE(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, EDGE>(m, good, forceDartMarker, thread)
+	{}
+};
+
+
+template <typename MAP>
+class TraversorF : public TraversorCell<MAP, FACE>
+{
+public:
+	TraversorF(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, FACE>(m, good, forceDartMarker, thread)
 	{}
 };
 
 template <typename MAP>
-class TraversorOF : public TraversorCell<MAP>
+class TraversorW : public TraversorCell<MAP, VOLUME>
 {
 public:
-	TraversorOF(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, ORIENTED_FACE, good, thread)
-	{}
-};
-
-template <typename MAP>
-class TraversorF : public TraversorCell<MAP>
-{
-public:
-	TraversorF(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, FACE, good, thread)
-	{}
-};
-
-template <typename MAP>
-class TraversorW : public TraversorCell<MAP>
-{
-public:
-	TraversorW(MAP& m, const FunctorSelect& good = allDarts, unsigned int thread = 0) : TraversorCell<MAP>(m, VOLUME, good, thread)
+	TraversorW(MAP& m, const FunctorSelect& good = allDarts, bool forceDartMarker = false, unsigned int thread = 0) : TraversorCell<MAP, VOLUME>(m, good, forceDartMarker, thread)
 	{}
 };
 
 } // namespace CGoGN
+
+#include "Topology/generic/traversorCell.hpp"
 
 #endif

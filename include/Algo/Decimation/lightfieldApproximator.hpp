@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -49,12 +49,12 @@ template <typename PFP>
 bool Approximator_RGBfunctionsHalf<PFP>::init()
 {
 	// get actual frames and hypothetical approximated frames
-	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX, "frame") ;
-	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
+	m_frame = this->m_map.template getAttribute<MATRIX33, VERTEX>("frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33, EDGE>("approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 
 	MapBrowserLinked<typename PFP::MAP> mb(this->m_map) ;
-	this->m_map.foreach_orbit(EDGE, mb) ;
+	this->m_map.template foreach_orbit<EDGE>(mb) ;
 
 	// create quadric embedding for computing and set them to 0
 	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))
@@ -108,16 +108,16 @@ void Approximator_RGBfunctionsHalf<PFP>::approximate(Dart d)
 //	REAL gamma1 = ((j1 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i1 * i ), -1.0f)) ; // angle positif ssi
 	REAL gamma2 = ((j2 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i2 * i ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
 	// Rotation dans le sens trigo autour de l'axe i (n1->n)
-//	REAL alpha1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
+//	REAL phi2_1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
 	REAL alpha2 = ((n * j2pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
 
 //	assert (-0.01 < gamma1 && gamma1 < 0.01) ;
-//	assert (-0.01 < alpha1 && alpha1 < 0.01) ;
+//	assert (-0.01 < phi2_1 && phi2_1 < 0.01) ;
 	REAL gamma1 = REAL(0) ;
-	REAL alpha1 = REAL(0) ;
+	REAL phi2_1 = REAL(0) ;
 
 	// Create and sum quadrics
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, phi2_1) ;
 	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
 }
 
@@ -128,8 +128,8 @@ void Approximator_RGBfunctionsHalf<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_Frame<PFP>::init()
 {
-	m_position = this->m_map.template getAttribute<VEC3>(VERTEX, "position") ;
-	m_approxPosition = this->m_map.template getAttribute<VEC3>(EDGE, "approx_position") ;
+	m_position = this->m_map.template getAttribute<VEC3, VERTEX>("position") ;
+	m_approxPosition = this->m_map.template getAttribute<VEC3, EDGE>("approx_position") ;
 
 	if (!m_position.isValid() || !m_approxPosition.isValid())
 	{
@@ -192,12 +192,12 @@ template <typename PFP>
 bool Approximator_RGBfunctions<PFP>::init()
 {
 	// get actual frames and hypothetical approximated frames
-	m_frame = this->m_map.template getAttribute<MATRIX33>(VERTEX, "frame") ;
-	m_approxFrame = this->m_map.template getAttribute<MATRIX33>(EDGE, "approx_frame") ;
-	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL> >(EDGE, "quadricRGBfunctions") ;
+	m_frame = this->m_map.template getAttribute<MATRIX33, VERTEX>("frame") ;
+	m_approxFrame = this->m_map.template getAttribute<MATRIX33, EDGE>("approx_frame") ;
+	m_quadricRGBfunctions = this->m_map.template getAttribute<QuadricRGBfunctions<REAL>, EDGE>("quadricRGBfunctions") ;
 
 	MapBrowserLinked<typename PFP::MAP> mb(this->m_map) ;
-	this->m_map.foreach_orbit(EDGE, mb) ;
+	this->m_map.template foreach_orbit<EDGE>(mb) ;
 
 	// create quadric embedding for computing and set them to 0
 	for (Dart d = mb.begin() ; d != mb.end() ; mb.next(d))
@@ -246,12 +246,12 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 	REAL gamma1 = ((j1 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i1 * i ), -1.0f)) ; // angle positif ssi
 	REAL gamma2 = ((j2 * i) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, i2 * i ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
 	// Rotation dans le sens trigo autour de l'axe i (n1->n)
-	REAL alpha1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
+	REAL phi2_1 = ((n * j1pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n1), -1.0f) ) ; // angle positif ssi
 	REAL alpha2 = ((n * j2pr) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, n * n2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
 
 //	assert (-3.15 < gamma1 && gamma1 <= 3.15) ;
 //	assert (-3.15 < gamma2 && gamma2 <= 3.15) ;
-//	assert (-3.15 < alpha1 && alpha1 <= 3.15) ;
+//	assert (-3.15 < phi2_1 && phi2_1 <= 3.15) ;
 //	assert (-3.15 < alpha2 && alpha2 <= 3.15) ;
 
 //	MATRIX36 &f1 = this->m_attrV[d] ;
@@ -259,7 +259,7 @@ void Approximator_RGBfunctions<PFP>::approximate(Dart d)
 
 	// Create and sum quadrics
 	m_quadricRGBfunctions[d].zero() ;
-	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, alpha1) ;
+	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[d], gamma1, phi2_1) ;
 	m_quadricRGBfunctions[d] += QuadricRGBfunctions<REAL>(this->m_attrV[dd], gamma2, alpha2) ;
 
 	// Compute new function

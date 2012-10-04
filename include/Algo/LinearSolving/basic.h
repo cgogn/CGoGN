@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -65,25 +65,25 @@ template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void setupVariables(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	CellMarker& lm,
-	const AttributeHandler<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int>& index,
+	CellMarker<VERTEX>& lm,
+	const VertexAttribute<ATTR_TYPE>& attr)
 {
 	FunctorMeshToSolver_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(s, index, lm, attr) ;
-	m.foreach_orbit(VERTEX, fmts) ;
+	m.template foreach_orbit<VERTEX>(fmts) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void setupVariables(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	CellMarker& lm,
-	const AttributeHandler<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int>& index,
+	CellMarker<VERTEX>& lm,
+	const VertexAttribute<ATTR_TYPE>& attr,
 	unsigned int coord)
 {
 	FunctorMeshToSolver_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fmts(s, index, lm, attr, coord) ;
-	m.foreach_orbit(VERTEX, fmts) ;
+	m.template foreach_orbit<VERTEX>(fmts) ;
 }
 
 /*******************************************************************************
@@ -104,50 +104,50 @@ template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const AttributeHandler<ATTR_TYPE>& attr,
-	const AttributeHandler<typename PFP::REAL>& weight)
+	const VertexAttribute<unsigned int>& index,
+	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<typename PFP::REAL>& weight)
 {
 	FunctorEquality_PerVertexWeight_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight) ;
-	m.foreach_orbit(VERTEX, ec) ;
+	m.template foreach_orbit<VERTEX>(ec) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const AttributeHandler<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int>& index,
+	const VertexAttribute<ATTR_TYPE>& attr,
 	float weight)
 {
 	FunctorEquality_UniformWeight_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight) ;
-	m.foreach_orbit(VERTEX, ec) ;
+	m.template foreach_orbit<VERTEX>(ec) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const AttributeHandler<ATTR_TYPE>& attr,
-	const AttributeHandler<typename PFP::REAL>& weight,
+	const VertexAttribute<unsigned int>& index,
+	const VertexAttribute<ATTR_TYPE>& attr,
+	const VertexAttribute<typename PFP::REAL>& weight,
 	unsigned int coord)
 {
 	FunctorEquality_PerVertexWeight_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight, coord) ;
-	m.foreach_orbit(VERTEX, ec) ;
+	m.template foreach_orbit<VERTEX>(ec) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Equality(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const AttributeHandler<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int>& index,
+	const VertexAttribute<ATTR_TYPE>& attr,
 	float weight,
 	unsigned int coord)
 {
 	FunctorEquality_UniformWeight_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> ec(s, index, attr, weight, coord) ;
-	m.foreach_orbit(VERTEX, ec) ;
+	m.template foreach_orbit<VERTEX>(ec) ;
 }
 
 /*******************************************************************************
@@ -158,33 +158,33 @@ template <typename PFP, class SOLVER_TRAITS>
 void addRows_Laplacian_Topo(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index)
+	const VertexAttribute<unsigned int> index)
 {
 	FunctorLaplacianTopo<PFP, SOLVER_TRAITS> flt(m, s, index) ;
-	m.foreach_orbit(VERTEX, flt) ;
+	m.template foreach_orbit<VERTEX>(flt) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const AttributeHandler<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int> index,
+	const VertexAttribute<ATTR_TYPE>& attr)
 {
 	FunctorLaplacianTopoRHS_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> flt(m, s, index, attr) ;
-	m.foreach_orbit(VERTEX, flt) ;
+	m.template foreach_orbit<VERTEX>(flt) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Laplacian_Topo(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const AttributeHandler<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int> index,
+	const VertexAttribute<ATTR_TYPE>& attr,
 	unsigned int coord)
 {
 	FunctorLaplacianTopoRHS_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> flt(m, s, index, attr, coord) ;
-	m.foreach_orbit(VERTEX, flt) ;
+	m.template foreach_orbit<VERTEX>(flt) ;
 }
 
 /*******************************************************************************
@@ -195,39 +195,39 @@ template <typename PFP, class SOLVER_TRAITS>
 void addRows_Laplacian_Cotan(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea)
+	const VertexAttribute<unsigned int> index,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea)
 {
 	FunctorLaplacianCotan<PFP, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea) ;
-	m.foreach_orbit(VERTEX, flc) ;
+	m.template foreach_orbit<VERTEX>(flc) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea,
-	const AttributeHandler<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int> index,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE>& attr)
 {
 	FunctorLaplacianCotanRHS_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea, attr) ;
-	m.foreach_orbit(VERTEX, flc) ;
+	m.template foreach_orbit<VERTEX>(flc) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void addRowsRHS_Laplacian_Cotan(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	const typename PFP::TREAL& edgeWeight,
-	const typename PFP::TREAL& vertexArea,
-	const AttributeHandler<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int> index,
+	const EdgeAttribute<typename PFP::REAL>& edgeWeight,
+	const VertexAttribute<typename PFP::REAL>& vertexArea,
+	const VertexAttribute<ATTR_TYPE>& attr,
 	unsigned int coord)
 {
 	FunctorLaplacianCotanRHS_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> flc(m, s, index, edgeWeight, vertexArea, attr, coord) ;
-	m.foreach_orbit(VERTEX, flc) ;
+	m.template foreach_orbit<VERTEX>(flc) ;
 }
 
 /*******************************************************************************
@@ -268,23 +268,23 @@ template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void getResult(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	AttributeHandler<ATTR_TYPE>& attr)
+	const VertexAttribute<unsigned int> index,
+	VertexAttribute<ATTR_TYPE>& attr)
 {
 	FunctorSolverToMesh_Scalar<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(s, index, attr) ;
-	m.foreach_orbit(VERTEX, fstm) ;
+	m.template foreach_orbit<VERTEX>(fstm) ;
 }
 
 template <typename PFP, typename ATTR_TYPE, class SOLVER_TRAITS>
 void getResult(
 	typename PFP::MAP& m,
 	LinearSolver<SOLVER_TRAITS>* s,
-	const AttributeHandler<unsigned int> index,
-	AttributeHandler<ATTR_TYPE>& attr,
+	const VertexAttribute<unsigned int> index,
+	VertexAttribute<ATTR_TYPE>& attr,
 	unsigned int coord)
 {
 	FunctorSolverToMesh_Vector<PFP, ATTR_TYPE, SOLVER_TRAITS> fstm(s, index, attr, coord) ;
-	m.foreach_orbit(VERTEX, fstm) ;
+	m.template foreach_orbit<VERTEX>(fstm) ;
 }
 
 } // namespace LinearSolving

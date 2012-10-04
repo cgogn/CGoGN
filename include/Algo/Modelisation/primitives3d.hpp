@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,10 +17,12 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
+#include "Algo/Modelisation/polyhedron.h"
 
 namespace CGoGN
 {
@@ -31,50 +33,18 @@ namespace Algo
 namespace Modelisation
 {
 
-//TEMPORAIRE
-template <typename PFP>
-Dart Primitive3D<PFP>::createHexa()
-{
-	Dart base = m_map.newFace(4, false);
-
-	Dart side1 = m_map.newFace(4, false);
-	m_map.sewFaces(base, side1, false);
-
-	Dart side2 = m_map.newFace(4, false);
-	m_map.sewFaces(m_map.phi1(base), side2, false);
-	m_map.sewFaces(m_map.phi_1(side1), m_map.phi1(side2), false);
-
-	Dart side3 = m_map.newFace(4, false);
-	m_map.sewFaces(m_map.phi1(m_map.phi1(base)), side3, false);
-	m_map.sewFaces(m_map.phi_1(side2), m_map.phi1(side3), false);
-
-	Dart side4 = m_map.newFace(4, false);
-	m_map.sewFaces(m_map.phi_1(base), side4, false);
-	m_map.sewFaces(m_map.phi_1(side3), m_map.phi1(side4), false);
-
-	m_map.sewFaces(m_map.phi_1(side4), m_map.phi1(side1), false);
-
-	Dart top = m_map.newFace(4, false);
-	m_map.sewFaces(top, m_map.phi1(m_map.phi1(side1)), false);
-	m_map.sewFaces(m_map.phi_1(top), m_map.phi1(m_map.phi1(side2)), false);
-	m_map.sewFaces(m_map.phi1(m_map.phi1(top)), m_map.phi1(m_map.phi1(side3)), false);
-	m_map.sewFaces(m_map.phi1(top), m_map.phi1(m_map.phi1(side4)), false);
-
-	return base;
-}
-
 template <typename PFP>
 Dart Primitive3D<PFP>::HexaGrid1Topo(unsigned int nx)
 {
 	// first cube
-	Dart d0 = createHexa();
+	Dart d0 = createHexahedron<PFP>(m_map);
 	m_tableVertDarts.push_back(d0);
 
 	Dart d1 = m_map.template phi<2112>(d0);
 
 	for (unsigned int i = 1; i < nx; ++i)
 	{
-		Dart d2 = createHexa();
+		Dart d2 = createHexahedron<PFP>(m_map);
 		m_tableVertDarts.push_back(d2);
 		m_map.sewVolumes(d1, d2, false);
 		d1 = m_map.template phi<2112>(d2);
@@ -206,7 +176,7 @@ void Primitive3D<PFP>::embedHexaGrid(float x, float y, float z)
 				typename PFP::VEC3 pos(-x/2.0f + dx*float(k), -y/2.0f + dy*float(j), -z/2.0f + dz*float(i));
 				Dart d = m_tableVertDarts[ i*nbs+j*(m_nx+1)+k ];
 
-				m_map.embedNewCell(VERTEX, d);
+				m_map.template embedNewCell<VERTEX>(d);
 				m_positions[d] = pos;
 			}
 		}

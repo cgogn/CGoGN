@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: http://cgogn.u-strasbg.fr/                                         *
+ * Web site: http://cgogn.unistra.fr/                                           *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -56,7 +56,18 @@ template <typename VEC3>
 Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const VEC3& PlaneP, const VEC3& NormP, VEC3& Inter) ;
 
 /**
- * test the intersection between a ray and a triangle (optimized version with triple product
+ * test the intersection between a line and a triangle
+ * @param P a point on the line
+ * @param Dir line direction
+ * @param Plane plane
+ * @param Inter store the intersection point
+ * @return the intersection ( FACE_INTERSECTION = OK, EDGE_INTERSECTION = line inside of plane)
+ */
+template <typename VEC3, typename PLANE>
+Intersection intersectionLinePlane(const VEC3& P, const VEC3& Dir, const PLANE& Plane, VEC3& Inter) ;
+
+/**
+ * test the intersection between a ray and a triangle (optimized version with triple product)
  * @param P a point on the line
  * @param Dir line direction
  * @param Ta triangle point 1
@@ -69,7 +80,7 @@ template <typename VEC3>
 Intersection intersectionRayTriangle(const VEC3& P, const VEC3& Dir, const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, VEC3& Inter) ;
 
 /**
- * test the intersection between a ray and a triangle (optimized version with triple product
+ * test the intersection between a ray and a triangle (optimized version with triple product)
  * @param P a point on the line
  * @param Dir line direction
  * @param Ta triangle point 1
@@ -82,7 +93,7 @@ template <typename VEC3>
 Intersection intersectionRayTriangleOpt(const VEC3& P, const VEC3& Dir, const VEC3& Ta,  const VEC3& Tb, const VEC3& Tc, VEC3& Inter);
 
 /**
- * test the intersection between a ray and a triangle (optimized version with triple product
+ * test the intersection between a ray and a triangle (optimized version with triple product)
  * @param P a point on the line
  * @param Dir line direction
  * @param Ta triangle point 1
@@ -151,6 +162,20 @@ Intersection intersectionPlaneRay(const PLANE3D& pl,const VEC3& p1,const VEC3& d
 
 template <typename VEC3>
 Intersection intersection2DSegmentSegment(const VEC3& PA, const VEC3& PB, const VEC3& QA, const VEC3& QB, VEC3& Inter) ;
+
+template <typename VEC3>
+Intersection intersectionSegmentPlan(const VEC3& PA, const VEC3& PB, const VEC3& PlaneP, const VEC3& NormP); //, VEC3& Inter) ;
+
+template <typename VEC3>
+Intersection intersectionTrianglePlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc, const VEC3& PlaneP, const VEC3& NormP);//, VEC3& Inter) ;
+
+template <typename VEC3>
+Intersection intersectionSegmentHalfPlan(const VEC3& PA, const VEC3& PB,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP);//, VEC3& Inter)
+
+template <typename VEC3>
+Intersection intersectionTriangleHalfPlan(const VEC3& Ta, const VEC3& Tb, const VEC3& Tc,
+		const VEC3& P, const VEC3& DirP, const VEC3& OrientP); //, VEC3& Inter) ;
 
 } // namespace Geom
 

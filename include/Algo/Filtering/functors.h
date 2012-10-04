@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -37,15 +37,16 @@ namespace Algo
 namespace Filtering
 {
 
-template <typename T>
+template <typename T, unsigned int ORBIT>
 class FunctorAverage : public virtual FunctorType
 {
 protected:
-	const AttributeHandler<T>& attr ;
+	const AttributeHandler<T, ORBIT>& attr ;
 	T sum ;
 	unsigned int count ;
+
 public:
-	FunctorAverage(const AttributeHandler<T>& a) : FunctorType(), attr(a), sum(0), count(0)
+	FunctorAverage(const AttributeHandler<T, ORBIT>& a) : FunctorType(), attr(a), sum(0), count(0)
 	{}
 	bool operator()(Dart d)
 	{
@@ -63,15 +64,17 @@ template <typename PFP, typename T>
 class FunctorAverageOnSphereBorder : public FunctorMap<typename PFP::MAP>
 {
 	typedef typename PFP::VEC3 VEC3;
+
 protected:
-	const AttributeHandler<T>& attr ;
-	const AttributeHandler<VEC3>& position ;
+	const VertexAttribute<T>& attr ;
+	const VertexAttribute<VEC3>& position ;
 	VEC3 center;
 	typename PFP::REAL radius;
 	T sum ;
 	unsigned int count ;
+
 public:
-	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T>& a, const AttributeHandler<VEC3>& p) :
+	FunctorAverageOnSphereBorder(typename PFP::MAP& map, const AttributeHandler<T, VERTEX>& a, const VertexAttribute<VEC3>& p) :
 		FunctorMap<typename PFP::MAP>(map), attr(a), position(p), sum(0), count(0)
 	{
 		center = VEC3(0);

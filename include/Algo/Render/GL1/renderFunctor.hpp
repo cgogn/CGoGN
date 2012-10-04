@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -49,7 +49,7 @@ namespace GL1
 */
 template <typename PFP>
 FunctorGLFace<PFP>::FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const typename PFP::TVEC3& posi, const typename PFP::TVEC3& normals , const FunctorSelect& good):
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals , const FunctorSelect& good):
 	FunctorMap<MAP>(map),
 	m_smooth(smooth),
 	m_lighted(lighted),
@@ -61,7 +61,6 @@ FunctorGLFace<PFP>::FunctorGLFace(MAP& map, bool lighted, bool smooth, int nbe, 
 	m_selector(good)
 {
 }
-
 
 /**
 * get back the vector of darts of faces that have not been treated
@@ -339,7 +338,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 }
 
 template<typename PFP>
-FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3& normals, float scale):
+FunctorGLNormal<PFP>::FunctorGLNormal(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, float scale):
 	FunctorMap<MAP>(map),
 	m_positions(posi),
 	m_normals(normals),
@@ -362,7 +361,7 @@ bool FunctorGLNormal<PFP>::operator() (Dart d)
 }
 
 template<typename PFP>
-FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const typename PFP::TVEC3& posi, const typename PFP::TVEC3 frames[3], float scale):
+FunctorGLFrame<PFP>::FunctorGLFrame(MAP& map, const FunctorSelect& good, const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3> frames[3], float scale):
 	FunctorMap<MAP>(map),
 	m_positions(posi),
 	m_frames(frames),
@@ -390,7 +389,7 @@ bool FunctorGLFrame<PFP>::operator() (Dart d)
 
 template <typename PFP>
 FunctorGLFaceColor<PFP>::FunctorGLFaceColor(MAP& map, bool lighted, bool smooth, int nbe, float expl, bool stor,
-		const typename PFP::TVEC3& posi, const typename PFP::TVEC3& normals, const typename PFP::TVEC3& colors , const FunctorSelect& good):
+		const VertexAttribute<typename PFP::VEC3>& posi, const VertexAttribute<typename PFP::VEC3>& normals, const VertexAttribute<typename PFP::VEC3>& colors , const FunctorSelect& good):
 	FunctorMap<MAP>(map),
 	m_smooth(smooth),
 	m_lighted(lighted),
@@ -408,7 +407,6 @@ std::vector<Dart>& FunctorGLFaceColor<PFP>::getPolyDarts()
 {
 	return m_poly;
 }
-
 
 template<typename PFP>
 bool FunctorGLFaceColor<PFP>::operator() (Dart d)
@@ -595,7 +593,6 @@ void FunctorGLFaceColor<PFP>::renderFace(Dart d)
 	}
 }
 
-
 template<typename PFP>
 void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 {
@@ -675,7 +672,6 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 	{
 		m_poly.push_back(d);
 		//CGoGNout << "store dart"<<CGoGNendl;
-
 	}
 }
 

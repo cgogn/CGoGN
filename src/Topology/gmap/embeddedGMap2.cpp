@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -37,25 +37,25 @@ void EmbeddedGMap2::splitVertex(Dart d, Dart e)
 
 	GMap2::splitVertex(d, e) ;
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
-		unsigned int vEmb = getEmbedding(VERTEX, d) ;
-		setDartEmbedding(VERTEX, phi1(dd), vEmb) ;
-		setDartEmbedding(VERTEX, beta2(phi1(dd)), vEmb) ;
-		setDartEmbedding(VERTEX, beta0(dd), vEmb) ;
+		unsigned int vEmb = getEmbedding<VERTEX>(d) ;
+		setDartEmbedding<VERTEX>(phi1(dd), vEmb) ;
+		setDartEmbedding<VERTEX>(beta2(phi1(dd)), vEmb) ;
+		setDartEmbedding<VERTEX>(beta0(dd), vEmb) ;
 
-		embedNewCell(VERTEX, e) ;
-		copyCell(VERTEX, e, d) ;
+		embedNewCell<VERTEX>(e) ;
+		copyCell<VERTEX>(e, d) ;
 	}
 
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 	{
-		unsigned int f1Emb = getEmbedding(FACE, dd) ;
-		copyDartEmbedding(FACE, phi1(dd), f1Emb) ;
-		copyDartEmbedding(FACE, beta0(phi1(dd)), f1Emb) ;
-		unsigned int f2Emb = getEmbedding(FACE, ee) ;
-		copyDartEmbedding(FACE, phi1(ee), f2Emb) ;
-		copyDartEmbedding(FACE, beta0(phi1(ee)), f2Emb) ;
+		unsigned int f1Emb = getEmbedding<FACE>(dd) ;
+		copyDartEmbedding<FACE>(phi1(dd), f1Emb) ;
+		copyDartEmbedding<FACE>(beta0(phi1(dd)), f1Emb) ;
+		unsigned int f2Emb = getEmbedding<FACE>(ee) ;
+		copyDartEmbedding<FACE>(phi1(ee), f2Emb) ;
+		copyDartEmbedding<FACE>(beta0(phi1(ee)), f2Emb) ;
 	}
 }
 
@@ -64,9 +64,9 @@ Dart EmbeddedGMap2::deleteVertex(Dart d)
 	Dart f = GMap2::deleteVertex(d) ;
 	if(f != NIL)
 	{
-		if (isOrbitEmbedded(FACE))
+		if (isOrbitEmbedded<FACE>())
 		{
-			embedOrbit(FACE, f, getEmbedding(FACE, f)) ;
+			embedOrbit<FACE>(f, getEmbedding<FACE>(f)) ;
 		}
 	}
 	return f ;
@@ -76,24 +76,24 @@ Dart EmbeddedGMap2::cutEdge(Dart d)
 {
 	Dart nd = GMap2::cutEdge(d) ;
 
-	if (isOrbitEmbedded(EDGE))
+	if (isOrbitEmbedded<EDGE>())
 	{
-		unsigned int eEmb = getEmbedding(EDGE, d) ;
-		setDartEmbedding(EDGE, phi2(d), eEmb) ;
-		setDartEmbedding(EDGE, beta0(d), eEmb) ;
-		embedNewCell(EDGE, nd) ;
-		copyCell(EDGE, nd, d) ;
+		unsigned int eEmb = getEmbedding<EDGE>(d) ;
+		setDartEmbedding<EDGE>(phi2(d), eEmb) ;
+		setDartEmbedding<EDGE>(beta0(d), eEmb) ;
+		embedNewCell<EDGE>(nd) ;
+		copyCell<EDGE>(nd, d) ;
 	}
 
-	if(isOrbitEmbedded(FACE))
+	if(isOrbitEmbedded<FACE>())
 	{
-		unsigned int f1Emb = getEmbedding(FACE, d) ;
-		setDartEmbedding(FACE, phi1(d), f1Emb) ;
-		setDartEmbedding(FACE, beta0(d), f1Emb) ;
+		unsigned int f1Emb = getEmbedding<FACE>(d) ;
+		setDartEmbedding<FACE>(phi1(d), f1Emb) ;
+		setDartEmbedding<FACE>(beta0(d), f1Emb) ;
 		Dart e = phi2(nd) ;
-		unsigned int f2Emb = getEmbedding(FACE, d) ;
-		setDartEmbedding(FACE, phi1(e), f2Emb) ;
-		setDartEmbedding(FACE, beta0(e), f2Emb) ;
+		unsigned int f2Emb = getEmbedding<FACE>(d) ;
+		setDartEmbedding<FACE>(phi1(e), f2Emb) ;
+		setDartEmbedding<FACE>(beta0(e), f2Emb) ;
 	}
 
 	return nd ;
@@ -103,11 +103,11 @@ bool EmbeddedGMap2::uncutEdge(Dart d)
 {
 	if(GMap2::uncutEdge(d))
 	{
-		if(isOrbitEmbedded(EDGE))
+		if(isOrbitEmbedded<EDGE>())
 		{
-			unsigned int eEmb = getEmbedding(EDGE, d) ;
-			setDartEmbedding(EDGE, phi2(d), eEmb) ;
-			setDartEmbedding(EDGE, beta0(d), eEmb) ;
+			unsigned int eEmb = getEmbedding<EDGE>(d) ;
+			setDartEmbedding<EDGE>(phi2(d), eEmb) ;
+			setDartEmbedding<EDGE>(beta0(d), eEmb) ;
 		}
 		return true ;
 	}
@@ -145,7 +145,7 @@ bool EmbeddedGMap2::edgeCanCollapse(Dart d)
 	Dart end = phi1(dd) ;
 	do
 	{
-		unsigned int ve = getEmbedding(VERTEX, phi2(vit1)) ;
+		unsigned int ve = getEmbedding<VERTEX>(phi2(vit1)) ;
 		vu1.push_back(ve) ;
 		vit1 = alpha1(vit1) ;
 	} while(vit1 != end) ;
@@ -153,7 +153,7 @@ bool EmbeddedGMap2::edgeCanCollapse(Dart d)
 	Dart vit2 = alpha1(alpha1(dd)) ;
 	do
 	{
-		unsigned int ve = getEmbedding(VERTEX, phi2(vit2)) ;
+		unsigned int ve = getEmbedding<VERTEX>(phi2(vit2)) ;
 		std::vector<unsigned int>::iterator it = std::find(vu1.begin(), vu1.end(), ve) ;
 		if(it != vu1.end())
 			return false ;
@@ -166,16 +166,16 @@ bool EmbeddedGMap2::edgeCanCollapse(Dart d)
 Dart EmbeddedGMap2::collapseEdge(Dart d, bool delDegenerateFaces)
 {
 	unsigned int vEmb = EMBNULL ;
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
-		vEmb = getEmbedding(VERTEX, d) ;
+		vEmb = getEmbedding<VERTEX>(d) ;
 	}
 
 	Dart dV = GMap2::collapseEdge(d, delDegenerateFaces);
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
-		embedOrbit(VERTEX, dV, vEmb) ;
+		embedOrbit<VERTEX>(dV, vEmb) ;
 	}
 
 	return dV ;
@@ -187,23 +187,23 @@ bool EmbeddedGMap2::flipEdge(Dart d)
 	{
 		Dart e = phi2(d) ;
 
-		if (isOrbitEmbedded(VERTEX))
+		if (isOrbitEmbedded<VERTEX>())
 		{
-			unsigned int v1Emb = getEmbedding(VERTEX, beta1(d)) ;
-			setDartEmbedding(VERTEX, d, v1Emb) ;
-			setDartEmbedding(VERTEX, beta2(d), v1Emb) ;
-			unsigned int v2Emb = getEmbedding(VERTEX, beta1(e)) ;
-			setDartEmbedding(VERTEX, e, v2Emb) ;
-			setDartEmbedding(VERTEX, beta2(e), v2Emb) ;
+			unsigned int v1Emb = getEmbedding<VERTEX>(beta1(d)) ;
+			setDartEmbedding<VERTEX>(d, v1Emb) ;
+			setDartEmbedding<VERTEX>(beta2(d), v1Emb) ;
+			unsigned int v2Emb = getEmbedding<VERTEX>(beta1(e)) ;
+			setDartEmbedding<VERTEX>(e, v2Emb) ;
+			setDartEmbedding<VERTEX>(beta2(e), v2Emb) ;
 		}
-		if (isOrbitEmbedded(FACE))
+		if (isOrbitEmbedded<FACE>())
 		{
-			unsigned int f1Emb = getEmbedding(FACE, d) ;
-			setDartEmbedding(FACE, phi_1(d), f1Emb) ;
-			setDartEmbedding(FACE, beta1(d), f1Emb) ;
-			unsigned int f2Emb = getEmbedding(FACE, e) ;
-			setDartEmbedding(FACE, phi_1(e), f2Emb) ;
-			setDartEmbedding(FACE, beta1(e), f2Emb) ;
+			unsigned int f1Emb = getEmbedding<FACE>(d) ;
+			setDartEmbedding<FACE>(phi_1(d), f1Emb) ;
+			setDartEmbedding<FACE>(beta1(d), f1Emb) ;
+			unsigned int f2Emb = getEmbedding<FACE>(e) ;
+			setDartEmbedding<FACE>(phi_1(e), f2Emb) ;
+			setDartEmbedding<FACE>(beta1(e), f2Emb) ;
 		}
 		return true ;
 	}
@@ -216,24 +216,24 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 	{
 		Dart e = phi2(d) ;
 
-		if (isOrbitEmbedded(VERTEX))
+		if (isOrbitEmbedded<VERTEX>())
 		{
-			unsigned int v1Emb = getEmbedding(VERTEX, beta1(d)) ;
-			setDartEmbedding(VERTEX, d, v1Emb) ;
-			setDartEmbedding(VERTEX, beta2(d), v1Emb) ;
-			unsigned int v2Emb = getEmbedding(VERTEX, beta1(e)) ;
-			setDartEmbedding(VERTEX, e, v2Emb) ;
-			setDartEmbedding(VERTEX, beta2(e), v2Emb) ;
+			unsigned int v1Emb = getEmbedding<VERTEX>(beta1(d)) ;
+			setDartEmbedding<VERTEX>(d, v1Emb) ;
+			setDartEmbedding<VERTEX>(beta2(d), v1Emb) ;
+			unsigned int v2Emb = getEmbedding<VERTEX>(beta1(e)) ;
+			setDartEmbedding<VERTEX>(e, v2Emb) ;
+			setDartEmbedding<VERTEX>(beta2(e), v2Emb) ;
 		}
 
-		if (isOrbitEmbedded(FACE))
+		if (isOrbitEmbedded<FACE>())
 		{
-			unsigned int f1Emb = getEmbedding(FACE, d) ;
-			setDartEmbedding(FACE, phi1(d), f1Emb) ;
-			setDartEmbedding(FACE, beta0(phi1(d)), f1Emb) ;
-			unsigned int f2Emb = getEmbedding(FACE, e) ;
-			setDartEmbedding(FACE, phi1(e), f2Emb) ;
-			setDartEmbedding(FACE, beta0(phi1(e)), f2Emb) ;
+			unsigned int f1Emb = getEmbedding<FACE>(d) ;
+			setDartEmbedding<FACE>(phi1(d), f1Emb) ;
+			setDartEmbedding<FACE>(beta0(phi1(d)), f1Emb) ;
+			unsigned int f2Emb = getEmbedding<FACE>(e) ;
+			setDartEmbedding<FACE>(phi1(e), f2Emb) ;
+			setDartEmbedding<FACE>(beta0(phi1(e)), f2Emb) ;
 		}
 		return true ;
 	}
@@ -244,22 +244,22 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 //{
 //	GMap2::insertEdgeInVertex(d, e);
 //
-//	if (isOrbitEmbedded(VERTEX))
+//	if (isOrbitEmbedded<VERTEX>())
 //	{
-//		copyDartEmbedding(VERTEX, e, d) ;
-//		copyDartEmbedding(VERTEX, beta2(e), d) ;
+//		copyDartEmbedding<VERTEX>(e, d) ;
+//		copyDartEmbedding<VERTEX>(beta2(e), d) ;
 //	}
 //
-//	if (isOrbitEmbedded(FACE))
+//	if (isOrbitEmbedded<FACE>())
 //	{
 //		if(!sameFace(d,e))
 //		{
-//			embedNewCell(FACE, e);
-//			copyCell(FACE, e, d) ;
+//			embedNewCell<FACE>(e);
+//			copyCell<FACE>(e, d) ;
 //		}
 //		else
 //		{
-//			embedOrbit(FACE, d, getEmbedding(FACE, d)) ;
+//			embedOrbit<FACE>(d, getEmbedding<FACE>(d)) ;
 //		}
 //	}
 //}
@@ -270,22 +270,22 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 //
 //	GMap2::removeEdgeFromVertex(d);
 //
-//	if (isOrbitEmbedded(VERTEX))
+//	if (isOrbitEmbedded<VERTEX>())
 //	{
-//		embedNewCell(VERTEX, d);
-//		copyCell(VERTEX, d, dPrev);
+//		embedNewCell<VERTEX>(d);
+//		copyCell<VERTEX>(d, dPrev);
 //	}
 //
-//	if (isOrbitEmbedded(FACE))
+//	if (isOrbitEmbedded<FACE>())
 //	{
 //		if(!sameFace(d, dPrev))
 //		{
-//			embedNewCell(FACE, d);
-//			copyCell(FACE, d, dPrev) ;
+//			embedNewCell<FACE>(d);
+//			copyCell<FACE>(d, dPrev) ;
 //		}
 //		else
 //		{
-//			embedOrbit(FACE, d, getEmbedding(FACE, d)) ;
+//			embedOrbit<FACE>(d, getEmbedding<FACE>(d)) ;
 //		}
 //	}
 //}
@@ -301,15 +301,15 @@ void EmbeddedGMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 
 	GMap2::sewFaces(d, e, true) ;
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
-		embedOrbit(VERTEX, d, getEmbedding(VERTEX, d)) ;
-		embedOrbit(VERTEX, e, getEmbedding(VERTEX, beta0(d))) ;
+		embedOrbit<VERTEX>(d, getEmbedding<VERTEX>(d)) ;
+		embedOrbit<VERTEX>(e, getEmbedding<VERTEX>(beta0(d))) ;
 	}
 
-	if (isOrbitEmbedded(EDGE))
+	if (isOrbitEmbedded<EDGE>())
 	{
-		embedOrbit(EDGE, e, getEmbedding(EDGE, d)) ;
+		embedOrbit<EDGE>(e, getEmbedding<EDGE>(d)) ;
 	}
 }
 
@@ -318,12 +318,12 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 	Dart e = beta2(d);
 	GMap2::unsewFaces(d);
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
 		if(!sameVertex(d,e))
 		{
-			embedNewCell(VERTEX, e);
-			copyCell(VERTEX, e, d);
+			embedNewCell<VERTEX>(e);
+			copyCell<VERTEX>(e, d);
 		}
 
 		d = beta0(d);
@@ -331,15 +331,15 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 
 		if(!sameVertex(d,e))
 		{
-			embedNewCell(VERTEX, e);
-			copyCell(VERTEX, e, d);
+			embedNewCell<VERTEX>(e);
+			copyCell<VERTEX>(e, d);
 		}
 	}
 
-	if (isOrbitEmbedded(EDGE))
+	if (isOrbitEmbedded<EDGE>())
 	{
-		embedNewCell(EDGE, e);
-		copyCell(EDGE, e, d);
+		embedNewCell<EDGE>(e);
+		copyCell<EDGE>(e, d);
 	}
 }
 
@@ -352,11 +352,11 @@ bool EmbeddedGMap2::collapseDegeneratedFace(Dart d)
 
 	if(GMap2::collapseDegeneratedFace(d))
 	{
-		if (isOrbitEmbedded(EDGE) && updateEdgeEmb)
+		if (isOrbitEmbedded<EDGE>() && updateEdgeEmb)
 		{
-			unsigned int eEmb = getEmbedding(EDGE, e) ;
-			setDartEmbedding(EDGE, beta2(e), eEmb) ;
-			setDartEmbedding(EDGE, phi2(e), eEmb) ;
+			unsigned int eEmb = getEmbedding<EDGE>(e) ;
+			setDartEmbedding<EDGE>(beta2(e), eEmb) ;
+			setDartEmbedding<EDGE>(phi2(e), eEmb) ;
 		}
 		return true ;
 	}
@@ -367,24 +367,24 @@ void EmbeddedGMap2::splitFace(Dart d, Dart e)
 {
 	GMap2::splitFace(d, e) ;
 
-	if (isOrbitEmbedded(VERTEX))
+	if (isOrbitEmbedded<VERTEX>())
 	{
-		unsigned int v1Emb = getEmbedding(VERTEX, d) ;
-		setDartEmbedding(VERTEX, phi_1(e), v1Emb) ;
-		setDartEmbedding(VERTEX, beta1(d), v1Emb) ;
-		setDartEmbedding(VERTEX, beta1(phi_1(e)), v1Emb) ;
-		unsigned int v2Emb = getEmbedding(VERTEX, e) ;
-		setDartEmbedding(VERTEX, phi_1(d), v2Emb) ;
-		setDartEmbedding(VERTEX, beta1(e), v2Emb) ;
-		setDartEmbedding(VERTEX, beta1(phi_1(d)), v2Emb) ;
+		unsigned int v1Emb = getEmbedding<VERTEX>(d) ;
+		setDartEmbedding<VERTEX>(phi_1(e), v1Emb) ;
+		setDartEmbedding<VERTEX>(beta1(d), v1Emb) ;
+		setDartEmbedding<VERTEX>(beta1(phi_1(e)), v1Emb) ;
+		unsigned int v2Emb = getEmbedding<VERTEX>(e) ;
+		setDartEmbedding<VERTEX>(phi_1(d), v2Emb) ;
+		setDartEmbedding<VERTEX>(beta1(e), v2Emb) ;
+		setDartEmbedding<VERTEX>(beta1(phi_1(d)), v2Emb) ;
 	}
-	if (isOrbitEmbedded(FACE))
+	if (isOrbitEmbedded<FACE>())
 	{
-		unsigned int fEmb = getEmbedding(FACE, d) ;
-		setDartEmbedding(FACE, phi_1(d), fEmb) ;
-		setDartEmbedding(FACE, beta1(phi_1(d)), fEmb) ;
-		embedNewCell(FACE, e) ;
-		copyCell(FACE, e, d) ;
+		unsigned int fEmb = getEmbedding<FACE>(d) ;
+		setDartEmbedding<FACE>(phi_1(d), fEmb) ;
+		setDartEmbedding<FACE>(beta1(phi_1(d)), fEmb) ;
+		embedNewCell<FACE>(e) ;
+		copyCell<FACE>(e, d) ;
 	}
 }
 
@@ -394,9 +394,9 @@ bool EmbeddedGMap2::mergeFaces(Dart d)
 
 	if(GMap2::mergeFaces(d))
 	{
-		if (isOrbitEmbedded(FACE))
+		if (isOrbitEmbedded<FACE>())
 		{
-			embedOrbit(FACE, dNext, getEmbedding(FACE, dNext)) ;
+			embedOrbit<FACE>(dNext, getEmbedding<FACE>(dNext)) ;
 		}
 		return true ;
 	}
@@ -417,14 +417,14 @@ bool EmbeddedGMap2::mergeVolumes(Dart d, Dart e)
 	{
 		darts.push_back(phi2(fit)) ;
 
-		if (isOrbitEmbedded(VERTEX))
+		if (isOrbitEmbedded<VERTEX>())
 		{
-			vEmb.push_back(getEmbedding(VERTEX, phi2(fit))) ;
+			vEmb.push_back(getEmbedding<VERTEX>(phi2(fit))) ;
 		}
 
-		if (isOrbitEmbedded(EDGE))
+		if (isOrbitEmbedded<EDGE>())
 		{
-			eEmb.push_back(getEmbedding(EDGE, fit)) ;
+			eEmb.push_back(getEmbedding<EDGE>(fit)) ;
 		}
 
 		fit = phi1(fit) ;
@@ -434,14 +434,14 @@ bool EmbeddedGMap2::mergeVolumes(Dart d, Dart e)
 	{
 		for(unsigned int i = 0; i < darts.size(); ++i)
 		{
-			if (isOrbitEmbedded(VERTEX))
+			if (isOrbitEmbedded<VERTEX>())
 			{
-				embedOrbit(VERTEX, darts[i], vEmb[i]) ;
+				embedOrbit<VERTEX>(darts[i], vEmb[i]) ;
 			}
 
-			if (isOrbitEmbedded(EDGE))
+			if (isOrbitEmbedded<EDGE>())
 			{
-				embedOrbit(EDGE, darts[i], eEmb[i]) ;
+				embedOrbit<EDGE>(darts[i], eEmb[i]) ;
 			}
 		}
 		return true ;
@@ -456,16 +456,16 @@ unsigned int EmbeddedGMap2::closeHole(Dart d, bool forboundary)
 	Dart it = dd ;
 	do
 	{
-		if (isOrbitEmbedded(VERTEX))
+		if (isOrbitEmbedded<VERTEX>())
 		{
-			copyDartEmbedding(VERTEX, it, beta2(it)) ;
-			copyDartEmbedding(VERTEX, beta0(it), phi2(it)) ;
+			copyDartEmbedding<VERTEX>(it, beta2(it)) ;
+			copyDartEmbedding<VERTEX>(beta0(it), phi2(it)) ;
 		}
-		if (isOrbitEmbedded(EDGE))
+		if (isOrbitEmbedded<EDGE>())
 		{
-			unsigned int eEmb = getEmbedding(EDGE, beta2(it)) ;
-			setDartEmbedding(EDGE, it, eEmb) ;
-			setDartEmbedding(EDGE, beta0(it), eEmb) ;
+			unsigned int eEmb = getEmbedding<EDGE>(beta2(it)) ;
+			setDartEmbedding<EDGE>(it, eEmb) ;
+			setDartEmbedding<EDGE>(beta0(it), eEmb) ;
 		}
 		it = phi1(it) ;
 	} while(it != dd) ;
@@ -481,27 +481,27 @@ bool EmbeddedGMap2::check()
 	CGoGNout << "Check: embedding begin" << CGoGNendl ;
 	for(Dart d = begin(); d != end(); next(d))
 	{
-		if (isOrbitEmbedded(VERTEX))
+		if (isOrbitEmbedded<VERTEX>())
 		{
-			if (getEmbedding(VERTEX, d) != getEmbedding(VERTEX, alpha1(d)))
+			if (getEmbedding<VERTEX>(d) != getEmbedding<VERTEX>(alpha1(d)))
 			{
 				CGoGNout << "Check: different embeddings on vertex" << CGoGNendl ;
 				return false ;
 			}
 		}
 
-		if (isOrbitEmbedded(EDGE))
+		if (isOrbitEmbedded<EDGE>())
 		{
-			if (getEmbedding(EDGE, d) != getEmbedding(EDGE, phi2(d)))
+			if (getEmbedding<EDGE>(d) != getEmbedding<EDGE>(phi2(d)))
 			{
 				CGoGNout << "Check: different embeddings on edge" << CGoGNendl ;
 				return false ;
 			}
 		}
 
-		if (isOrbitEmbedded(FACE))
+		if (isOrbitEmbedded<FACE>())
 		{
-			if (getEmbedding(FACE, d) != getEmbedding(FACE, phi1(d)))
+			if (getEmbedding<FACE>(d) != getEmbedding<FACE>(phi1(d)))
 		{
 				CGoGNout << "Check: different embeddings on face" << CGoGNendl ;
 				return false ;
@@ -511,13 +511,13 @@ bool EmbeddedGMap2::check()
 
 	CGoGNout << "Check: embedding ok" << CGoGNendl ;
 
-    std::cout << "nb vertex orbits : " << getNbOrbits(VERTEX) << std::endl ;
+    std::cout << "nb vertex orbits : " << getNbOrbits<VERTEX>() << std::endl ;
     std::cout << "nb vertex cells : " << m_attribs[VERTEX].size() << std::endl ;
 
-    std::cout << "nb edge orbits : " << getNbOrbits(EDGE) << std::endl ;
+    std::cout << "nb edge orbits : " << getNbOrbits<EDGE>() << std::endl ;
     std::cout << "nb edge cells : " << m_attribs[EDGE].size() << std::endl ;
 
-    std::cout << "nb face orbits : " << getNbOrbits(FACE) << std::endl ;
+    std::cout << "nb face orbits : " << getNbOrbits<FACE>() << std::endl ;
     std::cout << "nb face cells : " << m_attribs[FACE].size() << std::endl ;
 
 	return true ;

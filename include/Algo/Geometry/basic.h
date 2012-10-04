@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -40,7 +40,7 @@ namespace Geometry
  * vectorOutOfDart return a dart from the position of vertex attribute of d to the position of vertex attribute of phi1(d)
  */
 template <typename PFP>
-inline typename PFP::VEC3 vectorOutOfDart(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+inline typename PFP::VEC3 vectorOutOfDart(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 vec = position[map.phi1(d)] ;
 	vec -= position[d] ;
@@ -48,14 +48,14 @@ inline typename PFP::VEC3 vectorOutOfDart(typename PFP::MAP& map, Dart d, const 
 }
 
 template <typename PFP>
-inline typename PFP::REAL edgeLength(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+inline typename PFP::REAL edgeLength(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 v = vectorOutOfDart<PFP>(map, d, position) ;
 	return v.norm() ;
 }
 
 template <typename PFP>
-inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const typename PFP::TVEC3& position)
+inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	typename PFP::VEC3 v1 = vectorOutOfDart<PFP>(map, d1, position) ;
 	typename PFP::VEC3 v2 = vectorOutOfDart<PFP>(map, d2, position) ;
@@ -63,7 +63,7 @@ inline float angle(typename PFP::MAP& map, Dart d1, Dart d2, const typename PFP:
 }
 
 template <typename PFP>
-bool isTriangleObtuse(typename PFP::MAP& map, Dart d, const typename PFP::TVEC3& position)
+bool isTriangleObtuse(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
 {
 	return Geom::isTriangleObtuse(position[d], position[map.phi1(d)], position[map.phi_1(d)]) ;
 }

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -142,7 +142,7 @@ bool BoundingBox<VEC>::isInitialized() const
 template <typename VEC>
 void BoundingBox<VEC>::reset()
 {
-	m_initialized=false;
+	m_initialized = false;
 }
 
 template <typename VEC>
@@ -197,7 +197,6 @@ void BoundingBox<VEC>::fusion(const BoundingBox<VEC>& bb)
 	}
 }
 
-
 template <typename VEC>
 bool BoundingBox<VEC>::contains(const VEC& p)
 {
@@ -220,22 +219,21 @@ bool BoundingBox<VEC>::contains(const BoundingBox<VEC>& bb)
 	return this->contains(bb.min()) && this->contains(bb.max());
 }
 
+template <typename VEC>
+void BoundingBox<VEC>::scale(typename VEC::DATA_TYPE size)
+{
+	assert(m_initialized || !"Bounding box not initialized");
+	m_pMin *= size ;
+	m_pMax *= size ;
+}
 
-
-
-//template <typename VEC>
-//friend std::ostream& BoundingBox<VEC>::operator<<(std::ostream& out, const BoundingBox<VEC>& bb)
-//{
-//	out << bb.min() << " " << bb.max() ;
-//	return out ;
-//}
-//
-//template <typename VEC>
-//friend std::istream& BoundingBox<VEC>::operator>>(std::istream& in, BoundingBox<VEC>& bb)
-//{
-//	in >> bb.min() >> bb.max() ;
-//	return in ;
-//}
+template <typename VEC>
+void BoundingBox<VEC>::centeredScale(typename VEC::DATA_TYPE size)
+{
+	VEC center = (m_pMin + m_pMax) / typename VEC::DATA_TYPE(2) ;
+	m_pMin = ((m_pMin - center) * size) + center ;
+	m_pMax = ((m_pMax - center) * size) + center ;
+}
 
 } // namespace Geom
 

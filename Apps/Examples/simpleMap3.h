@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -52,7 +52,7 @@ public:
 	MAP myMap ;
 	SelectorTrue allDarts ;
 
-	PFP::TVEC3 position ;
+	VertexAttribute<VEC3> position ;
 
 	SimpleMap3() ;
 

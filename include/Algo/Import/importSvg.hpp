@@ -1,3 +1,27 @@
+/*******************************************************************************
+* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+* version 0.1                                                                  *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+*                                                                              *
+* This library is free software; you can redistribute it and/or modify it      *
+* under the terms of the GNU Lesser General Public License as published by the *
+* Free Software Foundation; either version 2.1 of the License, or (at your     *
+* option) any later version.                                                   *
+*                                                                              *
+* This library is distributed in the hope that it will be useful, but WITHOUT  *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+* for more details.                                                            *
+*                                                                              *
+* You should have received a copy of the GNU Lesser General Public License     *
+* along with this library; if not, write to the Free Software Foundation,      *
+* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+*                                                                              *
+* Web site: http://cgogn.unistra.fr/                                           *
+* Contact information: cgogn@unistra.fr                                        *
+*                                                                              *
+*******************************************************************************/
+
 #include <iostream>
 #include "Geometry/bounding_box.h"
 #include "Geometry/plane_3d.h"
@@ -187,7 +211,7 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 }
 
 template <typename PFP>
-bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP::TVEC3& position, CellMarker& polygons, CellMarker& polygonsFaces)
+bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces)
 {
 	typedef typename PFP::VEC3 VEC3;
 	typedef std::vector<VEC3 > POLYGON;
@@ -319,9 +343,9 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 		return false;
 	}
 
-	CellMarker brokenMark(map,EDGE);
-	AttributeHandler<float> edgeWidth = map.template addAttribute<float>(EDGE, "width");
-	AttributeHandler<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > >(EDGE, "planes");
+	CellMarker<EDGE> brokenMark(map);
+	EdgeAttribute<float> edgeWidth = map.template addAttribute<float, EDGE>("width");
+	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create broken lines
@@ -429,7 +453,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//add bounding box
 
-	CellMarker boundingBox(map,VERTEX);
+	CellMarker<VERTEX> boundingBox(map);
 //	Dart dBorder = map.newFace(4);
 //
 //	VEC3 bbCenter = bb->center();
@@ -488,7 +512,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//process broken lines
-	CellMarker eMTreated(map,EDGE);
+	CellMarker<EDGE> eMTreated(map);
 	for(Dart d = map.begin();d != map.end(); map.next(d))
 	{
 		if(brokenL.isMarked(d) && !eMTreated.isMarked(d))
@@ -518,7 +542,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 
 			//if the valence of one of the vertex is equal to one
 			//cut the edge to insert the quadrangular face
-			if(map.alpha1(d1)==d1)
+			if(map.phi2_1(d1)==d1)
 			{
 				map.cutEdge(d2);
 
@@ -530,7 +554,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 				edgePlanes[map.phi_1(d1)] = Geom::Plane3D<typename PFP::REAL>(v,p1);
 			}
 
-			if(map.alpha1(d2)==d2)
+			if(map.phi2_1(d2)==d2)
 			{
 				map.cutEdge(d1);
 				brokenL.mark(map.phi1(d1));
@@ -692,8 +716,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, typename PFP
 	return true ;
 }
 
-} //import
+} // namespace Import
 
-} //algo
+} // namespace Algo
 
-} //cgogn
+} // namespace CGoGN

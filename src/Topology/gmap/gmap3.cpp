@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -70,7 +70,7 @@ void GMap3::deleteVolume(Dart d)
 	std::vector<Dart> visitedFaces;		// Faces that are traversed
 	visitedFaces.reserve(512);
 	visitedFaces.push_back(d);			// Start with the face of d
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 
 	// For every face added to the list
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
@@ -86,7 +86,7 @@ void GMap3::deleteVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -103,7 +103,7 @@ void GMap3::fillHole(Dart d)
 	Dart dd = d ;
 	if(!isBoundaryMarked(dd))
 		dd = phi3(dd) ;
-	boundaryUnmarkOrbit(VOLUME, dd) ;
+	boundaryUnmarkOrbit<VOLUME>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -130,7 +130,7 @@ Dart GMap3::deleteVertex(Dart d)
 	{
 		if(!mf.isMarked(fstoretmp[i]))
 		{
-			mf.markOrbit(FACE, fstoretmp[i]);
+			mf.markOrbit<FACE>(fstoretmp[i]);
 			fstore.push_back(fstoretmp[i]);
 		}
 	}
@@ -215,8 +215,17 @@ bool GMap3::uncutEdge(Dart d)
 	return false;
 }
 
+bool GMap3::deleteEdgePreCond(Dart d)
+{
+	unsigned int nb1 = vertexDegree(d);
+	unsigned int nb2 = vertexDegree(phi1(d));
+	return (nb1!=2) && (nb2!=2);
+}
+
 Dart GMap3::deleteEdge(Dart d)
 {
+	assert(deleteEdgePreCond(d));
+
 	if(isBoundaryEdge(d))
 		return NIL ;
 
@@ -256,9 +265,17 @@ Dart GMap3::deleteEdge(Dart d)
 	return res ;
 }
 
+bool GMap3::splitFacePreCond(Dart d, Dart e)
+{
+	return (d != e && GMap2::sameFace(d, e)) ;
+}
+
 void GMap3::splitFace(Dart d, Dart e)
 {
-	assert(d != e && GMap2::sameOrientedFace(d, e)) ;
+	assert(splitFacePreCond(d, e));
+
+	if(!sameOrientedFace(d, e))
+		e = beta1(e) ;
 
 	Dart dd = beta1(beta3(d));
 	Dart ee = beta1(beta3(e));
@@ -353,8 +370,8 @@ void GMap3::unsewVolumes(Dart d)
 	unsigned int nbE = faceDegree(d) ;
 	Dart d3 = phi3(d);
 
-	Dart b1 = newBoundaryFace(nbE) ;
-	Dart b2 = newBoundaryFace(nbE) ;
+	Dart b1 = newBoundaryCycle(nbE) ;
+	Dart b2 = newBoundaryCycle(nbE) ;
 
 	Dart fit1 = d ;
 	Dart fit2 = d3 ;
@@ -410,15 +427,23 @@ void GMap3::splitVolume(std::vector<Dart>& vd)
 	Dart e = vd.front();
 	Dart e2 = phi2(e);
 
-	//unsew the edge path
-	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
-		GMap2::unsewFaces(*it);
-
-	GMap2::fillHole(e) ;
-	GMap2::fillHole(e2) ;
+	GMap2::splitSurface(vd,true,true);
 
 	//sew the two connected components
-	GMap3::sewVolumes(beta2(e), beta2(e2), false);
+	GMap3::sewVolumes(phi2(e), phi2(e2), false);
+
+//	Dart e = vd.front();
+//	Dart e2 = phi2(e);
+//
+//	//unsew the edge path
+//	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+//		GMap2::unsewFaces(*it);
+//
+//	GMap2::fillHole(e) ;
+//	GMap2::fillHole(e2) ;
+//
+//	//sew the two connected components
+//	GMap3::sewVolumes(beta2(e), beta2(e2), false);
 }
 
 /*! @name Topological Queries
@@ -529,7 +554,7 @@ unsigned int GMap3::vertexDegree(Dart d)
 		if(!me.isMarked(*it))
 		{
 			++count;
-			me.markOrbit(EDGE, *it);
+			me.markOrbit<EDGE>(*it);
 		}
 	}
 
@@ -649,7 +674,7 @@ bool GMap3::isBoundaryVolume(Dart d)
 	std::vector<Dart> visitedFaces ;
 	visitedFaces.reserve(128) ;
 	visitedFaces.push_back(d) ;
-	mark.markOrbit(FACE, d) ;
+	mark.markOrbit<FACE>(d) ;
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
@@ -663,7 +688,7 @@ bool GMap3::isBoundaryVolume(Dart d)
 			if(!mark.isMarked(ee)) // not already marked
 			{
 				visitedFaces.push_back(ee) ;
-				mark.markOrbit(FACE, ee) ;
+				mark.markOrbit<FACE>(ee) ;
 			}
 			e = phi1(e) ;
 		} while(e != visitedFaces[i]) ;
@@ -823,6 +848,18 @@ bool GMap3::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	return found;
 }
 
+bool GMap3::foreach_dart_of_oriented_edge(Dart d, FunctorType& f, unsigned int thread)
+{
+	Dart it = d;
+	do
+	{
+		if (GMap2::foreach_dart_of_oriented_edge(it, f, thread))
+			return true;
+		it = alpha2(it);
+	} while (it != d);
+	return false;
+}
+
 bool GMap3::foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread)
 {
 	Dart it = d;
@@ -889,7 +926,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 	std::vector<Dart> visitedFaces;	// Faces that are traversed
 	visitedFaces.reserve(1024) ;
 	visitedFaces.push_back(d);		// Start with the face of d
-	m.markOrbit(FACE, d) ;
+	m.markOrbit<FACE>(d) ;
 
 	unsigned int count = 0 ;
 
@@ -898,7 +935,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 	{
 		Dart f = visitedFaces[i] ;
 		unsigned int degree = faceDegree(f) ;
-		Dart b = newBoundaryFace(degree) ;
+		Dart b = newBoundaryCycle(degree) ;
 		++count ;
 
 		Dart bit = b ;
@@ -914,7 +951,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 					if(!m.isMarked(e))
 					{
 						visitedFaces.push_back(e) ;
-						m.markOrbit(FACE, e) ;
+						m.markOrbit<FACE>(e) ;
 					}
 				}
 				else if(isBoundaryMarked(e))
@@ -937,14 +974,19 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 	return count ;
 }
 
-void GMap3::closeMap()
+unsigned int GMap3::closeMap()
 {
 	// Search the map for topological holes (fix points of beta3)
+	unsigned int nb = 0 ;
 	for (Dart d = begin(); d != end(); next(d))
 	{
 		if (beta3(d) == d)
+		{
+			++nb ;
 			closeHole(d);
+		}
 	}
+	return nb ;
 }
 
 } // namespace CGoGN

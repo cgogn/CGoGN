@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -45,7 +45,7 @@ public:
 
 	GMap1();
 
-	virtual std::string mapTypeName();
+	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension();
 
@@ -93,18 +93,18 @@ public:
 	* @param nbEdges the number of sides of face
 	* @return a dart of the edge
 	*/
-	Dart newFace(unsigned int nbEdges);
+	Dart newCycle(unsigned int nbEdges);
 
 	//! Create an new face for boundary (marked)
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
-	Dart newBoundaryFace(unsigned int nbEdges);
+	Dart newBoundaryCycle(unsigned int nbEdges);
 
 	//! Delete a face erasing all its darts
 	/*! @param d a dart of the face
 	 */
-	void deleteFace(Dart d) ;
+	void deleteCycle(Dart d) ;
 	//@}
 
 	/*! @name Topological Operators
@@ -135,7 +135,7 @@ public:
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	void splitFace(Dart d, Dart e);
+	void splitCycle(Dart d, Dart e);
 
 	//! Merge the two faces of d and e, darts d & e disappear
 	/*! \pre Dart d and e MUST belong to distinct faces
@@ -143,14 +143,14 @@ public:
 	 *  @param d a dart in the first face
 	 *  @param e a dart in the second face
 	 */
-	void mergeFaces(Dart d, Dart e);
+	void mergeCycles(Dart d, Dart e);
 
 	//! Link two faces by adding an edge between two vertices
 	/*! \pre Dart d and e MUST be different and belong to distinct face
 	 *  @param d first dart in the face
 	 *  @param e second dart in the face
 	 */
-	void linkFaces(Dart d, Dart e);
+	void linkCycles(Dart d, Dart e);
 	//@}
 
 	/*! @name Topological Queries
@@ -162,25 +162,25 @@ public:
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
-	bool sameOrientedFace(Dart d, Dart e) ;
+	bool sameOrientedCycle(Dart d, Dart e) ;
 
 	//! Test if dart d and e belong to the same face
 	/*! @param d a dart
 	 *  @param e a dart
 	 */
-	bool sameFace(Dart d, Dart e) ;
+	bool sameCycle(Dart d, Dart e) ;
 
 	//! Length of a face (its number of oriented edges)
 	/*! @param d a dart of the face
 	 *  @return the length of the face
 	 */
-	unsigned int faceDegree(Dart d);
+	unsigned int cycleDegree(Dart d);
 
 	/**
 	 * check if the face of d is a triangle
 	 * @return a boolean indicating if the face is a triangle
 	 */
-	bool isFaceTriangle(Dart d);
+	bool isCycleTriangle(Dart d);
 	//@}
 
 	/*! @name Cell Functors
@@ -189,43 +189,30 @@ public:
 
 	//@{
 	/**
-	* Apply a functor on each dart of a face
-	* @param d a dart of the face
+	* Apply a functor on each dart of a vertex
+	* @param d a dart of the vertex
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_vertex(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
 	* Apply a functor on each dart of an edge
-	* @param d a dart of the oriented face
+	* @param d a dart of the edge
 	* @param fonct functor obj ref
 	*/
 	bool foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread=0);
 
 	/**
-	* Apply a functor on each dart of an oriented face
-	* @param d a dart of the oriented face
+	* Apply a functor on each dart of an oriented cc (face)
+	* @param d a dart of the oriented cc
 	* @param fonct functor obj ref
 	*/
-	bool foreach_dart_of_oriented_face(Dart d, FunctorType& f, unsigned int thread=0);
+	bool foreach_dart_of_oriented_cc(Dart d, FunctorType& f, unsigned int thread=0);
 
-	//! Apply a functor on every dart of a face
-	/*! @param d a dart of the face
+	//! Apply a functor on every dart of a cc (face)
+	/*! @param d a dart of the cc
 	 *  @param f the functor to apply
 	 */
-	bool foreach_dart_of_face(Dart d, FunctorType& fonct, unsigned int thread=0);
-
-	//! Apply a functor on every dart of a volume
-	/*! @param d a dart of the volume
-	 *  @param f the functor to apply
-	 */
-	bool foreach_dart_of_volume(Dart d, FunctorType& fonct, unsigned int thread=0);
-
-	/**
-	* Apply a functor on each dart of a cc
-	* @param d a dart of the cc
-	* @param fonct functor obj ref
-	*/
 	bool foreach_dart_of_cc(Dart d, FunctorType& fonct, unsigned int thread=0);
 	//@}
 };

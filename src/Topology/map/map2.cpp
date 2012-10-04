@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,39 +17,89 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 #include "Topology/map/map2.h"
 #include "Topology/generic/traversorCell.h"
+#include "Topology/generic/dartmarker.h"
 
 namespace CGoGN
 {
+
+void Map2::rdfi(Dart t, DartMarker& m1, DartMarker& m2)
+{
+	Dart p = NIL;
+	while (!(p == NIL && (t == NIL || (m1.isMarked(t) || m2.isMarked(t)) ) ) )
+	{
+		if (t == NIL || (m1.isMarked(t) || m2.isMarked(t)))
+		{
+			if (m2.isMarked(p))			// pop
+			{
+				Dart q = phi2(p);		//	q = p->s1;
+				unsigned int pi=dartIndex(p);
+				(*m_phi2)[pi]=t;		//	p->s1 = t;
+				t = p;
+				p = q;
+	     	}
+			else						// swing
+	     	{
+				m2.mark(p);				//	p->val = 2;
+				Dart q = phi1(p);		//	q = p->s0;
+				unsigned int pi=dartIndex(p);
+				(*m_phi1)[pi]=t;		//	p->s0 = t;
+				t = phi2(p);			//	t = p->s1;
+				(*m_phi2)[pi]=q;		//	p->s1 = q;
+			}
+		}
+		else							 // push
+		{
+			m1.mark(t);					//	t->val = 1;
+			Dart q = phi1(t);			//	q = t->s0;
+			unsigned int ti=dartIndex(t);
+			(*m_phi1)[ti]=p;			//	t->s0 = p;
+			p = t;
+			t = q;
+		}
+	}
+}
 
 void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 {
 	for (unsigned int i = m_attribs[DART].begin(); i != m_attribs[DART].end(); m_attribs[DART].next(i))
 	{
-		{
-			Dart& d = m_phi1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d != e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi_1->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d != e)
-				d = e;
-		}
-		{
-			Dart& d = m_phi2->operator [](i);
-			Dart e = Dart(oldnew[d.index]);
-			if (d != e)
-				d = e;
-		}
+		unsigned int d_index = dartIndex(m_phi1->operator[](i));
+		if (d_index != oldnew[d_index])
+			m_phi1->operator[](i) = Dart(oldnew[d_index]);
+
+		d_index = dartIndex(m_phi_1->operator[](i));
+		if (d_index != oldnew[d_index])
+			m_phi_1->operator[](i) = Dart(oldnew[d_index]);
+
+		d_index = dartIndex(m_phi2->operator[](i));
+		if (d_index != oldnew[d_index])
+			m_phi2->operator[](i) = Dart(oldnew[d_index]);
+
+//		{
+//			Dart& d = m_phi1->operator [](i);
+//			Dart e = Dart(oldnew[d.index]);
+//			if (d != e)
+//				d = e;
+//		}
+//		{
+//			Dart& d = m_phi_1->operator [](i);
+//			Dart e = Dart(oldnew[d.index]);
+//			if (d != e)
+//				d = e;
+//		}
+//		{
+//			Dart& d = m_phi2->operator [](i);
+//			Dart e = Dart(oldnew[d.index]);
+//			if (d != e)
+//				d = e;
+//		}
 	}
 }
 
@@ -75,19 +125,31 @@ Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 	return d;
 }
 
-void Map2::deleteFace(Dart d)
+void Map2::deleteFace(Dart d, bool withBoundary)
 {
 	assert(!isBoundaryMarked(d)) ;
+	if (withBoundary)
+	{
+		Dart it = d ;
+		do
+		{
+			if(!isBoundaryEdge(it))
+				unsewFaces(it) ;
+			it = phi1(it) ;
+		} while(it != d) ;
+		Dart dd = phi2(d) ;
+		Map1::deleteCycle(d) ;
+		Map1::deleteCycle(dd) ;
+		return;
+	}
+	//else with remove the face and create fixed points
 	Dart it = d ;
 	do
 	{
-		if(!isBoundaryEdge(it))
-			unsewFaces(it) ;
+		phi2unsew(it);
 		it = phi1(it) ;
 	} while(it != d) ;
-	Dart dd = phi2(d) ;
-	Map1::deleteCycle(d) ;
-	Map1::deleteCycle(dd) ;
+	Map1::deleteCycle(d);
 }
 
 void Map2::deleteCC(Dart d)
@@ -125,7 +187,7 @@ void Map2::fillHole(Dart d)
 	Dart dd = d ;
 	if(!isBoundaryMarked(dd))
 		dd = phi2(dd) ;
-	boundaryUnmarkOrbit(FACE, dd) ;
+	boundaryUnmarkOrbit<FACE>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -134,7 +196,7 @@ void Map2::fillHole(Dart d)
 
 void Map2::splitVertex(Dart d, Dart e)
 {
-	assert(sameOrientedVertex(d, e)) ;
+	assert(sameVertex(d, e)) ;
 	Dart d2 = phi2(d) ; assert(d != d2) ;
 	Dart e2 = phi2(e) ; assert(e != e2) ;
 	Dart nd = Map1::cutEdge(d2) ;	// Cut the edge of dd (make a new half edge)
@@ -144,6 +206,7 @@ void Map2::splitVertex(Dart d, Dart e)
 
 Dart Map2::deleteVertex(Dart d)
 {
+	//TODO utile ?
 	if(isBoundaryVertex(d))
 		return NIL ;
 
@@ -157,7 +220,7 @@ Dart Map2::deleteVertex(Dart d)
 		Dart f = phi_1(phi2(vit)) ;
 		phi1sew(vit, f) ;
 
-		vit = alpha1(vit) ;
+		vit = phi2(phi_1(vit)) ;
 	} while(vit != d) ;
 	Map1::deleteCycle(d) ;
 	return res ;
@@ -166,10 +229,10 @@ Dart Map2::deleteVertex(Dart d)
 Dart Map2::cutEdge(Dart d)
 {
 	Dart e = phi2(d);
-	phi2unsew(d);			// remove old phi2 links
+	phi2unsew(d);					// remove old phi2 links
 	Dart nd = Map1::cutEdge(d);		// Cut the 1-edge of d
 	Dart ne = Map1::cutEdge(e);		// Cut the 1-edge of phi2(d)
-	phi2sew(d, ne);	// Correct the phi2 links
+	phi2sew(d, ne);					// Correct the phi2 links
 	phi2sew(e, nd);
 	return nd;
 }
@@ -263,6 +326,20 @@ bool Map2::flipBackEdge(Dart d)
 	return false ; // cannot flip a border edge
 }
 
+void Map2::swapEdges(Dart d, Dart e)
+{
+	assert(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e));
+
+	//Dart d2 = phi2(d);
+	//Dart e2 = phi2(e);
+
+	phi2unsew(d);
+	phi2unsew(e) ;
+
+	phi2sew(d, e);
+	//phi2sew(d2, e2);
+}
+
 //void Map2::insertEdgeInVertex(Dart d, Dart e)
 //{
 //	assert(!sameVertex(d,e) && phi2(e) == phi_1(e));
@@ -308,7 +385,7 @@ void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 
 void Map2::unsewFaces(Dart d)
 {
-	assert(!isBoundaryEdge(d)) ;
+	assert(!Map2::isBoundaryEdge(d)) ;
 
 	Dart dd = phi2(d) ;
 
@@ -316,12 +393,13 @@ void Map2::unsewFaces(Dart d)
 	Dart ee = phi1(e) ;
 
 	Dart f = findBoundaryEdgeOfVertex(d) ;
+	Dart ff = findBoundaryEdgeOfVertex(dd) ;
+
 	if(f != NIL)
 		phi1sew(e, phi_1(f)) ;
 
-	f = findBoundaryEdgeOfVertex(dd) ;
-	if(f != NIL)
-		phi1sew(ee, phi_1(f)) ;
+	if(ff != NIL)
+		phi1sew(ee, phi_1(ff)) ;
 
 	phi2unsew(d) ;
 
@@ -355,7 +433,7 @@ bool Map2::collapseDegeneratedFace(Dart d)
 
 void Map2::splitFace(Dart d, Dart e)
 {
-	assert(d != e && sameFace(d, e)) ;
+	assert(d != e && Map2::sameFace(d, e)) ;
 	Dart dd = Map1::cutEdge(phi_1(d)) ;
 	Dart ee = Map1::cutEdge(phi_1(e)) ;
 	Map1::splitCycle(dd, ee) ;
@@ -414,25 +492,6 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 	phi2sew(phi1(e), vv2) ;
 }
 
-void Map2::unsewAroundVertex(Dart d)
-{
-	Dart it = d ;
-	do
-	{
-		Dart temp = phi1(it) ;
-		Dart e_1 = phi_1(it) ;
-
-		do
-		{
-			unsewFaces(temp) ;
-			temp = phi1(temp) ;
-		} while(temp != e_1);
-
-		it = alpha1(it);
-	}
-	while(it != d);
-}
-
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
 	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
@@ -482,6 +541,27 @@ bool Map2::mergeVolumes(Dart d, Dart e)
 	return true ;
 }
 
+void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool secondSideClosed)
+{
+//	assert(checkSimpleOrientedPath(vd)) ;
+
+	Dart e = vd.front() ;
+	Dart e2 = phi2(e) ;
+
+	//unsew the edge path
+	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
+	{
+		if(!Map2::isBoundaryEdge(*it))
+			unsewFaces(*it) ;
+	}
+
+	if(firstSideClosed)
+		Map2::fillHole(e) ;
+
+	if(secondSideClosed)
+		Map2::fillHole(e2) ;
+}
+
 /*! @name Topological Queries
  *  Return or set various topological information
  *************************************************************************/
@@ -493,7 +573,7 @@ bool Map2::sameOrientedVertex(Dart d, Dart e)
 	{
 		if (it == e)			// Test equality with e
 			return true;
-		it = alpha1(it);
+		it = phi2(phi_1(it));
 	} while (it != d);
 	return false;				// None is equal to e => vertices are distinct
 }
@@ -505,7 +585,7 @@ unsigned int Map2::vertexDegree(Dart d)
 	do
 	{
 		++count ;
-		it = alpha1(it) ;
+		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
 	return count ;
 }
@@ -517,7 +597,7 @@ bool Map2::isBoundaryVertex(Dart d)
 	{
 		if (isBoundaryMarked(it))
 			return true ;
-		it = alpha1(it) ;
+		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
 	return false ;
 }
@@ -529,7 +609,7 @@ Dart Map2::findBoundaryEdgeOfVertex(Dart d)
 	{
 		if (isBoundaryMarked(it))
 			return it ;
-		it = alpha1(it) ;
+		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
 	return NIL ;
 }
@@ -680,7 +760,7 @@ bool Map2::checkSimpleOrientedPath(std::vector<Dart>& vd)
 	{
 		if(dm.isMarked(*it))
 			return false ;
-		dm.markOrbit(VERTEX, *it) ;
+		dm.markOrbit<VERTEX>(*it) ;
 
 		std::vector<Dart>::iterator prev ;
 		if(it == vd.begin())
@@ -705,7 +785,7 @@ bool Map2::foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread)
 	{
 		if (f(dNext))
 			return true;
-		dNext = alpha1(dNext);
+		dNext = phi2(phi_1(dNext));
  	} while (dNext != d);
  	return false;
 }
@@ -717,7 +797,7 @@ bool Map2::foreach_dart_of_edge(Dart d, FunctorType& fonct, unsigned int thread)
 	return fonct(phi2(d));
 }
 
-bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int thread)
+bool Map2::foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread)
 {
 	DartMarkerStore mark(*this, thread);	// Lock a marker
 	bool found = false;				// Last functor return value
@@ -732,7 +812,7 @@ bool Map2::foreach_dart_of_oriented_volume(Dart d, FunctorType& f, unsigned int 
 		if (!mark.isMarked(visitedFaces[i]))	// Face has not been visited yet
 		{
 			// Apply functor to the darts of the face
-			found = foreach_dart_of_oriented_face(visitedFaces[i], f);
+			found = Map2::foreach_dart_of_face(visitedFaces[i], f);
 
 			// If functor returns false then mark visited darts (current face)
 			// and add non visited adjacent faces to the list of face
@@ -786,19 +866,24 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 	} while (dPhi1 != d);
 
 	if(forboundary)
-		boundaryMarkOrbit(FACE, phi2(d));
+		boundaryMarkOrbit<FACE>(phi2(d));
 
 	return countEdges ;
 }
 
-void Map2::closeMap()
+unsigned int Map2::closeMap()
 {
 	// Search the map for topological holes (fix points of phi2)
+	unsigned int nb = 0 ;
 	for (Dart d = begin(); d != end(); next(d))
 	{
 		if (phi2(d) == d)
+		{
+			++nb ;
 			closeHole(d);
+		}
 	}
+	return nb ;
 }
 
 } // namespace CGoGN

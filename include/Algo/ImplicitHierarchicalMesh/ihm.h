@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -36,19 +36,19 @@ namespace Algo
 namespace IHM
 {
 
-template<typename T> class AttributeHandler_IHM ;
+template<typename T, unsigned int ORBIT> class AttributeHandler_IHM ;
 
 class ImplicitHierarchicalMap : public EmbeddedMap2
 {
-	template<typename T> friend class AttributeHandler_IHM ;
+	template<typename T, unsigned int ORBIT> friend class AttributeHandler_IHM ;
 
 private:
 	unsigned int m_curLevel ;
 	unsigned int m_maxLevel ;
 	unsigned int m_idCount ;
 
-	AttributeHandler<unsigned int> m_dartLevel ;
-	AttributeHandler<unsigned int> m_edgeId ;
+	DartAttribute<unsigned int> m_dartLevel ;
+	DartAttribute<unsigned int> m_edgeId ;
 
 	AttributeMultiVector<unsigned int>* m_nextLevelCell[NB_ORBITS] ;
 
@@ -63,11 +63,11 @@ public:
 	 *             ATTRIBUTES MANAGEMENT               *
 	 ***************************************************/
 
-	template <typename T>
-	AttributeHandler_IHM<T> addAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler_IHM<T, ORBIT> addAttribute(const std::string& nameAttr) ;
 
-	template <typename T>
-	AttributeHandler_IHM<T> getAttribute(unsigned int orbit, const std::string& nameAttr) ;
+	template <typename T, unsigned int ORBIT>
+	AttributeHandler_IHM<T, ORBIT> getAttribute(const std::string& nameAttr) ;
 
 	/***************************************************
 	 *                 MAP TRAVERSAL                   *
@@ -87,11 +87,11 @@ public:
 
 	Dart alpha_1(Dart d) ;
 
-	virtual Dart begin() ;
+	virtual Dart begin() const ;
 
-	virtual Dart end() ;
+	virtual Dart end() const ;
 
-	virtual void next(Dart& d) ;
+	virtual void next(Dart& d) const ;
 
 	virtual bool foreach_dart_of_vertex(Dart d, FunctorType& f, unsigned int thread = 0) ;
 
@@ -201,26 +201,26 @@ public:
 	bool faceIsSubdividedOnce(Dart d) ;
 } ;
 
-template <typename T>
-class AttributeHandler_IHM : public AttributeHandler<T>
+template <typename T, unsigned int ORBIT>
+class AttributeHandler_IHM : public AttributeHandler<T, ORBIT>
 {
 public:
 	typedef T DATA_TYPE ;
 
-	AttributeHandler_IHM() : AttributeHandler<T>()
+	AttributeHandler_IHM() : AttributeHandler<T, ORBIT>()
 	{}
 
-	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T>(m, amv)
+	AttributeHandler_IHM(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, ORBIT>(m, amv)
 	{}
 
 	AttributeMultiVector<T>* getDataVector() const
 	{
-		return AttributeHandler<T>::getDataVector() ;
+		return AttributeHandler<T, ORBIT>::getDataVector() ;
 	}
 
 	bool isValid() const
 	{
-		return AttributeHandler<T>::isValid() ;
+		return AttributeHandler<T, ORBIT>::isValid() ;
 	}
 
 	T& operator[](Dart d) ;
@@ -229,12 +229,12 @@ public:
 
 	T& operator[](unsigned int a)
 	{
-		return AttributeHandler<T>::operator[](a) ;
+		return AttributeHandler<T, ORBIT>::operator[](a) ;
 	}
 
 	const T& operator[](unsigned int a) const
 	{
-		return AttributeHandler<T>::operator[](a) ;
+		return AttributeHandler<T, ORBIT>::operator[](a) ;
 	}
 } ;
 

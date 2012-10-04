@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -29,9 +29,9 @@
 
 SimpleGMap2::SimpleGMap2()
 {
-	 position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	 position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-     Dart d = Algo::Modelisation::Polyhedron<PFP>::createTetra(myMap);
+     Dart d = Algo::Modelisation::createTetrahedron<PFP>(myMap);
      position[d] = VEC3(0,0,0);
      position[myMap.phi1(d)] = VEC3(10,0,15);
      position[myMap.phi_1(d)] = VEC3(10,20,15);
@@ -57,7 +57,6 @@ SimpleGMap2::SimpleGMap2()
 
 void SimpleGMap2::initGUI()
 {
-
 }
 
 void SimpleGMap2::cb_initGL()
@@ -80,7 +79,6 @@ void SimpleGMap2::cb_redraw()
 	Algo::Render::GL1::renderTopoGMD2<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 }
 
-
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
@@ -97,4 +95,3 @@ int main(int argc, char **argv)
 
 	return app.exec() ;
 }
-

@@ -34,14 +34,130 @@ namespace Algo
 namespace Geometry
 {
 
-template <typename PFP>
-void featureEdgeDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, CellMarker& featureEdge) ;
+enum
+{
+	EMPTY = 0,
+	SEGMENT = 1,
+	BARY = 2
+};
+
+typedef struct { Dart d ; float w ; } e0point ;
+typedef struct { e0point p1 ; e0point p2 ; unsigned char type ; } e0segment ;
+typedef NoMathIONameAttribute<e0segment> ridgeSegment ;
 
 template <typename PFP>
-std::vector<typename PFP::VEC3> occludingContoursDetection(typename PFP::MAP& map, const typename PFP::VEC3& cameraPosition, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
+void featureEdgeDetection(
+	typename PFP::MAP& map,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	CellMarker<EDGE>& featureEdge) ;
 
 template <typename PFP>
-std::vector<typename PFP::VEC3> featureLinesDetection(typename PFP::MAP& map, const typename PFP::TVEC3& position, const typename PFP::TVEC3& normal) ;
+void computeFaceGradient(
+	typename PFP::MAP& map,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_normal,
+	const VertexAttribute<typename PFP::REAL>& kmax,
+	const FaceAttribute<typename PFP::REAL>& face_area,
+	FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+template <typename PFP>
+typename PFP::VEC3 faceGradient(
+	typename PFP::MAP& map,
+	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_normal,
+	const VertexAttribute<typename PFP::REAL>& kmax,
+	const FaceAttribute<typename PFP::REAL>& area) ;
+
+template <typename PFP>
+void computeVertexGradient(
+	typename PFP::MAP& map,
+	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FaceAttribute<typename PFP::REAL>& face_area,
+	VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+template <typename PFP>
+typename PFP::VEC3 vertexGradient(
+	typename PFP::MAP& map,
+	Dart d,
+	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+	const FaceAttribute<typename PFP::REAL>& area) ;
+
+//template <typename PFP>
+//typename PFP::REAL extremality(
+//	typename PFP::MAP& map,
+//	Dart d,
+//	const typename PFP::VEC3& K,
+//	const FaceAttribute<typename PFP::VEC3>& face_gradient,
+//	const FaceAttribute<typename PFP::REAL>& face_area) ;
+
+template <typename PFP>
+void computeTriangleType(
+	typename PFP::MAP& map,
+	const VertexAttribute<typename PFP::VEC3>& Kmax,
+	CellMarker<FACE>& regularMarker,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+template <typename PFP>
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& Kmax) ;
+
+template <typename PFP>
+void initRidgeSegments(
+	typename PFP::MAP& map,
+	FaceAttribute<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+template <typename PFP>
+void computeRidgeLines(
+	typename PFP::MAP& map,
+	CellMarker<FACE>& regularMarker,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& K,
+	FaceAttribute<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+template <typename PFP>
+void ridgeLines(
+	typename PFP::MAP& map,
+	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	FaceAttribute<ridgeSegment>& ridge_segments) ;
+
+template <typename PFP>
+void computeExtremalities() ;
+
+template <typename PFP>
+void computeSingularTriangle(
+	typename PFP::MAP& map,
+	CellMarker<FACE>& regularMarker,
+	FaceAttribute<ridgeSegment>& ridge_segments,
+	const FunctorSelect& select = allDarts,
+	unsigned int thread = 0) ;
+
+template <typename PFP>
+void singularTriangle(
+	typename PFP::MAP& map,
+	Dart d,
+	CellMarker<FACE>& regularMarker,
+	FaceAttribute<ridgeSegment>& ridge_segments) ;
+
+template <typename PFP>
+bool isEdgeInTriangle(typename PFP::MAP& map, Dart edge, Dart triangle) ;
+
+template <typename PFP>
+std::vector<typename PFP::VEC3> occludingContoursDetection(
+	typename PFP::MAP& map,
+	const typename PFP::VEC3& cameraPosition,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal) ;
 
 } // namespace Geometry
 

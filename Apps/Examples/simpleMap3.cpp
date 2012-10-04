@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -28,12 +28,11 @@
 #include "Algo/Modelisation/primitives3d.h"
 #include "Algo/Modelisation/subdivision3.h"
 
-
 SimpleMap3::SimpleMap3()
 {
-	position = myMap.addAttribute<PFP::VEC3>(VERTEX, "position");
+	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
-	Algo::Modelisation::Primitive3D<PFP> primCat(myMap,position);
+	Algo::Modelisation::Primitive3D<PFP> primCat(myMap, position);
 	Dart d = primCat.hexaGrid_topo(2,1,1);
 	primCat.embedHexaGrid(1,1,1);
 
@@ -73,7 +72,6 @@ SimpleMap3::SimpleMap3()
 
 void SimpleMap3::initGUI()
 {
-
 }
 
 void SimpleMap3::cb_initGL()
@@ -96,7 +94,6 @@ void SimpleMap3::cb_redraw()
 	Algo::Render::GL1::renderTopoMD3<PFP>(myMap, position, true, true, true, 0.9f, 0.9f, 0.9f);
 }
 
-
 /**********************************************************************************************
  *                                      MAIN FUNCTION                                         *
  **********************************************************************************************/
@@ -113,4 +110,3 @@ int main(int argc, char **argv)
 
 	return app.exec() ;
 }
-

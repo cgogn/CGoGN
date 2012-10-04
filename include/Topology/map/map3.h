@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -57,9 +57,22 @@ protected:
 public:
 	typedef Map2 ParentMap;
 
+	inline static unsigned int ORBIT_IN_PARENT(unsigned int o){ return o+7; }
+	inline static unsigned int ORBIT_IN_PARENT2(unsigned int o) { return o+5; }
+
+	static const unsigned int IN_PARENT = 7 ;
+	static const unsigned int IN_PARENT2 = 5 ;
+
+	static const unsigned int VERTEX_OF_PARENT = VERTEX+7;
+	static const unsigned int EDGE_OF_PARENT = EDGE+7;
+	static const unsigned int FACE_OF_PARENT = FACE+7;
+
+	static const unsigned int VERTEX_OF_PARENT2 = VERTEX+5;
+	static const unsigned int EDGE_OF_PARENT2 = EDGE+5;
+
 	Map3();
 
-	virtual std::string mapTypeName();
+	virtual std::string mapTypeName() const;
 
 	virtual unsigned int dimension();
 
@@ -127,6 +140,14 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Split the vertex along a permutation of faces
+	/*! \per Darts d & e MUST belong to the same vertex
+	 * 	\per Darts d & e MUST belong to different volumes
+	 *  \per Works only on the boundary
+	 *  @param vd a vector of darts
+	 */
+	virtual Dart splitVertex(std::vector<Dart>& vd);
+
 	//! Delete the vertex of d
 	/*! All the volumes around the vertex are merged into one volume
 	 *  @param d a dart of the vertex to delete
@@ -145,6 +166,12 @@ public:
 	 */
 	virtual bool uncutEdge(Dart d);
 
+
+	/**
+	 * Precondition for deleting edge
+	 */
+	bool deleteEdgePreCond(Dart d);
+
 	//! Delete the edge of d
 	/*! All the volumes around the edge are merged into one volume
 	 *  @param d a dart of the edge to delete
@@ -160,6 +187,21 @@ public:
 	 */
 	virtual Dart collapseEdge(Dart d, bool delDegenerateVolumes = true);
 
+	//! Delete a face if and only if it has one or two edges
+	/*! If the face is sewed to two distinct adjacent faces,
+	 *  then those two faces are sewed
+	 *  @param d a dart of the face
+	 *  @return true if the collapse has been executed, false otherwise
+	 */
+//	virtual bool collapseDegeneratedFace(Dart d);
+
+	//! Split Face Pre-condition
+	/*!
+	 *  @param d dart of first vertex
+	 *  @param e dart of second vertex
+	 */
+	bool splitFacePreCond(Dart d, Dart e);
+
 	//! Split a face inserting an edge between two vertices
 	/*! \pre Dart d and e should belong to the same face and be distinct
 	 *  @param d dart of first vertex
@@ -167,13 +209,32 @@ public:
 	 */
 	virtual void splitFace(Dart d, Dart e);
 
+	//! Merge the two faces incident to the edge of d.
+	/*! Works only for edges of degree 2.
+	 *  \warning Darts of the edge of d no longer exist after the call
+	 *  @param d a dart in the first face
+	 *  @return true if the merge has been executed, false otherwise
+	 */
+	virtual bool mergeFaces(Dart d);
+
+	//! Collapse a face (that is deleted) possibly merging its vertices
+	/*! \warning
+	 *  @param d a dart in the deleted face
+	 *  @return a dart of the resulting vertex
+	 */
+	virtual Dart collapseFace(Dart d, bool delDegenerateVolumes = true);
+
 	//! Delete a volume if and only if it has a face with degree < 3 or only 3 vertices
 	/*! If the volume is sewed to two distinct adjacent volumes and if the face degree
 	 *  of the two adjacent volumes is equal then those two volumes are sewed
 	 *  @param d a dart of the face
 	 *  @return true if the collapse has been executed, false otherwise
 	 */
-	virtual bool collapseDegeneretedVolume(Dart d);
+	bool collapseDegeneretedVolume(Dart d);
+
+	//!! sewVolumes Pre-condition
+	bool sewVolumesPreCond(Dart d, Dart e);
+
 
 	//! Sew two oriented volumes along their faces. 
 	/*! The oriented faces should not be phi3-linked and have the same degree
@@ -183,12 +244,15 @@ public:
 	 */
 	virtual void sewVolumes(Dart d, Dart e, bool withBoundary = true);
 
+	//! Unsew volumes pre-condition
+	bool unsewVolumesPreCond(Dart d);
+
 	//! Unsew two oriented volumes along their faces.
 	/*! @param d a dart of one volume
 	 */
 	virtual void unsewVolumes(Dart d);
 
-	//! Merge to volume along their common oriented face
+	//! Merge two volumes along their common oriented face
 	/*! @param d a dart of common face
 	 */
 	virtual bool mergeVolumes(Dart d);
@@ -197,6 +261,13 @@ public:
 	/*! @param vd a vector of darts
 	 */
 	virtual void splitVolume(std::vector<Dart>& vd);
+
+	//! Collapse a volume (that is deleted) possibly merging its vertices
+	/*! \warning
+	 *  @param d a dart in the deleted volume
+	 *  @return a dart of the resulting vertex
+	 */
+	virtual Dart collapseVolume(Dart d, bool delDegenerateVolumes = true);
 	//@}
 
 	/*! @name Topological Queries
@@ -215,10 +286,21 @@ public:
 	 */
 	unsigned int vertexDegree(Dart d) ;
 
+	//! Compute the number of edges of the vertex of d on the boundary
+	/*!	@param d a dart
+	 */
+	unsigned int vertexDegreeOnBoundary(Dart d);
+
 	//! Tell if the vertex of d is on the boundary
 	/*! @param d a dart
 	 */
 	bool isBoundaryVertex(Dart d) ;
+
+	//! Find the dart of vertex that belong to the boundary
+	/*! return NIL if the vertex is not on the boundary
+	 *  @param d a dart
+	 */
+	Dart findBoundaryFaceOfVertex(Dart d) ;
 
 	//! Test if dart d and e belong to the same oriented edge
 	/*! @param d a dart
@@ -237,14 +319,14 @@ public:
 	 */
 	unsigned int edgeDegree(Dart d) ;
 
-	/**
-	 * tell if the edge of d is on the boundary of the map
+	//! Tell if the edge of d is on the boundary of the map
+	/*! @param d a dart
 	 */
 	bool isBoundaryEdge(Dart d) ;
 
-	/**
-	 * find the dart of edge that belong to the boundary
-	 * return NIL if the edge is not on the boundary
+	//! Find the dart of edge that belong to the boundary
+	/*! return NIL if the edge is not on the boundary
+	 *  @param d a dart
 	 */
 	Dart findBoundaryFaceOfEdge(Dart d) ;
 
@@ -263,6 +345,11 @@ public:
 	/*  @param d a dart
 	 */
 	bool isBoundaryVolume(Dart d) ;
+
+	//! Tell if an edge of the volume is on the boundary
+	/*	@param d a dart
+	 */
+	bool hasBoundaryEdge(Dart d);
 
 	//! Check the map completeness
 	/*! Test if phi3 and phi2 ares involutions and if phi1 is a permutation
@@ -287,17 +374,43 @@ public:
 	 */
 	bool foreach_dart_of_edge(Dart d, FunctorType& f, unsigned int thread = 0);
 
-	//! Apply a functor on each dart of an oriented face
+	//! Apply a functor on each dart of a face
 	/*! @param d a dart of the oriented face
 	 *  @param fonct the functor
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on each dart of a face
+	/*! @param d a dart of the oriented face
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
 
 	//! Apply a functor on each dart of a cc
 	/*! @param d a dart of the cc
 	 *  @param fonct the functor
 	 */
 	bool foreach_dart_of_cc(Dart d, FunctorType& f, unsigned int thread = 0);
+
+
+	//! Apply a functor on each dart of a vertex
+	/*! @param d a dart of the vertex
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_vertex2(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on each dart of an edge
+	/*! @param d a dart of the oriented edge
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_edge2(Dart d, FunctorType& f, unsigned int thread = 0);
+
+	//! Apply a functor on each dart of an oriented face
+	/*! @param d a dart of the oriented face
+	 *  @param fonct the functor
+	 */
+	bool foreach_dart_of_face2(Dart d, FunctorType& f, unsigned int thread = 0);
+
 	//@}
 
 	/*! @name Close map after import or creation
@@ -317,8 +430,9 @@ public:
 	//! Close the map removing topological holes: DO NOT USE, only for import/creation algorithm
 	/*! Add volumes to the map that close every existing hole.
 	 *  These faces are marked as boundary.
+	 *  @return the number of closed holes
 	 */
-	void closeMap();
+	unsigned int closeMap();
 	//@}
 };
 

@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -27,6 +27,7 @@
 
 #include <math.h>
 #include <vector>
+#include "Geometry/plane_3d.h"
 
 namespace CGoGN
 {
@@ -45,7 +46,38 @@ namespace Modelisation
 template <typename PFP>
 Dart cut3Ear(typename PFP::MAP& map, Dart d);
 
+/**
+* Cut a volume considering a plane
+* @param d dart of the volume
+* @return a dart from the created face
+* * TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, Geom::Plane3D<typename PFP::REAL > pl);
 
+/**
+* Cut a volume considering a set of marked edges and vertices
+* marked edges and vertices must form a simple path
+* @param d dart of the volume
+* @param edgesToCut marker to identify edges along the slice
+* @param verticesToSplit marker to identify edges on the slice
+* @return a dart from the created face
+* TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+Dart sliceConvexVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, Dart d, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit);
+
+/**
+* Cut a set of volumes considering a set of marked edges and vertices
+* marked edges and vertices must form a simple path
+* @param d dart of the volume
+* @param edgesToCut marker to identify edges along the slice
+* @param verticesToSplit marker to identify edges on the slice
+* @return a dart from the created face
+* TODO (optimization) change to build path while splitting faces
+*/
+template <typename PFP>
+std::vector<Dart> sliceConvexVolumes(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position,CellMarker<VOLUME>& volumesToCut, CellMarker<EDGE>& edgesToCut, CellMarker<VERTEX>& verticesToSplit);
 
 /**
 * catmull clark volumic : do not move the original vertices
@@ -55,12 +87,12 @@ Dart cut3Ear(typename PFP::MAP& map, Dart d);
 * TODO : test if it works for the functorselect
 */
 template <typename PFP, typename EMBV, typename EMB>
-void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected= allDarts);
+void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect& selected = allDarts);
 
 template <typename PFP>
-void catmullClarkVol(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected= allDarts)
+void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts)
 {
-	catmullClarkVol<PFP,typename PFP::TVEC3, typename PFP::VEC3>(map, position, selected);
+	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected);
 }
 
 } // namespace Modelisation

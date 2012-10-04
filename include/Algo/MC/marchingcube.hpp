@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,13 +17,14 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 #include "Algo/MC/windowing.h"
 #include "Topology/generic/dartmarker.h"
+#include <vector>
 
 namespace CGoGN
 {
@@ -45,6 +46,11 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(const char* _cName)
 	m_fOrigin = typename PFP::VEC3(0.0,0.0,0.0);
 	m_fScal = typename PFP::VEC3(1.0,1.0,1.0);
 
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice = 0;
+		m_zslice = NULL;
+	#endif
+
 }
 
 
@@ -58,10 +64,15 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, Windo
 	m_fScal(typename PFP::VEC3(1.0,1.0,1.0)),
 	m_brem(boundRemoved)
 {
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice = 0;
+		m_zslice = NULL;
+	#endif
+
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, const typename PFP::TVEC3& position, Windowing<DataType> wind, bool boundRemoved):
+MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP* map, VertexAttribute<VEC3>& position, Windowing<DataType> wind, bool boundRemoved):
 	m_Image(img),
 	m_windowFunc(wind),
 	m_Buffer(NULL),
@@ -71,6 +82,10 @@ MarchingCube<DataType, Windowing, PFP>::MarchingCube(Image<DataType>* img, L_MAP
 	m_fScal(typename PFP::VEC3(1.0,1.0,1.0)),
 	m_brem(boundRemoved)
 {
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice = 0;
+		m_zslice = NULL;
+	#endif
 }
 
 
@@ -100,9 +115,26 @@ void MarchingCube<DataType, Windowing, PFP>::deleteMesh()
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3)
+{
+	L_DART d = m_map->newFace(3,false);
+		
+	FunctorSetEmb<GenericMap, VERTEX> fsetemb(*m_map, e1);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+	d = m_map->phi1(d);
+	fsetemb.changeEmb(e2);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+	d = m_map->phi1(d);
+	fsetemb.changeEmb(e3);
+	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
+	d = m_map->phi1(d);
+
+	return d;
+}
+
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 {
-
 	// create the mesh if needed
 	if (m_map==NULL)
 	{
@@ -119,13 +151,11 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 
 	// compute value to transform points directly to final system coordinate
 
-/*	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));*/
+	m_fOrigin   =  typename PFP::VEC3((float)(m_Image->getOrigin()[0]),(float)(m_Image->getOrigin()[1]),(float)(m_Image->getOrigin()[2]));
 
 	m_fScal[0] = m_Image->getVoxSizeX();
 	m_fScal[1] = m_Image->getVoxSizeY();
 	m_fScal[2] = m_Image->getVoxSizeZ();
-
-
 
 	// get access to data (pointer + size)
 
@@ -136,7 +166,6 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 	int lTx = m_Image->getWidthX();
 	int lTy = m_Image->getWidthY();
 	int lTz = m_Image->getWidthZ();
-
 
 /*	gmtl::Vec3i orig = m_Image->getOrigin();*/
 
@@ -172,6 +201,10 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 		lY++;
 	}
 	lZ++;
+	#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		m_currentZSlice++;
+	#endif
+
 	m_Buffer->nextSlice();
 
 // middles slices
@@ -196,23 +229,23 @@ void MarchingCube<DataType, Windowing, PFP>::simpleMeshing()
 			ucData = m_Image->getVoxelPtr(lX,lY,lZ);
 
 			createFaces_7(ucData++,lX++,lY,lZ,16); // TAG
-			while (lX < lTxm)
+			while (lX < lTxm-1)
 			{
 				createFaces_8(ucData++,lX++,lY,lZ,0);
 			}
-			createFaces_8(ucData++,lX++,lY,lZ,32);   //TAG
+			createFaces_8(ucData++,lX,lY,lZ,32);   //TAG
 			lY++;
 		}
 
 		lZ++;
+		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+			m_currentZSlice++;
+		#endif
 		m_Buffer->nextSlice();
 	}
 
 	CGoGNout << "Taille 2-carte:"<<m_map->getNbDarts()<<" brins"<<CGoGNendl;
-
 }
-
-
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 unsigned char MarchingCube<DataType, Windowing, PFP>::computeIndex(const DataType* const _ucData) const
@@ -220,10 +253,8 @@ unsigned char MarchingCube<DataType, Windowing, PFP>::computeIndex(const DataTyp
 	unsigned char ucCubeIndex = 0;
 	const DataType* ucDataLocal = _ucData;
 
-
-	int32 lTx = m_Image->getWidthX();
-	int32 lTxy = m_Image->getWidthXY();
-
+	int lTx = m_Image->getWidthX();
+	int lTxy = m_Image->getWidthXY();
 
 	if ( m_windowFunc.inside(*ucDataLocal) )
 		ucCubeIndex = 1; // point 0
@@ -256,52 +287,43 @@ template< typename  DataType, template < typename D2 > class Windowing, typename
 typename PFP::VEC3 MarchingCube<DataType, Windowing, PFP>::recalPoint(const typename PFP::VEC3& _P, const typename PFP::VEC3& _dec ) const
 {
 	typename PFP::VEC3 point = _P + _dec ;
-
-	point -= m_fOrigin;
-
-	point[0] = point[0] * m_fScal[0];
-	point[1] = point[1] * m_fScal[1];
-	point[2] = point[2] * m_fScal[2];
-
+//	point[0] = point[0] * m_fScal[0];
+//	point[1] = point[1] * m_fScal[1];
+//	point[2] = point[2] * m_fScal[2];
+//
+//	point += m_fOrigin;
 	return 	point;
 }
-
-
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge0(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 1)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX+1,_lY,_lZ) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(interp, 0., 0.));
 //		lVertTable[0] = L_EMB::create(newPoint);
-		lVertTable[0] = m_map->newCell(VERTEX);
+		lVertTable[0] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[0]] = recalPoint(vPos,typename PFP::VEC3(interp, 0., 0.));
 		m_Buffer->setPointEdge0(_lX, _lY,lVertTable[0]);
 	}
 }
 
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge1(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 2)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX,_lY+1,_lZ) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(1.,interp, 0.));
 //		lVertTable[1] = L_EMB::create(newPoint);
-		lVertTable[1] = m_map->newCell(VERTEX);
+		lVertTable[1] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[1]] = recalPoint(vPos,typename PFP::VEC3(1.,interp, 0.));
 		m_Buffer->setPointEdge1(_lX, _lY,lVertTable[1]);
 	}
 }
-
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge2(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
@@ -312,12 +334,11 @@ void MarchingCube<DataType, Windowing, PFP>::createPointEdge2(const unsigned cha
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(interp, 1., 0.));
 //		lVertTable[2] = L_EMB::create(newPoint);
-		lVertTable[2] = m_map->newCell(VERTEX);
+		lVertTable[2] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[2]] = recalPoint(vPos,typename PFP::VEC3(interp, 1., 0.));
 		m_Buffer->setPointEdge2(_lX, _lY,lVertTable[2]);
 	}
 }
-
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge3(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
@@ -328,155 +349,134 @@ void MarchingCube<DataType, Windowing, PFP>::createPointEdge3(const unsigned cha
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(0., interp, 0.));
 //		lVertTable[3] = L_EMB::create(newPoint);
-		lVertTable[3] = m_map->newCell(VERTEX);
+		lVertTable[3] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[3]] = recalPoint(vPos,typename PFP::VEC3(0., interp, 0.));
 		m_Buffer->setPointEdge3(_lX, _lY,lVertTable[3]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge4(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 16)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX+1,_lY,_lZ) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(interp, 0., 1.));
 //		lVertTable[4] = L_EMB::create(newPoint);
-		lVertTable[4] = m_map->newCell(VERTEX);
+		lVertTable[4] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[4]] = recalPoint(vPos,typename PFP::VEC3(interp, 0., 1.));
 		m_Buffer->setPointEdge4(_lX, _lY,lVertTable[4]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge5(const unsigned char _ucCubeIndex,  const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 32)
  	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX,_lY+1,_lZ) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(1., interp, 1.));
 //		lVertTable[5] = L_EMB::create(newPoint);
-		lVertTable[5] = m_map->newCell(VERTEX);
+		lVertTable[5] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[5]] = recalPoint(vPos,typename PFP::VEC3(1., interp, 1.));
 		m_Buffer->setPointEdge5(_lX, _lY,lVertTable[5]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge6(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 64)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX-1,_lY,_lZ), m_Image->getVoxel(_lX,_lY,_lZ) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(interp, 1., 1.));
 //		lVertTable[6] = L_EMB::create(newPoint);
-		lVertTable[6] = m_map->newCell(VERTEX);
+		lVertTable[6] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[6]] = recalPoint(vPos,typename PFP::VEC3(interp, 1., 1.));
 		m_Buffer->setPointEdge6(_lX, _lY,lVertTable[6]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge7(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 128)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY-1,_lZ), m_Image->getVoxel(_lX,_lY,_lZ) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(0., interp, 1.));
 //		lVertTable[7] = L_EMB::create(newPoint);
-		lVertTable[7] = m_map->newCell(VERTEX);
+		lVertTable[7] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[7]] = recalPoint(vPos,typename PFP::VEC3(0., interp, 1.));
 		m_Buffer->setPointEdge7(_lX, _lY,lVertTable[7]);
 	}
 }
 
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge8(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 256)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX,_lY,_lZ+1) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(0., 0., interp));
 //		lVertTable[8] = L_EMB::create(newPoint);
-		lVertTable[8] = m_map->newCell(VERTEX);
+		lVertTable[8] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[8]] = recalPoint(vPos,typename PFP::VEC3(0., 0., interp));
 		m_Buffer->setPointEdge8(_lX, _lY,lVertTable[8]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge9(const unsigned char _ucCubeIndex,  const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 512)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX,_lY,_lZ+1) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(1., 0., interp));
 //		lVertTable[9] = L_EMB::create(newPoint);
-		lVertTable[9] = m_map->newCell(VERTEX);
+		lVertTable[9] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[9]] = recalPoint(vPos,typename PFP::VEC3(1., 0., interp));
 		m_Buffer->setPointEdge9(_lX, _lY,lVertTable[9]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge10(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 1024)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX,_lY,_lZ+1) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(1., 1., interp));
 //		lVertTable[10] = L_EMB::create(newPoint);
-		lVertTable[10] = m_map->newCell(VERTEX);
+		lVertTable[10] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[10]] = recalPoint(vPos,typename PFP::VEC3(1., 1., interp));
 		m_Buffer->setPointEdge10(_lX, _lY,lVertTable[10]);
 	}
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::createPointEdge11(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ, unsigned int * const lVertTable, const typename PFP::VEC3& vPos)
 {
-
 	if  (accelMCTable::m_EdgeTable[_ucCubeIndex] & 2048)
 	{
 		float interp = m_windowFunc.interpole( m_Image->getVoxel(_lX,_lY,_lZ), m_Image->getVoxel(_lX,_lY,_lZ+1) );
 
 //		typename PFP::VEC3 newPoint = recalPoint(vPos,typename PFP::VEC3(0., 1., interp));
 //		lVertTable[11] = L_EMB::create(newPoint);
-		lVertTable[11] = m_map->newCell(VERTEX);
+		lVertTable[11] = m_map->template newCell<VERTEX>();
 		m_positions[lVertTable[11]] = recalPoint(vPos,typename PFP::VEC3(0., 1., interp));
 		m_Buffer->setPointEdge11(_lX, _lY,lVertTable[11]);
 	}
 }
 
-
-
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const int _lX,const int _lY,const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const int _lX,const int _lY,const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
@@ -484,7 +484,9 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const 
 
 	unsigned int  lVertTable[12];
 
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+//	typename PFP::VEC3 vPos(float(_lX) , float(_lY) , float(_lZ) );
+//	typename PFP::VEC3 vPos(float(_lX) + 0.5f, float(_lY) + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 
@@ -514,7 +516,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const 
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 
-
 // get the shared vertices corresponding to the shared edges :
 	//all edges
 	    lVertTable[ 0]  = m_Buffer->getPointEdge0(_lX, _lY);
@@ -532,22 +533,17 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_1(DataType *vox, const 
 
 // create the new faces, the mask (6 bits) of faces to treat is 111111
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x3F, curv, tag);
-
 }
 
-
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -556,7 +552,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const 
 
 //	float curv = m_Curvature.computeCurvatureSimple(vox);
 	float curv=0.0f;
-
 
 	createPointEdge0( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos );
 	lX++;
@@ -574,7 +569,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const 
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 
-
 // get the shared vertices corresponding to the shared edges :
 	//edge 3
 	    lVertTable[3]  = m_Buffer->getPointEdge3(_lX, _lY);
@@ -588,24 +582,19 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_2(DataType *vox, const 
 	//edge 11
 	    lVertTable[11] = m_Buffer->getPointEdge11(_lX, _lY);
 
-
 // create the new faces, the mask (6 bits) of faces to treat is 111110
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x3E, curv, tag);
-
 }
 
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -631,7 +620,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const 
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 
-
 // get the shared vertices corresponding to the shared edges :
 	//edge 0
 	    lVertTable[0] = m_Buffer->getPointEdge0(_lX, _lY);
@@ -648,20 +636,17 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_3(DataType *vox, const 
 
 // create the new faces, the mask (6 bits) of faces to treat is 111011
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x3B, curv, tag);
-
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -681,7 +666,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const 
 	createPointEdge5( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
-
 
 // get the shared vertices corresponding to the shared edges :
 	//edge 3
@@ -707,20 +691,17 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_4(DataType *vox, const 
 
 // create the new faces, the mask (6 bits) of faces to treat is 111010
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x3A, curv, tag);
-
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX;
@@ -747,7 +728,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const 
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 
-
 // get the shared vertices corresponding to the shared edges :
 	//edge 0
 	    lVertTable[0] = m_Buffer->getPointEdge0(_lX, _lY);
@@ -764,20 +744,17 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_5(DataType *vox, const 
 
 // create the new faces, the mask (6 bits) of faces to treat is 101111
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x2F, curv, tag);
-
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -799,7 +776,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const 
 	createPointEdge5( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
-
 
 // get the shared vertices corresponding to the shared edges :
 	//edge 0
@@ -826,20 +802,17 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_6(DataType *vox, const 
 
 // create the new faces, the mask (6 bits) of faces to treat is 101110
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x2E, curv, tag);
-
 }
 
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -861,7 +834,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const 
 	createPointEdge5( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 	lY++;
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
-
 
 // get the shared vertices corresponding to the shared edges :
 	//edge 0
@@ -890,18 +862,15 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_7(DataType *vox, const 
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x2B, curv, tag);
 }
 
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const int _lX, const int _lY, const int _lZ, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const int _lX, const int _lY, const int _lZ, unsigned char tag)
 {
 	unsigned char ucCubeIndex = computeIndex(vox);
 	if ((ucCubeIndex == 0) || (ucCubeIndex == 255))
 		return;
 
 	unsigned int  lVertTable[12];
-//	typename PFP::VEC3 vPos((float)_lX , (float)_lY, (float)_lZ);
-	typename PFP::VEC3 vPos((float)_lX + 0.5f, (float)_lY + 0.5f, (float)_lZ + 0.5f);
+	typename PFP::VEC3 vPos(_lX, _lY, _lZ);
 
 // create the new  vertices
 	int lX = _lX+1;
@@ -914,7 +883,6 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const 
 	createPointEdge6( ucCubeIndex, lX,  lY,  lZ, lVertTable, vPos);
 	createPointEdge5( ucCubeIndex, lX,  _lY,  lZ, lVertTable, vPos);
 	createPointEdge10( ucCubeIndex, lX,  lY,  _lZ, lVertTable, vPos);
-
 
 // get the shared vertices corresponding to the shared edges :
 	//edge 0
@@ -947,25 +915,44 @@ void MarchingCube<DataType, Windowing, PFP>::createFaces_8(DataType *vox, const 
 
 // create the new faces, the mask (6 bits) of faces to treat is 101010
 	createLocalFaces(ucCubeIndex, _lX, _lY, _lZ,  lVertTable, 0x2A, curv, tag);
-
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::setNeighbourSimple(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
-		m_map->sewFaces(d1,d2);
+	{
+		m_map->sewFaces(d1,d2,false);
+		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		if (m_zslice!=NULL)
+		{
+			unsigned int val = (m_currentZSlice - m_zbound)/m_sliceGroup;
+			std::cout << "ZSLICE=" << val << std::endl;
+			m_zslice->operator[](d1) = val;
+		}
+		#endif
+	}
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
-		m_map->sewFaces(d1,d2);
+	{
+		m_map->sewFaces(d1,d2,false);
+		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+		if (m_zslice!=NULL)
+		{
+			unsigned int val = (m_currentZSlice - m_zbound)/m_sliceGroup;
+			std::cout << "ZSLICE=" << val << std::endl;
+			m_zslice->operator[](d1) = val;
+		}
+		#endif
+	}
 }
 
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int  const *_lVertTable, const unsigned short _usMask, float curv, uint8 tag)
+void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned char _ucCubeIndex, const int _lX, const int _lY, const int _lZ,  unsigned int  const *_lVertTable, const unsigned short _usMask, float curv, unsigned char tag)
 {
 // TODO parametre _LZ not used => a supprimer ?
 // TODO parametre curv not used => a supprimer ?
@@ -981,8 +968,8 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 	L_DART *lFacesTab = m_Buffer->getFacesCubeTableAdr(_lX,_lY);
 
 // To speed access to data "precompute indirection"
-	const int8* cTriangle = accelMCTable::m_TriTable[_ucCubeIndex];
-	const int8* cNeighbour = accelMCTable::m_NeighTable[_ucCubeIndex];
+	const char* cTriangle = accelMCTable::m_TriTable[_ucCubeIndex];
+	const char* cNeighbour = accelMCTable::m_NeighTable[_ucCubeIndex];
 
 //	L_DART dartTriangles[5];
 
@@ -1104,8 +1091,6 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 		}
 	}
 
-
-
 // PASS 2: set the neighbours in buffer
 
  	for (int i=0; cTriangle[i]!=-1;/* incrementation inside */)
@@ -1153,32 +1138,7 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
  			}
 		}
 		i++;
-
 	}
-
-
-// CGoGNout << "NB TRIS: "<< lNumFaces <<CGoGNendl;
-// for (int i=0; i< lNumFaces; ++i)
-// {
-// 	L_DART d = lFacesTab[i];
-// 	L_DART dd = L_MAP::phi2(d);
-// 	L_DART ddd = L_MAP::phi2(dd);
-// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
-//
-//
-// 	d =m_map->phi1(d);
-// 	dd = L_MAP::phi2(d);
-// 	ddd = L_MAP::phi2(dd);
-// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
-//
-// 	d =m_map->phi1(d);
-// 	dd = L_MAP::phi2(d);
-// 	ddd = L_MAP::phi2(dd);
-// 	CGoGNout << d->getLabel()<< " == "<< dd->getLabel()<< " == "<< ddd->getLabel()<< CGoGNendl;
-//
-// }
-
-
 
 // finish buffer table of faces with -1
 // PAS FORCEMENT UTILE A VERIFIER
@@ -1191,20 +1151,15 @@ void MarchingCube<DataType, Windowing, PFP>::createLocalFaces(const unsigned cha
 	#undef ODDMASK
 }
 
-
-
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
-void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHandler<unsigned char>& boundVertices, unsigned int frameWidth)
+void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(VertexAttribute<unsigned char>& boundVertices, unsigned int frameWidth)
 {
-
 	float xmin = frameWidth;
-	float xmax = m_Image->getWidthX() - frameWidth;
+	float xmax = m_Image->getWidthX() - frameWidth -1;
 	float ymin = frameWidth;
-	float ymax = m_Image->getWidthY() - frameWidth;
+	float ymax = m_Image->getWidthY() - frameWidth -1;
 	float zmin = frameWidth;
-	float zmax = m_Image->getWidthZ() - frameWidth;
-
-
+	float zmax = m_Image->getWidthZ() - frameWidth -1;
 
 	// traverse position and create bound attrib
 	for(unsigned int it = m_positions.begin(); it != m_positions.end(); m_positions.next(it))
@@ -1221,11 +1176,11 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 			boundVertices[it] = 0;
 	}
 
-	// traverse face and check if all vertices are bound
+//	 traverse face and check if all vertices are bound
 	DartMarker mf(*m_map);
-	for (Dart d = m_map->begin(); d != m_map->end();)
+	for (Dart d = m_map->begin(); d != m_map->end();)	// next done inside loop because of deleteFace
 	{
-		if (!mf.isMarked(d))
+		if (!mf.isMarked(d) && !m_map->isBoundaryMarked(d))
 		{
 			Dart dd = d;
 			Dart e = m_map->phi1(d);
@@ -1236,21 +1191,64 @@ void MarchingCube<DataType, Windowing, PFP>::removeFacesOfBoundary(AttributeHand
 				m_map->next(d);
 			}
 			if ((boundVertices[dd]!=0) && (boundVertices[e]!=0) && (boundVertices[f]!=0))
-				m_map->deleteFace(dd);
+				m_map->deleteFace(dd,false);
 			else
-				mf.markOrbit(FACE,dd);
+				mf.markOrbit<FACE>(dd);
 		}
+		else m_map->next(d);
 	}
+	m_map->closeMap();
 
+////	 VERSION USING DELETE FACE WITH BOUNDARY
+//	DartMarker mf(*m_map);
+//	std::vector<Dart> vecF;
+//	vecF.reserve(8192);
+//	for (Dart d = m_map->begin(); d != m_map->end();m_map->next(d))	// next done inside loop because of deleteFace
+//	{
+//		if ((!mf.isMarked(d)) && (!m_map->isBoundaryMarked(d)) )
+//		{
+//			Dart dd = d;
+//			Dart e = m_map->phi1(d);
+//			Dart f = m_map->phi1(e);
+//			if ((boundVertices[dd]!=0) && (boundVertices[e]!=0) && (boundVertices[f]!=0))
+//				vecF.push_back(d);
+//			mf.markOrbit(FACE,dd);
+//		}
+//	}
+//	for (std::vector<Dart>::iterator it = vecF.begin(); it != vecF.end(); ++it)
+//		m_map->deleteFace(*it);
+}
 
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+void MarchingCube<DataType, Windowing, PFP>::recalPoints(const Geom::Vec3f& origin)
+{
 
+	for(unsigned int i=m_positions.begin(); i != m_positions.end(); m_positions.next(i))
+	{
+		typename PFP::VEC3& P = m_positions[i];
+		P -= m_fOrigin;
+		P[0] = (P[0]+0.5f) * m_fScal[0];
+		P[1] = (P[1]+0.5f) * m_fScal[1];
+		P[2] = (P[2]+0.5f) * m_fScal[2];
+		P+=origin;
+	}
 }
 
 
+#ifdef MC_WIDTH_EDGE_Z_EMBEDED
+template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
+void MarchingCube<DataType, Windowing, PFP>::setZSliceAttrib(EdgeAttribute<unsigned long long>* zsatt, unsigned int zbound, unsigned int nbZone)
+{
+	m_zslice = zsatt;
+	m_zbound = zbound;
+	m_sliceGroup = m_Image->getWidthZ()/nbZone;
+}
+#endif
 
 
 
+} // namespace MC
 
-} // end namespace
-} // end namespace
-} // end namespace
+} // namespace Algo
+
+} // namespace CGoGN

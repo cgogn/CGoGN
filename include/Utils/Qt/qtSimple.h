@@ -1,7 +1,7 @@
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * version 0.1                                                                  *
- * Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
  *                                                                              *
  * This library is free software; you can redistribute it and/or modify it      *
  * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,7 +17,7 @@
  * along with this library; if not, write to the Free Software Foundation,      *
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
  *                                                                              *
- * Web site: http://cgogn.u-strasbg.fr/                                         *
+ * Web site: http://cgogn.unistra.fr/                                           *
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
@@ -31,6 +31,7 @@
 #include <QWidget>
 #include <QtGui>
 #include "Utils/Qt/qtgl.h"
+
 #include <set>
 #include <string>
 #include "Geometry/vector_gen.h"
@@ -147,6 +148,7 @@ public:
 	 * if false : mouseMove events are only generated when a button is pressed
 	 */
 	void setGLWidgetMouseTracking(bool b);
+	
 
 protected:
 	GLWidget* m_glWidget;
@@ -188,7 +190,7 @@ protected:
 	void keyPressEvent(QKeyEvent *event);
 
 	void keyReleaseEvent(QKeyEvent *e);
-
+	
 public:
 	/**
 	 * set width and pos center of object to draw
@@ -199,6 +201,12 @@ public:
 	 * set focal
 	 */
 	void setFocal(float f) { m_glWidget->setFocal(f); }
+
+
+	/**
+	 * set geometry (override buggy Qt function)
+	 */
+	void setGeometry(int x, int y, int w, int h);
 
 	/**
 	 * get the mouse position in GL widget
@@ -394,7 +402,9 @@ public:
 	 * @param dir base directory
 	 * @param filters file filters (syntax: "label1 (filter1);; label2 (filter2);; ...")
 	 */
-	std::string selectFileSave(const std::string& title = "open file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
+	std::string selectFileSave(const std::string& title = "save file", const std::string& dir =  ".", const std::string& filters = "all (*.*)");
+
+	void snapshot(const QString& filename, const char* format = 0, const int& quality = -1);
 
 public slots:
 	virtual void cb_New() { std::cerr << "callback not implemented" << std::endl; }

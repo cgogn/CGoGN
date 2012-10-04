@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,18 +17,19 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
 namespace CGoGN
 {
+
 namespace Algo
 {
+
 namespace Modelisation
 {
-
 
 template<typename PFP>
 bool EarTriangulation<PFP>::inTriangle(const typename PFP::VEC3& P, const typename PFP::VEC3& normal, const typename PFP::VEC3& Ta,  const typename PFP::VEC3& Tb, const typename PFP::VEC3& Tc)
@@ -47,8 +48,6 @@ bool EarTriangulation<PFP>::inTriangle(const typename PFP::VEC3& P, const typena
 
 	return true;
 }
-
-
 
 template<typename PFP>
 void EarTriangulation<PFP>::recompute2Ears( Dart d, const typename PFP::VEC3& normalPoly, bool convex)
@@ -111,7 +110,6 @@ void EarTriangulation<PFP>::recompute2Ears( Dart d, const typename PFP::VEC3& no
 	m_dartEars[d] = m_ears.insert(VertexPoly(d,dotpr2,length));
 }
 
-
 template<typename PFP>
 float EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& normalPoly, float& val)
 {
@@ -152,12 +150,9 @@ float EarTriangulation<PFP>::computeEarInit(Dart d, const typename PFP::VEC3& no
 	return (Tb-Tc).norm2();
 }
 
-
-
 template<typename PFP>
 //void EarTriangulation<PFP>::trianguleFace(Dart d, DartMarker& mark)
 void EarTriangulation<PFP>::trianguleFace(Dart d)
-
 {
 	// compute normal to polygon
 	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(m_map, d, m_position);
@@ -169,7 +164,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 
 	if (m_map.template phi<111>(d) ==d)
 	{
-//		mark.markOrbit(FACE, d);	// mark the face
+//		mark.markOrbit<FACE>(d);	// mark the face
 		return;
 	}
 
@@ -198,7 +193,7 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 		Dart e2 = m_map.phi_1(d_e);
 
 		m_map.splitFace(e1,e2);
-//		mark.markOrbit(FACE, d_e);
+//		mark.markOrbit<FACE>(d_e);
 		nbv--;
 
 		if (nbv>3)	// do not recompute if only one triangle left
@@ -214,12 +209,10 @@ void EarTriangulation<PFP>::trianguleFace(Dart d)
 			convex = (m_ears.rbegin()->angle) < 5.0f;
 		}
 //		else
-//			mark.markOrbit(FACE, e1);	// mark last face
+//			mark.markOrbit<FACE>(e1);	// mark last face
 	}
 	m_ears.clear();
-
 }
-
 
 template<typename PFP>
 void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int thread)
@@ -247,9 +240,8 @@ void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int t
 	}
 }
 
+} // namespace Modelisation
 
+} // namespace Algo
 
-}
-}
-}
-
+} // namespace CGoGN

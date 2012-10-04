@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009-2011, IGG Team, LSIIT, University of Strasbourg           *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,15 +17,17 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.u-strasbg.fr/                                         *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
 
+#include "GL/glew.h"
 #include "Utils/drawer.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
 #include "Utils/vbo.h"
+#include "Utils/svg.h"
 
 namespace CGoGN
 {
@@ -69,12 +71,15 @@ void Drawer::lineWidth(float lw)
 
 void Drawer::pointSize(float ps)
 {
-	m_currentWidth = ps;
+	m_currentSize = ps;
 }
 
 void Drawer::begin(GLenum mode)
 {
-	m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentWidth));
+	if (mode == GL_POINTS)
+		m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentSize));
+	else
+		m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentWidth));
 }
 
 void Drawer::end()
@@ -162,6 +167,73 @@ void Drawer::callList()
 		glDrawArrays(pp->mode, pp->begin, pp->nb);
 	}
  	m_shader->disableVertexAttribs();
+}
+
+
+void Drawer::toSVG(Utils::SVG::SVGOut& svg)
+{
+	const Geom::Vec3f* ptrP = reinterpret_cast<Geom::Vec3f*>(m_vboPos->lockPtr());
+	const Geom::Vec3f* ptrC = reinterpret_cast<Geom::Vec3f*>(m_vboCol->lockPtr());
+
+	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
+	{
+		svg.setWidth(pp->width);
+		if (pp->mode == GL_POINTS)
+		{
+			unsigned int end = pp->begin + pp->nb;
+			svg.beginPoints();
+			for (unsigned int i=pp->begin; i<end; ++i)
+				svg.addPoint(ptrP[i], ptrC[i]);
+			svg.endPoints();
+		}
+
+		if (pp->mode == GL_LINES)
+		{
+			unsigned int end = pp->begin + pp->nb;
+			svg.beginLines();
+			for (unsigned int i=pp->begin; i<end; i+=2)
+				svg.addLine(ptrP[i], ptrP[i+1], ptrC[i]);
+			svg.endLines();
+		}
+
+		if ((pp->mode == GL_LINE_LOOP) || (pp->mode == GL_POLYGON))
+		{
+			unsigned int end = pp->begin + pp->nb-1;
+			svg.beginLines();
+			for (unsigned int i=pp->begin; i<=end; ++i)
+				svg.addLine(ptrP[i], ptrP[i+1], ptrC[i]);
+			svg.addLine(ptrP[end], ptrP[pp->begin], ptrC[end]);
+			svg.endLines();
+		}
+		if (pp->mode == GL_TRIANGLES)
+		{
+			unsigned int end = pp->begin + pp->nb;
+			svg.beginLines();
+			for (unsigned int i=pp->begin; i<end; i+=3)
+			{
+				svg.addLine(ptrP[i],   ptrP[i+1], ptrC[i]);
+				svg.addLine(ptrP[i+1], ptrP[i+2], ptrC[i+1]);
+				svg.addLine(ptrP[i+2], ptrP[i],   ptrC[i+2]);
+			}
+			svg.endLines();
+		}
+		if (pp->mode == GL_QUADS)
+		{
+			unsigned int end = pp->begin + pp->nb;
+			svg.beginLines();
+			for (unsigned int i=pp->begin; i<end; i+=4)
+			{
+				svg.addLine(ptrP[i],   ptrP[i+1], ptrC[i]);
+				svg.addLine(ptrP[i+1], ptrP[i+2], ptrC[i+1]);
+				svg.addLine(ptrP[i+2], ptrP[i+3], ptrC[i+2]);
+				svg.addLine(ptrP[i+3], ptrP[i],   ptrC[i+3]);
+			}
+			svg.endLines();
+		}
+	}
+
+	m_vboPos->releasePtr();
+	m_vboCol->releasePtr();
 }
 
 } // namespace Utils

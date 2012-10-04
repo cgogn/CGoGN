@@ -17,7 +17,7 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: https://iggservis.u-strasbg.fr/CGoGN/                              *
+* Web site: http://cgogn.unistra.fr/                                  *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
@@ -587,7 +587,7 @@ template <typename TYPEDOUBLE>
 void Image<DIM,TYPE>::subSample2()
 {
 	Image<DIM,TYPE>* newImg = subSampleToNewImage2<TYPEDOUBLE>();
-	swap(*newImg);
+	this->swap(*newImg);
 	delete newImg;
 }
 
@@ -720,7 +720,7 @@ template < unsigned int DIM, typename TYPE >
 void Image<DIM,TYPE>::rotate90(int axis)
 {
 	Image<DIM,TYPE>* newImg = rotate90ToNewImage(axis);
-	swap(*newImg);
+	this->swap(*newImg);
 	delete newImg;
 }
 
@@ -863,7 +863,7 @@ Filter<DIM>* Filter<DIM>::createGaussian(int radius, double sigma)
 		break;
 	case 2:
 		{
-			double tot=0.0;
+//			double tot=0.0;
 			double coef = 1.0/(sig2*M_PI);
 			for (int j=0; j< sz; ++j)
 				for (int i=0; i< sz; ++i)
