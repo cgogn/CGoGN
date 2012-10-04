@@ -1,17 +1,10 @@
 #ifndef PARTCELL_H
 #define PARTCELL_H
 
-<<<<<<< HEAD
-#include <iostream>
-=======
 #include "Algo/MovingObjects/particle_base.h"
->>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e
-
 #include "Algo/Geometry/inclusion.h"
 #include "Geometry/intersection.h"
 #include "Algo/Geometry/orientation.h"
-
-#include "particle_base.h"
 
 /* A particle cell is a particle base within a map, within a precise cell,
  * the displacement function should indicate after each displacement
@@ -38,11 +31,7 @@ class ParticleCell2D : public ParticleBase<PFP>
 public:
 	typedef typename PFP::MAP Map ;
 	typedef typename PFP::VEC3 VEC3;
-<<<<<<< HEAD
-	typedef typename PFP::TVEC3 TAB_POS ;
-=======
 	typedef VertexAttribute<typename PFP::VEC3> TAB_POS;
->>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e
 
 	Map& m ;
 
@@ -53,10 +42,10 @@ public:
 
 	unsigned int crossCell ;
 
-	ParticleCell2D(Map& map) :
-		m(map)
-	{
-	}
+//	ParticleCell2D(Map& map) :
+//		m(map)
+//	{
+//	}
 
 	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
 		ParticleBase<PFP>(pos),

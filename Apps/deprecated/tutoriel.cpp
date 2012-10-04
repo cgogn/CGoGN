@@ -362,11 +362,7 @@ void MyQT::cb_keyPress(int keycode)
 	// Sélectionne des faces
 	case 'f':
 		d_faces.clear();
-<<<<<<< HEAD:Apps/Examples/tutoriel.cpp
 		Algo::Selection:: facesRaySelection<PFP>(myQuadMesh, position, SelectorTrue(), rayA, AB, d_faces);
-=======
-		Algo::Selection::facesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_faces);
->>>>>>> 69653d4f2ddc874cfdf5765126462ba58105052e:Apps/deprecated/tutoriel.cpp
 
 		if (!d_faces.empty())
 		{
