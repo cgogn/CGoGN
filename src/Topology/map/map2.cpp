@@ -260,7 +260,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	phi2unsew(d);	// Unlink the opposite edges
 
 	Dart f = phi1(e) ;
-	Dart h = alpha1(e);
+	Dart h = phi2(phi_1(e));
 
 	if (h != e)
 		resV = h;
@@ -276,7 +276,7 @@ Dart Map2::collapseEdge(Dart d, bool delDegenerateFaces)
 	f = phi1(d) ;
 	if(resV == NIL)
 	{
-		h = alpha1(d);
+		h = phi2(phi_1(d));
 		if (h != d)
 			resV = h;
 	}

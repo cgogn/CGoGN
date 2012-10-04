@@ -66,7 +66,7 @@ public:
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d) { }
+	void updateWithoutCollapse() { }
 } ;
 
 template <typename PFP>
@@ -97,7 +97,7 @@ public:
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d) { }
+	void updateWithoutCollapse() { }
 } ;
 
 template <typename PFP>
@@ -142,7 +142,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d) { }
+	void updateWithoutCollapse() { }
 } ;
 
 template <typename PFP>
@@ -194,7 +194,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d);
+	void updateWithoutCollapse();
 } ;
 
 template <typename PFP>
@@ -246,7 +246,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d) { }
+	void updateWithoutCollapse() { }
 } ;
 
 template <typename PFP>
@@ -344,7 +344,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d) { }
+	void updateWithoutCollapse() { }
 } ;
 
 template <typename PFP>
@@ -392,7 +392,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	bool nextEdgeWithoutUpdates(Dart& d) { }
+	void updateWithoutCollapse() { }
 } ;
 
 /*****************************************************************************************************************
