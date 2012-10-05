@@ -42,7 +42,8 @@ namespace CGoGN
 typedef vrj::opengl::ContextData<GLint> CGoGNGLint;
 typedef vrj::opengl::ContextData<GLuint> CGoGNGLuint;
 typedef vrj::opengl::ContextData<GLhandleARB> CGoGNGLhandleARB;
-
+typedef vrj::opengl::ContextData<GLenum> CGoGNGLenum;
+typedef vrj::opengl::ContextData<GLenum*> CGoGNGLenumTable;
 #else
 
 template <typename T>
@@ -60,6 +61,7 @@ typedef FalsePtr<GLint> CGoGNGLint;
 typedef FalsePtr<GLuint> CGoGNGLuint;
 typedef FalsePtr<GLhandleARB> CGoGNGLhandleARB;
 typedef FalsePtr<GLenum> CGoGNGLenum;
+typedef FalsePtr<GLenum*> CGoGNGLenumTable;
 
 #endif
 
