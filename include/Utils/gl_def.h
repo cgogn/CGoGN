@@ -59,6 +59,7 @@ public:
 typedef FalsePtr<GLint> CGoGNGLint;
 typedef FalsePtr<GLuint> CGoGNGLuint;
 typedef FalsePtr<GLhandleARB> CGoGNGLhandleARB;
+typedef FalsePtr<GLenum> CGoGNGLenum;
 
 #endif
 
