@@ -200,6 +200,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/map3MR/map3MR_PrimalAdapt.hpp"
+#include "Algo/Multiresolution/Map3MR/map3MR_PrimalAdapt.hpp"
 
 #endif /* __MAP3MR_PRIMAL__ */

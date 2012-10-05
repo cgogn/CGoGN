@@ -22,21 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
+#ifndef __MAP2MR_PRIMAL_REGULAR__
+#define __MAP2MR_PRIMAL_REGULAR__
 
 #include "Topology/map/embeddedMap2.h"
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
-#include "Container/attributeContainer.h"
-
-#include "Algo/Decimation/selector.h"
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/geometryPredictor.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
-
+#include "Algo/Multiresolution/map2MR/filters_Primal.h"
 
 namespace CGoGN
 {
@@ -44,57 +37,59 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Regular
 {
 
 template <typename PFP>
-class Map2MR_PM
+class Map2MR
 {
+
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-private:
-	MAP& m_map ;
-	VertexAttribute<VEC3>& m_position;
+protected:
+	MAP& m_map;
+	bool shareVertexEmbeddings ;
 
-	bool m_initOk ;
-
-	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
-
-	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
 
 public:
-	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position);
+	Map2MR(MAP& map) ;
 
-	~Map2MR_PM();
 
-	//create a progressive mesh (a coarser level)
-	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts) ;
+	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
 
-	void addNewLevel(unsigned int percentWantedVertices);
+	void addNewLevelSqrt3(bool embedNewVertices = true);
 
-	void collapseEdge(Dart d);
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
-	//coarsen the mesh -> analysis
-	void coarsen() ;
+	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+	void clearAnalysisFilters() { analysisFilters.clear() ; }
 
-	//refine the mesh -> synthesis
-	void refine() ;
-
-	bool initOk() { return m_initOk; }
+	void analysis() ;
+	void synthesis() ;
 } ;
 
-} // namespace Multiresolution
+} // namespace Regular
+
+} // namespace Primal
+
+} // namespace MR
 
 } // namespace Algo
 
 } // namespace CGoGN
 
-
-#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
+#include "Algo/Multiresolution/Map2MR/map2MR_PrimalRegular.hpp"
 
 #endif

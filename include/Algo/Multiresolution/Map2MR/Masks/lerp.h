@@ -22,15 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP3MR_PRIMAL_REGULAR_
-#define __MAP3MR_PRIMAL_REGULAR_
+#ifndef __MR_LERP_MASK__
+#define __MR_LERP_MASK__
 
-#include "Topology/map/embeddedMap3.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor3.h"
-
-#include "Algo/Multiresolution/map3MR/filters_Primal.h"
-#include "Algo/Modelisation/tetrahedralization.h"
+#include <cmath>
+//#include "Algo/Decimation/decimation.h"
 
 namespace CGoGN
 {
@@ -44,88 +40,94 @@ namespace MR
 namespace Primal
 {
 
-namespace Regular
+namespace Masks
 {
-
-/*! \brief The class of regular 3-map MR
- */
 
 template <typename PFP>
-class Map3MR
+class LerpVertexVertexFunctor : public FunctorType
 {
-
-public:
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
-
 protected:
-	MAP& m_map;
-	bool shareVertexEmbeddings;
-
-	std::vector<Algo::MR::Filter*> synthesisFilters ;
-	std::vector<Algo::MR::Filter*> analysisFilters ;
-
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Map3MR(MAP& map);
+	LerpVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-private:
-	/*! @name Topological helping functions
-	 *
-	 *************************************************************************/
-	//@{
-	void swapEdges(Dart d, Dart e);
+	bool operator() (Dart d)
+	{
+		m_map.decCurrentLevel() ;
+		typename PFP::VEC3 p = m_position[d] ;
+		m_map.incCurrentLevel() ;
 
-	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
-	//@}
+		m_position[d] = p ;
+
+		return false ;
+	}
+} ;
+
+template <typename PFP>
+class LerpEdgeVertexFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	/*! @name Level creation
-	 *
-	 *************************************************************************/
-	//@{
-	//!
-	/*
-	 *
-	 */
-	void addNewLevelSqrt3(bool embedNewVertices);
+	LerpEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-	//!
-	/*
-	 */
-	void addNewLevelTetraOcta(bool embedNewVertices);
+	bool operator() (Dart d)
+	{
+		Dart d1 = m_map.phi2(d) ;
 
-	//!
-	/*
-	 */
-	void addNewLevelHexa(bool embedNewVertices);
+		m_map.decCurrentLevel() ;
+		Dart d2 = m_map.phi2(d1) ;
+		typename PFP::VEC3 p = (m_position[d1] + m_position[d2]) / 2.0 ;
+		m_map.incCurrentLevel() ;
 
-	//!
-	/*
-	 */
-	//void addNewLevel(bool embedNewVertices);
-	//@}
+		m_position[d] = p ;
 
-	/*! @name Geometry modification
-	 *  Analysis / Synthesis
-	 *************************************************************************/
-	//@{
+		return false ;
+	}
+} ;
 
-	void setSharingVertexEmbeddings(bool b) { shareVertexEmbeddings = b; }
+template <typename PFP>
+class LerpFaceVertexFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
-	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
+public:
+	LerpFaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
+	bool operator() (Dart d)
+	{
+		Dart df = m_map.phi1(m_map.phi1(d)) ;
 
-	void analysis() ;
-	void synthesis() ;
-	//@}
-};
+		m_map.decCurrentLevel() ;
 
-} // namespace Regular
+		typename PFP::VEC3 p(0) ;
+		unsigned int degree = 0 ;
+		Traversor2FV<typename PFP::MAP> trav(m_map, df) ;
+		for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+		{
+			++degree ;
+			p += m_position[it] ;
+		}
+		p /= degree ;
+
+		m_map.incCurrentLevel() ;
+
+		m_position[d] = p ;
+
+		return false ;
+	}
+} ;
+
+} // namespace Masks
 
 } // namespace Primal
 
@@ -135,6 +137,5 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/map3MR/map3MR_PrimalRegular.hpp"
+#endif
 
-#endif /* __MAP3MR_PRIMAL__ */

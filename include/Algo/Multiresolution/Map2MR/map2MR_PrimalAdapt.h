@@ -174,6 +174,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/map2MR/map2MR_PrimalAdapt.hpp"
+#include "Algo/Multiresolution/Map2MR/map2MR_PrimalAdapt.hpp"
 
 #endif
