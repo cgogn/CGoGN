@@ -133,7 +133,7 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread=0) ;
+	const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 
 template <typename PFP>
 void computeCurvatureVertices_QuadraticFitting(
@@ -144,7 +144,7 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select = allDarts, unsigned int nbth=0, unsigned int current_thread=0);
+	const FunctorSelect& select = allDarts, unsigned int nbth=0);
 
 } // namespace Parallel
 

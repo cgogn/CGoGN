@@ -178,10 +178,10 @@ public:
 };
 
 template <typename PFP>
-void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+void computeAreaFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorConvexFaceArea<PFP> funct(map,position,area);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select);
 }
 
 
@@ -202,10 +202,10 @@ public:
 };
 
 template <typename PFP>
-void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+void computeOneRingAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorConvexFaceArea<PFP> funct(map,position,area);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select);
 }
 
 
@@ -227,10 +227,10 @@ public:
 };
 
 template <typename PFP>
-void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+void computeVoronoiAreaVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::REAL>& area, const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorConvexFaceArea<PFP> funct(map,position,area);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select);
 }
 
 

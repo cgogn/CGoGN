@@ -39,7 +39,7 @@
 #include "Algo/Modelisation/polyhedron.h"
 
 #include "Algo/Parallel/parallel_foreach.h"
-#include "Algo/Parallel/cgogn_thread.h"
+
 #include "Utils/cgognStream.h"
 #include "Utils/chrono.h"
 
@@ -60,28 +60,6 @@ PFP::MAP myMap;
 VertexAttribute<PFP::VEC3> position;
 VertexAttribute<PFP::VEC3> position2;
 VertexAttribute<PFP::VEC3> normal;
-
-
-
-
-template <typename XXX>
-class ThreadNormals: public Algo::Parallel::CGoGNThread<typename XXX::MAP>
-{
-protected:
-	VertexAttribute<typename XXX::VEC3>& m_positions;
-	VertexAttribute<typename XXX::VEC3>& m_normals;
-public:
-	ThreadNormals(typename XXX::MAP& map, VertexAttribute<typename XXX::VEC3>& pos, VertexAttribute<typename XXX::VEC3>& norm, unsigned int th):
-		Algo::Parallel::CGoGNThread<typename XXX::MAP>(map,th),
-		m_positions(pos),
-		m_normals(norm)
-	{}
-
-	void operator()()
-	{
-		Algo::Geometry::computeNormalVertices<XXX>(this->m_map, m_positions, m_normals, SelectorTrue(), this->tid());
-	}
-};
 
 
 
@@ -109,9 +87,7 @@ void MyQT::cb_initGL()
 	m_lines->setScale(2.0f);
 	m_lines->setColor(Geom::Vec4f(0.0f, 1.0f, 0.2f, 0.0f));
 
-	CGoGNout << "Je calcule les normales en meme temps que les primitives" << CGoGNendl;
-	boost::thread thread1( ThreadNormals<PFP>(myMap,position,normal,1));
-
+	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
 	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::POINTS);
@@ -119,8 +95,6 @@ void MyQT::cb_initGL()
 	registerShader(m_shader);
 	registerShader(m_lines);
 
-	// on attend la fin du thread pour etre sur que normal est a jour
-	thread1.join();
 	m_normalVBO->updateData(normal);
 
 }
