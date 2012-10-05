@@ -253,8 +253,11 @@ template <typename PFP>
 void computeRidgeLines(
 	typename PFP::MAP& map,
 	CellMarker<FACE>& regularMarker,
-	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL>& k,
+	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
@@ -263,7 +266,7 @@ void computeRidgeLines(
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		if (regularMarker.isMarked(d))
-			ridgeLines<PFP>(map, d, K, vertex_gradient, ridge_segments) ;
+			ridgeLines<PFP>(map, d, position, K, vertex_gradient, k, k2, ridge_segments) ;
 	}
 }
 
@@ -271,8 +274,11 @@ template <typename PFP>
 void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& K,
 	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL>& k,
+	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments)
 {
 	typedef typename PFP::REAL REAL ;
@@ -293,7 +299,7 @@ void ridgeLines(
 
 	assert(mutuallyPositive<PFP>(Kv1, Kv2, Kv3)) ;
 
-	/* Calcul coefficient extremalite */
+	// Calcul coefficient extremalite
 
 //	REAL e1 = extremality<PFP>(map, v1, Kv1, face_gradient, face_area) ;
 //	REAL e2 = extremality<PFP>(map, v2, Kv2, face_gradient, face_area) ;
@@ -303,7 +309,7 @@ void ridgeLines(
 	REAL e2 = vertex_gradient[v2] * Kv2 ;
 	REAL e3 = vertex_gradient[v3] * Kv3 ;
 
-	/* Extraction des zeros */
+	// Extraction des zeros
 
 	bool p1set = false ;
 	bool p2set = false ;
@@ -344,6 +350,30 @@ void ridgeLines(
 			p2set = true ;
 			ridge_segments[d].type = SEGMENT ;
 		}
+	}
+
+	if(p1set && p2set)
+	{
+		VEC3 n = Algo::Geometry::faceNormal<PFP>(map, d, position) ;
+		REAL a = Algo::Geometry::convexFaceArea<PFP>(map, d, position) ;
+
+		VEC3 p1 = position[v1] ;
+		VEC3 p2 = position[v2] ;
+		VEC3 p3 = position[v3] ;
+
+		VEC3 eg = e1 * ( ( n ^ ( p3 - p2 ) ) / ( 2 * a ) ) +
+				  e2 * ( ( n ^ ( p1 - p3 ) ) / ( 2 * a ) ) +
+				  e3 * ( ( n ^ ( p2 - p1 ) ) / ( 2 * a ) ) ;
+		eg.normalize() ;
+
+		VEC3 Ktotal = Kv1 + Kv2 + Kv3 ;
+		REAL ktotal = k[v1] + k[v2] + k[v3] ;
+		ktotal = ktotal > 0 ? ktotal : -1.0 * ktotal ;
+		REAL k2total = k2[v1] + k2[v2] + k2[v3] ;
+		k2total = k2total > 0 ? k2total : -1.0 * k2total ;
+
+		if( ( (eg * Ktotal) < 0 ) && ( ktotal > k2total ) )
+			ridge_segments[d].type = FEATURE ;
 	}
 }
 

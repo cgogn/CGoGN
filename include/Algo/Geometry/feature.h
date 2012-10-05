@@ -118,8 +118,11 @@ template <typename PFP>
 void computeRidgeLines(
 	typename PFP::MAP& map,
 	CellMarker<FACE>& regularMarker,
-	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL>& k,
+	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments,
 	const FunctorSelect& select = allDarts,
 	unsigned int thread = 0) ;
@@ -128,8 +131,12 @@ template <typename PFP>
 void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const FaceAttribute<typename PFP::VEC3>& face_area,
 	const VertexAttribute<typename PFP::VEC3>& K,
 	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL>& k,
+	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments) ;
 
 template <typename PFP>
