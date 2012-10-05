@@ -22,8 +22,14 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SELECTOR_H__
-#define __SELECTOR_H__
+#ifndef __MAP2MR_PRIMAL_REGULAR__
+#define __MAP2MR_PRIMAL_REGULAR__
+
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
+
+#include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
 {
@@ -31,61 +37,59 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Decimation
+namespace MR
 {
 
-enum SelectorType
+namespace Primal
 {
-	S_MapOrder = 0,
-	S_Random,
-	S_EdgeLength,
-	S_QEM,
-	S_QEMml,
-	S_MinDetail,
-	S_Curvature,
-	S_ColorNaive,
-	S_QEMextColor,
-	S_Lightfield,
-	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	S_hQEMml
-} ;
 
-template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
+namespace Regular
+{
 
 template <typename PFP>
-class EdgeSelector
+class Map2MR
 {
+
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
-	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
-	const FunctorSelect& m_select ;
+	MAP& m_map;
+	bool shareVertexEmbeddings ;
+
+	std::vector<Filter*> synthesisFilters ;
+	std::vector<Filter*> analysisFilters ;
 
 public:
-	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		m_map(m), m_position(pos), m_approximators(approx), m_select(select)
-	{}
-	virtual ~EdgeSelector()
-	{}
-	virtual SelectorType getType() = 0 ;
-	virtual bool init() = 0 ;
-	virtual bool nextEdge(Dart& d) = 0 ;
-	virtual void updateBeforeCollapse(Dart d) = 0 ;
-	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
+	Map2MR(MAP& map) ;
 
-	virtual void updateWithoutCollapse() = 0;
+
+	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+
+	void addNewLevelSqrt3(bool embedNewVertices = true);
+
+	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+
+	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+	void clearAnalysisFilters() { analysisFilters.clear() ; }
+
+	void analysis() ;
+	void synthesis() ;
 } ;
 
-} // namespace Decimation
+} // namespace Regular
+
+} // namespace Primal
+
+} // namespace MR
 
 } // namespace Algo
 
 } // namespace CGoGN
+
+#include "Algo/Multiresolution/Map2MR/map2MR_PrimalRegular.hpp"
 
 #endif

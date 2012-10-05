@@ -142,8 +142,9 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 	unsigned int nbWantedVertices = nbVertices * percentWantedVertices / 100 ;
 
 	unsigned int nbDeletedVertex=0;
-	unsigned int percentWantedPerLevel = 20;
-	unsigned int nbWantedPerLevel = nbWantedVertices * percentWantedPerLevel / 100 ;
+	unsigned int percentWantedPerLevel = 50;
+	//unsigned int nbWantedPerLevel = nbWantedVertices * percentWantedPerLevel / 100 ;
+	unsigned int nbWantedPerLevel = nbVertices * percentWantedPerLevel / 100 ;
 
 	CGoGNout << "  initializing selector.." << CGoGNflush ;
 	m_initOk = m_selector->init() ;
@@ -158,9 +159,10 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 
 	bool finished = false ;
 	Dart d ;
+
 	while(!finished)
 	{
-		if(!m_selector->nextEdgeWithoutUpdates(d))
+		if(!m_selector->nextEdge(d))
 			break ;
 
 		if(!me.isMarked(d))
@@ -169,19 +171,21 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 			Dart dt = d;
 			do
 			{
-				Traversor2VF<typename PFP::MAP> tf(m_map, dt) ;
+				Traversor2VE<typename PFP::MAP> tf(m_map, dt) ;
 				for(Dart it = tf.begin(); it != tf.end(); it = tf.next())
 				{
-					me.markOrbit<FACE>(it);
+					me.markOrbit<EDGE>(it);
+					me.markOrbit<EDGE>(m_map.phi1(it));
 				}
 
 				dt = m_map.phi1(dt);
 			}while(dt != d);
 
-			Traversor2VF<typename PFP::MAP> tf(m_map, m_map.phi_1(m_map.phi2(d))) ;
+			Traversor2VE<typename PFP::MAP> tf(m_map, m_map.phi_1(m_map.phi2(d))) ;
 			for(Dart it = tf.begin(); it != tf.end(); it = tf.next())
 			{
-				me.markOrbit<FACE>(it);
+				me.markOrbit<EDGE>(it);
+				me.markOrbit<EDGE>(m_map.phi1(it));
 			}
 
 			++nbDeletedVertex ;
@@ -189,45 +193,39 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 			edges.push_back(d);
 		}
 
+		m_selector->updateWithoutCollapse();
+
 		if(nbDeletedVertex >= nbWantedPerLevel)
 			finished = true ;
 	}
 
+
 	std::cout << "nbDeletedVertices  : " << nbDeletedVertex << std::endl;
 
-
-	//create the new level
-	m_map.addLevelFront();
-	m_map.setCurrentLevel(0);
-
-	AttributeContainer& attribs = m_map.getMRAttributeContainer();
-	AttributeMultiVector<unsigned int>* attribLevel = m_map.getMRLevelAttributeVector();
-	AttributeMultiVector<unsigned int>* attribDarts = m_map.getMRDartAttributeVector(0);
-
-	for(unsigned int i = attribs.begin(); i != attribs.end(); attribs.next(i))
+	if(!edges.empty())
 	{
-		if((*attribDarts)[i] == MRNULL)
-			++(*attribLevel)[i];
-	}
+		//create the new level
+		m_map.addLevelFront();
+		m_map.setCurrentLevel(0);
 
-	for(std::vector<Dart>::iterator it = edges.begin() ; it != edges.end() ; ++it)
-	{
-		collapseEdge(*it);
-	}
+		AttributeContainer& attribs = m_map.getMRAttributeContainer();
+		AttributeMultiVector<unsigned int>* attribLevel = m_map.getMRLevelAttributeVector();
+		AttributeMultiVector<unsigned int>* attribDarts = m_map.getMRDartAttributeVector(0);
 
-//	Dart d2 = m_map.phi2(m_map.phi_1(d)) ;
-//	Dart dd2 = m_map.phi2(m_map.phi_1(m_map.phi2(d))) ;
-//
-//	m_selector->updateBeforeCollapse(d) ;		// update selector
-//
-//	collapseEdge(d);
-//
-//	m_selector->updateAfterCollapse(d2, dd2) ;	// update selector
-//
-//
-//	CGoGNout << "..done (" << nbDeletedVertex << " vertices)" << CGoGNendl ;
-//
-//	m_map.printMR();
+		for(unsigned int i = attribs.begin(); i != attribs.end(); attribs.next(i))
+		{
+			if((*attribDarts)[i] == MRNULL)
+				++(*attribLevel)[i];
+		}
+
+		for(std::vector<Dart>::iterator it = edges.begin() ; it != edges.end() ; ++it)
+		{
+//			if(*it == Dart(301459))
+//				break;
+
+			collapseEdge(*it);
+		}
+	}
 }
 
 
@@ -244,6 +242,11 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 
 	//m_map.printMR();
 
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(d)), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(d)), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(m_map.phi2(d))), 0);
+	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(m_map.phi2(d))), 0);
+
 	m_map.duplicateDartAtOneLevel(d, 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi1(d), 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi_1(d), 0);
@@ -251,10 +254,7 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 	m_map.duplicateDartAtOneLevel(m_map.phi_1(m_map.phi2(d)), 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi1(m_map.phi2(d)), 0);
 
-	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(d)), 0);
-	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(d)), 0);
-	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(m_map.phi2(d))), 0);
-	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(m_map.phi2(d))), 0);
+	//m_map.printMR();
 
 	m_map.collapseEdge(d);
 

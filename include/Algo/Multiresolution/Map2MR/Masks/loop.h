@@ -22,21 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PM__
-#define __MAP2MR_PM__
+#ifndef __MR_LOOP_MASK__
+#define __MR_LOOP_MASK__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-#include "Container/attributeContainer.h"
-
-#include "Algo/Decimation/selector.h"
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/geometryPredictor.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
-
+#include <cmath>
 
 namespace CGoGN
 {
@@ -44,57 +33,101 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Masks
 {
 
 template <typename PFP>
-class Map2MR_PM
+class LoopVertexVertexFunctor : public FunctorType
 {
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
-private:
-	MAP& m_map ;
-	VertexAttribute<VEC3>& m_position;
-
-	bool m_initOk ;
-
-	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
-	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
-	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
-
-	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position);
+	LoopVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-	~Map2MR_PM();
+	bool operator() (Dart d)
+	{
+		m_map.decCurrentLevel() ;
 
-	//create a progressive mesh (a coarser level)
-	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts) ;
+		typename PFP::VEC3 np(0) ;
+		unsigned int degree = 0 ;
+		Traversor2VVaE<typename PFP::MAP> trav(m_map, d) ;
+		for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+		{
+			++degree ;
+			np += m_position[it] ;
+		}
+		float tmp = 3.0 + 2.0 * cos(2.0 * M_PI / degree) ;
+		float beta = (5.0 / 8.0) - ( tmp * tmp / 64.0 ) ;
+		np *= beta / degree ;
 
-	void addNewLevel(unsigned int percentWantedVertices);
+		typename PFP::VEC3 vp = m_position[d] ;
+		vp *= 1.0 - beta ;
 
-	void collapseEdge(Dart d);
+		m_map.incCurrentLevel() ;
 
-	//coarsen the mesh -> analysis
-	void coarsen() ;
+		m_position[d] = np + vp ;
 
-	//refine the mesh -> synthesis
-	void refine() ;
-
-	bool initOk() { return m_initOk; }
+		return false ;
+	}
 } ;
 
-} // namespace Multiresolution
+template <typename PFP>
+class LoopEdgeVertexFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LoopEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() (Dart d)
+	{
+		Dart d1 = m_map.phi2(d) ;
+
+		m_map.decCurrentLevel() ;
+
+		Dart d2 = m_map.phi2(d1) ;
+		Dart d3 = m_map.phi_1(d1) ;
+		Dart d4 = m_map.phi_1(d2) ;
+
+		typename PFP::VEC3 p1 = m_position[d1] ;
+		typename PFP::VEC3 p2 = m_position[d2] ;
+		typename PFP::VEC3 p3 = m_position[d3] ;
+		typename PFP::VEC3 p4 = m_position[d4] ;
+
+		p1 *= 3.0 / 8.0 ;
+		p2 *= 3.0 / 8.0 ;
+		p3 *= 1.0 / 8.0 ;
+		p4 *= 1.0 / 8.0 ;
+
+		m_map.incCurrentLevel() ;
+
+		m_position[d] = p1 + p2 + p3 + p4 ;
+
+		return false ;
+	}
+} ;
+
+} // namespace Masks
+
+} // namespace Primal
+
+} // namespace MR
 
 } // namespace Algo
 
 } // namespace CGoGN
 
-
-#include "Algo/Multiresolution/map2MR/map2MR_PM.hpp"
-
 #endif
+

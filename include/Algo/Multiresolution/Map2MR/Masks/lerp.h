@@ -22,8 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SELECTOR_H__
-#define __SELECTOR_H__
+#ifndef __MR_LERP_MASK__
+#define __MR_LERP_MASK__
+
+#include <cmath>
+//#include "Algo/Decimation/decimation.h"
 
 namespace CGoGN
 {
@@ -31,61 +34,108 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Decimation
+namespace MR
 {
 
-enum SelectorType
+namespace Primal
 {
-	S_MapOrder = 0,
-	S_Random,
-	S_EdgeLength,
-	S_QEM,
-	S_QEMml,
-	S_MinDetail,
-	S_Curvature,
-	S_ColorNaive,
-	S_QEMextColor,
-	S_Lightfield,
-	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	S_hQEMml
-} ;
 
-template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
+namespace Masks
+{
 
 template <typename PFP>
-class EdgeSelector
+class LerpVertexVertexFunctor : public FunctorType
 {
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
 protected:
-	MAP& m_map ;
+	typename PFP::MAP& m_map ;
 	VertexAttribute<typename PFP::VEC3>& m_position ;
-	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
-	const FunctorSelect& m_select ;
 
 public:
-	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		m_map(m), m_position(pos), m_approximators(approx), m_select(select)
+	LerpVertexVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
 	{}
-	virtual ~EdgeSelector()
-	{}
-	virtual SelectorType getType() = 0 ;
-	virtual bool init() = 0 ;
-	virtual bool nextEdge(Dart& d) = 0 ;
-	virtual void updateBeforeCollapse(Dart d) = 0 ;
-	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
 
-	virtual void updateWithoutCollapse() = 0;
+	bool operator() (Dart d)
+	{
+		m_map.decCurrentLevel() ;
+		typename PFP::VEC3 p = m_position[d] ;
+		m_map.incCurrentLevel() ;
+
+		m_position[d] = p ;
+
+		return false ;
+	}
 } ;
 
-} // namespace Decimation
+template <typename PFP>
+class LerpEdgeVertexFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpEdgeVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() (Dart d)
+	{
+		Dart d1 = m_map.phi2(d) ;
+
+		m_map.decCurrentLevel() ;
+		Dart d2 = m_map.phi2(d1) ;
+		typename PFP::VEC3 p = (m_position[d1] + m_position[d2]) / 2.0 ;
+		m_map.incCurrentLevel() ;
+
+		m_position[d] = p ;
+
+		return false ;
+	}
+} ;
+
+template <typename PFP>
+class LerpFaceVertexFunctor : public FunctorType
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpFaceVertexFunctor(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	bool operator() (Dart d)
+	{
+		Dart df = m_map.phi1(m_map.phi1(d)) ;
+
+		m_map.decCurrentLevel() ;
+
+		typename PFP::VEC3 p(0) ;
+		unsigned int degree = 0 ;
+		Traversor2FV<typename PFP::MAP> trav(m_map, df) ;
+		for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+		{
+			++degree ;
+			p += m_position[it] ;
+		}
+		p /= degree ;
+
+		m_map.incCurrentLevel() ;
+
+		m_position[d] = p ;
+
+		return false ;
+	}
+} ;
+
+} // namespace Masks
+
+} // namespace Primal
+
+} // namespace MR
 
 } // namespace Algo
 
 } // namespace CGoGN
 
 #endif
+

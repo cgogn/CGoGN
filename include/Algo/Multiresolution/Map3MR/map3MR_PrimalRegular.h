@@ -29,7 +29,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor3.h"
 
-#include "Algo/Multiresolution/map3MR/filters_Primal.h"
+#include "Algo/Multiresolution/filter.h"
 #include "Algo/Modelisation/tetrahedralization.h"
 
 namespace CGoGN
@@ -135,6 +135,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/map3MR/map3MR_PrimalRegular.hpp"
+#include "Algo/Multiresolution/Map3MR/map3MR_PrimalRegular.hpp"
 
 #endif /* __MAP3MR_PRIMAL__ */

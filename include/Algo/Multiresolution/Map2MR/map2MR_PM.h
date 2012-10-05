@@ -22,8 +22,21 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __SELECTOR_H__
-#define __SELECTOR_H__
+#ifndef __MAP2MR_PM__
+#define __MAP2MR_PM__
+
+#include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/traversorCell.h"
+#include "Topology/generic/traversor2.h"
+
+#include "Container/attributeContainer.h"
+
+#include "Algo/Decimation/selector.h"
+#include "Algo/Decimation/edgeSelector.h"
+#include "Algo/Decimation/geometryApproximator.h"
+#include "Algo/Decimation/geometryPredictor.h"
+#include "Algo/Decimation/lightfieldApproximator.h"
+
 
 namespace CGoGN
 {
@@ -31,61 +44,57 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Decimation
+namespace Multiresolution
 {
-
-enum SelectorType
-{
-	S_MapOrder = 0,
-	S_Random,
-	S_EdgeLength,
-	S_QEM,
-	S_QEMml,
-	S_MinDetail,
-	S_Curvature,
-	S_ColorNaive,
-	S_QEMextColor,
-	S_Lightfield,
-	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	S_hQEMml
-} ;
-
-template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
 
 template <typename PFP>
-class EdgeSelector
+class Map2MR_PM
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
-protected:
+private:
 	MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
-	std::vector<ApproximatorGen<PFP>*>& m_approximators ;
-	const FunctorSelect& m_select ;
+	VertexAttribute<VEC3>& m_position;
+
+	bool m_initOk ;
+
+	Algo::Decimation::EdgeSelector<PFP>* m_selector ;
+	std::vector<Algo::Decimation::ApproximatorGen<PFP>*> m_approximators ;
+	std::vector<Algo::Decimation::PredictorGen<PFP>*> m_predictors ;
+
+	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
 
 public:
-	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		m_map(m), m_position(pos), m_approximators(approx), m_select(select)
-	{}
-	virtual ~EdgeSelector()
-	{}
-	virtual SelectorType getType() = 0 ;
-	virtual bool init() = 0 ;
-	virtual bool nextEdge(Dart& d) = 0 ;
-	virtual void updateBeforeCollapse(Dart d) = 0 ;
-	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
+	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position);
 
-	virtual void updateWithoutCollapse() = 0;
+	~Map2MR_PM();
+
+	//create a progressive mesh (a coarser level)
+	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts) ;
+
+	void addNewLevel(unsigned int percentWantedVertices);
+
+	void collapseEdge(Dart d);
+
+	//coarsen the mesh -> analysis
+	void coarsen() ;
+
+	//refine the mesh -> synthesis
+	void refine() ;
+
+	bool initOk() { return m_initOk; }
 } ;
 
-} // namespace Decimation
+} // namespace Multiresolution
 
 } // namespace Algo
 
 } // namespace CGoGN
+
+
+#include "Algo/Multiresolution/Map2MR/map2MR_PM.hpp"
 
 #endif

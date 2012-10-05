@@ -117,6 +117,14 @@ inline void GenericMap::deleteDart(Dart d)
 
 		if(getDartLevel(d) > m_mrCurrentLevel)
 		{
+			unsigned int di = (*m_mrDarts[m_mrCurrentLevel + 1])[d.index];
+			// si le brin de niveau i pointe sur le meme brin que le niveau i-1
+			if(di != index)
+			{
+				if(isDartValid(d))//index))
+					deleteDartLine(index) ;
+			}
+
 			(*m_mrDarts[m_mrCurrentLevel])[d.index] = MRNULL ;
 			return;
 		}
@@ -124,7 +132,7 @@ inline void GenericMap::deleteDart(Dart d)
 		// a MRdart can only be deleted on its insertion level
 		if(getDartLevel(d) == m_mrCurrentLevel)
 		{
-			if(isDartValid(index))
+			if(isDartValid(d))//index))
 				deleteDartLine(index) ;
 
 			m_mrattribs.removeLine(d.index);
@@ -132,11 +140,11 @@ inline void GenericMap::deleteDart(Dart d)
 		}
 		else
 		{
-			unsigned int di = (*m_mrDarts[m_mrCurrentLevel - 1])[d.index]; //m_mrDarts[m_mrCurrentLevel - 1]->operator[](d.index) ;
+			unsigned int di = (*m_mrDarts[m_mrCurrentLevel - 1])[d.index];
 			// si le brin de niveau i pointe sur le meme brin que le niveau i-1
 			if(di != index)
 			{
-				if(isDartValid(index))
+				if(isDartValid(d))//index))
 					deleteDartLine(index) ;
 			}
 
@@ -155,7 +163,7 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 	m_attribs[DART].removeLine(index) ;	// free the dart line
 
 	for (unsigned int t = 0; t < m_nbThreads; ++t)	// clear markers of
-		(*m_markTables[DART][t])[index].clear() ;	// the removed dart
+		(*m_markTables[DART][t])[index].clear() ;		// the removed dart
 
 	for(unsigned int orbit = 0; orbit < NB_ORBITS; ++orbit)
 	{
@@ -167,7 +175,7 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 				if(m_attribs[orbit].unrefLine(emb))					// unref the pointed embedding line
 				{
 					for (unsigned int t = 0; t < m_nbThreads; ++t)	// and clear its markers if it was
-						(*m_markTables[orbit][t])[emb].clear() ;	// its last unref (and was thus freed)
+						(*m_markTables[orbit][t])[emb].clear() ;		// its last unref (and was thus freed)
 				}
 			}
 		}

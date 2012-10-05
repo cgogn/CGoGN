@@ -22,14 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL_REGULAR__
-#define __MAP2MR_PRIMAL_REGULAR__
+#ifndef __MR_LERP_FILTER__
+#define __MR_LERP_FILTER__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-#include "Algo/Multiresolution/map2MR/filters_Primal.h"
+#include <cmath>
+#include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
 {
@@ -43,44 +40,80 @@ namespace MR
 namespace Primal
 {
 
-namespace Regular
+namespace Filters
 {
 
+
+
+/*********************************************************************************
+ *                           ANALYSIS FILTERS
+ *********************************************************************************/
+
+
+
+/*********************************************************************************
+ *                           SYNTHESIS FILTERS
+ *********************************************************************************/
 template <typename PFP>
-class Map2MR
+class LerpEdgeSynthesisFilter : public Filter
 {
-
-public:
-	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
-
 protected:
-	MAP& m_map;
-	bool shareVertexEmbeddings ;
-
-	std::vector<Algo::MR::Filter*> synthesisFilters ;
-	std::vector<Algo::MR::Filter*> analysisFilters ;
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Map2MR(MAP& map) ;
+	LerpEdgeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi1(d)]) * typename PFP::REAL(0.5);
 
-	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+			m_map.incCurrentLevel() ;
 
-	void addNewLevelSqrt3(bool embedNewVertices = true);
+			Dart midV = m_map.phi1(d) ;
+			m_position[midV] = p ;
 
-	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
-
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
-
-	void analysis() ;
-	void synthesis() ;
+			m_map.decCurrentLevel() ;
+		}
+	}
 } ;
 
-} // namespace Regular
+template <typename PFP>
+class LerpFaceSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpFaceSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
+
+			m_map.incCurrentLevel() ;
+			if(m_map.faceDegree(d) != 3)
+			{
+				Dart midF = m_map.phi1(m_map.phi1(d));
+				m_position[midF] = p ;
+			}
+			m_map.decCurrentLevel() ;
+
+		}
+	}
+} ;
+
+
+} // namespace Filters
 
 } // namespace Primal
 
@@ -90,6 +123,5 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/map2MR/map2MR_PrimalRegular.hpp"
-
 #endif
+
