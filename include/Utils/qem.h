@@ -32,9 +32,8 @@
 #include "Geometry/matrix.h"
 #include "Geometry/plane_3d.h"
 
-// GSL includes
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_matrix.h>
+// Eigen includes
+#include <Eigen/Dense>
 
 namespace CGoGN {
 
@@ -326,51 +325,41 @@ public:
 
 	QuadricHF()
 	{
-		m_A = gsl_matrix_alloc(0,0) ;
-		m_b = gsl_vector_alloc(0) ;
+		m_A.resize(0,0) ;
+		m_b.resize(0) ;
 		m_c = 0 ;
 	}
 
-	QuadricHF(int i):
-		m_A(NULL),
-		m_b(NULL),
-		m_c(0)
+	QuadricHF(int i)
 	{
-		m_A = gsl_matrix_calloc(i, i) ;
-		m_b = gsl_vector_calloc(i) ;
+		m_A.resize(i,i) ;
+		m_b.resize(i) ;
 		m_c = 0 ;
 	}
 
 	QuadricHF(const std::vector<VEC3>& coefs, const REAL& gamma, const REAL& alpha)
 	{
-		m_A = gsl_matrix_calloc(coefs.size(), coefs.size()) ;
-		m_b = gsl_vector_calloc(coefs.size()) ;
+		m_A.resize(coefs.size(),coefs.size()) ;
+		m_b.resize(coefs.size()) ;
 		m_c = 0 ;
 		// TODO : build A, b and c
 		assert(false || !"todo") ;
 	}
 
 	~QuadricHF()
-	{
-		gsl_matrix_free(m_A) ;
-		gsl_vector_free(m_b) ;
-	}
+	{}
 
 	void zero()
 	{
-		gsl_matrix_set_zero(m_A) ;
-		gsl_vector_set_zero(m_b) ;
+		m_A.setZero() ;
+		m_b.setZero() ;
 		m_c = 0 ;
 	}
 
 	QuadricHF& operator= (const QuadricHF<REAL>& q)
 	{
-		m_A = gsl_matrix_alloc(q.m_A->size1,q.m_A->size1) ;
-		gsl_matrix_memcpy(m_A,q.m_A) ;
-
-		m_b = gsl_vector_alloc(m_b->size) ;
-		gsl_vector_memcpy(m_b,q.m_b) ;
-
+		m_A = q.m_A ;
+		m_b = q.m_b ;
 		m_c = q.m_c ;
 
 		return *this ;
@@ -378,12 +367,12 @@ public:
 
 	QuadricHF& operator+= (const QuadricHF<REAL>& q)
 	{
-		assert(((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && m_b->size == q.m_b->size) || !"Incompatible add of matrices") ;
-		if ((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && (m_b->size == q.m_b->size))
+		assert(((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && m_b.size() == q.m_b.size()) || !"Incompatible add of matrices") ;
+		if ((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && (m_b.size() == q.m_b.size()))
 			return *this ;
 
-		gsl_matrix_add(m_A,q.m_A) ;
-		gsl_vector_add(m_b,q.m_b) ;
+		m_A += q.m_A ;
+		m_b += q.m_b ;
 		m_c += q.m_c ;
 
 		return *this ;
@@ -391,12 +380,12 @@ public:
 
 	QuadricHF& operator -= (const QuadricHF<REAL>& q)
 	{
-		assert(((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && m_b->size == q.m_b->size) || !"Incompatible add of matrices") ;
-		if ((m_A->size1 == q.m_A->size1) && (m_A->size2 == q.m_A->size2) && (m_b->size == q.m_b->size))
+		assert(((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && m_b.size() == q.m_b.size()) || !"Incompatible add of matrices") ;
+		if ((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && (m_b.size() == q.m_b.size()))
 			return *this ;
 
-		gsl_matrix_sub(m_A,q.m_A) ;
-		gsl_vector_sub(m_b,q.m_b) ;
+		m_A -= q.m_A ;
+		m_b -= q.m_b ;
 		m_c -= q.m_c ;
 
 		return *this ;
@@ -404,8 +393,8 @@ public:
 
 	QuadricHF& operator *= (const REAL& v)
 	{
-		gsl_matrix_scale(m_A,v) ;
-		gsl_vector_scale(m_b,v) ;
+		m_A *= v ;
+		m_b *= v ;
 		m_c *= v ;
 
 		return *this ;
@@ -455,8 +444,8 @@ public:
 
 private:
 	// Double computation is crucial for stability
-	gsl_matrix *m_A ;
-	gsl_vector *m_b ;
+	Eigen::MatrixXd m_A ;
+	Eigen::VectorXd m_b ;
 	double m_c ;
 
 	REAL evaluate(const std::vector<VEC3>& coefs) const
@@ -468,7 +457,7 @@ private:
 
 	bool optimize(std::vector<VEC3>& coefs) const
 	{
-		coefs.reserve(m_b->size) ;
+		coefs.reserve(m_b.size()) ;
 
 		// TODO
 /*		if (std::isnan(A(0,0)))
