@@ -110,7 +110,7 @@ void facesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
  * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
-void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float distMax)
+void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecEdges, float distMax, const FunctorSelect& good)
 {
 	typename PFP::REAL dist2 = distMax * distMax;
 	typename PFP::REAL AB2 = rayAB * rayAB;
@@ -165,7 +165,7 @@ void edgesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PF
  * @param dist radius of the cylinder of selection
  */
 template<typename PFP>
-void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good= allDarts)
+void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good)
 {
 	typename PFP::REAL dist2 = dist * dist;
 	typename PFP::REAL AB2 = rayAB * rayAB;
