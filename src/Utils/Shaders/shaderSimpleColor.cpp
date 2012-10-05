@@ -72,7 +72,7 @@ ShaderSimpleColor::ShaderSimpleColor(bool black_is_transparent)
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
-	m_unif_color = glGetUniformLocation(this->program_handler(),"color");
+	*m_unif_color = glGetUniformLocation(this->program_handler(),"color");
 
 	//Default values
 	Geom::Vec4f color(0.1f, 0.9f, 0.1f, 0.0f);
@@ -83,7 +83,7 @@ void ShaderSimpleColor::setColor(const Geom::Vec4f& color)
 {
 	m_color = color;
 	bind();
-	glUniform4fv(m_unif_color, 1, color.data());
+	glUniform4fv(*m_unif_color, 1, color.data());
 }
 
 unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
@@ -94,9 +94,9 @@ unsigned int ShaderSimpleColor::setAttributePosition(VBO* vbo)
 
 void ShaderSimpleColor::restoreUniformsAttribs()
 {
-	m_unif_color = glGetUniformLocation(this->program_handler(), "color");
+	*m_unif_color = glGetUniformLocation(this->program_handler(), "color");
 	bind();
-	glUniform4fv(m_unif_color, 1, m_color.data());
+	glUniform4fv(*m_unif_color, 1, m_color.data());
 	bindVA_VBO("VertexPosition", m_vboPos);
 	unbind();
 }

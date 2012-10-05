@@ -42,8 +42,8 @@ protected:
     static std::string geometryShaderText;
     static std::string fragmentShaderText;
 
-    GLuint m_uniform_scale;
-    GLuint m_uniform_color;
+    CGoGNGLuint m_uniform_scale;
+    CGoGNGLuint m_uniform_color;
 
 	float m_scale;
 	Geom::Vec4f m_color;

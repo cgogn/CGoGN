@@ -43,12 +43,12 @@ protected:
     static std::string geometryShaderText;
 
     // uniform locations
-	GLuint m_unif_ambiant;
-	GLuint m_unif_backColor;
-	GLuint m_unif_lightPos;
-	GLuint m_unif_explodeV;
-	GLuint m_unif_explodeF;
-	GLuint m_unif_plane;
+	CGoGNGLuint m_unif_ambiant;
+	CGoGNGLuint m_unif_backColor;
+	CGoGNGLuint m_unif_lightPos;
+	CGoGNGLuint m_unif_explodeV;
+	CGoGNGLuint m_unif_explodeF;
+	CGoGNGLuint m_unif_plane;
 
 //	local storage for uniforms
 	float m_explodeV;

@@ -47,18 +47,20 @@ protected:
 
 	static std::string fragmentShaderText;
 
-	static GLuint m_idTexture;
-
-	static GLuint m_uniform_texture;
-
 	static unsigned char* m_ptrSphere;
+
+	static PointSprite* m_instance0;
 
 	// compute the sphere instead of storing it in image file.
 	static void computeSphere();
 
-	GLuint m_uniform_size;
+	CGoGNGLuint m_uniform_size;
 
-	GLuint m_uniform_color;
+	CGoGNGLuint m_uniform_color;
+
+	CGoGNGLuint m_idTexture;
+
+	CGoGNGLuint m_uniform_texture;
 
 public:
 	/**

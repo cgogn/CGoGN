@@ -27,7 +27,9 @@
 #define __GL_MATRICES_H_
 
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include <stack>
+#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -37,13 +39,61 @@ namespace Utils
 class GL_Matrices
 {
 public:
-	/// 0: projection / 1: modelView /2: transfo
-	glm::mat4 m_matrices[3];
+	/// 0: projection / 1: modelView /2: transfo / 3:PMV /4:normal
+	glm::mat4 m_matrices[5];
 	/// stack of transfo matrix
 	std::stack<glm::mat4> m_stack;
 
-	void pushTransfo() { m_stack.push(m_matrices[2]); }
-	void popTransfo() { if (m_stack.empty()) return;  m_matrices[2] = m_stack.top(); m_stack.pop(); }
+public:
+	void pushTransfo()
+	{
+		m_stack.push(m_matrices[2]);
+	}
+
+	void popTransfo()
+	{
+		if (m_stack.empty())
+			return;
+		m_matrices[2] = m_stack.top();
+		m_stack.pop();
+	}
+
+	const glm::mat4&  getTransfo() const
+	{
+		return m_matrices[2];
+	}
+
+	glm::mat4& getTransfo()
+	{
+		return m_matrices[2];
+	}
+
+	void rotate(float angle, const Geom::Vec3f& Axis)
+	{
+		m_matrices[2] = glm::rotate(m_matrices[2], angle, glm::vec3(Axis[0],Axis[1],Axis[2]));
+	}
+
+	void translate(const Geom::Vec3f& P)
+	{
+		m_matrices[2] = glm::translate(m_matrices[2], glm::vec3(P[0],P[1],P[2]));
+	}
+
+	void scale(const Geom::Vec3f& S)
+	{
+		m_matrices[2] = glm::scale(m_matrices[2], glm::vec3(S[0],S[1],S[2]));
+	}
+
+	void scale(float s)
+	{
+		m_matrices[2] = glm::scale(m_matrices[2], glm::vec3(s,s,s));
+	}
+
+	void apply (const glm::mat4& m)
+	{
+		m_matrices[2] = m * m_matrices[2];
+
+	}
+
 };
 
 

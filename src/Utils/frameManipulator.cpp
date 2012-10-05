@@ -156,8 +156,8 @@ float FrameManipulator::getSize()
 
 void FrameManipulator::draw()
 {
-	glm::mat4 store = Utils::GLSLShader::currentTransfo();
-	Utils::GLSLShader::currentTransfo() *= transfoRenderFrame();
+	Utils::GLSLShader::pushTransfo();
+	Utils::GLSLShader::applyTransfo(transfoRenderFrame());
 	Utils::GLSLShader::updateCurrentMatrices();
 
  	glPushAttrib(GL_LINE_BIT);
@@ -299,7 +299,7 @@ void FrameManipulator::draw()
  	m_shader->disableVertexAttribs();
  	glPopAttrib();
 
-	Utils::GLSLShader::currentTransfo() = store;
+ 	Utils::GLSLShader::popTransfo();
 	Utils::GLSLShader::updateCurrentMatrices();
 
 }

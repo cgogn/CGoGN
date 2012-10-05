@@ -106,13 +106,15 @@ public:
 
 	/**
 	 * use as glVertex
+	 * @return index of position for update
 	 */
-	void vertex(const Geom::Vec3f& v);
+	unsigned int vertex(const Geom::Vec3f& v);
 
 	/**
 	 * use as glVertex
+	 * @return index of position for update
 	 */
-	void vertex3f(float x, float y, float z);
+	unsigned int vertex3f(float x, float y, float z);
 
 	/**
 	 * use as glColor
@@ -138,6 +140,22 @@ public:
 	 * usr as glPointSize
 	 */
 	void pointSize(float ps);
+
+	/**
+	 * update position of VBO of drawer
+	 * @param first index of vertex to update
+	 * @param nb number of vertex tp update
+	 * @param P ptr to table of vertices
+	 */
+	void updatePositions(unsigned int first, unsigned int nb, const Geom::Vec3f* P);
+
+	/**
+	 * update position of VBO of drawer
+	 * @param first index of vertex to update
+	 * @param nb number of vertex tp update
+	 * @param P ptr to table of vertices
+	 */
+	void updatePositions(unsigned int first, unsigned int nb, const float* P);
 
 	/**
 	 * rendering in svg struct

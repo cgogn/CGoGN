@@ -124,6 +124,9 @@ protected:
 	 */
 	DartAttribute<unsigned int> m_attIndex;
 
+
+	Geom::Vec3f* m_bufferDartPosition;
+
 	/**
 	 * save colors
 	 */
@@ -307,6 +310,13 @@ public:
 	 * render svg into svg file
 	 */
 	void svgout2D(const std::string& filename, const glm::mat4& model, const glm::mat4& proj);
+
+
+	template<typename PFP>
+	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good=allDarts);
+
+	template<typename PFP>
+	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax, const FunctorSelect& good=allDarts);
 
 protected:
 	/**

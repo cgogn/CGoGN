@@ -25,9 +25,10 @@
 #ifndef __CGoGN_GLSL_VBO__
 #define __CGoGN_GLSL_VBO__
 
+
 #include <vector>
 #include <GL/glew.h>
-
+#include "Utils/gl_def.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Container/convert.h"
 
@@ -50,7 +51,7 @@ class VBO
 {
 protected:
 	// VBO id
-	GLuint m_id;
+	CGoGNGLuint m_id;
 	// size of data (in floats)
 	unsigned int m_data_size;
 	// shaders that ref this vbo
@@ -77,7 +78,7 @@ public:
 	/**
 	 * get id of vbo
 	 */
-	unsigned int id() const { return m_id; }
+	GLuint id() const { return *m_id; }
 
 	/**
 	 * get dataSize
@@ -97,7 +98,7 @@ public:
 	/**
 	 * bind array vbo
 	 */
-	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER, m_id); }
+	void bind() const  { glBindBuffer(GL_ARRAY_BUFFER, *m_id); }
 
 	/**
 	 * alloc buffer of same size than parameter

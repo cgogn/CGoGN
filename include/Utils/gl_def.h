@@ -22,60 +22,47 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_FLAT_COLOR_PER_FACE__
-#define __CGOGN_SHADER_FLAT_COLOR_PER_FACE__
+#ifndef __CGOGN_GL_DEF_H_
+#define __CGOGN_GL_DEF_H_
 
-#include "Utils/GLSLShader.h"
-#include "Geometry/vector_gen.h"
+#ifdef USE_VRJUGGLER
+#include <vrj/Draw/OGL/GlApp.h>
+#include <vrj/Draw/OGL/GlContextData.h>
+#endif
+
+#include <GL/glew.h>
 
 namespace CGoGN
 {
 
-namespace Utils
+#ifdef USE_VRJUGGLER
+
+#include <vrj/Draw/OGL/GlApp.h>
+#include <vrj/Draw/OGL/GlContextData.h>
+typedef vrj::opengl::ContextData<GLint> CGoGNGLint;
+typedef vrj::opengl::ContextData<GLuint> CGoGNGLuint;
+typedef vrj::opengl::ContextData<GLhandleARB> CGoGNGLhandleARB;
+
+#else
+
+template <typename T>
+class FalsePtr
 {
-
-class ShaderFlatColor : public GLSLShader
-{
-protected:
-	// shader sources
-    static std::string vertexShaderText;
-    static std::string fragmentShaderText;
-    static std::string geometryShaderText;
-
-    // uniform locations
-	CGoGNGLuint m_unif_ambiant;
-	CGoGNGLuint m_unif_lightPos;
-	CGoGNGLuint m_unif_explode;
-
-	float m_explode;
-	Geom::Vec4f m_ambiant;
-	Geom::Vec3f m_light_pos;
-
-	VBO* m_vboPos;
-	VBO* m_vboColor;
-
-	void getLocations();
-
-	void restoreUniformsAttribs();
-
+        T m_v;
 public:
-	ShaderFlatColor(bool averageColor=false);
-
-	void setExplode(float explode);
-
-	void setAmbiant(const Geom::Vec4f& ambiant);
-
-	void setLightPosition(const Geom::Vec3f& lp);
-
-	void setParams(float explode, const Geom::Vec4f& ambiant, const Geom::Vec3f& lightPos);
-
-	void setAttributePosition(VBO* vbo);
-	
-	void setAttributeColor(VBO* vbo);
+        FalsePtr() :m_v(T(0)) {}
+        FalsePtr(const T& v) : m_v(v) {}
+        T& operator*() { return m_v; }
+        const T& operator*() const { return m_v; }
 };
 
-} // namespace Utils
-
-} // namespace CGoGN
+typedef FalsePtr<GLint> CGoGNGLint;
+typedef FalsePtr<GLuint> CGoGNGLuint;
+typedef FalsePtr<GLhandleARB> CGoGNGLhandleARB;
 
 #endif
+
+}
+
+
+#endif /* GL_DEF_H_ */
