@@ -278,7 +278,7 @@ void volumesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename 
  * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
  */
 template<typename PFP>
-void vertexOfSurfaceRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = allDarts)
+void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good)
 {
 	if (map.dimension() >2)
 	{
@@ -364,7 +364,7 @@ void vertexOfSurfaceRaySelection(typename PFP::MAP& map, const VertexAttribute<t
  * @param vecDarts (out) vector to store dart of intersected darts
  */
 //template<typename PFP>
-//void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts, const FunctorSelect& good = allDarts)
+//void dartsRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecDarts, const FunctorSelect& good)
 //{
 //	// recuperation des brins intersectes
 //	vecDarts.clear();
@@ -399,7 +399,7 @@ void vertexOfSurfaceRaySelection(typename PFP::MAP& map, const VertexAttribute<t
 template<typename PFP>
 void facesPlanSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
 		const typename Geom::Plane3D<typename PFP::VEC3::DATA_TYPE>& plan, std::vector<Dart>& vecDarts,
-		const FunctorSelect& good = allDarts)
+		const FunctorSelect& good)
 {
 	TraversorF<typename PFP::MAP> travF(map);
 
@@ -702,7 +702,7 @@ Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename
 //}
 //
 //template<typename PFP>
-//void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good = allDarts, unsigned int nbth=0, unsigned int current_thread=0)
+//void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex, const FunctorSelect& good, unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	std::vector<Dart> vecFaces;
 //	vecFaces.reserve(100);

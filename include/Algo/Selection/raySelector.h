@@ -97,7 +97,7 @@ void volumesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename 
  * @param vertex (out) dart of selected vertex (set to NIL if no vertex selected)
  */
 template<typename PFP>
-void vertexOfSurfaceRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
+void vertexRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position,
 		const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, Dart& vertex,
 		const FunctorSelect& good = allDarts);
 
