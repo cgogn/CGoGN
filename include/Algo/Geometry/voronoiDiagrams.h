@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <map>
+#include <set>
 
+//#include "Topology/map/map2.h"
 #include "Topology/generic/traversor2.h"
 
 namespace CGoGN
@@ -45,12 +47,13 @@ public :
 	~VoronoiDiagram ();
 
 	const std::vector<Dart>& getSeeds (){return seeds;}
-	virtual void setSeeds (const std::vector<Dart>&);
-	virtual void setRandomSeeds (unsigned int nbseeds);
+	virtual void setSeeds_fromVector (const std::vector<Dart>&);
+	virtual void setSeeds_random (unsigned int nbseeds);
 	const std::vector<Dart>& getBorder (){return border;}
 	void setCost (const EdgeAttribute<REAL>& c);
 
-	void computeDiagram ();
+	Dart computeDiagram ();
+	virtual void computeDiagram_incremental (unsigned int nbseeds);
 	void computeDistancesWithinRegion (Dart seed);
 
 protected :
@@ -84,8 +87,9 @@ public :
 			VertexAttribute<REAL>& a);
 	~CentroidalVoronoiDiagram ();
 
-	void setSeeds (const std::vector<Dart>&);
-	void setRandomSeeds (unsigned int nbseeds);
+	void setSeeds_fromVector (const std::vector<Dart>&);
+	void setSeeds_random (unsigned int nbseeds);
+	void computeDiagram_incremental (unsigned int nbseeds);
 	void cumulateEnergy();
 	void cumulateEnergyAndGradients();
 	unsigned int moveSeedsOneEdgeNoCheck(); // returns the number of seeds that did move

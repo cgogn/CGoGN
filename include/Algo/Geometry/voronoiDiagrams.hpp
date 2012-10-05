@@ -33,29 +33,48 @@ void VoronoiDiagram<PFP>::clear ()
 }
 
 template <typename PFP>
-void VoronoiDiagram<PFP>::setSeeds (const std::vector<Dart>& s)
+void VoronoiDiagram<PFP>::setSeeds_fromVector (const std::vector<Dart>& s)
 {
 	seeds.clear();
 	seeds = s;
 }
 
 template <typename PFP>
-void VoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
+void VoronoiDiagram<PFP>::setSeeds_random (unsigned int nseeds)
 {
 	seeds.clear();
-	vmReached.unmarkAll();
-
 	srand ( time(NULL) );
-	unsigned int n = nseeds;
-	while (n > 0)
-	{ // TODO : correct this random init which assumes contiguous Dart table
-		Dart d = rand() % map.getNbDarts() ;
-		if (! vmReached.isMarked(d))
+	const unsigned int nbv = map.getNbCells(VERTEX);
+
+	std::set<unsigned int> myVertices ;;
+	while (myVertices.size() < nseeds)
+	{
+		myVertices.insert(rand() % nbv);
+	}
+
+	std::set<unsigned int>::iterator it = myVertices.begin();
+	unsigned int n = 0;
+	TraversorV<typename PFP::MAP> tv (map);
+	Dart dit = tv.begin();
+
+	while (it != myVertices.end())
+	{
+		while(n<*it)
 		{
-			vmReached.mark(d);
-			seeds.push_back(d);
-			n--;
+			dit = tv.next();
+			++n;
 		}
+		seeds.push_back(dit);
+		it++;
+	}
+
+	// random permutation = un-sort the seeds
+	for (unsigned int i=0; i<nseeds; i++)
+	{
+		unsigned int j = i + rand() % (nseeds - i);
+		Dart d = seeds[i];
+		seeds[i] = seeds[j];
+		seeds[j] = d;
 	}
 }
 
@@ -109,13 +128,14 @@ void VoronoiDiagram<PFP>::updateVertexInFront(Dart f, float d){
 }
 
 template <typename PFP>
-void VoronoiDiagram<PFP>::computeDiagram ()
+Dart VoronoiDiagram<PFP>::computeDiagram ()
 {
 	initFrontWithSeeds();
 
+	Dart e;
 	while ( !front.empty() )
 	{
-		Dart e = front.begin()->second;
+		e = front.begin()->second;
 		float d = front.begin()->first;
 
 		collectVertexFromFront(e);
@@ -135,6 +155,35 @@ void VoronoiDiagram<PFP>::computeDiagram ()
 				addVertexToFront(f,d);
 			}
 		}
+	}
+	return e;
+}
+
+template <typename PFP>
+void VoronoiDiagram<PFP>::computeDiagram_incremental (unsigned int nseeds)
+{
+	seeds.clear();
+
+	// first seed
+	srand ( time(NULL) );
+	unsigned int s = rand() % map.getNbCells(VERTEX);
+	unsigned int n = 0;
+	TraversorV<typename PFP::MAP> tv (map);
+	Dart dit = tv.begin();
+	while(n<s)
+	{
+		dit = tv.next();
+		++n;
+	}
+	seeds.push_back(dit);
+
+	// add other seeds one by one
+	Dart e = computeDiagram();
+
+	for(unsigned int i = 1; i< nseeds ; i++)
+	{
+		seeds.push_back(e);
+		e = computeDiagram();
 	}
 }
 
@@ -205,16 +254,23 @@ void CentroidalVoronoiDiagram<PFP>::collectVertexFromFront(Dart e){
 
 
 template <typename PFP>
-void CentroidalVoronoiDiagram<PFP>::setSeeds (const std::vector<Dart>& s)
+void CentroidalVoronoiDiagram<PFP>::setSeeds_fromVector (const std::vector<Dart>& s)
 {
-	VoronoiDiagram<PFP>::setSeeds (s);
+	VoronoiDiagram<PFP>::setSeeds_fromVector (s);
 	energyGrad.resize(this->seeds.size());
 }
 
 template <typename PFP>
-void CentroidalVoronoiDiagram<PFP>::setRandomSeeds (unsigned int nseeds)
+void CentroidalVoronoiDiagram<PFP>::setSeeds_random (unsigned int nseeds)
 {
-	VoronoiDiagram<PFP>::setRandomSeeds (nseeds);
+	VoronoiDiagram<PFP>::setSeeds_random (nseeds);
+	energyGrad.resize(this->seeds.size());
+}
+
+template <typename PFP>
+void CentroidalVoronoiDiagram<PFP>::computeDiagram_incremental (unsigned int nseeds)
+{
+	VoronoiDiagram<PFP>::computeDiagram_incremental (nseeds);
 	energyGrad.resize(this->seeds.size());
 }
 
@@ -259,7 +315,6 @@ unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeNoCheck(){
 
 template <typename PFP>
 unsigned int CentroidalVoronoiDiagram<PFP>::moveSeedsOneEdgeCheck(){
-	// TODO : probable bug (memoire ?) car les iterations ralentissent inexplicablement
 	unsigned int m = 0;
 	for (unsigned int i = 0; i < this->seeds.size(); i++)
 	{
@@ -334,6 +389,7 @@ typename PFP::REAL CentroidalVoronoiDiagram<PFP>::cumulateEnergyFromRoot(Dart e)
 
 template <typename PFP>
 void CentroidalVoronoiDiagram<PFP>::cumulateEnergyAndGradientFromSeed(unsigned int numSeed){
+	// precondition : energyGrad.size() > numSeed
 	Dart e = this->seeds[numSeed];
 
 	std::vector<Dart> v;
