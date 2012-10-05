@@ -29,7 +29,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
-#include "Algo/Multiresolution/map2MR/filters_Primal.h"
+#include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
 {
@@ -59,8 +59,8 @@ protected:
 	MAP& m_map;
 	bool shareVertexEmbeddings ;
 
-	std::vector<Algo::MR::Filter*> synthesisFilters ;
-	std::vector<Algo::MR::Filter*> analysisFilters ;
+	std::vector<Filter*> synthesisFilters ;
+	std::vector<Filter*> analysisFilters ;
 
 public:
 	Map2MR(MAP& map) ;
@@ -70,8 +70,8 @@ public:
 
 	void addNewLevelSqrt3(bool embedNewVertices = true);
 
-	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
+	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
 
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
