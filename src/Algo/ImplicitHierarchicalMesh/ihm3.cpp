@@ -725,7 +725,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersMoreThanOne(Dart d)
 {
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 
-	unsigned int vLevel = volumeLevel(d);
+	int vLevel = volumeLevel(d);
 	bool isMoreThanOne = false;
 
 //	std::cout << "niveau du courant : " << vLevel << std::endl;
@@ -735,7 +735,7 @@ bool ImplicitHierarchicalMap3::neighborhoodLevelDiffersMoreThanOne(Dart d)
 		//Dart oldit = volumeOldestDart(dit);
 //		std::cout << "niveau du voisin : " << volumeLevel(dit) << std::endl;
 //		std::cout << "difference de niveau avec voisin : " << abs((volumeLevel(dit) - vLevel)) << std::endl;
-		if(abs((volumeLevel(dit) - vLevel)) > 1)
+		if(abs((int(volumeLevel(dit)) - vLevel)) > 1)
 			isMoreThanOne = true;
 	}
 
@@ -756,7 +756,7 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersMoreThanOne(Dart d
 	assert(m_dartLevel[d] <= m_curLevel || !"Access to a dart introduced after current level") ;
 //	assert(m_curLevel > 0 || !"Coarsen a volume at level 0");
 
-	unsigned int vLevel = volumeLevel(d)-1;
+	int vLevel = volumeLevel(d)-1;
 	bool isMoreThanOne = false;
 
 //	std::cout << "niveau du courant : " << vLevel << std::endl;
@@ -766,7 +766,7 @@ bool ImplicitHierarchicalMap3::coarsenNeighborhoodLevelDiffersMoreThanOne(Dart d
 		//Dart oldit = volumeOldestDart(dit);
 //		std::cout << "niveau du voisin : " << volumeLevel(dit) << std::endl;
 //		std::cout << "difference de niveau avec voisin : " << abs((volumeLevel(dit) - vLevel)) << std::endl;
-		if(abs((volumeLevel(dit) - vLevel)) > 1)
+		if(abs((int(volumeLevel(dit)) - vLevel)) > 1)
 			isMoreThanOne = true;
 	}
 

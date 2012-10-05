@@ -1,6 +1,6 @@
-Pour utiliser Eclipse (testé avec la version Helios, Galileo & Indigo)
-English version bellow
+ *** English version below ***
 
+Pour utiliser Eclipse (testé avec la version Helios, Galileo, Indigo & Juno)
  * Configurer un projet dans Eclipse :
  - Faire un nouveau projet C++
  - Choisir Makefile project -> Empty Project
@@ -31,8 +31,8 @@ Projet X -> Properties -> Project references : cocher le projet dont il dépend.
 Afin d'éviter qu'Eclipse ne rejette les syntaxes Qt (les includes de Qt, les Q_OBJECT, les callbacks) :
  - Télécharger le plugin Qt "eclipse-integration" http://qt.nokia.com/developer/eclipse-integration/
  - Décompresser l'archive et copier son contenu dans le répertoire d'installation d'Eclipse (plugins et features)
- - Relancer Eclipse au moins une fois avec l'option --clean (relecture des répertoires locaux)
-Normalement, dans Window->Preferences de Eclipse, Qt apparait dans le menu.
+ - Relancer Eclipse au moins une fois avec l'option "-clean" (relecture des répertoires locaux)
+Normalement, dans Window --> Preferences de Eclipse, Qt apparait dans le menu.
  - Y ajouter le répertoire de Qt (/usr/bin sur Debian/Ubuntu) et le répertoire d'include (/usr/include/qt4).
 Ensuite, pour chaque projet, ajouter les includes suivants dans Properties -> C/C++ general -> Paths and Symbols
 parmi les includes de C++ :
@@ -63,7 +63,7 @@ Dans Preferences -> Shaders Preferences, on peut désormais configurer certaines
                                 ENGLISH VERSION
 =========================================================================================
 
-To use Eclipse (tested with version Helios, Galileo & Indigo)
+To use Eclipse (tested with version Helios, Galileoi, Indigo & Juno)
 
  * Setting up a project in Eclipse:
  - Make a new C + + project
@@ -84,18 +84,18 @@ In the project properties:
 	Tutorial: Build / Apps / Tutorial (compiles tutorials)
 	etc. ..
 
-This added to the directory of CGoGN a .project. and .cproject files.
+This adds a .project. and .cproject files to the CGoGN directory.
 
- * Inter-dependencies projects and autocompletion
-If the project X depends on another project, then:
+ * Project inter-dependencies and autocompletion
+If project X depends on another project, then:
 Project X -> Properties -> Project references: check the project which it depends.
 
  * Qt dependencies:
-To avoid Eclipse rejects the Qt syntax (the Qt includes the Q_OBJECT, callbacks):
+To avoid Eclipse rejecting the Qt syntax (includes, Q_OBJECT, callbacks):
  - Download the Qt plugin "eclipse-integration" http://qt.nokia.com/developer/eclipse-integration/
  - Unzip the archive and copy its contents into the installation directory of Eclipse (plugins and features)
- - Restart Eclipse at least once with the - clean (proofreading local directories)
-Normally in Window-> Preferences of Eclipse, Qt appears in the menu.
+ - Restart Eclipse at least once with the "-clean" (proofreading local directories)
+Normally in Window --> Preferences of Eclipse, Qt appears in the menu.
  - Add the Qt directory (/ usr / bin on Debian / Ubuntu) and the directory include (/ usr/include/qt4).
 Then, for each project, add the following includes in Properties -> C / C + + general -> Paths and Symbols
 among the C + + includes:

@@ -29,28 +29,49 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
-#include "Topology/map/map2MR/filters_Primal.h"
+#include "Algo/Multiresolution/map2MR/filters_Primal.h"
 
 namespace CGoGN
 {
 
-class Map2MR_PrimalRegular : public EmbeddedMap2
+namespace Algo
 {
-protected:
-	bool shareVertexEmbeddings ;
 
-	std::vector<Multiresolution::MRFilter*> synthesisFilters ;
-	std::vector<Multiresolution::MRFilter*> analysisFilters ;
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Regular
+{
+
+template <typename PFP>
+class Map2MR
+{
 
 public:
-	Map2MR_PrimalRegular() ;
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
-	virtual std::string mapTypeName() const { return "Map2MR_PrimalRegular" ; }
+protected:
+	MAP& m_map;
+	bool shareVertexEmbeddings ;
 
-	void addNewLevel(bool embedNewVertices = true) ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
 
-	void addSynthesisFilter(Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
+public:
+	Map2MR(MAP& map) ;
+
+
+	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+
+	void addNewLevelSqrt3(bool embedNewVertices = true);
+
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
@@ -59,6 +80,16 @@ public:
 	void synthesis() ;
 } ;
 
+} // namespace Regular
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Algo
+
 } // namespace CGoGN
+
+#include "Algo/Multiresolution/map2MR/map2MR_PrimalRegular.hpp"
 
 #endif

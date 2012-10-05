@@ -34,9 +34,29 @@
 namespace CGoGN
 {
 
-class Map2MR_PrimalAdapt : public EmbeddedMap2
+namespace Algo
 {
+
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Adaptive
+{
+
+template <typename PFP>
+class Map2MR
+{
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 protected:
+	MAP& m_map;
 	bool shareVertexEmbeddings ;
 
 	FunctorType* vertexVertexFunctor ;
@@ -44,9 +64,8 @@ protected:
 	FunctorType* faceVertexFunctor ;
 
 public:
-	Map2MR_PrimalAdapt() ;
+	Map2MR(MAP& map) ;
 
-	virtual std::string mapTypeName() const { return "Map2MR_PrimalAdapt" ; }
 
 	/***************************************************
 	 *               CELLS INFORMATION                 *
@@ -100,27 +119,22 @@ public:
 	 */
 	bool faceIsSubdividedOnce(Dart d) ;
 
+
+protected:
+	/**
+	 *
+	 */
+	Dart cutEdge(Dart d) ;
+
+	/**
+	 *
+	 */
+	void splitFace(Dart d, Dart e) ;
+
 	/***************************************************
 	 *               SUBDIVISION                       *
 	 ***************************************************/
 
-	/**
-	 * add a new resolution level
-	 */
-	void addNewLevel(bool embedNewVertices = true) ;
-
-	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
-
-	template <unsigned int ORBIT>
-	void propagateDartEmbedding(Dart d) ;
-
-	template <unsigned int ORBIT>
-	void propagateOrbitEmbedding(Dart d) ;
-
-	Dart cutEdge(Dart d) ;
-	void splitFace(Dart d, Dart e) ;
-
-protected:
 	/**
 	 * subdivide the edge of d to the next level
 	 */
@@ -135,7 +149,7 @@ public:
 	/**
 	 * subdivide the face of d to the next level
 	 */
-	unsigned int subdivideFace(Dart d) ;
+	unsigned int subdivideFace(Dart d, bool triQuad = true, bool OneLevelDifference = true);
 
 	/**
 	 * coarsen the face of d from the next level
@@ -150,6 +164,16 @@ public:
 	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
 } ;
 
+} // namespace Adaptive
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Algo
+
 } // namespace CGoGN
+
+#include "Algo/Multiresolution/map2MR/map2MR_PrimalAdapt.hpp"
 
 #endif

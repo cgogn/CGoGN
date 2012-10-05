@@ -29,6 +29,7 @@
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
 
+#include "Container/attributeContainer.h"
 
 #include "Algo/Decimation/selector.h"
 #include "Algo/Decimation/edgeSelector.h"
@@ -75,6 +76,8 @@ public:
 	void createPM(Algo::Decimation::SelectorType s, Algo::Decimation::ApproximatorType a, const FunctorSelect& select = allDarts) ;
 
 	void addNewLevel(unsigned int percentWantedVertices);
+
+	void collapseEdge(Dart d);
 
 	//coarsen the mesh -> analysis
 	void coarsen() ;

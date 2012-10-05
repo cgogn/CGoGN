@@ -33,18 +33,37 @@
 namespace CGoGN
 {
 
+namespace Algo
+{
+
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Adaptive
+{
+
 /*! \brief The class of adaptive 3-map MR
  */
 
-class Map3MR_PrimalAdapt : public EmbeddedMap3
+template <typename PFP>
+class Map3MR
 {
+
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 protected:
 	enum SubdivideType
 	{
 		S_TRI,
 		S_QUAD
 	} ;
-
+	MAP& m_map;
 	bool shareVertexEmbeddings;
 
 	FunctorType* vertexVertexFunctor ;
@@ -53,10 +72,9 @@ protected:
 	FunctorType* volumeVertexFunctor ;
 
 public:
-	Map3MR_PrimalAdapt();
+	Map3MR(MAP& map);
 
-	virtual std::string mapTypeName() const { return "Map3MR_PrimalAdapt"; }
-
+private:
 	/*! @name Topological helping functions
 	 *
 	 *************************************************************************/
@@ -66,32 +84,23 @@ public:
 	 */
 	void swapEdges(Dart d, Dart e);
 
-	//!
-	/*!
-	 *
-	 */
-	bool isTetrahedron(Dart d);
-
 	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
+
 	Dart cutEdgeInVolume(Dart d);
+
 	void splitFaceInVolume(Dart d, Dart e);
 
 	void splitVolume(std::vector<Dart>& vd);
 
-	//!
-	/*!
-	 */
 	void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
 
-	//!
-	/*!
-	 */
 	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
 
 	Dart cutEdge(Dart d) ;
 	void splitFace(Dart d, Dart e) ;
 	//@}
 
+public:
 	/*! @name Cells informations
 	 *
 	 *************************************************************************/
@@ -145,19 +154,6 @@ public:
 	 *************************************************************************/
 protected:
 	//@{
-	//! Add a new resolution level
-	/*!
-	 */
-	void addNewLevel() ;
-
-	void propagateDartRelation(Dart d, AttributeMultiVector<Dart>* rel) ;
-
-	template <unsigned int ORBIT>
-	void propagateDartEmbedding(Dart d) ;
-
-	template <unsigned int ORBIT>
-	void propagateOrbitEmbedding(Dart d) ;
-
 	//! Subdivide the edge of d to the next level
 	/*! @param d Dart from the edge
 	 */
@@ -186,30 +182,24 @@ public:
 	 *
 	 *************************************************************************/
 	//@{
-	//!
-	/*!
-	 */
 	void setVertexVertexFunctor(FunctorType* f) { vertexVertexFunctor = f ; }
-
-	//!
-	/*
-	 *
-	 */
 	void setEdgeVertexFunctor(FunctorType* f) { edgeVertexFunctor = f ; }
-
-	//!
-	/*!
-	 */
 	void setFaceVertexFunctor(FunctorType* f) { faceVertexFunctor = f ; }
-
-	//!
-	/*!
-	 */
 	void setVolumeVertexFunctor(FunctorType* f) { volumeVertexFunctor = f ; }
 	//@}
 
 };
 
-} //end namespace CGoGN
+} // namespace Adaptive
+
+} // namespace Primal
+
+} // namespace MR
+
+} // namespace Algo
+
+} // namespace CGoGN
+
+#include "Algo/Multiresolution/map3MR/map3MR_PrimalAdapt.hpp"
 
 #endif /* __MAP3MR_PRIMAL__ */

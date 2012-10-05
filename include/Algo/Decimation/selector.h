@@ -36,15 +36,18 @@ namespace Decimation
 
 enum SelectorType
 {
-	S_MapOrder,
+	S_MapOrder = 0,
 	S_Random,
 	S_EdgeLength,
 	S_QEM,
 	S_QEMml,
 	S_MinDetail,
 	S_Curvature,
-	S_hQEMml,
-	S_hLightfield
+	S_ColorNaive,
+	S_QEMextColor,
+	S_Lightfield,
+	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
+	S_hQEMml
 } ;
 
 template <typename PFP> class ApproximatorGen ;
@@ -75,6 +78,8 @@ public:
 	virtual bool nextEdge(Dart& d) = 0 ;
 	virtual void updateBeforeCollapse(Dart d) = 0 ;
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
+
+	virtual bool nextEdgeWithoutUpdates(Dart& d) = 0;
 } ;
 
 } // namespace Decimation

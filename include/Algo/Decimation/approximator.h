@@ -39,14 +39,17 @@ namespace Decimation
 enum ApproximatorType
 {
 	A_QEM,
-	A_QEMhalfEdge,
 	A_MidEdge,
-	A_HalfCollapse,
 	A_CornerCutting,
 	A_TangentPredict1,
 	A_TangentPredict2,
-	A_LightfieldHalf,
-	A_LightfieldFull
+	A_ColorNaive,
+	A_ColorQEMext,
+	A_Lightfield,
+	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
+	A_hHalfCollapse,
+	A_hQEM
+	// A_hLightfieldHalf,
 } ;
 
 template <typename PFP>
@@ -65,8 +68,10 @@ public:
 	{}
 	virtual ~ApproximatorGen()
 	{}
-	virtual const std::string& getApproximatedAttributeName() const = 0 ;
+	virtual const std::string& getApproximatedAttributeName(unsigned int index = 0) const = 0 ;
+//	virtual std::vector<std::string> getApproximatedAttributeNames() const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
+	virtual unsigned int getNbApproximated() const = 0 ;
 	virtual bool init() = 0 ;
 	virtual void approximate(Dart d) = 0 ;
 	virtual void saveApprox(Dart d) = 0 ;
@@ -87,52 +92,95 @@ public:
 protected:
 	Predictor<PFP, T>* m_predictor ;
 
-	VertexAttribute<T>& m_attrV ;	// vertex attribute to be approximated
-	EdgeAttribute<T> m_approx ;	// attribute to store approximation result
-	EdgeAttribute<T> m_detail ;	// attribute to store detail information for reconstruction
-	T m_app ;
+	std::vector<VertexAttribute<T>* > m_attrV ;	// vertex attributes to be approximated
+	std::vector<EdgeAttribute<T> > m_approx ;	// attributes to store approximation result
+	std::vector<EdgeAttribute<T> > m_detail ;	// attributes to store detail information for reconstruction
+	std::vector<T> m_app ;
 
 public:
-	Approximator(MAP& m, VertexAttribute<T>& a, Predictor<PFP, T>* predictor) :
-		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(a)
+	Approximator(MAP& m, std::vector<VertexAttribute<T>* > va, Predictor<PFP, T> * predictor) :
+		ApproximatorGen<PFP>(m), m_predictor(predictor), m_attrV(va)
 	{
-		std::stringstream aname ;
-		aname << "approx_" << m_attrV.name() ;
-		m_approx = this->m_map.template addAttribute<T, EDGE>(aname.str()) ;
+		const unsigned int& size = m_attrV.size() ;
+		assert(size > 0 || !"Approximator: no attributes provided") ;
 
-		if(m_predictor)	// if a predictor is associated to the approximator
-		{				// create an attribute to store the detail needed for reconstruction
-			std::stringstream dname ;
-			dname << "detail_" << m_attrV.name() ;
-			m_detail = this->m_map.template addAttribute<T, EDGE>(dname.str()) ;
+		m_approx.resize(size) ;
+		m_detail.resize(size) ;
+		m_app.resize(size) ;
+
+		for (unsigned int i = 0 ; i < size ; ++i)
+		{
+			if (!m_attrV[i]->isValid())
+				std::cerr << "Approximator Warning: attribute number " << i << " is not valid" << std::endl ;
+
+			std::stringstream aname ;
+			aname << "approx_" << m_attrV[i]->name() ;
+			m_approx[i] = this->m_map.template addAttribute<T, EDGE>(aname.str()) ;
+
+			if(m_predictor)	// if predictors are associated to the approximator
+			{				// create attributes to store the details needed for reconstruction
+				std::stringstream dname ;
+				dname << "detail_" << m_attrV[i]->name() ;
+				m_detail[i] = this->m_map.template addAttribute<T, EDGE>(dname.str()) ;
+			}
 		}
 	}
 
 	virtual ~Approximator()
 	{
-		this->m_map.template removeAttribute(m_approx) ;
-		if(m_predictor)
-			this->m_map.template removeAttribute(m_detail) ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+		{
+			this->m_map.template removeAttribute(m_approx[i]) ;
+			if(m_predictor)
+				this->m_map.template removeAttribute(m_detail[i]) ;
+		}
 	}
 
-	const std::string& getApproximatedAttributeName() const
+	const std::string& getApproximatedAttributeName(unsigned int index = 0) const
 	{
-		return m_attrV.name() ;
+		return m_attrV[index]->name() ;
+	}
+
+//	std::vector<std::string> getApproximatedAttributeNames() const
+//	{
+//		std::vector<std::string> names ;
+//		names.resize(m_attrV.size()) ;
+//		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+//			names[i] = m_attrV[i]->name() ;
+//
+//		return names ;
+//	}
+
+	unsigned int getNbApproximated() const
+	{
+		return m_attrV.size() ;
 	}
 
 	void saveApprox(Dart d)
 	{
-		m_app = m_approx[d] ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			m_app[i] = m_approx[i][d] ;
 	}
 
 	void affectApprox(Dart d)
 	{
-		m_attrV[d] = m_app ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			m_attrV[i]->operator[](d) = m_app[i] ;
 	}
 
-	const T& getApprox(Dart d) const
+	const T& getApprox(Dart d, unsigned int index = 0) const
 	{
-		return m_approx[d] ;
+		return m_approx[index][d] ;
+	}
+
+	std::vector<T> getAllApprox(Dart d) const
+	{
+		std::vector<T> res ;
+		res.resize(m_attrV.size()) ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			res[i] = m_approx[i][d] ;
+
+		return res ;
 	}
 
 	const Predictor<PFP, T>* getPredictor() const
@@ -140,17 +188,37 @@ public:
 		return m_predictor ;
 	}
 
-	const T& getDetail(Dart d) const
+	const T& getDetail(Dart d, unsigned int index = 0) const
 	{
 		assert(m_predictor || !"Trying to get detail on a non-predictive scheme") ;
-		return m_detail[d] ;
+		return m_detail[index][d] ;
 	}
 
-	void setDetail(Dart d, T& val)
+	std::vector<T> getAllDetail(Dart d) const
+	{
+		assert(m_predictor || !"Trying to get detail on a non-predictive scheme") ;
+
+		std::vector<T> res ;
+		res.resize(m_attrV.size()) ;
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			res[i] = m_detail[i][d] ;
+		return res ;
+	}
+
+	void setDetail(Dart d, unsigned int index, T& val)
 	{
 		assert(m_predictor || !"Trying to set detail on a non-predictive scheme") ;
-		m_detail[d] = val ;
+		m_detail[index][d] = val ;
 	}
+
+	void setDetail(Dart d, std::vector<T>& val)
+	{
+		assert(m_predictor || !"Trying to set detail on a non-predictive scheme") ;
+
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+			m_detail[index][d] = val[i] ;
+	}
+
 
 //	// TODO works only for vector types !!
 //	REAL detailMagnitude(Dart d)
@@ -162,13 +230,17 @@ public:
 	void addDetail(Dart d, double amount, bool sign, typename PFP::MATRIX33* detailTransform)
 	{
 		assert(m_predictor || !"Trying to add detail on a non-predictive scheme") ;
-		T det = m_detail[d] ;
-		if(detailTransform)
-			det = (*detailTransform) * det ;
-		det *= amount ;
-		if(!sign)
-			det *= REAL(-1) ;
-		m_attrV[d] += det ;
+
+		for (unsigned int i = 0 ; i < m_attrV.size() ; ++i)
+		{
+			T det = m_detail[i][d] ;
+			if(detailTransform)
+				det = (*detailTransform) * det ;
+			det *= amount ;
+			if(!sign)
+				det *= REAL(-1) ;
+			m_attrV[i]->operator[](d) += det ;
+		}
 	}
 } ;
 

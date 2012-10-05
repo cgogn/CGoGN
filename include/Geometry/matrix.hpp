@@ -444,7 +444,7 @@ Vector<N,T> operator*(const Vector<M,T>& v, const Matrix<M,N,T>& m)
 	Vector<N,T> res (0);
 	for(unsigned int i = 0; i < M; ++i)
 		for(unsigned int j = 0; j < N; ++j)
-			res[j] += m(i,j) * v[i] ;
+			res[j] += v[i] * m(i,j) ;
 	return res ;
 }
 

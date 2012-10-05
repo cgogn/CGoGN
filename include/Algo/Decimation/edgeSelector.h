@@ -65,6 +65,8 @@ public:
 	void updateBeforeCollapse(Dart d)
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -82,7 +84,9 @@ private:
 
 public:
 	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		EdgeSelector<PFP>(m, pos, approx, select)
+		EdgeSelector<PFP>(m, pos, approx, select),
+		cur(0),
+		allSkipped(false)
 	{}
 	~EdgeSelector_Random()
 	{}
@@ -92,6 +96,8 @@ public:
 	void updateBeforeCollapse(Dart d2)
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -135,6 +141,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -169,7 +177,8 @@ private:
 
 public:
 	EdgeSelector_QEM(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		EdgeSelector<PFP>(m, pos, approx, select)
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
@@ -184,6 +193,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d);
 } ;
 
 template <typename PFP>
@@ -218,7 +229,8 @@ private:
 
 public:
 	EdgeSelector_QEMml(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		EdgeSelector<PFP>(m, pos, approx, select)
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
@@ -233,6 +245,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -275,7 +289,8 @@ private:
 
 public:
 	EdgeSelector_Curvature(MAP& m, VertexAttribute<VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		EdgeSelector<PFP>(m, pos, approx, select)
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
 	{
 		bb = Algo::Geometry::computeBoundingBox<PFP>(m, pos) ;
 		radius = bb.diagSize() * 0.003 ;
@@ -328,6 +343,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
 } ;
 
 template <typename PFP>
@@ -360,7 +377,8 @@ private:
 
 public:
 	EdgeSelector_MinDetail(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		EdgeSelector<PFP>(m, pos, approx, select)
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 	}
@@ -369,6 +387,195 @@ public:
 		this->m_map.removeAttribute(edgeInfo) ;
 	}
 	SelectorType getType() { return S_MinDetail ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	bool nextEdgeWithoutUpdates(Dart& d) { }
+} ;
+
+/*****************************************************************************************************************
+ *                                      EDGE NAIVE COLOR METRIC (using QEMml)                                    *
+ *****************************************************************************************************************/
+template <typename PFP>
+class EdgeSelector_ColorNaive : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "ColorNaiveEdgeInfo" ; }
+	} ColorNaiveedgeInfo ;
+	typedef NoMathIOAttribute<ColorNaiveedgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	VertexAttribute<Quadric<REAL> > m_quadric ;
+
+	VertexAttribute<VEC3> m_pos, m_color ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_color, m_attrindex_color ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	EdgeSelector_ColorNaive(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_color(-1),
+		m_attrindex_color(-1)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		m_quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+	}
+	~EdgeSelector_ColorNaive()
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
+	}
+	SelectorType getType() { return S_ColorNaive ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
+
+/*****************************************************************************************************************
+ *                                 QEM extended to color metric                                                  *
+ *****************************************************************************************************************/
+template <typename PFP>
+class EdgeSelector_QEMextColor : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<6,REAL> VEC6 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
+	} QEMextColorEdgeInfo ;
+	typedef NoMathIOAttribute<QEMextColorEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	VertexAttribute<QuadricNd<REAL,6> > m_quadric ;
+
+	VertexAttribute<VEC3> m_pos, m_color ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_color, m_attrindex_color ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	EdgeSelector_QEMextColor(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_color(-1),
+		m_attrindex_color(-1)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		m_quadric = m.template addAttribute<QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
+	}
+	~EdgeSelector_QEMextColor()
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+		this->m_map.removeAttribute(m_quadric) ;
+	}
+	SelectorType getType() { return S_QEMextColor ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+} ;
+
+/*****************************************************************************************************************
+ *                                 LIGHTFIELD QUADRIC ERROR METRIC                                               *
+ *****************************************************************************************************************/
+template <typename PFP>
+class EdgeSelector_Lightfield : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename Geom::Vector<6,REAL> VEC6 ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "QEMextColorEdgeInfo" ; }
+	} QEMextColorEdgeInfo ;
+	typedef NoMathIOAttribute<QEMextColorEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+
+	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN ;
+	//VertexAttribute<VEC3> *m_HF ;
+	int m_approxindex_pos, m_attrindex_pos ;
+	int m_approxindex_FN, m_attrindex_FN ;
+
+	VertexAttribute<Quadric<REAL> > m_quadricGeom ;
+	VertexAttribute<QuadricHF<REAL> > m_quadricHF ;
+
+	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d,EdgeInfo& einfo) ;
+	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	EdgeSelector_Lightfield(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select = allDarts) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_approxindex_pos(-1),
+		m_attrindex_pos(-1),
+		m_approxindex_FN(-1),
+		m_attrindex_FN(-1)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		m_quadricGeom = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
+		m_quadricHF = m.template addAttribute<QuadricHF<REAL>, VERTEX>("HFquadric") ;
+	}
+	~EdgeSelector_Lightfield()
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+		this->m_map.removeAttribute(m_quadricGeom) ;
+		this->m_map.removeAttribute(m_quadricHF) ;
+	}
+	SelectorType getType() { return S_Lightfield ; }
 	bool init() ;
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP3MR_PRIMAL__
-#define __MAP3MR_PRIMAL__
+#ifndef __MAP3MR_PRIMAL_REGULAR_
+#define __MAP3MR_PRIMAL_REGULAR_
 
 #include "Topology/map/embeddedMap3.h"
 #include "Topology/generic/traversorCell.h"
@@ -38,15 +38,22 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
+{
+
+namespace Primal
+{
+
+namespace Regular
 {
 
 /*! \brief The class of regular 3-map MR
  */
 
 template <typename PFP>
-class Map3MR_PrimalRegular
+class Map3MR
 {
+
 public:
 	typedef typename PFP::MAP MAP;
 	typedef typename PFP::VEC3 VEC3;
@@ -56,14 +63,14 @@ protected:
 	MAP& m_map;
 	bool shareVertexEmbeddings;
 
-	std::vector<Algo::Multiresolution::MRFilter*> synthesisFilters ;
-	std::vector<Algo::Multiresolution::MRFilter*> analysisFilters ;
+	std::vector<Algo::MR::Filter*> synthesisFilters ;
+	std::vector<Algo::MR::Filter*> analysisFilters ;
+
 
 public:
-	Map3MR_PrimalRegular(MAP& map);
+	Map3MR(MAP& map);
 
-	std::string mapTypeName() const { return "Map3MR_PrimalRegular"; }
-
+private:
 	/*! @name Topological helping functions
 	 *
 	 *************************************************************************/
@@ -73,6 +80,7 @@ public:
 	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
 	//@}
 
+public:
 	/*! @name Level creation
 	 *
 	 *************************************************************************/
@@ -104,49 +112,28 @@ public:
 	 *************************************************************************/
 	//@{
 
-	//!
-	/*
-	 */
 	void setSharingVertexEmbeddings(bool b) { shareVertexEmbeddings = b; }
 
-	//!
-	/*
-	 */
-	void addSynthesisFilter(Algo::Multiresolution::MRFilter* f) { synthesisFilters.push_back(f) ; }
+	void addSynthesisFilter(Algo::MR::Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Algo::MR::Filter* f) { analysisFilters.push_back(f) ; }
 
-	//!
-	/*
-	 */
-	void addAnalysisFilter(Algo::Multiresolution::MRFilter* f) { analysisFilters.push_back(f) ; }
-
-	//!
-	/*
-	 */
 	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-
-	//!
-	/*
-	 */
 	void clearAnalysisFilters() { analysisFilters.clear() ; }
 
-	//!
-	/*
-	 */
 	void analysis() ;
-
-	//!
-	/*
-	 */
 	void synthesis() ;
 	//@}
 };
 
-} // namespace Multiresolution
+} // namespace Regular
+
+} // namespace Primal
+
+} // namespace MR
 
 } // namespace Algo
 
 } // namespace CGoGN
-
 
 #include "Algo/Multiresolution/map3MR/map3MR_PrimalRegular.hpp"
 
