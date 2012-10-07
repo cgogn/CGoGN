@@ -61,6 +61,12 @@ protected:
 	CGoGNGLuint m_idTexture;
 
 	CGoGNGLuint m_uniform_texture;
+	
+	CGoGNGLuint m_uniform_texture;
+	
+	CGoGNGLuint m_uniform_planeX;
+	
+	CGoGNGLuint m_uniform_planeY;
 
 public:
 	/**
@@ -69,7 +75,7 @@ public:
 	 * @param radius of sphere
 	 */
 
-	PointSprite(bool withColorPerVertex=false, float radius=1.0f);
+	PointSprite(bool withColorPerVertex=false, float radius=1.0f, bool with_plane=false);
 
 	/**
 	 * clean shaders, texture and variables
@@ -97,6 +103,12 @@ public:
 	 * @param radius
 	 */
 	void setSize(float radius);
+	
+	/**
+	* set the plane of rendering for VR rendering
+	*/
+	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& ox);
+
 
 	/**
 	 * set position attribute

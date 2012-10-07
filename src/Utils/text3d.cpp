@@ -43,7 +43,7 @@ std::string Strings3D::fragmentShaderText2 =
 Strings3D* Strings3D::m_instance0 = NULL;
 
 
-Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0),m_scale(1.0f)
+Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plane) : m_nbChars(0),m_scale(1.0f)
 {
 	if (m_instance0 == NULL)
 	{
@@ -67,6 +67,8 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 	}
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);
+	if (with_plane)
+		glxverte.append("#define WITH_PLANE 1")
 	glxvert.append(vertexShaderText);
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 
@@ -98,6 +100,11 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 	*m_uniform_scale = glGetUniformLocation(program_handler(), "scale");
 	*m_uniform_texture = glGetUniformLocation(program_handler(), "FontTexture");
 	glUniform1f(*m_uniform_scale, 1.0f);
+	if (with_plane)
+	{
+		*m_uniform_planeX = glGetUniformLocation(program_handler(), "planeX");
+		*m_uniform_planeY = glGetUniformLocation(program_handler(), "planeY");
+	}
 	unbind();
 }
 
@@ -106,6 +113,14 @@ void Strings3D::setScale(float scale)
 	bind();
 	glUniform1f(*m_uniform_scale, scale);
 	m_scale = scale;
+	unbind();
+}
+
+void Strings3D::setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& ox)
+{
+	bind();
+	glUniform3f(*m_uniform_planeX, ox);
+	glUniform3f(*m_uniform_planeY, oy);
 	unbind();
 }
 
