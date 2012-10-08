@@ -212,7 +212,7 @@ void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename
 template<typename PFP>
 void volumesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVolumes)
 {
-	std::vector<Dart>& vecFaces;
+	std::vector<Dart> vecFaces;
 	std::vector<typename PFP::VEC3> iPoints;
 
 	// get back intersected faces
