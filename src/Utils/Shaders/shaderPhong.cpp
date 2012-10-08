@@ -36,7 +36,7 @@ namespace Utils
 
 ShaderPhong::ShaderPhong(bool doubleSided, bool withEyePosition):
 	m_with_color(false),
-	m_with_eyepos(false),
+	m_with_eyepos(withEyePosition),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
@@ -121,14 +121,14 @@ void ShaderPhong::setShininess(float shininess)
 	m_shininess = shininess;
 }
 
-void ShaderPhong::setLightPosition( Geom::Vec3f lightPos)
+void ShaderPhong::setLightPosition(const Geom::Vec3f& lightPos)
 {
 	this->bind();
 	glUniform3fv(*m_unif_lightPos,1,lightPos.data());
 	m_lightPos = lightPos;
 }
 
-void ShaderPhong::setEyePosition( Geom::Vec3f eyePos)
+void ShaderPhong::setEyePosition(const Geom::Vec3f& eyePos)
 {
 	if (m_with_eyepos)
 	{

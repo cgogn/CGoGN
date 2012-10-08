@@ -19,8 +19,10 @@ void main(void)
 	if (lum==0.0)
 		discard;
 	vec2 v = texCoord-vec2(0.5,0.5);
+#ifndef WITH_PLANE
 	float z = size * sqrt(1.0-dot(v,v));
 	vec2 zfrag = positionFragIn + vec2(z,0.0);
 	gl_FragDepth = 0.5 + 0.5 * dot(zfrag, mvpFragIn.xy) / dot(zfrag, mvpFragIn.zw);
+#endif
 	gl_FragColor = vec4(colorsprite,0.0)*lum;
 }

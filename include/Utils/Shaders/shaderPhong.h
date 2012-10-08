@@ -87,10 +87,10 @@ public:
 
 	void setShininess(float shininess);
 
-	void setLightPosition(Geom::Vec3f lp);
+	void setLightPosition(const Geom::Vec3f& lp);
 	
 	/// set eye position for VR environement
-	void setEyePosition(Geom::Vec3f ep);
+	void setEyePosition(const Geom::Vec3f& ep);
 
 	const Geom::Vec4f& getAmbiant() const { return m_ambiant; }
 

@@ -34,35 +34,35 @@ void main()
 
 	texCoord = vec2(0.0,1.0);
 	#ifdef WITH_PLANE
-		vec4 pos = posCenter + vec4(-size, size, 0.0, 0.0);
+		vec4 pos = posCenter - size*vec4(planeX,0.0) + size*vec4(planeY,0.0) + size*vec4(0.0,0.0,0.5,0.0);
 	#else
-		vec4 pos = posCenter - vec4(planeX,0.0) + vec4(planeY,0.0)
+		vec4 pos = posCenter + vec4(-size, size, 0.0, 0.0);
 	#endif	
 	gl_Position = ProjectionMatrix *  pos;
 	EmitVertex();
 
 	#ifdef WITH_PLANE
-		pos = posCenter + vec4(-size, -size, 0.0, 0.0);
+		pos = posCenter - size*vec4(planeX,0.0) - size*vec4(planeY,0.0) + size*vec4(0.0,0.0,0.5,0.0);
 	#else
-		pos = posCenter - vec4(planeX,0.0) - vec4(planeY,0.0)
+		pos = posCenter + vec4(-size, -size, 0.0, 0.0);
 	#endif	
 	texCoord = vec2(0.0,0.0);
 	gl_Position = ProjectionMatrix *  pos;
 	EmitVertex();
 
 	#ifdef WITH_PLANE
-		pos = posCenter + vec4(size, size, 0.0, 0.0);
+		pos = posCenter + size*vec4(planeX,0.0) + size*vec4(planeY,0.0) + size*vec4(0.0,0.0,0.5,0.0);
 	#else
-		pos = posCenter + vec4(planeX,0.0) + vec4(planeY,0.0)
+		pos = posCenter + vec4(size, size, 0.0, 0.0);
 	#endif	
 	texCoord = vec2(1.0,1.0);
 	gl_Position = ProjectionMatrix *  pos;
 	EmitVertex();
 
 	#ifdef WITH_PLANE
-		pos = posCenter + vec4(size, -size, 0.0, 0.0);
+		pos = posCenter + size*vec4(planeX,0.0) - size*vec4(planeY,0.0) + size*vec4(0.0,0.0,0.5,0.0);
 	#else
-		pos = posCenter + vec4(planeX,0.0) - vec4(planeY,0.0)
+		pos = posCenter + vec4(size, -size, 0.0, 0.0);
 	#endif	
 	texCoord = vec2(1.0,0.0);
 	gl_Position = ProjectionMatrix *  pos;
