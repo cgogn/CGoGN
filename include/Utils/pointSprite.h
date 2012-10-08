@@ -62,8 +62,6 @@ protected:
 
 	CGoGNGLuint m_uniform_texture;
 	
-	CGoGNGLuint m_uniform_texture;
-	
 	CGoGNGLuint m_uniform_planeX;
 	
 	CGoGNGLuint m_uniform_planeY;
@@ -107,7 +105,7 @@ public:
 	/**
 	* set the plane of rendering for VR rendering
 	*/
-	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& ox);
+	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
 
 
 	/**

@@ -148,7 +148,7 @@ public:
 	/**
 	* set the plane of rendering for VR rendering
 	*/
-	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& ox);
+	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
 
 
 	void toSVG(Utils::SVG::SVGOut& svg);

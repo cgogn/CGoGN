@@ -44,7 +44,7 @@ ShaderPhong::ShaderPhong(bool doubleSided, bool withEyePosition):
 	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
 	m_vboPos(NULL),
 	m_vboNormal(NULL),
-	m_vboColor(NULL),
+	m_vboColor(NULL)
 {
 
 	m_nameVS = "ShaderPhong_vs";
@@ -133,7 +133,7 @@ void ShaderPhong::setEyePosition( Geom::Vec3f eyePos)
 	if (m_with_eyepos)
 	{
 		this->bind();
-		glUniform3fv(*m_unif_eyetPos,1,eyePos.data());
+		glUniform3fv(*m_unif_eyePos,1,eyePos.data());
 		m_eyePos = eyePos;
 	}
 }

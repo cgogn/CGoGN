@@ -41,7 +41,7 @@ PointSprite* PointSprite::m_instance0 = NULL;
 
 
 
-PointSprite::PointSprite(bool withColorPervertex, float radius)
+PointSprite::PointSprite(bool withColorPervertex, float radius,  bool with_plane)
 {
 	std::string defineColor("#define WITH_COLOR_PER_VERTEX 1\n");
 

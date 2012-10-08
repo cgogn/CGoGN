@@ -68,7 +68,7 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	if (with_plane)
-		glxverte.append("#define WITH_PLANE 1")
+		glxvert.append("#define WITH_PLANE 1");
 	glxvert.append(vertexShaderText);
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 
@@ -116,11 +116,11 @@ void Strings3D::setScale(float scale)
 	unbind();
 }
 
-void Strings3D::setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& ox)
+void Strings3D::setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy)
 {
 	bind();
-	glUniform3f(*m_uniform_planeX, ox);
-	glUniform3f(*m_uniform_planeY, oy);
+	glUniform3fv(*m_uniform_planeX, 1, ox.data());
+	glUniform3fv(*m_uniform_planeY, 1, oy.data());
 	unbind();
 }
 
