@@ -436,7 +436,7 @@ void computeCurvatureVertices_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal,
-	const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+	const FunctorSelect& select, unsigned int nbth)
 {
 	// WAHOO BIG PROBLEM WITH LAZZY EMBEDDING !!!
 	if (!map. template isOrbitEmbedded<VERTEX>())
@@ -456,7 +456,7 @@ void computeCurvatureVertices_NormalCycles(
 	}
 
 	FunctorComputeCurvatureVertices_NormalCycles<PFP> funct(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select);
 }
 
 
@@ -503,10 +503,10 @@ void computeCurvatureVertices_QuadraticFitting(
 	VertexAttribute<typename PFP::REAL>& kmin,
 	VertexAttribute<typename PFP::VEC3>& Kmax,
 	VertexAttribute<typename PFP::VEC3>& Kmin,
-	const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+	const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorComputeCurvatureVertices_QuadraticFitting<PFP> funct(map, position, normal, kmax, kmin, Kmax, Kmin);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, true, select);
 }
 
 } // namespace Parallel

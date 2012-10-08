@@ -81,10 +81,10 @@ add_executable( tuto_subdivision tuto_subdivision.cpp)
 target_link_libraries( tuto_subdivision
 	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS} )
 
-QT4_WRAP_CPP(tp_master_moc tp_master.h)
-add_executable( tp_master tp_master.cpp ${tp_master_moc})
-target_link_libraries( tp_master
-	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
+#QT4_WRAP_CPP(tp_master_moc tp_master.h)
+#add_executable( tp_master tp_master.cpp ${tp_master_moc})
+#target_link_libraries( tp_master
+#	${CGoGN_LIBS_D}  ${CGoGN_EXT_LIBS}  )
 
 QT4_WRAP_CPP(tuto_histo_moc tuto_histo.h)
 add_executable( tuto_histo tuto_histo.cpp tuto_histo.h ${tuto_histo_ui}  ${tuto_histo_moc})

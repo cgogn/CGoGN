@@ -77,7 +77,7 @@ void ShaderSimpleTexture::setTextureUnit(GLenum texture_unit)
 {
 	this->bind();
 	int unit = texture_unit - GL_TEXTURE0;
-	glUniform1iARB(m_unif_unit,unit);
+	glUniform1iARB(*m_unif_unit,unit);
 	m_unit = unit;
 }
 
@@ -110,7 +110,7 @@ void ShaderSimpleTexture::restoreUniformsAttribs()
 {
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexTexCoord", m_vboTexCoord);
-	glUniform1iARB(m_unif_unit,m_unit);
+	glUniform1iARB(*m_unif_unit,m_unit);
 }
 
 } // namespace Utils

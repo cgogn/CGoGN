@@ -33,6 +33,8 @@
 #include "Topology/generic/traversorCell.h"
 #include "Algo/Geometry/centroid.h"
 
+#include "Geometry/distances.h"
+
 namespace CGoGN
 {
 
@@ -349,10 +351,16 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
 
-	m_vbo0->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
+
+	if (m_bufferDartPosition!=NULL)
+		delete m_bufferDartPosition;
+	m_bufferDartPosition = new Geom::Vec3f[2*m_nbDarts];
+	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(m_bufferDartPosition);
+
+//	m_vbo0->bind();
+//	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+//	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+//	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
 
 	std::vector<Dart> vecDartFaces;
 	vecDartFaces.reserve(m_nbDarts/6);
@@ -433,7 +441,9 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 	}
 
 	m_vbo0->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), m_bufferDartPosition, GL_STREAM_DRAW);
+//	m_vbo0->bind();
+//	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo4->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -763,6 +773,123 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribu
 //	m_vbo4->bind();
 //	glUnmapBuffer(GL_ARRAY_BUFFER);
 //}
+
+
+template<typename PFP>
+Dart Topo3Render::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good)
+{
+	float AB2 = rayAB*rayAB;
+	Dart dFinal;
+	double sin2 = sin(M_PI/180.0 * angle);
+	sin2 = sin2*sin2;
+	double dist2 = std::numeric_limits<double>::max();
+
+	for(Dart d = map.begin(); d!=map.end(); map.next(d))
+	{
+		// get back position of segment PQ
+		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
+		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
+		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+		Geom::Vec3f V = (P+Q)/2.0f - rayA;
+		double d2 = double(V*V);
+		double s2 = double(ld2) / d2;
+		if (s2 < sin2)
+		{
+			if (d2<dist2)
+			{
+				dist2 = d2;
+				dFinal = d;
+			}
+		}
+	}
+	return dFinal;
+}
+
+template<typename PFP>
+Dart Topo3Render::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax, const FunctorSelect& good)
+{
+	float AB2 = rayAB*rayAB;
+	Dart dFinal;
+	float dm2 = dmax*dmax;
+	double dist2 = std::numeric_limits<double>::max();
+
+	for(Dart d = map.begin(); d!=map.end(); map.next(d))
+	{
+		// get back position of segment PQ
+		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
+		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
+		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+		if (ld2<dm2)
+		{
+			Geom::Vec3f V = (P+Q)/2.0f - rayA;
+			double d2 = double(V*V);
+			if (d2<dist2)
+			{
+				dist2 = d2;
+				dFinal = d;
+			}
+		}
+	}
+	return dFinal;
+}
+
+// DART RAY SELECTION
+//template<typename PFP>
+//void edgesConeSelection(, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, float angle, std::vector<Dart>& vecEdges, const FunctorSelect& good)
+//{
+//	typename PFP::REAL AB2 = rayAB * rayAB;
+//
+//	double sin2 = sin(M_PI/180.0 * angle);
+//	sin2 = sin2*sin2;
+//
+//	// recuperation des aretes intersectees
+//	vecEdges.reserve(256);
+//	vecEdges.clear();
+//
+//	TraversorE<typename PFP::MAP> trav(map);
+//	for(Dart d = trav.begin(); d!=trav.end(); d = trav.next())
+//	{
+//		// get back position of segment PQ
+//		const typename PFP::VEC3& P = position[d];
+//		const typename PFP::VEC3& Q = position[map.phi1(d)];
+//		// the three distance to P, Q and (PQ) not used here
+//		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+//		typename PFP::VEC3 V = P - rayA;
+//		double s2 = double(ld2) / double(V*V);
+//		if (s2 < sin2)
+//			vecEdges.push_back(d);
+//	}
+//
+//	typedef std::pair<typename PFP::REAL, Dart> DartDist;
+//	std::vector<DartDist> distndart;
+//
+//	unsigned int nbi = vecEdges.size();
+//	distndart.resize(nbi);
+//
+//	// compute all distances to observer for each middle of intersected edge
+//	// and put them in a vector for sorting
+//	for (unsigned int i = 0; i < nbi; ++i)
+//	{
+//		Dart d = vecEdges[i];
+//		distndart[i].second = d;
+//		typename PFP::VEC3 V = (position[d] + position[map.phi1(d)]) / typename PFP::REAL(2);
+//		V -= rayA;
+//		distndart[i].first = V.norm2();
+//	}
+//
+//	// sort the vector of pair dist/dart
+//	std::sort(distndart.begin(), distndart.end(), distndartOrdering<PFP>);
+//
+//	// store sorted darts in returned vector
+//	for (unsigned int i = 0; i < nbi; ++i)
+//		vecEdges[i] = distndart[i].second;
+//}
+
+
+
+
+
+
 
 } //end namespace GL2
 

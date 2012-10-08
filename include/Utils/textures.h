@@ -25,6 +25,7 @@
 #ifndef CGOGN_TEXTURES_H_
 #define CGOGN_TEXTURES_H_
 
+#include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
 #include <GL/glew.h>
 #include <string>
@@ -309,7 +310,7 @@ protected:
 	/**
 	* texture id
 	*/
-	GLuint m_id;
+	CGoGNGLuint m_id;
 	
 	/**
 	 * dimension of texture

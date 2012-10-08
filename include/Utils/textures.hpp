@@ -915,9 +915,9 @@ m_type(type)
 		break;
 	}
 
-	glGenTextures(1, &m_id);
+	glGenTextures(1, &(*m_id));
 
-	glBindTexture(m_target, m_id);
+	glBindTexture(m_target, *m_id);
 	glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -963,7 +963,7 @@ GLenum Texture<DIM,TYPE>::internalFormat()
 template < unsigned int DIM, typename TYPE >
 void Texture<DIM,TYPE>::bind()
 {
-	glBindTexture(m_target, m_id);
+	glBindTexture(m_target, *m_id);
 }
 
 
@@ -983,7 +983,7 @@ void Texture<DIM,TYPE>::checkAlignment()
 template < unsigned int DIM, typename TYPE >
 void Texture<DIM,TYPE>::update()
 {
-	glBindTexture(m_target, m_id);
+	glBindTexture(m_target, *m_id);
 	checkAlignment();
 	switch(DIM)
 	{
@@ -1005,7 +1005,7 @@ void Texture<DIM,TYPE>::update()
 template < unsigned int DIM, typename TYPE >
 void Texture<DIM,TYPE>::update(const COORD& origin, const COORD& sz)
 {
-	glBindTexture(m_target, m_id);
+	glBindTexture(m_target, *m_id);
 	checkAlignment();
 	switch(DIM)
 	{
@@ -1028,7 +1028,7 @@ void Texture<DIM,TYPE>::update(const COORD& origin, const COORD& sz)
 template < unsigned int DIM, typename TYPE >
 void Texture<DIM,TYPE>::setFiltering(GLint param)
 {
-	glBindTexture(m_target, m_id);
+	glBindTexture(m_target, *m_id);
 	glTexParameteri(m_target, GL_TEXTURE_MIN_FILTER, param);
 	glTexParameteri(m_target, GL_TEXTURE_MAG_FILTER, param);
 }
@@ -1038,7 +1038,7 @@ void Texture<DIM,TYPE>::setFiltering(GLint param)
 template < unsigned int DIM, typename TYPE >
 void Texture<DIM,TYPE>::setWrapping(GLint param)
 {
-	glBindTexture(m_target, m_id);
+	glBindTexture(m_target, *m_id);
 	glTexParameteri(m_target, GL_TEXTURE_WRAP_S, param);
 	glTexParameteri(m_target, GL_TEXTURE_WRAP_T, param);
 	glTexParameteri(m_target, GL_TEXTURE_WRAP_R, param);

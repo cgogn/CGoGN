@@ -134,10 +134,10 @@ public:
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+		const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorComputeCentroidVolumes<PFP> funct(map,position,vol_centroid);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VOLUME>(map, funct, nbth, true, select);
 }
 
 

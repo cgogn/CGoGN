@@ -127,7 +127,7 @@ inline unsigned int optimalNbThreads(NbParam p)
 
 
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers, const FunctorSelect& good, unsigned int currentThread)
+void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bool needMarkers, const FunctorSelect& good)
 {
 	if (nbth == 0)
 		nbth = optimalNbThreads();
@@ -150,7 +150,7 @@ void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bo
 			funcs.push_back(func.duplicate());
 	}
 
-	foreach_cell<MAP,ORBIT>(map,funcs,needMarkers,good,currentThread);
+	foreach_cell<MAP,ORBIT>(map,funcs,needMarkers,good);
 
 	if (!shared)
 		for (unsigned int i = 0; i < nbth; ++i)
@@ -158,7 +158,7 @@ void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth, bo
 }
 
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers, const FunctorSelect& good, unsigned int currentThread)
+void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers, const FunctorSelect& good)
 {
 	unsigned int nbth = funcs.size();
 
@@ -198,7 +198,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 	{
 		if(map.template isOrbitEmbedded<ORBIT>())
 		{
-			cmark = new CellMarker<ORBIT>(map, currentThread) ;
+			cmark = new CellMarker<ORBIT>(map) ;
 
 			d = map.begin();
 			unsigned int nb = 0;
@@ -215,7 +215,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
 		}
 		else
 		{
-			dmark = new DartMarker(map, currentThread) ;
+			dmark = new DartMarker(map) ;
 			d = map.begin();
 			unsigned int nb = 0;
 			while ((d != map.end()) && (nb < nbth*SIZE_BUFFER_THREAD) )
@@ -657,232 +657,11 @@ void foreach_cell2Pass(MAP& map, FunctorMapThreaded<MAP>& funcFront, FunctorMapT
 			delete funcs[i];
 }
 
-//
-//
-//template <typename MAP>
-//void Foreach<MAP>::Foreach(MAP& map, unsigned int nbth):
-//m_nbth(nbth)
-//{
-//	if (m_nbth == 0)
-//		m_nbth = optimalNbThreads();
-//
-//	m_funcs.reserve(m_nbth);
-//
-//	m_vd = new std::vector<Dart>[2*nbth];
-//	for (unsigned int i = 0; i < 2*nbth; ++i)
-//		m_vd[i].reserve(SIZE_BUFFER_THREAD);
-//}
-//
-//template <typename MAP>
-//Foreach<MAP>::~Foreach(MAP& map, unsigned int nbth)
-//{
-//	delete[] m_vd;
-//}
-//
-//
-//template <typename MAP>
-//void Foreach<MAP>:: clearFunctors()
-//{
-//	m_funcs.clear();
-//}
-//
-//template <typename MAP>
-//void Foreach<MAP>:: addFunctor(FunctorMapThreaded<MAP>* funcPtr)
-//{
-//	m_funcs.push_back(funcPtr);
-//}
-//
-//template <typename MAP>
-//template<typename T>
-//T* Foreach<MAP>::getFunctor(unsigned int i)
-//{
-//	assert(i < m_funcs.size());
-//	return dynamic_cast<T*>(m_funcs[i]);
-//}
-//
-//
-//template <typename MAP>
-//template <unsigned int ORBIT>
-//void Foreach<MAP>::traverseCell<ORBIT>(bool needMarkers, const FunctorSelect& good, unsigned int currentThread)
-//{
-//	assert(m_funcs.size() ==  m_nbth);
-//
-//	boost::thread** threads = new boost::thread*[m_nbth];
-//
-//	AttributeContainer* cont = NULL;
-//	DartMarker* dmark = NULL;
-//	CellMarker<ORBIT>* cmark = NULL;
-//	AttributeMultiVector<Dart>* quickTraversal = m_map.template getQuickTraversal<ORBIT>() ;
-//
-//	// fill each vd buffers with SIZE_BUFFER_THREAD darts
-//	Dart d;
-//	unsigned int di=0;
-//
-//	if(quickTraversal != NULL)
-//	{
-//		cont = &(m_map.template getAttributeContainer<ORBIT>()) ;
-//
-//		di = cont->begin();
-//		unsigned int nb = 0;
-//		while ((di != cont->end()) && (nb < m_nbth*SIZE_BUFFER_THREAD) )
-//		{
-//			d = quickTraversal->operator[](di);
-//			if (good(d))
-//			{
-//				m_vd[nb%m_nbth].push_back(d);
-//				nb++;
-//			}
-//			cont->next(di);
-//		}
-//	}
-//	else
-//	{
-//		if(m_map.template isOrbitEmbedded<ORBIT>())
-//		{
-//			cmark = new CellMarker<ORBIT>(m_map, currentThread) ;
-//
-//			d = m_map.begin();
-//			unsigned int nb = 0;
-//			while ((d != m_map.end()) && (nb < m_nbth*SIZE_BUFFER_THREAD) )
-//			{
-//				if (good(d) && (!m_map.isBoundaryMarked(d)) && (!cmark->isMarked(d)))
-//				{
-//					cmark->mark(d);
-//					m_vd[nb%m_nbth].push_back(d);
-//					nb++;
-//				}
-//				m_map.next(d);
-//			}
-//		}
-//		else
-//		{
-//			dmark = new DartMarker(m_map, currentThread) ;
-//			d = m_map.begin();
-//			unsigned int nb = 0;
-//			while ((d != m_map.end()) && (nb < m_nbth*SIZE_BUFFER_THREAD) )
-//			{
-//				if (good(d) && (!m_map.isBoundaryMarked(d)) && (!dmark->isMarked(d)))
-//				{
-//					dmark->markOrbit<ORBIT>(d);
-//					m_vd[nb%m_nbth].push_back(d);
-//					nb++;
-//				}
-//				m_map.next(d);
-//			}
-//		}
-//	}
-//
-//	boost::barrier sync1(m_nbth+1);
-//	boost::barrier sync2(m_nbth+1);
-//	bool finished=false;
-//	// lauch threads
-//	if (needMarkers)
-//	{
-//		unsigned int nbth_prec = m_map.getNbThreadMarkers();
-//		if (nbth_prec < m_nbth+1)
-//			m_map.addThreadMarker(m_nbth+1-nbth_prec);
-//	}
-//
-//	for (unsigned int i = 0; i < m_nbth; ++i)
-//		threads[i] = new boost::thread(ThreadFunction<MAP>(m_funcs[i], m_vd[i],sync1,sync2, finished,1+i));
-//
-//
-//	if (cont)
-//	{
-//		while (di != cont->end())
-//		{
-//			for (unsigned int i = 0; i < m_nbth; ++i)
-//				m_vd[m_nbth+i].clear();
-//			unsigned int nb = 0;
-//			while ((di != cont->end()) && (nb < m_nbth*SIZE_BUFFER_THREAD) )
-//			{
-//				d = quickTraversal->operator[](di);
-//				if (good(d))
-//				{
-//					m_vd[m_nbth + nb%m_nbth].push_back(d);
-//					nb++;
-//				}
-//				cont->next(di);
-//			}
-//			sync1.wait();
-//			for (unsigned int i = 0; i < m_nbth; ++i)
-//				m_vd[i].swap(m_vd[m_nbth+i]);
-//			sync2.wait();
-//		}
-//	}
-//	else if (cmark)
-//	{
-//		while (d != m_map.end())
-//		{
-//			for (unsigned int i = 0; i < m_nbth; ++i)
-//				m_vd[m_nbth+i].clear();
-//			unsigned int nb = 0;
-//			while ((d != m_map.end()) && (nb < m_nbth*SIZE_BUFFER_THREAD) )
-//			{
-//				if (good(d) && (!m_map.isBoundaryMarked(d)) && (!cmark->isMarked(d)))
-//				{
-//					cmark->mark(d);
-//					m_vd[m_nbth+nb%m_nbth].push_back(d);
-//					nb++;
-//				}
-//				m_map.next(d);
-//			}
-//			sync1.wait();
-//			for (unsigned int i = 0; i < m_nbth; ++i)
-//				m_vd[i].swap(m_vd[m_nbth+i]);
-//			sync2.wait();
-//		}
-//	}
-//	else
-//	{
-//		while (d != m_map.end())
-//		{
-//			for (unsigned int i = 0; i < m_nbth; ++i)
-//				m_vd[m_nbth+i].clear();
-//			unsigned int nb = 0;
-//			while ((d != m_map.end()) && (nb < m_nbth*SIZE_BUFFER_THREAD) )
-//			{
-//				if (good(d) && (!m_map.isBoundaryMarked(d)) && (!dmark->isMarked(d)))
-//				{
-//					dmark->markOrbit<ORBIT>(d);
-//					m_vd[m_nbth+nb%m_nbth].push_back(d);
-//					nb++;
-//				}
-//				m_map.next(d);
-//			}
-//			sync1.wait();
-//			for (unsigned int i = 0; i < m_nbth; ++i)
-//				m_vd[i].swap(m_vd[m_nbth+i]);
-//			sync2.wait();
-//		}
-//	}
-//
-//	sync1.wait();
-//	finished = true;
-//	sync2.wait();
-//
-//	//wait for all theads to be finished
-//	for (unsigned int i = 0; i < m_nbth; ++i)
-//	{
-//		threads[i]->join();
-//		delete threads[i];
-//	}
-//	delete[] threads;
-//	delete[] m_vd;
-//
-//	if (cmark != NULL)
-//		delete cmark;
-//
-//	if (dmark != NULL)
-//		delete dmark;
-//}
-//
-//
 
 
 
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers, const FunctorSelect& good, unsigned int currentThread)
+void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers, const FunctorSelect& good)
 {
 	unsigned int nbth = funcs.size();
 
@@ -920,7 +699,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 	{
 		if(map.template isOrbitEmbedded<ORBIT>())
 		{
-			cmark = new CellMarker<ORBIT>(map, currentThread) ;
+			cmark = new CellMarker<ORBIT>(map) ;
 			d = map.begin();
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )
@@ -936,7 +715,7 @@ void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& fu
 		}
 		else
 		{
-			dmark = new DartMarker(map, currentThread) ;
+			dmark = new DartMarker(map) ;
 			d = map.begin();
 			unsigned int nb=0;
 			while ((d != map.end()) && (nb < SIZE_BUFFER_THREAD) )

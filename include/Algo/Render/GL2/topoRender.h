@@ -108,6 +108,8 @@ protected:
 	 */
 	DartAttribute<unsigned int> m_attIndex;
 
+	Geom::Vec3f* m_bufferDartPosition;
+
 	Utils::ShaderSimpleColor* m_shader1;
 	Utils::ShaderColorPerVertex* m_shader2;
 
@@ -230,6 +232,15 @@ public:
 	 */
 	template<typename PFP>
 	Dart picking(typename PFP::MAP& map, int x, int y, const FunctorSelect& good=allDarts);
+
+
+	template<typename PFP>
+	Dart coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good=allDarts);
+
+	template<typename PFP>
+	Dart raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float distmax, const FunctorSelect& good=allDarts);
+
+
 
 	template <typename PFP>
 	void updateData(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, float ke, float kf, const FunctorSelect& good = allDarts);
