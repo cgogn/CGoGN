@@ -34,8 +34,9 @@ namespace Utils
 #include "shaderPhong.frag"
 
 
-ShaderPhong::ShaderPhong(bool doubleSided):
+ShaderPhong::ShaderPhong(bool doubleSided, bool withEyePosition):
 	m_with_color(false),
+	m_with_eyepos(false),
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_specular(Geom::Vec4f(1.0f,1.0f,1.0f,0.0f)),
@@ -43,7 +44,7 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
 	m_vboPos(NULL),
 	m_vboNormal(NULL),
-	m_vboColor(NULL)
+	m_vboColor(NULL),
 {
 
 	m_nameVS = "ShaderPhong_vs";
@@ -53,6 +54,8 @@ ShaderPhong::ShaderPhong(bool doubleSided):
 	// get choose GL defines (2 or 3)
 	// ans compile shaders
 	std::string glxvert(*GLSLShader::DEFINES_GL);
+	if (m_with_eyepos)
+		glxvert.append("#define WITH_EYEPOSITION");
 	glxvert.append(vertexShaderText);
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	// Use double sided lighting if set
@@ -75,6 +78,8 @@ void ShaderPhong::getLocations()
 	*m_unif_specular  = glGetUniformLocation(this->program_handler(), "materialSpecular");
 	*m_unif_shininess = glGetUniformLocation(this->program_handler(), "shininess");
 	*m_unif_lightPos  = glGetUniformLocation(this->program_handler(), "lightPosition");
+	if (m_with_eyepos)
+		*m_unif_eyePos  = glGetUniformLocation(this->program_handler(), "eyePosition");
 }
 
 void ShaderPhong::sendParams()
@@ -84,6 +89,8 @@ void ShaderPhong::sendParams()
 	glUniform4fv(*m_unif_specular, 1, m_specular.data());
 	glUniform1f(*m_unif_shininess,    m_shininess);
 	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
+	if (m_with_eyepos)
+		glUniform3fv(*m_unif_eyePos, 1, m_eyePos.data());
 }
 
 void ShaderPhong::setAmbiant(const Geom::Vec4f& ambiant)
@@ -119,6 +126,16 @@ void ShaderPhong::setLightPosition( Geom::Vec3f lightPos)
 	this->bind();
 	glUniform3fv(*m_unif_lightPos,1,lightPos.data());
 	m_lightPos = lightPos;
+}
+
+void ShaderPhong::setEyePosition( Geom::Vec3f eyePos)
+{
+	if (m_with_eyepos)
+	{
+		this->bind();
+		glUniform3fv(*m_unif_eyetPos,1,eyePos.data());
+		m_eyePos = eyePos;
+	}
 }
 
 void ShaderPhong::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos)

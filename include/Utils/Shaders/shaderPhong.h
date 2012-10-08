@@ -42,6 +42,8 @@ class ShaderPhong : public ClippingShader
 protected:
 	// flag color per vertex or not
 	bool m_with_color;
+	// flag color per vertex or not
+	bool m_with_eyepos;	
 
 	// shader sources OGL3
     static std::string vertexShaderText;
@@ -53,6 +55,7 @@ protected:
 	CGoGNGLuint m_unif_specular;
 	CGoGNGLuint m_unif_shininess;
 	CGoGNGLuint m_unif_lightPos;
+	CGoGNGLuint m_unif_eyePos;
 
 	//values
 	Geom::Vec4f m_ambiant;
@@ -60,6 +63,7 @@ protected:
 	Geom::Vec4f m_specular;
 	float m_shininess;
 	Geom::Vec3f m_lightPos;
+	Geom::Vec3f m_eyePos;
 
 	VBO* m_vboPos;
 	VBO* m_vboNormal;
@@ -72,7 +76,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderPhong(bool doubleSided = false);
+	ShaderPhong(bool doubleSided = false, bool withEyePosition=false);
 
 	// inviduals parameter setting functions
 	void setAmbiant(const Geom::Vec4f& ambiant);
@@ -84,6 +88,9 @@ public:
 	void setShininess(float shininess);
 
 	void setLightPosition(Geom::Vec3f lp);
+	
+	/// set eye position for VR environement
+	void setEyePosition(Geom::Vec3f ep);
 
 	const Geom::Vec4f& getAmbiant() const { return m_ambiant; }
 
