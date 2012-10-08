@@ -48,7 +48,7 @@ LineDrawable::LineDrawable()
 	m_shader->setColor(Geom::Vec4f(1.,1.,0.,0.));
 	GLSLShader::registerShader(NULL, m_shader);
 
-	glGenBuffers(1, &m_ind);
+	glGenBuffers(1, &(*m_ind));
 }
 
 LineDrawable::~LineDrawable()
@@ -57,7 +57,7 @@ LineDrawable::~LineDrawable()
 	GLSLShader::unregisterShader(NULL, m_shader);
 	delete m_shader;
 
-	glDeleteBuffers(1, &m_ind);
+	glDeleteBuffers(1, &(*m_ind));
 }
 
 
@@ -162,6 +162,12 @@ void Pickable::draw()
 	Utils::GLSLShader::currentTransfo() = store;
 	Utils::GLSLShader::updateCurrentMatrices();
 }
+
+void Pickable::drawNoTransfo()
+{
+	m_drawable->draw();
+}
+
 
 
 glm::mat4&  Pickable::transfo()
@@ -471,7 +477,7 @@ void Sphere::changeTopo(unsigned int parp, unsigned int mer)
 	}
 
 	m_nb=tableIndices.size();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
@@ -491,7 +497,7 @@ void Sphere::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 void Sphere::draw()
 {
 	m_shader->enableVertexAttribs();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glDrawElements(GL_LINES, m_nb, GL_UNSIGNED_INT, 0);
 	m_shader->disableVertexAttribs();
 }
@@ -588,7 +594,7 @@ void Cone::changeTopo(unsigned int par, unsigned int mer)
 
 
 	m_nb=tableIndices.size();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
@@ -724,7 +730,7 @@ void Cylinder::changeTopo(unsigned int parp, unsigned int mer)
 
 
 	m_nb=tableIndices.size();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 
 }
@@ -862,7 +868,7 @@ void Cube::changeTopo(unsigned int sub)
 	}
 
 	m_nb=tableIndices.size();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 
@@ -880,7 +886,7 @@ void Cube::updatePrecisionDrawing(unsigned int sub, unsigned int sub2)
 void Cube::draw()
 {
 	m_shader->enableVertexAttribs();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glDrawElements(GL_LINES, m_nb, GL_UNSIGNED_INT, 0);
 	m_shader->disableVertexAttribs();
 }
@@ -1130,7 +1136,7 @@ void IcoSphere::changeTopoSubdivision(unsigned int sub)
 	}
 
 	m_nb=tableIndices.size();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ind);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_ind);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_nb*sizeof(GLuint), &(tableIndices[0]), GL_STREAM_DRAW);
 }
 

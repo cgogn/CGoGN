@@ -187,10 +187,10 @@ public:
 };
 
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorComputeNormalVertices<PFP> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,VERTEX>(map, funct, nbth, false, select);
 }
 
 
@@ -211,10 +211,10 @@ public:
 };
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorComputeNormalFaces<PFP> funct(map,position,normal);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,FACE>(map, funct, nbth, false, select);
 }
 
 
@@ -236,10 +236,10 @@ public:
 
 
 template <typename PFP>
-void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select, unsigned int nbth, unsigned int current_thread)
+void computeAnglesBetweenNormalsOnEdges(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, EdgeAttribute<typename PFP::REAL>& angles, const FunctorSelect& select, unsigned int nbth)
 {
 	FunctorComputeAngleBetweenNormalsOnEdge<PFP> funct(map,position,angles);
-	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false, select, current_thread);
+	Algo::Parallel::foreach_cell<typename PFP::MAP,EDGE>(map, funct, nbth, false, select);
 }
 
 } // endnamespace Parallel

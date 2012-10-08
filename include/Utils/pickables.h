@@ -44,7 +44,7 @@ protected:
 	/**
 	 * id of indices VBO
 	 */
-	GLuint m_ind;
+	CGoGNGLuint m_ind;
 
 	/**
 	 * VBO for position
@@ -192,6 +192,11 @@ public:
 	 * draw
 	 */
 	void draw();
+
+	/**
+	 * draw without applying transformation
+	 */
+	void drawNoTransfo();
 
 	/**
 	 * return a ref on the transformation matrix

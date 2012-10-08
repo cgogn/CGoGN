@@ -67,9 +67,9 @@ ShaderFlatColor::ShaderFlatColor(bool averageColor)
 
 void ShaderFlatColor::getLocations()
 {
-	m_unif_explode  = glGetUniformLocation(program_handler(),"explode");
-	m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
-	m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
+	*m_unif_explode  = glGetUniformLocation(program_handler(),"explode");
+	*m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
+	*m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 }
 
 void ShaderFlatColor::setAttributePosition(VBO* vbo)
@@ -93,9 +93,9 @@ void ShaderFlatColor::setParams(float expl, const Geom::Vec4f& ambiant, const Ge
 
 	bind();
 
-	glUniform1f(m_unif_explode, expl);
-	glUniform4fv(m_unif_ambiant, 1, ambiant.data());
-	glUniform3fv(m_unif_lightPos, 1, lightPos.data());
+	glUniform1f(*m_unif_explode, expl);
+	glUniform4fv(*m_unif_ambiant, 1, ambiant.data());
+	glUniform3fv(*m_unif_lightPos, 1, lightPos.data());
 
 	unbind(); // ??
 }
@@ -104,14 +104,14 @@ void ShaderFlatColor::setExplode(float explode)
 {
 	m_explode = explode;
 	bind();
-	glUniform1f(m_unif_explode, explode);
+	glUniform1f(*m_unif_explode, explode);
 }
 
 void ShaderFlatColor::setAmbiant(const Geom::Vec4f& ambiant)
 {
 	m_ambiant = ambiant;
 	bind();
-	glUniform4fv(m_unif_ambiant,1, ambiant.data());
+	glUniform4fv(*m_unif_ambiant,1, ambiant.data());
 }
 
 
@@ -119,19 +119,19 @@ void ShaderFlatColor::setLightPosition(const Geom::Vec3f& lp)
 {
 	m_light_pos = lp;
 	bind();
-	glUniform3fv(m_unif_lightPos,1,lp.data());
+	glUniform3fv(*m_unif_lightPos,1,lp.data());
 }
 
 void ShaderFlatColor::restoreUniformsAttribs()
 {
-	m_unif_explode   = glGetUniformLocation(program_handler(),"explode");
-	m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
-	m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
+	*m_unif_explode   = glGetUniformLocation(program_handler(),"explode");
+	*m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
+	*m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
 
 	bind();
-	glUniform1f (m_unif_explode, m_explode);
-	glUniform4fv(m_unif_ambiant,  1, m_ambiant.data());
-	glUniform3fv(m_unif_lightPos, 1, m_light_pos.data());
+	glUniform1f (*m_unif_explode, m_explode);
+	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
+	glUniform3fv(*m_unif_lightPos, 1, m_light_pos.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexColor", m_vboPos);

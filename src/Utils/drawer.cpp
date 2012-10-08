@@ -103,7 +103,7 @@ void Drawer::color3f(float r, float g, float b)
 	color(Geom::Vec3f(r,g,b));
 }
 
-void Drawer::vertex(const Geom::Vec3f& v)
+unsigned int Drawer::vertex(const Geom::Vec3f& v)
 {
 	if (m_dataPos.size() == m_dataCol.size())
 	{
@@ -112,13 +112,13 @@ void Drawer::vertex(const Geom::Vec3f& v)
 		else
 			m_dataCol.push_back( m_dataCol.back());
 	}
-
 	m_dataPos.push_back(v);
+	return  m_dataPos.size()-1;
 }
 
-void Drawer::vertex3f(float r, float g, float b)
+unsigned int Drawer::vertex3f(float r, float g, float b)
 {
-	vertex(Geom::Vec3f(r,g,b));
+	return vertex(Geom::Vec3f(r,g,b));
 }
 
 void Drawer::newList(GLenum comp)
@@ -151,6 +151,20 @@ void Drawer::endList()
 	if (m_compile != GL_COMPILE)
 		callList();
 }
+
+
+void Drawer::updatePositions(unsigned int first, unsigned int nb, const Geom::Vec3f* P)
+{
+	m_vboPos->bind();
+	glBufferSubData(GL_ARRAY_BUFFER, first * sizeof(Geom::Vec3f), nb * sizeof(Geom::Vec3f), P);
+}
+
+void Drawer::updatePositions(unsigned int first, unsigned int nb, const float* P)
+{
+	m_vboPos->bind();
+	glBufferSubData(GL_ARRAY_BUFFER, first * 3 * sizeof(float), nb * 3 * sizeof(float), P);
+}
+
 
 void Drawer::callList()
 {

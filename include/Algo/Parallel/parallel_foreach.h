@@ -106,7 +106,7 @@ void setNbCore(unsigned int nb);
  * @param good a selector
  */
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false, const FunctorSelect& good = allDarts);
 
 /**
  * Traverse cells of a map in parallel. Use quick traversal, cell markers or dart markers if available !
@@ -118,7 +118,7 @@ void foreach_cell(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool n
  * @param good a selector
  */
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0, bool needMarkers = false, const FunctorSelect& good = allDarts);
 
 
 /**
@@ -131,7 +131,7 @@ void foreach_cell(MAP& map, FunctorMapThreaded<MAP>& func, unsigned int nbth = 0
  * @param good a selector
  */
 template <typename MAP, unsigned int ORBIT>
-void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false, const FunctorSelect& good = allDarts, unsigned int currentThread = 0);
+void foreach_cell_all_thread(MAP& map, std::vector<FunctorMapThreaded<MAP>*>& funcs, bool needMarkers = false, const FunctorSelect& good = allDarts);
 
 
 /**

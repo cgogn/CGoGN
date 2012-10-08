@@ -43,9 +43,9 @@ protected:
     static std::string geometryShaderText;
 
     // uniform locations
-	GLuint m_unif_color;
-	GLuint m_unif_explodeV;
-	GLuint m_unif_plane;
+	CGoGNGLuint m_unif_color;
+	CGoGNGLuint m_unif_explodeV;
+	CGoGNGLuint m_unif_plane;
 
 	float m_explodeV;
 	Geom::Vec4f m_color;

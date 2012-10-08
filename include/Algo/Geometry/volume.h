@@ -52,7 +52,7 @@ typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typ
 namespace Parallel
 {
 template <typename PFP>
-typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+typename PFP::REAL totalVolume(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 
 }
 

@@ -49,7 +49,8 @@ Topo3Render::Topo3Render():
 	m_topo_dart_width(2.0f),
 	m_topo_relation_width(3.0f),
 	m_color_save(NULL),
-	m_dartsColor(1.0f,1.0f,1.0f)
+	m_dartsColor(1.0f,1.0f,1.0f),
+	m_bufferDartPosition(NULL)
 {
 	m_vbo0 = new Utils::VBO();
 	m_vbo1 = new Utils::VBO();
@@ -97,6 +98,9 @@ Topo3Render::~Topo3Render()
 	{
 		delete[] m_color_save;
 	}
+
+	if (m_bufferDartPosition!=NULL)
+		delete[] m_bufferDartPosition;
 }
 
 void Topo3Render::setDartWidth(float dw)
@@ -449,7 +453,6 @@ void Topo3Render::toSVG(Utils::SVG::SVGOut& svg)
 	m_vbo0->releasePtr();
 	m_vbo4->releasePtr();
 }
-
 
 
 }//end namespace GL2

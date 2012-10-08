@@ -35,7 +35,7 @@ namespace Utils
 
 VBO::VBO() : m_nbElts(0), m_lock(false)
 {
-	glGenBuffers(1, &m_id);
+	glGenBuffers(1, &(*m_id));
 	m_refs.reserve(4);
 }
 
@@ -46,7 +46,7 @@ VBO::VBO(const VBO& vbo) :
 {
 	unsigned int nbbytes =  sizeof(float) * m_data_size * m_nbElts;
 
-	glGenBuffers(1, &m_id);
+	glGenBuffers(1, &(*m_id));
 
 	vbo.bind();
 	void* src = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
@@ -62,7 +62,7 @@ VBO::~VBO()
 {
 	if (m_lock)
 		releasePtr();
-	glDeleteBuffers(1, &m_id);
+	glDeleteBuffers(1, &(*m_id));
 }
 
 void VBO::sameAllocSameBufferSize(const VBO& vbo)
@@ -83,7 +83,7 @@ void* VBO::lockPtr()
 	}
 
 	m_lock = true;
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
@@ -96,27 +96,27 @@ const void* VBO::lockPtr() const
 	}
 
 	m_lock = true;
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 }
 
 void VBO::releasePtr() const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	m_lock = false;
 }
 
 void VBO::copyData(void *ptr) const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, m_nbElts * m_data_size * sizeof(float), ptr);
 }
 
 void VBO::allocate(unsigned int nbElts)
 {
 	m_nbElts = nbElts;
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glBufferData(GL_ARRAY_BUFFER, nbElts * m_data_size * sizeof(float), 0, GL_STREAM_DRAW);
 }
 

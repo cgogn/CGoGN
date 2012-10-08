@@ -203,6 +203,7 @@ class DartAttribute : public AttributeHandler<T, DART>
 public:
 	DartAttribute() : AttributeHandler<T, DART>() {}
 	DartAttribute(const AttributeHandler<T, DART>& ah) : AttributeHandler<T, DART>(ah) {}
+	DartAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, DART>(m,amv) {}
 	DartAttribute<T>& operator=(const AttributeHandler<T, DART>& ah) { this->AttributeHandler<T, DART>::operator=(ah); return *this; }
 };
 
@@ -215,6 +216,7 @@ class VertexAttribute : public AttributeHandler<T, VERTEX>
 public:
 	VertexAttribute() : AttributeHandler<T, VERTEX>() {}
 	VertexAttribute(const AttributeHandler<T, VERTEX>& ah) : AttributeHandler<T, VERTEX>(ah) {}
+	VertexAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, VERTEX>(m,amv) {}
 	VertexAttribute<T>& operator=(const AttributeHandler<T, VERTEX>& ah) { this->AttributeHandler<T, VERTEX>::operator=(ah); return *this; }
 };
 
@@ -227,6 +229,7 @@ class EdgeAttribute : public AttributeHandler<T, EDGE>
 public:
 	EdgeAttribute() : AttributeHandler<T, EDGE>() {}
 	EdgeAttribute(const AttributeHandler<T, EDGE>& ah) : AttributeHandler<T, EDGE>(ah) {}
+	EdgeAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, EDGE>(m,amv) {}
 	EdgeAttribute<T>& operator=(const AttributeHandler<T, EDGE>& ah) { this->AttributeHandler<T, EDGE>::operator=(ah); return *this; }
 };
 
@@ -239,6 +242,7 @@ class FaceAttribute : public AttributeHandler<T, FACE>
 public:
 	FaceAttribute() : AttributeHandler<T, FACE>() {}
 	FaceAttribute(const AttributeHandler<T, FACE>& ah) : AttributeHandler<T, FACE>(ah) {}
+	FaceAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, FACE>(m,amv) {}
 	FaceAttribute<T>& operator=(const AttributeHandler<T, FACE>& ah) { this->AttributeHandler<T, FACE>::operator=(ah); return *this; }
 };
 
@@ -251,6 +255,7 @@ class VolumeAttribute : public AttributeHandler<T, VOLUME>
 public:
 	VolumeAttribute() : AttributeHandler<T, VOLUME>() {}
 	VolumeAttribute(const AttributeHandler<T, VOLUME>& ah) : AttributeHandler<T, VOLUME>(ah) {}
+	VolumeAttribute(GenericMap* m, AttributeMultiVector<T>* amv) : AttributeHandler<T, VOLUME>(m,amv) {}
 	VolumeAttribute<T>& operator=(const AttributeHandler<T, VOLUME>& ah) { this->AttributeHandler<T, VOLUME>::operator=(ah); return *this; }
 };
 

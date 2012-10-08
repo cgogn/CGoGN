@@ -129,7 +129,7 @@ public:
 	virtual void mark(Dart d)
 	{
 		assert(m_map.getMarkerSet<CELL>(m_thread).testMark(m_mark));
-		assert(m_map.getMarkVector<CELL>(m_thread) != NULL);
+		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
 		if (a == EMBNULL)

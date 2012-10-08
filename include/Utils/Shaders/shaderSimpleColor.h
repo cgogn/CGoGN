@@ -43,7 +43,7 @@ protected:
 	static std::string fragmentShaderText;
 
 	// uniform locations
-	GLuint m_unif_color;
+	CGoGNGLuint m_unif_color;
 
 	Geom::Vec4f m_color;
 

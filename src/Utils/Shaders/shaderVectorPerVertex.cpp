@@ -34,41 +34,6 @@ namespace Utils
 #include "shaderVectorPerVertex.geom"
 #include "shaderVectorPerVertex.frag"
 
-//std::string ShaderVectorPerVertex::vertexShaderText =
-//		"ATTRIBUTE vec3 VertexPosition;\n"
-//		"ATTRIBUTE vec3 VertexVector;\n"
-//		"VARYING_VERT vec3 VectorAttrib;\n"
-//		"INVARIANT_POS;\n"
-//		"void main ()\n"
-//		"{\n"
-//		"	VectorAttrib = VertexVector;\n"
-//		"	gl_Position = vec4(VertexPosition, 1.0);\n"
-//		"}";
-//
-//
-//std::string ShaderVectorPerVertex::geometryShaderText =
-//		"uniform float vectorScale;\n"
-//		"uniform mat4 ModelViewProjectionMatrix;\n"
-//		"VARYING_IN vec3 VectorAttrib[];\n"
-//		"void main()\n"
-//		"{\n"
-//		"	gl_Position = ModelViewProjectionMatrix * POSITION_IN(0);\n"
-//		"	EmitVertex();\n"
-//		"	gl_Position = ModelViewProjectionMatrix * (POSITION_IN(0) + vec4(VectorAttrib[0] * vectorScale, 0.0));\n"
-//		"	EmitVertex();\n"
-//		"	EndPrimitive();\n"
-//		"}";
-//
-//
-//std::string ShaderVectorPerVertex::fragmentShaderText =
-//		"PRECISON;\n"
-//		"uniform vec4 vectorColor;\n"
-//		"FRAG_OUT_DEF;\n"
-//		"void main()\n"
-//		"{\n"
-//		"	gl_FragColor = vectorColor;\n"
-//		"}";
-
 
 ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	m_scale(1.0f),
@@ -98,27 +63,27 @@ ShaderVectorPerVertex::ShaderVectorPerVertex() :
 
 void ShaderVectorPerVertex::getLocations()
 {
-	m_uniform_scale = glGetUniformLocation(this->program_handler(), "vectorScale");
-	m_uniform_color = glGetUniformLocation(this->program_handler(), "vectorColor");
+	*m_uniform_scale = glGetUniformLocation(this->program_handler(), "vectorScale");
+	*m_uniform_color = glGetUniformLocation(this->program_handler(), "vectorColor");
 }
 
 void ShaderVectorPerVertex::sendParams()
 {
-	glUniform1f(m_uniform_scale, m_scale);
-	glUniform4fv(m_uniform_color, 1, m_color.data());
+	glUniform1f(*m_uniform_scale, m_scale);
+	glUniform4fv(*m_uniform_color, 1, m_color.data());
 }
 
 void ShaderVectorPerVertex::setScale(float scale)
 {
 	bind();
-	glUniform1f(m_uniform_scale, scale);
+	glUniform1f(*m_uniform_scale, scale);
 	m_scale = scale;
 }
 
 void ShaderVectorPerVertex::setColor(const Geom::Vec4f& color)
 {
 	bind();
-	glUniform4fv(m_uniform_color, 1, color.data());
+	glUniform4fv(*m_uniform_color, 1, color.data());
 	m_color = color;
 }
 
