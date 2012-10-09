@@ -16,9 +16,11 @@ SET ( WITH_ZINRI ON CACHE BOOL "build CGoGN with Zinri lib  ")
 SET ( WITH_QT ON CACHE BOOL "build CGoGN with Qt lib  ")
 SET ( WITH_NUMERICAL ON CACHE BOOL "build CGoGN with Numerical libs support ")
 # for CGoGN MR
-SET ( FORCE_MR "2" CACHE STRING "0:none / 1 force multi / 2: force mono")
+SET ( FORCE_MR "0" CACHE STRING "0: normal mode / 1 multires mode")
 #create one big lib
 SET ( ONELIB OFF CACHE BOOL "build CGoGN in one lib")
+SET ( WITH_GLEWMX OFF CACHE BOOL "use multi-contex GLEW")
+
 
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
@@ -47,18 +49,21 @@ IF (FORCE_MR EQUAL 1)
 	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "1" )
 ENDIF (FORCE_MR EQUAL 1)
 
-IF (FORCE_MR EQUAL 2)
-	add_definitions(-DCGoGN_FORCE_MR=2)
-	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_mr.h "2" )
-ENDIF (FORCE_MR EQUAL 2)
-
-
 
 IF (ONELIB)
 	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h "1" )
 ELSE (ONELIB)
 	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h "0" )
 ENDIF (ONELIB)
+
+
+IF (WITH_GLEWMX)
+	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_gmx.h "1" )
+ELSE (WITH_GLEWMX)
+	file(WRITE ${CGoGN_ROOT_DIR}/include/cgogn_gmx.h "0" )
+ENDIF (WITH_GLEWMX)
+
+
 
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
@@ -106,6 +111,10 @@ IF (WITH_QT)
 	SET (CGoGN_EXT_LIBS ${CGoGN_EXT_LIBS} ${QT_LIBRARIES} )
 ENDIF (WITH_QT)
 
+IF (WITH_GLEWMX)
+	ADD_DEFINITIONS(-DGLEW_MX)
+ENDIF (WITH_GLEWMX)
+
 #IF (WITH_NUMERICAL)
 #	add_definitions(-DWITH_NUMERICAL)
 #	SET (CGoGN_NUMERICAL_INCLUDES  ${CGoGN_ROOT_DIR}/ThirdParty/Numerical ${CGoGN_ROOT_DIR}/ThirdParty/Numerical/UFconfig)
@@ -134,7 +143,7 @@ IF(WIN32)
 	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Only Release or Debug" FORCE)
 #	set(CMAKE_CONFIGURATION_TYPES "Release Debug" CACHE STRING "Only Release or Debug" FORCE)
 ELSE(WIN32)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
 	add_subdirectory(Release)
 	add_subdirectory(Debug)
 	add_subdirectory(${CGoGN_ROOT_DIR}/Apps Apps)

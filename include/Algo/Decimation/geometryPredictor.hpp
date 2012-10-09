@@ -43,8 +43,8 @@ void Predictor_HalfCollapse<PFP>::predict(Dart d2, Dart dd2)
 	this->m_predict.clear() ;
 
 	// get some darts
-	Dart d1 = m.phi2(d2) ;
-	Dart dd1 = m.phi2(dd2) ;
+	// Dart d1 = m.phi2(d2) ;
+	// Dart dd1 = m.phi2(dd2) ;
 
 	REAL k2 = REAL(1) ;
 	VEC3 s2_1(0) ;
@@ -75,8 +75,8 @@ typename PFP::REAL Predictor_CornerCutting<PFP>::autoAlpha(Dart d2, Dart dd2)
 	MAP& m = this->m_map ;
 
 	// get some darts
-	Dart d1 = m.phi2(d2) ;
-	Dart dd1 = m.phi2(dd2) ;
+	// Dart d1 = m.phi2(d2) ;
+	// Dart dd1 = m.phi2(dd2) ;
 
 	REAL k1 = 2 ;				// compute the alpha
 	REAL k2 = 2 ;				// value according to
@@ -102,8 +102,8 @@ void Predictor_CornerCutting<PFP>::predict(Dart d2, Dart dd2)
 	this->m_predict.clear() ;
 
 	// get some darts
-	Dart d1 = m.phi2(d2) ;
-	Dart dd1 = m.phi2(dd2) ;
+	// Dart d1 = m.phi2(d2) ;
+	// Dart dd1 = m.phi2(dd2) ;
 
 	REAL alpha = autoAlpha(d2, dd2) ;
 

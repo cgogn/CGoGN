@@ -126,11 +126,9 @@ protected:
 	 * is map a multiresolution map
 	 */
 #ifndef CGoGN_FORCE_MR
-	bool m_isMultiRes;
-#elif CGoGN_FORCE_MR == 1
-	static const bool m_isMultiRes = true ;
-#else
 	static const bool m_isMultiRes = false ;
+#else
+	static const bool m_isMultiRes = true ;
 #endif
 
 	/**
@@ -232,25 +230,49 @@ public:
 	 */
 	unsigned int getMaxLevel() ;
 
+//private:
+//	/*
+//	 * add a resolution level
+//	 */
+//	AttributeMultiVector<unsigned int>* addLevel();
+
+public:
 	/**
-	 * add a resolution level (use only in MRMaps)
+	 * add a resolution level in the back of the level table (use only in MRMaps)
 	 */
-	void addLevel() ;
+	void addLevelBack() ;
 
 	/**
 	 * add a resolution level in the front of the level table (use only in MRMaps)
 	 */
-	void addFrontLevel();
+	void addLevelFront();
 
 	/**
 	 * remove last resolution level (use only in MRMaps)
 	 */
-	void removeLevel() ;
+	void removeLevelBack() ;
 
 	/**
 	 * remove first resolution level (use only in MRMaps)
 	 */
-	void removeFrontLevel();
+	void removeLevelFront();
+
+	/**
+	 * copy MRDarts from level-1 to level
+	 */
+	void copyLevel(unsigned int level);
+
+	/**
+	 * duplicate darts from level-1 to level
+	 */
+	void duplicateDarts(unsigned int level);
+
+	/**
+	 * duplicate a dart starting from current level
+	 */
+	void duplicateDart(Dart d) ;
+
+	void duplicateDartAtOneLevel(Dart d, unsigned int level) ;
 
 	/****************************************
 	 *           DARTS MANAGEMENT           *
@@ -272,11 +294,6 @@ protected:
 	unsigned int copyDartLine(unsigned int index) ;
 
 	/**
-	 * duplicate a dart starting from current level
-	 */
-	void duplicateDart(Dart d) ;
-
-	/**
 	 * Properly deletes a dart in m_attribs[DART]
 	 */
 	void deleteDartLine(unsigned int index) ;
@@ -291,6 +308,12 @@ public:
 	 * get the insertion level of a dart (use only in MRMaps)
 	 */
 	unsigned int getDartLevel(Dart d) const ;
+
+	/**
+	 *
+	 */
+	void incDartLevel(Dart d) const ;
+
 
 	/**
 	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
@@ -438,6 +461,18 @@ public:
 	template <unsigned int ORBIT>
 	AttributeMultiVector<unsigned int>* getEmbeddingAttributeVector() ;
 
+	/**
+	 * get the MR attribute container
+	 */
+	AttributeContainer& getMRAttributeContainer() ;
+
+	/**
+	 * get the MR attribute container
+	 */
+	AttributeMultiVector<unsigned int>* getMRDartAttributeVector(unsigned int level) ;
+
+	AttributeMultiVector<unsigned int>* getMRLevelAttributeVector();
+
 //	/**
 //	 * swap two attribute containers
 //	 */
@@ -460,6 +495,8 @@ public:
 	 * print attributes name of map in std::cout (for debugging)
 	 */
 	void viewAttributesTables() ;
+
+	void printDartsTable();
 
 protected:
 	/****************************************

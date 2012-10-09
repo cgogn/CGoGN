@@ -28,6 +28,7 @@
 #include "Algo/Decimation/edgeSelector.h"
 #include "Algo/Decimation/halfEdgeSelector.h"
 #include "Algo/Decimation/geometryApproximator.h"
+#include "Algo/Decimation/colorPerVertexApproximator.h"
 #include "Algo/Decimation/lightfieldApproximator.h"
 
 namespace CGoGN
@@ -44,9 +45,10 @@ void decimate(
 	typename PFP::MAP& map,
 	SelectorType s,
 	ApproximatorType a,
-	VertexAttribute<typename PFP::VEC3>& position,
+	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
 	unsigned int nbWantedVertices,
-	const FunctorSelect& selected = allDarts
+	const FunctorSelect& selected = allDarts,
+	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
 ) ;
 
 } //namespace Decimation

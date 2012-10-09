@@ -44,7 +44,7 @@ protected:
 	static std::string vertexShaderText;
 	static std::string fragmentShaderText;
 
-	GLuint m_unif_unit;
+	CGoGNGLuint m_unif_unit;
 	int m_unit;
 
 

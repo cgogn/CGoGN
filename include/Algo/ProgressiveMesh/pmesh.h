@@ -31,7 +31,7 @@
 #include "Algo/Decimation/edgeSelector.h"
 #include "Algo/Decimation/geometryApproximator.h"
 #include "Algo/Decimation/geometryPredictor.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
+#include "Algo/Decimation/colorPerVertexApproximator.h"
 
 #include "Utils/quantization.h"
 

@@ -43,7 +43,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 	unsigned int byteTableSize;
 	unsigned int nbb = mv->getBlocksPointers(addr, byteTableSize);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glBufferData(GL_ARRAY_BUFFER, nbb * byteTableSize, 0, GL_STREAM_DRAW);
 
 	m_nbElts = nbb * byteTableSize / sizeof(typename ATTR_HANDLER::DATA_TYPE);
@@ -76,7 +76,7 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 	conv->reserve(mv->getBlockSize());
 
 	// bind buffer to update
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glBufferData(GL_ARRAY_BUFFER, nbb * conv->sizeBuffer(), 0, GL_STREAM_DRAW);
 
 	m_nbElts = nbb * conv->nbElt();
@@ -108,7 +108,7 @@ void VBO::updateData(std::vector<T>& data)
 	m_data_size = sizeof(T) / sizeof(float);
 	m_nbElts = data.size();
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, *m_id);
 	glBufferData(GL_ARRAY_BUFFER, m_nbElts * sizeof(T), &(data[0]), GL_STREAM_DRAW);
 }
 

@@ -71,11 +71,11 @@ void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typenam
 namespace Parallel
 {
 template <typename PFP>
-void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+void computeNormalVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& normal, const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 
 
 template <typename PFP>
-void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int thread = 0) ;
+void computeNormalFaces(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_normal, const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 
 }
 

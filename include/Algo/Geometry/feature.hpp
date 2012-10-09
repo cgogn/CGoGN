@@ -66,7 +66,7 @@ void computeFaceGradient(
 	typename PFP::MAP& map,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const FaceAttribute<typename PFP::VEC3>& face_normal,
-	const VertexAttribute<typename PFP::REAL>& kmax,
+	const VertexAttribute<typename PFP::REAL>& scalar,
 	const FaceAttribute<typename PFP::REAL>& area,
 	FaceAttribute<typename PFP::VEC3>& face_gradient,
 	const FunctorSelect& select,
@@ -74,7 +74,7 @@ void computeFaceGradient(
 {
 	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		face_gradient[d] = faceGradient<PFP>(map, d, position, face_normal, kmax, area) ;
+		face_gradient[d] = faceGradient<PFP>(map, d, position, face_normal, scalar, area) ;
 }
 
 template <typename PFP>
@@ -83,7 +83,7 @@ typename PFP::VEC3 faceGradient(
 	Dart d,
 	const VertexAttribute<typename PFP::VEC3>& position,
 	const FaceAttribute<typename PFP::VEC3>& face_normal,
-	const VertexAttribute<typename PFP::REAL>& kmax,
+	const VertexAttribute<typename PFP::REAL>& scalar,
 	const FaceAttribute<typename PFP::REAL>& face_area)
 {
 	typedef typename PFP::REAL REAL ;
@@ -93,15 +93,15 @@ typename PFP::VEC3 faceGradient(
 
 	Dart it = t.begin() ;
 	VEC3 pos1 = position[it] ;
-	REAL k1 = kmax[it] ;
+	REAL k1 = scalar[it] ;
 
 	it = t.next() ;
 	VEC3 pos2 = position[it] ;
-	REAL k2 = kmax[it] ;
+	REAL k2 = scalar[it] ;
 
 	it = t.next() ;
 	VEC3 pos3 = position[it] ;
-	REAL k3 = kmax[it] ;
+	REAL k3 = scalar[it] ;
 
 	VEC3 n = face_normal[d] ;
 	REAL a = face_area[d] ;
@@ -174,15 +174,17 @@ typename PFP::VEC3 vertexGradient(
 template <typename PFP>
 void computeTriangleType(
 	typename PFP::MAP& map,
-	const VertexAttribute<typename PFP::VEC3>& Kmax,
+	const VertexAttribute<typename PFP::VEC3>& K,
 	CellMarker<FACE>& regularMarker,
 	const FunctorSelect& select,
 	unsigned int thread)
 {
 	TraversorF<typename PFP::MAP> trav(map, select, thread);
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-		if(isTriangleRegular<PFP>(map, d, Kmax))
+	{
+		if(isTriangleRegular<PFP>(map, d, K))
 			regularMarker.mark(d) ;
+	}
 }
 
 template <typename PFP>
@@ -197,7 +199,7 @@ bool mutuallyPositive(typename PFP::VEC3& v1, typename PFP::VEC3& v2, typename P
 }
 
 template <typename PFP>
-bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& Kmax)
+bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& K)
 {
 	typedef typename PFP::REAL REAL ;
 	typedef typename PFP::VEC3 VEC3 ;
@@ -206,9 +208,9 @@ bool isTriangleRegular(typename PFP::MAP& map, Dart d, const VertexAttribute<typ
 	Dart v2 = map.phi1(v1) ;
 	Dart v3 = map.phi1(v2) ;
 
-	VEC3 K1 = Kmax[v1] ;
-	VEC3 K2 = Kmax[v2] ;
-	VEC3 K3 = Kmax[v3] ;
+	VEC3 K1 = K[v1] ;
+	VEC3 K2 = K[v2] ;
+	VEC3 K3 = K[v3] ;
 
 //	VEC3 K1n = typename VEC3::DATA_TYPE(-1) * K1 ;
 	VEC3 K2n = typename VEC3::DATA_TYPE(-1) * K2 ;
@@ -251,8 +253,11 @@ template <typename PFP>
 void computeRidgeLines(
 	typename PFP::MAP& map,
 	CellMarker<FACE>& regularMarker,
-	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& K,
+	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL>& k,
+	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments,
 	const FunctorSelect& select,
 	unsigned int thread)
@@ -261,7 +266,7 @@ void computeRidgeLines(
 	for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 	{
 		if (regularMarker.isMarked(d))
-			ridgeLines<PFP>(map, d, K, vertex_gradient, ridge_segments) ;
+			ridgeLines<PFP>(map, d, position, K, vertex_gradient, k, k2, ridge_segments) ;
 	}
 }
 
@@ -269,8 +274,11 @@ template <typename PFP>
 void ridgeLines(
 	typename PFP::MAP& map,
 	Dart d,
+	const VertexAttribute<typename PFP::VEC3>& position,
 	const VertexAttribute<typename PFP::VEC3>& K,
 	const VertexAttribute<typename PFP::VEC3>& vertex_gradient,
+	const VertexAttribute<typename PFP::REAL>& k,
+	const VertexAttribute<typename PFP::REAL>& k2,
 	FaceAttribute<ridgeSegment>& ridge_segments)
 {
 	typedef typename PFP::REAL REAL ;
@@ -291,7 +299,7 @@ void ridgeLines(
 
 	assert(mutuallyPositive<PFP>(Kv1, Kv2, Kv3)) ;
 
-	/* Calcul coefficient extremalite */
+	// Calcul coefficient extremalite
 
 //	REAL e1 = extremality<PFP>(map, v1, Kv1, face_gradient, face_area) ;
 //	REAL e2 = extremality<PFP>(map, v2, Kv2, face_gradient, face_area) ;
@@ -301,7 +309,7 @@ void ridgeLines(
 	REAL e2 = vertex_gradient[v2] * Kv2 ;
 	REAL e3 = vertex_gradient[v3] * Kv3 ;
 
-	/* Extraction des zeros */
+	// Extraction des zeros
 
 	bool p1set = false ;
 	bool p2set = false ;
@@ -342,6 +350,30 @@ void ridgeLines(
 			p2set = true ;
 			ridge_segments[d].type = SEGMENT ;
 		}
+	}
+
+	if(p1set && p2set)
+	{
+		VEC3 n = Algo::Geometry::faceNormal<PFP>(map, d, position) ;
+		REAL a = Algo::Geometry::convexFaceArea<PFP>(map, d, position) ;
+
+		VEC3 p1 = position[v1] ;
+		VEC3 p2 = position[v2] ;
+		VEC3 p3 = position[v3] ;
+
+		VEC3 eg = e1 * ( ( n ^ ( p3 - p2 ) ) / ( 2 * a ) ) +
+				  e2 * ( ( n ^ ( p1 - p3 ) ) / ( 2 * a ) ) +
+				  e3 * ( ( n ^ ( p2 - p1 ) ) / ( 2 * a ) ) ;
+		eg.normalize() ;
+
+		VEC3 Ktotal = Kv1 + Kv2 + Kv3 ;
+		REAL ktotal = k[v1] + k[v2] + k[v3] ;
+		ktotal = ktotal > 0 ? ktotal : -1.0 * ktotal ;
+		REAL k2total = k2[v1] + k2[v2] + k2[v3] ;
+		k2total = k2total > 0 ? k2total : -1.0 * k2total ;
+
+		if( ( (eg * Ktotal) < 0 ) && ( ktotal > k2total ) )
+			ridge_segments[d].type = FEATURE ;
 	}
 }
 

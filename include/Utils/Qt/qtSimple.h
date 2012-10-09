@@ -198,6 +198,11 @@ public:
 	void setParamObject(float width, float* pos) { m_glWidget->setParamObject(width, pos); }
 
 	/**
+	 * make the contex of glWidget current
+	 */
+	void makeCurrent() { m_glWidget->makeCurrent();}
+
+	/**
 	 * set focal
 	 */
 	void setFocal(float f) { m_glWidget->setFocal(f); }

@@ -55,7 +55,7 @@ protected:
     static std::string fragmentShaderText1;
     static std::string fragmentShaderText2;
 
-    static GLuint m_idTexture;
+    static Strings3D*  m_instance0;
 
 	std::vector<std::string> m_strings;
 
@@ -71,13 +71,15 @@ protected:
 
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
 
-    GLuint m_uniform_texture;
+    CGoGNGLuint m_idTexture;
 
-    GLuint m_uniform_scale;
+    CGoGNGLuint m_uniform_texture;
 
-    GLuint m_uniform_position;
+    CGoGNGLuint m_uniform_scale;
 
-    GLuint m_uniform_color;
+    CGoGNGLuint m_uniform_position;
+
+    CGoGNGLuint m_uniform_color;
 
 public:
 	Strings3D(bool withBackground = true, const Geom::Vec3f& bgc = Geom::Vec3f(0));
