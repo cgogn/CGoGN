@@ -50,96 +50,107 @@ void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
 template <typename PFP>
 void hexahedronsToTetrahedrons(typename PFP::MAP& map);
 
+
 template <typename PFP>
 void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 /************************************************************************************************
- * 									Collapse / Split Operators
+ * 									Collapse / Split Operators									*
  ************************************************************************************************/
+
+//!
+/*!
+ *
+ */
 template <typename PFP>
 Dart splitVertex(typename PFP::MAP& map, std::vector<Dart>& vd);
 
-
 /************************************************************************************************
- * 																Tetrahedron functions																	   *
+ * 									Tetrahedron functions										*
  ************************************************************************************************/
 
-/**
- * test if the volume is a tetrahedron
- * @param map
- * @param a dart from the volume
+//!
+/*!
+ *
  */
 template <typename PFP>
 bool isTetrahedron(typename PFP::MAP& the_map, Dart d, unsigned int thread=0);
 
-/**
- * test if a mesh (or submesh) is a tetrahedral mesh
- * @param map
- * @param selected
+//!
+/*!
+ *
  */
 template <typename PFP>
 bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected = allDarts);
 
 
-
 /************************************************************************************************
- *																		Swap Functions 																	   *
+ *										Swap Functions 											*
  ************************************************************************************************/
 
-/**
- * Swap a configuration of 2 Tetrahedron to another one
- * @param map
- * @param d a dart from the face between the two tetahedron to swap
+//!
+/*!
  *
- * TODO ajouter image
  */
 template <typename PFP>
-void swap2To2(typename PFP::MAP& map, Dart d);
+Dart swap2To2(typename PFP::MAP& map, Dart d);
 
-/**
+//!
+/*!
  *
  */
 template <typename PFP>
 void swap4To4(typename PFP::MAP& map, Dart d);
 
-/**
- * Swap a configuration of 3 tetrahedron to another one with 2 tetrahedron
- * @param map
- * @param d
- *
- * TODO ajouter image
+//!
+/*!
  *
  */
 template <typename PFP>
-void swap3To2(typename PFP::MAP& map, Dart d);
+Dart swap3To2(typename PFP::MAP& map, Dart d);
 
-/**
+//!
+/*!
  *
  */
 template <typename PFP>
 Dart swap2To3(typename PFP::MAP& map, Dart d);
 
-/**
+//!
+/*!
  *
  */
 template <typename PFP>
-void swap5To4(typename PFP::MAP& the_map, Dart d, VertexAttribute<typename PFP::VEC3>& positions);
+Dart swap5To4(typename PFP::MAP& map, Dart d);
 
 /************************************************************************************************
- *																		Flip Functions 																	   *
+ *											Flip Functions 										*
  ************************************************************************************************/
 
-/*
+//!
+/*!
  *
  */
 template <typename PFP>
-void flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+Dart flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
-/**
+//!
+/*!
  *
  */
 template <typename PFP>
-void edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+Dart flip1To3(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+
+/************************************************************************************************
+ *											Bisection Functions 										*
+ ************************************************************************************************/
+
+//!
+/*!
+ *
+ */
+template <typename PFP>
+Dart edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
 
 } // namespace Tetrahedralization
 

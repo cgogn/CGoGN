@@ -95,6 +95,9 @@ void catmullClarkVol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>
 	catmullClarkVol<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, position, selected);
 }
 
+template <typename PFP>
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected = allDarts);
+
 } // namespace Modelisation
 
 } // namespace Algo

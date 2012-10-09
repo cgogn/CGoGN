@@ -626,9 +626,56 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //	{
 //		map.embedOrbit<VERTEX>(map.phi2(map.phi1(d)), map.getEmbedding<VERTEX>(map.phi2(map.phi1(d))));
 //	}
-
-
 }
+
+
+template <typename PFP>
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+{
+	DartMarkerStore m(map);
+
+	//
+	// 1-4 flip of all tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tW(map,selected);
+	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
+	{
+		if(!map.isBoundaryFace(dit))
+			m.markOrbit<VOLUME>(dit);
+
+		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit, position);
+	}
+
+	//
+	// 2-3 swap of all old interior faces
+	//
+	TraversorF<typename PFP::MAP> tF(map,selected);
+	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<FACE>(dit);
+			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
+		}
+	}
+
+	//
+	// 1-3 flip of all boundary tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tWb(map,selected);
+	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
+	{
+		if(map.isBoundaryVolume(dit))
+		{
+			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit, position);
+		}
+	}
+
+	//
+	// edge-removal on all old boundary edges
+	//
+}
+
 
 } //namespace Modelisation
 
