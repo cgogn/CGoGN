@@ -212,7 +212,7 @@ void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename
 template<typename PFP>
 void volumesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& good, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVolumes)
 {
-	std::vector<Dart>& vecFaces;
+	std::vector<Dart> vecFaces;
 	std::vector<typename PFP::VEC3> iPoints;
 
 	// get back intersected faces
@@ -425,7 +425,7 @@ void facesPlanSelection(typename PFP::MAP& map, const VertexAttribute<typename P
  * @param angle angle of the code in degree.
  */
 template<typename PFP>
-void verticesConeSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, float angle, std::vector<Dart>& vecVertices, const FunctorSelect& good= allDarts)
+void verticesConeSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, float angle, std::vector<Dart>& vecVertices, const FunctorSelect& good)
 {
 	typename PFP::REAL AB2 = rayAB * rayAB;
 
@@ -533,7 +533,7 @@ void edgesConeSelection(typename PFP::MAP& map, const VertexAttribute<typename P
 
 
 template<typename PFP>
-Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax, const FunctorSelect& good=allDarts)
+Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax, const FunctorSelect& good)
 {
 	typename PFP::REAL l2max = radiusMax*radiusMax;
 	typename PFP::REAL l2min(std::numeric_limits<float>::max());
@@ -555,7 +555,7 @@ Dart verticesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typen
 
 
 template<typename PFP>
-Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax, const FunctorSelect& good=allDarts)
+Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& cursor, typename PFP::REAL radiusMax, const FunctorSelect& good)
 {
 	typename PFP::REAL l2max = radiusMax*radiusMax;
 	typename PFP::REAL l2min(std::numeric_limits<float>::max());
@@ -661,7 +661,7 @@ Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename
 //
 //
 //template<typename PFP>
-//void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good= allDarts, unsigned int nbth=0, unsigned int current_thread=0)
+//void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good , unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	typename PFP::REAL dist2 = dist * dist;
 //	typename PFP::REAL AB2 = rayAB * rayAB;

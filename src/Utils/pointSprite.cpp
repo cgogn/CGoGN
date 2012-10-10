@@ -41,7 +41,7 @@ PointSprite* PointSprite::m_instance0 = NULL;
 
 
 
-PointSprite::PointSprite(bool withColorPervertex, float radius)
+PointSprite::PointSprite(bool withColorPervertex, float radius,  bool with_plane)
 {
 	std::string defineColor("#define WITH_COLOR_PER_VERTEX 1\n");
 
@@ -53,11 +53,16 @@ PointSprite::PointSprite(bool withColorPervertex, float radius)
 	std::string glxgeom = GLSLShader::defines_Geom("points","triangle_strip",4);
 	if (withColorPervertex)
 		glxgeom.append(defineColor);
+	if (with_plane)
+		glxgeom.append("#define WITH_PLANE 1\n");
+
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	if (withColorPervertex)
 		glxfrag.append(defineColor);
+	if (with_plane)
+		glxfrag.append("#define WITH_PLANE 1\n");
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_TRIANGLE_STRIP,4);
@@ -85,6 +90,12 @@ PointSprite::PointSprite(bool withColorPervertex, float radius)
 	}
 
 	*m_uniform_texture = glGetUniformLocation(program_handler(),"SpriteTexture");
+
+	if (with_plane)
+	{
+		*m_uniform_planeX = glGetUniformLocation(program_handler(),"planeX");
+		*m_uniform_planeY = glGetUniformLocation(program_handler(),"planeY");
+	}
 }
 
 PointSprite::~PointSprite()
@@ -137,6 +148,15 @@ void PointSprite::setSize(float radius)
 	glUniform1f(*m_uniform_size, radius);
 	unbind();
 }
+
+void PointSprite::setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy)
+{
+	bind();
+	glUniform3fv(*m_uniform_planeX, 1, ox.data());
+	glUniform3fv(*m_uniform_planeY, 1, oy.data());
+	unbind();
+}
+
 
 void PointSprite::computeSphere()
 {

@@ -80,9 +80,13 @@ protected:
     CGoGNGLuint m_uniform_position;
 
     CGoGNGLuint m_uniform_color;
+	
+	CGoGNGLuint m_uniform_planeX;
+	
+	CGoGNGLuint m_uniform_planeY;
 
 public:
-	Strings3D(bool withBackground = true, const Geom::Vec3f& bgc = Geom::Vec3f(0));
+	Strings3D(bool withBackground = true, const Geom::Vec3f& bgc = Geom::Vec3f(0), bool with_plane=false);
 
 	~Strings3D();
 
@@ -112,7 +116,7 @@ public:
 	void sendToVBO();
 
 	/**
-	 * draw on string
+	 * draw one string
 	 * @param idSt the id of string
 	 * @param pos the position of text
 	 */
@@ -140,6 +144,11 @@ public:
 	 * @param scale
 	 */
 	void setScale(float scale);
+	
+	/**
+	* set the plane of rendering for VR rendering
+	*/
+	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
 
 
 	void toSVG(Utils::SVG::SVGOut& svg);
