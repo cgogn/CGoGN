@@ -136,17 +136,17 @@ namespace Parallel
 template <typename PFP>
 void computeCentroidVolumes(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VolumeAttribute<typename PFP::VEC3>& vol_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 
 template <typename PFP>
 void computeCentroidFaces(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, FaceAttribute<typename PFP::VEC3>& face_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 
 template <typename PFP>
 void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
-		const FunctorSelect& select = allDarts, unsigned int nbth = 0, unsigned int current_thread = 0) ;
+		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 }
 
 } // namespace Geometry

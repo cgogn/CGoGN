@@ -14,9 +14,6 @@ file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_mr.h FORCE_MR)
 IF (FORCE_MR EQUAL 1)
 	add_definitions(-DCGoGN_FORCE_MR=1)
 ENDIF (FORCE_MR EQUAL 1)
-IF (FORCE_MR EQUAL 2)
-	add_definitions(-DCGoGN_FORCE_MR=2)
-ENDIF (FORCE_MR EQUAL 2)
 
 
 # for CGoGN in one lib on not

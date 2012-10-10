@@ -30,6 +30,8 @@
 #include "Topology/map/embeddedMap2.h"
 #include "Topology/gmap/embeddedGMap2.h"
 
+#include "Geometry/distances.h"
+
 namespace CGoGN
 {
 
@@ -94,10 +96,15 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 	GLvoid* ColorDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 	VEC3* colorDartBuf = reinterpret_cast<VEC3*>(ColorDartsBuffer);
 
-	m_vbo0->bind();
-	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
-	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
+//	m_vbo0->bind();
+//	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), 0, GL_STREAM_DRAW);
+//	GLvoid* PositionDartsBuffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+//	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(PositionDartsBuffer);
+
+	if (m_bufferDartPosition!=NULL)
+		delete m_bufferDartPosition;
+	m_bufferDartPosition = new Geom::Vec3f[2*m_nbDarts];
+	VEC3* positionDartBuf = reinterpret_cast<VEC3*>(m_bufferDartPosition);
 
 	std::vector<VEC3> vecPos;
 	vecPos.reserve(16);
@@ -120,7 +127,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 				const VEC3& P = positions[d];
 				vecPos.push_back(P);
 				center += P;
-				d = map.phi1(d);
+				Dart e = map.phi1(d);
+				d = e;
 			} while (d != dd);
 			center /= REAL(vecPos.size());
 
@@ -158,7 +166,8 @@ void TopoRender::updateDataMap(typename PFP::MAP& mapx, const VertexAttribute<ty
 	}
 
 	m_vbo0->bind();
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBufferData(GL_ARRAY_BUFFER, 2*m_nbDarts*sizeof(VEC3), m_bufferDartPosition, GL_STREAM_DRAW);
+//	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	m_vbo3->bind();
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -410,6 +419,67 @@ Dart TopoRender::picking(typename PFP::MAP& map,int x, int y, const FunctorSelec
 	return d;
 
 }
+
+
+
+template<typename PFP>
+Dart TopoRender::coneSelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float angle, const FunctorSelect& good)
+{
+	float AB2 = rayAB*rayAB;
+	Dart dFinal;
+	double sin2 = sin(M_PI/180.0 * angle);
+	sin2 = sin2*sin2;
+	double dist2 = std::numeric_limits<double>::max();
+
+	for(Dart d = map.begin(); d!=map.end(); map.next(d))
+	{
+		// get back position of segment PQ
+		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
+		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
+		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+		Geom::Vec3f V = (P+Q)/2.0f - rayA;
+		double d2 = double(V*V);
+		double s2 = double(ld2) / d2;
+		if (s2 < sin2)
+		{
+			if (d2<dist2)
+			{
+				dist2 = d2;
+				dFinal = d;
+			}
+		}
+	}
+	return dFinal;
+}
+
+template<typename PFP>
+Dart TopoRender::raySelection(typename PFP::MAP& map, const Geom::Vec3f& rayA, const Geom::Vec3f& rayAB, float dmax, const FunctorSelect& good)
+{
+	float AB2 = rayAB*rayAB;
+	Dart dFinal;
+	float dm2 = dmax*dmax;
+	double dist2 = std::numeric_limits<double>::max();
+
+	for(Dart d = map.begin(); d!=map.end(); map.next(d))
+	{
+		// get back position of segment PQ
+		const Geom::Vec3f& P = m_bufferDartPosition[m_attIndex[d]];
+		const Geom::Vec3f& Q =m_bufferDartPosition[m_attIndex[d]+1];
+		float ld2 = Geom::squaredDistanceLine2Seg(rayA, rayAB, AB2, P, Q);
+		if (ld2<dm2)
+		{
+			Geom::Vec3f V = (P+Q)/2.0f - rayA;
+			double d2 = double(V*V);
+			if (d2<dist2)
+			{
+				dist2 = d2;
+				dFinal = d;
+			}
+		}
+	}
+	return dFinal;
+}
+
 
 }//end namespace GL2
 

@@ -131,7 +131,7 @@ Dart Map3::splitVertex(std::vector<Dart>& vd)
 {
 	//assert(checkPathAroundVertex(vd)) ;
 
-	bool boundE = false;
+	//bool boundE = false;
 
 	Dart prev = vd.front();	//elt 0
 

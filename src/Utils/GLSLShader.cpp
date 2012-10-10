@@ -71,18 +71,19 @@ std::set< std::pair<void*, GLSLShader*> > GLSLShader::m_registeredShaders;
 Utils::GL_Matrices* GLSLShader::s_current_matrices=NULL;
 
 GLSLShader::GLSLShader() :
-	m_vertex_shader_object(0),
-	m_fragment_shader_object(0),
-	m_geom_shader_object(0),
-	m_program_object(0),
-	m_uniMat_Proj(-1),
-	m_uniMat_Model(-1),
-	m_uniMat_ModelProj(-1),
-	m_uniMat_Normal(-1),
 	m_vertex_shader_source(NULL),
 	m_fragment_shader_source(NULL),
 	m_geom_shader_source(NULL)
 {
+	*m_vertex_shader_object = 0;
+	*m_fragment_shader_object = 0;
+	*m_geom_shader_object = 0;
+	*m_program_object = 0;
+	*m_uniMat_Proj = -1;
+	*m_uniMat_Model = -1;
+	*m_uniMat_ModelProj = -1;
+	*m_uniMat_Normal = -1;
+
 	if (DEFINES_GL == NULL)
 		DEFINES_GL = &DEFINES_GL2;
 }
@@ -275,16 +276,16 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	int		status;
 	char	*info_log;
 
-	if (m_vertex_shader_object==0)
+	if (*m_vertex_shader_object==0)
 	{
-		glDeleteShader(m_vertex_shader_object);
-		m_vertex_shader_object=0;
+		glDeleteShader(*m_vertex_shader_object);
+		*m_vertex_shader_object=0;
 	}
 
 	/*** create shader object ***/
-	m_vertex_shader_object = glCreateShader( GL_VERTEX_SHADER );
+	*m_vertex_shader_object = glCreateShader( GL_VERTEX_SHADER );
 
-	if( !m_vertex_shader_object )
+	if( !*m_vertex_shader_object )
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadVertexShader() - unable to create shader object." << CGoGNendl;
 		return false;
@@ -295,27 +296,27 @@ bool GLSLShader::loadVertexShaderSourceString( const char *vertex_shader_source 
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadVertexShader() - source string is empty." << CGoGNendl;
 
-		glDeleteObjectARB( m_vertex_shader_object );
-		m_vertex_shader_object = 0;
+		glDeleteObjectARB(*m_vertex_shader_object );
+		*m_vertex_shader_object = 0;
 
 		return false;
 	}
 
-	glShaderSourceARB( m_vertex_shader_object, 1, (const char**)&vertex_shader_source, NULL );
+	glShaderSourceARB( *m_vertex_shader_object, 1, (const char**)&vertex_shader_source, NULL );
 
 	/*** compile shader object ***/
-	glCompileShaderARB( m_vertex_shader_object );
+	glCompileShaderARB( *m_vertex_shader_object );
 
-	glGetObjectParameterivARB( m_vertex_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
+	glGetObjectParameterivARB( *m_vertex_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLshader::loadVertexShader() - error occured while compiling shader " << m_nameVS<< CGoGNendl;
-		info_log = getInfoLog( m_vertex_shader_object );
+		info_log = getInfoLog( *m_vertex_shader_object );
 				CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDeleteObjectARB( m_vertex_shader_object );
-		m_vertex_shader_object = 0;
+		glDeleteObjectARB( *m_vertex_shader_object );
+		*m_vertex_shader_object = 0;
 
 		return false;
 	}
@@ -329,16 +330,16 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	int		status;
 	char	*info_log;
 
-	if (m_fragment_shader_object==0)
+	if (*m_fragment_shader_object==0)
 	{
-		glDeleteShader(m_fragment_shader_object);
-		m_fragment_shader_object=0;
+		glDeleteShader(*m_fragment_shader_object);
+		*m_fragment_shader_object=0;
 	}
 
 	/*** create shader object ***/
-	m_fragment_shader_object = glCreateShader( GL_FRAGMENT_SHADER );
+	*m_fragment_shader_object = glCreateShader( GL_FRAGMENT_SHADER );
 
-	if( !m_fragment_shader_object )
+	if( !*m_fragment_shader_object )
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadFragmentShader() - unable to create shader object." << CGoGNendl;
 		return false;
@@ -349,27 +350,27 @@ bool GLSLShader::loadFragmentShaderSourceString( const char *fragment_shader_sou
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadFragmentShader() - source string is empty." << CGoGNendl;
 
-		glDeleteObjectARB( m_fragment_shader_object );
-		m_fragment_shader_object = 0;
+		glDeleteObjectARB( *m_fragment_shader_object );
+		*m_fragment_shader_object = 0;
 
 		return false;
 	}
 
-	glShaderSourceARB( m_fragment_shader_object, 1, (const char**)&fragment_shader_source, NULL );
+	glShaderSourceARB( *m_fragment_shader_object, 1, (const char**)&fragment_shader_source, NULL );
 
 	/*** compile shader object ***/
-	glCompileShaderARB( m_fragment_shader_object );
+	glCompileShaderARB( *m_fragment_shader_object );
 
-	glGetObjectParameterivARB( m_fragment_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
+	glGetObjectParameterivARB( *m_fragment_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLshader::loadFragmentShader() - error occured while compiling shader " <<  m_nameFS << CGoGNendl;
-		info_log = getInfoLog( m_fragment_shader_object );
+		info_log = getInfoLog( *m_fragment_shader_object );
 		CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDeleteObjectARB( m_fragment_shader_object );
-		m_fragment_shader_object = 0;
+		glDeleteObjectARB( *m_fragment_shader_object );
+		*m_fragment_shader_object = 0;
 
 		return false;
 	}
@@ -383,15 +384,15 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	int		status;
 	char	*info_log;
 
-	if (m_geom_shader_object==0)
+	if (*m_geom_shader_object==0)
 	{
-		glDeleteShader(m_geom_shader_object);
-		m_geom_shader_object=0;
+		glDeleteShader(*m_geom_shader_object);
+		*m_geom_shader_object=0;
 	}
 	/*** create shader object ***/
-	m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER_EXT);
+	*m_geom_shader_object = glCreateShader(GL_GEOMETRY_SHADER_EXT);
 
-	if( !m_geom_shader_object )
+	if( !*m_geom_shader_object )
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadGeometryShader() - unable to create shader object." << CGoGNendl;
 		return false;
@@ -402,27 +403,27 @@ bool GLSLShader::loadGeometryShaderSourceString( const char *geom_shader_source 
 	{
 		CGoGNerr << "ERROR - GLSLShader::loadGeometryShader() - source string is empty." << CGoGNendl;
 
-		glDeleteObjectARB( m_geom_shader_object );
-		m_geom_shader_object = 0;
+		glDeleteObjectARB( *m_geom_shader_object );
+		*m_geom_shader_object = 0;
 
 		return false;
 	}
 
-	glShaderSourceARB( m_geom_shader_object, 1, (const char**)&geom_shader_source, NULL );
+	glShaderSourceARB( *m_geom_shader_object, 1, (const char**)&geom_shader_source, NULL );
 
 	/*** compile shader object ***/
-	glCompileShaderARB( m_geom_shader_object );
+	glCompileShaderARB( *m_geom_shader_object );
 
-	glGetObjectParameterivARB( m_geom_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
+	glGetObjectParameterivARB( *m_geom_shader_object, GL_OBJECT_COMPILE_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLshader::loadGeometryShader() - error occured while compiling shader "<< m_nameGS << CGoGNendl;
-		info_log = getInfoLog( m_geom_shader_object );
+		info_log = getInfoLog( *m_geom_shader_object );
 		CGoGNerr << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDeleteObjectARB( m_geom_shader_object );
-		m_geom_shader_object = 0;
+		glDeleteObjectARB( *m_geom_shader_object );
+		*m_geom_shader_object = 0;
 
 		return false;
 	}
@@ -454,7 +455,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	m_geom_outputPrimitives = outputGeometryPrimitive;
 
 	/*** check if shaders are loaded ***/
-	if( !m_vertex_shader_object || !m_fragment_shader_object )
+	if( !*m_vertex_shader_object || !*m_fragment_shader_object )
 	{
 		CGoGNerr << "ERROR - GLSLShader::create() - shaders are not defined." << CGoGNendl;
 		return false;
@@ -463,49 +464,49 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	/*** create program object ***/
 	m_program_object = glCreateProgramObjectARB();
 
-	if( !m_program_object )
+	if( !*m_program_object )
 	{
 		CGoGNerr << "ERROR - GLSLShader::create() - unable to create program object." << CGoGNendl;
 		return false;
 	}
 
 	/*** attach shaders to program object ***/
-	glAttachObjectARB( m_program_object, m_vertex_shader_object );
-	glAttachObjectARB( m_program_object, m_fragment_shader_object );
-	if (m_geom_shader_object)
+	glAttachObjectARB( *m_program_object, *m_vertex_shader_object );
+	glAttachObjectARB( *m_program_object, *m_fragment_shader_object );
+	if (*m_geom_shader_object)
 	{
-		glAttachObjectARB( m_program_object, m_geom_shader_object );
+		glAttachObjectARB( *m_program_object, *m_geom_shader_object );
 
-		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_INPUT_TYPE_EXT,inputGeometryPrimitive);
-		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_OUTPUT_TYPE_EXT,outputGeometryPrimitive);
-		glProgramParameteriEXT(m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,nb_max_vertices);
+		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_INPUT_TYPE_EXT,inputGeometryPrimitive);
+		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_OUTPUT_TYPE_EXT,outputGeometryPrimitive);
+		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,nb_max_vertices);
 	}
 
 	/*** link program object ***/
-	glLinkProgramARB( m_program_object );
+	glLinkProgramARB( *m_program_object );
 
-	glGetObjectParameterivARB( m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
+	glGetObjectParameterivARB( *m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << CGoGNendl;
-		info_log = getInfoLog( m_program_object );
+		info_log = getInfoLog( *m_program_object );
 		CGoGNerr << "  LINK " << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDetachObjectARB( m_program_object, m_vertex_shader_object );
-		glDetachObjectARB( m_program_object, m_fragment_shader_object );
-		if (m_geom_shader_object)
-			glDetachObjectARB( m_program_object, m_geom_shader_object );
-		glDeleteObjectARB( m_program_object );
-		m_program_object = 0;
+		glDetachObjectARB( *m_program_object, *m_vertex_shader_object );
+		glDetachObjectARB( *m_program_object, *m_fragment_shader_object );
+		if (*m_geom_shader_object)
+			glDetachObjectARB( *m_program_object, *m_geom_shader_object );
+		glDeleteObjectARB( *m_program_object );
+		*m_program_object = 0;
 
 		return false;
 	}
 
-	m_uniMat_Proj		= glGetUniformLocation(m_program_object, "ProjectionMatrix");
-	m_uniMat_Model		= glGetUniformLocation(m_program_object, "ModelViewMatrix");
-	m_uniMat_ModelProj	= glGetUniformLocation(m_program_object, "ModelViewProjectionMatrix");
-	m_uniMat_Normal		= glGetUniformLocation(m_program_object, "NormalMatrix");
+	*m_uniMat_Proj		= glGetUniformLocation(*m_program_object, "ProjectionMatrix");
+	*m_uniMat_Model		= glGetUniformLocation(*m_program_object, "ModelViewMatrix");
+	*m_uniMat_ModelProj	= glGetUniformLocation(*m_program_object, "ModelViewProjectionMatrix");
+	*m_uniMat_Normal	= glGetUniformLocation(*m_program_object, "NormalMatrix");
 
 	return true;
 }
@@ -516,22 +517,22 @@ bool GLSLShader::link()
 	char	*info_log;
 
 	/*** link program object ***/
-	glLinkProgramARB( m_program_object );
+	glLinkProgramARB( *m_program_object );
 
-	glGetObjectParameterivARB( m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
+	glGetObjectParameterivARB( *m_program_object, GL_OBJECT_LINK_STATUS_ARB, &status );
 	if( !status )
 	{
 		CGoGNerr << "ERROR - GLSLShader::create() - error occured while linking shader program." << CGoGNendl;
-		info_log = getInfoLog( m_program_object );
+		info_log = getInfoLog( *m_program_object );
 		CGoGNerr << "  LINK " << info_log << CGoGNendl;
 		delete [] info_log;
 
-		glDetachObjectARB( m_program_object, m_vertex_shader_object );
-		glDetachObjectARB( m_program_object, m_fragment_shader_object );
-		if (m_geom_shader_object)
-			glDetachObjectARB( m_program_object, m_geom_shader_object );
-		glDeleteObjectARB( m_program_object );
-		m_program_object = 0;
+		glDetachObjectARB( *m_program_object, *m_vertex_shader_object );
+		glDetachObjectARB( *m_program_object, *m_fragment_shader_object );
+		if (*m_geom_shader_object)
+			glDetachObjectARB( *m_program_object, *m_geom_shader_object );
+		glDeleteObjectARB( *m_program_object );
+		*m_program_object = 0;
 
 		return false;
 	}
@@ -541,9 +542,9 @@ bool GLSLShader::link()
 
 bool GLSLShader::bind() const
 {
-	if( m_program_object )
+	if( *m_program_object )
 	{
-		glUseProgramObjectARB( m_program_object );
+		glUseProgramObjectARB( *m_program_object );
 		return true;
 	}
 	else
@@ -552,7 +553,7 @@ bool GLSLShader::bind() const
 
 void GLSLShader::unbind() const
 {
-	if( m_program_object )
+	if( *m_program_object )
 	{
 		glUseProgramObjectARB( 0 );
 	}
@@ -560,32 +561,32 @@ void GLSLShader::unbind() const
 
 bool GLSLShader::isBinded()
 {
-	return ( m_program_object && m_program_object == glGetHandleARB(GL_PROGRAM_OBJECT_ARB) );
+	return ( *m_program_object && *m_program_object == glGetHandleARB(GL_PROGRAM_OBJECT_ARB) );
 }
 
 GLSLShader::~GLSLShader()
 {
-	if( m_program_object )
+	if( *m_program_object )
 	{
 		unbind();
 
-		if( m_vertex_shader_object )
+		if( *m_vertex_shader_object )
 		{
-			glDetachObjectARB( m_program_object, m_vertex_shader_object );
-			glDeleteObjectARB( m_vertex_shader_object );
+			glDetachObjectARB( *m_program_object, *m_vertex_shader_object );
+			glDeleteObjectARB( *m_vertex_shader_object );
 		}
-		if( m_fragment_shader_object )
+		if( *m_fragment_shader_object )
 		{
-			glDetachObjectARB( m_program_object, m_fragment_shader_object );
-			glDeleteObjectARB( m_fragment_shader_object );
+			glDetachObjectARB( *m_program_object, *m_fragment_shader_object );
+			glDeleteObjectARB( *m_fragment_shader_object );
 		}
-		if (m_geom_shader_object)
+		if (*m_geom_shader_object)
 		{
-			glDetachObjectARB( m_program_object, m_geom_shader_object );
-			glDeleteObjectARB( m_geom_shader_object );
+			glDetachObjectARB( *m_program_object, *m_geom_shader_object );
+			glDeleteObjectARB( *m_geom_shader_object );
 		}
 
-		glDeleteObjectARB( m_program_object );
+		glDeleteObjectARB( *m_program_object );
 	}
 
 	if (m_vertex_shader_source != NULL)
@@ -641,6 +642,7 @@ std::string GLSLShader::findFile(const std::string filename)
 
 bool GLSLShader::init()
 {
+#ifndef GLEW_MX
 	GLenum error = glewInit();
 
 	if (error != GLEW_OK)
@@ -655,7 +657,9 @@ bool GLSLShader::init()
 		CGoGNout << "Shaders not supported !" << CGoGNendl;
 		return false;
 	}
-	return true; 
+#endif
+	return true;
+
 }
 
 bool GLSLShader::loadShaders(const std::string& vs, const std::string& ps)
@@ -832,10 +836,10 @@ bool GLSLShader::recompile()
 		return false;
 	}
 
-	m_uniMat_Proj		= glGetUniformLocation(m_program_object,"ProjectionMatrix");
-	m_uniMat_Model		= glGetUniformLocation(m_program_object,"ModelViewMatrix");
-	m_uniMat_ModelProj	= glGetUniformLocation(m_program_object,"ModelViewProjectionMatrix");
-	m_uniMat_Normal		= glGetUniformLocation(m_program_object,"NormalMatrix");
+	*m_uniMat_Proj		= glGetUniformLocation(*m_program_object,"ProjectionMatrix");
+	*m_uniMat_Model		= glGetUniformLocation(*m_program_object,"ModelViewMatrix");
+	*m_uniMat_ModelProj	= glGetUniformLocation(*m_program_object,"ModelViewProjectionMatrix");
+	*m_uniMat_Normal		= glGetUniformLocation(*m_program_object,"NormalMatrix");
 
 	restoreUniformsAttribs();
 
@@ -846,20 +850,20 @@ bool GLSLShader::recompile()
 
 bool GLSLShader::validateProgram()
 {
-	if(!m_program_object)
+	if(!*m_program_object)
 		return false;
 
-	glValidateProgram(m_program_object);
+	glValidateProgram(*m_program_object);
 	GLint Result = GL_FALSE;
-	glGetProgramiv(m_program_object, GL_VALIDATE_STATUS, &Result);
+	glGetProgramiv(*m_program_object, GL_VALIDATE_STATUS, &Result);
 
 	if(Result == GL_FALSE)
 	{
 		CGoGNout << "Validate program:" << CGoGNendl;
 		int InfoLogLength;
-		glGetProgramiv(m_program_object, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		glGetProgramiv(*m_program_object, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		std::vector<char> Buffer(InfoLogLength);
-		glGetProgramInfoLog(m_program_object, InfoLogLength, NULL, &Buffer[0]);
+		glGetProgramInfoLog(*m_program_object, InfoLogLength, NULL, &Buffer[0]);
 		CGoGNout <<  &(Buffer[0]) << CGoGNendl;
 		return false;
 	}
@@ -870,12 +874,12 @@ bool GLSLShader::validateProgram()
 bool GLSLShader::checkProgram()
 {
 	GLint Result = GL_FALSE;
-	glGetProgramiv(m_program_object, GL_LINK_STATUS, &Result);
+	glGetProgramiv(*m_program_object, GL_LINK_STATUS, &Result);
 
 	int InfoLogLength;
-	glGetProgramiv(m_program_object, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	glGetProgramiv(*m_program_object, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	std::vector<char> Buffer(std::max(InfoLogLength, int(1)));
-	glGetProgramInfoLog(m_program_object, InfoLogLength, NULL, &Buffer[0]);
+	glGetProgramInfoLog(*m_program_object, InfoLogLength, NULL, &Buffer[0]);
 	CGoGNout << &Buffer[0] << CGoGNendl;
 
 	return Result == GL_TRUE;
@@ -890,13 +894,13 @@ bool GLSLShader::checkShader(int shaderType)
 	switch(shaderType)
 	{
 	case VERTEX_SHADER:
-		id = m_vertex_shader_object;
+		id = *m_vertex_shader_object;
 		break;
 	case FRAGMENT_SHADER:
-		id = m_fragment_shader_object;
+		id = *m_fragment_shader_object;
 		break;
 	case GEOMETRY_SHADER:
-		id = m_geom_shader_object;
+		id = *m_geom_shader_object;
 		break;
 	default:
 		CGoGNerr << "Error unkown shader type" << CGoGNendl;
@@ -915,7 +919,7 @@ bool GLSLShader::checkShader(int shaderType)
 
 void GLSLShader::bindAttrib(unsigned int att, const char* name) const
 {
-	glBindAttribLocation(m_program_object, att, name);
+	glBindAttribLocation(*m_program_object, att, name);
 }
 
 void GLSLShader::addPathFileSeach(const std::string& path)
@@ -925,7 +929,7 @@ void GLSLShader::addPathFileSeach(const std::string& path)
 
 unsigned int GLSLShader::bindVA_VBO(const std::string& name, VBO* vbo)
 {
-	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
+	GLint idVA = glGetAttribLocation(*(this->m_program_object), name.c_str());
 	//valid ?
 	if (idVA < 0)
 	{
@@ -956,7 +960,7 @@ void GLSLShader::changeVA_VBO(unsigned int id, VBO* vbo)
 
 void GLSLShader::unbindVA(const std::string& name)
 {
-	GLint idVA = glGetAttribLocation(this->m_program_object, name.c_str());
+	GLint idVA = glGetAttribLocation(*(this->m_program_object), name.c_str());
 	//valid ?
 	if (idVA < 0)
 	{
@@ -998,18 +1002,49 @@ void GLSLShader::setCurrentOGLVersion(unsigned int version)
 void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview)
 {
 	this->bind();
-	glm::mat4 PMV = projection * modelview;
-	glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
 
-	if (m_uniMat_Proj >= 0)
-		glUniformMatrix4fv(m_uniMat_Proj,		1 , false, &projection[0][0]);
-	if (m_uniMat_Model >= 0)
-		glUniformMatrix4fv(m_uniMat_Model,		1 , false, &modelview[0][0]);
-	if (m_uniMat_ModelProj >= 0)
-		glUniformMatrix4fv(m_uniMat_ModelProj,	1 , false, &PMV[0][0]);
-	if (m_uniMat_Normal >= 0)
-		glUniformMatrix4fv(m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
+	if (*m_uniMat_Proj >= 0)
+		glUniformMatrix4fv(*m_uniMat_Proj, 1, false, &projection[0][0]);
+
+	if (*m_uniMat_Model >= 0)
+		glUniformMatrix4fv(*m_uniMat_Model,	1, false, &modelview[0][0]);
+
+	if (*m_uniMat_ModelProj >= 0)
+	{
+		glm::mat4 PMV = projection * modelview;
+		glUniformMatrix4fv(*m_uniMat_ModelProj,	1 , false, &PMV[0][0]);
+	}
+
+	if (*m_uniMat_Normal >= 0)
+	{
+		glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
+		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
+	}
 }
+
+void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview, const glm::mat4& PMV, const glm::mat4& normalMatrix)
+{
+	this->bind();
+
+	if (*m_uniMat_Proj >= 0)
+		glUniformMatrix4fv(*m_uniMat_Proj, 1, false, &projection[0][0]);
+
+	if (*m_uniMat_Model >= 0)
+		glUniformMatrix4fv(*m_uniMat_Model,	1, false, &modelview[0][0]);
+
+	if (*m_uniMat_ModelProj >= 0)
+	{
+		glUniformMatrix4fv(*m_uniMat_ModelProj,	1 , false, &PMV[0][0]);
+	}
+
+	if (*m_uniMat_Normal >= 0)
+	{
+		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
+	}
+}
+
+
+
 
 void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) const
 {
@@ -1030,14 +1065,46 @@ void GLSLShader::disableVertexAttribs() const
 	this->unbind();
 }
 
+
 void GLSLShader::updateCurrentMatrices()
 {
 	glm::mat4 model(currentModelView());
 	model *= currentTransfo();
 
+	currentPMV() = currentProjection() * model;
+	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
+
 	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
-		it->second->updateMatrices(currentProjection(), model);
+		it->second->updateMatrices(currentProjection(), model, currentPMV(), currentNormalMatrix());
 }
+
+void GLSLShader::updateAllFromGLMatrices()
+{
+	GLdouble modelview[16];
+	GLdouble projection[16];
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+	glGetDoublev( GL_PROJECTION_MATRIX, projection );
+
+	glm::mat4& model = currentModelView();
+	glm::mat4& proj = currentProjection();
+
+	for (unsigned int i=0; i< 4; ++i)
+	{
+		for (unsigned int j=0; j<4; ++j)
+		{
+			proj[i][j] = float(projection[4*i+j]);
+			model[i][j] = float(modelview[4*i+j]);
+		}
+	}
+	model *= currentTransfo();
+
+	currentPMV() = proj * model;
+	currentNormalMatrix() = glm::gtx::inverse_transpose::inverseTranspose(model);
+
+	for(std::set< std::pair<void*, GLSLShader*> >::iterator it = m_registeredShaders.begin(); it != m_registeredShaders.end(); ++it)
+		it->second->updateMatrices(proj, model, currentPMV(), currentNormalMatrix());
+}
+
 
 } // namespace Utils
 

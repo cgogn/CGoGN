@@ -329,10 +329,22 @@ public:
 	 */
 	Image<DataType>* Blur3();
 
-
+	/**
+	 * create a virtual sphere for computing curvature
+	 * @param table the vector a ptr offset of voxels of sphere
+	 * @param _i32radius radius of sphere
+	 */
 	void createMaskOffsetSphere(std::vector<int>& table, int _i32radius);
 
-	float computeCurvatureCount(const DataType *ptrVox, const std::vector<int>& sphere, DataType val);
+	/**
+	 * compute the curvature with method that count voxels in a virtual sphere
+	 * @param x position in x
+	 * @param y position in y
+	 * @param z position in z
+	 * @param sphere the precomputed sphere
+	 * @param outsideVal value of outside object
+	 */
+	float computeCurvatureCount(float x, float y, float z, const std::vector<int>& sphere, DataType outsideVal);
 
 	float computeCurvatureCount3(const DataType *ptrVox, const std::vector<int>& cylX, const std::vector<int>& cylY, const std::vector<int>& cyl2, DataType val);
 
