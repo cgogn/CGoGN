@@ -135,6 +135,12 @@ public:
 	void predraw(const Geom::Vec3f& color);
 
 	/**
+	* call just before a draw
+	* @param color the color of text
+	*/
+	void changeColor(const Geom::Vec3f& color);
+
+	/**
 	* call once after several draw(id,pos)
 	*/
 	void postdraw();
@@ -149,6 +155,14 @@ public:
 	* set the plane of rendering for VR rendering
 	*/
 	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
+
+	/**
+	 * Update string content
+	 * @warning size can not be changed
+	 * @param idSt string id
+	 * @param str new string content
+	 */
+	void updateString(unsigned int idSt, const std::string& str);
 
 
 	void toSVG(Utils::SVG::SVGOut& svg);

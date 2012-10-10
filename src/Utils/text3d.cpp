@@ -236,6 +236,12 @@ void Strings3D::predraw(const Geom::Vec3f& color)
 	enableVertexAttribs();
 }
 
+void Strings3D::changeColor(const Geom::Vec3f& color)
+{
+	bind();
+	glUniform3fv(*m_uniform_color, 1, color.data());
+}
+
 void Strings3D::postdraw()
 {
 	disableVertexAttribs();
@@ -265,6 +271,56 @@ void Strings3D::drawAll(const Geom::Vec3f& color)
 	}
 	postdraw();
 }
+
+void Strings3D::updateString(unsigned int idSt, const std::string& str)
+{
+	unsigned int firstIndex = m_strpos[idSt].first;
+	unsigned int nbIndices = m_strpos[idSt].second;
+
+	unsigned int nbc = std::min((unsigned int)(str.length()), nbIndices/4);
+
+
+	m_vbo1->bind();
+	float* buffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+
+	buffer += firstIndex*4;
+	float x = 0.0f;
+	for(unsigned int j = 0; j < nbc; ++j)
+	{
+		unsigned int ci = str[j]-32;
+		float u  = float(ci % CHARSPERLINE) / float(CHARSPERLINE);
+		float v  = float(ci / CHARSPERLINE) / float(CHARSPERCOL) + 1.0f / HEIGHTTEXTURE;
+		float u2 = u + float(REALWIDTHFONT) / float(WIDTHTEXTURE);
+		float v2 = v + float(WIDTHFONT - 1) / float(HEIGHTTEXTURE);
+
+		*buffer++ = x;
+		*buffer++ = 0;
+		*buffer++ = u;
+		*buffer++ = v2;
+
+		float xf = x + float(REALWIDTHFONT) / 25.f;
+
+		*buffer++ = xf;
+		*buffer++ = 0;
+		*buffer++ = u2;
+		*buffer++ = v2;
+
+		*buffer++ = xf;
+		*buffer++ = float(WIDTHFONT) / 25.f;
+		*buffer++ = u2;
+		*buffer++ = v;
+
+		*buffer++ = x;
+		*buffer++ = float(WIDTHFONT) / 25.f;
+		*buffer++ = u;
+		*buffer++ = v;
+
+		x = xf; // + space ?
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+
 
 void Strings3D::toSVG(Utils::SVG::SVGOut& svg)
 {
