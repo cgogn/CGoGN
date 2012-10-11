@@ -141,7 +141,7 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 		else
 			m_dmark->unmarkAll();
 	}
-	m_first=false;
+	m_first = false;
 
 	m_current = m_tradoo.begin() ;
 	// for the case of beginning with a given MarkerForTraversor
@@ -158,6 +158,13 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::begin()
 				m_current = m_tradoo.next();
 		}
 	}
+
+	if(ORBY == VOLUME)
+	{
+		if(m_map.isBoundaryMarked(m_current))
+			m_current = next();
+	}
+
 	return m_current;
 }
 
@@ -176,6 +183,11 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 		{
 			m_cmark->mark(m_current);
 			m_current = m_tradoo.next();
+			if(ORBY == VOLUME)
+			{
+				if(m_map.isBoundaryMarked(m_current))
+					m_cmark->mark(m_current);
+			}
 			while ((m_current != NIL) && m_cmark->isMarked(m_current))
 				m_current = m_tradoo.next();
 		}
@@ -192,6 +204,22 @@ Dart Traversor3XY<MAP, ORBX, ORBY>::next()
 			else
 				m_dmark->markOrbit<ORBY>(m_current);
 			m_current = m_tradoo.next();
+			if(ORBY == VOLUME)
+			{
+				if(m_map.isBoundaryMarked(m_current))
+				{
+					if (ORBX == VOLUME)
+					{
+						// if allocated we are in a local traversal of volume so we can mark only darts of volume
+						if (m_allocated)
+							m_dmark->markOrbit<ORBY + MAP::IN_PARENT>(m_current);
+						else
+							m_dmark->markOrbit<ORBY>(m_current); // here we need to mark all the darts
+					}
+					else
+						m_dmark->markOrbit<ORBY>(m_current);
+				}
+			}
 			while ((m_current != NIL) && m_dmark->isMarked(m_current))
 				m_current = m_tradoo.next();
 		}
