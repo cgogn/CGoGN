@@ -256,14 +256,18 @@ void Strings3D::draw(unsigned int idSt, const Geom::Vec3f& pos)
 
 void Strings3D::drawAll(const Geom::Vec3f& color)
 {
+	unsigned int nb = m_strpos.size();
+	//  nothing to do if no string !
+	if (nb == 0)
+		return;
+
 	predraw(color);
 	if (m_strpos.size() != m_strTranslate.size())
 	{
 		CGoGNerr << "Strings3D: for drawAll use exclusively addString with position"<< CGoGNendl;
 		return;
 	}
-
-	unsigned int nb = m_strpos.size();
+		
 	for (unsigned int idSt=0; idSt<nb; ++idSt)
 	{
 		glUniform3fv(*m_uniform_position, 1, m_strTranslate[idSt].data());
