@@ -25,11 +25,11 @@
 #ifndef __TRAVERSOR3_H__
 #define __TRAVERSOR3_H__
 
+#include "Topology/generic/dart.h"
+#include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversorGen.h"
 #include "Topology/generic/traversorDoO.h"
-#include "Topology/generic/dart.h"
-#include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
 {

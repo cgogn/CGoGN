@@ -23,9 +23,7 @@
 *******************************************************************************/
 
 #ifndef __TRAVERSORFACTORY_H__
-#define __TRAVERSORGEN_H__
-
-#include "Topology/generic/traversorGen.h"
+#define __TRAVERSORFACTORY_H__
 
 namespace CGoGN
 {

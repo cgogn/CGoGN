@@ -40,7 +40,7 @@ inline std::string GMap2::mapTypeName() const
 	return "GMap2";
 }
 
-inline unsigned int GMap2::dimension()
+inline unsigned int GMap2::dimension() const
 {
 	return 2;
 }

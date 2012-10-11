@@ -54,7 +54,7 @@ public:
 
 	virtual std::string mapTypeName() const;
 
-	virtual unsigned int dimension();
+	virtual unsigned int dimension() const;
 
 	virtual void clear(bool removeAttrib);
 
