@@ -612,11 +612,11 @@ unsigned int GenericMap::getNbOrbits(const FunctorSelect& good)
 	return fcount.getNb();
 }
 
-template <unsigned int ORBIT, unsigned int INCIDENT>
+template <typename MAP, unsigned int ORBIT, unsigned int INCIDENT>
 unsigned int GenericMap::degree(Dart d)
 {
 	assert(ORBIT != INCIDENT || !"degree does not manage adjacency counting");
-	Traversor<GenericMap>* t = TraversorFactory<GenericMap>::createIncident(*this, d, dimension(), ORBIT, INCIDENT) ;
+	Traversor<MAP>* t = TraversorFactory<MAP>::createIncident(*this, d, dimension(), ORBIT, INCIDENT) ;
 	FunctorCount fcount ;
 	t->applyFunctor(fcount) ;
 	return fcount.getNb() ;

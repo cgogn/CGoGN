@@ -685,7 +685,7 @@ public:
 	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
 	/*! @param d a dart
 	 */
-	template <unsigned int ORBIT, unsigned int INCIDENT>
+	template <typename MAP, unsigned int ORBIT, unsigned int INCIDENT>
 	unsigned int degree(Dart d);
 
 protected:
