@@ -63,7 +63,7 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 	}
 	else
 	{
-		*m_idTexture = *(this->m_idTexture);
+		*m_idTexture = *(m_instance0->m_idTexture);
 	}
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);
