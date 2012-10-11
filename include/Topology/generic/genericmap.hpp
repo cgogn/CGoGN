@@ -619,6 +619,7 @@ unsigned int GenericMap::degree(Dart d)
 	Traversor<MAP>* t = TraversorFactory<MAP>::createIncident(*(reinterpret_cast<MAP*>(this)), d, dimension(), ORBIT, INCIDENT) ;
 	FunctorCount fcount ;
 	t->applyFunctor(fcount) ;
+	delete t ;
 	return fcount.getNb() ;
 }
 
