@@ -35,7 +35,6 @@
 #include <map>
 #include <boost/thread/mutex.hpp>
 
-
 #include "Container/attributeContainer.h"
 
 #include "Topology/generic/dart.h"
@@ -89,7 +88,7 @@ protected:
 
 	/**
 	 * Direct access to the Dart attributes that store the orbits embeddings
-	 * (only initialized when necessary)
+	 * (only initialized when necessary, i.e. addEmbedding function)
 	 */
 	AttributeMultiVector<unsigned int>* m_embeddings[NB_ORBITS] ;
 
@@ -114,13 +113,11 @@ protected:
 	/**
 	 * Store links to created AttributeHandlers, DartMarkers and CellMarkers
 	 */
-	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!
+	std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*> attributeHandlers ; // TODO think of MT (AttributeHandler creation & release are not thread safe!)
 	boost::mutex attributeHandlersMutex;
 
 	std::vector<DartMarkerGen*> dartMarkers[NB_THREAD] ;
 	std::vector<CellMarkerGen*> cellMarkers[NB_THREAD] ;
-
-
 
 	/**
 	 * is map a multiresolution map
@@ -169,6 +166,8 @@ public:
 	~GenericMap() ;
 
 	virtual std::string mapTypeName() const = 0 ;
+
+	virtual unsigned int dimension() const = 0 ;
 
 	/**
 	 * Clear the map
@@ -236,7 +235,6 @@ public:
 //	 */
 //	AttributeMultiVector<unsigned int>* addLevel();
 
-public:
 	/**
 	 * add a resolution level in the back of the level table (use only in MRMaps)
 	 */
@@ -313,7 +311,6 @@ public:
 	 *
 	 */
 	void incDartLevel(Dart d) const ;
-
 
 	/**
 	 * get the number of darts inserted in the given leveldart (use only in MRMaps)
@@ -684,6 +681,12 @@ public:
 	 */
 	template <unsigned int ORBIT>
 	unsigned int getNbOrbits(const FunctorSelect& good = allDarts) ;
+
+	//! For an orbit of a given dimension, return the number of incident cells of an other given dimension
+	/*! @param d a dart
+	 */
+	template <unsigned int ORBIT, unsigned int INCIDENT>
+	unsigned int degree(Dart d);
 
 protected:
 	/// boundary marker
