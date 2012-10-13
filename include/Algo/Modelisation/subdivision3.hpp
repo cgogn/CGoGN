@@ -640,8 +640,12 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	TraversorW<typename PFP::MAP> tW(map,selected);
 	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
 	{
-		if(!map.isBoundaryFace(dit))
-			m.markOrbit<VOLUME>(dit);
+		Traversor3WF<typename PFP::MAP> tWF(map, dit);
+		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
+		{
+			if(!map.isBoundaryFace(ditWF))
+				m.markOrbit<FACE>(ditWF);
+		}
 
 		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit, position);
 	}
@@ -667,6 +671,13 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	{
 		if(map.isBoundaryVolume(dit))
 		{
+			Traversor3WE<typename PFP::MAP> tWE(map, dit);
+			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
+			{
+				if(map.isBoundaryEdge(ditWE))
+					m.markOrbit<EDGE>(ditWE);
+			}
+
 			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit, position);
 		}
 	}
@@ -674,6 +685,19 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	//
 	// edge-removal on all old boundary edges
 	//
+	TraversorE<typename PFP::MAP> tE(map,selected);
+	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<EDGE>(dit);
+
+			//std::cout << " nb F of E : " << map.template degree<typename PFP::MAP,EDGE,FACE>(dit) << std::endl;
+			Dart d = map.phi2(map.phi3(map.findBoundaryFaceOfEdge(dit)));
+			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
+
+		}
+	}
 }
 
 

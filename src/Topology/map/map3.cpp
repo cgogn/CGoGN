@@ -940,7 +940,8 @@ unsigned int Map3::edgeDegree(Dart d)
 	Dart it = d;
 	do
 	{
-		++deg;
+		if(!isBoundaryMarked(it))
+			++deg;
 		it = alpha2(it);
 	} while(it != d);
 	return deg;

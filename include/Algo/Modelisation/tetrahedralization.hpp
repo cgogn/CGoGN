@@ -38,157 +38,157 @@ namespace Modelisation
 namespace Tetrahedralization
 {
 
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
-{
-	Dart d1 = d;
-	Dart d2 = map.phi1(map.phi1(d));
-	Dart d3 = map.phi_1(map.phi2(d));
-	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
-
-	cut3Ear<PFP>(map,d1);
-	cut3Ear<PFP>(map,d2);
-	cut3Ear<PFP>(map,d3);
-	cut3Ear<PFP>(map,d4);
-}
-
-template <typename PFP>
-void hexahedronsToTetrahedrons(typename PFP::MAP& map)
-{
-    TraversorV<typename PFP::MAP> tv(map);
-
-    //for each vertex
-    for(Dart d = tv.begin() ; d != tv.end() ; d = tv.next())
-    {
-        bool vertToTet=true;
-        std::vector<Dart> dov;
-        dov.reserve(32);
-        FunctorStore fs(dov);
-        map.foreach_dart_of_vertex(d,fs);
-        CellMarkerStore<VOLUME> cmv(map);
-
-        //check if all vertices degree is equal to 3 (= no direct adjacent vertex has been split)
-        for(std::vector<Dart>::iterator it=dov.begin();vertToTet && it!=dov.end();++it)
-        {
-            if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
-            {
-                cmv.mark(*it);
-                vertToTet = (map.phi1(map.phi2(map.phi1(map.phi2(map.phi1(map.phi2(*it))))))==*it); //degree = 3
-            }
-        }
-
-        //if ok : create tetrahedrons around the vertex
-        if(vertToTet)
-        {
-            for(std::vector<Dart>::iterator it=dov.begin();it!=dov.end();++it)
-            {
-                if(cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
-                {
-                    cmv.unmark(*it);
-                    cut3Ear<PFP>(map,*it);
-                }
-            }
-        }
-    }
-}
-
-template <typename PFP>
-void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
-{
-	//mark bad edges
-	DartMarkerStore mBadEdge(map);
-
-	std::vector<Dart> vEdge;
-	vEdge.reserve(1024);
-
-//	unsignzed int i = 0;
-
-	unsigned int nbEdges = map.template getNbOrbits<EDGE>();
-	unsigned int i = 0;
-
-	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
-	{
-		//check if this edge is an "ear-edge"
-		if(!mBadEdge.isMarked(dit))
-		{
-			++i;
-			std::cout << i << " / " << nbEdges << std::endl;
-
-			//search three positions
-			typename PFP::VEC3 tris1[3];
-			tris1[0] = position[dit];
-			tris1[1] = position[map.phi_1(dit)];
-			tris1[2] = position[map.phi_1(map.phi2(dit))];
-
-			//search if the triangle formed by these three points intersect the rest of the mesh (intersection triangle/triangle)
-			TraversorF<typename PFP::MAP> travF(map);
-			for(Dart ditF = travF.begin() ; ditF != travF.end() ; ditF = travF.next())
-			{
-				//get vertices position
-				typename PFP::VEC3 tris2[3];
-				tris2[0] = position[ditF];
-				tris2[1] = position[map.phi1(ditF)];
-				tris2[2] = position[map.phi_1(ditF)];
-
-				bool intersection = false;
-
-				for (unsigned int i = 0; i < 3 && !intersection; ++i)
-				{
-					typename PFP::VEC3 inter;
-					intersection = Geom::intersectionSegmentTriangle(tris1[i], tris1[(i+1)%3], tris2[0], tris2[1], tris2[2], inter);
-				}
-
-				if(!intersection)
-				{
-					for (unsigned int i = 0; i < 3 && !intersection; ++i)
-					{
-						typename PFP::VEC3 inter;
-						intersection = Geom::intersectionSegmentTriangle(tris2[i], tris2[(i+1)%3], tris1[0], tris1[1], tris1[2], inter);
-					}
-				}
-
-				//std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
-
-				if(intersection)
-				{
-					mBadEdge.markOrbit<EDGE>(dit);
-				}
-				else //cut a tetrahedron
-				{
-					vEdge.push_back(dit);
-				}
-
-
+//template <typename PFP>
+//void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d)
+//{
+//	Dart d1 = d;
+//	Dart d2 = map.phi1(map.phi1(d));
+//	Dart d3 = map.phi_1(map.phi2(d));
+//	Dart d4 = map.phi1(map.phi1(map.phi2(map.phi_1(d3))));
 //
-//				if(i == 16)
-//					return;
-			}
-		}
-	}
-
-	std::cout << "nb edges to split = " << vEdge.size() << std::endl;
-	i = 0;
-	for(std::vector<Dart>::iterator it = vEdge.begin() ; it != vEdge.end() ; ++it)
-	{
-		++i;
-		std::cout << i << " / " << vEdge.size() << std::endl;
-
-		Dart dit = *it;
-
-		//std::cout << "cut cut " << std::endl;
-		std::vector<Dart> vPath;
-
-		vPath.push_back(map.phi1(dit));
-		vPath.push_back(map.phi1(map.phi2(map.phi_1(dit))));
-		vPath.push_back(map.phi_1(map.phi2(dit)));
-
-		map.splitVolume(vPath);
-
-		map.splitFace(map.phi2(map.phi1(dit)), map.phi2(map.phi1(map.phi2(dit))));
-	}
-
-	std::cout << "finished " << std::endl;
-}
+//	Algo::Modelisation::cut3Ear<PFP>(map,d1);
+//	Algo::Modelisation::cut3Ear<PFP>(map,d2);
+//	Algo::Modelisation::cut3Ear<PFP>(map,d3);
+//	Algo::Modelisation::cut3Ear<PFP>(map,d4);
+//}
+//
+//template <typename PFP>
+//void hexahedronsToTetrahedrons(typename PFP::MAP& map)
+//{
+//    TraversorV<typename PFP::MAP> tv(map);
+//
+//    //for each vertex
+//    for(Dart d = tv.begin() ; d != tv.end() ; d = tv.next())
+//    {
+//        bool vertToTet=true;
+//        std::vector<Dart> dov;
+//        dov.reserve(32);
+//        FunctorStore fs(dov);
+//        map.foreach_dart_of_vertex(d,fs);
+//        CellMarkerStore<VOLUME> cmv(map);
+//
+//        //check if all vertices degree is equal to 3 (= no direct adjacent vertex has been split)
+//        for(std::vector<Dart>::iterator it=dov.begin();vertToTet && it!=dov.end();++it)
+//        {
+//            if(!cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
+//            {
+//                cmv.mark(*it);
+//                vertToTet = (map.phi1(map.phi2(map.phi1(map.phi2(map.phi1(map.phi2(*it))))))==*it); //degree = 3
+//            }
+//        }
+//
+//        //if ok : create tetrahedrons around the vertex
+//        if(vertToTet)
+//        {
+//            for(std::vector<Dart>::iterator it=dov.begin();it!=dov.end();++it)
+//            {
+//                if(cmv.isMarked(*it) && !map.isBoundaryMarked(*it))
+//                {
+//                    cmv.unmark(*it);
+//                    cut3Ear<PFP>(map,*it);
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//template <typename PFP>
+//void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+//{
+//	//mark bad edges
+//	DartMarkerStore mBadEdge(map);
+//
+//	std::vector<Dart> vEdge;
+//	vEdge.reserve(1024);
+//
+////	unsignzed int i = 0;
+//
+//	unsigned int nbEdges = map.template getNbOrbits<EDGE>();
+//	unsigned int i = 0;
+//
+//	for(Dart dit = map.begin() ; dit != map.end() ; map.next(dit))
+//	{
+//		//check if this edge is an "ear-edge"
+//		if(!mBadEdge.isMarked(dit))
+//		{
+//			++i;
+//			std::cout << i << " / " << nbEdges << std::endl;
+//
+//			//search three positions
+//			typename PFP::VEC3 tris1[3];
+//			tris1[0] = position[dit];
+//			tris1[1] = position[map.phi_1(dit)];
+//			tris1[2] = position[map.phi_1(map.phi2(dit))];
+//
+//			//search if the triangle formed by these three points intersect the rest of the mesh (intersection triangle/triangle)
+//			TraversorF<typename PFP::MAP> travF(map);
+//			for(Dart ditF = travF.begin() ; ditF != travF.end() ; ditF = travF.next())
+//			{
+//				//get vertices position
+//				typename PFP::VEC3 tris2[3];
+//				tris2[0] = position[ditF];
+//				tris2[1] = position[map.phi1(ditF)];
+//				tris2[2] = position[map.phi_1(ditF)];
+//
+//				bool intersection = false;
+//
+//				for (unsigned int i = 0; i < 3 && !intersection; ++i)
+//				{
+//					typename PFP::VEC3 inter;
+//					intersection = Geom::intersectionSegmentTriangle(tris1[i], tris1[(i+1)%3], tris2[0], tris2[1], tris2[2], inter);
+//				}
+//
+//				if(!intersection)
+//				{
+//					for (unsigned int i = 0; i < 3 && !intersection; ++i)
+//					{
+//						typename PFP::VEC3 inter;
+//						intersection = Geom::intersectionSegmentTriangle(tris2[i], tris2[(i+1)%3], tris1[0], tris1[1], tris1[2], inter);
+//					}
+//				}
+//
+//				//std::cout << "intersection ? " << (intersection ? "true" : "false") << std::endl;
+//
+//				if(intersection)
+//				{
+//					mBadEdge.markOrbit<EDGE>(dit);
+//				}
+//				else //cut a tetrahedron
+//				{
+//					vEdge.push_back(dit);
+//				}
+//
+//
+////
+////				if(i == 16)
+////					return;
+//			}
+//		}
+//	}
+//
+//	std::cout << "nb edges to split = " << vEdge.size() << std::endl;
+//	i = 0;
+//	for(std::vector<Dart>::iterator it = vEdge.begin() ; it != vEdge.end() ; ++it)
+//	{
+//		++i;
+//		std::cout << i << " / " << vEdge.size() << std::endl;
+//
+//		Dart dit = *it;
+//
+//		//std::cout << "cut cut " << std::endl;
+//		std::vector<Dart> vPath;
+//
+//		vPath.push_back(map.phi1(dit));
+//		vPath.push_back(map.phi1(map.phi2(map.phi_1(dit))));
+//		vPath.push_back(map.phi_1(map.phi2(dit)));
+//
+//		map.splitVolume(vPath);
+//
+//		map.splitFace(map.phi2(map.phi1(dit)), map.phi2(map.phi1(map.phi2(dit))));
+//	}
+//
+//	std::cout << "finished " << std::endl;
+//}
 
 
 /************************************************************************************************
@@ -271,7 +271,6 @@ bool isTetrahedralization(typename PFP::MAP& map, const FunctorSelect& selected)
  * 										swap functions										   *
  ***********************************************************************************************/
 
-//ok
 template <typename PFP>
 Dart swap2To2(typename PFP::MAP& map, Dart d)
 {
@@ -282,21 +281,20 @@ Dart swap2To2(typename PFP::MAP& map, Dart d)
 	map.mergeFaces(map.phi1(d2_1));
 	map.splitFace(d2_1, map.phi1(map.phi1(d2_1)));
 
-	Dart stop = map.phi_1(d2_1);
-	Dart dit = stop;
-	do
-	{
-		edges.push_back(dit);
-		dit = map.phi1(map.phi2(map.phi1(dit)));
-	}
-	while(dit != stop);
+		Dart stop = map.phi_1(d2_1);
+		Dart dit = stop;
+		do
+		{
+			edges.push_back(dit);
+			dit = map.phi1(map.phi2(map.phi1(dit)));
+		}
+		while(dit != stop);
 
-	map.splitVolume(edges);
+		map.splitVolume(edges);
 
 	return map.phi2(stop);
 }
 
-//ok
 template <typename PFP>
 void swap4To4(typename PFP::MAP& map, Dart d)
 {
@@ -403,6 +401,54 @@ Dart swap5To4(typename PFP::MAP& map, Dart d)
 
 	return t1;
 }
+
+template <typename PFP>
+void swapGen3To2(typename PFP::MAP& map, Dart d)
+{
+	unsigned int n = map.edgeDegree(d);
+
+	if(n >= 4)
+	{
+		Dart dit = d;
+		if(map.isBoundaryEdge(dit))
+		{
+			for(unsigned int i = 0 ; i < n - 2 ; ++i)
+			{
+				dit = map.phi2(Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit));
+			}
+
+			Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, dit);
+		}
+		else
+		{
+			for(unsigned int i = 0 ; i < n - 4 ; ++i)
+			{
+				dit = map.phi2(Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit));
+			}
+			Algo::Modelisation::Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
+		}
+	}
+	else if (n == 3)
+	{
+		Dart dres = Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, d);
+		Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, map.phi2(dres));
+	}
+	else // si (n == 2)
+	{
+		Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, d);
+	}
+
+}
+
+template <typename PFP>
+void swapGen2To3(typename PFP::MAP& map, Dart d)
+{
+//- a single 2-3 swap, followed by n − 3 3-2 swaps, or
+//– a single 4-4 swap, followed by n − 4 3-2 swaps.
+}
+
+
+
 
 /************************************************************************************************
  *										Flip Functions 											*
@@ -528,23 +574,29 @@ Dart edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP:
 	position[e] += position[f];
 	position[e] *= 0.5;
 
-	map.splitFace(e, map.phi1(map.phi1(e)));
-
-	Dart stop = map.alpha2(e);
-	Dart dit = stop;
-	std::vector<Dart> edges;
+	Dart dit = e;
 	do
 	{
 		map.splitFace(dit, map.phi1(map.phi1(dit)));
-		edges.clear();
-		Dart dit3 = map.phi3(dit);
-		edges.push_back(map.phi1(dit3));
-		edges.push_back(map.phi1(map.phi2(map.phi1(edges[0]))));
-		edges.push_back(map.phi_1(map.phi2(dit3)));
-		map.splitVolume(edges);
-
 		dit = map.alpha2(dit);
-	}while(dit != stop);
+	}
+	while(dit != e);
+
+	dit = e;
+	std::vector<Dart> edges;
+	do
+	{
+		if(!map.isBoundaryMarked(dit))
+		{
+			edges.push_back(map.phi_1(dit));
+			edges.push_back(map.phi_1(map.phi2(map.phi_1(edges[0]))));
+			edges.push_back(map.phi1(map.phi2(dit)));
+			map.splitVolume(edges);
+			edges.clear();
+		}
+		dit = map.alpha2(dit);
+	}
+	while(dit != e);
 
 	return e;
 }

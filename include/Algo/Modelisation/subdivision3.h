@@ -28,6 +28,7 @@
 #include <math.h>
 #include <vector>
 #include "Geometry/plane_3d.h"
+#include "Algo/Modelisation/tetrahedralization.h"
 
 namespace CGoGN
 {

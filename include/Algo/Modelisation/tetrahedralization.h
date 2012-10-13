@@ -25,6 +25,7 @@
 #ifndef __TETRAHEDRALIZATION_H__
 #define __TETRAHEDRALIZATION_H__
 
+
 namespace CGoGN
 {
 
@@ -37,22 +38,22 @@ namespace Modelisation
 namespace Tetrahedralization
 {
 
-/**
-* subdivide a hexahedron into 5 tetrahedron
-*/
-template <typename PFP>
-void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
-
-/**
-* WARNING : assume all volumes to be hexahedrons
-* subdivide a hexahedron mesh into a tetrahedron mesh
-*/
-template <typename PFP>
-void hexahedronsToTetrahedrons(typename PFP::MAP& map);
-
-
-template <typename PFP>
-void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+///**
+//* subdivide a hexahedron into 5 tetrahedron
+//*/
+//template <typename PFP>
+//void hexahedronToTetrahedron(typename PFP::MAP& map, Dart d);
+//
+///**
+//* WARNING : assume all volumes to be hexahedrons
+//* subdivide a hexahedron mesh into a tetrahedron mesh
+//*/
+//template <typename PFP>
+//void hexahedronsToTetrahedrons(typename PFP::MAP& map);
+//
+//
+//template <typename PFP>
+//void tetrahedrizeVolume(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
 
 /************************************************************************************************
  * 									Collapse / Split Operators									*
@@ -122,6 +123,20 @@ Dart swap2To3(typename PFP::MAP& map, Dart d);
  */
 template <typename PFP>
 Dart swap5To4(typename PFP::MAP& map, Dart d);
+
+//!
+/*!
+ *  called edge removal (equivalent to G32)
+ */
+template <typename PFP>
+void swapGen3To2(typename PFP::MAP& map, Dart d);
+
+//!
+/*!
+ * called multi-face removal (equivalent to G23 )
+ */
+template <typename PFP>
+void swapGen2To3(typename PFP::MAP& map, Dart d);
 
 /************************************************************************************************
  *											Flip Functions 										*

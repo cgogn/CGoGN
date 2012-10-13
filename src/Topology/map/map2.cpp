@@ -551,7 +551,7 @@ void Map2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, bool second
 	//unsew the edge path
 	for(std::vector<Dart>::iterator it = vd.begin() ; it != vd.end() ; ++it)
 	{
-		if(!Map2::isBoundaryEdge(*it))
+		//if(!Map2::isBoundaryEdge(*it))
 			unsewFaces(*it) ;
 	}
 
