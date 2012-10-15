@@ -41,7 +41,6 @@ public:
 
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
-	 * No attribute is attached to the new edge
 	 */
 	virtual void splitVertex(Dart d, Dart e) ;
 
@@ -51,7 +50,6 @@ public:
 	virtual Dart deleteVertex(Dart d) ;
 
 	/**
-	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
 	virtual Dart cutEdge(Dart d) ;
@@ -119,7 +117,6 @@ public:
 	virtual bool collapseDegeneratedFace(Dart d);
 
 	/**
-	 * No attribute is attached to the new edge
 	 * The attributes attached to the old face are duplicated on both resulting faces
 	 */
 	virtual void splitFace(Dart d, Dart e) ;
@@ -141,7 +138,7 @@ public:
 	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 
 	/**
-	 * No attribute is attached to the new face
+	 *
 	 */
 	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 

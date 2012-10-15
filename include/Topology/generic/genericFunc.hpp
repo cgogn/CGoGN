@@ -91,7 +91,7 @@ void foreach_orbitGen(int dim, FunctorType<typename MM>& fonct, MM* ptr, unsigne
 //}
 
 template <typename MF, typename MM>
-void embedOrbitGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr)
+void setOrbitEmbeddingGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr)
 {
 //	if (em!=NULL)
 //	{

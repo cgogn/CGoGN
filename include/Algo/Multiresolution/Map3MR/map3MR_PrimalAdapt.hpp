@@ -83,7 +83,7 @@ void Map3MR<PFP>::swapEdges(Dart d, Dart e)
 		}
 
 		if(m_map.template isOrbitEmbedded<VOLUME>())
-			m_map.template embedNewCell<VOLUME>(d);
+			m_map.template setOrbitEmbeddingNewCell<VOLUME>(d);
 
 
 //		propagateDartRelation(d, m_phi2) ;
@@ -630,7 +630,7 @@ void Map3MR<PFP>::subdivideVolume(Dart d)
 	for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 	{
 		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-		m_map.template embedOrbit<VERTEX>(ditWV, EMBNULL);
+		m_map.template setOrbitEmbedding<VERTEX>(ditWV, EMBNULL);
 		(*vertexVertexFunctor)(ditWV) ;
 
 		Dart e = ditWV;
@@ -703,9 +703,9 @@ void Map3MR<PFP>::subdivideVolume(Dart d)
 		}
 	}
 
-	m_map.template embedOrbit<VERTEX>(centralDart, EMBNULL);
+	m_map.template setOrbitEmbedding<VERTEX>(centralDart, EMBNULL);
 	(*volumeVertexFunctor)(centralDart) ;
-	m_map.template embedOrbit<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
+	m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
 	propagateOrbitEmbedding<VERTEX>(centralDart) ;
 
 
@@ -716,7 +716,7 @@ void Map3MR<PFP>::subdivideVolume(Dart d)
 	{
 		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 		m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
-		m_map.template embedOrbit<VERTEX>(m_map.phi1(d), m_map.template getEmbedding<VERTEX>(m_map.phi1(d)));
+		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi1(d), m_map.template getEmbedding<VERTEX>(m_map.phi1(d)));
 	}
 	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
@@ -725,7 +725,7 @@ void Map3MR<PFP>::subdivideVolume(Dart d)
 	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 	{
 		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-		m_map.template embedOrbit<VERTEX>(m_map.phi2(m_map.phi1(d)), map.template getEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d))));
+		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d)), map.template getEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d))));
 		m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
 	}
 	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
@@ -780,7 +780,7 @@ void Map3MR<PFP>::subdivideVolumeTetOcta(Dart d)
 	setCurrentLevel(vLevel + 1) ;
 	for(Dart dit = traV.begin(); dit != traV.end(); dit = traV.next())
 	{
-		embedOrbit<VERTEX>(dit, EMBNULL);
+		setOrbitEmbedding<VERTEX>(dit, EMBNULL);
 		(*vertexVertexFunctor)(dit) ;
 
 		Dart f1 = phi1(dit);
@@ -859,8 +859,8 @@ void Map3MR<PFP>::subdivideVolumeTetOcta(Dart d)
 			}while(f != x);
 		}
 
-		embedOrbit<VERTEX>(centralDart, EMBNULL);
-		embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
+		setOrbitEmbedding<VERTEX>(centralDart, EMBNULL);
+		setOrbitEmbedding<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
 		(*volumeVertexFunctor)(centralDart) ;
 		propagateOrbitEmbedding<VERTEX>(centralDart) ;
 	}

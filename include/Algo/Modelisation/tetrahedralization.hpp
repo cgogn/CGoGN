@@ -304,14 +304,14 @@ void unlinkFromEdge(typename PFP::MAP& map, Dart d)
 //			unsigned int dVEmb = map.getEmbedding<VERTEX>(d) ;
 //			if(dVEmb != EMBNULL)
 //			{
-//				map.embedOrbit<VERTEX>(d, dVEmb) ;
+//				map.setOrbitEmbedding<VERTEX>(d, dVEmb) ;
 //				map.setDartEmbedding<VERTEX>(d, EMBNULL) ;
 //			}
 //
 //			unsigned int d3VEmb = map.getEmbedding<VERTEX>(d3) ;
 //			if(d3VEmb != EMBNULL)
 //			{
-//				map.embedOrbit<VERTEX>(d3, d3VEmb) ;
+//				map.setOrbitEmbedding<VERTEX>(d3, d3VEmb) ;
 //				map.setDartEmbedding<VERTEX>(d3, EMBNULL) ;
 //			}
 //		}

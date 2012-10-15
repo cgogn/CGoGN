@@ -898,7 +898,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
+	unsigned int newV = m.template setOrbitEmbeddingNewCell<VERTEX>(d2) ;
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -911,8 +911,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.template embedOrbit<VERTEX>(d, v1) ;
-	m.template embedOrbit<VERTEX>(dd, v2) ;
+	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
+	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
 
 	REAL err = 0 ;
 

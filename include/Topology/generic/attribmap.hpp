@@ -121,7 +121,7 @@ void AttribMap::bijectiveOrbitEmbedding()
 			{
 				if (counter[d] > 0)
 				{
-					unsigned int newEmb = embedNewCell<ORBIT>(d) ;
+					unsigned int newEmb = setOrbitEmbeddingNewCell<ORBIT>(d) ;
 					copyCell<ORBIT>(newEmb, emb) ;
 				}
 				counter[d]++ ;

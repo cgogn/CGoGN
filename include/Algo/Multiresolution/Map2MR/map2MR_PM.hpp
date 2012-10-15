@@ -291,7 +291,7 @@ void Map2MR_PM<PFP>::coarsen()
 
 		//std::cout << std::endl;
 
-		m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
+		m_map.template setOrbitEmbedding<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
 	}
 }
 
@@ -324,7 +324,7 @@ void Map2MR_PM<PFP>::refine()
 
 		//std::cout << std::endl;
 
-		m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
+		m_map.template setOrbitEmbedding<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
 	}
 }
 

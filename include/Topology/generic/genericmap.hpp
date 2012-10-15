@@ -176,7 +176,7 @@ inline void GenericMap::deleteDartLine(unsigned int index)
 				if(m_attribs[orbit].unrefLine(emb))					// unref the pointed embedding line
 				{
 					for (unsigned int t = 0; t < m_nbThreads; ++t)	// and clear its markers if it was
-						(*m_markTables[orbit][t])[emb].clear() ;		// its last unref (and was thus freed)
+						(*m_markTables[orbit][t])[emb].clear() ;	// its last unref (and was thus freed)
 				}
 			}
 		}
@@ -334,6 +334,15 @@ void GenericMap::setDartEmbedding(Dart d, unsigned int emb)
 }
 
 template <unsigned int ORBIT>
+void GenericMap::initDartEmbedding(Dart d, unsigned int emb)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+
+	m_attribs[ORBIT].refLine(emb);	// ref the new emb
+	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
+}
+
+template <unsigned int ORBIT>
 inline void GenericMap::copyDartEmbedding(Dart dest, Dart src)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
@@ -348,7 +357,7 @@ inline unsigned int GenericMap::newCell()
 }
 
 template <unsigned int ORBIT>
-inline void GenericMap::embedOrbit(Dart d, unsigned int em)
+inline void GenericMap::setOrbitEmbedding(Dart d, unsigned int em)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	FunctorSetEmb<GenericMap, ORBIT> fsetemb(*this, em);
@@ -356,11 +365,28 @@ inline void GenericMap::embedOrbit(Dart d, unsigned int em)
 }
 
 template <unsigned int ORBIT>
-inline unsigned int GenericMap::embedNewCell(Dart d)
+inline void GenericMap::initOrbitEmbedding(Dart d, unsigned int em)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	FunctorInitEmb<GenericMap, ORBIT> fsetemb(*this, em);
+	foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+}
+
+template <unsigned int ORBIT>
+inline unsigned int GenericMap::setOrbitEmbeddingNewCell(Dart d)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int em = newCell<ORBIT>();
-	embedOrbit<ORBIT>(d, em);
+	setOrbitEmbedding<ORBIT>(d, em);
+	return em;
+}
+
+template <unsigned int ORBIT>
+inline unsigned int GenericMap::initOrbitEmbeddingNewCell(Dart d)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	unsigned int em = newCell<ORBIT>();
+	initOrbitEmbedding<ORBIT>(d, em);
 	return em;
 }
 
@@ -373,7 +399,7 @@ inline void GenericMap::copyCell(Dart d, Dart e)
 	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
 	{
 		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-			dE = embedNewCell<ORBIT>(d) ;
+			dE = setOrbitEmbeddingNewCell<ORBIT>(d) ;
 		m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
 	}
 }
@@ -495,22 +521,6 @@ bool GenericMap::registerAttribute(const std::string &nameType)
 	return true;
 }
 
-template <unsigned int ORBIT>
-void GenericMap::initOrbitEmbedding(bool realloc)
-{
-	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
-	DartMarker mark(*this) ;
-	for(Dart d = begin(); d != end(); next(d))
-	{
-		if(!mark.isMarked(d))
-		{
-			mark.markOrbit<ORBIT>(d) ;
-			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
-				embedNewCell<ORBIT>(d) ;
-		}
-	}
-}
-
 /****************************************
  *   EMBEDDING ATTRIBUTES MANAGEMENT    *
  ****************************************/
@@ -527,9 +537,14 @@ void GenericMap::addEmbedding()
 	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
 	m_embeddings[ORBIT] = amv ;
 
-	// set new embedding to EMBNULL for all the darts of the map
-	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
-		(*amv)[i] = EMBNULL ;
+	FunctorInitEmb<GenericMap, ORBIT> fsetemb(*this);
+	TraversorCell<GenericMap, ORBIT> t(*this, allDarts, true) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	{
+		unsigned int em = newCell<ORBIT>();
+		fsetemb.changeEmb(em);
+		foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+	}
 }
 
 /****************************************

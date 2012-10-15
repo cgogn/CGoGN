@@ -258,8 +258,8 @@ inline void ImplicitHierarchicalMap::splitFace(Dart d, Dart e)
 	{
 		unsigned int cur = m_curLevel ;
 		m_curLevel = m_maxLevel ;
-		this->embedOrbit<FACE>(d, this->getEmbedding<FACE>(d)) ;
-		this->embedOrbit<FACE>(e, this->getEmbedding<FACE>(e)) ;
+		this->setOrbitEmbedding<FACE>(d, this->getEmbedding<FACE>(d)) ;
+		this->setOrbitEmbedding<FACE>(e, this->getEmbedding<FACE>(e)) ;
 		m_curLevel = cur ;
 	}
 }
@@ -349,7 +349,7 @@ T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d)
 
 	if(index == EMBNULL)
 	{
-		index = m->embedNewCell<ORBIT>(d) ;
+		index = m->setOrbitEmbeddingNewCell<ORBIT>(d) ;
 		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
 	}
 

@@ -174,9 +174,9 @@ void ProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices)
 
 		edgeCollapse(vs) ;							// collapse edge
 
-		unsigned int newV = m_map.template embedNewCell<VERTEX>(d2) ;
-		unsigned int newE1 = m_map.template embedNewCell<EDGE>(d2) ;
-		unsigned int newE2 = m_map.template embedNewCell<EDGE>(dd2) ;
+		unsigned int newV = m_map.template setOrbitEmbeddingNewCell<VERTEX>(d2) ;
+		unsigned int newE1 = m_map.template setOrbitEmbeddingNewCell<EDGE>(d2) ;
+		unsigned int newE2 = m_map.template setOrbitEmbeddingNewCell<EDGE>(dd2) ;
 		vs->setApproxV(newV) ;
 		vs->setApproxE1(newE1) ;
 		vs->setApproxE2(newE2) ;
@@ -240,9 +240,9 @@ void ProgressiveMesh<PFP>::coarsen()
 
 	edgeCollapse(vs) ;	// collapse edge
 
-	m_map.template embedOrbit<VERTEX>(d2, vs->getApproxV()) ;
-	m_map.template embedOrbit<EDGE>(d2, vs->getApproxE1()) ;
-	m_map.template embedOrbit<EDGE>(dd2, vs->getApproxE2()) ;
+	m_map.template setOrbitEmbedding<VERTEX>(d2, vs->getApproxV()) ;
+	m_map.template setOrbitEmbedding<EDGE>(d2, vs->getApproxE1()) ;
+	m_map.template setOrbitEmbedding<EDGE>(dd2, vs->getApproxE2()) ;
 }
 
 template <typename PFP>
@@ -287,12 +287,12 @@ void ProgressiveMesh<PFP>::refine()
 
 	vertexSplit(vs) ; // split vertex
 
-	m_map.template embedOrbit<VERTEX>(d, v1) ;		// embed the
-	m_map.template embedOrbit<VERTEX>(dd, v2) ;	// new vertices
-	m_map.template embedOrbit<EDGE>(d1, e1) ;
-	m_map.template embedOrbit<EDGE>(d2, e2) ;		// and new edges
-	m_map.template embedOrbit<EDGE>(dd1, e3) ;
-	m_map.template embedOrbit<EDGE>(dd2, e4) ;
+	m_map.template setOrbitEmbedding<VERTEX>(d, v1) ;		// embed the
+	m_map.template setOrbitEmbedding<VERTEX>(dd, v2) ;	// new vertices
+	m_map.template setOrbitEmbedding<EDGE>(d1, e1) ;
+	m_map.template setOrbitEmbedding<EDGE>(d2, e2) ;		// and new edges
+	m_map.template setOrbitEmbedding<EDGE>(dd1, e3) ;
+	m_map.template setOrbitEmbedding<EDGE>(dd2, e4) ;
 
 	if(!m_predictors.empty())
 	{
