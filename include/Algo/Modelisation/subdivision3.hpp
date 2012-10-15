@@ -647,7 +647,15 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 				m.markOrbit<FACE>(ditWF);
 		}
 
-		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit, position);
+		typename PFP::VEC3 volCenter(0.0);
+		volCenter += position[dit];
+		volCenter += position[map.phi1(dit)];
+		volCenter += position[map.phi_1(dit)];
+		volCenter += position[map.phi_1(map.phi2(dit))];
+		volCenter /= 4;
+
+		Dart dres = Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit);
+		position[dres] = volCenter;
 	}
 
 	//
@@ -678,7 +686,14 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 					m.markOrbit<EDGE>(ditWE);
 			}
 
-			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit, position);
+			typename PFP::VEC3 faceCenter(0.0);
+			faceCenter += position[dit];
+			faceCenter += position[map.phi1(dit)];
+			faceCenter += position[map.phi_1(dit)];
+			faceCenter /= 3;
+
+			Dart dres = Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
+			position[dres] = faceCenter;
 		}
 	}
 
@@ -691,8 +706,6 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 		if(m.isMarked(dit))
 		{
 			m.unmarkOrbit<EDGE>(dit);
-
-			//std::cout << " nb F of E : " << map.template degree<typename PFP::MAP,EDGE,FACE>(dit) << std::endl;
 			Dart d = map.phi2(map.phi3(map.findBoundaryFaceOfEdge(dit)));
 			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
 

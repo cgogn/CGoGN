@@ -135,6 +135,11 @@ public:
 				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
 				m_position[midV] = p ;
 			}
+			else
+			{
+				Dart midV = m_map.phi_1(m_map.phi2(d));
+				m_position[midV] = p;
+			}
 			m_map.decCurrentLevel() ;
 
 		}

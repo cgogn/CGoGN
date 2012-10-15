@@ -455,30 +455,19 @@ void swapGen2To3(typename PFP::MAP& map, Dart d)
  ************************************************************************************************/
 
 template <typename PFP>
-Dart flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
+Dart flip1To4(typename PFP::MAP& map, Dart d)
 {
 	std::vector<Dart> edges;
-	typename PFP::VEC3 volCenter(0.0);
 
 	//
 	// Cut the 1st tetrahedron
 	//
 	edges.push_back(map.phi2(d));
-	volCenter += position[edges[0]];
-
 	edges.push_back(map.phi2(map.phi1(d)));
-	volCenter += position[edges[1]];
-
 	edges.push_back(map.phi2(map.phi_1(d)));
-	volCenter += position[edges[2]];
-
 	map.splitVolume(edges);
-	volCenter += position[map.phi_1(edges[2])];
-
-	volCenter /= 4;
 
 	Dart x = Algo::Modelisation::trianguleFace<PFP>(map,map.phi2(d));
-	position[x] = volCenter;
 
 	//
 	// Cut the 2nd tetrahedron
@@ -513,21 +502,14 @@ Dart flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3
 }
 
 template <typename PFP>
-Dart flip1To3(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
+Dart flip1To3(typename PFP::MAP& map, Dart d)
 {
 	std::vector<Dart> edges;
-	typename PFP::VEC3 faceCenter(0.0);
-
-	faceCenter += position[d];
-	faceCenter += position[map.phi1(d)];
-	faceCenter += position[map.phi_1(d)];
-	faceCenter /= 3;
 
 	//
 	// Triangule one face
 	//
 	Dart x = Algo::Modelisation::trianguleFace<PFP>(map,d);
-	position[x] = faceCenter;
 
 	//
 	// Cut the 1st Tetrahedron
@@ -564,15 +546,11 @@ Dart flip1To3(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3
  ************************************************************************************************/
 
 template <typename PFP>
-Dart edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position)
+Dart edgeBisection(typename PFP::MAP& map, Dart d)
 {
 	//coupe l'arete en 2
-	Dart f = map.phi1(d);
 	map.cutEdge(d);
 	Dart e = map.phi1(d);
-	position[e] = position[d];
-	position[e] += position[f];
-	position[e] *= 0.5;
 
 	Dart dit = e;
 	do

@@ -120,60 +120,58 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
-	unsigned int cur = m_map.getCurrentLevel();
+	DartMarkerStore m(m_map);
 
 	//
-	TraversorW<typename PFP::MAP> travW(m_map);
-	for(Dart dit = travW.begin() ; dit != travW.end() ; dit = travW.next())
+	// 1-4 flip of all tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tW(m_map);
+	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
 	{
-		m_map.setCurrentLevel(cur+1);
-
-		//store the new faces to 3-sew
-		std::vector<std::pair<Dart,Dart> > nFaces;
-		nFaces.reserve(6);
-
-		Traversor3WF<typename PFP::MAP> travWF(m_map, dit);
-		for(Dart ditWF = travWF.begin() ; ditWF != travWF.end() ; ditWF = travWF.next())
+		Traversor3WF<typename PFP::MAP> tWF(m_map, dit);
+		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
 		{
-
-
-
-//			Dart temp = ditWF;
-//			do
-//			{
-//				nFaces.push_back(std::pair<Dart,Dart>(temp, m_map.phi2(temp)));
-//				m_map.unsewFaces(temp);
-//				temp = m_map.phi1(temp);
-//			}
-//			while(temp != ditWF);
-//
-//			m_map.PFP::MAP::ParentMap::closeHole(ditWF, false);
-
-			//Dart fi = map.phi2(*face);
-
-
-//			std::vector<Dart> split;
-//			split.push_back(ditWF);
-//			split.push_back(m_map.phi1(ditWF));
-//			split.push_back(m_map.phi_1(ditWF));
-//
-//			splitSurfaceInVolume(split,true,false);
+			if(!m_map.isBoundaryFace(ditWF))
+				m.markOrbit<FACE>(ditWF);
 		}
 
-		//Dart fi = map.phi2(*face);
-
-//		//coudre les nouveaux brins entre eux par phi3
-//		for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
-//		{
-//
-//			if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
-//				map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
-//		}
-//
-		m_map.setCurrentLevel(cur);
+		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
 	}
 
+	//
+	// 2-3 swap of all old interior faces
+	//
+	TraversorF<typename PFP::MAP> tF(m_map);
+	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<FACE>(dit);
+			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
+		}
+	}
+/*
+	//
+	// 1-3 flip of all boundary tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tWb(m_map);
+	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
+	{
+		if(m_map.isBoundaryVolume(dit))
+		{
+			Traversor3WE<typename PFP::MAP> tWE(m_map, dit);
+			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
+			{
+				if(m_map.isBoundaryEdge(ditWE))
+					m.markOrbit<EDGE>(ditWE);
+			}
+
+			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
+		}
+	}
+*/
 	m_map.setCurrentLevel(m_map.getMaxLevel());
+	m_map.popLevel() ;
 }
 
 template <typename PFP>

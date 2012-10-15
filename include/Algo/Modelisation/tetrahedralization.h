@@ -147,17 +147,17 @@ void swapGen2To3(typename PFP::MAP& map, Dart d);
  *
  */
 template <typename PFP>
-Dart flip1To4(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+Dart flip1To4(typename PFP::MAP& map, Dart d);
 
 //!
 /*!
  *
  */
 template <typename PFP>
-Dart flip1To3(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+Dart flip1To3(typename PFP::MAP& map, Dart d);
 
 /************************************************************************************************
- *											Bisection Functions 										*
+ *									Bisection Functions 										*
  ************************************************************************************************/
 
 //!
@@ -165,7 +165,7 @@ Dart flip1To3(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3
  *
  */
 template <typename PFP>
-Dart edgeBisection(typename PFP::MAP& map, Dart d, VertexAttribute<typename PFP::VEC3>& position);
+Dart edgeBisection(typename PFP::MAP& map, Dart d);
 
 } // namespace Tetrahedralization
 
