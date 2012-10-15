@@ -46,7 +46,6 @@ protected:
 	Mark m_mark ;
 	AttributeMultiVector<Mark>* m_markVector ;
 	unsigned int m_thread ;
-//	unsigned int m_idReg ;
 	bool releaseOnDestruct ;
 
 public:

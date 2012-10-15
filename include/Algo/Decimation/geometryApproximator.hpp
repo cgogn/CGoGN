@@ -211,7 +211,7 @@ void Approximator_MidEdge<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.template setOrbitEmbeddingNewCell<VERTEX>(d2) ;
+		unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 		this->m_attrV[0]->operator[](newV) = this->m_approx[0][d] ;
 
 		// compute the detail vector
@@ -260,7 +260,7 @@ void Approximator_HalfCollapse<PFP>::approximate(Dart d)
 
 		// temporary edge collapse
 		m.extractTrianglePair(d) ;
-		unsigned int newV = m.template setOrbitEmbeddingNewCell<VERTEX>(d2) ;
+		unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 		for (unsigned int i = 0 ; i < this->m_attrV.size() ; ++i)
 		{
 			this->m_attrV[i]->operator[](newV) = this->m_approx[i][d] ;

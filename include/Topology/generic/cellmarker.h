@@ -133,7 +133,7 @@ public:
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
 //		if (a == EMBNULL)
-//			a = m_map.setOrbitEmbeddingNewCell<CELL>(d) ;
+//			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
 		m_markVector->operator[](a).setMark(m_mark) ;
 	}
 
@@ -147,7 +147,7 @@ public:
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
 //		if (a == EMBNULL)
-//			a = m_map.setOrbitEmbeddingNewCell<CELL>(d) ;
+//			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
 		m_markVector->operator[](a).unsetMark(m_mark) ;
 	}
 

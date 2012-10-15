@@ -92,7 +92,7 @@ private:
 
 	// Assigne un nouveau plongement au sommet. Les anciens plongements sont libérés.
 	void newVertex(Dart d) {
-		setOrbitEmbeddingNewCell<VERTEX>(d);
+		setOrbitEmbeddingOnNewCell<VERTEX>(d);
 	}
 
 public:

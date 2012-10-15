@@ -404,7 +404,7 @@ public:
 	* @return index of the attribute in table
 	*/
 	template <unsigned int ORBIT>
-	unsigned int setOrbitEmbeddingNewCell(Dart d) ;
+	unsigned int setOrbitEmbeddingOnNewCell(Dart d) ;
 
 	/**
 	 * Associate an new cell to all darts of an orbit

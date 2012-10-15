@@ -38,7 +38,7 @@ Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 
 	if(isOrbitEmbedded<VERTEX>())
 	{
-		setOrbitEmbeddingNewCell<VERTEX>(d2);
+		setOrbitEmbeddingOnNewCell<VERTEX>(d2);
 		copyCell<VERTEX>(d2, d);
 		setOrbitEmbedding<VERTEX>( d, getEmbedding<VERTEX>(d));
 	}
@@ -81,7 +81,7 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 		// embed the new darts created in the cut edge
 		setOrbitEmbedding<EDGE>(d, getEmbedding<EDGE>(d)) ;
 		// embed a new cell for the new edge and copy the attributes' line (c) Lionel
-		setOrbitEmbeddingNewCell<EDGE>(nd) ;
+		setOrbitEmbeddingOnNewCell<EDGE>(nd) ;
 		copyCell<EDGE>(nd, d) ;
 	}
 
@@ -258,11 +258,11 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 	if(isOrbitEmbedded<FACE2>())
 	{
 		copyDartEmbedding<FACE2>(phi_1(d), d) ;
-		setOrbitEmbeddingNewCell<FACE2>(e) ;
+		setOrbitEmbeddingOnNewCell<FACE2>(e) ;
 		copyCell<FACE2>(e, d) ;
 
 		copyDartEmbedding<FACE2>(phi_1(dd), dd) ;
-		setOrbitEmbeddingNewCell<FACE2>(ee) ;
+		setOrbitEmbeddingOnNewCell<FACE2>(ee) ;
 		copyCell<FACE2>(ee, dd) ;
 	}
 
@@ -271,7 +271,7 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		unsigned int fEmb = getEmbedding<FACE>(d) ;
 		setDartEmbedding<FACE>(phi_1(d), fEmb) ;
 		setDartEmbedding<FACE>(phi_1(ee), fEmb) ;
-		setOrbitEmbeddingNewCell<FACE>(e);
+		setOrbitEmbeddingOnNewCell<FACE>(e);
 		copyCell<FACE>(e, d);
 	}
 
@@ -390,7 +390,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 			if(!sameVertex(dit, dd))
 			{
 				setOrbitEmbedding<VERTEX>(dit, getEmbedding<VERTEX>(dit)) ;
-				setOrbitEmbeddingNewCell<VERTEX>(dd);
+				setOrbitEmbeddingOnNewCell<VERTEX>(dd);
 				copyCell<VERTEX>(dd, dit);
 			}
 			else
@@ -406,7 +406,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 		{
 			if(!sameEdge(dit, dd))
 			{
-				setOrbitEmbeddingNewCell<EDGE>(dd);
+				setOrbitEmbeddingOnNewCell<EDGE>(dd);
 				copyCell<EDGE>(dd, dit);
 				copyDartEmbedding<EDGE>(phi3(dit), dit) ;
 			}
@@ -429,7 +429,7 @@ void EmbeddedMap3::unsewVolumes(Dart d)
 	// embed the unsewn face with the face embedding
 	if (isOrbitEmbedded<FACE>())
 	{
-		setOrbitEmbeddingNewCell<FACE>(dd);
+		setOrbitEmbeddingOnNewCell<FACE>(dd);
 		copyCell<FACE>(dd, d);
 	}
 }
@@ -485,7 +485,7 @@ void EmbeddedMap3::splitVolume(std::vector<Dart>& vd)
 	{
 		Dart v = vd.front() ;
 		Dart v23 = alpha2(v) ;
-		setOrbitEmbeddingNewCell<VOLUME>(v23) ;
+		setOrbitEmbeddingOnNewCell<VOLUME>(v23) ;
 		copyCell<VOLUME>(v23, v) ;
 	}
 }

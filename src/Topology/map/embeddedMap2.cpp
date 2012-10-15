@@ -39,9 +39,8 @@ void EmbeddedMap2::splitVertex(Dart d, Dart e)
 
 	if (isOrbitEmbedded<VERTEX>())
 	{
-		copyDartEmbedding<VERTEX>(phi1(dd), d) ;
-		copyDartEmbedding<VERTEX>(phi1(ee), e) ;
-		setOrbitEmbeddingNewCell<VERTEX>(e) ;
+		initDartEmbedding<VERTEX>(phi1(dd), getEmbedding<VERTEX>(d)) ;
+		setOrbitEmbeddingOnNewCell<VERTEX>(e) ;
 		copyCell<VERTEX>(e, d) ;
 	}
 
@@ -52,8 +51,8 @@ void EmbeddedMap2::splitVertex(Dart d, Dart e)
 
 	if(isOrbitEmbedded<FACE>())
 	{
-		copyDartEmbedding<FACE>(phi1(dd), dd) ;
-		copyDartEmbedding<FACE>(phi1(ee), ee) ;
+		initDartEmbedding<FACE>(phi1(dd), getEmbedding<FACE>(dd)) ;
+		initDartEmbedding<FACE>(phi1(ee), getEmbedding<FACE>(ee)) ;
 	}
 }
 
@@ -81,16 +80,16 @@ Dart EmbeddedMap2::cutEdge(Dart d)
 
 	if (isOrbitEmbedded<EDGE>())
 	{
-		copyDartEmbedding<EDGE>(phi2(d), d) ;
-		setOrbitEmbeddingNewCell<EDGE>(nd) ;
+		initDartEmbedding<EDGE>(phi2(d), getEmbedding<EDGE>(d)) ;
+		setOrbitEmbeddingOnNewCell<EDGE>(nd) ;
 		copyCell<EDGE>(nd, d) ;
 	}
 
 	if(isOrbitEmbedded<FACE>())
 	{
-		copyDartEmbedding<FACE>(nd, d) ;
+		initDartEmbedding<FACE>(nd, getEmbedding<FACE>(d)) ;
 		Dart e = phi2(nd) ;
-		copyDartEmbedding<FACE>(phi1(e), e) ;
+		initDartEmbedding<FACE>(phi1(e), getEmbedding<FACE>(e)) ;
 	}
 
 	return nd;
@@ -187,11 +186,13 @@ bool EmbeddedMap2::flipEdge(Dart d)
 			copyDartEmbedding<VERTEX>(d, phi1(e)) ;
 			copyDartEmbedding<VERTEX>(e, phi1(d)) ;
 		}
+
 		if (isOrbitEmbedded<FACE>())
 		{
 			copyDartEmbedding<FACE>(phi_1(d), d) ;
 			copyDartEmbedding<FACE>(phi_1(e), e) ;
 		}
+
 		return true ;
 	}
 	return false ;
@@ -208,11 +209,13 @@ bool EmbeddedMap2::flipBackEdge(Dart d)
 			copyDartEmbedding<VERTEX>(d, phi1(e)) ;
 			copyDartEmbedding<VERTEX>(e, phi1(d)) ;
 		}
+
 		if (isOrbitEmbedded<FACE>())
 		{
 			copyDartEmbedding<FACE>(phi1(d), d) ;
 			copyDartEmbedding<FACE>(phi1(e), e) ;
 		}
+
 		return true ;
 	}
 	return false ;
@@ -238,7 +241,7 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
-		setOrbitEmbeddingNewCell<VOLUME>(d);
+		setOrbitEmbeddingOnNewCell<VOLUME>(d);
 }
 
 //void EmbeddedMap2::insertEdgeInVertex(Dart d, Dart e)
@@ -254,7 +257,7 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 //	{
 //		if(!sameFace(d,e))
 //		{
-//			setOrbitEmbeddingNewCell<FACE>(e);
+//			setOrbitEmbeddingOnNewCell<FACE>(e);
 //			copyCell<FACE>(e, d) ;
 //		}
 //		else
@@ -272,7 +275,7 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 //
 //	if (isOrbitEmbedded<VERTEX>())
 //	{
-//		setOrbitEmbeddingNewCell<VERTEX>(d);
+//		setOrbitEmbeddingOnNewCell<VERTEX>(d);
 //		copyCell<VERTEX>(d, dPrev);
 //	}
 //
@@ -280,7 +283,7 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 //	{
 //		if(!sameFace(d, dPrev))
 //		{
-//			setOrbitEmbeddingNewCell<FACE>(d);
+//			setOrbitEmbeddingOnNewCell<FACE>(d);
 //			copyCell<FACE>(d, dPrev) ;
 //		}
 //		else
@@ -322,21 +325,21 @@ void EmbeddedMap2::unsewFaces(Dart d)
 		Dart ee = phi1(e) ;
 		if(!sameVertex(d, ee))
 		{
-			setOrbitEmbeddingNewCell<VERTEX>(ee);
+			setOrbitEmbeddingOnNewCell<VERTEX>(ee);
 			copyCell<VERTEX>(ee, d);
 		}
 
 		Dart dd = phi1(d) ;
 		if(!sameVertex(e, dd))
 		{
-			setOrbitEmbeddingNewCell<VERTEX>(dd);
+			setOrbitEmbeddingOnNewCell<VERTEX>(dd);
 			copyCell<VERTEX>(dd, e);
 		}
 	}
 
 	if (isOrbitEmbedded<EDGE>())
 	{
-		setOrbitEmbeddingNewCell<EDGE>(e);
+		setOrbitEmbeddingOnNewCell<EDGE>(e);
 		copyCell<EDGE>(e, d);
 	}
 }
@@ -365,8 +368,8 @@ void EmbeddedMap2::splitFace(Dart d, Dart e)
 
 	if (isOrbitEmbedded<VERTEX>())
 	{
-		copyDartEmbedding<VERTEX>(phi_1(e), d) ;
-		copyDartEmbedding<VERTEX>(phi_1(d), e) ;
+		initDartEmbedding<VERTEX>(phi_1(e), getEmbedding<VERTEX>(d)) ;
+		initDartEmbedding<VERTEX>(phi_1(d), getEmbedding<VERTEX>(e)) ;
 	}
 
 	if(isOrbitEmbedded<EDGE>())
@@ -376,8 +379,8 @@ void EmbeddedMap2::splitFace(Dart d, Dart e)
 
 	if (isOrbitEmbedded<FACE>())
 	{
-		copyDartEmbedding<FACE>(phi_1(d), d) ;
-		setOrbitEmbeddingNewCell<FACE>(e) ;
+		initDartEmbedding<FACE>(phi_1(d), getEmbedding<FACE>(d)) ;
+		setOrbitEmbeddingOnNewCell<FACE>(e) ;
 		copyCell<FACE>(e, d) ;
 	}
 }
@@ -465,23 +468,23 @@ void EmbeddedMap2::splitSurface(std::vector<Dart>& vd, bool firstSideClosed, boo
 		// embed the vertex embedded from the origin volume to the new darts
 		if(isOrbitEmbedded<VERTEX>())
 		{
-			copyDartEmbedding<VERTEX>(phi2(dit), phi1(dit));
-			copyDartEmbedding<VERTEX>(phi2(dit2), phi1(dit2));
+			initDartEmbedding<VERTEX>(phi2(dit), getEmbedding<VERTEX>(phi1(dit)));
+			initDartEmbedding<VERTEX>(phi2(dit2), getEmbedding<VERTEX>(phi1(dit2)));
 		}
 
 		// embed the edge embedded from the origin volume to the new darts
 		if(isOrbitEmbedded<EDGE>())
 		{
-			unsigned int eEmb = getEmbedding<EDGE>(dit) ;
-			setDartEmbedding<EDGE>(phi2(dit), eEmb);
-			setDartEmbedding<EDGE>(phi2(dit2), eEmb);
+			initDartEmbedding<EDGE>(phi2(dit), getEmbedding<EDGE>(dit));
+			setOrbitEmbeddingOnNewCell<EDGE>(phi2(dit2));
+			copyCell<EDGE>(dit2, dit);
 		}
 
 		// embed the volume embedded from the origin volume to the new darts
 		if(isOrbitEmbedded<VOLUME>())
 		{
-			copyDartEmbedding<VOLUME>(phi2(dit), dit);
-			copyDartEmbedding<VOLUME>(phi2(dit2), dit2);
+			initDartEmbedding<VOLUME>(phi2(dit), getEmbedding<VOLUME>(dit));
+			initDartEmbedding<VOLUME>(phi2(dit2), getEmbedding<VOLUME>(dit2));
 		}
 	}
 }
@@ -495,13 +498,14 @@ unsigned int EmbeddedMap2::closeHole(Dart d, bool forboundary)
 	{
 		if (isOrbitEmbedded<VERTEX>())
 		{
-			copyDartEmbedding<VERTEX>(f, phi2(phi_1(f))) ;
+			initDartEmbedding<VERTEX>(f, getEmbedding<VERTEX>(phi1(phi2(f)))) ;
 		}
 
 		if (isOrbitEmbedded<EDGE>())
 		{
-			copyDartEmbedding<EDGE>(f, phi2(f)) ;
+			initDartEmbedding<EDGE>(f, getEmbedding<EDGE>(phi2(f))) ;
 		}
+
 		f = phi1(f) ;
 	} while(dd != f) ;
 

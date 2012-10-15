@@ -44,7 +44,7 @@ void EmbeddedGMap2::splitVertex(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(beta2(phi1(dd)), vEmb) ;
 		setDartEmbedding<VERTEX>(beta0(dd), vEmb) ;
 
-		setOrbitEmbeddingNewCell<VERTEX>(e) ;
+		setOrbitEmbeddingOnNewCell<VERTEX>(e) ;
 		copyCell<VERTEX>(e, d) ;
 	}
 
@@ -91,7 +91,7 @@ Dart EmbeddedGMap2::cutEdge(Dart d)
 		unsigned int eEmb = getEmbedding<EDGE>(d) ;
 		setDartEmbedding<EDGE>(phi2(d), eEmb) ;
 		setDartEmbedding<EDGE>(beta0(d), eEmb) ;
-		setOrbitEmbeddingNewCell<EDGE>(nd) ;
+		setOrbitEmbeddingOnNewCell<EDGE>(nd) ;
 		copyCell<EDGE>(nd, d) ;
 	}
 
@@ -264,7 +264,7 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 //	{
 //		if(!sameFace(d,e))
 //		{
-//			setOrbitEmbeddingNewCell<FACE>(e);
+//			setOrbitEmbeddingOnNewCell<FACE>(e);
 //			copyCell<FACE>(e, d) ;
 //		}
 //		else
@@ -282,7 +282,7 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 //
 //	if (isOrbitEmbedded<VERTEX>())
 //	{
-//		setOrbitEmbeddingNewCell<VERTEX>(d);
+//		setOrbitEmbeddingOnNewCell<VERTEX>(d);
 //		copyCell<VERTEX>(d, dPrev);
 //	}
 //
@@ -290,7 +290,7 @@ bool EmbeddedGMap2::flipBackEdge(Dart d)
 //	{
 //		if(!sameFace(d, dPrev))
 //		{
-//			setOrbitEmbeddingNewCell<FACE>(d);
+//			setOrbitEmbeddingOnNewCell<FACE>(d);
 //			copyCell<FACE>(d, dPrev) ;
 //		}
 //		else
@@ -332,7 +332,7 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 	{
 		if(!sameVertex(d,e))
 		{
-			setOrbitEmbeddingNewCell<VERTEX>(e);
+			setOrbitEmbeddingOnNewCell<VERTEX>(e);
 			copyCell<VERTEX>(e, d);
 		}
 
@@ -341,14 +341,14 @@ void EmbeddedGMap2::unsewFaces(Dart d)
 
 		if(!sameVertex(d,e))
 		{
-			setOrbitEmbeddingNewCell<VERTEX>(e);
+			setOrbitEmbeddingOnNewCell<VERTEX>(e);
 			copyCell<VERTEX>(e, d);
 		}
 	}
 
 	if (isOrbitEmbedded<EDGE>())
 	{
-		setOrbitEmbeddingNewCell<EDGE>(e);
+		setOrbitEmbeddingOnNewCell<EDGE>(e);
 		copyCell<EDGE>(e, d);
 	}
 }
@@ -399,7 +399,7 @@ void EmbeddedGMap2::splitFace(Dart d, Dart e)
 		unsigned int fEmb = getEmbedding<FACE>(d) ;
 		setDartEmbedding<FACE>(phi_1(d), fEmb) ;
 		setDartEmbedding<FACE>(beta1(phi_1(d)), fEmb) ;
-		setOrbitEmbeddingNewCell<FACE>(e) ;
+		setOrbitEmbeddingOnNewCell<FACE>(e) ;
 		copyCell<FACE>(e, d) ;
 	}
 }

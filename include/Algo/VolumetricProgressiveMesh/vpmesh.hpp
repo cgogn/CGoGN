@@ -132,9 +132,9 @@ void VolumetricProgressiveMesh<PFP>::createPM(unsigned int percentWantedVertices
 
 		edgeCollapse(vs) ;							// collapse edge
 
-		unsigned int newV = m_map.template setOrbitEmbeddingNewCell<VERTEX>(d2) ;
-		unsigned int newE1 = m_map.template setOrbitEmbeddingNewCell<EDGE>(d2) ;
-		unsigned int newE2 = m_map.template setOrbitEmbeddingNewCell<EDGE>(dd2) ;
+		unsigned int newV = m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
+		unsigned int newE1 = m_map.template setOrbitEmbeddingOnNewCell<EDGE>(d2) ;
+		unsigned int newE2 = m_map.template setOrbitEmbeddingOnNewCell<EDGE>(dd2) ;
 		vs->setApproxV(newV) ;
 		vs->setApproxE1(newE1) ;
 		vs->setApproxE2(newE2) ;

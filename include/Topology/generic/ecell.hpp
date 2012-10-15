@@ -146,7 +146,7 @@ ECellDart<DIM> ECellDart<DIM>::operator[](Dart d)
 	unsigned int a = s_map->getEmbedding(d,DIM);
 
 	if (a == EMBNULL)
-		a = s_map->setOrbitEmbeddingNewCell(DIM, d);
+		a = s_map->setOrbitEmbeddingOnNewCell(DIM, d);
 
 	return ECellDart<DIM>(a);
 }

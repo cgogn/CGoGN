@@ -73,7 +73,7 @@ void Map3MR<PFP>::swapEdges(Dart d, Dart e)
 		}
 
 		if(m_map.template isOrbitEmbedded<VOLUME>())
-			m_map.template setOrbitEmbeddingNewCell<VOLUME>(d);
+			m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(d);
 	}
 }
 
@@ -203,9 +203,9 @@ void Map3MR<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 //		if(!shareVertexEmbeddings)
 //		{
 //			if(getEmbedding<VERTEX>(d) == EMBNULL)
-//				setOrbitEmbeddingNewCell<VERTEX>(d) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 //			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-//				setOrbitEmbeddingNewCell<VERTEX>(d) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 //		}
 
 		m_map.cutEdge(d) ;
@@ -214,7 +214,7 @@ void Map3MR<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 
 // When importing MR files
 //		if(embedNewVertices)
-//			m_map.template setOrbitEmbeddingNewCell<VERTEX>(m_map.phi1(d)) ;
+//			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(d)) ;
 	}
 
 	//2. split faces - triangular faces
@@ -332,7 +332,7 @@ void Map3MR<PFP>::addNewLevelTetraOcta(bool embedNewVertices)
 
 				// When importing MR files
 				//if(embedNewVertices)
-				//	m_map.template setOrbitEmbeddingNewCell<VERTEX>(x) ;
+				//	m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(x) ;
 			}
 			m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
 		}
@@ -368,9 +368,9 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 //		if(!shareVertexEmbeddings)
 //		{
 //			if(getEmbedding<VERTEX>(d) == EMBNULL)
-//				setOrbitEmbeddingNewCell<VERTEX>(d) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 //			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-//				setOrbitEmbeddingNewCell<VERTEX>(phi1(d)) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(phi1(d)) ;
 //		}
 
 		m_map.cutEdge(d) ;
@@ -379,7 +379,7 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 
 // When importing MR files  : activated for DEBUG
 //		if(embedNewVertices)
-//			setOrbitEmbeddingNewCell<VERTEX>(phi1(d)) ;
+//			setOrbitEmbeddingOnNewCell<VERTEX>(phi1(d)) ;
 	}
 
 	//2. split faces - quadrangule faces
@@ -400,7 +400,7 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 
 // When importing MR files : activated for DEBUG
 //		if(embedNewVertices)
-//			setOrbitEmbeddingNewCell<VERTEX>(phi1(ne)) ;
+//			setOrbitEmbeddingOnNewCell<VERTEX>(phi1(ne)) ;
 
 		dd = m_map.phi1(m_map.phi1(next)) ;
 		while(dd != ne)				// turn around the face and insert new edges
@@ -530,9 +530,9 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 //		if(!shareVertexEmbeddings)
 //		{
 //			if(getEmbedding<VERTEX>(d) == EMBNULL)
-//				setOrbitEmbeddingNewCell<VERTEX>(d) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 //			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-//				setOrbitEmbeddingNewCell<VERTEX>(d) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 //		}
 //
 //		cutEdge(d) ;
@@ -541,7 +541,7 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 //
 //// When importing MR files  : activated for DEBUG
 //		if(embedNewVertices)
-//			setOrbitEmbeddingNewCell<VERTEX>(phi1(d)) ;
+//			setOrbitEmbeddingOnNewCell<VERTEX>(phi1(d)) ;
 //	}
 //
 //	//2. split faces - quadrangule faces
@@ -587,7 +587,7 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 //
 //			// When importing MR files : activated for DEBUG
 //			if(embedNewVertices)
-//				setOrbitEmbeddingNewCell<VERTEX>(phi1(ne)) ;
+//				setOrbitEmbeddingOnNewCell<VERTEX>(phi1(ne)) ;
 //
 //			dd = phi1(phi1(next)) ;
 //			while(dd != ne)				// turn around the face and insert new edges

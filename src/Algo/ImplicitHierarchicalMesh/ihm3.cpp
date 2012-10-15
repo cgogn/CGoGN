@@ -111,7 +111,7 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
-		setOrbitEmbeddingNewCell<VOLUME>(d);
+		setOrbitEmbeddingOnNewCell<VOLUME>(d);
 	}
 }
 

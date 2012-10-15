@@ -83,7 +83,7 @@ void Map3MR<PFP>::swapEdges(Dart d, Dart e)
 		}
 
 		if(m_map.template isOrbitEmbedded<VOLUME>())
-			m_map.template setOrbitEmbeddingNewCell<VOLUME>(d);
+			m_map.template setOrbitEmbeddingOnNewCell<VOLUME>(d);
 
 
 //		propagateDartRelation(d, m_phi2) ;

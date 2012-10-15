@@ -373,7 +373,7 @@ inline void GenericMap::initOrbitEmbedding(Dart d, unsigned int em)
 }
 
 template <unsigned int ORBIT>
-inline unsigned int GenericMap::setOrbitEmbeddingNewCell(Dart d)
+inline unsigned int GenericMap::setOrbitEmbeddingOnNewCell(Dart d)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int em = newCell<ORBIT>();
@@ -396,12 +396,12 @@ inline void GenericMap::copyCell(Dart d, Dart e)
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int dE = getEmbedding<ORBIT>(d) ;
 	unsigned int eE = getEmbedding<ORBIT>(e) ;
-	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
-	{
-		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-			dE = setOrbitEmbeddingNewCell<ORBIT>(d) ;
+//	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
+//	{
+//		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
+//			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 		m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
-	}
+//	}
 }
 
 template <unsigned int ORBIT>

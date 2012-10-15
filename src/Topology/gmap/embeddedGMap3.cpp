@@ -59,7 +59,7 @@ Dart EmbeddedGMap3::cutEdge(Dart d)
 		} while(e != d) ;
 
 		// embed a new cell for the new edge and copy the attributes' line (c) Lionel
-		setOrbitEmbeddingNewCell<EDGE>(phi1(d)) ;
+		setOrbitEmbeddingOnNewCell<EDGE>(phi1(d)) ;
 		copyCell<EDGE>(phi1(d), d) ;
 	}
 
@@ -169,7 +169,7 @@ void EmbeddedGMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<FACE>(beta1(ee), fEmb) ;
 		setDartEmbedding<FACE>(beta0(beta1(ee)), fEmb) ;
 		setDartEmbedding<FACE>(beta1(beta0(beta1(ee))), fEmb) ;
-		setOrbitEmbeddingNewCell<FACE>(e);
+		setOrbitEmbeddingOnNewCell<FACE>(e);
 		copyCell<FACE>(e, d);
 	}
 
@@ -248,7 +248,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 			if(!sameVertex(dit, dd))
 			{
 				setOrbitEmbedding<VERTEX>(dit, getEmbedding<VERTEX>(dit)) ;
-				setOrbitEmbeddingNewCell<VERTEX>(dd);
+				setOrbitEmbeddingOnNewCell<VERTEX>(dd);
 				copyCell<VERTEX>(dd, dit);
 			}
 			else
@@ -265,7 +265,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 			if(!sameEdge(dit, dd))
 			{
 				setOrbitEmbedding<EDGE>(dit, getEmbedding<EDGE>(dit)) ;
-				setOrbitEmbeddingNewCell<EDGE>(dd);
+				setOrbitEmbeddingOnNewCell<EDGE>(dd);
 				copyCell<EDGE>(dd, dit);
 			}
 			else
@@ -286,7 +286,7 @@ void EmbeddedGMap3::unsewVolumes(Dart d)
 	// embed the unsewn face with the face embedding
 	if (isOrbitEmbedded<FACE>())
 	{
-		setOrbitEmbeddingNewCell<FACE>(dd);
+		setOrbitEmbeddingOnNewCell<FACE>(dd);
 		copyCell<FACE>(dd, d);
 	}
 }
@@ -348,7 +348,7 @@ void EmbeddedGMap3::splitVolume(std::vector<Dart>& vd)
 	{
 		Dart v = vd.front() ;
 		Dart v23 = alpha2(v) ;
-		setOrbitEmbeddingNewCell<VOLUME>(v23) ;
+		setOrbitEmbeddingOnNewCell<VOLUME>(v23) ;
 		copyCell<VOLUME>(v23, v) ;
 	}
 }
