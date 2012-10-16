@@ -108,6 +108,15 @@ class Tensor
 		void identity() ;
 
 		/**
+		 * \brief Modifier: set constant values
+		 *
+		 * Sets all values to r
+		 *
+		 * \param r the constant value
+		 */
+		void setConst(const REAL& r) ;
+
+		/**
 		 * \brief Modifier: copy Tensor
 		 *
 		 * copies argument into current instance
