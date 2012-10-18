@@ -45,7 +45,7 @@ Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 
 	if(isOrbitEmbedded<EDGE>())
 	{
-
+		initOrbitEmbeddingNewCell<EDGE>(dres) ; // TODO : check if dres is a dart of the new edge
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
@@ -75,6 +75,11 @@ Dart EmbeddedMap3::deleteVertex(Dart d)
 Dart EmbeddedMap3::cutEdge(Dart d)
 {
 	Dart nd = Map3::cutEdge(d);
+
+	if(isOrbitEmbedded<VERTEX>())
+	{
+		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
+	}
 
 	if(isOrbitEmbedded<EDGE>())
 	{
@@ -253,6 +258,11 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(phi_1(ee), vEmb1);
 		setDartEmbedding<VERTEX>(phi_1(d), vEmb2);
 		setDartEmbedding<VERTEX>(phi_1(dd), vEmb2);
+	}
+
+	if(isOrbitEmbedded<EDGE>())
+	{
+		initOrbitEmbeddingNewCell<EDGE>(phi_1(d)) ;
 	}
 
 	if(isOrbitEmbedded<FACE2>())
