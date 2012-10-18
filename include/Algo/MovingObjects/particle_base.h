@@ -18,33 +18,36 @@ template <typename PFP>
 class ParticleBase
 {
 private:
-	typename PFP::VEC3 m_position;
-	unsigned int m_state;
+	typename PFP::VEC3 m_position ;
+	unsigned int m_state ;
 
-public :
-	ParticleBase(typename PFP::VEC3 position) :
-		m_position(position),
-		m_state(FACE)
+public:
+	ParticleBase(const typename PFP::VEC3& position) :
+		m_position(position), m_state(FACE)
 	{
 	}
 
-	void setState(unsigned int state) {
-		m_state = state;
+	void setState(unsigned int state)
+	{
+		m_state = state ;
 	}
 
 	unsigned int getState()
 	{
-		return m_state;
+		return m_state ;
 	}
 
-	bool move(typename PFP::VEC3 position)
+	bool move(const typename PFP::VEC3& position)
 	{
-		m_position = position;
-		return true;
+		m_position = position ;
+		return true ;
 	}
 
-	typename PFP::VEC3 getPosition() { return m_position; }
-};
+	const typename PFP::VEC3& getPosition()
+	{
+		return m_position ;
+	}
+} ;
 
 } // namespace MovingObjects
 

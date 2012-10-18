@@ -22,10 +22,6 @@ ENDIF(WIN32)
 
 
 #define exec to compile
-QT4_WRAP_CPP(tutoriel_moc ../tutoriel.h)	
-add_executable( tutoriel ../tutoriel.cpp ${tutoriel_moc})
-target_link_libraries( tutoriel
-		${CGoGN_LIBS_R} ${CGoGN_EXT_LIBS}  )
 
 QT4_WRAP_CPP(frame_manip_moc ../frame_manip.h)	
 add_executable( frame_manip ../frame_manip.cpp ${frame_manip_moc})

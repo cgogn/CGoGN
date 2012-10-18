@@ -29,11 +29,11 @@ template <typename PFP>
 class ParticleCell2D : public ParticleBase<PFP>
 {
 public:
-	typedef typename PFP::MAP Map ;
-	typedef typename PFP::VEC3 VEC3;
-	typedef VertexAttribute<typename PFP::VEC3> TAB_POS;
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef VertexAttribute<VEC3> TAB_POS ;
 
-	Map& m ;
+	MAP& m ;
 
 	const TAB_POS& positionAttribut ;
 
@@ -42,12 +42,7 @@ public:
 
 	unsigned int crossCell ;
 
-//	ParticleCell2D(Map& map) :
-//		m(map)
-//	{
-//	}
-
-	ParticleCell2D(Map& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+	ParticleCell2D(MAP& map, Dart belonging_cell, const VEC3& pos, const TAB_POS& tabPos) :
 		ParticleBase<PFP>(pos),
 		m(map),
 		positionAttribut(tabPos),
@@ -105,7 +100,10 @@ public:
 			display() ;
 		}
 		else
+		{
+			// TODO Des petits pas répétés peuvent faire sortir de la cellule actuelle
 			this->ParticleBase<PFP>::move(goal) ;
+		}
 	}
 } ;
 
