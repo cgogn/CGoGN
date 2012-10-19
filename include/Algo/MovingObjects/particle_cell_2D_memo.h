@@ -26,19 +26,27 @@ class ParticleCell2DMemo : public ParticleCell2D<PFP>
 
 public:
 	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3;
 	typedef VertexAttribute<typename PFP::VEC3> TAB_POS ;
 
 	std::list<Dart> memo_cross ;
+	bool detect_vertex ;
+	bool detect_edge ;
+	bool detect_face ;
 
 private:
-	ParticleCell2DMemo()
+	ParticleCell2DMemo() :
+		detect_vertex(false), detect_edge(false), detect_face(true)
 	{
 	}
 
 public:
-	ParticleCell2DMemo(MAP& map, Dart belonging_cell, const VEC3& pos, const TAB_POS& tabPos,
-	                   DartMarker& obst) :
-		ParticleCell2D<PFP>(map, belonging_cell, pos, tabPos, obst)
+
+	ParticleCell2DMemo(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
+		ParticleCell2D<PFP>(map, belonging_cell, pos, tabPos),
+		detect_vertex(false),
+		detect_edge(false),
+		detect_face(true)
 	{
 	}
 
@@ -52,7 +60,6 @@ public:
 } ;
 
 #include "particle_cell_2D_memo.hpp"
-//namespace
 
 }
 

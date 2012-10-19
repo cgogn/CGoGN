@@ -48,10 +48,11 @@ typename PFP::VEC3 ParticleCell2D<PFP>::intersectLineEdge(const VEC3& pA, const 
 }
 
 template <typename PFP>
-Geom::Orientation2D ParticleCell2D<PFP>::getOrientationFace(VEC3 point, VEC3 sourcePoint, Dart d)
+Geom::Orientation2D ParticleCell2D<PFP>::getOrientationFace(VEC3 goal, Dart d)
 {
-	const VEC3& dPoint = positionAttribut[d] ;
-	return Geom::testOrientation2D(point, sourcePoint, dPoint) ;
+	const VEC3& p1 = this->getPosition() ;
+	const VEC3& p2 = positionAttribut[d] ;
+	return Geom::testOrientation2D(goal, p1, p2) ;
 }
 
 template <typename PFP>
@@ -188,17 +189,17 @@ Dart ParticleCell2D<PFP>::faceOrientationState(const VEC3& toward)
 
 	Dart res = d ;
 	Dart dd = d ;
-	float wsoe = getOrientationFace(toward, this->getPosition(), m.phi1(res)) ;
+	float wsoe = getOrientationFace(toward, m.phi1(res)) ;
 
 	// orientation step
 	if (wsoe != Geom::RIGHT)
 	{
 		res = m.phi1(res) ;
-		wsoe = getOrientationFace(toward, this->getPosition(), m.phi1(res)) ;
+		wsoe = getOrientationFace(toward, m.phi1(res)) ;
 		while (wsoe != Geom::RIGHT && dd != res)
 		{
 			res = m.phi1(res) ;
-			wsoe = getOrientationFace(toward, this->getPosition(), m.phi1(res)) ;
+			wsoe = getOrientationFace(toward, m.phi1(res)) ;
 		}
 
 		// source and position to reach are the same : verify if no edge is crossed due to numerical approximation
@@ -222,11 +223,11 @@ Dart ParticleCell2D<PFP>::faceOrientationState(const VEC3& toward)
 	}
 	else
 	{
-		wsoe = getOrientationFace(toward, this->getPosition(), d) ;
+		wsoe = getOrientationFace(toward, d) ;
 		while (wsoe == Geom::RIGHT && m.phi_1(res) != dd)
 		{
 			res = m.phi_1(res) ;
-			wsoe = getOrientationFace(toward, this->getPosition(), res) ;
+			wsoe = getOrientationFace(toward, res) ;
 		}
 
 		// in case of numerical incoherence
@@ -266,17 +267,17 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	Dart dd = d ;
-	float wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d)) ;
+	float wsoe = getOrientationFace(goal, m.phi1(d)) ;
 
 	// orientation step
 	if (wsoe != Geom::RIGHT)
 	{
 		d = m.phi1(d) ;
-		wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d)) ;
+		wsoe = getOrientationFace(goal, m.phi1(d)) ;
 		while (wsoe != Geom::RIGHT && dd != d)
 		{
 			d = m.phi1(d) ;
-			wsoe = getOrientationFace(goal, this->getPosition(), m.phi1(d)) ;
+			wsoe = getOrientationFace(goal, m.phi1(d)) ;
 		}
 
 		// source and position to reach are the same : verify if no edge is crossed due to numerical approximation
@@ -312,15 +313,15 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 			return ;
 		}
 		// take the orientation with d1 : in case we are going through a vertex
-		wsoe = getOrientationFace(goal, this->getPosition(), d) ;
+		wsoe = getOrientationFace(goal, d) ;
 	}
 	else
 	{
-		wsoe = getOrientationFace(goal, this->getPosition(), d) ;
+		wsoe = getOrientationFace(goal, d) ;
 		while (wsoe == Geom::RIGHT && m.phi_1(d) != dd)
 		{
 			d = m.phi_1(d) ;
-			wsoe = getOrientationFace(goal, this->getPosition(), d) ;
+			wsoe = getOrientationFace(goal, d) ;
 		}
 
 		// in case of numerical incoherence

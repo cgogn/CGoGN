@@ -68,7 +68,7 @@ public:
 
 	VEC3 intersectLineEdge(const VEC3& pA, const VEC3& pB, Dart d) ;
 
-	Geom::Orientation2D getOrientationFace(VEC3 sourcePoint, VEC3 point, Dart d) ;
+	Geom::Orientation2D getOrientationFace(VEC3 sourcePoint, Dart d) ;
 
 	void vertexState(const VEC3& current) ;
 
