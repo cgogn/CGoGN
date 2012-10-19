@@ -447,7 +447,7 @@ public:
 	void enableQuickTraversal() ;
 
 	template <unsigned int ORBIT>
-	void updateQuickTraversal() ;
+	void updateQuickTraversal(const FunctorSelect& good = allDarts) ;
 
 	template <unsigned int ORBIT>
 	AttributeMultiVector<Dart>* getQuickTraversal() ;
