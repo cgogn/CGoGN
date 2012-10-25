@@ -41,7 +41,7 @@ ShaderEnvMap::ShaderEnvMap(bool doubleSided, bool withEyePosition):
 	m_ambiant(Geom::Vec4f(0.05f,0.05f,0.1f,0.0f)),
 	m_diffuse(Geom::Vec4f(0.1f,1.0f,0.1f,0.0f)),
 	m_blend(0.5f),
-	m_lightPos(Geom::Vec3f(10.0f,10.0f,1000.0f)),
+	m_lightPos(Geom::Vec3f(10.0f,10.0f,10000.0f)),
 	m_vboPos(NULL),
 	m_vboNormal(NULL),
 	m_vboColor(NULL)
@@ -105,7 +105,7 @@ void ShaderEnvMap::sendParams()
 	if (m_with_eyepos)
 		glUniform3fv(*m_unif_eyePos, 1, m_eyePos.data());
 	// we use texture engine 0
-	glUniform1iARB(*m_unif_envMap,0);
+	glUniform1iARB(*m_unif_envMap,GL_TEXTURE0);
 }
 
 void ShaderEnvMap::setAmbiant(const Geom::Vec4f& ambiant)
@@ -246,8 +246,6 @@ void ShaderEnvMap::setCubeMap(unsigned int sz,
 
 bool ShaderEnvMap::setCubeMapImg(unsigned int sz, unsigned char *img)
 {
-	std::cout << "setCubeMapImg: "<< sz << std::endl;
-
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, *m_texId);
 
@@ -331,10 +329,8 @@ bool ShaderEnvMap::setCubeMapImg(unsigned int sz, unsigned char *img)
 }
 
 
-
-bool ShaderEnvMap::setCubeMapPipo()
+bool ShaderEnvMap::setCubeMapColored()
 {
-	std::cout << "setCubeMapPipo" << std::endl;
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, *m_texId);
 
@@ -396,6 +392,54 @@ bool ShaderEnvMap::setCubeMapPipo()
 }
 
 
+
+bool ShaderEnvMap::setCubeMapCheckered()
+{
+	glEnable(GL_TEXTURE_CUBE_MAP);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, *m_texId);
+
+	unsigned int sz = 256;
+	unsigned char* texture = new unsigned char[3*sz*sz];
+
+	unsigned int width = 16;
+
+	for (unsigned int i = 0; i< sz; ++i)
+	{
+		for (unsigned int j = 0; j< sz; ++j)
+		{
+
+			unsigned int k = i*sz+j;
+			if ((i/width)%2 == (j/width)%2)
+			{
+				texture[k*3]   = 255;
+				texture[k*3+1] = 255;
+				texture[k*3+2] = 255;
+			}
+			else
+			{
+				texture[k*3]   = 0;
+				texture[k*3+1] = 0;
+				texture[k*3+2] = 0;
+			}
+		}
+	}
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGBA, sz, sz, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+	delete[] texture;
+	return true;
+}
+
+
 #ifdef WITH_QT
 bool ShaderEnvMap::setCubeMap(const std::string& filename)
 {
@@ -408,16 +452,6 @@ bool ShaderEnvMap::setCubeMap(const std::string& filename)
 		return false;
 	}
 
-	//	get the info of images
-//	unsigned int bpp = ptr->depth() / 8;
-//
-//	// compatible TYPE
-//	if (bpp != 1)
-//	{
-//		CGoGNout << "Image::load incompatible type: bpp=" << ptr->depth() << CGoGNendl;
-//		delete ptr;
-//		return false;
-//	}
 
 	if ( ptr->width()/4 != ptr->height()/3 )
 	{
@@ -442,21 +476,14 @@ bool ShaderEnvMap::setCubeMap(const std::string& filename)
 
 void ShaderEnvMap::predraw()
 {
-//	glPushAttrib(GL_ENABLE_BIT);	// ??
-
 	glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_CUBE_MAP);
 	glBindTexture(GL_TEXTURE_2D, *m_texId);
-
-	bind();
-	glUniform1iARB(*m_unif_envMap,GL_TEXTURE0);
 }
 
 void ShaderEnvMap::postdraw()
 {
 	glDisable(GL_TEXTURE_CUBE_MAP);
-//	glPopAttrib();
-	unbind();
 }
 
 } // namespace Utils
