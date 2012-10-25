@@ -1,7 +1,7 @@
 #ifndef PARTBASE_H
 #define PARTBASE_H
 
-#include "Geometry/vector_gen.h"
+//#include "Geometry/vector_gen.h"
 
 namespace CGoGN
 {
@@ -12,41 +12,42 @@ namespace Algo
 namespace MovingObjects
 {
 
-typedef Geom::Vec3f VEC3;
-
 /* A particle base defines a position with a displacement function */
 
+template <typename PFP>
 class ParticleBase
 {
-public :
-	VEC3 m_position;
+private:
+	typename PFP::VEC3 m_position ;
+	unsigned int m_state ;
 
-	ParticleBase()
+public:
+	ParticleBase(const typename PFP::VEC3& position) :
+		m_position(position), m_state(FACE)
 	{
-		m_position.zero();
 	}
 
-	ParticleBase(VEC3 position)
+	void setState(unsigned int state)
 	{
-		m_position = position;
+		m_state = state ;
 	}
 
-	virtual unsigned int getState()
+	unsigned int getState()
 	{
-		return 0;
+		return m_state ;
 	}
 
-	/**
-	* @param newPosition new position to reach
-	*/
-	virtual bool move(VEC3 position)
+	bool move(const typename PFP::VEC3& position)
 	{
-		m_position = position;
-		return true;
+		m_position = position ;
+		return true ;
 	}
 
-	VEC3 getPosition() { return m_position; }
-};
+	const typename PFP::VEC3& getPosition() const
+	{
+		return m_position ;
+	}
+} ;
 
 } // namespace MovingObjects
 
