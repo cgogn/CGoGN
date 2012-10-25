@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_PHONG__
-#define __CGOGN_SHADER_PHONG__
+#ifndef __CGOGN_SHADER_ENVMAP__
+#define __CGOGN_SHADER_ENVMAP__
 
 #include "Utils/GLSLShader.h"
 #include "Utils/clippingShader.h"
