@@ -301,10 +301,10 @@ inline bool Vector<DIM, T>::hasNan() const
 }
 
 template <unsigned int DIM, typename T>
-inline bool Vector<DIM, T>::isNormal() const
+inline bool Vector<DIM, T>::isFinite() const
 {
 	for (unsigned int i = 0; i < DIM; ++i)
-		if (!std::isnormal(m_data[i])) return false ;
+		if (!std::isfinite(m_data[i])) return false ;
 	return true ;
 }
 

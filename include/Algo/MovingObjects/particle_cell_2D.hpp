@@ -61,7 +61,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 #ifdef DEBUG
 	CGoGNout << "vertexState" << d << CGoGNendl ;
 #endif
-	assert(goal.isNormal()) ;
+	assert(goal.isFinite()) ;
 
 	crossCell = CROSS_OTHER ;
 
@@ -132,7 +132,7 @@ void ParticleCell2D<PFP>::edgeState(const VEC3& goal, Geom::Orientation2D sideOf
 	CGoGNout << "edgeState" << d << CGoGNendl ;
 #endif
 
-	assert(goal.isNormal()) ;
+	assert(goal.isFinite()) ;
 // 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
 	if (crossCell == NO_CROSS)
@@ -262,8 +262,8 @@ void ParticleCell2D<PFP>::faceState(const VEC3& goal)
 	CGoGNout << "faceState" << d << CGoGNendl ;
 #endif
 
-	assert(this->getPosition().isNormal());
-	assert(goal.isNormal()) ;
+	assert(this->getPosition().isFinite());
+	assert(goal.isFinite()) ;
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
 
 	Dart dd = d ;

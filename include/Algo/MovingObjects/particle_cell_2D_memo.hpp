@@ -134,6 +134,7 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 			return ;
 		default :
 			this->setState(EDGE) ;
+			break ;
 	}
 
 	if (!Algo::Geometry::isPointOnHalfEdge < PFP

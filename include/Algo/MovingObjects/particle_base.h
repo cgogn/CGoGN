@@ -43,7 +43,7 @@ public:
 		return true ;
 	}
 
-	const typename PFP::VEC3& getPosition()
+	const typename PFP::VEC3& getPosition() const
 	{
 		return m_position ;
 	}

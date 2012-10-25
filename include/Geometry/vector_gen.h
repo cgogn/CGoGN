@@ -143,7 +143,7 @@ public:
 
 	bool hasNan() const ;
 
-	bool isNormal() const ;
+	bool isFinite() const ;
 
 	/**
 	 * Tests if the vector is normalized
