@@ -1,7 +1,7 @@
 //ShaderEnvMap::fragmentShaderText
 
 PRECISON;
-VARYING_FRAG vec3 EyeVector, Normal, LightDir,refl;
+VARYING_FRAG vec3 EyeVector, Normal, LightDir;
 #ifdef WITH_COLOR
 VARYING_FRAG vec3 Color;
 #endif
@@ -35,7 +35,7 @@ void main()
 		#endif
 		
 		vec3 R  = reflect(-EyeVector,N);
-		finalColor += mix(col,texture(EnvMap,R),blendCoef) * lambertTerm;
+		finalColor += mix(col,textureCube(EnvMap,R),blendCoef) * lambertTerm;
 	}	
 	gl_FragColor=finalColor;
 }

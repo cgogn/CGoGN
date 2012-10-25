@@ -40,7 +40,11 @@ namespace CGoGN
 
 namespace Utils
 {
-
+/**
+ * Class for shader environment mapping (cube mapping)
+ *
+ * @warning shader code is GL2.0 compatible for GL3.0 replace textureCube by texture in fragment shader !
+ */
 class ShaderEnvMap : public ClippingShader
 {
 protected:
@@ -115,9 +119,21 @@ public:
 
 	unsigned int setAttributeNormal(VBO* vbo);
 
+
 	// optional attributes
 	unsigned int setAttributeColor(VBO* vbo);
 	void unsetAttributeColor();
+
+
+	/**
+	 * need to be called just before draw
+	 */
+	void predraw();
+
+	/**
+	 * need to be called just after draw
+	 */
+	void postdraw();
 
 	void setCubeMap(unsigned int sz, unsigned char* Xpos, unsigned char* Ypos, unsigned char* Zpos, unsigned char* Xneg, unsigned char* Yneg, unsigned char* Zneg);
 
@@ -135,16 +151,17 @@ public:
 	/**
 	 * set colored plane for testing
 	 */
-	bool setCubeMapPipo();
+	bool setCubeMapColored();
 
+	/**
+	 * set colored plane for testing
+	 */
+	bool setCubeMapCheckered();
 
 #ifdef WITH_QT
 	bool setCubeMap(const std::string& filename);
 #endif
 
-	void predraw();
-
-	void postdraw();
 };
 
 } // namespace Utils
