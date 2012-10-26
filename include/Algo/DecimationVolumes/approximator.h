@@ -39,7 +39,8 @@ namespace DecimationVolumes
 
 enum ApproximatorType
 {
-	A_QEM
+	A_QEM,
+	A_MidEdge
 };
 
 template <typename PFP>
@@ -61,12 +62,10 @@ public:
 	virtual const std::string& getApproximatedAttributeName() const = 0 ;
 	virtual ApproximatorType getType() const = 0 ;
 	virtual bool init() = 0 ;
+	virtual void approximate(Dart d) = 0 ;
+	virtual void saveApprox(Dart d) = 0 ;
+	virtual void affectApprox(Dart d) = 0 ;
 	virtual const PredictorGen<PFP>* getPredictor() const = 0 ;
-	virtual void approximate(Operator<PFP>* op) = 0 ;
-	virtual void saveApprox(Operator<PFP>* op) = 0 ;
-	virtual void affectApprox(Operator<PFP>* op) = 0 ;
-
-	virtual void approximate(Dart d) = 0;
 } ;
 
 
@@ -123,45 +122,20 @@ public:
 		return m_approx[d] ;
 	}
 
+	void saveApprox(Dart d)
+	{
+		m_app = m_approx[d] ;
+	}
+
+	void affectApprox(Dart d)
+	{
+		m_attrV[d] = m_app ;
+	}
+
 	const Predictor<PFP, T>* getPredictor() const
 	{
 		return m_predictor ;
 	}
-
-	const T& getDetail(Dart d) const
-	{
-		assert(m_predictor || !"Trying to get detail on a non-predictive scheme") ;
-		return m_detail[d] ;
-	}
-
-	void setDetail(Dart d, T& val)
-	{
-		assert(m_predictor || !"Trying to set detail on a non-predictive scheme") ;
-		m_detail[d] = val ;
-	}
-
-	virtual void saveApprox(Operator<PFP>* op)
-	{
-		Dart d = op->getEdge();
-		m_app = m_approx[d];
-	}
-	virtual void affectApprox(Operator<PFP>* op)
-	{
-		Dart d = op->getEdge();
-		m_attrV[d] = m_app;
-	}
-
-
-	//	void saveApprox(Dart d)
-	//	{
-	//		m_app = m_approx[d] ;
-	//	}
-	//
-	//	void affectApprox(Dart d)
-	//	{
-	//		m_attrV[d] = m_app ;
-	//	}
-
 
 };
 

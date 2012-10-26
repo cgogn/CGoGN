@@ -69,6 +69,7 @@ void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	}
 }
 
+
 /************************************************************************************
  *                                    RANDOM                                        *
  ************************************************************************************/
@@ -112,6 +113,22 @@ bool EdgeSelector_Random<PFP>::nextEdge(Dart& d)
 
 template <typename PFP>
 void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+	allSkipped = false ;
+	do
+	{
+		++cur ;
+		if(cur == darts.size())
+		{
+			cur = 0 ;
+			allSkipped = true ;
+		}
+	} while(!this->m_select(cur) || !m.edgeCanCollapse(darts[cur])) ;
+}
+
+template <typename PFP>
+void EdgeSelector_Random<PFP>::updateWithoutCollapse()
 {
 	MAP& m = this->m_map ;
 	allSkipped = false ;
@@ -220,6 +237,17 @@ void EdgeSelector_Length<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_Length<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -418,6 +446,17 @@ void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -478,18 +517,6 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
-
-template <typename PFP>
-void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
-{
-	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
-	einfo.valid = false ;
-	edges.erase(einfo.it) ;
-
-	//edges.erase(cur) ;
-	cur = edges.begin();
-}
-
 
 /************************************************************************************
  *                            QUADRIC ERROR METRIC (Memoryless version)             *
@@ -658,6 +685,17 @@ void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_QEMml<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -837,6 +875,17 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_Curvature<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -1037,6 +1086,17 @@ void EdgeSelector_MinDetail<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_MinDetail<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>

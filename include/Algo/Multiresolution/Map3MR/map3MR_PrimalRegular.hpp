@@ -169,7 +169,23 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
 		}
 	}
+
+	//
+	// edge-removal on all old boundary edges
+	//
+	TraversorE<typename PFP::MAP> tE(m_map);
+	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<EDGE>(dit);
+			Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
+			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(m_map, d);
+
+		}
+	}
 */
+
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 	m_map.popLevel() ;
 }

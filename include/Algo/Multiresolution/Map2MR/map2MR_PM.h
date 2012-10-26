@@ -37,6 +37,7 @@
 #include "Algo/Decimation/geometryPredictor.h"
 #include "Algo/Decimation/lightfieldApproximator.h"
 
+#include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
 {
@@ -44,7 +45,7 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
 {
 
 template <typename PFP>
@@ -67,6 +68,9 @@ private:
 
 	Algo::Decimation::Approximator<PFP, VEC3>* m_positionApproximator ;
 
+	std::vector<Filter*> synthesisFilters ;
+	std::vector<Filter*> analysisFilters ;
+
 public:
 	Map2MR_PM(MAP& map, VertexAttribute<VEC3>& position);
 
@@ -86,6 +90,23 @@ public:
 	void refine() ;
 
 	bool initOk() { return m_initOk; }
+
+	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
+	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+
+	void clearSynthesisFilters() { synthesisFilters.clear() ; }
+	void clearAnalysisFilters() { analysisFilters.clear() ; }
+
+	/**
+	 * Given the vertex of d in the current level,
+	 * return a dart of from the vertex of the current level
+	 */
+	Dart vertexOrigin(Dart d) ;
+
+//	/**
+//	 * Return the level of the vertex of d in the current level map
+//	 */
+//	unsigned int vertexLevel(Dart d);
 } ;
 
 } // namespace Multiresolution

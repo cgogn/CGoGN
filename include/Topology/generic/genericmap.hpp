@@ -133,11 +133,12 @@ inline void GenericMap::deleteDart(Dart d)
 		// a MRdart can only be deleted on its insertion level
 		if(getDartLevel(d) == m_mrCurrentLevel)
 		{
-			if(isDartValid(d))//index))
+			if(isDartValid(d))
+			{
 				deleteDartLine(index) ;
-
-			m_mrattribs.removeLine(d.index);
-			m_mrNbDarts[m_mrCurrentLevel]--;
+				m_mrattribs.removeLine(d.index);
+				m_mrNbDarts[m_mrCurrentLevel]--;
+			}
 		}
 		else
 		{

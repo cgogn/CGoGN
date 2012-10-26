@@ -340,22 +340,6 @@ void Map2::swapEdges(Dart d, Dart e)
 	//phi2sew(d2, e2);
 }
 
-//void Map2::insertEdgeInVertex(Dart d, Dart e)
-//{
-//	assert(!sameVertex(d,e) && phi2(e) == phi_1(e));
-//	phi1sew(phi_1(d), phi_1(e));
-//}
-//
-//bool Map2::removeEdgeFromVertex(Dart d)
-//{
-//	if (!isBoundaryEdge(d))
-//	{
-//		phi1sew(phi_1(d), phi2(d)) ;
-//		return true ;
-//	}
-//	return false ;
-//}
-
 void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
 	// if sewing with fixed points
@@ -610,6 +594,18 @@ Dart Map2::findBoundaryEdgeOfVertex(Dart d)
 		if (isBoundaryMarked(it))
 			return it ;
 		it = phi2(phi_1(it)) ;
+	} while (it != d) ;
+	return NIL ;
+}
+
+Dart Map2::findBoundaryEdgeOfFace(Dart d)
+{
+	Dart it = d ;
+	do
+	{
+		if (isBoundaryMarked(phi2(it)))
+			return phi2(it) ;
+		it = phi1(it) ;
 	} while (it != d) ;
 	return NIL ;
 }

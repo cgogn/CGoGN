@@ -54,14 +54,6 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 
-//	for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//	{
-//		unsigned int newindex = copyDartLine((*m_mrDarts[m_mrCurrentLevel])[i]) ;	// duplicate all darts
-//		(*m_mrDarts[m_mrCurrentLevel])[i] = newindex ;								// on the new max level
-//		if(!shareVertexEmbeddings)
-//			(*m_embeddings[VERTEX])[newindex] = EMBNULL ;	// set vertex embedding to EMBNULL if no sharing
-//	}
-
 	// cut edges
 	TraversorE<typename PFP::MAP> travE(m_map) ;
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
@@ -94,7 +86,7 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 		unsigned int degree = m_map.faceDegree(old) ;
 		m_map.incCurrentLevel() ;
 
-		if(triQuad & degree == 3)					// if subdividing a triangle
+		if(triQuad && (degree == 3))					// if subdividing a triangle
 		{
 			Dart dd = m_map.phi1(old) ;
 			Dart e = m_map.phi1(m_map.phi1(dd)) ;
@@ -154,6 +146,66 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 	TraversorF<typename PFP::MAP> t(m_map) ;
 	for (Dart dit = t.begin(); dit != t.end(); dit = t.next())
 	{
+		//if it is an even level (triadic refinement) and a boundary face
+		if((m_map.getCurrentLevel()%2 == 0) && m_map.isBoundaryFace(dit))
+		{
+			//find the boundary edge
+			//Dart df = m_map.findBoundaryEdgeOfFace(dit);
+
+			//trisection of the boundary edge
+		}
+		else
+		{
+			Dart d1 = m_map.phi1(dit);
+			m_map.splitFace(dit, d1) ;
+			m_map.cutEdge(m_map.phi_1(dit)) ;
+			Dart x = m_map.phi2(m_map.phi_1(dit)) ;
+			Dart dd = m_map.phi1(m_map.phi1(m_map.phi1((x))));
+			while(dd != x)
+			{
+				Dart next = m_map.phi1(dd) ;
+				m_map.splitFace(dd, m_map.phi1(x)) ;
+				dd = next ;
+			}
+
+			Dart cd = m_map.phi2(x);
+
+			if(embedNewVertices)
+				m_map.template embedNewCell<VERTEX>(cd) ;
+
+			Dart fit = cd ;
+			do
+			{
+				t.skip(fit);
+				fit = m_map.phi2(m_map.phi_1(fit));
+			} while(fit != cd);
+		}
+	}
+
+	//swap edges
+	TraversorE<typename PFP::MAP> te(m_map) ;
+	for (Dart dit = te.begin(); dit != te.end(); dit = te.next())
+	{
+		if(m_map.getDartLevel(dit) < m_map.getCurrentLevel() && !m_map.isBoundaryEdge(dit))
+			m_map.flipEdge(dit);
+	}
+
+	m_map.popLevel() ;
+}
+
+template <typename PFP>
+void Map2MR<PFP>::addNewLevelSqrt2(bool embedNewVertices)
+{
+	m_map.pushLevel() ;
+
+	m_map.addLevelBack() ;
+	m_map.duplicateDarts(m_map.getMaxLevel());
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+
+	//split faces
+	TraversorF<typename PFP::MAP> t(m_map) ;
+	for (Dart dit = t.begin(); dit != t.end(); dit = t.next())
+	{
 		Dart d1 = m_map.phi1(dit);
 		m_map.splitFace(dit, d1) ;
 		m_map.cutEdge(m_map.phi_1(dit)) ;
@@ -177,14 +229,6 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 			t.skip(fit);
 			fit = m_map.phi2(m_map.phi_1(fit));
 		} while(fit != cd);
-	}
-
-	//swap edges
-	TraversorE<typename PFP::MAP> te(m_map) ;
-	for (Dart dit = te.begin(); dit != te.end(); dit = te.next())
-	{
-		if(m_map.getDartLevel(dit) < m_map.getCurrentLevel())
-			m_map.flipEdge(dit);
 	}
 
 	m_map.popLevel() ;

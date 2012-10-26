@@ -171,6 +171,33 @@ public:
 	FunctorSelect* copy() const { return new SelectorDartNoBoundary(m_map);}
 };
 
+template <typename MAP>
+class SelectorLevel : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+	unsigned int m_level;
+public:
+	SelectorLevel(MAP& m, unsigned int l): m_map(m), m_level(l) {}
+	bool operator()(Dart d) const { return m_map.getDartLevel(d) == m_level; }
+	FunctorSelect* copy() const { return new SelectorLevel(m_map, m_level);}
+};
+
+template <typename MAP>
+class SelectorEdgeLevel : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+	unsigned int m_level;
+public:
+	SelectorEdgeLevel(MAP& m, unsigned int l): m_map(m), m_level(l) {}
+	bool operator()(Dart d) const { return (m_map.getDartLevel(d) == m_level) && (m_map.getDartLevel(m_map.phi2(d)) == m_level); }
+	FunctorSelect* copy() const { return new SelectorEdgeLevel(m_map, m_level);}
+};
+
+
 //
 //class SelectorDartMarked : public FunctorSelect
 //{

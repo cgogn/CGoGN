@@ -22,13 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL_REGULAR__
-#define __MAP2MR_PRIMAL_REGULAR__
+#ifndef __MR_SQRT2_FILTER__
+#define __MR_SQRT2_FILTER__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
+#include <cmath>
 #include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
@@ -43,43 +40,50 @@ namespace MR
 namespace Primal
 {
 
-namespace Regular
+namespace Filters
 {
+
+/*********************************************************************************
+ *                           SYNTHESIS FILTERS
+ *********************************************************************************/
+
 
 template <typename PFP>
-class Map2MR
+class Sqrt2FaceSynthesisFilter : public Filter
 {
-public:
-	typedef typename PFP::MAP MAP ;
-
 protected:
-	MAP& m_map;
-	bool shareVertexEmbeddings ;
-
-	std::vector<Filter*> synthesisFilters ;
-	std::vector<Filter*> analysisFilters ;
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Map2MR(MAP& map) ;
+	Sqrt2FaceSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+	void operator() ()
+	{
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
 
-	void addNewLevelSqrt3(bool embedNewVertices = true);
+			m_map.incCurrentLevel() ;
 
-	void addNewLevelSqrt2(bool embedNewVertices = true);
+			Dart midF = m_map.phi2(d);
+			if(m_map.isBoundaryEdge(d))
+			{
+				midF = m_map.phi1(m_map.phi2(m_map.phi_1(d)));
+			}
 
-	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+			m_position[midF] = p ;
 
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
+			m_map.decCurrentLevel() ;
 
-	void analysis() ;
-	void synthesis() ;
+		}
+	}
 } ;
 
-} // namespace Regular
+
+} // namespace Filters
 
 } // namespace Primal
 
@@ -89,6 +93,5 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/Map2MR/map2MR_PrimalRegular.hpp"
-
 #endif
+
