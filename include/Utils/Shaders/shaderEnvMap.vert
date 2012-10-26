@@ -24,7 +24,7 @@ void main ()
 {
 	Normal = vec3 (NormalMatrix * vec4 (VertexNormal, 0.0));
  	vec3 Position = vec3 (ModelViewMatrix * vec4 (VertexPosition, 1.0));
-	LightDir = Position - lightPosition;
+	LightDir = lightPosition - Position;
 	#ifdef WITH_EYEPOSITION
 		EyeVector = eyePosition-Position;
 	#else
