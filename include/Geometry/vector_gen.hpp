@@ -336,8 +336,6 @@ std::istream& operator>>(std::istream& in, Vector<DIM,T>& v)
 	return in ;
 }
 
-
-
 template <unsigned int DIM, typename T>
 inline Vector<DIM,T> operator*(T a, const Vector<DIM,T>& v)
 {
@@ -357,11 +355,19 @@ inline T tripleProduct(const Vector<DIM,T>& v1, const Vector<DIM,T>& v2, const V
 }
 
 template <unsigned int DIM, typename T>
-inline Vector<DIM,T> slerp(const Vector<DIM,T>& v1, const Vector<DIM,T>& v2, const T& t)
+inline Vector<DIM,T> slerp(Vector<DIM,T> v1, Vector<DIM,T> v2, const T& t)
 {
 	Vector<DIM,T> res ;
 
-	T omega = acos(v1 * v2) ;	// assume v1,v2 normalized
+	T scal = v1 * v2 ;
+
+	// Prevention for floating point errors
+	if (1 < scal && scal < 1 + 1e-6)
+		scal = T(1) ;
+	if (-1. - 1e-6 < scal && scal < -1)
+		scal = -T(1) ;
+
+	T omega = acos(scal) ;
 	T den = sin(omega) ;
 
 	if (-1e-8 < den && den < 1e-8)

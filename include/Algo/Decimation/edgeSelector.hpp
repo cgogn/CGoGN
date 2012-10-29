@@ -1686,6 +1686,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		unsigned int k = 0 ;
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -1741,10 +1742,31 @@ bool EdgeSelector_Lightfield<PFP>::init()
 					saved = true ;
 				}
 			}
+			else
+			{
+				std::stringstream s ;
+				s << "PBcoefs" << k ;
+				if(ok > 3 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == s.str().c_str())
+				{
+					++ok ;
+					m_HF.push_back(m.template getAttribute<typename PFP::VEC3, VERTEX>(s.str().c_str())) ;
+					if (m_HF[k++].isValid())
+					{
+						m_approxindex_HF.push_back(approxindex) ;
+						m_attrindex_HF.push_back(attrindex) ;
+						if (!saved)
+						{
+							m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+							saved = true ;
+						}
+					}
+				}
+			}
 		}
+		m_K = k ;
 	}
 
-	if(ok != 4)
+	if(ok < 5)
 		return false ;
 
 	TraversorV<MAP> travV(m);
@@ -1829,7 +1851,7 @@ void EdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool rec
 {
 	Dart dFront,dBack ;
 	Dart dInit = d ;
-//todo
+
 	// Init Front
 	dFront = dInit ;
 
@@ -1855,7 +1877,7 @@ template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
-	//todo
+
 	recomputeQuadric(d2, true) ;
 
 	Dart vit = d2 ;
@@ -1952,11 +1974,10 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	const VEC3& newFN = this->m_approx[m_approxindex_FN]->getApprox(d,m_attrindex_FN) ; // get new frameN
 
 	// New function
-	// todo const VEC3& hfcoefs0 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[0]) ; // get newHFcoefs0
-	// todo const VEC3& hfcoefs1 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[1]) ; // get newHFcoefs1
-	// todo const VEC3& hfcoefs2 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[2]) ; // get newHFcoefs2
-	// ...
-	// todo const VEC3& hfcoefsK = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[K]) ; // get newHFcoefsK
+	std::vector<VEC3> newHF ;
+	newHF.resize(m_K) ;
+	for (unsigned int k = 0 ; k < m_K ; ++k)
+		newHF[k] = this->m_approx[m_approxindex_HF[k]]->getApprox(d,m_attrindex_HF[k]) ; // get newHFcoefsK
 
 	// Compute errors
 	// Position
@@ -1965,21 +1986,26 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	quadGeom += m_quadricGeom[dd] ;	// two vertices quadrics
 
 	// hemisphere difference error
-	double scal1 = abs(double(m_frameN[d] * newFN)) ;
-	scal1 = std::min(scal1, double(1)) ; // for epsilon normalization of newFN errors
+	double scal1 = double(m_frameN[d] * newFN) ;
+	double alpha1 = acos(std::max(std::min(scal1, double(1)),double(-1))) ; // for epsilon normalization of newFN errors
 	// angle 2
-	double scal2 = abs(double(m_frameN[dd] * newFN)) ;
-	scal2 = std::min(scal2, double(1)) ;
-	// Important: sum of abs values works only if newFN is in-between the two old ones (interpolated).
-	// This avoids computation of the sign of alpha1 and alpha2.
-	double alpha = acos(scal1 + scal2) ;
+	double scal2 = double(m_frameN[dd] * newFN) ;
+	double alpha2 = acos(std::max(std::min(scal2, double(1)),double(-1))) ; // for epsilon normalization of newFN errors
 
-	std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << std::endl ;
+	double alpha = alpha1 + alpha2 ;
+
+	if (isnan(alpha))
+		std::cerr << "Nan" << std::endl ;
+
+	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
+	QuadricHF<REAL> quadHF = m_quadricHF[d] ;
+
+	//std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << " vs " << quadHF(newHF) << std::endl ;
 	// sum of QEM metric and frame orientation difference
 	const REAL& err =
 			quadGeom(newPos) // geom
 			+ alpha / M_PI // frame
-			// todo+ quadHF(newHF) // function coefficients
+			+ quadHF(newHF) // function coefficients
 			 ;
 
 	// Check if errated values appear

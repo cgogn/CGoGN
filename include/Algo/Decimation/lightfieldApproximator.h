@@ -115,7 +115,7 @@ public:
 
 	std::vector<VertexAttribute<VEC3>* > m_coefs ;
 
-	VertexAttribute<QuadricHF<REAL> > m_quadricHF ;
+	EdgeAttribute<QuadricHF<REAL> > m_quadricHF ;
 
 public:
 	Approximator_HemiFuncCoefs(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
@@ -123,12 +123,8 @@ public:
 		m_nbCoefs(0),
 		m_HFtype(0) // SH = 0
 	{
-		// check name of number 0
-		if (this->m_attrV[0]->name().find("SH") != std::string::npos)
-			m_HFtype = 1 ;
-
 		unsigned int i ;
-		for (i = 1 ; i < 200 ; ++i)
+		for (i = 0 ; i < 200 ; ++i)
 		{
 			// check if number i is present
 			if ((this->m_attrV.size() <= i) || this->m_attrV[i]->name().find("coefs") == std::string::npos)
@@ -136,7 +132,15 @@ public:
 
 			m_coefs.push_back(this->m_attrV[i]) ;
 		}
-		m_nbCoefs = i - 1 ;
+
+		// check name of last valid
+		if (this->m_attrV[i-1]->name().find("PB") != std::string::npos)
+			m_HFtype = 1 ;
+
+		m_nbCoefs = i ;
+
+		// set quadric
+		m_quadricHF = this->m_map.template addAttribute<QuadricHF<REAL>, EDGE>("HFquadric") ;
 	}
 	~Approximator_HemiFuncCoefs()
 	{}

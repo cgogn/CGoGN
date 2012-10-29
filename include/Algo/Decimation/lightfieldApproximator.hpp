@@ -45,11 +45,13 @@ void Approximator_FrameInterpolation<PFP>::approximate(Dart d)
 	{
 		for (unsigned int i = 0 ; i < 3 ; ++i)
 			this->m_approx[i][d] = this->m_attrV[i]->operator[](d) ;
+		//std::cout << "fallback to p1" << std::endl ;
 	}
 	else if (this->m_approxposition[d] == this->m_position[dd]) // new Position is position of vertex dd
 	{
 		for (unsigned int i = 0 ; i < 3 ; ++i)
 			this->m_approx[i][d] = this->m_attrV[i]->operator[](dd) ;
+		//std::cout << "fallback to p2" << std::endl ;
 	}
 	else
 	{
@@ -64,11 +66,15 @@ void Approximator_FrameInterpolation<PFP>::approximate(Dart d)
 		REAL t = (v0v1 * v0v) / v0v1.norm() ;
 		t = std::max (std::min (t , REAL(1)) , REAL(0) ) ; // clamp it to [0,1]
 
-		const VEC3& normal1 = this->m_attrV[2]->operator[](d) ;
-		const VEC3& normal2 = this->m_attrV[2]->operator[](dd) ;
+		VEC3& normal1 = this->m_attrV[2]->operator[](d) ;
+		VEC3& normal2 = this->m_attrV[2]->operator[](dd) ;
+
+		//Geom::Vector<3,double> n1 = normal1 ;
+		//Geom::Vector<3,double> n2 = normal2 ;
 
 		VEC3 newN = slerp(normal1,normal2,t) ; // spherical interpolation
 		newN.normalize() ;
+		assert (!isnan(newN[0])) ;
 
 		VEC3 newT = normal2 ^ normal1 ; // i is perpendicular to newNormal
 		newT.normalize() ;
@@ -104,10 +110,6 @@ bool Approximator_HemiFuncCoefs<PFP>::init()
 	assert((m_newFrameT.isValid() && m_newFrameB.isValid() && m_frameN.isValid())
 			|| !"New frame embeddings are not set") ;
 
-	// get quadric
-	m_quadricHF = this->m_map.template getAttribute<QuadricHF<REAL>, VERTEX>("HFquadric") ;
-	// Does not require to be valid (if it is not, altenatives will be used).
-
 	if(this->m_predictor)
 	{
 		return false ;
@@ -121,59 +123,78 @@ void Approximator_HemiFuncCoefs<PFP>::approximate(Dart d)
 {
 	const Dart& dd = this->m_map.phi1(d) ;
 
-	QuadricHF<REAL> q ;
-	if (m_quadricHF.isValid()) // if the selector does provide a quadricHF
-	{
-		q = m_quadricHF[d] ;
-		q += m_quadricHF[dd] ;
-	}
-	else // the selector does not provide a quadricHF
-	{
-		// get coefs of v1 and v2
-		std::vector<VEC3> coefs1, coefs2 ;
-		coefs1.resize(m_nbCoefs) ; coefs2.resize(m_nbCoefs) ;
-		for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
-		{
-			coefs1[i] = m_coefs[i]->operator[](d) ;
-			coefs2[i] = m_coefs[i]->operator[](dd) ;
-		}
-
-		const VEC3& T = m_newFrameT[d] ;
-		const VEC3& T1 = m_frameT[d] ;
-		const VEC3& T2 = m_frameT[dd] ;
-		const VEC3& B1 = m_newFrameB[d] ;
-		const VEC3& B2 = m_newFrameB[d] ;
-		const VEC3& N = m_frameN[d] ;
-		const VEC3& N1 = m_newFrameN[d] ;
-		const VEC3& N2 = m_newFrameN[dd] ;
-
-		assert(T * (N1 ^ N2) > 0.99 || !"T is not an intersection of the two tangent planes") ;
-
-		// Compute D1' and D2'
-		VEC3 B1prime = N1 ^ T ;
-		B1prime.normalize() ;
-		VEC3 B2prime = N2 ^ T ;
-		B2prime.normalize() ;
-
-		// Rotation dans sens trigo dans le plan tangent autour de N (T1 --> T)
-		const REAL gamma1 = ((B1 * T) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, T1 * T ), -1.0f)) ; // angle positif ssi
-		const REAL gamma2 = ((B2 * T) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, T2 * T ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
-		// Rotation dans le sens trigo autour de l'axe T (N1 --> N)
-		const REAL alpha1 = ((N * B1prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N1), -1.0f) ) ; // angle positif ssi
-		const REAL alpha2 = ((N * B2prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
-
-		// Create and sum quadrics
-		q = QuadricHF<REAL>(coefs1, gamma1, alpha1) ;
-		q += QuadricHF<REAL>(coefs2, gamma2, alpha2) ;
-	}
-
-	std::vector<VEC3> coefs ;
-	// Compute new function
-	bool opt = q.findOptimizedCoefs(coefs) ;
-	// copy result
+	// get coefs of v1 and v2
+	std::vector<VEC3> coefs1, coefs2 ;
+	coefs1.resize(m_nbCoefs) ; coefs2.resize(m_nbCoefs) ;
 	for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
-		this->m_approx[i][d] = opt ? (m_coefs[i]->operator[](d) + m_coefs[i]->operator[](dd))/2 : m_coefs[i]->operator[](d) ; // if fail take first one
-	assert(false || !"TODO: what todo when fail") ;
+	{
+		coefs1[i] = m_coefs[i]->operator[](d) ;
+		coefs2[i] = m_coefs[i]->operator[](dd) ;
+	}
+
+	const VEC3& T = m_newFrameT[d] ;
+	const VEC3& T1 = m_frameT[d] ;
+	const VEC3& T2 = m_frameT[dd] ;
+	const VEC3& B1 = m_frameB[d] ;
+	const VEC3& B2 = m_frameB[dd] ;
+	const VEC3& N = m_newFrameN[d] ;
+	const VEC3& N1 = m_frameN[d] ;
+	const VEC3& N2 = m_frameN[dd] ;
+
+	//assert(abs(T * N1) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the first tangent plane") ;
+	//assert(abs(T * N2) < 1e-6 || !"Approximator_FrameInterpolation<PFP>::approximate: T is not located in the second tangent plane") ;
+
+	// Compute D1' and D2'
+	VEC3 B1prime = N1 ^ T ;
+	B1prime.normalize() ;
+	VEC3 B2prime = N2 ^ T ;
+	B2prime.normalize() ;
+
+	// Rotation dans sens trigo dans le plan tangent autour de N (T1 --> T)
+	const REAL gamma1 = ((B1 * T) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, T1 * T ), -1.0f)) ; // angle positif ssi
+	const REAL gamma2 = ((B2 * T) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, T2 * T ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
+	// Rotation dans le sens trigo autour de l'axe T (N1 --> N)
+	const REAL alpha1 = ((N * B1prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N1), -1.0f) ) ; // angle positif ssi
+	const REAL alpha2 = ((N * B2prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
+
+	assert (m_quadricHF.isValid() || !"LightfieldApproximator:approximate quadricHF is not valid") ;
+
+	if (T == T1)
+	{
+		// std::cout << "Fallback to p1" << std::endl ;
+
+		m_quadricHF[d] = QuadricHF<REAL>(coefs1, gamma1, 0) ;
+		m_quadricHF[d] += QuadricHF<REAL>(coefs2, gamma2, alpha2 - alpha1) ;
+
+		for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
+			this->m_approx[i][d] = m_coefs[i]->operator[](d) ;
+	}
+	else if (T == T2)
+	{
+		// std::cout << "Fallback to p2" << std::endl ;
+
+		m_quadricHF[d] = QuadricHF<REAL>(coefs1, gamma1, alpha1 - alpha2) ;
+		m_quadricHF[d] += QuadricHF<REAL>(coefs2, gamma2, 0) ;
+
+		for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
+			this->m_approx[i][d] = m_coefs[i]->operator[](dd) ;
+	}
+	else
+	{
+		// Create and sum quadrics
+		m_quadricHF[d] = QuadricHF<REAL>(coefs1, gamma1, alpha1) ;
+		m_quadricHF[d] += QuadricHF<REAL>(coefs2, gamma2, alpha2) ;
+
+		std::vector<VEC3> coefs ;
+		// Compute new function
+		bool opt = m_quadricHF[d].findOptimizedCoefs(coefs) ;
+		// copy result
+		for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
+			this->m_approx[i][d] = opt ? coefs[i] : (m_coefs[i]->operator[](d) + m_coefs[i]->operator[](dd))/2 ; // if fail take first one
+
+		if (!opt)
+			std::cerr << "LightfieldApproximator::Inversion failed : not treated" << std::endl ;
+	}
 }
 
 

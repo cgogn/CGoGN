@@ -183,7 +183,7 @@ T tripleProduct(const Vector<DIM,T>& v1, const Vector<DIM,T>& v2, const Vector<D
 
 // returns a spherical interpolation of two vectors considering parameter t ((0 <= t <= 1) => result between v1 and v2)
 template <unsigned int DIM, typename T>
-Vector<DIM,T> slerp(const Vector<DIM,T> &v1, const Vector<DIM,T> &v2, const T &t) ;
+Vector<DIM,T> slerp(Vector<DIM,T> v1, Vector<DIM,T> v2, const T &t) ;
 
 /**********************************************/
 /*           SOME USEFUL TYPEDEFS             */

@@ -1,26 +1,26 @@
 /*******************************************************************************
-* CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
-* version 0.1                                                                  *
-* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
-*                                                                              *
-* This library is free software; you can redistribute it and/or modify it      *
-* under the terms of the GNU Lesser General Public License as published by the *
-* Free Software Foundation; either version 2.1 of the License, or (at your     *
-* option) any later version.                                                   *
-*                                                                              *
-* This library is distributed in the hope that it will be useful, but WITHOUT  *
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
-* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
-* for more details.                                                            *
-*                                                                              *
-* You should have received a copy of the GNU Lesser General Public License     *
-* along with this library; if not, write to the Free Software Foundation,      *
-* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
-*                                                                              *
-* Web site: http://cgogn.unistra.fr/                                           *
-* Contact information: cgogn@unistra.fr                                        *
-*                                                                              *
-*******************************************************************************/
+ * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+ * version 0.1                                                                  *
+ * Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
+ *                                                                              *
+ * This library is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU Lesser General Public License as published by the *
+ * Free Software Foundation; either version 2.1 of the License, or (at your     *
+ * option) any later version.                                                   *
+ *                                                                              *
+ * This library is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+ * for more details.                                                            *
+ *                                                                              *
+ * You should have received a copy of the GNU Lesser General Public License     *
+ * along with this library; if not, write to the Free Software Foundation,      *
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+ *                                                                              *
+ * Web site: http://cgogn.unistra.fr/                                           *
+ * Contact information: cgogn@unistra.fr                                        *
+ *                                                                              *
+ *******************************************************************************/
 
 #ifndef __QEM__
 #define __QEM__
@@ -30,10 +30,13 @@
 
 #include "Geometry/vector_gen.h"
 #include "Geometry/matrix.h"
+#include "Geometry/tensor.h"
 #include "Geometry/plane_3d.h"
 
 // Eigen includes
 #include <Eigen/Dense>
+
+#define CONST_VAL -5212368.54127
 
 namespace CGoGN {
 
@@ -79,25 +82,25 @@ public:
 		A = q.A ;
 	}
 	Quadric& operator+= (const Quadric<REAL>& q)
-	{
+					{
 		A += q.A ;
 		return *this ;
-	}
+					}
 	Quadric& operator -= (const Quadric<REAL>& q)
-	{
+					{
 		A -= q.A ;
 		return *this ;
-	}
+					}
 	Quadric& operator *= (REAL v)
-	{
+					{
 		A *= v ;
 		return *this ;
-	}
+					}
 	Quadric& operator /= (REAL v)
-	{
+					{
 		A /= v ;
 		return *this ;
-	}
+					}
 
 	REAL operator() (const VEC4& v) const
 	{
@@ -222,35 +225,35 @@ public:
 		c = q.c ;
 	}
 	QuadricNd& operator+= (const QuadricNd<REAL,N>& q)
-	{
+					{
 		A += q.A ;
 		b += q.b ;
 		c += q.c ;
 		return *this ;
-	}
+					}
 
 	QuadricNd& operator -= (const QuadricNd<REAL,N>& q)
-	{
+					{
 		A -= q.A ;
 		b -= q.b ;
 		c -= q.c ;
 		return *this ;
-	}
+					}
 
 	QuadricNd& operator *= (REAL v)
-	{
+					{
 		A *= v ;
 		b *= v ;
 		c *= v ;
 		return *this ;
-	}
+					}
 	QuadricNd& operator /= (REAL v)
-	{
+					{
 		A /= v ;
 		b /= v ;
 		c /= v ;
 		return *this ;
-	}
+					}
 
 	REAL operator() (const VECNp& v) const
 	{
@@ -324,98 +327,156 @@ public:
 	typedef Geom::Vector<3,REAL> VEC3 ;
 
 	QuadricHF()
-	{
-		m_A.resize(0,0) ;
-		m_b.resize(0) ;
-		m_c = 0 ;
-	}
+	{}
 
 	QuadricHF(int i)
 	{
 		m_A.resize(i,i) ;
-		m_b.resize(i) ;
-		m_c = 0 ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			m_b[c].resize(i) ;
+			m_c[c] = 0 ;
+		}
 	}
 
-	QuadricHF(const std::vector<VEC3>& coefs, const REAL& gamma, const REAL& alpha)
+	QuadricHF(const std::vector<VEC3>& v, const REAL& gamma, const REAL& alpha)
 	{
-		m_A.resize(coefs.size(),coefs.size()) ;
-		m_b.resize(coefs.size()) ;
-		m_c = 0 ;
-		// TODO : build A, b and c
-		assert(false || !"todo") ;
+		*this = QuadricHF(tensorsFromCoefs(v), gamma, alpha) ;
+	}
+
+	QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REAL& alpha)
+	{
+		const unsigned int nbcoefs = ((T[0].order() + 1) * (T[0].order() + 2)) / 2. ;
+
+		//m_A.resize(nbcoefs, nbcoefs) ;
+
+		// 2D rotation
+		const Geom::Matrix33d R = rotateMatrix(gamma) ;
+		Geom::Tensor3d* Trot = new Geom::Tensor3d[3] ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+			Trot[c] = rotate(T[c],R) ;
+		std::vector<VEC3> coefsR = coefsFromTensors(Trot) ;
+
+		// parameterized integral on intersection
+
+		// build A, b and c
+		m_A = buildIntegralMatrix_A(alpha,nbcoefs) ; // Parameterized integral matrix A
+		Eigen::MatrixXd integ_b = buildIntegralMatrix_B(alpha,nbcoefs) ; // Parameterized integral matrix b
+		Eigen::MatrixXd integ_c = buildIntegralMatrix_C(alpha,nbcoefs) ; // Parameterized integral matrix c
+
+//		for (unsigned int i = 0 ; i < nbcoefs ; ++i)
+//			for (unsigned int j = 0 ; j < nbcoefs ; ++j)
+//				std::cout << "(" << i << "," << j << ")=" << m_A(i,j) << std::endl ;
+//
+//		for (unsigned int i = 0 ; i < nbcoefs ; ++i)
+//			for (unsigned int j = 0 ; j < nbcoefs ; ++j)
+//				std::cout << "(" << i << "," << j << ")=" << integ_b(i,j) << std::endl ;
+//
+//		for (unsigned int i = 0 ; i < nbcoefs ; ++i)
+//			for (unsigned int j = 0 ; j < nbcoefs ; ++j)
+//				std::cout << "(" << i << "," << j << ")=" << integ_c(i,j) << std::endl ;
+
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			Eigen::VectorXd v ;	v.resize(nbcoefs) ;
+			for (unsigned int i = 0 ; i < nbcoefs ; ++i) // copy into vector
+				v[i] = coefsR[i][c] ;
+
+			m_b[c] = integ_b * v ; // Vector b
+			m_c[c] = v.transpose() * (integ_c * v) ; // Constant c
+		}
 	}
 
 	~QuadricHF()
-	{}
+	{
+		//delete m_A ;
+		//for (unsigned int c = 0 ; c < 3 ; ++c)
+		//	delete m_b[c] ;
+	}
 
 	void zero()
 	{
 		m_A.setZero() ;
-		m_b.setZero() ;
-		m_c = 0 ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			m_b[c].setZero() ;
+			m_c[c] = 0 ;
+		}
 	}
 
 	QuadricHF& operator= (const QuadricHF<REAL>& q)
 	{
 		m_A = q.m_A ;
-		m_b = q.m_b ;
-		m_c = q.m_c ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			m_b[c] = q.m_b[c] ;
+			m_c[c] = q.m_c[c] ;
+		}
 
 		return *this ;
 	}
 
 	QuadricHF& operator+= (const QuadricHF<REAL>& q)
 	{
-		assert(((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && m_b.size() == q.m_b.size()) || !"Incompatible add of matrices") ;
-		if ((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && (m_b.size() == q.m_b.size()))
+		assert(((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && m_b[0].size() == q.m_b[0].size()) || !"Incompatible add of matrices") ;
+		if (!(m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && (m_b[0].size() == q.m_b[0].size()))
 			return *this ;
 
 		m_A += q.m_A ;
-		m_b += q.m_b ;
-		m_c += q.m_c ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			m_b[c] += q.m_b[c] ;
+			m_c[c] += q.m_c[c] ;
+		}
 
 		return *this ;
 	}
 
 	QuadricHF& operator -= (const QuadricHF<REAL>& q)
-	{
-		assert(((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && m_b.size() == q.m_b.size()) || !"Incompatible add of matrices") ;
-		if ((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && (m_b.size() == q.m_b.size()))
+					{
+		assert(((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && m_b[0].size() == q.m_b[0].size()) || !"Incompatible substraction of matrices") ;
+		if ((m_A.cols() == q.m_A.cols()) && (m_A.rows() == q.m_A.rows()) && (m_b[0].size() == q.m_b[0].size()))
 			return *this ;
 
 		m_A -= q.m_A ;
-		m_b -= q.m_b ;
-		m_c -= q.m_c ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			m_b[c] -= q.m_b[c] ;
+			m_c[c] -= q.m_c[c] ;
+		}
 
 		return *this ;
-	}
+					}
 
 	QuadricHF& operator *= (const REAL& v)
-	{
+					{
 		m_A *= v ;
-		m_b *= v ;
-		m_c *= v ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			m_b[c] *= v ;
+			m_c[c] *= v ;
+		}
 
 		return *this ;
-	}
+					}
+
 	QuadricHF& operator /= (const REAL& v)
-	{
+					{
 		const REAL& inv = 1. / v ;
 
 		(*this) *= inv ;
 
 		return *this ;
-	}
+					}
 
-//	REAL operator() (const VECNp& v) const
-//	{
-//		VECN hv ;
-//		for (unsigned int i = 0 ; i < 3 ; ++i)
-//			hv[i] = v[i] ;
-//
-//		return evaluate(v) ;
-//	}
+	//	REAL operator() (const VECNp& v) const
+	//	{
+	//		VECN hv ;
+	//		for (unsigned int i = 0 ; i < 3 ; ++i)
+	//			hv[i] = v[i] ;
+	//
+	//		return evaluate(v) ;
+	//	}
 
 	REAL operator() (const std::vector<VEC3>& coefs) const
 	{
@@ -431,49 +492,790 @@ public:
 	friend std::istream& operator>>(std::istream& in, QuadricHF<REAL>& q)
 	{
 		// TODO
-//		in >> q.A ;
-//		in >> q.b ;
-//		in >> q.c ;
+		//		in >> q.A ;
+		//		in >> q.b ;
+		//		in >> q.c ;
 		return in ;
 	}
 
 	bool findOptimizedCoefs(std::vector<VEC3>& coefs)
 	{
+//		unsigned int nbcoefs = 6 ;
+//		for (unsigned int i = 0 ; i < nbcoefs ; ++i)
+//			for (unsigned int j = 0 ; j < nbcoefs ; ++j)
+//				std::cout << "A(" << i << "," << j << ")=" << m_A(i,j) << std::endl ;
+//
+//		for (unsigned int i = 0 ; i < nbcoefs ; ++i)
+//				std::cout << "b(" << i << ")=" << m_b[0][i] << std::endl ;
+//
+//		std::cout << "c=" << m_c[0] << std::endl ;
+
 		return optimize(coefs) ;
 	}
 
 private:
 	// Double computation is crucial for stability
 	Eigen::MatrixXd m_A ;
-	Eigen::VectorXd m_b ;
-	double m_c ;
+	Eigen::VectorXd m_b[3] ;
+	double m_c[3] ;
 
 	REAL evaluate(const std::vector<VEC3>& coefs) const
 	{
-		// TODO
-//		Geom::Vector<3, double> v_d = v ;
-//		return v_d*A*v_d + 2.*(b*v_d) + c ;
+		VEC3 res ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			Eigen::VectorXd tmp(coefs.size()) ;
+			for (unsigned int i = 0 ; i < coefs.size() ; ++i)
+				tmp[i] = coefs[i][c] ;
+			res[c] = tmp.transpose() * m_A * tmp ;		// A
+			res[c] -= 2. * (m_b[c]).transpose() * tmp ;	// - 2b
+			res[c] += m_c[c] ;							// + c
+		}
+
+		res /= 2*M_PI ; // max integral value over hemisphere
+
+		return (res[0] + res[1] + res[2]) / 3. ;
 	}
 
 	bool optimize(std::vector<VEC3>& coefs) const
 	{
-		coefs.reserve(m_b.size()) ;
+		coefs.resize(m_b[0].size()) ;
 
-		// TODO
-/*		if (std::isnan(A(0,0)))
+		if (fabs(m_A.determinant()) < 1e-6 )
 			return false ;
 
-		Geom::Matrix<3,3,double> Ainv ;
-		double det = A.invert(Ainv) ;
+		Eigen::MatrixXd Ainv = m_A.inverse() ;
 
-		if(det > -1e-6 && det < 1e-6)
-			return false ;
+		for (unsigned int c = 0 ; c < 3 ; ++c)
+		{
+			Eigen::VectorXd tmp(m_b[0].size()) ;
+			tmp = Ainv * m_b[c] ;
+			for (unsigned int i = 0 ; i < m_b[c].size() ; ++i)
+				coefs[i][c] = tmp[i] ;
+		}
 
-		v.zero() ;
-		v -= Ainv * b ;
-*/
 		return true ;
 	}
+
+	Geom::Matrix33d rotateMatrix(const REAL& gamma)
+	{
+		Geom::Matrix33d R ;
+		R.identity() ;
+		R(0,0) = cos(gamma) ;
+		R(0,1) = sin(gamma) ;
+		R(1,0) = -sin(gamma) ;
+		R(1,1) = cos(gamma) ;
+
+		return R ;
+	}
+
+	Geom::Tensor3d rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R)
+	{
+		Geom::Tensor3d Tp(T.order()) ;
+		std::vector<unsigned int> p ; p.resize(T.order(), 0) ;
+		for (unsigned int i = 0 ; i < T.nbElem() ; ++i)
+		{
+			REAL S = 0 ;
+			std::vector<unsigned int> q ; q.resize(T.order(), 0) ;
+			for (unsigned int j = 0 ; j < T.nbElem() ; ++j)
+			{
+				REAL P = T[j] ;
+				for (unsigned int k = 0 ; k < T.order() ; ++k)
+					P *= R(q[k],p[k]) ;
+				S += P ;
+				Geom::Tensor3d::incremIndex(q) ;
+			}
+			Tp[i] = S ;
+			Geom::Tensor3d::incremIndex(p) ;
+		}
+
+		return Tp ;
+	}
+
+	Eigen::MatrixXd buildIntegralMatrix_A(const REAL& alpha, unsigned int size)
+	{
+		Eigen::MatrixXd A(size,size) ;
+
+		A( 0 , 0 ) =  2*(M_PI-alpha) ;
+		A( 0 , 1 ) =  M_PI*sin(alpha)/2.0 ;
+		A( 0 , 2 ) =  0 ;
+		A( 0 , 3 ) =  0 ;
+		A( 0 , 4 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.0 ;
+		A( 0 , 5 ) =  2.0*(M_PI-alpha)/3.0 ;
+		A( 1 , 0 ) =  M_PI*sin(alpha)/2.0 ;
+		A( 1 , 1 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.0 ;
+		A( 1 , 2 ) =  0 ;
+		A( 1 , 3 ) =  0 ;
+		A( 1 , 4 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/8.0 ;
+		A( 1 , 5 ) =  M_PI*sin(alpha)/8.0 ;
+		A( 2 , 0 ) =  0 ;
+		A( 2 , 1 ) =  0 ;
+		A( 2 , 2 ) =  2.0*(M_PI-alpha)/3.0 ;
+		A( 2 , 3 ) =  M_PI*sin(alpha)/8.0 ;
+		A( 2 , 4 ) =  0 ;
+		A( 2 , 5 ) =  0 ;
+		A( 3 , 0 ) =  0 ;
+		A( 3 , 1 ) =  0 ;
+		A( 3 , 2 ) =  M_PI*sin(alpha)/8.0 ;
+		A( 3 , 3 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		A( 3 , 4 ) =  0 ;
+		A( 3 , 5 ) =  0 ;
+		A( 4 , 0 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.0 ;
+		A( 4 , 1 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/8.0 ;
+		A( 4 , 2 ) =  0 ;
+		A( 4 , 3 ) =  0 ;
+		A( 4 , 4 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/3.0E+1 ;
+		A( 4 , 5 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		A( 5 , 0 ) =  2.0*(M_PI-alpha)/3.0 ;
+		A( 5 , 1 ) =  M_PI*sin(alpha)/8.0 ;
+		A( 5 , 2 ) =  0 ;
+		A( 5 , 3 ) =  0 ;
+		A( 5 , 4 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		A( 5 , 5 ) =  2.0*(M_PI-alpha)/5.0 ;
+
+		if (size < 7)
+			return A ;
+
+		A( 6 , 0 ) =  0 ;
+		A( 6 , 1 ) =  0 ;
+		A( 6 , 2 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		A( 6 , 3 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		A( 6 , 4 ) =  0 ;
+		A( 6 , 5 ) =  0 ;
+		A( 6 , 6 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		A( 6 , 7 ) =  0 ;
+		A( 6 , 8 ) =  0 ;
+		A( 6 , 9 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		A( 7 , 0 ) =  M_PI*sin(alpha)/8.0 ;
+		A( 7 , 1 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		A( 7 , 2 ) =  0 ;
+		A( 7 , 3 ) =  0 ;
+		A( 7 , 4 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		A( 7 , 5 ) =  M_PI*sin(alpha)/1.6E+1 ;
+		A( 7 , 6 ) =  0 ;
+		A( 7 , 7 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		A( 7 , 8 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		A( 7 , 9 ) =  0 ;
+		A( 8 , 0 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/8.0 ;
+		A( 8 , 1 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/3.0E+1 ;
+		A( 8 , 2 ) =  0 ;
+		A( 8 , 3 ) =  0 ;
+		A( 8 , 4 ) =  M_PI*(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/4.8E+1 ;
+		A( 8 , 5 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		A( 8 , 6 ) =  0 ;
+		A( 8 , 7 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		A( 8 , 8 ) =  -(9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha-60*M_PI )/2.1E+2 ;
+		A( 8 , 9 ) =  0 ;
+		A( 9 , 0 ) =  0 ;
+		A( 9 , 1 ) =  0 ;
+		A( 9 , 2 ) =  2.0*(M_PI-alpha)/5.0 ;
+		A( 9 , 3 ) =  M_PI*sin(alpha)/1.6E+1 ;
+		A( 9 , 4 ) =  0 ;
+		A( 9 , 5 ) =  0 ;
+		A( 9 , 6 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		A( 9 , 7 ) =  0 ;
+		A( 9 , 8 ) =  0 ;
+		A( 9 , 9 ) =  2.0*(M_PI-alpha)/7.0 ;
+
+		if (size < 11)
+			return A ;
+
+		A( 10 , 0 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		A( 10 , 1 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		A( 10 , 2 ) =  0 ;
+		A( 10 , 3 ) =  0 ;
+		A( 10 , 4 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		A( 10 , 5 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		A( 10 , 6 ) =  0 ;
+		A( 10 , 7 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/1.28E+2 ;
+		A( 10 , 8 ) =  M_PI*(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/3.84E+2 ;
+		A( 10 , 9 ) =  0 ;
+		A( 10 , 10 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/6.3E+2 ;
+		A( 10 , 11 ) =  0 ;
+		A( 10 , 12 ) =  0 ;
+		A( 10 , 13 ) =  -(9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha-60*M_PI )/1.89E+3 ;
+		A( 10 , 14 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/6.3E+1 ;
+		A( 11 , 0 ) =  0 ;
+		A( 11 , 1 ) =  0 ;
+		A( 11 , 2 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		A( 11 , 3 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		A( 11 , 4 ) =  0 ;
+		A( 11 , 5 ) =  0 ;
+		A( 11 , 6 ) =  M_PI*(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/3.84E+2 ;
+		A( 11 , 7 ) =  0 ;
+		A( 11 , 8 ) =  0 ;
+		A( 11 , 9 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/1.28E+2 ;
+		A( 11 , 10 ) =  0 ;
+		A( 11 , 11 ) =  -(9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha-60*M_PI )/1.89E+3 ;
+		A( 11 , 12 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/6.3E+2 ;
+		A( 11 , 13 ) =  0 ;
+		A( 11 , 14 ) =  0 ;
+		A( 12 , 0 ) =  0 ;
+		A( 12 , 1 ) =  0 ;
+		A( 12 , 2 ) =  M_PI*sin(alpha)/1.6E+1 ;
+		A( 12 , 3 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		A( 12 , 4 ) =  0 ;
+		A( 12 , 5 ) =  0 ;
+		A( 12 , 6 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/1.28E+2 ;
+		A( 12 , 7 ) =  0 ;
+		A( 12 , 8 ) =  0 ;
+		A( 12 , 9 ) =  5.0*M_PI*sin(alpha)/1.28E+2 ;
+		A( 12 , 10 ) =  0 ;
+		A( 12 , 11 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/6.3E+2 ;
+		A( 12 , 12 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/6.3E+1 ;
+		A( 12 , 13 ) =  0 ;
+		A( 12 , 14 ) =  0 ;
+		A( 13 , 0 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/3.0E+1 ;
+		A( 13 , 1 ) =  M_PI*(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/4.8E+1 ;
+		A( 13 , 2 ) =  0 ;
+		A( 13 , 3 ) =  0 ;
+		A( 13 , 4 ) =  -(9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha-60*M_PI )/2.1E+2 ;
+		A( 13 , 5 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		A( 13 , 6 ) =  0 ;
+		A( 13 , 7 ) =  M_PI*(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/3.84E+2 ;
+		A( 13 , 8 ) =  -M_PI*(5*pow(sin(alpha),7)-21*pow(sin(alpha),5)+35*pow(sin(alpha),3)-35*sin(alpha))/1.28E+2 ;
+		A( 13 , 9 ) =  0 ;
+		A( 13 , 10 ) =  -(9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha-60*M_PI )/1.89E+3 ;
+		A( 13 , 11 ) =  0 ;
+		A( 13 , 12 ) =  0 ;
+		A( 13 , 13 ) =  -(3*sin(8*alpha)+168*sin(4*alpha)-128*pow(sin(2*alpha),3)+768*sin(2*alpha)+840*alpha-840*M_PI)/3.78E+3 ;
+		A( 13 , 14 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/6.3E+2 ;
+		A( 14 , 0 ) =  2.0*(M_PI-alpha)/5.0 ;
+		A( 14 , 1 ) =  M_PI*sin(alpha)/1.6E+1 ;
+		A( 14 , 2 ) =  0 ;
+		A( 14 , 3 ) =  0 ;
+		A( 14 , 4 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		A( 14 , 5 ) =  2.0*(M_PI-alpha)/7.0 ;
+		A( 14 , 6 ) =  0 ;
+		A( 14 , 7 ) =  5.0*M_PI*sin(alpha)/1.28E+2 ;
+		A( 14 , 8 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/1.28E+2 ;
+		A( 14 , 9 ) =  0 ;
+		A( 14 , 10 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/6.3E+1 ;
+		A( 14 , 11 ) =  0 ;
+		A( 14 , 12 ) =  0 ;
+		A( 14 , 13 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/6.3E+2 ;
+		A( 14 , 14 ) =  2.0*(M_PI-alpha)/9.0 ;
+
+		return A ;
+	}
+
+	Eigen::MatrixXd buildIntegralMatrix_B(const REAL& alpha, unsigned int size)
+	{
+		Eigen::MatrixXd B(size,size) ;
+
+		B( 0 , 0 ) =  2*(M_PI-alpha) ;
+		B( 0 , 1 ) =  M_PI*(sin(2*alpha)+sin(alpha))/2.0 ;
+		B( 0 , 2 ) =  0 ;
+		B( 0 , 3 ) =  0 ;
+		B( 0 , 4 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.0 ;
+		B( 0 , 5 ) =  2.0*(M_PI-alpha)/3.0 ;
+		B( 1 , 0 ) =  M_PI*sin(alpha)/2.0 ;
+		B( 1 , 1 ) =  4.0*(sin(alpha)/4.0-(sin(3*alpha)+(2*alpha-2*M_PI)*cos(alpha) )/4.0)/3.0 ;
+		B( 1 , 2 ) =  0 ;
+		B( 1 , 3 ) =  0 ;
+		B( 1 , 4 ) =  3.0*M_PI*((sin(5*alpha)+3*sin(3*alpha)+6*sin(alpha))/1.2E+1+sin( 2*alpha)/3.0)/8.0 ;
+		B( 1 , 5 ) =  M_PI*sin(alpha)/8.0 ;
+		B( 2 , 0 ) =  0 ;
+		B( 2 , 1 ) =  0 ;
+		B( 2 , 2 ) =  2.0*(M_PI-alpha)/3.0 ;
+		B( 2 , 3 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		B( 2 , 4 ) =  0 ;
+		B( 2 , 5 ) =  0 ;
+		B( 3 , 0 ) =  0 ;
+		B( 3 , 1 ) =  0 ;
+		B( 3 , 2 ) =  M_PI*sin(alpha)/8.0 ;
+		B( 3 , 3 ) =  4.0*(sin(alpha)/4.0-(sin(3*alpha)+(2*alpha-2*M_PI)*cos(alpha) )/4.0)/1.5E+1 ;
+		B( 3 , 4 ) =  0 ;
+		B( 3 , 5 ) =  0 ;
+		B( 4 , 0 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.0 ;
+		B( 4 , 1 ) =  3.0*M_PI*((sin(4*alpha)+6*sin(2*alpha))/1.2E+1+sin(alpha)/3.0 )/8.0 ;
+		B( 4 , 2 ) =  0 ;
+		B( 4 , 3 ) =  0 ;
+		B( 4 , 4 ) =  1.6E+1*(5.0*sin(2*alpha)/3.2E+1-(sin(6*alpha)+4*sin(4*alpha)+4* sin(2*alpha)+(4*alpha-4*M_PI)*cos(2*alpha)+8*alpha-8*M_PI)/3.2E+1 )/1.5E+1 ;
+		B( 4 , 5 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		B( 5 , 0 ) =  2.0*(M_PI-alpha)/3.0 ;
+		B( 5 , 1 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		B( 5 , 2 ) =  0 ;
+		B( 5 , 3 ) =  0 ;
+		B( 5 , 4 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		B( 5 , 5 ) =  2.0*(M_PI-alpha)/5.0 ;
+
+		if (size < 7)
+			return B ;
+
+		B( 6 , 0 ) =  0 ;
+		B( 6 , 1 ) =  0 ;
+		B( 6 , 2 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		B( 6 , 3 ) =  M_PI*((sin(4*alpha)+6*sin(2*alpha))/1.2E+1+sin(alpha)/3.0)/1.6E+1 ;
+		B( 6 , 4 ) =  0 ;
+		B( 6 , 5 ) =  0 ;
+		B( 6 , 6 ) =  1.6E+1*(5.0*sin(2*alpha)/3.2E+1-(sin(6*alpha)+4*sin(4*alpha)+4* sin(2*alpha)+(4*alpha-4*M_PI)*cos(2*alpha)+8*alpha-8*M_PI)/3.2E+1 )/1.05E+2 ;
+		B( 6 , 7 ) =  0 ;
+		B( 6 , 8 ) =  0 ;
+		B( 6 , 9 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		B( 7 , 0 ) =  M_PI*sin(alpha)/8.0 ;
+		B( 7 , 1 ) =  4.0*(sin(alpha)/4.0-(sin(3*alpha)+(2*alpha-2*M_PI)*cos(alpha) )/4.0)/1.5E+1 ;
+		B( 7 , 2 ) =  0 ;
+		B( 7 , 3 ) =  0 ;
+		B( 7 , 4 ) =  M_PI*((sin(5*alpha)+3*sin(3*alpha)+6*sin(alpha))/1.2E+1+sin(2*alpha )/3.0)/1.6E+1 ;
+		B( 7 , 5 ) =  M_PI*sin(alpha)/1.6E+1 ;
+		B( 7 , 6 ) =  0 ;
+		B( 7 , 7 ) =  4.0*(sin(alpha)/4.0-(sin(3*alpha)+(2*alpha-2*M_PI)*cos(alpha) )/4.0)/3.5E+1 ;
+		B( 7 , 8 ) =  1.6E+1*((3*sin(3*alpha)+6*sin(alpha))/3.2E+1-(sin(7*alpha)+2*sin(5 *alpha)+6*sin(3*alpha)+(12*alpha-12*M_PI)*cos(alpha))/3.2E+1)/1.05E+2 ;
+		B( 7 , 9 ) =  0 ;
+		B( 8 , 0 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/8.0 ;
+		B( 8 , 1 ) =  1.6E+1*(5.0*sin(alpha)/3.2E+1-(sin(5*alpha)+6*sin(3*alpha)+2*sin(alpha)+(12*alpha-12*M_PI)*cos(alpha))/3.2E+1)/1.5E+1 ;
+		B( 8 , 2 ) =  0 ;
+		B( 8 , 3 ) =  0 ;
+		B( 8 , 4 ) =  5.0*M_PI*((3*sin(7*alpha)+15*sin(5*alpha)+55*sin(3*alpha)+75*sin (alpha))/2.4E+2+sin(2*alpha)/5.0)/1.6E+1 ;
+		B( 8 , 5 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		B( 8 , 6 ) =  0 ;
+		B( 8 , 7 ) =  1.6E+1*(5.0*sin(alpha)/3.2E+1-(sin(5*alpha)+6*sin(3*alpha)+2*sin(alpha)+(12*alpha-12*M_PI)*cos(alpha))/3.2E+1)/1.05E+2 ;
+		B( 8 , 8 ) =  3.2E+1*((29*sin(3*alpha)+45*sin(alpha))/3.84E+2-(2*sin(9*alpha)+9*sin(7*alpha)+27*sin(5*alpha)+54*sin(3*alpha)+(12*alpha-12*M_PI)*cos(3*alpha)+18*sin(alpha)+(108*alpha-108*M_PI)*cos(alpha))/3.84E+2)/3.5E+1 ;
+		B( 8 , 9 ) =  0 ;
+		B( 9 , 0 ) =  0 ;
+		B( 9 , 1 ) =  0 ;
+		B( 9 , 2 ) =  2.0*(M_PI-alpha)/5.0 ;
+		B( 9 , 3 ) =  M_PI*(sin(2*alpha)+sin(alpha))/1.6E+1 ;
+		B( 9 , 4 ) =  0 ;
+		B( 9 , 5 ) =  0 ;
+		B( 9 , 6 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		B( 9 , 7 ) =  0 ;
+		B( 9 , 8 ) =  0 ;
+		B( 9 , 9 ) =  2.0*(M_PI-alpha)/7.0 ;
+
+		if (size < 11)
+			return B ;
+
+		B( 10 , 0 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/1.5E+1 ;
+		B( 10 , 1 ) =  M_PI*((sin(4*alpha)+6*sin(2*alpha))/1.2E+1+sin(alpha)/3.0)/1.6E+1 ;
+		B( 10 , 2 ) =  0 ;
+		B( 10 , 3 ) =  0 ;
+		B( 10 , 4 ) =  1.6E+1*(5.0*sin(2*alpha)/3.2E+1-(sin(6*alpha)+4*sin(4*alpha)+4* sin(2*alpha)+(4*alpha-4*M_PI)*cos(2*alpha)+8*alpha-8*M_PI)/3.2E+1 )/1.05E+2 ;
+		B( 10 , 5 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/3.5E+1 ;
+		B( 10 , 6 ) =  0 ;
+		B( 10 , 7 ) =  3.0*M_PI*((sin(4*alpha)+6*sin(2*alpha))/1.2E+1+sin(alpha)/3.0 )/1.28E+2 ;
+		B( 10 , 8 ) =  5.0*M_PI*((3*sin(8*alpha)+10*sin(6*alpha)+30*sin(4*alpha)+90*sin (2*alpha))/2.4E+2+(7*sin(3*alpha)+15*sin(alpha))/6.0E+1)/1.28E+2 ;
+		B( 10 , 9 ) =  0 ;
+		B( 10 , 10 ) =  1.6E+1*(5.0*sin(2*alpha)/3.2E+1-(sin(6*alpha)+4*sin(4*alpha)+4* sin(2*alpha)+(4*alpha-4*M_PI)*cos(2*alpha)+8*alpha-8*M_PI)/3.2E+1 )/3.15E+2 ;
+		B( 10 , 11 ) =  0 ;
+		B( 10 , 12 ) =  0 ;
+		B( 10 , 13 ) =  3.2E+1*((7*sin(4*alpha)+30*sin(2*alpha))/1.92E+2-(sin(10*alpha)+3* sin(8*alpha)+9*sin(6*alpha)+24*sin(4*alpha)+18*sin(2*alpha)+(24 *alpha-24*M_PI)*cos(2*alpha)+36*alpha-36*M_PI)/1.92E+2)/3.15E+2 ;
+		B( 10 , 14 ) =  -(sin(2*alpha)+2*alpha-2*M_PI)/6.3E+1 ;
+		B( 11 , 0 ) =  0 ;
+		B( 11 , 1 ) =  0 ;
+		B( 11 , 2 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/4.8E+1 ;
+		B( 11 , 3 ) =  1.6E+1*(5.0*sin(alpha)/3.2E+1-(sin(5*alpha)+6*sin(3*alpha)+2*sin(alpha)+(12*alpha-12*M_PI)*cos(alpha))/3.2E+1)/1.05E+2 ;
+		B( 11 , 4 ) =  0 ;
+		B( 11 , 5 ) =  0 ;
+		B( 11 , 6 ) =  5.0*M_PI*((3*sin(7*alpha)+15*sin(5*alpha)+55*sin(3*alpha)+75*sin (alpha))/2.4E+2+sin(2*alpha)/5.0)/1.28E+2 ;
+		B( 11 , 7 ) =  0 ;
+		B( 11 , 8 ) =  0 ;
+		B( 11 , 9 ) =  -M_PI*(pow(sin(alpha),3)-3*sin(alpha))/1.28E+2 ;
+		B( 11 , 10 ) =  0 ;
+		B( 11 , 11 ) =  3.2E+1*((29*sin(3*alpha)+45*sin(alpha))/3.84E+2-(2*sin(9*alpha)+9*sin(7*alpha)+27*sin(5*alpha)+54*sin(3*alpha)+(12*alpha-12*M_PI)* cos(3*alpha)+18*sin(alpha)+(108*alpha-108*M_PI)*cos(alpha))/3.84E+2)/3.15E+2 ;
+		B( 11 , 12 ) =  1.6E+1*(5.0*sin(alpha)/3.2E+1-(sin(5*alpha)+6*sin(3*alpha)+2*sin(alpha)+(12*alpha-12*M_PI)*cos(alpha))/3.2E+1)/3.15E+2 ;
+		B( 11 , 13 ) =  0 ;
+		B( 11 , 14 ) =  0 ;
+		B( 12 , 0 ) =  0 ;
+		B( 12 , 1 ) =  0 ;
+		B( 12 , 2 ) =  M_PI*sin(alpha)/1.6E+1 ;
+		B( 12 , 3 ) =  4.0*(sin(alpha)/4.0-(sin(3*alpha)+(2*alpha-2*M_PI)*cos(alpha) )/4.0)/3.5E+1 ;
+		B( 12 , 4 ) =  0 ;
+		B( 12 , 5 ) =  0 ;
+		B( 12 , 6 ) =  3.0*M_PI*((sin(5*alpha)+3*sin(3*alpha)+6*sin(alpha))/1.2E+1+sin( 2*alpha)/3.0)/1.28E+2 ;
+		B( 12 , 7 ) =  0 ;
+		B( 12 , 8 ) =  0 ;
+		B( 12 , 9 ) =  5.0*M_PI*sin(alpha)/1.28E+2 ;
+		B( 12 , 10 ) =  0 ;
+		B( 12 , 11 ) =  1.6E+1*((3*sin(3*alpha)+6*sin(alpha))/3.2E+1-(sin(7*alpha)+2*sin(5 *alpha)+6*sin(3*alpha)+(12*alpha-12*M_PI)*cos(alpha))/3.2E+1)/3.15E+2 ;
+		B( 12 , 12 ) =  4.0*(sin(alpha)/4.0-(sin(3*alpha)+(2*alpha-2*M_PI)*cos(alpha) )/4.0)/6.3E+1 ;
+		B( 12 , 13 ) =  0 ;
+		B( 12 , 14 ) =  0 ;
+		B( 13 , 0 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/3.0E+1 ;
+		B( 13 , 1 ) =  5.0*M_PI*((3*sin(6*alpha)+20*sin(4*alpha)+95*sin(2*alpha))/2.4E+2 + sin(alpha)/5.0)/1.6E+1 ;
+		B( 13 , 2 ) =  0 ;
+		B( 13 , 3 ) =  0 ;
+		B( 13 , 4 ) =  3.2E+1*(1.1E+1*sin(2*alpha)/9.6E+1-(sin(8*alpha)+6*sin(6*alpha)+21 *sin(4*alpha)+24*sin(2*alpha)+(24*alpha-24*M_PI)*cos(2*alpha)+36 *alpha-36*M_PI)/1.92E+2)/3.5E+1 ;
+		B( 13 , 5 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/2.1E+2 ;
+		B( 13 , 6 ) =  0 ;
+		B( 13 , 7 ) =  5.0*M_PI*((3*sin(6*alpha)+20*sin(4*alpha)+95*sin(2*alpha))/2.4E+2+sin(alpha)/5.0)/1.28E+2 ;
+		B( 13 , 8 ) =  3.5E+1*M_PI*((5*sin(10*alpha)+28*sin(8*alpha)+91*sin(6*alpha)+280*sin(4*alpha)+630*sin(2*alpha))/2.24E+3+(13*sin(3*alpha)+21*sin(alpha))/1.4E+2)/1.28E+2 ;
+		B( 13 , 9 ) =  0 ;
+		B( 13 , 10 ) =  3.2E+1*(1.1E+1*sin(2*alpha)/9.6E+1-(sin(8*alpha)+6*sin(6*alpha)+21 *sin(4*alpha)+24*sin(2*alpha)+(24*alpha-24*M_PI)*cos(2*alpha)+36 *alpha-36*M_PI)/1.92E+2)/3.15E+2 ;
+		B( 13 , 11 ) =  0 ;
+		B( 13 , 12 ) =  0 ;
+		B( 13 , 13 ) =  2.56E+2*((103*sin(4*alpha)+352*sin(2*alpha))/3.072E+3-(3*sin(12*alpha)+16*sin(10*alpha)+52*sin(8*alpha)+144*sin(6*alpha)+324*sin(4*alpha)+(24*alpha-24*M_PI)*cos(4*alpha)+288*sin(2*alpha)+(384*alpha-384*M_PI)*cos(2*alpha)+432*alpha-432*M_PI)/3.072E+3)/3.15E+2 ;
+		B( 13 , 14 ) =  -(sin(4*alpha)+8*sin(2*alpha)+12*alpha-12*M_PI)/6.3E+2 ;
+		B( 14 , 0 ) =  2.0*(M_PI-alpha)/5.0 ;
+		B( 14 , 1 ) =  M_PI*(sin(2*alpha)+sin(alpha))/1.6E+1 ;
+		B( 14 , 2 ) =  0 ;
+		B( 14 , 3 ) =  0 ;
+		B( 14 , 4 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		B( 14 , 5 ) =  2.0*(M_PI-alpha)/7.0 ;
+		B( 14 , 6 ) =  0 ;
+		B( 14 , 7 ) =  5.0*M_PI*(sin(2*alpha)+sin(alpha))/1.28E+2 ;
+		B( 14 , 8 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/1.28E+2 ;
+		B( 14 , 9 ) =  0 ;
+		B( 14 , 10 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/6.3E+1 ;
+		B( 14 , 11 ) =  0 ;
+		B( 14 , 12 ) =  0 ;
+		B( 14 , 13 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/3.15E+2 ;
+		B( 14 , 14 ) =  2.0*(M_PI-alpha)/9.0 ;
+
+		return B ;
+	}
+
+	Eigen::MatrixXd buildIntegralMatrix_C(const REAL& alpha, unsigned int size)
+	{
+		Eigen::MatrixXd C(size,size) ;
+
+		C( 0 , 0 ) =  2*(M_PI-alpha) ;
+		C( 0 , 1 ) =  M_PI*(sin(2*alpha)+sin(alpha))/2.0 ;
+		C( 0 , 2 ) =  0 ;
+		C( 0 , 3 ) =  0 ;
+		C( 0 , 4 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.0 ;
+		C( 0 , 5 ) =  2.0*(M_PI-alpha)/3.0 ;
+		C( 1 , 0 ) =  M_PI*(sin(2*alpha)+sin(alpha))/2.0 ;
+		C( 1 , 1 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.0 ;
+		C( 1 , 2 ) =  0 ;
+		C( 1 , 3 ) =  0 ;
+		C( 1 , 4 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/8.0 ;
+		C( 1 , 5 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		C( 2 , 0 ) =  0 ;
+		C( 2 , 1 ) =  0 ;
+		C( 2 , 2 ) =  2.0*(M_PI-alpha)/3.0 ;
+		C( 2 , 3 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		C( 2 , 4 ) =  0 ;
+		C( 2 , 5 ) =  0 ;
+		C( 3 , 0 ) =  0 ;
+		C( 3 , 1 ) =  0 ;
+		C( 3 , 2 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		C( 3 , 3 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		C( 3 , 4 ) =  0 ;
+		C( 3 , 5 ) =  0 ;
+		C( 4 , 0 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.0 ;
+		C( 4 , 1 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/8.0 ;
+		C( 4 , 2 ) =  0 ;
+		C( 4 , 3 ) =  0 ;
+		C( 4 , 4 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.5E+1 ;
+		C( 4 , 5 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		C( 5 , 0 ) =  2.0*(M_PI-alpha)/3.0 ;
+		C( 5 , 1 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		C( 5 , 2 ) =  0 ;
+		C( 5 , 3 ) =  0 ;
+		C( 5 , 4 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		C( 5 , 5 ) =  2.0*(M_PI-alpha)/5.0 ;
+
+		if (size < 7)
+			return C ;
+
+		C( 6 , 0 ) =  0 ;
+		C( 6 , 1 ) =  0 ;
+		C( 6 , 2 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		C( 6 , 3 ) =  M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin (alpha))/3.0)/1.6E+1 ;
+		C( 6 , 4 ) =  0 ;
+		C( 6 , 5 ) =  0 ;
+		C( 6 , 6 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.05E+2 ;
+		C( 6 , 7 ) =  0 ;
+		C( 6 , 8 ) =  0 ;
+		C( 6 , 9 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		C( 7 , 0 ) =  M_PI*(sin(2*alpha)+sin(alpha))/8.0 ;
+		C( 7 , 1 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		C( 7 , 2 ) =  0 ;
+		C( 7 , 3 ) =  0 ;
+		C( 7 , 4 ) =  M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin (alpha))/3.0)/1.6E+1 ;
+		C( 7 , 5 ) =  M_PI*(sin(2*alpha)+sin(alpha))/1.6E+1 ;
+		C( 7 , 6 ) =  0 ;
+		C( 7 , 7 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		C( 7 , 8 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.05E+2 ;
+		C( 7 , 9 ) =  0 ;
+		C( 8 , 0 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/8.0 ;
+		C( 8 , 1 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.5E+1 ;
+		C( 8 , 2 ) =  0 ;
+		C( 8 , 3 ) =  0 ;
+		C( 8 , 4 ) =  5.0*M_PI*((3*pow(sin(2*alpha),5)-10*pow(sin(2*alpha),3)+15*sin(2*alpha)) /1.5E+1+(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/1.5E+1 )/1.6E+1 ;
+		C( 8 , 5 ) =  M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin (alpha))/3.0)/1.6E+1 ;
+		C( 8 , 6 ) =  0 ;
+		C( 8 , 7 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.05E+2 ;
+		C( 8 , 8 ) =  3.2E+1*((9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha )/1.92E+2-(9*sin(8*alpha)-4*pow(sin(4*alpha),3)+48*sin(4*alpha)+120 *alpha-60*M_PI)/1.92E+2)/3.5E+1 ;
+		C( 8 , 9 ) =  0 ;
+		C( 9 , 0 ) =  0 ;
+		C( 9 , 1 ) =  0 ;
+		C( 9 , 2 ) =  2.0*(M_PI-alpha)/5.0 ;
+		C( 9 , 3 ) =  M_PI*(sin(2*alpha)+sin(alpha))/1.6E+1 ;
+		C( 9 , 4 ) =  0 ;
+		C( 9 , 5 ) =  0 ;
+		C( 9 , 6 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		C( 9 , 7 ) =  0 ;
+		C( 9 , 8 ) =  0 ;
+		C( 9 , 9 ) =  2.0*(M_PI-alpha)/7.0 ;
+
+		if (size < 11)
+			return C ;
+
+		C( 10 , 0 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
+		C( 10 , 1 ) =  M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin (alpha))/3.0)/1.6E+1 ;
+		C( 10 , 2 ) =  0 ;
+		C( 10 , 3 ) =  0 ;
+		C( 10 , 4 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.05E+2 ;
+		C( 10 , 5 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		C( 10 , 6 ) =  0 ;
+		C( 10 , 7 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/1.28E+2 ;
+		C( 10 , 8 ) =  5.0*M_PI*((3*pow(sin(2*alpha),5)-10*pow(sin(2*alpha),3)+15*sin(2*alpha)) /1.5E+1+(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/1.5E+1)/1.28E+2 ;
+		C( 10 , 9 ) =  0 ;
+		C( 10 , 10 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/3.15E+2 ;
+		C( 10 , 11 ) =  0 ;
+		C( 10 , 12 ) =  0 ;
+		C( 10 , 13 ) =  3.2E+1*((9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha )/1.92E+2-(9*sin(8*alpha)-4*pow(sin(4*alpha),3)+48*sin(4*alpha)+120 *alpha-60*M_PI)/1.92E+2)/3.15E+2 ;
+		C( 10 , 14 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/6.3E+1 ;
+		C( 11 , 0 ) =  0 ;
+		C( 11 , 1 ) =  0 ;
+		C( 11 , 2 ) =  M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin (alpha))/3.0)/1.6E+1 ;
+		C( 11 , 3 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.05E+2 ;
+		C( 11 , 4 ) =  0 ;
+		C( 11 , 5 ) =  0 ;
+		C( 11 , 6 ) =  5.0*M_PI*((3*pow(sin(2*alpha),5)-10*pow(sin(2*alpha),3)+15*sin(2*alpha)) /1.5E+1+(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/1.5E+1 )/1.28E+2 ;
+		C( 11 , 7 ) =  0 ;
+		C( 11 , 8 ) =  0 ;
+		C( 11 , 9 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/1.28E+2 ;
+		C( 11 , 10 ) =  0 ;
+		C( 11 , 11 ) =  3.2E+1*((9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha )/1.92E+2-(9*sin(8*alpha)-4*pow(sin(4*alpha),3)+48*sin(4*alpha)+120 *alpha-60*M_PI)/1.92E+2)/3.15E+2 ;
+		C( 11 , 12 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/3.15E+2 ;
+		C( 11 , 13 ) =  0 ;
+		C( 11 , 14 ) =  0 ;
+		C( 12 , 0 ) =  0 ;
+		C( 12 , 1 ) =  0 ;
+		C( 12 , 2 ) =  M_PI*(sin(2*alpha)+sin(alpha))/1.6E+1 ;
+		C( 12 , 3 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		C( 12 , 4 ) =  0 ;
+		C( 12 , 5 ) =  0 ;
+		C( 12 , 6 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/1.28E+2 ;
+		C( 12 , 7 ) =  0 ;
+		C( 12 , 8 ) =  0 ;
+		C( 12 , 9 ) =  5.0*M_PI*(sin(2*alpha)+sin(alpha))/1.28E+2 ;
+		C( 12 , 10 ) =  0 ;
+		C( 12 , 11 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/3.15E+2 ;
+		C( 12 , 12 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/6.3E+1 ;
+		C( 12 , 13 ) =  0 ;
+		C( 12 , 14 ) =  0 ;
+		C( 13 , 0 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.5E+1 ;
+		C( 13 , 1 ) =  5.0*M_PI*((3*pow(sin(2*alpha),5)-10*pow(sin(2*alpha),3)+15*sin(2*alpha)) /1.5E+1+(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/1.5E+1 )/1.6E+1 ;
+		C( 13 , 2 ) =  0 ;
+		C( 13 , 3 ) =  0 ;
+		C( 13 , 4 ) =  3.2E+1*((9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha )/1.92E+2-(9*sin(8*alpha)-4*pow(sin(4*alpha),3)+48*sin(4*alpha)+120 *alpha-60*M_PI)/1.92E+2)/3.5E+1 ;
+		C( 13 , 5 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/1.05E+2 ;
+		C( 13 , 6 ) =  0 ;
+		C( 13 , 7 ) =  5.0*M_PI*((3*pow(sin(2*alpha),5)-10*pow(sin(2*alpha),3)+15*sin(2*alpha)) /1.5E+1+(3*pow(sin(alpha),5)-10*pow(sin(alpha),3)+15*sin(alpha))/1.5E+1 )/1.28E+2 ;
+		C( 13 , 8 ) =  3.5E+1*M_PI*(-(5*pow(sin(2*alpha),7)-21*pow(sin(2*alpha),5)+35*pow(sin(2*alpha),3)-35*sin(2*alpha))/3.5E+1-(5*pow(sin(alpha),7)-21*pow(sin(alpha),5)+35*pow(sin(alpha),3)-35*sin(alpha))/3.5E+1)/1.28E+2 ;
+		C( 13 , 9 ) =  0 ;
+		C( 13 , 10 ) =  3.2E+1*((9*sin(4*alpha)-4*pow(sin(2*alpha),3)+48*sin(2*alpha)+60*alpha )/1.92E+2-(9*sin(8*alpha)-4*pow(sin(4*alpha),3)+48*sin(4*alpha)+120 *alpha-60*M_PI)/1.92E+2)/3.15E+2 ;
+		C( 13 , 11 ) =  0 ;
+		C( 13 , 12 ) =  0 ;
+		C( 13 , 13 ) =  2.56E+2*((3*sin(8*alpha)+168*sin(4*alpha)-128*pow(sin(2*alpha),3)+768* sin(2*alpha)+840*alpha)/3.072E+3-(3*sin(16*alpha)+168*sin(8*alpha)-128*pow(sin(4*alpha),3)+768*sin(4*alpha)+1680*alpha-840*M_PI)/3.072E+3)/3.15E+2 ;
+		C( 13 , 14 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/3.15E+2 ;
+		C( 14 , 0 ) =  2.0*(M_PI-alpha)/5.0 ;
+		C( 14 , 1 ) =  M_PI*(sin(2*alpha)+sin(alpha))/1.6E+1 ;
+		C( 14 , 2 ) =  0 ;
+		C( 14 , 3 ) =  0 ;
+		C( 14 , 4 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/3.5E+1 ;
+		C( 14 , 5 ) =  2.0*(M_PI-alpha)/7.0 ;
+		C( 14 , 6 ) =  0 ;
+		C( 14 , 7 ) =  5.0*M_PI*(sin(2*alpha)+sin(alpha))/1.28E+2 ;
+		C( 14 , 8 ) =  3.0*M_PI*(-(pow(sin(2*alpha),3)-3*sin(2*alpha))/3.0-(pow(sin(alpha),3)-3*sin(alpha))/3.0)/1.28E+2 ;
+		C( 14 , 9 ) =  0 ;
+		C( 14 , 10 ) =  4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/6.3E+1 ;
+		C( 14 , 11 ) =  0 ;
+		C( 14 , 12 ) =  0 ;
+		C( 14 , 13 ) =  1.6E+1*((sin(4*alpha)+8*sin(2*alpha)+12*alpha)/3.2E+1-(sin(8*alpha )+8*sin(4*alpha)+24*alpha-12*M_PI)/3.2E+1)/3.15E+2 ;
+		C( 14 , 14 ) =  2.0*(M_PI-alpha)/9.0 ;
+
+		return C ;
+	}
+
+	void fillTensor(Geom::Tensor3d& T)
+	{
+		std::vector<unsigned int> p ;
+		p.resize(T.order(), 0) ;
+		do
+		{
+			//		for (unsigned int i = 0 ; i < p.size() ; ++i)
+			//			std::cout << p[i] << " " ;
+			//		std::cout << std::endl ;
+			if (T(p) == CONST_VAL)
+			{
+				std::vector<unsigned int> sorted_p = p ;
+				std::sort(sorted_p.begin(), sorted_p.begin() + T.order()) ;
+				//			std::cout << "sort: " ;
+				//			for (unsigned int i = 0 ; i < p.size() ; ++i)
+				//				std::cout << sorted_p[i] << " " ;
+				//			std::cout << std::endl ;
+				T(p) = T(sorted_p) ;
+			}
+		} while (Geom::Tensor3d::incremIndex(p)) ;
+	}
+
+
+	Geom::Tensor3d* tensorsFromCoefs(const std::vector<VEC3>& coefs)
+	{
+		const unsigned int& N = coefs.size() ;
+		const unsigned int& degree = (sqrt(1+8*N) - 3) / REAL(2) ;
+		Geom::Tensor3d *A = new Geom::Tensor3d[3] ;
+
+		for (unsigned int col = 0 ; col < 3 ; ++col)
+		{
+			A[col] = Geom::Tensor3d(degree) ;
+			A[col].setConst(CONST_VAL) ;
+		}
+
+		std::vector<unsigned int> index ;
+		if (N > 0)
+		{
+			index.resize(degree,2) ;
+			for (unsigned int col = 0 ; col < 3 ; ++col)
+				A[col](index) = coefs[0][col] ; // constant term (2,2,2,2)
+			if (N > 2)
+			{
+				//				index.resize(degree,2) ;
+				index[0] = 1 ;
+				for (unsigned int col = 0 ; col < 3 ; ++col)
+					A[col](index) = coefs[1][col] / degree ; // v (1,2,2,2)
+				index[0] = 0 ;
+				for (unsigned int col = 0 ; col < 3 ; ++col)
+					A[col](index) = coefs[2][col] / degree ; // u (0,2,2,2)
+				if (N > 5)
+				{
+					//					index.resize(degree,2) ;
+					index[0] = 0 ; index[1] = 1 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						A[col](index) = coefs[3][col] / (degree * (degree - 1)); // uv (0,1,2,2)
+
+					index[0] = 1 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						A[col](index) = coefs[4][col] / ((degree * (degree - 1)) / 2.) ; // v² (1,1,2,2)
+
+					index[0] = 0 ; index[1] = 0 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						A[col](index) = coefs[5][col] / ((degree * (degree - 1)) / 2.) ; // u² (0,0,2,2)
+					if (N > 9)
+					{
+						//						index.resize(degree,2) ;
+						index[0] = 0 ; index[1] = 1 ; index[2] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							A[col](index) = coefs[6][col] / ((degree * (degree - 1) * (degree - 2)) / 2.) ; // uv**2 (0,1,1,2)
+						index[0] = 0 ; index[1] = 0 ; index[2] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							A[col](index) = coefs[7][col] / ((degree * (degree - 1) * (degree - 2)) / 2.) ; // u**2v (0,0,1,2)
+						index[0] = 1 ; index[1] = 1 ; index[2] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							A[col](index) = coefs[8][col] / ((degree * (degree - 1) * (degree - 2)) / 6.) ; // v**3 (1,1,1,2)
+						index[0] = 0 ; index[1] = 0 ; index[2] = 0 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							A[col](index) = coefs[9][col] / ((degree * (degree - 1) * (degree - 2)) / 6.) ; // u**3 (0,0,0,2)
+						if (N > 14)
+						{
+							assert(degree == 4) ;
+							//							index.resize(degree,2)
+							index[0] = 0 ; index[1] = 0 ; index[2] = 1 ; index[3] = 1 ;
+							for (unsigned int col = 0 ; col < 3 ; ++col)
+								A[col](index) = coefs[10][col] / 6 ; // u**2v**2 (0,0,1,1)
+							index[0] = 0 ; index[1] = 0 ; index[2] = 0 ; index[3] = 1 ;
+							for (unsigned int col = 0 ; col < 3 ; ++col)
+								A[col](index) = coefs[11][col] / 4 ; // uv**3 (0,0,0,1)
+							index[0] = 0 ; index[1] = 1 ; index[2] = 1 ; index[3] = 1 ;
+							for (unsigned int col = 0 ; col < 3 ; ++col)
+								A[col](index) = coefs[12][col] / 4 ; // u**3v (0,1,1,1)
+							index[0] = 1 ; index[1] = 1 ; index[2] = 1 ; index[3] = 1 ;
+							for (unsigned int col = 0 ; col < 3 ; ++col)
+								A[col](index) = coefs[13][col] ; // v**4 (1,1,1,1)
+							index[0] = 0 ; index[1] = 0 ; index[2] = 0 ; index[3] = 0 ;
+							for (unsigned int col = 0 ; col < 3 ; ++col)
+								A[col](index) = coefs[14][col] ; // u**4 (0,0,0,0)
+						}
+					}
+				}
+			}
+		}
+
+		for (unsigned int col = 0 ; col < 3 ; ++col)
+			fillTensor(A[col]) ;
+
+		return A ;
+	}
+
+	std::vector<VEC3> coefsFromTensors(Geom::Tensor3d* A)
+					{
+		const unsigned int& degree = A[0].order() ;
+		std::vector<VEC3> coefs ;
+		coefs.resize(((degree + 1) * (degree + 2)) / REAL(2)) ;
+
+		std::vector<unsigned int> index ;
+		index.resize(degree,2) ;
+		for (unsigned int col = 0 ; col < 3 ; ++col)
+			coefs[0][col] = A[col](index) ; // constant term (2,2,2,2)
+		if (degree > 0)
+		{
+			index[0] = 1 ;
+			for (unsigned int col = 0 ; col < 3 ; ++col)
+				coefs[1][col] = A[col](index) * degree ; // v (1,2,2,2)
+			index[0] = 0 ;
+			for (unsigned int col = 0 ; col < 3 ; ++col)
+				coefs[2][col] = A[col](index) * degree ; // u (0,2,2,2)
+			if (degree > 1)
+			{
+				//					index.resize(degree,2) ;
+				index[0] = 0 ; index[1] = 1 ;
+				for (unsigned int col = 0 ; col < 3 ; ++col)
+					coefs[3][col]  = A[col](index) * (degree * (degree - 1)); // uv (0,1,2,2)
+
+				index[0] = 1 ;
+				for (unsigned int col = 0 ; col < 3 ; ++col)
+					coefs[4][col] = A[col](index) * ((degree * (degree - 1)) / 2.) ; // v² (1,1,2,2)
+
+				index[0] = 0 ; index[1] = 0 ;
+				for (unsigned int col = 0 ; col < 3 ; ++col)
+					coefs[5][col] = A[col](index) * ((degree * (degree - 1)) / 2.) ; // u² (0,0,2,2)
+				if (degree > 2)
+				{
+					//						index.resize(degree,2) ;
+					index[0] = 0 ; index[1] = 1 ; index[2] = 1 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						coefs[6][col] = A[col](index) * ((degree * (degree - 1) * (degree - 2)) / 2.) ; // uv**2 (0,1,1,2)
+					index[0] = 0 ; index[1] = 0 ; index[2] = 1 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						coefs[7][col] = A[col](index) * ((degree * (degree - 1) * (degree - 2)) / 2.) ; // u**2v (0,0,1,2)
+					index[0] = 1 ; index[1] = 1 ; index[2] = 1 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						coefs[8][col] = A[col](index) * ((degree * (degree - 1) * (degree - 2)) / 6.) ; // v**3 (1,1,1,2)
+					index[0] = 0 ; index[1] = 0 ; index[2] = 0 ;
+					for (unsigned int col = 0 ; col < 3 ; ++col)
+						coefs[9][col] = A[col](index) * ((degree * (degree - 1) * (degree - 2)) / 6.) ; // u**3 (0,0,0,2)
+					if (degree > 3)
+					{
+						assert(degree == 4) ;
+						//							index.resize(degree,2)
+						index[0] = 0 ; index[1] = 0 ; index[2] = 1 ; index[3] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							coefs[10][col] = A[col](index) * 6 ; // u**2v**2 (0,0,1,1)
+						index[0] = 0 ; index[1] = 0 ; index[2] = 0 ; index[3] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							coefs[11][col] = A[col](index) * 4 ; // uv**3 (0,0,0,1)
+						index[0] = 0 ; index[1] = 1 ; index[2] = 1 ; index[3] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							coefs[12][col] = A[col](index) * 4 ; // u**3v (0,1,1,1)
+						index[0] = 1 ; index[1] = 1 ; index[2] = 1 ; index[3] = 1 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							coefs[13][col] = A[col](index) ; // v**4 (1,1,1,1)
+						index[0] = 0 ; index[1] = 0 ; index[2] = 0 ; index[3] = 0 ;
+						for (unsigned int col = 0 ; col < 3 ; ++col)
+							coefs[14][col] = A[col](index) ; // u**4 (0,0,0,0)
+					}
+				}
+			}
+		}
+
+		return coefs ;
+					}
 } ;
 
 //} // Utils

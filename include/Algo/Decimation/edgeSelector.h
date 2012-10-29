@@ -544,12 +544,14 @@ private:
 	EdgeAttribute<EdgeInfo> edgeInfo ;
 
 	VertexAttribute<VEC3> m_pos, m_frameT, m_frameB, m_frameN ;
-	//VertexAttribute<VEC3> *m_HF ;
+	std::vector<VertexAttribute<VEC3> > m_HF ;
 	int m_approxindex_pos, m_attrindex_pos ;
 	int m_approxindex_FN, m_attrindex_FN ;
+	std::vector<unsigned int> m_approxindex_HF, m_attrindex_HF ;
+	unsigned int m_K ;
 
 	VertexAttribute<Quadric<REAL> > m_quadricGeom ;
-	VertexAttribute<QuadricHF<REAL> > m_quadricHF ;
+	EdgeAttribute<QuadricHF<REAL> > m_quadricHF ;
 
 	std::vector<Approximator<PFP, typename PFP::VEC3>* > m_approx ;
 
@@ -567,11 +569,12 @@ public:
 		m_approxindex_pos(-1),
 		m_attrindex_pos(-1),
 		m_approxindex_FN(-1),
-		m_attrindex_FN(-1)
+		m_attrindex_FN(-1),
+		m_K(0)
 	{
 		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 		m_quadricGeom = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
-		m_quadricHF = m.template addAttribute<QuadricHF<REAL>, VERTEX>("HFquadric") ;
+		m_quadricHF = m.template getAttribute<QuadricHF<REAL>, EDGE>("HFquadric") ;
 	}
 	~EdgeSelector_Lightfield()
 	{
