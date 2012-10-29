@@ -51,7 +51,7 @@ void Approximator_FrameInterpolation<PFP>::approximate(Dart d)
 	{
 		for (unsigned int i = 0 ; i < 3 ; ++i)
 			this->m_approx[i][d] = this->m_attrV[i]->operator[](dd) ;
-		//std::cout << "fallback to p2" << std::endl ;
+		// std::cout << "fallback to p2" << std::endl ;
 	}
 	else
 	{
