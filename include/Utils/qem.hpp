@@ -31,12 +31,12 @@ Quadric<REAL>::Quadric()
 {
 	A.zero() ;
 }
-
-template <typename REAL>
-Quadric<REAL>::Quadric(int i)
-{
-	A.zero() ;
-}
+//
+//template <typename REAL>
+//Quadric<REAL>::Quadric(int i)
+//{
+//	A.zero() ;
+//}
 
 template <typename REAL>
 Quadric<REAL>::Quadric(VEC3& p1, VEC3& p2, VEC3& p3)
@@ -81,7 +81,7 @@ Quadric<REAL>::operator -= (const Quadric<REAL>& q)
 
 template <typename REAL>
 Quadric<REAL>&
-Quadric<REAL>::operator *= (REAL v)
+Quadric<REAL>::operator *= (const REAL& v)
 {
 	A *= v ;
 	return *this ;
@@ -89,7 +89,7 @@ Quadric<REAL>::operator *= (REAL v)
 
 template <typename REAL>
 Quadric<REAL>&
-Quadric<REAL>::operator /= (REAL v)
+Quadric<REAL>::operator /= (const REAL& v)
 {
 	A /= v ;
 	return *this ;

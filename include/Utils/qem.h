@@ -22,12 +22,9 @@
  *                                                                              *
  *******************************************************************************/
 
-/**
-* @file qem.h
+/*! \file qem.h
 * Header file for Quadric Error Metric classes.
 */
-
-
 
 #ifndef __QEM__
 #define __QEM__
@@ -45,63 +42,187 @@
 
 #define CONST_VAL -5212368.54127 // random value
 
+/*! \namespace CGoGN
+ * \brief namespace for all elements composing the CGoGN library
+ */
 namespace CGoGN {
 
+/*! \namespace Utils
+ * \brief namespace for tool classes used by CGoGN and its applications
+ */
 namespace Utils {
 
+/*! \class Quadric
+ *
+ * \brief Quadric for computing the quadric error metric (QEM)
+ * introduced by Garland and Heckbert in 1997.
+ */
 template <typename REAL>
 class Quadric
 {
 public:
-	static std::string CGoGNnameOfType() { return "Quadric" ; }
+	/**
+	 * \return name of the CGoGN type
+	 */
+	static std::string CGoGNnameOfType()
+	{
+		return "Quadric" ;
+	}
 
 	typedef Geom::Vector<3,REAL> VEC3 ;
 	typedef Geom::Vector<4,REAL> VEC4 ;
 	typedef Geom::Matrix<4,4,double> MATRIX44 ; // double is crucial here !
 
+	/*!
+	 * \brief Default constructor
+	 *
+	 * Initializes empty members
+	 */
 	Quadric() ;
-	Quadric(int i) ;
 
+	//Quadric(int i) ;
+
+	/*!
+	 * \brief Constructor building a quadric given three points (defining a plane);
+	 *
+	 * \param p1 first point
+	 * \param p2 second point
+	 * \param p3 third point
+	 */
 	Quadric(VEC3& p1, VEC3& p2, VEC3& p3) ;
 
+	/*!
+	 * \brief set members to zero
+	 */
 	void zero() ;
 
+	/*!
+	 * \brief affectation operator (by copy)
+	 *
+	 * \param q the Quadric to copy
+	 */
 	void operator= (const Quadric<REAL>& q) ;
-	Quadric& operator+= (const Quadric<REAL>& q) ;
-	Quadric& operator -= (const Quadric<REAL>& q) ;
-	Quadric& operator *= (REAL v) ;
-	Quadric& operator /= (REAL v) ;
 
+	/*!
+	 * \brief sum of Quadric operator
+	 *
+	 * \param q the Quadric to sum
+	 */
+	Quadric& operator+= (const Quadric<REAL>& q) ;
+
+	/*!
+	 * \brief substract of Quadric operator
+	 *
+	 * \param q the Quadric to substract
+	 */
+	Quadric& operator -= (const Quadric<REAL>& q) ;
+
+	/*!
+	 * \brief scalar product operator
+	 *
+	 * \param v the scalar to multiply the Quadric with
+	 */
+	Quadric& operator *= (const REAL& v) ;
+
+	/*!
+	 * \brief scalar division operator
+	 *
+	 * \param v the scalar to divide the Quadric with
+	 */
+	Quadric& operator /= (const REAL& v) ;
+
+	/*!
+	 * `brief error evaluation operator
+	 *
+	 * \param v a point expressed in homogeneous coordinates in space
+	 *
+	 * \return the error
+	 */
 	REAL operator() (const VEC4& v) const ;
+
+	/*!
+	 * `brief error evaluation operator
+	 *
+	 * \param v a point in space
+	 *
+	 * \param the error
+	 */
 	REAL operator() (const VEC3& v) const ;
 
+	/*!
+	 * \brief Write to stream operator
+	 *
+	 * \param out the stream to write to
+	 * \param q the Quadric to write in the stream
+	 *
+	 * \return the stream reference
+	 */
 	friend std::ostream& operator<<(std::ostream& out, const Quadric<REAL>& q)
 	{
 		out << q.A ;
 		return out ;
 	} ;
 
+	/*!
+	 * \brief Read from stream operator
+	 *
+	 * \param int the stream to read from
+	 * \param q the Quadric to write the data that has been read in
+	 *
+	 * \return the stream reference
+	 */
 	friend std::istream& operator>>(std::istream& in, Quadric<REAL>& q)
 	{
 		in >> q.A ;
 		return in ;
 	} ;
 
+	/*!
+	 * \brief Method to deduce a position in space that minimizes the error
+	 *
+	 * \param v the ideal position (if it can be computed)
+	 *
+	 * \return true if the ideal position has been computed correctly
+	 */
 	bool findOptimizedPos(VEC3& v) ;
 
 private:
-	MATRIX44 A ;
+	MATRIX44 A ; /*!< The Quadric matrix */
 
+	/*!
+	 * \brief method to evaluate the error at a given point in space (homogeneous coordinates)
+	 *
+	 * \param v the given point
+	 *
+	 * \return the error
+	 */
 	REAL evaluate(const VEC4& v) const ;
 
+	/*!
+	 * \brief method to deduce an optimal position in space (homogeneous coordinates)
+	 * w.r.t. the current Quadric.
+	 *
+	 * \param v will contain the optimal position (if it can be computed)
+	 *
+	 * \return true if an optimal position was correctly computed
+	 */
 	bool optimize(VEC4& v) const ;
 } ;
 
+/*! \class QuadricNd
+ * \brief extension of Quadric (which is 3D) to nD points.
+ * This was published by Garland and Heckbert in 1998 and is meant to define a quadric
+ * for a nD-space which contains geometry (3D) + other attributes like color (3D),
+ * normals (3D) or texture coordinates (2D) for instance.
+ */
 template <typename REAL, unsigned int N>
 class QuadricNd
 {
 public:
-	static std::string CGoGNnameOfType() { return "QuadricNd" ; }
+	static std::string CGoGNnameOfType()
+	{
+		return "QuadricNd" ;
+	}
 
 	typedef Geom::Vector<N,REAL> VECN ;
 	typedef Geom::Vector<N+1,REAL> VECNp ;
