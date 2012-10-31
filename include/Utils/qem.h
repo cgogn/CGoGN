@@ -62,6 +62,8 @@ class Quadric
 {
 public:
 	/**
+	 * \brief get CGoGN name of current type
+	 *
 	 * \return name of the CGoGN type
 	 */
 	static std::string CGoGNnameOfType()
@@ -80,7 +82,7 @@ public:
 	 */
 	Quadric() ;
 
-	//Quadric(int i) ;
+	Quadric(int i) ;
 
 	/*!
 	 * \brief Constructor building a quadric given three points (defining a plane);
@@ -219,6 +221,11 @@ template <typename REAL, unsigned int N>
 class QuadricNd
 {
 public:
+	/**
+	 * \brief get CGoGN name of current type
+	 *
+	 * \return name of the CGoGN type
+	 */
 	static std::string CGoGNnameOfType()
 	{
 		return "QuadricNd" ;
@@ -280,6 +287,11 @@ template <typename REAL>
 class QuadricHF
 {
 public:
+	/**
+	 * \brief get CGoGN name of current type
+	 *
+	 * \return name of the CGoGN type
+	 */
 	static std::string CGoGNnameOfType() { return "QuadricHF" ; }
 
 	typedef Geom::Vector<3,REAL> VEC3 ;

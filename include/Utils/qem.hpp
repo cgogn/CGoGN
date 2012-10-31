@@ -31,12 +31,12 @@ Quadric<REAL>::Quadric()
 {
 	A.zero() ;
 }
-//
-//template <typename REAL>
-//Quadric<REAL>::Quadric(int i)
-//{
-//	A.zero() ;
-//}
+
+template <typename REAL>
+Quadric<REAL>::Quadric(int i)
+{
+	A.zero() ;
+}
 
 template <typename REAL>
 Quadric<REAL>::Quadric(VEC3& p1, VEC3& p2, VEC3& p3)
