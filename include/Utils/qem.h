@@ -560,7 +560,7 @@ public:
 	 *
 	 * \return a vector of coefficients representing the same lightfield function
 	 */
-	static td::vector<VEC3> coefsFromTensors(Geom::Tensor3d* T) ;
+	static std::vector<VEC3> coefsFromTensors(Geom::Tensor3d* T) ;
 
 	/*!
 	 * \brief method to complete a symmetric tensor that was
