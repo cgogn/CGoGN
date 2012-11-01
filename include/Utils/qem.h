@@ -283,28 +283,28 @@ public:
 	/*!
 	 * \brief affectation operator (by copy)
 	 *
-	 * \param q the Quadric to copy
+	 * \param q the QuadricNd to copy
 	 */
 	void operator= (const QuadricNd<REAL,N>& q) ;
 
 	/*!
-	 * \brief sum of Quadric operator
+	 * \brief sum of QuadricNd operator
 	 *
-	 * \param q the Quadric to sum
+	 * \param q the QuadricNd to sum
 	 */
 	QuadricNd& operator+= (const QuadricNd<REAL,N>& q) ;
 
 	/*!
-	 * \brief substract of Quadric operator
+	 * \brief substract of QuadricNd operator
 	 *
-	 * \param q the Quadric to substract
+	 * \param q the QuadricNd to substract
 	 */
 	QuadricNd& operator -= (const QuadricNd<REAL,N>& q) ;
 
 	/*!
 	 * \brief scalar product operator
 	 *
-	 * \param v the scalar to multiply the Quadric with
+	 * \param v the scalar to multiply the QuadricNd with
 	 */
 	QuadricNd& operator *= (REAL v) ;
 
@@ -399,7 +399,7 @@ private:
 } ;
 
 /*! \class QuadricHF
- * \brief Quadric used for measuring a lightfield metric.
+ * \brief quadric used for measuring a lightfield metric.
  * This was defined by Vanhoey, Sauvage and Dischler in 2012.
  * This implementation works only for polynomial basis functions.
  */
@@ -432,7 +432,7 @@ public:
 	QuadricHF(int i) ;
 
 	/*!
-	 * \brief Constructor building a quadric given a lightfield function and the two angles gamma and alpha
+	 * \brief Constructor building a QuadricHF given a lightfield function and the two angles gamma and alpha
 	 *
 	 * \param v the lightfield function
 	 * \param gamma
@@ -441,7 +441,7 @@ public:
 	QuadricHF(const std::vector<VEC3>& v, const REAL& gamma, const REAL& alpha) ;
 
 	/*!
-	 * \brief Constructor building a quadric given a lightfield function and the two angles gamma and alpha
+	 * \brief Constructor building a QuadricHF given a lightfield function and the two angles gamma and alpha
 	 *
 	 * \param v the lightfield function expressed as a Geom::Tensor
 	 * \param gamma
@@ -474,7 +474,7 @@ public:
 	QuadricHF& operator+= (const QuadricHF<REAL>& q) ;
 
 	/*!
-	 * \brief substract of Quadric operator
+	 * \brief substract of QuadricHF operator
 	 *
 	 * \param q the QuadricHF to substract
 	 */
@@ -507,7 +507,7 @@ public:
 	 * \brief Write to stream operator
 	 *
 	 * \param out the stream to write to
-	 * \param q the QuadricNd to write in the stream
+	 * \param q the QuadricHF to write in the stream
 	 *
 	 * \return the stream reference
 	 */
@@ -587,7 +587,7 @@ private:
 
 	/*!
 	 * \brief method to deduce an optimal coefficients in space
-	 * w.r.t. the current QuadricND.
+	 * w.r.t. the current QuadricHF.
 	 *
 	 * \param coefs will contain the optimal result (if it can be computed)
 	 *
