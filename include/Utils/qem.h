@@ -78,20 +78,32 @@ public:
 	/*!
 	 * \brief Default constructor
 	 *
-	 * Initializes empty members
+	 * Initializes empty members.
 	 */
 	Quadric() ;
 
+	/*!
+	 * \brief Constructor
+	 *
+	 * Initializes empty members (idem. default constructor).
+	 * Exists for compatibility reasons.
+	 */
 	Quadric(int i) ;
 
 	/*!
-	 * \brief Constructor building a quadric given three points (defining a plane);
+	 * \brief Constructor building a quadric given three points (defining a plane);.
 	 *
 	 * \param p1 first point
 	 * \param p2 second point
 	 * \param p3 third point
 	 */
 	Quadric(VEC3& p1, VEC3& p2, VEC3& p3) ;
+
+
+	/*!
+	 * \brief destructor
+	 */
+	~Quadric() {} ;
 
 	/*!
 	 * \brief set members to zero
@@ -134,7 +146,7 @@ public:
 	Quadric& operator /= (const REAL& v) ;
 
 	/*!
-	 * `brief error evaluation operator
+	 * \brief error evaluation operator
 	 *
 	 * \param v a point expressed in homogeneous coordinates in space
 	 *
@@ -143,7 +155,7 @@ public:
 	REAL operator() (const VEC4& v) const ;
 
 	/*!
-	 * `brief error evaluation operator
+	 * \brief error evaluation operator
 	 *
 	 * \param v a point in space
 	 *
@@ -234,34 +246,115 @@ public:
 	typedef Geom::Vector<N,REAL> VECN ;
 	typedef Geom::Vector<N+1,REAL> VECNp ;
 
+	/*!
+	 * \brief Default constructor
+	 *
+	 * Initializes empty members.
+	 */
 	QuadricNd() ;
 
+	/*!
+	 * \brief Constructor
+	 *
+	 * Initializes empty members (idem. default constructor).
+	 * Exists for compatibility reasons.
+	 */
 	QuadricNd(int i) ;
 
+	/*!
+	 * \brief Constructor building a quadricNd given three points (defining a plane);
+	 *
+	 * \param p1 first point
+	 * \param p2 second point
+	 * \param p3 third point
+	 */
 	QuadricNd(const VECN& p1_r, const VECN& p2_r, const VECN& p3_r) ;
 
+	/*!
+	 * \brief destructor
+	 */
+	~QuadricNd() {} ;
+
+	/*!
+	 * \brief set members to zero
+	 */
 	void zero() ;
 
+	/*!
+	 * \brief affectation operator (by copy)
+	 *
+	 * \param q the Quadric to copy
+	 */
 	void operator= (const QuadricNd<REAL,N>& q) ;
 
+	/*!
+	 * \brief sum of Quadric operator
+	 *
+	 * \param q the Quadric to sum
+	 */
 	QuadricNd& operator+= (const QuadricNd<REAL,N>& q) ;
 
+	/*!
+	 * \brief substract of Quadric operator
+	 *
+	 * \param q the Quadric to substract
+	 */
 	QuadricNd& operator -= (const QuadricNd<REAL,N>& q) ;
 
+	/*!
+	 * \brief scalar product operator
+	 *
+	 * \param v the scalar to multiply the Quadric with
+	 */
 	QuadricNd& operator *= (REAL v) ;
 
+	/*!
+	 * \brief scalar division operator
+	 *
+	 * \param v the scalar to divide the QuadricNd with
+	 */
 	QuadricNd& operator /= (REAL v) ;
 
+	/*!
+	 * \brief error evaluation operator
+	 *
+	 * \param v a point expressed in homogeneous coordinates in nD space
+	 *
+	 * \return the error
+	 */
 	REAL operator() (const VECNp& v) const ;
 
+	/*!
+	 * \brief error evaluation operator
+	 *
+	 * \param v a point in nD space
+	 *
+	 * \param the error
+	 */
 	REAL operator() (const VECN& v) const ;
 
+	/*!
+	 * \brief Write to stream operator
+	 *
+	 * \param out the stream to write to
+	 * \param q the QuadricNd to write in the stream
+	 *
+	 * \return the stream reference
+	 */
 	friend std::ostream& operator<<(std::ostream& out, const QuadricNd<REAL,N>& q)
 	{
 		out << "(" << q.A << ", " << q.b << ", " << q.c << ")" ;
 		return out ;
 	} ;
 
+	/*!
+	 * \brief Read from stream operator
+	 *
+	 * \param int the stream to read from
+	 * \param q the QuadricNd to write the data that has been read in
+	 *
+	 * \return the stream reference
+	 */
 	friend std::istream& operator>>(std::istream& in, QuadricNd<REAL,N>& q)
 	{
 		in >> q.A ;
@@ -270,19 +363,46 @@ public:
 		return in ;
 	} ;
 
+	/*!
+	 * \brief Method to deduce a position in space that minimizes the error
+	 *
+	 * \param v the ideal position (if it can be computed)
+	 *
+	 * \return true if the ideal position has been computed correctly
+	 */
 	bool findOptimizedVec(VECN& v) ;
 
 private:
 	// Double computation is crucial for stability
-	Geom::Matrix<N,N,double> A ;
-	Geom::Vector<N,double> b ;
-	double c ;
+	Geom::Matrix<N,N,double> A ; /*!< The first QuadricNd member matrix A */
+	Geom::Vector<N,double> b ; /*!< The second QuadricNd member vector b */
+	double c ;/*!< The third QuadricNd member scalar c */
 
+	/*!
+	 * \brief method to evaluate the error at a given nD point in space (homogeneous coordinates)
+	 *
+	 * \param v the given point
+	 *
+	 * \return the error
+	 */
 	REAL evaluate(const VECN& v) const ;
 
+	/*!
+	 * \brief method to deduce an optimal position in space (homogeneous coordinates)
+	 * w.r.t. the current QuadricNd.
+	 *
+	 * \param v will contain the optimal position (if it can be computed)
+	 *
+	 * \return true if an optimal position was correctly computed
+	 */
 	bool optimize(VECN& v) const ;
 } ;
 
+/*! \class QuadricHF
+ * \brief Quadric used for measuring a lightfield metric.
+ * This was defined by Vanhoey, Sauvage and Dischler in 2012.
+ * This implementation works only for polynomial basis functions.
+ */
 template <typename REAL>
 class QuadricHF
 {
@@ -296,37 +416,115 @@ public:
 
 	typedef Geom::Vector<3,REAL> VEC3 ;
 
+	/*!
+	 * \brief Constructor
+	 *
+	 * Initializes empty members
+	 */
 	QuadricHF() ;
 
+	/*!
+	 * \brief Constructor
+	 *
+	 * Initializes empty members (idem. default constructor)
+	 * Exists for compatibility reasons
+	 */
 	QuadricHF(int i) ;
 
+	/*!
+	 * \brief Constructor building a quadric given a lightfield function and the two angles gamma and alpha
+	 *
+	 * \param v the lightfield function
+	 * \param gamma
+	 * \param alpha
+	 */
 	QuadricHF(const std::vector<VEC3>& v, const REAL& gamma, const REAL& alpha) ;
 
+	/*!
+	 * \brief Constructor building a quadric given a lightfield function and the two angles gamma and alpha
+	 *
+	 * \param v the lightfield function expressed as a Geom::Tensor
+	 * \param gamma
+	 * \param alpha
+	 */
 	QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REAL& alpha) ;
 
+	/*!
+	 * Destructor
+	 */
 	~QuadricHF() ;
 
+	/*!
+	 * \brief set members to zero
+	 */
 	void zero() ;
 
+	/*!
+	 * \brief affectation operator (by copy)
+	 *
+	 * \param q the QuadricHF to copy
+	 */
 	QuadricHF& operator= (const QuadricHF<REAL>& q) ;
 
+	/*!
+	 * \brief sum of QuadricHF operator
+	 *
+	 * \param q the QuadricHF to sum
+	 */
 	QuadricHF& operator+= (const QuadricHF<REAL>& q) ;
+
+	/*!
+	 * \brief substract of Quadric operator
+	 *
+	 * \param q the QuadricHF to substract
+	 */
 	QuadricHF& operator -= (const QuadricHF<REAL>& q) ;
 
+	/*!
+	 * \brief scalar product operator
+	 *
+	 * \param v the scalar to multiply the QuadricHF with
+	 */
 	QuadricHF& operator *= (const REAL& v) ;
 
+	/*!
+	 * \brief scalar division operator
+	 *
+	 * \param v the scalar to divide the QuadricHF with
+	 */
 	QuadricHF& operator /= (const REAL& v) ;
 
-	//	REAL operator() (const VECNp& v) const ;
-
+	/*!
+	 * \brief error evaluation operator
+	 *
+	 * \param coefs a lightfield function
+	 *
+	 * \param the error
+	 */
 	REAL operator() (const std::vector<VEC3>& coefs) const ;
 
+	/*!
+	 * \brief Write to stream operator
+	 *
+	 * \param out the stream to write to
+	 * \param q the QuadricNd to write in the stream
+	 *
+	 * \return the stream reference
+	 */
 	friend std::ostream& operator<<(std::ostream& out, const QuadricHF<REAL>& q)
 	{
 		// TODO out << "(" << q.m_A << ", " << q.m_b << ", " << q.m_c << ")" ;
 		return out ;
 	} ;
 
+	/*!
+	 * \brief Read from stream operator
+	 *
+	 * \param int the stream to read from
+	 * \param q the QuadricHF to write the data that has been read in
+	 *
+	 * \return the stream reference
+	 */
 	friend std::istream& operator>>(std::istream& in, QuadricHF<REAL>& q)
 	{
 		// TODO
@@ -336,32 +534,111 @@ public:
 		return in ;
 	} ;
 
+	/*!
+	 * \brief Method to deduce a position in space that minimizes the error
+	 *
+	 * \param v the ideal position (if it can be computed)
+	 *
+	 * \return true if the ideal position has been computed correctly
+	 */
 	bool findOptimizedCoefs(std::vector<VEC3>& coefs) ;
+
+	/*!
+	 * \brief method to convert a lightfield in tensor format to a coefficient vector format
+	 *
+	 * \param coefs vector of coefficients representing a lightfield function
+	 *
+	 * \return a tensor representing the same lightfield function
+	 *
+	 */
+	static Geom::Tensor3d* tensorsFromCoefs(const std::vector<VEC3>& coefs) ;
+
+	/*!
+	 * \brief method to convert a lightfield in coefficient vector format to a tensor format
+	 *
+	 * \param T the tensor to convert
+	 *
+	 * \return a vector of coefficients representing the same lightfield function
+	 */
+	static td::vector<VEC3> coefsFromTensors(Geom::Tensor3d* T) ;
+
+	/*!
+	 * \brief method to complete a symmetric tensor that was
+	 * only filled in its first half
+	 *
+	 * \param T the tensor to fill
+	 */
+	static void fillTensor(Geom::Tensor3d& T) ;
 
 private:
 	// Double computation is crucial for stability
-	Eigen::MatrixXd m_A ;
-	Eigen::VectorXd m_b[3] ;
-	double m_c[3] ;
+	Eigen::MatrixXd m_A ; /*!< The first QuadricHF member matrix A */
+	Eigen::VectorXd m_b[3] ; /*!< The second QuadricHF member vector b */
+	double m_c[3] ; /*!< The third QuadricHF member scalar c */
 
+	/*!
+	 * \brief method to evaluate the error for a given lightfield function
+	 *
+	 * \param coefs the given function
+	 *
+	 * \return the error
+	 */
 	REAL evaluate(const std::vector<VEC3>& coefs) const ;
 
+	/*!
+	 * \brief method to deduce an optimal coefficients in space
+	 * w.r.t. the current QuadricND.
+	 *
+	 * \param coefs will contain the optimal result (if it can be computed)
+	 *
+	 * \return true if an optimal result was correctly computed
+	 */
 	bool optimize(std::vector<VEC3>& coefs) const ;
-
-	Geom::Matrix33d rotateMatrix(const REAL& gamma) ;
 
 	Geom::Tensor3d rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R) ;
 
+	/*!
+	 * \brief method to build a rotate matrix (rotation in tangent plane)
+	 * given angle gamma
+	 *
+	 * \param gamma the rotation angle
+	 *
+	 * \return the rotation matrix
+	 */
+	Geom::Matrix33d buildRotateMatrix(const REAL& gamma) ;
+
+	/*!
+	 * \brief method to build the first integral matrix A
+	 * given angle alpha
+	 *
+	 * \param alpha angle
+	 * \param size the amount of monomes in a function
+	 *
+	 * \return the integral of product of monomes
+	 */
 	Eigen::MatrixXd buildIntegralMatrix_A(const REAL& alpha, unsigned int size) ;
+
+	/*!
+	 * \brief method to build the first integral matrix B
+	 * given angle alpha
+	 *
+	 * \param alpha angle
+	 * * \param size the amount of monomes in a function
+	 *
+	 * \return the integral of product of monomes
+	 */
 	Eigen::MatrixXd buildIntegralMatrix_B(const REAL& alpha, unsigned int size) ;
 
+	/*!
+	 * \brief method to build the third integral matrix C
+	 * given angle alpha
+	 *
+	 * \param alpha angle
+	 * \param size the amount of monomes in a function
+	 *
+	 * \return the integral of product of monomes
+	 */
 	Eigen::MatrixXd buildIntegralMatrix_C(const REAL& alpha, unsigned int size) ;
-
-	void fillTensor(Geom::Tensor3d& T) ;
-
-	Geom::Tensor3d* tensorsFromCoefs(const std::vector<VEC3>& coefs) ;
-
-	std::vector<VEC3> coefsFromTensors(Geom::Tensor3d* A) ;
 } ;
 
 } // Utils

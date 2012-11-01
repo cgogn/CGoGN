@@ -328,7 +328,7 @@ QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REA
 	//m_A.resize(nbcoefs, nbcoefs) ;
 
 	// 2D rotation
-	const Geom::Matrix33d R = rotateMatrix(gamma) ;
+	const Geom::Matrix33d R = buildRotateMatrix(gamma) ;
 	Geom::Tensor3d* Trot = new Geom::Tensor3d[3] ;
 	for (unsigned int c = 0 ; c < 3 ; ++c)
 		Trot[c] = rotate(T[c],R) ;
@@ -538,7 +538,7 @@ QuadricHF<REAL>::optimize(std::vector<VEC3>& coefs) const
 
 template <typename REAL>
 Geom::Matrix33d
-QuadricHF<REAL>::rotateMatrix(const REAL& gamma)
+QuadricHF<REAL>::buildRotateMatrix(const REAL& gamma)
 {
 	Geom::Matrix33d R ;
 	R.identity() ;
