@@ -106,6 +106,8 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 		*m_uniform_planeY = glGetUniformLocation(program_handler(), "planeY");
 	}
 	unbind();
+
+	m_color = Geom::Vec4f(0.0f,0.0f,0.0f,1.0f);
 }
 
 void Strings3D::setScale(float scale)

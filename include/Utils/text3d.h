@@ -130,7 +130,7 @@ public:
 	*/
 	void drawAll(const Geom::Vec4f& color);
 
-	void drawAll(const Geom::Vec3f& color){ drawAll( Geom::Vec4f(color[0],color[1],color[2],1.0f)); }
+	void drawAll(const Geom::Vec3f& color){ drawAll( Geom::Vec4f(color[0],color[1],color[2],m_color[3])); }
 
 
 	/**
@@ -139,7 +139,7 @@ public:
 	*/
 	void predraw(const Geom::Vec4f& color);
 
-	void predraw(const Geom::Vec3f& color){ predraw( Geom::Vec4f(color[0],color[1],color[2],1.0f)); }
+	void predraw(const Geom::Vec3f& color){ predraw( Geom::Vec4f(color[0],color[1],color[2],m_color[3])); }
 
 
 	/**
@@ -148,7 +148,7 @@ public:
 	*/
 	void changeColor(const Geom::Vec4f& color);
 
-	void changeColor(const Geom::Vec3f& color){ changeColor( Geom::Vec4f(color[0],color[1],color[2],1.0f)); }
+	void changeColor(const Geom::Vec3f& color){ changeColor( Geom::Vec4f(color[0],color[1],color[2],m_color[3])); }
 
 	/**
 	 * change opacity but keep color (0 is totally transparent 1 is totally opaque)

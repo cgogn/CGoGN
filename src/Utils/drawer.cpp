@@ -171,6 +171,8 @@ void Drawer::callList(float opacity)
 	if (m_begins.empty())
 		return;
 
+	m_shader->setOpacity(opacity);
+
 	m_shader->enableVertexAttribs();
 	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
 	{
@@ -182,6 +184,7 @@ void Drawer::callList(float opacity)
 	}
  	m_shader->disableVertexAttribs();
 }
+
 
 
 void Drawer::toSVG(Utils::SVG::SVGOut& svg)
