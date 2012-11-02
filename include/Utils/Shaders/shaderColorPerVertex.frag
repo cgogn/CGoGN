@@ -2,6 +2,7 @@
 
 PRECISON;
 VARYING_FRAG vec3 color;
+uniform float alpha;
 FRAG_OUT_DEF;
 void main()
 {
@@ -9,5 +10,5 @@ void main()
 	if (dot(color,color) == 0.0)
 		discard;
 #endif
-	gl_FragColor=vec4(color,0.0);
+	gl_FragColor=vec4(color,alpha);
 }

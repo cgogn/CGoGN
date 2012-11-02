@@ -166,7 +166,7 @@ void Drawer::updatePositions(unsigned int first, unsigned int nb, const float* P
 }
 
 
-void Drawer::callList()
+void Drawer::callList(float opacity)
 {
 	if (m_begins.empty())
 		return;

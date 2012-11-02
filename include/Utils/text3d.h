@@ -69,6 +69,8 @@ protected:
 
     float m_scale;
 
+    Geom::Vec4f m_color;
+
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
 
     CGoGNGLuint m_idTexture;
@@ -126,19 +128,33 @@ public:
 	* Draw all text stored with their position
 	* @param color the color of text
 	*/
-	void drawAll(const Geom::Vec3f& color);
+	void drawAll(const Geom::Vec4f& color);
+
+	void drawAll(const Geom::Vec3f& color){ drawAll( Geom::Vec4f(color[0],color[1],color[2],1.0f)); }
+
 
 	/**
 	* call once before several draw(id,pos)
 	* @param color the color of text
 	*/
-	void predraw(const Geom::Vec3f& color);
+	void predraw(const Geom::Vec4f& color);
+
+	void predraw(const Geom::Vec3f& color){ predraw( Geom::Vec4f(color[0],color[1],color[2],1.0f)); }
+
 
 	/**
 	* call just before a draw
 	* @param color the color of text
 	*/
-	void changeColor(const Geom::Vec3f& color);
+	void changeColor(const Geom::Vec4f& color);
+
+	void changeColor(const Geom::Vec3f& color){ changeColor( Geom::Vec4f(color[0],color[1],color[2],1.0f)); }
+
+	/**
+	 * change opacity but keep color (0 is totally transparent 1 is totally opaque)
+	 * @param opacity
+	 */
+	void changeOpacity(float op);
 
 	/**
 	* call once after several draw(id,pos)

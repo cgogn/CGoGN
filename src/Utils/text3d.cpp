@@ -36,7 +36,7 @@ namespace Utils
 
 
 std::string Strings3D::fragmentShaderText2 =
-"	gl_FragColor = vec4(color,0.0)*lum;\n"
+"	gl_FragColor = color*lum;\n"
 "}";
 
 
@@ -221,11 +221,12 @@ void Strings3D::sendToVBO()
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void Strings3D::predraw(const Geom::Vec3f& color)
+void Strings3D::predraw(const Geom::Vec4f& color)
 {
+	m_color = color;
 	bind();
 	glUniform1i(*m_uniform_texture, 0);
-	glUniform3fv(*m_uniform_color, 1, color.data());
+	glUniform4fv(*m_uniform_color, 1, color.data());
 
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
@@ -236,10 +237,18 @@ void Strings3D::predraw(const Geom::Vec3f& color)
 	enableVertexAttribs();
 }
 
-void Strings3D::changeColor(const Geom::Vec3f& color)
+void Strings3D::changeColor(const Geom::Vec4f& color)
 {
+	m_color = color;
 	bind();
-	glUniform3fv(*m_uniform_color, 1, color.data());
+	glUniform4fv(*m_uniform_color, 1, color.data());
+}
+
+void Strings3D::changeOpacity(float op)
+{
+	m_color[3] = op;
+	bind();
+	glUniform4fv(*m_uniform_color, 1, m_color.data());
 }
 
 void Strings3D::postdraw()
@@ -254,8 +263,9 @@ void Strings3D::draw(unsigned int idSt, const Geom::Vec3f& pos)
 	glDrawArrays(GL_QUADS, m_strpos[idSt].first , m_strpos[idSt].second );
 }
 
-void Strings3D::drawAll(const Geom::Vec3f& color)
+void Strings3D::drawAll(const Geom::Vec4f& color)
 {
+	m_color = color;
 	unsigned int nb = m_strpos.size();
 	//  nothing to do if no string !
 	if (nb == 0)

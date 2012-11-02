@@ -132,6 +132,11 @@ public:
 	void callList();
 
 	/**
+	 * use as a glCallList
+	 */
+	void callList(float opacity) { m_shader->setOpacity(opacity); callList(); }
+
+	/**
 	 * use as glLineWidth
 	 */
 	void lineWidth(float lw);
