@@ -317,7 +317,9 @@ QuadricHF<REAL>::QuadricHF(int i)
 template <typename REAL>
 QuadricHF<REAL>::QuadricHF(const std::vector<VEC3>& v, const REAL& gamma, const REAL& alpha)
 {
-	*this = QuadricHF(tensorsFromCoefs(v), gamma, alpha) ;
+	Geom::Tensor3d *T = tensorsFromCoefs(v) ;
+	*this = QuadricHF(T, gamma, alpha) ;
+	delete[] T ;
 }
 
 template <typename REAL>
@@ -333,6 +335,7 @@ QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REA
 	for (unsigned int c = 0 ; c < 3 ; ++c)
 		Trot[c] = rotate(T[c],R) ;
 	std::vector<VEC3> coefsR = coefsFromTensors(Trot) ;
+	delete[] Trot ;
 
 	// parameterized integral on intersection
 
