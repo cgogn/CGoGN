@@ -92,7 +92,7 @@ Tensor<SIZE, REAL>::operator=(const Tensor& T)
 {
 	m_order = T.m_order ;
 
-	delete(m_data) ;
+	delete[] m_data ;
 	m_data = new REAL[T.nbElem()] ;
 
 	for (unsigned int i = 0 ; i < T.nbElem() ; ++i)
