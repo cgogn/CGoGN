@@ -38,7 +38,7 @@ namespace Decimation
 {
 
 template <typename PFP>
-class Approximator_ColorNaive : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_ColorNaive : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -53,7 +53,7 @@ protected:
 
 public:
 	Approximator_ColorNaive(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, attr, pred)
+		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
 	{
 		m_color = this->m_attrV[0] ;
 	}
@@ -82,7 +82,7 @@ public:
 } ;
 
 template <typename PFP>
-class Approximator_ColorQEMext : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_ColorQEMext : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -91,13 +91,13 @@ public:
 	typedef Geom::Vector<6,REAL> VEC6 ;
 
 protected:
-	VertexAttribute<QuadricNd<REAL,6> > m_quadric ;
+	VertexAttribute<Utils::QuadricNd<REAL,6> > m_quadric ;
 	VertexAttribute<VEC3> *m_position ;
 	VertexAttribute<VEC3> *m_color ;
 
 public:
 	Approximator_ColorQEMext(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, attr, pred)
+		Approximator<PFP, VEC3, EDGE>(m, attr, pred)
 	{
 		assert(attr.size() > 1 || !"Approximator_ColorQEMext: there are not sufficient attributes provided") ;
 
@@ -117,6 +117,45 @@ public:
 
 	void approximate(Dart d) ;
 } ;
+
+/*
+template <typename PFP>
+class Approximator_ColorQEMextHalfCollapse : public Approximator<PFP, typename PFP::VEC3>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef Geom::Vector<6,REAL> VEC6 ;
+
+protected:
+	VertexAttribute<Utils::QuadricNd<REAL,6> > m_quadric ;
+	VertexAttribute<VEC3> *m_position ;
+	VertexAttribute<VEC3> *m_color ;
+
+public:
+	Approximator_ColorQEMextHalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3>* >& attr, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, attr, pred)
+	{
+		assert(attr.size() > 1 || !"Approximator_ColorQEMext_HalfCollapse: there are not sufficient attributes provided") ;
+
+		m_position = this->m_attrV[0] ;
+		m_color = this->m_attrV[1] ;
+	}
+
+	~Approximator_ColorQEMextHalfCollapse()
+	{}
+
+	ApproximatorType getType() const
+	{
+		return A_ColorQEMextHalfCollapse ;
+	}
+
+	bool init() ;
+
+	void approximate(Dart d) ;
+} ;
+*/
 
 } //namespace Decimation
 
