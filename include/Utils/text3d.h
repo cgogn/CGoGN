@@ -54,6 +54,7 @@ protected:
 
     static std::string fragmentShaderText1;
     static std::string fragmentShaderText2;
+    static std::string fragmentShaderText3;
 
     static Strings3D*  m_instance0;
 

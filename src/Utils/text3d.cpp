@@ -36,8 +36,10 @@ namespace Utils
 
 
 std::string Strings3D::fragmentShaderText2 =
-"	gl_FragColor = color*lum;\n"
-"}";
+"	if (lum == 0.0) discard;\n gl_FragColor = color*lum;\n}";
+
+std::string Strings3D::fragmentShaderText3 =
+"	gl_FragColor = mix(backColor,color,lum);\n}";
 
 
 Strings3D* Strings3D::m_instance0 = NULL;
@@ -70,22 +72,28 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 	if (with_plane)
 		glxvert.append("#define WITH_PLANE 1");
 	glxvert.append(vertexShaderText);
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
 
+
+	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText1);
 
-	std::string background;
 	if (!withBackground)
-		glxfrag.append("if (lum == 0.0) discard;\n");
-	else if (bgc*bgc > 0.0)
+	{
+		glxfrag.append(fragmentShaderText2);
+	}
+	else
 	{
 		std::stringstream ss;
-		ss << "	if (lum==0.0) gl_FragColor=vec4(";
-		ss << bgc[0] << "," << bgc[1] << "," << bgc[2] << ",color[3]);\n		else\n";
-		background.append(ss.str());
+		ss << "vec4 backColor = vec4(" <<bgc[0] << "," << bgc[1] << "," << bgc[2] << ",color[3]);\n";
+//		ss << "vec4 backColor = vec4(0.2,0.1,0.4);\n";
+		glxfrag.append(ss.str());
+		glxfrag.append(fragmentShaderText3);
 	}
-	glxfrag.append(background);
-	glxfrag.append(fragmentShaderText2);
+
+
+	std::cout << "===================================="<< std::endl;
+	std::cout << glxfrag << std::endl;
+	std::cout << "===================================="<< std::endl;
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
