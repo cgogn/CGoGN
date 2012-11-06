@@ -108,7 +108,7 @@ Geom::Vector<3,REAL> ColourConverter<REAL>::getColour(enum ColourEncoding enc) {
 		return getLab() ;
 		break ;
 
-	case (C_Lab) :
+	case (C_HSV) :
 		return getHSV() ;
 		break ;
 
