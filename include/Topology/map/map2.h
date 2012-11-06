@@ -228,7 +228,7 @@ public:
 	/*! \pre Edge of dart d MUST NOT be a boundary edge
 	 *  @param d a dart of a face
 	 */
-	virtual void unsewFaces(Dart d);
+	virtual void unsewFaces(Dart d, bool withBoundary = true);
 
 	//! Delete an oriented face if and only if it has one or two edges
 	/*! If the face is sewed to two distinct adjacent faces,

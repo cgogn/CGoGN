@@ -155,11 +155,11 @@ Dart EmbeddedMap3::deleteEdge(Dart d)
 
 bool EmbeddedMap3::edgeCanCollapse(Dart d)
 {
-	if(isBoundaryVertex(d) || isBoundaryVertex(phi1(d)))
-		return false;
-
-	if(isBoundaryEdge(d))
-		return false;
+//	if(isBoundaryVertex(d) || isBoundaryVertex(phi1(d)))
+//		return false;
+//
+//	if(isBoundaryEdge(d))
+//		return false;
 
 	CellMarkerStore<VERTEX> mv(*this);
 

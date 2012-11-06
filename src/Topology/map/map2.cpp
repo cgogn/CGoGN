@@ -367,8 +367,14 @@ void Map2::sewFaces(Dart d, Dart e, bool withBoundary)
 	phi2sew(d, e) ; // sew the faces
 }
 
-void Map2::unsewFaces(Dart d)
+void Map2::unsewFaces(Dart d, bool withBoundary)
 {
+	if (!withBoundary)
+	{
+		phi2unsew(d) ;
+		return ;
+	}
+
 	assert(!Map2::isBoundaryEdge(d)) ;
 
 	Dart dd = phi2(d) ;

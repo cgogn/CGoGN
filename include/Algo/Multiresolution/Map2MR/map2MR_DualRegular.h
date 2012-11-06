@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL_REGULAR__
-#define __MAP2MR_PRIMAL_REGULAR__
+#ifndef __MAP2MR_DUAL_REGULAR__
+#define __MAP2MR_DUAL_REGULAR__
 
 #include "Topology/map/embeddedMap2.h"
 #include "Topology/generic/traversorCell.h"
@@ -40,7 +40,7 @@ namespace Algo
 namespace MR
 {
 
-namespace Primal
+namespace Dual
 {
 
 namespace Regular
@@ -65,11 +65,7 @@ public:
 	~Map2MR();
 
 	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
-
-	void addNewLevelSqrt3(bool embedNewVertices = true);
-
-	void addNewLevelSqrt2(bool embedNewVertices = true);
+	void addNewLevel(bool embedNewVertices = true) ;
 
 	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
 	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
@@ -83,7 +79,7 @@ public:
 
 } // namespace Regular
 
-} // namespace Primal
+} // namespace Dual
 
 } // namespace MR
 
@@ -91,6 +87,6 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/Map2MR/map2MR_PrimalRegular.hpp"
+#include "Algo/Multiresolution/Map2MR/map2MR_DualRegular.hpp"
 
 #endif

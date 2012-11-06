@@ -46,6 +46,19 @@ Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
 }
 
 template <typename PFP>
+Map2MR<PFP>::~Map2MR()
+{
+	unsigned int level = m_map.getCurrentLevel();
+	unsigned int maxL = m_map.getMaxLevel();
+
+	for(unsigned int i = maxL ; i > level ; --i)
+		m_map.removeLevelBack();
+
+	for(unsigned int i = 0 ; i < level ; ++i)
+		m_map.removeLevelFront();
+}
+
+template <typename PFP>
 void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 {
 	m_map.pushLevel() ;

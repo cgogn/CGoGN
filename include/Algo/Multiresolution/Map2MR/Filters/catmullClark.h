@@ -408,7 +408,7 @@ public:
 			e *= u / degree;
 
 			m_map.incCurrentLevel() ;
-			m_position[m_map.phi2(m_map.phi1(d))] -= v - e ;
+			m_position[m_map.phi2(m_map.phi1(d))] = m_position[m_map.phi2(m_map.phi1(d))] - v - e ;
 			m_map.decCurrentLevel() ;
 		}
 

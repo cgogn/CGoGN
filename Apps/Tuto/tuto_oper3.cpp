@@ -330,6 +330,7 @@ void MyQT::cb_mousePress(int button, int x, int y)
 		{
 			if (d != Dart::nil())
 				m_selected = d;
+			std::cout << myMap.edgeCanCollapse(d) << std::endl;
 		}
 		if (button == Qt::RightButton)
 		{

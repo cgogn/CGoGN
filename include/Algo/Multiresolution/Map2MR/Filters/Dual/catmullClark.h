@@ -22,14 +22,10 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __MAP2MR_PRIMAL_REGULAR__
-#define __MAP2MR_PRIMAL_REGULAR__
+#ifndef __MR_CC_MASK__
+#define __MR_CC_MASK__
 
-#include "Topology/map/embeddedMap2.h"
-#include "Topology/generic/traversorCell.h"
-#include "Topology/generic/traversor2.h"
-
-#include "Algo/Multiresolution/filter.h"
+#include <cmath>
 
 namespace CGoGN
 {
@@ -40,48 +36,94 @@ namespace Algo
 namespace MR
 {
 
-namespace Primal
+namespace Dual
 {
 
-namespace Regular
+namespace Filters
 {
 
 template <typename PFP>
-class Map2MR
+class CCVertexSynthesisFilter : public Filter
 {
-public:
-	typedef typename PFP::MAP MAP ;
-
 protected:
-	MAP& m_map;
-	bool shareVertexEmbeddings ;
-
-	std::vector<Filter*> synthesisFilters ;
-	std::vector<Filter*> analysisFilters ;
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
 
 public:
-	Map2MR(MAP& map);
+	CCVertexSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
 
-	~Map2MR();
+	void operator() ()
+	{
+		TraversorV<typename PFP::MAP> trav(m_map) ;
+		for (Dart dV = trav.begin(); dV != trav.end(); dV = trav.next())
+		{
+			m_map.incCurrentLevel() ;
 
-	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+			Dart start = m_map.phi2(m_map.phi1(m_map.phi2(dV)));
+			Dart dit = start;
+			do
+			{
+				Dart d = m_map.phi1(m_map.phi2(m_map.phi1(m_map.phi2(dit))));
+				unsigned int degree = m_map.faceDegree(d);
+				typename PFP::VEC3 p(0.0);
 
-	void addNewLevelSqrt3(bool embedNewVertices = true);
+				typename PFP::REAL a0 = 1.0 / 2.0 + 1.0 / (4.0 * typename PFP::REAL(degree));
+				typename PFP::REAL a1 = 1.0 / 8.0 + 1.0 / (4.0 * typename PFP::REAL(degree));
+				typename PFP::REAL ak_1 = a1;
 
-	void addNewLevelSqrt2(bool embedNewVertices = true);
+				if(degree == 3)
+				{
+					p += a0 * m_position[d] + a1 * m_position[m_map.phi1(d)] + ak_1 * m_position[m_map.phi_1(d)];
 
-	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
-	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
+					m_map.incCurrentLevel();
+					m_position[d] = p;
+					m_map.decCurrentLevel();
 
-	void clearSynthesisFilters() { synthesisFilters.clear() ; }
-	void clearAnalysisFilters() { analysisFilters.clear() ; }
+				}
+				else if(degree == 4)
+				{
+					typename PFP::REAL a2 = 1.0 / (4.0 * typename PFP::REAL(degree));
 
-	void analysis() ;
-	void synthesis() ;
+					p += a0 * m_position[d] + a1 * m_position[m_map.phi1(d)] + a2 * m_position[m_map.phi1(m_map.phi1(d))] + ak_1 * m_position[m_map.phi_1(d)];
+
+					m_map.incCurrentLevel();
+					m_position[d] = p;
+
+				}
+				else
+				{
+					p += a0 * m_position[d] + a1 * m_position[m_map.phi1(d)];
+
+					Dart end = m_map.phi_1(m_map.phi_1(d));
+					Dart dit = m_map.phi1(m_map.phi1(d));
+					do
+					{
+						typename PFP::REAL ai = 1.0 / (4.0 * typename PFP::REAL(degree));
+						p += ai * m_position[dit];
+
+						dit = m_map.phi1(dit);
+					}
+					while(dit != end);
+
+					p += ak_1 * m_position[m_map.phi_1(d)];
+
+					m_map.incCurrentLevel();
+					m_position[d] = p;
+				}
+
+
+				dit = m_map.phi1(dit);
+			}
+			while(dit != start);
+		}
+
+		m_map.decCurrentLevel();
+	}
 } ;
 
-} // namespace Regular
+
+} // namespace Masks
 
 } // namespace Primal
 
@@ -91,6 +133,5 @@ public:
 
 } // namespace CGoGN
 
-#include "Algo/Multiresolution/Map2MR/map2MR_PrimalRegular.hpp"
-
 #endif
+
