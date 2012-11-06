@@ -81,7 +81,7 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 	{
 		std::stringstream ss;
 		ss << "	if (lum==0.0) gl_FragColor=vec4(";
-		ss << bgc[0] << "," << bgc[1] << "," << bgc[2] << ",0.0);\n		else\n";
+		ss << bgc[0] << "," << bgc[1] << "," << bgc[2] << ",color[3]);\n		else\n";
 		background.append(ss.str());
 	}
 	glxfrag.append(background);
