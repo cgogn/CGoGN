@@ -37,6 +37,7 @@ ENDIF(APPLE)
 
 
 add_subdirectory(Tools Tools/build)
+add_subdirectory(QGLViewer QGLViewer/build)
 
 IF (WITH_ZINRI)
 	add_subdirectory(Zinri Zinri/build)
@@ -49,6 +50,7 @@ ENDIF (WITH_ASSIMP)
 IF (WITH_NUMERICAL)
 	add_subdirectory(Numerical Numerical/build)
 ENDIF (WITH_NUMERICAL)
+
 
 IF(WIN32)
 	SET(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})

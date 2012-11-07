@@ -1,0 +1,9 @@
+<SETTINGS>
+  <PLUGINS>
+    <DIR path="@PLUGIN_COMPILE_DIR@"/>
+    <DIR path="@PLUGIN_COMPILE_DIR@D"/>
+  </PLUGINS>
+  <CAMERAS/>
+  <SCENES/>
+  <DISPLAY/>
+</SETTINGS>
