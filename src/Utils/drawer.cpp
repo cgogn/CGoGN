@@ -208,6 +208,27 @@ void Drawer::callSubList(int index, float opacity)
 	m_shader->disableVertexAttribs();
 }
 
+void Drawer::callSubLists(int first, int nb, float opacity)
+{
+	m_shader->setOpacity(opacity);
+	m_shader->enableVertexAttribs();
+
+	int last = first+nb;
+	for (int i = first; i< last; ++i)
+		if (i < int(m_begins.size()))
+		{
+			PrimParam* pp = & (m_begins[i]);
+
+			if (pp->mode == GL_POINTS)
+				glPointSize(pp->width);
+			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+				glLineWidth(pp->width);
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+
+	m_shader->disableVertexAttribs();
+}
+
 void Drawer::callSubLists(std::vector<int> indices, float opacity)
 {
 	m_shader->setOpacity(opacity);

@@ -143,6 +143,12 @@ public:
 	void callSubLists(std::vector<int> indices, float opacity);
 
 	/**
+	 * call a set of sub-lists
+	 */
+	void callSubLists(int first, int nb, float opacity);
+
+
+	/**
 	 * use as glLineWidth
 	 */
 	void lineWidth(float lw);
