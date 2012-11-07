@@ -90,8 +90,9 @@ public:
 	/**
 	 * as glBegin, but need a newList call before
 	 * @param mode: POINTS, LINES, LINE_LOOP, TRIANGLES, QUADS, POLYGON, etc..
+	 * @return index of subdrawing possible call
 	 */
-	void begin(GLenum mode);
+	int begin(GLenum mode);
 
 	/**
 	 * as glEnd
@@ -130,6 +131,16 @@ public:
 	 * use as a glCallList
 	 */
 	void callList(float opacity = 1.0f);
+
+	/**
+	 * call a sub-list (index return by begin (0,1,...)
+	 */
+	void callSubList(int index, float opacity = 1.0f);
+
+	/**
+	 * call a set of sub-lists
+	 */
+	void callSubLists(std::vector<int> indices, float opacity);
 
 	/**
 	 * use as glLineWidth
