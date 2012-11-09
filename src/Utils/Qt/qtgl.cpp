@@ -71,6 +71,21 @@ void GLWidget::setParamObject(float width, float* pos)
 	m_obj_pos = glm::vec3(-pos[0], -pos[1], -pos[2]);
 }
 
+void GLWidget::resetCenterOfRotation(float width, float* pos)
+{
+	m_cbs->trans_x() = 0.;
+	m_cbs->trans_y() = 0.;
+	m_cbs->trans_z() = -FAR_PLANE / 5.0f;
+
+//	float Z[3] = { 0.0f, 0.0f, 1.0f };
+//	axis_to_quat(Z, 0.0f, m_cbs->curquat());
+
+	setParamObject(width,pos);
+
+	recalcModelView();
+}
+
+
 void GLWidget::setRotation(bool b)
 {
 	allow_rotation = b;

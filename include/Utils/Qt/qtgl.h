@@ -106,6 +106,8 @@ protected:
 	void changeCenterOfRotation(const glm::vec3& newCenter);
 
 public:
+	void resetCenterOfRotation(float width, float* pos);
+
 	void setParamObject(float width, float* pos);
 
 	void setRotation(bool b);
