@@ -69,6 +69,8 @@ void GLWidget::setParamObject(float width, float* pos)
 {
 	m_obj_sc = ((FAR_PLANE / 5.0f) / foc) / width;
 	m_obj_pos = glm::vec3(-pos[0], -pos[1], -pos[2]);
+	m_obj_pos_save = glm::vec3(pos[0], pos[1], pos[2]);
+	m_obj_width = width;
 }
 
 void GLWidget::resetCenterOfRotation(float width, float* pos)
@@ -76,13 +78,11 @@ void GLWidget::resetCenterOfRotation(float width, float* pos)
 	m_cbs->trans_x() = 0.;
 	m_cbs->trans_y() = 0.;
 	m_cbs->trans_z() = -FAR_PLANE / 5.0f;
+	m_obj_sc = ((FAR_PLANE / 5.0f) / foc) / width;
 
-//	float Z[3] = { 0.0f, 0.0f, 1.0f };
-//	axis_to_quat(Z, 0.0f, m_cbs->curquat());
+	m_obj_pos = glm::vec3(-pos[0], -pos[1], -pos[2]);
+	newModel=1;
 
-	setParamObject(width,pos);
-
-	recalcModelView();
 }
 
 
@@ -260,6 +260,11 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent* event)
 			glm::vec3 win(x, y, depth);
 			glm::vec3 P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
 			changeCenterOfRotation(P);
+		}
+		else
+		{
+			resetCenterOfRotation(m_obj_width, static_cast<float*>(&m_obj_pos_save.x)) ;
+			updateGL();
 		}
 	}
 }
