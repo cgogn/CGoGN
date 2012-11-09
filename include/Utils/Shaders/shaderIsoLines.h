@@ -33,27 +33,34 @@ namespace CGoGN
 
 namespace Utils
 {
-
+/**
+ * Shader to draw iso-lines on a triangles mesh.
+ * Iso-line are computed on a data vertex attribute (float)
+ */
 class ShaderIsoLines : public GLSLShader
 {
 protected:
-	// shader sources
+	/// shader sources
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
     static std::string geometryShaderText;
 
-    // uniform locations
+    /// uniform locations
 	CGoGNGLuint m_unif_colorMin;
 	CGoGNGLuint m_unif_colorMax;
 	CGoGNGLuint m_unif_vmin;
 	CGoGNGLuint m_unif_vmax;
 	CGoGNGLuint m_unif_vnb;
 
-
+	// colors of iso-lines
 	Geom::Vec4f m_colorMin;
 	Geom::Vec4f m_colorMax;
+
+	/// min/max of data attribute
 	float m_vmin;
 	float m_vmax;
+
+	/// number of iso-line to draw
 	int m_vnb;
 
 	VBO* m_vboPos;
@@ -61,24 +68,47 @@ protected:
 
 	void getLocations();
 
-//	void restoreUniformsAttribs();
-
 public:
+	/**
+	 * constructor
+	 * @param max number of isolines drawable per triangle (as low as possible for performance)
+	 */
 	ShaderIsoLines(int maxNbIsoPerTriangle=6);
 
+	/**
+	 * set colors for min and max isoLine, interpolated between
+//	 * @param colorMin color for minimum iso-line value
+	 * @param colorMax color for maximum iso-line value
+	 */
 	void setColors(const Geom::Vec4f& colorMin, const Geom::Vec4f& colorMax);
+
+	/**
+	 * Set min and max value of used atribute
+	 * @param attMin minimun of attribute
+	 * @param attMax maximun of attribute
+	 */
 
 	void setDataBound(float attMin, float attMax);
 
+	/**
+	 * set the number of iso-lines (default is 32)
+	 */
 	void setNbIso(int nb);
 
 	/**
-	 *
+	 * set max number of isolines per triangle
+	 * If to small risk of missing lines
+	 * if to big performance problem
+	 */
+	void setNbMaxIsoLinePerTriangle(int nb) { changeNbMaxVertices(2*nb); }
+
+	/**
+	 * Position attribute
 	 */
 	void setAttributePosition(VBO* vbo);
 
 	/**
-	 * Data  attribute must be float
+	 * Data attribute for iso-lines must be of type float
 	 */
 	void setAttributeData(VBO* vbo);
 };

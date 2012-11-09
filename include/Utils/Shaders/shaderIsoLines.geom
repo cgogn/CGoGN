@@ -35,13 +35,13 @@ void isoLine(float x)
 	
 	if (in01)
 	{
+		vec4 pos01 = ModelViewProjectionMatrix * mix(POSITION_IN(0),POSITION_IN(1),b01);	
 		if (in02)
 		{
 		// line 01 - 02
-			vec4 pos =  mix(POSITION_IN(0),POSITION_IN(1),b01);
-			gl_Position = ModelViewProjectionMatrix *  pos;
+			gl_Position = pos01;
 			EmitVertex();
-			pos =  mix(POSITION_IN(0),POSITION_IN(2),b02);
+			vec4 pos =  mix(POSITION_IN(0),POSITION_IN(2),b02);
 			gl_Position = ModelViewProjectionMatrix *  pos;
 			EmitVertex();
 			EndPrimitive();
@@ -49,10 +49,9 @@ void isoLine(float x)
 		if (in12)
 		{
 		// line 01 - 12
-			vec4 pos =  mix(POSITION_IN(0),POSITION_IN(1),b01);
-			gl_Position = ModelViewProjectionMatrix *  pos;
+			gl_Position = pos01;
 			EmitVertex();
-			pos =  mix(POSITION_IN(1),POSITION_IN(2),b12);
+			vec4 pos =  mix(POSITION_IN(1),POSITION_IN(2),b12);
 			gl_Position = ModelViewProjectionMatrix *  pos;
 			EmitVertex();
 			EndPrimitive();
@@ -74,16 +73,10 @@ void isoLine(float x)
 
 void main(void)
 {
-	
 	float inc = (vmax-vmin)/float(vnb);
 	for (int i=0; i<vnb; ++i)
 	{
 		float v = vmin + float(i)*inc;
 		isoLine(v);
 	}
-
-//	isoLine(0.5);
-//	isoLine(0.5);
-//	isoLine(0.75);
-	
 }
