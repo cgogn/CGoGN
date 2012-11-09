@@ -40,34 +40,41 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 	else
 	{
 		//orientation step
-		if (this->positionAttribut[this->d][0] == this->positionAttribut[this->m.phi1(this->d)][0]
-		    && this->positionAttribut[this->d][1]
-		        == this->positionAttribut[this->m.phi1(this->d)][1]) this->d = this->m.phi2_1(
-		    this->d) ;
+		if (this->positionAttribut[this->d][0] == this->positionAttribut[this->m.phi1(this->d)][0] && this->positionAttribut[this->d][1] == this->positionAttribut[this->m.phi1(this->d)][1])
+			this->d = this->m.phi2_1(this->d) ;
 		if (this->getOrientationEdge(current, this->m.phi2_1(this->d)) != Geom::RIGHT)
 		{
 			Dart dd_vert = this->d ;
 			do
 			{
 				this->d = this->m.phi2_1(this->d) ;
-				if (this->positionAttribut[this->d][0]
-				    == this->positionAttribut[this->m.phi1(this->d)][0]
-				    && this->positionAttribut[this->d][1]
-				        == this->positionAttribut[this->m.phi1(this->d)][1]) this->d = this->m.phi2_1(this->d) ;
-			} while (this->getOrientationEdge(current, this->m.phi2_1(this->d)) != Geom::RIGHT
-			    && dd_vert != this->d) ;
+				if (this->positionAttribut[this->d][0] == this->positionAttribut[this->m.phi1(this->d)][0]
+					&& this->positionAttribut[this->d][1]== this->positionAttribut[this->m.phi1(this->d)][1])
+					this->d = this->m.phi2_1(this->d) ;
+			} while (this->getOrientationEdge(current, this->m.phi2_1(this->d)) != Geom::RIGHT && dd_vert != this->d) ;
 
 			if (dd_vert == this->d)
 			{
 				//orbit with 2 edges : point on one edge
 				if (this->m.phi2_1(this->m.phi2_1(this->d)) == this->d)
 				{
-					if (!Algo::Geometry::isPointOnHalfEdge < PFP
-					    > (this->m, this->d, this->positionAttribut, current)) this->d = this->m.phi2_1(
-					    this->d) ;
+					if (!Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
+						this->d = this->m.phi2_1(this->d) ;
 				}
 				else
 				{
+					//checking : case with 3 orthogonal darts and point on an edge
+					do
+					{
+						if(Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
+								&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current))
+						{
+							this->edgeState(current) ;
+							return;
+						}
+						this->d = this->m.phi2_1(this->d) ;
+					} while (this->getOrientationEdge(current, this->m.phi2_1(this->d)) != Geom::RIGHT && dd_vert != this->d) ;
+
 					this->ParticleBase<PFP>::move(current) ;
 					this->setState(VERTEX) ;
 					return ;
@@ -80,19 +87,17 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 			while (this->getOrientationEdge(current, this->d) == Geom::RIGHT && dd_vert != this->d)
 			{
 				this->d = this->m.phi12(this->d) ;
-				if (this->positionAttribut[this->d][0]
-				    == this->positionAttribut[this->m.phi1(this->d)][0]
-				    && this->positionAttribut[this->d][1]
-				        == this->positionAttribut[this->m.phi1(this->d)][1]) this->d = this->m.phi12(
-				    this->d) ;
+				if (this->positionAttribut[this->d][0] == this->positionAttribut[this->m.phi1(this->d)][0]
+				    && this->positionAttribut[this->d][1] == this->positionAttribut[this->m.phi1(this->d)][1])
+					this->d = this->m.phi12(this->d) ;
 			}
 		}
 
 		//displacement step
-		if (detect_vertex) memo_cross.push_back(this->d) ;
+		if (detect_vertex)
+			memo_cross.push_back(this->d) ;
 		if (this->getOrientationEdge(current, this->d) == Geom::ALIGNED
-		    && Algo::Geometry::isPointOnHalfEdge < PFP
-		        > (this->m, this->d, this->positionAttribut, current))
+				&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
 			edgeState(current) ;
 		else
 		{
@@ -108,7 +113,9 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 #ifdef DEBUG
 	CGoGNout << "edgeState" << d << CGoGNendl ;
 #endif
-	if (detect_edge) memo_cross.push_back(this->d) ;
+	if (detect_edge)
+		memo_cross.push_back(this->d) ;
+
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
 // 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
 
