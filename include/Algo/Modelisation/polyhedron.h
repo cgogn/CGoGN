@@ -45,11 +45,10 @@ namespace Modelisation
 enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
 /**
-* sudivide the all quads of primtive into 2 triangles
-* the vertex darts table remain valid (adding only darts, no remove)
+* sudivide the all quads of a CC into 2 triangles
 */
-// template <typename PFP>
-// void onlyTriangles(typename PFP::MAP& the_map, Dart primd);
+ template <typename PFP>
+ void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd);
 
 /**
 * Create a triangle fans (to close cylinders)
