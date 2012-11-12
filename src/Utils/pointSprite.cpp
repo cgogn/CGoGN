@@ -93,10 +93,17 @@ PointSprite::PointSprite(bool withColorPervertex, float radius,  bool with_plane
 
 	if (with_plane)
 	{
-		*m_uniform_planeX = glGetUniformLocation(program_handler(),"planeX");
-		*m_uniform_planeY = glGetUniformLocation(program_handler(),"planeY");
+		*m_uniform_EyePos = glGetUniformLocation(program_handler(),"eyePos");
+		*m_uniform_EyeY = glGetUniformLocation(program_handler(),"eyeY");
 	}
+
+	*m_uniform_ambiant = glGetUniformLocation(program_handler(),"ambiant");
+	*m_uniform_lightPos = glGetUniformLocation(program_handler(),"lightPos");
+
+	setLightPosition(Geom::Vec3f(2000.0,2000.0,2000.0));
+	setAmbiantColor(Geom::Vec3f(0.1f,0.1f,0.1f));
 }
+
 
 PointSprite::~PointSprite()
 {
@@ -149,11 +156,11 @@ void PointSprite::setSize(float radius)
 	unbind();
 }
 
-void PointSprite::setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy)
+void PointSprite::setEyePosition(const Geom::Vec3f& ox, const Geom::Vec3f& oy)
 {
 	bind();
-	glUniform3fv(*m_uniform_planeX, 1, ox.data());
-	glUniform3fv(*m_uniform_planeY, 1, oy.data());
+	glUniform3fv(*m_uniform_EyePos, 1, ox.data());
+	glUniform3fv(*m_uniform_EyeY, 1, oy.data());
 	unbind();
 }
 
@@ -196,6 +203,22 @@ void PointSprite::computeSphere()
 		}
 	}
 }
+
+
+void PointSprite::setLightPosition(const Geom::Vec3f& pos)
+{
+	bind();
+	glUniform3fv(*m_uniform_lightPos, 1, pos.data());
+	unbind();
+}
+
+void PointSprite::setAmbiantColor(const Geom::Vec3f& amb)
+{
+	bind();
+	glUniform3fv(*m_uniform_ambiant, 1, amb.data());
+	unbind();
+}
+
 
 } // namespace Utils
 

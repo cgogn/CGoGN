@@ -45,7 +45,7 @@ ShaderExplodeVolumesLines::ShaderExplodeVolumesLines()
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom(GLSLShader::defines_Geom("triangles", "triangle_strip", 4));
+	std::string glxgeom(GLSLShader::defines_Geom("triangles", "line_strip", 4));
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);

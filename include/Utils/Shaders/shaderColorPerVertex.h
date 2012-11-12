@@ -67,6 +67,8 @@ public:
 	 * set opacity (0=transparent / 1=opaque)
 	 */
 	void setOpacity(float op);
+
+	float getOpacity() const  { return m_opacity;}
 };
 
 } // namespace Utils

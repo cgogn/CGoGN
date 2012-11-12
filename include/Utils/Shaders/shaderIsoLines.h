@@ -36,6 +36,8 @@ namespace Utils
 /**
  * Shader to draw iso-lines on a triangles mesh.
  * Iso-line are computed on a data vertex attribute (float)
+ * nb iso-lines, min/max attributes value and colors can be changed on the fly
+ * For better rendering result use glEnable(GL_LINE_SMOOTH)
  */
 class ShaderIsoLines : public GLSLShader
 {
@@ -83,11 +85,10 @@ public:
 	void setColors(const Geom::Vec4f& colorMin, const Geom::Vec4f& colorMax);
 
 	/**
-	 * Set min and max value of used atribute
+	 * Set min and max value of used atribute.
 	 * @param attMin minimun of attribute
 	 * @param attMax maximun of attribute
 	 */
-
 	void setDataBound(float attMin, float attMax);
 
 	/**

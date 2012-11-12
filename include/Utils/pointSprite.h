@@ -62,9 +62,13 @@ protected:
 
 	CGoGNGLuint m_uniform_texture;
 	
-	CGoGNGLuint m_uniform_planeX;
+	CGoGNGLuint m_uniform_EyePos;
 	
-	CGoGNGLuint m_uniform_planeY;
+	CGoGNGLuint m_uniform_EyeY;
+
+	CGoGNGLuint m_uniform_ambiant;
+
+	CGoGNGLuint m_uniform_lightPos;
 
 public:
 	/**
@@ -105,7 +109,7 @@ public:
 	/**
 	* set the plane of rendering for VR rendering
 	*/
-	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
+	void setEyePosition(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
 
 
 	/**
@@ -117,6 +121,12 @@ public:
 	 * set color attribute
 	 */
 	unsigned int setAttributeColor(VBO* vbo);
+
+
+	void setLightPosition(const Geom::Vec3f& pos);
+
+	void setAmbiantColor(const Geom::Vec3f& amb);
+
 };
 
 } // namespace Utils

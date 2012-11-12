@@ -90,11 +90,6 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plan
 		glxfrag.append(fragmentShaderText3);
 	}
 
-
-	std::cout << "===================================="<< std::endl;
-	std::cout << glxfrag << std::endl;
-	std::cout << "===================================="<< std::endl;
-
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
 	m_vbo1 = new Utils::VBO();
