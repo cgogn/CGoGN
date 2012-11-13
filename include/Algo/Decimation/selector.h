@@ -84,16 +84,7 @@ public:
 
 	virtual void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
 	{
-//		assert(colors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
-//		if (!colors->isValid())
-//			std::cerr << "EdgeSelector::setColorMap requires valid vertexattribute argument" << std::endl ;
-//
-//		TraversorV<typename PFP::MAP> travV(map);
-//		for(Dart d = travV.begin() ; d != travV.end() ; d = travV.next())
-//		{
-//			REAL scaled = scale_to_0_1(error,edges.begin()->first,edges.rbegin()->first) ;
-//			(*colors)[d] = color_map_blue_green_red(scaled) ;
-//		}
+		std::cout << "WARNING:: getEdgeErrors was not overridden" << std::endl ;
 	}
 } ;
 

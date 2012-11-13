@@ -67,6 +67,7 @@ public:
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
 	void updateWithoutCollapse() { }
+
 } ;
 
 template <typename PFP>
@@ -143,6 +144,24 @@ public:
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
 	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
+		assert(edgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			(*errors)[d] = -1 ;
+			if (edgeInfo[d].valid)
+			{
+				(*errors)[d] = edgeInfo[d].it->first ;
+			}
+		}
+	}
 } ;
 
 template <typename PFP>
@@ -518,6 +537,24 @@ public:
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
 	void updateWithoutCollapse() { }
+
+	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		assert(errors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+		if (!errors->isValid())
+			std::cerr << "EdgeSelector::setColorMap requires valid edgeattribute argument" << std::endl ;
+		assert(edgeInfo.isValid()) ;
+
+		TraversorE<typename PFP::MAP> travE(this->m_map) ;
+		for(Dart d = travE.begin() ; d != travE.end() ; d = travE.next())
+		{
+			(*errors)[d] = -1 ;
+			if (edgeInfo[d].valid)
+			{
+				(*errors)[d] = edgeInfo[d].it->first ;
+			}
+		}
+	}
 } ;
 
 /*****************************************************************************************************************

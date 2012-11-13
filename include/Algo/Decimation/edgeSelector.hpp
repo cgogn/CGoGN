@@ -290,6 +290,9 @@ bool EdgeSelector_QEM<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_QEM) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_QEM) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_QEM) are not compatible") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
@@ -507,6 +510,9 @@ bool EdgeSelector_QEMml<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_QEMml) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_QEMml) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_QEMml) are not compatible") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
@@ -737,6 +743,9 @@ bool EdgeSelector_Curvature<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_Curvature) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_Curvature) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_Curvature) are not compatible") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
@@ -948,6 +957,9 @@ bool EdgeSelector_MinDetail<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position" && (*it)->getPredictor())
 		{
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_MinDetail) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_MinDetail) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_MinDetail) are not compatible") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
@@ -1116,14 +1128,14 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(this->m_approximators[0]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (ColorNaive) are not compatible") ;
-
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (ColorNaive) are not compatible") ;
+
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -1383,13 +1395,14 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(this->m_approximators[0]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_QEMextColor) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_QEMextColor) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (EdgeSelector_QEMextColor) are not compatible") ;
+
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -1681,13 +1694,14 @@ bool EdgeSelector_Lightfield<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(this->m_approximators[0]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_Lightfield) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_Lightfield) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (EdgeSelector_Lightfield) are not compatible") ;
+
 		unsigned int k = 0 ;
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
@@ -2004,18 +2018,16 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	//std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << " vs " << quadHF(newHF) << std::endl ;
 	// sum of QEM metric and frame orientation difference
-	const REAL& err =
-			quadGeom(newPos) // geom
-			+ alpha / M_PI // frame
-			+ quadHF(newHF) // function coefficients
-			 ;
+	const REAL& errG = quadGeom(newPos) ; // geom
+	const REAL& errAngle = alpha / M_PI ; // frame
+	const REAL& errLF = quadHF(newHF) ; // function coefficients
 
 	// Check if errated values appear
-	if (err < -1e-6)
+	if (errG < -1e-10 || errAngle < -1e-10 || errLF < -1e-10)
 		einfo.valid = false ;
 	else
 	{
-		einfo.it = edges.insert(std::make_pair(std::max(err,REAL(0)), d)) ;
+		einfo.it = edges.insert(std::make_pair(std::max(errG + errAngle + errLF, REAL(0)), d)) ;
 		einfo.valid = true ;
 	}
 }

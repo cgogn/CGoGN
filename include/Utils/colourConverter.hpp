@@ -256,7 +256,7 @@ void ColourConverter<REAL>::convertHSVtoRGB()
 	const REAL& s = (*HSV)[1] ;
 	const REAL& v = (*HSV)[2] ;
 
-	const unsigned int Hi = (unsigned int)(std::floor(H / 60)) % 6 ;
+	const unsigned int Hi = (unsigned int)(floor(H / 60)) % 6 ;
 	const REAL f = (H / 60) - Hi ;
 	const REAL l = v * (1 - s) ;
 	const REAL m = v * (1 - f * s) ;
