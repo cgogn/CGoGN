@@ -29,6 +29,9 @@
  * \file tensor.h
  */
 
+#define CONST_VAL -5212368.54127 // random value
+
+
 namespace CGoGN
 {
 
@@ -191,6 +194,15 @@ class Tensor
 		 * \return true if final index not reached
 		 */
 		static bool incremIndex(std::vector<unsigned int>& p) ;
+
+		/*!
+		 * \brief method to complete a symmetric tensor that was
+		 * only filled in its first half (defined by an index that
+		 * is order ascendantly)
+		 *
+		 * \param T the tensor to fill
+		 */
+		void completeSymmetricTensor() ;
 
 		/**********************************************/
 		/*             STREAM OPERATORS               */

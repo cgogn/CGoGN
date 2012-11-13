@@ -134,6 +134,21 @@ Tensor<SIZE, REAL>::getIndex(std::vector<unsigned int> p) const
 	return res ;
 }
 
+
+template <unsigned int SIZE, typename REAL>
+void
+Tensor<SIZE, REAL>::completeSymmetricTensor()
+{
+	std::vector<unsigned int> p ;
+	p.resize(order(), 0) ;
+	do
+	{
+		std::vector<unsigned int> sorted_p = p ;
+		std::sort(sorted_p.begin(), sorted_p.begin() + (*this).order()) ;
+		(*this)(p) = (*this)(sorted_p) ;
+	} while (incremIndex(p)) ;
+}
+
 template <unsigned int SIZE, typename REAL>
 const unsigned int&
 Tensor<SIZE, REAL>::order() const
