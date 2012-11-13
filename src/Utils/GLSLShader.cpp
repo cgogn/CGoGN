@@ -86,6 +86,8 @@ GLSLShader::GLSLShader() :
 
 	if (DEFINES_GL == NULL)
 		DEFINES_GL = &DEFINES_GL2;
+
+	m_nbMaxVertices = 16;
 }
 
 void GLSLShader::registerShader(void* ptr, GLSLShader* shader)
@@ -451,6 +453,9 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	int		status;
 	char	*info_log;
 
+	if (nb_max_vertices!=-1)
+		m_nbMaxVertices = nb_max_vertices;
+
 	m_geom_inputPrimitives = inputGeometryPrimitive;
 	m_geom_outputPrimitives = outputGeometryPrimitive;
 
@@ -479,7 +484,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 
 		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_INPUT_TYPE_EXT,inputGeometryPrimitive);
 		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_OUTPUT_TYPE_EXT,outputGeometryPrimitive);
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,nb_max_vertices);
+		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,m_nbMaxVertices);
 	}
 
 	/*** link program object ***/
@@ -510,6 +515,26 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 
 	return true;
 }
+
+
+
+bool GLSLShader::changeNbMaxVertices(int nb_max_vertices)
+{
+	m_nbMaxVertices = nb_max_vertices;
+	if (*m_geom_shader_object)
+	{
+		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,m_nbMaxVertices);
+		// need to relink
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+
 
 bool GLSLShader::link()
 {
@@ -839,7 +864,7 @@ bool GLSLShader::recompile()
 	*m_uniMat_Proj		= glGetUniformLocation(*m_program_object,"ProjectionMatrix");
 	*m_uniMat_Model		= glGetUniformLocation(*m_program_object,"ModelViewMatrix");
 	*m_uniMat_ModelProj	= glGetUniformLocation(*m_program_object,"ModelViewProjectionMatrix");
-	*m_uniMat_Normal		= glGetUniformLocation(*m_program_object,"NormalMatrix");
+	*m_uniMat_Normal	= glGetUniformLocation(*m_program_object,"NormalMatrix");
 
 	restoreUniformsAttribs();
 

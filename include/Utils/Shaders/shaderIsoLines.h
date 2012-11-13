@@ -22,99 +22,96 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_PHONG__
-#define __CGOGN_SHADER_PHONG__
+#ifndef __CGOGN_SHADER_ISO_LINES__
+#define __CGOGN_SHADER_ISO_LINES__
 
 #include "Utils/GLSLShader.h"
-#include "Utils/clippingShader.h"
 #include "Geometry/vector_gen.h"
-
-#include <string>
 
 namespace CGoGN
 {
 
 namespace Utils
 {
-
-class ShaderPhong : public ClippingShader
+/**
+ * Shader to draw iso-lines on a triangles mesh.
+ * Iso-line are computed on a data vertex attribute (float)
+ * nb iso-lines, min/max attributes value and colors can be changed on the fly
+ * For better rendering result use glEnable(GL_LINE_SMOOTH)
+ */
+class ShaderIsoLines : public GLSLShader
 {
 protected:
-	// flag color per vertex or not
-	bool m_with_color;
-	// flag color per vertex or not
-	bool m_with_eyepos;	
-
-	// shader sources OGL3
+	/// shader sources
     static std::string vertexShaderText;
     static std::string fragmentShaderText;
+    static std::string geometryShaderText;
 
-    // uniform locations
-	CGoGNGLuint m_unif_ambiant;
-	CGoGNGLuint m_unif_diffuse;
-	CGoGNGLuint m_unif_specular;
-	CGoGNGLuint m_unif_shininess;
-	CGoGNGLuint m_unif_lightPos;
-	CGoGNGLuint m_unif_eyePos;
+    /// uniform locations
+	CGoGNGLuint m_unif_colorMin;
+	CGoGNGLuint m_unif_colorMax;
+	CGoGNGLuint m_unif_vmin;
+	CGoGNGLuint m_unif_vmax;
+	CGoGNGLuint m_unif_vnb;
 
-	//values
-	Geom::Vec4f m_ambiant;
-	Geom::Vec4f m_diffuse;
-	Geom::Vec4f m_specular;
-	float m_shininess;
-	Geom::Vec3f m_lightPos;
-	Geom::Vec3f m_eyePos;
+	// colors of iso-lines
+	Geom::Vec4f m_colorMin;
+	Geom::Vec4f m_colorMax;
+
+	/// min/max of data attribute
+	float m_vmin;
+	float m_vmax;
+
+	/// number of iso-line to draw
+	int m_vnb;
 
 	VBO* m_vboPos;
-	VBO* m_vboNormal;
-	VBO* m_vboColor;
+	VBO* m_vboData;
 
 	void getLocations();
 
-	void sendParams();
-
-	void restoreUniformsAttribs();
-
 public:
-	ShaderPhong(bool doubleSided = false, bool withEyePosition=false);
-
-	// inviduals parameter setting functions
-	void setAmbiant(const Geom::Vec4f& ambiant);
-
-	void setDiffuse(const Geom::Vec4f& diffuse);
-
-	void setSpecular(const Geom::Vec4f& specular);
-
-	void setShininess(float shininess);
-
-	void setLightPosition(const Geom::Vec3f& lp);
-	
-	/// set eye position for VR environement
-	void setEyePosition(const Geom::Vec3f& ep);
-
-	const Geom::Vec4f& getAmbiant() const { return m_ambiant; }
-
-	const Geom::Vec4f& getDiffuse() const { return m_diffuse; }
-
-	const Geom::Vec4f& getSpecular() const { return m_specular; }
-
-	float getShininess() const { return m_shininess; }
-
-	const Geom::Vec3f& getLightPosition() const { return m_lightPos; }
+	/**
+	 * constructor
+	 * @param max number of isolines drawable per triangle (as low as possible for performance)
+	 */
+	ShaderIsoLines(int maxNbIsoPerTriangle=6);
 
 	/**
-	 * set all parameter in on call (one bind also)
+	 * set colors for min and max isoLine, interpolated between
+//	 * @param colorMin color for minimum iso-line value
+	 * @param colorMax color for maximum iso-line value
 	 */
-	void setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos);
+	void setColors(const Geom::Vec4f& colorMin, const Geom::Vec4f& colorMax);
 
-	// attributes
-	unsigned int setAttributePosition(VBO* vbo);
+	/**
+	 * Set min and max value of used atribute.
+	 * @param attMin minimun of attribute
+	 * @param attMax maximun of attribute
+	 */
+	void setDataBound(float attMin, float attMax);
 
-	unsigned int setAttributeNormal(VBO* vbo);
+	/**
+	 * set the number of iso-lines (default is 32)
+	 */
+	void setNbIso(int nb);
 
-	// optional attributes
-	unsigned int setAttributeColor(VBO* vbo);
-	void unsetAttributeColor();
+	/**
+	 * set max number of isolines per triangle
+	 * If to small risk of missing lines
+	 * if to big performance problem
+	 */
+	void setNbMaxIsoLinePerTriangle(int nb) { changeNbMaxVertices(2*nb); }
+
+	/**
+	 * Position attribute
+	 */
+	void setAttributePosition(VBO* vbo);
+
+	/**
+	 * Data attribute for iso-lines must be of type float
+	 */
+	void setAttributeData(VBO* vbo);
 };
 
 } // namespace Utils

@@ -22,8 +22,8 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __CGOGN_SHADER_PHONG__
-#define __CGOGN_SHADER_PHONG__
+#ifndef __CGOGN_SHADER_ENVMAP__
+#define __CGOGN_SHADER_ENVMAP__
 
 #include "Utils/GLSLShader.h"
 #include "Utils/clippingShader.h"
@@ -31,19 +31,27 @@
 
 #include <string>
 
+#ifdef WITH_QT
+#include <QImage>
+#endif
+
 namespace CGoGN
 {
 
 namespace Utils
 {
-
-class ShaderPhong : public ClippingShader
+/**
+ * Class for shader environment mapping (cube mapping)
+ *
+ * @warning shader code is GL2.0 compatible for GL3.0 replace textureCube by texture in fragment shader !
+ */
+class ShaderEnvMap : public ClippingShader
 {
 protected:
 	// flag color per vertex or not
 	bool m_with_color;
 	// flag color per vertex or not
-	bool m_with_eyepos;	
+	bool m_with_eyepos;
 
 	// shader sources OGL3
     static std::string vertexShaderText;
@@ -52,18 +60,19 @@ protected:
     // uniform locations
 	CGoGNGLuint m_unif_ambiant;
 	CGoGNGLuint m_unif_diffuse;
-	CGoGNGLuint m_unif_specular;
-	CGoGNGLuint m_unif_shininess;
+	CGoGNGLuint m_unif_blend;
 	CGoGNGLuint m_unif_lightPos;
 	CGoGNGLuint m_unif_eyePos;
+	CGoGNGLuint m_unif_envMap;
 
 	//values
 	Geom::Vec4f m_ambiant;
 	Geom::Vec4f m_diffuse;
-	Geom::Vec4f m_specular;
-	float m_shininess;
+	float m_blend;
 	Geom::Vec3f m_lightPos;
 	Geom::Vec3f m_eyePos;
+
+	CGoGNGLuint m_texId;
 
 	VBO* m_vboPos;
 	VBO* m_vboNormal;
@@ -76,7 +85,7 @@ protected:
 	void restoreUniformsAttribs();
 
 public:
-	ShaderPhong(bool doubleSided = false, bool withEyePosition=false);
+	ShaderEnvMap(bool doubleSided = false, bool withEyePosition=false);
 
 	// inviduals parameter setting functions
 	void setAmbiant(const Geom::Vec4f& ambiant);
@@ -85,10 +94,10 @@ public:
 
 	void setSpecular(const Geom::Vec4f& specular);
 
-	void setShininess(float shininess);
+	void setBlendCoef(float blend);
 
 	void setLightPosition(const Geom::Vec3f& lp);
-	
+
 	/// set eye position for VR environement
 	void setEyePosition(const Geom::Vec3f& ep);
 
@@ -96,25 +105,63 @@ public:
 
 	const Geom::Vec4f& getDiffuse() const { return m_diffuse; }
 
-	const Geom::Vec4f& getSpecular() const { return m_specular; }
-
-	float getShininess() const { return m_shininess; }
+	float getBlendCoef() const { return m_blend; }
 
 	const Geom::Vec3f& getLightPosition() const { return m_lightPos; }
 
 	/**
 	 * set all parameter in on call (one bind also)
 	 */
-	void setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec4f& specular, float shininess, const Geom::Vec3f& lightPos);
+	void setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, float blend, const Geom::Vec3f& lightPos);
 
 	// attributes
 	unsigned int setAttributePosition(VBO* vbo);
 
 	unsigned int setAttributeNormal(VBO* vbo);
 
+
 	// optional attributes
 	unsigned int setAttributeColor(VBO* vbo);
 	void unsetAttributeColor();
+
+
+	/**
+	 * need to be called just before draw
+	 */
+	void predraw();
+
+	/**
+	 * need to be called just after draw
+	 */
+	void postdraw();
+
+	void setCubeMap(unsigned int sz, unsigned char* Xpos, unsigned char* Ypos, unsigned char* Zpos, unsigned char* Xneg, unsigned char* Yneg, unsigned char* Zneg);
+
+	/**
+	 * set envmap texture image
+	 * image looks  likre:
+	 *  Y
+	 * XZXZ
+	 *  Y
+	 * @parameter sz size of edge of cube in pixel
+	 * @parameter ptr pointer on image data (RGB RGB RGB ....)
+	 */
+	bool setCubeMapImg(unsigned int sz, unsigned char *ptr);
+
+	/**
+	 * set colored plane for testing
+	 */
+	bool setCubeMapColored();
+
+	/**
+	 * set colored plane for testing
+	 */
+	bool setCubeMapCheckered();
+
+#ifdef WITH_QT
+	bool setCubeMap(const std::string& filename);
+#endif
+
 };
 
 } // namespace Utils
