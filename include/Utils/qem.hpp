@@ -847,7 +847,7 @@ QuadricHF<REAL>::buildIntegralMatrix_B(const REAL& alpha, unsigned int size)
 	 B( 9 , 8 ) = 0 ;
 	 B( 9 , 9 ) = 2.0*(M_PI-alpha)/7.0 ;
 
-	 if (size < 10)
+	 if (size < 11)
 		 return B ;
 
 	 B( 0 , 10 ) = 4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;
