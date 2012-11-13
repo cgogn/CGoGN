@@ -51,6 +51,7 @@ bool HalfEdgeSelector_QEMml<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
+			assert((*it)->getType() == A_hQEM || (*it)->getType() == A_hHalfCollapse || (*it)->getType() != A_Lightfield || !"Approximator for selector (HalfEdgeSelector_QEMml) must be of a half-edge approximator") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,DART>* >(*it) ;
 			ok = true ;
 		}
@@ -290,6 +291,11 @@ bool HalfEdgeSelector_QEMextColor<PFP>::init()
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() == A_hQEM
+				|| this->m_approximators[approxindex]->getType() == A_hHalfCollapse
+				|| this->m_approximators[approxindex]->getType() != A_Lightfield
+				|| !"Approximator for selector (HalfEdgeSelector_QEMextColor) must be of a half-edge approximator") ;
+
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -602,6 +608,11 @@ bool HalfEdgeSelector_Lightfield<PFP>::init()
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() == A_hQEM
+				|| this->m_approximators[approxindex]->getType() == A_hHalfCollapse
+				|| this->m_approximators[approxindex]->getType() != A_Lightfield
+				|| !"Approximator for selector (HalfEdgeSelector_Lightfield) must be of a half-edge approximator") ;
+
 		unsigned int k = 0 ;
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
@@ -934,17 +945,20 @@ void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo&
 	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
 	Utils::QuadricHF<REAL> quadHF = m_quadricHF[d] ;
 
-	//std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << " vs " << quadHF(newHF) << std::endl ;
+	//std::cout << quadGeom(newPos) / (alpha/M_PI + quadHF(newHF)) << std::endl ;
 	// sum of QEM metric and frame orientation difference
 	const REAL& err =
-			quadGeom(newPos) // geom
-			+ alpha / M_PI // frame
-			+ quadHF(newHF) // function coefficients
+			//quadGeom(newPos) + // geom
+			alpha / M_PI + // frame
+			quadHF(newHF) // function coefficients
 			 ;
 
 	// Check if errated values appear
 	if (err < -1e-6)
+	{
 		heinfo.valid = false ;
+		std::cout << err << std::endl ;
+	}
 	else
 	{
 		heinfo.it = this->halfEdges.insert(std::make_pair(std::max(err,REAL(0)), d)) ;
