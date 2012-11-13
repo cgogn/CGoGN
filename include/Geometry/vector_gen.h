@@ -188,6 +188,7 @@ T tripleProduct(const Vector<DIM, T>& v1, const Vector<DIM, T>& v2, const Vector
 template <unsigned int DIM, typename T>
 Vector<DIM, T> slerp(const Vector<DIM, T> &v1, const Vector<DIM, T> &v2, const T &t) ;
 
+
 /**********************************************/
 /*           SOME USEFUL TYPEDEFS             */
 /**********************************************/

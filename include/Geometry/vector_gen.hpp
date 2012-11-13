@@ -363,7 +363,15 @@ inline Vector<DIM, T> slerp(const Vector<DIM, T>& v1, const Vector<DIM, T>& v2, 
 {
 	Vector<DIM, T> res ;
 
-	T omega = acos(v1 * v2) ;	// assume v1,v2 normalized
+	T scal = v1 * v2 ;
+
+	// Prevention for floating point errors
+	if (1 < scal && scal < 1 + 1e-6)
+		scal = T(1) ;
+	if (-1. - 1e-6 < scal && scal < -1)
+		scal = -T(1) ;
+
+	T omega = acos(scal) ;
 	T den = sin(omega) ;
 
 	if (-1e-8 < den && den < 1e-8) return t < 0.5 ? v1 : v2 ;

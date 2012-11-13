@@ -56,7 +56,7 @@ void Approximator_ColorNaive<PFP>::approximate(Dart d)
 template <typename PFP>
 bool Approximator_ColorQEMext<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
+	m_quadric = this->m_map.template getAttribute<Utils::QuadricNd<REAL,6>, VERTEX>("QEMext-quadric") ;
 	// Does not require to be valid (if it is not, altenatives will be used).
 
 	if(this->m_predictor)
@@ -75,7 +75,7 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 	// get some darts
 	Dart dd = m.phi2(d) ;
 
-	QuadricNd<REAL,6> q1, q2 ;
+	Utils::QuadricNd<REAL,6> q1, q2 ;
 	if(!m_quadric.isValid()) // if the selector is not QEM, compute local error quadrics
 	{
 		// compute the error quadric associated to v1
@@ -93,7 +93,7 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 				p2[i+3] = this->m_attrV[1]->operator[](m.phi_1(it))[i] ;
 			}
 
-			QuadricNd<REAL,6> q(p0,p1,p2) ;
+			Utils::QuadricNd<REAL,6> q(p0,p1,p2) ;
 			q1 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != d) ;
@@ -113,7 +113,7 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 				p2[i+3] = this->m_attrV[1]->operator[](m.phi_1(it))[i] ;
 			}
 
-			QuadricNd<REAL,6> q(p0,p1,p2) ;
+			Utils::QuadricNd<REAL,6> q(p0,p1,p2) ;
 			q2 += q ;
 			it = m.phi2_1(it) ;
 		} while(it != dd) ;
@@ -124,7 +124,7 @@ void Approximator_ColorQEMext<PFP>::approximate(Dart d)
 		q2 = m_quadric[dd] ;
 	}
 
-	QuadricNd<REAL,6> quad ;
+	Utils::QuadricNd<REAL,6> quad ;
 	quad += q1 ;	// compute the sum of the
 	quad += q2 ;	// two vertices quadrics
 

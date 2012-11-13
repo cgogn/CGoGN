@@ -1001,7 +1001,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	if (*endline == '\r') // for windows
 		fp.read(endline, sizeof(char)) ;
 	assert(*endline == '\n') ;
-	delete endline ;
+	delete[] endline ;
 
 	// Define containers
 	VertexAttribute<typename PFP::VEC3> positions = m_map.template getAttribute<typename PFP::VEC3, VERTEX>("position") ;

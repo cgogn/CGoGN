@@ -47,11 +47,13 @@ enum SelectorType
 	S_QEMextColor,
 	S_Lightfield,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	S_hQEMml
+	S_hQEMextColor,
+	S_hQEMml,
+	S_hLightfield
 } ;
 
 template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
+template <typename PFP, typename T, unsigned int ORBIT> class Approximator ;
 
 template <typename PFP>
 class EdgeSelector
@@ -78,8 +80,21 @@ public:
 	virtual bool nextEdge(Dart& d) = 0 ;
 	virtual void updateBeforeCollapse(Dart d) = 0 ;
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
-
 	virtual void updateWithoutCollapse() = 0;
+
+	virtual void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+//		assert(colors != NULL || !"EdgeSelector::setColorMap requires non null vertexattribute argument") ;
+//		if (!colors->isValid())
+//			std::cerr << "EdgeSelector::setColorMap requires valid vertexattribute argument" << std::endl ;
+//
+//		TraversorV<typename PFP::MAP> travV(map);
+//		for(Dart d = travV.begin() ; d != travV.end() ; d = travV.next())
+//		{
+//			REAL scaled = scale_to_0_1(error,edges.begin()->first,edges.rbegin()->first) ;
+//			(*colors)[d] = color_map_blue_green_red(scaled) ;
+//		}
+	}
 } ;
 
 } // namespace Decimation
