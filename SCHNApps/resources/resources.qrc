@@ -1,0 +1,20 @@
+<RCC>
+  <qresource prefix="splash">
+    <file>cgogn/splash.png</file>
+  </qresource>
+  <qresource prefix="icons">
+    <file>icons/map_plugin.png</file>
+    <file>cgogn/cgogn2.png</file>
+    <file>icons/check.png</file>
+    <file>icons/close.png</file>
+    <file>icons/share.png</file>
+    <file>icons/give.png</file>
+    <file>icons/camera_b.png</file>
+    <file>icons/separate_camera.png</file>
+    <file>icons/camera.png</file>
+    <file>icons/plugins.png</file>
+    <file>icons/link.png</file>
+    <file>icons/broken_link.png</file>
+    <file>icons/add_view.png</file>
+  </qresource>
+</RCC>

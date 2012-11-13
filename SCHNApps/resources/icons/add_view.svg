@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="529.48621"
+   height="407.79816"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="add_view.svg">
+  <defs
+     id="defs4">
+    <filter
+       inkscape:collect="always"
+       id="filter3803"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="3.1219019"
+         id="feGaussianBlur3805" />
+    </filter>
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask3809">
+      <path
+         transform="matrix(1.1060606,0,0,1.4166667,-37.099568,-125.92471)"
+         d="m 470,298.79074 a 147.14285,94.285713 0 1 1 -294.28571,0 147.14285,94.285713 0 1 1 294.28571,0 z"
+         sodipodi:ry="94.285713"
+         sodipodi:rx="147.14285"
+         sodipodi:cy="298.79074"
+         sodipodi:cx="322.85715"
+         id="path3811"
+         style="fill:#ffccaa;stroke:none"
+         sodipodi:type="arc" />
+    </mask>
+    <filter
+       inkscape:collect="always"
+       id="filter3832"
+       color-interpolation-filters="sRGB">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="7.3278556"
+         id="feGaussianBlur3834" />
+    </filter>
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask3838">
+      <path
+         transform="matrix(1.1060606,0,0,1.4166667,-37.099568,-125.92471)"
+         d="m 470,298.79074 a 147.14285,94.285713 0 1 1 -294.28571,0 147.14285,94.285713 0 1 1 294.28571,0 z"
+         sodipodi:ry="94.285713"
+         sodipodi:rx="147.14285"
+         sodipodi:cy="298.79074"
+         sodipodi:cx="322.85715"
+         id="path3840"
+         style="fill:#ffccaa;stroke:none"
+         sodipodi:type="arc" />
+    </mask>
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask3899">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3901"
+         d="m 192.85714,115.94643 0,57.84375 -57.84375,0 0,48.5625 57.84375,0 0,57.875 48.5625,0 0,-57.875 57.875,0 0,-48.5625 -57.875,0 0,-57.84375 -48.5625,0 z"
+         style="fill:#1fff29;fill-opacity:1;stroke:none" />
+    </mask>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter3889">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.9002752"
+         id="feGaussianBlur3891" />
+    </filter>
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask3860">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3862"
+         d="m 192.85714,115.94643 0,57.84375 -57.84375,0 0,48.5625 57.84375,0 0,57.875 48.5625,0 0,-57.875 57.875,0 0,-48.5625 -57.875,0 0,-57.84375 -48.5625,0 z"
+         style="fill:#1fff29;fill-opacity:1;stroke:none" />
+    </mask>
+    <filter
+       color-interpolation-filters="sRGB"
+       inkscape:collect="always"
+       id="filter3854">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.5101024"
+         id="feGaussianBlur3856" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="390.67167"
+     inkscape:cy="572.50538"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1600"
+     inkscape:window-height="1146"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-61.828326,-401.35511)">
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffccaa;stroke:none"
+       id="path2991"
+       sodipodi:cx="322.85715"
+       sodipodi:cy="298.79074"
+       sodipodi:rx="147.14285"
+       sodipodi:ry="94.285713"
+       d="m 470,298.79074 c 0,52.07256 -65.8781,94.28571 -147.14285,94.28571 -81.26476,0 -147.14286,-42.21315 -147.14286,-94.28571 0,-52.07256 65.8781,-94.28571 147.14286,-94.28571 81.26475,0 147.14285,42.21315 147.14285,94.28571 z"
+       transform="matrix(1.1060606,0,0,1.4166667,-18.528139,198.361)"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       style="fill:#fffaf6;fill-opacity:1;stroke:none;filter:url(#filter3832)"
+       d="m 60.84375,94.65625 0,355.71875 494.3125,0 0,-355.71875 -494.3125,0 z M 308,151.78125 c 89.88374,0 162.75,59.82429 162.75,133.59375 0,73.76946 -72.86626,133.5625 -162.75,133.5625 -89.88374,0 -162.75,-59.79304 -162.75,-133.5625 0,-73.76946 72.86626,-133.59375 162.75,-133.59375 z"
+       id="rect3815"
+       inkscape:connector-curvature="0"
+       mask="url(#mask3838)"
+       transform="translate(18.571429,324.28571)" />
+    <path
+       style="fill:#c38a67;fill-opacity:1;stroke:none;filter:url(#filter3803)"
+       d="m 149,135.9375 0,341.4375 382.84375,0 0,-341.4375 z m 205.71429,40.70089 c 89.88374,0 152.03571,56.96715 152.03571,130.73661 0,73.76946 -60.7234,127.84821 -150.60714,127.84821 -89.88374,0 -174.89286,-54.07875 -174.89286,-127.84821 0,-73.76946 83.58055,-130.73661 173.46429,-130.73661 z"
+       id="rect3780"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccsssss"
+       mask="url(#mask3809)"
+       transform="translate(18.571429,324.28571)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="path3765"
+       sodipodi:cx="322.85715"
+       sodipodi:cy="298.79074"
+       sodipodi:rx="147.14285"
+       sodipodi:ry="94.285713"
+       d="m 470,298.79074 c 0,52.07256 -65.8781,94.28571 -147.14285,94.28571 -81.26476,0 -147.14286,-42.21315 -147.14286,-94.28571 0,-52.07256 65.8781,-94.28571 147.14286,-94.28571 81.26475,0 147.14285,42.21315 147.14285,94.28571 z"
+       transform="matrix(1.1060606,0,0,1.1515152,-18.528139,277.58582)"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       transform="matrix(1.1060606,0,0,1.0454546,-18.528139,309.27575)"
+       d="m 470,298.79074 c 0,52.07256 -65.8781,94.28571 -147.14285,94.28571 -81.26476,0 -147.14286,-42.21315 -147.14286,-94.28571 0,-52.07256 65.8781,-94.28571 147.14286,-94.28571 81.26475,0 147.14285,42.21315 147.14285,94.28571 z"
+       sodipodi:ry="94.285713"
+       sodipodi:rx="147.14285"
+       sodipodi:cy="298.79074"
+       sodipodi:cx="322.85715"
+       id="path2995"
+       style="fill:#eeffff;fill-opacity:1;stroke:none"
+       sodipodi:type="arc"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#61c6ff;fill-opacity:1;stroke:none"
+       id="path3767"
+       sodipodi:cx="322.85715"
+       sodipodi:cy="298.79074"
+       sodipodi:rx="86.438354"
+       sodipodi:ry="86.438354"
+       d="m 409.2955,298.79074 c 0,47.73859 -38.69977,86.43836 -86.43835,86.43836 -47.73859,0 -86.43836,-38.69977 -86.43836,-86.43836 0,-47.73858 38.69977,-86.43835 86.43836,-86.43835 47.73858,0 86.43835,38.69977 86.43835,86.43835 z"
+       transform="matrix(1.1060606,0,0,1.0454546,-18.528139,309.27575)"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       transform="matrix(1.1060606,0,0,1.0454546,-18.528139,309.27575)"
+       d="m 382.17221,298.79074 c 0,32.75881 -26.55626,59.31507 -59.31506,59.31507 -32.75881,0 -59.31507,-26.55626 -59.31507,-59.31507 0,-32.75881 26.55626,-59.31507 59.31507,-59.31507 32.7588,0 59.31506,26.55626 59.31506,59.31507 z"
+       sodipodi:ry="59.315067"
+       sodipodi:rx="59.315067"
+       sodipodi:cy="298.79074"
+       sodipodi:cx="322.85715"
+       id="path3769"
+       style="fill:#00079c;fill-opacity:1;stroke:none"
+       sodipodi:type="arc"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#d6f0ff;fill-opacity:1;stroke:none"
+       id="path3771"
+       sodipodi:cx="368.57144"
+       sodipodi:cy="259.50504"
+       sodipodi:rx="26.428572"
+       sodipodi:ry="26.428572"
+       d="m 395.00001,259.50504 c 0,14.59609 -11.83247,26.42857 -26.42857,26.42857 -14.5961,0 -26.42857,-11.83248 -26.42857,-26.42857 0,-14.5961 11.83247,-26.42858 26.42857,-26.42858 14.5961,0 26.42857,11.83248 26.42857,26.42858 z"
+       transform="translate(18.571429,324.28571)"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       style="fill:#d6f0ff;fill-opacity:1;stroke:none"
+       d="m 335.41518,656.47321 -1.625,0.46875 c 8.18746,8.57699 3.88581,19.08945 -11.8125,25.4375 -16.88653,6.82854 -41.18534,6.55536 -57.3125,-0.1875 0.85664,0.61636 1.79407,1.20968 2.78125,1.78125 15.68419,9.08101 43.60759,10.27663 62.375,2.6875 18.76741,-7.58913 21.27794,-21.10649 5.59375,-30.1875 z"
+       id="path3773"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       style="fill:#1fff29;fill-opacity:1;stroke:none"
+       d="m 217.02758,457.25137 0,57.84375 -57.84375,0 0,48.5625 57.84375,0 0,57.875 48.5625,0 0,-57.875 57.875,0 0,-48.5625 -57.875,0 0,-57.84375 -48.5625,0 z"
+       id="rect3842"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/add_view.png"
+       inkscape:export-xdpi="21.143213"
+       inkscape:export-ydpi="21.143213" />
+    <path
+       transform="translate(24.170439,341.30494)"
+       style="fill:#004b03;fill-opacity:1;stroke:none;filter:url(#filter3854)"
+       d="m 113,85.375 0,233.5625 233.5625,0 0,-233.5625 z m 87.84375,38.5625 48.5625,0 -10,57.84375 67.875,0 0,48.5625 -57.875,0 0,57.875 -48.5625,0 0,-67.875 -57.84375,10 0,-48.5625 57.84375,0 z"
+       id="rect3851"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccccccccccc"
+       mask="url(#mask3860)" />
+    <path
+       transform="translate(24.170439,341.30494)"
+       style="fill:#c6ffc8;fill-opacity:1;stroke:none;filter:url(#filter3889)"
+       d="m 119.86161,83.65625 -4.28572,222.13839 217.86607,8.57143 -17.14285,-224.995534 z m 64.98214,24.28125 48.5625,0 0,74.27232 57.875,-16.42857 0,48.5625 -57.875,0 0,57.875 -48.5625,0 18.57143,-57.875 -76.41518,0 0,-48.5625 57.84375,0 z"
+       id="rect3866"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccccccccccc"
+       mask="url(#mask3899)" />
+  </g>
+</svg>

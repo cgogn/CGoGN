@@ -66,7 +66,7 @@ public:
 
 	virtual std::string mapTypeName() const;
 
-	virtual unsigned int dimension();
+	virtual unsigned int dimension() const;
 
 	virtual void clear(bool removeAttrib);
 
@@ -134,7 +134,7 @@ public:
 
 	//! Delete the face of d
 	/*! @param d a dart of the face
-	 *  @param withBoudary  create or extend boundary face instead of fixed points (default true)
+	 *  @param withBoudary create or extend boundary face instead of fixed points (default true)
 	 */
 	virtual void deleteFace(Dart d, bool withBoundary = true) ;
 

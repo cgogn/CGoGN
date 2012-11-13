@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Window</class>
+ <widget class="QMainWindow" name="Window">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>785</width>
+    <height>593</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>CGoGN Plug</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/resources.qrc">
+    <normaloff>:/icons/cgogn/cgogn2.png</normaloff>:/icons/cgogn/cgogn2.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>785</width>
+     <height>29</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFichier">
+    <property name="title">
+     <string>Fichier</string>
+    </property>
+    <addaction name="actionQuitter"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout_CGoGN"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuPlugins">
+    <property name="title">
+     <string>Plugins</string>
+    </property>
+    <addaction name="actionPlugins"/>
+   </widget>
+   <widget class="QMenu" name="menuViews">
+    <property name="title">
+     <string>Visu</string>
+    </property>
+    <addaction name="actionNew_Scene"/>
+    <addaction name="actionGlobalCamera"/>
+    <addaction name="actionLinkPluginMap"/>
+   </widget>
+   <addaction name="menuFichier"/>
+   <addaction name="menuViews"/>
+   <addaction name="menuPlugins"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew_Scene"/>
+   <addaction name="actionPlugins"/>
+   <addaction name="actionGlobalCamera"/>
+   <addaction name="actionLinkPluginMap"/>
+  </widget>
+  <action name="actionAbout_CGoGN">
+   <property name="text">
+    <string>About CGoGN ...</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About ...</string>
+   </property>
+  </action>
+  <action name="actionQuitter">
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+  </action>
+  <action name="actionPlugins">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/icons/plugins.png</normaloff>:/icons/icons/plugins.png</iconset>
+   </property>
+   <property name="text">
+    <string>Plugins ...</string>
+   </property>
+  </action>
+  <action name="actionNew_Scene">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/icons/add_view.png</normaloff>:/icons/icons/add_view.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ajouter nouvelle scène ...</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adds a new empty view.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </action>
+  <action name="actionGlobalCamera">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/icons/camera_b.png</normaloff>:/icons/icons/camera_b.png</iconset>
+   </property>
+   <property name="text">
+    <string>Gestion des caméras ...</string>
+   </property>
+   <property name="toolTip">
+    <string>Gestion des caméras</string>
+   </property>
+  </action>
+  <action name="actionLinkPluginMap">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/icons/map_plugin.png</normaloff>:/icons/icons/map_plugin.png</iconset>
+   </property>
+   <property name="text">
+    <string>Lier plugins et maps</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionQuitter</sender>
+   <signal>triggered()</signal>
+   <receiver>Window</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

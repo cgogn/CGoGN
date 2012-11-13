@@ -82,7 +82,7 @@ namespace CGoGN
 //* ptr an ptr on the Map
 //*/
 //template <typename MF, typename MM>
-//void embedOrbitGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr, unsigned int th=0);
+//void setOrbitEmbeddingGen(int dim, typename MM::Dart d, int index, Embedding* em, MM* ptr, unsigned int th=0);
 
 
 /**

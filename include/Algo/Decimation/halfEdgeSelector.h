@@ -87,6 +87,8 @@ public:
 	bool nextEdge(Dart& d) ;
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
 } ;
 
 ///*****************************************************************************************************************

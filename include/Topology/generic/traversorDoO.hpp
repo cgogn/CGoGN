@@ -25,10 +25,8 @@
 #include "Topology/generic/genericmap.h"
 #include "Topology/generic/functor.h"
 
-
 namespace CGoGN
 {
-
 
 template <typename MAP, unsigned int ORBIT>
 TraversorDartsOfOrbit<MAP, ORBIT>::TraversorDartsOfOrbit(MAP& map, Dart d, unsigned int thread)

@@ -69,9 +69,9 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 		if(!shareVertexEmbeddings && embedNewVertices)
 		{
 			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
-				m_map.template embedNewCell<VERTEX>(d) ;
+				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
-				m_map.template embedNewCell<VERTEX>(d) ;
+				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
 		}
 
 		m_map.cutEdge(d) ;
@@ -79,7 +79,7 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 		travE.skip(m_map.phi1(d)) ;
 
 		if(embedNewVertices)
-			m_map.template embedNewCell<VERTEX>(m_map.phi1(d)) ;
+			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(d)) ;
 	}
 
 	// split faces
@@ -124,7 +124,7 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 			travF.skip(dd) ;
 
 			if(embedNewVertices)
-				m_map.template embedNewCell<VERTEX>(m_map.phi1(ne)) ;
+				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(ne)) ;
 
 			dd = m_map.phi1(m_map.phi1(next)) ;
 			while(dd != ne)				// turn around the face and insert new edges
@@ -169,7 +169,7 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		Dart cd = m_map.phi2(x);
 
 		if(embedNewVertices)
-			m_map.template embedNewCell<VERTEX>(cd) ;
+			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(cd) ;
 
 		Dart fit = cd ;
 		do

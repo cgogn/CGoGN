@@ -22,14 +22,11 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Topology/generic/traversorGen.h"
-
-
 #ifndef __TRAVERSOR2_H__
 #define __TRAVERSOR2_H__
 
-
 #include "Topology/generic/dart.h"
+#include "Topology/generic/traversorGen.h"
 
 namespace CGoGN
 {

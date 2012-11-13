@@ -122,12 +122,12 @@ void CollapseEdgeOperator<PFP>::split(typename PFP::MAP& m, VertexAttribute<type
 //	//vertexSplit(vs) ; // split vertex
 //	//map.vertexSplit()
 //
-//	m_map.template embedOrbit<VERTEX>(d, v1) ;		// embed the
-//	m_map.template embedOrbit<VERTEX>(dd, v2) ;	// new vertices
-//	m_map.template embedOrbit<EDGE>(d1, e1) ;
-//	m_map.template embedOrbit<EDGE>(d2, e2) ;		// and new edges
-//	m_map.template embedOrbit<EDGE>(dd1, e3) ;
-//	m_map.template embedOrbit<EDGE>(dd2, e4) ;
+//	m_map.template setOrbitEmbedding<VERTEX>(d, v1) ;		// embed the
+//	m_map.template setOrbitEmbedding<VERTEX>(dd, v2) ;	// new vertices
+//	m_map.template setOrbitEmbedding<EDGE>(d1, e1) ;
+//	m_map.template setOrbitEmbedding<EDGE>(d2, e2) ;		// and new edges
+//	m_map.template setOrbitEmbedding<EDGE>(dd1, e3) ;
+//	m_map.template setOrbitEmbedding<EDGE>(dd2, e4) ;
 }
 
 /****************************************************************************************************
