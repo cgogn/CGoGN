@@ -175,7 +175,7 @@ void SimplifTrian<PFP>::updateCriterias(Dart d)
 		CRIT_IT it = m_edgeCrit.insert(std::make_pair(key,cr));
 		// store iterator on edge
 		unsigned int em = m_map.getEmbedding(d, EDGE);
-		m_map.embedOrbit<EDGE>(d, em);
+		m_map.setOrbitEmbedding<EDGE>(d, em);
 		m_edgeEmb[em] = it;
 
 		m_protectMarker.mark(em) ;
@@ -235,7 +235,7 @@ Dart SimplifTrian<PFP>::edgeCollapse(Dart d, typename PFP::VEC3& newPos)
 
 	// embed new vertex
 	unsigned int emb = m_map.getEmbedding(d2, VERTEX);
-	m_map.embedOrbit<VERTEX>(d2, emb);
+	m_map.setOrbitEmbedding<VERTEX>(d2, emb);
 
 	m_positions[d2] = newPos;
 	m_valences[d2] = v_d + v_dd - 4;

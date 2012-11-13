@@ -82,6 +82,8 @@ protected:
 
 	float m_obj_sc;
 	glm::vec3 m_obj_pos;
+	glm::vec3 m_obj_pos_save;
+	float m_obj_width;
 
 	// width and height of windows
 	int W;
@@ -106,6 +108,8 @@ protected:
 	void changeCenterOfRotation(const glm::vec3& newCenter);
 
 public:
+	void resetCenterOfRotation(float width, float* pos);
+
 	void setParamObject(float width, float* pos);
 
 	void setRotation(bool b);

@@ -47,11 +47,13 @@ enum SelectorType
 	S_QEMextColor,
 	S_Lightfield,
 	// note: the following "h" prefix means that half-edges are prioritized instead of edges.
-	S_hQEMml
+	S_hQEMextColor,
+	S_hQEMml,
+	S_hLightfield
 } ;
 
 template <typename PFP> class ApproximatorGen ;
-template <typename PFP, typename T> class Approximator ;
+template <typename PFP, typename T, unsigned int ORBIT> class Approximator ;
 
 template <typename PFP>
 class EdgeSelector
@@ -78,8 +80,12 @@ public:
 	virtual bool nextEdge(Dart& d) = 0 ;
 	virtual void updateBeforeCollapse(Dart d) = 0 ;
 	virtual void updateAfterCollapse(Dart d2, Dart dd2) = 0 ;
-
 	virtual void updateWithoutCollapse() = 0;
+
+	virtual void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
+	{
+		std::cout << "WARNING:: getEdgeErrors was not overridden" << std::endl ;
+	}
 } ;
 
 } // namespace Decimation

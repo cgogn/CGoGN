@@ -197,6 +197,8 @@ public:
 	 */
 	void setParamObject(float width, float* pos) { m_glWidget->setParamObject(width, pos); }
 
+	void resetCenterOfRotation(float width, float* pos) { m_glWidget->resetCenterOfRotation(width, pos); }
+
 	/**
 	 * make the contex of glWidget current
 	 */

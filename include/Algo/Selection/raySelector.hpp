@@ -661,7 +661,7 @@ Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename
 //
 //
 //template<typename PFP>
-//void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good, unsigned int nbth=0, unsigned int current_thread=0)
+//void verticesRaySelection(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, const typename PFP::VEC3& rayA, const typename PFP::VEC3& rayAB, std::vector<Dart>& vecVertices, float dist, const FunctorSelect& good , unsigned int nbth=0, unsigned int current_thread=0)
 //{
 //	typename PFP::REAL dist2 = dist * dist;
 //	typename PFP::REAL AB2 = rayAB * rayAB;

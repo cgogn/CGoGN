@@ -59,6 +59,10 @@ Dans Preferences -> Shaders Preferences, on peut désormais configurer certaines
  - Installer et redémarrer
  - Dans Preferences -> General -> Editors -> File Associations il est possible d'associer les CMakeLists.txt à ce logiciel d'édition
  
+ * Problème indexeur
+ Si l'indexeur plante avec comme message "Out of memory" (c'est la cas par défaut sur Juno lors de l'indexation totale de CGoGN),
+ relancer eclipse avec l'option "/opt/eclipse/eclipse -vmargs -Xms512m -Xmx1024M" avant de refaire une indexation globale.
+
 =========================================================================================
                                 ENGLISH VERSION
 =========================================================================================
@@ -122,3 +126,7 @@ In Preferences -> Shaders Preferences, you can now configure some options relate
  - Install and restart
  - In Preferences -> General -> Editors -> File Associations You can associate the CMakeLists.txt to editing software
  
+ * Indexer problem
+ If the indexer fails with an "Out of Memory" error (this is the case when indexing CGoGN fully on eclipse Juno for instance),
+ then relaunch eclipse using some options to use a bigger heap "/opt/eclipse/eclipse -vmargs -Xms512m -Xmx1024M" before indexing
+ CGoGN globally.

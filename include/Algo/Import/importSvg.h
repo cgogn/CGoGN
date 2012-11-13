@@ -43,6 +43,12 @@ namespace Import
 bool checkXmlNode(xmlNodePtr node, const std::string& name);
 
 template <typename PFP>
+void readCoordAndStyle(xmlNode* cur_path,
+		std::vector<std::vector<VEC3 > >& allPoly,
+		std::vector<std::vector<VEC3 > >& allBrokenLines,
+		std::vector<float>& allBrokenLinesWidth);
+
+template <typename PFP>
 bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttribute<typename PFP::VEC3>& position, CellMarker<EDGE>& polygons, CellMarker<FACE>& polygonsFaces);
 
 /**

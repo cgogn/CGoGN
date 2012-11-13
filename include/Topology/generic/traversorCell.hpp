@@ -29,30 +29,32 @@ template <typename MAP, unsigned int ORBIT>
 TraversorCell<MAP, ORBIT>::TraversorCell(MAP& map, const FunctorSelect& good, bool forceDartMarker, unsigned int thread) :
 	m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
 {
-	quickTraversal = map.template getQuickTraversal<ORBIT>() ;
-	if(quickTraversal != NULL)
-	{
-		cont = &(m.template getAttributeContainer<ORBIT>()) ;
-	}
+	if(forceDartMarker)
+		dmark = new DartMarker(map, thread) ;
 	else
 	{
-		if(!forceDartMarker && map.template isOrbitEmbedded<ORBIT>())
-			cmark = new CellMarker<ORBIT>(map, thread) ;
+		quickTraversal = map.template getQuickTraversal<ORBIT>() ;
+		if(quickTraversal != NULL)
+		{
+			cont = &(m.template getAttributeContainer<ORBIT>()) ;
+		}
 		else
-			dmark = new DartMarker(map, thread) ;
+		{
+			if(map.template isOrbitEmbedded<ORBIT>())
+				cmark = new CellMarker<ORBIT>(map, thread) ;
+			else
+				dmark = new DartMarker(map, thread) ;
+		}
 	}
 }
 
 template <typename MAP, unsigned int ORBIT>
 TraversorCell<MAP, ORBIT>::~TraversorCell()
 {
-	if(quickTraversal == NULL)
-	{
-		if(dmark)
-			delete dmark ;
-		else
-			delete cmark ;
-	}
+	if(dmark)
+		delete dmark ;
+	else if(cmark)
+		delete cmark ;
 }
 
 template <typename MAP, unsigned int ORBIT>

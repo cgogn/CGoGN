@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="395.28125"
+   height="395.28125"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.1 r9760"
+   sodipodi:docname="camera.svg"
+   inkscape:export-filename="/home/hurstel/Desktop/SOCIS2012/SOCIS2012/Interface/Ressources/icons/camera.png"
+   inkscape:export-xdpi="5.4644637"
+   inkscape:export-ydpi="5.4644637">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="192.58487"
+     inkscape:cy="227.1961"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1600"
+     inkscape:window-height="1146"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-65.21875,-323.28125)">
+    <rect
+       y="331.77075"
+       x="73.694313"
+       height="378.32565"
+       width="378.32565"
+       id="rect3072"
+       style="fill:#a0c4ce;stroke:#f9f9f9;stroke-width:16;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1"
+       inkscape:export-xdpi="18.032402"
+       inkscape:export-ydpi="18.032402"
+       ry="60"
+       rx="60" />
+    <rect
+       style="fill:none;stroke:#000000"
+       id="rect2985"
+       width="394.28571"
+       height="394.28571"
+       x="65.714287"
+       y="323.79074" />
+    <path
+       style="fill:#f9f9f9;fill-opacity:1;stroke:none"
+       d="m 117.73791,471.62174 c -26.498749,19.42514 -32.27366,56.66976 -12.84852,83.1685 16.49113,22.49632 45.85894,30.03662 70.55439,19.91267 l -1.59187,1.16692 60.68061,82.77725 132.77056,-97.32867 -17.22017,-23.49083 83.70415,-15.65506 -70.33149,-95.94243 -41.75755,72.87633 -15.07553,-20.56525 -6.10935,4.47851 c 17.08602,-20.50432 18.73252,-50.77995 2.2414,-73.27628 -19.42513,-26.49873 -56.63822,-32.23062 -83.13695,-12.80548 -26.49874,19.42513 -32.27364,56.66978 -12.84851,83.16851 16.49113,22.49629 45.85895,30.0366 70.55439,19.91266 l -78.69001,57.68441 c 17.08602,-20.50432 18.73253,-50.77995 2.24139,-73.27627 -19.42514,-26.49872 -56.63822,-32.23061 -83.13694,-12.80549 z"
+       id="rect3782"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

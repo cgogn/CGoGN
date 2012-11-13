@@ -278,25 +278,26 @@ public:
 		this->m_map.template setDartEmbedding<ORBIT>(d, emb);
 		return false;
 	}
-	void changeEmb(unsigned int e) { emb = e;}
+	void changeEmb(unsigned int e) { emb = e; }
 };
 
-//template <typename MAP>
-//class FunctorSetEmb : public FunctorMap<MAP>
-//{
-//protected:
-//	unsigned int orbit;
-//	unsigned int emb;
-//public:
-//	FunctorSetEmb(MAP& map, unsigned int orb, unsigned int e) : FunctorMap<MAP>(map), orbit(orb), emb(e)
-//	{}
-//	bool operator()(Dart d)
-//	{
-//		this->m_map.setDartEmbedding(orbit, d, emb);
-//		return false;
-//	}
-//	void changeEmb(unsigned int e) { emb = e;}
-//};
+template <typename MAP, unsigned int ORBIT>
+class FunctorInitEmb : public FunctorMap<MAP>
+{
+protected:
+	unsigned int emb;
+public:
+	FunctorInitEmb(MAP& map) : FunctorMap<MAP>(map), emb(EMBNULL)
+	{}
+	FunctorInitEmb(MAP& map, unsigned int e) : FunctorMap<MAP>(map), emb(e)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_map.template initDartEmbedding<ORBIT>(d, emb);
+		return false;
+	}
+	void changeEmb(unsigned int e) { emb = e; }
+};
 
 // Functor Check Embedding : to check the embeddings of the given map
 

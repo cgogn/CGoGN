@@ -27,7 +27,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS regex thread REQUIRED)
+find_package(Boost COMPONENTS regex thread system REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
@@ -82,6 +82,7 @@ SET (CGoGN_EXT_LIBS
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${LIBXML2_LIBRARIES}
+	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
 	${Boost_THREAD_LIBRARY} )
 

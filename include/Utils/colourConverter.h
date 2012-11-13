@@ -61,7 +61,8 @@ public: // types
 		C_RGB = 0,
 		C_XYZ = 1,
 		C_Luv = 2,
-		C_Lab = 3
+		C_Lab = 3,
+		C_HSV = 4
 	} ;
 
 	typedef Geom::Vector<3,REAL> VEC3 ; /*!< Triplet for color encoding */
@@ -105,6 +106,11 @@ public: // methods
 	VEC3 getLab() ;
 	/**
 	 * getR
+	 * @return Lab value of provided colour
+	 */
+	VEC3 getHSV() ;
+	/**
+	 * getR
 	 * @return XYZ value of provided colour
 	 */
 	VEC3 getXYZ() ;
@@ -116,6 +122,7 @@ private: // private members
 	VEC3 *RGB ;
 	VEC3 *Luv ;
 	VEC3 *Lab ;
+	VEC3 *HSV ;
 	VEC3 *XYZ ;
 
 	bool convert(enum ColourEncoding from, enum ColourEncoding to) ;
@@ -127,6 +134,9 @@ private: // private members
 
 	void convertXYZtoLab() ;
 	void convertLabToXYZ() ;
+
+	void convertRGBtoHSV() ;
+	void convertHSVtoRGB() ;
 
 private: // private constants
 	// D65 reference white

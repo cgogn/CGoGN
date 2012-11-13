@@ -616,7 +616,7 @@ T& AttributeHandler_IHM<T, ORBIT>::operator[](Dart d)
 
 	if(index == EMBNULL)
 	{
-		index = m->embedNewCell<ORBIT>(d) ;
+		index = m->setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 		m->m_nextLevelCell[orbit]->operator[](index) = EMBNULL ;
 	}
 
