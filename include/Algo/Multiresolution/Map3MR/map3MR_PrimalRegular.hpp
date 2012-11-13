@@ -45,6 +45,19 @@ Map3MR<PFP>::Map3MR(typename PFP::MAP& map) :
 
 }
 
+template <typename PFP>
+Map3MR<PFP>::~Map3MR()
+{
+	unsigned int level = m_map.getCurrentLevel();
+	unsigned int maxL = m_map.getMaxLevel();
+
+	for(unsigned int i = maxL ; i > level ; --i)
+		m_map.removeLevelBack();
+
+	for(unsigned int i = 0 ; i < level ; ++i)
+		m_map.removeLevelFront();
+}
+
 
 /************************************************************************
  *					Topological helping functions						*
@@ -138,6 +151,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
 	}
 
+/*
 	//
 	// 2-3 swap of all old interior faces
 	//
@@ -150,7 +164,7 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
 		}
 	}
-/*
+
 	//
 	// 1-3 flip of all boundary tetrahedra
 	//
@@ -364,37 +378,26 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
-//	if(!shareVertexEmbeddings)
-//	{
-//		//create the new level with the old one
-//		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//		{
-//			unsigned int index = (*m_mrDarts[m_mrCurrentLevel])[i] ;
-//			(*m_embeddings[VERTEX])[index] = EMBNULL ;		// set vertex embedding to EMBNULL if no sharing
-//		}
-//	}
-
-	//subdivision
 	//1. cut edges
 	TraversorE<typename PFP::MAP> travE(m_map);
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-//		if(!shareVertexEmbeddings)
-//		{
-//			if(getEmbedding<VERTEX>(d) == EMBNULL)
-//				embedNewCell<VERTEX>(d) ;
-//			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-//				embedNewCell<VERTEX>(phi1(d)) ;
-//		}
+		if(!shareVertexEmbeddings && embedNewVertices)
+		{
+			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+				m_map.template embedNewCell<VERTEX>(d) ;
+			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+				m_map.template embedNewCell<VERTEX>(d) ;
+		}
 
 		m_map.cutEdge(d) ;
 		travE.skip(d) ;
 		travE.skip(m_map.phi1(d)) ;
 
-// When importing MR files  : activated for DEBUG
-//		if(embedNewVertices)
-//			embedNewCell<VERTEX>(phi1(d)) ;
+		if(embedNewVertices)
+			m_map.template embedNewCell<VERTEX>(m_map.phi1(d)) ;
 	}
+	std::cout << "current Level = " << m_map.getCurrentLevel() << std::endl;
 
 	//2. split faces - quadrangule faces
 	TraversorF<typename PFP::MAP> travF(m_map) ;
@@ -412,9 +415,8 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 		m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 		travF.skip(dd) ;
 
-// When importing MR files : activated for DEBUG
-//		if(embedNewVertices)
-//			embedNewCell<VERTEX>(phi1(ne)) ;
+		if(embedNewVertices)
+			m_map.template embedNewCell<VERTEX>(m_map.phi1(ne)) ;
 
 		dd = m_map.phi1(m_map.phi1(next)) ;
 		while(dd != ne)				// turn around the face and insert new edges

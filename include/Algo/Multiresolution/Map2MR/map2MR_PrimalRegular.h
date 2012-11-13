@@ -79,6 +79,10 @@ public:
 
 	void analysis() ;
 	void synthesis() ;
+
+	//threshold
+
+	void filtering();
 } ;
 
 } // namespace Regular

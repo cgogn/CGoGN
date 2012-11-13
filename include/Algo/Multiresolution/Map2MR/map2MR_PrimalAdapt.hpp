@@ -303,6 +303,27 @@ void Map2MR<PFP>::splitFace(Dart d, Dart e)
 }
 
 template <typename PFP>
+void Map2MR<PFP>::flipBackEdge(Dart d)
+{
+	Dart dprev = m_map.phi_1(d) ;
+	Dart dnext = m_map.phi_1(d) ;
+
+	Dart d2 = m_map.phi2(d);
+	Dart d2prev = m_map.phi_1(d2) ;
+	Dart d2next = m_map.phi_1(d2) ;
+
+	m_map.duplicateDart(d);
+	m_map.duplicateDart(dprev);
+	m_map.duplicateDart(dnext);
+
+	m_map.duplicateDart(d2);
+	m_map.duplicateDart(d2prev);
+	m_map.duplicateDart(d2next);
+
+	m_map.flipBackEdge(d) ;
+}
+
+template <typename PFP>
 void Map2MR<PFP>::subdivideEdge(Dart d)
 {
 	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"subdivideEdge : called with a dart inserted after current level") ;
@@ -369,7 +390,7 @@ unsigned int Map2MR<PFP>::subdivideFace(Dart d, bool triQuad, bool OneLevelDiffe
 
 	m_map.setCurrentLevel(fLevel + 1) ;	// go to the next level to perform face subdivision
 
-	if(triQuad & degree == 3)					// if subdividing a triangle
+	if(triQuad && degree == 3)					// if subdividing a triangle
 	{
 		Dart dd = m_map.phi1(old) ;
 		Dart e = m_map.phi1(dd) ;
@@ -466,6 +487,76 @@ void Map2MR<PFP>::coarsenFace(Dart d)
 	unsigned int maxL = m_map.getMaxLevel() ;
 	if(m_map.getCurrentLevel() == maxL - 1 && m_map.getNbInsertedDarts(maxL) == 0)
 		m_map.removeLevelBack() ;
+}
+
+template <typename PFP>
+unsigned int Map2MR<PFP>::subdivideFaceSqrt3(Dart d)
+{
+	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"subdivideFace : called with a dart inserted after current level") ;
+	//assert(!faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
+
+	unsigned int fLevel = faceLevel(d) ;
+	Dart old = faceOldestDart(d) ;
+
+	m_map.pushLevel() ;
+	m_map.setCurrentLevel(fLevel) ;		// go to the level of the face to subdivide its edges
+
+	if(m_map.getCurrentLevel() == m_map.getMaxLevel())
+		m_map.addLevelBack();
+
+	m_map.setCurrentLevel(fLevel + 1) ;	// go to the next level to perform face subdivision
+
+	//if it is an even level (triadic refinement) and a boundary face
+	if((m_map.getCurrentLevel()%2 == 0) && m_map.isBoundaryFace(d))
+	{
+//		//find the boundary edge
+//		Dart df = m_map.findBoundaryEdgeOfFace(d);
+//		//trisection of the boundary edge
+//		cutEdge(df) ;
+//		splitFace(m_map.phi2(df), m_map.phi1(m_map.phi1(m_map.phi2(df)))) ;
+//		(*vertexVertexFunctor)(m_map.phi1(df) ;
+//
+//		df = m_map.phi1(df);
+//		cutEdge(df) ;
+//		splitFace(m_map.phi2(df), m_map.phi1(m_map.phi1(m_map.phi2(df)))) ;
+//		//(*vertexVertexFunctor)(m_map.phi1(df)) ;
+	}
+	else
+	{
+		Dart d1 = m_map.phi1(old);
+		(*vertexVertexFunctor)(old) ;
+		splitFace(old, d1) ;
+		(*vertexVertexFunctor)(d1) ;
+		cutEdge(m_map.phi_1(old)) ;
+		Dart x = m_map.phi2(m_map.phi_1(old)) ;
+		Dart dd = m_map.phi1(m_map.phi1(m_map.phi1((x))));
+		while(dd != x)
+		{
+			(*vertexVertexFunctor)(dd) ;
+			Dart next = m_map.phi1(dd) ;
+			splitFace(dd, m_map.phi1(x)) ;
+			dd = next ;
+		}
+
+		Dart cd = m_map.phi2(x);
+		(*faceVertexFunctor)(cd) ;
+
+		Dart dit = cd;
+		do
+		{
+			Dart dit12 = m_map.phi2(m_map.phi1(dit));
+
+			dit = m_map.phi2(m_map.phi_1(dit));
+
+			if(faceLevel(dit12) == (fLevel + 1)  && !m_map.isBoundaryEdge(dit12))
+					flipBackEdge(dit12);
+		}
+		while(dit != cd);
+	}
+
+	m_map.popLevel() ;
+
+	return fLevel ;
 }
 
 } // namespace Adaptive

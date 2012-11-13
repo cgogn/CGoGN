@@ -56,6 +56,44 @@ public:
 
 	bool operator() (Dart d)
 	{
+		if(m_map.isBoundaryVertex(d))
+		{
+			Dart df = m_map.findBoundaryEdgeOfVertex(d);
+
+			if(m_map.getDartLevel(df) < m_map.getCurrentLevel())
+			{
+				if((m_map.getCurrentLevel()%2 == 0))
+				{
+					m_map.decCurrentLevel() ;
+
+					typename PFP::VEC3 np(0) ;
+					typename PFP::VEC3 nl(0) ;
+					typename PFP::VEC3 nr(0) ;
+
+					typename PFP::VEC3 pi = m_position[df];
+					typename PFP::VEC3 pi_1 = m_position[m_map.phi_1(df)];
+					typename PFP::VEC3 pi1 = m_position[m_map.phi1(df)];
+
+					np += pi_1 * 4 + pi * 19 + pi1 * 4;
+					np /= 27;
+
+					nl +=  pi_1 * 10 + pi * 16 + pi1;
+					nl /= 27;
+
+					nr += pi_1 + pi * 16 + pi1 * 10;
+					nr /= 27;
+
+					m_map.incCurrentLevel() ;
+
+					m_position[df] = np;
+					m_position[m_map.phi_1(df)] = nl;
+					m_position[m_map.phi1(df)] = nr;
+
+					return false;
+				}
+			}
+		}
+
 		m_map.decCurrentLevel() ;
 
 		typename PFP::VEC3 np(0) ;
@@ -97,8 +135,8 @@ public:
 
 		m_map.decCurrentLevel() ;
 
-		Dart d1 = m_map.phi1(d1) ;
-		Dart d2 = m_map.phi1(d2) ;
+		Dart d1 = m_map.phi1(d0) ;
+		Dart d2 = m_map.phi1(d1) ;
 
 		typename PFP::VEC3 p0 = m_position[d0] ;
 		typename PFP::VEC3 p1 = m_position[d1] ;

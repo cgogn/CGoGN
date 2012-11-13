@@ -100,34 +100,6 @@ inline double omega0(unsigned int n)
  *********************************************************************************/
 
 template <typename PFP>
-class Sqrt3InitVertexSynthesisFilter : public Filter
-{
-protected:
-	typename PFP::MAP& m_map ;
-	VertexAttribute<typename PFP::VEC3>& m_position ;
-	bool first;
-
-public:
-	Sqrt3InitVertexSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p), first(true)
-	{}
-
-	void operator() ()
-	{
-		if(first)
-		{
-			TraversorV<typename PFP::MAP> trav(m_map) ;
-			for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
-			{
-				m_map.incCurrentLevel() ;
-				m_position[d] = typename PFP::VEC3(0.0); // ou phi2(d)
-				m_map.decCurrentLevel() ;
-			}
-			first = false;
-		}
-	}
-} ;
-
-template <typename PFP>
 class Sqrt3FaceSynthesisFilter : public Filter
 {
 protected:
@@ -154,12 +126,19 @@ public:
 			p1 *= 1.0 / 3.0 ;
 			p2 *= 1.0 / 3.0 ;
 
-			m_map.incCurrentLevel() ;
-
-			m_position[m_map.phi2(d)] += p0 + p1 + p2 ;
+			if(m_map.isBoundaryFace(d))
+			{
+				Dart df = m_map.findBoundaryEdgeOfFace(d);
+				m_map.incCurrentLevel() ;
+				m_position[m_map.phi_1(m_map.phi2(df))] += p0 + p1 + p2 ;
+			}
+			else
+			{
+				m_map.incCurrentLevel() ;
+				m_position[m_map.phi2(d)] += p0 + p1 + p2 ;
+			}
 
 			m_map.decCurrentLevel() ;
-
 		}
 	}
 } ;
@@ -180,36 +159,70 @@ public:
 		TraversorV<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			typename PFP::VEC3 nf(0) ;
-			unsigned int degree = 0 ;
-
-			m_map.incCurrentLevel() ;
-			Dart df = m_map.phi2(m_map.phi1(d));
-
-			Traversor2VVaE<typename PFP::MAP> trav(m_map, df) ;
-			for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+			if(m_map.isBoundaryVertex(d))
 			{
-				++degree ;
-				nf += m_position[it] ;
+				Dart df = m_map.findBoundaryEdgeOfVertex(d);
 
+				if((m_map.getCurrentLevel()%2 == 0))
+				{
+					typename PFP::VEC3 np(0) ;
+					typename PFP::VEC3 nl(0) ;
+					typename PFP::VEC3 nr(0) ;
+
+					typename PFP::VEC3 pi = m_position[df];
+					typename PFP::VEC3 pi_1 = m_position[m_map.phi_1(df)];
+					typename PFP::VEC3 pi1 = m_position[m_map.phi1(df)];
+
+					np += pi_1 * 4 + pi * 19 + pi1 * 4;
+					np /= 27;
+
+					nl +=  pi_1 * 10 + pi * 16 + pi1;
+					nl /= 27;
+
+					nr += pi_1 + pi * 16 + pi1 * 10;
+					nr /= 27;
+
+					m_map.incCurrentLevel() ;
+
+					m_position[df] = np;
+					m_position[m_map.phi_1(df)] = nl;
+					m_position[m_map.phi1(df)] = nr;
+
+					m_map.decCurrentLevel() ;
+				}
 			}
-			m_map.decCurrentLevel() ;
+			else
+			{
+				typename PFP::VEC3 nf(0) ;
+				unsigned int degree = 0 ;
 
-			float alpha = 1.0/9.0 * ( 4.0 - 2.0 * cos(2.0 * M_PI / degree));
-			float teta = 1 - (3 * alpha) / 2;
-			float sigma = (3 * alpha) / (2 * degree);
+				m_map.incCurrentLevel() ;
+				Dart df = m_map.phi2(m_map.phi1(d));
 
-			nf *= sigma;
+				Traversor2VVaE<typename PFP::MAP> trav(m_map, df) ;
+				for(Dart it = trav.begin(); it != trav.end(); it = trav.next())
+				{
+					++degree ;
+					nf += m_position[it] ;
 
-			typename PFP::VEC3 vp = m_position[d] ;
-			vp *= teta ;
+				}
+				m_map.decCurrentLevel() ;
 
-			m_map.incCurrentLevel() ;
+				float alpha = 1.0/9.0 * ( 4.0 - 2.0 * cos(2.0 * M_PI / degree));
+				float teta = 1 - (3 * alpha) / 2;
+				float sigma = (3 * alpha) / (2 * degree);
 
-			m_position[df] = vp + nf;
+				nf *= sigma;
 
-			m_map.decCurrentLevel() ;
+				typename PFP::VEC3 vp = m_position[d] ;
+				vp *= teta ;
 
+				m_map.incCurrentLevel() ;
+
+				m_position[df] = vp + nf;
+
+				m_map.decCurrentLevel() ;
+			}
 		}
 	}
 } ;

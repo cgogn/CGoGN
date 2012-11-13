@@ -163,9 +163,14 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 		if((m_map.getCurrentLevel()%2 == 0) && m_map.isBoundaryFace(dit))
 		{
 			//find the boundary edge
-			//Dart df = m_map.findBoundaryEdgeOfFace(dit);
-
+			Dart df = m_map.findBoundaryEdgeOfFace(dit);
 			//trisection of the boundary edge
+			m_map.cutEdge(df) ;
+			m_map.splitFace(m_map.phi2(df), m_map.phi1(m_map.phi1(m_map.phi2(df)))) ;
+
+			df = m_map.phi1(df);
+			m_map.cutEdge(df) ;
+			m_map.splitFace(m_map.phi2(df), m_map.phi1(m_map.phi1(m_map.phi2(df)))) ;
 		}
 		else
 		{
@@ -199,7 +204,7 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 	TraversorE<typename PFP::MAP> te(m_map) ;
 	for (Dart dit = te.begin(); dit != te.end(); dit = te.next())
 	{
-		if(m_map.getDartLevel(dit) < m_map.getCurrentLevel() && !m_map.isBoundaryEdge(dit))
+		if(!m_map.isBoundaryEdge(dit) && m_map.getDartLevel(dit) < m_map.getCurrentLevel())
 			m_map.flipEdge(dit);
 	}
 

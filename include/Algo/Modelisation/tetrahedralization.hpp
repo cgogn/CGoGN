@@ -443,8 +443,10 @@ void swapGen3To2(typename PFP::MAP& map, Dart d)
 template <typename PFP>
 void swapGen2To3(typename PFP::MAP& map, Dart d)
 {
+	unsigned int n = map.edgeDegree(d);
+
 //- a single 2-3 swap, followed by n − 3 3-2 swaps, or
-//– a single 4-4 swap, followed by n − 4 3-2 swaps.
+//- a single 4-4 swap, followed by n − 4 3-2 swaps.
 }
 
 

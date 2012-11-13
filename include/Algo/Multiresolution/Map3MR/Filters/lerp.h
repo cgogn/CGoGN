@@ -98,11 +98,10 @@ public:
 			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
 
 			m_map.incCurrentLevel() ;
-			if(m_map.faceDegree(d) != 3)
-			{
-				Dart midF = m_map.phi2(m_map.phi1(d));
-				m_position[midF] = p ;
-			}
+
+			Dart midF = m_map.phi2(m_map.phi1(d));
+			m_position[midF] = p ;
+
 			m_map.decCurrentLevel() ;
 
 		}
@@ -135,11 +134,36 @@ public:
 				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
 				m_position[midV] = p ;
 			}
-			else
-			{
-				Dart midV = m_map.phi_1(m_map.phi2(d));
-				m_position[midV] = p;
-			}
+
+			m_map.decCurrentLevel() ;
+
+		}
+	}
+} ;
+
+template <typename PFP>
+class LerpSqrt3VolumeSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpSqrt3VolumeSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorW<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+
+			m_map.incCurrentLevel() ;
+
+			Dart midV = m_map.phi_1(m_map.phi2(d));
+			m_position[midV] = p;
+
 			m_map.decCurrentLevel() ;
 
 		}
