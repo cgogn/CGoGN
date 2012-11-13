@@ -40,8 +40,6 @@
 // Eigen includes
 #include <Eigen/Dense>
 
-#define CONST_VAL -5212368.54127 // random value
-
 /*! \namespace CGoGN
  * \brief namespace for all elements composing the CGoGN library
  */
@@ -563,12 +561,22 @@ public:
 	static std::vector<VEC3> coefsFromTensors(Geom::Tensor3d* T) ;
 
 	/*!
-	 * \brief method to complete a symmetric tensor that was
-	 * only filled in its first half
+	 * \brief method to complete a symmetric matrix that was
+	 * only filled in its first half (line >= column)
 	 *
-	 * \param T the tensor to fill
+	 * \param M the matrix to fill
 	 */
-	static void fillTensor(Geom::Tensor3d& T) ;
+	static void fillSymmetricMatrix(Eigen::MatrixXd& M) ;
+
+	/*!
+	 * \brief method to rotate a tensor representing a polynomial light field
+	 *
+	 * \param T the tensor representing a polynomial light field
+	 * \param R the 3x3 matrix representing a rotation in (u,v,1)-space
+	 *
+	 * \return a new rotated tensor representing a polynomial light field.
+	 */
+	static Geom::Tensor3d rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R) ;
 
 private:
 	// Double computation is crucial for stability
@@ -595,7 +603,7 @@ private:
 	 */
 	bool optimize(std::vector<VEC3>& coefs) const ;
 
-	Geom::Tensor3d rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R) ;
+//	Geom::Tensor3d rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R) ;
 
 	/*!
 	 * \brief method to build a rotate matrix (rotation in tangent plane)
@@ -639,6 +647,9 @@ private:
 	 * \return the integral of product of monomes
 	 */
 	Eigen::MatrixXd buildIntegralMatrix_C(const REAL& alpha, unsigned int size) ;
+
+	Eigen::MatrixXd buildLowerLeftIntegralMatrix_A(const REAL& alpha, unsigned int size) ;
+	Eigen::MatrixXd buildLowerLeftIntegralMatrix_C(const REAL& alpha, unsigned int size) ;
 } ;
 
 } // Utils
