@@ -96,6 +96,19 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 				}
 				else
 				{
+					//checking : case with 3 orthogonal darts and point on an edge
+					do
+					{
+						if(Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal)
+								&& Algo::Geometry::isPointOnHalfEdge<PFP>(m,this->m.phi2(d),positionAttribut,goal))
+						{
+							edgeState(goal) ;
+							return;
+						}
+						this->d = this->m.phi2_1(this->d) ;
+					} while (this->getOrientationEdge(goal, this->m.phi2_1(this->d)) != Geom::RIGHT && dd_vert != this->d) ;
+
+
 					this->setState(VERTEX) ;
 					this->ParticleBase < PFP > ::move(goal) ;
 					return ;
