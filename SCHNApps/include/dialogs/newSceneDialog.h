@@ -1,16 +1,13 @@
 #ifndef _NEWSCENEDIALOG_H_
 #define _NEWSCENEDIALOG_H_
 
-
 #include "ui_newSceneDialog.h"
-
 
 #include <QListWidget>
 
 namespace myListCameraTypes{
 	enum type {view, camera,scene};
 }
-
 
 class Window;
 

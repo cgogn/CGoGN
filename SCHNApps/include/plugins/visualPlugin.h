@@ -1,10 +1,10 @@
 #ifndef _VISUALPLUGIN_H_
 #define _VISUALPLUGIN_H_
 
-#include "plugin.h"
+#include "plugins/plugin.h"
 
-
-class VisualPlugin : public QObject, public Plugin{
+class VisualPlugin : public QObject, public Plugin
+{
 	Q_OBJECT
 public:
 	VisualPlugin();

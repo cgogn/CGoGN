@@ -1,15 +1,14 @@
-#include "scene.h"
+#include "visualization/scene.h"
 
 #include <QGLContext>
 #include <iostream>
 
-#include "camera.h"
-#include "view.h"
-#include "context.h"
-#include "window.h"
-#include "plugin.h"
-#include "vboHandler.h"
-
+#include "visualization/camera.h"
+#include "visualization/view.h"
+#include "visualization/context.h"
+#include "visualization/vboHandler.h"
+#include "interface/window.h"
+#include "plugins/plugin.h"
 
 Scene::Scene(QString name, Window* window, Camera* sharedCamera) :
 	m_window(window),
@@ -17,8 +16,6 @@ Scene::Scene(QString name, Window* window, Camera* sharedCamera) :
 	m_creator(NULL),
 	m_context(window->context())
 {
-
-
 	View* view= new View(this,name+"_view1",sharedCamera,0,m_context);
 
 	l_view.push_back(view);
@@ -419,4 +416,3 @@ ViewButton* Scene::takeCustomViewButton(ViewButton* viewButton){
 		return NULL;
 	}
 }
-

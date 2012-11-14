@@ -1,7 +1,7 @@
-#include "visualPlugin.h"
+#include "plugins/visualPlugin.h"
+#include "Utils/GLSLShader.h"
 
 #include <set>
-#include <Utils/GLSLShader.h>
 
 VisualPlugin::VisualPlugin() :
 	m_waitedScene(UNLIMITED_NUMBER_OF_SCENES),

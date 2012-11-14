@@ -1,10 +1,10 @@
 #ifndef _SIMPLEPLUGIN_H_
 #define _SIMPLEPLUGIN_H_
 
-#include "plugin.h"
+#include "plugins/plugin.h"
 
-
-class SimplePlugin : public QObject, public Plugin{
+class SimplePlugin : public QObject, public Plugin
+{
 	Q_OBJECT
 public:
 	SimplePlugin();

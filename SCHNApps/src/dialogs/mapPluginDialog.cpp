@@ -1,8 +1,8 @@
-#include "mapPluginDialog.h"
+#include "dialogs/mapPluginDialog.h"
 
-#include "window.h"
-#include "plugin.h"
-#include "mapHandler.h"
+#include "interface/window.h"
+#include "plugins/plugin.h"
+#include "visualization/mapHandler.h"
 
 Q_DECLARE_METATYPE(Plugin*)
 Q_DECLARE_METATYPE(MapHandler*)

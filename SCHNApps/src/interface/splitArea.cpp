@@ -1,5 +1,4 @@
-#include "splitArea.h"
-
+#include "interface/splitArea.h"
 
 #include <QLayout>
 

@@ -1,9 +1,8 @@
-#include "cameraOptionDialog.h"
+#include "dialogs/cameraOptionDialog.h"
+#include "visualization/camera.h"
 
-#include "camera.h"
-
-CameraOptionDialog::CameraOptionDialog(Camera* camera, QWidget* parent=0) : QDialog(parent),
-	m_camera(camera)
+CameraOptionDialog::CameraOptionDialog(Camera* camera, QWidget* parent=0) :
+	QDialog(parent), m_camera(camera)
 {
 	this->setupUi(this);
 
@@ -32,24 +31,30 @@ CameraOptionDialog::CameraOptionDialog(Camera* camera, QWidget* parent=0) : QDia
 	connect(drawPath_Check, SIGNAL(toggled(bool)), this, SLOT(drawPathChecked(bool)));
 }
 
-void CameraOptionDialog::drawChecked(bool b){
+void CameraOptionDialog::drawChecked(bool b)
+{
 	farPlane_Check->setEnabled(b);
 	scale_Spin->setEnabled(b);
 }
 
-void CameraOptionDialog::drawPathChecked(bool b){
+void CameraOptionDialog::drawPathChecked(bool b)
+{
 	groupBox_2->setEnabled(b);
 }
 
-void CameraOptionDialog::accept(){
-	if(m_camera){
+void CameraOptionDialog::accept()
+{
+	if(m_camera)
+	{
 		m_camera->enableDraw(draw_Check->isChecked());
-		if(draw_Check->isChecked()){
+		if(draw_Check->isChecked())
+		{
 			m_camera->enableDrawFarPlan(farPlane_Check->isChecked());
 			m_camera->setDrawScale(scale_Spin->value());
 		}
 		m_camera->enablePathDraw(drawPath_Check->isChecked());
-		if(drawPath_Check->isChecked()){
+		if(drawPath_Check->isChecked())
+		{
 			m_camera->enablePathAxisDrawn(drawAxis_Check->isChecked());
 			m_camera->setPathDrawScale(frameScale_Spin->value());
 		}

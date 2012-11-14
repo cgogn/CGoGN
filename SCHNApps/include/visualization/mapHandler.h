@@ -1,10 +1,7 @@
 #ifndef _VIZUHANDLER_H_
 #define _VIZUHANDLER_H_
 
-
 #include <QHash>
-
-
 
 namespace CGoGN {
 	class GenericMap;
@@ -15,7 +12,8 @@ namespace CGoGN {
 
 class VBOHandler;
 
-class MapHandler{
+class MapHandler
+{
 public:
 	MapHandler(CGoGN::GenericMap* map);
 	~MapHandler();
@@ -37,6 +35,5 @@ protected:
 	CGoGN::GenericMap* m_map;
 	QList<VBOHandler*> l_vbo;
 };
-
 
 #endif

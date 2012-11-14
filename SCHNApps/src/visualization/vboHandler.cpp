@@ -1,6 +1,5 @@
-#include "vboHandler.h"
-
-#include "mapHandler.h"
+#include "visualization/vboHandler.h"
+#include "visualization/mapHandler.h"
 
 bool VBOHandler::shareWith(MapHandler* vh){
 	if(!vh || l_vizuHandler.contains(vh)){

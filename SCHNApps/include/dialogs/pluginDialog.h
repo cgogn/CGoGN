@@ -11,7 +11,6 @@
 
 #include "types.h"
 
-
 class Plugin;
 class Window;
 

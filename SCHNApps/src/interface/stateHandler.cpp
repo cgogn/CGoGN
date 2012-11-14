@@ -1,10 +1,8 @@
-#include "system.h"
-
-
-#include "window.h"
-#include "plugin.h"
-#include "camera.h"
-#include "splitArea.h"
+#include "interface/system.h"
+#include "interface/window.h"
+#include "interface/splitArea.h"
+#include "plugins/plugin.h"
+#include "visualization/camera.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -13,7 +11,6 @@
 bool System::StateHandler::saveState(Window* window, PluginHash* pluginHash, SceneHash* sceneHash, SplitArea* splitArea){
 	QList<Plugin*> plugins;
 	QList<Scene*> scenes;
-
 
 	Dialog::QuestionSessionDialog qsd(window);
 	qsd.label->setText(QString::fromUtf8("Voulez-vous sauvergarder cette session (Plugins chargé, scènes, vues et caméras)?"));

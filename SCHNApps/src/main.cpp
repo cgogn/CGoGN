@@ -1,18 +1,17 @@
-#include "system.h"
-
-#include "window.h"
+#include "interface/system.h"
+#include "interface/window.h"
 
 QSplashScreen* System::splash;
 
-QString System::app_path= QString();
+QString System::app_path = QString();
 
-int main(int argc, char* argv[]){
+int main(int argc, char* argv[])
+{
 	QApplication app(argc, argv);
 	
-	System::app_path= app.applicationDirPath();
+	System::app_path = app.applicationDirPath();
 
-
-	System::splash= new QSplashScreen(QPixmap(":splash/cgogn/splash.png"));
+	System::splash = new QSplashScreen(QPixmap(":splash/cgogn/splash.png"));
 
 	System::splash->show();
 

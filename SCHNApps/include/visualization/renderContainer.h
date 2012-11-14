@@ -1,17 +1,15 @@
 #ifndef _RENDERCONTAINER_H_
 #define _RENDERCONTAINER_H_
 
-
 #include "Utils/GLSLShader.h"
 #include "Algo/Render/GL2/topo3Render.h"
 #include "Utils/vbo.h"
 
 #include "types.h"
-#include "system.h"
+#include "interface/system.h"
 
 #include <QList>
 #include <QHash>
-
 
 //forward declaration
 class Scene;

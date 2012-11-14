@@ -1,21 +1,15 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
-
 #include "ui_window.h"
 
 #include <QVBoxLayout>
 
-#include "mapHandler.h"
-
 #include "Topology/generic/genericmap.h"
-
 #include "types.h"
-
-#include "splitArea.h"
-
-#include "system.h"
-
+#include "visualization/mapHandler.h"
+#include "interface/splitArea.h"
+#include "interface/system.h"
 
 class Scene;
 class View;
@@ -23,7 +17,6 @@ class Camera;
 class Plugin;
 class Context;
 class MapHandler;
-
 
 class Window : public QMainWindow, Ui::Window{
 	Q_OBJECT

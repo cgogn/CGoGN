@@ -1,17 +1,15 @@
 #ifndef _SCENESELECTOR_H_
 #define _SCENESELECTOR_H_
 
-
-#include "view.h"
+#include "visualization/view.h"
 
 #include <QDialog>
 #include <QRect>
 
 class SplitArea;
 
-
-
-struct PixElem{
+struct PixElem
+{
 	View* view;
 	QRect rect;
 	QColor color;
@@ -30,11 +28,11 @@ struct PixElem{
 };
 
 
-class ViewPixMaps : public QList<QList<PixElem> >{
+class ViewPixMaps : public QList<QList<PixElem> >
+{
 public:
 	typedef ViewPixMaps::iterator y_iterator;
 	typedef QList<PixElem>::iterator x_iterator;
-
 
 	ViewPixMaps();
 	~ViewPixMaps();
@@ -52,7 +50,6 @@ public:
 	y_iterator y_end(){return this->end();}
 	x_iterator x_begin(y_iterator y_it){return y_it->begin();}
 	x_iterator x_end(y_iterator y_it){return y_it->end();}
-
 
 	void beginMove(int x, int y);
 	void moveTmp(int x, int y);
@@ -80,7 +77,8 @@ protected:
 	void computeSize();
 };
 
-class ViewSelector : public QDialog {
+class ViewSelector : public QDialog
+{
 	Q_OBJECT
 public:
 	enum SelectorDialogType {MOVE,SELECT};
@@ -97,7 +95,6 @@ public:
 	void setInsertionName(QString insertionName){this->insertionName= insertionName;}
 
 	bool keys[3];
-
 
 protected:
 	ViewPixMaps viewPixMap;
@@ -123,7 +120,5 @@ protected:
 private:
     QPoint mouseToIndice();
 };
-
-
 
 #endif

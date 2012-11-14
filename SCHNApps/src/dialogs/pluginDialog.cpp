@@ -1,4 +1,4 @@
-#include "pluginDialog.h"
+#include "dialogs/pluginDialog.h"
 
 #include <libxml2/libxml/tree.h>
 #include <QFile>
@@ -9,8 +9,8 @@
 #include <QMessageBox>
 #include <QTextBrowser>
 
-#include "system.h"
-#include "plugin.h"
+#include "interface/system.h"
+#include "plugins/plugin.h"
 
 
 PluginDialog::PluginDialog(Window* parent, PluginHash* activePlugins) : QDialog(parent),

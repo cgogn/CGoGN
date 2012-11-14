@@ -1,11 +1,8 @@
-#include "mapHandler.h"
+#include "visualization/mapHandler.h"
+#include "visualization/vboHandler.h"
+#include "interface/system.h"
 
 #include "Topology/generic/genericmap.h"
-
-#include "vboHandler.h"
-
-#include "system.h"
-
 
 MapHandler::MapHandler(CGoGN::GenericMap* map) :
 	m_map(map)
@@ -85,7 +82,6 @@ QList<VBOHandler*> MapHandler::findVBOsMatching(QRegExp regexp){
 	return rlist;
 }
 
-
 VBOHandler* MapHandler::takeVBO(VBOHandler* vbo){
 	int i= l_vbo.indexOf(vbo);
 	if(i>=0){
@@ -97,5 +93,3 @@ VBOHandler* MapHandler::takeVBO(VBOHandler* vbo){
 		return NULL;
 	}
 }
-
-

@@ -1,6 +1,5 @@
-#include "renderContainer.h"
-
-#include "scene.h"
+#include "visualization/renderContainer.h"
+#include "visualization/scene.h"
 
 RenderContainer::RenderContainer(Scene* scene) :
 	h_vbo(NULL),

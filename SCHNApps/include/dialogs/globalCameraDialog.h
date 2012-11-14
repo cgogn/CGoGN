@@ -1,19 +1,15 @@
 #ifndef _GLOBALCAMERADIALOG_H_
 #define _GLOBALCAMERADIALOG_H_
 
-
-
 #include "ui_globalCameraDialog.h"
-
 
 #include <QListWidget>
 #include <QTreeWidget>
 #include <QVariant>
 #include <QMenu>
 
-
-#include "camera.h"
-#include "view.h"
+#include "visualization/camera.h"
+#include "visualization/view.h"
 
 class Window;
 

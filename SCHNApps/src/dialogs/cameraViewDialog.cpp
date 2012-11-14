@@ -1,9 +1,7 @@
-#include "cameraViewDialog.h"
+#include "dialogs/cameraViewDialog.h"
+#include "dialogs/cameraOptionDialog.h"
 
-#include "camera.h"
-#include "cameraOptionDialog.h"
-
-
+#include "visualization/camera.h"
 
 Q_DECLARE_METATYPE(Camera*);
 

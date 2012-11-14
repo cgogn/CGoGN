@@ -3,8 +3,8 @@
     <file>cgogn/splash.png</file>
   </qresource>
   <qresource prefix="icons">
-    <file>icons/map_plugin.png</file>
     <file>cgogn/cgogn2.png</file>
+    <file>icons/map_plugin.png</file>
     <file>icons/check.png</file>
     <file>icons/close.png</file>
     <file>icons/share.png</file>

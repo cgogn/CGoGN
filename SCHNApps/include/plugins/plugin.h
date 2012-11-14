@@ -7,15 +7,16 @@
 #include <iostream>
 #include <list>
 
-#include "window.h"
-#include "view.h"
-#include "camera.h"
-#include "system.h"
-#include "mapHandler.h"
-#include "vboHandler.h"
-#include "scene.h"
+#include "interface/window.h"
+#include "interface/system.h"
+#include "visualization/view.h"
+#include "visualization/camera.h"
+#include "visualization/mapHandler.h"
+#include "visualization/vboHandler.h"
+#include "visualization/scene.h"
 
-class Plugin{
+class Plugin
+{
 public:
 	enum {UNLIMITED_MAP_NUMBER=-1};
 

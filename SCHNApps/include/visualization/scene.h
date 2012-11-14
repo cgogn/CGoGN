@@ -11,9 +11,6 @@
 
 #include "types.h"
 
-
-
-
 //forward declarations
 class View;
 class Window;

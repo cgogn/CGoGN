@@ -1,15 +1,14 @@
-#include "newSceneDialog.h"
+#include "dialogs/newSceneDialog.h"
 
 #include <QMessageBox>
 #include <QVariant>
 
-#include "system.h"
-#include "window.h"
-#include "scene.h"
-#include "view.h"
-#include "camera.h"
-#include "plugin.h"
-
+#include "interface/system.h"
+#include "interface/window.h"
+#include "visualization/scene.h"
+#include "visualization/view.h"
+#include "visualization/camera.h"
+#include "plugins/plugin.h"
 
 Q_DECLARE_METATYPE(Camera*)
 Q_DECLARE_METATYPE(View*)
