@@ -2020,7 +2020,7 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	const REAL& errLF = quadHF(newHF) ; // function coefficients
 
 	// Check if errated values appear
-	if (errG < -1e-10 || errAngle < -1e-10 || errLF < -1e-10)
+	if (errG < -1e-6 || errAngle < -1e-6 || errLF < -1e-6)
 		einfo.valid = false ;
 	else
 	{

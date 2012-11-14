@@ -204,7 +204,7 @@ void Approximator_HemiFuncCoefs<PFP>::approximate(Dart d)
 		bool opt = m_quadricHF[d].findOptimizedCoefs(coefs) ;
 		// copy result
 		for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
-			this->m_approx[i][d] = opt ? coefs[i] : (m_coefs[i]->operator[](d) + m_coefs[i]->operator[](dd))/2 ; // if fail average coefs (TODO better)
+			this->m_approx[i][d] = coefs[i] ;
 
 		if (!opt)
 			std::cerr << "LightfieldApproximator::Inversion failed: coefs are averaged" << std::endl ;
