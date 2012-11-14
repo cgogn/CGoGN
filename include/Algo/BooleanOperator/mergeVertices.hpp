@@ -51,6 +51,7 @@ void mergeVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC
 			ee = map.phi2_1(ee);
 		} while(ee != e);
 		map.insertEdgeInVertex(ee,dd);
+
 	} while(dd!=d);
 }
 

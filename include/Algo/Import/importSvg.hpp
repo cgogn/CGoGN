@@ -76,12 +76,10 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 		if(coord[0]=='m' || coord[0]=='l' || coord[0]=='t') //start point, line or quadratic bezier curve
 		{
 			mode = 0;
-//							std::cout << "relative coordinates" << std::endl;
 			relative=true;
 		}
 		else if(coord[0]=='M' || coord[0] == 'L' || coord[0]=='T') //same in absolute coordinates
 		{
-//							std::cout << "absolute coordinates" << std::endl;
 			mode = 1;
 			relative=false;
 		}
@@ -92,31 +90,26 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 		}
 		else if(coord[0]=='v' || coord[0] == 'V') //vertical line
 		{
-//							std::cout << "vertical line" << std::endl;
 			mode = 3;
 			relative=(coord[0]=='v');
 		}
 		else if(coord[0]=='c' || coord[0] == 'C') //bezier curve
 		{
-//							std::cout << "bezier line" << std::endl;
 			mode = 4;
 			relative=(coord[0]=='c');
 		}
 		else if(coord[0]=='s' || coord[0] == 'S' || coord[0]=='q' || coord[0] == 'Q') //bezier curve 2
 		{
-//							std::cout << "bezier line 2" << std::endl;
 			mode = 5;
 			relative= ((coord[0]=='s') || (coord[0]=='q'));
 		}
 		else if(coord[0]=='a' || coord[0] == 'A') //elliptic arc
 		{
-//							std::cout << "elliptic arc" << std::endl;
 			mode =6;
 			relative= (coord[0]=='a');
 		}
-		else if(coord[0]=='z')
+		else if(coord[0]=='z') //end of path
 		{
-//							std::cout << "the end" << std::endl;
 			closedPoly = true;
 		}
 		else //coordinates
@@ -202,10 +195,61 @@ void getPolygonFromSVG(std::string allcoords, std::vector<VEC3>& curPoly, bool& 
 				y += previous[1];
 			}
 
-//			std::cout << "coord " << x << " " << y << std::endl;
-
 			if(curPoly.size()==0 || (curPoly.size()>0 && (x!=previous[0] || y!= previous[1])))
 				curPoly.push_back(VEC3(x,y,0));
+		}
+	}
+}
+
+template <typename PFP>
+void readCoordAndStyle(xmlNode* cur_path,
+		std::vector<std::vector<VEC3 > >& allPoly,
+		std::vector<std::vector<VEC3 > >& allBrokenLines,
+		std::vector<float>& allBrokenLinesWidth)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef std::vector<VEC3 > POLYGON;
+
+	bool closedPoly;
+	POLYGON curPoly;
+
+//	CGoGNout << "--load a path--"<< CGoGNendl;
+	xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "d");
+	std::string allcoords((reinterpret_cast<const char*>(prop)));
+	getPolygonFromSVG(allcoords,curPoly,closedPoly);
+
+	//check orientation : set in CCW
+	if(curPoly.size()>2)
+	{
+		VEC3 v1(curPoly[1]-curPoly[0]);
+		VEC3 v2(curPoly[2]-curPoly[1]);
+		if((v1^v2)[2]<0)
+		{
+			std::reverse(curPoly.begin(), curPoly.end());
+		}
+	}
+
+	//closed polygon ?
+	if(closedPoly)
+		allPoly.push_back(curPoly);
+	else
+	{
+		//if not : read the linewidth for further dilatation
+		allBrokenLines.push_back(curPoly);
+		xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "style");
+		std::string allstyle((reinterpret_cast<const char*>(prop)));
+		std::stringstream is(allstyle);
+		std::string style;
+		while ( std::getline( is, style, ';' ) )
+		{
+			if(style.find("stroke-width:")!=std::string::npos)
+			{
+				std::stringstream isSize(style);
+				std::getline( isSize, style, ':' );
+				float sizeOfLine;
+				isSize >> sizeOfLine;
+				allBrokenLinesWidth.push_back(sizeOfLine);
+			}
 		}
 	}
 }
@@ -228,106 +272,18 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	std::vector<POLYGON> allPoly;
 	std::vector<POLYGON> allBrokenLines;
 	std::vector<float> allBrokenLinesWidth;
-	bool closedPoly;
 
 	for (xmlNode* cur_node = map_node->children; cur_node; cur_node = cur_node->next)
 	{
 		// for each layer
 		if (checkXmlNode(cur_node, "g"))
-		{
-//			CGoGNout << "----load layer----"<< CGoGNendl;
-
 			for (xmlNode* cur_path = cur_node->children ; cur_path; cur_path = cur_path->next)
 			{
 				if (checkXmlNode(cur_path, "path"))
-				{
-					POLYGON curPoly;
-//					CGoGNout << "--load a path--"<< CGoGNendl;
-					xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "d");
-					std::string allcoords((reinterpret_cast<const char*>(prop)));
-					getPolygonFromSVG(allcoords,curPoly,closedPoly);
-
-					//check orientation : set in CCW
-					if(curPoly.size()>2)
-					{
-						VEC3 v1(curPoly[1]-curPoly[0]);
-						VEC3 v2(curPoly[2]-curPoly[1]);
-						if((v1^v2)[2]>0)
-						{
-							std::reverse(curPoly.begin(), curPoly.end());
-						}
-					}
-
-					if(closedPoly)
-						allPoly.push_back(curPoly);
-					else
-					{
-						allBrokenLines.push_back(curPoly);
-						xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "style");
-						std::string allstyle((reinterpret_cast<const char*>(prop)));
-						std::stringstream is(allstyle);
-						std::string style;
-						while ( std::getline( is, style, ';' ) )
-						{
-							if(style.find("stroke-width:")!=std::string::npos)
-							{
-								std::stringstream isSize(style);
-								std::getline( isSize, style, ':' );
-								float sizeOfLine;
-								isSize >> sizeOfLine;
-								allBrokenLinesWidth.push_back(sizeOfLine);
-							}
-						}
-					}
-				}
+					readCoordAndStyle<PFP>(cur_path, allPoly, allBrokenLines, allBrokenLinesWidth);
 			}
-		}
-		else
-		{
-			xmlNode* cur_path = cur_node;
-			if (checkXmlNode(cur_path, "path"))
-			{
-				POLYGON curPoly;
-//				CGoGNout << "--load a path--"<< CGoGNendl;
-				xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "d");
-				std::string allcoords((reinterpret_cast<const char*>(prop)));
-				getPolygonFromSVG(allcoords,curPoly,closedPoly);
-
-				//check orientation : set in CCW
-				if(curPoly.size()>2)
-				{
-					VEC3 v1(curPoly[1]-curPoly[0]);
-					VEC3 v2(curPoly[2]-curPoly[1]);
-					if((v1^v2)[2]>0)
-					{
-						std::reverse(curPoly.begin(), curPoly.end());
-					}
-				}
-
-				if(closedPoly)
-					allPoly.push_back(curPoly);
-				else
-				{
-					allBrokenLines.push_back(curPoly);
-					xmlChar* prop = xmlGetProp(cur_path, BAD_CAST "style");
-					std::string allstyle((reinterpret_cast<const char*>(prop)));
-					std::stringstream is(allstyle);
-					std::string style;
-					while ( std::getline( is, style, ';' ) )
-					{
-						if(style.find("stroke-width:")!=std::string::npos)
-						{
-							std::stringstream isSize(style);
-							std::getline( isSize, style, ':' );
-							float sizeOfLine;
-							isSize >> sizeOfLine;
-							std::cout << "sizeOfLine : " << sizeOfLine << std::endl;
-							allBrokenLinesWidth.push_back(sizeOfLine);
-						}
-					}
-				}
-			}
-		}
+		else if (checkXmlNode(cur_node, "path"))
+				readCoordAndStyle<PFP>(cur_node, allPoly, allBrokenLines, allBrokenLinesWidth);
 	}
 
 	xmlFreeDoc(doc);
@@ -343,8 +299,11 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		return false;
 	}
 
+	std::cout << "importSVG : XML read." << std::endl;
+
 	CellMarker<EDGE> brokenMark(map);
 	EdgeAttribute<float> edgeWidth = map.template addAttribute<float, EDGE>("width");
+	EdgeAttribute<Dart> edgeOpp = map.template addAttribute<Dart, EDGE>("opp");
 	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -368,11 +327,14 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 			Dart d1=d;
 			Dart d_1=map.phi_1(d);
+			//build a degenerated "line" face
 			for(unsigned int i = 0; i<faceDegree/2 ; ++i)
 			{
-				map.sewFaces(d1,d_1);
+				edgeOpp[d1] = d_1;
+				edgeOpp[d_1] = d_1;
 
 				edgeWidth[d1] = *itW;
+				edgeWidth[d_1] = *itW;
 
 				brokenL.mark(d1);
 				brokenL.mark(d_1);
@@ -381,98 +343,76 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 				d_1 = map.phi_1(d_1);
 			}
 
+			//embed the line
 			Dart dd = d;
+			Dart dOp = d;
 			for(typename POLYGON::iterator emb = it->begin(); emb != it->end() ; emb++)
 			{
 				bb->addPoint(*emb);
 				position[dd] = *emb;
+				position[dOp] = *emb;
 				dd = map.phi1(dd);
+				dOp = map.phi_1(dOp);
 			}
-
-//			do
-//			{
-//				bb->addPoint(*emb);
-//				position[dd] = *emb;
-//				std::cout << "emb " << *emb << std::endl;
-//				emb++;
-//				dd = map.phi1(dd);
-//			} while(dd!=map.phi_1(d));
-
 		}
 
 		itW++;
 	}
 
+	std::cout << "importSVG : broken lines created." << std::endl;
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create polygons
-	typename std::vector<POLYGON >::iterator it;
-	for(it = allPoly.begin() ; it != allPoly.end() ; ++it)
-	{
-
-		if(it->size()<4)
-		{
-			it = allPoly.erase(it);
-		}
-		else
-		{
-			Dart d = map.newFace(it->size()-1);
-//			std::cout << "newFace1 " << it->size()-1 << std::endl;
-			polygonsFaces.mark(d);
-
-			Dart dd = d;
-			typename POLYGON::iterator emb = it->begin();
-			do
-			{
-				bb->addPoint(*emb);
-				position[dd] = *emb;
-				emb++;
-				dd = map.phi1(dd);
-			} while(dd!=d);
-		}
-	}
-
-	for(Dart d = map.begin();d != map.end(); map.next(d))
-	{
-		if(position[d][0] == position[map.phi1(d)][0] && position[d][1] == position[map.phi1(d)][1])
-			std::cout << "prob d " << d << std::endl;
-	}
-
-	DartMarker inside(map);
-
-	for(Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		polygons.mark(d);
-		inside.mark(d);
-	}
-
-	DartMarker close(map);
-	map.closeMap(close);
-
-	Algo::BooleanOperator::mergeVertices<PFP>(map,position);
+//	typename std::vector<POLYGON >::iterator it;
+//	for(it = allPoly.begin() ; it != allPoly.end() ; ++it)
+//	{
+//
+//		if(it->size()<4)
+//		{
+//			it = allPoly.erase(it);
+//		}
+//		else
+//		{
+//			Dart d = map.newFace(it->size()-1);
+////			std::cout << "newFace1 " << it->size()-1 << std::endl;
+//			polygonsFaces.mark(d);
+//
+//			Dart dd = d;
+//			typename POLYGON::iterator emb = it->begin();
+//			do
+//			{
+//				bb->addPoint(*emb);
+//				position[dd] = *emb;
+//				emb++;
+//				dd = map.phi1(dd);
+//			} while(dd!=d);
+//		}
+//	}
+//
+//	for(Dart d = map.begin();d != map.end(); map.next(d))
+//	{
+//		if(position[d][0] == position[map.phi1(d)][0] && position[d][1] == position[map.phi1(d)][1])
+//			std::cout << "prob d " << d << std::endl;
+//	}
+//
+//	DartMarker inside(map);
+//
+//	for(Dart d = map.begin(); d != map.end(); map.next(d))
+//	{
+//		polygons.mark(d);
+//		inside.mark(d);
+//	}
+//
+//	std::cout << "importSVG : Polygons generated." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//add bounding box
 
-	CellMarker<VERTEX> boundingBox(map);
-//	Dart dBorder = map.newFace(4);
-//
-//	VEC3 bbCenter = bb->center();
-//	VEC3 bmin = bb->min();
-//	bmin += 0.3f*(bmin-bbCenter);
-//	VEC3 bmax = bb->max();
-//	bmax -= 0.3f*(bmin-bbCenter);
-//
-//	position[dBorder] = bmin;
-//	position[map.phi1(dBorder)] = VEC3(bmax[0],bmin[1],0);
-//	position[map.phi1(map.phi1(dBorder))] = VEC3(bmax[0],bmax[1],0);
-//	position[map.phi_1(dBorder)] = VEC3(bmin[0],bmax[1],0);
-//
-//	Dart d = dBorder;
-//	do
-//	{
-//		boundingBox.mark(d);
-//		d = map.phi1(d);
-//	} while(d!=dBorder);
+//	DartMarker close(map);
+//	map.closeMap(close);
+//	map.closeMap();
+
+	Algo::BooleanOperator::mergeVertices<PFP>(map,position);
+	std::cout << "importSVG : Vertices merged." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//cut the edges to have a more regular sampling
@@ -515,25 +455,23 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	CellMarker<EDGE> eMTreated(map);
 	for(Dart d = map.begin();d != map.end(); map.next(d))
 	{
-		if(brokenL.isMarked(d) && !eMTreated.isMarked(d))
+		if(brokenL.isMarked(d) && !eMTreated.isMarked(d) && edgeOpp[d]!=d)
 		{
-			eMTreated.mark(d);
-			//insert a quadrangular face in the broken line
 			// -> we convert broken lines to faces to represent their width
-			// -> the intersection are then closed
 
 			Dart d1 = d;
-			Dart d2 = map.phi2(d1);
+			Dart d2 = edgeOpp[d];
 			VEC3 p1 = position[d1];
 			VEC3 p2 = position[d2];
+
 			float width = edgeWidth[d1]/2.0f;
 			if(width==0)
 				std::cout << "importSVG : error width of path is equal to zero" << std::endl;
 
-			VEC3 v = p2-p1;
-			map.unsewFaces(d1);
+			eMTreated.mark(d1);
+			eMTreated.mark(d2);
 
-			Dart dN = map.newFace(4);
+			VEC3 v = p2-p1;
 
 			//take the orthogonal direction to the path to apply width afterward
 			VEC3 ortho = v^VEC3(0,0,1);
@@ -542,44 +480,62 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 			//if the valence of one of the vertex is equal to one
 			//cut the edge to insert the quadrangular face
-			if(map.phi2_1(d1)==d1)
+//			if(map.phi2_1(d1)==d1)
+			if(map.phi_1(d1)==d2)
 			{
 				map.cutEdge(d2);
 
-				brokenL.mark(map.phi1(d2));
-				eMTreated.mark(map.phi1(d2));
-				map.sewFaces(map.phi_1(d1),map.phi1(dN));
+				Dart dC = map.phi1(d2);
+				eMTreated.mark(dC);
+				edgeOpp[dC] = dC;
 
 				position[map.phi_1(d1)]=p1;
 				edgePlanes[map.phi_1(d1)] = Geom::Plane3D<typename PFP::REAL>(v,p1);
 			}
+			else
+			{
+				if(d1 != map.phi1(d2) && map.phi_1(d1)!=map.phi1(d2))
+				{
+					map.splitFace(d1,map.phi1(d2));
+				}
+			}
 
-			if(map.phi2_1(d2)==d2)
+//			if(map.phi2_1(d2)==d2)
+			if(map.phi_1(d2)==d1)
 			{
 				map.cutEdge(d1);
-				brokenL.mark(map.phi1(d1));
-				eMTreated.mark(map.phi1(d1));
 
-				map.sewFaces(map.phi_1(d2), map.phi_1(dN));
+				Dart dC = map.phi1(d1);
+				eMTreated.mark(dC);
+				edgeOpp[dC] = dC;
 
 				position[map.phi_1(d2)]=p2;
 				edgePlanes[map.phi_1(d2)] = Geom::Plane3D<typename PFP::REAL>(-1.0f*v, p2);
 			}
+			else
+			{
+				if(d2 != map.phi1(d1) && map.phi_1(d2)!=map.phi1(d1))
+				{
+					map.splitFace(d2,map.phi1(d1));
+				}
+			}
 
-			map.sewFaces(d1, dN);
-			map.sewFaces(d2, map.phi1(map.phi1(dN)));
+//			map.sewFaces(d1, dN);
+//			map.sewFaces(d2, map.phi1(map.phi1(dN)));
 
 			edgePlanes[d1] = Geom::Plane3D<typename PFP::REAL>(ortho, p1-(width*ortho));
 			edgePlanes[d2] = Geom::Plane3D<typename PFP::REAL>(-1.0f*ortho, p2+(width*ortho));
 		}
 	}
 
-	//close the intersections
-	for(Dart d = map.begin();d != map.end(); map.next(d))
-	{
-		if(d==map.phi2(d))
-			 map.closeHole(d);
-	}
+	std::cout << "Broken line faces : inserted" << std::endl;
+
+//	//close the intersections
+//	for(Dart d = map.begin();d != map.end(); map.next(d))
+//	{
+//		if(map.isBoundaryMarked(map.phi2(d)))
+//			 map.closeHole(d);
+//	}
 
 	//embed the path
 	for(Dart d = map.begin();d != map.end(); map.next(d))
@@ -588,11 +544,13 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		{
 			Geom::Plane3D<typename PFP::REAL> pl = edgePlanes[d];
 
+			std::cout << "pl " << pl << std::endl;
+
 			VEC3 pos = position[d];
 			pl.project(pos);
-			pl = edgePlanes[map.phi_1(d)];
-
-			pl.project(pos);
+//			pl = edgePlanes[map.phi_1(d)];
+//
+//			pl.project(pos);
 			position[d] = pos;
 		}
 	}
