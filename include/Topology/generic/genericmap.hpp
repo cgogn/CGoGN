@@ -337,8 +337,8 @@ template <unsigned int ORBIT>
 void GenericMap::initDartEmbedding(Dart d, unsigned int emb)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
-
-	m_attribs[ORBIT].refLine(emb);	// ref the new emb
+	if(emb != EMBNULL)
+		m_attribs[ORBIT].refLine(emb);	// ref the new emb
 	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
 }
 

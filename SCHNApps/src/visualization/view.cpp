@@ -6,10 +6,10 @@
 #include "cameraViewDialog.h"
 #include "cameraSceneDialog.h"
 #include "context.h"
-#include "GL/glut.h"
-#include "GL/freeglut_ext.h"
-#include "GL/freeglut_std.h"
-#include "GL/freeglut.h"
+//#include "GL/glut.h"
+//#include "GL/freeglut_ext.h"
+//#include "GL/freeglut_std.h"
+//#include "GL/freeglut.h"
 
 
 
