@@ -340,6 +340,8 @@ void computeCurvatureVertex_NormalCycles(
 
 	tensor /= neigh.getArea() ;
 
+
+	/*
 	long int n = 3, lda = 3, info, lwork = 9 ;
 	char jobz='V', uplo = 'U' ;
 	float work[9] ;
@@ -377,6 +379,51 @@ void computeCurvatureVertex_NormalCycles(
 	dirNormal[2] = a[3*s[0]+2];
 	if (dirNormal * normal[dart] < 0)
 		dirNormal *= -1; // change orientation
+*/
+
+	// TEST : lib eigen
+//	if ( dart == map.begin()) {
+
+	// solve eigen problem
+	Eigen::Matrix3f m3 ;
+	m3 << tensor(0,0) , tensor(0,1) , tensor(0,1) , tensor(1,0) , tensor(1,1) , tensor(1,2) , tensor(2,0) , tensor(2,1) , tensor(2,2) ;
+	Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> solver (m3);
+	Eigen::Vector3f ev = solver.eigenvalues();
+	Eigen::Matrix3f evec = solver.eigenvectors();
+
+	// sort eigen components : ev[s[0]] has minimal absolute value ; kmin = ev[s[1]] <= ev[s[2]] = kmax
+	int s[3] = {0, 1, 2} ;
+	int tmp ;
+	if (abs(ev[s[2]]) < abs(ev[s[1]])) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+	if (abs(ev[s[1]]) < abs(ev[s[0]])) { tmp = s[0] ; s[0] = s[1] ; s[1] = tmp ; }
+	if (ev[s[2]] < ev[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+
+	// set eigen components
+	kmin[dart] = ev[s[1]] ;
+	kmax[dart] = ev[s[2]] ;
+	VEC3& dirMin = Kmin[dart] ;
+	dirMin[0] = evec(0,s[2]);
+	dirMin[1] = evec(1,s[2]);
+	dirMin[2] = evec(2,s[2]); // warning : Kmin and Kmax are switched
+	VEC3& dirMax = Kmax[dart] ;
+	dirMax[0] = evec(0,s[1]);
+	dirMax[1] = evec(1,s[1]);
+	dirMax[2] = evec(2,s[1]); // warning : Kmin and Kmax are switched
+	VEC3& dirNormal = Knormal[dart] ;
+	dirNormal[0] = evec(0,s[0]);
+	dirNormal[1] = evec(1,s[0]);
+	dirNormal[2] = evec(2,s[0]);
+	if (dirNormal * normal[dart] < 0)
+		dirNormal *= -1; // change orientation
+
+
+//	CGoGNout << ev[s[0]] << "\t" << ev[s[1]] << "\t" << ev[s[2]] << CGoGNendl;
+//	CGoGNout << "? \t" << kmin[dart] << "\t" << kmax[dart] << CGoGNendl;
+//
+//	CGoGNout << dirNormal << "\n" << dirMin << "\n" << dirMax << "\n" << CGoGNendl;
+//	CGoGNout << evec.col(s[0]) << "\n" << evec.col(s[2]) << "\n" << evec.col(s[1]) << "\n" << CGoGNendl;
+//		CGoGNout << solver.eigenvectors() << CGoGNendl;
+
 }
 
 
