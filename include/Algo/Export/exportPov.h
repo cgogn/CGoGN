@@ -55,10 +55,10 @@ void exportMeshPlain(std::ofstream& out, typename PFP::MAP& map, VertexAttribute
 					Dart dd = d;
 					do
 					{
-						out << "<" << position[dd][0] << "," << position[dd][1] << "," << position[dd][2] << ">," << std::endl;
+						out << "<" << position[dd][0] << "," << position[dd][2] << "," << position[dd][1] << ">," << std::endl;
 						dd = map.phi1(dd);
 					} while(dd!=d);
-					out << "<" << position[d][0] << "," << position[d][1] << "," << position[d][2] << ">" << std::endl;
+					out << "<" << position[d][0] << "," << position[d][2] << "," << position[d][1] << ">" << std::endl;
 					out << "}" << std::endl;
 			}
 		}
