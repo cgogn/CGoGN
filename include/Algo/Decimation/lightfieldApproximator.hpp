@@ -207,7 +207,7 @@ void Approximator_HemiFuncCoefs<PFP>::approximate(Dart d)
 			this->m_approx[i][d] = opt ? coefs[i] : (m_coefs[i]->operator[](d) + m_coefs[i]->operator[](dd))/2 ; // if fail average coefs (TODO better)
 
 		if (!opt)
-			std::cerr << "LightfieldApproximator::Inversion failed: not treated correctly" << std::endl ;
+			std::cerr << "LightfieldApproximator::Inversion failed: coefs are averaged" << std::endl ;
 	}
 }
 
@@ -337,8 +337,8 @@ void Approximator_HemiFuncCoefsHalfEdge<PFP>::approximate(Dart d)
 	const REAL gamma1 = ((B1 * T) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, T1 * T ), -1.0f)) ; // angle positif ssi
 	const REAL gamma2 = ((B2 * T) > 0 ? 1 : -1) * acos( std::max(std::min(1.0f, T2 * T ), -1.0f)) ; // -PI/2 < angle(i,j1) < PI/2  ssi i*j1 > 0
 	// Rotation dans le sens trigo autour de l'axe T (N1 --> N)
-	const REAL alpha1 = ((N * B1prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N1), -1.0f) ) ; // angle positif ssi
-	const REAL alpha2 = ((N * B2prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
+	const REAL alpha1 = (N == N1) ? 0 : ((N * B1prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N1), -1.0f) ) ; // angle positif ssi
+	const REAL alpha2 = (N == N2) ? 0 : ((N * B2prime) > 0 ? -1 : 1) * acos( std::max(std::min(1.0f, N * N2), -1.0f) ) ; // PI/2 < angle(j1',n) < -PI/2 ssi j1'*n < 0
 
 	assert (m_quadricHF.isValid() || !"LightfieldApproximator:approximate quadricHF is not valid") ;
 
@@ -383,10 +383,13 @@ void Approximator_HemiFuncCoefsHalfEdge<PFP>::approximate(Dart d)
 		bool opt = m_quadricHF[d].findOptimizedCoefs(coefs) ;
 		// copy result
 		for (unsigned int i = 0 ; i < m_nbCoefs ; ++i)
-			this->m_approx[i][d] = opt ? coefs[i] : (m_coefs[i]->operator[](d) + m_coefs[i]->operator[](dd))/2 ; // if fail average coefs (TODO better)
+			this->m_approx[i][d] = coefs[i] ;
 
 		if (!opt)
-			std::cerr << "LightfieldApproximator::Inversion failed: not treated correctly" << std::endl ;
+		{
+			std::cerr << "LightfieldApproximatorHalfCollapse::Optimization failed (should never happen since no optim is done)" << std::endl ;
+			std::cout << alpha1 << std::endl ;
+		}
 
 		// Add second one for error evaluation
 		m_quadricHF[d] += Utils::QuadricHF<REAL>(coefs2, gamma2, alpha2) ;

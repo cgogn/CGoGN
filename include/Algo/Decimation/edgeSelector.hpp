@@ -2010,9 +2010,6 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	double alpha = alpha1 + alpha2 ;
 
-	if (isnan(alpha))
-		std::cerr << "Nan: " << m_frameN[d] << " ; " << m_frameN[dd] << " ; " << newFN << std::endl ;
-
 	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
 	Utils::QuadricHF<REAL> quadHF = m_quadricHF[d] ;
 
@@ -2027,7 +2024,7 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 		einfo.valid = false ;
 	else
 	{
-		einfo.it = edges.insert(std::make_pair(std::max(errG + errAngle + errLF, REAL(0)), d)) ;
+		einfo.it = edges.insert(std::make_pair(std::max(/*errG +*/ errAngle + errLF, REAL(0)), d)) ;
 		einfo.valid = true ;
 	}
 }

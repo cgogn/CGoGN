@@ -939,9 +939,6 @@ void HalfEdgeSelector_Lightfield<PFP>::computeHalfEdgeInfo(Dart d, HalfEdgeInfo&
 
 	double alpha = alpha1 + alpha2 ;
 
-	if (isnan(alpha))
-		std::cerr << "Nan: " << m_frameN[d] << " ; " << m_frameN[dd] << " ; " << newFN << std::endl ;
-
 	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
 	Utils::QuadricHF<REAL> quadHF = m_quadricHF[d] ;
 
