@@ -1,6 +1,6 @@
 #ifndef PARTCELL2DMEMO_H
 #define PARTCELL2DMEMO_H
-#define DEBUG
+//#define DEBUG
 #include "particle_cell_2D.h"
 
 #include "Algo/Geometry/inclusion.h"

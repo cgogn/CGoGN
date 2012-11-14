@@ -34,7 +34,7 @@ template <typename PFP>
 void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross)
 {
 #ifdef DEBUG
-	CGoGNout << "vertexState" << d << CGoGNendl ;
+	CGoGNout << "vertexState" << this->d << CGoGNendl ;
 #endif
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
 	(*memo_cross).mark(this->d);
@@ -76,13 +76,11 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 					do
 					{
 						if(Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
-								&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current))
+								&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
+								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
 						{
-<<<<<<< HEAD
+
 							this->edgeState(current,memo_cross) ;
-=======
-							this->edgeState(current) ;
->>>>>>> cc8261af6a531ffd879a73e4851c7f27eb1e7667
 							return;
 						}
 						this->d = this->m.phi2_1(this->d) ;
@@ -107,17 +105,10 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FA
 		}
 
 		//displacement step
-<<<<<<< HEAD
+
 		if (this->getOrientationEdge(current, this->d) == Geom::ALIGNED
 				&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
 			edgeState(current,memo_cross) ;
-=======
-		if (detect_vertex)
-			memo_cross.push_back(this->d) ;
-		if (this->getOrientationEdge(current, this->d) == Geom::ALIGNED
-				&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
-			edgeState(current) ;
->>>>>>> cc8261af6a531ffd879a73e4851c7f27eb1e7667
 		else
 		{
 			this->d = this->m.phi1(this->d) ;
@@ -130,13 +121,8 @@ template <typename PFP>
 void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, CellMarkerMemo<FACE>* memo_cross, Geom::Orientation2D sideOfEdge)
 {
 #ifdef DEBUG
-	CGoGNout << "edgeState" << d << CGoGNendl ;
+	CGoGNout << "edgeState" << this->d << CGoGNendl ;
 #endif
-<<<<<<< HEAD
-=======
-	if (detect_edge)
-		memo_cross.push_back(this->d) ;
->>>>>>> cc8261af6a531ffd879a73e4851c7f27eb1e7667
 
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
 // 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
@@ -189,7 +175,7 @@ template <typename PFP>
 void ParticleCell2DMemo<PFP>::faceState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross)
 {
 #ifdef DEBUG
-	CGoGNout << "faceState" << d << CGoGNendl ;
+	CGoGNout << "faceState" << this->d << CGoGNendl ;
 #endif
 
 	assert(
