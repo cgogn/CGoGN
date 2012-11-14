@@ -303,12 +303,13 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 	CellMarker<EDGE> brokenMark(map);
 	EdgeAttribute<float> edgeWidth = map.template addAttribute<float, EDGE>("width");
-	EdgeAttribute<Dart> edgeOpp = map.template addAttribute<Dart, EDGE>("opp");
 	EdgeAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> > > edgePlanes = map.template addAttribute<NoMathAttribute<Geom::Plane3D<typename PFP::REAL> >, EDGE>("planes");
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create broken lines
 	DartMarker brokenL(map);
+
+	unsigned int nbVertices = 0 ;
 
 	std::vector<float >::iterator itW = allBrokenLinesWidth.begin();
 	for(typename std::vector<POLYGON >::iterator it = allBrokenLines.begin() ; it != allBrokenLines.end() ; ++it)
@@ -320,46 +321,42 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		}
 		else
 		{
-			unsigned int faceDegree = it->size()*2-2;
-			Dart d = map.newFace(faceDegree);
+			nbVertices += it->size() ;
 
-			polygonsFaces.mark(d);
+			Dart d = map.newFace(it->size()*2-2,false);
 
 			Dart d1=d;
 			Dart d_1=map.phi_1(d);
 			//build a degenerated "line" face
-			for(unsigned int i = 0; i<faceDegree/2 ; ++i)
+			for(unsigned int i = 0; i<it->size() ; ++i)
 			{
-				edgeOpp[d1] = d_1;
-				edgeOpp[d_1] = d_1;
-
-				edgeWidth[d1] = *itW;
-				edgeWidth[d_1] = *itW;
-
 				brokenL.mark(d1);
 				brokenL.mark(d_1);
+
+				map.sewFaces(d1,d_1,false) ;
+
+				edgeWidth[d1] = *itW;
 
 				d1 = map.phi1(d1);
 				d_1 = map.phi_1(d_1);
 			}
 
+			polygonsFaces.mark(d);
+
 			//embed the line
-			Dart dd = d;
-			Dart dOp = d;
+			d1 = d;
 			for(typename POLYGON::iterator emb = it->begin(); emb != it->end() ; emb++)
 			{
 				bb->addPoint(*emb);
-				position[dd] = *emb;
-				position[dOp] = *emb;
-				dd = map.phi1(dd);
-				dOp = map.phi_1(dOp);
+				position[d1] = *emb;
+				d1 = map.phi1(d1);
 			}
 		}
 
 		itW++;
 	}
 
-	std::cout << "importSVG : broken lines created." << std::endl;
+	std::cout << "importSVG : broken lines created : " << nbVertices << " vertices"<< std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create polygons
@@ -411,6 +408,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 //	map.closeMap(close);
 //	map.closeMap();
 
+	std::cout << "importSVG : Vertices merging..." << std::endl;
 	Algo::BooleanOperator::mergeVertices<PFP>(map,position);
 	std::cout << "importSVG : Vertices merged." << std::endl;
 
@@ -455,12 +453,12 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	CellMarker<EDGE> eMTreated(map);
 	for(Dart d = map.begin();d != map.end(); map.next(d))
 	{
-		if(brokenL.isMarked(d) && !eMTreated.isMarked(d) && edgeOpp[d]!=d)
+		if(brokenL.isMarked(d) && !eMTreated.isMarked(d))
 		{
 			// -> we convert broken lines to faces to represent their width
 
 			Dart d1 = d;
-			Dart d2 = edgeOpp[d];
+			Dart d2 = map.phi2(d);
 			VEC3 p1 = position[d1];
 			VEC3 p2 = position[d2];
 
@@ -487,7 +485,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 				Dart dC = map.phi1(d2);
 				eMTreated.mark(dC);
-				edgeOpp[dC] = dC;
 
 				position[map.phi_1(d1)]=p1;
 				edgePlanes[map.phi_1(d1)] = Geom::Plane3D<typename PFP::REAL>(v,p1);
@@ -507,7 +504,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 				Dart dC = map.phi1(d1);
 				eMTreated.mark(dC);
-				edgeOpp[dC] = dC;
 
 				position[map.phi_1(d2)]=p2;
 				edgePlanes[map.phi_1(d2)] = Geom::Plane3D<typename PFP::REAL>(-1.0f*v, p2);
@@ -548,9 +544,9 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 			VEC3 pos = position[d];
 			pl.project(pos);
-//			pl = edgePlanes[map.phi_1(d)];
-//
-//			pl.project(pos);
+			pl = edgePlanes[map.phi_1(d)];
+
+			pl.project(pos);
 			position[d] = pos;
 		}
 	}
