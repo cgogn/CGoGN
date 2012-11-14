@@ -5,7 +5,6 @@ uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
 #ifdef WITH_PLANE
 	uniform vec3 eyePos;
-	uniform vec3 eyeY;
 	VARYING_OUT vec4 eyePosFrag;
 #endif
 
@@ -51,7 +50,8 @@ void main()
 
 	vec3 V = sphereCenter-eyePosFrag;
 	V.normalize();
-	vec3 planeX = cross(V, eyeY);
+//	vec3 planeX = cross(V, vec3(0.0,1.0,0.0));
+	vec3 planeX = vec3(-V[2],0.0,V[0]);
 	vec3 planeY = cross(X,V);
 	corner(posCenter, planeX, planeY, -1.0, 1.0);
 	corner(posCenter, planeX, planeY, -1.0,-1.0);

@@ -5,8 +5,6 @@ uniform vec3 lightPos;
 uniform vec3 ambiant;
 uniform float size;
 #ifdef WITH_PLANE
-	uniform vec3 eyePos;
-	uniform vec3 eyeY;
 	VARYING_FRAG vec3 eyePosFrag;
 #endif
 
@@ -21,18 +19,14 @@ uniform float size;
 VARYING_FRAG vec2 texCoord;
 VARYING_FRAG vec3 sphereCenter;
 
-
-
 void main(void)
 {
-
 	vec3 billboard_frag_pos = sphereCenter + vec3(texCoord, 0.0) * size;
 #ifdef WITH_PLANE
 	vec3 ray_direction = normalize(billboard_frag_pos - eyePosFrag;);
 #else
 	vec3 ray_direction = normalize(billboard_frag_pos);
 #endif
-
 	float TD = -dot(ray_direction,sphereCenter);
 	float c = dot(sphereCenter, sphereCenter) - size * size;
 	float arg = TD * TD - c;
@@ -50,5 +44,4 @@ void main(void)
 	float lambertTerm = dot(N,L);
 	
 	gl_FragColor = vec4(colorsprite*lambertTerm + ambiant ,1.0);
-
 }

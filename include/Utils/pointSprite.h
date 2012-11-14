@@ -64,7 +64,7 @@ protected:
 	
 	CGoGNGLuint m_uniform_EyePos;
 	
-	CGoGNGLuint m_uniform_EyeY;
+//	CGoGNGLuint m_uniform_EyeY;
 
 	CGoGNGLuint m_uniform_ambiant;
 
@@ -109,7 +109,7 @@ public:
 	/**
 	* set the plane of rendering for VR rendering
 	*/
-	void setEyePosition(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
+	void setEyePosition(const Geom::Vec3f& ep);
 
 
 	/**
