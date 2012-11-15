@@ -42,14 +42,14 @@ public:
 
 	}
 
-	void vertexState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross) ;
+	void vertexState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
-	void edgeState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
+	void edgeState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
 
-	void faceState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross) ;
+	void faceState(const VEC3& current, CellMarkerMemo<FACE>& memo_cross) ;
 
-	void move(const VEC3& goal, CellMarkerMemo<FACE> * memo_cross) ;
-	std::vector<Dart> get_memo(const VEC3& goal);
+	void move(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross) ;
+	std::vector<Dart> get_memo(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross);
 } ;
 
 #include "particle_cell_2D_memo.hpp"
