@@ -35,6 +35,7 @@ template <typename PFP>
 void decimate(
 	typename PFP::MAP& map, SelectorType s, ApproximatorType a,
 	std::vector<VertexAttribute<typename PFP::VEC3>* >& attribs, unsigned int nbWantedVertices, const FunctorSelect& selected,
+	EdgeAttribute<typename PFP::REAL> *edgeErrors,
 	void (*callback_wrapper)(void*, const void*), void* callback_object
 )
 {
@@ -92,27 +93,27 @@ void decimate(
 			// pos
 			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, attribs)) ;
 		break ;
-//		case A_hLightfieldHalf:
-//		{
-//			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
-//
-//			// pos
-//			v_approx[0].push_back(attribs[0]) ;
-//			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, v_approx[0])) ;
-//
-//			// frame
-//			assert(attribs.size() >= 4 || !"Decimate: A_LightfieldHalf --> not enough attribs provided") ;
-//			for (unsigned int i = 0 ; i < 3 ; ++i)
-//				v_approx[1].push_back(attribs[i+1]) ;
-//			approximators.push_back(new Approximator_FrameHalf<PFP>(map, v_approx[1])) ;
-//
-//			// hemifunction
-//			assert(attribs.size() >= 5 || !"Decimate: A_LightfieldHalf --> not enough attribs provided") ;
-//			for (unsigned int i = 0 ; i < attribs.size() - 4 ; ++i)
-//				v_approx[2].push_back(attribs[i+4]) ;
-//			approximators.push_back(new Approximator_LightfieldCoefsHalf<PFP>(map, v_approx[2])) ;
-//		}
-//		break ;
+		case A_hLightfieldHalf:
+		{
+			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
+
+			// pos
+			v_approx[0].push_back(attribs[0]) ;
+			approximators.push_back(new Approximator_QEMhalfEdge<PFP>(map, v_approx[0])) ;
+
+			// frame
+			assert(attribs.size() >= 4 || !"Decimate: A_hLightfieldHalf --> not enough attribs provided") ;
+			for (unsigned int i = 0 ; i < 3 ; ++i)
+				v_approx[1].push_back(attribs[i+1]) ;
+			approximators.push_back(new Approximator_FrameInterpolationHalfEdge<PFP>(map, v_approx[1])) ;
+
+			// hemifunction
+			assert(attribs.size() >= 5 || !"Decimate: A_hLightfieldHalf --> not enough attribs provided") ;
+			for (unsigned int i = 0 ; i < attribs.size() - 4 ; ++i)
+				v_approx[2].push_back(attribs[i+4]) ;
+			approximators.push_back(new Approximator_HemiFuncCoefsHalfEdge<PFP>(map, v_approx[2])) ;
+		}
+		break ;
 		case A_Lightfield :
 		{
 			v_approx = new std::vector<VertexAttribute<typename PFP::VEC3>* >[3] ;
@@ -165,11 +166,17 @@ void decimate(
 		case S_QEMextColor :
 			selector = new EdgeSelector_QEMextColor<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_hQEMextColor :
+			selector = new HalfEdgeSelector_QEMextColor<PFP>(map, position, approximators, selected) ;
+			break ;
 		case S_hQEMml :
 			selector = new HalfEdgeSelector_QEMml<PFP>(map, position, approximators, selected) ;
 			break ;
 		case S_Lightfield :
 			selector = new EdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
+			break ;
+		case S_hLightfield :
+			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
 			break ;
 	}
 
@@ -188,6 +195,8 @@ void decimate(
 		return ;
 	}
 
+	if (edgeErrors != NULL)
+		selector->getEdgeErrors(edgeErrors) ;
 
 	unsigned int nbVertices = map.template getNbOrbits<VERTEX>() ;
 	bool finished = false ;

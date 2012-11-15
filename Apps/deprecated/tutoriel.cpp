@@ -48,13 +48,13 @@
 using namespace CGoGN;
 
 // déclaration de la classe utilisée pour le TP
-class Map2TP;
+class QuadMesh;
 
 // definition de la structure qui decrit le type de carte utilise
 struct PFP: public PFP_STANDARD
 {
 	// definition of the map
-	typedef Map2TP MAP;
+	typedef QuadMesh MAP;
 };
 
 // fonction qui renvoit vrai (pour sélectioner tous les brins)
@@ -85,277 +85,19 @@ AttributeHandler<PFP::VEC3> normal;
 /// Assigner un plongement à un sommet (celui du brin d)
 ///		embedVertex(d,P);
 
-class Map2TP : public Map2
+class QuadMesh : public EmbeddedMap2
 {
 private:
-	// 3 brins de la carte
-	Dart d_carre;
-	Dart d_tri;
-	Dart d_multiFaces;
-
-	// Assigne un nouveau plongement au sommet. Les anciens plongements sont libérés.
-	void newVertex(Dart d) {
-		embedNewCell(VERTEX,d);
-	}
 
 public:
-	//  Fonction Carre: construit un carre et renvoit un brin
-	Dart Carre()
-	{
-		Point3D P[4];
-		P[0] = Point3D(0.0f,0.0f,0.0f);
-		P[1] = Point3D(1.0f,0.0f,0.0f);
-		P[2] = Point3D(1.0f,1.0f,0.0f);
-		P[3] = Point3D(0.0f,1.0f,0.0f);
-
-		Dart d0 = newOrientedFace(4);
-		position[d0] = P[0];
-
-		Dart d1 = phi1(d0);
-		position[d1] = P[1];
-
-		Dart d2 = phi1(d1);
-		position[d2] = P[2];
-
-		Dart d3 = phi1(d2);
-		position[d3] = P[3];
-
-		return d0;
+	void createMesh() {
 	}
 
-	//  Fonction Triangle: construit un triangle et renvoit un brin
-	Dart Triangle()
-	{
-		Point3D P[3];
-		P[0] = Point3D(0.0f,1.1f,0.0f);
-		P[1] = Point3D(1.0f,1.1f,0.0f);
-		P[2] = Point3D(0.5f,2.0f,0.0f);
-
-		Dart d0 = newOrientedFace(3);
-		position[d0] = P[0];
-
-		Dart d1 = phi1(d0);
-		position[d1] = P[1];
-
-		Dart d2 = phi1(d1);
-		position[d2] = P[2];
-
-		return d0;
-	}
-
-	// Construit un polygone de taille "size"
-	Dart Polygone(Point3D* P, unsigned size)
-	{
-		Dart d = newOrientedFace(size);
-
-		for (unsigned i=0; i<size; i++) {
-			position[d] = P[i];
-			d = phi1(d);
-		}
-		return d;
-	}
-
-	// appel clavier touche 'c'
-	void Colle(Dart d, Dart e)
-	{
-		Point3D p = position[d];
-		Point3D q = position[phi1(d)];
-		phi2sew(d,e);
-		newVertex(d);
-		position[d] = p;
-		newVertex(e);
-		position[e] = q;
-	}
-
-	// appel clavier touche 'm'
-	void ColleMilieu(Dart d, Dart e)
-	{
-		Point3D p1 = position[d];
-		Point3D p2 = position[phi1(d)];
-		Point3D q1 = position[e];
-		Point3D q2 = position[phi1(e)];
-		Point3D m1 = (p1+q2)/2;
-		Point3D m2 = (q1+p2)/2;;
-
-		phi2sew(d,e);
-
-		newVertex(d);
-		position[d] = m1;
-		newVertex(e);
-		position[e] = m2;
-	}
-
-	// Construit une figure
-	Dart MultiFaces()
-	{
-		Point3D P[6];
-		P[0] = Point3D(2.0f,0.0f,0.0f);
-		P[1] = Point3D(3.0f,0.0f,0.0f);
-		P[2] = Point3D(3.5f,1.0f,0.0f);
-		P[3] = Point3D(3.0f,1.8f,0.0f);
-		P[4] = Point3D(2.0f,1.8f,0.0f);
-		P[5] = Point3D(1.5f,1.0f,0.0f);
-		Dart hexa = Polygone(P,6);
-
-		Point3D Q[3];
-		Q[0] = Point3D(2.0f,2.0f,0.0f);
-		Q[1] = Point3D(3.0f,2.0f,0.0f);
-		Q[2] = Point3D(2.5f,3.0f,0.0f);
-		Dart triangle = Polygone(Q,3);
-
-		Point3D R[4];
-		R[0] = Point3D(4.0f,0.0f,0.0f);
-		R[1] = Point3D(5.0f,0.0f,0.0f);
-		R[2] = Point3D(5.0f,1.0f,0.0f);
-		R[3] = Point3D(4.0f,1.0f,0.0f);
-		Dart carre = Polygone(R,4);
-
-		Point3D S[3];
-		S[0] = Point3D(4.0f,1.2f,0.0f);
-		S[1] = Point3D(5.0f,1.2f,0.0f);
-		S[2] = Point3D(4.5f,2.2f,0.0f);
-		Dart triangle2 = Polygone(S,3);
-
-		Dart haut_carre = phi1(phi1(carre));
-		Dart hexa2 = phi1(phi1(phi1(hexa)));
-
-	//	Test du phi1Sew
-	//	myMap.phi1sew(hexa,hexa2);
-	//	myMap.phi1sew(myMap.phi1(hexa),myMap.phi_1(carre));
-
-		// Génére un maillage à la fin
-		Colle(haut_carre,triangle2);
-		Colle(hexa2,triangle);
-		Colle(phi_1(triangle2),phi_1(hexa2));
-		Colle(phi1(hexa),phi_1(carre));
-
-		return hexa;
-	}
-
-	// Fonction de creation de la carte (appelee par le main)
-	void createMap()
-	{
-		d_carre = Carre();
-		d_tri = Triangle();
-		d_multiFaces = MultiFaces();
-
-		Colle(phi1(phi1(d_carre)),d_tri);
-		Colle(phi_1(d_multiFaces),phi1(d_carre));
-		Colle(phi_1(phi_1(d_multiFaces)),phi1(d_tri));
-	}
-
-	// Touche x
-	void coupeFace(Dart d, Dart e)
-	{
-		Point3D p = position[phi1(d)];
-		Point3D q = position[phi1(e)];
-
-		Dart dd = newOrientedFace(2);
-		Dart ee = phi1(dd);
-
-		phi1sew(d,dd);
-		phi1sew(e,ee);
-		phi2sew(dd,ee);
-
-		newVertex(ee);
-		position[ee] = p;
-		newVertex(dd);
-		position[dd] = q;
-	}
-
-	// Touche y
 	void coupeArete(Dart d) {
 		Point3D p = position[d];
 		Point3D q = position[phi1(d)];
 		Point3D milieu = (p + q + Point3D(0.2f,0.2f,0.0f) /* decalage pour voir le point */ )/2;
 
-		Dart dd = newDart();
-		phi1sew(d,dd);
-
-		Dart e = phi2(d);
-		if (e != d) {
-			Dart ee = newDart();
-			phi1sew(e,ee);
-			phi2unsew(d);
-			phi2sew(d,ee);
-			phi2sew(e,dd);
-		}
-		newVertex(dd);
-		position[dd] = milieu;
-	}
-
-	// Touche z
-	void arrondi(Dart d) {
-		Dart e = phi_1(d);
-		coupeArete(d);
-		coupeArete(e);
-		e = phi1(e);
-		Point3D P = position[d];
-		Point3D Q = position[e];
-		Point3D R = position[phi1(d)];
-		Point3D M = (P + P + Q + R)/4;
-
-		position[d] = M;
-	}
-
-	unsigned face_size(Dart d) {
-		unsigned n = 0;
-		Dart e = d;
-		do {
-			n++;
-			e = phi1(e);
-		} while (e != d);
-		return n;
-	}
-
-	// Touche p
-	void triangule() {
-		Dart d;
-		for (d = begin(); d != end();) {
-			if (face_size(d) > 3) {
-				coupeFace(d,phi1(phi1(d)));
-			}
-			else {
-				next(d);
-			}
-		}
-	}
-
-	// Touche q
-	void fusionSommet(Dart d)
-	{
-		Point3D P = position[d];
-		Point3D Q = position[phi1(d)];
-		Point3D M = (P + Q)/2;
-
-		// On attrape des pointeurs sur les brins à manipuler
-		Dart dd = phi1(d);
-		Dart ddd = phi1(dd);
-
-		Dart e = phi2(d);
-		Dart ee = phi1(e);
-		Dart eee = phi1(ee);
-
-		Dart dd2 = phi2(dd);
-		Dart ee2 = phi2(ee);
-		Dart ddd2 = phi2(ddd);
-		Dart eee2 = phi2(eee);
-
-		// On découd les triangles du centre
-		phi2unsew(d);
-		phi2unsew(dd);
-		phi2unsew(ee);
-		phi2unsew(ddd);
-		phi2unsew(eee);
-		// On détruit les 2 triangles
-		deleteOrientedFace(d);
-		deleteOrientedFace(e);
-		// On recout les brins restants
-		phi2sew(dd2,ddd2);
-		phi2sew(ee2,eee2);
-		// On plonge le sommet central sur le nouveau point calculé
-		newVertex(ddd2);
-		position[ddd2] = M;
 	}
 
 	// Longueur d'une arête
@@ -380,13 +122,12 @@ public:
 				lmin = longueur(d);
 			}
 		}
-		fusionSommet(dmin);
 	}
 
 };
 
 // definition de la carte comme variable globale
-PFP::MAP myMap;
+PFP::MAP myQuadMesh;
 
 // pile des brins selectionnes (6 max)
 std::vector<Dart> selected_darts;
@@ -420,7 +161,7 @@ void MyQT::drawSelected()
 		{
 			const PFP::VEC3& P = position[d];
 			m_ds->vertex(P);
-			d = myMap.phi1(d);
+			d = myQuadMesh.phi1(d);
 		} while (d!=d_faces[i]);
 
 		m_ds->end();
@@ -439,7 +180,7 @@ void MyQT::drawSelected()
 		Dart d = d_edges[i];
 		const PFP::VEC3& P = position[d];
 		m_ds->vertex(P);
-		d = myMap.phi1(d);
+		d = myQuadMesh.phi1(d);
 		const PFP::VEC3& Q =  position[d];
 		m_ds->vertex(Q);
 	}
@@ -527,17 +268,17 @@ void MyQT::cb_initGL()
 void MyQT::cb_redraw()
 {
 	// update des normales aux sommets
-	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+	Algo::Geometry::computeNormalVertices<PFP>(myQuadMesh, position, normal) ;
 
 	// update du VBO position (contexte GL necessaire)
 	m_positionVBO->updateData(position);
 	m_normalVBO->updateData(normal);
 
 	// update des primitives du renderer
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
-	m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::LINES);
+	m_render->initPrimitives<PFP>(myQuadMesh, CGoGN::allDarts, Algo::Render::GL2::TRIANGLES);
+	m_render->initPrimitives<PFP>(myQuadMesh, CGoGN::allDarts, Algo::Render::GL2::LINES);
 
-	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f);
+	m_render_topo->updateData<PFP>(myQuadMesh, position, 0.9f, 0.9f);
 
 	drawSelected();
 	if (renderTopo)
@@ -593,7 +334,7 @@ void MyQT::cb_keyPress(int keycode)
 
 	// Sélectionne un brin
 	case 'd':
-		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, SelectorTrue());
+		Algo::Selection::dartsRaySelection<PFP>(myQuadMesh, position, rayA, AB, darts, SelectorTrue());
 
 		if (!darts.empty() && selected_darts.size() < 6)
 		{
@@ -603,13 +344,13 @@ void MyQT::cb_keyPress(int keycode)
 
 	// Affiche les informations sur un brin
 	case 'D':
-		Algo::Selection::dartsRaySelection<PFP>(myMap, position, rayA, AB, darts, SelectorTrue());
+		Algo::Selection::dartsRaySelection<PFP>(myQuadMesh, position, rayA, AB, darts, SelectorTrue());
 
 		if (!darts.empty()) 
 		{
 			std::stringstream ss;
-			Dart d1 = myMap.phi1(darts[0]);
-			Dart d2 = myMap.phi2(darts[0]);
+			Dart d1 = myQuadMesh.phi1(darts[0]);
+			Dart d2 = myQuadMesh.phi2(darts[0]);
 			ss << "dart:" << darts[0].index<<" /phi1:"<< d1.index<<" /phi2:"<< d2.index;
 
 			const Point3D& P = position[darts[0]];
@@ -621,7 +362,7 @@ void MyQT::cb_keyPress(int keycode)
 	// Sélectionne des faces
 	case 'f':
 		d_faces.clear();
-		Algo::Selection::facesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_faces);
+		Algo::Selection:: facesRaySelection<PFP>(myQuadMesh, position, SelectorTrue(), rayA, AB, d_faces);
 
 		if (!d_faces.empty())
 		{
@@ -634,15 +375,15 @@ void MyQT::cb_keyPress(int keycode)
 	// Sélectionne des arêtes
 	case 'a':
 		d_edges.clear();
-		Algo::Selection::edgesRaySelection<PFP>(myMap, position, SelectorTrue(), rayA, AB, d_edges,dist);
+		Algo::Selection::edgesRaySelection<PFP>(myQuadMesh, position, SelectorTrue(), rayA, AB, d_edges,dist);
 
 		if (!d_edges.empty())
 		{
 			std::stringstream ss;
-			Dart dd = myMap.phi2(d_edges[0]);
-			ss << "Arete:  dart: " << d_edges[0].index<<" phi1: "<< myMap.phi1(d_edges[0]).index;
+			Dart dd = myQuadMesh.phi2(d_edges[0]);
+			ss << "Arete:  dart: " << d_edges[0].index<<" phi1: "<< myQuadMesh.phi1(d_edges[0]).index;
 			if (dd != d_edges[0])
-				ss << " phi2: " << dd.index<<" phi1: "<< myMap.phi1(dd).index;
+				ss << " phi2: " << dd.index<<" phi1: "<< myQuadMesh.phi1(dd).index;
 			statusMsg(ss.str().c_str());
 		}
 		break;
@@ -650,12 +391,12 @@ void MyQT::cb_keyPress(int keycode)
 	// Sélectionne des sommets
 	case 's':
 		d_vertices.clear();
-		Algo::Selection::verticesRaySelection<PFP>(myMap, position,rayA, AB, d_vertices,dist,SelectorTrue());
+		Algo::Selection::verticesRaySelection<PFP>(myQuadMesh, position,rayA, AB, d_vertices,dist,SelectorTrue());
 
 		if (!d_vertices.empty())
 		{
 			std::stringstream ss;
-			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]]<< "( id emb:"<< myMap.getEmbedding(VERTEX,d_vertices[0])<<")"<< std::endl; ;
+			ss << "Sommet:  dart: " << d_vertices[0].index << ": " << position[d_vertices[0]]<< "( id emb:"<< myQuadMesh.getEmbedding(VERTEX,d_vertices[0])<<")"<< std::endl; ;
 			statusMsg(ss.str().c_str());
 		}
 		break;
@@ -669,15 +410,6 @@ void MyQT::cb_keyPress(int keycode)
 			switch (keycode) {
 			// Colle 2 arêtes
 			case 'c':
-				myMap.Colle(selected_darts[0], selected_darts[1]);
-				break;
-			// Colle 2 arêtes en leur milieu
-			case 'm':
-				myMap.ColleMilieu(selected_darts[0], selected_darts[1]);
-				break;
-			// Coupe une face en 2 avec une nouvelle arête
-			case 'x':
-				myMap.coupeFace(selected_darts[0], selected_darts[1]);
 				break;
 			}
 			selected_darts.clear();
@@ -693,15 +425,7 @@ void MyQT::cb_keyPress(int keycode)
 			switch (keycode) {
 			// Coupe une arête en 2 avec un nouveau sommet
 			case 'y':
-				myMap.coupeArete(selected_darts[0]);
-				break;
-			// Arrondi
-			case 'z':
-				myMap.arrondi(selected_darts[0]);
-				break;
-			// Fusion de sommet
-			case 'q':
-				myMap.fusionSommet(selected_darts[0]);
+				myQuadMesh.coupeArete(selected_darts[0]);
 				break;
 			}
 			selected_darts.clear();
@@ -709,14 +433,9 @@ void MyQT::cb_keyPress(int keycode)
 		break;
 
 	// Opérations globales
-	// Triangulation
-	case 'p':
-		myMap.triangule();
-		selected_darts.clear();
-		break;
 	// Simplification
 	case 'k':
-		myMap.simplifie();
+		myQuadMesh.simplifie();
 		selected_darts.clear();
 		break;
 	}
@@ -732,25 +451,25 @@ int main(int argc, char **argv)
 
 	if (argc == 2) {
 		std::vector<std::string> attrNames ;
-		Algo::Import::importMesh<PFP>(myMap, argv[1], attrNames) ;
-		position = myMap.getAttribute<Point3D>(VERTEX, attrNames[0]) ;
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
-		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		Algo::Import::importMesh<PFP>(myQuadMesh, argv[1], attrNames) ;
+		position = myQuadMesh.getAttribute<Point3D>(VERTEX, attrNames[0]) ;
+		normal = myQuadMesh.addAttribute<PFP::VEC3>(VERTEX, "normal");
+		Algo::Geometry::computeNormalVertices<PFP>(myQuadMesh, position, normal) ;
 	}
 	else {
-		position = myMap.addAttribute<Point3D>(VERTEX, "position");
-		normal = myMap.addAttribute<PFP::VEC3>(VERTEX, "normal");
-		myMap.createMap();
-		Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+		position = myQuadMesh.addAttribute<Point3D>(VERTEX, "position");
+		normal = myQuadMesh.addAttribute<PFP::VEC3>(VERTEX, "normal");
+		myQuadMesh.createMesh();
+		Algo::Geometry::computeNormalVertices<PFP>(myQuadMesh, position, normal) ;
 	}
 
-	if (myMap.getNbDarts()==0) {
+	if (myQuadMesh.getNbDarts()==0) {
 		CGoGNout << "Aucun brin dans la carte. Sortie ..." << CGoGNendl;
 		exit(0);
 	}
 
 	// Parametre de la fenetre en fonction de la taille du maillage à afficher
-	Geom::BoundingBox<Point3D> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	Geom::BoundingBox<Point3D> bb = Algo::Geometry::computeBoundingBox<PFP>(myQuadMesh, position);
 	float lWidthObj = std::max(std::max(bb.size(0), bb.size(1)), bb.size(2));
 	Point3D lPosObj = (bb.min() +  bb.max()) / 2;
 	sqt.setParamObject(lWidthObj,lPosObj.data());
