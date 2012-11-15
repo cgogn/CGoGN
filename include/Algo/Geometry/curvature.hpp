@@ -343,7 +343,7 @@ void computeCurvatureVertex_NormalCycles(
 
 	// solve eigen problem
 	Eigen::Matrix3f m3 ;
-	m3 << tensor(0,0) , tensor(0,1) , tensor(0,1) , tensor(1,0) , tensor(1,1) , tensor(1,2) , tensor(2,0) , tensor(2,1) , tensor(2,2) ;
+	m3 << tensor(0,0) , tensor(0,1) , tensor(0,2) , tensor(1,0) , tensor(1,1) , tensor(1,2) , tensor(2,0) , tensor(2,1) , tensor(2,2) ;
 	Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> solver (m3);
 	Eigen::Vector3f ev = solver.eigenvalues();
 	Eigen::Matrix3f evec = solver.eigenvectors();
@@ -356,22 +356,25 @@ void computeCurvatureVertex_NormalCycles(
 	if (ev[s[2]] < ev[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
 
 	// set curvatures from sorted eigen components
-	kmin[dart] = ev[s[1]] ;
-	kmax[dart] = ev[s[2]] ;
-	VEC3& dirMin = Kmin[dart] ;
-	dirMin[0] = evec(0,s[2]);
-	dirMin[1] = evec(1,s[2]);
-	dirMin[2] = evec(2,s[2]); // warning : Kmin and Kmax are switched
-	VEC3& dirMax = Kmax[dart] ;
-	dirMax[0] = evec(0,s[1]);
-	dirMax[1] = evec(1,s[1]);
-	dirMax[2] = evec(2,s[1]); // warning : Kmin and Kmax are switched
+	// warning : Kmin and Kmax are switched w.r.t. kmin and kmax
+	// normal direction : minimal absolute eigen value
 	VEC3& dirNormal = Knormal[dart] ;
 	dirNormal[0] = evec(0,s[0]);
 	dirNormal[1] = evec(1,s[0]);
 	dirNormal[2] = evec(2,s[0]);
-	if (dirNormal * normal[dart] < 0)
-		dirNormal *= -1; // change orientation
+	if (dirNormal * normal[dart] < 0) dirNormal *= -1; // change orientation
+	// min curvature
+	kmin[dart] = ev[s[1]] ;
+	VEC3& dirMin = Kmin[dart] ;
+	dirMin[0] = evec(0,s[2]);
+	dirMin[1] = evec(1,s[2]);
+	dirMin[2] = evec(2,s[2]);
+	// max curvature
+	kmax[dart] = ev[s[2]] ;
+	VEC3& dirMax = Kmax[dart] ;
+	dirMax[0] = evec(0,s[1]);
+	dirMax[1] = evec(1,s[1]);
+	dirMax[2] = evec(2,s[1]);
 }
 
 
