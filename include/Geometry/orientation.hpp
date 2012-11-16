@@ -35,28 +35,76 @@ Orientation2D testOrientation2D(const VEC3& P, const VEC3& Pa, const VEC3& Pb)
 {
 
 	typedef typename VEC3::DATA_TYPE T ;
-//	const T min = std::numeric_limits<T>::min()*T(100);
-	const T min = 0.0001;
+	const T zero = 0.0001 ;
 
-//	T wsof = (Pa[0]-P[0])*(P[1]-Pb[1])-(P[0]-Pb[0])*(Pa[1]-P[1]);
-	T wsof = (P[0]-Pa[0])*(Pb[1]-Pa[1])-(Pb[0]-Pa[0])*(P[1]-Pa[1]);
+	T p = (P[0] - Pa[0]) * (Pb[1] - Pa[1]) - (Pb[0] - Pa[0]) * (P[1] - Pa[1]) ;
 
-	if(wsof>min)
+	if (p > zero)
 		return RIGHT ;
-	else if(fabs(wsof)>min)
-		return LEFT;
+	else if (-p > zero)
+		return LEFT ;
+	else
+		return ALIGNED ;
+}
 
-	return ALIGNED;
+// TODO use triple product with a normal to the plane that contains u and v
+template <typename VEC3>
+int orientation2D(const VEC3& u, const VEC3& v)
+{
+	typedef typename VEC3::DATA_TYPE T ;
 
-// 	VEC3 dir = Pb - Pa ;
-// 	VEC3 Np = dir ^ N ;
-// 	int o3d = testOrientation3D(P, Np, Pa) ;
-// 	switch(o3d)
-// 	{
-// 		case ON : return ALIGNED ;
-// 		case OVER : return RIGHT ;
-// 		case UNDER : return LEFT ;
-// 	}
+	T p = u[0] * v[1] - u[1] * v[0] ;
+	const T zero = 0.0001 ;
+
+	if (p > zero)
+		return 1 ;
+	else if (-p > zero)
+		return -1 ;
+	else
+		return 0 ;
+}
+
+// TODO use dot product => include epsilon in vector_gen to test sign
+template <typename VEC3>
+int aligned2D(const VEC3& u, const VEC3& v)
+{
+	typedef typename VEC3::DATA_TYPE T ;
+
+	T p = u[0] * v[0] + u[1] * v[1] ;
+	const T zero = 0.0001 ;
+
+	if (p > zero)
+		return 1 ;
+	else if (-p > zero)
+		return -1 ;
+	else
+		return 0 ;
+}
+
+template <typename VEC3>
+bool isBetween(const VEC3& u, const VEC3& v, const VEC3& w)
+{
+	int orientWV = orientation2D(w,v) ;
+
+	if (orientWV > 0)
+	{
+		if (orientation2D(v,u) >= 0) return true ;
+		int orientWU = orientation2D(w,u) ;
+		if (orientWU < 0) return true ;
+		return (orientWU == 0) && (aligned2D(w,u) <= 0) ;
+	}
+	else if (orientWV < 0 || (orientWV == 0 && aligned2D(w,v) < 0))
+	{
+		if (orientation2D(v,u) < 0) return false ;
+		int orientWU = orientation2D(w,u) ;
+		if (orientWU < 0) return true ;
+		return (orientWU == 0) && (aligned2D(w,u) <= 0) ;
+	}
+	else // orientWV == 0 && v*u >= 0
+	     // ==> v et u ont même direction ou sont nuls
+	{
+		return (orientation2D(v,u) == 0 && aligned2D(v,u) >= 0) ;
+	}
 }
 
 template <typename VEC3>
@@ -71,7 +119,7 @@ bool isTetrahedronWellOriented(const VEC3 points[4], bool CCW)
 	VEC3 N = AB ^ AC ;
 
 	T dot = N * AD ;
-	if(CCW)
+	if (CCW)
 		return dot <= 0 ;
 	else
 		return dot >= 0 ;

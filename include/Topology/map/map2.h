@@ -222,14 +222,14 @@ public:
 //	 *  @param d dart of the vertex
 //	 *  @param e dart of the edge
 //	 */
-//	virtual void insertEdgeInVertex(Dart d, Dart e);
+	virtual void insertEdgeInVertex(Dart d, Dart e);
 //
 //	//! Remove an edge from a vertex orbit
 //	/*! \pre Dart d must be phi2 sewed
 //	 *  @param d the dart of the edge to remove from the vertex
 //	 * @return true if the removal has been executed, false otherwise
 //	 */
-//	virtual bool removeEdgeFromVertex(Dart d);
+	virtual bool removeEdgeFromVertex(Dart d);
 
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Edges of darts d & e MUST be boundary edges

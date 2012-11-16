@@ -15,7 +15,6 @@ IF (FORCE_MR EQUAL 1)
 	add_definitions(-DCGoGN_FORCE_MR=1)
 ENDIF (FORCE_MR EQUAL 1)
 
-
 # for CGoGN in one lib or not
 file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
@@ -26,12 +25,9 @@ ELSE (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS_R topology algo container utils)
 ENDIF (ONELIB_STR EQUAL 1)
 
-
-
 IF(WIN32)
 	set(CMAKE_PREFIX_PATH ${CGoGN_ROOT_DIR}/windows_dependencies CACHE STRING "path to dependencies")
 ENDIF(WIN32)
-
 
 find_package(OpenGL REQUIRED)
 find_package(Boost COMPONENTS regex thread REQUIRED)
@@ -39,14 +35,11 @@ find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
 
-
-
 IF (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=${ASSERTON})
 ELSE (DEFINED ASSERTON)
 	add_definitions(-DCGOGN_ASSERT_BOOL=false)
 ENDIF (DEFINED ASSERTON)
-
 
 add_definitions(-DSHADERPATH="${CGoGN_ROOT_DIR}/lib/Shaders/")
 
@@ -97,7 +90,6 @@ IF (WITH_NUMERICAL)
 	SET (COMMON_LIBS ${COMMON_LIBS} numerical lapack blas f2c)
 ENDIF (WITH_NUMERICAL)
 
-
 # qq definition specifiques pour mac
 IF(APPLE)
 # attention a changer pour chercher la bonne version automatiquement
@@ -123,6 +115,3 @@ IF(WIN32)
 ELSE (WIN32)
 	link_directories( ${CGoGN_ROOT_DIR}/lib/Debug ${CGoGN_ROOT_DIR}/lib/Release)
 ENDIF (WIN32)
-
-
-

@@ -20,7 +20,8 @@ class VBOHandler;
 class Context;
 class ViewButton;
 
-class Scene : public QObject{
+class Scene : public QObject
+{
 	Q_OBJECT
 public:
 	Scene(QString name, Window* window, Camera* sharedCamera=NULL);
@@ -75,7 +76,6 @@ public:
 	bool addCustomViewButton(ViewButton* viewButton);
 	ViewButton* takeCustomViewButton(ViewButton* viewButton);
 
-
 protected:
 	Window* m_window;
 
@@ -96,6 +96,5 @@ protected:
 signals:
 	void viewButtonClicked(View*, ViewButton*);
 };
-
 
 #endif

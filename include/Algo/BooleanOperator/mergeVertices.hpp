@@ -32,40 +32,56 @@ namespace BooleanOperator
 {
 
 template <typename PFP>
+bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e, Dart f)
+{
+	return CGoGN::Geom::isBetween(positions[map.phi1(d)]-positions[d],
+	                 positions[map.phi1(e)]-positions[e],
+	                 positions[map.phi1(f)]-positions[f]);
+}
+
+template <typename PFP>
 void mergeVertex(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e)
 {
 	assert(Geom::arePointsEquals(positions[d],positions[e]) && !map.sameVertex(d,e));
-	Dart dd;
-	do
-	{
-		dd = map.phi2_1(d);
-		map.removeEdgeFromVertex(dd);
-		Dart ee = e;
-		do
-		{
-			if(Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(ee)])!=Geom::RIGHT
-					&& Geom::testOrientation2D(positions[map.phi1(dd)],positions[ee],positions[map.phi1(map.phi2_1(ee))])==Geom::RIGHT)
-			{
-				break;
-			}
-			ee = map.phi2_1(ee);
-		} while(ee != e);
-		map.insertEdgeInVertex(ee,dd);
-	} while(dd!=d);
+  // d1 traverses the vertex of d (following the alpha1 permutation)
+  // y is a temporay buffer to stop the loop
+  Dart d1=d;
+  // e1 traverses the vertex of e (following the alpha1 permutation)
+  Dart e1=e;
+  bool notempty = true;
+  do {
+	if (map.phi2_1(e1) == e1) notempty = false;
+	// detach z from its vertex
+	map.removeEdgeFromVertex(e1);
+	// Searchs the dart of the vertex of x where tz may be inserted
+	Dart nd1 = d1;
+	do {
+	  if (CGoGN::Algo::BooleanOperator::isBetween<PFP>(map,positions,e1,d1,map.phi2_1(d1))) break;
+	  d1 = map.phi2_1(d1);
+	} while (d1 != nd1);
+	map.insertEdgeInVertex(d1,e1);
+	d1 = e1;
+  } while (notempty);
+
+  // 0-embed z on the vertex of x without copy of the vertex
+//  positions[d] = ;
 }
+
+
 
 template <typename PFP>
 void mergeVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& positions)
 {
+	// TODO optimiser en triant les sommets
 	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{
 		CellMarker<VERTEX> vM(map);
 		vM.mark(d);
+		std::cout << "." ; std::cout.flush() ;
 		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
 		{
 			if(!vM.isMarked(dd))
 			{
-				vM.mark(dd);
 				if(Geom::arePointsEquals(positions[d],positions[dd]))
 				{
 					mergeVertex<PFP>(map,positions,d,dd);
