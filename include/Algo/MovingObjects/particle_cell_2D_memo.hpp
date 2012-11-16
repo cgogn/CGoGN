@@ -22,9 +22,9 @@ void ParticleCell2DMemo<PFP>::move(const VEC3& goal, CellMarkerMemo<FACE>& memo_
 }
 
 template <typename PFP>
-std::vector<Dart> ParticleCell2DMemo<PFP>::get_memo(const VEC3& goal, CellMarkerMemo<FACE>& memo_cross)
+std::vector<Dart> ParticleCell2DMemo<PFP>::get_memo(const VEC3& goal)
 {
-	memo_cross.unmarkAll();
+	CellMarkerMemo<FACE> memo_cross(this->m);
 	memo_cross.mark(this->d);
 	this->move(goal,memo_cross);
 	return memo_cross.get_markedCells();
