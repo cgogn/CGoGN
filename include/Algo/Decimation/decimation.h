@@ -62,7 +62,7 @@ void decimate(
 	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
 	unsigned int nbWantedVertices,
 	const FunctorSelect& selected = allDarts,
-	VertexAttribute<typename PFP::VEC3> *edgeErrors = NULL,
+	EdgeAttribute<typename PFP::VEC3> *edgeErrors = NULL,
 	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
 ) ;
 
