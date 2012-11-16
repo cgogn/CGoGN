@@ -101,7 +101,7 @@ void ParticleCell2D<PFP>::vertexState(const VEC3& goal)
 					{
 						if(Algo::Geometry::isPointOnHalfEdge<PFP>(m,d,positionAttribut,goal)
 								&& Algo::Geometry::isPointOnHalfEdge<PFP>(m,this->m.phi2(d),positionAttribut,goal)
-								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
+								&& this->getOrientationEdge(goal, this->d) == Geom::ALIGNED)
 						{
 							edgeState(goal) ;
 							return;
