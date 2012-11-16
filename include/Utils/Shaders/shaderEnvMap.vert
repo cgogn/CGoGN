@@ -1,4 +1,4 @@
-//ShaderPhong::vertexShaderText
+//ShaderEnvMap::vertexShaderText
 
 ATTRIBUTE vec3 VertexPosition, VertexNormal;
 #ifdef WITH_COLOR
@@ -8,6 +8,7 @@ uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 ModelViewMatrix;
 uniform mat4 NormalMatrix;
 uniform vec3 lightPosition;
+
 VARYING_VERT vec3 EyeVector, Normal, LightDir;
 
 #ifdef WITH_COLOR
@@ -32,5 +33,6 @@ void main ()
 	#ifdef WITH_COLOR
 		Color = VertexColor;
 	#endif
+
 	gl_Position = ModelViewProjectionMatrix * vec4 (VertexPosition, 1.0);
 }

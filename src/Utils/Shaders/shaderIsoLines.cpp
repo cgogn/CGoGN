@@ -22,109 +22,110 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <string.h>
+#include <string>
 #include <GL/glew.h>
-#include "Utils/Shaders/shaderExplodeVolumesLines.h"
+#include "Utils/Shaders/shaderIsoLines.h"
 
 namespace CGoGN
 {
 
 namespace Utils
 {
-#include "shaderExplodeVolumesLines.vert"
-#include "shaderExplodeVolumesLines.frag"
-#include "shaderExplodeVolumesLines.geom"
+#include "shaderIsoLines.vert"
+#include "shaderIsoLines.frag"
+#include "shaderIsoLines.geom"
 
 
-ShaderExplodeVolumesLines::ShaderExplodeVolumesLines()
+ShaderIsoLines::ShaderIsoLines(int maxNbIsoPerTriangle)
 {
-	m_nameVS = "ShaderExplodeVolumesLines_vs";
-	m_nameFS = "ShaderExplodeVolumesLines_fs";
-	m_nameGS = "ShaderExplodeVolumesLines_gs";
+	m_nameVS = "shaderIsoLines_vs";
+	m_nameFS = "shaderIsoLines_fs";
+	m_nameGS = "shaderIsoLines_gs";
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);
 	glxvert.append(vertexShaderText);
 
-	std::string glxgeom(GLSLShader::defines_Geom("triangles", "line_strip", 4));
+	std::string glxgeom = GLSLShader::defines_Geom("triangles", "line_strip", 2*maxNbIsoPerTriangle);
 	glxgeom.append(geometryShaderText);
 
 	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText);
 
-	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES , GL_LINE_STRIP,4);
+	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES, GL_LINE_STRIP, 2*maxNbIsoPerTriangle);
 
 	getLocations();
 
 	//Default values
-	m_explodeV = 0.9f;
-	m_color = Geom::Vec4f(0.05f, 0.05f, 0.05f, 0.0f);
-	m_plane   = Geom::Vec4f(0.0f, 0.0f, 1000.f, 1000000000000000000000000000.0f);
-	setParams(m_explodeV, m_color, m_plane);
+
+	setColors(Geom::Vec4f(1.0f,0.0f,0.0f,1.0f),Geom::Vec4f(0.0f,1.0f,0.0f,1.0f));
+	setDataBound(0.0f,1.0f);
+	setNbIso(32);
+
 }
 
-void ShaderExplodeVolumesLines::getLocations()
+void ShaderIsoLines::getLocations()
 {
-	*m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
-	*m_unif_color  = glGetUniformLocation(program_handler(),"color");
-	*m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
+	*m_unif_colorMin = glGetUniformLocation(program_handler(),"colorMin");
+	*m_unif_colorMax = glGetUniformLocation(program_handler(),"colorMax");
+	*m_unif_vmin = glGetUniformLocation(program_handler(),"vmin");
+	*m_unif_vmax = glGetUniformLocation(program_handler(),"vmax");
+	*m_unif_vnb = glGetUniformLocation(program_handler(),"vnb");
 }
 
-void ShaderExplodeVolumesLines::setAttributePosition(VBO* vbo)
+void ShaderIsoLines::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
 	bindVA_VBO("VertexPosition", vbo);
 }
-
-void ShaderExplodeVolumesLines::setParams(float explV, const Geom::Vec4f& color, const Geom::Vec4f& plane)
+void ShaderIsoLines::setAttributeData(VBO* vbo)
 {
-	m_explodeV = explV;
-	m_color = color;
-	m_plane = plane;
-
-	bind();
-
-	glUniform1f(*m_unif_explodeV, explV);
-	glUniform4fv(*m_unif_color, 1, color.data());
-	glUniform4fv(*m_unif_plane,    1, m_plane.data());
-	unbind(); // ??
-}
-
-void ShaderExplodeVolumesLines::setExplodeVolumes(float explode)
-{
-	m_explodeV = explode;
-	bind();
-	glUniform1f(*m_unif_explodeV, explode);
+	m_vboData = vbo;
+	bindVA_VBO("VertexData", vbo);
 }
 
 
-void ShaderExplodeVolumesLines::setColor(const Geom::Vec4f& color)
+void ShaderIsoLines::setColors(const Geom::Vec4f& colorMin, const Geom::Vec4f& colorMax)
 {
-	m_color = color;
+	m_colorMin = colorMin;
+	m_colorMax = colorMax;
 	bind();
-	glUniform4fv(*m_unif_color,1, color.data());
+	glUniform4fv(*m_unif_colorMin,1, colorMin.data());
+	glUniform4fv(*m_unif_colorMax,1, colorMax.data());
 }
 
-void ShaderExplodeVolumesLines::setClippingPlane(const Geom::Vec4f& plane)
+void ShaderIsoLines::setDataBound(float attMin, float attMax)
 {
-	m_plane = plane;
+	m_vmin = attMin;
+	m_vmax = attMax;
 	bind();
-	glUniform4fv(*m_unif_plane,1, plane.data());
+	glUniform1f(*m_unif_vmin, attMin);
+	glUniform1f(*m_unif_vmax, attMax);
 }
 
-void ShaderExplodeVolumesLines::restoreUniformsAttribs()
+void ShaderIsoLines::setNbIso(int nb)
 {
-	*m_unif_explodeV   = glGetUniformLocation(program_handler(),"explodeV");
-	*m_unif_color   = glGetUniformLocation(program_handler(),"color");
-	*m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
+	m_vnb = nb;
+	bind();
+	glUniform1i(*m_unif_vnb, nb);
+}
+
+/*
+void ShaderIsoLines::restoreUniformsAttribs()
+{
+	*m_unif_explode   = glGetUniformLocation(program_handler(),"explode");
+	*m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
+	*m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
 
 	bind();
-	glUniform1f (*m_unif_explodeV, m_explodeV);
-	glUniform4fv(*m_unif_color,  1, m_color.data());
-	glUniform4fv(*m_unif_plane,    1, m_plane.data());
+	glUniform1f (*m_unif_explode, m_explode);
+	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
+	glUniform3fv(*m_unif_lightPos, 1, m_light_pos.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
+	bindVA_VBO("VertexColor", m_vboPos);
 	unbind();
 }
+*/
 
 } // namespace Utils
 

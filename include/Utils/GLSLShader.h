@@ -79,6 +79,9 @@ protected:
 
 	static std::string defines_Geom(const std::string& primitivesIn, const std::string& primitivesOut, int maxVert);
 
+	int m_nbMaxVertices;
+
+
 	/**
 	 * handle of vertex shader
 	 */
@@ -167,7 +170,7 @@ protected:
 	/**
 	 * create the shader (attach and link shaders into program)
 	 */
-	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES, int nb_max_vertices=16);
+	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES, int nb_max_vertices=-1);
 
 	/**
 	 * get log after compiling
@@ -269,6 +272,8 @@ public:
 	bool reloadGeometryShaderFromMemory(const char* gs);
 
 	bool recompile();
+
+	bool changeNbMaxVertices(int nb_max_vertices);
 
 	/**
 	 * Link the shader do it just after binding the attributes

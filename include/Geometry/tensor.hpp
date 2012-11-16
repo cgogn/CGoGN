@@ -39,6 +39,9 @@ Tensor<SIZE, REAL>::Tensor(const Tensor& T):
 m_order(T.m_order)
 {
 	m_data = new REAL[T.nbElem()] ;
+
+	for (unsigned int i = 0 ; i < T.nbElem() ; ++i)
+		m_data[i] = T[i] ;
 }
 
 template <unsigned int SIZE, typename REAL>
@@ -65,22 +68,35 @@ void Tensor<SIZE, REAL>::identity()
 
 template <unsigned int SIZE, typename REAL>
 void
-Tensor<SIZE, REAL>::operator=(const Tensor& T)
-{
-	m_order = T.m_order ;
-	m_data = new REAL[T.nbElem()] ;
-	for (unsigned int i = 0 ; i < T.nbElem() ; ++i)
-		m_data[i] = T[i] ;
-}
-
-template <unsigned int SIZE, typename REAL>
-void
 Tensor<SIZE, REAL>::zero()
 {
 	for (unsigned int i = 0 ; i < (unsigned int)pow(SIZE,m_order) ; ++i)
 	{
 		m_data[i] = 0 ;
 	}
+}
+
+template <unsigned int SIZE, typename REAL>
+void
+Tensor<SIZE, REAL>::setConst(const REAL& r)
+{
+	for (unsigned int i = 0 ; i < nbElem() ; ++i)
+	{
+		m_data[i] = r ;
+	}
+}
+
+template <unsigned int SIZE, typename REAL>
+void
+Tensor<SIZE, REAL>::operator=(const Tensor& T)
+{
+	m_order = T.m_order ;
+
+	delete[] m_data ;
+	m_data = new REAL[T.nbElem()] ;
+
+	for (unsigned int i = 0 ; i < T.nbElem() ; ++i)
+		m_data[i] = T[i] ;
 }
 
 template <unsigned int SIZE, typename REAL>
@@ -118,6 +134,21 @@ Tensor<SIZE, REAL>::getIndex(std::vector<unsigned int> p) const
 	return res ;
 }
 
+
+template <unsigned int SIZE, typename REAL>
+void
+Tensor<SIZE, REAL>::completeSymmetricTensor()
+{
+	std::vector<unsigned int> p ;
+	p.resize(order(), 0) ;
+	do
+	{
+		std::vector<unsigned int> sorted_p = p ;
+		std::sort(sorted_p.begin(), sorted_p.begin() + (*this).order()) ;
+		(*this)(p) = (*this)(sorted_p) ;
+	} while (incremIndex(p)) ;
+}
+
 template <unsigned int SIZE, typename REAL>
 const unsigned int&
 Tensor<SIZE, REAL>::order() const
@@ -153,13 +184,13 @@ template <unsigned int SIZE, typename REAL>
 bool
 Tensor<SIZE, REAL>::incremIndex(std::vector<unsigned int>& p)
 {
-	unsigned int i = 0 ;
-	while (i < p.size())
+	int i = p.size() - 1 ;
+	while (i >= 0)
 	{
 		p[i] = (p[i] + 1) % SIZE ;
 		if (p[i] != 0) // if no overflow
 			return true ;
-		++i ;
+		--i ;
 	}
 	return false ;
 }

@@ -45,14 +45,30 @@ protected:
     VBO* m_vboPos;
     VBO* m_vboCol;
 
+    CGoGNGLuint m_unif_alpha;
+    float m_opacity;
+
     void restoreUniformsAttribs();
 
 public:
     ShaderColorPerVertex(bool black_is_transparent = false);
 
-	unsigned int setAttributePosition(VBO* vbo);
+	/**
+	 * set the VBO of position (vec3)
+	 */
+    unsigned int setAttributePosition(VBO* vbo);
 
+	/**
+	 * set the VBO of color (vec3)
+	 */
 	unsigned int setAttributeColor(VBO* vbo);
+
+	/**
+	 * set opacity (0=transparent / 1=opaque)
+	 */
+	void setOpacity(float op);
+
+	float getOpacity() const  { return m_opacity;}
 };
 
 } // namespace Utils
