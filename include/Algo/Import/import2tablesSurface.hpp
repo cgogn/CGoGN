@@ -1074,11 +1074,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 		fp.read((char*)properties,nbProps * propSize) ;
 
 		// positions
-<<<<<<< HEAD
 		if (nbProps > 2)
-=======
-		if (nbprops > 2)
->>>>>>> adff367c4314a32954fe9d4bd8e1629e7efa8be2
 			positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
 
 		if (tangent && binormal && normal) // == if (nbprops > 11)
