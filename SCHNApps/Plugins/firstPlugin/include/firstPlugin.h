@@ -1,7 +1,7 @@
 #ifndef FIRSTPLUGIN_H_
 #define FIRSTPLUGIN_H_
 
-#include "visualPlugin.h"
+#include "plugins/visualPlugin.h"
 
 /**---CGoGN includes **/
 #include "Utils/Qt/qtSimple.h"

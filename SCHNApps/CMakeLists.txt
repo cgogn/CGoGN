@@ -18,6 +18,8 @@ find_package(QGLViewer REQUIRED)
 
 #======SCHNApps=======#
 SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
+SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin)
+SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/plugins/lib)
 
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Release Release)
 IF (NOT WIN32)
@@ -25,10 +27,6 @@ IF (NOT WIN32)
 ENDIF (NOT WIN32)
 
 configure_file(${CMAKE_SOURCE_DIR}/settings/state_save.xml ${EXECUTABLE_OUTPUT_PATH}/state_save.xml @ONLY)
-
-
-#======Plugins=======#
-#ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Plugins)
 
 
 #======Documentation=======#
@@ -41,4 +39,3 @@ add_custom_target(doc
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
-
