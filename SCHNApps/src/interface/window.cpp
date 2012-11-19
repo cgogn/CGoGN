@@ -561,9 +561,7 @@ Plugin *Window::loadPlugin(QString pluginPath)
 	{
 		Plugin *plugin = qobject_cast<Plugin *>(pluginObject);
 
-		QString pluginName = QFileInfo(pluginPath).fileName();
-		pluginName.remove(0, 3);
-		pluginName.remove(pluginName.lastIndexOf(".so"), 3);
+		QString pluginName = QFileInfo(pluginPath).baseName().remove(0, 3);
 
 		//we set the plugin with correct parameters (name, filepath)
 		plugin->setWindow(this);
@@ -573,10 +571,8 @@ Plugin *Window::loadPlugin(QString pluginPath)
 		//then we call its activate() methods
 		if (plugin->activate(m_initialization))
 		{
-
 			//if it succeeded we reference this plugin
 			h_plugin.insert(pluginName, plugin);
-
 			//method success
 			return plugin;
 		}
@@ -616,7 +612,6 @@ void Window::unloadPlugin(QString pluginName)
 			m_splitArea->updateSize();
 	}
 }
-
 
 Plugin *Window::checkPluginDependencie(QString name, Plugin *dependantPlugin)
 {

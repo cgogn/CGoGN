@@ -21,7 +21,6 @@ PluginDialog::PluginDialog(Window *parent, PluginHash *activePlugins) :
 	parentWindow(parent),
 	init(true)
 {
-
 //	if(!xmlFile.exists())
 //	{
 //		System::Error::code= System::Error::NO_PLUGIN_PATH_FILE;
