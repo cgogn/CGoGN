@@ -1,0 +1,56 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction and purposes}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}CGoGN}{3}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}What is CGoGN library ?}{3}{subsection.1.1.1}
+\contentsline {subsection}{\numberline {1.1.2}CGoGN and visualization?}{3}{subsection.1.1.2}
+\contentsline {section}{\numberline {1.2}The project}{3}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}CGoGN in space?}{3}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}Plugins and CGoGN?}{4}{subsection.1.2.2}
+\contentsline {chapter}{\numberline {2}The project}{5}{chapter.2}
+\contentsline {section}{\numberline {2.1}Work}{5}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Specifications}{5}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Additional features}{5}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Third party libraries}{6}{subsection.2.1.3}
+\contentsline {section}{\numberline {2.2}Quick presentation}{6}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}The main application}{6}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}The import plugin}{13}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}The camera path plugin}{15}{subsection.2.2.3}
+\contentsline {chapter}{\numberline {3}How to write plugins?}{19}{chapter.3}
+\contentsline {section}{\numberline {3.1}Basics and concepts}{19}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Visualization concepts}{19}{subsection.3.1.1}
+\contentsline {paragraph}{Plugin:}{19}{section*.44}
+\contentsline {paragraph}{Scene:}{19}{section*.45}
+\contentsline {paragraph}{View:}{19}{section*.46}
+\contentsline {paragraph}{Camera:}{19}{section*.47}
+\contentsline {subsection}{\numberline {3.1.2}The first plugin}{20}{subsection.3.1.2}
+\contentsline {subsubsection}{How to write the plugin}{20}{section*.52}
+\contentsline {paragraph}{firstPlugin.h}{21}{section*.55}
+\contentsline {paragraph}{firstPlugin.cpp}{23}{section*.57}
+\contentsline {subsubsection}{Compilation}{25}{section*.58}
+\contentsline {paragraph}{CMakeLists.txt}{25}{section*.61}
+\contentsline {subsubsection}{Using the plugin}{26}{section*.63}
+\contentsline {subsection}{\numberline {3.1.3}Tricks and advice}{28}{subsection.3.1.3}
+\contentsline {subsubsection}{Understanding the callBacks}{28}{section*.68}
+\contentsline {subsubsection}{Bug \& Debug}{29}{section*.70}
+\contentsline {paragraph}{Common bug:}{29}{section*.71}
+\contentsline {paragraph}{Debug:}{29}{section*.72}
+\contentsline {section}{\numberline {3.2}Going further\dots }{30}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Few words on plugins}{30}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Objects and visualization plugins}{30}{subsection.3.2.2}
+\contentsline {subsubsection}{Scene:}{30}{section*.77}
+\contentsline {paragraph}{Automatic creation:}{31}{section*.79}
+\contentsline {paragraph}{Call-back on scene linking:}{31}{section*.80}
+\contentsline {subsubsection}{View:}{32}{section*.82}
+\contentsline {subsubsection}{Camera:}{33}{section*.85}
+\contentsline {subsection}{\numberline {3.2.3}GUI and user interactions}{34}{subsection.3.2.3}
+\contentsline {subsubsection}{Custom widgets and menu entries}{34}{section*.87}
+\contentsline {paragraph}{Custom menu entries:}{34}{section*.89}
+\contentsline {paragraph}{Custom toolbar buttons:}{35}{section*.90}
+\contentsline {paragraph}{Custom widgets:}{35}{section*.91}
+\contentsline {subsubsection}{User interactions}{36}{section*.92}
+\contentsline {subsection}{\numberline {3.2.4}Maps and VBOs}{36}{subsection.3.2.4}
+\contentsline {subsubsection}{Map and VBO handling types}{36}{section*.95}
+\contentsline {paragraph}{MapHandler:}{37}{section*.98}
+\contentsline {paragraph}{VBOHandler:}{38}{section*.99}
+\contentsline {subsubsection}{Sharing maps}{39}{section*.100}
+\contentsline {subsubsection}{Plugins maps callback}{40}{section*.103}

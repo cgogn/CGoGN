@@ -111,7 +111,7 @@ void ImplicitHierarchicalMap3::swapEdges(Dart d, Dart e)
 	}
 
 	if(isOrbitEmbedded<VOLUME>())
-		embedNewCell<VOLUME>(d);
+		setOrbitEmbeddingOnNewCell<VOLUME>(d);
 	}
 }
 
@@ -171,7 +171,7 @@ Dart ImplicitHierarchicalMap3::quadranguleFace(Dart d)
 		do
 		{
 			//copyDartEmbedding<VERTEX>(it, phi1(phi3(it)));
-			embedOrbit<VERTEX>(it, getEmbedding<VERTEX>(phi1(phi3(it))));
+			setOrbitEmbedding<VERTEX>(it, getEmbedding<VERTEX>(phi1(phi3(it))));
 			it = phi1(it) ;
 		} while(it != bc) ;
 	}

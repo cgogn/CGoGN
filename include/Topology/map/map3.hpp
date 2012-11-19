@@ -40,7 +40,7 @@ inline std::string Map3::mapTypeName() const
 	return "Map3";
 }
 
-inline unsigned int Map3::dimension()
+inline unsigned int Map3::dimension() const
 {
 	return 3;
 }

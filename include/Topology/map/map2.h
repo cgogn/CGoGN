@@ -66,7 +66,7 @@ public:
 
 	virtual std::string mapTypeName() const;
 
-	virtual unsigned int dimension();
+	virtual unsigned int dimension() const;
 
 	virtual void clear(bool removeAttrib);
 
@@ -134,7 +134,7 @@ public:
 
 	//! Delete the face of d
 	/*! @param d a dart of the face
-	 *  @param withBoudary  create or extend boundary face instead of fixed points (default true)
+	 *  @param withBoudary create or extend boundary face instead of fixed points (default true)
 	 */
 	virtual void deleteFace(Dart d, bool withBoundary = true) ;
 
@@ -216,21 +216,6 @@ public:
 	 */
 	void swapEdges(Dart d, Dart e);
 
-//	//! Insert an edge after a dart in the vertex orbit
-//	/*! \pre Dart d and e MUST be different and belong to distinct face
-//	 *  \pre Dart e must be phi2-linked with its phi_1 dart
-//	 *  @param d dart of the vertex
-//	 *  @param e dart of the edge
-//	 */
-	virtual void insertEdgeInVertex(Dart d, Dart e);
-//
-//	//! Remove an edge from a vertex orbit
-//	/*! \pre Dart d must be phi2 sewed
-//	 *  @param d the dart of the edge to remove from the vertex
-//	 * @return true if the removal has been executed, false otherwise
-//	 */
-	virtual bool removeEdgeFromVertex(Dart d);
-
 	//! Sew two oriented faces along oriented edges
 	/*! \pre Edges of darts d & e MUST be boundary edges
 	 *  @param d a dart of the first face
@@ -243,7 +228,7 @@ public:
 	/*! \pre Edge of dart d MUST NOT be a boundary edge
 	 *  @param d a dart of a face
 	 */
-	virtual void unsewFaces(Dart d);
+	virtual void unsewFaces(Dart d, bool withBoundary = true);
 
 	//! Delete an oriented face if and only if it has one or two edges
 	/*! If the face is sewed to two distinct adjacent faces,
@@ -333,6 +318,12 @@ public:
 	 * return NIL if the vertex is not on the boundary
 	 */
 	Dart findBoundaryEdgeOfVertex(Dart d);
+
+	/**
+	 * find the dart of edge that belong to the boundary
+	 * return NIL if the face is not on the boundary
+	 */
+	Dart findBoundaryEdgeOfFace(Dart d);
 
 	//! Test if dart d and e belong to the same edge
 	/*! @param d a dart

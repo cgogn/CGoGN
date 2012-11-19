@@ -3,7 +3,6 @@
 
 #include "Container/fakeAttribute.h"
 #include "Algo/DecimationVolumes/selector.h"
-#include "Algo/DecimationVolumes/operator.h"
 #include "Utils/qem.h"
 #include "Topology/generic/traversorCell.h"
 
@@ -16,80 +15,166 @@ namespace Algo
 namespace DecimationVolumes
 {
 
-/********************************************************************************
- *			 				Parent Edge Selector								*
- ********************************************************************************/
+/*
+ * Map Order
+ */
 template <typename PFP>
-class EdgeSelector : public Selector<PFP>
+class EdgeSelector_MapOrder : public Selector<PFP>
 {
 public:
 	typedef typename PFP::MAP MAP ;
 	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL;
+	typedef typename PFP::REAL REAL ;
 
-protected:
-
+private:
+	Dart cur ;
 
 public:
-	EdgeSelector(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+	EdgeSelector_MapOrder(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
 		Selector<PFP>(m, pos, approx, select)
 	{}
+	~EdgeSelector_MapOrder()
+	{}
+	SelectorType getType() { return S_MapOrder ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d)
+	{}
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-};
+	void updateWithoutCollapse() { }
+} ;
 
+
+/*
+ * Random
+ */
 template <typename PFP>
-class EdgeSelector_QEM : public EdgeSelector<PFP>
+class EdgeSelector_Random : public Selector<PFP>
 {
 public:
-	typedef typename PFP::MAP MAP;
-	typedef typename PFP::VEC3 VEC3;
-	typedef typename PFP::REAL REAL;
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	std::vector<Dart> darts ;
+	unsigned int cur ;
+	bool allSkipped ;
+
+public:
+	EdgeSelector_Random(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		Selector<PFP>(m, pos, approx, select),
+		cur(0),
+		allSkipped(false)
+	{}
+	~EdgeSelector_Random()
+	{}
+	SelectorType getType() { return S_Random ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d2)
+	{}
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+} ;
+
+/*
+ * Edge Length
+ */
+template <typename PFP>
+class EdgeSelector_Length : public Selector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
 
 private:
 	typedef struct
 	{
-		typename std::multimap<float, Dart>::iterator it;
-		bool valid;
-		static std::string CGoGNnameOfType() { return "QEMedgeInfo" ; }
-	} QEMedgeInfo;
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "LengthEdgeInfo" ; }
+	} LengthEdgeInfo ;
+	typedef NoMathIOAttribute<LengthEdgeInfo> EdgeInfo ;
 
-	typedef NoMathIOAttribute<QEMedgeInfo> EdgeInfo;
+	EdgeAttribute<EdgeInfo> edgeInfo ;
 
-	EdgeAttribute<EdgeInfo> edgeInfo;
-	VertexAttribute<Quadric<REAL> > quadric;
-	Quadric<REAL> tmpQ;
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
 
-	std::multimap<float, Dart> edges;
-	typename std::multimap<float, Dart>::iterator cur;
-
-	Approximator<PFP, typename PFP::VEC3>* m_positionApproximator;
-
-	void initEdgeInfo(Dart d);
-	void updateEdgeInfo(Dart d, bool recompute);
-	void computeEdgeInfo(Dart d, EdgeInfo& einfo);
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
 
 public:
-	EdgeSelector_QEM(MAP& m, VertexAttribute<typename PFP::VEC3>& pos,
-			std::vector<ApproximatorGen<PFP>* >& approx, const FunctorSelect& select) :
-				EdgeSelector<PFP>(m, pos, approx, select)
+	EdgeSelector_Length(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		Selector<PFP>(m, pos, approx, select)
 	{
-		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo");
-		quadric = m.template addAttribute<Quadric<REAL>, VERTEX>("QEMquadric");
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
 	}
-
-	~EdgeSelector_QEM()
+	~EdgeSelector_Length()
 	{
-		this->m_map.removeAttribute(quadric);
-		this->m_map.removeAttribute(edgeInfo);
+		this->m_map.removeAttribute(edgeInfo) ;
 	}
+	SelectorType getType() { return S_EdgeLength ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	SelectorType getType() { return S_QEM; }
-	bool init();
-	Operator<PFP>* nextOperator();
-	bool updateBeforeOperation(Operator<PFP>* op);
-	void updateAfterOperation(Operator<PFP>* op);
-	void finish() { }
-};
+	void updateWithoutCollapse() { }
+} ;
+
+
+/*
+ * Progressive Tetrahedralizations [SG98]
+ * Oliver Staadt && Markus Gross
+ */
+template <typename PFP>
+class EdgeSelector_SG98 : public Selector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "SG98edgeInfo" ; }
+	} SG98edgeInfo ;
+	typedef NoMathIOAttribute<SG98edgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, typename PFP::VEC3>* m_positionApproximator ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d, bool recompute) ;
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
+
+public:
+	EdgeSelector_SG98(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		Selector<PFP>(m, pos, approx, select)
+	{}
+	~EdgeSelector_SG98()
+	{}
+	SelectorType getType() { return S_SG98 ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d);
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+} ;
 
 
 

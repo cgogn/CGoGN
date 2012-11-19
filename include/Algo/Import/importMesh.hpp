@@ -49,6 +49,8 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 
 	DartMarkerNoUnmark m(map) ;
 
+	FunctorInitEmb<typename PFP::MAP, VERTEX> fsetemb(map);
+
 	// for each face of table
 	for(unsigned int i = 0; i < nbf; ++i)
 	{
@@ -77,9 +79,7 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 			for (unsigned int j = 0; j < nbe; ++j)
 			{
 				unsigned int em = edgesBuffer[j];		// get embedding
-
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
-//				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+				fsetemb.changeEmb(em) ;
 				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
 
 				m.mark(d) ;								// mark on the fly to unmark on second loop

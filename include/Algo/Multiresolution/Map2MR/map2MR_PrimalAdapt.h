@@ -131,6 +131,11 @@ protected:
 	 */
 	void splitFace(Dart d, Dart e) ;
 
+	/**
+	 *
+	 */
+	void flipBackEdge(Dart d);
+
 	/***************************************************
 	 *               SUBDIVISION                       *
 	 ***************************************************/
@@ -150,6 +155,11 @@ public:
 	 * subdivide the face of d to the next level
 	 */
 	unsigned int subdivideFace(Dart d, bool triQuad = true, bool OneLevelDifference = true);
+
+	/**
+	 *
+	 */
+	unsigned int subdivideFaceSqrt3(Dart d);
 
 	/**
 	 * coarsen the face of d from the next level

@@ -88,6 +88,15 @@ AttributeHandler<PFP::VEC3> normal;
 class QuadMesh : public EmbeddedMap2
 {
 private:
+	// 3 brins de la carte
+	Dart d_carre;
+	Dart d_tri;
+	Dart d_multiFaces;
+
+	// Assigne un nouveau plongement au sommet. Les anciens plongements sont libérés.
+	void newVertex(Dart d) {
+		setOrbitEmbeddingOnNewCell(VERTEX,d);
+	}
 
 public:
 	void createMesh() {

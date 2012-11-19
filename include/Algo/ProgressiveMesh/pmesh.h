@@ -65,7 +65,7 @@ private:
 	std::vector<VSplit<PFP>*> m_splits ;
 	unsigned int m_cur ;
 
-	Algo::Decimation::HalfEdgeApproximator<PFP, VEC3, EDGE>* m_positionApproximator ;
+	Algo::Decimation::Approximator<PFP, VEC3, EDGE>* m_positionApproximator ;
 
 	bool m_initOk ;
 

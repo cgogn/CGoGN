@@ -25,10 +25,8 @@
 #ifndef __TRAVERSOR_DOO_H__
 #define __TRAVERSOR_DOO_H__
 
-#include "Topology/generic/traversorGen.h"
-
 #include "Topology/generic/dart.h"
-
+#include "Topology/generic/traversorGen.h"
 
 namespace CGoGN
 {
