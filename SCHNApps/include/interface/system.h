@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QSplashScreen>
 
-
 #include <unistd.h>
 #include <stdarg.h>
 #include <iostream>
@@ -13,7 +12,6 @@
 
 #include "ui_questionSessionDialog.h"
 #include "ui_infoDialog.h"
-
 
 class Window;
 class SplitArea;
@@ -53,8 +51,6 @@ namespace System{
 
 		static ERROR_CODE code;
 
-
-
 		static ERROR_CODE BAD_PLUGIN_PATH_IN_FILE_f(QString file);
 		static ERROR_CODE NO_PLUGIN_IN_DIR_f(QString dir);
 		static ERROR_CODE PLUGIN_EXISTS_f(QString plugin);
@@ -72,7 +68,6 @@ namespace System{
 		static ERROR_CODE TOPO3RENDER_NOT_FOUND_f(QString name, QString glv_name=QString());
 		static ERROR_CODE OPEN_FILE_ERROR_f(QString filepath);
 		static ERROR_CODE BAD_XML_FILE_f(QString filepath);
-
 
 		static void showError(QWidget* parent=0);
 	};
@@ -102,14 +97,11 @@ namespace System{
 		static bool savePluginsInfo(Window* window, PluginHash* pluginHash, QStringList paths);
 	};
 
-
-
 	typedef enum{GLVIEWER_IN_DOCK, SIMPLE_GLVIEWER} QGLV_CREATE_SETTINGS;
 
 	extern QString app_path;
 
 	extern QSplashScreen* splash;
-
 }
 
 #endif

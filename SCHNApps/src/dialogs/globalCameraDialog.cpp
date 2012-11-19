@@ -1,4 +1,4 @@
-#include "globalCameraDialog.h"
+#include "dialogs/globalCameraDialog.h"
 
 namespace Qt{
 	int UserRoleType= 33;
@@ -9,8 +9,8 @@ namespace Qt{
 #include <QMimeData>
 #include <QMessageBox>
 
-#include "scene.h"
-#include "window.h"
+#include "visualization/scene.h"
+#include "interface/window.h"
 
 Q_DECLARE_METATYPE(Camera*)
 Q_DECLARE_METATYPE(View*)
@@ -33,9 +33,6 @@ QDataStream &operator>>(QDataStream &in, CarryCamera &c){
 }
 
 
-
-
-
 MyCameraMenu::MyCameraMenu(const QString & title, QWidget * parent, int mode) :
 		QMenu(title, parent),
 		m_result(none)
@@ -54,16 +51,12 @@ MyCameraMenu::MyCameraMenu(const QString & title, QWidget * parent, int mode) :
 }
 
 
-
-
-
 MyDragListWidget::MyDragListWidget(QWidget* parent) : QListWidget(parent)
 {
 	setDragEnabled(true);
 
     qRegisterMetaTypeStreamOperators<QListWidgetItem>("CarryCamera");
 }
-
 
 
 QMimeData* MyDragListWidget::mimeData(const QList<QListWidgetItem *> items) const{
@@ -86,8 +79,6 @@ QMimeData* MyDragListWidget::mimeData(const QList<QListWidgetItem *> items) cons
 }
 
 
-
-
 MyDropTreeWidget::MyDropTreeWidget(QWidget* parent) : QTreeWidget(parent)
 {
 	setAcceptDrops(true);
@@ -101,42 +92,49 @@ MyDropTreeWidget::MyDropTreeWidget(QWidget* parent) : QTreeWidget(parent)
 }
 
 
-bool MyDropTreeWidget::dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data, Qt::DropAction action){
+bool MyDropTreeWidget::dropMimeData(QTreeWidgetItem *parent, int index, const QMimeData *data, Qt::DropAction action)
+{
 	CarryCamera cc;
 	View* origin_view;
 	Camera* c;
 
-	if(parent->data(0,Qt::UserRoleType).value<int>()==myDragDropWidgets::view){
+	if(parent->data(0,Qt::UserRoleType).value<int>()==myDragDropWidgets::view)
+	{
 		QByteArray ba= data->data("CarryCamera");
 		QDataStream st(&ba, QIODevice::ReadOnly);
-		while(!st.atEnd()){
+		while(!st.atEnd())
+		{
 			st >> cc;
 			c= cc.camera;
 			origin_view= cc.view;
 
-
-			if(c && origin_view){
+			if(c && origin_view)
+			{
 				Scene* origin_scene= origin_view->getScene();
 				View* dest_view= parent->data(0,Qt::UserRole).value<View*>();
 				Scene* dest_scene= dest_view->getScene();
 
-				if(origin_view==dest_view) return false;
+				if(origin_view==dest_view)
+					return false;
 
 				MyCameraMenu::ResultType result;
-				if(origin_scene==dest_scene){
+				if(origin_scene==dest_scene)
+				{
 					MyCameraMenu menu(QString::fromUtf8("Gestion caméra"), this, MyCameraMenu::moving);
 					menu.exec(QCursor::pos());
 					result= menu.result();
 				}
-				else{
-
+				else
+				{
 					MyCameraMenu menu(QString::fromUtf8("Gestion caméra"), this);
 					menu.exec(QCursor::pos());
 					result= menu.result();
 				}
-				switch (result) {
+				switch (result)
+				{
 					case MyCameraMenu::move:
-						if(origin_view->countCameras()<=1 && origin_scene->countViews()<=1){
+						if(origin_view->countCameras()<=1 && origin_scene->countViews()<=1)
+						{
 							QMessageBox err(this);
 							err.setText(QString::fromUtf8("Vous ne pouvez pas retirer toutes les caméras"
 									"de l'unique vue d'une scène."));
@@ -144,18 +142,23 @@ bool MyDropTreeWidget::dropMimeData(QTreeWidgetItem *parent, int index, const QM
 
 							return false;
 						}
-						else{
+						else
+						{
 							origin_view->takeCamera(c);
 							dest_view->insertCamera(index,c);
 						}
 
-						if(origin_view->countCameras()<=0){
+						if(origin_view->countCameras()<=0)
+						{
 							View* tmp_view;
 							QTreeWidgetItemIterator it(this);
-							while(*it){
-								if((*it)->data(0,Qt::UserRoleType).value<int>()==myDragDropWidgets::view){
+							while(*it)
+							{
+								if((*it)->data(0,Qt::UserRoleType).value<int>()==myDragDropWidgets::view)
+								{
 									tmp_view= (*it)->data(0,Qt::UserRole).value<View*>();
-									if(tmp_view==origin_view){
+									if(tmp_view==origin_view)
+									{
 										delete *it;
 										break;
 									}
@@ -179,30 +182,29 @@ bool MyDropTreeWidget::dropMimeData(QTreeWidgetItem *parent, int index, const QM
 
 				this->currentItemChanged(this->currentItem(),this->currentItem());
 			}
-
-
 		}
 
 		return true;
 	}
-	else{
+	else
+	{
 		return false;
 	}
 }
 
-QStringList MyDropTreeWidget::mimeTypes() const{
+QStringList MyDropTreeWidget::mimeTypes() const
+{
     QStringList qstrList;
     // list of accepted mime types for drop
     qstrList.append("CarryCamera");
     return qstrList;
 }
 
-Qt::DropActions MyDropTreeWidget::supportedDropActions () const{
+Qt::DropActions MyDropTreeWidget::supportedDropActions () const
+{
     // returns what actions are supported when dropping
     return (Qt::CopyAction | Qt::TargetMoveAction);
 }
-
-
 
 
 GlobalCameraDialog::GlobalCameraDialog(Window* window) : QDialog(window)
@@ -329,5 +331,3 @@ void GlobalCameraDialog::treeCurrentItemChanged(QTreeWidgetItem* cur, QTreeWidge
 		}
 	}
 }
-
-

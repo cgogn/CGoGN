@@ -1,20 +1,16 @@
 #ifndef _VIEW_H_
 #define _VIEW_H_
 
-
-#include "types.h"
-//#include <GL/glew.h>
-//#include <QGLViewer/qglviewer.h>
-# include <QKeyEvent>
-
 #include <iostream>
 
+#include "types.h"
+#include "interface/viewButtonArea.h"
+
+# include <QKeyEvent>
 #include <QList>
 #include <QWidget>
 
 #include "Utils/gl_matrices.h"
-
-#include "viewButtonArea.h"
 
 //forward declaration
 class Scene;

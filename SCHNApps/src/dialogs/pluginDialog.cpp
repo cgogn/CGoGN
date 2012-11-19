@@ -1,4 +1,4 @@
-#include "pluginDialog.h"
+#include "dialogs/pluginDialog.h"
 
 #include <libxml2/libxml/tree.h>
 #include <QFile>
@@ -9,8 +9,8 @@
 #include <QMessageBox>
 #include <QTextBrowser>
 
-#include "system.h"
-#include "plugin.h"
+#include "interface/system.h"
+#include "plugins/plugin.h"
 
 
 PluginDialog::PluginDialog(Window* parent, PluginHash* activePlugins) : QDialog(parent),
@@ -68,9 +68,11 @@ PluginDialog::PluginDialog(Window* parent, PluginHash* activePlugins) : QDialog(
 	init=false;
 }
 
-PluginDialog::~PluginDialog(){}
+PluginDialog::~PluginDialog()
+{}
 
-bool PluginDialog::loadInfoPlugins(){
+bool PluginDialog::loadInfoPlugins()
+{
 	QFile xmlFile(System::app_path.toStdString().c_str() +
 				QString("/state_save.xml"));
 
@@ -80,29 +82,34 @@ bool PluginDialog::loadInfoPlugins(){
 		return false;
 	}
 
-	if(!xmlFile.open(QIODevice::ReadOnly)){
+	if(!xmlFile.open(QIODevice::ReadOnly))
+	{
 		System::Error::code= System::Error::ERROR_OPEN_PLUGIN_FILE;
 		return false;
 	}
+	
 	QDomDocument doc;
-	if(!doc.setContent(&xmlFile)){
+	if(!doc.setContent(&xmlFile))
+	{
 		System::Error::code= System::Error::BAD_PLUGIN_PATH_FILE;
 		xmlFile.close();
 		return false;
 	}
 	xmlFile.close();
 
-
-
 	QDomElement root= doc.documentElement();
 	QDomElement plugins_node= root.firstChildElement("PLUGINS");
-	if(!plugins_node.isNull()){
+	if(!plugins_node.isNull())
+	{
 		QDomElement plugins_subNode= plugins_node.firstChildElement();
-		while(!plugins_subNode.isNull()){
-			if(plugins_subNode.tagName()=="DIR"){
+		while(!plugins_subNode.isNull())
+		{
+			if(plugins_subNode.tagName()=="DIR")
+			{
 				QString pluginDirPath= plugins_subNode.attribute("path","./plugins");
 				QFileInfo fi(pluginDirPath);
-				if(fi.exists() && fi.isDir()){
+				if(fi.exists() && fi.isDir())
+				{
 					QDir pluginDir(pluginDirPath);
 
 					QTreeWidgetItem* dirItem= new QTreeWidgetItem(treeWidget, DIR);
@@ -110,37 +117,45 @@ bool PluginDialog::loadInfoPlugins(){
 
 					QStringList	filters, dirFiles;
 					filters << "lib*.so";
+					filters << "lib*.dylib";
 
 					dirFiles= pluginDir.entryList(filters,QDir::Files);
-					foreach(QString fileName, dirFiles){
-						QString pluginName= fileName;
-						pluginName.remove(0,3);
-						pluginName.remove(pluginName.lastIndexOf(".so"),3);
+					foreach(QString fileName, dirFiles)
+					{
+						QFileInfo pfi(fileName);
+						QString pluginName= pfi.baseName().remove(0,3);
 
 						QTreeWidgetItem* item= new QTreeWidgetItem(dirItem, FILE_DIR);
 						item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-						if(activePlugins->find(pluginName)!=activePlugins->end()){
+						if(activePlugins->find(pluginName)!=activePlugins->end())
+						{
 							item->setCheckState(0,Qt::Checked);
 						}
-						else{
+						else
+						{
 							item->setCheckState(0,Qt::Unchecked);
 						}
 						item->setText(1,pluginDir.absoluteFilePath(fileName));
 					}
 				}
 			}
-			else if(plugins_subNode.tagName()=="FILE"){
+			else if(plugins_subNode.tagName()=="FILE")
+			{
 				QString pluginPath= plugins_subNode.attribute("path");
-				if(!pluginPath.isEmpty()){
+				if(!pluginPath.isEmpty())
+				{
 					QFileInfo fi(pluginPath);
-					if(fi.exists() && pluginPath.left(3)=="lib" && fi.suffix()=="so"){
+					if(fi.exists() && pluginPath.left(3)=="lib" && (fi.suffix()=="so" || fi.suffix()=="dylib"))
+					{
 						QString pluginName= fi.baseName().remove(0,3);
 						QTreeWidgetItem* item= new QTreeWidgetItem(treeWidget, FILE);
 						item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-						if(activePlugins->find(pluginName)!=activePlugins->end()){
+						if(activePlugins->find(pluginName)!=activePlugins->end())
+						{
 							item->setCheckState(0,Qt::Checked);
 						}
-						else{
+						else
+						{
 							item->setCheckState(0,Qt::Unchecked);
 						}
 						item->setText(1,pluginPath);
@@ -211,8 +226,10 @@ bool PluginDialog::loadInfoPlugins(){
 //
 //}
 
-void PluginDialog::showPluginsDir(QDir directory){
-	if(!directory.exists()){
+void PluginDialog::showPluginsDir(QDir directory)
+{
+	if(!directory.exists())
+	{
 		System::Error::code= System::Error::BAD_PLUGIN_PATH_IN_FILE_f(directory.absolutePath());
 	}
 
@@ -221,27 +238,30 @@ void PluginDialog::showPluginsDir(QDir directory){
 
 	QStringList	filters, dirFiles;
 	filters << "lib*.so";
+	filters << "lib*.dylib";
 
 	dirFiles= directory.entryList(filters, QDir::Files);
 
-	foreach(QString file, dirFiles){
-		QString pluginName= file;
-		pluginName.remove(0,3);
-		pluginName.remove(pluginName.lastIndexOf(".so"),3);
+	foreach(QString file, dirFiles)
+	{
+		QFileInfo pfi(file);
+		QString pluginName= pfi.baseName().remove(0,3);
 
 		QTreeWidgetItem* item= new QTreeWidgetItem(dirItem, FILE_DIR);
 		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-		if(activePlugins->find(pluginName)!=activePlugins->end()){
+		if(activePlugins->find(pluginName)!=activePlugins->end())
+		{
 			item->setCheckState(0,Qt::Checked);
 		}
-		else{
+		else
+		{
 			item->setCheckState(0,Qt::Unchecked);
 		}
 		item->setText(1,directory.absoluteFilePath(file));
-
 	}
 
-	if(dirFiles.isEmpty()){
+	if(dirFiles.isEmpty())
+	{
 		System::Error::code= System::Error::NO_PLUGIN_IN_DIR_f(directory.absolutePath());
 	}
 }
@@ -252,7 +272,7 @@ void PluginDialog::cb_addPlugins(){
 							 this,
 							 "Select one or more plugin to open",
 							 "/home",
-							 "Plugins (lib*.so)");
+							 "Plugins (lib*.so, lib*.dylib)");
 	if(!files.empty()){
 //		QDomElement root= doc.documentElement();
 //		QDomNode node= root.firstChild();
@@ -430,9 +450,12 @@ void PluginDialog::cb_removePlugins(){
 	}
 }
 
-void PluginDialog::cb_activePlugin(QTreeWidgetItem* item, int column){
-	if(!init && column==0){
-		if(item->checkState(0)==Qt::Checked){
+void PluginDialog::cb_activePlugin(QTreeWidgetItem* item, int column)
+{
+	if(!init && column==0)
+	{
+		if(item->checkState(0)==Qt::Checked)
+		{
 //			QDomElement root= doc.documentElement();
 //			QDomNode node= root.firstChild();
 //			QDomElement balise;
@@ -453,10 +476,7 @@ void PluginDialog::cb_activePlugin(QTreeWidgetItem* item, int column){
 
 			QString pluginFile= item->text(1);
 			QFileInfo pluginInfo(pluginFile);
-			QString pluginName= pluginInfo.fileName();
-
-			pluginName.remove(0,3);
-			pluginName.remove(pluginName.lastIndexOf(".so"),3);
+			QString pluginName= pluginInfo.baseName().remove(0,3);
 
 			if(activePlugins->find(pluginName)!= activePlugins->end()){
 				System::Error::code= System::Error::PLUGIN_EXISTS_f(pluginName);
@@ -495,12 +515,8 @@ void PluginDialog::cb_activePlugin(QTreeWidgetItem* item, int column){
 //			}
 
 			QString pluginFile= item->text(1);
-			QString pluginName= QFileInfo(pluginFile).fileName();
-
-			pluginName.remove(0,3);
-			pluginName.remove(pluginName.lastIndexOf(".so"),3);
-
-
+			QFileInfo pluginInfo(pluginFile);
+			QString pluginName= pluginInfo.baseName().remove(0,3);
 
 			PluginHash::iterator it= activePlugins->find(pluginName);
 			bool pluginHasDependencies= (it!=activePlugins->end())?(*it)->hasDependantPlugins():false;
@@ -538,9 +554,9 @@ void PluginDialog::cb_activePlugin(QTreeWidgetItem* item, int column){
 				QTreeWidgetItemIterator tree_it(treeWidget, QTreeWidgetItemIterator::Checked);
 				while(*tree_it){
 					QString depPlugPath=(*tree_it)->text(1);
-					QString depPlugName= QFileInfo(depPlugPath).fileName();
-					depPlugName.remove(0,3);
-					depPlugName.remove(depPlugName.lastIndexOf(".so"),3);
+
+					QFileInfo depPlugInfo(depPlugPath);
+					QString depPlugName= depPlugInfo.baseName().remove(0,3);
 
 					if(depList.contains(depPlugName)){
 						init=true;

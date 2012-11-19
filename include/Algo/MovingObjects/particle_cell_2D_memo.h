@@ -1,6 +1,6 @@
 #ifndef PARTCELL2DMEMO_H
 #define PARTCELL2DMEMO_H
-
+//#define DEBUG
 #include "particle_cell_2D.h"
 
 #include "Algo/Geometry/inclusion.h"
@@ -29,34 +29,27 @@ public:
 	typedef typename PFP::VEC3 VEC3;
 	typedef VertexAttribute<typename PFP::VEC3> TAB_POS ;
 
-	std::list<Dart> memo_cross ;
-	bool detect_vertex ;
-	bool detect_edge ;
-	bool detect_face ;
 
 private:
-	ParticleCell2DMemo() :
-		detect_vertex(false), detect_edge(false), detect_face(true)
-	{
+	ParticleCell2DMemo(){
 	}
 
 public:
 
 	ParticleCell2DMemo(MAP& map, Dart belonging_cell, VEC3 pos, const TAB_POS& tabPos) :
-		ParticleCell2D<PFP>(map, belonging_cell, pos, tabPos),
-		detect_vertex(false),
-		detect_edge(false),
-		detect_face(true)
+	ParticleCell2D<PFP>(map, belonging_cell, pos, tabPos)
 	{
+
 	}
 
-	void vertexState(const VEC3& current) ;
+	void vertexState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross) ;
 
-	void edgeState(const VEC3& current, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
+	void edgeState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross, Geom::Orientation2D sideOfEdge = Geom::ALIGNED) ;
 
-	void faceState(const VEC3& current) ;
+	void faceState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross) ;
 
-	void move(const VEC3& goal) ;
+	void move(const VEC3& goal, CellMarkerMemo<FACE> * memo_cross) ;
+	std::vector<Dart> get_memo(const VEC3& goal);
 } ;
 
 #include "particle_cell_2D_memo.hpp"

@@ -1,7 +1,7 @@
-#include "simplePlugin.h"
+#include "plugins/simplePlugin.h"
+#include "Utils/GLSLShader.h"
 
 #include <set>
-#include <Utils/GLSLShader.h>
 
 SimplePlugin::SimplePlugin()
 {
@@ -31,9 +31,6 @@ bool SimplePlugin::activate(bool initializing){
 	this->m_windowInitializing= false;
 	return r;
 }
-
-
-
 
 void SimplePlugin::addDependantPlugin(Plugin* dependant){
 	this->l_dependantPlugins.push_back(dependant);
@@ -144,7 +141,6 @@ void SimplePlugin::suppressAllDependantLinks(){
 		plugin->suppressDependencieLink(this);
 	}
 }
-
 
 QAction* SimplePlugin::addMenuAction(QString menuPath, const char* method){
 	QAction* action= new QAction(m_window);

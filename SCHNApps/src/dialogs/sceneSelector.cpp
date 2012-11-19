@@ -8,8 +8,8 @@
  */
 
 
-#include "sceneSelector.h"
-#include "splitArea.h"
+#include "dialogs/sceneSelector.h"
+#include "interface/splitArea.h"
 
 #include <QPainter>
 #include <QMouseEvent>

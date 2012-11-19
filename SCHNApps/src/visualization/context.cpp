@@ -1,14 +1,9 @@
-#include "context.h"
+#include "visualization/context.h"
 
+Context::Context(QWidget* w, const QGLFormat & format) : QGLContext(format, w)
+{}
 
-
-
-
-Context::Context(QWidget* w, const QGLFormat & format) : QGLContext(format, w){}
-
-
-
-void Context::setDevice(QWidget* w){
+void Context::setDevice(QWidget* w)
+{
 	QGLContext::setDevice(w);
 }
-

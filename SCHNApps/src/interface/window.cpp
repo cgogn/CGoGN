@@ -1,4 +1,4 @@
-#include "window.h"
+#include "interface/window.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -6,17 +6,17 @@
 #include <QPluginLoader>
 #include <QFileInfo>
 
-#include "scene.h"
-#include "sceneSelector.h"
-#include "view.h"
-#include "newSceneDialog.h"
-#include "globalCameraDialog.h"
-#include "plugin.h"
-#include "pluginDialog.h"
-#include "linkViewDialog.h"
-#include "context.h"
-#include "mapPluginDialog.h"
-#include "mapHandler.h"
+#include "plugins/plugin.h"
+#include "visualization/scene.h"
+#include "visualization/view.h"
+#include "visualization/context.h"
+#include "visualization/mapHandler.h"
+#include "dialogs/sceneSelector.h"
+#include "dialogs/newSceneDialog.h"
+#include "dialogs/globalCameraDialog.h"
+#include "dialogs/pluginDialog.h"
+#include "dialogs/linkViewDialog.h"
+#include "dialogs/mapPluginDialog.h"
 
 
 Window::Window(QWidget* parent): QMainWindow(parent),

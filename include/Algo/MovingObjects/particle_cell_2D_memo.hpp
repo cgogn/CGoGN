@@ -1,5 +1,5 @@
 template <typename PFP>
-void ParticleCell2DMemo<PFP>::move(const VEC3& goal)
+void ParticleCell2DMemo<PFP>::move(const VEC3& goal, CellMarkerMemo<FACE> * memo_cross)
 {
 	this->crossCell = NO_CROSS ;
 	if (!Geom::arePointsEquals(goal, this->getPosition()))
@@ -7,13 +7,13 @@ void ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 		switch (this->getState())
 		{
 			case VERTEX :
-				vertexState(goal) ;
+				vertexState(goal,memo_cross) ;
 				break ;
 			case EDGE :
-				edgeState(goal) ;
+				edgeState(goal,memo_cross) ;
 				break ;
 			case FACE :
-				faceState(goal) ;
+				faceState(goal,memo_cross) ;
 				break ;
 		}
 	}
@@ -22,13 +22,22 @@ void ParticleCell2DMemo<PFP>::move(const VEC3& goal)
 }
 
 template <typename PFP>
-void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
+std::vector<Dart> ParticleCell2DMemo<PFP>::get_memo(const VEC3& goal)
+{
+	CellMarkerMemo<FACE> memo_cross(this->m);
+	memo_cross.mark(this->d);
+	this->move(goal,&memo_cross);
+	return memo_cross.get_markedCells();
+}
+
+template <typename PFP>
+void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross)
 {
 #ifdef DEBUG
-	CGoGNout << "vertexState" << d << CGoGNendl ;
+	CGoGNout << "vertexState" << this->d << CGoGNendl ;
 #endif
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
-
+	(*memo_cross).mark(this->d);
 	this->crossCell = CROSS_OTHER ;
 
 	if (Algo::Geometry::isPointOnVertex < PFP > (this->m, this->d, this->positionAttribut, current))
@@ -67,9 +76,12 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 					do
 					{
 						if(Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->d,this->positionAttribut,current)
-								&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current))
+								&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m,this->m.phi2(this->d),this->positionAttribut,current)
+								&& this->getOrientationEdge(current, this->d) == Geom::ALIGNED)
 						{
-							this->edgeState(current) ;
+
+							this->edgeState(current,memo_cross) ;
+
 							return;
 						}
 						this->d = this->m.phi2_1(this->d) ;
@@ -94,31 +106,28 @@ void ParticleCell2DMemo<PFP>::vertexState(const VEC3& current)
 		}
 
 		//displacement step
-		if (detect_vertex)
-			memo_cross.push_back(this->d) ;
+
 		if (this->getOrientationEdge(current, this->d) == Geom::ALIGNED
 				&& Algo::Geometry::isPointOnHalfEdge<PFP>(this->m, this->d, this->positionAttribut, current))
-			edgeState(current) ;
+			edgeState(current,memo_cross) ;
 		else
 		{
 			this->d = this->m.phi1(this->d) ;
-			faceState(current) ;
+			faceState(current,memo_cross) ;
 		}
 	}
 }
 
 template <typename PFP>
-void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D sideOfEdge)
+void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, CellMarkerMemo<FACE>* memo_cross, Geom::Orientation2D sideOfEdge)
 {
 #ifdef DEBUG
-	CGoGNout << "edgeState" << d << CGoGNendl ;
+	CGoGNout << "edgeState" << this->d << CGoGNendl ;
 #endif
-	if (detect_edge)
-		memo_cross.push_back(this->d) ;
 
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
 // 	assert(Algo::Geometry::isPointOnEdge<PFP>(m,d,m_positions,m_position));
-
+	(*memo_cross).mark(this->d);
 	if (this->crossCell == NO_CROSS)
 	{
 		this->crossCell = CROSS_EDGE ;
@@ -133,11 +142,11 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 	{
 		case Geom::LEFT :
 			this->d = this->m.phi1(this->d) ;
-			faceState(current) ;
+			faceState(current,memo_cross) ;
 			return ;
 		case Geom::RIGHT :
 			this->d = this->m.phi1(this->m.phi2(this->d)) ;
-			faceState(current) ;
+			faceState(current,memo_cross) ;
 			return ;
 		default :
 			this->setState(EDGE) ;
@@ -148,7 +157,7 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 	    > (this->m, this->d, this->positionAttribut, current))
 	{
 		this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
-		vertexState(current) ;
+		vertexState(current,memo_cross) ;
 		return ;
 	}
 	else if (!Algo::Geometry::isPointOnHalfEdge < PFP
@@ -156,7 +165,7 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 	{
 		this->d = this->m.phi2(this->d) ;
 		this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
-		vertexState(current) ;
+		vertexState(current,memo_cross) ;
 		return ;
 	}
 
@@ -164,18 +173,18 @@ void ParticleCell2DMemo<PFP>::edgeState(const VEC3& current, Geom::Orientation2D
 }
 
 template <typename PFP>
-void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
+void ParticleCell2DMemo<PFP>::faceState(const VEC3& current, CellMarkerMemo<FACE> * memo_cross)
 {
 #ifdef DEBUG
-	CGoGNout << "faceState" << d << CGoGNendl ;
+	CGoGNout << "faceState" << this->d << CGoGNendl ;
 #endif
-	if (detect_face) memo_cross.push_back(this->d) ;
+
 	assert(
 	    std::isfinite(this->getPosition()[0]) && std::isfinite(this->getPosition()[1])
 	        && std::isfinite(this->getPosition()[2])) ;
 	assert(std::isfinite(current[0]) && std::isfinite(current[1]) && std::isfinite(current[2])) ;
 // 	assert(Algo::Geometry::isPointInConvexFace2D<PFP>(m,d,m_positions,m_position,true));
-
+	(*memo_cross).mark(this->d);
 	Dart dd = this->d ;
 	float wsoe = this->getOrientationFace(current, this->m.phi1(this->d)) ;
 
@@ -202,16 +211,16 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 						break ;
 					case Geom::ALIGNED :
 						this->ParticleBase<PFP>::move(current) ;
-						edgeState(current) ;
+						edgeState(current,memo_cross) ;
 						return ;
 					case Geom::RIGHT :
 //									CGoGNout << "smthg went bad " << m_position << " " << current << CGoGNendl;
 //									CGoGNout << "d1 " << m_positions[d] << " d2 " << m_positions[m.phi1(d)] << CGoGNendl;
-						this->ParticleBase<PFP>::move(this->intersectLineEdge(current, this->getPosition(), this->d)) ;
+					this->ParticleBase<PFP>::move(this->intersectLineEdge(current, this->getPosition(), this->d)) ;
 //									CGoGNout << " " << m_position << CGoGNendl;
 
-						edgeState(current, Geom::RIGHT) ;
-						return ;
+					edgeState(current,memo_cross, Geom::RIGHT) ;
+					return ;
 				}
 			} while (this->d != dd) ;
 			this->ParticleBase<PFP>::move(current);
@@ -252,13 +261,13 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 					case Geom::ALIGNED :
 // 					CGoGNout << "pic" << CGoGNendl;
 						this->ParticleBase<PFP>::move(current) ;
-						edgeState(current) ;
+						edgeState(current,memo_cross) ;
 						return ;
 					case Geom::RIGHT :
 //					CGoGNout << "smthg went bad(2) " << m_position << CGoGNendl;
 						this->ParticleBase<PFP>::move(this->intersectLineEdge(current, this->getPosition(), this->d)) ;
 // 					CGoGNout << " " << m_position << CGoGNendl;
-						edgeState(current, Geom::RIGHT) ;
+						edgeState(current,memo_cross ,Geom::RIGHT) ;
 						return ;
 				}
 			} while (this->d != dd) ;
@@ -294,12 +303,12 @@ void ParticleCell2DMemo<PFP>::faceState(const VEC3& current)
 
 				this->d = this->m.phi1(this->d) ; //to check
 				this->ParticleBase<PFP>::move(this->positionAttribut[this->d]) ;
-				vertexState(current) ;
+				vertexState(current,memo_cross) ;
 			}
 			else
 			{
 				this->ParticleBase<PFP>::move(this->intersectLineEdge(current, this->getPosition(), this->d)) ;
-				edgeState(current, Geom::RIGHT) ;
+				edgeState(current,memo_cross, Geom::RIGHT) ;
 			}
 	}
 

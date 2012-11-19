@@ -1,12 +1,12 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include "view.h"
+#include "visualization/view.h"
 
 //forward declaration
 
-
-class Camera : public qglviewer::Camera{
+class Camera : public qglviewer::Camera
+{
 public:
 	Camera(View* v);
 	Camera(View* v, Camera c);
@@ -61,6 +61,5 @@ protected:
 
 	int m_snapCount;
 };
-
 
 #endif

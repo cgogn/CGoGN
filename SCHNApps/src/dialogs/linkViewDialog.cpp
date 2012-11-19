@@ -1,15 +1,15 @@
-#include "linkViewDialog.h"
-
+#include "dialogs/linkViewDialog.h"
 
 #include <QVariant>
 #include <QMessageBox>
 #include <QPushButton>
 
-#include <plugin.h>
+#include <plugins/plugin.h>
 
 Q_DECLARE_METATYPE(Plugin*);
 
-LinkViewDialog::LinkViewDialog(Window* parent, PluginHash* activePlugins, Scene* scene) : QDialog(parent),
+LinkViewDialog::LinkViewDialog(Window* parent, PluginHash* activePlugins, Scene* scene) :
+	QDialog(parent),
 	m_scene(scene),
 	m_mode(LINK)
 {
@@ -19,8 +19,6 @@ LinkViewDialog::LinkViewDialog(Window* parent, PluginHash* activePlugins, Scene*
 
 	if(scene)
 		groupBox->setTitle(QString::fromUtf8("Lier la vue ")+scene->getName());
-
-
 
 	if(!activePlugins || activePlugins->isEmpty()){
 		listWidget->setEnabled(false);
@@ -60,10 +58,10 @@ LinkViewDialog::LinkViewDialog(Window* parent, PluginHash* activePlugins, Scene*
 
 }
 
-
-LinkViewDialog::LinkViewDialog(Window* parent, QList<Plugin*> dependingPlugin, Scene* scene) : QDialog(parent),
-		m_scene(scene),
-		m_mode(UNLINK)
+LinkViewDialog::LinkViewDialog(Window* parent, QList<Plugin*> dependingPlugin, Scene* scene) :
+	QDialog(parent),
+	m_scene(scene),
+	m_mode(UNLINK)
 {
 	std::cout << "UNLINK MODE" << std::endl;
 	this->setupUi(this);
@@ -108,7 +106,8 @@ LinkViewDialog::LinkViewDialog(Window* parent, QList<Plugin*> dependingPlugin, S
 
 }
 
-void LinkViewDialog::button_OK(){
+void LinkViewDialog::button_OK()
+{
 	if(m_mode==LINK){
 		Window* parent=((Window*)this->parent());
 		QListWidgetItem* cur_item= listWidget->currentItem();
@@ -175,7 +174,8 @@ void LinkViewDialog::button_OK(){
 	}
 }
 
-void LinkViewDialog::customContextMenu(const QPoint & pos){
+void LinkViewDialog::customContextMenu(const QPoint & pos)
+{
 	QPoint globalPos= listWidget->mapToGlobal(pos);
 
 	QListWidgetItem* item= listWidget->itemAt(pos);
@@ -192,7 +192,8 @@ void LinkViewDialog::customContextMenu(const QPoint & pos){
 	}
 }
 
-void LinkViewDialog::showPluginInfo(){
+void LinkViewDialog::showPluginInfo()
+{
 	QListWidgetItem* item= listWidget->currentItem();
 	if(item){
 		Plugin* plugin= item->data(Qt::UserRole).value<Plugin*>();

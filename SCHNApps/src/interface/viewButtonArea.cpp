@@ -1,12 +1,10 @@
-#include "viewButtonArea.h"
+#include "interface/viewButtonArea.h"
 
-
-#include "camera.h"
-#include "scene.h"
-#include "context.h"
+#include "visualization/camera.h"
+#include "visualization/scene.h"
+#include "visualization/context.h"
 
 #include <iostream>
-
 
 ViewButton::ViewButton(QString image, View* view)
 {
@@ -34,9 +32,6 @@ void ViewButton::drawAt(int x, int y){
 		glVertex2i(x+m_size.width(),y);
 	glEnd();
 }
-
-
-
 
 
 ViewButtonArea::~ViewButtonArea(){}
