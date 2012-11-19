@@ -22,9 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderScalarField.h"
-
 
 namespace CGoGN
 {

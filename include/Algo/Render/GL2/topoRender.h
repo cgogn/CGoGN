@@ -25,8 +25,6 @@
 #ifndef _GL2_TOPO_RENDER_
 #define _GL2_TOPO_RENDER_
 
-#include <GL/glew.h>
-
 #include <vector>
 #include <list>
 

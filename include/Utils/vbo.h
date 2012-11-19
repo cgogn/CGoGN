@@ -27,7 +27,6 @@
 
 
 #include <vector>
-#include <GL/glew.h>
 #include "Utils/gl_def.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Container/convert.h"

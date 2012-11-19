@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderEnvMap.h"
 #include <string.h>
 
