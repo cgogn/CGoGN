@@ -33,16 +33,16 @@
 namespace CGoGN
 {
 
-std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL ;
+std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
 
 GenericMap::GenericMap() : m_nbThreads(1)
 {
 	if(m_attributes_registry_map == NULL)
-		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*> ;
-
+		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*>;
 
 	m_nbInstances++;
+	
 	// register all known types
 	registerAttribute<Dart>("Dart");
 	registerAttribute<Mark>("Mark");
