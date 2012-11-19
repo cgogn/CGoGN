@@ -94,7 +94,7 @@ PointSprite::PointSprite(bool withColorPervertex, float radius,  bool with_plane
 	if (with_plane)
 	{
 		*m_uniform_EyePos = glGetUniformLocation(program_handler(),"eyePos");
-		*m_uniform_EyeY = glGetUniformLocation(program_handler(),"eyeY");
+//		*m_uniform_EyeY = glGetUniformLocation(program_handler(),"eyeY");
 	}
 
 	*m_uniform_ambiant = glGetUniformLocation(program_handler(),"ambiant");
@@ -156,11 +156,11 @@ void PointSprite::setSize(float radius)
 	unbind();
 }
 
-void PointSprite::setEyePosition(const Geom::Vec3f& ox, const Geom::Vec3f& oy)
+void PointSprite::setEyePosition(const Geom::Vec3f& ep)
 {
 	bind();
-	glUniform3fv(*m_uniform_EyePos, 1, ox.data());
-	glUniform3fv(*m_uniform_EyeY, 1, oy.data());
+	glUniform3fv(*m_uniform_EyePos, 1, ep.data());
+//	glUniform3fv(*m_uniform_EyeY, 1, oy.data());
 	unbind();
 }
 
