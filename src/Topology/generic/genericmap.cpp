@@ -40,8 +40,6 @@ GenericMap::GenericMap() : m_nbThreads(1)
 {
 	if(m_attributes_registry_map == NULL)
 	{
-		std::cout << "INITIALIZE REGISTRY MAP" << std::endl;
-
 		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*>;
 
 		// register all known types

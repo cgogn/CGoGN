@@ -538,12 +538,16 @@ void GenericMap::addEmbedding()
 	m_embeddings[ORBIT] = amv ;
 
 	FunctorInitEmb<GenericMap, ORBIT> fsetemb(*this);
-	TraversorCell<GenericMap, ORBIT> t(*this, allDarts, true) ;
-	for(Dart d = t.begin(); d != t.end(); d = t.next())
+	DartMarker dm(*this);
+	for(Dart d = this->begin(); d != this->end(); this->next(d))
 	{
-		unsigned int em = newCell<ORBIT>();
-		fsetemb.changeEmb(em);
-		foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+		if(!dm.isMarked(d))
+		{
+			dm.markOrbit<ORBIT>(d);
+			unsigned int em = newCell<ORBIT>();
+			fsetemb.changeEmb(em);
+			foreach_dart_of_orbit<ORBIT>(d, fsetemb);
+		}
 	}
 }
 
