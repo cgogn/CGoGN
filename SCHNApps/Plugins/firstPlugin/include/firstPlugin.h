@@ -1,20 +1,11 @@
-#ifndef FIRSTPLUGIN_H_
-#define FIRSTPLUGIN_H_
+#ifndef _FIRSTPLUGIN_H_
+#define _FIRSTPLUGIN_H_
 
 #include "plugins/visualPlugin.h"
 
 /**---CGoGN includes **/
-#include "Utils/Qt/qtSimple.h"
-#include "Utils/cgognStream.h"
-
 #include "Topology/generic/parameters.h"
-
-#ifdef USE_GMAP
-	#include "Topology/gmap/embeddedGMap2.h"
-#else
-	#include "Topology/map/embeddedMap2.h"
-#endif
-
+#include "Topology/map/embeddedMap2.h"
 #include "Algo/Render/GL2/topoRender.h"
 /**---CGoGN includes **/
 
@@ -27,17 +18,13 @@ using namespace CGoGN ;
  */
 struct PFP: public PFP_STANDARD
 {
-	// definition of the type of the map
-#ifdef USE_GMAP
-	typedef EmbeddedGMap2 MAP;
-#else
+	// definition of the map
 	typedef EmbeddedMap2 MAP;
-#endif
 };
 
 typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
-/**---Definitions  specific to CGoGN ---*/
+/**---Definitions specific to CGoGN ---*/
 
 /**
  * This class is a basic minimal plugin.
@@ -71,7 +58,7 @@ public:
 	 * When a scene will be link to this plugin, it will call
 	 * back this method with itself as a parameter.
 	 */
-	void cb_initGL(Scene* scene);
+	void cb_initGL(Scene *scene);
 
 	/**
 	 * The drawing method that needs to be overloaded.
@@ -79,7 +66,7 @@ public:
 	 * views that is contains) needs to be refresh, it calls back
 	 * this method with itself as a parameter
 	 */
-	void cb_redraw(Scene* scene);
+	void cb_redraw(Scene *scene);
 
 	/**
 	 * The plugin's activation method
@@ -106,15 +93,27 @@ protected:
 	VertexAttribute<VEC3> position;
 
 	// render (for the topo)
-	Algo::Render::GL2::TopoRender* m_render_topo;
+	Algo::Render::GL2::TopoRender *m_render_topo;
 
 	// just for more compact writing
-	inline Dart PHI1(Dart d) { return myMap.phi1(d); }
-	inline Dart PHI_1(Dart d) { return myMap.phi_1(d); }
-	inline Dart PHI2(Dart d) { return myMap.phi2(d); }
+	inline Dart PHI1(Dart d)
+	{
+		return myMap.phi1(d);
+	}
+	inline Dart PHI_1(Dart d)
+	{
+		return myMap.phi_1(d);
+	}
+	inline Dart PHI2(Dart d)
+	{
+		return myMap.phi2(d);
+	}
 	template<int X>
-	Dart PHI(Dart d) { return myMap.phi<X>(d); }
+	Dart PHI(Dart d)
+	{
+		return myMap.phi<X>(d);
+	}
 	/** Attributes that are specific to this plugin **/
 };
 
-#endif /* FIRSTPLUGIN_H_ */
+#endif // _FIRSTPLUGIN_H_

@@ -83,7 +83,6 @@ protected:
 	AttributeContainer m_attribs[NB_ORBITS] ;
 
 	static std::map<std::string, RegisteredBaseAttribute*>* m_attributes_registry_map ;
-
 	static int m_nbInstances;
 
 	/**
