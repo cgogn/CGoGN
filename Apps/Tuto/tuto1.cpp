@@ -46,16 +46,16 @@ int main(int argc, char **argv)
 
 void MyQT::createMap()
 {
+	// creation of a new attribute on vertices of type 3D vector for position.
+	// a handler to this attribute is returned
+	position = myMap.addAttribute<VEC3, VERTEX>("position");
+
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);
 	Dart d2 = myMap.newFace(4);
 
 	// sew these faces along one of their edge
 	myMap.sewFaces(d1, d2);
-
-	// creation of a new attribute on vertices of type 3D vector for position.
-	// a handler to this attribute is returned
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
 
 	// affect position by moving in the map
 	position[d1] = VEC3(0, 0, 0);

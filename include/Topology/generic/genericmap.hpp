@@ -561,8 +561,11 @@ inline Dart GenericMap::begin() const
 	if (m_isMultiRes)
 	{
 		unsigned int d = m_mrattribs.begin() ;
-		while (getDartLevel(d) > m_mrCurrentLevel)
-			m_mrattribs.next(d) ;
+		if(d != m_mrattribs.end())
+		{
+			while (getDartLevel(d) > m_mrCurrentLevel)
+				m_mrattribs.next(d) ;
+		}
 		return Dart::create(d) ;
 	}
 
