@@ -25,7 +25,6 @@
 #ifndef _COLOR_PER_FACE_RENDER
 #define _COLOR_PER_FACE_RENDER
 
-#include <GL/glew.h>
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"

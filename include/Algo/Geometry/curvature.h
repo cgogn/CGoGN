@@ -31,6 +31,9 @@
 #include "OpenNL/sparse_matrix.h"
 #include "OpenNL/full_vector.h"
 
+#include <Eigen/Core>
+#include <Eigen/Eigenvalues>
+
 namespace CGoGN
 {
 

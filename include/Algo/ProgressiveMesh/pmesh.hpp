@@ -108,7 +108,7 @@ ProgressiveMesh<PFP>::ProgressiveMesh(
 		if(! (*it)->init())
 			m_initOk = false ;
 		if((*it)->getApproximatedAttributeName() == "position")
-			m_positionApproximator = reinterpret_cast<Algo::Decimation::Approximator<PFP, VEC3>*>(*it) ;
+			m_positionApproximator = reinterpret_cast<Algo::Decimation::Approximator<PFP, VEC3, EDGE>*>(*it) ;
 	}
 	CGoGNout << "..done" << CGoGNendl ;
 

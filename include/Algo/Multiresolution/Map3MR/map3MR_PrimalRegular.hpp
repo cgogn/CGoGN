@@ -45,6 +45,19 @@ Map3MR<PFP>::Map3MR(typename PFP::MAP& map) :
 
 }
 
+template <typename PFP>
+Map3MR<PFP>::~Map3MR()
+{
+	unsigned int level = m_map.getCurrentLevel();
+	unsigned int maxL = m_map.getMaxLevel();
+
+	for(unsigned int i = maxL ; i > level ; --i)
+		m_map.removeLevelBack();
+
+	for(unsigned int i = 0 ; i < level ; ++i)
+		m_map.removeLevelFront();
+}
+
 
 /************************************************************************
  *					Topological helping functions						*
@@ -120,60 +133,75 @@ void Map3MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
-	unsigned int cur = m_map.getCurrentLevel();
+	DartMarkerStore m(m_map);
 
 	//
-	TraversorW<typename PFP::MAP> travW(m_map);
-	for(Dart dit = travW.begin() ; dit != travW.end() ; dit = travW.next())
+	// 1-4 flip of all tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tW(m_map);
+	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
 	{
-		m_map.setCurrentLevel(cur+1);
-
-		//store the new faces to 3-sew
-		std::vector<std::pair<Dart,Dart> > nFaces;
-		nFaces.reserve(6);
-
-		Traversor3WF<typename PFP::MAP> travWF(m_map, dit);
-		for(Dart ditWF = travWF.begin() ; ditWF != travWF.end() ; ditWF = travWF.next())
+		Traversor3WF<typename PFP::MAP> tWF(m_map, dit);
+		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
 		{
-
-
-
-//			Dart temp = ditWF;
-//			do
-//			{
-//				nFaces.push_back(std::pair<Dart,Dart>(temp, m_map.phi2(temp)));
-//				m_map.unsewFaces(temp);
-//				temp = m_map.phi1(temp);
-//			}
-//			while(temp != ditWF);
-//
-//			m_map.PFP::MAP::ParentMap::closeHole(ditWF, false);
-
-			//Dart fi = map.phi2(*face);
-
-
-//			std::vector<Dart> split;
-//			split.push_back(ditWF);
-//			split.push_back(m_map.phi1(ditWF));
-//			split.push_back(m_map.phi_1(ditWF));
-//
-//			splitSurfaceInVolume(split,true,false);
+			if(!m_map.isBoundaryFace(ditWF))
+				m.markOrbit<FACE>(ditWF);
 		}
 
-		//Dart fi = map.phi2(*face);
-
-//		//coudre les nouveaux brins entre eux par phi3
-//		for (std::vector<std::pair<Dart,Dart> >::iterator face =nFaces.begin(); face != nFaces.end(); ++face)
-//		{
-//
-//			if(map.phi3(map.phi2((*face).first)) == map.phi2((*face).first))
-//				map.sewVolumes(map.phi2((*face).first), map.phi2((*face).second));
-//		}
-//
-		m_map.setCurrentLevel(cur);
+		Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(m_map, dit);
 	}
 
+/*
+	//
+	// 2-3 swap of all old interior faces
+	//
+	TraversorF<typename PFP::MAP> tF(m_map);
+	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<FACE>(dit);
+			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(m_map, dit);
+		}
+	}
+
+	//
+	// 1-3 flip of all boundary tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tWb(m_map);
+	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
+	{
+		if(m_map.isBoundaryVolume(dit))
+		{
+			Traversor3WE<typename PFP::MAP> tWE(m_map, dit);
+			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
+			{
+				if(m_map.isBoundaryEdge(ditWE))
+					m.markOrbit<EDGE>(ditWE);
+			}
+
+			Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(m_map, dit);
+		}
+	}
+
+	//
+	// edge-removal on all old boundary edges
+	//
+	TraversorE<typename PFP::MAP> tE(m_map);
+	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<EDGE>(dit);
+			Dart d = m_map.phi2(m_map.phi3(m_map.findBoundaryFaceOfEdge(dit)));
+			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(m_map, d);
+
+		}
+	}
+*/
+
 	m_map.setCurrentLevel(m_map.getMaxLevel());
+	m_map.popLevel() ;
 }
 
 template <typename PFP>
@@ -350,37 +378,27 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 	m_map.duplicateDarts(m_map.getMaxLevel());
 	m_map.setCurrentLevel(m_map.getMaxLevel());
 
-//	if(!shareVertexEmbeddings)
-//	{
-//		//create the new level with the old one
-//		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
-//		{
-//			unsigned int index = (*m_mrDarts[m_mrCurrentLevel])[i] ;
-//			(*m_embeddings[VERTEX])[index] = EMBNULL ;		// set vertex embedding to EMBNULL if no sharing
-//		}
-//	}
-
-	//subdivision
 	//1. cut edges
 	TraversorE<typename PFP::MAP> travE(m_map);
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-//		if(!shareVertexEmbeddings)
-//		{
-//			if(getEmbedding<VERTEX>(d) == EMBNULL)
-//				setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-//			if(getEmbedding<VERTEX>(phi1(d)) == EMBNULL)
-//				setOrbitEmbeddingOnNewCell<VERTEX>(phi1(d)) ;
-//		}
+		if(!shareVertexEmbeddings && embedNewVertices)
+		{
+			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+				m_map.template embedNewCell<VERTEX>(d) ;
+			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+				m_map.template embedNewCell<VERTEX>(d) ;
+		}
 
 		m_map.cutEdge(d) ;
 		travE.skip(d) ;
 		travE.skip(m_map.phi1(d)) ;
 
-// When importing MR files  : activated for DEBUG
-//		if(embedNewVertices)
-//			setOrbitEmbeddingOnNewCell<VERTEX>(phi1(d)) ;
+		if(embedNewVertices)
+			m_map.template embedNewCell<VERTEX>(m_map.phi1(d)) ;
+
 	}
+	std::cout << "current Level = " << m_map.getCurrentLevel() << std::endl;
 
 	//2. split faces - quadrangule faces
 	TraversorF<typename PFP::MAP> travF(m_map) ;
@@ -398,9 +416,8 @@ void Map3MR<PFP>::addNewLevelHexa(bool embedNewVertices)
 		m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 		travF.skip(dd) ;
 
-// When importing MR files : activated for DEBUG
-//		if(embedNewVertices)
-//			setOrbitEmbeddingOnNewCell<VERTEX>(phi1(ne)) ;
+		if(embedNewVertices)
+			m_map.template embedNewCell<VERTEX>(m_map.phi1(ne)) ;
 
 		dd = m_map.phi1(m_map.phi1(next)) ;
 		while(dd != ne)				// turn around the face and insert new edges

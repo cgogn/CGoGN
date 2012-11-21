@@ -1142,52 +1142,51 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 	}
 }
 
-// template <typename PFP>
-// void onlyTriangles(typename PFP::MAP& the_map, Dart primd)
-// {
-// 	DartMarker m(the_map);
-// 
-// 	// list of faces to process and processed(before pos iterator)
-// 	std::list<Dart> ld;
-// 	ld.push_back(primd);
-// 	// current position in list
-// 	typename std::list<Dart>::iterator pos = ld.begin();
-// 	do
-// 	{
-// 		Dart d = *pos;
-// 		
-// 		// cut the face of first dart of list
-// 		Dart d1 = the_map.phi1(d);
-// 		Dart e = the_map.phi1(d1);
-// 		Dart e1 = the_map.phi1(e);
-// 		Dart f = the_map.phi1(e1);
-// 		m.markOrbit<FACE>(d);
-// 		if (f==d) // quad
-// 		{
-// 			Dart n = the_map.cutFace(d,e);
-// 			Dart nn = the_map.phi2(n);
-// 			// mark the face
-// 			m.mark(n);
-// 			m.mark(nn);
-// 		}
-// 
-// 		// and store neighbours faces in the list
-// 		d = the_map.phi2(d);
-// 		e = the_map.phi2(e);
-// 		d1 = the_map.phi1(the_map.phi2(d1));
-// 		e1 = the_map.phi1(the_map.phi2(e1));
-// 
-// 		if (!m.isMarked(d))
-// 			ld.push_back(d);
-// 		if (!m.isMarked(e))
-// 			ld.push_back(e);
-// 		if (!m.isMarked(d1))
-// 			ld.push_back(d1);
-// 		if ((f==d) && (!m.isMarked(e1)))
-// 			ld.push_back(e1);
-// 		pos++;
-// 	}while (pos!=ld.end()); // stop when no more face to process
-// }
+ template <typename PFP>
+ void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd)
+ {
+ 	DartMarker m(the_map);
+
+ 	// list of faces to process and processed(before pos iterator)
+ 	std::list<Dart> ld;
+ 	ld.push_back(primd);
+ 	// current position in list
+ 	typename std::list<Dart>::iterator pos = ld.begin();
+ 	do
+ 	{
+ 		Dart d = *pos;
+
+ 		// cut the face of first dart of list
+ 		Dart d1 = the_map.phi1(d);
+ 		Dart e = the_map.phi1(d1);
+ 		Dart e1 = the_map.phi1(e);
+ 		Dart f = the_map.phi1(e1);
+ 		if (f==d) // quad
+ 		{
+ 			the_map.splitFace(d,e);
+ 			// mark the face
+ 			m.markOrbit<FACE>(d);
+ 			m.markOrbit<FACE>(e);
+ 		}
+ 		else m.markOrbit<FACE>(d);
+
+ 		// and store neighbours faces in the list
+ 		d = the_map.phi2(d);
+ 		e = the_map.phi2(e);
+ 		d1 = the_map.phi1(the_map.phi2(d1));
+ 		e1 = the_map.phi1(the_map.phi2(e1));
+
+ 		if (!m.isMarked(d))
+ 			ld.push_back(d);
+ 		if (!m.isMarked(e))
+ 			ld.push_back(e);
+ 		if (!m.isMarked(d1))
+ 			ld.push_back(d1);
+ 		if ((f==d) && (!m.isMarked(e1)))
+ 			ld.push_back(e1);
+ 		pos++;
+ 	}while (pos!=ld.end()); // stop when no more face to process
+ }
 
 // template <typename PFP>
 // Dart triangleFan_topo(typename PFP::MAP& the_map, int n)

@@ -92,7 +92,7 @@ Tensor<SIZE, REAL>::operator=(const Tensor& T)
 {
 	m_order = T.m_order ;
 
-	delete(m_data) ;
+	delete[] m_data ;
 	m_data = new REAL[T.nbElem()] ;
 
 	for (unsigned int i = 0 ; i < T.nbElem() ; ++i)
@@ -132,6 +132,21 @@ Tensor<SIZE, REAL>::getIndex(std::vector<unsigned int> p) const
 		prod *= SIZE ;
 	}
 	return res ;
+}
+
+
+template <unsigned int SIZE, typename REAL>
+void
+Tensor<SIZE, REAL>::completeSymmetricTensor()
+{
+	std::vector<unsigned int> p ;
+	p.resize(order(), 0) ;
+	do
+	{
+		std::vector<unsigned int> sorted_p = p ;
+		std::sort(sorted_p.begin(), sorted_p.begin() + (*this).order()) ;
+		(*this)(p) = (*this)(sorted_p) ;
+	} while (incremIndex(p)) ;
 }
 
 template <unsigned int SIZE, typename REAL>

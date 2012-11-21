@@ -98,7 +98,7 @@ public:
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
-	virtual void unsewFaces(Dart d) ;
+	virtual void unsewFaces(Dart d, bool withBoundary = true) ;
 
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge

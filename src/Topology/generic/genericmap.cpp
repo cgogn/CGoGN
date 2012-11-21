@@ -284,7 +284,33 @@ void GenericMap::removeLevelBack()
 
 void GenericMap::removeLevelFront()
 {
-	std::cout << "TO DO" << std::endl;
+	unsigned int maxL = getMaxLevel() ;
+	if(maxL > 0) //must have at min 2 levels (0 and 1) to remove the front one
+	{
+		AttributeMultiVector<unsigned int>* minMR = m_mrDarts[0] ;
+		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int idx = (*minMR)[i] ;
+			if((*m_mrLevels)[i] != 0)	// if the MRdart was introduced after the level we're removing
+			{
+				--(*m_mrLevels)[i]; //decrement his level of insertion
+			}
+			else							// if the dart was introduced on a this level and not used after
+			{
+//				if(idx != (*firstMR)[i])		// delete the pointed dart line only if
+//					deleteDartLine(idx) ;	// it is not shared with next level
+			}
+		}
+
+		m_mrNbDarts[1] += m_mrNbDarts[0];
+
+		m_mrattribs.removeAttribute<unsigned int>(minMR->getIndex()) ;
+		m_mrDarts.erase(m_mrDarts.begin()) ;
+		m_mrNbDarts.erase(m_mrNbDarts.begin()) ;
+
+		--m_mrCurrentLevel ;
+	}
 }
 
 void GenericMap::copyLevel(unsigned int level)

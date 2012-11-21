@@ -313,6 +313,7 @@ void computeCurvatureVertex_NormalCycles(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
 
+	// collect the normal cycle tensor
 	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
 	neigh.collectAll(dart) ;
 	neigh.computeArea() ;
@@ -321,14 +322,14 @@ void computeCurvatureVertex_NormalCycles(
 
 	typename PFP::MATRIX33 tensor(0) ;
 
-	// inside
+	// collect edges inside the neighborhood
 	const std::vector<Dart>& vd1 = neigh.getInsideEdges() ;
 	for (std::vector<Dart>::const_iterator it = vd1.begin(); it != vd1.end(); ++it)
 	{
 		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, *it, position) ;
 		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
 	}
-	// border
+	// collect edges crossing the neighborhood's border
 	const std::vector<Dart>& vd2 = neigh.getBorder() ;
 	for (std::vector<Dart>::const_iterator it = vd2.begin(); it != vd2.end(); ++it)
 	{
@@ -340,43 +341,40 @@ void computeCurvatureVertex_NormalCycles(
 
 	tensor /= neigh.getArea() ;
 
-	long int n = 3, lda = 3, info, lwork = 9 ;
-	char jobz='V', uplo = 'U' ;
-	float work[9] ;
-	float w[3] ;
-	float a[3*3] = {
-		tensor(0,0), 0.0f, 0.0f,
-		tensor(1,0), tensor(1,1), 0.0f,
-		tensor(2,0), tensor(2,1), tensor(2,2)
-	} ;
-	// Solve eigenproblem
-	ssyev_(&jobz, &uplo, (integer*)&n, a, (integer*)&lda, w, work, (integer*)&lwork, (integer*)&info) ;
-	// Check for convergence
-	if(info > 0)
-		std::cerr << "clapack ssyev_ failed to compute eigenvalues : exit with code " << info << std::endl ;
-	// sort eigen components : w[s[0]] has minimal absolute value ; kmin = w[s[1]] <= w[s[2]] = kmax
+	// solve eigen problem
+	Eigen::Matrix3f m3 ;
+	m3 << tensor(0,0) , tensor(0,1) , tensor(0,2) , tensor(1,0) , tensor(1,1) , tensor(1,2) , tensor(2,0) , tensor(2,1) , tensor(2,2) ;
+	Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> solver (m3);
+	Eigen::Vector3f ev = solver.eigenvalues();
+	Eigen::Matrix3f evec = solver.eigenvectors();
+
+	// sort eigen components : ev[s[0]] has minimal absolute value ; kmin = ev[s[1]] <= ev[s[2]] = kmax
 	int s[3] = {0, 1, 2} ;
 	int tmp ;
-	if (abs(w[s[2]]) < abs(w[s[1]])) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
-	if (abs(w[s[1]]) < abs(w[s[0]])) { tmp = s[0] ; s[0] = s[1] ; s[1] = tmp ; }
-	if (w[s[2]] < w[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+	if (abs(ev[s[2]]) < abs(ev[s[1]])) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+	if (abs(ev[s[1]]) < abs(ev[s[0]])) { tmp = s[0] ; s[0] = s[1] ; s[1] = tmp ; }
+	if (ev[s[2]] < ev[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
 
-	kmin[dart] = w[s[1]] ;
-	kmax[dart] = w[s[2]] ;
-	VEC3& dirMin = Kmin[dart] ;
-	dirMin[0] = a[3*s[2]];
-	dirMin[1] = a[3*s[2]+1];
-	dirMin[2] = a[3*s[2]+2]; // warning : Kmin and Kmax are switched
-	VEC3& dirMax = Kmax[dart] ;
-	dirMax[0] = a[3*s[1]];
-	dirMax[1] = a[3*s[1]+1];
-	dirMax[2] = a[3*s[1]+2]; // warning : Kmin and Kmax are switched
+	// set curvatures from sorted eigen components
+	// warning : Kmin and Kmax are switched w.r.t. kmin and kmax
+	// normal direction : minimal absolute eigen value
 	VEC3& dirNormal = Knormal[dart] ;
-	dirNormal[0] = a[3*s[0]];
-	dirNormal[1] = a[3*s[0]+1];
-	dirNormal[2] = a[3*s[0]+2];
-	if (dirNormal * normal[dart] < 0)
-		dirNormal *= -1; // change orientation
+	dirNormal[0] = evec(0,s[0]);
+	dirNormal[1] = evec(1,s[0]);
+	dirNormal[2] = evec(2,s[0]);
+	if (dirNormal * normal[dart] < 0) dirNormal *= -1; // change orientation
+	// min curvature
+	kmin[dart] = ev[s[1]] ;
+	VEC3& dirMin = Kmin[dart] ;
+	dirMin[0] = evec(0,s[2]);
+	dirMin[1] = evec(1,s[2]);
+	dirMin[2] = evec(2,s[2]);
+	// max curvature
+	kmax[dart] = ev[s[2]] ;
+	VEC3& dirMax = Kmax[dart] ;
+	dirMax[0] = evec(0,s[1]);
+	dirMax[1] = evec(1,s[1]);
+	dirMax[2] = evec(2,s[1]);
 }
 
 

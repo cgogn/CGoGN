@@ -266,8 +266,14 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 	}
 }
 
-void EmbeddedMap2::unsewFaces(Dart d)
+void EmbeddedMap2::unsewFaces(Dart d, bool withBoundary)
 {
+	if (!withBoundary)
+	{
+		Map2::unsewFaces(d, false) ;
+		return ;
+	}
+
 	Dart e = phi2(d) ;
 	Map2::unsewFaces(d) ;
 

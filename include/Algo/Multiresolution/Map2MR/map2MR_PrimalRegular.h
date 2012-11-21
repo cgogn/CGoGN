@@ -49,11 +49,8 @@ namespace Regular
 template <typename PFP>
 class Map2MR
 {
-
 public:
 	typedef typename PFP::MAP MAP ;
-	typedef typename PFP::VEC3 VEC3 ;
-	typedef typename PFP::REAL REAL ;
 
 protected:
 	MAP& m_map;
@@ -63,12 +60,16 @@ protected:
 	std::vector<Filter*> analysisFilters ;
 
 public:
-	Map2MR(MAP& map) ;
+	Map2MR(MAP& map);
 
+	~Map2MR();
 
+	//if true : tri and quad else quad
 	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
 
 	void addNewLevelSqrt3(bool embedNewVertices = true);
+
+	void addNewLevelSqrt2(bool embedNewVertices = true);
 
 	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
 	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
@@ -78,6 +79,10 @@ public:
 
 	void analysis() ;
 	void synthesis() ;
+
+	//threshold
+
+	void filtering();
 } ;
 
 } // namespace Regular

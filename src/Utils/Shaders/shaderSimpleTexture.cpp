@@ -24,7 +24,6 @@
 
 #ifdef WITH_QT
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderSimpleTexture.h"
 
 

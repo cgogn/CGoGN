@@ -2,7 +2,7 @@
 
 VARYING_FRAG vec2 tex_coord;
 uniform sampler2D FontTexture;
-uniform vec3 color;
+uniform vec4 color;
 FRAG_OUT_DEF;
 void main (void)
 {

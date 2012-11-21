@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include <iostream>
 #include "Utils/trackball.h"
 #include "Utils/Qt/qtgl.h"
@@ -30,6 +29,9 @@
 #include "glm/gtc/type_precision.hpp"
 #include "Utils/GLSLShader.h"
 
+#ifdef MAC_OSX
+  #include "Utils/Qt/macgl3.h"
+#endif
 namespace CGoGN
 {
 
@@ -42,7 +44,12 @@ namespace QT
 float GLWidget::FAR_PLANE = 500.0f;
 
 GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
+#ifdef MAC_OSX
+//	QGLWidget(new Core3_2_context(QGLFormat::defaultFormat()),parent),
 	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
+#else
+	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
+#endif
 	m_cbs(cbs),
 	m_state_modifier(0),
 	allow_rotation(true)
@@ -69,7 +76,22 @@ void GLWidget::setParamObject(float width, float* pos)
 {
 	m_obj_sc = ((FAR_PLANE / 5.0f) / foc) / width;
 	m_obj_pos = glm::vec3(-pos[0], -pos[1], -pos[2]);
+	m_obj_pos_save = glm::vec3(pos[0], pos[1], pos[2]);
+	m_obj_width = width;
 }
+
+void GLWidget::resetCenterOfRotation(float width, float* pos)
+{
+	m_cbs->trans_x() = 0.;
+	m_cbs->trans_y() = 0.;
+	m_cbs->trans_z() = -FAR_PLANE / 5.0f;
+	m_obj_sc = ((FAR_PLANE / 5.0f) / foc) / width;
+
+	m_obj_pos = glm::vec3(-pos[0], -pos[1], -pos[2]);
+	newModel=1;
+
+}
+
 
 void GLWidget::setRotation(bool b)
 {
@@ -171,6 +193,7 @@ glm::vec3& GLWidget::getObjPos()
 
 void GLWidget::initializeGL()
 {
+	std::cout << "GL VERSION = "<< glGetString(GL_VERSION)<< std::endl;
 	glEnable(GL_DEPTH_TEST);
 
 	if (m_cbs)
@@ -245,6 +268,11 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent* event)
 			glm::vec3 win(x, y, depth);
 			glm::vec3 P = glm::unProject(win, m_cbs->modelViewMatrix(), m_cbs->projectionMatrix(), viewport);
 			changeCenterOfRotation(P);
+		}
+		else
+		{
+			resetCenterOfRotation(m_obj_width, static_cast<float*>(&m_obj_pos_save.x)) ;
+			updateGL();
 		}
 	}
 }

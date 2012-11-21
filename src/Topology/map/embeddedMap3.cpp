@@ -160,61 +160,35 @@ Dart EmbeddedMap3::deleteEdge(Dart d)
 
 bool EmbeddedMap3::edgeCanCollapse(Dart d)
 {
-//	//Criteres sur le bord
+//	if(isBoundaryVertex(d) || isBoundaryVertex(phi1(d)))
+//		return false;
+//
 //	if(isBoundaryEdge(d))
-//	{
-//		//fusion de deux bords
-//
-//		//deconnection du bord
-//	}
-//
-//	return true;
+//		return false;
 
-//	if(Map2::isBoundaryVertex(d) || Map2::isBoundaryVertex(phi1(d)))
-//		return false ;
+	CellMarkerStore<VERTEX> mv(*this);
 
-	unsigned int val_v1 = Map2::vertexDegree(d) ;
-	unsigned int val_v2 = Map2::vertexDegree(phi1(d)) ;
-
-	if(val_v1 + val_v2 < 8 || val_v1 + val_v2 > 14)
-		return false ;
-
-	if(Map2::faceDegree(d) == 3)
+	Traversor3VVaE<TOPO_MAP> t3VVaE_v1(*this,d);
+	for(Dart dit = t3VVaE_v1.begin() ; dit != t3VVaE_v1.end() ; dit = t3VVaE_v1.next())
 	{
-		if(Map2::vertexDegree(phi_1(d)) < 4)
-			return false ;
+		mv.mark(dit);
 	}
 
-	Dart dd = phi2(d) ;
-	if(Map2::faceDegree(dd) == 3)
+	Traversor3EW<TOPO_MAP> t3EW(*this,d);
+	for(Dart dit = t3EW.begin() ; dit != t3EW.end() ; dit = t3EW.next())
 	{
-		if(Map2::vertexDegree(phi_1(dd)) < 4)
-			return false ;
+		mv.unmark(phi_1(dit));
+		mv.unmark(phi_1(phi2(dit)));
 	}
 
-	// Check vertex sharing condition
-	std::vector<unsigned int> vu1 ;
-	vu1.reserve(256) ;
-	Dart vit1 = phi2(phi_1(phi2(phi_1(d)))) ;
-	Dart end = phi1(dd) ;
-	do
+	Traversor3VVaE<TOPO_MAP> t3VVaE_v2(*this,phi2(d));
+	for(Dart dit = t3VVaE_v2.begin() ; dit != t3VVaE_v2.end() ; dit = t3VVaE_v2.next())
 	{
-		unsigned int ve = getEmbedding<VERTEX>(phi2(vit1)) ;
-		vu1.push_back(ve) ;
-		vit1 = phi2(phi_1(vit1)) ;
-	} while(vit1 != end) ;
-	end = phi1(d) ;
-	Dart vit2 = phi2(phi_1(phi2(phi_1(dd)))) ;
-	do
-	{
-		unsigned int ve = getEmbedding<VERTEX>(phi2(vit2)) ;
-		std::vector<unsigned int>::iterator it = std::find(vu1.begin(), vu1.end(), ve) ;
-		if(it != vu1.end())
-			return false ;
-		vit2 = phi2(phi_1(vit2)) ;
-	} while(vit2 != end) ;
+		if(mv.isMarked(dit))
+			return false;
+	}
 
-	return true ;
+	return true;
 }
 
 Dart EmbeddedMap3::collapseEdge(Dart d, bool delDegenerateVolumes)

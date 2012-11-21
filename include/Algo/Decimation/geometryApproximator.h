@@ -37,7 +37,7 @@ namespace Decimation
 {
 
 template <typename PFP>
-class Approximator_QEM : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_QEM : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -45,11 +45,11 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<Quadric<REAL> > m_quadric ;
+	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
 
 public:
 	Approximator_QEM(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, pred)
+		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_QEM: attribute vector is empty") ;
 	}
@@ -61,7 +61,7 @@ public:
 } ;
 
 template <typename PFP>
-class Approximator_QEMhalfEdge : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_QEMhalfEdge : public Approximator<PFP, typename PFP::VEC3, DART>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -69,11 +69,11 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 protected:
-	VertexAttribute<Quadric<REAL> > m_quadric ;
+	VertexAttribute<Utils::Quadric<REAL> > m_quadric ;
 
 public:
 	Approximator_QEMhalfEdge(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, pred)
+		Approximator<PFP, VEC3, DART>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_QEMhalfEdge: attribute vector is empty") ;
 	}
@@ -85,7 +85,7 @@ public:
 } ;
 
 template <typename PFP>
-class Approximator_MidEdge : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_MidEdge : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -93,7 +93,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	Approximator_MidEdge(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, pred)
+		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_MidEdge: attribute vector is empty") ;
 	}
@@ -105,7 +105,7 @@ public:
 } ;
 
 template <typename PFP>
-class Approximator_HalfCollapse : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_HalfCollapse : public Approximator<PFP, typename PFP::VEC3, DART>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -113,19 +113,19 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	Approximator_HalfCollapse(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, pred)
+		Approximator<PFP, VEC3, DART>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_HalfCollapse: attribute vector is empty") ;
 	}
-	~Approximator_HalfCollapse()
-	{}
+	~Approximator_HalfCollapse() {}
+
 	ApproximatorType getType() const { return A_hHalfCollapse ; }
 	bool init() ;
 	void approximate(Dart d) ;
 } ;
 
 template <typename PFP>
-class Approximator_CornerCutting : public Approximator<PFP, typename PFP::VEC3>
+class Approximator_CornerCutting : public Approximator<PFP, typename PFP::VEC3, EDGE>
 {
 public:
 	typedef typename PFP::MAP MAP ;
@@ -133,7 +133,7 @@ public:
 	typedef typename PFP::REAL REAL ;
 
 	Approximator_CornerCutting(MAP& m, std::vector<VertexAttribute<VEC3>* > pos, Predictor<PFP, VEC3>* pred = NULL) :
-		Approximator<PFP, VEC3>(m, pos, pred)
+		Approximator<PFP, VEC3, EDGE>(m, pos, pred)
 	{
 		assert(pos.size() > 0 || !"Approximator_CornerCutting: attribute vector is empty") ;
 	}
