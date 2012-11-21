@@ -30,6 +30,35 @@
 namespace CGoGN
 {
 
+Dart EmbeddedMap2::newFace(unsigned int nbEdges, bool withBoundary)
+{
+	Dart d = Map2::newFace(nbEdges, withBoundary);
+
+	if(withBoundary)
+	{
+		if (isOrbitEmbedded<VERTEX>())
+		{
+			Traversor2FV<EmbeddedMap2> t(*this, d);
+			for(Dart it = t.begin(); it != t.end(); it = t.next())
+				initOrbitEmbeddingNewCell<VERTEX>(it) ;
+		}
+
+		if(isOrbitEmbedded<EDGE>())
+		{
+			Traversor2FE<EmbeddedMap2> t(*this, d);
+			for(Dart it = t.begin(); it != t.end(); it = t.next())
+				initOrbitEmbeddingNewCell<EDGE>(it) ;
+		}
+
+		if(isOrbitEmbedded<FACE>())
+		{
+			initOrbitEmbeddingNewCell<FACE>(d) ;
+			initOrbitEmbeddingNewCell<FACE>(phi2(d)) ;
+		}
+	}
+	return d ;
+}
+
 void EmbeddedMap2::splitVertex(Dart d, Dart e)
 {
 	Dart dd = phi2(d) ;
