@@ -1,4 +1,4 @@
-#include "plugins/simplePlugin.h"
+#include "simplePlugin.h"
 #include "Utils/GLSLShader.h"
 
 #include <set>
@@ -12,29 +12,6 @@ SimplePlugin::SimplePlugin()
 
 SimplePlugin::~SimplePlugin(){
 };
-
-void SimplePlugin::setWindow(Window* window){
-	this->m_window= window;
-}
-
-void SimplePlugin::setName(QString name){
-	this->m_name= name;
-}
-
-void SimplePlugin::setPluginFilePath(QString path){
-	this->m_pluginPathFile= path;
-}
-
-bool SimplePlugin::activate(bool initializing){
-	this->m_windowInitializing= initializing;
-	bool r= activate();
-	this->m_windowInitializing= false;
-	return r;
-}
-
-void SimplePlugin::addDependantPlugin(Plugin* dependant){
-	this->l_dependantPlugins.push_back(dependant);
-}
 
 bool SimplePlugin::addWidgetInDockTab(QWidget* newTabWidget, QString tabText){
 	if(m_window){
@@ -65,41 +42,6 @@ bool SimplePlugin::addReferencedMap(QString map_name, CGoGN::GenericMap* map){
 	}
 }
 
-Plugin* SimplePlugin::addDependencie(QString dependencie){
-	Plugin* plugin;
-	if((plugin=m_window->checkPluginDependencie(dependencie, this))){
-		this->l_dependencies.push_back(plugin);
-		return plugin;
-	}
-	else{
-		return NULL;
-	}
-}
-
-void SimplePlugin::deleteDependantLink(Plugin* dependantPlugin){
-	l_dependantPlugins.removeAll(dependantPlugin);
-}
-
-QStringList SimplePlugin::getDependantPluginNames(){
-	QStringList l;
-	for(QList<Plugin*>::iterator it= l_dependantPlugins.begin(); it!=l_dependantPlugins.end(); ++it){
-		l.push_back((*it)->getName());
-	}
-	return l;
-}
-
-
-void SimplePlugin::suppressDependencieLink(Plugin* dependencie){
-	dependencie->deleteDependantLink(this);
-	l_dependencies.removeAll(dependencie);
-}
-
-void SimplePlugin::suppressAllDependencieLinks(){
-	foreach(Plugin* plugin, l_dependencies){
-		this->suppressDependencieLink(plugin);
-	}
-}
-
 void SimplePlugin::unloadDependantPlugins(){
 	while(!l_dependantPlugins.empty()){
 		if(l_dependantPlugins.back())
@@ -126,19 +68,6 @@ CGoGN::GenericMap* SimplePlugin::takeMap(CGoGN::GenericMap* map){
 	}
 	else{
 		return NULL;
-	}
-}
-
-void SimplePlugin::suppressDependantLink(Plugin* dependant){
-	int i= l_dependantPlugins.indexOf(dependant);
-	if(i>=0){
-		dependant->suppressDependencieLink(this);
-	}
-}
-
-void SimplePlugin::suppressAllDependantLinks(){
-	foreach(Plugin* plugin, l_dependantPlugins){
-		plugin->suppressDependencieLink(this);
 	}
 }
 

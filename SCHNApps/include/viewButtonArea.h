@@ -12,17 +12,22 @@
 class View;
 class Context;
 
-
-class ViewButton : public QObject{
+class ViewButton : public QObject
+{
 	Q_OBJECT
+
 public:
 	ViewButton(QString image, View* view);
 
-	void click(View* view){emit clicked(); emit viewClicked(view);}
+	void click(View* view)
+	{
+		emit clicked();
+		emit viewClicked(view);
+	}
 
 	void drawAt(int x, int y);
 
-	QSize getSize(){return m_GLimg.size();}
+	QSize getSize() { return m_GLimg.size(); }
 
 protected:
 	QSize m_size;
@@ -34,10 +39,13 @@ signals:
 	void viewClicked(View* view);
 };
 
-class ViewButtonArea : public QObject{
+class ViewButtonArea : public QObject
+{
 	Q_OBJECT
+
 public:
-	ViewButtonArea(View* view) : m_view(view) {}
+	ViewButtonArea(View* view) : m_view(view)
+	{}
 	~ViewButtonArea();
 
 	void addButton(ViewButton* button);
@@ -47,7 +55,7 @@ public:
 
 	ViewButton* clickAt(int x, int y);
 
-	QRect form(){return m_form;}
+	QRect form() { return m_form; }
 
 	void setTopRightPosition(int x, int y);
 
@@ -66,7 +74,5 @@ public slots:
 signals:
 	void buttonClicked(ViewButton* button);
 };
-
-
 
 #endif

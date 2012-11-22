@@ -23,13 +23,14 @@ class ViewButton;
 class Scene : public QObject
 {
 	Q_OBJECT
+
 public:
-	Scene(QString name, Window* window, Camera* sharedCamera=NULL);
+	Scene(QString name, Window* window, Camera* sharedCamera = NULL);
 	Scene(QString name, Plugin* plugin, Window* window);
 	~Scene();
 
 	void initializeGL();
-	void updateGL(View* view=NULL);
+	void updateGL(View* view = NULL);
 	void draw(View* view);
 	void init();
 
@@ -40,29 +41,29 @@ public:
 	bool mouseMoveEvent(QMouseEvent* event);
 	bool wheelEvent(QWheelEvent* event);
 
-	void setName(QString name){m_name=name;}
-	QString getName(){return m_name;}
+	QString getName() { return m_name; }
+	void setName(QString name) { m_name = name; }
 
 	View* getView(int num);
-	QList<View*> views(){return l_view;}
-	int countViews(){return l_view.size();}
+	QList<View*> views() { return l_view; }
+	int countViews() { return l_view.size(); }
 	View* addNewView(Camera* c);
 	void deleteView(View* view);
 
 	void viewClickedButton(View* view, ViewButton* viewButton);
 
-	void associateNewPlugin(Plugin* plugin,bool callBackInitGL=true);
+	void associateNewPlugin(Plugin* plugin, bool callBackInitGL = true);
 	void suppressLinkWith(Plugin* plugin);
 	void linkWithPlugin();
 	void unlinkPlugin();
 
-	bool isManual(){return (m_creator==NULL);}
-	Plugin* creator(){return m_creator;}
+	bool isManual() { return (m_creator == NULL); }
+	Plugin* creator() { return m_creator; }
 
-	QList<Plugin*> linkedPlugins(){return l_plugin;}
+	QList<Plugin*> linkedPlugins() { return l_plugin; }
 
-	bool isLinked(){return !l_plugin.isEmpty();}
-	bool isLinkedWith(Plugin* plugin){return l_plugin.contains(plugin);}
+	bool isLinked() { return !l_plugin.isEmpty(); }
+	bool isLinkedWith(Plugin* plugin) { return l_plugin.contains(plugin); }
 
 //	VBOHandler* addNewVBO(QString name);
 //	void addVBO(VBOHandler* vbo);

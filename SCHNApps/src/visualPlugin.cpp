@@ -1,4 +1,4 @@
-#include "plugins/visualPlugin.h"
+#include "visualPlugin.h"
 #include "Utils/GLSLShader.h"
 
 #include <set>
@@ -58,18 +58,6 @@ void VisualPlugin::updateGL(){
 
 void VisualPlugin::updateGL(Scene* scene){
 	scene->updateGL();
-}
-
-void VisualPlugin::setWindow(Window* window){
-	this->m_window= window;
-}
-
-void VisualPlugin::setName(QString name){
-	this->m_name= name;
-}
-
-void VisualPlugin::setPluginFilePath(QString path){
-	this->m_pluginPathFile= path;
 }
 
 bool VisualPlugin::activate(bool initializing){
@@ -169,10 +157,6 @@ void VisualPlugin::deleteLinkWith(Scene* scene){
 	}
 }
 
-void VisualPlugin::addDependantPlugin(Plugin* dependant){
-	this->l_dependantPlugins.push_back(dependant);
-}
-
 bool VisualPlugin::addWidgetInDockTab(QWidget* newTabWidget, QString tabText){
 	if(m_window){
 		m_window->addWidgetInDockTab(newTabWidget, tabText);
@@ -217,30 +201,8 @@ MapHandler*  VisualPlugin::getReferencedMap(QString map_name){
 	}
 }
 
-Plugin* VisualPlugin::addDependencie(QString dependencie){
-	Plugin* plugin;
-	if((plugin=m_window->checkPluginDependencie(dependencie, this))){
-		this->l_dependencies.push_back(plugin);
-		return plugin;
-	}
-	else{
-		return NULL;
-	}
-}
-
-void VisualPlugin::deleteDependantLink(Plugin* dependantPlugin){
-	l_dependantPlugins.removeAll(dependantPlugin);
-}
-
-QStringList VisualPlugin::getDependantPluginNames(){
-	QStringList l;
-	for(QList<Plugin*>::iterator it= l_dependantPlugins.begin(); it!=l_dependantPlugins.end(); ++it){
-		l.push_back((*it)->getName());
-	}
-	return l;
-}
-
-void VisualPlugin::recieveScene(Scene* scene){
+void VisualPlugin::recieveScene(Scene* scene)
+{
 	if(scene!=NULL && (m_waitedScene>0 || m_waitedScene==UNLIMITED_NUMBER_OF_SCENES) &&
 			( !scene->isLinkedWith(this) || m_allowSameViewSeveralTime))
 	{
@@ -282,16 +244,6 @@ void VisualPlugin::waitingForScene(int nb){
 	}
 }
 
-void VisualPlugin::suppressDependencieLink(Plugin* dependencie){
-	dependencie->deleteDependantLink(this);
-	l_dependencies.removeAll(dependencie);
-}
-
-void VisualPlugin::suppressAllDependencieLinks(){
-	foreach(Plugin* plugin, l_dependencies){
-		this->suppressDependencieLink(plugin);
-	}
-}
 
 void VisualPlugin::unloadDependantPlugins(){
 	while(!l_dependantPlugins.empty()){
@@ -319,19 +271,6 @@ MapHandler* VisualPlugin::takeMap(MapHandler* map){
 	}
 	else{
 		return NULL;
-	}
-}
-
-void VisualPlugin::suppressDependantLink(Plugin* dependant){
-	int i= l_dependantPlugins.indexOf(dependant);
-	if(i>=0){
-		dependant->suppressDependencieLink(this);
-	}
-}
-
-void VisualPlugin::suppressAllDependantLinks(){
-	foreach(Plugin* plugin, l_dependantPlugins){
-		plugin->suppressDependencieLink(this);
 	}
 }
 
