@@ -29,7 +29,7 @@
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Topology/generic/functor.h"
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/GLSLShader.h"
 
 

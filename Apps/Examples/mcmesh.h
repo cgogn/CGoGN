@@ -38,6 +38,7 @@
 #include "Algo/Render/GL2/mapRender.h"
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
+#include "Utils/vbo.h"
 #include "Algo/Geometry/boundingbox.h"
 
 #include "Algo/MC/marchingcube.h"

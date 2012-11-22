@@ -26,7 +26,7 @@
 #ifndef __FRAMEMANIPULATOR_H_
 #define __FRAMEMANIPULATOR_H_
 
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "glm/glm.hpp"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/pickables.h"

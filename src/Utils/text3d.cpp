@@ -23,8 +23,9 @@
 *******************************************************************************/
 
 #include "Utils/text3d.h"
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/svg.h"
+#include "Utils/gzstream.h"
 
 namespace CGoGN
 {
