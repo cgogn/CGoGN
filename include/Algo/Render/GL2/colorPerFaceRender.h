@@ -25,6 +25,7 @@
 #ifndef _COLOR_PER_FACE_RENDER
 #define _COLOR_PER_FACE_RENDER
 
+#include <GL/glew.h>
 
 #include "Topology/generic/dart.h"
 #include "Topology/generic/attributeHandler.h"
@@ -46,7 +47,7 @@ namespace GL2
 {
 
 /**
- * Class that update VBO to allow the rendering of per face color rendering
+ * Class that update VBO to allow the rendering of per face colors
  * Use with ColorPerVertexShader
  */
 class ColorPerFaceRender
@@ -69,9 +70,9 @@ public:
 	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
 	* @param good selector
 	*/
-	template<typename PFP, typename ATTRIB>
+	template<typename PFP, unsigned int ORBIT>
 	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good = allDarts) ;
+			const VertexAttribute<typename PFP::VEC3>& positions, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
 	/**
 	* update drawing buffers
@@ -84,9 +85,9 @@ public:
 	* @param colorPerXXX attribute of color (per face, per vertex per face, per what you want)
 	* @param good selector
 	*/
-	template<typename PFP, typename ATTRIB>
-	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormals, Utils::VBO& vboColor, typename PFP::MAP& map,
-			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const ATTRIB& colorPerXXX, const FunctorSelect& good = allDarts) ;
+	template<typename PFP, unsigned int ORBIT>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboNormal, Utils::VBO& vboColor, typename PFP::MAP& map,
+			const VertexAttribute<typename PFP::VEC3>& positions, const VertexAttribute<typename PFP::VEC3>& normals, const AttributeHandler<typename PFP::VEC3,ORBIT>& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
 
 	/**
