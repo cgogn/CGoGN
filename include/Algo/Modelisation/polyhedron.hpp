@@ -61,12 +61,48 @@ Dart createPyramid(typename PFP::MAP& map, unsigned int n)
 	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[n-1]), false);
 
 	//sewing the bottom face
-	Dart d1 = map.newFace(n, false);
-	dres = d1;
+	Dart base = map.newFace(n, false);
+	dres = base;
 	for(unsigned int i = 0; i < n ; ++i)
 	{
-		map.sewFaces(m_tableVertDarts[i], d1, false);
-		d1 = map.phi1(d1);
+		map.sewFaces(m_tableVertDarts[i], base, false);
+		base = map.phi1(base);
+	}
+
+	if(map.dimension() == 3)
+		map.closeMap();
+
+	if(map.template isOrbitEmbedded<VERTEX>())
+	{
+		for(unsigned int i = 0; i < n; ++i)
+		{
+			map.template initOrbitEmbeddingNewCell<VERTEX>(m_tableVertDarts[i]);
+		}
+		map.template initOrbitEmbeddingNewCell<VERTEX>(map.phi_1(m_tableVertDarts[0]));
+	}
+
+	if(map.template isOrbitEmbedded<EDGE>())
+	{
+		for(unsigned int i = 0; i < n; ++i)
+		{
+			map.template initOrbitEmbeddingNewCell<EDGE>(m_tableVertDarts[i]);
+			map.template initOrbitEmbeddingNewCell<EDGE>(map.phi1(m_tableVertDarts[i]));
+		}
+	}
+
+	if(map.template isOrbitEmbedded<FACE>())
+	{
+		for(unsigned int i = 0; i < n; ++i)
+		{
+			map.template initOrbitEmbeddingNewCell<FACE>(m_tableVertDarts[i]);
+		}
+
+		map.template initOrbitEmbeddingNewCell<FACE>(dres);
+	}
+
+	if(map.template isOrbitEmbedded<VOLUME>())
+	{
+		map.template initOrbitEmbeddingNewCell<VOLUME>(dres);
 	}
 
 	//return a dart from the base
@@ -110,16 +146,54 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
 	map.sewFaces(map.phi1(m_tableVertDarts[0]), map.phi_1(m_tableVertDarts[n-1]), false);
 
 	//sewing the top & bottom faces
-	Dart d1 = map.newFace(n, false);
-	Dart d2 = map.newFace(n, false);
-	dres = d1;
+	Dart top = map.newFace(n, false);
+	Dart bottom = map.newFace(n, false);
+	dres = top;
 	for(unsigned int i = 0; i < n ; ++i)
 	{
-		map.sewFaces(m_tableVertDarts[i], d1, false);
-		map.sewFaces(m_tableVertDarts[n+i], d2, false);
-		d1 = map.phi1(d1);
-		d2 = map.phi_1(d2);
+		map.sewFaces(m_tableVertDarts[i], top, false);
+		map.sewFaces(m_tableVertDarts[n+i], bottom, false);
+		top = map.phi1(top);
+		bottom = map.phi_1(bottom);
 	}
+
+	if(map.dimension() == 3)
+		map.closeMap();
+
+	if(map.template isOrbitEmbedded<VERTEX>())
+	{
+		for(unsigned int i = 0; i < nb; ++i)
+		{
+			map.template initOrbitEmbeddingNewCell<VERTEX>(m_tableVertDarts[i]);
+		}
+	}
+
+	if(map.template isOrbitEmbedded<EDGE>())
+	{
+		for(unsigned int i = 0; i < n; ++i)
+		{
+			map.template initOrbitEmbeddingNewCell<FACE>(m_tableVertDarts[i]);
+			map.template initOrbitEmbeddingNewCell<FACE>(map.phi1(m_tableVertDarts[i]));
+			map.template initOrbitEmbeddingNewCell<FACE>(map.phi1(map.phi1(m_tableVertDarts[i])));
+		}
+	}
+
+	if(map.template isOrbitEmbedded<FACE>())
+	{
+		for(unsigned int i = 0; i < n; ++i)
+		{
+			map.template initOrbitEmbeddingNewCell<FACE>(m_tableVertDarts[i]);
+		}
+
+		map.template initOrbitEmbeddingNewCell<FACE>(top);
+		map.template initOrbitEmbeddingNewCell<FACE>(bottom);
+	}
+
+	if(map.template isOrbitEmbedded<VOLUME>())
+	{
+		map.template initOrbitEmbeddingNewCell<VOLUME>(dres);
+	}
+
 
 	//return a dart from the base
 	return dres;

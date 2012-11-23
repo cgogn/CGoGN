@@ -193,6 +193,7 @@ public:
 
 				}while(dit != db);
 
+//TODO Replace do--while with a Traversor2 on Boundary
 //				Traversor2VF<typename PFP::MAP> travVF(m_map,db);
 //				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
 //				{
@@ -273,9 +274,6 @@ public:
 			if(m_map.isBoundaryEdge(d))
 			{
 				Dart db = m_map.findBoundaryFaceOfEdge(d);
-
-				unsigned int count = 0;
-
 				typename PFP::VEC3 fe(0.0);
 
 				m_map.incCurrentLevel() ;
@@ -285,6 +283,8 @@ public:
 				fe += m_position[midV];
 				m_map.decCurrentLevel() ;
 
+//TODO Replace do--while with a Traversor2 on Boundary
+//				unsigned int count = 0;
 //				Traversor2EF<typename PFP::MAP> travEF(m_map, db);
 //				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 //				{
@@ -568,9 +568,6 @@ public:
 			if(m_map.isBoundaryEdge(d))
 			{
 				Dart db = m_map.findBoundaryFaceOfEdge(d);
-
-				unsigned int count = 0;
-
 				typename PFP::VEC3 fe(0.0);
 
 				m_map.incCurrentLevel() ;
@@ -580,6 +577,8 @@ public:
 				fe += m_position[midV];
 				m_map.decCurrentLevel() ;
 
+//TODO Replace do--while with a Traversor2 on Boundary
+//				unsigned int count = 0;
 //				Traversor2EF<typename PFP::MAP> travEF(m_map, db);
 //				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
 //				{
