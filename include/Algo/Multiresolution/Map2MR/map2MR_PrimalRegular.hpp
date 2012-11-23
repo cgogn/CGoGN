@@ -60,7 +60,7 @@ Map2MR<PFP>::~Map2MR()
 }
 
 template <typename PFP>
-void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
+void Map2MR<PFP>::addNewLevel(bool triQuad)
 {
 	m_map.pushLevel() ;
 
@@ -72,20 +72,18 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 	TraversorE<typename PFP::MAP> travE(m_map) ;
 	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 	{
-		if(!shareVertexEmbeddings && embedNewVertices)
-		{
-			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
-				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
-				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
-		}
+//		if(!shareVertexEmbeddings)
+//		{
+//			if(m_map.template getEmbedding<VERTEX>(d) == EMBNULL)
+//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+//			if(m_map.template getEmbedding<VERTEX>(m_map.phi1(d)) == EMBNULL)
+//				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d) ;
+//		}
 
 		m_map.cutEdge(d) ;
 		travE.skip(d) ;
 		travE.skip(m_map.phi1(d)) ;
 
-		if(embedNewVertices)
-			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(d)) ;
 	}
 
 	// split faces
@@ -128,9 +126,6 @@ void Map2MR<PFP>::addNewLevel(bool triQuad, bool embedNewVertices)
 			Dart ne = m_map.alpha1(dd) ;
 			m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 			travF.skip(dd) ;
-
-			if(embedNewVertices)
-				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(m_map.phi1(ne)) ;
 
 			dd = m_map.phi1(m_map.phi1(next)) ;
 			while(dd != ne)				// turn around the face and insert new edges
@@ -189,9 +184,6 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 
 			Dart cd = m_map.phi2(x);
 
-			if(embedNewVertices)
-				m_map.template embedNewCell<VERTEX>(cd) ;
-
 			Dart fit = cd ;
 			do
 			{
@@ -238,9 +230,6 @@ void Map2MR<PFP>::addNewLevelSqrt2(bool embedNewVertices)
 		}
 
 		Dart cd = m_map.phi2(x);
-
-		if(embedNewVertices)
-			m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(cd) ;
 
 		Dart fit = cd ;
 		do

@@ -77,11 +77,11 @@ public:
 	~Map2MR();
 
 	//if true : tri and quad else quad
-	void addNewLevel(bool triQuad = true, bool embedNewVertices = true) ;
+	void addNewLevel(bool triQuad = true) ;
 
-	void addNewLevelSqrt3(bool embedNewVertices = true);
+	void addNewLevelSqrt3();
 
-	void addNewLevelSqrt2(bool embedNewVertices = true);
+	void addNewLevelSqrt2();
 
 	void addSynthesisFilter(Filter* f) { synthesisFilters.push_back(f) ; }
 	void addAnalysisFilter(Filter* f) { analysisFilters.push_back(f) ; }
