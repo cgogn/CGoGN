@@ -54,6 +54,27 @@ public:
 	void approximate(Dart d) ;
 } ;
 
+template <typename PFP>
+class Approximator_HalfCollapse : public Approximator<PFP, typename PFP::VEC3>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	Approximator_HalfCollapse(MAP& m, VertexAttribute<VEC3>& pos, Predictor<PFP, VEC3>* pred = NULL) :
+		Approximator<PFP, VEC3>(m, pos, pred)
+	{
+		assert(pos.size() > 0 || !"Approximator_HalfCollapse: attribute vector is empty") ;
+	}
+	~Approximator_HalfCollapse()
+	{}
+	ApproximatorType getType() const { return A_hHalfCollapse ; }
+	bool init() ;
+	void approximate(Dart d) ;
+} ;
+
+
 } //namespace DecimationVolumes
 
 } //namespace Algo

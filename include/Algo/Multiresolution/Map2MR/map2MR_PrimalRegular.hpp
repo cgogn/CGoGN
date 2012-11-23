@@ -40,7 +40,8 @@ namespace Regular
 template <typename PFP>
 Map2MR<PFP>::Map2MR(typename PFP::MAP& map) :
 	m_map(map),
-	shareVertexEmbeddings(true)
+	shareVertexEmbeddings(true),
+	filter(F_None)
 {
 
 }
@@ -270,6 +271,16 @@ void Map2MR<PFP>::synthesis()
 
 	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
 		(*synthesisFilters[i])() ;
+
+//	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
+//	{
+//		if((filter == F_LowPass && m_map.getCurrentLevel() <= thresholdHigh) ||
+//		(filter == F_HighPass && m_map.getCurrentLevel() >= thresholdLow) ||
+//		(filter == F_BandPass && (thresholdLow >= m_map.getCurrentLevel() &&  m_map.getCurrentLevel() <= thresholdHigh)))
+//			(*synthesisFilters[i])(true) ;
+//		else
+//			(*synthesisFilters[i])(false) ;
+//	}
 
 	m_map.incCurrentLevel() ;
 }

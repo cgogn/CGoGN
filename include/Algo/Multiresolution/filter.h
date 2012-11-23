@@ -43,6 +43,7 @@ public:
 	Filter() {}
 	virtual ~Filter() {}
 	virtual void operator() () = 0 ;
+	//virtual void operator() (bool filtering) = 0 ;
 } ;
 
 

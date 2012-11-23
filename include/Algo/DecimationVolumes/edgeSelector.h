@@ -163,10 +163,14 @@ private:
 
 public:
 	EdgeSelector_SG98(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
-		Selector<PFP>(m, pos, approx, select)
-	{}
+		Selector<PFP>(m, pos, approx, select), m_positionApproximator(NULL)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+	}
 	~EdgeSelector_SG98()
-	{}
+	{
+		this->m_map.removeAttribute(edgeInfo) ;
+	}
 	SelectorType getType() { return S_SG98 ; }
 	bool init() ;
 	bool nextEdge(Dart& d) ;

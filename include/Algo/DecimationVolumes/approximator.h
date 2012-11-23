@@ -40,7 +40,8 @@ namespace DecimationVolumes
 enum ApproximatorType
 {
 	A_QEM,
-	A_MidEdge
+	A_MidEdge,
+	A_hHalfCollapse
 };
 
 template <typename PFP>
