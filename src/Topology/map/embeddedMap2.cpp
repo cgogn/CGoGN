@@ -319,9 +319,7 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 		if(isOrbitEmbedded<EDGE>())
 		{
 /*
-			Traversor2FE<EmbeddedMap2> t(*this, d);
-			for(Dart it = t.begin(); it != t.end(); it = t.next())
-				initOrbitEmbeddingNewCell<EDGE>(it) ;
+			initOrbitEmbeddingNewCell<EDGE>(d) ;
 */
 			unsigned int emb = newCell<EDGE>();
 			initDartEmbedding<EDGE>(d,emb);
