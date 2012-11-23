@@ -300,11 +300,13 @@ QuadricNd<REAL,N>::optimize(VECN& v) const
 }
 
 template <typename REAL>
-QuadricHF<REAL>::QuadricHF()
+QuadricHF<REAL>::QuadricHF():
+m_noAlphaRot(false)
 {}
 
 template <typename REAL>
-QuadricHF<REAL>::QuadricHF(int i)
+QuadricHF<REAL>::QuadricHF(int i):
+m_noAlphaRot(false)
 {
 	m_A.resize(i,i) ;
 	for (unsigned int c = 0 ; c < 3 ; ++c)
@@ -323,18 +325,17 @@ QuadricHF<REAL>::QuadricHF(const std::vector<VEC3>& v, const REAL& gamma, const 
 }
 
 template <typename REAL>
-QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REAL& alpha)
+QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REAL& alpha):
+m_noAlphaRot(fabs(alpha) < 1e-13)
 {
 	const unsigned int nbcoefs = ((T[0].order() + 1) * (T[0].order() + 2)) / 2. ;
-
-	//m_A.resize(nbcoefs, nbcoefs) ;
 
 	// 2D rotation
 	const Geom::Matrix33d R = buildRotateMatrix(gamma) ;
 	Geom::Tensor3d* Trot = new Geom::Tensor3d[3] ;
 	for (unsigned int c = 0 ; c < 3 ; ++c)
 		Trot[c] = rotate(T[c],R) ;
-	std::vector<VEC3> coefsR = coefsFromTensors(Trot) ;
+	m_coefs = coefsFromTensors(Trot) ;
 	delete[] Trot ;
 
 	// parameterized integral on intersection
@@ -348,7 +349,7 @@ QuadricHF<REAL>::QuadricHF(const Geom::Tensor3d* T, const REAL& gamma, const REA
 	{
 		Eigen::VectorXd v ;	v.resize(nbcoefs) ;
 		for (unsigned int i = 0 ; i < nbcoefs ; ++i) // copy into vector
-			v[i] = coefsR[i][c] ;
+			v[i] = m_coefs[i][c] ;
 
 		m_b[c] = integ_b * v ; // Vector b
 		m_c[c] = v.transpose() * (integ_c * v) ; // Constant c
@@ -369,6 +370,8 @@ QuadricHF<REAL>::zero()
 		m_b[c].setZero() ;
 		m_c[c] = 0 ;
 	}
+	m_coefs.clear() ;
+	m_noAlphaRot = false ;
 }
 
 template <typename REAL>
@@ -381,6 +384,8 @@ QuadricHF<REAL>::operator= (const QuadricHF<REAL>& q)
 		m_b[c] = q.m_b[c] ;
 		m_c[c] = q.m_c[c] ;
 	}
+	m_coefs = q.m_coefs ;
+	m_noAlphaRot = q.m_noAlphaRot ;
 
 	return *this ;
 }
@@ -399,6 +404,11 @@ QuadricHF<REAL>::operator+= (const QuadricHF<REAL>& q)
 		m_b[c] += q.m_b[c] ;
 		m_c[c] += q.m_c[c] ;
 	}
+	m_coefs.resize(m_coefs.size()) ;
+	for (unsigned int i = 0 ; i < m_coefs.size() ; ++i)
+		m_coefs[i] += q.m_coefs[i] ;
+
+	m_noAlphaRot &= q.m_noAlphaRot ;
 
 	return *this ;
 }
@@ -418,6 +428,12 @@ QuadricHF<REAL>::operator -= (const QuadricHF<REAL>& q)
 		m_c[c] -= q.m_c[c] ;
 	}
 
+	m_coefs.resize(m_coefs.size()) ;
+	for (unsigned int i = 0 ; i < m_coefs.size() ; ++i)
+		m_coefs[i] -= q.m_coefs[i] ;
+
+	m_noAlphaRot &= q.m_noAlphaRot ;
+
 	return *this ;
 }
 
@@ -425,6 +441,7 @@ template <typename REAL>
 QuadricHF<REAL>&
 QuadricHF<REAL>::operator *= (const REAL& v)
 {
+	std::cout << "Warning: QuadricHF<REAL>::operator *= should not be used !" << std::endl ;
 	m_A *= v ;
 	for (unsigned int c = 0 ; c < 3 ; ++c)
 	{
@@ -439,6 +456,7 @@ template <typename REAL>
 QuadricHF<REAL>&
 QuadricHF<REAL>::operator /= (const REAL& v)
 {
+	std::cout << "Warning: QuadricHF<REAL>::operator /= should not be used !" << std::endl ;
 	const REAL& inv = 1. / v ;
 
 	(*this) *= inv ;
@@ -457,7 +475,24 @@ template <typename REAL>
 bool
 QuadricHF<REAL>::findOptimizedCoefs(std::vector<VEC3>& coefs)
 {
-	return optimize(coefs) ;
+	coefs.resize(m_b[0].size()) ;
+
+	if (fabs(m_A.determinant()) < 1e-10 )
+	{
+		coefs = m_coefs ;
+		return m_noAlphaRot ; // if true inversion failed (normal!) and m_coefs forms a valid solution
+	}
+	Eigen::MatrixXd Ainv = m_A.inverse() ;
+
+	for (unsigned int c = 0 ; c < 3 ; ++c)
+	{
+		Eigen::VectorXd tmp(m_b[0].size()) ;
+		tmp = Ainv * m_b[c] ;
+		for (unsigned int i = 0 ; i < m_b[c].size() ; ++i)
+			coefs[i][c] = tmp[i] ;
+	}
+
+	return true ;
 }
 
 template <typename REAL>
@@ -478,28 +513,6 @@ QuadricHF<REAL>::evaluate(const std::vector<VEC3>& coefs) const
 	res /= 2*M_PI ; // max integral value over hemisphere
 
 	return (res[0] + res[1] + res[2]) / 3. ;
-}
-
-template <typename REAL>
-bool
-QuadricHF<REAL>::optimize(std::vector<VEC3>& coefs) const
-{
-	coefs.resize(m_b[0].size()) ;
-
-	if (fabs(m_A.determinant()) < 1e-10 )
-		return false ;
-
-	Eigen::MatrixXd Ainv = m_A.inverse() ;
-
-	for (unsigned int c = 0 ; c < 3 ; ++c)
-	{
-		Eigen::VectorXd tmp(m_b[0].size()) ;
-		tmp = Ainv * m_b[c] ;
-		for (unsigned int i = 0 ; i < m_b[c].size() ; ++i)
-			coefs[i][c] = tmp[i] ;
-	}
-
-	return true ;
 }
 
 template <typename REAL>
@@ -847,7 +860,7 @@ QuadricHF<REAL>::buildIntegralMatrix_B(const REAL& alpha, unsigned int size)
 	 B( 9 , 8 ) = 0 ;
 	 B( 9 , 9 ) = 2.0*(M_PI-alpha)/7.0 ;
 
-	 if (size < 10)
+	 if (size < 11)
 		 return B ;
 
 	 B( 0 , 10 ) = 4.0*((sin(2*alpha)+2*alpha)/4.0-(sin(4*alpha)+4*alpha-2*M_PI) /4.0)/1.5E+1 ;

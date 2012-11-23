@@ -25,8 +25,6 @@
 #ifndef _EXPLODE_VOLUME_VBO_RENDER
 #define _EXPLODE_VOLUME_VBO_RENDER
 
-#include <GL/glew.h>
-
 #include <vector>
 #include <list>
 

@@ -16,95 +16,64 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}
 	${QGLVIEWER_INCLUDE_DIR}
+	${SCHNApps_ROOT_DIR}/include
 )
 
-SET(SRC_FILES
-	${SRC_DIR}/main.cpp
-	${SRC_DIR}/interface/window.cpp
-	${SRC_DIR}/interface/system.cpp
-	${SRC_DIR}/interface/stateHandler.cpp
-	${SRC_DIR}/visualization/view.cpp
-	${SRC_DIR}/visualization/scene.cpp
-	${SRC_DIR}/visualization/camera.cpp
-	${SRC_DIR}/interface/splitArea.cpp
-	${SRC_DIR}/dialogs/newSceneDialog.cpp
-	${SRC_DIR}/dialogs/sceneSelector.cpp
-	${SRC_DIR}/interface/viewButtonArea.cpp
-	${SRC_DIR}/dialogs/cameraViewDialog.cpp
-	${SRC_DIR}/dialogs/cameraOptionDialog.cpp
-	${SRC_DIR}/dialogs/cameraSceneDialog.cpp
-	${SRC_DIR}/dialogs/globalCameraDialog.cpp
-	${SRC_DIR}/dialogs/pluginDialog.cpp
-	${SRC_DIR}/dialogs/linkViewDialog.cpp
-	${SRC_DIR}/visualization/vboHandler.cpp
-	${SRC_DIR}/visualization/mapHandler.cpp
-	${SRC_DIR}/visualization/context.cpp
-	${SRC_DIR}/dialogs/mapPluginDialog.cpp
+file(
+	GLOB
+	SCHNApps_SRC_FILES
+	${SCHNApps_ROOT_DIR}/src/main.cpp
+	${SCHNApps_ROOT_DIR}/src/interface/*.cpp
+	${SCHNApps_ROOT_DIR}/src/visualization/*.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/*.cpp
 )
 
-SET(H_OBJECT_FILES
-	${INC_DIR}/interface/window.h
-	${INC_DIR}/interface/system.h
-	${INC_DIR}/visualization/view.h
-	${INC_DIR}/visualization/scene.h
-	${INC_DIR}/interface/splitArea.h
-	${INC_DIR}/dialogs/newSceneDialog.h
-	${INC_DIR}/dialogs/sceneSelector.h
-	${INC_DIR}/interface/viewButtonArea.h
-	${INC_DIR}/dialogs/cameraViewDialog.h
-	${INC_DIR}/dialogs/cameraOptionDialog.h
-	${INC_DIR}/dialogs/cameraSceneDialog.h
-	${INC_DIR}/dialogs/globalCameraDialog.h
-	${INC_DIR}/dialogs/pluginDialog.h
-	${INC_DIR}/dialogs/linkViewDialog.h
-	${INC_DIR}/dialogs/mapPluginDialog.h
+SET(SCHNApps_H_OBJECT_FILES
+	${SCHNApps_ROOT_DIR}/include/interface/window.h
+	${SCHNApps_ROOT_DIR}/include/interface/system.h
+	${SCHNApps_ROOT_DIR}/include/interface/viewButtonArea.h
+	${SCHNApps_ROOT_DIR}/include/interface/splitArea.h
+	${SCHNApps_ROOT_DIR}/include/visualization/view.h
+	${SCHNApps_ROOT_DIR}/include/visualization/scene.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/newSceneDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/sceneSelector.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/cameraOptionDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/cameraSceneDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/globalCameraDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/pluginDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/linkViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/mapPluginDialog.h
 )
 
-SET(FORMS_FILES
-	${FORMS_DIR}/window.ui
-	${FORMS_DIR}/questionSessionDialog.ui
-	${FORMS_DIR}/infoDialog.ui
-	${FORMS_DIR}/newSceneDialog.ui
-	${FORMS_DIR}/cameraViewDialog.ui
-	${FORMS_DIR}/cameraOptionDialog.ui
-	${FORMS_DIR}/cameraSceneDialog.ui
-	${FORMS_DIR}/globalCameraDialog.ui
-	${FORMS_DIR}/pluginDialog.ui
-	${FORMS_DIR}/linkViewDialog.ui
-	${FORMS_DIR}/mapPluginDialog.ui
+file(
+	GLOB
+	SCHNApps_FORM_FILES
+	${SCHNApps_ROOT_DIR}/forms/*.ui
 )
 
-QT4_WRAP_UI(UI_H_FILES
-	${FORMS_FILES}
+QT4_WRAP_UI( UI_H_FILES
+	${SCHNApps_FORM_FILES}
 )
-QT4_WRAP_CPP(MOC_FILES
-	${H_OBJECT_FILES}
+QT4_WRAP_CPP( MOC_FILES
+	${SCHNApps_H_OBJECT_FILES}
 )
-QT4_ADD_RESOURCES(RCC_FILES
-	${RESOURCES_DIR}/resources.qrc
-)
-
-INCLUDE_DIRECTORIES(
-	${FORMS}
-	${INC_DIR}
-	${INC_DIR}/interface
-	${INC_DIR}/visualization
-	${INC_DIR}/dialogs
-	${INC_DIR}/plugins
+QT4_ADD_RESOURCES( RCC_FILES
+	${SCHNApps_ROOT_DIR}/resources/resources.qrc
 )
 
-ADD_EXECUTABLE(CGoGN_plug
-	${SRC_FILES}
+ADD_EXECUTABLE( SCHNApps
+	${SCHNApps_SRC_FILES}
 	${UI_H_FILES}
 	${MOC_FILES}
 	${RCC_FILES}
 )
 
-TARGET_LINK_LIBRARIES(CGoGN_plug
+TARGET_LINK_LIBRARIES( SCHNApps
 	${CGoGN_LIBS_R}
 	${COMMON_LIBS}
 	${QGLVIEWER_LIBRARIES}
 )
 
-#ADD_SUBDIRECTORY(${PLUGIN_DIR} plugins)
 
+ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)

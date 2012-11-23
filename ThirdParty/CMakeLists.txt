@@ -37,7 +37,6 @@ ENDIF(APPLE)
 
 
 add_subdirectory(Tools Tools/build)
-add_subdirectory(QGLViewer QGLViewer/build)
 
 IF (WITH_ZINRI)
 	add_subdirectory(Zinri Zinri/build)

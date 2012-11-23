@@ -1010,12 +1010,21 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 	attrNames.push_back(positions.name()) ;
 
 	VertexAttribute<typename PFP::VEC3> *frame = new VertexAttribute<typename PFP::VEC3>[3] ;
-	frame[0] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("frameT") ; // Tangent
-	frame[1] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("frameB") ; // Bitangent
-	frame[2] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("frameN") ; // Normal
-	attrNames.push_back(frame[0].name()) ;
-	attrNames.push_back(frame[1].name()) ;
-	attrNames.push_back(frame[2].name()) ;
+	if (tangent)
+	{
+		frame[0] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("frameT") ; // Tangent
+		attrNames.push_back(frame[0].name()) ;
+	}
+	if (binormal)
+	{
+		frame[1] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("frameB") ; // Bitangent
+		attrNames.push_back(frame[0].name()) ;
+	}
+	if (normal)
+	{
+		frame[2] = m_map.template addAttribute<typename PFP::VEC3, VERTEX>("frameN") ; // Normal
+		attrNames.push_back(frame[0].name()) ;
+	}
 
 	VertexAttribute<typename PFP::VEC3> *PBcoefs = NULL, *SHcoefs = NULL ;
 	if (PTM)
@@ -1064,14 +1073,15 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 
 		fp.read((char*)properties,nbProps * propSize) ;
 
-		positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
-		for (unsigned int k = 0 ; k < 3 ; ++k) // frame
-			for (unsigned int l = 0 ; l < 3 ; ++l)
-				frame[k][id][l] = (typename PFP::REAL)(properties[3+(3*k+l)]) ;
-		/*
-		 	for (unsigned int k = 0 ; k < 3 ; ++k) // coefficients
-			for (unsigned int l = 0 ; l < nbCoefs ; ++l)
-		 */
+		// positions
+		if (nbProps > 2)
+			positions[id] = VEC3(properties[0],properties[1],properties[2]) ; // position
+
+		if (tangent && binormal && normal) // == if (nbprops > 11)
+			for (unsigned int k = 0 ; k < 3 ; ++k) // frame
+				for (unsigned int l = 0 ; l < 3 ; ++l)
+					frame[k][id][l] = (typename PFP::REAL)(properties[3+(3*k+l)]) ;
+
 		for (unsigned int l = 0 ; l < nbCoefs ; ++l) // coefficients
 			for (unsigned int k = 0 ; k < 3 ; ++k)
 			{
@@ -1080,6 +1090,7 @@ bool MeshTablesSurface<PFP>::importPlySLFgenericBin(const std::string& filename,
 				else /* if SH */
 					SHcoefs[l][id][k] = (typename PFP::REAL)(properties[12+(3*l+k)]) ;
 			}
+
 		unsigned int cur = 12+3*nbCoefs ;
 		for (unsigned int k = 0 ; k < nbRemainders ; ++k) // remaining data
 			remainders[k][id] = (typename PFP::REAL)(properties[cur + k]) ;

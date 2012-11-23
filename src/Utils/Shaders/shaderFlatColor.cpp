@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include <string>
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderFlatColor.h"
 
 namespace CGoGN

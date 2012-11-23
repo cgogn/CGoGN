@@ -733,20 +733,6 @@ Dart edgesBubbleSelection(typename PFP::MAP& map, const VertexAttribute<typename
 //
 //}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 } //namespace Selection
 
 } //namespace Algo

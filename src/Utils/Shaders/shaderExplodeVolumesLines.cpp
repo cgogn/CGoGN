@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include <string.h>
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderExplodeVolumesLines.h"
 
 namespace CGoGN

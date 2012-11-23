@@ -25,7 +25,7 @@
 #ifndef _VBO_RENDER_
 #define _VBO_RENDER_
 
-#include <GL/glew.h>
+#include "Utils/gl_def.h"
 
 namespace CGoGN
 {

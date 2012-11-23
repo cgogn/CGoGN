@@ -39,6 +39,11 @@ class EmbeddedMap2 : public Map2
 public:
 	typedef Map2 TOPO_MAP;
 
+	/*
+	 *
+	 */
+	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
+
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
 	 */

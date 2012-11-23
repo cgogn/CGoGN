@@ -28,7 +28,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include <GL/glew.h>
 #include <vector>
 #include <list>
 #include <set>

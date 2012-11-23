@@ -25,7 +25,7 @@
 #ifndef __QT_GL2__
 #define __QT_GL2__
 
-#include <GL/glew.h>
+#include "Utils/gl_def.h"
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QKeyEvent>

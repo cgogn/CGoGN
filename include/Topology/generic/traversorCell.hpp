@@ -27,7 +27,7 @@ namespace CGoGN
 
 template <typename MAP, unsigned int ORBIT>
 TraversorCell<MAP, ORBIT>::TraversorCell(MAP& map, const FunctorSelect& good, bool forceDartMarker, unsigned int thread) :
-	m(map), dmark(NULL), cmark(NULL), current(NIL), firstTraversal(true), m_good(good)
+	m(map), dmark(NULL), cmark(NULL), quickTraversal(NULL), current(NIL), firstTraversal(true), m_good(good)
 {
 	if(forceDartMarker)
 		dmark = new DartMarker(map, thread) ;

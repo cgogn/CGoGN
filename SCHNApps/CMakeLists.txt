@@ -2,28 +2,26 @@ cmake_minimum_required(VERSION 2.8)
 
 project(SCHNApps)
 
+SET( QT_USE_QTOPENGL TRUE )
 SET( QT_USE_QTXML TRUE )
-SET (QT_USE_QTDESIGNER TRUE)
-SET (QT_USE_QTGUI TRUE)
-SET(QT_USE_QTPLUGIN TRUE)
+SET( QT_USE_QTDESIGNER TRUE )
+SET( QT_USE_QTGUI TRUE )
+SET( QT_USE_QTPLUGIN TRUE )
 
 #========CGoGN========#
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 INCLUDE(${CGoGN_ROOT_DIR}/apps_cmake.txt)
 
+find_package(Qt4 REQUIRED)
 
 #=======QGLViewer=========#
 find_package(QGLViewer REQUIRED)
 
 
-#======Directories=======#
-SET(INC_DIR ${CMAKE_SOURCE_DIR}/include)
-SET(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-SET(FORMS_DIR ${CMAKE_SOURCE_DIR}/forms)
-SET(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/resources)
-
-SET(PLUGIN_DIR ${CMAKE_SOURCE_DIR}/Plugins)
-SET(PLUGIN_COMPILE_DIR ${EXECUTABLE_OUTPUT_PATH}/plugins)
+#======SCHNApps=======#
+SET(SCHNApps_ROOT_DIR ${CGoGN_ROOT_DIR}/SCHNApps)
+SET(EXECUTABLE_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/bin)
+SET(LIBRARY_OUTPUT_PATH ${SCHNApps_ROOT_DIR}/Plugins)
 
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/Release Release)
 IF (NOT WIN32)
@@ -43,4 +41,3 @@ add_custom_target(doc
 	COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
-

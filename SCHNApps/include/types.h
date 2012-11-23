@@ -1,7 +1,6 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-
 #include <GL/glew.h>
 #include <QGLViewer/qglviewer.h>
 
@@ -44,6 +43,5 @@ namespace CGoGN { class GenericMap; }
 namespace Qt{
 	extern int UserRoleType;
 }
-
 
 #endif
