@@ -22,11 +22,10 @@ class View : public QGLViewer
 	Q_OBJECT
 
 public:
-	View(Scene* s, QString name, Camera* c, QGLWidget* shareWidget = NULL, Context* context = NULL, QWidget* parent = NULL);
+	View(Scene* s, const QString& name, Camera* c, QGLWidget* shareWidget = NULL, Context* context = NULL, QWidget* parent = NULL);
 	~View();
 
 	virtual void updateGL();
-	void simpleUpdate();
 	virtual void draw();
 	virtual void init();
 
@@ -50,8 +49,8 @@ public:
 
 	Scene* getScene() { return m_scene; }
 
-	void setName(QString name) { m_name = name; }
-	QString getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
+	const QString& getName() { return m_name; }
 
 	void enableLinking(bool b = true);
 	void enableUnlinking(bool b = true);
@@ -88,9 +87,8 @@ public:
 	void setShowButtons(bool b) { b_showButtons = b; }
 
 protected:
-	Scene* m_scene;
-
 	QString m_name;
+	Scene* m_scene;
 
 	QList<Camera*> l_camera;
 	Camera* m_currentCamera;

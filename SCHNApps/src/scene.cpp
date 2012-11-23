@@ -10,92 +10,51 @@
 #include "window.h"
 #include "plugin.h"
 
-Scene::Scene(QString name, Window* window, Camera* sharedCamera) :
-	m_window(window),
+Scene::Scene(const QString& name, Window* window) :
 	m_name(name),
-	m_creator(NULL),
-	m_context(window->context())
-{
-	View* view = new View(this, name + "_view1", sharedCamera, NULL, m_context);
-
-	l_view.push_back(view);
-
-	view->enableLinking();
-	view->enableCameraGesture();
-	view->enableViewClose();
-}
-
-Scene::Scene(QString name, Plugin* plugin, Window* window) :
 	m_window(window),
-	m_name(name),
-	m_creator(plugin),
-	m_context(window->context())
-{
-	View* view = new View(this, name + "_view1", NULL, NULL, m_context);
-
-	l_view.push_back(view);
-
-	l_plugin.push_back(plugin);
-
-	view->enableLinking();
-	view->enableUnlinking();
-	view->enableCameraGesture();
-}
+	m_context(window->getContext())
+{}
 
 Scene::~Scene()
 {
-	while(!l_view.isEmpty())
-	{
-		View* view = l_view.takeFirst();
-		delete view;
-	}
+	foreach(View* v, l_views)
+		removeView(v);
 
-//	while(!l_vbo.isEmpty())
-//	{
-//		VBOHandler* vbo = l_vbo.first();
-//		if(!vbo->isShared())
-//	{
-//			vbo->unshareWith(this);
-//			delete vbo;
-//		}
-//		else
-//			vbo->unshareWith(this);
-//	}
+	foreach(Plugin* p, l_plugins)
+		removePlugin(p);
 
-	while(!l_plugin.isEmpty())
-		suppressLinkWith(l_plugin.last());
+	// view buttons
 }
 
-void Scene::updateGL(View* view)
+void Scene::initGL()
 {
-	foreach(View* v, l_view)
-	{
-		if(v != view)
-			v->simpleUpdate();
-	}
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_initGL(this);
 }
 
-void Scene::draw(View* view)
+void Scene::updateGL()
 {
+	foreach(View* v, l_views)
+		v->updateGL();
+}
+
+void Scene::draw(View *v)
+{
+	QList<Camera*> cameras = m_window->getCameras();
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glDisable(GL_LIGHTING);
-	foreach(View* v, l_view)
-		v->drawCameras(view);
+	foreach(Camera* c, cameras)
+		c->draw();
 	glPopAttrib();
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	foreach(Plugin* plugin, l_plugin)
+	foreach(Plugin* plugin, l_plugins)
 	{
-		plugin->cb_updateMatrix(view);
+		plugin->cb_updateMatrix(v);
 		plugin->cb_redraw(this);
 	}
 	glPopAttrib();
-}
-
-void Scene::init()
-{
-	foreach(Plugin* plugin, l_plugin)
-		plugin->cb_initGL(this);
 }
 
 bool Scene::keyPressEvent(QKeyEvent* event)

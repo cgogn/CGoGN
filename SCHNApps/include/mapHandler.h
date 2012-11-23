@@ -25,14 +25,14 @@ public:
 		return m_map;
 	}
 
-	VBOHandler *findVBO(QString name);
-	VBOHandler *findFirstVBOMatching(QRegExp regexp);
-	QList<VBOHandler *> findVBOsMatching(QRegExp regexp);
+	VBOHandler* findVBO(QString name);
+	VBOHandler* findFirstVBOMatching(QRegExp regexp);
+	QList<VBOHandler*> findVBOsMatching(QRegExp regexp);
 
-	bool addVBO(VBOHandler *vboH);
-	VBOHandler *addNewVBO(QString vboName);
+	bool addVBO(VBOHandler* vboH);
+	VBOHandler* addNewVBO(QString vboName);
 
-	VBOHandler *takeVBO(VBOHandler *vbo);
+	VBOHandler* takeVBO(VBOHandler* vbo);
 
 	int countVBO()
 	{
@@ -40,8 +40,8 @@ public:
 	}
 
 protected:
-	CGoGN::GenericMap *m_map;
-	QList<VBOHandler *> l_vbo;
+	CGoGN::GenericMap* m_map;
+	QList<VBOHandler*> l_vbo;
 };
 
 #endif

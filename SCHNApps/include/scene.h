@@ -25,14 +25,21 @@ class Scene : public QObject
 	Q_OBJECT
 
 public:
-	Scene(QString name, Window* window, Camera* sharedCamera = NULL);
-	Scene(QString name, Plugin* plugin, Window* window);
+	Scene(const QString& name, Window* window);
 	~Scene();
 
-	void initializeGL();
-	void updateGL(View* view = NULL);
-	void draw(View* view);
-	void init();
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
+
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
+
+	Context* getContext() { return m_context; }
+	void setContext(Context* c) { m_context = c; }
+
+	void initGL();
+	void updateGL();
+	void draw(View *v);
 
 	bool keyPressEvent(QKeyEvent* event);
 	bool keyReleaseEvent(QKeyEvent *e);
@@ -41,29 +48,33 @@ public:
 	bool mouseMoveEvent(QMouseEvent* event);
 	bool wheelEvent(QWheelEvent* event);
 
-	QString getName() { return m_name; }
-	void setName(QString name) { m_name = name; }
-
+	/*********************************************************
+	 * MANAGE VIEWS
+	 *********************************************************/
+	View* addView(Camera* c = NULL);
+	void removeView(View* view);
 	View* getView(int num);
-	QList<View*> views() { return l_view; }
-	int countViews() { return l_view.size(); }
-	View* addNewView(Camera* c);
-	void deleteView(View* view);
+	QList<View*> getViews() { return l_views; }
+	int getNbViews() { return l_views.size(); }
 
 	void viewClickedButton(View* view, ViewButton* viewButton);
 
-	void associateNewPlugin(Plugin* plugin, bool callBackInitGL = true);
-	void suppressLinkWith(Plugin* plugin);
-	void linkWithPlugin();
-	void unlinkPlugin();
+	/*********************************************************
+	 * MANAGE PLUGINS
+	 *********************************************************/
+	void addPlugin(Plugin* plugin, bool callBackInitGL = true);
+	void removePlugin(Plugin* plugin);
+	QList<Plugin*> getPlugins() { return l_plugins; }
+	bool hasPlugins() { return !l_plugins.isEmpty(); }
+	bool hasPlugin(Plugin* plugin) { return l_plugins.contains(plugin); }
+//	void linkWithPlugin();
+//	void unlinkPlugin();
 
-	bool isManual() { return (m_creator == NULL); }
-	Plugin* creator() { return m_creator; }
-
-	QList<Plugin*> linkedPlugins() { return l_plugin; }
-
-	bool isLinked() { return !l_plugin.isEmpty(); }
-	bool isLinkedWith(Plugin* plugin) { return l_plugin.contains(plugin); }
+	/*********************************************************
+	 * MANAGE VIEW BUTTONS
+	 *********************************************************/
+	bool addViewButton(ViewButton* viewButton);
+	ViewButton* removeViewButton(ViewButton* viewButton);
 
 //	VBOHandler* addNewVBO(QString name);
 //	void addVBO(VBOHandler* vbo);
@@ -74,25 +85,15 @@ public:
 
 	void firstViewFitSphere(float x, float y, float z, float radius);
 
-	bool addCustomViewButton(ViewButton* viewButton);
-	ViewButton* takeCustomViewButton(ViewButton* viewButton);
-
 protected:
-	Window* m_window;
-
-	QList<View*> l_view;
-
 	QString m_name;
-
-	QList<Plugin*> l_plugin;
-
-	Plugin* m_creator;
-
-//	QList<VBOHandler*> l_vbo;
-
+	Window* m_window;
 	Context* m_context;
 
-	QList<ViewButton*> l_viewButton;
+	QList<View*> l_views;
+	QList<Plugin*> l_plugins;
+//	QList<VBOHandler*> l_vbo;
+	QList<ViewButton*> l_viewButtons;
 
 signals:
 	void viewButtonClicked(View*, ViewButton*);

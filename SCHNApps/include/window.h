@@ -8,9 +8,9 @@
 #include "Topology/generic/genericmap.h"
 
 #include "types.h"
-#include "visualization/mapHandler.h"
-#include "interface/splitArea.h"
-#include "interface/system.h"
+#include "system.h"
+#include "splitArea.h"
+#include "mapHandler.h"
 
 class Scene;
 class View;
@@ -37,50 +37,28 @@ public:
 	 */
 	~Window();
 
-	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
-	bool addNewSceneView(Scene *scene, View *view);
-
-	QList<Scene *> scenes()
-	{
-		return h_scene.values();
-	}
-
-	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
-
-	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
-	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
-
-	void removeScene(QString name);
-
-	/**
-	 * \fn void addEmptyDock()
-	 * \brief add an empty dock to the window, if one doesn't already exists
-	 *
-	 * \see addWidgetInDock()
-	 * \see VisualPlugin::addWidgetInDockTab()
-	 */
-	void addEmptyDock();
+	/*********************************************************
+	 * MANAGE DOCK
+	 *********************************************************/
 
 	/**
 	 * \fn QTabWidget* getDockTabWidget()
 	 * \brief Accessor to the QTabWidget of this interface
 	 *
-	 * An early developed function. Aparantly their's no need for such feature
-	 *
 	 * \return a pointer to the TabWidget, NULL if not allocated yet
 	 */
-	QTabWidget *getDockTabWidget();
+	QTabWidget* getDockTabWidget();
 
 	/**
-	 * \fn void addWidgetInDockTab(QWidget* newTabWidget, QString tabText)
+	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText)
 	 * \brief Adds the widget as a new tab in the interface's dock
 	 *
-	 * \param newTabWidget the created and allocated pointer to the QWidget to add in the dock
+	 * \param tabWidget the created and allocated pointer to the QWidget to add in the dock
 	 * \param tabText The text that will appears in the tab label
 	 *
 	 * \see removeTabInDock()
 	 */
-	void addWidgetInDockTab(QWidget *newTabWidget, QString tabText);
+	void addTabInDock(QWidget* tabWidget, const QString& tabText);
 
 	/**
 	 * \fn void removeTabInDock(QWidget* tabWidget)
@@ -92,14 +70,18 @@ public:
 	 *
 	 * \see addWidgetInDockTab()
 	 */
-	void removeTabInDock(QWidget *tabWidget);
+	void removeTabInDock(QWidget* tabWidget);
+
+	/*********************************************************
+	 * MANAGE MENU ACTIONS
+	 *********************************************************/
 
 	/**
-	 * \fn bool addMenuAction(QString menuPath, QAction* act)
+	 * \fn bool addMenuAction(const QString& menuPath, QAction* action)
 	 * \brief adds an action in the program menu bar
 	 *
 	 * \param menuPath the menu path (see details below) to specify a location for the action in the menu.
-	 * \param act a pointer to the allocated action to add in the menu. All the details ont that action (such as
+	 * \param action a pointer to the allocated action to add in the menu. All the details on that action (such as
 	 *          QObject::connect() calls) are not dealt in this function.
 	 *
 	 *  The menu path is a string used to specify the location of the new action in the menu bar.
@@ -114,39 +96,48 @@ public:
 	 *                  submenu of a new menu <em>"Settings"</em>, the menu path
 	 *                  shall be: <em>Settings;config;action</em>
 	 *
-	 *
 	 *  A new action should at least belong to one menu (already existing or not). Otherwise the method will fail.
 	 *
-	 *  This method is already called by reimplemented Plugin methods, there's apparently no reason for calling it.
+	 *  This method is called by Plugin methods
 	 *
 	 *  \return a boolean whether the method succeeded or not.
 	 *
 	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
+	 *    depending on the error. This error can be shown with Error::showError
 	 *
 	 * \see deleteMenuAction()
-	 * \see VisualPlugin::addMenuAction()
+	 * \see Plugin::addMenuAction()
 	 */
-	bool addMenuAction(QString menuPath, QAction *act);
+	bool addMenuAction(const QString& menuPath, QAction* action);
 
 	/**
-	 * \fn void deleteMenuAction(QAction* act)
+	 * \fn void deleteMenuAction(QAction* action)
 	 * \brief delete an action from the menu bar
 	 *
-	 * \param act pointer to the allocated action to delete.
+	 * \param action pointer to the allocated action to delete.
 	 *
 	 *  If this action was the only action remaining in a menu, this menu will also be deleted.
 	 *
 	 *  \warning DO NOT use this method with an action that hasn't been added with addMenuAction()
 	 *
-	 *  This method is already called by reimplemented Plugin methods, there's apparently no reason for calling it.
+	 *  This method is called by Plugin methods
 	 *
 	 *  \see addMenuAction()
-	 *  \see VisualPlugin::deleteMenuActions()
+	 *  \see Plugin::removeMenuAction()
 	 */
-	void deleteMenuAction(QAction *act);
+	void removeMenuAction(QAction* action);
 
-	bool addToolbarAction(QAction *act);
+	/*********************************************************
+	 * MANAGE TOOLBAR ACTIONS
+	 *********************************************************/
+
+	bool addToolbarAction(QAction* action);
+
+	void removeToolbarAction(QAction* action);
+
+	/*********************************************************
+	 * MANAGE PLUGINS
+	 *********************************************************/
 
 	/**
 	 * \fn bool loadPlugin(QString pluginPath)
@@ -155,28 +146,28 @@ public:
 	 * \param pluginPath the absolute path of the Plugin location
 	 *
 	 * The Plugin is loaded and referenced under a name that is the Plugin file name
-	     where the extension '.so' and the prefix 'lib' were removed.
+	 * where the extension ('.so', '.dylib') and the prefix 'lib' were removed.
 	 *
 	 *  <b>Example:</b> <em>/path/libExample.so</em> will be referenced as <em>Example</em>
 	 *
 	 * You have to make sure that a Plugin file with a similar name hasn't been loaded yet, otherwise
 	 * the loading will fail.
 	 *
-	 * This method calls for the Plugin::activate() method on the concerned Plugin. That is why
-	   when Plugin are written, this method is override and used as an initialization method.
+	 * This method calls the Plugin::enable() method of the concerned Plugin. That is why
+	 * when Plugin are written, this method is overriden and used as an initialization method.
 	 *
-	 *  \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
+	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
 	 *
-	 *  \return a boolean whether the loading succeeded or not.
+	 * \return a boolean whether the loading succeeded or not.
 	 *
 	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
+	 * depending on the error. This error can be shown with Error::showError
 	 *
 	 * \see unloadPlugin()
-	 * \see getPlugin()
-	 * \see Plugin::activate()
-	*/
-	Plugin *loadPlugin(QString pluginPath);
+	 * \see getPlugins()
+	 * \see Plugin::enable()
+	 */
+	bool loadPlugin(const QString& pluginPath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -184,19 +175,19 @@ public:
 	 *
 	 * \param pluginName the name under which the Plugin is referenced
 	 *
-	 * The Plugin of the given name is dereferenced and deleted, if he exists and was previously
+	 * The Plugin of the given name is dereferenced and deleted, if it exists and was previously
 	 * referenced, if not, the method does nothing.
 	 *
-	 * This method calls for the Plugin::disable() method on the concerned Plugin. That is why,
-	   when Plugin are written, this method is override and used as an destruction method.
+	 * This method calls the Plugin::disable() method of the concerned Plugin. That is why,
+	 * when Plugin are written, this method is overriden and used as a destruction method.
 	 *
 	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
 	 *
 	 * \see loadPlugin()
-	 * \see getPlugin()
+	 * \see getPlugins()
 	 * \see Plugin::disable()
 	 */
-	void unloadPlugin(QString pluginName);
+	void unloadPlugin(const QString& pluginName);
 
 	/**
 	 * \fn Plugin* checkPluginDependencie(QString name, Plugin* dependantPlugin)
@@ -216,17 +207,50 @@ public:
 	 *
 	 * \see loadPlugin()
 	 * \see VisualPlugin::addDependencie()
-	 **/
+	 */
+//	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
 
-	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
+	/**
+	 *
+	 */
+	QList<Plugin*> getPlugins();
 
-	QList<Plugin *> activePlugins()
-	{
-		return h_plugin.values();
-	}
+	/*********************************************************
+	 * MANAGE SCENES
+	 *********************************************************/
+
+	bool addScene(const QString& name);
+
+	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
+	bool addNewSceneView(Scene *scene, View *view);
+
+	/**
+	 *
+	 */
+	QList<Scene*> getScenes();
+
+	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
+
+	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
+	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
+
+	void removeScene(QString name);
 
 	void linkDialog(Scene *scene);
 	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
+
+	/*********************************************************
+	 * MANAGE MAPS
+	 *********************************************************/
+
+
+
+
+
+
+
+
+
 
 	bool addReferencedMap(QString map_name, MapHandler *map);
 
@@ -305,14 +329,9 @@ public:
 //	}
 	MapHandler *getReferencedMap(QString map_name);
 
-	Context *context()
+	Context* getContext()
 	{
 		return m_context;
-	}
-
-	QList<Plugin *> plugins()
-	{
-		return h_plugin.values();
 	}
 
 	QList<MapHandler *> maps()
@@ -321,48 +340,25 @@ public:
 	}
 
 protected:
-	QVBoxLayout *verticalLayout;
-	SplitArea *m_splitArea;
-
-	/**
-	 * \var QDockWidget* m_dock
-	 * \brief The dock of the application
-	 */
-	QDockWidget *m_dock;
-	/**
-	 * \var QTabWidget* m_dockTabWidget
-	 * \brief the tab widget that contains widgets provided by referenced Plugin
-	 */
-	QTabWidget *m_dockTabWidget;
-
-	SceneHash h_scene;
-
-	/**
-	 * \var PluginHash h_plugin
-	 * \brief Plugin referencing hash table
-	 */
-	PluginHash h_plugin;
-
-	/**
-	 * \var MapHash h_map
-	 * \brief Map referencing hash table
-	 */
-//	MapHash h_map;
-	MapHash h_vizu;
-
-	/**
-	 * \var bool initialization
-	 * \brief a boolean to determine if the main window is in it's initialization phase or not
-	 */
 	bool m_initialization;
+
+	QVBoxLayout* m_verticalLayout;
+	SplitArea* m_splitArea;
+
+	Context* m_context;
+
+	QDockWidget* m_dock;
+	QTabWidget* m_dockTabWidget;
+
+	SceneHash h_scenes;
+	PluginHash h_plugins;
+	MapHash h_maps;
 
 	/**
 	 * \var bool keys[3]
 	 * \brief a static tab to store state of some keys (here: M, Shift and CTRL)
 	 */
 	bool keys[3];
-
-	Context *m_context;
 
 	/**
 	 * \fn void keyPressEvent( QKeyEvent * event )
@@ -410,11 +406,11 @@ public slots:
 	void cb_pluginDialog();
 
 	/**
-	 * \fn void cb_niewView()
-	 * \brief method called when the "add niew view" button is pushed. Show the new empty view creation dialog:
+	 * \fn void cb_newView()
+	 * \brief method called when the "add new view" button is pushed. Show the new empty view creation dialog:
 	 *              NewViewDialog
 	 */
-	void cb_niewScene();
+	void cb_newScene();
 
 	void cb_globalCamera();
 

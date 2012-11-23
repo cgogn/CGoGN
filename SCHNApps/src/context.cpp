@@ -1,4 +1,4 @@
-#include "visualization/context.h"
+#include "context.h"
 
 Context::Context(QWidget* w, const QGLFormat & format) : QGLContext(format, w)
 {}

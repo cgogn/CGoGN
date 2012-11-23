@@ -47,7 +47,7 @@ public:
 	bool setContent(QUrl urlHTMLFile);
 };
 
-}
+} // namespace Dialog
 
 class Error
 {
@@ -119,13 +119,14 @@ public:
 
 typedef enum
 {
-	GLVIEWER_IN_DOCK, SIMPLE_GLVIEWER
+	GLVIEWER_IN_DOCK,
+	SIMPLE_GLVIEWER
 } QGLV_CREATE_SETTINGS;
 
 extern QString app_path;
 
 extern QSplashScreen *splash;
 
-}
+} // namespace System
 
 #endif

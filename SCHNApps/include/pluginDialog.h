@@ -14,41 +14,40 @@
 class Plugin;
 class Window;
 
-class PluginDialog : public QDialog, public Ui::Dialog{
+class PluginDialog : public QDialog, public Ui::Dialog
+{
 	Q_OBJECT
+
 public:
-	PluginDialog(Window* parent=0, PluginHash* activePlugins=NULL);
+	PluginDialog(Window* parent = 0, PluginHash* activePlugins = NULL);
 	~PluginDialog();
 
 protected:
-//	QDomDocument doc;
-//	QFile xmlFile;
-//	QTextStream out;
-
-	PluginHash* activePlugins;
 	Window* parentWindow;
+	PluginHash* activePlugins;
 
-	bool loadInfoPlugins();
-//	void showPlugins();
+	bool restoreState();
 
 private:
 	bool init;
 
-	enum EntryType{DIR=1,FILE, FILE_DIR};
-
-
-	void showPluginsDir(QDir directory);
+	enum EntryType
+	{
+		DIR = 1,
+		FILE,
+		FILE_DIR
+	};
 
 protected slots:
 	void cb_addPlugins();
 	void cb_removePlugins();
-	void cb_addPluginDirectory();
+	void cb_addPluginsDirectory();
 
-	void cb_activePlugin(QTreeWidgetItem* item, int column);
-
-	void cb_acceptDialog();
+	void cb_togglePlugin(QTreeWidgetItem* item, int column);
 
 	void customContextMenu(const QPoint & pos);
+
+	void cb_acceptDialog();
 
 	void showPluginInfo();
 };

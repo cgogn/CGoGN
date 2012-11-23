@@ -7,7 +7,7 @@
 #include "cameraViewDialog.h"
 #include "cameraSceneDialog.h"
 
-View::View(Scene* s, QString name, Camera* c, QGLWidget * shareWidget, Context* context, QWidget* parent) :
+View::View(Scene* s, const QString& name, Camera* c, QGLWidget * shareWidget, Context* context, QWidget* parent) :
 	QGLViewer(new Context(NULL, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer))),
 	m_scene(s),
 	m_name(name),
@@ -81,14 +81,6 @@ View::~View()
 
 
 void View::updateGL()
-{
-	if(m_scene)
-		m_scene->updateGL(this);
-
-	QGLViewer::updateGL();
-}
-
-void View::simpleUpdate()
 {
 	QGLViewer::updateGL();
 }

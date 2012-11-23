@@ -1,4 +1,4 @@
-#include "interface/system.h"
+#include "system.h"
 
 #include <QErrorMessage>
 #include <QMessageBox>
@@ -7,21 +7,23 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
-using namespace System;
+namespace System
+{
 
-Error::ERROR_CODE Error::code= SUCCESS;
+Error::ERROR_CODE Error::code = SUCCESS;
 
-QString Error::parameter= QString("???");
+QString Error::parameter = QString("???");
 
-QString app_path= QString();
+QString app_path = QString();
 
-bool Events::movieDialogOpened= false;
+bool Events::movieDialogOpened = false;
 
+void Error::showError(QWidget* parent)
+{
+	QString message = QString();
 
-void Error::showError(QWidget* parent){
-	QString message= QString();
-
-	switch (Error::code){
+	switch (Error::code)
+	{
 	case SUCCESS:
 	{
 		message= QString::fromUtf8("ERREUR - SUCESS: Aucun erreur n'est survenue.");
@@ -227,32 +229,29 @@ void Error::showError(QWidget* parent){
 	}
 	}
 
-	if(!parameter.isEmpty()) parameter= QString("???");
+	if(!parameter.isEmpty())
+		parameter= QString("???");
 
 	QMessageBox err;
 	err.setText(message);
 	err.exec();
 
-	code= SUCCESS;
+	code = SUCCESS;
 }
 
-Error::ERROR_CODE Error::BAD_PLUGIN_PATH_IN_FILE_f(QString file){
-	if(code!=BAD_PLUGIN_PATH_IN_FILE){
+Error::ERROR_CODE Error::BAD_PLUGIN_PATH_IN_FILE_f(QString file)
+{
+	if(code != BAD_PLUGIN_PATH_IN_FILE)
 		parameter.clear();
-	}
-
-	parameter+= " "+file;
-
+	parameter += " " + file;
 	return BAD_PLUGIN_PATH_IN_FILE;
 }
 
-Error::ERROR_CODE Error::NO_PLUGIN_IN_DIR_f(QString dir){
-	if(code!=NO_PLUGIN_IN_DIR){
-			parameter.clear();
-	}
-
-	parameter+= " "+dir;
-
+Error::ERROR_CODE Error::NO_PLUGIN_IN_DIR_f(QString dir)
+{
+	if(code != NO_PLUGIN_IN_DIR)
+		parameter.clear();
+	parameter += " " + dir;
 	return NO_PLUGIN_IN_DIR;
 }
 
@@ -404,58 +403,63 @@ Error::ERROR_CODE Error::BAD_XML_FILE_f(QString filepath){
 	return BAD_XML_FILE;
 }
 
-void Info::showPluginInfo(QString pluginAbsolutePath, QWidget* parent){
+void Info::showPluginInfo(QString pluginAbsolutePath, QWidget* parent)
+{
 	QFileInfo fileInfo(pluginAbsolutePath);
-	if(fileInfo.exists()){
-		QString baseName= fileInfo.baseName();
-		QString path= fileInfo.absolutePath();
-		int i= baseName.indexOf("lib");
+	if(fileInfo.exists())
+	{
+		QString baseName = fileInfo.baseName();
+		QString path = fileInfo.absolutePath();
+		int i = baseName.indexOf("lib");
 		QString newName(baseName);
-		if(i==0){
-			newName= newName.replace(0,3,"");
-		}
-
+		if(i == 0)
+			newName = newName.replace(0,3,"");
 		showPluginInfo(path, newName);
 	}
-	else{
+	else
+	{
 		QMessageBox msg(parent);
 		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-				" fournir un fichier d'information pour ce plugin."));
+									  " fournir un fichier d'information pour ce plugin."));
 		msg.exec();
 	}
-
 }
 
-void Info::showPluginInfo(QString locationPath, QString pluginName, QWidget* parent){
-	QString newPath= locationPath+"/"+pluginName+".html";
+void Info::showPluginInfo(QString locationPath, QString pluginName, QWidget* parent)
+{
+	QString newPath = locationPath + "/" + pluginName + ".html";
 
-	QUrl url= QUrl::fromLocalFile(newPath);
-	if(QFileInfo(newPath).exists()){
+	QUrl url = QUrl::fromLocalFile(newPath);
+	if(QFileInfo(newPath).exists())
+	{
 		Dialog::InfoDialog id(parent);
-		if(!id.setContent(url)){
+		if(!id.setContent(url))
+		{
 			QMessageBox msg(parent);
 			msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-					" fournir un fichier d'information pour ce plugin."));
+										  " fournir un fichier d'information pour ce plugin."));
 			msg.exec();
 		}
-		else{
+		else
 			id.exec();
-		}
 	}
-	else{
+	else
+	{
 		QMessageBox msg(parent);
 		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-				" fournir un fichier d'information pour ce plugin."));
+									  " fournir un fichier d'information pour ce plugin."));
 		msg.exec();
 	}
 }
 
-
-bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile){
-	if(urlHTMLFile.isLocalFile()){
+bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile)
+{
+	if(urlHTMLFile.isLocalFile())
+	{
 		textBrowser->setSource(urlHTMLFile);
-
 		return true;
 	}
 	return false;
 }
+
+} // namespace System
