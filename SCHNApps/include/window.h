@@ -243,6 +243,11 @@ public:
 	 * MANAGE MAPS
 	 *********************************************************/
 
+	/*********************************************************
+	 * MANAGE CAMERAS
+	 *********************************************************/
+
+	QList<Camera*> getCameras() { return h_cameras.values(); }
 
 
 
@@ -353,6 +358,7 @@ protected:
 	SceneHash h_scenes;
 	PluginHash h_plugins;
 	MapHash h_maps;
+	CameraHash h_cameras;
 
 	/**
 	 * \var bool keys[3]

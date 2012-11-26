@@ -20,8 +20,7 @@ public:
 	enum { UNLIMITED_NUMBER_OF_MAPS = -1 };
 	enum { UNLIMITED_NUMBER_OF_SCENES = -1 };
 
-	Plugin(const QString& name, const QString& filePath);
-
+	Plugin(const QString& name, const QString& filePath, Window* window);
 	virtual ~Plugin();
 
 	virtual bool enable() = 0;
@@ -43,13 +42,13 @@ public:
 	virtual void cb_updateMatrix(View* view) = 0;
 	virtual void cb_redraw(Scene* scene) = 0;
 
-	virtual bool cb_keyPress(Scene* scene, int event) = 0;
-	virtual bool cb_keyRelease(Scene* scene, int event) = 0;
-	virtual bool cb_mousePress(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseRelease(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseClick(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseMove(Scene* scene, int buttons, int x, int y) = 0;
-	virtual bool cb_wheelEvent(Scene* scene, int delta, int x, int y) = 0;
+	virtual void cb_keyPress(Scene* scene, int key) = 0;
+	virtual void cb_keyRelease(Scene* scene, int key) = 0;
+	virtual void cb_mousePress(Scene* scene, int button, int x, int y) = 0;
+	virtual void cb_mouseRelease(Scene* scene, int button, int x, int y) = 0;
+	virtual void cb_mouseClick(Scene* scene, int button, int x, int y) = 0;
+	virtual void cb_mouseMove(Scene* scene, int buttons, int x, int y) = 0;
+	virtual void cb_wheelEvent(Scene* scene, int delta, int x, int y) = 0;
 
 	virtual void cb_mapAdded(MapHandler* map) = 0;
 	virtual void cb_mapRemoved(MapHandler* map) = 0;
@@ -60,21 +59,21 @@ public:
 	/*********************************************************
 	 * MANAGE MAPS
 	 *********************************************************/
-	bool addMap(MapHandler* map);
-	void removeMap(MapHandler* map);
-	bool hasMap(MapHandler* map);
-	QList<MapHandler*> getMaps();
-	void setMaxNumberOfMaps(int n);
-	int getCurrentNumberOfMaps();
-	int getRemainingNumberOfMaps();
+	bool linkMap(MapHandler* map);
+	void unlinkMap(MapHandler* map);
+	bool isLinkedToMap(MapHandler* map);
+	QList<MapHandler*> getLinkedMaps();
+	void setMaxNumberOfLinkedMaps(int n);
+	int getCurrentNumberOfLinkedMaps();
+	int getRemainingNumberOfLinkedMaps();
 
 	/*********************************************************
 	 * MANAGE SCENES
 	 *********************************************************/
-	bool addScene(Scene* scene);
-	void removeScene(Scene* scene);
-	bool hasScene(Scene* scene);
-	QList<Scene*> getScenes();
+	bool linkScene(Scene* scene);
+	void unlinkScene(Scene* scene);
+	bool isLinkedToScene(Scene* scene);
+	QList<Scene*> getLinkedScenes();
 
 	/*********************************************************
 	 * MANAGE DOCK TABS

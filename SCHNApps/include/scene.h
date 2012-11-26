@@ -41,40 +41,32 @@ public:
 	void updateGL();
 	void draw(View *v);
 
-	bool keyPressEvent(QKeyEvent* event);
-	bool keyReleaseEvent(QKeyEvent *e);
-	bool mousePressEvent(QMouseEvent* event);
-	bool mouseReleaseEvent(QMouseEvent* event);
-	bool mouseMoveEvent(QMouseEvent* event);
-	bool wheelEvent(QWheelEvent* event);
+	void keyPressEvent(QKeyEvent* event);
+	void keyReleaseEvent(QKeyEvent *e);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	void mouseMoveEvent(QMouseEvent* event);
+	void wheelEvent(QWheelEvent* event);
 
 	/*********************************************************
 	 * MANAGE VIEWS
 	 *********************************************************/
-	View* addView(Camera* c = NULL);
-	void removeView(View* view);
-	View* getView(int num);
-	QList<View*> getViews() { return l_views; }
-	int getNbViews() { return l_views.size(); }
-
-	void viewClickedButton(View* view, ViewButton* viewButton);
+	void linkView(View* view);
+	void unlinkView(View* view);
+	View* getLinkedView(unsigned int num);
+	QList<View*> getLinkedViews() { return l_views; }
+	int getNbLinkedViews() { return l_views.size(); }
 
 	/*********************************************************
 	 * MANAGE PLUGINS
 	 *********************************************************/
-	void addPlugin(Plugin* plugin, bool callBackInitGL = true);
-	void removePlugin(Plugin* plugin);
-	QList<Plugin*> getPlugins() { return l_plugins; }
-	bool hasPlugins() { return !l_plugins.isEmpty(); }
-	bool hasPlugin(Plugin* plugin) { return l_plugins.contains(plugin); }
+	void linkPlugin(Plugin* plugin, bool callInitGL = true);
+	void unlinkPlugin(Plugin* plugin);
+	QList<Plugin*> getLinkedPlugins() { return l_plugins; }
+	bool isLinkedToPlugins() { return !l_plugins.isEmpty(); }
+	bool isLinkedToPlugin(Plugin* plugin) { return l_plugins.contains(plugin); }
 //	void linkWithPlugin();
 //	void unlinkPlugin();
-
-	/*********************************************************
-	 * MANAGE VIEW BUTTONS
-	 *********************************************************/
-	bool addViewButton(ViewButton* viewButton);
-	ViewButton* removeViewButton(ViewButton* viewButton);
 
 //	VBOHandler* addNewVBO(QString name);
 //	void addVBO(VBOHandler* vbo);
@@ -93,10 +85,7 @@ protected:
 	QList<View*> l_views;
 	QList<Plugin*> l_plugins;
 //	QList<VBOHandler*> l_vbo;
-	QList<ViewButton*> l_viewButtons;
-
-signals:
-	void viewButtonClicked(View*, ViewButton*);
+//	QList<ViewButton*> l_viewButtons;
 };
 
 #endif

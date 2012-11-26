@@ -6,15 +6,26 @@
 
 #include <iostream>
 
-ViewButton::ViewButton(QString image, View* view)
+ViewButton::ViewButton(const QString& image, View* view) :
+	m_view(view)
 {
 	m_GLimg.load(image);
 	if(!m_GLimg.isNull())
 	{
 		m_size = m_GLimg.size();
 		m_GLimg = QGLWidget::convertToGLFormat(m_GLimg);
-		m_texID = view->bindTexture(m_GLimg,GL_TEXTURE_2D, GL_RGBA);
+		m_texID = m_view->bindTexture(m_GLimg, GL_TEXTURE_2D, GL_RGBA);
 	}
+}
+
+ViewButton::~ViewButton()
+{
+	m_view->deleteTexture(m_texID);
+}
+
+void ViewButton::click()
+{
+	emit clicked();
 }
 
 void ViewButton::drawAt(int x, int y)
@@ -33,12 +44,12 @@ void ViewButton::drawAt(int x, int y)
 	glEnd();
 }
 
-ViewButtonArea::~ViewButtonArea()
-{}
+
+
 
 void ViewButtonArea::addButton(ViewButton* button)
 {
-	if(!l_button.contains(button))
+	if(!l_buttons.contains(button))
 	{
 		QSize b_size = button->getSize();
 
@@ -48,56 +59,47 @@ void ViewButtonArea::addButton(ViewButton* button)
 		if(b_size.height() > m_form.height())
 			m_form.setHeight(b_size.height() + 6);
 
-		l_button.push_back(button);
-
-		connect(button, SIGNAL(destroyed(QObject*)), this, SLOT(buttonDestroyed(QObject*)));
+		l_buttons.push_back(button);
 	}
 }
 
-ViewButton* ViewButtonArea::takeButton(ViewButton* button)
+void ViewButtonArea::removeButton(ViewButton* button)
 {
-	ViewButton* b = NULL;
-	int i;
-	while((i = l_button.indexOf(button)) >= 0)
+	if(l_buttons.removeOne(button))
 	{
 		QSize b_size = button->getSize();
 
 		m_form.setWidth(m_form.width() - b_size.width() - 3);
 		m_form.moveTopLeft(QPoint(m_form.x() + b_size.width() + 3, m_form.y()));
 
-		int h_min = l_button.first()->getSize().height();
-		foreach(ViewButton* b, l_button)
+		int h_max = l_buttons.first()->getSize().height();
+		foreach(ViewButton* b, l_buttons)
 		{
 			int h = b->getSize().height();
-			if(h > h_min)
-				h_min = h;
+			if(h > h_max)
+				h_max = h;
 		}
-		m_form.setHeight(h_min + 6);
-
-		b = l_button.takeAt(i);
+		m_form.setHeight(h_max + 6);
 	}
-	disconnect(button, SIGNAL(destroyed(QObject*)), this, SLOT(buttonDestroyed(QObject*)));
-	return b;
 }
 
-bool ViewButtonArea::isIn(int x, int y)
+bool ViewButtonArea::isClicked(int x, int y)
 {
-	return m_form.contains(x,y);
+	return m_form.contains(x, y);
 }
 
-ViewButton* ViewButtonArea::clickAt(int x, int y)
+ViewButton* ViewButtonArea::clickButton(int x, int y)
 {
 	QPoint p = m_form.topLeft();
 	p.setY(p.y() + 3);
-	for(QList<ViewButton*>::iterator it = l_button.begin(); it != l_button.end(); ++it)
+	foreach(ViewButton* b, l_buttons)
 	{
-		if(QRect(p, (*it)->getSize()).contains(x,y))
+		if(QRect(p, b->getSize()).contains(x,y))
 		{
-			emit(buttonClicked((*it)));
-			(*it)->click(m_view);
-			return (*it);
+			b->click();
+			return b;
 		}
-		p.setX(p.x() + 3 + (*it)->getSize().width());
+		p.setX(p.x() + 3 + b->getSize().width());
 	}
 	return NULL;
 }
@@ -109,15 +111,12 @@ void ViewButtonArea::setTopRightPosition(int x, int y)
 
 void ViewButtonArea::draw()
 {
-	int p_x = m_form.x(), p_y = m_form.y();
-	for(QList<ViewButton*>::iterator it = l_button.begin(); it != l_button.end(); ++it)
-	{
-		(*it)->drawAt(p_x, p_y + 3);
-		p_x += (*it)->getSize().width() + 3;
-	}
-}
+	int p_x = m_form.x();
+	int p_y = m_form.y();
 
-void ViewButtonArea::buttonDestroyed(QObject* button)
-{
-	takeButton((ViewButton*)button);
+	foreach(ViewButton* b, l_buttons)
+	{
+		b->drawAt(p_x, p_y + 3);
+		p_x += b->getSize().width() + 3;
+	}
 }

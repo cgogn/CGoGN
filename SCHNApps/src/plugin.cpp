@@ -1,14 +1,15 @@
 #include "plugin.h"
 
-Plugin::Plugin(const QString& name, const QString& filePath)
-{
-
-}
+Plugin::Plugin(const QString& name, const QString& filePath, Window* window) :
+	m_name(name),
+	m_filePath(filePath),
+	m_window(window)
+{}
 
 Plugin::~Plugin()
 {
 	foreach(Scene* scene, l_scenes)
-		removeScene(scene);
+		unlinkScene(scene);
 
 	foreach(QWidget* tabWidget, l_tabWidgets)
 		removeTabInDock(tabWidget);
@@ -38,7 +39,7 @@ void Plugin::updateGL(Scene* s)
  * MANAGE MAPS
  *********************************************************/
 
-bool Plugin::addMap(MapHandler* map)
+bool Plugin::linkMap(MapHandler* map)
 {
 	if(
 		(m_maxNumberOfMaps == UNLIMITED_NUMBER_OF_MAPS || l_maps.size() < m_maxNumberOfMaps)
@@ -54,34 +55,34 @@ bool Plugin::addMap(MapHandler* map)
 		return false;
 }
 
-void Plugin::removeMap(MapHandler* map)
+void Plugin::unlinkMap(MapHandler* map)
 {
 	if(l_maps.removeOne(map))
 		cb_mapRemoved(map);
 }
 
-bool Plugin::hasMap(MapHandler* map)
+bool Plugin::isLinkedToMap(MapHandler* map)
 {
 	return l_maps.contains(map);
 }
 
-QList<MapHandler*> Plugin::getMaps()
+QList<MapHandler*> Plugin::getLinkedMaps()
 {
 	return l_maps;
 }
 
-void Plugin::setMaxNumberOfMaps(int n)
+void Plugin::setMaxNumberOfLinkedMaps(int n)
 {
 	if(n >= l_maps.size() || n == UNLIMITED_NUMBER_OF_MAPS)
 		m_maxNumberOfMaps = n;
 }
 
-int Plugin::getCurrentNumberOfMaps()
+int Plugin::getCurrentNumberOfLinkedMaps()
 {
 	return l_maps.size();
 }
 
-int Plugin::getRemainingNumberOfMaps()
+int Plugin::getRemainingNumberOfLinkedMaps()
 {
 	if(m_maxNumberOfMaps != UNLIMITED_NUMBER_OF_MAPS)
 		return m_maxNumberOfMaps - l_maps.size();
@@ -93,9 +94,9 @@ int Plugin::getRemainingNumberOfMaps()
  * MANAGE SCENES
  *********************************************************/
 
-bool Plugin::addScene(Scene* scene)
+bool Plugin::linkScene(Scene* scene)
 {
-	if(s && !l_scenes.contains(scene))
+	if(scene && !l_scenes.contains(scene))
 	{
 		l_scenes.push_back(scene);
 		scene->addPlugin(this);
@@ -107,7 +108,7 @@ bool Plugin::addScene(Scene* scene)
 		return false;
 }
 
-void Plugin::removeScene(Scene* scene)
+void Plugin::unlinkScene(Scene* scene)
 {
 	if(l_scenes.removeOne(scene))
 	{
@@ -117,12 +118,12 @@ void Plugin::removeScene(Scene* scene)
 	}
 }
 
-bool Plugin::hasScene(Scene* scene)
+bool Plugin::isLinkedToScene(Scene* scene)
 {
 	return l_scenes.contains(scene);
 }
 
-QList<Scene*> Plugin::getScenes()
+QList<Scene*> Plugin::getLinkedScenes()
 {
 	return l_scenes;
 }
