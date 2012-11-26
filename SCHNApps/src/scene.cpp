@@ -1,101 +1,65 @@
-#include "visualization/scene.h"
+#include "scene.h"
 
 #include <QGLContext>
 #include <iostream>
 
-#include "visualization/camera.h"
-#include "visualization/view.h"
-#include "visualization/context.h"
-#include "visualization/vboHandler.h"
-#include "interface/window.h"
-#include "plugins/plugin.h"
+#include "camera.h"
+#include "view.h"
+#include "context.h"
+#include "vboHandler.h"
+#include "window.h"
+#include "plugin.h"
 
-Scene::Scene(QString name, Window* window, Camera* sharedCamera) :
-	m_window(window),
+Scene::Scene(const QString& name, Window* window) :
 	m_name(name),
-	m_creator(NULL),
-	m_context(window->context())
+	m_window(window),
+	m_context(window->getContext())
+{}
+
+Scene::~Scene()
 {
-	View* view= new View(this,name+"_view1",sharedCamera,0,m_context);
+	foreach(View* v, l_views)
+		removeView(v);
 
-	l_view.push_back(view);
+	foreach(Plugin* p, l_plugins)
+		removePlugin(p);
 
-	view->enableLinking();
-	view->enableCameraGesture();
-	view->enableViewClose();
+	// view buttons
 }
 
-Scene::Scene(QString name, Plugin* plugin, Window* window) :
-			m_window(window),
-			m_name(name),
-			m_creator(plugin),
-			m_context(window->context())
+void Scene::initGL()
 {
-	View* view= new View(this,name+"_view1",0,0,m_context);
-
-	l_view.push_back(view);
-
-	l_plugin.push_back(plugin);
-
-	view->enableLinking();
-	view->enableUnlinking();
-	view->enableCameraGesture();
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_initGL(this);
 }
 
-Scene::~Scene(){
-	while(!l_view.isEmpty()){
-		View* view= l_view.takeFirst();
-		delete view;
-	}
-//	while(!l_vbo.isEmpty()){
-//		VBOHandler* vbo= l_vbo.first();
-//		if(!vbo->isShared()){
-//			vbo->unshareWith(this);
-//			delete vbo;
-//		}
-//		else{
-//			vbo->unshareWith(this);
-//		}
-//	}
-	while(!l_plugin.isEmpty()){
-		suppressLinkWith(l_plugin.last());
-	}
+void Scene::updateGL()
+{
+	foreach(View* v, l_views)
+		v->updateGL();
 }
 
-void Scene::updateGL(View* view){
-	foreach(View* v, l_view){
-		std::cout << "a ___" << std::endl;
-		if(v!=view){
-			v->simpleUpdate();
-		}
-	}
-}
-
-void Scene::draw(View* view){
+void Scene::draw(View *v)
+{
+	QList<Camera*> cameras = m_window->getCameras();
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glDisable(GL_LIGHTING);
-	foreach(View* v, l_view){
-		v->drawCameras(view);
-	}
+	foreach(Camera* c, cameras)
+		c->draw();
 	glPopAttrib();
 
-
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	foreach(Plugin* plugin, l_plugin){
-		plugin->cb_updateMatrix(view);
+	foreach(Plugin* plugin, l_plugins)
+	{
+		plugin->cb_updateMatrix(v);
 		plugin->cb_redraw(this);
 	}
 	glPopAttrib();
 }
 
-void Scene::init(){
-	foreach(Plugin* plugin, l_plugin){
-		plugin->cb_initGL(this);
-	}
-}
-
-bool Scene::keyPressEvent(QKeyEvent* event){
-	int k= event->key();
+bool Scene::keyPressEvent(QKeyEvent* event)
+{
+	int k = event->key();
 
 	//for each plugin that operated on this view,
 	//a callback is made on their corresponding method.
