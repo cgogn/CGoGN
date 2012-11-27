@@ -5,18 +5,15 @@
 
 #include <QVBoxLayout>
 
-#include "Topology/generic/genericmap.h"
-
 #include "types.h"
-#include "visualization/mapHandler.h"
-#include "interface/splitArea.h"
-#include "interface/system.h"
+#include "system.h"
+#include "splitArea.h"
 
+class Plugin;
 class Scene;
 class View;
 class Camera;
-class Plugin;
-class Context;
+//class Context;
 class MapHandler;
 
 class Window : public QMainWindow, Ui::Window
@@ -25,62 +22,43 @@ class Window : public QMainWindow, Ui::Window
 
 public:
 	/**
-	 * \fn Window(QWidget* parent=0)
+	 * \fn Window(QWidget* parent = NULL)
 	 * \brief Default (and unique) constructor
 	 *
 	 * \param parent the parent of the window
 	 */
-	Window(QWidget *parent = 0);
+	Window(QWidget* parent = NULL);
+
 	/**
 	 * \fn ~Window()
 	 * \brief the class destructor
 	 */
 	~Window();
 
-	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
-	bool addNewSceneView(Scene *scene, View *view);
+	QGLContext* getContext() { return m_context; }
 
-	QList<Scene *> scenes()
-	{
-		return h_scene.values();
-	}
-
-	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
-
-	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
-	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
-
-	void removeScene(QString name);
-
-	/**
-	 * \fn void addEmptyDock()
-	 * \brief add an empty dock to the window, if one doesn't already exists
-	 *
-	 * \see addWidgetInDock()
-	 * \see VisualPlugin::addWidgetInDockTab()
-	 */
-	void addEmptyDock();
+	/*********************************************************
+	 * MANAGE DOCK
+	 *********************************************************/
 
 	/**
 	 * \fn QTabWidget* getDockTabWidget()
 	 * \brief Accessor to the QTabWidget of this interface
 	 *
-	 * An early developed function. Aparantly their's no need for such feature
-	 *
 	 * \return a pointer to the TabWidget, NULL if not allocated yet
 	 */
-	QTabWidget *getDockTabWidget();
+	QTabWidget* getDockTabWidget();
 
 	/**
-	 * \fn void addWidgetInDockTab(QWidget* newTabWidget, QString tabText)
+	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText)
 	 * \brief Adds the widget as a new tab in the interface's dock
 	 *
-	 * \param newTabWidget the created and allocated pointer to the QWidget to add in the dock
+	 * \param tabWidget the created and allocated pointer to the QWidget to add in the dock
 	 * \param tabText The text that will appears in the tab label
 	 *
 	 * \see removeTabInDock()
 	 */
-	void addWidgetInDockTab(QWidget *newTabWidget, QString tabText);
+	void addTabInDock(QWidget* tabWidget, const QString& tabText);
 
 	/**
 	 * \fn void removeTabInDock(QWidget* tabWidget)
@@ -92,14 +70,18 @@ public:
 	 *
 	 * \see addWidgetInDockTab()
 	 */
-	void removeTabInDock(QWidget *tabWidget);
+	void removeTabInDock(QWidget* tabWidget);
+
+	/*********************************************************
+	 * MANAGE MENU ACTIONS
+	 *********************************************************/
 
 	/**
-	 * \fn bool addMenuAction(QString menuPath, QAction* act)
+	 * \fn bool addMenuAction(const QString& menuPath, QAction* action)
 	 * \brief adds an action in the program menu bar
 	 *
 	 * \param menuPath the menu path (see details below) to specify a location for the action in the menu.
-	 * \param act a pointer to the allocated action to add in the menu. All the details ont that action (such as
+	 * \param action a pointer to the allocated action to add in the menu. All the details on that action (such as
 	 *          QObject::connect() calls) are not dealt in this function.
 	 *
 	 *  The menu path is a string used to specify the location of the new action in the menu bar.
@@ -114,39 +96,48 @@ public:
 	 *                  submenu of a new menu <em>"Settings"</em>, the menu path
 	 *                  shall be: <em>Settings;config;action</em>
 	 *
-	 *
 	 *  A new action should at least belong to one menu (already existing or not). Otherwise the method will fail.
 	 *
-	 *  This method is already called by reimplemented Plugin methods, there's apparently no reason for calling it.
+	 *  This method is called by Plugin methods
 	 *
 	 *  \return a boolean whether the method succeeded or not.
 	 *
 	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
+	 *    depending on the error. This error can be shown with Error::showError
 	 *
 	 * \see deleteMenuAction()
-	 * \see VisualPlugin::addMenuAction()
+	 * \see Plugin::addMenuAction()
 	 */
-	bool addMenuAction(QString menuPath, QAction *act);
+	bool addMenuAction(const QString& menuPath, QAction* action);
 
 	/**
-	 * \fn void deleteMenuAction(QAction* act)
+	 * \fn void deleteMenuAction(QAction* action)
 	 * \brief delete an action from the menu bar
 	 *
-	 * \param act pointer to the allocated action to delete.
+	 * \param action pointer to the allocated action to delete.
 	 *
 	 *  If this action was the only action remaining in a menu, this menu will also be deleted.
 	 *
 	 *  \warning DO NOT use this method with an action that hasn't been added with addMenuAction()
 	 *
-	 *  This method is already called by reimplemented Plugin methods, there's apparently no reason for calling it.
+	 *  This method is called by Plugin methods
 	 *
 	 *  \see addMenuAction()
-	 *  \see VisualPlugin::deleteMenuActions()
+	 *  \see Plugin::removeMenuAction()
 	 */
-	void deleteMenuAction(QAction *act);
+	void removeMenuAction(QAction* action);
 
-	bool addToolbarAction(QAction *act);
+	/*********************************************************
+	 * MANAGE TOOLBAR ACTIONS
+	 *********************************************************/
+
+	bool addToolbarAction(QAction* action);
+
+	void removeToolbarAction(QAction* action);
+
+	/*********************************************************
+	 * MANAGE PLUGINS
+	 *********************************************************/
 
 	/**
 	 * \fn bool loadPlugin(QString pluginPath)
@@ -155,28 +146,28 @@ public:
 	 * \param pluginPath the absolute path of the Plugin location
 	 *
 	 * The Plugin is loaded and referenced under a name that is the Plugin file name
-	     where the extension '.so' and the prefix 'lib' were removed.
+	 * where the extension ('.so', '.dylib') and the prefix 'lib' were removed.
 	 *
 	 *  <b>Example:</b> <em>/path/libExample.so</em> will be referenced as <em>Example</em>
 	 *
 	 * You have to make sure that a Plugin file with a similar name hasn't been loaded yet, otherwise
 	 * the loading will fail.
 	 *
-	 * This method calls for the Plugin::activate() method on the concerned Plugin. That is why
-	   when Plugin are written, this method is override and used as an initialization method.
+	 * This method calls the Plugin::enable() method of the concerned Plugin. That is why
+	 * when Plugin are written, this method is overriden and used as an initialization method.
 	 *
-	 *  \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
+	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
 	 *
-	 *  \return a boolean whether the loading succeeded or not.
+	 * \return a boolean whether the loading succeeded or not.
 	 *
 	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
+	 * depending on the error. This error can be shown with Error::showError
 	 *
 	 * \see unloadPlugin()
-	 * \see getPlugin()
-	 * \see Plugin::activate()
-	*/
-	Plugin *loadPlugin(QString pluginPath);
+	 * \see getPlugins()
+	 * \see Plugin::enable()
+	 */
+	Plugin* loadPlugin(const QString& pluginPath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -184,19 +175,19 @@ public:
 	 *
 	 * \param pluginName the name under which the Plugin is referenced
 	 *
-	 * The Plugin of the given name is dereferenced and deleted, if he exists and was previously
+	 * The Plugin of the given name is dereferenced and deleted, if it exists and was previously
 	 * referenced, if not, the method does nothing.
 	 *
-	 * This method calls for the Plugin::disable() method on the concerned Plugin. That is why,
-	   when Plugin are written, this method is override and used as an destruction method.
+	 * This method calls the Plugin::disable() method of the concerned Plugin. That is why,
+	 * when Plugin are written, this method is overriden and used as a destruction method.
 	 *
 	 * \warning In the program this method is called under specific and controlled circumstances, you should probably not call it.
 	 *
 	 * \see loadPlugin()
-	 * \see getPlugin()
+	 * \see getPlugins()
 	 * \see Plugin::disable()
 	 */
-	void unloadPlugin(QString pluginName);
+	void unloadPlugin(const QString& pluginName);
 
 	/**
 	 * \fn Plugin* checkPluginDependencie(QString name, Plugin* dependantPlugin)
@@ -216,82 +207,60 @@ public:
 	 *
 	 * \see loadPlugin()
 	 * \see VisualPlugin::addDependencie()
-	 **/
-
-	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
-
-	QList<Plugin *> activePlugins()
-	{
-		return h_plugin.values();
-	}
-
-	void linkDialog(Scene *scene);
-	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
-
-	bool addReferencedMap(QString map_name, MapHandler *map);
-
-	/**
-	 * \fn bool addNewReferencedMap(QString map_name, T* &map)
-	 * \brief adds and reference a new map
-	 *
-	 * This method insert in the map hash table a new map that will be referenced under
-	 * the given name.
-	 *
-	 * \warning This function was meant to be used by the plugins and GLViewers, you should probably not call it.
-	 *
-	 * \tparam T the template parameter which the type of the map you want to add. T must be a CGoGN
-	 *      map type, that is to say an instance of a class that inherits CGoGN::GenericMap.
-	 *
-	 * \param[in] map_name The name under which will be referenced the map
-	 * \param[out] map A pointer to a type T map, which will be set to the adress of the newly created map, or
-	 *      to the already existing map refererence by the same name
-	 *
-	 * \return true if the map is created, false if creation fails (returns false if a same named map already exists)
-	 *
-	 * \see getReferencedMap()
 	 */
-	template<typename T>
-	MapHandler *addNewReferencedMap(QString map_name, T *&map)
-	{
-		//if a map isn't already referenced under that name
-		MapHash::iterator it;
+//	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
 
-		if ((it = h_vizu.find(map_name)) == h_vizu.end())
-		{
-			//the map is created, inserted, and reference under the given name
-			map = new T();
-			MapHandler *vh = new MapHandler((CGoGN::GenericMap *)map);
-			h_vizu.insert(map_name, vh);
+	Plugin* getPlugin(const QString& name);
 
-			return vh;
-		}
-		//if a map already has that name
-		else
-		{
-			//failure + map affected with the address of the already existing map
-			map = ((T *)((*it)->map()));
-			System::Error::code = System::Error::MAP_EXISTS_f(map_name);
-			return NULL;
-		}
-	}
+	QList<Plugin*> getPlugins() { return h_plugins.values(); }
 
-	/**
-	 * \fn T* getReferencedMap(QString map_name)
-	 * \brief return the map referenced under the given name
-	 *
-	 * \warning This function was meant to be used by the plugins and GLViewers, you should probably not call it.
-	 *
-	 * \tparam T the type of the referenced map you want to fetch.
-	 *
-	 * \param map_name the name under which is referenced the map.
-	 *
-	 * \return a T type pointer to the map referenced under the given name, if faillure it returns NULL
-	 *
-	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
-	 *
-	 * \see addNewReferencedMap()
-	 */
+	/*********************************************************
+	 * MANAGE SCENES
+	 *********************************************************/
+
+	Scene* addScene(const QString& name);
+	void removeScene(const QString& name);
+	Scene* getScene(const QString& name);
+	QList<Scene*> getScenes() { return h_scenes.values(); }
+
+//	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
+//	bool addNewSceneView(Scene *scene, View *view);
+
+//	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
+
+//	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
+//	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
+
+//	void linkDialog(Scene *scene);
+//	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
+
+	/*********************************************************
+	 * MANAGE VIEWS
+	 *********************************************************/
+
+	View* addView(const QString& name);
+	void removeView(const QString& name);
+	View* getView(const QString& name);
+	QList<View*> getView() { return h_views.values(); }
+
+	/*********************************************************
+	 * MANAGE CAMERAS
+	 *********************************************************/
+
+	Camera* addCamera(const QString& name);
+	void removeCamera(const QString& name);
+	Camera* getCamera(const QString& name);
+	QList<Camera*> getCameras() { return h_cameras.values(); }
+
+	/*********************************************************
+	 * MANAGE MAPS
+	 *********************************************************/
+
+	bool addMap(const QString& name, MapHandler* map);
+	void removeMap(const QString& name);
+	MapHandler* getMap(const QString& name);
+	QList<MapHandler*> getMaps() { return h_maps.values(); }
+
 //	template<typename T>
 //	T* getReferencedMap(QString map_name){
 //		MapHash::iterator it;
@@ -303,92 +272,37 @@ public:
 //			return NULL;
 //		}
 //	}
-	MapHandler *getReferencedMap(QString map_name);
-
-	Context *context()
-	{
-		return m_context;
-	}
-
-	QList<Plugin *> plugins()
-	{
-		return h_plugin.values();
-	}
-
-	QList<MapHandler *> maps()
-	{
-		return h_vizu.values();
-	}
 
 protected:
-	QVBoxLayout *verticalLayout;
-	SplitArea *m_splitArea;
-
-	/**
-	 * \var QDockWidget* m_dock
-	 * \brief The dock of the application
-	 */
-	QDockWidget *m_dock;
-	/**
-	 * \var QTabWidget* m_dockTabWidget
-	 * \brief the tab widget that contains widgets provided by referenced Plugin
-	 */
-	QTabWidget *m_dockTabWidget;
-
-	SceneHash h_scene;
-
-	/**
-	 * \var PluginHash h_plugin
-	 * \brief Plugin referencing hash table
-	 */
-	PluginHash h_plugin;
-
-	/**
-	 * \var MapHash h_map
-	 * \brief Map referencing hash table
-	 */
-//	MapHash h_map;
-	MapHash h_vizu;
-
-	/**
-	 * \var bool initialization
-	 * \brief a boolean to determine if the main window is in it's initialization phase or not
-	 */
 	bool m_initialization;
+
+	QVBoxLayout* m_verticalLayout;
+	SplitArea* m_splitArea;
+
+	QGLContext* m_context;
+
+	QDockWidget* m_dock;
+	QTabWidget* m_dockTabWidget;
+
+	PluginHash h_plugins;
+	SceneHash h_scenes;
+	ViewHash h_views;
+	CameraHash h_cameras;
+	MapHash h_maps;
 
 	/**
 	 * \var bool keys[3]
 	 * \brief a static tab to store state of some keys (here: M, Shift and CTRL)
 	 */
 	bool keys[3];
-
-	Context *m_context;
-
-	/**
-	 * \fn void keyPressEvent( QKeyEvent * event )
-	 * \brief handles the mouse button pressure
-	 *
-	 * Overload function from "QWidget" in order to handle the mouse
-	 * button pressure. See the Qt documentation for more details
-	 * ( http://qt-project.org/doc/qt-4.8/qwidget.html#mousePressEvent ).
-	 */
 	void keyPressEvent(QKeyEvent *event);
-
-	/**
-	 * \fn void keyReleaseEvent( QKeyEvent * event )
-	 * \brief handles the mouse button release
-	 *
-	 * Overload function from "QWidget" in order to handle the mouse
-	 * button release. See the Qt documentation for more details
-	 * ( http://qt-project.org/doc/qt-4.8/qwidget.html#mouseReleaseEvent ).
-	 */
 	void keyReleaseEvent(QKeyEvent *event);
 
 	/**
 	 * \fn void moveView()
 	 * \brief shows a reordering dialog for the Views
 	 *
-	 * Make a call with the rigth parameters to the dialog class
+	 * Make a call with the right parameters to the dialog class
 	 * GLVSelector and show this dialog.
 	 *
 	 * This method is meant to be called when the user press
@@ -398,27 +312,44 @@ protected:
 
 public slots:
 	/**
+	 * \fn void cb_about_SCHNApps();
+	 * \brief function that is called when the "about SCHNApps" menu action is triggered
+	 */
+	void cb_aboutSCHNApps();
+
+	/**
 	 * \fn void cb_about_CGoGN();
 	 * \brief function that is called when the "about CGOGN" menu action is triggered
 	 */
-	void cb_about_CGoGN();
-	/**
-	 * \fn void cb_pluginDialog()
-	 * \brief method called when the "Plugins" menu action is triggered. Show the plugin managmement dialog:
-	 *              PluginDialog
-	 */
-	void cb_pluginDialog();
+	void cb_aboutCGoGN();
 
 	/**
-	 * \fn void cb_niewView()
-	 * \brief method called when the "add niew view" button is pushed. Show the new empty view creation dialog:
-	 *              NewViewDialog
+	 * \fn void cb_managePlugins()
+	 * \brief method called when the "Plugins" action is triggered.
+	 * Show the plugins management dialog
 	 */
-	void cb_niewScene();
+	void cb_managePlugins();
 
-	void cb_globalCamera();
+	/**
+	 * \fn void cb_manageScenes()
+	 * \brief method called when the "Scenes" action is triggered.
+	 * Show the scenes management dialog:
+	 */
+	void cb_manageScenes();
 
-	void cb_mapPlugin();
+	/**
+	 * \fn void cb_manageCameras()
+	 * \brief method called when the "Cameras" action is triggered.
+	 * Show the cameras management dialog:
+	 */
+	void cb_manageCameras();
+
+	/**
+	 * \fn void cb_manageMaps()
+	 * \brief method called when the "Maps" action is triggered.
+	 * Show the maps management dialog:
+	 */
+	void cb_manageMaps();
 };
 
 #endif

@@ -8,11 +8,11 @@
 
 #include "window.h"
 #include "system.h"
+#include "scene.h"
 #include "view.h"
 #include "camera.h"
 #include "mapHandler.h"
 #include "vboHandler.h"
-#include "scene.h"
 
 class Plugin
 {
@@ -20,52 +20,96 @@ public:
 	enum { UNLIMITED_NUMBER_OF_MAPS = -1 };
 	enum { UNLIMITED_NUMBER_OF_SCENES = -1 };
 
-	virtual ~Plugin()
-	{}
+	Plugin(const QString& name, const QString& filePath, Window* window);
+	virtual ~Plugin();
 
-	virtual void cb_updateMatrix(View* view) = 0;
-	virtual void cb_redraw(Scene* scene) = 0;
-	virtual void cb_initGL(Scene* scene) = 0;
-
-	void updateGL()	= 0;
-	void updateGL(Scene* scene)	= 0;
-
-	virtual bool cb_keyPress(Scene* scene, int event) = 0;
-	virtual bool cb_keyRelease(Scene* scene, int event) = 0;
-	virtual bool cb_mousePress(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseRelease(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseClick(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseMove(Scene* scene, int buttons, int x, int y) = 0;
-	virtual bool cb_wheelEvent(Scene* scene, int delta, int x, int y) = 0;
-
-	virtual void cb_recievedMap(MapHandler* map) = 0;
-	virtual void cb_removingMap(MapHandler* map) = 0;
-
-	virtual bool isWaitingForScene() = 0;
-	virtual void recieveScene(Scene* scene) = 0;
-	virtual void deleteLinkWithScene(Scene* scene) = 0;
-	virtual bool hasManualLinkWithScene(Scene* scene) = 0;
-
-	const QString& getName() { return m_name; }
-	void setName(QString name) { m_name = name; }
-
-	const QString& getPluginFilePath() { return m_pluginPathFile; }
-	void setPluginFilePath(QString path) { m_pluginPathFile = path; }
-
-	Window* getWindow() { return m_window; }
-	void setWindow(Window* window) { m_window = window; }
-
-	virtual bool activate(bool initializing)
-	{
-		m_windowInitializing = initializing;
-		bool r = activate();
-		m_windowInitializing = false;
-		return r;
-	}
-
-	virtual void activate() = 0;
+	virtual bool enable() = 0;
 	virtual void disable() = 0;
 
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
+
+	const QString& getFilePath() { return m_filePath; }
+	void setFilePath(const QString& f) { m_filePath = f; }
+
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
+
+	void updateGL();
+	void updateGL(Scene* scene);
+
+	virtual void cb_initGL(Scene* scene) = 0;
+	virtual void cb_updateMatrix(View* view) = 0;
+	virtual void cb_redraw(Scene* scene) = 0;
+
+	virtual void cb_keyPress(Scene* scene, int key) = 0;
+	virtual void cb_keyRelease(Scene* scene, int key) = 0;
+	virtual void cb_mousePress(Scene* scene, int button, int x, int y) = 0;
+	virtual void cb_mouseRelease(Scene* scene, int button, int x, int y) = 0;
+	virtual void cb_mouseClick(Scene* scene, int button, int x, int y) = 0;
+	virtual void cb_mouseMove(Scene* scene, int buttons, int x, int y) = 0;
+	virtual void cb_wheelEvent(Scene* scene, int delta, int x, int y) = 0;
+
+	virtual void cb_mapAdded(MapHandler* map) = 0;
+	virtual void cb_mapRemoved(MapHandler* map) = 0;
+
+	virtual void cb_sceneAdded(Scene* s) = 0;
+	virtual void cb_sceneRemoved(Scene* s) = 0;
+
+	/*********************************************************
+	 * MANAGE MAPS
+	 *********************************************************/
+	bool linkMap(MapHandler* map);
+	void unlinkMap(MapHandler* map);
+	bool isLinkedToMap(MapHandler* map);
+	QList<MapHandler*> getLinkedMaps();
+	void setMaxNumberOfLinkedMaps(int n);
+	int getCurrentNumberOfLinkedMaps();
+	int getRemainingNumberOfLinkedMaps();
+
+	/*********************************************************
+	 * MANAGE SCENES
+	 *********************************************************/
+	bool linkScene(Scene* scene);
+	void unlinkScene(Scene* scene);
+	bool isLinkedToScene(Scene* scene);
+	QList<Scene*> getLinkedScenes();
+
+	/*********************************************************
+	 * MANAGE DOCK TABS
+	 *********************************************************/
+	bool addTabInDock(QWidget* tabWidget, const QString& tabText);
+	void removeTabInDock(QWidget* tabWidget);
+
+	/*********************************************************
+	 * MANAGE MENU ACTIONS
+	 *********************************************************/
+	bool addMenuAction(const QString& menuPath, QAction* action);
+	void removeMenuAction(QAction* action);
+
+	/*********************************************************
+	 * MANAGE TOOLBAR ACTIONS
+	 *********************************************************/
+	bool addToolbarAction(QAction* action);
+	void removeToolbarAction(QAction* action);
+
+protected:
+	QString m_name;
+	QString m_filePath;
+	Window* m_window;
+
+	int m_maxNumberOfMaps;
+	QList<MapHandler*> l_maps;
+	QList<Scene*> l_scenes;
+	QList<QWidget*> l_tabWidgets;
+	QList<QAction*> l_menuActions;
+	QList<QAction*> l_toolbarActions;
+//	QList<ViewButton*> l_viewButtons;
+
+//	QList<Plugin*> l_dependencies;
+//	QList<Plugin*> l_dependantPlugins;
+
+/*
 	void addDependantPlugin(Plugin* p) { l_dependantPlugins.push_back(p); }
 	void removeDependantPlugin(Plugin* p) { l_dependantPlugins.removeAll(p); }
 	void removeAllDependantPlugins() { l_dependantPlugins.clear(); }
@@ -127,49 +171,7 @@ public:
 				m_window->unloadPlugin(l_dependantPlugins.back()->getName());
 		}
 	}
-
-	bool addMap(MapHandler* map)
-	{
-		if((m_mapNumber == UNLIMITED_NUMBER_OF_MAPS || l_map.size() < m_mapNumber) && map && !l_map.contains(map))
-		{
-			l_map.push_back(map);
-			cb_recievedMap(map);
-			return true;
-		}
-		else
-			return false;
-	}
-	MapHandler* takeMap(MapHandler* map)
-	{
-		int i = l_map.indexOf(map);
-		if(i >= 0)
-		{
-			cb_removingMap(map);
-			return l_map.takeAt(i);
-		}
-		else
-			return NULL;
-	}
-	QList<MapHandler*> workingMaps() { return l_map; }
-	void setMapNumber(int n)
-	{
-		if(n >= l_map.size() || n == UNLIMITED_NUMBER_OF_MAPS)
-			m_mapNumber = n;
-	}
-	virtual int remainingMapNumber()
-	{
-		return m_mapNumber != UNLIMITED_NUMBER_OF_MAPS ? m_mapNumber - l_map.size() : m_mapNumber;
-	}
-
-protected:
-	Window* m_window;
-	QString m_name;
-	QString m_pluginPathFile;
-	QList<Plugin*> l_dependencies;
-	QList<Plugin*> l_dependantPlugins;
-	bool m_windowInitializing;
-	int m_mapNumber;
-	QList<MapHandler*> l_map;
+*/
 };
 
 Q_DECLARE_INTERFACE(Plugin, "Window.Plugin")

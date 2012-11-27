@@ -5,327 +5,189 @@
 
 #include "camera.h"
 #include "view.h"
-#include "context.h"
+//#include "context.h"
 #include "vboHandler.h"
 #include "window.h"
 #include "plugin.h"
 
-Scene::Scene(QString name, Window* window, Camera* sharedCamera) :
-	m_window(window),
+unsigned int Scene::sceneCount = 0;
+
+Scene::Scene(const QString& name, Window* window) :
 	m_name(name),
-	m_creator(NULL),
-	m_context(window->context())
-{
-	View* view = new View(this, name + "_view1", sharedCamera, NULL, m_context);
-
-	l_view.push_back(view);
-
-	view->enableLinking();
-	view->enableCameraGesture();
-	view->enableViewClose();
-}
-
-Scene::Scene(QString name, Plugin* plugin, Window* window) :
 	m_window(window),
-	m_name(name),
-	m_creator(plugin),
-	m_context(window->context())
+	m_context(window->getContext())
 {
-	View* view = new View(this, name + "_view1", NULL, NULL, m_context);
-
-	l_view.push_back(view);
-
-	l_plugin.push_back(plugin);
-
-	view->enableLinking();
-	view->enableUnlinking();
-	view->enableCameraGesture();
+	++sceneCount;
 }
 
 Scene::~Scene()
 {
-	while(!l_view.isEmpty())
-	{
-		View* view = l_view.takeFirst();
-		delete view;
-	}
+	foreach(View* v, l_views)
+		unlinkView(v);
 
-//	while(!l_vbo.isEmpty())
-//	{
-//		VBOHandler* vbo = l_vbo.first();
-//		if(!vbo->isShared())
-//	{
-//			vbo->unshareWith(this);
-//			delete vbo;
-//		}
-//		else
-//			vbo->unshareWith(this);
-//	}
+	foreach(Plugin* p, l_plugins)
+		unlinkPlugin(p);
 
-	while(!l_plugin.isEmpty())
-		suppressLinkWith(l_plugin.last());
+	// view buttons
 }
 
-void Scene::updateGL(View* view)
+void Scene::initGL()
 {
-	foreach(View* v, l_view)
-	{
-		if(v != view)
-			v->simpleUpdate();
-	}
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_initGL(this);
 }
 
-void Scene::draw(View* view)
+void Scene::updateGL()
 {
+	foreach(View* v, l_views)
+		v->updateGL();
+}
+
+void Scene::draw(View *v)
+{
+	QList<Camera*> cameras = m_window->getCameras();
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glDisable(GL_LIGHTING);
-	foreach(View* v, l_view)
-		v->drawCameras(view);
+	foreach(Camera* c, cameras)
+		c->draw();
 	glPopAttrib();
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	foreach(Plugin* plugin, l_plugin)
+	foreach(Plugin* plugin, l_plugins)
 	{
-		plugin->cb_updateMatrix(view);
+		plugin->cb_updateMatrix(v);
 		plugin->cb_redraw(this);
 	}
 	glPopAttrib();
 }
 
-void Scene::init()
+void Scene::keyPressEvent(QKeyEvent* event)
 {
-	foreach(Plugin* plugin, l_plugin)
-		plugin->cb_initGL(this);
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_keyPress(this, event->key());
 }
 
-bool Scene::keyPressEvent(QKeyEvent* event)
+void Scene::keyReleaseEvent(QKeyEvent* event)
 {
-	int k = event->key();
-
-	//for each plugin that operated on this view,
-	//a callback is made on their corresponding method.
-	//if none of the methods operates on this view (they return false)
-	//the the default behavior is adopted
-	foreach(Plugin* plugin, l_plugin){
-		if(plugin->cb_keyPress(this,k)){
-			return true;
-		}
-	}
-	return false;
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_keyRelease(this, event->key());
 }
 
-bool Scene::keyReleaseEvent(QKeyEvent* event){
-	int k= event->key();
-
-	//for each plugin that operated on this view,
-	//a callback is made on their corresponding method.
-	//if none of the methods operates on this view (they return false)
-	//the the default behavior is adopted
-	foreach(Plugin* plugin, l_plugin){
-		if(plugin->cb_keyRelease(this,k)){
-			return true;
-		}
-	}
-	return false;
-
-
-}
-
-bool Scene::mousePressEvent(QMouseEvent* event)
+void Scene::mousePressEvent(QMouseEvent* event)
 {
-	//for each plugin that operated on this view,
-	//a callback is made on their corresponding method.
-	//if none of the methods operates on this view (they return false)
-	//the the default behavior is adopted
-	foreach(Plugin* plugin, l_plugin){
-		if(plugin->cb_mousePress(this,event->button(),event->x(),event->y())){
-			return true;
-		}
-	}
-	return false;
-
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_mousePress(this, event->button(), event->x(), event->y());
 }
 
-bool Scene::mouseReleaseEvent(QMouseEvent* event){
-
-	//for each plugin that operated on this view,
-	//a callback is made on their corresponding method.
-	//if none of the methods operates on this view (they return false)
-	//the the default behavior is adopted
-	foreach(Plugin* plugin, l_plugin){
-		if(plugin->cb_mouseRelease(this,event->button(),event->x(),event->y())){
-			return true;
-		}
-	}
-	return false;
+void Scene::mouseReleaseEvent(QMouseEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_mouseRelease(this, event->button(), event->x(), event->y());
 }
 
-bool Scene::mouseMoveEvent(QMouseEvent* event){
-
-	//for each plugin that operated on this view,
-	//a callback is made on their corresponding method.
-	//if none of the methods operates on this view (they return false)
-	//the the default behavior is adopted
-	foreach(Plugin* plugin, l_plugin){
-		if(plugin->cb_mouseMove(this,event->button(),event->x(),event->y())){
-			return true;
-		}
-	}
-	return false;
+void Scene::mouseMoveEvent(QMouseEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_mouseMove(this, event->button(), event->x(), event->y());
 }
 
-bool Scene::wheelEvent(QWheelEvent* event){
-
-	//for each plugin that operated on this view,
-	//a callback is made on their corresponding method.
-	//if none of the methods operates on this view (they return false)
-	//the the default behavior is adopted
-	foreach(Plugin* plugin, l_plugin){
-		if(plugin->cb_wheelEvent(this,event->delta(),event->x(),event->y())){
-			return true;
-		}
-	}
-	return false;
-
+void Scene::wheelEvent(QWheelEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->cb_wheelEvent(this,event->delta(),event->x(),event->y());
 }
 
+/*********************************************************
+ * MANAGE VIEWS
+ *********************************************************/
 
-View* Scene::getView(int num){
-	if(num<0 || num>l_view.size()){
-		return NULL;
-	}
-	else{
-		return l_view[num];
-	}
-}
+void Scene::linkView(View* view)
+{
+	if(view)
+	{
+		l_views.push_back(view);
+		view->setScene(this);
+/*
+		if(m_window)
+			m_window->addNewSceneView(this, view);
 
-View* Scene::addNewView(Camera* c){
-	View* view= new View(this,m_name+"_view1"+QString::number(countViews()),c,l_view.first(), m_context);
-
-	l_view.push_back(view);
-
-	if(m_window){
-		m_window->addNewSceneView(this, view);
-	}
-
-	view->enableCameraGesture();
-	view->enableViewClose();
-	if(!isManual() && l_view.size()==2){
-		l_view.first()->enableViewClose();
-	}
-	view->enableLinking();
-	if(!l_plugin.isEmpty()){
-		view->enableUnlinking();
-	}
-
-	foreach(ViewButton* button, l_viewButton){
-		view->addCustomViewButton(button);
-	}
-
-	return view;
-}
-
-void Scene::deleteView(View* view){
-	if(l_view.size()==1 && view==l_view.first()){
-		m_window->removeScene(m_name);
-	}
-	else{
-		int i= l_view.indexOf(view);
-		if(i>=0){
-			std::cout << "A" << std::endl;
-			delete (l_view.takeAt(i));
-			if(!isManual()){
-				std::cout << "B" << std::endl;
-				if(l_view.size()==1){
-					l_view.first()->enableViewClose(false);
-				}
-			}
-		}
-	}
-}
-
-void Scene::viewClickedButton(View* view, ViewButton* viewButton){
-	if(view && viewButton){
-		emit(viewButtonClicked(view, viewButton));
-	}
-}
-
-void Scene::associateNewPlugin(Plugin* plugin, bool callBackInitGL){
-	//the plugin is put in the operating plugin list
-	l_plugin.push_back(plugin);
-
-	//if the caller desires so (callBackInitGL=true), a call back on the new operating plugin's
-	//initGL methode is made
-	if(callBackInitGL){
-		plugin->cb_initGL(this);
-	}
-
-	this->updateGL();
-}
-
-void Scene::suppressLinkWith(Plugin* plugin){
-	//if the given plugin is the creator of this view
-	if( !this->isManual() && m_creator==plugin){
-		//this view will be destroyed
-		//so we first remove all the other plugins (starting from the end of the list)
-		//and we suppress their link with this view
-		while(!l_plugin.empty()){
-			Plugin* plug_t= l_plugin.back();
-			l_plugin.pop_back();
-			plug_t->deleteLinkWith(this);
-		}
-		m_window->removeScene(m_name);
-	}
-	//if the given plugin is not the creator
-	else{
-		int i= l_plugin.indexOf(plugin);
-		if(i>=0){
-			plugin->deleteLinkWith(this);
-			l_plugin.takeAt(i);
-		}
-
-		int nbManualPlugin=0;
-		foreach(Plugin* plugin, l_plugin){
-			if(plugin->hasManualLinkWith(this)){
-				++nbManualPlugin;
-			}
-		}
-		if(nbManualPlugin<1){
-			foreach(View* view, l_view){
-				view->enableUnlinking(false);
-			}
-		}
-	}
-}
-
-void Scene::linkWithPlugin(){
-	m_window->linkDialog(this);
-	if((isManual() && l_plugin.size()>0) || (!isManual() && l_plugin.size()>1)){
-		foreach(View* view, l_view){
+		view->enableCameraGesture();
+		view->enableViewClose();
+		view->enableLinking();
+		if(!l_plugins.isEmpty())
 			view->enableUnlinking();
-		}
+
+		foreach(ViewButton* button, l_viewButtons)
+			view->addViewButton(button);
+*/
 	}
 }
 
-void Scene::unlinkPlugin(){
-	QList<Plugin*> dependingPlugins(l_plugin);
-	QList<Plugin*>::iterator it= dependingPlugins.begin();
-	while(it!=dependingPlugins.end()){
-		if(!(*it)->hasManualLinkWith(this)){
-			it= dependingPlugins.erase(it);
-		}
-		else{
-			++it;
-		}
-	}
+void Scene::unlinkView(View* view)
+{
+	l_views.removeOne(view);
+	if(view)
+		delete view;
+}
 
-	m_window->unlinkDialog(this, dependingPlugins);
-	if((isManual() && l_plugin.size()<=0) || (!isManual() && l_plugin.size()<=1)){
-		foreach(View* view, l_view){
-			view->enableUnlinking(false);
-		}
+View* Scene::getLinkedView(int num)
+{
+	if(num > l_views.size())
+		return NULL;
+	else
+		return l_views[num];
+}
+
+/*********************************************************
+ * MANAGE PLUGINS
+ *********************************************************/
+
+void Scene::linkPlugin(Plugin* plugin, bool callInitGL)
+{
+	if(plugin && !l_plugins.contains(plugin))
+	{
+		l_plugins.push_back(plugin);
+
+		// if the caller desires so (callBackInitGL = true), a call to the plugin's
+		// initGL method is made
+		if(callInitGL)
+			plugin->cb_initGL(this);
+
+		updateGL();
 	}
 }
+
+void Scene::unlinkPlugin(Plugin* plugin)
+{
+	if(l_plugins.removeOne(plugin))
+		plugin->unlinkScene(this);
+}
+
+///*********************************************************
+// * MANAGE VIEW BUTTONS
+// *********************************************************/
+//
+//void Scene::addViewButton(ViewButton* viewButton)
+//{
+//	if(viewButton && !l_viewButtons.contains(viewButton))
+//	{
+//		foreach(View* view, l_views)
+//			view->addViewButton(viewButton);
+//
+//		l_viewButtons.push_back((viewButton));
+//	}
+//}
+//
+//void Scene::removeViewButton(ViewButton* viewButton)
+//{
+//	if(l_viewButtons.removeOne(viewButton))
+//	{
+//		foreach(View* view, l_views)
+//			view->removeViewButton(viewButton);
+//	}
+//}
+
+
 
 //VBOHandler* Scene::addNewVBO(QString name){
 //	foreach(VBOHandler* vbo, l_vbo){
@@ -388,36 +250,8 @@ void Scene::unlinkPlugin(){
 //	}
 //}
 
-void Scene::firstViewFitSphere(float x, float y, float z, float radius){
-	if(!l_view.empty()){
-		l_view.first()->currentCamera()->fitSphere(qglviewer::Vec(x,y,z), radius);
-	}
-}
-
-bool Scene::addCustomViewButton(ViewButton* viewButton){
-	if(viewButton && !l_viewButton.contains(viewButton)){
-		foreach(View* view, l_view){
-			view->addCustomViewButton(viewButton);
-		}
-
-		l_viewButton.push_back((viewButton));
-
-		return true;
-	}
-
-	return false;
-}
-
-ViewButton* Scene::takeCustomViewButton(ViewButton* viewButton){
-	int i= l_viewButton.indexOf(viewButton);
-	if(i>=0){
-		foreach(View* view, l_view){
-			view->removeCustomViewButton(viewButton);
-		}
-
-		return l_viewButton.takeAt(i);
-	}
-	else{
-		return NULL;
-	}
+void Scene::firstViewFitSphere(float x, float y, float z, float radius)
+{
+	if(!l_views.empty())
+		l_views.first()->getCurrentCamera()->fitSphere(qglviewer::Vec(x,y,z), radius);
 }

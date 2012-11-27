@@ -9,38 +9,31 @@
 
 class Plugin;
 class Scene;
-namespace CGoGN { class GenericMap; }
+class View;
+class Camera;
 
-#define PluginHash QHash<QString, Plugin*>
-#define SceneHash QHash<QString, Scene*>
+class MapHandler;
 
-/**
- * \def MapHash
- *
- * Preprocessor macro for simplifying the type "QHash<QString, GenericMap*>" into GLViewerHash, within the code
- *
- */
-//#define MapHash QHash<QString,CGoGN::GenericMap*>
+namespace CGoGN
+{
+	namespace Utils
+	{
+		class VBO;
+		class GLSLShader;
+	}
+}
 
-/**
- * \def VBOHash
- * \brief Preprocessor macro for simplifying the type "QHash<QString, Utils::VBO*>" into GLViewerHash, within the code
- */
-#define VBOHash QHash<QString, CGoGN::Utils::VBO*>
-/**
- * \def ShaderHash
- * \brief Preprocessor macro for simplifying the type "QHash<QString, Utils::GLSLShader*>" into GLViewerHash, within the code
- */
-#define ShaderHash QHash<QString, CGoGN::Utils::GLSLShader*>
-/**
- * \def ShaderHash
- * \brief Preprocessor macro for simplifying the type "QHash<QString, Algo::Render::GL2::Topo3Render*>" into GLViewerHash, within the code
- */
-#define Topo3RenderHash QHash<QString, Algo::Render::GL2::Topo3Render*>
+typedef QHash<QString, Plugin*> PluginHash;
+typedef QHash<QString, Scene*> SceneHash;
+typedef QHash<QString, View*> ViewHash;
+typedef QHash<QString, Camera*> CameraHash;
 
-#define MapHash QHash<QString, MapHandler*>
+typedef QHash<QString, MapHandler*> MapHash;
+typedef QHash<QString, CGoGN::Utils::VBO*> VBOHash;
+typedef QHash<QString, CGoGN::Utils::GLSLShader*> ShaderHash;
 
-namespace Qt{
+namespace Qt
+{
 	extern int UserRoleType;
 }
 

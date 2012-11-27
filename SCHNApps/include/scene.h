@@ -11,13 +11,11 @@
 
 #include "types.h"
 
-//forward declarations
-class View;
 class Window;
-class Camera;
 class Plugin;
-class VBOHandler;
-class Context;
+class View;
+class Camera;
+//class Context;
 class ViewButton;
 
 class Scene : public QObject
@@ -25,45 +23,48 @@ class Scene : public QObject
 	Q_OBJECT
 
 public:
-	Scene(QString name, Window* window, Camera* sharedCamera = NULL);
-	Scene(QString name, Plugin* plugin, Window* window);
+	Scene(const QString& name, Window* window);
 	~Scene();
 
-	void initializeGL();
-	void updateGL(View* view = NULL);
-	void draw(View* view);
-	void init();
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	bool keyPressEvent(QKeyEvent* event);
-	bool keyReleaseEvent(QKeyEvent *e);
-	bool mousePressEvent(QMouseEvent* event);
-	bool mouseReleaseEvent(QMouseEvent* event);
-	bool mouseMoveEvent(QMouseEvent* event);
-	bool wheelEvent(QWheelEvent* event);
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
 
-	QString getName() { return m_name; }
-	void setName(QString name) { m_name = name; }
+	QGLContext* getContext() { return m_context; }
+	void setContext(QGLContext* c) { m_context = c; }
 
-	View* getView(int num);
-	QList<View*> views() { return l_view; }
-	int countViews() { return l_view.size(); }
-	View* addNewView(Camera* c);
-	void deleteView(View* view);
+	void initGL();
+	void updateGL();
+	void draw(View *v);
 
-	void viewClickedButton(View* view, ViewButton* viewButton);
+	void keyPressEvent(QKeyEvent* event);
+	void keyReleaseEvent(QKeyEvent *e);
+	void mousePressEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+	void mouseMoveEvent(QMouseEvent* event);
+	void wheelEvent(QWheelEvent* event);
 
-	void associateNewPlugin(Plugin* plugin, bool callBackInitGL = true);
-	void suppressLinkWith(Plugin* plugin);
-	void linkWithPlugin();
-	void unlinkPlugin();
+	/*********************************************************
+	 * MANAGE VIEWS
+	 *********************************************************/
+	void linkView(View* view);
+	void unlinkView(View* view);
+	View* getLinkedView(int num);
+	QList<View*> getLinkedViews() { return l_views; }
+	int getNbLinkedViews() { return l_views.size(); }
 
-	bool isManual() { return (m_creator == NULL); }
-	Plugin* creator() { return m_creator; }
-
-	QList<Plugin*> linkedPlugins() { return l_plugin; }
-
-	bool isLinked() { return !l_plugin.isEmpty(); }
-	bool isLinkedWith(Plugin* plugin) { return l_plugin.contains(plugin); }
+	/*********************************************************
+	 * MANAGE PLUGINS
+	 *********************************************************/
+	void linkPlugin(Plugin* plugin, bool callInitGL = true);
+	void unlinkPlugin(Plugin* plugin);
+	QList<Plugin*> getLinkedPlugins() { return l_plugins; }
+	bool isLinkedToPlugins() { return !l_plugins.isEmpty(); }
+	bool isLinkedToPlugin(Plugin* plugin) { return l_plugins.contains(plugin); }
+//	void linkWithPlugin();
+//	void unlinkPlugin();
 
 //	VBOHandler* addNewVBO(QString name);
 //	void addVBO(VBOHandler* vbo);
@@ -74,28 +75,17 @@ public:
 
 	void firstViewFitSphere(float x, float y, float z, float radius);
 
-	bool addCustomViewButton(ViewButton* viewButton);
-	ViewButton* takeCustomViewButton(ViewButton* viewButton);
-
 protected:
-	Window* m_window;
-
-	QList<View*> l_view;
+	static unsigned int sceneCount;
 
 	QString m_name;
+	Window* m_window;
+	QGLContext* m_context;
 
-	QList<Plugin*> l_plugin;
-
-	Plugin* m_creator;
-
+	QList<View*> l_views;
+	QList<Plugin*> l_plugins;
 //	QList<VBOHandler*> l_vbo;
-
-	Context* m_context;
-
-	QList<ViewButton*> l_viewButton;
-
-signals:
-	void viewButtonClicked(View*, ViewButton*);
+//	QList<ViewButton*> l_viewButtons;
 };
 
 #endif

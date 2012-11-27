@@ -1,36 +1,38 @@
 #include "camera.h"
-#include "scene.h"
 
-Camera::Camera(View* v) :
-	m_name("camera"),
+#include "window.h"
+#include "view.h"
+
+unsigned int Camera::cameraCount = 0;
+
+Camera::Camera(const QString& name, Window* window) :
+	m_name(name),
+	m_window(window),
 	m_draw(false),
 	m_drawFarPlane(false),
 	m_drawScale(1.0),
 	m_drawPath(false),
 	m_drawPathAxis(false),
 	m_drawPathScale(1.0),
-	m_lastWorkingView(v),
 	m_snapCount(0)
 {
-	if(v)
-		l_views.push_back(v);
+	++cameraCount;
 	this->setZClippingCoefficient(100);
 }
 
-Camera::Camera(View* v, Camera c) :
+Camera::Camera(const QString& name, Window* window, const qglviewer::Camera& c) :
 	qglviewer::Camera(c),
-	m_name("camera"),
+	m_name(name),
+	m_window(window),
 	m_draw(false),
 	m_drawFarPlane(false),
 	m_drawScale(1.0),
 	m_drawPath(false),
 	m_drawPathAxis(false),
 	m_drawPathScale(1.0),
-	m_lastWorkingView(v),
 	m_snapCount(0)
 {
-	if(v)
-		l_views.push_back(v);
+	++cameraCount;
 	this->setZClippingCoefficient(100);
 }
 
@@ -53,33 +55,31 @@ void Camera::draw()
 	}
 }
 
-void Camera::takenFrom(View* v)
+void Camera::linkView(View* view)
 {
-	l_views.removeOne(v);
-//	int i = l_views.indexOf(v);
-//	if(i >= 0)
-//		l_views.takeAt(i);
+	if(view && !l_views.contains(view))
+		l_views.push_back(view);
 }
 
-void Camera::sharedWith(View* v)
+void Camera::unlinkView(View* view)
 {
-	if(!l_views.contains(v))
-		l_views.push_back(v);
+	l_views.removeOne(view);
 }
 
-void Camera::fitParamWith(View* v)
+bool Camera::isLinkedWithView(View* view)
 {
-	if(v != m_lastWorkingView)
-	{
-		setScreenWidthAndHeight(v->width(), v->height());
-		m_lastWorkingView = v;
-	}
+	return l_views.contains(view);
+}
+
+void Camera::fitParamWith(View* view)
+{
+	setScreenWidthAndHeight(view->width(), view->height());
 }
 
 void Camera::saveSnapshot(QString snapPathName)
 {
 	foreach(View* view, l_views)
-		view->saveSnapshot(snapPathName + view->getName() + '_' + QString::number(m_snapCount) + ".jpeg", true);
+		view->saveSnapshot(snapPathName + view->getName() + '_' + QString::number(m_snapCount) + ".jpg", true);
 	++m_snapCount;
 }
 
@@ -89,8 +89,8 @@ void Camera::updateGL()
 		view->updateGL();
 }
 
-void Camera::viewShowButton(bool b)
-{
-	foreach(View* view, l_views)
-		view->setShowButtons(b);
-}
+//void Camera::viewShowButton(bool b)
+//{
+//	foreach(View* view, l_views)
+//		view->setShowButtons(b);
+//}

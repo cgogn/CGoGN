@@ -8,7 +8,7 @@
 class Context : public QGLContext
 {
 public:
-	Context(QWidget* w, const QGLFormat & format);
+	Context(const QGLFormat& format, QWidget* w);
 
 	void setDevice(QWidget* w);
 };

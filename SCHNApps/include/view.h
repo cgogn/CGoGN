@@ -6,31 +6,49 @@
 #include "types.h"
 #include "viewButtonArea.h"
 
-# include <QKeyEvent>
+#include <QKeyEvent>
 #include <QList>
 #include <QWidget>
+#include <QGLContext>
 
 #include "Utils/gl_matrices.h"
 
-//forward declaration
+class Window;
 class Scene;
 class Camera;
-class Context;
+//class Context;
 
 class View : public QGLViewer
 {
 	Q_OBJECT
 
 public:
-	View(Scene* s, QString name, Camera* c, QGLWidget* shareWidget = NULL, Context* context = NULL, QWidget* parent = NULL);
+	View(const QString& name, Window* w, QWidget* parent);
 	~View();
 
-	virtual void updateGL();
-	void simpleUpdate();
-	virtual void draw();
-	virtual void init();
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	void drawCameras(View* view);
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
+
+	Scene* getScene() { return m_scene; }
+	void setScene(Scene* s) { m_scene = s; }
+
+	Camera* getCurrentCamera() { return m_currentCamera; }
+	void setCurrentCamera(Camera* c)
+	{
+		m_currentCamera = c;
+		updateTextInfo();
+		updateGL();
+	}
+
+	QGLContext* getContext() { return m_context; }
+	void setContext(QGLContext* c) { m_context = c; }
+
+	virtual void initGL();
+	virtual void updateGL();
+	virtual void draw();
 	void drawText();
 	void drawButtons();
 
@@ -48,27 +66,11 @@ public:
 //	virtual void paintGL() { update(); }
 //	virtual void paintEvent(QPaintEvent *event);
 
-	Scene* getScene() { return m_scene; }
-
-	void setName(QString name) { m_name = name; }
-	QString getName() { return m_name; }
-
 	void enableLinking(bool b = true);
 	void enableUnlinking(bool b = true);
 	void enableCameraGesture(bool b = true);
 	void enableSceneCameraGesture(bool b = true);
 	void enableViewClose(bool b = true);
-
-	Camera* currentCamera() { return m_currentCamera; }
-	void setCurrentCamera(Camera* c);
-	QList<Camera*> cameras() { return l_camera; }
-	int countCameras() { return l_camera.size(); }
-
-	void removeCamera(Camera* c);
-	Camera* takeCamera(Camera* c);
-	Camera* addCamera();
-	void insertCamera(int index, Camera* c);
-	void shareCamera(Camera* c, int index = 0);
 
 //	void addUnlinkButton();
 //	void removeUnlinkButton();
@@ -79,56 +81,51 @@ public:
 	glm::mat4 getCurrentProjectionMatrix();
 	glm::mat4 getCurrentModelViewProjectionMatrix();
 
-	void setCurrentModelViewMatrix(glm::mat4 mvm);
-	void setCurrentProjectionMatrix(glm::mat4 pm);
+	void setCurrentModelViewMatrix(const glm::mat4& mvm);
+	void setCurrentProjectionMatrix(const glm::mat4& pm);
 
-	void addCustomViewButton(ViewButton* viewButton);
-	void removeCustomViewButton(ViewButton* viewButton);
+//	void addViewButton(ViewButton* viewButton);
+//	void removeViewButton(ViewButton* viewButton);
 
-	void setShowButtons(bool b) { b_showButtons = b; }
+//	void setShowButtons(bool b) { b_showButtons = b; }
 
 protected:
-	Scene* m_scene;
+	static unsigned int viewCount;
 
 	QString m_name;
+	Window* m_window;
+	QGLContext* m_context;
 
-	QList<Camera*> l_camera;
+	Scene* m_scene;
 	Camera* m_currentCamera;
 
-	ViewButtonArea* m_buttonArea;
+//	ViewButtonArea* m_buttonArea;
 
-	ViewButton* m_linkButton;
-	bool m_linkViewEnabled;
-	ViewButton* m_unlinkButton;
-	bool m_unlinkViewEnabled;
-	ViewButton* m_cameraButton;
-	bool m_cameraEnabled;
-	ViewButton* m_cameraSceneButton;
-	bool m_cameraSceneEnabled;
-	ViewButton* m_closeViewButton;
-	bool m_closeViewEnabled;
+//	ViewButton* m_linkButton;
+//	bool m_linkViewEnabled;
+//	ViewButton* m_unlinkButton;
+//	bool m_unlinkViewEnabled;
+//	ViewButton* m_cameraButton;
+//	bool m_cameraEnabled;
+//	ViewButton* m_cameraSceneButton;
+//	bool m_cameraSceneEnabled;
+//	ViewButton* m_closeViewButton;
+//	bool m_closeViewEnabled;
+
+//	bool b_showButtons;
 
 	QString m_textInfo;
+	bool b_drawText;
 
-	Context* m_context;
+//public slots:
+//	void linkView();
+//	void unlinkView();
+//	void cameraGesture();
+//	void cameraSceneGesture();
+//	void closeView();
 
-	bool b_showButtons;
-
-public slots:
-	void linkView();
-	void unlinkView();
-	void cameraGesture();
-	void cameraSceneGesture();
-	void closeView();
-
-	void clickButton(ViewButton* viewButton);
-
-private:
-	bool b_destroyView;
-
-signals:
-	void currentCameraChanged(Camera* camera);
-	void viewButtonClicked(ViewButton* viewButton);
+//signals:
+//	void currentCameraChanged(Camera* camera);
 };
 
 #endif
