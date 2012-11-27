@@ -532,12 +532,20 @@ unsigned int EmbeddedMap2::closeHole(Dart d, bool forboundary)
 	{
 		if (isOrbitEmbedded<VERTEX>())
 		{
-			initDartEmbedding<VERTEX>(f, getEmbedding<VERTEX>(phi1(phi2(f)))) ;
+			unsigned int emb = getEmbedding<VERTEX>(phi1(phi2(f)));
+			if (emb == EMBNULL)
+				initOrbitEmbeddingNewCell<VERTEX>(f) ;
+			else
+				initDartEmbedding<VERTEX>(f, emb) ;
 		}
 
 		if (isOrbitEmbedded<EDGE>())
 		{
-			initDartEmbedding<EDGE>(f, getEmbedding<EDGE>(phi2(f))) ;
+			unsigned int emb = getEmbedding<EDGE>(phi2(f));
+			if (emb == EMBNULL)
+				initOrbitEmbeddingNewCell<EDGE>(f) ;
+			else
+				initDartEmbedding<EDGE>(f, emb) ;
 		}
 
 		f = phi1(f) ;
