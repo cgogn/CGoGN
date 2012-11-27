@@ -3,9 +3,11 @@
 
 #include <QHash>
 
-namespace CGoGN {
+namespace CGoGN
+{
 	class GenericMap;
-	namespace Utils{
+	namespace Utils
+	{
 		class VBO;
 	}
 }
@@ -15,10 +17,13 @@ class VBOHandler;
 class MapHandler
 {
 public:
-	MapHandler(CGoGN::GenericMap* map);
+	MapHandler(CGoGN::GenericMap *map);
 	~MapHandler();
 
-	CGoGN::GenericMap* map(){ return m_map;}
+	CGoGN::GenericMap *map()
+	{
+		return m_map;
+	}
 
 	VBOHandler* findVBO(QString name);
 	VBOHandler* findFirstVBOMatching(QRegExp regexp);
@@ -29,7 +34,10 @@ public:
 
 	VBOHandler* takeVBO(VBOHandler* vbo);
 
-	int countVBO(){ return l_vbo.count();}
+	int countVBO()
+	{
+		return l_vbo.count();
+	}
 
 protected:
 	CGoGN::GenericMap* m_map;

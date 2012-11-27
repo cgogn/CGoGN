@@ -1,9 +1,9 @@
 #include "firstPlugin.h"
 #include "Algo/Geometry/boundingbox.h"
 
-void FirstPlugin::cb_initGL(Scene* scene)
+void FirstPlugin::cb_initGL(Scene *scene)
 {
-	if(scene)
+	if (scene)
 	{
 		// we fit the first (possibly the only) view of the newly liked
 		// scene to the content of our map
@@ -21,7 +21,7 @@ void FirstPlugin::cb_initGL(Scene* scene)
 	}
 }
 
-void FirstPlugin::cb_redraw(Scene* scene)
+void FirstPlugin::cb_redraw(Scene *scene)
 {
 	m_render_topo->drawTopo();
 }
@@ -46,14 +46,14 @@ bool FirstPlugin::activate()
 	position[PHI<11>(d2)] = VEC3(0, -2, 0);
 	position[PHI_1(d2)] = VEC3(2, -2, 0);
 
-	m_render_topo=NULL;
+	m_render_topo = NULL;
 
 	return true;
 }
 
 void FirstPlugin::disable()
 {
-	if(m_render_topo)
+	if (m_render_topo)
 	{
 		delete m_render_topo;
 	}
@@ -64,11 +64,11 @@ void FirstPlugin::disable()
  * we also define a DEBUG macro at the compilation
  */
 #ifndef DEBUG
-	// essential Qt function:
-	// arguments are
-	//	- the complied name of the plugin
-	//	- the main class of our plugin (that extends VisualPlugin)
-	Q_EXPORT_PLUGIN2(FirstPlugin, FirstPlugin)
+// essential Qt function:
+// arguments are
+//  - the complied name of the plugin
+//  - the main class of our plugin (that extends VisualPlugin)
+Q_EXPORT_PLUGIN2(FirstPlugin, FirstPlugin)
 #else
-	Q_EXPORT_PLUGIN2(FirstPluginD, FirstPlugin)
+Q_EXPORT_PLUGIN2(FirstPluginD, FirstPlugin)
 #endif
