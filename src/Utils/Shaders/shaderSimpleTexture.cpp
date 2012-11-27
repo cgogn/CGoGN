@@ -69,7 +69,7 @@ ShaderSimpleTexture::ShaderSimpleTexture()
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
-	m_unif_unit   = glGetUniformLocation(this->program_handler(), "textureUnit");
+	*m_unif_unit   = glGetUniformLocation(this->program_handler(), "textureUnit");
 }
 
 void ShaderSimpleTexture::setTextureUnit(GLenum texture_unit)

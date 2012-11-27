@@ -44,6 +44,12 @@ namespace Modelisation
 
 enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
+//template <typename PFP>
+//void sewFaceEmb(typename PFP::MAP& map, Dart d, Dart e);
+//
+//template <typename PFP>
+//Dart newFaceEmb(typename PFP::MAP& map, unsigned int n);
+
 /**
 * sudivide the all quads of a CC into 2 triangles
 */

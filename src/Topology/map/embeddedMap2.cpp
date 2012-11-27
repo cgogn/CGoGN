@@ -72,27 +72,27 @@ Dart EmbeddedMap2::newFace(unsigned int nbEdges, bool withBoundary)
 			initOrbitEmbeddingNewCell<FACE>(phi2(d)) ;
 		}
 	}
-	else
-	{
-		if (isOrbitEmbedded<VERTEX>())
-		{
-/*
-			Traversor2FV<EmbeddedMap2> t(*this, d);
-			for(Dart it = t.begin(); it != t.end(); it = t.next())
-				initOrbitEmbeddingNewCell<VERTEX>(it) ;
-*/
-			Dart e = d;
-			do
-			{
-				initDartEmbedding<VERTEX>(e,newCell<VERTEX>());
-				e = this->phi1(e);
-			} while (d!=e);
-		}
-
-		if(isOrbitEmbedded<FACE>())
-			initOrbitEmbeddingNewCell<FACE>(d) ;
-
-	}
+//	else
+//	{
+//		if (isOrbitEmbedded<VERTEX>())
+//		{
+///*
+//			Traversor2FV<EmbeddedMap2> t(*this, d);
+//			for(Dart it = t.begin(); it != t.end(); it = t.next())
+//				initOrbitEmbeddingNewCell<VERTEX>(it) ;
+//*/
+//			Dart e = d;
+//			do
+//			{
+//				initDartEmbedding<VERTEX>(e,newCell<VERTEX>());
+//				e = this->phi1(e);
+//			} while (d!=e);
+//		}
+//
+//		if(isOrbitEmbedded<FACE>())
+//			initOrbitEmbeddingNewCell<FACE>(d) ;
+//
+//	}
 	return d ;
 }
 
@@ -316,15 +316,15 @@ void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 	{
 		Map2::sewFaces(d, e, false) ;
 
-		if(isOrbitEmbedded<EDGE>())
-		{
-/*
-			initOrbitEmbeddingNewCell<EDGE>(d) ;
-*/
-			unsigned int emb = newCell<EDGE>();
-			initDartEmbedding<EDGE>(d,emb);
-			initDartEmbedding<EDGE>(e,emb);
-		}
+//		if(isOrbitEmbedded<EDGE>())
+//		{
+///*
+//			initOrbitEmbeddingNewCell<EDGE>(d) ;
+//*/
+//			unsigned int emb = newCell<EDGE>();
+//			initDartEmbedding<EDGE>(d,emb);
+//			initDartEmbedding<EDGE>(e,emb);
+//		}
 
 		return ;
 	}
