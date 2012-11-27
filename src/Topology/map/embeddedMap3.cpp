@@ -29,6 +29,7 @@
 namespace CGoGN
 {
 
+//TODO
 Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 {
 	Dart d = vd.front();
@@ -59,6 +60,7 @@ Dart EmbeddedMap3::splitVertex(std::vector<Dart>& vd)
 	return dres;
 }
 
+//TODO
 Dart EmbeddedMap3::deleteVertex(Dart d)
 {
 	Dart v = Map3::deleteVertex(d) ;
@@ -426,6 +428,7 @@ bool EmbeddedMap3::mergeVolumes(Dart d)
 	{
 		if (isOrbitEmbedded<VOLUME>())
 		{
+			std::cout << "plop" << std::endl;
 			setOrbitEmbedding<VOLUME>(d2, getEmbedding<VOLUME>(d2)) ;
 		}
 		return true;
