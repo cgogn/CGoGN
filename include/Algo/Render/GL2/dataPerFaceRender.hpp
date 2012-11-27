@@ -59,7 +59,7 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
 
-	std::vector<VEC3> bufferData;
+	std::vector<T> bufferData;
 	bufferData.reserve(16384);
 
 	TraversorCell<typename PFP::MAP, FACE> traFace(map, good);
@@ -93,8 +93,8 @@ DataPerFaceRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboData, typen
 
 	vboData.setDataSize(3);
 	vboData.allocate(bufferData.size());
-	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboData.lockPtr());
-	memcpy(ptrCol,&bufferData[0],bufferData.size()*sizeof(VEC3));
+	T* ptrData = reinterpret_cast<T*>(vboData.lockPtr());
+	memcpy(ptrData,&bufferData[0],bufferData.size()*sizeof(T));
 	vboData.releasePtr();
 }
 
@@ -104,9 +104,6 @@ inline void DataPerFaceRender::draw(Utils::GLSLShader* sh)
 	glDrawArrays(GL_TRIANGLES , 0 , m_nbTris*3 );
 	sh->disableVertexAttribs();
 }
-
-
-
 
 }//end namespace VBO
 
