@@ -26,6 +26,8 @@
 #include "Topology/generic/dartmarker.h"
 #include <vector>
 
+#include "Algo/Modelisation/boundEmb.h"
+
 namespace CGoGN
 {
 
@@ -117,7 +119,9 @@ void MarchingCube<DataType, Windowing, PFP>::deleteMesh()
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
 Dart  MarchingCube<DataType, Windowing, PFP>::createTriEmb(unsigned int e1, unsigned int e2, unsigned int e3)
 {
-	L_DART d = m_map->newFace(3,false);
+//	L_DART d = m_map->newFace(3,false);
+
+	L_DART d = Modelisation::newFaceEmb<PFP>(*m_map,3);
 		
 	FunctorSetEmb<GenericMap, VERTEX> fsetemb(*m_map, e1);
 	m_map->template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT>(d, fsetemb);
@@ -922,7 +926,9 @@ void MarchingCube<DataType, Windowing, PFP>::setNeighbourSimple(L_DART d1, L_DAR
 {
 	if (m_map->phi2(d1) != d2)
 	{
-		m_map->sewFaces(d1,d2,false);
+//		m_map->sewFaces(d1,d2,false);
+		Modelisation::sewFaceEmb<PFP>(*m_map,d1,d2);
+
 		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
 		if (m_zslice!=NULL)
 		{
@@ -939,7 +945,9 @@ void MarchingCube<DataType, Windowing, PFP>::setNeighbour(L_DART d1, L_DART d2)
 {
 	if (m_map->phi2(d1) != d2)
 	{
-		m_map->sewFaces(d1,d2,false);
+//		m_map->sewFaces(d1,d2,false);
+		Modelisation::sewFaceEmb<PFP>(*m_map,d1,d2);
+
 		#ifdef MC_WIDTH_EDGE_Z_EMBEDED
 		if (m_zslice!=NULL)
 		{
