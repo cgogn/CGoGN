@@ -26,7 +26,7 @@
 #include "Utils/drawer.h"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/svg.h"
 
 namespace CGoGN
