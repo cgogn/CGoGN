@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 
 namespace CGoGN

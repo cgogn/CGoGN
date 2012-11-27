@@ -30,7 +30,7 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Multiresolution
+namespace MR
 {
 
 template <typename PFP>
@@ -133,8 +133,6 @@ void Map2MR_PM<PFP>::createPM(Algo::Decimation::SelectorType s, Algo::Decimation
 
 }
 
-
-
 template <typename PFP>
 void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 {
@@ -220,12 +218,11 @@ void Map2MR_PM<PFP>::addNewLevel(unsigned int percentWantedVertices)
 
 		for(std::vector<Dart>::iterator it = edges.begin() ; it != edges.end() ; ++it)
 		{
-//			if(*it == Dart(301459))
-//				break;
-
 			collapseEdge(*it);
 		}
 	}
+
+	//m_map.printMR();
 }
 
 
@@ -240,8 +237,6 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 	m_map.incDartLevel(m_map.phi_1(m_map.phi2(d)));
 	m_map.incDartLevel(m_map.phi1(m_map.phi2(d)));
 
-	//m_map.printMR();
-
 	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(d)), 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi_1(d)), 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi2(m_map.phi1(m_map.phi2(d))), 0);
@@ -254,14 +249,10 @@ void Map2MR_PM<PFP>::collapseEdge(Dart d)
 	m_map.duplicateDartAtOneLevel(m_map.phi_1(m_map.phi2(d)), 0);
 	m_map.duplicateDartAtOneLevel(m_map.phi1(m_map.phi2(d)), 0);
 
-	//m_map.printMR();
-
 	m_map.collapseEdge(d);
-
-	//m_map.printMR();
 }
 
-
+//analysis
 template <typename PFP>
 void Map2MR_PM<PFP>::coarsen()
 {
@@ -269,32 +260,11 @@ void Map2MR_PM<PFP>::coarsen()
 
 	m_map.decCurrentLevel() ;
 
-	TraversorV<typename PFP::MAP> tE(m_map);
-	for(Dart d = tE.begin() ; d != tE.end() ; d = tE.next())
-	{
-		Dart dit = d;
-		Dart dres = d;
-		bool found = false;
-		do
-		{
-			//std::cout << "emb["<<dit<<"] = " << m_map.template getEmbedding<VERTEX>(dit) << std::endl;
-
-			if(m_map.getDartLevel(dit) == m_map.getCurrentLevel())
-			{
-				dres = dit;
-				found = true;
-			}
-
-			dit = m_map.phi2(m_map.phi_1(dit));
-
-		}while(!found & dit!=d);
-
-		//std::cout << std::endl;
-
-		m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
-	}
+	for(unsigned int i = 0; i < analysisFilters.size(); ++i)
+		(*analysisFilters[i])() ;
 }
 
+//synthesis
 template <typename PFP>
 void Map2MR_PM<PFP>::refine()
 {
@@ -302,31 +272,43 @@ void Map2MR_PM<PFP>::refine()
 
 	m_map.incCurrentLevel() ;
 
-	TraversorV<typename PFP::MAP> tE(m_map);
-	for(Dart d = tE.begin() ; d != tE.end() ; d = tE.next())
-	{
-		Dart dit = d;
-		Dart dres = d;
-		bool found = false;
-		do
-		{
-			//std::cout << "emb["<<dit<<"] = " << m_map.template getEmbedding<VERTEX>(dit) << std::endl;
-
-			if(m_map.getDartLevel(dit) == m_map.getCurrentLevel())
-			{
-				dres = dit;
-				found = true;
-			}
-
-			dit = m_map.phi2(m_map.phi_1(dit));
-
-		}while(!found & dit!=d);
-
-		//std::cout << std::endl;
-
-		m_map.template embedOrbit<VERTEX>(dres, m_map.template getEmbedding<VERTEX>(dres));
-	}
+	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
+		(*synthesisFilters[i])() ;
 }
+
+template <typename PFP>
+Dart Map2MR_PM<PFP>::vertexOrigin(Dart d)
+{
+//	Dart dit = d;
+//	do
+//	{
+//		if(m_map.getDartLevel(dit) == m_map.currentLevel())
+//			return dit;
+//
+//		dit = m_map.phi2(m_map.phi_1(dit));
+//	}
+//	while(dit != d);
+}
+
+//template <typename PFP>
+//unsigned int Map2MR_PM<PFP>::vertexLevel(Dart d)
+//{
+//	assert(m_map.getDartLevel(d) <= m_map.getCurrentLevel() || !"edgeLevel : called with a dart inserted after current level") ;
+//
+//	Dart dit = d;
+//	do
+//	{
+//		unsigned int ldit = m_map.getDartLevel(dit) ;
+//
+//		dit = m_map.phi2(m_map.phi_1(dit));
+//	}
+//	while(dit != d);
+//
+//
+//	unsigned int ldd = m_map.getDartLevel(m_map.phi2(d)) ;	// the level of an edge is the maximum of the
+//	return ld > ldd ? ld : ldd ;				// insertion levels of its two darts
+//}
+
 
 } // namespace Multiresolution
 

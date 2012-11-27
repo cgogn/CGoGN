@@ -26,7 +26,7 @@
 #define _CGOGN_DRAWER_H_
 
 #include <vector>
-#include <GL/glew.h>
+#include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
 
 namespace CGoGN { namespace Utils { class VBO; } }

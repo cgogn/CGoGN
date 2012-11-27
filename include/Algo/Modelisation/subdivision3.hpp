@@ -607,7 +607,7 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //			if(phi3(f1) == f1 && phi3(f2) == f2)
 //				sewVolumes(f1, f2, false);
 //		}
-//		embedOrbit<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
+//		setOrbitEmbedding<VERTEX>(centralDart, getEmbedding<VERTEX>(centralDart));
 		//attributs[map.phi1(ne)] = attBary[*it];
 //
 //		setCurrentLevel(getMaxLevel() - 1) ;
@@ -618,17 +618,101 @@ void catmullClarkVol(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 //	TraversorE<typename PFP::MAP> travE2(map);
 //	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
 //	{
-//		map.embedOrbit<VERTEX>(map.phi1(d), map.getEmbedding<VERTEX>(map.phi1(d)));
+//		map.setOrbitEmbedding<VERTEX>(map.phi1(d), map.getEmbedding<VERTEX>(map.phi1(d)));
 //	}
 //
 //	TraversorF<typename PFP::MAP> travF2(map) ;
 //	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
 //	{
-//		map.embedOrbit<VERTEX>(map.phi2(map.phi1(d)), map.getEmbedding<VERTEX>(map.phi2(map.phi1(d))));
+//		map.setOrbitEmbedding<VERTEX>(map.phi2(map.phi1(d)), map.getEmbedding<VERTEX>(map.phi2(map.phi1(d))));
 //	}
-
-
 }
+
+
+template <typename PFP>
+void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position, const FunctorSelect& selected)
+{
+	DartMarkerStore m(map);
+
+	//
+	// 1-4 flip of all tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tW(map,selected);
+	for(Dart dit = tW.begin() ; dit != tW.end() ; dit = tW.next())
+	{
+		Traversor3WF<typename PFP::MAP> tWF(map, dit);
+		for(Dart ditWF = tWF.begin() ; ditWF != tWF.end() ; ditWF = tWF.next())
+		{
+			if(!map.isBoundaryFace(ditWF))
+				m.markOrbit<FACE>(ditWF);
+		}
+
+		typename PFP::VEC3 volCenter(0.0);
+		volCenter += position[dit];
+		volCenter += position[map.phi1(dit)];
+		volCenter += position[map.phi_1(dit)];
+		volCenter += position[map.phi_1(map.phi2(dit))];
+		volCenter /= 4;
+
+		Dart dres = Algo::Modelisation::Tetrahedralization::flip1To4<PFP>(map, dit);
+		position[dres] = volCenter;
+	}
+
+	//
+	// 2-3 swap of all old interior faces
+	//
+	TraversorF<typename PFP::MAP> tF(map,selected);
+	for(Dart dit = tF.begin() ; dit != tF.end() ; dit = tF.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<FACE>(dit);
+			Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit);
+		}
+	}
+
+	//
+	// 1-3 flip of all boundary tetrahedra
+	//
+	TraversorW<typename PFP::MAP> tWb(map,selected);
+	for(Dart dit = tWb.begin() ; dit != tWb.end() ; dit = tWb.next())
+	{
+		if(map.isBoundaryVolume(dit))
+		{
+			Traversor3WE<typename PFP::MAP> tWE(map, dit);
+			for(Dart ditWE = tWE.begin() ; ditWE != tWE.end() ; ditWE = tWE.next())
+			{
+				if(map.isBoundaryEdge(ditWE))
+					m.markOrbit<EDGE>(ditWE);
+			}
+
+			typename PFP::VEC3 faceCenter(0.0);
+			faceCenter += position[dit];
+			faceCenter += position[map.phi1(dit)];
+			faceCenter += position[map.phi_1(dit)];
+			faceCenter /= 3;
+
+			Dart dres = Algo::Modelisation::Tetrahedralization::flip1To3<PFP>(map, dit);
+			position[dres] = faceCenter;
+		}
+	}
+
+	//
+	// edge-removal on all old boundary edges
+	//
+	TraversorE<typename PFP::MAP> tE(map,selected);
+	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
+	{
+		if(m.isMarked(dit))
+		{
+			m.unmarkOrbit<EDGE>(dit);
+			Dart d = map.phi2(map.phi3(map.findBoundaryFaceOfEdge(dit)));
+			Algo::Modelisation::Tetrahedralization::swapGen3To2<PFP>(map, d);
+
+		}
+	}
+}
+
 
 } //namespace Modelisation
 

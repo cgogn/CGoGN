@@ -25,11 +25,11 @@
 #ifndef __TRAVERSOR3_H__
 #define __TRAVERSOR3_H__
 
+#include "Topology/generic/dart.h"
+#include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversorGen.h"
 #include "Topology/generic/traversorDoO.h"
-#include "Topology/generic/dart.h"
-#include "Topology/generic/cellmarker.h"
 
 namespace CGoGN
 {
@@ -69,8 +69,6 @@ private:
 	CellMarkerStore<ORBY>* m_cmark ;
 	Dart m_current ;
 	TraversorDartsOfOrbit<MAP, ORBX> m_tradoo;
-//	unsigned int m_orbx;
-//	unsigned int m_orby;
 	bool m_allocated;
 	bool m_first;
 public:
@@ -104,8 +102,6 @@ public:
 };
 
 
-
-
 /**
  * Traverse vertices incident to volume
  */
@@ -135,7 +131,6 @@ class Traversor3WF: public Traversor3XY<MAP, VOLUME, FACE>
 public:
 	Traversor3WF(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP, VOLUME, FACE>(m, dart, forceDartMarker, thread) {}
 };
-
 
 /**
  * Traverse vertices incident to face
@@ -167,7 +162,6 @@ public:
 	Traversor3FW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP, FACE, VOLUME>(m, dart, forceDartMarker, thread)	{}
 };
 
-
 /**
  * Traverse vertices incident to edge
  */
@@ -197,8 +191,6 @@ class Traversor3EW: public Traversor3XY<MAP, EDGE, VOLUME>
 public:
 	Traversor3EW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP, EDGE, VOLUME>(m, dart, forceDartMarker, thread)	{}
 };
-
-
 
 /**
  * Traverse edges incident to vertex
@@ -230,8 +222,6 @@ public:
 	Traversor3VW(MAP& m, Dart dart, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XY<MAP, VERTEX, VOLUME>(m, dart, forceDartMarker, thread)	{}
 };
 
-
-
 /**
  * Traverse vertices adjacent to a vertex by an edge
  */
@@ -261,7 +251,6 @@ class Traversor3VVaW: public Traversor3XXaY<MAP, VERTEX, VOLUME>
 public:
 	Traversor3VVaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP, VERTEX, VOLUME>(m, d, forceDartMarker, thread)	{}
 };
-
 
 /**
  * Traverse edges adjacent to an egde by a vertex
@@ -293,7 +282,6 @@ public:
 	Traversor3EEaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP, EDGE, VOLUME>(m, d, forceDartMarker, thread)	{}
 };
 
-
 /**
  * Traverse faces adjacent to a face by a vertex
  */
@@ -324,7 +312,6 @@ public:
 	Traversor3FFaW(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP, FACE, VOLUME>(m, d, forceDartMarker, thread)	{}
 };
 
-
 /**
  * Traverse volumes adjacent to a volume by a vertex
  */
@@ -354,7 +341,6 @@ class Traversor3WWaF: public Traversor3XXaY<MAP, VOLUME, FACE>
 public:
 	Traversor3WWaF(MAP& m, Dart d, bool forceDartMarker = false, unsigned int thread = 0) : Traversor3XXaY<MAP, VOLUME, FACE>(m, d, forceDartMarker, thread)	{}
 };
-
 
 } // namespace CGoGN
 

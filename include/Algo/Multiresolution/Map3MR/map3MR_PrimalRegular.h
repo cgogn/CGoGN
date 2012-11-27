@@ -70,6 +70,8 @@ protected:
 public:
 	Map3MR(MAP& map);
 
+	~Map3MR();
+
 private:
 	/*! @name Topological helping functions
 	 *

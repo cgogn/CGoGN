@@ -39,9 +39,13 @@ class EmbeddedMap2 : public Map2
 public:
 	typedef Map2 TOPO_MAP;
 
+	/*
+	 *
+	 */
+	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
+
 	/**
 	 * The attributes attached to the old vertex are duplicated on both resulting vertices
-	 * No attribute is attached to the new edge
 	 */
 	virtual void splitVertex(Dart d, Dart e) ;
 
@@ -51,7 +55,6 @@ public:
 	virtual Dart deleteVertex(Dart d) ;
 
 	/**
-	 * No attribute is attached to the new vertex
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
 	virtual Dart cutEdge(Dart d) ;
@@ -89,17 +92,6 @@ public:
 	 *
 	 */
 	virtual void swapEdges(Dart d, Dart e);
-//	/**
-//	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
-//	 * The attributes attached to the face of dart d are overwritten on the face of dart e
-//	 */
-//	virtual void insertEdgeInVertex(Dart d, Dart e);
-//
-//	/**
-//	 * The attributes attached to the vertex of dart d are kept on the resulting vertex
-//	 * The attributes attached to the face of dart d are overwritten on the face of dart e
-//	 */
-//	virtual void removeEdgeFromVertex(Dart d);
 
 	/**
 	 * The attributes attached to the vertices of the edge of d are kept on the vertices of the resulting edge
@@ -111,7 +103,7 @@ public:
 	 * The attributes attached to the vertices of the old edge of d are duplicated on the vertices of both resulting edges
 	 * The attributes attached to the old edge are duplicated on both resulting edges
 	 */
-	virtual void unsewFaces(Dart d) ;
+	virtual void unsewFaces(Dart d, bool withBoundary = true) ;
 
 	/**
 	 * The attributes attached to the edge of d are kept on the resulting edge
@@ -119,7 +111,6 @@ public:
 	virtual bool collapseDegeneratedFace(Dart d);
 
 	/**
-	 * No attribute is attached to the new edge
 	 * The attributes attached to the old face are duplicated on both resulting faces
 	 */
 	virtual void splitFace(Dart d, Dart e) ;
@@ -141,7 +132,7 @@ public:
 	virtual void splitSurface(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = true);
 
 	/**
-	 * No attribute is attached to the new face
+	 *
 	 */
 	virtual unsigned int closeHole(Dart d, bool forboundary = true);
 

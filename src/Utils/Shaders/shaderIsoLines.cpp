@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include <string>
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderIsoLines.h"
 
 namespace CGoGN

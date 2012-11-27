@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include <iostream>
 #include "Utils/trackball.h"
 #include "Utils/Qt/qtgl.h"
@@ -30,6 +29,9 @@
 #include "glm/gtc/type_precision.hpp"
 #include "Utils/GLSLShader.h"
 
+#ifdef MAC_OSX
+  #include "Utils/Qt/macgl3.h"
+#endif
 namespace CGoGN
 {
 
@@ -42,7 +44,12 @@ namespace QT
 float GLWidget::FAR_PLANE = 500.0f;
 
 GLWidget::GLWidget(SimpleQT* cbs, QWidget *parent) :
+#ifdef MAC_OSX
+//	QGLWidget(new Core3_2_context(QGLFormat::defaultFormat()),parent),
 	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
+#else
+	QGLWidget(QGLFormat(QGL::Rgba | QGL::DoubleBuffer| QGL::DepthBuffer), parent),
+#endif
 	m_cbs(cbs),
 	m_state_modifier(0),
 	allow_rotation(true)
@@ -186,6 +193,7 @@ glm::vec3& GLWidget::getObjPos()
 
 void GLWidget::initializeGL()
 {
+	std::cout << "GL VERSION = "<< glGetString(GL_VERSION)<< std::endl;
 	glEnable(GL_DEPTH_TEST);
 
 	if (m_cbs)

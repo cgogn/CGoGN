@@ -69,6 +69,7 @@ void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	}
 }
 
+
 /************************************************************************************
  *                                    RANDOM                                        *
  ************************************************************************************/
@@ -112,6 +113,22 @@ bool EdgeSelector_Random<PFP>::nextEdge(Dart& d)
 
 template <typename PFP>
 void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+	allSkipped = false ;
+	do
+	{
+		++cur ;
+		if(cur == darts.size())
+		{
+			cur = 0 ;
+			allSkipped = true ;
+		}
+	} while(!this->m_select(cur) || !m.edgeCanCollapse(darts[cur])) ;
+}
+
+template <typename PFP>
+void EdgeSelector_Random<PFP>::updateWithoutCollapse()
 {
 	MAP& m = this->m_map ;
 	allSkipped = false ;
@@ -220,6 +237,17 @@ void EdgeSelector_Length<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_Length<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -421,6 +449,17 @@ void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -481,18 +520,6 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
-
-template <typename PFP>
-void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
-{
-	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
-	einfo.valid = false ;
-	edges.erase(einfo.it) ;
-
-	//edges.erase(cur) ;
-	cur = edges.begin();
-}
-
 
 /************************************************************************************
  *                            QUADRIC ERROR METRIC (Memoryless version)             *
@@ -664,6 +691,17 @@ void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_QEMml<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -849,6 +887,17 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_Curvature<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_Curvature<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -907,7 +956,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
+	unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -920,8 +969,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.template embedOrbit<VERTEX>(d, v1) ;
-	m.template embedOrbit<VERTEX>(dd, v2) ;
+	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
+	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
 
 	REAL err = 0 ;
 
@@ -1049,6 +1098,17 @@ void EdgeSelector_MinDetail<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_MinDetail<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -2010,9 +2070,6 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	double alpha = alpha1 + alpha2 ;
 
-	if (isnan(alpha))
-		std::cerr << "Nan: " << m_frameN[d] << " ; " << m_frameN[dd] << " ; " << newFN << std::endl ;
-
 	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
 	Utils::QuadricHF<REAL> quadHF = m_quadricHF[d] ;
 
@@ -2023,11 +2080,11 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	const REAL& errLF = quadHF(newHF) ; // function coefficients
 
 	// Check if errated values appear
-	if (errG < -1e-10 || errAngle < -1e-10 || errLF < -1e-10)
+	if (errG < -1e-6 || errAngle < -1e-6 || errLF < -1e-6)
 		einfo.valid = false ;
 	else
 	{
-		einfo.it = edges.insert(std::make_pair(std::max(errG + errAngle + errLF, REAL(0)), d)) ;
+		einfo.it = edges.insert(std::make_pair(std::max(/*errG +*/ errAngle + errLF, REAL(0)), d)) ;
 		einfo.valid = true ;
 	}
 }

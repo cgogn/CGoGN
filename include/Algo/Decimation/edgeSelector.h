@@ -98,7 +98,7 @@ public:
 	{}
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	void updateWithoutCollapse() { }
+	void updateWithoutCollapse();
 } ;
 
 template <typename PFP>
@@ -143,7 +143,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	void updateWithoutCollapse() { }
+	void updateWithoutCollapse();
 
 	void getEdgeErrors(EdgeAttribute<typename PFP::REAL> *errors)
 	{
@@ -265,7 +265,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	void updateWithoutCollapse() { }
+	void updateWithoutCollapse();
 } ;
 
 template <typename PFP>
@@ -363,7 +363,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	void updateWithoutCollapse() { }
+	void updateWithoutCollapse();
 } ;
 
 template <typename PFP>
@@ -411,7 +411,7 @@ public:
 	void updateBeforeCollapse(Dart d) ;
 	void updateAfterCollapse(Dart d2, Dart dd2) ;
 
-	void updateWithoutCollapse() { }
+	void updateWithoutCollapse();
 } ;
 
 /*****************************************************************************************************************

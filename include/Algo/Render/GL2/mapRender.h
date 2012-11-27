@@ -28,19 +28,18 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#include <GL/glew.h>
 #include <vector>
 #include <list>
 #include <set>
 #include <utility>
 
+#include "Utils/gl_def.h"
 #include "Topology/generic/dart.h"
 #include "Topology/generic/functor.h"
 #include "Topology/generic/attributeHandler.h"
 #include "Container/convert.h"
 #include "Geometry/vector_gen.h"
 
-#include "Utils/vbo.h"
 
 // forward definition
 namespace CGoGN { namespace Utils { class GLSLShader; } }

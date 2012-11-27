@@ -132,9 +132,8 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
-		if (a == EMBNULL)
-			a = m_map.embedNewCell<CELL>(d) ;
-
+//		if (a == EMBNULL)
+//			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
 		m_markVector->operator[](a).setMark(m_mark) ;
 	}
 
@@ -147,9 +146,8 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
-		if (a == EMBNULL)
-			a = m_map.embedNewCell<CELL>(d) ;
-
+//		if (a == EMBNULL)
+//			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
 		m_markVector->operator[](a).unsetMark(m_mark) ;
 	}
 
@@ -162,9 +160,8 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
-		if (a == EMBNULL)
-			return false ;
-
+//		if (a == EMBNULL)
+//			return false ;
 		return m_markVector->operator[](a).testMark(m_mark) ;
 	}
 
@@ -307,7 +304,55 @@ public:
 			this->m_markVector->operator[](*it).unsetMark(this->m_mark) ;
 	}
 };
+/**
+ * class that allows the marking of Darts
+ * the marked Darts are stored to optimize the unmarking task at destruction
+ * \warning no default constructor
+ */
+template <unsigned int CELL>
+class CellMarkerMemo: public CellMarkerBase<CELL>
+{
+protected:
+	std::vector<Dart> m_markedDarts ;
 
+public:
+	CellMarkerMemo(GenericMap& map, unsigned int thread = 0) : CellMarkerBase<CELL>(map, thread)
+	{}
+
+	virtual ~CellMarkerMemo()
+	{
+		unmarkAll() ;
+//		assert(isAllUnmarked);
+		CGoGN_ASSERT(this->isAllUnmarked())
+	}
+
+protected:
+	CellMarkerMemo(const CellMarkerMemo& cm) : CellMarkerBase<CELL>(cm)
+	{}
+
+public:
+	void mark(Dart d)
+	{
+		if(!this->isMarked(d))
+		{
+			CellMarkerBase<CELL>::mark(d) ;
+			m_markedDarts.push_back(d) ;
+		}
+	}
+
+	void unmarkAll()
+	{
+		assert(this->m_map.template getMarkerSet<CELL>(this->m_thread).testMark(this->m_mark));
+		assert(this->m_markVector != NULL);
+
+		for (std::vector<Dart>::iterator it = m_markedDarts.begin(); it != m_markedDarts.end(); ++it)
+			this->m_markVector->operator[](this->m_map.template getEmbedding<CELL>(*it)).unsetMark(this->m_mark) ;
+	}
+	std::vector<Dart> get_markedCells()
+	{
+		return m_markedDarts;
+	}
+};
 /**
  * class that allows the marking of cells
  * the markers are not unmarked at destruction

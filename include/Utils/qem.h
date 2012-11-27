@@ -583,6 +583,8 @@ private:
 	Eigen::MatrixXd m_A ; /*!< The first QuadricHF member matrix A */
 	Eigen::VectorXd m_b[3] ; /*!< The second QuadricHF member vector b */
 	double m_c[3] ; /*!< The third QuadricHF member scalar c */
+	std::vector<VEC3> m_coefs ; /*!< The coefficients in cas optim fails */
+	bool m_noAlphaRot ; /*!< If alpha = 0 then optim will fail */
 
 	/*!
 	 * \brief method to evaluate the error for a given lightfield function
@@ -592,18 +594,6 @@ private:
 	 * \return the error
 	 */
 	REAL evaluate(const std::vector<VEC3>& coefs) const ;
-
-	/*!
-	 * \brief method to deduce an optimal coefficients in space
-	 * w.r.t. the current QuadricHF.
-	 *
-	 * \param coefs will contain the optimal result (if it can be computed)
-	 *
-	 * \return true if an optimal result was correctly computed
-	 */
-	bool optimize(std::vector<VEC3>& coefs) const ;
-
-//	Geom::Tensor3d rotate(const Geom::Tensor3d& T, const Geom::Matrix33d& R) ;
 
 	/*!
 	 * \brief method to build a rotate matrix (rotation in tangent plane)

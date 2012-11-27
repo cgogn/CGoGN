@@ -27,7 +27,6 @@
 
 #include "Utils/gl_def.h"
 #include "Geometry/vector_gen.h"
-#include <GL/glew.h>
 #include <string>
 #include <QImage>
 

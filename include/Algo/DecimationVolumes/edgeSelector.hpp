@@ -33,21 +33,117 @@ namespace Algo
 
 namespace DecimationVolumes
 {
-
 /************************************************************************************
- *                            QUADRIC ERROR METRIC                                  *
+ *                                  MAP ORDER                                       *
  ************************************************************************************/
 
 template <typename PFP>
-bool EdgeSelector_QEM<PFP>::init()
+bool EdgeSelector_MapOrder<PFP>::init()
+{
+	MAP& m = this->m_map ;
+	cur = m.begin() ;
+	while(!this->m_select(cur) || !m.edgeCanCollapse(cur))
+	{
+		m.next(cur) ;
+		if(cur == m.end())
+			return false;
+	}
+	return true ;
+}
+
+template <typename PFP>
+bool EdgeSelector_MapOrder<PFP>::nextEdge(Dart& d)
+{
+	MAP& m = this->m_map ;
+	if(cur == m.end())
+		return false ;
+	d = cur ;
+	return true ;
+}
+
+template <typename PFP>
+void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+	cur = m.begin() ;
+	while(!this->m_select(cur) || !m.edgeCanCollapse(cur))
+	{
+		m.next(cur) ;
+		if(cur == m.end())
+			break ;
+	}
+}
+
+/************************************************************************************
+ *	                                  RANDOM                                    	*
+ ************************************************************************************/
+template <typename PFP>
+bool EdgeSelector_Random<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	//searching the Geometry Approximator
+	darts.reserve(m.getNbDarts()) ;
+	darts.clear() ;
+
+	for(Dart d = m.begin(); d != m.end(); m.next(d))
+		darts.push_back(d) ;
+
+	srand(time(NULL)) ;
+	int remains = darts.size() ;
+	for(unsigned int i = 0; i < darts.size()-1; ++i) // generate the random permutation
+	{
+		int r = (rand() % remains) + i ;
+		// swap ith and rth elements
+		Dart tmp = darts[i] ;
+		darts[i] = darts[r] ;
+		darts[r] = tmp ;
+		--remains ;
+	}
+
+	cur = 0 ;
+	allSkipped = true ;
+
+	return true ;
+}
+
+template <typename PFP>
+bool EdgeSelector_Random<PFP>::nextEdge(Dart& d)
+{
+	if(cur == darts.size() && allSkipped)
+		return false ;
+	d = darts[cur] ;
+	return true ;
+}
+
+
+template <typename PFP>
+void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+	allSkipped = false ;
+	do
+	{
+		++cur ;
+		if(cur == darts.size())
+		{
+			cur = 0 ;
+			allSkipped = true ;
+		}
+	} while(!this->m_select(cur) || !m.edgeCanCollapse(darts[cur])) ;
+}
+
+/************************************************************************************
+ *                                 		SG98                                     	*
+ ************************************************************************************/
+template <typename PFP>
+bool EdgeSelector_SG98<PFP>::init()
+{
+	MAP& m = this->m_map ;
+
 	bool ok = false ;
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = this->m_approximators.begin();
-			it != this->m_approximators.end() && !ok;
-			++it)
+		it != this->m_approximators.end() && !ok;
+		++it)
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
@@ -59,135 +155,58 @@ bool EdgeSelector_QEM<PFP>::init()
 	if(!ok)
 		return false ;
 
-	// init the Quadric error metric for cells
-	edges.clear();
-	TraversorV<MAP> travV(m);
-	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
-	{
-		//create one quadric per vertex
-		Quadric<REAL> q;
-		quadric[dit] = q;
-	}
+	edges.clear() ;
 
-	// init the quadric for each boundary triangle
-	TraversorF<MAP> travF(m);
-	for(Dart dit = travF.begin() ; dit != travF.end() ; dit = travF.next())
-	{
-		Dart d1 = m.phi1(dit) ;				// for each triangle,
-		Dart d_1 = m.phi_1(dit) ;				// initialize the quadric of the triangle
-		Quadric<REAL> q(this->m_position[dit], this->m_position[d1], this->m_position[d_1]) ;
-		quadric[dit] += q ;					// and add the contribution of
-		quadric[d1] += q ;					// this quadric to the ones
-		quadric[d_1] += q ;					// of the 3 incident vertices
-
-	}
-
-	// init the edges with their optimal position
-	// and insert them in the multimap according to their error
-	TraversorE<MAP> travE(m);
-	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
+	TraversorE<typename PFP::MAP> tE(m);
+	for(Dart dit = tE.begin() ; dit != tE.end() ; dit = tE.next())
 	{
 		initEdgeInfo(dit);
 	}
 
-	// init the current edge to the first one
 	cur = edges.begin();
 
 	return true;
 }
 
 template <typename PFP>
-Operator<PFP>* EdgeSelector_QEM<PFP>::nextOperator()
+bool EdgeSelector_SG98<PFP>::nextEdge(Dart& d)
 {
-	MAP& m = this->m_map ;
-	Operator<PFP>* op = NULL;
-
-	if(cur != edges.end() && !edges.empty())
-	{
-		op = new CollapseEdgeOperator<PFP>((*cur).second);
-
-		op->setFirstIncidentEdge(m.phi2(m.phi_1((*cur).second)));
-		op->setSecondIncidentEdge(m.phi2(m.phi_1(m.phi2((*cur).second))));
-	}
-
-	return op ;
+	if(cur == edges.end() || edges.empty())
+		return false ;
+	d = (*cur).second ;
+	return true ;
 }
 
 template <typename PFP>
-bool EdgeSelector_QEM<PFP>::updateBeforeOperation(Operator<PFP>* op)
+void EdgeSelector_SG98<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
-	Dart d = op->getEdge();
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	// remove all
+	// the concerned edges
+	// from the multimap
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		edges.erase(edgeE.it) ;
-
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
-									// from the multimap
-	Dart dd = m.phi2(d) ;
-	if(dd != d)
-	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
-
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
-	}
-
-	tmpQ.zero() ;			// compute quadric for the new
-	tmpQ += quadric[d] ;	// vertex as the sum of those
-	tmpQ += quadric[dd] ;	// of the contracted vertices
-
-	return true;
 }
 
 template <typename PFP>
-void EdgeSelector_QEM<PFP>::updateAfterOperation(Operator<PFP>* op)
+void EdgeSelector_SG98<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
-	Dart d2 = op->getFirstIncidentEdge();
-	Dart dd2 = op->getSecondIncidentEdge();
 
-	quadric[d2] = tmpQ ;
 
-	Dart vit = d2 ;
-	do
-	{
-		updateEdgeInfo(m.phi1(vit), false) ;			// must recompute some edge infos in the
-		if(vit == d2 || vit == dd2)						// neighborhood of the collapsed edge
-		{
-			initEdgeInfo(vit) ;							// various optimizations are applied here by
-														// treating differently :
-			Dart vit2 = m.phi1(m.phi2(m.phi1(vit))) ;		// - edges for which the criteria must be recomputed
-			Dart stop = m.phi2(vit) ;					// - edges that must be re-embedded
-			do											// - edges for which only the collapsibility must be re-tested
-			{
-				updateEdgeInfo(vit2, false) ;
-				updateEdgeInfo(m.phi1(vit2), false) ;
-				vit2 = m.phi1(m.phi2(vit2)) ;
-			} while(vit2 != stop) ;
-		}
-		else
-			updateEdgeInfo(vit, true) ;
+	// must recompute some edge infos in the
 
-		vit = m.phi2(m.phi_1(vit)) ;
-	} while(vit != d2) ;
+	// various optimizations are applied here by
+	// treating differently :
+	// - edges for which the criteria must be recomputed
+	// - edges that must be re-embedded
+	// - edges for which only the collapsibility must be re-tested
 
 	cur = edges.begin() ; // set the current edge to the first one
-
 }
 
 template <typename PFP>
-void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
+void EdgeSelector_SG98<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
 	EdgeInfo einfo ;
@@ -199,11 +218,10 @@ void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
 }
 
 template <typename PFP>
-void EdgeSelector_QEM<PFP>::updateEdgeInfo(Dart d, bool recompute)
+void EdgeSelector_SG98<PFP>::updateEdgeInfo(Dart d, bool recompute)
 {
 	MAP& m = this->m_map ;
 	EdgeInfo& einfo = edgeInfo[d] ;
-
 	if(recompute)
 	{
 		if(einfo.valid)
@@ -232,25 +250,22 @@ void EdgeSelector_QEM<PFP>::updateEdgeInfo(Dart d, bool recompute)
 }
 
 template <typename PFP>
-void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
+void EdgeSelector_SG98<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 {
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	Quadric<REAL> quad ;
-	quad += quadric[d] ;	// compute the sum of the
-	quad += quadric[dd] ;	// two vertices quadrics
-
-	m_positionApproximator->approximate(d) ;
-
-	REAL err = std::max(REAL(0),REAL(quad(m_positionApproximator->getApprox(d)))) ;
-
-	einfo.it = edges.insert(std::make_pair(err, d)) ;
-	einfo.valid = true ;
+//	Quadric<REAL> quad ;
+//	quad += quadric[d] ;	// compute the sum of the
+//	quad += quadric[dd] ;	// two vertices quadrics
+//
+//	m_positionApproximator->approximate(d) ;
+//
+//	REAL err = quad(m_positionApproximator->getApprox(d)) ;
+//
+//	einfo.it = edges.insert(std::make_pair(err, d)) ;
+//	einfo.valid = true ;
 }
-
-
-
 
 } //end namespace DecimationVolumique
 } //end namespace Algo

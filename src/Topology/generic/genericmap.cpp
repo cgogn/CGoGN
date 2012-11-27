@@ -33,43 +33,45 @@
 namespace CGoGN
 {
 
-std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL ;
+std::map<std::string, RegisteredBaseAttribute*>* GenericMap::m_attributes_registry_map = NULL;
 int GenericMap::m_nbInstances = 0;
 
 GenericMap::GenericMap() : m_nbThreads(1)
 {
 	if(m_attributes_registry_map == NULL)
-		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*> ;
+	{
+		m_attributes_registry_map = new std::map<std::string, RegisteredBaseAttribute*>;
 
+		// register all known types
+		registerAttribute<Dart>("Dart");
+		registerAttribute<Mark>("Mark");
+
+		registerAttribute<long>("long");
+		registerAttribute<int>("int");
+		registerAttribute<short>("short");
+		registerAttribute<char>("char");
+
+		registerAttribute<unsigned long>("unsigned long");
+		registerAttribute<unsigned int>("unsigned int");
+		registerAttribute<unsigned short>("unsigned short");
+		registerAttribute<unsigned char>("unsigned char");
+
+		registerAttribute<Geom::Vec2f>(Geom::Vec2f::CGoGNnameOfType());
+		registerAttribute<Geom::Vec3f>(Geom::Vec3f::CGoGNnameOfType());
+		registerAttribute<Geom::Vec4f>(Geom::Vec4f::CGoGNnameOfType());
+
+		registerAttribute<Geom::Vec2d>(Geom::Vec2d::CGoGNnameOfType());
+		registerAttribute<Geom::Vec3d>(Geom::Vec3d::CGoGNnameOfType());
+		registerAttribute<Geom::Vec4d>(Geom::Vec4d::CGoGNnameOfType());
+
+		registerAttribute<Geom::Matrix33f>(Geom::Matrix33f::CGoGNnameOfType());
+		registerAttribute<Geom::Matrix44f>(Geom::Matrix44f::CGoGNnameOfType());
+
+		registerAttribute<Geom::Matrix33d>(Geom::Matrix33d::CGoGNnameOfType());
+		registerAttribute<Geom::Matrix44d>(Geom::Matrix44d::CGoGNnameOfType());
+	}
 
 	m_nbInstances++;
-	// register all known types
-	registerAttribute<Dart>("Dart");
-	registerAttribute<Mark>("Mark");
-
-	registerAttribute<long>("long");
-	registerAttribute<int>("int");
-	registerAttribute<short>("short");
-	registerAttribute<char>("char");
-
-	registerAttribute<unsigned long>("unsigned long");
-	registerAttribute<unsigned int>("unsigned int");
-	registerAttribute<unsigned short>("unsigned short");
-	registerAttribute<unsigned char>("unsigned char");
-
-	registerAttribute<Geom::Vec2f>(Geom::Vec2f::CGoGNnameOfType());
-	registerAttribute<Geom::Vec3f>(Geom::Vec3f::CGoGNnameOfType());
-	registerAttribute<Geom::Vec4f>(Geom::Vec4f::CGoGNnameOfType());
-
-	registerAttribute<Geom::Vec2d>(Geom::Vec2d::CGoGNnameOfType());
-	registerAttribute<Geom::Vec3d>(Geom::Vec3d::CGoGNnameOfType());
-	registerAttribute<Geom::Vec4d>(Geom::Vec4d::CGoGNnameOfType());
-
-	registerAttribute<Geom::Matrix33f>(Geom::Matrix33f::CGoGNnameOfType());
-	registerAttribute<Geom::Matrix44f>(Geom::Matrix44f::CGoGNnameOfType());
-
-	registerAttribute<Geom::Matrix33d>(Geom::Matrix33d::CGoGNnameOfType());
-	registerAttribute<Geom::Matrix44d>(Geom::Matrix44d::CGoGNnameOfType());
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -108,7 +110,6 @@ GenericMap::~GenericMap()
 			m_attribs[i].clear(true) ;
 	}
 
-
 	for(std::multimap<AttributeMultiVectorGen*, AttributeHandlerGen*>::iterator it = attributeHandlers.begin(); it != attributeHandlers.end(); ++it)
 		(*it).second->setInvalid() ;
 	attributeHandlers.clear() ;
@@ -126,7 +127,7 @@ GenericMap::~GenericMap()
 
 	// clean type registry if necessary
 	m_nbInstances--;
-	if (m_nbInstances<=0)
+	if (m_nbInstances <= 0)
 	{
 		for (std::map<std::string, RegisteredBaseAttribute*>::iterator it =  m_attributes_registry_map->begin(); it != m_attributes_registry_map->end(); ++it)
 			delete it->second;
@@ -283,7 +284,33 @@ void GenericMap::removeLevelBack()
 
 void GenericMap::removeLevelFront()
 {
-	std::cout << "TO DO" << std::endl;
+	unsigned int maxL = getMaxLevel() ;
+	if(maxL > 0) //must have at min 2 levels (0 and 1) to remove the front one
+	{
+		AttributeMultiVector<unsigned int>* minMR = m_mrDarts[0] ;
+		AttributeMultiVector<unsigned int>* firstMR = m_mrDarts[1] ;
+		for(unsigned int i = m_mrattribs.begin(); i != m_mrattribs.end(); m_mrattribs.next(i))
+		{
+			unsigned int idx = (*minMR)[i] ;
+			if((*m_mrLevels)[i] != 0)	// if the MRdart was introduced after the level we're removing
+			{
+				--(*m_mrLevels)[i]; //decrement his level of insertion
+			}
+			else							// if the dart was introduced on a this level and not used after
+			{
+//				if(idx != (*firstMR)[i])		// delete the pointed dart line only if
+//					deleteDartLine(idx) ;	// it is not shared with next level
+			}
+		}
+
+		m_mrNbDarts[1] += m_mrNbDarts[0];
+
+		m_mrattribs.removeAttribute<unsigned int>(minMR->getIndex()) ;
+		m_mrDarts.erase(m_mrDarts.begin()) ;
+		m_mrNbDarts.erase(m_mrNbDarts.begin()) ;
+
+		--m_mrCurrentLevel ;
+	}
 }
 
 void GenericMap::copyLevel(unsigned int level)

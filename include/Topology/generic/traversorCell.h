@@ -80,7 +80,6 @@ public:
 	{}
 };
 
-
 template <typename MAP>
 class TraversorF : public TraversorCell<MAP, FACE>
 {
