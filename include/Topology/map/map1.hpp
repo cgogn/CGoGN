@@ -43,7 +43,7 @@ inline std::string Map1::mapTypeName() const
 	return "Map1" ;
 }
 
-inline unsigned int Map1::dimension()
+inline unsigned int Map1::dimension() const
 {
 	return 1 ;
 }

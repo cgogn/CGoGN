@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
+#include "Utils/gl_def.h"
 #include "Geometry/transfo.h"
 
 namespace CGoGN
@@ -257,7 +257,7 @@ Polyhedron<PFP>* extrusion_scale_prim(typename PFP::MAP& the_map, VertexAttribut
 			else position[em] = P;
 
 			Dart d = vertD[index++];
-			the_map.template embedOrbit<VERTEX>(d, em);
+			the_map.template setOrbitEmbedding<VERTEX>(d, em);
 
 			// rotate again to put profile in the good position along the path
 //			pos4=Geom::Vec4f ((*ip)[0],(*ip)[1],(*ip)[2], 1.0f);

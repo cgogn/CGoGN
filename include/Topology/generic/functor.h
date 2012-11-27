@@ -171,6 +171,33 @@ public:
 	FunctorSelect* copy() const { return new SelectorDartNoBoundary(m_map);}
 };
 
+template <typename MAP>
+class SelectorLevel : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+	unsigned int m_level;
+public:
+	SelectorLevel(MAP& m, unsigned int l): m_map(m), m_level(l) {}
+	bool operator()(Dart d) const { return m_map.getDartLevel(d) == m_level; }
+	FunctorSelect* copy() const { return new SelectorLevel(m_map, m_level);}
+};
+
+template <typename MAP>
+class SelectorEdgeLevel : public FunctorSelect
+{
+public:
+protected:
+	MAP& m_map;
+	unsigned int m_level;
+public:
+	SelectorEdgeLevel(MAP& m, unsigned int l): m_map(m), m_level(l) {}
+	bool operator()(Dart d) const { return (m_map.getDartLevel(d) == m_level) && (m_map.getDartLevel(m_map.phi2(d)) == m_level); }
+	FunctorSelect* copy() const { return new SelectorEdgeLevel(m_map, m_level);}
+};
+
+
 //
 //class SelectorDartMarked : public FunctorSelect
 //{
@@ -251,25 +278,26 @@ public:
 		this->m_map.template setDartEmbedding<ORBIT>(d, emb);
 		return false;
 	}
-	void changeEmb(unsigned int e) { emb = e;}
+	void changeEmb(unsigned int e) { emb = e; }
 };
 
-//template <typename MAP>
-//class FunctorSetEmb : public FunctorMap<MAP>
-//{
-//protected:
-//	unsigned int orbit;
-//	unsigned int emb;
-//public:
-//	FunctorSetEmb(MAP& map, unsigned int orb, unsigned int e) : FunctorMap<MAP>(map), orbit(orb), emb(e)
-//	{}
-//	bool operator()(Dart d)
-//	{
-//		this->m_map.setDartEmbedding(orbit, d, emb);
-//		return false;
-//	}
-//	void changeEmb(unsigned int e) { emb = e;}
-//};
+template <typename MAP, unsigned int ORBIT>
+class FunctorInitEmb : public FunctorMap<MAP>
+{
+protected:
+	unsigned int emb;
+public:
+	FunctorInitEmb(MAP& map) : FunctorMap<MAP>(map), emb(EMBNULL)
+	{}
+	FunctorInitEmb(MAP& map, unsigned int e) : FunctorMap<MAP>(map), emb(e)
+	{}
+	bool operator()(Dart d)
+	{
+		this->m_map.template initDartEmbedding<ORBIT>(d, emb);
+		return false;
+	}
+	void changeEmb(unsigned int e) { emb = e; }
+};
 
 // Functor Check Embedding : to check the embeddings of the given map
 

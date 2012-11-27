@@ -1,4 +1,4 @@
-# A mettre juste apres la definition de CGoGN_ROOT_DIR  a la racine du CGoGN_Apps
+# A mettre juste apres la definition de CGoGN_ROOT_DIR a la racine du CGoGN_Apps
 # include(${CGoGN_ROOT_DIR}/build/apps_cmake.txt)
 
 SET(CMAKE_MODULE_PATH ${CGoGN_ROOT_DIR}/cmake_modules/)
@@ -15,7 +15,7 @@ IF (FORCE_MR EQUAL 1)
 	add_definitions(-DCGoGN_FORCE_MR=1)
 ENDIF (FORCE_MR EQUAL 1)
 
-# for CGoGN in one lib on not
+# for CGoGN in one lib or not
 file(STRINGS ${CGoGN_ROOT_DIR}/include/cgogn_onelib.h ONELIB_STR)
 IF (ONELIB_STR EQUAL 1)
 	SET(CGoGN_LIBS_D cgognD)
@@ -30,7 +30,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS regex thread REQUIRED)
+find_package(Boost COMPONENTS regex thread system REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(GLEW REQUIRED)
@@ -58,6 +58,7 @@ SET (COMMON_LIBS
 	${GLEW_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${LIBXML2_LIBRARIES}
+	${Boost_SYSTEM_LIBRARY}
 	${Boost_REGEX_LIBRARY}
 	${Boost_THREAD_LIBRARY} )
 

@@ -783,7 +783,7 @@ void Polyhedron<PFP>::embedGrid(float x, float y, float z)
 			VEC3 pos(-x/2 + dx*float(j), -y/2 + dy*float(i), z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx+1)+j];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 }
@@ -814,7 +814,7 @@ void Polyhedron<PFP>::embedCylinder(float bottom_radius, float top_radius, float
 			VEC3 pos(x, y, -height/2 + dz*float(i));
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx)+j];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 
@@ -824,7 +824,7 @@ void Polyhedron<PFP>::embedCylinder(float bottom_radius, float top_radius, float
 		VEC3 pos(0.0f, 0.0f, -height/2 );
 		unsigned int em = m_positions.insert(pos);
 		Dart d = m_tableVertDarts[indexUmbrella++];
-		m_map.template embedOrbit<VERTEX>(d, em);
+		m_map.template setOrbitEmbedding<VERTEX>(d, em);
 	}
 
 	if (m_top_closed)
@@ -832,7 +832,7 @@ void Polyhedron<PFP>::embedCylinder(float bottom_radius, float top_radius, float
 		VEC3 pos(0.0f ,0.0f, height/2 );
 		unsigned int em = m_positions.insert(pos);
 		Dart d = m_tableVertDarts[indexUmbrella];
-		m_map.template embedOrbit<VERTEX>(d, em);
+		m_map.template setOrbitEmbedding<VERTEX>(d, em);
 	}
 }
 
@@ -864,7 +864,7 @@ void Polyhedron<PFP>::embedCone(float radius, float height)
 			VEC3 pos(x, y, h);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx)+j];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 
@@ -874,14 +874,14 @@ void Polyhedron<PFP>::embedCone(float radius, float height)
 		VEC3 pos(0.0f, 0.0f, -height/2 );
 		unsigned int em = m_positions.insert(pos);
 		Dart d = m_tableVertDarts[indexUmbrella++];
-		m_map.template embedOrbit<VERTEX>(d, em);
+		m_map.template setOrbitEmbedding<VERTEX>(d, em);
 	}
 
 	//  top always closed in cone 
 	VEC3 pos(0.0f ,0.0f, height/2.0f );
 	unsigned int em = m_positions.insert(pos);
 	Dart d = m_tableVertDarts[indexUmbrella];
-	m_map.template embedOrbit<VERTEX>(d, em);
+	m_map.template setOrbitEmbedding<VERTEX>(d, em);
 }
 
 template <typename PFP>
@@ -910,7 +910,7 @@ void Polyhedron<PFP>::embedSphere(float radius)
 			VEC3 pos(x, y, h );
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx)+j];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 
@@ -918,13 +918,13 @@ void Polyhedron<PFP>::embedSphere(float radius)
 	VEC3 pos(0.0f, 0.0f, -radius);
 	unsigned int em = m_positions.insert(pos);
 	Dart d = m_tableVertDarts[m_nx*(m_nz+1)];
-	m_map.template embedOrbit<VERTEX>(d, em);
+	m_map.template setOrbitEmbedding<VERTEX>(d, em);
 
 	//  top pole
 	pos = VEC3(0.0f, 0.0f, radius);
 	em = m_positions.insert(pos);
 	d = m_tableVertDarts[m_nx*(m_nz+1)+1];
-	m_map.template embedOrbit<VERTEX>(d, em);
+	m_map.template setOrbitEmbedding<VERTEX>(d, em);
 }
 
 template <typename PFP>
@@ -952,7 +952,7 @@ void Polyhedron<PFP>::embedTore(float big_radius, float small_radius)
 			VEC3 pos(x, y, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[j*(m_nx)+i];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 }
@@ -983,7 +983,7 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 			VEC3 pos(x, -sy/2.0f, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 		for (unsigned int i = 0; i < m_ny; ++i)
 		{
@@ -991,7 +991,7 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 			VEC3 pos(sx/2.0f, y, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 		for (unsigned int i = 0; i < m_nx; ++i)
 		{
@@ -999,7 +999,7 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 			VEC3 pos(x, sy/2.0f, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 		for (unsigned int i = 0; i < m_ny ;++i)
 		{
@@ -1007,7 +1007,7 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 			VEC3 pos(-sx/2.0f, y, z);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 
@@ -1019,7 +1019,7 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 			VEC3 pos(-sx/2.0f+float(j)*dx, -sy/2.0f+float(i)*dy, sz/2.0f);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 
@@ -1031,7 +1031,7 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 			VEC3 pos(-sx/2.0f+float(j)*dx, sy/2.0f-float(i)*dy, -sz/2.0f);
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[index++];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 }
@@ -1104,7 +1104,7 @@ void Polyhedron<PFP>::embedTwistedStrip(float radius_min,  float radius_max, flo
 			VEC3 pos(r*cos(alpha*float(i)), r*sin(alpha*float(i)), rw*sin(beta*float(i)));
 			unsigned int em = m_positions.insert(pos);
 			Dart d = m_tableVertDarts[i*(m_nx+1)+j];
-			m_map.template embedOrbit<VERTEX>(d, em);
+			m_map.template setOrbitEmbedding<VERTEX>(d, em);
 		}
 	}
 }
@@ -1142,52 +1142,51 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 	}
 }
 
-// template <typename PFP>
-// void onlyTriangles(typename PFP::MAP& the_map, Dart primd)
-// {
-// 	DartMarker m(the_map);
-// 
-// 	// list of faces to process and processed(before pos iterator)
-// 	std::list<Dart> ld;
-// 	ld.push_back(primd);
-// 	// current position in list
-// 	typename std::list<Dart>::iterator pos = ld.begin();
-// 	do
-// 	{
-// 		Dart d = *pos;
-// 		
-// 		// cut the face of first dart of list
-// 		Dart d1 = the_map.phi1(d);
-// 		Dart e = the_map.phi1(d1);
-// 		Dart e1 = the_map.phi1(e);
-// 		Dart f = the_map.phi1(e1);
-// 		m.markOrbit<FACE>(d);
-// 		if (f==d) // quad
-// 		{
-// 			Dart n = the_map.cutFace(d,e);
-// 			Dart nn = the_map.phi2(n);
-// 			// mark the face
-// 			m.mark(n);
-// 			m.mark(nn);
-// 		}
-// 
-// 		// and store neighbours faces in the list
-// 		d = the_map.phi2(d);
-// 		e = the_map.phi2(e);
-// 		d1 = the_map.phi1(the_map.phi2(d1));
-// 		e1 = the_map.phi1(the_map.phi2(e1));
-// 
-// 		if (!m.isMarked(d))
-// 			ld.push_back(d);
-// 		if (!m.isMarked(e))
-// 			ld.push_back(e);
-// 		if (!m.isMarked(d1))
-// 			ld.push_back(d1);
-// 		if ((f==d) && (!m.isMarked(e1)))
-// 			ld.push_back(e1);
-// 		pos++;
-// 	}while (pos!=ld.end()); // stop when no more face to process
-// }
+ template <typename PFP>
+ void quads2TrianglesCC(typename PFP::MAP& the_map, Dart primd)
+ {
+ 	DartMarker m(the_map);
+
+ 	// list of faces to process and processed(before pos iterator)
+ 	std::list<Dart> ld;
+ 	ld.push_back(primd);
+ 	// current position in list
+ 	typename std::list<Dart>::iterator pos = ld.begin();
+ 	do
+ 	{
+ 		Dart d = *pos;
+
+ 		// cut the face of first dart of list
+ 		Dart d1 = the_map.phi1(d);
+ 		Dart e = the_map.phi1(d1);
+ 		Dart e1 = the_map.phi1(e);
+ 		Dart f = the_map.phi1(e1);
+ 		if (f==d) // quad
+ 		{
+ 			the_map.splitFace(d,e);
+ 			// mark the face
+ 			m.markOrbit<FACE>(d);
+ 			m.markOrbit<FACE>(e);
+ 		}
+ 		else m.markOrbit<FACE>(d);
+
+ 		// and store neighbours faces in the list
+ 		d = the_map.phi2(d);
+ 		e = the_map.phi2(e);
+ 		d1 = the_map.phi1(the_map.phi2(d1));
+ 		e1 = the_map.phi1(the_map.phi2(e1));
+
+ 		if (!m.isMarked(d))
+ 			ld.push_back(d);
+ 		if (!m.isMarked(e))
+ 			ld.push_back(e);
+ 		if (!m.isMarked(d1))
+ 			ld.push_back(d1);
+ 		if ((f==d) && (!m.isMarked(e1)))
+ 			ld.push_back(e1);
+ 		pos++;
+ 	}while (pos!=ld.end()); // stop when no more face to process
+ }
 
 // template <typename PFP>
 // Dart triangleFan_topo(typename PFP::MAP& the_map, int n)

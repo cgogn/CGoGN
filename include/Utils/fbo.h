@@ -25,7 +25,6 @@
 #ifndef __CGoGN_GLSL_FBO__
 #define __CGoGN_GLSL_FBO__
 
-#include <GL/glew.h>
 #include "Utils/gl_def.h"
 
 #include <iostream>

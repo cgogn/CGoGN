@@ -113,7 +113,6 @@ public:
 		assert(m_map.getMarkerSet<DART>(m_thread).testMark(m_mark));
 		unsigned int d_index = m_map.dartIndex(d) ;
 		m_markVector->operator[](d_index).setMark(m_mark) ;
-
 	}
 
 	/**

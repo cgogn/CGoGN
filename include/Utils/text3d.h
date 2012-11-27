@@ -54,6 +54,7 @@ protected:
 
     static std::string fragmentShaderText1;
     static std::string fragmentShaderText2;
+    static std::string fragmentShaderText3;
 
     static Strings3D*  m_instance0;
 
@@ -69,6 +70,8 @@ protected:
 
     float m_scale;
 
+    Geom::Vec4f m_color;
+
     unsigned int sendOneStringToVBO(const std::string& str, float **buffer);
 
     CGoGNGLuint m_idTexture;
@@ -80,9 +83,13 @@ protected:
     CGoGNGLuint m_uniform_position;
 
     CGoGNGLuint m_uniform_color;
+	
+	CGoGNGLuint m_uniform_planeX;
+	
+	CGoGNGLuint m_uniform_planeY;
 
 public:
-	Strings3D(bool withBackground = true, const Geom::Vec3f& bgc = Geom::Vec3f(0));
+	Strings3D(bool withBackground = true, const Geom::Vec3f& bgc = Geom::Vec3f(0), bool with_plane=false);
 
 	~Strings3D();
 
@@ -112,7 +119,7 @@ public:
 	void sendToVBO();
 
 	/**
-	 * draw on string
+	 * draw one string
 	 * @param idSt the id of string
 	 * @param pos the position of text
 	 */
@@ -122,13 +129,33 @@ public:
 	* Draw all text stored with their position
 	* @param color the color of text
 	*/
-	void drawAll(const Geom::Vec3f& color);
+	void drawAll(const Geom::Vec4f& color);
+
+	void drawAll(const Geom::Vec3f& color){ drawAll( Geom::Vec4f(color[0],color[1],color[2],m_color[3])); }
+
 
 	/**
 	* call once before several draw(id,pos)
 	* @param color the color of text
 	*/
-	void predraw(const Geom::Vec3f& color);
+	void predraw(const Geom::Vec4f& color);
+
+	void predraw(const Geom::Vec3f& color){ predraw( Geom::Vec4f(color[0],color[1],color[2],m_color[3])); }
+
+
+	/**
+	* call just before a draw
+	* @param color the color of text
+	*/
+	void changeColor(const Geom::Vec4f& color);
+
+	void changeColor(const Geom::Vec3f& color){ changeColor( Geom::Vec4f(color[0],color[1],color[2],m_color[3])); }
+
+	/**
+	 * change opacity but keep color (0 is totally transparent 1 is totally opaque)
+	 * @param opacity
+	 */
+	void changeOpacity(float op);
 
 	/**
 	* call once after several draw(id,pos)
@@ -140,6 +167,19 @@ public:
 	 * @param scale
 	 */
 	void setScale(float scale);
+	
+	/**
+	* set the plane of rendering for VR rendering
+	*/
+	void setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy);
+
+	/**
+	 * Update string content
+	 * @warning size can not be changed
+	 * @param idSt string id
+	 * @param str new string content
+	 */
+	void updateString(unsigned int idSt, const std::string& str);
 
 
 	void toSVG(Utils::SVG::SVGOut& svg);

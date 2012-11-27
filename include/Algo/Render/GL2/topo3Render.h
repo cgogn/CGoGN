@@ -25,8 +25,6 @@
 #ifndef _TOPO3_VBO_RENDER
 #define _TOPO3_VBO_RENDER
 
-#include <GL/glew.h>
-
 #include <vector>
 #include <list>
 

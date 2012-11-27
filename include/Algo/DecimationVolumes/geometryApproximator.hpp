@@ -35,86 +35,35 @@ namespace DecimationVolumes
 {
 
 /************************************************************************************
- *                            QUADRIC ERROR METRIC                                  *
+ *							         MID EDGE                                       *
  ************************************************************************************/
 
 template <typename PFP>
-bool Approximator_QEM<PFP>::init()
+bool Approximator_MidEdge<PFP>::init()
 {
-	m_quadric = this->m_map.template getAttribute<Quadric<REAL>, VERTEX>("QEMquadric") ;
-
-	if(this->m_predictor)
-	{
-		return false ;
-	}
 	return true ;
 }
 
 template <typename PFP>
-void Approximator_QEM<PFP>::approximate(Operator<PFP> *op)
-{
-	Dart d = op->getEdge();
-	approximate(d);
-}
-
-template <typename PFP>
-void Approximator_QEM<PFP>::approximate(Dart d)
+void Approximator_MidEdge<PFP>::approximate(Dart d)
 {
 	MAP& m = this->m_map ;
 
 	// get some darts
 	Dart dd = m.phi2(d) ;
 
-	Quadric<REAL> q1, q2 ;
-	if(!m_quadric.isValid()) // if the selector is not QEM, compute local error quadrics
-	{
-		// compute the error quadric associated to v1
-		Dart it = d ;
-		do
-		{
-			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
-			q1 += q ;
-			it = m.phi2_1(it) ;
-		} while(it != d) ;
+	// get the contracted edge vertices positions
+	VEC3 v1 = this->m_attrV[d] ;
+	VEC3 v2 = this->m_attrV[dd] ;
 
-		// compute the error quadric associated to v2
-		it = dd ;
-		do
-		{
-			Quadric<REAL> q(this->m_attrV[it], this->m_attrV[m.phi1(it)], this->m_attrV[m.phi_1(it)]) ;
-			q2 += q ;
-			it = m.phi2_1(it) ;
-		} while(it != dd) ;
-	}
-	else // if the selector is QEM, use the error quadrics computed by the selector
-	{
-		q1 = m_quadric[d] ;
-		q2 = m_quadric[dd] ;
-	}
+	// Compute the approximated position
+	this->m_approx[d] = (v1 + v2) / REAL(2) ;
 
-	Quadric<REAL> quad ;
-	quad += q1 ;	// compute the sum of the
-	quad += q2 ;	// two vertices quadrics
-
-	VEC3 res ;
-	bool opt = quad.findOptimizedPos(res) ;	// try to compute an optimized position for the contraction of this edge
-	if(!opt)
+	if(this->m_predictor)
 	{
-		VEC3 p1 = this->m_attrV[d] ;	// let the new vertex lie
-		VEC3 p2 = this->m_attrV[dd] ;	// on either one of the two endpoints
-		VEC3 p12 = (p1 + p2) / 2.0f ;	// or the middle of the edge
-		REAL e1 = quad(p1) ;
-		REAL e2 = quad(p2) ;
-		REAL e12 = quad(p12) ;
-		REAL minerr = std::min(std::min(e1, e2), e12) ;	// consider only the one for
-		if(minerr == e12) this->m_approx[d] = p12 ;		// which the error is minimal
-		else if(minerr == e1) this->m_approx[d] = p1 ;
-		else this->m_approx[d] = p2 ;
+
 	}
-	else
-		this->m_approx[d] = res ;
 }
-
 } //end namespace DecimationVolumes
 
 } //end namespace Algo

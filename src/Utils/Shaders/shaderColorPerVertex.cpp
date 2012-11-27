@@ -22,7 +22,6 @@
 *                                                                              *
 *******************************************************************************/
 
-#include <GL/glew.h>
 #include "Utils/Shaders/shaderColorPerVertex.h"
 
 
@@ -73,6 +72,11 @@ ShaderColorPerVertex::ShaderColorPerVertex(bool black_is_transparent)
 	glxfrag.append(fragmentShaderText);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
+
+	*m_unif_alpha = glGetUniformLocation(this->program_handler(), "alpha");
+	glUniform1f (*m_unif_alpha, 1.0f);
+	m_opacity = 1.0f;
+
 }
 
 unsigned int ShaderColorPerVertex::setAttributePosition(VBO* vbo)
@@ -92,7 +96,16 @@ void ShaderColorPerVertex::restoreUniformsAttribs()
 	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexColor", m_vboCol);
+	glUniform1f (*m_unif_alpha, m_opacity);
 	unbind();
+}
+
+void ShaderColorPerVertex::setOpacity(float op)
+{
+	bind();
+	glUniform1f (*m_unif_alpha, op);
+	unbind();
+	m_opacity = op;
 }
 
 } // namespace Utils

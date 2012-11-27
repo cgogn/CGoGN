@@ -74,12 +74,14 @@ void Drawer::pointSize(float ps)
 	m_currentSize = ps;
 }
 
-void Drawer::begin(GLenum mode)
+int Drawer::begin(GLenum mode)
 {
+	int res = m_begins.size();
 	if (mode == GL_POINTS)
 		m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentSize));
 	else
 		m_begins.push_back(PrimParam(m_dataPos.size(), mode, m_currentWidth));
+	return res;
 }
 
 void Drawer::end()
@@ -166,10 +168,12 @@ void Drawer::updatePositions(unsigned int first, unsigned int nb, const float* P
 }
 
 
-void Drawer::callList()
+void Drawer::callList(float opacity)
 {
 	if (m_begins.empty())
 		return;
+
+	m_shader->setOpacity(opacity);
 
 	m_shader->enableVertexAttribs();
 	for (std::vector<PrimParam>::iterator pp = m_begins.begin(); pp != m_begins.end(); ++pp)
@@ -181,6 +185,69 @@ void Drawer::callList()
 		glDrawArrays(pp->mode, pp->begin, pp->nb);
 	}
  	m_shader->disableVertexAttribs();
+}
+
+
+void Drawer::callSubList(int index, float opacity)
+{
+	if (index >= int(m_begins.size()))
+		return;
+
+	m_shader->setOpacity(opacity);
+
+	m_shader->enableVertexAttribs();
+
+	PrimParam* pp = & (m_begins[index]);
+
+	if (pp->mode == GL_POINTS)
+		glPointSize(pp->width);
+	if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+		glLineWidth(pp->width);
+	glDrawArrays(pp->mode, pp->begin, pp->nb);
+
+	m_shader->disableVertexAttribs();
+}
+
+void Drawer::callSubLists(int first, int nb, float opacity)
+{
+	m_shader->setOpacity(opacity);
+	m_shader->enableVertexAttribs();
+
+	int last = first+nb;
+	for (int i = first; i< last; ++i)
+		if (i < int(m_begins.size()))
+		{
+			PrimParam* pp = & (m_begins[i]);
+
+			if (pp->mode == GL_POINTS)
+				glPointSize(pp->width);
+			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+				glLineWidth(pp->width);
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+
+	m_shader->disableVertexAttribs();
+}
+
+void Drawer::callSubLists(std::vector<int> indices, float opacity)
+{
+	m_shader->setOpacity(opacity);
+
+	m_shader->enableVertexAttribs();
+
+	for (std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
+		if (*it < int(m_begins.size()))
+		{
+			PrimParam* pp = & (m_begins[*it]);
+
+			if (pp->mode == GL_POINTS)
+				glPointSize(pp->width);
+			if ((pp->mode == GL_LINES) || (pp->mode == GL_LINE_LOOP))
+				glLineWidth(pp->width);
+			glDrawArrays(pp->mode, pp->begin, pp->nb);
+		}
+
+	m_shader->disableVertexAttribs();
 }
 
 

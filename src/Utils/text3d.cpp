@@ -36,14 +36,16 @@ namespace Utils
 
 
 std::string Strings3D::fragmentShaderText2 =
-"	gl_FragColor = vec4(color,0.0)*lum;\n"
-"}";
+"	if (lum == 0.0) discard;\n gl_FragColor = color*lum;\n}";
+
+std::string Strings3D::fragmentShaderText3 =
+"	gl_FragColor = mix(backColor,color,lum);\n}";
 
 
 Strings3D* Strings3D::m_instance0 = NULL;
 
 
-Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0),m_scale(1.0f)
+Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc, bool with_plane) : m_nbChars(0),m_scale(1.0f)
 {
 	if (m_instance0 == NULL)
 	{
@@ -63,27 +65,30 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 	}
 	else
 	{
-		*m_idTexture = *(this->m_idTexture);
+		*m_idTexture = *(m_instance0->m_idTexture);
 	}
 
 	std::string glxvert(*GLSLShader::DEFINES_GL);
+	if (with_plane)
+		glxvert.append("#define WITH_PLANE 1");
 	glxvert.append(vertexShaderText);
-	std::string glxfrag(*GLSLShader::DEFINES_GL);
 
+
+	std::string glxfrag(*GLSLShader::DEFINES_GL);
 	glxfrag.append(fragmentShaderText1);
 
-	std::string background;
 	if (!withBackground)
-		glxfrag.append("if (lum == 0.0) discard;\n");
-	else if (bgc*bgc > 0.0)
+	{
+		glxfrag.append(fragmentShaderText2);
+	}
+	else
 	{
 		std::stringstream ss;
-		ss << "	if (lum==0.0) gl_FragColor=vec4(";
-		ss << bgc[0] << "," << bgc[1] << "," << bgc[2] << ",0.0);\n		else\n";
-		background.append(ss.str());
+		ss << "vec4 backColor = vec4(" <<bgc[0] << "," << bgc[1] << "," << bgc[2] << ",color[3]);\n";
+//		ss << "vec4 backColor = vec4(0.2,0.1,0.4);\n";
+		glxfrag.append(ss.str());
+		glxfrag.append(fragmentShaderText3);
 	}
-	glxfrag.append(background);
-	glxfrag.append(fragmentShaderText2);
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
@@ -98,7 +103,14 @@ Strings3D::Strings3D(bool withBackground, const Geom::Vec3f& bgc) : m_nbChars(0)
 	*m_uniform_scale = glGetUniformLocation(program_handler(), "scale");
 	*m_uniform_texture = glGetUniformLocation(program_handler(), "FontTexture");
 	glUniform1f(*m_uniform_scale, 1.0f);
+	if (with_plane)
+	{
+		*m_uniform_planeX = glGetUniformLocation(program_handler(), "planeX");
+		*m_uniform_planeY = glGetUniformLocation(program_handler(), "planeY");
+	}
 	unbind();
+
+	m_color = Geom::Vec4f(0.0f,0.0f,0.0f,1.0f);
 }
 
 void Strings3D::setScale(float scale)
@@ -106,6 +118,14 @@ void Strings3D::setScale(float scale)
 	bind();
 	glUniform1f(*m_uniform_scale, scale);
 	m_scale = scale;
+	unbind();
+}
+
+void Strings3D::setPlane(const Geom::Vec3f& ox, const Geom::Vec3f& oy)
+{
+	bind();
+	glUniform3fv(*m_uniform_planeX, 1, ox.data());
+	glUniform3fv(*m_uniform_planeY, 1, oy.data());
 	unbind();
 }
 
@@ -206,11 +226,12 @@ void Strings3D::sendToVBO()
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void Strings3D::predraw(const Geom::Vec3f& color)
+void Strings3D::predraw(const Geom::Vec4f& color)
 {
+	m_color = color;
 	bind();
 	glUniform1i(*m_uniform_texture, 0);
-	glUniform3fv(*m_uniform_color, 1, color.data());
+	glUniform4fv(*m_uniform_color, 1, color.data());
 
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glBindTexture(GL_TEXTURE_2D, *m_idTexture);
@@ -219,6 +240,20 @@ void Strings3D::predraw(const Geom::Vec3f& color)
 	glDisable(GL_LIGHTING);
 
 	enableVertexAttribs();
+}
+
+void Strings3D::changeColor(const Geom::Vec4f& color)
+{
+	m_color = color;
+	bind();
+	glUniform4fv(*m_uniform_color, 1, color.data());
+}
+
+void Strings3D::changeOpacity(float op)
+{
+	m_color[3] = op;
+	bind();
+	glUniform4fv(*m_uniform_color, 1, m_color.data());
 }
 
 void Strings3D::postdraw()
@@ -233,16 +268,21 @@ void Strings3D::draw(unsigned int idSt, const Geom::Vec3f& pos)
 	glDrawArrays(GL_QUADS, m_strpos[idSt].first , m_strpos[idSt].second );
 }
 
-void Strings3D::drawAll(const Geom::Vec3f& color)
+void Strings3D::drawAll(const Geom::Vec4f& color)
 {
+	m_color = color;
+	unsigned int nb = m_strpos.size();
+	//  nothing to do if no string !
+	if (nb == 0)
+		return;
+
 	predraw(color);
 	if (m_strpos.size() != m_strTranslate.size())
 	{
 		CGoGNerr << "Strings3D: for drawAll use exclusively addString with position"<< CGoGNendl;
 		return;
 	}
-
-	unsigned int nb = m_strpos.size();
+		
 	for (unsigned int idSt=0; idSt<nb; ++idSt)
 	{
 		glUniform3fv(*m_uniform_position, 1, m_strTranslate[idSt].data());
@@ -250,6 +290,56 @@ void Strings3D::drawAll(const Geom::Vec3f& color)
 	}
 	postdraw();
 }
+
+void Strings3D::updateString(unsigned int idSt, const std::string& str)
+{
+	unsigned int firstIndex = m_strpos[idSt].first;
+	unsigned int nbIndices = m_strpos[idSt].second;
+
+	unsigned int nbc = std::min((unsigned int)(str.length()), nbIndices/4);
+
+
+	m_vbo1->bind();
+	float* buffer = reinterpret_cast<float*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
+
+	buffer += firstIndex*4;
+	float x = 0.0f;
+	for(unsigned int j = 0; j < nbc; ++j)
+	{
+		unsigned int ci = str[j]-32;
+		float u  = float(ci % CHARSPERLINE) / float(CHARSPERLINE);
+		float v  = float(ci / CHARSPERLINE) / float(CHARSPERCOL) + 1.0f / HEIGHTTEXTURE;
+		float u2 = u + float(REALWIDTHFONT) / float(WIDTHTEXTURE);
+		float v2 = v + float(WIDTHFONT - 1) / float(HEIGHTTEXTURE);
+
+		*buffer++ = x;
+		*buffer++ = 0;
+		*buffer++ = u;
+		*buffer++ = v2;
+
+		float xf = x + float(REALWIDTHFONT) / 25.f;
+
+		*buffer++ = xf;
+		*buffer++ = 0;
+		*buffer++ = u2;
+		*buffer++ = v2;
+
+		*buffer++ = xf;
+		*buffer++ = float(WIDTHFONT) / 25.f;
+		*buffer++ = u2;
+		*buffer++ = v;
+
+		*buffer++ = x;
+		*buffer++ = float(WIDTHFONT) / 25.f;
+		*buffer++ = u;
+		*buffer++ = v;
+
+		x = xf; // + space ?
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+
 
 void Strings3D::toSVG(Utils::SVG::SVGOut& svg)
 {

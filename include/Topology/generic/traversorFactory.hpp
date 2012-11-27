@@ -21,6 +21,7 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+
 #include "Topology/generic/traversor1.h"
 #include "Topology/generic/traversor2.h"
 #include "Topology/generic/traversor3.h"
@@ -33,7 +34,6 @@ namespace CGoGN
 template<typename MAP>
 Traversor<MAP>* TraversorFactory<MAP>::createIncident(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY)
 {
-
 	int code = 0x100*dim + 0x10*(orbX-VERTEX) + orbY-VERTEX;
 
 	switch(code)
@@ -78,7 +78,6 @@ Traversor<MAP>* TraversorFactory<MAP>::createIncident(MAP& map, Dart dart, unsig
 			return new Traversor3XY<MAP, VOLUME, FACE>(map,dart);
 			break;
 
-
 		case 0x201:
 			return new Traversor2VE<MAP>(map,dart);
 			break;
@@ -112,12 +111,9 @@ Traversor<MAP>* TraversorFactory<MAP>::createIncident(MAP& map, Dart dart, unsig
 	return NULL;
 }
 
-
-
 template<typename MAP>
 Traversor<MAP>* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsigned int dim, unsigned int orbX, unsigned int orbY)
 {
-
 	int code = 0x100*dim + 0x10*(orbX-VERTEX) + orbY-VERTEX;
 
 	switch(code)
@@ -162,7 +158,6 @@ Traversor<MAP>* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsig
 			return new Traversor3XXaY<MAP, VOLUME, FACE>(map,dart);
 			break;
 
-
 		case 0x201:
 			return new Traversor2VVaE<MAP>(map,dart);
 			break;
@@ -182,7 +177,6 @@ Traversor<MAP>* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsig
 			return new Traversor2FFaE<MAP>(map,dart);
 			break;
 
-
 		case 0x101:
 			return new Traversor1VVaE<MAP>(map,dart);
 			break;
@@ -197,45 +191,44 @@ Traversor<MAP>* TraversorFactory<MAP>::createAdjacent(MAP& map, Dart dart, unsig
 	return NULL;
 }
 
-
 template<typename MAP>
 Traversor<MAP>* TraversorFactory<MAP>::createCell(MAP& map, unsigned int orb, const FunctorSelect& good, bool forceDartMarker, unsigned int thread)
 {
 	switch(orb)
 	{
-	case VERTEX:
-		return new TraversorCell<MAP,VERTEX>(map,good,forceDartMarker,thread);
-		break;
-	case EDGE:
-		return new TraversorCell<MAP,EDGE>(map,good,forceDartMarker,thread);
-		break;
-	case FACE:
-		return new TraversorCell<MAP,FACE>(map,good,forceDartMarker,thread);
-		break;
-	case VOLUME:
-		return new TraversorCell<MAP,VOLUME>(map,good,forceDartMarker,thread);
-		break;
-	case CC:
-		return new TraversorCell<MAP,CC>(map,good,forceDartMarker,thread);
-		break;
-	case VERTEX1:
-		return new TraversorCell<MAP,VERTEX1>(map,good,forceDartMarker,thread);
-		break;
-	case EDGE1:
-		return new TraversorCell<MAP,EDGE1>(map,good,forceDartMarker,thread);
-		break;
-	case VERTEX2:
-		return new TraversorCell<MAP,VERTEX2>(map,good,forceDartMarker,thread);
-		break;
-	case EDGE2:
-		return new TraversorCell<MAP,EDGE2>(map,good,forceDartMarker,thread);
-		break;
-	case FACE2:
-		return new TraversorCell<MAP,FACE2>(map,good,forceDartMarker,thread);
-		break;
-	default:
-		return NULL;
-		break;
+		case VERTEX:
+			return new TraversorCell<MAP,VERTEX>(map,good,forceDartMarker,thread);
+			break;
+		case EDGE:
+			return new TraversorCell<MAP,EDGE>(map,good,forceDartMarker,thread);
+			break;
+		case FACE:
+			return new TraversorCell<MAP,FACE>(map,good,forceDartMarker,thread);
+			break;
+		case VOLUME:
+			return new TraversorCell<MAP,VOLUME>(map,good,forceDartMarker,thread);
+			break;
+		case CC:
+			return new TraversorCell<MAP,CC>(map,good,forceDartMarker,thread);
+			break;
+		case VERTEX1:
+			return new TraversorCell<MAP,VERTEX1>(map,good,forceDartMarker,thread);
+			break;
+		case EDGE1:
+			return new TraversorCell<MAP,EDGE1>(map,good,forceDartMarker,thread);
+			break;
+		case VERTEX2:
+			return new TraversorCell<MAP,VERTEX2>(map,good,forceDartMarker,thread);
+			break;
+		case EDGE2:
+			return new TraversorCell<MAP,EDGE2>(map,good,forceDartMarker,thread);
+			break;
+		case FACE2:
+			return new TraversorCell<MAP,FACE2>(map,good,forceDartMarker,thread);
+			break;
+		default:
+			return NULL;
+			break;
 	}
 }
 
@@ -244,43 +237,40 @@ Traversor<MAP>* TraversorFactory<MAP>::createDartsOfOrbits(MAP& map, Dart dart, 
 {
 	switch(orb)
 	{
-	case VERTEX:
-		return new TraversorDartsOfOrbit<MAP,VERTEX>(map,dart);
-		break;
-	case EDGE:
-		return new TraversorDartsOfOrbit<MAP,EDGE>(map,dart);
-		break;
-	case FACE:
-		return new TraversorDartsOfOrbit<MAP,FACE>(map,dart);
-		break;
-	case VOLUME:
-		return new TraversorDartsOfOrbit<MAP,VOLUME>(map,dart);
-		break;
-	case CC:
-		return new TraversorDartsOfOrbit<MAP,CC>(map,dart);
-		break;
-	case VERTEX1:
-		return new TraversorDartsOfOrbit<MAP,VERTEX1>(map,dart);
-		break;
-	case EDGE1:
-		return new TraversorDartsOfOrbit<MAP,EDGE1>(map,dart);
-		break;
-	case VERTEX2:
-		return new TraversorDartsOfOrbit<MAP,VERTEX2>(map,dart);
-		break;
-	case EDGE2:
-		return new TraversorDartsOfOrbit<MAP,EDGE2>(map,dart);
-		break;
-	case FACE2:
-		return new TraversorDartsOfOrbit<MAP,FACE2>(map,dart);
-		break;
-	default:
-		return NULL;
-		break;
+		case VERTEX:
+			return new TraversorDartsOfOrbit<MAP,VERTEX>(map,dart);
+			break;
+		case EDGE:
+			return new TraversorDartsOfOrbit<MAP,EDGE>(map,dart);
+			break;
+		case FACE:
+			return new TraversorDartsOfOrbit<MAP,FACE>(map,dart);
+			break;
+		case VOLUME:
+			return new TraversorDartsOfOrbit<MAP,VOLUME>(map,dart);
+			break;
+		case CC:
+			return new TraversorDartsOfOrbit<MAP,CC>(map,dart);
+			break;
+		case VERTEX1:
+			return new TraversorDartsOfOrbit<MAP,VERTEX1>(map,dart);
+			break;
+		case EDGE1:
+			return new TraversorDartsOfOrbit<MAP,EDGE1>(map,dart);
+			break;
+		case VERTEX2:
+			return new TraversorDartsOfOrbit<MAP,VERTEX2>(map,dart);
+			break;
+		case EDGE2:
+			return new TraversorDartsOfOrbit<MAP,EDGE2>(map,dart);
+			break;
+		case FACE2:
+			return new TraversorDartsOfOrbit<MAP,FACE2>(map,dart);
+			break;
+		default:
+			return NULL;
+			break;
 	}
 }
 
-
 }
-
-

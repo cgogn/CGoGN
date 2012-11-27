@@ -69,6 +69,7 @@ void EdgeSelector_MapOrder<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	}
 }
 
+
 /************************************************************************************
  *                                    RANDOM                                        *
  ************************************************************************************/
@@ -112,6 +113,22 @@ bool EdgeSelector_Random<PFP>::nextEdge(Dart& d)
 
 template <typename PFP>
 void EdgeSelector_Random<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
+{
+	MAP& m = this->m_map ;
+	allSkipped = false ;
+	do
+	{
+		++cur ;
+		if(cur == darts.size())
+		{
+			cur = 0 ;
+			allSkipped = true ;
+		}
+	} while(!this->m_select(cur) || !m.edgeCanCollapse(darts[cur])) ;
+}
+
+template <typename PFP>
+void EdgeSelector_Random<PFP>::updateWithoutCollapse()
 {
 	MAP& m = this->m_map ;
 	allSkipped = false ;
@@ -223,6 +240,17 @@ void EdgeSelector_Length<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_Length<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_Length<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -290,7 +318,10 @@ bool EdgeSelector_QEM<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ;
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_QEM) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_QEM) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_QEM) are not compatible") ;
+			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
 	}
@@ -305,7 +336,7 @@ bool EdgeSelector_QEM<PFP>::init()
 	{
 		if(!vMark.isMarked(d))
 		{
-			Quadric<REAL> q ;	// create one quadric
+			Utils::Quadric<REAL> q ;	// create one quadric
 			quadric[d] = q ;	// per vertex
 			vMark.mark(d) ;
 		}
@@ -318,7 +349,7 @@ bool EdgeSelector_QEM<PFP>::init()
 		{
 			Dart d1 = m.phi1(d) ;				// for each triangle,
 			Dart d_1 = m.phi_1(d) ;				// initialize the quadric of the triangle
-			Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
+			Utils::Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
@@ -418,6 +449,17 @@ void EdgeSelector_QEM<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_QEM<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -467,7 +509,7 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	Quadric<REAL> quad ;
+	Utils::Quadric<REAL> quad ;
 	quad += quadric[d] ;	// compute the sum of the
 	quad += quadric[dd] ;	// two vertices quadrics
 
@@ -478,18 +520,6 @@ void EdgeSelector_QEM<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
 }
-
-template <typename PFP>
-void EdgeSelector_QEM<PFP>::updateWithoutCollapse()
-{
-	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
-	einfo.valid = false ;
-	edges.erase(einfo.it) ;
-
-	//edges.erase(cur) ;
-	cur = edges.begin();
-}
-
 
 /************************************************************************************
  *                            QUADRIC ERROR METRIC (Memoryless version)             *
@@ -507,7 +537,10 @@ bool EdgeSelector_QEMml<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ;
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_QEMml) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_QEMml) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_QEMml) are not compatible") ;
+			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
 	}
@@ -522,7 +555,7 @@ bool EdgeSelector_QEMml<PFP>::init()
 	{
 		if(!vMark.isMarked(d))
 		{
-			Quadric<REAL> q ;	// create one quadric
+			Utils::Quadric<REAL> q ;	// create one quadric
 			quadric[d] = q ;	// per vertex
 			vMark.mark(d) ;
 		}
@@ -535,7 +568,7 @@ bool EdgeSelector_QEMml<PFP>::init()
 		{
 			Dart d1 = m.phi1(d) ;				// for each triangle,
 			Dart d_1 = m.phi_1(d) ;				// initialize the quadric of the triangle
-			Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
+			Utils::Quadric<REAL> q(this->m_position[d], this->m_position[d1], this->m_position[d_1]) ;
 			quadric[d] += q ;					// and add the contribution of
 			quadric[d1] += q ;					// this quadric to the ones
 			quadric[d_1] += q ;					// of the 3 incident vertices
@@ -619,7 +652,7 @@ void EdgeSelector_QEMml<PFP>::recomputeQuadric(const Dart d, const bool recomput
        	dFront = this->m_map.phi2_1(dFront) ;
 
        	if (dBack != dFront) { // if dFront is no border
-           	quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+           	quadric[d] += Utils::Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -658,6 +691,17 @@ void EdgeSelector_QEMml<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	} while(vit != d2) ;
 
 	cur = edges.begin() ; // set the current edge to the first one
+}
+
+template <typename PFP>
+void EdgeSelector_QEMml<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
 }
 
 template <typename PFP>
@@ -710,7 +754,7 @@ void EdgeSelector_QEMml<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	MAP& m = this->m_map ;
 	Dart dd = m.phi2(d) ;
 
-	Quadric<REAL> quad ;
+	Utils::Quadric<REAL> quad ;
 	quad += quadric[d] ;	// compute the sum of the
 	quad += quadric[dd] ;	// two vertices quadrics
 
@@ -737,7 +781,10 @@ bool EdgeSelector_Curvature<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ;
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_Curvature) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_Curvature) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_Curvature) are not compatible") ;
+			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
 	}
@@ -840,6 +887,17 @@ void EdgeSelector_Curvature<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_Curvature<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_Curvature<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -898,7 +956,7 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart d2 = m.phi2(m.phi_1(d)) ;
 	Dart dd2 = m.phi2(m.phi_1(dd)) ;
 	m.extractTrianglePair(d) ;
-	unsigned int newV = m.template embedNewCell<VERTEX>(d2) ;
+	unsigned int newV = m.template setOrbitEmbeddingOnNewCell<VERTEX>(d2) ;
 	this->m_position[newV] = m_positionApproximator->getApprox(d) ;
 
 	// compute things on the coarse version of the mesh
@@ -911,8 +969,8 @@ void EdgeSelector_Curvature<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	// vertex split to reset the initial connectivity and embeddings
 	m.insertTrianglePair(d, d2, dd2) ;
-	m.template embedOrbit<VERTEX>(d, v1) ;
-	m.template embedOrbit<VERTEX>(dd, v2) ;
+	m.template setOrbitEmbedding<VERTEX>(d, v1) ;
+	m.template setOrbitEmbedding<VERTEX>(dd, v2) ;
 
 	REAL err = 0 ;
 
@@ -948,7 +1006,10 @@ bool EdgeSelector_MinDetail<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position" && (*it)->getPredictor())
 		{
-			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3>* >(*it) ;
+			assert((*it)->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_MinDetail) are not compatible") ;
+			assert((*it)->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_MinDetail) are not compatible") ;
+			assert((*it)->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (EdgeSelector_MinDetail) are not compatible") ;
+			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
 	}
@@ -1040,6 +1101,17 @@ void EdgeSelector_MinDetail<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 }
 
 template <typename PFP>
+void EdgeSelector_MinDetail<PFP>::updateWithoutCollapse()
+{
+	EdgeInfo& einfo = edgeInfo[(*cur).second] ;
+	einfo.valid = false ;
+	edges.erase(einfo.it) ;
+
+	//edges.erase(cur) ;
+	cur = edges.begin();
+}
+
+template <typename PFP>
 void EdgeSelector_MinDetail<PFP>::initEdgeInfo(Dart d)
 {
 	MAP& m = this->m_map ;
@@ -1116,14 +1188,14 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(this->m_approximators[0]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (ColorNaive) are not compatible") ;
-
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_Lightfield || !"Approximator(hLightfield) and selector (ColorNaive) are not compatible") ;
+
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -1136,7 +1208,7 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 				m_pos = this->m_position ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
@@ -1149,7 +1221,7 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 				assert(m_color.isValid() || !"EdgeSelector_ColorNaive: color attribute is not valid") ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
@@ -1162,7 +1234,7 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 	TraversorV<MAP> travV(m);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
 	{
-		Quadric<REAL> q ;		// create one quadric
+		Utils::Quadric<REAL> q ;		// create one quadric
 		m_quadric[dit] = q ;		// per vertex
 	}
 
@@ -1172,7 +1244,7 @@ bool EdgeSelector_ColorNaive<PFP>::init()
 	{
 		Dart d1 = m.phi1(dit) ;					// for each triangle,
 		Dart d_1 = m.phi_1(dit) ;					// initialize the quadric of the triangle
-		Quadric<REAL> q(this->m_position[dit], this->m_position[d1], this->m_position[d_1]) ;
+		Utils::Quadric<REAL> q(this->m_position[dit], this->m_position[d1], this->m_position[d_1]) ;
 		m_quadric[dit] += q ;						// and add the contribution of
 		m_quadric[d1] += q ;						// this quadric to the ones
 		m_quadric[d_1] += q ;						// of the 3 incident vertices
@@ -1254,7 +1326,7 @@ void EdgeSelector_ColorNaive<PFP>::recomputeQuadric(const Dart d, const bool rec
 
        	if (dBack != dFront)
        	{ // if dFront is no border
-       		m_quadric[d] += Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
+       		m_quadric[d] += Utils::Quadric<REAL>(this->m_position[d],this->m_position[this->m_map.phi2(dFront)],this->m_position[dBack]) ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -1344,7 +1416,7 @@ void EdgeSelector_ColorNaive<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart dd = m.phi1(d) ;
 
 	// New position
-	Quadric<REAL> quad ;
+	Utils::Quadric<REAL> quad ;
 	quad += m_quadric[d] ;	// compute the sum of the
 	quad += m_quadric[dd] ;	// two vertices quadrics
 
@@ -1383,13 +1455,14 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(this->m_approximators[0]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_QEMextColor) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_QEMextColor) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (EdgeSelector_QEMextColor) are not compatible") ;
+
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -1402,7 +1475,7 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 				m_pos = this->m_position ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
@@ -1415,7 +1488,7 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 				assert(m_color.isValid() || !"EdgeSelector_QEMextColor: color attribute is not valid") ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
@@ -1428,7 +1501,7 @@ bool EdgeSelector_QEMextColor<PFP>::init()
 	TraversorV<MAP> travV(m);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
 	{
-		QuadricNd<REAL,6> q ;		// create one quadric
+		Utils::QuadricNd<REAL,6> q ;		// create one quadric
 		m_quadric[dit] = q ;		// per vertex
 	}
 
@@ -1449,11 +1522,13 @@ bool EdgeSelector_QEMextColor<PFP>::init()
    			p2[i] = this->m_position[d_1][i] ;
    			p2[i+3] = this->m_color[d_1][i] ;
    		}
-		QuadricNd<REAL,6> q(p0,p1,p2) ;
+		Utils::QuadricNd<REAL,6> q(p0,p1,p2) ;
 		m_quadric[dit] += q ;						// and add the contribution of
 		m_quadric[d1] += q ;						// this quadric to the ones
 		m_quadric[d_1] += q ;						// of the 3 incident vertices
 	}
+
+	edges.clear() ;
 
 	TraversorE<MAP> travE(m);
 	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
@@ -1544,7 +1619,7 @@ void EdgeSelector_QEMextColor<PFP>::recomputeQuadric(const Dart d, const bool re
        			p2[i] = this->m_position[dBack][i] ;
        			p2[i+3] = this->m_color[dBack][i] ;
        		}
-       		m_quadric[d] += QuadricNd<REAL,6>(p0,p1,p2) ;
+       		m_quadric[d] += Utils::QuadricNd<REAL,6>(p0,p1,p2) ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -1634,7 +1709,7 @@ void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart dd = m.phi1(d) ;
 
 	// New position
-	QuadricNd<REAL,6> quad ;
+	Utils::QuadricNd<REAL,6> quad ;
 	quad += m_quadric[d] ;	// compute the sum of the
 	quad += m_quadric[dd] ;	// two vertices quadrics
 
@@ -1649,7 +1724,7 @@ void EdgeSelector_QEMextColor<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	// get pos
 	const VEC3& newPos = this->m_approx[m_approxindex_pos]->getApprox(d,m_attrindex_pos) ; // get newPos
 	// get col
-	const VEC3& newCol = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get newPos
+	const VEC3& newCol = this->m_approx[m_approxindex_color]->getApprox(d,m_attrindex_color) ; // get newCol
 
 	// compute error
 	VEC6 newEmb ;
@@ -1679,13 +1754,15 @@ bool EdgeSelector_Lightfield<PFP>::init()
 {
 	MAP& m = this->m_map ;
 
-	assert(this->m_approximators[0]->getType() != A_hQEM || !"Approximator(hQEM) and selector (ColorNaive) are not compatible") ;
-	assert(this->m_approximators[0]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (ColorNaive) are not compatible") ;
-
 	// Verify availability of required approximators
 	unsigned int ok = 0 ;
 	for (unsigned int approxindex = 0 ; approxindex < this->m_approximators.size() ; ++approxindex)
 	{
+		assert(this->m_approximators[approxindex]->getType() != A_hQEM || !"Approximator(hQEM) and selector (EdgeSelector_Lightfield) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hHalfCollapse || !"Approximator(hHalfCollapse) and selector (EdgeSelector_Lightfield) are not compatible") ;
+		assert(this->m_approximators[approxindex]->getType() != A_hLightfieldHalf || !"Approximator(hLightfieldHalf) and selector (EdgeSelector_Lightfield) are not compatible") ;
+
+		unsigned int k = 0 ;
 		bool saved = false ;
 		for (unsigned int attrindex = 0 ; attrindex < this->m_approximators[approxindex]->getNbApproximated() ; ++ attrindex)
 		{
@@ -1698,7 +1775,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 				m_pos = this->m_position ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
@@ -1710,7 +1787,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 				m_frameT = m.template getAttribute<typename PFP::VEC3, VERTEX>("frameT") ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					assert(m_frameT.isValid() || !"EdgeSelector_QEMextColor: frameT attribute is not valid") ;
 					saved = true ;
 				}
@@ -1724,7 +1801,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 				assert(m_frameB.isValid() || !"EdgeSelector_QEMextColor: frameB attribute is not valid") ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
@@ -1737,20 +1814,41 @@ bool EdgeSelector_Lightfield<PFP>::init()
 				assert(m_frameN.isValid() || !"EdgeSelector_QEMextColor: frameN attribute is not valid") ;
 				if (!saved)
 				{
-					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3>* >(this->m_approximators[approxindex])) ;
+					m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
 					saved = true ;
 				}
 			}
+			else
+			{
+				std::stringstream s ;
+				s << "PBcoefs" << k ;
+				if(ok > 3 && this->m_approximators[approxindex]->getApproximatedAttributeName(attrindex) == s.str().c_str())
+				{
+					++ok ;
+					m_HF.push_back(m.template getAttribute<typename PFP::VEC3, VERTEX>(s.str().c_str())) ;
+					if (m_HF[k++].isValid())
+					{
+						m_approxindex_HF.push_back(approxindex) ;
+						m_attrindex_HF.push_back(attrindex) ;
+						if (!saved)
+						{
+							m_approx.push_back(reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(this->m_approximators[approxindex])) ;
+							saved = true ;
+						}
+					}
+				}
+			}
 		}
+		m_K = k ;
 	}
 
-	if(ok != 4)
+	if(ok < 5)
 		return false ;
 
 	TraversorV<MAP> travV(m);
 	for(Dart dit = travV.begin() ; dit != travV.end() ; dit = travV.next())
 	{
-		Quadric<REAL> q ;		// create one quadric
+		Utils::Quadric<REAL> q ;		// create one quadric
 		m_quadricGeom[dit] = q ;		// per vertex
 	}
 
@@ -1761,7 +1859,7 @@ bool EdgeSelector_Lightfield<PFP>::init()
 		Dart d1 = m.phi1(dit) ;					// for each triangle,
 		Dart d_1 = m.phi_1(dit) ;					// initialize the quadric of the triangle
 
-		Quadric<REAL> q(this->m_position[dit], this->m_position[d1], this->m_position[d_1]) ;
+		Utils::Quadric<REAL> q(this->m_position[dit], this->m_position[d1], this->m_position[d_1]) ;
 		m_quadricGeom[dit] += q ;						// and add the contribution of
 		m_quadricGeom[d1] += q ;						// this quadric to the ones
 		m_quadricGeom[d_1] += q ;						// of the 3 incident vertices
@@ -1829,7 +1927,7 @@ void EdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool rec
 {
 	Dart dFront,dBack ;
 	Dart dInit = d ;
-//todo
+
 	// Init Front
 	dFront = dInit ;
 
@@ -1843,7 +1941,7 @@ void EdgeSelector_Lightfield<PFP>::recomputeQuadric(const Dart d, const bool rec
 
        	if (dBack != dFront)
        	{ // if dFront is no border
-       		m_quadricGeom[d] += Quadric<REAL>(m_pos[d],m_pos[this->m_map.phi1(dFront)],m_pos[dBack]) ;
+       		m_quadricGeom[d] += Utils::Quadric<REAL>(m_pos[d],m_pos[this->m_map.phi1(dFront)],m_pos[dBack]) ;
        	}
        	if (recomputeNeighbors)
        		recomputeQuadric(dBack, false) ;
@@ -1855,7 +1953,7 @@ template <typename PFP>
 void EdgeSelector_Lightfield<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 {
 	MAP& m = this->m_map ;
-	//todo
+
 	recomputeQuadric(d2, true) ;
 
 	Dart vit = d2 ;
@@ -1933,7 +2031,7 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	Dart dd = m.phi1(d) ;
 
 	// New position
-	Quadric<REAL> quad ;
+	Utils::Quadric<REAL> quad ;
 	quad += m_quadricGeom[d] ;	// compute the sum of the
 	quad += m_quadricGeom[dd] ;	// two vertices quadrics
 
@@ -1952,42 +2050,41 @@ void EdgeSelector_Lightfield<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 	const VEC3& newFN = this->m_approx[m_approxindex_FN]->getApprox(d,m_attrindex_FN) ; // get new frameN
 
 	// New function
-	// todo const VEC3& hfcoefs0 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[0]) ; // get newHFcoefs0
-	// todo const VEC3& hfcoefs1 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[1]) ; // get newHFcoefs1
-	// todo const VEC3& hfcoefs2 = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[2]) ; // get newHFcoefs2
-	// ...
-	// todo const VEC3& hfcoefsK = this->m_approximators[m_approxindex_hf]->getApprox(d,m_attrindex_hf[K]) ; // get newHFcoefsK
+	std::vector<VEC3> newHF ;
+	newHF.resize(m_K) ;
+	for (unsigned int k = 0 ; k < m_K ; ++k)
+		newHF[k] = this->m_approx[m_approxindex_HF[k]]->getApprox(d,m_attrindex_HF[k]) ; // get newHFcoefsK
 
 	// Compute errors
 	// Position
-	Quadric<REAL> quadGeom ;
+	Utils::Quadric<REAL> quadGeom ;
 	quadGeom += m_quadricGeom[d] ;	// compute the sum of the
 	quadGeom += m_quadricGeom[dd] ;	// two vertices quadrics
 
 	// hemisphere difference error
-	double scal1 = abs(double(m_frameN[d] * newFN)) ;
-	scal1 = std::min(scal1, double(1)) ; // for epsilon normalization of newFN errors
+	double scal1 = double(m_frameN[d] * newFN) ;
+	double alpha1 = acos(std::max(std::min(scal1, double(1)),double(-1))) ; // for epsilon normalization of newFN errors
 	// angle 2
-	double scal2 = abs(double(m_frameN[dd] * newFN)) ;
-	scal2 = std::min(scal2, double(1)) ;
-	// Important: sum of abs values works only if newFN is in-between the two old ones (interpolated).
-	// This avoids computation of the sign of alpha1 and alpha2.
-	double alpha = acos(scal1 + scal2) ;
+	double scal2 = double(m_frameN[dd] * newFN) ;
+	double alpha2 = acos(std::max(std::min(scal2, double(1)),double(-1))) ; // for epsilon normalization of newFN errors
 
-	std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << std::endl ;
+	double alpha = alpha1 + alpha2 ;
+
+	assert(m_quadricHF.isValid() | !"EdgeSelector_Lightfield<PFP>::computeEdgeInfo: quadricHF is not valid") ;
+	Utils::QuadricHF<REAL> quadHF = m_quadricHF[d] ;
+
+	//std::cout << quadGeom(newPos) << " vs " << alpha/M_PI << " vs " << quadHF(newHF) << std::endl ;
 	// sum of QEM metric and frame orientation difference
-	const REAL& err =
-			quadGeom(newPos) // geom
-			+ alpha / M_PI // frame
-			// todo+ quadHF(newHF) // function coefficients
-			 ;
+	const REAL& errG = quadGeom(newPos) ; // geom
+	const REAL& errAngle = alpha / M_PI ; // frame
+	const REAL& errLF = quadHF(newHF) ; // function coefficients
 
 	// Check if errated values appear
-	if (err < -1e-6)
+	if (errG < -1e-6 || errAngle < -1e-6 || errLF < -1e-6)
 		einfo.valid = false ;
 	else
 	{
-		einfo.it = edges.insert(std::make_pair(std::max(err,REAL(0)), d)) ;
+		einfo.it = edges.insert(std::make_pair(std::max(/*errG +*/ errAngle + errLF, REAL(0)), d)) ;
 		einfo.valid = true ;
 	}
 }

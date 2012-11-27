@@ -448,87 +448,6 @@ Dart Map3::collapseEdge(Dart d, bool delDegenerateVolumes)
 }
 
 
-
-
-//	Dart e = d;
-//
-//	// stocke un brin par volume autour de l'arete
-//	std::vector<Dart> tmp;
-//	tmp.reserve(32);
-//	do
-//	{
-//		tmp.push_back(e);
-//		e = alpha2(e);
-//	} while (e != d);
-//
-//	// contraction de la 2 carte de chaque 2-arete
-//	for (std::vector<Dart>::iterator it = tmp.begin(); it != tmp.end(); ++it)
-//	{
-//		// un brin d'une face adjacente a l'arrete contracte
-//		Dart d = phi2(phi_1(*it));
-//		Map2::collapseEdge(*it, true);
-//
-//		// test de la degeneresence
-//		// impossible d'avoir un volume de moins de 4 faces sans avoir de phi2 en points fixe donc on les vire
-//		if(delDegenerateVolumes && Map2::volumeDegree(d) < 4)
-//		{
-//			Dart e = d;
-//			// pour tous les brins de la face adjacente
-//
-//			do
-//			{
-//				Dart ee = phi3(e);
-//				Dart ff = phi3(phi2(e));
-//
-//				// si les brins ont un voisin par phi3
-//				if(ee != e)
-//
-//					phi3unsew(ee);
-//				if(ff != phi2(e))
-//					phi3unsew(ff);
-//
-//				// si les deux en ont un, il faut les coudres ensemble
-//				if(ee != e && ff != phi2(e))
-//					phi3sew(ee, ff);
-//
-//				// on peut supprimer les brins de cette arete
-//				deleteDart(e);
-//				deleteDart(phi2(e));
-//				e = phi1(e);
-//
-//			} while (e != d);
-//		}
-//	}
-
-//bool Map3::collapseDegeneratedFace(Dart d)
-//{
-//	Dart d3 = phi3(d);
-//
-//	std::cout << "Map3::collapseDegeneratedFace"<< std::endl;
-//
-//	if (!isDartValid(d))
-//		Map2::collapseDegeneratedFace(d);
-//	else
-//		std::cout << "Warning Coll1 invalid"<< std::endl;
-//
-//
-//	if (isDartValid(d3))
-//		Map2::collapseDegeneratedFace(d3);
-//	else
-//		std::cout << "Warning coll2 invalid"<< std::endl;
-//
-//
-//
-///*
-//	Map3::unsewVolumes(d);
-//
-//	std::cout << Map2::collapseDegeneratedFace(d) << std::endl;
-//	std::cout << Map2::collapseDegeneratedFace(d3) << std::endl;
-//	std::cout << std::endl;
-//*/
-//	return true;
-//}
-
 bool Map3::splitFacePreCond(Dart d, Dart e)
 {
 	return (d != e && sameOrientedFace(d, e)) ;
@@ -940,7 +859,8 @@ unsigned int Map3::edgeDegree(Dart d)
 	Dart it = d;
 	do
 	{
-		++deg;
+		if(!isBoundaryMarked(it))
+			++deg;
 		it = alpha2(it);
 	} while(it != d);
 	return deg;
@@ -996,7 +916,7 @@ bool Map3::hasBoundaryEdge(Dart d)
 bool Map3::check()
 {
     std::cout << "Check: topology begin" << std::endl;
-    DartMarker m(*this);
+    DartMarkerStore m(*this);
     for(Dart d = Map3::begin(); d != Map3::end(); Map3::next(d))
     {
         Dart d3 = phi3(d);
@@ -1008,8 +928,11 @@ bool Map3::check()
 
 		if(phi1(d3) != phi3(phi_1(d)))
 		{
-			std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
-			//return false;
+			if(isBoundaryMarked(d))
+				std::cout << "Boundary case - Check: phi3 , faces are not entirely sewn" << std::endl;
+			else
+				std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
+			return false;
 		}
 
         Dart d2 = phi2(d);
