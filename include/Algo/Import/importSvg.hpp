@@ -336,6 +336,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 				map.sewFaces(d1,d_1,false) ;
 
 				edgeWidth[d1] = *itW;
+				if (*itW == 0) std::cout << "importSVG : null path width" << std::endl ;
 
 				d1 = map.phi1(d1);
 				d_1 = map.phi_1(d_1);
@@ -404,153 +405,145 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
-//	DartMarker close(map);
-//	map.closeMap(close);
-//	map.closeMap();
-
-	std::cout << "importSVG : Vertices merging..." << std::endl;
 	Algo::BooleanOperator::mergeVertices<PFP>(map,position);
-	std::cout << "importSVG : Vertices merged." << std::endl;
+	std::cout << "importSVG : Merging of vertices." << std::endl;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//simplify the edges to have a more regular sampling
+	float minDist = 20.0f ;
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		bool canSimplify = true ;
+		while ( canSimplify && ((position[map.phi1(d)] - position[d]).norm() < minDist) )
+		{
+			if (map.vertexDegree(map.phi1(d)) == 2) {
+				map.uncutEdge(d) ;
+			}
+			else canSimplify = false ;
+		}
+	}
+	std::cout << "importSVG : Downsampling of vertices." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//cut the edges to have a more regular sampling
-//	float maxDist=60.0f;
-//	CellMarker treated(map,EDGE);
-//	for(Dart d = map.begin(); d != map.end(); map.next(d))
-//	{
-//		if(!treated.isMarked(d))
-//		{
-//			treated.mark(d);
-//			VEC3 p1 =position[d];
-//			VEC3 p2 =position[map.phi1(d)];
-//
-//			if((p1-p2).norm()>maxDist)
-//			{
-//				unsigned int nbSeg = ((p1-p2).norm())/int(maxDist);
-//				for(unsigned int i=0;i<nbSeg-1;++i)
-//				{
-//					map.cutEdge(d);
-//
-//					if(boundingBox.isMarked(d))
-//						boundingBox.mark(map.phi1(d));
-//				}
-//
-//				Dart dd = map.phi1(d);
-//				VEC3 interv(p2-p1);
-//				interv /= nbSeg;
-//
-//				for(unsigned int i=1;i<nbSeg;++i)
-//				{
-//					position[dd] = p1+interv*i;
-//					dd = map.phi1(dd);
-//				}
-//			}
-//		}
-//	}
+	float maxDist = 40.0f ;
+	CellMarker<EDGE> treated(map) ;
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		if (!treated.isMarked(d))
+		{
+			treated.mark(d) ;
+			VEC3 p1 = position[d] ;
+			VEC3 p2 = position[map.phi1(d)] ;
+			VEC3 v  = p2 - p1 ;
+
+			if (v.norm() > maxDist)
+			{
+				unsigned int nbSeg = (unsigned int)(v.norm() / maxDist) ;
+				v /= nbSeg ;
+
+				for (unsigned int i = 0 ; i < nbSeg - 1 ; ++i)
+					map.cutEdge(d) ;
+
+				brokenL.mark(d);
+				brokenL.mark(map.phi2(d));
+				Dart dd = map.phi1(d) ;
+
+				for (unsigned int i = 1 ; i < nbSeg ; ++i)
+				{
+					brokenL.mark(dd);
+					brokenL.mark(map.phi2(dd));
+					position[dd] = p1 + v * i ;
+					dd = map.phi1(dd) ;
+				}
+			}
+		}
+	}
+	std::cout << "importSVG : Refinement of long edges." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//process broken lines
-	CellMarker<EDGE> eMTreated(map);
-	for(Dart d = map.begin();d != map.end(); map.next(d))
+	CellMarker<EDGE> eMTreated(map) ;
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{
-		if(brokenL.isMarked(d) && !eMTreated.isMarked(d))
+		if (brokenL.isMarked(d) && !eMTreated.isMarked(d))
 		{
+			eMTreated.mark(d) ;
+			//insert a quadrangular face in the broken line
 			// -> we convert broken lines to faces to represent their width
+			// -> the intersection are then closed
 
-			Dart d1 = d;
-			Dart d2 = map.phi2(d);
-			VEC3 p1 = position[d1];
-			VEC3 p2 = position[d2];
+			Dart d1 = d ;
+			Dart d2 = map.phi2(d1) ;
 
-			float width = edgeWidth[d1]/2.0f;
-			if(width==0)
-				std::cout << "importSVG : error width of path is equal to zero" << std::endl;
+			map.unsewFaces(d1) ;
+			Dart dN = map.newFace(4) ;
 
-			eMTreated.mark(d1);
-			eMTreated.mark(d2);
+			VEC3 p1 = position[d1] ;
+			VEC3 p2 = position[d2] ;
+			VEC3 v = p2 - p1 ;
+			VEC3 ortho = v ^ VEC3(0, 0, 1);
+			float width = edgeWidth[d1] / 2.0f ;
+			ortho.normalize() ;
+			v.normalize() ;
 
-			VEC3 v = p2-p1;
 
-			//take the orthogonal direction to the path to apply width afterward
-			VEC3 ortho = v^VEC3(0,0,1);
-			ortho.normalize();
-			v.normalize();
 
 			//if the valence of one of the vertex is equal to one
 			//cut the edge to insert the quadrangular face
-//			if(map.phi2_1(d1)==d1)
-			if(map.phi_1(d1)==d2)
+			if (map.phi2_1(d1) == d1)
 			{
-				map.cutEdge(d2);
+				map.cutEdge(d2) ;
+				brokenL.mark(map.phi1(d2)) ;
+				eMTreated.mark(map.phi1(d2)) ;
+				map.sewFaces(map.phi_1(d1), map.phi1(dN)) ;
 
-				Dart dC = map.phi1(d2);
-				eMTreated.mark(dC);
-
-				position[map.phi_1(d1)]=p1;
-				edgePlanes[map.phi_1(d1)] = Geom::Plane3D<typename PFP::REAL>(v,p1);
-			}
-			else
-			{
-				if(d1 != map.phi1(d2) && map.phi_1(d1)!=map.phi1(d2))
-				{
-					map.splitFace(d1,map.phi1(d2));
-				}
+				position[map.phi_1(d1)] = p1 ;
+				edgePlanes[map.phi_1(d1)] = Geom::Plane3D<typename PFP::REAL>(v, p1) ;
 			}
 
-//			if(map.phi2_1(d2)==d2)
-			if(map.phi_1(d2)==d1)
+			if (map.phi2_1(d2) == d2)
 			{
-				map.cutEdge(d1);
+				map.cutEdge(d1) ;
+				brokenL.mark(map.phi1(d1)) ;
+				eMTreated.mark(map.phi1(d1)) ;
 
-				Dart dC = map.phi1(d1);
-				eMTreated.mark(dC);
+				map.sewFaces(map.phi_1(d2), map.phi_1(dN)) ;
 
-				position[map.phi_1(d2)]=p2;
-				edgePlanes[map.phi_1(d2)] = Geom::Plane3D<typename PFP::REAL>(-1.0f*v, p2);
-			}
-			else
-			{
-				if(d2 != map.phi1(d1) && map.phi_1(d2)!=map.phi1(d1))
-				{
-					map.splitFace(d2,map.phi1(d1));
-				}
+				position[map.phi_1(d2)] = p2 ;
+				edgePlanes[map.phi_1(d2)] = Geom::Plane3D<typename PFP::REAL>(-1.0f * v, p2) ;
 			}
 
-//			map.sewFaces(d1, dN);
-//			map.sewFaces(d2, map.phi1(map.phi1(dN)));
+			map.sewFaces(d1, dN) ;
+			map.sewFaces(d2, map.phi1(map.phi1(dN))) ;
 
-			edgePlanes[d1] = Geom::Plane3D<typename PFP::REAL>(ortho, p1-(width*ortho));
-			edgePlanes[d2] = Geom::Plane3D<typename PFP::REAL>(-1.0f*ortho, p2+(width*ortho));
+			edgePlanes[d1] = Geom::Plane3D<typename PFP::REAL>(ortho, p1 - (width * ortho)) ;
+			edgePlanes[d2] = Geom::Plane3D<typename PFP::REAL>(-1.0f * ortho, p2 + (width * ortho)) ;
 		}
 	}
 
-	std::cout << "Broken line faces : inserted" << std::endl;
-
-//	//close the intersections
-//	for(Dart d = map.begin();d != map.end(); map.next(d))
-//	{
-//		if(map.isBoundaryMarked(map.phi2(d)))
-//			 map.closeHole(d);
-//	}
+	//close the intersections
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		if (d == map.phi2(d)) map.closeHole(d) ;
+	}
 
 	//embed the path
-	for(Dart d = map.begin();d != map.end(); map.next(d))
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 	{
-		if(brokenL.isMarked(d))
+		if (brokenL.isMarked(d))
 		{
-			Geom::Plane3D<typename PFP::REAL> pl = edgePlanes[d];
+			Geom::Plane3D<typename PFP::REAL> pl;
+			VEC3 pos = position[d] ;
 
-			std::cout << "pl " << pl << std::endl;
+			pl = edgePlanes[d] ;
+			pl.project(pos) ;
+			pl = edgePlanes[map.phi_1(d)] ;
+			pl.project(pos) ;
 
-			VEC3 pos = position[d];
-			pl.project(pos);
-			pl = edgePlanes[map.phi_1(d)];
-
-			pl.project(pos);
-			position[d] = pos;
+			position[d] = pos ;
 		}
 	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//process polygons
 
