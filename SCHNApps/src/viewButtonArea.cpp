@@ -2,7 +2,7 @@
 
 #include "camera.h"
 #include "scene.h"
-#include "context.h"
+//#include "context.h"
 
 #include <iostream>
 

@@ -1,17 +1,20 @@
 #include "view.h"
 
 #include "system.h"
-#include "camera.h"
+#include "window.h"
+#include "plugin.h"
 #include "scene.h"
+#include "camera.h"
 #include "cameraViewDialog.h"
 #include "cameraSceneDialog.h"
 
-View::View(const QString& name, Window* w, Scene* s, Camera* c, QWidget* parent, const QGLWidget* shareWidget = NULL) :
+unsigned int View::viewCount = 0;
+
+View::View(const QString& name, Window* w, QWidget* parent) :
 //	QGLViewer(new Context(NULL, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer))),
-	QGLViewer(parent, shareWidget),
+	QGLViewer(w->getContext(), parent),
 	m_name(name),
 	m_window(w),
-	m_scene(s),
 	m_context(w->getContext()),
 	b_drawText(true)
 //	m_linkButton(NULL),
@@ -26,26 +29,28 @@ View::View(const QString& name, Window* w, Scene* s, Camera* c, QWidget* parent,
 //	m_closeViewEnabled(false),
 //	b_showButtons(true)
 {
+	++viewCount;
+
 //	((Context*)(this->context()))->setDevice(this);
 //	((Context*)(this->context()))->create(context);
 
 //	makeCurrent();
 //	glewInit();
 
-	qglviewer::Camera* defaultCamera = this->camera();
-
-	if(c)
-	{
-		m_currentCamera = c;
-		this->setCamera(c);
-		c->linkView(this);
-	}
-	else
-	{
-		m_currentCamera = new Camera(m_window, this, *defaultCamera);
-	}
-
-	delete defaultCamera;
+//	qglviewer::Camera* defaultCamera = this->camera();
+//
+//	if(c)
+//	{
+//		m_currentCamera = c;
+//		this->setCamera(c);
+//		c->linkView(this);
+//	}
+//	else
+//	{
+//		m_currentCamera = new Camera(m_window, this, *defaultCamera);
+//	}
+//
+//	delete defaultCamera;
 
 //	m_buttonArea = new ViewButtonArea(this);
 //	m_buttonArea->setTopRightPosition(this->width(), 0);

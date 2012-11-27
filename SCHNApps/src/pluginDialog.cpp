@@ -14,8 +14,8 @@
 
 PluginDialog::PluginDialog(Window* parent, PluginHash* activePlugins) :
 	QDialog(parent),
-	activePlugins(activePlugins),
 	parentWindow(parent),
+	activePlugins(activePlugins),
 	init(true)
 {
 	this->setupUi(this);
@@ -306,13 +306,17 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 			{
 				System::Error::code = System::Error::PLUGIN_EXISTS_f(pluginName);
 				System::Error::showError(this);
-				init = true; item->setCheckState(0, Qt::Unchecked), init = false;
+				init = true;
+				item->setCheckState(0, Qt::Unchecked);
+				init = false;
 				return;
 			}
 
 			if (!parentWindow->loadPlugin(item->text(1)))
 			{
-				init = true; item->setCheckState(0, Qt::Unchecked), init = false;
+				init = true;
+				item->setCheckState(0, Qt::Unchecked);
+				init = false;
 				return;
 			}
 		}

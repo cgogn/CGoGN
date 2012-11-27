@@ -22,28 +22,35 @@ INCLUDE_DIRECTORIES(
 file(
 	GLOB
 	SCHNApps_SRC_FILES
+	${SCHNApps_ROOT_DIR}/src/camera.cpp
+	${SCHNApps_ROOT_DIR}/src/context.cpp
 	${SCHNApps_ROOT_DIR}/src/main.cpp
-	${SCHNApps_ROOT_DIR}/src/interface/*.cpp
-	${SCHNApps_ROOT_DIR}/src/visualization/*.cpp
-	${SCHNApps_ROOT_DIR}/src/dialogs/*.cpp
+	${SCHNApps_ROOT_DIR}/src/mapHandler.cpp
+	${SCHNApps_ROOT_DIR}/src/plugin.cpp
+	${SCHNApps_ROOT_DIR}/src/scene.cpp
+	${SCHNApps_ROOT_DIR}/src/splitArea.cpp
+	${SCHNApps_ROOT_DIR}/src/system.cpp
+	${SCHNApps_ROOT_DIR}/src/view.cpp
+	${SCHNApps_ROOT_DIR}/src/viewSelector.cpp
+	${SCHNApps_ROOT_DIR}/src/window.cpp
 )
 
 SET(SCHNApps_H_OBJECT_FILES
-	${SCHNApps_ROOT_DIR}/include/interface/window.h
-	${SCHNApps_ROOT_DIR}/include/interface/system.h
-	${SCHNApps_ROOT_DIR}/include/interface/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/interface/splitArea.h
-	${SCHNApps_ROOT_DIR}/include/visualization/view.h
-	${SCHNApps_ROOT_DIR}/include/visualization/scene.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/newSceneDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/sceneSelector.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/cameraOptionDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/cameraSceneDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/globalCameraDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/pluginDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/linkViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/dialogs/mapPluginDialog.h
+	${SCHNApps_ROOT_DIR}/include/window.h
+	${SCHNApps_ROOT_DIR}/include/scene.h
+	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
+	${SCHNApps_ROOT_DIR}/include/system.h
+	${SCHNApps_ROOT_DIR}/include/splitArea.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/newSceneDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/sceneSelector.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/cameraOptionDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/cameraSceneDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/globalCameraDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/pluginDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/linkViewDialog.h
+#	${SCHNApps_ROOT_DIR}/include/dialogs/mapPluginDialog.h
 )
 
 file(
@@ -76,4 +83,4 @@ TARGET_LINK_LIBRARIES( SCHNApps
 )
 
 
-ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)
+#ADD_SUBDIRECTORY(${SCHNApps_ROOT_DIR}/Plugins Plugins)

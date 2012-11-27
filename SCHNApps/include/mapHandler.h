@@ -1,7 +1,8 @@
-#ifndef _VIZUHANDLER_H_
-#define _VIZUHANDLER_H_
+#ifndef _MAPHANDLER_H_
+#define _MAPHANDLER_H_
 
-#include <QHash>
+#include <QString>
+#include "types.h"
 
 namespace CGoGN
 {
@@ -12,36 +13,30 @@ namespace CGoGN
 	}
 }
 
-class VBOHandler;
-
 class MapHandler
 {
 public:
-	MapHandler(CGoGN::GenericMap *map);
+	MapHandler(const QString& name, CGoGN::GenericMap* map);
 	~MapHandler();
 
-	CGoGN::GenericMap *map()
-	{
-		return m_map;
-	}
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	VBOHandler* findVBO(QString name);
-	VBOHandler* findFirstVBOMatching(QRegExp regexp);
-	QList<VBOHandler*> findVBOsMatching(QRegExp regexp);
+	CGoGN::GenericMap* getMap() { return m_map; }
 
-	bool addVBO(VBOHandler* vboH);
-	VBOHandler* addNewVBO(QString vboName);
+	CGoGN::Utils::VBO* addVBO(const QString& name);
+	void removeVBO(const QString& name);
+	CGoGN::Utils::VBO* getVBO(const QString& name);
+	CGoGN::Utils::VBO* findFirstVBOMatching(const QRegExp& regexp);
+	QList<CGoGN::Utils::VBO*> findVBOsMatching(const QRegExp& regexp);
 
-	VBOHandler* takeVBO(VBOHandler* vbo);
-
-	int countVBO()
-	{
-		return l_vbo.count();
-	}
+	int getNbVBO() { return h_vbo.count(); }
 
 protected:
+	QString m_name;
 	CGoGN::GenericMap* m_map;
-	QList<VBOHandler*> l_vbo;
+
+	VBOHash h_vbo;
 };
 
 #endif

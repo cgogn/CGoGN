@@ -1,15 +1,17 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include "view.h"
+#include "types.h"
+#include "QGLViewer/camera.h"
 
-//forward declaration
+class Window;
+class View;
 
 class Camera : public qglviewer::Camera
 {
 public:
-	Camera(Window* window, View* v);
-	Camera(Window* window, View* v, const qglviewer::Camera& c);
+	Camera(const QString& name, Window* window);
+	Camera(const QString& name, Window* window, const qglviewer::Camera& c);
 	~Camera();
 
 	void setName(QString name) { m_name = name; }
@@ -51,13 +53,14 @@ public:
 
 	void updateGL();
 
-	void viewShowButton(bool b);
+//	void viewShowButton(bool b);
 
 protected:
 	static unsigned int cameraCount;
 
 	QString m_name;
 	Window* m_window;
+
 	QList<View*> l_views;
 
 	bool m_draw;

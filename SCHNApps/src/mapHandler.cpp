@@ -1,106 +1,75 @@
-#include "visualization/mapHandler.h"
-#include "visualization/vboHandler.h"
-#include "interface/system.h"
+#include "mapHandler.h"
 
-#include "Topology/generic/genericmap.h"
+#include "system.h"
+#include "Utils/vbo.h"
 
-MapHandler::MapHandler(CGoGN::GenericMap *map) :
+MapHandler::MapHandler(const QString& name, CGoGN::GenericMap *map) :
+	m_name(name),
 	m_map(map)
 {}
 
 MapHandler::~MapHandler()
 {
-	while (!l_vbo.isEmpty())
-	{
-		VBOHandler *vboH = l_vbo.first();
-		bool destroy = !vboH->isShared();
-		takeVBO(vboH);
-
-		if (destroy)
-			delete vboH;
-	}
+	foreach(CGoGN::Utils::VBO* vbo, h_vbo)
+		delete vbo;
 
 	if (m_map)
 		delete m_map;
 }
 
-VBOHandler *MapHandler::addNewVBO(QString name)
+CGoGN::Utils::VBO* MapHandler::addVBO(const QString& name)
 {
-	foreach(VBOHandler * vbo, l_vbo)
+	if (h_vbo.contains(name))
 	{
-		if ((*vbo) == name)
-		{
-			System::Error::code = System::Error::VBO_EXISTS_f(name);
-
-			return NULL;
-		}
+		System::Error::code = System::Error::VBO_EXISTS;
+		return NULL;
 	}
-	VBOHandler *newVBO = new VBOHandler(name);
-	newVBO->shareWith(this);
 
-	return newVBO;
+	CGoGN::Utils::VBO* vbo = new CGoGN::Utils::VBO();
+	h_vbo.insert(name, vbo);
+	return vbo;
 }
 
-bool MapHandler::addVBO(VBOHandler *vbo)
+void MapHandler::removeVBO(const QString& name)
 {
-	if (vbo)
+	if (h_vbo.contains(name))
 	{
-		foreach(VBOHandler * vboH, l_vbo)
-		{
-			if (vbo == vboH || vbo->getName() == vboH->getName())
-			{
-				System::Error::code = System::Error::VBO_EXISTS_f(vbo->getName());
-				return false;
-			}
-		}
-		l_vbo.push_back(vbo);
-		return true;
+		CGoGN::Utils::VBO* vbo = h_vbo[name];
+		h_vbo.remove(name);
+		delete vbo;
 	}
+}
+
+CGoGN::Utils::VBO* MapHandler::getVBO(const QString& name)
+{
+	if (h_vbo.contains(name))
+		return h_vbo[name];
 	else
-		return false;
+	{
+		System::Error::code = System::Error::VBO_DOES_NOT_EXIST;
+		return NULL;
+	}
 }
 
-VBOHandler *MapHandler::findVBO(QString name)
+CGoGN::Utils::VBO* MapHandler::findFirstVBOMatching(const QRegExp& regexp)
 {
-	foreach(VBOHandler * vbo, l_vbo)
+	QHash<QString, CGoGN::Utils::VBO*>::iterator it;
+	for (it = h_vbo.begin(); it != h_vbo.end(); ++it)
 	{
-		if (vbo->getName() == name)
-			return vbo;
+		if (it.key().contains(regexp))
+			return it.value();
 	}
 	return NULL;
 }
 
-VBOHandler *MapHandler::findFirstVBOMatching(QRegExp regexp)
+QList<CGoGN::Utils::VBO*> MapHandler::findVBOsMatching(const QRegExp& regexp)
 {
-	foreach(VBOHandler * vbo, l_vbo)
+	QList<CGoGN::Utils::VBO*> rlist;
+	QHash<QString, CGoGN::Utils::VBO*>::iterator it;
+	for (it = h_vbo.begin(); it != h_vbo.end(); ++it)
 	{
-		if (vbo->getName().contains(regexp))
-			return vbo;
-	}
-	return NULL;
-}
-
-QList<VBOHandler *> MapHandler::findVBOsMatching(QRegExp regexp)
-{
-	QList<VBOHandler *> rlist;
-	foreach(VBOHandler * vbo, l_vbo)
-	{
-		if (vbo->getName().contains(regexp))
-			rlist.push_back(vbo);
+		if (it.key().contains(regexp))
+			rlist.push_back(it.value());
 	}
 	return rlist;
-}
-
-VBOHandler *MapHandler::takeVBO(VBOHandler *vbo)
-{
-	int i = l_vbo.indexOf(vbo);
-
-	if (i >= 0)
-	{
-		VBOHandler *vboh = l_vbo.takeAt(i);
-		vboh->unshareWith(this);
-		return vboh;
-	}
-	else
-		return NULL;
 }

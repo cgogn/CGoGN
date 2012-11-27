@@ -5,16 +5,20 @@
 
 #include "camera.h"
 #include "view.h"
-#include "context.h"
+//#include "context.h"
 #include "vboHandler.h"
 #include "window.h"
 #include "plugin.h"
+
+unsigned int Scene::sceneCount = 0;
 
 Scene::Scene(const QString& name, Window* window) :
 	m_name(name),
 	m_window(window),
 	m_context(window->getContext())
-{}
+{
+	++sceneCount;
+}
 
 Scene::~Scene()
 {
@@ -126,7 +130,7 @@ void Scene::unlinkView(View* view)
 		delete view;
 }
 
-View* Scene::getLinkedView(unsigned int num)
+View* Scene::getLinkedView(int num)
 {
 	if(num > l_views.size())
 		return NULL;
@@ -249,5 +253,5 @@ void Scene::unlinkPlugin(Plugin* plugin)
 void Scene::firstViewFitSphere(float x, float y, float z, float radius)
 {
 	if(!l_views.empty())
-		l_views.first()->currentCamera()->fitSphere(qglviewer::Vec(x,y,z), radius);
+		l_views.first()->getCurrentCamera()->fitSphere(qglviewer::Vec(x,y,z), radius);
 }

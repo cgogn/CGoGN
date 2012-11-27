@@ -5,18 +5,15 @@
 
 #include <QVBoxLayout>
 
-#include "Topology/generic/genericmap.h"
-
 #include "types.h"
 #include "system.h"
 #include "splitArea.h"
-#include "mapHandler.h"
 
+class Plugin;
 class Scene;
 class View;
 class Camera;
-class Plugin;
-class Context;
+//class Context;
 class MapHandler;
 
 class Window : public QMainWindow, Ui::Window
@@ -25,17 +22,20 @@ class Window : public QMainWindow, Ui::Window
 
 public:
 	/**
-	 * \fn Window(QWidget* parent=0)
+	 * \fn Window(QWidget* parent = NULL)
 	 * \brief Default (and unique) constructor
 	 *
 	 * \param parent the parent of the window
 	 */
-	Window(QWidget *parent = 0);
+	Window(QWidget* parent = NULL);
+
 	/**
 	 * \fn ~Window()
 	 * \brief the class destructor
 	 */
 	~Window();
+
+	QGLContext* getContext() { return m_context; }
 
 	/*********************************************************
 	 * MANAGE DOCK
@@ -167,7 +167,7 @@ public:
 	 * \see getPlugins()
 	 * \see Plugin::enable()
 	 */
-	bool loadPlugin(const QString& pluginPath);
+	Plugin* loadPlugin(const QString& pluginPath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -210,117 +210,57 @@ public:
 	 */
 //	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
 
-	/**
-	 *
-	 */
-	QList<Plugin*> getPlugins();
+	Plugin* getPlugin(const QString& name);
+
+	QList<Plugin*> getPlugins() { return h_plugins.values(); }
 
 	/*********************************************************
 	 * MANAGE SCENES
 	 *********************************************************/
 
-	bool addScene(const QString& name);
+	Scene* addScene(const QString& name);
+	void removeScene(const QString& name);
+	Scene* getScene(const QString& name);
+	QList<Scene*> getScenes() { return h_scenes.values(); }
 
-	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
-	bool addNewSceneView(Scene *scene, View *view);
+//	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
+//	bool addNewSceneView(Scene *scene, View *view);
 
-	/**
-	 *
-	 */
-	QList<Scene*> getScenes();
+//	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
 
-	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
+//	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
+//	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
 
-	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
-	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
-
-	void removeScene(QString name);
-
-	void linkDialog(Scene *scene);
-	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
+//	void linkDialog(Scene *scene);
+//	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
 
 	/*********************************************************
-	 * MANAGE MAPS
+	 * MANAGE VIEWS
 	 *********************************************************/
+
+	View* addView(const QString& name);
+	void removeView(const QString& name);
+	View* getView(const QString& name);
+	QList<View*> getView() { return h_views.values(); }
 
 	/*********************************************************
 	 * MANAGE CAMERAS
 	 *********************************************************/
 
+	Camera* addCamera(const QString& name);
+	void removeCamera(const QString& name);
+	Camera* getCamera(const QString& name);
 	QList<Camera*> getCameras() { return h_cameras.values(); }
 
+	/*********************************************************
+	 * MANAGE MAPS
+	 *********************************************************/
 
+	bool addMap(const QString& name, MapHandler* map);
+	void removeMap(const QString& name);
+	MapHandler* getMap(const QString& name);
+	QList<MapHandler*> getMaps() { return h_maps.values(); }
 
-
-
-
-
-
-
-	bool addReferencedMap(QString map_name, MapHandler *map);
-
-	/**
-	 * \fn bool addNewReferencedMap(QString map_name, T* &map)
-	 * \brief adds and reference a new map
-	 *
-	 * This method insert in the map hash table a new map that will be referenced under
-	 * the given name.
-	 *
-	 * \warning This function was meant to be used by the plugins and GLViewers, you should probably not call it.
-	 *
-	 * \tparam T the template parameter which the type of the map you want to add. T must be a CGoGN
-	 *      map type, that is to say an instance of a class that inherits CGoGN::GenericMap.
-	 *
-	 * \param[in] map_name The name under which will be referenced the map
-	 * \param[out] map A pointer to a type T map, which will be set to the adress of the newly created map, or
-	 *      to the already existing map refererence by the same name
-	 *
-	 * \return true if the map is created, false if creation fails (returns false if a same named map already exists)
-	 *
-	 * \see getReferencedMap()
-	 */
-	template<typename T>
-	MapHandler *addNewReferencedMap(QString map_name, T *&map)
-	{
-		//if a map isn't already referenced under that name
-		MapHash::iterator it;
-
-		if ((it = h_vizu.find(map_name)) == h_vizu.end())
-		{
-			//the map is created, inserted, and reference under the given name
-			map = new T();
-			MapHandler *vh = new MapHandler((CGoGN::GenericMap *)map);
-			h_vizu.insert(map_name, vh);
-
-			return vh;
-		}
-		//if a map already has that name
-		else
-		{
-			//failure + map affected with the address of the already existing map
-			map = ((T *)((*it)->map()));
-			System::Error::code = System::Error::MAP_EXISTS_f(map_name);
-			return NULL;
-		}
-	}
-
-	/**
-	 * \fn T* getReferencedMap(QString map_name)
-	 * \brief return the map referenced under the given name
-	 *
-	 * \warning This function was meant to be used by the plugins and GLViewers, you should probably not call it.
-	 *
-	 * \tparam T the type of the referenced map you want to fetch.
-	 *
-	 * \param map_name the name under which is referenced the map.
-	 *
-	 * \return a T type pointer to the map referenced under the given name, if faillure it returns NULL
-	 *
-	 * If the function failed, the error code ( Error::code ) is affected with a value
-	     depending on the error. This error can be shown with Error::showError
-	 *
-	 * \see addNewReferencedMap()
-	 */
 //	template<typename T>
 //	T* getReferencedMap(QString map_name){
 //		MapHash::iterator it;
@@ -332,17 +272,6 @@ public:
 //			return NULL;
 //		}
 //	}
-	MapHandler *getReferencedMap(QString map_name);
-
-	Context* getContext()
-	{
-		return m_context;
-	}
-
-	QList<MapHandler *> maps()
-	{
-		return h_vizu.values();
-	}
 
 protected:
 	bool m_initialization;
@@ -350,47 +279,30 @@ protected:
 	QVBoxLayout* m_verticalLayout;
 	SplitArea* m_splitArea;
 
-	Context* m_context;
+	QGLContext* m_context;
 
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
 
-	SceneHash h_scenes;
 	PluginHash h_plugins;
-	MapHash h_maps;
+	SceneHash h_scenes;
+	ViewHash h_views;
 	CameraHash h_cameras;
+	MapHash h_maps;
 
 	/**
 	 * \var bool keys[3]
 	 * \brief a static tab to store state of some keys (here: M, Shift and CTRL)
 	 */
 	bool keys[3];
-
-	/**
-	 * \fn void keyPressEvent( QKeyEvent * event )
-	 * \brief handles the mouse button pressure
-	 *
-	 * Overload function from "QWidget" in order to handle the mouse
-	 * button pressure. See the Qt documentation for more details
-	 * ( http://qt-project.org/doc/qt-4.8/qwidget.html#mousePressEvent ).
-	 */
 	void keyPressEvent(QKeyEvent *event);
-
-	/**
-	 * \fn void keyReleaseEvent( QKeyEvent * event )
-	 * \brief handles the mouse button release
-	 *
-	 * Overload function from "QWidget" in order to handle the mouse
-	 * button release. See the Qt documentation for more details
-	 * ( http://qt-project.org/doc/qt-4.8/qwidget.html#mouseReleaseEvent ).
-	 */
 	void keyReleaseEvent(QKeyEvent *event);
 
 	/**
 	 * \fn void moveView()
 	 * \brief shows a reordering dialog for the Views
 	 *
-	 * Make a call with the rigth parameters to the dialog class
+	 * Make a call with the right parameters to the dialog class
 	 * GLVSelector and show this dialog.
 	 *
 	 * This method is meant to be called when the user press
@@ -400,27 +312,44 @@ protected:
 
 public slots:
 	/**
+	 * \fn void cb_about_SCHNApps();
+	 * \brief function that is called when the "about SCHNApps" menu action is triggered
+	 */
+	void cb_aboutSCHNApps();
+
+	/**
 	 * \fn void cb_about_CGoGN();
 	 * \brief function that is called when the "about CGOGN" menu action is triggered
 	 */
-	void cb_about_CGoGN();
-	/**
-	 * \fn void cb_pluginDialog()
-	 * \brief method called when the "Plugins" menu action is triggered. Show the plugin managmement dialog:
-	 *              PluginDialog
-	 */
-	void cb_pluginDialog();
+	void cb_aboutCGoGN();
 
 	/**
-	 * \fn void cb_newView()
-	 * \brief method called when the "add new view" button is pushed. Show the new empty view creation dialog:
-	 *              NewViewDialog
+	 * \fn void cb_managePlugins()
+	 * \brief method called when the "Plugins" action is triggered.
+	 * Show the plugins management dialog
 	 */
-	void cb_newScene();
+	void cb_managePlugins();
 
-	void cb_globalCamera();
+	/**
+	 * \fn void cb_manageScenes()
+	 * \brief method called when the "Scenes" action is triggered.
+	 * Show the scenes management dialog:
+	 */
+	void cb_manageScenes();
 
-	void cb_mapPlugin();
+	/**
+	 * \fn void cb_manageCameras()
+	 * \brief method called when the "Cameras" action is triggered.
+	 * Show the cameras management dialog:
+	 */
+	void cb_manageCameras();
+
+	/**
+	 * \fn void cb_manageMaps()
+	 * \brief method called when the "Maps" action is triggered.
+	 * Show the maps management dialog:
+	 */
+	void cb_manageMaps();
 };
 
 #endif

@@ -6,23 +6,24 @@
 #include "types.h"
 #include "viewButtonArea.h"
 
-# include <QKeyEvent>
+#include <QKeyEvent>
 #include <QList>
 #include <QWidget>
 #include <QGLContext>
 
 #include "Utils/gl_matrices.h"
 
+class Window;
 class Scene;
 class Camera;
-class Context;
+//class Context;
 
 class View : public QGLViewer
 {
 	Q_OBJECT
 
 public:
-	View(const QString& name, Window* w, Scene* s, Camera* c, QWidget* parent, const QGLWidget* shareWidget = NULL);
+	View(const QString& name, Window* w, QWidget* parent);
 	~View();
 
 	const QString& getName() { return m_name; }
@@ -89,10 +90,13 @@ public:
 //	void setShowButtons(bool b) { b_showButtons = b; }
 
 protected:
+	static unsigned int viewCount;
+
 	QString m_name;
 	Window* m_window;
-	Scene* m_scene;
 	QGLContext* m_context;
+
+	Scene* m_scene;
 	Camera* m_currentCamera;
 
 //	ViewButtonArea* m_buttonArea;

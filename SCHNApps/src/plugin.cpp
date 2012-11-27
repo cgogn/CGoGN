@@ -99,7 +99,7 @@ bool Plugin::linkScene(Scene* scene)
 	if(scene && !l_scenes.contains(scene))
 	{
 		l_scenes.push_back(scene);
-		scene->addPlugin(this);
+		scene->linkPlugin(this);
 		scene->updateGL();
 		cb_sceneAdded(scene);
 		return true;
@@ -112,7 +112,7 @@ void Plugin::unlinkScene(Scene* scene)
 {
 	if(l_scenes.removeOne(scene))
 	{
-		scene->removePlugin(this);
+		scene->unlinkPlugin(this);
 		scene->updateGL();
 		cb_sceneRemoved(scene);
 	}
@@ -134,26 +134,20 @@ QList<Scene*> Plugin::getLinkedScenes()
 
 bool Plugin::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
-	if(m_window)
+	if(tabWidget && !l_tabWidgets.contains(tabWidget))
 	{
-		l_tabWidgets.push_back(tabWidget);
 		m_window->addTabInDock(tabWidget, tabText);
+		l_tabWidgets.push_back(tabWidget);
 		return true;
 	}
 	else
-	{
-		System::Error::code = System::Error::BAD_LINK_PLUGIN_WINDOW_f(m_name);
 		return false;
-	}
 }
 
 void Plugin::removeTabInDock(QWidget* tabWidget)
 {
-	if(m_window)
-	{
-		l_tabWidgets.removeOne(tabWidget);
+	if(l_tabWidgets.removeOne(tabWidget))
 		m_window->removeTabInDock(tabWidget);
-	}
 }
 
 /*********************************************************

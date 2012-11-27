@@ -1,9 +1,12 @@
 #include "camera.h"
-#include "scene.h"
 
-static unsigned int Camera::cameraCount = 0;
+#include "window.h"
+#include "view.h"
 
-Camera::Camera(Window* window, View* v) :
+unsigned int Camera::cameraCount = 0;
+
+Camera::Camera(const QString& name, Window* window) :
+	m_name(name),
 	m_window(window),
 	m_draw(false),
 	m_drawFarPlane(false),
@@ -13,15 +16,13 @@ Camera::Camera(Window* window, View* v) :
 	m_drawPathScale(1.0),
 	m_snapCount(0)
 {
-	m_name = "camera_" + cameraCount;
 	++cameraCount;
-	if(v)
-		l_views.push_back(v);
 	this->setZClippingCoefficient(100);
 }
 
-Camera::Camera(Window* window, View* v, const qglviewer::Camera& c) :
+Camera::Camera(const QString& name, Window* window, const qglviewer::Camera& c) :
 	qglviewer::Camera(c),
+	m_name(name),
 	m_window(window),
 	m_draw(false),
 	m_drawFarPlane(false),
@@ -31,10 +32,7 @@ Camera::Camera(Window* window, View* v, const qglviewer::Camera& c) :
 	m_drawPathScale(1.0),
 	m_snapCount(0)
 {
-	m_name = "camera_" + cameraCount;
 	++cameraCount;
-	if(v)
-		l_views.push_back(v);
 	this->setZClippingCoefficient(100);
 }
 
@@ -91,8 +89,8 @@ void Camera::updateGL()
 		view->updateGL();
 }
 
-void Camera::viewShowButton(bool b)
-{
-	foreach(View* view, l_views)
-		view->setShowButtons(b);
-}
+//void Camera::viewShowButton(bool b)
+//{
+//	foreach(View* view, l_views)
+//		view->setShowButtons(b);
+//}
