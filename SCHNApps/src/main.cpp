@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	System::splash->show();
 
 	Window window;
-//	window.showMaximized();
+	window.show();
 
 	sleep(1);
 	System::splash->finish(&window);

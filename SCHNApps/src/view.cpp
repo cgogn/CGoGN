@@ -1,21 +1,23 @@
 #include "view.h"
 
-#include "system.h"
 #include "window.h"
-#include "plugin.h"
 #include "scene.h"
 #include "camera.h"
-#include "cameraViewDialog.h"
-#include "cameraSceneDialog.h"
+#include "viewButtonArea.h"
+
+//#include "cameraViewDialog.h"
+//#include "cameraSceneDialog.h"
 
 unsigned int View::viewCount = 0;
 
-View::View(const QString& name, Window* w, QWidget* parent) :
+View::View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget) :
 //	QGLViewer(new Context(NULL, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer))),
-	QGLViewer(w->getContext(), parent),
+	QGLViewer(parent, shareWidget),
 	m_name(name),
 	m_window(w),
 	m_context(w->getContext()),
+	m_scene(NULL),
+	m_currentCamera(NULL),
 	b_drawText(true)
 //	m_linkButton(NULL),
 //	m_linkViewEnabled(false),
@@ -30,6 +32,9 @@ View::View(const QString& name, Window* w, QWidget* parent) :
 //	b_showButtons(true)
 {
 	++viewCount;
+
+	Camera* c = m_window->addCamera();
+	setCurrentCamera(c);
 
 //	((Context*)(this->context()))->setDevice(this);
 //	((Context*)(this->context()))->create(context);
@@ -65,6 +70,20 @@ View::~View()
 
 //	if(m_buttonArea)
 //		delete m_buttonArea;
+}
+
+void View::setCurrentCamera(Camera* c)
+{
+	if(c != m_currentCamera)
+	{
+		if(m_currentCamera != NULL)
+			m_currentCamera->unlinkView(this);
+		m_currentCamera = c;
+		m_currentCamera->linkView(this);
+		this->setCamera(m_currentCamera);
+		updateTextInfo();
+		updateGL();
+	}
 }
 
 void View::initGL()
@@ -118,6 +137,26 @@ void View::draw()
 	if(m_scene && m_currentCamera)
 		m_scene->draw(this);
 
+	const float nbSteps = 200.0;
+	glBegin(GL_QUAD_STRIP);
+	for (float i = 0; i < nbSteps; ++i)
+	{
+		float ratio = i/nbSteps;
+		float angle = 21.0*ratio;
+		float c = cos(angle);
+		float s = sin(angle);
+		float r1 = 1.0 - 0.8f*ratio;
+		float r2 = 0.8f - 0.8f*ratio;
+		float alt = ratio - 0.5f;
+		const float nor = 0.5f;
+		const float up = sqrt(1.0-nor*nor);
+		glColor3f(1.0-ratio, 0.2f , ratio);
+		glNormal3f(nor*c, up, nor*s);
+		glVertex3f(r1*c, alt, r1*s);
+		glVertex3f(r2*c, alt+0.05f, r2*s);
+	}
+	glEnd();
+
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 //	if(b_drawButtons)
 //		drawButtons();
@@ -147,13 +186,15 @@ void View::drawText()
 
 void View::keyPressEvent(QKeyEvent* event)
 {
-	m_scene->keyPressEvent(event);
+	if(m_scene)
+		m_scene->keyPressEvent(event);
 	QGLViewer::keyPressEvent(event);
 }
 
 void View::keyReleaseEvent(QKeyEvent *e)
 {
-	m_scene->keyReleaseEvent(e);
+	if(m_scene)
+		m_scene->keyReleaseEvent(e);
 	QGLViewer::keyReleaseEvent(e);
 }
 
@@ -163,26 +204,30 @@ void View::mousePressEvent(QMouseEvent* event)
 //		m_buttonArea->clickButton(event->x(), event->y());
 //	else
 //	{
-		m_scene->mousePressEvent(event);
+		if(m_scene)
+			m_scene->mousePressEvent(event);
 		QGLViewer::mousePressEvent(event);
 //	}
 }
 
 void View::mouseReleaseEvent(QMouseEvent* event)
 {
-	m_scene->mouseReleaseEvent(event);
+	if(m_scene)
+		m_scene->mouseReleaseEvent(event);
 	QGLViewer::mouseReleaseEvent(event);
 }
 
 void View::mouseMoveEvent(QMouseEvent* event)
 {
-	m_scene->mouseMoveEvent(event);
+	if(m_scene)
+		m_scene->mouseMoveEvent(event);
 	QGLViewer::mouseMoveEvent(event);
 }
 
 void View::wheelEvent(QWheelEvent* event)
 {
-	m_scene->wheelEvent(event);
+	if(m_scene)
+		m_scene->wheelEvent(event);
 	QGLViewer::wheelEvent(event);
 }
 
@@ -292,9 +337,13 @@ void View::drawOverpaint(QPainter *painter)
 
 void View::updateTextInfo()
 {
-	m_textInfo = QString("Scene: ") + m_scene->getName() + " > "
-			   + QString("View: ") + this->m_name + " > "
-			   + QString("Camera: ") + m_currentCamera->getName() + (m_currentCamera->isShared() ? " (shared)" : "");
+	if(m_scene)
+		m_textInfo = QString("scene: ") + m_scene->getName() + QString(" / ");
+	else
+		m_textInfo = "";
+	m_textInfo +=
+		QString("view: ") + m_name +
+		QString(" / camera: ") + m_currentCamera->getName();
 }
 
 glm::mat4 View::getCurrentModelViewMatrix()

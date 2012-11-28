@@ -1,21 +1,25 @@
 #include "pluginDialog.h"
 
-#include <libxml2/libxml/tree.h>
+//#include <libxml2/libxml/tree.h>
 #include <QFile>
-#include <QRegExp>
-#include <QTreeWidgetItem>
+#include <QFileInfo>
+#include <QDir>
+//#include <QRegExp>
+//#include <QTreeWidgetItem>
 #include <QFileDialog>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QDomNode>
 #include <QDomText>
 #include <QMessageBox>
-#include <QTextBrowser>
+//#include <QTextBrowser>
 
 #include "system.h"
-#include "plugin.h"
+#include "window.h"
+//#include "plugin.h"
 
-PluginDialog::PluginDialog(Window* parent, PluginHash* activePlugins) :
-	QDialog(parent),
-	parentWindow(parent),
-	activePlugins(activePlugins),
+PluginDialog::PluginDialog(Window* window) :
+	m_window(window),
 	init(true)
 {
 	this->setupUi(this);
@@ -74,6 +78,8 @@ bool PluginDialog::restoreState()
 	QDomElement root = doc.documentElement();
 	QDomElement plugins_node = root.firstChildElement("PLUGINS");
 
+	const PluginHash& activePlugins = m_window->getPluginsHash();
+
 	if (!plugins_node.isNull())
 	{
 		QDomElement plugins_subNode = plugins_node.firstChildElement();
@@ -105,7 +111,7 @@ bool PluginDialog::restoreState()
 						QTreeWidgetItem *item = new QTreeWidgetItem(dirItem, FILE_DIR);
 						item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 
-						if (activePlugins->contains(pluginName))
+						if (activePlugins.contains(pluginName))
 							item->setCheckState(0, Qt::Checked);
 						else
 							item->setCheckState(0, Qt::Unchecked);
@@ -128,7 +134,7 @@ bool PluginDialog::restoreState()
 						QTreeWidgetItem *item =  new QTreeWidgetItem(treeWidget, FILE);
 						item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 
-						if (activePlugins->contains(pluginName))
+						if (activePlugins.contains(pluginName))
 							item->setCheckState(0, Qt::Checked);
 						else
 							item->setCheckState(0, Qt::Unchecked);
@@ -200,6 +206,8 @@ void PluginDialog::cb_addPluginsDirectory()
 
 		dirFiles = directory.entryList(filters, QDir::Files);
 
+		const PluginHash& activePlugins = m_window->getPluginsHash();
+
 		foreach(QString file, dirFiles)
 		{
 			QFileInfo pfi(file);
@@ -208,7 +216,7 @@ void PluginDialog::cb_addPluginsDirectory()
 			QTreeWidgetItem *item = new QTreeWidgetItem(dirItem, FILE_DIR);
 			item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
 
-			if (activePlugins->contains(pluginName))
+			if (activePlugins.contains(pluginName))
 				item->setCheckState(0, Qt::Checked);
 			else
 				item->setCheckState(0, Qt::Unchecked);
@@ -296,13 +304,20 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 {
 	if (!init && column == 0)
 	{
+		QString pluginFilePath = item->text(1);
+
+		std::cout << pluginFilePath.toUtf8().constData() << std::endl;
+
+		QFileInfo pluginInfo(pluginFilePath);
+		QString pluginName = pluginInfo.baseName().remove(0, 3);
+
+		std::cout << pluginName.toUtf8().constData() << std::endl;
+
 		if (item->checkState(0) == Qt::Checked)
 		{
-			QString pluginFile = item->text(1);
-			QFileInfo pluginInfo(pluginFile);
-			QString pluginName = pluginInfo.baseName().remove(0, 3);
+			const PluginHash& activePlugins = m_window->getPluginsHash();
 
-			if (activePlugins->contains(pluginName))
+			if (activePlugins.contains(pluginName))
 			{
 				System::Error::code = System::Error::PLUGIN_EXISTS_f(pluginName);
 				System::Error::showError(this);
@@ -312,7 +327,9 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 				return;
 			}
 
-			if (!parentWindow->loadPlugin(item->text(1)))
+			Plugin* p = m_window->loadPlugin(pluginFilePath);
+
+			if (p == NULL)
 			{
 				init = true;
 				item->setCheckState(0, Qt::Unchecked);
@@ -321,13 +338,7 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 			}
 		}
 		else if (item->checkState(0) == Qt::Unchecked)
-		{
-			QString pluginFile = item->text(1);
-			QFileInfo pluginInfo(pluginFile);
-			QString pluginName = pluginInfo.baseName().remove(0, 3);
-
-			parentWindow->unloadPlugin(pluginName);
-		}
+			m_window->unloadPlugin(pluginName);
 	}
 }
 
@@ -367,14 +378,14 @@ void PluginDialog::cb_acceptDialog()
 		}
 	}
 
-	if (!System::StateHandler::savePluginsInfo(parentWindow, activePlugins, paths))
-		System::Error::showError();
+//	if (!System::StateHandler::savePluginsInfo(m_window, activePlugins, paths))
+//		System::Error::showError();
 }
 
-void PluginDialog::showPluginInfo()
-{
-	QTreeWidgetItem *item = treeWidget->currentItem();
-	QString strUrl = item->text(1);
-
-	System::Info::showPluginInfo(strUrl);
-}
+//void PluginDialog::showPluginInfo()
+//{
+//	QTreeWidgetItem *item = treeWidget->currentItem();
+//	QString strUrl = item->text(1);
+//
+//	System::Info::showPluginInfo(strUrl);
+//}

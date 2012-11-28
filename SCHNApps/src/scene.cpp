@@ -1,14 +1,11 @@
 #include "scene.h"
 
-#include <QGLContext>
-#include <iostream>
-
-#include "camera.h"
-#include "view.h"
-//#include "context.h"
-#include "vboHandler.h"
 #include "window.h"
 #include "plugin.h"
+
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 unsigned int Scene::sceneCount = 0;
 
@@ -45,7 +42,7 @@ void Scene::updateGL()
 
 void Scene::draw(View *v)
 {
-	QList<Camera*> cameras = m_window->getCameras();
+	QList<Camera*> cameras = m_window->getCamerasList();
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glDisable(GL_LIGHTING);
 	foreach(Camera* c, cameras)

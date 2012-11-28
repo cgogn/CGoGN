@@ -26,7 +26,7 @@ void FirstPlugin::cb_redraw(Scene *scene)
 	m_render_topo->drawTopo();
 }
 
-bool FirstPlugin::activate()
+bool FirstPlugin::enable()
 {
 	// creation of 2 new faces: 1 triangle and 1 square
 	Dart d1 = myMap.newFace(3);

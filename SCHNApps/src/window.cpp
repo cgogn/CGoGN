@@ -1,35 +1,26 @@
 #include "window.h"
 
-#include <QApplication>
+//#include <QApplication>
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QPluginLoader>
 #include <QFileInfo>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 #include "plugin.h"
-#include "scene.h"
 #include "view.h"
-#include "camera.h"
-//#include "context.h"
-#include "mapHandler.h"
-
+#include "context.h"
 #include "splitArea.h"
+
 #include "viewSelector.h"
-
-//#include "pluginDialog.h"
-//#include "sceneDialog.h"
-//#include "cameraDialog.h"
-//#include "mapDialog.h"
-
-//#include "sceneSelector.h"
-
-//#include "newSceneDialog.h"
-//#include "globalCameraDialog.h"
-//#include "linkViewDialog.h"
-//#include "mapPluginDialog.h"
+#include "cameraViewDialog.h"
+#include "pluginDialog.h"
 
 Window::Window(QWidget *parent) :
 	QMainWindow(parent),
+	m_firstView(NULL),
 	m_dock(NULL),
 	m_dockTabWidget(NULL)
 {
@@ -37,14 +28,15 @@ Window::Window(QWidget *parent) :
 	m_initialization = true;
 
 	glewInit();
-	m_context = new QGLContext(QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer));
+//	m_context = new Context(QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer));
+//	m_context->setDevice(this);
 
-	if (m_context->create())
-		std::cout << "QGLContext created" << std::endl;
-	else
-		std::cout << "Failed to create QGLContext" << std::endl;
+//	if (m_context->create())
+//		std::cout << "QGLContext created" << std::endl;
+//	else
+//		std::cout << "Failed to create QGLContext" << std::endl;
 
-//	this->setupUi(this);
+	this->setupUi(this);
 	System::splash->showMessage("Welcome to SCHNApps", Qt::AlignBottom | Qt::AlignCenter);
 	sleep(1);
 
@@ -61,14 +53,18 @@ Window::Window(QWidget *parent) :
 	keys[1] = false;
 	keys[2] = false;
 
+	// add first view
+	m_firstView = addView();
+	m_splitArea->addFitElement(m_firstView);
+
 	// connect the basic actions
 	connect(actionAboutSCHNApps, SIGNAL(triggered()), this, SLOT(cb_aboutSCHNApps()));
 	connect(actionAboutCGoGN, SIGNAL(triggered()), this, SLOT(cb_aboutCGoGN()));
 
-//	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
-//	connect(actionManageScenes, SIGNAL(triggered()), this, SLOT(cb_manageScenes()));
-//	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
-//	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
+	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
+	connect(actionManageViews, SIGNAL(triggered()), this, SLOT(cb_manageViews()));
+	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
+	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
 
 //	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
 
@@ -310,9 +306,9 @@ void Window::removeToolbarAction(QAction* action)
  * MANAGE PLUGINS
  *********************************************************/
 
-Plugin* Window::loadPlugin(const QString& pluginPath)
+Plugin* Window::loadPlugin(QString pluginFilePath)
 {
-	QString pluginName = QFileInfo(pluginPath).baseName().remove(0, 3);
+	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
 
 	if (h_plugins.contains(pluginName))
 	{
@@ -322,7 +318,7 @@ Plugin* Window::loadPlugin(const QString& pluginPath)
 	}
 
 	// QT's plugin loader class
-	QPluginLoader loader(pluginPath);
+	QPluginLoader loader(pluginFilePath);
 
 	// if the loader loads a plugin instance
 	if (QObject* pluginObject = loader.instance())
@@ -330,8 +326,8 @@ Plugin* Window::loadPlugin(const QString& pluginPath)
 		Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
 
 		// we set the plugin with correct parameters (name, filepath, window)
-		plugin->setName(pluginName);
-		plugin->setFilePath(pluginPath);
+//		plugin->setName(pluginName);
+//		plugin->setFilePath(pluginFilePath);
 		plugin->setWindow(this);
 
 		// then we call its enable() methods
@@ -419,6 +415,11 @@ Scene* Window::addScene(const QString& name)
 	Scene* scene = new Scene(name, this);
 	h_scenes.insert(name, scene);
 	return scene;
+}
+
+Scene* Window::addScene()
+{
+	return addScene(QString("scene_") + QString::number(Scene::sceneCount));
 }
 
 void Window::removeScene(const QString& name)
@@ -694,9 +695,18 @@ View* Window::addView(const QString& name)
 		return NULL;
 	}
 
-	View* view = new View(name, this, this);
+	View* view = NULL;
+	if(m_firstView == NULL)
+		view = new View(name, this, this);
+	else
+		view = new View(name, this, this, m_firstView);
 	h_views.insert(name, view);
 	return view;
+}
+
+View* Window::addView()
+{
+	return addView(QString("view_") + QString::number(View::viewCount));
 }
 
 void Window::removeView(const QString& name)
@@ -735,6 +745,11 @@ Camera* Window::addCamera(const QString& name)
 	Camera* camera = new Camera(name, this);
 	h_cameras.insert(name, camera);
 	return camera;
+}
+
+Camera* Window::addCamera()
+{
+	return addCamera(QString("camera_") + QString::number(Camera::cameraCount));
 }
 
 void Window::removeCamera(const QString& name)
@@ -893,24 +908,41 @@ void Window::cb_aboutCGoGN()
 
 void Window::cb_managePlugins()
 {
-//	PluginDialog pd(this, &h_plugins);
-//	pd.exec();
+	PluginDialog pd(this);
+	pd.exec();
 }
 
-void Window::cb_manageScenes()
+void Window::cb_manageViews()
 {
-//	SceneDialog sd(this);
-//	sd.exec();
+	ViewPixMaps pm;
+	pm.fromSplitArea(m_splitArea);
+
+	ViewSelector selector(pm, this, ViewSelector::SELECT);
+
+	selector.setInsertionName("coucou");
+
+	selector.exec();
+
+	if (selector.result() == QDialog::Accepted)
+	{
+		View* v = addView();
+		QPoint insertPoint = selector.getInsertPoint();
+		m_splitArea->addElementAt(v, insertPoint.x(), insertPoint.y());
+	}
+
+//	ViewDialog vd(this);
+//	vd.exec();
 }
 
 void Window::cb_manageCameras()
 {
-//	CameraDialog cd(this);
-//	cd.exec();
+	CameraViewDialog cd(this);
+	cd.exec();
 }
 
 void Window::cb_manageMaps()
 {
+	std::cout << "manage maps" << std::endl;
 //	MapDialog md(this, &h_maps);
 //	md.exec();
 }

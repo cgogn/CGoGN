@@ -1,6 +1,6 @@
 #include "context.h"
 
-Context::Context(const QGLFormat& format, QWidget* w) : QGLContext(format, w)
+Context::Context(const QGLFormat& format) : QGLContext(format)
 {}
 
 void Context::setDevice(QWidget* w)

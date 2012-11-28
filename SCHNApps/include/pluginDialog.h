@@ -3,28 +3,18 @@
 
 #include "ui_pluginDialog.h"
 
-#include <QDir>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
-#include <QTextStream>
-
 #include "types.h"
 
-class Plugin;
-class Window;
-
-class PluginDialog : public QDialog, public Ui::Dialog
+class PluginDialog : public QDialog, public Ui::PluginDialog
 {
 	Q_OBJECT
 
 public:
-	PluginDialog(Window* parent = 0, PluginHash* activePlugins = NULL);
+	PluginDialog(Window* window);
 	~PluginDialog();
 
 protected:
-	Window* parentWindow;
-	PluginHash* activePlugins;
+	Window* m_window;
 
 	bool restoreState();
 
@@ -49,7 +39,7 @@ protected slots:
 
 	void cb_acceptDialog();
 
-	void showPluginInfo();
+//	void showPluginInfo();
 };
 
 #endif

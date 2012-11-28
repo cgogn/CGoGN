@@ -1,25 +1,26 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include "types.h"
+#include "view.h"
 #include "QGLViewer/camera.h"
 
 class Window;
-class View;
 
 class Camera : public qglviewer::Camera
 {
 public:
+	static unsigned int cameraCount;
+
 	Camera(const QString& name, Window* window);
-	Camera(const QString& name, Window* window, const qglviewer::Camera& c);
 	~Camera();
 
-	void setName(QString name) { m_name = name; }
-	QString getName() { return m_name; }
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
+	bool isUsed() { return l_views.size() > 0; }
 	bool isShared()	{ return l_views.size() > 1; }
 
 	void draw();
@@ -56,8 +57,6 @@ public:
 //	void viewShowButton(bool b);
 
 protected:
-	static unsigned int cameraCount;
-
 	QString m_name;
 	Window* m_window;
 

@@ -1,16 +1,15 @@
 #ifndef _TYPES_H_
 #define _TYPES_H_
 
-#include <GL/glew.h>
-#include <QGLViewer/qglviewer.h>
-
 #include <QHash>
 #include <QString>
 
+class Window;
 class Plugin;
 class Scene;
 class View;
 class Camera;
+class Context;
 
 class MapHandler;
 

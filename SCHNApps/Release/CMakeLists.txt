@@ -31,20 +31,23 @@ file(
 	${SCHNApps_ROOT_DIR}/src/splitArea.cpp
 	${SCHNApps_ROOT_DIR}/src/system.cpp
 	${SCHNApps_ROOT_DIR}/src/view.cpp
-	${SCHNApps_ROOT_DIR}/src/viewSelector.cpp
 	${SCHNApps_ROOT_DIR}/src/window.cpp
+	${SCHNApps_ROOT_DIR}/src/viewSelector.cpp
+	${SCHNApps_ROOT_DIR}/src/cameraViewDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/pluginDialog.cpp
 )
 
 SET(SCHNApps_H_OBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/scene.h
 	${SCHNApps_ROOT_DIR}/include/view.h
-	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/system.h
 	${SCHNApps_ROOT_DIR}/include/splitArea.h
+	${SCHNApps_ROOT_DIR}/include/viewSelector.h
+	${SCHNApps_ROOT_DIR}/include/cameraViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/pluginDialog.h
+	
 #	${SCHNApps_ROOT_DIR}/include/dialogs/newSceneDialog.h
 #	${SCHNApps_ROOT_DIR}/include/dialogs/sceneSelector.h
-#	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
 #	${SCHNApps_ROOT_DIR}/include/dialogs/cameraOptionDialog.h
 #	${SCHNApps_ROOT_DIR}/include/dialogs/cameraSceneDialog.h
 #	${SCHNApps_ROOT_DIR}/include/dialogs/globalCameraDialog.h
@@ -56,7 +59,9 @@ SET(SCHNApps_H_OBJECT_FILES
 file(
 	GLOB
 	SCHNApps_FORM_FILES
-	${SCHNApps_ROOT_DIR}/forms/*.ui
+	${SCHNApps_ROOT_DIR}/forms/window.ui
+	${SCHNApps_ROOT_DIR}/forms/cameraViewDialog.ui
+	${SCHNApps_ROOT_DIR}/forms/pluginDialog.ui
 )
 
 QT4_WRAP_UI( UI_H_FILES

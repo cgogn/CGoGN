@@ -10,8 +10,8 @@
 
 #include "types.h"
 
-#include "ui_questionSessionDialog.h"
-#include "ui_infoDialog.h"
+//#include "ui_questionSessionDialog.h"
+//#include "ui_infoDialog.h"
 
 class Window;
 class SplitArea;
@@ -19,35 +19,35 @@ class SplitArea;
 namespace System
 {
 
-namespace Dialog
-{
+//namespace Dialog
+//{
+//
+//class QuestionSessionDialog : public QDialog, public Ui::QSDialog
+//{
+//	Q_OBJECT
+//
+//public:
+//	QuestionSessionDialog(QWidget *parent = 0) : QDialog(parent)
+//	{
+//		this->setupUi(this);
+//	}
+//};
 
-class QuestionSessionDialog : public QDialog, public Ui::QSDialog
-{
-	Q_OBJECT
 
-public:
-	QuestionSessionDialog(QWidget *parent = 0) : QDialog(parent)
-	{
-		this->setupUi(this);
-	}
-};
-
-
-class InfoDialog : public QDialog, public Ui::InfoDialog
-{
-	Q_OBJECT
-
-public:
-	InfoDialog(QWidget *parent = 0) : QDialog(parent)
-	{
-		this->setupUi(this);
-	}
-
-	bool setContent(QUrl urlHTMLFile);
-};
-
-} // namespace Dialog
+//class InfoDialog : public QDialog, public Ui::InfoDialog
+//{
+//	Q_OBJECT
+//
+//public:
+//	InfoDialog(QWidget *parent = 0) : QDialog(parent)
+//	{
+//		this->setupUi(this);
+//	}
+//
+//	bool setContent(QUrl urlHTMLFile);
+//};
+//
+//} // namespace Dialog
 
 class Error
 {
@@ -123,25 +123,25 @@ public:
 	static bool movieDialogOpened;
 };
 
-class Info
-{
-public:
-	virtual ~Info() = 0;
+//class Info
+//{
+//public:
+//	virtual ~Info() = 0;
+//
+//	static void showPluginInfo(QString pluginAbsolutePath, QWidget *parent = 0);
+//	static void showPluginInfo(QString locationPath, QString pluginName, QWidget *parent = 0);
+//};
 
-	static void showPluginInfo(QString pluginAbsolutePath, QWidget *parent = 0);
-	static void showPluginInfo(QString locationPath, QString pluginName, QWidget *parent = 0);
-};
-
-class StateHandler
-{
-public:
-	virtual ~StateHandler() = 0;
-
-	static bool saveState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
-	static bool loadState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
-	static void unsaveState();
-	static bool savePluginsInfo(Window *window, PluginHash *pluginHash, QStringList paths);
-};
+//class StateHandler
+//{
+//public:
+//	virtual ~StateHandler() = 0;
+//
+//	static bool saveState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
+//	static bool loadState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
+//	static void unsaveState();
+//	static bool savePluginsInfo(Window *window, PluginHash *pluginHash, QStringList paths);
+//};
 
 typedef enum
 {

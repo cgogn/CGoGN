@@ -8,12 +8,9 @@
 
 class SplitArea;
 
-struct PixElem
+class PixElem
 {
-	View* view;
-	QRect rect;
-	QColor color;
-
+public:
 	PixElem() :
 		view(NULL),
 		color(Qt::gray)
@@ -26,8 +23,8 @@ struct PixElem
 
 	PixElem(const PixElem& pixElem) :
 		view(pixElem.view),
-		rect(pixElem.rect),
-		color(pixElem.color)
+		color(pixElem.color),
+		rect(pixElem.rect)
 	{}
 
 	bool operator== (const PixElem& other) const
@@ -42,8 +39,11 @@ struct PixElem
 		color = other.color;
 		return *this;
 	}
-};
 
+	View* view;
+	QColor color;
+	QRect rect;
+};
 
 class ViewPixMaps : public QList<QList<PixElem> >
 {
@@ -100,14 +100,17 @@ class ViewSelector : public QDialog
 	Q_OBJECT
 
 public:
-	enum SelectorDialogType {MOVE,SELECT};
+	enum SelectorDialogType
+	{
+		MOVE,
+		SELECT
+	};
 
 	ViewSelector(QWidget* parent = NULL, SelectorDialogType type = MOVE);
 	ViewSelector(ViewPixMaps viewPixMap, QWidget* parent = NULL, SelectorDialogType type = MOVE);
-	virtual ~ViewSelector()
-	{}
+	~ViewSelector();
 
-	void setGLVMap(ViewPixMaps viewPixMap);
+	void setGLVMap(const ViewPixMaps& viewPixMap);
 	ViewPixMaps getGLVMap() { return viewPixMap; }
 
 	QPoint getInsertPoint();

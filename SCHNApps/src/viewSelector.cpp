@@ -23,15 +23,15 @@ void ViewPixMaps::fromSplitArea(SplitArea* splitArea)
 {
 	this->clear();
 
-	int nbRow = splitArea->count();
-	int nbColumn;
+	int nbRows = splitArea->count();
+	int nbColumns;
 
-	for (int j = 0; j < nbRow; ++j)
+	for (int j = 0; j < nbRows; ++j)
 	{
 		QSplitter* row = (QSplitter*)(splitArea->widget(j));
-		nbColumn = row->count();
+		nbColumns = row->count();
 		QList<PixElem> l;
-		for(int i = 0; i < nbColumn; ++i)
+		for(int i = 0; i < nbColumns; ++i)
 		{
 			PixElem p((View*)(row->widget(i)));
 			l.push_back(p);
@@ -293,7 +293,7 @@ ViewSelector::ViewSelector(QWidget* parent, SelectorDialogType type) :
 }
 
 ViewSelector::ViewSelector(ViewPixMaps viewPixMap, QWidget* parent, SelectorDialogType type) :
-	QDialog(parent, type==SELECT ? Qt::Widget : Qt::FramelessWindowHint),
+	QDialog(parent, type == SELECT ? Qt::Widget : Qt::FramelessWindowHint),
 	viewPixMap(viewPixMap),
 	mouseX(0),
 	mouseY(0),
@@ -309,7 +309,10 @@ ViewSelector::ViewSelector(ViewPixMaps viewPixMap, QWidget* parent, SelectorDial
 	this->setMouseTracking(true);
 }
 
-void ViewSelector::setGLVMap(ViewPixMaps viewPixMap)
+ViewSelector::~ViewSelector()
+{}
+
+void ViewSelector::setGLVMap(const ViewPixMaps& viewPixMap)
 {
 	this->viewPixMap = viewPixMap;
 }

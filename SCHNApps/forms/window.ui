@@ -55,7 +55,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionManagePlugins"/>
-   <addaction name="actionManageView"/>
+   <addaction name="actionManageViews"/>
    <addaction name="actionManageCameras"/>
    <addaction name="actionManageMaps"/>
   </widget>
@@ -83,7 +83,7 @@
     <string>Manage plugins</string>
    </property>
   </action>
-  <action name="actionManageView">
+  <action name="actionManageViews">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/icons/add_view.png</normaloff>:/icons/icons/add_view.png</iconset>

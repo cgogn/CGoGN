@@ -1,27 +1,8 @@
 #include "camera.h"
 
-#include "window.h"
-#include "view.h"
-
 unsigned int Camera::cameraCount = 0;
 
 Camera::Camera(const QString& name, Window* window) :
-	m_name(name),
-	m_window(window),
-	m_draw(false),
-	m_drawFarPlane(false),
-	m_drawScale(1.0),
-	m_drawPath(false),
-	m_drawPathAxis(false),
-	m_drawPathScale(1.0),
-	m_snapCount(0)
-{
-	++cameraCount;
-	this->setZClippingCoefficient(100);
-}
-
-Camera::Camera(const QString& name, Window* window, const qglviewer::Camera& c) :
-	qglviewer::Camera(c),
 	m_name(name),
 	m_window(window),
 	m_draw(false),

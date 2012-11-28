@@ -76,7 +76,7 @@ public:
 	 * conditions.
 	 * If this methods return 'false', the plugin load will be aborted.
 	 */
-	bool activate();
+	bool enable();
 
 	/**
 	 * The plugin's disabling method

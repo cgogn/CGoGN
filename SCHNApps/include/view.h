@@ -1,29 +1,22 @@
 #ifndef _VIEW_H_
 #define _VIEW_H_
 
-#include <iostream>
+#include <GL/glew.h>
+#include <QGLViewer/qglviewer.h>
 
 #include "types.h"
-#include "viewButtonArea.h"
-
-#include <QKeyEvent>
-#include <QList>
-#include <QWidget>
-#include <QGLContext>
-
 #include "Utils/gl_matrices.h"
 
-class Window;
-class Scene;
-class Camera;
-//class Context;
+//class ViewButton;
 
 class View : public QGLViewer
 {
 	Q_OBJECT
 
 public:
-	View(const QString& name, Window* w, QWidget* parent);
+	static unsigned int viewCount;
+
+	View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget = NULL);
 	~View();
 
 	const QString& getName() { return m_name; }
@@ -36,15 +29,10 @@ public:
 	void setScene(Scene* s) { m_scene = s; }
 
 	Camera* getCurrentCamera() { return m_currentCamera; }
-	void setCurrentCamera(Camera* c)
-	{
-		m_currentCamera = c;
-		updateTextInfo();
-		updateGL();
-	}
+	void setCurrentCamera(Camera* c);
 
-	QGLContext* getContext() { return m_context; }
-	void setContext(QGLContext* c) { m_context = c; }
+	Context* getContext() { return m_context; }
+	void setContext(Context* c) { m_context = c; }
 
 	virtual void initGL();
 	virtual void updateGL();
@@ -90,11 +78,9 @@ public:
 //	void setShowButtons(bool b) { b_showButtons = b; }
 
 protected:
-	static unsigned int viewCount;
-
 	QString m_name;
 	Window* m_window;
-	QGLContext* m_context;
+	Context* m_context;
 
 	Scene* m_scene;
 	Camera* m_currentCamera;

@@ -1,31 +1,29 @@
 #ifndef _CAMERAVIEWDIALOG_H_
 #define _CAMERAVIEWDIALOG_H_
 
-
 #include "ui_cameraViewDialog.h"
 
-class View;
-class Camera;
+class Window;
 
-class CameraViewDialog : public QDialog, Ui::CVDialog{
+class CameraViewDialog : public QDialog, Ui::CameraViewDialog
+{
 	Q_OBJECT
+
 public:
-	CameraViewDialog(View* view, QWidget* parent=0);
+	CameraViewDialog(Window* window);
 	~CameraViewDialog();
 
-protected:
-	View* view;
-
-protected slots:
-	void addCamera();
-	void removeCamera();
-	void changeCurrentCamera(QListWidgetItem * current, QListWidgetItem * previous);
-	void cameraNameChange(QListWidgetItem * item);
-	void settingsCamera();
-
 private:
-	bool autoText;
-};
+	void updateCameraList();
+	void updateViewList();
 
+	Window* m_window;
+
+public slots:
+	void cb_addCamera();
+	void cb_removeCamera();
+	void cb_selectedViewChanged(QListWidgetItem* current, QListWidgetItem* previous);
+	void cb_selectedCameraChanged(QListWidgetItem* current, QListWidgetItem* previous);
+};
 
 #endif

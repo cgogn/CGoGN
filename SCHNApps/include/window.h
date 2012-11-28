@@ -3,18 +3,10 @@
 
 #include "ui_window.h"
 
+#include "system.h"
 #include <QVBoxLayout>
 
-#include "types.h"
-#include "system.h"
-#include "splitArea.h"
-
-class Plugin;
-class Scene;
-class View;
-class Camera;
-//class Context;
-class MapHandler;
+class SplitArea;
 
 class Window : public QMainWindow, Ui::Window
 {
@@ -35,7 +27,7 @@ public:
 	 */
 	~Window();
 
-	QGLContext* getContext() { return m_context; }
+	Context* getContext() { return m_context; }
 
 	/*********************************************************
 	 * MANAGE DOCK
@@ -167,7 +159,7 @@ public:
 	 * \see getPlugins()
 	 * \see Plugin::enable()
 	 */
-	Plugin* loadPlugin(const QString& pluginPath);
+	Plugin* loadPlugin(QString pluginFilePath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -211,17 +203,19 @@ public:
 //	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
 
 	Plugin* getPlugin(const QString& name);
-
-	QList<Plugin*> getPlugins() { return h_plugins.values(); }
+	QList<Plugin*> getPluginsList() { return h_plugins.values(); }
+	const PluginHash& getPluginsHash() { return h_plugins; }
 
 	/*********************************************************
 	 * MANAGE SCENES
 	 *********************************************************/
 
 	Scene* addScene(const QString& name);
+	Scene* addScene();
 	void removeScene(const QString& name);
 	Scene* getScene(const QString& name);
-	QList<Scene*> getScenes() { return h_scenes.values(); }
+	QList<Scene*> getScenesList() { return h_scenes.values(); }
+	const SceneHash& getScenesHash() { return h_scenes; }
 
 //	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
 //	bool addNewSceneView(Scene *scene, View *view);
@@ -239,18 +233,22 @@ public:
 	 *********************************************************/
 
 	View* addView(const QString& name);
+	View* addView();
 	void removeView(const QString& name);
 	View* getView(const QString& name);
-	QList<View*> getView() { return h_views.values(); }
+	QList<View*> getViewsList() { return h_views.values(); }
+	const ViewHash& getViewsHash() { return h_views; }
 
 	/*********************************************************
 	 * MANAGE CAMERAS
 	 *********************************************************/
 
 	Camera* addCamera(const QString& name);
+	Camera* addCamera();
 	void removeCamera(const QString& name);
 	Camera* getCamera(const QString& name);
-	QList<Camera*> getCameras() { return h_cameras.values(); }
+	QList<Camera*> getCamerasList() { return h_cameras.values(); }
+	const CameraHash& getCamerasHash() { return h_cameras; }
 
 	/*********************************************************
 	 * MANAGE MAPS
@@ -259,7 +257,8 @@ public:
 	bool addMap(const QString& name, MapHandler* map);
 	void removeMap(const QString& name);
 	MapHandler* getMap(const QString& name);
-	QList<MapHandler*> getMaps() { return h_maps.values(); }
+	QList<MapHandler*> getMapsList() { return h_maps.values(); }
+	const MapHash& getMapsHash() { return h_maps; }
 
 //	template<typename T>
 //	T* getReferencedMap(QString map_name){
@@ -279,7 +278,9 @@ protected:
 	QVBoxLayout* m_verticalLayout;
 	SplitArea* m_splitArea;
 
-	QGLContext* m_context;
+	View* m_firstView;
+
+	Context* m_context;
 
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
@@ -331,11 +332,11 @@ public slots:
 	void cb_managePlugins();
 
 	/**
-	 * \fn void cb_manageScenes()
-	 * \brief method called when the "Scenes" action is triggered.
+	 * \fn void cb_manageViews()
+	 * \brief method called when the "Views" action is triggered.
 	 * Show the scenes management dialog:
 	 */
-	void cb_manageScenes();
+	void cb_manageViews();
 
 	/**
 	 * \fn void cb_manageCameras()

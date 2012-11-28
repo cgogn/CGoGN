@@ -1,28 +1,19 @@
 #ifndef _SCENE_H_
 #define _SCENE_H_
 
-#include <QList>
-#include <QString>
-#include <QHash>
-
-#include <QKeyEvent>
-#include <QMouseEvent>
-#include <QWheelEvent>
-
 #include "types.h"
 
-class Window;
-class Plugin;
-class View;
-class Camera;
-//class Context;
-class ViewButton;
+class QKeyEvent;
+class QMouseEvent;
+class QWheelEvent;
 
 class Scene : public QObject
 {
 	Q_OBJECT
 
 public:
+	static unsigned int sceneCount;
+
 	Scene(const QString& name, Window* window);
 	~Scene();
 
@@ -32,8 +23,8 @@ public:
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	QGLContext* getContext() { return m_context; }
-	void setContext(QGLContext* c) { m_context = c; }
+	Context* getContext() { return m_context; }
+	void setContext(Context* c) { m_context = c; }
 
 	void initGL();
 	void updateGL();
@@ -76,11 +67,9 @@ public:
 	void firstViewFitSphere(float x, float y, float z, float radius);
 
 protected:
-	static unsigned int sceneCount;
-
 	QString m_name;
 	Window* m_window;
-	QGLContext* m_context;
+	Context* m_context;
 
 	QList<View*> l_views;
 	QList<Plugin*> l_plugins;
