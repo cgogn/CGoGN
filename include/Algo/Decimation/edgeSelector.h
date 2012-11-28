@@ -268,6 +268,60 @@ public:
 	void updateWithoutCollapse() { }
 } ;
 
+
+template <typename PFP>
+class EdgeSelector_NormalArea : public EdgeSelector<PFP>
+{
+public:
+	typedef typename PFP::MAP MAP ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+private:
+	typedef	struct
+	{
+		typename std::multimap<float,Dart>::iterator it ;
+		bool valid ;
+		static std::string CGoGNnameOfType() { return "NormalAreaEdgeInfo" ; }
+	} NormalAreaEdgeInfo ;
+	typedef NoMathIOAttribute<NormalAreaEdgeInfo> EdgeInfo ;
+
+	EdgeAttribute<EdgeInfo> edgeInfo ;
+	EdgeAttribute<Geom::Matrix<3,3,REAL> > edgeMatrix ;
+
+	std::multimap<float,Dart> edges ;
+	typename std::multimap<float,Dart>::iterator cur ;
+
+	Approximator<PFP, typename PFP::VEC3, EDGE>* m_positionApproximator ;
+
+	void initEdgeInfo(Dart d) ;
+	void updateEdgeInfo(Dart d) ;
+	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
+//	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
+
+public:
+	EdgeSelector_NormalArea(MAP& m, VertexAttribute<typename PFP::VEC3>& pos, std::vector<ApproximatorGen<PFP>*>& approx, const FunctorSelect& select) :
+		EdgeSelector<PFP>(m, pos, approx, select),
+		m_positionApproximator(NULL)
+	{
+		edgeInfo = m.template addAttribute<EdgeInfo, EDGE>("edgeInfo") ;
+		edgeMatrix = m.template addAttribute<Geom::Matrix<3,3,REAL>, EDGE>("NormalAreaMatrix") ;
+	}
+	~EdgeSelector_NormalArea()
+	{
+		this->m_map.removeAttribute(edgeMatrix) ;
+		this->m_map.removeAttribute(edgeInfo) ;
+	}
+	SelectorType getType() { return S_NormalArea ; }
+	bool init() ;
+	bool nextEdge(Dart& d) ;
+	void updateBeforeCollapse(Dart d) ;
+	void updateAfterCollapse(Dart d2, Dart dd2) ;
+
+	void updateWithoutCollapse() { }
+} ;
+
+
 template <typename PFP>
 class EdgeSelector_Curvature : public EdgeSelector<PFP>
 {
