@@ -178,6 +178,9 @@ void decimate(
 		case S_hLightfield :
 			selector = new HalfEdgeSelector_Lightfield<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_hLightfieldExp :
+			selector = new HalfEdgeSelector_LightfieldExp<PFP>(map, position, approximators, selected) ;
+			break ;
 	}
 
 	for(typename std::vector<ApproximatorGen<PFP>*>::iterator it = approximators.begin(); it != approximators.end(); ++it)
