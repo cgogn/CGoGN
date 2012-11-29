@@ -43,6 +43,7 @@ enum SelectorType
 	S_QEMml,
 	S_MinDetail,
 	S_Curvature,
+	S_NormalArea,
 	S_ColorNaive,
 	S_QEMextColor,
 	S_Lightfield,

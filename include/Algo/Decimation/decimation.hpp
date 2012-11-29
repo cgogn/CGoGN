@@ -157,6 +157,9 @@ void decimate(
 		case S_Curvature :
 			selector = new EdgeSelector_Curvature<PFP>(map, position, approximators, selected) ;
 			break ;
+		case S_NormalArea :
+			selector = new EdgeSelector_NormalArea<PFP>(map, position, approximators, selected) ;
+			break ;
 		case S_MinDetail :
 			selector = new EdgeSelector_MinDetail<PFP>(map, position, approximators, selected) ;
 			break ;
