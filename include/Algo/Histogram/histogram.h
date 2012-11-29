@@ -33,7 +33,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Geometry/vector_gen.h"
 #include "Utils/colorMaps.h"
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 
 
 namespace CGoGN

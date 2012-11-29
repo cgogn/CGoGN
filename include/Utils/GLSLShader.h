@@ -31,8 +31,9 @@
 
 #include "Utils/gl_def.h"
 #include "Utils/os_spec.h"
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/gl_matrices.h"
+#include "Utils/cgognStream.h"
 
 #include "glm/glm.hpp"
 #include <GL/glew.h>

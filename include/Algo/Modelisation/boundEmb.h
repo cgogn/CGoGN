@@ -1,7 +1,7 @@
 /*******************************************************************************
 * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
 * version 0.1                                                                  *
-* Copyright (C) 2009, IGG Team, LSIIT, University of Strasbourg                *
+* Copyright (C) 2009-2012, IGG Team, LSIIT, University of Strasbourg           *
 *                                                                              *
 * This library is free software; you can redistribute it and/or modify it      *
 * under the terms of the GNU Lesser General Public License as published by the *
@@ -17,88 +17,41 @@
 * along with this library; if not, write to the Free Software Foundation,      *
 * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
 *                                                                              *
-* Web site: http://cgogn.unistra.fr                                            *
+* Web site: http://cgogn.unistra.fr/                                           *
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#ifndef _BOUND_EMBD_H
+#define _BOUND_EMBD_H
 
-#include <iostream>
-
-#include "Utils/Qt/qtSimple.h"
-#include "ui_mcmesh.h"
-#include "Utils/Qt/qtui.h"
-
-#include "Topology/generic/parameters.h"
-#include "Topology/map/map2.h"
-#include "Topology/map/embeddedMap2.h"
-
-#include "Geometry/vector_gen.h"
-#include "Geometry/matrix.h"
-
-#include "Algo/Render/GL2/mapRender.h"
-#include "Utils/Shaders/shaderFlat.h"
-#include "Utils/Shaders/shaderSimpleColor.h"
-#include "Utils/vbo.h"
-#include "Algo/Geometry/boundingbox.h"
-
-#include "Algo/MC/marchingcube.h"
-
-
-using namespace CGoGN ;
-
-struct PFP: public PFP_STANDARD
+namespace CGoGN
 {
-	// definition of the map
-	typedef EmbeddedMap2 MAP ;
-};
 
-typedef PFP::MAP MAP ;
-typedef PFP::VEC3 VEC3 ;
-
-typedef unsigned char DATATYPE;
-
-class MCMesh : public Utils::QT::SimpleQT
+namespace Algo
 {
-	Q_OBJECT
 
-public:
-	MAP myMap ;
-	SelectorTrue allDarts ;
+namespace Modelisation
+{
 
-    Utils::QT::uiDockInterface dock ;
+template <typename PFP>
+void sewFaceEmb(typename PFP::MAP& map, Dart d, Dart e)
+{
+	map.sewFaces(d, e, false) ;
+	if (map.template isOrbitEmbedded<EDGE>())
+		map.template initOrbitEmbeddingNewCell<EDGE>(d) ;
+}
 
-	float shininess ;
+template <typename PFP>
+Dart newFaceEmb(typename PFP::MAP& map, unsigned int n)
+{
+	Dart d = map.newFace(n,false);
+	if (map.template isOrbitEmbedded<FACE>())
+		map.template initOrbitEmbeddingNewCell<FACE>(d) ;
+	return d;
+}
 
-	Geom::BoundingBox<PFP::VEC3> bb ;
+}
+}
+}
 
-	bool m_drawEdges ;
-	bool m_drawFaces ;
-
-	VertexAttribute<VEC3> position ;
-
-	Algo::Render::GL2::MapRender* m_render ;
-
-	Utils::VBO* m_positionVBO ;
-	Utils::ShaderFlat* m_flatShader ;
-	Utils::ShaderSimpleColor* m_simpleColorShader ;
-
-	DATATYPE valLabel;
-	Algo::MC::Image<DATATYPE>* myImg;
-
-	MCMesh() ;
-
-	void initGUI();
-	void updateRender();
-	void MC();
-
-	void cb_initGL() ;
-	void cb_redraw() ;
-	void cb_Open() ;
-	
-	void fromFile(char* fname);
-	void sphere();
-
-public slots:
-	void slot_drawEdges(bool b) ;
-	void slot_drawFaces(bool b) ;
-};
+#endif

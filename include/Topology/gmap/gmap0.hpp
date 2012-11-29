@@ -50,7 +50,8 @@ inline unsigned int GMap0::dimension() const
 inline void GMap0::clear(bool removeAttrib)
 {
 	AttribMap::clear(removeAttrib) ;
-	init() ;
+	if (removeAttrib)
+		init() ;
 }
 
 inline void GMap0::update_topo_shortcuts()
