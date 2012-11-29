@@ -438,6 +438,14 @@ public:
 	template <unsigned int ORBIT>
 	void initCell(unsigned int i) ;
 
+	/**
+	 * Traverse the map and embed all orbits of the given dimension with a new cell
+	 * @param realloc if true -> all the orbits are embedded on new cells, if false -> already embedded orbits are not impacted
+	 */
+	template <unsigned int ORBIT>
+	void initAllOrbitsEmbedding(bool realloc = false) ;
+
+
 	/****************************************
 	 *     QUICK TRAVERSAL MANAGEMENT       *
 	 ****************************************/

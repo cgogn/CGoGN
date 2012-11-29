@@ -22,7 +22,7 @@
 *                                                                              *
 *******************************************************************************/
 
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/GLSLShader.h"
 #include <stdio.h>
 #include <string.h>

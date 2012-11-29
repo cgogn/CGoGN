@@ -27,7 +27,7 @@
 #include "Topology/generic/cellmarker.h"
 #include "Topology/generic/traversorCell.h"
 
-#include "Utils/vbo.h"
+//#include "Utils/vbo.h"
 
 #include "Geometry/intersection.h"
 #include "Algo/Geometry/normal.h"
