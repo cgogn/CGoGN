@@ -397,12 +397,12 @@ inline void GenericMap::copyCell(Dart d, Dart e)
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
 	unsigned int dE = getEmbedding<ORBIT>(d) ;
 	unsigned int eE = getEmbedding<ORBIT>(e) ;
-//	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
-//	{
-//		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
-//			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+	if(eE != EMBNULL)	// if the source is NULL, nothing to copy
+	{
+		if(dE == EMBNULL)	// if the dest is NULL, create a new cell
+			dE = setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
 		m_attribs[ORBIT].copyLine(dE, eE) ;	// copy the data
-//	}
+	}
 }
 
 template <unsigned int ORBIT>
@@ -538,18 +538,9 @@ void GenericMap::addEmbedding()
 	AttributeMultiVector<unsigned int>* amv = dartCont.addAttribute<unsigned int>(oss.str()) ;
 	m_embeddings[ORBIT] = amv ;
 
-	FunctorInitEmb<GenericMap, ORBIT> fsetemb(*this);
-	DartMarker dm(*this);
-	for(Dart d = this->begin(); d != this->end(); this->next(d))
-	{
-		if(!dm.isMarked(d))
-		{
-			dm.markOrbit<ORBIT>(d);
-			unsigned int em = newCell<ORBIT>();
-			fsetemb.changeEmb(em);
-			foreach_dart_of_orbit<ORBIT>(d, fsetemb);
-		}
-	}
+	// set new embedding to EMBNULL for all the darts of the map
+	for(unsigned int i = dartCont.begin(); i < dartCont.end(); dartCont.next(i))
+		(*amv)[i] = EMBNULL ;
 }
 
 /****************************************
