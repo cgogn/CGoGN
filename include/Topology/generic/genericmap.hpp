@@ -419,6 +419,23 @@ inline void GenericMap::initCell(unsigned int i)
 	m_attribs[ORBIT].initLine(i) ;
 }
 
+
+template <unsigned int ORBIT>
+void GenericMap::initAllOrbitsEmbedding(bool realloc)
+{
+	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded") ;
+	DartMarker mark(*this) ;
+	for(Dart d = begin(); d != end(); next(d))
+	{
+		if(!mark.isMarked(d))
+		{
+			mark.markOrbit<ORBIT>(d) ;
+			if(realloc || getEmbedding<ORBIT>(d) == EMBNULL)
+				setOrbitEmbeddingOnNewCell<ORBIT>(d) ;
+		}
+	}
+}
+
 /****************************************
  *     QUICK TRAVERSAL MANAGEMENT       *
  ****************************************/
