@@ -183,28 +183,28 @@ void EdgeSelector_Length<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 									// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 
@@ -386,28 +386,28 @@ void EdgeSelector_QEM<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 									// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 
 	tmpQ.zero() ;			// compute quadric for the new
@@ -605,28 +605,28 @@ void EdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 									// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 
@@ -826,28 +826,42 @@ void EdgeSelector_NormalArea<PFP>::updateBeforeCollapse(Dart d)
 	MAP& m = this->m_map ;
 	assert(!m.isBoundaryEdge(d));
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		{ edges.erase(edgeE.it) ; edgeE.valid = false;}
+	EdgeInfo* edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		{ edges.erase(edgeE.it) ; edgeE.valid = false;}
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		{ edges.erase(edgeE.it) ; edgeE.valid = false;}
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
+
 									// from the multimap
 	Dart dd = m.phi2(d) ;
-	edgeE = edgeInfo[m.phi1(dd)] ;
-	if(edgeE.valid)
-		{ edges.erase(edgeE.it) ; edgeE.valid = false;}
+	edgeE = &(edgeInfo[m.phi1(dd)]) ;
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
 
-
-	edgeE = edgeInfo[m.phi_1(dd)] ;
-	if(edgeE.valid)
-		{ edges.erase(edgeE.it) ; edgeE.valid = false;}
-
+	edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+	if(edgeE->valid)
+	{
+		edges.erase(edgeE->it) ;
+		edgeE->valid = false;
+	}
 }
 
 
@@ -907,6 +921,7 @@ void EdgeSelector_NormalArea<PFP>::updateEdgeInfo(Dart d)
 
 	if(einfo.valid)
 		edges.erase(einfo.it) ;		// remove the edge from the multimap
+
 	if(m.edgeCanCollapse(d))
 		computeEdgeInfo(d, einfo) ;
 	else
@@ -1015,28 +1030,28 @@ void EdgeSelector_Curvature<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 									// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 
@@ -1236,28 +1251,28 @@ void EdgeSelector_MinDetail<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)					// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)					// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the concerned edges
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the concerned edges
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 									// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 
@@ -1468,28 +1483,28 @@ void EdgeSelector_ColorNaive<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the edges that will disappear
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the edges that will disappear
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 
@@ -1748,28 +1763,28 @@ void EdgeSelector_QEMextColor<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the edges that will disappear
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the edges that will disappear
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 
@@ -2083,28 +2098,28 @@ void EdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	EdgeInfo& edgeE = edgeInfo[d] ;
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	EdgeInfo *edgeE = &(edgeInfo[d]) ;
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		edges.erase(edgeE->it) ;
 
-	edgeE = edgeInfo[m.phi_1(d)] ;	// the edges that will disappear
-	if(edgeE.valid)
-		edges.erase(edgeE.it) ;
+	edgeE = &(edgeInfo[m.phi_1(d)]) ;	// the edges that will disappear
+	if(edgeE->valid)
+		edges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	if(dd != d)
 	{
-		edgeE = edgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 
-		edgeE = edgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			edges.erase(edgeE.it) ;
+		edgeE = &(edgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			edges.erase(edgeE->it) ;
 	}
 }
 

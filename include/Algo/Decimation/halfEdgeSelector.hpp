@@ -113,33 +113,33 @@ void HalfEdgeSelector_QEMml<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	HalfEdgeInfo& edgeE = halfEdgeInfo[d] ;
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	HalfEdgeInfo* edgeE = &(halfEdgeInfo[d]) ;
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi_1(d)] ;	// the halfedges that will disappear
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi_1(d)]) ;	// the halfedges that will disappear
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	assert(dd != d) ;
 	if(dd != d)
 	{
-		edgeE = halfEdgeInfo[dd] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[dd]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 	}
 }
 
@@ -389,33 +389,33 @@ void HalfEdgeSelector_QEMextColor<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	HalfEdgeInfo& edgeE = halfEdgeInfo[d] ;
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	HalfEdgeInfo* edgeE = &(halfEdgeInfo[d]) ;
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi_1(d)] ;	// the halfedges that will disappear
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi_1(d)]) ;	// the halfedges that will disappear
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	assert(dd != d) ;
 	if(dd != d)
 	{
-		edgeE = halfEdgeInfo[dd] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[dd]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 	}
 }
 
@@ -744,33 +744,33 @@ void HalfEdgeSelector_Lightfield<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	HalfEdgeInfo& edgeE = halfEdgeInfo[d] ;
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	HalfEdgeInfo* edgeE = &(halfEdgeInfo[d]) ;
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi_1(d)] ;	// the halfedges that will disappear
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi_1(d)]) ;	// the halfedges that will disappear
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	assert(dd != d) ;
 	if(dd != d)
 	{
-		edgeE = halfEdgeInfo[dd] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[dd]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 	}
 }
 
@@ -1108,33 +1108,33 @@ void HalfEdgeSelector_LightfieldExp<PFP>::updateBeforeCollapse(Dart d)
 {
 	MAP& m = this->m_map ;
 
-	HalfEdgeInfo& edgeE = halfEdgeInfo[d] ;
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	HalfEdgeInfo* edgeE = &(halfEdgeInfo[d]) ;
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi1(d)] ;
-	if(edgeE.valid)						// remove all
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi1(d)]) ;
+	if(edgeE->valid)						// remove all
+		halfEdges.erase(edgeE->it) ;
 
-	edgeE = halfEdgeInfo[m.phi_1(d)] ;	// the halfedges that will disappear
-	if(edgeE.valid)
-		halfEdges.erase(edgeE.it) ;
+	edgeE = &(halfEdgeInfo[m.phi_1(d)]) ;	// the halfedges that will disappear
+	if(edgeE->valid)
+		halfEdges.erase(edgeE->it) ;
 										// from the multimap
 	Dart dd = m.phi2(d) ;
 	assert(dd != d) ;
 	if(dd != d)
 	{
-		edgeE = halfEdgeInfo[dd] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[dd]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 
-		edgeE = halfEdgeInfo[m.phi_1(dd)] ;
-		if(edgeE.valid)
-			halfEdges.erase(edgeE.it) ;
+		edgeE = &(halfEdgeInfo[m.phi_1(dd)]) ;
+		if(edgeE->valid)
+			halfEdges.erase(edgeE->it) ;
 	}
 }
 
