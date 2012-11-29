@@ -235,14 +235,10 @@ void Map3MR<PFP>::addNewLevelTetraOcta()
 	{
 		Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
 
-		Dart centralDart = NIL;
-
 		for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
 		{
 			m_map.setCurrentLevel(m_map.getMaxLevel()) ;
 			Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
-
-			centralDart = x;
 
 			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
 			{
@@ -271,9 +267,6 @@ void Map3MR<PFP>::addNewLevelTetraOcta()
 			}
 			m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
 		}
-
-		if(centralDart != NIL)
-			m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
 	}
 
 	m_map.popLevel() ;
@@ -366,63 +359,63 @@ void Map3MR<PFP>::addNewLevelHexa()
 
 			splitSurfaceInVolume(v);
 
-//			Dart dd = m_map.phi2(m_map.phi1(ditWV));
-//			Dart next = m_map.phi1(m_map.phi1(dd)) ;
-//			m_map.PFP::MAP::ParentMap::splitFace(dd, next) ;
-//
-//			Dart ne = m_map.phi2(m_map.phi_1(dd));
-//			m_map.PFP::MAP::ParentMap::cutEdge(ne) ;
-//			centralDart = m_map.phi1(ne);
-//
-//			dd = m_map.phi1(m_map.phi1(next)) ;
-//			while(dd != ne)
-//			{
-//				Dart tmp = m_map.phi1(ne) ;
-//				m_map.PFP::MAP::ParentMap::splitFace(tmp, dd) ;
-//				dd = m_map.phi1(m_map.phi1(dd)) ;
-//			}
+			Dart dd = m_map.phi2(m_map.phi1(ditWV));
+			Dart next = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.PFP::MAP::ParentMap::splitFace(dd, next) ;
+
+			Dart ne = m_map.phi2(m_map.phi_1(dd));
+			m_map.PFP::MAP::ParentMap::cutEdge(ne) ;
+			centralDart = m_map.phi1(ne);
+
+			dd = m_map.phi1(m_map.phi1(next)) ;
+			while(dd != ne)
+			{
+				Dart tmp = m_map.phi1(ne) ;
+				m_map.PFP::MAP::ParentMap::splitFace(tmp, dd) ;
+				dd = m_map.phi1(m_map.phi1(dd)) ;
+			}
 
 			m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ; //Utile ?
 		}
 
-//		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-//		//4 couture des relations precedemment sauvegarde
-//		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
-//		{
-//			Dart f1 = m_map.phi2((*it).first);
-//			Dart f2 = m_map.phi2((*it).second);
-//
-//			//if(isBoundaryFace(f1) && isBoundaryFace(f2))
-//			if(m_map.phi3(f1) == f1 && m_map.phi3(f2) == f2)
-//				m_map.sewVolumes(f1, f2, false);
-//		}
-//		m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
+		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+		//4 couture des relations precedemment sauvegarde
+		for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+		{
+			Dart f1 = m_map.phi2((*it).first);
+			Dart f2 = m_map.phi2((*it).second);
+
+			//if(isBoundaryFace(f1) && isBoundaryFace(f2))
+			if(m_map.phi3(f1) == f1 && m_map.phi3(f2) == f2)
+				m_map.sewVolumes(f1, f2, false);
+		}
+		m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
 
 		m_map.setCurrentLevel(m_map.getMaxLevel() - 1) ;
 	}
-//
-//	//A optimiser
-//	m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
-//	TraversorE<typename PFP::MAP> travE2(m_map);
-//	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
-//	{
-//		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-//		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi1(d), m_map.template getEmbedding<VERTEX>(m_map.phi1(d)));
-//		m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
-//	}
-//	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-//
-//	m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
-//	TraversorF<typename PFP::MAP> travF2(m_map) ;
-//	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
-//	{
-//		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-//		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d)), m_map.template getEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d))));
-//		m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
-//	}
-//	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
-//
-//	m_map.popLevel() ;
+
+	//A optimiser
+	m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
+	TraversorE<typename PFP::MAP> travE2(m_map);
+	for (Dart d = travE2.begin(); d != travE2.end(); d = travE2.next())
+	{
+		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi1(d), m_map.template getEmbedding<VERTEX>(m_map.phi1(d)));
+		m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
+	}
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+
+	m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
+	TraversorF<typename PFP::MAP> travF2(m_map) ;
+	for (Dart d = travF2.begin(); d != travF2.end(); d = travF2.next())
+	{
+		m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+		m_map.template setOrbitEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d)), m_map.template getEmbedding<VERTEX>(m_map.phi2(m_map.phi1(d))));
+		m_map.setCurrentLevel(m_map.getMaxLevel()-1) ;
+	}
+	m_map.setCurrentLevel(m_map.getMaxLevel()) ;
+
+	m_map.popLevel() ;
 }
 
 //void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)

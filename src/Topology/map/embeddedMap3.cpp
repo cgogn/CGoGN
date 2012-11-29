@@ -78,10 +78,10 @@ Dart EmbeddedMap3::cutEdge(Dart d)
 {
 	Dart nd = Map3::cutEdge(d);
 
-	if(isOrbitEmbedded<VERTEX>())
-	{
-		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
-	}
+//	if(isOrbitEmbedded<VERTEX>())
+//	{
+//		initOrbitEmbeddingNewCell<VERTEX>(nd) ;
+//	}
 
 	if(isOrbitEmbedded<EDGE>())
 	{
@@ -236,10 +236,10 @@ void EmbeddedMap3::splitFace(Dart d, Dart e)
 		setDartEmbedding<VERTEX>(phi_1(dd), vEmb2);
 	}
 
-	if(isOrbitEmbedded<EDGE>())
-	{
-		initOrbitEmbeddingNewCell<EDGE>(phi_1(d)) ;
-	}
+//	if(isOrbitEmbedded<EDGE>())
+//	{
+//		initOrbitEmbeddingNewCell<EDGE>(phi_1(d)) ;
+//	}
 
 	if(isOrbitEmbedded<FACE2>())
 	{
@@ -428,7 +428,6 @@ bool EmbeddedMap3::mergeVolumes(Dart d)
 	{
 		if (isOrbitEmbedded<VOLUME>())
 		{
-			std::cout << "plop" << std::endl;
 			setOrbitEmbedding<VOLUME>(d2, getEmbedding<VOLUME>(d2)) ;
 		}
 		return true;

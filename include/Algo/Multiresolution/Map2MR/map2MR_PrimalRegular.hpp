@@ -143,7 +143,7 @@ void Map2MR<PFP>::addNewLevel(bool triQuad)
 }
 
 template <typename PFP>
-void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
+void Map2MR<PFP>::addNewLevelSqrt3()
 {
 	m_map.pushLevel() ;
 
@@ -205,7 +205,7 @@ void Map2MR<PFP>::addNewLevelSqrt3(bool embedNewVertices)
 }
 
 template <typename PFP>
-void Map2MR<PFP>::addNewLevelSqrt2(bool embedNewVertices)
+void Map2MR<PFP>::addNewLevelSqrt2()
 {
 	m_map.pushLevel() ;
 
