@@ -132,8 +132,8 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
-//		if (a == EMBNULL)
-//			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
+		if (a == EMBNULL)
+			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
 		m_markVector->operator[](a).setMark(m_mark) ;
 	}
 
@@ -146,8 +146,8 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
-//		if (a == EMBNULL)
-//			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
+		if (a == EMBNULL)
+			a = m_map.setOrbitEmbeddingOnNewCell<CELL>(d) ;
 		m_markVector->operator[](a).unsetMark(m_mark) ;
 	}
 
@@ -160,8 +160,8 @@ public:
 		assert(m_markVector != NULL);
 
 		unsigned int a = m_map.getEmbedding<CELL>(d) ;
-//		if (a == EMBNULL)
-//			return false ;
+		if (a == EMBNULL)
+			return false ;
 		return m_markVector->operator[](a).testMark(m_mark) ;
 	}
 
