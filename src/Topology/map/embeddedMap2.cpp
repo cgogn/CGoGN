@@ -310,6 +310,63 @@ void EmbeddedMap2::swapEdges(Dart d, Dart e)
 		setOrbitEmbeddingOnNewCell<VOLUME>(d);
 }
 
+void EmbeddedMap2::insertEdgeInVertex(Dart d, Dart e)
+{
+	Map2::insertEdgeInVertex(d, e);
+
+	if (isOrbitEmbedded<VERTEX>())
+	{
+		copyDartEmbedding<VERTEX>(e, d) ;
+	}
+
+	if (isOrbitEmbedded<FACE>())
+	{
+		if(!sameFace(d,e))
+		{
+//			embedNewCell<FACE>(e);
+//			copyCell<FACE>(e, d) ;
+			setOrbitEmbedding<FACE>(e, getEmbedding<FACE>(d)) ;
+		}
+		else
+		{
+//			embedOrbit<FACE>(d, getEmbedding<FACE>(d)) ;
+			setOrbitEmbedding<FACE>(d, getEmbedding<FACE>(d)) ;
+		}
+	}
+}
+
+bool EmbeddedMap2::removeEdgeFromVertex(Dart d)
+{
+	Dart dPrev = alpha_1(d);
+
+	if (dPrev == d) return false ;
+
+	bool b = Map2::removeEdgeFromVertex(d);
+
+	if (isOrbitEmbedded<VERTEX>())
+	{
+//		embedNewCell<VERTEX>(d);
+//		copyCell<VERTEX>(d, dPrev);
+		initDartEmbedding<VERTEX>(d, getEmbedding<VERTEX>(dPrev)) ;
+	}
+
+	if (isOrbitEmbedded<FACE>())
+	{
+		if(!sameFace(d, dPrev))
+		{
+//			embedNewCell<FACE>(d);
+//			copyCell<FACE>(d, dPrev) ;
+			initDartEmbedding<FACE>(d, getEmbedding<FACE>(dPrev)) ;
+		}
+		else
+		{
+//			embedOrbit<FACE>(d, getEmbedding<FACE>(d)) ;
+			initDartEmbedding<FACE>(d, getEmbedding<FACE>(d)) ;
+		}
+	}
+	return b ;
+}
+
 void EmbeddedMap2::sewFaces(Dart d, Dart e, bool withBoundary)
 {
 	if (!withBoundary)
