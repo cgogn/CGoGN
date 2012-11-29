@@ -491,7 +491,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 
 			//if the valence of one of the vertex is equal to one
 			//cut the edge to insert the quadrangular face
-			if (map.phi2_1(d1) == d1)
+			if(map.vertexDegree(d1)==2)
 			{
 				map.cutEdge(d2) ;
 				brokenL.mark(map.phi1(d2)) ;
@@ -502,7 +502,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 				edgePlanes[map.phi_1(d1)] = Geom::Plane3D<typename PFP::REAL>(v, p1) ;
 			}
 
-			if (map.phi2_1(d2) == d2)
+			if(map.vertexDegree(d2)==2)
 			{
 				map.cutEdge(d1) ;
 				brokenL.mark(map.phi1(d1)) ;
@@ -533,15 +533,21 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	{
 		if (brokenL.isMarked(d))
 		{
+			VEC3 pos;
+
 			Geom::Plane3D<typename PFP::REAL> pl;
-			VEC3 pos = position[d] ;
+			pos = position[d] ;
 
 			pl = edgePlanes[d] ;
 			pl.project(pos) ;
-			pl = edgePlanes[map.phi_1(d)] ;
-			pl.project(pos) ;
+//			pl = edgePlanes[map.phi_1(d)] ;
+//			pl.project(pos) ;
 
 			position[d] = pos ;
+
+			pos = position[map.phi1(d)] ;
+			pl.project(pos) ;
+			position[map.phi1(d)] = pos ;
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
