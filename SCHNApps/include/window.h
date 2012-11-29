@@ -7,6 +7,8 @@
 #include <QVBoxLayout>
 
 class SplitArea;
+class PluginDialog;
+class CameraDialog;
 
 class Window : public QMainWindow, Ui::Window
 {
@@ -26,8 +28,6 @@ public:
 	 * \brief the class destructor
 	 */
 	~Window();
-
-	Context* getContext() { return m_context; }
 
 	/*********************************************************
 	 * MANAGE DOCK
@@ -207,28 +207,6 @@ public:
 	const PluginHash& getPluginsHash() { return h_plugins; }
 
 	/*********************************************************
-	 * MANAGE SCENES
-	 *********************************************************/
-
-	Scene* addScene(const QString& name);
-	Scene* addScene();
-	void removeScene(const QString& name);
-	Scene* getScene(const QString& name);
-	QList<Scene*> getScenesList() { return h_scenes.values(); }
-	const SceneHash& getScenesHash() { return h_scenes; }
-
-//	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
-//	bool addNewSceneView(Scene *scene, View *view);
-
-//	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
-
-//	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
-//	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
-
-//	void linkDialog(Scene *scene);
-//	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
-
-	/*********************************************************
 	 * MANAGE VIEWS
 	 *********************************************************/
 
@@ -280,16 +258,16 @@ protected:
 
 	View* m_firstView;
 
-	Context* m_context;
-
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
 
 	PluginHash h_plugins;
-	SceneHash h_scenes;
 	ViewHash h_views;
 	CameraHash h_cameras;
 	MapHash h_maps;
+
+	PluginDialog* m_pluginDialog;
+	CameraDialog* m_cameraViewDialog;
 
 	/**
 	 * \var bool keys[3]
@@ -344,13 +322,6 @@ public slots:
 	 * Show the cameras management dialog:
 	 */
 	void cb_manageCameras();
-
-	/**
-	 * \fn void cb_manageMaps()
-	 * \brief method called when the "Maps" action is triggered.
-	 * Show the maps management dialog:
-	 */
-	void cb_manageMaps();
 };
 
 #endif

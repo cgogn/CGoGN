@@ -5,6 +5,19 @@
 
 #include "types.h"
 
+struct PluginInfo
+{
+	PluginInfo(const QString& path, const QString& name) :
+		pluginPath(path),
+		pluginName(name)
+	{}
+
+	PluginInfo() {}
+
+	QString pluginPath;
+	QString pluginName;
+};
+
 class PluginDialog : public QDialog, public Ui::PluginDialog
 {
 	Q_OBJECT
@@ -15,8 +28,9 @@ public:
 
 protected:
 	Window* m_window;
+	QHash<QTreeWidgetItem*, PluginInfo> m_listedPlugins;
 
-	bool restoreState();
+//	bool restoreState();
 
 private:
 	bool init;
@@ -35,9 +49,9 @@ protected slots:
 
 	void cb_togglePlugin(QTreeWidgetItem* item, int column);
 
-	void customContextMenu(const QPoint & pos);
+//	void customContextMenu(const QPoint & pos);
 
-	void cb_acceptDialog();
+//	void cb_acceptDialog();
 
 //	void showPluginInfo();
 };

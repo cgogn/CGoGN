@@ -10,7 +10,6 @@
 #include <iostream>
 
 class View;
-class Context;
 
 class ViewButton : public QObject
 {

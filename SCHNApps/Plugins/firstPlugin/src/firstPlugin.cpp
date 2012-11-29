@@ -67,7 +67,7 @@ void FirstPlugin::disable()
 // essential Qt function:
 // arguments are
 //  - the complied name of the plugin
-//  - the main class of our plugin (that extends VisualPlugin)
+//  - the main class of our plugin
 Q_EXPORT_PLUGIN2(FirstPlugin, FirstPlugin)
 #else
 Q_EXPORT_PLUGIN2(FirstPluginD, FirstPlugin)

@@ -23,6 +23,10 @@ public:
 	bool isUsed() { return l_views.size() > 0; }
 	bool isShared()	{ return l_views.size() > 1; }
 
+	/*********************************************************
+	 * CAMERA DRAWING
+	 *********************************************************/
+
 	void draw();
 
 	bool getDraw() { return m_draw; }
@@ -43,11 +47,19 @@ public:
 	double getDrawPathScale() { return m_drawPathScale; }
 	void setDrawPathScale(double s) { m_drawPathScale = s;}
 
+	/*********************************************************
+	 * MANAGE LINKED VIEWS
+	 *********************************************************/
+
 	void linkView(View* view);
 	void unlinkView(View* view);
 	bool isLinkedWithView(View* view);
 
 	void fitParamWith(View* view);
+
+	/*********************************************************
+	 * SNAPSHOTS
+	 *********************************************************/
 
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);

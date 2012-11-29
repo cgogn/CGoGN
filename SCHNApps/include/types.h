@@ -6,10 +6,8 @@
 
 class Window;
 class Plugin;
-class Scene;
 class View;
 class Camera;
-class Context;
 
 class MapHandler;
 
@@ -23,7 +21,6 @@ namespace CGoGN
 }
 
 typedef QHash<QString, Plugin*> PluginHash;
-typedef QHash<QString, Scene*> SceneHash;
 typedef QHash<QString, View*> ViewHash;
 typedef QHash<QString, Camera*> CameraHash;
 

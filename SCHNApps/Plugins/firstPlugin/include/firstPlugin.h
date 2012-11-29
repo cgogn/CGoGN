@@ -1,7 +1,7 @@
 #ifndef _FIRSTPLUGIN_H_
 #define _FIRSTPLUGIN_H_
 
-#include "plugins/visualPlugin.h"
+#include "plugin.h"
 
 /**---CGoGN includes **/
 #include "Topology/generic/parameters.h"
@@ -36,12 +36,9 @@ typedef PFP::VEC3 VEC3;
  */
 
 /**
- * Our plugin must inherit from VisualPlugin,
- * that is a class that itself is an implementation
- * of the Plugin interface (virtual class). It contains
- * many useful and essantial methods.
+ * Our plugin must inherit from Plugin
  */
-class FirstPlugin : public VisualPlugin
+class FirstPlugin : public Plugin
 {
 	/**
 	 * Essential Qt macros.
@@ -50,26 +47,14 @@ class FirstPlugin : public VisualPlugin
 	Q_INTERFACES(Plugin)
 
 public:
-	FirstPlugin() {}
-	~FirstPlugin() {}
+	FirstPlugin()
+	{}
+
+	~FirstPlugin()
+	{}
 
 	/**
-	 * The classical call back for the initGL method
-	 * When a scene will be link to this plugin, it will call
-	 * back this method with itself as a parameter.
-	 */
-	void cb_initGL(Scene *scene);
-
-	/**
-	 * The drawing method that needs to be overloaded.
-	 * Each time a scene (that is to say, at least one of the
-	 * views that is contains) needs to be refresh, it calls back
-	 * this method with itself as a parameter
-	 */
-	void cb_redraw(Scene *scene);
-
-	/**
-	 * The plugin's activation method
+	 * The plugin's enable method
 	 * Each time the main application loads this plugin,
 	 * it call this method. Writing this method is
 	 * the occasion to initialize the plugin and check certain
@@ -79,11 +64,26 @@ public:
 	bool enable();
 
 	/**
-	 * The plugin's disabling method
+	 * The plugin's disable method
 	 * Each time the main application will unload the plugin
 	 * it will call this method.
 	 */
 	void disable();
+
+	void cb_initGL(Scene *scene);
+	virtual void cb_updateMatrix(View* view) {}
+	void cb_redraw(Scene *scene);
+
+	virtual void cb_keyPress(Scene* scene, int key) {}
+	virtual void cb_keyRelease(Scene* scene, int key) {}
+	virtual void cb_mousePress(Scene* scene, int button, int x, int y) {}
+	virtual void cb_mouseRelease(Scene* scene, int button, int x, int y) {}
+//	virtual void cb_mouseClick(Scene* scene, int button, int x, int y) {}
+	virtual void cb_mouseMove(Scene* scene, int buttons, int x, int y) {}
+	virtual void cb_wheelEvent(Scene* scene, int delta, int x, int y) {}
+
+	virtual void cb_viewAdded(Scene* s) {}
+	virtual void cb_viewRemoved(Scene* s) {}
 
 protected:
 	/** Attributes that are specific to this plugin **/

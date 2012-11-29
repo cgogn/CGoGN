@@ -1,5 +1,9 @@
 #include "plugin.h"
 
+Plugin::Plugin() :
+	m_window(NULL)
+{}
+
 Plugin::Plugin(const QString& name, const QString& filePath, Window* window) :
 	m_name(name),
 	m_filePath(filePath),
@@ -8,8 +12,8 @@ Plugin::Plugin(const QString& name, const QString& filePath, Window* window) :
 
 Plugin::~Plugin()
 {
-	foreach(Scene* scene, l_scenes)
-		unlinkScene(scene);
+	foreach(View* view, l_views)
+		unlinkView(view);
 
 	foreach(QWidget* tabWidget, l_tabWidgets)
 		removeTabInDock(tabWidget);
@@ -24,108 +28,32 @@ Plugin::~Plugin()
 //	removeAllDependencyLinks();
 }
 
-void Plugin::updateGL()
-{
-	foreach(Scene* s, l_scenes)
-		s->updateGL();
-}
-
-void Plugin::updateGL(Scene* s)
-{
-	s->updateGL();
-}
-
-/*********************************************************
- * MANAGE MAPS
- *********************************************************/
-
-bool Plugin::linkMap(MapHandler* map)
-{
-	if(
-		(m_maxNumberOfMaps == UNLIMITED_NUMBER_OF_MAPS || l_maps.size() < m_maxNumberOfMaps)
-		&& map
-		&& !l_maps.contains(map)
-	)
-	{
-		l_maps.push_back(map);
-		cb_mapAdded(map);
-		return true;
-	}
-	else
-		return false;
-}
-
-void Plugin::unlinkMap(MapHandler* map)
-{
-	if(l_maps.removeOne(map))
-		cb_mapRemoved(map);
-}
-
-bool Plugin::isLinkedToMap(MapHandler* map)
-{
-	return l_maps.contains(map);
-}
-
-QList<MapHandler*> Plugin::getLinkedMaps()
-{
-	return l_maps;
-}
-
-void Plugin::setMaxNumberOfLinkedMaps(int n)
-{
-	if(n >= l_maps.size() || n == UNLIMITED_NUMBER_OF_MAPS)
-		m_maxNumberOfMaps = n;
-}
-
-int Plugin::getCurrentNumberOfLinkedMaps()
-{
-	return l_maps.size();
-}
-
-int Plugin::getRemainingNumberOfLinkedMaps()
-{
-	if(m_maxNumberOfMaps != UNLIMITED_NUMBER_OF_MAPS)
-		return m_maxNumberOfMaps - l_maps.size();
-	else
-		return UNLIMITED_NUMBER_OF_MAPS;
-}
-
 /*********************************************************
  * MANAGE SCENES
  *********************************************************/
 
-bool Plugin::linkScene(Scene* scene)
+bool Plugin::linkView(View* view)
 {
-	if(scene && !l_scenes.contains(scene))
+	if(view && !l_views.contains(view))
 	{
-		l_scenes.push_back(scene);
-		scene->linkPlugin(this);
-		scene->updateGL();
-		cb_sceneAdded(scene);
+		l_views.push_back(view);
+		view->linkPlugin(this);
+		view->updateGL();
+		cb_viewAdded(view);
 		return true;
 	}
 	else
 		return false;
 }
 
-void Plugin::unlinkScene(Scene* scene)
+void Plugin::unlinkView(View* view)
 {
-	if(l_scenes.removeOne(scene))
+	if(l_views.removeOne(view))
 	{
-		scene->unlinkPlugin(this);
-		scene->updateGL();
-		cb_sceneRemoved(scene);
+		view->unlinkPlugin(this);
+		view->updateGL();
+		cb_viewRemoved(view);
 	}
-}
-
-bool Plugin::isLinkedToScene(Scene* scene)
-{
-	return l_scenes.contains(scene);
-}
-
-QList<Scene*> Plugin::getLinkedScenes()
-{
-	return l_scenes;
 }
 
 /*********************************************************
@@ -193,21 +121,3 @@ void Plugin::removeToolbarAction(QAction* action)
 	if(l_toolbarActions.removeOne(action))
 		m_window->removeToolbarAction(action);
 }
-
-/*********************************************************
- * MANAGE SCENE VIEW BUTTONS
- *********************************************************/
-/*
-bool Plugin::addSceneViewButton(Scene* scene, ViewButton* viewButton)
-{
-	if(scene && viewButton)
-		return scene->addViewButton(viewButton);
-	return false;
-}
-
-void Plugin::removeSceneViewButton(Scene* scene, ViewButton* viewButton)
-{
-	if(scene && viewButton)
-		scene->removeViewButton(viewButton);
-}
-*/
