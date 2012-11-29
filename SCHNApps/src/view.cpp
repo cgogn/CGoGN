@@ -18,6 +18,7 @@ View::View(const QString& name, Window* w, QWidget* parent, const QGLWidget* sha
 	QGLViewer(parent, shareWidget),
 	m_name(name),
 	m_window(w),
+	m_currentCamera(NULL),
 	m_cameraButton(NULL),
 	m_pluginsButton(NULL),
 	m_mapsButton(NULL),
@@ -45,20 +46,6 @@ View::~View()
 		unlinkMap(map);
 
 	delete m_buttonArea;
-}
-
-void View::setCurrentCamera(Camera* c)
-{
-	if(c != m_currentCamera)
-	{
-		if(m_currentCamera != NULL)
-			m_currentCamera->unlinkView(this);
-		m_currentCamera = c;
-		m_currentCamera->linkView(this);
-		this->setCamera(m_currentCamera);
-		updateTextInfo();
-		updateGL();
-	}
 }
 
 void View::initGL()
@@ -101,7 +88,7 @@ void View::draw()
 	glEnd();
 
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	drawButtons();
+//	drawButtons();
 	drawText();
 	glPopAttrib();
 }
@@ -181,6 +168,42 @@ void View::drawOverpaint(QPainter *painter)
 	painter->save();
 	painter->setOpacity(0.8);
     painter->restore();
+}
+
+void View::setCurrentCamera(Camera* c)
+{
+	if(c != m_currentCamera)
+	{
+		if(m_currentCamera != NULL)
+			m_currentCamera->unlinkView(this);
+		m_currentCamera = c;
+		m_currentCamera->linkView(this);
+		this->setCamera(m_currentCamera);
+		updateTextInfo();
+		updateGL();
+	}
+}
+
+void View::linkPlugin(Plugin* plugin)
+{
+	if(plugin && !l_plugins.contains(plugin))
+		l_plugins.push_back(plugin);
+}
+
+void View::unlinkPlugin(Plugin* plugin)
+{
+	l_plugins.removeOne(plugin);
+}
+
+void View::linkMap(MapHandler* map)
+{
+	if(map && !l_maps.contains(map))
+		l_maps.push_back(map);
+}
+
+void View::unlinkMap(MapHandler* map)
+{
+	l_maps.removeOne(map);
 }
 
 void View::updateTextInfo()

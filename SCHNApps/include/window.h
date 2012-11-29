@@ -267,7 +267,7 @@ protected:
 	MapHash h_maps;
 
 	PluginDialog* m_pluginDialog;
-	CameraDialog* m_cameraViewDialog;
+	CameraDialog* m_cameraDialog;
 
 	/**
 	 * \var bool keys[3]

@@ -31,6 +31,7 @@ file(
 	${SCHNApps_ROOT_DIR}/src/system.cpp
 	${SCHNApps_ROOT_DIR}/src/view.cpp
 	${SCHNApps_ROOT_DIR}/src/window.cpp
+	${SCHNApps_ROOT_DIR}/src/viewButtonArea.cpp
 	${SCHNApps_ROOT_DIR}/src/viewSelector.cpp
 	${SCHNApps_ROOT_DIR}/src/cameraDialog.cpp
 	${SCHNApps_ROOT_DIR}/src/pluginDialog.cpp
@@ -40,7 +41,9 @@ file(
 SET(SCHNApps_H_OBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/plugin.h
 	${SCHNApps_ROOT_DIR}/include/splitArea.h
+	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
 	${SCHNApps_ROOT_DIR}/include/viewSelector.h
 	${SCHNApps_ROOT_DIR}/include/cameraDialog.h
 	${SCHNApps_ROOT_DIR}/include/pluginDialog.h

@@ -26,7 +26,7 @@ Window::Window(QWidget *parent) :
 	m_initialization = true;
 
 	m_pluginDialog = new PluginDialog(this);
-	m_cameraViewDialog = new CameraDialog(this);
+	m_cameraDialog = new CameraDialog(this);
 
 	glewInit();
 
@@ -414,8 +414,6 @@ View* Window::addView(const QString& name)
 		view = new View(name, this, this, m_firstView);
 	h_views.insert(name, view);
 
-	m_cameraViewDialog->addViewToList(view->getName());
-
 	return view;
 }
 
@@ -465,7 +463,7 @@ Camera* Window::addCamera(const QString& name)
 	Camera* camera = new Camera(name, this);
 	h_cameras.insert(name, camera);
 
-	m_cameraViewDialog->addCameraToList(camera->getName());
+	m_cameraDialog->addCameraToList(camera->getName());
 
 	return camera;
 }
@@ -655,5 +653,5 @@ void Window::cb_manageViews()
 
 void Window::cb_manageCameras()
 {
-	m_cameraViewDialog->show();
+	m_cameraDialog->show();
 }

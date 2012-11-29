@@ -70,20 +70,20 @@ public:
 	 */
 	void disable();
 
-	void cb_initGL(Scene *scene);
+	void cb_initGL(View *scene);
 	virtual void cb_updateMatrix(View* view) {}
-	void cb_redraw(Scene *scene);
+	void cb_redraw(View *scene);
 
-	virtual void cb_keyPress(Scene* scene, int key) {}
-	virtual void cb_keyRelease(Scene* scene, int key) {}
-	virtual void cb_mousePress(Scene* scene, int button, int x, int y) {}
-	virtual void cb_mouseRelease(Scene* scene, int button, int x, int y) {}
-//	virtual void cb_mouseClick(Scene* scene, int button, int x, int y) {}
-	virtual void cb_mouseMove(Scene* scene, int buttons, int x, int y) {}
-	virtual void cb_wheelEvent(Scene* scene, int delta, int x, int y) {}
+	virtual void cb_keyPress(View* scene, int key) {}
+	virtual void cb_keyRelease(View* scene, int key) {}
+	virtual void cb_mousePress(View* scene, int button, int x, int y) {}
+	virtual void cb_mouseRelease(View* scene, int button, int x, int y) {}
+//	virtual void cb_mouseClick(View* scene, int button, int x, int y) {}
+	virtual void cb_mouseMove(View* scene, int buttons, int x, int y) {}
+	virtual void cb_wheelEvent(View* scene, int delta, int x, int y) {}
 
-	virtual void cb_viewAdded(Scene* s) {}
-	virtual void cb_viewRemoved(Scene* s) {}
+	virtual void cb_viewAdded(View* s) {}
+	virtual void cb_viewRemoved(View* s) {}
 
 protected:
 	/** Attributes that are specific to this plugin **/

@@ -1,17 +1,14 @@
 #include "firstPlugin.h"
 #include "Algo/Geometry/boundingbox.h"
 
-void FirstPlugin::cb_initGL(Scene *scene)
+void FirstPlugin::cb_initGL(View *view)
 {
-	if (scene)
+	if (view)
 	{
-		// we fit the first (possibly the only) view of the newly liked
-		// scene to the content of our map
-
 		// bounding box of scene
 		Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
 
-		scene->firstViewFitSphere(bb.center()[0], bb.center()[1], bb.center()[2], bb.maxSize());
+//		scene->firstViewFitSphere(bb.center()[0], bb.center()[1], bb.center()[2], bb.maxSize());
 
 		m_render_topo = new Algo::Render::GL2::TopoRender() ;
 
@@ -21,7 +18,7 @@ void FirstPlugin::cb_initGL(Scene *scene)
 	}
 }
 
-void FirstPlugin::cb_redraw(Scene *scene)
+void FirstPlugin::cb_redraw(View* view)
 {
 	m_render_topo->drawTopo();
 }
