@@ -30,6 +30,37 @@
 namespace CGoGN
 {
 
+Dart EmbeddedMap2::newPolyLine(unsigned int nbEdges)
+{
+	Dart d = Map2::newPolyLine(nbEdges) ;
+
+	if (isOrbitEmbedded<VERTEX>())
+	{
+		Dart e = d ;
+		for (unsigned int i = 0 ; i <= nbEdges ; ++i)
+		{
+			initOrbitEmbeddingNewCell<VERTEX>(e) ;
+			e = this->phi1(e) ;
+		}
+	}
+
+	if (isOrbitEmbedded<EDGE>())
+	{
+		Dart e = d ;
+		for (unsigned int i = 0 ; i < nbEdges ; ++i)
+		{
+			initOrbitEmbeddingNewCell<EDGE>(e) ;
+			e = this->phi1(e) ;
+		}
+	}
+
+	if (isOrbitEmbedded<FACE>())
+	{
+		initOrbitEmbeddingNewCell<FACE>(d) ;
+	}
+	return d ;
+}
+
 Dart EmbeddedMap2::newFace(unsigned int nbEdges, bool withBoundary)
 {
 	Dart d = Map2::newFace(nbEdges, withBoundary);

@@ -107,6 +107,22 @@ void Map2::compactTopoRelations(const std::vector<unsigned int>& oldnew)
  *  To generate or delete faces in a 2-map
  *************************************************************************/
 
+Dart Map2::newPolyLine(unsigned int nbEdges)
+{
+	Dart d = Map1::newCycle(2*nbEdges);
+	{
+		Dart it1 = d;
+		Dart it2 = phi_1(d);
+		for(unsigned int i = 0; i<nbEdges ; ++i)
+		{
+			phi2sew(it1, it2);
+			it1 = phi1(it1);
+			it2 = phi_1(it2);
+		}
+	}
+	return d;
+}
+
 Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 {
 	Dart d = Map1::newCycle(nbEdges);

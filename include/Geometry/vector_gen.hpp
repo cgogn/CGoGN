@@ -315,9 +315,23 @@ inline bool Vector<DIM, T>::isNormalized(const T& epsilon) const
 }
 
 template <unsigned int DIM, typename T>
-inline bool Vector<DIM, T>::isOrthogonal(const Vector<DIM, T>& V, const T& epsilon) const
+inline bool Vector<DIM, T>::isOrthogonal(const Vector<DIM, T>& v, const T& epsilon) const
 {
-	return (fabs(V * (*this)) < epsilon) ;
+	return (fabs(v * (*this)) < epsilon) ;
+}
+
+template <unsigned int DIM, typename T>
+inline bool Vector<DIM, T>::isNear(const Vector<DIM, T>& v, int precision) const
+{
+	T diff ;
+	T norm2(0) ;
+	for (unsigned int i = 0 ; i < DIM ; ++i)
+	{
+		diff = m_data[i] - v[i] ;
+		if (!isNull(diff, precision)) return false ;
+		norm2 += diff * diff ;
+	}
+	return isNull2(norm2, precision) ;
 }
 
 /**********************************************/
@@ -338,6 +352,39 @@ std::istream& operator>>(std::istream& in, Vector<DIM, T>& v)
 	for (unsigned int i = 0; i < DIM; ++i)
 		in >> v[i] ;
 	return in ;
+}
+
+/***
+ * Test if x is null within precision.
+ * 3 cases are possible :
+ *  - precision = 0 : x is null <=> (x == 0)
+ *  - precision > 0 : x is null <=> (|x| < precision)
+ *  - precision < 0 : x is null <=> (|x| < 1/precision) <=> (precision * |x| < 1)
+ */
+template <typename T>
+inline bool isNull(T x, int precision)
+{
+	if (precision == 0)
+		return (x == 0) ;
+	else if (precision > 0)
+			return (fabs(x) < precision) ;
+	else
+		return (precision * fabs(x) < 1) ;
+}
+
+/***
+ * Test if the square root of x is null within precision.
+ * In other words, test if x is null within precision*precision
+ */
+template <typename T>
+inline bool isNull2(T x, int precision)
+{
+	if (precision == 0)
+		return (x == 0) ;
+	else if (precision > 0)
+		return (isNull(x, precision * precision)) ;
+	else
+		return (isNull(x, - (precision * precision))) ;
 }
 
 template <unsigned int DIM, typename T>

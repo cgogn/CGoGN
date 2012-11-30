@@ -40,15 +40,12 @@ bool isBetween(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>
 }
 
 template <typename PFP>
-void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e)
+void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, Dart d, Dart e, int precision)
 {
-	assert(Geom::arePointsEquals(positions[d], positions[e]) && !map.sameVertex(d, e)) ;
-
-	typedef typename PFP::VEC3 VEC3;
-	VEC3 p = positions[d] ;
+	assert(positions[d].isNear(positions[e], precision) && !map.sameVertex(d, e)) ;
 
 	bool notempty = true ;
-	do // while vertex of e contains more than one dart
+	do // While vertex of e contains more than one dart
 	{
 		Dart e1 = map.alpha1(e) ;			// e1 stores next dart of vertex of e
 		if (e1 == e)
@@ -72,32 +69,32 @@ void mergeVertex(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& po
 		d = e ;
 		e = e1 ;
 	} while (notempty) ;
-
-	// 0-embed z on the merged vertex
-	positions[d] = p ;
 }
 
 template <typename PFP>
-void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions)
+void mergeVertices(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& positions, int precision)
 {
 	// TODO optimiser en triant les sommets
-	for(Dart d = map.begin() ; d != map.end() ; map.next(d))
+	//	map.template enableQuickTraversal<VERTEX>();
+	TraversorV<typename PFP::MAP> travV1(map) ;
+	CellMarker<VERTEX> vM(map);
+	for(Dart d1 = travV1.begin() ; d1 != travV1.end() ; d1 = travV1.next())
 	{
-		CellMarker<VERTEX> vM(map);
-		vM.mark(d);
-		for(Dart dd = map.begin() ; dd != map.end() ; map.next(dd))
+		vM.mark(d1);
+		TraversorV<typename PFP::MAP> travV2(map) ;
+		for(Dart d2 = travV2.begin() ; d2 != travV2.end() ; d2 = travV2.next())
 		{
-			if(!vM.isMarked(dd))
+			if(!vM.isMarked(d2))
 			{
-				if(Geom::arePointsEquals(positions[d],positions[dd]))
+				if(positions[d1].isNear(positions[d2], precision))
 				{
-					if (map.sameVertex(d,dd)) std::cout << "fusion: sameVertex" << std::endl ;
-					if (!map.sameVertex(d,dd)) mergeVertex<PFP>(map,positions,d,dd);
-//					vM.mark(d);
+					if (map.sameVertex(d1,d2)) std::cout << "fusion: sameVertex" << std::endl ;
+					if (!map.sameVertex(d1,d2)) mergeVertex<PFP>(map,positions,d1,d2,precision);
 				}
 			}
 		}
 	}
+	//	map.template disableQuickTraversal<VERTEX>();
 }
 
 }

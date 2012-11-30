@@ -310,10 +310,9 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	//create broken lines
 	DartMarker brokenL(map);
 
-	unsigned int nbVertices = 0 ;
-
+	typename std::vector<POLYGON >::iterator it;
 	std::vector<float >::iterator itW = allBrokenLinesWidth.begin();
-	for(typename std::vector<POLYGON >::iterator it = allBrokenLines.begin() ; it != allBrokenLines.end() ; ++it)
+	for(it = allBrokenLines.begin() ; it != allBrokenLines.end() ; ++it, ++itW)
 	{
 		if(it->size()<2)
 		{
@@ -322,74 +321,48 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		}
 		else
 		{
-			nbVertices += it->size() ;
+			Dart d = map.newPolyLine(it->size()-1);
 
-			Dart d = map.newFace(it->size()*2-2,false);
-
-			Dart d1=d;
-			Dart d_1=map.phi_1(d);
-			//build a degenerated "line" face
-			for(unsigned int i = 0; i<it->size() ; ++i)
-			{
-				brokenL.mark(d1);
-				brokenL.mark(d_1);
-
-				map.sewFaces(d1,d_1,false) ;
-
-				edgeWidth[d1] = *itW;
-				if (*itW == 0)
-					std::cout << "importSVG : null path width" << std::endl ;
-
-				d1 = map.phi1(d1);
-				d_1 = map.phi_1(d_1);
-			}
-
-//			polygonsFaces.mark(d);
-
-			//embed the line
-			d1 = d;
 			for(typename POLYGON::iterator emb = it->begin(); emb != it->end() ; emb++)
 			{
+				brokenL.mark(d);
+				brokenL.mark(map.phi2(d));
+
+				edgeWidth[d] = *itW;
+				if (*itW == 0)
+					std::cout << "importSVG : null path width" << std::endl ;
 				bb->addPoint(*emb);
-				position[d1] = *emb;
-				d1 = map.phi1(d1);
+				position[d] = *emb;
+				d = map.phi1(d);
 			}
 		}
-
-		itW++;
 	}
-
-	std::cout << "importSVG : broken lines created : " << nbVertices << " vertices"<< std::endl;
+	std::cout << "importSVG : broken lines created : " << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
-
-	Algo::BooleanOperator::mergeVertices<PFP>(map,position);
+	// Merge near vertices
+	Algo::BooleanOperator::mergeVertices<PFP>(map,position,1);
 	std::cout << "importSVG : Merging of vertices." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//create polygons
-	typename std::vector<POLYGON >::iterator it;
 	for(it = allPoly.begin() ; it != allPoly.end() ; ++it)
 	{
-		if(it->size()<4)
+		if(it->size()<3)
 		{
 			it = allPoly.erase(it);
 		}
 		else
 		{
 			Dart d = map.newFace(it->size());
-//			std::cout << "newFace1 " << it->size()-1 << std::endl;
 			polygonsFaces.mark(d);
 
-			Dart dd = d;
-			typename POLYGON::iterator emb = it->begin();
-			do
+			for(typename POLYGON::iterator emb = it->begin(); emb != it->end() ; emb++)
 			{
 				bb->addPoint(*emb);
-				position[dd] = *emb;
-				emb++;
-				dd = map.phi1(dd);
-			} while(dd!=d);
+				position[d] = *emb;
+				d = map.phi1(d);
+			}
 		}
 	}
 
@@ -408,26 +381,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	}
 
 	std::cout << "importSVG : Polygons generated." << std::endl;
-
-
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//simplify the edges to have a more regular sampling
-	float minDist = 20.0f ;
-	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
-	{
-		if(!polygons.isMarked(d))
-		{
-			bool canSimplify = true ;
-			while ( canSimplify && ((position[map.phi1(d)] - position[d]).norm() < minDist) )
-			{
-				if (map.vertexDegree(map.phi1(d)) == 2) {
-					map.uncutEdge(d) ;
-				}
-				else canSimplify = false ;
-			}
-		}
-	}
-	std::cout << "importSVG : Downsampling of vertices." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//cut the edges to have a more regular sampling
@@ -464,7 +417,26 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 			}
 		}
 	}
-	std::cout << "importSVG : Refinement of long edges." << std::endl;
+	std::cout << "importSVG : Subdivision of long edges." << std::endl;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//simplify the edges to have a more regular sampling
+	float minDist = 30.0f ;
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		if(!polygons.isMarked(d))
+		{
+			bool canSimplify = true ;
+			while ( canSimplify && ((position[map.phi1(d)] - position[d]).norm() < minDist) )
+			{
+				if (map.vertexDegree(map.phi1(d)) == 2) {
+					map.uncutEdge(d) ;
+				}
+				else canSimplify = false ;
+			}
+		}
+	}
+	std::cout << "importSVG : Downsampling of vertices." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//process broken lines
