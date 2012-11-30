@@ -25,6 +25,7 @@
 #include "texturesExample.h"
 #include "Algo/Geometry/boundingbox.h"
 #include "Algo/Modelisation/polyhedron.h"
+#include "Utils/vbo.h" 
 
 TexView::TexView():
 	m_render(NULL),

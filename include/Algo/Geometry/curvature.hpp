@@ -440,17 +440,17 @@ void computeCurvatureVertices_NormalCycles(
 	if (!map. template isOrbitEmbedded<VERTEX>())
 	{
 		CellMarkerNoUnmark<VERTEX> cm(map);
-		map. template initOrbitEmbedding<VERTEX>();
+		map. template initAllOrbitsEmbedding<VERTEX>();
 	}
 	if (!map. template isOrbitEmbedded<EDGE>())
 	{
 		CellMarkerNoUnmark<EDGE> cm(map);
-		map. template initOrbitEmbedding<EDGE>();
+		map. template initAllOrbitsEmbedding<EDGE>();
 	}
 	if (!map. template isOrbitEmbedded<FACE>())
 	{
 		CellMarkerNoUnmark<FACE> cm(map);
-		map. template initOrbitEmbedding<FACE>();
+		map. template initAllOrbitsEmbedding<FACE>();
 	}
 
 	FunctorComputeCurvatureVertices_NormalCycles<PFP> funct(map, radius, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal);
