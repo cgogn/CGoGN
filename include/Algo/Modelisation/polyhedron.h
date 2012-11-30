@@ -44,6 +44,12 @@ namespace Modelisation
 
 enum { NONE, GRID, CUBE, CYLINDER, CONE, SPHERE, TORE, COMPOSED };
 
+//template <typename PFP>
+//void sewFaceEmb(typename PFP::MAP& map, Dart d, Dart e);
+//
+//template <typename PFP>
+//Dart newFaceEmb(typename PFP::MAP& map, unsigned int n);
+
 /**
 * sudivide the all quads of a CC into 2 triangles
 */
@@ -194,7 +200,8 @@ protected:
 
 	void computeCenter();
 
-
+	Dart grid_topo_open(unsigned int x, unsigned int y);
+	Dart cylinder_topo_open(unsigned int n, unsigned int z);
 public:
 	/**
 	* Constructor
@@ -232,6 +239,8 @@ public:
 	* get the table of darts (one per vertex)
 	*/
 	std::vector<Dart>& getVertexDarts() { return m_tableVertDarts; }
+
+
 
 	/**
 	* Create a 2D grid

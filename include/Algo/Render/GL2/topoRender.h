@@ -33,7 +33,7 @@
 #include "Topology/generic/functor.h"
 #include "Geometry/vector_gen.h"
 
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "Utils/svg.h"
 
 // forward

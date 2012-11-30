@@ -45,7 +45,7 @@
 
 #include "Topology/generic/cellmarker.h"
 #include "Utils/text3d.h"
-
+#include "Utils/vbo.h"
 #include "Utils/pointSprite.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/Shaders/shaderVectorPerVertex.h"

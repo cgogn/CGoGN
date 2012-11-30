@@ -26,7 +26,7 @@
 #ifndef __PICKABLES_H_
 #define __PICKABLES_H_
 
-#include "Utils/vbo.h"
+#include "Utils/vbo_base.h"
 #include "glm/glm.hpp"
 #include "Utils/Shaders/shaderColorPerVertex.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
