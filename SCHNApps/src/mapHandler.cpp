@@ -1,6 +1,7 @@
 #include "mapHandler.h"
 
 #include "system.h"
+#include "Topology/generic/genericmap.h"
 #include "Utils/vbo.h"
 
 MapHandler::MapHandler(const QString& name, CGoGN::GenericMap *map) :
@@ -72,4 +73,28 @@ QList<CGoGN::Utils::VBO*> MapHandler::findVBOsMatching(const QRegExp& regexp)
 			rlist.push_back(it.value());
 	}
 	return rlist;
+}
+
+/*********************************************************
+ * MANAGE VIEWS
+ *********************************************************/
+
+bool MapHandler::linkView(View* view)
+{
+	if(view && !l_views.contains(view))
+	{
+		l_views.push_back(view);
+		view->updateGL();
+		return true;
+	}
+	else
+		return false;
+}
+
+void MapHandler::unlinkView(View* view)
+{
+	if(l_views.removeOne(view))
+	{
+		view->updateGL();
+	}
 }

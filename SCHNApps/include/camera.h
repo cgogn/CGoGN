@@ -64,10 +64,6 @@ public:
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);
 
-	void updateGL();
-
-//	void viewShowButton(bool b);
-
 protected:
 	QString m_name;
 	Window* m_window;

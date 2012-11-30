@@ -4,6 +4,7 @@
 #include "ui_cameraViewDialog.h"
 
 class Window;
+class Camera;
 class View;
 
 class CameraViewDialog : public QDialog, Ui::CameraViewDialog
@@ -18,8 +19,12 @@ private:
 	Window* m_window;
 	View* m_view;
 
+	void selectCurrentCamera();
+
 public slots:
-	void cb_selectedCameraChanged(QListWidgetItem* current, QListWidgetItem* previous);
+	void cb_selectedCameraChanged();
+	void cb_addCameraToList(Camera* c);
+	void cb_removeCameraFromList(Camera* c);
 };
 
 #endif

@@ -28,8 +28,6 @@ Window::Window(QWidget *parent) :
 	m_pluginDialog = new PluginDialog(this);
 	m_cameraDialog = new CameraDialog(this);
 
-	glewInit();
-
 	this->setupUi(this);
 	System::splash->showMessage("Welcome to SCHNApps", Qt::AlignBottom | Qt::AlignCenter);
 	sleep(1);
@@ -50,6 +48,8 @@ Window::Window(QWidget *parent) :
 	// add first view
 	m_firstView = addView();
 	m_splitArea->addFitElement(m_firstView);
+
+	glewInit();
 
 	// connect the basic actions
 	connect(actionAboutSCHNApps, SIGNAL(triggered()), this, SLOT(cb_aboutSCHNApps()));
@@ -296,6 +296,113 @@ void Window::removeToolbarAction(QAction* action)
 }
 
 /*********************************************************
+ * MANAGE CAMERAS
+ *********************************************************/
+
+Camera* Window::addCamera(const QString& name)
+{
+	if (h_cameras.contains(name))
+	{
+		System::Error::code = System::Error::CAMERA_EXISTS;
+		return NULL;
+	}
+
+	Camera* camera = new Camera(name, this);
+	h_cameras.insert(name, camera);
+
+	emit(cameraAdded(camera));
+
+	return camera;
+}
+
+Camera* Window::addCamera()
+{
+	return addCamera(QString("camera_") + QString::number(Camera::cameraCount));
+}
+
+void Window::removeCamera(const QString& name)
+{
+	if (h_cameras.contains(name))
+	{
+		Camera* camera = h_cameras[name];
+		h_cameras.remove(name);
+
+		emit(cameraRemoved(camera));
+
+		delete camera;
+	}
+}
+
+Camera* Window::getCamera(const QString& name)
+{
+	if (h_cameras.contains(name))
+		return h_cameras[name];
+	else
+	{
+		System::Error::code = System::Error::CAMERA_DOES_NOT_EXIST;
+		return NULL;
+	}
+}
+
+/*********************************************************
+ * MANAGE VIEWS
+ *********************************************************/
+
+View* Window::addView(const QString& name)
+{
+	if (h_views.contains(name))
+	{
+		System::Error::code = System::Error::VIEW_EXISTS;
+		return NULL;
+	}
+
+	View* view = NULL;
+	if(m_firstView == NULL)
+		view = new View(name, this, this);
+	else
+		view = new View(name, this, this, m_firstView);
+	h_views.insert(name, view);
+
+	emit(viewAdded(view));
+
+	return view;
+}
+
+View* Window::addView()
+{
+	return addView(QString("view_") + QString::number(View::viewCount));
+}
+
+void Window::removeView(const QString& name)
+{
+	if (h_views.contains(name))
+	{
+		if(h_views.count() > 1)
+		{
+			View* view = h_views[name];
+			if(m_firstView == view)
+				m_firstView = h_views.constBegin().value();
+			h_views.remove(name);
+
+			emit(viewRemoved(view));
+
+			delete view;
+		}
+	}
+}
+
+View* Window::getView(const QString& name)
+{
+	if (h_views.contains(name))
+		return h_views[name];
+	else
+	{
+		System::Error::code = System::Error::VIEW_DOES_NOT_EXIST;
+		return NULL;
+	}
+}
+
+/*********************************************************
  * MANAGE PLUGINS
  *********************************************************/
 
@@ -329,6 +436,9 @@ Plugin* Window::loadPlugin(QString pluginFilePath)
 			// if it succeeded we reference this plugin
 			h_plugins.insert(pluginName, plugin);
 			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+
+			emit(pluginAdded(plugin));
+
 			// method success
 			return plugin;
 		}
@@ -356,6 +466,8 @@ void Window::unloadPlugin(const QString& pluginName)
 		// calling its disable() method and dereferencing it
 		plugin->disable();
 		h_plugins.remove(pluginName);
+
+		emit(pluginRemoved(plugin));
 
 		// delete plugin
 		delete plugin;
@@ -396,105 +508,6 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
 */
 
 /*********************************************************
- * MANAGE VIEWS
- *********************************************************/
-
-View* Window::addView(const QString& name)
-{
-	if (h_views.contains(name))
-	{
-		System::Error::code = System::Error::VIEW_EXISTS;
-		return NULL;
-	}
-
-	View* view = NULL;
-	if(m_firstView == NULL)
-		view = new View(name, this, this);
-	else
-		view = new View(name, this, this, m_firstView);
-	h_views.insert(name, view);
-
-	return view;
-}
-
-View* Window::addView()
-{
-	return addView(QString("view_") + QString::number(View::viewCount));
-}
-
-void Window::removeView(const QString& name)
-{
-	if (h_views.contains(name))
-	{
-		if(h_views.count() > 1)
-		{
-			View* view = h_views[name];
-			if(m_firstView == view)
-				m_firstView = h_views.constBegin().value();
-			h_views.remove(name);
-			delete view;
-		}
-	}
-}
-
-View* Window::getView(const QString& name)
-{
-	if (h_views.contains(name))
-		return h_views[name];
-	else
-	{
-		System::Error::code = System::Error::VIEW_DOES_NOT_EXIST;
-		return NULL;
-	}
-}
-
-/*********************************************************
- * MANAGE CAMERAS
- *********************************************************/
-
-Camera* Window::addCamera(const QString& name)
-{
-	if (h_cameras.contains(name))
-	{
-		System::Error::code = System::Error::CAMERA_EXISTS;
-		return NULL;
-	}
-
-	Camera* camera = new Camera(name, this);
-	h_cameras.insert(name, camera);
-
-	m_cameraDialog->addCameraToList(camera->getName());
-
-	return camera;
-}
-
-Camera* Window::addCamera()
-{
-	return addCamera(QString("camera_") + QString::number(Camera::cameraCount));
-}
-
-void Window::removeCamera(const QString& name)
-{
-	if (h_cameras.contains(name))
-	{
-		Camera* camera = h_cameras[name];
-		h_cameras.remove(name);
-		delete camera;
-	}
-}
-
-Camera* Window::getCamera(const QString& name)
-{
-	if (h_cameras.contains(name))
-		return h_cameras[name];
-	else
-	{
-		System::Error::code = System::Error::CAMERA_DOES_NOT_EXIST;
-		return NULL;
-	}
-}
-
-/*********************************************************
  * MANAGE MAPS
  *********************************************************/
 
@@ -507,6 +520,9 @@ bool Window::addMap(const QString& name, MapHandler* map)
 	}
 
 	h_maps.insert(name, map);
+
+	emit(mapAdded(map));
+
 	return true;
 }
 
@@ -516,6 +532,9 @@ void Window::removeMap(const QString& name)
 	{
 		MapHandler* map = h_maps[name];
 		h_maps.remove(name);
+
+		emit(mapRemoved(map));
+
 		delete map;
 	}
 }
@@ -553,7 +572,7 @@ void Window::keyReleaseEvent(QKeyEvent *event)
 		keys[0] = false;
 	else if (event->key() == Qt::Key_Shift)
 		keys[1] = false;
-	else if (event->key() == Qt::CTRL)
+	else if (event->key() == Qt::Key_Control)
 		keys[2] = false;
 }
 
@@ -627,9 +646,9 @@ void Window::cb_aboutCGoGN()
 	QMessageBox::about(this, tr("About CGoGN"), str);
 }
 
-void Window::cb_managePlugins()
+void Window::cb_manageCameras()
 {
-	m_pluginDialog->show();
+	m_cameraDialog->show();
 }
 
 void Window::cb_manageViews()
@@ -638,9 +657,7 @@ void Window::cb_manageViews()
 	pm.fromSplitArea(m_splitArea);
 
 	ViewSelector selector(pm, this, ViewSelector::SELECT);
-
 	selector.setInsertionName("new view");
-
 	selector.exec();
 
 	if (selector.result() == QDialog::Accepted)
@@ -651,7 +668,7 @@ void Window::cb_manageViews()
 	}
 }
 
-void Window::cb_manageCameras()
+void Window::cb_managePlugins()
 {
-	m_cameraDialog->show();
+	m_pluginDialog->show();
 }

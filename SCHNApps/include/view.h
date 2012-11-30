@@ -10,6 +10,10 @@
 class ViewButtonArea;
 class ViewButton;
 
+class CameraViewDialog;
+class PluginsViewDialog;
+class MapsViewDialog;
+
 class View : public QGLViewer
 {
 	Q_OBJECT
@@ -26,9 +30,12 @@ public:
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	virtual void initGL();
-	virtual void updateGL();
+	virtual void init();
+	virtual void preDraw();
 	virtual void draw();
+	virtual void postDraw();
+	virtual void resizeGL(int width, int height);
+
 	void drawText();
 	void drawButtons();
 
@@ -38,8 +45,6 @@ public:
 	void mouseReleaseEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event);
-
-	virtual void resizeGL(int width, int height);
 
 	void drawOverpaint(QPainter *painter);
 
@@ -100,8 +105,15 @@ protected:
 
 	QString m_textInfo;
 
+	CameraViewDialog* m_cameraViewDialog;
+	PluginsViewDialog* m_pluginsViewDialog;
+	MapsViewDialog* m_mapsViewDialog;
+
 public slots:
-	void cb_cameraView();
+	void cb_cameraView(int x, int y);
+	void cb_pluginsView(int x, int y);
+	void cb_mapsView(int x, int y);
+	void cb_closeView(int x, int y);
 
 //signals:
 //	void currentCameraChanged(Camera* camera);

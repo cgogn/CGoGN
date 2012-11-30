@@ -4,6 +4,8 @@
 #include <QString>
 #include "types.h"
 
+#include "view.h"
+
 namespace CGoGN
 {
 	class GenericMap;
@@ -32,9 +34,20 @@ public:
 
 	int getNbVBO() { return h_vbo.count(); }
 
+	/*********************************************************
+	 * MANAGE LINKED VIEWS
+	 *********************************************************/
+
+	bool linkView(View* view);
+	void unlinkView(View* view);
+	bool isLinkedToView(View* view) { return l_views.contains(view); }
+	QList<View*> getLinkedViews() { return l_views; }
+
 protected:
 	QString m_name;
 	CGoGN::GenericMap* m_map;
+
+	QList<View*> l_views;
 
 	VBOHash h_vbo;
 };

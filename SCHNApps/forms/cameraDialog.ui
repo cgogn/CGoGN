@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>232</width>
-    <height>430</height>
+    <width>198</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="OKButton">
      <property name="text">
       <string>OK</string>
      </property>
@@ -49,5 +49,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>OKButton</sender>
+   <signal>clicked()</signal>
+   <receiver>CameraDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>115</x>
+     <y>407</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>115</x>
+     <y>214</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

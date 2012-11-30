@@ -6,6 +6,10 @@
 #include "viewButtonArea.h"
 
 #include "cameraViewDialog.h"
+#include "pluginsViewDialog.h"
+#include "mapsViewDialog.h"
+
+#include "Utils/GLSLShader.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -14,11 +18,9 @@
 unsigned int View::viewCount = 0;
 
 View::View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget) :
-//	QGLViewer(new Context(NULL, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer))),
 	QGLViewer(parent, shareWidget),
 	m_name(name),
 	m_window(w),
-	m_currentCamera(NULL),
 	m_cameraButton(NULL),
 	m_pluginsButton(NULL),
 	m_mapsButton(NULL),
@@ -26,18 +28,19 @@ View::View(const QString& name, Window* w, QWidget* parent, const QGLWidget* sha
 {
 	++viewCount;
 
-	Camera* c = m_window->addCamera();
-	setCurrentCamera(c);
+	m_currentCamera = m_window->addCamera();
 
-	m_buttonArea = new ViewButtonArea(this);
-	m_buttonArea->setTopRightPosition(this->width(), 0);
-
-	updateTextInfo();
+	m_cameraViewDialog = new CameraViewDialog(m_window, this);
+	m_pluginsViewDialog = new PluginsViewDialog(m_window, this);
+	m_mapsViewDialog = new MapsViewDialog(m_window, this);
 }
 
 View::~View()
 {
 	m_currentCamera->unlinkView(this);
+
+	qglviewer::Camera* c = new qglviewer::Camera();
+	this->setCamera(c);
 
 	foreach(Plugin* plugin, l_plugins)
 		unlinkPlugin(plugin);
@@ -48,49 +51,71 @@ View::~View()
 	delete m_buttonArea;
 }
 
-void View::initGL()
+void View::init()
 {
+	m_buttonArea = new ViewButtonArea(this);
+	m_buttonArea->setTopRightPosition(this->width(), 0);
+
 	m_cameraButton = new ViewButton(":icons/icons/camera_32.png", this);
-	connect(m_cameraButton, SIGNAL(clicked()), this, SLOT(cb_cameraView()));
+	m_buttonArea->addButton(m_cameraButton);
+	connect(m_cameraButton, SIGNAL(clicked(int, int)), this, SLOT(cb_cameraView(int, int)));
 
 	m_pluginsButton = new ViewButton(":icons/icons/plugins_32.png", this);
+	m_buttonArea->addButton(m_pluginsButton);
+	connect(m_pluginsButton, SIGNAL(clicked(int, int)), this, SLOT(cb_pluginsView(int, int)));
 
 	m_mapsButton = new ViewButton(":icons/icons/maps_32.png", this);
+	m_buttonArea->addButton(m_mapsButton);
+	connect(m_mapsButton, SIGNAL(clicked(int, int)), this, SLOT(cb_mapsView(int, int)));
 
 	m_closeButton = new ViewButton(":icons/icons/close_32.png", this);
+	m_buttonArea->addButton(m_closeButton);
+	connect(m_closeButton, SIGNAL(clicked(int, int)), this, SLOT(cb_closeView(int, int)));
+
+	qglviewer::Camera* c = this->camera();
+	this->setCamera(m_currentCamera);
+	delete c;
+
+	this->setBackgroundColor(QColor(0,0,0));
+
+	updateTextInfo();
 }
 
-void View::updateGL()
+void View::preDraw()
 {
-	QGLViewer::updateGL();
+	QGLViewer::preDraw();
+
+	glm::mat4 mm = getCurrentModelViewMatrix();
+	glm::mat4 pm = getCurrentProjectionMatrix();
+	for(std::set< std::pair<void*, CGoGN::Utils::GLSLShader*> >::iterator it = CGoGN::Utils::GLSLShader::m_registeredShaders.begin();
+		it != CGoGN::Utils::GLSLShader::m_registeredShaders.end();
+		++it)
+	{
+		it->second->updateMatrices(pm, mm);
+	}
 }
 
 void View::draw()
 {
-	const float nbSteps = 200.0;
-	glBegin(GL_QUAD_STRIP);
-	for (float i = 0; i < nbSteps; ++i)
-	{
-		float ratio = i/nbSteps;
-		float angle = 21.0*ratio;
-		float c = cos(angle);
-		float s = sin(angle);
-		float r1 = 1.0 - 0.8f*ratio;
-		float r2 = 0.8f - 0.8f*ratio;
-		float alt = ratio - 0.5f;
-		const float nor = 0.5f;
-		const float up = sqrt(1.0-nor*nor);
-		glColor3f(1.0-ratio, 0.2f , ratio);
-		glNormal3f(nor*c, up, nor*s);
-		glVertex3f(r1*c, alt, r1*s);
-		glVertex3f(r2*c, alt+0.05f, r2*s);
-	}
-	glEnd();
+	foreach(Plugin* plugin, l_plugins)
+		plugin->redraw(this);
+}
 
+void View::postDraw()
+{
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-//	drawButtons();
+	drawButtons();
 	drawText();
 	glPopAttrib();
+
+	QGLViewer::postDraw();
+}
+
+void View::resizeGL(int width, int height)
+{
+	QGLViewer::resizeGL(width, height);
+	if(m_buttonArea)
+		m_buttonArea->setTopRightPosition(width, 0);
 }
 
 void View::drawText()
@@ -101,7 +126,6 @@ void View::drawText()
 
 void View::drawButtons()
 {
-	glColor3f(1.0f,1.0f,1.0f);
 	glEnable(GL_TEXTURE_2D);
 	startScreenCoordinatesSystem();
 	m_buttonArea->draw();
@@ -112,14 +136,14 @@ void View::drawButtons()
 void View::keyPressEvent(QKeyEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->cb_keyPress(this, event->key());
+		plugin->keyPress(this, event->key());
 	QGLViewer::keyPressEvent(event);
 }
 
 void View::keyReleaseEvent(QKeyEvent *event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->cb_keyRelease(this, event->key());
+		plugin->keyRelease(this, event->key());
 	QGLViewer::keyReleaseEvent(event);
 }
 
@@ -130,7 +154,7 @@ void View::mousePressEvent(QMouseEvent* event)
 	else
 	{
 		foreach(Plugin* plugin, l_plugins)
-			plugin->cb_mousePress(this, event->button(), event->pos().x(), event->pos().y());
+			plugin->mousePress(this, event->button(), event->pos().x(), event->pos().y());
 		QGLViewer::mousePressEvent(event);
 	}
 }
@@ -138,29 +162,22 @@ void View::mousePressEvent(QMouseEvent* event)
 void View::mouseReleaseEvent(QMouseEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->cb_mouseRelease(this, event->button(), event->pos().x(), event->pos().y());
+		plugin->mouseRelease(this, event->button(), event->pos().x(), event->pos().y());
 	QGLViewer::mouseReleaseEvent(event);
 }
 
 void View::mouseMoveEvent(QMouseEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->cb_mouseMove(this, event->button(), event->pos().x(), event->pos().y());
+		plugin->mouseMove(this, event->button(), event->pos().x(), event->pos().y());
 	QGLViewer::mouseMoveEvent(event);
 }
 
 void View::wheelEvent(QWheelEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
-		plugin->cb_mouseMove(this, event->delta(), event->pos().x(), event->pos().y());
+		plugin->wheelEvent(this, event->delta(), event->pos().x(), event->pos().y());
 	QGLViewer::wheelEvent(event);
-}
-
-void View::resizeGL(int width, int height)
-{
-	QGLViewer::resizeGL(width, height);
-	if(m_buttonArea)
-		m_buttonArea->setTopRightPosition(width, 0);
 }
 
 void View::drawOverpaint(QPainter *painter)
@@ -170,19 +187,24 @@ void View::drawOverpaint(QPainter *painter)
     painter->restore();
 }
 
+/*********************************************************
+ * MANAGE LINKED CAMERA
+ *********************************************************/
+
 void View::setCurrentCamera(Camera* c)
 {
-	if(c != m_currentCamera)
+	if(c != m_currentCamera && c != NULL)
 	{
-		if(m_currentCamera != NULL)
-			m_currentCamera->unlinkView(this);
 		m_currentCamera = c;
-		m_currentCamera->linkView(this);
 		this->setCamera(m_currentCamera);
 		updateTextInfo();
 		updateGL();
 	}
 }
+
+/*********************************************************
+ * MANAGE LINKED PLUGINS
+ *********************************************************/
 
 void View::linkPlugin(Plugin* plugin)
 {
@@ -195,6 +217,10 @@ void View::unlinkPlugin(Plugin* plugin)
 	l_plugins.removeOne(plugin);
 }
 
+/*********************************************************
+ * MANAGE LINKED MAPS
+ *********************************************************/
+
 void View::linkMap(MapHandler* map)
 {
 	if(map && !l_maps.contains(map))
@@ -205,6 +231,9 @@ void View::unlinkMap(MapHandler* map)
 {
 	l_maps.removeOne(map);
 }
+
+
+
 
 void View::updateTextInfo()
 {
@@ -274,8 +303,23 @@ void View::setCurrentProjectionMatrix(const glm::mat4& pm)
 	this->camera()->setFromProjectionMatrix(gl_pm);
 }
 
-void View::cb_cameraView()
+void View::cb_cameraView(int x, int y)
 {
-	CameraViewDialog cvd(m_window, this);
-	cvd.exec();
+//	m_cameraViewDialog->setGeometry(x, y, 150, 300);
+	m_cameraViewDialog->show();
+}
+
+void View::cb_pluginsView(int x, int y)
+{
+	m_pluginsViewDialog->show();
+}
+
+void View::cb_mapsView(int x, int y)
+{
+	m_mapsViewDialog->show();
+}
+
+void View::cb_closeView(int x, int y)
+{
+	m_window->removeView(m_name);
 }

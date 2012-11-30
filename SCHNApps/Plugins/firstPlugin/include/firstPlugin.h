@@ -48,7 +48,10 @@ class FirstPlugin : public Plugin
 
 public:
 	FirstPlugin()
-	{}
+	{
+		setProvidesRendering(true);
+		glewInit();
+	}
 
 	~FirstPlugin()
 	{}
@@ -70,20 +73,18 @@ public:
 	 */
 	void disable();
 
-	void cb_initGL(View *scene);
-	virtual void cb_updateMatrix(View* view) {}
-	void cb_redraw(View *scene);
+	virtual void redraw(View *view);
 
-	virtual void cb_keyPress(View* scene, int key) {}
-	virtual void cb_keyRelease(View* scene, int key) {}
-	virtual void cb_mousePress(View* scene, int button, int x, int y) {}
-	virtual void cb_mouseRelease(View* scene, int button, int x, int y) {}
-//	virtual void cb_mouseClick(View* scene, int button, int x, int y) {}
-	virtual void cb_mouseMove(View* scene, int buttons, int x, int y) {}
-	virtual void cb_wheelEvent(View* scene, int delta, int x, int y) {}
+	virtual void keyPress(View* view, int key) {}
+	virtual void keyRelease(View* view, int key) {}
+	virtual void mousePress(View* view, int button, int x, int y) {}
+	virtual void mouseRelease(View* view, int button, int x, int y) {}
+//	virtual void mouseClick(View* view, int button, int x, int y) {}
+	virtual void mouseMove(View* view, int buttons, int x, int y) {}
+	virtual void wheelEvent(View* view, int delta, int x, int y) {}
 
-	virtual void cb_viewAdded(View* s) {}
-	virtual void cb_viewRemoved(View* s) {}
+	virtual void viewAdded(View* view);
+	virtual void viewRemoved(View* view) {}
 
 protected:
 	/** Attributes that are specific to this plugin **/

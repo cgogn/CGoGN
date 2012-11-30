@@ -63,15 +63,3 @@ void Camera::saveSnapshot(QString snapPathName)
 		view->saveSnapshot(snapPathName + view->getName() + '_' + QString::number(m_snapCount) + ".jpg", true);
 	++m_snapCount;
 }
-
-void Camera::updateGL()
-{
-	foreach(View* view, l_views)
-		view->updateGL();
-}
-
-//void Camera::viewShowButton(bool b)
-//{
-//	foreach(View* view, l_views)
-//		view->setShowButtons(b);
-//}

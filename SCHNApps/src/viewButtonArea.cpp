@@ -21,9 +21,9 @@ ViewButton::~ViewButton()
 	m_view->deleteTexture(m_texID);
 }
 
-void ViewButton::click()
+void ViewButton::click(int x, int y)
 {
-	emit clicked();
+	emit clicked(x, y);
 }
 
 void ViewButton::drawAt(int x, int y)
@@ -86,20 +86,19 @@ bool ViewButtonArea::isClicked(int x, int y)
 	return m_form.contains(x, y);
 }
 
-ViewButton* ViewButtonArea::clickButton(int x, int y)
+void ViewButtonArea::clickButton(int x, int y)
 {
 	QPoint p = m_form.topLeft();
 	p.setY(p.y() + 3);
 	foreach(ViewButton* b, l_buttons)
 	{
-		if(QRect(p, b->getSize()).contains(x,y))
+		if(QRect(p, b->getSize()).contains(x, y))
 		{
-			b->click();
-			return b;
+			b->click(x, y);
+			return;
 		}
 		p.setX(p.x() + 3 + b->getSize().width());
 	}
-	return NULL;
 }
 
 void ViewButtonArea::setTopRightPosition(int x, int y)

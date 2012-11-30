@@ -1,13 +1,8 @@
 #include "plugin.h"
 
 Plugin::Plugin() :
-	m_window(NULL)
-{}
-
-Plugin::Plugin(const QString& name, const QString& filePath, Window* window) :
-	m_name(name),
-	m_filePath(filePath),
-	m_window(window)
+	m_window(NULL),
+	b_providesRendering(false)
 {}
 
 Plugin::~Plugin()
@@ -29,7 +24,7 @@ Plugin::~Plugin()
 }
 
 /*********************************************************
- * MANAGE SCENES
+ * MANAGE VIEWS
  *********************************************************/
 
 bool Plugin::linkView(View* view)
@@ -37,9 +32,8 @@ bool Plugin::linkView(View* view)
 	if(view && !l_views.contains(view))
 	{
 		l_views.push_back(view);
-		view->linkPlugin(this);
 		view->updateGL();
-		cb_viewAdded(view);
+		viewAdded(view);
 		return true;
 	}
 	else
@@ -50,9 +44,8 @@ void Plugin::unlinkView(View* view)
 {
 	if(l_views.removeOne(view))
 	{
-		view->unlinkPlugin(this);
 		view->updateGL();
-		cb_viewRemoved(view);
+		viewRemoved(view);
 	}
 }
 

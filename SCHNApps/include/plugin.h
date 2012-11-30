@@ -20,7 +20,6 @@ public:
 	enum { UNLIMITED_NUMBER_OF_SCENES = -1 };
 
 	Plugin();
-	Plugin(const QString& name, const QString& filePath, Window* window);
 	virtual ~Plugin();
 
 	virtual bool enable() = 0;
@@ -35,20 +34,21 @@ public:
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	virtual void cb_initGL(View* scene) = 0;
-	virtual void cb_updateMatrix(View* view) = 0;
-	virtual void cb_redraw(View* scene) = 0;
+	bool getProvidesRendering() { return b_providesRendering; }
+	void setProvidesRendering(bool b) { b_providesRendering = b; }
 
-	virtual void cb_keyPress(View* scene, int key) = 0;
-	virtual void cb_keyRelease(View* scene, int key) = 0;
-	virtual void cb_mousePress(View* scene, int button, int x, int y) = 0;
-	virtual void cb_mouseRelease(View* scene, int button, int x, int y) = 0;
-//	virtual void cb_mouseClick(View* scene, int button, int x, int y) = 0;
-	virtual void cb_mouseMove(View* scene, int buttons, int x, int y) = 0;
-	virtual void cb_wheelEvent(View* scene, int delta, int x, int y) = 0;
+	virtual void redraw(View* view) = 0;
 
-	virtual void cb_viewAdded(View* s) = 0;
-	virtual void cb_viewRemoved(View* s) = 0;
+	virtual void keyPress(View* view, int key) = 0;
+	virtual void keyRelease(View* view, int key) = 0;
+	virtual void mousePress(View* view, int button, int x, int y) = 0;
+	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
+//	virtual void mouseClick(View* view, int button, int x, int y) = 0;
+	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
+	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
+
+	virtual void viewAdded(View* view) = 0;
+	virtual void viewRemoved(View* view) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
@@ -84,6 +84,8 @@ protected:
 	QString m_name;
 	QString m_filePath;
 	Window* m_window;
+
+	bool b_providesRendering;
 
 	QList<View*> l_views;
 	QList<QWidget*> l_tabWidgets;

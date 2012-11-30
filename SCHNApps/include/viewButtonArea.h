@@ -19,20 +19,20 @@ public:
 	ViewButton(const QString& image, View* view);
 	~ViewButton();
 
-	void click();
-
-	void drawAt(int x, int y);
-
 	QSize getSize() { return m_GLimg.size(); }
+
+	void click(int x, int y);
+	void drawAt(int x, int y);
 
 protected:
 	View* m_view;
+
 	QSize m_size;
 	QImage m_GLimg;
 	int m_texID;
 
 signals:
-	void clicked();
+	void clicked(int x, int y);
 };
 
 class ViewButtonArea : public QObject
@@ -49,7 +49,7 @@ public:
 	void removeButton(ViewButton* button);
 
 	bool isClicked(int x, int y);
-	ViewButton* clickButton(int x, int y);
+	void clickButton(int x, int y);
 
 	const QRect& getForm() { return m_form; }
 

@@ -4,6 +4,7 @@
 #include "ui_cameraDialog.h"
 
 class Window;
+class Camera;
 
 class CameraDialog : public QDialog, Ui::CameraDialog
 {
@@ -13,15 +14,14 @@ public:
 	CameraDialog(Window* window);
 	~CameraDialog();
 
-	void addCameraToList(const QString& name);
-	void addViewToList(const QString& name);
-
 private:
 	Window* m_window;
 
 public slots:
 	void cb_addCamera();
 	void cb_removeCamera();
+	void cb_addCameraToList(Camera* c);
+	void cb_removeCameraFromList(Camera* c);
 };
 
 #endif

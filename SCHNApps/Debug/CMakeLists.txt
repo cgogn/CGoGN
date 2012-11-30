@@ -34,18 +34,21 @@ file(
 	${SCHNApps_ROOT_DIR}/src/cameraDialog.cpp
 	${SCHNApps_ROOT_DIR}/src/pluginDialog.cpp
 	${SCHNApps_ROOT_DIR}/src/cameraViewDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/pluginsViewDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/mapsViewDialog.cpp
 )
 
 SET(SCHNApps_H_OBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/view.h
-	${SCHNApps_ROOT_DIR}/include/plugin.h
 	${SCHNApps_ROOT_DIR}/include/splitArea.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
 	${SCHNApps_ROOT_DIR}/include/viewSelector.h
 	${SCHNApps_ROOT_DIR}/include/cameraDialog.h
 	${SCHNApps_ROOT_DIR}/include/pluginDialog.h
 	${SCHNApps_ROOT_DIR}/include/cameraViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/pluginsViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/mapsViewDialog.h
 )
 
 file(
@@ -55,6 +58,8 @@ file(
 	${SCHNApps_ROOT_DIR}/forms/cameraDialog.ui
 	${SCHNApps_ROOT_DIR}/forms/pluginDialog.ui
 	${SCHNApps_ROOT_DIR}/forms/cameraViewDialog.ui
+	${SCHNApps_ROOT_DIR}/forms/pluginsViewDialog.ui
+	${SCHNApps_ROOT_DIR}/forms/mapsViewDialog.ui
 )
 
 QT4_WRAP_UI( UI_H_FILES

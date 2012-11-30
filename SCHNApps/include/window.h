@@ -128,6 +128,28 @@ public:
 	void removeToolbarAction(QAction* action);
 
 	/*********************************************************
+	 * MANAGE CAMERAS
+	 *********************************************************/
+
+	Camera* addCamera(const QString& name);
+	Camera* addCamera();
+	void removeCamera(const QString& name);
+	Camera* getCamera(const QString& name);
+	QList<Camera*> getCamerasList() { return h_cameras.values(); }
+	const CameraHash& getCamerasHash() { return h_cameras; }
+
+	/*********************************************************
+	 * MANAGE VIEWS
+	 *********************************************************/
+
+	View* addView(const QString& name);
+	View* addView();
+	void removeView(const QString& name);
+	View* getView(const QString& name);
+	QList<View*> getViewsList() { return h_views.values(); }
+	const ViewHash& getViewsHash() { return h_views; }
+
+	/*********************************************************
 	 * MANAGE PLUGINS
 	 *********************************************************/
 
@@ -207,28 +229,6 @@ public:
 	const PluginHash& getPluginsHash() { return h_plugins; }
 
 	/*********************************************************
-	 * MANAGE VIEWS
-	 *********************************************************/
-
-	View* addView(const QString& name);
-	View* addView();
-	void removeView(const QString& name);
-	View* getView(const QString& name);
-	QList<View*> getViewsList() { return h_views.values(); }
-	const ViewHash& getViewsHash() { return h_views; }
-
-	/*********************************************************
-	 * MANAGE CAMERAS
-	 *********************************************************/
-
-	Camera* addCamera(const QString& name);
-	Camera* addCamera();
-	void removeCamera(const QString& name);
-	Camera* getCamera(const QString& name);
-	QList<Camera*> getCamerasList() { return h_cameras.values(); }
-	const CameraHash& getCamerasHash() { return h_cameras; }
-
-	/*********************************************************
 	 * MANAGE MAPS
 	 *********************************************************/
 
@@ -303,11 +303,11 @@ public slots:
 	void cb_aboutCGoGN();
 
 	/**
-	 * \fn void cb_managePlugins()
-	 * \brief method called when the "Plugins" action is triggered.
-	 * Show the plugins management dialog
+	 * \fn void cb_manageCameras()
+	 * \brief method called when the "Cameras" action is triggered.
+	 * Show the cameras management dialog:
 	 */
-	void cb_managePlugins();
+	void cb_manageCameras();
 
 	/**
 	 * \fn void cb_manageViews()
@@ -317,11 +317,24 @@ public slots:
 	void cb_manageViews();
 
 	/**
-	 * \fn void cb_manageCameras()
-	 * \brief method called when the "Cameras" action is triggered.
-	 * Show the cameras management dialog:
+	 * \fn void cb_managePlugins()
+	 * \brief method called when the "Plugins" action is triggered.
+	 * Show the plugins management dialog
 	 */
-	void cb_manageCameras();
+	void cb_managePlugins();
+
+signals:
+	void cameraAdded(Camera* camera);
+	void cameraRemoved(Camera* camera);
+
+	void viewAdded(View* view);
+	void viewRemoved(View* view);
+
+	void mapAdded(MapHandler* camera);
+	void mapRemoved(MapHandler* map);
+
+	void pluginAdded(Plugin* plugin);
+	void pluginRemoved(Plugin* plugin);
 };
 
 #endif
