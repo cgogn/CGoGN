@@ -32,6 +32,7 @@
 #include "Utils/qem.h"
 #include "Utils/quadricRGBfunctions.h"
 #include "Algo/Geometry/curvature.h"
+#include "Algo/Geometry/area.h"
 
 namespace CGoGN
 {
@@ -297,6 +298,7 @@ private:
 	void initEdgeInfo(Dart d) ;
 	void updateEdgeInfo(Dart d) ;
 	void computeEdgeInfo(Dart d, EdgeInfo& einfo) ;
+	void computeEdgeMatrix(Dart d) ;
 //	void recomputeQuadric(const Dart d, const bool recomputeNeighbors = false) ;
 
 public:
