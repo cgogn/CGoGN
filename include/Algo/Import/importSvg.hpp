@@ -490,7 +490,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	}
 
 	//close the intersections
-	map.closeMap() ;
+	map.closeMap(false) ;
 
 	//embed the path
 	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
