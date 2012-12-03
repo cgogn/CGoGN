@@ -40,7 +40,10 @@ public:
 	typedef Map2 TOPO_MAP;
 
 	/*
-	 *
+	 */
+	virtual Dart newPolyLine(unsigned int nbEdges) ;
+
+	/*
 	 */
 	virtual Dart newFace(unsigned int nbEdges, bool withBoundary = true) ;
 

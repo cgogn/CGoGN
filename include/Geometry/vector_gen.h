@@ -153,12 +153,20 @@ public:
 	bool isNormalized(const T& epsilon) const ;
 
 	/**
+	 * Tests if current and given vectors are near within 1/precision (equal if precision is zero)
+	 * @param V a vector
+	 * @param epsilon tolerated error
+	 * @return true if orthogonal
+	 */
+	bool isNear(const Vector<DIM, T>& v, int precision) const ;
+
+	/**
 	 * Tests if current and given vectors are orthogonal
 	 * @param V a vector
 	 * @param epsilon tolerated error
 	 * @return true if orthogonal
 	 */
-	bool isOrthogonal(const Vector<DIM, T>& V, const T& epsilon = 1e-5) const ;
+	bool isOrthogonal(const Vector<DIM, T>& v, const T& epsilon = 1e-5) const ;
 
 	/**********************************************/
 	/*             STREAM OPERATORS               */
@@ -173,6 +181,22 @@ public:
 private:
 	T m_data[DIM] ;
 } ;
+
+/***
+ * Test if x is null within precision.
+ * Two cases are possible :
+ *  - precision == 0 : x is null if (x == 0)
+ *  - precision > 0 : x is null if (|x| < 1/precision) or (precision * |x| < 1)
+ */
+template <typename T>
+bool isNull(T x, int precision = 0) ;
+
+/***
+ * Test if the square root of x is null within precision.
+ * In other words, test if x is null within precision*precision
+ */
+template <typename T>
+bool isNull2(T x, int precision = 0) ;
 
 template <unsigned int DIM, typename T>
 Vector<DIM, T> operator*(T a, const Vector<DIM, T>& v) ;

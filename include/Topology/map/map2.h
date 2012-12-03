@@ -125,6 +125,12 @@ public:
 	 *************************************************************************/
 
 	//@{
+	//! Create an new polyline of nbEdges, i.e 2*nbEdges darts pairewise sewn by phi2
+	/*! @param nbEdges the number of edges
+	 *  @return return a dart of the face
+	 */
+	virtual Dart newPolyLine(unsigned int nbEdges) ;
+
 	//! Create an new face of nbEdges
 	/*! @param nbEdges the number of edges
 	 *  @param withBoundary create the face and its boundary (default true)
