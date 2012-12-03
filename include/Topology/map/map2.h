@@ -475,7 +475,7 @@ public:
 	 *  These faces are marked as boundary.
 	 *  @return the number of closed holes
 	 */
-	unsigned int closeMap();
+	unsigned int closeMap(bool forboundary = true);
 	//@}
 };
 

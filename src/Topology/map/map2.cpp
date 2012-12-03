@@ -906,7 +906,7 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 	return countEdges ;
 }
 
-unsigned int Map2::closeMap()
+unsigned int Map2::closeMap(bool forboundary)
 {
 	// Search the map for topological holes (fix points of phi2)
 	unsigned int nb = 0 ;
@@ -915,7 +915,7 @@ unsigned int Map2::closeMap()
 		if (phi2(d) == d)
 		{
 			++nb ;
-			closeHole(d);
+			closeHole(d, forboundary);
 		}
 	}
 	return nb ;
