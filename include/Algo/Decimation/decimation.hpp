@@ -65,6 +65,9 @@ void decimate(
 		case A_TangentPredict2 :
 			approximators.push_back(new Approximator_MidEdge<PFP>(map, attribs)) ;
 			break ;
+		case A_NormalArea :
+			approximators.push_back(new Approximator_NormalArea<PFP>(map, attribs)) ;
+			break ;
 		case A_hHalfCollapse :
 			approximators.push_back(new Approximator_HalfCollapse<PFP>(map, attribs)) ;
 			break ;
