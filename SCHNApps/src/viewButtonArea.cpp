@@ -1,44 +1,48 @@
 #include "viewButtonArea.h"
 
+#include "window.h"
+#include "view.h"
+#include "texture.h"
 #include "camera.h"
 
 #include <iostream>
 
 ViewButton::ViewButton(const QString& image, View* view) :
+	m_img(image),
 	m_view(view)
 {
-	m_GLimg.load(image);
-	if(!m_GLimg.isNull())
-	{
-		m_size = m_GLimg.size();
-		m_GLimg = QGLWidget::convertToGLFormat(m_GLimg);
-		m_texID = m_view->bindTexture(m_GLimg, GL_TEXTURE_2D, GL_RGBA);
-	}
+	m_tex = m_view->getWindow()->getTexture(m_img);
 }
 
 ViewButton::~ViewButton()
 {
-	m_view->deleteTexture(m_texID);
+	m_view->getWindow()->releaseTexture(m_img);
 }
 
-void ViewButton::click(int x, int y)
+QSize ViewButton::getSize()
 {
-	emit clicked(x, y);
+	return m_tex->size;
+}
+
+void ViewButton::click(int x, int y, int globalX, int globalY)
+{
+	emit clicked(x, y, globalX, globalY);
 }
 
 void ViewButton::drawAt(int x, int y)
 {
-	glBindTexture(GL_TEXTURE_2D, m_texID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_GLimg.bits());
+	int w = m_tex->size.width();
+	int h = m_tex->size.height();
+	glBindTexture(GL_TEXTURE_2D, m_tex->texID);
 	glBegin (GL_QUADS);
 		glTexCoord2i(0, 1);
 		glVertex2i(x, y);
 		glTexCoord2i(0, 0);
-		glVertex2i(x, y + m_size.height());
+		glVertex2i(x, y + h);
 		glTexCoord2i(1, 0);
-		glVertex2i(x + m_size.width(), y + m_size.height());
+		glVertex2i(x + w, y + h);
 		glTexCoord2i(1, 1);
-		glVertex2i(x + m_size.width(), y);
+		glVertex2i(x + w, y);
 	glEnd();
 }
 
@@ -86,7 +90,7 @@ bool ViewButtonArea::isClicked(int x, int y)
 	return m_form.contains(x, y);
 }
 
-void ViewButtonArea::clickButton(int x, int y)
+void ViewButtonArea::clickButton(int x, int y, int globalX, int globalY)
 {
 	QPoint p = m_form.topLeft();
 	p.setY(p.y() + 3);
@@ -94,7 +98,7 @@ void ViewButtonArea::clickButton(int x, int y)
 	{
 		if(QRect(p, b->getSize()).contains(x, y))
 		{
-			b->click(x, y);
+			b->click(x, y, globalX, globalY);
 			return;
 		}
 		p.setX(p.x() + 3 + b->getSize().width());

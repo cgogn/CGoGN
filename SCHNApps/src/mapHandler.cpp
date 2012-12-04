@@ -4,10 +4,13 @@
 #include "Topology/generic/genericmap.h"
 #include "Utils/vbo.h"
 
-MapHandler::MapHandler(const QString& name, CGoGN::GenericMap *map) :
+MapHandler::MapHandler(const QString& name, Window* window, CGoGN::GenericMap *map) :
 	m_name(name),
+	m_window(window),
 	m_map(map)
-{}
+{
+//	connect(m_window, SIGNAL(viewRemoved(View*)), this, SLOT(cb_viewRemoved(View*)));
+}
 
 MapHandler::~MapHandler()
 {
@@ -97,4 +100,9 @@ void MapHandler::unlinkView(View* view)
 	{
 		view->updateGL();
 	}
+}
+
+void MapHandler::cb_viewRemoved(View* view)
+{
+	unlinkView(view);
 }

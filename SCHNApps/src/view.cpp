@@ -43,10 +43,16 @@ View::~View()
 	this->setCamera(c);
 
 	foreach(Plugin* plugin, l_plugins)
+	{
+		plugin->unlinkView(this);
 		unlinkPlugin(plugin);
+	}
 
 	foreach(MapHandler* map, l_maps)
+	{
+		map->unlinkView(this);
 		unlinkMap(map);
+	}
 
 	delete m_buttonArea;
 }
@@ -58,19 +64,19 @@ void View::init()
 
 	m_cameraButton = new ViewButton(":icons/icons/camera_32.png", this);
 	m_buttonArea->addButton(m_cameraButton);
-	connect(m_cameraButton, SIGNAL(clicked(int, int)), this, SLOT(cb_cameraView(int, int)));
+	connect(m_cameraButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_cameraView(int, int, int, int)));
 
 	m_pluginsButton = new ViewButton(":icons/icons/plugins_32.png", this);
 	m_buttonArea->addButton(m_pluginsButton);
-	connect(m_pluginsButton, SIGNAL(clicked(int, int)), this, SLOT(cb_pluginsView(int, int)));
+	connect(m_pluginsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_pluginsView(int, int, int, int)));
 
 	m_mapsButton = new ViewButton(":icons/icons/maps_32.png", this);
 	m_buttonArea->addButton(m_mapsButton);
-	connect(m_mapsButton, SIGNAL(clicked(int, int)), this, SLOT(cb_mapsView(int, int)));
+	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_mapsView(int, int, int, int)));
 
 	m_closeButton = new ViewButton(":icons/icons/close_32.png", this);
 	m_buttonArea->addButton(m_closeButton);
-	connect(m_closeButton, SIGNAL(clicked(int, int)), this, SLOT(cb_closeView(int, int)));
+	connect(m_closeButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_closeView(int, int, int, int)));
 
 	qglviewer::Camera* c = this->camera();
 	this->setCamera(m_currentCamera);
@@ -83,8 +89,6 @@ void View::init()
 
 void View::preDraw()
 {
-	QGLViewer::preDraw();
-
 	glm::mat4 mm = getCurrentModelViewMatrix();
 	glm::mat4 pm = getCurrentProjectionMatrix();
 	for(std::set< std::pair<void*, CGoGN::Utils::GLSLShader*> >::iterator it = CGoGN::Utils::GLSLShader::m_registeredShaders.begin();
@@ -93,6 +97,8 @@ void View::preDraw()
 	{
 		it->second->updateMatrices(pm, mm);
 	}
+
+	QGLViewer::preDraw();
 }
 
 void View::draw()
@@ -150,7 +156,7 @@ void View::keyReleaseEvent(QKeyEvent *event)
 void View::mousePressEvent(QMouseEvent* event)
 {
 	if(m_buttonArea->isClicked(event->x(), event->y()))
-		m_buttonArea->clickButton(event->x(), event->y());
+		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
 	else
 	{
 		foreach(Plugin* plugin, l_plugins)
@@ -303,23 +309,25 @@ void View::setCurrentProjectionMatrix(const glm::mat4& pm)
 	this->camera()->setFromProjectionMatrix(gl_pm);
 }
 
-void View::cb_cameraView(int x, int y)
+void View::cb_cameraView(int x, int y, int globalX, int globalY)
 {
-//	m_cameraViewDialog->setGeometry(x, y, 150, 300);
+	m_cameraViewDialog->move(globalX, globalY);
 	m_cameraViewDialog->show();
 }
 
-void View::cb_pluginsView(int x, int y)
+void View::cb_pluginsView(int x, int y, int globalX, int globalY)
 {
+	m_pluginsViewDialog->move(globalX, globalY);
 	m_pluginsViewDialog->show();
 }
 
-void View::cb_mapsView(int x, int y)
+void View::cb_mapsView(int x, int y, int globalX, int globalY)
 {
+	m_mapsViewDialog->move(globalX, globalY);
 	m_mapsViewDialog->show();
 }
 
-void View::cb_closeView(int x, int y)
+void View::cb_closeView(int x, int y, int globalX, int globalY)
 {
 	m_window->removeView(m_name);
 }

@@ -39,9 +39,12 @@ file(
 )
 
 SET(SCHNApps_H_OBJECT_FILES
-	${SCHNApps_ROOT_DIR}/include/window.h
-	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/camera.h
+	${SCHNApps_ROOT_DIR}/include/mapHandler.h
+	${SCHNApps_ROOT_DIR}/include/plugin.h
 	${SCHNApps_ROOT_DIR}/include/splitArea.h
+	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
 	${SCHNApps_ROOT_DIR}/include/viewSelector.h
 	${SCHNApps_ROOT_DIR}/include/cameraDialog.h

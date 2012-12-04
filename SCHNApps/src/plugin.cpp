@@ -3,7 +3,9 @@
 Plugin::Plugin() :
 	m_window(NULL),
 	b_providesRendering(false)
-{}
+{
+//	connect(m_window, SIGNAL(viewRemoved(View*)), this, SLOT(cb_viewRemoved(View*)));
+}
 
 Plugin::~Plugin()
 {
@@ -113,4 +115,9 @@ void Plugin::removeToolbarAction(QAction* action)
 {
 	if(l_toolbarActions.removeOne(action))
 		m_window->removeToolbarAction(action);
+}
+
+void Plugin::cb_viewRemoved(View* view)
+{
+	unlinkView(view);
 }

@@ -15,14 +15,19 @@ namespace CGoGN
 	}
 }
 
-class MapHandler
+class MapHandler : public QObject
 {
+	Q_OBJECT
+
 public:
-	MapHandler(const QString& name, CGoGN::GenericMap* map);
+	MapHandler(const QString& name, Window* window, CGoGN::GenericMap* map);
 	~MapHandler();
 
 	const QString& getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
+
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
 
 	CGoGN::GenericMap* getMap() { return m_map; }
 
@@ -45,11 +50,15 @@ public:
 
 protected:
 	QString m_name;
+	Window* m_window;
 	CGoGN::GenericMap* m_map;
 
 	QList<View*> l_views;
 
 	VBOHash h_vbo;
+
+public slots:
+	void cb_viewRemoved(View* view);
 };
 
 #endif

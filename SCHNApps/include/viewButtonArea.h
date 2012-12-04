@@ -10,6 +10,7 @@
 #include <iostream>
 
 class View;
+class Texture;
 
 class ViewButton : public QObject
 {
@@ -19,20 +20,18 @@ public:
 	ViewButton(const QString& image, View* view);
 	~ViewButton();
 
-	QSize getSize() { return m_GLimg.size(); }
+	QSize getSize();
 
-	void click(int x, int y);
+	void click(int x, int y, int globalX, int globalY);
 	void drawAt(int x, int y);
 
 protected:
+	QString m_img;
 	View* m_view;
-
-	QSize m_size;
-	QImage m_GLimg;
-	int m_texID;
+	Texture* m_tex;
 
 signals:
-	void clicked(int x, int y);
+	void clicked(int x, int y, int globalX, int globalY);
 };
 
 class ViewButtonArea : public QObject
@@ -49,7 +48,7 @@ public:
 	void removeButton(ViewButton* button);
 
 	bool isClicked(int x, int y);
-	void clickButton(int x, int y);
+	void clickButton(int x, int y, int globalX, int globalY);
 
 	const QRect& getForm() { return m_form; }
 

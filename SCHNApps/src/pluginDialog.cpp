@@ -15,6 +15,7 @@
 
 #include "system.h"
 #include "window.h"
+#include "plugin.h"
 
 PluginDialog::PluginDialog(Window* window) :
 	m_window(window),
@@ -155,7 +156,7 @@ void PluginDialog::cb_addPlugins()
 	QStringList files = QFileDialog::getOpenFileNames(
 		this,
 		"Select one or more plugins",
-		System::app_path,
+		System::app_path + QString("/../Plugins/"),
 		"Plugins (lib*.so lib*.dylib)"
 	);
 
@@ -189,7 +190,7 @@ void PluginDialog::cb_addPluginsDirectory()
 	QString dir = QFileDialog::getExistingDirectory(
 		this,
 		tr("Select a directory"),
-		System::app_path,
+		System::app_path + QString("/../Plugins/"),
 		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
 	);
 
@@ -345,11 +346,25 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 				init = true;
 				item->setCheckState(0, Qt::Unchecked);
 				init = false;
-				return;
 			}
 		}
 		else if (item->checkState(0) == Qt::Unchecked)
-			m_window->unloadPlugin(pluginName);
+		{
+			Plugin* p = m_window->getPlugin(pluginName);
+
+			if(!p->getLinkedViews().empty())
+			{
+				QMessageBox::warning(this, tr("Warning"), "Plugin is currently used");
+				init = true;
+				item->setCheckState(0, Qt::Checked);
+				init = false;
+				return;
+			}
+			else
+			{
+				m_window->unloadPlugin(pluginName);
+			}
+		}
 	}
 }
 

@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_BUILD_TYPE Release)
 
-ADD_DEFINITIONS(-fPIC)
-
 IF(WIN32)
 	link_directories( ${CGoGN_ROOT_DIR}/lib/Release )
 ELSE (WIN32)
@@ -41,9 +39,12 @@ file(
 )
 
 SET(SCHNApps_H_OBJECT_FILES
-	${SCHNApps_ROOT_DIR}/include/window.h
-	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/camera.h
+	${SCHNApps_ROOT_DIR}/include/mapHandler.h
+	${SCHNApps_ROOT_DIR}/include/plugin.h
 	${SCHNApps_ROOT_DIR}/include/splitArea.h
+	${SCHNApps_ROOT_DIR}/include/view.h
+	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
 	${SCHNApps_ROOT_DIR}/include/viewSelector.h
 	${SCHNApps_ROOT_DIR}/include/cameraDialog.h

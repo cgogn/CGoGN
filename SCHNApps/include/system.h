@@ -143,11 +143,11 @@ public:
 //	static bool savePluginsInfo(Window *window, PluginHash *pluginHash, QStringList paths);
 //};
 
-typedef enum
-{
-	GLVIEWER_IN_DOCK,
-	SIMPLE_GLVIEWER
-} QGLV_CREATE_SETTINGS;
+//typedef enum
+//{
+//	GLVIEWER_IN_DOCK,
+//	SIMPLE_GLVIEWER
+//} QGLV_CREATE_SETTINGS;
 
 extern QString app_path;
 

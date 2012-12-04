@@ -105,15 +105,18 @@ protected:
 
 	QString m_textInfo;
 
+	qglviewer::Vec bbmin;
+	qglviewer::Vec bbmax;
+
 	CameraViewDialog* m_cameraViewDialog;
 	PluginsViewDialog* m_pluginsViewDialog;
 	MapsViewDialog* m_mapsViewDialog;
 
 public slots:
-	void cb_cameraView(int x, int y);
-	void cb_pluginsView(int x, int y);
-	void cb_mapsView(int x, int y);
-	void cb_closeView(int x, int y);
+	void cb_cameraView(int x, int y, int globalX, int globalY);
+	void cb_pluginsView(int x, int y, int globalX, int globalY);
+	void cb_mapsView(int x, int y, int globalX, int globalY);
+	void cb_closeView(int x, int y, int globalX, int globalY);
 
 //signals:
 //	void currentCameraChanged(Camera* camera);

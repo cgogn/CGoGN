@@ -15,10 +15,9 @@
 
 class Plugin : public QObject
 {
-public:
-	enum { UNLIMITED_NUMBER_OF_MAPS = -1 };
-	enum { UNLIMITED_NUMBER_OF_SCENES = -1 };
+	Q_OBJECT
 
+public:
 	Plugin();
 	virtual ~Plugin();
 
@@ -35,7 +34,12 @@ public:
 	void setWindow(Window* w) { m_window = w; }
 
 	bool getProvidesRendering() { return b_providesRendering; }
-	void setProvidesRendering(bool b) { b_providesRendering = b; }
+	void setProvidesRendering(bool b)
+	{
+		b_providesRendering = b;
+		if(b_providesRendering)
+			glewInit();
+	}
 
 	virtual void redraw(View* view) = 0;
 
@@ -91,6 +95,9 @@ protected:
 	QList<QWidget*> l_tabWidgets;
 	QList<QAction*> l_menuActions;
 	QList<QAction*> l_toolbarActions;
+
+public slots:
+	void cb_viewRemoved(View* view);
 
 //	QList<Plugin*> l_dependencies;
 //	QList<Plugin*> l_dependantPlugins;

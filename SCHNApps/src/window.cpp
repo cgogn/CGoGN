@@ -10,6 +10,7 @@
 
 #include "plugin.h"
 #include "view.h"
+#include "texture.h"
 #include "splitArea.h"
 
 #include "viewSelector.h"
@@ -417,7 +418,6 @@ Plugin* Window::loadPlugin(QString pluginFilePath)
 		return NULL;
 	}
 
-	// QT's plugin loader class
 	QPluginLoader loader(pluginFilePath);
 
 	// if the loader loads a plugin instance
@@ -435,8 +435,8 @@ Plugin* Window::loadPlugin(QString pluginFilePath)
 		{
 			// if it succeeded we reference this plugin
 			h_plugins.insert(pluginName, plugin);
-			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
 
+			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
 			emit(pluginAdded(plugin));
 
 			// method success
@@ -467,12 +467,14 @@ void Window::unloadPlugin(const QString& pluginName)
 		plugin->disable();
 		h_plugins.remove(pluginName);
 
+		QPluginLoader loader(plugin->getFilePath());
+		loader.unload();
+
+		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
 		emit(pluginRemoved(plugin));
 
 		// delete plugin
 		delete plugin;
-
-		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
 	}
 }
 
@@ -547,6 +549,47 @@ MapHandler* Window::getMap(const QString& name)
 	{
 		System::Error::code = System::Error::MAP_DOES_NOT_EXIST;
 		return NULL;
+	}
+}
+
+/*********************************************************
+ * MANAGE TEXTURES
+ *********************************************************/
+
+Texture* Window::getTexture(const QString& image)
+{
+	if(h_textures.contains(image))
+	{
+		Texture* t = h_textures[image];
+		t->ref++;
+		return t;
+	}
+	else
+	{
+		Texture* t = NULL;
+		QImage img(image);
+		if(!img.isNull())
+		{
+			GLuint texID = m_firstView->bindTexture(img);
+			t = new Texture(texID, img.size(), 1);
+			h_textures.insert(image, t);
+		}
+		return t;
+	}
+}
+
+void Window::releaseTexture(const QString& image)
+{
+	if(h_textures.contains(image))
+	{
+		Texture* t = h_textures[image];
+		t->ref--;
+		if(t->ref == 0)
+		{
+			m_firstView->deleteTexture(h_textures[image]->texID);
+			h_textures.remove(image);
+			delete t;
+		}
 	}
 }
 

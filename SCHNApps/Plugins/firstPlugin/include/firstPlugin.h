@@ -6,7 +6,8 @@
 /**---CGoGN includes **/
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/topoRender.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/Shaders/shaderFlat.h"
 /**---CGoGN includes **/
 
 /**---Definitions specific to CGoGN ---*/
@@ -50,7 +51,6 @@ public:
 	FirstPlugin()
 	{
 		setProvidesRendering(true);
-		glewInit();
 	}
 
 	~FirstPlugin()
@@ -87,34 +87,11 @@ public:
 	virtual void viewRemoved(View* view) {}
 
 protected:
-	/** Attributes that are specific to this plugin **/
 	MAP myMap;
-
-	// attribute for vertices positions
 	VertexAttribute<VEC3> position;
-
-	// render (for the topo)
-	Algo::Render::GL2::TopoRender *m_render_topo;
-
-	// just for more compact writing
-	inline Dart PHI1(Dart d)
-	{
-		return myMap.phi1(d);
-	}
-	inline Dart PHI_1(Dart d)
-	{
-		return myMap.phi_1(d);
-	}
-	inline Dart PHI2(Dart d)
-	{
-		return myMap.phi2(d);
-	}
-	template<int X>
-	Dart PHI(Dart d)
-	{
-		return myMap.phi<X>(d);
-	}
-	/** Attributes that are specific to this plugin **/
+	Algo::Render::GL2::MapRender* m_render ;
+	Utils::VBO* m_positionVBO ;
+	Utils::ShaderFlat* m_flatShader ;
 };
 
 #endif // _FIRSTPLUGIN_H_

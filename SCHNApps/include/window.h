@@ -9,6 +9,7 @@
 class SplitArea;
 class PluginDialog;
 class CameraDialog;
+class Texture;
 
 class Window : public QMainWindow, Ui::Window
 {
@@ -238,17 +239,12 @@ public:
 	QList<MapHandler*> getMapsList() { return h_maps.values(); }
 	const MapHash& getMapsHash() { return h_maps; }
 
-//	template<typename T>
-//	T* getReferencedMap(QString map_name){
-//		MapHash::iterator it;
-//		if((it=h_map.find(map_name))!=h_map.end()){
-//			return ((T*)(*it));
-//		}
-//		else{
-//			System::Error::code= System::Error::MAP_UNREFERENCED_f(map_name);
-//			return NULL;
-//		}
-//	}
+	/*********************************************************
+	 * MANAGE TEXTURES
+	 *********************************************************/
+
+	Texture* getTexture(const QString& image);
+	void releaseTexture(const QString& image);
 
 protected:
 	bool m_initialization;
@@ -265,6 +261,8 @@ protected:
 	ViewHash h_views;
 	CameraHash h_cameras;
 	MapHash h_maps;
+
+	TextureHash h_textures;
 
 	PluginDialog* m_pluginDialog;
 	CameraDialog* m_cameraDialog;
@@ -330,7 +328,7 @@ signals:
 	void viewAdded(View* view);
 	void viewRemoved(View* view);
 
-	void mapAdded(MapHandler* camera);
+	void mapAdded(MapHandler* map);
 	void mapRemoved(MapHandler* map);
 
 	void pluginAdded(Plugin* plugin);
