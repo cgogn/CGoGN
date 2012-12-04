@@ -781,7 +781,7 @@ bool EdgeSelector_NormalArea<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
-			assert((*it)->getType() == A_MidEdge || !"Only MidEdge Approximator is valid") ;
+//			assert((*it)->getType() == A_MidEdge || (*it)->getType() == A_NormalArea || !"Only MidEdge and NormalArea Approximator are valid") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
@@ -795,10 +795,11 @@ bool EdgeSelector_NormalArea<PFP>::init()
 	TraversorE<MAP> travE(m);
 	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
 	{
-		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(m, dit, this->m_position) ;
-		edgeMatrix[dit].identity();
-		edgeMatrix[dit] *= e.norm2();
-		edgeMatrix[dit] -= Geom::transposed_vectors_mult(e,e) ;
+		computeEdgeMatrix(dit);
+//		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(m, dit, this->m_position) ;
+//		edgeMatrix[dit].identity();
+//		edgeMatrix[dit] *= e.norm2();
+//		edgeMatrix[dit] -= Geom::transposed_vectors_mult(e,e) ;
 	}
 
 	for(Dart dit = travE.begin() ; dit != travE.end() ; dit = travE.next())
@@ -874,10 +875,7 @@ void EdgeSelector_NormalArea<PFP>::updateAfterCollapse(Dart d2, Dart dd2)
 	Traversor2VE<MAP> te (m,d2);
 	for(Dart dit = te.begin() ; dit != te.end() ; dit = te.next())
 	{
-		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(m, dit, this->m_position) ;
-		edgeMatrix[dit].identity();
-		edgeMatrix[dit] *= e.norm2();
-		edgeMatrix[dit] -= Geom::transposed_vectors_mult(e,e) ;
+		computeEdgeMatrix(dit);
 	}
 
 	// update the multimap
@@ -968,8 +966,33 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeInfo(Dart d, EdgeInfo& einfo)
 
 	REAL err = av1 * (M1 * av1) + av2 * (M2 * av2);
 
+/*
+	// TODO : test to normalize by area
+	// TODO : not border-safe
+ 	REAL area = 0.0;
+	Traversor2EEaV<MAP> ta (m,d);
+	for (Dart dita = ta.begin(); dita != ta.end(); dita=ta.next())
+	{
+		area += Algo::Geometry::triangleArea<PFP>(m,dita,this->m_position);
+	}
+	err /= area ; // résultats sensiblment identiques à ceux sans pris en compte de l'aire.
+//	err /= area*area ; // ca favorise la contraction des gros triangles : maillages très in-homogènes et qualité géométrique mauvaise
+*/
 	einfo.it = edges.insert(std::make_pair(err, d)) ;
 	einfo.valid = true ;
+}
+
+
+template <typename PFP>
+void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
+{
+	const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->m_map, d, this->m_position) ;
+	edgeMatrix[d].identity();
+	edgeMatrix[d] *= e.norm2();
+	edgeMatrix[d] -= Geom::transposed_vectors_mult(e,e) ;
+	// TODO : test : try to normalize by area
+	edgeMatrix[d] /= e.norm2(); // pas d'amélioration significative par rapport à la version sans normalisation
+//	edgeMatrix[d] /= e.norm2() * e.norm2(); // étonnament bon : sur certains maillages équivalant à la QEMml
 }
 
 /************************************************************************************
