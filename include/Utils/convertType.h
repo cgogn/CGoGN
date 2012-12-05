@@ -26,6 +26,7 @@
 #define __CONVERTTYPE_H_
 
 #include <assert.h>
+#include <vector>
 
 namespace CGoGN {
 
@@ -83,6 +84,22 @@ inline const OUT* convertPtr(const IN* vec)
 	return reinterpret_cast<const OUT*>(vec);
 }
 
+
+
+template <typename OUT, typename IN>
+inline std::vector<OUT>& convertVector(std::vector<IN>& vec)
+{
+	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
+	return *(reinterpret_cast< std::vector<OUT>* >(&vec));
+}
+
+
+template <typename OUT, typename IN>
+inline const std::vector<OUT>& convertVector(const std::vector<IN>& vec)
+{
+	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
+	return *(reinterpret_cast< const std::vector<OUT>* >(&vec));
+}
 
 
 } // namespace Utils
