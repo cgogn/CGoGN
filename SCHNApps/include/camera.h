@@ -8,8 +8,6 @@ class Window;
 
 class Camera : public qglviewer::Camera
 {
-	Q_OBJECT
-
 public:
 	static unsigned int cameraCount;
 
@@ -81,9 +79,6 @@ protected:
 	double m_drawPathScale;
 
 	int m_snapCount;
-
-public slots:
-	void cb_viewRemoved(View* view);
 };
 
 #endif

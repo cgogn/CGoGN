@@ -15,8 +15,6 @@ Camera::Camera(const QString& name, Window* window) :
 {
 	++cameraCount;
 	this->setZClippingCoefficient(100);
-
-//	connect(m_window, SIGNAL(viewRemoved(View*)), this, SLOT(cb_viewRemoved(View*)));
 }
 
 Camera::~Camera()
@@ -64,9 +62,4 @@ void Camera::saveSnapshot(QString snapPathName)
 	foreach(View* view, l_views)
 		view->saveSnapshot(snapPathName + view->getName() + '_' + QString::number(m_snapCount) + ".jpg", true);
 	++m_snapCount;
-}
-
-void Camera::cb_viewRemoved(View* view)
-{
-	unlinkView(view);
 }

@@ -41,6 +41,17 @@ Window::Window(QWidget *parent) :
 	m_splitArea = new SplitArea(centralwidget);
 	m_verticalLayout->addWidget(m_splitArea);
 
+	m_dock = new QDockWidget(tr("Control"), this);
+	m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	m_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
+	addDockWidget(Qt::RightDockWidgetArea, m_dock);
+
+	m_dockTabWidget = new QTabWidget(m_dock);
+	m_dockTabWidget->setObjectName("DockTabWidget");
+	m_dockTabWidget->setLayoutDirection(Qt::RightToLeft);
+	m_dockTabWidget->setTabPosition(QTabWidget::East);
+	m_dock->setWidget(m_dockTabWidget);
+
 	// init keys as unpressed
 	keys[0] = false;
 	keys[1] = false;
@@ -84,45 +95,16 @@ QTabWidget* Window::getDockTabWidget()
 	return m_dockTabWidget;
 }
 
-void Window::addTabInDock(QWidget *tabWidget, const QString& tabText)
+void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
-	// if there is still no dock
-	if (!m_dock)
-	{
-		m_dock = new QDockWidget(tr("Control"), this);
-		m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-		m_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
-		addDockWidget(Qt::RightDockWidgetArea, m_dock);
-	}
-
-	// if there is still no tab widget in the dock
-	if (!m_dockTabWidget)
-	{
-		QWidget* dockWidgetContents = new QWidget();
-		QVBoxLayout* verticalLayout = new QVBoxLayout(dockWidgetContents);
-		m_dockTabWidget = new QTabWidget(dockWidgetContents);
-		m_dockTabWidget->setObjectName(QString::fromUtf8("tabWidget"));
-		m_dockTabWidget->setLayoutDirection(Qt::RightToLeft);
-		m_dockTabWidget->setTabPosition(QTabWidget::East);
-
-		verticalLayout->addWidget(m_dockTabWidget);
-
-		m_dock->setWidget(dockWidgetContents);
-	}
-
-	// adding a new tab containing the specified widget
-	m_dockTabWidget->addTab(tabWidget, tabText);
-//	m_dockTabWidget->setTabText(m_dockTabWidget->indexOf(tabWidget), tabText);
+	if(tabWidget)
+		m_dockTabWidget->addTab(tabWidget, tabText);
 }
 
 void Window::removeTabInDock(QWidget *tabWidget)
 {
-	// if there is a dock and a tab widget
-	if (m_dock && m_dockTabWidget)
-	{
-		// remove the tab containing the specified widget
+	if(tabWidget)
 		m_dockTabWidget->removeTab(m_dockTabWidget->indexOf(tabWidget));
-	}
 }
 
 /*********************************************************
@@ -513,15 +495,15 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
  * MANAGE MAPS
  *********************************************************/
 
-bool Window::addMap(const QString& name, MapHandler* map)
+bool Window::addMap(MapHandlerGen* map)
 {
-	if (h_maps.contains(name))
+	if (h_maps.contains(map->getName()))
 	{
 		System::Error::code = System::Error::MAP_EXISTS;
 		return false;
 	}
 
-	h_maps.insert(name, map);
+	h_maps.insert(map->getName(), map);
 
 	emit(mapAdded(map));
 
@@ -532,7 +514,7 @@ void Window::removeMap(const QString& name)
 {
 	if (h_maps.contains(name))
 	{
-		MapHandler* map = h_maps[name];
+		MapHandlerGen* map = h_maps[name];
 		h_maps.remove(name);
 
 		emit(mapRemoved(map));
@@ -541,7 +523,7 @@ void Window::removeMap(const QString& name)
 	}
 }
 
-MapHandler* Window::getMap(const QString& name)
+MapHandlerGen* Window::getMap(const QString& name)
 {
 	if (h_maps.contains(name))
 		return h_maps[name];

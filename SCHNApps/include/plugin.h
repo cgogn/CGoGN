@@ -15,8 +15,6 @@
 
 class Plugin : public QObject
 {
-	Q_OBJECT
-
 public:
 	Plugin();
 	virtual ~Plugin();
@@ -34,12 +32,7 @@ public:
 	void setWindow(Window* w) { m_window = w; }
 
 	bool getProvidesRendering() { return b_providesRendering; }
-	void setProvidesRendering(bool b)
-	{
-		b_providesRendering = b;
-		if(b_providesRendering)
-			glewInit();
-	}
+	void setProvidesRendering(bool b) {	b_providesRendering = b; }
 
 	virtual void redraw(View* view) = 0;
 
@@ -51,8 +44,8 @@ public:
 	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
 	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
 
-	virtual void viewAdded(View* view) = 0;
-	virtual void viewRemoved(View* view) = 0;
+	virtual void viewLinked(View* view) = 0;
+	virtual void viewUnlinked(View* view) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
@@ -95,9 +88,6 @@ protected:
 	QList<QWidget*> l_tabWidgets;
 	QList<QAction*> l_menuActions;
 	QList<QAction*> l_toolbarActions;
-
-public slots:
-	void cb_viewRemoved(View* view);
 
 //	QList<Plugin*> l_dependencies;
 //	QList<Plugin*> l_dependantPlugins;

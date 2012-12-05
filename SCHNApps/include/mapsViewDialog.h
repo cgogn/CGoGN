@@ -5,7 +5,7 @@
 
 class Window;
 class View;
-class MapHandler;
+class MapHandlerGen;
 
 class MapsViewDialog : public QDialog, Ui::MapsViewDialog
 {
@@ -19,12 +19,10 @@ private:
 	Window* m_window;
 	View* m_view;
 
-	void selectCurrentMaps();
-
 public slots:
 	void cb_selectedMapsChanged();
-	void cb_addMapToList(MapHandler* m);
-	void cb_removeMapFromList(MapHandler* m);
+	void cb_addMapToList(MapHandlerGen* m);
+	void cb_removeMapFromList(MapHandlerGen* m);
 };
 
 #endif

@@ -19,8 +19,6 @@ private:
 	Window* m_window;
 	View* m_view;
 
-	void selectCurrentPlugins();
-
 public slots:
 	void cb_selectedPluginsChanged();
 	void cb_addPluginToList(Plugin* p);

@@ -233,10 +233,10 @@ public:
 	 * MANAGE MAPS
 	 *********************************************************/
 
-	bool addMap(const QString& name, MapHandler* map);
+	bool addMap(MapHandlerGen* map);
 	void removeMap(const QString& name);
-	MapHandler* getMap(const QString& name);
-	QList<MapHandler*> getMapsList() { return h_maps.values(); }
+	MapHandlerGen* getMap(const QString& name);
+	QList<MapHandlerGen*> getMapsList() { return h_maps.values(); }
 	const MapHash& getMapsHash() { return h_maps; }
 
 	/*********************************************************
@@ -328,8 +328,8 @@ signals:
 	void viewAdded(View* view);
 	void viewRemoved(View* view);
 
-	void mapAdded(MapHandler* map);
-	void mapRemoved(MapHandler* map);
+	void mapAdded(MapHandlerGen* map);
+	void mapRemoved(MapHandlerGen* map);
 
 	void pluginAdded(Plugin* plugin);
 	void pluginRemoved(Plugin* plugin);

@@ -10,6 +10,7 @@
 #include "mapsViewDialog.h"
 
 #include "Utils/GLSLShader.h"
+#include "Algo/Geometry/boundingbox.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -48,7 +49,7 @@ View::~View()
 		unlinkPlugin(plugin);
 	}
 
-	foreach(MapHandler* map, l_maps)
+	foreach(MapHandlerGen* map, l_maps)
 	{
 		map->unlinkView(this);
 		unlinkMap(map);
@@ -227,15 +228,22 @@ void View::unlinkPlugin(Plugin* plugin)
  * MANAGE LINKED MAPS
  *********************************************************/
 
-void View::linkMap(MapHandler* map)
+void View::linkMap(MapHandlerGen* map)
 {
 	if(map && !l_maps.contains(map))
+	{
 		l_maps.push_back(map);
+
+		// TODO : update view global BB
+		setSceneBoundingBox(map->getBBmin(), map->getBBmax());
+	}
 }
 
-void View::unlinkMap(MapHandler* map)
+void View::unlinkMap(MapHandlerGen* map)
 {
 	l_maps.removeOne(map);
+
+	// TODO : update view global BB
 }
 
 

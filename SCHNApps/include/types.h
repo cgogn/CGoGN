@@ -2,6 +2,7 @@
 #define _TYPES_H_
 
 #include <QHash>
+#include <QMap>
 #include <QString>
 
 class Window;
@@ -10,7 +11,7 @@ class View;
 class Camera;
 class Texture;
 
-class MapHandler;
+class MapHandlerGen;
 
 namespace CGoGN
 {
@@ -25,8 +26,8 @@ typedef QHash<QString, Plugin*> PluginHash;
 typedef QHash<QString, View*> ViewHash;
 typedef QHash<QString, Camera*> CameraHash;
 
-typedef QHash<QString, MapHandler*> MapHash;
-typedef QHash<QString, CGoGN::Utils::VBO*> VBOHash;
+typedef QHash<QString, MapHandlerGen*> MapHash;
+typedef QMap<std::string, CGoGN::Utils::VBO*> VBOHash;
 typedef QHash<QString, CGoGN::Utils::GLSLShader*> ShaderHash;
 
 typedef QHash<QString, Texture*> TextureHash;

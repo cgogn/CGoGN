@@ -17,58 +17,44 @@ MapsViewDialog::MapsViewDialog(Window* window, View* view) :
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapsChanged()));
 
-	connect(m_window, SIGNAL(mapAdded(MapHandler*)), this, SLOT(cb_addMapToList(MapHandler*)));
-	connect(m_window, SIGNAL(mapRemoved(MapHandler*)), this, SLOT(cb_removeMapFromList(MapHandler*)));
+	connect(m_window, SIGNAL(mapAdded(MapHandlerGen*)), this, SLOT(cb_addMapToList(MapHandlerGen*)));
+	connect(m_window, SIGNAL(mapRemoved(MapHandlerGen*)), this, SLOT(cb_removeMapFromList(MapHandlerGen*)));
 
-	QList<MapHandler*> maps = m_window->getMapsList();
-	foreach(MapHandler* m, maps)
+	QList<MapHandlerGen*> maps = m_window->getMapsList();
+	foreach(MapHandlerGen* m, maps)
 		mapList->addItem(m->getName());
 }
 
 MapsViewDialog::~MapsViewDialog()
 {}
 
-void MapsViewDialog::selectCurrentMaps()
-{
-	QList<MapHandler*> currentMaps = m_view->getLinkedMaps();
-	QList<QString> currentMapsNames;
-	foreach(MapHandler* m, currentMaps)
-	currentMapsNames.push_back(m->getName());
-
-	for(int i = 0; i < mapList->count(); ++i)
-	{
-		if(currentMapsNames.contains(mapList->item(i)->text()))
-			mapList->item(i)->setSelected(true);
-		else
-			mapList->item(i)->setSelected(false);
-	}
-}
-
 void MapsViewDialog::cb_selectedMapsChanged()
 {
 	for(int i = 0; i < mapList->count(); ++i)
 	{
 		QString mapName = mapList->item(i)->text();
-		MapHandler* map = m_window->getMap(mapName);
-		if(mapList->item(i)->isSelected() && !m_view->isLinkedToMap(map))
+		MapHandlerGen* map = m_window->getMap(mapName);
+		if(mapList->item(i)->isSelected())
 		{
+			assert(!m_view->isLinkedToMap(map) && !map->isLinkedToView(m_view));
 			m_view->linkMap(map);
 			map->linkView(m_view);
 		}
-		else if(!mapList->item(i)->isSelected() && m_view->isLinkedToMap(map))
+		else if(!mapList->item(i)->isSelected())
 		{
+			assert(m_view->isLinkedToMap(map) && map->isLinkedToView(m_view));
 			m_view->unlinkMap(map);
 			map->unlinkView(m_view);
 		}
 	}
 }
 
-void MapsViewDialog::cb_addMapToList(MapHandler* m)
+void MapsViewDialog::cb_addMapToList(MapHandlerGen* m)
 {
 	mapList->addItem(m->getName());
 }
 
-void MapsViewDialog::cb_removeMapFromList(MapHandler* m)
+void MapsViewDialog::cb_removeMapFromList(MapHandlerGen* m)
 {
 	for(int i = 0; i < mapList->count(); ++i)
 	{

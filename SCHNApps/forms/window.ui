@@ -31,6 +31,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionShow_Hide_Dock"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -98,6 +100,11 @@
    </property>
    <property name="text">
     <string>Manage cameras</string>
+   </property>
+  </action>
+  <action name="actionShow_Hide_Dock">
+   <property name="text">
+    <string>Show/Hide Dock</string>
    </property>
   </action>
  </widget>

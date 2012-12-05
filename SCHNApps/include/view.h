@@ -71,10 +71,10 @@ public:
 	 * MANAGE LINKED MAPS
 	 *********************************************************/
 
-	void linkMap(MapHandler* map);
-	void unlinkMap(MapHandler* map);
-	QList<MapHandler*> getLinkedMaps() { return l_maps; }
-	bool isLinkedToMap(MapHandler* map) { return l_maps.contains(map); }
+	void linkMap(MapHandlerGen* map);
+	void unlinkMap(MapHandlerGen* map);
+	QList<MapHandlerGen*> getLinkedMaps() { return l_maps; }
+	bool isLinkedToMap(MapHandlerGen* map) { return l_maps.contains(map); }
 
 
 
@@ -94,7 +94,10 @@ protected:
 
 	Camera* m_currentCamera;
 	QList<Plugin*> l_plugins;
-	QList<MapHandler*> l_maps;
+	QList<MapHandlerGen*> l_maps;
+
+	qglviewer::Vec bbmin;
+	qglviewer::Vec bbmax;
 
 	ViewButtonArea* m_buttonArea;
 
@@ -105,9 +108,6 @@ protected:
 
 	QString m_textInfo;
 
-	qglviewer::Vec bbmin;
-	qglviewer::Vec bbmax;
-
 	CameraViewDialog* m_cameraViewDialog;
 	PluginsViewDialog* m_pluginsViewDialog;
 	MapsViewDialog* m_mapsViewDialog;
@@ -117,9 +117,6 @@ public slots:
 	void cb_pluginsView(int x, int y, int globalX, int globalY);
 	void cb_mapsView(int x, int y, int globalX, int globalY);
 	void cb_closeView(int x, int y, int globalX, int globalY);
-
-//signals:
-//	void currentCameraChanged(Camera* camera);
 };
 
 #endif
