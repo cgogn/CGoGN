@@ -86,6 +86,7 @@ inline const OUT* convertPtr(const IN* vec)
 
 
 
+
 template <typename OUT, typename IN>
 inline std::vector<OUT>& convertVector(std::vector<IN>& vec)
 {
@@ -99,6 +100,25 @@ inline const std::vector<OUT>& convertVector(const std::vector<IN>& vec)
 {
 	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
 	return *(reinterpret_cast< const std::vector<OUT>* >(&vec));
+}
+
+
+
+
+
+template <typename OUT, typename IN>
+inline const std::list<OUT>& convertList(const std::list<IN>& vec)
+{
+	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
+	return *(reinterpret_cast< const std::list<OUT>* >(&vec));
+}
+
+
+template <typename OUT, typename IN>
+inline std::list<OUT>& convertList(std::list<IN>& vec)
+{
+	assert(sizeof(IN) == sizeof(OUT) || "incompatible size cast");
+	return *(reinterpret_cast< std::list<OUT>* >(&vec));
 }
 
 
