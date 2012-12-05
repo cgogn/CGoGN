@@ -10,8 +10,8 @@
 
 #include "types.h"
 
-#include "ui_questionSessionDialog.h"
-#include "ui_infoDialog.h"
+//#include "ui_questionSessionDialog.h"
+//#include "ui_infoDialog.h"
 
 class Window;
 class SplitArea;
@@ -19,35 +19,35 @@ class SplitArea;
 namespace System
 {
 
-namespace Dialog
-{
+//namespace Dialog
+//{
+//
+//class QuestionSessionDialog : public QDialog, public Ui::QSDialog
+//{
+//	Q_OBJECT
+//
+//public:
+//	QuestionSessionDialog(QWidget *parent = 0) : QDialog(parent)
+//	{
+//		this->setupUi(this);
+//	}
+//};
 
-class QuestionSessionDialog : public QDialog, public Ui::QSDialog
-{
-	Q_OBJECT
 
-public:
-	QuestionSessionDialog(QWidget *parent = 0) : QDialog(parent)
-	{
-		this->setupUi(this);
-	}
-};
-
-
-class InfoDialog : public QDialog, public Ui::InfoDialog
-{
-	Q_OBJECT
-
-public:
-	InfoDialog(QWidget *parent = 0) : QDialog(parent)
-	{
-		this->setupUi(this);
-	}
-
-	bool setContent(QUrl urlHTMLFile);
-};
-
-}
+//class InfoDialog : public QDialog, public Ui::InfoDialog
+//{
+//	Q_OBJECT
+//
+//public:
+//	InfoDialog(QWidget *parent = 0) : QDialog(parent)
+//	{
+//		this->setupUi(this);
+//	}
+//
+//	bool setContent(QUrl urlHTMLFile);
+//};
+//
+//} // namespace Dialog
 
 class Error
 {
@@ -56,11 +56,37 @@ public:
 
 	typedef enum
 	{
-		SUCCESS, NO_SCENE, SCENE_UNREFERENCED, SCENE_EXISTS, NO_DOCK, NO_PLUGIN_PATH_FILE,
-		ERROR_OPEN_PLUGIN_FILE , BAD_PLUGIN_PATH_FILE, BAD_PLUGIN_PATH_IN_FILE, NO_PLUGIN_IN_DIR,
-		PLUGIN_EXISTS, ERROR_PLUGIN_LOAD, BAD_LINK_PLUGIN_WINDOW, UNSATSIFIED_PLUGIN_DEPENDENCIE,
-		BAD_ACTION_MENU_PATH, MAP_UNREFERENCED, MAP_EXISTS, SHADER_EXISTS, SHADER_NOT_FOUND,
-		VBO_EXISTS, VBO_NOT_FOUND, TOPO3RENDER_EXISTS, TOPO3RENDER_NOT_FOUND, OPEN_FILE_ERROR,
+		SUCCESS,
+		NO_SCENE,
+		SCENE_EXISTS,
+		SCENE_DOES_NOT_EXIST,
+		VIEW_EXISTS,
+		VIEW_DOES_NOT_EXIST,
+		CAMERA_EXISTS,
+		CAMERA_DOES_NOT_EXIST,
+		NO_DOCK,
+		NO_PLUGIN_PATH_FILE,
+		ERROR_OPEN_PLUGIN_FILE,
+		BAD_PLUGIN_PATH_FILE,
+		BAD_PLUGIN_PATH_IN_FILE,
+		NO_PLUGIN_IN_DIR,
+		PLUGIN_EXISTS,
+		PLUGIN_DOES_NOT_EXIST,
+		ERROR_PLUGIN_LOAD,
+		BAD_LINK_PLUGIN_WINDOW,
+		UNSATSIFIED_PLUGIN_DEPENDENCIE,
+		BAD_ACTION_MENU_PATH,
+		MAP_UNREFERENCED,
+		MAP_EXISTS,
+		MAP_DOES_NOT_EXIST,
+		SHADER_EXISTS,
+		SHADER_NOT_FOUND,
+		VBO_EXISTS,
+		VBO_DOES_NOT_EXIST,
+		VBO_NOT_FOUND,
+		TOPO3RENDER_EXISTS,
+		TOPO3RENDER_NOT_FOUND,
+		OPEN_FILE_ERROR,
 		BAD_XML_FILE
 	} ERROR_CODE;
 
@@ -97,35 +123,36 @@ public:
 	static bool movieDialogOpened;
 };
 
-class Info
-{
-public:
-	virtual ~Info() = 0;
+//class Info
+//{
+//public:
+//	virtual ~Info() = 0;
+//
+//	static void showPluginInfo(QString pluginAbsolutePath, QWidget *parent = 0);
+//	static void showPluginInfo(QString locationPath, QString pluginName, QWidget *parent = 0);
+//};
 
-	static void showPluginInfo(QString pluginAbsolutePath, QWidget *parent = 0);
-	static void showPluginInfo(QString locationPath, QString pluginName, QWidget *parent = 0);
-};
+//class StateHandler
+//{
+//public:
+//	virtual ~StateHandler() = 0;
+//
+//	static bool saveState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
+//	static bool loadState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
+//	static void unsaveState();
+//	static bool savePluginsInfo(Window *window, PluginHash *pluginHash, QStringList paths);
+//};
 
-class StateHandler
-{
-public:
-	virtual ~StateHandler() = 0;
-
-	static bool saveState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
-	static bool loadState(Window *window, PluginHash *pluginHash, SceneHash *sceneHash, SplitArea *splitArea);
-	static void unsaveState();
-	static bool savePluginsInfo(Window *window, PluginHash *pluginHash, QStringList paths);
-};
-
-typedef enum
-{
-	GLVIEWER_IN_DOCK, SIMPLE_GLVIEWER
-} QGLV_CREATE_SETTINGS;
+//typedef enum
+//{
+//	GLVIEWER_IN_DOCK,
+//	SIMPLE_GLVIEWER
+//} QGLV_CREATE_SETTINGS;
 
 extern QString app_path;
 
 extern QSplashScreen *splash;
 
-}
+} // namespace System
 
 #endif

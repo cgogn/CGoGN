@@ -3,54 +3,57 @@
 
 #include "ui_pluginDialog.h"
 
-#include <QDir>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
-#include <QTextStream>
-
 #include "types.h"
 
-class Plugin;
-class Window;
+struct PluginInfo
+{
+	PluginInfo(const QString& path, const QString& name) :
+		pluginPath(path),
+		pluginName(name)
+	{}
 
-class PluginDialog : public QDialog, public Ui::Dialog{
+	PluginInfo() {}
+
+	QString pluginPath;
+	QString pluginName;
+};
+
+class PluginDialog : public QDialog, public Ui::PluginDialog
+{
 	Q_OBJECT
+
 public:
-	PluginDialog(Window* parent=0, PluginHash* activePlugins=NULL);
+	PluginDialog(Window* window);
 	~PluginDialog();
 
 protected:
-//	QDomDocument doc;
-//	QFile xmlFile;
-//	QTextStream out;
+	Window* m_window;
+	QHash<QTreeWidgetItem*, PluginInfo> m_listedPlugins;
 
-	PluginHash* activePlugins;
-	Window* parentWindow;
-
-	bool loadInfoPlugins();
-//	void showPlugins();
+//	bool restoreState();
 
 private:
 	bool init;
 
-	enum EntryType{DIR=1,FILE, FILE_DIR};
-
-
-	void showPluginsDir(QDir directory);
+	enum EntryType
+	{
+		DIR = 1,
+		FILE,
+		FILE_DIR
+	};
 
 protected slots:
 	void cb_addPlugins();
 	void cb_removePlugins();
-	void cb_addPluginDirectory();
+	void cb_addPluginsDirectory();
 
-	void cb_activePlugin(QTreeWidgetItem* item, int column);
+	void cb_togglePlugin(QTreeWidgetItem* item, int column);
 
-	void cb_acceptDialog();
+//	void customContextMenu(const QPoint & pos);
 
-	void customContextMenu(const QPoint & pos);
+//	void cb_acceptDialog();
 
-	void showPluginInfo();
+//	void showPluginInfo();
 };
 
 #endif

@@ -1,99 +1,77 @@
-#include "dialogs/cameraViewDialog.h"
-#include "dialogs/cameraOptionDialog.h"
+#include "cameraViewDialog.h"
 
-#include "visualization/camera.h"
+#include "window.h"
+#include "view.h"
+#include "camera.h"
 
-Q_DECLARE_METATYPE(Camera*);
+#include <QMessageBox>
+#include <QMouseEvent>
 
-CameraViewDialog::CameraViewDialog(View* view, QWidget* parent) : QDialog(parent),
-	view(view),
-	autoText(false)
+CameraViewDialog::CameraViewDialog(Window* window, View* view) :
+	QDialog(view),
+	m_window(window),
+	m_view(view)
 {
 	this->setupUi(this);
+	this->setWindowTitle(m_view->getName() + QString(" : camera"));
 
-	connect(add_Button,SIGNAL(clicked()), this, SLOT(addCamera()));
-	connect(remove_Button, SIGNAL(clicked()), this, SLOT(removeCamera()));
-	connect(settings_Button, SIGNAL(clicked()), this, SLOT(settingsCamera()));
+	connect(cameraList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedCameraChanged()));
 
-	if(view){
-		QList<Camera*> cameraList= view->cameras();
-		foreach(Camera* c, cameraList){
-			QVariant var;
-			var.setValue(c);
+	connect(m_window, SIGNAL(cameraAdded(Camera*)), this, SLOT(cb_addCameraToList(Camera*)));
+	connect(m_window, SIGNAL(cameraRemoved(Camera*)), this, SLOT(cb_removeCameraFromList(Camera*)));
 
-			QListWidgetItem* item= new QListWidgetItem(listWidget);
-			item->setData(Qt::UserRole, var);
-			autoText=true;
-			item->setText(c->getName());
-			autoText=false;
-			item->setFlags (item->flags () | Qt::ItemIsEditable);
+	QList<Camera*> cameras = m_window->getCamerasList();
+	foreach(Camera* c, cameras)
+		cameraList->addItem(c->getName());
 
-			if(view->currentCamera()==c){
-				listWidget->setCurrentItem(item);
-			}
+	selectCurrentCamera();
+}
 
+CameraViewDialog::~CameraViewDialog()
+{}
+
+void CameraViewDialog::selectCurrentCamera()
+{
+	Camera* current = m_view->getCurrentCamera();
+	for(int i = 0; i < cameraList->count(); ++i)
+	{
+		if(cameraList->item(i)->text() == current->getName())
+			cameraList->item(i)->setSelected(true);
+		else
+			cameraList->item(i)->setSelected(false);
+	}
+}
+
+void CameraViewDialog::cb_selectedCameraChanged()
+{
+	QList<QListWidgetItem*> currentItems = cameraList->selectedItems();
+	if(currentItems.empty())
+	{
+		selectCurrentCamera();
+	}
+	else
+	{
+		const QString& cname = currentItems[0]->text();
+		Camera* c = m_window->getCamera(cname);
+		m_view->getCurrentCamera()->unlinkView(m_view);
+		m_view->setCurrentCamera(c);
+		c->linkView(m_view);
+	}
+}
+
+void CameraViewDialog::cb_addCameraToList(Camera* c)
+{
+	cameraList->addItem(c->getName());
+}
+
+void CameraViewDialog::cb_removeCameraFromList(Camera* c)
+{
+	for(int i = 0; i < cameraList->count(); ++i)
+	{
+		if(cameraList->item(i)->text() == c->getName())
+		{
+			delete cameraList->item(i);
+			return;
 		}
-
-		connect(listWidget, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
-				this, SLOT(changeCurrentCamera(QListWidgetItem*, QListWidgetItem*)));
-		connect(listWidget, SIGNAL(itemChanged ( QListWidgetItem *)),
-				this, SLOT(cameraNameChange(QListWidgetItem *)));
-	}
-
-
-}
-
-CameraViewDialog::~CameraViewDialog(){}
-
-void CameraViewDialog::addCamera(){
-	if(view){
-		Camera* c= view->addCamera();
-		QVariant var;
-		var.setValue(c);
-
-		QListWidgetItem* item= new QListWidgetItem(listWidget);
-		autoText=true;
-		item->setData(Qt::UserRole, var);
-		item->setText(c->getName());
-		autoText=false;
-		item->setFlags (item->flags () | Qt::ItemIsEditable);
-	}
-}
-
-void CameraViewDialog::removeCamera(){
-	QListWidgetItem* item;
-	if(view && (item=listWidget->currentItem()) && listWidget->count()>1){
-		Camera* c= item->data(Qt::UserRole).value<Camera*>();
-
-		delete item;
-
-		view->removeCamera(c);
-	}
-}
-
-void CameraViewDialog::changeCurrentCamera(QListWidgetItem * current, QListWidgetItem * previous){
-	if(current && view){
-		Camera* c= current->data(Qt::UserRole).value<Camera*>();
-
-		view->setCurrentCamera(c);
-	}
-}
-
-void CameraViewDialog::cameraNameChange(QListWidgetItem * item){
-	if(!autoText && item){
-		Camera* c= item->data(Qt::UserRole).value<Camera*>();
-		if(c){
-			c->setName(item->text());
-		}
-	}
-}
-
-void CameraViewDialog::settingsCamera(){
-	QListWidgetItem* item= listWidget->currentItem();
-	if(view && item){
-		Camera* c= item->data(Qt::UserRole).value<Camera*>();
-
-		CameraOptionDialog cod(c,this);
-		cod.exec();
 	}
 }

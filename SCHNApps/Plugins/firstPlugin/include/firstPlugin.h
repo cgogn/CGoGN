@@ -1,12 +1,13 @@
 #ifndef _FIRSTPLUGIN_H_
 #define _FIRSTPLUGIN_H_
 
-#include "plugins/visualPlugin.h"
+#include "plugin.h"
 
 /**---CGoGN includes **/
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
-#include "Algo/Render/GL2/topoRender.h"
+#include "Algo/Render/GL2/mapRender.h"
+#include "Utils/Shaders/shaderFlat.h"
 /**---CGoGN includes **/
 
 /**---Definitions specific to CGoGN ---*/
@@ -36,12 +37,9 @@ typedef PFP::VEC3 VEC3;
  */
 
 /**
- * Our plugin must inherit from VisualPlugin,
- * that is a class that itself is an implementation
- * of the Plugin interface (virtual class). It contains
- * many useful and essantial methods.
+ * Our plugin must inherit from Plugin
  */
-class FirstPlugin : public VisualPlugin
+class FirstPlugin : public Plugin
 {
 	/**
 	 * Essential Qt macros.
@@ -50,70 +48,50 @@ class FirstPlugin : public VisualPlugin
 	Q_INTERFACES(Plugin)
 
 public:
-	FirstPlugin() {}
-	~FirstPlugin() {}
+	FirstPlugin()
+	{
+		setProvidesRendering(true);
+	}
+
+	~FirstPlugin()
+	{}
 
 	/**
-	 * The classical call back for the initGL method
-	 * When a scene will be link to this plugin, it will call
-	 * back this method with itself as a parameter.
-	 */
-	void cb_initGL(Scene *scene);
-
-	/**
-	 * The drawing method that needs to be overloaded.
-	 * Each time a scene (that is to say, at least one of the
-	 * views that is contains) needs to be refresh, it calls back
-	 * this method with itself as a parameter
-	 */
-	void cb_redraw(Scene *scene);
-
-	/**
-	 * The plugin's activation method
+	 * The plugin's enable method
 	 * Each time the main application loads this plugin,
 	 * it call this method. Writing this method is
 	 * the occasion to initialize the plugin and check certain
 	 * conditions.
 	 * If this methods return 'false', the plugin load will be aborted.
 	 */
-	bool activate();
+	bool enable();
 
 	/**
-	 * The plugin's disabling method
+	 * The plugin's disable method
 	 * Each time the main application will unload the plugin
 	 * it will call this method.
 	 */
 	void disable();
 
+	virtual void redraw(View *view);
+
+	virtual void keyPress(View* view, int key) {}
+	virtual void keyRelease(View* view, int key) {}
+	virtual void mousePress(View* view, int button, int x, int y) {}
+	virtual void mouseRelease(View* view, int button, int x, int y) {}
+//	virtual void mouseClick(View* view, int button, int x, int y) {}
+	virtual void mouseMove(View* view, int buttons, int x, int y) {}
+	virtual void wheelEvent(View* view, int delta, int x, int y) {}
+
+	virtual void viewAdded(View* view);
+	virtual void viewRemoved(View* view) {}
+
 protected:
-	/** Attributes that are specific to this plugin **/
 	MAP myMap;
-
-	// attribute for vertices positions
 	VertexAttribute<VEC3> position;
-
-	// render (for the topo)
-	Algo::Render::GL2::TopoRender *m_render_topo;
-
-	// just for more compact writing
-	inline Dart PHI1(Dart d)
-	{
-		return myMap.phi1(d);
-	}
-	inline Dart PHI_1(Dart d)
-	{
-		return myMap.phi_1(d);
-	}
-	inline Dart PHI2(Dart d)
-	{
-		return myMap.phi2(d);
-	}
-	template<int X>
-	Dart PHI(Dart d)
-	{
-		return myMap.phi<X>(d);
-	}
-	/** Attributes that are specific to this plugin **/
+	Algo::Render::GL2::MapRender* m_render ;
+	Utils::VBO* m_positionVBO ;
+	Utils::ShaderFlat* m_flatShader ;
 };
 
 #endif // _FIRSTPLUGIN_H_

@@ -1,62 +1,48 @@
 #include "firstPlugin.h"
 #include "Algo/Geometry/boundingbox.h"
+#include "Algo/Import/import.h"
 
-void FirstPlugin::cb_initGL(Scene *scene)
+bool FirstPlugin::enable()
 {
-	if (scene)
-	{
-		// we fit the first (possibly the only) view of the newly liked
-		// scene to the content of our map
+	m_render = new Algo::Render::GL2::MapRender() ;
+	m_positionVBO = new Utils::VBO() ;
+	m_flatShader = new Utils::ShaderFlat() ;
+	m_flatShader->setAttributePosition(m_positionVBO) ;
+	m_flatShader->setAmbiant(Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f)) ;
+	m_flatShader->setDiffuse(Geom::Vec4f(0.8f, 0.9f, 0.7f, 1.0f)) ;
+	m_flatShader->setExplode(1.0f) ;
+	CGoGN::Utils::GLSLShader::registerShader(NULL, m_flatShader) ;
 
-		// bounding box of scene
-		Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position);
+	std::vector<std::string> attrNames ;
+	CGoGN::Algo::Import::importMesh<PFP>(myMap, "/home/kraemer/Media/Data/surface/lowRes/duck_163.ply", attrNames);
+	position = myMap.getAttribute<PFP::VEC3, VERTEX>(attrNames[0]) ;
 
-		scene->firstViewFitSphere(bb.center()[0], bb.center()[1], bb.center()[2], bb.maxSize());
+	m_render->initPrimitives<PFP>(myMap, allDarts, CGoGN::Algo::Render::GL2::POINTS) ;
+	m_render->initPrimitives<PFP>(myMap, allDarts, CGoGN::Algo::Render::GL2::LINES) ;
+	m_render->initPrimitives<PFP>(myMap, allDarts, CGoGN::Algo::Render::GL2::TRIANGLES) ;
 
-		m_render_topo = new Algo::Render::GL2::TopoRender() ;
-
-		// render the topo of the map without boundary darts
-		SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f, nb);
-	}
-}
-
-void FirstPlugin::cb_redraw(Scene *scene)
-{
-	m_render_topo->drawTopo();
-}
-
-bool FirstPlugin::activate()
-{
-	// creation of 2 new faces: 1 triangle and 1 square
-	Dart d1 = myMap.newFace(3);
-	Dart d2 = myMap.newFace(4);
-
-	// sew these faces along one of their edge
-	myMap.sewFaces(d1, d2);
-
-	// creation of a new attribute on vertices of type 3D vector for position.
-	// a handler to this attribute is returned
-	position = myMap.addAttribute<VEC3, VERTEX>("position");
-
-	// affect position by moving in the map
-	position[d1] = VEC3(0, 0, 0);
-	position[PHI1(d1)] = VEC3(2, 0, 0);
-	position[PHI_1(d1)] = VEC3(1, 2, 0);
-	position[PHI<11>(d2)] = VEC3(0, -2, 0);
-	position[PHI_1(d2)] = VEC3(2, -2, 0);
-
-	m_render_topo = NULL;
+	m_positionVBO->updateData(position) ;
 
 	return true;
 }
 
 void FirstPlugin::disable()
 {
-	if (m_render_topo)
-	{
-		delete m_render_topo;
-	}
+}
+
+void FirstPlugin::redraw(View* view)
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) ;
+	glEnable(GL_LIGHTING) ;
+	m_render->draw(m_flatShader, Algo::Render::GL2::TRIANGLES) ;
+}
+
+void FirstPlugin::viewAdded(View* view)
+{
+	CGoGN::Geom::BoundingBox<PFP::VEC3> bb = Algo::Geometry::computeBoundingBox<PFP>(myMap, position) ;
+	qglviewer::Vec min(bb.min()[0], bb.min()[1], bb.min()[2]);
+	qglviewer::Vec max(bb.max()[0], bb.max()[1], bb.max()[2]);
+	view->setSceneBoundingBox(min, max);
 }
 
 /**
@@ -67,7 +53,7 @@ void FirstPlugin::disable()
 // essential Qt function:
 // arguments are
 //  - the complied name of the plugin
-//  - the main class of our plugin (that extends VisualPlugin)
+//  - the main class of our plugin
 Q_EXPORT_PLUGIN2(FirstPlugin, FirstPlugin)
 #else
 Q_EXPORT_PLUGIN2(FirstPluginD, FirstPlugin)

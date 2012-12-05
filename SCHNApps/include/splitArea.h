@@ -3,10 +3,14 @@
 
 #include <QSplitter>
 
-class SplitArea : public QSplitter{
+class SplitArea : public QSplitter
+{
 	Q_OBJECT
+
 public:
-	SplitArea(QWidget* parent=0);
+	SplitArea(QWidget* parent = NULL);
+
+	int getNbRows() { return nbRows; }
 
 	void addFitElement(QWidget* element);
 	void addElementAt(QWidget* element, int x, int y);
@@ -14,24 +18,21 @@ public:
 	void addElementRightTo(QWidget* element, QWidget* left);
 
 	bool isEmpty();
-	int getNbRow(){return nbRow;}
 
 	void updateSize();
 
 protected:
-	int nbRow, nbMaxColumn;
+	int nbRows;
+	int maxNbColumns;
 	int rowMin;
-	int nbElement;
+	int nbElements;
 
 protected slots:
 	void elementRemoved();
 
 private:
 	bool sizeUpdated;
-
 	void determineRowMin();
-
 };
-
 
 #endif
