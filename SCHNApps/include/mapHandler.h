@@ -16,12 +16,10 @@ public:
 	MapHandlerGen(const QString& name, Window* window);
 	virtual ~MapHandlerGen();
 
-	virtual void draw(CGoGN::Utils::GLSLShader* shader, int primitive) = 0;
-
-	const QString& getName() { return m_name; }
+	const QString& getName() const { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
-	Window* getWindow() { return m_window; }
+	Window* getWindow() const { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
@@ -30,17 +28,16 @@ public:
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
 	void setBBmax(qglviewer::Vec& v) { m_bbMax = v; }
 
+	float getBBdiagSize() { return (m_bbMax - m_bbMin).norm(); }
+
+	void draw(CGoGN::Utils::GLSLShader* shader, int primitive);
+
 	/*********************************************************
 	 * MANAGE VBOs
 	 *********************************************************/
 
 	CGoGN::Utils::VBO* getVBO(const std::string& name);
 	void deleteVBO(const std::string& name);
-//	CGoGN::Utils::VBO* addVBO(const QString& name);
-//	CGoGN::Utils::VBO* findFirstVBOMatching(const QRegExp& regexp);
-//	QList<CGoGN::Utils::VBO*> findVBOsMatching(const QRegExp& regexp);
-
-	int getNbVBO() { return h_vbo.count(); }
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
@@ -48,12 +45,14 @@ public:
 
 	bool linkView(View* view);
 	void unlinkView(View* view);
-	bool isLinkedToView(View* view) { return l_views.contains(view); }
-	QList<View*> getLinkedViews() { return l_views; }
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
 protected:
 	QString m_name;
 	Window* m_window;
+
+	CGoGN::Algo::Render::GL2::MapRender* m_render;
 
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
@@ -70,9 +69,7 @@ public:
 	MapHandler(const QString& name, Window* window, typename PFP::MAP* map) :
 		MapHandlerGen(name, window),
 		m_map(map)
-	{
-		m_render = new CGoGN::Algo::Render::GL2::MapRender();
-	}
+	{}
 
 	~MapHandler()
 	{
@@ -87,14 +84,8 @@ public:
 		m_render->initPrimitives<PFP>(*m_map, good, primitive) ;
 	}
 
-	void draw(CGoGN::Utils::GLSLShader* shader, int primitive)
-	{
-		m_render->draw(shader, primitive);
-	}
-
 protected:
 	typename PFP::MAP* m_map;
-	CGoGN::Algo::Render::GL2::MapRender* m_render;
 };
 
 #endif

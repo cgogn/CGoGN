@@ -32,7 +32,7 @@ CameraViewDialog::~CameraViewDialog()
 
 void CameraViewDialog::selectCurrentCamera()
 {
-	Camera* current = m_view->getCurrentCamera();
+	const Camera* current = m_view->getCurrentCamera();
 	for(int i = 0; i < cameraList->count(); ++i)
 	{
 		if(cameraList->item(i)->text() == current->getName())

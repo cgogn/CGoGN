@@ -56,9 +56,9 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionManageViews"/>
    <addaction name="actionManageCameras"/>
    <addaction name="actionManagePlugins"/>
+   <addaction name="actionManageMaps"/>
   </widget>
   <action name="actionAboutCGoGN">
    <property name="text">
@@ -84,15 +84,6 @@
     <string>Manage plugins</string>
    </property>
   </action>
-  <action name="actionManageViews">
-   <property name="icon">
-    <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/add_view.png</normaloff>:/icons/icons/add_view.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add view</string>
-   </property>
-  </action>
   <action name="actionManageCameras">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
@@ -105,6 +96,18 @@
   <action name="actionShow_Hide_Dock">
    <property name="text">
     <string>Show/Hide Dock</string>
+   </property>
+  </action>
+  <action name="actionManageMaps">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/icons/map_plugin.png</normaloff>:/icons/icons/map_plugin.png</iconset>
+   </property>
+   <property name="text">
+    <string>ManageMaps</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage maps</string>
    </property>
   </action>
  </widget>

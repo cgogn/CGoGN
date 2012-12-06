@@ -14,7 +14,7 @@ Camera::Camera(const QString& name, Window* window) :
 	m_snapCount(0)
 {
 	++cameraCount;
-	this->setZClippingCoefficient(100);
+//	setZClippingCoefficient(100);
 }
 
 Camera::~Camera()
@@ -45,11 +45,6 @@ void Camera::linkView(View* view)
 void Camera::unlinkView(View* view)
 {
 	l_views.removeOne(view);
-}
-
-bool Camera::isLinkedWithView(View* view)
-{
-	return l_views.contains(view);
 }
 
 void Camera::fitParamWith(View* view)

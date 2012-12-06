@@ -1045,6 +1045,8 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 		glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 	}
+
+	this->unbind();
 }
 
 void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview, const glm::mat4& PMV, const glm::mat4& normalMatrix)
@@ -1066,6 +1068,8 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 	{
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 	}
+
+	this->unbind();
 }
 
 
@@ -1080,11 +1084,12 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 		glEnableVertexAttribArray(it->va_id);
 		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)begin);
 	}
+//	this->unbind();
 }
 
 void GLSLShader::disableVertexAttribs() const
 {
-	this->bind();
+//	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 		glDisableVertexAttribArray(it->va_id);
 	this->unbind();

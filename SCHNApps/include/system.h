@@ -149,9 +149,9 @@ public:
 //	SIMPLE_GLVIEWER
 //} QGLV_CREATE_SETTINGS;
 
-extern QString app_path;
+//extern QString app_path;
 
-extern QSplashScreen *splash;
+//extern QSplashScreen *splash;
 
 } // namespace System
 

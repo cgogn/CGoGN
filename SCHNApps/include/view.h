@@ -5,6 +5,7 @@
 #include <QGLViewer/qglviewer.h>
 
 #include "types.h"
+#include "window.h"
 #include "Utils/gl_matrices.h"
 
 class ViewButtonArea;
@@ -24,11 +25,13 @@ public:
 	View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget = NULL);
 	~View();
 
-	const QString& getName() { return m_name; }
+	const QString& getName() const { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
-	Window* getWindow() { return m_window; }
+	Window* getWindow() const { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
+
+	bool isCurrentView() const { return m_window->getCurrentView() == this; }
 
 	virtual void init();
 	virtual void preDraw();
@@ -38,6 +41,7 @@ public:
 
 	void drawText();
 	void drawButtons();
+	void drawFrame();
 
 	void keyPressEvent(QKeyEvent* event);
 	void keyReleaseEvent(QKeyEvent *event);
@@ -46,16 +50,11 @@ public:
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event);
 
-	void drawOverpaint(QPainter *painter);
-
-//	virtual void paintGL() { update(); }
-//	virtual void paintEvent(QPaintEvent *event);
-
 	/*********************************************************
 	 * MANAGE LINKED CAMERA
 	 *********************************************************/
 
-	Camera* getCurrentCamera() { return m_currentCamera; }
+	Camera* getCurrentCamera() const { return m_currentCamera; }
 	void setCurrentCamera(Camera* c);
 
 	/*********************************************************
@@ -64,8 +63,8 @@ public:
 
 	void linkPlugin(Plugin* plugin);
 	void unlinkPlugin(Plugin* plugin);
-	QList<Plugin*> getLinkedPlugins() { return l_plugins; }
-	bool isLinkedToPlugin(Plugin* plugin) { return l_plugins.contains(plugin); }
+	const QList<Plugin*>& getLinkedPlugins() const { return l_plugins; }
+	bool isLinkedToPlugin(Plugin* plugin) const { return l_plugins.contains(plugin); }
 
 	/*********************************************************
 	 * MANAGE LINKED MAPS
@@ -73,17 +72,17 @@ public:
 
 	void linkMap(MapHandlerGen* map);
 	void unlinkMap(MapHandlerGen* map);
-	QList<MapHandlerGen*> getLinkedMaps() { return l_maps; }
-	bool isLinkedToMap(MapHandlerGen* map) { return l_maps.contains(map); }
+	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
+	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
 
 
 
 
 	void updateTextInfo();
 
-	glm::mat4 getCurrentModelViewMatrix();
-	glm::mat4 getCurrentProjectionMatrix();
-	glm::mat4 getCurrentModelViewProjectionMatrix();
+	glm::mat4 getCurrentModelViewMatrix() const;
+	glm::mat4 getCurrentProjectionMatrix() const;
+	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
 	void setCurrentModelViewMatrix(const glm::mat4& mvm);
 	void setCurrentProjectionMatrix(const glm::mat4& pm);

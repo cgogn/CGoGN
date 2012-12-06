@@ -19,9 +19,6 @@ public:
 	Plugin();
 	virtual ~Plugin();
 
-	virtual bool enable() = 0;
-	virtual void disable() = 0;
-
 	const QString& getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
 
@@ -34,18 +31,21 @@ public:
 	bool getProvidesRendering() { return b_providesRendering; }
 	void setProvidesRendering(bool b) {	b_providesRendering = b; }
 
+	virtual bool enable() = 0;
+	virtual void disable() = 0;
+
 	virtual void redraw(View* view) = 0;
 
 	virtual void keyPress(View* view, int key) = 0;
 	virtual void keyRelease(View* view, int key) = 0;
 	virtual void mousePress(View* view, int button, int x, int y) = 0;
 	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
-//	virtual void mouseClick(View* view, int button, int x, int y) = 0;
 	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
 	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
 
 	virtual void viewLinked(View* view) = 0;
 	virtual void viewUnlinked(View* view) = 0;
+	virtual void currentViewChanged(View* view) = 0;
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
@@ -53,8 +53,8 @@ public:
 
 	bool linkView(View* view);
 	void unlinkView(View* view);
-	bool isLinkedToView(View* view) { return l_views.contains(view); }
-	QList<View*> getLinkedViews() { return l_views; }
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
 	/*********************************************************
 	 * MANAGE DOCK TABS
@@ -62,6 +62,7 @@ public:
 
 	bool addTabInDock(QWidget* tabWidget, const QString& tabText);
 	void removeTabInDock(QWidget* tabWidget);
+	const QList<QWidget*>& getTabWidgets() const { return l_tabWidgets; }
 
 	/*********************************************************
 	 * MANAGE MENU ACTIONS

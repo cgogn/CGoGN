@@ -18,6 +18,7 @@
 #include "plugin.h"
 
 PluginDialog::PluginDialog(Window* window) :
+	QDialog(window),
 	m_window(window),
 	init(true)
 {
@@ -156,7 +157,7 @@ void PluginDialog::cb_addPlugins()
 	QStringList files = QFileDialog::getOpenFileNames(
 		this,
 		"Select one or more plugins",
-		System::app_path + QString("/../Plugins/"),
+		m_window->getAppPath() + QString("/../Plugins/"),
 		"Plugins (lib*.so lib*.dylib)"
 	);
 
@@ -190,7 +191,7 @@ void PluginDialog::cb_addPluginsDirectory()
 	QString dir = QFileDialog::getExistingDirectory(
 		this,
 		tr("Select a directory"),
-		System::app_path + QString("/../Plugins/"),
+		m_window->getAppPath() + QString("/../Plugins/"),
 		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
 	);
 

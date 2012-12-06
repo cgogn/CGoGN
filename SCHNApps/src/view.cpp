@@ -1,6 +1,5 @@
 #include "view.h"
 
-#include "window.h"
 #include "plugin.h"
 #include "camera.h"
 #include "viewButtonArea.h"
@@ -46,13 +45,13 @@ View::~View()
 	foreach(Plugin* plugin, l_plugins)
 	{
 		plugin->unlinkView(this);
-		unlinkPlugin(plugin);
+//		unlinkPlugin(plugin);
 	}
 
 	foreach(MapHandlerGen* map, l_maps)
 	{
 		map->unlinkView(this);
-		unlinkMap(map);
+//		unlinkMap(map);
 	}
 
 	delete m_buttonArea;
@@ -96,7 +95,8 @@ void View::preDraw()
 		it != CGoGN::Utils::GLSLShader::m_registeredShaders.end();
 		++it)
 	{
-		it->second->updateMatrices(pm, mm);
+		if(it->first == this || it->first == NULL)
+			it->second->updateMatrices(pm, mm);
 	}
 
 	QGLViewer::preDraw();
@@ -113,6 +113,8 @@ void View::postDraw()
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	drawButtons();
 	drawText();
+	if(isCurrentView())
+		drawFrame();
 	glPopAttrib();
 
 	QGLViewer::postDraw();
@@ -140,6 +142,20 @@ void View::drawButtons()
 	glDisable(GL_TEXTURE_2D);
 }
 
+void View::drawFrame()
+{
+	startScreenCoordinatesSystem();
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glLineWidth(2.0);
+	glBegin(GL_LINE_LOOP);
+		glVertex2i(1, 1);
+		glVertex2i(1, height()-1);
+		glVertex2i(width()-1, height()-1);
+		glVertex2i(width()-1, 1);
+	glEnd();
+	stopScreenCoordinatesSystem();
+}
+
 void View::keyPressEvent(QKeyEvent* event)
 {
 	foreach(Plugin* plugin, l_plugins)
@@ -156,6 +172,9 @@ void View::keyReleaseEvent(QKeyEvent *event)
 
 void View::mousePressEvent(QMouseEvent* event)
 {
+	if(!isCurrentView())
+		m_window->setCurrentView(this);
+
 	if(m_buttonArea->isClicked(event->x(), event->y()))
 		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
 	else
@@ -187,13 +206,6 @@ void View::wheelEvent(QWheelEvent* event)
 	QGLViewer::wheelEvent(event);
 }
 
-void View::drawOverpaint(QPainter *painter)
-{
-	painter->save();
-	painter->setOpacity(0.8);
-    painter->restore();
-}
-
 /*********************************************************
  * MANAGE LINKED CAMERA
  *********************************************************/
@@ -216,12 +228,18 @@ void View::setCurrentCamera(Camera* c)
 void View::linkPlugin(Plugin* plugin)
 {
 	if(plugin && !l_plugins.contains(plugin))
+	{
 		l_plugins.push_back(plugin);
+		if(isCurrentView())
+			m_window->enablePluginTabWidgets(plugin);
+	}
 }
 
 void View::unlinkPlugin(Plugin* plugin)
 {
 	l_plugins.removeOne(plugin);
+	if(isCurrentView())
+		m_window->disablePluginTabWidgets(plugin);
 }
 
 /*********************************************************
@@ -236,6 +254,7 @@ void View::linkMap(MapHandlerGen* map)
 
 		// TODO : update view global BB
 		setSceneBoundingBox(map->getBBmin(), map->getBBmax());
+		showEntireScene();
 	}
 }
 
@@ -256,10 +275,10 @@ void View::updateTextInfo()
 		QString(" / camera: ") + m_currentCamera->getName();
 }
 
-glm::mat4 View::getCurrentModelViewMatrix()
+glm::mat4 View::getCurrentModelViewMatrix() const
 {
 	GLdouble gl_mvm[16];
-	this->camera()->getModelViewMatrix(gl_mvm);
+	camera()->getModelViewMatrix(gl_mvm);
 	glm::mat4 mvm;
 	for(unsigned int i = 0; i < 4; ++i)
 	{
@@ -269,10 +288,10 @@ glm::mat4 View::getCurrentModelViewMatrix()
 	return mvm;
 }
 
-glm::mat4 View::getCurrentProjectionMatrix()
+glm::mat4 View::getCurrentProjectionMatrix() const
 {
 	GLdouble gl_pm[16];
-	this->camera()->getProjectionMatrix(gl_pm);
+	camera()->getProjectionMatrix(gl_pm);
 	glm::mat4 pm;
 	for(unsigned int i = 0; i < 4; ++i)
 	{
@@ -282,10 +301,10 @@ glm::mat4 View::getCurrentProjectionMatrix()
 	return pm;
 }
 
-glm::mat4 View::getCurrentModelViewProjectionMatrix()
+glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 {
 	GLdouble gl_mvpm[16];
-	this->camera()->getModelViewProjectionMatrix(gl_mvpm);
+	camera()->getModelViewProjectionMatrix(gl_mvpm);
 	glm::mat4 mvpm;
 	for(unsigned int i = 0; i < 4; ++i)
 	{
@@ -303,7 +322,7 @@ void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
 		for(unsigned int j = 0; j < 4; ++j)
 			gl_mvm[i*4+j] = mvm[i][j];
 	}
-	this->camera()->setFromModelViewMatrix(gl_mvm);
+	camera()->setFromModelViewMatrix(gl_mvm);
 }
 
 void View::setCurrentProjectionMatrix(const glm::mat4& pm)
@@ -314,7 +333,7 @@ void View::setCurrentProjectionMatrix(const glm::mat4& pm)
 		for(unsigned int j = 0; j < 4; ++j)
 			gl_pm[i*3+j] = pm[i][j];
 	}
-	this->camera()->setFromProjectionMatrix(gl_pm);
+	camera()->setFromProjectionMatrix(gl_pm);
 }
 
 void View::cb_cameraView(int x, int y, int globalX, int globalY)

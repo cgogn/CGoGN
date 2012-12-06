@@ -20,8 +20,7 @@
 Window::Window(QWidget *parent) :
 	QMainWindow(parent),
 	m_firstView(NULL),
-	m_dock(NULL),
-	m_dockTabWidget(NULL)
+	m_currentView(NULL)
 {
 	// program in its initialization phase
 	m_initialization = true;
@@ -30,12 +29,9 @@ Window::Window(QWidget *parent) :
 	m_cameraDialog = new CameraDialog(this);
 
 	this->setupUi(this);
-	System::splash->showMessage("Welcome to SCHNApps", Qt::AlignBottom | Qt::AlignCenter);
-	sleep(1);
 
 	// layout in which we store the main area
 	m_verticalLayout = new QVBoxLayout(centralwidget);
-	m_verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
 
 	// the main area: multi GL views display area
 	m_splitArea = new SplitArea(centralwidget);
@@ -48,7 +44,7 @@ Window::Window(QWidget *parent) :
 
 	m_dockTabWidget = new QTabWidget(m_dock);
 	m_dockTabWidget->setObjectName("DockTabWidget");
-	m_dockTabWidget->setLayoutDirection(Qt::RightToLeft);
+	m_dockTabWidget->setLayoutDirection(Qt::LeftToRight);
 	m_dockTabWidget->setTabPosition(QTabWidget::East);
 	m_dock->setWidget(m_dockTabWidget);
 
@@ -59,6 +55,7 @@ Window::Window(QWidget *parent) :
 
 	// add first view
 	m_firstView = addView();
+	m_currentView = m_firstView;
 	m_splitArea->addFitElement(m_firstView);
 
 	glewInit();
@@ -68,7 +65,7 @@ Window::Window(QWidget *parent) :
 	connect(actionAboutCGoGN, SIGNAL(triggered()), this, SLOT(cb_aboutCGoGN()));
 
 	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
-	connect(actionManageViews, SIGNAL(triggered()), this, SLOT(cb_manageViews()));
+	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
 	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
 
 //	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
@@ -86,25 +83,39 @@ Window::~Window()
  * MANAGE DOCK
  *********************************************************/
 
-QTabWidget* Window::getDockTabWidget()
-{
-	// if no dock or no tab widget: set error message
-	if (!m_dock || !m_dockTabWidget)
-		System::Error::code = System::Error::NO_DOCK;
-
-	return m_dockTabWidget;
-}
-
 void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
 	if(tabWidget)
-		m_dockTabWidget->addTab(tabWidget, tabText);
+	{
+		int idx = m_dockTabWidget->addTab(tabWidget, tabText);
+		m_dockTabWidget->setTabEnabled(idx, false);
+	}
 }
 
 void Window::removeTabInDock(QWidget *tabWidget)
 {
 	if(tabWidget)
 		m_dockTabWidget->removeTab(m_dockTabWidget->indexOf(tabWidget));
+}
+
+void Window::enablePluginTabWidgets(Plugin* plugin)
+{
+	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
+	foreach(QWidget* w, tabWidgets)
+	{
+		int idx = m_dockTabWidget->indexOf(w);
+		m_dockTabWidget->setTabEnabled(idx, true);
+	}
+}
+
+void Window::disablePluginTabWidgets(Plugin* plugin)
+{
+	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
+	foreach(QWidget* w, tabWidgets)
+	{
+		int idx = m_dockTabWidget->indexOf(w);
+		m_dockTabWidget->setTabEnabled(idx, false);
+	}
 }
 
 /*********************************************************
@@ -316,7 +327,7 @@ void Window::removeCamera(const QString& name)
 	}
 }
 
-Camera* Window::getCamera(const QString& name)
+Camera* Window::getCamera(const QString& name) const
 {
 	if (h_cameras.contains(name))
 		return h_cameras[name];
@@ -363,8 +374,22 @@ void Window::removeView(const QString& name)
 		if(h_views.count() > 1)
 		{
 			View* view = h_views[name];
-			if(m_firstView == view)
-				m_firstView = h_views.constBegin().value();
+			if(view == m_firstView)
+			{
+				ViewHash::const_iterator i = h_views.constBegin();
+				while (i != h_views.constEnd())
+				{
+					if(i.value() != view)
+					{
+						m_firstView = i.value();
+						i = h_views.constEnd();
+					}
+					else
+						++i;
+				}
+			}
+//			if(view == m_currentView)
+			setCurrentView(m_firstView);
 			h_views.remove(name);
 
 			emit(viewRemoved(view));
@@ -374,7 +399,7 @@ void Window::removeView(const QString& name)
 	}
 }
 
-View* Window::getView(const QString& name)
+View* Window::getView(const QString& name) const
 {
 	if (h_views.contains(name))
 		return h_views[name];
@@ -385,11 +410,84 @@ View* Window::getView(const QString& name)
 	}
 }
 
+void Window::setCurrentView(View* view)
+{
+	const QList<Plugin*>& oldPlugins = m_currentView->getLinkedPlugins();
+	foreach(Plugin* p, oldPlugins)
+		disablePluginTabWidgets(p);
+
+	View* oldCurrent = m_currentView;
+	m_currentView = view;
+
+	const QList<Plugin*>& newPlugins = m_currentView->getLinkedPlugins();
+	foreach(Plugin* p, newPlugins)
+	{
+		enablePluginTabWidgets(p);
+		p->currentViewChanged(m_currentView);
+	}
+
+	oldCurrent->updateGL();
+	m_currentView->updateGL();
+}
+
+void Window::moveView()
+{
+	// if splitArea not empty or has more than 1 element
+	if (m_splitArea->getNbRows() > 1 || ((QSplitter *)m_splitArea->widget(0))->count() > 1)
+	{
+		// map the splitArea
+		ViewPixMaps pm, finalPm;
+		pm.fromSplitArea(m_splitArea);
+
+		// build a GLViewerSelector using this map
+		ViewSelector selector(pm, this, ViewSelector::MOVE);
+
+		// show the move dialog box
+		selector.exec();
+
+		// the dialog is accepted: it has some modification
+		if (selector.result() == QDialog::Accepted)
+		{
+			// get back the modifier map
+			finalPm = selector.getGLVMap();
+
+			// creating a new split area and switch it with the old one
+			SplitArea *old = m_splitArea;
+			m_splitArea = new SplitArea(centralwidget);
+			m_verticalLayout->addWidget(m_splitArea);
+
+			// fill the new SplitArea using the modified map
+			int x = 0;
+			int y = 0;
+
+			for (ViewPixMaps::y_iterator y_it = finalPm.y_begin(); y_it != finalPm.y_end(); ++y_it)
+			{
+				for (ViewPixMaps::x_iterator x_it = finalPm.x_begin(y_it); x_it != finalPm.x_end(y_it); ++x_it)
+				{
+					x_it->view->setParent(m_splitArea);
+					m_splitArea->addElementAt(x_it->view, x, y);
+					++x;
+				}
+				x = 0;
+				++y;
+			}
+
+			// delete the old splitArea
+			delete old;
+		}
+
+		// key states at the end of the move dialog
+		keys[0] = selector.keys[0];
+		keys[1] = selector.keys[1];
+		keys[2] = selector.keys[2];
+	}
+}
+
 /*********************************************************
  * MANAGE PLUGINS
  *********************************************************/
 
-Plugin* Window::loadPlugin(QString pluginFilePath)
+Plugin* Window::loadPlugin(const QString& pluginFilePath)
 {
 	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
 
@@ -460,7 +558,7 @@ void Window::unloadPlugin(const QString& pluginName)
 	}
 }
 
-Plugin* Window::getPlugin(const QString& name)
+Plugin* Window::getPlugin(const QString& name) const
 {
 	if (h_plugins.contains(name))
 		return h_plugins[name];
@@ -523,7 +621,7 @@ void Window::removeMap(const QString& name)
 	}
 }
 
-MapHandlerGen* Window::getMap(const QString& name)
+MapHandlerGen* Window::getMap(const QString& name) const
 {
 	if (h_maps.contains(name))
 		return h_maps[name];
@@ -601,58 +699,7 @@ void Window::keyReleaseEvent(QKeyEvent *event)
 		keys[2] = false;
 }
 
-void Window::moveView()
-{
-	// if splitArea not empty or has more than 1 element
-	if (m_splitArea->getNbRows() > 1 || ((QSplitter *)m_splitArea->widget(0))->count() > 1)
-	{
-		// map the splitArea
-		ViewPixMaps pm, finalPm;
-		pm.fromSplitArea(m_splitArea);
 
-		// build a GLViewerSelector using this map
-		ViewSelector selector(pm, this, ViewSelector::MOVE);
-
-		// show the move dialog box
-		selector.exec();
-
-		// the dialog is accepted: it has some modification
-		if (selector.result() == QDialog::Accepted)
-		{
-			// get back the modifier map
-			finalPm = selector.getGLVMap();
-
-			// creating a new split area and switch it with the old one
-			SplitArea *old = m_splitArea;
-			m_splitArea = new SplitArea(centralwidget);
-			m_verticalLayout->addWidget(m_splitArea);
-
-			// fill the new SplitArea using the modified map
-			int x = 0;
-			int y = 0;
-
-			for (ViewPixMaps::y_iterator y_it = finalPm.y_begin(); y_it != finalPm.y_end(); ++y_it)
-			{
-				for (ViewPixMaps::x_iterator x_it = finalPm.x_begin(y_it); x_it != finalPm.x_end(y_it); ++x_it)
-				{
-					x_it->view->setParent(m_splitArea);
-					m_splitArea->addElementAt(x_it->view, x, y);
-					++x;
-				}
-				x = 0;
-				++y;
-			}
-
-			// delete the old splitArea
-			delete old;
-		}
-
-		// key states at the end of the move dialog
-		keys[0] = selector.keys[0];
-		keys[1] = selector.keys[1];
-		keys[2] = selector.keys[2];
-	}
-}
 
 void Window::cb_aboutSCHNApps()
 {
@@ -676,24 +723,12 @@ void Window::cb_manageCameras()
 	m_cameraDialog->show();
 }
 
-void Window::cb_manageViews()
-{
-	ViewPixMaps pm;
-	pm.fromSplitArea(m_splitArea);
-
-	ViewSelector selector(pm, this, ViewSelector::SELECT);
-	selector.setInsertionName("new view");
-	selector.exec();
-
-	if (selector.result() == QDialog::Accepted)
-	{
-		View* v = addView();
-		QPoint insertPoint = selector.getInsertPoint();
-		m_splitArea->addElementAt(v, insertPoint.x(), insertPoint.y());
-	}
-}
-
 void Window::cb_managePlugins()
 {
 	m_pluginDialog->show();
+}
+
+void Window::cb_manageMaps()
+{
+
 }

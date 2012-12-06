@@ -14,8 +14,6 @@ Error::ERROR_CODE Error::code = SUCCESS;
 
 QString Error::parameter = QString("???");
 
-QString app_path = QString();
-
 bool Events::movieDialogOpened = false;
 
 //bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile)

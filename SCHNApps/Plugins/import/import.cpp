@@ -1,6 +1,10 @@
 #include "import.h"
 
+#include <QFileDialog>
+#include <QFileInfo>
+#include "system.h"
 #include "mapHandler.h"
+
 #include "Algo/Import/import.h"
 
 bool ImportPlugin::enable()
@@ -17,11 +21,14 @@ void ImportPlugin::disable()
 
 void ImportPlugin::cb_import()
 {
+	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off)");
+	QFileInfo fi(fileName);
+
 	MAP* m = new MAP();
-	MapHandler<PFP>* h = new MapHandler<PFP>("duck", m_window, m);
+	MapHandler<PFP>* h = new MapHandler<PFP>(fi.baseName(), m_window, m);
 
 	std::vector<std::string> attrNames ;
-	CGoGN::Algo::Import::importMesh<PFP>(*m, "/home/kraemer/Media/Data/surface/lowRes/duck_163.ply", attrNames);
+	CGoGN::Algo::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
 
 	CGoGN::VertexAttribute<PFP::VEC3> position = m->getAttribute<PFP::VEC3, CGoGN::VERTEX>(attrNames[0]);
 
@@ -36,10 +43,10 @@ void ImportPlugin::cb_import()
 	h->updatePrimitives(CGoGN::Algo::Render::GL2::LINES, CGoGN::allDarts) ;
 	h->updatePrimitives(CGoGN::Algo::Render::GL2::TRIANGLES, CGoGN::allDarts) ;
 
-	m_window->addMap(h);
-
 	CGoGN::Utils::VBO* positionVBO = h->getVBO(position.name());
 	positionVBO->updateData(position);
+
+	m_window->addMap(h);
 }
 
 /**

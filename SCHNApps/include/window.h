@@ -30,6 +30,9 @@ public:
 	 */
 	~Window();
 
+	const QString& getAppPath() { return m_appPath; }
+	void setAppPath(const QString& path) { m_appPath = path; }
+
 	/*********************************************************
 	 * MANAGE DOCK
 	 *********************************************************/
@@ -40,7 +43,7 @@ public:
 	 *
 	 * \return a pointer to the TabWidget, NULL if not allocated yet
 	 */
-	QTabWidget* getDockTabWidget();
+	QTabWidget* getDockTabWidget() const { return m_dockTabWidget; }
 
 	/**
 	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText)
@@ -64,6 +67,9 @@ public:
 	 * \see addWidgetInDockTab()
 	 */
 	void removeTabInDock(QWidget* tabWidget);
+
+	void enablePluginTabWidgets(Plugin* plugin);
+	void disablePluginTabWidgets(Plugin* plugin);
 
 	/*********************************************************
 	 * MANAGE MENU ACTIONS
@@ -135,9 +141,9 @@ public:
 	Camera* addCamera(const QString& name);
 	Camera* addCamera();
 	void removeCamera(const QString& name);
-	Camera* getCamera(const QString& name);
-	QList<Camera*> getCamerasList() { return h_cameras.values(); }
-	const CameraHash& getCamerasHash() { return h_cameras; }
+	Camera* getCamera(const QString& name) const;
+	QList<Camera*> getCamerasList() const { return h_cameras.values(); }
+	const CameraHash& getCamerasHash() const { return h_cameras; }
 
 	/*********************************************************
 	 * MANAGE VIEWS
@@ -146,9 +152,24 @@ public:
 	View* addView(const QString& name);
 	View* addView();
 	void removeView(const QString& name);
-	View* getView(const QString& name);
-	QList<View*> getViewsList() { return h_views.values(); }
-	const ViewHash& getViewsHash() { return h_views; }
+	View* getView(const QString& name) const;
+	QList<View*> getViewsList() const { return h_views.values(); }
+	const ViewHash& getViewsHash() const { return h_views; }
+
+	View* getCurrentView() const { return m_currentView; }
+	void setCurrentView(View* view);
+
+	/**
+	 * \fn void moveView()
+	 * \brief shows a reordering dialog for the Views
+	 *
+	 * Make a call with the right parameters to the dialog class
+	 * GLVSelector and show this dialog.
+	 *
+	 * This method is meant to be called when the user press
+	 * CTRL+Shift+M.
+	 */
+	void moveView();
 
 	/*********************************************************
 	 * MANAGE PLUGINS
@@ -182,7 +203,7 @@ public:
 	 * \see getPlugins()
 	 * \see Plugin::enable()
 	 */
-	Plugin* loadPlugin(QString pluginFilePath);
+	Plugin* loadPlugin(const QString& pluginFilePath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -225,9 +246,9 @@ public:
 	 */
 //	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
 
-	Plugin* getPlugin(const QString& name);
-	QList<Plugin*> getPluginsList() { return h_plugins.values(); }
-	const PluginHash& getPluginsHash() { return h_plugins; }
+	Plugin* getPlugin(const QString& name) const;
+	QList<Plugin*> getPluginsList() const { return h_plugins.values(); }
+	const PluginHash& getPluginsHash() const { return h_plugins; }
 
 	/*********************************************************
 	 * MANAGE MAPS
@@ -235,9 +256,9 @@ public:
 
 	bool addMap(MapHandlerGen* map);
 	void removeMap(const QString& name);
-	MapHandlerGen* getMap(const QString& name);
-	QList<MapHandlerGen*> getMapsList() { return h_maps.values(); }
-	const MapHash& getMapsHash() { return h_maps; }
+	MapHandlerGen* getMap(const QString& name) const;
+	QList<MapHandlerGen*> getMapsList() const { return h_maps.values(); }
+	const MapHash& getMapsHash() const { return h_maps; }
 
 	/*********************************************************
 	 * MANAGE TEXTURES
@@ -247,12 +268,15 @@ public:
 	void releaseTexture(const QString& image);
 
 protected:
+	QString m_appPath;
+
 	bool m_initialization;
 
 	QVBoxLayout* m_verticalLayout;
 	SplitArea* m_splitArea;
 
 	View* m_firstView;
+	View* m_currentView;
 
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
@@ -275,18 +299,6 @@ protected:
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 
-	/**
-	 * \fn void moveView()
-	 * \brief shows a reordering dialog for the Views
-	 *
-	 * Make a call with the right parameters to the dialog class
-	 * GLVSelector and show this dialog.
-	 *
-	 * This method is meant to be called when the user press
-	 * CTRL+Shift+M.
-	 */
-	void moveView();
-
 public slots:
 	/**
 	 * \fn void cb_about_SCHNApps();
@@ -308,18 +320,13 @@ public slots:
 	void cb_manageCameras();
 
 	/**
-	 * \fn void cb_manageViews()
-	 * \brief method called when the "Views" action is triggered.
-	 * Show the scenes management dialog:
-	 */
-	void cb_manageViews();
-
-	/**
 	 * \fn void cb_managePlugins()
 	 * \brief method called when the "Plugins" action is triggered.
 	 * Show the plugins management dialog
 	 */
 	void cb_managePlugins();
+
+	void cb_manageMaps();
 
 signals:
 	void cameraAdded(Camera* camera);
