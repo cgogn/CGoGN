@@ -109,6 +109,38 @@ public:
 } ;
 
 template <typename PFP>
+class LerpTriQuadFaceSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpTriQuadFaceSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			if(m_map.faceDegree(d) > 3)
+			{
+				typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
+
+				m_map.incCurrentLevel() ;
+
+				Dart midF = m_map.phi2(m_map.phi1(d));
+				m_position[midF] = p ;
+
+				m_map.decCurrentLevel() ;
+			}
+		}
+	}
+} ;
+
+
+template <typename PFP>
 class LerpVolumeSynthesisFilter : public Filter
 {
 protected:
@@ -128,11 +160,12 @@ public:
 
 			m_map.incCurrentLevel() ;
 
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d))
+			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d)) // &&  is not a pyramide && is not a prisme
 			{
-
 				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
 				m_position[midV] = p ;
+
+				std::cout << "midV  = " << midV << std::endl;
 			}
 
 			m_map.decCurrentLevel() ;

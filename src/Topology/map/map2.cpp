@@ -330,14 +330,14 @@ void Map2::swapEdges(Dart d, Dart e)
 {
 	assert(!Map2::isBoundaryEdge(d) && !Map2::isBoundaryEdge(e));
 
-	//Dart d2 = phi2(d);
-	//Dart e2 = phi2(e);
+	Dart d2 = phi2(d);
+	Dart e2 = phi2(e);
 
 	phi2unsew(d);
 	phi2unsew(e) ;
 
 	phi2sew(d, e);
-	//phi2sew(d2, e2);
+	phi2sew(d2, e2);
 }
 
 void Map2::sewFaces(Dart d, Dart e, bool withBoundary)

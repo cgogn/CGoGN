@@ -35,7 +35,7 @@ namespace Modelisation
  * create a n-sided pyramid
  */
 template <typename PFP>
-Dart createPyramid(typename PFP::MAP& map, unsigned int n)
+Dart createPyramid(typename PFP::MAP& map, unsigned int n, bool withBoundary)
 {
 	Dart dres = Dart::nil();
 	std::vector<Dart> m_tableVertDarts;
@@ -69,41 +69,8 @@ Dart createPyramid(typename PFP::MAP& map, unsigned int n)
 		base = map.phi1(base);
 	}
 
-	if(map.dimension() == 3)
+	if(map.dimension() == 3 && withBoundary)
 		map.closeMap();
-
-	if(map.template isOrbitEmbedded<VERTEX>())
-	{
-		for(unsigned int i = 0; i < n; ++i)
-		{
-			map.template initOrbitEmbeddingNewCell<VERTEX>(m_tableVertDarts[i]);
-		}
-		map.template initOrbitEmbeddingNewCell<VERTEX>(map.phi_1(m_tableVertDarts[0]));
-	}
-
-	if(map.template isOrbitEmbedded<EDGE>())
-	{
-		for(unsigned int i = 0; i < n; ++i)
-		{
-			map.template initOrbitEmbeddingNewCell<EDGE>(m_tableVertDarts[i]);
-			map.template initOrbitEmbeddingNewCell<EDGE>(map.phi1(m_tableVertDarts[i]));
-		}
-	}
-
-	if(map.template isOrbitEmbedded<FACE>())
-	{
-		for(unsigned int i = 0; i < n; ++i)
-		{
-			map.template initOrbitEmbeddingNewCell<FACE>(m_tableVertDarts[i]);
-		}
-
-		map.template initOrbitEmbeddingNewCell<FACE>(dres);
-	}
-
-	if(map.template isOrbitEmbedded<VOLUME>())
-	{
-		map.template initOrbitEmbeddingNewCell<VOLUME>(dres);
-	}
 
 	//return a dart from the base
 	return dres;
@@ -113,7 +80,7 @@ Dart createPyramid(typename PFP::MAP& map, unsigned int n)
  * create a n-sided prism
  */
 template <typename PFP>
-Dart createPrism(typename PFP::MAP& map, unsigned int n)
+Dart createPrism(typename PFP::MAP& map, unsigned int n, bool withBoundary)
 {
 	Dart dres = Dart::nil();
 	unsigned int nb = n*2;
@@ -157,43 +124,8 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
 		bottom = map.phi_1(bottom);
 	}
 
-	if(map.dimension() == 3)
+	if(map.dimension() == 3 && withBoundary)
 		map.closeMap();
-
-	if(map.template isOrbitEmbedded<VERTEX>())
-	{
-		for(unsigned int i = 0; i < nb; ++i)
-		{
-			map.template initOrbitEmbeddingNewCell<VERTEX>(m_tableVertDarts[i]);
-		}
-	}
-
-	if(map.template isOrbitEmbedded<EDGE>())
-	{
-		for(unsigned int i = 0; i < n; ++i)
-		{
-			map.template initOrbitEmbeddingNewCell<FACE>(m_tableVertDarts[i]);
-			map.template initOrbitEmbeddingNewCell<FACE>(map.phi1(m_tableVertDarts[i]));
-			map.template initOrbitEmbeddingNewCell<FACE>(map.phi1(map.phi1(m_tableVertDarts[i])));
-		}
-	}
-
-	if(map.template isOrbitEmbedded<FACE>())
-	{
-		for(unsigned int i = 0; i < n; ++i)
-		{
-			map.template initOrbitEmbeddingNewCell<FACE>(m_tableVertDarts[i]);
-		}
-
-		map.template initOrbitEmbeddingNewCell<FACE>(top);
-		map.template initOrbitEmbeddingNewCell<FACE>(bottom);
-	}
-
-	if(map.template isOrbitEmbedded<VOLUME>())
-	{
-		map.template initOrbitEmbeddingNewCell<VOLUME>(dres);
-	}
-
 
 	//return a dart from the base
 	return dres;
@@ -203,12 +135,12 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
  * create a n-sided diamond
  */
 template <typename PFP>
-Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
+Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides, bool withBoundary)
 {
 	Dart res = Dart::nil();
 
-	Dart firstP = createPyramid<PFP>(map,nbSides);
-	Dart secondP = createPyramid<PFP>(map,nbSides);
+	Dart firstP = createPyramid<PFP>(map,nbSides, withBoundary);
+	Dart secondP = createPyramid<PFP>(map,nbSides, withBoundary);
 
 	res = map.phi2(firstP);
 
@@ -224,45 +156,45 @@ Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
  * create a 3-sided prism
  */
 template <typename PFP>
-Dart createTriangularPrism(typename PFP::MAP& map)
+Dart createTriangularPrism(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPrism<PFP>(map, 3);
+	return createPrism<PFP>(map, 3, withBoundary);
 }
 
 /**
  * create a hexahedron
  */
 template <typename PFP>
-Dart createHexahedron(typename PFP::MAP& map)
+Dart createHexahedron(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPrism<PFP>(map, 4);
+	return createPrism<PFP>(map, 4, withBoundary);
 }
 
 /**
  * create a tetrahedron
  */
 template <typename PFP>
-Dart createTetrahedron(typename PFP::MAP& map)
+Dart createTetrahedron(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPyramid<PFP>(map, 3);
+	return createPyramid<PFP>(map, 3, withBoundary);
 }
 
 /**
  * create a 4-sided pyramid
  */
 template <typename PFP>
-Dart createQuadrangularPyramid(typename PFP::MAP& map)
+Dart createQuadrangularPyramid(typename PFP::MAP& map, bool withBoundary)
 {
-	return createPyramid<PFP>(map, 4);
+	return createPyramid<PFP>(map, 4, withBoundary);
 }
 
 /**
  * create an octahedron (i.e. 4-sided diamond)
  */
 template <typename PFP>
-Dart createOctahedron(typename PFP::MAP& map)
+Dart createOctahedron(typename PFP::MAP& map, bool withBoundary)
 {
-	return createDiamond<PFP>(map,4);
+	return createDiamond<PFP>(map,4, withBoundary);
 }
 
 

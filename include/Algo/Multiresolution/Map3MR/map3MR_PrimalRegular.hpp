@@ -72,6 +72,12 @@ void Map3MR<PFP>::swapEdges(Dart d, Dart e)
 
 		m_map.PFP::MAP::ParentMap::swapEdges(d,e);
 
+//		m_map.PFP::MAP::ParentMap::unsewFaces(d);
+//		m_map.PFP::MAP::ParentMap::unsewFaces(e);
+//
+//		m_map.PFP::MAP::ParentMap::sewFaces(d, e);
+//		m_map.PFP::MAP::ParentMap::sewFaces(d2, e2);
+
 		if(m_map.template isOrbitEmbedded<VERTEX>())
 		{
 			m_map.template copyDartEmbedding<VERTEX>(d, m_map.phi2(m_map.phi_1(d)));
@@ -418,8 +424,363 @@ void Map3MR<PFP>::addNewLevelHexa()
 	m_map.popLevel() ;
 }
 
-//void Map3MR_PrimalRegular::addNewLevel(bool embedNewVertices)
-//{
+
+template <typename PFP>
+void Map3MR<PFP>::addNewLevel()
+{
+	m_map.pushLevel();
+
+	m_map.addLevelBack();
+	m_map.duplicateDarts(m_map.getMaxLevel());
+	m_map.setCurrentLevel(m_map.getMaxLevel());
+
+	//1. cut edges
+	TraversorE<typename PFP::MAP> travE(m_map);
+	for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
+	{
+		m_map.cutEdge(d) ;
+		travE.skip(d) ;
+		travE.skip(m_map.phi1(d)) ;
+	}
+
+	//2. split faces - quadrangule faces
+	TraversorF<typename PFP::MAP> travF(m_map) ;
+	for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
+	{
+		Dart old = d;
+		if(m_map.getDartLevel(old) == m_map.getMaxLevel())
+			old = m_map.phi1(old) ;
+
+		m_map.decCurrentLevel() ;
+		unsigned int degree = m_map.faceDegree(old) ;
+		m_map.incCurrentLevel() ;
+
+		if(degree == 3)					// if subdividing a triangle
+		{
+			Dart dd = m_map.phi1(old) ;
+			Dart e = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, e) ;
+			travF.skip(dd) ;
+
+			dd = e ;
+			e = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, e) ;
+			travF.skip(dd) ;
+
+			dd = e ;
+			e = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, e) ;
+			travF.skip(dd) ;
+
+			travF.skip(e) ;
+		}
+		else							// if subdividing a polygonal face
+		{
+			Dart dd = m_map.phi1(old) ;
+			Dart next = m_map.phi1(m_map.phi1(dd)) ;
+			m_map.splitFace(dd, next) ;		// insert a first edge
+
+			Dart ne = m_map.phi2(m_map.phi_1(dd)) ;
+			m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
+			travF.skip(dd) ;
+
+			dd = m_map.phi1(m_map.phi1(next)) ;
+			while(dd != ne)				// turn around the face and insert new edges
+			{							// linked to the central vertex
+				Dart tmp = m_map.phi1(ne) ;
+				m_map.splitFace(tmp, dd) ;
+				travF.skip(tmp) ;
+				dd = m_map.phi1(m_map.phi1(dd)) ;
+			}
+			travF.skip(ne) ;
+		}
+	}
+
+
+	//3. create inside volumes
+	m_map.decCurrentLevel() ;
+	TraversorW<typename PFP::MAP> traW(m_map);
+	for(Dart dit = traW.begin(); dit != traW.end(); dit = traW.next())
+	{
+		std::vector<std::pair<Dart, Dart> > subdividedFaces;
+		subdividedFaces.reserve(64);
+		Dart centralDart = NIL;
+
+		bool isocta = false;
+		bool ishex = false;
+		bool isprism = false;
+		bool ispyra = false;
+
+		Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
+		for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+		{
+			m_map.incCurrentLevel() ;
+
+			Dart e = ditWV;
+			std::vector<Dart> v ;
+
+			do
+			{
+				v.push_back(m_map.phi1(e));
+
+				if(m_map.phi1(m_map.phi1(m_map.phi1(e))) != e)
+					v.push_back(m_map.phi1(m_map.phi1(e)));
+
+				if(!m_map.PFP::MAP::ParentMap::isBoundaryEdge(m_map.phi1(e)))
+					subdividedFaces.push_back(std::pair<Dart,Dart>(m_map.phi1(e),m_map.phi2(m_map.phi1(e))));
+
+				if(m_map.phi1(m_map.phi1(m_map.phi1(e))) != e)
+					if(!m_map.PFP::MAP::ParentMap::isBoundaryEdge(m_map.phi1(m_map.phi1(e))))
+						subdividedFaces.push_back(std::pair<Dart,Dart>(m_map.phi1(m_map.phi1(e)),m_map.phi2(m_map.phi1(m_map.phi1(e)))));
+
+				e = m_map.phi2(m_map.phi_1(e));
+			}
+			while(e != ditWV);
+
+			m_map.splitVolume(v);
+
+			unsigned int fdeg = m_map.faceDegree(m_map.phi2(m_map.phi1(ditWV)));
+
+			if(fdeg == 4)
+			{
+				std::cout << "== 4" << std::endl;
+
+				if(m_map.PFP::MAP::ParentMap::vertexDegree(ditWV) == 3)
+				{
+					isocta = false;
+					ispyra = true;
+
+					std::cout << "pyra" << std::endl;
+
+					Dart it = ditWV;
+					if((m_map.faceDegree(it) == 3) && (m_map.faceDegree(m_map.phi2(it))) == 3)
+					{
+						it = m_map.phi2(m_map.phi_1(it));
+					}
+					else if((m_map.faceDegree(it) == 3) && (m_map.faceDegree(m_map.phi2(it)) == 4))
+					{
+						it = m_map.phi1(m_map.phi2(it));
+					}
+
+					Dart old = m_map.phi2(m_map.phi1(it));
+					Dart dd = m_map.phi1(m_map.phi1(old));
+
+					m_map.splitFace(old,dd) ;
+					centralDart = old;
+				}
+				else
+				{
+					isocta = true;
+
+					std::cout << "octa" << std::endl;
+
+					Dart old = m_map.phi2(m_map.phi1(ditWV));
+					Dart dd = m_map.phi1(old) ;
+					m_map.splitFace(old,dd) ;
+
+					Dart ne = m_map.phi1(old);
+
+					m_map.cutEdge(ne);
+					centralDart = m_map.phi1(ne);
+
+					Dart stop = m_map.phi2(m_map.phi1(ne));
+					ne = m_map.phi2(ne);
+					do
+					{
+						dd = m_map.phi1(m_map.phi1(ne));
+
+						m_map.splitFace(ne, dd) ;
+
+						ne = m_map.phi2(m_map.phi_1(ne));
+						dd = m_map.phi1(dd);
+					}
+					while(dd != stop);
+				}
+			}
+			else if(fdeg == 5)
+			{
+				std::cout << "== 5" << std::endl;
+
+				isprism = true;
+
+				Dart it = ditWV;
+				if(m_map.faceDegree(it) == 3)
+				{
+					it = m_map.phi2(m_map.phi_1(it));
+				}
+				else if(m_map.faceDegree(m_map.phi2(m_map.phi_1(ditWV))) == 3)
+				{
+					it = m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(it))));
+				}
+
+				Dart old = m_map.phi2(m_map.phi1(it));
+				Dart dd = m_map.phi_1(m_map.phi_1(old));
+
+				m_map.splitFace(old,dd) ;
+			}
+			if(fdeg == 6)
+			{
+				std::cout << "== 6" << std::endl;
+				ishex = true;
+
+				Dart dd = m_map.phi2(m_map.phi1(ditWV));;
+				Dart next = m_map.phi1(m_map.phi1(dd)) ;
+				m_map.splitFace(dd, next) ;		// insert a first edge
+
+				Dart ne = m_map.phi2(m_map.phi_1(dd)) ;
+				m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
+				centralDart = m_map.phi1(ne);
+				//m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
+
+				dd = m_map.phi1(m_map.phi1(next)) ;
+				while(dd != ne)				// turn around the face and insert new edges
+				{							// linked to the central vertex
+					Dart tmp = m_map.phi1(ne) ;
+					m_map.splitFace(tmp, dd) ;
+					dd = m_map.phi1(m_map.phi1(dd)) ;
+				}
+			}
+
+			m_map.decCurrentLevel() ;
+		}
+
+		if(ishex)
+		{
+			m_map.incCurrentLevel();
+
+			m_map.deleteVolume(m_map.phi3(m_map.phi2(m_map.phi1(dit))));
+
+			for (std::vector<std::pair<Dart,Dart> >::iterator it = subdividedFaces.begin(); it != subdividedFaces.end(); ++it)
+			{
+				Dart f1 = m_map.phi2((*it).first);
+				Dart f2 = m_map.phi2((*it).second);
+
+				if(m_map.isBoundaryFace(f1) && m_map.isBoundaryFace(f2))
+				{
+						m_map.sewVolumes(f1, f2);//, false);
+				}
+			}
+
+			m_map.decCurrentLevel() ;
+		}
+
+		if(ispyra)
+		{
+			isocta = false;
+
+			Dart ditV = dit;
+
+			Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
+			for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+			{
+				if(m_map.PFP::MAP::ParentMap::vertexDegree(ditWV) == 4)
+					ditV = ditWV;
+			}
+
+			m_map.incCurrentLevel();
+			Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditV)));
+
+			Dart f = x;
+			do
+			{
+				Dart f3 = m_map.phi3(f);
+				Dart tmp =  m_map.phi_1(m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(f3))))); //future voisin par phi2
+				swapEdges(f3, tmp);
+
+				std::cout << "plop : " << f3 << std::endl;
+
+				f = m_map.phi2(m_map.phi_1(f));
+			}while(f != x);
+
+			//replonger l'orbit de ditV.
+			m_map.template setOrbitEmbedding<VERTEX>(ditV, m_map.template getEmbedding<VERTEX>(ditV));
+
+			m_map.decCurrentLevel() ;
+		}
+
+		if(isocta)
+		{
+			std::cout << "is octa " << std::endl;
+
+			Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
+
+			for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
+			{
+				m_map.incCurrentLevel();
+				Dart x = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
+
+				if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,x))
+				{
+					DartMarkerStore me(m_map);
+
+					Dart f = x;
+
+					do
+					{
+						Dart f3 = m_map.phi3(f);
+
+						if(!me.isMarked(f3))
+						{
+							Dart tmp =  m_map.phi_1(m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(f3))))); //future voisin par phi2
+
+							Dart f32 = m_map.phi2(f3);
+							swapEdges(f3, tmp);
+
+							me.markOrbit<EDGE>(f3);
+							me.markOrbit<EDGE>(f32);
+						}
+
+						f = m_map.phi2(m_map.phi_1(f));
+					}while(f != x);
+
+				}
+				m_map.decCurrentLevel() ;
+			}
+		}
+
+
+
+		if(isprism)
+		{
+			m_map.incCurrentLevel();
+
+			Dart ditWV = dit;
+			if(m_map.faceDegree(dit) == 3)
+			{
+				ditWV = m_map.phi2(m_map.phi_1(dit));
+			}
+			else if(m_map.faceDegree(m_map.phi2(m_map.phi_1(dit))) == 3)
+			{
+				ditWV = m_map.phi1(m_map.phi2(dit));
+			}
+
+			ditWV = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
+
+			//m_map.deleteVolume(m_map.phi3(m_map.phi2(m_map.phi1(dit))));
+
+			m_map.decCurrentLevel() ;
+		}
+
+	}
+
+	m_map.incCurrentLevel();
+	m_map.popLevel() ;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //	pushLevel();
 //
 //	addLevel();

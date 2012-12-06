@@ -29,6 +29,7 @@
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Modelisation/tetrahedralization.h"
 #include "Algo/Multiresolution/filter.h"
+#include "Topology/generic/traversor2_closed.h"
 
 namespace CGoGN
 {
@@ -174,28 +175,8 @@ public:
 				typename PFP::VEC3 ev(0.0);
 				typename PFP::VEC3 fv(0.0);
 
-				std::cout << "db = " << db << std::endl;
-
-				Dart dit = db;
-				do
-				{
-					std::cout << "dit = " << dit << std::endl;
-					m_map.incCurrentLevel() ;
-
-					Dart midEdgeV = m_map.phi1(dit);
-					ev += m_position[midEdgeV];
-					fv += m_position[m_map.phi1(midEdgeV)];
-
-					m_map.decCurrentLevel() ;
-					++count;
-
-					dit = m_map.phi2(m_map.phi_1(dit));
-
-				}while(dit != db);
-
-//TODO Replace do--while with a Traversor2 on Boundary
-//				Traversor2VF<typename PFP::MAP> travVF(m_map,db);
-//				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
+//				Dart dit = db;
+//				do
 //				{
 //					std::cout << "dit = " << dit << std::endl;
 //					m_map.incCurrentLevel() ;
@@ -206,9 +187,24 @@ public:
 //
 //					m_map.decCurrentLevel() ;
 //					++count;
-//				}
+//
+//					dit = m_map.phi2(m_map.phi_1(dit));
+//
+//				}while(dit != db);
 
-				std::cout << std::endl;
+				//TODO Replace do--while with a Traversor2 on Boundary
+				ClosedMap::Traversor2VF<typename PFP::MAP> travVF(m_map,db);
+				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
+				{
+					m_map.incCurrentLevel() ;
+
+					Dart midEdgeV = m_map.phi1(dit);
+					ev += m_position[midEdgeV];
+					fv += m_position[m_map.phi1(midEdgeV)];
+
+					m_map.decCurrentLevel() ;
+					++count;
+				}
 
 				fv /= count;
 				fv *= 4 * m_a * m_a;
@@ -276,26 +272,26 @@ public:
 				Dart db = m_map.findBoundaryFaceOfEdge(d);
 				typename PFP::VEC3 fe(0.0);
 
-				m_map.incCurrentLevel() ;
-				Dart midV = m_map.phi1(m_map.phi1(db));
-				fe += m_position[midV];
-				midV = m_map.phi_1(m_map.phi2(db));
-				fe += m_position[midV];
-				m_map.decCurrentLevel() ;
+//				m_map.incCurrentLevel() ;
+//				Dart midV = m_map.phi1(m_map.phi1(db));
+//				fe += m_position[midV];
+//				midV = m_map.phi_1(m_map.phi2(db));
+//				fe += m_position[midV];
+//				m_map.decCurrentLevel() ;
 
-//TODO Replace do--while with a Traversor2 on Boundary
-//				unsigned int count = 0;
-//				Traversor2EF<typename PFP::MAP> travEF(m_map, db);
-//				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
-//				{
-//					m_map.incCurrentLevel() ;
-//					Dart midV = m_map.phi1(m_map.phi1(dit));
-//					fe += m_position[midV];
-//					m_map.decCurrentLevel() ;
-//					++count;
-//				}
+				//TODO Replace do--while with a Traversor2 on Boundary
+				unsigned int count = 0;
+				ClosedMap::Traversor2EF<typename PFP::MAP> travEF(m_map, db);
+				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
+				{
+					m_map.incCurrentLevel() ;
+					Dart midV = m_map.phi1(m_map.phi1(dit));
+					fe += m_position[midV];
+					m_map.decCurrentLevel() ;
+					++count;
+				}
 
-				fe /= 2;
+				fe /= count;
 				fe *= 2 * m_a;
 
 				m_map.incCurrentLevel() ;
@@ -570,26 +566,26 @@ public:
 				Dart db = m_map.findBoundaryFaceOfEdge(d);
 				typename PFP::VEC3 fe(0.0);
 
-				m_map.incCurrentLevel() ;
-				Dart midV = m_map.phi1(m_map.phi1(db));
-				fe += m_position[midV];
-				midV = m_map.phi_1(m_map.phi2(db));
-				fe += m_position[midV];
-				m_map.decCurrentLevel() ;
+//				m_map.incCurrentLevel() ;
+//				Dart midV = m_map.phi1(m_map.phi1(db));
+//				fe += m_position[midV];
+//				midV = m_map.phi_1(m_map.phi2(db));
+//				fe += m_position[midV];
+//				m_map.decCurrentLevel() ;
 
-//TODO Replace do--while with a Traversor2 on Boundary
-//				unsigned int count = 0;
-//				Traversor2EF<typename PFP::MAP> travEF(m_map, db);
-//				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
-//				{
-//					m_map.incCurrentLevel() ;
-//					Dart midV = m_map.phi1(m_map.phi1(dit));
-//					fe += m_position[midV];
-//					m_map.decCurrentLevel() ;
-//					++count;
-//				}
+				//TODO Replace do--while with a Traversor2 on Boundary
+				unsigned int count = 0;
+				ClosedMap::Traversor2EF<typename PFP::MAP> travEF(m_map, db);
+				for(Dart dit = travEF.begin() ; dit != travEF.end() ; dit = travEF.next())
+				{
+					m_map.incCurrentLevel() ;
+					Dart midV = m_map.phi1(m_map.phi1(dit));
+					fe += m_position[midV];
+					m_map.decCurrentLevel() ;
+					++count;
+				}
 
-				fe /= 2;
+				fe /= count;
 				fe *= 2 * m_a;
 
 				m_map.incCurrentLevel() ;
@@ -646,27 +642,8 @@ public:
 				typename PFP::VEC3 ev(0.0);
 				typename PFP::VEC3 fv(0.0);
 
-				std::cout << "db = " << db << std::endl;
-
-				Dart dit = db;
-				do
-				{
-					std::cout << "dit = " << dit << std::endl;
-					m_map.incCurrentLevel() ;
-
-					Dart midEdgeV = m_map.phi1(dit);
-					ev += m_position[midEdgeV];
-					fv += m_position[m_map.phi1(midEdgeV)];
-
-					m_map.decCurrentLevel() ;
-					++count;
-
-					dit = m_map.phi2(m_map.phi_1(dit));
-
-				}while(dit != db);
-
-//				Traversor2VF<typename PFP::MAP> travVF(m_map,db);
-//				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
+//				Dart dit = db;
+//				do
 //				{
 //					std::cout << "dit = " << dit << std::endl;
 //					m_map.incCurrentLevel() ;
@@ -677,9 +654,24 @@ public:
 //
 //					m_map.decCurrentLevel() ;
 //					++count;
-//				}
+//
+//					dit = m_map.phi2(m_map.phi_1(dit));
+//
+//				}while(dit != db);
 
-				std::cout << std::endl;
+				ClosedMap::Traversor2VF<typename PFP::MAP> travVF(m_map,db);
+				for(Dart dit = travVF.begin(); dit != travVF.end() ; dit = travVF.next())
+				{
+					std::cout << "dit = " << dit << std::endl;
+					m_map.incCurrentLevel() ;
+
+					Dart midEdgeV = m_map.phi1(dit);
+					ev += m_position[midEdgeV];
+					fv += m_position[m_map.phi1(midEdgeV)];
+
+					m_map.decCurrentLevel() ;
+					++count;
+				}
 
 				fv /= count;
 				fv *= 4 * m_a * m_a;

@@ -281,7 +281,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, fl
 
 			for(unsigned int k = 0 ; k < nbStage ; ++k)
 			{
-				Dart d = Algo::Modelisation::createPrism<PFP>(map, nbe);
+				Dart d = Algo::Modelisation::createPrism<PFP>(map, nbe,false);
 
 				//Embed the base faces
 				for (unsigned int j = 0; j < nbe; ++j)

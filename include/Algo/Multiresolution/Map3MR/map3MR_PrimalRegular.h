@@ -77,12 +77,15 @@ private:
 	 *
 	 *************************************************************************/
 	//@{
-	void swapEdges(Dart d, Dart e);
+
 
 	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
 	//@}
 
 public:
+
+	void swapEdges(Dart d, Dart e);
+
 	/*! @name Level creation
 	 *
 	 *************************************************************************/
@@ -96,6 +99,11 @@ public:
 	/*
 	 */
 	void addNewLevelHexa();
+
+	//!
+	/*
+	 */
+	void addNewLevel();
 
 	//!
 	/*

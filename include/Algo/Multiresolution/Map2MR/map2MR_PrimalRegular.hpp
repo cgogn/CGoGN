@@ -123,7 +123,7 @@ void Map2MR<PFP>::addNewLevel(bool triQuad)
 			Dart next = m_map.phi1(m_map.phi1(dd)) ;
 			m_map.splitFace(dd, next) ;		// insert a first edge
 
-			Dart ne = m_map.alpha1(dd) ;
+			Dart ne = m_map.phi2(m_map.phi_1(dd)) ;
 			m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 			travF.skip(dd) ;
 

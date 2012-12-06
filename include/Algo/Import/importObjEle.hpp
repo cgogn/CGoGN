@@ -145,7 +145,7 @@ bool importOFFWithELERegions(typename PFP::MAP& map, const std::string& filename
 		std::stringstream oss(line);
 		oss >> nbe;
 
-		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
+		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map,false);
 		Geom::Vec4ui pt;
 		oss >> pt[0];
 		oss >> pt[1];

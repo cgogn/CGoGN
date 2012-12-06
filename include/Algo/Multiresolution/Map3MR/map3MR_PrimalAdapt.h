@@ -118,57 +118,57 @@ public:
 	//@}
 
 protected:
-//	/*! @name Topological helping functions
-//	 *
-//	 *************************************************************************/
-//	//@{
-//	//!
-//	/*!
-//	 */
-//	void swapEdges(Dart d, Dart e);
-//
-//	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
-//
-//	Dart cutEdgeInVolume(Dart d);
-//
-//	void splitFaceInVolume(Dart d, Dart e);
-//
-//	void splitVolume(std::vector<Dart>& vd);
-//
-//	void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
-//
-//	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
-//
-//	Dart cutEdge(Dart d) ;
-//	void splitFace(Dart d, Dart e) ;
-//	//@}
-//
-//	/*! @name Subdivision
-//	 *
-//	 *************************************************************************/
-//	//@{
-//	//! Subdivide the edge of d to the next level
-//	/*! @param d Dart from the edge
-//	 */
-//	void subdivideEdge(Dart d) ;
-//
-//	//! Subdivide the edge of d to the next level
-//	/*! @param d Dart frome the face
-//	 */
-//	void subdivideFace(Dart d, bool triQuad) ;
+	/*! @name Topological helping functions
+	 *
+	 *************************************************************************/
+	//@{
+	//!
+	/*!
+	 */
+	void swapEdges(Dart d, Dart e);
+
+	void splitSurfaceInVolume(std::vector<Dart>& vd, bool firstSideClosed = true, bool secondSideClosed = false);
+
+	Dart cutEdgeInVolume(Dart d);
+
+	void splitFaceInVolume(Dart d, Dart e);
+
+	void splitVolume(std::vector<Dart>& vd);
+
+	void saveRelationsAroundVertex(Dart d, std::vector<std::pair<Dart, Dart> >& vd);
+
+	void unsewAroundVertex(std::vector<std::pair<Dart, Dart> >& vd);
+
+	Dart cutEdge(Dart d) ;
+	void splitFace(Dart d, Dart e) ;
+	//@}
+
+	/*! @name Subdivision
+	 *
+	 *************************************************************************/
+	//@{
+	//! Subdivide the edge of d to the next level
+	/*! @param d Dart from the edge
+	 */
+	void subdivideEdge(Dart d) ;
+
+	//! Subdivide the edge of d to the next level
+	/*! @param d Dart frome the face
+	 */
+	void subdivideFace(Dart d, bool triQuad) ;
 
 public:
-//	//! Subdivide the volume of d to hexahedral cells
-//	/*! @param d Dart from the volume
-//	 */
-//	unsigned int subdivideVolume(Dart d, bool triQuad = true, bool OneLevelDifference = true);
-//
-//	//! Subdivide the volume of d to hexahedral cells
-//	/*! @param d Dart from the volume
-//	 */
-//	void subdivideVolumeTetOcta(Dart d) ;
-//
-//	void subdivideVolumeTetOctaTemp(Dart d);
+	//! Subdivide the volume of d to hexahedral cells
+	/*! @param d Dart from the volume
+	 */
+	unsigned int subdivideVolume(Dart d, bool triQuad = true, bool OneLevelDifference = true);
+
+	//! Subdivide the volume of d to hexahedral cells
+	/*! @param d Dart from the volume
+	 */
+	void subdivideVolumeTetOcta(Dart d) ;
+
+	void subdivideVolumeTetOctaTemp(Dart d);
 	//@}
 
 	/*! @name Vertices Attributes management
