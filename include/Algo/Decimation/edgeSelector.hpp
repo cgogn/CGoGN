@@ -781,7 +781,7 @@ bool EdgeSelector_NormalArea<PFP>::init()
 	{
 		if((*it)->getApproximatedAttributeName() == "position")
 		{
-			assert((*it)->getType() == A_MidEdge || !"Only MidEdge Approximator is valid") ;
+//			assert((*it)->getType() == A_MidEdge || (*it)->getType() == A_NormalArea || !"Only MidEdge and NormalArea Approximator are valid") ;
 			m_positionApproximator = reinterpret_cast<Approximator<PFP, VEC3,EDGE>* >(*it) ;
 			ok = true ;
 		}
@@ -991,7 +991,7 @@ void EdgeSelector_NormalArea<PFP>::computeEdgeMatrix(Dart d)
 	edgeMatrix[d] *= e.norm2();
 	edgeMatrix[d] -= Geom::transposed_vectors_mult(e,e) ;
 	// TODO : test : try to normalize by area
-//	edgeMatrix[d] /= e.norm2(); // pas d'amélioration significative par rapport à la version sans normalisation
+	edgeMatrix[d] /= e.norm2(); // pas d'amélioration significative par rapport à la version sans normalisation
 //	edgeMatrix[d] /= e.norm2() * e.norm2(); // étonnament bon : sur certains maillages équivalant à la QEMml
 }
 

@@ -368,6 +368,74 @@ void Approximator_CornerCutting<PFP>::approximate(Dart d)
 	}
 }
 
+/************************************************************************************
+ *                            NORMAL AREA METRIC                                    *
+ ************************************************************************************/
+template <typename PFP>
+bool Approximator_NormalArea<PFP>::init()
+{
+	edgeMatrix = this->m_map.template getAttribute<Geom::Matrix<3,3,REAL>, EDGE>("NormalAreaMatrix") ;
+	assert(edgeMatrix.isValid());
+
+//	m_quadric = this->m_map.template getAttribute<Utils::Quadric<REAL>, VERTEX>("QEMquadric") ;
+	// Does not require to be valid (if it is not, altenatives will be used).
+
+	if(this->m_predictor)
+	{
+		return false ;
+	}
+	return true ;
+}
+
+template <typename PFP>
+void Approximator_NormalArea<PFP>::approximate(Dart d)
+{
+	MAP& m = this->m_map ;
+	Dart dd = m.phi2(d);
+	Geom::Matrix33f M1; // init zero included
+	Geom::Matrix33f M2; // init zero included
+
+	assert(! m.isBoundaryEdge(d));
+
+	Traversor2VF<MAP> td (m,d);
+	Dart it = td.begin();
+	it = td.next();
+	Dart it2 = td.next();
+	while( it2 != td.end())
+	{
+		M1 += edgeMatrix[m.phi1(it)];
+		it = it2;
+		it2 = td.next();
+	}
+
+	Traversor2VF<MAP> tdd (m,dd);
+	it = tdd.begin();
+	it = tdd.next();
+	it2 = tdd.next();
+	while( it2 != tdd.end())
+	{
+		M2 += edgeMatrix[m.phi1(it)];
+		it = it2;
+		it2 = tdd.next();
+	}
+
+	const VEC3 & v1 = (*this->m_attrV[0])[d] ;
+	const VEC3 & v2 = (*this->m_attrV[0])[dd] ;
+
+
+	Eigen::Matrix3f A ;
+	A << M1(0,0)+M2(0,0) , M1(0,1)+M2(0,1) , M1(0,2)+M2(0,2) , M1(1,0)+M2(1,0) , M1(1,1)+M2(1,1) , M1(1,2)+M2(1,2) , M1(2,0)+M2(2,0) , M1(2,1)+M2(2,1) , M1(2,2)+M2(2,2) ;
+
+	VEC3 mb = M1*v1 + M2*v2 ;
+	Eigen::Vector3f b (mb[0],mb[1],mb[2]);
+
+	Eigen::LDLT<Eigen::Matrix3f> decompo (A);
+	Eigen::Vector3f x = decompo.solve(b);
+
+	this->m_approx[0][d] = VEC3 (x(0),x(1),x(2)) ;
+}
+
+
 } //namespace Decimation
 
 } //namespace Algo
