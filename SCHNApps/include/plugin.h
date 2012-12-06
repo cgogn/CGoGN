@@ -8,20 +8,17 @@
 
 #include "window.h"
 #include "system.h"
-#include "scene.h"
 #include "view.h"
 #include "camera.h"
 #include "mapHandler.h"
 #include "vboHandler.h"
 
-class Plugin
+class Plugin : public QObject
 {
+	Q_OBJECT
+
 public:
-	enum { UNLIMITED_NUMBER_OF_MAPS = -1 };
-	enum { UNLIMITED_NUMBER_OF_SCENES = -1 };
-
-	Plugin(const QString& name, const QString& filePath);
-
+	Plugin();
 	virtual ~Plugin();
 
 	virtual bool enable() = 0;
@@ -36,61 +33,54 @@ public:
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	void updateGL();
-	void updateGL(Scene* scene);
+	bool getProvidesRendering() { return b_providesRendering; }
+	void setProvidesRendering(bool b)
+	{
+		b_providesRendering = b;
+		if(b_providesRendering)
+			glewInit();
+	}
 
-	virtual void cb_initGL(Scene* scene) = 0;
-	virtual void cb_updateMatrix(View* view) = 0;
-	virtual void cb_redraw(Scene* scene) = 0;
+	virtual void redraw(View* view) = 0;
 
-	virtual bool cb_keyPress(Scene* scene, int event) = 0;
-	virtual bool cb_keyRelease(Scene* scene, int event) = 0;
-	virtual bool cb_mousePress(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseRelease(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseClick(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseMove(Scene* scene, int buttons, int x, int y) = 0;
-	virtual bool cb_wheelEvent(Scene* scene, int delta, int x, int y) = 0;
+	virtual void keyPress(View* view, int key) = 0;
+	virtual void keyRelease(View* view, int key) = 0;
+	virtual void mousePress(View* view, int button, int x, int y) = 0;
+	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
+//	virtual void mouseClick(View* view, int button, int x, int y) = 0;
+	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
+	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
 
-	virtual void cb_mapAdded(MapHandler* map) = 0;
-	virtual void cb_mapRemoved(MapHandler* map) = 0;
-
-	virtual void cb_sceneAdded(Scene* s) = 0;
-	virtual void cb_sceneRemoved(Scene* s) = 0;
-
-	/*********************************************************
-	 * MANAGE MAPS
-	 *********************************************************/
-	bool addMap(MapHandler* map);
-	void removeMap(MapHandler* map);
-	bool hasMap(MapHandler* map);
-	QList<MapHandler*> getMaps();
-	void setMaxNumberOfMaps(int n);
-	int getCurrentNumberOfMaps();
-	int getRemainingNumberOfMaps();
+	virtual void viewAdded(View* view) = 0;
+	virtual void viewRemoved(View* view) = 0;
 
 	/*********************************************************
-	 * MANAGE SCENES
+	 * MANAGE LINKED VIEWS
 	 *********************************************************/
-	bool addScene(Scene* scene);
-	void removeScene(Scene* scene);
-	bool hasScene(Scene* scene);
-	QList<Scene*> getScenes();
+
+	bool linkView(View* view);
+	void unlinkView(View* view);
+	bool isLinkedToView(View* view) { return l_views.contains(view); }
+	QList<View*> getLinkedViews() { return l_views; }
 
 	/*********************************************************
 	 * MANAGE DOCK TABS
 	 *********************************************************/
+
 	bool addTabInDock(QWidget* tabWidget, const QString& tabText);
 	void removeTabInDock(QWidget* tabWidget);
 
 	/*********************************************************
 	 * MANAGE MENU ACTIONS
 	 *********************************************************/
+
 	bool addMenuAction(const QString& menuPath, QAction* action);
 	void removeMenuAction(QAction* action);
 
 	/*********************************************************
 	 * MANAGE TOOLBAR ACTIONS
 	 *********************************************************/
+
 	bool addToolbarAction(QAction* action);
 	void removeToolbarAction(QAction* action);
 
@@ -99,13 +89,15 @@ protected:
 	QString m_filePath;
 	Window* m_window;
 
-	int m_maxNumberOfMaps;
-	QList<MapHandler*> l_maps;
-	QList<Scene*> l_scenes;
+	bool b_providesRendering;
+
+	QList<View*> l_views;
 	QList<QWidget*> l_tabWidgets;
 	QList<QAction*> l_menuActions;
 	QList<QAction*> l_toolbarActions;
-//	QList<ViewButton*> l_viewButtons;
+
+public slots:
+	void cb_viewRemoved(View* view);
 
 //	QList<Plugin*> l_dependencies;
 //	QList<Plugin*> l_dependantPlugins;

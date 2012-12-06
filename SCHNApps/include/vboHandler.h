@@ -3,31 +3,27 @@
 
 #include "Utils/vbo.h"
 
-#include <QString>
-#include <QList>
-
-using namespace CGoGN;
-
-using namespace Utils;
-
-class Scene;
-class MapHandler;
-
-class VBOHandler : public VBO{
+class VBOHandler
+{
 public:
-	VBOHandler(QString name) : VBO(), m_name(name){}
-	VBOHandler(VBO vbo, QString name) : VBO(vbo), m_name(name){}
+	VBOHandler(const QString& name, CGoGN::Utils::VBO* vbo) :
+		m_name(name),
+		m_vbo(vbo)
+	{}
 
-	bool isShared(){return l_vizuHandler.size()>1;}
-	bool shareWith(MapHandler* vh);
-	void unshareWith(MapHandler* vh);
+	~VBOHandler()
+	{
+		delete m_vbo;
+	}
 
-	QString getName(){return m_name;}
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	bool operator==(QString const & name);
+	CGoGN::Utils::VBO* getVBO() { return m_vbo; }
+
 protected:
 	QString m_name;
-	QList<MapHandler*> l_vizuHandler;
+	CGoGN::Utils::VBO* m_vbo;
 };
 
 #endif

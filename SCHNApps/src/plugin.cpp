@@ -1,14 +1,16 @@
 #include "plugin.h"
 
-Plugin::Plugin(const QString& name, const QString& filePath)
+Plugin::Plugin() :
+	m_window(NULL),
+	b_providesRendering(false)
 {
-
+//	connect(m_window, SIGNAL(viewRemoved(View*)), this, SLOT(cb_viewRemoved(View*)));
 }
 
 Plugin::~Plugin()
 {
-	foreach(Scene* scene, l_scenes)
-		removeScene(scene);
+	foreach(View* view, l_views)
+		unlinkView(view);
 
 	foreach(QWidget* tabWidget, l_tabWidgets)
 		removeTabInDock(tabWidget);
@@ -23,108 +25,30 @@ Plugin::~Plugin()
 //	removeAllDependencyLinks();
 }
 
-void Plugin::updateGL()
-{
-	foreach(Scene* s, l_scenes)
-		s->updateGL();
-}
-
-void Plugin::updateGL(Scene* s)
-{
-	s->updateGL();
-}
-
 /*********************************************************
- * MANAGE MAPS
+ * MANAGE VIEWS
  *********************************************************/
 
-bool Plugin::addMap(MapHandler* map)
+bool Plugin::linkView(View* view)
 {
-	if(
-		(m_maxNumberOfMaps == UNLIMITED_NUMBER_OF_MAPS || l_maps.size() < m_maxNumberOfMaps)
-		&& map
-		&& !l_maps.contains(map)
-	)
+	if(view && !l_views.contains(view))
 	{
-		l_maps.push_back(map);
-		cb_mapAdded(map);
+		l_views.push_back(view);
+		view->updateGL();
+		viewAdded(view);
 		return true;
 	}
 	else
 		return false;
 }
 
-void Plugin::removeMap(MapHandler* map)
+void Plugin::unlinkView(View* view)
 {
-	if(l_maps.removeOne(map))
-		cb_mapRemoved(map);
-}
-
-bool Plugin::hasMap(MapHandler* map)
-{
-	return l_maps.contains(map);
-}
-
-QList<MapHandler*> Plugin::getMaps()
-{
-	return l_maps;
-}
-
-void Plugin::setMaxNumberOfMaps(int n)
-{
-	if(n >= l_maps.size() || n == UNLIMITED_NUMBER_OF_MAPS)
-		m_maxNumberOfMaps = n;
-}
-
-int Plugin::getCurrentNumberOfMaps()
-{
-	return l_maps.size();
-}
-
-int Plugin::getRemainingNumberOfMaps()
-{
-	if(m_maxNumberOfMaps != UNLIMITED_NUMBER_OF_MAPS)
-		return m_maxNumberOfMaps - l_maps.size();
-	else
-		return UNLIMITED_NUMBER_OF_MAPS;
-}
-
-/*********************************************************
- * MANAGE SCENES
- *********************************************************/
-
-bool Plugin::addScene(Scene* scene)
-{
-	if(s && !l_scenes.contains(scene))
+	if(l_views.removeOne(view))
 	{
-		l_scenes.push_back(scene);
-		scene->addPlugin(this);
-		scene->updateGL();
-		cb_sceneAdded(scene);
-		return true;
+		view->updateGL();
+		viewRemoved(view);
 	}
-	else
-		return false;
-}
-
-void Plugin::removeScene(Scene* scene)
-{
-	if(l_scenes.removeOne(scene))
-	{
-		scene->removePlugin(this);
-		scene->updateGL();
-		cb_sceneRemoved(scene);
-	}
-}
-
-bool Plugin::hasScene(Scene* scene)
-{
-	return l_scenes.contains(scene);
-}
-
-QList<Scene*> Plugin::getScenes()
-{
-	return l_scenes;
 }
 
 /*********************************************************
@@ -133,26 +57,20 @@ QList<Scene*> Plugin::getScenes()
 
 bool Plugin::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
-	if(m_window)
+	if(tabWidget && !l_tabWidgets.contains(tabWidget))
 	{
-		l_tabWidgets.push_back(tabWidget);
 		m_window->addTabInDock(tabWidget, tabText);
+		l_tabWidgets.push_back(tabWidget);
 		return true;
 	}
 	else
-	{
-		System::Error::code = System::Error::BAD_LINK_PLUGIN_WINDOW_f(m_name);
 		return false;
-	}
 }
 
 void Plugin::removeTabInDock(QWidget* tabWidget)
 {
-	if(m_window)
-	{
-		l_tabWidgets.removeOne(tabWidget);
+	if(l_tabWidgets.removeOne(tabWidget))
 		m_window->removeTabInDock(tabWidget);
-	}
 }
 
 /*********************************************************
@@ -199,20 +117,7 @@ void Plugin::removeToolbarAction(QAction* action)
 		m_window->removeToolbarAction(action);
 }
 
-/*********************************************************
- * MANAGE SCENE VIEW BUTTONS
- *********************************************************/
-/*
-bool Plugin::addSceneViewButton(Scene* scene, ViewButton* viewButton)
+void Plugin::cb_viewRemoved(View* view)
 {
-	if(scene && viewButton)
-		return scene->addViewButton(viewButton);
-	return false;
+	unlinkView(view);
 }
-
-void Plugin::removeSceneViewButton(Scene* scene, ViewButton* viewButton)
-{
-	if(scene && viewButton)
-		scene->removeViewButton(viewButton);
-}
-*/

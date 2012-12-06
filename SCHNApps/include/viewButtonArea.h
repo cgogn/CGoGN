@@ -10,33 +10,28 @@
 #include <iostream>
 
 class View;
-class Context;
+class Texture;
 
 class ViewButton : public QObject
 {
 	Q_OBJECT
 
 public:
-	ViewButton(QString image, View* view);
+	ViewButton(const QString& image, View* view);
+	~ViewButton();
 
-	void click(View* view)
-	{
-		emit clicked();
-		emit viewClicked(view);
-	}
+	QSize getSize();
 
+	void click(int x, int y, int globalX, int globalY);
 	void drawAt(int x, int y);
 
-	QSize getSize() { return m_GLimg.size(); }
-
 protected:
-	QSize m_size;
-	QImage m_GLimg;
-	int m_texID;
+	QString m_img;
+	View* m_view;
+	Texture* m_tex;
 
 signals:
-	void clicked();
-	void viewClicked(View* view);
+	void clicked(int x, int y, int globalX, int globalY);
 };
 
 class ViewButtonArea : public QObject
@@ -46,33 +41,25 @@ class ViewButtonArea : public QObject
 public:
 	ViewButtonArea(View* view) : m_view(view)
 	{}
-	~ViewButtonArea();
+	~ViewButtonArea()
+	{}
 
 	void addButton(ViewButton* button);
-	ViewButton* takeButton(ViewButton* button);
+	void removeButton(ViewButton* button);
 
-	bool isIn(int x, int y);
+	bool isClicked(int x, int y);
+	void clickButton(int x, int y, int globalX, int globalY);
 
-	ViewButton* clickAt(int x, int y);
-
-	QRect form() { return m_form; }
+	const QRect& getForm() { return m_form; }
 
 	void setTopRightPosition(int x, int y);
 
 	void draw();
 
 protected:
-	QRect m_form;
-
-	QList<ViewButton*> l_button;
-
 	View* m_view;
-
-public slots:
-	void buttonDestroyed(QObject* button);
-
-signals:
-	void buttonClicked(ViewButton* button);
+	QRect m_form;
+	QList<ViewButton*> l_buttons;
 };
 
 #endif

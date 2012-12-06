@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CameraViewDialog</class>
- <widget class="QDialog" name="CameraViewDialog">
+ <class>MapsViewDialog</class>
+ <widget class="QDialog" name="MapsViewDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,13 +11,19 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CameraViewDialog</string>
+   <string>MapsViewDialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QListWidget" name="cameraList">
+    <widget class="QListWidget" name="mapList">
      <property name="alternatingRowColors">
       <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+     <property name="viewMode">
+      <enum>QListView::ListMode</enum>
      </property>
     </widget>
    </item>
@@ -35,7 +41,7 @@
   <connection>
    <sender>OKButton</sender>
    <signal>clicked()</signal>
-   <receiver>CameraViewDialog</receiver>
+   <receiver>MapsViewDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -7,16 +7,16 @@ INCLUDE_DIRECTORIES(
 )
 
 SET( FIRSTPLUGIN_PLUGIN_SRC
-	${SCHNApps_ROOT_DIR}/src/plugins/visualPlugin.cpp
     ${SCHNApps_ROOT_DIR}/Plugins/firstPlugin/src/firstPlugin.cpp
 )
 
 SET( FIRSTPLUGIN_PLUGIN_H
-    ${SCHNApps_ROOT_DIR}/include/plugins/visualPlugin.h
     ${SCHNApps_ROOT_DIR}/Plugins/firstPlugin/include/firstPlugin.h
 )
 
 IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
+
+	ADD_DEFINITIONS(-DDEBUG)
 
 	IF(WIN32)
 		link_directories( ${CGoGN_ROOT_DIR}/lib/Release )

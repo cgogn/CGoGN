@@ -1,7 +1,10 @@
-#ifndef _VIZUHANDLER_H_
-#define _VIZUHANDLER_H_
+#ifndef _MAPHANDLER_H_
+#define _MAPHANDLER_H_
 
-#include <QHash>
+#include <QString>
+#include "types.h"
+
+#include "view.h"
 
 namespace CGoGN
 {
@@ -12,36 +15,50 @@ namespace CGoGN
 	}
 }
 
-class VBOHandler;
-
-class MapHandler
+class MapHandler : public QObject
 {
+	Q_OBJECT
+
 public:
-	MapHandler(CGoGN::GenericMap *map);
+	MapHandler(const QString& name, Window* window, CGoGN::GenericMap* map);
 	~MapHandler();
 
-	CGoGN::GenericMap *map()
-	{
-		return m_map;
-	}
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	VBOHandler* findVBO(QString name);
-	VBOHandler* findFirstVBOMatching(QRegExp regexp);
-	QList<VBOHandler*> findVBOsMatching(QRegExp regexp);
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
 
-	bool addVBO(VBOHandler* vboH);
-	VBOHandler* addNewVBO(QString vboName);
+	CGoGN::GenericMap* getMap() { return m_map; }
 
-	VBOHandler* takeVBO(VBOHandler* vbo);
+	CGoGN::Utils::VBO* addVBO(const QString& name);
+	void removeVBO(const QString& name);
+	CGoGN::Utils::VBO* getVBO(const QString& name);
+	CGoGN::Utils::VBO* findFirstVBOMatching(const QRegExp& regexp);
+	QList<CGoGN::Utils::VBO*> findVBOsMatching(const QRegExp& regexp);
 
-	int countVBO()
-	{
-		return l_vbo.count();
-	}
+	int getNbVBO() { return h_vbo.count(); }
+
+	/*********************************************************
+	 * MANAGE LINKED VIEWS
+	 *********************************************************/
+
+	bool linkView(View* view);
+	void unlinkView(View* view);
+	bool isLinkedToView(View* view) { return l_views.contains(view); }
+	QList<View*> getLinkedViews() { return l_views; }
 
 protected:
+	QString m_name;
+	Window* m_window;
 	CGoGN::GenericMap* m_map;
-	QList<VBOHandler*> l_vbo;
+
+	QList<View*> l_views;
+
+	VBOHash h_vbo;
+
+public slots:
+	void cb_viewRemoved(View* view);
 };
 
 #endif

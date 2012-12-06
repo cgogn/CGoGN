@@ -1,9 +1,9 @@
-#include "interface/system.h"
-#include "interface/window.h"
+#include "system.h"
+#include "window.h"
 
 QSplashScreen* System::splash;
 
-QString System::app_path = QString();
+//QString System::app_path = QString();
 
 int main(int argc, char* argv[])
 {
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 	System::splash->show();
 
 	Window window;
-	window.showMaximized();
+	window.show();
 
 	sleep(1);
 	System::splash->finish(&window);

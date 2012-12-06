@@ -1,32 +1,49 @@
-#ifndef _SCENESELECTOR_H_
-#define _SCENESELECTOR_H_
+#ifndef _VIEWSELECTOR_H_
+#define _VIEWSELECTOR_H_
 
-#include "visualization/view.h"
+#include "view.h"
 
 #include <QDialog>
 #include <QRect>
 
 class SplitArea;
 
-struct PixElem
+class PixElem
 {
+public:
+	PixElem() :
+		view(NULL),
+		color(Qt::gray)
+	{}
+
+	PixElem(View* view) :
+		view(view),
+		color(Qt::gray)
+	{}
+
+	PixElem(const PixElem& pixElem) :
+		view(pixElem.view),
+		color(pixElem.color),
+		rect(pixElem.rect)
+	{}
+
+	bool operator== (const PixElem& other) const
+	{
+		return view == other.view;
+	}
+
+	PixElem& operator= (const PixElem & other)
+	{
+		view = other.view;
+		rect = other.rect;
+		color = other.color;
+		return *this;
+	}
+
 	View* view;
-	QRect rect;
 	QColor color;
-
-	PixElem() : view(NULL),color(Qt::gray){}
-	PixElem(View* view) : view(view),color(Qt::gray){}
-	PixElem(const PixElem& pixElem) : view(pixElem.view),rect(pixElem.rect),color(pixElem.color){}
-
-	bool operator== ( const PixElem & other ) const{
-		return view==other.view;
-	}
-
-	PixElem & operator= ( const PixElem & other ){
-		view= other.view; rect= other.rect, color= other.color; return *this;
-	}
+	QRect rect;
 };
-
 
 class ViewPixMaps : public QList<QList<PixElem> >
 {
@@ -35,16 +52,17 @@ public:
 	typedef QList<PixElem>::iterator x_iterator;
 
 	ViewPixMaps();
-	~ViewPixMaps();
+	~ViewPixMaps()
+	{}
 
 	void fromSplitArea(SplitArea* splitArea);
 
-	int getMaxX();
-	int getMinX();
-	int getY();
-	int getYMinX();
+	int getMaxX() { return maxX; }
+	int getMinX() { return minX; }
+	int getY() { return Y; }
+	int getYMinX() { return YminX; }
 
-	PixElem& getAt(int x, int y);
+	PixElem& getAt(int x, int y) { return (*this)[y][x]; }
 
 	y_iterator y_begin(){return this->begin();}
 	y_iterator y_end(){return this->end();}
@@ -80,26 +98,32 @@ protected:
 class ViewSelector : public QDialog
 {
 	Q_OBJECT
-public:
-	enum SelectorDialogType {MOVE,SELECT};
 
-	ViewSelector(QWidget* parent=0, SelectorDialogType type=MOVE);
-	ViewSelector(ViewPixMaps viewPixMap, QWidget* parent=0, SelectorDialogType type=MOVE);
+public:
+	enum SelectorDialogType
+	{
+		MOVE,
+		SELECT
+	};
+
+	ViewSelector(QWidget* parent = NULL, SelectorDialogType type = MOVE);
+	ViewSelector(ViewPixMaps viewPixMap, QWidget* parent = NULL, SelectorDialogType type = MOVE);
 	~ViewSelector();
 
-	void setGLVMap(ViewPixMaps viewPixMap);
-	ViewPixMaps getGLVMap(){return viewPixMap;}
+	void setGLVMap(const ViewPixMaps& viewPixMap);
+	ViewPixMaps getGLVMap() { return viewPixMap; }
 
 	QPoint getInsertPoint();
 
-	void setInsertionName(QString insertionName){this->insertionName= insertionName;}
+	void setInsertionName(QString insertionName) { this->insertionName = insertionName; }
 
 	bool keys[3];
 
 protected:
 	ViewPixMaps viewPixMap;
 
-	int mouseX, mouseY;
+	int mouseX;
+	int mouseY;
 
 	bool pixmapGrabbed;
 	QRect grabbed;

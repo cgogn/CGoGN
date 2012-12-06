@@ -1,37 +1,33 @@
 #include "window.h"
 
-#include <QApplication>
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QPluginLoader>
 #include <QFileInfo>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 #include "plugin.h"
-#include "scene.h"
 #include "view.h"
-#include "context.h"
-#include "mapHandler.h"
-#include "sceneSelector.h"
-#include "newSceneDialog.h"
-#include "globalCameraDialog.h"
+#include "texture.h"
+#include "splitArea.h"
+
+#include "viewSelector.h"
+#include "cameraDialog.h"
 #include "pluginDialog.h"
-#include "linkViewDialog.h"
-#include "mapPluginDialog.h"
 
 Window::Window(QWidget *parent) :
 	QMainWindow(parent),
+	m_firstView(NULL),
 	m_dock(NULL),
 	m_dockTabWidget(NULL)
 {
 	// program in its initialization phase
 	m_initialization = true;
 
-	m_context = new Context(this, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer));
-
-	if (m_context->create())
-		std::cout << "QGLContext created" << std::endl;
-	else
-		std::cout << "Failed to create QGLContext" << std::endl;
+	m_pluginDialog = new PluginDialog(this);
+	m_cameraDialog = new CameraDialog(this);
 
 	this->setupUi(this);
 	System::splash->showMessage("Welcome to SCHNApps", Qt::AlignBottom | Qt::AlignCenter);
@@ -50,16 +46,21 @@ Window::Window(QWidget *parent) :
 	keys[1] = false;
 	keys[2] = false;
 
+	// add first view
+	m_firstView = addView();
+	m_splitArea->addFitElement(m_firstView);
+
+	glewInit();
+
 	// connect the basic actions
-	connect(actionAbout_CGoGN, SIGNAL(triggered()), this, SLOT(cb_about_CGoGN()));
-	connect(actionPlugins, SIGNAL(triggered()), this, SLOT(cb_pluginDialog()));
-	connect(actionNew_Scene, SIGNAL(triggered()), this, SLOT(cb_newScene()));
-	connect(actionGlobalCamera, SIGNAL(triggered()), this, SLOT(cb_globalCamera()));
-	connect(actionLinkPluginMap, SIGNAL(triggered()), this, SLOT(cb_mapPlugin()));
+	connect(actionAboutSCHNApps, SIGNAL(triggered()), this, SLOT(cb_aboutSCHNApps()));
+	connect(actionAboutCGoGN, SIGNAL(triggered()), this, SLOT(cb_aboutCGoGN()));
+
+	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
+	connect(actionManageViews, SIGNAL(triggered()), this, SLOT(cb_manageViews()));
+	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
 
 //	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
-
-	actionGlobalCamera->setEnabled(h_scene.size() > 1);
 
 	// program in its initialization phase
 	m_initialization = false;
@@ -67,7 +68,7 @@ Window::Window(QWidget *parent) :
 
 Window::~Window()
 {
-	System::StateHandler::saveState(this, &h_plugin, &h_scene, m_splitArea);
+//	System::StateHandler::saveState(this, &h_plugins, &h_scenes, m_splitArea);
 }
 
 /*********************************************************
@@ -111,7 +112,7 @@ void Window::addTabInDock(QWidget *tabWidget, const QString& tabText)
 
 	// adding a new tab containing the specified widget
 	m_dockTabWidget->addTab(tabWidget, tabText);
-	m_dockTabWidget->setTabText(m_dockTabWidget->indexOf(tabWidget), tabText);
+//	m_dockTabWidget->setTabText(m_dockTabWidget->indexOf(tabWidget), tabText);
 }
 
 void Window::removeTabInDock(QWidget *tabWidget)
@@ -138,9 +139,7 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 	}
 
 	if (!action)
-	{
 		return false;
-	}
 
 	// extracting all the substring separated by ';'
 	QStringList stepNames = menuPath.split(";");
@@ -298,68 +297,195 @@ void Window::removeToolbarAction(QAction* action)
 }
 
 /*********************************************************
+ * MANAGE CAMERAS
+ *********************************************************/
+
+Camera* Window::addCamera(const QString& name)
+{
+	if (h_cameras.contains(name))
+	{
+		System::Error::code = System::Error::CAMERA_EXISTS;
+		return NULL;
+	}
+
+	Camera* camera = new Camera(name, this);
+	h_cameras.insert(name, camera);
+
+	emit(cameraAdded(camera));
+
+	return camera;
+}
+
+Camera* Window::addCamera()
+{
+	return addCamera(QString("camera_") + QString::number(Camera::cameraCount));
+}
+
+void Window::removeCamera(const QString& name)
+{
+	if (h_cameras.contains(name))
+	{
+		Camera* camera = h_cameras[name];
+		h_cameras.remove(name);
+
+		emit(cameraRemoved(camera));
+
+		delete camera;
+	}
+}
+
+Camera* Window::getCamera(const QString& name)
+{
+	if (h_cameras.contains(name))
+		return h_cameras[name];
+	else
+	{
+		System::Error::code = System::Error::CAMERA_DOES_NOT_EXIST;
+		return NULL;
+	}
+}
+
+/*********************************************************
+ * MANAGE VIEWS
+ *********************************************************/
+
+View* Window::addView(const QString& name)
+{
+	if (h_views.contains(name))
+	{
+		System::Error::code = System::Error::VIEW_EXISTS;
+		return NULL;
+	}
+
+	View* view = NULL;
+	if(m_firstView == NULL)
+		view = new View(name, this, this);
+	else
+		view = new View(name, this, this, m_firstView);
+	h_views.insert(name, view);
+
+	emit(viewAdded(view));
+
+	return view;
+}
+
+View* Window::addView()
+{
+	return addView(QString("view_") + QString::number(View::viewCount));
+}
+
+void Window::removeView(const QString& name)
+{
+	if (h_views.contains(name))
+	{
+		if(h_views.count() > 1)
+		{
+			View* view = h_views[name];
+			if(m_firstView == view)
+				m_firstView = h_views.constBegin().value();
+			h_views.remove(name);
+
+			emit(viewRemoved(view));
+
+			delete view;
+		}
+	}
+}
+
+View* Window::getView(const QString& name)
+{
+	if (h_views.contains(name))
+		return h_views[name];
+	else
+	{
+		System::Error::code = System::Error::VIEW_DOES_NOT_EXIST;
+		return NULL;
+	}
+}
+
+/*********************************************************
  * MANAGE PLUGINS
  *********************************************************/
 
-bool Window::loadPlugin(const QString& pluginPath)
+Plugin* Window::loadPlugin(QString pluginFilePath)
 {
-	// QT's plugin loader class
-	QPluginLoader loader(pluginPath);
+	QString pluginName = QFileInfo(pluginFilePath).baseName().remove(0, 3);
+
+	if (h_plugins.contains(pluginName))
+	{
+		// set message error + function fails
+		System::Error::code = System::Error::PLUGIN_EXISTS;
+		return NULL;
+	}
+
+	QPluginLoader loader(pluginFilePath);
 
 	// if the loader loads a plugin instance
 	if (QObject* pluginObject = loader.instance())
 	{
 		Plugin* plugin = qobject_cast<Plugin*>(pluginObject);
 
-		QString pluginName = QFileInfo(pluginPath).baseName().remove(0, 3);
-
-		// we set the plugin with correct parameters (name, filepath)
-		plugin->setWindow(this);
+		// we set the plugin with correct parameters (name, filepath, window)
 		plugin->setName(pluginName);
-		plugin->setFilePath(pluginPath);
+		plugin->setFilePath(pluginFilePath);
+		plugin->setWindow(this);
 
 		// then we call its enable() methods
 		if (plugin->enable())
 		{
 			// if it succeeded we reference this plugin
 			h_plugins.insert(pluginName, plugin);
+
+			statusbar->showMessage(pluginName + QString(" successfully loaded."), 2000);
+			emit(pluginAdded(plugin));
+
 			// method success
-			return true;
+			return plugin;
 		}
 		else
 		{
-			// if it fails: method failure
-			// error message already set within method enable
-			return false;
+			delete plugin;
+			return NULL;
 		}
 	}
 	// if loading fails
 	else
 	{
 		// set error message + method failure
-		System::Error::code = System::Error::ERROR_PLUGIN_LOAD_f(pluginPath);
-		return false;
+		System::Error::code = System::Error::ERROR_PLUGIN_LOAD_f(pluginName);
+		return NULL;
 	}
 }
 
 void Window::unloadPlugin(const QString& pluginName)
 {
-	// if the plugin is referenced and found
-	PluginHash::iterator it;
-
-	if ((it = h_plugins.find(pluginName)) != h_plugins.end())
+	if (h_plugins.contains(pluginName))
 	{
-		Plugin* plugin = *it;
+		Plugin* plugin = h_plugins[pluginName];
 
 		// calling its disable() method and dereferencing it
 		plugin->disable();
-		h_plugins.erase(it);
+		h_plugins.remove(pluginName);
 
-		// deleting plugin
-		delete(plugin);
+		QPluginLoader loader(plugin->getFilePath());
+		loader.unload();
 
-		if (m_splitArea)
-			m_splitArea->updateSize();
+		statusbar->showMessage(pluginName + QString(" successfully unloaded."), 2000);
+		emit(pluginRemoved(plugin));
+
+		// delete plugin
+		delete plugin;
+	}
+}
+
+Plugin* Window::getPlugin(const QString& name)
+{
+	if (h_plugins.contains(name))
+		return h_plugins[name];
+	else
+	{
+		System::Error::code = System::Error::PLUGIN_DOES_NOT_EXIST;
+		return NULL;
 	}
 }
 /*
@@ -383,437 +509,145 @@ Plugin* Window::checkPluginDependencie(QString name, Plugin* dependantPlugin)
 }
 */
 
-QList<Plugin*> Window::getPlugins()
-{
-	return h_plugins.values();
-}
-
 /*********************************************************
- * MANAGE SCENES
+ * MANAGE MAPS
  *********************************************************/
 
-bool Window::addScene(const QString& name)
+bool Window::addMap(const QString& name, MapHandler* map)
 {
-	if (!m_splitArea || h_scenes.find(name) != h_scenes.end())
+	if (h_maps.contains(name))
 	{
-		// set message error + function fails
-		System::Error::code = System::Error::SCENE_EXISTS;
+		System::Error::code = System::Error::MAP_EXISTS;
 		return false;
 	}
+
+	h_maps.insert(name, map);
+
+	emit(mapAdded(map));
+
+	return true;
+}
+
+void Window::removeMap(const QString& name)
+{
+	if (h_maps.contains(name))
+	{
+		MapHandler* map = h_maps[name];
+		h_maps.remove(name);
+
+		emit(mapRemoved(map));
+
+		delete map;
+	}
+}
+
+MapHandler* Window::getMap(const QString& name)
+{
+	if (h_maps.contains(name))
+		return h_maps[name];
 	else
 	{
-		Scene* s = new Scene(name, this);
-	}
-}
-
-bool Window::addScene(const QString& name, Plugin* creator)
-{
-	if (!m_splitArea || h_scenes.find(name) != h_scenes.end())
-	{
-		// set message error + function fails
-		System::Error::code = System::Error::SCENE_EXISTS;
-		return false;
-	}
-	else
-	{
-		Scene* s = new Scene(name, this, creator);
-	}
-}
-
-QList<Scene*> Window::getScenes()
-{
-	return h_scenes.values();
-}
-
-
-
-
-
-
-
-
-
-
-
-bool Window::addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera)
-{
-	// if there's no main area allocated or
-	// a viewer with the same name is found
-	if (!m_splitArea || h_scenes.find(name) != h_scenes.end())
-	{
-		//set message error + function fails
-		System::Error::code = System::Error::SCENE_EXISTS;
-		return false;
-	}
-	//if the glviewer doesn't exists and the main area allocated
-	else
-	{
-		//the GLviewer is created, set with the correct parameters (name, creating plugin)
-		//and is put in the correct place in the main area
-		scene = new Scene(name, this, sharedCamera);
-
-		View *sceneView = scene->getView(0);
-
-		//the GLView selection dialog is relevant only if their is some
-		//view already displayed
-		if (!h_scene.isEmpty() && dialog)
-		{
-			//we map the splitArea
-			ViewPixMaps pm;
-			pm.fromSplitArea(m_splitArea);
-
-			//we build a GLViewerSelector using this map
-			ViewSelector selector(pm, this, ViewSelector::SELECT);
-
-			selector.setInsertionName(name);
-
-			//we show the move dialog box
-			selector.exec();
-
-			//if the dialog is accepted: it has some modification
-			if (selector.result() == QDialog::Accepted)
-			{
-				QPoint insertPoint = selector.getInsertPoint();
-
-				//we're inserting the view in the desired place in the window
-				m_splitArea->addElementAt(sceneView, insertPoint.x(), insertPoint.y());
-			}
-			//if not, usual insertion
-			else
-			{
-				m_splitArea->addFitElement(sceneView);
-			}
-		}
-		else if (!m_initialization)
-		{
-			m_splitArea->addFitElement(sceneView);
-		}
-
-		h_scene.insert(name, scene);
-
-		if (h_scene.count() <= 1)
-		{
-			actionGlobalCamera->setEnabled(false);
-		}
-		else
-		{
-			actionGlobalCamera->setEnabled(true);
-		}
-
-		return true;
-	}
-}
-
-bool Window::addNewSceneView(Scene *scene, View *view)
-{
-	if (scene && h_scene.find(scene->getName()) != h_scene.end() && m_splitArea)
-	{
-		if (!m_initialization)
-			m_splitArea->addElementRightTo(view, scene->getView(0));
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool Window::associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL)
-{
-	//if the main area is allocated and some GLViewers are allocated
-	if (m_splitArea && !h_scene.empty())
-	{
-		//try to find the corresponding GLViewer
-		SceneHash::iterator it = h_scene.find(glviewer);
-
-		//if found return its reference
-		if (it != h_scene.end())
-		{
-			scene = (*it);
-
-			//adding a new plugin to the found GLViewers operating plugin list
-			(*it)->associateNewPlugin(plugin, cb_initGL);
-
-			return true;
-		}
-		//if not found: set error message + returns NULL
-		else
-		{
-			System::Error::code = System::Error::SCENE_UNREFERENCED;
-			return false;
-		}
-	}
-	//if no area or no glviewers already referenced,
-	else
-	{
-		//set error message + returns NULL
-		System::Error::code = System::Error::NO_SCENE;
-		return false;
-	}
-}
-
-bool Window::addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene)
-{
-	//if there's no main area allocated or
-	//a viewer with the same name is found
-	if (!m_splitArea || h_scene.find(name) != h_scene.end())
-	{
-		//set message error + function fails
-		System::Error::code = System::Error::SCENE_EXISTS;
-		return false;
-	}
-	//if the glviewer doesn't exists and the main area allocated
-	else
-	{
-		//the GLviewer is created, set with the correct parameters (name, creating plugin)
-		//and is put in the correct place in the main area
-		scene = new Scene(name, plugin, this);
-		scene->setName(name);
-		//if we are in the initialization phase, the glviews won't be
-		//added now, but when the info about their size will be read in
-		//the xml settings file
-		//otherwise we add the here.
-//		if(!m_initialization)
-		m_splitArea->addFitElement(scene->getView(0));
-		h_scene.insert(name, scene);
-		scene->updateGL();
-
-		if (h_scene.count() <= 1)
-		{
-			actionGlobalCamera->setEnabled(false);
-		}
-		else
-		{
-			actionGlobalCamera->setEnabled(true);
-		}
-
-		//function succeeded
-		return true;
-	}
-}
-
-bool Window::addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene)
-{
-	//if there's no main area allocated or
-	//a viewer with the same name is found
-	if (!m_splitArea || h_scene.find(name) != h_scene.end())
-	{
-		//set message error + function fails
-		System::Error::code = System::Error::SCENE_EXISTS;
-		return false;
-	}
-	//if the glviewer doesn't exists and the main area allocated
-	else
-	{
-		//the GLviewer is created, set with the correct parameters (name, creating plugin)
-		//and is put in the correct place in the main area
-		scene = new Scene(name, plugin, this);
-		scene->setName(name);
-
-		//the GLView selection dialog is relevant only if their is some
-		//view already displayed
-		if (!h_scene.isEmpty())
-		{
-			//we map the splitArea
-			ViewPixMaps pm, finalPm;
-			pm.fromSplitArea(m_splitArea);
-
-			//we build a ViewSelector using this map
-			ViewSelector selector(pm, this, ViewSelector::SELECT);
-
-			selector.setInsertionName(name);
-
-			//we show the move dialog box
-			selector.exec();
-
-			//if the dialog is accepted: it has some modification
-			if (selector.result() == QDialog::Accepted)
-			{
-				QPoint insertPoint = selector.getInsertPoint();
-
-				//we're inserting the view in the desired place in the window
-				m_splitArea->addElementAt(scene->getView(0), insertPoint.x(), insertPoint.y());
-			}
-			//if not, usual insertion
-			else
-			{
-				m_splitArea->addFitElement(scene->getView(0));
-			}
-		}
-		else
-		{
-			m_splitArea->addFitElement(scene->getView(0));
-		}
-
-		h_scene.insert(name, scene);
-		scene->updateGL();
-
-		if (h_scene.count() <= 1)
-		{
-			actionGlobalCamera->setEnabled(false);
-		}
-		else
-		{
-			actionGlobalCamera->setEnabled(true);
-		}
-
-		//function succeeded
-		return true;
-	}
-}
-
-void Window::removeScene(QString name)
-{
-	//if the glviewer is referenced and found
-	SceneHash::iterator it = h_scene.find(name);
-	std::cout << "Window removing " << name.toStdString() << std::endl;
-
-	if (it != h_scene.end())
-	{
-		std::cout << "found" << std::endl;
-		//it is remove form the referencing hash table and destroyed
-		Scene *scene = (*it);
-		h_scene.erase(it);
-		delete scene;
-	}
-
-	if (h_scene.count() <= 1)
-	{
-		actionGlobalCamera->setEnabled(false);
-	}
-	else
-	{
-		actionGlobalCamera->setEnabled(true);
-	}
-}
-void Window::linkDialog(Scene *scene)
-{
-	LinkViewDialog lvDialog(this, &h_plugin, scene);
-	lvDialog.exec();
-}
-
-void Window::unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins)
-{
-	LinkViewDialog lvDialog(this, dependingPlugins, scene);
-	lvDialog.exec();
-}
-
-bool Window::addReferencedMap(QString map_name, MapHandler *map)
-{
-	//if a map isn't already referenced under that name
-//	MapHash::iterator it;
-//	if((it=h_map.find(map_name))==h_map.end()){
-//		//the map is created, inserted, and reference under the given name
-//		h_map.insert(map_name,map);
-//
-//		return true;
-//	}
-	MapHash::iterator it;
-
-	if ((it = h_vizu.find(map_name)) == h_vizu.end())
-	{
-		h_vizu.insert(map_name, map);
-
-		return true;
-	}
-
-	//if a map already has that name
-	else
-	{
-		//failure + map affected with the address of the already existing map
-		System::Error::code = System::Error::MAP_EXISTS_f(map_name);
-		return false;
-	}
-}
-
-MapHandler *Window::getReferencedMap(QString map_name)
-{
-	MapHash::iterator it;
-
-	if ((it = h_vizu.find(map_name)) != h_vizu.end())
-	{
-		return (*it);
-	}
-	else
-	{
-		System::Error::code = System::Error::MAP_UNREFERENCED_f(map_name);
+		System::Error::code = System::Error::MAP_DOES_NOT_EXIST;
 		return NULL;
 	}
 }
 
+/*********************************************************
+ * MANAGE TEXTURES
+ *********************************************************/
+
+Texture* Window::getTexture(const QString& image)
+{
+	if(h_textures.contains(image))
+	{
+		Texture* t = h_textures[image];
+		t->ref++;
+		return t;
+	}
+	else
+	{
+		Texture* t = NULL;
+		QImage img(image);
+		if(!img.isNull())
+		{
+			GLuint texID = m_firstView->bindTexture(img);
+			t = new Texture(texID, img.size(), 1);
+			h_textures.insert(image, t);
+		}
+		return t;
+	}
+}
+
+void Window::releaseTexture(const QString& image)
+{
+	if(h_textures.contains(image))
+	{
+		Texture* t = h_textures[image];
+		t->ref--;
+		if(t->ref == 0)
+		{
+			m_firstView->deleteTexture(h_textures[image]->texID);
+			h_textures.remove(image);
+			delete t;
+		}
+	}
+}
+
+
+
+
 void Window::keyPressEvent(QKeyEvent *event)
 {
-	std::cout << "KeyPressEvent" << std::endl;
-
 	if (event->key() == Qt::Key_M)
-	{
-		std::cout << "M" << std::endl;
 		keys[0] = true;
-	}
 	else if (event->key() == Qt::Key_Shift)
-	{
-		std::cout << "Shift" << std::endl;
 		keys[1] = true;
-	}
 	else if (event->key() == Qt::Key_Control)
-	{
-		std::cout << "CTRL" << std::endl;
 		keys[2] = true;
-	}
 
 	if (keys[0] && keys[1] && keys[2])
-	{
-		std::cout << "CTRL+Maj+M" << std::endl;
 		this->moveView();
-	}
 }
 
 void Window::keyReleaseEvent(QKeyEvent *event)
 {
 	if (event->key() == Qt::Key_M)
-	{
 		keys[0] = false;
-	}
 	else if (event->key() == Qt::Key_Shift)
-	{
 		keys[1] = false;
-	}
-	else if (event->key() == Qt::CTRL)
-	{
+	else if (event->key() == Qt::Key_Control)
 		keys[2] = false;
-	}
 }
 
 void Window::moveView()
 {
-	//if splitArea not empty or have more than 1 element
-	if (!m_splitArea->isEmpty() &&
-	        (m_splitArea->getNbRow() > 1 || ((QSplitter *)m_splitArea->widget(0))->count() > 1))
+	// if splitArea not empty or has more than 1 element
+	if (m_splitArea->getNbRows() > 1 || ((QSplitter *)m_splitArea->widget(0))->count() > 1)
 	{
-		//we map the splitArea
+		// map the splitArea
 		ViewPixMaps pm, finalPm;
 		pm.fromSplitArea(m_splitArea);
 
-		//we build a GLViewerSelector using this map
+		// build a GLViewerSelector using this map
 		ViewSelector selector(pm, this, ViewSelector::MOVE);
 
-		//we show the move dialog box
+		// show the move dialog box
 		selector.exec();
 
-		//if the dialog is acceteped: it has some modification
+		// the dialog is accepted: it has some modification
 		if (selector.result() == QDialog::Accepted)
 		{
-			//get back the modifier map
+			// get back the modifier map
 			finalPm = selector.getGLVMap();
 
-			//creating a new split area and switch it with the old one
+			// creating a new split area and switch it with the old one
 			SplitArea *old = m_splitArea;
 			m_splitArea = new SplitArea(centralwidget);
-			verticalLayout->addWidget(m_splitArea);
+			m_verticalLayout->addWidget(m_splitArea);
 
-			//we fill the new SplitArea using the modified map
-			int x = 0, y = 0;
+			// fill the new SplitArea using the modified map
+			int x = 0;
+			int y = 0;
 
 			for (ViewPixMaps::y_iterator y_it = finalPm.y_begin(); y_it != finalPm.y_end(); ++y_it)
 			{
@@ -821,24 +655,32 @@ void Window::moveView()
 				{
 					x_it->view->setParent(m_splitArea);
 					m_splitArea->addElementAt(x_it->view, x, y);
-
-					x++;
+					++x;
 				}
-
 				x = 0;
 				++y;
 			}
 
-			//we suppress the old splitArea
-			delete(old);
+			// delete the old splitArea
+			delete old;
 		}
 
-		//key states at the end of the mov dialog
-		keys[0] = selector.keys[0]; keys[1] = selector.keys[1]; keys[2] = selector.keys[2];
+		// key states at the end of the move dialog
+		keys[0] = selector.keys[0];
+		keys[1] = selector.keys[1];
+		keys[2] = selector.keys[2];
 	}
 }
 
-void Window::cb_about_CGoGN()
+void Window::cb_aboutSCHNApps()
+{
+	QString str("SCHNApps:\nS... CGoGN Holder for Nice Applications\n"
+	            "Web site: http://cgogn.unistra.fr \n"
+	            "Contact information: cgogn@unistra.fr");
+	QMessageBox::about(this, tr("About SCHNApps"), str);
+}
+
+void Window::cb_aboutCGoGN()
 {
 	QString str("CGoGN:\nCombinatorial and Geometric modeling\n"
 	            "with Generic N-dimensional Maps\n"
@@ -847,31 +689,29 @@ void Window::cb_about_CGoGN()
 	QMessageBox::about(this, tr("About CGoGN"), str);
 }
 
-void Window::cb_pluginDialog()
+void Window::cb_manageCameras()
 {
-	PluginDialog plugDial(this, &h_plugin);
-	plugDial.exec();
+	m_cameraDialog->show();
 }
 
-void Window::cb_newScene()
+void Window::cb_manageViews()
 {
-	NewSceneDialog ns(this);
-	ns.exec();
+	ViewPixMaps pm;
+	pm.fromSplitArea(m_splitArea);
+
+	ViewSelector selector(pm, this, ViewSelector::SELECT);
+	selector.setInsertionName("new view");
+	selector.exec();
+
+	if (selector.result() == QDialog::Accepted)
+	{
+		View* v = addView();
+		QPoint insertPoint = selector.getInsertPoint();
+		m_splitArea->addElementAt(v, insertPoint.x(), insertPoint.y());
+	}
 }
 
-void Window::cb_globalCamera()
+void Window::cb_managePlugins()
 {
-	GlobalCameraDialog gcd(this);
-	gcd.exec();
-
-	if (h_scene.count() <= 1)
-		actionGlobalCamera->setEnabled(false);
-	else
-		actionGlobalCamera->setEnabled(true);
-}
-
-void Window::cb_mapPlugin()
-{
-	MapPluginDialog mpd(this, &h_vizu);
-	mpd.exec();
+	m_pluginDialog->show();
 }

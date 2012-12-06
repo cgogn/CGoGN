@@ -25,6 +25,8 @@
 #ifndef __CGoGN_VBO__
 #define __CGoGN_VBO__
 
+#include "Utils/cgognStream.h"
+#include "Container/attributeMultiVector.h"
 
 #include "Utils/vbo_base.h"
 #include "Utils/vbo.hpp"

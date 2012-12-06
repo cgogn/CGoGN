@@ -1,215 +1,120 @@
 #include "view.h"
 
-#include "system.h"
+#include "window.h"
+#include "plugin.h"
 #include "camera.h"
-#include "scene.h"
-#include "context.h"
+#include "viewButtonArea.h"
+
 #include "cameraViewDialog.h"
-#include "cameraSceneDialog.h"
+#include "pluginsViewDialog.h"
+#include "mapsViewDialog.h"
 
-View::View(Scene* s, const QString& name, Camera* c, QGLWidget * shareWidget, Context* context, QWidget* parent) :
-	QGLViewer(new Context(NULL, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer))),
-	m_scene(s),
+#include "Utils/GLSLShader.h"
+
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
+
+unsigned int View::viewCount = 0;
+
+View::View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget) :
+	QGLViewer(parent, shareWidget),
 	m_name(name),
-	m_linkButton(NULL),
-	m_linkViewEnabled(false),
-	m_unlinkButton(NULL),
-	m_unlinkViewEnabled(false),
+	m_window(w),
 	m_cameraButton(NULL),
-	m_cameraEnabled(false),
-	m_cameraSceneButton(NULL),
-	m_cameraSceneEnabled(false),
-	m_closeViewButton(NULL),
-	m_closeViewEnabled(false),
-	m_context(context),
-	b_showButtons(true),
-	b_destroyView(false)
+	m_pluginsButton(NULL),
+	m_mapsButton(NULL),
+	m_closeButton(NULL)
 {
-	((Context*)(this->context()))->setDevice(this);
-	((Context*)(this->context()))->create(context);
+	++viewCount;
 
-	makeCurrent();
-	glewInit();
+	m_currentCamera = m_window->addCamera();
 
-	qglviewer::Camera* defaultCamera = this->camera();
-	if(c)
-	{
-		m_currentCamera = c;
-		this->setCamera(c);
-		c->sharedWith(this);
-	}
-	else
-	{
-		m_currentCamera = new Camera(this);
-		this->setCamera(m_currentCamera);
-	}
-	l_camera.push_back(m_currentCamera);
-
-	if(m_name.isEmpty())
-		m_name = QString(s->getName() + "_view" + s->countViews());
-
-	delete defaultCamera;
-
-	m_buttonArea = new ViewButtonArea(this);
-	m_buttonArea->setTopRightPosition(this->width(), 0);
-	connect(m_buttonArea, SIGNAL(buttonClicked(ViewButton*)), this, SIGNAL(clickButton(ViewButton*)));
-
-	updateTextInfo();
+	m_cameraViewDialog = new CameraViewDialog(m_window, this);
+	m_pluginsViewDialog = new PluginsViewDialog(m_window, this);
+	m_mapsViewDialog = new MapsViewDialog(m_window, this);
 }
 
 View::~View()
 {
-	while(!l_camera.isEmpty())
+	m_currentCamera->unlinkView(this);
+
+	qglviewer::Camera* c = new qglviewer::Camera();
+	this->setCamera(c);
+
+	foreach(Plugin* plugin, l_plugins)
 	{
-		Camera* camera = l_camera.takeFirst();
-		if(!camera->isShared() && m_currentCamera!=camera)
-			delete camera;
-		else if (camera->isShared())
-		{
-			camera->takenFrom(this);
-			if(m_currentCamera == camera)
-			{
-				qglviewer::Camera* defaultCamera = new qglviewer::Camera(*camera);
-				this->setCamera(defaultCamera);
-			}
-		}
+		plugin->unlinkView(this);
+		unlinkPlugin(plugin);
 	}
 
-	if(m_buttonArea)
-		delete m_buttonArea;
-}
+	foreach(MapHandler* map, l_maps)
+	{
+		map->unlinkView(this);
+		unlinkMap(map);
+	}
 
-
-void View::updateGL()
-{
-	QGLViewer::updateGL();
-}
-
-void View::draw()
-{
-	if(m_scene && m_currentCamera)
-		m_scene->draw(this);
-
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	drawButtons();
-	drawText();
-	glPopAttrib();
+	delete m_buttonArea;
 }
 
 void View::init()
 {
-	if(m_scene && m_scene->countViews() > 1)
-		m_scene->init();
+	m_buttonArea = new ViewButtonArea(this);
+	m_buttonArea->setTopRightPosition(this->width(), 0);
 
-	m_linkButton = new ViewButton(":icons/icons/link.png", this);
-	if(m_linkViewEnabled)
+	m_cameraButton = new ViewButton(":icons/icons/camera_32.png", this);
+	m_buttonArea->addButton(m_cameraButton);
+	connect(m_cameraButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_cameraView(int, int, int, int)));
+
+	m_pluginsButton = new ViewButton(":icons/icons/plugins_32.png", this);
+	m_buttonArea->addButton(m_pluginsButton);
+	connect(m_pluginsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_pluginsView(int, int, int, int)));
+
+	m_mapsButton = new ViewButton(":icons/icons/maps_32.png", this);
+	m_buttonArea->addButton(m_mapsButton);
+	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_mapsView(int, int, int, int)));
+
+	m_closeButton = new ViewButton(":icons/icons/close_32.png", this);
+	m_buttonArea->addButton(m_closeButton);
+	connect(m_closeButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_closeView(int, int, int, int)));
+
+	qglviewer::Camera* c = this->camera();
+	this->setCamera(m_currentCamera);
+	delete c;
+
+	this->setBackgroundColor(QColor(0,0,0));
+
+	updateTextInfo();
+}
+
+void View::preDraw()
+{
+	glm::mat4 mm = getCurrentModelViewMatrix();
+	glm::mat4 pm = getCurrentProjectionMatrix();
+	for(std::set< std::pair<void*, CGoGN::Utils::GLSLShader*> >::iterator it = CGoGN::Utils::GLSLShader::m_registeredShaders.begin();
+		it != CGoGN::Utils::GLSLShader::m_registeredShaders.end();
+		++it)
 	{
-		m_linkViewEnabled = false;
-		enableLinking(true);
+		it->second->updateMatrices(pm, mm);
 	}
 
-	m_cameraButton = new ViewButton(":icons/icons/camera.png", this);
-	if(m_cameraEnabled)
-	{
-		m_cameraEnabled = false;
-		enableCameraGesture(true);
-	}
-
-	m_unlinkButton = new ViewButton(":icons/icons/broken_link.png", this);
-	if(m_unlinkViewEnabled)
-	{
-		m_unlinkViewEnabled = false;
-		enableUnlinking(true);
-	}
-
-	m_cameraSceneButton = new ViewButton(":icons/icons/separate_camera.png", this);
-	if(m_cameraSceneEnabled)
-	{
-		m_cameraSceneEnabled = false;
-		enableSceneCameraGesture(true);
-	}
-
-	m_closeViewButton = new ViewButton(":icons/icons/close.png", this);
-	if(m_closeViewEnabled)
-	{
-		m_closeViewEnabled = false;
-		enableViewClose(true);
-	}
+	QGLViewer::preDraw();
 }
 
-void View::drawCameras(View* view)
+void View::draw()
 {
-	foreach(Camera* camera, l_camera)
-	{
-		if(camera != view->currentCamera())
-			camera->draw();
-	}
+	foreach(Plugin* plugin, l_plugins)
+		plugin->redraw(this);
 }
 
-void View::drawText()
+void View::postDraw()
 {
-	glColor3f(1.0f, 1.0f, 1.0f);
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	drawButtons();
+	drawText();
+	glPopAttrib();
 
-	if(b_showButtons)
-		QGLViewer::drawText(10,20,m_textInfo);
-}
-
-void View::drawButtons()
-{
-	glColor3f(1.0f,1.0f,1.0f);
-	glEnable(GL_TEXTURE_2D);
-	if(b_showButtons)
-	{
-		startScreenCoordinatesSystem();
-		m_buttonArea->draw();
-		stopScreenCoordinatesSystem();
-	}
-	glDisable(GL_TEXTURE_2D);
-}
-
-void View::keyPressEvent(QKeyEvent* event)
-{
-	if(!m_scene->keyPressEvent(event))
-		QGLViewer::keyPressEvent(event);
-}
-
-void View::keyReleaseEvent(QKeyEvent *e)
-{
-	if(!m_scene->keyReleaseEvent(e))
-		QGLViewer::keyReleaseEvent(e);
-}
-
-void View::mousePressEvent(QMouseEvent* event)
-{
-	if(m_buttonArea->isIn(event->x(),event->y()))
-	{
-		ViewButton* vb;
-		if((vb = m_buttonArea->clickAt(event->x(), event->y())))
-			m_scene->viewClickedButton(this, vb);
-	}
-	else if(!m_scene->mousePressEvent(event))
-		QGLViewer::mousePressEvent(event);
-
-	if(b_destroyView)
-		m_scene->deleteView(this);
-}
-
-void View::mouseReleaseEvent(QMouseEvent* event)
-{
-	if(!m_scene->mouseReleaseEvent(event))
-		QGLViewer::mouseReleaseEvent(event);
-}
-
-void View::mouseMoveEvent(QMouseEvent* event)
-{
-	if(!m_scene->mouseMoveEvent(event))
-		QGLViewer::mouseMoveEvent(event);
-}
-
-void View::wheelEvent(QWheelEvent* event)
-{
-	if(!m_scene->wheelEvent(event))
-		QGLViewer::wheelEvent(event);
+	QGLViewer::postDraw();
 }
 
 void View::resizeGL(int width, int height)
@@ -219,6 +124,68 @@ void View::resizeGL(int width, int height)
 		m_buttonArea->setTopRightPosition(width, 0);
 }
 
+void View::drawText()
+{
+	glColor3f(1.0f, 1.0f, 1.0f);
+	QGLViewer::drawText(10, 20, m_textInfo);
+}
+
+void View::drawButtons()
+{
+	glEnable(GL_TEXTURE_2D);
+	startScreenCoordinatesSystem();
+	m_buttonArea->draw();
+	stopScreenCoordinatesSystem();
+	glDisable(GL_TEXTURE_2D);
+}
+
+void View::keyPressEvent(QKeyEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->keyPress(this, event->key());
+	QGLViewer::keyPressEvent(event);
+}
+
+void View::keyReleaseEvent(QKeyEvent *event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->keyRelease(this, event->key());
+	QGLViewer::keyReleaseEvent(event);
+}
+
+void View::mousePressEvent(QMouseEvent* event)
+{
+	if(m_buttonArea->isClicked(event->x(), event->y()))
+		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
+	else
+	{
+		foreach(Plugin* plugin, l_plugins)
+			plugin->mousePress(this, event->button(), event->pos().x(), event->pos().y());
+		QGLViewer::mousePressEvent(event);
+	}
+}
+
+void View::mouseReleaseEvent(QMouseEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->mouseRelease(this, event->button(), event->pos().x(), event->pos().y());
+	QGLViewer::mouseReleaseEvent(event);
+}
+
+void View::mouseMoveEvent(QMouseEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->mouseMove(this, event->button(), event->pos().x(), event->pos().y());
+	QGLViewer::mouseMoveEvent(event);
+}
+
+void View::wheelEvent(QWheelEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->wheelEvent(this, event->delta(), event->pos().x(), event->pos().y());
+	QGLViewer::wheelEvent(event);
+}
+
 void View::drawOverpaint(QPainter *painter)
 {
 	painter->save();
@@ -226,189 +193,59 @@ void View::drawOverpaint(QPainter *painter)
     painter->restore();
 }
 
-void View::enableLinking(bool b)
-{
-	if(m_linkButton)
-	{
-		if(b && !m_linkViewEnabled)
-		{
-			m_buttonArea->addButton(m_linkButton);
-			connect(m_linkButton, SIGNAL(clicked()), this, SLOT(linkView()));
-		}
-		else if(!b && m_linkViewEnabled)
-		{
-			disconnect(m_linkButton, SIGNAL(clicked()), this, SLOT(linkView()));
-			m_buttonArea->takeButton(m_linkButton);
-		}
-	}
-	m_linkViewEnabled = b;
-}
-
-void View::enableUnlinking(bool b)
-{
-	if(m_unlinkButton)
-	{
-		if(b && !m_unlinkViewEnabled)
-		{
-			m_buttonArea->addButton(m_unlinkButton);
-			connect(m_unlinkButton, SIGNAL(clicked()), this, SLOT(unlinkView()));
-		}
-		else if(!b && m_unlinkViewEnabled)
-		{
-			disconnect(m_unlinkButton, SIGNAL(clicked()), this, SLOT(unlinkView()));
-			m_buttonArea->takeButton(m_unlinkButton);
-		}
-	}
-	m_unlinkViewEnabled = b;
-}
-
-void View::enableCameraGesture(bool b)
-{
-	if(m_cameraButton)
-	{
-		if(b && !m_cameraEnabled)
-		{
-			m_buttonArea->addButton(m_cameraButton);
-			connect(m_cameraButton, SIGNAL(clicked()), this, SLOT(cameraGesture()));
-		}
-		else if(!b && m_cameraEnabled)
-		{
-			disconnect(m_cameraButton, SIGNAL(clicked()), this, SLOT(cameraGesture()));
-			m_buttonArea->takeButton(m_cameraButton);
-		}
-	}
-	m_cameraEnabled = b;
-}
-
-void View::enableSceneCameraGesture(bool b)
-{
-	if(m_cameraSceneButton)
-	{
-		if(b && !m_cameraSceneEnabled)
-		{
-			m_buttonArea->addButton(m_cameraSceneButton);
-			connect(m_cameraSceneButton, SIGNAL(clicked()), this, SLOT(cameraSceneGesture()));
-		}
-		else if(!b && m_cameraSceneEnabled)
-		{
-			disconnect(m_cameraSceneButton, SIGNAL(clicked()), this, SLOT(cameraSceneGesture()));
-			m_buttonArea->takeButton(m_cameraSceneButton);
-		}
-	}
-	m_cameraSceneEnabled = b;
-}
-
-void View::enableViewClose(bool b)
-{
-	if(m_closeViewButton)
-	{
-		if(b && !m_closeViewEnabled)
-		{
-			m_buttonArea->addButton(m_closeViewButton);
-			connect(m_closeViewButton, SIGNAL(clicked()), this, SLOT(closeView()));
-		}
-		else if(!b && m_closeViewEnabled)
-		{
-			disconnect(m_closeViewButton, SIGNAL(clicked()), this, SLOT(closeView()));
-			m_buttonArea->takeButton(m_closeViewButton);
-		}
-	}
-	m_closeViewEnabled = b;
-}
+/*********************************************************
+ * MANAGE LINKED CAMERA
+ *********************************************************/
 
 void View::setCurrentCamera(Camera* c)
 {
-	if(c != m_currentCamera && l_camera.contains(c))
+	if(c != m_currentCamera && c != NULL)
 	{
-		if(m_currentCamera == NULL)
-		{
-			qglviewer::Camera* defaultCam = this->camera();
-			this->setCamera(c);
-			delete defaultCam;
-		}
-		else
-			this->setCamera(c);
-
 		m_currentCamera = c;
-
-		emit currentCameraChanged(c);
-
-		this->updateTextInfo();
-		this->updateGL();
+		this->setCamera(m_currentCamera);
+		updateTextInfo();
+		updateGL();
 	}
 }
 
-Camera* View::addCamera()
+/*********************************************************
+ * MANAGE LINKED PLUGINS
+ *********************************************************/
+
+void View::linkPlugin(Plugin* plugin)
 {
-	Camera* c;
-	if(m_currentCamera != NULL)
-		c = new Camera(this, *m_currentCamera);
-	else
-	{
-		c = new Camera(this);
-		this->setCurrentCamera(c);
-	}
-	l_camera.push_back(c);
-	return c;
+	if(plugin && !l_plugins.contains(plugin))
+		l_plugins.push_back(plugin);
 }
 
-void View::removeCamera(Camera* c)
+void View::unlinkPlugin(Plugin* plugin)
 {
-	int i = l_camera.indexOf(c);
-	if(c && i >= 0)
-	{
-		l_camera.takeAt(i);
-		c->takenFrom(this);
-		if(!c->isShared())
-			delete c;
-	}
+	l_plugins.removeOne(plugin);
 }
 
-Camera* View::takeCamera(Camera* c)
+/*********************************************************
+ * MANAGE LINKED MAPS
+ *********************************************************/
+
+void View::linkMap(MapHandler* map)
 {
-	int i = l_camera.indexOf(c);
-	if(i >= 0)
-	{
-		Camera* camera = l_camera.takeAt(i);
-		if(m_currentCamera == camera && !l_camera.isEmpty())
-		{
-			m_currentCamera = l_camera.first();
-			this->setCamera(m_currentCamera);
-			emit currentCameraChanged(m_currentCamera);
-			this->updateTextInfo();
-			this->updateGL();
-		}
-		else if(l_camera.isEmpty())
-		{
-			this->setCamera(new qglviewer::Camera(*m_currentCamera));
-			m_currentCamera = NULL;
-			emit currentCameraChanged(NULL);
-		}
-		camera->takenFrom(this);
-		return camera;
-	}
-	else
-		return NULL;
+	if(map && !l_maps.contains(map))
+		l_maps.push_back(map);
 }
 
-void View::insertCamera(int index, Camera* c)
+void View::unlinkMap(MapHandler* map)
 {
-	l_camera.insert(index, c);
-	if(m_currentCamera == NULL)
-		this->setCurrentCamera(c);
-	c->sharedWith(this);
+	l_maps.removeOne(map);
 }
-void View::shareCamera(Camera* c, int index)
-{
-	if(!l_camera.contains(c))
-		insertCamera(index, c);
-}
+
+
+
 
 void View::updateTextInfo()
 {
-	m_textInfo = QString("Scene: ") + m_scene->getName() + " > "
-				+ this->m_name + " > "
-				+ m_currentCamera->getName() + (m_currentCamera->isShared() ? " (shared)" : "");
+	m_textInfo =
+		QString("view: ") + m_name +
+		QString(" / camera: ") + m_currentCamera->getName();
 }
 
 glm::mat4 View::getCurrentModelViewMatrix()
@@ -419,9 +256,7 @@ glm::mat4 View::getCurrentModelViewMatrix()
 	for(unsigned int i = 0; i < 4; ++i)
 	{
 		for(unsigned int j = 0; j < 4; ++j)
-		{
 			mvm[i][j] = (float)gl_mvm[i*4+j];
-		}
 	}
 	return mvm;
 }
@@ -434,9 +269,7 @@ glm::mat4 View::getCurrentProjectionMatrix()
 	for(unsigned int i = 0; i < 4; ++i)
 	{
 		for(unsigned int j = 0; j < 4; ++j)
-		{
 			pm[i][j] = (float)gl_pm[i*4+j];
-		}
 	}
 	return pm;
 }
@@ -449,81 +282,52 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix()
 	for(unsigned int i = 0; i < 4; ++i)
 	{
 		for(unsigned int j = 0; j < 4; ++j)
-		{
 			mvpm[i][j] = (float)gl_mvpm[i*4+j];
-		}
 	}
 	return mvpm;
 }
 
-void View::setCurrentModelViewMatrice(glm::mat4 mvm)
+void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
 {
 	GLdouble gl_mvm[16];
 	for(unsigned int i = 0; i < 4; ++i)
 	{
 		for(unsigned int j = 0; j < 4; ++j)
-		{
 			gl_mvm[i*4+j] = mvm[i][j];
-		}
 	}
 	this->camera()->setFromModelViewMatrix(gl_mvm);
 }
 
-void View::setCurrentProjectionMatrice(glm::mat4 pm)
+void View::setCurrentProjectionMatrix(const glm::mat4& pm)
 {
 	float gl_pm[12];
 	for(unsigned int i = 0; i < 3; ++i)
 	{
 		for(unsigned int j = 0; j < 4; ++j)
-		{
 			gl_pm[i*3+j] = pm[i][j];
-		}
 	}
 	this->camera()->setFromProjectionMatrix(gl_pm);
 }
 
-void View::linkView()
+void View::cb_cameraView(int x, int y, int globalX, int globalY)
 {
-	m_scene->linkWithPlugin();
+	m_cameraViewDialog->move(globalX, globalY);
+	m_cameraViewDialog->show();
 }
 
-void View::unlinkView()
+void View::cb_pluginsView(int x, int y, int globalX, int globalY)
 {
-	m_scene->unlinkPlugin();
+	m_pluginsViewDialog->move(globalX, globalY);
+	m_pluginsViewDialog->show();
 }
 
-void View::cameraGesture()
+void View::cb_mapsView(int x, int y, int globalX, int globalY)
 {
-	CameraViewDialog cvd(this, this);
-	cvd.exec();
-	updateTextInfo();
-	enableSceneCameraGesture(l_camera.size() > 1 || m_scene->countViews() > 1);
+	m_mapsViewDialog->move(globalX, globalY);
+	m_mapsViewDialog->show();
 }
 
-void View::cameraSceneGesture()
+void View::cb_closeView(int x, int y, int globalX, int globalY)
 {
-	CameraSceneDialog csd(m_scene);
-	csd.exec();
-	updateTextInfo();
-}
-
-void View::closeView()
-{
-	b_destroyView = true;
-}
-
-void View::clickButton(ViewButton* viewButton)
-{
-	if(viewButton)
-		emit(viewButtonClicked(viewButton));
-}
-
-void View::addCustomViewButton(ViewButton* viewButton)
-{
-	m_buttonArea->addButton(viewButton);
-}
-
-void View::removeCustomViewButton(ViewButton* viewButton)
-{
-	m_buttonArea->takeButton(viewButton);
+	m_window->removeView(m_name);
 }

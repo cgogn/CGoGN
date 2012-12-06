@@ -3,30 +3,34 @@
 
 #include "ui_pluginDialog.h"
 
-#include <QDir>
-#include <QDomDocument>
-#include <QDomElement>
-#include <QDomNode>
-#include <QTextStream>
-
 #include "types.h"
 
-class Plugin;
-class Window;
+struct PluginInfo
+{
+	PluginInfo(const QString& path, const QString& name) :
+		pluginPath(path),
+		pluginName(name)
+	{}
 
-class PluginDialog : public QDialog, public Ui::Dialog
+	PluginInfo() {}
+
+	QString pluginPath;
+	QString pluginName;
+};
+
+class PluginDialog : public QDialog, public Ui::PluginDialog
 {
 	Q_OBJECT
 
 public:
-	PluginDialog(Window* parent = 0, PluginHash* activePlugins = NULL);
+	PluginDialog(Window* window);
 	~PluginDialog();
 
 protected:
-	Window* parentWindow;
-	PluginHash* activePlugins;
+	Window* m_window;
+	QHash<QTreeWidgetItem*, PluginInfo> m_listedPlugins;
 
-	bool restoreState();
+//	bool restoreState();
 
 private:
 	bool init;
@@ -45,11 +49,11 @@ protected slots:
 
 	void cb_togglePlugin(QTreeWidgetItem* item, int column);
 
-	void customContextMenu(const QPoint & pos);
+//	void customContextMenu(const QPoint & pos);
 
-	void cb_acceptDialog();
+//	void cb_acceptDialog();
 
-	void showPluginInfo();
+//	void showPluginInfo();
 };
 
 #endif

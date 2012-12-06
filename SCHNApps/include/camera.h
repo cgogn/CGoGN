@@ -2,52 +2,75 @@
 #define _CAMERA_H_
 
 #include "view.h"
+#include "QGLViewer/camera.h"
 
-//forward declaration
+class Window;
 
 class Camera : public qglviewer::Camera
 {
+	Q_OBJECT
+
 public:
-	Camera(View* v);
-	Camera(View* v, Camera c);
+	static unsigned int cameraCount;
+
+	Camera(const QString& name, Window* window);
 	~Camera();
 
+	const QString& getName() { return m_name; }
+	void setName(const QString& name) { m_name = name; }
+
+	Window* getWindow() { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
+
+	bool isUsed() { return l_views.size() > 0; }
 	bool isShared()	{ return l_views.size() > 1; }
 
-	QString getName() { return m_name; }
-	void setName(QString name) { m_name = name; }
+	/*********************************************************
+	 * CAMERA DRAWING
+	 *********************************************************/
 
 	void draw();
 
 	bool getDraw() { return m_draw; }
-	bool getDrawFarPlane() { return m_drawFarPlane; }
-	double getDrawScale() { return m_drawScale; }
-	bool getDrawPath() { return m_drawPath; }
-	bool getDrawPathAxis() { return m_drawPathAxis; }
-	double getDrawPathScale() { return m_drawPathScale; }
-
 	void setDraw(bool b = true) { m_draw = b; }
+
+	bool getDrawFarPlane() { return m_drawFarPlane; }
 	void setDrawFarPlane(bool b = true) { m_drawFarPlane = b; }
+
+	double getDrawScale() { return m_drawScale; }
 	void setDrawScale(double s) { m_drawScale = s; }
+
+	bool getDrawPath() { return m_drawPath; }
 	void setDrawPath(bool b = true) { m_drawPath = b; }
+
+	bool getDrawPathAxis() { return m_drawPathAxis; }
 	void setDrawPathAxis(bool b = true) { m_drawPathAxis = b; }
+
+	double getDrawPathScale() { return m_drawPathScale; }
 	void setDrawPathScale(double s) { m_drawPathScale = s;}
 
-	void takenFrom(View* v);
-	void sharedWith(View* v);
-	void fitParamWith(View* v);
+	/*********************************************************
+	 * MANAGE LINKED VIEWS
+	 *********************************************************/
+
+	void linkView(View* view);
+	void unlinkView(View* view);
+	bool isLinkedWithView(View* view);
+
+	void fitParamWith(View* view);
+
+	/*********************************************************
+	 * SNAPSHOTS
+	 *********************************************************/
 
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);
 
-	void updateGL();
-
-	void viewShowButton(bool b);
-
 protected:
-	QList<View*> l_views;
-
 	QString m_name;
+	Window* m_window;
+
+	QList<View*> l_views;
 
 	bool m_draw;
 	bool m_drawFarPlane;
@@ -57,9 +80,10 @@ protected:
 	bool m_drawPathAxis;
 	double m_drawPathScale;
 
-	View* m_lastWorkingView;
-
 	int m_snapCount;
+
+public slots:
+	void cb_viewRemoved(View* view);
 };
 
 #endif
