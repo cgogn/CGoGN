@@ -311,6 +311,8 @@ public slots:
 	 * \brief function that is called when the "about CGOGN" menu action is triggered
 	 */
 	void cb_aboutCGoGN();
+	
+	void cb_showHideDock();
 
 	/**
 	 * \fn void cb_manageCameras()

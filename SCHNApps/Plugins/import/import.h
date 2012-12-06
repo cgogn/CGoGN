@@ -10,7 +10,6 @@
 
 struct PFP: public CGoGN::PFP_STANDARD
 {
-	// definition of the map
 	typedef CGoGN::EmbeddedMap2 MAP;
 };
 

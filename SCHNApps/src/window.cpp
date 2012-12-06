@@ -48,6 +48,8 @@ Window::Window(QWidget *parent) :
 	m_dockTabWidget->setTabPosition(QTabWidget::East);
 	m_dock->setWidget(m_dockTabWidget);
 
+	connect(actionShowHideDock, SIGNAL(triggered()), this, SLOT(cb_showHideDock()));
+
 	// init keys as unpressed
 	keys[0] = false;
 	keys[1] = false;
@@ -716,6 +718,11 @@ void Window::cb_aboutCGoGN()
 	            "Web site: http://cgogn.unistra.fr \n"
 	            "Contact information: cgogn@unistra.fr");
 	QMessageBox::about(this, tr("About CGoGN"), str);
+}
+
+void Window::cb_showHideDock()
+{
+	m_dock->setVisible(m_dock->isHidden());
 }
 
 void Window::cb_manageCameras()

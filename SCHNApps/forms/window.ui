@@ -24,14 +24,14 @@
      <x>0</x>
      <y>0</y>
      <width>785</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionShow_Hide_Dock"/>
+    <addaction name="actionShowHideDock"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -78,7 +78,7 @@
   <action name="actionManagePlugins">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/plugins.png</normaloff>:/icons/icons/plugins.png</iconset>
+     <normaloff>:/icons/icons/action_plugins.png</normaloff>:/icons/icons/action_plugins.png</iconset>
    </property>
    <property name="text">
     <string>Manage plugins</string>
@@ -87,13 +87,13 @@
   <action name="actionManageCameras">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/camera_b.png</normaloff>:/icons/icons/camera_b.png</iconset>
+     <normaloff>:/icons/icons/action_cameras.png</normaloff>:/icons/icons/action_cameras.png</iconset>
    </property>
    <property name="text">
     <string>Manage cameras</string>
    </property>
   </action>
-  <action name="actionShow_Hide_Dock">
+  <action name="actionShowHideDock">
    <property name="text">
     <string>Show/Hide Dock</string>
    </property>
@@ -101,7 +101,7 @@
   <action name="actionManageMaps">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/map_plugin.png</normaloff>:/icons/icons/map_plugin.png</iconset>
+     <normaloff>:/icons/icons/action_maps.png</normaloff>:/icons/icons/action_maps.png</iconset>
    </property>
    <property name="text">
     <string>ManageMaps</string>

@@ -62,19 +62,19 @@ void View::init()
 	m_buttonArea = new ViewButtonArea(this);
 	m_buttonArea->setTopRightPosition(this->width(), 0);
 
-	m_cameraButton = new ViewButton(":icons/icons/camera_32.png", this);
+	m_cameraButton = new ViewButton(":icons/icons/button_cameras.png", this);
 	m_buttonArea->addButton(m_cameraButton);
 	connect(m_cameraButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_cameraView(int, int, int, int)));
 
-	m_pluginsButton = new ViewButton(":icons/icons/plugins_32.png", this);
+	m_pluginsButton = new ViewButton(":icons/icons/button_plugins.png", this);
 	m_buttonArea->addButton(m_pluginsButton);
 	connect(m_pluginsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_pluginsView(int, int, int, int)));
 
-	m_mapsButton = new ViewButton(":icons/icons/maps_32.png", this);
+	m_mapsButton = new ViewButton(":icons/icons/button_maps.png", this);
 	m_buttonArea->addButton(m_mapsButton);
 	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_mapsView(int, int, int, int)));
 
-	m_closeButton = new ViewButton(":icons/icons/close_32.png", this);
+	m_closeButton = new ViewButton(":icons/icons/button_close.png", this);
 	m_buttonArea->addButton(m_closeButton);
 	connect(m_closeButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_closeView(int, int, int, int)));
 
