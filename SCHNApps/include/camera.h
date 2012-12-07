@@ -20,7 +20,7 @@ public:
 	Window* getWindow() const { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	bool isUsed() const { return l_views.size() > 0; }
+	bool isUsed() const { return !l_views.empty(); }
 	bool isShared()	const { return l_views.size() > 1; }
 
 	/*********************************************************

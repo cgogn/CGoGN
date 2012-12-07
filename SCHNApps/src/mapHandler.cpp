@@ -2,9 +2,10 @@
 
 #include "system.h"
 
-MapHandlerGen::MapHandlerGen(const QString& name, Window* window) :
+MapHandlerGen::MapHandlerGen(const QString& name, Window* window, CGoGN::GenericMap* map) :
 	m_name(name),
-	m_window(window)
+	m_window(window),
+	m_map(map)
 {
 	m_render = new CGoGN::Algo::Render::GL2::MapRender();
 }
@@ -46,20 +47,13 @@ void MapHandlerGen::deleteVBO(const std::string& name)
  * MANAGE LINKED VIEWS
  *********************************************************/
 
-bool MapHandlerGen::linkView(View* view)
+void MapHandlerGen::linkView(View* view)
 {
 	if(view && !l_views.contains(view))
-	{
 		l_views.push_back(view);
-		view->updateGL();
-		return true;
-	}
-	else
-		return false;
 }
 
 void MapHandlerGen::unlinkView(View* view)
 {
-	if(l_views.removeOne(view))
-		view->updateGL();
+	l_views.removeOne(view);
 }

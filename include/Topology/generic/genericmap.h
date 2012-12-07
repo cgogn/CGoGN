@@ -473,6 +473,8 @@ public:
 	template <unsigned int ORBIT>
 	AttributeContainer& getAttributeContainer() ;
 
+	AttributeContainer& getAttributeContainer(unsigned int orbit) ;
+
 	/**
 	 * get a multi vector of mark attribute (direct access with [i])
 	 */

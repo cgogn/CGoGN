@@ -1,4 +1,4 @@
-#include "pluginDialog.h"
+#include "pluginsDialog.h"
 
 //#include <libxml2/libxml/tree.h>
 #include <QFile>
@@ -17,7 +17,7 @@
 #include "window.h"
 #include "plugin.h"
 
-PluginDialog::PluginDialog(Window* window) :
+PluginsDialog::PluginsDialog(Window* window) :
 	QDialog(window),
 	m_window(window),
 	init(true)
@@ -44,10 +44,10 @@ PluginDialog::PluginDialog(Window* window) :
 	init = false;
 }
 
-PluginDialog::~PluginDialog()
+PluginsDialog::~PluginsDialog()
 {}
 
-//bool PluginDialog::restoreState()
+//bool PluginsDialog::restoreState()
 //{
 //	QFile xmlFile(System::app_path.toStdString().c_str() + QString("/state_save.xml"));
 //
@@ -150,7 +150,7 @@ PluginDialog::~PluginDialog()
 //	return true;
 //}
 
-void PluginDialog::cb_addPlugins()
+void PluginsDialog::cb_addPlugins()
 {
 	init = true;
 
@@ -184,7 +184,7 @@ void PluginDialog::cb_addPlugins()
 	init = false;
 }
 
-void PluginDialog::cb_addPluginsDirectory()
+void PluginsDialog::cb_addPluginsDirectory()
 {
 	init = true;
 
@@ -243,7 +243,7 @@ void PluginDialog::cb_addPluginsDirectory()
 	init = false;
 }
 
-void PluginDialog::cb_removePlugins()
+void PluginsDialog::cb_removePlugins()
 {
 	QList<QTreeWidgetItem*> itemList = treeWidget->selectedItems();
 
@@ -317,7 +317,7 @@ void PluginDialog::cb_removePlugins()
 		System::Error::showError(this);
 }
 
-void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
+void PluginsDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 {
 	if (!init && column == 0)
 	{
@@ -353,7 +353,7 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 		{
 			Plugin* p = m_window->getPlugin(pluginName);
 
-			if(!p->getLinkedViews().empty())
+			if(p->isUsed())
 			{
 				QMessageBox::warning(this, tr("Warning"), "Plugin is currently used");
 				init = true;
@@ -369,7 +369,7 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 	}
 }
 
-//void PluginDialog::customContextMenu(const QPoint &pos)
+//void PluginsDialog::customContextMenu(const QPoint &pos)
 //{
 //	QPoint globalPos = treeWidget->mapToGlobal(pos);
 //
@@ -388,7 +388,7 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 //	}
 //}
 
-//void PluginDialog::cb_acceptDialog()
+//void PluginsDialog::cb_acceptDialog()
 //{
 //	QStringList paths;
 //
@@ -409,7 +409,7 @@ void PluginDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 //		System::Error::showError();
 //}
 
-//void PluginDialog::showPluginInfo()
+//void PluginsDialog::showPluginInfo()
 //{
 //	QTreeWidgetItem *item = treeWidget->currentItem();
 //	QString strUrl = item->text(1);

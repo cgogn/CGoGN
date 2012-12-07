@@ -25,6 +25,9 @@ public:
 	void click(int x, int y, int globalX, int globalY);
 	void drawAt(int x, int y);
 
+	static const int SIZE = 24;
+	static const int SPACE = 4;
+
 protected:
 	QString m_img;
 	View* m_view;
@@ -39,7 +42,9 @@ class ViewButtonArea : public QObject
 	Q_OBJECT
 
 public:
-	ViewButtonArea(View* view) : m_view(view)
+	ViewButtonArea(View* view) :
+		m_view(view),
+		m_form(0,0,0,0)
 	{}
 	~ViewButtonArea()
 	{}

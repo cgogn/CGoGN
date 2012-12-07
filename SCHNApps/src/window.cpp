@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include <QVBoxLayout>
+#include <QSplitter>
 #include <QMessageBox>
 #include <QDockWidget>
 #include <QPluginLoader>
@@ -11,11 +13,10 @@
 #include "plugin.h"
 #include "view.h"
 #include "texture.h"
-#include "splitArea.h"
 
-#include "viewSelector.h"
-#include "cameraDialog.h"
-#include "pluginDialog.h"
+#include "camerasDialog.h"
+#include "pluginsDialog.h"
+#include "mapsDialog.h"
 
 Window::Window(QWidget *parent) :
 	QMainWindow(parent),
@@ -25,22 +26,17 @@ Window::Window(QWidget *parent) :
 	// program in its initialization phase
 	m_initialization = true;
 
-	m_pluginDialog = new PluginDialog(this);
-	m_cameraDialog = new CameraDialog(this);
+	m_camerasDialog = new CamerasDialog(this);
+	m_pluginsDialog = new PluginsDialog(this);
+	m_mapsDialog = new MapsDialog(this);
 
 	this->setupUi(this);
-
-	// layout in which we store the main area
-	m_verticalLayout = new QVBoxLayout(centralwidget);
-
-	// the main area: multi GL views display area
-	m_splitArea = new SplitArea(centralwidget);
-	m_verticalLayout->addWidget(m_splitArea);
 
 	m_dock = new QDockWidget(tr("Control"), this);
 	m_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	m_dock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetClosable);
 	addDockWidget(Qt::RightDockWidgetArea, m_dock);
+	m_dock->setVisible(false);
 
 	m_dockTabWidget = new QTabWidget(m_dock);
 	m_dockTabWidget->setObjectName("DockTabWidget");
@@ -50,15 +46,16 @@ Window::Window(QWidget *parent) :
 
 	connect(actionShowHideDock, SIGNAL(triggered()), this, SLOT(cb_showHideDock()));
 
-	// init keys as unpressed
-	keys[0] = false;
-	keys[1] = false;
-	keys[2] = false;
+	m_centralLayout = new QVBoxLayout(centralwidget);
+
+	m_rootSplitter = new QSplitter(centralwidget);
+	b_rootSplitterInitialized = false;
+	m_centralLayout->addWidget(m_rootSplitter);
 
 	// add first view
 	m_firstView = addView();
 	m_currentView = m_firstView;
-	m_splitArea->addFitElement(m_firstView);
+	m_rootSplitter->addWidget(m_firstView);
 
 	glewInit();
 
@@ -66,9 +63,9 @@ Window::Window(QWidget *parent) :
 	connect(actionAboutSCHNApps, SIGNAL(triggered()), this, SLOT(cb_aboutSCHNApps()));
 	connect(actionAboutCGoGN, SIGNAL(triggered()), this, SLOT(cb_aboutCGoGN()));
 
+	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
 	connect(actionManagePlugins, SIGNAL(triggered()), this, SLOT(cb_managePlugins()));
 	connect(actionManageMaps, SIGNAL(triggered()), this, SLOT(cb_manageMaps()));
-	connect(actionManageCameras, SIGNAL(triggered()), this, SLOT(cb_manageCameras()));
 
 //	System::StateHandler::loadState(this, &h_plugin, &h_scene, m_splitArea);
 
@@ -90,6 +87,7 @@ void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
 	if(tabWidget)
 	{
 		int idx = m_dockTabWidget->addTab(tabWidget, tabText);
+		m_dock->setVisible(true);
 		m_dockTabWidget->setTabEnabled(idx, false);
 	}
 }
@@ -354,9 +352,9 @@ View* Window::addView(const QString& name)
 
 	View* view = NULL;
 	if(m_firstView == NULL)
-		view = new View(name, this, this);
+		view = new View(name, this);
 	else
-		view = new View(name, this, this, m_firstView);
+		view = new View(name, this, m_firstView);
 	h_views.insert(name, view);
 
 	emit(viewAdded(view));
@@ -432,56 +430,34 @@ void Window::setCurrentView(View* view)
 	m_currentView->updateGL();
 }
 
-void Window::moveView()
+void Window::splitView(const QString& name, Qt::Orientation orientation)
 {
-	// if splitArea not empty or has more than 1 element
-	if (m_splitArea->getNbRows() > 1 || ((QSplitter *)m_splitArea->widget(0))->count() > 1)
+	View* newView = addView();
+
+//	std::cout << "splitView" << std::endl;
+
+	View* view = h_views[name];
+	QSplitter* parent = (QSplitter*)(view->parentWidget());
+	if(parent == m_rootSplitter && !b_rootSplitterInitialized)
 	{
-		// map the splitArea
-		ViewPixMaps pm, finalPm;
-		pm.fromSplitArea(m_splitArea);
-
-		// build a GLViewerSelector using this map
-		ViewSelector selector(pm, this, ViewSelector::MOVE);
-
-		// show the move dialog box
-		selector.exec();
-
-		// the dialog is accepted: it has some modification
-		if (selector.result() == QDialog::Accepted)
-		{
-			// get back the modifier map
-			finalPm = selector.getGLVMap();
-
-			// creating a new split area and switch it with the old one
-			SplitArea *old = m_splitArea;
-			m_splitArea = new SplitArea(centralwidget);
-			m_verticalLayout->addWidget(m_splitArea);
-
-			// fill the new SplitArea using the modified map
-			int x = 0;
-			int y = 0;
-
-			for (ViewPixMaps::y_iterator y_it = finalPm.y_begin(); y_it != finalPm.y_end(); ++y_it)
-			{
-				for (ViewPixMaps::x_iterator x_it = finalPm.x_begin(y_it); x_it != finalPm.x_end(y_it); ++x_it)
-				{
-					x_it->view->setParent(m_splitArea);
-					m_splitArea->addElementAt(x_it->view, x, y);
-					++x;
-				}
-				x = 0;
-				++y;
-			}
-
-			// delete the old splitArea
-			delete old;
-		}
-
-		// key states at the end of the move dialog
-		keys[0] = selector.keys[0];
-		keys[1] = selector.keys[1];
-		keys[2] = selector.keys[2];
+//		std::cout << "init root splitter" << std::endl;
+		m_rootSplitter->setOrientation(orientation);
+		b_rootSplitterInitialized = true;
+	}
+	if(parent->orientation() == orientation)
+	{
+//		std::cout << "same orientation" << std::endl;
+		parent->insertWidget(parent->indexOf(view)+1, newView);
+	}
+	else
+	{
+//		std::cout << "new orientation" << std::endl;
+		int idx = parent->indexOf(view);
+		view->setParent(NULL);
+		QSplitter* spl = new QSplitter(orientation);
+		spl->addWidget(view);
+		spl->addWidget(newView);
+		parent->insertWidget(idx, spl);
 	}
 }
 
@@ -677,32 +653,6 @@ void Window::releaseTexture(const QString& image)
 
 
 
-
-void Window::keyPressEvent(QKeyEvent *event)
-{
-	if (event->key() == Qt::Key_M)
-		keys[0] = true;
-	else if (event->key() == Qt::Key_Shift)
-		keys[1] = true;
-	else if (event->key() == Qt::Key_Control)
-		keys[2] = true;
-
-	if (keys[0] && keys[1] && keys[2])
-		this->moveView();
-}
-
-void Window::keyReleaseEvent(QKeyEvent *event)
-{
-	if (event->key() == Qt::Key_M)
-		keys[0] = false;
-	else if (event->key() == Qt::Key_Shift)
-		keys[1] = false;
-	else if (event->key() == Qt::Key_Control)
-		keys[2] = false;
-}
-
-
-
 void Window::cb_aboutSCHNApps()
 {
 	QString str("SCHNApps:\nS... CGoGN Holder for Nice Applications\n"
@@ -727,15 +677,15 @@ void Window::cb_showHideDock()
 
 void Window::cb_manageCameras()
 {
-	m_cameraDialog->show();
+	m_camerasDialog->show();
 }
 
 void Window::cb_managePlugins()
 {
-	m_pluginDialog->show();
+	m_pluginsDialog->show();
 }
 
 void Window::cb_manageMaps()
 {
-
+	m_mapsDialog->show();
 }

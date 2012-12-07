@@ -28,6 +28,8 @@ public:
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
+	bool isUsed() const { return !l_views.empty(); }
+
 	bool getProvidesRendering() { return b_providesRendering; }
 	void setProvidesRendering(bool b) {	b_providesRendering = b; }
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>785</width>
-    <height>593</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,8 +23,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>785</width>
-     <height>22</height>
+     <width>800</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -78,7 +78,7 @@
   <action name="actionManagePlugins">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/action_plugins.png</normaloff>:/icons/icons/action_plugins.png</iconset>
+     <normaloff>:/icons/icons/plugins.png</normaloff>:/icons/icons/plugins.png</iconset>
    </property>
    <property name="text">
     <string>Manage plugins</string>
@@ -87,7 +87,7 @@
   <action name="actionManageCameras">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/action_cameras.png</normaloff>:/icons/icons/action_cameras.png</iconset>
+     <normaloff>:/icons/icons/cameras.png</normaloff>:/icons/icons/cameras.png</iconset>
    </property>
    <property name="text">
     <string>Manage cameras</string>
@@ -101,7 +101,7 @@
   <action name="actionManageMaps">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/action_maps.png</normaloff>:/icons/icons/action_maps.png</iconset>
+     <normaloff>:/icons/icons/maps.png</normaloff>:/icons/icons/maps.png</iconset>
    </property>
    <property name="text">
     <string>ManageMaps</string>

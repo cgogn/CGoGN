@@ -495,6 +495,11 @@ inline AttributeContainer& GenericMap::getAttributeContainer()
 	return m_attribs[ORBIT] ;
 }
 
+inline AttributeContainer& GenericMap::getAttributeContainer(unsigned int orbit)
+{
+	return m_attribs[orbit] ;
+}
+
 template <unsigned int ORBIT>
 inline AttributeMultiVector<Mark>* GenericMap::getMarkVector(unsigned int thread)
 {

@@ -17,8 +17,8 @@
 
 unsigned int View::viewCount = 0;
 
-View::View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget) :
-	QGLViewer(parent, shareWidget),
+View::View(const QString& name, Window* w, const QGLWidget* shareWidget) :
+	QGLViewer(NULL, shareWidget),
 	m_name(name),
 	m_window(w),
 	m_cameraButton(NULL),
@@ -62,19 +62,27 @@ void View::init()
 	m_buttonArea = new ViewButtonArea(this);
 	m_buttonArea->setTopRightPosition(this->width(), 0);
 
-	m_cameraButton = new ViewButton(":icons/icons/button_cameras.png", this);
+	m_cameraButton = new ViewButton(":icons/icons/cameras.png", this);
 	m_buttonArea->addButton(m_cameraButton);
 	connect(m_cameraButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_cameraView(int, int, int, int)));
 
-	m_pluginsButton = new ViewButton(":icons/icons/button_plugins.png", this);
+	m_pluginsButton = new ViewButton(":icons/icons/plugins.png", this);
 	m_buttonArea->addButton(m_pluginsButton);
 	connect(m_pluginsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_pluginsView(int, int, int, int)));
 
-	m_mapsButton = new ViewButton(":icons/icons/button_maps.png", this);
+	m_mapsButton = new ViewButton(":icons/icons/maps.png", this);
 	m_buttonArea->addButton(m_mapsButton);
 	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_mapsView(int, int, int, int)));
 
-	m_closeButton = new ViewButton(":icons/icons/button_close.png", this);
+	m_VsplitButton = new ViewButton(":icons/icons/Vsplit.png", this);
+	m_buttonArea->addButton(m_VsplitButton);
+	connect(m_VsplitButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_VsplitView(int, int, int, int)));
+
+	m_HsplitButton = new ViewButton(":icons/icons/Hsplit.png", this);
+	m_buttonArea->addButton(m_HsplitButton);
+	connect(m_HsplitButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_HsplitView(int, int, int, int)));
+
+	m_closeButton = new ViewButton(":icons/icons/close.png", this);
 	m_buttonArea->addButton(m_closeButton);
 	connect(m_closeButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_closeView(int, int, int, int)));
 
@@ -357,4 +365,14 @@ void View::cb_mapsView(int x, int y, int globalX, int globalY)
 void View::cb_closeView(int x, int y, int globalX, int globalY)
 {
 	m_window->removeView(m_name);
+}
+
+void View::cb_VsplitView(int x, int y, int globalX, int globalY)
+{
+	m_window->splitView(m_name, Qt::Horizontal);
+}
+
+void View::cb_HsplitView(int x, int y, int globalX, int globalY)
+{
+	m_window->splitView(m_name, Qt::Vertical);
 }

@@ -22,7 +22,7 @@ class View : public QGLViewer
 public:
 	static unsigned int viewCount;
 
-	View(const QString& name, Window* w, QWidget* parent, const QGLWidget* shareWidget = NULL);
+	View(const QString& name, Window* w, const QGLWidget* shareWidget = NULL);
 	~View();
 
 	const QString& getName() const { return m_name; }
@@ -104,6 +104,8 @@ protected:
 	ViewButton* m_pluginsButton;
 	ViewButton* m_mapsButton;
 	ViewButton* m_closeButton;
+	ViewButton* m_VsplitButton;
+	ViewButton* m_HsplitButton;
 
 	QString m_textInfo;
 
@@ -116,6 +118,8 @@ public slots:
 	void cb_pluginsView(int x, int y, int globalX, int globalY);
 	void cb_mapsView(int x, int y, int globalX, int globalY);
 	void cb_closeView(int x, int y, int globalX, int globalY);
+	void cb_VsplitView(int x, int y, int globalX, int globalY);
+	void cb_HsplitView(int x, int y, int globalX, int globalY);
 };
 
 #endif

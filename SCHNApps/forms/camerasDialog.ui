@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CameraDialog</class>
- <widget class="QDialog" name="CameraDialog">
+ <class>CamerasDialog</class>
+ <widget class="QDialog" name="CamerasDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CameraDialog</string>
+   <string>CamerasDialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -26,7 +26,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="removeCameraButton">
+        <widget class="QPushButton" name="removeCamerasButton">
          <property name="text">
           <string>Remove</string>
          </property>
@@ -35,7 +35,11 @@
       </layout>
      </item>
      <item>
-      <widget class="QListWidget" name="cameraList"/>
+      <widget class="QListWidget" name="cameraList">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -53,7 +57,7 @@
   <connection>
    <sender>OKButton</sender>
    <signal>clicked()</signal>
-   <receiver>CameraDialog</receiver>
+   <receiver>CamerasDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -32,7 +32,7 @@ CameraViewDialog::~CameraViewDialog()
 
 void CameraViewDialog::selectCurrentCamera()
 {
-	const Camera* current = m_view->getCurrentCamera();
+	Camera* current = m_view->getCurrentCamera();
 	for(int i = 0; i < cameraList->count(); ++i)
 	{
 		if(cameraList->item(i)->text() == current->getName())
@@ -46,9 +46,7 @@ void CameraViewDialog::cb_selectedCameraChanged()
 {
 	QList<QListWidgetItem*> currentItems = cameraList->selectedItems();
 	if(currentItems.empty())
-	{
 		selectCurrentCamera();
-	}
 	else
 	{
 		const QString& cname = currentItems[0]->text();

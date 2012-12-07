@@ -1,7 +1,7 @@
-#ifndef _PLUGINDIALOG_H_
-#define _PLUGINDIALOG_H_
+#ifndef _PLUGINSDIALOG_H_
+#define _PLUGINSDIALOG_H_
 
-#include "ui_pluginDialog.h"
+#include "ui_pluginsDialog.h"
 
 #include "types.h"
 
@@ -18,13 +18,13 @@ struct PluginInfo
 	QString pluginName;
 };
 
-class PluginDialog : public QDialog, public Ui::PluginDialog
+class PluginsDialog : public QDialog, public Ui::PluginsDialog
 {
 	Q_OBJECT
 
 public:
-	PluginDialog(Window* window);
-	~PluginDialog();
+	PluginsDialog(Window* window);
+	~PluginsDialog();
 
 protected:
 	Window* m_window;

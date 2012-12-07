@@ -47,6 +47,7 @@ void MapsViewDialog::cb_selectedMapsChanged()
 			map->unlinkView(m_view);
 		}
 	}
+	m_view->updateGL();
 }
 
 void MapsViewDialog::cb_addMapToList(MapHandlerGen* m)

@@ -4,11 +4,14 @@
 #include "ui_window.h"
 
 #include "system.h"
-#include <QVBoxLayout>
 
-class SplitArea;
-class PluginDialog;
-class CameraDialog;
+class QVBoxLayout;
+class QSplitter;
+
+class CamerasDialog;
+class PluginsDialog;
+class MapsDialog;
+
 class Texture;
 
 class Window : public QMainWindow, Ui::Window
@@ -159,17 +162,7 @@ public:
 	View* getCurrentView() const { return m_currentView; }
 	void setCurrentView(View* view);
 
-	/**
-	 * \fn void moveView()
-	 * \brief shows a reordering dialog for the Views
-	 *
-	 * Make a call with the right parameters to the dialog class
-	 * GLVSelector and show this dialog.
-	 *
-	 * This method is meant to be called when the user press
-	 * CTRL+Shift+M.
-	 */
-	void moveView();
+	void splitView(const QString& name, Qt::Orientation orientation);
 
 	/*********************************************************
 	 * MANAGE PLUGINS
@@ -272,8 +265,9 @@ protected:
 
 	bool m_initialization;
 
-	QVBoxLayout* m_verticalLayout;
-	SplitArea* m_splitArea;
+	QVBoxLayout* m_centralLayout;
+	QSplitter* m_rootSplitter;
+	bool b_rootSplitterInitialized;
 
 	View* m_firstView;
 	View* m_currentView;
@@ -288,16 +282,9 @@ protected:
 
 	TextureHash h_textures;
 
-	PluginDialog* m_pluginDialog;
-	CameraDialog* m_cameraDialog;
-
-	/**
-	 * \var bool keys[3]
-	 * \brief a static tab to store state of some keys (here: M, Shift and CTRL)
-	 */
-	bool keys[3];
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *event);
+	CamerasDialog* m_camerasDialog;
+	PluginsDialog* m_pluginsDialog;
+	MapsDialog* m_mapsDialog;
 
 public slots:
 	/**

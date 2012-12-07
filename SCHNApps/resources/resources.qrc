@@ -4,12 +4,11 @@
   </qresource>
   <qresource prefix="icons">
     <file>cgogn/cgogn2.png</file>
-    <file>icons/action_cameras.png</file>
-    <file>icons/action_plugins.png</file>
-    <file>icons/action_maps.png</file>
-    <file>icons/button_cameras.png</file>
-    <file>icons/button_plugins.png</file>
-    <file>icons/button_maps.png</file>
-    <file>icons/button_close.png</file>
+    <file>icons/cameras.png</file>
+    <file>icons/plugins.png</file>
+    <file>icons/maps.png</file>
+    <file>icons/close.png</file>
+    <file>icons/Vsplit.png</file>
+    <file>icons/Hsplit.png</file>
   </qresource>
 </RCC>

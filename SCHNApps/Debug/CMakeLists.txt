@@ -25,27 +25,25 @@ file(
 	${SCHNApps_ROOT_DIR}/src/main.cpp
 	${SCHNApps_ROOT_DIR}/src/mapHandler.cpp
 	${SCHNApps_ROOT_DIR}/src/plugin.cpp
-	${SCHNApps_ROOT_DIR}/src/splitArea.cpp
 	${SCHNApps_ROOT_DIR}/src/system.cpp
 	${SCHNApps_ROOT_DIR}/src/view.cpp
 	${SCHNApps_ROOT_DIR}/src/window.cpp
 	${SCHNApps_ROOT_DIR}/src/viewButtonArea.cpp
-	${SCHNApps_ROOT_DIR}/src/viewSelector.cpp
-	${SCHNApps_ROOT_DIR}/src/cameraDialog.cpp
-	${SCHNApps_ROOT_DIR}/src/pluginDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/camerasDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/pluginsDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/mapsDialog.cpp
 	${SCHNApps_ROOT_DIR}/src/cameraViewDialog.cpp
 	${SCHNApps_ROOT_DIR}/src/pluginsViewDialog.cpp
 	${SCHNApps_ROOT_DIR}/src/mapsViewDialog.cpp
 )
 
 SET(SCHNApps_H_OBJECT_FILES
-	${SCHNApps_ROOT_DIR}/include/splitArea.h
 	${SCHNApps_ROOT_DIR}/include/view.h
 	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/viewSelector.h
-	${SCHNApps_ROOT_DIR}/include/cameraDialog.h
-	${SCHNApps_ROOT_DIR}/include/pluginDialog.h
+	${SCHNApps_ROOT_DIR}/include/camerasDialog.h
+	${SCHNApps_ROOT_DIR}/include/pluginsDialog.h
+	${SCHNApps_ROOT_DIR}/include/mapsDialog.h
 	${SCHNApps_ROOT_DIR}/include/cameraViewDialog.h
 	${SCHNApps_ROOT_DIR}/include/pluginsViewDialog.h
 	${SCHNApps_ROOT_DIR}/include/mapsViewDialog.h
@@ -55,8 +53,9 @@ file(
 	GLOB
 	SCHNApps_FORM_FILES
 	${SCHNApps_ROOT_DIR}/forms/window.ui
-	${SCHNApps_ROOT_DIR}/forms/cameraDialog.ui
-	${SCHNApps_ROOT_DIR}/forms/pluginDialog.ui
+	${SCHNApps_ROOT_DIR}/forms/camerasDialog.ui
+	${SCHNApps_ROOT_DIR}/forms/pluginsDialog.ui
+	${SCHNApps_ROOT_DIR}/forms/mapsDialog.ui
 	${SCHNApps_ROOT_DIR}/forms/cameraViewDialog.ui
 	${SCHNApps_ROOT_DIR}/forms/pluginsViewDialog.ui
 	${SCHNApps_ROOT_DIR}/forms/mapsViewDialog.ui
