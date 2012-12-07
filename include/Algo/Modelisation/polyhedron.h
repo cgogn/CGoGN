@@ -125,6 +125,20 @@ Dart createQuadrangularPyramid(typename PFP::MAP& map, bool withBoundary = true)
 template <typename PFP>
 Dart createOctahedron(typename PFP::MAP& map, bool withBoundary = true);
 
+//TODO optimize
+template <typename PFP>
+bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+
+//TODO optimize
+template <typename PFP>
+bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread = 0);
+
+
+
+
+
+
+
 
 
 /**

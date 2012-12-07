@@ -28,6 +28,7 @@
 #include <cmath>
 #include "Algo/Geometry/centroid.h"
 #include "Algo/Modelisation/tetrahedralization.h"
+#include "Algo/Modelisation/polyhedron.h"
 #include "Algo/Multiresolution/filter.h"
 
 namespace CGoGN
@@ -51,6 +52,69 @@ namespace Filters
 
 /* Linear Interpolation
  *********************************************************************************/
+
+
+template <typename PFP>
+class LerpOddSynthesisFilter : public Filter
+{
+protected:
+	typename PFP::MAP& m_map ;
+	VertexAttribute<typename PFP::VEC3>& m_position ;
+
+public:
+	LerpOddSynthesisFilter(typename PFP::MAP& m, VertexAttribute<typename PFP::VEC3>& p) : m_map(m), m_position(p)
+	{}
+
+	void operator() ()
+	{
+		TraversorE<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi2(d)]) * typename PFP::REAL(0.5);
+
+			m_map.incCurrentLevel() ;
+
+			Dart midV = m_map.phi2(d) ;
+			m_position[midV] += p ;
+
+			m_map.decCurrentLevel() ;
+		}
+
+		TraversorF<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
+
+			m_map.incCurrentLevel() ;
+
+			Dart midF = m_map.phi2(m_map.phi1(d));
+			m_position[midF] += p ;
+
+			m_map.decCurrentLevel() ;
+
+		}
+
+		TraversorW<typename PFP::MAP> trav(m_map) ;
+		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		{
+			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d) && !Algo::Modelisation::isPrism<PFP>(m_map,d) && !Algo::Modelisation::isPyra<PFP>(m_map,d))
+			{
+				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+
+				m_map.incCurrentLevel() ;
+
+				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
+				m_position[midV] += p ;
+
+				m_map.decCurrentLevel() ;
+			}
+		}
+	}
+
+};
+
+
+
 template <typename PFP>
 class LerpEdgeSynthesisFilter : public Filter
 {
@@ -156,20 +220,17 @@ public:
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
-
-			m_map.incCurrentLevel() ;
-
-			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d)) // &&  is not a pyramide && is not a prisme
+			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d) && !Algo::Modelisation::isPrism<PFP>(m_map,d) && !Algo::Modelisation::isPyra<PFP>(m_map,d))
 			{
+				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
+
+				m_map.incCurrentLevel() ;
+
 				Dart midV = m_map.phi_1(m_map.phi2(m_map.phi1(d)));
 				m_position[midV] = p ;
 
-				std::cout << "midV  = " << midV << std::endl;
+				m_map.decCurrentLevel() ;
 			}
-
-			m_map.decCurrentLevel() ;
-
 		}
 	}
 } ;
@@ -202,6 +263,7 @@ public:
 		}
 	}
 } ;
+
 
 } // namespace Filters
 

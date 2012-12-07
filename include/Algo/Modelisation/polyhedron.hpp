@@ -201,6 +201,62 @@ Dart createOctahedron(typename PFP::MAP& map, bool withBoundary)
 
 
 
+
+template <typename PFP>
+bool isPyra(typename PFP::MAP& map, Dart d, unsigned int thread)
+{
+	unsigned int nbFacesT = 0;
+	unsigned int nbFacesQ = 0;
+
+	//Test the number of faces end its valency
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
+	{
+		//increase the number of faces
+		if(map.faceDegree(dit) == 3)
+			nbFacesT++;
+		else if(map.faceDegree(dit) == 4)
+			nbFacesQ++;
+		else
+			return false;
+	}
+
+	if((nbFacesT != 4) || (nbFacesQ != 1))	//too much faces
+		return false;
+
+	return true;
+}
+
+template <typename PFP>
+bool isPrism(typename PFP::MAP& map, Dart d, unsigned int thread)
+{
+	unsigned int nbFacesT = 0;
+	unsigned int nbFacesQ = 0;
+
+	//Test the number of faces end its valency
+	Traversor3WF<typename PFP::MAP> travWF(map, d, false, thread);
+	for(Dart dit = travWF.begin() ; dit != travWF.end(); dit = travWF.next())
+	{
+		//increase the number of faces
+		if(map.faceDegree(dit) == 3)
+			nbFacesT++;
+		else if(map.faceDegree(dit) == 4)
+			nbFacesQ++;
+		else
+			return false;
+	}
+
+	if((nbFacesT != 2) || (nbFacesQ != 3))	//too much faces
+		return false;
+
+	return true;
+}
+
+
+
+
+
+
 template <typename PFP>
 void explodPolyhedron(typename PFP::MAP& map, Dart d,  VertexAttribute<typename PFP::VEC3>& position)
 {

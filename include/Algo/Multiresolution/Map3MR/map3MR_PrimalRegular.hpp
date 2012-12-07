@@ -543,14 +543,10 @@ void Map3MR<PFP>::addNewLevel()
 
 			if(fdeg == 4)
 			{
-				std::cout << "== 4" << std::endl;
-
 				if(m_map.PFP::MAP::ParentMap::vertexDegree(ditWV) == 3)
 				{
 					isocta = false;
 					ispyra = true;
-
-					std::cout << "pyra" << std::endl;
 
 					Dart it = ditWV;
 					if((m_map.faceDegree(it) == 3) && (m_map.faceDegree(m_map.phi2(it))) == 3)
@@ -571,8 +567,6 @@ void Map3MR<PFP>::addNewLevel()
 				else
 				{
 					isocta = true;
-
-					std::cout << "octa" << std::endl;
 
 					Dart old = m_map.phi2(m_map.phi1(ditWV));
 					Dart dd = m_map.phi1(old) ;
@@ -599,8 +593,6 @@ void Map3MR<PFP>::addNewLevel()
 			}
 			else if(fdeg == 5)
 			{
-				std::cout << "== 5" << std::endl;
-
 				isprism = true;
 
 				Dart it = ditWV;
@@ -620,7 +612,6 @@ void Map3MR<PFP>::addNewLevel()
 			}
 			if(fdeg == 6)
 			{
-				std::cout << "== 6" << std::endl;
 				ishex = true;
 
 				Dart dd = m_map.phi2(m_map.phi1(ditWV));;
@@ -630,7 +621,6 @@ void Map3MR<PFP>::addNewLevel()
 				Dart ne = m_map.phi2(m_map.phi_1(dd)) ;
 				m_map.cutEdge(ne) ;				// cut the new edge to insert the central vertex
 				centralDart = m_map.phi1(ne);
-				//m_map.template setOrbitEmbedding<VERTEX>(centralDart, m_map.template getEmbedding<VERTEX>(centralDart));
 
 				dd = m_map.phi1(m_map.phi1(next)) ;
 				while(dd != ne)				// turn around the face and insert new edges
@@ -687,21 +677,17 @@ void Map3MR<PFP>::addNewLevel()
 				Dart tmp =  m_map.phi_1(m_map.phi2(m_map.phi_1(m_map.phi2(m_map.phi_1(f3))))); //future voisin par phi2
 				swapEdges(f3, tmp);
 
-				std::cout << "plop : " << f3 << std::endl;
-
 				f = m_map.phi2(m_map.phi_1(f));
 			}while(f != x);
 
 			//replonger l'orbit de ditV.
-			m_map.template setOrbitEmbedding<VERTEX>(ditV, m_map.template getEmbedding<VERTEX>(ditV));
+			m_map.template setOrbitEmbedding<VERTEX>(x, m_map.template getEmbedding<VERTEX>(x));
 
 			m_map.decCurrentLevel() ;
 		}
 
 		if(isocta)
 		{
-			std::cout << "is octa " << std::endl;
-
 			Traversor3WV<typename PFP::MAP> traWV(m_map, dit);
 
 			for(Dart ditWV = traWV.begin(); ditWV != traWV.end(); ditWV = traWV.next())
@@ -738,8 +724,6 @@ void Map3MR<PFP>::addNewLevel()
 			}
 		}
 
-
-
 		if(isprism)
 		{
 			m_map.incCurrentLevel();
@@ -754,9 +738,31 @@ void Map3MR<PFP>::addNewLevel()
 				ditWV = m_map.phi1(m_map.phi2(dit));
 			}
 
-			ditWV = m_map.phi_1(m_map.phi2(m_map.phi1(ditWV)));
+			ditWV = m_map.phi3(m_map.phi_1(m_map.phi2(m_map.phi1(ditWV))));
 
-			//m_map.deleteVolume(m_map.phi3(m_map.phi2(m_map.phi1(dit))));
+
+			std::vector<Dart> path;
+
+			Dart dtemp = ditWV;
+			do
+			{
+				//future voisin par phi2
+				Dart sF1 = m_map.phi1(m_map.phi2(m_map.phi3(dtemp)));
+				Dart wrongVolume = m_map.phi3(sF1);
+				Dart sF2 = m_map.phi3(m_map.phi2(wrongVolume));
+				Dart tmp =  m_map.phi3(m_map.phi2(m_map.phi1(sF2)));
+				swapEdges(dtemp, tmp);
+
+				m_map.deleteVolume(wrongVolume);
+				m_map.sewVolumes(sF1,sF2);
+
+				path.push_back(dtemp);
+				dtemp = m_map.phi_1(m_map.phi2(m_map.phi_1(dtemp)));
+
+
+			}while(dtemp != ditWV);
+
+			m_map.splitVolume(path);
 
 			m_map.decCurrentLevel() ;
 		}
