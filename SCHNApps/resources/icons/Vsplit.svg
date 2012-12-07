@@ -16,7 +16,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="button_cameras.svg"
+   sodipodi:docname="button_Vsplit.svg"
    inkscape:export-filename="/home/kraemer/Dev/CGoGN/SCHNApps/resources/icons/action_cameras.png"
    inkscape:export-xdpi="14.1"
    inkscape:export-ydpi="14.1">
@@ -162,8 +162,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.49497475"
-     inkscape:cx="334.75068"
-     inkscape:cy="359.44714"
+     inkscape:cx="203.43085"
+     inkscape:cy="361.46744"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -189,7 +189,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="color:#000000;fill:#e2ed7e;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:5;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       style="color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:5;stroke-opacity:1;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect2985-93"
        width="505.71429"
        height="505.71429"
@@ -197,10 +197,27 @@
        y="96.647873"
        rx="0"
        ry="0" />
-    <path
-       style="fill:#135a97;fill-opacity:1;stroke:none"
-       d="m 181.7972,286.59144 c -35.68276,26.15755 -43.45915,76.31049 -17.30159,111.99322 22.20665,30.29314 61.75282,40.44677 95.00727,26.81404 l -2.14359,1.57136 81.71143,111.46636 178.78646,-131.06104 -23.18837,-31.63234 112.7145,-21.08082 -94.70712,-129.19438 -56.22997,98.13399 -20.30044,-27.69281 -8.22673,6.03067 c 23.00772,-27.61075 25.22487,-68.37937 3.01823,-98.67252 -26.15754,-35.68271 -76.26802,-43.40118 -111.95073,-17.24364 -35.68273,26.15753 -43.45912,76.31052 -17.30159,111.99323 22.20666,30.29311 61.75284,40.44677 95.00729,26.81405 L 290.72968,402.5076 c 23.00774,-27.61075 25.22491,-68.37936 3.01822,-98.67253 -26.15754,-35.6827 -76.26801,-43.40116 -111.9507,-17.24363 z"
-       id="rect3782"
-       inkscape:connector-curvature="0" />
+    <g
+       id="g3887"
+       transform="translate(-2.3427124,0)">
+      <rect
+         ry="36.450947"
+         rx="36.450947"
+         y="141.10048"
+         x="400.02039"
+         height="416.80908"
+         width="187.88837"
+         id="rect3831-7"
+         style="color:#000000;fill:#0b375e;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         ry="36.450947"
+         rx="36.450947"
+         y="141.10048"
+         x="176.77669"
+         height="416.80908"
+         width="187.88837"
+         id="rect3831-7-7"
+         style="color:#000000;fill:#0b375e;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
   </g>
 </svg>
