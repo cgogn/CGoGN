@@ -45,7 +45,7 @@ void RenderPlugin::redraw(View* view)
 		CGoGN::Utils::VBO* positionVBO = m->getVBO("position");
 		if(params->renderVertices)
 		{
-			m_pointSprite->setSize(m->getBBdiagSize() / 100.0f * params->verticesScaleFactor);
+			m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * params->verticesScaleFactor);
 			m_pointSprite->setAttributePosition(positionVBO);
 			m_pointSprite->predraw(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
 			m->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);

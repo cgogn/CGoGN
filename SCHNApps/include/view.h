@@ -75,17 +75,18 @@ public:
 	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
 	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
 
+	void updateViewBB();
 
-
-
-	void updateTextInfo();
+	/*********************************************************
+	 * MANAGE MATRICES
+	 *********************************************************/
 
 	glm::mat4 getCurrentModelViewMatrix() const;
 	glm::mat4 getCurrentProjectionMatrix() const;
 	glm::mat4 getCurrentModelViewProjectionMatrix() const;
 
-	void setCurrentModelViewMatrix(const glm::mat4& mvm);
-	void setCurrentProjectionMatrix(const glm::mat4& pm);
+//	void setCurrentModelViewMatrix(const glm::mat4& mvm);
+//	void setCurrentProjectionMatrix(const glm::mat4& pm);
 
 protected:
 	QString m_name;
@@ -94,9 +95,6 @@ protected:
 	Camera* m_currentCamera;
 	QList<Plugin*> l_plugins;
 	QList<MapHandlerGen*> l_maps;
-
-	qglviewer::Vec bbmin;
-	qglviewer::Vec bbmax;
 
 	ViewButtonArea* m_buttonArea;
 

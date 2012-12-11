@@ -91,8 +91,6 @@ void View::init()
 	delete c;
 
 	this->setBackgroundColor(QColor(0,0,0));
-
-	updateTextInfo();
 }
 
 void View::preDraw()
@@ -120,7 +118,6 @@ void View::postDraw()
 {
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	drawButtons();
-	drawText();
 	if(isCurrentView())
 		drawFrame();
 	glPopAttrib();
@@ -133,12 +130,6 @@ void View::resizeGL(int width, int height)
 	QGLViewer::resizeGL(width, height);
 	if(m_buttonArea)
 		m_buttonArea->setTopRightPosition(width, 0);
-}
-
-void View::drawText()
-{
-	glColor3f(1.0f, 1.0f, 1.0f);
-	QGLViewer::drawText(10, 20, m_textInfo);
 }
 
 void View::drawButtons()
@@ -224,7 +215,6 @@ void View::setCurrentCamera(Camera* c)
 	{
 		m_currentCamera = c;
 		this->setCamera(m_currentCamera);
-		updateTextInfo();
 		updateGL();
 	}
 }
@@ -259,29 +249,45 @@ void View::linkMap(MapHandlerGen* map)
 	if(map && !l_maps.contains(map))
 	{
 		l_maps.push_back(map);
-
-		// TODO : update view global BB
-		setSceneBoundingBox(map->getBBmin(), map->getBBmax());
-		showEntireScene();
+		updateViewBB();
 	}
 }
 
 void View::unlinkMap(MapHandlerGen* map)
 {
 	l_maps.removeOne(map);
-
-	// TODO : update view global BB
+	updateViewBB();
 }
 
-
-
-
-void View::updateTextInfo()
+void View::updateViewBB()
 {
-	m_textInfo =
-		QString("view: ") + m_name +
-		QString(" / camera: ") + m_currentCamera->getName();
+	qglviewer::Vec bbMin(0,0,0);
+	qglviewer::Vec bbMax(1,1,1);
+	if(!l_maps.empty())
+	{
+		bbMin = l_maps[0]->getBBmin();
+		bbMax = l_maps[0]->getBBmax();
+		for(int i = 1; i < l_maps.size(); ++i)
+		{
+			MapHandlerGen* m = l_maps[i];
+			qglviewer::Vec min = m->getBBmin();
+			qglviewer::Vec max = m->getBBmax();
+			for(unsigned int dim = 0; dim < 3; ++dim)
+			{
+				if(min[dim] < bbMin[dim])
+					bbMin[dim] = min[dim];
+				if(max[dim] > bbMax[dim])
+					bbMax[dim] = max[dim];
+			}
+		}
+	}
+	setSceneBoundingBox(bbMin, bbMax);
+	showEntireScene();
 }
+
+/*********************************************************
+ * MANAGE MATRICES
+ *********************************************************/
 
 glm::mat4 View::getCurrentModelViewMatrix() const
 {
@@ -322,27 +328,27 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 	return mvpm;
 }
 
-void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
-{
-	GLdouble gl_mvm[16];
-	for(unsigned int i = 0; i < 4; ++i)
-	{
-		for(unsigned int j = 0; j < 4; ++j)
-			gl_mvm[i*4+j] = mvm[i][j];
-	}
-	camera()->setFromModelViewMatrix(gl_mvm);
-}
-
-void View::setCurrentProjectionMatrix(const glm::mat4& pm)
-{
-	float gl_pm[12];
-	for(unsigned int i = 0; i < 3; ++i)
-	{
-		for(unsigned int j = 0; j < 4; ++j)
-			gl_pm[i*3+j] = pm[i][j];
-	}
-	camera()->setFromProjectionMatrix(gl_pm);
-}
+//void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
+//{
+//	GLdouble gl_mvm[16];
+//	for(unsigned int i = 0; i < 4; ++i)
+//	{
+//		for(unsigned int j = 0; j < 4; ++j)
+//			gl_mvm[i*4+j] = mvm[i][j];
+//	}
+//	camera()->setFromModelViewMatrix(gl_mvm);
+//}
+//
+//void View::setCurrentProjectionMatrix(const glm::mat4& pm)
+//{
+//	float gl_pm[12];
+//	for(unsigned int i = 0; i < 3; ++i)
+//	{
+//		for(unsigned int j = 0; j < 4; ++j)
+//			gl_pm[i*3+j] = pm[i][j];
+//	}
+//	camera()->setFromProjectionMatrix(gl_pm);
+//}
 
 void View::cb_cameraView(int x, int y, int globalX, int globalY)
 {

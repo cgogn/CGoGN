@@ -30,9 +30,9 @@ void ImportPlugin::cb_import()
 	std::vector<std::string> attrNames ;
 	CGoGN::Algo::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
 
-	CGoGN::VertexAttribute<PFP::VEC3> position = m->getAttribute<PFP::VEC3, CGoGN::VERTEX>(attrNames[0]);
+	CGoGN::VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
 
-	CGoGN::Geom::BoundingBox<PFP::VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*m, position) ;
+	CGoGN::Geom::BoundingBox<VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*m, position) ;
 	qglviewer::Vec min(bb.min()[0], bb.min()[1], bb.min()[2]);
 	qglviewer::Vec max(bb.max()[0], bb.max()[1], bb.max()[2]);
 
