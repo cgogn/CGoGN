@@ -7,6 +7,12 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 namespace System
 {
 
@@ -14,9 +20,17 @@ Error::ERROR_CODE Error::code = SUCCESS;
 
 QString Error::parameter = QString("???");
 
-QString app_path = QString();
-
 bool Events::movieDialogOpened = false;
+
+//bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile)
+//{
+//	if(urlHTMLFile.isLocalFile())
+//	{
+//		textBrowser->setSource(urlHTMLFile);
+//		return true;
+//	}
+//	return false;
+//}
 
 void Error::showError(QWidget* parent)
 {
@@ -389,63 +403,57 @@ Error::ERROR_CODE Error::BAD_XML_FILE_f(QString filepath){
 	return BAD_XML_FILE;
 }
 
-void Info::showPluginInfo(QString pluginAbsolutePath, QWidget* parent)
-{
-	QFileInfo fileInfo(pluginAbsolutePath);
-	if(fileInfo.exists())
-	{
-		QString baseName = fileInfo.baseName();
-		QString path = fileInfo.absolutePath();
-		int i = baseName.indexOf("lib");
-		QString newName(baseName);
-		if(i == 0)
-			newName = newName.replace(0,3,"");
-		showPluginInfo(path, newName);
-	}
-	else
-	{
-		QMessageBox msg(parent);
-		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-									  " fournir un fichier d'information pour ce plugin."));
-		msg.exec();
-	}
-}
+//void Info::showPluginInfo(QString pluginAbsolutePath, QWidget* parent)
+//{
+//	QFileInfo fileInfo(pluginAbsolutePath);
+//	if(fileInfo.exists())
+//	{
+//		QString baseName = fileInfo.baseName();
+//		QString path = fileInfo.absolutePath();
+//		int i = baseName.indexOf("lib");
+//		QString newName(baseName);
+//		if(i == 0)
+//			newName = newName.replace(0,3,"");
+//		showPluginInfo(path, newName);
+//	}
+//	else
+//	{
+//		QMessageBox msg(parent);
+//		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
+//									  " fournir un fichier d'information pour ce plugin."));
+//		msg.exec();
+//	}
+//}
 
-void Info::showPluginInfo(QString locationPath, QString pluginName, QWidget* parent)
-{
-	QString newPath = locationPath + "/" + pluginName + ".html";
-
-	QUrl url = QUrl::fromLocalFile(newPath);
-	if(QFileInfo(newPath).exists())
-	{
-		Dialog::InfoDialog id(parent);
-		if(!id.setContent(url))
-		{
-			QMessageBox msg(parent);
-			msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-										  " fournir un fichier d'information pour ce plugin."));
-			msg.exec();
-		}
-		else
-			id.exec();
-	}
-	else
-	{
-		QMessageBox msg(parent);
-		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-									  " fournir un fichier d'information pour ce plugin."));
-		msg.exec();
-	}
-}
-
-bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile)
-{
-	if(urlHTMLFile.isLocalFile())
-	{
-		textBrowser->setSource(urlHTMLFile);
-		return true;
-	}
-	return false;
-}
+//void Info::showPluginInfo(QString locationPath, QString pluginName, QWidget* parent)
+//{
+//	QString newPath = locationPath + "/" + pluginName + ".html";
+//
+//	QUrl url = QUrl::fromLocalFile(newPath);
+//	if(QFileInfo(newPath).exists())
+//	{
+//		Dialog::InfoDialog id(parent);
+//		if(!id.setContent(url))
+//		{
+//			QMessageBox msg(parent);
+//			msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
+//										  " fournir un fichier d'information pour ce plugin."));
+//			msg.exec();
+//		}
+//		else
+//			id.exec();
+//	}
+//	else
+//	{
+//		QMessageBox msg(parent);
+//		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
+//									  " fournir un fichier d'information pour ce plugin."));
+//		msg.exec();
+//	}
+//}
 
 } // namespace System
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

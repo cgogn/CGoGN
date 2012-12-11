@@ -84,12 +84,6 @@ public:
 	template <typename T, unsigned int ORBIT>
 	bool copyAttribute(AttributeHandler<T, ORBIT>& dst, AttributeHandler<T, ORBIT>& src) ;
 
-	/**
-	 * get the number of cell in the attribute container of an orbit
-	 * @param orb the orbit to get number of cells
-	 */
-	unsigned int getNbCells(unsigned int orbit);
-
 
 	/****************************************
 	 *               UTILITIES              *

@@ -1,7 +1,10 @@
 #include "camera.h"
 
-#include "window.h"
-#include "view.h"
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 unsigned int Camera::cameraCount = 0;
 
@@ -17,23 +20,7 @@ Camera::Camera(const QString& name, Window* window) :
 	m_snapCount(0)
 {
 	++cameraCount;
-	this->setZClippingCoefficient(100);
-}
-
-Camera::Camera(const QString& name, Window* window, const qglviewer::Camera& c) :
-	qglviewer::Camera(c),
-	m_name(name),
-	m_window(window),
-	m_draw(false),
-	m_drawFarPlane(false),
-	m_drawScale(1.0),
-	m_drawPath(false),
-	m_drawPathAxis(false),
-	m_drawPathScale(1.0),
-	m_snapCount(0)
-{
-	++cameraCount;
-	this->setZClippingCoefficient(100);
+//	setZClippingCoefficient(100);
 }
 
 Camera::~Camera()
@@ -66,11 +53,6 @@ void Camera::unlinkView(View* view)
 	l_views.removeOne(view);
 }
 
-bool Camera::isLinkedWithView(View* view)
-{
-	return l_views.contains(view);
-}
-
 void Camera::fitParamWith(View* view)
 {
 	setScreenWidthAndHeight(view->width(), view->height());
@@ -83,14 +65,6 @@ void Camera::saveSnapshot(QString snapPathName)
 	++m_snapCount;
 }
 
-void Camera::updateGL()
-{
-	foreach(View* view, l_views)
-		view->updateGL();
-}
+} // namespace SCHNApps
 
-//void Camera::viewShowButton(bool b)
-//{
-//	foreach(View* view, l_views)
-//		view->setShowButtons(b);
-//}
+} // namespace CGoGN

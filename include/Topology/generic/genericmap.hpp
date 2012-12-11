@@ -338,6 +338,7 @@ template <unsigned int ORBIT>
 void GenericMap::initDartEmbedding(Dart d, unsigned int emb)
 {
 	assert(isOrbitEmbedded<ORBIT>() || !"Invalid parameter: orbit not embedded");
+	assert(getEmbedding<ORBIT>(d) == EMBNULL || !"initDartEmbedding called on already embedded dart");
 	if(emb != EMBNULL)
 		m_attribs[ORBIT].refLine(emb);	// ref the new emb
 	(*m_embeddings[ORBIT])[dartIndex(d)] = emb ; // affect the embedding to the dart
@@ -488,10 +489,20 @@ inline void GenericMap::disableQuickTraversal()
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
+inline unsigned int GenericMap::getNbCells(unsigned int orbit)
+{
+	return m_attribs[orbit].size() ;
+}
+
 template <unsigned int ORBIT>
 inline AttributeContainer& GenericMap::getAttributeContainer()
 {
 	return m_attribs[ORBIT] ;
+}
+
+inline AttributeContainer& GenericMap::getAttributeContainer(unsigned int orbit)
+{
+	return m_attribs[orbit] ;
 }
 
 template <unsigned int ORBIT>

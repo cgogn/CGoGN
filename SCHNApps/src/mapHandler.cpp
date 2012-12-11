@@ -1,75 +1,69 @@
 #include "mapHandler.h"
 
 #include "system.h"
-#include "Utils/vbo.h"
 
-MapHandler::MapHandler(const QString& name, CGoGN::GenericMap *map) :
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+MapHandlerGen::MapHandlerGen(const QString& name, Window* window, GenericMap* map) :
 	m_name(name),
+	m_window(window),
 	m_map(map)
-{}
+{
+	m_render = new Algo::Render::GL2::MapRender();
+}
 
-MapHandler::~MapHandler()
+MapHandlerGen::~MapHandlerGen()
 {
 	foreach(CGoGN::Utils::VBO* vbo, h_vbo)
 		delete vbo;
-
-	if (m_map)
-		delete m_map;
 }
 
-CGoGN::Utils::VBO* MapHandler::addVBO(const QString& name)
+void MapHandlerGen::draw(Utils::GLSLShader* shader, int primitive)
 {
-	if (h_vbo.contains(name))
-	{
-		System::Error::code = System::Error::VBO_EXISTS;
-		return NULL;
-	}
-
-	CGoGN::Utils::VBO* vbo = new CGoGN::Utils::VBO();
-	h_vbo.insert(name, vbo);
-	return vbo;
+	m_render->draw(shader, primitive);
 }
 
-void MapHandler::removeVBO(const QString& name)
-{
-	if (h_vbo.contains(name))
-	{
-		CGoGN::Utils::VBO* vbo = h_vbo[name];
-		h_vbo.remove(name);
-		delete vbo;
-	}
-}
-
-CGoGN::Utils::VBO* MapHandler::getVBO(const QString& name)
+Utils::VBO* MapHandlerGen::getVBO(const std::string& name)
 {
 	if (h_vbo.contains(name))
 		return h_vbo[name];
 	else
 	{
-		System::Error::code = System::Error::VBO_DOES_NOT_EXIST;
-		return NULL;
+		Utils::VBO* vbo = new Utils::VBO();
+		h_vbo.insert(name, vbo);
+		return vbo;
 	}
 }
 
-CGoGN::Utils::VBO* MapHandler::findFirstVBOMatching(const QRegExp& regexp)
+void MapHandlerGen::deleteVBO(const std::string& name)
 {
-	QHash<QString, CGoGN::Utils::VBO*>::iterator it;
-	for (it = h_vbo.begin(); it != h_vbo.end(); ++it)
+	if (h_vbo.contains(name))
 	{
-		if (it.key().contains(regexp))
-			return it.value();
+		Utils::VBO* vbo = h_vbo[name];
+		h_vbo.remove(name);
+		delete vbo;
 	}
-	return NULL;
 }
 
-QList<CGoGN::Utils::VBO*> MapHandler::findVBOsMatching(const QRegExp& regexp)
+/*********************************************************
+ * MANAGE LINKED VIEWS
+ *********************************************************/
+
+void MapHandlerGen::linkView(View* view)
 {
-	QList<CGoGN::Utils::VBO*> rlist;
-	QHash<QString, CGoGN::Utils::VBO*>::iterator it;
-	for (it = h_vbo.begin(); it != h_vbo.end(); ++it)
-	{
-		if (it.key().contains(regexp))
-			rlist.push_back(it.value());
-	}
-	return rlist;
+	if(view && !l_views.contains(view))
+		l_views.push_back(view);
 }
+
+void MapHandlerGen::unlinkView(View* view)
+{
+	l_views.removeOne(view);
+}
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

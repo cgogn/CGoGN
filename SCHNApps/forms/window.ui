@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>785</width>
-    <height>593</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>785</width>
+     <width>800</width>
      <height>23</height>
     </rect>
    </property>
@@ -31,6 +31,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionShowHideDock"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -54,9 +56,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionManagePlugins"/>
-   <addaction name="actionManageView"/>
    <addaction name="actionManageCameras"/>
+   <addaction name="actionManagePlugins"/>
    <addaction name="actionManageMaps"/>
   </widget>
   <action name="actionAboutCGoGN">
@@ -83,31 +84,30 @@
     <string>Manage plugins</string>
    </property>
   </action>
-  <action name="actionManageView">
-   <property name="icon">
-    <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/add_view.png</normaloff>:/icons/icons/add_view.png</iconset>
-   </property>
-   <property name="text">
-    <string>Add view</string>
-   </property>
-  </action>
   <action name="actionManageCameras">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/camera_b.png</normaloff>:/icons/icons/camera_b.png</iconset>
+     <normaloff>:/icons/icons/cameras.png</normaloff>:/icons/icons/cameras.png</iconset>
    </property>
    <property name="text">
     <string>Manage cameras</string>
    </property>
   </action>
+  <action name="actionShowHideDock">
+   <property name="text">
+    <string>Show/Hide Dock</string>
+   </property>
+  </action>
   <action name="actionManageMaps">
    <property name="icon">
     <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/icons/map_plugin.png</normaloff>:/icons/icons/map_plugin.png</iconset>
+     <normaloff>:/icons/icons/maps.png</normaloff>:/icons/icons/maps.png</iconset>
    </property>
    <property name="text">
-    <string>Manage CGoGN maps</string>
+    <string>ManageMaps</string>
+   </property>
+   <property name="toolTip">
+    <string>Manage maps</string>
    </property>
   </action>
  </widget>

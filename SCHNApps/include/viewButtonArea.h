@@ -9,8 +9,14 @@
 
 #include <iostream>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class View;
-class Context;
+class Texture;
 
 class ViewButton : public QObject
 {
@@ -20,20 +26,21 @@ public:
 	ViewButton(const QString& image, View* view);
 	~ViewButton();
 
-	void click();
+	QSize getSize();
 
+	void click(int x, int y, int globalX, int globalY);
 	void drawAt(int x, int y);
 
-	QSize getSize() { return m_GLimg.size(); }
+	static const int SIZE = 24;
+	static const int SPACE = 4;
 
 protected:
+	QString m_img;
 	View* m_view;
-	QSize m_size;
-	QImage m_GLimg;
-	int m_texID;
+	Texture* m_tex;
 
 signals:
-	void clicked();
+	void clicked(int x, int y, int globalX, int globalY);
 };
 
 class ViewButtonArea : public QObject
@@ -41,7 +48,9 @@ class ViewButtonArea : public QObject
 	Q_OBJECT
 
 public:
-	ViewButtonArea(View* view) : m_view(view)
+	ViewButtonArea(View* view) :
+		m_view(view),
+		m_form(0,0,0,0)
 	{}
 	~ViewButtonArea()
 	{}
@@ -50,7 +59,7 @@ public:
 	void removeButton(ViewButton* button);
 
 	bool isClicked(int x, int y);
-	ViewButton* clickButton(int x, int y);
+	void clickButton(int x, int y, int globalX, int globalY);
 
 	const QRect& getForm() { return m_form; }
 
@@ -63,5 +72,9 @@ protected:
 	QRect m_form;
 	QList<ViewButton*> l_buttons;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

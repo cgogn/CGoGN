@@ -3,18 +3,22 @@
 
 #include "ui_window.h"
 
-#include <QVBoxLayout>
-
-#include "types.h"
 #include "system.h"
-#include "splitArea.h"
 
-class Plugin;
-class Scene;
-class View;
-class Camera;
-//class Context;
-class MapHandler;
+class QVBoxLayout;
+class QSplitter;
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+class CamerasDialog;
+class PluginsDialog;
+class MapsDialog;
+
+struct Texture;
 
 class Window : public QMainWindow, Ui::Window
 {
@@ -27,7 +31,7 @@ public:
 	 *
 	 * \param parent the parent of the window
 	 */
-	Window(QWidget* parent = NULL);
+	Window(const QString& appPath, QWidget* parent = NULL);
 
 	/**
 	 * \fn ~Window()
@@ -35,7 +39,7 @@ public:
 	 */
 	~Window();
 
-	QGLContext* getContext() { return m_context; }
+	const QString& getAppPath() { return m_appPath; }
 
 	/*********************************************************
 	 * MANAGE DOCK
@@ -47,7 +51,7 @@ public:
 	 *
 	 * \return a pointer to the TabWidget, NULL if not allocated yet
 	 */
-	QTabWidget* getDockTabWidget();
+	QTabWidget* getDockTabWidget() const { return m_dockTabWidget; }
 
 	/**
 	 * \fn void addTabInDock(QWidget* tabWidget, const QString& tabText)
@@ -71,6 +75,9 @@ public:
 	 * \see addWidgetInDockTab()
 	 */
 	void removeTabInDock(QWidget* tabWidget);
+
+	void enablePluginTabWidgets(Plugin* plugin);
+	void disablePluginTabWidgets(Plugin* plugin);
 
 	/*********************************************************
 	 * MANAGE MENU ACTIONS
@@ -136,6 +143,33 @@ public:
 	void removeToolbarAction(QAction* action);
 
 	/*********************************************************
+	 * MANAGE CAMERAS
+	 *********************************************************/
+
+	Camera* addCamera(const QString& name);
+	Camera* addCamera();
+	void removeCamera(const QString& name);
+	Camera* getCamera(const QString& name) const;
+	QList<Camera*> getCamerasList() const { return h_cameras.values(); }
+	const CameraHash& getCamerasHash() const { return h_cameras; }
+
+	/*********************************************************
+	 * MANAGE VIEWS
+	 *********************************************************/
+
+	View* addView(const QString& name);
+	View* addView();
+	void removeView(const QString& name);
+	View* getView(const QString& name) const;
+	QList<View*> getViewsList() const { return h_views.values(); }
+	const ViewHash& getViewsHash() const { return h_views; }
+
+	View* getCurrentView() const { return m_currentView; }
+	void setCurrentView(View* view);
+
+	void splitView(const QString& name, Qt::Orientation orientation);
+
+	/*********************************************************
 	 * MANAGE PLUGINS
 	 *********************************************************/
 
@@ -167,7 +201,7 @@ public:
 	 * \see getPlugins()
 	 * \see Plugin::enable()
 	 */
-	Plugin* loadPlugin(const QString& pluginPath);
+	Plugin* loadPlugin(const QString& pluginFilePath);
 
 	/**
 	 * \fn void unloadPlugin(QString pluginName)
@@ -210,105 +244,52 @@ public:
 	 */
 //	Plugin *checkPluginDependencie(QString name, Plugin *dependantPlugin);
 
-	Plugin* getPlugin(const QString& name);
-
-	QList<Plugin*> getPlugins() { return h_plugins.values(); }
-
-	/*********************************************************
-	 * MANAGE SCENES
-	 *********************************************************/
-
-	Scene* addScene(const QString& name);
-	void removeScene(const QString& name);
-	Scene* getScene(const QString& name);
-	QList<Scene*> getScenes() { return h_scenes.values(); }
-
-//	bool addNewEmptyScene(QString name, Scene *&scene, bool dialog, Camera *sharedCamera = NULL);
-//	bool addNewSceneView(Scene *scene, View *view);
-
-//	bool associateSceneWithPlugin(QString glviewer, Plugin *plugin, Scene *&scene, bool cb_initGL = false);
-
-//	bool addNewSceneFromPlugin(QString name, Plugin *plugin, Scene *&scene);
-//	bool addNewSceneFromPluginDialog(QString name, Plugin *plugin, Scene *&scene);
-
-//	void linkDialog(Scene *scene);
-//	void unlinkDialog(Scene *scene, QList<Plugin *> dependingPlugins);
-
-	/*********************************************************
-	 * MANAGE VIEWS
-	 *********************************************************/
-
-	View* addView(const QString& name);
-	void removeView(const QString& name);
-	View* getView(const QString& name);
-	QList<View*> getView() { return h_views.values(); }
-
-	/*********************************************************
-	 * MANAGE CAMERAS
-	 *********************************************************/
-
-	Camera* addCamera(const QString& name);
-	void removeCamera(const QString& name);
-	Camera* getCamera(const QString& name);
-	QList<Camera*> getCameras() { return h_cameras.values(); }
+	Plugin* getPlugin(const QString& name) const;
+	QList<Plugin*> getPluginsList() const { return h_plugins.values(); }
+	const PluginHash& getPluginsHash() const { return h_plugins; }
 
 	/*********************************************************
 	 * MANAGE MAPS
 	 *********************************************************/
 
-	bool addMap(const QString& name, MapHandler* map);
+	bool addMap(MapHandlerGen* map);
 	void removeMap(const QString& name);
-	MapHandler* getMap(const QString& name);
-	QList<MapHandler*> getMaps() { return h_maps.values(); }
+	MapHandlerGen* getMap(const QString& name) const;
+	QList<MapHandlerGen*> getMapsList() const { return h_maps.values(); }
+	const MapHash& getMapsHash() const { return h_maps; }
 
-//	template<typename T>
-//	T* getReferencedMap(QString map_name){
-//		MapHash::iterator it;
-//		if((it=h_map.find(map_name))!=h_map.end()){
-//			return ((T*)(*it));
-//		}
-//		else{
-//			System::Error::code= System::Error::MAP_UNREFERENCED_f(map_name);
-//			return NULL;
-//		}
-//	}
+	/*********************************************************
+	 * MANAGE TEXTURES
+	 *********************************************************/
+
+	Texture* getTexture(const QString& image);
+	void releaseTexture(const QString& image);
 
 protected:
+	QString m_appPath;
+
 	bool m_initialization;
 
-	QVBoxLayout* m_verticalLayout;
-	SplitArea* m_splitArea;
+	QVBoxLayout* m_centralLayout;
+	QSplitter* m_rootSplitter;
+	bool b_rootSplitterInitialized;
 
-	QGLContext* m_context;
+	View* m_firstView;
+	View* m_currentView;
 
 	QDockWidget* m_dock;
 	QTabWidget* m_dockTabWidget;
 
 	PluginHash h_plugins;
-	SceneHash h_scenes;
 	ViewHash h_views;
 	CameraHash h_cameras;
 	MapHash h_maps;
 
-	/**
-	 * \var bool keys[3]
-	 * \brief a static tab to store state of some keys (here: M, Shift and CTRL)
-	 */
-	bool keys[3];
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *event);
+	TextureHash h_textures;
 
-	/**
-	 * \fn void moveView()
-	 * \brief shows a reordering dialog for the Views
-	 *
-	 * Make a call with the right parameters to the dialog class
-	 * GLVSelector and show this dialog.
-	 *
-	 * This method is meant to be called when the user press
-	 * CTRL+Shift+M.
-	 */
-	void moveView();
+	CamerasDialog* m_camerasDialog;
+	PluginsDialog* m_pluginsDialog;
+	MapsDialog* m_mapsDialog;
 
 public slots:
 	/**
@@ -322,20 +303,8 @@ public slots:
 	 * \brief function that is called when the "about CGOGN" menu action is triggered
 	 */
 	void cb_aboutCGoGN();
-
-	/**
-	 * \fn void cb_managePlugins()
-	 * \brief method called when the "Plugins" action is triggered.
-	 * Show the plugins management dialog
-	 */
-	void cb_managePlugins();
-
-	/**
-	 * \fn void cb_manageScenes()
-	 * \brief method called when the "Scenes" action is triggered.
-	 * Show the scenes management dialog:
-	 */
-	void cb_manageScenes();
+	
+	void cb_showHideDock();
 
 	/**
 	 * \fn void cb_manageCameras()
@@ -345,11 +314,30 @@ public slots:
 	void cb_manageCameras();
 
 	/**
-	 * \fn void cb_manageMaps()
-	 * \brief method called when the "Maps" action is triggered.
-	 * Show the maps management dialog:
+	 * \fn void cb_managePlugins()
+	 * \brief method called when the "Plugins" action is triggered.
+	 * Show the plugins management dialog
 	 */
+	void cb_managePlugins();
+
 	void cb_manageMaps();
+
+signals:
+	void cameraAdded(Camera* camera);
+	void cameraRemoved(Camera* camera);
+
+	void viewAdded(View* view);
+	void viewRemoved(View* view);
+
+	void mapAdded(MapHandlerGen* map);
+	void mapRemoved(MapHandlerGen* map);
+
+	void pluginAdded(Plugin* plugin);
+	void pluginRemoved(Plugin* plugin);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif
