@@ -1,4 +1,4 @@
-#include "pluginsViewDialog.h"
+#include "dialogs/pluginsViewDialog.h"
 
 #include "window.h"
 #include "view.h"
@@ -6,6 +6,12 @@
 
 #include <QMessageBox>
 #include <QMouseEvent>
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 PluginsViewDialog::PluginsViewDialog(Window* window, View* view) :
 	QDialog(view),
@@ -73,3 +79,7 @@ void PluginsViewDialog::cb_removePluginFromList(Plugin* p)
 		}
 	}
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

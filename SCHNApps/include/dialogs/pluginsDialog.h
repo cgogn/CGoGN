@@ -5,6 +5,14 @@
 
 #include "types.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+class Window;
+
 struct PluginInfo
 {
 	PluginInfo(const QString& path, const QString& name) :
@@ -55,5 +63,9 @@ protected slots:
 
 //	void showPluginInfo();
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

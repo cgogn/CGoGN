@@ -7,6 +7,12 @@
 
 #include <iostream>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 ViewButton::ViewButton(const QString& image, View* view) :
 	m_img(image),
 	m_view(view)
@@ -105,3 +111,7 @@ void ViewButtonArea::draw()
 		p_x += ViewButton::SIZE + ViewButton::SPACE;
 	}
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

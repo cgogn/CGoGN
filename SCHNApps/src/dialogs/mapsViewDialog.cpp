@@ -1,4 +1,4 @@
-#include "mapsViewDialog.h"
+#include "dialogs/mapsViewDialog.h"
 
 #include "window.h"
 #include "view.h"
@@ -6,6 +6,12 @@
 
 #include <QMessageBox>
 #include <QMouseEvent>
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 MapsViewDialog::MapsViewDialog(Window* window, View* view) :
 	QDialog(view),
@@ -66,3 +72,7 @@ void MapsViewDialog::cb_removeMapFromList(MapHandlerGen* m)
 		}
 	}
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

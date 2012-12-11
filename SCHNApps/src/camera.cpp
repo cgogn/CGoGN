@@ -1,5 +1,11 @@
 #include "camera.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 unsigned int Camera::cameraCount = 0;
 
 Camera::Camera(const QString& name, Window* window) :
@@ -58,3 +64,7 @@ void Camera::saveSnapshot(QString snapPathName)
 		view->saveSnapshot(snapPathName + view->getName() + '_' + QString::number(m_snapCount) + ".jpg", true);
 	++m_snapCount;
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

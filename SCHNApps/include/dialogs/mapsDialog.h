@@ -3,6 +3,12 @@
 
 #include "ui_mapsDialog.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class Window;
 class MapHandlerGen;
 
@@ -23,5 +29,9 @@ public slots:
 	void cb_addMapToList(MapHandlerGen* m);
 	void cb_removeMapFromList(MapHandlerGen* m);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

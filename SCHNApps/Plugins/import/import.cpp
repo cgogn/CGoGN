@@ -1,11 +1,12 @@
 #include "import.h"
 
-#include <QFileDialog>
-#include <QFileInfo>
 #include "system.h"
 #include "mapHandler.h"
 
 #include "Algo/Import/import.h"
+
+#include <QFileDialog>
+#include <QFileInfo>
 
 bool ImportPlugin::enable()
 {
@@ -28,23 +29,36 @@ void ImportPlugin::cb_import()
 	MapHandler<PFP>* h = new MapHandler<PFP>(fi.baseName(), m_window, m);
 
 	std::vector<std::string> attrNames ;
-	CGoGN::Algo::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
+	Algo::Import::importMesh<PFP>(*m, fileName.toUtf8().constData(), attrNames);
 
-	CGoGN::VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
+	// get vertex position attribute
+	VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
 
-	CGoGN::Geom::BoundingBox<VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*m, position) ;
+	// create VBO for vertex position attribute
+	Utils::VBO* positionVBO = h->getVBO(position.name());
+	positionVBO->updateData(position);
+
+	// compute vertex normal attribute
+	VertexAttribute<VEC3> normal = m->getAttribute<VEC3, CGoGN::VERTEX>("normal");
+	if(!normal.isValid())
+		normal = m->addAttribute<VEC3, CGoGN::VERTEX>("normal");
+	Algo::Geometry::computeNormalVertices<PFP>(*m, position, normal);
+
+	// create VBO for vertex normal attribute
+	CGoGN::Utils::VBO* normalVBO = h->getVBO("normal");
+	normalVBO->updateData(normal);
+
+	// compute map bounding box
+	CGoGN::Geom::BoundingBox<VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*m, position);
 	qglviewer::Vec min(bb.min()[0], bb.min()[1], bb.min()[2]);
 	qglviewer::Vec max(bb.max()[0], bb.max()[1], bb.max()[2]);
-
 	h->setBBmin(min);
 	h->setBBmax(max);
 
-	h->updatePrimitives(CGoGN::Algo::Render::GL2::POINTS, CGoGN::allDarts) ;
-	h->updatePrimitives(CGoGN::Algo::Render::GL2::LINES, CGoGN::allDarts) ;
-	h->updatePrimitives(CGoGN::Algo::Render::GL2::TRIANGLES, CGoGN::allDarts) ;
-
-	CGoGN::Utils::VBO* positionVBO = h->getVBO(position.name());
-	positionVBO->updateData(position);
+	// compute primitive connectivity VBOs
+	h->updatePrimitives(CGoGN::Algo::Render::GL2::POINTS, CGoGN::allDarts);
+	h->updatePrimitives(CGoGN::Algo::Render::GL2::LINES, CGoGN::allDarts);
+	h->updatePrimitives(CGoGN::Algo::Render::GL2::TRIANGLES, CGoGN::allDarts);
 
 	m_window->addMap(h);
 }

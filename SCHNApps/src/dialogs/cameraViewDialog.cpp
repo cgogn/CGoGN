@@ -1,4 +1,4 @@
-#include "cameraViewDialog.h"
+#include "dialogs/cameraViewDialog.h"
 
 #include "window.h"
 #include "view.h"
@@ -6,6 +6,12 @@
 
 #include <QMessageBox>
 #include <QMouseEvent>
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 CameraViewDialog::CameraViewDialog(Window* window, View* view) :
 	QDialog(view),
@@ -73,3 +79,7 @@ void CameraViewDialog::cb_removeCameraFromList(Camera* c)
 		}
 	}
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

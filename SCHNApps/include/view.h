@@ -8,6 +8,12 @@
 #include "window.h"
 #include "Utils/gl_matrices.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class ViewButtonArea;
 class ViewButton;
 
@@ -119,5 +125,9 @@ public slots:
 	void cb_VsplitView(int x, int y, int globalX, int globalY);
 	void cb_HsplitView(int x, int y, int globalX, int globalY);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

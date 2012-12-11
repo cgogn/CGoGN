@@ -14,9 +14,15 @@
 #include "view.h"
 #include "texture.h"
 
-#include "camerasDialog.h"
-#include "pluginsDialog.h"
-#include "mapsDialog.h"
+#include "dialogs/camerasDialog.h"
+#include "dialogs/pluginsDialog.h"
+#include "dialogs/mapsDialog.h"
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 Window::Window(QWidget *parent) :
 	QMainWindow(parent),
@@ -689,3 +695,7 @@ void Window::cb_manageMaps()
 {
 	m_mapsDialog->show();
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

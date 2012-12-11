@@ -3,6 +3,12 @@
 
 #include "ui_camerasDialog.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class Window;
 class Camera;
 
@@ -23,5 +29,9 @@ public slots:
 	void cb_addCameraToList(Camera* c);
 	void cb_removeCameraFromList(Camera* c);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

@@ -9,8 +9,13 @@
 #include "Topology/map/embeddedMap2.h"
 
 #include "Utils/Shaders/shaderFlat.h"
+#include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
 #include "Utils/pointSprite.h"
+
+
+using namespace CGoGN;
+using namespace SCHNApps;
 
 
 class RenderDockTab : public QWidget, public Ui::RenderWidget
@@ -20,26 +25,34 @@ public:
 };
 
 
+enum FaceShadingStyle
+{
+	FLAT = 0,
+	PHONG = 1
+};
+
 struct TabParams
 {
-	TabParams(float vsf, bool rv, bool re, bool rf) :
+	TabParams(float vsf, bool rv, bool re, bool rf, FaceShadingStyle fstyle) :
 		verticesScaleFactor(vsf),
 		renderVertices(rv),
 		renderEdges(re),
-		renderFaces(rf)
+		renderFaces(rf),
+		faceStyle(fstyle)
 	{}
 
 	float verticesScaleFactor;
 	bool renderVertices;
 	bool renderEdges;
 	bool renderFaces;
+	FaceShadingStyle faceStyle;
 };
 
 
 class RenderPlugin : public Plugin
 {
 	Q_OBJECT
-	Q_INTERFACES(Plugin)
+	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
 	RenderPlugin()
@@ -71,14 +84,16 @@ protected:
 	QHash<View*, TabParams*> h_viewParams;
 
 	CGoGN::Utils::ShaderFlat* m_flatShader;
-	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader ;
-	CGoGN::Utils::PointSprite* m_pointSprite ;
+	CGoGN::Utils::ShaderPhong* m_phongShader;
+	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader;
+	CGoGN::Utils::PointSprite* m_pointSprite;
 
 public slots:
 	void cb_renderVerticesChanged(bool b);
 	void cb_verticesScaleFactorChanged(int i);
 	void cb_renderEdgesChanged(bool b);
 	void cb_renderFacesChanged(bool b);
+	void cb_faceStyleChanged(QAbstractButton* b);
 };
 
 #endif

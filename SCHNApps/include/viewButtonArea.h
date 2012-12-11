@@ -9,6 +9,12 @@
 
 #include <iostream>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class View;
 class Texture;
 
@@ -66,5 +72,9 @@ protected:
 	QRect m_form;
 	QList<ViewButton*> l_buttons;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

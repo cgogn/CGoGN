@@ -4,6 +4,12 @@
 #include "view.h"
 #include "QGLViewer/camera.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class Window;
 
 class Camera : public qglviewer::Camera
@@ -81,5 +87,9 @@ protected:
 
 	int m_snapCount;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

@@ -1,4 +1,4 @@
-#include "pluginsDialog.h"
+#include "dialogs/pluginsDialog.h"
 
 //#include <libxml2/libxml/tree.h>
 #include <QFile>
@@ -16,6 +16,12 @@
 #include "system.h"
 #include "window.h"
 #include "plugin.h"
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 PluginsDialog::PluginsDialog(Window* window) :
 	QDialog(window),
@@ -416,3 +422,7 @@ void PluginsDialog::cb_togglePlugin(QTreeWidgetItem *item, int column)
 //
 //	System::Info::showPluginInfo(strUrl);
 //}
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

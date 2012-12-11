@@ -13,6 +13,12 @@
 #include "mapHandler.h"
 #include "vboHandler.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class Plugin : public QObject
 {
 public:
@@ -160,6 +166,10 @@ protected:
 */
 };
 
-Q_DECLARE_INTERFACE(Plugin, "Window.Plugin")
+} // namespace SCHNApps
+
+} // namespace CGoGN
+
+Q_DECLARE_INTERFACE(CGoGN::SCHNApps::Plugin, "CGoGN.SCHNapps.Plugin")
 
 #endif

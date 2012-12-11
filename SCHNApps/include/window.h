@@ -8,11 +8,17 @@
 class QVBoxLayout;
 class QSplitter;
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class CamerasDialog;
 class PluginsDialog;
 class MapsDialog;
 
-class Texture;
+struct Texture;
 
 class Window : public QMainWindow, Ui::Window
 {
@@ -330,5 +336,9 @@ signals:
 	void pluginAdded(Plugin* plugin);
 	void pluginRemoved(Plugin* plugin);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

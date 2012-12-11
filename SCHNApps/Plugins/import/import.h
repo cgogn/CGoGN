@@ -2,25 +2,29 @@
 #define _IMPORT_PLUGIN_H_
 
 #include "plugin.h"
+#include "view.h"
 
 #include "Topology/generic/functor.h"
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
 
 
-struct PFP: public CGoGN::PFP_STANDARD
+using namespace CGoGN;
+using namespace SCHNApps;
+
+
+struct PFP: public PFP_STANDARD
 {
-	typedef CGoGN::EmbeddedMap2 MAP;
+	typedef EmbeddedMap2 MAP;
 };
 
 typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
 
-
 class ImportPlugin : public Plugin
 {
 	Q_OBJECT
-	Q_INTERFACES(Plugin)
+	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
 	ImportPlugin()

@@ -11,10 +11,16 @@
 #include "Utils/vbo.h"
 #include "Algo/Render/GL2/mapRender.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class MapHandlerGen
 {
 public:
-	MapHandlerGen(const QString& name, Window* window, CGoGN::GenericMap* map);
+	MapHandlerGen(const QString& name, Window* window, GenericMap* map);
 	virtual ~MapHandlerGen();
 
 	const QString& getName() const { return m_name; }
@@ -23,7 +29,7 @@ public:
 	Window* getWindow() const { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	CGoGN::GenericMap* getGenericMap() { return m_map; }
+	GenericMap* getGenericMap() { return m_map; }
 
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
 	void setBBmin(qglviewer::Vec& v) { m_bbMin = v; }
@@ -35,13 +41,13 @@ public:
 
 	bool isUsed() const { return !l_views.empty(); }
 
-	void draw(CGoGN::Utils::GLSLShader* shader, int primitive);
+	void draw(Utils::GLSLShader* shader, int primitive);
 
 	/*********************************************************
 	 * MANAGE VBOs
 	 *********************************************************/
 
-	CGoGN::Utils::VBO* getVBO(const std::string& name);
+	Utils::VBO* getVBO(const std::string& name);
 	void deleteVBO(const std::string& name);
 
 	/*********************************************************
@@ -56,9 +62,9 @@ public:
 protected:
 	QString m_name;
 	Window* m_window;
-	CGoGN::GenericMap* m_map;
+	GenericMap* m_map;
 
-	CGoGN::Algo::Render::GL2::MapRender* m_render;
+	Algo::Render::GL2::MapRender* m_render;
 
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
@@ -84,10 +90,14 @@ public:
 
 	typename PFP::MAP* getMap() { return reinterpret_cast<typename PFP::MAP*>(m_map); }
 
-	void updatePrimitives(int primitive, const CGoGN::FunctorSelect& good)
+	void updatePrimitives(int primitive, const FunctorSelect& good)
 	{
 		m_render->initPrimitives<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
 	}
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

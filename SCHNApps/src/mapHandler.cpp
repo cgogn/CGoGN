@@ -2,12 +2,18 @@
 
 #include "system.h"
 
-MapHandlerGen::MapHandlerGen(const QString& name, Window* window, CGoGN::GenericMap* map) :
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+MapHandlerGen::MapHandlerGen(const QString& name, Window* window, GenericMap* map) :
 	m_name(name),
 	m_window(window),
 	m_map(map)
 {
-	m_render = new CGoGN::Algo::Render::GL2::MapRender();
+	m_render = new Algo::Render::GL2::MapRender();
 }
 
 MapHandlerGen::~MapHandlerGen()
@@ -16,18 +22,18 @@ MapHandlerGen::~MapHandlerGen()
 		delete vbo;
 }
 
-void MapHandlerGen::draw(CGoGN::Utils::GLSLShader* shader, int primitive)
+void MapHandlerGen::draw(Utils::GLSLShader* shader, int primitive)
 {
 	m_render->draw(shader, primitive);
 }
 
-CGoGN::Utils::VBO* MapHandlerGen::getVBO(const std::string& name)
+Utils::VBO* MapHandlerGen::getVBO(const std::string& name)
 {
 	if (h_vbo.contains(name))
 		return h_vbo[name];
 	else
 	{
-		CGoGN::Utils::VBO* vbo = new CGoGN::Utils::VBO();
+		Utils::VBO* vbo = new Utils::VBO();
 		h_vbo.insert(name, vbo);
 		return vbo;
 	}
@@ -37,7 +43,7 @@ void MapHandlerGen::deleteVBO(const std::string& name)
 {
 	if (h_vbo.contains(name))
 	{
-		CGoGN::Utils::VBO* vbo = h_vbo[name];
+		Utils::VBO* vbo = h_vbo[name];
 		h_vbo.remove(name);
 		delete vbo;
 	}
@@ -57,3 +63,7 @@ void MapHandlerGen::unlinkView(View* view)
 {
 	l_views.removeOne(view);
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

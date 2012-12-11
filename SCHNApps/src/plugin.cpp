@@ -1,5 +1,11 @@
 #include "plugin.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 Plugin::Plugin() :
 	m_window(NULL),
 	b_providesRendering(false)
@@ -112,3 +118,7 @@ void Plugin::removeToolbarAction(QAction* action)
 	if(l_toolbarActions.removeOne(action))
 		m_window->removeToolbarAction(action);
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

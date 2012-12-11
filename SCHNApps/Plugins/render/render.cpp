@@ -14,6 +14,12 @@ bool RenderPlugin::enable()
 	m_flatShader->setDiffuse(CGoGN::Geom::Vec4f(0.8f, 0.9f, 0.7f, 1.0f));
 	m_flatShader->setExplode(1.0f);
 
+	m_phongShader = new CGoGN::Utils::ShaderPhong() ;
+	m_phongShader->setAmbiant(CGoGN::Geom::Vec4f(0.2f, 0.2f, 0.2f, 0.1f)) ;
+	m_phongShader->setDiffuse(CGoGN::Geom::Vec4f(0.8f, 0.9f, 0.7f, 1.0f)) ;
+	m_phongShader->setSpecular(CGoGN::Geom::Vec4f(0.9f, 0.9f, 0.9f, 1.0f)) ;
+	m_phongShader->setShininess(80.0f) ;
+
 	m_simpleColorShader = new CGoGN::Utils::ShaderSimpleColor();
 	CGoGN::Geom::Vec4f c(0.1f, 0.1f, 0.1f, 1.0f);
 	m_simpleColorShader->setColor(c);
@@ -24,6 +30,7 @@ bool RenderPlugin::enable()
 	connect(m_dockTab->slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_verticesScaleFactorChanged(int)));
 	connect(m_dockTab->check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(cb_renderEdgesChanged(bool)));
 	connect(m_dockTab->check_renderFaces, SIGNAL(toggled(bool)), this, SLOT(cb_renderFacesChanged(bool)));
+	connect(m_dockTab->group_faceShading, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(cb_faceStyleChanged(QAbstractButton*)));
 
 	return true;
 }
@@ -31,6 +38,7 @@ bool RenderPlugin::enable()
 void RenderPlugin::disable()
 {
 	delete m_flatShader;
+	delete m_phongShader;
 	delete m_simpleColorShader;
 	delete m_pointSprite;
 }
@@ -43,6 +51,7 @@ void RenderPlugin::redraw(View* view)
 	foreach(MapHandlerGen* m, maps)
 	{
 		CGoGN::Utils::VBO* positionVBO = m->getVBO("position");
+		CGoGN::Utils::VBO* normalVBO = m->getVBO("normal");
 		if(params->renderVertices)
 		{
 			m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * params->verticesScaleFactor);
@@ -63,8 +72,18 @@ void RenderPlugin::redraw(View* view)
 			glEnable(GL_LIGHTING);
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonOffset(1.0f, 1.0f);
-			m_flatShader->setAttributePosition(positionVBO);
-			m->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+			switch(params->faceStyle)
+			{
+				case FLAT :
+					m_flatShader->setAttributePosition(positionVBO);
+					m->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					break ;
+				case PHONG :
+					m_phongShader->setAttributePosition(positionVBO) ;
+					m_phongShader->setAttributeNormal(normalVBO) ;
+					m->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+					break ;
+			}
 			glDisable(GL_POLYGON_OFFSET_FILL);
 		}
 	}
@@ -73,9 +92,10 @@ void RenderPlugin::redraw(View* view)
 void RenderPlugin::viewLinked(View* view)
 {
 	assert(!h_viewParams.contains(view));
-	h_viewParams.insert(view, new TabParams(1.0, false, false, true));
+	h_viewParams.insert(view, new TabParams(1.0, false, false, true, FLAT));
 
 	CGoGN::Utils::GLSLShader::registerShader(view, m_flatShader);
+	CGoGN::Utils::GLSLShader::registerShader(view, m_phongShader);
 	CGoGN::Utils::GLSLShader::registerShader(view, m_simpleColorShader);
 	CGoGN::Utils::GLSLShader::registerShader(view, m_pointSprite);
 }
@@ -86,6 +106,7 @@ void RenderPlugin::viewUnlinked(View* view)
 	h_viewParams.remove(view);
 
 	CGoGN::Utils::GLSLShader::unregisterShader(view, m_flatShader);
+	CGoGN::Utils::GLSLShader::registerShader(view, m_phongShader);
 	CGoGN::Utils::GLSLShader::unregisterShader(view, m_simpleColorShader);
 	CGoGN::Utils::GLSLShader::unregisterShader(view, m_pointSprite);
 }
@@ -97,6 +118,8 @@ void RenderPlugin::currentViewChanged(View* view)
 	m_dockTab->slider_verticesScaleFactor->setSliderPosition(params->verticesScaleFactor * 50.0);
 	m_dockTab->check_renderEdges->setChecked(params->renderEdges);
 	m_dockTab->check_renderFaces->setChecked(params->renderFaces);
+	m_dockTab->radio_flatShading->setChecked(params->faceStyle == FLAT);
+	m_dockTab->radio_phongShading->setChecked(params->faceStyle == PHONG);
 }
 
 void RenderPlugin::cb_renderVerticesChanged(bool b)
@@ -136,6 +159,19 @@ void RenderPlugin::cb_renderFacesChanged(bool b)
 
 	TabParams* params = h_viewParams[current];
 	params->renderFaces = b;
+	current->updateGL();
+}
+
+void RenderPlugin::cb_faceStyleChanged(QAbstractButton* b)
+{
+	View* current = m_window->getCurrentView();
+	assert(isLinkedToView(current));
+
+	TabParams* params = h_viewParams[current];
+	if(m_dockTab->radio_flatShading->isChecked())
+		params->faceStyle = FLAT;
+	else if(m_dockTab->radio_phongShading->isChecked())
+		params->faceStyle = PHONG;
 	current->updateGL();
 }
 

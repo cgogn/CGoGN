@@ -29,24 +29,24 @@ file(
 	${SCHNApps_ROOT_DIR}/src/view.cpp
 	${SCHNApps_ROOT_DIR}/src/window.cpp
 	${SCHNApps_ROOT_DIR}/src/viewButtonArea.cpp
-	${SCHNApps_ROOT_DIR}/src/camerasDialog.cpp
-	${SCHNApps_ROOT_DIR}/src/pluginsDialog.cpp
-	${SCHNApps_ROOT_DIR}/src/mapsDialog.cpp
-	${SCHNApps_ROOT_DIR}/src/cameraViewDialog.cpp
-	${SCHNApps_ROOT_DIR}/src/pluginsViewDialog.cpp
-	${SCHNApps_ROOT_DIR}/src/mapsViewDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/camerasDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/pluginsDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/mapsDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/cameraViewDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/pluginsViewDialog.cpp
+	${SCHNApps_ROOT_DIR}/src/dialogs/mapsViewDialog.cpp
 )
 
 SET(SCHNApps_H_OBJECT_FILES
 	${SCHNApps_ROOT_DIR}/include/view.h
 	${SCHNApps_ROOT_DIR}/include/window.h
 	${SCHNApps_ROOT_DIR}/include/viewButtonArea.h
-	${SCHNApps_ROOT_DIR}/include/camerasDialog.h
-	${SCHNApps_ROOT_DIR}/include/pluginsDialog.h
-	${SCHNApps_ROOT_DIR}/include/mapsDialog.h
-	${SCHNApps_ROOT_DIR}/include/cameraViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/pluginsViewDialog.h
-	${SCHNApps_ROOT_DIR}/include/mapsViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/camerasDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/mapsDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/cameraViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/pluginsViewDialog.h
+	${SCHNApps_ROOT_DIR}/include/dialogs/mapsViewDialog.h
 )
 
 file(

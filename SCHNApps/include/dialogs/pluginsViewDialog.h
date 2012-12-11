@@ -3,6 +3,12 @@
 
 #include "ui_pluginsViewDialog.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class Window;
 class View;
 class Plugin;
@@ -24,5 +30,9 @@ public slots:
 	void cb_addPluginToList(Plugin* p);
 	void cb_removePluginFromList(Plugin* p);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

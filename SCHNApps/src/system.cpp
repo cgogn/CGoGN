@@ -7,6 +7,12 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 namespace System
 {
 
@@ -447,3 +453,7 @@ Error::ERROR_CODE Error::BAD_XML_FILE_f(QString filepath){
 //}
 
 } // namespace System
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

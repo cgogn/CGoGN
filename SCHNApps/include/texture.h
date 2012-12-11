@@ -1,6 +1,12 @@
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 struct Texture
 {
 	Texture(GLuint id, const QSize& s, unsigned int r) :
@@ -13,5 +19,9 @@ struct Texture
 	QSize size;
 	unsigned int ref;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

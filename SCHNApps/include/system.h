@@ -13,6 +13,12 @@
 //#include "ui_questionSessionDialog.h"
 //#include "ui_infoDialog.h"
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 class Window;
 class SplitArea;
 
@@ -149,10 +155,10 @@ public:
 //	SIMPLE_GLVIEWER
 //} QGLV_CREATE_SETTINGS;
 
-//extern QString app_path;
-
-//extern QSplashScreen *splash;
-
 } // namespace System
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

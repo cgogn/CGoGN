@@ -4,9 +4,9 @@
 #include "camera.h"
 #include "viewButtonArea.h"
 
-#include "cameraViewDialog.h"
-#include "pluginsViewDialog.h"
-#include "mapsViewDialog.h"
+#include "dialogs/cameraViewDialog.h"
+#include "dialogs/pluginsViewDialog.h"
+#include "dialogs/mapsViewDialog.h"
 
 #include "Utils/GLSLShader.h"
 #include "Algo/Geometry/boundingbox.h"
@@ -14,6 +14,12 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
 
 unsigned int View::viewCount = 0;
 
@@ -382,3 +388,7 @@ void View::cb_HsplitView(int x, int y, int globalX, int globalY)
 {
 	m_window->splitView(m_name, Qt::Vertical);
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
