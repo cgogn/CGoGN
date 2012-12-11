@@ -40,6 +40,8 @@ protected:
 
 //	bool restoreState();
 
+	void addPluginsDirectory(const QString& dir);
+
 private:
 	bool init;
 

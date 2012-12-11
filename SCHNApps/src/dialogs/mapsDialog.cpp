@@ -30,6 +30,23 @@ MapsDialog::MapsDialog(Window* window) :
 MapsDialog::~MapsDialog()
 {}
 
+void MapsDialog::clearInfo()
+{
+	dartAttributes->clear();
+	vertexAttributes->clear();
+	edgeAttributes->clear();
+	faceAttributes->clear();
+	volumeAttributes->clear();
+	lineEdit_dart_orbits->setText("");
+	lineEdit_dart_cells->setText("");
+	lineEdit_vertex_orbits->setText("");
+	lineEdit_vertex_cells->setText("");
+	lineEdit_edge_orbits->setText("");
+	lineEdit_edge_cells->setText("");
+	lineEdit_face_orbits->setText("");
+	lineEdit_face_cells->setText("");
+}
+
 void MapsDialog::cb_removeMap()
 {
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
@@ -38,7 +55,10 @@ void MapsDialog::cb_removeMap()
 		const QString& name = currentItems[0]->text();
 		MapHandlerGen* m = m_window->getMap(name);
 		if(!m->isUsed())
+		{
 			m_window->removeMap(name);
+			cb_selectedMapChanged();
+		}
 		else
 			QMessageBox::warning(this, tr("Warning"), "Map is currently used");
 	}
@@ -46,45 +66,50 @@ void MapsDialog::cb_removeMap()
 
 void MapsDialog::cb_selectedMapChanged()
 {
+	clearInfo();
+
 	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
 	if(!currentItems.empty())
 	{
 		QListWidgetItem* current = currentItems[0];
 
-		dartAttributes->clear();
-		vertexAttributes->clear();
-		edgeAttributes->clear();
-		faceAttributes->clear();
-		volumeAttributes->clear();
-
 		const QString& name = current->text();
 		MapHandlerGen* mh = m_window->getMap(name);
-		CGoGN::GenericMap* m = mh->getGenericMap();
-		for(unsigned int orbit = CGoGN::DART; orbit <= CGoGN::VOLUME; ++orbit)
+		GenericMap* m = mh->getGenericMap();
+		for(unsigned int orbit = DART; orbit <= FACE; ++orbit)
 		{
+			unsigned int nbc = m->getNbCells(orbit);
+			switch(orbit)
+			{
+				case DART : {
+					unsigned int nb = m->getNbDarts();
+					lineEdit_dart_orbits->setText(QString::number(nb));
+					lineEdit_dart_cells->setText(QString::number(nbc));
+					break;
+				}
+				case VERTEX : {
+					unsigned int nb = m->getNbOrbits<VERTEX>();
+					lineEdit_vertex_orbits->setText(QString::number(nb));
+					lineEdit_vertex_cells->setText(QString::number(nbc));
+					break;
+				}
+				case EDGE : {
+					unsigned int nb = m->getNbOrbits<EDGE>();
+					lineEdit_edge_orbits->setText(QString::number(nb));
+					lineEdit_edge_cells->setText(QString::number(nbc));
+					break;
+				}
+				case FACE : {
+					unsigned int nb = m->getNbOrbits<FACE>();
+					lineEdit_face_orbits->setText(QString::number(nb));
+					lineEdit_face_cells->setText(QString::number(nbc));
+					break;
+				}
+			}
+
 			if(m->isOrbitEmbedded(orbit))
 			{
-//				unsigned int nb = 0;
-//				switch(orbit)
-//				{
-//					case CGoGN::DART :
-//						nb = m->getNbOrbits<CGoGN::DART>();
-//						break;
-//					case CGoGN::VERTEX :
-//						nb = m->getNbOrbits<CGoGN::VERTEX>();
-//						break;
-//					case CGoGN::EDGE :
-//						nb = m->getNbOrbits<CGoGN::EDGE>();
-//						break;
-//					case CGoGN::FACE :
-//						nb = m->getNbOrbits<CGoGN::FACE>();
-//						break;
-//					case CGoGN::VOLUME :
-//						nb = m->getNbOrbits<CGoGN::VOLUME>();
-//						break;
-//				}
-
-				CGoGN::AttributeContainer& cont = m->getAttributeContainer(orbit);
+				AttributeContainer& cont = m->getAttributeContainer(orbit);
 				std::vector<std::string> names;
 				std::vector<std::string> types;
 				cont.getAttributesNames(names);
@@ -95,11 +120,11 @@ void MapsDialog::cb_selectedMapChanged()
 					QString type = QString::fromStdString(types[i]);
 					switch(orbit)
 					{
-						case CGoGN::DART : dartAttributes->addItem(name + "(" + type + ")"); break;
-						case CGoGN::VERTEX : vertexAttributes->addItem(name + "(" + type + ")"); break;
-						case CGoGN::EDGE : edgeAttributes->addItem(name + "(" + type + ")"); break;
-						case CGoGN::FACE : faceAttributes->addItem(name + "(" + type + ")"); break;
-						case CGoGN::VOLUME : volumeAttributes->addItem(name + "(" + type + ")"); break;
+						case DART : dartAttributes->addItem(name + " (" + type + ")"); break;
+						case VERTEX : vertexAttributes->addItem(name + " (" + type + ")"); break;
+						case EDGE : edgeAttributes->addItem(name + " (" + type + ")"); break;
+						case FACE : faceAttributes->addItem(name + " (" + type + ")"); break;
+						case VOLUME : volumeAttributes->addItem(name + " (" + type + ")"); break;
 					}
 				}
 

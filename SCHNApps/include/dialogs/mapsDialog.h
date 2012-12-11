@@ -23,6 +23,8 @@ public:
 private:
 	Window* m_window;
 
+	void clearInfo();
+
 public slots:
 	void cb_removeMap();
 	void cb_selectedMapChanged();

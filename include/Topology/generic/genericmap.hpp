@@ -489,6 +489,11 @@ inline void GenericMap::disableQuickTraversal()
  *        ATTRIBUTES MANAGEMENT         *
  ****************************************/
 
+inline unsigned int GenericMap::getNbCells(unsigned int orbit)
+{
+	return m_attribs[orbit].size() ;
+}
+
 template <unsigned int ORBIT>
 inline AttributeContainer& GenericMap::getAttributeContainer()
 {

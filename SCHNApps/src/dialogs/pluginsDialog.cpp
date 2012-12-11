@@ -44,6 +44,8 @@ PluginsDialog::PluginsDialog(Window* window) :
 
 //	restoreState();
 
+	addPluginsDirectory(m_window->getAppPath() + QString("/../Plugins/"));
+
 	if (System::Error::code != System::Error::SUCCESS)
 		System::Error::showError(this);
 
@@ -156,6 +158,48 @@ PluginsDialog::~PluginsDialog()
 //	return true;
 //}
 
+void PluginsDialog::addPluginsDirectory(const QString& dir)
+{
+	QDir directory(dir);
+
+	if (!directory.exists())
+		System::Error::code = System::Error::BAD_PLUGIN_PATH_IN_FILE_f(directory.absolutePath());
+
+	QTreeWidgetItem *dirItem = new QTreeWidgetItem(treeWidget, DIR);
+	dirItem->setText(1, directory.path());
+
+	QStringList filters;
+	filters << "lib*.so";
+	filters << "lib*.dylib";
+
+	QStringList dirFiles;
+	dirFiles = directory.entryList(filters, QDir::Files);
+
+	const PluginHash& activePlugins = m_window->getPluginsHash();
+
+	foreach(QString pluginPath, dirFiles)
+	{
+		QFileInfo pfi(pluginPath);
+		QString pluginName = pfi.baseName().remove(0, 3);
+		PluginInfo pinfo(directory.absoluteFilePath(pluginPath), pluginName);
+
+		QTreeWidgetItem *item = new QTreeWidgetItem(dirItem, FILE_DIR);
+		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+
+		if (activePlugins.contains(pluginName))
+			item->setCheckState(0, Qt::Checked);
+		else
+			item->setCheckState(0, Qt::Unchecked);
+
+		item->setText(1, pluginName);
+
+		m_listedPlugins[item] = pinfo;
+	}
+
+	if (dirFiles.isEmpty())
+		System::Error::code = System::Error::NO_PLUGIN_IN_DIR_f(directory.absolutePath());
+}
+
 void PluginsDialog::cb_addPlugins()
 {
 	init = true;
@@ -163,7 +207,7 @@ void PluginsDialog::cb_addPlugins()
 	QStringList files = QFileDialog::getOpenFileNames(
 		this,
 		"Select one or more plugins",
-		m_window->getAppPath() + QString("/../Plugins/"),
+		m_window->getAppPath(),
 		"Plugins (lib*.so lib*.dylib)"
 	);
 
@@ -202,46 +246,7 @@ void PluginsDialog::cb_addPluginsDirectory()
 	);
 
 	if (!dir.isEmpty())
-	{
-		QDir directory(dir);
-
-		if (!directory.exists())
-			System::Error::code = System::Error::BAD_PLUGIN_PATH_IN_FILE_f(directory.absolutePath());
-
-		QTreeWidgetItem *dirItem = new QTreeWidgetItem(treeWidget, DIR);
-		dirItem->setText(1, directory.path());
-
-		QStringList filters;
-		filters << "lib*.so";
-		filters << "lib*.dylib";
-
-		QStringList dirFiles;
-		dirFiles = directory.entryList(filters, QDir::Files);
-
-		const PluginHash& activePlugins = m_window->getPluginsHash();
-
-		foreach(QString pluginPath, dirFiles)
-		{
-			QFileInfo pfi(pluginPath);
-			QString pluginName = pfi.baseName().remove(0, 3);
-			PluginInfo pinfo(directory.absoluteFilePath(pluginPath), pluginName);
-
-			QTreeWidgetItem *item = new QTreeWidgetItem(dirItem, FILE_DIR);
-			item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-
-			if (activePlugins.contains(pluginName))
-				item->setCheckState(0, Qt::Checked);
-			else
-				item->setCheckState(0, Qt::Unchecked);
-
-			item->setText(1, pluginName);
-
-			m_listedPlugins[item] = pinfo;
-		}
-
-		if (dirFiles.isEmpty())
-			System::Error::code = System::Error::NO_PLUGIN_IN_DIR_f(directory.absolutePath());
-	}
+		addPluginsDirectory(dir);
 
 	if (System::Error::code != System::Error::SUCCESS)
 		System::Error::showError(this);

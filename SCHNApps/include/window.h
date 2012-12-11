@@ -31,7 +31,7 @@ public:
 	 *
 	 * \param parent the parent of the window
 	 */
-	Window(QWidget* parent = NULL);
+	Window(const QString& appPath, QWidget* parent = NULL);
 
 	/**
 	 * \fn ~Window()
@@ -40,7 +40,6 @@ public:
 	~Window();
 
 	const QString& getAppPath() { return m_appPath; }
-	void setAppPath(const QString& path) { m_appPath = path; }
 
 	/*********************************************************
 	 * MANAGE DOCK

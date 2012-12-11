@@ -24,8 +24,9 @@ namespace CGoGN
 namespace SCHNApps
 {
 
-Window::Window(QWidget *parent) :
+Window::Window(const QString& appPath, QWidget *parent) :
 	QMainWindow(parent),
+	m_appPath(appPath),
 	m_firstView(NULL),
 	m_currentView(NULL)
 {

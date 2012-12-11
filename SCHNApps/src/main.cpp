@@ -9,8 +9,7 @@ int main(int argc, char* argv[])
 	splash->show();
 	splash->showMessage("Welcome to SCHNApps", Qt::AlignBottom | Qt::AlignCenter);
 
-	CGoGN::SCHNApps::Window window;
-	window.setAppPath(app.applicationDirPath());
+	CGoGN::SCHNApps::Window window(app.applicationDirPath());
 	window.show();
 
 	splash->finish(&window);
