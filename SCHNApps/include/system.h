@@ -4,10 +4,6 @@
 #include <QWidget>
 #include <QSplashScreen>
 
-#include <unistd.h>
-#include <stdarg.h>
-#include <iostream>
-
 #include "types.h"
 
 //#include "ui_questionSessionDialog.h"

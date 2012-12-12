@@ -26,6 +26,11 @@ bool RenderPlugin::enable()
 
 	m_pointSprite = new CGoGN::Utils::PointSprite();
 
+	registerShader(m_flatShader);
+	registerShader(m_phongShader);
+	registerShader(m_simpleColorShader);
+	registerShader(m_pointSprite);
+
 	connect(m_dockTab->check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(cb_renderVerticesChanged(bool)));
 	connect(m_dockTab->slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_verticesScaleFactorChanged(int)));
 	connect(m_dockTab->check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(cb_renderEdgesChanged(bool)));
@@ -91,24 +96,12 @@ void RenderPlugin::redraw(View* view)
 
 void RenderPlugin::viewLinked(View* view)
 {
-	assert(!h_viewParams.contains(view));
 	h_viewParams.insert(view, new TabParams(1.0, false, false, true, FLAT));
-
-	CGoGN::Utils::GLSLShader::registerShader(view, m_flatShader);
-	CGoGN::Utils::GLSLShader::registerShader(view, m_phongShader);
-	CGoGN::Utils::GLSLShader::registerShader(view, m_simpleColorShader);
-	CGoGN::Utils::GLSLShader::registerShader(view, m_pointSprite);
 }
 
 void RenderPlugin::viewUnlinked(View* view)
 {
-	assert(h_viewParams.contains(view));
 	h_viewParams.remove(view);
-
-	CGoGN::Utils::GLSLShader::unregisterShader(view, m_flatShader);
-	CGoGN::Utils::GLSLShader::registerShader(view, m_phongShader);
-	CGoGN::Utils::GLSLShader::unregisterShader(view, m_simpleColorShader);
-	CGoGN::Utils::GLSLShader::unregisterShader(view, m_pointSprite);
 }
 
 void RenderPlugin::currentViewChanged(View* view)

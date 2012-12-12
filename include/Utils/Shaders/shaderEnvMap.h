@@ -119,7 +119,6 @@ public:
 
 	unsigned int setAttributeNormal(VBO* vbo);
 
-
 	// optional attributes
 	unsigned int setAttributeColor(VBO* vbo);
 	void unsetAttributeColor();

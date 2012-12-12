@@ -3,6 +3,7 @@
 #include "plugin.h"
 #include "camera.h"
 #include "viewButtonArea.h"
+#include "mapHandler.h"
 
 #include "dialogs/cameraViewDialog.h"
 #include "dialogs/pluginsViewDialog.h"

@@ -3,6 +3,7 @@
 #include "window.h"
 #include "view.h"
 #include "plugin.h"
+#include "mapHandler.h"
 
 #include <QMessageBox>
 #include <QMouseEvent>

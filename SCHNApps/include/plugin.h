@@ -2,22 +2,17 @@
 #define _PLUGIN_H_
 
 #include <QtPlugin>
+#include <QAction>
 
-#include <iostream>
-#include <list>
-
-#include "window.h"
-#include "system.h"
-#include "view.h"
-#include "camera.h"
-#include "mapHandler.h"
-#include "vboHandler.h"
+#include "types.h"
 
 namespace CGoGN
 {
 
 namespace SCHNApps
 {
+
+class Window;
 
 class Plugin : public QObject
 {
@@ -65,6 +60,13 @@ public:
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
 	/*********************************************************
+	 * MANAGE SHADERS
+	 *********************************************************/
+
+	void registerShader(Utils::GLSLShader* shader);
+	void unregisterShader(Utils::GLSLShader* shader);
+
+	/*********************************************************
 	 * MANAGE DOCK TABS
 	 *********************************************************/
 
@@ -97,6 +99,8 @@ protected:
 	QList<QWidget*> l_tabWidgets;
 	QList<QAction*> l_menuActions;
 	QList<QAction*> l_toolbarActions;
+
+	QList<Utils::GLSLShader*> l_shaders;
 
 //	QList<Plugin*> l_dependencies;
 //	QList<Plugin*> l_dependantPlugins;

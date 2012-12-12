@@ -10,6 +10,7 @@
 #include "Topology/generic/functor.h"
 #include "Utils/vbo.h"
 #include "Algo/Render/GL2/mapRender.h"
+#include "Algo/Geometry/boundingbox.h"
 
 namespace CGoGN
 {
@@ -32,16 +33,12 @@ public:
 	GenericMap* getGenericMap() { return m_map; }
 
 	const qglviewer::Vec& getBBmin() const { return m_bbMin; }
-	void setBBmin(qglviewer::Vec& v) { m_bbMin = v; }
-
 	const qglviewer::Vec& getBBmax() const { return m_bbMax; }
-	void setBBmax(qglviewer::Vec& v) { m_bbMax = v; }
-
-	float getBBdiagSize() { return (m_bbMax - m_bbMin).norm(); }
+	float getBBdiagSize() { return m_bbDiagSize; }
 
 	bool isUsed() const { return !l_views.empty(); }
 
-	void draw(Utils::GLSLShader* shader, int primitive);
+	void draw(Utils::GLSLShader* shader, int primitive) { m_render->draw(shader, primitive); }
 
 	/*********************************************************
 	 * MANAGE VBOs
@@ -68,6 +65,7 @@ protected:
 
 	qglviewer::Vec m_bbMin;
 	qglviewer::Vec m_bbMax;
+	float m_bbDiagSize;
 
 	QList<View*> l_views;
 
@@ -89,6 +87,14 @@ public:
 	}
 
 	typename PFP::MAP* getMap() { return reinterpret_cast<typename PFP::MAP*>(m_map); }
+
+	void updateBB(const VertexAttribute<typename PFP::VEC3>& position)
+	{
+		CGoGN::Geom::BoundingBox<typename PFP::VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), position);
+		m_bbMin = qglviewer::Vec(bb.min()[0], bb.min()[1], bb.min()[2]);
+		m_bbMax = qglviewer::Vec(bb.max()[0], bb.max()[1], bb.max()[2]);
+		m_bbDiagSize = (m_bbMax - m_bbMin).norm();
+	}
 
 	void updatePrimitives(int primitive, const FunctorSelect& good)
 	{

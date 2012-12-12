@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "view.h"
 #include "texture.h"
+#include "camera.h"
+#include "mapHandler.h"
 
 #include "dialogs/camerasDialog.h"
 #include "dialogs/pluginsDialog.h"

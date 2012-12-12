@@ -72,7 +72,6 @@ public:
 	 */
 	void activeTexture();
 
-
 	unsigned int setAttributePosition(VBO* vbo);
 
 	unsigned int setAttributeTexCoord(VBO* vbo);

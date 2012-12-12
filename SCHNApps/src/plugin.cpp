@@ -1,5 +1,10 @@
 #include "plugin.h"
 
+#include <GL/glew.h>
+
+#include "window.h"
+#include "Utils/GLSLShader.h"
+
 namespace CGoGN
 {
 
@@ -32,7 +37,7 @@ Plugin::~Plugin()
 }
 
 /*********************************************************
- * MANAGE VIEWS
+ * MANAGE LINKED VIEWS
  *********************************************************/
 
 bool Plugin::linkView(View* view)
@@ -40,6 +45,8 @@ bool Plugin::linkView(View* view)
 	if(view && !l_views.contains(view))
 	{
 		l_views.push_back(view);
+		foreach(Utils::GLSLShader* shader, l_shaders)
+			Utils::GLSLShader::registerShader(view, shader);
 		viewLinked(view);
 		return true;
 	}
@@ -50,7 +57,26 @@ bool Plugin::linkView(View* view)
 void Plugin::unlinkView(View* view)
 {
 	if(l_views.removeOne(view))
+	{
+		foreach(Utils::GLSLShader* shader, l_shaders)
+			Utils::GLSLShader::unregisterShader(view, shader);
 		viewUnlinked(view);
+	}
+}
+
+/*********************************************************
+ * MANAGE SHADERS
+ *********************************************************/
+
+void Plugin::registerShader(Utils::GLSLShader* shader)
+{
+	if(shader && !l_shaders.contains(shader))
+		l_shaders.push_back(shader);
+}
+
+void Plugin::unregisterShader(Utils::GLSLShader* shader)
+{
+	l_shaders.removeOne(shader);
 }
 
 /*********************************************************

@@ -51,11 +51,7 @@ void ImportPlugin::cb_import()
 		normalVBO->updateData(normal);
 
 		// compute map bounding box
-		CGoGN::Geom::BoundingBox<VEC3> bb = CGoGN::Algo::Geometry::computeBoundingBox<PFP>(*m, position);
-		qglviewer::Vec min(bb.min()[0], bb.min()[1], bb.min()[2]);
-		qglviewer::Vec max(bb.max()[0], bb.max()[1], bb.max()[2]);
-		h->setBBmin(min);
-		h->setBBmax(max);
+		h->updateBB(position);
 
 		// compute primitive connectivity VBOs
 		h->updatePrimitives(CGoGN::Algo::Render::GL2::POINTS, CGoGN::allDarts);

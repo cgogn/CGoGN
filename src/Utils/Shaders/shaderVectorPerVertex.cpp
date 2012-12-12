@@ -29,6 +29,7 @@ namespace CGoGN
 
 namespace Utils
 {
+
 #include "shaderVectorPerVertex.vert"
 #include "shaderVectorPerVertex.geom"
 #include "shaderVectorPerVertex.frag"
@@ -38,7 +39,6 @@ ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	m_scale(1.0f),
 	m_color(Geom::Vec4f(1.0f, 0.0f, 0.0f, 0.0f))
 {
-
 	m_nameVS = "ShaderVectorPerVertex_vs";
 	m_nameFS = "ShaderVectorPerVertex_fs";
 	m_nameGS = "ShaderVectorPerVertex_gs";
@@ -55,21 +55,24 @@ ShaderVectorPerVertex::ShaderVectorPerVertex() :
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_POINTS, GL_LINE_STRIP,2);
 
 	// get and fill uniforms
-	bind();
 	getLocations();
 	sendParams();
 }
 
 void ShaderVectorPerVertex::getLocations()
 {
+	bind();
 	*m_uniform_scale = glGetUniformLocation(this->program_handler(), "vectorScale");
 	*m_uniform_color = glGetUniformLocation(this->program_handler(), "vectorColor");
+	unbind();
 }
 
 void ShaderVectorPerVertex::sendParams()
 {
+	bind();
 	glUniform1f(*m_uniform_scale, m_scale);
 	glUniform4fv(*m_uniform_color, 1, m_color.data());
+	unbind();
 }
 
 void ShaderVectorPerVertex::setScale(float scale)
@@ -77,6 +80,7 @@ void ShaderVectorPerVertex::setScale(float scale)
 	bind();
 	glUniform1f(*m_uniform_scale, scale);
 	m_scale = scale;
+	unbind();
 }
 
 void ShaderVectorPerVertex::setColor(const Geom::Vec4f& color)
@@ -84,24 +88,32 @@ void ShaderVectorPerVertex::setColor(const Geom::Vec4f& color)
 	bind();
 	glUniform4fv(*m_uniform_color, 1, color.data());
 	m_color = color;
+	unbind();
 }
 
 unsigned int ShaderVectorPerVertex::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 unsigned int ShaderVectorPerVertex::setAttributeVector(VBO* vbo)
 {
 	m_vboVec = vbo;
-	return bindVA_VBO("VertexVector", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexVector", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderVectorPerVertex::restoreUniformsAttribs()
 {
 	getLocations();
 	sendParams();
+
 	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexVector", m_vboVec);

@@ -453,7 +453,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	int		status;
 	char	*info_log;
 
-	if (nb_max_vertices!=-1)
+	if (nb_max_vertices != -1)
 		m_nbMaxVertices = nb_max_vertices;
 
 	m_geom_inputPrimitives = inputGeometryPrimitive;
@@ -482,9 +482,9 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	{
 		glAttachObjectARB( *m_program_object, *m_geom_shader_object );
 
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_INPUT_TYPE_EXT,inputGeometryPrimitive);
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_OUTPUT_TYPE_EXT,outputGeometryPrimitive);
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,m_nbMaxVertices);
+		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_INPUT_TYPE_EXT, inputGeometryPrimitive);
+		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_OUTPUT_TYPE_EXT, outputGeometryPrimitive);
+		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_VERTICES_OUT_EXT, m_nbMaxVertices);
 	}
 
 	/*** link program object ***/
@@ -753,9 +753,11 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 	m_fragment_shader_source = new char[sz+1];
 	strcpy(m_fragment_shader_source, fs);
 
-	if(!loadVertexShaderSourceString(vs)) return false;
+	if(!loadVertexShaderSourceString(vs))
+		return false;
 
-	if(!loadFragmentShaderSourceString(fs)) return false;
+	if(!loadFragmentShaderSourceString(fs))
+		return false;
 
 	if(!create())
 	{
@@ -773,7 +775,6 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
-
 	strcpy(m_vertex_shader_source,vs);
 
 	if (m_fragment_shader_source)
@@ -799,7 +800,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 	if(!loadGeometryShaderSourceString(gs))
 		return false;
 
-	if(!create(inputGeometryPrimitive,outputGeometryPrimitive,nb_max_vertices))
+	if(!create(inputGeometryPrimitive, outputGeometryPrimitive, nb_max_vertices))
 	{
 		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;

@@ -86,9 +86,9 @@ public:
 
 	void setParams(float explodeV, float explodeF, const Geom::Vec4f& ambiant, const Geom::Vec4f& diffuse, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane);
 
-	void setAttributePosition(VBO* vbo);
+	unsigned int setAttributePosition(VBO* vbo);
 
-	void setAttributeColor(VBO* vbo);
+	unsigned int setAttributeColor(VBO* vbo);
 };
 
 } // namespace Utils

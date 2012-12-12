@@ -22,10 +22,9 @@ MapHandlerGen::~MapHandlerGen()
 		delete vbo;
 }
 
-void MapHandlerGen::draw(Utils::GLSLShader* shader, int primitive)
-{
-	m_render->draw(shader, primitive);
-}
+/*********************************************************
+ * MANAGE VBOs
+ *********************************************************/
 
 Utils::VBO* MapHandlerGen::getVBO(const std::string& name)
 {
