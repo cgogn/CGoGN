@@ -355,7 +355,6 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		}
 	}
 
-
 	Geom::BoundingBox<typename PFP::VEC3> bb ;
 	bb = Algo::Geometry::computeBoundingBox<PFP>(map, position) ;
 	float tailleX = bb.size(0) ;
@@ -419,11 +418,13 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 			bool canSimplify = true ;
 			while ( canSimplify && ((position[map.phi1(d)] - position[d]).norm() < edgeWidth[d]) )
 			{
-				if (map.vertexDegree(map.phi1(d)) == 2) {
+				if (map.vertexDegree(map.phi1(d)) == 2)
+				{
 					map.uncutEdge(d) ;
 					count++;
 				}
-				else canSimplify = false ;
+				else
+					canSimplify = false ;
 			}
 		}
 	}
@@ -489,8 +490,18 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		}
 	}
 
-	//close the intersections
-	map.closeMap(false) ;
+	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+	{
+		if(map.isBoundaryMarked(d))
+		{
+			map.fillHole(d);
+		}
+
+		if(map.faceDegree(d)==2)
+		{
+			map.mergeFaces(d);
+		}
+	}
 
 	//embed the path
 	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
@@ -511,6 +522,23 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 			position[map.phi1(d)] = pos ;
 		}
 	}
+
+	if(allBrokenLines.size()>0)
+		map.template initAllOrbitsEmbedding<FACE>(true);
+
+	if(allBrokenLines.size()>0)
+	{
+		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+		{
+			if (!map.isBoundaryMarked(d) && brokenL.isMarked(d))
+			{
+				map.deleteFace(d,false);
+			}
+		}
+	}
+
+	map.closeMap();
+
 	return true ;
 }
 
