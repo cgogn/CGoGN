@@ -27,6 +27,7 @@
 
 #include <math.h>
 #include <vector>
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
@@ -111,6 +112,12 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 template <typename PFP>
 void reverseOrientation(typename PFP::MAP& map) ;
 
+/**
+ * Doo-Sabin subdivision scheme
+ */
+template <typename PFP>
+void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position);
+
 ///**
 // * Dual mesh computation
 // */
@@ -122,6 +129,8 @@ void reverseOrientation(typename PFP::MAP& map) ;
 // */
 //template <typename PFP>
 //void Sqrt3Subdivision(typename PFP::MAP& map, typename PFP::TVEC3& position, const FunctorSelect& selected = allDarts) ;
+
+
 
 
 } // namespace Modelisation

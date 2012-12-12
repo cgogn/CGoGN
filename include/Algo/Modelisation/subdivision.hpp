@@ -533,6 +533,112 @@ void reverseOrientation(typename PFP::MAP& map)
 	map.template swapAttributes<Dart>(phi1, phi_1) ;
 }
 
+
+template <typename PFP>
+void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& position)
+{
+	DartMarker dm(map);
+	// storage of boundary of hole (missing vertex faces)
+	std::vector<Dart> fp;
+	fp.reserve(16384);
+
+	// storage of initial faces for position updating
+	std::vector<Dart> faces;
+	faces.reserve(16384);
+
+
+	// create the edge faces
+	for(Dart d=map.begin(); d != map.end(); map.next(d))
+	{
+		if (!dm.isMarked(d))
+		{
+			faces.push_back(d);
+			Dart e = d;
+			do
+			{
+				Dart e2 = map.phi2(e);
+				if (!dm.isMarked(e2))
+				{
+					map.unsewFaces(e,false);
+					Dart nf = map.newFace(4,false);
+					map.sewFaces(e,nf,false);
+					map.sewFaces(e2,map.template phi<11>(nf),false);
+					// take care of edge embedding
+					if(map.template isOrbitEmbedded<EDGE>())
+					{
+						map.template setOrbitEmbedding<EDGE>(nf, map.template getEmbedding<EDGE>(e));
+						map.template setOrbitEmbedding<EDGE>(map.template phi<11>(nf), map.template getEmbedding<EDGE>(e2));
+					}
+
+					dm.markOrbit<FACE>(nf);
+					fp.push_back(map.phi1(nf));
+					fp.push_back(map.phi_1(nf));
+				}
+				dm.markOrbit<EDGE1>(e);
+				e = map.phi1(e);
+			}while (e!=d);
+		}
+	}
+	// fill (create) the new  vertex faces
+	for (std::vector<Dart>::iterator di=fp.begin(); di != fp.end(); ++di)
+	{
+		if (map.phi2(*di) == *di)
+		{
+			map.PFP::MAP::TOPO_MAP::closeHole(*di,false);
+
+			if(map.template isOrbitEmbedded<EDGE>())
+			{
+				Dart df = map.phi2(*di);
+				Dart d = df;
+				do
+				{
+					map.template setOrbitEmbedding<EDGE>(d,map.template getEmbedding<EDGE>(map.phi2(d)));
+					d = map.phi1(d);
+				} while (d != df);
+			}
+		}
+	}
+
+	std::vector<typename PFP::VEC3> buffer;
+	buffer.reserve(8);
+	for (std::vector<Dart>::iterator di=faces.begin(); di != faces.end(); ++di)
+	{
+		Dart e = *di;
+		typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,e,position);
+
+		do
+		{
+			// compute DoSabin
+			buffer.push_back(position[e]);
+			e = map.phi1(e);
+		}while (e != * di);
+
+		int N = buffer.size();
+		for (int i=0; i<N; ++i)
+		{
+			typename PFP::VEC3 P(0,0,0);
+			for (int j=0; j<N; ++j)
+			{
+				if (j==i)
+				{
+					float c1 = float(N+5)/float(4*N);
+					P += buffer[j]*c1;
+				}
+				else
+				{
+					float c2 = (3.0+2.0*cos(2.0*M_PI*(double(i-j))/double(N))) /(4.0*N);
+					P+= c2*buffer[j];
+				}
+			}
+			map.template setOrbitEmbeddingOnNewCell<VERTEX>(e);
+			position[e] = P;
+			e = map.phi1(e);
+		}
+		buffer.clear();
+	}
+}
+
+
 //template <typename PFP>
 //void computeDual(typename PFP::MAP& map, const FunctorSelect& selected)
 //{
