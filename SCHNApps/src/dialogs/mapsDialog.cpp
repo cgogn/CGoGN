@@ -76,7 +76,7 @@ void MapsDialog::cb_selectedMapChanged()
 		const QString& name = current->text();
 		MapHandlerGen* mh = m_window->getMap(name);
 		GenericMap* m = mh->getGenericMap();
-		for(unsigned int orbit = DART; orbit <= FACE; ++orbit)
+		for(unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
 		{
 			unsigned int nbc = m->getNbCells(orbit);
 			switch(orbit)
@@ -103,6 +103,12 @@ void MapsDialog::cb_selectedMapChanged()
 					unsigned int nb = m->getNbOrbits<FACE>();
 					lineEdit_face_orbits->setText(QString::number(nb));
 					lineEdit_face_cells->setText(QString::number(nbc));
+					break;
+				}
+				case VOLUME : {
+					unsigned int nb = m->getNbOrbits<VOLUME>();
+					lineEdit_volume_orbits->setText(QString::number(nb));
+					lineEdit_volume_cells->setText(QString::number(nbc));
 					break;
 				}
 			}

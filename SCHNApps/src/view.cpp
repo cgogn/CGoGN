@@ -101,6 +101,8 @@ void View::init()
 
 void View::preDraw()
 {
+	m_currentCamera->setScreenWidthAndHeight(width(), height());
+
 	glm::mat4 mm = getCurrentModelViewMatrix();
 	glm::mat4 pm = getCurrentProjectionMatrix();
 	for(std::set< std::pair<void*, CGoGN::Utils::GLSLShader*> >::iterator it = CGoGN::Utils::GLSLShader::m_registeredShaders.begin();
