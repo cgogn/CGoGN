@@ -208,6 +208,7 @@ class CollectorCriterion
 {
 public :
 	CollectorCriterion() {};
+	virtual ~CollectorCriterion() {} ;
 	virtual void init(Dart center) = 0;
 	virtual bool isInside(Dart d) = 0;
 
