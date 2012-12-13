@@ -258,18 +258,24 @@ void Map2MR<PFP>::synthesis()
 {
 	assert(m_map.getCurrentLevel() < m_map.getMaxLevel() || !"synthesis : called on max level") ;
 
-	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
-		(*synthesisFilters[i])() ;
-
 //	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
-//	{
-//		if((filter == F_LowPass && m_map.getCurrentLevel() <= thresholdHigh) ||
-//		(filter == F_HighPass && m_map.getCurrentLevel() >= thresholdLow) ||
-//		(filter == F_BandPass && (thresholdLow >= m_map.getCurrentLevel() &&  m_map.getCurrentLevel() <= thresholdHigh)))
-//			(*synthesisFilters[i])(true) ;
-//		else
-//			(*synthesisFilters[i])(false) ;
-//	}
+//		(*synthesisFilters[i])() ;
+
+	for(unsigned int i = 0; i < synthesisFilters.size(); ++i)
+	{
+		if((filter == F_LowPass && m_map.getCurrentLevel() <= thresholdHigh) ||
+		(filter == F_HighPass && m_map.getCurrentLevel() >= thresholdLow) ||
+		(filter == F_BandPass && (thresholdLow >= m_map.getCurrentLevel() &&  m_map.getCurrentLevel() <= thresholdHigh)))
+		{
+			std::cout << "without details" << std::endl;
+			(*synthesisFilters[i])(true) ;
+		}
+		else
+		{
+			std::cout << "with details" << std::endl;
+			(*synthesisFilters[i])(false) ;
+		}
+	}
 
 	m_map.incCurrentLevel() ;
 }

@@ -80,6 +80,11 @@ public:
 
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 

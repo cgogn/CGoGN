@@ -37,14 +37,14 @@ template <typename PFP>
 Dart Primitive3D<PFP>::HexaGrid1Topo(unsigned int nx)
 {
 	// first cube
-	Dart d0 = createHexahedron<PFP>(m_map);
+	Dart d0 = createHexahedron<PFP>(m_map,false);
 	m_tableVertDarts.push_back(d0);
 
 	Dart d1 = m_map.template phi<2112>(d0);
 
 	for (unsigned int i = 1; i < nx; ++i)
 	{
-		Dart d2 = createHexahedron<PFP>(m_map);
+		Dart d2 = createHexahedron<PFP>(m_map,false);
 		m_tableVertDarts.push_back(d2);
 		m_map.sewVolumes(d1, d2, false);
 		d1 = m_map.template phi<2112>(d2);
@@ -178,6 +178,37 @@ void Primitive3D<PFP>::embedHexaGrid(float x, float y, float z)
 
 				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d);
 				m_positions[d] = pos;
+			}
+		}
+	}
+}
+
+template <typename PFP>
+void Primitive3D<PFP>::embedHexaGrid(typename PFP::VEC3 origin, float x, float y, float z)
+{
+	if (m_kind != HEXAGRID)
+	{
+		CGoGNerr << "Warning try to embedHexaGrid something that is not a grid of hexahedron"<<CGoGNendl;
+		return;
+	}
+
+	float dx = x/float(m_nx);
+	float dy = y/float(m_ny);
+	float dz = z/float(m_nz);
+
+	unsigned int nbs = (m_nx+1)*(m_ny+1);
+
+	for(unsigned int i = 0; i <= m_nz; ++i)
+	{
+		for(unsigned int j = 0; j <= m_ny; ++j)
+		{
+			for(unsigned int k = 0; k <= m_nx; ++k)
+			{
+				typename PFP::VEC3 pos(-x/2.0f + dx*float(k), -y/2.0f + dy*float(j), -z/2.0f + dz*float(i));
+				Dart d = m_tableVertDarts[ i*nbs+j*(m_nx+1)+k ];
+
+				m_map.template setOrbitEmbeddingOnNewCell<VERTEX>(d);
+				m_positions[d] = origin + pos;
 			}
 		}
 	}

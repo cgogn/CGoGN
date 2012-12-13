@@ -133,7 +133,16 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midF = m_map.phi1(m_map.phi1(d));
-			m_position[midF] += vf + ef ;
+			if(filtering)
+			{
+				std::cout << "sans +=" << std::endl;
+				m_position[midF] = vf + ef ;
+			}
+			else
+			{
+				std::cout << "avec +=" << std::endl;
+				m_position[midF] += vf + ef ;
+			}
 			m_map.decCurrentLevel() ;
 
 		}
@@ -146,7 +155,16 @@ public:
 
 			m_map.incCurrentLevel() ;
 			Dart midV = m_map.phi1(d) ;
-			m_position[midV] += ve;
+			if(filtering)
+			{
+				std::cout << "sans +=" << std::endl;
+				m_position[midV] = ve;
+			}
+			else
+			{
+				std::cout << "avec +=" << std::endl;
+				m_position[midV] += ve;
+			}
 			m_map.decCurrentLevel() ;
 		}
 	}
@@ -251,9 +269,15 @@ public:
 				ev *= 2 * m_a;
 
 				if(filtering)
+				{
+					std::cout << "sans +=" << std::endl;
 					m_position[db] = ev;
+				}
 				else
+				{
+					std::cout << "avec +=" << std::endl;
 					m_position[db] += ev;
+				}
 			}
 			else
 			{
@@ -276,9 +300,15 @@ public:
 				ev /= count;
 				ev *= 4 * m_a;
 				if(filtering)
-					m_position[d] = fv;// + ev;
+				{
+					std::cout << "sans +=" << std::endl;
+					m_position[d] = fv + ev;
+				}
 				else
+				{
+					std::cout << "avec +=" << std::endl;
 					m_position[d] += fv + ev;
+				}
 			}
 		}
 
@@ -306,9 +336,15 @@ public:
 				m_map.incCurrentLevel() ;
 				Dart midF = m_map.phi1(d);
 				if(filtering)
-					m_position[midF] += fe;
+				{
+					std::cout << "sans +=" << std::endl;
+					m_position[midF] = fe;
+				}
 				else
+				{
+					std::cout << "avec +=" << std::endl;
 					m_position[midF] += fe;
+				}
 				m_map.decCurrentLevel() ;
 			}
 		}

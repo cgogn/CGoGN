@@ -67,8 +67,8 @@ public:
 
 	void operator() ()
 	{
-		TraversorE<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		TraversorE<typename PFP::MAP> travE(m_map) ;
+		for (Dart d = travE.begin(); d != travE.end(); d = travE.next())
 		{
 			typename PFP::VEC3 p = (m_position[d] + m_position[m_map.phi2(d)]) * typename PFP::REAL(0.5);
 
@@ -80,8 +80,8 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 
-		TraversorF<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		TraversorF<typename PFP::MAP> travF(m_map) ;
+		for (Dart d = travF.begin(); d != travF.end(); d = travF.next())
 		{
 			typename PFP::VEC3 p = Algo::Geometry::faceCentroid<PFP>(m_map, d, m_position);
 
@@ -94,8 +94,8 @@ public:
 
 		}
 
-		TraversorW<typename PFP::MAP> trav(m_map) ;
-		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
+		TraversorW<typename PFP::MAP> travW(m_map) ;
+		for (Dart d = travW.begin(); d != travW.end(); d = travW.next())
 		{
 			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d) && !Algo::Modelisation::isPrism<PFP>(m_map,d) && !Algo::Modelisation::isPyra<PFP>(m_map,d))
 			{

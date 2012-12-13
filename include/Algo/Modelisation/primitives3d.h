@@ -156,6 +156,8 @@ public:
 	*/
 	void embedHexaGrid(float x, float y, float z);
 
+	void embedHexaGrid(typename PFP::VEC3 origin, float x, float y, float z);
+
 	/**
 	* Create a 3D grid 
 	* @param nx nb of cubes in x

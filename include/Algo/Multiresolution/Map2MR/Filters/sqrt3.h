@@ -141,6 +141,11 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -225,6 +230,11 @@ public:
 			}
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -275,6 +285,11 @@ public:
 
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -311,6 +326,11 @@ public:
 			m_map.decCurrentLevel() ;
 
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 

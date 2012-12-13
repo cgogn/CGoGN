@@ -90,6 +90,11 @@ public:
 			first = false;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -118,6 +123,11 @@ public:
 			first = false;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -143,6 +153,11 @@ public:
 			m_position[midV] += ei ;
 			m_map.decCurrentLevel() ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 
@@ -190,6 +205,11 @@ public:
 			m_position[m_map.phi2(m_map.phi1(d))] += v + e ;
 			m_map.decCurrentLevel() ;
 		}
+
+	}
+
+	void operator() (bool filtering)
+	{
 
 	}
 } ;
@@ -244,6 +264,11 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -277,6 +302,11 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -309,6 +339,11 @@ public:
 			m_position[m_map.phi1(d)] = ei;
 			m_map.decCurrentLevel() ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 
@@ -364,6 +399,11 @@ public:
 
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -411,6 +451,10 @@ public:
 			m_position[m_map.phi2(m_map.phi1(d))] = m_position[m_map.phi2(m_map.phi1(d))] - v - e ;
 			m_map.decCurrentLevel() ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
 
 	}
 } ;
@@ -438,6 +482,11 @@ public:
 			m_position[midV] -= ei ;
 			m_map.decCurrentLevel() ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 

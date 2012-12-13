@@ -121,6 +121,11 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -142,6 +147,11 @@ public:
 			typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, d) ;
 			m_position[d] -= p ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 
@@ -167,6 +177,11 @@ public:
 
 			m_position[d] /= n ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 
@@ -200,6 +215,11 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
+
+	void operator() (bool filtering)
+	{
+
+	}
 } ;
 
 template <typename PFP>
@@ -221,6 +241,11 @@ public:
 			typename PFP::VEC3 p = loopEvenVertex<PFP>(m_map, m_position, d) ;
 			m_position[d] += p ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 
@@ -246,6 +271,11 @@ public:
 
 			m_position[d] *= n ;
 		}
+	}
+
+	void operator() (bool filtering)
+	{
+
 	}
 } ;
 
