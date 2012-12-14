@@ -60,6 +60,8 @@ protected:
 
 	Dart centerDart;
 
+	bool isInsideCollected;
+
 	std::vector<Dart> insideVertices;
 	std::vector<Dart> insideEdges;
 	std::vector<Dart> insideFaces;
@@ -71,6 +73,7 @@ public:
 	inline void init(Dart d)
 	{
 		centerDart = d;
+		isInsideCollected = false;
 		insideVertices.clear();
 		insideEdges.clear();
 		insideFaces.clear();
@@ -97,14 +100,14 @@ public:
 
 	inline Dart getCenterDart() const { return centerDart; }
 
-	inline const std::vector<Dart>& getInsideVertices() const { return insideVertices; }
-	inline const std::vector<Dart>& getInsideEdges() const { return insideEdges; }
-	inline const std::vector<Dart>& getInsideFaces() const { return insideFaces; }
+	inline const std::vector<Dart>& getInsideVertices() const { assert(isInsideCollected || !"getInsideVertices: inside cells have not been collected.") ; return insideVertices; }
+	inline const std::vector<Dart>& getInsideEdges() const { assert(isInsideCollected || !"getInsideEdges: inside cells have not been collected.") ; return insideEdges; }
+	inline const std::vector<Dart>& getInsideFaces() const { assert(isInsideCollected || !"getInsideFaces: inside cells have not been collected.") ; return insideFaces; }
 	inline const std::vector<Dart>& getBorder() const { return border; }
 
-	inline unsigned int getNbInsideVertices() const { return insideVertices.size(); }
-	inline unsigned int getNbInsideEdges() const { return insideEdges.size(); }
-	inline unsigned int getNbInsideFaces() const { return insideFaces.size(); }
+	inline unsigned int getNbInsideVertices() const { assert(isInsideCollected || !"getNbInsideVertices: inside cells have not been collected.") ; return insideVertices.size(); }
+	inline unsigned int getNbInsideEdges() const { assert(isInsideCollected || !"getNbInsideEdges: inside cells have not been collected.") ; return insideEdges.size(); }
+	inline unsigned int getNbInsideFaces() const { assert(isInsideCollected || !"getNbInsideFaces: inside cells have not been collected.") ; return insideFaces.size(); }
 	inline unsigned int getNbBorder() const { return border.size(); }
 
 	template <typename PPFP>

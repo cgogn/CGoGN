@@ -40,12 +40,13 @@ namespace Selection
  *********************************************************/
 
 template <typename PFP>
-Collector<PFP>::Collector(typename PFP::MAP& m, unsigned int thread) : map(m), m_thread(thread)
+Collector<PFP>::Collector(typename PFP::MAP& m, unsigned int thread) : map(m), m_thread(thread), isInsideCollected(false)
 {}
 
 template <typename PFP>
 inline bool Collector<PFP>::applyOnInsideVertices(FunctorType& f)
 {
+	assert(isInsideCollected || !"applyOnInsideVertices: inside cells have not been collected.") ;
 	for(std::vector<Dart>::iterator iv = insideVertices.begin(); iv != insideVertices.end(); ++iv)
 		if(f(*iv))
 			return true ;
@@ -55,6 +56,7 @@ inline bool Collector<PFP>::applyOnInsideVertices(FunctorType& f)
 template <typename PFP>
 inline bool Collector<PFP>::applyOnInsideEdges(FunctorType& f)
 {
+	assert(isInsideCollected || !"applyOnInsideEdges: inside cells have not been collected.") ;
 	for(std::vector<Dart>::iterator iv = insideEdges.begin(); iv != insideEdges.end(); ++iv)
 		if(f(*iv))
 			return true ;
@@ -64,6 +66,7 @@ inline bool Collector<PFP>::applyOnInsideEdges(FunctorType& f)
 template <typename PFP>
 inline bool Collector<PFP>::applyOnInsideFaces(FunctorType& f)
 {
+	assert(isInsideCollected || !"applyOnInsideFaces: inside cells have not been collected.") ;
 	for(std::vector<Dart>::iterator iv = insideFaces.begin(); iv != insideFaces.end(); ++iv)
 		if(f(*iv))
 			return true ;
@@ -106,6 +109,7 @@ template <typename PFP>
 void Collector_OneRing<PFP>::collectAll(Dart d)
 {
 	this->init(d);
+	this->isInsideCollected = true;
 	this->insideEdges.reserve(16);
 	this->insideFaces.reserve(16);
 	this->border.reserve(16);
@@ -146,6 +150,7 @@ void Collector_WithinSphere<PFP>::collectAll(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
+	this->isInsideCollected = true;
 	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
@@ -254,6 +259,7 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 template <typename PFP>
 void Collector_WithinSphere<PFP>::computeArea()
 {
+	assert(this->isInsideCollected || !"computeArea: inside cells have not been collected.") ;
 	area = 0;
 	typename PFP::VEC3 centerPosition = this->position[this->centerDart];
 
@@ -292,6 +298,7 @@ void Collector_NormalAngle<PFP>::collectAll(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
+	this->isInsideCollected = true;
 	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
@@ -414,6 +421,7 @@ void Collector_Vertices<PFP>::collectAll(Dart d)
 
 	crit.init(d);
 	this->init(d);
+	this->isInsideCollected = true;
 	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
 	this->border.reserve(32);
@@ -529,6 +537,7 @@ void Collector_NormalAngle_Triangles<PFP>::collectAll(Dart d)
 	typedef typename PFP::REAL REAL;
 
 	this->init(d);
+	this->isInsideCollected = true;
 	this->insideVertices.reserve(32);
 	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
@@ -680,6 +689,7 @@ void Collector_Triangles<PFP>::collectAll(Dart d)
 
 	crit.init(d);
 	this->init(d);
+	this->isInsideCollected = true;
 	this->insideVertices.reserve(32);
 	this->insideEdges.reserve(32);
 	this->insideFaces.reserve(32);
@@ -813,6 +823,7 @@ template <typename PFP>
 void Collector_Dijkstra_Vertices<PFP>::collectAll(Dart dinit)
 {
 	init(dinit);
+	this->isInsideCollected = true;
 
 	CellMarkerStore<VERTEX> vmReached (this->map, this->m_thread);
 	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
@@ -977,6 +988,7 @@ template <typename PFP>
 void Collector_Dijkstra<PFP>::collectAll(Dart dinit)
 {
 	init(dinit);
+	this->isInsideCollected = true;
 
 	CellMarkerStore<VERTEX> vmReached (this->map, this->m_thread);
 	vertexInfo[this->centerDart].it = front.insert(std::pair<float,Dart>(0.0, this->centerDart));
