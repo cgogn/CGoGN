@@ -113,11 +113,11 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	REAL computeArea () {
+	REAL computeArea (const VertexAttribute<VEC3>& pos) {
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	void computeNormalCyclesTensor (const EdgeAttribute<REAL>&, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
 
 };
 
@@ -135,11 +135,18 @@ public:
 template <typename PFP>
 class Collector_OneRing : public Collector<PFP>
 {
+protected:
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
 public:
 	Collector_OneRing(typename PFP::MAP& m, unsigned int thread=0):
 		Collector<PFP>(m, thread) {}
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
+
+	REAL computeArea(const VertexAttribute<VEC3>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>&edgeangle, typename PFP::MATRIX33&);
 };
 
 /*********************************************************
@@ -175,8 +182,8 @@ public:
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	REAL computeArea();
-	void computeNormalCyclesTensor (const EdgeAttribute<REAL>&, typename PFP::MATRIX33&);
+	REAL computeArea(const VertexAttribute<VEC3>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&);
 };
 
 /*********************************************************

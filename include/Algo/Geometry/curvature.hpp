@@ -318,10 +318,11 @@ void computeCurvatureVertex_NormalCycles(
 
 	// collect the normal cycle tensor
 	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
+//	Algo::Selection::Collector_OneRing<PFP> neigh(map, thread) ;
 	neigh.collectAll(dart) ;
 
 	MATRIX tensor(0) ;
-	neigh.computeNormalCyclesTensor(edgeangle,tensor);
+	neigh.computeNormalCyclesTensor(position, edgeangle,tensor);
 
 	// solve eigen problem
 	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tensor));
