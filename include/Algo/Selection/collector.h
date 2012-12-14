@@ -112,6 +112,13 @@ public:
 
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
+
+	REAL computeArea () {
+		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
+		return 0.0;
+	}
+	void computeNormalCyclesTensor (const EdgeAttribute<REAL>&, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+
 };
 
 /*********************************************************
@@ -149,26 +156,27 @@ template <typename PFP>
 class Collector_WithinSphere : public Collector<PFP>
 {
 protected:
-	const VertexAttribute<typename PFP::VEC3>& position;
-	typename PFP::REAL radius;
-	typename PFP::REAL area;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+	const VertexAttribute<VEC3>& position;
+	REAL radius;
 
 public:
-	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<typename PFP::VEC3>& p, typename PFP::REAL r = 0, unsigned int thread=0) :
+	Collector_WithinSphere(typename PFP::MAP& m, const VertexAttribute<VEC3>& p, REAL r = 0, unsigned int thread=0) :
 		Collector<PFP>(m, thread),
 		position(p),
-		radius(r),
-		area(0)
+		radius(r)
 	{}
-	inline void setRadius(typename PFP::REAL r) { radius = r; }
-	inline typename PFP::REAL getRadius() const { return radius; }
-	inline const VertexAttribute<typename PFP::VEC3>& getPosition() const { return position; }
+	inline void setRadius(REAL r) { radius = r; }
+	inline REAL getRadius() const { return radius; }
+	inline const VertexAttribute<VEC3>& getPosition() const { return position; }
 
 	void collectAll(Dart d);
 	void collectBorder(Dart d);
 
-	void computeArea();
-	inline typename PFP::REAL getArea() const { return area; }
+	REAL computeArea();
+	void computeNormalCyclesTensor (const EdgeAttribute<REAL>&, typename PFP::MATRIX33&);
 };
 
 /*********************************************************

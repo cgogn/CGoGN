@@ -27,6 +27,8 @@
 
 #include "Geometry/basic.h"
 
+#include "Utils/convertType.h"
+
 #include "OpenNL/linear_solver.h"
 #include "OpenNL/sparse_matrix.h"
 #include "OpenNL/full_vector.h"

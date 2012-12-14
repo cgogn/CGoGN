@@ -310,43 +310,23 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
 {
-	typedef typename PFP::VEC3 VEC3 ;
 	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef Geom::Matrix<3,3,REAL> MATRIX;
+	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
+	typedef Eigen::Matrix<REAL,3,3> E_MATRIX;
 
 	// collect the normal cycle tensor
 	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
 	neigh.collectAll(dart) ;
-	neigh.computeArea() ;
 
-	VEC3 center = position[dart] ;
-
-	typename PFP::MATRIX33 tensor(0) ;
-
-	// collect edges inside the neighborhood
-	const std::vector<Dart>& vd1 = neigh.getInsideEdges() ;
-	for (std::vector<Dart>::const_iterator it = vd1.begin(); it != vd1.end(); ++it)
-	{
-		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, *it, position) ;
-		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
-	}
-	// collect edges crossing the neighborhood's border
-	const std::vector<Dart>& vd2 = neigh.getBorder() ;
-	for (std::vector<Dart>::const_iterator it = vd2.begin(); it != vd2.end(); ++it)
-	{
-		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(map, *it, position) ;
-		REAL alpha ;
-		Algo::Geometry::intersectionSphereEdge<PFP>(map, center, radius, *it, position, alpha) ;
-		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) * alpha ;
-	}
-
-	tensor /= neigh.getArea() ;
+	MATRIX tensor(0) ;
+	neigh.computeNormalCyclesTensor(edgeangle,tensor);
 
 	// solve eigen problem
-	Eigen::Matrix3f m3 ;
-	m3 << tensor(0,0) , tensor(0,1) , tensor(0,2) , tensor(1,0) , tensor(1,1) , tensor(1,2) , tensor(2,0) , tensor(2,1) , tensor(2,2) ;
-	Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> solver (m3);
-	Eigen::Vector3f ev = solver.eigenvalues();
-	Eigen::Matrix3f evec = solver.eigenvectors();
+	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tensor));
+	const VEC3& ev = Utils::convertRef<VEC3>(solver.eigenvalues());
+	const MATRIX& evec = Utils::convertRef<MATRIX>(solver.eigenvectors());
 
 	// sort eigen components : ev[s[0]] has minimal absolute value ; kmin = ev[s[1]] <= ev[s[2]] = kmax
 	int s[3] = {0, 1, 2} ;

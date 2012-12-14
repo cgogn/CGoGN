@@ -256,12 +256,14 @@ void Collector_WithinSphere<PFP>::collectBorder(Dart d)
 	this->insideVertices.clear();
 }
 
+
 template <typename PFP>
-void Collector_WithinSphere<PFP>::computeArea()
+typename PFP::REAL Collector_WithinSphere<PFP>::computeArea()
 {
 	assert(this->isInsideCollected || !"computeArea: inside cells have not been collected.") ;
-	area = 0;
-	typename PFP::VEC3 centerPosition = this->position[this->centerDart];
+
+	VEC3 centerPosition = position[this->centerDart];
+	REAL area = 0;
 
 	for (std::vector<Dart>::const_iterator it = this->insideFaces.begin(); it != this->insideFaces.end(); ++it)
 		area += Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
@@ -285,7 +287,34 @@ void Collector_WithinSphere<PFP>::computeArea()
 			area += alpha * beta * Algo::Geometry::triangleArea<PFP>(this->map, *it, this->position);
 		}
 	}
+	return area;
 }
+
+template <typename PFP>
+void Collector_WithinSphere<PFP>::computeNormalCyclesTensor (const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33& tensor){
+	assert(this->isInsideCollected || !"computeNormalCyclesTensor: inside cells have not been collected.") ;
+
+	VEC3 centerPosition = position[this->centerDart];
+	tensor.zero() ;
+
+	// collect edges inside the neighborhood
+	for (std::vector<Dart>::const_iterator it = this->insideEdges.begin(); it != this->insideEdges.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, position) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) ;
+	}
+	// collect edges crossing the neighborhood's border
+	for (std::vector<Dart>::const_iterator it = this->border.begin(); it != this->border.end(); ++it)
+	{
+		const VEC3 e = Algo::Geometry::vectorOutOfDart<PFP>(this->map, *it, position) ;
+		REAL alpha ;
+		Algo::Geometry::intersectionSphereEdge<PFP>(this->map, centerPosition, radius, *it, position, alpha) ;
+		tensor += Geom::transposed_vectors_mult(e,e) * edgeangle[*it] * (1 / e.norm()) * alpha ;
+	}
+
+	tensor /= computeArea() ;
+}
+
 
 /*********************************************************
  * Collector Normal Angle (Vertices)
