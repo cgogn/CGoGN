@@ -150,6 +150,37 @@ public:
 };
 
 /*********************************************************
+ * Collector One Ring around edge
+ *********************************************************/
+
+/*
+ * insideVertices = 2 ends of center edge (centerDart)
+ * insideEdges = center egde + edges adjacent by a vertex
+ *             = union of stars of 1-rings of the 2 ends
+ * insideFaces = triangles incident to the 2 ends
+ * border = vertices of 1-ring -> link (set of adjacent vertices)
+ *        = edges of 1-ring
+ */
+
+template <typename PFP>
+class Collector_OneRing_AroundEdge : public Collector<PFP>
+{
+protected:
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef typename PFP::REAL REAL ;
+
+public:
+	Collector_OneRing_AroundEdge(typename PFP::MAP& m, unsigned int thread=0):
+		Collector<PFP>(m, thread) {}
+	void collectAll(Dart d);
+	void collectBorder(Dart d);
+
+	REAL computeArea(const VertexAttribute<VEC3>& pos);
+	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>&edgeangle, typename PFP::MATRIX33&);
+};
+
+
+/*********************************************************
  * Collector Within Sphere
  *********************************************************/
 
