@@ -26,7 +26,6 @@
 #include "Geometry/matrix.h"
 #include "Topology/generic/traversorCell.h"
 #include "Topology/generic/traversor2.h"
-#include "Algo/Selection/collector.h"
 
 extern "C"
 {
@@ -331,6 +330,60 @@ void computeCurvatureVertex_NormalCycles(
 
 	normalCycles_SortAndSetEigenComponents<PFP>(ev,evec,kmax[dart],kmin[dart],Kmax[dart],Kmin[dart],Knormal[dart],normal[dart],thread);
 }
+
+template <typename PFP>
+void computeCurvatureVertices_NormalCycles(
+	typename PFP::MAP& map,
+	Algo::Selection::Collector<PFP> & neigh,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal,
+	const FunctorSelect& select, unsigned int thread)
+{
+	TraversorV<typename PFP::MAP> t(map, select) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		computeCurvatureVertex_NormalCycles<PFP>(map, d, neigh, position, normal, edgeangle, kmax, kmin, Kmax, Kmin, Knormal,thread) ;
+}
+
+template <typename PFP>
+void computeCurvatureVertex_NormalCycles(
+	typename PFP::MAP& map,
+	Dart dart,
+	Algo::Selection::Collector<PFP> & neigh,
+	const VertexAttribute<typename PFP::VEC3>& position,
+	const VertexAttribute<typename PFP::VEC3>& normal,
+	const EdgeAttribute<typename PFP::REAL>& edgeangle,
+	VertexAttribute<typename PFP::REAL>& kmax,
+	VertexAttribute<typename PFP::REAL>& kmin,
+	VertexAttribute<typename PFP::VEC3>& Kmax,
+	VertexAttribute<typename PFP::VEC3>& Kmin,
+	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread)
+{
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef Geom::Matrix<3,3,REAL> MATRIX;
+	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
+	typedef Eigen::Matrix<REAL,3,3> E_MATRIX;
+
+	// collect the normal cycle tensor
+	neigh.collectAll(dart) ;
+
+	MATRIX tensor(0) ;
+	neigh.computeNormalCyclesTensor(position, edgeangle,tensor);
+
+	// solve eigen problem
+	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tensor));
+	const VEC3& ev = Utils::convertRef<VEC3>(solver.eigenvalues());
+	const MATRIX& evec = Utils::convertRef<MATRIX>(solver.eigenvectors());
+
+	normalCycles_SortAndSetEigenComponents<PFP>(ev,evec,kmax[dart],kmin[dart],Kmax[dart],Kmin[dart],Knormal[dart],normal[dart],thread);
+}
+
 
 template <typename PFP>
 void normalCycles_SortAndSetEigenComponents(

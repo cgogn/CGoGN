@@ -113,11 +113,11 @@ public:
 	template <typename PPFP>
 	friend std::ostream& operator<<(std::ostream &out, const Collector<PPFP>& c);
 
-	REAL computeArea (const VertexAttribute<VEC3>& pos) {
+	virtual REAL computeArea (const VertexAttribute<VEC3>& pos) {
 		assert(!"Warning: Collector<PFP>::computeArea() should be overloaded in non-virtual derived classes");
 		return 0.0;
 	}
-	void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
+	virtual void computeNormalCyclesTensor (const VertexAttribute<VEC3>& pos, const EdgeAttribute<REAL>& edgeangle, typename PFP::MATRIX33&) {assert(!"Warning: Collector<PFP>::computeNormalCyclesTensor() should be overloaded in non-virtual derived classes"); }
 
 };
 
