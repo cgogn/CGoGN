@@ -329,35 +329,46 @@ void computeCurvatureVertex_NormalCycles(
 	const VEC3& ev = Utils::convertRef<VEC3>(solver.eigenvalues());
 	const MATRIX& evec = Utils::convertRef<MATRIX>(solver.eigenvectors());
 
+	normalCycles_SortAndSetEigenComponents<PFP>(ev,evec,kmax[dart],kmin[dart],Kmax[dart],Kmin[dart],Knormal[dart],normal[dart],thread);
+}
+
+template <typename PFP>
+void normalCycles_SortAndSetEigenComponents(
+	const typename PFP::VEC3& e_val,
+	const Geom::Matrix<3,3,typename PFP::REAL> & e_vec,
+	typename PFP::REAL& kmax,
+	typename PFP::REAL& kmin,
+	typename PFP::VEC3& Kmax,
+	typename PFP::VEC3& Kmin,
+	typename PFP::VEC3& Knormal,
+	const typename PFP::VEC3& normal,
+	unsigned int thread=0)
+{
 	// sort eigen components : ev[s[0]] has minimal absolute value ; kmin = ev[s[1]] <= ev[s[2]] = kmax
 	int s[3] = {0, 1, 2} ;
 	int tmp ;
-	if (abs(ev[s[2]]) < abs(ev[s[1]])) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
-	if (abs(ev[s[1]]) < abs(ev[s[0]])) { tmp = s[0] ; s[0] = s[1] ; s[1] = tmp ; }
-	if (ev[s[2]] < ev[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+	if (abs(e_val[s[2]]) < abs(e_val[s[1]])) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+	if (abs(e_val[s[1]]) < abs(e_val[s[0]])) { tmp = s[0] ; s[0] = s[1] ; s[1] = tmp ; }
+	if (e_val[s[2]] < e_val[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
 
 	// set curvatures from sorted eigen components
 	// warning : Kmin and Kmax are switched w.r.t. kmin and kmax
 	// normal direction : minimal absolute eigen value
-	VEC3& dirNormal = Knormal[dart] ;
-	dirNormal[0] = evec(0,s[0]);
-	dirNormal[1] = evec(1,s[0]);
-	dirNormal[2] = evec(2,s[0]);
-	if (dirNormal * normal[dart] < 0) dirNormal *= -1; // change orientation
+	Knormal[0] = e_vec(0,s[0]);
+	Knormal[1] = e_vec(1,s[0]);
+	Knormal[2] = e_vec(2,s[0]);
+	if (Knormal * normal < 0) Knormal *= -1; // change orientation
 	// min curvature
-	kmin[dart] = ev[s[1]] ;
-	VEC3& dirMin = Kmin[dart] ;
-	dirMin[0] = evec(0,s[2]);
-	dirMin[1] = evec(1,s[2]);
-	dirMin[2] = evec(2,s[2]);
+	kmin = e_val[s[1]] ;
+	Kmin[0] = e_vec(0,s[2]);
+	Kmin[1] = e_vec(1,s[2]);
+	Kmin[2] = e_vec(2,s[2]);
 	// max curvature
-	kmax[dart] = ev[s[2]] ;
-	VEC3& dirMax = Kmax[dart] ;
-	dirMax[0] = evec(0,s[1]);
-	dirMax[1] = evec(1,s[1]);
-	dirMax[2] = evec(2,s[1]);
+	kmax = e_val[s[2]] ;
+	Kmax[0] = e_vec(0,s[1]);
+	Kmax[1] = e_vec(1,s[1]);
+	Kmax[2] = e_vec(2,s[1]);
 }
-
 
 namespace Parallel
 {

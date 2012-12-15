@@ -122,7 +122,17 @@ void computeCurvatureVertex_NormalCycles(
 	VertexAttribute<typename PFP::VEC3>& Kmin,
 	VertexAttribute<typename PFP::VEC3>& Knormal, unsigned int thread=0) ;
 
-
+template <typename PFP>
+void normalCycles_SortAndSetEigenComponents(
+	const typename PFP::VEC3& e_val,
+	const Geom::Matrix<3,3,typename PFP::REAL> & e_vec,
+	typename PFP::REAL& kmax,
+	typename PFP::REAL& kmin,
+	typename PFP::VEC3& Kmax,
+	typename PFP::VEC3& Kmin,
+	typename PFP::VEC3& Knormal,
+	const typename PFP::VEC3& normal,
+	unsigned int thread=0) ;
 
 namespace Parallel
 {
