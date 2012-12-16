@@ -929,6 +929,70 @@ void Polyhedron<PFP>::embedCube(float sx, float sy, float sz)
 }
 
 template <typename PFP>
+void Polyhedron<PFP>::embedCube(VEC3 origin, float sx, float sy, float sz)
+{
+	typedef typename PFP::VEC3 VEC3 ;
+
+	if (m_kind != CUBE)
+	{
+		CGoGNerr << "Warning try to embedCube something that is not a cube"<<CGoGNendl;
+		return;
+	}
+
+	float dz = sz/float(m_nz);
+	float dy = sy/float(m_ny);
+	float dx = sx/float(m_nx);
+
+	// first embedding the sides
+	int index = 0;
+	for (unsigned int k = 0; k <= m_nz; ++k)
+	{
+		float z = float(k)*dz - sz/2.0f;
+		for (unsigned int i = 0; i < m_nx; ++i)
+		{
+			float x = float(i)*dx - sx/2.0f;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(x, -sy/2.0f, z);
+		}
+		for (unsigned int i = 0; i < m_ny; ++i)
+		{
+			float y = float(i)*dy - sy/2.0f;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(sx/2.0f, y, z);
+		}
+		for (unsigned int i = 0; i < m_nx; ++i)
+		{
+			float x = sx/2.0f-float(i)*dx;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(x, sy/2.0f, z);
+		}
+		for (unsigned int i = 0; i < m_ny ;++i)
+		{
+			float y = sy/2.0f - float(i)*dy;
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + VEC3(-sx/2.0f, y, z);
+		}
+	}
+
+	// the top
+	for(unsigned int i = 1; i  <m_ny; ++i)
+	{
+		for(unsigned int j = 1; j < m_nx; ++j)
+		{
+			VEC3 pos(-sx/2.0f+float(j)*dx, -sy/2.0f+float(i)*dy, sz/2.0f);
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + pos;
+		}
+	}
+
+	// the bottom
+	for(unsigned int i = 1; i < m_ny; ++i)
+	{
+		for(unsigned int j = 1; j < m_nx; ++j)
+		{
+			VEC3 pos(-sx/2.0f+float(j)*dx, sy/2.0f-float(i)*dy, -sz/2.0f);
+			m_positions[ m_tableVertDarts[ index++ ] ] = origin + pos;
+		}
+	}
+}
+
+
+template <typename PFP>
 void Polyhedron<PFP>::computeCenter()
 {
 	typename PFP::VEC3 center(0);

@@ -350,6 +350,8 @@ public:
 	*/
 	void embedCube(float sx, float sy, float sz);
 
+	void embedCube(VEC3 origin, float sx, float sy, float sz);
+
 	/**
 	* embed the a grid into a twister open ribbon
 	* with turns=PI it is a Moebius strip, needs only to be closed (if model allow it)

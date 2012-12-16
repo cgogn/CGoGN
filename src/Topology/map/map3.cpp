@@ -81,37 +81,44 @@ void Map3::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 
 void Map3::deleteVolume(Dart d)
 {
-	DartMarkerStore mark(*this);		// Lock a marker
+//	DartMarkerStore mark(*this);		// Lock a marker
+//
+//	std::vector<Dart> visitedFaces;		// Faces that are traversed
+//	visitedFaces.reserve(512);
+//	visitedFaces.push_back(d);			// Start with the face of d
+//
+//	mark.markOrbit<FACE2>(d) ;
+//
+//
+//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+//	{
+//		Dart e = visitedFaces[i] ;
+//
+//		if(!isBoundaryFace(e))
+//			unsewVolumes(e) ;
+//
+//		do	// add all face neighbours to the table
+//		{
+//			Dart ee = phi2(e) ;
+//			if(!mark.isMarked(ee)) // not already marked
+//			{
+//				visitedFaces.push_back(ee) ;
+//				mark.markOrbit<FACE2>(ee) ;
+//			}
+//			e = phi1(e) ;
+//		} while(e != visitedFaces[i]) ;
+//	}
 
-	std::vector<Dart> visitedFaces;		// Faces that are traversed
-	visitedFaces.reserve(512);
-	visitedFaces.push_back(d);			// Start with the face of d
-
-	mark.markOrbit<FACE2>(d) ;
-
-
-	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
+	Traversor3WF<Map3> tWF(*this,d);
+	for(Dart dit = tWF.begin() ; dit != tWF.end() ; dit = tWF.next())
 	{
-		Dart e = visitedFaces[i] ;
-
-		if(!isBoundaryFace(e))
-			unsewVolumes(e) ;
-
-		do	// add all face neighbours to the table
-		{
-			Dart ee = phi2(e) ;
-			if(!mark.isMarked(ee)) // not already marked
-			{
-				visitedFaces.push_back(ee) ;
-				mark.markOrbit<FACE2>(ee) ;
-			}
-			e = phi1(e) ;
-		} while(e != visitedFaces[i]) ;
+		if(!isBoundaryFace(dit))
+			unsewVolumes(dit) ;
 	}
 
 	Dart dd = phi3(d) ;
 	Map2::deleteCC(d) ; //deleting the volume
-	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
+//	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
 }
 
 void Map3::fillHole(Dart d)

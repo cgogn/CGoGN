@@ -147,7 +147,7 @@ Dart Primitive3D<PFP>::hexaGrid_topo(unsigned int nx, unsigned int ny, unsigned 
 		m_tableVertDarts.push_back(dd);
 	}
 
-	m_map.closeMap() ;
+	std::cout << m_map.closeMap() << std::endl;
 
 	return d0;
 }

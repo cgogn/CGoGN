@@ -99,11 +99,6 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
-
-	void operator() (bool filtering)
-	{
-
-	}
 };
 
 // Tri/quad refinement
@@ -160,11 +155,6 @@ public:
 			m_position[midV] += ve ;
 			m_map.decCurrentLevel() ;
 		}
-	}
-
-	void operator() (bool filtering)
-	{
-
 	}
 };
 
@@ -224,11 +214,6 @@ public:
 			m_map.decCurrentLevel() ;
 		}
 	}
-
-	void operator() (bool filtering)
-	{
-
-	}
 };
 
 // Tri/quad refinement
@@ -285,11 +270,6 @@ public:
 				m_map.decCurrentLevel() ;
 			}
 		}
-	}
-
-	void operator() (bool filtering)
-	{
-
 	}
 };
 
