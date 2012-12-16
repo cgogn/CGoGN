@@ -317,7 +317,6 @@ void computeCurvatureVertex_NormalCycles(
 
 	// collect the normal cycle tensor
 	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
-//	Algo::Selection::Collector_OneRing<PFP> neigh(map, thread) ;
 	neigh.collectAll(dart) ;
 
 	MATRIX tensor(0) ;
@@ -329,6 +328,16 @@ void computeCurvatureVertex_NormalCycles(
 	const MATRIX& evec = Utils::convertRef<MATRIX>(solver.eigenvectors());
 
 	normalCycles_SortAndSetEigenComponents<PFP>(ev,evec,kmax[dart],kmin[dart],Kmax[dart],Kmin[dart],Knormal[dart],normal[dart],thread);
+
+//	if (dart.index % 15000 == 0)
+//	{
+//		CGoGNout << solver.eigenvalues() << CGoGNendl;
+//		CGoGNout << solver.eigenvectors() << CGoGNendl;
+//		normalCycles_SortTensor<PFP>(tensor);
+//		solver.compute(Utils::convertRef<E_MATRIX>(tensor));
+//		CGoGNout << solver.eigenvalues() << CGoGNendl;
+//		CGoGNout << solver.eigenvectors() << CGoGNendl;
+//	}
 }
 
 template <typename PFP>
@@ -398,12 +407,12 @@ void normalCycles_SortAndSetEigenComponents(
 	unsigned int thread=0)
 {
 	// sort eigen components : ev[inormal] has minimal absolute value ; kmin = ev[imin] <= ev[imax] = kmax
-	int inormal=0, imin, imax, tmp ;
+	int inormal=0, imin, imax ;
 	if (abs(e_val[1]) < abs(e_val[inormal])) inormal = 1;
 	if (abs(e_val[2]) < abs(e_val[inormal])) inormal = 2;
 	imin = (inormal + 1) % 3;
 	imax = (inormal + 2) % 3;
-	if (e_val[imax] < e_val[imin]) { tmp = imin ; imin = imax ; imax = tmp ; }
+	if (e_val[imax] < e_val[imin]) { int tmp = imin ; imin = imax ; imax = tmp ; }
 
 	// set curvatures from sorted eigen components
 	// warning : Kmin and Kmax are switched w.r.t. kmin and kmax
@@ -424,7 +433,6 @@ void normalCycles_SortAndSetEigenComponents(
 	Kmax[2] = e_vec(2,imin);
 }
 
-/*
 template <typename PFP>
 void normalCycles_SortTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int thread=0)
 {
@@ -436,13 +444,27 @@ void normalCycles_SortTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, uns
 
 	// compute eigen components
 	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tensor));
-	const VEC3& ev = Utils::convertRef<VEC3>(solver.eigenvalues());
-	const MATRIX& evec = Utils::convertRef<MATRIX>(solver.eigenvectors());
+	const VEC3& e_val = Utils::convertRef<VEC3>(solver.eigenvalues());
+	const MATRIX& e_vec = Utils::convertRef<MATRIX>(solver.eigenvectors());
 
-	// switch kmin and kmax
+	// switch kmin and kmax w.r.t. Kmin and Kmax
+	int inormal=0, imin, imax ;
+	if (abs(e_val[1]) < abs(e_val[inormal])) inormal = 1;
+	if (abs(e_val[2]) < abs(e_val[inormal])) inormal = 2;
+	imin = (inormal + 1) % 3;
+	imax = (inormal + 2) % 3;
+	if (e_val[imax] < e_val[imin]) { int tmp = imin ; imin = imax ; imax = tmp ; }
 
+	tensor = e_vec;
+	int i; REAL v;
+	i = inormal; v = e_val[inormal];
+	tensor(0,i) *= v; tensor(1,i) *= v; tensor(2,i) *= v;
+	i = imin; v = e_val[imax];
+	tensor(0,i) *= v; tensor(1,i) *= v; tensor(2,i) *= v;
+	i = imax; v = e_val[imin];
+	tensor(0,i) *= v; tensor(1,i) *= v; tensor(2,i) *= v;
+	tensor = tensor*e_vec.transposed();
 }
-*/
 
 namespace Parallel
 {
