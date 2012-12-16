@@ -137,6 +137,8 @@ void normalCycles_SortAndSetEigenComponents(
 	const typename PFP::VEC3& normal,
 	unsigned int thread=0) ;
 
+template <typename PFP>
+void normalCycles_SortTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int thread=0) ;
 
 /* normal cycles with collector as a parameter : not usable in parallel */
 

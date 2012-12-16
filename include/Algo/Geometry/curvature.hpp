@@ -313,7 +313,7 @@ void computeCurvatureVertex_NormalCycles(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef Geom::Matrix<3,3,REAL> MATRIX;
 	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
-	typedef Eigen::Matrix<REAL,3,3> E_MATRIX;
+	typedef Eigen::Matrix<REAL,3,3,Eigen::RowMajor> E_MATRIX;
 
 	// collect the normal cycle tensor
 	Algo::Selection::Collector_WithinSphere<PFP> neigh(map, position, radius, thread) ;
@@ -368,7 +368,7 @@ void computeCurvatureVertex_NormalCycles(
 	typedef typename PFP::VEC3 VEC3 ;
 	typedef Geom::Matrix<3,3,REAL> MATRIX;
 	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
-	typedef Eigen::Matrix<REAL,3,3> E_MATRIX;
+	typedef Eigen::Matrix<REAL,3,3,Eigen::RowMajor> E_MATRIX;
 
 	// collect the normal cycle tensor
 	neigh.collectAll(dart) ;
@@ -397,31 +397,52 @@ void normalCycles_SortAndSetEigenComponents(
 	const typename PFP::VEC3& normal,
 	unsigned int thread=0)
 {
-	// sort eigen components : ev[s[0]] has minimal absolute value ; kmin = ev[s[1]] <= ev[s[2]] = kmax
-	int s[3] = {0, 1, 2} ;
-	int tmp ;
-	if (abs(e_val[s[2]]) < abs(e_val[s[1]])) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
-	if (abs(e_val[s[1]]) < abs(e_val[s[0]])) { tmp = s[0] ; s[0] = s[1] ; s[1] = tmp ; }
-	if (e_val[s[2]] < e_val[s[1]]) { tmp = s[1] ; s[1] = s[2] ; s[2] = tmp ; }
+	// sort eigen components : ev[inormal] has minimal absolute value ; kmin = ev[imin] <= ev[imax] = kmax
+	int inormal=0, imin, imax, tmp ;
+	if (abs(e_val[1]) < abs(e_val[inormal])) inormal = 1;
+	if (abs(e_val[2]) < abs(e_val[inormal])) inormal = 2;
+	imin = (inormal + 1) % 3;
+	imax = (inormal + 2) % 3;
+	if (e_val[imax] < e_val[imin]) { tmp = imin ; imin = imax ; imax = tmp ; }
 
 	// set curvatures from sorted eigen components
 	// warning : Kmin and Kmax are switched w.r.t. kmin and kmax
 	// normal direction : minimal absolute eigen value
-	Knormal[0] = e_vec(0,s[0]);
-	Knormal[1] = e_vec(1,s[0]);
-	Knormal[2] = e_vec(2,s[0]);
+	Knormal[0] = e_vec(0,inormal);
+	Knormal[1] = e_vec(1,inormal);
+	Knormal[2] = e_vec(2,inormal);
 	if (Knormal * normal < 0) Knormal *= -1; // change orientation
 	// min curvature
-	kmin = e_val[s[1]] ;
-	Kmin[0] = e_vec(0,s[2]);
-	Kmin[1] = e_vec(1,s[2]);
-	Kmin[2] = e_vec(2,s[2]);
+	kmin = e_val[imin] ;
+	Kmin[0] = e_vec(0,imax);
+	Kmin[1] = e_vec(1,imax);
+	Kmin[2] = e_vec(2,imax);
 	// max curvature
-	kmax = e_val[s[2]] ;
-	Kmax[0] = e_vec(0,s[1]);
-	Kmax[1] = e_vec(1,s[1]);
-	Kmax[2] = e_vec(2,s[1]);
+	kmax = e_val[imax] ;
+	Kmax[0] = e_vec(0,imin);
+	Kmax[1] = e_vec(1,imin);
+	Kmax[2] = e_vec(2,imin);
 }
+
+/*
+template <typename PFP>
+void normalCycles_SortTensor( Geom::Matrix<3,3,typename PFP::REAL> & tensor, unsigned int thread=0)
+{
+	typedef typename PFP::REAL REAL ;
+	typedef typename PFP::VEC3 VEC3 ;
+	typedef Geom::Matrix<3,3,REAL> MATRIX;
+	typedef Eigen::Matrix<REAL,3,1> E_VEC3;
+	typedef Eigen::Matrix<REAL,3,3,Eigen::RowMajor> E_MATRIX;
+
+	// compute eigen components
+	Eigen::SelfAdjointEigenSolver<E_MATRIX> solver (Utils::convertRef<E_MATRIX>(tensor));
+	const VEC3& ev = Utils::convertRef<VEC3>(solver.eigenvalues());
+	const MATRIX& evec = Utils::convertRef<MATRIX>(solver.eigenvectors());
+
+	// switch kmin and kmax
+
+}
+*/
 
 namespace Parallel
 {
