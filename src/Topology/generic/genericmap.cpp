@@ -592,12 +592,24 @@ bool GenericMap::loadMapBin(const std::string& filename)
 		fs.read(reinterpret_cast<char*>(&(m_mrNbDarts[0])), nb *sizeof(unsigned int));
 	}
 
-
 	// retrieve m_embeddings (from m_attribs)
 	update_m_emb_afterLoad();
 
 	// recursive call from real type of map (for topo relation attributes pointers) down to GenericMap (for Marker_cleaning & pointers)
 	update_topo_shortcuts();
+
+	// restore nbThreads
+	std::vector<std::string> typeMark;
+	unsigned int nbatt0 = m_attribs[0].getAttributesTypes(typeMark);
+	m_nbThreads = 0;
+	for (unsigned int i = 0; i < nbatt0; ++i)
+	{
+		if (typeMark[i] == "Mark")
+			++m_nbThreads;
+	}
+
+
+
 
 	return true;
 }

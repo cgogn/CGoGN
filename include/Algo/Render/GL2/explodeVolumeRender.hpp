@@ -27,6 +27,7 @@
 #include "Topology/generic/dartmarker.h"
 #include "Topology/generic/cellmarker.h"
 #include "Algo/Geometry/centroid.h"
+#include "Topology/generic/autoAttributeHandler.h"
 
 namespace CGoGN
 {
