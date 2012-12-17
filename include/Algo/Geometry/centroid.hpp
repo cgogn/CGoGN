@@ -196,13 +196,33 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 }
 
 
+namespace Volumes
+{
 
+template <typename PFP, typename EMBV, typename EMB>
+EMB vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs)
+{
+	EMB center = AttribOps::zero<EMB,PFP>();
+	unsigned int count = 0 ;
+	Traversor3VVaE<typename PFP::MAP> t(map, d) ;
+	for(Dart it = t.begin(); it != t.end(); it = t.next())
+	{
+		center += attributs[it];
+		++count ;
+	}
+	center /= count ;
+	return center ;
+}
 
+template <typename PFP>
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map, const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid, const FunctorSelect& select, unsigned int thread)
+{
+	TraversorV<typename PFP::MAP> t(map, select, thread) ;
+	for(Dart d = t.begin(); d != t.end(); d = t.next())
+		vertex_centroid[d] = Algo::Geometry::Volumes::vertexNeighborhoodCentroid<PFP>(map, d, position) ;
+}
 
-
-
-
-
+}
 
 
 

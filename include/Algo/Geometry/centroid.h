@@ -149,6 +149,28 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 		const FunctorSelect& select = allDarts, unsigned int nbth = 0) ;
 }
 
+
+namespace Volumes
+{
+
+template <typename PFP, typename EMBV, typename EMB>
+typename PFP::VEC3 vertexNeighborhoodCentroidGen(typename PFP::MAP& map, Dart d, const EMBV& attributs);
+
+template <typename PFP>
+typename PFP::VEC3 vertexNeighborhoodCentroid(typename PFP::MAP& map, Dart d, const VertexAttribute<typename PFP::VEC3>& position)
+{
+	return Algo::Geometry::Volumes::vertexNeighborhoodCentroidGen<PFP, VertexAttribute<typename PFP::VEC3>, typename PFP::VEC3>(map, d, position);
+}
+
+template <typename PFP>
+void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& position, VertexAttribute<typename PFP::VEC3>& vertex_centroid,
+		const FunctorSelect& select = allDarts, unsigned int thread = 0) ;
+
+}
+
+
+
 } // namespace Geometry
 
 } // namespace Algo
