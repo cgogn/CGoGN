@@ -188,7 +188,8 @@ void Viewer::cb_Save()
 	std::string filters("all (*.*);; map (*.map);; off (*.off);; ply (*.ply)") ;
 	std::string filename = selectFileSave("Save Mesh", "", filters) ;
 
-	exportMesh(filename) ;
+	if (!filename.empty())
+		exportMesh(filename) ;
 }
 
 void Viewer::cb_keyPress(int keycode)
