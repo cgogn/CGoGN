@@ -21,13 +21,25 @@ public:
 	RenderVectorDockTab() { setupUi(this); }
 };
 
-struct TabParams
+struct PerMapTabParams
 {
-	TabParams(float vsf) :
-		vectorsScaleFactor(vsf)
+	PerMapTabParams() {}
+
+	PerMapTabParams(Utils::VBO* pos, Utils::VBO* vec, float s) :
+		positionVBO(pos),
+		vectorVBO(vec),
+		vectorsScaleFactor(s)
 	{}
 
+	Utils::VBO* positionVBO;
+	Utils::VBO* vectorVBO;
 	float vectorsScaleFactor;
+};
+
+struct TabParams
+{
+	QHash<QString, PerMapTabParams> perMap;
+	MapHandlerGen* selectedMap;
 };
 
 
@@ -61,6 +73,11 @@ public:
 	virtual void viewUnlinked(View* view);
 	virtual void currentViewChanged(View* view);
 
+	virtual void mapLinked(View* view, MapHandlerGen* m);
+	virtual void mapUnlinked(View* view, MapHandlerGen* m);
+
+	void refreshTabInfo();
+
 protected:
 	RenderVectorDockTab* m_dockTab;
 	QHash<View*, TabParams*> h_viewParams;
@@ -68,6 +85,10 @@ protected:
 	CGoGN::Utils::ShaderVectorPerVertex* m_vectorShader;
 
 public slots:
+	void cb_selectedMapChanged();
+	void cb_positionVBOChanged(int index);
+	void cb_vectorVBOChanged(int index);
+	void cb_refreshVBOs();
 	void cb_vectorsScaleFactorChanged(int i);
 };
 

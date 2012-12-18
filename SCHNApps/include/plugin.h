@@ -50,6 +50,9 @@ public:
 	virtual void viewUnlinked(View* view) = 0;
 	virtual void currentViewChanged(View* view) = 0;
 
+	virtual void mapLinked(View* view, MapHandlerGen* m) = 0;
+	virtual void mapUnlinked(View* view, MapHandlerGen* m) = 0;
+
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/

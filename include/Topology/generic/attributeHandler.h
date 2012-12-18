@@ -58,6 +58,8 @@ public:
 		return valid ;
 	}
 
+	virtual const std::string& name() const = 0;
+
 protected:
 	void setInvalid()
 	{
@@ -92,9 +94,8 @@ public:
 	AttributeHandler() ;
 
 	template <unsigned int ORBIT2>
-	AttributeHandler(const AttributeHandler<T, ORBIT2>& h)
+	AttributeHandler(const AttributeHandler<T, ORBIT2>& h) : AttributeHandlerGen(h.m_map, h.valid)
 	{
-		AttributeHandlerGen(h.m_map, h.valid);
 		m_attrib = h.m_attrib;
 		if(m_attrib->getOrbit() == ORBIT2)
 		{
@@ -147,7 +148,7 @@ public:
 	/**
 	 * get attribute name
 	 */
-	const std::string& name() const ;
+	virtual const std::string& name() const ;
 
 	/**
 	 * give the number of elements of the attribute container

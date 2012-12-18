@@ -51,6 +51,9 @@ public:
 	virtual void viewUnlinked(View* view) {}
 	virtual void currentViewChanged(View* view) {}
 
+	virtual void mapLinked(View* view, MapHandlerGen* m) {}
+	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
+
 public slots:
 	void cb_import();
 

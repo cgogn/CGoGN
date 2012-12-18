@@ -133,7 +133,6 @@ void MapsDialog::cb_selectedMapChanged()
 						case VOLUME : volumeAttributes->addItem(name + " (" + type + ")"); break;
 					}
 				}
-
 			}
 		}
 	}

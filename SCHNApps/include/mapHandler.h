@@ -44,8 +44,17 @@ public:
 	 * MANAGE VBOs
 	 *********************************************************/
 
-	Utils::VBO* getVBO(const std::string& name);
-	void deleteVBO(const std::string& name);
+	template <typename ATTR_HANDLER>
+	Utils::VBO* createVBO(const ATTR_HANDLER& attr)
+	{
+		Utils::VBO* vbo = getVBO(QString::fromStdString(attr.name()));
+		vbo->updateData(attr);
+		return vbo;
+	}
+
+	Utils::VBO* getVBO(const QString& name);
+	QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
+	void deleteVBO(const QString& name);
 
 	/*********************************************************
 	 * MANAGE LINKED VIEWS

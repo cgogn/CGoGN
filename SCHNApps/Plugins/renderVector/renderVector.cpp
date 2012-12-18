@@ -14,6 +14,10 @@ bool RenderVectorPlugin::enable()
 
 	registerShader(m_vectorShader);
 
+	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
+	connect(m_dockTab->combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionVBOChanged(int)));
+	connect(m_dockTab->combo_vectorVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_vectorVBOChanged(int)));
+	connect(m_dockTab->button_refreshVBOs, SIGNAL(clicked()), this, SLOT(cb_refreshVBOs()));
 	connect(m_dockTab->slider_vectorsScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_vectorsScaleFactorChanged(int)));
 
 	return true;
@@ -31,19 +35,58 @@ void RenderVectorPlugin::redraw(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* m, maps)
 	{
-		CGoGN::Utils::VBO* positionVBO = m->getVBO("position");
-		CGoGN::Utils::VBO* normalVBO = m->getVBO("normal");
-		m_vectorShader->setScale(m->getBBdiagSize() / 100.0f * params->vectorsScaleFactor) ;
-		m_vectorShader->setAttributePosition(positionVBO) ;
-		m_vectorShader->setAttributeVector(normalVBO) ;
-		glLineWidth(1.0f) ;
-		m->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+		std::cout << "draw map " << m->getName().toUtf8().constData() << std::endl;
+		const PerMapTabParams& p = params->perMap[m->getName()];
+		if(p.positionVBO != NULL && p.vectorVBO != NULL)
+		{
+			m_vectorShader->setScale(m->getBBdiagSize() / 100.0f * p.vectorsScaleFactor) ;
+			m_vectorShader->setAttributePosition(p.positionVBO) ;
+			m_vectorShader->setAttributeVector(p.vectorVBO) ;
+			glLineWidth(1.0f) ;
+			m->draw(m_vectorShader, Algo::Render::GL2::POINTS) ;
+		}
 	}
 }
 
 void RenderVectorPlugin::viewLinked(View* view)
 {
-	h_viewParams.insert(view, new TabParams(1.0));
+	TabParams* params = new TabParams();
+	h_viewParams.insert(view, params);
+
+	m_dockTab->mapList->clear();
+	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+	if(maps.empty())
+		params->selectedMap = NULL;
+	else
+	{
+		params->selectedMap = maps[0];
+		for(int i = 0; i < maps.count(); ++i)
+		{
+			PerMapTabParams p(NULL, NULL, 1.0f);
+			params->perMap.insert(maps[i]->getName(), p);
+
+			m_dockTab->mapList->addItem(maps[i]->getName());
+			if(maps[i] == params->selectedMap)
+			{
+				m_dockTab->mapList->item(i)->setSelected(true);
+				m_dockTab->combo_positionVBO->clear();
+				m_dockTab->combo_vectorVBO->clear();
+				QList<Utils::VBO*> vbos = maps[i]->getVBOList();
+				for(int j = 0; j < vbos.count(); ++j)
+				{
+					m_dockTab->combo_positionVBO->addItem(QString::fromStdString(vbos[j]->name()));
+					m_dockTab->combo_vectorVBO->addItem(QString::fromStdString(vbos[j]->name()));
+				}
+				if(vbos.count() > 0)
+				{
+					p.positionVBO = vbos[0];
+					m_dockTab->combo_positionVBO->setCurrentIndex(0);
+					p.vectorVBO = vbos[0];
+					m_dockTab->combo_vectorVBO->setCurrentIndex(0);
+				}
+			}
+		}
+	}
 }
 
 void RenderVectorPlugin::viewUnlinked(View* view)
@@ -51,10 +94,195 @@ void RenderVectorPlugin::viewUnlinked(View* view)
 	h_viewParams.remove(view);
 }
 
+void RenderVectorPlugin::mapLinked(View* view, MapHandlerGen* m)
+{
+	assert(isLinkedToView(view));
+	TabParams* params = h_viewParams[view];
+	PerMapTabParams p(NULL, NULL, 1.0f);
+	params->perMap.insert(m->getName(), p);
+	m_dockTab->mapList->addItem(m->getName());
+}
+
+void RenderVectorPlugin::mapUnlinked(View* view, MapHandlerGen* m)
+{
+	assert(isLinkedToView(view));
+	TabParams* params = h_viewParams[view];
+	params->perMap.remove(m->getName());
+//	for(int i = 0; i < m_dockTab->mapList->count(); ++i)
+//	{
+//		if(m_dockTab->mapList->item(i)->text() == m->getName())
+//		{
+//			delete m_dockTab->mapList->item(i);
+//			return;
+//		}
+//	}
+}
+
 void RenderVectorPlugin::currentViewChanged(View* view)
 {
 	TabParams* params = h_viewParams[view];
-	m_dockTab->slider_vectorsScaleFactor->setSliderPosition(params->vectorsScaleFactor * 50.0);
+
+	m_dockTab->mapList->clear();
+	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+	for(int i = 0; i < maps.count(); ++i)
+	{
+		m_dockTab->mapList->addItem(maps[i]->getName());
+		if(maps[i] == params->selectedMap)
+		{
+			m_dockTab->mapList->item(i)->setSelected(true);
+			PerMapTabParams p = params->perMap[maps[i]->getName()];
+			m_dockTab->slider_vectorsScaleFactor->setSliderPosition(p.vectorsScaleFactor * 50.0);
+			m_dockTab->combo_positionVBO->clear();
+			m_dockTab->combo_vectorVBO->clear();
+			QList<Utils::VBO*> vbos = maps[i]->getVBOList();
+			for(int j = 0; j < vbos.count(); ++j)
+			{
+				m_dockTab->combo_positionVBO->addItem(QString::fromStdString(vbos[j]->name()));
+				if(vbos[j] == p.positionVBO)
+					m_dockTab->combo_positionVBO->setCurrentIndex(j);
+				m_dockTab->combo_vectorVBO->addItem(QString::fromStdString(vbos[j]->name()));
+				if(vbos[j] == p.vectorVBO)
+					m_dockTab->combo_vectorVBO->setCurrentIndex(j);
+			}
+			if(p.positionVBO == NULL && vbos.count() > 0)
+				m_dockTab->combo_positionVBO->setCurrentIndex(0);
+			if(p.vectorVBO == NULL && vbos.count() > 0)
+				m_dockTab->combo_vectorVBO->setCurrentIndex(0);
+		}
+	}
+}
+
+void RenderVectorPlugin::refreshTabInfo()
+{
+	m_dockTab->mapList->clear();
+	m_dockTab->combo_positionVBO->clear();
+	m_dockTab->combo_vectorVBO->clear();
+	View* view = m_window->getCurrentView();
+
+	assert(isLinkedToView(view));
+
+	TabParams* params = h_viewParams[view];
+	MapHandlerGen* map = params->selectedMap;
+
+	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+	for(int i = 0; i < maps.count(); ++i)
+	{
+		m_dockTab->mapList->addItem(maps[i]->getName());
+		if(maps[i] == map)
+			m_dockTab->mapList->item(i)->setSelected(true);
+	}
+
+	if(map != NULL)
+	{
+		PerMapTabParams p = params->perMap[map->getName()];
+		m_dockTab->slider_vectorsScaleFactor->setSliderPosition(p.vectorsScaleFactor * 50.0);
+		QList<Utils::VBO*> vbos = map->getVBOList();
+		for(int i = 0; i < vbos.count(); ++i)
+		{
+			m_dockTab->combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
+			if(vbos[i] == p.positionVBO)
+				m_dockTab->combo_positionVBO->setCurrentIndex(i);
+			m_dockTab->combo_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
+			if(vbos[i] == p.vectorVBO)
+				m_dockTab->combo_vectorVBO->setCurrentIndex(i);
+		}
+		if(p.positionVBO == NULL && vbos.count() > 0)
+		{
+			p.positionVBO = vbos[0];
+			m_dockTab->combo_positionVBO->setCurrentIndex(0);
+		}
+		if(p.vectorVBO == NULL && vbos.count() > 0)
+		{
+			p.vectorVBO = vbos[0];
+			m_dockTab->combo_vectorVBO->setCurrentIndex(0);
+		}
+	}
+}
+
+void RenderVectorPlugin::cb_selectedMapChanged()
+{
+	View* current = m_window->getCurrentView();
+	assert(isLinkedToView(current));
+
+	TabParams* params = h_viewParams[current];
+
+	QList<QListWidgetItem*> currentItems = m_dockTab->mapList->selectedItems();
+	if(!currentItems.empty())
+	{
+		const QString& mapname = currentItems[0]->text();
+		MapHandlerGen* m = m_window->getMap(mapname);
+
+		params->selectedMap = m;
+		PerMapTabParams p = params->perMap[m->getName()];
+		m_dockTab->combo_positionVBO->clear();
+		m_dockTab->combo_vectorVBO->clear();
+		QList<Utils::VBO*> vbos = m->getVBOList();
+		for(int j = 0; j < vbos.count(); ++j)
+		{
+			m_dockTab->combo_positionVBO->addItem(QString::fromStdString(vbos[j]->name()));
+			if(vbos[j] == p.positionVBO)
+				m_dockTab->combo_positionVBO->setCurrentIndex(j);
+			m_dockTab->combo_vectorVBO->addItem(QString::fromStdString(vbos[j]->name()));
+			if(vbos[j] == p.vectorVBO)
+				m_dockTab->combo_vectorVBO->setCurrentIndex(j);
+		}
+		if(p.positionVBO == NULL && vbos.count() > 0)
+			m_dockTab->combo_positionVBO->setCurrentIndex(0);
+		if(p.vectorVBO == NULL && vbos.count() > 0)
+			m_dockTab->combo_vectorVBO->setCurrentIndex(0);
+	}
+}
+
+void RenderVectorPlugin::cb_positionVBOChanged(int index)
+{
+	View* current = m_window->getCurrentView();
+	assert(isLinkedToView(current));
+
+	TabParams* params = h_viewParams[current];
+	MapHandlerGen* m = params->selectedMap;
+	params->perMap[m->getName()].positionVBO = m->getVBO(m_dockTab->combo_positionVBO->currentText());
+	current->updateGL();
+}
+
+void RenderVectorPlugin::cb_vectorVBOChanged(int index)
+{
+	View* current = m_window->getCurrentView();
+	assert(isLinkedToView(current));
+
+	TabParams* params = h_viewParams[current];
+	MapHandlerGen* m = params->selectedMap;
+	params->perMap[m->getName()].vectorVBO = m->getVBO(m_dockTab->combo_vectorVBO->currentText());
+	current->updateGL();
+}
+
+void RenderVectorPlugin::cb_refreshVBOs()
+{
+	View* current = m_window->getCurrentView();
+	assert(isLinkedToView(current));
+
+	TabParams* params = h_viewParams[current];
+	MapHandlerGen* m = params->selectedMap;
+	if(m != NULL)
+	{
+		PerMapTabParams p = params->perMap[m->getName()];
+		p.positionVBO = NULL;
+		p.vectorVBO = NULL;
+		m_dockTab->combo_positionVBO->clear();
+		m_dockTab->combo_vectorVBO->clear();
+		QList<Utils::VBO*> vbos = m->getVBOList();
+		for(int j = 0; j < vbos.count(); ++j)
+		{
+			m_dockTab->combo_positionVBO->addItem(QString::fromStdString(vbos[j]->name()));
+			m_dockTab->combo_vectorVBO->addItem(QString::fromStdString(vbos[j]->name()));
+		}
+		if(vbos.count() > 0)
+		{
+			p.positionVBO = vbos[0];
+			m_dockTab->combo_positionVBO->setCurrentIndex(0);
+			p.vectorVBO = vbos[0];
+			m_dockTab->combo_vectorVBO->setCurrentIndex(0);
+		}
+	}
 }
 
 void RenderVectorPlugin::cb_vectorsScaleFactorChanged(int i)
@@ -63,7 +291,8 @@ void RenderVectorPlugin::cb_vectorsScaleFactorChanged(int i)
 	assert(isLinkedToView(current));
 
 	TabParams* params = h_viewParams[current];
-	params->vectorsScaleFactor = i / 50.0;
+	MapHandlerGen* m = params->selectedMap;
+	params->perMap[m->getName()].vectorsScaleFactor = i / 50.0;
 	current->updateGL();
 }
 

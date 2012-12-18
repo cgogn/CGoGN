@@ -258,6 +258,8 @@ void View::linkMap(MapHandlerGen* map)
 	if(map && !l_maps.contains(map))
 	{
 		l_maps.push_back(map);
+		foreach(Plugin* plugin, l_plugins)
+			plugin->mapLinked(this, map);
 		updateViewBB();
 	}
 }
@@ -265,6 +267,8 @@ void View::linkMap(MapHandlerGen* map)
 void View::unlinkMap(MapHandlerGen* map)
 {
 	l_maps.removeOne(map);
+	foreach(Plugin* plugin, l_plugins)
+		plugin->mapUnlinked(this, map);
 	updateViewBB();
 }
 

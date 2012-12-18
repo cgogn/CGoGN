@@ -36,6 +36,9 @@ void VBO::updateData(const ATTR_HANDLER& attrib)
 		CGoGNerr << "Error locked VBO" << CGoGNendl;
 		return;
 	}
+
+	m_name = attrib.name();
+
 	m_data_size = sizeof(typename ATTR_HANDLER::DATA_TYPE) / sizeof(float);
 	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 
@@ -65,6 +68,9 @@ void VBO::updateData(const ATTR_HANDLER& attrib, ConvertAttrib* conv)
 		CGoGNerr << "Error locked VBO" << CGoGNendl;
 		return;
 	}
+
+	m_name = attrib.name();
+
 	m_data_size = conv->sizeElt();
 	AttributeMultiVector<typename ATTR_HANDLER::DATA_TYPE>* mv = attrib.getDataVector() ;
 

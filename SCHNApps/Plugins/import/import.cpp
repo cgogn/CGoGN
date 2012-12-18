@@ -37,8 +37,9 @@ void ImportPlugin::cb_import()
 		VertexAttribute<VEC3> position = m->getAttribute<VEC3, CGoGN::VERTEX>(attrNames[0]);
 
 		// create VBO for vertex position attribute
-		Utils::VBO* positionVBO = h->getVBO(position.name());
-		positionVBO->updateData(position);
+		h->createVBO(position);
+//		Utils::VBO* positionVBO = h->getVBO(position.name());
+//		positionVBO->updateData(position);
 
 		// compute vertex normal attribute
 		VertexAttribute<VEC3> normal = m->getAttribute<VEC3, CGoGN::VERTEX>("normal");
@@ -47,8 +48,9 @@ void ImportPlugin::cb_import()
 		Algo::Geometry::computeNormalVertices<PFP>(*m, position, normal);
 
 		// create VBO for vertex normal attribute
-		CGoGN::Utils::VBO* normalVBO = h->getVBO("normal");
-		normalVBO->updateData(normal);
+		h->createVBO(normal);
+//		CGoGN::Utils::VBO* normalVBO = h->getVBO(normal);
+//		normalVBO->updateData(normal);
 
 		// compute map bounding box
 		h->updateBB(position);

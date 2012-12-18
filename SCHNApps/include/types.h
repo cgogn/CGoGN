@@ -28,7 +28,7 @@ typedef QHash<QString, View*> ViewHash;
 typedef QHash<QString, Camera*> CameraHash;
 
 typedef QHash<QString, MapHandlerGen*> MapHash;
-typedef QMap<std::string, Utils::VBO*> VBOHash;
+typedef QMap<QString, Utils::VBO*> VBOHash;
 typedef QHash<QString, Utils::GLSLShader*> ShaderHash;
 
 typedef QHash<QString, Texture*> TextureHash;

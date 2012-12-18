@@ -79,6 +79,9 @@ public:
 	virtual void viewUnlinked(View* view);
 	virtual void currentViewChanged(View* view);
 
+	virtual void mapLinked(View* view, MapHandlerGen* m) {}
+	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
+
 protected:
 	RenderDockTab* m_dockTab;
 	QHash<View*, TabParams*> h_viewParams;

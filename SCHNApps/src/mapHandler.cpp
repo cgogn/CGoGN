@@ -26,7 +26,7 @@ MapHandlerGen::~MapHandlerGen()
  * MANAGE VBOs
  *********************************************************/
 
-Utils::VBO* MapHandlerGen::getVBO(const std::string& name)
+Utils::VBO* MapHandlerGen::getVBO(const QString& name)
 {
 	if (h_vbo.contains(name))
 		return h_vbo[name];
@@ -38,7 +38,7 @@ Utils::VBO* MapHandlerGen::getVBO(const std::string& name)
 	}
 }
 
-void MapHandlerGen::deleteVBO(const std::string& name)
+void MapHandlerGen::deleteVBO(const QString& name)
 {
 	if (h_vbo.contains(name))
 	{
