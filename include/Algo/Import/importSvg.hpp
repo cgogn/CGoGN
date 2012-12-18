@@ -239,8 +239,6 @@ void readCoordAndStyle(xmlNode* cur_path,
 				it2 = curPoly.begin();
 		}
 
-		std::cout << "v " << v << std::endl;
-
 		if(v[2]>0)
 		{
 			std::reverse(curPoly.begin(), curPoly.end());
@@ -381,7 +379,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	bb = Algo::Geometry::computeBoundingBox<PFP>(map, position) ;
 	float tailleX = bb.size(0) ;
 	float tailleY = bb.size(1) ;
-	float tailleM = std::max<float>(tailleX, tailleY) / 80 ;
+	float tailleM = std::max<float>(tailleX, tailleY) / 30 ;
 	std::cout << "bounding box = " << tailleX << " X " << tailleY << std::endl;
 
 	for(Dart d = map.begin();d != map.end(); map.next(d))
@@ -393,9 +391,10 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	std::cout << "importSVG : Polygons generated." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	unsigned int count = 0 ;
+
 	//cut the edges to have a more regular sampling
 	TraversorE<typename PFP::MAP> edges(map) ;
-	unsigned int count = 0 ;
 	for (Dart d = edges.begin() ; d != edges.end() ; d = edges.next())
 	{
 		if (!buildingMark.isMarked(d))
@@ -558,6 +557,13 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		}
 
 		map.closeMap();
+
+		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+		{
+			if (map.isBoundaryMarked(d))
+				buildingMark.mark(d);
+		}
+
 	}
 
 	return true ;

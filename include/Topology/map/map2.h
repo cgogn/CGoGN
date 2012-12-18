@@ -125,7 +125,7 @@ public:
 	 *************************************************************************/
 
 	//@{
-	//! Create an new polyline of nbEdges, i.e 2*nbEdges darts pairewise sewn by phi2
+	//! Create an new polyline of nbEdges, i.e 2*nbEdges darts pairwise sewn by phi2
 	/*! @param nbEdges the number of edges
 	 *  @return return a dart of the face
 	 */
