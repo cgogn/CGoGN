@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Modelisation
 {
 
@@ -715,6 +718,8 @@ void sqrt3Vol(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 
 
 } //namespace Modelisation
+
+}
 
 } //namespace Algo
 

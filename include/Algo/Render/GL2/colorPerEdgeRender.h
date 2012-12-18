@@ -22,14 +22,16 @@
 *                                                                              *
 *******************************************************************************/
 
-#ifndef __DECIMATION_H__
-#define __DECIMATION_H__
+#ifndef _COLOR_PER_EDGE_RENDER
+#define _COLOR_PER_EDGE_RENDER
 
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/halfEdgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/colorPerVertexApproximator.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
+
+#include "Topology/generic/dart.h"
+#include "Topology/generic/attributeHandler.h"
+#include "Topology/generic/functor.h"
+#include "Utils/vbo_base.h"
+#include "Utils/GLSLShader.h"
+
 
 namespace CGoGN
 {
@@ -37,46 +39,56 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Surface
+namespace Render
 {
 
-namespace Decimation
+namespace GL2
 {
 
 /**
- * Decimate the mesh through edge contraction
- * by using a selector and approximator scheme.
- *
- * \param map the map to decimate
- * \param s the SelectorType
- * \param a the ApproximatorType
- * \param position the vertex position embeddings
- * \param nbWantedVertices the aimed amount of vertices after decimation
- * \param selected the selector stipulating which darts are eligible for contraction
- * \param edgeErrors will (if not null) contain the edge errors computed by the approximator/selector (default NULL)
- * \param callback_wrapper a callback function for progress monitoring (default NULL)
- * \param callback_object the object to call the callback on (default NULL)
+ * Class that update VBO to allow the rendering of per face color rendering
+ * Use with ColorPerVertexShader
  */
-template <typename PFP>
-void decimate(
-	typename PFP::MAP& map,
-	SelectorType s,
-	ApproximatorType a,
-	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
-	unsigned int nbWantedVertices,
-	const FunctorSelect& selected = allDarts,
-	EdgeAttribute<typename PFP::REAL> *edgeErrors = NULL,
-	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
-) ;
+class ColorPerEdgeRender
+{
+protected:
+	GLuint m_nbEdges;
 
-} //namespace Decimation
+public:
+	/**
+	* Constructor
+	*/
+	ColorPerEdgeRender() ;
 
-}
+	/**
+	* update drawing buffers
+	* @param vboPosition vbo of positions to update
+	* @param vboColor vbo of colors to update
+	* @param map the map
+	* @param positions attribute of position vertices
+	* @param colorPerXXX attribute of color (per edge or per vertex per edge)
+	* @param good selector
+	*/
+	template<typename PFP, typename ATTRIB>
+	void updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
+			const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good = allDarts) ;
 
-} //namespace Algo
+	/**
+	 * draw
+	 * @param sh shader use to draw (user ColorPerVertex or compatible)
+	 */
+	void draw(Utils::GLSLShader* sh) ;
 
-} //namespace CGoGN
+};
 
-#include "Algo/Decimation/decimation.hpp"
+}//end namespace GL2
+
+}//end namespace Algo
+
+}//end namespace Render
+
+}//end namespace CGoGN
+
+#include "Algo/Render/GL2/colorPerEdgeRender.hpp"
 
 #endif

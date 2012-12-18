@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 template< typename  DataType, template < typename D2 > class Windowing, typename PFP >
@@ -1248,6 +1251,8 @@ void MarchingCube<DataType, Windowing, PFP>::setZSliceAttrib(EdgeAttribute<unsig
 
 
 } // namespace MC
+
+}
 
 } // namespace Algo
 

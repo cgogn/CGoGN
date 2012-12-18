@@ -42,6 +42,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -511,6 +514,8 @@ void computeCurvatureVertices_QuadraticFitting(
 
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

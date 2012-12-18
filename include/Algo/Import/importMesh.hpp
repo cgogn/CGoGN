@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -130,8 +133,138 @@ bool importMesh(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
 	return true ;
 }
 
+
 template <typename PFP>
-bool importMeshSToV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float dist)
+bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
+{
+	MeshTablesSurface<PFP> mts(map);
+
+	if(!mts.importMesh(filename, attrNames))
+		return false;
+
+	if (mergeCloseVertices)
+		mts.mergeCloseVertices();
+
+	return importMesh<PFP>(map, mts);
+}
+
+
+template <typename PFP>
+bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
+{
+	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
+
+	unsigned nbf = mts.getNbFaces();
+	int index = 0;
+	// buffer for tempo faces (used to remove degenerated edges)
+	std::vector<unsigned int> edgesBuffer;
+	edgesBuffer.reserve(16);
+
+	DartMarkerNoUnmark m(map) ;
+
+	// for each face of table
+	for(unsigned int i = 0; i < nbf; ++i)
+	{
+		// store face in buffer, removing degenerated edges
+		unsigned int nbe = mts.getNbEdgesFace(i);
+		edgesBuffer.clear();
+		unsigned int prec = EMBNULL;
+		for (unsigned int j = 0; j < nbe; ++j)
+		{
+			unsigned int em = mts.getEmbIdx(index++);
+			if (em != prec)
+			{
+				prec = em;
+				edgesBuffer.push_back(em);
+			}
+		}
+		// check first/last vertices
+		if (edgesBuffer.front() == edgesBuffer.back())
+			edgesBuffer.pop_back();
+
+		// create only non degenerated faces
+		nbe = edgesBuffer.size();
+		if (nbe > 2)
+		{
+			Dart d = map.newFace(nbe, false);
+			for (unsigned int j = 0; j < nbe; ++j)
+			{
+				unsigned int em = edgesBuffer[j];		// get embedding
+
+				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
+//				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
+				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT2>(d, fsetemb);
+
+				m.mark(d) ;								// mark on the fly to unmark on second loop
+				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
+				d = map.phi1(d);
+			}
+		}
+	}
+
+	// reconstruct neighbourhood
+	unsigned int nbBoundaryEdges = 0;
+	for (Dart d = map.begin(); d != map.end(); map.next(d))
+	{
+		if (m.isMarked(d))
+		{
+			// darts incident to end vertex of edge
+			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
+
+			unsigned int embd = map.template getEmbedding<VERTEX>(d);
+			Dart good_dart = NIL;
+			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
+			{
+				if (map.template getEmbedding<VERTEX>(map.phi1(*it)) == embd)
+					good_dart = *it;
+			}
+
+			if (good_dart != NIL)
+			{
+				map.sewFaces(d, good_dart, false);
+				m.unmarkOrbit<EDGE>(d);
+			}
+			else
+			{
+				m.unmark(d);
+				++nbBoundaryEdges;
+			}
+		}
+	}
+
+	unsigned int nbH = map.closeMap();
+	CGoGNout << "Map closed (" << map.template getNbOrbits<FACE>() << " boundary faces / " << nbH << " holes)" << CGoGNendl;
+	std::cout << "nb darts : " << map.getNbDarts() << std::endl ;
+	// ensure bijection between topo and embedding
+	//map.template bijectiveOrbitEmbedding<VERTEX>();
+
+	return true ;
+}
+
+template <typename PFP>
+bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
+{
+	MeshTablesSurface<PFP> mts(map);
+
+	if(!mts.importMesh(filename, attrNames))
+		return false;
+
+	return importMeshSAsV<PFP>(map, mts);
+}
+
+
+}
+}
+
+
+namespace Volume
+{
+
+namespace Import
+{
+
+template <typename PFP>
+bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float dist)
 {
 	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
 	unsigned nbf = mts.getNbFaces();
@@ -364,97 +497,6 @@ bool importMeshSurfToVol(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, fl
 	return true ;
 }
 
-template <typename PFP>
-bool importMeshSAsV(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts)
-{
-	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map, "incidents");
-
-	unsigned nbf = mts.getNbFaces();
-	int index = 0;
-	// buffer for tempo faces (used to remove degenerated edges)
-	std::vector<unsigned int> edgesBuffer;
-	edgesBuffer.reserve(16);
-
-	DartMarkerNoUnmark m(map) ;
-
-	// for each face of table
-	for(unsigned int i = 0; i < nbf; ++i)
-	{
-		// store face in buffer, removing degenerated edges
-		unsigned int nbe = mts.getNbEdgesFace(i);
-		edgesBuffer.clear();
-		unsigned int prec = EMBNULL;
-		for (unsigned int j = 0; j < nbe; ++j)
-		{
-			unsigned int em = mts.getEmbIdx(index++);
-			if (em != prec)
-			{
-				prec = em;
-				edgesBuffer.push_back(em);
-			}
-		}
-		// check first/last vertices
-		if (edgesBuffer.front() == edgesBuffer.back())
-			edgesBuffer.pop_back();
-
-		// create only non degenerated faces
-		nbe = edgesBuffer.size();
-		if (nbe > 2)
-		{
-			Dart d = map.newFace(nbe, false);
-			for (unsigned int j = 0; j < nbe; ++j)
-			{
-				unsigned int em = edgesBuffer[j];		// get embedding
-
-				FunctorSetEmb<typename PFP::MAP, VERTEX> fsetemb(map, em);
-//				foreach_dart_of_orbit_in_parent<typename PFP::MAP>(&map, VERTEX, d, fsetemb) ;
-				map.template foreach_dart_of_orbit<PFP::MAP::VERTEX_OF_PARENT2>(d, fsetemb);
-
-				m.mark(d) ;								// mark on the fly to unmark on second loop
-				vecDartsPerVertex[em].push_back(d);		// store incident darts for fast adjacency reconstruction
-				d = map.phi1(d);
-			}
-		}
-	}
-
-	// reconstruct neighbourhood
-	unsigned int nbBoundaryEdges = 0;
-	for (Dart d = map.begin(); d != map.end(); map.next(d))
-	{
-		if (m.isMarked(d))
-		{
-			// darts incident to end vertex of edge
-			std::vector<Dart>& vec = vecDartsPerVertex[map.phi1(d)];
-
-			unsigned int embd = map.template getEmbedding<VERTEX>(d);
-			Dart good_dart = NIL;
-			for (typename std::vector<Dart>::iterator it = vec.begin(); it != vec.end() && good_dart == NIL; ++it)
-			{
-				if (map.template getEmbedding<VERTEX>(map.phi1(*it)) == embd)
-					good_dart = *it;
-			}
-
-			if (good_dart != NIL)
-			{
-				map.sewFaces(d, good_dart, false);
-				m.unmarkOrbit<EDGE>(d);
-			}
-			else
-			{
-				m.unmark(d);
-				++nbBoundaryEdges;
-			}
-		}
-	}
-
-	unsigned int nbH = map.closeMap();
-	CGoGNout << "Map closed (" << map.template getNbOrbits<FACE>() << " boundary faces / " << nbH << " holes)" << CGoGNendl;
-	std::cout << "nb darts : " << map.getNbDarts() << std::endl ;
-	// ensure bijection between topo and embedding
-	//map.template bijectiveOrbitEmbedding<VERTEX>();
-
-	return true ;
-}
 
 template <typename PFP>
 bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
@@ -463,43 +505,30 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 	return false;
 }
 
-template <typename PFP>
-bool importMesh(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
-{
-	MeshTablesSurface<PFP> mts(map);
-
-	if(!mts.importMesh(filename, attrNames))
-		return false;
-
-	if (mergeCloseVertices)
-		mts.mergeCloseVertices();
-
-	return importMesh<PFP>(map, mts);
-}
 
 template <typename PFP>
 bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
-	ImportVolumique::ImportType kind = ImportVolumique::UNKNOWNVOLUME;
+	Volume::Import::ImportType kind = Volume::Import::UNKNOWNVOLUME;
 
 	if ((filename.rfind(".tet") != std::string::npos) || (filename.rfind(".TET") != std::string::npos))
-		kind = ImportVolumique::TET;
+		kind = Volume::Import::TET;
 
 	if ((filename.rfind(".off") != std::string::npos) || (filename.rfind(".OFF") != std::string::npos))
-		kind = ImportVolumique::OFF;
+		kind = Volume::Import::OFF;
 
 	if ((filename.rfind(".node") != std::string::npos) || (filename.rfind(".NODE") != std::string::npos))
-		kind = ImportVolumique::NODE;
+		kind = Volume::Import::NODE;
 
 	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
-		kind = ImportVolumique::TS;
+		kind = Volume::Import::TS;
 
 	switch (kind)
 	{
-		case ImportVolumique::TET:
+		case Volume::Import::TET:
 			return Algo::Import::importTet<PFP>(map, filename, attrNames, 1.0f);
 			break;
-		case ImportVolumique::OFF:
+		case Volume::Import::OFF:
 		{
 			size_t pos = filename.rfind(".");
 			std::string fileEle = filename;
@@ -508,7 +537,7 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
 			return Algo::Import::importOFFWithELERegions<PFP>(map, filename, fileEle, attrNames);
 			break;
 		}
-		case ImportVolumique::NODE:
+		case Volume::Import::NODE:
 		{
 			size_t pos = filename.rfind(".");
 			std::string fileEle = filename;
@@ -517,7 +546,7 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
 			return Algo::Import::importNodeWithELERegions<PFP>(map, filename, fileEle, attrNames);
 			break;
 		}
-		case ImportVolumique::TS:
+		case Volume::Import::TS:
 			Algo::Import::importTs<PFP>(map, filename, attrNames, 1.0f);
 			break;
 		default:
@@ -530,7 +559,7 @@ bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vecto
 template <typename PFP>
 bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, float scale, unsigned int nbStage)
 {
-	MeshTablesSurface<PFP> mts(map);
+	Surface::Import::MeshTablesSurface<PFP> mts(map);
 
 	if(!mts.importMesh(filename, attrNames))
 		return false;
@@ -538,18 +567,11 @@ bool importMeshToExtrude(typename PFP::MAP& map, const std::string& filename, st
 	return importMeshSurfToVol<PFP>(map, mts, scale, nbStage);
 }
 
-template <typename PFP>
-bool importMeshSAsV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames)
-{
-	MeshTablesSurface<PFP> mts(map);
 
-	if(!mts.importMesh(filename, attrNames))
-		return false;
-
-	return importMeshSAsV<PFP>(map, mts);
-}
 
 } // namespace Import
+}
+
 
 } // namespace Algo
 

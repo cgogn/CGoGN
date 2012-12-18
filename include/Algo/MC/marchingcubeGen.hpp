@@ -30,6 +30,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace MC
 {
 
@@ -1222,7 +1225,7 @@ void MarchingCubeGen<DataType, ImgT, Windowing, PFP>::createLocalFaces(const uns
 
 }
 
-
+}
 } // end namespace
 } // end namespace
 } // end namespace

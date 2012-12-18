@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -277,6 +280,8 @@ void Predictor_TangentPredict2<PFP>::predict(Dart d2, Dart dd2)
 }
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

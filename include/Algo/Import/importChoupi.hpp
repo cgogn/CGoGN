@@ -29,6 +29,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -124,6 +127,8 @@ bool importChoupi(const std::string& filename, std::vector<typename PFP::VEC3>& 
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

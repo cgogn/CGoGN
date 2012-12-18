@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -134,6 +137,8 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

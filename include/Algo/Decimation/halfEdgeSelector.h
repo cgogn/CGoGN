@@ -33,6 +33,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -267,6 +270,8 @@ public:
 } ;
 
 } // namespace Decimation
+
+}
 
 } // namespace Algo
 

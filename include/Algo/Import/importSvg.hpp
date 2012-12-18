@@ -35,6 +35,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -671,6 +674,8 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

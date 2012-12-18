@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -181,6 +184,8 @@ template <typename PFP>
 bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, QuadTree& qt) ;
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

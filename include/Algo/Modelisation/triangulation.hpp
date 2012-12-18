@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -241,6 +244,8 @@ void EarTriangulation<PFP>::triangule( const FunctorSelect& good, unsigned int t
 }
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

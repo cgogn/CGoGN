@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -131,17 +134,20 @@ Dart createPrism(typename PFP::MAP& map, unsigned int n)
 template <typename PFP>
 Dart createDiamond(typename PFP::MAP& map, unsigned int nbSides)
 {
-	Dart res = Dart::nil();
 
-	Dart firstP = createPyramid<PFP>(map,nbSides);
-	Dart secondP = createPyramid<PFP>(map,nbSides);
+// TODO A REFAIRE
 
-	res = map.phi2(firstP);
-
-	map.sewVolumes(firstP, secondP);
-	//map.mergeVolumes(firstP);
-
-	return res;
+//	Dart res = Dart::nil();
+//
+//	Dart firstP = createPyramid<PFP>(map,nbSides);
+//	Dart secondP = createPyramid<PFP>(map,nbSides);
+//
+//	res = map.phi2(firstP);
+//
+//	map.sewVolumes(firstP, secondP);
+//	//map.mergeVolumes(firstP);
+//
+//	return res;
 }
 
 
@@ -1032,6 +1038,8 @@ void Polyhedron<PFP>::embedHelicoid(float radius_min, float radius_max, float ma
 // }
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

@@ -21,15 +21,12 @@
 * Contact information: cgogn@unistra.fr                                        *
 *                                                                              *
 *******************************************************************************/
+#include <cmath>
 
-#ifndef __DECIMATION_H__
-#define __DECIMATION_H__
-
-#include "Algo/Decimation/edgeSelector.h"
-#include "Algo/Decimation/halfEdgeSelector.h"
-#include "Algo/Decimation/geometryApproximator.h"
-#include "Algo/Decimation/colorPerVertexApproximator.h"
-#include "Algo/Decimation/lightfieldApproximator.h"
+#include "Geometry/vector_gen.h"
+#include "Topology/generic/dartmarker.h"
+#include "Topology/generic/cellmarker.h"
+#include "Algo/Geometry/centroid.h"
 
 namespace CGoGN
 {
@@ -37,46 +34,77 @@ namespace CGoGN
 namespace Algo
 {
 
-namespace Surface
+namespace Render
 {
 
-namespace Decimation
+namespace GL2
 {
 
-/**
- * Decimate the mesh through edge contraction
- * by using a selector and approximator scheme.
- *
- * \param map the map to decimate
- * \param s the SelectorType
- * \param a the ApproximatorType
- * \param position the vertex position embeddings
- * \param nbWantedVertices the aimed amount of vertices after decimation
- * \param selected the selector stipulating which darts are eligible for contraction
- * \param edgeErrors will (if not null) contain the edge errors computed by the approximator/selector (default NULL)
- * \param callback_wrapper a callback function for progress monitoring (default NULL)
- * \param callback_object the object to call the callback on (default NULL)
- */
-template <typename PFP>
-void decimate(
-	typename PFP::MAP& map,
-	SelectorType s,
-	ApproximatorType a,
-	std::vector<VertexAttribute<typename PFP::VEC3> *>& position,
-	unsigned int nbWantedVertices,
-	const FunctorSelect& selected = allDarts,
-	EdgeAttribute<typename PFP::REAL> *edgeErrors = NULL,
-	void (*callback_wrapper)(void*, const void*) = NULL, void *callback_object = NULL
-) ;
 
-} //namespace Decimation
 
+inline ColorPerEdgeRender::ColorPerEdgeRender():
+m_nbEdges(0)
+{
 }
 
-} //namespace Algo
 
-} //namespace CGoGN
 
-#include "Algo/Decimation/decimation.hpp"
+template<typename PFP, typename ATTRIB>
+void ColorPerEdgeRender::updateVBO(Utils::VBO& vboPosition, Utils::VBO& vboColor, typename PFP::MAP& map,
+		const VertexAttribute<typename PFP::VEC3>& positions, const ATTRIB& colorPerXXX, const FunctorSelect& good)
+{
+	typedef typename PFP::VEC3 VEC3;
+	typedef typename PFP::REAL REAL;
 
-#endif
+	std::vector<VEC3> buffer;
+	buffer.reserve(16384);
+
+	std::vector<VEC3> bufferColors;
+	bufferColors.reserve(16384);
+
+	TraversorCell<typename PFP::MAP, EDGE> traEdge(map, good);
+
+	for (Dart d=traEdge.begin(); d!=traEdge.end(); d=traEdge.next())
+	{
+		buffer.push_back(positions[d]);
+		bufferColors.push_back(colorPerXXX[d]);
+		Dart e = map.phi2(d);
+		buffer.push_back(positions[e]);
+		bufferColors.push_back(colorPerXXX[e]);
+	}
+
+	m_nbEdges = buffer.size()/2;
+
+	vboPosition.setDataSize(3);
+	vboPosition.allocate(buffer.size());
+	VEC3* ptrPos = reinterpret_cast<VEC3*>(vboPosition.lockPtr());
+	memcpy(ptrPos,&buffer[0],buffer.size()*sizeof(VEC3));
+	vboPosition.releasePtr();
+
+	vboColor.setDataSize(3);
+	vboColor.allocate(bufferColors.size());
+	VEC3* ptrCol = reinterpret_cast<VEC3*>(vboColor.lockPtr());
+	memcpy(ptrCol,&bufferColors[0],bufferColors.size()*sizeof(VEC3));
+	vboColor.releasePtr();
+}
+
+
+
+
+inline void ColorPerEdgeRender::draw(Utils::GLSLShader* sh)
+{
+	sh->enableVertexAttribs();
+	glDrawArrays(GL_LINES , 0 , m_nbEdges*2 );
+	sh->disableVertexAttribs();
+}
+
+
+
+
+}//end namespace VBO
+
+}//end namespace Algo
+
+}//end namespace Render
+
+}//end namespace CGoGN

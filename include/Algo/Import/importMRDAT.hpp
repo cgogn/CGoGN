@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
@@ -269,6 +272,8 @@ bool importMRDAT(typename PFP::MAP& map, const std::string& filename, std::vecto
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

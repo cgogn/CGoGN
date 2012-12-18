@@ -40,91 +40,94 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Import
 {
 
 template<typename PFP>
-ImportSurfacique::ImportType MeshTablesSurface<PFP>::getFileType(const std::string& filename)
+ImportType MeshTablesSurface<PFP>::getFileType(const std::string& filename)
 {
 	if ((filename.rfind(".trianbgz")!=std::string::npos) || (filename.rfind(".TRIANBGZ")!=std::string::npos))
-		return ImportSurfacique::TRIANBGZ;
+		return TRIANBGZ;
 
 	if ((filename.rfind(".trian")!=std::string::npos) || (filename.rfind(".TRIAN")!=std::string::npos))
-		return ImportSurfacique::TRIAN;
+		return TRIAN;
 
 	if ((filename.rfind(".meshbin")!=std::string::npos) || (filename.rfind(".MESHBIN")!=std::string::npos))
-		return ImportSurfacique::MESHBIN;
+		return MESHBIN;
 
 /*	if ((filename.rfind(".plyptm")!=std::string::npos) || (filename.rfind(".PLYGEN")!=std::string::npos))
-		return ImportSurfacique::PLYPTM;
+		return PLYPTM;
 */
 	if ((filename.rfind(".plyPTMextBin")!=std::string::npos) || (filename.rfind(".plySHrealBin")!=std::string::npos))
-		return ImportSurfacique::PLYSLFgenericBin;
+		return PLYSLFgenericBin;
 
 	if ((filename.rfind(".plyPTMext")!=std::string::npos) || (filename.rfind(".plySHreal")!=std::string::npos))
-		return ImportSurfacique::PLYSLFgeneric;
+		return PLYSLFgeneric;
 
 	if ((filename.rfind(".ply")!=std::string::npos) || (filename.rfind(".PLY")!=std::string::npos))
-		return ImportSurfacique::PLY;
+		return PLY;
 
 	if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
-		return ImportSurfacique::OFF;
+		return OFF;
 
 	if ((filename.rfind(".obj")!=std::string::npos) || (filename.rfind(".OBJ")!=std::string::npos))
-		return ImportSurfacique::OBJ;
+		return OBJ;
 
 	if ((filename.rfind(".ahem")!=std::string::npos) || (filename.rfind(".AHEM")!=std::string::npos))
-		return ImportSurfacique::AHEM;
+		return AHEM;
 
-	return ImportSurfacique::UNKNOWNSURFACE;
+	return UNKNOWNSURFACE;
 }
 
 template<typename PFP>
 bool MeshTablesSurface<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames)
 {
-	ImportSurfacique::ImportType kind = getFileType(filename);
+	ImportType kind = getFileType(filename);
 
 	attrNames.clear() ;
 
 	switch (kind)
 	{
-	case ImportSurfacique::TRIAN:
+	case TRIAN:
 		CGoGNout << "TYPE: TRIAN" << CGoGNendl;
 		return importTrian(filename, attrNames);
 		break;
-	case ImportSurfacique::TRIANBGZ:
+	case TRIANBGZ:
 		CGoGNout << "TYPE: TRIANBGZ" << CGoGNendl;
 		return importTrianBinGz(filename, attrNames);
 		break;
-	case ImportSurfacique::OFF:
+	case OFF:
 		CGoGNout << "TYPE: OFF" << CGoGNendl;
 		return importOff(filename, attrNames);
 		break;
-	case ImportSurfacique::MESHBIN:
+	case MESHBIN:
 		CGoGNout << "TYPE: MESHBIN" << CGoGNendl;
 		return importMeshBin(filename, attrNames);
 		break;
-	case ImportSurfacique::PLY:
+	case PLY:
 		CGoGNout << "TYPE: PLY" << CGoGNendl;
 		return importPly(filename, attrNames);
 		break;
-/*	case ImportSurfacique::PLYPTM:
+/*	case PLYPTM:
 		CGoGNout << "TYPE: PLYPTM" << CGoGNendl;
 		return importPlyPTM(filename, attrNames);
 		break;
-*/	case ImportSurfacique::PLYSLFgeneric:
+*/	case PLYSLFgeneric:
 		CGoGNout << "TYPE: PLYSLFgeneric" << CGoGNendl;
 		return importPlySLFgeneric(filename, attrNames);
 		break;
-	case ImportSurfacique::PLYSLFgenericBin:
+	case PLYSLFgenericBin:
 		CGoGNout << "TYPE: PLYSLFgenericBin" << CGoGNendl;
 		return importPlySLFgenericBin(filename, attrNames);
 		break;
-	case ImportSurfacique::OBJ:
+	case OBJ:
 		CGoGNout << "TYPE: OBJ" << CGoGNendl;
 		return importObj(filename, attrNames);
 		break;
-	case ImportSurfacique::AHEM:
+	case AHEM:
 		CGoGNout << "TYPE: AHEM" << CGoGNendl;
 		return importAHEM(filename, attrNames);
 		break;
@@ -1633,6 +1636,8 @@ bool MeshTablesSurface<PFP>::mergeCloseVertices()
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Import
 {
 
@@ -188,6 +191,8 @@ bool MeshTablesVolume<PFP>::importTet(const std::string& filename, std::vector<s
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

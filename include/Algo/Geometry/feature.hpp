@@ -32,6 +32,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -515,6 +518,8 @@ std::vector<typename PFP::VEC3> occludingContoursDetection(
 }
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

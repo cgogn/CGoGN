@@ -31,6 +31,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Import 
 {
 
@@ -204,6 +207,8 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 }
 
 } // namespace Import
+
+}
 
 } // namespace Algo
 

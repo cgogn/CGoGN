@@ -30,6 +30,8 @@ namespace CGoGN
 {
 namespace Algo
 {
+namespace Volume
+{
 namespace Import 
 {
 
@@ -213,7 +215,6 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 }
 
 } // namespace Import
-
+}
 } // namespace Algo
-
 } // namespace CGoGN

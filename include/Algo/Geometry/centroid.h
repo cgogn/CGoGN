@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Geometry
 {
 
@@ -150,6 +153,8 @@ void computeNeighborhoodCentroidVertices(typename PFP::MAP& map,
 }
 
 } // namespace Geometry
+
+}
 
 } // namespace Algo
 

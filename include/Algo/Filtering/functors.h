@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Filtering
 {
 
@@ -95,6 +98,8 @@ public:
 } ;
 
 } // namespace Filtering
+
+}
 
 } // namespace Algo
 

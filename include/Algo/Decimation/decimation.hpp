@@ -28,6 +28,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Decimation
 {
 
@@ -248,6 +251,8 @@ void decimate(
 }
 
 } //namespace Decimation
+
+}
 
 } //namespace Algo
 

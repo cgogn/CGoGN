@@ -34,6 +34,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Surface
+{
+
 namespace Modelisation
 {
 
@@ -735,6 +738,8 @@ inline double sqrt3_K(unsigned int n)
 //}
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 
