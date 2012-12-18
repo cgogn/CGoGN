@@ -222,9 +222,26 @@ void readCoordAndStyle(xmlNode* cur_path,
 	//check orientation : set in CCW
 	if(curPoly.size()>2)
 	{
-		VEC3 v1(curPoly[1]-curPoly[0]);
-		VEC3 v2(curPoly[2]-curPoly[1]);
-		if((v1^v2)[2]<0)
+		VEC3 v(0), v1, v2;
+		typename std::vector<VEC3 >::iterator it0, it1, it2;
+		it0 = curPoly.begin();
+		it1 = it0+1;
+		it2 = it1+1;
+		for(unsigned int i = 0 ; i < curPoly.size() ; ++i)
+		{
+			VEC3 t = (*it1)^(*it0);
+			v += t;
+
+			it0=it1;
+			it1=it2;
+			it2++;
+			if(it2 == curPoly.end())
+				it2 = curPoly.begin();
+		}
+
+		std::cout << "v " << v << std::endl;
+
+		if(v[2]>0)
 		{
 			std::reverse(curPoly.begin(), curPoly.end());
 		}
@@ -333,6 +350,10 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	std::cout << "importSVG : Merging of vertices." << std::endl;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	std::cout << "buildings " << allPoly.size() << std::endl;
+	unsigned int c = 0;
+
 	//create polygons
 	for(it = allPoly.begin() ; it != allPoly.end() ; ++it)
 	{
@@ -343,6 +364,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		else
 		{
 			Dart d = map.newFace(it->size());
+			c++;
 			buildingMark.mark(d);
 			buildingMark.mark(map.phi2(d));
 
@@ -359,7 +381,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 	bb = Algo::Geometry::computeBoundingBox<PFP>(map, position) ;
 	float tailleX = bb.size(0) ;
 	float tailleY = bb.size(1) ;
-	float tailleM = std::max<float>(tailleX, tailleY) / 20 ;
+	float tailleM = std::max<float>(tailleX, tailleY) / 80 ;
 	std::cout << "bounding box = " << tailleX << " X " << tailleY << std::endl;
 
 	for(Dart d = map.begin();d != map.end(); map.next(d))
@@ -490,44 +512,43 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 		}
 	}
 
-	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
-	{
-		if(map.isBoundaryMarked(d))
-		{
-			map.fillHole(d);
-		}
-
-		if(map.faceDegree(d)==2)
-		{
-			map.mergeFaces(d);
-		}
-	}
-
-	//embed the path
-	for (Dart d = map.begin() ; d != map.end() ; map.next(d))
-	{
-		if (brokenL.isMarked(d))
-		{
-			VEC3 pos;
-
-			Geom::Plane3D<typename PFP::REAL> pl;
-			pos = position[d] ;
-
-			pl = edgePlanes[d] ;
-			pl.project(pos) ;
-			position[d] = pos ;
-
-			pos = position[map.phi1(d)] ;
-			pl.project(pos) ;
-			position[map.phi1(d)] = pos ;
-		}
-	}
-
 	if(allBrokenLines.size()>0)
+	{
+		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+		{
+			if(map.isBoundaryMarked(d))
+			{
+				map.fillHole(d);
+			}
+
+			if(map.faceDegree(d)==2)
+			{
+				map.mergeFaces(d);
+			}
+		}
+
+		//embed the path
+		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
+		{
+			if (brokenL.isMarked(d))
+			{
+				VEC3 pos;
+
+				Geom::Plane3D<typename PFP::REAL> pl;
+				pos = position[d] ;
+
+				pl = edgePlanes[d] ;
+				pl.project(pos) ;
+				position[d] = pos ;
+
+				pos = position[map.phi1(d)] ;
+				pl.project(pos) ;
+				position[map.phi1(d)] = pos ;
+			}
+		}
+
 		map.template initAllOrbitsEmbedding<FACE>(true);
 
-	if(allBrokenLines.size()>0)
-	{
 		for (Dart d = map.begin() ; d != map.end() ; map.next(d))
 		{
 			if (!map.isBoundaryMarked(d) && brokenL.isMarked(d))
@@ -535,9 +556,9 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 				map.deleteFace(d,false);
 			}
 		}
-	}
 
-	map.closeMap();
+		map.closeMap();
+	}
 
 	return true ;
 }
