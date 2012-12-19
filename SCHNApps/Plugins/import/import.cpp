@@ -11,7 +11,7 @@
 bool ImportPlugin::enable()
 {
 	importAction = new QAction("import", this);
-	addMenuAction("Import;import", importAction);
+	addMenuAction("Import;Import Surface", importAction);
 	connect(importAction, SIGNAL(triggered()), this, SLOT(cb_import()));
 	return true;
 }
@@ -38,8 +38,6 @@ void ImportPlugin::cb_import()
 
 		// create VBO for vertex position attribute
 		h->createVBO(position);
-//		Utils::VBO* positionVBO = h->getVBO(position.name());
-//		positionVBO->updateData(position);
 
 		// compute vertex normal attribute
 		VertexAttribute<VEC3> normal = m->getAttribute<VEC3, CGoGN::VERTEX>("normal");
@@ -49,8 +47,6 @@ void ImportPlugin::cb_import()
 
 		// create VBO for vertex normal attribute
 		h->createVBO(normal);
-//		CGoGN::Utils::VBO* normalVBO = h->getVBO(normal);
-//		normalVBO->updateData(normal);
 
 		// compute map bounding box
 		h->updateBB(position);

@@ -15,17 +15,12 @@ using namespace CGoGN;
 using namespace SCHNApps;
 
 
-class RenderVectorDockTab : public QWidget, public Ui::RenderVectorWidget
+struct PerMapParameterSet
 {
-public:
-	RenderVectorDockTab() { setupUi(this); }
-};
+	PerMapParameterSet() : positionVBO(NULL), vectorVBO(NULL), vectorsScaleFactor(1.0f)
+	{}
 
-struct PerMapTabParams
-{
-	PerMapTabParams() {}
-
-	PerMapTabParams(Utils::VBO* pos, Utils::VBO* vec, float s) :
+	PerMapParameterSet(Utils::VBO* pos, Utils::VBO* vec, float s) :
 		positionVBO(pos),
 		vectorVBO(vec),
 		vectorsScaleFactor(s)
@@ -36,10 +31,30 @@ struct PerMapTabParams
 	float vectorsScaleFactor;
 };
 
-struct TabParams
+struct ParameterSet
 {
-	QHash<QString, PerMapTabParams> perMap;
+	ParameterSet() : selectedMap(NULL)
+	{}
+
+	QHash<QString, PerMapParameterSet> perMap;
 	MapHandlerGen* selectedMap;
+};
+
+
+class RenderVectorPlugin;
+
+class RenderVectorDockTab : public QWidget, public Ui::RenderVectorWidget
+{
+public:
+	RenderVectorDockTab(RenderVectorPlugin* p) : plugin(p)
+	{
+		setupUi(this);
+	}
+
+	void refreshUI(ParameterSet* params);
+
+private:
+	RenderVectorPlugin* plugin;
 };
 
 
@@ -49,7 +64,7 @@ class RenderVectorPlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderVectorPlugin()
+	RenderVectorPlugin() : b_refreshingUI(false)
 	{
 		setProvidesRendering(true);
 	}
@@ -76,13 +91,15 @@ public:
 	virtual void mapLinked(View* view, MapHandlerGen* m);
 	virtual void mapUnlinked(View* view, MapHandlerGen* m);
 
-	void refreshTabInfo();
+	void setRefreshingUI(bool b) { b_refreshingUI = b; }
 
 protected:
 	RenderVectorDockTab* m_dockTab;
-	QHash<View*, TabParams*> h_viewParams;
+	QHash<View*, ParameterSet*> h_viewParams;
 
 	CGoGN::Utils::ShaderVectorPerVertex* m_vectorShader;
+
+	bool b_refreshingUI;
 
 public slots:
 	void cb_selectedMapChanged();

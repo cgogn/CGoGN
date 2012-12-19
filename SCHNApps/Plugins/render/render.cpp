@@ -50,7 +50,7 @@ void RenderPlugin::disable()
 
 void RenderPlugin::redraw(View* view)
 {
-	TabParams* params = h_viewParams[view];
+	ParameterSet* params = h_viewParams[view];
 
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* m, maps)
@@ -96,23 +96,22 @@ void RenderPlugin::redraw(View* view)
 
 void RenderPlugin::viewLinked(View* view)
 {
-	h_viewParams.insert(view, new TabParams(1.0, false, false, true, FLAT));
+	h_viewParams.insert(view, new ParameterSet());
+	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
 void RenderPlugin::viewUnlinked(View* view)
 {
 	h_viewParams.remove(view);
+	View* current = m_window->getCurrentView();
+	if(isLinkedToView(current))
+		m_dockTab->refreshUI(h_viewParams[current]);
 }
 
 void RenderPlugin::currentViewChanged(View* view)
 {
-	TabParams* params = h_viewParams[view];
-	m_dockTab->check_renderVertices->setChecked(params->renderVertices);
-	m_dockTab->slider_verticesScaleFactor->setSliderPosition(params->verticesScaleFactor * 50.0);
-	m_dockTab->check_renderEdges->setChecked(params->renderEdges);
-	m_dockTab->check_renderFaces->setChecked(params->renderFaces);
-	m_dockTab->radio_flatShading->setChecked(params->faceStyle == FLAT);
-	m_dockTab->radio_phongShading->setChecked(params->faceStyle == PHONG);
+	assert(isLinkedToView(view));
+	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
 void RenderPlugin::cb_renderVerticesChanged(bool b)
@@ -120,7 +119,7 @@ void RenderPlugin::cb_renderVerticesChanged(bool b)
 	View* current = m_window->getCurrentView();
 	assert(isLinkedToView(current));
 
-	TabParams* params = h_viewParams[current];
+	ParameterSet* params = h_viewParams[current];
 	params->renderVertices = b;
 	current->updateGL();
 }
@@ -130,7 +129,7 @@ void RenderPlugin::cb_verticesScaleFactorChanged(int i)
 	View* current = m_window->getCurrentView();
 	assert(isLinkedToView(current));
 
-	TabParams* params = h_viewParams[current];
+	ParameterSet* params = h_viewParams[current];
 	params->verticesScaleFactor = i / 50.0;
 	current->updateGL();
 }
@@ -140,7 +139,7 @@ void RenderPlugin::cb_renderEdgesChanged(bool b)
 	View* current = m_window->getCurrentView();
 	assert(isLinkedToView(current));
 
-	TabParams* params = h_viewParams[current];
+	ParameterSet* params = h_viewParams[current];
 	params->renderEdges = b;
 	current->updateGL();
 }
@@ -150,7 +149,7 @@ void RenderPlugin::cb_renderFacesChanged(bool b)
 	View* current = m_window->getCurrentView();
 	assert(isLinkedToView(current));
 
-	TabParams* params = h_viewParams[current];
+	ParameterSet* params = h_viewParams[current];
 	params->renderFaces = b;
 	current->updateGL();
 }
@@ -160,13 +159,28 @@ void RenderPlugin::cb_faceStyleChanged(QAbstractButton* b)
 	View* current = m_window->getCurrentView();
 	assert(isLinkedToView(current));
 
-	TabParams* params = h_viewParams[current];
+	ParameterSet* params = h_viewParams[current];
 	if(m_dockTab->radio_flatShading->isChecked())
 		params->faceStyle = FLAT;
 	else if(m_dockTab->radio_phongShading->isChecked())
 		params->faceStyle = PHONG;
 	current->updateGL();
 }
+
+
+
+void RenderDockTab::refreshUI(ParameterSet* params)
+{
+	check_renderVertices->setChecked(params->renderVertices);
+	slider_verticesScaleFactor->setSliderPosition(params->verticesScaleFactor * 50.0);
+	check_renderEdges->setChecked(params->renderEdges);
+	check_renderFaces->setChecked(params->renderFaces);
+	radio_flatShading->setChecked(params->faceStyle == FLAT);
+	radio_phongShading->setChecked(params->faceStyle == PHONG);
+}
+
+
+
 
 /**
  * If we want to compile this plugin in debug mode,

@@ -18,27 +18,20 @@ using namespace CGoGN;
 using namespace SCHNApps;
 
 
-class RenderDockTab : public QWidget, public Ui::RenderWidget
-{
-public:
-	RenderDockTab() { setupUi(this); }
-};
-
-
 enum FaceShadingStyle
 {
 	FLAT = 0,
 	PHONG = 1
 };
 
-struct TabParams
+struct ParameterSet
 {
-	TabParams(float vsf, bool rv, bool re, bool rf, FaceShadingStyle fstyle) :
-		verticesScaleFactor(vsf),
-		renderVertices(rv),
-		renderEdges(re),
-		renderFaces(rf),
-		faceStyle(fstyle)
+	ParameterSet() :
+		verticesScaleFactor(1.0f),
+		renderVertices(false),
+		renderEdges(false),
+		renderFaces(true),
+		faceStyle(FLAT)
 	{}
 
 	float verticesScaleFactor;
@@ -46,6 +39,15 @@ struct TabParams
 	bool renderEdges;
 	bool renderFaces;
 	FaceShadingStyle faceStyle;
+};
+
+
+class RenderDockTab : public QWidget, public Ui::RenderWidget
+{
+public:
+	RenderDockTab() { setupUi(this); }
+
+	void refreshUI(ParameterSet* params);
 };
 
 
@@ -84,7 +86,7 @@ public:
 
 protected:
 	RenderDockTab* m_dockTab;
-	QHash<View*, TabParams*> h_viewParams;
+	QHash<View*, ParameterSet*> h_viewParams;
 
 	CGoGN::Utils::ShaderFlat* m_flatShader;
 	CGoGN::Utils::ShaderPhong* m_phongShader;

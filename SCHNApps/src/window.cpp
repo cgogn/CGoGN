@@ -95,9 +95,14 @@ void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
 	if(tabWidget)
 	{
+		int currentTab = m_dockTabWidget->currentIndex();
+
 		int idx = m_dockTabWidget->addTab(tabWidget, tabText);
 		m_dock->setVisible(true);
 		m_dockTabWidget->setTabEnabled(idx, false);
+
+		if(currentTab != -1)
+			m_dockTabWidget->setCurrentIndex(currentTab);
 	}
 }
 
@@ -109,22 +114,24 @@ void Window::removeTabInDock(QWidget *tabWidget)
 
 void Window::enablePluginTabWidgets(Plugin* plugin)
 {
+	int currentTab = m_dockTabWidget->currentIndex();
+
 	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
 	foreach(QWidget* w, tabWidgets)
-	{
-		int idx = m_dockTabWidget->indexOf(w);
-		m_dockTabWidget->setTabEnabled(idx, true);
-	}
+		m_dockTabWidget->setTabEnabled(m_dockTabWidget->indexOf(w), true);
+
+	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 void Window::disablePluginTabWidgets(Plugin* plugin)
 {
+	int currentTab = m_dockTabWidget->currentIndex();
+
 	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
 	foreach(QWidget* w, tabWidgets)
-	{
-		int idx = m_dockTabWidget->indexOf(w);
-		m_dockTabWidget->setTabEnabled(idx, false);
-	}
+		m_dockTabWidget->setTabEnabled(m_dockTabWidget->indexOf(w), false);
+
+	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 /*********************************************************
