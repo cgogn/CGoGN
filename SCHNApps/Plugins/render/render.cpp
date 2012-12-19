@@ -181,16 +181,7 @@ void RenderDockTab::refreshUI(ParameterSet* params)
 
 
 
-
-/**
- * If we want to compile this plugin in debug mode,
- * we also define a DEBUG macro at the compilation
- */
 #ifndef DEBUG
-// essential Qt function:
-// arguments are
-//  - the compiled name of the plugin
-//  - the main class of our plugin
 Q_EXPORT_PLUGIN2(RenderPlugin, RenderPlugin)
 #else
 Q_EXPORT_PLUGIN2(RenderPluginD, RenderPlugin)

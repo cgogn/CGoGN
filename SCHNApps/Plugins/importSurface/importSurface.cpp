@@ -1,6 +1,5 @@
-#include "import.h"
+#include "importSurface.h"
 
-#include "system.h"
 #include "mapHandler.h"
 
 #include "Algo/Import/import.h"
@@ -8,7 +7,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
-bool ImportPlugin::enable()
+bool ImportSurfacePlugin::enable()
 {
 	importAction = new QAction("import", this);
 	addMenuAction("Import;Import Surface", importAction);
@@ -16,11 +15,7 @@ bool ImportPlugin::enable()
 	return true;
 }
 
-void ImportPlugin::disable()
-{
-}
-
-void ImportPlugin::cb_import()
+void ImportSurfacePlugin::cb_import()
 {
 	QString fileName = QFileDialog::getOpenFileName(m_window, "Import file", m_window->getAppPath(), "Mesh Files (*.ply *.off)");
 	QFileInfo fi(fileName);
@@ -60,16 +55,8 @@ void ImportPlugin::cb_import()
 	}
 }
 
-/**
- * If we want to compile this plugin in debug mode,
- * we also define a DEBUG macro at the compilation
- */
 #ifndef DEBUG
-// essential Qt function:
-// arguments are
-//  - the compiled name of the plugin
-//  - the main class of our plugin
-Q_EXPORT_PLUGIN2(ImportPlugin, ImportPlugin)
+Q_EXPORT_PLUGIN2(ImportSurfacePlugin, ImportSurfacePlugin)
 #else
-Q_EXPORT_PLUGIN2(ImportPluginD, ImportPlugin)
+Q_EXPORT_PLUGIN2(ImportSurfacePluginD, ImportSurfacePlugin)
 #endif

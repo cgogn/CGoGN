@@ -1,8 +1,7 @@
-#ifndef _IMPORT_PLUGIN_H_
-#define _IMPORT_PLUGIN_H_
+#ifndef _IMPORTSURFACE_PLUGIN_H_
+#define _IMPORTSURFACE_PLUGIN_H_
 
 #include "plugin.h"
-#include "view.h"
 
 #include "Topology/generic/functor.h"
 #include "Topology/generic/parameters.h"
@@ -21,22 +20,22 @@ struct PFP: public PFP_STANDARD
 typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
 
-class ImportPlugin : public Plugin
+class ImportSurfacePlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	ImportPlugin()
+	ImportSurfacePlugin()
 	{
 		setProvidesRendering(false);
 	}
 
-	~ImportPlugin()
+	~ImportSurfacePlugin()
 	{}
 
 	virtual bool enable();
-	virtual void disable();
+	virtual void disable() {}
 
 	virtual void redraw(View *view) {}
 

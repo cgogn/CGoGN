@@ -4,9 +4,9 @@
 #include "plugin.h"
 #include "ui_render.h"
 
-#include "Topology/generic/functor.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
+//#include "Topology/generic/functor.h"
+//#include "Topology/generic/parameters.h"
+//#include "Topology/map/embeddedMap2.h"
 
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderPhong.h"
