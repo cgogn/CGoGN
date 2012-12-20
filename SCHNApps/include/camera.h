@@ -33,7 +33,7 @@ public:
 	 * CAMERA DRAWING
 	 *********************************************************/
 
-	void draw();
+	virtual void draw();
 
 	bool getDraw() const { return m_draw; }
 	void setDraw(bool b = true) { m_draw = b; }

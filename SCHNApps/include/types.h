@@ -21,7 +21,7 @@ class Plugin;
 class View;
 class Camera;
 class MapHandlerGen;
-class Texture;
+struct Texture;
 
 typedef QHash<QString, Plugin*> PluginHash;
 typedef QHash<QString, View*> ViewHash;

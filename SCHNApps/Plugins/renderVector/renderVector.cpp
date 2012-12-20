@@ -9,8 +9,8 @@ bool RenderVectorPlugin::enable()
 	m_dockTab = new RenderVectorDockTab(this);
 	addTabInDock(m_dockTab, "RenderVector");
 
-	m_vectorShader = new Utils::ShaderVectorPerVertex() ;
-	m_vectorShader->setColor(Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f)) ;
+	m_vectorShader = new Utils::ShaderVectorPerVertex();
+	m_vectorShader->setColor(Geom::Vec4f(1.0f, 0.0f, 0.0f, 1.0f));
 
 	registerShader(m_vectorShader);
 

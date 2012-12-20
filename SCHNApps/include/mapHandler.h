@@ -116,15 +116,6 @@ public:
 	{
 		m_render->initPrimitives<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
 	}
-
-	void updateVBOs()
-	{
-		QList<Utils::VBO*> vbos = getVBOList();
-		foreach(Utils::VBO* vbo, vbos)
-		{
-
-		}
-	}
 };
 
 } // namespace SCHNApps

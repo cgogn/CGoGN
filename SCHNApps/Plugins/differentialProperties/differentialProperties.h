@@ -25,8 +25,16 @@ typedef PFP::VEC3 VEC3;
 
 class ComputeNormalsDialog : public QDialog, public Ui::ComputeNormalsDialog
 {
+	Q_OBJECT
+	
 public:
-	ComputeNormalsDialog() { setupUi(this);	}
+	ComputeNormalsDialog(Window* w);
+
+public slots:
+	void cb_selectedMapChanged();
+
+private:
+	Window* m_window;
 };
 
 
@@ -64,6 +72,7 @@ public:
 	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
 public slots:
+	void cb_openComputeNormalsDialog();
 	void cb_computeNormals();
 
 private:
