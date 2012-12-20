@@ -52,6 +52,13 @@ public:
 		return vbo;
 	}
 
+	template <typename ATTR_HANDLER>
+	void updateVBO(const ATTR_HANDLER& attr)
+	{
+		Utils::VBO* vbo = getVBO(QString::fromStdString(attr.name()));
+		vbo->updateData(attr);
+	}
+
 	Utils::VBO* getVBO(const QString& name);
 	QList<Utils::VBO*> getVBOList() const { return h_vbo.values(); }
 	void deleteVBO(const QString& name);
@@ -105,9 +112,18 @@ public:
 		m_bbDiagSize = (m_bbMax - m_bbMin).norm();
 	}
 
-	void updatePrimitives(int primitive, const FunctorSelect& good)
+	void updatePrimitives(int primitive, const FunctorSelect& good = allDarts)
 	{
 		m_render->initPrimitives<PFP>(*(reinterpret_cast<typename PFP::MAP*>(m_map)), good, primitive) ;
+	}
+
+	void updateVBOs()
+	{
+		QList<Utils::VBO*> vbos = getVBOList();
+		foreach(Utils::VBO* vbo, vbos)
+		{
+
+		}
 	}
 };
 

@@ -72,6 +72,7 @@ void RenderVectorPlugin::viewUnlinked(View* view)
 
 void RenderVectorPlugin::currentViewChanged(View* view)
 {
+	assert(isLinkedToView(view));
 	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
@@ -181,8 +182,6 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 
 			PerMapParameterSet& p = params->perMap[map->getName()];
 
-			slider_vectorsScaleFactor->setSliderPosition(p.vectorsScaleFactor * 50.0);
-
 			QList<Utils::VBO*> vbos = map->getVBOList();
 			for(int i = 0; i < vbos.count(); ++i)
 			{
@@ -203,6 +202,8 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 				p.vectorVBO = vbos[0];
 				combo_vectorVBO->setCurrentIndex(0);
 			}
+
+			slider_vectorsScaleFactor->setSliderPosition(p.vectorsScaleFactor * 50.0);
 		}
 		++i;
 	}

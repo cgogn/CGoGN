@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 INCLUDE_DIRECTORIES(
 	${SCHNApps_ROOT_DIR}/include
-	${SCHNApps_ROOT_DIR}/Plugins/import
+	${SCHNApps_ROOT_DIR}/Plugins/importSurface
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 

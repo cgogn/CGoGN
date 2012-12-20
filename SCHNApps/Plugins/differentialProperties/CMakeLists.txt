@@ -2,20 +2,20 @@ cmake_minimum_required(VERSION 2.8)
 
 INCLUDE_DIRECTORIES(
 	${SCHNApps_ROOT_DIR}/include
-	${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface
+	${SCHNApps_ROOT_DIR}/Plugins/differentialProperties
 	${CMAKE_CURRENT_BINARY_DIR}
 )
 
 SET( PLUGIN_SRC
-    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/subdivideSurface.cpp
+    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/differentialProperties.cpp
 )
 
 SET( PLUGIN_H
-    ${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/subdivideSurface.h
+    ${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/differentialProperties.h
 )
 
 SET( PLUGIN_FORM
-	${SCHNApps_ROOT_DIR}/Plugins/subdivideSurface/subdivideSurface.ui
+	${SCHNApps_ROOT_DIR}/Plugins/differentialProperties/computeNormalsDialog.ui
 )
 
 IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
@@ -31,21 +31,21 @@ IF( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	QT4_WRAP_UI( PLUGIN_UI ${PLUGIN_FORM} )
 	QT4_WRAP_CPP( PLUGIN_MOC ${PLUGIN_H} )
 	
-	ADD_LIBRARY( SubdivideSurfacePluginD SHARED
+	ADD_LIBRARY( DifferentialPropertiesPluginD SHARED
 		${PLUGIN_SRC}
 		${PLUGIN_UI}
 		${PLUGIN_MOC}
 	)
 
-	TARGET_LINK_LIBRARIES( SubdivideSurfacePluginD
+	TARGET_LINK_LIBRARIES( DifferentialPropertiesPluginD
 		${CGoGN_LIBS_D}
 		${COMMON_LIBS}
 		${QGLVIEWER_LIBRARIES}
 	)
 
-	ADD_DEPENDENCIES( SubdivideSurfacePluginD SCHNAppsD )
+	ADD_DEPENDENCIES( DifferentialPropertiesPluginD SCHNAppsD )
 
-	SET_TARGET_PROPERTIES( SubdivideSurfacePluginD PROPERTIES COMPILE_DEFINITIONS "DEBUG" )
+	SET_TARGET_PROPERTIES( DifferentialPropertiesPluginD PROPERTIES COMPILE_DEFINITIONS "DEBUG" )
 		
 ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	
@@ -58,18 +58,18 @@ ELSE ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )
 	QT4_WRAP_UI( PLUGIN_UI ${PLUGIN_FORM} )
 	QT4_WRAP_CPP( PLUGIN_MOC ${PLUGIN_H} )
 
-	ADD_LIBRARY( SubdivideSurfacePlugin SHARED
+	ADD_LIBRARY( DifferentialPropertiesPlugin SHARED
 		${PLUGIN_SRC}
 		${PLUGIN_UI}
 		${PLUGIN_MOC}
 	)
 
-	TARGET_LINK_LIBRARIES( SubdivideSurfacePlugin
+	TARGET_LINK_LIBRARIES( DifferentialPropertiesPlugin
 		${CGoGN_LIBS_R}
 		${COMMON_LIBS}
 		${QGLVIEWER_LIBRARIES}
 	)
 
-	ADD_DEPENDENCIES( SubdivideSurfacePlugin SCHNApps )
+	ADD_DEPENDENCIES( DifferentialPropertiesPlugin SCHNApps )
 	
 ENDIF ( ${CMAKE_BUILD_TYPE} STREQUAL Debug )

@@ -6,7 +6,7 @@
 
 bool RenderPlugin::enable()
 {
-	m_dockTab = new RenderDockTab();
+	m_dockTab = new RenderDockTab(this);
 	addTabInDock(m_dockTab, "Render");
 
 	m_flatShader = new CGoGN::Utils::ShaderFlat();
@@ -31,6 +31,10 @@ bool RenderPlugin::enable()
 	registerShader(m_simpleColorShader);
 	registerShader(m_pointSprite);
 
+	connect(m_dockTab->mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
+	connect(m_dockTab->combo_positionVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_positionVBOChanged(int)));
+	connect(m_dockTab->combo_normalVBO, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_normalVBOChanged(int)));
+	connect(m_dockTab->button_refreshVBOs, SIGNAL(clicked()), this, SLOT(cb_refreshVBOs()));
 	connect(m_dockTab->check_renderVertices, SIGNAL(toggled(bool)), this, SLOT(cb_renderVerticesChanged(bool)));
 	connect(m_dockTab->slider_verticesScaleFactor, SIGNAL(valueChanged(int)), this, SLOT(cb_verticesScaleFactorChanged(int)));
 	connect(m_dockTab->check_renderEdges, SIGNAL(toggled(bool)), this, SLOT(cb_renderEdgesChanged(bool)));
@@ -55,54 +59,68 @@ void RenderPlugin::redraw(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* m, maps)
 	{
-		CGoGN::Utils::VBO* positionVBO = m->getVBO("position");
-		CGoGN::Utils::VBO* normalVBO = m->getVBO("normal");
-		if(params->renderVertices)
+		const PerMapParameterSet& p = params->perMap[m->getName()];
+		if(p.positionVBO != NULL)
 		{
-			m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * params->verticesScaleFactor);
-			m_pointSprite->setAttributePosition(positionVBO);
-			m_pointSprite->predraw(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
-			m->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
-			m_pointSprite->postdraw();
-		}
-		if(params->renderEdges)
-		{
-			glLineWidth(1.0f);
-			m_simpleColorShader->setAttributePosition(positionVBO);
-			m->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
-		}
-		if(params->renderFaces)
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glEnable(GL_LIGHTING);
-			glEnable(GL_POLYGON_OFFSET_FILL);
-			glPolygonOffset(1.0f, 1.0f);
-			switch(params->faceStyle)
+			if(p.renderVertices)
 			{
-				case FLAT :
-					m_flatShader->setAttributePosition(positionVBO);
-					m->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-					break ;
-				case PHONG :
-					m_phongShader->setAttributePosition(positionVBO) ;
-					m_phongShader->setAttributeNormal(normalVBO) ;
-					m->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
-					break ;
+				m_pointSprite->setSize(m->getBBdiagSize() / 200.0f * p.verticesScaleFactor);
+				m_pointSprite->setAttributePosition(p.positionVBO);
+				m_pointSprite->predraw(CGoGN::Geom::Vec3f(0.0f, 0.0f, 1.0f));
+				m->draw(m_pointSprite, CGoGN::Algo::Render::GL2::POINTS);
+				m_pointSprite->postdraw();
 			}
-			glDisable(GL_POLYGON_OFFSET_FILL);
+			if(p.renderEdges)
+			{
+				glLineWidth(1.0f);
+				m_simpleColorShader->setAttributePosition(p.positionVBO);
+				m->draw(m_simpleColorShader, CGoGN::Algo::Render::GL2::LINES);
+			}
+			if(p.renderFaces)
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glEnable(GL_LIGHTING);
+				glEnable(GL_POLYGON_OFFSET_FILL);
+				glPolygonOffset(1.0f, 1.0f);
+				switch(p.faceStyle)
+				{
+					case FLAT :
+						m_flatShader->setAttributePosition(p.positionVBO);
+						m->draw(m_flatShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+						break ;
+					case PHONG :
+						if(p.normalVBO != NULL)
+						{
+							m_phongShader->setAttributePosition(p.positionVBO) ;
+							m_phongShader->setAttributeNormal(p.normalVBO) ;
+							m->draw(m_phongShader, CGoGN::Algo::Render::GL2::TRIANGLES);
+						}
+						break ;
+				}
+				glDisable(GL_POLYGON_OFFSET_FILL);
+			}
 		}
 	}
 }
 
 void RenderPlugin::viewLinked(View* view)
 {
-	h_viewParams.insert(view, new ParameterSet());
-	m_dockTab->refreshUI(h_viewParams[view]);
+	ParameterSet* params = new ParameterSet();
+	h_viewParams.insert(view, params);
+	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
+	foreach(MapHandlerGen* map, maps)
+	{
+		PerMapParameterSet p;
+		params->perMap.insert(map->getName(), p);
+	}
+
+	m_dockTab->refreshUI(params);
 }
 
 void RenderPlugin::viewUnlinked(View* view)
 {
 	h_viewParams.remove(view);
+
 	View* current = m_window->getCurrentView();
 	if(isLinkedToView(current))
 		m_dockTab->refreshUI(h_viewParams[current]);
@@ -114,69 +132,195 @@ void RenderPlugin::currentViewChanged(View* view)
 	m_dockTab->refreshUI(h_viewParams[view]);
 }
 
-void RenderPlugin::cb_renderVerticesChanged(bool b)
+void RenderPlugin::mapLinked(View* view, MapHandlerGen* m)
+{
+	assert(isLinkedToView(view));
+	ParameterSet* params = h_viewParams[view];
+	PerMapParameterSet p;
+	params->perMap.insert(m->getName(), p);
+
+	m_dockTab->refreshUI(params);
+}
+
+void RenderPlugin::mapUnlinked(View* view, MapHandlerGen* m)
+{
+	assert(isLinkedToView(view));
+	ParameterSet* params = h_viewParams[view];
+	params->perMap.remove(m->getName());
+
+	if(params->selectedMap == m)
+	{
+		params->selectedMap = NULL;
+		m_dockTab->refreshUI(params);
+	}
+}
+
+void RenderPlugin::cb_selectedMapChanged()
+{
+	if(!b_refreshingUI)
+	{
+		View* view = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[view];
+		QList<QListWidgetItem*> currentItems = m_dockTab->mapList->selectedItems();
+		if(!currentItems.empty())
+		{
+			const QString& mapname = currentItems[0]->text();
+			params->selectedMap = m_window->getMap(mapname);
+			m_dockTab->refreshUI(params);
+			view->updateGL();
+		}
+	}
+}
+
+void RenderPlugin::cb_positionVBOChanged(int index)
+{
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* map = params->selectedMap;
+		params->perMap[map->getName()].positionVBO = map->getVBO(m_dockTab->combo_positionVBO->currentText());
+		current->updateGL();
+	}
+}
+
+void RenderPlugin::cb_normalVBOChanged(int index)
+{
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* map = params->selectedMap;
+		params->perMap[map->getName()].normalVBO = map->getVBO(m_dockTab->combo_normalVBO->currentText());
+		current->updateGL();
+	}
+}
+
+void RenderPlugin::cb_refreshVBOs()
 {
 	View* current = m_window->getCurrentView();
-	assert(isLinkedToView(current));
+	if(isLinkedToView(current))
+		m_dockTab->refreshUI(h_viewParams[current]);
+}
 
-	ParameterSet* params = h_viewParams[current];
-	params->renderVertices = b;
-	current->updateGL();
+void RenderPlugin::cb_renderVerticesChanged(bool b)
+{
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* m = params->selectedMap;
+		params->perMap[m->getName()].renderVertices = b;
+		current->updateGL();
+	}
 }
 
 void RenderPlugin::cb_verticesScaleFactorChanged(int i)
 {
-	View* current = m_window->getCurrentView();
-	assert(isLinkedToView(current));
-
-	ParameterSet* params = h_viewParams[current];
-	params->verticesScaleFactor = i / 50.0;
-	current->updateGL();
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* m = params->selectedMap;
+		params->perMap[m->getName()].verticesScaleFactor = i / 50.0;
+		current->updateGL();
+	}
 }
 
 void RenderPlugin::cb_renderEdgesChanged(bool b)
 {
-	View* current = m_window->getCurrentView();
-	assert(isLinkedToView(current));
-
-	ParameterSet* params = h_viewParams[current];
-	params->renderEdges = b;
-	current->updateGL();
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* m = params->selectedMap;
+		params->perMap[m->getName()].renderEdges = b;
+		current->updateGL();
+	}
 }
 
 void RenderPlugin::cb_renderFacesChanged(bool b)
 {
-	View* current = m_window->getCurrentView();
-	assert(isLinkedToView(current));
-
-	ParameterSet* params = h_viewParams[current];
-	params->renderFaces = b;
-	current->updateGL();
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* m = params->selectedMap;
+		params->perMap[m->getName()].renderFaces = b;
+		current->updateGL();
+	}
 }
 
 void RenderPlugin::cb_faceStyleChanged(QAbstractButton* b)
 {
-	View* current = m_window->getCurrentView();
-	assert(isLinkedToView(current));
-
-	ParameterSet* params = h_viewParams[current];
-	if(m_dockTab->radio_flatShading->isChecked())
-		params->faceStyle = FLAT;
-	else if(m_dockTab->radio_phongShading->isChecked())
-		params->faceStyle = PHONG;
-	current->updateGL();
+	if(!b_refreshingUI)
+	{
+		View* current = m_window->getCurrentView();
+		ParameterSet* params = h_viewParams[current];
+		MapHandlerGen* m = params->selectedMap;
+		if(m_dockTab->radio_flatShading->isChecked())
+			params->perMap[m->getName()].faceStyle = FLAT;
+		else if(m_dockTab->radio_phongShading->isChecked())
+			params->perMap[m->getName()].faceStyle = PHONG;
+		current->updateGL();
+	}
 }
 
 
 
 void RenderDockTab::refreshUI(ParameterSet* params)
 {
-	check_renderVertices->setChecked(params->renderVertices);
-	slider_verticesScaleFactor->setSliderPosition(params->verticesScaleFactor * 50.0);
-	check_renderEdges->setChecked(params->renderEdges);
-	check_renderFaces->setChecked(params->renderFaces);
-	radio_flatShading->setChecked(params->faceStyle == FLAT);
-	radio_phongShading->setChecked(params->faceStyle == PHONG);
+	plugin->setRefreshingUI(true);
+
+	mapList->clear();
+	combo_positionVBO->clear();
+	combo_normalVBO->clear();
+
+	MapHandlerGen* map = params->selectedMap;
+
+	QHash<QString, PerMapParameterSet>::const_iterator i = params->perMap.constBegin();
+	while (i != params->perMap.constEnd())
+	{
+		mapList->addItem(i.key());
+		if(map != NULL && i.key() == map->getName())
+		{
+			QList<QListWidgetItem*> item = mapList->findItems(map->getName(), Qt::MatchExactly);
+			item[0]->setSelected(true);
+
+			PerMapParameterSet& p = params->perMap[map->getName()];
+
+			QList<Utils::VBO*> vbos = map->getVBOList();
+			for(int i = 0; i < vbos.count(); ++i)
+			{
+				combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
+				if(vbos[i] == p.positionVBO)
+					combo_positionVBO->setCurrentIndex(i);
+				combo_normalVBO->addItem(QString::fromStdString(vbos[i]->name()));
+				if(vbos[i] == p.normalVBO)
+					combo_normalVBO->setCurrentIndex(i);
+			}
+			if(p.positionVBO == NULL && vbos.count() > 0)
+			{
+				p.positionVBO = vbos[0];
+				combo_positionVBO->setCurrentIndex(0);
+			}
+			if(p.normalVBO == NULL && vbos.count() > 0)
+			{
+				p.normalVBO = vbos[0];
+				combo_normalVBO->setCurrentIndex(0);
+			}
+
+			check_renderVertices->setChecked(p.renderVertices);
+			slider_verticesScaleFactor->setSliderPosition(p.verticesScaleFactor * 50.0);
+			check_renderEdges->setChecked(p.renderEdges);
+			check_renderFaces->setChecked(p.renderFaces);
+			radio_flatShading->setChecked(p.faceStyle == FLAT);
+			radio_phongShading->setChecked(p.faceStyle == PHONG);
+		}
+		++i;
+	}
+
+	plugin->setRefreshingUI(false);
 }
 
 

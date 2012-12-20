@@ -87,7 +87,9 @@ bool Plugin::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
 	if(tabWidget && !l_tabWidgets.contains(tabWidget))
 	{
-		m_window->addTabInDock(tabWidget, tabText);
+		// tab created by plugins that do not provide rendering are always enabled,
+		// the other are enabled only if they are linked to the current view
+		m_window->addTabInDock(tabWidget, tabText, !b_providesRendering);
 		l_tabWidgets.push_back(tabWidget);
 		return true;
 	}

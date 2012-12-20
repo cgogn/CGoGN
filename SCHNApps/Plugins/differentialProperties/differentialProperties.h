@@ -1,8 +1,8 @@
-#ifndef _SUBDIVIDESURFACE_PLUGIN_H_
-#define _SUBDIVIDESURFACE_PLUGIN_H_
+#ifndef _DIFFERENTIALPROPERTIES_PLUGIN_H_
+#define _DIFFERENTIALPROPERTIES_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_subdivideSurface.h"
+#include "ui_computeNormalsDialog.h"
 
 #include "Topology/generic/functor.h"
 #include "Topology/generic/parameters.h"
@@ -23,25 +23,25 @@ typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
 
 
-class SubdivideSurfaceDockTab : public QWidget, public Ui::SubdivideSurfaceWidget
+class ComputeNormalsDialog : public QDialog, public Ui::ComputeNormalsDialog
 {
 public:
-	SubdivideSurfaceDockTab() { setupUi(this); }
+	ComputeNormalsDialog() { setupUi(this);	}
 };
 
 
-class SubdivideSurfacePlugin : public Plugin
+class DifferentialPropertiesPlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	SubdivideSurfacePlugin()
+	DifferentialPropertiesPlugin()
 	{
 		setProvidesRendering(false);
 	}
 
-	~SubdivideSurfacePlugin()
+	~DifferentialPropertiesPlugin()
 	{}
 
 	virtual bool enable();
@@ -63,13 +63,13 @@ public:
 	virtual void mapLinked(View* view, MapHandlerGen* m) {}
 	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
-protected:
-	SubdivideSurfaceDockTab* m_dockTab;
-
 public slots:
-	void cb_addMapToList(MapHandlerGen* m);
-	void cb_removeMapFromList(MapHandlerGen* m);
-	void cb_trianguleFaces();
+	void cb_computeNormals();
+
+private:
+	ComputeNormalsDialog* m_computeNormalsDialog;
+
+	QAction* computeNormalsAction;
 };
 
 #endif

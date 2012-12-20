@@ -4,10 +4,6 @@
 #include "plugin.h"
 #include "ui_renderVector.h"
 
-//#include "Topology/generic/functor.h"
-//#include "Topology/generic/parameters.h"
-//#include "Topology/map/embeddedMap2.h"
-
 #include "Utils/Shaders/shaderVectorPerVertex.h"
 
 
@@ -17,13 +13,10 @@ using namespace SCHNApps;
 
 struct PerMapParameterSet
 {
-	PerMapParameterSet() : positionVBO(NULL), vectorVBO(NULL), vectorsScaleFactor(1.0f)
-	{}
-
-	PerMapParameterSet(Utils::VBO* pos, Utils::VBO* vec, float s) :
-		positionVBO(pos),
-		vectorVBO(vec),
-		vectorsScaleFactor(s)
+	PerMapParameterSet() :
+		positionVBO(NULL),
+		vectorVBO(NULL),
+		vectorsScaleFactor(1.0f)
 	{}
 
 	Utils::VBO* positionVBO;

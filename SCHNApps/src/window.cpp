@@ -91,7 +91,7 @@ Window::~Window()
  * MANAGE DOCK
  *********************************************************/
 
-void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
+void Window::addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable)
 {
 	if(tabWidget)
 	{
@@ -99,7 +99,7 @@ void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
 
 		int idx = m_dockTabWidget->addTab(tabWidget, tabText);
 		m_dock->setVisible(true);
-		m_dockTabWidget->setTabEnabled(idx, false);
+		m_dockTabWidget->setTabEnabled(idx, enable);
 
 		if(currentTab != -1)
 			m_dockTabWidget->setCurrentIndex(currentTab);
