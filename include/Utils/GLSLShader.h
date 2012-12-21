@@ -171,7 +171,7 @@ protected:
 	/**
 	 * create the shader (attach and link shaders into program)
 	 */
-	bool create(GLint inputGeometryPrimitive=GL_TRIANGLES,GLint outputGeometryPrimitive=GL_TRIANGLES, int nb_max_vertices=-1);
+	bool create(GLint inputGeometryPrimitive = GL_TRIANGLES, GLint outputGeometryPrimitive = GL_TRIANGLES, int nb_max_vertices = -1);
 
 	/**
 	 * get log after compiling

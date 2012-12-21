@@ -8,11 +8,14 @@ SET( QT_USE_QTDESIGNER TRUE )
 SET( QT_USE_QTGUI TRUE )
 SET( QT_USE_QTPLUGIN TRUE )
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
+
 #========CGoGN========#
 SET(CGoGN_ROOT_DIR ${CMAKE_SOURCE_DIR}/.. CACHE STRING "CGoGN root dir")
 INCLUDE(${CGoGN_ROOT_DIR}/apps_cmake.txt)
 
 find_package(Qt4 REQUIRED)
+
 
 #=======QGLViewer=========#
 find_package(QGLViewer REQUIRED)

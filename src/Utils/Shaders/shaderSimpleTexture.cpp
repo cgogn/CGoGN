@@ -69,15 +69,18 @@ ShaderSimpleTexture::ShaderSimpleTexture()
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
-	*m_unif_unit   = glGetUniformLocation(this->program_handler(), "textureUnit");
+	bind();
+	*m_unif_unit = glGetUniformLocation(this->program_handler(), "textureUnit");
+	unbind();
 }
 
 void ShaderSimpleTexture::setTextureUnit(GLenum texture_unit)
 {
-	this->bind();
 	int unit = texture_unit - GL_TEXTURE0;
-	glUniform1iARB(*m_unif_unit,unit);
 	m_unit = unit;
+	bind();
+	glUniform1iARB(*m_unif_unit, m_unit);
+	unbind();
 }
 
 void ShaderSimpleTexture::setTexture(Utils::GTexture* tex)
@@ -91,25 +94,31 @@ void ShaderSimpleTexture::activeTexture()
 	m_tex_ptr->bind();
 }
 
-
-
 unsigned int ShaderSimpleTexture::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", m_vboPos);
+	unbind();
+	return id;
 }
 
 unsigned int ShaderSimpleTexture::setAttributeTexCoord(VBO* vbo)
 {
 	m_vboTexCoord = vbo;
-	return bindVA_VBO("VertexTexCoord", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexTexCoord", m_vboTexCoord);
+	unbind();
+	return id;
 }
 
 void ShaderSimpleTexture::restoreUniformsAttribs()
 {
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexTexCoord", m_vboTexCoord);
 	glUniform1iARB(*m_unif_unit,m_unit);
+	unbind();
 }
 
 } // namespace Utils

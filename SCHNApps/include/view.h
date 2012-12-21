@@ -1,132 +1,133 @@
 #ifndef _VIEW_H_
 #define _VIEW_H_
 
-#include <iostream>
+#include <GL/glew.h>
+#include <QGLViewer/qglviewer.h>
 
 #include "types.h"
-#include "viewButtonArea.h"
-
-# include <QKeyEvent>
-#include <QList>
-#include <QWidget>
-
+#include "window.h"
 #include "Utils/gl_matrices.h"
 
-//forward declaration
-class Scene;
-class Camera;
-class Context;
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+class ViewButtonArea;
+class ViewButton;
+
+class CameraViewDialog;
+class PluginsViewDialog;
+class MapsViewDialog;
 
 class View : public QGLViewer
 {
 	Q_OBJECT
 
 public:
-	View(Scene* s, const QString& name, Camera* c, QGLWidget* shareWidget = NULL, Context* context = NULL, QWidget* parent = NULL);
+	static unsigned int viewCount;
+
+	View(const QString& name, Window* w, const QGLWidget* shareWidget = NULL);
 	~View();
 
-	virtual void updateGL();
-	virtual void draw();
-	virtual void init();
+	const QString& getName() const { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	void drawCameras(View* view);
+	Window* getWindow() const { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
+
+	bool isCurrentView() const { return m_window->getCurrentView() == this; }
+
+	virtual void init();
+	virtual void preDraw();
+	virtual void draw();
+	virtual void postDraw();
+	virtual void resizeGL(int width, int height);
+
 	void drawText();
 	void drawButtons();
+	void drawFrame();
 
 	void keyPressEvent(QKeyEvent* event);
-	void keyReleaseEvent(QKeyEvent *e);
+	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event);
 
-	virtual void resizeGL(int width, int height);
+	/*********************************************************
+	 * MANAGE LINKED CAMERA
+	 *********************************************************/
 
-	void drawOverpaint(QPainter *painter);
-
-//	virtual void paintGL() { update(); }
-//	virtual void paintEvent(QPaintEvent *event);
-
-	Scene* getScene() { return m_scene; }
-
-	void setName(const QString& name) { m_name = name; }
-	const QString& getName() { return m_name; }
-
-	void enableLinking(bool b = true);
-	void enableUnlinking(bool b = true);
-	void enableCameraGesture(bool b = true);
-	void enableSceneCameraGesture(bool b = true);
-	void enableViewClose(bool b = true);
-
-	Camera* currentCamera() { return m_currentCamera; }
+	Camera* getCurrentCamera() const { return m_currentCamera; }
 	void setCurrentCamera(Camera* c);
-	QList<Camera*> cameras() { return l_camera; }
-	int countCameras() { return l_camera.size(); }
 
-	void removeCamera(Camera* c);
-	Camera* takeCamera(Camera* c);
-	Camera* addCamera();
-	void insertCamera(int index, Camera* c);
-	void shareCamera(Camera* c, int index = 0);
+	/*********************************************************
+	 * MANAGE LINKED PLUGINS
+	 *********************************************************/
 
-//	void addUnlinkButton();
-//	void removeUnlinkButton();
+	void linkPlugin(Plugin* plugin);
+	void unlinkPlugin(Plugin* plugin);
+	const QList<Plugin*>& getLinkedPlugins() const { return l_plugins; }
+	bool isLinkedToPlugin(Plugin* plugin) const { return l_plugins.contains(plugin); }
 
-	void updateTextInfo();
+	/*********************************************************
+	 * MANAGE LINKED MAPS
+	 *********************************************************/
 
-	glm::mat4 getCurrentModelViewMatrix();
-	glm::mat4 getCurrentProjectionMatrix();
-	glm::mat4 getCurrentModelViewProjectionMatrix();
+	void linkMap(MapHandlerGen* map);
+	void unlinkMap(MapHandlerGen* map);
+	const QList<MapHandlerGen*>& getLinkedMaps() const { return l_maps; }
+	bool isLinkedToMap(MapHandlerGen* map) const { return l_maps.contains(map); }
 
-	void setCurrentModelViewMatrix(glm::mat4 mvm);
-	void setCurrentProjectionMatrix(glm::mat4 pm);
+	void updateViewBB();
 
-	void addCustomViewButton(ViewButton* viewButton);
-	void removeCustomViewButton(ViewButton* viewButton);
+	/*********************************************************
+	 * MANAGE MATRICES
+	 *********************************************************/
 
-	void setShowButtons(bool b) { b_showButtons = b; }
+	glm::mat4 getCurrentModelViewMatrix() const;
+	glm::mat4 getCurrentProjectionMatrix() const;
+	glm::mat4 getCurrentModelViewProjectionMatrix() const;
+
+//	void setCurrentModelViewMatrix(const glm::mat4& mvm);
+//	void setCurrentProjectionMatrix(const glm::mat4& pm);
 
 protected:
 	QString m_name;
-	Scene* m_scene;
+	Window* m_window;
 
-	QList<Camera*> l_camera;
 	Camera* m_currentCamera;
+	QList<Plugin*> l_plugins;
+	QList<MapHandlerGen*> l_maps;
 
 	ViewButtonArea* m_buttonArea;
 
-	ViewButton* m_linkButton;
-	bool m_linkViewEnabled;
-	ViewButton* m_unlinkButton;
-	bool m_unlinkViewEnabled;
 	ViewButton* m_cameraButton;
-	bool m_cameraEnabled;
-	ViewButton* m_cameraSceneButton;
-	bool m_cameraSceneEnabled;
-	ViewButton* m_closeViewButton;
-	bool m_closeViewEnabled;
+	ViewButton* m_pluginsButton;
+	ViewButton* m_mapsButton;
+	ViewButton* m_closeButton;
+	ViewButton* m_VsplitButton;
+	ViewButton* m_HsplitButton;
 
 	QString m_textInfo;
 
-	Context* m_context;
-
-	bool b_showButtons;
+	CameraViewDialog* m_cameraViewDialog;
+	PluginsViewDialog* m_pluginsViewDialog;
+	MapsViewDialog* m_mapsViewDialog;
 
 public slots:
-	void linkView();
-	void unlinkView();
-	void cameraGesture();
-	void cameraSceneGesture();
-	void closeView();
-
-	void clickButton(ViewButton* viewButton);
-
-private:
-	bool b_destroyView;
-
-signals:
-	void currentCameraChanged(Camera* camera);
-	void viewButtonClicked(ViewButton* viewButton);
+	void cb_cameraView(int x, int y, int globalX, int globalY);
+	void cb_pluginsView(int x, int y, int globalX, int globalY);
+	void cb_mapsView(int x, int y, int globalX, int globalY);
+	void cb_closeView(int x, int y, int globalX, int globalY);
+	void cb_VsplitView(int x, int y, int globalX, int globalY);
+	void cb_HsplitView(int x, int y, int globalX, int globalY);
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

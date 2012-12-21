@@ -2,30 +2,23 @@
 #define _PLUGIN_H_
 
 #include <QtPlugin>
+#include <QAction>
 
-#include <iostream>
-#include <list>
+#include "types.h"
 
-#include "window.h"
-#include "system.h"
-#include "scene.h"
-#include "view.h"
-#include "camera.h"
-#include "mapHandler.h"
-#include "vboHandler.h"
+namespace CGoGN
+{
 
-class Plugin
+namespace SCHNApps
+{
+
+class Window;
+
+class Plugin : public QObject
 {
 public:
-	enum { UNLIMITED_NUMBER_OF_MAPS = -1 };
-	enum { UNLIMITED_NUMBER_OF_SCENES = -1 };
-
-	Plugin(const QString& name, const QString& filePath);
-
+	Plugin();
 	virtual ~Plugin();
-
-	virtual bool enable() = 0;
-	virtual void disable() = 0;
 
 	const QString& getName() { return m_name; }
 	void setName(const QString& name) { m_name = name; }
@@ -36,61 +29,65 @@ public:
 	Window* getWindow() { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	void updateGL();
-	void updateGL(Scene* scene);
+	bool isUsed() const { return !l_views.empty(); }
 
-	virtual void cb_initGL(Scene* scene) = 0;
-	virtual void cb_updateMatrix(View* view) = 0;
-	virtual void cb_redraw(Scene* scene) = 0;
+	bool getProvidesRendering() { return b_providesRendering; }
+	void setProvidesRendering(bool b) {	b_providesRendering = b; }
 
-	virtual bool cb_keyPress(Scene* scene, int event) = 0;
-	virtual bool cb_keyRelease(Scene* scene, int event) = 0;
-	virtual bool cb_mousePress(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseRelease(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseClick(Scene* scene, int button, int x, int y) = 0;
-	virtual bool cb_mouseMove(Scene* scene, int buttons, int x, int y) = 0;
-	virtual bool cb_wheelEvent(Scene* scene, int delta, int x, int y) = 0;
+	virtual bool enable() = 0;
+	virtual void disable() = 0;
 
-	virtual void cb_mapAdded(MapHandler* map) = 0;
-	virtual void cb_mapRemoved(MapHandler* map) = 0;
+	virtual void redraw(View* view) = 0;
 
-	virtual void cb_sceneAdded(Scene* s) = 0;
-	virtual void cb_sceneRemoved(Scene* s) = 0;
+	virtual void keyPress(View* view, int key) = 0;
+	virtual void keyRelease(View* view, int key) = 0;
+	virtual void mousePress(View* view, int button, int x, int y) = 0;
+	virtual void mouseRelease(View* view, int button, int x, int y) = 0;
+	virtual void mouseMove(View* view, int buttons, int x, int y) = 0;
+	virtual void wheelEvent(View* view, int delta, int x, int y) = 0;
 
-	/*********************************************************
-	 * MANAGE MAPS
-	 *********************************************************/
-	bool addMap(MapHandler* map);
-	void removeMap(MapHandler* map);
-	bool hasMap(MapHandler* map);
-	QList<MapHandler*> getMaps();
-	void setMaxNumberOfMaps(int n);
-	int getCurrentNumberOfMaps();
-	int getRemainingNumberOfMaps();
+	virtual void viewLinked(View* view) = 0;
+	virtual void viewUnlinked(View* view) = 0;
+	virtual void currentViewChanged(View* view) = 0;
+
+	virtual void mapLinked(View* view, MapHandlerGen* m) = 0;
+	virtual void mapUnlinked(View* view, MapHandlerGen* m) = 0;
 
 	/*********************************************************
-	 * MANAGE SCENES
+	 * MANAGE LINKED VIEWS
 	 *********************************************************/
-	bool addScene(Scene* scene);
-	void removeScene(Scene* scene);
-	bool hasScene(Scene* scene);
-	QList<Scene*> getScenes();
+
+	bool linkView(View* view);
+	void unlinkView(View* view);
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
+	/*********************************************************
+	 * MANAGE SHADERS
+	 *********************************************************/
+
+	void registerShader(Utils::GLSLShader* shader);
+	void unregisterShader(Utils::GLSLShader* shader);
 
 	/*********************************************************
 	 * MANAGE DOCK TABS
 	 *********************************************************/
+
 	bool addTabInDock(QWidget* tabWidget, const QString& tabText);
 	void removeTabInDock(QWidget* tabWidget);
+	const QList<QWidget*>& getTabWidgets() const { return l_tabWidgets; }
 
 	/*********************************************************
 	 * MANAGE MENU ACTIONS
 	 *********************************************************/
+
 	bool addMenuAction(const QString& menuPath, QAction* action);
 	void removeMenuAction(QAction* action);
 
 	/*********************************************************
 	 * MANAGE TOOLBAR ACTIONS
 	 *********************************************************/
+
 	bool addToolbarAction(QAction* action);
 	void removeToolbarAction(QAction* action);
 
@@ -99,13 +96,14 @@ protected:
 	QString m_filePath;
 	Window* m_window;
 
-	int m_maxNumberOfMaps;
-	QList<MapHandler*> l_maps;
-	QList<Scene*> l_scenes;
+	bool b_providesRendering;
+
+	QList<View*> l_views;
 	QList<QWidget*> l_tabWidgets;
 	QList<QAction*> l_menuActions;
 	QList<QAction*> l_toolbarActions;
-//	QList<ViewButton*> l_viewButtons;
+
+	QList<Utils::GLSLShader*> l_shaders;
 
 //	QList<Plugin*> l_dependencies;
 //	QList<Plugin*> l_dependantPlugins;
@@ -175,6 +173,10 @@ protected:
 */
 };
 
-Q_DECLARE_INTERFACE(Plugin, "Window.Plugin")
+} // namespace SCHNApps
+
+} // namespace CGoGN
+
+Q_DECLARE_INTERFACE(CGoGN::SCHNApps::Plugin, "CGoGN.SCHNapps.Plugin")
 
 #endif

@@ -2,52 +2,80 @@
 #define _CAMERA_H_
 
 #include "view.h"
+#include "QGLViewer/camera.h"
 
-//forward declaration
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+class Window;
 
 class Camera : public qglviewer::Camera
 {
 public:
-	Camera(View* v);
-	Camera(View* v, Camera c);
+	static unsigned int cameraCount;
+
+	Camera(const QString& name, Window* window);
 	~Camera();
 
-	bool isShared()	{ return l_views.size() > 1; }
+	const QString& getName() const { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	QString getName() { return m_name; }
-	void setName(QString name) { m_name = name; }
+	Window* getWindow() const { return m_window; }
+	void setWindow(Window* w) { m_window = w; }
 
-	void draw();
+	bool isUsed() const { return !l_views.empty(); }
+	bool isShared()	const { return l_views.size() > 1; }
 
-	bool getDraw() { return m_draw; }
-	bool getDrawFarPlane() { return m_drawFarPlane; }
-	double getDrawScale() { return m_drawScale; }
-	bool getDrawPath() { return m_drawPath; }
-	bool getDrawPathAxis() { return m_drawPathAxis; }
-	double getDrawPathScale() { return m_drawPathScale; }
+	/*********************************************************
+	 * CAMERA DRAWING
+	 *********************************************************/
 
+	virtual void draw();
+
+	bool getDraw() const { return m_draw; }
 	void setDraw(bool b = true) { m_draw = b; }
-	void setDrawFarPlane(bool b = true) { m_drawFarPlane = b; }
+
+	bool getDrawFarPlane() const { return m_drawFarPlane; }
+	void setDrawFarPlane(bool b) { m_drawFarPlane = b; }
+
+	double getDrawScale() const { return m_drawScale; }
 	void setDrawScale(double s) { m_drawScale = s; }
-	void setDrawPath(bool b = true) { m_drawPath = b; }
-	void setDrawPathAxis(bool b = true) { m_drawPathAxis = b; }
+
+	bool getDrawPath() const { return m_drawPath; }
+	void setDrawPath(bool b) { m_drawPath = b; }
+
+	bool getDrawPathAxis() const { return m_drawPathAxis; }
+	void setDrawPathAxis(bool b) { m_drawPathAxis = b; }
+
+	double getDrawPathScale() const { return m_drawPathScale; }
 	void setDrawPathScale(double s) { m_drawPathScale = s;}
 
-	void takenFrom(View* v);
-	void sharedWith(View* v);
-	void fitParamWith(View* v);
+	/*********************************************************
+	 * MANAGE LINKED VIEWS
+	 *********************************************************/
+
+	void linkView(View* view);
+	void unlinkView(View* view);
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
+	void fitParamWith(View* view);
+
+	/*********************************************************
+	 * SNAPSHOTS
+	 *********************************************************/
 
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);
 
-	void updateGL();
-
-	void viewShowButton(bool b);
-
 protected:
-	QList<View*> l_views;
-
 	QString m_name;
+	Window* m_window;
+
+	QList<View*> l_views;
 
 	bool m_draw;
 	bool m_drawFarPlane;
@@ -57,9 +85,11 @@ protected:
 	bool m_drawPathAxis;
 	double m_drawPathScale;
 
-	View* m_lastWorkingView;
-
 	int m_snapCount;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

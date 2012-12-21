@@ -453,7 +453,7 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	int		status;
 	char	*info_log;
 
-	if (nb_max_vertices!=-1)
+	if (nb_max_vertices != -1)
 		m_nbMaxVertices = nb_max_vertices;
 
 	m_geom_inputPrimitives = inputGeometryPrimitive;
@@ -482,9 +482,9 @@ bool GLSLShader::create(GLint inputGeometryPrimitive,GLint outputGeometryPrimiti
 	{
 		glAttachObjectARB( *m_program_object, *m_geom_shader_object );
 
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_INPUT_TYPE_EXT,inputGeometryPrimitive);
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_OUTPUT_TYPE_EXT,outputGeometryPrimitive);
-		glProgramParameteriEXT(*m_program_object,GL_GEOMETRY_VERTICES_OUT_EXT,m_nbMaxVertices);
+		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_INPUT_TYPE_EXT, inputGeometryPrimitive);
+		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_OUTPUT_TYPE_EXT, outputGeometryPrimitive);
+		glProgramParameteriEXT(*m_program_object, GL_GEOMETRY_VERTICES_OUT_EXT, m_nbMaxVertices);
 	}
 
 	/*** link program object ***/
@@ -753,9 +753,11 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs)
 	m_fragment_shader_source = new char[sz+1];
 	strcpy(m_fragment_shader_source, fs);
 
-	if(!loadVertexShaderSourceString(vs)) return false;
+	if(!loadVertexShaderSourceString(vs))
+		return false;
 
-	if(!loadFragmentShaderSourceString(fs)) return false;
+	if(!loadFragmentShaderSourceString(fs))
+		return false;
 
 	if(!create())
 	{
@@ -773,7 +775,6 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 
 	unsigned int sz = strlen(vs);
 	m_vertex_shader_source = new char[sz+1];
-
 	strcpy(m_vertex_shader_source,vs);
 
 	if (m_fragment_shader_source)
@@ -799,7 +800,7 @@ bool GLSLShader::loadShadersFromMemory(const char* vs, const char* fs, const cha
 	if(!loadGeometryShaderSourceString(gs))
 		return false;
 
-	if(!create(inputGeometryPrimitive,outputGeometryPrimitive,nb_max_vertices))
+	if(!create(inputGeometryPrimitive, outputGeometryPrimitive, nb_max_vertices))
 	{
 		CGoGNout << "Unable to create the shaders !" << CGoGNendl;
 		return false;
@@ -1045,6 +1046,8 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 		glm::mat4 normalMatrix = glm::gtx::inverse_transpose::inverseTranspose(modelview);
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 	}
+
+	this->unbind();
 }
 
 void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& modelview, const glm::mat4& PMV, const glm::mat4& normalMatrix)
@@ -1066,6 +1069,8 @@ void GLSLShader::updateMatrices(const glm::mat4& projection, const glm::mat4& mo
 	{
 		glUniformMatrix4fv(*m_uniMat_Normal, 	1 , false, &normalMatrix[0][0]);
 	}
+
+	this->unbind();
 }
 
 
@@ -1080,11 +1085,12 @@ void GLSLShader::enableVertexAttribs(unsigned int stride, unsigned int begin) co
 		glEnableVertexAttribArray(it->va_id);
 		glVertexAttribPointer(it->va_id, it->vbo_ptr->dataSize(), GL_FLOAT, false, stride, (const GLvoid*)begin);
 	}
+//	this->unbind();
 }
 
 void GLSLShader::disableVertexAttribs() const
 {
-	this->bind();
+//	this->bind();
 	for (std::vector<Utils::GLSLShader::VAStr>::const_iterator it = m_va_vbo_binding.begin(); it != m_va_vbo_binding.end(); ++it)
 		glDisableVertexAttribArray(it->va_id);
 	this->unbind();

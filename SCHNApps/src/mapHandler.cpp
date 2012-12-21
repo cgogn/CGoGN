@@ -1,106 +1,68 @@
-#include "visualization/mapHandler.h"
-#include "visualization/vboHandler.h"
-#include "interface/system.h"
+#include "mapHandler.h"
 
-#include "Topology/generic/genericmap.h"
+#include "system.h"
 
-MapHandler::MapHandler(CGoGN::GenericMap *map) :
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+MapHandlerGen::MapHandlerGen(const QString& name, Window* window, GenericMap* map) :
+	m_name(name),
+	m_window(window),
 	m_map(map)
-{}
-
-MapHandler::~MapHandler()
 {
-	while (!l_vbo.isEmpty())
-	{
-		VBOHandler *vboH = l_vbo.first();
-		bool destroy = !vboH->isShared();
-		takeVBO(vboH);
-
-		if (destroy)
-			delete vboH;
-	}
-
-	if (m_map)
-		delete m_map;
+	m_render = new Algo::Render::GL2::MapRender();
 }
 
-VBOHandler *MapHandler::addNewVBO(QString name)
+MapHandlerGen::~MapHandlerGen()
 {
-	foreach(VBOHandler * vbo, l_vbo)
-	{
-		if ((*vbo) == name)
-		{
-			System::Error::code = System::Error::VBO_EXISTS_f(name);
-
-			return NULL;
-		}
-	}
-	VBOHandler *newVBO = new VBOHandler(name);
-	newVBO->shareWith(this);
-
-	return newVBO;
+	foreach(CGoGN::Utils::VBO* vbo, h_vbo)
+		delete vbo;
 }
 
-bool MapHandler::addVBO(VBOHandler *vbo)
+/*********************************************************
+ * MANAGE VBOs
+ *********************************************************/
+
+Utils::VBO* MapHandlerGen::getVBO(const QString& name)
 {
-	if (vbo)
-	{
-		foreach(VBOHandler * vboH, l_vbo)
-		{
-			if (vbo == vboH || vbo->getName() == vboH->getName())
-			{
-				System::Error::code = System::Error::VBO_EXISTS_f(vbo->getName());
-				return false;
-			}
-		}
-		l_vbo.push_back(vbo);
-		return true;
-	}
+	if (h_vbo.contains(name))
+		return h_vbo[name];
 	else
-		return false;
-}
-
-VBOHandler *MapHandler::findVBO(QString name)
-{
-	foreach(VBOHandler * vbo, l_vbo)
 	{
-		if (vbo->getName() == name)
-			return vbo;
+		Utils::VBO* vbo = new Utils::VBO();
+		h_vbo.insert(name, vbo);
+		return vbo;
 	}
-	return NULL;
 }
 
-VBOHandler *MapHandler::findFirstVBOMatching(QRegExp regexp)
+void MapHandlerGen::deleteVBO(const QString& name)
 {
-	foreach(VBOHandler * vbo, l_vbo)
+	if (h_vbo.contains(name))
 	{
-		if (vbo->getName().contains(regexp))
-			return vbo;
+		Utils::VBO* vbo = h_vbo[name];
+		h_vbo.remove(name);
+		delete vbo;
 	}
-	return NULL;
 }
 
-QList<VBOHandler *> MapHandler::findVBOsMatching(QRegExp regexp)
+/*********************************************************
+ * MANAGE LINKED VIEWS
+ *********************************************************/
+
+void MapHandlerGen::linkView(View* view)
 {
-	QList<VBOHandler *> rlist;
-	foreach(VBOHandler * vbo, l_vbo)
-	{
-		if (vbo->getName().contains(regexp))
-			rlist.push_back(vbo);
-	}
-	return rlist;
+	if(view && !l_views.contains(view))
+		l_views.push_back(view);
 }
 
-VBOHandler *MapHandler::takeVBO(VBOHandler *vbo)
+void MapHandlerGen::unlinkView(View* view)
 {
-	int i = l_vbo.indexOf(vbo);
-
-	if (i >= 0)
-	{
-		VBOHandler *vboh = l_vbo.takeAt(i);
-		vboh->unshareWith(this);
-		return vboh;
-	}
-	else
-		return NULL;
+	l_views.removeOne(view);
 }
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

@@ -30,6 +30,7 @@ namespace CGoGN
 
 namespace Utils
 {
+
 #include "shaderIsoLines.vert"
 #include "shaderIsoLines.frag"
 #include "shaderIsoLines.geom"
@@ -59,37 +60,45 @@ ShaderIsoLines::ShaderIsoLines(int maxNbIsoPerTriangle)
 	setColors(Geom::Vec4f(1.0f,0.0f,0.0f,1.0f),Geom::Vec4f(0.0f,1.0f,0.0f,1.0f));
 	setDataBound(0.0f,1.0f);
 	setNbIso(32);
-
 }
 
 void ShaderIsoLines::getLocations()
 {
+	bind();
 	*m_unif_colorMin = glGetUniformLocation(program_handler(),"colorMin");
 	*m_unif_colorMax = glGetUniformLocation(program_handler(),"colorMax");
 	*m_unif_vmin = glGetUniformLocation(program_handler(),"vmin");
 	*m_unif_vmax = glGetUniformLocation(program_handler(),"vmax");
 	*m_unif_vnb = glGetUniformLocation(program_handler(),"vnb");
+	unbind();
 }
 
-void ShaderIsoLines::setAttributePosition(VBO* vbo)
+unsigned int ShaderIsoLines::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	bindVA_VBO("VertexPosition", vbo);
-}
-void ShaderIsoLines::setAttributeData(VBO* vbo)
-{
-	m_vboData = vbo;
-	bindVA_VBO("VertexData", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
+unsigned int ShaderIsoLines::setAttributeData(VBO* vbo)
+{
+	m_vboData = vbo;
+	bind();
+	unsigned int id = bindVA_VBO("VertexData", vbo);
+	unbind();
+	return id;
+}
 
 void ShaderIsoLines::setColors(const Geom::Vec4f& colorMin, const Geom::Vec4f& colorMax)
 {
 	m_colorMin = colorMin;
 	m_colorMax = colorMax;
 	bind();
-	glUniform4fv(*m_unif_colorMin,1, colorMin.data());
-	glUniform4fv(*m_unif_colorMax,1, colorMax.data());
+	glUniform4fv(*m_unif_colorMin,1, m_colorMin.data());
+	glUniform4fv(*m_unif_colorMax,1, m_colorMax.data());
+	unbind();
 }
 
 void ShaderIsoLines::setDataBound(float attMin, float attMax)
@@ -97,31 +106,35 @@ void ShaderIsoLines::setDataBound(float attMin, float attMax)
 	m_vmin = attMin;
 	m_vmax = attMax;
 	bind();
-	glUniform1f(*m_unif_vmin, attMin);
-	glUniform1f(*m_unif_vmax, attMax);
+	glUniform1f(*m_unif_vmin, m_vmin);
+	glUniform1f(*m_unif_vmax, m_vmax);
+	unbind();
 }
 
 void ShaderIsoLines::setNbIso(int nb)
 {
 	m_vnb = nb;
 	bind();
-	glUniform1i(*m_unif_vnb, nb);
+	glUniform1i(*m_unif_vnb, m_vnb);
+	unbind();
 }
 
 /*
 void ShaderIsoLines::restoreUniformsAttribs()
 {
+	bind();
+
 	*m_unif_explode   = glGetUniformLocation(program_handler(),"explode");
 	*m_unif_ambiant   = glGetUniformLocation(program_handler(),"ambient");
 	*m_unif_lightPos =  glGetUniformLocation(program_handler(),"lightPosition");
 
-	bind();
 	glUniform1f (*m_unif_explode, m_explode);
 	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
 	glUniform3fv(*m_unif_lightPos, 1, m_light_pos.data());
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexColor", m_vboPos);
+
 	unbind();
 }
 */
