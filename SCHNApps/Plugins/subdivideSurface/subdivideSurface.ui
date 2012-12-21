@@ -39,6 +39,20 @@
     </layout>
    </item>
    <item>
+    <widget class="QPushButton" name="button_loopSubdivision">
+     <property name="text">
+      <string>Loop subdivision</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="button_CCSubdivision">
+     <property name="text">
+      <string>Catmull-Clark subdivision</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="button_trianguleFaces">
      <property name="text">
       <string>Triangule Faces</string>

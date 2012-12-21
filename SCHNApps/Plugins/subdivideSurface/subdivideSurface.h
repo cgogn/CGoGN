@@ -70,6 +70,9 @@ public slots:
 	void cb_addMapToList(MapHandlerGen* m);
 	void cb_removeMapFromList(MapHandlerGen* m);
 	void cb_selectedMapChanged();
+
+	void cb_loopSubdivision();
+	void cb_CCSubdivision();
 	void cb_trianguleFaces();
 };
 

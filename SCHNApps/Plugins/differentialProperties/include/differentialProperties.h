@@ -65,6 +65,7 @@ private:
 	ComputeNormalsDialog* m_computeNormalsDialog;
 
 	QAction* computeNormalsAction;
+	QAction* computeCurvatureAction;
 };
 
 #endif

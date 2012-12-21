@@ -139,6 +139,8 @@ void RenderPlugin::viewLinked(View* view)
 		PerMapParameterSet p(map);
 		params->perMap.insert(map->getName(), p);
 	}
+	if (!maps.empty())
+		params->selectedMap = maps[0];
 
 	m_dockTab->refreshUI(params);
 }
@@ -164,6 +166,8 @@ void RenderPlugin::mapLinked(View* view, MapHandlerGen* m)
 	ParameterSet* params = h_viewParams[view];
 	PerMapParameterSet p(m);
 	params->perMap.insert(m->getName(), p);
+	if(params->perMap.count() == 1)
+		params->selectedMap = m;
 
 	m_dockTab->refreshUI(params);
 }
@@ -176,7 +180,10 @@ void RenderPlugin::mapUnlinked(View* view, MapHandlerGen* m)
 
 	if(params->selectedMap == m)
 	{
-		params->selectedMap = NULL;
+		if(!params->perMap.empty())
+			params->selectedMap = m_window->getMap(params->perMap.begin().key());
+		else
+			params->selectedMap = NULL;
 		m_dockTab->refreshUI(params);
 	}
 }
