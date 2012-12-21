@@ -81,44 +81,44 @@ void Map3::compactTopoRelations(const std::vector<unsigned int>& oldnew)
 
 void Map3::deleteVolume(Dart d)
 {
-//	DartMarkerStore mark(*this);		// Lock a marker
-//
-//	std::vector<Dart> visitedFaces;		// Faces that are traversed
-//	visitedFaces.reserve(512);
-//	visitedFaces.push_back(d);			// Start with the face of d
-//
-//	mark.markOrbit<FACE2>(d) ;
-//
-//
-//	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
-//	{
-//		Dart e = visitedFaces[i] ;
-//
-//		if(!isBoundaryFace(e))
-//			unsewVolumes(e) ;
-//
-//		do	// add all face neighbours to the table
-//		{
-//			Dart ee = phi2(e) ;
-//			if(!mark.isMarked(ee)) // not already marked
-//			{
-//				visitedFaces.push_back(ee) ;
-//				mark.markOrbit<FACE2>(ee) ;
-//			}
-//			e = phi1(e) ;
-//		} while(e != visitedFaces[i]) ;
-//	}
+	DartMarkerStore mark(*this);		// Lock a marker
 
-	Traversor3WF<Map3> tWF(*this,d);
-	for(Dart dit = tWF.begin() ; dit != tWF.end() ; dit = tWF.next())
+	std::vector<Dart> visitedFaces;		// Faces that are traversed
+	visitedFaces.reserve(512);
+	visitedFaces.push_back(d);			// Start with the face of d
+
+	mark.markOrbit<FACE2>(d) ;
+
+
+	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		if(!isBoundaryFace(dit))
-			unsewVolumes(dit) ;
+		Dart e = visitedFaces[i] ;
+
+		if(!isBoundaryFace(e))
+			unsewVolumes(e) ;
+
+		do	// add all face neighbours to the table
+		{
+			Dart ee = phi2(e) ;
+			if(!mark.isMarked(ee)) // not already marked
+			{
+				visitedFaces.push_back(ee) ;
+				mark.markOrbit<FACE2>(ee) ;
+			}
+			e = phi1(e) ;
+		} while(e != visitedFaces[i]) ;
 	}
+
+//	Traversor3WF<Map3> tWF(*this,d);
+//	for(Dart dit = tWF.begin() ; dit != tWF.end() ; dit = tWF.next())
+//	{
+//		if(!isBoundaryFace(dit))
+//			unsewVolumes(dit) ;
+//	}
 
 	Dart dd = phi3(d) ;
 	Map2::deleteCC(d) ; //deleting the volume
-//	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
+	Map2::deleteCC(dd) ; //deleting its border (created from the unsew operation)
 }
 
 void Map3::fillHole(Dart d)
@@ -936,50 +936,82 @@ bool Map3::check()
 		if(phi1(d3) != phi3(phi_1(d)))
 		{
 			if(isBoundaryMarked(d))
-				std::cout << "Boundary case - Check: phi3 , faces are not entirely sewn" << std::endl;
-			else
-				std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
+				std::cout << "Boundary case - ";
+
+			std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
 			return false;
 		}
 
         Dart d2 = phi2(d);
         if (phi2(d2) != d) // phi2 involution ?
 		{
-            std::cout << "Check: phi2 is not an involution" << std::endl;
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
+        	std::cout << "Check: phi2 is not an involution" << std::endl;
             return false;
         }
 
         Dart d1 = phi1(d);
         if (phi_1(d1) != d) // phi1 a une image correcte ?
 		{
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
             std::cout << "Check: unconsistent phi_1 link" << std::endl;
             return false;
         }
 
         if (m.isMarked(d1)) // phi1 a un seul antécédent ?
 		{
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
             std::cout << "Check: dart with two phi1 predecessors" << std::endl;
             return false;
         }
         m.mark(d1);
 
         if (d1 == d)
+        {
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
             std::cout << "Check: (warning) face loop (one edge)" << std::endl;
+        }
 
         if (phi1(d1) == d)
+        {
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
             std::cout << "Check: (warning) face with only two edges" << std::endl;
+        }
 
         if (phi2(d1) == d)
-            std::cout << "Check: (warning) dandling edge (phi2)" << std::endl;
+        {
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
+        	std::cout << "Check: (warning) dandling edge (phi2)" << std::endl;
+        }
 
         if (phi3(d1) == d)
+        {
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
             std::cout << "Check: (warning) dandling edge (phi3)" << std::endl;
+        }
     }
 
     for(Dart d = this->begin(); d != this->end(); this->next(d))
     {
         if (!m.isMarked(d)) // phi1 a au moins un antécédent ?
 		{
+        	if(isBoundaryMarked(d))
+        		std::cout << "Boundary case - ";
+
             std::cout << "Check: dart with no phi1 predecessor" << std::endl;
             return false;
         }
