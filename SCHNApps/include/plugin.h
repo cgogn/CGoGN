@@ -68,6 +68,7 @@ public:
 
 	void registerShader(Utils::GLSLShader* shader);
 	void unregisterShader(Utils::GLSLShader* shader);
+	const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
 
 	/*********************************************************
 	 * MANAGE DOCK TABS

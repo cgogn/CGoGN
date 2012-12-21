@@ -45,8 +45,6 @@ bool Plugin::linkView(View* view)
 	if(view && !l_views.contains(view))
 	{
 		l_views.push_back(view);
-		foreach(Utils::GLSLShader* shader, l_shaders)
-			Utils::GLSLShader::registerShader(view, shader);
 		viewLinked(view);
 		return true;
 	}
@@ -57,11 +55,7 @@ bool Plugin::linkView(View* view)
 void Plugin::unlinkView(View* view)
 {
 	if(l_views.removeOne(view))
-	{
-		foreach(Utils::GLSLShader* shader, l_shaders)
-			Utils::GLSLShader::unregisterShader(view, shader);
 		viewUnlinked(view);
-	}
 }
 
 /*********************************************************

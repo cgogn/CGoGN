@@ -4,6 +4,26 @@
 
 #include "Algo/Import/import.h"
 
+
+PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
+	positionVBO(NULL),
+	vectorVBO(NULL),
+	vectorsScaleFactor(1.0f)
+{
+	QList<Utils::VBO*> vbos = map->getVBOList();
+	for(int i = 0; i < vbos.count(); ++i)
+	{
+		if(vbos[i]->name() == "position") // try to select a VBO named "position"
+			positionVBO = vbos[i];
+	}
+
+	if(positionVBO == NULL && vbos.count() > 0)
+		positionVBO = vbos[0];
+	if(vectorVBO == NULL && vbos.count() > 0)
+		vectorVBO = vbos[0];
+}
+
+
 bool RenderVectorPlugin::enable()
 {
 	m_dockTab = new RenderVectorDockTab(this);
@@ -54,7 +74,7 @@ void RenderVectorPlugin::viewLinked(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* map, maps)
 	{
-		PerMapParameterSet p;
+		PerMapParameterSet p(map);
 		params->perMap.insert(map->getName(), p);
 	}
 
@@ -80,7 +100,7 @@ void RenderVectorPlugin::mapLinked(View* view, MapHandlerGen* m)
 {
 	assert(isLinkedToView(view));
 	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet p;
+	PerMapParameterSet p(m);
 	params->perMap.insert(m->getName(), p);
 
 	m_dockTab->refreshUI(params);
@@ -186,12 +206,22 @@ void RenderVectorDockTab::refreshUI(ParameterSet* params)
 			for(int i = 0; i < vbos.count(); ++i)
 			{
 				combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(vbos[i] == p.positionVBO)
+				if(p.positionVBO == NULL)
+				{										// if nothing is specified in the parameter set
+					if(vbos[i]->name() == "position")	// try to select a VBO named "position"
+					{
+						p.positionVBO = vbos[i];
+						combo_positionVBO->setCurrentIndex(i);
+					}
+				}
+				else if(vbos[i] == p.positionVBO)
 					combo_positionVBO->setCurrentIndex(i);
+
 				combo_vectorVBO->addItem(QString::fromStdString(vbos[i]->name()));
 				if(vbos[i] == p.vectorVBO)
 					combo_vectorVBO->setCurrentIndex(i);
 			}
+
 			if(p.positionVBO == NULL && vbos.count() > 0)
 			{
 				p.positionVBO = vbos[0];

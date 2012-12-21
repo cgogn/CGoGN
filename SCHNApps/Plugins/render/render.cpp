@@ -4,6 +4,32 @@
 
 #include "Algo/Import/import.h"
 
+
+PerMapParameterSet::PerMapParameterSet(MapHandlerGen* map) :
+	positionVBO(NULL),
+	normalVBO(NULL),
+	verticesScaleFactor(1.0f),
+	renderVertices(false),
+	renderEdges(false),
+	renderFaces(true),
+	faceStyle(FLAT)
+{
+	QList<Utils::VBO*> vbos = map->getVBOList();
+	for(int i = 0; i < vbos.count(); ++i)
+	{
+		if(vbos[i]->name() == "position") // try to select a VBO named "position"
+			positionVBO = vbos[i];
+		if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
+			normalVBO = vbos[i];
+	}
+
+	if(positionVBO == NULL && vbos.count() > 0)
+		positionVBO = vbos[0];
+	if(normalVBO == NULL && vbos.count() > 0)
+		normalVBO = vbos[0];
+}
+
+
 bool RenderPlugin::enable()
 {
 	m_dockTab = new RenderDockTab(this);
@@ -110,7 +136,7 @@ void RenderPlugin::viewLinked(View* view)
 	const QList<MapHandlerGen*>& maps = view->getLinkedMaps();
 	foreach(MapHandlerGen* map, maps)
 	{
-		PerMapParameterSet p;
+		PerMapParameterSet p(map);
 		params->perMap.insert(map->getName(), p);
 	}
 
@@ -136,7 +162,7 @@ void RenderPlugin::mapLinked(View* view, MapHandlerGen* m)
 {
 	assert(isLinkedToView(view));
 	ParameterSet* params = h_viewParams[view];
-	PerMapParameterSet p;
+	PerMapParameterSet p(m);
 	params->perMap.insert(m->getName(), p);
 
 	m_dockTab->refreshUI(params);
@@ -293,12 +319,30 @@ void RenderDockTab::refreshUI(ParameterSet* params)
 			for(int i = 0; i < vbos.count(); ++i)
 			{
 				combo_positionVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(vbos[i] == p.positionVBO)
+				if(p.positionVBO == NULL)
+				{										// if nothing is specified in the parameter set
+					if(vbos[i]->name() == "position")	// try to select a VBO named "position"
+					{
+						p.positionVBO = vbos[i];
+						combo_positionVBO->setCurrentIndex(i);
+					}
+				}
+				else if(vbos[i] == p.positionVBO)
 					combo_positionVBO->setCurrentIndex(i);
+
 				combo_normalVBO->addItem(QString::fromStdString(vbos[i]->name()));
-				if(vbos[i] == p.normalVBO)
+				if(p.normalVBO == NULL)
+				{									// if nothing is specified in the parameter set
+					if(vbos[i]->name() == "normal")	// try to select a VBO named "normal"
+					{
+						p.normalVBO = vbos[i];
+						combo_normalVBO->setCurrentIndex(i);
+					}
+				}
+				else if(vbos[i] == p.normalVBO)
 					combo_normalVBO->setCurrentIndex(i);
 			}
+
 			if(p.positionVBO == NULL && vbos.count() > 0)
 			{
 				p.positionVBO = vbos[0];

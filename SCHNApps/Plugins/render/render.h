@@ -32,6 +32,8 @@ struct PerMapParameterSet
 		faceStyle(FLAT)
 	{}
 
+	PerMapParameterSet(MapHandlerGen* map);
+
 	Utils::VBO* positionVBO;
 	Utils::VBO* normalVBO;
 	float verticesScaleFactor;

@@ -19,6 +19,8 @@ struct PerMapParameterSet
 		vectorsScaleFactor(1.0f)
 	{}
 
+	PerMapParameterSet(MapHandlerGen* map);
+
 	Utils::VBO* positionVBO;
 	Utils::VBO* vectorVBO;
 	float vectorsScaleFactor;
