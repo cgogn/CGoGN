@@ -46,12 +46,14 @@ void PluginsViewDialog::cb_selectedPluginsChanged()
 		if(pluginList->item(i)->isSelected() && !m_view->isLinkedToPlugin(plugin))
 		{
 			assert(!plugin->isLinkedToView(m_view));
+			std::cout << "link view : " << m_view->getName().toUtf8().constData() << " to plugin : " << plugin->getName().toUtf8().constData() << std::endl;
 			m_view->linkPlugin(plugin);
 			plugin->linkView(m_view);
 		}
 		else if(!pluginList->item(i)->isSelected() && m_view->isLinkedToPlugin(plugin))
 		{
 			assert(plugin->isLinkedToView(m_view));
+			std::cout << "unlink view : " << m_view->getName().toUtf8().constData() << " from plugin : " << plugin->getName().toUtf8().constData() << std::endl;
 			m_view->unlinkPlugin(plugin);
 			plugin->unlinkView(m_view);
 		}

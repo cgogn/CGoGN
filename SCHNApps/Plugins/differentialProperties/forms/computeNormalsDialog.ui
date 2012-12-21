@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>223</height>
+    <width>282</width>
+    <height>265</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,21 +18,32 @@
     <widget class="QListWidget" name="mapList"/>
    </item>
    <item>
-    <widget class="QComboBox" name="combo_positionAttribute">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Position attribute :</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="combo_positionAttribute">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Attribute name :</string>
+        <string>Normal attribute name :</string>
        </property>
       </widget>
      </item>
@@ -40,6 +51,16 @@
       <widget class="QLineEdit" name="attributeName"/>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="check_createVBO">
+     <property name="text">
+      <string>create VBO</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

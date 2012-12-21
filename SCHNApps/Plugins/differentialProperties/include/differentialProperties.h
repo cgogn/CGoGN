@@ -2,7 +2,8 @@
 #define _DIFFERENTIALPROPERTIES_PLUGIN_H_
 
 #include "plugin.h"
-#include "ui_computeNormalsDialog.h"
+
+#include "computeNormalsDialog.h"
 
 #include "Topology/generic/functor.h"
 #include "Topology/generic/parameters.h"
@@ -21,21 +22,6 @@ struct PFP: public PFP_STANDARD
 
 typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
-
-
-class ComputeNormalsDialog : public QDialog, public Ui::ComputeNormalsDialog
-{
-	Q_OBJECT
-	
-public:
-	ComputeNormalsDialog(Window* w);
-
-public slots:
-	void cb_selectedMapChanged();
-
-private:
-	Window* m_window;
-};
 
 
 class DifferentialPropertiesPlugin : public Plugin

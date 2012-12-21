@@ -19,7 +19,8 @@ MapsDialog::MapsDialog(Window* window) :
 	this->setupUi(this);
 	this->setModal(false);
 
-	connect(removeMapButton, SIGNAL(clicked()), this, SLOT(cb_removeMap()));
+	connect(button_removeMap, SIGNAL(clicked()), this, SLOT(cb_removeMap()));
+	connect(button_refreshMapInfo, SIGNAL(clicked()), this, SLOT(cb_selectedMapChanged()));
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
 

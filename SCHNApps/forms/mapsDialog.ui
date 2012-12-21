@@ -27,7 +27,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="removeMapButton">
+      <widget class="QPushButton" name="button_refreshMapInfo">
+       <property name="text">
+        <string>Refresh info</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_removeMap">
        <property name="text">
         <string>Remove</string>
        </property>

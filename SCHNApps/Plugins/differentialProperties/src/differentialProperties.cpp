@@ -5,32 +5,6 @@
 #include "Algo/Geometry/normal.h"
 
 
-
-ComputeNormalsDialog::ComputeNormalsDialog(Window* w) : m_window(w)
-{
-	setupUi(this);
-	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
-}
-
-void ComputeNormalsDialog::cb_selectedMapChanged()
-{
-	QList<QListWidgetItem*> currentItems = mapList->selectedItems();
-	if(!currentItems.empty())
-	{
-		combo_positionAttribute->clear();
-		const QString& mapname = currentItems[0]->text();
-		MapHandlerGen* mh = m_window->getMap(mapname);
-		GenericMap* map = mh->getGenericMap();
-		AttributeContainer& cont = map->getAttributeContainer<VERTEX>();
-		std::vector<std::string> names;
-		cont.getAttributesNames(names);
-		for(unsigned int i = 0; i < names.size(); ++i)
-			combo_positionAttribute->addItem(QString::fromStdString(names[i]));
-	}
-}
-
-
-
 bool DifferentialPropertiesPlugin::enable()
 {
 	m_computeNormalsDialog = new ComputeNormalsDialog(m_window);
@@ -46,12 +20,7 @@ bool DifferentialPropertiesPlugin::enable()
 
 void DifferentialPropertiesPlugin::cb_openComputeNormalsDialog()
 {
-	m_computeNormalsDialog->mapList->clear();
-	m_computeNormalsDialog->attributeName->setText("normal");
-	const QList<MapHandlerGen*>& maps = m_window->getMapsList();
-	foreach(MapHandlerGen* map, maps)
-		m_computeNormalsDialog->mapList->addItem(map->getName());
-
+	m_computeNormalsDialog->init();
 	m_computeNormalsDialog->show();
 }
 
@@ -70,6 +39,8 @@ void DifferentialPropertiesPlugin::cb_computeNormals()
 		if(!normal.isValid())
 			normal = map->addAttribute<VEC3, VERTEX>(normalName);
 		Algo::Geometry::computeNormalVertices<PFP>(*map, position, normal);
+		if(m_computeNormalsDialog->check_createVBO->checkState() == Qt::Checked)
+			mh->createVBO(normal);
 	}
 }
 
