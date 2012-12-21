@@ -42,10 +42,16 @@ void ComputeNormalsDialog::cb_selectedMapChanged()
 		cont.getAttributesNames(names);
 		cont.getAttributesTypes(types);
 		std::string vec3TypeName = VEC3::CGoGNnameOfType();
+		unsigned int j = 0;
 		for(unsigned int i = 0; i < names.size(); ++i)
 		{
 			if(types[i] == vec3TypeName)
+			{
 				combo_positionAttribute->addItem(QString::fromStdString(names[i]));
+				if(names[i] == "position") // try to select an attribute named "position"
+					combo_positionAttribute->setCurrentIndex(j);
+				++j;
+			}
 		}
 	}
 }

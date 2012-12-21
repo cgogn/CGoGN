@@ -163,7 +163,6 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 		return false;
 	}
 
-	// for every extracted substring
 	unsigned int i = 0;
 	QMenu* lastMenu = NULL;
 	foreach(QString step, stepNames)
@@ -189,9 +188,16 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 			if (!found)
 			{
 				QMenu* newMenu;
-				if(i == 1) newMenu = menubar->addMenu(step);
-				else newMenu = lastMenu->addMenu(step);
-				newMenu->setParent(lastMenu);
+				if(i == 1)
+				{
+					newMenu = menubar->addMenu(step);
+					newMenu->setParent(menubar);
+				}
+				else
+				{
+					newMenu = lastMenu->addMenu(step);
+					newMenu->setParent(lastMenu);
+				}
 				lastMenu = newMenu;
 			}
 		}

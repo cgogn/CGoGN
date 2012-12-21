@@ -106,12 +106,11 @@ void View::preDraw()
 
 	glm::mat4 mm = getCurrentModelViewMatrix();
 	glm::mat4 pm = getCurrentProjectionMatrix();
-	for(std::set< std::pair<void*, CGoGN::Utils::GLSLShader*> >::iterator it = CGoGN::Utils::GLSLShader::m_registeredShaders.begin();
-		it != CGoGN::Utils::GLSLShader::m_registeredShaders.end();
-		++it)
+	foreach(Plugin* plugin, l_plugins)
 	{
-		if(it->first == this || it->first == NULL)
-			it->second->updateMatrices(pm, mm);
+		const QList<CGoGN::Utils::GLSLShader*>& shaders = plugin->getShaders();
+		foreach(CGoGN::Utils::GLSLShader* shader, shaders)
+			shader->updateMatrices(pm, mm);
 	}
 
 	QGLViewer::preDraw();
