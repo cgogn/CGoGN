@@ -51,7 +51,8 @@ enum SelectorType
 	S_hQEMextColor,
 	S_hQEMml,
 	S_hLightfield,
-	S_hLightfieldExp
+	S_hLightfieldExp,
+	S_hLightfieldKCL
 } ;
 
 template <typename PFP> class ApproximatorGen ;
