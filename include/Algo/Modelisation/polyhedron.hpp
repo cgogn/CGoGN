@@ -494,7 +494,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
+				Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}
@@ -510,7 +510,7 @@ Dart Polyhedron<PFP>::cylinder_topo(unsigned int n, unsigned int z, bool top_clo
 			d = m_map.phi2(d);
 			if(m_map.faceDegree(d) > 3)
 			{
-				Algo::Modelisation::trianguleFace<PFP>(m_map, d);
+				Modelisation::trianguleFace<PFP>(m_map, d);
 				m_tableVertDarts.push_back(m_map.phi_1(d));
 			}
 		}

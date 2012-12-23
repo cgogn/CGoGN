@@ -89,7 +89,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -100,7 +100,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	{
 		if (m_ef)
 		{
-			VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map, d, positions);
+			VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
 			Dart a = d;
 			Dart b = map.phi1(a);
 			Dart c = map.phi1(b);
@@ -181,7 +181,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 	typedef typename PFP::REAL REAL;
 
 	VolumeAutoAttribute<VEC3> centerVolumes(map, "centerVolumes");
-	Algo::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
+	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(map, positions, centerVolumes, good);
 
 	std::vector<VEC3> buffer;
 	buffer.reserve(16384);
@@ -197,7 +197,7 @@ void ExplodeVolumeRender::updateData(typename PFP::MAP& map, const VertexAttribu
 
 	for (Dart d = traFace.begin(); d != traFace.end(); d = traFace.next())
 	{
-		VEC3 centerFace = Algo::Geometry::faceCentroid<PFP>(map, d, positions);
+		VEC3 centerFace = Algo::Surface::Geometry::faceCentroid<PFP>(map, d, positions);
 
 		Dart a = d;
 		Dart b = map.phi1(a);

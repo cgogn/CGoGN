@@ -30,6 +30,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Modelisation
 {
 
@@ -37,14 +40,14 @@ template <typename PFP>
 Dart Primitive3D<PFP>::HexaGrid1Topo(unsigned int nx)
 {
 	// first cube
-	Dart d0 = createHexahedron<PFP>(m_map);
+	Dart d0 = Surface::Modelisation::createHexahedron<PFP>(m_map);
 	m_tableVertDarts.push_back(d0);
 
 	Dart d1 = m_map.template phi<2112>(d0);
 
 	for (unsigned int i = 1; i < nx; ++i)
 	{
-		Dart d2 = createHexahedron<PFP>(m_map);
+		Dart d2 = Surface::Modelisation::createHexahedron<PFP>(m_map);
 		m_tableVertDarts.push_back(d2);
 		m_map.sewVolumes(d1, d2, false);
 		d1 = m_map.template phi<2112>(d2);
@@ -204,6 +207,8 @@ void Primitive3D<PFP>::transform(const Geom::Matrix44f& matrice)
 //}
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

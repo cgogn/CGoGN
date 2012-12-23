@@ -35,39 +35,39 @@ namespace Import
 {
 
 template <typename PFP>
-ImportVolumique::ImportType MeshTablesVolume<PFP>::getFileType(const std::string& filename)
+ImportType MeshTablesVolume<PFP>::getFileType(const std::string& filename)
 {
 	if ((filename.rfind(".tet")!=std::string::npos) || (filename.rfind(".TET")!=std::string::npos))
-		return ImportVolumique::TET;
+		return TET;
 
 	if ((filename.rfind(".node")!=std::string::npos) || (filename.rfind(".NODE")!=std::string::npos))
-		return ImportVolumique::NODE;
+		return NODE;
 
 	if ((filename.rfind(".off")!=std::string::npos) || (filename.rfind(".OFF")!=std::string::npos))
-		return ImportVolumique::OFF;
+		return OFF;
 
 	if ((filename.rfind(".ts")!=std::string::npos) || (filename.rfind(".TS")!=std::string::npos))
-		return ImportVolumique::TS;
+		return TS;
 
 	if ((filename.rfind(".moka")!=std::string::npos) || (filename.rfind(".MOKA")!=std::string::npos))
-		return ImportVolumique::MOKA;
+		return MOKA;
 
-	return ImportVolumique::UNKNOWNVOLUME;
+	return UNKNOWNVOLUME;
 }
 
 template <typename PFP>
 bool MeshTablesVolume<PFP>::importMesh(const std::string& filename, std::vector<std::string>& attrNames, float scaleFactor)
 {
-	ImportVolumique::ImportType kind = getFileType(filename);
+	ImportType kind = getFileType(filename);
 
 	switch (kind)
 	{
-	case ImportVolumique::TET:
+	case TET:
 		return importTet(filename, attrNames, scaleFactor);
 		break;
-	case ImportVolumique::NODE:
+	case NODE:
 		break;
-	case ImportVolumique::TS:
+	case TS:
 		break;
 //	case ImportVolumique::MOKA:
 //		return importMoka(filename,attrNames);

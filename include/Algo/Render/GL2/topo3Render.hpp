@@ -83,7 +83,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<
 	CellMarker<VOLUME> cmv(mapx);
 	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
 
-	Algo::Geometry::Parallel::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, allDarts,3);
+	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, allDarts,3);
 
 
 	// debut phi1
@@ -338,7 +338,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 
 	// compute center of each volumes
 	VolumeAutoAttribute<VEC3> centerVolumes(mapx, "centerVolumes");
-	Algo::Geometry::Parallel::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, good);
+	Algo::Volume::Geometry::Parallel::computeCentroidVolumes<PFP>(mapx, positions, centerVolumes, good);
 
 	// beta1
 	DartAutoAttribute<VEC3> fv1(mapx);

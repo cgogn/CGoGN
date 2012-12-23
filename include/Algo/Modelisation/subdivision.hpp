@@ -69,7 +69,7 @@ void trianguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSelect
 	TraversorF<typename PFP::MAP> t(map, selected) ;
 	for (Dart d = t.begin(); d != t.end(); d = t.next())
 	{
-		EMB center = Algo::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
+		EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
 		Dart cd = trianguleFace<PFP>(map, d);	// triangule the face
 		attributs[cd] = center;					// affect the data to the central vertex
 		Dart fit = cd ;
@@ -156,7 +156,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 	{
 		if (selected(d) && !map.isBoundaryMarked(d) && !mf.isMarked(d))
 		{
-			EMB center = Algo::Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
+			EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
 			attributs[cf] = center;					// affect the data to the central vertex
 			Dart e = cf;
@@ -493,7 +493,7 @@ void TwoNPlusOneSubdivision(typename PFP::MAP& map, EMBV& attributs, const Funct
 //	//second pass create corner face
 	for (std::vector<Dart>::iterator it = dOrig.begin(); it != dOrig.end(); ++it)
 	{
-		EMB c = Algo::Geometry::faceCentroid<PFP>(map,*it,attributs);
+		EMB c = Geometry::faceCentroid<PFP>(map,*it,attributs);
 		Dart dd = *it;
 		do
 		{
@@ -607,7 +607,7 @@ void DooSabin(typename PFP::MAP& map, VertexAttribute<typename PFP::VEC3>& posit
 	for (std::vector<Dart>::iterator di=faces.begin(); di != faces.end(); ++di)
 	{
 		Dart e = *di;
-		typename PFP::VEC3 center = Algo::Geometry::faceCentroid<PFP>(map,e,position);
+		typename PFP::VEC3 center = Geometry::faceCentroid<PFP>(map,e,position);
 
 		do
 		{
@@ -699,7 +699,7 @@ inline double sqrt3_K(unsigned int n)
 //	FaceAttribute<VEC3> positionF = map.template getAttribute<VEC3, FACE>("position") ;
 //	if(!positionF.isValid())
 //		positionF = map.template addAttribute<VEC3, FACE>("position") ;
-//	Algo::Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
+//	Geometry::computeCentroidFaces<PFP>(map, position, positionF) ;
 //
 //	computeDual<PFP>(map, selected);
 //

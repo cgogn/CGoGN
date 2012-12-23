@@ -108,13 +108,13 @@ void FunctorGLFace<PFP>::renderFace(Dart d)
 		VEC3 norm;
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 
 		// compute center
-		VEC3 center = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
-		VEC3 centerNormal = Algo::Geometry::faceNormal<PFP>(this->m_map, dd, m_positions);
+		VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
+		VEC3 centerNormal = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, dd, m_positions);
 
 		if (m_smooth) 				// use vertex normal
 		{
@@ -151,7 +151,7 @@ void FunctorGLFace<PFP>::renderFace(Dart d)
 	{
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 
@@ -180,7 +180,7 @@ void FunctorGLFace<PFP>::renderFace(Dart d)
 	{
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 		// vertices
@@ -224,7 +224,7 @@ void FunctorGLFace<PFP>::renderFace(Dart d)
 	{
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 		// vertices
@@ -291,7 +291,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 	if (dd == d)
 	{
 		//CGoGNout << "POLY: "<<m_nbEdges<<CGoGNendl;
-		VEC3 center = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
+		VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
 
 		// modify vertex position (explode faces)
 		vecPos.resize(m_nbEdges);
@@ -305,7 +305,7 @@ void FunctorGLFace<PFP>::renderFaceExplode(Dart d)
 		}
 		if ( m_lighted && !m_smooth ) // use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			//if (m_inverted) norm *= -1.0f ;
 			glNormal3fv(norm.data());
 		}
@@ -436,14 +436,14 @@ void FunctorGLFaceColor<PFP>::renderFace(Dart d)
 		VEC3 norm;
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 
 		// compute center
-		VEC3 center = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
-		VEC3 centerNormal = Algo::Geometry::faceNormal<PFP>(this->m_map, dd, m_positions);
-		VEC3 centerColor = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_colors);
+		VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
+		VEC3 centerNormal = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, dd, m_positions);
+		VEC3 centerColor = Algo::Surface::Geometry::faceCentroid<PFP>(this->m_map, d, m_colors);
 
 		if (m_smooth) 				// use vertex normal
 		{
@@ -484,7 +484,7 @@ void FunctorGLFaceColor<PFP>::renderFace(Dart d)
 	{
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 
@@ -515,7 +515,7 @@ void FunctorGLFaceColor<PFP>::renderFace(Dart d)
 	{
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 		// vertices
@@ -562,7 +562,7 @@ void FunctorGLFaceColor<PFP>::renderFace(Dart d)
 	{
 		if (m_lighted && !m_smooth)	// use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			glNormal3fv(norm.data());
 		}
 		// vertices
@@ -628,7 +628,7 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 	if (dd == d)
 	{
 		//CGoGNout << "POLY: "<<m_nbEdges<<CGoGNendl;
-		VEC3 center = Algo::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
+		VEC3 center = Algo::Surface::Geometry::faceCentroid<PFP>(this->m_map, d, m_positions);
 
 		// modify vertex position (explode faces)
 		vecPos.resize(m_nbEdges);
@@ -642,7 +642,7 @@ void FunctorGLFaceColor<PFP>::renderFaceExplode(Dart d)
 		}
 		if ( m_lighted && !m_smooth ) // use face normal
 		{
-			VEC3 norm = Algo::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
+			VEC3 norm = Algo::Surface::Geometry::faceNormal<PFP>(this->m_map, d, m_positions);
 			//if (m_inverted) norm *= -1.0f ;
 			glNormal3fv(norm.data());
 		}

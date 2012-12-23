@@ -259,7 +259,7 @@ void MyQT::cb_keyPress(int code)
 	if(code == 'c')
 	{
 		//SelectorDartNoBoundary<PFP::MAP> nb(myMap);
-		Algo::Modelisation::catmullClarkVol<PFP>(myMap, position);
+		Algo::Volume::Modelisation::catmullClarkVol<PFP>(myMap, position);
 
 		m_positionVBO->updateData(position);
 		m_render->initPrimitives<PFP>(myMap, allDarts, Algo::Render::GL2::TRIANGLES);
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 	CGoGNout << 5.34 << " toto "<< Geom::Vec3f(2.5f, 2.2f, 4.3f) << CGoGNendl;
 	CGoGNout << 3 << " tutu "<< 4 << CGoGNendl;
 
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	int nb=3;
 	if (argc>1)
 		nb = atoi(argv[1]);

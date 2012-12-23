@@ -281,7 +281,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>
 	typedef typename PFP::MAP MAP;
 
 	// triangule
-	Dart c = Algo::Modelisation::trianguleFace<PFP>(the_map,d);
+	Dart c = Surface::Modelisation::trianguleFace<PFP>(the_map,d);
 
 	Dart cc = c;
 	// cut edges
@@ -322,7 +322,7 @@ Dart extrudeFace(typename PFP::MAP& the_map, VertexAttribute<typename PFP::VEC3>
 	typedef typename PFP::MAP MAP;
 
 	//compute normal
-	typename PFP::VEC3 normal = Algo::Geometry::faceNormal<PFP>(the_map, d, position);
+	typename PFP::VEC3 normal = Surface::Geometry::faceNormal<PFP>(the_map, d, position);
 	normal *= dist;
 	
 	return extrudeFace<PFP>(the_map, position, d, normal);

@@ -170,7 +170,7 @@ protected:
 	*/
 	std::vector<unsigned int> m_emb;
 
-	static ImportVolumique::ImportType getFileType(const std::string& filename);
+	static ImportType getFileType(const std::string& filename);
 
 public:
 	typedef typename PFP::VEC3 VEC3 ;

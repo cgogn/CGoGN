@@ -219,7 +219,7 @@ void Viewer::importMesh(std::string& filename)
 	else
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
+		if(!Algo::Surface::Import::importMesh<PFP>(myMap, filename.c_str(), attrNames))
 		{
 			CGoGNerr << "could not import " << filename << CGoGNendl ;
 			return;
@@ -243,7 +243,7 @@ void Viewer::importMesh(std::string& filename)
 	if(!normal.isValid())
 		normal = myMap.addAttribute<VEC3, VERTEX>("normal") ;
 
-	Algo::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
+	Algo::Surface::Geometry::computeNormalVertices<PFP>(myMap, position, normal) ;
 
 	m_positionVBO->updateData(position) ;
 	m_normalVBO->updateData(normal) ;
@@ -258,7 +258,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 	std::string extension = filename.substr(pos) ;
 
 	if (extension == std::string(".off"))
-		Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
+		Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str(), allDarts) ;
 	else if (extension.compare(0, 4, std::string(".ply")) == 0)
 	{
 		int ascii = 0 ;
@@ -267,7 +267,7 @@ void Viewer::exportMesh(std::string& filename, bool askExportMode)
 
 		std::vector<VertexAttribute<VEC3>*> attributes ;
 		attributes.push_back(&position) ;
-		Algo::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
+		Algo::Surface::Export::exportPLYnew<PFP>(myMap, attributes, filename.c_str(), !ascii, allDarts) ;
 	}
 	else if (extension == std::string(".map"))
 		myMap.saveMapBin(filename) ;

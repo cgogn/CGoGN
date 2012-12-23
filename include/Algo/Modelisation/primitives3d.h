@@ -36,6 +36,9 @@ namespace CGoGN
 namespace Algo
 {
 
+namespace Volume
+{
+
 namespace Modelisation
 {
 
@@ -176,6 +179,8 @@ public:
 };
 
 } // namespace Modelisation
+
+}
 
 } // namespace Algo
 

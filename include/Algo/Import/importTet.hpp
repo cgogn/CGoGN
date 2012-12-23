@@ -116,7 +116,7 @@ bool importTet(typename PFP::MAP& map, const std::string& filename, std::vector<
 		std::stringstream oss(ligne);
 		oss >> nbe; //number of vertices = 4 or used for region mark
 
-		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
+		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map);
 
 		Geom::Vec4ui pt;
 		oss >> pt[0];

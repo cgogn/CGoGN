@@ -196,7 +196,7 @@ void MyQT::operation(int x)
 		CGoGNout <<"collapse face"<<CGoGNendl;
 		if (m_selected != NIL)
 		{
-			PFP::VEC3 Q = Algo::Geometry::faceCentroid<PFP>(myMap,m_selected,position);
+			PFP::VEC3 Q = Algo::Surface::Geometry::faceCentroid<PFP>(myMap,m_selected,position);
 			Dart x = myMap.collapseFace(m_selected);
 			dm.markAll();
 			position[x]= Q;
@@ -208,7 +208,7 @@ void MyQT::operation(int x)
 		CGoGNout <<"collapse volume"<<CGoGNendl;
 		if (m_selected != NIL)
 		{
-			PFP::VEC3 Q = Algo::Geometry::volumeCentroid<PFP>(myMap,m_selected,position);
+			PFP::VEC3 Q = Algo::Surface::Geometry::volumeCentroid<PFP>(myMap,m_selected,position);
 			Dart x = myMap.collapseVolume(m_selected);
 			dm.markAll();
 			position[x]= Q;
@@ -248,7 +248,7 @@ void MyQT::createMap(int n)
 	position = myMap.getAttribute<VEC3, VERTEX>("position");
 	if (!position.isValid())
 		position = myMap.addAttribute<VEC3, VERTEX>("position");
-	Algo::Modelisation::Primitive3D<PFP> prim(myMap, position);
+	Algo::Volume::Modelisation::Primitive3D<PFP> prim(myMap, position);
 	prim.hexaGrid_topo(n,n,n);
 	prim.embedHexaGrid(1.0f,1.0f,1.0f);
 
@@ -603,7 +603,7 @@ void MyQT::cb_Open()
 void MyQT::cb_Save()
 {
 	std::string filename = selectFileSave("Export SVG file ",".","(*.off)");
-	Algo::Export::exportOFF<PFP>(myMap, position, filename.c_str());
+	Algo::Surface::Export::exportOFF<PFP>(myMap, position, filename.c_str()); // ???
 }
 
 void MyQT::importMesh(std::string& filename)
@@ -621,7 +621,7 @@ void MyQT::importMesh(std::string& filename)
 	else if (extension == std::string(".node"))
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::NODE))
+		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::NODE))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;
@@ -631,7 +631,7 @@ void MyQT::importMesh(std::string& filename)
 	else if(extension == std::string(".tet"))
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::TET))
+		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::TET))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;
@@ -641,7 +641,7 @@ void MyQT::importMesh(std::string& filename)
 	else if(extension == std::string(".off"))
 	{
 		std::vector<std::string> attrNames ;
-		if(!Algo::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Import::ImportVolumique::OFF))
+		if(!Algo::Volume::Import::importMeshV<PFP>(myMap, filename, attrNames, Algo::Volume::Import::OFF))
 		{
 			std::cerr << "could not import " << filename << std::endl ;
 			return ;

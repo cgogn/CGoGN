@@ -123,7 +123,7 @@ bool importTs(typename PFP::MAP& map, const std::string& filename, std::vector<s
 		oss >> nbe; //number of vertices = 4
 		assert(nbe == 4);
 
-		Dart d = Algo::Modelisation::createTetrahedron<PFP>(map);
+		Dart d = Surface::Modelisation::createTetrahedron<PFP>(map);
 
 		Geom::Vec4ui pt;
 		oss >> pt[0];

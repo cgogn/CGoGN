@@ -302,7 +302,7 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
 		nbe = edgesBuffer.size();
 		if (nbe > 2)
 		{
-			Dart d = Algo::Modelisation::createPrism<PFP>(map, nbe);
+			Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe);
 
 			//Embed the base faces
 			for (unsigned int j = 0; j < nbe; ++j)
@@ -370,7 +370,7 @@ bool importMeshSToV(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<P
 }
 
 template <typename PFP>
-bool importMeshSurfToVol(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, float scale, unsigned int nbStage)
+bool importMeshSurfToVol(typename PFP::MAP& map, Surface::Import::MeshTablesSurface<PFP>& mts, float scale, unsigned int nbStage)
 {
 	VertexAutoAttribute< NoMathIONameAttribute< std::vector<Dart> > > vecDartsPerVertex(map);
 	unsigned nbf = mts.getNbFaces();
@@ -414,7 +414,7 @@ bool importMeshSurfToVol(typename PFP::MAP& map, MeshTablesSurface<PFP>& mts, fl
 
 			for(unsigned int k = 0 ; k < nbStage ; ++k)
 			{
-				Dart d = Algo::Modelisation::createPrism<PFP>(map, nbe);
+				Dart d = Surface::Modelisation::createPrism<PFP>(map, nbe);
 
 				//Embed the base faces
 				for (unsigned int j = 0; j < nbe; ++j)
@@ -509,45 +509,45 @@ bool importMesh(typename PFP::MAP& map, MeshTablesVolume<PFP>& mtv)
 template <typename PFP>
 bool importMeshV(typename PFP::MAP& map, const std::string& filename, std::vector<std::string>& attrNames, bool mergeCloseVertices)
 {
-	Volume::Import::ImportType kind = Volume::Import::UNKNOWNVOLUME;
+	ImportType kind = Volume::Import::UNKNOWNVOLUME;
 
 	if ((filename.rfind(".tet") != std::string::npos) || (filename.rfind(".TET") != std::string::npos))
-		kind = Volume::Import::TET;
+		kind = TET;
 
 	if ((filename.rfind(".off") != std::string::npos) || (filename.rfind(".OFF") != std::string::npos))
-		kind = Volume::Import::OFF;
+		kind = OFF;
 
 	if ((filename.rfind(".node") != std::string::npos) || (filename.rfind(".NODE") != std::string::npos))
-		kind = Volume::Import::NODE;
+		kind = NODE;
 
 	if ((filename.rfind(".ts") != std::string::npos) || (filename.rfind(".TS") != std::string::npos))
-		kind = Volume::Import::TS;
+		kind = TS;
 
 	switch (kind)
 	{
-		case Volume::Import::TET:
-			return Algo::Import::importTet<PFP>(map, filename, attrNames, 1.0f);
+		case TET:
+			return importTet<PFP>(map, filename, attrNames, 1.0f);
 			break;
-		case Volume::Import::OFF:
+		case OFF:
 		{
 			size_t pos = filename.rfind(".");
 			std::string fileEle = filename;
 			fileEle.erase(pos);
 			fileEle.append(".ele");
-			return Algo::Import::importOFFWithELERegions<PFP>(map, filename, fileEle, attrNames);
+			return importOFFWithELERegions<PFP>(map, filename, fileEle, attrNames);
 			break;
 		}
-		case Volume::Import::NODE:
+		case NODE:
 		{
 			size_t pos = filename.rfind(".");
 			std::string fileEle = filename;
 			fileEle.erase(pos);
 			fileEle.append(".ele");
-			return Algo::Import::importNodeWithELERegions<PFP>(map, filename, fileEle, attrNames);
+			return importNodeWithELERegions<PFP>(map, filename, fileEle, attrNames);
 			break;
 		}
 		case Volume::Import::TS:
-			Algo::Import::importTs<PFP>(map, filename, attrNames, 1.0f);
+			return importTs<PFP>(map, filename, attrNames, 1.0f);
 			break;
 		default:
 			CGoGNerr << "Not yet supported" << CGoGNendl;

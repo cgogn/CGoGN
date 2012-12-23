@@ -181,6 +181,9 @@ public:
 	 */
 	virtual bool mergeVolumes(Dart d);
 
+	virtual bool mergeVolumes(Dart d, Dart e) { assert("use mergeVolumes(d,e) only in dimension 2");return false;}
+
+
 	//! Split a volume into two volumes along a edge path
 	/*! @param vd a vector of darts
 	 */

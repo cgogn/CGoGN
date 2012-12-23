@@ -92,9 +92,9 @@ public:
 	AttributeHandler() ;
 
 	template <unsigned int ORBIT2>
-	AttributeHandler(const AttributeHandler<T, ORBIT2>& h)
+	AttributeHandler(const AttributeHandler<T, ORBIT2>& h):
+	AttributeHandlerGen(h.m_map, h.valid)
 	{
-		AttributeHandlerGen(h.m_map, h.valid);
 		m_attrib = h.m_attrib;
 		if(m_attrib->getOrbit() == ORBIT2)
 		{

@@ -183,7 +183,7 @@ inline void MapRender::addEarTri(typename PFP::MAP& map, Dart d, std::vector<GLu
 	const VertexAttribute<typename PFP::VEC3>& position = *pos ;
 
 	// compute normal to polygon
-	typename PFP::VEC3 normalPoly = Algo::Geometry::newellNormal<PFP>(map, d, position);
+	typename PFP::VEC3 normalPoly = Algo::Surface::Geometry::newellNormal<PFP>(map, d, position);
 
 	// first pass create polygon in chained list with angle computation
 	VertexPoly* vpp = NULL;

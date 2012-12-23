@@ -59,7 +59,7 @@ typename PFP::REAL convexFaceArea(typename PFP::MAP& map, Dart d, const VertexAt
 	else
 	{
 		float area = 0.0f ;
-		VEC3 centroid = Algo::Geometry::faceCentroid<PFP>(map, d, position) ;
+		VEC3 centroid = faceCentroid<PFP>(map, d, position) ;
 		Traversor2FE<typename PFP::MAP> t(map, d) ;
 		for(Dart it = t.begin(); it != t.end(); it = t.next())
 		{

@@ -308,8 +308,8 @@ void swap4To4(typename PFP::MAP& map, Dart d)
 	map.unsewVolumes(d);
 	map.unsewVolumes(map.phi2(map.phi3(dd)));
 
-	Dart d1 = Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, dd);
-	Dart d2 = Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, e);
+	Dart d1 = Tetrahedralization::swap2To2<PFP>(map, dd);
+	Dart d2 = Tetrahedralization::swap2To2<PFP>(map, e);
 
 	//sew middle darts so that they do not cross
 	map.sewVolumes(map.phi2(d1),map.phi2(map.phi3(d2)));
@@ -397,7 +397,7 @@ Dart swap5To4(typename PFP::MAP& map, Dart d)
 	map.unsewVolumes(map.phi2(d323));
 	map.deleteVolume(d);
 
-	Dart d1 = Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, dswap);
+	Dart d1 = Tetrahedralization::swap2To2<PFP>(map, dswap);
 
 	map.sewVolumes(map.phi2(d1), t1);
 	map.sewVolumes(map.phi2(map.phi3(d1)),t2);
@@ -417,28 +417,28 @@ void swapGen3To2(typename PFP::MAP& map, Dart d)
 		{
 			for(unsigned int i = 0 ; i < n - 2 ; ++i)
 			{
-				dit = map.phi2(Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit));
+				dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
 			}
 
-			Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, dit);
+			Tetrahedralization::swap2To2<PFP>(map, dit);
 		}
 		else
 		{
 			for(unsigned int i = 0 ; i < n - 4 ; ++i)
 			{
-				dit = map.phi2(Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, dit));
+				dit = map.phi2(Tetrahedralization::swap2To3<PFP>(map, dit));
 			}
-			Algo::Modelisation::Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
+			Tetrahedralization::swap4To4<PFP>(map,  map.alpha2(dit));
 		}
 	}
 	else if (n == 3)
 	{
-		Dart dres = Algo::Modelisation::Tetrahedralization::swap2To3<PFP>(map, d);
-		Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, map.phi2(dres));
+		Dart dres = Tetrahedralization::swap2To3<PFP>(map, d);
+		Tetrahedralization::swap2To2<PFP>(map, map.phi2(dres));
 	}
 	else // si (n == 2)
 	{
-		Algo::Modelisation::Tetrahedralization::swap2To2<PFP>(map, d);
+		Tetrahedralization::swap2To2<PFP>(map, d);
 	}
 
 }
@@ -472,7 +472,7 @@ Dart flip1To4(typename PFP::MAP& map, Dart d)
 	edges.push_back(map.phi2(map.phi_1(d)));
 	map.splitVolume(edges);
 
-	Dart x = Algo::Modelisation::trianguleFace<PFP>(map,map.phi2(d));
+	Dart x = Surface::Modelisation::trianguleFace<PFP>(map,map.phi2(d));
 
 	//
 	// Cut the 2nd tetrahedron
@@ -514,7 +514,7 @@ Dart flip1To3(typename PFP::MAP& map, Dart d)
 	//
 	// Triangule one face
 	//
-	Dart x = Algo::Modelisation::trianguleFace<PFP>(map,d);
+	Dart x = Surface::Modelisation::trianguleFace<PFP>(map,d);
 
 	//
 	// Cut the 1st Tetrahedron
