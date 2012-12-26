@@ -4,10 +4,6 @@
 #include "plugin.h"
 #include "ui_render.h"
 
-#include "Topology/generic/functor.h"
-#include "Topology/generic/parameters.h"
-#include "Topology/map/embeddedMap2.h"
-
 #include "Utils/Shaders/shaderFlat.h"
 #include "Utils/Shaders/shaderPhong.h"
 #include "Utils/Shaders/shaderSimpleColor.h"
@@ -18,34 +14,59 @@ using namespace CGoGN;
 using namespace SCHNApps;
 
 
-class RenderDockTab : public QWidget, public Ui::RenderWidget
-{
-public:
-	RenderDockTab() { setupUi(this); }
-};
-
-
 enum FaceShadingStyle
 {
 	FLAT = 0,
 	PHONG = 1
 };
 
-struct TabParams
+struct PerMapParameterSet
 {
-	TabParams(float vsf, bool rv, bool re, bool rf, FaceShadingStyle fstyle) :
-		verticesScaleFactor(vsf),
-		renderVertices(rv),
-		renderEdges(re),
-		renderFaces(rf),
-		faceStyle(fstyle)
+	PerMapParameterSet() :
+		positionVBO(NULL),
+		normalVBO(NULL),
+		verticesScaleFactor(1.0f),
+		renderVertices(false),
+		renderEdges(false),
+		renderFaces(true),
+		faceStyle(FLAT)
 	{}
 
+	PerMapParameterSet(MapHandlerGen* map);
+
+	Utils::VBO* positionVBO;
+	Utils::VBO* normalVBO;
 	float verticesScaleFactor;
 	bool renderVertices;
 	bool renderEdges;
 	bool renderFaces;
 	FaceShadingStyle faceStyle;
+};
+
+struct ParameterSet
+{
+	ParameterSet() : selectedMap(NULL)
+	{}
+
+	QHash<QString, PerMapParameterSet> perMap;
+	MapHandlerGen* selectedMap;
+};
+
+
+class RenderPlugin;
+
+class RenderDockTab : public QWidget, public Ui::RenderWidget
+{
+public:
+	RenderDockTab(RenderPlugin* p) : plugin(p)
+	{
+		setupUi(this);
+	}
+
+	void refreshUI(ParameterSet* params);
+
+private:
+	RenderPlugin* plugin;
 };
 
 
@@ -55,7 +76,7 @@ class RenderPlugin : public Plugin
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	RenderPlugin()
+	RenderPlugin() : b_refreshingUI(false)
 	{
 		setProvidesRendering(true);
 	}
@@ -79,16 +100,27 @@ public:
 	virtual void viewUnlinked(View* view);
 	virtual void currentViewChanged(View* view);
 
+	virtual void mapLinked(View* view, MapHandlerGen* m);
+	virtual void mapUnlinked(View* view, MapHandlerGen* m);
+
+	void setRefreshingUI(bool b) { b_refreshingUI = b; }
+
 protected:
 	RenderDockTab* m_dockTab;
-	QHash<View*, TabParams*> h_viewParams;
+	QHash<View*, ParameterSet*> h_viewParams;
 
 	CGoGN::Utils::ShaderFlat* m_flatShader;
 	CGoGN::Utils::ShaderPhong* m_phongShader;
 	CGoGN::Utils::ShaderSimpleColor* m_simpleColorShader;
 	CGoGN::Utils::PointSprite* m_pointSprite;
 
+	bool b_refreshingUI;
+
 public slots:
+	void cb_selectedMapChanged();
+	void cb_positionVBOChanged(int index);
+	void cb_normalVBOChanged(int index);
+	void cb_refreshVBOs();
 	void cb_renderVerticesChanged(bool b);
 	void cb_verticesScaleFactorChanged(int i);
 	void cb_renderEdgesChanged(bool b);

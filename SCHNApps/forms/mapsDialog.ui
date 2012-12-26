@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>457</width>
-    <height>374</height>
+    <width>558</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,14 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="removeMapButton">
+      <widget class="QPushButton" name="button_refreshMapInfo">
+       <property name="text">
+        <string>Refresh info</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_removeMap">
        <property name="text">
         <string>Remove</string>
        </property>
@@ -38,7 +45,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="dartTab">
       <attribute name="title">

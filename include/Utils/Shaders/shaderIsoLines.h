@@ -106,12 +106,12 @@ public:
 	/**
 	 * Position attribute
 	 */
-	void setAttributePosition(VBO* vbo);
+	unsigned int setAttributePosition(VBO* vbo);
 
 	/**
 	 * Data attribute for iso-lines must be of type float
 	 */
-	void setAttributeData(VBO* vbo);
+	unsigned int setAttributeData(VBO* vbo);
 };
 
 } // namespace Utils

@@ -30,6 +30,7 @@ namespace CGoGN
 
 namespace Utils
 {
+
 #include "shaderEnvMap.vert"
 #include "shaderEnvMap.frag"
 
@@ -64,7 +65,6 @@ ShaderEnvMap::ShaderEnvMap(bool doubleSided, bool withEyePosition):
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str());
 
 	// and get and fill uniforms
-	bind();
 	getLocations();
 	sendParams();
 
@@ -85,6 +85,7 @@ ShaderEnvMap::ShaderEnvMap(bool doubleSided, bool withEyePosition):
 
 void ShaderEnvMap::getLocations()
 {
+	bind();
 	*m_unif_ambiant   = glGetUniformLocation(this->program_handler(), "materialAmbient");
 	*m_unif_diffuse   = glGetUniformLocation(this->program_handler(), "materialDiffuse");
 	*m_unif_blend = glGetUniformLocation(this->program_handler(), "blendCoef");
@@ -93,10 +94,12 @@ void ShaderEnvMap::getLocations()
 		*m_unif_eyePos= glGetUniformLocation(this->program_handler(), "eyePosition");
 
 	*m_unif_envMap	  = glGetUniformLocation(this->program_handler(), "EnvMap");
+	unbind();
 }
 
 void ShaderEnvMap::sendParams()
 {
+	bind();
 	glUniform4fv(*m_unif_ambiant,  1, m_ambiant.data());
 	glUniform4fv(*m_unif_diffuse,  1, m_diffuse.data());
 	glUniform1f(*m_unif_blend,    m_blend);
@@ -105,44 +108,50 @@ void ShaderEnvMap::sendParams()
 		glUniform3fv(*m_unif_eyePos, 1, m_eyePos.data());
 	// we use texture engine 0
 	glUniform1iARB(*m_unif_envMap,GL_TEXTURE0);
+	unbind();
 }
 
 void ShaderEnvMap::setAmbiant(const Geom::Vec4f& ambiant)
 {
-	this->bind();
-	glUniform4fv(*m_unif_ambiant,1, ambiant.data());
 	m_ambiant = ambiant;
+	bind();
+	glUniform4fv(*m_unif_ambiant,1, m_ambiant.data());
+	unbind();
 }
 
 void ShaderEnvMap::setDiffuse(const Geom::Vec4f& diffuse)
 {
-	this->bind();
-	glUniform4fv(*m_unif_diffuse,1, diffuse.data());
 	m_diffuse = diffuse;
+	bind();
+	glUniform4fv(*m_unif_diffuse,1, m_diffuse.data());
+	unbind();
 }
 
 
 void ShaderEnvMap::setBlendCoef(float blend)
 {
-	this->bind();
-	glUniform1f (*m_unif_blend, blend);
 	m_blend = blend;
+	bind();
+	glUniform1f (*m_unif_blend, m_blend);
+	unbind();
 }
 
 void ShaderEnvMap::setLightPosition(const Geom::Vec3f& lightPos)
 {
-	this->bind();
-	glUniform3fv(*m_unif_lightPos,1,lightPos.data());
 	m_lightPos = lightPos;
+	bind();
+	glUniform3fv(*m_unif_lightPos, 1, m_lightPos.data());
+	unbind();
 }
 
 void ShaderEnvMap::setEyePosition(const Geom::Vec3f& eyePos)
 {
 	if (m_with_eyepos)
 	{
-		this->bind();
-		glUniform3fv(*m_unif_eyePos,1,eyePos.data());
 		m_eyePos = eyePos;
+		bind();
+		glUniform3fv(*m_unif_eyePos, 1, m_eyePos.data());
+		unbind();
 	}
 }
 
@@ -152,7 +161,6 @@ void ShaderEnvMap::setParams(const Geom::Vec4f& ambiant, const Geom::Vec4f& diff
 	m_diffuse = diffuse;
 	m_blend = blend;
 	m_lightPos = lightPos;
-	bind();
 	sendParams();
 }
 
@@ -172,12 +180,14 @@ unsigned int ShaderEnvMap::setAttributeColor(VBO* vbo)
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
 
 		// and treat uniforms
-		bind();
 		getLocations();
 		sendParams();
 	}
 	// bind th VA with WBO
-	return bindVA_VBO("VertexColor", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexColor", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderEnvMap::unsetAttributeColor()
@@ -185,9 +195,11 @@ void ShaderEnvMap::unsetAttributeColor()
 	m_vboColor = NULL;
 	if (m_with_color)
 	{
-		m_with_color=false;
+		m_with_color = false;
 		// unbind the VA
+		bind();
 		unbindVA("VertexColor");
+		unbind();
 		// recompile shader
 		std::string gl3vert(*GLSLShader::DEFINES_GL);
 		gl3vert.append(vertexShaderText);
@@ -195,7 +207,6 @@ void ShaderEnvMap::unsetAttributeColor()
 		gl3frag.append(fragmentShaderText);
 		loadShadersFromMemory(gl3vert.c_str(), gl3frag.c_str());
 		// and treat uniforms
-		bind();
 		getLocations();
 		sendParams();
 	}
@@ -204,10 +215,9 @@ void ShaderEnvMap::unsetAttributeColor()
 void ShaderEnvMap::restoreUniformsAttribs()
 {
 	getLocations();
-
-	bind();
 	sendParams();
 
+	bind();
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexNormal", m_vboNormal);
 	if (m_vboColor)
@@ -218,13 +228,19 @@ void ShaderEnvMap::restoreUniformsAttribs()
 unsigned int ShaderEnvMap::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	return bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
 unsigned int ShaderEnvMap::setAttributeNormal(VBO* vbo)
 {
 	m_vboNormal = vbo;
-	return bindVA_VBO("VertexNormal", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexNormal", vbo);
+	unbind();
+	return id;
 }
 
 

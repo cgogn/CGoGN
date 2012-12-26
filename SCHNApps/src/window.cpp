@@ -13,6 +13,8 @@
 #include "plugin.h"
 #include "view.h"
 #include "texture.h"
+#include "camera.h"
+#include "mapHandler.h"
 
 #include "dialogs/camerasDialog.h"
 #include "dialogs/pluginsDialog.h"
@@ -89,13 +91,18 @@ Window::~Window()
  * MANAGE DOCK
  *********************************************************/
 
-void Window::addTabInDock(QWidget* tabWidget, const QString& tabText)
+void Window::addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable)
 {
 	if(tabWidget)
 	{
+		int currentTab = m_dockTabWidget->currentIndex();
+
 		int idx = m_dockTabWidget->addTab(tabWidget, tabText);
 		m_dock->setVisible(true);
-		m_dockTabWidget->setTabEnabled(idx, false);
+		m_dockTabWidget->setTabEnabled(idx, enable);
+
+		if(currentTab != -1)
+			m_dockTabWidget->setCurrentIndex(currentTab);
 	}
 }
 
@@ -107,22 +114,24 @@ void Window::removeTabInDock(QWidget *tabWidget)
 
 void Window::enablePluginTabWidgets(Plugin* plugin)
 {
+	int currentTab = m_dockTabWidget->currentIndex();
+
 	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
 	foreach(QWidget* w, tabWidgets)
-	{
-		int idx = m_dockTabWidget->indexOf(w);
-		m_dockTabWidget->setTabEnabled(idx, true);
-	}
+		m_dockTabWidget->setTabEnabled(m_dockTabWidget->indexOf(w), true);
+
+	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 void Window::disablePluginTabWidgets(Plugin* plugin)
 {
+	int currentTab = m_dockTabWidget->currentIndex();
+
 	const QList<QWidget*> tabWidgets = plugin->getTabWidgets();
 	foreach(QWidget* w, tabWidgets)
-	{
-		int idx = m_dockTabWidget->indexOf(w);
-		m_dockTabWidget->setTabEnabled(idx, false);
-	}
+		m_dockTabWidget->setTabEnabled(m_dockTabWidget->indexOf(w), false);
+
+	m_dockTabWidget->setCurrentIndex(currentTab);
 }
 
 /*********************************************************
@@ -154,88 +163,52 @@ bool Window::addMenuAction(const QString& menuPath, QAction* action)
 		return false;
 	}
 
-	// for every extracted substring
 	unsigned int i = 0;
-	QMenu* lastMenu;
-	QAction* lastAction;
+	QMenu* lastMenu = NULL;
 	foreach(QString step, stepNames)
 	{
 		++i;
-		bool newMenu = true;
-		// if not last substring (= menu)
-		if (i < nbStep)
+		if (i < nbStep) // if not last substring (= menu)
 		{
-			// if first substring
-			if (i == 1)
+			// try to find an existing submenu with step name
+			bool found = false;
+			QList<QAction*> actions;
+			if(i == 1) actions = menubar->actions();
+			else actions = lastMenu->actions();
+			foreach(QAction* action, actions)
 			{
-				// checking if it's an existing menu or not
-				QList<QAction *> actions = menubar->actions();
-				foreach(QAction * action, actions)
+				QMenu* submenu = action->menu();
+				if (submenu && submenu->title() == step)
 				{
-					if (action->menu()->title() == step)
-					{
-						lastAction = action;
-						newMenu = false;
-						break;
-					}
-				}
-				// if new menu: adding it to menubar
-				if (newMenu)
-				{
-					lastMenu = menubar->addMenu(step);
-					lastMenu->setParent(menubar);
-				}
-				// if not: next operation in the already existing corresponding menu
-				else
-				{
-					lastMenu = lastAction->menu();
-					// setting the parent will be useful for the deleting function
-					lastMenu->setParent(menubar);
+					lastMenu = submenu;
+					found = true;
+					break;
 				}
 			}
-			// if not first substring
-			else
+			if (!found)
 			{
-				// same thing: except not operating on the menubar
-				QList<QAction *> actions = lastMenu->actions();
-				foreach(QAction * action, actions)
+				QMenu* newMenu;
+				if(i == 1)
 				{
-					if (action->menu()->title() == step)
-					{
-						lastAction = action;
-						newMenu = false;
-						break;
-					}
-				}
-				if (newMenu)
-				{
-					QMenu *tmp = lastMenu;
-					lastMenu = lastMenu->addMenu(step);
-					// setting the parent will be useful for the deleting function
-					lastMenu->setParent(tmp);
+					newMenu = menubar->addMenu(step);
+					newMenu->setParent(menubar);
 				}
 				else
 				{
-					QMenu *tmp = lastMenu;
-					lastMenu = lastAction->menu();
-					// setting the parent will be useful for the deleting function
-					lastMenu->setParent(tmp);
+					newMenu = lastMenu->addMenu(step);
+					newMenu->setParent(lastMenu);
 				}
+				lastMenu = newMenu;
 			}
 		}
-		// if last substring (= action name)
-		else
+		else // if last substring (= action name)
 		{
-			// adding it to the corresponding menu
 			lastMenu->addAction(action);
 			action->setText(step);
-			// setting the parent will be useful for the deleting function
 			action->setParent(lastMenu);
-			break;
 		}
 	}
 
-	// success
 	return true;
 }
 
@@ -248,30 +221,18 @@ void Window::removeMenuAction(QAction *action)
 		// which is an instance of QMenu if the action was created
 		// using the addMenuActionMethod()
 		QObject* parent = action->parent();
-		// deleting action
 		delete action;
 
-		//if parent is an instance of QMenu
-		if (parent->inherits("QMenu"))
+		while(parent != NULL)
 		{
-			// for this menu and all of its parent that are instance of QMenu
-			// that are also fit for deleting
-			while (parent != NULL)
+			QMenu* parentMenu = dynamic_cast<QMenu*>(parent);
+			if(parentMenu && parentMenu->actions().empty())
 			{
-				QMenu *menuParent = (QMenu*)(parent);
 				parent = parent->parent();
-
-				// if the menu doesn't have any other actions/menus
-				// it is deleted
-				if (menuParent->actions().empty())
-					delete menuParent;
-				// otherwise: end function
-				else
-					break;
-
-				if (!parent->inherits("QMenu"))
-					parent = NULL;
+				delete parentMenu;
 			}
+			else
+				parent = NULL;
 		}
 	}
 }

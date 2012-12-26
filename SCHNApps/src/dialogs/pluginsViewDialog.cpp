@@ -43,15 +43,15 @@ void PluginsViewDialog::cb_selectedPluginsChanged()
 	{
 		QString pluginName = pluginList->item(i)->text();
 		Plugin* plugin = m_window->getPlugin(pluginName);
-		if(pluginList->item(i)->isSelected())
+		if(pluginList->item(i)->isSelected() && !m_view->isLinkedToPlugin(plugin))
 		{
-			assert(!m_view->isLinkedToPlugin(plugin) && !plugin->isLinkedToView(m_view));
+			assert(!plugin->isLinkedToView(m_view));
 			m_view->linkPlugin(plugin);
 			plugin->linkView(m_view);
 		}
-		else if(!pluginList->item(i)->isSelected())
+		else if(!pluginList->item(i)->isSelected() && m_view->isLinkedToPlugin(plugin))
 		{
-			assert(m_view->isLinkedToPlugin(plugin) && plugin->isLinkedToView(m_view));
+			assert(plugin->isLinkedToView(m_view));
 			m_view->unlinkPlugin(plugin);
 			plugin->unlinkView(m_view);
 		}

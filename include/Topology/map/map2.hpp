@@ -198,6 +198,10 @@ inline bool Map2::foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thre
 	return Map1::foreach_dart_of_cc(d, f, thread);
 }
 
+inline bool Map2::foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread)
+{
+	return foreach_dart_of_cc(d, f, thread);
+}
 
 inline bool Map2::foreach_dart_of_vertex1(Dart d, FunctorType& f, unsigned int thread)
 {

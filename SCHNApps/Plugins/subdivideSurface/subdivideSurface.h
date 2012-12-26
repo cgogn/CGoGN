@@ -1,12 +1,13 @@
-#ifndef _IMPORT_PLUGIN_H_
-#define _IMPORT_PLUGIN_H_
+#ifndef _SUBDIVIDESURFACE_PLUGIN_H_
+#define _SUBDIVIDESURFACE_PLUGIN_H_
 
 #include "plugin.h"
-#include "view.h"
+#include "ui_subdivideSurface.h"
 
 #include "Topology/generic/functor.h"
 #include "Topology/generic/parameters.h"
 #include "Topology/map/embeddedMap2.h"
+#include "Topology/generic/attributeHandler.h"
 
 
 using namespace CGoGN;
@@ -21,22 +22,30 @@ struct PFP: public PFP_STANDARD
 typedef PFP::MAP MAP;
 typedef PFP::VEC3 VEC3;
 
-class ImportPlugin : public Plugin
+
+class SubdivideSurfaceDockTab : public QWidget, public Ui::SubdivideSurfaceWidget
+{
+public:
+	SubdivideSurfaceDockTab() { setupUi(this); }
+};
+
+
+class SubdivideSurfacePlugin : public Plugin
 {
 	Q_OBJECT
 	Q_INTERFACES(CGoGN::SCHNApps::Plugin)
 
 public:
-	ImportPlugin()
+	SubdivideSurfacePlugin()
 	{
 		setProvidesRendering(false);
 	}
 
-	~ImportPlugin()
+	~SubdivideSurfacePlugin()
 	{}
 
 	virtual bool enable();
-	virtual void disable();
+	virtual void disable() {}
 
 	virtual void redraw(View *view) {}
 
@@ -51,11 +60,20 @@ public:
 	virtual void viewUnlinked(View* view) {}
 	virtual void currentViewChanged(View* view) {}
 
-public slots:
-	void cb_import();
+	virtual void mapLinked(View* view, MapHandlerGen* m) {}
+	virtual void mapUnlinked(View* view, MapHandlerGen* m) {}
 
-private:
-	QAction* importAction;
+protected:
+	SubdivideSurfaceDockTab* m_dockTab;
+
+public slots:
+	void cb_addMapToList(MapHandlerGen* m);
+	void cb_removeMapFromList(MapHandlerGen* m);
+	void cb_selectedMapChanged();
+
+	void cb_loopSubdivision();
+	void cb_CCSubdivision();
+	void cb_trianguleFaces();
 };
 
 #endif

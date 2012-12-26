@@ -19,7 +19,8 @@ MapsDialog::MapsDialog(Window* window) :
 	this->setupUi(this);
 	this->setModal(false);
 
-	connect(removeMapButton, SIGNAL(clicked()), this, SLOT(cb_removeMap()));
+	connect(button_removeMap, SIGNAL(clicked()), this, SLOT(cb_removeMap()));
+	connect(button_refreshMapInfo, SIGNAL(clicked()), this, SLOT(cb_selectedMapChanged()));
 
 	connect(mapList, SIGNAL(itemSelectionChanged()), this, SLOT(cb_selectedMapChanged()));
 
@@ -76,7 +77,7 @@ void MapsDialog::cb_selectedMapChanged()
 		const QString& name = current->text();
 		MapHandlerGen* mh = m_window->getMap(name);
 		GenericMap* m = mh->getGenericMap();
-		for(unsigned int orbit = DART; orbit <= FACE; ++orbit)
+		for(unsigned int orbit = DART; orbit <= VOLUME; ++orbit)
 		{
 			unsigned int nbc = m->getNbCells(orbit);
 			switch(orbit)
@@ -105,6 +106,12 @@ void MapsDialog::cb_selectedMapChanged()
 					lineEdit_face_cells->setText(QString::number(nbc));
 					break;
 				}
+				case VOLUME : {
+					unsigned int nb = m->getNbOrbits<VOLUME>();
+					lineEdit_volume_orbits->setText(QString::number(nb));
+					lineEdit_volume_cells->setText(QString::number(nbc));
+					break;
+				}
 			}
 
 			if(m->isOrbitEmbedded(orbit))
@@ -127,7 +134,6 @@ void MapsDialog::cb_selectedMapChanged()
 						case VOLUME : volumeAttributes->addItem(name + " (" + type + ")"); break;
 					}
 				}
-
 			}
 		}
 	}

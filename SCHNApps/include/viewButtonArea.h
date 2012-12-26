@@ -16,7 +16,7 @@ namespace SCHNApps
 {
 
 class View;
-class Texture;
+struct Texture;
 
 class ViewButton : public QObject
 {

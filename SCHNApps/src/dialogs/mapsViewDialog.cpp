@@ -3,6 +3,7 @@
 #include "window.h"
 #include "view.h"
 #include "plugin.h"
+#include "mapHandler.h"
 
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -40,15 +41,15 @@ void MapsViewDialog::cb_selectedMapsChanged()
 	{
 		QString mapName = mapList->item(i)->text();
 		MapHandlerGen* map = m_window->getMap(mapName);
-		if(mapList->item(i)->isSelected())
+		if(mapList->item(i)->isSelected() && !m_view->isLinkedToMap(map))
 		{
-			assert(!m_view->isLinkedToMap(map) && !map->isLinkedToView(m_view));
+			assert(!map->isLinkedToView(m_view));
 			m_view->linkMap(map);
 			map->linkView(m_view);
 		}
-		else if(!mapList->item(i)->isSelected())
+		else if(!mapList->item(i)->isSelected() && m_view->isLinkedToMap(map))
 		{
-			assert(m_view->isLinkedToMap(map) && map->isLinkedToView(m_view));
+			assert(map->isLinkedToView(m_view));
 			m_view->unlinkMap(map);
 			map->unlinkView(m_view);
 		}

@@ -2,22 +2,17 @@
 #define _PLUGIN_H_
 
 #include <QtPlugin>
+#include <QAction>
 
-#include <iostream>
-#include <list>
-
-#include "window.h"
-#include "system.h"
-#include "view.h"
-#include "camera.h"
-#include "mapHandler.h"
-#include "vboHandler.h"
+#include "types.h"
 
 namespace CGoGN
 {
 
 namespace SCHNApps
 {
+
+class Window;
 
 class Plugin : public QObject
 {
@@ -55,6 +50,9 @@ public:
 	virtual void viewUnlinked(View* view) = 0;
 	virtual void currentViewChanged(View* view) = 0;
 
+	virtual void mapLinked(View* view, MapHandlerGen* m) = 0;
+	virtual void mapUnlinked(View* view, MapHandlerGen* m) = 0;
+
 	/*********************************************************
 	 * MANAGE LINKED VIEWS
 	 *********************************************************/
@@ -63,6 +61,14 @@ public:
 	void unlinkView(View* view);
 	const QList<View*>& getLinkedViews() const { return l_views; }
 	bool isLinkedToView(View* view) const { return l_views.contains(view); }
+
+	/*********************************************************
+	 * MANAGE SHADERS
+	 *********************************************************/
+
+	void registerShader(Utils::GLSLShader* shader);
+	void unregisterShader(Utils::GLSLShader* shader);
+	const QList<Utils::GLSLShader*> getShaders() const { return l_shaders; }
 
 	/*********************************************************
 	 * MANAGE DOCK TABS
@@ -97,6 +103,8 @@ protected:
 	QList<QWidget*> l_tabWidgets;
 	QList<QAction*> l_menuActions;
 	QList<QAction*> l_toolbarActions;
+
+	QList<Utils::GLSLShader*> l_shaders;
 
 //	QList<Plugin*> l_dependencies;
 //	QList<Plugin*> l_dependantPlugins;

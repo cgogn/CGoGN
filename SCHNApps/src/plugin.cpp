@@ -1,5 +1,10 @@
 #include "plugin.h"
 
+#include <GL/glew.h>
+
+#include "window.h"
+#include "Utils/GLSLShader.h"
+
 namespace CGoGN
 {
 
@@ -32,7 +37,7 @@ Plugin::~Plugin()
 }
 
 /*********************************************************
- * MANAGE VIEWS
+ * MANAGE LINKED VIEWS
  *********************************************************/
 
 bool Plugin::linkView(View* view)
@@ -54,6 +59,21 @@ void Plugin::unlinkView(View* view)
 }
 
 /*********************************************************
+ * MANAGE SHADERS
+ *********************************************************/
+
+void Plugin::registerShader(Utils::GLSLShader* shader)
+{
+	if(shader && !l_shaders.contains(shader))
+		l_shaders.push_back(shader);
+}
+
+void Plugin::unregisterShader(Utils::GLSLShader* shader)
+{
+	l_shaders.removeOne(shader);
+}
+
+/*********************************************************
  * MANAGE DOCK TABS
  *********************************************************/
 
@@ -61,7 +81,9 @@ bool Plugin::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
 	if(tabWidget && !l_tabWidgets.contains(tabWidget))
 	{
-		m_window->addTabInDock(tabWidget, tabText);
+		// tab created by plugins that do not provide rendering are always enabled,
+		// the other are enabled only if they are linked to the current view
+		m_window->addTabInDock(tabWidget, tabText, !b_providesRendering);
 		l_tabWidgets.push_back(tabWidget);
 		return true;
 	}

@@ -62,7 +62,7 @@ public:
 	 *
 	 * \see removeTabInDock()
 	 */
-	void addTabInDock(QWidget* tabWidget, const QString& tabText);
+	void addTabInDock(QWidget* tabWidget, const QString& tabText, bool enable);
 
 	/**
 	 * \fn void removeTabInDock(QWidget* tabWidget)

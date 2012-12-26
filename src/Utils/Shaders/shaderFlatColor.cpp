@@ -54,16 +54,18 @@ ShaderFlatColor::ShaderFlatColor(bool averageColor)
 
 	loadShadersFromMemory(glxvert.c_str(), glxfrag.c_str(), glxgeom.c_str(), GL_TRIANGLES, GL_TRIANGLE_STRIP,3);
 
+	bind();
 	getLocations();
+	unbind();
 
 	//Default values
 	m_explode = 1.0f;
 	m_ambiant = Geom::Vec4f(0.05f, 0.05f, 0.1f, 0.0f);
 	m_light_pos = Geom::Vec3f(10.0f, 10.0f, 1000.0f);
-
 	setParams(m_explode, m_ambiant, m_light_pos);
 }
 
+// precond : is binded
 void ShaderFlatColor::getLocations()
 {
 	*m_unif_explode  = glGetUniformLocation(program_handler(),"explode");
@@ -71,18 +73,23 @@ void ShaderFlatColor::getLocations()
 	*m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 }
 
-void ShaderFlatColor::setAttributePosition(VBO* vbo)
+unsigned int ShaderFlatColor::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
-void ShaderFlatColor::setAttributeColor(VBO* vbo)
+
+unsigned int ShaderFlatColor::setAttributeColor(VBO* vbo)
 {
 	m_vboColor = vbo;
-	bindVA_VBO("VertexColor", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexColor", vbo);
+	unbind();
+	return id;
 }
-
-
 
 void ShaderFlatColor::setParams(float expl, const Geom::Vec4f& ambiant, const Geom::Vec3f& lightPos)
 {
@@ -96,7 +103,7 @@ void ShaderFlatColor::setParams(float expl, const Geom::Vec4f& ambiant, const Ge
 	glUniform4fv(*m_unif_ambiant, 1, ambiant.data());
 	glUniform3fv(*m_unif_lightPos, 1, lightPos.data());
 
-	unbind(); // ??
+	unbind();
 }
 
 void ShaderFlatColor::setExplode(float explode)
@@ -104,6 +111,7 @@ void ShaderFlatColor::setExplode(float explode)
 	m_explode = explode;
 	bind();
 	glUniform1f(*m_unif_explode, explode);
+	unbind();
 }
 
 void ShaderFlatColor::setAmbiant(const Geom::Vec4f& ambiant)
@@ -111,14 +119,15 @@ void ShaderFlatColor::setAmbiant(const Geom::Vec4f& ambiant)
 	m_ambiant = ambiant;
 	bind();
 	glUniform4fv(*m_unif_ambiant,1, ambiant.data());
+	unbind();
 }
-
 
 void ShaderFlatColor::setLightPosition(const Geom::Vec3f& lp)
 {
 	m_light_pos = lp;
 	bind();
 	glUniform3fv(*m_unif_lightPos,1,lp.data());
+	unbind();
 }
 
 void ShaderFlatColor::restoreUniformsAttribs()

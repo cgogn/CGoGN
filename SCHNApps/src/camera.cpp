@@ -11,16 +11,15 @@ unsigned int Camera::cameraCount = 0;
 Camera::Camera(const QString& name, Window* window) :
 	m_name(name),
 	m_window(window),
-	m_draw(false),
-	m_drawFarPlane(false),
-	m_drawScale(1.0),
+	m_draw(true),
+	m_drawFarPlane(true),
+	m_drawScale(0.1),
 	m_drawPath(false),
 	m_drawPathAxis(false),
 	m_drawPathScale(1.0),
 	m_snapCount(0)
 {
 	++cameraCount;
-//	setZClippingCoefficient(100);
 }
 
 Camera::~Camera()
