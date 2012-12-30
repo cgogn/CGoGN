@@ -208,7 +208,7 @@ void Topo3Render::updateDataMap3(typename PFP::MAP& mapx, const VertexAttribute<
 				m_nbRel2++;
 			}
 			e = mapx.phi3(d);
-			if (!mapx.isBoundaryMarked(e) && (d < e) && good(d) && good(e))
+			if (!mapx.isBoundaryMarked3(e) && (d < e) && good(d) && good(e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
@@ -485,7 +485,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 				m_nbRel2++;
 			}
 			e = map.beta3(d);
-			if (!map.isBoundaryMarked(e) && (d < e))
+			if (!map.isBoundaryMarked3(e) && (d < e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
@@ -504,7 +504,7 @@ void Topo3Render::updateDataGMap3(typename PFP::MAP& mapx, const VertexAttribute
 				m_nbRel2++;
 			}
 			e = map.beta3(d);
-			if (!map.isBoundaryMarked(e) && (d < e))
+			if (!map.isBoundaryMarked3(e) && (d < e))
 			{
 				*positionF3++ = fv2[d];
 				*positionF3++ = fv2x[e];
@@ -745,7 +745,7 @@ void Topo3Render::computeDartMiddlePositions(typename PFP::MAP& map, DartAttribu
 //				m_nbRel2++;
 //			}
 //			e = map.phi3(d);
-//			if (!map.isBoundaryMarked(e) && (d < e))
+//			if (!map.isBoundaryMarked3(e) && (d < e))
 //			{
 //				*positionF3++ = fv2[d];
 //				*positionF3++ = fv2x[e];

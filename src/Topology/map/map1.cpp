@@ -72,7 +72,7 @@ Dart Map1::newBoundaryCycle(unsigned int nbEdges)
 {
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 	Dart d = newDart() ;			// Create the first edge
-	boundaryMark(d);
+	boundaryMark2(d);
 	for (unsigned int i = 1 ; i < nbEdges ; ++i)
 		Map1::cutEdge(d) ;			// Subdivide nbEdges-1 times this edge
 	return d ;

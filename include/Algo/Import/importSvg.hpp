@@ -532,7 +532,7 @@ bool importSVG(typename PFP::MAP& map, const std::string& filename, VertexAttrib
 //	//close the intersections
 //	for(Dart d = map.begin();d != map.end(); map.next(d))
 //	{
-//		if(map.isBoundaryMarked(map.phi2(d)))
+//		if(map.isBoundaryMarked2(map.phi2(d)))
 //			 map.closeHole(d);
 //	}
 

@@ -166,7 +166,7 @@ inline bool Map2::sameEdge(Dart d, Dart e)
 
 inline bool Map2::isBoundaryEdge(Dart d)
 {
-	return isBoundaryMarked(d) || isBoundaryMarked(phi2(d));
+	return isBoundaryMarked2(d) || isBoundaryMarked2(phi2(d));
 }
 
 inline bool Map2::sameOrientedFace(Dart d, Dart e)

@@ -101,9 +101,9 @@ void GMap3::fillHole(Dart d)
 {
 	assert(isBoundaryFace(d)) ;
 	Dart dd = d ;
-	if(!isBoundaryMarked(dd))
+	if(!isBoundaryMarked3(dd))
 		dd = phi3(dd) ;
-	boundaryUnmarkOrbit<VOLUME>(dd) ;
+	boundaryUnmarkOrbit<VOLUME,3>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -572,7 +572,7 @@ bool GMap3::isBoundaryVertex(Dart d)
 
 	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
-		if(isBoundaryMarked(darts[i]))
+		if(isBoundaryMarked3(darts[i]))
 			return true ;
 
 		//add phi21 and phi23 successor if they are not marked yet
@@ -636,7 +636,7 @@ bool GMap3::isBoundaryEdge(Dart d)
 	Dart it = d;
 	do
 	{
-		if(isBoundaryMarked(it))
+		if(isBoundaryMarked3(it))
 			return true ;
 		it = alpha2(it);
 	} while(it != d);
@@ -648,7 +648,7 @@ Dart GMap3::findBoundaryFaceOfEdge(Dart d)
 	Dart it = d;
 	do
 	{
-		if (isBoundaryMarked(it))
+		if (isBoundaryMarked3(it))
 			return it ;
 		it = alpha2(it);
 	} while(it != d);
@@ -678,7 +678,7 @@ bool GMap3::isBoundaryVolume(Dart d)
 
 	for(unsigned int i = 0; i < visitedFaces.size(); ++i)
 	{
-		if (isBoundaryMarked(beta3(visitedFaces[i])))
+		if (isBoundaryMarked3(beta3(visitedFaces[i])))
 			return true ;
 
 		Dart e = visitedFaces[i] ;
@@ -954,7 +954,7 @@ unsigned int GMap3::closeHole(Dart d, bool forboundary)
 						m.markOrbit<FACE>(e) ;
 					}
 				}
-				else if(isBoundaryMarked(e))
+				else if(isBoundaryMarked3(e))
 				{
 					found = true ;
 					beta2sew(e, bit) ;

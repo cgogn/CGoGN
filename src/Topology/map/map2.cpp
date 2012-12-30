@@ -127,7 +127,7 @@ Dart Map2::newFace(unsigned int nbEdges, bool withBoundary)
 
 void Map2::deleteFace(Dart d, bool withBoundary)
 {
-	assert(!isBoundaryMarked(d)) ;
+	assert(!isBoundaryMarked2(d)) ;
 	if (withBoundary)
 	{
 		Dart it = d ;
@@ -185,9 +185,9 @@ void Map2::fillHole(Dart d)
 {
 	assert(isBoundaryEdge(d)) ;
 	Dart dd = d ;
-	if(!isBoundaryMarked(dd))
+	if(!isBoundaryMarked2(dd))
 		dd = phi2(dd) ;
-	boundaryUnmarkOrbit<FACE>(dd) ;
+	boundaryUnmarkOrbit<FACE,2>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -484,7 +484,7 @@ void Map2::insertTrianglePair(Dart d, Dart v1, Dart v2)
 
 bool Map2::mergeVolumes(Dart d, Dart e)
 {
-	assert(!isBoundaryMarked(d) && !isBoundaryMarked(e)) ;
+	assert(!isBoundaryMarked2(d) && !isBoundaryMarked2(e)) ;
 
 	if (Map2::isBoundaryFace(d) || Map2::isBoundaryFace(e))
 		return false;
@@ -585,7 +585,7 @@ bool Map2::isBoundaryVertex(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(it))
+		if (isBoundaryMarked2(it))
 			return true ;
 		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
@@ -597,7 +597,7 @@ Dart Map2::findBoundaryEdgeOfVertex(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(it))
+		if (isBoundaryMarked2(it))
 			return it ;
 		it = phi2(phi_1(it)) ;
 	} while (it != d) ;
@@ -609,7 +609,7 @@ Dart Map2::findBoundaryEdgeOfFace(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(phi2(it)))
+		if (isBoundaryMarked2(phi2(it)))
 			return phi2(it) ;
 		it = phi1(it) ;
 	} while (it != d) ;
@@ -621,7 +621,7 @@ bool Map2::isBoundaryFace(Dart d)
 	Dart it = d ;
 	do
 	{
-		if (isBoundaryMarked(phi2(it)))
+		if (isBoundaryMarked2(phi2(it)))
 			return true ;
 		it = phi1(it) ;
 	} while (it != d) ;
@@ -639,7 +639,7 @@ bool Map2::sameOrientedVolume(Dart d, Dart e)
 	// For every face added to the list
 	for (face = visitedFaces.begin(); face != visitedFaces.end(); ++face)
 	{
-		if (!isBoundaryMarked(*face) && !mark.isMarked(*face))		// Face has not been visited yet
+		if (!isBoundaryMarked2(*face) && !mark.isMarked(*face))		// Face has not been visited yet
 		{
 			Dart it = *face ;
 			do
@@ -649,7 +649,7 @@ bool Map2::sameOrientedVolume(Dart d, Dart e)
 
 				mark.mark(it);						// Mark
 				Dart adj = phi2(it);				// Get adjacent face
-				if (!isBoundaryMarked(adj) && !mark.isMarked(adj))
+				if (!isBoundaryMarked2(adj) && !mark.isMarked(adj))
 					visitedFaces.push_back(adj);	// Add it
 				it = phi1(it);
 			} while(it != *face);
@@ -672,7 +672,7 @@ unsigned int Map2::volumeDegree(Dart d)
 	for (unsigned int i = 0; i != visitedFaces.size(); ++i)
 	{
 		Dart df = visitedFaces[i];
-		if (!isBoundaryMarked(df) && !mark.isMarked(df))		// Face has not been visited yet
+		if (!isBoundaryMarked2(df) && !mark.isMarked(df))		// Face has not been visited yet
 		{
 			++count;
 			Dart it = df ;
@@ -680,7 +680,7 @@ unsigned int Map2::volumeDegree(Dart d)
 			{
 				mark.mark(it);					// Mark
 				Dart adj = phi2(it);			// Get adjacent face
-				if ( !isBoundaryMarked(adj) && !mark.isMarked(adj) )
+				if ( !isBoundaryMarked2(adj) && !mark.isMarked(adj) )
 					visitedFaces.push_back(adj);// Add it
 				it = phi1(it);
 			} while(it != df);
@@ -868,7 +868,7 @@ unsigned int Map2::closeHole(Dart d, bool forboundary)
 	} while (dPhi1 != d);
 
 	if(forboundary)
-		boundaryMarkOrbit<FACE>(phi2(d));
+		boundaryMarkOrbit<FACE,2>(phi2(d));
 
 	return countEdges ;
 }

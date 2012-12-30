@@ -41,7 +41,7 @@ void subdivideEdge(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.edgeIsSubdivided(d) || !"Trying to subdivide an already subdivided edge") ;
-	assert(!map.isBoundaryMarked(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int eLevel = map.edgeLevel(d) ;
 
@@ -73,7 +73,7 @@ void subdivideFace(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.faceIsSubdivided(d) || !"Trying to subdivide an already subdivided face") ;
-	assert(!map.isBoundaryMarked(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int fLevel = map.faceLevel(d) ;
 	Dart old = map.faceOldestDart(d) ;
@@ -192,7 +192,7 @@ Dart subdivideVolumeClassic(typename PFP::MAP& map, Dart d, AttributeHandler<typ
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-	assert(!map.isBoundaryMarked(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int vLevel = map.volumeLevel(d);
 	Dart old = map.volumeOldestDart(d);
@@ -524,7 +524,7 @@ Dart subdivideVolumeClassic2(typename PFP::MAP& map, Dart d, AttributeHandler<ty
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-	assert(!map.isBoundaryMarked(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int vLevel = map.volumeLevel(d);
 	Dart old = map.volumeOldestDart(d);
@@ -658,7 +658,7 @@ void subdivideLoop(typename PFP::MAP& map, Dart d, AttributeHandler<typename PFP
 {
 	assert(map.getDartLevel(d) <= map.getCurrentLevel() || !"Access to a dart introduced after current level") ;
 	assert(!map.volumeIsSubdivided(d) || !"Trying to subdivide an already subdivided volume") ;
-	assert(!map.isBoundaryMarked(d) || !"Trying to subdivide a dart marked boundary");
+	assert(!map.isBoundaryMarked3(d) || !"Trying to subdivide a dart marked boundary");
 
 	unsigned int vLevel = map.volumeLevel(d);
 	Dart old = map.volumeOldestDart(d);

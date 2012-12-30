@@ -93,7 +93,8 @@ GenericMap::GenericMap() : m_nbThreads(1)
 	}
 
 	// get & lock marker for boundary
-	m_boundaryMarker =  m_marksets[DART][0].getNewMark();
+	m_boundaryMarkers[0] =  m_marksets[DART][0].getNewMark();
+	m_boundaryMarkers[1] =  m_marksets[DART][0].getNewMark();
 
 	if (m_isMultiRes)
 		initMR() ;
@@ -102,7 +103,8 @@ GenericMap::GenericMap() : m_nbThreads(1)
 GenericMap::~GenericMap()
 {
 	// release marker for boundary
-	m_marksets[DART][0].releaseMark(m_boundaryMarker);
+	m_marksets[DART][0].releaseMark(m_boundaryMarkers[0]);
+	m_marksets[DART][0].releaseMark(m_boundaryMarkers[1]);
 
 	for(unsigned int i = 0; i < NB_ORBITS; ++i)
 	{
@@ -695,7 +697,9 @@ void GenericMap::update_topo_shortcuts()
 
 				if ((orbit == DART) && (thread == 0))	// for Marker of dart of thread O keep the boundary marker
 				{
-					Mark m(m_boundaryMarker);
+			// TODO Verifier ce qu fait exactement ce unsetMark sur m.invert ??
+//					Mark m(m_boundaryMarker);
+					Mark m(m_boundaryMarkers[0]+m_boundaryMarkers[1]);
 					m.invert();
 					for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
 						amvMark->operator[](i).unsetMark(m);
@@ -879,13 +883,6 @@ bool GenericMap::foreach_dart(FunctorType& f, const FunctorSelect& good)
 				return true;
 	}
 	return false;
-}
-
-void GenericMap::boundaryUnmarkAll()
-{
-	AttributeContainer& cont = getAttributeContainer<DART>() ;
-	for (unsigned int i = cont.begin(); i != cont.end(); cont.next(i))
-		m_markTables[DART][0]->operator[](i).unsetMark(m_boundaryMarker);
 }
 
 } // namespace CGoGN

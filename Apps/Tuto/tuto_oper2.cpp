@@ -197,7 +197,7 @@ void MyQT::createMap(int n)
 
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
 		{
 			int n = rand();
 			float r = float(n&0x7f)/255.0f + 0.25f;
@@ -214,7 +214,7 @@ void MyQT::updateMap()
 	m_render_topo->updateData<PFP>(myMap, position, 0.9f, 0.9f,nb);
 	for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 	{
-		if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+		if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
 		{
 			const Geom::Vec3f& C = colorDarts[d];
 			if (C*C != 0.0f)
@@ -273,7 +273,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'c':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked(d))
+			if (!myMap.isBoundaryMarked2(d))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;
@@ -287,7 +287,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'g':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked(d))
+			if (!myMap.isBoundaryMarked2(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.5f,0.5f,0.5f);
 				m_render_topo->setDartColor(d,0.5f,0.5f,0.5f);
@@ -298,7 +298,7 @@ void MyQT::cb_keyPress(int keycode)
 	case 'b':
 		for (Dart d = myMap.begin(); d != myMap.end(); myMap.next(d))
 		{
-			if (!myMap.isBoundaryMarked(d))
+			if (!myMap.isBoundaryMarked2(d))
 			{
 				colorDarts[d] =  Geom::Vec3f(0.0f,0.0f,0.0f);
 				m_render_topo->setDartColor(d,0.0f,0.0f,0.0f);
@@ -388,7 +388,7 @@ void MyQT::importMesh(std::string& filename)
 		colorDarts = myMap.addAttribute<VEC3, DART>("color");
 		for (Dart d=myMap.begin(); d!=myMap.end(); myMap.next(d))
 		{
-			if (dm.isMarked(d) && (!myMap.isBoundaryMarked(d)))
+			if (dm.isMarked(d) && (!myMap.isBoundaryMarked2(d)))
 			{
 				int n = rand();
 				float r = float(n&0x7f)/255.0f + 0.25f;

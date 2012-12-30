@@ -118,9 +118,9 @@ void Map3::fillHole(Dart d)
 {
 	assert(isBoundaryFace(d)) ;
 	Dart dd = d ;
-	if(!isBoundaryMarked(dd))
+	if(!isBoundaryMarked3(dd))
 		dd = phi3(dd) ;
-	boundaryUnmarkOrbit<VOLUME>(dd) ;
+	boundaryUnmarkOrbit<VOLUME,3>(dd) ;
 }
 
 /*! @name Topological Operators
@@ -786,7 +786,7 @@ bool Map3::isBoundaryVertex(Dart d)
 
 	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
-		if(isBoundaryMarked(darts[i]))
+		if(isBoundaryMarked3(darts[i]))
 			return true ;
 
 		//add phi21 and phi23 successor if they are not marked yet
@@ -819,7 +819,7 @@ Dart Map3::findBoundaryFaceOfVertex(Dart d)
 
 	for(unsigned int i = 0; i < darts.size(); ++i)
 	{
-		if(isBoundaryMarked(darts[i]))
+		if(isBoundaryMarked3(darts[i]))
 			return darts[i];
 
 		//add phi21 and phi23 successor if they are not marked yet
@@ -859,7 +859,7 @@ unsigned int Map3::edgeDegree(Dart d)
 	Dart it = d;
 	do
 	{
-		if(!isBoundaryMarked(it))
+		if(!isBoundaryMarked3(it))
 			++deg;
 		it = alpha2(it);
 	} while(it != d);
@@ -871,7 +871,7 @@ bool Map3::isBoundaryEdge(Dart d)
 	Dart it = d;
 	do
 	{
-		if(isBoundaryMarked(it))
+		if(isBoundaryMarked3(it))
 			return true ;
 		it = alpha2(it);
 	} while(it != d);
@@ -883,7 +883,7 @@ Dart Map3::findBoundaryFaceOfEdge(Dart d)
 	Dart it = d;
 	do
 	{
-		if (isBoundaryMarked(it))
+		if (isBoundaryMarked3(it))
 			return it ;
 		it = alpha2(it);
 	} while(it != d);
@@ -895,7 +895,7 @@ bool Map3::isBoundaryVolume(Dart d)
 	Traversor3WF<Map3> tra(*this, d);
 	for(Dart dit = tra.begin() ; dit != tra.end() ; dit = tra.next())
 	{
-		if(isBoundaryMarked(phi3(dit)))
+		if(isBoundaryMarked3(phi3(dit)))
 			return true ;
 	}
 	return false;
@@ -928,7 +928,7 @@ bool Map3::check()
 
 		if(phi1(d3) != phi3(phi_1(d)))
 		{
-			if(isBoundaryMarked(d))
+			if(isBoundaryMarked3(d))
 				std::cout << "Boundary case - Check: phi3 , faces are not entirely sewn" << std::endl;
 			else
 				std::cout << "Check: phi3 , faces are not entirely sewn" << std::endl;
@@ -1112,7 +1112,7 @@ unsigned int Map3::closeHole(Dart d, bool forboundary)
 						m.markOrbit<FACE2>(e) ;
 					}
 				}
-				else if(isBoundaryMarked(e))
+				else if(isBoundaryMarked3(e))
 				{
 					found = true ;
 					phi2sew(e, bit) ;

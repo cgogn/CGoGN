@@ -169,7 +169,7 @@ inline bool GMap2::sameEdge(Dart d, Dart e)
 
 inline bool GMap2::isBoundaryEdge(Dart d)
 {
-	return isBoundaryMarked(d) || isBoundaryMarked(beta2(d));
+	return isBoundaryMarked2(d) || isBoundaryMarked2(beta2(d));
 }
 
 inline bool GMap2::sameOrientedFace(Dart d, Dart e)

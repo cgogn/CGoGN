@@ -71,14 +71,14 @@ Dart GMap1::newBoundaryCycle(unsigned int nbEdges)
 	assert(nbEdges > 0 || !"Cannot create a face with no edge") ;
 
 	Dart d0 =  GMap0::newEdge();	// create the first edge
-	boundaryMark(d0);
-	boundaryMark(beta0(d0));
+	boundaryMark2(d0);
+	boundaryMark2(beta0(d0));
 	Dart dp = beta0(d0);			// store an extremity
 	for (unsigned int i = 1; i < nbEdges; ++i)
 	{
 		Dart di = GMap0::newEdge();	// create the next edge
-		boundaryMark(di);
-		boundaryMark(beta0(di));
+		boundaryMark2(di);
+		boundaryMark2(beta0(di));
 		beta1sew(dp,di);
 		dp = beta0(di);	// change the preceding
 	}

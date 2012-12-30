@@ -134,7 +134,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 	// first pass: cut the edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked(d) && !me.isMarked(d))
+		if (selected(d) && !map.isBoundaryMarked2(d) && !me.isMarked(d))
 		{
 			Dart f = map.phi1(d);
 			Dart e = map.cutEdge(d);
@@ -154,7 +154,7 @@ void quadranguleFaces(typename PFP::MAP& map, EMBV& attributs, const FunctorSele
 	// second pass: quandrangule faces
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked(d) && !mf.isMarked(d))
+		if (selected(d) && !map.isBoundaryMarked2(d) && !mf.isMarked(d))
 		{
 			EMB center = Geometry::faceCentroidGen<PFP,EMBV,EMB>(map, d, attributs);	// compute center
 			Dart cf = quadranguleFace<PFP>(map, d);	// quadrangule the face
@@ -188,7 +188,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	// first pass: cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked(d) && !me.isMarked(d))
+		if (selected(d) && !map.isBoundaryMarked2(d) && !me.isMarked(d))
 		{
 			if (!m0.isMarked(d))
 			{
@@ -222,7 +222,7 @@ void CatmullClarkSubdivision(typename PFP::MAP& map, EMBV& attributs, const Func
 	// second pass: quandrangule faces
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked(d) && mf.isMarked(d)) // for each face not subdivided
+		if (selected(d) && !map.isBoundaryMarked2(d) && mf.isMarked(d)) // for each face not subdivided
 		{
 			// compute center skip darts of new vertices non embedded
 			EMB center = AttribOps::zero<EMB,PFP>();
@@ -340,7 +340,7 @@ void LoopSubdivision(typename PFP::MAP& map, EMBV& attributs, const FunctorSelec
 	// first pass cut edges
 	for (Dart d = map.begin(); d != map.end(); map.next(d))
 	{
-		if (selected(d) && !map.isBoundaryMarked(d) && !me.isMarked(d))
+		if (selected(d) && !map.isBoundaryMarked2(d) && !me.isMarked(d))
 		{
 			if (!m0.isMarked(d))
 			{

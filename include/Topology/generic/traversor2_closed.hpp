@@ -133,8 +133,6 @@ Dart Traversor2VVaE<MAP>::next()
 template <typename MAP>
 Traversor2VVaF<MAP>::Traversor2VVaF(MAP& map, Dart dart) : m(map)
 {
-	if(m.isBoundaryMarked(dart))
-		dart = m.phi2(m.phi_1(dart)) ;
 	start = m.phi1(m.phi1(dart)) ;
 	if(start == dart)
 		start = m.phi1(dart) ;
