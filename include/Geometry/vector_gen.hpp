@@ -257,6 +257,14 @@ inline double Vector<DIM, T>::normalize()
 }
 
 template <unsigned int DIM, typename T>
+inline Vector<DIM, T> Vector<DIM, T>::normalized() const
+{
+	Vector<DIM, T> v(*this);
+	v.normalize();
+	return v;
+}
+
+template <unsigned int DIM, typename T>
 inline T Vector<DIM, T>::operator*(const Vector<DIM, T> v) const
 {
 	T d(0) ;

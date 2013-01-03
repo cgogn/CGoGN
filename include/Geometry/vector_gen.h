@@ -127,7 +127,15 @@ public:
 
 	double norm() const ;
 
+	/*
+	 * normalize the vector and returns its norm
+	 */
 	double normalize() ;
+
+	/*
+	 * Return a normalized copy
+	 */
+	Vector<DIM, T> normalized() const;
 
 	// dot product
 	T operator*(const Vector<DIM, T> v) const ;
