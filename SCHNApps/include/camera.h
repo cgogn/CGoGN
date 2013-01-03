@@ -2,62 +2,79 @@
 #define _CAMERA_H_
 
 #include "view.h"
+#include "QGLViewer/camera.h"
 
-//forward declaration
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+class Window;
 
 class Camera : public qglviewer::Camera
 {
 public:
-	Camera(Window* window, View* v);
-	Camera(Window* window, View* v, const qglviewer::Camera& c);
+	static unsigned int cameraCount;
+
+	Camera(const QString& name, Window* window);
 	~Camera();
 
-	void setName(QString name) { m_name = name; }
-	QString getName() { return m_name; }
+	const QString& getName() const { return m_name; }
+	void setName(const QString& name) { m_name = name; }
 
-	Window* getWindow() { return m_window; }
+	Window* getWindow() const { return m_window; }
 	void setWindow(Window* w) { m_window = w; }
 
-	bool isShared()	{ return l_views.size() > 1; }
+	bool isUsed() const { return !l_views.empty(); }
+	bool isShared()	const { return l_views.size() > 1; }
 
-	void draw();
+	/*********************************************************
+	 * CAMERA DRAWING
+	 *********************************************************/
 
-	bool getDraw() { return m_draw; }
+	virtual void draw();
+
+	bool getDraw() const { return m_draw; }
 	void setDraw(bool b = true) { m_draw = b; }
 
-	bool getDrawFarPlane() { return m_drawFarPlane; }
-	void setDrawFarPlane(bool b = true) { m_drawFarPlane = b; }
+	bool getDrawFarPlane() const { return m_drawFarPlane; }
+	void setDrawFarPlane(bool b) { m_drawFarPlane = b; }
 
-	double getDrawScale() { return m_drawScale; }
+	double getDrawScale() const { return m_drawScale; }
 	void setDrawScale(double s) { m_drawScale = s; }
 
-	bool getDrawPath() { return m_drawPath; }
-	void setDrawPath(bool b = true) { m_drawPath = b; }
+	bool getDrawPath() const { return m_drawPath; }
+	void setDrawPath(bool b) { m_drawPath = b; }
 
-	bool getDrawPathAxis() { return m_drawPathAxis; }
-	void setDrawPathAxis(bool b = true) { m_drawPathAxis = b; }
+	bool getDrawPathAxis() const { return m_drawPathAxis; }
+	void setDrawPathAxis(bool b) { m_drawPathAxis = b; }
 
-	double getDrawPathScale() { return m_drawPathScale; }
+	double getDrawPathScale() const { return m_drawPathScale; }
 	void setDrawPathScale(double s) { m_drawPathScale = s;}
+
+	/*********************************************************
+	 * MANAGE LINKED VIEWS
+	 *********************************************************/
 
 	void linkView(View* view);
 	void unlinkView(View* view);
-	bool isLinkedWithView(View* view);
+	const QList<View*>& getLinkedViews() const { return l_views; }
+	bool isLinkedToView(View* view) const { return l_views.contains(view); }
 
 	void fitParamWith(View* view);
+
+	/*********************************************************
+	 * SNAPSHOTS
+	 *********************************************************/
 
 	void resetSnapCount() { m_snapCount = 0; }
 	void saveSnapshot(QString snapPathName);
 
-	void updateGL();
-
-	void viewShowButton(bool b);
-
 protected:
-	static unsigned int cameraCount;
-
 	QString m_name;
 	Window* m_window;
+
 	QList<View*> l_views;
 
 	bool m_draw;
@@ -70,5 +87,9 @@ protected:
 
 	int m_snapCount;
 };
+
+} // namespace SCHNApps
+
+} // namespace CGoGN
 
 #endif

@@ -50,9 +50,9 @@ protected:
 public:
     ShaderScalarField();
 
-	unsigned int setAttributePosition(VBO* vbo);
+    unsigned int setAttributePosition(VBO* vbo);
 
-	unsigned int setAttributeScalar(VBO* vbo);
+    unsigned int setAttributeScalar(VBO* vbo);
 };
 
 } // namespace Utils

@@ -50,12 +50,18 @@ class VBO
 protected:
 	// VBO id
 	CGoGNGLuint m_id;
+
 	// size of data (in floats)
 	unsigned int m_data_size;
+
 	// shaders that ref this vbo
 	std::vector<GLSLShader*> m_refs;
+
 	unsigned int m_nbElts;
 	mutable bool m_lock;
+
+	// name of the last attribute used to fill the VBO
+	std::string m_name;
 
 public:
 	/**
@@ -82,6 +88,11 @@ public:
 	 * get dataSize
 	 */
 	unsigned int dataSize() const { return m_data_size; }
+
+	/**
+	 * get name
+	 */
+	const std::string& name() const { return m_name; }
 
 	/**
 	 * set the data size (in number of float)

@@ -1,41 +1,25 @@
 #include "camera.h"
-#include "scene.h"
 
-static unsigned int Camera::cameraCount = 0;
+namespace CGoGN
+{
 
-Camera::Camera(Window* window, View* v) :
+namespace SCHNApps
+{
+
+unsigned int Camera::cameraCount = 0;
+
+Camera::Camera(const QString& name, Window* window) :
+	m_name(name),
 	m_window(window),
-	m_draw(false),
-	m_drawFarPlane(false),
-	m_drawScale(1.0),
+	m_draw(true),
+	m_drawFarPlane(true),
+	m_drawScale(0.1),
 	m_drawPath(false),
 	m_drawPathAxis(false),
 	m_drawPathScale(1.0),
 	m_snapCount(0)
 {
-	m_name = "camera_" + cameraCount;
 	++cameraCount;
-	if(v)
-		l_views.push_back(v);
-	this->setZClippingCoefficient(100);
-}
-
-Camera::Camera(Window* window, View* v, const qglviewer::Camera& c) :
-	qglviewer::Camera(c),
-	m_window(window),
-	m_draw(false),
-	m_drawFarPlane(false),
-	m_drawScale(1.0),
-	m_drawPath(false),
-	m_drawPathAxis(false),
-	m_drawPathScale(1.0),
-	m_snapCount(0)
-{
-	m_name = "camera_" + cameraCount;
-	++cameraCount;
-	if(v)
-		l_views.push_back(v);
-	this->setZClippingCoefficient(100);
 }
 
 Camera::~Camera()
@@ -68,11 +52,6 @@ void Camera::unlinkView(View* view)
 	l_views.removeOne(view);
 }
 
-bool Camera::isLinkedWithView(View* view)
-{
-	return l_views.contains(view);
-}
-
 void Camera::fitParamWith(View* view)
 {
 	setScreenWidthAndHeight(view->width(), view->height());
@@ -85,14 +64,6 @@ void Camera::saveSnapshot(QString snapPathName)
 	++m_snapCount;
 }
 
-void Camera::updateGL()
-{
-	foreach(View* view, l_views)
-		view->updateGL();
-}
+} // namespace SCHNApps
 
-void Camera::viewShowButton(bool b)
-{
-	foreach(View* view, l_views)
-		view->setShowButtons(b);
-}
+} // namespace CGoGN

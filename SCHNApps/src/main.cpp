@@ -1,27 +1,19 @@
-#include "interface/system.h"
-#include "interface/window.h"
-
-QSplashScreen* System::splash;
-
-QString System::app_path = QString();
+#include "system.h"
+#include "window.h"
 
 int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
-	
-	System::app_path = app.applicationDirPath();
 
-	System::splash = new QSplashScreen(QPixmap(":splash/cgogn/splash.png"));
+	QSplashScreen* splash = new QSplashScreen(QPixmap(":splash/cgogn/splash.png"));
+	splash->show();
+	splash->showMessage("Welcome to SCHNApps", Qt::AlignBottom | Qt::AlignCenter);
 
-	System::splash->show();
+	CGoGN::SCHNApps::Window window(app.applicationDirPath());
+	window.show();
 
-	Window window;
-	window.showMaximized();
-
-	sleep(1);
-	System::splash->finish(&window);
-
-	delete System::splash;
+	splash->finish(&window);
+	delete splash;
 	
 	return app.exec();
 }

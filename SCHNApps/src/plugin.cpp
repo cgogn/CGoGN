@@ -1,15 +1,27 @@
 #include "plugin.h"
 
-Plugin::Plugin(const QString& name, const QString& filePath, Window* window) :
-	m_name(name),
-	m_filePath(filePath),
-	m_window(window)
-{}
+#include <GL/glew.h>
+
+#include "window.h"
+#include "Utils/GLSLShader.h"
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+Plugin::Plugin() :
+	m_window(NULL),
+	b_providesRendering(false)
+{
+	glewInit();
+}
 
 Plugin::~Plugin()
 {
-	foreach(Scene* scene, l_scenes)
-		unlinkScene(scene);
+	foreach(View* view, l_views)
+		unlinkView(view);
 
 	foreach(QWidget* tabWidget, l_tabWidgets)
 		removeTabInDock(tabWidget);
@@ -24,108 +36,41 @@ Plugin::~Plugin()
 //	removeAllDependencyLinks();
 }
 
-void Plugin::updateGL()
-{
-	foreach(Scene* s, l_scenes)
-		s->updateGL();
-}
-
-void Plugin::updateGL(Scene* s)
-{
-	s->updateGL();
-}
-
 /*********************************************************
- * MANAGE MAPS
+ * MANAGE LINKED VIEWS
  *********************************************************/
 
-bool Plugin::linkMap(MapHandler* map)
+bool Plugin::linkView(View* view)
 {
-	if(
-		(m_maxNumberOfMaps == UNLIMITED_NUMBER_OF_MAPS || l_maps.size() < m_maxNumberOfMaps)
-		&& map
-		&& !l_maps.contains(map)
-	)
+	if(view && !l_views.contains(view))
 	{
-		l_maps.push_back(map);
-		cb_mapAdded(map);
+		l_views.push_back(view);
+		viewLinked(view);
 		return true;
 	}
 	else
 		return false;
 }
 
-void Plugin::unlinkMap(MapHandler* map)
+void Plugin::unlinkView(View* view)
 {
-	if(l_maps.removeOne(map))
-		cb_mapRemoved(map);
-}
-
-bool Plugin::isLinkedToMap(MapHandler* map)
-{
-	return l_maps.contains(map);
-}
-
-QList<MapHandler*> Plugin::getLinkedMaps()
-{
-	return l_maps;
-}
-
-void Plugin::setMaxNumberOfLinkedMaps(int n)
-{
-	if(n >= l_maps.size() || n == UNLIMITED_NUMBER_OF_MAPS)
-		m_maxNumberOfMaps = n;
-}
-
-int Plugin::getCurrentNumberOfLinkedMaps()
-{
-	return l_maps.size();
-}
-
-int Plugin::getRemainingNumberOfLinkedMaps()
-{
-	if(m_maxNumberOfMaps != UNLIMITED_NUMBER_OF_MAPS)
-		return m_maxNumberOfMaps - l_maps.size();
-	else
-		return UNLIMITED_NUMBER_OF_MAPS;
+	if(l_views.removeOne(view))
+		viewUnlinked(view);
 }
 
 /*********************************************************
- * MANAGE SCENES
+ * MANAGE SHADERS
  *********************************************************/
 
-bool Plugin::linkScene(Scene* scene)
+void Plugin::registerShader(Utils::GLSLShader* shader)
 {
-	if(scene && !l_scenes.contains(scene))
-	{
-		l_scenes.push_back(scene);
-		scene->addPlugin(this);
-		scene->updateGL();
-		cb_sceneAdded(scene);
-		return true;
-	}
-	else
-		return false;
+	if(shader && !l_shaders.contains(shader))
+		l_shaders.push_back(shader);
 }
 
-void Plugin::unlinkScene(Scene* scene)
+void Plugin::unregisterShader(Utils::GLSLShader* shader)
 {
-	if(l_scenes.removeOne(scene))
-	{
-		scene->removePlugin(this);
-		scene->updateGL();
-		cb_sceneRemoved(scene);
-	}
-}
-
-bool Plugin::isLinkedToScene(Scene* scene)
-{
-	return l_scenes.contains(scene);
-}
-
-QList<Scene*> Plugin::getLinkedScenes()
-{
-	return l_scenes;
+	l_shaders.removeOne(shader);
 }
 
 /*********************************************************
@@ -134,26 +79,22 @@ QList<Scene*> Plugin::getLinkedScenes()
 
 bool Plugin::addTabInDock(QWidget* tabWidget, const QString& tabText)
 {
-	if(m_window)
+	if(tabWidget && !l_tabWidgets.contains(tabWidget))
 	{
+		// tab created by plugins that do not provide rendering are always enabled,
+		// the other are enabled only if they are linked to the current view
+		m_window->addTabInDock(tabWidget, tabText, !b_providesRendering);
 		l_tabWidgets.push_back(tabWidget);
-		m_window->addTabInDock(tabWidget, tabText);
 		return true;
 	}
 	else
-	{
-		System::Error::code = System::Error::BAD_LINK_PLUGIN_WINDOW_f(m_name);
 		return false;
-	}
 }
 
 void Plugin::removeTabInDock(QWidget* tabWidget)
 {
-	if(m_window)
-	{
-		l_tabWidgets.removeOne(tabWidget);
+	if(l_tabWidgets.removeOne(tabWidget))
 		m_window->removeTabInDock(tabWidget);
-	}
 }
 
 /*********************************************************
@@ -200,20 +141,6 @@ void Plugin::removeToolbarAction(QAction* action)
 		m_window->removeToolbarAction(action);
 }
 
-/*********************************************************
- * MANAGE SCENE VIEW BUTTONS
- *********************************************************/
-/*
-bool Plugin::addSceneViewButton(Scene* scene, ViewButton* viewButton)
-{
-	if(scene && viewButton)
-		return scene->addViewButton(viewButton);
-	return false;
-}
+} // namespace SCHNApps
 
-void Plugin::removeSceneViewButton(Scene* scene, ViewButton* viewButton)
-{
-	if(scene && viewButton)
-		scene->removeViewButton(viewButton);
-}
-*/
+} // namespace CGoGN

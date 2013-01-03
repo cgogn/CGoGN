@@ -61,7 +61,7 @@ public:
 	/**
 	 * set the VBO of color (vec3)
 	 */
-	unsigned int setAttributeColor(VBO* vbo);
+    unsigned int setAttributeColor(VBO* vbo);
 
 	/**
 	 * set opacity (0=transparent / 1=opaque)

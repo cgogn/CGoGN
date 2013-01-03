@@ -1,301 +1,310 @@
 #include "view.h"
 
-#include "system.h"
+#include "plugin.h"
 #include "camera.h"
-#include "scene.h"
-#include "cameraViewDialog.h"
-#include "cameraSceneDialog.h"
+#include "viewButtonArea.h"
+#include "mapHandler.h"
 
-View::View(const QString& name, Window* w, Scene* s, Camera* c, QWidget* parent, const QGLWidget* shareWidget = NULL) :
-//	QGLViewer(new Context(NULL, QGLFormat(QGL::Rgba | QGL::DoubleBuffer | QGL::DepthBuffer))),
-	QGLViewer(parent, shareWidget),
+#include "dialogs/cameraViewDialog.h"
+#include "dialogs/pluginsViewDialog.h"
+#include "dialogs/mapsViewDialog.h"
+
+#include "Utils/GLSLShader.h"
+#include "Algo/Geometry/boundingbox.h"
+
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QWheelEvent>
+
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
+unsigned int View::viewCount = 0;
+
+View::View(const QString& name, Window* w, const QGLWidget* shareWidget) :
+	QGLViewer(NULL, shareWidget),
 	m_name(name),
 	m_window(w),
-	m_scene(s),
-	m_context(w->getContext()),
-	b_drawText(true)
-//	m_linkButton(NULL),
-//	m_linkViewEnabled(false),
-//	m_unlinkButton(NULL),
-//	m_unlinkViewEnabled(false),
-//	m_cameraButton(NULL),
-//	m_cameraEnabled(false),
-//	m_cameraSceneButton(NULL),
-//	m_cameraSceneEnabled(false),
-//	m_closeViewButton(NULL),
-//	m_closeViewEnabled(false),
-//	b_showButtons(true)
+	m_cameraButton(NULL),
+	m_pluginsButton(NULL),
+	m_mapsButton(NULL),
+	m_closeButton(NULL)
 {
-//	((Context*)(this->context()))->setDevice(this);
-//	((Context*)(this->context()))->create(context);
+	++viewCount;
 
-//	makeCurrent();
-//	glewInit();
+	m_currentCamera = m_window->addCamera();
 
-	qglviewer::Camera* defaultCamera = this->camera();
-
-	if(c)
-	{
-		m_currentCamera = c;
-		this->setCamera(c);
-		c->linkView(this);
-	}
-	else
-	{
-		m_currentCamera = new Camera(m_window, this, *defaultCamera);
-	}
-
-	delete defaultCamera;
-
-//	m_buttonArea = new ViewButtonArea(this);
-//	m_buttonArea->setTopRightPosition(this->width(), 0);
-
-	updateTextInfo();
+	m_cameraViewDialog = new CameraViewDialog(m_window, this);
+	m_pluginsViewDialog = new PluginsViewDialog(m_window, this);
+	m_mapsViewDialog = new MapsViewDialog(m_window, this);
 }
 
 View::~View()
 {
-	m_scene->unlinkView(this);
 	m_currentCamera->unlinkView(this);
 
-//	if(m_buttonArea)
-//		delete m_buttonArea;
+	qglviewer::Camera* c = new qglviewer::Camera();
+	this->setCamera(c);
+
+	foreach(Plugin* plugin, l_plugins)
+	{
+		plugin->unlinkView(this);
+//		unlinkPlugin(plugin);
+	}
+
+	foreach(MapHandlerGen* map, l_maps)
+	{
+		map->unlinkView(this);
+//		unlinkMap(map);
+	}
+
+	delete m_buttonArea;
 }
 
-void View::initGL()
+void View::init()
 {
-	if(m_scene)
-		m_scene->initGL();
+	m_buttonArea = new ViewButtonArea(this);
+	m_buttonArea->setTopRightPosition(this->width(), 0);
 
-//	m_linkButton = new ViewButton(":icons/icons/link.png", this);
-//	if(m_linkViewEnabled)
-//	{
-//		m_linkViewEnabled = false;
-//		enableLinking(true);
-//	}
-//
-//	m_cameraButton = new ViewButton(":icons/icons/camera.png", this);
-//	if(m_cameraEnabled)
-//	{
-//		m_cameraEnabled = false;
-//		enableCameraGesture(true);
-//	}
-//
-//	m_unlinkButton = new ViewButton(":icons/icons/broken_link.png", this);
-//	if(m_unlinkViewEnabled)
-//	{
-//		m_unlinkViewEnabled = false;
-//		enableUnlinking(true);
-//	}
-//
-//	m_cameraSceneButton = new ViewButton(":icons/icons/separate_camera.png", this);
-//	if(m_cameraSceneEnabled)
-//	{
-//		m_cameraSceneEnabled = false;
-//		enableSceneCameraGesture(true);
-//	}
-//
-//	m_closeViewButton = new ViewButton(":icons/icons/close.png", this);
-//	if(m_closeViewEnabled)
-//	{
-//		m_closeViewEnabled = false;
-//		enableViewClose(true);
-//	}
+	m_cameraButton = new ViewButton(":icons/icons/cameras.png", this);
+	m_buttonArea->addButton(m_cameraButton);
+	connect(m_cameraButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_cameraView(int, int, int, int)));
+
+	m_pluginsButton = new ViewButton(":icons/icons/plugins.png", this);
+	m_buttonArea->addButton(m_pluginsButton);
+	connect(m_pluginsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_pluginsView(int, int, int, int)));
+
+	m_mapsButton = new ViewButton(":icons/icons/maps.png", this);
+	m_buttonArea->addButton(m_mapsButton);
+	connect(m_mapsButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_mapsView(int, int, int, int)));
+
+	m_VsplitButton = new ViewButton(":icons/icons/Vsplit.png", this);
+	m_buttonArea->addButton(m_VsplitButton);
+	connect(m_VsplitButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_VsplitView(int, int, int, int)));
+
+	m_HsplitButton = new ViewButton(":icons/icons/Hsplit.png", this);
+	m_buttonArea->addButton(m_HsplitButton);
+	connect(m_HsplitButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_HsplitView(int, int, int, int)));
+
+	m_closeButton = new ViewButton(":icons/icons/close.png", this);
+	m_buttonArea->addButton(m_closeButton);
+	connect(m_closeButton, SIGNAL(clicked(int, int, int, int)), this, SLOT(cb_closeView(int, int, int, int)));
+
+	qglviewer::Camera* c = this->camera();
+	this->setCamera(m_currentCamera);
+	delete c;
+
+	this->setBackgroundColor(QColor(0,0,0));
 }
 
-void View::updateGL()
+void View::preDraw()
 {
-	QGLViewer::updateGL();
+	m_currentCamera->setScreenWidthAndHeight(width(), height());
+
+	glm::mat4 mm = getCurrentModelViewMatrix();
+	glm::mat4 pm = getCurrentProjectionMatrix();
+	foreach(Plugin* plugin, l_plugins)
+	{
+		const QList<CGoGN::Utils::GLSLShader*>& shaders = plugin->getShaders();
+		foreach(CGoGN::Utils::GLSLShader* shader, shaders)
+			shader->updateMatrices(pm, mm);
+	}
+
+	QGLViewer::preDraw();
 }
 
 void View::draw()
 {
-	if(m_scene && m_currentCamera)
-		m_scene->draw(this);
+	foreach(Plugin* plugin, l_plugins)
+		plugin->redraw(this);
+}
 
+void View::postDraw()
+{
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-//	if(b_drawButtons)
-//		drawButtons();
-	if(b_drawText)
-		drawText();
+	drawButtons();
+	if(isCurrentView())
+		drawFrame();
 	glPopAttrib();
-}
 
-void View::drawText()
-{
-	glColor3f(1.0f, 1.0f, 1.0f);
-	QGLViewer::drawText(10, 20, m_textInfo);
-}
-
-//void View::drawButtons()
-//{
-//	glColor3f(1.0f,1.0f,1.0f);
-//	glEnable(GL_TEXTURE_2D);
-//	if(b_showButtons)
-//	{
-//		startScreenCoordinatesSystem();
-//		m_buttonArea->draw();
-//		stopScreenCoordinatesSystem();
-//	}
-//	glDisable(GL_TEXTURE_2D);
-//}
-
-void View::keyPressEvent(QKeyEvent* event)
-{
-	m_scene->keyPressEvent(event);
-	QGLViewer::keyPressEvent(event);
-}
-
-void View::keyReleaseEvent(QKeyEvent *e)
-{
-	m_scene->keyReleaseEvent(e);
-	QGLViewer::keyReleaseEvent(e);
-}
-
-void View::mousePressEvent(QMouseEvent* event)
-{
-//	if(m_buttonArea->isClicked(event->x(), event->y()))
-//		m_buttonArea->clickButton(event->x(), event->y());
-//	else
-//	{
-		m_scene->mousePressEvent(event);
-		QGLViewer::mousePressEvent(event);
-//	}
-}
-
-void View::mouseReleaseEvent(QMouseEvent* event)
-{
-	m_scene->mouseReleaseEvent(event);
-	QGLViewer::mouseReleaseEvent(event);
-}
-
-void View::mouseMoveEvent(QMouseEvent* event)
-{
-	m_scene->mouseMoveEvent(event);
-	QGLViewer::mouseMoveEvent(event);
-}
-
-void View::wheelEvent(QWheelEvent* event)
-{
-	m_scene->wheelEvent(event);
-	QGLViewer::wheelEvent(event);
+	QGLViewer::postDraw();
 }
 
 void View::resizeGL(int width, int height)
 {
 	QGLViewer::resizeGL(width, height);
-//	if(m_buttonArea)
-//		m_buttonArea->setTopRightPosition(width, 0);
+	if(m_buttonArea)
+		m_buttonArea->setTopRightPosition(width, 0);
 }
 
-void View::drawOverpaint(QPainter *painter)
+void View::drawButtons()
 {
-	painter->save();
-	painter->setOpacity(0.8);
-    painter->restore();
+	glEnable(GL_TEXTURE_2D);
+	startScreenCoordinatesSystem();
+	m_buttonArea->draw();
+	stopScreenCoordinatesSystem();
+	glDisable(GL_TEXTURE_2D);
 }
 
-//void View::enableLinking(bool b)
-//{
-//	if(m_linkButton)
-//	{
-//		if(b && !m_linkViewEnabled)
-//		{
-//			m_buttonArea->addButton(m_linkButton);
-//			connect(m_linkButton, SIGNAL(clicked()), this, SLOT(linkView()));
-//		}
-//		else if(!b && m_linkViewEnabled)
-//		{
-//			disconnect(m_linkButton, SIGNAL(clicked()), this, SLOT(linkView()));
-//			m_buttonArea->removeButton(m_linkButton);
-//		}
-//	}
-//	m_linkViewEnabled = b;
-//}
-//
-//void View::enableUnlinking(bool b)
-//{
-//	if(m_unlinkButton)
-//	{
-//		if(b && !m_unlinkViewEnabled)
-//		{
-//			m_buttonArea->addButton(m_unlinkButton);
-//			connect(m_unlinkButton, SIGNAL(clicked()), this, SLOT(unlinkView()));
-//		}
-//		else if(!b && m_unlinkViewEnabled)
-//		{
-//			disconnect(m_unlinkButton, SIGNAL(clicked()), this, SLOT(unlinkView()));
-//			m_buttonArea->removeButton(m_unlinkButton);
-//		}
-//	}
-//	m_unlinkViewEnabled = b;
-//}
-//
-//void View::enableCameraGesture(bool b)
-//{
-//	if(m_cameraButton)
-//	{
-//		if(b && !m_cameraEnabled)
-//		{
-//			m_buttonArea->addButton(m_cameraButton);
-//			connect(m_cameraButton, SIGNAL(clicked()), this, SLOT(cameraGesture()));
-//		}
-//		else if(!b && m_cameraEnabled)
-//		{
-//			disconnect(m_cameraButton, SIGNAL(clicked()), this, SLOT(cameraGesture()));
-//			m_buttonArea->removeButton(m_cameraButton);
-//		}
-//	}
-//	m_cameraEnabled = b;
-//}
-//
-//void View::enableSceneCameraGesture(bool b)
-//{
-//	if(m_cameraSceneButton)
-//	{
-//		if(b && !m_cameraSceneEnabled)
-//		{
-//			m_buttonArea->addButton(m_cameraSceneButton);
-//			connect(m_cameraSceneButton, SIGNAL(clicked()), this, SLOT(cameraSceneGesture()));
-//		}
-//		else if(!b && m_cameraSceneEnabled)
-//		{
-//			disconnect(m_cameraSceneButton, SIGNAL(clicked()), this, SLOT(cameraSceneGesture()));
-//			m_buttonArea->removeButton(m_cameraSceneButton);
-//		}
-//	}
-//	m_cameraSceneEnabled = b;
-//}
-//
-//void View::enableViewClose(bool b)
-//{
-//	if(m_closeViewButton)
-//	{
-//		if(b && !m_closeViewEnabled)
-//		{
-//			m_buttonArea->addButton(m_closeViewButton);
-//			connect(m_closeViewButton, SIGNAL(clicked()), this, SLOT(closeView()));
-//		}
-//		else if(!b && m_closeViewEnabled)
-//		{
-//			disconnect(m_closeViewButton, SIGNAL(clicked()), this, SLOT(closeView()));
-//			m_buttonArea->removeButton(m_closeViewButton);
-//		}
-//	}
-//	m_closeViewEnabled = b;
-//}
-
-void View::updateTextInfo()
+void View::drawFrame()
 {
-	m_textInfo = QString("Scene: ") + m_scene->getName() + " > "
-			   + QString("View: ") + this->m_name + " > "
-			   + QString("Camera: ") + m_currentCamera->getName() + (m_currentCamera->isShared() ? " (shared)" : "");
+	startScreenCoordinatesSystem();
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glLineWidth(2.0);
+	glBegin(GL_LINE_LOOP);
+		glVertex2i(1, 1);
+		glVertex2i(1, height()-1);
+		glVertex2i(width()-1, height()-1);
+		glVertex2i(width()-1, 1);
+	glEnd();
+	stopScreenCoordinatesSystem();
 }
 
-glm::mat4 View::getCurrentModelViewMatrix()
+void View::keyPressEvent(QKeyEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->keyPress(this, event->key());
+	QGLViewer::keyPressEvent(event);
+}
+
+void View::keyReleaseEvent(QKeyEvent *event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->keyRelease(this, event->key());
+	QGLViewer::keyReleaseEvent(event);
+}
+
+void View::mousePressEvent(QMouseEvent* event)
+{
+	if(!isCurrentView())
+		m_window->setCurrentView(this);
+
+	if(m_buttonArea->isClicked(event->x(), event->y()))
+		m_buttonArea->clickButton(event->x(), event->y(), event->globalX(), event->globalY());
+	else
+	{
+		foreach(Plugin* plugin, l_plugins)
+			plugin->mousePress(this, event->button(), event->pos().x(), event->pos().y());
+		QGLViewer::mousePressEvent(event);
+	}
+}
+
+void View::mouseReleaseEvent(QMouseEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->mouseRelease(this, event->button(), event->pos().x(), event->pos().y());
+	QGLViewer::mouseReleaseEvent(event);
+}
+
+void View::mouseMoveEvent(QMouseEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->mouseMove(this, event->button(), event->pos().x(), event->pos().y());
+	QGLViewer::mouseMoveEvent(event);
+}
+
+void View::wheelEvent(QWheelEvent* event)
+{
+	foreach(Plugin* plugin, l_plugins)
+		plugin->wheelEvent(this, event->delta(), event->pos().x(), event->pos().y());
+	QGLViewer::wheelEvent(event);
+}
+
+/*********************************************************
+ * MANAGE LINKED CAMERA
+ *********************************************************/
+
+void View::setCurrentCamera(Camera* c)
+{
+	if(c != m_currentCamera && c != NULL)
+	{
+		m_currentCamera = c;
+		this->setCamera(m_currentCamera);
+		updateGL();
+	}
+}
+
+/*********************************************************
+ * MANAGE LINKED PLUGINS
+ *********************************************************/
+
+void View::linkPlugin(Plugin* plugin)
+{
+	if(plugin && !l_plugins.contains(plugin))
+	{
+		l_plugins.push_back(plugin);
+		if(isCurrentView())
+			m_window->enablePluginTabWidgets(plugin);
+	}
+}
+
+void View::unlinkPlugin(Plugin* plugin)
+{
+	l_plugins.removeOne(plugin);
+	if(isCurrentView())
+		m_window->disablePluginTabWidgets(plugin);
+}
+
+/*********************************************************
+ * MANAGE LINKED MAPS
+ *********************************************************/
+
+void View::linkMap(MapHandlerGen* map)
+{
+	if(map && !l_maps.contains(map))
+	{
+		l_maps.push_back(map);
+		foreach(Plugin* plugin, l_plugins)
+			plugin->mapLinked(this, map);
+		updateViewBB();
+	}
+}
+
+void View::unlinkMap(MapHandlerGen* map)
+{
+	l_maps.removeOne(map);
+	foreach(Plugin* plugin, l_plugins)
+		plugin->mapUnlinked(this, map);
+	updateViewBB();
+}
+
+void View::updateViewBB()
+{
+	qglviewer::Vec bbMin(0,0,0);
+	qglviewer::Vec bbMax(1,1,1);
+	if(!l_maps.empty())
+	{
+		bbMin = l_maps[0]->getBBmin();
+		bbMax = l_maps[0]->getBBmax();
+		for(int i = 1; i < l_maps.size(); ++i)
+		{
+			MapHandlerGen* m = l_maps[i];
+			qglviewer::Vec min = m->getBBmin();
+			qglviewer::Vec max = m->getBBmax();
+			for(unsigned int dim = 0; dim < 3; ++dim)
+			{
+				if(min[dim] < bbMin[dim])
+					bbMin[dim] = min[dim];
+				if(max[dim] > bbMax[dim])
+					bbMax[dim] = max[dim];
+			}
+		}
+	}
+	setSceneBoundingBox(bbMin, bbMax);
+	showEntireScene();
+}
+
+/*********************************************************
+ * MANAGE MATRICES
+ *********************************************************/
+
+glm::mat4 View::getCurrentModelViewMatrix() const
 {
 	GLdouble gl_mvm[16];
-	this->camera()->getModelViewMatrix(gl_mvm);
+	camera()->getModelViewMatrix(gl_mvm);
 	glm::mat4 mvm;
 	for(unsigned int i = 0; i < 4; ++i)
 	{
@@ -305,10 +314,10 @@ glm::mat4 View::getCurrentModelViewMatrix()
 	return mvm;
 }
 
-glm::mat4 View::getCurrentProjectionMatrix()
+glm::mat4 View::getCurrentProjectionMatrix() const
 {
 	GLdouble gl_pm[16];
-	this->camera()->getProjectionMatrix(gl_pm);
+	camera()->getProjectionMatrix(gl_pm);
 	glm::mat4 pm;
 	for(unsigned int i = 0; i < 4; ++i)
 	{
@@ -318,10 +327,10 @@ glm::mat4 View::getCurrentProjectionMatrix()
 	return pm;
 }
 
-glm::mat4 View::getCurrentModelViewProjectionMatrix()
+glm::mat4 View::getCurrentModelViewProjectionMatrix() const
 {
 	GLdouble gl_mvpm[16];
-	this->camera()->getModelViewProjectionMatrix(gl_mvpm);
+	camera()->getModelViewProjectionMatrix(gl_mvpm);
 	glm::mat4 mvpm;
 	for(unsigned int i = 0; i < 4; ++i)
 	{
@@ -331,64 +340,61 @@ glm::mat4 View::getCurrentModelViewProjectionMatrix()
 	return mvpm;
 }
 
-void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
+//void View::setCurrentModelViewMatrix(const glm::mat4& mvm)
+//{
+//	GLdouble gl_mvm[16];
+//	for(unsigned int i = 0; i < 4; ++i)
+//	{
+//		for(unsigned int j = 0; j < 4; ++j)
+//			gl_mvm[i*4+j] = mvm[i][j];
+//	}
+//	camera()->setFromModelViewMatrix(gl_mvm);
+//}
+//
+//void View::setCurrentProjectionMatrix(const glm::mat4& pm)
+//{
+//	float gl_pm[12];
+//	for(unsigned int i = 0; i < 3; ++i)
+//	{
+//		for(unsigned int j = 0; j < 4; ++j)
+//			gl_pm[i*3+j] = pm[i][j];
+//	}
+//	camera()->setFromProjectionMatrix(gl_pm);
+//}
+
+void View::cb_cameraView(int x, int y, int globalX, int globalY)
 {
-	GLdouble gl_mvm[16];
-	for(unsigned int i = 0; i < 4; ++i)
-	{
-		for(unsigned int j = 0; j < 4; ++j)
-			gl_mvm[i*4+j] = mvm[i][j];
-	}
-	this->camera()->setFromModelViewMatrix(gl_mvm);
+	m_cameraViewDialog->move(globalX, globalY);
+	m_cameraViewDialog->show();
 }
 
-void View::setCurrentProjectionMatrix(const glm::mat4& pm)
+void View::cb_pluginsView(int x, int y, int globalX, int globalY)
 {
-	float gl_pm[12];
-	for(unsigned int i = 0; i < 3; ++i)
-	{
-		for(unsigned int j = 0; j < 4; ++j)
-			gl_pm[i*3+j] = pm[i][j];
-	}
-	this->camera()->setFromProjectionMatrix(gl_pm);
+	m_pluginsViewDialog->move(globalX, globalY);
+	m_pluginsViewDialog->show();
 }
 
-//void View::linkView()
-//{
-//	m_scene->linkWithPlugin();
-//}
-//
-//void View::unlinkView()
-//{
-//	m_scene->unlinkPlugin();
-//}
-//
-//void View::cameraGesture()
-//{
-//	CameraViewDialog cvd(this, this);
-//	cvd.exec();
-//	updateTextInfo();
-//	enableSceneCameraGesture(l_camera.size() > 1 || m_scene->countViews() > 1);
-//}
-//
-//void View::cameraSceneGesture()
-//{
-//	CameraSceneDialog csd(m_scene);
-//	csd.exec();
-//	updateTextInfo();
-//}
-//
-//void View::closeView()
-//{
-//	b_destroyView = true;
-//}
+void View::cb_mapsView(int x, int y, int globalX, int globalY)
+{
+	m_mapsViewDialog->move(globalX, globalY);
+	m_mapsViewDialog->show();
+}
 
-//void View::addViewButton(ViewButton* viewButton)
-//{
-//	m_buttonArea->addButton(viewButton);
-//}
-//
-//void View::removeViewButton(ViewButton* viewButton)
-//{
-//	m_buttonArea->takeButton(viewButton);
-//}
+void View::cb_closeView(int x, int y, int globalX, int globalY)
+{
+	m_window->removeView(m_name);
+}
+
+void View::cb_VsplitView(int x, int y, int globalX, int globalY)
+{
+	m_window->splitView(m_name, Qt::Horizontal);
+}
+
+void View::cb_HsplitView(int x, int y, int globalX, int globalY)
+{
+	m_window->splitView(m_name, Qt::Vertical);
+}
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

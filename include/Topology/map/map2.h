@@ -436,6 +436,12 @@ public:
 	 */
 	bool foreach_dart_of_face(Dart d, FunctorType& f, unsigned int thread = 0);
 
+	//! Apply a functor on every dart of an face
+	/*! @param d a dart of the volume
+	 *  @param f the functor to apply
+	 */
+	bool foreach_dart_of_volume(Dart d, FunctorType& f, unsigned int thread = 0);
+
 	//! Apply a functor on every dart of a connected component
 	/*! @param d a dart of the connected component
 	 *  @param f the functor to apply

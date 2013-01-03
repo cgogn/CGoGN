@@ -7,6 +7,12 @@
 #include <QVBoxLayout>
 #include <QTextBrowser>
 
+namespace CGoGN
+{
+
+namespace SCHNApps
+{
+
 namespace System
 {
 
@@ -14,9 +20,17 @@ Error::ERROR_CODE Error::code = SUCCESS;
 
 QString Error::parameter = QString("???");
 
-QString app_path = QString();
-
 bool Events::movieDialogOpened = false;
+
+//bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile)
+//{
+//	if(urlHTMLFile.isLocalFile())
+//	{
+//		textBrowser->setSource(urlHTMLFile);
+//		return true;
+//	}
+//	return false;
+//}
 
 void Error::showError(QWidget* parent)
 {
@@ -34,21 +48,18 @@ void Error::showError(QWidget* parent)
 	{
 		message= QString::fromUtf8("ERREUR - NO_SCENE: aucune scène n'a été référencée.\n"
 				"Essayez de charger et/ou d'activer d'autres plugins au préalable");
-
 		break;
 	}
-	case SCENE_UNREFERENCED:
+	case SCENE_DOES_NOT_EXIST:
 	{
-		message= QString::fromUtf8("ERREUR - SCENE_UNREFERENCED: la scène désignée n'existe pas ou n'a pas été référencé.\n"
+		message= QString::fromUtf8("ERREUR - SCENE_DOES_NOT_EXIST: la scène désignée n'existe pas.\n"
 				"Essayez de charger et/ou d'activer d'autres plugins au préalable");
-
 		break;
 	}
 	case SCENE_EXISTS:
 	{
 		message= QString::fromUtf8("ERREUR - SCENE_EXISTS: une Scene de même nom existe déjà.\n"
 				"Un même plugin a peut-être été chargé 2 fois sinon 2 plugins sont incompatibles");
-
 		break;
 	}
 	case NO_DOCK:
@@ -125,7 +136,6 @@ void Error::showError(QWidget* parent)
 		message= QString::fromUtf8("ERREUR - UNSATSIFIED_PLUGIN_DEPENDENCIE: dépendance de plugin instatisfaite.\n"
 				"Une dépendance entre plugin n'a put être satisfaite. Certains plugins ne sont peut-être pas chargés.\n"
 				"Plugin concernés: " ) +  parameter;
-
 		break;
 	}
 	case BAD_ACTION_MENU_PATH:
@@ -134,7 +144,6 @@ void Error::showError(QWidget* parent)
 				"Le chemin indiqué pour la création d'une action dans le menu est mauvais. Peut-être est-il "
 				"vide? Une action doit être encapsulée dans un menu.\n"
 				"Chemin erroné: ") + parameter;
-
 		break;
 	}
 	case MAP_UNREFERENCED:
@@ -143,7 +152,6 @@ void Error::showError(QWidget* parent)
 				"Peut-être que certains plugins n'ont pas été chargés, ou le nom de map spécifié"
 				"est mauvais.\n"
 				"Map inexistante: ") + parameter;
-
 		break;
 	}
 	case MAP_EXISTS:
@@ -151,7 +159,6 @@ void Error::showError(QWidget* parent)
 		message= QString::fromUtf8("ERREUR - MAP_EXISTS: la map existe déjà.\n"
 				"Vous avez essayé de creéer et référencer une map qui l'est déjà.\n"
 				"Map déjà existante: ") + parameter;
-
 		break;
 	}
 	case SHADER_EXISTS:
@@ -160,7 +167,6 @@ void Error::showError(QWidget* parent)
 				"Un shader a essayer d'être référencé sous un nom déjà utilisé dans la vue"
 				"concernée.\n"
 				"Objets concernés: ") + parameter;
-
 		break;
 	}
 	case SHADER_NOT_FOUND:
@@ -169,7 +175,6 @@ void Error::showError(QWidget* parent)
 				"Le programme a essayé d'accéder à un shader non référencé. Le nom de référencement"
 				"était peut-être mauvais\n"
 				"Objets concernés: ") + parameter;
-
 		break;
 	}
 	case VBO_EXISTS:
@@ -178,7 +183,6 @@ void Error::showError(QWidget* parent)
 				"Un vbo a essayer d'être référencé sous un nom déjà utilisé dans la vue"
 				"concernée.\n"
 				"Objets concernés: ") + parameter;
-
 		break;
 	}
 	case VBO_NOT_FOUND:
@@ -187,7 +191,6 @@ void Error::showError(QWidget* parent)
 				"Le programme a essayé d'accéder à un shader non référencé. Le nom de référencement"
 				"était peut-être mauvais\n"
 				"Objets concernés: ") + parameter;
-
 		break;
 	}
 	case TOPO3RENDER_EXISTS:
@@ -196,7 +199,6 @@ void Error::showError(QWidget* parent)
 				"Un topo3Render a essayer d'être référencé sous un nom déjà utilisé dans la vue"
 				"concernée.\n"
 				"Objets concernés: ") + parameter;
-
 		break;
 	}
 	case TOPO3RENDER_NOT_FOUND:
@@ -205,7 +207,6 @@ void Error::showError(QWidget* parent)
 				"Le programme a essayé d'accéder à un topo3Render non référencé. Le nom de référencement"
 				"était peut-être mauvais\n"
 				"Objets concernés: ") + parameter;
-
 		break;
 	}
 	case OPEN_FILE_ERROR:
@@ -224,7 +225,6 @@ void Error::showError(QWidget* parent)
 	}
 	default :{
 		message= QString::fromUtf8("ERREUR - UNKNOWN ERROR: erreur inconnue");
-
 		break;
 	}
 	}
@@ -403,63 +403,57 @@ Error::ERROR_CODE Error::BAD_XML_FILE_f(QString filepath){
 	return BAD_XML_FILE;
 }
 
-void Info::showPluginInfo(QString pluginAbsolutePath, QWidget* parent)
-{
-	QFileInfo fileInfo(pluginAbsolutePath);
-	if(fileInfo.exists())
-	{
-		QString baseName = fileInfo.baseName();
-		QString path = fileInfo.absolutePath();
-		int i = baseName.indexOf("lib");
-		QString newName(baseName);
-		if(i == 0)
-			newName = newName.replace(0,3,"");
-		showPluginInfo(path, newName);
-	}
-	else
-	{
-		QMessageBox msg(parent);
-		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-									  " fournir un fichier d'information pour ce plugin."));
-		msg.exec();
-	}
-}
+//void Info::showPluginInfo(QString pluginAbsolutePath, QWidget* parent)
+//{
+//	QFileInfo fileInfo(pluginAbsolutePath);
+//	if(fileInfo.exists())
+//	{
+//		QString baseName = fileInfo.baseName();
+//		QString path = fileInfo.absolutePath();
+//		int i = baseName.indexOf("lib");
+//		QString newName(baseName);
+//		if(i == 0)
+//			newName = newName.replace(0,3,"");
+//		showPluginInfo(path, newName);
+//	}
+//	else
+//	{
+//		QMessageBox msg(parent);
+//		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
+//									  " fournir un fichier d'information pour ce plugin."));
+//		msg.exec();
+//	}
+//}
 
-void Info::showPluginInfo(QString locationPath, QString pluginName, QWidget* parent)
-{
-	QString newPath = locationPath + "/" + pluginName + ".html";
-
-	QUrl url = QUrl::fromLocalFile(newPath);
-	if(QFileInfo(newPath).exists())
-	{
-		Dialog::InfoDialog id(parent);
-		if(!id.setContent(url))
-		{
-			QMessageBox msg(parent);
-			msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-										  " fournir un fichier d'information pour ce plugin."));
-			msg.exec();
-		}
-		else
-			id.exec();
-	}
-	else
-	{
-		QMessageBox msg(parent);
-		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
-									  " fournir un fichier d'information pour ce plugin."));
-		msg.exec();
-	}
-}
-
-bool Dialog::InfoDialog::setContent(QUrl urlHTMLFile)
-{
-	if(urlHTMLFile.isLocalFile())
-	{
-		textBrowser->setSource(urlHTMLFile);
-		return true;
-	}
-	return false;
-}
+//void Info::showPluginInfo(QString locationPath, QString pluginName, QWidget* parent)
+//{
+//	QString newPath = locationPath + "/" + pluginName + ".html";
+//
+//	QUrl url = QUrl::fromLocalFile(newPath);
+//	if(QFileInfo(newPath).exists())
+//	{
+//		Dialog::InfoDialog id(parent);
+//		if(!id.setContent(url))
+//		{
+//			QMessageBox msg(parent);
+//			msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
+//										  " fournir un fichier d'information pour ce plugin."));
+//			msg.exec();
+//		}
+//		else
+//			id.exec();
+//	}
+//	else
+//	{
+//		QMessageBox msg(parent);
+//		msg.setText(QString::fromUtf8("Le créateur de ce plugin n'a pas jugé utile de"
+//									  " fournir un fichier d'information pour ce plugin."));
+//		msg.exec();
+//	}
+//}
 
 } // namespace System
+
+} // namespace SCHNApps
+
+} // namespace CGoGN

@@ -30,13 +30,15 @@ namespace CGoGN
 
 namespace Utils
 {
+
 #include "shaderExplodeVolumes.vert"
 #include "shaderExplodeVolumes.frag"
 #include "shaderExplodeVolumes.geom"
 
 
 ShaderExplodeVolumes::ShaderExplodeVolumes(bool withColorPerFace, bool withExplodeFace):
-m_wcpf(withColorPerFace), m_wef(withExplodeFace)
+	m_wcpf(withColorPerFace),
+	m_wef(withExplodeFace)
 {
 	m_nameVS = "ShaderExplodeVolumes_vs";
 	m_nameFS = "ShaderExplodeVolumes_fs";
@@ -74,24 +76,32 @@ m_wcpf(withColorPerFace), m_wef(withExplodeFace)
 
 void ShaderExplodeVolumes::getLocations()
 {
+	bind();
 	*m_unif_explodeV  = glGetUniformLocation(program_handler(),"explodeV");
 	*m_unif_explodeF  = glGetUniformLocation(program_handler(),"explodeF");
 	*m_unif_ambiant  = glGetUniformLocation(program_handler(),"ambient");
 	*m_unif_backColor  = glGetUniformLocation(program_handler(),"backColor");
 	*m_unif_lightPos = glGetUniformLocation(program_handler(),"lightPosition");
 	*m_unif_plane   = glGetUniformLocation(program_handler(),"plane");
+	unbind();
 }
 
-void ShaderExplodeVolumes::setAttributePosition(VBO* vbo)
+unsigned int ShaderExplodeVolumes::setAttributePosition(VBO* vbo)
 {
 	m_vboPos = vbo;
-	bindVA_VBO("VertexPosition", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexPosition", vbo);
+	unbind();
+	return id;
 }
 
-void ShaderExplodeVolumes::setAttributeColor(VBO* vbo)
+unsigned int ShaderExplodeVolumes::setAttributeColor(VBO* vbo)
 {
 	m_vboColors = vbo;
-	bindVA_VBO("VertexColor", vbo);
+	bind();
+	unsigned int id = bindVA_VBO("VertexColor", vbo);
+	unbind();
+	return id;
 }
 
 void ShaderExplodeVolumes::setParams(float explV, float explF, const Geom::Vec4f& ambiant, const Geom::Vec4f& backColor, const Geom::Vec3f& lightPos, const Geom::Vec4f& plane)
@@ -112,15 +122,15 @@ void ShaderExplodeVolumes::setParams(float explV, float explF, const Geom::Vec4f
 	m_plane = plane;
 	glUniform4fv(*m_unif_plane,    1, m_plane.data());
 
-	unbind(); // ??
+	unbind();
 }
-
 
 void ShaderExplodeVolumes::setExplodeVolumes(float explode)
 {
 	m_explodeV = explode;
 	bind();
 	glUniform1f(*m_unif_explodeV, explode);
+	unbind();
 }
 
 void ShaderExplodeVolumes::setExplodeFaces(float explode)
@@ -128,14 +138,15 @@ void ShaderExplodeVolumes::setExplodeFaces(float explode)
 	m_explodeF = explode;
 	bind();
 	glUniform1f(*m_unif_explodeF, explode);
+	unbind();
 }
-
 
 void ShaderExplodeVolumes::setAmbiant(const Geom::Vec4f& ambiant)
 {
 	m_ambiant = ambiant;
 	bind();
 	glUniform4fv(*m_unif_ambiant,1, ambiant.data());
+	unbind();
 }
 
 void ShaderExplodeVolumes::setBackColor(const Geom::Vec4f& backColor)
@@ -143,6 +154,7 @@ void ShaderExplodeVolumes::setBackColor(const Geom::Vec4f& backColor)
 	m_backColor = backColor;
 	bind();
 	glUniform4fv(*m_unif_backColor, 1, backColor.data());
+	unbind();
 }
 
 void ShaderExplodeVolumes::setLightPosition(const Geom::Vec3f& lp)
@@ -150,16 +162,16 @@ void ShaderExplodeVolumes::setLightPosition(const Geom::Vec3f& lp)
 	m_light_pos = lp;
 	bind();
 	glUniform3fv(*m_unif_lightPos,1,lp.data());
+	unbind();
 }
-
 
 void ShaderExplodeVolumes::setClippingPlane(const Geom::Vec4f& plane)
 {
 	m_plane = plane;
 	bind();
 	glUniform4fv(*m_unif_plane,1, plane.data());
+	unbind();
 }
-
 
 void ShaderExplodeVolumes::restoreUniformsAttribs()
 {
@@ -185,6 +197,7 @@ void ShaderExplodeVolumes::restoreUniformsAttribs()
 
 	bindVA_VBO("VertexPosition", m_vboPos);
 	bindVA_VBO("VertexColor", m_vboColors);
+
 	unbind();
 }
 
