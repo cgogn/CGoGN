@@ -387,7 +387,7 @@ bool EmbeddedMap2::removeEdgeFromVertex(Dart d)
 		}
 		else
 		{
-			initDartEmbedding<FACE>(d, getEmbedding<FACE>(d)) ;
+			setDartEmbedding<FACE>(d, getEmbedding<FACE>(d)) ;
 		}
 	}
 	return b ;
