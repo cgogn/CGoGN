@@ -376,8 +376,8 @@ public:
 		TraversorW<typename PFP::MAP> trav(m_map) ;
 		for (Dart d = trav.begin(); d != trav.end(); d = trav.next())
 		{
-			//if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d) && !Algo::Modelisation::isPrism<PFP>(m_map,d) && !Algo::Modelisation::isPyra<PFP>(m_map,d))
-			//{
+			if(!Algo::Modelisation::Tetrahedralization::isTetrahedron<PFP>(m_map,d) && !Algo::Modelisation::isPrism<PFP>(m_map,d) && !Algo::Modelisation::isPyra<PFP>(m_map,d))
+			{
 				typename PFP::VEC3 p = Algo::Geometry::volumeCentroid<PFP>(m_map, d, m_position);
 
 				m_map.incCurrentLevel() ;
@@ -386,7 +386,7 @@ public:
 				m_position[midV] = p ;
 
 				m_map.decCurrentLevel() ;
-			//}
+			}
 		}
 	}
 } ;
